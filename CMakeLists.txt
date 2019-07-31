@@ -11,16 +11,22 @@ set(VTK_REQ_COMPONENTS
   IOImage
   IOImport
   IOPLY
+  IOXML
   RenderingAnnotation
   RenderingCore
   RenderingLabel
-  RenderingOpenGL2)
+  RenderingOpenGL2
+)
 
 find_package(VTK COMPONENTS
-    ${VTK_REQ_COMPONENTS}
-    REQUIRED)
+  ${VTK_REQ_COMPONENTS}
+  REQUIRED)
 
-add_executable(f3d main.cxx)
+add_executable(f3d
+  main.cxx
+  ImporterFactory.cxx
+  vtkF3DInteractor.cxx
+)
 
-target_link_libraries(f3d INTERFACE ${VTK_LIBRARIES})
+target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES})
 vtk_module_autoinit(TARGETS f3d MODULES ${VTK_LIBRARIES})
