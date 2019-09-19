@@ -4,15 +4,15 @@
 #include "cxxopts.hpp"
 
 #include "vtkF3DInteractor.h"
+#include "vtkF3DMetaReader.h"
 
 #include <vtkActor.h>
 #include <vtkNew.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkDataSetMapper.h>
 #include <vtkRenderer.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkXMLPolyDataReader.h>
 
 int main(int argc, char **argv)
 {
@@ -54,12 +54,12 @@ int main(int argc, char **argv)
     }
 
     // Read all the data from the file
-    vtkNew<vtkXMLPolyDataReader> reader;
-    reader->SetFileName(result["input"].as<std::string>().c_str());
+    vtkNew<vtkF3DMetaReader> reader;
+    reader->SetFileName(result["input"].as<std::string>());
     reader->Update();
 
     // Visualize
-    vtkNew<vtkPolyDataMapper> mapper;
+    vtkNew<vtkDataSetMapper> mapper;
     mapper->SetInputConnection(reader->GetOutputPort());
 
     vtkNew<vtkActor> actor;

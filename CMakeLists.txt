@@ -26,6 +26,7 @@ add_executable(f3d
   main.cxx
   ImporterFactory.cxx
   vtkF3DInteractor.cxx
+  vtkF3DMetaReader.cxx
 )
 
 target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES})
