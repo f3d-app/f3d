@@ -25,7 +25,7 @@ void vtkF3DMetaReader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-vtkTypeBool vtkF3DMetaReader::ProcessRequest(vtkInformation* request,
+int vtkF3DMetaReader::ProcessRequest(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (!this->InternalReader)
@@ -75,12 +75,9 @@ void vtkF3DMetaReader::SetFileName(std::string fileName)
     if (!readerFound && ext.find(".vt") == 0)
     {
       vtkNew<vtkXMLGenericDataObjectReader> reader;
-      if (reader->CanReadFile(this->FileName))
-      {
-        reader->SetFileName(this->FileName);
-        this->InternalReader = reader;
-        readerFound = true;
-      }
+      reader->SetFileName(this->FileName);
+      this->InternalReader = reader;
+      readerFound = true;
     }
     if (!readerFound && ext == ".ply")
     {

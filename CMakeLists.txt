@@ -4,6 +4,7 @@ project(f3d CXX)
 
 set(VTK_REQ_COMPONENTS
   FiltersGeneral
+  FiltersGeometry
   InteractionStyle
   InteractionWidgets
   IOCityGML
@@ -24,7 +25,7 @@ find_package(VTK COMPONENTS
 
 add_executable(f3d
   main.cxx
-  ImporterFactory.cxx
+  vtkF3DGenericImporter.cxx
   vtkF3DInteractor.cxx
   vtkF3DMetaReader.cxx
 )
