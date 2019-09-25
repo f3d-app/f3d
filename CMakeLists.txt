@@ -17,6 +17,7 @@ set(VTK_REQ_COMPONENTS
   RenderingCore
   RenderingLabel
   RenderingOpenGL2
+  jsoncpp
 )
 
 find_package(VTK COMPONENTS

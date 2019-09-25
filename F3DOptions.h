@@ -23,8 +23,8 @@ public:
   F3DOptions() = default;
   ~F3DOptions() = default;
 
-  void InitializeFromArgs(int argc, char** argv);
-  void InitializeFromFile(const std::string& fname);
+  bool InitializeFromArgs(int argc, char** argv);
+  bool InitializeFromFile(const std::string& fname);
 
   bool Normals = false;
   bool Axis = false;

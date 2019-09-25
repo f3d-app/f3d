@@ -2,8 +2,12 @@
 
 #include "vtkF3DGenericImporter.h"
 
+#include <vtk_jsoncpp.h>
+
+#include <fstream>
+
 //----------------------------------------------------------------------------
-void F3DOptions::InitializeFromArgs(int argc, char** argv)
+bool F3DOptions::InitializeFromArgs(int argc, char** argv)
 {
   try
   {
@@ -38,10 +42,33 @@ void F3DOptions::InitializeFromArgs(int argc, char** argv)
     std::cout << "error parsing options: " << e.what() << std::endl;
     exit(EXIT_FAILURE);
   }
+  return true;
 }
 
 //----------------------------------------------------------------------------
-void F3DOptions::InitializeFromFile(const std::string &fname)
+bool F3DOptions::InitializeFromFile(const std::string &fname)
 {
+  std::ifstream file;
+  file.open(fname.c_str());
 
+  if (!file.is_open())
+  {
+    std::cerr << "Unable to open configuration file " << fname << endl;
+    return false;
+  }
+  Json::CharReaderBuilder builder;
+  builder["collectComments"] = false;
+  Json::Value root;
+  std::string errs;
+  std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+  bool success = Json::parseFromStream(builder, file, &root, &errs);
+  if (!success)
+  {
+    std::cerr << "Unable to parse the configuration file " << fname << endl;
+    return false;
+  }
+
+  // TODO
+
+  return true;
 }
