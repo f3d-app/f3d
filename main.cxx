@@ -3,15 +3,20 @@
 
 #include "cxxopts.hpp"
 
-#include "vtkF3DInteractor.h"
 #include "vtkF3DGenericImporter.h"
+#include "vtkF3DInteractor.h"
+#include "vtkF3DOpenGLGridMapper.h"
 
 #include <vtkActor.h>
 #include <vtkAxesActor.h>
+#include <vtkBoundingBox.h>
 #include <vtkNew.h>
 #include <vtkOrientationMarkerWidget.h>
+#include <vtkPointSource.h>
+#include <vtkProperty.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkRendererCollection.h>
 
 int main(int argc, char **argv)
 {
@@ -25,6 +30,7 @@ int main(int argc, char **argv)
 
     bool normals = false;
     bool axis = false;
+    bool grid = false;
     std::vector<int> size;
 
     options
@@ -33,6 +39,7 @@ int main(int argc, char **argv)
       ("i,input", "Input file", cxxopts::value<std::string>(), "file")
       ("h,help", "Print help")
       ("x,axis", "Show axis", cxxopts::value<bool>(axis))
+      ("g,grid", "Show grid", cxxopts::value<bool>(grid))
       ("s,size", "Window size", cxxopts::value<std::vector<int>>(size)->default_value("1000,600"));
 
     options.parse_positional({"input", "positional"});
@@ -66,6 +73,35 @@ int main(int argc, char **argv)
 
     renderWindow->SetWindowName(title.c_str());
     renderWindow->Render();
+
+    vtkRenderer* firstRenderer = renderWindow->GetRenderers()->GetFirstRenderer();
+
+    if (grid)
+    {
+      firstRenderer->SetClippingRangeExpansion(0.99);
+      firstRenderer->ResetCameraClippingRange();
+
+      double bounds[6];
+      firstRenderer->ComputeVisiblePropBounds(bounds);
+
+      vtkBoundingBox bbox(bounds);
+
+      vtkNew<vtkPointSource> gridPointSource;
+      gridPointSource->SetNumberOfPoints(1);
+      gridPointSource->SetRadius(0);
+      gridPointSource->SetCenter(0, bounds[2], 0);
+
+      vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
+      gridMapper->SetInputConnection(gridPointSource->GetOutputPort());
+      gridMapper->SetFadeDistance(bbox.GetDiagonalLength());
+
+      vtkNew<vtkActor> gridActor;
+      gridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
+      gridActor->SetMapper(gridMapper);
+      firstRenderer->AddActor(gridActor);
+
+      renderWindow->Render();
+    }
 
     vtkNew<vtkOrientationMarkerWidget> widget;
     if (axis)
