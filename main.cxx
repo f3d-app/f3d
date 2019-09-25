@@ -4,13 +4,10 @@
 #include "cxxopts.hpp"
 
 #include "vtkF3DInteractor.h"
-#include "vtkF3DMetaReader.h"
+#include "vtkF3DGenericImporter.h"
 
 #include <vtkActor.h>
 #include <vtkNew.h>
-#include <vtkDataSetMapper.h>
-#include <vtkRenderer.h>
-#include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 
@@ -47,36 +44,20 @@ int main(int argc, char **argv)
       return EXIT_SUCCESS;
     }
 
-    if (result.count("input"))
-    {
-      std::cout << "Input = " << result["input"].as<std::string>()
-                << std::endl;
-    }
-
     // Read all the data from the file
-    vtkNew<vtkF3DMetaReader> reader;
-    reader->SetFileName(result["input"].as<std::string>());
-    reader->Update();
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetFileName(result["input"].as<std::string>().c_str());
+    importer->Update();
 
-    // Visualize
-    vtkNew<vtkDataSetMapper> mapper;
-    mapper->SetInputConnection(reader->GetOutputPort());
+    vtkRenderWindow* renderWindow = importer->GetRenderWindow();
+    renderWindow->SetSize(1000, 600);
 
-    vtkNew<vtkActor> actor;
-    actor->SetMapper(mapper);
-
-    vtkNew<vtkRenderer> renderer;
-    vtkNew<vtkRenderWindow> renderWindow;
-    renderWindow->AddRenderer(renderer);
     vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
     renderWindowInteractor->SetRenderWindow(renderWindow);
     vtkNew<vtkF3DInteractor> interactorStyle;
     renderWindowInteractor->SetInteractorStyle(interactorStyle);
 
-    renderer->AddActor(actor);
-    renderer->SetBackground(.4, .4, .4);
-
-    renderWindow->SetWindowName("f3d");
+    renderWindow->SetWindowName("f3d - The fast 3D viewer");
     renderWindow->Render();
     renderWindowInteractor->Start();
   }

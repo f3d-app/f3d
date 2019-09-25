@@ -1,10 +1,10 @@
-#include <vtkInteractorStyleTrackballActor.h>
+#include <vtkInteractorStyleTrackballCamera.h>
 
-class vtkF3DInteractor : public vtkInteractorStyleTrackballActor
+class vtkF3DInteractor : public vtkInteractorStyleTrackballCamera
 {
 public:
   static vtkF3DInteractor *New();
-  vtkTypeMacro(vtkF3DInteractor, vtkInteractorStyleTrackballActor);
+  vtkTypeMacro(vtkF3DInteractor, vtkInteractorStyleTrackballCamera);
 
   vtkF3DInteractor() = default;
 
