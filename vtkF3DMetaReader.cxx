@@ -1,8 +1,10 @@
 #include "vtkF3DMetaReader.h"
 
 #include <vtkDemandDrivenPipeline.h>
+#include <vtkGLTFReader.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
+#include <vtkOBJReader.h>
 #include <vtkObjectFactory.h>
 #include <vtkPLYReader.h>
 #include <vtkPolyDataReader.h>
@@ -92,6 +94,22 @@ void vtkF3DMetaReader::SetFileName(std::string fileName)
     if (!readerFound && ext == ".stl")
     {
       vtkNew<vtkSTLReader> reader;
+      reader->SetFileName(this->FileName);
+      this->InternalReader = reader;
+      readerFound = true;
+    }
+
+    // we need to use the importers for these file formats
+    if (!readerFound && ext == ".obj")
+    {
+      vtkNew<vtkOBJReader> reader;
+      reader->SetFileName(this->FileName);
+      this->InternalReader = reader;
+      readerFound = true;
+    }
+    if (!readerFound && (ext == ".gltf" || ext == ".glb"))
+    {
+      vtkNew<vtkGLTFReader> reader;
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
       readerFound = true;
