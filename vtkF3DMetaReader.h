@@ -7,7 +7,9 @@
 #ifndef vtkF3DMetaReader_h
 #define vtkF3DMetaReader_h
 
-#include "vtkDataObjectAlgorithm.h"
+#include "Config.h"
+
+#include <vtkDataObjectAlgorithm.h>
 #include <vtkSmartPointer.h>
 
 class vtkF3DMetaReader : public vtkDataObjectAlgorithm

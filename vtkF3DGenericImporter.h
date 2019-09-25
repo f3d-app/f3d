@@ -1,14 +1,3 @@
-/*=========================================================================
-  Program:   Visualization Toolkit
-  Module:    vtkF3DGenericImporter.h
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-=========================================================================*/
 /**
  * @class   vtkF3DGenericImporter
  * @brief   create a scene from the meta reader
@@ -17,9 +6,11 @@
 #ifndef vtkF3DGenericImporter_h
 #define vtkF3DGenericImporter_h
 
-#include <vtkImporter.h>
+#include "Config.h"
 
 #include "vtkF3DMetaReader.h"
+
+#include <vtkImporter.h>
 
 class vtkF3DGenericImporter : public vtkImporter
 {
