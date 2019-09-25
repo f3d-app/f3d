@@ -20,6 +20,7 @@
 #include "vtkLightKit.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkProperty.h"
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkF3DGenericImporter);
@@ -56,6 +57,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   }
 
   vtkNew<vtkActor> actor;
+  actor->GetProperty()->SetInterpolationToPBR();
+  actor->GetProperty()->SetRoughness(0.3);
   actor->SetMapper(mapper);
 
   ren->AddActor(actor);
@@ -73,7 +76,8 @@ void vtkF3DGenericImporter::ImportLights(vtkRenderer* ren)
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ImportProperties(vtkRenderer* ren)
 {
-  ren->SetBackground(.4, .4, .4);
+  ren->SetBackground(.2, .2, .2);
+  ren->UseFXAAOn();
 }
 
 //----------------------------------------------------------------------------
