@@ -13,23 +13,47 @@
 #include "vtkF3DGenericImporter.h"
 
 #include "vtkActor.h"
+#include "vtkAppendPolyData.h"
+#include "vtkDataObjectTreeRange.h"
+#include "vtkDataSetSurfaceFilter.h"
 #include "vtkObjectFactory.h"
 #include "vtkLightKit.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
-#include "vtkGeometryFilter.h"
 
 vtkStandardNewMacro(vtkF3DGenericImporter);
 
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
-  // right now, convert it to a polydata
-  vtkNew<vtkGeometryFilter> geom;
-  geom->SetInputConnection(this->Reader->GetOutputPort());
+  this->Reader->Update();
 
   vtkNew<vtkPolyDataMapper> mapper;
-  mapper->SetInputConnection(geom->GetOutputPort());
+
+  vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(this->Reader->GetOutput());
+  if (mb)
+  {
+    vtkNew<vtkAppendPolyData> append;
+
+    for (vtkDataObject* current : vtk::Range(mb, vtk::DataObjectTreeOptions::SkipEmptyNodes |
+                                                 vtk::DataObjectTreeOptions::TraverseSubTree |
+                                                 vtk::DataObjectTreeOptions::VisitOnlyLeaves))
+    {
+      vtkNew<vtkDataSetSurfaceFilter> geom;
+      geom->SetInputData(current);
+      geom->Update();
+      append->AddInputData(vtkPolyData::SafeDownCast(geom->GetOutput()));
+    }
+
+    mapper->SetInputConnection(append->GetOutputPort());
+  }
+  else
+  {
+    vtkNew<vtkDataSetSurfaceFilter> geom;
+    geom->SetInputConnection(this->Reader->GetOutputPort());
+    mapper->SetInputConnection(geom->GetOutputPort());
+  }
 
   vtkNew<vtkActor> actor;
   actor->SetMapper(mapper);

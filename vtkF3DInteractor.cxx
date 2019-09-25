@@ -8,11 +8,8 @@ vtkStandardNewMacro(vtkF3DInteractor);
 //----------------------------------------------------------------------------
 void vtkF3DInteractor::OnChar()
 {
-}
+  this->Superclass::OnChar();
 
-//----------------------------------------------------------------------------
-void vtkF3DInteractor::OnKeyPress()
-{
   vtkRenderWindowInteractor *rwi = this->GetInteractor();
   char keyCode = rwi->GetKeyCode();
   std::string keyname = rwi->GetKeySym();
@@ -22,8 +19,6 @@ void vtkF3DInteractor::OnKeyPress()
     case 'h':
       cout << "HELP!" << endl;
       break;
-    case 'q':
-      rwi->ExitCallback();
     default:
       break;
   }

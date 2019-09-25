@@ -9,6 +9,4 @@ public:
   vtkF3DInteractor() = default;
 
   void OnChar() override;
-
-  void OnKeyPress() override;
 };
