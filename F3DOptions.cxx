@@ -13,11 +13,28 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
   {
     cxxopts::Options options(argv[0], f3d::AppTitle);
     options
-        .positional_help("input_file")
-        .show_positional_help();
+      .positional_help("input_file")
+      .show_positional_help();
 
     options
-        .add_options()("n,normals", "Show mesh normals", cxxopts::value<bool>(this->Normals))("i,input", "Input file", cxxopts::value<std::string>(), "file")("h,help", "Print help")("x,axis", "Show axis", cxxopts::value<bool>(this->Axis))("g,grid", "Show grid", cxxopts::value<bool>(this->Grid))("s,size", "Window size", cxxopts::value<std::vector<int>>(this->WindowSize)->default_value("1000,600"));
+      .add_options()
+      ("n,normals", "Show mesh normals", cxxopts::value<bool>(this->Normals))
+      ("i,input", "Input file", cxxopts::value<std::string>(), "file")
+      ("h,help", "Print help")
+      ("v,verbose", "Enable verbose mode", cxxopts::value<bool>(this->Verbose))
+      ("x,axis", "Show axis", cxxopts::value<bool>(this->Axis))
+      ("g,grid", "Show grid", cxxopts::value<bool>(this->Grid));
+
+    options
+      .add_options("Window")
+      ("b,bg-color", "Background color", cxxopts::value<std::vector<double>>(this->BackgroundColor)->default_value("0.2,0.2,0.2"))
+      ("r,resolution", "Window resolution", cxxopts::value<std::vector<int>>(this->WindowSize)->default_value("1000,600"));
+
+    options
+      .add_options("PostFX")
+      ("d,depth-peeling", "Enable depth peeling", cxxopts::value<bool>(this->DepthPeeling))
+      ("f,fxaa", "Enable FXAA anti-aliasing", cxxopts::value<bool>(this->FXAA))
+      ("u,ssao", "Enable Screen-Space Ambient Occlusion", cxxopts::value<bool>(this->SSAO));
 
     options.parse_positional({"input", "positional"});
 

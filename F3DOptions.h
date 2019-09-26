@@ -29,7 +29,12 @@ public:
   bool Normals = false;
   bool Axis = false;
   bool Grid = false;
+  bool SSAO = false;
+  bool FXAA = false;
+  bool DepthPeeling = false;
+  bool Verbose = false;
   std::vector<int> WindowSize;
+  std::vector<double> BackgroundColor;
   std::string Input = "";
 };
 
