@@ -76,8 +76,6 @@ void vtkF3DGenericImporter::ImportLights(vtkRenderer* ren)
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ImportProperties(vtkRenderer* ren)
 {
-  ren->SetBackground(.2, .2, .2);
-  ren->UseFXAAOn();
 }
 
 //----------------------------------------------------------------------------

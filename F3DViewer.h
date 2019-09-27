@@ -40,6 +40,8 @@ protected:
 
   void SetupWithOptions();
 
+  void SetupRenderPasses(F3DOptions *options);
+
 protected:
   F3DOptions *Options = nullptr;
   vtkF3DGenericImporter *Importer = nullptr;
