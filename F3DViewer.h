@@ -37,10 +37,9 @@ public:
   void Render();
 
 protected:
-
   void SetupWithOptions();
 
-  void SetupRenderPasses(F3DOptions *options);
+  void SetupRenderPasses();
 
 protected:
   F3DOptions *Options = nullptr;

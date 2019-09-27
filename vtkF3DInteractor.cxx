@@ -22,7 +22,7 @@ void vtkF3DInteractor::OnChar()
   int shift = rwi->GetShiftKey();
   switch (keyCode)
   {
-    case 'a':
+    case 'x':
       this->Viewer->ShowAxis(!this->Viewer->IsAxisVisible());
       this->Viewer->Render();
       break;
