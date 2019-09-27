@@ -7,7 +7,9 @@
 #ifndef vtkF3DOpenGLGridMapper_h
 #define vtkF3DOpenGLGridMapper_h
 
-#include "vtkOpenGLPolyDataMapper.h"
+#include "Config.h"
+
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkSmartPointer.h>
 
 class vtkF3DOpenGLGridMapper : public vtkOpenGLPolyDataMapper

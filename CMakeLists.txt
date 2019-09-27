@@ -17,6 +17,7 @@ set(VTK_REQ_COMPONENTS
   RenderingCore
   RenderingLabel
   RenderingOpenGL2
+  jsoncpp
 )
 
 find_package(VTK COMPONENTS
@@ -29,6 +30,8 @@ add_executable(f3d
   vtkF3DInteractor.cxx
   vtkF3DMetaReader.cxx
   vtkF3DOpenGLGridMapper.cxx
+  F3DOptions.cxx
+  F3DViewer.cxx
 )
 
 target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES})
