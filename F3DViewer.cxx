@@ -36,7 +36,7 @@ F3DViewer::F3DViewer(F3DOptions* options, vtkF3DGenericImporter* importer)
 
   this->Renderer = this->RenderWindow->GetRenderers()->GetFirstRenderer();
 
-  this->SetupRenderPasses(options);
+  this->SetupRenderPasses();
 
   this->Renderer->SetBackground(this->Options->BackgroundColor.data());
 
@@ -47,21 +47,25 @@ F3DViewer::F3DViewer(F3DOptions* options, vtkF3DGenericImporter* importer)
 
   this->RenderWindow->SetSize(this->Options->WindowSize[0], this->Options->WindowSize[1]);
   this->RenderWindow->SetWindowName(f3d::AppTitle.c_str());
+
+  vtkNew<vtkAxesActor> axes;
+  this->AxisWidget->SetOrientationMarker(axes);
+  this->AxisWidget->SetInteractor(this->RenderWindowInteractor);
+  this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
 }
 
 //----------------------------------------------------------------------------
 void F3DViewer::ShowAxis(bool show)
 {
-  vtkNew<vtkAxesActor> axes;
-  this->AxisWidget->SetOrientationMarker(axes);
-  this->AxisWidget->SetInteractor(this->RenderWindowInteractor);
-  this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
-  this->AxisWidget->InteractiveOff();
   this->AxisWidget->SetEnabled(show);
+  if (show)
+  {
+    this->AxisWidget->InteractiveOff();
+  }
 }
 
 //----------------------------------------------------------------------------
-void F3DViewer::SetupRenderPasses(F3DOptions* options)
+void F3DViewer::SetupRenderPasses()
 {
   vtkOpenGLRenderer* renderer = vtkOpenGLRenderer::SafeDownCast(this->Renderer);
 
@@ -77,7 +81,7 @@ void F3DViewer::SetupRenderPasses(F3DOptions* options)
   collection->AddItem(lightsP);
 
   // opaque passes
-  if (options->SSAO)
+  if (this->Options->SSAO)
   {
     double bounds[6];
     this->Renderer->ComputeVisiblePropBounds(bounds);
@@ -98,7 +102,7 @@ void F3DViewer::SetupRenderPasses(F3DOptions* options)
   }
 
   // translucent and volumic passes
-  if (options->DepthPeeling)
+  if (this->Options->DepthPeeling)
   {
     vtkNew<vtkDualDepthPeelingPass> ddpP;
     ddpP->SetTranslucentPass(translucentP);
@@ -114,7 +118,7 @@ void F3DViewer::SetupRenderPasses(F3DOptions* options)
   vtkNew<vtkSequencePass> sequence;
   sequence->SetPasses(collection);
 
-  if (options->FXAA)
+  if (this->Options->FXAA)
   {
     vtkNew<vtkOpenGLFXAAPass> fxaaP;
     fxaaP->SetDelegatePass(sequence);
