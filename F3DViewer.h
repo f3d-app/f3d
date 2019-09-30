@@ -14,6 +14,7 @@
 #include <vtkNew.h>
 #include <vtkOrientationMarkerWidget.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkSmartPointer.h>
 
 class vtkF3DGenericImporter;
 class F3DOptions;
@@ -30,9 +31,11 @@ public:
 
   void ShowAxis(bool show);
   void ShowGrid(bool show);
+  void ShowScalarBar(bool show);
 
   bool IsAxisVisible();
   bool IsGridVisible();
+  bool IsScalarBarVisible();
 
   void Render();
 
@@ -49,6 +52,7 @@ protected:
   vtkRenderer *Renderer = nullptr;
 
   vtkNew<vtkActor> GridActor;
+  vtkSmartPointer<vtkActor2D> ScalarBarActor;
 
   vtkNew<vtkOrientationMarkerWidget> AxisWidget;
   vtkNew<vtkRenderWindowInteractor> RenderWindowInteractor;

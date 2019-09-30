@@ -36,6 +36,11 @@ public:
   std::vector<int> WindowSize;
   std::vector<double> BackgroundColor;
   std::string Input = "";
+  std::string Scalars = "";
+  int Component = -1;
+  bool Cells = false;
+  bool HideBar = false;
+  std::vector<double> Range;
 };
 
 #endif

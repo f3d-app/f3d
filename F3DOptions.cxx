@@ -18,17 +18,25 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
 
     options
       .add_options()
-      ("n,normals", "Show mesh normals", cxxopts::value<bool>(this->Normals))
-      ("i,input", "Input file", cxxopts::value<std::string>(), "file")
+      ("input", "Input file", cxxopts::value<std::string>(), "file")
       ("h,help", "Print help")
       ("v,verbose", "Enable verbose mode", cxxopts::value<bool>(this->Verbose))
       ("x,axis", "Show axis", cxxopts::value<bool>(this->Axis))
-      ("g,grid", "Show grid", cxxopts::value<bool>(this->Grid));
+      ("g,grid", "Show grid", cxxopts::value<bool>(this->Grid))
+      ("n,normals", "Show mesh normals", cxxopts::value<bool>(this->Normals));
 
     options
       .add_options("Window")
-      ("b,bg-color", "Background color", cxxopts::value<std::vector<double>>(this->BackgroundColor)->default_value("0.2,0.2,0.2"))
-      ("r,resolution", "Window resolution", cxxopts::value<std::vector<int>>(this->WindowSize)->default_value("1000,600"));
+      ("bg-color", "Background color", cxxopts::value<std::vector<double>>(this->BackgroundColor)->default_value("0.2,0.2,0.2"))
+      ("resolution", "Window resolution", cxxopts::value<std::vector<int>>(this->WindowSize)->default_value("1000,600"));
+
+    options
+      .add_options("Scientific visualization")
+      ("scalars", "Color by scalars", cxxopts::value<std::string>(this->Scalars)->implicit_value("f3d_reserved"), "array_name")
+      ("comp", "Specify the component used", cxxopts::value<int>(this->Component), "comp_index")
+      ("cells", "The array is located on cells", cxxopts::value<bool>(this->Cells))
+      ("range", "Custom range for the array", cxxopts::value<std::vector<double>>(this->Range), "min,max")
+      ("b,hide-bar", "Hide scalar bar", cxxopts::value<bool>(this->HideBar));
 
     options
       .add_options("PostFX")

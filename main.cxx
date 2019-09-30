@@ -16,6 +16,7 @@ int main(int argc, char **argv)
   // Read all the data from the file
   vtkNew<vtkF3DGenericImporter> importer;
   importer->SetFileName(options.Input.c_str());
+  importer->SetOptions(options);
   importer->Update();
 
   F3DViewer viewer(&options, importer);
