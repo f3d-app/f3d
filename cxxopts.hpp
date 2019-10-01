@@ -1411,14 +1411,7 @@ namespace cxxopts
 
       if (!o.is_boolean)
       {
-        if (o.has_implicit)
-        {
-          result += " [=" + arg + "(=" + toLocalString(o.implicit_value) + ")]";
-        }
-        else
-        {
-          result += " " + arg;
-        }
+        result += " " + arg;
       }
 
       return result;

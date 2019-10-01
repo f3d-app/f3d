@@ -30,6 +30,10 @@ void vtkF3DInteractor::OnChar()
       this->Viewer->ShowGrid(!this->Viewer->IsGridVisible());
       this->Viewer->Render();
       break;
+    case 'b':
+      this->Viewer->ShowScalarBar(!this->Viewer->IsScalarBarVisible());
+      this->Viewer->Render();
+      break;
     default:
       break;
   }

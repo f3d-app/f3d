@@ -6,6 +6,7 @@
 #include "vtkF3DOpenGLGridMapper.h"
 
 #include <vtkActor.h>
+#include <vtkActor2DCollection.h>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCameraPass.h>
@@ -14,6 +15,7 @@
 #include <vtkOpaquePass.h>
 #include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderer.h>
+#include <vtkOverlayPass.h>
 #include <vtkPointSource.h>
 #include <vtkProperty.h>
 #include <vtkRenderPassCollection.h>
@@ -52,6 +54,18 @@ F3DViewer::F3DViewer(F3DOptions* options, vtkF3DGenericImporter* importer)
   this->AxisWidget->SetOrientationMarker(axes);
   this->AxisWidget->SetInteractor(this->RenderWindowInteractor);
   this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
+
+  vtkActor2DCollection* actors = this->Renderer->GetActors2D();
+  actors->InitTraversal();
+  vtkActor2D* currentActor;
+  while ((currentActor = actors->GetNextActor2D()) != nullptr)
+  {
+    if (currentActor->IsA("vtkScalarBarActor"))
+    {
+      this->ScalarBarActor = currentActor;
+      break;
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -73,9 +87,7 @@ void F3DViewer::SetupRenderPasses()
   vtkNew<vtkOpaquePass> opaqueP;
   vtkNew<vtkTranslucentPass> translucentP;
   vtkNew<vtkVolumetricPass> volumeP;
-
-  vtkNew<vtkCameraPass> cameraP;
-  cameraP->SetDelegatePass(opaqueP);
+  vtkNew<vtkOverlayPass> overlayP;
 
   vtkNew<vtkRenderPassCollection> collection;
   collection->AddItem(lightsP);
@@ -88,17 +100,20 @@ void F3DViewer::SetupRenderPasses()
 
     vtkBoundingBox bbox(bounds);
 
+    vtkNew<vtkCameraPass> ssaoCamP;
+    ssaoCamP->SetDelegatePass(opaqueP);
+
     vtkNew<vtkSSAOPass> ssaoP;
     ssaoP->SetRadius(0.1 * bbox.GetDiagonalLength());
     ssaoP->SetBias(0.001 * bbox.GetDiagonalLength());
     ssaoP->SetKernelSize(200);
-    ssaoP->SetDelegatePass(cameraP);
+    ssaoP->SetDelegatePass(ssaoCamP);
 
     collection->AddItem(ssaoP);
   }
   else
   {
-    collection->AddItem(cameraP);
+    collection->AddItem(opaqueP);
   }
 
   // translucent and volumic passes
@@ -115,19 +130,24 @@ void F3DViewer::SetupRenderPasses()
     collection->AddItem(volumeP);
   }
 
+  collection->AddItem(overlayP);
+
   vtkNew<vtkSequencePass> sequence;
   sequence->SetPasses(collection);
+
+  vtkNew<vtkCameraPass> cameraP;
+  cameraP->SetDelegatePass(sequence);
 
   if (this->Options->FXAA)
   {
     vtkNew<vtkOpenGLFXAAPass> fxaaP;
-    fxaaP->SetDelegatePass(sequence);
+    fxaaP->SetDelegatePass(cameraP);
 
     renderer->SetPass(fxaaP);
   }
   else
   {
-    renderer->SetPass(sequence);
+    renderer->SetPass(cameraP);
   }
 }
 
@@ -158,6 +178,7 @@ void F3DViewer::ShowGrid(bool show)
   gridMapper->SetFadeDistance(bbox.GetDiagonalLength());
 
   this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
+  this->GridActor->ForceTranslucentOn();
   this->GridActor->SetMapper(gridMapper);
 
   this->Renderer->RemoveActor(this->GridActor);
@@ -170,6 +191,21 @@ void F3DViewer::ShowGrid(bool show)
 bool F3DViewer::IsGridVisible()
 {
   return this->GridActor->GetVisibility();
+}
+
+//----------------------------------------------------------------------------
+void F3DViewer::ShowScalarBar(bool show)
+{
+  if (this->ScalarBarActor)
+  {
+    this->ScalarBarActor->SetVisibility(show);
+  }
+}
+
+//----------------------------------------------------------------------------
+bool F3DViewer::IsScalarBarVisible()
+{
+  return this->ScalarBarActor && this->ScalarBarActor->GetVisibility();
 }
 
 //----------------------------------------------------------------------------

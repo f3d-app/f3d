@@ -12,6 +12,8 @@
 
 #include <vtkImporter.h>
 
+class F3DOptions;
+
 class vtkF3DGenericImporter : public vtkImporter
 {
 public:
@@ -25,6 +27,11 @@ public:
    */
   void SetFileName(const char* arg);
 
+  /**
+   * Set options.
+   */
+  void SetOptions(const F3DOptions& options);
+
 protected:
   vtkF3DGenericImporter() = default;
   ~vtkF3DGenericImporter() override = default;
@@ -34,6 +41,8 @@ protected:
   void ImportProperties(vtkRenderer*) override;
 
   vtkNew<vtkF3DMetaReader> Reader;
+
+  const F3DOptions* Options = nullptr;
 
 private:
   vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;
