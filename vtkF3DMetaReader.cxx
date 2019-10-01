@@ -1,9 +1,12 @@
 #include "vtkF3DMetaReader.h"
 
+#include <vtkDICOMImageReader.h>
 #include <vtkDemandDrivenPipeline.h>
 #include <vtkGLTFReader.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
+#include <vtkMetaImageReader.h>
+#include <vtkNrrdReader.h>
 #include <vtkOBJReader.h>
 #include <vtkObjectFactory.h>
 #include <vtkPLYReader.h>
@@ -23,12 +26,12 @@ vtkF3DMetaReader::vtkF3DMetaReader()
 //----------------------------------------------------------------------------
 void vtkF3DMetaReader::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------
-int vtkF3DMetaReader::ProcessRequest(vtkInformation* request,
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkF3DMetaReader::ProcessRequest(
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (!this->InternalReader)
   {
@@ -94,6 +97,27 @@ void vtkF3DMetaReader::SetFileName(std::string fileName)
     if (!readerFound && ext == ".stl")
     {
       vtkNew<vtkSTLReader> reader;
+      reader->SetFileName(this->FileName);
+      this->InternalReader = reader;
+      readerFound = true;
+    }
+    if (!readerFound && ext == ".dcm")
+    {
+      vtkNew<vtkDICOMImageReader> reader;
+      reader->SetFileName(this->FileName);
+      this->InternalReader = reader;
+      readerFound = true;
+    }
+    if (!readerFound && (ext == ".nrrd" || ext == ".nhdr"))
+    {
+      vtkNew<vtkNrrdReader> reader;
+      reader->SetFileName(this->FileName);
+      this->InternalReader = reader;
+      readerFound = true;
+    }
+    if (!readerFound && (ext == ".mha" || ext == ".mhd"))
+    {
+      vtkNew<vtkMetaImageReader> reader;
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
       readerFound = true;
