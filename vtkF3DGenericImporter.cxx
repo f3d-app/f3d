@@ -90,27 +90,53 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       cout << nbPointData << " point data array(s)\n";
       for (vtkIdType i = 0; i < nbPointData; i++)
       {
-        cout << " #" << i << " '" << pointData->GetArray(i)->GetName() << "'\n";
+        vtkDataArray* array = pointData->GetArray(i);
+        cout << " #" << i << " '" << array->GetName() << "': " << array->GetNumberOfComponents()
+             << " comp.\n";
       }
 
       cout << nbCellData << " cell data array(s)\n";
       for (vtkIdType i = 0; i < nbCellData; i++)
       {
-        cout << " #" << i << " '" << cellData->GetArray(i)->GetName() << "'\n";
+        vtkDataArray* array = cellData->GetArray(i);
+        cout << " #" << i << " '" << array->GetName() << "': " << array->GetNumberOfComponents()
+             << " comp.\n";
       }
     }
 
-    if (!this->Options->Scalars.empty())
+    std::string usedArray = this->Options->Scalars;
+
+    if (usedArray == "f3d_reserved")
+    {
+      vtkDataArray* array = nullptr;
+      if (this->Options->Cells)
+      {
+        array = cellData->GetScalars();
+      }
+      else
+      {
+        array = pointData->GetScalars();
+      }
+
+      if (array)
+      {
+        usedArray = array->GetName();
+        cout << "Using default scalar array: " << usedArray << endl;
+      }
+      else
+      {
+        usedArray = "";
+        cout << "No default scalar array, please specify an array name." << endl;
+      }
+    }
+
+    if (!usedArray.empty())
     {
       mapper->ScalarVisibilityOn();
       mapper->InterpolateScalarsBeforeMappingOn();
-
-      if (this->Options->Scalars != "f3d_reserved")
-      {
-        mapper->SelectColorArray(this->Options->Scalars.c_str());
-        mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
-                                                   : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-      }
+      mapper->SelectColorArray(usedArray.c_str());
+      mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
+                                                 : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
 
       vtkScalarsToColors* lut = mapper->GetLookupTable();
 
@@ -131,8 +157,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       else
       {
         vtkDataArray* array = this->Options->Cells
-          ? cellData->GetArray(this->Options->Scalars.c_str())
-          : pointData->GetArray(this->Options->Scalars.c_str());
+          ? cellData->GetArray(usedArray.c_str())
+          : pointData->GetArray(usedArray.c_str());
 
         if (array)
         {
@@ -142,9 +168,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
         }
       }
 
-      lut->Build();
-
-      std::string title = this->Options->Scalars;
+      std::string title = usedArray;
       if (this->Options->Component >= 0)
       {
         title += " (";
@@ -167,6 +191,10 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       scalarBar->SetVisibility(!this->Options->HideBar);
 
       ren->AddActor2D(scalarBar);
+    }
+    else
+    {
+      mapper->ScalarVisibilityOff();
     }
   }
 }
