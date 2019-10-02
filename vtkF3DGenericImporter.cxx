@@ -17,7 +17,7 @@
 #include "vtkActor.h"
 #include "vtkAppendPolyData.h"
 #include "vtkCellData.h"
-#include "vtkDataObjectTreeRange.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkLightKit.h"
 #include "vtkMultiBlockDataSet.h"
@@ -43,13 +43,16 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   {
     vtkNew<vtkAppendPolyData> append;
 
-    for (vtkDataObject* current :
-      vtk::Range(mb,
-        vtk::DataObjectTreeOptions::SkipEmptyNodes | vtk::DataObjectTreeOptions::TraverseSubTree |
-          vtk::DataObjectTreeOptions::VisitOnlyLeaves))
+    vtkSmartPointer<vtkDataObjectTreeIterator> iter;
+    iter.TakeReference(vtkDataObjectTreeIterator::SafeDownCast(mb->NewIterator()));
+    iter->VisitOnlyLeavesOn();
+    iter->SkipEmptyNodesOn();
+    iter->TraverseSubTreeOn();
+
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
       vtkNew<vtkDataSetSurfaceFilter> geom;
-      geom->SetInputData(current);
+      geom->SetInputData(iter->GetCurrentDataObject());
       geom->Update();
       append->AddInputData(vtkPolyData::SafeDownCast(geom->GetOutput()));
     }
@@ -64,9 +67,12 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   }
 
   vtkNew<vtkActor> actor;
+  actor->SetMapper(mapper);
+
+#if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
   actor->GetProperty()->SetInterpolationToPBR();
   actor->GetProperty()->SetRoughness(0.3);
-  actor->SetMapper(mapper);
+#endif
 
   ren->AddActor(actor);
 

@@ -3,21 +3,22 @@ cmake_minimum_required(VERSION 3.1)
 project(f3d CXX)
 
 set(VTK_REQ_COMPONENTS
-  FiltersGeneral
-  FiltersGeometry
-  InteractionStyle
-  InteractionWidgets
-  IOCityGML
-  IOGeometry
-  IOImage
-  IOImport
-  IOPLY
-  IOXML
-  RenderingAnnotation
-  RenderingCore
-  RenderingLabel
-  RenderingOpenGL2
-  jsoncpp
+  vtkFiltersGeneral
+  vtkFiltersGeometry
+  vtkInteractionStyle
+  vtkInteractionWidgets
+  vtkIOCityGML
+  vtkIOGeometry
+  vtkIOImage
+  vtkIOImport
+  vtkIOPLY
+  vtkIOXML
+  vtkRenderingAnnotation
+  vtkRenderingCore
+  vtkRenderingLabel
+  vtkRenderingOpenGL2
+  vtkjsoncpp
+  QUIET
 )
 
 find_package(VTK COMPONENTS
@@ -34,5 +35,15 @@ add_executable(f3d
   F3DViewer.cxx
 )
 
-target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES})
-vtk_module_autoinit(TARGETS f3d MODULES ${VTK_LIBRARIES})
+target_compile_definitions(f3d
+  PRIVATE VTK_VERSION_MAJOR=${VTK_VERSION_MAJOR}
+  PRIVATE VTK_VERSION_MINOR=${VTK_VERSION_MINOR}
+)
+
+if(${VTK_VERSION} VERSION_LESS 8.90.0)
+  include(${VTK_USE_FILE})
+  target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES})
+else()
+  target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES})
+  vtk_module_autoinit(TARGETS f3d MODULES ${VTK_LIBRARIES})
+endif()

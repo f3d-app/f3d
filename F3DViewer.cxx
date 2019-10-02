@@ -10,10 +10,8 @@
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCameraPass.h>
-#include <vtkDualDepthPeelingPass.h>
 #include <vtkLightsPass.h>
 #include <vtkOpaquePass.h>
-#include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOverlayPass.h>
 #include <vtkPointSource.h>
@@ -23,10 +21,15 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
-#include <vtkSSAOPass.h>
 #include <vtkSequencePass.h>
 #include <vtkTranslucentPass.h>
 #include <vtkVolumetricPass.h>
+
+#if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
+#include <vtkDualDepthPeelingPass.h>
+#include <vtkOpenGLFXAAPass.h>
+#include <vtkSSAOPass.h>
+#endif
 
 //----------------------------------------------------------------------------
 F3DViewer::F3DViewer(F3DOptions* options, vtkF3DGenericImporter* importer)
@@ -81,6 +84,7 @@ void F3DViewer::ShowAxis(bool show)
 //----------------------------------------------------------------------------
 void F3DViewer::SetupRenderPasses()
 {
+#if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
   vtkOpenGLRenderer* renderer = vtkOpenGLRenderer::SafeDownCast(this->Renderer);
 
   vtkNew<vtkLightsPass> lightsP;
@@ -149,6 +153,10 @@ void F3DViewer::SetupRenderPasses()
   {
     renderer->SetPass(cameraP);
   }
+#else
+  this->Renderer->SetUseFXAA(this->Options->FXAA);
+  this->Renderer->SetUseDepthPeeling(this->Options->DepthPeeling);
+#endif
 }
 
 //----------------------------------------------------------------------------
