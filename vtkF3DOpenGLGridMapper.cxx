@@ -79,6 +79,8 @@ void vtkF3DOpenGLGridMapper::PrintSelf(ostream& os, vtkIndent indent)
 void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
+  this->ReplaceShaderRenderPass(shaders, ren, actor, true);
+
   std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
   std::string FSSource = shaders[vtkShader::Fragment]->GetSource();
 
@@ -92,9 +94,12 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "in vec4 positionMCGSOutput;\n"
     "uniform float fadeDist;\n");
 
-  vtkShaderProgram::Substitute(FSSource, "  //VTK::Color::Impl",
+  // fwidth must be computed for all fragments to avoid artifacts with early returns
+  vtkShaderProgram::Substitute(FSSource, "  //VTK::UniformFlow::Impl",
     "  vec2 coord = positionMCGSOutput.xz / positionMCGSOutput.w;\n"
-    "  vec2 grid = abs(fract(coord - 0.5) - 0.5) / fwidth(coord);\n"
+    "  vec2 grid = abs(fract(coord - 0.5) - 0.5) / fwidth(coord);\n");
+
+  vtkShaderProgram::Substitute(FSSource, "  //VTK::Color::Impl",
     "  float line = min(grid.x, grid.y);\n"
     "  float dist2 = coord.x * coord.x + coord.y * coord.y;\n"
     "  float ratio = max(0.0, (1.0 - min(line, 1.0)) * (1.0 - dist2 / (fadeDist * fadeDist)));\n"
@@ -109,6 +114,9 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
 
   // add color uniforms declaration
   this->ReplaceShaderColor(shaders, ren, actor);
+
+  // for depth peeling
+  this->ReplaceShaderRenderPass(shaders, ren, actor, false);
 }
 
 //----------------------------------------------------------------------------
