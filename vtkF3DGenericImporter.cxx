@@ -102,6 +102,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
         cout << " #" << i << " '" << array->GetName() << "': " << array->GetNumberOfComponents()
              << " comp.\n";
       }
+
+      cout.flush();
     }
 
     std::string usedArray = this->Options->Scalars;
