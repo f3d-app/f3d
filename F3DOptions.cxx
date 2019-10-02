@@ -41,8 +41,10 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
     options
       .add_options("PostFX")
       ("d,depth-peeling", "Enable depth peeling", cxxopts::value<bool>(this->DepthPeeling))
-      ("f,fxaa", "Enable FXAA anti-aliasing", cxxopts::value<bool>(this->FXAA))
-      ("u,ssao", "Enable Screen-Space Ambient Occlusion", cxxopts::value<bool>(this->SSAO));
+#if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
+      ("u,ssao", "Enable Screen-Space Ambient Occlusion", cxxopts::value<bool>(this->SSAO))
+#endif
+      ("f,fxaa", "Enable FXAA anti-aliasing", cxxopts::value<bool>(this->FXAA));
 
     options.parse_positional({"input", "positional"});
 

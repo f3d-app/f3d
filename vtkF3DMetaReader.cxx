@@ -2,7 +2,6 @@
 
 #include <vtkDICOMImageReader.h>
 #include <vtkDemandDrivenPipeline.h>
-#include <vtkGLTFReader.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkMetaImageReader.h>
@@ -14,6 +13,10 @@
 #include <vtkSTLReader.h>
 #include <vtkXMLGenericDataObjectReader.h>
 #include <vtksys/SystemTools.hxx>
+
+#if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
+#include <vtkGLTFReader.h>
+#endif
 
 vtkStandardNewMacro(vtkF3DMetaReader);
 
@@ -131,6 +134,8 @@ void vtkF3DMetaReader::SetFileName(std::string fileName)
       this->InternalReader = reader;
       readerFound = true;
     }
+
+#if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
     if (!readerFound && (ext == ".gltf" || ext == ".glb"))
     {
       vtkNew<vtkGLTFReader> reader;
@@ -138,5 +143,6 @@ void vtkF3DMetaReader::SetFileName(std::string fileName)
       this->InternalReader = reader;
       readerFound = true;
     }
+#endif
   }
 }
