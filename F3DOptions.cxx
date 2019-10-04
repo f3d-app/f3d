@@ -19,6 +19,11 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
     options
       .add_options()
       ("input", "Input file", cxxopts::value<std::string>(), "file")
+      ("o,output", "Output file", cxxopts::value<std::string>(this->Output), "png file")
+#ifdef F3D_TESTING
+      ("ref", "Reference image (for testing)", cxxopts::value<std::string>(this->Reference), "png file")
+      ("ref-threshold", "Testing threshold", cxxopts::value<double>(this->RefThreshold), "threshold")
+#endif
       ("h,help", "Print help")
       ("v,verbose", "Enable verbose mode", cxxopts::value<bool>(this->Verbose))
       ("x,axis", "Show axis", cxxopts::value<bool>(this->Axis))
