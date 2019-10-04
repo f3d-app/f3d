@@ -5,6 +5,7 @@ project(f3d CXX)
 set(VTK_REQ_COMPONENTS
   vtkFiltersGeneral
   vtkFiltersGeometry
+  vtkImagingCore
   vtkInteractionStyle
   vtkInteractionWidgets
   vtkIOCityGML
@@ -46,4 +47,29 @@ if(${VTK_VERSION} VERSION_LESS 8.90.0)
 else()
   target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES})
   vtk_module_autoinit(TARGETS f3d MODULES ${VTK_LIBRARIES})
+endif()
+
+option(BUILD_TESTING OFF)
+
+if(BUILD_TESTING)
+  enable_testing()
+  target_compile_definitions(f3d
+    PRIVATE F3D_TESTING=1
+  )
+
+  function(f3d_test name input args)
+    separate_arguments(args)
+    add_test(NAME ${name}
+             COMMAND ${CMAKE_BUILD_DIR}/f3d
+               ${args}
+               --ref ${CMAKE_SOURCE_DIR}/data/baselines/${name}.png
+               ${CMAKE_SOURCE_DIR}/data/${input})
+  endfunction()
+
+  f3d_test(TestPLY suzanne.ply "--resolution 300,300")
+  f3d_test(TestOBJ suzanne.obj "--resolution 300,300")
+  f3d_test(TestSTL suzanne.stl "--resolution 300,300")
+  f3d_test(TestVTU dragon.vtu "--resolution 300,300")
+  f3d_test(TestGrid suzanne.ply "-g --resolution 300,300")
+  f3d_test(TestAxis suzanne.ply "-x --resolution 300,300")
 endif()

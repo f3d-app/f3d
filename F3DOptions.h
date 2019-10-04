@@ -36,6 +36,9 @@ public:
   std::vector<int> WindowSize;
   std::vector<double> BackgroundColor;
   std::string Input = "";
+  std::string Reference = "";
+  double RefThreshold = 0.1;
+  std::string Output = "";
   std::string Scalars = "";
   int Component = -1;
   bool Cells = false;

@@ -10,10 +10,13 @@
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCameraPass.h>
+#include <vtkImageDifference.h>
 #include <vtkLightsPass.h>
 #include <vtkOpaquePass.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOverlayPass.h>
+#include <vtkPNGReader.h>
+#include <vtkPNGWriter.h>
 #include <vtkPointSource.h>
 #include <vtkProperty.h>
 #include <vtkRenderPassCollection.h>
@@ -24,6 +27,7 @@
 #include <vtkSequencePass.h>
 #include <vtkTranslucentPass.h>
 #include <vtkVolumetricPass.h>
+#include <vtkWindowToImageFilter.h>
 
 #if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
 #include <vtkDualDepthPeelingPass.h>
@@ -221,16 +225,51 @@ void F3DViewer::SetupWithOptions()
 {
   this->ShowGrid(this->Options->Grid);
   this->ShowAxis(this->Options->Axis);
-
-  this->Render();
 }
 
 //----------------------------------------------------------------------------
-void F3DViewer::Start()
+int F3DViewer::Start()
 {
   this->SetupWithOptions();
 
+  if (!this->Options->Output.empty() || !this->Options->Reference.empty())
+  {
+    vtkNew<vtkWindowToImageFilter> rtW2if;
+    rtW2if->SetInput(this->RenderWindow);
+
+    this->RenderWindow->OffScreenRenderingOn();
+    this->Render();
+
+    if (!this->Options->Output.empty())
+    {
+      vtkNew<vtkPNGWriter> writer;
+      writer->SetInputConnection(rtW2if->GetOutputPort());
+      writer->SetFileName(this->Options->Output.c_str());
+      writer->Write();
+
+      return EXIT_SUCCESS;
+    }
+
+    vtkNew<vtkPNGReader> reader;
+    reader->SetFileName(this->Options->Reference.c_str());
+
+    vtkNew<vtkImageDifference> diff;
+    diff->SetInputConnection(rtW2if->GetOutputPort());
+    diff->SetImageConnection(reader->GetOutputPort());
+    diff->Update();
+
+    double error = diff->GetThresholdedError();
+    if (error > this->Options->RefThreshold)
+    {
+      cerr << "Compare failing with error = " << error << endl;
+      return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
+  }
+
+  this->Render();
   this->RenderWindowInteractor->Start();
+  return EXIT_SUCCESS;
 }
 
 //----------------------------------------------------------------------------

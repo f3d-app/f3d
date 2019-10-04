@@ -27,7 +27,7 @@ public:
   F3DViewer(F3DOptions *options, vtkF3DGenericImporter *importer);
   ~F3DViewer() = default;
 
-  void Start();
+  int Start();
 
   void ShowAxis(bool show);
   void ShowGrid(bool show);
