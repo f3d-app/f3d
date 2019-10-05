@@ -2,7 +2,18 @@ cmake_minimum_required(VERSION 3.1)
 
 project(f3d CXX)
 
-set(VTK_REQ_COMPONENTS
+# CMake variables
+option(BUILD_TESTING OFF)
+
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+
+set(VTK_REQUIRED_VERSION "8.2.0" CACHE STRING "VTK target version")
+set_property(CACHE VTK_REQUIRED_VERSION PROPERTY STRINGS "8.2.0" "8.90.0")
+message(${VTK_REQUIRED_VERSION})
+
+# VTK dependency
+find_package(VTK ${VTK_REQUIRED_VERSION} EXACT COMPONENTS
   vtkFiltersGeneral
   vtkFiltersGeometry
   vtkImagingCore
@@ -20,10 +31,6 @@ set(VTK_REQ_COMPONENTS
   vtkRenderingOpenGL2
   vtkjsoncpp
   QUIET
-)
-
-find_package(VTK COMPONENTS
-  ${VTK_REQ_COMPONENTS}
   REQUIRED)
 
 add_executable(f3d
@@ -48,8 +55,6 @@ else()
   target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES})
   vtk_module_autoinit(TARGETS f3d MODULES ${VTK_LIBRARIES})
 endif()
-
-option(BUILD_TESTING OFF)
 
 if(BUILD_TESTING)
   enable_testing()
