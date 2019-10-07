@@ -1,0 +1,70 @@
+cache:
+  paths:
+    - build/
+
+stages:
+  - build
+  - test
+  - package
+
+build:linux:vtk8.2:
+  stage: build
+  script:
+    - mkdir -p build
+    - cd build
+    - cmake -DBUILD_TESTING=ON ..
+    - cmake --build .
+  tags:
+    - linux
+    - vtk-8.2
+
+build:linux:vtk8.90:
+  stage: build
+  script:
+    - mkdir -p build
+    - cd build
+    - cmake -DVTK_REQUIRED_VERSION=8.90.0 -DBUILD_TESTING=ON ..
+    - cmake --build .
+  tags:
+    - linux
+    - vtk-8.90
+
+build:windows:vtk8.2:
+  stage: build
+  script:
+    - md -Force build
+    - cd build
+    - cmake -A x64 -DBUILD_TESTING=ON ..
+    - cmake --build . --config Release
+  tags:
+    - windows
+    - vtk-8.2
+
+build:windows:vtk8.90:
+  stage: build
+  script:
+    - md -Force build
+    - cd build
+    - cmake -A x64 -DVTK_REQUIRED_VERSION="8.90.0" -DBUILD_TESTING=ON ..
+    - cmake --build . --config Release
+  tags:
+    - windows
+    - vtk-8.90
+
+test:linux:
+  stage: test
+  script:
+    - cd build
+    - ctest --output-on-failure
+  tags:
+    - linux
+    - vtk-8.90
+
+test:windows:
+  stage: test
+  script:
+    - cd build
+    - ctest -C Release --output-on-failure
+  tags:
+    - windows
+    - vtk-8.90

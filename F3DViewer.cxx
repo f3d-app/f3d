@@ -259,9 +259,9 @@ int F3DViewer::Start()
     diff->Update();
 
     double error = diff->GetThresholdedError();
+    cout << "Diff threshold error = " << error << endl;
     if (error > this->Options->RefThreshold)
     {
-      cerr << "Compare failing with error = " << error << endl;
       return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
