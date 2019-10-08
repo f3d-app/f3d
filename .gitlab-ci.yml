@@ -7,64 +7,72 @@ stages:
   - test
   - package
 
-build:linux:vtk8.2:
+# Build stage
+
+.build-linux:
   stage: build
   script:
-    - mkdir -p build
-    - cd build
-    - cmake -DBUILD_TESTING=ON ..
-    - cmake --build .
+    - cmake $ADDITIONAL_VARIABLES -DBUILD_TESTING=ON -Bbuild .
+    - cmake --build build
+
+.build-windows:
+  stage: build
+  script:
+    - cmake -A x64 $env:ADDITIONAL_VARIABLES -DBUILD_TESTING=ON -Bbuild .
+    - cmake --build build --config Release
+
+build-linux-vtk8.2:
+  extends: .build-linux
+  variables:
+    ADDITIONAL_VARIABLES: -DVTK_REQUIRED_VERSION=8.2.0
+    CMAKE_BUILD_PARALLEL_LEVEL: 4
   tags:
     - linux
     - vtk-8.2
 
-build:linux:vtk8.90:
-  stage: build
-  script:
-    - mkdir -p build
-    - cd build
-    - cmake -DVTK_REQUIRED_VERSION=8.90.0 -DBUILD_TESTING=ON ..
-    - cmake --build .
+build-linux-vtk8.90:
+  extends: .build-linux
+  variables:
+    ADDITIONAL_VARIABLES: -DVTK_REQUIRED_VERSION=8.90.0
+    CMAKE_BUILD_PARALLEL_LEVEL: 4
   tags:
     - linux
     - vtk-8.90
 
-build:windows:vtk8.2:
-  stage: build
-  script:
-    - md -Force build
-    - cd build
-    - cmake -A x64 -DBUILD_TESTING=ON ..
-    - cmake --build . --config Release
+build-windows-vtk8.2:
+  extends: .build-windows
+  variables:
+    ADDITIONAL_VARIABLES: -DVTK_REQUIRED_VERSION="8.2.0"
+    CMAKE_BUILD_PARALLEL_LEVEL: 4
   tags:
     - windows
     - vtk-8.2
 
-build:windows:vtk8.90:
-  stage: build
-  script:
-    - md -Force build
-    - cd build
-    - cmake -A x64 -DVTK_REQUIRED_VERSION="8.90.0" -DBUILD_TESTING=ON ..
-    - cmake --build . --config Release
+build-windows-vtk8.90:
+  extends: .build-windows
+  variables:
+    ADDITIONAL_VARIABLES: -DVTK_REQUIRED_VERSION="8.90.0"
+    CMAKE_BUILD_PARALLEL_LEVEL: 4
   tags:
     - windows
     - vtk-8.90
 
-test:linux:
+# Test stage
+
+.test:
   stage: test
   script:
     - cd build
-    - ctest --output-on-failure
+    - ctest -C Release --output-on-failure -j8
+
+test-linux:
+  extends: .test
   tags:
     - linux
     - vtk-8.90
 
-test:windows:
-  stage: test
-  script:
-    - cd build
-    - ctest -C Release --output-on-failure
+test-windows:
+  extends: .test
   tags:
     - windows
     - vtk-8.90

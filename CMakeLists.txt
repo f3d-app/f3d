@@ -12,6 +12,7 @@ endif()
 
 set(VTK_REQUIRED_VERSION "8.2.0" CACHE STRING "VTK target version")
 set_property(CACHE VTK_REQUIRED_VERSION PROPERTY STRINGS "8.2.0" "8.90.0")
+message("Building with VTK ${VTK_REQUIRED_VERSION}")
 
 # VTK dependency
 find_package(VTK ${VTK_REQUIRED_VERSION} EXACT COMPONENTS
