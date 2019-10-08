@@ -28,6 +28,11 @@ public:
   //@}
 
   /**
+   * Returns true if the internal reader is correctly initialized.
+   */
+  bool IsReaderValid() { return this->InternalReader != nullptr; }
+
+  /**
    * Transfer to the InternalReader
    */
   int ProcessRequest(vtkInformation*,
