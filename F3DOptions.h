@@ -33,6 +33,7 @@ public:
   bool FXAA = false;
   bool DepthPeeling = false;
   bool Verbose = false;
+  bool Importer = false;
   std::vector<int> WindowSize;
   std::vector<double> BackgroundColor;
   std::string Input = "";

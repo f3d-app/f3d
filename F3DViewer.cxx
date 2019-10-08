@@ -2,7 +2,6 @@
 
 #include "F3DOptions.h"
 
-#include "vtkF3DGenericImporter.h"
 #include "vtkF3DOpenGLGridMapper.h"
 
 #include <vtkActor.h>
@@ -11,6 +10,7 @@
 #include <vtkBoundingBox.h>
 #include <vtkCameraPass.h>
 #include <vtkImageDifference.h>
+#include <vtkImporter.h>
 #include <vtkLightsPass.h>
 #include <vtkOpaquePass.h>
 #include <vtkOpenGLRenderer.h>
@@ -36,7 +36,7 @@
 #endif
 
 //----------------------------------------------------------------------------
-F3DViewer::F3DViewer(F3DOptions* options, vtkF3DGenericImporter* importer)
+F3DViewer::F3DViewer(F3DOptions* options, vtkImporter* importer)
 {
   this->Options = options;
   this->Importer = importer;

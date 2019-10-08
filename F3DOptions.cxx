@@ -28,7 +28,8 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
       ("v,verbose", "Enable verbose mode", cxxopts::value<bool>(this->Verbose))
       ("x,axis", "Show axis", cxxopts::value<bool>(this->Axis))
       ("g,grid", "Show grid", cxxopts::value<bool>(this->Grid))
-      ("n,normals", "Show mesh normals", cxxopts::value<bool>(this->Normals));
+      ("n,normals", "Show mesh normals", cxxopts::value<bool>(this->Normals))
+      ("i,importer", "Use dedicated importer when possible", cxxopts::value<bool>(this->Importer));
 
     options
       .add_options("Window")
