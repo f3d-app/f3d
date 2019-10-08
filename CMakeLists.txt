@@ -5,12 +5,13 @@ project(f3d CXX)
 # CMake variables
 option(BUILD_TESTING OFF)
 
-set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
-set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+endif()
 
 set(VTK_REQUIRED_VERSION "8.2.0" CACHE STRING "VTK target version")
 set_property(CACHE VTK_REQUIRED_VERSION PROPERTY STRINGS "8.2.0" "8.90.0")
-message(${VTK_REQUIRED_VERSION})
 
 # VTK dependency
 find_package(VTK ${VTK_REQUIRED_VERSION} EXACT COMPONENTS
@@ -77,4 +78,5 @@ if(BUILD_TESTING)
   f3d_test(TestVTU dragon.vtu "--resolution 300,300")
   f3d_test(TestGrid suzanne.ply "-g --resolution 300,300")
   f3d_test(TestAxis suzanne.ply "-x --resolution 300,300")
+  f3d_test(TestPointCloud pointsCloud.vtp "--resolution 300,300")
 endif()
