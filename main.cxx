@@ -6,6 +6,10 @@
 
 #include "vtkF3DGenericImporter.h"
 
+#include <vtkGLTFImporter.h>
+#include <vtkOBJImporter.h>
+#include <vtk3DSImporter.h>
+#include <vtkVRMLImporter.h>
 #include <vtkNew.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -20,12 +24,79 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  // Read all the data from the file
-  vtkNew<vtkF3DGenericImporter> importer;
-  importer->SetFileName(options.Input.c_str());
-  importer->SetOptions(options);
-  importer->Update();
+  vtkSmartPointer<vtkImporter> importer;
+  bool importerFound = false;
+  std::string fileName = options.Input.c_str();
 
+  if (options.Importer)
+  {
+    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(fileName);
+
+    if (!importerFound && ext == ".3ds")
+    {
+      vtk3DSImporter* localImporter = vtk3DSImporter::New();
+      localImporter->SetFileName(fileName.c_str());
+      localImporter->SetComputeNormals(options.Normals);
+      importer.TakeReference(localImporter);
+      importerFound = true;
+    }
+
+    if (!importerFound && ext == ".obj")
+    {
+      vtkOBJImporter* localImporter = vtkOBJImporter::New();
+      localImporter->SetFileName(fileName.c_str());
+
+      std::string path = vtksys::SystemTools::GetFilenamePath(fileName);
+      localImporter->SetTexturePath(path.c_str());
+
+      // This logic is partially implemented in the OBJ importer itself
+      // This complete version should be backported.
+      std::string mtlFile = fileName + ".mtl";
+      if (vtksys::SystemTools::FileExists(mtlFile))
+      {
+        localImporter->SetFileNameMTL(mtlFile.c_str());
+      }
+      else
+      {
+        mtlFile = path + "/" + vtksys::SystemTools::GetFilenameWithoutLastExtension(fileName) + ".mtl";
+        if (vtksys::SystemTools::FileExists(mtlFile))
+        {
+          localImporter->SetFileNameMTL(mtlFile.c_str());
+        }
+      }
+
+      importer.TakeReference(localImporter);
+      importerFound = true;
+    }
+
+    if (!importerFound && ext == ".wrl")
+    {
+      vtkVRMLImporter* localImporter = vtkVRMLImporter::New();
+      localImporter->SetFileName(fileName.c_str());
+      importer.TakeReference(localImporter);
+      importerFound = true;
+    }
+
+#if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
+    if (!importerFound && (ext == ".gltf" || ext == ".glb"))
+    {
+      vtkGLTFImporter* localImporter = vtkGLTFImporter::New();
+      localImporter->SetFileName(fileName.c_str());
+      importer.TakeReference(localImporter);
+      importerFound = true;
+    }
+#endif
+  }
+
+  if (!importerFound)
+  {
+    vtkF3DGenericImporter* localImporter = vtkF3DGenericImporter::New();
+    localImporter->SetFileName(fileName.c_str());
+    localImporter->SetOptions(options);
+    importer.TakeReference(localImporter);
+  }
+
+  importer->Update();
   F3DViewer viewer(&options, importer);
   return viewer.Start();
 }

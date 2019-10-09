@@ -38,7 +38,8 @@ int vtkF3DMetaReader::ProcessRequest(
 {
   if (!this->InternalReader)
   {
-    vtkErrorMacro("InternalReader has not been created yet, make sure to set the FileName first");
+    vtkErrorMacro("InternalReader has not been created yet, "
+      "make sure to set to use a supported file format and to set the FileName");
     return 0;
   }
 
@@ -50,7 +51,8 @@ int vtkF3DMetaReader::FillOutputPortInformation(int port, vtkInformation* info)
 {
   if (!this->InternalReader)
   {
-    vtkErrorMacro("InternalReader has not been created yet, make sure to set the FileName first");
+    vtkErrorMacro("InternalReader has not been created yet, "
+      "make sure to set to use a supported file format and to set the FileName");
     return 0;
   }
 
@@ -144,5 +146,10 @@ void vtkF3DMetaReader::SetFileName(std::string fileName)
       readerFound = true;
     }
 #endif
+
+    if (!readerFound)  
+    {
+      vtkErrorMacro(<< this->FileName << " format is not supported");
+    }
   }
 }

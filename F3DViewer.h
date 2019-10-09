@@ -16,15 +16,15 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSmartPointer.h>
 
-class vtkF3DGenericImporter;
 class F3DOptions;
-class vtkRenderer;
+class vtkImporter;
 class vtkRenderWindow;
+class vtkRenderer;
 
 class F3DViewer
 {
 public:
-  F3DViewer(F3DOptions *options, vtkF3DGenericImporter *importer);
+  F3DViewer(F3DOptions *options, vtkImporter *importer);
   ~F3DViewer() = default;
 
   int Start();
@@ -46,7 +46,7 @@ protected:
 
 protected:
   F3DOptions *Options = nullptr;
-  vtkF3DGenericImporter *Importer = nullptr;
+  vtkImporter *Importer = nullptr;
 
   vtkRenderWindow *RenderWindow = nullptr;
   vtkRenderer *Renderer = nullptr;
