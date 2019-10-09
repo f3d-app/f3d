@@ -18,12 +18,8 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
 
     options
       .add_options()
-      ("input", "Input file", cxxopts::value<std::string>(), "file")
-      ("o,output", "Output file", cxxopts::value<std::string>(this->Output), "png file")
-#ifdef F3D_TESTING
-      ("ref", "Reference image (for testing)", cxxopts::value<std::string>(this->Reference), "png file")
-      ("ref-threshold", "Testing threshold", cxxopts::value<double>(this->RefThreshold), "threshold")
-#endif
+      ("input", "Input file", cxxopts::value<std::string>(), "<file>")
+      ("o,output", "Render to file", cxxopts::value<std::string>(this->Output), "<png file>")
       ("h,help", "Print help")
       ("v,verbose", "Enable verbose mode", cxxopts::value<bool>(this->Verbose))
       ("x,axis", "Show axis", cxxopts::value<bool>(this->Axis))
@@ -38,10 +34,10 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
 
     options
       .add_options("Scientific visualization")
-      ("scalars", "Color by scalars", cxxopts::value<std::string>(this->Scalars)->implicit_value("f3d_reserved"), "array_name")
-      ("comp", "Specify the component used", cxxopts::value<int>(this->Component), "comp_index")
+      ("scalars", "Color by scalars", cxxopts::value<std::string>(this->Scalars)->implicit_value("f3d_reserved"), "<array_name>")
+      ("comp", "Specify the component used", cxxopts::value<int>(this->Component), "<comp_index>")
       ("cells", "The array is located on cells", cxxopts::value<bool>(this->Cells))
-      ("range", "Custom range for the array", cxxopts::value<std::vector<double>>(this->Range), "min,max")
+      ("range", "Custom range for the array", cxxopts::value<std::vector<double>>(this->Range), "<min,max>")
       ("b,hide-bar", "Hide scalar bar", cxxopts::value<bool>(this->HideBar));
 
     options
@@ -51,6 +47,13 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
       ("u,ssao", "Enable Screen-Space Ambient Occlusion", cxxopts::value<bool>(this->SSAO))
 #endif
       ("f,fxaa", "Enable FXAA anti-aliasing", cxxopts::value<bool>(this->FXAA));
+
+#ifdef F3D_TESTING
+    options
+      .add_options("Testing")
+      ("ref", "Reference image (for testing)", cxxopts::value<std::string>(this->Reference), "<png file>")
+      ("ref-threshold", "Testing threshold", cxxopts::value<double>(this->RefThreshold), "<threshold>");
+#endif
 
     options.parse_positional({"input", "positional"});
 

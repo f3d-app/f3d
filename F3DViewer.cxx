@@ -108,16 +108,23 @@ void F3DViewer::SetupRenderPasses()
 
     vtkBoundingBox bbox(bounds);
 
-    vtkNew<vtkCameraPass> ssaoCamP;
-    ssaoCamP->SetDelegatePass(opaqueP);
+    if (bbox.IsValid())
+    {
+      vtkNew<vtkCameraPass> ssaoCamP;
+      ssaoCamP->SetDelegatePass(opaqueP);
 
-    vtkNew<vtkSSAOPass> ssaoP;
-    ssaoP->SetRadius(0.1 * bbox.GetDiagonalLength());
-    ssaoP->SetBias(0.001 * bbox.GetDiagonalLength());
-    ssaoP->SetKernelSize(200);
-    ssaoP->SetDelegatePass(ssaoCamP);
+      vtkNew<vtkSSAOPass> ssaoP;
+      ssaoP->SetRadius(0.1 * bbox.GetDiagonalLength());
+      ssaoP->SetBias(0.001 * bbox.GetDiagonalLength());
+      ssaoP->SetKernelSize(200);
+      ssaoP->SetDelegatePass(ssaoCamP);
 
-    collection->AddItem(ssaoP);
+      collection->AddItem(ssaoP);
+    }
+    else
+    {
+      collection->AddItem(opaqueP);
+    }
   }
   else
   {
@@ -180,22 +187,28 @@ void F3DViewer::ShowGrid(bool show)
 
   vtkBoundingBox bbox(bounds);
 
-  vtkNew<vtkPointSource> gridPointSource;
-  gridPointSource->SetNumberOfPoints(1);
-  gridPointSource->SetRadius(0);
-  gridPointSource->SetCenter(0, bounds[2], 0);
+  if (bbox.IsValid())
+  {
+    vtkNew<vtkPointSource> gridPointSource;
+    gridPointSource->SetNumberOfPoints(1);
+    gridPointSource->SetRadius(0);
+    gridPointSource->SetCenter(0, bounds[2], 0);
 
-  vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
-  gridMapper->SetInputConnection(gridPointSource->GetOutputPort());
-  gridMapper->SetFadeDistance(bbox.GetDiagonalLength());
+    vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
+    gridMapper->SetInputConnection(gridPointSource->GetOutputPort());
+    gridMapper->SetFadeDistance(bbox.GetDiagonalLength());
 
-  this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
-  this->GridActor->ForceTranslucentOn();
-  this->GridActor->SetMapper(gridMapper);
+    this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
+    this->GridActor->ForceTranslucentOn();
+    this->GridActor->SetMapper(gridMapper);
 
-  this->Renderer->RemoveActor(this->GridActor);
-  this->Renderer->AddActor(this->GridActor);
-
+    this->Renderer->RemoveActor(this->GridActor);
+    this->Renderer->AddActor(this->GridActor);
+  }
+  else
+  {
+    show = false;
+  }
   this->GridActor->SetVisibility(show);
 }
 
