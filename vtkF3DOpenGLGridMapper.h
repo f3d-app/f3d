@@ -25,8 +25,10 @@ public:
   vtkSetMacro(UnitSquare, double);
   vtkGetMacro(UnitSquare, double);
 
+  double* GetBounds() override;
+
 protected:
-  vtkF3DOpenGLGridMapper() = default;
+  vtkF3DOpenGLGridMapper();
   ~vtkF3DOpenGLGridMapper() = default;
 
   void ReplaceShaderValues(
@@ -34,6 +36,13 @@ protected:
 
   void SetMapperShaderParameters(
     vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* actor) override;
+
+  void BuildBufferObjects(vtkRenderer* ren, vtkActor* act) override;
+
+  void RenderPiece(vtkRenderer* ren, vtkActor* actor) override;
+
+  bool GetNeedToRebuildShaders(
+    vtkOpenGLHelper &cellBO, vtkRenderer *ren, vtkActor *act) override;
 
   double FadeDistance = 10.0;
   double UnitSquare = 1.0;

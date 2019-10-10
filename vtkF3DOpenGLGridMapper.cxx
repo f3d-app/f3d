@@ -1,73 +1,22 @@
 #include "vtkF3DOpenGLGridMapper.h"
 
+#include <vtkFloatArray.h>
 #include <vtkObjectFactory.h>
+#include <vtkOpenGLError.h>
+#include <vtkOpenGLRenderWindow.h>
+#include <vtkOpenGLVertexArrayObject.h>
+#include <vtkOpenGLVertexBufferObjectGroup.h>
+#include <vtkRenderer.h>
 #include <vtkShaderProgram.h>
 
 vtkStandardNewMacro(vtkF3DOpenGLGridMapper);
 
-const char* geometryShader = R"glsl(//VTK::System::Dec
-// VTK::PositionVC::Dec// VTK::TCoord::Dec
-
-layout(points) in;
-layout(triangle_strip, max_vertices = 12) out;
-
-in vec4 positionMCVSOutput[];
-out vec4 positionMCGSOutput;
-
-uniform mat4 MCDCMatrix;
-
-void main()
+//----------------------------------------------------------------------------
+vtkF3DOpenGLGridMapper::vtkF3DOpenGLGridMapper()
 {
-  vec4 center = positionMCVSOutput[0];
-  vec4 corner1 = vec4(1.0, 0.0, 0.0, 0.0);
-  vec4 corner2 = vec4(0.0, 0.0, 1.0, 0.0);
-  vec4 corner3 = vec4(-1.0, 0.0, 0.0, 0.0);
-  vec4 corner4 = vec4(0.0, 0.0, -1.0, 0.0);
-
-  positionMCGSOutput = center;
-  gl_Position = MCDCMatrix * center;
-  EmitVertex();
-  positionMCGSOutput = corner1;
-  gl_Position = MCDCMatrix * corner1;
-  EmitVertex();
-  positionMCGSOutput = corner2;
-  gl_Position = MCDCMatrix * corner2;
-  EmitVertex();
-  EndPrimitive();
-
-  positionMCGSOutput = center;
-  gl_Position = MCDCMatrix * center;
-  EmitVertex();
-  positionMCGSOutput = corner2;
-  gl_Position = MCDCMatrix * corner2;
-  EmitVertex();
-  positionMCGSOutput = corner3;
-  gl_Position = MCDCMatrix * corner3;
-  EmitVertex();
-  EndPrimitive();
-
-  positionMCGSOutput = center;
-  gl_Position = MCDCMatrix * center;
-  EmitVertex();
-  positionMCGSOutput = corner3;
-  gl_Position = MCDCMatrix * corner3;
-  EmitVertex();
-  positionMCGSOutput = corner4;
-  gl_Position = MCDCMatrix * corner4;
-  EmitVertex();
-  EndPrimitive();
-
-  positionMCGSOutput = center;
-  gl_Position = MCDCMatrix * center;
-  EmitVertex();
-  positionMCGSOutput = corner4;
-  gl_Position = MCDCMatrix * corner4;
-  EmitVertex();
-  positionMCGSOutput = corner1;
-  gl_Position = MCDCMatrix * corner1;
-  EmitVertex();
-  EndPrimitive();
-})glsl";
+  this->SetNumberOfInputPorts(0);
+  this->StaticOn();
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DOpenGLGridMapper::PrintSelf(ostream& os, vtkIndent indent)
@@ -87,17 +36,18 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
   vtkShaderProgram::Substitute(
     VSSource, "//VTK::PositionVC::Dec", "out vec4 positionMCVSOutput;\n");
 
-  vtkShaderProgram::Substitute(
-    VSSource, "//VTK::PositionVC::Impl", "positionMCVSOutput = vertexMC;\n");
+  vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
+    "positionMCVSOutput = vec4(vertexMC.x, 0.0, vertexMC.y, 1.0);\n"
+    "gl_Position = MCDCMatrix * positionMCVSOutput;\n");
 
   vtkShaderProgram::Substitute(FSSource, "//VTK::PositionVC::Dec",
-    "in vec4 positionMCGSOutput;\n"
+    "in vec4 positionMCVSOutput;\n"
     "uniform float fadeDist;\n"
     "uniform float unitSquare;\n");
 
   // fwidth must be computed for all fragments to avoid artifacts with early returns
   vtkShaderProgram::Substitute(FSSource, "  //VTK::UniformFlow::Impl",
-    "  vec2 coord = positionMCGSOutput.xz / (unitSquare * positionMCGSOutput.w);\n"
+    "  vec2 coord = positionMCVSOutput.xz / (unitSquare * positionMCVSOutput.w);\n"
     "  vec2 grid = abs(fract(coord - 0.5) - 0.5) / fwidth(coord);\n");
 
   vtkShaderProgram::Substitute(FSSource, "  //VTK::Color::Impl",
@@ -110,7 +60,6 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "  gl_FragData[0] = vec4(color, opacity);\n");
 
   shaders[vtkShader::Vertex]->SetSource(VSSource);
-  shaders[vtkShader::Geometry]->SetSource(geometryShader);
   shaders[vtkShader::Fragment]->SetSource(FSSource);
 
   // add camera uniforms declaration
@@ -127,8 +76,71 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
 void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
   vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* actor)
 {
-  this->Superclass::SetMapperShaderParameters(cellBO, ren, actor);
+  if (this->VBOs->GetMTime() > cellBO.AttributeUpdateTime ||
+    cellBO.ShaderSourceTime > cellBO.AttributeUpdateTime)
+  {
+    cellBO.VAO->Bind();
+    this->VBOs->AddAllAttributesToVAO(cellBO.Program, cellBO.VAO);
+
+    cellBO.AttributeUpdateTime.Modified();
+  }
 
   cellBO.Program->SetUniformf("fadeDist", this->FadeDistance);
   cellBO.Program->SetUniformf("unitSquare", this->UnitSquare);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DOpenGLGridMapper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act)
+{
+  double origin[3] = {};
+
+  vtkNew<vtkFloatArray> infinitePlane;
+  infinitePlane->SetNumberOfComponents(2);
+  infinitePlane->SetNumberOfTuples(4);
+
+  float d = static_cast<float>(this->FadeDistance);
+  float corner1[] = { -d, -d };
+  float corner2[] = { d, -d };
+  float corner3[] = { -d, d };
+  float corner4[] = { d, d };
+
+  infinitePlane->SetTuple(0, corner1);
+  infinitePlane->SetTuple(1, corner2);
+  infinitePlane->SetTuple(2, corner3);
+  infinitePlane->SetTuple(3, corner4);
+
+  vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow());
+  vtkOpenGLVertexBufferObjectCache* cache = renWin->GetVBOCache();
+
+  this->VBOs->CacheDataArray("vertexMC", infinitePlane, cache, VTK_FLOAT);
+  this->VBOs->BuildAllVBOs(cache);
+
+  vtkOpenGLCheckErrorMacro("failed after BuildBufferObjects");
+
+  this->VBOBuildTime.Modified();
+}
+
+//-----------------------------------------------------------------------------
+double* vtkF3DOpenGLGridMapper::GetBounds()
+{
+  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = -this->FadeDistance;
+  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = this->FadeDistance;
+  return this->Bounds;
+}
+
+//-----------------------------------------------------------------------------
+void vtkF3DOpenGLGridMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
+{
+  // Update/build/etc the shader.
+  this->UpdateBufferObjects(ren, actor);
+  this->UpdateShaders(this->Primitives[PrimitivePoints], ren, actor);
+
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+//-----------------------------------------------------------------------------
+bool vtkF3DOpenGLGridMapper::GetNeedToRebuildShaders(
+  vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* act)
+{
+  return cellBO.Program == nullptr;
 }
