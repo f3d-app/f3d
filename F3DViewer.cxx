@@ -194,9 +194,18 @@ void F3DViewer::ShowGrid(bool show)
     gridPointSource->SetRadius(0);
     gridPointSource->SetCenter(0, bounds[2], 0);
 
+    double diag = bbox.GetDiagonalLength();
+    double unitSquare = pow(10.0, round(log10(diag * 0.1)));
+
+    if (this->Options->Verbose)
+    {
+      cout << "Using grid unit square size = " << unitSquare << endl;
+    }
+
     vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
     gridMapper->SetInputConnection(gridPointSource->GetOutputPort());
-    gridMapper->SetFadeDistance(bbox.GetDiagonalLength());
+    gridMapper->SetFadeDistance(diag);
+    gridMapper->SetUnitSquare(unitSquare);
 
     this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
     this->GridActor->ForceTranslucentOn();
