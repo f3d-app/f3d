@@ -92,18 +92,22 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
 
   vtkShaderProgram::Substitute(FSSource, "//VTK::PositionVC::Dec",
     "in vec4 positionMCGSOutput;\n"
-    "uniform float fadeDist;\n");
+    "uniform float fadeDist;\n"
+    "uniform float unitSquare;\n");
 
   // fwidth must be computed for all fragments to avoid artifacts with early returns
   vtkShaderProgram::Substitute(FSSource, "  //VTK::UniformFlow::Impl",
-    "  vec2 coord = positionMCGSOutput.xz / positionMCGSOutput.w;\n"
+    "  vec2 coord = positionMCGSOutput.xz / (unitSquare * positionMCGSOutput.w);\n"
     "  vec2 grid = abs(fract(coord - 0.5) - 0.5) / fwidth(coord);\n");
 
   vtkShaderProgram::Substitute(FSSource, "  //VTK::Color::Impl",
     "  float line = min(grid.x, grid.y);\n"
-    "  float dist2 = coord.x * coord.x + coord.y * coord.y;\n"
-    "  float ratio = max(0.0, (1.0 - min(line, 1.0)) * (1.0 - dist2 / (fadeDist * fadeDist)));\n"
-    "  gl_FragData[0] = vec4(diffuseColorUniform, ratio);\n");
+    "  float dist2 = unitSquare * unitSquare * (coord.x * coord.x + coord.y * coord.y);\n"
+    "  float opacity = (1.0 - min(line, 1.0)) * (1.0 - dist2 / (fadeDist * fadeDist));\n"
+    "  vec3 color = diffuseColorUniform;\n"
+    "  if (abs(coord.x) < 0.1 && grid.y != line) color = vec3(0.0, 0.0, 1.0);\n"
+    "  if (abs(coord.y) < 0.1 && grid.x != line) color = vec3(1.0, 0.0, 0.0);\n"
+    "  gl_FragData[0] = vec4(color, opacity);\n");
 
   shaders[vtkShader::Vertex]->SetSource(VSSource);
   shaders[vtkShader::Geometry]->SetSource(geometryShader);
@@ -126,4 +130,5 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
   this->Superclass::SetMapperShaderParameters(cellBO, ren, actor);
 
   cellBO.Program->SetUniformf("fadeDist", this->FadeDistance);
+  cellBO.Program->SetUniformf("unitSquare", this->UnitSquare);
 }

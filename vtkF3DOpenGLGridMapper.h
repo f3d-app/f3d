@@ -22,6 +22,9 @@ public:
   vtkSetMacro(FadeDistance, double);
   vtkGetMacro(FadeDistance, double);
 
+  vtkSetMacro(UnitSquare, double);
+  vtkGetMacro(UnitSquare, double);
+
 protected:
   vtkF3DOpenGLGridMapper() = default;
   ~vtkF3DOpenGLGridMapper() = default;
@@ -33,6 +36,7 @@ protected:
     vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* actor) override;
 
   double FadeDistance = 10.0;
+  double UnitSquare = 1.0;
 
 private:
   vtkF3DOpenGLGridMapper(const vtkF3DOpenGLGridMapper&) = delete;
