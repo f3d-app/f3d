@@ -17,7 +17,6 @@
 #include <vtkOverlayPass.h>
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
-#include <vtkPointSource.h>
 #include <vtkProperty.h>
 #include <vtkRenderPassCollection.h>
 #include <vtkRenderWindow.h>
@@ -189,11 +188,6 @@ void F3DViewer::ShowGrid(bool show)
 
   if (bbox.IsValid())
   {
-    vtkNew<vtkPointSource> gridPointSource;
-    gridPointSource->SetNumberOfPoints(1);
-    gridPointSource->SetRadius(0);
-    gridPointSource->SetCenter(0, bounds[2], 0);
-
     double diag = bbox.GetDiagonalLength();
     double unitSquare = pow(10.0, round(log10(diag * 0.1)));
 
@@ -203,12 +197,12 @@ void F3DViewer::ShowGrid(bool show)
     }
 
     vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
-    gridMapper->SetInputConnection(gridPointSource->GetOutputPort());
     gridMapper->SetFadeDistance(diag);
     gridMapper->SetUnitSquare(unitSquare);
 
     this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
     this->GridActor->ForceTranslucentOn();
+    this->GridActor->SetPosition(0, bounds[2], 0);
     this->GridActor->SetMapper(gridMapper);
 
     this->Renderer->RemoveActor(this->GridActor);
