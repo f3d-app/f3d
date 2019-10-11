@@ -31,6 +31,7 @@ int main(int argc, char **argv)
   if (options.Importer)
   {
     std::string ext = vtksys::SystemTools::GetFilenameLastExtension(fileName);
+    ext = vtksys::SystemTools::LowerCase(ext);
 
     if (!importerFound && ext == ".3ds")
     {

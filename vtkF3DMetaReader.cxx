@@ -73,6 +73,7 @@ void vtkF3DMetaReader::SetFileName(std::string fileName)
   if (time != this->GetMTime())
   {
     std::string ext = vtksys::SystemTools::GetFilenameLastExtension(fileName);
+    ext = vtksys::SystemTools::LowerCase(ext);
     bool readerFound = false;
     if (!readerFound && ext == ".vtk")
     {
