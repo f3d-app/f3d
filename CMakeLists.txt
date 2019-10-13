@@ -12,7 +12,7 @@ endif()
 
 set(VTK_REQUIRED_VERSION "8.2.0" CACHE STRING "VTK target version")
 set_property(CACHE VTK_REQUIRED_VERSION PROPERTY STRINGS "8.2.0" "8.90.0")
-message("Building with VTK ${VTK_REQUIRED_VERSION}")
+message(STATUS "Building with VTK ${VTK_REQUIRED_VERSION}")
 
 # VTK dependency
 find_package(VTK ${VTK_REQUIRED_VERSION} EXACT COMPONENTS
@@ -50,11 +50,15 @@ target_compile_definitions(f3d
   PRIVATE VTK_VERSION_MINOR=${VTK_VERSION_MINOR}
 )
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  find_library(OPENGL_FRAMEWORK OpenGL REQUIRED)
+endif()
+
 if(${VTK_VERSION} VERSION_LESS 8.90.0)
   include(${VTK_USE_FILE})
-  target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES})
+  target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES} ${OPENGL_FRAMEWORK})
 else()
-  target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES})
+  target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES} ${OPENGL_FRAMEWORK})
   vtk_module_autoinit(TARGETS f3d MODULES ${VTK_LIBRARIES})
 endif()
 

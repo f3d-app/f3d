@@ -6,12 +6,15 @@
 
 #include "vtkF3DGenericImporter.h"
 
-#include <vtkGLTFImporter.h>
 #include <vtkOBJImporter.h>
 #include <vtk3DSImporter.h>
 #include <vtkVRMLImporter.h>
 #include <vtkNew.h>
 #include <vtksys/SystemTools.hxx>
+
+#if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
+#include <vtkGLTFImporter.h>
+#endif
 
 int main(int argc, char **argv)
 {
