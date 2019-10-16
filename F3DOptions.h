@@ -44,6 +44,7 @@ public:
   int Component = -1;
   bool Cells = false;
   bool HideBar = false;
+  bool HideProgress = false;
   std::vector<double> Range;
 };
 

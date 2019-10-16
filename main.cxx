@@ -100,7 +100,6 @@ int main(int argc, char **argv)
     importer.TakeReference(localImporter);
   }
 
-  importer->Update();
   F3DViewer viewer(&options, importer);
   return viewer.Start();
 }
