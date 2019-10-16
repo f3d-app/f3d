@@ -92,8 +92,6 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
 //----------------------------------------------------------------------------
 void vtkF3DOpenGLGridMapper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act)
 {
-  double origin[3] = {};
-
   vtkNew<vtkFloatArray> infinitePlane;
   infinitePlane->SetNumberOfComponents(2);
   infinitePlane->SetNumberOfTuples(4);

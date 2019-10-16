@@ -224,9 +224,14 @@ void F3DViewer::ShowGrid(bool show)
     double diag = bbox.GetDiagonalLength();
     double unitSquare = pow(10.0, round(log10(diag * 0.1)));
 
+    double gridX = 0.5 * (bounds[0] + bounds[1]);
+    double gridY = bounds[2];
+    double gridZ = 0.5 * (bounds[4] + bounds[5]);
+
     if (this->Options->Verbose)
     {
       cout << "Using grid unit square size = " << unitSquare << endl;
+      cout << "Grid origin set to [" << gridX << ", " << gridY << ", " << gridZ << "]" << endl;
     }
 
     vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
@@ -235,7 +240,7 @@ void F3DViewer::ShowGrid(bool show)
 
     this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
     this->GridActor->ForceTranslucentOn();
-    this->GridActor->SetPosition(0, bounds[2], 0);
+    this->GridActor->SetPosition(gridX, gridY, gridZ);
     this->GridActor->SetMapper(gridMapper);
 
     this->Renderer->RemoveActor(this->GridActor);
