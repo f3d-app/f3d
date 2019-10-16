@@ -20,6 +20,7 @@
 #include "vtkCellData.h"
 #include "vtkDataObjectTreeIterator.h"
 #include "vtkDataSetSurfaceFilter.h"
+#include "vtkEventForwarderCommand.h"
 #include "vtkLightKit.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
@@ -41,6 +42,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     cerr << "File \"" << this->Reader->GetFileName() << "\" cannot be read." << endl;
     return;
   }
+
+  // forward progress event
+  vtkNew<vtkEventForwarderCommand> forwarder;
+  forwarder->SetTarget(this);
+  this->Reader->AddObserver(vtkCommand::ProgressEvent, forwarder);
 
   this->Reader->Update();
 

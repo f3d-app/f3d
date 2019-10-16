@@ -2,6 +2,7 @@
 
 #include <vtkDICOMImageReader.h>
 #include <vtkDemandDrivenPipeline.h>
+#include <vtkEventForwarderCommand.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkMetaImageReader.h>
@@ -39,7 +40,7 @@ int vtkF3DMetaReader::ProcessRequest(
   if (!this->InternalReader)
   {
     vtkErrorMacro("InternalReader has not been created yet, "
-      "make sure to set to use a supported file format and to set the FileName");
+                  "make sure to set to use a supported file format and to set the FileName");
     return 0;
   }
 
@@ -52,7 +53,7 @@ int vtkF3DMetaReader::FillOutputPortInformation(int port, vtkInformation* info)
   if (!this->InternalReader)
   {
     vtkErrorMacro("InternalReader has not been created yet, "
-      "make sure to set to use a supported file format and to set the FileName");
+                  "make sure to set to use a supported file format and to set the FileName");
     return 0;
   }
 
@@ -148,9 +149,16 @@ void vtkF3DMetaReader::SetFileName(std::string fileName)
     }
 #endif
 
-    if (!readerFound)  
+    if (!readerFound)
     {
       vtkErrorMacro(<< this->FileName << " format is not supported");
+    }
+    else
+    {
+      // forward progress event
+      vtkNew<vtkEventForwarderCommand> forwarder;
+      forwarder->SetTarget(this);
+      this->InternalReader->AddObserver(vtkCommand::ProgressEvent, forwarder);
     }
   }
 }

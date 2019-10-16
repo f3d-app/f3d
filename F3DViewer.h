@@ -13,7 +13,11 @@
 #include <vtkActor.h>
 #include <vtkNew.h>
 #include <vtkOrientationMarkerWidget.h>
+#include <vtkProgressBarRepresentation.h>
+#include <vtkProgressBarWidget.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
 
 class F3DOptions;
@@ -44,15 +48,20 @@ protected:
 
   void SetupRenderPasses();
 
+  void SetProgress(double progress);
+
 protected:
   F3DOptions *Options = nullptr;
   vtkImporter *Importer = nullptr;
 
-  vtkRenderWindow *RenderWindow = nullptr;
-  vtkRenderer *Renderer = nullptr;
+  vtkNew<vtkRenderWindow> RenderWindow;
+  vtkNew<vtkRenderer> Renderer;
 
   vtkNew<vtkActor> GridActor;
   vtkSmartPointer<vtkActor2D> ScalarBarActor;
+
+  vtkNew<vtkProgressBarRepresentation> ProgressRepresentation;
+  vtkNew<vtkProgressBarWidget> ProgressWidget;
 
   vtkNew<vtkOrientationMarkerWidget> AxisWidget;
   vtkNew<vtkRenderWindowInteractor> RenderWindowInteractor;

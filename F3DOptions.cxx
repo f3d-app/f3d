@@ -24,6 +24,7 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
       ("v,verbose", "Enable verbose mode", cxxopts::value<bool>(this->Verbose))
       ("x,axis", "Show axis", cxxopts::value<bool>(this->Axis))
       ("g,grid", "Show grid", cxxopts::value<bool>(this->Grid))
+      ("p,hide-progress", "Hide progress bar", cxxopts::value<bool>(this->HideProgress))
       ("n,normals", "Show mesh normals", cxxopts::value<bool>(this->Normals))
       ("i,importer", "Use dedicated importer when possible", cxxopts::value<bool>(this->Importer));
 

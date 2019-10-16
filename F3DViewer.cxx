@@ -8,6 +8,7 @@
 #include <vtkActor2DCollection.h>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
+#include <vtkCallbackCommand.h>
 #include <vtkCameraPass.h>
 #include <vtkImageDifference.h>
 #include <vtkImporter.h>
@@ -19,9 +20,7 @@
 #include <vtkPNGWriter.h>
 #include <vtkProperty.h>
 #include <vtkRenderPassCollection.h>
-#include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
 #include <vtkSequencePass.h>
 #include <vtkTranslucentPass.h>
@@ -40,21 +39,55 @@ F3DViewer::F3DViewer(F3DOptions* options, vtkImporter* importer)
   this->Options = options;
   this->Importer = importer;
 
-  this->RenderWindow = importer->GetRenderWindow();
+  this->RenderWindow->SetOffScreenRendering(
+    !this->Options->Output.empty() || !this->Options->Reference.empty());
 
-  this->Renderer = this->RenderWindow->GetRenderers()->GetFirstRenderer();
-
-  this->SetupRenderPasses();
+  this->Importer->SetRenderWindow(this->RenderWindow);
+  this->RenderWindow->AddRenderer(this->Renderer);
 
   this->Renderer->SetBackground(this->Options->BackgroundColor.data());
 
   this->RenderWindowInteractor->SetRenderWindow(this->RenderWindow);
   this->RenderWindowInteractor->SetInteractorStyle(this->InteractorStyle);
+  this->RenderWindowInteractor->Initialize();
 
   this->InteractorStyle->SetViewer(this);
 
   this->RenderWindow->SetSize(this->Options->WindowSize[0], this->Options->WindowSize[1]);
   this->RenderWindow->SetWindowName(f3d::AppTitle.c_str());
+
+  if (!this->Options->HideProgress)
+  {
+    vtkNew<vtkCallbackCommand> progressCallback;
+    progressCallback->SetClientData(this);
+    progressCallback->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void* callData) {
+        static_cast<F3DViewer*>(clientData)->SetProgress(*static_cast<double*>(callData));
+      });
+    this->Importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
+
+    this->ProgressWidget->SetInteractor(this->RenderWindowInteractor);
+    this->ProgressWidget->SetRepresentation(this->ProgressRepresentation);
+
+    this->ProgressRepresentation->SetProgressRate(0.0);
+    this->ProgressRepresentation->SetPosition(0.25, 0.45);
+    this->ProgressRepresentation->SetProgressBarColor(1, 1, 1);
+    this->ProgressRepresentation->SetBackgroundColor(1, 1, 1);
+    this->ProgressRepresentation->DrawBackgroundOff();
+
+    this->ProgressWidget->On();
+  }
+
+  // display window
+  this->Render();
+
+  // Read file
+  this->Importer->Update();
+
+  this->ProgressWidget->Off();
+  this->Renderer->ResetCamera();
+  this->SetupRenderPasses();
+  this->Render();
 
   vtkNew<vtkAxesActor> axes;
   this->AxisWidget->SetOrientationMarker(axes);
@@ -253,9 +286,6 @@ int F3DViewer::Start()
     vtkNew<vtkWindowToImageFilter> rtW2if;
     rtW2if->SetInput(this->RenderWindow);
 
-    this->RenderWindow->OffScreenRenderingOn();
-    this->Render();
-
     if (!this->Options->Output.empty())
     {
       vtkNew<vtkPNGWriter> writer;
@@ -292,4 +322,11 @@ int F3DViewer::Start()
 void F3DViewer::Render()
 {
   this->RenderWindow->Render();
+}
+
+//----------------------------------------------------------------------------
+void F3DViewer::SetProgress(double progress)
+{
+  this->ProgressRepresentation->SetProgressRate(progress);
+  this->Render();
 }
