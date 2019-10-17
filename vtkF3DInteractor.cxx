@@ -12,16 +12,18 @@ vtkStandardNewMacro(vtkF3DInteractor);
 //----------------------------------------------------------------------------
 void vtkF3DInteractor::OnChar()
 {
-  this->Superclass::OnChar();
-
-  assert(this->Viewer);
-
   vtkRenderWindowInteractor *rwi = this->GetInteractor();
-  char keyCode = rwi->GetKeyCode();
-  std::string keyname = rwi->GetKeySym();
-  int shift = rwi->GetShiftKey();
-  switch (keyCode)
+  switch (rwi->GetKeyCode())
   {
+    case 'q' :
+    case 'Q' :
+      rwi->ExitCallback();
+      break;
+    case 'r' :
+    case 'R' :
+      this->Viewer->GetRenderer()->ResetCamera();
+      this->Viewer->Render();
+      break;
     case 'x':
       this->Viewer->ShowAxis(!this->Viewer->IsAxisVisible());
       this->Viewer->Render();
@@ -34,6 +36,11 @@ void vtkF3DInteractor::OnChar()
       this->Viewer->ShowScalarBar(!this->Viewer->IsScalarBarVisible());
       this->Viewer->Render();
       break;
+    case 'w' :
+    case 'W' :
+      this->Viewer->ShowEdge(!this->Viewer->IsEdgeVisible());
+      this->Viewer->Render();
+    break;
     default:
       break;
   }

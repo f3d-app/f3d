@@ -275,6 +275,33 @@ bool F3DViewer::IsScalarBarVisible()
 }
 
 //----------------------------------------------------------------------------
+void F3DViewer::ShowEdge(bool show)
+{
+  vtkActor *anActor, *aPart;
+  vtkActorCollection* ac = this->Renderer->GetActors();
+  vtkCollectionSimpleIterator ait;
+  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait)); )
+  {
+    anActor->GetProperty()->SetEdgeVisibility(show);
+  }
+  this->Render();
+}
+
+//----------------------------------------------------------------------------
+bool F3DViewer::IsEdgeVisible()
+{
+  bool visible = true;
+  vtkActor *anActor, *aPart;
+  vtkActorCollection* ac = this->Renderer->GetActors();
+  vtkCollectionSimpleIterator ait;
+  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait)); )
+  {
+    visible = visible && anActor->GetProperty()->GetEdgeVisibility();
+  }
+  return visible;
+}
+
+//----------------------------------------------------------------------------
 void F3DViewer::SetupWithOptions()
 {
   this->ShowGrid(this->Options->Grid);
@@ -334,4 +361,10 @@ void F3DViewer::SetProgress(double progress)
 {
   this->ProgressRepresentation->SetProgressRate(progress);
   this->Render();
+}
+
+//----------------------------------------------------------------------------
+vtkRenderer* F3DViewer::GetRenderer()
+{
+  return this->Renderer;
 }

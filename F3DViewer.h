@@ -36,12 +36,16 @@ public:
   void ShowAxis(bool show);
   void ShowGrid(bool show);
   void ShowScalarBar(bool show);
+  void ShowEdge(bool show);
 
   bool IsAxisVisible();
   bool IsGridVisible();
   bool IsScalarBarVisible();
+  bool IsEdgeVisible();
 
   void Render();
+
+  vtkRenderer* GetRenderer();
 
 protected:
   void SetupWithOptions();
