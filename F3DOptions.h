@@ -46,6 +46,7 @@ public:
   bool HideBar = false;
   bool HideProgress = false;
   std::vector<double> Range;
+  bool FPS = false;
 };
 
 #endif

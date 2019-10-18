@@ -31,7 +31,8 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
     options
       .add_options("Window")
       ("bg-color", "Background color", cxxopts::value<std::vector<double>>(this->BackgroundColor)->default_value("0.2,0.2,0.2"))
-      ("resolution", "Window resolution", cxxopts::value<std::vector<int>>(this->WindowSize)->default_value("1000,600"));
+      ("resolution", "Window resolution", cxxopts::value<std::vector<int>>(this->WindowSize)->default_value("1000,600"))
+      ("t,timer", "Display frame per second", cxxopts::value<bool>(this->FPS));
 
     options
       .add_options("Scientific visualization")
