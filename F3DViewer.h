@@ -19,6 +19,9 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
+#include <vtkTextActor.h>
+
+#include <vtk_glew.h>
 
 class F3DOptions;
 class vtkImporter;
@@ -70,6 +73,9 @@ protected:
   vtkNew<vtkOrientationMarkerWidget> AxisWidget;
   vtkNew<vtkRenderWindowInteractor> RenderWindowInteractor;
   vtkNew<vtkF3DInteractor> InteractorStyle;
+
+  vtkNew<vtkTextActor> FPSActor;
+  GLuint Timer;
 };
 
 #endif

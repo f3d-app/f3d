@@ -56,14 +56,39 @@ F3DViewer::F3DViewer(F3DOptions* options, vtkImporter* importer)
   this->RenderWindow->SetSize(this->Options->WindowSize[0], this->Options->WindowSize[1]);
   this->RenderWindow->SetWindowName(f3d::AppTitle.c_str());
 
+  // perf
+  if (this->Options->FPS)
+  {
+    glGenQueries(1, &this->Timer);
+    vtkNew<vtkCallbackCommand> rwCB;
+    rwCB->SetClientData(this);
+    rwCB->SetCallback([](vtkObject*, unsigned long eid, void* clientdata, void*) {
+      F3DViewer* that = static_cast<F3DViewer*>(clientdata);
+      if (eid == vtkCommand::StartEvent)
+      {
+        glBeginQuery(GL_TIME_ELAPSED, that->Timer);
+      }
+      else
+      {
+        glEndQuery(GL_TIME_ELAPSED);
+        GLint elapsed;
+        glGetQueryObjectiv(that->Timer, GL_QUERY_RESULT, &elapsed);
+        int fps = static_cast<int>(std::round(1.0/(elapsed*1e-9)));
+        that->FPSActor->SetInput(std::to_string(fps).c_str());
+      }
+    });
+    this->RenderWindow->AddObserver(vtkCommand::StartEvent, rwCB);
+    this->RenderWindow->AddObserver(vtkCommand::EndEvent, rwCB);
+    this->Renderer->AddActor(this->FPSActor);
+  }
+
   if (!this->Options->HideProgress)
   {
     vtkNew<vtkCallbackCommand> progressCallback;
     progressCallback->SetClientData(this);
-    progressCallback->SetCallback(
-      [](vtkObject*, unsigned long, void* clientData, void* callData) {
-        static_cast<F3DViewer*>(clientData)->SetProgress(*static_cast<double*>(callData));
-      });
+    progressCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void* callData) {
+      static_cast<F3DViewer*>(clientData)->SetProgress(*static_cast<double*>(callData));
+    });
     this->Importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
 
     this->ProgressWidget->SetInteractor(this->RenderWindowInteractor);
@@ -280,7 +305,7 @@ void F3DViewer::ShowEdge(bool show)
   vtkActor *anActor, *aPart;
   vtkActorCollection* ac = this->Renderer->GetActors();
   vtkCollectionSimpleIterator ait;
-  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait)); )
+  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
   {
     anActor->GetProperty()->SetEdgeVisibility(show);
   }
@@ -294,7 +319,7 @@ bool F3DViewer::IsEdgeVisible()
   vtkActor *anActor, *aPart;
   vtkActorCollection* ac = this->Renderer->GetActors();
   vtkCollectionSimpleIterator ait;
-  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait)); )
+  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
   {
     visible = visible && anActor->GetProperty()->GetEdgeVisibility();
   }
