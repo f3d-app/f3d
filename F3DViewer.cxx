@@ -10,10 +10,12 @@
 #include <vtkBoundingBox.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCameraPass.h>
+#include <vtkDualDepthPeelingPass.h>
 #include <vtkImageDifference.h>
 #include <vtkImporter.h>
 #include <vtkLightsPass.h>
 #include <vtkOpaquePass.h>
+#include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOverlayPass.h>
 #include <vtkPNGReader.h>
@@ -22,16 +24,11 @@
 #include <vtkRenderPassCollection.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
+#include <vtkSSAOPass.h>
 #include <vtkSequencePass.h>
 #include <vtkTranslucentPass.h>
 #include <vtkVolumetricPass.h>
 #include <vtkWindowToImageFilter.h>
-
-#if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
-#include <vtkDualDepthPeelingPass.h>
-#include <vtkOpenGLFXAAPass.h>
-#include <vtkSSAOPass.h>
-#endif
 
 //----------------------------------------------------------------------------
 F3DViewer::F3DViewer(F3DOptions* options, vtkImporter* importer)
@@ -73,7 +70,7 @@ F3DViewer::F3DViewer(F3DOptions* options, vtkImporter* importer)
         glEndQuery(GL_TIME_ELAPSED);
         GLint elapsed;
         glGetQueryObjectiv(that->Timer, GL_QUERY_RESULT, &elapsed);
-        int fps = static_cast<int>(std::round(1.0/(elapsed*1e-9)));
+        int fps = static_cast<int>(std::round(1.0 / (elapsed * 1e-9)));
         that->FPSActor->SetInput(std::to_string(fps).c_str());
       }
     });
@@ -145,7 +142,6 @@ void F3DViewer::ShowAxis(bool show)
 //----------------------------------------------------------------------------
 void F3DViewer::SetupRenderPasses()
 {
-#if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
   vtkOpenGLRenderer* renderer = vtkOpenGLRenderer::SafeDownCast(this->Renderer);
 
   vtkNew<vtkLightsPass> lightsP;
@@ -221,10 +217,6 @@ void F3DViewer::SetupRenderPasses()
   {
     renderer->SetPass(cameraP);
   }
-#else
-  this->Renderer->SetUseFXAA(this->Options->FXAA);
-  this->Renderer->SetUseDepthPeeling(this->Options->DepthPeeling);
-#endif
 }
 
 //----------------------------------------------------------------------------

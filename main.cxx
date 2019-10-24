@@ -1,22 +1,19 @@
 #include <cstdio>
 #include <iostream>
 
-#include "F3DViewer.h"
 #include "F3DOptions.h"
+#include "F3DViewer.h"
 
 #include "vtkF3DGenericImporter.h"
 
-#include <vtkOBJImporter.h>
 #include <vtk3DSImporter.h>
-#include <vtkVRMLImporter.h>
+#include <vtkGLTFImporter.h>
 #include <vtkNew.h>
+#include <vtkOBJImporter.h>
+#include <vtkVRMLImporter.h>
 #include <vtksys/SystemTools.hxx>
 
-#if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
-#include <vtkGLTFImporter.h>
-#endif
-
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   F3DOptions options;
   options.InitializeFromArgs(argc, argv);
@@ -62,7 +59,8 @@ int main(int argc, char **argv)
       }
       else
       {
-        mtlFile = path + "/" + vtksys::SystemTools::GetFilenameWithoutLastExtension(fileName) + ".mtl";
+        mtlFile =
+          path + "/" + vtksys::SystemTools::GetFilenameWithoutLastExtension(fileName) + ".mtl";
         if (vtksys::SystemTools::FileExists(mtlFile))
         {
           localImporter->SetFileNameMTL(mtlFile.c_str());
@@ -81,7 +79,6 @@ int main(int argc, char **argv)
       importerFound = true;
     }
 
-#if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
     if (!importerFound && (ext == ".gltf" || ext == ".glb"))
     {
       vtkGLTFImporter* localImporter = vtkGLTFImporter::New();
@@ -89,7 +86,6 @@ int main(int argc, char **argv)
       importer.TakeReference(localImporter);
       importerFound = true;
     }
-#endif
   }
 
   if (!importerFound)

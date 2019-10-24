@@ -3,76 +3,131 @@ cache:
     - build/
 
 stages:
+  - clean
+  - configure
   - build
   - test
   - package
 
-# Build stage
+.linux:
+  tags:
+    - linux
 
-.build-linux:
+.windows:
+  tags:
+    - windows
+
+# Clean
+.clean:
+  stage: clean
+  script:
+    - cmake -E remove_directory build
+  when: manual
+
+clean-linux:
+  extends:
+    - .clean
+    - .linux
+
+clean-windows:
+  extends:
+    - .clean
+    - .windows
+
+# Configure
+.configure:
+  stage: configure
+  script:
+    - cmake -E make_directory build
+    - cd build
+    - cmake $ARCH_PARAM -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+
+configure-linux:
+  extends:
+    - .configure
+    - .linux
+
+configure-windows:
+  extends:
+    - .configure
+    - .windows
+  variables:
+    ARCH_PARAM: -Ax64
+
+# Build
+.build:
   stage: build
   script:
-    - cmake $ADDITIONAL_VARIABLES -DBUILD_TESTING=ON -Bbuild .
-    - cmake --build build
-
-.build-windows:
-  stage: build
-  script:
-    - cmake -A x64 $env:ADDITIONAL_VARIABLES -DBUILD_TESTING=ON -Bbuild .
     - cmake --build build --config Release
 
-build-linux-vtk8.2:
-  extends: .build-linux
-  variables:
-    ADDITIONAL_VARIABLES: -DVTK_REQUIRED_VERSION=8.2.0
-    CMAKE_BUILD_PARALLEL_LEVEL: 4
-  tags:
-    - linux
-    - vtk-8.2
+build-linux:
+  extends:
+    - .build
+    - .linux
+  needs:
+    - configure-linux
 
-build-linux-vtk8.90:
-  extends: .build-linux
-  variables:
-    ADDITIONAL_VARIABLES: -DVTK_REQUIRED_VERSION=8.90.0
-    CMAKE_BUILD_PARALLEL_LEVEL: 4
-  tags:
-    - linux
-    - vtk-8.90
+build-windows:
+  extends:
+    - .build
+    - .windows
+  needs:
+    - configure-windows
 
-build-windows-vtk8.2:
-  extends: .build-windows
-  variables:
-    ADDITIONAL_VARIABLES: -DVTK_REQUIRED_VERSION="8.2.0"
-    CMAKE_BUILD_PARALLEL_LEVEL: 4
-  tags:
-    - windows
-    - vtk-8.2
-
-build-windows-vtk8.90:
-  extends: .build-windows
-  variables:
-    ADDITIONAL_VARIABLES: -DVTK_REQUIRED_VERSION="8.90.0"
-    CMAKE_BUILD_PARALLEL_LEVEL: 4
-  tags:
-    - windows
-    - vtk-8.90
-
-# Test stage
-
+# Test
 .test:
   stage: test
   script:
     - cd build
-    - ctest -C Release --output-on-failure -j8
+    - ctest -C Release -j 8
 
 test-linux:
-  extends: .test
-  tags:
-    - linux
-    - vtk-8.90
+  extends:
+    - .test
+    - .linux
+  needs:
+    - configure-linux
+    - build-linux
 
 test-windows:
-  extends: .test
-  tags:
-    - windows
-    - vtk-8.90
+  extends:
+    - .test
+    - .windows
+  needs:
+    - configure-windows
+    - build-windows
+
+# Package
+.package:
+  stage: package
+  script:
+    - cd build
+    - cpack -C Release
+  only:
+    - master
+
+package-linux:
+  extends:
+    - .package
+    - .linux
+  needs:
+    - configure-linux
+    - build-linux
+    - test-linux
+  artifacts:
+    paths:
+      - build/f3d-*.tar.gz
+      - build/f3d-*.tar.xz
+
+package-windows:
+  extends:
+    - .package
+    - .windows
+  needs:
+    - configure-windows
+    - build-windows
+    - test-windows
+  artifacts:
+    paths:
+      - build/f3d-*.zip
+      - build/f3d-*.exe

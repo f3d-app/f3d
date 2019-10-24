@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(f3d CXX)
+message(STATUS "env: $ENV{CMAKE_GENERATOR}, var: ${CMAKE_GENERATOR}")
+
+project(f3d
+  VERSION "0.1.0"
+  DESCRIPTION "f3d - Fast 3D Viewer"
+  LANGUAGES CXX)
 
 # CMake variables
 option(BUILD_TESTING OFF)
@@ -10,12 +15,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
 
-set(VTK_REQUIRED_VERSION "8.2.0" CACHE STRING "VTK target version")
-set_property(CACHE VTK_REQUIRED_VERSION PROPERTY STRINGS "8.2.0" "8.90.0")
-message(STATUS "Building with VTK ${VTK_REQUIRED_VERSION}")
-
 # VTK dependency
-find_package(VTK ${VTK_REQUIRED_VERSION} EXACT COMPONENTS
+find_package(VTK 8.90.0 COMPONENTS
   vtkFiltersGeneral
   vtkFiltersGeometry
   vtkImagingCore
@@ -34,6 +35,12 @@ find_package(VTK ${VTK_REQUIRED_VERSION} EXACT COMPONENTS
   vtkjsoncpp
   QUIET
   REQUIRED)
+  
+message(STATUS "VTK version: ${VTK_VERSION}")
+
+if(${VTK_VERSION} VERSION_LESS 8.90.0)
+  message(FATAL_ERROR "VTK >= 9.0 is REQUIRED")
+endif()
 
 add_executable(f3d
   main.cxx
@@ -50,23 +57,11 @@ target_compile_definitions(f3d
   PRIVATE VTK_VERSION_MINOR=${VTK_VERSION_MINOR}
 )
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  find_library(OPENGL_FRAMEWORK OpenGL REQUIRED)
-endif()
-
-if(${VTK_VERSION} VERSION_LESS 8.90.0)
-  include(${VTK_USE_FILE})
-  target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES} ${OPENGL_FRAMEWORK})
-else()
-  target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES} ${OPENGL_FRAMEWORK})
-  vtk_module_autoinit(TARGETS f3d MODULES ${VTK_LIBRARIES})
-endif()
+target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES})
+vtk_module_autoinit(TARGETS f3d MODULES ${VTK_LIBRARIES})
 
 if(BUILD_TESTING)
   enable_testing()
-  target_compile_definitions(f3d
-    PRIVATE F3D_TESTING=1
-  )
 
   function(f3d_test name input args)
     separate_arguments(args)
@@ -93,3 +88,24 @@ if(BUILD_TESTING)
     f3d_test(TestGLTFImporter WaterBottle.glb "-pi --resolution 300,300")
   endif()
 endif()
+
+# installation
+include(GNUInstallDirs)
+install(TARGETS f3d
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# packaging
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+  set(CPACK_GENERATOR NSIS64 ZIP)
+  set(CPACK_NSIS_MODIFY_PATH ON)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  set(CPACK_GENERATOR TGZ TXZ)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(CPACK_GENERATOR DMG PKG)
+endif()
+
+set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_VENDOR "Kitware SAS")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_DESCRIPTION}")
+include(CPack)

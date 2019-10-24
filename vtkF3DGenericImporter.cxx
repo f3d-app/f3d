@@ -242,10 +242,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   vtkNew<vtkActor> actor;
   actor->SetMapper(mapper);
 
-#if VTK_VERSION_MAJOR == 8 && VTK_VERSION_MINOR > 2
   actor->GetProperty()->SetInterpolationToPBR();
   actor->GetProperty()->SetRoughness(0.3);
-#endif
 
   ren->AddActor(actor);
 }
