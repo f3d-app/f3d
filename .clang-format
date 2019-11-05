@@ -1,0 +1,20 @@
+---
+# This configuration requires clang-format 3.8 or higher.
+BasedOnStyle: Mozilla
+AlignAfterOpenBracket: DontAlign
+AlignOperands: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakAfterDefinitionReturnType: None
+BreakBeforeBraces: Allman
+BinPackArguments: true
+BinPackParameters: true
+ColumnLimit: 100
+# Note that on versions after 4.0 you need to specify
+# SpaceAfterTemplateKeyword: true
+# which is not an option prior to 4.0. Later versions
+# of clang may produce results different from 3.8.
+# For your commits to be compatible with clang 3.8
+# you are best off running clang-format 3.8 on your
+# system
+Standard: Cpp03
+...
