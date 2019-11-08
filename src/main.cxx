@@ -10,7 +10,7 @@
 int main(int argc, char** argv)
 {
   F3DOptions options;
-  options.InitializeFromArgs(argc, argv);
+  F3DOptionsParser parser(options, argc, argv);
 
   F3DLoader loader(options);
 
