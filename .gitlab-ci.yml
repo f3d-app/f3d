@@ -17,6 +17,10 @@ stages:
   tags:
     - windows
 
+.osx:
+  tags:
+    - osx
+
 # Clean
 .clean:
   stage: clean
@@ -34,13 +38,18 @@ clean-windows:
     - .clean
     - .windows
 
+clean-osx:
+  extends:
+    - .clean
+    - .osx
+
 # Configure
 .configure:
   stage: configure
   script:
     - cmake -E make_directory build
     - cd build
-    - cmake $ARCH_PARAM -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+    - cmake $ADDITIONAL_OPTIONS -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
 
 configure-linux:
   extends:
@@ -52,7 +61,14 @@ configure-windows:
     - .configure
     - .windows
   variables:
-    ARCH_PARAM: -Ax64
+    ADDITIONAL_OPTIONS: -Ax64
+
+configure-osx:
+  extends:
+    - .configure
+    - .osx
+  variables:
+    ADDITIONAL_OPTIONS: -DMACOSX_BUILD_BUNDLE=ON
 
 # Build
 .build:
@@ -73,6 +89,13 @@ build-windows:
     - .windows
   needs:
     - configure-windows
+
+build-osx:
+  extends:
+    - .build
+    - .osx
+  needs:
+    - configure-osx
 
 # Test
 .test:
@@ -96,6 +119,14 @@ test-windows:
   needs:
     - configure-windows
     - build-windows
+
+test-osx:
+  extends:
+    - .test
+    - .osx
+  needs:
+    - configure-osx
+    - build-osx
 
 # Package
 .package:
@@ -131,3 +162,15 @@ package-windows:
     paths:
       - build/f3d-*.zip
       - build/f3d-*.exe
+
+package-osx:
+  extends:
+    - .package
+    - .osx
+  needs:
+    - configure-osx
+    - build-osx
+    - test-osx
+  artifacts:
+    paths:
+      - build/f3d-*.dmg

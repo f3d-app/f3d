@@ -58,6 +58,18 @@ target_compile_definitions(f3d
   PRIVATE VTK_VERSION_MINOR=${VTK_VERSION_MINOR}
 )
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  option(MACOSX_BUILD_BUNDLE OFF)
+  set_target_properties(f3d PROPERTIES MACOSX_BUNDLE TRUE)
+
+  # Add logo icon
+  set(MACOSX_BUNDLE_ICON_FILE logo.icns)
+  set(f3d_ICON ${CMAKE_CURRENT_SOURCE_DIR}/resources/logo.icns)
+  set_source_files_properties(${f3d_ICON} PROPERTIES
+    MACOSX_PACKAGE_LOCATION "Resources")
+  target_sources(f3d PRIVATE ${f3d_ICON})
+endif()
+
 target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES})
 vtk_module_autoinit(TARGETS f3d MODULES ${VTK_LIBRARIES})
 
@@ -67,7 +79,7 @@ if(BUILD_TESTING)
   function(f3d_test name input args)
     separate_arguments(args)
     add_test(NAME ${name}
-             COMMAND ${CMAKE_BUILD_DIR}/f3d
+             COMMAND ${CMAKE_BUILD_DIR}/$<TARGET_FILE:f3d>
                ${args}
                --ref ${CMAKE_SOURCE_DIR}/data/baselines/${name}.png
                ${CMAKE_SOURCE_DIR}/data/${input})
@@ -93,7 +105,8 @@ endif()
 # installation
 include(GNUInstallDirs)
 install(TARGETS f3d
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  BUNDLE DESTINATION ".")
 
 # packaging
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -102,7 +115,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(CPACK_GENERATOR TGZ TXZ)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  set(CPACK_GENERATOR DMG PKG)
+  set(CPACK_GENERATOR DragNDrop)
 endif()
 
 set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
