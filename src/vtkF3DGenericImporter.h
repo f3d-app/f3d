@@ -12,7 +12,7 @@
 
 #include <vtkImporter.h>
 
-class F3DOptions;
+struct F3DOptions;
 
 class vtkF3DGenericImporter : public vtkImporter
 {
