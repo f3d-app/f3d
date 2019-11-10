@@ -27,9 +27,15 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
       ("v,verbose", "Enable verbose mode", cxxopts::value<bool>(this->Verbose))
       ("x,axis", "Show axis", cxxopts::value<bool>(this->Axis))
       ("g,grid", "Show grid", cxxopts::value<bool>(this->Grid))
-      ("p,hide-progress", "Hide progress bar", cxxopts::value<bool>(this->HideProgress))
-      ("n,normals", "Show mesh normals", cxxopts::value<bool>(this->Normals))
-      ("i,importer", "Use dedicated importer when possible", cxxopts::value<bool>(this->Importer));
+      ("p,progress", "Show progress bar", cxxopts::value<bool>(this->Progress))
+      ("m,geometry-only", "Do not read materials, cameras and lights from file", cxxopts::value<bool>(this->GeometryOnly));
+
+    options
+      .add_options("Material")
+      ("e,edges", "Show cell edges", cxxopts::value<bool>(this->Edges))
+      ("color", "Solid color", cxxopts::value<std::vector<double>>(this->SolidColor)->default_value("1.0,1.0,1.0"))
+      ("roughness", "Roughness coefficient (0.0-1.0)", cxxopts::value<double>(this->Roughness)->default_value("0.3"))
+      ("metallic", "Metallic coefficient (0.0-1.0)", cxxopts::value<double>(this->Metallic)->default_value("0.0"));
 
     options
       .add_options("Window")
@@ -41,15 +47,15 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
       .add_options("Scientific visualization")
       ("scalars", "Color by scalars", cxxopts::value<std::string>(this->Scalars)->implicit_value("f3d_reserved"), "<array_name>")
       ("comp", "Specify the component used", cxxopts::value<int>(this->Component), "<comp_index>")
-      ("cells", "The array is located on cells", cxxopts::value<bool>(this->Cells))
+      ("c,cells", "The array is located on cells", cxxopts::value<bool>(this->Cells))
       ("range", "Custom range for the array", cxxopts::value<std::vector<double>>(this->Range), "<min,max>")
-      ("b,hide-bar", "Hide scalar bar", cxxopts::value<bool>(this->HideBar));
+      ("b,bar", "Show scalar bar", cxxopts::value<bool>(this->Bar));
 
     options
       .add_options("PostFX")
       ("d,depth-peeling", "Enable depth peeling", cxxopts::value<bool>(this->DepthPeeling))
       ("u,ssao", "Enable Screen-Space Ambient Occlusion", cxxopts::value<bool>(this->SSAO))
-      ("f,fxaa", "Enable FXAA anti-aliasing", cxxopts::value<bool>(this->FXAA));
+      ("f,fxaa", "Enable Fast Approximate Anti-Aliasing", cxxopts::value<bool>(this->FXAA));
 
     options
       .add_options("Testing")

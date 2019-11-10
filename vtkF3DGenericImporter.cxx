@@ -179,72 +179,86 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     }
   }
 
+  mapper->ScalarVisibilityOff();
   if (!usedArray.empty())
   {
-    mapper->ScalarVisibilityOn();
-    mapper->SelectColorArray(usedArray.c_str());
-    mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
-                                               : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-
-    vtkScalarsToColors* lut = mapper->GetLookupTable();
-
-    if (this->Options->Component >= 0)
-    {
-      lut->SetVectorModeToComponent();
-      lut->SetVectorComponent(this->Options->Component);
-    }
-    else
-    {
-      lut->SetVectorModeToMagnitude();
-    }
-
-    if (this->Options->Range.size() == 2)
-    {
-      mapper->SetScalarRange(this->Options->Range[0], this->Options->Range[1]);
-    }
-    else
-    {
-      vtkDataArray* array = this->Options->Cells ? cellData->GetArray(usedArray.c_str())
+    vtkDataArray* array = this->Options->Cells ? cellData->GetArray(usedArray.c_str())
                                                  : pointData->GetArray(usedArray.c_str());
 
-      if (array)
+    if (array)
+    {
+      if (this->Options->Component < array->GetNumberOfComponents())
       {
-        double range[2];
-        array->GetRange(range, this->Options->Component);
-        mapper->SetScalarRange(range);
+        mapper->ScalarVisibilityOn();
+        mapper->SelectColorArray(usedArray.c_str());
+        mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
+                                                  : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+
+        vtkScalarsToColors* lut = mapper->GetLookupTable();
+
+        if (this->Options->Component >= 0)
+        {
+          lut->SetVectorModeToComponent();
+          lut->SetVectorComponent(this->Options->Component);
+        }
+        else
+        {
+          lut->SetVectorModeToMagnitude();
+        }
+
+        if (this->Options->Range.size() == 2)
+        {
+          mapper->SetScalarRange(this->Options->Range[0], this->Options->Range[1]);
+        }
+        else
+        {
+          double range[2];
+          array->GetRange(range, this->Options->Component);
+          mapper->SetScalarRange(range);
+        }
+
+        std::string title = usedArray;
+        if (this->Options->Component >= 0)
+        {
+          title += " (Component #";
+          title += std::to_string(this->Options->Component);
+          title += ")";
+        }
+
+        vtkNew<vtkScalarBarActor> scalarBar;
+        scalarBar->SetLookupTable(lut);
+        scalarBar->SetTitle(title.c_str());
+        scalarBar->SetNumberOfLabels(4);
+        scalarBar->SetOrientationToHorizontal();
+        scalarBar->SetWidth(0.8);
+        scalarBar->SetHeight(0.07);
+        scalarBar->SetPosition(0.1, 0.01);
+        scalarBar->SetVisibility(this->Options->Bar);
+
+        ren->AddActor2D(scalarBar);
+      }
+      else
+      {
+        cerr << "Invalid component index: " << this->Options->Component << endl;
       }
     }
-
-    std::string title = usedArray;
-    if (this->Options->Component >= 0)
+    else
     {
-      title += " (Component #";
-      title += std::to_string(this->Options->Component);
-      title += ")";
+      cerr << "Unknow scalar array: " << usedArray << endl;
     }
-
-    vtkNew<vtkScalarBarActor> scalarBar;
-    scalarBar->SetLookupTable(lut);
-    scalarBar->SetTitle(title.c_str());
-    scalarBar->SetNumberOfLabels(4);
-    scalarBar->SetOrientationToHorizontal();
-    scalarBar->SetWidth(0.8);
-    scalarBar->SetHeight(0.07);
-    scalarBar->SetPosition(0.1, 0.01);
-    scalarBar->SetVisibility(!this->Options->HideBar);
-
-    ren->AddActor2D(scalarBar);
-  }
-  else
-  {
-    mapper->ScalarVisibilityOff();
   }
 
   vtkNew<vtkActor> actor;
   actor->SetMapper(mapper);
 
   actor->GetProperty()->SetInterpolationToPBR();
-  actor->GetProperty()->SetRoughness(0.3);
+
+  double col[3];
+  std::copy(this->Options->SolidColor.begin(), this->Options->SolidColor.end(), col);
+
+  actor->GetProperty()->SetColor(col);
+  actor->GetProperty()->SetRoughness(this->Options->Roughness);
+  actor->GetProperty()->SetMetallic(this->Options->Metallic);
 
   ren->AddActor(actor);
 }
