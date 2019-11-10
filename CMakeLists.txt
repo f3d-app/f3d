@@ -35,7 +35,7 @@ find_package(VTK 8.90.0 COMPONENTS
   vtkjsoncpp
   QUIET
   REQUIRED)
-  
+
 message(STATUS "VTK version: ${VTK_VERSION}")
 
 if(${VTK_VERSION} VERSION_LESS 8.90.0)
@@ -48,6 +48,7 @@ add_executable(f3d
   vtkF3DInteractor.cxx
   vtkF3DMetaReader.cxx
   vtkF3DOpenGLGridMapper.cxx
+  F3DLoader.cxx
   F3DOptions.cxx
   F3DViewer.cxx
 )

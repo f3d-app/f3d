@@ -1,6 +1,6 @@
 /**
  * @class   F3DOptions
- * @brief   The main viewer class
+ * @brief   The class that holds and manages options
  *
  */
 
