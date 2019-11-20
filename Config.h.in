@@ -1,0 +1,12 @@
+#ifndef Config_h
+#define Config_h
+
+#include <string>
+
+namespace f3d
+{
+const std::string AppName = "@PROJECT_NAME@";
+const std::string AppTitle = "@PROJECT_DESCRIPTION@";
+}
+
+#endif

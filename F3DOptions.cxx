@@ -1,5 +1,7 @@
 #include "F3DOptions.h"
 
+#include "F3DLog.h"
+
 #include "vtkF3DGenericImporter.h"
 
 #include <vtk_jsoncpp.h>
@@ -11,7 +13,8 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
 {
   try
   {
-    cxxopts::Options options(argv[0], f3d::AppTitle);
+
+    cxxopts::Options options(f3d::AppName, f3d::AppTitle);
     options
       .positional_help("input_file")
       .show_positional_help();
@@ -57,7 +60,7 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
 
     if (argc == 1)
     {
-      std::cout << options.help() << std::endl;
+      F3DLog::Print(F3DLog::Severity::Info, options.help());
       exit(EXIT_FAILURE);
     }
 
@@ -65,7 +68,7 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
 
     if (result.count("help") > 0)
     {
-      std::cout << options.help() << std::endl;
+      F3DLog::Print(F3DLog::Severity::Info, options.help());
       exit(EXIT_SUCCESS);
     }
 
@@ -73,7 +76,7 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
   }
   catch (const cxxopts::OptionException &e)
   {
-    std::cout << "error parsing options: " << e.what() << std::endl;
+    F3DLog::Print(F3DLog::Severity::Error, "Error parsing options: ", e.what());
     exit(EXIT_FAILURE);
   }
   return true;
@@ -87,7 +90,7 @@ bool F3DOptions::InitializeFromFile(const std::string &fname)
 
   if (!file.is_open())
   {
-    std::cerr << "Unable to open configuration file " << fname << endl;
+    F3DLog::Print(F3DLog::Severity::Error, "Unable to open configuration file ", fname);
     return false;
   }
   Json::CharReaderBuilder builder;
@@ -98,7 +101,7 @@ bool F3DOptions::InitializeFromFile(const std::string &fname)
   bool success = Json::parseFromStream(builder, file, &root, &errs);
   if (!success)
   {
-    std::cerr << "Unable to parse the configuration file " << fname << endl;
+    F3DLog::Print(F3DLog::Severity::Error, "Unable to parse the configuration file ", fname);
     return false;
   }
 

@@ -294,7 +294,7 @@ bool F3DViewer::IsScalarBarVisible()
 //----------------------------------------------------------------------------
 void F3DViewer::ShowEdge(bool show)
 {
-  vtkActor *anActor, *aPart;
+  vtkActor *anActor;
   vtkActorCollection* ac = this->Renderer->GetActors();
   vtkCollectionSimpleIterator ait;
   for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
@@ -308,7 +308,7 @@ void F3DViewer::ShowEdge(bool show)
 bool F3DViewer::IsEdgeVisible()
 {
   bool visible = true;
-  vtkActor *anActor, *aPart;
+  vtkActor *anActor;
   vtkActorCollection* ac = this->Renderer->GetActors();
   vtkCollectionSimpleIterator ait;
   for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)

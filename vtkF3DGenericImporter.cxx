@@ -12,6 +12,7 @@
 
 #include "vtkF3DGenericImporter.h"
 
+#include "F3DLog.h"
 #include "F3DOptions.h"
 
 #include "vtkActor.h"
@@ -39,7 +40,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
   if (!this->Reader->IsReaderValid())
   {
-    cerr << "File \"" << this->Reader->GetFileName() << "\" cannot be read." << endl;
+    F3DLog::Print(F3DLog::Severity::Info, "File '", this->Reader->GetFileName(), "' cannot be read.");
     return;
   }
 
