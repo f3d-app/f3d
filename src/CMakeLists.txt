@@ -19,9 +19,6 @@ add_executable(f3d
 target_include_directories(f3d
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-configure_file(Config.h.in
-  "${CMAKE_CURRENT_BINARY_DIR}/Config.h" @ONLY)
-
 target_compile_definitions(f3d
   PRIVATE VTK_VERSION_MAJOR=${VTK_VERSION_MAJOR}
   PRIVATE VTK_VERSION_MINOR=${VTK_VERSION_MINOR}
@@ -43,9 +40,61 @@ if(WIN32)
   set_target_properties(f3d PROPERTIES WIN32_EXECUTABLE TRUE)
 endif()
 
-target_link_libraries(f3d PUBLIC ${VTK_LIBRARIES})
+vtk_module_autoinit(
+  TARGETS f3d
+  MODULES
+    VTK::FiltersGeneral
+    VTK::FiltersGeometry
+    VTK::ImagingCore
+    VTK::InteractionStyle
+    VTK::InteractionWidgets
+    VTK::IOCityGML
+    VTK::IOGeometry
+    VTK::IOImage
+    VTK::IOImport
+    VTK::IOPLY
+    VTK::IOXML
+    VTK::RenderingAnnotation
+    VTK::RenderingCore
+    VTK::RenderingLabel
+    VTK::RenderingOpenGL2
+    VTK::jsoncpp
+)
 
-vtk_module_autoinit(TARGETS f3d MODULES ${VTK_LIBRARIES})
+target_link_libraries(f3d
+  PUBLIC
+    VTK::FiltersGeneral
+    VTK::FiltersGeometry
+    VTK::ImagingCore
+    VTK::InteractionStyle
+    VTK::InteractionWidgets
+    VTK::IOCityGML
+    VTK::IOGeometry
+    VTK::IOImage
+    VTK::IOImport
+    VTK::IOPLY
+    VTK::IOXML
+    VTK::RenderingAnnotation
+    VTK::RenderingCore
+    VTK::RenderingLabel
+    VTK::RenderingOpenGL2
+    VTK::jsoncpp
+)
+
+if(TARGET VTK::RenderingRayTracing)
+  message(STATUS "VTK RayTracing enabled")
+  set(F3D_HAS_RAYTRACING ON)
+  vtk_module_autoinit(
+    TARGETS f3d
+    MODULES VTK::RenderingRayTracing
+  )
+  target_link_libraries(f3d
+    PUBLIC VTK::RenderingRayTracing
+  )
+endif()
+
+configure_file(Config.h.in
+  "${CMAKE_CURRENT_BINARY_DIR}/Config.h" @ONLY)
 
 install(TARGETS f3d
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

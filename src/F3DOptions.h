@@ -50,6 +50,11 @@ public:
   std::vector<double> SolidColor;
   double Roughness;
   double Metallic;
+  bool Raytracing = false;
+  int Samples = 5;
+  bool Denoise = false;
+  double PointSize = 10.0;
+  double Opacity = 1.0;
 };
 
 #endif
