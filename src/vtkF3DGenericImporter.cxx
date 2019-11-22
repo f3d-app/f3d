@@ -89,21 +89,24 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     return;
   }
 
-  vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  vtkSmartPointer<vtkPolyDataMapper> mapper;
 
   vtkPointData* pointData = surface->GetPointData();
   vtkIdType nbPointData = pointData->GetNumberOfArrays();
   vtkCellData* cellData = surface->GetCellData();
   vtkIdType nbCellData = cellData->GetNumberOfArrays();
 
-  if (surface->GetNumberOfVerts() == surface->GetNumberOfCells())
+  if (!this->Options->Raytracing && surface->GetNumberOfVerts() == surface->GetNumberOfCells())
   {
     double bounds[6];
     surface->GetBounds(bounds);
 
     vtkBoundingBox bbox(bounds);
     vtkNew<vtkPointGaussianMapper> gaussianMapper;
-    gaussianMapper->SetScaleFactor(bbox.GetDiagonalLength() * 0.02);
+
+    double pointSize = this->Options->PointSize * bbox.GetDiagonalLength() * 0.001;
+
+    gaussianMapper->SetScaleFactor(pointSize);
     gaussianMapper->EmissiveOff();
     gaussianMapper->SetSplatShaderCode(
       "//VTK::Color::Impl\n"
@@ -116,6 +119,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       "  diffuseColor *= scale;\n"
       "}\n");
     mapper = gaussianMapper;
+  }
+  else
+  {
+    mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->InterpolateScalarsBeforeMappingOn();
   }
 
   mapper->SetInputData(surface);
@@ -257,8 +265,10 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   std::copy(this->Options->SolidColor.begin(), this->Options->SolidColor.end(), col);
 
   actor->GetProperty()->SetColor(col);
+  actor->GetProperty()->SetOpacity(this->Options->Opacity);
   actor->GetProperty()->SetRoughness(this->Options->Roughness);
   actor->GetProperty()->SetMetallic(this->Options->Metallic);
+  actor->GetProperty()->SetPointSize(this->Options->PointSize);
 
   ren->AddActor(actor);
 }

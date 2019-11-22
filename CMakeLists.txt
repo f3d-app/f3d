@@ -14,33 +14,33 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # VTK dependency
-find_package(VTK 8.90.0 COMPONENTS
-  FiltersGeneral
-  FiltersGeometry
-  ImagingCore
-  InteractionStyle
-  InteractionWidgets
-  IOCityGML
-  IOGeometry
-  IOImage
-  IOImport
-  IOPLY
-  IOXML
-  RenderingAnnotation
-  RenderingCore
-  RenderingLabel
-  RenderingOpenGL2
-  jsoncpp
-  REQUIRED)
-
-message(STATUS "VTK version: ${VTK_VERSION}")
+find_package(VTK 8.90.0 REQUIRED
+  COMPONENTS
+    FiltersGeneral
+    FiltersGeometry
+    ImagingCore
+    InteractionStyle
+    InteractionWidgets
+    IOCityGML
+    IOGeometry
+    IOImage
+    IOImport
+    IOPLY
+    IOXML
+    RenderingAnnotation
+    RenderingCore
+    RenderingLabel
+    RenderingOpenGL2
+    jsoncpp
+  OPTIONAL_COMPONENTS
+    RenderingRayTracing
+)
 
 if(${VTK_VERSION} VERSION_LESS 8.90.0)
   message(FATAL_ERROR "VTK >= 9.0 is REQUIRED")
 endif()
 
 include(GNUInstallDirs)
-
 add_subdirectory(src)
 
 # testing
