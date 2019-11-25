@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=f3d
+GenericName=3D Viewer
+Comment=A fast and minimalist 3D viewer
+TryExec=f3d
+Exec=f3d
+Icon=f3d
+Categories=Graphics;3DGraphics;
