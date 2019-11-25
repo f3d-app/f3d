@@ -15,23 +15,22 @@ endif()
 
 # VTK dependency
 find_package(VTK 8.90.0 COMPONENTS
-  vtkFiltersGeneral
-  vtkFiltersGeometry
-  vtkImagingCore
-  vtkInteractionStyle
-  vtkInteractionWidgets
-  vtkIOCityGML
-  vtkIOGeometry
-  vtkIOImage
-  vtkIOImport
-  vtkIOPLY
-  vtkIOXML
-  vtkRenderingAnnotation
-  vtkRenderingCore
-  vtkRenderingLabel
-  vtkRenderingOpenGL2
-  vtkjsoncpp
-  QUIET
+  FiltersGeneral
+  FiltersGeometry
+  ImagingCore
+  InteractionStyle
+  InteractionWidgets
+  IOCityGML
+  IOGeometry
+  IOImage
+  IOImport
+  IOPLY
+  IOXML
+  RenderingAnnotation
+  RenderingCore
+  RenderingLabel
+  RenderingOpenGL2
+  jsoncpp
   REQUIRED)
 
 message(STATUS "VTK version: ${VTK_VERSION}")
