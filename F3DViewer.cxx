@@ -79,7 +79,7 @@ F3DViewer::F3DViewer(F3DOptions* options, vtkImporter* importer)
     this->Renderer->AddActor(this->FPSActor);
   }
 
-  if (!this->Options->HideProgress)
+  if (this->Options->Progress)
   {
     vtkNew<vtkCallbackCommand> progressCallback;
     progressCallback->SetClientData(this);
@@ -323,6 +323,7 @@ void F3DViewer::SetupWithOptions()
 {
   this->ShowGrid(this->Options->Grid);
   this->ShowAxis(this->Options->Axis);
+  this->ShowEdge(this->Options->Edges);
 }
 
 //----------------------------------------------------------------------------

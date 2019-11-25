@@ -22,7 +22,7 @@ vtkSmartPointer<vtkImporter> F3DLoader::GetImporter() const
   bool importerFound = false;
   std::string fileName = this->Options.Input.c_str();
 
-  if (this->Options.Importer)
+  if (!this->Options.GeometryOnly)
   {
     std::string ext = vtksys::SystemTools::GetFilenameLastExtension(fileName);
     ext = vtksys::SystemTools::LowerCase(ext);
@@ -31,7 +31,7 @@ vtkSmartPointer<vtkImporter> F3DLoader::GetImporter() const
     {
       vtk3DSImporter* localImporter = vtk3DSImporter::New();
       localImporter->SetFileName(fileName.c_str());
-      localImporter->SetComputeNormals(this->Options.Normals);
+      localImporter->ComputeNormalsOn();
       importer.TakeReference(localImporter);
       importerFound = true;
     }

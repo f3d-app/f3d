@@ -26,14 +26,13 @@ public:
   bool InitializeFromArgs(int argc, char** argv);
   bool InitializeFromFile(const std::string& fname);
 
-  bool Normals = false;
   bool Axis = false;
   bool Grid = false;
   bool SSAO = false;
   bool FXAA = false;
   bool DepthPeeling = false;
   bool Verbose = false;
-  bool Importer = false;
+  bool GeometryOnly = false;
   std::vector<int> WindowSize;
   std::vector<double> BackgroundColor;
   std::string Input = "";
@@ -43,10 +42,14 @@ public:
   std::string Scalars = "";
   int Component = -1;
   bool Cells = false;
-  bool HideBar = false;
-  bool HideProgress = false;
+  bool Bar = false;
+  bool Progress = false;
   std::vector<double> Range;
   bool FPS = false;
+  bool Edges = false;
+  std::vector<double> SolidColor;
+  double Roughness;
+  double Metallic;
 };
 
 #endif
