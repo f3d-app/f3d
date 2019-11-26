@@ -25,6 +25,7 @@ find_package(VTK 8.90.0 REQUIRED
     IOGeometry
     IOImage
     IOImport
+    IOParallel
     IOPLY
     IOXML
     RenderingAnnotation
