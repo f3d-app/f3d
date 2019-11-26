@@ -33,7 +33,9 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
     options
       .add_options("Material")
       ("e,edges", "Show cell edges", cxxopts::value<bool>(this->Edges))
+      ("point-size", "Point size", cxxopts::value<double>(this->PointSize)->default_value("10.0"), "<size>")
       ("color", "Solid color", cxxopts::value<std::vector<double>>(this->SolidColor)->default_value("1.0,1.0,1.0"))
+      ("opacity", "Opacity", cxxopts::value<double>(this->Opacity)->default_value("1.0"))
       ("roughness", "Roughness coefficient (0.0-1.0)", cxxopts::value<double>(this->Roughness)->default_value("0.3"))
       ("metallic", "Metallic coefficient (0.0-1.0)", cxxopts::value<double>(this->Metallic)->default_value("0.0"));
 
@@ -51,8 +53,16 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
       ("range", "Custom range for the array", cxxopts::value<std::vector<double>>(this->Range), "<min,max>")
       ("b,bar", "Show scalar bar", cxxopts::value<bool>(this->Bar));
 
+#if F3D_HAS_RAYTRACING
     options
-      .add_options("PostFX")
+      .add_options("Raytracing")
+      ("r,raytracing", "Enable raytracing", cxxopts::value<bool>(this->Raytracing))
+      ("samples", "Number of samples per pixel", cxxopts::value<int>(this->Samples)->default_value("5"), "<samples>")
+      ("s,denoise", "Denoise the image", cxxopts::value<bool>(this->Denoise));
+#endif
+
+    options
+      .add_options("PostFX (OpenGL)")
       ("d,depth-peeling", "Enable depth peeling", cxxopts::value<bool>(this->DepthPeeling))
       ("u,ssao", "Enable Screen-Space Ambient Occlusion", cxxopts::value<bool>(this->SSAO))
       ("f,fxaa", "Enable Fast Approximate Anti-Aliasing", cxxopts::value<bool>(this->FXAA));

@@ -9,4 +9,6 @@ const std::string AppName = "@PROJECT_NAME@";
 const std::string AppTitle = "@PROJECT_DESCRIPTION@";
 }
 
+#cmakedefine01 F3D_HAS_RAYTRACING
+
 #endif

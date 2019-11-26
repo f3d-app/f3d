@@ -30,6 +30,11 @@
 #include <vtkVolumetricPass.h>
 #include <vtkWindowToImageFilter.h>
 
+#if F3D_HAS_RAYTRACING
+#include <vtkOSPRayPass.h>
+#include <vtkOSPRayRendererNode.h>
+#endif
+
 //----------------------------------------------------------------------------
 F3DViewer::F3DViewer(F3DOptions* options, vtkImporter* importer)
 {
@@ -143,6 +148,31 @@ void F3DViewer::ShowAxis(bool show)
 void F3DViewer::SetupRenderPasses()
 {
   vtkOpenGLRenderer* renderer = vtkOpenGLRenderer::SafeDownCast(this->Renderer);
+
+#if F3D_HAS_RAYTRACING
+  if (this->Options->Raytracing)
+  {
+    vtkNew<vtkOSPRayPass> osprayP;
+    vtkNew<vtkTranslucentPass> translucentP;
+
+    vtkNew<vtkRenderPassCollection> collection;
+    collection->AddItem(osprayP);
+    collection->AddItem(translucentP);
+
+    vtkNew<vtkSequencePass> sequence;
+    sequence->SetPasses(collection);
+
+    vtkNew<vtkCameraPass> cameraP;
+    cameraP->SetDelegatePass(sequence);
+    renderer->SetPass(cameraP);
+
+    vtkOSPRayRendererNode::SetRendererType("pathtracer", renderer);
+    vtkOSPRayRendererNode::SetSamplesPerPixel(this->Options->Samples, renderer);
+    vtkOSPRayRendererNode::SetEnableDenoiser(this->Options->Denoise, renderer);
+
+    return;
+  }
+#endif
 
   vtkNew<vtkLightsPass> lightsP;
   vtkNew<vtkOpaquePass> opaqueP;
