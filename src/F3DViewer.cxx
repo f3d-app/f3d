@@ -59,30 +59,27 @@ F3DViewer::F3DViewer(F3DOptions* options, vtkImporter* importer)
   this->RenderWindow->SetWindowName(f3d::AppTitle.c_str());
 
   // perf
-  if (this->Options->FPS)
-  {
-    glGenQueries(1, &this->Timer);
-    vtkNew<vtkCallbackCommand> rwCB;
-    rwCB->SetClientData(this);
-    rwCB->SetCallback([](vtkObject*, unsigned long eid, void* clientdata, void*) {
-      F3DViewer* that = static_cast<F3DViewer*>(clientdata);
-      if (eid == vtkCommand::StartEvent)
-      {
-        glBeginQuery(GL_TIME_ELAPSED, that->Timer);
-      }
-      else
-      {
-        glEndQuery(GL_TIME_ELAPSED);
-        GLint elapsed;
-        glGetQueryObjectiv(that->Timer, GL_QUERY_RESULT, &elapsed);
-        int fps = static_cast<int>(std::round(1.0 / (elapsed * 1e-9)));
-        that->FPSActor->SetInput(std::to_string(fps).c_str());
-      }
-    });
-    this->RenderWindow->AddObserver(vtkCommand::StartEvent, rwCB);
-    this->RenderWindow->AddObserver(vtkCommand::EndEvent, rwCB);
-    this->Renderer->AddActor(this->FPSActor);
-  }
+  glGenQueries(1, &this->Timer);
+  vtkNew<vtkCallbackCommand> rwCB;
+  rwCB->SetClientData(this);
+  rwCB->SetCallback([](vtkObject*, unsigned long eid, void* clientdata, void*) {
+    F3DViewer* that = static_cast<F3DViewer*>(clientdata);
+    if (eid == vtkCommand::StartEvent)
+    {
+      glBeginQuery(GL_TIME_ELAPSED, that->Timer);
+    }
+    else
+    {
+      glEndQuery(GL_TIME_ELAPSED);
+      GLint elapsed;
+      glGetQueryObjectiv(that->Timer, GL_QUERY_RESULT, &elapsed);
+      int fps = static_cast<int>(std::round(1.0 / (elapsed * 1e-9)));
+      that->TimerActor->SetInput(std::to_string(fps).c_str());
+    }
+  });
+  this->RenderWindow->AddObserver(vtkCommand::StartEvent, rwCB);
+  this->RenderWindow->AddObserver(vtkCommand::EndEvent, rwCB);
+  this->Renderer->AddActor(this->TimerActor);
 
   if (this->Options->Progress)
   {
@@ -132,6 +129,12 @@ F3DViewer::F3DViewer(F3DOptions* options, vtkImporter* importer)
       break;
     }
   }
+}
+
+//----------------------------------------------------------------------------
+F3DViewer::~F3DViewer()
+{
+  glDeleteQueries(1, &this->Timer);
 }
 
 //----------------------------------------------------------------------------
@@ -322,6 +325,21 @@ bool F3DViewer::IsScalarBarVisible()
 }
 
 //----------------------------------------------------------------------------
+void F3DViewer::ShowTimer(bool show)
+{
+  if (this->TimerActor)
+  {
+    this->TimerActor->SetVisibility(show);
+  }
+}
+
+//----------------------------------------------------------------------------
+bool F3DViewer::IsTimerVisible()
+{
+  return this->TimerActor && this->TimerActor->GetVisibility();
+}
+
+//----------------------------------------------------------------------------
 void F3DViewer::ShowEdge(bool show)
 {
   vtkActor *anActor;
@@ -354,6 +372,7 @@ void F3DViewer::SetupWithOptions()
   this->ShowGrid(this->Options->Grid);
   this->ShowAxis(this->Options->Axis);
   this->ShowEdge(this->Options->Edges);
+  this->ShowTimer(this->Options->FPS);
 }
 
 //----------------------------------------------------------------------------
