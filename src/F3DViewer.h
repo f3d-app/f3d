@@ -32,7 +32,7 @@ class F3DViewer
 {
 public:
   F3DViewer(F3DOptions *options, vtkImporter *importer);
-  ~F3DViewer() = default;
+  ~F3DViewer();
 
   int Start();
 
@@ -40,11 +40,13 @@ public:
   void ShowGrid(bool show);
   void ShowScalarBar(bool show);
   void ShowEdge(bool show);
+  void ShowTimer(bool show);
 
   bool IsAxisVisible();
   bool IsGridVisible();
   bool IsScalarBarVisible();
   bool IsEdgeVisible();
+  bool IsTimerVisible();
 
   void Render();
 
@@ -74,7 +76,7 @@ protected:
   vtkNew<vtkRenderWindowInteractor> RenderWindowInteractor;
   vtkNew<vtkF3DInteractor> InteractorStyle;
 
-  vtkNew<vtkTextActor> FPSActor;
+  vtkNew<vtkTextActor> TimerActor;
   GLuint Timer;
 };
 
