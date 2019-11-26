@@ -11,4 +11,6 @@ const std::string AppTitle = "@PROJECT_DESCRIPTION@";
 
 #cmakedefine01 F3D_HAS_RAYTRACING
 
+#cmakedefine01 F3D_WIN32_APP
+
 #endif

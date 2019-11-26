@@ -2,7 +2,7 @@
 
 #include "Config.h"
 
-#if WIN32
+#if F3D_WIN32_APP
 #  include <Windows.h>
 #endif
 
@@ -10,7 +10,7 @@
 
 void F3DLog::PrintInternal(Severity sev, const std::string& str)
 {
-#if WIN32
+#if F3D_WIN32_APP
   unsigned int icon;
   switch (sev)
   {
