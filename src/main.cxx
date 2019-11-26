@@ -1,5 +1,7 @@
 #include <cstdio>
 
+#include "Config.h"
+
 #include "F3DLoader.h"
 #include "F3DLog.h"
 #include "F3DOptions.h"
@@ -16,7 +18,7 @@ int main(int argc, char** argv)
   return viewer.Start();
 }
 
-#if WIN32
+#if F3D_WIN32_APP
 #include <Windows.h>
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)

@@ -16,6 +16,8 @@ add_executable(f3d
   ${WINDOWS_RC_FILE}
 )
 
+set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+
 target_include_directories(f3d
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -25,8 +27,11 @@ target_compile_definitions(f3d
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  option(MACOSX_BUILD_BUNDLE OFF)
-  set_target_properties(f3d PROPERTIES MACOSX_BUNDLE TRUE)
+  # MacOS Bundle app
+  option(MACOSX_BUILD_BUNDLE ON)
+  if(MACOSX_BUILD_BUNDLE)
+    set_target_properties(f3d PROPERTIES MACOSX_BUNDLE TRUE)
+  endif()
 
   # Add logo icon
   set(MACOSX_BUNDLE_ICON_FILE logo.icns)
@@ -37,7 +42,12 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif()
 
 if(WIN32)
-  set_target_properties(f3d PROPERTIES WIN32_EXECUTABLE TRUE)
+  # Windows executable without console
+  option(WINDOWS_BUILD_WIN32 ON)
+  if(WINDOWS_BUILD_WIN32)
+    set_target_properties(f3d PROPERTIES WIN32_EXECUTABLE TRUE)
+    set(F3D_WIN32_APP ON)
+  endif()
 endif()
 
 vtk_module_autoinit(

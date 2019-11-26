@@ -24,20 +24,28 @@ void vtkF3DInteractor::OnChar()
       this->Viewer->GetRenderer()->ResetCamera();
       this->Viewer->Render();
       break;
+    case 't':
+    case 'T':
+      this->Viewer->ShowTimer(!this->Viewer->IsTimerVisible());
+      this->Viewer->Render();
+      break;
     case 'x':
+    case 'X':
       this->Viewer->ShowAxis(!this->Viewer->IsAxisVisible());
       this->Viewer->Render();
       break;
     case 'g':
+    case 'G':
       this->Viewer->ShowGrid(!this->Viewer->IsGridVisible());
       this->Viewer->Render();
       break;
     case 'b':
+    case 'B':
       this->Viewer->ShowScalarBar(!this->Viewer->IsScalarBarVisible());
       this->Viewer->Render();
       break;
-    case 'w' :
-    case 'W' :
+    case 'e' :
+    case 'E' :
       this->Viewer->ShowEdge(!this->Viewer->IsEdgeVisible());
       this->Viewer->Render();
     break;
