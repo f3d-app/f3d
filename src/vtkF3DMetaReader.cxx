@@ -10,11 +10,12 @@
 #include <vtkNrrdReader.h>
 #include <vtkOBJReader.h>
 #include <vtkObjectFactory.h>
+#include <vtkPDataSetReader.h>
 #include <vtkPLYReader.h>
-#include <vtkPolyDataReader.h>
 #include <vtkSTLReader.h>
 #include <vtkXMLGenericDataObjectReader.h>
 #include <vtksys/SystemTools.hxx>
+
 
 vtkStandardNewMacro(vtkF3DMetaReader);
 
@@ -75,8 +76,7 @@ void vtkF3DMetaReader::SetFileName(std::string fileName)
     bool readerFound = false;
     if (!readerFound && ext == ".vtk")
     {
-      // TODO not working and not generic anyway
-      vtkNew<vtkPolyDataReader> reader;
+      vtkNew<vtkPDataSetReader> reader;
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
       readerFound = true;
