@@ -41,10 +41,10 @@ public:
 
 protected:
   vtkF3DMetaReader();
-  ~vtkF3DMetaReader() = default;
+  ~vtkF3DMetaReader() override = default;
 
   /**
-   * Protected method used internaly to set the filename
+   * Protected method used internally to set the filename
   */
   vtkSetStringMacro(FileName);
 

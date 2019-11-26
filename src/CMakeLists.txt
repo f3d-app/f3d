@@ -62,6 +62,7 @@ vtk_module_autoinit(
     VTK::IOGeometry
     VTK::IOImage
     VTK::IOImport
+    VTK::IOParallel
     VTK::IOPLY
     VTK::IOXML
     VTK::RenderingAnnotation
@@ -82,6 +83,7 @@ target_link_libraries(f3d
     VTK::IOGeometry
     VTK::IOImage
     VTK::IOImport
+    VTK::IOParallel
     VTK::IOPLY
     VTK::IOXML
     VTK::RenderingAnnotation
