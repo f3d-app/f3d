@@ -34,15 +34,15 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
       .add_options("Material")
       ("e,edges", "Show cell edges", cxxopts::value<bool>(this->Edges))
       ("point-size", "Point size", cxxopts::value<double>(this->PointSize)->default_value("10.0"), "<size>")
-      ("color", "Solid color", cxxopts::value<std::vector<double>>(this->SolidColor)->default_value("1.0,1.0,1.0"))
-      ("opacity", "Opacity", cxxopts::value<double>(this->Opacity)->default_value("1.0"))
-      ("roughness", "Roughness coefficient (0.0-1.0)", cxxopts::value<double>(this->Roughness)->default_value("0.3"))
-      ("metallic", "Metallic coefficient (0.0-1.0)", cxxopts::value<double>(this->Metallic)->default_value("0.0"));
+      ("color", "Solid color", cxxopts::value<std::vector<double>>(this->SolidColor)->default_value("1.0,1.0,1.0"), "<R,G,B>")
+      ("opacity", "Opacity", cxxopts::value<double>(this->Opacity)->default_value("1.0"), "<opacity>")
+      ("roughness", "Roughness coefficient (0.0-1.0)", cxxopts::value<double>(this->Roughness)->default_value("0.3"), "<roughness>")
+      ("metallic", "Metallic coefficient (0.0-1.0)", cxxopts::value<double>(this->Metallic)->default_value("0.0"), "<metallic>");
 
     options
       .add_options("Window")
-      ("bg-color", "Background color", cxxopts::value<std::vector<double>>(this->BackgroundColor)->default_value("0.2,0.2,0.2"))
-      ("resolution", "Window resolution", cxxopts::value<std::vector<int>>(this->WindowSize)->default_value("1000,600"))
+      ("bg-color", "Background color", cxxopts::value<std::vector<double>>(this->BackgroundColor)->default_value("0.2,0.2,0.2"), "<R,G,B>")
+      ("resolution", "Window resolution", cxxopts::value<std::vector<int>>(this->WindowSize)->default_value("1000,600"), "<width,height>")
       ("t,timer", "Display frame per second", cxxopts::value<bool>(this->FPS));
 
     options
