@@ -102,7 +102,7 @@ build-osx:
   stage: test
   script:
     - cd build
-    - ctest -C Release -j 8
+    - ctest -C Release -j 8 --output-on-failure
 
 test-linux:
   extends:
