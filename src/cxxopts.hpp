@@ -1411,7 +1411,7 @@ namespace cxxopts
 
       if (!o.is_boolean)
       {
-        result += " " + arg;
+        result += "=" + arg;
       }
 
       return result;
