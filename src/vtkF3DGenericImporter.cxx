@@ -124,6 +124,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   {
     mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->InterpolateScalarsBeforeMappingOn();
+    mapper->SetColorModeToMapScalars();
   }
 
   mapper->SetInputData(surface);
