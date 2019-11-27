@@ -7,6 +7,8 @@ namespace f3d
 {
 const std::string AppName = "@PROJECT_NAME@";
 const std::string AppTitle = "@PROJECT_DESCRIPTION@";
+const std::string AppVersion = "@PROJECT_VERSION@";
+const std::string AppBuildDate = "@F3D_BUILD_DATE@";
 }
 
 #cmakedefine01 F3D_HAS_RAYTRACING
