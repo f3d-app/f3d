@@ -1,4 +1,5 @@
 cache:
+  key: "$CI_COMMIT_REF_NAME-cache" # one cache per branch
   paths:
     - build/
 
@@ -49,7 +50,7 @@ clean-osx:
   script:
     - cmake -E make_directory build
     - cd build
-    - cmake $ADDITIONAL_OPTIONS -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+    - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
 
 configure-linux:
   extends:
@@ -61,7 +62,8 @@ configure-windows:
     - .configure
     - .windows
   variables:
-    ADDITIONAL_OPTIONS: -Ax64
+    BUILD_ARCHITECTURE: -Ax64
+    ADDITIONAL_OPTIONS: -DWINDOWS_BUILD_WIN32=ON
 
 configure-osx:
   extends:
@@ -103,6 +105,10 @@ build-osx:
   script:
     - cd build
     - ctest -C Release -j 8 --output-on-failure
+  artifacts:
+    when: on_failure
+    paths:
+      - build/Test*.png
 
 test-linux:
   extends:
