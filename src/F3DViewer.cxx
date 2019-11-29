@@ -29,6 +29,7 @@
 #include <vtkTranslucentPass.h>
 #include <vtkVolumetricPass.h>
 #include <vtkWindowToImageFilter.h>
+#include <vtksys/SystemTools.hxx>
 
 #if F3D_HAS_RAYTRACING
 #include <vtkOSPRayPass.h>
@@ -389,10 +390,32 @@ int F3DViewer::Start()
     {
       vtkNew<vtkPNGWriter> writer;
       writer->SetInputConnection(rtW2if->GetOutputPort());
-      writer->SetFileName(this->Options->Output.c_str());
+      std::string fullPath = vtksys::SystemTools::CollapseFullPath(this->Options->Output);
+      writer->SetFileName(fullPath.c_str());
       writer->Write();
 
       return EXIT_SUCCESS;
+    }
+
+    if (vtksys::SystemTools::HasEnv("F3D_GEN_REF"))
+    {
+      vtkNew<vtkPNGWriter> writer;
+      writer->SetInputConnection(rtW2if->GetOutputPort());
+      std::string fullPath = vtksys::SystemTools::CollapseFullPath(this->Options->Reference);
+      writer->SetFileName(fullPath.c_str());
+      writer->Write();
+
+      cerr << "Reference generated!" << endl;
+
+      return EXIT_SUCCESS;
+    }
+
+    if (!vtksys::SystemTools::FileExists(this->Options->Reference))
+    {
+      cerr << "Reference file does not exists, "
+        << "generate it first (set F3D_GEN_REF variable and run test again)." << endl;
+
+      return EXIT_FAILURE;
     }
 
     vtkNew<vtkPNGReader> reader;
@@ -407,6 +430,22 @@ int F3DViewer::Start()
     cout << "Diff threshold error = " << error << endl;
     if (error > this->Options->RefThreshold)
     {
+      std::string fileName = vtksys::SystemTools::GetFilenameName(this->Options->Reference.c_str());
+      std::string testFileName = vtksys::SystemTools::CollapseFullPath(fileName);
+
+      std::string modFileName = fileName;
+      vtksys::SystemTools::ReplaceString(modFileName, ".png", ".diff.png");
+      std::string diffFileName = vtksys::SystemTools::CollapseFullPath(modFileName);
+
+      vtkNew<vtkPNGWriter> writer;
+      writer->SetInputConnection(rtW2if->GetOutputPort());
+      writer->SetFileName(fileName.c_str());
+      writer->Write();
+
+      writer->SetInputConnection(diff->GetOutputPort());
+      writer->SetFileName(diffFileName.c_str());
+      writer->Write();
+
       return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
