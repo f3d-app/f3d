@@ -13,7 +13,6 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
 {
   try
   {
-
     cxxopts::Options options(f3d::AppName, f3d::AppTitle);
     options
       .positional_help("input_file")
@@ -24,6 +23,7 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
       ("input", "Input file", cxxopts::value<std::string>(), "<file>")
       ("o,output", "Render to file", cxxopts::value<std::string>(this->Output), "<png file>")
       ("h,help", "Print help")
+      ("version", "Print version details")
       ("v,verbose", "Enable verbose mode", cxxopts::value<bool>(this->Verbose))
       ("x,axis", "Show axis", cxxopts::value<bool>(this->Axis))
       ("g,grid", "Show grid", cxxopts::value<bool>(this->Grid))
@@ -85,6 +85,25 @@ bool F3DOptions::InitializeFromArgs(int argc, char** argv)
     if (result.count("help") > 0)
     {
       F3DLog::Print(F3DLog::Severity::Info, options.help());
+      exit(EXIT_SUCCESS);
+    }
+
+    if (result.count("version") > 0)
+    {
+      std::string version = f3d::AppTitle;
+      version += "\nVersion: ";
+      version += f3d::AppVersion;
+      version += "\nBuild date: ";
+      version += f3d::AppBuildDate;
+      version += "\nRayTracing module: ";
+#if F3D_HAS_RAYTRACING
+      version += "ON";
+#else
+      version += "OFF";
+#endif
+      version += "\nAuthor: Kitware SAS";
+
+      F3DLog::Print(F3DLog::Severity::Info, version);
       exit(EXIT_SUCCESS);
     }
 
