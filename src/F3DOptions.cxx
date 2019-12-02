@@ -240,7 +240,6 @@ bool ConfigurationOptions::InitializeFromConfigFile()
 
   if (!file.is_open())
   {
-    // cout << "No configuration file found at " << configFilePath << endl;
     return false;
   }
 
