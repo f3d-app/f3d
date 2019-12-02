@@ -9,6 +9,10 @@
 
 int main(int argc, char** argv)
 {
+#if NDEBUG
+  vtkObject::GlobalWarningDisplayOff();
+#endif
+
   F3DOptions options;
   options.InitializeFromArgs(argc, argv);
 
