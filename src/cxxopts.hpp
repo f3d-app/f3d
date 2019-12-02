@@ -52,6 +52,9 @@ THE SOFTWARE.
 #define CXXOPTS__VERSION_MINOR 2
 #define CXXOPTS__VERSION_PATCH 0
 
+#define CXXOPTS__MAX_WIDTH 100
+#define CXXOPTS__OPTION_LONGEST 50
+
 namespace cxxopts
 {
   static constexpr struct {
@@ -1373,7 +1376,7 @@ namespace cxxopts
 
   namespace
   {
-    constexpr int OPTION_LONGEST = 30;
+    constexpr int OPTION_LONGEST = CXXOPTS__OPTION_LONGEST;
     constexpr int OPTION_DESC_GAP = 2;
 
     std::basic_regex<char> option_matcher
@@ -1969,7 +1972,7 @@ Options::help_one_group(const std::string& g) const
   longest = (std::min)(longest, static_cast<size_t>(OPTION_LONGEST));
 
   //widest allowed description
-  auto allowed = size_t{76} - longest - OPTION_DESC_GAP;
+  auto allowed = size_t{CXXOPTS__MAX_WIDTH} - longest - OPTION_DESC_GAP;
 
   auto fiter = format.begin();
   for (const auto& o : group->second.options)
