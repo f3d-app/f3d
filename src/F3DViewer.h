@@ -23,7 +23,7 @@
 
 #include <vtk_glew.h>
 
-class F3DOptions;
+struct F3DOptions;
 class vtkImporter;
 class vtkRenderWindow;
 class vtkRenderer;
