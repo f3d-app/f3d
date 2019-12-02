@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 #endif
 
   F3DOptions options;
-  options.InitializeFromArgs(argc, argv);
+  F3DOptionsParser parser(options, argc, argv);
 
   F3DLoader loader(options);
 

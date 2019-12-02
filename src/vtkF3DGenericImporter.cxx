@@ -284,7 +284,9 @@ void vtkF3DGenericImporter::ImportLights(vtkRenderer* ren)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::ImportProperties(vtkRenderer* ren) {}
+void vtkF3DGenericImporter::ImportProperties(vtkRenderer* ren)
+{
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
