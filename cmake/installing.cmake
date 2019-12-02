@@ -1,8 +1,7 @@
 # F3D Installation
 
 install(FILES LICENSE README.md
-  DESTINATION "."
-  COMPONENT "Documentation")
+  DESTINATION ".")
 
 if(UNIX AND NOT APPLE)
   install(FILES "${CMAKE_SOURCE_DIR}/resources/f3d.desktop"
