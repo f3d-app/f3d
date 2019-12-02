@@ -28,7 +28,7 @@ target_compile_definitions(f3d
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   # MacOS Bundle app
-  option(MACOSX_BUILD_BUNDLE ON)
+  option(MACOSX_BUILD_BUNDLE ON "Build a macOS bundle application")
   if(MACOSX_BUILD_BUNDLE)
     set_target_properties(f3d PROPERTIES MACOSX_BUNDLE TRUE)
   endif()
@@ -43,7 +43,7 @@ endif()
 
 if(WIN32)
   # Windows executable without console
-  option(WINDOWS_BUILD_WIN32 ON)
+  option(WINDOWS_BUILD_WIN32 ON "Build a non-console Win32 application")
   if(WINDOWS_BUILD_WIN32)
     set_target_properties(f3d PROPERTIES WIN32_EXECUTABLE TRUE)
     set(F3D_WIN32_APP ON)
