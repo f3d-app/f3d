@@ -122,6 +122,7 @@ Simple interaction with the displayed data is possible directly within the windo
 * *Move the mouse wheel* to zoom in/out.
 * *Click and drag* with the *middle* mouse button to translate the camera.
 * Press `r` key to reset the camera zoom.
+* Press `q` key to close the window and quit f3d.
 
 Some options can be toggled directly using interactions:
 * Press `x` key to toggle the trihedral axes display.
