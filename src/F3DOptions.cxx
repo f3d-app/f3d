@@ -142,13 +142,13 @@ bool ConfigurationOptions::InitializeFromArgs(F3DOptions &options)
     this->DeclareOption(grp1, "help", "h", "Print help");
     this->DeclareOption(grp1, "version", "", "Print version details");
     this->DeclareOption(grp1, "verbose", "v", "Enable verbose mode", options.Verbose);
-    this->DeclareOption(grp1, "axis", "x", "Show axis", options.Axis);
+    this->DeclareOption(grp1, "axis", "x", "Show axes", options.Axis);
     this->DeclareOption(grp1, "grid", "g", "Show grid", options.Grid);
+    this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.Edges);
     this->DeclareOption(grp1, "progress", "p", "Show progress bar", options.Progress);
     this->DeclareOption(grp1, "geometry-only", "m", "Do not read materials, cameras and lights from file", options.GeometryOnly);
 
     auto grp2 = cxxOptions.add_options("Material");
-    this->DeclareOption(grp2, "edges", "e", "Show cell edges", options.Edges);
     this->DeclareOption(grp2, "point-size", "", "Point size", options.PointSize, true, "<size>");
     this->DeclareOption(grp2, "color", "", "Solid color", options.SolidColor, true, "<R,G,B>");
     this->DeclareOption(grp2, "opacity", "", "Opacity", options.Opacity, true, "<opacity>");
@@ -162,9 +162,9 @@ bool ConfigurationOptions::InitializeFromArgs(F3DOptions &options)
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
     this->DeclareOption(grp4, "scalars", "", "Color by scalars", options.Scalars, std::string("f3d_reserved"), "<array_name>");
-    this->DeclareOption(grp4, "comp", "", "Specify the component used", options.Component, true, "<comp_index>");
-    this->DeclareOption(grp4, "cells", "c", "The array is located on cells", options.Cells);
-    this->DeclareOption(grp4, "range", "", "Custom range for the array", options.Range, false, "<min,max>");
+    this->DeclareOption(grp4, "comp", "", "Component from the scalar array to color with", options.Component, true, "<comp_index>");
+    this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.Cells);
+    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.Range, false, "<min,max>");
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.Bar);
 
 #if F3D_HAS_RAYTRACING
