@@ -50,48 +50,28 @@ if(WIN32)
   endif()
 endif()
 
-vtk_module_autoinit(
-  TARGETS f3d
-  MODULES
-    VTK::FiltersGeneral
-    VTK::FiltersGeometry
-    VTK::ImagingCore
-    VTK::InteractionStyle
-    VTK::InteractionWidgets
-    VTK::IOCityGML
-    VTK::IOGeometry
-    VTK::IOImage
-    VTK::IOImport
-    VTK::IOParallel
-    VTK::IOPLY
-    VTK::IOXML
-    VTK::RenderingAnnotation
-    VTK::RenderingCore
-    VTK::RenderingLabel
-    VTK::RenderingOpenGL2
-    VTK::jsoncpp
+set(F3D_MODULES_BASE
+  VTK::FiltersGeneral
+  VTK::FiltersGeometry
+  VTK::ImagingCore
+  VTK::InteractionStyle
+  VTK::InteractionWidgets
+  VTK::IOCityGML
+  VTK::IOGeometry
+  VTK::IOImage
+  VTK::IOImport
+  VTK::IOParallel
+  VTK::IOPLY
+  VTK::IOXML
+  VTK::RenderingAnnotation
+  VTK::RenderingCore
+  VTK::RenderingLabel
+  VTK::RenderingOpenGL2
+  VTK::jsoncpp
 )
 
-target_link_libraries(f3d
-  PUBLIC
-    VTK::FiltersGeneral
-    VTK::FiltersGeometry
-    VTK::ImagingCore
-    VTK::InteractionStyle
-    VTK::InteractionWidgets
-    VTK::IOCityGML
-    VTK::IOGeometry
-    VTK::IOImage
-    VTK::IOImport
-    VTK::IOParallel
-    VTK::IOPLY
-    VTK::IOXML
-    VTK::RenderingAnnotation
-    VTK::RenderingCore
-    VTK::RenderingLabel
-    VTK::RenderingOpenGL2
-    VTK::jsoncpp
-)
+vtk_module_autoinit(TARGETS f3d MODULES ${F3D_MODULES_BASE})
+target_link_libraries(f3d PUBLIC ${F3D_MODULES_BASE})
 
 if(TARGET VTK::RenderingRayTracing)
   message(STATUS "VTK RayTracing enabled")
