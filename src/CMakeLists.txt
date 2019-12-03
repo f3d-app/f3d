@@ -39,6 +39,9 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set_source_files_properties(${f3d_ICON} PROPERTIES
     MACOSX_PACKAGE_LOCATION "Resources")
   target_sources(f3d PRIVATE ${f3d_ICON})
+  configure_file("${CMAKE_SOURCE_DIR}/resources/BundleInfo.plist.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/BundleInfo.plist")
+  set_target_properties(f3d PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/BundleInfo.plist")
 endif()
 
 if(WIN32)
