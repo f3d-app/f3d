@@ -1734,6 +1734,13 @@ ParseResult::parse(int& argc, char**& argv)
       break;
     }
 
+    // patch for macOS
+    if (std::string(argv[current]).substr(0, 4) == std::string("-psn"))
+    {
+      ++current;
+      continue;
+    }
+
     std::match_results<const char*> result;
     std::regex_match(argv[current], result, option_matcher);
 
