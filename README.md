@@ -136,3 +136,4 @@ Some options can be toggled directly using interactions:
 * No support for animation.
 * No support for specifying manual lighting in the default scene.
 * No support for volume rendering
+* Cannot open files from Finder on OSX
