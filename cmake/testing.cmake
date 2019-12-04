@@ -10,7 +10,7 @@ function(f3d_test)
              --resolution=${ARGV2}
              --ref ${CMAKE_SOURCE_DIR}/data/baselines/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 3)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
 endfunction()
 
 f3d_test(TestPLY suzanne.ply "300,300")
