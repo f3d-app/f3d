@@ -234,6 +234,12 @@ bool ConfigurationOptions::InitializeFromConfigFile()
   F3DOptions opts;
   this->InitializeFromArgs(opts);
 
+  // disable config file for tests
+  if (!opts.Reference.empty())
+  {
+    return true;
+  }
+
   const std::string& configFilePath = this->GetUserSettingsFilePath();
   std::ifstream file;
   file.open(configFilePath.c_str());
