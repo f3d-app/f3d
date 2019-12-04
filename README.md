@@ -10,6 +10,9 @@ has simple interaction mechanisms and is fully controllable using arguments in t
 It is open-source and cross-platform (tested on Windows, Linux, and macOS).
 It supports a range of file formats, rendering and texturing options.
 
+![F3D Demo](./resources/demo.png)  
+*A typical render by f3d*
+
 # Installation
 
 You can find the release binary packages for Windows, Linux, and OSX on the [Release page](https://gitlab.kitware.com/f3d/f3d/-/releases).
