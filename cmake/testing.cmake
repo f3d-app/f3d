@@ -42,3 +42,14 @@ f3d_test(TestBackground suzanne.ply "300,300" "--bg-color=0.8,0.2,0.9")
 if(F3D_HAS_RAYTRACING)
   f3d_test(TestOSPRayGLTF WaterBottle.glb "300,300" "-r --samples=1")
 endif()
+
+# Test few basic options
+add_test(NAME TestNoArg COMMAND $<TARGET_FILE:f3d>)
+set_tests_properties(TestNoArg PROPERTIES ENVIRONMENT F3D_NO_MESSAGEBOX=1)
+set_tests_properties(TestNoArg PROPERTIES WILL_FAIL TRUE)
+
+add_test(NAME TestHelp COMMAND $<TARGET_FILE:f3d> --help)
+set_tests_properties(TestHelp PROPERTIES ENVIRONMENT F3D_NO_MESSAGEBOX=1)
+
+add_test(NAME TestVersion COMMAND $<TARGET_FILE:f3d> --version)
+set_tests_properties(TestVersion PROPERTIES ENVIRONMENT F3D_NO_MESSAGEBOX=1)

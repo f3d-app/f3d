@@ -192,7 +192,6 @@ bool ConfigurationOptions::InitializeFromArgs(F3DOptions &options)
     }
     int argc = this->Argc;
     auto result = cxxOptions.parse(argc, this->Argv);
-    options.Input = result["input"].as<std::string>().c_str();
 
     if (result.count("help") > 0)
     {
@@ -217,6 +216,11 @@ bool ConfigurationOptions::InitializeFromArgs(F3DOptions &options)
 
       F3DLog::Print(F3DLog::Severity::Info, version);
       exit(EXIT_SUCCESS);
+    }
+
+    if (result.count("input") > 0)
+    {
+      options.Input = result["input"].as<std::string>().c_str();
     }
   }
   catch (const cxxopts::OptionException &e)

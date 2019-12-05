@@ -21,6 +21,7 @@ public:
     AppendArg(ss, args...);
     PrintInternal(sev, ss.str());
   }
+
 protected:
   static void AppendArg(std::stringstream& ss) {}
 
