@@ -6,6 +6,7 @@
 #  include <Windows.h>
 #endif
 
+#include <cstdlib>
 #include <iostream>
 
 void F3DLog::PrintInternal(Severity sev, const std::string& str)
@@ -25,7 +26,10 @@ void F3DLog::PrintInternal(Severity sev, const std::string& str)
     icon = MB_ICONERROR;
     break;
   }
-  MessageBox(0, str.c_str(), f3d::AppTitle.c_str(), icon);
+  if (!std::getenv("F3D_NO_MESSAGEBOX"))
+  {
+    MessageBox(0, str.c_str(), f3d::AppTitle.c_str(), icon);
+  }
 #else
   std::cerr << str << std::endl;
 #endif
