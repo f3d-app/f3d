@@ -1,8 +1,10 @@
 #include "vtkF3DOpenGLGridMapper.h"
 
 #include <vtkFloatArray.h>
+#include <vtkInformation.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLError.h>
+#include <vtkOpenGLRenderPass.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLVertexArrayObject.h>
 #include <vtkOpenGLVertexBufferObjectGroup.h>
@@ -85,6 +87,23 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
     cellBO.AttributeUpdateTime.Modified();
   }
 
+  // Handle render pass setup:
+  vtkInformation* info = actor->GetPropertyKeys();
+  if (info && info->Has(vtkOpenGLRenderPass::RenderPasses()))
+  {
+    int numRenderPasses = info->Length(vtkOpenGLRenderPass::RenderPasses());
+    for (int i = 0; i < numRenderPasses; ++i)
+    {
+      vtkObjectBase* rpBase = info->Get(vtkOpenGLRenderPass::RenderPasses(), i);
+      vtkOpenGLRenderPass* rp = vtkOpenGLRenderPass::SafeDownCast(rpBase);
+      if (rp && !rp->SetShaderParameters(cellBO.Program, this, actor, cellBO.VAO))
+      {
+        vtkErrorMacro(
+          "RenderPass::SetShaderParameters failed for renderpass: " << rp->GetClassName());
+      }
+    }
+  }
+
   cellBO.Program->SetUniformf("fadeDist", this->FadeDistance);
   cellBO.Program->SetUniformf("unitSquare", this->UnitSquare);
 }
@@ -140,5 +159,6 @@ void vtkF3DOpenGLGridMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
 bool vtkF3DOpenGLGridMapper::GetNeedToRebuildShaders(
   vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* act)
 {
-  return cellBO.Program == nullptr;
+  vtkMTimeType renderPassMTime = this->GetRenderPassStageMTime(act);
+  return cellBO.Program == nullptr || cellBO.ShaderSourceTime < renderPassMTime;
 }
