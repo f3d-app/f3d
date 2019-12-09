@@ -38,6 +38,7 @@ f3d_test(TestVTICell waveletMaterial.vti "300,300" "--scalars=Material -c --roug
 f3d_test(TestSSAO suzanne.ply "300,300" "-u")
 f3d_test(TestDepthPeeling suzanne.ply "300,300" "-d --opacity=0.5")
 f3d_test(TestBackground suzanne.ply "300,300" "--bg-color=0.8,0.2,0.9")
+f3d_test(TestGridWithDepthPeeling suzanne.ply "300,300" "-gd --opacity 0.2")
 
 if(F3D_HAS_RAYTRACING)
   f3d_test(TestOSPRayGLTF WaterBottle.glb "300,300" "-r --samples=1")
