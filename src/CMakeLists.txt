@@ -1,18 +1,23 @@
-
 if(WIN32)
   set(WINDOWS_RC_FILE ${CMAKE_SOURCE_DIR}/resources/f3d.rc)
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(OSX_DELEGATE ${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm)
 endif()
 
 add_executable(f3d
   main.cxx
   vtkF3DGenericImporter.cxx
-  vtkF3DInteractor.cxx
+  vtkF3DInteractorStyle.cxx
   vtkF3DMetaReader.cxx
   vtkF3DOpenGLGridMapper.cxx
+  vtkF3DRenderer.cxx
   F3DLoader.cxx
   F3DLog.cxx
+  F3DOffscreenRender.cxx
   F3DOptions.cxx
-  F3DViewer.cxx
+  ${OSX_DELEGATE}
   ${WINDOWS_RC_FILE}
 )
 

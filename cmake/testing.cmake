@@ -10,7 +10,9 @@ function(f3d_test)
              --resolution=${ARGV2}
              --ref ${CMAKE_SOURCE_DIR}/data/baselines/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
+  set_tests_properties(${ARGV0} PROPERTIES
+    TIMEOUT 10
+    ENVIRONMENT F3D_NO_MESSAGEBOX=1)
 endfunction()
 
 f3d_test(TestPLY suzanne.ply "300,300")
@@ -39,18 +41,16 @@ f3d_test(TestSSAO suzanne.ply "300,300" "-u")
 f3d_test(TestDepthPeeling suzanne.ply "300,300" "-d --opacity=0.5")
 f3d_test(TestBackground suzanne.ply "300,300" "--bg-color=0.8,0.2,0.9")
 f3d_test(TestGridWithDepthPeeling suzanne.ply "300,300" "-gd --opacity 0.2")
+f3d_test(TestFilename suzanne.ply "300,300" "-n")
 
 if(F3D_HAS_RAYTRACING)
   f3d_test(TestOSPRayGLTF WaterBottle.glb "300,300" "-r --samples=1")
 endif()
 
 # Test few basic options
-add_test(NAME TestNoArg COMMAND $<TARGET_FILE:f3d>)
-set_tests_properties(TestNoArg PROPERTIES ENVIRONMENT F3D_NO_MESSAGEBOX=1)
-set_tests_properties(TestNoArg PROPERTIES WILL_FAIL TRUE)
-
 add_test(NAME TestHelp COMMAND $<TARGET_FILE:f3d> --help)
-set_tests_properties(TestHelp PROPERTIES ENVIRONMENT F3D_NO_MESSAGEBOX=1)
-
 add_test(NAME TestVersion COMMAND $<TARGET_FILE:f3d> --version)
-set_tests_properties(TestVersion PROPERTIES ENVIRONMENT F3D_NO_MESSAGEBOX=1)
+
+set_tests_properties(TestHelp TestVersion PROPERTIES
+    TIMEOUT 2
+    ENVIRONMENT F3D_NO_MESSAGEBOX=1)
