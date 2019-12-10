@@ -2,12 +2,10 @@
  * @class   vtkF3DMetaReader
  * @brief   A meta reader that can read multiple type of files
  *
-*/
+ */
 
 #ifndef vtkF3DMetaReader_h
 #define vtkF3DMetaReader_h
-
-#include "Config.h"
 
 #include <vtkDataObjectAlgorithm.h>
 #include <vtkSmartPointer.h>
@@ -35,9 +33,7 @@ public:
   /**
    * Transfer to the InternalReader
    */
-  int ProcessRequest(vtkInformation*,
-                     vtkInformationVector**,
-                     vtkInformationVector*) override;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 protected:
   vtkF3DMetaReader();
@@ -45,7 +41,7 @@ protected:
 
   /**
    * Protected method used internally to set the filename
-  */
+   */
   vtkSetStringMacro(FileName);
 
   /**

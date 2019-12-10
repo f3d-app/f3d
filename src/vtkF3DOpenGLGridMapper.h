@@ -7,8 +7,6 @@
 #ifndef vtkF3DOpenGLGridMapper_h
 #define vtkF3DOpenGLGridMapper_h
 
-#include "Config.h"
-
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkSmartPointer.h>
 
@@ -41,8 +39,7 @@ protected:
 
   void RenderPiece(vtkRenderer* ren, vtkActor* actor) override;
 
-  bool GetNeedToRebuildShaders(
-    vtkOpenGLHelper &cellBO, vtkRenderer *ren, vtkActor *act) override;
+  bool GetNeedToRebuildShaders(vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* act) override;
 
   double FadeDistance = 10.0;
   double UnitSquare = 1.0;
