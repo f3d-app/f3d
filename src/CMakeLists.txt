@@ -78,7 +78,7 @@ target_link_libraries(f3d PUBLIC ${F3D_MODULES_BASE})
 
 if(TARGET VTK::RenderingRayTracing)
   message(STATUS "VTK RayTracing enabled")
-  set(F3D_HAS_RAYTRACING ON CACHE BOOL INTERNAL)
+  set(F3D_HAS_RAYTRACING ON CACHE INTERNAL BOOL)
   vtk_module_autoinit(
     TARGETS f3d
     MODULES VTK::RenderingRayTracing
@@ -86,6 +86,8 @@ if(TARGET VTK::RenderingRayTracing)
   target_link_libraries(f3d
     PUBLIC VTK::RenderingRayTracing
   )
+else()
+  set(F3D_HAS_RAYTRACING OFF CACHE INTERNAL BOOL)
 endif()
 
 configure_file(Config.h.in
