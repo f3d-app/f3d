@@ -10,7 +10,7 @@ has simple interaction mechanisms and is fully controllable using arguments in t
 It is open-source and cross-platform (tested on Windows, Linux, and macOS).
 It supports a range of file formats, rendering and texturing options.
 
-![F3D Demo](./resources/demo.png)
+![F3D Demo](./resources/demo.png)\
 *A typical render by f3d*
 
 # Installation
@@ -30,7 +30,7 @@ Alternatively, you can build it yourself, following the [build guide](#build).
 Set the following CMake options:
 * ` VTK_DIR`: Point to a build or install directory of VTK.
 * `BUILD_TESTING`: Optionally, enable the tests.
-* `MACOSX_BUILD_BUNDLE`: On MacOS, build a `.app` bundle.
+* `MACOSX_BUILD_BUNDLE`: On macOS, build a `.app` bundle.
 * `WINDOWS_BUILD_WIN32`: On Windows, build a Win32 application (without console).
 
 Then build the software using your build system.
@@ -75,9 +75,9 @@ Options|Description
 ## Material options
 Options|Default|Description
 ------|------|------
---point-size=\<size\>|10.0|Set the *point size*.<br>Points are displayed only if raytracing is activated and the geometry contains vertices,<br>or if the geometry contains only vertices.<br>In this last case, a representation with sphere glyphs is used.<br>This behavior will be changed in the near future.
+--point-size=\<size\>|10.0|Set the *point size*.<br>Points are displayed only if raytracing is activated and the geometry contains vertices,<br>or if the geometry contains only vertices.<br>In this last case, a representation of sphere glyphs is used.<br>This behavior will be changed in the near future.
 --color=\<R,G,B\>|1.0, 1.0, 1.0| Set a *color* on the geometry.<br>This only makes sense when using the default scene.
---opacity=\<opacity\>|1.0|Set an *opacity* on the geometry.<br>This only makes sense when using the default scene.
+--opacity=\<opacity\>|1.0|Set *opacity* on the geometry.<br>This only makes sense when using the default scene.
 --roughness=\<roughness\>|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
 --metallic=\<metallic\>|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
 
@@ -85,14 +85,14 @@ Options|Default|Description
 Options|Description
 ------|------
 -d, --depth-peeling|Enable *depth peeling*. This is a technique used to correctly render translucent objects.
--u, --ssao|Enable *Screen-Space Ambient Occlusion*. This is a technique used to improve depth perception of the object.
+-u, --ssao|Enable *Screen-Space Ambient Occlusion*. This is a technique used to improve the depth perception of the object.
 -f, --fxaa|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.
 
 ## Raytracing options:
 Options|Default|Description
 ------|------|------
--r, --raytracing||Enable *OSPRay raytracing*. Requires OSPray raytracing to be enabled in the linked VTK.
---samples=\<samples\>|5|Number of *samples per pixel*. It only makes sense with raytracing enabled.
+-r, --raytracing||Enable *OSPRay raytracing*. Requires OSPRay raytracing to be enabled in the linked VTK.
+--samples=\<samples\>|5|The number of *samples per pixel*. It only makes sense with raytracing enabled.
 -s, --denoise||*Denoise* the image. It only makes sense with raytracing enabled.
 
 ## Scientific visualization options:
@@ -101,7 +101,7 @@ Options|Default|Description
 --scalars=\<array_name\>||*Color by a specific scalar* array present in the file.<br>This only makes sense when using the default scene.<br>Use verbose to recover the usable array names.
 --comp=\<comp_index\>|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. Any negative value means *magnitude*.
 -c, --cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
---range=\<min,max\>||Set a *custom range for the coloring* by array.<br>Use with the scalar option.
+--range=\<min,max\>||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
 -b, --bar||Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
 
 ## Testing options:
@@ -136,12 +136,12 @@ Some options can be toggled directly using interactions:
 
 # Configuration file
 
-All the comand-line options can be controlled using a configuration file.
-This configuration file uses the "long" version of the options in a json
+All the command-line options can be controlled using a configuration file.
+This configuration file uses the "long" version of the options in a JSON
 formatted file to provide default values for these options.
 
 These options can be organized by block using a regular expression for each block
-in order to provide different default values for different filetype.
+in order to provide different default values for the different filetypes.
 
 Using a command-line option will override the corresponding value in the config file.
 A typical config file may look like this :
@@ -173,10 +173,10 @@ A typical config file may look like this :
 ```
 This first block defines a basic configuration with many desired options for all files.
 The second block specifies that all files ending with vt., eg: vtk, vtp, vtu, ... will be shown with edges on.
-The third block specify raytracing usage for .gltf and .glb files.
+The third block specifies raytracing usage for .gltf and .glb files.
 
-The configuration file location depends of your operating system:
- * Linux : `${XDG_CONFIG_HOME}/.config/f3d/f3d.json` if the variable exist, if not `~/.config/f3d/f3d.json`
+The configuration file location depends on your operating system:
+ * Linux : `${XDG_CONFIG_HOME}/.config/f3d/f3d.json` if the variable exists, if not `~/.config/f3d/f3d.json`
  * Windows : `%APPDATA%\f3d\f3d.json`
  * MacOS : `~/.config/f3d/f3d.json`
 
