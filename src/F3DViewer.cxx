@@ -75,7 +75,9 @@ F3DViewer::F3DViewer(F3DOptions* options, vtkImporter* importer)
       GLint elapsed;
       glGetQueryObjectiv(that->Timer, GL_QUERY_RESULT, &elapsed);
       int fps = static_cast<int>(std::round(1.0 / (elapsed * 1e-9)));
-      that->TimerActor->SetInput(std::to_string(fps).c_str());
+      std::string str = std::to_string(fps);
+      str += " fps";
+      that->TimerActor->SetInput(str.c_str());
     }
   });
   this->RenderWindow->AddObserver(vtkCommand::StartEvent, rwCB);
