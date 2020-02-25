@@ -13,6 +13,7 @@
 #include <vtkImporter.h>
 
 struct F3DOptions;
+class vtkMultiBlockDataSet;
 
 class vtkF3DGenericImporter : public vtkImporter
 {
@@ -36,6 +37,19 @@ public:
    * Check if the file can be read.
    */
   bool CanReadFile();
+   
+  /**
+   * Get a string describing the outputs
+   */
+  std::string GetOutputsDescription() override;
+
+  //@{
+  /**
+   * Static methods to recover information about data
+   */
+  static std::string GetMultiBlockDescription(vtkMultiBlockDataSet* mb, vtkIndent indent);
+  static std::string GetDataObjectDescription(vtkDataObject* object);
+  //@}
 
 protected:
   vtkF3DGenericImporter() = default;
@@ -48,6 +62,7 @@ protected:
   vtkNew<vtkF3DMetaReader> Reader;
 
   const F3DOptions* Options = nullptr;
+  std::string OutputDescription;
 
 private:
   vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;
