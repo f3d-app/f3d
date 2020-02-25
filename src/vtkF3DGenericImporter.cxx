@@ -22,6 +22,7 @@
 #include <vtkDataObjectTreeIterator.h>
 #include <vtkDataSetSurfaceFilter.h>
 #include <vtkEventForwarderCommand.h>
+#include <vtkInformation.h>
 #include <vtkLightKit.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
@@ -53,6 +54,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->Reader->Update();
 
   vtkSmartPointer<vtkDataObject> dataObject = this->Reader->GetOutput();
+
+  if (this->Options->Verbose)
+  {
+    this->OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(dataObject);
+  }
 
   vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(dataObject);
   if (mb)
@@ -93,10 +99,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   vtkSmartPointer<vtkPolyDataMapper> mapper;
 
   vtkPointData* pointData = surface->GetPointData();
-  vtkIdType nbPointData = pointData->GetNumberOfArrays();
   vtkCellData* cellData = surface->GetCellData();
-  vtkIdType nbCellData = cellData->GetNumberOfArrays();
-
   if (!this->Options->Raytracing && surface->GetNumberOfVerts() == surface->GetNumberOfCells())
   {
     double bounds[6];
@@ -130,32 +133,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   mapper->SetInputData(surface);
   mapper->Update();
-
-  if (this->Options->Verbose)
-  {
-    cout << "Number of points: " << surface->GetNumberOfPoints()
-         << "\nNumber of polygons: " << surface->GetNumberOfPolys()
-         << "\nNumber of lines: " << surface->GetNumberOfLines()
-         << "\nNumber of vertices: " << surface->GetNumberOfVerts() << "\n";
-
-    cout << nbPointData << " point data array(s)\n";
-    for (vtkIdType i = 0; i < nbPointData; i++)
-    {
-      vtkDataArray* array = pointData->GetArray(i);
-      cout << " #" << i << " '" << array->GetName() << "': " << array->GetNumberOfComponents()
-           << " comp.\n";
-    }
-
-    cout << nbCellData << " cell data array(s)\n";
-    for (vtkIdType i = 0; i < nbCellData; i++)
-    {
-      vtkDataArray* array = cellData->GetArray(i);
-      cout << " #" << i << " '" << array->GetName() << "': " << array->GetNumberOfComponents()
-           << " comp.\n";
-    }
-
-    cout.flush();
-  }
 
   std::string usedArray = this->Options->Scalars;
 
@@ -309,4 +286,49 @@ void vtkF3DGenericImporter::SetOptions(const F3DOptions& options)
 bool vtkF3DGenericImporter::CanReadFile()
 {
   return this->Reader->IsReaderValid();
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DGenericImporter::GetOutputsDescription()
+{
+  return this->OutputDescription;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DGenericImporter::GetMultiBlockDescription(vtkMultiBlockDataSet* mb, vtkIndent indent)
+{
+  std::stringstream ss;
+  for (int i = 0; i < mb->GetNumberOfBlocks(); i++)
+  {
+    const char* blockName = mb->GetMetaData(i)->Get(vtkCompositeDataSet::NAME());
+    ss << indent << "Block: " << (blockName ? std::string(blockName) : std::to_string(i))<< "\n";
+    vtkDataObject* object = mb->GetBlock(i);
+    vtkMultiBlockDataSet* mbChild = vtkMultiBlockDataSet::SafeDownCast(object);
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(object);
+    if (mbChild)
+    {
+      ss << vtkF3DGenericImporter::GetMultiBlockDescription(mbChild, indent.GetNextIndent());
+    }
+    else if(ds)
+    {
+      ss << vtkImporter::GetDataSetDescription(ds, indent.GetNextIndent());
+    }
+  }
+  return ss.str();
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DGenericImporter::GetDataObjectDescription(vtkDataObject* object)
+{
+  vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(object);
+  vtkDataSet* ds = vtkDataSet::SafeDownCast(object);
+  if (mb)
+  {
+    return vtkF3DGenericImporter::GetMultiBlockDescription(mb, vtkIndent(0));
+  }
+  else if (ds)
+  {
+    return vtkImporter::GetDataSetDescription(ds, vtkIndent(0));
+  }
+  return "";
 }

@@ -158,6 +158,12 @@ void F3DLoader::LoadCurrentIndex(vtkF3DRenderer* ren)
 
   importer->Update();
 
+  // Display description
+  if (opts.Verbose)
+  {
+    F3DLog::Print(F3DLog::Severity::Info, importer->GetOutputsDescription());
+  }
+
   progressWidget->Off();
 
   // Store scalar bar actor added by the generic importer
