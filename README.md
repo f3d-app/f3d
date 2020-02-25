@@ -28,7 +28,7 @@ Alternatively, you can build it yourself, following the [build guide](#build).
 
 ## Configuration and building
 Set the following CMake options:
-* ` VTK_DIR`: Point to a build or install directory of VTK.
+* `VTK_DIR`: Point to a build or install directory of VTK.
 * `BUILD_TESTING`: Optionally, enable the tests.
 * `MACOSX_BUILD_BUNDLE`: On macOS, build a `.app` bundle.
 * `WINDOWS_BUILD_WIN32`: On Windows, build a Win32 application (without console).
@@ -185,4 +185,3 @@ The configuration file location depends on your operating system:
 * No support for animation.
 * No support for specifying manual lighting in the default scene.
 * No support for volume rendering
-* Cannot open files from Finder on OSX
