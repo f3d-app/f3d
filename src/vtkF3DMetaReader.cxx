@@ -16,7 +16,6 @@
 #include <vtkXMLGenericDataObjectReader.h>
 #include <vtksys/SystemTools.hxx>
 
-
 vtkStandardNewMacro(vtkF3DMetaReader);
 
 //----------------------------------------------------------------------------
@@ -73,79 +72,66 @@ void vtkF3DMetaReader::SetFileName(std::string fileName)
   {
     std::string ext = vtksys::SystemTools::GetFilenameLastExtension(fileName);
     ext = vtksys::SystemTools::LowerCase(ext);
-    bool readerFound = false;
-    if (!readerFound && ext == ".vtk")
+
+    if (!this->InternalReader && ext == ".vtk")
     {
       vtkNew<vtkPDataSetReader> reader;
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
-      readerFound = true;
     }
-    if (!readerFound && ext.find(".vt") == 0)
+    if (!this->InternalReader && ext.find(".vt") == 0)
     {
       vtkNew<vtkXMLGenericDataObjectReader> reader;
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
-      readerFound = true;
     }
-    if (!readerFound && ext == ".ply")
+    if (!this->InternalReader && ext == ".ply")
     {
       vtkNew<vtkPLYReader> reader;
       if (reader->CanReadFile(this->FileName))
       {
         reader->SetFileName(this->FileName);
         this->InternalReader = reader;
-        readerFound = true;
       }
     }
-    if (!readerFound && ext == ".stl")
+    if (!this->InternalReader && ext == ".stl")
     {
       vtkNew<vtkSTLReader> reader;
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
-      readerFound = true;
     }
-    if (!readerFound && ext == ".dcm")
+    if (!this->InternalReader && ext == ".dcm")
     {
       vtkNew<vtkDICOMImageReader> reader;
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
-      readerFound = true;
     }
-    if (!readerFound && (ext == ".nrrd" || ext == ".nhdr"))
+    if (!this->InternalReader && (ext == ".nrrd" || ext == ".nhdr"))
     {
       vtkNew<vtkNrrdReader> reader;
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
-      readerFound = true;
     }
-    if (!readerFound && (ext == ".mha" || ext == ".mhd"))
+    if (!this->InternalReader && (ext == ".mha" || ext == ".mhd"))
     {
       vtkNew<vtkMetaImageReader> reader;
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
-      readerFound = true;
     }
-    if (!readerFound && ext == ".obj")
+    if (!this->InternalReader && ext == ".obj")
     {
       vtkNew<vtkOBJReader> reader;
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
-      readerFound = true;
     }
-    if (!readerFound && (ext == ".gltf" || ext == ".glb"))
+    if (!this->InternalReader && (ext == ".gltf" || ext == ".glb"))
     {
       vtkNew<vtkGLTFReader> reader;
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
-      readerFound = true;
     }
 
-    if (!readerFound)
-    {
-      vtkErrorMacro(<< this->FileName << " format is not supported");
-    }
-    else
+    if (this->InternalReader)
     {
       // forward progress event
       vtkNew<vtkEventForwarderCommand> forwarder;

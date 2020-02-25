@@ -9,15 +9,8 @@
 
 #include "Config.h"
 
-#include "cxxopts.hpp"
-
-#include <vtk_jsoncpp.h>
-
-#include <vtkObject.h>
-
-class vtkF3DGenericImporter;
-class vtkRenderer;
-class vtkRenderWindow;
+#include <memory>
+#include <vector>
 
 class ConfigurationOptions;
 
@@ -30,6 +23,7 @@ struct F3DOptions
   bool DepthPeeling = false;
   bool Edges = false;
   bool FPS = false;
+  bool Filename = false;
   bool FXAA = false;
   bool GeometryOnly = false;
   bool Grid = false;
@@ -44,7 +38,6 @@ struct F3DOptions
   double Roughness = 0.3;
   int Component = -1;
   int Samples = 5;
-  std::string Input = "";
   std::string Output = "";
   std::string Reference = "";
   std::string Scalars = "";
@@ -57,11 +50,21 @@ struct F3DOptions
 class F3DOptionsParser
 {
 public:
-  F3DOptionsParser(F3DOptions& options, int argc, char** argv);
+  static F3DOptionsParser& GetInstance();
+
+  void Initialize(int argc, char** argv);
+
+  F3DOptions GetOptionsFromCommandLine(std::vector<std::string>& files);
+  F3DOptions GetOptionsFromFile(const std::string& filePath);
+
+private:
+  F3DOptionsParser();
   ~F3DOptionsParser();
 
-protected:
-  ConfigurationOptions* ConfigOptions = nullptr;
+  F3DOptionsParser(F3DOptionsParser const&) = delete;
+  void operator=(F3DOptionsParser const&) = delete;
+
+  std::unique_ptr<ConfigurationOptions> ConfigOptions;
 };
 
 #endif

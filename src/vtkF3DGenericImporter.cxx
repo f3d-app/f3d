@@ -40,7 +40,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
   if (!this->Reader->IsReaderValid())
   {
-    F3DLog::Print(F3DLog::Severity::Info, "File '", this->Reader->GetFileName(), "' cannot be read.");
+    F3DLog::Print(
+      F3DLog::Severity::Info, "File '", this->Reader->GetFileName(), "' cannot be read.");
     return;
   }
 
@@ -192,7 +193,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   if (!usedArray.empty())
   {
     vtkDataArray* array = this->Options->Cells ? cellData->GetArray(usedArray.c_str())
-                                                 : pointData->GetArray(usedArray.c_str());
+                                               : pointData->GetArray(usedArray.c_str());
 
     if (array)
     {
@@ -201,7 +202,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
         mapper->ScalarVisibilityOn();
         mapper->SelectColorArray(usedArray.c_str());
         mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
-                                                  : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+                                                   : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
 
         vtkScalarsToColors* lut = mapper->GetLookupTable();
 
@@ -284,9 +285,7 @@ void vtkF3DGenericImporter::ImportLights(vtkRenderer* ren)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::ImportProperties(vtkRenderer* ren)
-{
-}
+void vtkF3DGenericImporter::ImportProperties(vtkRenderer* ren) {}
 
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
@@ -304,4 +303,10 @@ void vtkF3DGenericImporter::SetFileName(const char* arg)
 void vtkF3DGenericImporter::SetOptions(const F3DOptions& options)
 {
   this->Options = &options;
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DGenericImporter::CanReadFile()
+{
+  return this->Reader->IsReaderValid();
 }

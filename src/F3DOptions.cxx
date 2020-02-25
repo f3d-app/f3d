@@ -2,42 +2,34 @@
 
 #include "F3DLog.h"
 
-#include "vtkF3DGenericImporter.h"
+#include <vtk_jsoncpp.h>
 
 #include <vtksys/SystemTools.hxx>
 
 #include <fstream>
 #include <regex>
-#include <utility>
 #include <vector>
+
+#include "cxxopts.hpp"
 
 class ConfigurationOptions
 {
 public:
-  ConfigurationOptions(F3DOptions& parent, int argc, char** argv)
-    : Parent(parent)
-    , Argc(argc)
+  ConfigurationOptions(int argc, char** argv)
+    : Argc(argc)
     , Argv(argv)
   {
   }
 
-  bool Initialize()
-  {
-    this->InitializeFromConfigFile();
-    return this->InitializeFromArgs(this->Parent);
-  }
+  F3DOptions GetOptionsFromArgs(std::vector<std::string>& inputs);
+  bool InitializeDictionaryFromConfigFile(const std::string& filePath);
 
 protected:
-  bool InitializeFromArgs(F3DOptions&);
-  bool InitializeFromConfigFile();
-
-  bool ParseConfigurationFile(const std::string& configFilePath);
-
   template<class T>
-  std::string GetOptionDefault(const std::string& option, T currValue)
+  std::string GetOptionDefault(const std::string& option, T currValue) const
   {
-    auto it = this->ConfigOptions.find(option);
-    if (it == this->ConfigOptions.end())
+    auto it = this->ConfigDic.find(option);
+    if (it == this->ConfigDic.end())
     {
       std::stringstream ss;
       ss << currValue;
@@ -46,17 +38,17 @@ protected:
     return it->second;
   }
 
-  std::string GetOptionDefault(const std::string& option, bool currValue)
+  std::string GetOptionDefault(const std::string& option, bool currValue) const
   {
-    auto it = this->ConfigOptions.find(option);
-    if (it == this->ConfigOptions.end())
+    auto it = this->ConfigDic.find(option);
+    if (it == this->ConfigDic.end())
     {
       return currValue ? "true" : "false";
     }
     return it->second;
   }
 
-  std::string CollapseName(const std::string& longName, const std::string& shortName)
+  std::string CollapseName(const std::string& longName, const std::string& shortName) const
   {
     std::stringstream ss;
     if (shortName != "")
@@ -68,16 +60,17 @@ protected:
   }
 
   template<class T>
-  std::string GetOptionDefault(const std::string& option, const std::vector<T>& currValue)
+  std::string GetOptionDefault(const std::string& option, const std::vector<T>& currValue) const
   {
-    auto it = this->ConfigOptions.find(option);
-    if (it == this->ConfigOptions.end())
+    auto it = this->ConfigDic.find(option);
+    if (it == this->ConfigDic.end())
     {
       std::stringstream ss;
       for (size_t i = 0; i < currValue.size(); i++)
       {
         ss << currValue[i];
-        if (i != currValue.size() - 1) ss << ",";
+        if (i != currValue.size() - 1)
+          ss << ",";
       }
       return ss.str();
     }
@@ -85,7 +78,7 @@ protected:
   }
 
   void DeclareOption(cxxopts::OptionAdder& group, const std::string& longName,
-    const std::string& shortName, const std::string& doc)
+    const std::string& shortName, const std::string& doc) const
   {
     group(this->CollapseName(longName, shortName), doc);
   }
@@ -93,7 +86,7 @@ protected:
   template<class T>
   void DeclareOption(cxxopts::OptionAdder& group, const std::string& longName,
     const std::string& shortName, const std::string& doc, T& var, bool hasDefault = true,
-    const std::string& argHelp = "")
+    const std::string& argHelp = "") const
   {
     auto val = cxxopts::value<T>(var);
     if (hasDefault)
@@ -107,7 +100,7 @@ protected:
   template<class T>
   void DeclareOption(cxxopts::OptionAdder& group, const std::string& longName,
     const std::string& shortName, const std::string& doc, T& var, const std::string& implicitValue,
-    const std::string& argHelp = "")
+    const std::string& argHelp = "") const
   {
     auto val = cxxopts::value<T>(var)->implicit_value(implicitValue);
     var = {};
@@ -118,26 +111,24 @@ protected:
   static std::string GetUserSettingsFilePath();
 
 protected:
-  F3DOptions& Parent;
   int Argc;
   char** Argv;
 
   using Dictionnary = std::map<std::string, std::string>;
-  Dictionnary ConfigOptions;
+  Dictionnary ConfigDic;
 };
 
 //----------------------------------------------------------------------------
-bool ConfigurationOptions::InitializeFromArgs(F3DOptions &options)
+F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& inputs)
 {
+  F3DOptions options;
   try
   {
     cxxopts::Options cxxOptions(f3d::AppName, f3d::AppTitle);
-    cxxOptions
-      .positional_help("input_file")
-      .show_positional_help();
+    cxxOptions.positional_help("file1 file2 ...");
 
     auto grp1 = cxxOptions.add_options();
-    this->DeclareOption(grp1, "input", "", "Input file", options.Input, false, "<file>");
+    this->DeclareOption(grp1, "input", "", "Input file", inputs, false, "<files>");
     this->DeclareOption(grp1, "output", "", "Render to file", options.Output, false, "<png file>");
     this->DeclareOption(grp1, "help", "h", "Print help");
     this->DeclareOption(grp1, "version", "", "Print version details");
@@ -146,31 +137,41 @@ bool ConfigurationOptions::InitializeFromArgs(F3DOptions &options)
     this->DeclareOption(grp1, "grid", "g", "Show grid", options.Grid);
     this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.Edges);
     this->DeclareOption(grp1, "progress", "p", "Show progress bar", options.Progress);
-    this->DeclareOption(grp1, "geometry-only", "m", "Do not read materials, cameras and lights from file", options.GeometryOnly);
+    this->DeclareOption(grp1, "geometry-only", "m",
+      "Do not read materials, cameras and lights from file", options.GeometryOnly);
 
     auto grp2 = cxxOptions.add_options("Material");
     this->DeclareOption(grp2, "point-size", "", "Point size", options.PointSize, true, "<size>");
     this->DeclareOption(grp2, "color", "", "Solid color", options.SolidColor, true, "<R,G,B>");
     this->DeclareOption(grp2, "opacity", "", "Opacity", options.Opacity, true, "<opacity>");
-    this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.Roughness, true, "<roughness>");
-    this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.Metallic, true, "<metallic>");
+    this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.Roughness,
+      true, "<roughness>");
+    this->DeclareOption(
+      grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.Metallic, true, "<metallic>");
 
     auto grp3 = cxxOptions.add_options("Window");
-    this->DeclareOption(grp3, "bg-color", "", "Background color", options.BackgroundColor, true, "<R,G,B>");
-    this->DeclareOption(grp3, "resolution", "", "Window resolution", options.WindowSize, true, "<width,height>");
+    this->DeclareOption(
+      grp3, "bg-color", "", "Background color", options.BackgroundColor, true, "<R,G,B>");
+    this->DeclareOption(
+      grp3, "resolution", "", "Window resolution", options.WindowSize, true, "<width,height>");
     this->DeclareOption(grp3, "timer", "t", "Display frame per second", options.FPS);
+    this->DeclareOption(grp3, "filename", "n", "Display filename", options.Filename);
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
-    this->DeclareOption(grp4, "scalars", "", "Color by scalars", options.Scalars, std::string("f3d_reserved"), "<array_name>");
-    this->DeclareOption(grp4, "comp", "", "Component from the scalar array to color with", options.Component, true, "<comp_index>");
+    this->DeclareOption(grp4, "scalars", "", "Color by scalars", options.Scalars,
+      std::string("f3d_reserved"), "<array_name>");
+    this->DeclareOption(grp4, "comp", "", "Component from the scalar array to color with",
+      options.Component, true, "<comp_index>");
     this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.Cells);
-    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.Range, false, "<min,max>");
+    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.Range,
+      false, "<min,max>");
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.Bar);
 
 #if F3D_HAS_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
     this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.Raytracing);
-    this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.Samples, true, "<samples>");
+    this->DeclareOption(
+      grp5, "samples", "", "Number of samples per pixel", options.Samples, true, "<samples>");
     this->DeclareOption(grp5, "denoise", "s", "Denoise the image", options.Denoise);
 #endif
 
@@ -181,15 +182,11 @@ bool ConfigurationOptions::InitializeFromArgs(F3DOptions &options)
 
     auto grp7 = cxxOptions.add_options("Testing");
     this->DeclareOption(grp7, "ref", "", "Reference", options.Reference, false, "<png file>");
-    this->DeclareOption(grp7, "ref-threshold", "", "Testing threshold", options.RefThreshold, false, "<threshold>");
+    this->DeclareOption(
+      grp7, "ref-threshold", "", "Testing threshold", options.RefThreshold, false, "<threshold>");
 
-    cxxOptions.parse_positional({ "input", "positional" });
+    cxxOptions.parse_positional({ "input" });
 
-    if (this->Argc == 1)
-    {
-      F3DLog::Print(F3DLog::Severity::Info, cxxOptions.help());
-      exit(EXIT_FAILURE);
-    }
     int argc = this->Argc;
     auto result = cxxOptions.parse(argc, this->Argv);
 
@@ -217,33 +214,18 @@ bool ConfigurationOptions::InitializeFromArgs(F3DOptions &options)
       F3DLog::Print(F3DLog::Severity::Info, version);
       exit(EXIT_SUCCESS);
     }
-
-    if (result.count("input") > 0)
-    {
-      options.Input = result["input"].as<std::string>().c_str();
-    }
   }
-  catch (const cxxopts::OptionException &e)
+  catch (const cxxopts::OptionException& e)
   {
     F3DLog::Print(F3DLog::Severity::Error, "Error parsing options: ", e.what());
     exit(EXIT_FAILURE);
   }
-  return true;
+  return options;
 }
 
 //----------------------------------------------------------------------------
-bool ConfigurationOptions::InitializeFromConfigFile()
+bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string& filePath)
 {
-  // Parse the args first to fetch the input file path
-  F3DOptions opts;
-  this->InitializeFromArgs(opts);
-
-  // disable config file for tests
-  if (!opts.Reference.empty())
-  {
-    return true;
-  }
-
   const std::string& configFilePath = this->GetUserSettingsFilePath();
   std::ifstream file;
   file.open(configFilePath.c_str());
@@ -261,7 +243,8 @@ bool ConfigurationOptions::InitializeFromConfigFile()
   bool success = Json::parseFromStream(builder, file, &root, &errs);
   if (!success)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Unable to parse the configuration file ", configFilePath);
+    F3DLog::Print(
+      F3DLog::Severity::Error, "Unable to parse the configuration file ", configFilePath);
     F3DLog::Print(F3DLog::Severity::Error, errs);
     return false;
   }
@@ -270,14 +253,14 @@ bool ConfigurationOptions::InitializeFromConfigFile()
   {
     std::regex re(id);
     std::smatch matches;
-    if (std::regex_match(opts.Input, matches, re))
+    if (std::regex_match(filePath, matches, re))
     {
       const Json::Value node = root[id];
 
       for (auto const& nl : node.getMemberNames())
       {
         const Json::Value v = node[nl];
-        this->ConfigOptions[nl] = v.asString();
+        this->ConfigDic[nl] = v.asString();
       }
     }
   }
@@ -307,7 +290,7 @@ std::string ConfigurationOptions::GetUserSettingsDirectory()
   std::string separator("/");
 
   // Emulating QSettings behavior.
-  const char* xdgConfigHome = getenv("XDG_CONFIG_HOME");
+  const char* xdgConfigHome = vtksys::SystemTools::GetEnv("XDG_CONFIG_HOME");
   if (xdgConfigHome && strlen(xdgConfigHome) > 0)
   {
     directoryPath = xdgConfigHome;
@@ -318,7 +301,7 @@ std::string ConfigurationOptions::GetUserSettingsDirectory()
   }
   else
   {
-    const char* home = getenv("HOME");
+    const char* home = vtksys::SystemTools::GetEnv("HOME");
     if (!home)
     {
       return std::string();
@@ -342,14 +325,35 @@ std::string ConfigurationOptions::GetUserSettingsFilePath()
 }
 
 //----------------------------------------------------------------------------
-F3DOptionsParser::F3DOptionsParser(F3DOptions& options, int argc, char** argv)
-  : ConfigOptions(new ConfigurationOptions(options, argc, argv))
+F3DOptionsParser::F3DOptionsParser() = default;
+
+//----------------------------------------------------------------------------
+F3DOptionsParser::~F3DOptionsParser() = default;
+
+//----------------------------------------------------------------------------
+F3DOptionsParser& F3DOptionsParser::GetInstance()
 {
-  this->ConfigOptions->Initialize();
+  static F3DOptionsParser instance;
+  return instance;
 }
 
 //----------------------------------------------------------------------------
-F3DOptionsParser::~F3DOptionsParser()
+void F3DOptionsParser::Initialize(int argc, char** argv)
 {
-  delete this->ConfigOptions;
+  this->ConfigOptions = std::unique_ptr<ConfigurationOptions>(new ConfigurationOptions(argc, argv));
+}
+
+//----------------------------------------------------------------------------
+F3DOptions F3DOptionsParser::GetOptionsFromCommandLine(std::vector<std::string>& files)
+{
+  return this->ConfigOptions->GetOptionsFromArgs(files);
+}
+
+//----------------------------------------------------------------------------
+F3DOptions F3DOptionsParser::GetOptionsFromFile(const std::string& filePath)
+{
+  this->ConfigOptions->InitializeDictionaryFromConfigFile(filePath);
+
+  std::vector<std::string> dummy;
+  return this->GetOptionsFromCommandLine(dummy);
 }

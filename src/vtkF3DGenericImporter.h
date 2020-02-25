@@ -32,6 +32,11 @@ public:
    */
   void SetOptions(const F3DOptions& options);
 
+  /**
+   * Check if the file can be read.
+   */
+  bool CanReadFile();
+
 protected:
   vtkF3DGenericImporter() = default;
   ~vtkF3DGenericImporter() override = default;
