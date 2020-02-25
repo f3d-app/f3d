@@ -57,6 +57,13 @@ public:
   F3DOptions GetOptionsFromCommandLine(std::vector<std::string>& files);
   F3DOptions GetOptionsFromFile(const std::string& filePath);
 
+  /**
+   * Check the validity of a provided option
+   * and print to the log if they are not
+   * return true if all options are compatible, false otherwise
+   */
+  static bool CheckValidity(const F3DOptions& options, const std::string& filePath);
+
 private:
   F3DOptionsParser();
   ~F3DOptionsParser();
