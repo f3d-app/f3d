@@ -153,7 +153,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       usedArray = array->GetName();
       if (this->Options->Verbose)
       {
-        cout << "Using default scalar array: " << usedArray << endl;
+        F3DLog::Print(F3DLog::Severity::Info, "Using default scalar array: ", usedArray);
       }
     }
     else
@@ -161,7 +161,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       usedArray = "";
       if (this->Options->Verbose)
       {
-        cout << "No default scalar array, please specify an array name." << endl;
+        F3DLog::Print(F3DLog::Severity::Info, "No default scalar array, please specify an array name.");
       }
     }
   }
@@ -226,12 +226,12 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       }
       else
       {
-        cerr << "Invalid component index: " << this->Options->Component << endl;
+        F3DLog::Print(F3DLog::Severity::Warning, "Invalid component index: ", this->Options->Component);
       }
     }
     else
     {
-      cerr << "Unknow scalar array: " << usedArray << endl;
+      F3DLog::Print(F3DLog::Severity::Warning, "Unknow scalar array: ", usedArray);
     }
   }
 
