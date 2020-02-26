@@ -242,10 +242,10 @@ void vtkF3DRenderer::ShowGrid(bool show)
     double gridY = bounds[2];
     double gridZ = 0.5 * (bounds[4] + bounds[5]);
 
-    if (this->Options.Verbose)
+    if (this->Options.Verbose && show)
     {
-      cout << "Using grid unit square size = " << unitSquare << endl;
-      cout << "Grid origin set to [" << gridX << ", " << gridY << ", " << gridZ << "]" << endl;
+      F3DLog::Print(F3DLog::Severity::Info, "Using grid unit square size = ", unitSquare, "\n",
+        "Grid origin set to [", gridX, ", ", gridY, ", ", gridZ, "]");
     }
 
     vtkNew<vtkF3DOpenGLGridMapper> gridMapper;

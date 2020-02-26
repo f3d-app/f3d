@@ -8,6 +8,8 @@
 #include <vtkWindowToImageFilter.h>
 #include <vtksys/SystemTools.hxx>
 
+#include "F3DLog.h"
+
 int F3DOffscreenRender::RenderOffScreen(vtkRenderWindow* renWin, const std::string& output)
 {
   renWin->OffScreenRenderingOn();
@@ -43,16 +45,15 @@ int F3DOffscreenRender::RenderTesting(
     writer->SetFileName(fullPath.c_str());
     writer->Write();
 
-    cerr << "Reference generated!" << endl;
+    F3DLog::Print(F3DLog::Severity::Info, "Reference generated!");
 
     return EXIT_SUCCESS;
   }
 
   if (!vtksys::SystemTools::FileExists(reference))
   {
-    cerr << "Reference file does not exists, "
-         << "generate it first (set F3D_GEN_REF variable and run test again)." << endl;
-
+    F3DLog::Print(F3DLog::Severity::Error, "Reference file does not exists, "
+        "generate it first (set F3D_GEN_REF variable and run test again).");
     return EXIT_FAILURE;
   }
 
@@ -65,7 +66,7 @@ int F3DOffscreenRender::RenderTesting(
   diff->Update();
 
   double error = diff->GetThresholdedError();
-  cout << "Diff threshold error = " << error << endl;
+  F3DLog::Print(F3DLog::Severity::Info, "Diff threshold error = ", error);
   if (error > threshold)
   {
     std::string fileName = vtksys::SystemTools::GetFilenameName(reference.c_str());
