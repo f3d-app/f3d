@@ -1,5 +1,6 @@
 #include "F3DLoader.h"
 
+#include "F3DLog.h"
 #include "vtkF3DGenericImporter.h"
 
 #include <vtk3DSImporter.h>
@@ -158,6 +159,12 @@ void F3DLoader::LoadCurrentIndex(vtkF3DRenderer* ren)
 
   importer->Update();
 
+  // Display description
+  if (opts.Verbose)
+  {
+    F3DLog::Print(F3DLog::Severity::Info, importer->GetOutputsDescription());
+  }
+
   progressWidget->Off();
 
   // Store scalar bar actor added by the generic importer
@@ -186,7 +193,7 @@ vtkSmartPointer<vtkImporter> F3DLoader::GetImporter(
 {
   if (!vtksys::SystemTools::FileExists(file))
   {
-    cerr << "Specified input file '" << file << "' does not exist!" << endl;
+    F3DLog::Print(F3DLog::Severity::Error, "Specified input file '", file, "' does not exist!");
     exit(EXIT_FAILURE);
   }
 

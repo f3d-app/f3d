@@ -355,5 +355,154 @@ F3DOptions F3DOptionsParser::GetOptionsFromFile(const std::string& filePath)
   this->ConfigOptions->InitializeDictionaryFromConfigFile(filePath);
 
   std::vector<std::string> dummy;
-  return this->GetOptionsFromCommandLine(dummy);
+  F3DOptions options = this->GetOptionsFromCommandLine(dummy);
+
+  // Check the validity of the options
+  if (options.Verbose)
+  {
+    F3DOptionsParser::CheckValidity(options, filePath);
+  }
+
+  return options;
+}
+
+//----------------------------------------------------------------------------
+bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::string& filePath)
+{
+  bool ret = true;
+  F3DOptions defaultOptions;
+  bool usingDefaultScene = true;
+
+  if (!options.GeometryOnly)
+  {
+    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(filePath);
+    ext = vtksys::SystemTools::LowerCase(ext);
+
+    if (ext == ".3ds" || ext == ".obj" || ext == ".wrl" || ext == ".gltf" || ext == ".glb")
+    {
+      usingDefaultScene = false;
+    }
+  }
+
+  if (!usingDefaultScene)
+  {
+    if (defaultOptions.PointSize != options.PointSize)
+    {
+      // Check what's up in the readme about this option and raytracing TODO
+      // To update with PointGaussian option
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Point Size while not using the default scene has no effect.");
+      ret = false;
+    }
+    if (defaultOptions.SolidColor != options.SolidColor)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Solid Color while not using the default scene has no effect.");
+      ret = false;
+    }
+    if (defaultOptions.Opacity != options.Opacity)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying an Opacity while not using the default scene has no effect.");
+      ret = false;
+    }
+    if (defaultOptions.Roughness != options.Roughness)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Roughness coefficient while not using the default scene has no effect.");
+      ret = false;
+    }
+    if (defaultOptions.Metallic != options.Metallic)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Metallic coefficient while not using the default scene has no effect.");
+      ret = false;
+    }
+    if (defaultOptions.Scalars != options.Scalars)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying Scalars to color with while not using the default scene has no effect.");
+      ret = false;
+    }
+    if (defaultOptions.Component != options.Component)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Component to color with while not using the default scene has no effect.");
+      ret = false;
+    }
+    if (defaultOptions.Cells != options.Cells)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying to color with Cells while not using the default scene has no effect.");
+      ret = false;
+    }
+    if (defaultOptions.Range != options.Range)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Range to color with while not using the default scene has no effect.");
+      ret = false;
+    }
+    if (defaultOptions.Bar != options.Bar)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying to show a scalar Bar while not using the default scene has no effect.");
+      ret = false;
+    }
+  }
+  else
+  {
+    if (defaultOptions.Scalars == options.Scalars)
+    {
+      if (defaultOptions.Component != options.Component)
+      {
+        F3DLog::Print(F3DLog::Severity::Info, "Specifying a Component to color with has no effect without specifying Scalars to color with.");
+        ret = false;
+      }
+      if (defaultOptions.Cells != options.Cells)
+      {
+        F3DLog::Print(F3DLog::Severity::Info, "Specifying to color with Cells has no effect without specifying Scalars to color with.");
+        ret = false;
+      }
+      if (defaultOptions.Range != options.Range)
+      {
+        F3DLog::Print(F3DLog::Severity::Info, "Specifying a Range to color with has no effect without specifying Scalars to color with.");
+        ret = false;
+      }
+      if (defaultOptions.Bar != options.Bar)
+      {
+        F3DLog::Print(F3DLog::Severity::Info, "Specifying to show a scalar Bar has no effect without specifying Scalars to color with.");
+        ret = false;
+      }
+    }
+    // TODO PointGaussian Option
+    // not compatible with Opacity, Roughness, Metallic
+  }
+
+  if (options.Raytracing)
+  {
+    if(defaultOptions.FPS != options.FPS)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying to display the Frame per second counter has no effect when using Raytracing.");
+      ret = false;
+    }
+    if(defaultOptions.DepthPeeling != options.DepthPeeling)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying to render using Depth Peeling has no effect when using Raytracing.");
+      ret = false;
+    }
+    if(defaultOptions.FXAA != options.FXAA)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying to render using FXAA has no effect when using Raytracing.");
+      ret = false;
+    }
+    if(defaultOptions.SSAO != options.SSAO)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying to render using SSAO has no effect when using Raytracing.");
+      ret = false;
+    }
+  }
+  else
+  {
+    if(defaultOptions.Samples != options.Samples)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Number of samples per pixel has no effect when not using Raytracing.");
+      ret = false;
+    }
+    if(defaultOptions.Denoise != options.Denoise)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying to Denoise the image has no effect when not using Raytracing.");
+      ret = false;
+    }
+  }
+  return ret;
 }
