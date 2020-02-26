@@ -45,6 +45,7 @@ f3d_test(TestFilename suzanne.ply "300,300" "-n")
 
 if(F3D_HAS_RAYTRACING)
   f3d_test(TestOSPRayGLTF WaterBottle.glb "300,300" "-r --samples=1")
+  f3d_test(TestOSPRayBackground suzanne.ply "300,300" "-r --samples=1 --bg-color=1,0,0")
 endif()
 
 # Test few basic options
