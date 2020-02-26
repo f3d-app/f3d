@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 
 project(f3d
-  VERSION "0.1.1"
+  VERSION "0.2.0"
   DESCRIPTION "f3d - A fast and minimalist 3D viewer"
   LANGUAGES CXX)
 
@@ -16,7 +16,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # VTK dependency
-find_package(VTK 8.90.0 REQUIRED
+find_package(VTK 9.0 REQUIRED
   COMPONENTS
     FiltersGeneral
     FiltersGeometry
@@ -39,7 +39,7 @@ find_package(VTK 8.90.0 REQUIRED
     RenderingRayTracing
 )
 
-if(${VTK_VERSION} VERSION_LESS 8.90.0)
+if(${VTK_VERSION} VERSION_LESS 9.0)
   message(FATAL_ERROR "VTK >= 9.0 is REQUIRED")
 endif()
 
