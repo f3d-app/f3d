@@ -31,6 +31,7 @@ struct F3DOptions
   bool Raytracing = false;
   bool SSAO = false;
   bool Verbose = false;
+  bool PointSprites = false;
   double Metallic = 0.0;
   double Opacity = 1.0;
   double PointSize = 10.0;

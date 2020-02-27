@@ -141,7 +141,8 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
       "Do not read materials, cameras and lights from file", options.GeometryOnly);
 
     auto grp2 = cxxOptions.add_options("Material");
-    this->DeclareOption(grp2, "point-size", "", "Point size", options.PointSize, true, "<size>");
+    this->DeclareOption(grp2, "point-sprites", "", "Show sphere sprites instead of geometry", options.PointSprites);
+    this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.PointSize, true, "<size>");
     this->DeclareOption(grp2, "color", "", "Solid color", options.SolidColor, true, "<R,G,B>");
     this->DeclareOption(grp2, "opacity", "", "Opacity", options.Opacity, true, "<opacity>");
     this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.Roughness,
@@ -386,11 +387,9 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
 
   if (!usingDefaultScene)
   {
-    if (defaultOptions.PointSize != options.PointSize)
+    if (defaultOptions.PointSprites != options.PointSprites)
     {
-      // Check what's up in the readme about this option and raytracing TODO
-      // To update with PointGaussian option
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Point Size while not using the default scene has no effect.");
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying to show shere sprites while not using the default scene has no effect.");
       ret = false;
     }
     if (defaultOptions.SolidColor != options.SolidColor)
@@ -464,12 +463,15 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
         ret = false;
       }
     }
-    // TODO PointGaussian Option
-    // not compatible with Opacity, Roughness, Metallic
   }
 
   if (options.Raytracing)
   {
+    if(defaultOptions.PointSprites != options.PointSprites)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying to show point sprites has no effect when using Raytracing.");
+      ret = false;
+    }
     if(defaultOptions.FPS != options.FPS)
     {
       F3DLog::Print(F3DLog::Severity::Info, "Specifying to display the Frame per second counter has no effect when using Raytracing.");
@@ -502,6 +504,24 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
     {
       F3DLog::Print(F3DLog::Severity::Info, "Specifying to Denoise the image has no effect when not using Raytracing.");
       ret = false;
+    }
+    if(defaultOptions.PointSprites == options.PointSprites)
+    {
+      if (defaultOptions.Opacity != options.Opacity)
+      {
+        F3DLog::Print(F3DLog::Severity::Info, "Specifying an Opacity while using point sprites has no effect.");
+        ret = false;
+      }
+      if (defaultOptions.Roughness != options.Roughness)
+      {
+        F3DLog::Print(F3DLog::Severity::Info, "Specifying a Roughness coefficient while using point sprites has no effect.");
+        ret = false;
+      }
+      if (defaultOptions.Metallic != options.Metallic)
+      {
+        F3DLog::Print(F3DLog::Severity::Info, "Specifying a Metallic coefficient while using point sprites has no effect.");
+        ret = false;
+      }
     }
   }
   return ret;
