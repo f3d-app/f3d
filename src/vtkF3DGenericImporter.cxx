@@ -100,7 +100,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   vtkPointData* pointData = surface->GetPointData();
   vtkCellData* cellData = surface->GetCellData();
-  if (!this->Options->Raytracing && surface->GetNumberOfVerts() == surface->GetNumberOfCells())
+  if (!this->Options->Raytracing && this->Options->PointSprites)
   {
     double bounds[6];
     surface->GetBounds(bounds);

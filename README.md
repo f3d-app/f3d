@@ -75,7 +75,8 @@ Options|Description
 ## Material options
 Options|Default|Description
 ------|------|------
---point-size=\<size\>|10.0|Set the *point size*.<br>Points are displayed only if raytracing is activated and the geometry contains vertices,<br>or if the geometry contains only vertices.<br>In this last case, a representation of sphere glyphs is used.<br>This behavior will be changed in the near future.
+--point-sprites||Show sphere *points sprites* instead of the geometry.
+--point-size|10.0|Set the *size* of points when showing vertices and point sprites.
 --color=\<R,G,B\>|1.0, 1.0, 1.0| Set a *color* on the geometry.<br>This only makes sense when using the default scene.
 --opacity=\<opacity\>|1.0|Set *opacity* on the geometry.<br>This only makes sense when using the default scene.
 --roughness=\<roughness\>|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
