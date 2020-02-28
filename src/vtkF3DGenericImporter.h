@@ -12,8 +12,14 @@
 
 #include <vtkImporter.h>
 
-struct F3DOptions;
+class vtkActor;
+class vtkMapper;
 class vtkMultiBlockDataSet;
+class vtkPointGaussianMapper;
+class vtkPolyDataMapper;
+class vtkScalarBarActor;
+class vtkScalarsToColors;
+struct F3DOptions;
 
 class vtkF3DGenericImporter : public vtkImporter
 {
@@ -51,6 +57,22 @@ public:
   static std::string GetDataObjectDescription(vtkDataObject* object);
   //@}
 
+  //@{
+  /**
+   * Access to specific actors
+   */
+  vtkGetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
+  vtkGetSmartPointerMacro(GeometryActor, vtkActor);
+  //@}
+
+  //@{
+  /**
+   * Access to specific mappers
+   */
+  vtkGetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
+  vtkGetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
+  //@}
+
 protected:
   vtkF3DGenericImporter() = default;
   ~vtkF3DGenericImporter() override = default;
@@ -59,9 +81,15 @@ protected:
   void ImportLights(vtkRenderer*) override;
   void ImportProperties(vtkRenderer*) override;
 
+  vtkScalarsToColors* ConfigureMapperForColoring(vtkMapper* mapper, vtkDataArray* array);
+
   vtkNew<vtkF3DMetaReader> Reader;
 
   const F3DOptions* Options = nullptr;
+  vtkNew<vtkScalarBarActor> ScalarBarActor;
+  vtkNew<vtkActor> GeometryActor;
+  vtkNew<vtkPolyDataMapper> PolyDataMapper;
+  vtkNew<vtkPointGaussianMapper> PointGaussianMapper;
   std::string OutputDescription;
 
 private:

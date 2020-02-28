@@ -78,6 +78,13 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->TimerVisible = this->Options.FPS;
   this->FilenameVisible = this->Options.Filename;
   this->ScalarBarVisible = this->Options.Bar;
+  this->ScalarsVisible = !this->Options.Scalars.empty();
+  this->UseRaytracing = this->Options.Raytracing;
+  this->UseRaytracingDenoiser = this->Options.Denoise;
+  this->UseDepthPeeling = this->Options.DepthPeeling;
+  this->UseSSAOPass = this->Options.SSAO;
+  this->UseFXAAPass = this->Options.FXAA;
+  this->UsePointSprites = this->Options.PointSprites;
 
   this->SetBackground(this->Options.BackgroundColor[0], this->Options.BackgroundColor[1],
     this->Options.BackgroundColor[2]);
@@ -93,7 +100,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
 void vtkF3DRenderer::SetupRenderPasses()
 {
 #if F3D_HAS_RAYTRACING
-  if (this->Options.Raytracing)
+  if (this->UseRaytracing)
   {
     vtkNew<vtkOSPRayPass> osprayP;
     vtkNew<vtkTranslucentPass> translucentP;
@@ -111,7 +118,7 @@ void vtkF3DRenderer::SetupRenderPasses()
 
     vtkOSPRayRendererNode::SetRendererType("pathtracer", this);
     vtkOSPRayRendererNode::SetSamplesPerPixel(this->Options.Samples, this);
-    vtkOSPRayRendererNode::SetEnableDenoiser(this->Options.Denoise, this);
+    vtkOSPRayRendererNode::SetEnableDenoiser(this->UseRaytracingDenoiser, this);
     vtkOSPRayRendererNode::SetDenoiserThreshold(0, this);
     vtkOSPRayRendererNode::SetBackgroundMode(1, this);
 
@@ -129,7 +136,7 @@ void vtkF3DRenderer::SetupRenderPasses()
   collection->AddItem(lightsP);
 
   // opaque passes
-  if (this->Options.SSAO)
+  if (this->UseSSAOPass)
   {
     double bounds[6];
     this->ComputeVisiblePropBounds(bounds);
@@ -160,7 +167,7 @@ void vtkF3DRenderer::SetupRenderPasses()
   }
 
   // translucent and volumic passes
-  if (this->Options.DepthPeeling)
+  if (this->UseDepthPeeling)
   {
     vtkNew<vtkDualDepthPeelingPass> ddpP;
     ddpP->SetTranslucentPass(translucentP);
@@ -181,7 +188,7 @@ void vtkF3DRenderer::SetupRenderPasses()
   vtkNew<vtkCameraPass> cameraP;
   cameraP->SetDelegatePass(sequence);
 
-  if (this->Options.FXAA)
+  if (this->UseFXAAPass)
   {
     vtkNew<vtkOpenGLFXAAPass> fxaaP;
     fxaaP->SetDelegatePass(cameraP);
@@ -275,13 +282,132 @@ bool vtkF3DRenderer::IsGridVisible()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseDepthPeeling(bool use)
+{
+  this->UseDepthPeeling = use;
+  this->SetupRenderPasses();
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::UsingDepthPeeling()
+{
+  return this->UseDepthPeeling;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseSSAOPass(bool use)
+{
+  this->UseSSAOPass = use;
+  this->SetupRenderPasses();
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::UsingSSAOPass()
+{
+  return this->UseSSAOPass;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseFXAAPass(bool use)
+{
+  this->UseFXAAPass = use;
+  this->SetupRenderPasses();
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::UsingFXAAPass()
+{
+  return this->UseFXAAPass;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUsePointSprites(bool use)
+{
+  this->UsePointSprites = use;
+  if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper)
+  {
+    if (use)
+    {
+      this->GeometryActor->SetMapper(this->PointGaussianMapper);
+    }
+    else
+    {
+      this->GeometryActor->SetMapper(this->PolyDataMapper);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::UsingPointSprites()
+{
+  return this->UsePointSprites;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseRaytracing(bool use)
+{
+  this->UseRaytracing = use;
+
+  if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper)
+  {
+    if (use)
+    {
+      this->GeometryActor->SetMapper(this->PolyDataMapper);
+    }
+    else
+    {
+      this->SetUsePointSprites(this->UsePointSprites);
+    }
+  }
+
+  this->SetupRenderPasses();
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::UsingRaytracing()
+{
+  return this->UseRaytracing;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseRaytracingDenoiser(bool use)
+{
+  this->UseRaytracingDenoiser = use;
+  this->SetupRenderPasses();
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::UsingRaytracingDenoiser()
+{
+  return this->UseRaytracingDenoiser;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowScalars(bool show)
+{
+  this->ScalarsVisible = show;
+  if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper)
+  {
+    this->PolyDataMapper->SetScalarVisibility(show);
+    this->PointGaussianMapper->SetScalarVisibility(show);
+    this->ShowScalarBar(this->ScalarBarVisible);
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::AreScalarsVisible()
+{
+  return this->ScalarsVisible;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowScalarBar(bool show)
 {
+  this->ScalarBarVisible = show;
   if (this->ScalarBarActor)
   {
-    this->ScalarBarActor->SetVisibility(show);
+    this->ScalarBarActor->SetVisibility(show && this->ScalarsVisible);
   }
-  this->ScalarBarVisible = show;
 }
 
 //----------------------------------------------------------------------------
@@ -351,6 +477,7 @@ void vtkF3DRenderer::ShowOptions()
   this->ShowGrid(this->GridVisible);
   this->ShowAxis(this->AxisVisible);
   this->ShowScalarBar(this->ScalarBarVisible);
+  this->ShowScalars(this->ScalarsVisible);
   this->ShowTimer(this->TimerVisible);
   this->ShowEdge(this->EdgesVisible);
   this->ShowFilename(this->FilenameVisible);

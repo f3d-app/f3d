@@ -9,6 +9,9 @@
 #include <vtkGLTFImporter.h>
 #include <vtkNew.h>
 #include <vtkOBJImporter.h>
+#include <vtkPointGaussianMapper.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkScalarBarActor.h>
 #include <vtkVRMLImporter.h>
 #include <vtksys/Directory.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -167,17 +170,14 @@ void F3DLoader::LoadCurrentIndex(vtkF3DRenderer* ren)
 
   progressWidget->Off();
 
-  // Store scalar bar actor added by the generic importer
-  vtkActor2DCollection* actors = ren->GetActors2D();
-  actors->InitTraversal();
-  vtkActor2D* currentActor;
-  while ((currentActor = actors->GetNextActor2D()) != nullptr)
+  // Recover generic importer specific actors and mappers to set on the renderer
+  vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importer);
+  if (genericImporter)
   {
-    if (currentActor->IsA("vtkScalarBarActor"))
-    {
-      ren->SetScalarBarActor(currentActor);
-      break;
-    }
+    ren->SetScalarBarActor(genericImporter->GetScalarBarActor());
+    ren->SetGeometryActor(genericImporter->GetGeometryActor());
+    ren->SetPolyDataMapper(genericImporter->GetPolyDataMapper());
+    ren->SetPointGaussianMapper(genericImporter->GetPointGaussianMapper());
   }
 
   // Actors are loaded, use the bounds to reset camera and set-up SSAO
