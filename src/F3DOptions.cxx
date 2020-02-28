@@ -136,12 +136,12 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp1, "axis", "x", "Show axes", options.Axis);
     this->DeclareOption(grp1, "grid", "g", "Show grid", options.Grid);
     this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.Edges);
-    this->DeclareOption(grp1, "progress", "p", "Show progress bar", options.Progress);
+    this->DeclareOption(grp1, "progress", "", "Show progress bar", options.Progress);
     this->DeclareOption(grp1, "geometry-only", "m",
       "Do not read materials, cameras and lights from file", options.GeometryOnly);
 
     auto grp2 = cxxOptions.add_options("Material");
-    this->DeclareOption(grp2, "point-sprites", "", "Show sphere sprites instead of geometry", options.PointSprites);
+    this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.PointSprites);
     this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.PointSize, true, "<size>");
     this->DeclareOption(grp2, "color", "", "Solid color", options.SolidColor, true, "<R,G,B>");
     this->DeclareOption(grp2, "opacity", "", "Opacity", options.Opacity, true, "<opacity>");
@@ -159,7 +159,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp3, "filename", "n", "Display filename", options.Filename);
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
-    this->DeclareOption(grp4, "scalars", "", "Color by scalars", options.Scalars,
+    this->DeclareOption(grp4, "scalars", "s", "Color by scalars", options.Scalars,
       std::string("f3d_reserved"), "<array_name>");
     this->DeclareOption(grp4, "comp", "", "Component from the scalar array to color with",
       options.Component, true, "<comp_index>");
@@ -173,11 +173,11 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.Raytracing);
     this->DeclareOption(
       grp5, "samples", "", "Number of samples per pixel", options.Samples, true, "<samples>");
-    this->DeclareOption(grp5, "denoise", "s", "Denoise the image", options.Denoise);
+    this->DeclareOption(grp5, "denoise", "d", "Denoise the image", options.Denoise);
 #endif
 
     auto grp6 = cxxOptions.add_options("PostFX (OpenGL)");
-    this->DeclareOption(grp6, "depth-peeling", "d", "Enable depth peeling", options.DepthPeeling);
+    this->DeclareOption(grp6, "depth-peeling", "p", "Enable depth peeling", options.DepthPeeling);
     this->DeclareOption(grp6, "ssao", "u", "Enable Screen-Space Ambient Occlusion", options.SSAO);
     this->DeclareOption(grp6, "fxaa", "f", "Enable Fast Approximate Anti-Aliasing", options.FXAA);
 
@@ -194,6 +194,23 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     if (result.count("help") > 0)
     {
       F3DLog::Print(F3DLog::Severity::Info, cxxOptions.help());
+      F3DLog::Print(F3DLog::Severity::Info,
+                    "Keys:\n"
+                    " ESC       Exit f3d\n"
+                    " RETURN    Reset camera zoom\n"
+                    " x         Toggle the axes display\n"
+                    " g         Toggle the grid display\n"
+                    " e         Toggle the edges display\n"
+                    " s         Toggle the coloration by scalar\n"
+                    " b         Toggle the scalar bar display\n"
+                    " t         Toggle the FPS counter display\n"
+                    " n         Toggle the filename display\n"
+                    " r         Toggle raytracing rendering\n"
+                    " d         Toggle denoising when raytracing\n"
+                    " p         Toggle depth peeling\n"
+                    " u         Toggle SSAO\n"
+                    " f         Toggle FXAA\n"
+                    " o         Toggle point sprites rendering\n");
       exit(EXIT_SUCCESS);
     }
 

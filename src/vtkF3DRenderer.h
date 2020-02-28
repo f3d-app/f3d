@@ -14,6 +14,7 @@
 #include <vtkActor.h>
 #include <vtkActor2D.h>
 #include <vtkCornerAnnotation.h>
+#include <vtkMapper.h>
 #include <vtkNew.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOrientationMarkerWidget.h>
@@ -39,6 +40,13 @@ public:
   void ShowEdge(bool show);
   void ShowTimer(bool show);
   void ShowFilename(bool show);
+  void ShowScalars(bool show);
+  void SetUseRaytracing(bool use);
+  void SetUseRaytracingDenoiser(bool use);
+  void SetUseDepthPeeling(bool use);
+  void SetUseSSAOPass(bool use);
+  void SetUseFXAAPass(bool use);
+  void SetUsePointSprites(bool use);
 
   bool IsAxisVisible();
   bool IsGridVisible();
@@ -46,6 +54,13 @@ public:
   bool IsEdgeVisible();
   bool IsTimerVisible();
   bool IsFilenameVisible();
+  bool AreScalarsVisible();
+  bool UsingRaytracing();
+  bool UsingRaytracingDenoiser();
+  bool UsingDepthPeeling();
+  bool UsingSSAOPass();
+  bool UsingFXAAPass();
+  bool UsingPointSprites();
 
   void Render() override;
 
@@ -57,8 +72,37 @@ public:
   vtkGetSmartPointerMacro(AxisWidget, vtkOrientationMarkerWidget);
   vtkSetSmartPointerMacro(AxisWidget, vtkOrientationMarkerWidget);
 
+  //@{
+  /**
+   * Set/Get the scalar bar actor, used for hotkey purposes
+   */
   vtkGetSmartPointerMacro(ScalarBarActor, vtkActor2D);
   vtkSetSmartPointerMacro(ScalarBarActor, vtkActor2D);
+  //@}
+
+  //@{
+  /**
+   * Set/Get the geometry actor, used for hotkey purposes
+   */
+  vtkGetSmartPointerMacro(GeometryActor, vtkActor);
+  vtkSetSmartPointerMacro(GeometryActor, vtkActor);
+  //@}
+
+  //@{
+  /**
+   * Set/Get the polydata mapper actor, used for hotkey purposes
+   */
+  vtkGetSmartPointerMacro(PolyDataMapper, vtkMapper);
+  vtkSetSmartPointerMacro(PolyDataMapper, vtkMapper);
+  //@}
+
+  //@{
+  /**
+   * Set/Get the point gaussian mapper actor, used for hotkey purposes
+   */
+  vtkGetSmartPointerMacro(PointGaussianMapper, vtkMapper);
+  vtkSetSmartPointerMacro(PointGaussianMapper, vtkMapper);
+  //@}
 
   void ShowOptions();
 
@@ -72,6 +116,9 @@ protected:
 
   vtkNew<vtkActor> GridActor;
   vtkSmartPointer<vtkActor2D> ScalarBarActor;
+  vtkSmartPointer<vtkActor> GeometryActor;
+  vtkSmartPointer<vtkMapper> PolyDataMapper;
+  vtkSmartPointer<vtkMapper> PointGaussianMapper;
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
@@ -87,6 +134,13 @@ protected:
   bool TimerVisible;
   bool FilenameVisible;
   bool ScalarBarVisible;
+  bool ScalarsVisible;
+  bool UseRaytracing;
+  bool UseRaytracingDenoiser;
+  bool UseDepthPeeling;
+  bool UseFXAAPass;
+  bool UseSSAOPass;
+  bool UsePointSprites;
 };
 
 #endif
