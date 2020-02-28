@@ -3,6 +3,9 @@
 #include "F3DLoader.h"
 #include "vtkF3DRenderer.h"
 
+#include <vtkCallbackCommand.h>
+#include <vtkMath.h>
+#include <vtkMatrix3x3.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
@@ -58,6 +61,11 @@ void vtkF3DInteractorStyle::OnKeyPress()
     case 'f':
     case 'F':
       ren->SetUseFXAAPass(!ren->UsingFXAAPass());
+      renWin->Render();
+      break;
+    case 'a':
+    case 'A':
+      ren->SetUseToneMappingPass(!ren->UsingToneMappingPass());
       renWin->Render();
       break;
     case 'o':
@@ -119,5 +127,24 @@ void vtkF3DInteractorStyle::OnKeyPress()
         renWin->Render();
       }
       break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DInteractorStyle::EnvironmentRotate()
+{
+  this->Superclass::EnvironmentRotate();
+
+  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
+  if (ren)
+  {
+    // update skybox orientation
+    double* up = ren->GetEnvironmentUp();
+    double* right = ren->GetEnvironmentRight();
+
+    ren->GetSkybox()->SetFloorPlane(-up[2], up[1], up[0], 0.0);
+    ren->GetSkybox()->SetFloorRight(-right[2], right[1], right[0]);
+
+    this->Interactor->Render();
   }
 }

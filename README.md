@@ -82,6 +82,7 @@ Options|Default|Description
 --opacity=\<opacity\>|1.0|Set *opacity* on the geometry.<br>This only makes sense when using the default scene.
 --roughness=\<roughness\>|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
 --metallic=\<metallic\>|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
+--hrdi=\<file path\>||Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, png, jpg, pnm, tiff, bmp.
 
 ## PostFX (OpenGL) options:
 Options|Description
@@ -89,6 +90,7 @@ Options|Description
 -p, --depth-peeling|Enable *depth peeling*. This is a technique used to correctly render translucent objects.
 -u, --ssao|Enable *Screen-Space Ambient Occlusion*. This is a technique used to improve the depth perception of the object.
 -f, --fxaa|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.
+-a, --tone-mapping|Enable *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
 
 ## Raytracing options:
 Options|Default|Description
@@ -115,7 +117,7 @@ Options|Description
 ## Window options:
 Options|Default|Description
 ------|------|------
---bg-color=\<R,G,B\>|0.2, 0.2, 0.2|Set the window *background color*.
+--bg-color=\<R,G,B\>|0.2, 0.2, 0.2|Set the window *background color*.<br>Ignored if *hdri* is set.
 --resolution=\<width,height\>|1000, 600|Set the *window resolution*.
 -t, --timer||Display a *frame per second counter*.
 -n, --filename||Display the *name of the file*.
@@ -145,6 +147,7 @@ Some options can be toggled directly using interactions:
 * Press `p` key to toggle depth peeling.
 * Press `u` key to toggle Screen-Space Ambient Occlusion.
 * Press `f` key to toggle Fast Approximate Anti-Aliasing.
+* Press `a` key to toggle tone mapping.
 * Press `o` key to toggle point sprites rendering.
 
 # Configuration file

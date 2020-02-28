@@ -24,6 +24,7 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
+#include <vtkSkybox.h>
 #include <vtkTextActor.h>
 
 struct F3DOptions;
@@ -47,6 +48,7 @@ public:
   void SetUseSSAOPass(bool use);
   void SetUseFXAAPass(bool use);
   void SetUsePointSprites(bool use);
+  void SetUseToneMappingPass(bool use);
 
   bool IsAxisVisible();
   bool IsGridVisible();
@@ -61,6 +63,7 @@ public:
   bool UsingSSAOPass();
   bool UsingFXAAPass();
   bool UsingPointSprites();
+  bool UsingToneMappingPass();
 
   void Render() override;
 
@@ -104,6 +107,11 @@ public:
   vtkSetSmartPointerMacro(PointGaussianMapper, vtkMapper);
   //@}
 
+  /**
+   * Get the OpenGL skybox
+   */
+  vtkGetObjectMacro(Skybox, vtkSkybox);
+
   void ShowOptions();
 
   void SetupRenderPasses();
@@ -119,6 +127,7 @@ protected:
   vtkSmartPointer<vtkActor> GeometryActor;
   vtkSmartPointer<vtkMapper> PolyDataMapper;
   vtkSmartPointer<vtkMapper> PointGaussianMapper;
+  vtkNew<vtkSkybox> Skybox;
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
@@ -141,6 +150,7 @@ protected:
   bool UseFXAAPass;
   bool UseSSAOPass;
   bool UsePointSprites;
+  bool UseToneMappingPass;
 };
 
 #endif

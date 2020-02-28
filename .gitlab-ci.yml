@@ -33,7 +33,8 @@ stages:
     - cmake -E make_directory build
     - cd build
     - cmake $BUILD_ARCHITECTURE -DVTK_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
-      -DVTK_LEGACY_REMOVE=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=../../vtk-install
+      -DVTK_LEGACY_REMOVE=ON -DBUILD_SHARED_LIBS=OFF
+      -DCMAKE_INSTALL_PREFIX:FILEPATH=../../vtk-install
       -DVTK_GROUP_ENABLE_Rendering=DEFAULT -DVTK_GROUP_ENABLE_StandAlone=DEFAULT
       -DVTK_MODULE_ENABLE_VTK_FiltersGeneral=YES
       -DVTK_MODULE_ENABLE_VTK_FiltersGeometry=YES
@@ -82,7 +83,7 @@ update-vtk-osx:
     - cmake -E make_directory build
     - cd build
     - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS -DBUILD_TESTING=ON
-      -DCMAKE_BUILD_TYPE=Release -DVTK_DIR=vtk-install/lib/cmake/vtk-9.0 ..
+      -DCMAKE_BUILD_TYPE=Release -DVTK_DIR:FILEPATH=vtk-install/lib/cmake/vtk-9.0 ..
 
 configure-linux:
   extends:
