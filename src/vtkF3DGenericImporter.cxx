@@ -158,10 +158,30 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     }
     else
     {
-      usedArray = "";
-      if (this->Options->Verbose)
+      if (this->Options->Cells && cellData->GetNumberOfArrays() > 0)
       {
-        F3DLog::Print(F3DLog::Severity::Info, "No default scalar array, please specify an array name.");
+        array = cellData->GetArray(0);
+      }
+      else if (!this->Options->Cells && pointData->GetNumberOfArrays() > 0)
+      {
+        array = pointData->GetArray(0);
+      }
+
+      if (array)
+      {
+        usedArray = array->GetName();
+        if (this->Options->Verbose)
+        {
+          F3DLog::Print(F3DLog::Severity::Info, "Using first found array: ", usedArray);
+        }
+      }
+      else
+      {
+        usedArray = "";
+        if (this->Options->Verbose)
+        {
+          F3DLog::Print(F3DLog::Severity::Info, "No array found for scalar coloring");
+        }
       }
     }
   }
