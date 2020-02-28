@@ -35,13 +35,39 @@ void vtkF3DInteractorStyle::OnKeyPress()
 
   switch (rwi->GetKeyCode())
   {
-    case 'q':
-    case 'Q':
-      rwi->ExitCallback();
+    case 's':
+    case 'S':
+      ren->ShowScalars(!ren->AreScalarsVisible());
+      renWin->Render();
       break;
     case 'r':
     case 'R':
-      ren->ResetCamera();
+      ren->SetUseRaytracing(!ren->UsingRaytracing());
+      renWin->Render();
+      break;
+    case 'd':
+    case 'D':
+      ren->SetUseRaytracingDenoiser(!ren->UsingRaytracingDenoiser());
+      renWin->Render();
+      break;
+    case 'p':
+    case 'P':
+      ren->SetUseDepthPeeling(!ren->UsingDepthPeeling());
+      renWin->Render();
+      break;
+    case 'u':
+    case 'U':
+      ren->SetUseSSAOPass(!ren->UsingSSAOPass());
+      renWin->Render();
+      break;
+    case 'f':
+    case 'F':
+      ren->SetUseFXAAPass(!ren->UsingFXAAPass());
+      renWin->Render();
+      break;
+    case 'o':
+    case 'O':
+      ren->SetUsePointSprites(!ren->UsingPointSprites());
       renWin->Render();
       break;
     case 't':
@@ -79,12 +105,22 @@ void vtkF3DInteractorStyle::OnKeyPress()
       if (keySym == "Left")
       {
         F3DLoader::GetInstance().LoadPrevious(ren);
+        renWin->Render();
       }
       else if (keySym == "Right")
       {
         F3DLoader::GetInstance().LoadNext(ren);
+        renWin->Render();
       }
-      renWin->Render();
+      else if (keySym == "Escape")
+      {
+        rwi->ExitCallback();
+      }
+      else if (keySym == "Return")
+      {
+        ren->ResetCamera();
+        renWin->Render();
+      }
       break;
   }
 }
