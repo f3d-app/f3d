@@ -96,47 +96,47 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     return;
   }
 
-  vtkSmartPointer<vtkPolyDataMapper> mapper;
+  // Configure polydata mapper
+  this->PolyDataMapper->InterpolateScalarsBeforeMappingOn();
+  this->PolyDataMapper->SetColorModeToMapScalars();
+  this->PolyDataMapper->SetInputData(surface);
 
-  vtkPointData* pointData = surface->GetPointData();
-  vtkCellData* cellData = surface->GetCellData();
+  // Configure Point Gaussian mapper
+  double bounds[6];
+  surface->GetBounds(bounds);
+  vtkBoundingBox bbox(bounds);
+  double pointSize = this->Options->PointSize * bbox.GetDiagonalLength() * 0.001;
+  this->PointGaussianMapper->SetScaleFactor(pointSize);
+  this->PointGaussianMapper->EmissiveOff();
+  this->PointGaussianMapper->SetSplatShaderCode(
+    "//VTK::Color::Impl\n"
+    "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
+    "if (dist > 1.0) {\n"
+    "  discard;\n"
+    "} else {\n"
+    "  float scale = (1.0 - dist);\n"
+    "  ambientColor *= scale;\n"
+    "  diffuseColor *= scale;\n"
+    "}\n");
+  this->PointGaussianMapper->SetInputData(surface);
+
+  // Select correct mapper
+  vtkSmartPointer<vtkPolyDataMapper> mapper;
   if (!this->Options->Raytracing && this->Options->PointSprites)
   {
-    double bounds[6];
-    surface->GetBounds(bounds);
-
-    vtkBoundingBox bbox(bounds);
-    vtkNew<vtkPointGaussianMapper> gaussianMapper;
-
-    double pointSize = this->Options->PointSize * bbox.GetDiagonalLength() * 0.001;
-
-    gaussianMapper->SetScaleFactor(pointSize);
-    gaussianMapper->EmissiveOff();
-    gaussianMapper->SetSplatShaderCode(
-      "//VTK::Color::Impl\n"
-      "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
-      "if (dist > 1.0) {\n"
-      "  discard;\n"
-      "} else {\n"
-      "  float scale = (1.0 - dist);\n"
-      "  ambientColor *= scale;\n"
-      "  diffuseColor *= scale;\n"
-      "}\n");
-    mapper = gaussianMapper;
+    mapper = this->PointGaussianMapper;
   }
   else
   {
-    mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->InterpolateScalarsBeforeMappingOn();
-    mapper->SetColorModeToMapScalars();
+    mapper = this->PolyDataMapper;
   }
 
-  mapper->SetInputData(surface);
-  mapper->Update();
-
+  vtkPointData* pointData = surface->GetPointData();
+  vtkCellData* cellData = surface->GetCellData();
   std::string usedArray = this->Options->Scalars;
 
-  if (usedArray == "f3d_reserved")
+  // Recover an array for coloring if we ever need it
+  if (usedArray == "f3d_reserved" || usedArray.empty())
   {
     vtkDataArray* array = nullptr;
     if (this->Options->Cells)
@@ -151,7 +151,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     if (array)
     {
       usedArray = array->GetName();
-      if (this->Options->Verbose)
+      if (this->Options->Verbose && !this->Options->Scalars.empty())
       {
         F3DLog::Print(F3DLog::Severity::Info, "Using default scalar array: ", usedArray);
       }
@@ -170,7 +170,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       if (array)
       {
         usedArray = array->GetName();
-        if (this->Options->Verbose)
+        if (this->Options->Verbose && !this->Options->Scalars.empty())
         {
           F3DLog::Print(F3DLog::Severity::Info, "Using first found array: ", usedArray);
         }
@@ -178,7 +178,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       else
       {
         usedArray = "";
-        if (this->Options->Verbose)
+        if (this->Options->Verbose && !this->Options->Scalars.empty())
         {
           F3DLog::Print(F3DLog::Severity::Info, "No array found for scalar coloring");
         }
@@ -186,90 +186,89 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     }
   }
 
-  mapper->ScalarVisibilityOff();
-  if (!usedArray.empty())
+  // Configure the mappers for coloring if it is ever needed
+  vtkDataArray* array = this->Options->Cells ? cellData->GetArray(usedArray.c_str())
+    : pointData->GetArray(usedArray.c_str());
+  if (array)
   {
-    vtkDataArray* array = this->Options->Cells ? cellData->GetArray(usedArray.c_str())
-                                               : pointData->GetArray(usedArray.c_str());
-
-    if (array)
+    if (this->Options->Component < array->GetNumberOfComponents())
     {
-      if (this->Options->Component < array->GetNumberOfComponents())
+      this->ConfigureMapperForColoring(this->PointGaussianMapper, array);
+      vtkScalarsToColors* lut = this->ConfigureMapperForColoring(this->PolyDataMapper, array);
+
+      std::string title = usedArray;
+      if (this->Options->Component >= 0)
       {
-        mapper->ScalarVisibilityOn();
-        mapper->SelectColorArray(usedArray.c_str());
-        mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
-                                                   : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-
-        vtkScalarsToColors* lut = mapper->GetLookupTable();
-
-        if (this->Options->Component >= 0)
-        {
-          lut->SetVectorModeToComponent();
-          lut->SetVectorComponent(this->Options->Component);
-        }
-        else
-        {
-          lut->SetVectorModeToMagnitude();
-        }
-
-        if (this->Options->Range.size() == 2)
-        {
-          mapper->SetScalarRange(this->Options->Range[0], this->Options->Range[1]);
-        }
-        else
-        {
-          double range[2];
-          array->GetRange(range, this->Options->Component);
-          mapper->SetScalarRange(range);
-        }
-
-        std::string title = usedArray;
-        if (this->Options->Component >= 0)
-        {
-          title += " (Component #";
-          title += std::to_string(this->Options->Component);
-          title += ")";
-        }
-
-        vtkNew<vtkScalarBarActor> scalarBar;
-        scalarBar->SetLookupTable(lut);
-        scalarBar->SetTitle(title.c_str());
-        scalarBar->SetNumberOfLabels(4);
-        scalarBar->SetOrientationToHorizontal();
-        scalarBar->SetWidth(0.8);
-        scalarBar->SetHeight(0.07);
-        scalarBar->SetPosition(0.1, 0.01);
-        scalarBar->SetVisibility(this->Options->Bar);
-
-        ren->AddActor2D(scalarBar);
+        title += " (Component #";
+        title += std::to_string(this->Options->Component);
+        title += ")";
       }
-      else
-      {
-        F3DLog::Print(F3DLog::Severity::Warning, "Invalid component index: ", this->Options->Component);
-      }
+
+      this->ScalarBarActor->SetLookupTable(lut);
+      this->ScalarBarActor->SetTitle(title.c_str());
+      this->ScalarBarActor->SetNumberOfLabels(4);
+      this->ScalarBarActor->SetOrientationToHorizontal();
+      this->ScalarBarActor->SetWidth(0.8);
+      this->ScalarBarActor->SetHeight(0.07);
+      this->ScalarBarActor->SetPosition(0.1, 0.01);
+      this->ScalarBarActor->SetVisibility(this->Options->Bar);
+      ren->AddActor2D(this->ScalarBarActor);
     }
     else
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "Unknow scalar array: ", usedArray);
+      F3DLog::Print(F3DLog::Severity::Warning, "Invalid component index: ", this->Options->Component);
     }
   }
+  else if (!usedArray.empty())
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, "Unknow scalar array: ", usedArray);
+  }
 
-  vtkNew<vtkActor> actor;
-  actor->SetMapper(mapper);
-
-  actor->GetProperty()->SetInterpolationToPBR();
+  this->GeometryActor->SetMapper(mapper);
+  this->GeometryActor->GetProperty()->SetInterpolationToPBR();
 
   double col[3];
   std::copy(this->Options->SolidColor.begin(), this->Options->SolidColor.end(), col);
 
-  actor->GetProperty()->SetColor(col);
-  actor->GetProperty()->SetOpacity(this->Options->Opacity);
-  actor->GetProperty()->SetRoughness(this->Options->Roughness);
-  actor->GetProperty()->SetMetallic(this->Options->Metallic);
-  actor->GetProperty()->SetPointSize(this->Options->PointSize);
+  this->GeometryActor->GetProperty()->SetColor(col);
+  this->GeometryActor->GetProperty()->SetOpacity(this->Options->Opacity);
+  this->GeometryActor->GetProperty()->SetRoughness(this->Options->Roughness);
+  this->GeometryActor->GetProperty()->SetMetallic(this->Options->Metallic);
+  this->GeometryActor->GetProperty()->SetPointSize(this->Options->PointSize);
 
-  ren->AddActor(actor);
+  ren->AddActor(this->GeometryActor);
+}
+
+//----------------------------------------------------------------------------
+vtkScalarsToColors* vtkF3DGenericImporter::ConfigureMapperForColoring(vtkMapper* mapper, vtkDataArray* array)
+{
+  mapper->SelectColorArray(array->GetName());
+  mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
+                        : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+  mapper->SetScalarVisibility(!this->Options->Scalars.empty());
+  vtkScalarsToColors* lut = mapper->GetLookupTable();
+
+  if (this->Options->Component >= 0)
+  {
+    lut->SetVectorModeToComponent();
+    lut->SetVectorComponent(this->Options->Component);
+  }
+  else
+  {
+    lut->SetVectorModeToMagnitude();
+  }
+
+  if (this->Options->Range.size() == 2)
+  {
+    mapper->SetScalarRange(this->Options->Range[0], this->Options->Range[1]);
+  }
+  else
+  {
+    double range[2];
+    array->GetRange(range, this->Options->Component);
+    mapper->SetScalarRange(range);
+  }
+  return lut;
 }
 
 //----------------------------------------------------------------------------
