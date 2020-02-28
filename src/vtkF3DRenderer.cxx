@@ -12,12 +12,16 @@
 #include <vtkCallbackCommand.h>
 #include <vtkCameraPass.h>
 #include <vtkDualDepthPeelingPass.h>
+#include <vtkImageReader2.h>
+#include <vtkImageReader2Factory.h>
 #include <vtkImporter.h>
 #include <vtkLightsPass.h>
 #include <vtkObjectFactory.h>
+#include <vtkToneMappingPass.h>
 #include <vtkOpaquePass.h>
 #include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderer.h>
+#include <vtkOpenGLTexture.h>
 #include <vtkOverlayPass.h>
 #include <vtkProperty.h>
 #include <vtkRenderPassCollection.h>
@@ -25,6 +29,7 @@
 #include <vtkRendererCollection.h>
 #include <vtkSSAOPass.h>
 #include <vtkSequencePass.h>
+#include <vtkSkybox.h>
 #include <vtkTranslucentPass.h>
 #include <vtkVolumetricPass.h>
 #include <vtksys/Directory.hxx>
@@ -68,7 +73,6 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
 
   this->RemoveAllViewProps();
   this->RemoveAllLights();
-  this->AutomaticLightCreationOn();
 
   this->Options = options;
 
@@ -84,10 +88,49 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->UseDepthPeeling = this->Options.DepthPeeling;
   this->UseSSAOPass = this->Options.SSAO;
   this->UseFXAAPass = this->Options.FXAA;
+  this->UseToneMappingPass = this->Options.ToneMapping;
   this->UsePointSprites = this->Options.PointSprites;
 
-  this->SetBackground(this->Options.BackgroundColor[0], this->Options.BackgroundColor[1],
-    this->Options.BackgroundColor[2]);
+  if (!this->Options.HDRIFile.empty() && !this->GetUseImageBasedLighting())
+  {
+    std::string fullPath = vtksys::SystemTools::CollapseFullPath(this->Options.HDRIFile);
+
+    auto reader = vtkSmartPointer<vtkImageReader2>::Take(
+      vtkImageReader2Factory::CreateImageReader2(fullPath.c_str()));
+    if (reader)
+    {
+      reader->SetFileName(fullPath.c_str());
+      reader->Update();
+      vtkNew<vtkTexture> texture;
+      texture->SetColorModeToDirectScalars();
+      texture->SetInputConnection(reader->GetOutputPort());
+
+      // HDRI OpenGL
+      this->UseImageBasedLightingOn();
+      this->SetEnvironmentTexture(texture, true);
+
+      // Skybox OpenGL
+      this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
+      this->Skybox->SetProjection(vtkSkybox::Sphere);
+      this->Skybox->SetTexture(texture);
+    }
+    else
+    {
+      vtkWarningMacro("Cannot open HDRI file " << fullPath);
+    }
+  }
+
+  if (this->GetUseImageBasedLighting())
+  {
+    this->AddActor(this->Skybox);
+    this->AutomaticLightCreationOff();
+  }
+  else
+  {
+    this->SetBackground(this->Options.BackgroundColor[0], this->Options.BackgroundColor[1],
+      this->Options.BackgroundColor[2]);
+    this->AutomaticLightCreationOn();
+  }
 
   this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, fileInfo.c_str());
 
@@ -99,28 +142,25 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetupRenderPasses()
 {
+  vtkRenderPass* pass = this->GetPass();
+  if (pass)
+  {
+    pass->ReleaseGraphicsResources(this->RenderWindow);
+  }
+
 #if F3D_HAS_RAYTRACING
   if (this->UseRaytracing)
   {
     vtkNew<vtkOSPRayPass> osprayP;
-    vtkNew<vtkTranslucentPass> translucentP;
-
-    vtkNew<vtkRenderPassCollection> collection;
-    collection->AddItem(osprayP);
-    collection->AddItem(translucentP);
-
-    vtkNew<vtkSequencePass> sequence;
-    sequence->SetPasses(collection);
-
-    vtkNew<vtkCameraPass> cameraP;
-    cameraP->SetDelegatePass(sequence);
-    this->SetPass(cameraP);
+    this->SetPass(osprayP);
 
     vtkOSPRayRendererNode::SetRendererType("pathtracer", this);
     vtkOSPRayRendererNode::SetSamplesPerPixel(this->Options.Samples, this);
     vtkOSPRayRendererNode::SetEnableDenoiser(this->UseRaytracingDenoiser, this);
     vtkOSPRayRendererNode::SetDenoiserThreshold(0, this);
-    vtkOSPRayRendererNode::SetBackgroundMode(1, this);
+
+    bool hasHDRI = this->GetEnvironmentTexture() != nullptr;
+    vtkOSPRayRendererNode::SetBackgroundMode(hasHDRI ? 2 : 1, this);
 
     return;
   }
@@ -188,16 +228,25 @@ void vtkF3DRenderer::SetupRenderPasses()
   vtkNew<vtkCameraPass> cameraP;
   cameraP->SetDelegatePass(sequence);
 
+  vtkSmartPointer<vtkRenderPass> activePass = cameraP;
+  if (this->UseToneMappingPass)
+  {
+    vtkNew<vtkToneMappingPass> toneP;
+    toneP->SetToneMappingType(vtkToneMappingPass::Reinhard);
+    toneP->SetDelegatePass(cameraP);
+    activePass = toneP;
+  }
+
   if (this->UseFXAAPass)
   {
     vtkNew<vtkOpenGLFXAAPass> fxaaP;
-    fxaaP->SetDelegatePass(cameraP);
+    fxaaP->SetDelegatePass(activePass);
 
     this->SetPass(fxaaP);
   }
   else
   {
-    this->SetPass(cameraP);
+    this->SetPass(activePass);
   }
 }
 
@@ -318,6 +367,19 @@ void vtkF3DRenderer::SetUseFXAAPass(bool use)
 bool vtkF3DRenderer::UsingFXAAPass()
 {
   return this->UseFXAAPass;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseToneMappingPass(bool use)
+{
+  this->UseToneMappingPass = use;
+  this->SetupRenderPasses();
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::UsingToneMappingPass()
+{
+  return this->UseToneMappingPass;
 }
 
 //----------------------------------------------------------------------------

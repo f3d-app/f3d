@@ -28,6 +28,11 @@ public:
    * Handle drop files
    */
   void OnDropFiles(vtkStringArray* files) override;
+
+  /**
+   * Overriden to rotate the skybox as well
+   */
+  void EnvironmentRotate() override;
 };
 
 #endif

@@ -43,7 +43,7 @@ public:
    * Check if the file can be read.
    */
   bool CanReadFile();
-   
+
   /**
    * Get a string describing the outputs
    */
