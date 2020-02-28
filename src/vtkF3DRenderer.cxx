@@ -112,6 +112,7 @@ void vtkF3DRenderer::SetupRenderPasses()
     vtkOSPRayRendererNode::SetRendererType("pathtracer", this);
     vtkOSPRayRendererNode::SetSamplesPerPixel(this->Options.Samples, this);
     vtkOSPRayRendererNode::SetEnableDenoiser(this->Options.Denoise, this);
+    vtkOSPRayRendererNode::SetDenoiserThreshold(0, this);
     vtkOSPRayRendererNode::SetBackgroundMode(1, this);
 
     return;
