@@ -349,13 +349,6 @@ F3DOptionsParser::F3DOptionsParser() = default;
 F3DOptionsParser::~F3DOptionsParser() = default;
 
 //----------------------------------------------------------------------------
-F3DOptionsParser& F3DOptionsParser::GetInstance()
-{
-  static F3DOptionsParser instance;
-  return instance;
-}
-
-//----------------------------------------------------------------------------
 void F3DOptionsParser::Initialize(int argc, char** argv)
 {
   this->ConfigOptions = std::unique_ptr<ConfigurationOptions>(new ConfigurationOptions(argc, argv));

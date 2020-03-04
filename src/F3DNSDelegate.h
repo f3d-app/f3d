@@ -9,12 +9,13 @@
 #ifndef F3DNSDelegate_h
 #define F3DNSDelegate_h
 
+class F3DLoader;
 class vtkF3DRenderer;
 
 class F3DNSDelegate
 {
 public:
-  static void InitializeDelegate(vtkF3DRenderer* ren);
+  static void InitializeDelegate(F3DLoader* loader);
 };
 
 #endif
