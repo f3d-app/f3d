@@ -51,8 +51,6 @@ struct F3DOptions
 class F3DOptionsParser
 {
 public:
-  static F3DOptionsParser& GetInstance();
-
   void Initialize(int argc, char** argv);
 
   F3DOptions GetOptionsFromCommandLine(std::vector<std::string>& files);
@@ -65,10 +63,10 @@ public:
    */
   static bool CheckValidity(const F3DOptions& options, const std::string& filePath);
 
-private:
   F3DOptionsParser();
   ~F3DOptionsParser();
 
+private:
   F3DOptionsParser(F3DOptionsParser const&) = delete;
   void operator=(F3DOptionsParser const&) = delete;
 

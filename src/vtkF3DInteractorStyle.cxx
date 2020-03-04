@@ -1,28 +1,23 @@
 #include "vtkF3DInteractorStyle.h"
 
 #include "F3DLoader.h"
+#include "vtkF3DRenderer.h"
 
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 #include <vtkStringArray.h>
 
-#include "vtkF3DRenderer.h"
 
 vtkStandardNewMacro(vtkF3DInteractorStyle);
 
+//----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
 {
   vtkRenderWindowInteractor* rwi = this->GetInteractor();
   vtkRenderWindow* renWin = rwi->GetRenderWindow();
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-
-  for (int i = 0; i < files->GetNumberOfTuples(); i++)
-  {
-    F3DLoader::GetInstance().AddFile(files->GetValue(i), ren);
-  }
-
-  F3DLoader::GetInstance().LoadNext(ren);
+  this->InvokeEvent(F3DLoader::NewFilesEvent, files);
   renWin->Render();
 }
 
@@ -104,12 +99,14 @@ void vtkF3DInteractorStyle::OnKeyPress()
       std::string keySym = rwi->GetKeySym();
       if (keySym == "Left")
       {
-        F3DLoader::GetInstance().LoadPrevious(ren);
+        int load = F3DLoader::LOAD_PREVIOUS;
+        this->InvokeEvent(F3DLoader::LoadFileEvent, &load);
         renWin->Render();
       }
       else if (keySym == "Right")
       {
-        F3DLoader::GetInstance().LoadNext(ren);
+        int load = F3DLoader::LOAD_NEXT;
+        this->InvokeEvent(F3DLoader::LoadFileEvent, &load);
         renWin->Render();
       }
       else if (keySym == "Escape")
