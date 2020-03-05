@@ -65,6 +65,7 @@ Options|Description
 -o, --output=\<png file\>|Instead of showing a render view and render into it, *render directly into a png file*.
 -h, --help|Print *help*.
 -v, --verbose|Enable *verbose* mode.
+--no-render|Verbose mode without any rendering for the first provided file, to recover information about a file.
 --version|Show *version* information.
 -x, --axis|Show *axes* as a trihedron in the scene.
 -g, --grid|Show *a grid* aligned with the XZ plane.

@@ -36,48 +36,50 @@ int F3DLoader::Start(int argc, char** argv)
   F3DOptions options = this->Parser.GetOptionsFromCommandLine(files);
 
   vtkNew<vtkRenderWindow> renWin;
-  renWin->SetSize(options.WindowSize[0], options.WindowSize[1]);
-  renWin->SetWindowName(f3d::AppTitle.c_str());
-
-  // the renderer must be added to the render window after OpenGL context initialization
-  renWin->AddRenderer(this->Renderer);
-
   vtkNew<vtkRenderWindowInteractor> interactor;
-  vtkNew<vtkF3DInteractorStyle> style;
+  if (!options.NoRender)
+  {
+    renWin->SetSize(options.WindowSize[0], options.WindowSize[1]);
+    renWin->SetWindowName(f3d::AppTitle.c_str());
 
-  // Setup the observers for the interactor style events
-  vtkNew<vtkCallbackCommand> newFilesCallback;
-  newFilesCallback->SetClientData(this);
-  newFilesCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void* callData) {
-    F3DLoader* loader = static_cast<F3DLoader*>(clientData);
-    loader->CurrentFileIndex = loader->FilesList.size();
-    vtkStringArray* files = static_cast<vtkStringArray*>(callData);
-    for (int i = 0; i < files->GetNumberOfTuples(); i++)
-    {
-    loader->AddFile(files->GetValue(i));
-    }
-    loader->LoadFile();
-    });
-  style->AddObserver(F3DLoader::NewFilesEvent, newFilesCallback);
+    // the renderer must be added to the render window after OpenGL context initialization
+    renWin->AddRenderer(this->Renderer);
 
-  vtkNew<vtkCallbackCommand> loadFileCallback;
-  loadFileCallback->SetClientData(this);
-  loadFileCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void* callData) {
-    F3DLoader* loader = static_cast<F3DLoader*>(clientData);
-    int* load = static_cast<int*>(callData);
-    loader->LoadFile(*load);
-    });
-  style->AddObserver(F3DLoader::LoadFileEvent, loadFileCallback);
+    vtkNew<vtkF3DInteractorStyle> style;
 
-  interactor->SetRenderWindow(renWin);
-  interactor->SetInteractorStyle(style);
-  interactor->Initialize();
+    // Setup the observers for the interactor style events
+    vtkNew<vtkCallbackCommand> newFilesCallback;
+    newFilesCallback->SetClientData(this);
+    newFilesCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void* callData) {
+      F3DLoader* loader = static_cast<F3DLoader*>(clientData);
+      loader->CurrentFileIndex = loader->FilesList.size();
+      vtkStringArray* files = static_cast<vtkStringArray*>(callData);
+      for (int i = 0; i < files->GetNumberOfTuples(); i++)
+      {
+      loader->AddFile(files->GetValue(i));
+      }
+      loader->LoadFile();
+      });
+    style->AddObserver(F3DLoader::NewFilesEvent, newFilesCallback);
+
+    vtkNew<vtkCallbackCommand> loadFileCallback;
+    loadFileCallback->SetClientData(this);
+    loadFileCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void* callData) {
+      F3DLoader* loader = static_cast<F3DLoader*>(clientData);
+      int* load = static_cast<int*>(callData);
+      loader->LoadFile(*load);
+      });
+    style->AddObserver(F3DLoader::LoadFileEvent, loadFileCallback);
+
+    interactor->SetRenderWindow(renWin);
+    interactor->SetInteractorStyle(style);
+    interactor->Initialize();
+    this->Renderer->Initialize(options, "");
+  }
 
 #if __APPLE__
   F3DNSDelegate::InitializeDelegate(this);
 #endif
-
-  this->Renderer->Initialize(options, "");
 
   if (files.size() > 0)
   {
@@ -86,22 +88,25 @@ int F3DLoader::Start(int argc, char** argv)
   }
 
   int retVal = EXIT_SUCCESS;
-  if (!options.Output.empty())
+  if (!options.NoRender)
   {
-    retVal = F3DOffscreenRender::RenderOffScreen(renWin, options.Output);
-  }
-  else if (!options.Reference.empty())
-  {
-    retVal = F3DOffscreenRender::RenderTesting(renWin, options.Reference, options.RefThreshold);
-  }
-  else
-  {
-    renWin->Render();
-    interactor->Start();
-  }
+    if (!options.Output.empty())
+    {
+      retVal = F3DOffscreenRender::RenderOffScreen(renWin, options.Output);
+    }
+    else if (!options.Reference.empty())
+    {
+      retVal = F3DOffscreenRender::RenderTesting(renWin, options.Reference, options.RefThreshold);
+    }
+    else
+    {
+      renWin->Render();
+      interactor->Start();
+    }
 
-  // for some reason, the widget should be disable before destruction
-  this->Renderer->ShowAxis(false);
+    // for some reason, the widget should be disable before destruction
+    this->Renderer->ShowAxis(false);
+  }
 
   return retVal;
 }
@@ -168,70 +173,77 @@ void F3DLoader::LoadFile(int load)
 
   F3DOptions opts = this->Parser.GetOptionsFromFile(filePath);
   vtkSmartPointer<vtkImporter> importer = this->GetImporter(opts, filePath);
-  if (!importer)
-  {
-    fileInfo += " [UNSUPPORTED]";
-    this->Renderer->Initialize(opts, fileInfo);
-    return;
-  }
 
-  this->Renderer->Initialize(opts, fileInfo);
-
-  importer->SetRenderWindow(this->Renderer->GetRenderWindow());
-
-  vtkNew<vtkProgressBarRepresentation> progressRep;
   vtkNew<vtkProgressBarWidget> progressWidget;
-
-  if (opts.Progress)
+  if (!opts.NoRender)
   {
-    vtkNew<vtkCallbackCommand> progressCallback;
-    progressCallback->SetClientData(progressWidget);
-    progressCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void* callData) {
-      vtkProgressBarWidget* widget = static_cast<vtkProgressBarWidget*>(clientData);
-      vtkProgressBarRepresentation* rep =
+    if (!importer)
+    {
+      fileInfo += " [UNSUPPORTED]";
+      this->Renderer->Initialize(opts, fileInfo);
+      return;
+    }
+
+    this->Renderer->Initialize(opts, fileInfo);
+
+    importer->SetRenderWindow(this->Renderer->GetRenderWindow());
+
+    vtkNew<vtkProgressBarRepresentation> progressRep;
+
+    if (opts.Progress)
+    {
+      vtkNew<vtkCallbackCommand> progressCallback;
+      progressCallback->SetClientData(progressWidget);
+      progressCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void* callData) {
+        vtkProgressBarWidget* widget = static_cast<vtkProgressBarWidget*>(clientData);
+        vtkProgressBarRepresentation* rep =
         vtkProgressBarRepresentation::SafeDownCast(widget->GetRepresentation());
-      rep->SetProgressRate(*static_cast<double*>(callData));
-      widget->GetInteractor()->GetRenderWindow()->Render();
-    });
-    importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
+        rep->SetProgressRate(*static_cast<double*>(callData));
+        widget->GetInteractor()->GetRenderWindow()->Render();
+        });
+      importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
 
-    progressWidget->SetInteractor(this->Renderer->GetRenderWindow()->GetInteractor());
-    progressWidget->SetRepresentation(progressRep);
+      progressWidget->SetInteractor(this->Renderer->GetRenderWindow()->GetInteractor());
+      progressWidget->SetRepresentation(progressRep);
 
-    progressRep->SetProgressRate(0.0);
-    progressRep->SetPosition(0.25, 0.45);
-    progressRep->SetProgressBarColor(1, 1, 1);
-    progressRep->SetBackgroundColor(1, 1, 1);
-    progressRep->DrawBackgroundOff();
+      progressRep->SetProgressRate(0.0);
+      progressRep->SetPosition(0.25, 0.45);
+      progressRep->SetProgressBarColor(1, 1, 1);
+      progressRep->SetBackgroundColor(1, 1, 1);
+      progressRep->DrawBackgroundOff();
 
-    progressWidget->On();
+      progressWidget->On();
+    }
   }
 
   importer->Update();
 
   // Display description
-  if (opts.Verbose)
+  if (opts.Verbose || opts.NoRender)
   {
     F3DLog::Print(F3DLog::Severity::Info, importer->GetOutputsDescription());
   }
 
-  progressWidget->Off();
-
-  // Recover generic importer specific actors and mappers to set on the renderer
-  vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importer);
-  if (genericImporter)
+  if (!opts.NoRender)
   {
-    this->Renderer->SetScalarBarActor(genericImporter->GetScalarBarActor());
-    this->Renderer->SetGeometryActor(genericImporter->GetGeometryActor());
-    this->Renderer->SetPolyDataMapper(genericImporter->GetPolyDataMapper());
-    this->Renderer->SetPointGaussianMapper(genericImporter->GetPointGaussianMapper());
+    progressWidget->Off();
+
+    // Recover generic importer specific actors and mappers to set on the renderer
+    vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importer);
+    if (genericImporter)
+    {
+      this->Renderer->SetScalarBarActor(genericImporter->GetScalarBarActor());
+      this->Renderer->SetGeometryActor(genericImporter->GetGeometryActor());
+      this->Renderer->SetPolyDataMapper(genericImporter->GetPolyDataMapper());
+      this->Renderer->SetPointGaussianMapper(genericImporter->GetPointGaussianMapper());
+    }
+
+    // Actors are loaded, use the bounds to reset camera and set-up SSAO
+    this->Renderer->SetupRenderPasses();
+    this->Renderer->ResetCamera();
+
+    this->Renderer->ShowOptions();
   }
-
-  // Actors are loaded, use the bounds to reset camera and set-up SSAO
-  this->Renderer->SetupRenderPasses();
-  this->Renderer->ResetCamera();
-
-  this->Renderer->ShowOptions();
 }
 
 //----------------------------------------------------------------------------
