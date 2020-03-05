@@ -1,10 +1,13 @@
 #include "F3DLoader.h"
 
 #include "F3DLog.h"
+#include "F3DNSDelegate.h"
+#include "F3DOffscreenRender.h"
+#include "F3DOptions.h"
 #include "vtkF3DGenericImporter.h"
+#include "vtkStringArray.h"
 
 #include <vtk3DSImporter.h>
-#include <vtkActor2DCollection.h>
 #include <vtkCallbackCommand.h>
 #include <vtkGLTFImporter.h>
 #include <vtkNew.h>
@@ -16,23 +19,92 @@
 #include <vtksys/Directory.hxx>
 #include <vtksys/SystemTools.hxx>
 
-#include "F3DLog.h"
-#include "F3DOptions.h"
-
 #include <algorithm>
-
-//----------------------------------------------------------------------------
-F3DLoader& F3DLoader::GetInstance()
-{
-  static F3DLoader instance;
-  return instance;
-}
 
 //----------------------------------------------------------------------------
 F3DLoader::F3DLoader() = default;
 
 //----------------------------------------------------------------------------
 F3DLoader::~F3DLoader() = default;
+
+//----------------------------------------------------------------------------
+int F3DLoader::Start(int argc, char** argv)
+{
+  std::vector<std::string> files;
+
+  this->Parser.Initialize(argc, argv);
+  F3DOptions options = this->Parser.GetOptionsFromCommandLine(files);
+
+  vtkNew<vtkRenderWindow> renWin;
+  renWin->SetSize(options.WindowSize[0], options.WindowSize[1]);
+  renWin->SetWindowName(f3d::AppTitle.c_str());
+
+  // the renderer must be added to the render window after OpenGL context initialization
+  renWin->AddRenderer(this->Renderer);
+
+  vtkNew<vtkRenderWindowInteractor> interactor;
+  vtkNew<vtkF3DInteractorStyle> style;
+
+  // Setup the observers for the interactor style events
+  vtkNew<vtkCallbackCommand> newFilesCallback;
+  newFilesCallback->SetClientData(this);
+  newFilesCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void* callData) {
+    F3DLoader* loader = static_cast<F3DLoader*>(clientData);
+    loader->CurrentFileIndex = loader->FilesList.size();
+    vtkStringArray* files = static_cast<vtkStringArray*>(callData);
+    for (int i = 0; i < files->GetNumberOfTuples(); i++)
+    {
+    loader->AddFile(files->GetValue(i));
+    }
+    loader->LoadFile();
+    });
+  style->AddObserver(F3DLoader::NewFilesEvent, newFilesCallback);
+
+  vtkNew<vtkCallbackCommand> loadFileCallback;
+  loadFileCallback->SetClientData(this);
+  loadFileCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void* callData) {
+    F3DLoader* loader = static_cast<F3DLoader*>(clientData);
+    int* load = static_cast<int*>(callData);
+    loader->LoadFile(*load);
+    });
+  style->AddObserver(F3DLoader::LoadFileEvent, loadFileCallback);
+
+  interactor->SetRenderWindow(renWin);
+  interactor->SetInteractorStyle(style);
+  interactor->Initialize();
+
+#if __APPLE__
+  F3DNSDelegate::InitializeDelegate(this);
+#endif
+
+  this->Renderer->Initialize(options, "");
+
+  if (files.size() > 0)
+  {
+    this->AddFiles(files);
+    this->LoadFile();
+  }
+
+  int retVal = EXIT_SUCCESS;
+  if (!options.Output.empty())
+  {
+    retVal = F3DOffscreenRender::RenderOffScreen(renWin, options.Output);
+  }
+  else if (!options.Reference.empty())
+  {
+    retVal = F3DOffscreenRender::RenderTesting(renWin, options.Reference, options.RefThreshold);
+  }
+  else
+  {
+    renWin->Render();
+    interactor->Start();
+  }
+
+  // for some reason, the widget should be disable before destruction
+  this->Renderer->ShowAxis(false);
+
+  return retVal;
+}
 
 //----------------------------------------------------------------------------
 void F3DLoader::AddFiles(const std::vector<std::string>& files)
@@ -79,36 +151,11 @@ void F3DLoader::AddFile(const std::string& path, bool recursive)
 }
 
 //----------------------------------------------------------------------------
-void F3DLoader::LoadPrevious(vtkF3DRenderer* ren)
+void F3DLoader::LoadFile(int load)
 {
-  if (this->CurrentFileIndex > 0)
-  {
-    this->CurrentFileIndex--;
-  }
-  else
-  {
-    this->CurrentFileIndex = this->FilesList.size() - 1;
-  }
-  this->LoadCurrentIndex(ren);
-}
+  // Compute the correct file index
+  this->CurrentFileIndex = (this->CurrentFileIndex + load) % this->FilesList.size();
 
-//----------------------------------------------------------------------------
-void F3DLoader::LoadNext(vtkF3DRenderer* ren)
-{
-  if (this->CurrentFileIndex < this->FilesList.size() - 1)
-  {
-    this->CurrentFileIndex++;
-  }
-  else
-  {
-    this->CurrentFileIndex = 0;
-  }
-  this->LoadCurrentIndex(ren);
-}
-
-//----------------------------------------------------------------------------
-void F3DLoader::LoadCurrentIndex(vtkF3DRenderer* ren)
-{
   if (this->CurrentFileIndex < 0 || this->CurrentFileIndex >= this->FilesList.size())
   {
     F3DLog::Print(F3DLog::Severity::Error, "Cannot load file index ", this->CurrentFileIndex);
@@ -119,18 +166,18 @@ void F3DLoader::LoadCurrentIndex(vtkF3DRenderer* ren)
   std::string fileInfo = "(" + std::to_string(this->CurrentFileIndex + 1) + "/" +
     std::to_string(this->FilesList.size()) + ") " + vtksys::SystemTools::GetFilenameName(filePath);
 
-  F3DOptions opts = F3DOptionsParser::GetInstance().GetOptionsFromFile(filePath);
+  F3DOptions opts = this->Parser.GetOptionsFromFile(filePath);
   vtkSmartPointer<vtkImporter> importer = this->GetImporter(opts, filePath);
   if (!importer)
   {
     fileInfo += " [UNSUPPORTED]";
-    ren->Initialize(opts, fileInfo);
+    this->Renderer->Initialize(opts, fileInfo);
     return;
   }
 
-  ren->Initialize(opts, fileInfo);
+  this->Renderer->Initialize(opts, fileInfo);
 
-  importer->SetRenderWindow(ren->GetRenderWindow());
+  importer->SetRenderWindow(this->Renderer->GetRenderWindow());
 
   vtkNew<vtkProgressBarRepresentation> progressRep;
   vtkNew<vtkProgressBarWidget> progressWidget;
@@ -148,7 +195,7 @@ void F3DLoader::LoadCurrentIndex(vtkF3DRenderer* ren)
     });
     importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
 
-    progressWidget->SetInteractor(ren->GetRenderWindow()->GetInteractor());
+    progressWidget->SetInteractor(this->Renderer->GetRenderWindow()->GetInteractor());
     progressWidget->SetRepresentation(progressRep);
 
     progressRep->SetProgressRate(0.0);
@@ -174,17 +221,17 @@ void F3DLoader::LoadCurrentIndex(vtkF3DRenderer* ren)
   vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importer);
   if (genericImporter)
   {
-    ren->SetScalarBarActor(genericImporter->GetScalarBarActor());
-    ren->SetGeometryActor(genericImporter->GetGeometryActor());
-    ren->SetPolyDataMapper(genericImporter->GetPolyDataMapper());
-    ren->SetPointGaussianMapper(genericImporter->GetPointGaussianMapper());
+    this->Renderer->SetScalarBarActor(genericImporter->GetScalarBarActor());
+    this->Renderer->SetGeometryActor(genericImporter->GetGeometryActor());
+    this->Renderer->SetPolyDataMapper(genericImporter->GetPolyDataMapper());
+    this->Renderer->SetPointGaussianMapper(genericImporter->GetPointGaussianMapper());
   }
 
   // Actors are loaded, use the bounds to reset camera and set-up SSAO
-  ren->SetupRenderPasses();
-  ren->ResetCamera();
+  this->Renderer->SetupRenderPasses();
+  this->Renderer->ResetCamera();
 
-  ren->ShowOptions();
+  this->Renderer->ShowOptions();
 }
 
 //----------------------------------------------------------------------------
