@@ -133,6 +133,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp1, "help", "h", "Print help");
     this->DeclareOption(grp1, "version", "", "Print version details");
     this->DeclareOption(grp1, "verbose", "v", "Enable verbose mode", options.Verbose);
+    this->DeclareOption(grp1, "no-render", "", "Verbose mode without any rendering, only for the first file", options.NoRender);
     this->DeclareOption(grp1, "axis", "x", "Show axes", options.Axis);
     this->DeclareOption(grp1, "grid", "g", "Show grid", options.Grid);
     this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.Edges);
@@ -369,7 +370,7 @@ F3DOptions F3DOptionsParser::GetOptionsFromFile(const std::string& filePath)
   F3DOptions options = this->GetOptionsFromCommandLine(dummy);
 
   // Check the validity of the options
-  if (options.Verbose)
+  if (options.Verbose || options.NoRender)
   {
     F3DOptionsParser::CheckValidity(options, filePath);
   }
@@ -534,5 +535,6 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
       }
     }
   }
+  // No check for --no-render option
   return ret;
 }

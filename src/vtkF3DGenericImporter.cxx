@@ -55,7 +55,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   vtkSmartPointer<vtkDataObject> dataObject = this->Reader->GetOutput();
 
-  if (this->Options->Verbose)
+  if (this->Options->Verbose || this->Options->NoRender)
   {
     this->OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(dataObject);
   }
@@ -148,10 +148,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       array = pointData->GetScalars();
     }
 
+    bool print = (this->Options->Verbose || this->Options->NoRender) && !this->Options->Scalars.empty();
     if (array)
     {
       usedArray = array->GetName();
-      if (this->Options->Verbose && !this->Options->Scalars.empty())
+      if (print);
       {
         F3DLog::Print(F3DLog::Severity::Info, "Using default scalar array: ", usedArray);
       }
@@ -170,7 +171,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       if (array)
       {
         usedArray = array->GetName();
-        if (this->Options->Verbose && !this->Options->Scalars.empty())
+        if (print)
         {
           F3DLog::Print(F3DLog::Severity::Info, "Using first found array: ", usedArray);
         }
@@ -178,7 +179,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       else
       {
         usedArray = "";
-        if (this->Options->Verbose && !this->Options->Scalars.empty())
+        if (print)
         {
           F3DLog::Print(F3DLog::Severity::Info, "No array found for scalar coloring");
         }
