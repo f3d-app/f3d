@@ -1,38 +1,252 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleExecutable</key>
-	<string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
-	<key>CFBundleGetInfoString</key>
-	<string>${MACOSX_BUNDLE_INFO_STRING}</string>
-	<key>CFBundleIconFile</key>
-	<string>${MACOSX_BUNDLE_ICON_FILE}</string>
-	<key>CFBundleIdentifier</key>
-	<string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleLongVersionString</key>
-	<string>${MACOSX_BUNDLE_LONG_VERSION_STRING}</string>
-	<key>CFBundleName</key>
-	<string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>${MACOSX_BUNDLE_SHORT_VERSION_STRING}</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
-	<key>CSResourcesFileMapped</key>
-	<true/>
-	<key>LSRequiresCarbon</key>
-	<true/>
-	<key>NSHumanReadableCopyright</key>
-	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
-	<key>NSHighResolutionCapable</key>
-	<true/>
-</dict>
+	<dict>
+		<key>CFBundleDevelopmentRegion</key>
+		<string>English</string>
+		<key>CFBundleExecutable</key>
+		<string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
+		<key>CFBundleGetInfoString</key>
+		<string>${MACOSX_BUNDLE_INFO_STRING}</string>
+		<key>CFBundleIconFile</key>
+		<string>${MACOSX_BUNDLE_ICON_FILE}</string>
+		<key>CFBundleIdentifier</key>
+		<string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
+		<key>CFBundleInfoDictionaryVersion</key>
+		<string>6.0</string>
+		<key>CFBundleLongVersionString</key>
+		<string>${MACOSX_BUNDLE_LONG_VERSION_STRING}</string>
+		<key>CFBundleName</key>
+		<string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+		<key>CFBundleShortVersionString</key>
+		<string>${MACOSX_BUNDLE_SHORT_VERSION_STRING}</string>
+		<key>CFBundleVersion</key>
+		<string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
+		<key>CSResourcesFileMapped</key>
+		<true/>
+		<key>LSRequiresCarbon</key>
+		<true/>
+		<key>NSHumanReadableCopyright</key>
+		<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+		<key>NSHighResolutionCapable</key>
+		<true/>
+		<!-- File type associations -->
+		<key>CFBundleDocumentTypes</key>
+		<array>
+			<!-- VTK Legacy Data Format -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>VTK Legacy Data Format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>vtk</string>
+				</array>
+			</dict>
+			<!-- VTK XML PolyData Format -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>VTK XML PolyData Format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>vtp</string>
+				</array>
+			</dict>
+			<!-- VTK XML UnstructuredGrid Format -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>VTK XML UnstructuredGrid Format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>vtu</string>
+				</array>
+			</dict>
+			<!-- VTK XML ImageData format -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>VTK XML ImageData format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>vti</string>
+				</array>
+			</dict>
+			<!-- VTK XML RectilinearGrid format -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>VTK XML RectilinearGrid format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>vtr</string>
+				</array>
+			</dict>
+			<!-- VTK XML StructuredGrid format -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>VTK XML StructuredGrid format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>vts</string>
+				</array>
+			</dict>
+			<!-- VTK XML Multiblock Format -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>VTK XML Multiblock Format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>vtm</string>
+				</array>
+			</dict>
+			<!-- VRML 2 -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>VRML 2 data</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>wrl</string>
+				</array>
+			</dict>
+			<!-- glTF -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>glTF</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>gltf</string>
+					<string>glb</string>
+				</array>
+			</dict>
+			<!-- PLY Polygonal -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>PLY Polygonal data</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>ply</string>
+				</array>
+			</dict>
+			<!-- OBJ -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>Wavefront OBJ</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>obj</string>
+				</array>
+			</dict>
+			<!-- 3DS -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>Autodesk 3DS Max</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>3ds</string>
+				</array>
+			</dict>
+			<!-- Stereo Lithography -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>Stereo Lithography data</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>stl</string>
+				</array>
+			</dict>
+			<!-- Meta Image Data -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>Meta Image data</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>mhd</string>
+					<string>mha</string>
+				</array>
+			</dict>
+			<!-- DICOM -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>DICOM</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>dcm</string>
+				</array>
+			</dict>
+			<!-- NRRD -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>NRRD</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>nrrd</string>
+					<string>nhdr</string>
+				</array>
+			</dict>
+			<!-- File type associations -->
+		</array>
+	</dict>
 </plist>

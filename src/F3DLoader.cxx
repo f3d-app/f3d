@@ -75,11 +75,11 @@ int F3DLoader::Start(int argc, char** argv)
     interactor->SetInteractorStyle(style);
     interactor->Initialize();
     this->Renderer->Initialize(options, "");
-  }
 
 #if __APPLE__
-  F3DNSDelegate::InitializeDelegate(this);
+    F3DNSDelegate::InitializeDelegate(this, renWin);
 #endif
+  }
 
   if (files.size() > 0)
   {
