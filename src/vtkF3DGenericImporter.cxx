@@ -152,7 +152,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     if (array)
     {
       usedArray = array->GetName();
-      if (print);
+      if (print)
       {
         F3DLog::Print(F3DLog::Severity::Info, "Using default scalar array: ", usedArray);
       }
