@@ -23,7 +23,7 @@ public:
   }
 
 protected:
-  static void AppendArg(std::stringstream& ss) {}
+  static void AppendArg(std::stringstream&) {}
 
   template<typename T, typename... Args>
   static void AppendArg(std::stringstream& ss, T value, Args... args)

@@ -15,6 +15,7 @@
 // ----------------------------------------------------------------------------
 - (BOOL)application:(NSApplication*)theApplication openFile:(NSString*)filename
 {
+  (void)theApplication;
   Loader->AddFile([filename UTF8String]);
   Loader->LoadFile();
   return YES;

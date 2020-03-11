@@ -43,7 +43,7 @@ public:
   void ShowScalars(bool show);
   void SetUseRaytracing(bool use);
   void SetUseRaytracingDenoiser(bool use);
-  void SetUseDepthPeeling(bool use);
+  void SetUseDepthPeelingPass(bool use);
   void SetUseSSAOPass(bool use);
   void SetUseFXAAPass(bool use);
   void SetUsePointSprites(bool use);
