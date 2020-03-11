@@ -35,6 +35,8 @@ int F3DLoader::Start(int argc, char** argv)
   this->Parser.Initialize(argc, argv);
   F3DOptions options = this->Parser.GetOptionsFromCommandLine(files);
 
+  this->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
+
   vtkNew<vtkRenderWindow> renWin;
   vtkNew<vtkRenderWindowInteractor> interactor;
   if (!options.NoRender)
@@ -253,7 +255,7 @@ vtkSmartPointer<vtkImporter> F3DLoader::GetImporter(
   if (!vtksys::SystemTools::FileExists(file))
   {
     F3DLog::Print(F3DLog::Severity::Error, "Specified input file '", file, "' does not exist!");
-    exit(EXIT_FAILURE);
+    return nullptr;
   }
 
   if (!options.GeometryOnly)
