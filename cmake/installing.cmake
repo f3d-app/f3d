@@ -18,6 +18,15 @@ if(UNIX AND NOT APPLE)
   install(FILES "${CMAKE_SOURCE_DIR}/resources/logo.svg"
     DESTINATION "share/icons/hicolor/scalable/apps"
     RENAME "f3d.svg")
+  install(FILES "${CMAKE_SOURCE_DIR}/resources/completion.bash"
+    DESTINATION "share/bash-completion/completions"
+    RENAME "f3d")
+  install(FILES "${CMAKE_SOURCE_DIR}/resources/completion.zsh"
+    DESTINATION "share/zsh/site-functions"
+    RENAME "_f3d")
+  install(FILES "${CMAKE_SOURCE_DIR}/resources/completion.fish"
+    DESTINATION "share/fish/vendor_completions.d"
+    RENAME "f3d.fish")
 elseif(WIN32 AND NOT UNIX)
   install(FILES "${CMAKE_SOURCE_DIR}/resources/logo.ico"
     DESTINATION ".")
