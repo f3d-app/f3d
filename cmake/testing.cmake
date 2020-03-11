@@ -44,6 +44,7 @@ f3d_test(TestGridWithDepthPeeling suzanne.ply "300,300" "-gp --opacity 0.2")
 f3d_test(TestFilename suzanne.ply "300,300" "-n")
 f3d_test(TestCityGML Part-4-Buildings-V4-one.gml "300,300")
 f3d_test(TestPTS samplePTS.pts "300,300")
+f3d_test(TestColormap IM-0001-1983.dcm "300,300" "--scalars --roughness=1 --colormap=0,1,0,0,1,0,1,0")
 
 if(F3D_HAS_RAYTRACING)
   f3d_test(TestOSPRayGLTF WaterBottle.glb "300,300" "-r --samples=1")
