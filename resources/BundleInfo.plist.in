@@ -246,6 +246,32 @@
 					<string>nhdr</string>
 				</array>
 			</dict>
+			<!-- CityGML -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>CityGML</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>gml</string>
+				</array>
+			</dict>
+			<!-- Point Cloud -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>Point Cloud</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>pts</string>
+				</array>
+			</dict>
 			<!-- File type associations -->
 		</array>
 	</dict>

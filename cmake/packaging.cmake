@@ -53,6 +53,8 @@ if(WIN32 AND NOT UNIX)
     \\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' '.glb' 'GL Transmission Format'\n\
     \\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' '.3ds' 'Autodesk 3DS Max file format'\n\
     \\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' '.wrl' 'VRML file format'\n\
+    \\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' '.gml' 'CityGML file format'\n\
+    \\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' '.pts' 'Point cloud file format'\n\
     \\\${RefreshShellIcons}")
 
   # Remove association on uninstall
@@ -76,6 +78,8 @@ if(WIN32 AND NOT UNIX)
     \\\${UnRegisterExtension} '.glb' 'GL Transmission Format'\n\
     \\\${UnRegisterExtension} '.3ds' 'Autodesk 3DS Max file format'\n\
     \\\${UnRegisterExtension} '.wrl' 'VRML file format'\n\
+    \\\${UnRegisterExtension} '.gml' 'CityGML file format'\n\
+    \\\${UnRegisterExtension} '.pts' 'Point Cloud file format'\n\
     \\\${RefreshShellIcons}")
 
 else()

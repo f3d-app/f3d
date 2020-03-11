@@ -45,6 +45,8 @@ Here is the list of supported file formats:
 * **.dcm** : DICOM file format
 * **.nrrd/.nhrd** : "nearly raw raster data" file format
 * **.mhd/.mha** : MetaHeader MetaIO file format
+* **.gml** : CityGML file format
+* **.pts** : Point Cloud file format
 * **.obj** : Wavefront OBJ file format (full scene)
 * **.gltf/.glb** : GL Transmission Format (full scene)
 * **.3ds** : Autodesk 3DS Max file format (full scene)
