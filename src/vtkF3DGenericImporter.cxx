@@ -19,6 +19,7 @@
 #include <vtkAppendPolyData.h>
 #include <vtkBoundingBox.h>
 #include <vtkCellData.h>
+#include <vtkColorTransferFunction.h>
 #include <vtkDataObjectTreeIterator.h>
 #include <vtkDataSetSurfaceFilter.h>
 #include <vtkEventForwarderCommand.h>
@@ -247,6 +248,44 @@ vtkScalarsToColors* vtkF3DGenericImporter::ConfigureMapperForColoring(vtkMapper*
   mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
                         : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
   mapper->SetScalarVisibility(!this->Options->Scalars.empty());
+
+  double range[2];
+  if (this->Options->Range.size() == 2)
+  {
+    range[0] = this->Options->Range[0];
+    range[1] = this->Options->Range[1];
+  }
+  else
+  {
+    if (this->Options->Range.size() > 0)
+    {
+      F3DLog::Print(F3DLog::Severity::Warning, "The range specified does not have exactly 2 values");
+    }
+    array->GetRange(range, this->Options->Component);
+  }
+  mapper->SetScalarRange(range);
+
+  if (this->Options->LookupPoints.size() > 0)
+  {
+    if (this->Options->LookupPoints.size() % 4 == 0)
+    {
+      vtkNew<vtkColorTransferFunction> ctf;
+      for (size_t i = 0; i < this->Options->LookupPoints.size(); i += 4)
+      {
+        double val = this->Options->LookupPoints[i];
+        double r = this->Options->LookupPoints[i + 1];
+        double g = this->Options->LookupPoints[i + 2];
+        double b = this->Options->LookupPoints[i + 3];
+        ctf->AddRGBPoint(range[0] + val * (range[1] - range[0]), r, g, b);
+      }
+      mapper->SetLookupTable(ctf);
+    }
+    else
+    {
+      F3DLog::Print(F3DLog::Severity::Warning, "Specified color map list count is not a multiple of 4");
+    }
+  }
+
   vtkScalarsToColors* lut = mapper->GetLookupTable();
 
   if (this->Options->Component >= 0)
@@ -259,16 +298,6 @@ vtkScalarsToColors* vtkF3DGenericImporter::ConfigureMapperForColoring(vtkMapper*
     lut->SetVectorModeToMagnitude();
   }
 
-  if (this->Options->Range.size() == 2)
-  {
-    mapper->SetScalarRange(this->Options->Range[0], this->Options->Range[1]);
-  }
-  else
-  {
-    double range[2];
-    array->GetRange(range, this->Options->Component);
-    mapper->SetScalarRange(range);
-  }
   return lut;
 }
 

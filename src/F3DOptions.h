@@ -50,6 +50,7 @@ struct F3DOptions
   std::vector<double> SolidColor = { 1., 1., 1. };
   std::vector<int> WindowSize = { 1000, 600 };
   std::string HDRIFile;
+  std::vector<double> LookupPoints;
 };
 
 class F3DOptionsParser

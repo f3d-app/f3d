@@ -12,6 +12,29 @@
 
 #include "cxxopts.hpp"
 
+//----------------------------------------------------------------------------
+namespace
+{
+template<typename T>
+bool CompareVectors(const std::vector<T>& v1,const std::vector<T>& v2)
+{
+  if (v1.size() != v2.size())
+  {
+    return false;
+  }
+
+  for(size_t i = 0; i < v1.size(); i++)
+  {
+    if(v1[i] != v2[i])
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+}
+
 class ConfigurationOptions
 {
 public:
@@ -163,6 +186,8 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.Cells);
     this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.Range, false, "<min,max>");
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.Bar);
+    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.LookupPoints,
+      false, "<color_list>");
 
 #if F3D_HAS_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
@@ -401,7 +426,7 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
         "Specifying to show shere sprites while not using the default scene has no effect.");
       ret = false;
     }
-    if (defaultOptions.SolidColor != options.SolidColor)
+    if (!::CompareVectors(defaultOptions.SolidColor, options.SolidColor))
     {
       F3DLog::Print(F3DLog::Severity::Info,
         "Specifying a Solid Color while not using the default scene has no effect.");
@@ -443,7 +468,7 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
         "Specifying to color with Cells while not using the default scene has no effect.");
       ret = false;
     }
-    if (defaultOptions.Range != options.Range)
+    if (!::CompareVectors(defaultOptions.Range, options.Range))
     {
       F3DLog::Print(F3DLog::Severity::Info,
         "Specifying a Range to color with while not using the default scene has no effect.");
@@ -453,6 +478,11 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
     {
       F3DLog::Print(F3DLog::Severity::Info,
         "Specifying to show a scalar Bar while not using the default scene has no effect.");
+      ret = false;
+    }
+    if (!::CompareVectors(defaultOptions.LookupPoints, options.LookupPoints))
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Specifying a custom colormap while not using the default scene has no effect.");
       ret = false;
     }
   }
@@ -473,7 +503,7 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
           "Specifying to color with Cells has no effect without specifying Scalars to color with.");
         ret = false;
       }
-      if (defaultOptions.Range != options.Range)
+      if (!::CompareVectors(defaultOptions.Range, options.Range))
       {
         F3DLog::Print(F3DLog::Severity::Info,
           "Specifying a Range to color with has no effect without specifying Scalars to color "
@@ -568,8 +598,7 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
 
   if (!options.HDRIFile.empty())
   {
-    if (!std::equal(defaultOptions.BackgroundColor.begin(), defaultOptions.BackgroundColor.end(),
-          options.BackgroundColor.begin()))
+    if (!::CompareVectors(defaultOptions.BackgroundColor, options.BackgroundColor))
     {
       F3DLog::Print(
         F3DLog::Severity::Info, "Specifying a background color while a HDRI file has no effect.");
