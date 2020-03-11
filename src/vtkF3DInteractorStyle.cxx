@@ -16,7 +16,6 @@ void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
 {
   vtkRenderWindowInteractor* rwi = this->GetInteractor();
   vtkRenderWindow* renWin = rwi->GetRenderWindow();
-  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
   this->InvokeEvent(F3DLoader::NewFilesEvent, files);
   renWin->Render();
 }

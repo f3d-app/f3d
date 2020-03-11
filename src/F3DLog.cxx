@@ -28,6 +28,7 @@ void F3DLog::PrintInternal(Severity sev, const std::string& str)
     MessageBox(0, str.c_str(), f3d::AppTitle.c_str(), icon);
   }
 #else
+  (void)sev;
   std::cerr << str << std::endl;
 #endif
 }

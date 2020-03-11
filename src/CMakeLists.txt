@@ -23,6 +23,12 @@ add_executable(f3d
 
 set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
+if(MSVC)
+  target_compile_options(f3d PRIVATE /W4 /WX)
+else()
+  target_compile_options(f3d PRIVATE -Wall -Wextra -Werror)
+endif()
+
 target_include_directories(f3d
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 

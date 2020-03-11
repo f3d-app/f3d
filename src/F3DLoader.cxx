@@ -161,7 +161,7 @@ void F3DLoader::LoadFile(int load)
   // Compute the correct file index
   this->CurrentFileIndex = (this->CurrentFileIndex + load) % this->FilesList.size();
 
-  if (this->CurrentFileIndex < 0 || this->CurrentFileIndex >= this->FilesList.size())
+  if (this->CurrentFileIndex >= this->FilesList.size())
   {
     F3DLog::Print(F3DLog::Severity::Error, "Cannot load file index ", this->CurrentFileIndex);
     return;
