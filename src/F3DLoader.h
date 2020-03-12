@@ -65,7 +65,7 @@ protected:
   std::vector<std::string> FilesList;
   size_t CurrentFileIndex = 0;
   F3DOptionsParser Parser;
-  vtkNew<vtkF3DRenderer> Renderer;
+  vtkSmartPointer<vtkF3DRenderer> Renderer;
 
 private:
   F3DLoader(F3DLoader const&) = delete;
