@@ -127,6 +127,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     cxxopts::Options cxxOptions(f3d::AppName, f3d::AppTitle);
     cxxOptions.positional_help("file1 file2 ...");
 
+    // clang-format off
     auto grp1 = cxxOptions.add_options();
     this->DeclareOption(grp1, "input", "", "Input file", inputs, false, "<files>");
     this->DeclareOption(grp1, "output", "", "Render to file", options.Output, false, "<png file>");
@@ -138,42 +139,34 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp1, "grid", "g", "Show grid", options.Grid);
     this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.Edges);
     this->DeclareOption(grp1, "progress", "", "Show progress bar", options.Progress);
-    this->DeclareOption(grp1, "geometry-only", "m",
-      "Do not read materials, cameras and lights from file", options.GeometryOnly);
+    this->DeclareOption(grp1, "geometry-only", "m", "Do not read materials, cameras and lights from file", options.GeometryOnly);
 
     auto grp2 = cxxOptions.add_options("Material");
     this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.PointSprites);
     this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.PointSize, true, "<size>");
     this->DeclareOption(grp2, "color", "", "Solid color", options.SolidColor, true, "<R,G,B>");
     this->DeclareOption(grp2, "opacity", "", "Opacity", options.Opacity, true, "<opacity>");
-    this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.Roughness,
-      true, "<roughness>");
-    this->DeclareOption(
-      grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.Metallic, true, "<metallic>");
+    this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.Roughness, true, "<roughness>");
+    this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.Metallic, true, "<metallic>");
+    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.HDRIFile, true, "<file path>");
 
     auto grp3 = cxxOptions.add_options("Window");
-    this->DeclareOption(
-      grp3, "bg-color", "", "Background color", options.BackgroundColor, true, "<R,G,B>");
-    this->DeclareOption(
-      grp3, "resolution", "", "Window resolution", options.WindowSize, true, "<width,height>");
+    this->DeclareOption(grp3, "bg-color", "", "Background color", options.BackgroundColor, true, "<R,G,B>");
+    this->DeclareOption(grp3, "resolution", "", "Window resolution", options.WindowSize, true, "<width,height>");
     this->DeclareOption(grp3, "timer", "t", "Display frame per second", options.FPS);
     this->DeclareOption(grp3, "filename", "n", "Display filename", options.Filename);
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
-    this->DeclareOption(grp4, "scalars", "s", "Color by scalars", options.Scalars,
-      std::string("f3d_reserved"), "<array_name>");
-    this->DeclareOption(grp4, "comp", "", "Component from the scalar array to color with",
-      options.Component, true, "<comp_index>");
+    this->DeclareOption(grp4, "scalars", "s", "Color by scalars", options.Scalars, std::string("f3d_reserved"), "<array_name>");
+    this->DeclareOption(grp4, "comp", "", "Component from the scalar array to color with", options.Component, true, "<comp_index>");
     this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.Cells);
-    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.Range,
-      false, "<min,max>");
+    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.Range, false, "<min,max>");
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.Bar);
 
 #if F3D_HAS_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
     this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.Raytracing);
-    this->DeclareOption(
-      grp5, "samples", "", "Number of samples per pixel", options.Samples, true, "<samples>");
+    this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.Samples, true, "<samples>");
     this->DeclareOption(grp5, "denoise", "d", "Denoise the image", options.Denoise);
 #endif
 
@@ -181,11 +174,12 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp6, "depth-peeling", "p", "Enable depth peeling", options.DepthPeeling);
     this->DeclareOption(grp6, "ssao", "u", "Enable Screen-Space Ambient Occlusion", options.SSAO);
     this->DeclareOption(grp6, "fxaa", "f", "Enable Fast Approximate Anti-Aliasing", options.FXAA);
+    this->DeclareOption(grp6, "tone-mapping", "a", "Enable Tone Mapping", options.ToneMapping);
 
     auto grp7 = cxxOptions.add_options("Testing");
     this->DeclareOption(grp7, "ref", "", "Reference", options.Reference, false, "<png file>");
-    this->DeclareOption(
-      grp7, "ref-threshold", "", "Testing threshold", options.RefThreshold, false, "<threshold>");
+    this->DeclareOption(grp7, "ref-threshold", "", "Testing threshold", options.RefThreshold, false, "<threshold>");
+    // clang-format on
 
     cxxOptions.parse_positional({ "input" });
 
@@ -196,22 +190,23 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     {
       F3DLog::Print(F3DLog::Severity::Info, cxxOptions.help());
       F3DLog::Print(F3DLog::Severity::Info,
-                    "Keys:\n"
-                    " ESC       Exit f3d\n"
-                    " RETURN    Reset camera zoom\n"
-                    " x         Toggle the axes display\n"
-                    " g         Toggle the grid display\n"
-                    " e         Toggle the edges display\n"
-                    " s         Toggle the coloration by scalar\n"
-                    " b         Toggle the scalar bar display\n"
-                    " t         Toggle the FPS counter display\n"
-                    " n         Toggle the filename display\n"
-                    " r         Toggle raytracing rendering\n"
-                    " d         Toggle denoising when raytracing\n"
-                    " p         Toggle depth peeling\n"
-                    " u         Toggle SSAO\n"
-                    " f         Toggle FXAA\n"
-                    " o         Toggle point sprites rendering\n");
+        "Keys:\n"
+        " ESC       Exit f3d\n"
+        " RETURN    Reset camera zoom\n"
+        " x         Toggle the axes display\n"
+        " g         Toggle the grid display\n"
+        " e         Toggle the edges display\n"
+        " s         Toggle the coloration by scalar\n"
+        " b         Toggle the scalar bar display\n"
+        " t         Toggle the FPS counter display\n"
+        " n         Toggle the filename display\n"
+        " r         Toggle raytracing rendering\n"
+        " d         Toggle denoising when raytracing\n"
+        " p         Toggle depth peeling\n"
+        " u         Toggle SSAO\n"
+        " f         Toggle FXAA\n"
+        " a         Toggle tone mapping\n"
+        " o         Toggle point sprites rendering\n");
       exit(EXIT_SUCCESS);
     }
 
@@ -400,52 +395,62 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
   {
     if (defaultOptions.PointSprites != options.PointSprites)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying to show shere sprites while not using the default scene has no effect.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying to show shere sprites while not using the default scene has no effect.");
       ret = false;
     }
     if (defaultOptions.SolidColor != options.SolidColor)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Solid Color while not using the default scene has no effect.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying a Solid Color while not using the default scene has no effect.");
       ret = false;
     }
     if (defaultOptions.Opacity != options.Opacity)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying an Opacity while not using the default scene has no effect.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying an Opacity while not using the default scene has no effect.");
       ret = false;
     }
     if (defaultOptions.Roughness != options.Roughness)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Roughness coefficient while not using the default scene has no effect.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying a Roughness coefficient while not using the default scene has no effect.");
       ret = false;
     }
     if (defaultOptions.Metallic != options.Metallic)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Metallic coefficient while not using the default scene has no effect.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying a Metallic coefficient while not using the default scene has no effect.");
       ret = false;
     }
     if (defaultOptions.Scalars != options.Scalars)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying Scalars to color with while not using the default scene has no effect.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying Scalars to color with while not using the default scene has no effect.");
       ret = false;
     }
     if (defaultOptions.Component != options.Component)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Component to color with while not using the default scene has no effect.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying a Component to color with while not using the default scene has no effect.");
       ret = false;
     }
     if (defaultOptions.Cells != options.Cells)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying to color with Cells while not using the default scene has no effect.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying to color with Cells while not using the default scene has no effect.");
       ret = false;
     }
     if (defaultOptions.Range != options.Range)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Range to color with while not using the default scene has no effect.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying a Range to color with while not using the default scene has no effect.");
       ret = false;
     }
     if (defaultOptions.Bar != options.Bar)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying to show a scalar Bar while not using the default scene has no effect.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying to show a scalar Bar while not using the default scene has no effect.");
       ret = false;
     }
   }
@@ -455,22 +460,29 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
     {
       if (defaultOptions.Component != options.Component)
       {
-        F3DLog::Print(F3DLog::Severity::Info, "Specifying a Component to color with has no effect without specifying Scalars to color with.");
+        F3DLog::Print(F3DLog::Severity::Info,
+          "Specifying a Component to color with has no effect without specifying Scalars to color "
+          "with.");
         ret = false;
       }
       if (defaultOptions.Cells != options.Cells)
       {
-        F3DLog::Print(F3DLog::Severity::Info, "Specifying to color with Cells has no effect without specifying Scalars to color with.");
+        F3DLog::Print(F3DLog::Severity::Info,
+          "Specifying to color with Cells has no effect without specifying Scalars to color with.");
         ret = false;
       }
       if (defaultOptions.Range != options.Range)
       {
-        F3DLog::Print(F3DLog::Severity::Info, "Specifying a Range to color with has no effect without specifying Scalars to color with.");
+        F3DLog::Print(F3DLog::Severity::Info,
+          "Specifying a Range to color with has no effect without specifying Scalars to color "
+          "with.");
         ret = false;
       }
       if (defaultOptions.Bar != options.Bar)
       {
-        F3DLog::Print(F3DLog::Severity::Info, "Specifying to show a scalar Bar has no effect without specifying Scalars to color with.");
+        F3DLog::Print(F3DLog::Severity::Info,
+          "Specifying to show a scalar Bar has no effect without specifying Scalars to color "
+          "with.");
         ret = false;
       }
     }
@@ -478,61 +490,88 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
 
   if (options.Raytracing)
   {
-    if(defaultOptions.PointSprites != options.PointSprites)
+    if (defaultOptions.PointSprites != options.PointSprites)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying to show point sprites has no effect when using Raytracing.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying to show point sprites has no effect when using Raytracing.");
       ret = false;
     }
-    if(defaultOptions.FPS != options.FPS)
+    if (defaultOptions.FPS != options.FPS)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying to display the Frame per second counter has no effect when using Raytracing.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying to display the Frame per second counter has no effect when using Raytracing.");
       ret = false;
     }
-    if(defaultOptions.DepthPeeling != options.DepthPeeling)
+    if (defaultOptions.DepthPeeling != options.DepthPeeling)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying to render using Depth Peeling has no effect when using Raytracing.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying to render using Depth Peeling has no effect when using Raytracing.");
       ret = false;
     }
-    if(defaultOptions.FXAA != options.FXAA)
+    if (defaultOptions.FXAA != options.FXAA)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying to render using FXAA has no effect when using Raytracing.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying to render using FXAA has no effect when using Raytracing.");
       ret = false;
     }
-    if(defaultOptions.SSAO != options.SSAO)
+    if (defaultOptions.SSAO != options.SSAO)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying to render using SSAO has no effect when using Raytracing.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying to render using SSAO has no effect when using Raytracing.");
+      ret = false;
+    }
+    if (defaultOptions.ToneMapping != options.ToneMapping)
+    {
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying to render using ToneMapping has no effect when using Raytracing.");
       ret = false;
     }
   }
   else
   {
-    if(defaultOptions.Samples != options.Samples)
+    if (defaultOptions.Samples != options.Samples)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying a Number of samples per pixel has no effect when not using Raytracing.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying a Number of samples per pixel has no effect when not using Raytracing.");
       ret = false;
     }
-    if(defaultOptions.Denoise != options.Denoise)
+    if (defaultOptions.Denoise != options.Denoise)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying to Denoise the image has no effect when not using Raytracing.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying to Denoise the image has no effect when not using Raytracing.");
       ret = false;
     }
-    if(defaultOptions.PointSprites == options.PointSprites)
+    if (defaultOptions.PointSprites != options.PointSprites)
     {
       if (defaultOptions.Opacity != options.Opacity)
       {
-        F3DLog::Print(F3DLog::Severity::Info, "Specifying an Opacity while using point sprites has no effect.");
+        F3DLog::Print(
+          F3DLog::Severity::Info, "Specifying an Opacity while using point sprites has no effect.");
         ret = false;
       }
       if (defaultOptions.Roughness != options.Roughness)
       {
-        F3DLog::Print(F3DLog::Severity::Info, "Specifying a Roughness coefficient while using point sprites has no effect.");
+        F3DLog::Print(F3DLog::Severity::Info,
+          "Specifying a Roughness coefficient while using point sprites has no effect.");
         ret = false;
       }
       if (defaultOptions.Metallic != options.Metallic)
       {
-        F3DLog::Print(F3DLog::Severity::Info, "Specifying a Metallic coefficient while using point sprites has no effect.");
+        F3DLog::Print(F3DLog::Severity::Info,
+          "Specifying a Metallic coefficient while using point sprites has no effect.");
         ret = false;
       }
+    }
+  }
+
+  if (!options.HDRIFile.empty())
+  {
+    if (!std::equal(defaultOptions.BackgroundColor.begin(), defaultOptions.BackgroundColor.end(),
+          options.BackgroundColor.begin()))
+    {
+      F3DLog::Print(
+        F3DLog::Severity::Info, "Specifying a background color while a HDRI file has no effect.");
+      ret = false;
     }
   }
   // No check for --no-render option

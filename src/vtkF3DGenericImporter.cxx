@@ -277,8 +277,11 @@ void vtkF3DGenericImporter::ImportLights(vtkRenderer* ren)
 {
   ren->AutomaticLightCreationOff();
 
-  vtkNew<vtkLightKit> lightKit;
-  lightKit->AddLightsToRenderer(ren);
+  if (!ren->GetUseImageBasedLighting())
+  {
+    vtkNew<vtkLightKit> lightKit;
+    lightKit->AddLightsToRenderer(ren);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -318,7 +321,7 @@ std::string vtkF3DGenericImporter::GetOutputsDescription()
 std::string vtkF3DGenericImporter::GetMultiBlockDescription(vtkMultiBlockDataSet* mb, vtkIndent indent)
 {
   std::stringstream ss;
-  for (int i = 0; i < mb->GetNumberOfBlocks(); i++)
+  for (vtkIdType i = 0; i < mb->GetNumberOfBlocks(); i++)
   {
     const char* blockName = mb->GetMetaData(i)->Get(vtkCompositeDataSet::NAME());
     ss << indent << "Block: " << (blockName ? std::string(blockName) : std::to_string(i))<< "\n";
