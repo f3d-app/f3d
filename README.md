@@ -109,6 +109,7 @@ Options|Default|Description
 -c, --cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
 --range=\<min,max\>||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
 -b, --bar||Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
+--colormap=\<color_list\>||Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).<br>Use with the scalar option.
 
 ## Testing options:
 Options|Description
