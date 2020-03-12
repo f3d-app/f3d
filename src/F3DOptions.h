@@ -33,6 +33,7 @@ struct F3DOptions
   bool Verbose = false;
   bool NoRender = false;
   bool PointSprites = false;
+  bool ToneMapping = false;
   double Metallic = 0.0;
   double Opacity = 1.0;
   double PointSize = 10.0;
@@ -47,6 +48,7 @@ struct F3DOptions
   std::vector<double> Range;
   std::vector<double> SolidColor = { 1., 1., 1. };
   std::vector<int> WindowSize = { 1000, 600 };
+  std::string HDRIFile;
 };
 
 class F3DOptionsParser
