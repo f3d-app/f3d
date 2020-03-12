@@ -33,6 +33,7 @@ struct F3DOptions
   bool Verbose = false;
   bool NoRender = false;
   bool PointSprites = false;
+  bool FullScreen = false;
   bool ToneMapping = false;
   double Metallic = 0.0;
   double Opacity = 1.0;
