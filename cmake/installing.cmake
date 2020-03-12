@@ -18,4 +18,7 @@ if(UNIX AND NOT APPLE)
   install(FILES "${CMAKE_SOURCE_DIR}/resources/logo.svg"
     DESTINATION "share/icons/hicolor/scalable/apps"
     RENAME "f3d.svg")
+elseif(WIN32 AND NOT UNIX)
+  install(FILES "${CMAKE_SOURCE_DIR}/resources/logo.ico"
+    DESTINATION ".")
 endif()
