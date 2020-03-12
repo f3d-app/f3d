@@ -1,5 +1,6 @@
 #include "vtkF3DMetaReader.h"
 
+#include <vtkCityGMLReader.h>
 #include <vtkDICOMImageReader.h>
 #include <vtkDemandDrivenPipeline.h>
 #include <vtkEventForwarderCommand.h>
@@ -12,6 +13,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkPDataSetReader.h>
 #include <vtkPLYReader.h>
+#include <vtkPTSReader.h>
 #include <vtkSTLReader.h>
 #include <vtkXMLGenericDataObjectReader.h>
 #include <vtksys/SystemTools.hxx>
@@ -127,6 +129,18 @@ void vtkF3DMetaReader::SetFileName(std::string fileName)
     if (!this->InternalReader && (ext == ".gltf" || ext == ".glb"))
     {
       vtkNew<vtkGLTFReader> reader;
+      reader->SetFileName(this->FileName);
+      this->InternalReader = reader;
+    }
+    if (!this->InternalReader && ext == ".gml")
+    {
+      vtkNew<vtkCityGMLReader> reader;
+      reader->SetFileName(this->FileName);
+      this->InternalReader = reader;
+    }
+    if (!this->InternalReader && ext == ".pts")
+    {
+      vtkNew<vtkPTSReader> reader;
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
     }
