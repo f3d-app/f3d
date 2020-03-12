@@ -102,6 +102,11 @@ void vtkF3DInteractorStyle::OnKeyPress()
       ren->ShowFilename(!ren->IsFilenameVisible());
       renWin->Render();
       break;
+    case 'l':
+    case 'L':
+      renWin->SetFullScreen(!renWin->GetFullScreen());
+      renWin->Render();
+      break;
     default:
       std::string keySym = rwi->GetKeySym();
       if (keySym == "Left")
