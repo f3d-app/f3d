@@ -149,6 +149,7 @@ Some options can be toggled directly using interactions:
 * Press `f` key to toggle Fast Approximate Anti-Aliasing.
 * Press `a` key to toggle tone mapping.
 * Press `o` key to toggle point sprites rendering.
+* Press `l` key to toggle full screen.
 
 # Configuration file
 

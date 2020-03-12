@@ -43,6 +43,7 @@ int F3DLoader::Start(int argc, char** argv)
   {
     renWin->SetSize(options.WindowSize[0], options.WindowSize[1]);
     renWin->SetWindowName(f3d::AppTitle.c_str());
+    renWin->SetFullScreen(options.FullScreen);
 
     // the renderer must be added to the render window after OpenGL context initialization
     renWin->AddRenderer(this->Renderer);
