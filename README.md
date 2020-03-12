@@ -202,3 +202,16 @@ The configuration file location depends on your operating system:
 * No support for animation.
 * No support for specifying manual lighting in the default scene.
 * No support for volume rendering
+
+# Troubleshootings
+
+## Windows
+> I have installed f3d using the provided installer but when launched, I have an error with unfound DLL libraries.
+
+You need to install [Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145), selection the `x64` version.
+
+> I use f3d in a VM, the application fails to launch
+
+OpenGL applications like `f3d` can have issues when launched from a guest Windows because the access to the GPU is restricted.\
+You can try to use a software implementation of OpenGL, called [Mesa](https://github.com/pal1000/mesa-dist-win/releases).\
+Download the lastest `release-msvc` and copy `OpenGL.dll` in the same folder than `f3d.exe`.
