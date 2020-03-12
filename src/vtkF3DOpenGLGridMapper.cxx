@@ -76,7 +76,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
 
 //----------------------------------------------------------------------------
 void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
-  vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* actor)
+  vtkOpenGLHelper& cellBO, vtkRenderer* vtkNotUsed(ren), vtkActor* actor)
 {
   if (this->VBOs->GetMTime() > cellBO.AttributeUpdateTime ||
     cellBO.ShaderSourceTime > cellBO.AttributeUpdateTime)
@@ -109,7 +109,7 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DOpenGLGridMapper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act)
+void vtkF3DOpenGLGridMapper::BuildBufferObjects(vtkRenderer* ren, vtkActor* vtkNotUsed(act))
 {
   vtkNew<vtkFloatArray> infinitePlane;
   infinitePlane->SetNumberOfComponents(2);
@@ -157,7 +157,7 @@ void vtkF3DOpenGLGridMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
 
 //-----------------------------------------------------------------------------
 bool vtkF3DOpenGLGridMapper::GetNeedToRebuildShaders(
-  vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* act)
+  vtkOpenGLHelper& cellBO, vtkRenderer* vtkNotUsed(ren), vtkActor* act)
 {
   vtkMTimeType renderPassMTime = this->GetRenderPassStageMTime(act);
   return cellBO.Program == nullptr || cellBO.ShaderSourceTime < renderPassMTime;

@@ -331,7 +331,7 @@ bool vtkF3DRenderer::IsGridVisible()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseDepthPeeling(bool use)
+void vtkF3DRenderer::SetUseDepthPeelingPass(bool use)
 {
   this->UseDepthPeeling = use;
   this->SetupRenderPasses();
