@@ -1,17 +1,17 @@
 ![F3D Logo](./resources/logo.svg)
 
-# f3d - Fast and minimalist 3D viewer
+# F3D - Fast and minimalist 3D viewer
 
 By [Kitware SAS](https://www.kitware.eu), 2019
 
-f3d (pronounced `/fɛd/`) is a [VTK-based](https://vtk.org) 3D viewer following the [KISS principle](https://en.wikipedia.org/wiki/KISS_principle), so it is minimalist, efficient, has no GUI,
+F3D (pronounced `/fɛd/`) is a [VTK-based](https://vtk.org) 3D viewer following the [KISS principle](https://en.wikipedia.org/wiki/KISS_principle), so it is minimalist, efficient, has no GUI,
 has simple interaction mechanisms and is fully controllable using arguments in the command line.
 
 It is open-source and cross-platform (tested on Windows, Linux, and macOS).
 It supports a range of file formats, rendering and texturing options.
 
 ![F3D Demo](./resources/demo.png)\
-*A typical render by f3d*
+*A typical render by F3D*
 
 # Installation
 
@@ -133,7 +133,7 @@ Simple interaction with the displayed data is possible directly within the windo
 * *Move the mouse wheel* to zoom in/out.
 * *Click and drag* with the *middle* mouse button to translate the camera.
 * Press `Return` key to reset the camera zoom.
-* Press `Escape` key to close the window and quit f3d.
+* Press `Escape` key to close the window and quit F3D.
 * Press `Left/Right` to load the next/previous file if any
 * Drag and Drop a file to load it
 
@@ -209,12 +209,12 @@ The configuration file location depends on your operating system:
 # Troubleshootings
 
 ## Windows
-> I have installed f3d using the provided installer but when launched, I have an error with unfound DLL libraries.
+> I have installed F3D using the provided installer but when launched, I have an error with unfound DLL libraries.
 
 You need to install [Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145), selection the `x64` version.
 
-> I use f3d in a VM, the application fails to launch
+> I use F3D in a VM, the application fails to launch
 
-OpenGL applications like `f3d` can have issues when launched from a guest Windows because the access to the GPU is restricted.\
+OpenGL applications like F3D can have issues when launched from a guest Windows because the access to the GPU is restricted.\
 You can try to use a software implementation of OpenGL, called [Mesa](https://github.com/pal1000/mesa-dist-win/releases).\
 Download the lastest `release-msvc` and copy `OpenGL.dll` in the same folder than `f3d.exe`.
