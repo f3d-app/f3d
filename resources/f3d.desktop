@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=f3d
+Name=F3D
 GenericName=3D Viewer
 Comment=A fast and minimalist 3D viewer
 TryExec=f3d

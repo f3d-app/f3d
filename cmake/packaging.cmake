@@ -25,7 +25,7 @@ if(WIN32 AND NOT UNIX)
   set(CPACK_NSIS_INSTALLED_ICON_NAME "logo.ico")
   set(CPACK_NSIS_URL_INFO_ABOUT ${f3d_url})
   set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
-  set(CPACK_NSIS_DISPLAY_NAME "f3d")
+  set(CPACK_NSIS_DISPLAY_NAME "F3D")
 
   # Include the scripts
   # FileAssociation.nsh, from https://nsis.sourceforge.io/File_Association, has to be installed in NSIS\Include
