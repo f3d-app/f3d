@@ -45,6 +45,7 @@ f3d_test(TestFilename suzanne.ply "300,300" "-n")
 f3d_test(TestCityGML Part-4-Buildings-V4-one.gml "300,300")
 f3d_test(TestPTS samplePTS.pts "300,300")
 f3d_test(TestColormap IM-0001-1983.dcm "300,300" "--scalars --roughness=1 --colormap=0,1,0,0,1,0,1,0")
+f3d_test(TestCameraConfiguration suzanne.obj "300,300" "--camera-position=0,0,-10 -x --camera-view-up=1,0,0 --camera-focal-point=1,0,0 --camera-view-angle=20")
 
 if(F3D_HAS_RAYTRACING)
   f3d_test(TestOSPRayGLTF WaterBottle.glb "300,300" "-r --samples=1")

@@ -189,6 +189,12 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.LookupPoints,
       false, "<color_list>");
 
+    auto grpCamera = cxxOptions.add_options("Camera");
+    this->DeclareOption(grpCamera, "camera-position", "", "Camera position", options.CameraPosition, false, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-focal-point", "", "Camera focal point", options.CameraFocalPoint, false, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", options.CameraViewUp, false, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degress)", options.CameraViewAngle, false, "<angle>");
+
 #if F3D_HAS_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
     this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.Raytracing);
@@ -218,7 +224,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
       F3DLog::Print(F3DLog::Severity::Info,
         "Keys:\n"
         " ESC       Exit f3d\n"
-        " RETURN    Reset camera zoom\n"
+        " RETURN    Reset camera to initial parameters\n"
         " x         Toggle the axes display\n"
         " g         Toggle the grid display\n"
         " e         Toggle the edges display\n"
@@ -604,6 +610,25 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
         F3DLog::Severity::Info, "Specifying a background color while a HDRI file has no effect.");
       ret = false;
     }
+  }
+
+  if (!::CompareVectors(defaultOptions.CameraPosition, options.CameraPosition) &&  options.CameraPosition.size() != 3)
+  {
+    F3DLog::Print(
+      F3DLog::Severity::Info, "Specifying a camera position of not 3 component has no effect.");
+    ret = false;
+  }
+  if (!::CompareVectors(defaultOptions.CameraFocalPoint, options.CameraFocalPoint) &&  options.CameraFocalPoint.size() != 3)
+  {
+    F3DLog::Print(
+      F3DLog::Severity::Info, "Specifying a camera focal point of not 3 component has no effect.");
+    ret = false;
+  }
+  if (!::CompareVectors(defaultOptions.CameraViewUp, options.CameraViewUp) &&  options.CameraViewUp.size() != 3)
+  {
+    F3DLog::Print(
+      F3DLog::Severity::Info, "Specifying a camera view up of not 3 component has no effect.");
+    ret = false;
   }
   // No check for --no-render option
   return ret;

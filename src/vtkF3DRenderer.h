@@ -116,6 +116,17 @@ public:
 
   void SetupRenderPasses();
 
+  /**
+   * Initialize the camera position, focal point,
+   * view up and view angle according to the options if any
+   */
+  void InitializeCamera();
+
+  /**
+   * Reset the camera to its initial parameters
+   */
+  void ResetCamera() override;
+
 protected:
   vtkF3DRenderer() = default;
   ~vtkF3DRenderer() override;
@@ -128,6 +139,7 @@ protected:
   vtkSmartPointer<vtkMapper> PolyDataMapper;
   vtkSmartPointer<vtkMapper> PointGaussianMapper;
   vtkNew<vtkSkybox> Skybox;
+  vtkNew<vtkCamera> InitialCamera;
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
