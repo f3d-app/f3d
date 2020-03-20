@@ -94,6 +94,14 @@ Options|Description
 -f, --fxaa|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.
 -a, --tone-mapping|Enable *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
 
+## Camera configuration options:
+Options|Description
+------|------|------
+--camera-position=\<X,Y,Z\>||The position of the camera. Automaticaly computed or recovered from the file if not provided.
+--camera-focal-point=\<X,Y,Z\>||The focal point of the camera. Automaticaly computed or recovered from the file if not provided.
+--camera-view-up=\<X,Y,Z\>||The focal point of the camera. Will be orthogonalized even when provided. Automaticaly computed or recovered from the file if not provided.
+--camera-view-angle=\<angle\>||The view angle of the camera, non-zero value in degrees. Automaticaly computed or recovered from the file if not provided.
+
 ## Raytracing options:
 Options|Default|Description
 ------|------|------
@@ -132,7 +140,7 @@ Simple interaction with the displayed data is possible directly within the windo
 * *Click and drag* vertically with the *right* mouse button to zoom in/out.
 * *Move the mouse wheel* to zoom in/out.
 * *Click and drag* with the *middle* mouse button to translate the camera.
-* Press `Return` key to reset the camera zoom.
+* Press `Return` key to reset the camera to its inital parameters.
 * Press `Escape` key to close the window and quit F3D.
 * Press `Left/Right` to load the next/previous file if any
 * Drag and Drop a file to load it

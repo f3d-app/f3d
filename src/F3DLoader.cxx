@@ -249,7 +249,7 @@ void F3DLoader::LoadFile(int load)
 
     // Actors are loaded, use the bounds to reset camera and set-up SSAO
     this->Renderer->SetupRenderPasses();
-    this->Renderer->ResetCamera();
+    this->Renderer->InitializeCamera();
 
     this->Renderer->ShowOptions();
   }
