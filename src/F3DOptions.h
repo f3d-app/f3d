@@ -35,6 +35,7 @@ struct F3DOptions
   bool PointSprites = false;
   bool FullScreen = false;
   bool ToneMapping = false;
+  double CameraViewAngle;
   double Metallic = 0.0;
   double Opacity = 1.0;
   double PointSize = 10.0;
@@ -46,11 +47,14 @@ struct F3DOptions
   std::string Reference = "";
   std::string Scalars = "";
   std::vector<double> BackgroundColor = { 0.2, 0.2, 0.2 };
+  std::vector<double> CameraPosition;
+  std::vector<double> CameraFocalPoint;
+  std::vector<double> CameraViewUp;
+  std::vector<double> LookupPoints;
   std::vector<double> Range;
   std::vector<double> SolidColor = { 1., 1., 1. };
   std::vector<int> WindowSize = { 1000, 600 };
   std::string HDRIFile;
-  std::vector<double> LookupPoints;
 };
 
 class F3DOptionsParser
