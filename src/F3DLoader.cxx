@@ -128,6 +128,7 @@ void F3DLoader::AddFile(const std::string& path, bool recursive)
 {
   if (path.empty() || !vtksys::SystemTools::FileExists(path))
   {
+    F3DLog::Print(F3DLog::Severity::Error, "File ", path, " does not exist");
     return;
   }
 
@@ -161,6 +162,11 @@ void F3DLoader::AddFile(const std::string& path, bool recursive)
 //----------------------------------------------------------------------------
 void F3DLoader::LoadFile(int load)
 {
+  if (this->FilesList.size() == 0)
+  {
+    return;
+  }
+
   // Compute the correct file index
   this->CurrentFileIndex = (this->CurrentFileIndex + load) % this->FilesList.size();
 
