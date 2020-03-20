@@ -284,7 +284,6 @@ void vtkF3DRenderer::ShowGrid(bool show)
   this->GridVisible = show;
 
   this->SetClippingRangeExpansion(0.99);
-  this->ResetCameraClippingRange();
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -323,6 +322,7 @@ void vtkF3DRenderer::ShowGrid(bool show)
     show = false;
   }
   this->GridActor->SetVisibility(show);
+  this->ResetCameraClippingRange();
 }
 
 //----------------------------------------------------------------------------
