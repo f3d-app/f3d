@@ -302,7 +302,7 @@ void vtkF3DRenderer::ShowGrid(bool show)
     if (this->Options.Verbose && show)
     {
       F3DLog::Print(F3DLog::Severity::Info, "Using grid unit square size = ", unitSquare, "\n",
-        "Grid origin set to [", gridX, ", ", gridY, ", ", gridZ, "]");
+        "Grid origin set to [", gridX, ", ", gridY, ", ", gridZ, "]\n");
     }
 
     vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
@@ -603,7 +603,7 @@ void vtkF3DRenderer::InitializeCamera()
     F3DLog::Print(F3DLog::Severity::Info, "Camera focal point is : ", focalPoint[0], ", ", focalPoint[1], ", ", focalPoint[2], ".");
     double* viewUp = cam->GetViewUp();
     F3DLog::Print(F3DLog::Severity::Info, "Camera view up is : ", viewUp[0], ", ", viewUp[1], ", ", viewUp[2], ".");
-    F3DLog::Print(F3DLog::Severity::Info, "Camera view angle is : ", cam->GetViewAngle(), ".");
+    F3DLog::Print(F3DLog::Severity::Info, "Camera view angle is : ", cam->GetViewAngle(), ".\n");
   }
 }
 
