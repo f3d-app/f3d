@@ -92,7 +92,7 @@ Options|Description
 -p, --depth-peeling|Enable *depth peeling*. This is a technique used to correctly render translucent objects.
 -u, --ssao|Enable *Screen-Space Ambient Occlusion*. This is a technique used to improve the depth perception of the object.
 -f, --fxaa|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.
--a, --tone-mapping|Enable *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
+-a, --tone-mapping|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
 
 ## Camera configuration options:
 Options|Description
@@ -219,7 +219,7 @@ The configuration file location depends on your operating system:
 ## Windows
 > I have installed F3D using the provided installer but when launched, I have an error with unfound DLL libraries.
 
-You need to install [Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145), selection the `x64` version.
+You need to install [Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145), select the `x64` version.
 
 > I use F3D in a VM, the application fails to launch
 

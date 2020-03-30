@@ -42,6 +42,7 @@ int F3DLoader::Start(int argc, char** argv)
   if (!options.NoRender)
   {
     renWin->SetSize(options.WindowSize[0], options.WindowSize[1]);
+    renWin->SetMultiSamples(0); // Disable hardware antialiasing
     renWin->SetWindowName(f3d::AppTitle.c_str());
     renWin->SetFullScreen(options.FullScreen);
 
