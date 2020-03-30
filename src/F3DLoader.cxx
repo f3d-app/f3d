@@ -181,6 +181,11 @@ void F3DLoader::LoadFile(int load)
     std::to_string(this->FilesList.size()) + ") " + vtksys::SystemTools::GetFilenameName(filePath);
 
   F3DOptions opts = this->Parser.GetOptionsFromFile(filePath);
+  if (opts.Verbose || opts.NoRender)
+  {
+    F3DLog::Print(F3DLog::Severity::Info, "Loading: ", filePath, "\n");
+  }
+
   vtkSmartPointer<vtkImporter> importer = this->GetImporter(opts, filePath);
 
   vtkNew<vtkProgressBarWidget> progressWidget;
@@ -188,6 +193,7 @@ void F3DLoader::LoadFile(int load)
   {
     if (!importer)
     {
+      F3DLog::Print(F3DLog::Severity::Warning, filePath, " is not a file of a supported file format\n");
       fileInfo += " [UNSUPPORTED]";
       this->Renderer->Initialize(opts, fileInfo);
       return;
