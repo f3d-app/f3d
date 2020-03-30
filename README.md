@@ -96,11 +96,11 @@ Options|Description
 
 ## Camera configuration options:
 Options|Description
-------|------|------
---camera-position=\<X,Y,Z\>||The position of the camera. Automaticaly computed or recovered from the file if not provided.
---camera-focal-point=\<X,Y,Z\>||The focal point of the camera. Automaticaly computed or recovered from the file if not provided.
---camera-view-up=\<X,Y,Z\>||The focal point of the camera. Will be orthogonalized even when provided. Automaticaly computed or recovered from the file if not provided.
---camera-view-angle=\<angle\>||The view angle of the camera, non-zero value in degrees. Automaticaly computed or recovered from the file if not provided.
+------|------
+--camera-position=\<X,Y,Z\>|The position of the camera. Automaticaly computed or recovered from the file if not provided.
+--camera-focal-point=\<X,Y,Z\>|The focal point of the camera. Automaticaly computed or recovered from the file if not provided.
+--camera-view-up=\<X,Y,Z\>|The focal point of the camera. Will be orthogonalized even when provided. Automaticaly computed or recovered from the file if not provided.
+--camera-view-angle=\<angle\>|The view angle of the camera, non-zero value in degrees. Automaticaly computed or recovered from the file if not provided.
 
 ## Raytracing options:
 Options|Default|Description
