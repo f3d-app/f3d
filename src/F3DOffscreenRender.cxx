@@ -34,9 +34,6 @@ int F3DOffscreenRender::RenderTesting(
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(renWin);
 
-  // Disable hardware antialiasing
-  renWin->SetMultiSamples(0);
-
   if (vtksys::SystemTools::HasEnv("F3D_GEN_REF"))
   {
     vtkNew<vtkPNGWriter> writer;

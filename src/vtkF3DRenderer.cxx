@@ -233,7 +233,8 @@ void vtkF3DRenderer::SetupRenderPasses()
   if (this->UseToneMappingPass)
   {
     vtkNew<vtkToneMappingPass> toneP;
-    toneP->SetToneMappingType(vtkToneMappingPass::Reinhard);
+    toneP->SetToneMappingType(vtkToneMappingPass::GenericFilmic);
+    toneP->SetGenericFilmicDefaultPresets();
     toneP->SetDelegatePass(cameraP);
     activePass = toneP;
   }
