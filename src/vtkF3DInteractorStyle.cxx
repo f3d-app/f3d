@@ -49,7 +49,7 @@ void vtkF3DInteractorStyle::OnKeyPress()
       break;
     case 'p':
     case 'P':
-      ren->SetUseDepthPeeling(!ren->UsingDepthPeeling());
+      ren->SetUseDepthPeelingPass(!ren->UsingDepthPeelingPass());
       renWin->Render();
       break;
     case 'u':
