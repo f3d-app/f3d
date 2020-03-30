@@ -59,7 +59,7 @@ public:
   bool AreScalarsVisible();
   bool UsingRaytracing();
   bool UsingRaytracingDenoiser();
-  bool UsingDepthPeeling();
+  bool UsingDepthPeelingPass();
   bool UsingSSAOPass();
   bool UsingFXAAPass();
   bool UsingPointSprites();
@@ -158,7 +158,7 @@ protected:
   bool ScalarsVisible;
   bool UseRaytracing;
   bool UseRaytracingDenoiser;
-  bool UseDepthPeeling;
+  bool UseDepthPeelingPass;
   bool UseFXAAPass;
   bool UseSSAOPass;
   bool UsePointSprites;

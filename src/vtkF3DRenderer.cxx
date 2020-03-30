@@ -86,7 +86,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->ScalarsVisible = !this->Options.Scalars.empty();
   this->UseRaytracing = this->Options.Raytracing;
   this->UseRaytracingDenoiser = this->Options.Denoise;
-  this->UseDepthPeeling = this->Options.DepthPeeling;
+  this->UseDepthPeelingPass = this->Options.DepthPeeling;
   this->UseSSAOPass = this->Options.SSAO;
   this->UseFXAAPass = this->Options.FXAA;
   this->UseToneMappingPass = this->Options.ToneMapping;
@@ -208,7 +208,7 @@ void vtkF3DRenderer::SetupRenderPasses()
   }
 
   // translucent and volumic passes
-  if (this->UseDepthPeeling)
+  if (this->UseDepthPeelingPass)
   {
     vtkNew<vtkDualDepthPeelingPass> ddpP;
     ddpP->SetTranslucentPass(translucentP);
@@ -334,14 +334,14 @@ bool vtkF3DRenderer::IsGridVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseDepthPeelingPass(bool use)
 {
-  this->UseDepthPeeling = use;
+  this->UseDepthPeelingPass = use;
   this->SetupRenderPasses();
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::UsingDepthPeeling()
+bool vtkF3DRenderer::UsingDepthPeelingPass()
 {
-  return this->UseDepthPeeling;
+  return this->UseDepthPeelingPass;
 }
 
 //----------------------------------------------------------------------------
