@@ -78,7 +78,7 @@ Options|Description
 ## Material options
 Options|Default|Description
 ------|------|------
---point-sprites||Show sphere *points sprites* instead of the geometry.
+-o, --point-sprites||Show sphere *points sprites* instead of the geometry.
 --point-size|10.0|Set the *size* of points when showing vertices and point sprites.
 --color=\<R,G,B\>|1.0, 1.0, 1.0| Set a *color* on the geometry.<br>This only makes sense when using the default scene.
 --opacity=\<opacity\>|1.0|Set *opacity* on the geometry.<br>This only makes sense when using the default scene.
