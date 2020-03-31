@@ -82,7 +82,7 @@ update-vtk-osx:
   script:
     - cmake -E make_directory build
     - cd build
-    - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS -DBUILD_TESTING=ON
+    - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS -DBUILD_TESTING=ON -F3D_STRICT_BUILD=ON
       -DCMAKE_BUILD_TYPE=Release -DVTK_DIR:FILEPATH=vtk-install/lib/cmake/vtk-9.0 ..
 
 configure-linux:
