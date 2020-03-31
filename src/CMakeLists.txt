@@ -23,10 +23,14 @@ add_executable(f3d
 
 set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
-if(MSVC)
-  target_compile_options(f3d PRIVATE /W4 /WX)
-else()
-  target_compile_options(f3d PRIVATE -Wall -Wextra -Werror)
+set(F3D_STRICT_BUILD OFF CACHE BOOL "Use strict warning and errors flags for building F3D")
+mark_as_advanced(F3D_STRICT_BUILD)
+if (F3D_STRICT_BUILD)
+  if(MSVC)
+    target_compile_options(f3d PRIVATE /W4 /WX)
+  else()
+    target_compile_options(f3d PRIVATE -Wall -Wextra -Werror)
+  endif()
 endif()
 
 target_include_directories(f3d
