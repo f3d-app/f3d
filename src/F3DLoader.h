@@ -63,7 +63,7 @@ protected:
   static vtkSmartPointer<vtkImporter> GetImporter(const F3DOptions& options, const std::string& file);
 
   std::vector<std::string> FilesList;
-  size_t CurrentFileIndex = 0;
+  int CurrentFileIndex = 0;
   F3DOptionsParser Parser;
   vtkSmartPointer<vtkF3DRenderer> Renderer;
 
