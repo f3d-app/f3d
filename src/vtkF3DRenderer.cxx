@@ -135,9 +135,9 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
 
   this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, fileInfo.c_str());
 
-  this->SetupRenderPasses();
-
   this->ShowOptions();
+
+  this->SetupRenderPasses();
 }
 
 //----------------------------------------------------------------------------
@@ -314,6 +314,7 @@ void vtkF3DRenderer::ShowGrid(bool show)
     this->GridActor->ForceTranslucentOn();
     this->GridActor->SetPosition(gridX, gridY, gridZ);
     this->GridActor->SetMapper(gridMapper);
+    this->GridActor->UseBoundsOff();
 
     this->RemoveActor(this->GridActor);
     this->AddActor(this->GridActor);
