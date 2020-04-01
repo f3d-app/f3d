@@ -56,7 +56,7 @@ int F3DLoader::Start(int argc, char** argv)
     newFilesCallback->SetClientData(this);
     newFilesCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void* callData) {
       F3DLoader* loader = static_cast<F3DLoader*>(clientData);
-      loader->CurrentFileIndex = loader->FilesList.size();
+      loader->CurrentFileIndex = static_cast<int>(loader->FilesList.size());
       vtkStringArray* files = static_cast<vtkStringArray*>(callData);
       for (int i = 0; i < files->GetNumberOfTuples(); i++)
       {
@@ -163,15 +163,17 @@ void F3DLoader::AddFile(const std::string& path, bool recursive)
 //----------------------------------------------------------------------------
 void F3DLoader::LoadFile(int load)
 {
-  if (this->FilesList.size() == 0)
+  int size = static_cast<int>(this->FilesList.size());
+  if (size == 0)
   {
     return;
   }
 
   // Compute the correct file index
-  this->CurrentFileIndex = (this->CurrentFileIndex + load) % this->FilesList.size();
+  this->CurrentFileIndex = (this->CurrentFileIndex + load) % size;
+  this->CurrentFileIndex = this->CurrentFileIndex < 0 ? this->CurrentFileIndex + size : this->CurrentFileIndex;
 
-  if (this->CurrentFileIndex >= this->FilesList.size())
+  if (this->CurrentFileIndex >= size)
   {
     F3DLog::Print(F3DLog::Severity::Error, "Cannot load file index ", this->CurrentFileIndex);
     return;
@@ -179,7 +181,7 @@ void F3DLoader::LoadFile(int load)
 
   std::string filePath = this->FilesList[this->CurrentFileIndex];
   std::string fileInfo = "(" + std::to_string(this->CurrentFileIndex + 1) + "/" +
-    std::to_string(this->FilesList.size()) + ") " + vtksys::SystemTools::GetFilenameName(filePath);
+    std::to_string(size) + ") " + vtksys::SystemTools::GetFilenameName(filePath);
 
   F3DOptions opts = this->Parser.GetOptionsFromFile(filePath);
   if (opts.Verbose || opts.NoRender)
