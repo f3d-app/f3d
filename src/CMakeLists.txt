@@ -2,7 +2,7 @@ if(WIN32)
   set(WINDOWS_RC_FILE ${CMAKE_SOURCE_DIR}/resources/f3d.rc)
 endif()
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if(APPLE)
   set(OSX_DELEGATE ${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm)
 endif()
 
@@ -21,7 +21,7 @@ add_executable(f3d
   ${WINDOWS_RC_FILE}
 )
 
-set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 set(F3D_STRICT_BUILD OFF CACHE BOOL "Use strict warning and errors flags for building F3D")
 mark_as_advanced(F3D_STRICT_BUILD)
@@ -41,11 +41,20 @@ target_compile_definitions(f3d
   PRIVATE VTK_VERSION_MINOR=${VTK_VERSION_MINOR}
 )
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if(APPLE)
   # MacOS Bundle app
   option(MACOSX_BUILD_BUNDLE ON "Build a macOS bundle application")
   if(MACOSX_BUILD_BUNDLE)
     set_target_properties(f3d PROPERTIES MACOSX_BUNDLE TRUE)
+    set(F3D_OSX_BUNDLE ON)
+
+    # Add default configuration
+    if(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
+      set(f3d_CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json)
+      set_source_files_properties(${f3d_CONFIG} PROPERTIES
+        MACOSX_PACKAGE_LOCATION "Resources")
+      target_sources(f3d PRIVATE ${f3d_CONFIG})
+    endif()
   endif()
 
   # Add logo icon

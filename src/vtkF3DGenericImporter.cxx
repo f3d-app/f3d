@@ -137,7 +137,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   std::string usedArray = this->Options->Scalars;
 
   // Recover an array for coloring if we ever need it
-  if (usedArray == "f3d_reserved" || usedArray.empty())
+  if (usedArray.empty())
   {
     vtkDataArray* array = nullptr;
     if (this->Options->Cells)
@@ -149,7 +149,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       array = pointData->GetScalars();
     }
 
-    bool print = (this->Options->Verbose || this->Options->NoRender) && !this->Options->Scalars.empty();
+    bool print = (this->Options->Verbose || this->Options->NoRender);
     if (array)
     {
       usedArray = array->GetName();
@@ -221,7 +221,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       F3DLog::Print(F3DLog::Severity::Warning, "Invalid component index: ", this->Options->Component);
     }
   }
-  else if (!usedArray.empty())
+  else if (!usedArray.empty() && !(usedArray == f3d::F3DReservedString))
   {
     F3DLog::Print(F3DLog::Severity::Warning, "Unknow scalar array: ", usedArray);
   }
@@ -247,7 +247,7 @@ vtkScalarsToColors* vtkF3DGenericImporter::ConfigureMapperForColoring(vtkMapper*
   mapper->SelectColorArray(array->GetName());
   mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
                         : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-  mapper->SetScalarVisibility(!this->Options->Scalars.empty());
+  mapper->SetScalarVisibility(this->Options->Scalars != f3d::F3DReservedString);
 
   double range[2];
   if (this->Options->Range.size() == 2)
