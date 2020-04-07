@@ -196,7 +196,9 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     if (this->Options->Component < array->GetNumberOfComponents())
     {
       this->ConfigureMapperForColoring(this->PointGaussianMapper, array);
-      vtkScalarsToColors* lut = this->ConfigureMapperForColoring(this->PolyDataMapper, array);
+      this->ConfigureMapperForColoring(this->PolyDataMapper, array);
+
+      vtkScalarsToColors* lut = mapper->GetLookupTable();
 
       std::string title = usedArray;
       if (this->Options->Component >= 0)
