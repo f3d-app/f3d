@@ -21,6 +21,7 @@ struct F3DOptions
   bool Cells = false;
   bool Denoise = false;
   bool DepthPeeling = false;
+  bool DryRun = false;
   bool Edges = false;
   bool FPS = false;
   bool Filename = false;
@@ -45,7 +46,7 @@ struct F3DOptions
   int Samples = 5;
   std::string Output = "";
   std::string Reference = "";
-  std::string Scalars = "";
+  std::string Scalars = f3d::F3DReservedString;
   std::vector<double> BackgroundColor = { 0.2, 0.2, 0.2 };
   std::vector<double> CameraPosition;
   std::vector<double> CameraFocalPoint;
@@ -62,13 +63,32 @@ class F3DOptionsParser
 public:
   void Initialize(int argc, char** argv);
 
-  F3DOptions GetOptionsFromCommandLine(std::vector<std::string>& files);
-  F3DOptions GetOptionsFromFile(const std::string& filePath);
+  /**
+   * Parse the command line and return the options passed
+   * The provided inputs arguments will also be filled by the
+   * positional inputs or inputs arguments from command line.
+   * Returns the resulting options.
+   */
+  F3DOptions GetOptionsFromCommandLine(std::vector<std::string>& inputs);
+
+  /**
+   * Parse the command line and return the options passed.
+   * Convenience method that does not allows to recover the inputs.
+   */
+  F3DOptions GetOptionsFromCommandLine();
+
+  /**
+   * Parse the config file in different potential location
+   * using the provided filepath to match the regexp in
+   * the config files. Then parse the command line for any supplemental.
+   * Returns the resulting options.
+   */
+  F3DOptions GetOptionsFromConfigFile(const std::string& filePath);
 
   /**
    * Check the validity of a provided option
-   * and print to the log if they are not
-   * return true if all options are compatible, false otherwise
+   * and print to the log if they are not.
+   * return true if all options are compatible, false otherwise.
    */
   static bool CheckValidity(const F3DOptions& options, const std::string& filePath);
 
