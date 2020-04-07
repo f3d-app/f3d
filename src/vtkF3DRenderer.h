@@ -26,6 +26,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkSkybox.h>
 #include <vtkTextActor.h>
+#include <vtkSmartVolumeMapper.h>
 
 struct F3DOptions;
 
@@ -49,6 +50,8 @@ public:
   void SetUseFXAAPass(bool use);
   void SetUsePointSprites(bool use);
   void SetUseToneMappingPass(bool use);
+  void SetUseVolume(bool use);
+  void SetUseInverseOpacityFunction(bool use);
 
   bool IsAxisVisible();
   bool IsGridVisible();
@@ -64,6 +67,8 @@ public:
   bool UsingFXAAPass();
   bool UsingPointSprites();
   bool UsingToneMappingPass();
+  bool UsingVolume();
+  bool UsingInverseOpacityFunction();
 
   void Render() override;
 
@@ -93,7 +98,23 @@ public:
 
   //@{
   /**
-   * Set/Get the polydata mapper actor, used for hotkey purposes
+   * Set/Get the point sprites actor, used for hotkey purposes
+   */
+  vtkGetSmartPointerMacro(PointSpritesActor, vtkActor);
+  vtkSetSmartPointerMacro(PointSpritesActor, vtkActor);
+  //@}
+
+  //@{
+  /**
+   * Set/Get the volume prop, used for hotkey purposes
+   */
+  vtkGetSmartPointerMacro(VolumeProp, vtkVolume);
+  vtkSetSmartPointerMacro(VolumeProp, vtkVolume);
+  //@}
+
+  //@{
+  /**
+   * Set/Get the polydata mapper, used for hotkey purposes
    */
   vtkGetSmartPointerMacro(PolyDataMapper, vtkMapper);
   vtkSetSmartPointerMacro(PolyDataMapper, vtkMapper);
@@ -101,10 +122,18 @@ public:
 
   //@{
   /**
-   * Set/Get the point gaussian mapper actor, used for hotkey purposes
+   * Set/Get the point gaussian mapper, used for hotkey purposes
    */
   vtkGetSmartPointerMacro(PointGaussianMapper, vtkMapper);
   vtkSetSmartPointerMacro(PointGaussianMapper, vtkMapper);
+  //@}
+
+  //@{
+  /**
+   * Set/Get the volume mapper, used for hotkey purposes
+   */
+  vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
+  vtkSetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
   //@}
 
   /**
@@ -131,13 +160,18 @@ protected:
   vtkF3DRenderer() = default;
   ~vtkF3DRenderer() override;
 
+  void UpdateActorVisibility();
+
   F3DOptions Options;
 
   vtkNew<vtkActor> GridActor;
   vtkSmartPointer<vtkActor2D> ScalarBarActor;
   vtkSmartPointer<vtkActor> GeometryActor;
+  vtkSmartPointer<vtkActor> PointSpritesActor;
+  vtkSmartPointer<vtkVolume> VolumeProp;
   vtkSmartPointer<vtkMapper> PolyDataMapper;
   vtkSmartPointer<vtkMapper> PointGaussianMapper;
+  vtkSmartPointer<vtkSmartVolumeMapper> VolumeMapper;
   vtkNew<vtkSkybox> Skybox;
   vtkNew<vtkCamera> InitialCamera;
 
@@ -163,6 +197,8 @@ protected:
   bool UseSSAOPass;
   bool UsePointSprites;
   bool UseToneMappingPass;
+  bool UseVolume;
+  bool UseInverseOpacityFunction;
 };
 
 #endif
