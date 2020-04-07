@@ -53,6 +53,7 @@ stages:
       -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
       -DVTK_MODULE_ENABLE_VTK_RenderingLabel=YES
       -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
+      -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
       -DVTK_MODULE_ENABLE_VTK_jsoncpp=YES
       ..
     - cmake --build . --config Release --parallel 4

@@ -119,6 +119,8 @@ Options|Default|Description
 --range=\<min,max\>||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
 -b, --bar||Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
 --colormap=\<color_list\>||Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).<br>Use with the scalar option.
+-z, --volume||Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.
+-i, --inverse||Inverse the linear opacity function. Only makes sense with volume rendering.
 
 ## Testing options:
 Options|Description
@@ -133,6 +135,12 @@ Options|Default|Description
 --resolution=\<width,height\>|1000, 600|Set the *window resolution*.
 -t, --timer||Display a *frame per second counter*.
 -n, --filename||Display the *name of the file*.
+
+# Rendering precedence
+Some rendering options are not compatible between them, here is the precedence order if several are defined:
+- Raytracing (`-r`)
+- Volume (`-z`)
+- Point Sprites (`-o`)
 
 # Interaction
 
@@ -197,12 +205,16 @@ A typical config file may look like this :
        "raytracing": true,
        "denoise": true,
        "samples": 3
+   },
+   ".*mhd": {
+       "volume": true
    }
 }
 ```
 This first block defines a basic configuration with many desired options for all files.
 The second block specifies that all files ending with vt., eg: vtk, vtp, vtu, ... will be shown with edges on.
 The third block specifies raytracing usage for .gltf and .glb files.
+The last block specifies that volume rendering should be used with .mhd files.
 
 The configuration file possible locations depends on your operating system.
 They are considered in the below order and only the first found will be used.

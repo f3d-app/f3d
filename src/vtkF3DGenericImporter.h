@@ -13,12 +13,14 @@
 #include <vtkImporter.h>
 
 class vtkActor;
-class vtkMapper;
+class vtkVolume;
+class vtkPolyDataMapper;
 class vtkMultiBlockDataSet;
 class vtkPointGaussianMapper;
 class vtkPolyDataMapper;
+class vtkSmartVolumeMapper;
 class vtkScalarBarActor;
-class vtkScalarsToColors;
+class vtkColorTransferFunction;
 struct F3DOptions;
 
 class vtkF3DGenericImporter : public vtkImporter
@@ -63,6 +65,8 @@ public:
    */
   vtkGetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
   vtkGetSmartPointerMacro(GeometryActor, vtkActor);
+  vtkGetSmartPointerMacro(PointSpritesActor, vtkActor);
+  vtkGetSmartPointerMacro(VolumeProp, vtkVolume);
   //@}
 
   //@{
@@ -71,6 +75,7 @@ public:
    */
   vtkGetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
   vtkGetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
+  vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
   //@}
 
 protected:
@@ -81,15 +86,22 @@ protected:
   void ImportLights(vtkRenderer*) override;
   void ImportProperties(vtkRenderer*) override;
 
-  vtkScalarsToColors* ConfigureMapperForColoring(vtkMapper* mapper, vtkDataArray* array);
+  void ConfigureMapperForColoring(
+    vtkPolyDataMapper* mapper, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2]);
+
+  void ConfigureVolumeForColoring(
+    vtkVolume* volume, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2]);
 
   vtkNew<vtkF3DMetaReader> Reader;
 
   const F3DOptions* Options = nullptr;
   vtkNew<vtkScalarBarActor> ScalarBarActor;
   vtkNew<vtkActor> GeometryActor;
+  vtkNew<vtkActor> PointSpritesActor;
+  vtkNew<vtkVolume> VolumeProp;
   vtkNew<vtkPolyDataMapper> PolyDataMapper;
   vtkNew<vtkPointGaussianMapper> PointGaussianMapper;
+  vtkNew<vtkSmartVolumeMapper> VolumeMapper;
   std::string OutputDescription;
 
 private:

@@ -107,6 +107,16 @@ void vtkF3DInteractorStyle::OnKeyPress()
       renWin->SetFullScreen(!renWin->GetFullScreen());
       renWin->Render();
       break;
+    case 'z':
+    case 'Z':
+      ren->SetUseVolume(!ren->UsingVolume());
+      renWin->Render();
+      break;
+    case 'i':
+    case 'I':
+      ren->SetUseInverseOpacityFunction(!ren->UsingInverseOpacityFunction());
+      renWin->Render();
+      break;
     default:
       std::string keySym = rwi->GetKeySym();
       if (keySym == "Left")

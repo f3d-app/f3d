@@ -23,10 +23,12 @@
 #include <vtkDataObjectTreeIterator.h>
 #include <vtkDataSetSurfaceFilter.h>
 #include <vtkEventForwarderCommand.h>
+#include <vtkImageData.h>
 #include <vtkInformation.h>
 #include <vtkLightKit.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
+#include <vtkPiecewiseFunction.h>
 #include <vtkPointData.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkPolyDataMapper.h>
@@ -34,6 +36,8 @@
 #include <vtkRenderer.h>
 #include <vtkScalarBarActor.h>
 #include <vtkScalarsToColors.h>
+#include <vtkSmartVolumeMapper.h>
+#include <vtkVolumeProperty.h>
 
 vtkStandardNewMacro(vtkF3DGenericImporter);
 
@@ -84,6 +88,12 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   }
   else
   {
+    vtkImageData* image = vtkImageData::SafeDownCast(dataObject);
+    if (image)
+    {
+      this->VolumeMapper->SetInputData(image);
+    }
+
     vtkNew<vtkDataSetSurfaceFilter> geom;
     geom->SetInputConnection(this->Reader->GetOutputPort());
     geom->Update();
@@ -96,6 +106,9 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   {
     return;
   }
+
+  // Configure volume mapper
+  this->VolumeMapper->SetRequestedRenderModeToGPU();
 
   // Configure polydata mapper
   this->PolyDataMapper->InterpolateScalarsBeforeMappingOn();
@@ -121,23 +134,12 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     "}\n");
   this->PointGaussianMapper->SetInputData(surface);
 
-  // Select correct mapper
-  vtkSmartPointer<vtkPolyDataMapper> mapper;
-  if (!this->Options->Raytracing && this->Options->PointSprites)
-  {
-    mapper = this->PointGaussianMapper;
-  }
-  else
-  {
-    mapper = this->PolyDataMapper;
-  }
-
   vtkPointData* pointData = surface->GetPointData();
   vtkCellData* cellData = surface->GetCellData();
   std::string usedArray = this->Options->Scalars;
 
   // Recover an array for coloring if we ever need it
-  if (usedArray.empty() || usedArray == f3d::F3DReservedString)
+  if (usedArray.empty() || this->Options->Volume || usedArray == f3d::F3DReservedString)
   {
     vtkDataArray* array = nullptr;
     if (this->Options->Cells)
@@ -195,10 +197,60 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   {
     if (this->Options->Component < array->GetNumberOfComponents())
     {
-      this->ConfigureMapperForColoring(this->PointGaussianMapper, array);
-      this->ConfigureMapperForColoring(this->PolyDataMapper, array);
+      // Get range
+      double range[2];
+      if (this->Options->Range.size() == 2)
+      {
+        range[0] = this->Options->Range[0];
+        range[1] = this->Options->Range[1];
+      }
+      else
+      {
+        if (this->Options->Range.size() > 0)
+        {
+          F3DLog::Print(F3DLog::Severity::Warning, "The range specified does not have exactly 2 values, using automatic range.");
+        }
+        array->GetRange(range, this->Options->Component);
+      }
 
-      vtkScalarsToColors* lut = mapper->GetLookupTable();
+      // Create lookup table
+      vtkNew<vtkColorTransferFunction> ctf;
+      if (this->Options->LookupPoints.size() > 0)
+      {
+        if (this->Options->LookupPoints.size() % 4 == 0)
+        {
+          for (size_t i = 0; i < this->Options->LookupPoints.size(); i += 4)
+          {
+            double val = this->Options->LookupPoints[i];
+            double r = this->Options->LookupPoints[i + 1];
+            double g = this->Options->LookupPoints[i + 2];
+            double b = this->Options->LookupPoints[i + 3];
+            ctf->AddRGBPoint(range[0] + val * (range[1] - range[0]), r, g, b);
+          }
+        }
+        else
+        {
+          F3DLog::Print(F3DLog::Severity::Warning, "Specified color map list count is not a multiple of 4, ignoring it.");
+        }
+      }
+
+      if (this->Options->Component >= 0)
+      {
+        ctf->SetVectorModeToComponent();
+        ctf->SetVectorComponent(this->Options->Component);
+      }
+      else
+      {
+        ctf->SetVectorModeToMagnitude();
+      }
+
+      if (this->VolumeMapper->GetInput())
+      {
+        this->ConfigureVolumeForColoring(this->VolumeProp, array, ctf, range);
+      }
+
+      this->ConfigureMapperForColoring(this->PointGaussianMapper, array, ctf, range);
+      this->ConfigureMapperForColoring(this->PolyDataMapper, array, ctf, range);
 
       std::string title = usedArray;
       if (this->Options->Component >= 0)
@@ -208,7 +260,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
         title += ")";
       }
 
-      this->ScalarBarActor->SetLookupTable(lut);
+      this->ScalarBarActor->SetLookupTable(ctf);
       this->ScalarBarActor->SetTitle(title.c_str());
       this->ScalarBarActor->SetNumberOfLabels(4);
       this->ScalarBarActor->SetOrientationToHorizontal();
@@ -228,7 +280,10 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     F3DLog::Print(F3DLog::Severity::Warning, "Unknow scalar array: ", usedArray);
   }
 
-  this->GeometryActor->SetMapper(mapper);
+  // configure props
+  this->VolumeProp->SetMapper(this->VolumeMapper);
+
+  this->GeometryActor->SetMapper(this->PolyDataMapper);
   this->GeometryActor->GetProperty()->SetInterpolationToPBR();
 
   double col[3];
@@ -240,67 +295,62 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->GeometryActor->GetProperty()->SetMetallic(this->Options->Metallic);
   this->GeometryActor->GetProperty()->SetPointSize(this->Options->PointSize);
 
+  this->PointSpritesActor->SetMapper(this->PointGaussianMapper);
+  this->PointSpritesActor->GetProperty()->SetColor(col);
+  this->PointSpritesActor->GetProperty()->SetOpacity(this->Options->Opacity);
+
+  // add props
   ren->AddActor(this->GeometryActor);
+  ren->AddActor(this->PointSpritesActor);
+  ren->AddVolume(this->VolumeProp);
+
+  if (!this->Options->Raytracing && this->Options->PointSprites)
+  {
+    this->PointSpritesActor->VisibilityOn();
+    this->GeometryActor->VisibilityOff();
+    this->VolumeProp->VisibilityOff();
+  }
+  else if (!this->Options->Raytracing && this->Options->Volume)
+  {
+    this->PointSpritesActor->VisibilityOff();
+    this->GeometryActor->VisibilityOff();
+    this->VolumeProp->VisibilityOn();
+  }
+  else
+  {
+    this->PointSpritesActor->VisibilityOff();
+    this->GeometryActor->VisibilityOn();
+    this->VolumeProp->VisibilityOff();
+  }
 }
 
 //----------------------------------------------------------------------------
-vtkScalarsToColors* vtkF3DGenericImporter::ConfigureMapperForColoring(vtkMapper* mapper, vtkDataArray* array)
+void vtkF3DGenericImporter::ConfigureVolumeForColoring(
+    vtkVolume* volume, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2])
+{
+  vtkNew<vtkPiecewiseFunction> otf;
+  otf->AddPoint(range[0], this->Options->InverseOpacityFunction ? 1.0 : 0.0);
+  otf->AddPoint(range[1], this->Options->InverseOpacityFunction ? 0.0 : 1.0);
+
+  vtkNew<vtkVolumeProperty> property;
+  property->SetColor(ctf);
+  property->SetScalarOpacity(otf);
+  property->ShadeOn();
+  property->SetInterpolationTypeToLinear();
+
+  volume->SetProperty(property);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::ConfigureMapperForColoring(
+  vtkPolyDataMapper* mapper, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2])
 {
   mapper->SelectColorArray(array->GetName());
   mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
                         : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
   mapper->SetScalarVisibility(this->Options->Scalars != f3d::F3DReservedString);
-
-  double range[2];
-  if (this->Options->Range.size() == 2)
-  {
-    range[0] = this->Options->Range[0];
-    range[1] = this->Options->Range[1];
-  }
-  else
-  {
-    if (this->Options->Range.size() > 0)
-    {
-      F3DLog::Print(F3DLog::Severity::Warning, "The range specified does not have exactly 2 values");
-    }
-    array->GetRange(range, this->Options->Component);
-  }
   mapper->SetScalarRange(range);
-
-  if (this->Options->LookupPoints.size() > 0)
-  {
-    if (this->Options->LookupPoints.size() % 4 == 0)
-    {
-      vtkNew<vtkColorTransferFunction> ctf;
-      for (size_t i = 0; i < this->Options->LookupPoints.size(); i += 4)
-      {
-        double val = this->Options->LookupPoints[i];
-        double r = this->Options->LookupPoints[i + 1];
-        double g = this->Options->LookupPoints[i + 2];
-        double b = this->Options->LookupPoints[i + 3];
-        ctf->AddRGBPoint(range[0] + val * (range[1] - range[0]), r, g, b);
-      }
-      mapper->SetLookupTable(ctf);
-    }
-    else
-    {
-      F3DLog::Print(F3DLog::Severity::Warning, "Specified color map list count is not a multiple of 4");
-    }
-  }
-
-  vtkScalarsToColors* lut = mapper->GetLookupTable();
-
-  if (this->Options->Component >= 0)
-  {
-    lut->SetVectorModeToComponent();
-    lut->SetVectorComponent(this->Options->Component);
-  }
-  else
-  {
-    lut->SetVectorModeToMagnitude();
-  }
-
-  return lut;
+  mapper->SetLookupTable(ctf);
 }
 
 //----------------------------------------------------------------------------

@@ -195,7 +195,9 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.Range, false, "<min,max>");
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.Bar);
     this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.LookupPoints,
-      false, "<color_list>");
+      true, "<color_list>");
+    this->DeclareOption(grp4, "volume", "z", "Show volume if the file is compatible", options.Volume);
+    this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.InverseOpacityFunction);
 
     auto grpCamera = cxxOptions.add_options("Camera");
     this->DeclareOption(grpCamera, "camera-position", "", "Camera position", options.CameraPosition, false, "<X,Y,Z>");
@@ -509,7 +511,7 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
     if (defaultOptions.PointSprites != options.PointSprites)
     {
       F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to show shere sprites while not using the default scene has no effect.");
+        "Specifying to show sphere sprites while not using the default scene has no effect.");
       ret = false;
     }
     if (!::CompareVectors(defaultOptions.SolidColor, options.SolidColor))
@@ -606,8 +608,57 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
     }
   }
 
+  if (options.Volume)
+  {
+     if (defaultOptions.PointSprites != options.PointSprites)
+    {
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying to show sphere sprites while using volume rendering has no effect.");
+      ret = false;
+    }
+    if (!::CompareVectors(defaultOptions.SolidColor, options.SolidColor))
+    {
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying a Solid Color while using volume rendering has no effect.");
+      ret = false;
+    }
+    if (defaultOptions.Opacity != options.Opacity)
+    {
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying an Opacity while using volume rendering has no effect.");
+      ret = false;
+    }
+    if (defaultOptions.Roughness != options.Roughness)
+    {
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying a Roughness coefficient while using volume rendering has no effect.");
+      ret = false;
+    }
+    if (defaultOptions.Metallic != options.Metallic)
+    {
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying a Metallic coefficient while using volume rendering has no effect.");
+      ret = false;
+    }
+  }
+  else
+  {
+    if (defaultOptions.InverseOpacityFunction != options.InverseOpacityFunction)
+    {
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying inverse opacity function while not using volume rendering has no effect.");
+      ret = false;
+    }
+  }
+
   if (options.Raytracing)
   {
+    if (defaultOptions.Volume != options.Volume)
+    {
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying to show volume has no effect when using Raytracing.");
+      ret = false;
+    }
     if (defaultOptions.PointSprites != options.PointSprites)
     {
       F3DLog::Print(F3DLog::Severity::Info,

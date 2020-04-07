@@ -35,6 +35,7 @@ find_package(VTK 9.0 REQUIRED
     RenderingCore
     RenderingLabel
     RenderingOpenGL2
+    RenderingVolumeOpenGL2
     jsoncpp
   OPTIONAL_COMPONENTS
     RenderingRayTracing
