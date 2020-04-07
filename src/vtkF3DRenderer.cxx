@@ -83,7 +83,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->TimerVisible = this->Options.FPS;
   this->FilenameVisible = this->Options.Filename;
   this->ScalarBarVisible = this->Options.Bar;
-  this->ScalarsVisible = !this->Options.Scalars.empty();
+  this->ScalarsVisible = this->Options.Scalars != f3d::F3DReservedString;
   this->UseRaytracing = this->Options.Raytracing;
   this->UseRaytracingDenoiser = this->Options.Denoise;
   this->UseDepthPeelingPass = this->Options.DepthPeeling;

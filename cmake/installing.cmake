@@ -1,8 +1,34 @@
 # F3D Installation
 
-install(FILES LICENSE README.md
-  DESTINATION ".")
+# Documentation
+set(F3D_DOC_DIR ".")
 
+if (UNIX AND NOT APPLE)
+  set(F3D_DOC_DIR ${CMAKE_INSTALL_DOCDIR})
+endif()
+
+install(FILES LICENSE README.md
+  DESTINATION ${F3D_DOC_DIR})
+
+# Default config file
+if (UNIX AND NOT APPLE)
+  if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
+    if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
+      install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
+        DESTINATION ".")
+    else()
+      if (NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr")
+        message(WARNING "Enabling F3D_INSTALL_DEFAULT_CONFIGURATION_FILE, while not installing to /usr. "
+                "Default configuration file may be installed in a location that will not be scanned by F3D. "
+                "You can set F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX to ensure the file will be scanned.")
+      endif()
+      install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
+        DESTINATION "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d/config.json")
+    endif()
+  endif()
+endif()
+
+# Other ressoure files
 if(UNIX AND NOT APPLE)
   install(FILES "${CMAKE_SOURCE_DIR}/resources/f3d.desktop"
     DESTINATION "share/applications")
@@ -30,4 +56,13 @@ if(UNIX AND NOT APPLE)
 elseif(WIN32 AND NOT UNIX)
   install(FILES "${CMAKE_SOURCE_DIR}/resources/logo.ico"
     DESTINATION ".")
+  if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
+    install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
+      DESTINATION ".")
+  endif()
+elseif(APPLE AND NOT MACOSX_BUILD_BUNDLE)
+  if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
+    install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
+      DESTINATION ".")
+  endif()
 endif()

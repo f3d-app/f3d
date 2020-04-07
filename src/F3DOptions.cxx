@@ -121,17 +121,24 @@ protected:
   }
 
   template<class T>
-  void DeclareOption(cxxopts::OptionAdder& group, const std::string& longName,
+  void DeclareOptionWithImplicitValue(cxxopts::OptionAdder& group, const std::string& longName,
     const std::string& shortName, const std::string& doc, T& var, const std::string& implicitValue,
-    const std::string& argHelp = "") const
+    bool hasDefault = true, const std::string& argHelp = "") const
   {
     auto val = cxxopts::value<T>(var)->implicit_value(implicitValue);
+    if (hasDefault)
+    {
+      val = val->default_value(this->GetOptionDefault(longName, var));
+    }
     var = {};
     group(this->CollapseName(longName, shortName), doc, val, argHelp);
   }
 
+  std::string GetBinarySettingsDirectory();
+  std::string GetSettingsFilePath();
+
+  static std::string GetSystemSettingsDirectory();
   static std::string GetUserSettingsDirectory();
-  static std::string GetUserSettingsFilePath();
 
 protected:
   int Argc;
@@ -163,6 +170,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.Edges);
     this->DeclareOption(grp1, "progress", "", "Show progress bar", options.Progress);
     this->DeclareOption(grp1, "geometry-only", "m", "Do not read materials, cameras and lights from file", options.GeometryOnly);
+    this->DeclareOption(grp1, "dry-run", "", "Do not read the configuration file", options.DryRun);
 
     auto grp2 = cxxOptions.add_options("Material");
     this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.PointSprites);
@@ -181,7 +189,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp3, "fullscreen", "l", "Full screen", options.FullScreen);
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
-    this->DeclareOption(grp4, "scalars", "s", "Color by scalars", options.Scalars, std::string("f3d_reserved"), "<array_name>");
+    this->DeclareOptionWithImplicitValue(grp4, "scalars", "s", "Color by scalars", options.Scalars, std::string(""), true, "<array_name>");
     this->DeclareOption(grp4, "comp", "", "Component from the scalar array to color with", options.Component, true, "<comp_index>");
     this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.Cells);
     this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.Range, false, "<min,max>");
@@ -273,12 +281,21 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
 //----------------------------------------------------------------------------
 bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string& filePath)
 {
-  const std::string& configFilePath = this->GetUserSettingsFilePath();
+  this->ConfigDic.clear();
+
+  const std::string& configFilePath = this->GetSettingsFilePath();
+  if (configFilePath.empty())
+  {
+     return false;
+  }
+
   std::ifstream file;
   file.open(configFilePath.c_str());
 
   if (!file.is_open())
   {
+    F3DLog::Print(
+      F3DLog::Severity::Error, "Unable to open the configuration file ", configFilePath);
     return false;
   }
 
@@ -336,7 +353,7 @@ std::string ConfigurationOptions::GetUserSettingsDirectory()
   std::string directoryPath;
   std::string separator("/");
 
-  // Emulating QSettings behavior.
+  // Implementing XDG specifications
   const char* xdgConfigHome = vtksys::SystemTools::GetEnv("XDG_CONFIG_HOME");
   if (xdgConfigHome && strlen(xdgConfigHome) > 0)
   {
@@ -366,9 +383,67 @@ std::string ConfigurationOptions::GetUserSettingsDirectory()
 }
 
 //----------------------------------------------------------------------------
-std::string ConfigurationOptions::GetUserSettingsFilePath()
+std::string ConfigurationOptions::GetSystemSettingsDirectory()
 {
-  return ConfigurationOptions::GetUserSettingsDirectory() + "f3d.json";
+  std::string directoryPath = "";
+// No support implemented for system wide settings on Windows yet
+#ifndef _WIN32 
+  // Implementing simple /etc/ system wide config
+  directoryPath = "/etc/f3d/";
+#endif
+  return directoryPath;
+}
+
+//----------------------------------------------------------------------------
+std::string ConfigurationOptions::GetBinarySettingsDirectory()
+{
+  std::string directoryPath = "";
+  std::string errorMsg, programFilePath;
+  if(vtksys::SystemTools::FindProgramPath(this->Argv[0], programFilePath, errorMsg))
+  {
+    directoryPath = vtksys::SystemTools::GetProgramPath(programFilePath);
+    std::string separator;
+#if defined(_WIN32)
+    separator = "\\";
+    if (directoryPath[directoryPath.size() - 1] != separator[0])
+    {
+      directoryPath.append(separator);
+    }
+#else
+    separator = "/";
+    directoryPath += separator;
+#endif
+    directoryPath += "..";
+#ifdef F3D_OSX_BUNDLE
+    if (vtksys::SystemTools::FileExists(directoryPath + "/Resources"))
+    {
+      directoryPath += "/Resources";
+    }
+#endif
+    directoryPath = vtksys::SystemTools::CollapseFullPath(directoryPath);
+    directoryPath += separator;
+  }
+  return directoryPath;
+}
+
+//----------------------------------------------------------------------------
+std::string ConfigurationOptions::GetSettingsFilePath()
+{
+  std::string fileName = "config.json";
+  std::string filePath = ConfigurationOptions::GetUserSettingsDirectory() + fileName;
+  if (!vtksys::SystemTools::FileExists(filePath))
+  {
+    filePath = this->GetBinarySettingsDirectory() + fileName;
+    if (!vtksys::SystemTools::FileExists(filePath))
+    {
+      filePath = ConfigurationOptions::GetSystemSettingsDirectory() + fileName;
+      if (!vtksys::SystemTools::FileExists(filePath))
+      {
+         filePath = "";
+      }
+    }
+  }
+  return filePath;
 }
 
 //----------------------------------------------------------------------------
@@ -384,18 +459,23 @@ void F3DOptionsParser::Initialize(int argc, char** argv)
 }
 
 //----------------------------------------------------------------------------
+F3DOptions F3DOptionsParser::GetOptionsFromCommandLine()
+{
+  std::vector<std::string> dummy;
+  return this->GetOptionsFromCommandLine(dummy);
+}
+
+//----------------------------------------------------------------------------
 F3DOptions F3DOptionsParser::GetOptionsFromCommandLine(std::vector<std::string>& files)
 {
   return this->ConfigOptions->GetOptionsFromArgs(files);
 }
 
 //----------------------------------------------------------------------------
-F3DOptions F3DOptionsParser::GetOptionsFromFile(const std::string& filePath)
+F3DOptions F3DOptionsParser::GetOptionsFromConfigFile(const std::string& filePath)
 {
   this->ConfigOptions->InitializeDictionaryFromConfigFile(filePath);
-
-  std::vector<std::string> dummy;
-  F3DOptions options = this->GetOptionsFromCommandLine(dummy);
+  F3DOptions options = this->GetOptionsFromCommandLine();
 
   // Check the validity of the options
   if (options.Verbose || options.NoRender)
