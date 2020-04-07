@@ -83,12 +83,15 @@ update-vtk-osx:
     - cmake -E make_directory build
     - cd build
     - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS -DBUILD_TESTING=ON -F3D_STRICT_BUILD=ON
-      -DCMAKE_BUILD_TYPE=Release -DVTK_DIR:FILEPATH=vtk-install/lib/cmake/vtk-9.0 ..
+      -DCMAKE_BUILD_TYPE=Release -DVTK_DIR:FILEPATH=vtk-install/lib/cmake/vtk-9.0
+      -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON ..
 
 configure-linux:
   extends:
     - .configure
     - .linux
+  variables:
+    ADDITIONAL_OPTIONS: -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
 
 configure-windows:
   extends:

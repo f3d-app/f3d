@@ -183,7 +183,12 @@ void F3DLoader::LoadFile(int load)
   std::string fileInfo = "(" + std::to_string(this->CurrentFileIndex + 1) + "/" +
     std::to_string(size) + ") " + vtksys::SystemTools::GetFilenameName(filePath);
 
-  F3DOptions opts = this->Parser.GetOptionsFromFile(filePath);
+  F3DOptions opts = this->Parser.GetOptionsFromCommandLine();
+  if (!opts.DryRun)
+  {
+    opts = this->Parser.GetOptionsFromConfigFile(filePath);
+  }
+
   if (opts.Verbose || opts.NoRender)
   {
     F3DLog::Print(F3DLog::Severity::Info, "Loading: ", filePath, "\n");

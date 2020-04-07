@@ -7,6 +7,7 @@ function(f3d_test)
   add_test(NAME ${ARGV0}
            COMMAND $<TARGET_FILE:f3d>
              ${ARGV3}
+             --dry-run
              --resolution=${ARGV2}
              --ref ${CMAKE_SOURCE_DIR}/data/baselines/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/${ARGV1})
@@ -24,7 +25,7 @@ f3d_test(TestVTR RectGrid2.vtr "300,300" "--scalars --roughness=1")
 f3d_test(TestVTK cow.vtk "300,300")
 f3d_test(TestGrid suzanne.ply "300,300" "-g")
 f3d_test(TestAxis suzanne.ply "300,300" "-x")
-f3d_test(TestPointCloud pointsCloud.vtp "300,300" "--point-sprites" "--point-size=20")
+f3d_test(TestPointCloud pointsCloud.vtp "300,300" "--point-sprites --point-size=20")
 f3d_test(TestVRMLImporter bot2.wrl "300,300")
 f3d_test(Test3DSImporter iflamigm.3ds "300,300")
 f3d_test(TestOBJImporter world.obj "300,300")
@@ -48,11 +49,12 @@ f3d_test(TestColormap IM-0001-1983.dcm "300,300" "--scalars --roughness=1 --colo
 f3d_test(TestCameraConfiguration suzanne.obj "300,300" "--camera-position=0,0,-10 -x --camera-view-up=1,0,0 --camera-focal-point=1,0,0 --camera-view-angle=20")
 f3d_test(TestToneMapping suzanne.ply "300,300" "-a")
 f3d_test(TestDepthPeelingToneMapping suzanne.ply "300,300" "--opacity=0.9 -pa")
+f3d_test(TestDefaultConfigFileSimilar dragon.vtu "300,300" "-sfgxnv --progress")
 
 if(F3D_HAS_RAYTRACING)
   f3d_test(TestOSPRayGLTF WaterBottle.glb "300,300" "-r --samples=1")
   f3d_test(TestOSPRayBackground suzanne.ply "300,300" "-r --samples=1 --bg-color=1,0,0")
-  f3d_test(TestOSPRayPointCloud pointsCloud.vtp "300,300" "-r" "--point-sprites" "--point-size=20")
+  f3d_test(TestOSPRayPointCloud pointsCloud.vtp "300,300" "-r --point-sprites --point-size=20")
 endif()
 
 # Test few basic options
