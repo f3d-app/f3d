@@ -32,7 +32,8 @@ stages:
     - git checkout 820646fd12
     - cmake -E make_directory build
     - cd build
-    - cmake $BUILD_ARCHITECTURE -DVTK_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
+    - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS
+      -DVTK_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
       -DVTK_LEGACY_REMOVE=ON -DBUILD_SHARED_LIBS=OFF
       -DCMAKE_INSTALL_PREFIX:FILEPATH=../../vtk-install
       -DVTK_GROUP_ENABLE_Rendering=DEFAULT -DVTK_GROUP_ENABLE_StandAlone=DEFAULT
@@ -63,6 +64,8 @@ update-vtk-linux:
   extends:
     - .update-vtk
     - .linux
+  variables:
+    ADDITIONAL_OPTIONS: -DVTK_USE_X=ON
 
 update-vtk-windows:
   extends:
@@ -75,6 +78,8 @@ update-vtk-osx:
   extends:
     - .update-vtk
     - .osx
+  variables:
+    ADDITIONAL_OPTIONS: -DVTK_USE_COCOA=ON
 
 # Configure
 .configure:
