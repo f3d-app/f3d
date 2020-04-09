@@ -107,13 +107,22 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
     {
       reader->SetFileName(fullPath.c_str());
       reader->Update();
+
       vtkNew<vtkTexture> texture;
       texture->SetColorModeToDirectScalars();
+      texture->MipmapOn();
+      texture->InterpolateOn();
       texture->SetInputConnection(reader->GetOutputPort());
+
+      // 8-bit textures are usually gamma-corrected
+      if (reader->GetOutput() && reader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
+      {
+        texture->UseSRGBColorSpaceOn();
+      }
 
       // HDRI OpenGL
       this->UseImageBasedLightingOn();
-      this->SetEnvironmentTexture(texture, true);
+      this->SetEnvironmentTexture(texture);
 
       // Skybox OpenGL
       this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
