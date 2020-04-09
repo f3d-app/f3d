@@ -257,8 +257,11 @@ void F3DLoader::LoadFile(int load)
     {
       this->Renderer->SetScalarBarActor(genericImporter->GetScalarBarActor());
       this->Renderer->SetGeometryActor(genericImporter->GetGeometryActor());
+      this->Renderer->SetPointSpritesActor(genericImporter->GetPointSpritesActor());
+      this->Renderer->SetVolumeProp(genericImporter->GetVolumeProp());
       this->Renderer->SetPolyDataMapper(genericImporter->GetPolyDataMapper());
       this->Renderer->SetPointGaussianMapper(genericImporter->GetPointGaussianMapper());
+      this->Renderer->SetVolumeMapper(genericImporter->GetVolumeMapper());
     }
 
     // Actors are loaded, use the bounds to reset camera and set-up SSAO

@@ -9,21 +9,22 @@
 #include <vtkActor2DCollection.h>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
-#include <vtkCamera.h>
 #include <vtkCallbackCommand.h>
+#include <vtkCamera.h>
 #include <vtkCameraPass.h>
 #include <vtkDualDepthPeelingPass.h>
+#include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkImporter.h>
 #include <vtkLightsPass.h>
 #include <vtkObjectFactory.h>
-#include <vtkToneMappingPass.h>
 #include <vtkOpaquePass.h>
 #include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkOverlayPass.h>
+#include <vtkPiecewiseFunction.h>
 #include <vtkProperty.h>
 #include <vtkRenderPassCollection.h>
 #include <vtkRenderWindowInteractor.h>
@@ -31,7 +32,9 @@
 #include <vtkSSAOPass.h>
 #include <vtkSequencePass.h>
 #include <vtkSkybox.h>
+#include <vtkToneMappingPass.h>
 #include <vtkTranslucentPass.h>
+#include <vtkVolumeProperty.h>
 #include <vtkVolumetricPass.h>
 #include <vtksys/Directory.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -83,7 +86,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->TimerVisible = this->Options.FPS;
   this->FilenameVisible = this->Options.Filename;
   this->ScalarBarVisible = this->Options.Bar;
-  this->ScalarsVisible = this->Options.Scalars != f3d::F3DReservedString;
+  this->ScalarsVisible = this->Options.Volume || this->Options.Scalars != f3d::F3DReservedString;
   this->UseRaytracing = this->Options.Raytracing;
   this->UseRaytracingDenoiser = this->Options.Denoise;
   this->UseDepthPeelingPass = this->Options.DepthPeeling;
@@ -91,6 +94,8 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->UseFXAAPass = this->Options.FXAA;
   this->UseToneMappingPass = this->Options.ToneMapping;
   this->UsePointSprites = this->Options.PointSprites;
+  this->UseVolume = this->Options.Volume;
+  this->UseInverseOpacityFunction = this->Options.InverseOpacityFunction;
 
   if (!this->Options.HDRIFile.empty() && !this->GetUseImageBasedLighting())
   {
@@ -149,9 +154,11 @@ void vtkF3DRenderer::SetupRenderPasses()
     pass->ReleaseGraphicsResources(this->RenderWindow);
   }
 
-#if F3D_HAS_RAYTRACING
-  if (this->UseRaytracing)
+  vtkSmartPointer<vtkRenderPass> renderingPass;
+
+  if (F3D_HAS_RAYTRACING && this->UseRaytracing)
   {
+#if F3D_HAS_RAYTRACING
     vtkNew<vtkOSPRayPass> osprayP;
     this->SetPass(osprayP);
 
@@ -163,92 +170,95 @@ void vtkF3DRenderer::SetupRenderPasses()
     bool hasHDRI = this->GetEnvironmentTexture() != nullptr;
     vtkOSPRayRendererNode::SetBackgroundMode(hasHDRI ? 2 : 1, this);
 
-    return;
-  }
+    renderingPass = osprayP;
 #endif
-
-  vtkNew<vtkLightsPass> lightsP;
-  vtkNew<vtkOpaquePass> opaqueP;
-  vtkNew<vtkTranslucentPass> translucentP;
-  vtkNew<vtkVolumetricPass> volumeP;
-  vtkNew<vtkOverlayPass> overlayP;
-
-  vtkNew<vtkRenderPassCollection> collection;
-  collection->AddItem(lightsP);
-
-  // opaque passes
-  if (this->UseSSAOPass)
+  }
+  else
   {
-    double bounds[6];
-    this->ComputeVisiblePropBounds(bounds);
+    vtkNew<vtkLightsPass> lightsP;
+    vtkNew<vtkOpaquePass> opaqueP;
+    vtkNew<vtkTranslucentPass> translucentP;
+    vtkNew<vtkVolumetricPass> volumeP;
+    vtkNew<vtkOverlayPass> overlayP;
 
-    vtkBoundingBox bbox(bounds);
+    vtkNew<vtkRenderPassCollection> collection;
+    collection->AddItem(lightsP);
 
-    if (bbox.IsValid())
+    // opaque passes
+    if (this->UseSSAOPass)
     {
-      vtkNew<vtkCameraPass> ssaoCamP;
-      ssaoCamP->SetDelegatePass(opaqueP);
+      double bounds[6];
+      this->ComputeVisiblePropBounds(bounds);
 
-      vtkNew<vtkSSAOPass> ssaoP;
-      ssaoP->SetRadius(0.1 * bbox.GetDiagonalLength());
-      ssaoP->SetBias(0.001 * bbox.GetDiagonalLength());
-      ssaoP->SetKernelSize(200);
-      ssaoP->SetDelegatePass(ssaoCamP);
+      vtkBoundingBox bbox(bounds);
 
-      collection->AddItem(ssaoP);
+      if (bbox.IsValid())
+      {
+        vtkNew<vtkCameraPass> ssaoCamP;
+        ssaoCamP->SetDelegatePass(opaqueP);
+
+        vtkNew<vtkSSAOPass> ssaoP;
+        ssaoP->SetRadius(0.1 * bbox.GetDiagonalLength());
+        ssaoP->SetBias(0.001 * bbox.GetDiagonalLength());
+        ssaoP->SetKernelSize(200);
+        ssaoP->SetDelegatePass(ssaoCamP);
+
+        collection->AddItem(ssaoP);
+      }
+      else
+      {
+        collection->AddItem(opaqueP);
+      }
     }
     else
     {
       collection->AddItem(opaqueP);
     }
+
+    // translucent and volumic passes
+    if (this->UseDepthPeelingPass)
+    {
+      vtkNew<vtkDualDepthPeelingPass> ddpP;
+      ddpP->SetTranslucentPass(translucentP);
+      ddpP->SetVolumetricPass(volumeP);
+      collection->AddItem(ddpP);
+    }
+    else
+    {
+      collection->AddItem(translucentP);
+      collection->AddItem(volumeP);
+    }
+
+    collection->AddItem(overlayP);
+
+    vtkNew<vtkSequencePass> sequence;
+    sequence->SetPasses(collection);
+
+    vtkNew<vtkCameraPass> cameraP;
+    cameraP->SetDelegatePass(sequence);
+
+    renderingPass = cameraP;
   }
-  else
-  {
-    collection->AddItem(opaqueP);
-  }
 
-  // translucent and volumic passes
-  if (this->UseDepthPeelingPass)
-  {
-    vtkNew<vtkDualDepthPeelingPass> ddpP;
-    ddpP->SetTranslucentPass(translucentP);
-    ddpP->SetVolumetricPass(volumeP);
-    collection->AddItem(ddpP);
-  }
-  else
-  {
-    collection->AddItem(translucentP);
-    collection->AddItem(volumeP);
-  }
-
-  collection->AddItem(overlayP);
-
-  vtkNew<vtkSequencePass> sequence;
-  sequence->SetPasses(collection);
-
-  vtkNew<vtkCameraPass> cameraP;
-  cameraP->SetDelegatePass(sequence);
-
-  vtkSmartPointer<vtkRenderPass> activePass = cameraP;
   if (this->UseToneMappingPass)
   {
     vtkNew<vtkToneMappingPass> toneP;
     toneP->SetToneMappingType(vtkToneMappingPass::GenericFilmic);
     toneP->SetGenericFilmicDefaultPresets();
-    toneP->SetDelegatePass(cameraP);
-    activePass = toneP;
+    toneP->SetDelegatePass(renderingPass);
+    renderingPass = toneP;
   }
 
   if (this->UseFXAAPass)
   {
     vtkNew<vtkOpenGLFXAAPass> fxaaP;
-    fxaaP->SetDelegatePass(activePass);
+    fxaaP->SetDelegatePass(renderingPass);
 
     this->SetPass(fxaaP);
   }
   else
   {
-    this->SetPass(activePass);
+    this->SetPass(renderingPass);
   }
 }
 
@@ -389,17 +399,7 @@ bool vtkF3DRenderer::UsingToneMappingPass()
 void vtkF3DRenderer::SetUsePointSprites(bool use)
 {
   this->UsePointSprites = use;
-  if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper)
-  {
-    if (use)
-    {
-      this->GeometryActor->SetMapper(this->PointGaussianMapper);
-    }
-    else
-    {
-      this->GeometryActor->SetMapper(this->PolyDataMapper);
-    }
-  }
+  this->UpdateActorVisibility();
 }
 
 //----------------------------------------------------------------------------
@@ -409,22 +409,49 @@ bool vtkF3DRenderer::UsingPointSprites()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseVolume(bool use)
+{
+  this->UseVolume = use;
+  this->UpdateActorVisibility();
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::UsingVolume()
+{
+  return this->UseVolume;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
+{
+  if (this->UseVolume)
+  {
+    this->UseInverseOpacityFunction = use;
+
+    vtkPiecewiseFunction* pwf = this->VolumeProp->GetProperty()->GetScalarOpacity();
+    if (pwf->GetSize() == 2)
+    {
+      double range[2];
+      pwf->GetRange(range);
+
+      pwf->RemoveAllPoints();
+      pwf->AddPoint(range[0], this->UseInverseOpacityFunction ? 1.0 : 0.0);
+      pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::UsingInverseOpacityFunction()
+{
+  return this->UseInverseOpacityFunction;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseRaytracing(bool use)
 {
   this->UseRaytracing = use;
-
-  if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper)
-  {
-    if (use)
-    {
-      this->GeometryActor->SetMapper(this->PolyDataMapper);
-    }
-    else
-    {
-      this->SetUsePointSprites(this->UsePointSprites);
-    }
-  }
-
+  this->UpdateActorVisibility();
   this->SetupRenderPasses();
 }
 
@@ -450,12 +477,15 @@ bool vtkF3DRenderer::UsingRaytracingDenoiser()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowScalars(bool show)
 {
-  this->ScalarsVisible = show;
-  if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper)
+  if (!this->UseVolume) // when using volume, scalars are always enabled
   {
-    this->PolyDataMapper->SetScalarVisibility(show);
-    this->PointGaussianMapper->SetScalarVisibility(show);
-    this->ShowScalarBar(this->ScalarBarVisible);
+    this->ScalarsVisible = show;
+    if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper)
+    {
+      this->PolyDataMapper->SetScalarVisibility(show);
+      this->PointGaussianMapper->SetScalarVisibility(show);
+      this->ShowScalarBar(this->ScalarBarVisible);
+    }
   }
 }
 
@@ -547,7 +577,7 @@ void vtkF3DRenderer::ShowOptions()
   this->ShowEdge(this->EdgesVisible);
   this->ShowFilename(this->FilenameVisible);
 
-  // Set the initial camera once all options 
+  // Set the initial camera once all options
   // have been shown as they may have an effect on it
   vtkCamera* cam = this->GetActiveCamera();
   this->InitialCamera->DeepCopy(cam);
@@ -600,11 +630,14 @@ void vtkF3DRenderer::InitializeCamera()
   if (this->Options.Verbose)
   {
     double* position = cam->GetPosition();
-    F3DLog::Print(F3DLog::Severity::Info, "Camera position is : ", position[0], ", ", position[1], ", ", position[2], ".");
+    F3DLog::Print(F3DLog::Severity::Info, "Camera position is : ", position[0], ", ", position[1],
+      ", ", position[2], ".");
     double* focalPoint = cam->GetFocalPoint();
-    F3DLog::Print(F3DLog::Severity::Info, "Camera focal point is : ", focalPoint[0], ", ", focalPoint[1], ", ", focalPoint[2], ".");
+    F3DLog::Print(F3DLog::Severity::Info, "Camera focal point is : ", focalPoint[0], ", ",
+      focalPoint[1], ", ", focalPoint[2], ".");
     double* viewUp = cam->GetViewUp();
-    F3DLog::Print(F3DLog::Severity::Info, "Camera view up is : ", viewUp[0], ", ", viewUp[1], ", ", viewUp[2], ".");
+    F3DLog::Print(F3DLog::Severity::Info, "Camera view up is : ", viewUp[0], ", ", viewUp[1], ", ",
+      viewUp[2], ".");
     F3DLog::Print(F3DLog::Severity::Info, "Camera view angle is : ", cam->GetViewAngle(), ".\n");
   }
 }
@@ -615,4 +648,21 @@ void vtkF3DRenderer::ResetCamera()
   vtkCamera* cam = this->GetActiveCamera();
   cam->DeepCopy(this->InitialCamera);
   cam->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateActorVisibility()
+{
+  if (this->GeometryActor)
+  {
+    this->GeometryActor->SetVisibility(this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites));
+  }
+  if (this->PointSpritesActor)
+  {
+    this->PointSpritesActor->SetVisibility(!this->UseRaytracing && !this->UseVolume && this->UsePointSprites);
+  }
+  if (this->VolumeProp)
+  {
+    this->VolumeProp->SetVisibility(!this->UseRaytracing && this->UseVolume);
+  }
 }
