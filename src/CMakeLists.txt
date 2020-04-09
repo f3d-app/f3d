@@ -94,6 +94,7 @@ set(F3D_MODULES_BASE
   VTK::RenderingCore
   VTK::RenderingLabel
   VTK::RenderingOpenGL2
+  VTK::RenderingVolumeOpenGL2
   VTK::jsoncpp
 )
 

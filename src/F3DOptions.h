@@ -36,6 +36,8 @@ struct F3DOptions
   bool PointSprites = false;
   bool FullScreen = false;
   bool ToneMapping = false;
+  bool Volume = false;
+  bool InverseOpacityFunction = false;
   double CameraViewAngle;
   double Metallic = 0.0;
   double Opacity = 1.0;
@@ -51,7 +53,7 @@ struct F3DOptions
   std::vector<double> CameraPosition;
   std::vector<double> CameraFocalPoint;
   std::vector<double> CameraViewUp;
-  std::vector<double> LookupPoints;
+  std::vector<double> LookupPoints = { 0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 };
   std::vector<double> Range;
   std::vector<double> SolidColor = { 1., 1., 1. };
   std::vector<int> WindowSize = { 1000, 600 };
