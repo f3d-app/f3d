@@ -137,7 +137,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   std::string usedArray = this->Options->Scalars;
 
   // Recover an array for coloring if we ever need it
-  if (usedArray.empty())
+  if (usedArray.empty() || usedArray == f3d::F3DReservedString)
   {
     vtkDataArray* array = nullptr;
     if (this->Options->Cells)
