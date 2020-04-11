@@ -96,7 +96,7 @@ int F3DLoader::Start(int argc, char** argv)
   {
     if (!options.Output.empty())
     {
-      retVal = F3DOffscreenRender::RenderOffScreen(renWin, options.Output);
+      retVal = F3DOffscreenRender::RenderOffScreen(renWin, options.Output, options.NoBackground);
     }
     else if (!options.Reference.empty())
     {
