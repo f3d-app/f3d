@@ -14,7 +14,7 @@ class vtkRenderWindow;
 class F3DOffscreenRender
 {
 public:
-  static int RenderOffScreen(vtkRenderWindow* renWin, const std::string& output);
+  static int RenderOffScreen(vtkRenderWindow* renWin, const std::string& output, bool noBg);
   static int RenderTesting(vtkRenderWindow* renWin, const std::string& reference, double threshold);
 };
 

@@ -133,8 +133,17 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   }
   else
   {
+    if (this->Options.NoBackground && !this->Options.Output.empty())
+    {
+      // we need to set the background to black to avoid blending issues with translucent
+      // objetcs when saving to file with no background
+      this->SetBackground(0, 0, 0);
+    }
+    else
+    {
     this->SetBackground(this->Options.BackgroundColor[0], this->Options.BackgroundColor[1],
       this->Options.BackgroundColor[2]);
+    }
     this->AutomaticLightCreationOn();
   }
 
@@ -294,8 +303,6 @@ void vtkF3DRenderer::ShowGrid(bool show)
 {
   this->GridVisible = show;
 
-  this->SetClippingRangeExpansion(0.99);
-
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
 
@@ -303,6 +310,8 @@ void vtkF3DRenderer::ShowGrid(bool show)
 
   if (bbox.IsValid())
   {
+    this->SetClippingRangeExpansion(0.99);
+
     double diag = bbox.GetDiagonalLength();
     double unitSquare = pow(10.0, round(log10(diag * 0.1)));
 
@@ -331,6 +340,7 @@ void vtkF3DRenderer::ShowGrid(bool show)
   }
   else
   {
+    this->SetClippingRangeExpansion(0);
     show = false;
   }
   this->GridActor->SetVisibility(show);
