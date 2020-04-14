@@ -2,6 +2,7 @@
   ".*":
   {
     "axis": true,
+    "tone-mapping": true,
     "grid": true,
     "progress": true,
     "fxaa": true,
