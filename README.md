@@ -65,6 +65,7 @@ Options|Description
 ------|------
 --input=\<file\>|The *input* file or files to read, can also be provided as a positional argument.
 --output=\<png file\>|Instead of showing a render view and render into it, *render directly into a png file*.
+--no-background|Output file is saved with a transparent background.
 -h, --help|Print *help*.
 -v, --verbose|Enable *verbose* mode.
 --no-render|Verbose mode without any rendering for the first provided file, to recover information about a file.

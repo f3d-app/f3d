@@ -161,6 +161,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     auto grp1 = cxxOptions.add_options();
     this->DeclareOption(grp1, "input", "", "Input file", inputs, false, "<files>");
     this->DeclareOption(grp1, "output", "", "Render to file", options.Output, false, "<png file>");
+    this->DeclareOption(grp1, "no-background", "", "No background when render to file", options.NoBackground);
     this->DeclareOption(grp1, "help", "h", "Print help");
     this->DeclareOption(grp1, "version", "", "Print version details");
     this->DeclareOption(grp1, "verbose", "v", "Enable verbose mode", options.Verbose);
@@ -731,6 +732,13 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
         ret = false;
       }
     }
+  }
+
+  if (options.NoBackground && options.Output.empty())
+  {
+    F3DLog::Print(
+        F3DLog::Severity::Info, "Specifying no background while not outputing to file has no effect.");
+      ret = false;
   }
 
   if (!options.HDRIFile.empty())

@@ -10,12 +10,17 @@
 
 #include "F3DLog.h"
 
-int F3DOffscreenRender::RenderOffScreen(vtkRenderWindow* renWin, const std::string& output)
+int F3DOffscreenRender::RenderOffScreen(vtkRenderWindow* renWin, const std::string& output, bool noBg)
 {
   renWin->OffScreenRenderingOn();
 
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(renWin);
+
+  if (noBg)
+  {
+    rtW2if->SetInputBufferTypeToRGBA();
+  }
 
   vtkNew<vtkPNGWriter> writer;
   writer->SetInputConnection(rtW2if->GetOutputPort());
