@@ -77,7 +77,7 @@ if(WIN32)
   endif()
 endif()
 
-set(F3D_MODULES_BASE
+set(F3D_MODULES
   VTK::FiltersGeneral
   VTK::FiltersGeometry
   VTK::ImagingCore
@@ -98,22 +98,16 @@ set(F3D_MODULES_BASE
   VTK::jsoncpp
 )
 
-vtk_module_autoinit(TARGETS f3d MODULES ${F3D_MODULES_BASE})
-target_link_libraries(f3d PUBLIC ${F3D_MODULES_BASE})
-
 if(TARGET VTK::RenderingRayTracing)
   message(STATUS "VTK RayTracing enabled")
   set(F3D_HAS_RAYTRACING ON CACHE INTERNAL BOOL)
-  vtk_module_autoinit(
-    TARGETS f3d
-    MODULES VTK::RenderingRayTracing
-  )
-  target_link_libraries(f3d
-    PUBLIC VTK::RenderingRayTracing
-  )
+  set(F3D_MODULES ${F3D_MODULES} VTK::RenderingRayTracing)
 else()
   set(F3D_HAS_RAYTRACING OFF CACHE INTERNAL BOOL)
 endif()
+
+vtk_module_autoinit(TARGETS f3d MODULES ${F3D_MODULES})
+target_link_libraries(f3d PUBLIC ${F3D_MODULES})
 
 configure_file(Config.h.in
   "${CMAKE_CURRENT_BINARY_DIR}/Config.h" @ONLY)
