@@ -21,6 +21,7 @@ class vtkPolyDataMapper;
 class vtkSmartVolumeMapper;
 class vtkScalarBarActor;
 class vtkColorTransferFunction;
+class vtkTexture;
 struct F3DOptions;
 
 class vtkF3DGenericImporter : public vtkImporter
@@ -85,6 +86,8 @@ protected:
   void ImportActors(vtkRenderer*) override;
   void ImportLights(vtkRenderer*) override;
   void ImportProperties(vtkRenderer*) override;
+
+  vtkSmartPointer<vtkTexture> GetTexture(const std::string &fileName, bool isSRGB = false);
 
   void ConfigureMapperForColoring(
     vtkPolyDataMapper* mapper, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2]);

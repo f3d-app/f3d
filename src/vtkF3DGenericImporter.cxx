@@ -38,6 +38,11 @@
 #include <vtkScalarsToColors.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkVolumeProperty.h>
+#include <vtkTexture.h>
+#include <vtkImageReader2Factory.h>
+#include <vtkImageReader2.h>
+#include <vtksys/SystemTools.hxx>
+#include <vtkSmartPointer.h>
 
 vtkStandardNewMacro(vtkF3DGenericImporter);
 
@@ -300,6 +305,14 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->PointSpritesActor->GetProperty()->SetColor(col);
   this->PointSpritesActor->GetProperty()->SetOpacity(this->Options->Opacity);
 
+  //Textures
+  this->GeometryActor->GetProperty()->SetBaseColorTexture(this->GetTexture(this->Options->BaseColorTex, true));
+  this->GeometryActor->GetProperty()->SetORMTexture(this->GetTexture(this->Options->ORMTex));
+  this->GeometryActor->GetProperty()->SetEmissiveTexture(this->GetTexture(this->Options->EmissiveTex, true));
+  this->GeometryActor->GetProperty()->SetEmissiveFactor(this->Options->EmissiveFactor.data());
+  this->GeometryActor->GetProperty()->SetNormalTexture(this->GetTexture(this->Options->NormalTex));
+  this->GeometryActor->GetProperty()->SetNormalScale(this->Options->NormalScale);
+
   // add props
   ren->AddActor(this->GeometryActor);
   ren->AddActor(this->PointSpritesActor);
@@ -323,6 +336,39 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     this->GeometryActor->VisibilityOn();
     this->VolumeProp->VisibilityOff();
   }
+}
+
+//----------------------------------------------------------------------------
+// TODO : add this function in a utils file for rendering in VTK directly
+vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(const std::string &fileName, bool isSRGB)
+{
+  vtkSmartPointer<vtkTexture> texture;
+  if (!fileName.empty())
+  {
+    std::string fullPath = vtksys::SystemTools::CollapseFullPath(fileName);
+
+    auto reader = vtkSmartPointer<vtkImageReader2>::Take(
+      vtkImageReader2Factory::CreateImageReader2(fullPath.c_str()));
+    if (reader)
+    {
+      reader->SetFileName(fullPath.c_str());
+      reader->Update();
+      texture = vtkSmartPointer<vtkTexture>::New();
+      texture->SetInputConnection(reader->GetOutputPort());
+      if (isSRGB)
+      {
+        texture->UseSRGBColorSpaceOn();
+      }
+      texture->InterpolateOn();
+      return texture;
+    }
+    else
+    {
+      vtkWarningMacro("Cannot open texture file " << fullPath);
+    }
+  }
+
+  return texture;
 }
 
 //----------------------------------------------------------------------------
