@@ -106,6 +106,7 @@ void vtkF3DInteractorStyle::OnKeyPress()
     case 'L':
       renWin->SetFullScreen(!renWin->GetFullScreen());
       renWin->Render();
+      rwi->ReInitialize();
       break;
     case 'z':
     case 'Z':
