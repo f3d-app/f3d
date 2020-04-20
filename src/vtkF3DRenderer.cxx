@@ -128,6 +128,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
       this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
       this->Skybox->SetProjection(vtkSkybox::Sphere);
       this->Skybox->SetTexture(texture);
+      this->Skybox->GammaCorrectOn();
     }
     else
     {
