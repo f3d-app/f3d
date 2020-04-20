@@ -230,10 +230,16 @@ On Linux, it will be installed in /etc/f3d/, on Windows, it will be installed in
 
 * No support for animation.
 * No support for specifying manual lighting in the default scene.
-* No support for volume rendering
-* Drag&Drop does not work with Thunar file manager
+* Drag&Drop does not work with Thunar file manager.
+* FPS counter is not working with raytracing.
+* Full screen mode cannot be exited on Linux.
 
 # Troubleshootings
+
+## General
+> I have built F3D with raytracing support but the denoiser is not working.
+
+Be sure that OSPRay has been built with *OpenImageDenoise* support.
 
 ## Windows
 > I have installed F3D using the provided installer but when launched, I have an error with unfound DLL libraries.
