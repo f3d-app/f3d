@@ -42,6 +42,7 @@ public:
   void ShowEdge(bool show);
   void ShowTimer(bool show);
   void ShowFilename(bool show);
+  void ShowCheatSheet(bool show);
   void ShowScalars(bool show);
   void SetUseRaytracing(bool use);
   void SetUseRaytracingDenoiser(bool use);
@@ -59,6 +60,7 @@ public:
   bool IsEdgeVisible();
   bool IsTimerVisible();
   bool IsFilenameVisible();
+  bool IsCheatSheetVisible();
   bool AreScalarsVisible();
   bool UsingRaytracing();
   bool UsingRaytracingDenoiser();
@@ -164,6 +166,10 @@ protected:
 
   void UpdateActorVisibility();
 
+  bool IsBackgroundDark();
+
+  void UpdateCheatSheet();
+
   F3DOptions Options;
 
   vtkNew<vtkActor> GridActor;
@@ -181,6 +187,9 @@ protected:
 
   vtkNew<vtkCornerAnnotation> FilenameActor;
 
+  vtkNew<vtkTextActor> CheatSheetActor;
+  bool CheatSheetNeedUpdate = false;
+
   // vtkCornerAnnotation building is too slow for the timer
   vtkNew<vtkTextActor> TimerActor;
   unsigned int Timer = 0;
@@ -192,6 +201,7 @@ protected:
   bool FilenameVisible;
   bool ScalarBarVisible;
   bool ScalarsVisible;
+  bool CheatSheetVisible = false;
   bool UseRaytracing;
   bool UseRaytracingDenoiser;
   bool UseDepthPeelingPass;

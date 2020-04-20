@@ -37,14 +37,9 @@ void vtkF3DInteractorStyle::OnKeyPress()
       ren->ShowScalars(!ren->AreScalarsVisible());
       renWin->Render();
       break;
-    case 'r':
-    case 'R':
-      ren->SetUseRaytracing(!ren->UsingRaytracing());
-      renWin->Render();
-      break;
-    case 'd':
-    case 'D':
-      ren->SetUseRaytracingDenoiser(!ren->UsingRaytracingDenoiser());
+    case 'b':
+    case 'B':
+      ren->ShowScalarBar(!ren->IsScalarBarVisible());
       renWin->Render();
       break;
     case 'p':
@@ -67,14 +62,9 @@ void vtkF3DInteractorStyle::OnKeyPress()
       ren->SetUseToneMappingPass(!ren->UsingToneMappingPass());
       renWin->Render();
       break;
-    case 'o':
-    case 'O':
-      ren->SetUsePointSprites(!ren->UsingPointSprites());
-      renWin->Render();
-      break;
-    case 't':
-    case 'T':
-      ren->ShowTimer(!ren->IsTimerVisible());
+    case 'e':
+    case 'E':
+      ren->ShowEdge(!ren->IsEdgeVisible());
       renWin->Render();
       break;
     case 'x':
@@ -87,19 +77,39 @@ void vtkF3DInteractorStyle::OnKeyPress()
       ren->ShowGrid(!ren->IsGridVisible());
       renWin->Render();
       break;
-    case 'b':
-    case 'B':
-      ren->ShowScalarBar(!ren->IsScalarBarVisible());
-      renWin->Render();
-      break;
-    case 'e':
-    case 'E':
-      ren->ShowEdge(!ren->IsEdgeVisible());
-      renWin->Render();
-      break;
     case 'n':
     case 'N':
       ren->ShowFilename(!ren->IsFilenameVisible());
+      renWin->Render();
+      break;
+    case 't':
+    case 'T':
+      ren->ShowTimer(!ren->IsTimerVisible());
+      renWin->Render();
+      break;
+    case 'r':
+    case 'R':
+      ren->SetUseRaytracing(!ren->UsingRaytracing());
+      renWin->Render();
+      break;
+    case 'd':
+    case 'D':
+      ren->SetUseRaytracingDenoiser(!ren->UsingRaytracingDenoiser());
+      renWin->Render();
+      break;
+    case 'z':
+    case 'Z':
+      ren->SetUseVolume(!ren->UsingVolume());
+      renWin->Render();
+      break;
+    case 'i':
+    case 'I':
+      ren->SetUseInverseOpacityFunction(!ren->UsingInverseOpacityFunction());
+      renWin->Render();
+      break;
+    case 'o':
+    case 'O':
+      ren->SetUsePointSprites(!ren->UsingPointSprites());
       renWin->Render();
       break;
     case 'l':
@@ -114,14 +124,8 @@ void vtkF3DInteractorStyle::OnKeyPress()
 
       renWin->Render();
       break;
-    case 'z':
-    case 'Z':
-      ren->SetUseVolume(!ren->UsingVolume());
-      renWin->Render();
-      break;
-    case 'i':
-    case 'I':
-      ren->SetUseInverseOpacityFunction(!ren->UsingInverseOpacityFunction());
+    case '?':
+      ren->ShowCheatSheet(!ren->IsCheatSheetVisible());
       renWin->Render();
       break;
     default:
