@@ -82,6 +82,7 @@ Options|Default|Description
 ------|------|------
 -o, --point-sprites||Show sphere *points sprites* instead of the geometry.
 --point-size|10.0|Set the *size* of points when showing vertices and point sprites.
+--line-width|1.0|Set the *width* of lines when showing edges.
 --color=\<R,G,B\>|1.0, 1.0, 1.0| Set a *color* on the geometry.<br>This only makes sense when using the default scene.
 --opacity=\<opacity\>|1.0|Set *opacity* on the geometry.<br>This only makes sense when using the default scene. Usually used with Depth Peeling option.
 --roughness=\<roughness\>|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.

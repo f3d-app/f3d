@@ -294,6 +294,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->GeometryActor->GetProperty()->SetRoughness(this->Options->Roughness);
   this->GeometryActor->GetProperty()->SetMetallic(this->Options->Metallic);
   this->GeometryActor->GetProperty()->SetPointSize(this->Options->PointSize);
+  this->GeometryActor->GetProperty()->SetLineWidth(this->Options->LineWidth);
 
   this->PointSpritesActor->SetMapper(this->PointGaussianMapper);
   this->PointSpritesActor->GetProperty()->SetColor(col);
