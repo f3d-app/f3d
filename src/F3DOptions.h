@@ -43,6 +43,7 @@ struct F3DOptions
   double Metallic = 0.0;
   double Opacity = 1.0;
   double PointSize = 10.0;
+  double LineWidth = 1.0;
   double RefThreshold = 0.1;
   double Roughness = 0.3;
   int Component = -1;

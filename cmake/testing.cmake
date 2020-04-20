@@ -52,6 +52,7 @@ f3d_test(TestToneMapping suzanne.ply "300,300" "-a")
 f3d_test(TestDepthPeelingToneMapping suzanne.ply "300,300" "--opacity=0.9 -pa")
 f3d_test(TestDefaultConfigFileSimilar dragon.vtu "300,300" "-safgxnv --progress")
 f3d_test(TestVolume HeadMRVolume.mhd "300,300" "-z --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1")
+f3d_test(TestLineWidth cow.vtk "300,300" "-e --line-width=5")
 
 if(F3D_HAS_RAYTRACING)
   f3d_test(TestOSPRayGLTF WaterBottle.glb "300,300" "-r --samples=1")
