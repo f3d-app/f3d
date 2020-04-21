@@ -176,6 +176,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     auto grp2 = cxxOptions.add_options("Material");
     this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.PointSprites);
     this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.PointSize, true, "<size>");
+    this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", options.LineWidth, true, "<width>");
     this->DeclareOption(grp2, "color", "", "Solid color", options.SolidColor, true, "<R,G,B>");
     this->DeclareOption(grp2, "opacity", "", "Opacity", options.Opacity, true, "<opacity>");
     this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.Roughness, true, "<roughness>");
