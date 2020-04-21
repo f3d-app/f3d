@@ -105,8 +105,14 @@ void vtkF3DInteractorStyle::OnKeyPress()
     case 'l':
     case 'L':
       renWin->SetFullScreen(!renWin->GetFullScreen());
-      renWin->Render();
+
+      // when going full screen, the OpenGL context changes, we need to reinitialize
+      // the interactor, the render passes and the grid actor.
+      ren->ShowGrid(ren->IsGridVisible());
+      ren->SetupRenderPasses();
       rwi->ReInitialize();
+
+      renWin->Render();
       break;
     case 'z':
     case 'Z':
