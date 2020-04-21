@@ -158,7 +158,9 @@ public:
 
 protected:
   vtkF3DRenderer() = default;
-  ~vtkF3DRenderer() override;
+  ~vtkF3DRenderer() override = default;
+
+  void ReleaseGraphicsResources(vtkWindow *w) override;
 
   void UpdateActorVisibility();
 
