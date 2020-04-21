@@ -232,7 +232,6 @@ On Linux, it will be installed in /etc/f3d/, on Windows, it will be installed in
 * No support for animation.
 * No support for specifying manual lighting in the default scene.
 * Drag&Drop does not work with Thunar file manager.
-* FPS counter is not working with raytracing.
 
 # Troubleshootings
 
