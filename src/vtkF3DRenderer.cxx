@@ -53,12 +53,14 @@
 vtkStandardNewMacro(vtkF3DRenderer);
 
 //----------------------------------------------------------------------------
-vtkF3DRenderer::~vtkF3DRenderer()
+void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow *w)
 {
   if (this->Timer != 0)
   {
     glDeleteQueries(1, &this->Timer);
+    this->Timer = 0;
   }
+  this->Superclass::ReleaseGraphicsResources(w);
 }
 
 //----------------------------------------------------------------------------
@@ -68,11 +70,6 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   {
     F3DLog::Print(F3DLog::Severity::Error, "No render window linked");
     return;
-  }
-
-  if (this->Timer == 0)
-  {
-    glGenQueries(1, &this->Timer);
   }
 
   this->RemoveAllViewProps();
@@ -158,6 +155,8 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   }
 
   this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, fileInfo.c_str());
+
+  this->TimerActor->SetInput("0 fps");
 
   this->ShowOptions();
 
@@ -603,26 +602,43 @@ void vtkF3DRenderer::ShowOptions()
   this->InitialCamera->DeepCopy(cam);
 }
 
+#include <chrono>
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
-  if (this->Timer > 0)
+  if (!this->TimerVisible)
   {
-    glBeginQuery(GL_TIME_ELAPSED, this->Timer);
+    this->Superclass::Render();
+    return;
   }
+
+  auto cpuStart = std::chrono::high_resolution_clock::now();
+  if (this->Timer == 0)
+  {
+    glGenQueries(1, &this->Timer);
+  }
+  glBeginQuery(GL_TIME_ELAPSED, this->Timer);
+
+  this->TimerActor->RenderOpaqueGeometry(this); // update texture
 
   this->Superclass::Render();
 
-  if (this->Timer > 0)
-  {
-    glEndQuery(GL_TIME_ELAPSED);
-    GLint elapsed;
-    glGetQueryObjectiv(this->Timer, GL_QUERY_RESULT, &elapsed);
-    int fps = static_cast<int>(std::round(1.0 / (elapsed * 1e-9)));
-    std::string str = std::to_string(fps);
-    str += " fps";
-    this->TimerActor->SetInput(str.c_str());
-  }
+  auto cpuElapsed = std::chrono::high_resolution_clock::now() - cpuStart;
+
+  // Get CPU frame per seconds
+  int fps = static_cast<int>(std::round(1.0 / (std::chrono::duration_cast<std::chrono::microseconds>(cpuElapsed).count() * 1e-6)));
+
+  glEndQuery(GL_TIME_ELAPSED);
+  GLint elapsed;
+  glGetQueryObjectiv(this->Timer, GL_QUERY_RESULT, &elapsed);
+
+  // Get min between CPU frame per seconds and GPU frame per seconds
+  fps = std::min(fps, static_cast<int>(std::round(1.0 / (elapsed * 1e-9))));
+
+  std::string str = std::to_string(fps);
+  str += " fps";
+  this->TimerActor->SetInput(str.c_str());
 }
 
 //----------------------------------------------------------------------------
