@@ -32,6 +32,7 @@
 #include <vtkSSAOPass.h>
 #include <vtkSequencePass.h>
 #include <vtkSkybox.h>
+#include <vtkTextProperty.h>
 #include <vtkToneMappingPass.h>
 #include <vtkTranslucentPass.h>
 #include <vtkVolumeProperty.h>
@@ -148,13 +149,35 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
     }
     else
     {
-    this->SetBackground(this->Options.BackgroundColor[0], this->Options.BackgroundColor[1],
-      this->Options.BackgroundColor[2]);
+      this->SetBackground(this->Options.BackgroundColor[0], this->Options.BackgroundColor[1],
+        this->Options.BackgroundColor[2]);
     }
     this->AutomaticLightCreationOn();
   }
 
+  double textColor[3];
+  if (this->IsBackgroundDark())
+  {
+    textColor[0] = textColor[1] = textColor[2] = 1.0;
+  }
+  else
+  {
+    textColor[0] = textColor[1] = textColor[2] = 0.0;
+  }
+
   this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, fileInfo.c_str());
+  this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->FilenameActor->GetTextProperty()->SetColor(textColor);
+
+  this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->TimerActor->GetTextProperty()->SetColor(textColor);
+
+  this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->CheatSheetActor->GetTextProperty()->SetFontSize(15);
+  this->CheatSheetActor->GetTextProperty()->SetOpacity(0.5);
+  this->CheatSheetActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
+  this->CheatSheetActor->GetTextProperty()->SetBackgroundOpacity(0.5);
+  this->CheatSheetActor->SetTextScaleModeToNone();
 
   this->TimerActor->SetInput("0 fps");
 
@@ -299,6 +322,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
   }
 
   this->AxisVisible = show;
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -354,6 +378,7 @@ void vtkF3DRenderer::ShowGrid(bool show)
   }
   this->GridActor->SetVisibility(show);
   this->ResetCameraClippingRange();
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -367,6 +392,7 @@ void vtkF3DRenderer::SetUseDepthPeelingPass(bool use)
 {
   this->UseDepthPeelingPass = use;
   this->SetupRenderPasses();
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -380,6 +406,7 @@ void vtkF3DRenderer::SetUseSSAOPass(bool use)
 {
   this->UseSSAOPass = use;
   this->SetupRenderPasses();
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -393,6 +420,7 @@ void vtkF3DRenderer::SetUseFXAAPass(bool use)
 {
   this->UseFXAAPass = use;
   this->SetupRenderPasses();
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -406,6 +434,7 @@ void vtkF3DRenderer::SetUseToneMappingPass(bool use)
 {
   this->UseToneMappingPass = use;
   this->SetupRenderPasses();
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -419,6 +448,7 @@ void vtkF3DRenderer::SetUsePointSprites(bool use)
 {
   this->UsePointSprites = use;
   this->UpdateActorVisibility();
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -432,6 +462,7 @@ void vtkF3DRenderer::SetUseVolume(bool use)
 {
   this->UseVolume = use;
   this->UpdateActorVisibility();
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -458,6 +489,7 @@ void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
       pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
     }
   }
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -472,6 +504,7 @@ void vtkF3DRenderer::SetUseRaytracing(bool use)
   this->UseRaytracing = use;
   this->UpdateActorVisibility();
   this->SetupRenderPasses();
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -485,6 +518,7 @@ void vtkF3DRenderer::SetUseRaytracingDenoiser(bool use)
 {
   this->UseRaytracingDenoiser = use;
   this->SetupRenderPasses();
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -506,6 +540,7 @@ void vtkF3DRenderer::ShowScalars(bool show)
       this->ShowScalarBar(this->ScalarBarVisible);
     }
   }
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -522,6 +557,7 @@ void vtkF3DRenderer::ShowScalarBar(bool show)
   {
     this->ScalarBarActor->SetVisibility(show && this->ScalarsVisible);
   }
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -540,6 +576,7 @@ void vtkF3DRenderer::ShowTimer(bool show)
     this->TimerActor->SetVisibility(show);
   }
   this->TimerVisible = show;
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -558,12 +595,72 @@ void vtkF3DRenderer::ShowFilename(bool show)
     this->FilenameActor->SetVisibility(show);
   }
   this->FilenameVisible = show;
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::IsFilenameVisible()
 {
   return this->FilenameVisible;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowCheatSheet(bool show)
+{
+  if (this->CheatSheetActor)
+  {
+    this->RemoveActor(this->CheatSheetActor);
+
+    if (show)
+    {
+      this->AddActor(this->CheatSheetActor);
+      this->CheatSheetActor->SetVisibility(show);
+    }
+  }
+  this->CheatSheetVisible = show;
+  this->CheatSheetNeedUpdate = true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::IsCheatSheetVisible()
+{
+  return this->CheatSheetVisible;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateCheatSheet()
+{
+  if (this->CheatSheetVisible)
+  {
+    std::stringstream cheatSheetText;
+    cheatSheetText << "\n S: Scalars coloring " << (this->ScalarsVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " P: Depth peeling " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " U: SSAO " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " F: FXAA " << (this->UseFXAAPass ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " A: Tone mapping " << (this->UseToneMappingPass ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " E: Edge visibility " << (this->EdgesVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " X: Axis " << (this->AxisVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " G: Grid " << (this->GridVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " N: File name " << (this->FilenameVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " T: FPS Timer " << (this->TimerVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " R: Raytracing " << (this->UseRaytracing ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " D: Denoiser " << (this->UseRaytracingDenoiser ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " Z: Volume representation " << (this->UseVolume ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " I: Inverse volume opacity "
+                   << (this->UseInverseOpacityFunction ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " O: Point sprites " << (this->UsePointSprites ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " L: Full screen "
+                   << (this->GetRenderWindow()->GetFullScreen() ? "[ON]" : "[OFF]") << "\n\n";
+    cheatSheetText << "   ?  : Cheat sheet \n";
+    cheatSheetText << "  ESC : Quit \n";
+    cheatSheetText << " ENTER: Reset camera \n";
+    cheatSheetText << " LEFT : Previous file \n";
+    cheatSheetText << " RIGHT: Next file \n";
+
+    this->CheatSheetActor->SetInput(cheatSheetText.str().c_str());
+    this->CheatSheetActor->RenderOpaqueGeometry(this);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -577,6 +674,7 @@ void vtkF3DRenderer::ShowEdge(bool show)
     anActor->GetProperty()->SetEdgeVisibility(show);
   }
   this->EdgesVisible = show;
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -595,6 +693,7 @@ void vtkF3DRenderer::ShowOptions()
   this->ShowTimer(this->TimerVisible);
   this->ShowEdge(this->EdgesVisible);
   this->ShowFilename(this->FilenameVisible);
+  this->ShowCheatSheet(this->CheatSheetVisible);
 
   // Set the initial camera once all options
   // have been shown as they may have an effect on it
@@ -607,6 +706,12 @@ void vtkF3DRenderer::ShowOptions()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
+  if (this->CheatSheetNeedUpdate)
+  {
+    this->UpdateCheatSheet();
+    this->CheatSheetNeedUpdate = false;
+  }
+
   if (!this->TimerVisible)
   {
     this->Superclass::Render();
@@ -618,6 +723,7 @@ void vtkF3DRenderer::Render()
   {
     glGenQueries(1, &this->Timer);
   }
+
   glBeginQuery(GL_TIME_ELAPSED, this->Timer);
 
   this->TimerActor->RenderOpaqueGeometry(this); // update texture
@@ -701,4 +807,12 @@ void vtkF3DRenderer::UpdateActorVisibility()
   {
     this->VolumeProp->SetVisibility(!this->UseRaytracing && this->UseVolume);
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::IsBackgroundDark()
+{
+  double luminance =
+    0.299 * this->Background[0] + 0.587 * this->Background[1] + 0.114 * this->Background[2];
+  return luminance < 0.5;
 }

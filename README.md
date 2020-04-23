@@ -178,6 +178,7 @@ Some options can be toggled directly using interactions:
 * Press `a` key to toggle tone mapping.
 * Press `o` key to toggle point sprites rendering.
 * Press `l` key to toggle full screen.
+* Press `?` key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
 
 # Configuration file
 
