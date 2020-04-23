@@ -11,7 +11,6 @@
 #include <vtkRendererCollection.h>
 #include <vtkStringArray.h>
 
-
 vtkStandardNewMacro(vtkF3DInteractorStyle);
 
 //----------------------------------------------------------------------------

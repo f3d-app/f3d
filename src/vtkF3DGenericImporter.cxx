@@ -24,6 +24,8 @@
 #include <vtkDataSetSurfaceFilter.h>
 #include <vtkEventForwarderCommand.h>
 #include <vtkImageData.h>
+#include <vtkImageReader2.h>
+#include <vtkImageReader2Factory.h>
 #include <vtkInformation.h>
 #include <vtkLightKit.h>
 #include <vtkMultiBlockDataSet.h>
@@ -36,13 +38,11 @@
 #include <vtkRenderer.h>
 #include <vtkScalarBarActor.h>
 #include <vtkScalarsToColors.h>
-#include <vtkSmartVolumeMapper.h>
-#include <vtkVolumeProperty.h>
-#include <vtkTexture.h>
-#include <vtkImageReader2Factory.h>
-#include <vtkImageReader2.h>
-#include <vtksys/SystemTools.hxx>
 #include <vtkSmartPointer.h>
+#include <vtkSmartVolumeMapper.h>
+#include <vtkTexture.h>
+#include <vtkVolumeProperty.h>
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkF3DGenericImporter);
 
@@ -197,7 +197,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   // Configure the mappers for coloring if it is ever needed
   vtkDataArray* array = this->Options->Cells ? cellData->GetArray(usedArray.c_str())
-    : pointData->GetArray(usedArray.c_str());
+                                             : pointData->GetArray(usedArray.c_str());
   if (array)
   {
     if (this->Options->Component < array->GetNumberOfComponents())
@@ -213,7 +213,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       {
         if (this->Options->Range.size() > 0)
         {
-          F3DLog::Print(F3DLog::Severity::Warning, "The range specified does not have exactly 2 values, using automatic range.");
+          F3DLog::Print(F3DLog::Severity::Warning,
+            "The range specified does not have exactly 2 values, using automatic range.");
         }
         array->GetRange(range, this->Options->Component);
       }
@@ -235,7 +236,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
         }
         else
         {
-          F3DLog::Print(F3DLog::Severity::Warning, "Specified color map list count is not a multiple of 4, ignoring it.");
+          F3DLog::Print(F3DLog::Severity::Warning,
+            "Specified color map list count is not a multiple of 4, ignoring it.");
         }
       }
 
@@ -277,7 +279,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     }
     else
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "Invalid component index: ", this->Options->Component);
+      F3DLog::Print(
+        F3DLog::Severity::Warning, "Invalid component index: ", this->Options->Component);
     }
   }
   else if (!usedArray.empty() && !(usedArray == f3d::F3DReservedString))
@@ -305,10 +308,12 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->PointSpritesActor->GetProperty()->SetColor(col);
   this->PointSpritesActor->GetProperty()->SetOpacity(this->Options->Opacity);
 
-  //Textures
-  this->GeometryActor->GetProperty()->SetBaseColorTexture(this->GetTexture(this->Options->BaseColorTex, true));
+  // Textures
+  this->GeometryActor->GetProperty()->SetBaseColorTexture(
+    this->GetTexture(this->Options->BaseColorTex, true));
   this->GeometryActor->GetProperty()->SetORMTexture(this->GetTexture(this->Options->ORMTex));
-  this->GeometryActor->GetProperty()->SetEmissiveTexture(this->GetTexture(this->Options->EmissiveTex, true));
+  this->GeometryActor->GetProperty()->SetEmissiveTexture(
+    this->GetTexture(this->Options->EmissiveTex, true));
   this->GeometryActor->GetProperty()->SetEmissiveFactor(this->Options->EmissiveFactor.data());
   this->GeometryActor->GetProperty()->SetNormalTexture(this->GetTexture(this->Options->NormalTex));
   this->GeometryActor->GetProperty()->SetNormalScale(this->Options->NormalScale);
@@ -340,7 +345,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
 //----------------------------------------------------------------------------
 // TODO : add this function in a utils file for rendering in VTK directly
-vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(const std::string &fileName, bool isSRGB)
+vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(
+  const std::string& fileName, bool isSRGB)
 {
   vtkSmartPointer<vtkTexture> texture;
   if (!fileName.empty())
@@ -373,7 +379,7 @@ vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(const std::string 
 
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ConfigureVolumeForColoring(
-    vtkVolume* volume, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2])
+  vtkVolume* volume, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2])
 {
   vtkNew<vtkPiecewiseFunction> otf;
   otf->AddPoint(range[0], this->Options->InverseOpacityFunction ? 1.0 : 0.0);
@@ -394,7 +400,7 @@ void vtkF3DGenericImporter::ConfigureMapperForColoring(
 {
   mapper->SelectColorArray(array->GetName());
   mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
-                        : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+                                             : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
   mapper->SetScalarVisibility(this->Options->Scalars != f3d::F3DReservedString);
   mapper->SetScalarRange(range);
   mapper->SetLookupTable(ctf);
@@ -446,13 +452,14 @@ std::string vtkF3DGenericImporter::GetOutputsDescription()
 }
 
 //----------------------------------------------------------------------------
-std::string vtkF3DGenericImporter::GetMultiBlockDescription(vtkMultiBlockDataSet* mb, vtkIndent indent)
+std::string vtkF3DGenericImporter::GetMultiBlockDescription(
+  vtkMultiBlockDataSet* mb, vtkIndent indent)
 {
   std::stringstream ss;
   for (vtkIdType i = 0; i < mb->GetNumberOfBlocks(); i++)
   {
     const char* blockName = mb->GetMetaData(i)->Get(vtkCompositeDataSet::NAME());
-    ss << indent << "Block: " << (blockName ? std::string(blockName) : std::to_string(i))<< "\n";
+    ss << indent << "Block: " << (blockName ? std::string(blockName) : std::to_string(i)) << "\n";
     vtkDataObject* object = mb->GetBlock(i);
     vtkMultiBlockDataSet* mbChild = vtkMultiBlockDataSet::SafeDownCast(object);
     vtkDataSet* ds = vtkDataSet::SafeDownCast(object);
@@ -460,7 +467,7 @@ std::string vtkF3DGenericImporter::GetMultiBlockDescription(vtkMultiBlockDataSet
     {
       ss << vtkF3DGenericImporter::GetMultiBlockDescription(mbChild, indent.GetNextIndent());
     }
-    else if(ds)
+    else if (ds)
     {
       ss << vtkImporter::GetDataSetDescription(ds, indent.GetNextIndent());
     }

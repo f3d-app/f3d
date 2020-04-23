@@ -19,7 +19,6 @@ struct F3DOptions;
 class F3DLoader
 {
 public:
-
   enum LoadFileEnum
   {
     LOAD_PREVIOUS = -1,
@@ -32,7 +31,6 @@ public:
     NewFilesEvent = vtkCommand::UserEvent + 100,
     LoadFileEvent
   };
-
 
   /**
    * Parse the options, create an importer and start the rendering
@@ -60,7 +58,8 @@ public:
   ~F3DLoader();
 
 protected:
-  static vtkSmartPointer<vtkImporter> GetImporter(const F3DOptions& options, const std::string& file);
+  static vtkSmartPointer<vtkImporter> GetImporter(
+    const F3DOptions& options, const std::string& file);
 
   std::vector<std::string> FilesList;
   int CurrentFileIndex = 0;

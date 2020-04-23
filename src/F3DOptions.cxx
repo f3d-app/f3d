@@ -16,16 +16,16 @@
 namespace
 {
 template<typename T>
-bool CompareVectors(const std::vector<T>& v1,const std::vector<T>& v2)
+bool CompareVectors(const std::vector<T>& v1, const std::vector<T>& v2)
 {
   if (v1.size() != v2.size())
   {
     return false;
   }
 
-  for(size_t i = 0; i < v1.size(); i++)
+  for (size_t i = 0; i < v1.size(); i++)
   {
-    if(v1[i] != v2[i])
+    if (v1[i] != v2[i])
     {
       return false;
     }
@@ -296,7 +296,7 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
   const std::string& configFilePath = this->GetSettingsFilePath();
   if (configFilePath.empty())
   {
-     return false;
+    return false;
   }
 
   std::ifstream file;
@@ -397,7 +397,7 @@ std::string ConfigurationOptions::GetSystemSettingsDirectory()
 {
   std::string directoryPath = "";
 // No support implemented for system wide settings on Windows yet
-#ifndef _WIN32 
+#ifndef _WIN32
   // Implementing simple /etc/ system wide config
   directoryPath = "/etc/f3d/";
 #endif
@@ -409,7 +409,7 @@ std::string ConfigurationOptions::GetBinarySettingsDirectory()
 {
   std::string directoryPath = "";
   std::string errorMsg, programFilePath;
-  if(vtksys::SystemTools::FindProgramPath(this->Argv[0], programFilePath, errorMsg))
+  if (vtksys::SystemTools::FindProgramPath(this->Argv[0], programFilePath, errorMsg))
   {
     directoryPath = vtksys::SystemTools::GetProgramPath(programFilePath);
     std::string separator;
@@ -449,7 +449,7 @@ std::string ConfigurationOptions::GetSettingsFilePath()
       filePath = ConfigurationOptions::GetSystemSettingsDirectory() + fileName;
       if (!vtksys::SystemTools::FileExists(filePath))
       {
-         filePath = "";
+        filePath = "";
       }
     }
   }
@@ -578,7 +578,8 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
     }
     if (!::CompareVectors(defaultOptions.LookupPoints, options.LookupPoints))
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Specifying a custom colormap while not using the default scene has no effect.");
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying a custom colormap while not using the default scene has no effect.");
       ret = false;
     }
   }
@@ -618,7 +619,7 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
 
   if (options.Volume)
   {
-     if (defaultOptions.PointSprites != options.PointSprites)
+    if (defaultOptions.PointSprites != options.PointSprites)
     {
       F3DLog::Print(F3DLog::Severity::Info,
         "Specifying to show sphere sprites while using volume rendering has no effect.");
@@ -663,8 +664,8 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
   {
     if (defaultOptions.Volume != options.Volume)
     {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to show volume has no effect when using Raytracing.");
+      F3DLog::Print(
+        F3DLog::Severity::Info, "Specifying to show volume has no effect when using Raytracing.");
       ret = false;
     }
     if (defaultOptions.PointSprites != options.PointSprites)
@@ -743,9 +744,9 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
 
   if (options.NoBackground && options.Output.empty())
   {
-    F3DLog::Print(
-        F3DLog::Severity::Info, "Specifying no background while not outputing to file has no effect.");
-      ret = false;
+    F3DLog::Print(F3DLog::Severity::Info,
+      "Specifying no background while not outputing to file has no effect.");
+    ret = false;
   }
 
   if (!options.HDRIFile.empty())
@@ -758,19 +759,22 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
     }
   }
 
-  if (!::CompareVectors(defaultOptions.CameraPosition, options.CameraPosition) &&  options.CameraPosition.size() != 3)
+  if (!::CompareVectors(defaultOptions.CameraPosition, options.CameraPosition) &&
+    options.CameraPosition.size() != 3)
   {
     F3DLog::Print(
       F3DLog::Severity::Info, "Specifying a camera position of not 3 component has no effect.");
     ret = false;
   }
-  if (!::CompareVectors(defaultOptions.CameraFocalPoint, options.CameraFocalPoint) &&  options.CameraFocalPoint.size() != 3)
+  if (!::CompareVectors(defaultOptions.CameraFocalPoint, options.CameraFocalPoint) &&
+    options.CameraFocalPoint.size() != 3)
   {
     F3DLog::Print(
       F3DLog::Severity::Info, "Specifying a camera focal point of not 3 component has no effect.");
     ret = false;
   }
-  if (!::CompareVectors(defaultOptions.CameraViewUp, options.CameraViewUp) &&  options.CameraViewUp.size() != 3)
+  if (!::CompareVectors(defaultOptions.CameraViewUp, options.CameraViewUp) &&
+    options.CameraViewUp.size() != 3)
   {
     F3DLog::Print(
       F3DLog::Severity::Info, "Specifying a camera view up of not 3 component has no effect.");

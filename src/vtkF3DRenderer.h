@@ -23,10 +23,10 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
-#include <vtkSmartPointer.h>
 #include <vtkSkybox.h>
-#include <vtkTextActor.h>
+#include <vtkSmartPointer.h>
 #include <vtkSmartVolumeMapper.h>
+#include <vtkTextActor.h>
 
 struct F3DOptions;
 
@@ -162,7 +162,7 @@ protected:
   vtkF3DRenderer() = default;
   ~vtkF3DRenderer() override = default;
 
-  void ReleaseGraphicsResources(vtkWindow *w) override;
+  void ReleaseGraphicsResources(vtkWindow* w) override;
 
   void UpdateActorVisibility();
 
