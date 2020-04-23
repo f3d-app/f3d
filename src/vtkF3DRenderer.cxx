@@ -49,6 +49,7 @@
 
 #include "F3DLog.h"
 
+#include <chrono>
 #include <cmath>
 
 vtkStandardNewMacro(vtkF3DRenderer);
@@ -168,6 +169,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, fileInfo.c_str());
   this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
   this->FilenameActor->GetTextProperty()->SetColor(textColor);
+  this->FilenameActor->RenderOpaqueGeometry(this);
 
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetColor(textColor);
@@ -555,7 +557,7 @@ void vtkF3DRenderer::ShowScalarBar(bool show)
   this->ScalarBarVisible = show;
   if (this->ScalarBarActor)
   {
-    this->ScalarBarActor->SetVisibility(show && this->ScalarsVisible);
+    this->ScalarBarActor->SetVisibility(show && (this->ScalarsVisible || this->UseVolume));
   }
   this->CheatSheetNeedUpdate = true;
 }
@@ -702,8 +704,6 @@ void vtkF3DRenderer::ShowOptions()
   vtkCamera* cam = this->GetActiveCamera();
   this->InitialCamera->DeepCopy(cam);
 }
-
-#include <chrono>
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
