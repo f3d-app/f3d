@@ -60,10 +60,10 @@ int F3DLoader::Start(int argc, char** argv)
       vtkStringArray* files = static_cast<vtkStringArray*>(callData);
       for (int i = 0; i < files->GetNumberOfTuples(); i++)
       {
-      loader->AddFile(files->GetValue(i));
+        loader->AddFile(files->GetValue(i));
       }
       loader->LoadFile();
-      });
+    });
     style->AddObserver(F3DLoader::NewFilesEvent, newFilesCallback);
 
     vtkNew<vtkCallbackCommand> loadFileCallback;
@@ -72,7 +72,7 @@ int F3DLoader::Start(int argc, char** argv)
       F3DLoader* loader = static_cast<F3DLoader*>(clientData);
       int* load = static_cast<int*>(callData);
       loader->LoadFile(*load);
-      });
+    });
     style->AddObserver(F3DLoader::LoadFileEvent, loadFileCallback);
 
     interactor->SetRenderWindow(renWin);
@@ -171,7 +171,8 @@ void F3DLoader::LoadFile(int load)
 
   // Compute the correct file index
   this->CurrentFileIndex = (this->CurrentFileIndex + load) % size;
-  this->CurrentFileIndex = this->CurrentFileIndex < 0 ? this->CurrentFileIndex + size : this->CurrentFileIndex;
+  this->CurrentFileIndex =
+    this->CurrentFileIndex < 0 ? this->CurrentFileIndex + size : this->CurrentFileIndex;
 
   if (this->CurrentFileIndex >= size)
   {
@@ -201,7 +202,8 @@ void F3DLoader::LoadFile(int load)
   {
     if (!importer)
     {
-      F3DLog::Print(F3DLog::Severity::Warning, filePath, " is not a file of a supported file format\n");
+      F3DLog::Print(
+        F3DLog::Severity::Warning, filePath, " is not a file of a supported file format\n");
       fileInfo += " [UNSUPPORTED]";
       this->Renderer->Initialize(opts, fileInfo);
       return;
@@ -217,12 +219,13 @@ void F3DLoader::LoadFile(int load)
     {
       vtkNew<vtkCallbackCommand> progressCallback;
       progressCallback->SetClientData(progressWidget);
-      progressCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void* callData) {
-        vtkProgressBarWidget* widget = static_cast<vtkProgressBarWidget*>(clientData);
-        vtkProgressBarRepresentation* rep =
-        vtkProgressBarRepresentation::SafeDownCast(widget->GetRepresentation());
-        rep->SetProgressRate(*static_cast<double*>(callData));
-        widget->GetInteractor()->GetRenderWindow()->Render();
+      progressCallback->SetCallback(
+        [](vtkObject*, unsigned long, void* clientData, void* callData) {
+          vtkProgressBarWidget* widget = static_cast<vtkProgressBarWidget*>(clientData);
+          vtkProgressBarRepresentation* rep =
+            vtkProgressBarRepresentation::SafeDownCast(widget->GetRepresentation());
+          rep->SetProgressRate(*static_cast<double*>(callData));
+          widget->GetInteractor()->GetRenderWindow()->Render();
         });
       importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
 

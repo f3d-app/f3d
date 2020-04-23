@@ -87,7 +87,7 @@ protected:
   void ImportLights(vtkRenderer*) override;
   void ImportProperties(vtkRenderer*) override;
 
-  vtkSmartPointer<vtkTexture> GetTexture(const std::string &fileName, bool isSRGB = false);
+  vtkSmartPointer<vtkTexture> GetTexture(const std::string& fileName, bool isSRGB = false);
 
   void ConfigureMapperForColoring(
     vtkPolyDataMapper* mapper, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2]);
