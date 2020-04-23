@@ -54,7 +54,7 @@
 vtkStandardNewMacro(vtkF3DRenderer);
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow *w)
+void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 {
   if (this->Timer != 0)
   {
@@ -633,9 +633,11 @@ void vtkF3DRenderer::UpdateCheatSheet()
   if (this->CheatSheetVisible)
   {
     std::stringstream cheatSheetText;
-    cheatSheetText << "\n S: Scalars coloring " << (this->ScalarsVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << "\n S: Scalars coloring " << (this->ScalarsVisible ? "[ON]" : "[OFF]")
+                   << "\n";
     cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " P: Depth peeling " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " P: Depth peeling " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]")
+                   << "\n";
     cheatSheetText << " U: SSAO " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " F: FXAA " << (this->UseFXAAPass ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " A: Tone mapping " << (this->UseToneMappingPass ? "[ON]" : "[OFF]") << "\n";
@@ -733,7 +735,8 @@ void vtkF3DRenderer::Render()
   auto cpuElapsed = std::chrono::high_resolution_clock::now() - cpuStart;
 
   // Get CPU frame per seconds
-  int fps = static_cast<int>(std::round(1.0 / (std::chrono::duration_cast<std::chrono::microseconds>(cpuElapsed).count() * 1e-6)));
+  int fps = static_cast<int>(std::round(
+    1.0 / (std::chrono::duration_cast<std::chrono::microseconds>(cpuElapsed).count() * 1e-6)));
 
   glEndQuery(GL_TIME_ELAPSED);
   GLint elapsed;
@@ -797,11 +800,13 @@ void vtkF3DRenderer::UpdateActorVisibility()
 {
   if (this->GeometryActor)
   {
-    this->GeometryActor->SetVisibility(this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites));
+    this->GeometryActor->SetVisibility(
+      this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites));
   }
   if (this->PointSpritesActor)
   {
-    this->PointSpritesActor->SetVisibility(!this->UseRaytracing && !this->UseVolume && this->UsePointSprites);
+    this->PointSpritesActor->SetVisibility(
+      !this->UseRaytracing && !this->UseVolume && this->UsePointSprites);
   }
   if (this->VolumeProp)
   {
