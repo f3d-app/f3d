@@ -10,7 +10,8 @@
 
 #include "F3DLog.h"
 
-int F3DOffscreenRender::RenderOffScreen(vtkRenderWindow* renWin, const std::string& output, bool noBg)
+int F3DOffscreenRender::RenderOffScreen(
+  vtkRenderWindow* renWin, const std::string& output, bool noBg)
 {
   renWin->OffScreenRenderingOn();
 
@@ -54,8 +55,9 @@ int F3DOffscreenRender::RenderTesting(
 
   if (!vtksys::SystemTools::FileExists(reference))
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Reference file does not exists, "
-        "generate it first (set F3D_GEN_REF variable and run test again).");
+    F3DLog::Print(F3DLog::Severity::Error,
+      "Reference file does not exists, "
+      "generate it first (set F3D_GEN_REF variable and run test again).");
     return EXIT_FAILURE;
   }
 

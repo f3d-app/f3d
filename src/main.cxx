@@ -1,5 +1,5 @@
-#include "F3DLoader.h"
 #include "Config.h"
+#include "F3DLoader.h"
 
 int main(int argc, char** argv)
 {
