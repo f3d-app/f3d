@@ -88,6 +88,12 @@ Options|Default|Description
 --roughness=\<roughness\>|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
 --metallic=\<metallic\>|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
 --hrdi=\<file path\>||Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, png, jpg, pnm, tiff, bmp.
+--texture-base-color=\<file path\>||Path to a texture file that sets the color of the object.
+--texture-material=\<file path\>||Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object.
+--texture-emissive=\<file path\>||Path to a texture file that sets the emited light of the object.
+--emissive-factor=\<R,G,B\>|1.0, 1.0, 1.0| Emissive factor. This value is multiplied with the emissive color when an emissive texture is present.
+--texture-normal=\<file path\>||Path to a texture file that sets the normal map of the object.
+--normal-scale=\<normal_scale\>|1.0|Normal scale affects the strength of the normal deviation from the normal texture.
 
 ## PostFX (OpenGL) options:
 Options|Description
