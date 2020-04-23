@@ -17,6 +17,7 @@ add_executable(f3d
   F3DLog.cxx
   F3DOffscreenRender.cxx
   F3DOptions.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/Config.cxx
   ${OSX_DELEGATE}
   ${WINDOWS_RC_FILE}
 )
@@ -106,11 +107,18 @@ else()
   set(F3D_HAS_RAYTRACING OFF CACHE INTERNAL BOOL)
 endif()
 
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/Config.h"
+  @ONLY)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/Config.cxx.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/Config.cxx"
+  @ONLY)
+
 vtk_module_autoinit(TARGETS f3d MODULES ${F3D_MODULES})
 target_link_libraries(f3d PUBLIC ${F3D_MODULES})
-
-configure_file(Config.h.in
-  "${CMAKE_CURRENT_BINARY_DIR}/Config.h" @ONLY)
 
 install(TARGETS f3d
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
