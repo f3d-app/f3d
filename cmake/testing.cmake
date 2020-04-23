@@ -53,6 +53,7 @@ f3d_test(TestDepthPeelingToneMapping suzanne.ply "300,300" "--opacity=0.9 -pa")
 f3d_test(TestDefaultConfigFileSimilar dragon.vtu "300,300" "-safgxnv --progress")
 f3d_test(TestVolume HeadMRVolume.mhd "300,300" "-z --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1")
 f3d_test(TestLineWidth cow.vtk "300,300" "-e --line-width=5")
+f3d_test(TestTextures WaterBottle.glb "300,300" "-m --texture-material=${CMAKE_SOURCE_DIR}/data/red.jpg --roughness=1 --metallic=1 --texture-base-color=${CMAKE_SOURCE_DIR}/data/albedo.png --texture-normal=${CMAKE_SOURCE_DIR}/data/normal.png --texture-emissive=${CMAKE_SOURCE_DIR}/data/red.jpg --emissive-factor=0.1,0.1,0.1")
 
 if(F3D_HAS_RAYTRACING)
   f3d_test(TestOSPRayGLTF WaterBottle.glb "300,300" "-r --samples=1")

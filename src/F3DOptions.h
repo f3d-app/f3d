@@ -60,6 +60,12 @@ struct F3DOptions
   std::vector<double> SolidColor = { 1., 1., 1. };
   std::vector<int> WindowSize = { 1000, 600 };
   std::string HDRIFile;
+  std::string BaseColorTex;
+  std::string ORMTex;
+  std::string EmissiveTex;
+  std::vector<double> EmissiveFactor = { 1., 1., 1. };
+  std::string NormalTex;
+  double NormalScale = 1.0;
 };
 
 class F3DOptionsParser
