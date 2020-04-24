@@ -194,6 +194,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp3, "resolution", "", "Window resolution", options.WindowSize, true, "<width,height>");
     this->DeclareOption(grp3, "timer", "t", "Display frame per second", options.FPS);
     this->DeclareOption(grp3, "filename", "n", "Display filename", options.Filename);
+    this->DeclareOption(grp3, "field-data", "y", "Display field data", options.FieldData);
     this->DeclareOption(grp3, "fullscreen", "l", "Full screen", options.FullScreen);
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
@@ -250,6 +251,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
         " b         Toggle the scalar bar display\n"
         " t         Toggle the FPS counter display\n"
         " n         Toggle the filename display\n"
+        " y         Toggle the field data display\n"
         " r         Toggle raytracing rendering\n"
         " d         Toggle denoising when raytracing\n"
         " p         Toggle depth peeling\n"
@@ -516,6 +518,12 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
 
   if (!usingDefaultScene)
   {
+    if (defaultOptions.FieldData != options.FieldData)
+    {
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying to show field data while not using the default scene has no effect.");
+      ret = false;
+    }
     if (defaultOptions.PointSprites != options.PointSprites)
     {
       F3DLog::Print(F3DLog::Severity::Info,

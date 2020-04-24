@@ -143,6 +143,7 @@ Options|Default|Description
 --resolution=\<width,height\>|1000, 600|Set the *window resolution*.
 -t, --timer||Display a *frame per second counter*.
 -n, --filename||Display the *name of the file*.
+-y, --field-data||Display the *field data*.<br>This only makes sense when using the default scene.
 
 # Rendering precedence
 Some rendering options are not compatible between them, here is the precedence order if several are defined:
@@ -170,6 +171,7 @@ Some options can be toggled directly using interactions:
 * Press `b` key to toggle the display of the scalar bar, only when coloring with scalars.
 * Press `t` key to toggle the display of the FPS counter.
 * Press `n` key to toggle the display of the file name.
+* Press `y` key to toggle the display of the field data if exists.
 * Press `r` key to toggle raytracing.
 * Press `d` key to toggle the denoiser when raytracing.
 * Press `p` key to toggle depth peeling.
