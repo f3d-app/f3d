@@ -23,7 +23,7 @@ if (UNIX AND NOT APPLE)
                 "You can set F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX to ensure the file will be scanned.")
       endif()
       install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
-        DESTINATION "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d/config.json")
+        DESTINATION "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d")
     endif()
   endif()
 endif()
