@@ -41,6 +41,7 @@ public:
   void ShowScalarBar(bool show);
   void ShowEdge(bool show);
   void ShowTimer(bool show);
+  void ShowFieldData(bool show);
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
   void ShowScalars(bool show);
@@ -60,6 +61,7 @@ public:
   bool IsEdgeVisible();
   bool IsTimerVisible();
   bool IsFilenameVisible();
+  bool IsFieldDataVisible();
   bool IsCheatSheetVisible();
   bool AreScalarsVisible();
   bool UsingRaytracing();
@@ -170,6 +172,8 @@ protected:
 
   void UpdateCheatSheet();
 
+  std::string GenerateFieldDataDescription();
+
   F3DOptions Options;
 
   vtkNew<vtkActor> GridActor;
@@ -186,8 +190,8 @@ protected:
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
   vtkNew<vtkCornerAnnotation> FilenameActor;
-
-  vtkNew<vtkTextActor> CheatSheetActor;
+  vtkNew<vtkCornerAnnotation> FieldDataActor;
+  vtkNew<vtkCornerAnnotation> CheatSheetActor;
   bool CheatSheetNeedUpdate = false;
 
   // vtkCornerAnnotation building is too slow for the timer
@@ -199,6 +203,7 @@ protected:
   bool EdgesVisible;
   bool TimerVisible;
   bool FilenameVisible;
+  bool FieldDataVisible;
   bool ScalarBarVisible;
   bool ScalarsVisible;
   bool CheatSheetVisible = false;
