@@ -5,6 +5,7 @@
 
 #include "vtkF3DOpenGLGridMapper.h"
 
+#include <vtkAbstractArray.h>
 #include <vtkActor.h>
 #include <vtkActor2DCollection.h>
 #include <vtkAxesActor.h>
@@ -13,6 +14,7 @@
 #include <vtkCamera.h>
 #include <vtkCameraPass.h>
 #include <vtkDualDepthPeelingPass.h>
+#include <vtkFieldData.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
@@ -84,6 +86,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->EdgesVisible = this->Options.Edges;
   this->TimerVisible = this->Options.FPS;
   this->FilenameVisible = this->Options.Filename;
+  this->FieldDataVisible = this->Options.FieldData;
   this->ScalarBarVisible = this->Options.Bar;
   this->ScalarsVisible = this->Options.Volume || this->Options.Scalars != f3d::F3DReservedString;
   this->UseRaytracing = this->Options.Raytracing;
@@ -171,6 +174,13 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->FilenameActor->GetTextProperty()->SetColor(textColor);
   this->FilenameActor->RenderOpaqueGeometry(this);
 
+  this->FieldDataActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->FieldDataActor->GetTextProperty()->SetFontSize(15);
+  this->FieldDataActor->GetTextProperty()->SetOpacity(0.5);
+  this->FieldDataActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
+  this->FieldDataActor->GetTextProperty()->SetBackgroundOpacity(0.5);
+  this->FieldDataActor->RenderOpaqueGeometry(this);
+
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetColor(textColor);
 
@@ -179,13 +189,48 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->CheatSheetActor->GetTextProperty()->SetOpacity(0.5);
   this->CheatSheetActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
   this->CheatSheetActor->GetTextProperty()->SetBackgroundOpacity(0.5);
-  this->CheatSheetActor->SetTextScaleModeToNone();
 
   this->TimerActor->SetInput("0 fps");
 
   this->ShowOptions();
 
   this->SetupRenderPasses();
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DRenderer::GenerateFieldDataDescription()
+{
+  std::string description;
+  description += " \n";
+  if (this->PolyDataMapper)
+  {
+    vtkDataSet* polyData = this->PolyDataMapper->GetInput();
+
+    if (polyData)
+    {
+      vtkFieldData* fieldData = this->PolyDataMapper->GetInput()->GetFieldData();
+      int nbFieldData = fieldData->GetNumberOfArrays();
+
+      for (vtkIdType i = 0; i < nbFieldData; i++)
+      {
+        vtkAbstractArray* array = fieldData->GetAbstractArray(i);
+        if (array)
+        {
+          vtkIdType nbTuples = array->GetNumberOfTuples();
+          if (nbTuples == 1)
+          {
+            description += " ";
+            description += array->GetName();
+            description += " = ";
+            description += array->GetVariantValue(0).ToString();
+            description += " \n";
+          }
+        }
+      }
+    }
+  }
+
+  return description;
 }
 
 //----------------------------------------------------------------------------
@@ -607,6 +652,30 @@ bool vtkF3DRenderer::IsFilenameVisible()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowFieldData(bool show)
+{
+  if (this->FieldDataActor)
+  {
+    this->RemoveActor(this->FieldDataActor);
+    this->AddActor(this->FieldDataActor);
+
+    // generate field data description
+    std::string fieldDataDesc = this->GenerateFieldDataDescription();
+    this->FieldDataActor->SetText(vtkCornerAnnotation::RightEdge, fieldDataDesc.c_str());
+
+    this->FieldDataActor->SetVisibility(show);
+  }
+  this->FieldDataVisible = show;
+  this->CheatSheetNeedUpdate = true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::IsFieldDataVisible()
+{
+  return this->FieldDataVisible;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowCheatSheet(bool show)
 {
   if (this->CheatSheetActor)
@@ -647,6 +716,7 @@ void vtkF3DRenderer::UpdateCheatSheet()
     cheatSheetText << " X: Axis " << (this->AxisVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " G: Grid " << (this->GridVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " N: File name " << (this->FilenameVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " Y: Field data " << (this->FieldDataVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " T: FPS Timer " << (this->TimerVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " R: Raytracing " << (this->UseRaytracing ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " D: Denoiser " << (this->UseRaytracingDenoiser ? "[ON]" : "[OFF]") << "\n";
@@ -662,7 +732,7 @@ void vtkF3DRenderer::UpdateCheatSheet()
     cheatSheetText << " LEFT : Previous file \n";
     cheatSheetText << " RIGHT: Next file \n";
 
-    this->CheatSheetActor->SetInput(cheatSheetText.str().c_str());
+    this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, cheatSheetText.str().c_str());
     this->CheatSheetActor->RenderOpaqueGeometry(this);
   }
 }
@@ -698,6 +768,7 @@ void vtkF3DRenderer::ShowOptions()
   this->ShowEdge(this->EdgesVisible);
   this->ShowFilename(this->FilenameVisible);
   this->ShowCheatSheet(this->CheatSheetVisible);
+  this->ShowFieldData(this->FieldDataVisible);
 
   // Set the initial camera once all options
   // have been shown as they may have an effect on it

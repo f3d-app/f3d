@@ -87,6 +87,11 @@ void vtkF3DInteractorStyle::OnKeyPress()
       ren->ShowFilename(!ren->IsFilenameVisible());
       renWin->Render();
       break;
+    case 'y':
+    case 'Y':
+      ren->ShowFieldData(!ren->IsFieldDataVisible());
+      renWin->Render();
+      break;
     case 't':
     case 'T':
       ren->ShowTimer(!ren->IsTimerVisible());
