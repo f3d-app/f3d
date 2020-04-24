@@ -421,6 +421,7 @@ void vtkF3DGenericImporter::ConfigureMapperForColoring(
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ImportLights(vtkRenderer* ren)
 {
+  ren->RemoveAllLights();
   ren->AutomaticLightCreationOff();
 
   if (!ren->GetUseImageBasedLighting())
