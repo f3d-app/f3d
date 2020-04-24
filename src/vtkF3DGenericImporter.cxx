@@ -137,7 +137,19 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     "  ambientColor *= scale;\n"
     "  diffuseColor *= scale;\n"
     "}\n");
-  this->PointGaussianMapper->SetInputData(surface);
+
+  // The VBO used in mappers is shared between mappers if the input points is the same instance.
+  // This can be an issue if a mapper supports Shift/Scale but not the other.
+  // vtkOpenGLPolyDataMapper supports it but not vtkOpenGLPointGaussianMapper.
+  // So we need to duplicate the points but we can shallow copy the point data and discard the rest.
+  vtkNew<vtkPolyData> pointsPolyData;
+  pointsPolyData->GetPointData()->ShallowCopy(surface->GetPointData());
+
+  vtkNew<vtkPoints> pts;
+  pts->DeepCopy(surface->GetPoints());
+  pointsPolyData->SetPoints(pts);
+
+  this->PointGaussianMapper->SetInputData(pointsPolyData);
 
   vtkPointData* pointData = surface->GetPointData();
   vtkCellData* cellData = surface->GetCellData();
