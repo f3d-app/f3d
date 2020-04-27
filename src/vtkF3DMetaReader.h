@@ -21,7 +21,7 @@ public:
   /**
    * Set/Get the name of the file from which to read.
    */
-  void SetFileName(std::string fileName);
+  void SetFileName(const std::string& fileName);
   vtkGetStringMacro(FileName);
   //@}
 

@@ -3,7 +3,6 @@
 #include "F3DLog.h"
 
 #include <vtk_jsoncpp.h>
-
 #include <vtksys/SystemTools.hxx>
 
 #include <fstream>
@@ -33,7 +32,7 @@ bool CompareVectors(const std::vector<T>& v1, const std::vector<T>& v2)
 
   return true;
 }
-}
+}  // namespace
 
 class ConfigurationOptions
 {
@@ -93,7 +92,9 @@ protected:
       {
         ss << currValue[i];
         if (i != currValue.size() - 1)
+        {
           ss << ",";
+        }
       }
       return ss.str();
     }
@@ -140,7 +141,7 @@ protected:
   static std::string GetSystemSettingsDirectory();
   static std::string GetUserSettingsDirectory();
 
-protected:
+private:
   int Argc;
   char** Argv;
 
