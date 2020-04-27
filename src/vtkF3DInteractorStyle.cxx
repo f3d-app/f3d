@@ -65,12 +65,6 @@ void vtkF3DInteractorStyle::OnKeyPress()
     case 'E':
       ren->ShowEdge(!ren->IsEdgeVisible());
       renWin->Render();
-      if (ren->IsTimerVisible())
-      {
-        // Needed to show a correct value, computed at the previous render
-        // TODO: Improve this by computing it and displaying it within a single render
-        renWin->Render();
-      }
       break;
     case 'x':
     case 'X':
@@ -96,6 +90,12 @@ void vtkF3DInteractorStyle::OnKeyPress()
     case 'T':
       ren->ShowTimer(!ren->IsTimerVisible());
       renWin->Render();
+      if (ren->IsTimerVisible())
+      {
+        // Needed to show a correct value, computed at the previous render
+        // TODO: Improve this by computing it and displaying it within a single render
+        renWin->Render();
+      }
       break;
     case 'r':
     case 'R':
