@@ -345,7 +345,15 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   {
     this->PointSpritesActor->VisibilityOff();
     this->GeometryActor->VisibilityOff();
-    this->VolumeProp->VisibilityOn();
+
+    if (this->VolumeMapper->GetInput())
+    {
+      this->VolumeProp->VisibilityOn();
+    }
+    else
+    {
+      F3DLog::Print(F3DLog::Severity::Error, "Cannot use volume with this dataset");
+    }
   }
   else
   {
