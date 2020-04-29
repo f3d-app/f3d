@@ -66,7 +66,7 @@ int vtkF3DMetaReader::FillOutputPortInformation(int port, vtkInformation* info)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DMetaReader::SetFileName(std::string fileName)
+void vtkF3DMetaReader::SetFileName(const std::string& fileName)
 {
   vtkMTimeType time = this->GetMTime();
   this->SetFileName(fileName.c_str());
