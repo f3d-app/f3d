@@ -881,7 +881,16 @@ void vtkF3DRenderer::UpdateActorVisibility()
   }
   if (this->VolumeProp)
   {
-    this->VolumeProp->SetVisibility(!this->UseRaytracing && this->UseVolume);
+    bool visibility = !this->UseRaytracing && this->UseVolume;
+    vtkSmartVolumeMapper* mapper = vtkSmartVolumeMapper::SafeDownCast(this->VolumeProp->GetMapper());
+    if (visibility && (!mapper || !mapper->GetInput()))
+    {
+      F3DLog::Print(F3DLog::Severity::Error, "Cannot use volume with this dataset");
+    }
+    else
+    {
+      this->VolumeProp->SetVisibility(visibility);
+    }
   }
 }
 
