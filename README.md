@@ -155,6 +155,7 @@ Some rendering options are not compatible between them, here is the precedence o
 
 Simple interaction with the displayed data is possible directly within the window. It is as follows:
 * *Click and drag* with the *left* mouse button to rotate around the focal point of the camera.
+* Hold *Shift* then *Click and drag* horizontally with the *right* mouse button to rotate the HDRI.
 * *Click and drag* vertically with the *right* mouse button to zoom in/out.
 * *Move the mouse wheel* to zoom in/out.
 * *Click and drag* with the *middle* mouse button to translate the camera.
