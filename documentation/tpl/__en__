@@ -1,0 +1,24 @@
+menu:
+  docs: Documentation
+  gallery: Gallery
+
+index:
+  get_started: Get started
+
+page:
+  contents: Contents
+  back_to_top: Back to Top
+  improve: Improve this doc
+  prev: Prev
+  next: Next
+  last_updated: "Last updated: %s"
+
+sidebar:
+  docs:
+    getting_started: Getting Started
+    overview: Overview
+    installation_and_build: Installation and build
+    configuration_file: Configuration file
+    miscellaneous: Miscellaneous
+    limitations: Limitations
+    troubleshooting: Troubleshooting
