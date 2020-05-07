@@ -134,6 +134,11 @@ void vtkF3DInteractorStyle::OnKeyPress()
 
       renWin->Render();
       break;
+    case 'k':
+    case 'K':
+      ren->SetUseBlurBackground(!ren->UsingBlurBackground());
+      renWin->Render();
+      break;
     case '?':
       ren->ShowCheatSheet(!ren->IsCheatSheetVisible());
       renWin->Render();

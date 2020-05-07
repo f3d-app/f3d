@@ -144,6 +144,8 @@ Options|Default|Description
 -t, --timer||Display a *frame per second counter*.
 -n, --filename||Display the *name of the file*.
 -y, --field-data||Display the *field data*.<br>This only makes sense when using the default scene.
+-l, --fullscreen||Display in fullscreen.
+-k, --blur-background||Blur background.<br>This only makes sense when using a HDRI.
 
 # Rendering precedence
 Some rendering options are not compatible between them, here is the precedence order if several are defined:
@@ -181,6 +183,7 @@ Some options can be toggled directly using interactions:
 * Press `a` key to toggle tone mapping.
 * Press `o` key to toggle point sprites rendering.
 * Press `l` key to toggle full screen.
+* Press `k` key to toggle background blur.
 * Press `?` key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
 
 # Configuration file
