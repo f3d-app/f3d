@@ -408,7 +408,7 @@ void vtkF3DGenericImporter::ConfigureVolumeForColoring(
   vtkNew<vtkVolumeProperty> property;
   property->SetColor(ctf);
   property->SetScalarOpacity(otf);
-  property->ShadeOn();
+  property->ShadeOff();
   property->SetInterpolationTypeToLinear();
 
   volume->SetProperty(property);

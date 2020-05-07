@@ -4,6 +4,7 @@
 #include "F3DOptions.h"
 
 #include "vtkF3DOpenGLGridMapper.h"
+#include "vtkF3DRenderPass.h"
 
 #include <vtkAbstractArray.h>
 #include <vtkActor.h>
@@ -12,8 +13,6 @@
 #include <vtkBoundingBox.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
-#include <vtkCameraPass.h>
-#include <vtkDualDepthPeelingPass.h>
 #include <vtkFieldData.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
@@ -21,24 +20,18 @@
 #include <vtkImporter.h>
 #include <vtkLightsPass.h>
 #include <vtkObjectFactory.h>
-#include <vtkOpaquePass.h>
 #include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLTexture.h>
-#include <vtkOverlayPass.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkProperty.h>
 #include <vtkRenderPassCollection.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
-#include <vtkSSAOPass.h>
-#include <vtkSequencePass.h>
 #include <vtkSkybox.h>
 #include <vtkTextProperty.h>
 #include <vtkToneMappingPass.h>
-#include <vtkTranslucentPass.h>
 #include <vtkVolumeProperty.h>
-#include <vtkVolumetricPass.h>
 #include <vtksys/Directory.hxx>
 #include <vtksys/SystemTools.hxx>
 
@@ -98,6 +91,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->UsePointSprites = this->Options.PointSprites;
   this->UseVolume = this->Options.Volume;
   this->UseInverseOpacityFunction = this->Options.InverseOpacityFunction;
+  this->UseBlurBackground = this->Options.BlurBackground;
 
   if (!this->Options.HDRIFile.empty() && !this->GetUseImageBasedLighting())
   {
@@ -130,7 +124,10 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
       this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
       this->Skybox->SetProjection(vtkSkybox::Sphere);
       this->Skybox->SetTexture(texture);
+
+#if F3D_USE_VTK_MASTER
       this->Skybox->GammaCorrectOn();
+#endif
     }
     else
     {
@@ -183,6 +180,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
 
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetColor(textColor);
+  this->TimerActor->GetTextProperty()->SetFontSize(15);
 
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontSize(15);
@@ -236,97 +234,25 @@ std::string vtkF3DRenderer::GenerateFieldDataDescription()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetupRenderPasses()
 {
+  // clean up previous pass
   vtkRenderPass* pass = this->GetPass();
   if (pass)
   {
     pass->ReleaseGraphicsResources(this->RenderWindow);
   }
 
-  vtkSmartPointer<vtkRenderPass> renderingPass;
+  vtkNew<vtkF3DRenderPass> newPass;
+  newPass->SetUseRaytracing(F3D_HAS_RAYTRACING && this->UseRaytracing);
+  newPass->SetUseSSAOPass(this->UseSSAOPass);
+  newPass->SetUseDepthPeelingPass(this->UseDepthPeelingPass);
+  newPass->SetUseBlurBackground(this->UseBlurBackground);
 
-  if (F3D_HAS_RAYTRACING && this->UseRaytracing)
-  {
-#if F3D_HAS_RAYTRACING
-    vtkNew<vtkOSPRayPass> osprayP;
-    this->SetPass(osprayP);
+  double bounds[6];
+  this->ComputeVisiblePropBounds(bounds);
+  newPass->SetBounds(bounds);
 
-    vtkOSPRayRendererNode::SetRendererType("pathtracer", this);
-    vtkOSPRayRendererNode::SetSamplesPerPixel(this->Options.Samples, this);
-    vtkOSPRayRendererNode::SetEnableDenoiser(this->UseRaytracingDenoiser, this);
-    vtkOSPRayRendererNode::SetDenoiserThreshold(0, this);
-
-    bool hasHDRI = this->GetEnvironmentTexture() != nullptr;
-    vtkOSPRayRendererNode::SetBackgroundMode(hasHDRI ? 2 : 1, this);
-
-    renderingPass = osprayP;
-#endif
-  }
-  else
-  {
-    vtkNew<vtkLightsPass> lightsP;
-    vtkNew<vtkOpaquePass> opaqueP;
-    vtkNew<vtkTranslucentPass> translucentP;
-    vtkNew<vtkVolumetricPass> volumeP;
-    vtkNew<vtkOverlayPass> overlayP;
-
-    vtkNew<vtkRenderPassCollection> collection;
-    collection->AddItem(lightsP);
-
-    // opaque passes
-    if (this->UseSSAOPass)
-    {
-      double bounds[6];
-      this->ComputeVisiblePropBounds(bounds);
-
-      vtkBoundingBox bbox(bounds);
-
-      if (bbox.IsValid())
-      {
-        vtkNew<vtkCameraPass> ssaoCamP;
-        ssaoCamP->SetDelegatePass(opaqueP);
-
-        vtkNew<vtkSSAOPass> ssaoP;
-        ssaoP->SetRadius(0.1 * bbox.GetDiagonalLength());
-        ssaoP->SetBias(0.001 * bbox.GetDiagonalLength());
-        ssaoP->SetKernelSize(200);
-        ssaoP->SetDelegatePass(ssaoCamP);
-
-        collection->AddItem(ssaoP);
-      }
-      else
-      {
-        collection->AddItem(opaqueP);
-      }
-    }
-    else
-    {
-      collection->AddItem(opaqueP);
-    }
-
-    // translucent and volumic passes
-    if (this->UseDepthPeelingPass)
-    {
-      vtkNew<vtkDualDepthPeelingPass> ddpP;
-      ddpP->SetTranslucentPass(translucentP);
-      ddpP->SetVolumetricPass(volumeP);
-      collection->AddItem(ddpP);
-    }
-    else
-    {
-      collection->AddItem(translucentP);
-      collection->AddItem(volumeP);
-    }
-
-    collection->AddItem(overlayP);
-
-    vtkNew<vtkSequencePass> sequence;
-    sequence->SetPasses(collection);
-
-    vtkNew<vtkCameraPass> cameraP;
-    cameraP->SetDelegatePass(sequence);
-
-    renderingPass = cameraP;
-  }
+  // Image post processing passes
+  vtkSmartPointer<vtkRenderPass> renderingPass = newPass;
 
   if (this->UseToneMappingPass)
   {
@@ -343,11 +269,20 @@ void vtkF3DRenderer::SetupRenderPasses()
     fxaaP->SetDelegatePass(renderingPass);
 
     this->SetPass(fxaaP);
+    renderingPass = fxaaP;
   }
-  else
-  {
-    this->SetPass(renderingPass);
-  }
+
+  this->SetPass(renderingPass);
+
+#if F3D_HAS_RAYTRACING
+  vtkOSPRayRendererNode::SetRendererType("pathtracer", this);
+  vtkOSPRayRendererNode::SetSamplesPerPixel(this->Options.Samples, this);
+  vtkOSPRayRendererNode::SetEnableDenoiser(this->UseRaytracingDenoiser, this);
+  vtkOSPRayRendererNode::SetDenoiserThreshold(0, this);
+
+  bool hasHDRI = this->GetEnvironmentTexture() != nullptr;
+  vtkOSPRayRendererNode::SetBackgroundMode(hasHDRI ? 2 : 1, this);
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -369,6 +304,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
   }
 
   this->AxisVisible = show;
+  this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -425,6 +361,7 @@ void vtkF3DRenderer::ShowGrid(bool show)
   }
   this->GridActor->SetVisibility(show);
   this->ResetCameraClippingRange();
+  this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -438,6 +375,20 @@ bool vtkF3DRenderer::IsGridVisible()
 void vtkF3DRenderer::SetUseDepthPeelingPass(bool use)
 {
   this->UseDepthPeelingPass = use;
+  this->SetupRenderPasses();
+  this->CheatSheetNeedUpdate = true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::UsingBlurBackground()
+{
+  return this->UseBlurBackground;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseBlurBackground(bool use)
+{
+  this->UseBlurBackground = use;
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
@@ -495,6 +446,7 @@ void vtkF3DRenderer::SetUsePointSprites(bool use)
 {
   this->UsePointSprites = use;
   this->UpdateActorVisibility();
+  this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -509,6 +461,7 @@ void vtkF3DRenderer::SetUseVolume(bool use)
 {
   this->UseVolume = use;
   this->UpdateActorVisibility();
+  this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -536,6 +489,7 @@ void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
       pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
     }
   }
+  this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -587,6 +541,7 @@ void vtkF3DRenderer::ShowScalars(bool show)
       this->ShowScalarBar(this->ScalarBarVisible);
     }
   }
+  this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -604,6 +559,7 @@ void vtkF3DRenderer::ShowScalarBar(bool show)
   {
     this->ScalarBarActor->SetVisibility(show && (this->ScalarsVisible || this->UseVolume));
   }
+  this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -623,6 +579,7 @@ void vtkF3DRenderer::ShowTimer(bool show)
     this->TimerActor->SetVisibility(show);
   }
   this->TimerVisible = show;
+  this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -642,6 +599,7 @@ void vtkF3DRenderer::ShowFilename(bool show)
     this->FilenameActor->SetVisibility(show);
   }
   this->FilenameVisible = show;
+  this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -666,6 +624,7 @@ void vtkF3DRenderer::ShowFieldData(bool show)
     this->FieldDataActor->SetVisibility(show);
   }
   this->FieldDataVisible = show;
+  this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -689,6 +648,7 @@ void vtkF3DRenderer::ShowCheatSheet(bool show)
     }
   }
   this->CheatSheetVisible = show;
+  this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -725,8 +685,10 @@ void vtkF3DRenderer::UpdateCheatSheet()
                    << (this->UseInverseOpacityFunction ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " O: Point sprites " << (this->UsePointSprites ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " L: Full screen "
-                   << (this->GetRenderWindow()->GetFullScreen() ? "[ON]" : "[OFF]") << "\n\n";
-    cheatSheetText << "   ?  : Cheat sheet \n";
+                   << (this->GetRenderWindow()->GetFullScreen() ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " K: Blur background " << (this->UseBlurBackground ? "[ON]" : "[OFF]")
+                   << "\n";
+    cheatSheetText << "\n   ?  : Cheat sheet \n";
     cheatSheetText << "  ESC : Quit \n";
     cheatSheetText << " ENTER: Reset camera \n";
     cheatSheetText << " LEFT : Previous file \n";
@@ -882,7 +844,8 @@ void vtkF3DRenderer::UpdateActorVisibility()
   if (this->VolumeProp)
   {
     bool visibility = !this->UseRaytracing && this->UseVolume;
-    vtkSmartVolumeMapper* mapper = vtkSmartVolumeMapper::SafeDownCast(this->VolumeProp->GetMapper());
+    vtkSmartVolumeMapper* mapper =
+      vtkSmartVolumeMapper::SafeDownCast(this->VolumeProp->GetMapper());
     if (visibility && (!mapper || !mapper->GetInput()))
     {
       F3DLog::Print(F3DLog::Severity::Error, "Cannot use volume with this dataset");

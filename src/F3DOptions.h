@@ -40,6 +40,7 @@ struct F3DOptions
   bool Volume = false;
   bool InverseOpacityFunction = false;
   bool NoBackground = false;
+  bool BlurBackground = false;
   double CameraViewAngle;
   double Metallic = 0.0;
   double Opacity = 1.0;

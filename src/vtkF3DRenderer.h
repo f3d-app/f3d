@@ -54,6 +54,7 @@ public:
   void SetUseToneMappingPass(bool use);
   void SetUseVolume(bool use);
   void SetUseInverseOpacityFunction(bool use);
+  void SetUseBlurBackground(bool use);
 
   bool IsAxisVisible();
   bool IsGridVisible();
@@ -73,6 +74,7 @@ public:
   bool UsingToneMappingPass();
   bool UsingVolume();
   bool UsingInverseOpacityFunction();
+  bool UsingBlurBackground();
 
   void Render() override;
 
@@ -216,6 +218,7 @@ protected:
   bool UseToneMappingPass;
   bool UseVolume;
   bool UseInverseOpacityFunction;
+  bool UseBlurBackground;
 };
 
 #endif

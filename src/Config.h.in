@@ -18,4 +18,6 @@ namespace f3d
 
 #cmakedefine01 F3D_OSX_BUNDLE
 
+#cmakedefine01 F3D_USE_VTK_MASTER
+
 #endif
