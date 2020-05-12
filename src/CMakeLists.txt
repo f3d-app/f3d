@@ -12,6 +12,7 @@ add_executable(f3d
   vtkF3DInteractorStyle.cxx
   vtkF3DMetaReader.cxx
   vtkF3DOpenGLGridMapper.cxx
+  vtkF3DRenderPass.cxx
   vtkF3DRenderer.cxx
   F3DLoader.cxx
   F3DLog.cxx
@@ -97,6 +98,7 @@ set(F3D_MODULES
   VTK::RenderingOpenGL2
   VTK::RenderingVolumeOpenGL2
   VTK::jsoncpp
+  VTK::opengl
 )
 
 if(TARGET VTK::RenderingRayTracing)
@@ -106,6 +108,9 @@ if(TARGET VTK::RenderingRayTracing)
 else()
   set(F3D_HAS_RAYTRACING OFF CACHE INTERNAL BOOL)
 endif()
+
+option(F3D_USE_VTK_MASTER OFF "Build using the lastest VTK version")
+mark_as_advanced(F3D_USE_VTK_MASTER)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in"

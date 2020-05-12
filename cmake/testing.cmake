@@ -56,6 +56,8 @@ f3d_test(TestVolume HeadMRVolume.mhd "300,300" "-z --camera-position=127.5,-400,
 f3d_test(TestLineWidth cow.vtk "300,300" "-e --line-width=5")
 f3d_test(TestTextures WaterBottle.glb "300,300" "-m --texture-material=${CMAKE_SOURCE_DIR}/data/red.jpg --roughness=1 --metallic=1 --texture-base-color=${CMAKE_SOURCE_DIR}/data/albedo.png --texture-normal=${CMAKE_SOURCE_DIR}/data/normal.png --texture-emissive=${CMAKE_SOURCE_DIR}/data/red.jpg --emissive-factor=0.1,0.1,0.1")
 f3d_test(TestFieldData pdiag.vtu "300,300" "-y")
+f3d_test(TestHDRI suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/palermo_park_1k.hdr")
+f3d_test(TestHDRIBlur suzanne.ply "300,300" "-k --hdri=${CMAKE_SOURCE_DIR}/data/palermo_park_1k.hdr")
 
 if(F3D_HAS_RAYTRACING)
   f3d_test(TestOSPRayGLTF WaterBottle.glb "300,300" "-r --samples=1")
