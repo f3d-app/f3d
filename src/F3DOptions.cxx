@@ -197,6 +197,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp3, "filename", "n", "Display filename", options.Filename);
     this->DeclareOption(grp3, "field-data", "y", "Display field data", options.FieldData);
     this->DeclareOption(grp3, "fullscreen", "l", "Full screen", options.FullScreen);
+    this->DeclareOption(grp3, "blur-background", "k", "Blur background", options.BlurBackground);
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
     this->DeclareOptionWithImplicitValue(grp4, "scalars", "s", "Color by scalars", options.Scalars, std::string(""), true, "<array_name>");
