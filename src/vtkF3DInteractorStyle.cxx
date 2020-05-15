@@ -46,18 +46,18 @@ void vtkF3DInteractorStyle::OnKeyPress()
       ren->SetUseDepthPeelingPass(!ren->UsingDepthPeelingPass());
       renWin->Render();
       break;
-    case 'u':
-    case 'U':
+    case 'q':
+    case 'Q':
       ren->SetUseSSAOPass(!ren->UsingSSAOPass());
-      renWin->Render();
-      break;
-    case 'f':
-    case 'F':
-      ren->SetUseFXAAPass(!ren->UsingFXAAPass());
       renWin->Render();
       break;
     case 'a':
     case 'A':
+      ren->SetUseFXAAPass(!ren->UsingFXAAPass());
+      renWin->Render();
+      break;
+    case 't':
+    case 'T':
       ren->SetUseToneMappingPass(!ren->UsingToneMappingPass());
       renWin->Render();
       break;
@@ -81,13 +81,13 @@ void vtkF3DInteractorStyle::OnKeyPress()
       ren->ShowFilename(!ren->IsFilenameVisible());
       renWin->Render();
       break;
-    case 'y':
-    case 'Y':
+    case 'm':
+    case 'M':
       ren->ShowFieldData(!ren->IsFieldDataVisible());
       renWin->Render();
       break;
-    case 't':
-    case 'T':
+    case 'z':
+    case 'Z':
       ren->ShowTimer(!ren->IsTimerVisible());
       renWin->Render();
       if (ren->IsTimerVisible())
@@ -107,8 +107,8 @@ void vtkF3DInteractorStyle::OnKeyPress()
       ren->SetUseRaytracingDenoiser(!ren->UsingRaytracingDenoiser());
       renWin->Render();
       break;
-    case 'z':
-    case 'Z':
+    case 'v':
+    case 'V':
       ren->SetUseVolume(!ren->UsingVolume());
       renWin->Render();
       break;
@@ -122,8 +122,8 @@ void vtkF3DInteractorStyle::OnKeyPress()
       ren->SetUsePointSprites(!ren->UsingPointSprites());
       renWin->Render();
       break;
-    case 'l':
-    case 'L':
+    case 'f':
+    case 'F':
       renWin->SetFullScreen(!renWin->GetFullScreen());
 
       // when going full screen, the OpenGL context changes, we need to reinitialize
@@ -134,14 +134,18 @@ void vtkF3DInteractorStyle::OnKeyPress()
 
       renWin->Render();
       break;
-    case 'k':
-    case 'K':
+    case 'u':
+    case 'U':
       ren->SetUseBlurBackground(!ren->UsingBlurBackground());
       renWin->Render();
       break;
-    case '?':
+    case 'h':
+    case 'H':
       ren->ShowCheatSheet(!ren->IsCheatSheetVisible());
       renWin->Render();
+      break;
+    case '?':
+      ren->DumpSceneState();
       break;
     default:
       std::string keySym = rwi->GetKeySym();

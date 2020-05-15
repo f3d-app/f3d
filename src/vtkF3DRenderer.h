@@ -162,6 +162,11 @@ public:
    */
   void ResetCamera() override;
 
+  /**
+   * Dump useful scene state. Currently supports only camera state.
+   */
+  void DumpSceneState();
+
 protected:
   vtkF3DRenderer() = default;
   ~vtkF3DRenderer() override = default;

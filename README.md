@@ -67,14 +67,14 @@ Options|Description
 --output=\<png file\>|Instead of showing a render view and render into it, *render directly into a png file*.
 --no-background|Output file is saved with a transparent background.
 -h, --help|Print *help*.
--v, --verbose|Enable *verbose* mode.
+--verbose|Enable *verbose* mode.
 --no-render|Verbose mode without any rendering for the first provided file, to recover information about a file.
 --version|Show *version* information.
 -x, --axis|Show *axes* as a trihedron in the scene.
 -g, --grid|Show *a grid* aligned with the XZ plane.
 -e, --edges|Show the *cell edges*.
 --progress|Show a *progress bar* when loading the file.
--m, --geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
+--geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 --dry-run|Do not read the configuration file but consider only the command line options
 
 ## Material options
@@ -99,9 +99,9 @@ Options|Default|Description
 Options|Description
 ------|------
 -p, --depth-peeling|Enable *depth peeling*. This is a technique used to correctly render translucent objects.
--u, --ssao|Enable *Screen-Space Ambient Occlusion*. This is a technique used to improve the depth perception of the object.
--f, --fxaa|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.
--a, --tone-mapping|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
+-q, --ssao|Enable *Screen-Space Ambient Occlusion*. This is a technique used to improve the depth perception of the object.
+-a, --fxaa|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.
+-t, --tone-mapping|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
 
 ## Camera configuration options:
 Options|Description
@@ -127,7 +127,7 @@ Options|Default|Description
 --range=\<min,max\>||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
 -b, --bar||Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
 --colormap=\<color_list\>||Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).<br>Use with the scalar option.
--z, --volume||Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.
+-v, --volume||Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.
 -i, --inverse||Inverse the linear opacity function. Only makes sense with volume rendering.
 
 ## Testing options:
@@ -141,16 +141,16 @@ Options|Default|Description
 ------|------|------
 --bg-color=\<R,G,B\>|0.2, 0.2, 0.2|Set the window *background color*.<br>Ignored if *hdri* is set.
 --resolution=\<width,height\>|1000, 600|Set the *window resolution*.
--t, --timer||Display a *frame per second counter*.
+-z, --fps||Display a *frame per second counter*.
 -n, --filename||Display the *name of the file*.
--y, --field-data||Display the *field data*.<br>This only makes sense when using the default scene.
--l, --fullscreen||Display in fullscreen.
--k, --blur-background||Blur background.<br>This only makes sense when using a HDRI.
+-m, --metadata||Display the *metadata*.<br>This only makes sense when using the default scene.
+-f, --fullscreen||Display in fullscreen.
+-u, --blur-background||Blur background.<br>This only makes sense when using a HDRI.
 
 # Rendering precedence
 Some rendering options are not compatible between them, here is the precedence order if several are defined:
 - Raytracing (`-r`)
-- Volume (`-z`)
+- Volume (`-v`)
 - Point Sprites (`-o`)
 
 # Interaction
@@ -172,19 +172,22 @@ Some options can be toggled directly using interactions:
 * Press `e` key to toggle the display of cell edges.
 * Press `s` key to toggle the coloration by scalar.
 * Press `b` key to toggle the display of the scalar bar, only when coloring with scalars.
-* Press `t` key to toggle the display of the FPS counter.
+* Press `z` key to toggle the display of the FPS counter.
 * Press `n` key to toggle the display of the file name.
-* Press `y` key to toggle the display of the field data if exists.
+* Press `m` key to toggle the display of the metadata if exists.
 * Press `r` key to toggle raytracing.
 * Press `d` key to toggle the denoiser when raytracing.
 * Press `p` key to toggle depth peeling.
-* Press `u` key to toggle Screen-Space Ambient Occlusion.
-* Press `f` key to toggle Fast Approximate Anti-Aliasing.
-* Press `a` key to toggle tone mapping.
+* Press `q` key to toggle Screen-Space Ambient Occlusion.
+* Press `a` key to toggle Fast Approximate Anti-Aliasing.
+* Press `t` key to toggle tone mapping.
 * Press `o` key to toggle point sprites rendering.
-* Press `l` key to toggle full screen.
-* Press `k` key to toggle background blur.
-* Press `?` key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
+* Press `f` key to toggle full screen.
+* Press `u` key to toggle background blur.
+* Press `v` key to toggle volume rendering.
+* Press `i` key to toggle opacity function inversion during volume rendering.
+* Press `h` key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
+* Press `?` key to dump camera state to the terminal.
 
 # Configuration file
 
@@ -245,7 +248,7 @@ On Linux, it will be installed in /etc/f3d/, on Windows, it will be installed in
 * No support for animation.
 * No support for specifying manual lighting in the default scene.
 * Drag&Drop does not work with Thunar file manager.
-* Pressing the `t` hotkey to display the FPS timer triggers a double render.
+* Pressing the `z` hotkey to display the FPS timer triggers a double render.
 
 # Troubleshootings
 
