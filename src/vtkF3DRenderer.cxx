@@ -669,26 +669,27 @@ void vtkF3DRenderer::UpdateCheatSheet()
     cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " P: Depth peeling " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]")
                    << "\n";
-    cheatSheetText << " U: SSAO " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " F: FXAA " << (this->UseFXAAPass ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " A: Tone mapping " << (this->UseToneMappingPass ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " Q: SSAO " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " A: FXAA " << (this->UseFXAAPass ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " T: Tone mapping " << (this->UseToneMappingPass ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " E: Edge visibility " << (this->EdgesVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " X: Axis " << (this->AxisVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " G: Grid " << (this->GridVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " N: File name " << (this->FilenameVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " Y: Field data " << (this->FieldDataVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " T: FPS Timer " << (this->TimerVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " M: Metadata " << (this->FieldDataVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " Z: FPS Timer " << (this->TimerVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " R: Raytracing " << (this->UseRaytracing ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " D: Denoiser " << (this->UseRaytracingDenoiser ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " Z: Volume representation " << (this->UseVolume ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " V: Volume representation " << (this->UseVolume ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " I: Inverse volume opacity "
                    << (this->UseInverseOpacityFunction ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " O: Point sprites " << (this->UsePointSprites ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " L: Full screen "
+    cheatSheetText << " F: Full screen "
                    << (this->GetRenderWindow()->GetFullScreen() ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " K: Blur background " << (this->UseBlurBackground ? "[ON]" : "[OFF]")
+    cheatSheetText << " U: Blur background " << (this->UseBlurBackground ? "[ON]" : "[OFF]")
                    << "\n";
-    cheatSheetText << "\n   ?  : Cheat sheet \n";
+    cheatSheetText << "\n   H  : Cheat sheet \n";
+    cheatSheetText << "   ?  : Dump camera state to the terminal\n";
     cheatSheetText << "  ESC : Quit \n";
     cheatSheetText << " ENTER: Reset camera \n";
     cheatSheetText << " LEFT : Previous file \n";
@@ -863,4 +864,19 @@ bool vtkF3DRenderer::IsBackgroundDark()
   double luminance =
     0.299 * this->Background[0] + 0.587 * this->Background[1] + 0.114 * this->Background[2];
   return luminance < 0.5;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::DumpSceneState()
+{
+  vtkCamera* cam = this->GetActiveCamera();
+  double position[3];
+  double focal[3];
+  double up[3];
+  cam->GetPosition(position);
+  cam->GetFocalPoint(focal);
+  cam->GetViewUp(up);
+  F3DLog::Print(F3DLog::Severity::Info, "Camera position: ", position[0], ",", position[1], ",", position[2]);
+  F3DLog::Print(F3DLog::Severity::Info, "Camera focal point: ", focal[0], ",", focal[1], ",", focal[2]);
+  F3DLog::Print(F3DLog::Severity::Info, "Camera view up: ", up[0], ",", up[1], ",", up[2], "\n");
 }
