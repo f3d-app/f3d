@@ -165,13 +165,13 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp1, "no-background", "", "No background when render to file", options.NoBackground);
     this->DeclareOption(grp1, "help", "h", "Print help");
     this->DeclareOption(grp1, "version", "", "Print version details");
-    this->DeclareOption(grp1, "verbose", "v", "Enable verbose mode", options.Verbose);
+    this->DeclareOption(grp1, "verbose", "", "Enable verbose mode", options.Verbose);
     this->DeclareOption(grp1, "no-render", "", "Verbose mode without any rendering, only for the first file", options.NoRender);
     this->DeclareOption(grp1, "axis", "x", "Show axes", options.Axis);
     this->DeclareOption(grp1, "grid", "g", "Show grid", options.Grid);
     this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.Edges);
     this->DeclareOption(grp1, "progress", "", "Show progress bar", options.Progress);
-    this->DeclareOption(grp1, "geometry-only", "m", "Do not read materials, cameras and lights from file", options.GeometryOnly);
+    this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", options.GeometryOnly);
     this->DeclareOption(grp1, "dry-run", "", "Do not read the configuration file", options.DryRun);
 
     auto grp2 = cxxOptions.add_options("Material");
@@ -193,11 +193,11 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     auto grp3 = cxxOptions.add_options("Window");
     this->DeclareOption(grp3, "bg-color", "", "Background color", options.BackgroundColor, true, "<R,G,B>");
     this->DeclareOption(grp3, "resolution", "", "Window resolution", options.WindowSize, true, "<width,height>");
-    this->DeclareOption(grp3, "timer", "t", "Display frame per second", options.FPS);
+    this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.FPS);
     this->DeclareOption(grp3, "filename", "n", "Display filename", options.Filename);
-    this->DeclareOption(grp3, "field-data", "y", "Display field data", options.FieldData);
-    this->DeclareOption(grp3, "fullscreen", "l", "Full screen", options.FullScreen);
-    this->DeclareOption(grp3, "blur-background", "k", "Blur background", options.BlurBackground);
+    this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.FieldData);
+    this->DeclareOption(grp3, "fullscreen", "f", "Full screen", options.FullScreen);
+    this->DeclareOption(grp3, "blur-background", "u", "Blur background", options.BlurBackground);
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
     this->DeclareOptionWithImplicitValue(grp4, "scalars", "s", "Color by scalars", options.Scalars, std::string(""), true, "<array_name>");
@@ -207,7 +207,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.Bar);
     this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.LookupPoints,
       true, "<color_list>");
-    this->DeclareOption(grp4, "volume", "z", "Show volume if the file is compatible", options.Volume);
+    this->DeclareOption(grp4, "volume", "v", "Show volume if the file is compatible", options.Volume);
     this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.InverseOpacityFunction);
 
     auto grpCamera = cxxOptions.add_options("Camera");
@@ -225,9 +225,9 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
 
     auto grp6 = cxxOptions.add_options("PostFX (OpenGL)");
     this->DeclareOption(grp6, "depth-peeling", "p", "Enable depth peeling", options.DepthPeeling);
-    this->DeclareOption(grp6, "ssao", "u", "Enable Screen-Space Ambient Occlusion", options.SSAO);
-    this->DeclareOption(grp6, "fxaa", "f", "Enable Fast Approximate Anti-Aliasing", options.FXAA);
-    this->DeclareOption(grp6, "tone-mapping", "a", "Enable Tone Mapping", options.ToneMapping);
+    this->DeclareOption(grp6, "ssao", "q", "Enable Screen-Space Ambient Occlusion", options.SSAO);
+    this->DeclareOption(grp6, "fxaa", "a", "Enable Fast Approximate Anti-Aliasing", options.FXAA);
+    this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping", options.ToneMapping);
 
     auto grp7 = cxxOptions.add_options("Testing");
     this->DeclareOption(grp7, "ref", "", "Reference", options.Reference, false, "<png file>");
@@ -251,17 +251,20 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
         " e         Toggle the edges display\n"
         " s         Toggle the coloration by scalar\n"
         " b         Toggle the scalar bar display\n"
-        " t         Toggle the FPS counter display\n"
+        " z         Toggle the FPS counter display\n"
         " n         Toggle the filename display\n"
-        " y         Toggle the field data display\n"
+        " m         Toggle the metadata display\n"
         " r         Toggle raytracing rendering\n"
         " d         Toggle denoising when raytracing\n"
         " p         Toggle depth peeling\n"
-        " u         Toggle SSAO\n"
-        " f         Toggle FXAA\n"
-        " a         Toggle tone mapping\n"
+        " q         Toggle SSAO\n"
+        " a         Toggle FXAA\n"
+        " t         Toggle tone mapping\n"
         " o         Toggle point sprites rendering\n"
-        " l         Toggle full screen\n");
+        " f         Toggle full screen\n"
+        " v         Toggle volume rendering\n"
+        " i         Toggle inverse opacity\n"
+        " u         Toggle blur background\n");
       exit(EXIT_SUCCESS);
     }
 
@@ -696,22 +699,10 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
         "Specifying to render using Depth Peeling has no effect when using Raytracing.");
       ret = false;
     }
-    if (defaultOptions.FXAA != options.FXAA)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to render using FXAA has no effect when using Raytracing.");
-      ret = false;
-    }
     if (defaultOptions.SSAO != options.SSAO)
     {
       F3DLog::Print(F3DLog::Severity::Info,
         "Specifying to render using SSAO has no effect when using Raytracing.");
-      ret = false;
-    }
-    if (defaultOptions.ToneMapping != options.ToneMapping)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to render using ToneMapping has no effect when using Raytracing.");
       ret = false;
     }
   }
