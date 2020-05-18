@@ -39,7 +39,7 @@ Then build the software using your build system.
 
 Here is the list of supported file formats:
 * **.vtk** : the legacy VTK format
-* **.vt\*** : XML based VTK formats
+* **.vt[p|u|i|r|s]** : XML based VTK formats
 * **.ply** : Polygon File format
 * **.stl** : Standard Triangle Language format
 * **.dcm** : DICOM file format
