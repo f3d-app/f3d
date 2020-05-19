@@ -85,11 +85,8 @@ int F3DLoader::Start(int argc, char** argv)
 #endif
   }
 
-  if (files.size() > 0)
-  {
-    this->AddFiles(files);
-    this->LoadFile();
-  }
+  this->AddFiles(files);
+  this->LoadFile();
 
   int retVal = EXIT_SUCCESS;
   if (!options.NoRender)
@@ -163,26 +160,24 @@ void F3DLoader::AddFile(const std::string& path, bool recursive)
 //----------------------------------------------------------------------------
 void F3DLoader::LoadFile(int load)
 {
+  std::string filePath, fileInfo;
   int size = static_cast<int>(this->FilesList.size());
-  if (size == 0)
+  if (size > 0)
   {
-    return;
+    // Compute the correct file index
+    this->CurrentFileIndex = (this->CurrentFileIndex + load) % size;
+    this->CurrentFileIndex =
+      this->CurrentFileIndex < 0 ? this->CurrentFileIndex + size : this->CurrentFileIndex;
+
+    if (this->CurrentFileIndex >= size)
+    {
+      F3DLog::Print(F3DLog::Severity::Error, "Cannot load file index ", this->CurrentFileIndex);
+      return;
+    }
+    filePath = this->FilesList[this->CurrentFileIndex];
+    fileInfo = "(" + std::to_string(this->CurrentFileIndex + 1) + "/" +
+      std::to_string(size) + ") " + vtksys::SystemTools::GetFilenameName(filePath);
   }
-
-  // Compute the correct file index
-  this->CurrentFileIndex = (this->CurrentFileIndex + load) % size;
-  this->CurrentFileIndex =
-    this->CurrentFileIndex < 0 ? this->CurrentFileIndex + size : this->CurrentFileIndex;
-
-  if (this->CurrentFileIndex >= size)
-  {
-    F3DLog::Print(F3DLog::Severity::Error, "Cannot load file index ", this->CurrentFileIndex);
-    return;
-  }
-
-  std::string filePath = this->FilesList[this->CurrentFileIndex];
-  std::string fileInfo = "(" + std::to_string(this->CurrentFileIndex + 1) + "/" +
-    std::to_string(size) + ") " + vtksys::SystemTools::GetFilenameName(filePath);
 
   F3DOptions opts = this->Parser.GetOptionsFromCommandLine();
   if (!opts.DryRun)
@@ -192,7 +187,21 @@ void F3DLoader::LoadFile(int load)
 
   if (opts.Verbose || opts.NoRender)
   {
-    F3DLog::Print(F3DLog::Severity::Info, "Loading: ", filePath, "\n");
+    if (filePath.empty())
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "No file to load provided\n");
+    }
+    else
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Loading: ", filePath, "\n");
+    }
+  }
+
+  if (filePath.empty())
+  {
+    fileInfo += "No file to load provided, please drop one into this window";
+    this->Renderer->Initialize(opts, fileInfo);
+    return;
   }
 
   vtkSmartPointer<vtkImporter> importer = this->GetImporter(opts, filePath);
