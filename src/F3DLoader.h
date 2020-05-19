@@ -49,7 +49,7 @@ public:
   void AddFile(const std::string& path, bool recursive = true);
 
   /**
-   * Load a file
+   * Load a file if any have been added
    * Set the load arguement to LOAD_PREVIOUS or LOAD_NEXT to change file index
    */
   void LoadFile(int load = F3DLoader::LOAD_CURRENT);

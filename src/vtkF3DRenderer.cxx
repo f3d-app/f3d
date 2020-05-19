@@ -474,10 +474,9 @@ bool vtkF3DRenderer::UsingVolume()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
 {
-  if (this->UseVolume)
+  this->UseInverseOpacityFunction = use;
+  if (this->VolumeProp)
   {
-    this->UseInverseOpacityFunction = use;
-
     vtkPiecewiseFunction* pwf = this->VolumeProp->GetProperty()->GetScalarOpacity();
     if (pwf->GetSize() == 2)
     {
@@ -488,8 +487,8 @@ void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
       pwf->AddPoint(range[0], this->UseInverseOpacityFunction ? 1.0 : 0.0);
       pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
     }
+    this->SetupRenderPasses();
   }
-  this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -531,15 +530,12 @@ bool vtkF3DRenderer::UsingRaytracingDenoiser()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowScalars(bool show)
 {
-  if (!this->UseVolume) // when using volume, scalars are always enabled
+  this->ScalarsVisible = show;
+  if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper)
   {
-    this->ScalarsVisible = show;
-    if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper)
-    {
-      this->PolyDataMapper->SetScalarVisibility(show);
-      this->PointGaussianMapper->SetScalarVisibility(show);
-      this->ShowScalarBar(this->ScalarBarVisible);
-    }
+    this->PolyDataMapper->SetScalarVisibility(show);
+    this->PointGaussianMapper->SetScalarVisibility(show);
+    this->ShowScalarBar(this->ScalarBarVisible);
   }
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
