@@ -18,6 +18,14 @@ It supports a range of file formats, rendering and texturing options.
 You can find the release binary packages for Windows, Linux, and OSX on the [Release page](https://gitlab.kitware.com/f3d/f3d/-/releases).
 Alternatively, you can build it yourself, following the [build guide](#build).
 
+# How to use
+
+There is mainly three ways to use F3D.
+
+ * By running F3D from a terminal with command-line options.
+ * By running F3D directly and then using drag&drop files into it to open them.
+ * By using F3D as an "Open with" program with specific file types.
+
 # Build
 
 ## Dependencies
