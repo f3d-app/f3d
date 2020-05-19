@@ -14,7 +14,7 @@
     "scalars": "",
     "bar": true
   },
-  ".*[dcm|nrrd|mhd|vti]":
+  ".*[dcm|nrrd|mhd|mha|vti]":
   {
     "volume": true,
     "scalars": "",
