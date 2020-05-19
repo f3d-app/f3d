@@ -161,33 +161,36 @@ Simple interaction with the displayed data is possible directly within the windo
 * *Click and drag* vertically with the *right* mouse button to zoom in/out.
 * *Move the mouse wheel* to zoom in/out.
 * *Click and drag* with the *middle* mouse button to translate the camera.
-* Press `Return` key to reset the camera to its inital parameters.
-* Press `Escape` key to close the window and quit F3D.
-* Press `Left/Right` to load the next/previous file if any
-* Drag and Drop a file to load it
+* Drag and Drop a file or directory into the F3D window to load it
 
 Some options can be toggled directly using interactions:
-* Press `x` key to toggle the trihedral axes display.
-* Press `g` key to toggle the XZ grid display.
-* Press `e` key to toggle the display of cell edges.
-* Press `s` key to toggle the coloration by scalar.
-* Press `b` key to toggle the display of the scalar bar, only when coloring with scalars.
-* Press `z` key to toggle the display of the FPS counter.
-* Press `n` key to toggle the display of the file name.
-* Press `m` key to toggle the display of the metadata if exists.
-* Press `r` key to toggle raytracing.
-* Press `d` key to toggle the denoiser when raytracing.
-* Press `p` key to toggle depth peeling.
-* Press `q` key to toggle Screen-Space Ambient Occlusion.
-* Press `a` key to toggle Fast Approximate Anti-Aliasing.
-* Press `t` key to toggle tone mapping.
-* Press `o` key to toggle point sprites rendering.
-* Press `f` key to toggle full screen.
-* Press `u` key to toggle background blur.
-* Press `v` key to toggle volume rendering.
-* Press `i` key to toggle opacity function inversion during volume rendering.
-* Press `h` key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
+* Press `S` key to toggle the coloration by scalar.
+* Press `B` key to toggle the display of the scalar bar, only when coloring with scalars.
+* Press `P` key to toggle depth peeling.
+* Press `Q` key to toggle Screen-Space Ambient Occlusion.
+* Press `A` key to toggle Fast Approximate Anti-Aliasing.
+* Press `T` key to toggle tone mapping.
+* Press `E` key to toggle the display of cell edges.
+* Press `X` key to toggle the trihedral axes display.
+* Press `G` key to toggle the XZ grid display.
+* Press `N` key to toggle the display of the file name.
+* Press `M` key to toggle the display of the metadata if exists.
+* Press `Z` key to toggle the display of the FPS counter.
+* Press `R` key to toggle raytracing.
+* Press `D` key to toggle the denoiser when raytracing.
+* Press `V` key to toggle volume rendering.
+* Press `I` key to toggle opacity function inversion during volume rendering.
+* Press `O` key to toggle point sprites rendering.
+* Press `F` key to toggle full screen.
+* Press `U` key to toggle background blur.
+
+Other interactions are available:
+* Press `H` key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
 * Press `?` key to dump camera state to the terminal.
+* Press `ESC` key to close the window and quit F3D.
+* Press `ENTER` key to reset the camera to its inital parameters.
+* Press `LEFT` to load the previous file if any
+* Press `RIGHT` to load the next file if any
 
 # Configuration file
 
