@@ -83,7 +83,7 @@ void vtkF3DInteractorStyle::OnKeyPress()
       break;
     case 'm':
     case 'M':
-      ren->ShowFieldData(!ren->IsFieldDataVisible());
+      ren->ShowMetaData(!ren->IsMetaDataVisible());
       renWin->Render();
       break;
     case 'z':

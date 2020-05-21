@@ -25,7 +25,7 @@ struct F3DOptions
   bool Edges = false;
   bool FPS = false;
   bool Filename = false;
-  bool FieldData = false;
+  bool MetaData = false;
   bool FXAA = false;
   bool GeometryOnly = false;
   bool Grid = false;
