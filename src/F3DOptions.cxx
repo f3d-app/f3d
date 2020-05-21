@@ -195,7 +195,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp3, "resolution", "", "Window resolution", options.WindowSize, true, "<width,height>");
     this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.FPS);
     this->DeclareOption(grp3, "filename", "n", "Display filename", options.Filename);
-    this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.FieldData);
+    this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.MetaData);
     this->DeclareOption(grp3, "fullscreen", "f", "Full screen", options.FullScreen);
     this->DeclareOption(grp3, "blur-background", "u", "Blur background", options.BlurBackground);
 
@@ -528,10 +528,10 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
 
   if (!usingDefaultScene)
   {
-    if (defaultOptions.FieldData != options.FieldData)
+    if (defaultOptions.MetaData != options.MetaData)
     {
       F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to show field data while not using the default scene has no effect.");
+        "Specifying to show meta data while not using the default scene has no effect.");
       ret = false;
     }
     if (defaultOptions.PointSprites != options.PointSprites)
