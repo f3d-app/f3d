@@ -209,6 +209,14 @@ void F3DLoader::LoadFile(int load)
   vtkNew<vtkProgressBarWidget> progressWidget;
   if (!opts.NoRender)
   {
+    this->Renderer->SetScalarBarActor(nullptr);
+    this->Renderer->SetGeometryActor(nullptr);
+    this->Renderer->SetPointSpritesActor(nullptr);
+    this->Renderer->SetVolumeProp(nullptr);
+    this->Renderer->SetPolyDataMapper(nullptr);
+    this->Renderer->SetPointGaussianMapper(nullptr);
+    this->Renderer->SetVolumeMapper(nullptr);
+
     if (!importer)
     {
       F3DLog::Print(
