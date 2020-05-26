@@ -26,6 +26,7 @@
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
+#include <vtkImageToPoints.h>
 #include <vtkInformation.h>
 #include <vtkLightKit.h>
 #include <vtkMultiBlockDataSet.h>
@@ -35,12 +36,15 @@
 #include <vtkPointGaussianMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
+#include <vtkRectilinearGrid.h>
+#include <vtkRectilinearGridToPointSet.h>
 #include <vtkRenderer.h>
 #include <vtkScalarBarActor.h>
 #include <vtkScalarsToColors.h>
 #include <vtkSmartPointer.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkTexture.h>
+#include <vtkVertexGlyphFilter.h>
 #include <vtkVolumeProperty.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -121,12 +125,43 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   // Recover the surface of the dataset if not available already
   vtkSmartPointer<vtkPolyData> surface = vtkPolyData::SafeDownCast(dataset);
+  vtkSmartPointer<vtkPolyData> cloud = surface;
   if (!surface)
   {
     vtkNew<vtkDataSetSurfaceFilter> geom;
     geom->SetInputData(dataset);
     geom->Update();
     surface = vtkPolyData::SafeDownCast(geom->GetOutput());
+
+    if (image)
+    {
+      vtkNew<vtkImageToPoints> imageCloudFilter;
+      imageCloudFilter->SetInputData(dataset);
+      imageCloudFilter->Update();
+      cloud = vtkPolyData::SafeDownCast(imageCloudFilter->GetOutput());
+    }
+    else if (vtkRectilinearGrid::SafeDownCast(dataset))
+    {
+      vtkNew<vtkRectilinearGridToPointSet> pointSetFilter;
+      pointSetFilter->SetInputData(dataset);
+      vtkNew<vtkVertexGlyphFilter> vertexFilter;
+      vertexFilter->SetInputConnection(pointSetFilter->GetOutputPort());
+      vertexFilter->Update();
+      cloud = vtkPolyData::SafeDownCast(vertexFilter->GetOutput());
+    }
+    else if (vtkPointSet::SafeDownCast(dataset))
+    {
+      vtkNew<vtkVertexGlyphFilter> vertexFilter;
+      vertexFilter->SetInputData(dataset);
+      vertexFilter->Update();
+      cloud = vtkPolyData::SafeDownCast(vertexFilter->GetOutput());
+    }
+    else
+    {
+      F3DLog::Print(F3DLog::Severity::Warning,
+        "Provided dataset is not convertable to a point cloud for sprites rendering, using its surface instead.");
+      cloud = surface;
+    }
   }
 
   if (!surface || !this->Options)
@@ -139,7 +174,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   // Configure polydata mapper
   this->PolyDataMapper->InterpolateScalarsBeforeMappingOn();
-  this->PolyDataMapper->SetColorModeToMapScalars();
   this->PolyDataMapper->SetInputData(surface);
 
   // Configure Point Gaussian mapper
@@ -147,6 +181,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   surface->GetBounds(bounds);
   vtkBoundingBox bbox(bounds);
   double pointSize = this->Options->PointSize * bbox.GetDiagonalLength() * 0.001;
+  this->PointGaussianMapper->SetInputData(cloud);
   this->PointGaussianMapper->SetScaleFactor(pointSize);
   this->PointGaussianMapper->EmissiveOff();
   this->PointGaussianMapper->SetSplatShaderCode(
@@ -159,19 +194,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     "  ambientColor *= scale;\n"
     "  diffuseColor *= scale;\n"
     "}\n");
-
-  // The VBO used in mappers is shared between mappers if the input points is the same instance.
-  // This can be an issue if a mapper supports Shift/Scale but not the other.
-  // vtkOpenGLPolyDataMapper supports it but not vtkOpenGLPointGaussianMapper.
-  // So we need to duplicate the points but we can shallow copy the point data and discard the rest.
-  vtkNew<vtkPolyData> pointsPolyData;
-  pointsPolyData->GetPointData()->ShallowCopy(surface->GetPointData());
-
-  vtkNew<vtkPoints> pts;
-  pts->DeepCopy(surface->GetPoints());
-  pointsPolyData->SetPoints(pts);
-
-  this->PointGaussianMapper->SetInputData(pointsPolyData);
 
   std::string usedArray = this->Options->Scalars;
   vtkDataSetAttributes* data = this->Options->Cells
@@ -419,6 +441,7 @@ void vtkF3DGenericImporter::ConfigureVolumeForColoring(vtkSmartVolumeMapper* map
 void vtkF3DGenericImporter::ConfigureMapperForColoring(
   vtkPolyDataMapper* mapper, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2])
 {
+  mapper->SetColorModeToMapScalars();
   mapper->SelectColorArray(array->GetName());
   mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
                                              : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
