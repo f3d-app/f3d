@@ -79,6 +79,13 @@ public:
   vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
   //@}
 
+  //@{
+  /**
+   * Access to specific flags
+   */
+  vtkGetMacro(ScalarsAvailable, bool);
+  //@}
+
 protected:
   vtkF3DGenericImporter() = default;
   ~vtkF3DGenericImporter() override = default;
@@ -92,8 +99,8 @@ protected:
   void ConfigureMapperForColoring(
     vtkPolyDataMapper* mapper, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2]);
 
-  void ConfigureVolumeForColoring(
-    vtkVolume* volume, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2]);
+  void ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
+    vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2]);
 
   vtkNew<vtkF3DMetaReader> Reader;
 
@@ -106,6 +113,7 @@ protected:
   vtkNew<vtkPointGaussianMapper> PointGaussianMapper;
   vtkNew<vtkSmartVolumeMapper> VolumeMapper;
   std::string OutputDescription;
+  bool ScalarsAvailable = false;
 
 private:
   vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;

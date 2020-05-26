@@ -47,7 +47,7 @@ Then build the software using your build system.
 
 Here is the list of supported file formats:
 * **.vtk** : the legacy VTK format
-* **.vt[p|u|i|r|s]** : XML based VTK formats
+* **.vt[p|u|r|i|s|m]** : XML based VTK formats
 * **.ply** : Polygon File format
 * **.stl** : Standard Triangle Language format
 * **.dcm** : DICOM file format
@@ -260,6 +260,8 @@ On Linux, it will be installed in /etc/f3d/, on Windows, it will be installed in
 * No support for specifying manual lighting in the default scene.
 * Drag&Drop does not work with Thunar file manager.
 * Pressing the `z` hotkey to display the FPS timer triggers a double render.
+* Volume rendering is only available for 3D image data
+* Multiblock (.vtm, .gml) support is partial, non-surfacic data will be converted into surfaces.
 
 # Troubleshootings
 

@@ -81,7 +81,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->FilenameVisible = this->Options.Filename;
   this->FieldDataVisible = this->Options.FieldData;
   this->ScalarBarVisible = this->Options.Bar;
-  this->ScalarsVisible = this->Options.Volume || this->Options.Scalars != f3d::F3DReservedString;
+  this->ScalarsVisible = this->Options.Scalars != f3d::F3DReservedString;
   this->UseRaytracing = this->Options.Raytracing;
   this->UseRaytracingDenoiser = this->Options.Denoise;
   this->UseDepthPeelingPass = this->Options.DepthPeeling;
@@ -190,8 +190,6 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
 
   this->TimerActor->SetInput("0 fps");
 
-  this->ShowOptions();
-
   this->SetupRenderPasses();
 }
 
@@ -297,6 +295,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
     this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
     this->AxisWidget->On();
     this->AxisWidget->InteractiveOff();
+    this->AxisWidget->SetKeyPressActivation(false);
   }
   else
   {
@@ -445,7 +444,7 @@ bool vtkF3DRenderer::UsingToneMappingPass()
 void vtkF3DRenderer::SetUsePointSprites(bool use)
 {
   this->UsePointSprites = use;
-  this->UpdateActorVisibility();
+  this->UpdateActorsVisibility();
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
@@ -460,7 +459,7 @@ bool vtkF3DRenderer::UsingPointSprites()
 void vtkF3DRenderer::SetUseVolume(bool use)
 {
   this->UseVolume = use;
-  this->UpdateActorVisibility();
+  this->UpdateActorsVisibility();
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
@@ -502,7 +501,7 @@ bool vtkF3DRenderer::UsingInverseOpacityFunction()
 void vtkF3DRenderer::SetUseRaytracing(bool use)
 {
   this->UseRaytracing = use;
-  this->UpdateActorVisibility();
+  this->UpdateActorsVisibility();
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
@@ -533,9 +532,15 @@ void vtkF3DRenderer::ShowScalars(bool show)
   this->ScalarsVisible = show;
   if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper)
   {
+    if (show && !this->ScalarsAvailable)
+    {
+      F3DLog::Print(F3DLog::Severity::Error,
+        "Cannot show scalars with this dataset or with the requested array");
+      show = false;
+    }
     this->PolyDataMapper->SetScalarVisibility(show);
     this->PointGaussianMapper->SetScalarVisibility(show);
-    this->ShowScalarBar(this->ScalarBarVisible);
+    this->UpdateScalarBarVisibility();
   }
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
@@ -551,10 +556,7 @@ bool vtkF3DRenderer::AreScalarsVisible()
 void vtkF3DRenderer::ShowScalarBar(bool show)
 {
   this->ScalarBarVisible = show;
-  if (this->ScalarBarActor)
-  {
-    this->ScalarBarActor->SetVisibility(show && (this->ScalarsVisible || this->UseVolume));
-  }
+  this->UpdateScalarBarVisibility();
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
@@ -721,7 +723,6 @@ void vtkF3DRenderer::ShowOptions()
 {
   this->ShowGrid(this->GridVisible);
   this->ShowAxis(this->AxisVisible);
-  this->ShowScalarBar(this->ScalarBarVisible);
   this->ShowScalars(this->ScalarsVisible);
   this->ShowTimer(this->TimerVisible);
   this->ShowEdge(this->EdgesVisible);
@@ -826,7 +827,7 @@ void vtkF3DRenderer::ResetCamera()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::UpdateActorVisibility()
+void vtkF3DRenderer::UpdateActorsVisibility()
 {
   if (this->GeometryActor)
   {
@@ -843,14 +844,24 @@ void vtkF3DRenderer::UpdateActorVisibility()
     bool visibility = !this->UseRaytracing && this->UseVolume;
     vtkSmartVolumeMapper* mapper =
       vtkSmartVolumeMapper::SafeDownCast(this->VolumeProp->GetMapper());
-    if (visibility && (!mapper || !mapper->GetInput()))
+    if (visibility && (!mapper || !mapper->GetInput() || !this->ScalarsAvailable))
     {
-      F3DLog::Print(F3DLog::Severity::Error, "Cannot use volume with this dataset");
+      F3DLog::Print(
+        F3DLog::Severity::Error, "Cannot use volume with this dataset or with the requested array");
+      visibility = false;
     }
-    else
-    {
-      this->VolumeProp->SetVisibility(visibility);
-    }
+    this->VolumeProp->SetVisibility(visibility);
+  }
+  this->UpdateScalarBarVisibility();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateScalarBarVisibility()
+{
+  if (this->ScalarBarActor)
+  {
+    this->ScalarBarActor->SetVisibility(this->ScalarBarVisible && this->ScalarsAvailable &&
+      (this->ScalarsVisible || this->UseVolume));
   }
 }
 
