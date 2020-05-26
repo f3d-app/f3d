@@ -63,7 +63,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   this->Reader->Update();
 
-  vtkSmartPointer<vtkDataObject> dataObject = this->Reader->GetOutput();
+  vtkDataObject* dataObject = this->Reader->GetOutput();
 
   if (this->Options->Verbose || this->Options->NoRender)
   {
@@ -71,6 +71,9 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   }
 
   vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(dataObject);
+  vtkSmartPointer<vtkDataSet> dataset = vtkDataSet::SafeDownCast(dataObject);
+
+  // Convert multiblock input and a surfacic dataset
   if (mb)
   {
     vtkNew<vtkAppendPolyData> append;
@@ -82,30 +85,49 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-      vtkNew<vtkDataSetSurfaceFilter> geom;
-      geom->SetInputData(iter->GetCurrentDataObject());
-      geom->Update();
-      append->AddInputData(vtkPolyData::SafeDownCast(geom->GetOutput()));
+      vtkDataSet* leafDS = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      vtkSmartPointer<vtkPolyData> leafPD = vtkPolyData::SafeDownCast(leafDS);
+      if (!leafDS)
+      {
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "A non data set block was ignored while reading a multiblock.");
+      }
+      else
+      {
+        if (!leafPD)
+        {
+          F3DLog::Print(F3DLog::Severity::Warning,
+            "A non polydata block was converted into a surface while reading a multiblock.");
+
+          vtkNew<vtkDataSetSurfaceFilter> geom;
+          geom->SetInputData(iter->GetCurrentDataObject());
+          geom->Update();
+          leafPD = vtkPolyData::SafeDownCast(geom->GetOutput());
+        }
+        append->AddInputData(leafPD);
+      }
     }
 
     append->Update();
-    dataObject = append->GetOutput();
+    dataset = append->GetOutput();
   }
-  else
+
+  // Check if input is an image
+  vtkImageData* image = vtkImageData::SafeDownCast(dataset);
+  if (image)
   {
-    vtkImageData* image = vtkImageData::SafeDownCast(dataObject);
-    if (image)
-    {
-      this->VolumeMapper->SetInputData(image);
-    }
-
-    vtkNew<vtkDataSetSurfaceFilter> geom;
-    geom->SetInputConnection(this->Reader->GetOutputPort());
-    geom->Update();
-    dataObject = geom->GetOutput();
+    this->VolumeMapper->SetInputData(image);
   }
 
-  vtkPolyData* surface = vtkPolyData::SafeDownCast(dataObject);
+  // Recover the surface of the dataset if not available already
+  vtkSmartPointer<vtkPolyData> surface = vtkPolyData::SafeDownCast(dataset);
+  if (!surface)
+  {
+    vtkNew<vtkDataSetSurfaceFilter> geom;
+    geom->SetInputData(dataset);
+    geom->Update();
+    surface = vtkPolyData::SafeDownCast(geom->GetOutput());
+  }
 
   if (!surface || !this->Options)
   {
@@ -151,23 +173,15 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   this->PointGaussianMapper->SetInputData(pointsPolyData);
 
-  vtkPointData* pointData = surface->GetPointData();
-  vtkCellData* cellData = surface->GetCellData();
   std::string usedArray = this->Options->Scalars;
+  vtkDataSetAttributes* data = this->Options->Cells
+    ? static_cast<vtkDataSetAttributes*>(dataset->GetCellData())
+    : static_cast<vtkDataSetAttributes*>(dataset->GetPointData());
 
   // Recover an array for coloring if we ever need it
-  if (usedArray.empty() || this->Options->Volume || usedArray == f3d::F3DReservedString)
+  if (usedArray.empty() || usedArray == f3d::F3DReservedString)
   {
-    vtkDataArray* array = nullptr;
-    if (this->Options->Cells)
-    {
-      array = cellData->GetScalars();
-    }
-    else
-    {
-      array = pointData->GetScalars();
-    }
-
+    vtkDataArray* array = data->GetScalars();
     bool print = (this->Options->Verbose || this->Options->NoRender);
     if (array)
     {
@@ -179,13 +193,9 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     }
     else
     {
-      if (this->Options->Cells && cellData->GetNumberOfArrays() > 0)
+      if (data->GetNumberOfArrays() > 0)
       {
-        array = cellData->GetArray(0);
-      }
-      else if (!this->Options->Cells && pointData->GetNumberOfArrays() > 0)
-      {
-        array = pointData->GetArray(0);
+        array = data->GetArray(0);
       }
 
       if (array)
@@ -201,15 +211,15 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
         usedArray = "";
         if (print)
         {
-          F3DLog::Print(F3DLog::Severity::Info, "No array found for scalar coloring");
+          F3DLog::Print(
+            F3DLog::Severity::Info, "No array found for scalar coloring and volume rendering");
         }
       }
     }
   }
 
   // Configure the mappers for coloring if it is ever needed
-  vtkDataArray* array = this->Options->Cells ? cellData->GetArray(usedArray.c_str())
-                                             : pointData->GetArray(usedArray.c_str());
+  vtkDataArray* array = data->GetArray(usedArray.c_str());
   if (array)
   {
     if (this->Options->Component < array->GetNumberOfComponents())
@@ -265,7 +275,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
       if (this->VolumeMapper->GetInput())
       {
-        this->ConfigureVolumeForColoring(this->VolumeProp, array, ctf, range);
+        this->ConfigureVolumeForColoring(this->VolumeMapper, this->VolumeProp, array, ctf, range);
       }
 
       this->ConfigureMapperForColoring(this->PointGaussianMapper, array, ctf, range);
@@ -286,18 +296,21 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       this->ScalarBarActor->SetWidth(0.8);
       this->ScalarBarActor->SetHeight(0.07);
       this->ScalarBarActor->SetPosition(0.1, 0.01);
-      this->ScalarBarActor->SetVisibility(this->Options->Bar);
       ren->AddActor2D(this->ScalarBarActor);
+
+      this->ScalarsAvailable = true;
     }
     else
     {
       F3DLog::Print(
         F3DLog::Severity::Warning, "Invalid component index: ", this->Options->Component);
+      this->ScalarsAvailable = false;
     }
   }
   else if (!usedArray.empty() && !(usedArray == f3d::F3DReservedString))
   {
     F3DLog::Print(F3DLog::Severity::Warning, "Unknow scalar array: ", usedArray);
+    this->ScalarsAvailable = false;
   }
 
   // configure props
@@ -334,33 +347,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   ren->AddActor(this->GeometryActor);
   ren->AddActor(this->PointSpritesActor);
   ren->AddVolume(this->VolumeProp);
-
-  if (!this->Options->Raytracing && this->Options->PointSprites)
-  {
-    this->PointSpritesActor->VisibilityOn();
-    this->GeometryActor->VisibilityOff();
-    this->VolumeProp->VisibilityOff();
-  }
-  else if (!this->Options->Raytracing && this->Options->Volume)
-  {
-    this->PointSpritesActor->VisibilityOff();
-    this->GeometryActor->VisibilityOff();
-
-    if (this->VolumeMapper->GetInput())
-    {
-      this->VolumeProp->VisibilityOn();
-    }
-    else
-    {
-      F3DLog::Print(F3DLog::Severity::Error, "Cannot use volume with this dataset");
-    }
-  }
-  else
-  {
-    this->PointSpritesActor->VisibilityOff();
-    this->GeometryActor->VisibilityOn();
-    this->VolumeProp->VisibilityOff();
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -398,9 +384,24 @@ vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::ConfigureVolumeForColoring(
+void vtkF3DGenericImporter::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper,
   vtkVolume* volume, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2])
 {
+  mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
+                                             : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+  mapper->SelectScalarArray(array->GetName());
+
+  // comp > 4 is actually not supported and will fail with a vtk error
+  if (this->Options->Component >= 0)
+  {
+    mapper->SetVectorMode(vtkSmartVolumeMapper::COMPONENT);
+    mapper->SetVectorComponent(this->Options->Component);
+  }
+  else if (this->Options->Component == -1)
+  {
+    mapper->SetVectorMode(vtkSmartVolumeMapper::MAGNITUDE);
+  }
+
   vtkNew<vtkPiecewiseFunction> otf;
   otf->AddPoint(range[0], this->Options->InverseOpacityFunction ? 1.0 : 0.0);
   otf->AddPoint(range[1], this->Options->InverseOpacityFunction ? 0.0 : 1.0);

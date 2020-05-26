@@ -82,9 +82,8 @@ void vtkF3DMetaReader::SetFileName(const std::string& fileName)
       this->InternalReader = reader;
     }
     if (!this->InternalReader &&
-        (ext == ".vtp" || ext == ".vtu" ||
-         ext == ".vti" || ext == ".vtr" ||
-         ext == ".vtr"))
+      (ext == ".vtp" || ext == ".vtu" || ext == ".vti" || ext == ".vtr" || ext == ".vts" ||
+        ext == ".vtm"))
     {
       vtkNew<vtkXMLGenericDataObjectReader> reader;
       reader->SetFileName(this->FileName);
