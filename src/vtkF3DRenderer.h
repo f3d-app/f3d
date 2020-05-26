@@ -143,6 +143,12 @@ public:
   //@}
 
   /**
+   * Set the ScalarsAvailable flag to inform the renderer that
+   * scalars rendering can be done.
+   */
+  vtkSetMacro(ScalarsAvailable, bool);
+
+  /**
    * Get the OpenGL skybox
    */
   vtkGetObjectMacro(Skybox, vtkSkybox);
@@ -167,13 +173,18 @@ public:
    */
   void DumpSceneState();
 
+  /**
+   * This considers the state of the renderer and update
+   * actor visibilities accordingly
+   */
+  void UpdateActorsVisibility();
+
 protected:
   vtkF3DRenderer() = default;
   ~vtkF3DRenderer() override = default;
 
   void ReleaseGraphicsResources(vtkWindow* w) override;
-
-  void UpdateActorVisibility();
+  void UpdateScalarBarVisibility();
 
   bool IsBackgroundDark();
 
@@ -200,6 +211,7 @@ protected:
   vtkNew<vtkCornerAnnotation> FieldDataActor;
   vtkNew<vtkCornerAnnotation> CheatSheetActor;
   bool CheatSheetNeedUpdate = false;
+  bool ScalarsAvailable = false;
 
   // vtkCornerAnnotation building is too slow for the timer
   vtkNew<vtkTextActor> TimerActor;
