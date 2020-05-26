@@ -13,6 +13,8 @@
 #include <vtkBoundingBox.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
+#include <vtkCellData.h>
+#include <vtkDataArray.h>
 #include <vtkFieldData.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
@@ -24,6 +26,7 @@
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkPiecewiseFunction.h>
+#include <vtkPointData.h>
 #include <vtkProperty.h>
 #include <vtkRenderPassCollection.h>
 #include <vtkRenderWindowInteractor.h>
@@ -79,7 +82,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->EdgesVisible = this->Options.Edges;
   this->TimerVisible = this->Options.FPS;
   this->FilenameVisible = this->Options.Filename;
-  this->FieldDataVisible = this->Options.FieldData;
+  this->MetaDataVisible = this->Options.MetaData;
   this->ScalarBarVisible = this->Options.Bar;
   this->ScalarsVisible = this->Options.Scalars != f3d::F3DReservedString;
   this->UseRaytracing = this->Options.Raytracing;
@@ -171,12 +174,12 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->FilenameActor->GetTextProperty()->SetColor(textColor);
   this->FilenameActor->RenderOpaqueGeometry(this);
 
-  this->FieldDataActor->GetTextProperty()->SetFontFamilyToCourier();
-  this->FieldDataActor->GetTextProperty()->SetFontSize(15);
-  this->FieldDataActor->GetTextProperty()->SetOpacity(0.5);
-  this->FieldDataActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
-  this->FieldDataActor->GetTextProperty()->SetBackgroundOpacity(0.5);
-  this->FieldDataActor->RenderOpaqueGeometry(this);
+  this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->MetaDataActor->GetTextProperty()->SetFontSize(15);
+  this->MetaDataActor->GetTextProperty()->SetOpacity(0.5);
+  this->MetaDataActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
+  this->MetaDataActor->GetTextProperty()->SetBackgroundOpacity(0.5);
+  this->MetaDataActor->RenderOpaqueGeometry(this);
 
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetColor(textColor);
@@ -194,20 +197,25 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
 }
 
 //----------------------------------------------------------------------------
-std::string vtkF3DRenderer::GenerateFieldDataDescription()
+std::string vtkF3DRenderer::GenerateMetaDataDescription()
 {
   std::string description;
   description += " \n";
   if (this->PolyDataMapper)
   {
-    vtkDataSet* polyData = this->PolyDataMapper->GetInput();
-
-    if (polyData)
+    vtkDataSet* dataset = this->PolyDataMapper->GetInput();
+    if (dataset)
     {
-      vtkFieldData* fieldData = this->PolyDataMapper->GetInput()->GetFieldData();
-      int nbFieldData = fieldData->GetNumberOfArrays();
+      description += " Number of points: ";
+      description += std::to_string(dataset->GetNumberOfPoints());
+      description += " \n Number of cells: ";
+      description += std::to_string(dataset->GetNumberOfCells());
+      description += " \n";
 
-      for (vtkIdType i = 0; i < nbFieldData; i++)
+      // Field Data
+      vtkFieldData* fieldData = dataset->GetFieldData();
+      int nbArrays = fieldData->GetNumberOfArrays();
+      for (vtkIdType i = 0; i < nbArrays; i++)
       {
         vtkAbstractArray* array = fieldData->GetAbstractArray(i);
         if (array)
@@ -224,6 +232,14 @@ std::string vtkF3DRenderer::GenerateFieldDataDescription()
         }
       }
     }
+    else
+    {
+      description += " Unavailable\n";
+    }
+  }
+  else
+  {
+    description += " Unavailable\n";
   }
 
   return description;
@@ -608,28 +624,28 @@ bool vtkF3DRenderer::IsFilenameVisible()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ShowFieldData(bool show)
+void vtkF3DRenderer::ShowMetaData(bool show)
 {
-  if (this->FieldDataActor)
+  if (this->MetaDataActor)
   {
-    this->RemoveActor(this->FieldDataActor);
-    this->AddActor(this->FieldDataActor);
+    this->RemoveActor(this->MetaDataActor);
+    this->AddActor(this->MetaDataActor);
 
     // generate field data description
-    std::string fieldDataDesc = this->GenerateFieldDataDescription();
-    this->FieldDataActor->SetText(vtkCornerAnnotation::RightEdge, fieldDataDesc.c_str());
+    std::string MetaDataDesc = this->GenerateMetaDataDescription();
+    this->MetaDataActor->SetText(vtkCornerAnnotation::RightEdge, MetaDataDesc.c_str());
 
-    this->FieldDataActor->SetVisibility(show);
+    this->MetaDataActor->SetVisibility(show);
   }
-  this->FieldDataVisible = show;
+  this->MetaDataVisible = show;
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::IsFieldDataVisible()
+bool vtkF3DRenderer::IsMetaDataVisible()
 {
-  return this->FieldDataVisible;
+  return this->MetaDataVisible;
 }
 
 //----------------------------------------------------------------------------
@@ -674,7 +690,7 @@ void vtkF3DRenderer::UpdateCheatSheet()
     cheatSheetText << " X: Axis " << (this->AxisVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " G: Grid " << (this->GridVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " N: File name " << (this->FilenameVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " M: Metadata " << (this->FieldDataVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " M: Metadata " << (this->MetaDataVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " Z: FPS Timer " << (this->TimerVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " R: Raytracing " << (this->UseRaytracing ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " D: Denoiser " << (this->UseRaytracingDenoiser ? "[ON]" : "[OFF]") << "\n";
@@ -728,7 +744,7 @@ void vtkF3DRenderer::ShowOptions()
   this->ShowEdge(this->EdgesVisible);
   this->ShowFilename(this->FilenameVisible);
   this->ShowCheatSheet(this->CheatSheetVisible);
-  this->ShowFieldData(this->FieldDataVisible);
+  this->ShowMetaData(this->MetaDataVisible);
 
   // Set the initial camera once all options
   // have been shown as they may have an effect on it
