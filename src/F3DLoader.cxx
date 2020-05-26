@@ -274,10 +274,12 @@ void F3DLoader::LoadFile(int load)
       this->Renderer->SetPolyDataMapper(genericImporter->GetPolyDataMapper());
       this->Renderer->SetPointGaussianMapper(genericImporter->GetPointGaussianMapper());
       this->Renderer->SetVolumeMapper(genericImporter->GetVolumeMapper());
+      this->Renderer->SetScalarsAvailable(genericImporter->GetScalarsAvailable());
     }
 
     // Actors are loaded, use the bounds to reset camera and set-up SSAO
     this->Renderer->SetupRenderPasses();
+    this->Renderer->UpdateActorsVisibility();
     this->Renderer->InitializeCamera();
 
     this->Renderer->ShowOptions();
