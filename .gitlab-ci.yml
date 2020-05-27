@@ -29,7 +29,7 @@ stages:
     - cmake -E make_directory vtk-install
     - git clone https://gitlab.kitware.com/vtk/vtk.git
     - cd vtk
-    - git checkout 424668b93855be8b1e5633912883fb51c034b192
+    - git checkout 42de65d2bf9f5898f027972b7f89acddb0c3697f
     - cmake -E make_directory build
     - cd build
     - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS
@@ -40,6 +40,7 @@ stages:
       -DVTK_MODULE_ENABLE_VTK_FiltersGeneral=YES
       -DVTK_MODULE_ENABLE_VTK_FiltersGeometry=YES
       -DVTK_MODULE_ENABLE_VTK_ImagingCore=YES
+      -DVTK_MODULE_ENABLE_VTK_ImagingHybrid=YES
       -DVTK_MODULE_ENABLE_VTK_InteractionStyle=YES
       -DVTK_MODULE_ENABLE_VTK_InteractionWidgets=YES
       -DVTK_MODULE_ENABLE_VTK_IOCityGML=YES

@@ -22,6 +22,7 @@ find_package(VTK 9.0 REQUIRED
     FiltersGeneral
     FiltersGeometry
     ImagingCore
+    ImagingHybrid
     InteractionStyle
     InteractionWidgets
     IOCityGML

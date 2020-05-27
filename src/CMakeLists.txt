@@ -83,6 +83,7 @@ set(F3D_MODULES
   VTK::FiltersGeneral
   VTK::FiltersGeometry
   VTK::ImagingCore
+  VTK::ImagingHybrid
   VTK::InteractionStyle
   VTK::InteractionWidgets
   VTK::IOCityGML
