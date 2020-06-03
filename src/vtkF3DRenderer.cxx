@@ -34,6 +34,7 @@
 #include <vtkSkybox.h>
 #include <vtkTextProperty.h>
 #include <vtkToneMappingPass.h>
+#include <vtkVersion.h>
 #include <vtkVolumeProperty.h>
 #include <vtksys/Directory.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -128,7 +129,8 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
       this->Skybox->SetProjection(vtkSkybox::Sphere);
       this->Skybox->SetTexture(texture);
 
-#if F3D_USE_VTK_MASTER
+// First version of VTK including the version check (and the feature used)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
       this->Skybox->GammaCorrectOn();
 #endif
     }
