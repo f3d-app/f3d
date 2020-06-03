@@ -110,9 +110,6 @@ else()
   set(F3D_HAS_RAYTRACING OFF CACHE INTERNAL BOOL)
 endif()
 
-option(F3D_USE_VTK_MASTER OFF "Build using the lastest VTK version")
-mark_as_advanced(F3D_USE_VTK_MASTER)
-
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/Config.h"
