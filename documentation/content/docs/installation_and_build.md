@@ -6,13 +6,21 @@ title: Installation and build
 You can find the release binary packages for Windows, Linux, and OSX on the [Release page](https://gitlab.kitware.com/f3d/f3d/-/releases).
 Alternatively, you can build it yourself, following the build guide.
 
+# How to use
+
+There is mainly three ways to use F3D.
+
+ * By running F3D from a terminal with command-line options.
+ * By running F3D directly and then using drag&drop files into it to open them.
+ * By using F3D as an "Open with" program with specific file types.
+
 # Build
 
 ## Dependencies
-* [CMake](https://cmake.org)
-* [VTK](https://vtk.org) (optionally with raytracing capabilities to enable OSPray rendering).
-* A C++11 compiler
-* A CMake-compatible build system (Visual Studio, XCode, Ninja, Make...)
+* [CMake](https://cmake.org) >= 3.1 .
+* [VTK](https://vtk.org) >= 9.0.0 (optionally with raytracing capabilities to enable OSPray rendering).
+* A C++11 compiler.
+* A CMake-compatible build system (Visual Studio, XCode, Ninja, Make...).
 
 ## Configuration and building
 Set the following CMake options:

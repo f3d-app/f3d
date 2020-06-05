@@ -33,15 +33,22 @@ A typical config file may look like this :
        "raytracing": true,
        "denoise": true,
        "samples": 3
+   },
+   ".*mhd": {
+       "volume": true
    }
 }
 ```
 This first block defines a basic configuration with many desired options for all files.
 The second block specifies that all files ending with vt., eg: vtk, vtp, vtu, ... will be shown with edges on.
 The third block specifies raytracing usage for .gltf and .glb files.
+The last block specifies that volume rendering should be used with .mhd files.
 
-The configuration file location depends on your operating system:
- * Linux : `${XDG_CONFIG_HOME}/.config/f3d/f3d.json` if the variable exists, if not `~/.config/f3d/f3d.json`
- * Windows : `%APPDATA%\f3d\f3d.json`
- * MacOS : `~/.config/f3d/f3d.json`
- 
+The configuration file possible locations depends on your operating system.
+They are considered in the below order and only the first found will be used.
+ * Linux : `/etc/f3d/config.json`, `[install_dir]/config.json`, `${XDG_CONFIG_HOME}/.config/f3d/config.json`, `~/.config/f3d/config.json`
+ * Windows : `[install_dir]\config.json`, `%APPDATA%\f3d\config.json`
+ * MacOS : `/etc/f3d/config.json`, `f3d.app/Contents/Resources/config.json`, `[install_dir]/config.json`, `~/.config/f3d/config.json`
+
+If you are using our release, a default configuration file will be installed when installing F3D.
+On Linux, it will be installed in /etc/f3d/, on Windows, it will be installed in the install directory, on MacOS, it will be installed in the bundle.
