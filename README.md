@@ -29,8 +29,8 @@ There is mainly three ways to use F3D.
 # Build
 
 ## Dependencies
-* [CMake](https://cmake.org)
-* [VTK](https://vtk.org) (optionally with raytracing capabilities to enable OSPray rendering).
+* [CMake](https://cmake.org) >= 3.1 .
+* [VTK](https://vtk.org) >= 9.0.0 (optionally with raytracing capabilities to enable OSPray rendering).
 * A C++11 compiler
 * A CMake-compatible build system (Visual Studio, XCode, Ninja, Make...)
 
