@@ -147,6 +147,7 @@ build-osx:
   stage: test
   script:
     - cd build
+    - cmake -E remove Test*.png
     - ctest -C Release -j 8 --output-on-failure
   artifacts:
     when: on_failure
@@ -182,6 +183,7 @@ test-osx:
   stage: package
   script:
     - cd build
+    - cmake -E remove f3d-*
     - cpack -C Release
 
 package-linux:
