@@ -64,7 +64,7 @@ f3d_test(TestMetaData pdiag.vtu "300,300" "-m")
 f3d_test(TestHDRI suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/palermo_park_1k.hdr")
 f3d_test(TestHDRIBlur suzanne.ply "300,300" "-u --hdri=${CMAKE_SOURCE_DIR}/data/palermo_park_1k.hdr")
 
-if(VTK_VERSION VERSION_GREATER 9.0.20200527)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20200527)
   f3d_test(TestEdges suzanne.ply "300,300" "-e")
   f3d_test(TestLineWidth cow.vtk "300,300" "-e --line-width=5")
 endif()
