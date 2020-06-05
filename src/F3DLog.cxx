@@ -1,5 +1,7 @@
 #include "F3DLog.h"
 
+#include "Config.h"
+
 #if F3D_WIN32_APP
 #include <Windows.h>
 #endif
