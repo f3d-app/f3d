@@ -132,17 +132,20 @@ void F3DLoader::AddFile(const std::string& path, bool recursive)
 
   std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
 
-  if (vtksys::SystemTools::FileIsDirectory(fullPath) && recursive)
+  if (vtksys::SystemTools::FileIsDirectory(fullPath))
   {
-    vtksys::Directory dir;
-    dir.Load(fullPath);
-
-    for (unsigned long i = 0; i < dir.GetNumberOfFiles(); i++)
+    if (recursive)
     {
-      std::string currentFile = dir.GetFile(i);
-      if (currentFile != "." && currentFile != "..")
+      vtksys::Directory dir;
+      dir.Load(fullPath);
+
+      for (unsigned long i = 0; i < dir.GetNumberOfFiles(); i++)
       {
-        this->AddFile(vtksys::SystemTools::JoinPath({ "", fullPath, currentFile }), true);
+        std::string currentFile = dir.GetFile(i);
+        if (currentFile != "." && currentFile != "..")
+        {
+          this->AddFile(vtksys::SystemTools::JoinPath({ "", fullPath, currentFile }), false);
+        }
       }
     }
   }
