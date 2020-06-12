@@ -8,15 +8,13 @@
     "fxaa": true,
     "filename": true
   },
-  ".*vt.":
+  ".*(dcm|nrrd|mhd|mha|vt.|ex2)":
   {
     "scalars": "",
     "bar": true
   },
   ".*(dcm|nrrd|mhd|mha|vti)":
   {
-    "volume": true,
-    "scalars": "",
-    "bar": true
+    "volume": true
   }
 }
