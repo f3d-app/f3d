@@ -29,7 +29,7 @@ A typical config file may look like this :
    ".*vt.": {
        "edges": true
    },
-   ".*gl[tf|b]": {
+   ".*gl(tf|b)": {
        "raytracing": true,
        "denoise": true,
        "samples": 3
