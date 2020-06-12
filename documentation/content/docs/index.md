@@ -22,6 +22,7 @@ Here is the list of supported file formats:
 * **.dcm** : DICOM file format
 * **.nrrd/.nhrd** : "nearly raw raster data" file format
 * **.mhd/.mha** : MetaHeader MetaIO file format
+* **.ex2/.e/.exo/.g** : Exodus 2 file format
 * **.gml** : CityGML file format
 * **.pts** : Point Cloud file format
 * **.obj** : Wavefront OBJ file format (full scene)
