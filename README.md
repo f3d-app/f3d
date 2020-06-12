@@ -70,89 +70,89 @@ For file formats that do not support it, **a default scene** will be provided.
 ## Generic Options
 Options|Description
 ------|------
---input=&lt;file&gt;|The *input* file or files to read, can also be provided as a positional argument.
---output=&lt;png file&gt;|Instead of showing a render view and render into it, *render directly into a png file*.
---no-background|Output file is saved with a transparent background.
--h, --help|Print *help*.
---verbose|Enable *verbose* mode.
---no-render|Verbose mode without any rendering for the first provided file, to recover information about a file.
---version|Show *version* information.
--x, --axis|Show *axes* as a trihedron in the scene.
--g, --grid|Show *a grid* aligned with the XZ plane.
--e, --edges|Show the *cell edges*.
---progress|Show a *progress bar* when loading the file.
---geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
---dry-run|Do not read the configuration file but consider only the command line options
+\-\-input=&lt;file&gt;|The *input* file or files to read, can also be provided as a positional argument.
+\-\-output=&lt;png file&gt;|Instead of showing a render view and render into it, *render directly into a png file*.
+\-\-no-background|Output file is saved with a transparent background.
+-h, \-\-help|Print *help*.
+\-\-verbose|Enable *verbose* mode.
+\-\-no-render|Verbose mode without any rendering for the first provided file, to recover information about a file.
+\-\-version|Show *version* information.
+-x, \-\-axis|Show *axes* as a trihedron in the scene.
+-g, \-\-grid|Show *a grid* aligned with the XZ plane.
+-e, \-\-edges|Show the *cell edges*.
+\-\-progress|Show a *progress bar* when loading the file.
+\-\-geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
+\-\-dry-run|Do not read the configuration file but consider only the command line options
 
 ## Material options
 Options|Default|Description
 ------|------|------
--o, --point-sprites||Show sphere *points sprites* instead of the geometry.
---point-size|10.0|Set the *size* of points when showing vertices and point sprites.
---line-width|1.0|Set the *width* of lines when showing edges.
---color=&lt;R,G,B&gt;|1.0, 1.0, 1.0| Set a *color* on the geometry.<br>This only makes sense when using the default scene.
---opacity=&lt;opacity&gt;|1.0|Set *opacity* on the geometry.<br>This only makes sense when using the default scene. Usually used with Depth Peeling option.
---roughness=&lt;roughness&gt;|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
---metallic=&lt;metallic&gt;|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
---hrdi=&lt;file path&gt;||Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, png, jpg, pnm, tiff, bmp.
---texture-base-color=&lt;file path&gt;||Path to a texture file that sets the color of the object.
---texture-material=&lt;file path&gt;||Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object.
---texture-emissive=&lt;file path&gt;||Path to a texture file that sets the emited light of the object.
---emissive-factor=&lt;R,G,B&gt;|1.0, 1.0, 1.0| Emissive factor. This value is multiplied with the emissive color when an emissive texture is present.
---texture-normal=&lt;file path&gt;||Path to a texture file that sets the normal map of the object.
---normal-scale=&lt;normal_scale&gt;|1.0|Normal scale affects the strength of the normal deviation from the normal texture.
+-o, \-\-point-sprites||Show sphere *points sprites* instead of the geometry.
+\-\-point-size|10.0|Set the *size* of points when showing vertices and point sprites.
+\-\-line-width|1.0|Set the *width* of lines when showing edges.
+\-\-color=&lt;R,G,B&gt;|1.0, 1.0, 1.0| Set a *color* on the geometry.<br>This only makes sense when using the default scene.
+\-\-opacity=&lt;opacity&gt;|1.0|Set *opacity* on the geometry.<br>This only makes sense when using the default scene. Usually used with Depth Peeling option.
+\-\-roughness=&lt;roughness&gt;|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
+\-\-metallic=&lt;metallic&gt;|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
+\-\-hrdi=&lt;file path&gt;||Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, png, jpg, pnm, tiff, bmp.
+\-\-texture-base-color=&lt;file path&gt;||Path to a texture file that sets the color of the object.
+\-\-texture-material=&lt;file path&gt;||Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object.
+\-\-texture-emissive=&lt;file path&gt;||Path to a texture file that sets the emited light of the object.
+\-\-emissive-factor=&lt;R,G,B&gt;|1.0, 1.0, 1.0| Emissive factor. This value is multiplied with the emissive color when an emissive texture is present.
+\-\-texture-normal=&lt;file path&gt;||Path to a texture file that sets the normal map of the object.
+\-\-normal-scale=&lt;normal_scale&gt;|1.0|Normal scale affects the strength of the normal deviation from the normal texture.
 
 ## PostFX (OpenGL) options:
 Options|Description
 ------|------
--p, --depth-peeling|Enable *depth peeling*. This is a technique used to correctly render translucent objects.
--q, --ssao|Enable *Screen-Space Ambient Occlusion*. This is a technique used to improve the depth perception of the object.
--a, --fxaa|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.
--t, --tone-mapping|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
+-p, \-\-depth-peeling|Enable *depth peeling*. This is a technique used to correctly render translucent objects.
+-q, \-\-ssao|Enable *Screen-Space Ambient Occlusion*. This is a technique used to improve the depth perception of the object.
+-a, \-\-fxaa|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.
+-t, \-\-tone-mapping|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
 
 ## Camera configuration options:
 Options|Description
 ------|------
---camera-position=&lt;X,Y,Z&gt;|The position of the camera. Automaticaly computed or recovered from the file if not provided.
---camera-focal-point=&lt;X,Y,Z&gt;|The focal point of the camera. Automaticaly computed or recovered from the file if not provided.
---camera-view-up=&lt;X,Y,Z&gt;|The focal point of the camera. Will be orthogonalized even when provided. Automaticaly computed or recovered from the file if not provided.
---camera-view-angle=&lt;angle&gt;|The view angle of the camera, non-zero value in degrees. Automaticaly computed or recovered from the file if not provided.
+\-\-camera-position=&lt;X,Y,Z&gt;|The position of the camera. Automaticaly computed or recovered from the file if not provided.
+\-\-camera-focal-point=&lt;X,Y,Z&gt;|The focal point of the camera. Automaticaly computed or recovered from the file if not provided.
+\-\-camera-view-up=&lt;X,Y,Z&gt;|The focal point of the camera. Will be orthogonalized even when provided. Automaticaly computed or recovered from the file if not provided.
+\-\-camera-view-angle=&lt;angle&gt;|The view angle of the camera, non-zero value in degrees. Automaticaly computed or recovered from the file if not provided.
 
 ## Raytracing options:
 Options|Default|Description
 ------|------|------
--r, --raytracing||Enable *OSPRay raytracing*. Requires OSPRay raytracing to be enabled in the linked VTK.
---samples=&lt;samples&gt;|5|The number of *samples per pixel*. It only makes sense with raytracing enabled.
--d, --denoise||*Denoise* the image. It only makes sense with raytracing enabled.
+-r, \-\-raytracing||Enable *OSPRay raytracing*. Requires OSPRay raytracing to be enabled in the linked VTK.
+\-\-samples=&lt;samples&gt;|5|The number of *samples per pixel*. It only makes sense with raytracing enabled.
+-d, \-\-denoise||*Denoise* the image. It only makes sense with raytracing enabled.
 
 ## Scientific visualization options:
 Options|Default|Description
 ------|------|------
--s, --scalars=&lt;array_name&gt;||*Color by a specific scalar* array present in the file. If no array_name is provided, one will be picked if any are available. <br>This only makes sense when using the default scene.<br>Use verbose to recover the usable array names.
---comp=&lt;comp_index&gt;|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. Any negative value means *magnitude*.
--c, --cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
---range=&lt;min,max&gt;||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
--b, --bar||Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
---colormap=&lt;color_list&gt;||Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).<br>Use with the scalar option.
--v, --volume||Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.
--i, --inverse||Inverse the linear opacity function. Only makes sense with volume rendering.
+-s, \-\-scalars=&lt;array_name&gt;||*Color by a specific scalar* array present in the file. If no array_name is provided, one will be picked if any are available. <br>This only makes sense when using the default scene.<br>Use verbose to recover the usable array names.
+\-\-comp=&lt;comp_index&gt;|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. Any negative value means *magnitude*.
+-c, \-\-cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
+\-\-range=&lt;min,max&gt;||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
+-b, \-\-bar||Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
+\-\-colormap=&lt;color_list&gt;||Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).<br>Use with the scalar option.
+-v, \-\-volume||Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.
+-i, \-\-inverse||Inverse the linear opacity function. Only makes sense with volume rendering.
 
 ## Testing options:
 Options|Description
 ------|------
---ref=&lt;png file&gt;|Reference *image to compare with* for testing purposes.
---ref-threshold=&lt;threshold&gt;|*Testing threshold* to trigger a test failure or success.
+\-\-ref=&lt;png file&gt;|Reference *image to compare with* for testing purposes.
+\-\-ref-threshold=&lt;threshold&gt;|*Testing threshold* to trigger a test failure or success.
 
 ## Window options:
 Options|Default|Description
 ------|------|------
---bg-color=&lt;R,G,B&gt;|0.2, 0.2, 0.2|Set the window *background color*.<br>Ignored if *hdri* is set.
---resolution=&lt;width,height&gt;|1000, 600|Set the *window resolution*.
--z, --fps||Display a *frame per second counter*.
--n, --filename||Display the *name of the file*.
--m, --metadata||Display the *metadata*.<br>This only makes sense when using the default scene.
--f, --fullscreen||Display in fullscreen.
--u, --blur-background||Blur background.<br>This only makes sense when using a HDRI.
+\-\-bg-color=&lt;R,G,B&gt;|0.2, 0.2, 0.2|Set the window *background color*.<br>Ignored if *hdri* is set.
+\-\-resolution=&lt;width,height&gt;|1000, 600|Set the *window resolution*.
+-z, \-\-fps||Display a *frame per second counter*.
+-n, \-\-filename||Display the *name of the file*.
+-m, \-\-metadata||Display the *metadata*.<br>This only makes sense when using the default scene.
+-f, \-\-fullscreen||Display in fullscreen.
+-u, \-\-blur-background||Blur background.<br>This only makes sense when using a HDRI.
 
 # Rendering precedence
 Some rendering options are not compatible between them, here is the precedence order if several are defined:
@@ -229,7 +229,7 @@ A typical config file may look like this :
    ".*vt.": {
        "edges": true
    },
-   ".*gl[tf|b]": {
+   ".*gl(tf|b)": {
        "raytracing": true,
        "denoise": true,
        "samples": 3
