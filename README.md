@@ -9,7 +9,7 @@ F3D (pronounced `/fɛd/`) is a [VTK-based](https://vtk.org) 3D viewer following 
 It is open-source and cross-platform (tested on Windows, Linux, and macOS).
 It supports a range of file formats, rendering and texturing options.
 
-![F3D Demo](./documentation/content/gallery/04-f3d.png)
+![F3D Demo](https://kitware.github.io/F3D/gallery/04-f3d.png)
 *A typical render by F3D*
 
 # Installation
