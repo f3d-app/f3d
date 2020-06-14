@@ -10,6 +10,7 @@
 #include <vtk3DSImporter.h>
 #include <vtkCallbackCommand.h>
 #include <vtkGLTFImporter.h>
+#include <vtkImageData.h>
 #include <vtkNew.h>
 #include <vtkOBJImporter.h>
 #include <vtkPointGaussianMapper.h>
@@ -20,6 +21,8 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <algorithm>
+
+#include "F3DIcon.h"
 
 //----------------------------------------------------------------------------
 F3DLoader::F3DLoader() = default;
@@ -79,6 +82,18 @@ int F3DLoader::Start(int argc, char** argv)
     interactor->SetInteractorStyle(style);
     interactor->Initialize();
     this->Renderer->Initialize(options, "");
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200615)
+    // set icon
+    vtkNew<vtkImageData> icon;
+    icon->SetDimensions(F3DIconDimX, F3DIconDimY, 1);
+    icon->AllocateScalars(VTK_UNSIGNED_CHAR, F3DIconNbComp);
+
+    unsigned char* p = static_cast<unsigned char*>(icon->GetScalarPointer(0, 0, 0));
+    std::copy(F3DIconBuffer, F3DIconBuffer + F3DIconDimX * F3DIconDimY * F3DIconNbComp, p);
+
+    renWin->SetIcon(icon);
+#endif
 
 #if __APPLE__
     F3DNSDelegate::InitializeDelegate(this, renWin);
