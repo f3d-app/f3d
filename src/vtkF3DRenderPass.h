@@ -85,7 +85,7 @@ protected:
   vtkSmartPointer<vtkFramebufferPass> BackgroundPass;
   vtkSmartPointer<vtkFramebufferPass> MainPass;
 
-  double Bounds[6];
+  double Bounds[6] = {};
 
   vtkMTimeType InitializeTime = 0;
 
