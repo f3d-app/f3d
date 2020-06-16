@@ -101,6 +101,9 @@ void vtkF3DMetaReader::SetFileName(const std::string& fileName)
     if (!this->InternalReader && ext == ".stl")
     {
       vtkNew<vtkSTLReader> reader;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200616)
+      reader->MergingOff();
+#endif
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
     }
