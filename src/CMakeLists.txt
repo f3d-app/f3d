@@ -1,3 +1,24 @@
+# Generate F3DIcon.h
+add_executable(embed embed.cxx)
+target_link_libraries(embed PUBLIC VTK::IOImage)
+
+if(WIN32)
+  get_target_property(_confs VTK::IOImage IMPORTED_CONFIGURATIONS)
+  foreach(_conf ${_confs})
+    get_target_property(_runtime_path VTK::IOImage IMPORTED_LOCATION_${_conf})
+    get_filename_component(_runtime_dir ${_runtime_path} DIRECTORY)
+    list(APPEND CMAKE_MSVCIDE_RUN_PATH "${_runtime_dir}")
+  endforeach()
+endif()
+
+add_custom_command(
+  OUTPUT F3DIcon.h
+  COMMAND $<TARGET_FILE:embed> 
+    "${CMAKE_CURRENT_SOURCE_DIR}/../resources/logo32.png"
+    "${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h"
+  DEPENDS embed)
+
+# f3d
 if(WIN32)
   set(WINDOWS_RC_FILE ${CMAKE_SOURCE_DIR}/resources/f3d.rc)
 endif()
@@ -18,6 +39,7 @@ add_executable(f3d
   F3DLog.cxx
   F3DOffscreenRender.cxx
   F3DOptions.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h
   ${CMAKE_CURRENT_BINARY_DIR}/Config.cxx
   ${OSX_DELEGATE}
   ${WINDOWS_RC_FILE}
