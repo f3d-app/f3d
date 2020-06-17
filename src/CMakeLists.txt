@@ -109,6 +109,7 @@ set(F3D_MODULES
   VTK::InteractionStyle
   VTK::InteractionWidgets
   VTK::IOCityGML
+  VTK::IOExodus
   VTK::IOGeometry
   VTK::IOImage
   VTK::IOImport
