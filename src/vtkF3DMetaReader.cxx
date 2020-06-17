@@ -4,6 +4,7 @@
 #include <vtkDICOMImageReader.h>
 #include <vtkDemandDrivenPipeline.h>
 #include <vtkEventForwarderCommand.h>
+#include <vtkExodusIIReader.h>
 #include <vtkGLTFReader.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
@@ -17,6 +18,8 @@
 #include <vtkSTLReader.h>
 #include <vtkXMLGenericDataObjectReader.h>
 #include <vtksys/SystemTools.hxx>
+
+#include <regex>
 
 vtkStandardNewMacro(vtkF3DMetaReader);
 
@@ -72,6 +75,9 @@ void vtkF3DMetaReader::SetFileName(const std::string& fileName)
   this->SetFileName(fileName.c_str());
   if (time != this->GetMTime())
   {
+    std::string shortName = vtksys::SystemTools::GetFilenameName(fileName);
+    shortName = vtksys::SystemTools::LowerCase(shortName);
+
     std::string ext = vtksys::SystemTools::GetFilenameLastExtension(fileName);
     ext = vtksys::SystemTools::LowerCase(ext);
 
@@ -147,6 +153,21 @@ void vtkF3DMetaReader::SetFileName(const std::string& fileName)
     {
       vtkNew<vtkPTSReader> reader;
       reader->SetFileName(this->FileName);
+      this->InternalReader = reader;
+    }
+
+    // Finds Exodus files using their common base extensions (first parenthesis group),
+    // which may be appended with a mesh-state index (second parenthesis group),
+    // and may additionally be a group of multiple small files corresponding
+    // to a decomposed Exodus file (the final parenthesis group).
+    std::regex exodusRegex("\\.(g|exo|ex2|e)(-s[0-9]+)?(\\.[0-9]+\\.[0-9]+)?");
+    if (!this->InternalReader && std::regex_search(shortName, exodusRegex))
+    {
+      vtkNew<vtkExodusIIReader> reader;
+      reader->SetFileName(this->FileName);
+      reader->UpdateInformation();
+      reader->SetAllArrayStatus(vtkExodusIIReader::NODAL, 1);
+      reader->SetAllArrayStatus(vtkExodusIIReader::ELEM_BLOCK, 1);
       this->InternalReader = reader;
     }
 
