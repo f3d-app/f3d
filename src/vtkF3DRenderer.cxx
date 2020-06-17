@@ -174,14 +174,12 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, fileInfo.c_str());
   this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
   this->FilenameActor->GetTextProperty()->SetColor(textColor);
-  this->FilenameActor->RenderOpaqueGeometry(this);
 
   this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
   this->MetaDataActor->GetTextProperty()->SetFontSize(15);
   this->MetaDataActor->GetTextProperty()->SetOpacity(0.5);
   this->MetaDataActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
   this->MetaDataActor->GetTextProperty()->SetBackgroundOpacity(0.5);
-  this->MetaDataActor->RenderOpaqueGeometry(this);
 
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetColor(textColor);
