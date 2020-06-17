@@ -16,6 +16,7 @@
 #include <vtkPLYReader.h>
 #include <vtkPTSReader.h>
 #include <vtkSTLReader.h>
+#include <vtkVersion.h>
 #include <vtkXMLGenericDataObjectReader.h>
 #include <vtksys/SystemTools.hxx>
 
