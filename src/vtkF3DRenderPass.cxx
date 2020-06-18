@@ -104,10 +104,10 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 
   // background pass, setup framebuffer, clear and draw skybox
   vtkNew<vtkOpaquePass> bgP;
-  vtkNew<vtkCameraPass> camP;
-  camP->SetDelegatePass(bgP);
+  vtkNew<vtkCameraPass> bgCamP;
+  bgCamP->SetDelegatePass(bgP);
   this->BackgroundPass = vtkSmartPointer<vtkFramebufferPass>::New();
-  this->BackgroundPass->SetDelegatePass(camP);
+  this->BackgroundPass->SetDelegatePass(bgCamP);
   this->BackgroundPass->SetColorFormat(vtkTextureObject::Float32);
 
   // main pass
