@@ -4,7 +4,7 @@ include(CMakeDependentOption)
 project(f3d
   VERSION "1.0.0"
   DESCRIPTION "F3D - A fast and minimalist 3D viewer"
-  LANGUAGES CXX)
+  LANGUAGES C CXX)
 
 string(TIMESTAMP F3D_BUILD_DATE "%Y-%m-%d %H:%M:%S")
 
