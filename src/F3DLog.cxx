@@ -11,7 +11,10 @@
 void F3DLog::PrintInternal(Severity sev, const std::string& str)
 {
 #if F3D_WIN32_APP
-  if (!std::getenv("F3D_NO_MESSAGEBOX"))
+  char* buf = nullptr;
+  size_t sz = 0;
+  _dupenv_s(&buf, &sz, "F3D_NO_MESSAGEBOX");
+  if (buf == nullptr)
   {
     unsigned int icon;
     switch (sev)
