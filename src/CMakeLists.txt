@@ -13,7 +13,7 @@ endif()
 
 add_custom_command(
   OUTPUT F3DIcon.h
-  COMMAND $<TARGET_FILE:embed> 
+  COMMAND $<TARGET_FILE:embed>
     "${CMAKE_CURRENT_SOURCE_DIR}/../resources/logo32.png"
     "${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h"
   DEPENDS embed)
