@@ -17,6 +17,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkScalarBarActor.h>
 #include <vtkVRMLImporter.h>
+#include <vtkVersion.h>
 #include <vtksys/Directory.hxx>
 #include <vtksys/SystemTools.hxx>
 
