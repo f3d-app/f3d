@@ -32,7 +32,7 @@ stages:
     - git checkout 28b97c484e419f814f88a13876a97d93c68d581a
     - cmake -E make_directory build
     - cd build
-    - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS
+    - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS $RUNTIME_OPTION $POLICY_OPTION
       -DVTK_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
       -DVTK_LEGACY_REMOVE=ON -DBUILD_SHARED_LIBS=OFF
       -DCMAKE_INSTALL_PREFIX:FILEPATH=../../vtk-install
@@ -75,6 +75,8 @@ update-vtk-windows:
     - .windows
   variables:
     BUILD_ARCHITECTURE: -Ax64
+    POLICY_OPTION: -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
+    RUNTIME_OPTION: -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
 
 update-vtk-osx:
   extends:
@@ -89,7 +91,8 @@ update-vtk-osx:
   script:
     - cmake -E make_directory build
     - cd build
-    - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS -DBUILD_TESTING=ON -F3D_STRICT_BUILD=ON
+    - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS $RUNTIME_OPTION $POLICY_OPTION
+      -DBUILD_TESTING=ON -DF3D_STRICT_BUILD=ON
       -DCMAKE_BUILD_TYPE=Release -DVTK_DIR:FILEPATH=vtk-install/lib/cmake/vtk-9.0
       -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON ..
 
@@ -107,6 +110,8 @@ configure-windows:
   variables:
     BUILD_ARCHITECTURE: -Ax64
     ADDITIONAL_OPTIONS: -DWINDOWS_BUILD_WIN32=ON
+    POLICY_OPTION: -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
+    RUNTIME_OPTION: -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
 
 configure-osx:
   extends:
