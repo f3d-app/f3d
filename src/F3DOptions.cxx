@@ -269,6 +269,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
         " ENTER     Reset camera to initial parameters\n"
         " LEFT      Previous file\n"
         " RIGHT     Next file\n"
+        " UP        Reload current file\n"
         );
       exit(EXIT_SUCCESS);
     }

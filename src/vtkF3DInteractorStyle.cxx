@@ -161,6 +161,12 @@ void vtkF3DInteractorStyle::OnKeyPress()
         this->InvokeEvent(F3DLoader::LoadFileEvent, &load);
         renWin->Render();
       }
+      else if (keySym == "Up")
+      {
+        int load = F3DLoader::LOAD_CURRENT;
+        this->InvokeEvent(F3DLoader::LoadFileEvent, &load);
+        renWin->Render();
+      }
       else if (keySym == "Escape")
       {
         rwi->ExitCallback();
