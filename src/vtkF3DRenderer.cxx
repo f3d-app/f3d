@@ -708,6 +708,7 @@ void vtkF3DRenderer::UpdateCheatSheet()
     cheatSheetText << " ENTER: Reset camera \n";
     cheatSheetText << " LEFT : Previous file \n";
     cheatSheetText << " RIGHT: Next file \n";
+    cheatSheetText << " UP   : Reload current file \n";
 
     this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, cheatSheetText.str().c_str());
     this->CheatSheetActor->RenderOpaqueGeometry(this);
