@@ -199,6 +199,7 @@ Other interactions are available:
 * Press `ENTER` key to reset the camera to its inital parameters.
 * Press `LEFT` to load the previous file if any
 * Press `RIGHT` to load the next file if any
+* Press `UP` to reload the current file
 
 # Configuration file
 
