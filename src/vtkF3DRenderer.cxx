@@ -723,7 +723,10 @@ void vtkF3DRenderer::ShowEdge(bool show)
   vtkCollectionSimpleIterator ait;
   for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
   {
-    anActor->GetProperty()->SetEdgeVisibility(show);
+    if (vtkSkybox::SafeDownCast(anActor) == nullptr)
+    {
+      anActor->GetProperty()->SetEdgeVisibility(show);
+    }
   }
   this->EdgesVisible = show;
   this->CheatSheetNeedUpdate = true;

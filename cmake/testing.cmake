@@ -64,6 +64,7 @@ f3d_test(TestTextures WaterBottle.glb "300,300" "--geometry-only --texture-mater
 f3d_test(TestMetaData pdiag.vtu "300,300" "-m")
 f3d_test(TestHDRI suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/palermo_park_1k.hdr")
 f3d_test(TestHDRIBlur suzanne.ply "300,300" "-u --hdri=${CMAKE_SOURCE_DIR}/data/palermo_park_1k.hdr")
+f3d_test(TestHDRIEdges suzanne.ply "300,300" "-e --hdri=${CMAKE_SOURCE_DIR}/data/palermo_park_1k.hdr")
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20200527)
   f3d_test(TestEdges suzanne.ply "300,300" "-e")
