@@ -266,7 +266,7 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
       ssImpl << "  vec3 bgCol = texture(texBackground, texCoord).rgb;\n";
     }
     ssImpl << "  vec3 result = bgCol * (1.0 - mainSample.a) + mainSample.rgb * mainSample.a;\n"
-              "  gl_FragData[0] = vec4(result.rgb, mainSample.a);\n";
+              "  gl_FragData[0] = vec4(result.rgb, 1.0);\n";
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl", ssImpl.str());
 
