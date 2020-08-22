@@ -29,7 +29,7 @@ stages:
     - cmake -E make_directory vtk-install
     - git clone https://gitlab.kitware.com/vtk/vtk.git
     - cd vtk
-    - git checkout 28b97c484e419f814f88a13876a97d93c68d581a
+    - git checkout 473edc3e7d
     - cmake -E make_directory build
     - cd build
     - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS $RUNTIME_OPTION $POLICY_OPTION
@@ -119,7 +119,7 @@ configure-osx:
     - .configure
     - .osx
   variables:
-    ADDITIONAL_OPTIONS: -DMACOSX_BUILD_BUNDLE=ON
+    ADDITIONAL_OPTIONS: -DMACOSX_BUILD_BUNDLE=ON -DCMAKE_OSX_SYSROOT:PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk
 
 # Build
 .build:
@@ -199,7 +199,6 @@ package-linux:
   needs:
     - configure-linux
     - build-linux
-    - test-linux
   artifacts:
     paths:
       - build/f3d-*.tar.gz
@@ -212,7 +211,6 @@ package-windows:
   needs:
     - configure-windows
     - build-windows
-    - test-windows
   artifacts:
     paths:
       - build/f3d-*.zip
@@ -225,7 +223,6 @@ package-osx:
   needs:
     - configure-osx
     - build-osx
-    - test-osx
   artifacts:
     paths:
       - build/f3d-*.dmg

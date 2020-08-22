@@ -22,6 +22,7 @@
 #include <vtkColorTransferFunction.h>
 #include <vtkDataObjectTreeIterator.h>
 #include <vtkDataSetSurfaceFilter.h>
+#include <vtkDoubleArray.h>
 #include <vtkEventForwarderCommand.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
@@ -43,12 +44,92 @@
 #include <vtkScalarsToColors.h>
 #include <vtkSmartPointer.h>
 #include <vtkSmartVolumeMapper.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkTexture.h>
 #include <vtkVertexGlyphFilter.h>
 #include <vtkVolumeProperty.h>
 #include <vtksys/SystemTools.hxx>
 
+#include "vtkF3DPostProcessFilter.h"
+
 vtkStandardNewMacro(vtkF3DGenericImporter);
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::UpdateTemporalInformation()
+{
+  if (!this->TemporalInformationUpdated)
+  {
+    if (!this->Reader->IsReaderValid())
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Reader is not valid");
+      return;
+    }
+    this->Reader->UpdateInformation();
+    vtkInformation* readerInfo = this->Reader->GetOutputInformation(0);
+
+    this->NbTimeSteps = readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    this->TimeRange = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+    this->TimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    this->TemporalInformationUpdated = true;
+  }
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkF3DGenericImporter::GetNumberOfAnimations()
+{
+  this->UpdateTemporalInformation();
+  return this->NbTimeSteps > 0 ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DGenericImporter::GetAnimationName(vtkIdType animationIndex)
+{
+  return animationIndex < this->GetNumberOfAnimations() ? "default" : "";
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::EnableAnimation(vtkIdType animationIndex)
+{
+  if (animationIndex < this->GetNumberOfAnimations())
+  {
+    this->AnimationEnabled = true;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::DisableAnimation(vtkIdType animationIndex)
+{
+  if (animationIndex < this->GetNumberOfAnimations())
+  {
+    this->AnimationEnabled = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DGenericImporter::IsAnimationEnabled(vtkIdType animationIndex)
+{
+  return animationIndex < this->GetNumberOfAnimations() ? this->AnimationEnabled : false;
+}
+
+//----------------------------------------------------------------------------
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
+bool vtkF3DGenericImporter::GetTemporalInformation(vtkIdType animationIndex,
+  double vtkNotUsed(frameRate), int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
+#else
+bool vtkF3DGenericImporter::GetTemporalInformation(vtkIdType animationIndex,
+  int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
+#endif
+{
+  if (animationIndex < this->GetNumberOfAnimations())
+  {
+    nbTimeSteps = this->NbTimeSteps;
+    timeRange[0] = this->TimeRange[0];
+    timeRange[1] = this->TimeRange[1];
+    timeSteps->SetArray(this->TimeSteps, this->NbTimeSteps, 1);
+    return true;
+  }
+  return false;
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
@@ -65,123 +146,32 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   forwarder->SetTarget(this);
   this->Reader->AddObserver(vtkCommand::ProgressEvent, forwarder);
 
-  this->Reader->Update();
-
-  vtkDataObject* dataObject = this->Reader->GetOutput();
+  this->PostPro->SetInputConnection(this->Reader->GetOutputPort());
+  this->PostPro->Update();
 
   if (this->Options->Verbose || this->Options->NoRender)
   {
-    this->OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(dataObject);
+    this->OutputDescription =
+      vtkF3DGenericImporter::GetDataObjectDescription(this->Reader->GetOutput());
   }
 
-  vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(dataObject);
-  vtkSmartPointer<vtkDataSet> dataset = vtkDataSet::SafeDownCast(dataObject);
-
-  // Convert multiblock input and a surfacic dataset
-  if (mb)
-  {
-    vtkNew<vtkAppendPolyData> append;
-
-    auto iter = vtkSmartPointer<vtkDataObjectTreeIterator>::Take(mb->NewTreeIterator());
-    iter->VisitOnlyLeavesOn();
-    iter->SkipEmptyNodesOn();
-    iter->TraverseSubTreeOn();
-
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-      vtkDataSet* leafDS = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-      vtkSmartPointer<vtkPolyData> leafPD = vtkPolyData::SafeDownCast(leafDS);
-      if (!leafDS)
-      {
-        F3DLog::Print(F3DLog::Severity::Warning,
-          "A non data set block was ignored while reading a multiblock.");
-      }
-      else
-      {
-        if (!leafPD)
-        {
-          F3DLog::Print(F3DLog::Severity::Warning,
-            "A non polydata block was converted into a surface while reading a multiblock.");
-
-          vtkNew<vtkDataSetSurfaceFilter> geom;
-          geom->SetInputData(iter->GetCurrentDataObject());
-          geom->Update();
-          leafPD = vtkPolyData::SafeDownCast(geom->GetOutput());
-        }
-        append->AddInputData(leafPD);
-      }
-    }
-
-    append->Update();
-    dataset = append->GetOutput();
-  }
-
-  // Check if input is an image
-  vtkImageData* image = vtkImageData::SafeDownCast(dataset);
-  if (image)
-  {
-    this->VolumeMapper->SetInputData(image);
-  }
-
-  // Recover the surface of the dataset if not available already
-  vtkSmartPointer<vtkPolyData> surface = vtkPolyData::SafeDownCast(dataset);
-  vtkSmartPointer<vtkPolyData> cloud = surface;
-  if (!surface)
-  {
-    vtkNew<vtkDataSetSurfaceFilter> geom;
-    geom->SetInputData(dataset);
-    geom->Update();
-    surface = vtkPolyData::SafeDownCast(geom->GetOutput());
-
-    if (image)
-    {
-      vtkNew<vtkImageToPoints> imageCloudFilter;
-      imageCloudFilter->SetInputData(dataset);
-      imageCloudFilter->Update();
-      cloud = vtkPolyData::SafeDownCast(imageCloudFilter->GetOutput());
-    }
-    else if (vtkRectilinearGrid::SafeDownCast(dataset))
-    {
-      vtkNew<vtkRectilinearGridToPointSet> pointSetFilter;
-      pointSetFilter->SetInputData(dataset);
-      vtkNew<vtkVertexGlyphFilter> vertexFilter;
-      vertexFilter->SetInputConnection(pointSetFilter->GetOutputPort());
-      vertexFilter->Update();
-      cloud = vtkPolyData::SafeDownCast(vertexFilter->GetOutput());
-    }
-    else if (vtkPointSet::SafeDownCast(dataset))
-    {
-      vtkNew<vtkVertexGlyphFilter> vertexFilter;
-      vertexFilter->SetInputData(dataset);
-      vertexFilter->Update();
-      cloud = vtkPolyData::SafeDownCast(vertexFilter->GetOutput());
-    }
-    else
-    {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "Provided dataset is not convertable to a point cloud for sprites rendering, using its surface instead.");
-      cloud = surface;
-    }
-  }
-
-  if (!surface || !this->Options)
-  {
-    return;
-  }
+  vtkPolyData* surface = vtkPolyData::SafeDownCast(this->PostPro->GetOutput());
+  vtkImageData* image = vtkImageData::SafeDownCast(this->PostPro->GetOutput(2));
 
   // Configure volume mapper
+  this->VolumeMapper->SetInputConnection(this->PostPro->GetOutputPort(2));
   this->VolumeMapper->SetRequestedRenderModeToGPU();
 
   // Configure polydata mapper
   this->PolyDataMapper->InterpolateScalarsBeforeMappingOn();
-  this->PolyDataMapper->SetInputData(surface);
+  this->PolyDataMapper->SetInputConnection(this->PostPro->GetOutputPort(0));
 
   // Configure Point Gaussian mapper
   double bounds[6];
   surface->GetBounds(bounds);
   vtkBoundingBox bbox(bounds);
   double pointSize = this->Options->PointSize * bbox.GetDiagonalLength() * 0.001;
-  this->PointGaussianMapper->SetInputData(cloud);
+  this->PointGaussianMapper->SetInputConnection(this->PostPro->GetOutputPort(1));
   this->PointGaussianMapper->SetScaleFactor(pointSize);
   this->PointGaussianMapper->EmissiveOff();
   this->PointGaussianMapper->SetSplatShaderCode(
@@ -195,10 +185,15 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     "  diffuseColor *= scale;\n"
     "}\n");
 
+  //
+  vtkDataSet* dataSet = vtkImageData::SafeDownCast(this->PostPro->GetInput())
+    ? vtkDataSet::SafeDownCast(image)
+    : vtkDataSet::SafeDownCast(surface);
+
   std::string usedArray = this->Options->Scalars;
   vtkDataSetAttributes* data = this->Options->Cells
-    ? static_cast<vtkDataSetAttributes*>(dataset->GetCellData())
-    : static_cast<vtkDataSetAttributes*>(dataset->GetPointData());
+    ? vtkDataSetAttributes::SafeDownCast(dataSet->GetCellData())
+    : vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
 
   // Recover an array for coloring if we ever need it
   if (usedArray.empty() || usedArray == f3d::F3DReservedString)
@@ -496,6 +491,7 @@ void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::SetFileName(const char* arg)
 {
+  this->TemporalInformationUpdated = false;
   this->Reader->SetFileName(std::string(arg));
 }
 
@@ -555,4 +551,10 @@ std::string vtkF3DGenericImporter::GetDataObjectDescription(vtkDataObject* objec
     return vtkImporter::GetDataSetDescription(ds, vtkIndent(0));
   }
   return "";
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
+{
+  this->PostPro->UpdateTimeStep(timestep);
 }

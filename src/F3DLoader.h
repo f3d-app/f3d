@@ -11,6 +11,7 @@
 #include <vtkSmartPointer.h>
 
 #include "vtkF3DRenderer.h"
+#include "F3DAnimationManager.h"
 
 class vtkF3DRenderer;
 class vtkImporter;
@@ -29,7 +30,8 @@ public:
   enum vtkCustomEvents
   {
     NewFilesEvent = vtkCommand::UserEvent + 100,
-    LoadFileEvent
+    LoadFileEvent,
+    ToggleAnimationEvent
   };
 
   /**
@@ -64,7 +66,11 @@ protected:
   std::vector<std::string> FilesList;
   int CurrentFileIndex = 0;
   F3DOptionsParser Parser;
+  F3DOptions Options;
+  F3DAnimationManager AnimationManager;
   vtkSmartPointer<vtkF3DRenderer> Renderer;
+  vtkSmartPointer<vtkImporter> Importer;
+  vtkSmartPointer<vtkRenderWindow> RenWin;
 
 private:
   F3DLoader(F3DLoader const&) = delete;

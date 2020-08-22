@@ -35,6 +35,11 @@ public:
    */
   int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
+  /**
+   * Transfer to the InternalReader
+   */
+  vtkInformation* GetOutputInformation(int port);
+
 protected:
   vtkF3DMetaReader();
   ~vtkF3DMetaReader() override = default;
