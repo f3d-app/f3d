@@ -207,7 +207,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     bool print = (this->Options->Verbose || this->Options->NoRender);
     if (array)
     {
-      usedArray = array->GetName();
+      const char* arrayName = array->GetName();
+      if (arrayName)
+      {
+        usedArray = arrayName;
+      }
       if (print)
       {
         F3DLog::Print(F3DLog::Severity::Info, "Using default scalar array: ", usedArray);
@@ -222,7 +226,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
       if (array)
       {
-        usedArray = array->GetName();
+        const char* arrayName = array->GetName();
+        if (arrayName)
+        {
+          usedArray = arrayName;
+        }
         if (print)
         {
           F3DLog::Print(F3DLog::Severity::Info, "Using first found array: ", usedArray);
