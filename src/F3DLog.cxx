@@ -10,6 +10,7 @@
 
 void F3DLog::PrintInternal(Severity sev, const std::string& str)
 {
+  std::ostream& outStream = (sev > F3DLog::Severity::Info) ? std::cerr : std::cout;
 #if F3D_WIN32_APP
   char* buf = nullptr;
   size_t sz = 0;
@@ -35,10 +36,10 @@ void F3DLog::PrintInternal(Severity sev, const std::string& str)
   }
   else
   {
-    std::cerr << str << std::endl;
+    outStream << str << std::endl;
   }
 #else
   (void)sev;
-  std::cerr << str << std::endl;
+  outStream << str << std::endl;
 #endif
 }
