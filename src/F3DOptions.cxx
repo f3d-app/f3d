@@ -170,7 +170,9 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp1, "axis", "x", "Show axes", options.Axis);
     this->DeclareOption(grp1, "grid", "g", "Show grid", options.Grid);
     this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.Edges);
+    this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", options.Trackball);
     this->DeclareOption(grp1, "progress", "", "Show progress bar", options.Progress);
+    this->DeclareOption(grp1, "up", "", "Up direction", options.Up, true, "[-X|+X|-Y|+Y|-Z|+Z]");
     this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", options.GeometryOnly);
     this->DeclareOption(grp1, "dry-run", "", "Do not read the configuration file", options.DryRun);
 
@@ -263,6 +265,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
         " O         Toggle point sprites rendering\n"
         " F         Toggle full screen\n"
         " U         Toggle blur background\n"
+        " K         Toggle trackball interaction\n"
         " H         Toggle Cheat sheet display\n"
         " ?         Dump camera state to the terminal\n"
         " ESC       Quit\n"

@@ -30,6 +30,11 @@ public:
   void OnDropFiles(vtkStringArray* files) override;
 
   /**
+   * Overriden for turntable mode
+   */
+  void Rotate() override;
+
+  /**
    * Overriden to rotate the skybox as well
    */
   void EnvironmentRotate() override;

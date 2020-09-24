@@ -55,6 +55,7 @@ public:
   void SetUseVolume(bool use);
   void SetUseInverseOpacityFunction(bool use);
   void SetUseBlurBackground(bool use);
+  void SetUseTrackball(bool use);
 
   bool IsAxisVisible();
   bool IsGridVisible();
@@ -75,6 +76,7 @@ public:
   bool UsingVolume();
   bool UsingInverseOpacityFunction();
   bool UsingBlurBackground();
+  bool UsingTrackball();
 
   void Render() override;
 
@@ -179,6 +181,22 @@ public:
    */
   void UpdateActorsVisibility();
 
+  //@{
+  /**
+   * Set/Get up vector
+   */
+  vtkGetVector3Macro(UpVector, double);
+  vtkSetVector3Macro(UpVector, double);
+  //@}
+
+  //@{
+  /**
+   * Set/Get right vector
+   */
+  vtkGetVector3Macro(RightVector, double);
+  vtkSetVector3Macro(RightVector, double);
+  //@}
+
 protected:
   vtkF3DRenderer() = default;
   ~vtkF3DRenderer() override = default;
@@ -217,25 +235,30 @@ protected:
   vtkNew<vtkTextActor> TimerActor;
   unsigned int Timer = 0;
 
-  bool GridVisible;
-  bool AxisVisible;
-  bool EdgesVisible;
-  bool TimerVisible;
-  bool FilenameVisible;
-  bool MetaDataVisible;
-  bool ScalarBarVisible;
-  bool ScalarsVisible;
+  bool GridVisible = false;
+  bool AxisVisible = false;
+  bool EdgesVisible = false;
+  bool TimerVisible = false;
+  bool FilenameVisible = false;
+  bool MetaDataVisible = false;
+  bool ScalarBarVisible = false;
+  bool ScalarsVisible = false;
   bool CheatSheetVisible = false;
-  bool UseRaytracing;
-  bool UseRaytracingDenoiser;
-  bool UseDepthPeelingPass;
-  bool UseFXAAPass;
-  bool UseSSAOPass;
-  bool UsePointSprites;
-  bool UseToneMappingPass;
-  bool UseVolume;
-  bool UseInverseOpacityFunction;
-  bool UseBlurBackground;
+  bool UseRaytracing = false;
+  bool UseRaytracingDenoiser = false;
+  bool UseDepthPeelingPass = false;
+  bool UseFXAAPass = false;
+  bool UseSSAOPass = false;
+  bool UsePointSprites = false;
+  bool UseToneMappingPass = false;
+  bool UseVolume = false;
+  bool UseInverseOpacityFunction = false;
+  bool UseBlurBackground = false;
+  bool UseTrackball = false;
+
+  double UpVector[3] = { 0.0, 1.0, 0.0 };
+  double RightVector[3] = { 1.0, 0.0, 0.0 };
+  int UpIndex = 1;
 };
 
 #endif
