@@ -38,28 +38,51 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
   vtkShaderProgram::Substitute(
     VSSource, "//VTK::PositionVC::Dec", "out vec4 positionMCVSOutput;\n");
 
-  vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
-    "positionMCVSOutput = vec4(vertexMC.x, 0.0, vertexMC.y, 1.0);\n"
-    "gl_Position = MCDCMatrix * positionMCVSOutput;\n");
-
   vtkShaderProgram::Substitute(FSSource, "//VTK::PositionVC::Dec",
     "in vec4 positionMCVSOutput;\n"
     "uniform float fadeDist;\n"
     "uniform float unitSquare;\n");
 
-  // fwidth must be computed for all fragments to avoid artifacts with early returns
-  vtkShaderProgram::Substitute(FSSource, "  //VTK::UniformFlow::Impl",
-    "  vec2 coord = positionMCVSOutput.xz / (unitSquare * positionMCVSOutput.w);\n"
-    "  vec2 grid = abs(fract(coord - 0.5) - 0.5) / fwidth(coord);\n");
+  std::string posImpl;
+  std::string uniformImpl;
 
-  vtkShaderProgram::Substitute(FSSource, "  //VTK::Color::Impl",
+  std::string colorImpl =
     "  float line = min(grid.x, grid.y);\n"
     "  float dist2 = unitSquare * unitSquare * (coord.x * coord.x + coord.y * coord.y);\n"
     "  float opacity = (1.0 - min(line, 1.0)) * (1.0 - dist2 / (fadeDist * fadeDist));\n"
-    "  vec3 color = diffuseColorUniform;\n"
-    "  if (abs(coord.x) < 0.1 && grid.y != line) color = vec3(0.0, 0.0, 1.0);\n"
-    "  if (abs(coord.y) < 0.1 && grid.x != line) color = vec3(1.0, 0.0, 0.0);\n"
-    "  gl_FragData[0] = vec4(color, opacity);\n");
+    "  vec3 color = diffuseColorUniform;\n";
+
+  switch (this->UpIndex)
+  {
+    case 0:
+      posImpl += "positionMCVSOutput = vec4(0.0, vertexMC.x, vertexMC.y, 1.0);\n";
+      uniformImpl +=
+        "  vec2 coord = positionMCVSOutput.yz / (unitSquare * positionMCVSOutput.w);\n";
+      colorImpl += "  if (abs(coord.x) < 0.1 && grid.y != line) color = vec3(0.0, 0.0, 1.0);\n"
+                   "  if (abs(coord.y) < 0.1 && grid.x != line) color = vec3(0.0, 1.0, 0.0);\n";
+      break;
+    case 1:
+      posImpl += "positionMCVSOutput = vec4(vertexMC.x, 0.0, vertexMC.y, 1.0);\n";
+      uniformImpl +=
+        "  vec2 coord = positionMCVSOutput.xz / (unitSquare * positionMCVSOutput.w);\n";
+      colorImpl += "  if (abs(coord.x) < 0.1 && grid.y != line) color = vec3(0.0, 0.0, 1.0);\n"
+                   "  if (abs(coord.y) < 0.1 && grid.x != line) color = vec3(1.0, 0.0, 0.0);\n";
+      break;
+    case 2:
+      posImpl += "positionMCVSOutput = vec4(vertexMC.x, vertexMC.y, 0.0, 1.0);\n";
+      uniformImpl +=
+        "  vec2 coord = positionMCVSOutput.xy / (unitSquare * positionMCVSOutput.w);\n";
+      colorImpl += "  if (abs(coord.x) < 0.1 && grid.y != line) color = vec3(0.0, 1.0, 0.0);\n"
+                   "  if (abs(coord.y) < 0.1 && grid.x != line) color = vec3(1.0, 0.0, 0.0);\n";
+      break;
+  }
+  posImpl += "gl_Position = MCDCMatrix * positionMCVSOutput;\n";
+  uniformImpl += "  vec2 grid = abs(fract(coord - 0.5) - 0.5) / fwidth(coord);\n";
+  colorImpl += "  gl_FragData[0] = vec4(color, opacity);\n";
+
+  vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl", posImpl);
+  vtkShaderProgram::Substitute(FSSource, "  //VTK::UniformFlow::Impl", uniformImpl);
+  vtkShaderProgram::Substitute(FSSource, "  //VTK::Color::Impl", colorImpl);
 
   shaders[vtkShader::Vertex]->SetSource(VSSource);
   shaders[vtkShader::Fragment]->SetSource(FSSource);

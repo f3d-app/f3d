@@ -81,7 +81,9 @@ Options|Description
 -x, \-\-axis|Show *axes* as a trihedron in the scene.
 -g, \-\-grid|Show *a grid* aligned with the XZ plane.
 -e, \-\-edges|Show the *cell edges*.
+-k, \-\-trackball|Enable trackball interaction.
 \-\-progress|Show a *progress bar* when loading the file.
+\-\-up|Define the Up direction (default: +Y)
 \-\-geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-dry-run|Do not read the configuration file but consider only the command line options
 
@@ -191,6 +193,7 @@ Some options can be toggled directly using interactions:
 * Press `O` key to toggle point sprites rendering.
 * Press `F` key to toggle full screen.
 * Press `U` key to toggle background blur.
+* Press `K` key to toggle trackball interaction mode.
 
 Other interactions are available:
 * Press `H` key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
