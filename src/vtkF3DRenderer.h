@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef vtkvtkF3DRenderer_h
-#define vtkvtkF3DRenderer_h
+#ifndef vtkF3DRenderer_h
+#define vtkF3DRenderer_h
 
 #include "Config.h"
 #include "F3DOptions.h"
@@ -180,7 +180,7 @@ public:
   void UpdateActorsVisibility();
 
 protected:
-  vtkF3DRenderer() = default;
+  vtkF3DRenderer();
   ~vtkF3DRenderer() override = default;
 
   void ReleaseGraphicsResources(vtkWindow* w) override;

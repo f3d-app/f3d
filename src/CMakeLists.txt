@@ -32,7 +32,9 @@ add_executable(f3d
   vtkF3DGenericImporter.cxx
   vtkF3DInteractorStyle.cxx
   vtkF3DMetaReader.cxx
+  vtkF3DObjectFactory.cxx
   vtkF3DOpenGLGridMapper.cxx
+  vtkF3DPolyDataMapper.cxx
   vtkF3DRenderPass.cxx
   vtkF3DRenderer.cxx
   F3DLoader.cxx

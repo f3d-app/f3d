@@ -14,6 +14,7 @@
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
 #include <vtkCellData.h>
+#include <vtkCullerCollection.h>
 #include <vtkDataArray.h>
 #include <vtkFieldData.h>
 #include <vtkImageData.h>
@@ -52,6 +53,12 @@
 #include <cmath>
 
 vtkStandardNewMacro(vtkF3DRenderer);
+
+//----------------------------------------------------------------------------
+vtkF3DRenderer::vtkF3DRenderer()
+{
+  this->Cullers->RemoveAllItems();
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
