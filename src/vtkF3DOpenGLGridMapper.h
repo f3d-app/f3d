@@ -17,11 +17,29 @@ public:
   vtkTypeMacro(vtkF3DOpenGLGridMapper, vtkOpenGLPolyDataMapper);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  //@{
+  /**
+   * Set/Get the distance where the grid disappear.
+   */
   vtkSetMacro(FadeDistance, double);
   vtkGetMacro(FadeDistance, double);
+  //@}
 
+  //@{
+  /**
+   * Set/Get the size of a square on the grid.
+   */
   vtkSetMacro(UnitSquare, double);
   vtkGetMacro(UnitSquare, double);
+  //@}
+
+  //@{
+  /**
+   * Set/Get the up vector index (X, Y, Z axis respectively).
+   */
+  vtkSetClampMacro(UpIndex, int, 0, 2);
+  vtkGetMacro(UpIndex, int);
+  //@}
 
   double* GetBounds() override;
 
@@ -43,6 +61,7 @@ protected:
 
   double FadeDistance = 10.0;
   double UnitSquare = 1.0;
+  int UpIndex = 1;
 
 private:
   vtkF3DOpenGLGridMapper(const vtkF3DOpenGLGridMapper&) = delete;

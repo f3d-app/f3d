@@ -49,6 +49,7 @@
 
 #include "F3DLog.h"
 
+#include <cctype>
 #include <chrono>
 #include <cmath>
 
@@ -103,6 +104,35 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->UseVolume = this->Options.Volume;
   this->UseInverseOpacityFunction = this->Options.InverseOpacityFunction;
   this->UseBlurBackground = this->Options.BlurBackground;
+  this->UseTrackball = this->Options.Trackball;
+
+  // parse up vector
+  if (this->Options.Up.size() == 2)
+  {
+    char sign = this->Options.Up[0];
+    char axis = std::toupper(this->Options.Up[1]);
+    if ((sign == '-' || sign == '+') && (axis >= 'X' && axis <= 'Z'))
+    {
+      this->UpIndex = axis - 'X';
+      std::fill(this->UpVector, this->UpVector + 3, 0);
+      this->UpVector[this->UpIndex] = (sign == '+') ? 1.0 : -1.0;
+
+      std::fill(this->RightVector, this->RightVector + 3, 0);
+      this->RightVector[this->UpIndex == 0 ? 1 : 0] = 1.0;
+
+      double pos[3];
+      vtkMath::Cross(this->UpVector, this->RightVector, pos);
+      vtkMath::MultiplyScalar(pos, -1.0);
+
+      vtkCamera* cam = this->GetActiveCamera();
+      cam->SetFocalPoint(0.0, 0.0, 0.0);
+      cam->SetPosition(pos);
+      cam->SetViewUp(this->UpVector);
+
+      this->SetEnvironmentUp(this->UpVector);
+      this->SetEnvironmentRight(this->RightVector);
+    }
+  }
 
   if (!this->Options.HDRIFile.empty() && !this->GetUseImageBasedLighting())
   {
@@ -132,7 +162,10 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
       this->SetEnvironmentTexture(texture);
 
       // Skybox OpenGL
-      this->Skybox->SetFloorRight(0.0, 0.0, 1.0);
+      double front[3];
+      vtkMath::Cross(this->RightVector, this->UpVector, front);
+      this->Skybox->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
+      this->Skybox->SetFloorRight(front[0], front[1], front[2]);
       this->Skybox->SetProjection(vtkSkybox::Sphere);
       this->Skybox->SetTexture(texture);
 
@@ -353,23 +386,27 @@ void vtkF3DRenderer::ShowGrid(bool show)
     double diag = bbox.GetDiagonalLength();
     double unitSquare = pow(10.0, round(log10(diag * 0.1)));
 
-    double gridX = 0.5 * (bounds[0] + bounds[1]);
-    double gridY = bounds[2];
-    double gridZ = 0.5 * (bounds[4] + bounds[5]);
+    double gridPos[3];
+    for (int i=0; i<3; i++)
+    {
+      double size = bounds[2*i+1] - bounds[2*i];
+      gridPos[i] = 0.5 * (bounds[2*i] + bounds[2*i+1] - this->UpVector[i] * size);
+    }
 
     if (this->Options.Verbose && show)
     {
       F3DLog::Print(F3DLog::Severity::Info, "Using grid unit square size = ", unitSquare, "\n",
-        "Grid origin set to [", gridX, ", ", gridY, ", ", gridZ, "]\n");
+        "Grid origin set to [", gridPos[0], ", ", gridPos[1], ", ", gridPos[2], "]\n");
     }
 
     vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
     gridMapper->SetFadeDistance(diag);
     gridMapper->SetUnitSquare(unitSquare);
+    gridMapper->SetUpIndex(this->UpIndex);
 
     this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
     this->GridActor->ForceTranslucentOn();
-    this->GridActor->SetPosition(gridX, gridY, gridZ);
+    this->GridActor->SetPosition(gridPos);
     this->GridActor->SetMapper(gridMapper);
     this->GridActor->UseBoundsOff();
 
@@ -709,9 +746,10 @@ void vtkF3DRenderer::UpdateCheatSheet()
                    << (this->GetRenderWindow()->GetFullScreen() ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " U: Blur background " << (this->UseBlurBackground ? "[ON]" : "[OFF]")
                    << "\n";
-    cheatSheetText << "\n   H  : Cheat sheet \n";
-    cheatSheetText << "   ?  : Dump camera state to the terminal\n";
-    cheatSheetText << "  ESC : Quit \n";
+    cheatSheetText << " K: Trackball interaction" << (this->UseTrackball ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << "\n H  : Cheat sheet \n";
+    cheatSheetText << " ?  : Dump camera state to the terminal\n";
+    cheatSheetText << " ESC : Quit \n";
     cheatSheetText << " ENTER: Reset camera \n";
     cheatSheetText << " LEFT : Previous file \n";
     cheatSheetText << " RIGHT: Next file \n";
@@ -743,6 +781,19 @@ void vtkF3DRenderer::ShowEdge(bool show)
 bool vtkF3DRenderer::IsEdgeVisible()
 {
   return this->EdgesVisible;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseTrackball(bool use)
+{
+  this->UseTrackball = use;
+  this->CheatSheetNeedUpdate = true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::UsingTrackball()
+{
+  return this->UseTrackball;
 }
 
 //----------------------------------------------------------------------------
@@ -910,7 +961,9 @@ void vtkF3DRenderer::DumpSceneState()
   cam->GetPosition(position);
   cam->GetFocalPoint(focal);
   cam->GetViewUp(up);
-  F3DLog::Print(F3DLog::Severity::Info, "Camera position: ", position[0], ",", position[1], ",", position[2]);
-  F3DLog::Print(F3DLog::Severity::Info, "Camera focal point: ", focal[0], ",", focal[1], ",", focal[2]);
+  F3DLog::Print(
+    F3DLog::Severity::Info, "Camera position: ", position[0], ",", position[1], ",", position[2]);
+  F3DLog::Print(
+    F3DLog::Severity::Info, "Camera focal point: ", focal[0], ",", focal[1], ",", focal[2]);
   F3DLog::Print(F3DLog::Severity::Info, "Camera view up: ", up[0], ",", up[1], ",", up[2], "\n");
 }

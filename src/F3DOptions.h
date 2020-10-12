@@ -41,6 +41,7 @@ struct F3DOptions
   bool InverseOpacityFunction = false;
   bool NoBackground = false;
   bool BlurBackground = false;
+  bool Trackball = false;
   double CameraViewAngle;
   double Metallic = 0.0;
   double Opacity = 1.0;
@@ -50,6 +51,7 @@ struct F3DOptions
   double Roughness = 0.3;
   int Component = -1;
   int Samples = 5;
+  std::string Up = "+Y";
   std::string Output = "";
   std::string Reference = "";
   std::string Scalars = f3d::F3DReservedString;
