@@ -431,6 +431,10 @@ void vtkF3DGenericImporter::ConfigureVolumeForColoring(vtkSmartVolumeMapper* map
   {
     mapper->SetVectorMode(vtkSmartVolumeMapper::MAGNITUDE);
   }
+  else if (this->Options->Component == -2)
+  {
+    mapper->SetVectorMode(vtkSmartVolumeMapper::DISABLED);
+  }
 
   vtkNew<vtkPiecewiseFunction> otf;
   otf->AddPoint(range[0], this->Options->InverseOpacityFunction ? 1.0 : 0.0);
@@ -454,8 +458,17 @@ void vtkF3DGenericImporter::ConfigureMapperForColoring(
   mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
                                              : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
   mapper->SetScalarVisibility(this->Options->Scalars != f3d::F3DReservedString);
-  mapper->SetScalarRange(range);
-  mapper->SetLookupTable(ctf);
+
+  if (this->Options->Component == -2)
+  {
+    mapper->SetColorModeToDirectScalars();
+  }
+  else
+  {
+    mapper->SetColorModeToMapScalars();
+    mapper->SetScalarRange(range);
+    mapper->SetLookupTable(ctf);
+  }
 }
 
 //----------------------------------------------------------------------------
