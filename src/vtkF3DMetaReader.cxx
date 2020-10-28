@@ -16,6 +16,7 @@
 #include <vtkPLYReader.h>
 #include <vtkPTSReader.h>
 #include <vtkSTLReader.h>
+#include <vtkTIFFReader.h>
 #include <vtkVersion.h>
 #include <vtkXMLGenericDataObjectReader.h>
 #include <vtksys/SystemTools.hxx>
@@ -129,6 +130,12 @@ void vtkF3DMetaReader::SetFileName(const std::string& fileName)
     if (!this->InternalReader && (ext == ".mha" || ext == ".mhd"))
     {
       vtkNew<vtkMetaImageReader> reader;
+      reader->SetFileName(this->FileName);
+      this->InternalReader = reader;
+    }
+    if (!this->InternalReader && (ext == ".tiff" || ext == ".tif"))
+    {
+      vtkNew<vtkTIFFReader> reader;
       reader->SetFileName(this->FileName);
       this->InternalReader = reader;
     }
