@@ -269,10 +269,19 @@ void F3DLoader::LoadFile(int load)
       progressWidget->SetRepresentation(progressRep);
 
       progressRep->SetProgressRate(0.0);
-      progressRep->SetPosition(0.25, 0.45);
+      progressRep->ProportionalResizeOff();
+      progressRep->SetPosition(0.0, 0.0);
+      progressRep->SetPosition2(1.0, 0.0);
+      progressRep->SetMinimumSize(0, 5);
       progressRep->SetProgressBarColor(1, 1, 1);
-      progressRep->SetBackgroundColor(1, 1, 1);
       progressRep->DrawBackgroundOff();
+      progressRep->DragableOff();
+      progressRep->SetShowBorderToOff();
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201027)
+      progressRep->DrawFrameOff();
+      progressRep->SetPadding(0.0, 0.0);
+#endif
 
       progressWidget->On();
     }
