@@ -416,8 +416,13 @@ std::string ConfigurationOptions::GetSystemSettingsDirectory()
   std::string directoryPath = "";
 // No support implemented for system wide settings on Windows yet
 #ifndef _WIN32
+#ifdef __APPLE__
+  // Implementing simple /usr/local/etc/ system wide config
+  directoryPath = "/usr/local/etc/f3d/";
+#else
   // Implementing simple /etc/ system wide config
   directoryPath = "/etc/f3d/";
+#endif
 #endif
   return directoryPath;
 }
