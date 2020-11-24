@@ -48,7 +48,6 @@ int F3DLoader::Start(int argc, char** argv)
   {
     this->RenWin->SetSize(options.WindowSize[0], options.WindowSize[1]);
     this->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
-    this->RenWin->SetWindowName(f3d::AppTitle.c_str());
     this->RenWin->SetFullScreen(options.FullScreen);
 
     // the renderer must be added to the render window after OpenGL context initialization
@@ -93,6 +92,7 @@ int F3DLoader::Start(int argc, char** argv)
     interactor->SetInteractorStyle(style);
     interactor->Initialize();
     this->Renderer->Initialize(options, "");
+    this->RenWin->SetWindowName(f3d::AppTitle.c_str());
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200615)
     // set icon
