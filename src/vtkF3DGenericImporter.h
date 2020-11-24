@@ -9,6 +9,7 @@
 #include "Config.h"
 
 #include "vtkF3DMetaReader.h"
+#include "vtkF3DPostProcessFilter.h"
 
 #include <vtkImporter.h>
 
@@ -86,6 +87,43 @@ public:
   vtkGetMacro(ScalarsAvailable, bool);
   //@}
 
+  void UpdateTimeStep(double timestep) override;
+
+  /**
+   * Get the number of available animations.
+   * Returns 1 if an animation is available or
+   * 0 if not.
+   */
+  vtkIdType GetNumberOfAnimations() override;
+
+  /**
+   * Return a dummy name of the first animation if any, empty string otherwise.
+   */
+  std::string GetAnimationName(vtkIdType animationIndex) override;
+
+  //@{
+  /**
+   * Enable/Disable/Get the status of specific animations
+   * Only the first animation can be enabled
+   */
+  void EnableAnimation(vtkIdType animationIndex) override;
+  void DisableAnimation(vtkIdType animationIndex) override;
+  bool IsAnimationEnabled(vtkIdType animationIndex) override;
+  //@}
+
+  /**
+   * Get temporal informations for the currently enabled animations.
+   * Framerate is ignored in this implementation.
+   * the three return arguments are defined in this implementation.
+   */
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
+  bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
+    double timeRange[2], vtkDoubleArray* timeSteps) override;
+#else
+  bool GetTemporalInformation(vtkIdType animationIndex, int& nbTimeSteps,
+    double timeRange[2], vtkDoubleArray* timeSteps) override;
+#endif
+
 protected:
   vtkF3DGenericImporter() = default;
   ~vtkF3DGenericImporter() override = default;
@@ -102,6 +140,8 @@ protected:
   void ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
     vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2]);
 
+  void UpdateTemporalInformation();
+
   vtkNew<vtkF3DMetaReader> Reader;
 
   const F3DOptions* Options = nullptr;
@@ -114,6 +154,13 @@ protected:
   vtkNew<vtkSmartVolumeMapper> VolumeMapper;
   std::string OutputDescription;
   bool ScalarsAvailable = false;
+
+  bool AnimationEnabled = false;
+  bool TemporalInformationUpdated = false;
+  int NbTimeSteps = -1;
+  double* TimeSteps = nullptr;
+  double* TimeRange = nullptr;
+  vtkNew<vtkF3DPostProcessFilter> PostPro;
 
 private:
   vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;

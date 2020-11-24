@@ -38,6 +38,19 @@ void vtkF3DMetaReader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
+vtkInformation* vtkF3DMetaReader::GetOutputInformation(int port)
+{
+  if (!this->InternalReader)
+  {
+    vtkErrorMacro("InternalReader has not been created yet, "
+                  "make sure to set to use a supported file format and to set the FileName");
+    return 0;
+  }
+
+  return this->InternalReader->GetOutputInformation(port);
+}
+
+//----------------------------------------------------------------------------
 int vtkF3DMetaReader::ProcessRequest(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
@@ -149,6 +162,18 @@ void vtkF3DMetaReader::SetFileName(const std::string& fileName)
     {
       vtkNew<vtkGLTFReader> reader;
       reader->SetFileName(this->FileName);
+
+      // Enable all animations in the GLTFReader
+      reader->SetFrameRate(30);
+      reader->ApplyDeformationsToGeometryOn();
+      reader->UpdateInformation(); // Read model metadata to get the number of animations
+      for (vtkIdType i = 0; i < reader->GetNumberOfAnimations(); i++)
+      {
+        reader->EnableAnimation(i);
+      }
+      // It is needed to update the information directly in order to recover it later
+      // Not entirely understood, TODO
+      reader->UpdateInformation();
       this->InternalReader = reader;
     }
     if (!this->InternalReader && ext == ".gml")

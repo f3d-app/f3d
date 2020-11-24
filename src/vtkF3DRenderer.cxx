@@ -224,6 +224,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetColor(textColor);
   this->TimerActor->GetTextProperty()->SetFontSize(15);
+  this->TimerActor->SetPosition(10, 10);
 
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontSize(15);
@@ -751,6 +752,11 @@ void vtkF3DRenderer::UpdateCheatSheet()
     cheatSheetText << " ?  : Dump camera state to the terminal\n";
     cheatSheetText << " ESC : Quit \n";
     cheatSheetText << " ENTER: Reset camera \n";
+    cheatSheetText << "\n   H  : Cheat sheet \n";
+    cheatSheetText << "   ?  : Dump camera state to the terminal\n";
+    cheatSheetText << "  ESC : Quit \n";
+    cheatSheetText << " ENTER: Reset camera to initial parameters\n";
+    cheatSheetText << " SPACE: Play animation if any\n";
     cheatSheetText << " LEFT : Previous file \n";
     cheatSheetText << " RIGHT: Next file \n";
     cheatSheetText << " UP   : Reload current file \n";
