@@ -175,11 +175,17 @@ void vtkF3DInteractorStyle::OnKeyPress()
       }
       else if (keySym == "Escape")
       {
+        rwi->RemoveAllObservers();
         rwi->ExitCallback();
       }
       else if (keySym == "Return")
       {
         ren->ResetCamera();
+        renWin->Render();
+      }
+      else if (keySym == "space")
+      {
+        this->InvokeEvent(F3DLoader::ToggleAnimationEvent);
         renWin->Render();
       }
       break;

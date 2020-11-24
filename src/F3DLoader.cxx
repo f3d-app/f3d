@@ -9,6 +9,7 @@
 
 #include <vtk3DSImporter.h>
 #include <vtkCallbackCommand.h>
+#include <vtkDoubleArray.h>
 #include <vtkGLTFImporter.h>
 #include <vtkImageData.h>
 #include <vtkNew.h>
@@ -40,18 +41,18 @@ int F3DLoader::Start(int argc, char** argv)
   F3DOptions options = this->Parser.GetOptionsFromCommandLine(files);
 
   this->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
+  this->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
 
-  vtkNew<vtkRenderWindow> renWin;
   vtkNew<vtkRenderWindowInteractor> interactor;
   if (!options.NoRender)
   {
-    renWin->SetSize(options.WindowSize[0], options.WindowSize[1]);
-    renWin->SetMultiSamples(0); // Disable hardware antialiasing
-    renWin->SetWindowName(f3d::AppTitle.c_str());
-    renWin->SetFullScreen(options.FullScreen);
+    this->RenWin->SetSize(options.WindowSize[0], options.WindowSize[1]);
+    this->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
+    this->RenWin->SetWindowName(f3d::AppTitle.c_str());
+    this->RenWin->SetFullScreen(options.FullScreen);
 
     // the renderer must be added to the render window after OpenGL context initialization
-    renWin->AddRenderer(this->Renderer);
+    this->RenWin->AddRenderer(this->Renderer);
 
     vtkNew<vtkF3DInteractorStyle> style;
 
@@ -79,7 +80,16 @@ int F3DLoader::Start(int argc, char** argv)
     });
     style->AddObserver(F3DLoader::LoadFileEvent, loadFileCallback);
 
-    interactor->SetRenderWindow(renWin);
+    vtkNew<vtkCallbackCommand> toggleAnimationCallback;
+    toggleAnimationCallback->SetClientData(&this->AnimationManager);
+    toggleAnimationCallback->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void*) {
+        F3DAnimationManager* animMgr = static_cast<F3DAnimationManager*>(clientData);
+        animMgr->ToggleAnimation();
+      });
+    style->AddObserver(F3DLoader::ToggleAnimationEvent, toggleAnimationCallback);
+
+    interactor->SetRenderWindow(this->RenWin);
     interactor->SetInteractorStyle(style);
     interactor->Initialize();
     this->Renderer->Initialize(options, "");
@@ -93,11 +103,11 @@ int F3DLoader::Start(int argc, char** argv)
     unsigned char* p = static_cast<unsigned char*>(icon->GetScalarPointer(0, 0, 0));
     std::copy(F3DIconBuffer, F3DIconBuffer + F3DIconDimX * F3DIconDimY * F3DIconNbComp, p);
 
-    renWin->SetIcon(icon);
+    this->RenWin->SetIcon(icon);
 #endif
 
 #if __APPLE__
-    F3DNSDelegate::InitializeDelegate(this, renWin);
+    F3DNSDelegate::InitializeDelegate(this, this->RenWin);
 #endif
   }
 
@@ -109,15 +119,17 @@ int F3DLoader::Start(int argc, char** argv)
   {
     if (!options.Output.empty())
     {
-      retVal = F3DOffscreenRender::RenderOffScreen(renWin, options.Output, options.NoBackground);
+      retVal =
+        F3DOffscreenRender::RenderOffScreen(this->RenWin, options.Output, options.NoBackground);
     }
     else if (!options.Reference.empty())
     {
-      retVal = F3DOffscreenRender::RenderTesting(renWin, options.Reference, options.RefThreshold);
+      retVal =
+        F3DOffscreenRender::RenderTesting(this->RenWin, options.Reference, options.RefThreshold);
     }
     else
     {
-      renWin->Render();
+      this->RenWin->Render();
       interactor->Start();
     }
 
@@ -194,17 +206,17 @@ void F3DLoader::LoadFile(int load)
       return;
     }
     filePath = this->FilesList[this->CurrentFileIndex];
-    fileInfo = "(" + std::to_string(this->CurrentFileIndex + 1) + "/" +
-      std::to_string(size) + ") " + vtksys::SystemTools::GetFilenameName(filePath);
+    fileInfo = "(" + std::to_string(this->CurrentFileIndex + 1) + "/" + std::to_string(size) +
+      ") " + vtksys::SystemTools::GetFilenameName(filePath);
   }
 
-  F3DOptions opts = this->Parser.GetOptionsFromCommandLine();
-  if (!opts.DryRun)
+  this->Options = this->Parser.GetOptionsFromCommandLine();
+  if (!this->Options.DryRun)
   {
-    opts = this->Parser.GetOptionsFromConfigFile(filePath);
+    this->Options = this->Parser.GetOptionsFromConfigFile(filePath);
   }
 
-  if (opts.Verbose || opts.NoRender)
+  if (this->Options.Verbose || this->Options.NoRender)
   {
     if (filePath.empty())
     {
@@ -219,14 +231,14 @@ void F3DLoader::LoadFile(int load)
   if (filePath.empty())
   {
     fileInfo += "No file to load provided, please drop one into this window";
-    this->Renderer->Initialize(opts, fileInfo);
+    this->Renderer->Initialize(this->Options, fileInfo);
     return;
   }
 
-  vtkSmartPointer<vtkImporter> importer = this->GetImporter(opts, filePath);
+  this->Importer = this->GetImporter(this->Options, filePath);
 
   vtkNew<vtkProgressBarWidget> progressWidget;
-  if (!opts.NoRender)
+  if (!this->Options.NoRender)
   {
     this->Renderer->SetScalarBarActor(nullptr);
     this->Renderer->SetGeometryActor(nullptr);
@@ -236,22 +248,20 @@ void F3DLoader::LoadFile(int load)
     this->Renderer->SetPointGaussianMapper(nullptr);
     this->Renderer->SetVolumeMapper(nullptr);
 
-    if (!importer)
+    if (!this->Importer)
     {
       F3DLog::Print(
         F3DLog::Severity::Warning, filePath, " is not a file of a supported file format\n");
       fileInfo += " [UNSUPPORTED]";
-      this->Renderer->Initialize(opts, fileInfo);
+      this->Renderer->Initialize(this->Options, fileInfo);
       return;
     }
 
-    this->Renderer->Initialize(opts, fileInfo);
+    this->Renderer->Initialize(this->Options, fileInfo);
 
-    importer->SetRenderWindow(this->Renderer->GetRenderWindow());
+    this->Importer->SetRenderWindow(this->Renderer->GetRenderWindow());
 
-    vtkNew<vtkProgressBarRepresentation> progressRep;
-
-    if (opts.Progress)
+    if (this->Options.Progress)
     {
       vtkNew<vtkCallbackCommand> progressCallback;
       progressCallback->SetClientData(progressWidget);
@@ -263,11 +273,12 @@ void F3DLoader::LoadFile(int load)
           rep->SetProgressRate(*static_cast<double*>(callData));
           widget->GetInteractor()->GetRenderWindow()->Render();
         });
-      importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
+      this->Importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
 
       progressWidget->SetInteractor(this->Renderer->GetRenderWindow()->GetInteractor());
-      progressWidget->SetRepresentation(progressRep);
 
+      vtkProgressBarRepresentation* progressRep =
+        vtkProgressBarRepresentation::SafeDownCast(progressWidget->GetRepresentation());
       progressRep->SetProgressRate(0.0);
       progressRep->ProportionalResizeOff();
       progressRep->SetPosition(0.0, 0.0);
@@ -287,20 +298,25 @@ void F3DLoader::LoadFile(int load)
     }
   }
 
-  importer->Update();
+  this->Importer->Update();
+
+  // we need to remove progress observer in order to hide the progress bar during animation
+  this->Importer->RemoveObservers(vtkCommand::ProgressEvent);
+
+  this->AnimationManager.Initialize(this->Options, this->Importer, this->RenWin);
 
   // Display description
-  if (opts.Verbose || opts.NoRender)
+  if (this->Options.Verbose || this->Options.NoRender)
   {
-    F3DLog::Print(F3DLog::Severity::Info, importer->GetOutputsDescription());
+    F3DLog::Print(F3DLog::Severity::Info, this->Importer->GetOutputsDescription());
   }
 
-  if (!opts.NoRender)
+  if (!this->Options.NoRender)
   {
     progressWidget->Off();
 
     // Recover generic importer specific actors and mappers to set on the renderer
-    vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importer);
+    vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(this->Importer);
     if (genericImporter)
     {
       this->Renderer->SetScalarBarActor(genericImporter->GetScalarBarActor());

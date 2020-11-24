@@ -173,6 +173,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", options.Trackball);
     this->DeclareOption(grp1, "progress", "", "Show progress bar", options.Progress);
     this->DeclareOption(grp1, "up", "", "Up direction", options.Up, true, "[-X|+X|-Y|+Y|-Z|+Z]");
+    this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.AnimationIndex, true, "<index>");
     this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", options.GeometryOnly);
     this->DeclareOption(grp1, "dry-run", "", "Do not read the configuration file", options.DryRun);
 
@@ -270,6 +271,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
         " ?         Dump camera state to the terminal\n"
         " ESC       Quit\n"
         " ENTER     Reset camera to initial parameters\n"
+        " SPACE     Play animation if any\n"
         " LEFT      Previous file\n"
         " RIGHT     Next file\n"
         " UP        Reload current file\n"
@@ -607,6 +609,13 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
   }
   else
   {
+    if (defaultOptions.AnimationIndex != options.AnimationIndex)
+    {
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying an Animation Index has no effect while using the default scene.");
+      ret = false;
+    }
+
     if (defaultOptions.Scalars == options.Scalars)
     {
       if (defaultOptions.Component != options.Component)

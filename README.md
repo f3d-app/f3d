@@ -85,6 +85,7 @@ Options|Description
 -k, \-\-trackball|Enable trackball interaction.
 \-\-progress|Show a *progress bar* when loading the file.
 \-\-up|Define the Up direction (default: +Y)
+\-\-animation-index|Selection the animation to show.<br>Any negative value means all animations.<br>The default scene always has a single animation if any.
 \-\-geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-dry-run|Do not read the configuration file but consider only the command line options
 
@@ -201,9 +202,10 @@ Other interactions are available:
 * Press `?` key to dump camera state to the terminal.
 * Press `ESC` key to close the window and quit F3D.
 * Press `ENTER` key to reset the camera to its inital parameters.
-* Press `LEFT` to load the previous file if any
-* Press `RIGHT` to load the next file if any
-* Press `UP` to reload the current file
+* Press `SPACE` key to play the animation if any.
+* Press `LEFT` to load the previous file if any.
+* Press `RIGHT` to load the next file if any.
+* Press `UP` to reload the current file.
 
 # Configuration file
 
@@ -261,12 +263,11 @@ On Linux, it will be installed in /etc/f3d/, on Windows, it will be installed in
 
 # Limitations
 
-* No support for animation.
 * No support for specifying manual lighting in the default scene.
 * Drag&Drop does not work with Thunar file manager.
 * Pressing the `z` hotkey to display the FPS timer triggers a double render.
-* Volume rendering is only available for 3D image data
 * Multiblock (.vtm, .gml) support is partial, non-surfacic data will be converted into surfaces.
+* Animation support with full scene data format require VTK >= 9.0.20201016.
 
 # Troubleshootings
 

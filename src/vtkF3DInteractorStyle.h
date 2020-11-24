@@ -25,6 +25,11 @@ public:
   void OnChar() override {}
 
   /**
+   * Disable base class features
+   */
+  void OnTimer() override {}
+
+  /**
    * Handle drop files
    */
   void OnDropFiles(vtkStringArray* files) override;

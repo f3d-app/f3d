@@ -35,8 +35,10 @@ add_executable(f3d
   vtkF3DObjectFactory.cxx
   vtkF3DOpenGLGridMapper.cxx
   vtkF3DPolyDataMapper.cxx
+  vtkF3DPostProcessFilter.cxx
   vtkF3DRenderPass.cxx
   vtkF3DRenderer.cxx
+  F3DAnimationManager.cxx
   F3DLoader.cxx
   F3DLog.cxx
   F3DOffscreenRender.cxx
