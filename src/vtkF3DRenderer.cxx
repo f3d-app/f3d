@@ -337,6 +337,12 @@ void vtkF3DRenderer::SetupRenderPasses()
 
   bool hasHDRI = this->GetEnvironmentTexture() != nullptr;
   vtkOSPRayRendererNode::SetBackgroundMode(hasHDRI ? 2 : 1, this);
+#else
+  if (this->UseRaytracing || this->UseRaytracingDenoiser)
+  {
+    F3DLog::Print(F3DLog::Severity::Warning,
+        "Raytracing options can't be used if F3D has not been built with raytracing");
+  }
 #endif
 }
 
