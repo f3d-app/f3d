@@ -45,9 +45,12 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
     this->ProgressWidget->On();
   }
 
+  // This can be -1 if animation support is not implemented in the importer
+  int availAnimations = this->Importer->GetNumberOfAnimations();
+
   if (options.Verbose || options.NoRender)
   {
-    if (this->Importer->GetNumberOfAnimations() == 0)
+    if (availAnimations <= 0)
     {
       F3DLog::Print(F3DLog::Severity::Info, "No animations available in this file");
     }
@@ -63,14 +66,22 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
 
   }
 
-  if (options.AnimationIndex >= this->Importer->GetNumberOfAnimations())
+  if (options.AnimationIndex >= 0)
   {
-    F3DLog::Print(F3DLog::Severity::Warning,
-      "Specified Animation Index is greater than the highest possible animation index, enabling all animations.");
+    if (availAnimations > 0 && options.AnimationIndex >= availAnimations)
+    {
+      F3DLog::Print(F3DLog::Severity::Warning,
+        "Specified animation index is greater than the highest possible animation index, enabling all animations.");
+    }
+    else if (availAnimations <= 0)
+    {
+      F3DLog::Print(F3DLog::Severity::Warning,
+        "An animation index has been specified but there are no animations available.");
+    }
   }
-  if (options.AnimationIndex <= -1 || options.AnimationIndex >= this->Importer->GetNumberOfAnimations())
+  if (options.AnimationIndex <= -1 || options.AnimationIndex >= availAnimations)
   {
-    for (int i = 0; i < this->Importer->GetNumberOfAnimations(); i++)
+    for (int i = 0; i < availAnimations; i++)
     {
       this->Importer->EnableAnimation(i);
     }
