@@ -434,6 +434,8 @@ std::string ConfigurationOptions::GetBinarySettingsDirectory()
   std::string errorMsg, programFilePath;
   if (vtksys::SystemTools::FindProgramPath(this->Argv[0], programFilePath, errorMsg))
   {
+    // resolve symlinks
+    programFilePath = vtksys::SystemTools::GetRealPath(programFilePath);
     directoryPath = vtksys::SystemTools::GetProgramPath(programFilePath);
     std::string separator;
 #if defined(_WIN32)
