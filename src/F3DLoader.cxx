@@ -369,8 +369,9 @@ vtkSmartPointer<vtkImporter> F3DLoader::GetImporter(
       std::string path = vtksys::SystemTools::GetFilenamePath(file);
       importer->SetTexturePath(path.c_str());
 
+#if VTK_VERSION_NUMBER <= VTK_VERSION_CHECK(9, 0, 20201129)
       // This logic is partially implemented in the OBJ importer itself
-      // This complete version should be backported.
+      // This has been backported in VTK 9.1
       std::string mtlFile = file + ".mtl";
       if (vtksys::SystemTools::FileExists(mtlFile))
       {
@@ -384,7 +385,7 @@ vtkSmartPointer<vtkImporter> F3DLoader::GetImporter(
           importer->SetFileNameMTL(mtlFile.c_str());
         }
       }
-
+#endif
       return importer;
     }
 
