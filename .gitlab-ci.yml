@@ -29,7 +29,7 @@ stages:
     - cmake -E make_directory vtk-install
     - git clone https://gitlab.kitware.com/vtk/vtk.git
     - cd vtk
-    - git checkout 8b1cf6c0
+    - git checkout 238849cb8f54e57ebb78b432d2ff6f23e848b473
     - cmake -E make_directory build
     - cd build
     - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS $RUNTIME_OPTION $POLICY_OPTION
