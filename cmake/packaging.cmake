@@ -57,6 +57,10 @@ if(WIN32 AND NOT UNIX)
     \\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' '.wrl' 'VRML file format'\n\
     \\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' '.gml' 'CityGML file format'\n\
     \\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' '.pts' 'Point cloud file format'\n\
+    \\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' '.ex2' 'Exodus II'\n\
+    \\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' '.exo' 'Exodus II'\n\
+    \\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' '.e' 'Exodus II'\n\
+    \\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' '.g' 'Exodus II'\n\
     \\\${RefreshShellIcons}")
 
   # Remove association on uninstall
@@ -82,6 +86,10 @@ if(WIN32 AND NOT UNIX)
     \\\${UnRegisterExtension} '.wrl' 'VRML file format'\n\
     \\\${UnRegisterExtension} '.gml' 'CityGML file format'\n\
     \\\${UnRegisterExtension} '.pts' 'Point Cloud file format'\n\
+    \\\${UnRegisterExtension} '.ex2' 'Exodus II'\n\
+    \\\${UnRegisterExtension} '.exo' 'Exodus II'\n\
+    \\\${UnRegisterExtension} '.e' 'Exodus II'\n\
+    \\\${UnRegisterExtension} '.g' 'Exodus II'\n\
     \\\${RefreshShellIcons}")
 
 else()

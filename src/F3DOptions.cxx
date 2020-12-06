@@ -286,6 +286,10 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
       version += f3d::AppVersion;
       version += "\nBuild date: ";
       version += f3d::AppBuildDate;
+      version += "\nSystem: ";
+      version += f3d::AppBuildSystem;
+      version += "\nCompiler: ";
+      version += f3d::AppCompiler;
       version += "\nRayTracing module: ";
 #if F3D_HAS_RAYTRACING
       version += "ON";

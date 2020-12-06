@@ -599,12 +599,6 @@ void vtkF3DRenderer::ShowScalars(bool show)
   this->ScalarsVisible = show;
   if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper)
   {
-    if (show && !this->ScalarsAvailable)
-    {
-      F3DLog::Print(F3DLog::Severity::Error,
-        "Cannot show scalars with this dataset or with the requested array");
-      show = false;
-    }
     this->PolyDataMapper->SetScalarVisibility(show);
     this->PointGaussianMapper->SetScalarVisibility(show);
     this->UpdateScalarBarVisibility();
