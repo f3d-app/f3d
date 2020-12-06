@@ -17,6 +17,7 @@
 #include <vtkPointGaussianMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkScalarBarActor.h>
+#include <vtkTimerLog.h>
 #include <vtkVRMLImporter.h>
 #include <vtkVersion.h>
 #include <vtksys/Directory.hxx>
@@ -25,6 +26,11 @@
 #include <algorithm>
 
 #include "F3DIcon.h"
+
+typedef struct ProgressDataStruct {
+    vtkTimerLog* timer;
+    vtkProgressBarWidget* widget;
+} ProgressDataStruct;
 
 //----------------------------------------------------------------------------
 F3DLoader::F3DLoader() = default;
@@ -238,6 +244,10 @@ void F3DLoader::LoadFile(int load)
   this->Importer = this->GetImporter(this->Options, filePath);
 
   vtkNew<vtkProgressBarWidget> progressWidget;
+  vtkNew<vtkTimerLog> timer;
+  ProgressDataStruct data;
+  data.timer = timer.Get();
+  data.widget = progressWidget.Get();
   if (!this->Options.NoRender)
   {
     this->Renderer->SetScalarBarActor(nullptr);
@@ -264,14 +274,21 @@ void F3DLoader::LoadFile(int load)
     if (this->Options.Progress)
     {
       vtkNew<vtkCallbackCommand> progressCallback;
-      progressCallback->SetClientData(progressWidget);
+      progressCallback->SetClientData(&data);
       progressCallback->SetCallback(
         [](vtkObject*, unsigned long, void* clientData, void* callData) {
-          vtkProgressBarWidget* widget = static_cast<vtkProgressBarWidget*>(clientData);
-          vtkProgressBarRepresentation* rep =
-            vtkProgressBarRepresentation::SafeDownCast(widget->GetRepresentation());
-          rep->SetProgressRate(*static_cast<double*>(callData));
-          widget->GetInteractor()->GetRenderWindow()->Render();
+          auto data = static_cast<ProgressDataStruct*>(clientData);
+          data->timer->StopTimer();
+          vtkProgressBarWidget* widget = data->widget;
+          // Only show and render the progress bar if loading takes more than 0.15 seconds
+          if(data->timer->GetElapsedTime() > 0.15)
+          {
+            widget->On();
+            vtkProgressBarRepresentation* rep =
+              vtkProgressBarRepresentation::SafeDownCast(widget->GetRepresentation());
+            rep->SetProgressRate(*static_cast<double*>(callData));
+            widget->GetInteractor()->GetRenderWindow()->Render();
+          }
         });
       this->Importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
 
@@ -293,11 +310,10 @@ void F3DLoader::LoadFile(int load)
       progressRep->DrawFrameOff();
       progressRep->SetPadding(0.0, 0.0);
 #endif
-
-      progressWidget->On();
     }
   }
 
+  timer->StartTimer();
   this->Importer->Update();
 
   // we need to remove progress observer in order to hide the progress bar during animation

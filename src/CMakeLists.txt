@@ -106,6 +106,7 @@ if(WIN32)
 endif()
 
 set(F3D_MODULES
+  VTK::CommonSystem
   VTK::FiltersGeneral
   VTK::FiltersGeometry
   VTK::ImagingCore
