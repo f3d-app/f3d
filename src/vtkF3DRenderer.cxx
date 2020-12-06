@@ -597,7 +597,7 @@ bool vtkF3DRenderer::UsingRaytracingDenoiser()
 void vtkF3DRenderer::ShowScalars(bool show)
 {
   this->ScalarsVisible = show;
-  if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper)
+  if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper && this->ScalarsAvailable)
   {
     this->PolyDataMapper->SetScalarVisibility(show);
     this->PointGaussianMapper->SetScalarVisibility(show);
