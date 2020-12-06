@@ -272,6 +272,22 @@
 					<string>pts</string>
 				</array>
 			</dict>
+			<!-- Exodus II -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>Exodus II</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>ex2</string>
+					<string>exo</string>
+					<string>g</string>
+					<string>e</string>
+				</array>
+			</dict>
 			<!-- File type associations -->
 		</array>
 	</dict>
