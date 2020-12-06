@@ -332,10 +332,16 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       this->ScalarsAvailable = false;
     }
   }
-  else if (!usedArray.empty() && !(usedArray == f3d::F3DReservedString))
+  else
   {
-    F3DLog::Print(F3DLog::Severity::Warning, "Unknow scalar array: ", usedArray);
     this->ScalarsAvailable = false;
+    this->PointGaussianMapper->ScalarVisibilityOff();
+    this->PolyDataMapper->ScalarVisibilityOff();
+
+    if (!usedArray.empty() && !(usedArray == f3d::F3DReservedString))
+    {
+      F3DLog::Print(F3DLog::Severity::Warning, "Unknow scalar array: ", usedArray);
+    }
   }
 
   // configure props
@@ -452,7 +458,7 @@ void vtkF3DGenericImporter::ConfigureMapperForColoring(
   mapper->SelectColorArray(array->GetName());
   mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
                                              : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-  mapper->SetScalarVisibility(this->Options->Scalars != f3d::F3DReservedString);
+  mapper->ScalarVisibilityOn();
 
   if (this->Options->Component == -2)
   {
