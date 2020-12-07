@@ -23,6 +23,7 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
 
   if (this->Importer->GetNumberOfAnimations() > 0)
   {
+    this->ProgressWidget = vtkSmartPointer<vtkProgressBarWidget>::New();
     this->ProgressWidget->SetInteractor(renWin->GetInteractor());
 
     vtkProgressBarRepresentation* progressRep =
@@ -44,6 +45,11 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
 
     this->ProgressWidget->On();
   }
+  else
+  {
+    this->ProgressWidget = nullptr;
+  }
+
 
   // This can be -1 if animation support is not implemented in the importer
   int availAnimations = this->Importer->GetNumberOfAnimations();
@@ -124,22 +130,25 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
 //----------------------------------------------------------------------------
 void F3DAnimationManager::ToggleAnimation()
 {
-  this->Playing = !this->Playing;
-
-  vtkRenderWindowInteractor* interactor = this->RenderWindow->GetInteractor();
-  interactor->RemoveObservers(vtkCommand::TimerEvent);
-  interactor->DestroyTimer();
-
-  if (this->Playing)
+  if (this->Importer && this->RenderWindow)
   {
-    vtkNew<vtkCallbackCommand> tickCallback;
-    tickCallback->SetClientData(this);
-    tickCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void*) {
-      F3DAnimationManager* animMgr = static_cast<F3DAnimationManager*>(clientData);
-      animMgr->Tick();
-    });
-    interactor->AddObserver(vtkCommand::TimerEvent, tickCallback);
-    interactor->CreateRepeatingTimer(1000.0 / this->FrameRate);
+    this->Playing = !this->Playing;
+
+    vtkRenderWindowInteractor* interactor = this->RenderWindow->GetInteractor();
+    interactor->RemoveObservers(vtkCommand::TimerEvent);
+    interactor->DestroyTimer();
+
+    if (this->Playing)
+    {
+      vtkNew<vtkCallbackCommand> tickCallback;
+      tickCallback->SetClientData(this);
+      tickCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void*) {
+        F3DAnimationManager* animMgr = static_cast<F3DAnimationManager*>(clientData);
+        animMgr->Tick();
+      });
+      interactor->AddObserver(vtkCommand::TimerEvent, tickCallback);
+      interactor->CreateRepeatingTimer(1000.0 / this->FrameRate);
+    }
   }
 }
 

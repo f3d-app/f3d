@@ -30,7 +30,7 @@ public:
   void Initialize(const F3DOptions& options, vtkImporter* importer, vtkRenderWindow* renWin);
 
   /**
-   * Start playing the animation
+   * Start/Stop playing the animation
    */
   void ToggleAnimation();
 
@@ -58,7 +58,7 @@ protected:
   int TimerId = 0;
   unsigned long ObserverId = 0;
 
-  vtkNew<vtkProgressBarWidget> ProgressWidget;
+  vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
 
 private:
   F3DAnimationManager(F3DAnimationManager const&) = delete;

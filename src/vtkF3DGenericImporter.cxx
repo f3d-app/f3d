@@ -137,7 +137,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   if (!this->Reader->IsReaderValid())
   {
     F3DLog::Print(
-      F3DLog::Severity::Info, "File '", this->Reader->GetFileName(), "' cannot be read.");
+      F3DLog::Severity::Error, "File '", this->Reader->GetFileName(), "' cannot be read.");
     return;
   }
 
@@ -147,7 +147,14 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->Reader->AddObserver(vtkCommand::ProgressEvent, forwarder);
 
   this->PostPro->SetInputConnection(this->Reader->GetOutputPort());
-  this->PostPro->Update();
+  bool ret = this->PostPro->GetExecutive()->Update();
+
+  if (!ret)
+  {
+    F3DLog::Print(
+      F3DLog::Severity::Error, "File '", this->Reader->GetFileName(), "' cannot be read.");
+    return;
+  }
 
   if (this->Options->Verbose || this->Options->NoRender)
   {
