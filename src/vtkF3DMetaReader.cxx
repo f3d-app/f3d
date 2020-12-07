@@ -193,7 +193,7 @@ void vtkF3DMetaReader::SetFileName(const std::string& fileName)
     // which may be appended with a mesh-state index (second parenthesis group),
     // and may additionally be a group of multiple small files corresponding
     // to a decomposed Exodus file (the final parenthesis group).
-    std::regex exodusRegex("\\.(g|exo|ex2|e)(-s[0-9]+)?(\\.[0-9]+\\.[0-9]+)?");
+    std::regex exodusRegex("\\.(g|exo|ex2|e)(-s[0-9]+)?(\\.[0-9]+\\.[0-9]+)?$");
     if (!this->InternalReader && std::regex_search(shortName, exodusRegex))
     {
       vtkNew<vtkExodusIIReader> reader;

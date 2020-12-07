@@ -197,6 +197,12 @@ void F3DLoader::AddFile(const std::string& path, bool recursive)
 //----------------------------------------------------------------------------
 void F3DLoader::LoadFile(int load)
 {
+  // Prevent the animation manager from playing
+  if (this->AnimationManager.IsPlaying())
+  {
+    this->AnimationManager.ToggleAnimation();
+  }
+
   std::string filePath, fileInfo;
   int size = static_cast<int>(this->FilesList.size());
   if (size > 0)
