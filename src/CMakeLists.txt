@@ -21,6 +21,7 @@ add_custom_command(
 # f3d
 if(WIN32)
   set(WINDOWS_RC_FILE ${CMAKE_SOURCE_DIR}/resources/f3d.rc)
+  set(WINDOWS_OUTPUT_WINDOW ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DWin32OutputWindow.cxx)
 endif()
 
 if(APPLE)
@@ -29,6 +30,7 @@ endif()
 
 add_executable(f3d
   main.cxx
+  vtkF3DConsoleOutputWindow.cxx
   vtkF3DGenericImporter.cxx
   vtkF3DInteractorStyle.cxx
   vtkF3DMetaReader.cxx
@@ -47,6 +49,7 @@ add_executable(f3d
   ${CMAKE_CURRENT_BINARY_DIR}/Config.cxx
   ${OSX_DELEGATE}
   ${WINDOWS_RC_FILE}
+  ${WINDOWS_OUTPUT_WINDOW}
 )
 
 set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
@@ -102,6 +105,8 @@ if(WIN32)
   if(WINDOWS_BUILD_WIN32)
     set_target_properties(f3d PROPERTIES WIN32_EXECUTABLE TRUE)
     set(F3D_WIN32_APP ON)
+  else()
+    set(F3D_WIN32_APP OFF)
   endif()
 endif()
 

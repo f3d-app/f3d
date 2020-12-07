@@ -9,7 +9,7 @@ int main(int argc, char** argv)
   vtkObject::GlobalWarningDisplayOff();
 #endif
 
-  // instanciate our own polydata mapper
+  // instanciate our own polydata mapper and output windows
   vtkNew<vtkF3DObjectFactory> factory;
   vtkObjectFactory::RegisterFactory(factory);
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
