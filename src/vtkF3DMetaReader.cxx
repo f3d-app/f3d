@@ -32,6 +32,12 @@ vtkF3DMetaReader::vtkF3DMetaReader()
 }
 
 //----------------------------------------------------------------------------
+vtkF3DMetaReader::~vtkF3DMetaReader()
+{
+  this->SetFileName(nullptr);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DMetaReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
