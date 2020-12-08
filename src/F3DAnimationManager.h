@@ -44,6 +44,11 @@ public:
    */
   double GetAnimationProgress();
 
+  /**
+   * Finalize different objects managed by the animation manager
+   */
+  void Finalize();
+
 protected:
   void Tick();
 

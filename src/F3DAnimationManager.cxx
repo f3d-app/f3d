@@ -26,7 +26,10 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
     return;
   }
 
-  if (this->Importer->GetNumberOfAnimations() > 0)
+  // This can be -1 if animation support is not implemented in the importer
+  int availAnimations = this->Importer->GetNumberOfAnimations();
+
+  if (availAnimations > 0)
   {
     this->ProgressWidget = vtkSmartPointer<vtkProgressBarWidget>::New();
     this->ProgressWidget->SetInteractor(renWin->GetInteractor());
@@ -54,10 +57,6 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
   {
     this->ProgressWidget = nullptr;
   }
-
-
-  // This can be -1 if animation support is not implemented in the importer
-  int availAnimations = this->Importer->GetNumberOfAnimations();
 
   if (options.Verbose || options.NoRender)
   {
@@ -130,6 +129,16 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
   }
 
   this->CurrentTimeStep = std::begin(this->TimeSteps);
+}
+
+//----------------------------------------------------------------------------
+void F3DAnimationManager::Finalize()
+{
+  if (this->IsPlaying())
+  {
+    this->ToggleAnimation();
+  }
+  this->ProgressWidget = nullptr;
 }
 
 //----------------------------------------------------------------------------
