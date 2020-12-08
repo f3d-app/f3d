@@ -139,8 +139,9 @@ int F3DLoader::Start(int argc, char** argv)
       interactor->Start();
     }
 
-    // for some reason, the widget should be disable before destruction
+    // The widgets should be disabled before destruction
     this->Renderer->ShowAxis(false);
+    this->AnimationManager.Finalize();
   }
 
   return retVal;
@@ -198,10 +199,7 @@ void F3DLoader::AddFile(const std::string& path, bool recursive)
 void F3DLoader::LoadFile(int load)
 {
   // Prevent the animation manager from playing
-  if (this->AnimationManager.IsPlaying())
-  {
-    this->AnimationManager.ToggleAnimation();
-  }
+  this->AnimationManager.Finalize();
 
   std::string filePath, fileInfo;
   int size = static_cast<int>(this->FilesList.size());
