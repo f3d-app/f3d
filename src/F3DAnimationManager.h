@@ -47,8 +47,8 @@ public:
 protected:
   void Tick();
 
-  vtkSmartPointer<vtkImporter> Importer;
-  vtkSmartPointer<vtkRenderWindow> RenderWindow;
+  vtkImporter* Importer = nullptr;
+  vtkRenderWindow* RenderWindow = nullptr;
 
   std::set<double> TimeSteps;
   std::set<double>::iterator CurrentTimeStep;

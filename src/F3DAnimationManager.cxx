@@ -20,6 +20,11 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
   }
 
   this->RenderWindow = renWin;
+  if (!this->RenderWindow)
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "RenderWindow is empty");
+    return;
+  }
 
   if (this->Importer->GetNumberOfAnimations() > 0)
   {
