@@ -748,10 +748,6 @@ void vtkF3DRenderer::UpdateCheatSheet()
     cheatSheetText << " U: Blur background " << (this->UseBlurBackground ? "[ON]" : "[OFF]")
                    << "\n";
     cheatSheetText << " K: Trackball interaction" << (this->UseTrackball ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << "\n H  : Cheat sheet \n";
-    cheatSheetText << " ?  : Dump camera state to the terminal\n";
-    cheatSheetText << " ESC : Quit \n";
-    cheatSheetText << " ENTER: Reset camera \n";
     cheatSheetText << "\n   H  : Cheat sheet \n";
     cheatSheetText << "   ?  : Dump camera state to the terminal\n";
     cheatSheetText << "  ESC : Quit \n";
