@@ -42,7 +42,7 @@ public:
 
 protected:
   vtkF3DMetaReader();
-  ~vtkF3DMetaReader() override = default;
+  ~vtkF3DMetaReader() override;
 
   /**
    * Protected method used internally to set the filename
