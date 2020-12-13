@@ -15,8 +15,11 @@
 #include "vtkDataObjectTreeIterator.h"
 #include "vtkRectilinearGridToPointSet.h"
 #include "vtkResampleToImage.h"
+#include "vtkUnstructuredGrid.h"
 
 #include "F3DLog.h"
+
+#include <numeric>
 
 vtkStandardNewMacro(vtkF3DPostProcessFilter);
 
@@ -74,19 +77,31 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
     dataset = append->GetOutput();
   }
 
+  // If the input is a polydata without cells, add a polyvertex cell
+  vtkPolyData* pd = vtkPolyData::SafeDownCast(dataset);
+  if (pd && pd->GetNumberOfCells() == 0)
+  {
+    std::vector<vtkIdType> polyVertex(pd->GetNumberOfPoints());
+    std::iota(polyVertex.begin(), polyVertex.end(), 1);
+    vtkNew<vtkCellArray> verts;
+    verts->InsertNextCell(pd->GetNumberOfPoints(), polyVertex.data());
+    pd->SetVerts(verts);
+  }
+
+  // If the input is an unstructured grid without cells, add a polyvertex cell
+  vtkUnstructuredGrid* ug = vtkUnstructuredGrid::SafeDownCast(dataset);
+  if (ug && ug->GetNumberOfCells() == 0)
+  {
+    std::vector<vtkIdType> polyVertex(ug->GetNumberOfPoints());
+    std::iota(polyVertex.begin(), polyVertex.end(), 1);
+    ug->InsertNextCell(VTK_POLY_VERTEX, ug->GetNumberOfPoints(), polyVertex.data());
+  }
+
   // Check if input is an image
   vtkImageData* image = vtkImageData::SafeDownCast(dataset);
   if (image)
   {
     outputImage->ShallowCopy(image);
-  }
-  else
-  {
-    vtkNew<vtkResampleToImage> resample;
-    resample->SetSamplingDimensions(50, 50, 50);
-    resample->SetInputDataObject(dataObject);
-    resample->Update();
-    outputImage->ShallowCopy(resample->GetOutput());
   }
 
   // Recover the surface of the dataset if not available already
