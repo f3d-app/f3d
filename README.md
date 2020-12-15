@@ -7,10 +7,20 @@ By [Kitware SAS](https://www.kitware.eu), 2019
 F3D (pronounced `/fɛd/`) is a [VTK-based](https://vtk.org) 3D viewer following the [KISS principle](https://en.wikipedia.org/wiki/KISS_principle), so it is minimalist, efficient, has no GUI, has simple interaction mechanisms and is fully controllable using arguments in the command line.
 
 It is open-source and cross-platform (tested on Windows, Linux, and macOS).
-It supports a range of file formats, rendering and texturing options.
+It supports a range of file formats (including glTF, stl, ply, obj), animation, rendering and texturing options.
 
-![F3D Demo](https://kitware.github.io/F3D/gallery/04-f3d.png)
+<img src="documentation/content/gallery/04-f3d.png"  width="640">
+
 *A typical render by F3D*
+
+<img src="documentation/content/gallery/dota.gif"  width="640">
+
+*Animation of a glTF file within F3D*
+
+<img src="documentation/content/gallery/directScalars.png"  width="640">
+
+*A direct scalars render by F3D*
+
 
 # Installation
 
