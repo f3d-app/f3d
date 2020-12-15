@@ -1,7 +1,7 @@
 title: Gallery
 ---
 
-Images displayed below use public datasets, you can download them [here](https://drive.google.com/uc?export=download&id=1BVoJsyvdVIPqhUj9u5Ap9-glPLeQ_0gF).
+Images and videos displayed below use public datasets, you can download them [here](https://drive.google.com/uc?export=download&id=1BVoJsyvdVIPqhUj9u5Ap9-glPLeQ_0gF).
 
 <style>
   div.gallery {
@@ -28,6 +28,34 @@ Images displayed below use public datasets, you can download them [here](https:/
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
 <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+<div class="gallery">
+    <a data-fancybox="gallery" href="gearbox.webm"><video autoplay loop src="gearbox.webm" type="video/webm"/></a>
+    <div class="desc">Animated realistic rendering
+      <span class="code">f3d gearbox/scene.gltf \-\-hdri=future_parking_2k.hdr -uqxtgas</span>
+    </div>
+</div>
+
+<div class="gallery">
+    <a data-fancybox="gallery" href="dota.webm"><video autoplay loop src="dota.webm" type="video/webm"/></a>
+    <div class="desc">Animated, skinned and morphed rendering
+      <span class="code">f3d dota/scene.gltf \-\-hdri=future_parking_2k.hdr -uqxtgas</span>
+    </div>
+</div>
+
+<div class="gallery">
+    <a data-fancybox="gallery" href="can.webm"><video autoplay loop src="can.webm" type="video/webm"/></a>
+    <div class="desc">Animated SciViz rendering
+      <span class="code">f3d can.ex2 -xtgans --up=+Z --scalars=VEL</span>
+    </div>
+</div>
+
+<div class="gallery">
+    <a data-fancybox="gallery" href="directScalars.png"><img src="directScalars.png"></a>
+    <div class="desc">Direct scalars rendering of a point cloud
+      <span class="code">f3d Carola_PointCloud.ply --point-size=0 --comp=-2 -so --verbose --up=+Z --hdri=venice_sunset_8k.hdr</span>
+    </div>
+</div>
 
 <div class="gallery">
     <a data-fancybox="gallery" href="01-f3d.png"><img src="01-f3d.png"></a>
@@ -84,3 +112,18 @@ Images displayed below use public datasets, you can download them [here](https:/
       <span class="code">f3d pointCloud.vtp -o <br>\-\-point-size=0.2 \-\-colormap=<br>0,0,0.8,0,0.4,0.9,0,0,0.8,0.9,0.9,0,1,0.5,0.5,1</span>
     </div>
 </div>
+
+Bristleback DOTA Fan-Art by Nikolay_Tsys
+https://sketchfab.com/Tolst
+
+SY Carola (point cloud) by Scottish Maritime Museum
+https://sketchfab.com/ScottishMaritimeMuseum
+
+Gearbox Animation by DZHUSI ØNE
+https://sketchfab.com/dzhusione
+
+Venice Sunset HDRI by Greg Zaal
+https://hdrihaven.com/hdris/?a=Greg%20Zaal
+
+Future Parking HDRI by Sergej Majboroda
+https://hdrihaven.com/hdris/?a=Sergej%20Majboroda
