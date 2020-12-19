@@ -13,7 +13,7 @@ It supports a range of file formats (including glTF, stl, ply, obj), animation, 
 
 *A typical render by F3D*
 
-<img src=https://kitware.github.io/F3D/gallery/dota.gif"  width="640">
+<img src="https://kitware.github.io/F3D/gallery/dota.gif"  width="640">
 
 *Animation of a glTF file within F3D*
 
