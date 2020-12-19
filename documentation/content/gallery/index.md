@@ -127,3 +127,6 @@ https://hdrihaven.com/hdris/?a=Greg%20Zaal
 
 Future Parking HDRI by Sergej Majboroda
 https://hdrihaven.com/hdris/?a=Sergej%20Majboroda
+
+<!-- hidden gif to be used by README.md -->
+<p hidden><img src="dota.gif"></p>
