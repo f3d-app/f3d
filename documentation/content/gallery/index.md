@@ -30,21 +30,21 @@ Images and videos displayed below use public datasets, you can download them [he
 <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
 
 <div class="gallery">
-    <a data-fancybox="gallery" href="gearbox.webm"><video autoplay loop src="gearbox.webm" type="video/webm"/></a>
+    <a data-fancybox="gallery" href="gearbox.webm"><video autoplay loop muted src="gearbox.webm" type="video/webm"/></a>
     <div class="desc">Animated realistic rendering
       <span class="code">f3d gearbox/scene.gltf \-\-hdri=future_parking_2k.hdr -uqxtgas</span>
     </div>
 </div>
 
 <div class="gallery">
-    <a data-fancybox="gallery" href="dota.webm"><video autoplay loop src="dota.webm" type="video/webm"/></a>
+    <a data-fancybox="gallery" href="dota.webm"><video autoplay loop muted src="dota.webm" type="video/webm"/></a>
     <div class="desc">Animated, skinned and morphed rendering
       <span class="code">f3d dota/scene.gltf \-\-hdri=future_parking_2k.hdr -uqxtgas</span>
     </div>
 </div>
 
 <div class="gallery">
-    <a data-fancybox="gallery" href="can.webm"><video autoplay loop src="can.webm" type="video/webm"/></a>
+    <a data-fancybox="gallery" href="can.webm"><video autoplay loop muted src="can.webm" type="video/webm"/></a>
     <div class="desc">Animated SciViz rendering
       <span class="code">f3d can.ex2 -xtgans --up=+Z --scalars=VEL</span>
     </div>
