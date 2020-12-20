@@ -120,7 +120,7 @@ configure-osx:
     - .configure
     - .osx
   variables:
-    ADDITIONAL_OPTIONS: -DMACOSX_BUILD_BUNDLE=ON -DCMAKE_OSX_SYSROOT:PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk
+    ADDITIONAL_OPTIONS: -DMACOSX_BUILD_BUNDLE=ON -DCMAKE_OSX_SYSROOT:PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
 
 # Build
 .build:
