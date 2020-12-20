@@ -8,6 +8,7 @@
 #include <vtkProgressBarRepresentation.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkVersion.h>
 
 //----------------------------------------------------------------------------
 void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* importer, vtkRenderWindow* renWin)
