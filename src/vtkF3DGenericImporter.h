@@ -12,6 +12,7 @@
 #include "vtkF3DPostProcessFilter.h"
 
 #include <vtkImporter.h>
+#include <vtkVersion.h>
 
 class vtkActor;
 class vtkVolume;
