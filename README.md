@@ -21,7 +21,6 @@ It supports a range of file formats (including glTF, stl, ply, obj), animation, 
 
 *A direct scalars render by F3D*
 
-
 # Installation
 
 You can find the release binary packages for Windows, Linux, and OSX on the [Release page](https://gitlab.kitware.com/f3d/f3d/-/releases).
@@ -144,7 +143,7 @@ Options|Default|Description
 Options|Default|Description
 ------|------|------
 -s, \-\-scalars=&lt;array_name&gt;||*Color by a specific scalar* array present in the file. If no array_name is provided, one will be picked if any are available. <br>This only makes sense when using the default scene.<br>Use verbose to recover the usable array names.
-\-\-comp=&lt;comp_index&gt;|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. -1 means *magnitude*. -2 means *direct values*.<br>When using *direct values*, components are used as L, LA, RGB, RGBA values depending on the number of components.
+-y, \-\-comp=&lt;comp_index&gt;|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. -1 means *magnitude*. -2 or the short option, -y,  means *direct values*.<br>When using *direct values*, components are used as L, LA, RGB, RGBA values depending on the number of components.
 -c, \-\-cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
 \-\-range=&lt;min,max&gt;||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
 -b, \-\-bar||Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
@@ -185,9 +184,17 @@ Simple interaction with the displayed data is possible directly within the windo
 * *Click and drag* with the *middle* mouse button to translate the camera.
 * Drag and Drop a file or directory into the F3D window to load it
 
-Some options can be toggled directly using interactions:
-* Press `S` key to toggle the coloration by scalar.
-* Press `B` key to toggle the display of the scalar bar, only when coloring with scalars.
+The coloring can be controlled directly using hotkeys:
+* Press `C` key to cycle between coloring with array from point data and from cell data.
+* Press `S` key to cycle the array to color with.
+* Press `Y` key to cycle the component of the array to color with.
+See the [coloring cycle](#Cycling Coloring) section for more info.
+
+Other options can be toggled directly using hotkeys:
+* Press `B` key to toggle the display of the scalar bar, only when coloring and not using direct scalars.
+* Press `V` key to toggle volume rendering.
+* Press `I` key to toggle opacity function inversion during volume rendering.
+* Press `O` key to toggle point sprites rendering.
 * Press `P` key to toggle depth peeling.
 * Press `Q` key to toggle Screen-Space Ambient Occlusion.
 * Press `A` key to toggle Fast Approximate Anti-Aliasing.
@@ -200,14 +207,12 @@ Some options can be toggled directly using interactions:
 * Press `Z` key to toggle the display of the FPS counter.
 * Press `R` key to toggle raytracing.
 * Press `D` key to toggle the denoiser when raytracing.
-* Press `V` key to toggle volume rendering.
-* Press `I` key to toggle opacity function inversion during volume rendering.
-* Press `O` key to toggle point sprites rendering.
 * Press `F` key to toggle full screen.
 * Press `U` key to toggle background blur.
 * Press `K` key to toggle trackball interaction mode.
+Certains hotkeys can be available or not depending of the file being loaded and F3D configuration.
 
-Other interactions are available:
+Other hotkeys are available:
 * Press `H` key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
 * Press `?` key to dump camera state to the terminal.
 * Press `ESC` key to close the window and quit F3D.
@@ -216,6 +221,21 @@ Other interactions are available:
 * Press `LEFT` to load the previous file if any.
 * Press `RIGHT` to load the next file if any.
 * Press `UP` to reload the current file.
+
+# Cycling Coloring
+When using the default scene, using the 'C', 'S' and 'Y' hotkeys let you cycle the coloring of the data.
+'C' let you cycle between point data and cell data, field data is not supported.
+'S' let you cycle the array available on the currently selected data, skipping array not containing numeric data.
+It will loop back to not coloring unless using volume rendering.
+'Y' let you cycle the component available on the currently selected array, looping to -2 for direct scalars rendering
+if the array contains 4 or less components, -1 otherwise.
+
+When changing the array, the component in use will be kept if valid with the new array, if not it will be reset to 0
+when coloring with an invalid higher than zero component, and to -1 when using direct scalars rendering with an array
+having more than 4 components.
+
+When changing the type of data to color with, the index of the array within the data will be kept if valid
+with the new data. If not, it will cycle until a valid array is found. After that, the component will be checked as well.
 
 # Configuration file
 
@@ -273,6 +293,8 @@ On Linux, it will be installed in /etc/f3d/, on Windows, it will be installed in
 
 # Limitations
 
+* No categorical generic field data rendering support.
+* No string array categorical rendering support.
 * No support for specifying manual lighting in the default scene.
 * Drag&Drop does not work with Thunar file manager.
 * Pressing the `z` hotkey to display the FPS timer triggers a double render.

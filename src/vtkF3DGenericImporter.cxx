@@ -19,7 +19,6 @@
 #include <vtkAppendPolyData.h>
 #include <vtkBoundingBox.h>
 #include <vtkCellData.h>
-#include <vtkColorTransferFunction.h>
 #include <vtkDataObjectTreeIterator.h>
 #include <vtkDataSetSurfaceFilter.h>
 #include <vtkDoubleArray.h>
@@ -198,15 +197,17 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     : vtkDataSet::SafeDownCast(surface);
 
   std::string usedArray = this->Options->Scalars;
-  vtkDataSetAttributes* data = this->Options->Cells
-    ? vtkDataSetAttributes::SafeDownCast(dataSet->GetCellData())
-    : vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
+  this->PointDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
+  this->CellDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetCellData());
+  vtkDataSetAttributes* dataForColoring =
+    this->Options->Cells ? this->CellDataForColoring : this->PointDataForColoring;
 
   // Recover an array for coloring if we ever need it
-  if (usedArray.empty() || usedArray == f3d::F3DReservedString)
+  this->ArrayIndexForColoring = -1;
+  bool print = (this->Options->Verbose || this->Options->NoRender);
+  if (usedArray.empty())
   {
-    vtkDataArray* array = data->GetScalars();
-    bool print = (this->Options->Verbose || this->Options->NoRender);
+    vtkDataArray* array = dataForColoring->GetScalars();
     if (array)
     {
       const char* arrayName = array->GetName();
@@ -221,134 +222,39 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     }
     else
     {
-      if (data->GetNumberOfArrays() > 0)
+      for (int i = 0; i < dataForColoring->GetNumberOfArrays(); i++)
       {
-        array = data->GetArray(0);
-      }
-
-      if (array)
-      {
-        const char* arrayName = array->GetName();
-        if (arrayName)
+        array = dataForColoring->GetArray(i);
+        if (array)
         {
-          usedArray = arrayName;
-        }
-        if (print)
-        {
-          F3DLog::Print(F3DLog::Severity::Info, "Using first found array: ", usedArray);
-        }
-      }
-      else
-      {
-        usedArray = "";
-        if (print)
-        {
-          F3DLog::Print(
-            F3DLog::Severity::Info, "No array found for scalar coloring and volume rendering");
-        }
-      }
-    }
-  }
-
-  // Configure the mappers for coloring if it is ever needed
-  vtkDataArray* array = data->GetArray(usedArray.c_str());
-  if (array)
-  {
-    if (this->Options->Component < array->GetNumberOfComponents())
-    {
-      // Get range
-      double range[2];
-      if (this->Options->Range.size() == 2)
-      {
-        range[0] = this->Options->Range[0];
-        range[1] = this->Options->Range[1];
-      }
-      else
-      {
-        if (this->Options->Range.size() > 0)
-        {
-          F3DLog::Print(F3DLog::Severity::Warning,
-            "The range specified does not have exactly 2 values, using automatic range.");
-        }
-        array->GetRange(range, this->Options->Component);
-      }
-
-      // Create lookup table
-      vtkNew<vtkColorTransferFunction> ctf;
-      if (this->Options->LookupPoints.size() > 0)
-      {
-        if (this->Options->LookupPoints.size() % 4 == 0)
-        {
-          for (size_t i = 0; i < this->Options->LookupPoints.size(); i += 4)
+          this->ArrayIndexForColoring = i;
+          const char* arrayName = array->GetName();
+          if (arrayName)
           {
-            double val = this->Options->LookupPoints[i];
-            double r = this->Options->LookupPoints[i + 1];
-            double g = this->Options->LookupPoints[i + 2];
-            double b = this->Options->LookupPoints[i + 3];
-            ctf->AddRGBPoint(range[0] + val * (range[1] - range[0]), r, g, b);
+            usedArray = arrayName;
           }
+          if (print)
+          {
+            F3DLog::Print(F3DLog::Severity::Info, "Using first found array: ", usedArray);
+          }
+          break;
         }
-        else
-        {
-          F3DLog::Print(F3DLog::Severity::Warning,
-            "Specified color map list count is not a multiple of 4, ignoring it.");
-        }
       }
-
-      if (this->Options->Component >= 0)
-      {
-        ctf->SetVectorModeToComponent();
-        ctf->SetVectorComponent(this->Options->Component);
-      }
-      else
-      {
-        ctf->SetVectorModeToMagnitude();
-      }
-
-      if (this->VolumeMapper->GetInput())
-      {
-        this->ConfigureVolumeForColoring(this->VolumeMapper, this->VolumeProp, array, ctf, range);
-      }
-
-      this->ConfigureMapperForColoring(this->PointGaussianMapper, array, ctf, range);
-      this->ConfigureMapperForColoring(this->PolyDataMapper, array, ctf, range);
-
-      std::string title = usedArray;
-      if (this->Options->Component >= 0)
-      {
-        title += " (Component #";
-        title += std::to_string(this->Options->Component);
-        title += ")";
-      }
-
-      this->ScalarBarActor->SetLookupTable(ctf);
-      this->ScalarBarActor->SetTitle(title.c_str());
-      this->ScalarBarActor->SetNumberOfLabels(4);
-      this->ScalarBarActor->SetOrientationToHorizontal();
-      this->ScalarBarActor->SetWidth(0.8);
-      this->ScalarBarActor->SetHeight(0.07);
-      this->ScalarBarActor->SetPosition(0.1, 0.01);
-      ren->AddActor2D(this->ScalarBarActor);
-
-      this->ScalarsAvailable = true;
-    }
-    else
-    {
-      F3DLog::Print(
-        F3DLog::Severity::Warning, "Invalid component index: ", this->Options->Component);
-      this->ScalarsAvailable = false;
     }
   }
-  else
+  if (this->ArrayIndexForColoring == -1)
   {
-    this->ScalarsAvailable = false;
-    this->PointGaussianMapper->ScalarVisibilityOff();
-    this->PolyDataMapper->ScalarVisibilityOff();
-
-    if (!usedArray.empty() && !(usedArray == f3d::F3DReservedString))
-    {
-      F3DLog::Print(F3DLog::Severity::Warning, "Unknow scalar array: ", usedArray);
-    }
+    dataForColoring->GetArray(usedArray.c_str(), this->ArrayIndexForColoring);
+  }
+  if (this->ArrayIndexForColoring == -1 && !usedArray.empty() &&
+    usedArray != f3d::F3DReservedString)
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, "Unknow scalar array: ", usedArray);
+  }
+  if (this->ArrayIndexForColoring == -1 && print)
+  {
+    F3DLog::Print(
+      F3DLog::Severity::Info, "No array found for scalar coloring and volume rendering");
   }
 
   // configure props
@@ -382,6 +288,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->GeometryActor->GetProperty()->SetNormalScale(this->Options->NormalScale);
 
   // add props
+  ren->AddActor2D(this->ScalarBarActor);
   ren->AddActor(this->GeometryActor);
   ren->AddActor(this->PointSpritesActor);
   ren->AddVolume(this->VolumeProp);
@@ -419,64 +326,6 @@ vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(
   }
 
   return texture;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DGenericImporter::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper,
-  vtkVolume* volume, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2])
-{
-  mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
-                                             : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-  mapper->SelectScalarArray(array->GetName());
-
-  // comp > 4 is actually not supported and will fail with a vtk error
-  if (this->Options->Component >= 0)
-  {
-    mapper->SetVectorMode(vtkSmartVolumeMapper::COMPONENT);
-    mapper->SetVectorComponent(this->Options->Component);
-  }
-  else if (this->Options->Component == -1)
-  {
-    mapper->SetVectorMode(vtkSmartVolumeMapper::MAGNITUDE);
-  }
-  else if (this->Options->Component == -2)
-  {
-    mapper->SetVectorMode(vtkSmartVolumeMapper::DISABLED);
-  }
-
-  vtkNew<vtkPiecewiseFunction> otf;
-  otf->AddPoint(range[0], this->Options->InverseOpacityFunction ? 1.0 : 0.0);
-  otf->AddPoint(range[1], this->Options->InverseOpacityFunction ? 0.0 : 1.0);
-
-  vtkNew<vtkVolumeProperty> property;
-  property->SetColor(ctf);
-  property->SetScalarOpacity(otf);
-  property->ShadeOff();
-  property->SetInterpolationTypeToLinear();
-
-  volume->SetProperty(property);
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DGenericImporter::ConfigureMapperForColoring(
-  vtkPolyDataMapper* mapper, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2])
-{
-  mapper->SetColorModeToMapScalars();
-  mapper->SelectColorArray(array->GetName());
-  mapper->SetScalarMode(this->Options->Cells ? VTK_SCALAR_MODE_USE_CELL_FIELD_DATA
-                                             : VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-  mapper->ScalarVisibilityOn();
-
-  if (this->Options->Component == -2)
-  {
-    mapper->SetColorModeToDirectScalars();
-  }
-  else
-  {
-    mapper->SetColorModeToMapScalars();
-    mapper->SetScalarRange(range);
-    mapper->SetLookupTable(ctf);
-  }
 }
 
 //----------------------------------------------------------------------------

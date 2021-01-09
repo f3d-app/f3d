@@ -204,7 +204,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
     this->DeclareOptionWithImplicitValue(grp4, "scalars", "s", "Color by scalars", options.Scalars, std::string(""), true, "<array_name>");
-    this->DeclareOption(grp4, "comp", "", "Component from the scalar array to color with", options.Component, true, "<comp_index>");
+    this->DeclareOptionWithImplicitValue(grp4, "comp", "y", "Component from the scalar array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", options.Component, "-2", true, "<comp_index>");
     this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.Cells);
     this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.Range, false, "<min,max>");
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.Bar);
