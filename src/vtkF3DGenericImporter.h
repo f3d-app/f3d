@@ -22,7 +22,6 @@ class vtkPointGaussianMapper;
 class vtkPolyDataMapper;
 class vtkSmartVolumeMapper;
 class vtkScalarBarActor;
-class vtkColorTransferFunction;
 class vtkTexture;
 struct F3DOptions;
 
@@ -85,7 +84,9 @@ public:
   /**
    * Access to specific flags
    */
-  vtkGetMacro(ScalarsAvailable, bool);
+  vtkGetMacro(ArrayIndexForColoring, int);
+  vtkGetObjectMacro(PointDataForColoring, vtkDataSetAttributes);
+  vtkGetObjectMacro(CellDataForColoring, vtkDataSetAttributes);
   //@}
 
   void UpdateTimeStep(double timestep) override;
@@ -135,12 +136,6 @@ protected:
 
   vtkSmartPointer<vtkTexture> GetTexture(const std::string& fileName, bool isSRGB = false);
 
-  void ConfigureMapperForColoring(
-    vtkPolyDataMapper* mapper, vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2]);
-
-  void ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
-    vtkDataArray* array, vtkColorTransferFunction* ctf, double range[2]);
-
   void UpdateTemporalInformation();
 
   vtkNew<vtkF3DMetaReader> Reader;
@@ -154,7 +149,10 @@ protected:
   vtkNew<vtkPointGaussianMapper> PointGaussianMapper;
   vtkNew<vtkSmartVolumeMapper> VolumeMapper;
   std::string OutputDescription;
-  bool ScalarsAvailable = false;
+
+  vtkDataSetAttributes* PointDataForColoring = nullptr;
+  vtkDataSetAttributes* CellDataForColoring = nullptr;
+  int ArrayIndexForColoring = 0;
 
   bool AnimationEnabled = false;
   bool TemporalInformationUpdated = false;

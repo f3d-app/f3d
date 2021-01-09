@@ -5,7 +5,8 @@
 #include "F3DOffscreenRender.h"
 #include "F3DOptions.h"
 #include "vtkF3DGenericImporter.h"
-#include "vtkStringArray.h"
+#include "vtkF3DInteractorStyle.h"
+#include "vtkF3DRendererWithColoring.h"
 
 #include <vtk3DSImporter.h>
 #include <vtkCallbackCommand.h>
@@ -16,7 +17,11 @@
 #include <vtkOBJImporter.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkProgressBarRepresentation.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkScalarBarActor.h>
+#include <vtkStringArray.h>
 #include <vtkTimerLog.h>
 #include <vtkVRMLImporter.h>
 #include <vtkVersion.h>
@@ -46,7 +51,7 @@ int F3DLoader::Start(int argc, char** argv)
   this->Parser.Initialize(argc, argv);
   F3DOptions options = this->Parser.GetOptionsFromCommandLine(files);
 
-  this->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
+  this->Renderer = vtkSmartPointer<vtkF3DRendererWithColoring>::New();
   this->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
 
   vtkNew<vtkRenderWindowInteractor> interactor;
@@ -242,6 +247,7 @@ void F3DLoader::LoadFile(int load)
   {
     fileInfo += "No file to load provided, please drop one into this window";
     this->Renderer->Initialize(this->Options, fileInfo);
+    this->Renderer->ShowOptions();
     return;
   }
 
@@ -254,20 +260,13 @@ void F3DLoader::LoadFile(int load)
   data.widget = progressWidget.Get();
   if (!this->Options.NoRender)
   {
-    this->Renderer->SetScalarBarActor(nullptr);
-    this->Renderer->SetGeometryActor(nullptr);
-    this->Renderer->SetPointSpritesActor(nullptr);
-    this->Renderer->SetVolumeProp(nullptr);
-    this->Renderer->SetPolyDataMapper(nullptr);
-    this->Renderer->SetPointGaussianMapper(nullptr);
-    this->Renderer->SetVolumeMapper(nullptr);
-
     if (!this->Importer)
     {
       F3DLog::Print(
         F3DLog::Severity::Warning, filePath, " is not a file of a supported file format\n");
       fileInfo += " [UNSUPPORTED]";
       this->Renderer->Initialize(this->Options, fileInfo);
+      this->Renderer->ShowOptions();
       return;
     }
 
@@ -346,12 +345,14 @@ void F3DLoader::LoadFile(int load)
       this->Renderer->SetPolyDataMapper(genericImporter->GetPolyDataMapper());
       this->Renderer->SetPointGaussianMapper(genericImporter->GetPointGaussianMapper());
       this->Renderer->SetVolumeMapper(genericImporter->GetVolumeMapper());
-      this->Renderer->SetScalarsAvailable(genericImporter->GetScalarsAvailable());
+      this->Renderer->SetColoring(genericImporter->GetPointDataForColoring(),
+        genericImporter->GetCellDataForColoring(), this->Options.Cells,
+        genericImporter->GetArrayIndexForColoring(), this->Options.Component);
     }
 
     // Actors are loaded, use the bounds to reset camera and set-up SSAO
     this->Renderer->SetupRenderPasses();
-    this->Renderer->UpdateActorsVisibility();
+    this->Renderer->UpdateInternalActors();
     this->Renderer->InitializeCamera();
 
     this->Renderer->ShowOptions();

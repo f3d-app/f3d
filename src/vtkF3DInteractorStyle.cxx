@@ -1,13 +1,14 @@
 #include "vtkF3DInteractorStyle.h"
 
 #include "F3DLoader.h"
-#include "vtkF3DRenderer.h"
+#include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
 #include <vtkMath.h>
 #include <vtkMatrix3x3.h>
 #include <vtkObjectFactory.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 #include <vtkStringArray.h>
@@ -28,13 +29,24 @@ void vtkF3DInteractorStyle::OnKeyPress()
 {
   vtkRenderWindowInteractor* rwi = this->GetInteractor();
   vtkRenderWindow* renWin = rwi->GetRenderWindow();
-  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  vtkF3DRendererWithColoring* ren =
+    vtkF3DRendererWithColoring::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
 
   switch (rwi->GetKeyCode())
   {
+    case 'c':
+    case 'C':
+      ren->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
+      renWin->Render();
+      break;
     case 's':
     case 'S':
-      ren->ShowScalars(!ren->AreScalarsVisible());
+      ren->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
+      renWin->Render();
+      break;
+    case 'y':
+    case 'Y':
+      ren->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
       renWin->Render();
       break;
     case 'b':
