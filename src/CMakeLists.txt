@@ -108,6 +108,8 @@ if(WIN32)
     set(F3D_WIN32_APP ON)
   else()
     set(F3D_WIN32_APP OFF)
+     # force usage of wWinMainCRTStartup in console mode for Unicode support
+    target_link_options(f3d PUBLIC "/ENTRY:wWinMainCRTStartup")
   endif()
 endif()
 

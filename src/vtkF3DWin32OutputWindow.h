@@ -16,6 +16,9 @@ public:
   vtkTypeMacro(vtkF3DWin32OutputWindow, vtkWin32OutputWindow);
   static vtkF3DWin32OutputWindow* New();
 
+  // overriden to simplify and support Unicode
+  void DisplayText(const char*) override;
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201207)
   const char* GetWindowTitle() override;
 #endif
