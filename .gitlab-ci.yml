@@ -1,229 +1,486 @@
-cache:
-  paths:
-    - vtk-install/
-    - build/
+########## Stages ##########
 
 stages:
-  - update-vtk
+  - deps
   - configure
   - build
   - test
   - package
 
+########## OS specific tags and variables ##########
+
 .linux:
   tags:
+    - docker
     - linux
+    - x11
+
+.linux_docker_vtk:
+  extends:
+    - .linux
+  image: gitlab.kitware.com:4567/f3d/f3d/linux/vtk:latest
+
+.linux_docker_vtk9:
+  extends:
+    - .linux
+  image: gitlab.kitware.com:4567/f3d/f3d/linux/vtk:9.0.1
+
+.linux_empty:
+  script:
+    - [ "true" ]
+  extends:
+    - .linux
 
 .windows:
+  variables:
+    GIT_CLONE_PATH: "$CI_BUILDS_DIR\\f3d-ci"
   tags:
     - windows
+    - f3d
 
-.osx:
-  tags:
-    - osx
+.windows_env:
+  before_script:
+    - $CMAKEPath = Join-Path -Path $pwd -ChildPath dependencies\cmake-3.19.3-win64-x64\bin\
+    - $NSISPath = Join-Path -Path $pwd -ChildPath dependencies\nsis-3.06.1\Bin\
+    - $env:Path += ";$NSISPath;$CMAKEPath"
 
-# VTK
-.update-vtk:
-  stage: update-vtk
+.windows_empty:
   script:
-    - cmake -E make_directory vtk-install
-    - git clone https://gitlab.kitware.com/vtk/vtk.git
-    - cd vtk
-    - git checkout 596af3290a5d7546a8137869fbc38b1af2eedc7d
-    - cmake -E make_directory build
-    - cd build
-    - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS $RUNTIME_OPTION $POLICY_OPTION
-      -DVTK_BUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
-      -DVTK_LEGACY_REMOVE=ON -DBUILD_SHARED_LIBS=OFF
-      -DCMAKE_INSTALL_PREFIX:FILEPATH=../../vtk-install
-      -DVTK_GROUP_ENABLE_Rendering=DEFAULT -DVTK_GROUP_ENABLE_StandAlone=DEFAULT
-      -DVTK_MODULE_ENABLE_VTK_CommonSystem=YES
-      -DVTK_MODULE_ENABLE_VTK_FiltersGeneral=YES
-      -DVTK_MODULE_ENABLE_VTK_FiltersGeometry=YES
-      -DVTK_MODULE_ENABLE_VTK_ImagingCore=YES
-      -DVTK_MODULE_ENABLE_VTK_ImagingHybrid=YES
-      -DVTK_MODULE_ENABLE_VTK_InteractionStyle=YES
-      -DVTK_MODULE_ENABLE_VTK_InteractionWidgets=YES
-      -DVTK_MODULE_ENABLE_VTK_IOCityGML=YES
-      -DVTK_MODULE_ENABLE_VTK_IOExodus=YES
-      -DVTK_MODULE_ENABLE_VTK_IOGeometry=YES
-      -DVTK_MODULE_ENABLE_VTK_IOImage=YES
-      -DVTK_MODULE_ENABLE_VTK_IOImport=YES
-      -DVTK_MODULE_ENABLE_VTK_IOParallel=YES
-      -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
-      -DVTK_MODULE_ENABLE_VTK_IOXML=YES
-      -DVTK_MODULE_ENABLE_VTK_RenderingAnnotation=YES
-      -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
-      -DVTK_MODULE_ENABLE_VTK_RenderingLabel=YES
-      -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
-      -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
-      -DVTK_MODULE_ENABLE_VTK_jsoncpp=YES
-      ..
-    - cmake --build . --config Release --parallel 4
-    - cmake --build . --config Release --target install
-  only:
-    - web
-
-update-vtk-linux:
+    - $true
   extends:
-    - .update-vtk
-    - .linux
-  variables:
-    ADDITIONAL_OPTIONS: -DVTK_USE_X=ON
-
-update-vtk-windows:
-  extends:
-    - .update-vtk
     - .windows
-  variables:
-    BUILD_ARCHITECTURE: -Ax64
-    POLICY_OPTION: -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
-    RUNTIME_OPTION: -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
 
-update-vtk-osx:
+.macos:
+  variables:
+    GIT_CLONE_PATH: "$CI_BUILDS_DIR\\f3d-ci"
+    DEVELOPER_DIR: "/Applications/Xcode-11.7.app/Contents/Developer"
+  tags:
+    - macos
+    - xcode-11.7
+    - f3d
+
+.macos_env:
+  before_script:
+    - export PATH=$(pwd)/dependencies/cmake-3.19.4-macos-universal/CMake.app/Contents/bin/:$PATH
+
+.macos_empty:
+  script:
+    - [ "true" ]
   extends:
-    - .update-vtk
-    - .osx
-  variables:
-    ADDITIONAL_OPTIONS: -DVTK_USE_COCOA=ON
+    - .macos
 
-# Configure
-.configure:
+########## Cross-platform scripts ##########
+
+.conf:
   stage: configure
   script:
-    - cmake -E make_directory build
+    - mkdir build
     - cd build
     - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS $RUNTIME_OPTION $POLICY_OPTION
       -DBUILD_TESTING=ON -DF3D_STRICT_BUILD=ON
-      -DCMAKE_BUILD_TYPE=Release -DVTK_DIR:FILEPATH=vtk-install/lib/cmake/vtk-9.0
+      -DCMAKE_BUILD_TYPE=Release -DVTK_DIR:FILEPATH=$VTK_DIR
       -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON ..
 
-configure-linux:
-  extends:
-    - .configure
-    - .linux
-  variables:
-    ADDITIONAL_OPTIONS: -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
-
-configure-windows:
-  extends:
-    - .configure
-    - .windows
-  variables:
-    BUILD_ARCHITECTURE: -Ax64
-    ADDITIONAL_OPTIONS: -DWINDOWS_BUILD_WIN32=ON
-    POLICY_OPTION: -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
-    RUNTIME_OPTION: -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
-
-configure-osx:
-  extends:
-    - .configure
-    - .osx
-  variables:
-    ADDITIONAL_OPTIONS: -DMACOSX_BUILD_BUNDLE=ON -DCMAKE_OSX_SYSROOT:PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
-
-# Build
 .build:
   stage: build
   script:
-    - cmake --build build --config Release --parallel 4
+    - cd build
+    - cmake --build . --config Release --parallel 8
 
-build-linux:
-  extends:
-    - .build
-    - .linux
-  needs:
-    - configure-linux
-
-build-windows:
-  extends:
-    - .build
-    - .windows
-  needs:
-    - configure-windows
-
-build-osx:
-  extends:
-    - .build
-    - .osx
-  needs:
-    - configure-osx
-
-# Test
 .test:
   stage: test
   script:
     - cd build
-    - cmake -E remove Test*.png
     - ctest -C Release -j 8 --output-on-failure
   artifacts:
     when: on_failure
     paths:
       - build/Test*.png
 
-test-linux:
-  extends:
-    - .test
-    - .linux
-  needs:
-    - configure-linux
-    - build-linux
-
-test-windows:
-  extends:
-    - .test
-    - .windows
-  needs:
-    - configure-windows
-    - build-windows
-
-test-osx:
-  extends:
-    - .test
-    - .osx
-  needs:
-    - configure-osx
-    - build-osx
-
-# Package
-.package:
+.pack:
   stage: package
   script:
     - cd build
-    - cmake -E remove f3d-*
     - cpack -C Release
 
-package-linux:
+########## Linux Specific ##########
+
+### Deps Linux ###
+
+.deps:linux:
+  stage: deps
   extends:
-    - .package
-    - .linux
+    - .linux_empty
+
+deps:linux:vtk9:
+  extends:
+    - .deps:linux
+
+deps:linux:
+  extends:
+    - .deps:linux
+
+### Conf Linux ###
+
+.conf:linux:
+  extends:
+    - .conf
+  variables:
+    ADDITIONAL_OPTIONS: -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
+    VTK_DIR: /vtk/vtk_install/lib/cmake/vtk-9.0
+  artifacts:
+    paths:
+      - build
+
+conf:linux:vtk9:
+  extends:
+    - .conf:linux
+    - .linux_docker_vtk9
+  dependencies:
+    - deps:linux:vtk9
   needs:
-    - configure-linux
-    - build-linux
+    - deps:linux:vtk9
+
+conf:linux:
+  extends:
+    - .conf:linux
+    - .linux_docker_vtk
+  dependencies:
+    - deps:linux
+  needs:
+    - deps:linux
+
+### Build Linux ###
+
+.build:linux:
+  extends:
+    - .build
+  artifacts:
+    paths:
+      - build
+
+build:linux:vtk9:
+  extends:
+    - .build:linux
+    - .linux_docker_vtk9
+  dependencies:
+    - conf:linux:vtk9
+  needs:
+    - conf:linux:vtk9
+
+build:linux:
+  extends:
+    - .build:linux
+    - .linux_docker_vtk
+  dependencies:
+    - conf:linux
+  needs:
+    - conf:linux
+
+### Test Linux ###
+
+test:linux:vtk9:
+  stage: test
+  extends:
+    - .linux_empty
+  needs:
+    - build:linux:vtk9
+
+test:linux:
+  extends:
+    - .linux
+    - .test
+    - .linux_docker_vtk
+  dependencies:
+    - build:linux
+  needs:
+    - build:linux
+  artifacts:
+    paths:
+      - build
+
+### Pack Linux ###
+
+pack:linux:vtk9:
+  stage: package
+  extends:
+    - .linux_empty
+  needs:
+    - build:linux:vtk9
+
+pack:linux:
+  extends:
+    - .linux
+    - .pack
+    - .linux_docker_vtk
+  dependencies:
+    - build:linux
+  needs:
+    - build:linux
   artifacts:
     paths:
       - build/f3d-*.tar.gz
       - build/f3d-*.tar.xz
 
-package-windows:
+########## Windows Specific ##########
+
+.deps:win:
+  stage: deps
+  script:
+    - mkdir dependencies
+    - Invoke-WebRequest https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-win64-x64.zip -OutFile .\cmake-3.19.3-win64-x64.zip
+    - $CmakeHash = (Get-FileHash .\cmake-3.19.3-win64-x64.zip -Algorithm MD5).Hash
+    - $CmakeHash -eq "6bbe95ee440c42ddd249f356d3ebd056"
+    - Expand-Archive -LiteralPath .\cmake-3.19.3-win64-x64.zip -DestinationPath .\dependencies
+    - $env:GIT_LFS_SKIP_SMUDGE="1"
+    - git clone https://gitlab.kitware.com/f3d/f3d-dependencies.git
+    - cd f3d-dependencies
+    - git lfs pull --include "windows/archive/nsis-3.06.1.zip"
+    - git lfs pull --include "windows/archive/$VTK_ARCHIVE"
+    - cd ..\
+    - cd dependencies
+    - cmake -E tar -x ../f3d-dependencies/windows/archive/nsis-3.06.1.zip
+    - cmake -E tar -x ../f3d-dependencies/windows/archive/$VTK_ARCHIVE
   extends:
-    - .package
     - .windows
+    - .windows_env
+  artifacts:
+    paths:
+      - dependencies
+
+deps:win:
+  extends:
+    - .deps:win
+  variables:
+    VTK_ARCHIVE: vtk-latest.zip
+
+deps:win:vtk9:
+  extends:
+    - .deps:win
+  variables:
+    VTK_ARCHIVE: vtk-9.0.1.zip
+
+.conf:win:
+  extends:
+    - .conf
+    - .windows
+    - .windows_env
+  variables:
+    BUILD_ARCHITECTURE: -Ax64
+    ADDITIONAL_OPTIONS: -DWINDOWS_BUILD_WIN32=ON
+    POLICY_OPTION: -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
+    RUNTIME_OPTION: -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
+    VTK_DIR: ..\dependencies\vtk_install\lib\cmake\vtk-9.0\
+  artifacts:
+    paths:
+      - dependencies
+      - build
+
+conf:win:
+  extends:
+    - .conf:win
+  dependencies:
+    - deps:win
   needs:
-    - configure-windows
-    - build-windows
+    - deps:win
+
+conf:win:vtk9:
+  extends:
+    - .conf:win
+  dependencies:
+    - deps:win:vtk9
+  needs:
+    - deps:win:vtk9
+
+.build:win:
+  extends:
+    - .windows
+    - .windows_env
+    - .build
+  dependencies:
+    - configure:win
+  needs:
+    - configure:win
+  artifacts:
+    paths:
+      - dependencies
+      - build
+
+build:win:
+  extends:
+    - .build:win
+  dependencies:
+    - conf:win
+  needs:
+    - conf:win
+
+build:win:vtk9:
+  extends:
+    - .build:win
+  dependencies:
+    - conf:win:vtk9
+  needs:
+    - conf:win:vtk9
+
+test:win:
+  extends:
+    - .windows
+    - .windows_env
+    - .test
+  dependencies:
+    - build:win
+  needs:
+    - build:win
+
+test:win:vtk9:
+  stage: test
+  extends:
+    - .windows_empty
+  needs:
+    - build:win
+
+pack:win:
+  extends:
+    - .windows
+    - .windows_env
+    - .pack
+  dependencies:
+    - build:win
+  needs:
+    - build:win
   artifacts:
     paths:
       - build/f3d-*.zip
       - build/f3d-*.exe
 
-package-osx:
+pack:win:vtk9:
+  stage: package
   extends:
-    - .package
-    - .osx
+    - .windows_empty
   needs:
-    - configure-osx
-    - build-osx
+    - build:win
+
+########## MacOS Specific ##########
+
+.deps:macos:
+  stage: deps
+  script:
+    - mkdir dependencies
+    - GIT_LFS_SKIP_SMUDGE=1 git clone https://gitlab.kitware.com/f3d/f3d-dependencies
+    - cd f3d-dependencies
+    - git lfs pull --include "macos/archive/$VTK_ARCHIVE"
+    - cd ../
+    - tar -zxf f3d-dependencies/macos/archive/$VTK_ARCHIVE -C ./dependencies
+    - cd dependencies
+    - curl -OL https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4-macos-universal.tar.gz
+    - echo "eb1f52996632c1e71a1051c9e2c30cc8df869fb5a213b1a0d3b202744c6c5758  cmake-3.19.4-macos-universal.tar.gz" | shasum -a 256 --check
+    - tar -zxf cmake-3.19.4-macos-universal.tar.gz
+  extends:
+    - .macos
+  artifacts:
+    paths:
+      - dependencies
+
+deps:macos:
+  extends:
+    - .deps:macos
+  variables:
+    VTK_ARCHIVE: vtk-latest.tar.gz
+
+deps:macos:vtk9:
+  extends:
+    - .deps:macos
+  variables:
+    VTK_ARCHIVE: vtk-9.0.1.tar.gz
+
+.conf:macos:
+  extends:
+    - .macos
+    - .macos_env
+    - .conf
+  variables:
+    ADDITIONAL_OPTIONS: -DMACOSX_BUILD_BUNDLE=ON
+    VTK_DIR: dependencies\vtk_install\lib\cmake\vtk-9.0\ # this should be ../dependencies, wtf is going on ?
+  artifacts:
+    paths:
+      - dependencies
+      - build
+
+conf:macos:
+  extends:
+    - .conf:macos
+  dependencies:
+    - deps:macos
+  needs:
+    - deps:macos
+
+conf:macos:vtk9:
+  extends:
+    - .conf:macos
+  dependencies:
+    - deps:macos:vtk9
+  needs:
+    - deps:macos:vtk9
+
+.build:macos:
+  extends:
+    - .macos
+    - .macos_env
+    - .build
+  artifacts:
+    paths:
+      - dependencies
+      - build
+
+build:macos:
+  extends:
+    - .build:macos
+  dependencies:
+    - conf:macos
+  needs:
+    - conf:macos
+
+build:macos:vtk9:
+  extends:
+    - .build:macos
+  dependencies:
+    - conf:macos:vtk9
+  needs:
+    - conf:macos:vtk9
+
+test:macos:
+  extends:
+    - .macos
+    - .macos_env
+    - .test
+  dependencies:
+    - build:macos
+  needs:
+    - build:macos
+
+test:macos:vtk9:
+  stage: test
+  extends:
+    - .macos_empty
+  needs:
+    - build:macos
+
+pack:macos:
+  extends:
+    - .macos
+    - .macos_env
+    - .pack
+  dependencies:
+    - build:macos
+  needs:
+    - build:macos
   artifacts:
     paths:
       - build/f3d-*.dmg
+
+pack:macos:vtk9:
+  stage: package
+  extends:
+    - .macos_empty
+  needs:
+    - build:macos
