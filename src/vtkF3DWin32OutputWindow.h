@@ -8,6 +8,8 @@
 
 #include "vtkWin32OutputWindow.h"
 
+#include "vtkVersion.h"
+
 class vtkF3DWin32OutputWindow : public vtkWin32OutputWindow
 {
 public:

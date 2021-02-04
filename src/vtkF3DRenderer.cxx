@@ -22,6 +22,7 @@
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
 #include <vtkToneMappingPass.h>
+#include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
 #if F3D_HAS_RAYTRACING
