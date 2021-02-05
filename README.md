@@ -317,3 +317,7 @@ You can try to use a software implementation of OpenGL, called [Mesa](https://gi
  * copy `x64/OpenGL32.dll` and `x64/libglapi.dll` in the same folder as `f3d.exe`.
  * set the environment variable `MESA_GL_VERSION_OVERRIDE` to 4.5
  * run `f3d.exe`
+
+> I run f3d from the command prompt and my Unicode characters are not displayed properly
+
+Set the codepage to UTF-8, run `chcp 65001`
