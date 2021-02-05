@@ -67,6 +67,7 @@ f3d_test(TestHDRI suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/palermo
 f3d_test(TestHDRIBlur suzanne.ply "300,300" "-u --hdri=${CMAKE_SOURCE_DIR}/data/palermo_park_1k.hdr")
 f3d_test(TestHDRIEdges suzanne.ply "300,300" "-e --hdri=${CMAKE_SOURCE_DIR}/data/palermo_park_1k.hdr")
 f3d_test(TestTIFF logo.tif "300,300" "-sy --up=-Y")
+f3d_test(TestUTF8 "(ノಠ益ಠ )ノ.vtp" "300,300")
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20200527)
   f3d_test(TestEdges suzanne.ply "300,300" "-e")
