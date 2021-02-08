@@ -1,11 +1,10 @@
 ########## Stages ##########
 
 stages:
-  - deps
-  - configure
+  - deps # Empty for linux
   - build
-  - test
-  - package
+  - test # Empty for vtk9
+  - package # Empty for vtk9
 
 ########## OS specific tags and variables ##########
 
@@ -88,8 +87,8 @@ stages:
       when: on_success
     - when: never
 
-.conf:
-  stage: configure
+.build:
+  stage: build
   script:
     - mkdir build
     - cd build
@@ -97,11 +96,6 @@ stages:
       -DBUILD_TESTING=ON -DF3D_STRICT_BUILD=ON
       -DCMAKE_BUILD_TYPE=Release -DVTK_DIR:FILEPATH=$VTK_DIR
       -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON ..
-
-.build:
-  stage: build
-  script:
-    - cd build
     - cmake --build . --config Release --parallel 8
 
 .test:
@@ -139,43 +133,24 @@ deps:linux:
     - .deps:linux
     - .when:automatic
 
-### Conf Linux ###
+### Build Linux ###
 
-.conf:linux:
+.build:linux:
   extends:
-    - .conf
+    - .build
   variables:
     ADDITIONAL_OPTIONS: -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
     VTK_DIR: /vtk/vtk_install/lib/cmake/vtk-9.0
-  artifacts:
-    paths:
-      - build
 
-conf:linux:vtk9:
+build:linux:
   extends:
-    - .conf:linux
-    - .linux_docker_vtk9
-    - .when:dependent
-  dependencies:
-    - deps:linux:vtk9
-  needs:
-    - deps:linux:vtk9
-
-conf:linux:
-  extends:
-    - .conf:linux
+    - .build:linux
     - .linux_docker_vtk
     - .when:dependent
   dependencies:
     - deps:linux
   needs:
     - deps:linux
-
-### Build Linux ###
-
-.build:linux:
-  extends:
-    - .build
   artifacts:
     paths:
       - build
@@ -186,19 +161,9 @@ build:linux:vtk9:
     - .linux_docker_vtk9
     - .when:dependent
   dependencies:
-    - conf:linux:vtk9
+    - deps:linux:vtk9
   needs:
-    - conf:linux:vtk9
-
-build:linux:
-  extends:
-    - .build:linux
-    - .linux_docker_vtk
-    - .when:dependent
-  dependencies:
-    - conf:linux
-  needs:
-    - conf:linux
+    - deps:linux:vtk9
 
 ### Test Linux ###
 
@@ -251,21 +216,24 @@ pack:linux:
 
 ########## Windows Specific ##########
 
+### Deps Windows ###
+
 .deps:win:
   stage: deps
   script:
-    - mkdir dependencies
-    - Invoke-WebRequest https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-win64-x64.zip -OutFile .\cmake-3.19.3-win64-x64.zip
-    - $CmakeHash = (Get-FileHash .\cmake-3.19.3-win64-x64.zip -Algorithm MD5).Hash
-    - $CmakeHash -eq "6bbe95ee440c42ddd249f356d3ebd056"
-    - Expand-Archive -LiteralPath .\cmake-3.19.3-win64-x64.zip -DestinationPath .\dependencies
     - $env:GIT_LFS_SKIP_SMUDGE="1"
     - git clone https://gitlab.kitware.com/f3d/f3d-dependencies.git
     - cd f3d-dependencies
     - git lfs pull --include "windows/archive/nsis-3.06.1.zip"
     - git lfs pull --include "windows/archive/$VTK_ARCHIVE"
     - cd ..\
+    - $ProgressPreference = 'SilentlyContinue'
+    - Invoke-WebRequest https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-win64-x64.zip -OutFile .\cmake-3.19.3-win64-x64.zip 
+    - $CmakeHash = (Get-FileHash .\cmake-3.19.3-win64-x64.zip -Algorithm MD5).Hash
+    - $CmakeHash -eq "6bbe95ee440c42ddd249f356d3ebd056"
+    - mkdir dependencies
     - cd dependencies
+    - tar -xf ..\cmake-3.19.3-win64-x64.zip
     - cmake -E tar -x ../f3d-dependencies/windows/archive/nsis-3.06.1.zip
     - cmake -E tar -x ../f3d-dependencies/windows/archive/$VTK_ARCHIVE
   extends:
@@ -289,72 +257,48 @@ deps:win:vtk9:
   variables:
     VTK_ARCHIVE: vtk-9.0.1.zip
 
-.conf:win:
-  extends:
-    - .conf
-    - .windows
-    - .windows_env
-  variables:
-    BUILD_ARCHITECTURE: -Ax64
-    ADDITIONAL_OPTIONS: -DWINDOWS_BUILD_WIN32=ON
-    POLICY_OPTION: -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
-    RUNTIME_OPTION: -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
-    VTK_DIR: ..\dependencies\vtk_install\lib\cmake\vtk-9.0\
-  artifacts:
-    paths:
-      - dependencies
-      - build
-
-conf:win:
-  extends:
-    - .conf:win
-    - .when:dependent
-  dependencies:
-    - deps:win
-  needs:
-    - deps:win
-
-conf:win:vtk9:
-  extends:
-    - .conf:win
-    - .when:dependent
-  dependencies:
-    - deps:win:vtk9
-  needs:
-    - deps:win:vtk9
+### Build Windows ###
 
 .build:win:
   extends:
     - .windows
     - .windows_env
     - .build
+  variables:
+    BUILD_ARCHITECTURE: -Ax64
+    ADDITIONAL_OPTIONS: -DWINDOWS_BUILD_WIN32=ON
+    POLICY_OPTION: -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
+    RUNTIME_OPTION: -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
+    VTK_DIR: ..\dependencies\vtk_install\lib\cmake\vtk-9.0\
+
+build:win:
+  extends:
+    - .build:win
     - .when:dependent
-  dependencies:
-    - configure:win
-  needs:
-    - configure:win
-  artifacts:
-    paths:
-      - dependencies
-      - build
 
 build:win:
   extends:
     - .build:win
     - .when:dependent
   dependencies:
-    - conf:win
+    - deps:win
   needs:
-    - conf:win
+    - deps:win
+  artifacts:
+    paths:
+      - dependencies
+      - build
 
 build:win:vtk9:
   extends:
     - .build:win
     - .when:dependent
   dependencies:
-    - conf:win:vtk9
+    - deps:win:vtk9
   needs:
-    - conf:win:vtk9
+    - deps:win:vtk9
+
+### Test Windows ###
 
 test:win:
   extends:
@@ -373,7 +317,9 @@ test:win:vtk9:
     - .windows_empty
     - .when:dependent
   needs:
-    - build:win
+    - build:win:vtk9
+
+### Package Windows ###
 
 pack:win:
   extends:
@@ -396,9 +342,11 @@ pack:win:vtk9:
     - .windows_empty
     - .when:dependent
   needs:
-    - build:win
+    - build:win:vtk9
 
 ########## MacOS Specific ##########
+
+### Deps MacOS ###
 
 .deps:macos:
   stage: deps
@@ -433,64 +381,40 @@ deps:macos:vtk9:
   variables:
     VTK_ARCHIVE: vtk-9.0.1.tar.gz
 
-.conf:macos:
-  extends:
-    - .macos
-    - .macos_env
-    - .conf
-  variables:
-    ADDITIONAL_OPTIONS: -DMACOSX_BUILD_BUNDLE=ON
-    VTK_DIR: dependencies\vtk_install\lib\cmake\vtk-9.0\ # this should be ../dependencies, wtf is going on ?
-  artifacts:
-    paths:
-      - dependencies
-      - build
-
-conf:macos:
-  extends:
-    - .conf:macos
-    - .when:dependent
-  dependencies:
-    - deps:macos
-  needs:
-    - deps:macos
-
-conf:macos:vtk9:
-  extends:
-    - .conf:macos
-    - .when:dependent
-  dependencies:
-    - deps:macos:vtk9
-  needs:
-    - deps:macos:vtk9
+### Build MacOS ###
 
 .build:macos:
   extends:
     - .macos
     - .macos_env
     - .build
-  artifacts:
-    paths:
-      - dependencies
-      - build
+  variables:
+    ADDITIONAL_OPTIONS: -DMACOSX_BUILD_BUNDLE=ON
+    VTK_DIR: dependencies\vtk_install\lib\cmake\vtk-9.0\ # this should be ../dependencies, TODO understand
 
 build:macos:
   extends:
     - .build:macos
     - .when:dependent
   dependencies:
-    - conf:macos
+    - deps:macos
   needs:
-    - conf:macos
+    - deps:macos
+  artifacts:
+    paths:
+      - dependencies
+      - build
 
 build:macos:vtk9:
   extends:
     - .build:macos
     - .when:dependent
   dependencies:
-    - conf:macos:vtk9
+    - deps:macos:vtk9
   needs:
-    - conf:macos:vtk9
+    - deps:macos:vtk9
+
+### Test MacOS ###
 
 test:macos:
   extends:
@@ -509,7 +433,9 @@ test:macos:vtk9:
     - .macos_empty
     - .when:dependent
   needs:
-    - build:macos
+    - build:macos:vtk9
+
+### Package MacOS ###
 
 pack:macos:
   extends:
@@ -531,4 +457,4 @@ pack:macos:vtk9:
     - .macos_empty
     - .when:dependent
   needs:
-    - build:macos
+    - build:macos:vtk9
