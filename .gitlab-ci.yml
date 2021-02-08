@@ -71,6 +71,23 @@ stages:
 
 ########## Cross-platform scripts ##########
 
+.when:automatic:
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID'
+      when: on_success
+    - if: '$CI_PROJECT_PATH == "f3d/f3d"'
+      when: delayed
+      start_in: 5 minutes
+    - when: never
+
+.when:dependent:
+  rules:
+    - if: '$CI_MERGE_REQUEST_ID'
+      when: on_success
+    - if: '$CI_PROJECT_PATH == "f3d/f3d"'
+      when: on_success
+    - when: never
+
 .conf:
   stage: configure
   script:
@@ -115,10 +132,12 @@ stages:
 deps:linux:vtk9:
   extends:
     - .deps:linux
+    - .when:automatic
 
 deps:linux:
   extends:
     - .deps:linux
+    - .when:automatic
 
 ### Conf Linux ###
 
@@ -136,6 +155,7 @@ conf:linux:vtk9:
   extends:
     - .conf:linux
     - .linux_docker_vtk9
+    - .when:dependent
   dependencies:
     - deps:linux:vtk9
   needs:
@@ -145,6 +165,7 @@ conf:linux:
   extends:
     - .conf:linux
     - .linux_docker_vtk
+    - .when:dependent
   dependencies:
     - deps:linux
   needs:
@@ -163,6 +184,7 @@ build:linux:vtk9:
   extends:
     - .build:linux
     - .linux_docker_vtk9
+    - .when:dependent
   dependencies:
     - conf:linux:vtk9
   needs:
@@ -172,6 +194,7 @@ build:linux:
   extends:
     - .build:linux
     - .linux_docker_vtk
+    - .when:dependent
   dependencies:
     - conf:linux
   needs:
@@ -183,6 +206,7 @@ test:linux:vtk9:
   stage: test
   extends:
     - .linux_empty
+    - .when:dependent
   needs:
     - build:linux:vtk9
 
@@ -191,6 +215,7 @@ test:linux:
     - .linux
     - .test
     - .linux_docker_vtk
+    - .when:dependent
   dependencies:
     - build:linux
   needs:
@@ -205,6 +230,7 @@ pack:linux:vtk9:
   stage: package
   extends:
     - .linux_empty
+    - .when:dependent
   needs:
     - build:linux:vtk9
 
@@ -213,6 +239,7 @@ pack:linux:
     - .linux
     - .pack
     - .linux_docker_vtk
+    - .when:dependent
   dependencies:
     - build:linux
   needs:
@@ -251,12 +278,14 @@ pack:linux:
 deps:win:
   extends:
     - .deps:win
+    - .when:automatic
   variables:
     VTK_ARCHIVE: vtk-latest.zip
 
 deps:win:vtk9:
   extends:
     - .deps:win
+    - .when:automatic
   variables:
     VTK_ARCHIVE: vtk-9.0.1.zip
 
@@ -279,6 +308,7 @@ deps:win:vtk9:
 conf:win:
   extends:
     - .conf:win
+    - .when:dependent
   dependencies:
     - deps:win
   needs:
@@ -287,6 +317,7 @@ conf:win:
 conf:win:vtk9:
   extends:
     - .conf:win
+    - .when:dependent
   dependencies:
     - deps:win:vtk9
   needs:
@@ -297,6 +328,7 @@ conf:win:vtk9:
     - .windows
     - .windows_env
     - .build
+    - .when:dependent
   dependencies:
     - configure:win
   needs:
@@ -309,6 +341,7 @@ conf:win:vtk9:
 build:win:
   extends:
     - .build:win
+    - .when:dependent
   dependencies:
     - conf:win
   needs:
@@ -317,6 +350,7 @@ build:win:
 build:win:vtk9:
   extends:
     - .build:win
+    - .when:dependent
   dependencies:
     - conf:win:vtk9
   needs:
@@ -327,6 +361,7 @@ test:win:
     - .windows
     - .windows_env
     - .test
+    - .when:dependent
   dependencies:
     - build:win
   needs:
@@ -336,6 +371,7 @@ test:win:vtk9:
   stage: test
   extends:
     - .windows_empty
+    - .when:dependent
   needs:
     - build:win
 
@@ -344,6 +380,7 @@ pack:win:
     - .windows
     - .windows_env
     - .pack
+    - .when:dependent
   dependencies:
     - build:win
   needs:
@@ -357,6 +394,7 @@ pack:win:vtk9:
   stage: package
   extends:
     - .windows_empty
+    - .when:dependent
   needs:
     - build:win
 
@@ -384,12 +422,14 @@ pack:win:vtk9:
 deps:macos:
   extends:
     - .deps:macos
+    - .when:automatic
   variables:
     VTK_ARCHIVE: vtk-latest.tar.gz
 
 deps:macos:vtk9:
   extends:
     - .deps:macos
+    - .when:automatic
   variables:
     VTK_ARCHIVE: vtk-9.0.1.tar.gz
 
@@ -409,6 +449,7 @@ deps:macos:vtk9:
 conf:macos:
   extends:
     - .conf:macos
+    - .when:dependent
   dependencies:
     - deps:macos
   needs:
@@ -417,6 +458,7 @@ conf:macos:
 conf:macos:vtk9:
   extends:
     - .conf:macos
+    - .when:dependent
   dependencies:
     - deps:macos:vtk9
   needs:
@@ -435,6 +477,7 @@ conf:macos:vtk9:
 build:macos:
   extends:
     - .build:macos
+    - .when:dependent
   dependencies:
     - conf:macos
   needs:
@@ -443,6 +486,7 @@ build:macos:
 build:macos:vtk9:
   extends:
     - .build:macos
+    - .when:dependent
   dependencies:
     - conf:macos:vtk9
   needs:
@@ -453,6 +497,7 @@ test:macos:
     - .macos
     - .macos_env
     - .test
+    - .when:dependent
   dependencies:
     - build:macos
   needs:
@@ -462,6 +507,7 @@ test:macos:vtk9:
   stage: test
   extends:
     - .macos_empty
+    - .when:dependent
   needs:
     - build:macos
 
@@ -470,6 +516,7 @@ pack:macos:
     - .macos
     - .macos_env
     - .pack
+    - .when:dependent
   dependencies:
     - build:macos
   needs:
@@ -482,5 +529,6 @@ pack:macos:vtk9:
   stage: package
   extends:
     - .macos_empty
+    - .when:dependent
   needs:
     - build:macos
