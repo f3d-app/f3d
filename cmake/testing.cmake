@@ -64,6 +64,7 @@ f3d_test(TestVolumeNonScalars waveletArrays.vti "300,300" "-vb --scalars=RandomP
 f3d_test(TestTextures WaterBottle.glb "300,300" "--geometry-only --texture-material=${CMAKE_SOURCE_DIR}/data/red.jpg --roughness=1 --metallic=1 --texture-base-color=${CMAKE_SOURCE_DIR}/data/albedo.png --texture-normal=${CMAKE_SOURCE_DIR}/data/normal.png --texture-emissive=${CMAKE_SOURCE_DIR}/data/red.jpg --emissive-factor=0.1,0.1,0.1")
 f3d_test(TestMetaData pdiag.vtu "300,300" "-m")
 f3d_test(TestHDRI suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/palermo_park_1k.hdr")
+f3d_test(TestHDRIOrient suzanne.stl "300,300" "--up=+Z --hdri=${CMAKE_SOURCE_DIR}/data/palermo_park_1k.hdr")
 f3d_test(TestHDRIBlur suzanne.ply "300,300" "-u --hdri=${CMAKE_SOURCE_DIR}/data/palermo_park_1k.hdr")
 f3d_test(TestHDRIEdges suzanne.ply "300,300" "-e --hdri=${CMAKE_SOURCE_DIR}/data/palermo_park_1k.hdr")
 f3d_test(TestTIFF logo.tif "300,300" "-sy --up=-Y")
