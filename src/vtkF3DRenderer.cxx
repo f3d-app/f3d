@@ -85,34 +85,6 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->UseBlurBackground = this->Options.BlurBackground;
   this->UseTrackball = this->Options.Trackball;
 
-  // parse up vector
-  if (this->Options.Up.size() == 2)
-  {
-    char sign = this->Options.Up[0];
-    char axis = std::toupper(this->Options.Up[1]);
-    if ((sign == '-' || sign == '+') && (axis >= 'X' && axis <= 'Z'))
-    {
-      this->UpIndex = axis - 'X';
-      std::fill(this->UpVector, this->UpVector + 3, 0);
-      this->UpVector[this->UpIndex] = (sign == '+') ? 1.0 : -1.0;
-
-      std::fill(this->RightVector, this->RightVector + 3, 0);
-      this->RightVector[this->UpIndex == 0 ? 1 : 0] = 1.0;
-
-      double pos[3];
-      vtkMath::Cross(this->UpVector, this->RightVector, pos);
-      vtkMath::MultiplyScalar(pos, -1.0);
-
-      vtkCamera* cam = this->GetActiveCamera();
-      cam->SetFocalPoint(0.0, 0.0, 0.0);
-      cam->SetPosition(pos);
-      cam->SetViewUp(this->UpVector);
-
-      this->SetEnvironmentUp(this->UpVector);
-      this->SetEnvironmentRight(this->RightVector);
-    }
-  }
-
   if (!this->Options.HDRIFile.empty() && !this->GetUseImageBasedLighting())
   {
     std::string fullPath = vtksys::SystemTools::CollapseFullPath(this->Options.HDRIFile);
@@ -141,10 +113,6 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
       this->SetEnvironmentTexture(texture);
 
       // Skybox OpenGL
-      double front[3];
-      vtkMath::Cross(this->RightVector, this->UpVector, front);
-      this->Skybox->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
-      this->Skybox->SetFloorRight(front[0], front[1], front[2]);
       this->Skybox->SetProjection(vtkSkybox::Sphere);
       this->Skybox->SetTexture(texture);
 
@@ -158,6 +126,40 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
       vtkWarningMacro("Cannot open HDRI file " << fullPath);
     }
   }
+
+  // parse up vector
+  if (this->Options.Up.size() == 2)
+  {
+    char sign = this->Options.Up[0];
+    char axis = std::toupper(this->Options.Up[1]);
+    if ((sign == '-' || sign == '+') && (axis >= 'X' && axis <= 'Z'))
+    {
+      this->UpIndex = axis - 'X';
+      std::fill(this->UpVector, this->UpVector + 3, 0);
+      this->UpVector[this->UpIndex] = (sign == '+') ? 1.0 : -1.0;
+
+      std::fill(this->RightVector, this->RightVector + 3, 0);
+      this->RightVector[this->UpIndex == 0 ? 1 : 0] = 1.0;
+
+      double pos[3];
+      vtkMath::Cross(this->UpVector, this->RightVector, pos);
+      vtkMath::MultiplyScalar(pos, -1.0);
+
+      vtkCamera* cam = this->GetActiveCamera();
+      cam->SetFocalPoint(0.0, 0.0, 0.0);
+      cam->SetPosition(pos);
+      cam->SetViewUp(this->UpVector);
+
+      this->SetEnvironmentUp(this->UpVector);
+      this->SetEnvironmentRight(this->RightVector);
+    }
+  }
+
+  // skybox orientation
+  double front[3];
+  vtkMath::Cross(this->RightVector, this->UpVector, front);
+  this->Skybox->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
+  this->Skybox->SetFloorRight(front[0], front[1], front[2]);
 
   if (this->GetUseImageBasedLighting())
   {
