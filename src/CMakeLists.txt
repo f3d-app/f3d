@@ -102,7 +102,7 @@ endif()
 
 if(WIN32)
   # Windows executable without console
-  option(WINDOWS_BUILD_WIN32 ON "Build a non-console Win32 application")
+  option(WINDOWS_BUILD_WIN32 "Build a non-console Win32 application" ON)
   if(WINDOWS_BUILD_WIN32)
     set_target_properties(f3d PROPERTIES WIN32_EXECUTABLE TRUE)
     set(F3D_WIN32_APP ON)
