@@ -1,6 +1,8 @@
-title: Limitations
+title: Known limitations
 ---
 
+* No categorical generic field data rendering support.
+* No string array categorical rendering support.
 * No support for specifying manual lighting in the default scene.
 * Drag&Drop does not work with Thunar file manager.
 * Pressing the `z` hotkey to display the FPS timer triggers a double render.
