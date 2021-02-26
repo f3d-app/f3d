@@ -2,6 +2,9 @@
 add_executable(embed embed.cxx)
 target_link_libraries(embed PUBLIC VTK::IOImage)
 
+# On Windows, add VTK IOImage library to PATH
+# It is required to run `embed` with `add_custom_command`
+# Other systems supports RPATH so it is not required
 if(WIN32)
   get_target_property(_confs VTK::IOImage IMPORTED_CONFIGURATIONS)
   foreach(_conf ${_confs})
@@ -19,13 +22,18 @@ add_custom_command(
   DEPENDS embed)
 
 # f3d
-if(WIN32)
-  set(WINDOWS_RC_FILE ${CMAKE_SOURCE_DIR}/resources/f3d.rc)
-  set(WINDOWS_OUTPUT_WINDOW ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DWin32OutputWindow.cxx)
-endif()
+cmake_dependent_option(F3D_MACOS_BUNDLE "Build a macOS bundle application" ON "APPLE" OFF)
+cmake_dependent_option(F3D_WINDOWS_GUI "Build a non-console Win32 application" ON "WIN32" OFF)
 
+set(PLATFORM_SPECIFIC_FILES "")
+if(WIN32)
+  set(PLATFORM_SPECIFIC_FILES "${CMAKE_SOURCE_DIR}/resources/f3d.rc")
+  if(F3D_WINDOWS_GUI)
+    set(PLATFORM_SPECIFIC_FILES ${PLATFORM_SPECIFIC_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DWin32OutputWindow.cxx")
+  endif()
+endif()
 if(APPLE)
-  set(OSX_DELEGATE ${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm)
+  set(PLATFORM_SPECIFIC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm")
 endif()
 
 add_executable(f3d
@@ -48,9 +56,7 @@ add_executable(f3d
   F3DOptions.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h
   ${CMAKE_CURRENT_BINARY_DIR}/Config.cxx
-  ${OSX_DELEGATE}
-  ${WINDOWS_RC_FILE}
-  ${WINDOWS_OUTPUT_WINDOW}
+  ${PLATFORM_SPECIFIC_FILES}
 )
 
 set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
@@ -59,7 +65,8 @@ set(F3D_STRICT_BUILD OFF CACHE BOOL "Use strict warning and errors flags for bui
 mark_as_advanced(F3D_STRICT_BUILD)
 if (F3D_STRICT_BUILD)
   if(MSVC)
-    target_compile_options(f3d PRIVATE /W4 /WX)
+    # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
+    target_compile_options(f3d PRIVATE /W4 /WX /wd4275)
   else()
     target_compile_options(f3d PRIVATE -Wall -Wextra -Werror)
   endif()
@@ -73,20 +80,16 @@ target_compile_definitions(f3d
   PRIVATE VTK_VERSION_MINOR=${VTK_VERSION_MINOR}
 )
 
-if(APPLE)
-  # MacOS Bundle app
-  option(MACOSX_BUILD_BUNDLE ON "Build a macOS bundle application")
-  if(MACOSX_BUILD_BUNDLE)
-    set_target_properties(f3d PROPERTIES MACOSX_BUNDLE TRUE)
-    set(F3D_OSX_BUNDLE ON)
+# MacOS Bundle app
+if(F3D_MACOS_BUNDLE)
+  set_target_properties(f3d PROPERTIES MACOSX_BUNDLE TRUE)
 
-    # Add default configuration
-    if(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
-      set(f3d_CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json)
-      set_source_files_properties(${f3d_CONFIG} PROPERTIES
-        MACOSX_PACKAGE_LOCATION "Resources")
-      target_sources(f3d PRIVATE ${f3d_CONFIG})
-    endif()
+  # Add default configuration
+  if(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
+    set(f3d_CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json)
+    set_source_files_properties(${f3d_CONFIG} PROPERTIES
+      MACOSX_PACKAGE_LOCATION "Resources")
+    target_sources(f3d PRIVATE ${f3d_CONFIG})
   endif()
 
   # Add logo icon
@@ -100,15 +103,12 @@ if(APPLE)
   set_target_properties(f3d PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/BundleInfo.plist")
 endif()
 
+# Windows executable without console
 if(WIN32)
-  # Windows executable without console
-  option(WINDOWS_BUILD_WIN32 "Build a non-console Win32 application" ON)
-  if(WINDOWS_BUILD_WIN32)
+  if(F3D_WINDOWS_GUI)
     set_target_properties(f3d PROPERTIES WIN32_EXECUTABLE TRUE)
-    set(F3D_WIN32_APP ON)
   else()
-    set(F3D_WIN32_APP OFF)
-     # force usage of wWinMainCRTStartup in console mode for Unicode support
+    # force usage of wWinMainCRTStartup in console mode for Unicode support
     target_link_options(f3d PUBLIC "/ENTRY:wWinMainCRTStartup")
   endif()
 endif()

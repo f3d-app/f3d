@@ -453,7 +453,7 @@ std::string ConfigurationOptions::GetBinarySettingsDirectory()
     directoryPath += separator;
 #endif
     directoryPath += "..";
-#ifdef F3D_OSX_BUNDLE
+#ifdef F3D_MACOS_BUNDLE
     if (vtksys::SystemTools::FileExists(directoryPath + "/Resources"))
     {
       directoryPath += "/Resources";
