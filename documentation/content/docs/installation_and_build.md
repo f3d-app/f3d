@@ -3,7 +3,7 @@ title: Installation and build
 
 # Installation
 
-You can find the release binary packages for Windows, Linux, and OSX on the [Release page](https://gitlab.kitware.com/f3d/f3d/-/releases).
+You can find the release binary packages for Windows, Linux, and macOS on the [Release page](https://gitlab.kitware.com/f3d/f3d/-/releases).
 Alternatively, you can build it yourself, following the build guide.
 
 # How to use
@@ -26,7 +26,7 @@ There is mainly three ways to use F3D.
 Set the following CMake options:
 * `VTK_DIR`: Point to a build or install directory of VTK.
 * `BUILD_TESTING`: Optionally, enable the tests.
-* `MACOSX_BUILD_BUNDLE`: On macOS, build a `.app` bundle.
-* `WINDOWS_BUILD_WIN32`: On Windows, build a Win32 application (without console).
+* `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
+* `F3D_WINDOWS_GUI`: On Windows, build a Win32 application (without console).
 
 Then build the software using your build system.

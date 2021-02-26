@@ -60,7 +60,7 @@ elseif(WIN32 AND NOT UNIX)
     install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
       DESTINATION ".")
   endif()
-elseif(APPLE AND NOT MACOSX_BUILD_BUNDLE)
+elseif(APPLE AND NOT F3D_MACOS_BUNDLE)
   if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
     install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
       DESTINATION ".")
