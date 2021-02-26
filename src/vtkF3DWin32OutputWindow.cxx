@@ -2,13 +2,10 @@
 
 #include <vtkObjectFactory.h>
 #include <vtkUnicodeString.h>
-
-#include <Windows.h>
+#include <vtkWindows.h>
 
 #include <codecvt>
 #include <regex>
-
-extern HWND vtkWin32OutputWindowOutputWindow;
 
 vtkStandardNewMacro(vtkF3DWin32OutputWindow);
 
@@ -18,6 +15,37 @@ const char* vtkF3DWin32OutputWindow::GetWindowTitle()
   return "F3D log window";
 }
 #endif
+
+int vtkF3DWin32OutputWindow::Initialize()
+{
+  int rc = this->Superclass::Initialize();
+
+  // retrieve window handle
+  HWND hCurWnd = nullptr;
+  do
+  {
+    hCurWnd = FindWindowExA(nullptr, hCurWnd, "vtkOutputWindow", nullptr);
+    DWORD processID = 0;
+    GetWindowThreadProcessId(hCurWnd, &processID);
+    if (processID == GetCurrentProcessId())
+    {
+      break;
+    }
+  }
+  while (hCurWnd != nullptr);
+
+  if (hCurWnd == nullptr)
+  {
+    // cannot find window
+    this->EditControlHandle = nullptr;
+    return 0;
+  }
+
+  // find Edit control
+  this->EditControlHandle = FindWindowExA(hCurWnd, nullptr, "Edit", nullptr);
+
+  return rc;
+}
 
 void vtkF3DWin32OutputWindow::DisplayText(const char* someText)
 {
@@ -35,12 +63,14 @@ void vtkF3DWin32OutputWindow::DisplayText(const char* someText)
 
   std::vector<vtkTypeUInt16> utf16data = vtkUnicodeString::from_utf8(someText).utf16_str();
 
-  int index = GetWindowTextLength(vtkWin32OutputWindowOutputWindow);
-  SetFocus(vtkWin32OutputWindowOutputWindow);
+  HWND hWnd = static_cast<HWND>(this->EditControlHandle);
+
+  int index = GetWindowTextLength(hWnd);
+  SetFocus(hWnd);
 
   // select end of text
-  SendMessageW(vtkWin32OutputWindowOutputWindow, EM_SETSEL, (WPARAM)index, (LPARAM)index);
+  SendMessageW(hWnd, EM_SETSEL, (WPARAM)index, (LPARAM)index);
 
   // print text
-  SendMessageW(vtkWin32OutputWindowOutputWindow, EM_REPLACESEL, 0, reinterpret_cast<LPARAM>(wstr.c_str()));
+  SendMessageW(hWnd, EM_REPLACESEL, 0, reinterpret_cast<LPARAM>(wstr.c_str()));
 }
