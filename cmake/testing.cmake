@@ -76,6 +76,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20200527)
   f3d_test(TestLineWidth cow.vtk "300,300" "-e --line-width=5")
 endif()
 
+if(VTK_VERSION VERSION_GREATER 9.0.20210228)
+  f3d_test(TestCameraPersp Cameras.gltf "300,300" "--camera-index=0")
+  f3d_test(TestCameraOrtho Cameras.gltf "300,300" "--camera-index=1")
+endif()
+
 if(F3D_HAS_RAYTRACING)
   f3d_test(TestOSPRayGLTF WaterBottle.glb "300,300" "-r --samples=1")
   f3d_test(TestOSPRayBackground suzanne.ply "300,300" "-r --samples=1 --bg-color=1,0,0")

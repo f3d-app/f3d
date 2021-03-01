@@ -54,7 +54,7 @@ Options &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 -e, \-\-edges|Show the *cell edges*.
 -k, \-\-trackball|Enable trackball interaction.
 \-\-progress|Show a *progress bar* when loading the file.
-\-\-animation-index|Selection the animation to show.<br>Any negative value means all animations.<br>The default scene always has a single animation if any.
+\-\-animation-index|Select the animation to show.<br>Any negative value means all animations.<br>The default scene always has a single animation if any.
 \-\-geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-up|Define the Up direction (default: +Y)
 \-\-dry-run|Do not read the configuration file but consider only the command line options
@@ -88,6 +88,7 @@ Options &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 ## Camera configuration options:
 Options &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|Description
 ------|------
+\-\-camera-index|Select the scene camera to use.<br>Any negative value means custom camera.<br>The default scene always has a custom camera.
 \-\-camera-position=&lt;X,Y,Z&gt;|The position of the camera. Automaticaly computed or recovered from the file if not provided.
 \-\-camera-focal-point=&lt;X,Y,Z&gt;|The focal point of the camera. Automaticaly computed or recovered from the file if not provided.
 \-\-camera-view-up=&lt;X,Y,Z&gt;|The focal point of the camera. Will be orthogonalized even when provided. Automaticaly computed or recovered from the file if not provided.
@@ -144,6 +145,8 @@ Simple interaction with the displayed data is possible directly within the windo
 * *Move the mouse wheel* to zoom in/out.
 * *Click and drag* with the *middle* mouse button to translate the camera.
 * Drag and Drop a file or directory into the F3D window to load it
+
+> Note: When playing an animation with a scene camera, camera interactions are locked.
 
 The coloring can be controlled directly using hotkeys:
 * Press `C` key to cycle between coloring with array from point data and from cell data.

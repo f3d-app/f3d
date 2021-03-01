@@ -4,6 +4,7 @@
 
 #include <vtk_jsoncpp.h>
 #include <vtksys/SystemTools.hxx>
+#include <vtkVersion.h>
 
 #include <fstream>
 #include <regex>
@@ -174,6 +175,9 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp1, "progress", "", "Show progress bar", options.Progress);
     this->DeclareOption(grp1, "up", "", "Up direction", options.Up, true, "[-X|+X|-Y|+Y|-Z|+Z]");
     this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.AnimationIndex, true, "<index>");
+#if VTK_VERSION_NUMBER > VTK_VERSION_CHECK(9, 0, 20210228)
+    this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", options.CameraIndex, true, "<index>");
+#endif
     this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", options.GeometryOnly);
     this->DeclareOption(grp1, "dry-run", "", "Do not read the configuration file", options.DryRun);
 
@@ -296,6 +300,8 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
 #else
       version += "OFF";
 #endif
+      version += "\nVTK version: ";
+      version += std::string(VTK_VERSION) + std::string(" (build ") + std::to_string(VTK_BUILD_VERSION) + std::string(")");
       version += "\nAuthor: Kitware SAS";
 
       F3DLog::Print(F3DLog::Severity::Info, version);
@@ -624,6 +630,13 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
     {
       F3DLog::Print(F3DLog::Severity::Info,
         "Specifying an Animation Index has no effect while using the default scene.");
+      ret = false;
+    }
+
+    if (defaultOptions.CameraIndex != options.CameraIndex)
+    {
+      F3DLog::Print(F3DLog::Severity::Info,
+        "Specifying a Camera Index has no effect while using the default scene.");
       ret = false;
     }
 

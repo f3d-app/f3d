@@ -10,6 +10,7 @@
 
 #include <vtk3DSImporter.h>
 #include <vtkCallbackCommand.h>
+#include <vtkCamera.h>
 #include <vtkDoubleArray.h>
 #include <vtkGLTFImporter.h>
 #include <vtkImageData.h>
@@ -63,8 +64,11 @@ int F3DLoader::Start(int argc, char** argv)
 
     // the renderer must be added to the render window after OpenGL context initialization
     this->RenWin->AddRenderer(this->Renderer);
+    this->RenWin->SetWindowName(f3d::AppTitle.c_str());
 
     vtkNew<vtkF3DInteractorStyle> style;
+    style->SetAnimationManager(this->AnimationManager);
+    style->SetOptions(this->Options);
 
     // Setup the observers for the interactor style events
     vtkNew<vtkCallbackCommand> newFilesCallback;
@@ -103,7 +107,6 @@ int F3DLoader::Start(int argc, char** argv)
     interactor->SetInteractorStyle(style);
     interactor->Initialize();
     this->Renderer->Initialize(options, "");
-    this->RenWin->SetWindowName(f3d::AppTitle.c_str());
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200615)
     // set icon
@@ -274,6 +277,10 @@ void F3DLoader::LoadFile(int load)
 
     this->Importer->SetRenderWindow(this->Renderer->GetRenderWindow());
 
+#if VTK_VERSION_NUMBER > VTK_VERSION_CHECK(9, 0, 20210228)
+    this->Importer->SetCamera(this->Options.CameraIndex);
+#endif
+
     if (this->Options.Progress)
     {
       vtkNew<vtkCallbackCommand> progressCallback;
@@ -322,11 +329,27 @@ void F3DLoader::LoadFile(int load)
   // we need to remove progress observer in order to hide the progress bar during animation
   this->Importer->RemoveObservers(vtkCommand::ProgressEvent);
 
-  this->AnimationManager.Initialize(this->Options, this->Importer, this->RenWin);
+  this->AnimationManager.Initialize(this->Options, this->Importer, this->RenWin, this->Renderer);
 
   // Display description
   if (this->Options.Verbose || this->Options.NoRender)
   {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210228)
+    vtkIdType availCameras = this->Importer->GetNumberOfCameras();
+    if (availCameras <= 0)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "No camera available in this file");
+    }
+    else
+    {
+      F3DLog::Print(F3DLog::Severity::Info, "Camera(s) available in this file are:");
+    }
+    for (int i = 0; i < availCameras; i++)
+    {
+      F3DLog::Print(F3DLog::Severity::Info, i, ": ", this->Importer->GetCameraName(i));
+    }
+    F3DLog::Print(F3DLog::Severity::Info, "\n");
+#endif
     F3DLog::Print(F3DLog::Severity::Info, this->Importer->GetOutputsDescription());
   }
 
@@ -353,9 +376,50 @@ void F3DLoader::LoadFile(int load)
     // Actors are loaded, use the bounds to reset camera and set-up SSAO
     this->Renderer->SetupRenderPasses();
     this->Renderer->UpdateInternalActors();
-    this->Renderer->InitializeCamera();
-
     this->Renderer->ShowOptions();
+
+    // Set the initial camera once all options
+    // have been shown as they may have an effect on it
+    if (this->Options.CameraIndex < 0)
+    {
+      // set a default camera from bounds using VTK method
+      this->Renderer->vtkRenderer::ResetCamera();
+
+      // use options to overwrite camera parameters
+      vtkCamera* cam = this->Renderer->GetActiveCamera();
+      if (this->Options.CameraPosition.size() == 3)
+      {
+        cam->SetPosition(this->Options.CameraPosition.data());
+      }
+      if (this->Options.CameraFocalPoint.size() == 3)
+      {
+        cam->SetFocalPoint(this->Options.CameraFocalPoint.data());
+      }
+      if (this->Options.CameraViewUp.size() == 3)
+      {
+        cam->SetViewUp(this->Options.CameraViewUp.data());
+      }
+      if (this->Options.CameraViewAngle != 0)
+      {
+        cam->SetViewAngle(this->Options.CameraViewAngle);
+      }
+      cam->OrthogonalizeViewUp();
+      if (this->Options.Verbose)
+      {
+        double* position = cam->GetPosition();
+        F3DLog::Print(F3DLog::Severity::Info, "Camera position is : ", position[0], ", ", position[1],
+          ", ", position[2], ".");
+        double* focalPoint = cam->GetFocalPoint();
+        F3DLog::Print(F3DLog::Severity::Info, "Camera focal point is : ", focalPoint[0], ", ",
+          focalPoint[1], ", ", focalPoint[2], ".");
+        double* viewUp = cam->GetViewUp();
+        F3DLog::Print(F3DLog::Severity::Info, "Camera view up is : ", viewUp[0], ", ", viewUp[1], ", ",
+          viewUp[2], ".");
+        F3DLog::Print(F3DLog::Severity::Info, "Camera view angle is : ", cam->GetViewAngle(), ".\n");
+      }
+    }
+
+    this->Renderer->InitializeCamera();
   }
 }
 

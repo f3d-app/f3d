@@ -15,6 +15,7 @@
 
 #include <set>
 
+class vtkF3DRenderer;
 class vtkImporter;
 class vtkRenderWindow;
 
@@ -27,7 +28,7 @@ public:
   /**
    * Initialize the animation manager, required before playing the animation
    */
-  void Initialize(const F3DOptions& options, vtkImporter* importer, vtkRenderWindow* renWin);
+  void Initialize(const F3DOptions& options, vtkImporter* importer, vtkRenderWindow* renWin, vtkF3DRenderer* renderer);
 
   /**
    * Start/Stop playing the animation
@@ -37,7 +38,7 @@ public:
   /**
    * Return true if the animation manager is playing the animation
    */
-  bool IsPlaying() { return Playing; }
+  bool IsPlaying() const { return Playing; }
 
   /**
    * Recover the animation progress
@@ -54,6 +55,7 @@ protected:
 
   vtkImporter* Importer = nullptr;
   vtkRenderWindow* RenderWindow = nullptr;
+  vtkF3DRenderer* Renderer = nullptr;
 
   std::set<double> TimeSteps;
   std::set<double>::iterator CurrentTimeStep;
