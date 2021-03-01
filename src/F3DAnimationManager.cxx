@@ -1,6 +1,7 @@
 #include "F3DAnimationManager.h"
 
 #include "F3DLog.h"
+#include "vtkF3DRenderer.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkDoubleArray.h>
@@ -8,10 +9,11 @@
 #include <vtkProgressBarRepresentation.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 
 //----------------------------------------------------------------------------
-void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* importer, vtkRenderWindow* renWin)
+void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* importer, vtkRenderWindow* renWin, vtkF3DRenderer* renderer)
 {
   this->Importer = importer;
   if (!this->Importer)
@@ -24,6 +26,13 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
   if (!this->RenderWindow)
   {
     F3DLog::Print(F3DLog::Severity::Error, "RenderWindow is empty");
+    return;
+  }
+
+  this->Renderer = renderer;
+  if (!this->Renderer)
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "Renderer is empty");
     return;
   }
 
@@ -67,14 +76,13 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
     }
     else
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Animations available in this file are:");
+      F3DLog::Print(F3DLog::Severity::Info, "Animation(s) available in this file are:");
     }
-    for (int i = 0; i < this->Importer->GetNumberOfAnimations(); i++)
+    for (int i = 0; i < availAnimations; i++)
     {
       F3DLog::Print(F3DLog::Severity::Info, i, ": ", this->Importer->GetAnimationName(i));
     }
     F3DLog::Print(F3DLog::Severity::Info, "\n");
-
   }
 
   if (options.AnimationIndex >= 0)
@@ -130,6 +138,7 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
   }
 
   this->CurrentTimeStep = std::begin(this->TimeSteps);
+  this->Playing = false;
 }
 
 //----------------------------------------------------------------------------
@@ -145,7 +154,7 @@ void F3DAnimationManager::Finalize()
 //----------------------------------------------------------------------------
 void F3DAnimationManager::ToggleAnimation()
 {
-  if (this->Importer && this->RenderWindow)
+  if (this->Importer && this->RenderWindow && this->TimeSteps.size() > 1)
   {
     this->Playing = !this->Playing;
 
@@ -179,6 +188,7 @@ void F3DAnimationManager::Tick()
 
     this->Importer->UpdateTimeStep(*this->CurrentTimeStep);
     this->RenderWindow->Render();
+    this->Renderer->InitializeCamera();
 
     this->CurrentTimeStep++;
 

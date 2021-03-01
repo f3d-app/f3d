@@ -1,5 +1,6 @@
 #include "vtkF3DInteractorStyle.h"
 
+#include "F3DAnimationManager.h"
 #include "F3DLoader.h"
 #include "vtkF3DRendererWithColoring.h"
 
@@ -207,6 +208,11 @@ void vtkF3DInteractorStyle::OnKeyPress()
 //------------------------------------------------------------------------------
 void vtkF3DInteractorStyle::Rotate()
 {
+  if (this->IsUserInteractionBlocked())
+  {
+    return;
+  }
+
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
 
   if (ren == nullptr)
@@ -270,6 +276,46 @@ void vtkF3DInteractorStyle::Rotate()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DInteractorStyle::Spin()
+{
+  if (this->IsUserInteractionBlocked())
+  {
+    return;
+  }
+  this->Superclass::Spin();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DInteractorStyle::Pan()
+{
+  if (this->IsUserInteractionBlocked())
+  {
+    return;
+  }
+  this->Superclass::Pan();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DInteractorStyle::Dolly()
+{
+  if (this->IsUserInteractionBlocked())
+  {
+    return;
+  }
+  this->Superclass::Dolly();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DInteractorStyle::Dolly(double factor)
+{
+  if (this->IsUserInteractionBlocked())
+  {
+    return;
+  }
+  this->Superclass::Dolly(factor);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::EnvironmentRotate()
 {
   this->Superclass::EnvironmentRotate();
@@ -289,4 +335,10 @@ void vtkF3DInteractorStyle::EnvironmentRotate()
 
     this->Interactor->Render();
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DInteractorStyle::IsUserInteractionBlocked()
+{
+  return this->AnimationManager->IsPlaying() && this->Options->CameraIndex >= 0;
 }
