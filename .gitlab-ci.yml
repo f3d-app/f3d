@@ -266,7 +266,7 @@ deps:win:vtk9:
     - .build
   variables:
     BUILD_ARCHITECTURE: -Ax64
-    ADDITIONAL_OPTIONS: -DWINDOWS_BUILD_WIN32=ON
+    ADDITIONAL_OPTIONS: -DF3D_WINDOWS_GUI=ON
     POLICY_OPTION: -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
     RUNTIME_OPTION: -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
     VTK_DIR: ..\dependencies\vtk_install\lib\cmake\vtk-9.0\
@@ -389,7 +389,7 @@ deps:macos:vtk9:
     - .macos_env
     - .build
   variables:
-    ADDITIONAL_OPTIONS: -DMACOSX_BUILD_BUNDLE=ON
+    ADDITIONAL_OPTIONS: -DF3D_MACOS_BUNDLE=ON
     VTK_DIR: dependencies\vtk_install\lib\cmake\vtk-9.0\ # this should be ../dependencies, TODO understand
 
 build:macos:
