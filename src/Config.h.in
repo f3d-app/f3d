@@ -16,8 +16,8 @@ namespace f3d
 
 #cmakedefine01 F3D_HAS_RAYTRACING
 
-#cmakedefine01 F3D_WIN32_APP
+#cmakedefine01 F3D_WINDOWS_GUI
 
-#cmakedefine01 F3D_OSX_BUNDLE
+#cmakedefine01 F3D_MACOS_BUNDLE
 
 #endif

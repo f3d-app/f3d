@@ -2,7 +2,7 @@
  * @class   F3DNSDelegate
  * @brief   The class that handles Apple events
  *
- * This class is only valid on OSX.
+ * This class is only valid on macOS.
  * This class triggers the opening of a new file when the user opens it from the finder.
  */
 
