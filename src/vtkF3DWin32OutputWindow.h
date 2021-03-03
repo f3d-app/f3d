@@ -27,6 +27,14 @@ protected:
   vtkF3DWin32OutputWindow() = default;
   ~vtkF3DWin32OutputWindow() override = default;
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201207)
+  int Initialize() override;
+#else
+  int Initialize();
+#endif
+
+  void* EditControlHandle = nullptr;
+
 private:
   vtkF3DWin32OutputWindow(const vtkF3DWin32OutputWindow&) = delete;
   void operator=(const vtkF3DWin32OutputWindow&) = delete;
