@@ -8,6 +8,7 @@
 #include <vtkOpenGLVertexBufferObjectGroup.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
+#include <vtkProperty.h>
 #include <vtkShaderProgram.h>
 #include <vtkShaderProperty.h>
 #include <vtkUniforms.h>
@@ -47,8 +48,8 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
   auto vertexShader = shaders[vtkShader::Vertex];
   auto VSSource = vertexShader->GetSource();
 
-  bool hasTangents = this->VBOs->GetNumberOfComponents("tangentMC") == 3;
-  bool hasNormals = this->VBOs->GetNumberOfComponents("normalMC") == 3;
+  bool hasTangents = this->VBOs->GetNumberOfComponents("tangentMC") == 3 && actor->GetProperty()->GetLighting();
+  bool hasNormals = this->VBOs->GetNumberOfComponents("normalMC") == 3 && actor->GetProperty()->GetLighting();
 
   vtkUniforms* uniforms = actor->GetShaderProperty()->GetVertexCustomUniforms();
 
