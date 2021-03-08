@@ -187,7 +187,7 @@ void vtkF3DInteractorStyle::OnKeyPress()
       }
       else if (keySym == "Escape")
       {
-        rwi->RemoveAllObservers();
+        rwi->RemoveObservers(vtkCommand::TimerEvent);
         rwi->ExitCallback();
       }
       else if (keySym == "Return")
