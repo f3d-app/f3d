@@ -53,6 +53,7 @@ struct F3DOptions
   int Samples = 5;
   std::string Up = "+Y";
   int AnimationIndex = -1;
+  int CameraIndex = -1;
   std::string Output = "";
   std::string Reference = "";
   std::string Scalars = f3d::F3DReservedString;
