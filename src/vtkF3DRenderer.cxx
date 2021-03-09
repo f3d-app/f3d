@@ -296,11 +296,6 @@ void vtkF3DRenderer::ShowOptions()
   this->ShowMetaData(this->MetaDataVisible);
 
   this->UpdateInternalActors();
-
-  // Set the initial camera once all options
-  // have been shown as they may have an effect on it
-  vtkCamera* cam = this->GetActiveCamera();
-  this->InitialCamera->DeepCopy(cam);
 }
 
 //----------------------------------------------------------------------------
@@ -711,38 +706,7 @@ void vtkF3DRenderer::Render()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::InitializeCamera()
 {
-  this->Superclass::ResetCamera();
-  vtkCamera* cam = this->GetActiveCamera();
-  if (this->Options.CameraPosition.size() == 3)
-  {
-    cam->SetPosition(this->Options.CameraPosition.data());
-  }
-  if (this->Options.CameraFocalPoint.size() == 3)
-  {
-    cam->SetFocalPoint(this->Options.CameraFocalPoint.data());
-  }
-  if (this->Options.CameraViewUp.size() == 3)
-  {
-    cam->SetViewUp(this->Options.CameraViewUp.data());
-  }
-  if (this->Options.CameraViewAngle != 0)
-  {
-    cam->SetViewAngle(this->Options.CameraViewAngle);
-  }
-  cam->OrthogonalizeViewUp();
-  if (this->Options.Verbose)
-  {
-    double* position = cam->GetPosition();
-    F3DLog::Print(F3DLog::Severity::Info, "Camera position is : ", position[0], ", ", position[1],
-      ", ", position[2], ".");
-    double* focalPoint = cam->GetFocalPoint();
-    F3DLog::Print(F3DLog::Severity::Info, "Camera focal point is : ", focalPoint[0], ", ",
-      focalPoint[1], ", ", focalPoint[2], ".");
-    double* viewUp = cam->GetViewUp();
-    F3DLog::Print(F3DLog::Severity::Info, "Camera view up is : ", viewUp[0], ", ", viewUp[1], ", ",
-      viewUp[2], ".");
-    F3DLog::Print(F3DLog::Severity::Info, "Camera view angle is : ", cam->GetViewAngle(), ".\n");
-  }
+  this->InitialCamera->DeepCopy(this->GetActiveCamera());
 }
 
 //----------------------------------------------------------------------------
