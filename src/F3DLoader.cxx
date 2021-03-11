@@ -52,7 +52,6 @@ int F3DLoader::Start(int argc, char** argv)
   this->Parser.Initialize(argc, argv);
   F3DOptions options = this->Parser.GetOptionsFromCommandLine(files);
 
-  this->Renderer = vtkSmartPointer<vtkF3DRendererWithColoring>::New();
   this->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
 
   vtkNew<vtkRenderWindowInteractor> interactor;
@@ -61,9 +60,6 @@ int F3DLoader::Start(int argc, char** argv)
     this->RenWin->SetSize(options.WindowSize[0], options.WindowSize[1]);
     this->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
     this->RenWin->SetFullScreen(options.FullScreen);
-
-    // the renderer must be added to the render window after OpenGL context initialization
-    this->RenWin->AddRenderer(this->Renderer);
     this->RenWin->SetWindowName(f3d::AppTitle.c_str());
 
     vtkNew<vtkF3DInteractorStyle> style;
@@ -106,7 +102,6 @@ int F3DLoader::Start(int argc, char** argv)
     interactor->SetRenderWindow(this->RenWin);
     interactor->SetInteractorStyle(style);
     interactor->Initialize();
-    this->Renderer->Initialize(options, "");
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200615)
     // set icon
@@ -147,7 +142,7 @@ int F3DLoader::Start(int argc, char** argv)
       interactor->Start();
     }
 
-    // The widgets should be disabled before destruction
+    // The axis widget should be disabled before destruction
     this->Renderer->ShowAxis(false);
     this->AnimationManager.Finalize();
   }
@@ -209,6 +204,13 @@ void F3DLoader::LoadFile(int load)
   // Prevent the animation manager from playing
   this->AnimationManager.Finalize();
 
+  // Clear renderer if already present
+  if (this->Renderer)
+  {
+    this->Renderer->ShowAxis(false);
+    this->RenWin->RemoveRenderer(this->Renderer);
+  }
+
   std::string filePath, fileInfo;
   int size = static_cast<int>(this->FilesList.size());
   if (size > 0)
@@ -248,6 +250,9 @@ void F3DLoader::LoadFile(int load)
 
   if (filePath.empty())
   {
+    this->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
+    this->RenWin->AddRenderer(this->Renderer);
+
     fileInfo += "No file to load provided, please drop one into this window";
     this->Renderer->Initialize(this->Options, fileInfo);
     this->Renderer->ShowOptions();
@@ -255,6 +260,7 @@ void F3DLoader::LoadFile(int load)
   }
 
   this->Importer = this->GetImporter(this->Options, filePath);
+  vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(this->Importer);
 
   vtkNew<vtkProgressBarWidget> progressWidget;
   vtkNew<vtkTimerLog> timer;
@@ -268,11 +274,23 @@ void F3DLoader::LoadFile(int load)
       F3DLog::Print(
         F3DLog::Severity::Warning, filePath, " is not a file of a supported file format\n");
       fileInfo += " [UNSUPPORTED]";
+      this->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
+      this->RenWin->AddRenderer(this->Renderer);
       this->Renderer->Initialize(this->Options, fileInfo);
       this->Renderer->ShowOptions();
       return;
     }
 
+    // Create and initialize renderer
+    if (genericImporter)
+    {
+      this->Renderer = vtkSmartPointer<vtkF3DRendererWithColoring>::New();
+    }
+    else
+    {
+      this->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
+    }
+    this->RenWin->AddRenderer(this->Renderer);
     this->Renderer->Initialize(this->Options, fileInfo);
 
     this->Importer->SetRenderWindow(this->Renderer->GetRenderWindow());
@@ -357,18 +375,20 @@ void F3DLoader::LoadFile(int load)
   {
     progressWidget->Off();
 
-    // Recover generic importer specific actors and mappers to set on the renderer
-    vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(this->Importer);
+    // Recover generic importer specific actors and mappers to set on the renderer with coloring
     if (genericImporter)
     {
-      this->Renderer->SetScalarBarActor(genericImporter->GetScalarBarActor());
-      this->Renderer->SetGeometryActor(genericImporter->GetGeometryActor());
-      this->Renderer->SetPointSpritesActor(genericImporter->GetPointSpritesActor());
-      this->Renderer->SetVolumeProp(genericImporter->GetVolumeProp());
-      this->Renderer->SetPolyDataMapper(genericImporter->GetPolyDataMapper());
-      this->Renderer->SetPointGaussianMapper(genericImporter->GetPointGaussianMapper());
-      this->Renderer->SetVolumeMapper(genericImporter->GetVolumeMapper());
-      this->Renderer->SetColoring(genericImporter->GetPointDataForColoring(),
+      // no sanity test needed
+      vtkF3DRendererWithColoring* renWithColor = vtkF3DRendererWithColoring::SafeDownCast(this->Renderer);
+
+      renWithColor->SetScalarBarActor(genericImporter->GetScalarBarActor());
+      renWithColor->SetGeometryActor(genericImporter->GetGeometryActor());
+      renWithColor->SetPointSpritesActor(genericImporter->GetPointSpritesActor());
+      renWithColor->SetVolumeProp(genericImporter->GetVolumeProp());
+      renWithColor->SetPolyDataMapper(genericImporter->GetPolyDataMapper());
+      renWithColor->SetPointGaussianMapper(genericImporter->GetPointGaussianMapper());
+      renWithColor->SetVolumeMapper(genericImporter->GetVolumeMapper());
+      renWithColor->SetColoring(genericImporter->GetPointDataForColoring(),
         genericImporter->GetCellDataForColoring(), this->Options.Cells,
         genericImporter->GetArrayIndexForColoring(), this->Options.Component);
     }
