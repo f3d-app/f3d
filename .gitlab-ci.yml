@@ -133,13 +133,17 @@ deps:linux:
     - .deps:linux
     - .when:automatic
 
+deps:linux:cov:
+  extends:
+    - .deps:linux
+    - .when:automatic
+
 ### Build Linux ###
 
 .build:linux:
   extends:
     - .build
   variables:
-    ADDITIONAL_OPTIONS: -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
     VTK_DIR: /vtk/vtk_install/lib/cmake/vtk-9.0
 
 build:linux:
@@ -151,6 +155,23 @@ build:linux:
     - deps:linux
   needs:
     - deps:linux
+  variables:
+    ADDITIONAL_OPTIONS: -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
+  artifacts:
+    paths:
+      - build
+
+build:linux:cov:
+  extends:
+    - .build:linux
+    - .linux_docker_vtk
+    - .when:dependent
+  dependencies:
+    - deps:linux:cov
+  needs:
+    - deps:linux:cov
+  variables:
+    ADDITIONAL_OPTIONS: -DF3D_COVERAGE=ON
   artifacts:
     paths:
       - build
@@ -189,6 +210,24 @@ test:linux:
     paths:
       - build
 
+test:linux:cov:
+  extends:
+    - .linux
+    - .test
+    - .linux_docker_vtk
+    - .when:dependent
+  after_script:
+    - cd build
+    - gcovr --xml-pretty --exclude-unreachable-branches --print-summary -o coverage.xml --root ${CI_PROJECT_DIR}
+  coverage: /^\s*lines:\s*\d+.\d+\%/
+  dependencies:
+    - build:linux:cov
+  needs:
+    - build:linux:cov
+  artifacts:
+    reports:
+      cobertura: build/coverage.xml
+
 ### Pack Linux ###
 
 pack:linux:vtk9:
@@ -213,6 +252,14 @@ pack:linux:
     paths:
       - build/f3d-*.tar.gz
       - build/f3d-*.tar.xz
+
+pack:linux:cov:
+  stage: package
+  extends:
+    - .linux_empty
+    - .when:dependent
+  needs:
+    - build:linux:cov
 
 ########## Windows Specific ##########
 
