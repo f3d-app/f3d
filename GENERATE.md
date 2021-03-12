@@ -1,7 +1,6 @@
-
-# How to generate the files
-
 By [Kitware SAS](https://www.kitware.eu), 2020
+
+# How to generate the documentation static page
 
 node-js with npm is required to generate the files. The following packages are required:
 
@@ -15,3 +14,11 @@ To generate html files and to test it with hexo server, follow the instructions 
 3. kw-doc -c config.js -m
 4. cd build-tmp
 5. hexo server
+
+# How to generate the full coverage report
+
+Requires `gcovr` program and `gcc` toolchain.
+
+1. Build with `F3D_COVERAGE` option enabled
+2. Run all tests
+3. Generate the report with: `gcovr -r /path/to/sources --html --html-details -o coverage.html`
