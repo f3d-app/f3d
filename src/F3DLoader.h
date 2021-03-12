@@ -13,7 +13,7 @@
 
 #include "F3DAnimationManager.h"
 
-class vtkF3DRendererWithColoring;
+class vtkF3DRenderer;
 class vtkImporter;
 struct F3DOptions;
 
@@ -68,7 +68,7 @@ protected:
   F3DOptionsParser Parser;
   F3DOptions Options;
   F3DAnimationManager AnimationManager;
-  vtkSmartPointer<vtkF3DRendererWithColoring> Renderer;
+  vtkSmartPointer<vtkF3DRenderer> Renderer;
   vtkSmartPointer<vtkImporter> Importer;
   vtkSmartPointer<vtkRenderWindow> RenWin;
 

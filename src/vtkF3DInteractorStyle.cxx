@@ -30,30 +30,42 @@ void vtkF3DInteractorStyle::OnKeyPress()
 {
   vtkRenderWindowInteractor* rwi = this->GetInteractor();
   vtkRenderWindow* renWin = rwi->GetRenderWindow();
-  vtkF3DRendererWithColoring* ren =
-    vtkF3DRendererWithColoring::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  vtkF3DRendererWithColoring* renWithColor = vtkF3DRendererWithColoring::SafeDownCast(ren);
 
   switch (rwi->GetKeyCode())
   {
     case 'c':
     case 'C':
-      ren->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
-      renWin->Render();
+      if (renWithColor)
+      {
+        renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
+        renWin->Render();
+      }
       break;
     case 's':
     case 'S':
-      ren->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
-      renWin->Render();
+      if (renWithColor)
+      {
+        renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
+        renWin->Render();
+      }
       break;
     case 'y':
     case 'Y':
-      ren->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
-      renWin->Render();
+      if (renWithColor)
+      {
+        renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
+        renWin->Render();
+      }
       break;
     case 'b':
     case 'B':
-      ren->ShowScalarBar(!ren->IsScalarBarVisible());
-      renWin->Render();
+      if (renWithColor)
+      {
+        renWithColor->ShowScalarBar(!renWithColor->IsScalarBarVisible());
+        renWin->Render();
+      }
       break;
     case 'p':
     case 'P':
@@ -123,18 +135,27 @@ void vtkF3DInteractorStyle::OnKeyPress()
       break;
     case 'v':
     case 'V':
-      ren->SetUseVolume(!ren->UsingVolume());
-      renWin->Render();
+      if (renWithColor)
+      {
+        renWithColor->SetUseVolume(!renWithColor->UsingVolume());
+        renWin->Render();
+      }
       break;
     case 'i':
     case 'I':
-      ren->SetUseInverseOpacityFunction(!ren->UsingInverseOpacityFunction());
-      renWin->Render();
+      if (renWithColor)
+      {
+        renWithColor->SetUseInverseOpacityFunction(!renWithColor->UsingInverseOpacityFunction());
+        renWin->Render();
+      }
       break;
     case 'o':
     case 'O':
-      ren->SetUsePointSprites(!ren->UsingPointSprites());
-      renWin->Render();
+      if (renWithColor)
+      {
+        renWithColor->SetUsePointSprites(!renWithColor->UsingPointSprites());
+        renWin->Render();
+      }
       break;
     case 'f':
     case 'F':

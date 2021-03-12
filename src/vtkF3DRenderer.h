@@ -137,6 +137,12 @@ public:
   vtkSetVector3Macro(RightVector, double);
   //@}
 
+  /**
+   * Override to update internal actors that display data
+   * in a specific way
+   */
+  virtual void UpdateInternalActors(){};
+
 protected:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -155,12 +161,6 @@ protected:
    * Override to add other hotkeys
    */
   virtual void FillCheatSheetHotkeys(std::stringstream& sheet);
-
-  /**
-   * Override to update internal actors that display data
-   * in a specific way
-   */
-  virtual void UpdateInternalActors(){};
 
   /**
    * Override to generate a data description
