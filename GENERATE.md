@@ -1,4 +1,7 @@
-By [Kitware SAS](https://www.kitware.eu), 2020
+
+# How to generate the documentation files
+
+By [Kitware SAS](https://www.kitware.eu), 2020-2021
 
 # How to generate the documentation static page
 
