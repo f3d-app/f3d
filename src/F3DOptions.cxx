@@ -791,6 +791,12 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
       "Specifying no background while not outputing to file has no effect.");
     ret = false;
   }
+  if (options.NoBackground && !options.Reference.empty())
+  {
+    F3DLog::Print(F3DLog::Severity::Info,
+      "Specifying no background while comparing with a reference has no effet.");
+    ret = false;
+  }
 
   if (!options.HDRIFile.empty())
   {
