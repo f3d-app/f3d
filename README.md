@@ -2,12 +2,12 @@
 
 # F3D - Fast and minimalist 3D viewer
 
-By [Kitware SAS](https://www.kitware.eu), 2019
+By [Kitware SAS](https://www.kitware.eu), 2019-2021
 
 F3D (pronounced `/fɛd/`) is a [VTK-based](https://vtk.org) 3D viewer following the [KISS principle](https://en.wikipedia.org/wiki/KISS_principle), so it is minimalist, efficient, has no GUI, has simple interaction mechanisms and is fully controllable using arguments in the command line.
 
-It is open-source and cross-platform (tested on Windows, Linux, and macOS).
-It supports a range of file formats (including glTF, stl, ply, obj), animation, rendering and texturing options.
+F3D is open-source and cross-platform (tested on Windows, Linux and macOS).
+It supports a range of file formats (including animated glTF, stl, ply, obj), and provides numerous rendering and texturing options.
 
 <img src="https://kitware.github.io/F3D/gallery/04-f3d.png"  width="640">
 
@@ -23,29 +23,32 @@ It supports a range of file formats (including glTF, stl, ply, obj), animation, 
 
 # Installation
 
-You can find the release binary packages for Windows, Linux, and macOS on the [Release page](https://gitlab.kitware.com/f3d/f3d/-/releases).
-Alternatively, you can build it yourself, following the [build guide](#build).
+You can find the release binary packages for Windows, Linux and macOS on the [Release page](https://gitlab.kitware.com/f3d/f3d/-/releases).
+Alternatively, you can build it yourself following the build guide below.
 
 # How to use
 
-There is mainly three ways to use F3D.
+There are 3 main ways to use F3D:
 
- * By running F3D from a terminal with command-line options.
- * By running F3D directly and then using drag&drop files into it to open them.
- * By using F3D as an "Open with" program with specific file types.
+* By running F3D from a terminal with a set of command-line options.
+* By running F3D directly and then dragging and dropping files into it to open them.
+* By using F3D as an "Open with" program with specific file types.
 
 # Build
 
 ## Dependencies
-* [CMake](https://cmake.org) >= 3.1 .
+
+* [CMake](https://cmake.org) >= 3.1.
 * [VTK](https://vtk.org) >= 9.0.0 (optionally with raytracing capabilities to enable OSPray rendering).
 * A C++11 compiler.
-* A CMake-compatible build system (Visual Studio, XCode, Ninja, Make...).
+* A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 
 ## Configuration and building
-Set the following CMake options:
-* `VTK_DIR`: Point to a build or install directory of VTK.
-* `BUILD_TESTING`: Optionally, enable the tests.
+
+Configure and generate the project with CMake by providing the following CMake options:
+
+* `VTK_DIR`: Path to a build or install directory of VTK.
+* `BUILD_TESTING`: Enable the tests.
 * `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
 * `F3D_WINDOWS_GUI`: On Windows, build a Win32 application (without console).
 
@@ -54,6 +57,7 @@ Then build the software using your build system.
 # File formats
 
 Here is the list of supported file formats:
+
 * **.vtk** : the legacy VTK format
 * **.vt[p|u|r|i|s|m]** : XML based VTK formats
 * **.ply** : Polygon File format
@@ -67,18 +71,19 @@ Here is the list of supported file formats:
 * **.pts** : Point Cloud file format
 * **.obj** : Wavefront OBJ file format (full scene)
 * **.gltf/.glb** : GL Transmission Format (full scene)
-* **.3ds** : Autodesk 3DS Max file format (full scene)
+* **.3ds** : Autodesk 3D Studio file format (full scene)
 * **.wrl** : VRML file format (full scene)
 
 # Scene construction
 
-The **full scene** formats (gltf/glb, 3ds, wrl, obj) contain not only *geometry*, but also scene information like *lights*, *cameras*, *actors* in the scene and *textures* properties.
+The **full scene** formats (gltf/glb, 3ds, wrl, obj) contain not only *geometry*, but also some scene information like *lights*, *cameras*, *actors* in the scene, as well as *texture* properties.
 By default, all this information will be loaded from the file and displayed.
-For file formats that do not support it, **a default scene** will be provided.
+For file formats that do not support it, **a default scene** will be created.
 
 # Options
 
 ## Generic Options
+
 Options|Description
 ------|------
 \-\-input=&lt;file&gt;|The *input* file or files to read, can also be provided as a positional argument.
@@ -99,6 +104,7 @@ Options|Description
 \-\-dry-run|Do not read the configuration file but consider only the command line options
 
 ## Material options
+
 Options|Default|Description
 ------|------|------
 -o, \-\-point-sprites||Show sphere *points sprites* instead of the geometry.
@@ -116,7 +122,8 @@ Options|Default|Description
 \-\-texture-normal=&lt;file path&gt;||Path to a texture file that sets the normal map of the object.
 \-\-normal-scale=&lt;normal_scale&gt;|1.0|Normal scale affects the strength of the normal deviation from the normal texture.
 
-## PostFX (OpenGL) options:
+## PostFX (OpenGL) options
+
 Options|Description
 ------|------
 -p, \-\-depth-peeling|Enable *depth peeling*. This is a technique used to correctly render translucent objects.
@@ -124,23 +131,26 @@ Options|Description
 -a, \-\-fxaa|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.
 -t, \-\-tone-mapping|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
 
-## Camera configuration options:
+## Camera configuration options
+
 Options|Description
 ------|------
 \-\-camera-index|Select the scene camera to use.<br>Any negative value means custom camera.<br>The default scene always has a custom camera.
-\-\-camera-position=&lt;X,Y,Z&gt;|The position of the camera. Automaticaly computed or recovered from the file if not provided.
-\-\-camera-focal-point=&lt;X,Y,Z&gt;|The focal point of the camera. Automaticaly computed or recovered from the file if not provided.
-\-\-camera-view-up=&lt;X,Y,Z&gt;|The focal point of the camera. Will be orthogonalized even when provided. Automaticaly computed or recovered from the file if not provided.
-\-\-camera-view-angle=&lt;angle&gt;|The view angle of the camera, non-zero value in degrees. Automaticaly computed or recovered from the file if not provided.
+\-\-camera-position=&lt;X,Y,Z&gt;|The position of the camera. Automatically computed or recovered from the file if not provided.
+\-\-camera-focal-point=&lt;X,Y,Z&gt;|The focal point of the camera. Automatically computed or recovered from the file if not provided.
+\-\-camera-view-up=&lt;X,Y,Z&gt;|The focal point of the camera. Will be orthogonalized even when provided. Automatically computed or recovered from the file if not provided.
+\-\-camera-view-angle=&lt;angle&gt;|The view angle of the camera, non-zero value in degrees. Automatically computed or recovered from the file if not provided.
 
-## Raytracing options:
+## Raytracing options
+
 Options|Default|Description
 ------|------|------
--r, \-\-raytracing||Enable *OSPRay raytracing*. Requires OSPRay raytracing to be enabled in the linked VTK.
+-r, \-\-raytracing||Enable *OSPRay raytracing*. Requires OSPRay raytracing to be enabled in the linked VTK dependency.
 \-\-samples=&lt;samples&gt;|5|The number of *samples per pixel*. It only makes sense with raytracing enabled.
 -d, \-\-denoise||*Denoise* the image. It only makes sense with raytracing enabled.
 
-## Scientific visualization options:
+## Scientific visualization options
+
 Options|Default|Description
 ------|------|------
 -s, \-\-scalars=&lt;array_name&gt;||*Color by a specific scalar* array present in the file. If no array_name is provided, one will be picked if any are available. <br>This only makes sense when using the default scene.<br>Use verbose to recover the usable array names.
@@ -152,13 +162,15 @@ Options|Default|Description
 -v, \-\-volume||Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.
 -i, \-\-inverse||Inverse the linear opacity function. Only makes sense with volume rendering.
 
-## Testing options:
+## Testing options
+
 Options|Description
 ------|------
 \-\-ref=&lt;png file&gt;|Reference *image to compare with* for testing purposes.
 \-\-ref-threshold=&lt;threshold&gt;|*Testing threshold* to trigger a test failure or success.
 
-## Window options:
+## Window options
+
 Options|Default|Description
 ------|------|------
 \-\-bg-color=&lt;R,G,B&gt;|0.2, 0.2, 0.2|Set the window *background color*.<br>Ignored if *hdri* is set.
@@ -170,14 +182,17 @@ Options|Default|Description
 -u, \-\-blur-background||Blur background.<br>This only makes sense when using a HDRI.
 
 # Rendering precedence
-Some rendering options are not compatible between them, here is the precedence order if several are defined:
-- Raytracing (`-r`)
-- Volume (`-v`)
-- Point Sprites (`-o`)
+
+Some rendering options are not compatible between them, here is the precedence order if several are provided:
+
+* Raytracing (`-r`)
+* Volume (`-v`)
+* Point Sprites (`-o`)
 
 # Interaction
 
 Simple interaction with the displayed data is possible directly within the window. It is as follows:
+
 * *Click and drag* with the *left* mouse button to rotate around the focal point of the camera.
 * Hold *Shift* then *Click and drag* horizontally with the *right* mouse button to rotate the HDRI.
 * *Click and drag* vertically with the *right* mouse button to zoom in/out.
@@ -187,50 +202,57 @@ Simple interaction with the displayed data is possible directly within the windo
 
 > Note: When playing an animation with a scene camera, camera interactions are locked.
 
-The coloring can be controlled directly using hotkeys:
-* Press `C` key to cycle between coloring with array from point data and from cell data.
-* Press `S` key to cycle the array to color with.
-* Press `Y` key to cycle the component of the array to color with.
+The coloring can be controlled directly by pressing the following hotkeys:
+
+* `C`: cycle between coloring with array from point data and from cell data.
+* `S`: cycle the array to color with.
+* `Y`: cycle the component of the array to color with.
+
 See the [coloring cycle](#Cycling Coloring) section for more info.
 
-Other options can be toggled directly using hotkeys:
-* Press `B` key to toggle the display of the scalar bar, only when coloring and not using direct scalars.
-* Press `V` key to toggle volume rendering.
-* Press `I` key to toggle opacity function inversion during volume rendering.
-* Press `O` key to toggle point sprites rendering.
-* Press `P` key to toggle depth peeling.
-* Press `Q` key to toggle Screen-Space Ambient Occlusion.
-* Press `A` key to toggle Fast Approximate Anti-Aliasing.
-* Press `T` key to toggle tone mapping.
-* Press `E` key to toggle the display of cell edges.
-* Press `X` key to toggle the trihedral axes display.
-* Press `G` key to toggle the XZ grid display.
-* Press `N` key to toggle the display of the file name.
-* Press `M` key to toggle the display of the metadata if exists.
-* Press `Z` key to toggle the display of the FPS counter.
-* Press `R` key to toggle raytracing.
-* Press `D` key to toggle the denoiser when raytracing.
-* Press `F` key to toggle full screen.
-* Press `U` key to toggle background blur.
-* Press `K` key to toggle trackball interaction mode.
-Certains hotkeys can be available or not depending of the file being loaded and F3D configuration.
+Other options can be toggled directly by pressing the following hotkeys:
+
+* `B`: display of the scalar bar, only when coloring and not using direct scalars.
+* `V`: volume rendering.
+* `I`: opacity function inversion during volume rendering.
+* `O`: point sprites rendering.
+* `P`: depth peeling.
+* `Q`: Screen-Space Ambient Occlusion.
+* `A`: Fast Approximate Anti-Aliasing.
+* `T`: tone mapping.
+* `E`: the display of cell edges.
+* `X`: the trihedral axes display.
+* `G`: the XZ grid display.
+* `N`: the display of the file name.
+* `M`: the display of the metadata if exists.
+* `Z`: the display of the FPS counter.
+* `R`: raytracing.
+* `D`: the denoiser when raytracing.
+* `F`: full screen.
+* `U`: background blur.
+* `K`: trackball interaction mode.
+
+Note that some hotkeys can be available or not depending on the file being loaded and the F3D configuration.
 
 Other hotkeys are available:
-* Press `H` key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
-* Press `?` key to dump camera state to the terminal.
-* Press `ESC` key to close the window and quit F3D.
-* Press `ENTER` key to reset the camera to its inital parameters.
-* Press `SPACE` key to play the animation if any.
-* Press `LEFT` to load the previous file if any.
-* Press `RIGHT` to load the next file if any.
-* Press `UP` to reload the current file.
+
+* `H`: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
+* `?`: key to dump camera state to the terminal.
+* `ESC`: close the window and quit F3D.
+* `ENTER`: reset the camera to its initial parameters.
+* `SPACE`: play the animation if any.
+* `LEFT`: load the previous file if any.
+* `RIGHT`: load the next file if any.
+* `UP`: reload the current file.
 
 # Cycling Coloring
-When using the default scene, using the 'C', 'S' and 'Y' hotkeys let you cycle the coloring of the data.
-'C' let you cycle between point data and cell data, field data is not supported.
-'S' let you cycle the array available on the currently selected data, skipping array not containing numeric data.
+
+When using the default scene, the following hotkeys let you cycle the coloring of the data:
+
+* `C`: cycle between point data and cell data - field data is not supported.
+* `S`: cycle the array available on the currently selected data, skipping array not containing numeric data.
 It will loop back to not coloring unless using volume rendering.
-'Y' let you cycle the component available on the currently selected array, looping to -2 for direct scalars rendering
+* `Y`: cycle the component available on the currently selected array, looping to -2 for direct scalars rendering
 if the array contains 4 or less components, -1 otherwise.
 
 When changing the array, the component in use will be kept if valid with the new array, if not it will be reset to 0
@@ -250,7 +272,7 @@ These options can be organized by block using a regular expression for each bloc
 in order to provide different default values for the different filetypes.
 
 Using a command-line option will override the corresponding value in the config file.
-A typical config file may look like this :
+A typical config file may look like this:
 
 ```javascript
 {
@@ -280,21 +302,22 @@ A typical config file may look like this :
    }
 }
 ```
-This first block defines a basic configuration with many desired options for all files.
-The second block specifies that all files ending with vt., eg: vtk, vtp, vtu, ... will be shown with edges on.
+Here, the first block defines a basic configuration with many desired options for all files.
+The second block specifies that all files ending with vt., eg: vtk, vtp, vtu, ... will be shown with edges visibility turned on.
 The third block specifies raytracing usage for .gltf and .glb files.
 The last block specifies that volume rendering should be used with .mhd files.
 
 The configuration file possible locations depends on your operating system.
 They are considered in the below order and only the first found will be used.
- * Linux : `/etc/f3d/config.json`, `[install_dir]/config.json`, `${XDG_CONFIG_HOME}/.config/f3d/config.json`, `~/.config/f3d/config.json`
- * Windows : `[install_dir]\config.json`, `%APPDATA%\f3d\config.json`
- * MacOS : `/etc/f3d/config.json`, `f3d.app/Contents/Resources/config.json`, `[install_dir]/config.json`, `~/.config/f3d/config.json`
 
-If you are using our release, a default configuration file will be installed when installing F3D.
-On Linux, it will be installed in /etc/f3d/, on Windows, it will be installed in the install directory, on MacOS, it will be installed in the bundle.
+ * Linux: `/etc/f3d/config.json`, `[install_dir]/config.json`, `${XDG_CONFIG_HOME}/.config/f3d/config.json`, `~/.config/f3d/config.json`
+ * Windows: `[install_dir]\config.json`, `%APPDATA%\f3d\config.json`
+ * macOS: `/etc/f3d/config.json`, `f3d.app/Contents/Resources/config.json`, `[install_dir]/config.json`, `~/.config/f3d/config.json`
 
-# Limitations
+If you are using the releases, a default configuration file is provided when installing F3D.
+On Linux, it will be installed in `/etc/f3d/`, on Windows, it will be installed in the install directory, on macOS, it will be installed in the bundle.
+
+# Known limitations
 
 * No categorical generic field data rendering support.
 * No string array categorical rendering support.
@@ -304,7 +327,7 @@ On Linux, it will be installed in /etc/f3d/, on Windows, it will be installed in
 * Multiblock (.vtm, .gml) support is partial, non-surfacic data will be converted into surfaces.
 * Animation support with full scene data format require VTK >= 9.0.20201016.
 
-# Troubleshootings
+# Troubleshooting
 
 ## General
 > I have built F3D with raytracing support but the denoiser is not working.
@@ -312,15 +335,15 @@ On Linux, it will be installed in /etc/f3d/, on Windows, it will be installed in
 Be sure that VTK has been built with *OpenImageDenoise* support (`VTKOSPRAY_ENABLE_DENOISER` option).
 
 ## Windows
-> I use F3D in a VM, the application fails to launch
+> I use F3D in a VM, the application fails to launch.
 
-OpenGL applications like F3D can have issues when launched from a guest Windows because the access to the GPU is restricted.\
+OpenGL applications like F3D can have issues when launched from a guest Windows because the access to the GPU is restricted.
 You can try to use a software implementation of OpenGL, called [Mesa](https://github.com/pal1000/mesa-dist-win/releases).
- * Download the lastest `release-msvc`
+ * Download the latest `release-msvc`
  * copy `x64/OpenGL32.dll` and `x64/libglapi.dll` in the same folder as `f3d.exe`.
  * set the environment variable `MESA_GL_VERSION_OVERRIDE` to 4.5
  * run `f3d.exe`
 
 > I run f3d from the command prompt and my Unicode characters are not displayed properly
 
-Set the codepage to UTF-8, run `chcp 65001`
+Set the codepage to UTF-8, run `chcp 65001`.
