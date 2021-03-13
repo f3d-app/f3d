@@ -45,8 +45,8 @@ For file formats that do not support it, **a default scene** will be created.
 Options &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|Description
 ------|------
 \-\-input=&lt;file&gt;|The *input* file or files to read, can also be provided as a positional argument.
-\-\-output=&lt;png file&gt;|Instead of showing a render view and render into it, *render directly into a png file*.
-\-\-no-background|Output file is saved with a transparent background.
+\-\-output=&lt;png file&gt;|Instead of showing a render view and render into it, *render directly into a png file*. When used with ref option, only outputs on failure
+\-\-no-background|Output file is saved with a transparent background. Ignored when using ref option.
 -h, \-\-help|Print *help*.
 \-\-verbose|Enable *verbose* mode.
 \-\-no-render|Verbose mode without any rendering for the first provided file, to recover information about a file.
@@ -124,7 +124,7 @@ Options &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 Options|Description
 ------|------
-\-\-ref=&lt;png file&gt;|Reference *image to compare with* for testing purposes.
+\-\-ref=&lt;png file&gt;|Reference *image to compare with* for testing purposes. Use with output option to generate new baselines and diff images.
 \-\-ref-threshold=&lt;threshold&gt;|*Testing threshold* to trigger a test failure or success.
 
 ## Window options
