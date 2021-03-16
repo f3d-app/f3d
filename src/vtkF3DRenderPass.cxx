@@ -42,7 +42,7 @@
 #include <vtkTranslucentPass.h>
 #include <vtkVolumetricPass.h>
 
-#if F3D_HAS_RAYTRACING
+#if F3D_MODULE_RAYTRACING
 #include <vtkOSPRayPass.h>
 #endif
 
@@ -111,9 +111,9 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   this->BackgroundPass->SetColorFormat(vtkTextureObject::Float32);
 
   // main pass
-  if (F3D_HAS_RAYTRACING && this->UseRaytracing)
+  if (F3D_MODULE_RAYTRACING && this->UseRaytracing)
   {
-#if F3D_HAS_RAYTRACING
+#if F3D_MODULE_RAYTRACING
     vtkNew<vtkOSPRayPass> ospP;
     this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainPass->SetDelegatePass(ospP);

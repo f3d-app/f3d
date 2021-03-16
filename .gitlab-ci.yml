@@ -17,12 +17,12 @@ stages:
 .linux_docker_vtk:
   extends:
     - .linux
-  image: gitlab.kitware.com:4567/f3d/f3d/linux/vtk:latest
+  image: gitlab.kitware.com:4567/f3d/f3d/linux-deps:latest
 
 .linux_docker_vtk9:
   extends:
     - .linux
-  image: gitlab.kitware.com:4567/f3d/f3d/linux/vtk:9.0.1
+  image: gitlab.kitware.com:4567/f3d/f3d/linux-deps:9.0.1
 
 .linux_empty:
   script:
@@ -93,8 +93,8 @@ stages:
     - mkdir build
     - cd build
     - cmake $BUILD_ARCHITECTURE $ADDITIONAL_OPTIONS $RUNTIME_OPTION $POLICY_OPTION
-      -DBUILD_TESTING=ON -DF3D_STRICT_BUILD=ON
-      -DCMAKE_BUILD_TYPE=Release -DVTK_DIR:FILEPATH=$VTK_DIR
+      -DBUILD_TESTING=ON -DF3D_STRICT_BUILD=ON -DF3D_MODULE_OCCT=ON
+      -DCMAKE_BUILD_TYPE=Release -DVTK_DIR:PATH=$VTK_DIR -DOpenCASCADE_DIR:PATH=$OCCT_DIR
       -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON ..
     - cmake --build . --config Release --parallel 8
 
@@ -144,7 +144,8 @@ deps:linux:cov:
   extends:
     - .build
   variables:
-    VTK_DIR: /vtk/vtk_install/lib/cmake/vtk-9.0
+    VTK_DIR: /vtk_install/lib/cmake/vtk-9.0
+    OCCT_DIR: /occt_install/lib/cmake/opencascade
 
 build:linux:
   extends:
@@ -273,6 +274,7 @@ pack:linux:cov:
     - cd f3d-dependencies
     - git lfs pull --include "windows/archive/nsis-3.06.1.zip"
     - git lfs pull --include "windows/archive/$VTK_ARCHIVE"
+    - git lfs pull --include "windows/archive/$OCCT_ARCHIVE"
     - cd ..\
     - $ProgressPreference = 'SilentlyContinue'
     - Invoke-WebRequest https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-win64-x64.zip -OutFile .\cmake-3.19.3-win64-x64.zip 
@@ -283,6 +285,7 @@ pack:linux:cov:
     - tar -xf ..\cmake-3.19.3-win64-x64.zip
     - cmake -E tar -x ../f3d-dependencies/windows/archive/nsis-3.06.1.zip
     - cmake -E tar -x ../f3d-dependencies/windows/archive/$VTK_ARCHIVE
+    - cmake -E tar -x ../f3d-dependencies/windows/archive/$OCCT_ARCHIVE
   extends:
     - .windows
     - .windows_env
@@ -296,6 +299,7 @@ deps:win:
     - .when:automatic
   variables:
     VTK_ARCHIVE: vtk-latest.zip
+    OCCT_ARCHIVE: occt-latest.zip
 
 deps:win:vtk9:
   extends:
@@ -303,6 +307,7 @@ deps:win:vtk9:
     - .when:automatic
   variables:
     VTK_ARCHIVE: vtk-9.0.1.zip
+    OCCT_ARCHIVE: occt-latest.zip
 
 ### Build Windows ###
 
@@ -317,6 +322,7 @@ deps:win:vtk9:
     POLICY_OPTION: -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
     RUNTIME_OPTION: -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
     VTK_DIR: ..\dependencies\vtk_install\lib\cmake\vtk-9.0\
+    OCCT_DIR: ..\dependencies\occt_install\cmake\
 
 build:win:
   extends:
@@ -402,8 +408,10 @@ pack:win:vtk9:
     - GIT_LFS_SKIP_SMUDGE=1 git clone https://gitlab.kitware.com/f3d/f3d-dependencies
     - cd f3d-dependencies
     - git lfs pull --include "macos/archive/$VTK_ARCHIVE"
+    - git lfs pull --include "macos/archive/$OCCT_ARCHIVE"
     - cd ../
     - tar -zxf f3d-dependencies/macos/archive/$VTK_ARCHIVE -C ./dependencies
+    - tar -zxf f3d-dependencies/macos/archive/$OCCT_ARCHIVE -C ./dependencies
     - cd dependencies
     - curl -OL https://github.com/Kitware/CMake/releases/download/v3.19.4/cmake-3.19.4-macos-universal.tar.gz
     - echo "eb1f52996632c1e71a1051c9e2c30cc8df869fb5a213b1a0d3b202744c6c5758  cmake-3.19.4-macos-universal.tar.gz" | shasum -a 256 --check
@@ -420,6 +428,7 @@ deps:macos:
     - .when:automatic
   variables:
     VTK_ARCHIVE: vtk-latest.tar.gz
+    OCCT_ARCHIVE: occt-latest.tar.gz
 
 deps:macos:vtk9:
   extends:
@@ -427,6 +436,7 @@ deps:macos:vtk9:
     - .when:automatic
   variables:
     VTK_ARCHIVE: vtk-9.0.1.tar.gz
+    OCCT_ARCHIVE: occt-latest.tar.gz
 
 ### Build MacOS ###
 
@@ -437,7 +447,8 @@ deps:macos:vtk9:
     - .build
   variables:
     ADDITIONAL_OPTIONS: -DF3D_MACOS_BUNDLE=ON
-    VTK_DIR: dependencies\vtk_install\lib\cmake\vtk-9.0\ # this should be ../dependencies, TODO understand
+    VTK_DIR: ../dependencies/vtk_install/lib/cmake/vtk-9.0
+    OCCT_DIR: ../dependencies/occt_install/lib/cmake/opencascade
 
 build:macos:
   extends:

@@ -223,7 +223,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", options.CameraViewUp, false, "<X,Y,Z>");
     this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degress)", options.CameraViewAngle, false, "<angle>");
 
-#if F3D_HAS_RAYTRACING
+#if F3D_MODULE_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
     this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.Raytracing);
     this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.Samples, true, "<samples>");
@@ -297,8 +297,24 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
       version += "\nCompiler: ";
       version += f3d::AppCompiler;
       version += "\nRayTracing module: ";
-#if F3D_HAS_RAYTRACING
+#if F3D_MODULE_RAYTRACING
       version += "ON";
+#else
+      version += "OFF";
+#endif
+      version += "\nExodus module: ";
+#if F3D_MODULE_EXODUS
+      version += "ON";
+#else
+      version += "OFF";
+#endif
+      version += "\nCAD module: ";
+#if F3D_MODULE_OCCT
+#if F3D_MODULE_OCCT_XCAF
+      version += "ON (full support)";
+#else
+      version += "ON (no metadata)";
+#endif
 #else
       version += "OFF";
 #endif

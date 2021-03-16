@@ -176,7 +176,12 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   double bounds[6];
   surface->GetBounds(bounds);
   vtkBoundingBox bbox(bounds);
-  double pointSize = this->Options->PointSize * bbox.GetDiagonalLength() * 0.001;
+
+  double pointSize = 1.0;
+  if (bbox.IsValid())
+  {
+    pointSize = this->Options->PointSize * bbox.GetDiagonalLength() * 0.001;
+  }
   this->PointGaussianMapper->SetInputConnection(this->PostPro->GetOutputPort(1));
   this->PointGaussianMapper->SetScaleFactor(pointSize);
   this->PointGaussianMapper->EmissiveOff();
