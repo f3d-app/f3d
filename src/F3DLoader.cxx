@@ -52,11 +52,10 @@ int F3DLoader::Start(int argc, char** argv)
   this->Parser.Initialize(argc, argv);
   F3DOptions options = this->Parser.GetOptionsFromCommandLine(files);
 
-  this->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
-
   vtkNew<vtkRenderWindowInteractor> interactor;
   if (!options.NoRender)
   {
+    this->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
     this->RenWin->SetSize(options.WindowSize[0], options.WindowSize[1]);
     this->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
     this->RenWin->SetFullScreen(options.FullScreen);
@@ -126,15 +125,15 @@ int F3DLoader::Start(int argc, char** argv)
   int retVal = EXIT_SUCCESS;
   if (!options.NoRender)
   {
-    if (!options.Output.empty())
+    if (!options.Reference.empty())
+    {
+      retVal =
+        F3DOffscreenRender::RenderTesting(this->RenWin, options.Reference, options.RefThreshold, options.Output);
+    }
+    else if (!options.Output.empty())
     {
       retVal =
         F3DOffscreenRender::RenderOffScreen(this->RenWin, options.Output, options.NoBackground);
-    }
-    else if (!options.Reference.empty())
-    {
-      retVal =
-        F3DOffscreenRender::RenderTesting(this->RenWin, options.Reference, options.RefThreshold);
     }
     else
     {
@@ -250,12 +249,15 @@ void F3DLoader::LoadFile(int load)
 
   if (filePath.empty())
   {
-    this->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
-    this->RenWin->AddRenderer(this->Renderer);
+    if (!this->Options.NoRender)
+    {
+      this->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
+      this->RenWin->AddRenderer(this->Renderer);
 
-    fileInfo += "No file to load provided, please drop one into this window";
-    this->Renderer->Initialize(this->Options, fileInfo);
-    this->Renderer->ShowOptions();
+      fileInfo += "No file to load provided, please drop one into this window";
+      this->Renderer->Initialize(this->Options, fileInfo);
+      this->Renderer->ShowOptions();
+    }
     return;
   }
 
@@ -267,20 +269,24 @@ void F3DLoader::LoadFile(int load)
   ProgressDataStruct data;
   data.timer = timer.Get();
   data.widget = progressWidget.Get();
-  if (!this->Options.NoRender)
+
+  if (!this->Importer)
   {
-    if (!this->Importer)
+    F3DLog::Print(
+      F3DLog::Severity::Warning, filePath, " is not a file of a supported file format\n");
+    if (!this->Options.NoRender)
     {
-      F3DLog::Print(
-        F3DLog::Severity::Warning, filePath, " is not a file of a supported file format\n");
       fileInfo += " [UNSUPPORTED]";
       this->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
       this->RenWin->AddRenderer(this->Renderer);
       this->Renderer->Initialize(this->Options, fileInfo);
       this->Renderer->ShowOptions();
-      return;
     }
+    return;
+  }
 
+  if (!this->Options.NoRender)
+  {
     // Create and initialize renderer
     if (genericImporter)
     {
@@ -347,7 +353,10 @@ void F3DLoader::LoadFile(int load)
   // we need to remove progress observer in order to hide the progress bar during animation
   this->Importer->RemoveObservers(vtkCommand::ProgressEvent);
 
-  this->AnimationManager.Initialize(this->Options, this->Importer, this->RenWin, this->Renderer);
+  if (!this->Options.NoRender)
+  {
+    this->AnimationManager.Initialize(this->Options, this->Importer, this->RenWin, this->Renderer);
+  }
 
   // Display description
   if (this->Options.Verbose || this->Options.NoRender)
@@ -447,12 +456,6 @@ void F3DLoader::LoadFile(int load)
 vtkSmartPointer<vtkImporter> F3DLoader::GetImporter(
   const F3DOptions& options, const std::string& file)
 {
-  if (!vtksys::SystemTools::FileExists(file))
-  {
-    F3DLog::Print(F3DLog::Severity::Error, "Specified input file '", file, "' does not exist!");
-    return nullptr;
-  }
-
   if (!options.GeometryOnly)
   {
     std::string ext = vtksys::SystemTools::GetFilenameLastExtension(file);

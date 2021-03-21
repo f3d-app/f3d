@@ -73,4 +73,8 @@ void vtkF3DWin32OutputWindow::DisplayText(const char* someText)
 
   // print text
   SendMessageW(hWnd, EM_REPLACESEL, 0, reinterpret_cast<LPARAM>(wstr.c_str()));
+
+  // print text to cout for testing purpose
+  std::cout<<someText;
+  std::cout.flush();
 }
