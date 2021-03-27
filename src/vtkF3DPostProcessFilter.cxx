@@ -139,7 +139,7 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
     else
     {
       F3DLog::Print(F3DLog::Severity::Warning,
-        "Provided dataset is not convertable to a point cloud for sprites rendering, using its "
+        "Provided dataset is not convertible to a point cloud for sprites rendering, using its "
         "surface instead.");
       cloud = surface;
     }

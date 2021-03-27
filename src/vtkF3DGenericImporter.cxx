@@ -249,7 +249,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   if (this->ArrayIndexForColoring == -1 && !usedArray.empty() &&
     usedArray != f3d::F3DReservedString)
   {
-    F3DLog::Print(F3DLog::Severity::Warning, "Unknow scalar array: ", usedArray);
+    F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: ", usedArray);
   }
   if (this->ArrayIndexForColoring == -1 && print)
   {
