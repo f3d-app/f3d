@@ -192,7 +192,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.HDRIFile, false, "<file path>");
     this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.BaseColorTex, false, "<file path>");
     this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.ORMTex, false, "<file path>");
-    this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emited light of the object", options.EmissiveTex, false, "<file path>");
+    this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emitted light of the object", options.EmissiveTex, false, "<file path>");
     this->DeclareOption(grp2, "emissive-factor", "", "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present", options.EmissiveFactor, true, "<R,G,B>");
     this->DeclareOption(grp2, "texture-normal", "", "Path to a texture file that sets the normal map of the object", options.NormalTex, false, "<file path>");
     this->DeclareOption(grp2, "normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", options.NormalScale, true, "<normalScale>");
@@ -790,7 +790,7 @@ bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::strin
   if (options.NoBackground && options.Output.empty())
   {
     F3DLog::Print(F3DLog::Severity::Info,
-      "Specifying no background while not outputing to file has no effect.");
+      "Specifying no background while not outputting to file has no effect.");
     ret = false;
   }
   if (options.NoBackground && !options.Reference.empty())
