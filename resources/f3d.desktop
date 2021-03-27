@@ -8,3 +8,4 @@ TryExec=f3d
 Exec=f3d %F
 Icon=f3d
 Categories=Graphics;3DGraphics;
+Keywords=vtk;animations;stl;dcm;ex2;gml;obj;3ds;gltf;pbr;raytracing;scivis;volume;rendering
