@@ -592,7 +592,7 @@ void vtkF3DRenderer::UpdateCheatSheet()
     cheatSheetText << " SPACE: Play animation if any\n";
     cheatSheetText << " LEFT : Previous file \n";
     cheatSheetText << " RIGHT: Next file \n";
-    cheatSheetText << " UP   : Reload current file \n";
+    cheatSheetText << "  UP  : Reload current file \n";
 
     this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, cheatSheetText.str().c_str());
     this->CheatSheetActor->RenderOpaqueGeometry(this);
