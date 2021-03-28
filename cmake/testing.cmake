@@ -146,9 +146,9 @@ set_tests_properties(TestOutput TestOutputOutput TestOutputNoBackground PROPERTI
 f3d_test_no_render(TestVerbose dragon.vtu "-s --verbose")
 set_tests_properties(TestVerbose PROPERTIES PASS_REGULAR_EXPRESSION "Using first found array: Normals.*Number of points: 69827\nNumber of cells: 139650")
 
-# Unknow scalar array verbosity test
+# Unknown scalar array verbosity test
 f3d_test_no_render(TestVerboseWrongArray dragon.vtu "--scalars=dummy --verbose")
-set_tests_properties(TestVerboseWrongArray PROPERTIES PASS_REGULAR_EXPRESSION "Unknow scalar array: dummy")
+set_tests_properties(TestVerboseWrongArray PROPERTIES PASS_REGULAR_EXPRESSION "Unknown scalar array: dummy")
 
 # Default scalar array verbosity test
 f3d_test_no_render(TestVerboseDefaultScalar HeadMRVolume.mhd "-s --verbose")
