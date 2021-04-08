@@ -7,7 +7,7 @@ By [Kitware SAS](https://www.kitware.eu), 2019-2021
 F3D (pronounced `/fɛd/`) is a [VTK-based](https://vtk.org) 3D viewer following the [KISS principle](https://en.wikipedia.org/wiki/KISS_principle), so it is minimalist, efficient, has no GUI, has simple interaction mechanisms and is fully controllable using arguments in the command line.
 
 F3D is open-source and cross-platform (tested on Windows, Linux and macOS).
-It supports a range of file formats (including animated glTF, stl, ply, obj), and provides numerous rendering and texturing options.
+It supports a range of file formats (including animated glTF, stl, step, ply, obj), and provides numerous rendering and texturing options.
 
 <img src="https://kitware.github.io/F3D/gallery/04-f3d.png"  width="640">
 
@@ -52,6 +52,12 @@ Configure and generate the project with CMake by providing the following CMake o
 * `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
 * `F3D_WINDOWS_GUI`: On Windows, build a Win32 application (without console).
 
+Some modules depending on external libraries can be optionally enabled with the following CMake variables:
+
+* `F3D_MODULE_EXODUS`: Support for ExodusII (.ex2) file format. Requires that VTK has been built with `IOExodus` module (and `hdf5`). Enabled by default.
+* `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay`. Disabled by default.
+* `F3D_MODULE_OCCT`: Support for STEP and IGES file formats. Requires `OpenCASCADE`. Disabled by default.
+
 Then build the software using your build system.
 
 # File formats
@@ -69,6 +75,8 @@ Here is the list of supported file formats:
 * **.ex2/.e/.exo/.g** : Exodus 2 file format
 * **.gml** : CityGML file format
 * **.pts** : Point Cloud file format
+* **.step/.stp** : CAD STEP exchange ISO format
+* **.iges/.igs** : CAD Initial Graphics Exchange Specification format
 * **.obj** : Wavefront OBJ file format (full scene)
 * **.gltf/.glb** : GL Transmission Format (full scene)
 * **.3ds** : Autodesk 3D Studio file format (full scene)

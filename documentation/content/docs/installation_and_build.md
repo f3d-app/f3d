@@ -32,4 +32,10 @@ Configure and generate the project with CMake by providing the following CMake o
 * `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
 * `WINDOWS_F3D_WINDOWS_GUIBUILD_WIN32`: On Windows, build a Win32 application (without console).
 
+Some modules depending on external libraries can be optionally enabled with the following CMake variables:
+
+* `F3D_MODULE_EXODUS`: Support for ExodusII (.ex2) file format. Requires that VTK has been built with `IOExodus` module (and `hdf5`). Enabled by default.
+* `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay`. Disabled by default.
+* `F3D_MODULE_OCCT`: Support for STEP and IGES file formats. Requires `OpenCASCADE`. Disabled by default.
+
 Then build the software using your build system.

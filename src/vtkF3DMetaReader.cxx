@@ -1,10 +1,11 @@
 #include "vtkF3DMetaReader.h"
 
+#include "Config.h"
+
 #include <vtkCityGMLReader.h>
 #include <vtkDICOMImageReader.h>
 #include <vtkDemandDrivenPipeline.h>
 #include <vtkEventForwarderCommand.h>
-#include <vtkExodusIIReader.h>
 #include <vtkGLTFReader.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
@@ -20,6 +21,14 @@
 #include <vtkVersion.h>
 #include <vtkXMLGenericDataObjectReader.h>
 #include <vtksys/SystemTools.hxx>
+
+#if F3D_MODULE_EXODUS
+#include <vtkExodusIIReader.h>
+#endif
+
+#if F3D_MODULE_OCCT
+#include "vtkF3DOCCTReader.h"
+#endif
 
 #include <regex>
 
@@ -195,6 +204,7 @@ void vtkF3DMetaReader::SetFileName(const std::string& fileName)
       this->InternalReader = reader;
     }
 
+#if F3D_MODULE_EXODUS
     // Finds Exodus files using their common base extensions (first parenthesis group),
     // which may be appended with a mesh-state index (second parenthesis group),
     // and may additionally be a group of multiple small files corresponding
@@ -209,6 +219,22 @@ void vtkF3DMetaReader::SetFileName(const std::string& fileName)
       reader->SetAllArrayStatus(vtkExodusIIReader::ELEM_BLOCK, 1);
       this->InternalReader = reader;
     }
+#endif
+
+#if F3D_MODULE_OCCT
+    if (!this->InternalReader && (ext == ".stp" || ext == ".step" || ext == ".igs" || ext == ".iges"))
+    {
+      vtkNew<vtkF3DOCCTReader> reader;
+      reader->SetFileName(this->FileName);
+      reader->RelativeDeflectionOn();
+      reader->SetLinearDeflection(0.1);
+      reader->SetAngularDeflection(0.5);
+      reader->ReadWireOn();
+      using ff = vtkF3DOCCTReader::FILE_FORMAT;
+      reader->SetFileFormat((ext == ".stp" || ext == ".step") ? ff::STEP : ff::IGES);
+      this->InternalReader = reader;
+    }
+#endif
 
     if (this->InternalReader)
     {

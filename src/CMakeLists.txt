@@ -36,6 +36,29 @@ if(APPLE)
   set(PLATFORM_SPECIFIC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm")
 endif()
 
+set(MODULES_SPECIFIC_SOURCE_FILES "")
+set(MODULES_SPECIFIC_INCLUDE_DIRS "")
+set(MODULES_SPECIFIC_LIBRARIES "")
+set(F3D_MODULE_OCCT_XCAF 0)
+if(F3D_MODULE_OCCT)
+  find_package(OpenCASCADE REQUIRED)
+  if(OpenCASCADE_FOUND)
+    if((TARGET "TKXDESTEP") AND (TARGET "TKXDEIGES"))
+      set(F3D_MODULE_OCCT_XCAF 1)
+    else()
+      message(WARNING "OpenCASCADE: TKXDESTEP and TKXDEIGES are not found. Parts color and name are not supported.")
+    endif()
+    if((NOT TARGET "TKSTEP") AND (NOT TARGET "TKIGES") AND (NOT TARGET "TKMesh"))
+      message(FATAL_ERROR "OpenCASCADE does not contain required modules")
+    endif()
+    set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DOCCTReader.cxx")
+    set(MODULES_SPECIFIC_INCLUDE_DIRS ${MODULES_SPECIFIC_INCLUDE_DIRS} ${OpenCASCADE_INCLUDE_DIR})
+    # Note: OpenCASCADE does not declare the libs in the correct dependency order.
+    # This could be an issue on Linux when linking with static libraries.
+    set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} ${OpenCASCADE_LIBRARIES})
+  endif()
+endif()
+
 add_executable(f3d
   main.cxx
   vtkF3DConsoleOutputWindow.cxx
@@ -57,6 +80,7 @@ add_executable(f3d
   ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h
   ${CMAKE_CURRENT_BINARY_DIR}/Config.cxx
   ${PLATFORM_SPECIFIC_FILES}
+  ${MODULES_SPECIFIC_SOURCE_FILES}
 )
 
 set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
@@ -75,12 +99,12 @@ endif()
 # coverage
 cmake_dependent_option(F3D_COVERAGE "Emit coverage files" OFF "UNIX" OFF)
 if(F3D_COVERAGE)
-  target_compile_options(f3d PRIVATE -g --coverage -fprofile-abs-path)
+  target_compile_options(f3d PRIVATE -g -O0 --coverage)
   target_link_options(f3d PRIVATE --coverage)
 endif()
 
 target_include_directories(f3d
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+  PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${MODULES_SPECIFIC_INCLUDE_DIRS})
 
 target_compile_definitions(f3d
   PRIVATE VTK_VERSION_MAJOR=${VTK_VERSION_MAJOR}
@@ -120,38 +144,8 @@ if(WIN32)
   endif()
 endif()
 
-set(F3D_MODULES
-  VTK::CommonSystem
-  VTK::FiltersGeneral
-  VTK::FiltersGeometry
-  VTK::ImagingCore
-  VTK::ImagingHybrid
-  VTK::InteractionStyle
-  VTK::InteractionWidgets
-  VTK::IOCityGML
-  VTK::IOExodus
-  VTK::IOGeometry
-  VTK::IOImage
-  VTK::IOImport
-  VTK::IOParallel
-  VTK::IOPLY
-  VTK::IOXML
-  VTK::RenderingAnnotation
-  VTK::RenderingCore
-  VTK::RenderingLabel
-  VTK::RenderingOpenGL2
-  VTK::RenderingVolumeOpenGL2
-  VTK::jsoncpp
-  VTK::opengl
-)
-
-if(TARGET VTK::RenderingRayTracing)
-  message(STATUS "VTK RayTracing enabled")
-  set(F3D_HAS_RAYTRACING ON CACHE INTERNAL BOOL)
-  set(F3D_MODULES ${F3D_MODULES} VTK::RenderingRayTracing)
-else()
-  set(F3D_HAS_RAYTRACING OFF CACHE INTERNAL BOOL)
-endif()
+vtk_module_autoinit(TARGETS f3d MODULES ${F3D_VTK_MODULES})
+target_link_libraries(f3d PUBLIC ${F3D_VTK_MODULES} ${MODULES_SPECIFIC_LIBRARIES})
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in"
@@ -162,9 +156,6 @@ configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/Config.cxx.in"
   "${CMAKE_CURRENT_BINARY_DIR}/Config.cxx"
   @ONLY)
-
-vtk_module_autoinit(TARGETS f3d MODULES ${F3D_MODULES})
-target_link_libraries(f3d PUBLIC ${F3D_MODULES})
 
 install(TARGETS f3d
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
