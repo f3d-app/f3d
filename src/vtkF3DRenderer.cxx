@@ -25,7 +25,7 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
-#if F3D_HAS_RAYTRACING
+#if F3D_MODULE_RAYTRACING
 #include <vtkOSPRayRendererNode.h>
 #endif
 
@@ -235,7 +235,7 @@ void vtkF3DRenderer::SetupRenderPasses()
   }
 
   vtkNew<vtkF3DRenderPass> newPass;
-  newPass->SetUseRaytracing(F3D_HAS_RAYTRACING && this->UseRaytracing);
+  newPass->SetUseRaytracing(F3D_MODULE_RAYTRACING && this->UseRaytracing);
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseDepthPeelingPass(this->UseDepthPeelingPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
@@ -267,7 +267,7 @@ void vtkF3DRenderer::SetupRenderPasses()
 
   this->SetPass(renderingPass);
 
-#if F3D_HAS_RAYTRACING
+#if F3D_MODULE_RAYTRACING
   vtkOSPRayRendererNode::SetRendererType("pathtracer", this);
   vtkOSPRayRendererNode::SetSamplesPerPixel(this->Options.Samples, this);
   vtkOSPRayRendererNode::SetEnableDenoiser(this->UseRaytracingDenoiser, this);
@@ -612,7 +612,7 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
   cheatSheetText << " N: File name " << (this->FilenameVisible ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText << " M: Metadata " << (this->MetaDataVisible ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText << " Z: FPS Timer " << (this->TimerVisible ? "[ON]" : "[OFF]") << "\n";
-#if F3D_HAS_RAYTRACING
+#if F3D_MODULE_RAYTRACING
   cheatSheetText << " R: Raytracing " << (this->UseRaytracing ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText << " D: Denoiser " << (this->UseRaytracingDenoiser ? "[ON]" : "[OFF]") << "\n";
 #endif

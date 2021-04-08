@@ -20,5 +20,13 @@
   ".*(3ds|stl)":
   {
     "up": "+Z"
+  },
+  ".*(step|stp|iges|igs)":
+  {
+    "up": "+Z",
+    "ssao": true,
+    "cells": true,
+    "scalars": "Colors",
+    "comp": -2
   }
 }

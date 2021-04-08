@@ -22,7 +22,7 @@ function(f3d_test_no_baseline)
              ${ARGV3}
              --dry-run
              --resolution=${ARGV2}
-             --output ${CMAKE_BINARY_DIR}/Testing/Temporary/output.png
+             --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
   set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 12)
 endfunction()
@@ -84,7 +84,6 @@ f3d_test(TestGridWithDepthPeeling suzanne.ply "300,300" "-gp --opacity 0.2")
 f3d_test(TestFilename suzanne.ply "300,300" "-n")
 f3d_test(TestFilenameWhiteBg suzanne.ply "300,300" "-n --bg-color=1,1,1")
 f3d_test(TestCityGML Part-4-Buildings-V4-one.gml "300,300")
-f3d_test(TestExodus disk_out_ref.ex2 "300,300" "-s --camera-position=-11,-2,-49")
 f3d_test(TestPTS samplePTS.pts "300,300")
 f3d_test(TestColormap IM-0001-1983.dcm "300,300" "--scalars --roughness=1 --colormap=0,1,0,0,1,0,1,0")
 f3d_test(TestCameraConfiguration suzanne.obj "300,300" "--camera-position=0,0,-10 -x --camera-view-up=1,0,0 --camera-focal-point=1,0,0 --camera-view-angle=20")
@@ -125,21 +124,36 @@ if(VTK_VERSION VERSION_GREATER 9.0.20210228)
   set_tests_properties(TestVerboseCamera PROPERTIES PASS_REGULAR_EXPRESSION "0:.*1:")
 endif()
 
-if(F3D_HAS_RAYTRACING)
+if(F3D_MODULE_RAYTRACING)
   f3d_test(TestOSPRayGLTF WaterBottle.glb "300,300" "-r --samples=1")
   f3d_test(TestOSPRayBackground suzanne.ply "300,300" "-r --samples=1 --bg-color=1,0,0")
   f3d_test(TestOSPRayPointCloud pointsCloud.vtp "300,300" "-r --point-size=20")
+endif()
+
+if(F3D_MODULE_EXODUS)
+  f3d_test(TestExodus disk_out_ref.ex2 "300,300" "-s --camera-position=-11,-2,-49")
+
+  # Test Generic Importer Verbose animation
+  f3d_test_no_baseline(TestVerboseGenericImporterAnimation small.ex2 "300,300" "--verbose")
+  set_tests_properties(TestVerboseGenericImporterAnimation PROPERTIES PASS_REGULAR_EXPRESSION "0: default")
+endif()
+
+if(F3D_MODULE_OCCT)
+  f3d_test(TestSTEP cube.stp "300,300")
+  f3d_test(TestIGES spacer.igs "300,300")
 endif()
 
 ## Tests to increase coverage
 
 # Output option test
 f3d_test_no_baseline(TestOutput cow.vtp "300,300")
-f3d_test_no_baseline(TestOutputOutput cow.vtp "300,300" "--ref=${CMAKE_BINARY_DIR}/Testing/Temporary/output.png")
+set_tests_properties(TestOutput PROPERTIES FIXTURES_SETUP OUTPUT_TEST)
+
+f3d_test_no_baseline(TestOutputOutput cow.vtp "300,300" "--ref=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutput.png")
+set_tests_properties(TestOutputOutput PROPERTIES FIXTURES_REQUIRED OUTPUT_TEST)
 
 # No background option cannot be tested with reference
 f3d_test_no_baseline(TestOutputNoBackground cow.vtp "300,300" "--no-background")
-set_tests_properties(TestOutput TestOutputOutput TestOutputNoBackground PROPERTIES RUN_SERIAL TRUE)
 
 # Simple verbosity test
 f3d_test_no_render(TestVerbose dragon.vtu "-s --verbose")
@@ -172,10 +186,6 @@ set_tests_properties(TestDirectory PROPERTIES PASS_REGULAR_EXPRESSION "Loading: 
 # Test Verbose animation, no baseline needed
 f3d_test_no_baseline(TestVerboseAnimation InterpolationTest.glb "300,300" "--verbose")
 set_tests_properties(TestVerboseAnimation PROPERTIES PASS_REGULAR_EXPRESSION "7: CubicSpline Translation")
-
-# Test Generic Importer Verbose animation
-f3d_test_no_baseline(TestVerboseGenericImporterAnimation small.ex2 "300,300" "--verbose")
-set_tests_properties(TestVerboseGenericImporterAnimation PROPERTIES PASS_REGULAR_EXPRESSION "0: default")
 
 # Test Animation index out of domain error
 f3d_test_no_baseline(TestVerboseAnimationIndexError1 InterpolationTest.glb "300,300" "--animation-index=48")
