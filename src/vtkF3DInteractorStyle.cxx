@@ -160,7 +160,25 @@ void vtkF3DInteractorStyle::OnKeyPress()
       break;
     case 'f':
     case 'F':
+      if (!renWin->GetFullScreen())
+      {
+        // save current window position and size
+        int* pos = renWin->GetPosition();
+        this->WindowPos[0] = pos[0];
+        this->WindowPos[1] = pos[1];
+        int* size = renWin->GetSize();
+        this->WindowSize[0] = size[0];
+        this->WindowSize[1] = size[1];
+      }
+
       renWin->SetFullScreen(!renWin->GetFullScreen());
+
+      if (!renWin->GetFullScreen() && this->WindowSize[0] > 0)
+      {
+        // restore previous window position and size
+        renWin->SetPosition(this->WindowPos);
+        renWin->SetSize(this->WindowSize);
+      }
 
       // when going full screen, the OpenGL context changes, we need to reinitialize
       // the interactor, the render passes and the grid actor.
