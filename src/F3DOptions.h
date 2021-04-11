@@ -55,7 +55,7 @@ struct F3DOptions
   int Component = -1;
   int Samples = 5;
   std::string Up = "+Y";
-  int AnimationIndex = -1;
+  int AnimationIndex = 0;
   int CameraIndex = -1;
   std::string UserConfigFile = "";
   std::string Output = "";

@@ -43,6 +43,7 @@ set(F3D_MODULE_OCCT_XCAF 0)
 if(F3D_MODULE_OCCT)
   find_package(OpenCASCADE REQUIRED)
   if(OpenCASCADE_FOUND)
+    set(F3D_OCCT_VERSION "${OpenCASCADE_VERSION}" CACHE INTERNAL "OpenCASCADE version" FORCE)
     if((TARGET "TKXDESTEP") AND (TARGET "TKXDEIGES"))
       set(F3D_MODULE_OCCT_XCAF 1)
     else()
@@ -56,6 +57,21 @@ if(F3D_MODULE_OCCT)
     # Note: OpenCASCADE does not declare the libs in the correct dependency order.
     # This could be an issue on Linux when linking with static libraries.
     set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} ${OpenCASCADE_LIBRARIES})
+  endif()
+endif()
+
+if(F3D_MODULE_ASSIMP)
+  find_package(assimp 5.0 REQUIRED)
+  if(assimp_FOUND)
+    set(F3D_ASSIMP_VERSION "${assimp_VERSION}" CACHE INTERNAL "Assimp version" FORCE)
+    set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DAssimpImporter.cxx")
+    set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} assimp::assimp)
+
+    # Note: Assimp CMake module file does not declare Debug target properties, just map it to Release properties
+    get_target_property(F3D_ASSIMP_DEBUG_VAR assimp::assimp IMPORTED_IMPLIB_RELEASE)
+    if(NOT F3D_ASSIMP_DEBUG_VAR)
+      set_target_properties(assimp::assimp PROPERTIES MAP_IMPORTED_CONFIG_DEBUG Release)
+    endif()
   endif()
 endif()
 
@@ -99,6 +115,10 @@ declare_f3d_reader(F3DVTKXMLReader)
 
 if(F3D_MODULE_OCCT)
   declare_f3d_reader(F3DOpenCascadeReader)
+endif()
+
+if(F3D_MODULE_ASSIMP)
+  declare_f3d_reader(F3DAssimpReader)
 endif()
 
 if(F3D_MODULE_EXODUS)

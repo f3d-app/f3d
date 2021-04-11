@@ -149,7 +149,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   # Test Verbose animation, no baseline needed
   f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_BASELINE REGEXP "7: CubicSpline Translation")
   # Test Animation index out of domain error
-  f3d_test(NAME TestVerboseAnimationIndexError1 DATA InterpolationTest.glb ARGS --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling all animations.")
+  f3d_test(NAME TestVerboseAnimationIndexError1 DATA InterpolationTest.glb ARGS --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
 endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210429)
@@ -192,6 +192,22 @@ endif()
 if(F3D_MODULE_OCCT)
   f3d_test(NAME TestSTEP DATA cube.stp)
   f3d_test(NAME TestIGES DATA spacer.igs)
+endif()
+
+if(F3D_MODULE_ASSIMP)
+  f3d_test(NAME TestOFF DATA teapot.off ARGS --up=+Z)
+  f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p)
+  f3d_test(NAME TestFBX DATA phong_cube.fbx)
+
+  if(VTK_VERSION VERSION_GREATER 9.0.20210728) # for TGA support and embedded textures
+    f3d_test(NAME TestDAE DATA duck.dae)
+    f3d_test(NAME TestTexturedFBX DATA slime.fbx)
+  endif()
+
+  # animations are broken with Assimp 5.1
+  if("${F3D_ASSIMP_VERSION}" VERSION_EQUAL "5.0")
+    f3d_test(NAME TestFBXAnim DATA robot_kyle_walking.fbx INTERACTION) #Space;Space;
+  endif()
 endif()
 
 ## Interaction Tests
@@ -253,7 +269,7 @@ f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --scalars --rough
 f3d_test(NAME TestDirectory DATA mb REGEXP "Loading: .*mb_._0.vt." NO_RENDER)
 
 # Test Animation invalid index
-f3d_test(NAME TestVerboseAnimationIndexError2 DATA cow.vtp ARGS --animation-index=1 --verbose REGEXP "An animation index has been specified but there are no animations available." NO_BASELINE)
+f3d_test(NAME TestVerboseAnimationIndexError2 DATA cow.vtp ARGS --animation-index=1 --verbose REGEXP "An animation index has been specified but there are no animation available." NO_BASELINE)
 
 # Test Grid verbose output
 f3d_test(NAME TestVerboseGrid DATA suzanne.ply ARGS -g --verbose REGEXP "Grid origin set to" NO_BASELINE)

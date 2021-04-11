@@ -402,13 +402,20 @@ void ConfigurationOptions::PrintVersion()
 #else
   version += "OFF";
 #endif
-  version += "\nCAD module: ";
+  version += "\nOpenCASCADE module: ";
 #if F3D_MODULE_OCCT
+  version += F3D_OCCT_VERSION;
 #if F3D_MODULE_OCCT_XCAF
-  version += "ON (full support)";
+  version += " (full support)";
 #else
-  version += "ON (no metadata)";
+  version += " (no metadata)";
 #endif
+#else
+  version += "OFF";
+#endif
+  version += "\nAssimp module: ";
+#if F3D_MODULE_ASSIMP
+  version += F3D_ASSIMP_VERSION;
 #else
   version += "OFF";
 #endif
