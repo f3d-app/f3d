@@ -1,6 +1,7 @@
 #include "vtkF3DInteractorStyle.h"
 
 #include "F3DAnimationManager.h"
+#include "F3DIncludes.h"
 #include "F3DLoader.h"
 #include "vtkF3DRendererWithColoring.h"
 
@@ -207,7 +208,7 @@ void vtkF3DInteractorStyle::OnKeyPress()
         this->InvokeEvent(F3DLoader::LoadFileEvent, &load);
         renWin->Render();
       }
-      else if (keySym == "Escape")
+      else if (keySym == F3D::EXIT_HOTKEY_SYM)
       {
         rwi->RemoveObservers(vtkCommand::TimerEvent);
         rwi->ExitCallback();

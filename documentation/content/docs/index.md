@@ -128,6 +128,8 @@ Options|Description
 ------|------
 \-\-ref=&lt;png file&gt;|Reference *image to compare with* for testing purposes. Use with output option to generate new baselines and diff images.
 \-\-ref-threshold=&lt;threshold&gt;|*Testing threshold* to trigger a test failure or success.
+\-\-interaction-test-record=&lt;log file&gt;|Path to an interaction log file to *record interaction events* to.
+\-\-interaction-test-play=&lt;log file&gt;|Path to an interaction log file to *play interactions events* from when loading a file.
 
 ## Window options
 
