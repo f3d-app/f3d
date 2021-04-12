@@ -57,6 +57,8 @@ struct F3DOptions
   std::string Output = "";
   std::string Reference = "";
   std::string Scalars = f3d::F3DReservedString;
+  std::string InteractionTestRecordFile = "";
+  std::string InteractionTestPlayFile = "";
   std::vector<double> BackgroundColor = { 0.2, 0.2, 0.2 };
   std::vector<double> CameraPosition;
   std::vector<double> CameraFocalPoint;

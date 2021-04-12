@@ -176,6 +176,8 @@ Options|Description
 ------|------
 \-\-ref=&lt;png file&gt;|Reference *image to compare with* for testing purposes. Use with output option to generate new baselines and diff images.
 \-\-ref-threshold=&lt;threshold&gt;|*Testing threshold* to trigger a test failure or success.
+\-\-interaction-test-record=&lt;log file&gt;|Path to an interaction log file to *record interaction events* to.
+\-\-interaction-test-play=&lt;log file&gt;|Path to an interaction log file to *play interactions events* from when loading a file.
 
 ## Window options
 
@@ -334,6 +336,8 @@ On Linux, it will be installed in `/etc/f3d/`, on Windows, it will be installed 
 * Pressing the `z` hotkey to display the FPS timer triggers a double render.
 * Multiblock (.vtm, .gml) support is partial, non-surfacic data will be converted into surfaces.
 * Animation support with full scene data format require VTK >= 9.0.20201016.
+* `Escape` interaction events cannot be recorded.
+* Drag&Drop interaction cannot be recorded nor played back.
 
 # Troubleshooting
 

@@ -5,6 +5,7 @@
 #include "F3DOffscreenRender.h"
 #include "F3DOptions.h"
 #include "vtkF3DGenericImporter.h"
+#include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRendererWithColoring.h"
 
@@ -125,7 +126,37 @@ int F3DLoader::Start(int argc, char** argv)
   int retVal = EXIT_SUCCESS;
   if (!options.NoRender)
   {
-    if (!options.Reference.empty())
+    // Manage recording options
+    vtkNew<vtkF3DInteractorEventRecorder> recorder;
+    bool record = !options.InteractionTestRecordFile.empty();
+    bool play = !options.InteractionTestPlayFile.empty();
+    if (record || play)
+    {
+      recorder->SetInteractor(interactor);
+      if (record)
+      {
+        if (play)
+        {
+          F3DLog::Print(F3DLog::Severity::Warning, "Interaction test record and play files have been provided, play file ignored.");
+        }
+        recorder->SetFileName(options.InteractionTestRecordFile.c_str());
+        recorder->On();
+        recorder->Record();
+      }
+      else
+      {
+        recorder->SetFileName(options.InteractionTestPlayFile.c_str());
+        recorder->Play();
+        recorder->Off();
+      }
+    }
+
+    // Recorder can stop the interactor, make sure it is still running
+    if (interactor->GetDone())
+    {
+      F3DLog::Print(F3DLog::Severity::Warning, "Interactor has been stopped, no rendering performed");
+    }
+    else if (!options.Reference.empty())
     {
       retVal =
         F3DOffscreenRender::RenderTesting(this->RenWin, options.Reference, options.RefThreshold, options.Output);
@@ -144,6 +175,11 @@ int F3DLoader::Start(int argc, char** argv)
     // The axis widget should be disabled before destruction
     this->Renderer->ShowAxis(false);
     this->AnimationManager.Finalize();
+
+    if (record)
+    {
+      recorder->Off();
+    }
   }
 
   return retVal;
