@@ -63,6 +63,7 @@ add_executable(f3d
   main.cxx
   vtkF3DConsoleOutputWindow.cxx
   vtkF3DGenericImporter.cxx
+  vtkF3DInteractorEventRecorder.cxx
   vtkF3DInteractorStyle.cxx
   vtkF3DMetaReader.cxx
   vtkF3DObjectFactory.cxx

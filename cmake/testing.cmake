@@ -15,6 +15,20 @@ function(f3d_test)
   set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 12)
 endfunction()
 
+function(f3d_test_interaction)
+  separate_arguments(ARGV3)
+  add_test(NAME ${ARGV0}
+           COMMAND $<TARGET_FILE:f3d>
+             ${ARGV3}
+             --dry-run
+             --resolution=${ARGV2}
+             --ref ${CMAKE_SOURCE_DIR}/data/baselines/${ARGV0}.png
+             --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
+             --interaction-test-play ${CMAKE_SOURCE_DIR}/recordings/${ARGV0}.log
+             ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
+endfunction()
+
 function(f3d_test_no_baseline)
   separate_arguments(ARGV3)
   add_test(NAME ${ARGV0}
@@ -25,6 +39,19 @@ function(f3d_test_no_baseline)
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
   set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 12)
+endfunction()
+
+function(f3d_test_interaction_no_baseline)
+  separate_arguments(ARGV3)
+  add_test(NAME ${ARGV0}
+           COMMAND $<TARGET_FILE:f3d>
+             ${ARGV3}
+             --dry-run
+             --resolution=${ARGV2}
+             --output ${CMAKE_BINARY_DIR}/Testing/Temporary/output.png
+             --interaction-test-play ${CMAKE_SOURCE_DIR}/recordings/${ARGV0}.log
+             ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
 endfunction()
 
 function(f3d_test_no_render)
@@ -143,6 +170,12 @@ if(F3D_MODULE_OCCT)
   f3d_test(TestIGES spacer.igs "300,300")
 endif()
 
+## Interaction Tests
+
+# Test exit hotkey
+f3d_test_interaction_no_baseline(TestInteractionSimpleExit cow.vtp "300,300")
+set_tests_properties(TestInteractionSimpleExit PROPERTIES PASS_REGULAR_EXPRESSION "Interactor has been stopped, no rendering performed")
+
 ## Tests to increase coverage
 
 # Output option test
@@ -154,6 +187,16 @@ set_tests_properties(TestOutputOutput PROPERTIES FIXTURES_REQUIRED OUTPUT_TEST)
 
 # No background option cannot be tested with reference
 f3d_test_no_baseline(TestOutputNoBackground cow.vtp "300,300" "--no-background")
+
+# Basic record and play test
+f3d_test_no_baseline(TestInteractionRecord cow.vtp "300,300" "--interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log")
+set_tests_properties(TestInteractionRecord PROPERTIES FIXTURES_SETUP INTERACTION_TEST)
+f3d_test_no_baseline(TestInteractionPlay cow.vtp "300,300" "--interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log")
+set_tests_properties(TestInteractionPlay PROPERTIES FIXTURES_REQUIRED INTERACTION_TEST)
+
+# Interaction record and play
+f3d_test_interaction_no_baseline(TestRecordPlay cow.vtp "300,300" "--interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/record.log")
+set_tests_properties(TestRecordPlay PROPERTIES PASS_REGULAR_EXPRESSION "Interaction test record and play files have been provided, play file ignored.")
 
 # Simple verbosity test
 f3d_test_no_render(TestVerbose dragon.vtu "-s --verbose")
