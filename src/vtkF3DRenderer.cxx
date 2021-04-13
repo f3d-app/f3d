@@ -274,12 +274,13 @@ void vtkF3DRenderer::SetupRenderPasses()
   vtkOSPRayRendererNode::SetDenoiserThreshold(0, this);
 
   bool hasHDRI = this->GetEnvironmentTexture() != nullptr;
-  vtkOSPRayRendererNode::SetBackgroundMode(hasHDRI ? vtkOSPRayRendererNode::Environment : vtkOSPRayRendererNode::Backplate, this);
+  vtkOSPRayRendererNode::SetBackgroundMode(
+    hasHDRI ? vtkOSPRayRendererNode::Environment : vtkOSPRayRendererNode::Backplate, this);
 #else
   if (this->UseRaytracing || this->UseRaytracingDenoiser)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
-        "Raytracing options can't be used if F3D has not been built with raytracing");
+      "Raytracing options can't be used if F3D has not been built with raytracing");
   }
 #endif
 }
@@ -346,10 +347,10 @@ void vtkF3DRenderer::ShowGrid(bool show)
     double unitSquare = pow(10.0, round(log10(diag * 0.1)));
 
     double gridPos[3];
-    for (int i=0; i<3; i++)
+    for (int i = 0; i < 3; i++)
     {
-      double size = bounds[2*i+1] - bounds[2*i];
-      gridPos[i] = 0.5 * (bounds[2*i] + bounds[2*i+1] - this->UpVector[i] * size);
+      double size = bounds[2 * i + 1] - bounds[2 * i];
+      gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
     }
 
     if (this->Options.Verbose && show)
