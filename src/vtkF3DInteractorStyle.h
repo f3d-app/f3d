@@ -76,6 +76,9 @@ protected:
 
   const F3DAnimationManager* AnimationManager = nullptr;
   const F3DOptions* Options = nullptr;
+
+  int WindowSize[2] = { -1, -1 };
+  int WindowPos[2] = { 0, 0 };
 };
 
 #endif
