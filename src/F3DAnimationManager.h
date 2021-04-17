@@ -41,11 +41,6 @@ public:
   bool IsPlaying() const { return Playing; }
 
   /**
-   * Recover the animation progress
-   */
-  double GetAnimationProgress();
-
-  /**
    * Finalize different objects managed by the animation manager
    */
   void Finalize();

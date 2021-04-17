@@ -123,7 +123,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
     }
     else
     {
-      vtkWarningMacro("Cannot open HDRI file " << fullPath);
+      F3DLog::Print(F3DLog::Severity::Warning, "Cannot open HDRI file ", fullPath);
     }
   }
 

@@ -118,6 +118,7 @@ f3d_test(TestToneMapping suzanne.ply "300,300" "-t")
 f3d_test(TestDepthPeelingToneMapping suzanne.ply "300,300" "--opacity=0.9 -pt")
 f3d_test(TestDefaultConfigFileSimilar dragon.vtu "300,300" "-stagxn --progress")
 f3d_test(TestVolume HeadMRVolume.mhd "300,300" "-v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1")
+f3d_test(TestVolumeInverse HeadMRVolume.mhd "300,300" "-vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1")
 f3d_test(TestVolumeMag vase_4comp.vti "300,300" "-vb")
 f3d_test(TestVolumeComp vase_4comp.vti "300,300" "-vb --comp=3")
 f3d_test(TestVolumeDirect vase_4comp.vti "300,300" "-vb --comp=-2")
@@ -125,8 +126,10 @@ f3d_test(TestVolumeCells waveletArrays.vti "300,300" "-vb --cells")
 f3d_test(TestVolumeNonScalars waveletArrays.vti "300,300" "-vb --scalars=RandomPointScalars")
 f3d_test(TestTextures WaterBottle.glb "300,300" "--geometry-only --texture-material=${CMAKE_SOURCE_DIR}/data/testing/red.jpg --roughness=1 --metallic=1 --texture-base-color=${CMAKE_SOURCE_DIR}/data/testing/albedo.png --texture-normal=${CMAKE_SOURCE_DIR}/data/testing/normal.png --texture-emissive=${CMAKE_SOURCE_DIR}/data/testing/red.jpg --emissive-factor=0.1,0.1,0.1")
 f3d_test(TestMetaData pdiag.vtu "300,300" "-m")
+f3d_test(TestMetaDataImporter BoxAnimated.gltf "300,300" "-m")
 f3d_test(TestMultiblockMetaData mb.vtm "300,300" "-m")
 f3d_test(TestHDRI suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
+f3d_test(TestHDRI8Bit suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/logo.tif")
 f3d_test(TestHDRIOrient suzanne.stl "300,300" "--up=+Z --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
 f3d_test(TestHDRIBlur suzanne.ply "300,300" "-u --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
 f3d_test(TestHDRIEdges suzanne.ply "300,300" "-e --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
@@ -155,10 +158,15 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(TestOSPRayGLTF WaterBottle.glb "300,300" "-r --samples=1")
   f3d_test(TestOSPRayBackground suzanne.ply "300,300" "-r --samples=1 --bg-color=1,0,0")
   f3d_test(TestOSPRayPointCloud pointsCloud.vtp "300,300" "-r --point-size=20")
+  f3d_test(TestOSPRayDenoise suzanne.ply "300,300" "-rd --samples=1")
+  f3d_test_interaction(TestInteractionOSPRayDenoise suzanne.ply "300,300" "--samples=1") #RD
 endif()
 
 if(F3D_MODULE_EXODUS)
   f3d_test(TestExodus disk_out_ref.ex2 "300,300" "-s --camera-position=-11,-2,-49")
+
+  # Test animation with generic importer
+  f3d_test_interaction_no_baseline(TestInteractionAnimationGenericImporter small.ex2  "300,300")#Space;Space;
 
   # Test Generic Importer Verbose animation
   f3d_test_no_baseline(TestVerboseGenericImporterAnimation small.ex2 "300,300" "--verbose")
@@ -173,8 +181,38 @@ endif()
 ## Interaction Tests
 
 # Test exit hotkey
-f3d_test_interaction_no_baseline(TestInteractionSimpleExit cow.vtp "300,300")
+f3d_test_interaction_no_baseline(TestInteractionSimpleExit cow.vtp "300,300") #Escape;
 set_tests_properties(TestInteractionSimpleExit PROPERTIES PASS_REGULAR_EXPRESSION "Interactor has been stopped, no rendering performed")
+
+# Test hotkeys
+f3d_test_interaction(TestInteractionPostFX cow.vtp "300,300") #PQAT
+f3d_test_interaction(TestInteractionActors cow.vtp "300,300") #EXGMN
+f3d_test_interaction_no_baseline(TestInteractionTimer cow.vtp "300,300") #Z
+f3d_test_interaction_no_baseline(TestInteractionMisc cow.vtp "300,300") #FFKK
+f3d_test_interaction(TestInteractionCheatsheet cow.vtp "300,300") #H
+f3d_test_interaction(TestInteractionCheatsheetScalars dragon.vtu "300,300" "--scalars --comp=-2") #HSSS
+f3d_test_interaction(TestInteractionCycleCell waveletArrays.vti "300,300") #VCCC
+f3d_test_interaction(TestInteractionCycleComp dragon.vtu "300,300") #SYYYY
+f3d_test_interaction(TestInteractionCycleScalars dragon.vtu "300,300") #BSSSS
+f3d_test_interaction(TestInteractionVolumeInverse HeadMRVolume.mhd "300,300" "--camera-position=127.5,-400,127.5 --camera-view-up=0,0,1") #VI
+f3d_test_interaction(TestInteractionPointCloud pointsCloud.vtp "300,300" "--point-size=20") #O
+f3d_test_interaction(TestInteractionHDRIBlur suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr") #U
+f3d_test_interaction(TestInteractionHDRIMove suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr") #Shift+MouseRight;
+f3d_test_interaction(TestInteractionDirectory mb "300,300") #Right;Right;Right;Left;Up;
+f3d_test_interaction(TestInteractionAnimation InterpolationTest.glb "300,300")#Space;Space;
+f3d_test_interaction_no_baseline(TestInteractionAnimationNotStopped InterpolationTest.glb "300,300")#Space;Space;
+f3d_test_interaction(TestInteractionResetCamera dragon.vtu "300,300")#MouseMovements;Return;
+f3d_test_interaction(TestInteractionAnimationMovement KameraAnim.glb "300,300" "--camera-index=1")#Space;MouseMovement;Space;
+f3d_test_interaction(TestInteractionTensorsCycleComp tensors.vti "300,300" "--scalars --comp=-2") #SYYYYYYYYYY
+f3d_test_interaction(TestInteractionCycleScalarsCompCheck dragon.vtu "300,300" "-b --scalars --comp=2") #S
+
+# Test ? hotkey
+f3d_test_interaction_no_baseline(TestInteractionDumpSceneState dragon.vtu "300,300")#?
+set_tests_properties(TestInteractionDumpSceneState PROPERTIES PASS_REGULAR_EXPRESSION "Camera position: 2.26745,3.82625,507.698")
+
+# Test a drop event without files. Actual drop can't be tested.
+f3d_test_interaction_no_baseline(TestInteractionEmptyDrop cow.vtp "300,300")#DropEvent;
+set_tests_properties(TestInteractionEmptyDrop PROPERTIES PASS_REGULAR_EXPRESSION "Drop event without any provided files.")
 
 ## Tests to increase coverage
 
@@ -234,17 +272,45 @@ set_tests_properties(TestVerboseAnimation PROPERTIES PASS_REGULAR_EXPRESSION "7:
 f3d_test_no_baseline(TestVerboseAnimationIndexError1 InterpolationTest.glb "300,300" "--animation-index=48")
 set_tests_properties(TestVerboseAnimationIndexError1 PROPERTIES PASS_REGULAR_EXPRESSION "Specified animation index is greater than the highest possible animation index, enabling all animations.")
 
-# Test Animation invalied index
+# Test Animation invalid index
 f3d_test_no_baseline(TestVerboseAnimationIndexError2 cow.vtp "300,300" "--animation-index=1 --verbose")
 set_tests_properties(TestVerboseAnimationIndexError2 PROPERTIES PASS_REGULAR_EXPRESSION "An animation index has been specified but there are no animations available.")
+
+# Test Grid verbose output
+f3d_test_no_baseline(TestVerboseGrid suzanne.ply "300,300" "-g --verbose")
+set_tests_properties(TestVerboseGrid PROPERTIES PASS_REGULAR_EXPRESSION "Grid origin set to")
+
+# Test Scalars coloring verbose output
+f3d_test_no_baseline(TestVerboseScalars suzanne.ply "300,300" "-s --verbose")
+set_tests_properties(TestVerboseScalars PROPERTIES PASS_REGULAR_EXPRESSION "Coloring using point array named Normals, Magnitude.")
+
+# Test direct scalars surface rendering with a 9 comp array
+f3d_test_no_baseline(TestTensorsDirect tensors.vti "300,300" "--scalars=tensors1 --comp=-2")
+set_tests_properties(TestTensorsDirect PROPERTIES PASS_REGULAR_EXPRESSION "Direct scalars rendering not supported by array with more than 4 components")
+
+# Test direct scalars volume rendering with a 9 comp array
+f3d_test_no_baseline(TestTensorsVolumeDirect tensors.vti "300,300" "-v --scalars=tensors1 --comp=-2")
+set_tests_properties(TestTensorsVolumeDirect PROPERTIES PASS_REGULAR_EXPRESSION "Direct scalars rendering not supported by array with more than 4 components")
+
+# Test volume rendering without any array
+f3d_test_no_baseline(TestVolumeNoArray cow.vtp "300,300" "-v")
+set_tests_properties(TestVolumeNoArray PROPERTIES PASS_REGULAR_EXPRESSION "No array to color with")
 
 # Test non existent file, do not create nonExistentFile.vtp
 f3d_test_no_render(TestVerboseNonExistentFile nonExistentFile.vtp "--filename --verbose")
 set_tests_properties(TestVerboseNonExistentFile PROPERTIES PASS_REGULAR_EXPRESSION "File .*/data/testing/nonExistentFile.vtp does not exist")
 
 # Test non supported file, do not add support for .dummy file.
-f3d_test_no_render(TestVerboseUnsupportedFile unsupportedFile.dummy "--filename")
-set_tests_properties(TestVerboseUnsupportedFile PROPERTIES PASS_REGULAR_EXPRESSION ".*/data/testing/unsupportedFile.dummy is not a file of a supported file format")
+f3d_test_no_render(TestUnsupportedFileText unsupportedFile.dummy "--filename")
+set_tests_properties(TestUnsupportedFileText PROPERTIES PASS_REGULAR_EXPRESSION ".*/data/testing/unsupportedFile.dummy is not a file of a supported file format")
+
+# Test invalid provided texture, do not add a dummy.png
+f3d_test_no_render(TestNonExistentTexture cow.vtp "--texture-material=${CMAKE_SOURCE_DIR}/data/testing/dummy.png")
+set_tests_properties(TestNonExistentTexture PROPERTIES PASS_REGULAR_EXPRESSION "Cannot open texture file")
+
+# Test invalid provided HDRI, do not add a dummy.png
+f3d_test_no_baseline(TestNonExistentHDRI cow.vtp "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/dummy.png")
+set_tests_properties(TestNonExistentHDRI PROPERTIES PASS_REGULAR_EXPRESSION "Cannot open HDRI file")
 
 # Test help display
 f3d_test_no_data(TestHelp "--help")

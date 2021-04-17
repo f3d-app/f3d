@@ -74,9 +74,3 @@ void vtkF3DInteractorEventRecorder::ProcessEvents(
     self->OutputStream->flush();
   }
 }
-
-//------------------------------------------------------------------------------
-void vtkF3DInteractorEventRecorder::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-}
