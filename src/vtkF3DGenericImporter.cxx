@@ -314,7 +314,7 @@ vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(
     }
     else
     {
-      vtkWarningMacro("Cannot open texture file " << fullPath);
+      F3DLog::Print(F3DLog::Severity::Warning, "Cannot open texture file ", fullPath);
     }
   }
 

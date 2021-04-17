@@ -172,9 +172,3 @@ int vtkF3DPostProcessFilter::FillOutputPortInformation(int port, vtkInformation*
   }
   return 1;
 }
-
-//----------------------------------------------------------------------------
-void vtkF3DPostProcessFilter::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-}

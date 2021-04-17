@@ -41,9 +41,3 @@ const char* vtkF3DObjectFactory::GetVTKSourceVersion()
 {
   return VTK_SOURCE_VERSION;
 }
-
-//----------------------------------------------------------------------------
-void vtkF3DObjectFactory::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-}

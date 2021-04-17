@@ -18,8 +18,6 @@ public:
 
   const char * GetVTKSourceVersion() override;
 
-  void PrintSelf(ostream &os, vtkIndent indent) override;
-
 protected:
   vtkF3DObjectFactory();
   ~vtkF3DObjectFactory() override = default;

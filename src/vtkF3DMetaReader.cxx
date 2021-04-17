@@ -50,6 +50,17 @@ vtkF3DMetaReader::~vtkF3DMetaReader()
 void vtkF3DMetaReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "FileName:" << this->FileName << "\n";
+  if (this->InternalReader)
+  {
+    os << indent << "InternalReader:\n";
+    this->InternalReader->PrintSelf(os, indent.GetNextIndent());
+  }
+  else
+  {
+    os << indent << "InternalReader: (none)\n";
+  }
 }
 
 //----------------------------------------------------------------------------
