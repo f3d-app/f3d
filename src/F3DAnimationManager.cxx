@@ -199,14 +199,3 @@ void F3DAnimationManager::Tick()
     }
   }
 }
-
-//----------------------------------------------------------------------------
-double F3DAnimationManager::GetAnimationProgress()
-{
-  if (this->TimeSteps.size() > 1)
-  {
-    int idx = std::distance(std::begin(this->TimeSteps), this->CurrentTimeStep);
-    return idx / static_cast<double>(this->TimeSteps.size() - 1);
-  }
-  return 0.0;
-}
