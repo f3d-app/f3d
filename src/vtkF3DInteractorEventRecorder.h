@@ -14,7 +14,6 @@ class vtkF3DInteractorEventRecorder : public vtkInteractorEventRecorder
 public:
   static vtkF3DInteractorEventRecorder* New();
   vtkTypeMacro(vtkF3DInteractorEventRecorder, vtkInteractorEventRecorder);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /*
    * Just set the interactor without adding other dedicated observers.

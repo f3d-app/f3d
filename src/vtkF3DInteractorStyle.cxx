@@ -3,6 +3,7 @@
 #include "F3DAnimationManager.h"
 #include "F3DIncludes.h"
 #include "F3DLoader.h"
+#include "F3DLog.h"
 #include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCallbackCommand.h>
@@ -20,6 +21,13 @@ vtkStandardNewMacro(vtkF3DInteractorStyle);
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
 {
+  if (files == nullptr)
+  {
+    F3DLog::Print(F3DLog::Severity::Warning,
+      "Drop event without any provided files.");
+    return;
+  }
+
   vtkRenderWindowInteractor* rwi = this->GetInteractor();
   vtkRenderWindow* renWin = rwi->GetRenderWindow();
   this->InvokeEvent(F3DLoader::NewFilesEvent, files);
