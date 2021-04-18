@@ -1,5 +1,6 @@
 #include "Config.h"
 #include "F3DLoader.h"
+#include "F3DException.h"
 
 #include "vtkF3DObjectFactory.h"
 
@@ -9,21 +10,37 @@ int main(int argc, char** argv)
   vtkObject::GlobalWarningDisplayOff();
 #endif
 
-  // instanciate our own polydata mapper and output windows
-  vtkNew<vtkF3DObjectFactory> factory;
-  vtkObjectFactory::RegisterFactory(factory);
-  vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
+  int res = EXIT_FAILURE;
 
-  F3DLoader loader;
-  return loader.Start(argc, argv);
+  try
+  {
+    // instanciate our own polydata mapper and output windows
+    vtkNew<vtkF3DObjectFactory> factory;
+    vtkObjectFactory::RegisterFactory(factory);
+    vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
+
+    F3DLoader loader;
+    res = loader.Start(argc, argv);
+  }
+  catch (F3DExNoProcess e)
+  {
+    // exit gracefully after cleanup when no process is required
+    exit(EXIT_SUCCESS);
+  }
+  catch(...)
+  {
+    exit(EXIT_FAILURE);
+  }
+
+  return res;
 }
 
 #ifdef _WIN32
 #include <Windows.h>
 #include <clocale>
+#include <codecvt>
 #include <locale>
 #include <string>
-#include <codecvt>
 
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
 {
