@@ -1,6 +1,7 @@
 #include "F3DOptions.h"
 
 #include "F3DLog.h"
+#include "F3DException.h"
 
 #include <vtk_jsoncpp.h>
 #include <vtksys/SystemTools.hxx>
@@ -284,7 +285,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
         " RIGHT     Next file\n"
         " UP        Reload current file\n"
         );
-      exit(EXIT_SUCCESS);
+      throw F3DExNoProcess();
     }
 
     if (result.count("version") > 0)
@@ -325,13 +326,13 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
       version += "\nAuthor: Kitware SAS";
 
       F3DLog::Print(F3DLog::Severity::Info, version);
-      exit(EXIT_SUCCESS);
+      throw F3DExNoProcess();
     }
   }
   catch (const cxxopts::OptionException& e)
   {
     F3DLog::Print(F3DLog::Severity::Error, "Error parsing options: ", e.what());
-    exit(EXIT_FAILURE);
+    throw;
   }
   return options;
 }
