@@ -117,15 +117,12 @@ f3d_test(TestPointCloudUG pointsCloud.vtu "300,300" "-o --point-size=20")
 f3d_test(TestPointCloudVolume bluntfin.vts "300,300" "-sob")
 f3d_test(TestVRMLImporter bot2.wrl "300,300")
 f3d_test(Test3DSImporter iflamigm.3ds "300,300" "--up=+Z")
-f3d_test(TestOBJImporter world.obj "300,300")
 f3d_test(TestScalars suzanne.ply "300,300" "--scalars=Normals --comp=1")
 f3d_test(TestScalarsRange suzanne.ply "300,300" "--scalars=Normals --comp=1 --range=0,1")
 f3d_test(TestScalarsWithBar suzanne.ply "300,300" "-b --scalars=Normals --comp=0")
 f3d_test(TestGLTFImporter WaterBottle.glb "300,300")
-f3d_test(TestGLTFImporterUnlit UnlitTest.glb "300,300")
 f3d_test(TestGLTFImporterWithAnimation BoxAnimated.gltf "300,300")
 f3d_test(TestGLTFReaderWithAnimation BoxAnimated.gltf "300,300" "--geometry-only")
-f3d_test(TestMaterial suzanne.ply "300,300" "--color=0.72,0.45,0.2 --metallic=1 --roughness=0.1")
 f3d_test(TestDicom IM-0001-1983.dcm "300,300" "--scalars --roughness=1")
 f3d_test(TestMHD HeadMRVolume.mhd "300,300" "--scalars --roughness=1")
 f3d_test(TestVTICell waveletMaterial.vti "300,300" "--scalars=Material -c --roughness=1")
@@ -151,12 +148,9 @@ f3d_test(TestVolumeDirect vase_4comp.vti "300,300" "-vb --comp=-2")
 f3d_test(TestVolumeCells waveletArrays.vti "300,300" "-vb --cells")
 f3d_test(TestVolumeNonScalars waveletArrays.vti "300,300" "-vb --scalars=RandomPointScalars")
 f3d_test(TestTextures WaterBottle.glb "300,300" "--geometry-only --texture-material=${CMAKE_SOURCE_DIR}/data/testing/red.jpg --roughness=1 --metallic=1 --texture-base-color=${CMAKE_SOURCE_DIR}/data/testing/albedo.png --texture-normal=${CMAKE_SOURCE_DIR}/data/testing/normal.png --texture-emissive=${CMAKE_SOURCE_DIR}/data/testing/red.jpg --emissive-factor=0.1,0.1,0.1")
-f3d_test(TestMetaData pdiag.vtu "300,300" "-m")
 f3d_test(TestMetaDataImporter BoxAnimated.gltf "300,300" "-m")
 f3d_test(TestMultiblockMetaData mb.vtm "300,300" "-m")
 f3d_test(TestHDRI suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
-f3d_test(TestHDRI8Bit suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/logo.tif")
-f3d_test(TestHDRIOrient suzanne.stl "300,300" "--up=+Z --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
 f3d_test(TestHDRIBlur suzanne.ply "300,300" "-u --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
 f3d_test(TestHDRIEdges suzanne.ply "300,300" "-e --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
 f3d_test(TestTIFF logo.tif "300,300" "-sy --up=-Y")
@@ -165,6 +159,32 @@ f3d_test(TestGenericImporterAnimation small.ex2 "300,300")
 f3d_test(TestAnimationIndex InterpolationTest.glb "300,300" "--animation-index=7")
 f3d_test(TestNonExistentFile nonExistentFile.vtp "300,300" "--filename")
 f3d_test(TestUnsupportedFile unsupportedFile.dummy "300,300" "--filename")
+
+# Tests that do not work with VTK 9.0.1 and have been
+# fixed prior to the date based versionning system
+if(VTK_VERSION VERSION_GREATER 9.0.1)
+  f3d_test(TestOBJImporter world.obj "300,300")
+  f3d_test(TestGLTFImporterUnlit UnlitTest.glb "300,300")
+  f3d_test(TestMaterial suzanne.ply "300,300" "--color=0.72,0.45,0.2 --metallic=1 --roughness=0.1")
+  f3d_test(TestMetaData pdiag.vtu "300,300" "-m")
+  f3d_test(TestHDRI8Bit suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/logo.tif")
+  f3d_test(TestHDRIOrient suzanne.stl "300,300" "--up=+Z --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
+  f3d_test_interaction(TestInteractionHDRIMove suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr") #Shift+MouseRight;
+  f3d_test_interaction(TestInteractionAnimation InterpolationTest.glb "300,300")#Space;Space;
+  f3d_test_interaction(TestInteractionAnimationMovement KameraAnim.glb "300,300" "--camera-index=1")#Space;MouseMovement;Space;
+
+  # Test exit hotkey
+  f3d_test_interaction_no_baseline(TestInteractionSimpleExit cow.vtp "300,300") #Escape;
+  set_tests_properties(TestInteractionSimpleExit PROPERTIES PASS_REGULAR_EXPRESSION "Interactor has been stopped, no rendering performed")
+
+  # Test Verbose animation, no baseline needed
+  f3d_test_no_baseline(TestVerboseAnimation InterpolationTest.glb "300,300" "--verbose")
+  set_tests_properties(TestVerboseAnimation PROPERTIES PASS_REGULAR_EXPRESSION "7: CubicSpline Translation")
+
+  # Test Animation index out of domain error
+  f3d_test_no_baseline(TestVerboseAnimationIndexError1 InterpolationTest.glb "300,300" "--animation-index=48")
+  set_tests_properties(TestVerboseAnimationIndexError1 PROPERTIES PASS_REGULAR_EXPRESSION "Specified animation index is greater than the highest possible animation index, enabling all animations.")
+endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20200527)
   f3d_test(TestEdges suzanne.ply "300,300" "-e")
@@ -206,10 +226,6 @@ endif()
 
 ## Interaction Tests
 
-# Test exit hotkey
-f3d_test_interaction_no_baseline(TestInteractionSimpleExit cow.vtp "300,300") #Escape;
-set_tests_properties(TestInteractionSimpleExit PROPERTIES PASS_REGULAR_EXPRESSION "Interactor has been stopped, no rendering performed")
-
 # Test hotkeys
 f3d_test_interaction(TestInteractionPostFX cow.vtp "300,300") #PQAT
 f3d_test_interaction(TestInteractionActors cow.vtp "300,300") #EXGMN
@@ -223,12 +239,9 @@ f3d_test_interaction(TestInteractionCycleScalars dragon.vtu "300,300") #BSSSS
 f3d_test_interaction(TestInteractionVolumeInverse HeadMRVolume.mhd "300,300" "--camera-position=127.5,-400,127.5 --camera-view-up=0,0,1") #VI
 f3d_test_interaction(TestInteractionPointCloud pointsCloud.vtp "300,300" "--point-size=20") #O
 f3d_test_interaction(TestInteractionHDRIBlur suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr") #U
-f3d_test_interaction(TestInteractionHDRIMove suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr") #Shift+MouseRight;
 f3d_test_interaction(TestInteractionDirectory mb "300,300") #Right;Right;Right;Left;Up;
-f3d_test_interaction(TestInteractionAnimation InterpolationTest.glb "300,300")#Space;Space;
 f3d_test_interaction_no_baseline(TestInteractionAnimationNotStopped InterpolationTest.glb "300,300")#Space;Space;
 f3d_test_interaction(TestInteractionResetCamera dragon.vtu "300,300")#MouseMovements;Return;
-f3d_test_interaction(TestInteractionAnimationMovement KameraAnim.glb "300,300" "--camera-index=1")#Space;MouseMovement;Space;
 f3d_test_interaction(TestInteractionTensorsCycleComp tensors.vti "300,300" "--scalars --comp=-2") #SYYYYYYYYYY
 f3d_test_interaction(TestInteractionCycleScalarsCompCheck dragon.vtu "300,300" "-b --scalars --comp=2") #S
 
@@ -289,14 +302,6 @@ set_tests_properties(TestIncorrectColormap PROPERTIES PASS_REGULAR_EXPRESSION "S
 # Test opening a directory
 f3d_test_no_render(TestDirectory mb)
 set_tests_properties(TestDirectory PROPERTIES PASS_REGULAR_EXPRESSION "Loading: .*mb_._0.vt.")
-
-# Test Verbose animation, no baseline needed
-f3d_test_no_baseline(TestVerboseAnimation InterpolationTest.glb "300,300" "--verbose")
-set_tests_properties(TestVerboseAnimation PROPERTIES PASS_REGULAR_EXPRESSION "7: CubicSpline Translation")
-
-# Test Animation index out of domain error
-f3d_test_no_baseline(TestVerboseAnimationIndexError1 InterpolationTest.glb "300,300" "--animation-index=48")
-set_tests_properties(TestVerboseAnimationIndexError1 PROPERTIES PASS_REGULAR_EXPRESSION "Specified animation index is greater than the highest possible animation index, enabling all animations.")
 
 # Test Animation invalid index
 f3d_test_no_baseline(TestVerboseAnimationIndexError2 cow.vtp "300,300" "--animation-index=1 --verbose")
