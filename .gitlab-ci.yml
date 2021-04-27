@@ -1,55 +1,55 @@
 ########## Stages ##########
 
 stages:
-  - deps # Empty for linux
+  - deps # Empty for lin
   - build
-  - test # Empty for vtk9
-  - package # Empty for vtk9
+  - test
+  - package # Empty for rel
 
 ########## OS specific tags and variables ##########
 
-.linux:
+.lin:
   tags:
     - docker
     - linux
     - x11
 
-.linux_docker_vtk:
+.lin_docker_vtk:
   extends:
-    - .linux
+    - .lin
   image: gitlab.kitware.com:4567/f3d/f3d/linux-deps:latest
 
-.linux_docker_vtk9:
+.lin_docker_rel:
   extends:
-    - .linux
+    - .lin
   image: gitlab.kitware.com:4567/f3d/f3d/linux-deps:9.0.1
 
-.linux_empty:
+.lin_empty:
   script:
     - [ "true" ]
   extends:
-    - .linux
+    - .lin
 
-.windows:
+.win:
   variables:
     GIT_CLONE_PATH: "$CI_BUILDS_DIR\\f3d-ci"
   tags:
     - windows
     - f3d
 
-.windows_env:
+.win_env:
   before_script:
     - $CMAKEPath = Join-Path -Path $pwd -ChildPath dependencies\cmake-3.19.3-win64-x64\bin\
     - $NSISPath = Join-Path -Path $pwd -ChildPath dependencies\nsis-3.06.1\Bin\
     - $env:Path += ";$NSISPath;$CMAKEPath"
 
-.windows_empty:
+.win_empty:
   script:
     - $true
   extends:
-    - .windows
+    - .win
 
-.macos:
+.mac:
   variables:
     GIT_CLONE_PATH: "$CI_BUILDS_DIR\\f3d-ci"
     DEVELOPER_DIR: "/Applications/Xcode-11.7.app/Contents/Developer"
@@ -58,15 +58,15 @@ stages:
     - xcode-11.7
     - f3d
 
-.macos_env:
+.mac_env:
   before_script:
     - export PATH=$(pwd)/dependencies/cmake-3.19.4-macos-universal/CMake.app/Contents/bin/:$PATH
 
-.macos_empty:
+.mac_empty:
   script:
     - [ "true" ]
   extends:
-    - .macos
+    - .mac
 
 ########## Cross-platform scripts ##########
 
@@ -118,149 +118,159 @@ stages:
 
 ### Deps Linux ###
 
-.deps:linux:
+.deps:lin:
   stage: deps
   extends:
-    - .linux_empty
+    - .lin_empty
 
-deps:linux:vtk9:
+deps:lin:rel:
   extends:
-    - .deps:linux
+    - .deps:lin
     - .when:automatic
 
-deps:linux:
+deps:lin:
   extends:
-    - .deps:linux
+    - .deps:lin
     - .when:automatic
 
-deps:linux:cov:
+deps:lin:cov:
   extends:
-    - .deps:linux
+    - .deps:lin
     - .when:automatic
 
 ### Build Linux ###
 
-.build:linux:
+.build:lin:
   extends:
     - .build
   variables:
     VTK_DIR: /vtk_install/lib/cmake/vtk-9.0
     OCCT_DIR: /occt_install/lib/cmake/opencascade
 
-build:linux:
+build:lin:
   extends:
-    - .build:linux
-    - .linux_docker_vtk
+    - .build:lin
+    - .lin_docker_vtk
     - .when:dependent
   dependencies:
-    - deps:linux
+    - deps:lin
   needs:
-    - deps:linux
+    - deps:lin
   variables:
     ADDITIONAL_OPTIONS: -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
   artifacts:
     paths:
       - build
 
-build:linux:cov:
+build:lin:cov:
   extends:
-    - .build:linux
-    - .linux_docker_vtk
+    - .build:lin
+    - .lin_docker_vtk
     - .when:dependent
   dependencies:
-    - deps:linux:cov
+    - deps:lin:cov
   needs:
-    - deps:linux:cov
+    - deps:lin:cov
   variables:
     ADDITIONAL_OPTIONS: -DF3D_COVERAGE=ON
   artifacts:
     paths:
       - build
 
-build:linux:vtk9:
+build:lin:rel:
   extends:
-    - .build:linux
-    - .linux_docker_vtk9
+    - .build:lin
+    - .lin_docker_rel
     - .when:dependent
   dependencies:
-    - deps:linux:vtk9
+    - deps:lin:rel
   needs:
-    - deps:linux:vtk9
-
-### Test Linux ###
-
-test:linux:vtk9:
-  stage: test
-  extends:
-    - .linux_empty
-    - .when:dependent
-  needs:
-    - build:linux:vtk9
-
-test:linux:
-  extends:
-    - .linux
-    - .test
-    - .linux_docker_vtk
-    - .when:dependent
-  dependencies:
-    - build:linux
-  needs:
-    - build:linux
+    - deps:lin:rel
   artifacts:
     paths:
       - build
 
-test:linux:cov:
+### Test Linux ###
+
+test:lin:rel:
+  stage: test
   extends:
-    - .linux
+    - .lin
     - .test
-    - .linux_docker_vtk
+    - .lin_docker_vtk
+    - .when:dependent
+  dependencies:
+    - build:lin:rel
+  needs:
+    - build:lin:rel
+  artifacts:
+    paths:
+      - build
+
+test:lin:
+  extends:
+    - .lin
+    - .test
+    - .lin_docker_vtk
+    - .when:dependent
+  dependencies:
+    - build:lin
+  needs:
+    - build:lin
+  artifacts:
+    paths:
+      - build
+
+test:lin:cov:
+  extends:
+    - .lin
+    - .test
+    - .lin_docker_vtk
     - .when:dependent
   after_script:
     - cd build
     - gcovr --xml-pretty --exclude-unreachable-branches --print-summary -o coverage.xml --root ${CI_PROJECT_DIR}
   coverage: /^\s*lines:\s*\d+.\d+\%/
   dependencies:
-    - build:linux:cov
+    - build:lin:cov
   needs:
-    - build:linux:cov
+    - build:lin:cov
   artifacts:
     reports:
       cobertura: build/coverage.xml
 
 ### Pack Linux ###
 
-pack:linux:vtk9:
+pack:lin:rel:
   stage: package
   extends:
-    - .linux_empty
+    - .lin_empty
     - .when:dependent
   needs:
-    - build:linux:vtk9
+    - build:lin:rel
 
-pack:linux:
+pack:lin:
   extends:
-    - .linux
+    - .lin
     - .pack
-    - .linux_docker_vtk
+    - .lin_docker_vtk
     - .when:dependent
   dependencies:
-    - build:linux
+    - build:lin
   needs:
-    - build:linux
+    - build:lin
   artifacts:
     paths:
       - build/f3d-*.tar.gz
       - build/f3d-*.tar.xz
 
-pack:linux:cov:
+pack:lin:cov:
   stage: package
   extends:
-    - .linux_empty
+    - .lin_empty
     - .when:dependent
   needs:
-    - build:linux:cov
+    - build:lin:cov
 
 ########## Windows Specific ##########
 
@@ -287,8 +297,8 @@ pack:linux:cov:
     - cmake -E tar -x ../f3d-dependencies/windows/archive/$VTK_ARCHIVE
     - cmake -E tar -x ../f3d-dependencies/windows/archive/$OCCT_ARCHIVE
   extends:
-    - .windows
-    - .windows_env
+    - .win
+    - .win_env
   artifacts:
     paths:
       - dependencies
@@ -301,7 +311,7 @@ deps:win:
     VTK_ARCHIVE: vtk-latest.zip
     OCCT_ARCHIVE: occt-latest.zip
 
-deps:win:vtk9:
+deps:win:rel:
   extends:
     - .deps:win
     - .when:automatic
@@ -313,8 +323,8 @@ deps:win:vtk9:
 
 .build:win:
   extends:
-    - .windows
-    - .windows_env
+    - .win
+    - .win_env
     - .build
   variables:
     BUILD_ARCHITECTURE: -Ax64
@@ -342,42 +352,56 @@ build:win:
       - dependencies
       - build
 
-build:win:vtk9:
+build:win:rel:
   extends:
     - .build:win
     - .when:dependent
   dependencies:
-    - deps:win:vtk9
+    - deps:win:rel
   needs:
-    - deps:win:vtk9
+    - deps:win:rel
+  artifacts:
+    paths:
+      - dependencies
+      - build
 
 ### Test Windows ###
 
 test:win:
   extends:
-    - .windows
-    - .windows_env
+    - .win
+    - .win_env
     - .test
     - .when:dependent
   dependencies:
     - build:win
   needs:
     - build:win
+  artifacts:
+    paths:
+      - build
 
-test:win:vtk9:
+test:win:rel:
   stage: test
   extends:
-    - .windows_empty
+    - .win
+    - .win_env
+    - .test
     - .when:dependent
+  dependencies:
+    - build:win:rel
   needs:
-    - build:win:vtk9
+    - build:win:rel
+  artifacts:
+    paths:
+      - build
 
 ### Package Windows ###
 
 pack:win:
   extends:
-    - .windows
-    - .windows_env
+    - .win
+    - .win_env
     - .pack
     - .when:dependent
   dependencies:
@@ -389,19 +413,19 @@ pack:win:
       - build/f3d-*.zip
       - build/f3d-*.exe
 
-pack:win:vtk9:
+pack:win:rel:
   stage: package
   extends:
-    - .windows_empty
+    - .win_empty
     - .when:dependent
   needs:
-    - build:win:vtk9
+    - build:win:rel
 
 ########## MacOS Specific ##########
 
 ### Deps MacOS ###
 
-.deps:macos:
+.deps:mac:
   stage: deps
   script:
     - mkdir dependencies
@@ -417,22 +441,22 @@ pack:win:vtk9:
     - echo "eb1f52996632c1e71a1051c9e2c30cc8df869fb5a213b1a0d3b202744c6c5758  cmake-3.19.4-macos-universal.tar.gz" | shasum -a 256 --check
     - tar -zxf cmake-3.19.4-macos-universal.tar.gz
   extends:
-    - .macos
+    - .mac
   artifacts:
     paths:
       - dependencies
 
-deps:macos:
+deps:mac:
   extends:
-    - .deps:macos
+    - .deps:mac
     - .when:automatic
   variables:
     VTK_ARCHIVE: vtk-latest.tar.gz
     OCCT_ARCHIVE: occt-latest.tar.gz
 
-deps:macos:vtk9:
+deps:mac:rel:
   extends:
-    - .deps:macos
+    - .deps:mac
     - .when:automatic
   variables:
     VTK_ARCHIVE: vtk-9.0.1.tar.gz
@@ -440,79 +464,93 @@ deps:macos:vtk9:
 
 ### Build MacOS ###
 
-.build:macos:
+.build:mac:
   extends:
-    - .macos
-    - .macos_env
+    - .mac
+    - .mac_env
     - .build
   variables:
     ADDITIONAL_OPTIONS: -DF3D_MACOS_BUNDLE=ON
     VTK_DIR: ../dependencies/vtk_install/lib/cmake/vtk-9.0
     OCCT_DIR: ../dependencies/occt_install/lib/cmake/opencascade
 
-build:macos:
+build:mac:
   extends:
-    - .build:macos
+    - .build:mac
     - .when:dependent
   dependencies:
-    - deps:macos
+    - deps:mac
   needs:
-    - deps:macos
+    - deps:mac
   artifacts:
     paths:
       - dependencies
       - build
 
-build:macos:vtk9:
+build:mac:rel:
   extends:
-    - .build:macos
+    - .build:mac
     - .when:dependent
   dependencies:
-    - deps:macos:vtk9
+    - deps:mac:rel
   needs:
-    - deps:macos:vtk9
+    - deps:mac:rel
+  artifacts:
+    paths:
+      - dependencies
+      - build
 
 ### Test MacOS ###
 
-test:macos:
+test:mac:
   extends:
-    - .macos
-    - .macos_env
+    - .mac
+    - .mac_env
     - .test
     - .when:dependent
   dependencies:
-    - build:macos
+    - build:mac
   needs:
-    - build:macos
+    - build:mac
+  artifacts:
+    paths:
+      - build
 
-test:macos:vtk9:
+test:mac:rel:
   stage: test
   extends:
-    - .macos_empty
+    - .mac
+    - .mac_env
+    - .test
     - .when:dependent
+  dependencies:
+    - build:mac:rel
   needs:
-    - build:macos:vtk9
+    - build:mac:rel
+  artifacts:
+    paths:
+      - build
 
 ### Package MacOS ###
 
-pack:macos:
+pack:mac:
   extends:
-    - .macos
-    - .macos_env
+    - .mac
+    - .mac_env
     - .pack
     - .when:dependent
   dependencies:
-    - build:macos
+    - build:mac
   needs:
-    - build:macos
+    - build:mac
   artifacts:
     paths:
       - build/f3d-*.dmg
 
-pack:macos:vtk9:
+pack:mac:rel:
   stage: package
   extends:
-    - .macos_empty
+    - .mac_empty
     - .when:dependent
   needs:
-    - build:macos:vtk9
+    - build:mac:rel
