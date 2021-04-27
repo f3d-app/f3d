@@ -62,6 +62,7 @@ Options &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 \-\-animation-index|Select the animation to show.<br>Any negative value means all animations.<br>The default scene always has a single animation if any.
 \-\-geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-dry-run|Do not read the configuration file but consider only the command line options
+\-\-config|Read a provided configuration file instead of default one
 
 ## Material options
 
