@@ -143,10 +143,16 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     return;
   }
 
-  if (this->Options->Verbose || this->Options->NoRender)
+  bool print = (this->Options->Verbose || this->Options->NoRender);
+  if (print)
   {
     this->OutputDescription =
       vtkF3DGenericImporter::GetDataObjectDescription(this->Reader->GetOutput());
+  }
+
+  if (this->Options->NoRender)
+  {
+    return;
   }
 
   vtkPolyData* surface = vtkPolyData::SafeDownCast(this->PostPro->GetOutput());
@@ -197,7 +203,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   // Recover an array for coloring if we ever need it
   this->ArrayIndexForColoring = -1;
-  bool print = (this->Options->Verbose || this->Options->NoRender);
   if (usedArray.empty())
   {
     vtkDataArray* array = dataForColoring->GetScalars();

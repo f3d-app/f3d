@@ -110,6 +110,7 @@ Options|Description
 \-\-animation-index|Select the animation to show.<br>Any negative value means all animations.<br>The default scene always has a single animation if any.
 \-\-geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-dry-run|Do not read the configuration file but consider only the command line options
+\-\-config|Read a provided configuration file instead of default one
 
 ## Material options
 
@@ -274,7 +275,7 @@ with the new data. If not, it will cycle until a valid array is found. After tha
 
 # Configuration file
 
-All the command-line options can be controlled using a configuration file.
+Almost all the command-line options can be controlled using a configuration file.
 This configuration file uses the "long" version of the options in a JSON
 formatted file to provide default values for these options.
 
@@ -316,6 +317,12 @@ Here, the first block defines a basic configuration with many desired options fo
 The second block specifies that all files ending with vt., eg: vtk, vtp, vtu, ... will be shown with edges visibility turned on.
 The third block specifies raytracing usage for .gltf and .glb files.
 The last block specifies that volume rendering should be used with .mhd files.
+
+The following command-line options <br>cannot</br> be set via config file:
+`help`, `version`, `config`, `dry-run`, `no-render`, `inputs`.
+
+Boolean options that have been turned on in the configuration file can be turned
+off in the command line if needed, eg: `--point-sprites=false`
 
 The configuration file possible locations depends on your operating system.
 They are considered in the below order and only the first found will be used.

@@ -51,19 +51,19 @@ int F3DLoader::Start(int argc, char** argv)
   std::vector<std::string> files;
 
   this->Parser.Initialize(argc, argv);
-  F3DOptions options = this->Parser.GetOptionsFromCommandLine(files);
+  this->CommandLineOptions = this->Parser.GetOptionsFromCommandLine(files);
+  this->Parser.InitializeDictionaryFromConfigFile(this->CommandLineOptions.UserConfigFile);
 
   vtkNew<vtkRenderWindowInteractor> interactor;
-  if (!options.NoRender)
+  if (!this->CommandLineOptions.NoRender)
   {
     this->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
-    this->RenWin->SetSize(options.WindowSize[0], options.WindowSize[1]);
     this->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
-    this->RenWin->SetFullScreen(options.FullScreen);
     this->RenWin->SetWindowName(f3d::AppTitle.c_str());
 
     vtkNew<vtkF3DInteractorStyle> style;
     style->SetAnimationManager(this->AnimationManager);
+    // Will only be used when interacting with a animated file
     style->SetOptions(this->Options);
 
     // Setup the observers for the interactor style events
@@ -124,12 +124,14 @@ int F3DLoader::Start(int argc, char** argv)
   this->LoadFile();
 
   int retVal = EXIT_SUCCESS;
-  if (!options.NoRender)
+
+  // Actual Options been parsed in LoadFile so use them
+  if (!this->Options.NoRender)
   {
     // Manage recording options
     vtkNew<vtkF3DInteractorEventRecorder> recorder;
-    bool record = !options.InteractionTestRecordFile.empty();
-    bool play = !options.InteractionTestPlayFile.empty();
+    bool record = !this->Options.InteractionTestRecordFile.empty();
+    bool play = !this->Options.InteractionTestPlayFile.empty();
     if (record || play)
     {
       recorder->SetInteractor(interactor);
@@ -139,13 +141,13 @@ int F3DLoader::Start(int argc, char** argv)
         {
           F3DLog::Print(F3DLog::Severity::Warning, "Interaction test record and play files have been provided, play file ignored.");
         }
-        recorder->SetFileName(options.InteractionTestRecordFile.c_str());
+        recorder->SetFileName(this->Options.InteractionTestRecordFile.c_str());
         recorder->On();
         recorder->Record();
       }
       else
       {
-        recorder->SetFileName(options.InteractionTestPlayFile.c_str());
+        recorder->SetFileName(this->Options.InteractionTestPlayFile.c_str());
         recorder->Play();
         recorder->Off();
       }
@@ -156,15 +158,15 @@ int F3DLoader::Start(int argc, char** argv)
     {
       F3DLog::Print(F3DLog::Severity::Warning, "Interactor has been stopped, no rendering performed");
     }
-    else if (!options.Reference.empty())
+    else if (!this->Options.Reference.empty())
     {
       retVal =
-        F3DOffscreenRender::RenderTesting(this->RenWin, options.Reference, options.RefThreshold, options.Output);
+        F3DOffscreenRender::RenderTesting(this->RenWin, this->Options.Reference, this->Options.RefThreshold, this->Options.Output);
     }
-    else if (!options.Output.empty())
+    else if (!this->Options.Output.empty())
     {
       retVal =
-        F3DOffscreenRender::RenderOffScreen(this->RenWin, options.Output, options.NoBackground);
+        F3DOffscreenRender::RenderOffScreen(this->RenWin, this->Options.Output, this->Options.NoBackground);
     }
     else
     {
@@ -265,8 +267,11 @@ void F3DLoader::LoadFile(int load)
       ") " + vtksys::SystemTools::GetFilenameName(filePath);
   }
 
-  this->Options = this->Parser.GetOptionsFromCommandLine();
-  if (!this->Options.DryRun)
+  if (this->CommandLineOptions.DryRun)
+  {
+    this->Options = this->CommandLineOptions;
+  }
+  else
   {
     this->Options = this->Parser.GetOptionsFromConfigFile(filePath);
   }
@@ -281,6 +286,12 @@ void F3DLoader::LoadFile(int load)
     {
       F3DLog::Print(F3DLog::Severity::Info, "Loading: ", filePath, "\n");
     }
+  }
+
+  if (!this->Options.NoRender)
+  {
+    this->RenWin->SetSize(this->Options.WindowSize[0], this->Options.WindowSize[1]);
+    this->RenWin->SetFullScreen(this->Options.FullScreen);
   }
 
   if (filePath.empty())

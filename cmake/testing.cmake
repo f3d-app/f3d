@@ -29,6 +29,19 @@ function(f3d_test_interaction)
   set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
 endfunction()
 
+function(f3d_test_config)
+  separate_arguments(ARGV3)
+  add_test(NAME ${ARGV0}
+           COMMAND $<TARGET_FILE:f3d>
+             ${ARGV4}
+             --resolution=${ARGV2}
+             --config=${ARGV3}
+             --ref ${CMAKE_SOURCE_DIR}/data/baselines/${ARGV0}.png
+             --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
+             ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 12)
+endfunction()
+
 function(f3d_test_no_baseline)
   separate_arguments(ARGV3)
   add_test(NAME ${ARGV0}
@@ -52,6 +65,18 @@ function(f3d_test_interaction_no_baseline)
              --interaction-test-play ${CMAKE_SOURCE_DIR}/recordings/${ARGV0}.log
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
   set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
+endfunction()
+
+function(f3d_test_config_no_baseline)
+  separate_arguments(ARGV3)
+  add_test(NAME ${ARGV0}
+           COMMAND $<TARGET_FILE:f3d>
+             ${ARGV4}
+             --resolution=${ARGV2}
+             --config=${ARGV3}
+             --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
+             ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 12)
 endfunction()
 
 function(f3d_test_no_render)
@@ -116,7 +141,8 @@ f3d_test(TestColormap IM-0001-1983.dcm "300,300" "--scalars --roughness=1 --colo
 f3d_test(TestCameraConfiguration suzanne.obj "300,300" "--camera-position=0,0,-10 -x --camera-view-up=1,0,0 --camera-focal-point=1,0,0 --camera-view-angle=20")
 f3d_test(TestToneMapping suzanne.ply "300,300" "-t")
 f3d_test(TestDepthPeelingToneMapping suzanne.ply "300,300" "--opacity=0.9 -pt")
-f3d_test(TestDefaultConfigFileSimilar dragon.vtu "300,300" "-stagxn --progress")
+f3d_test_config(TestDefaultConfigFile dragon.vtu "300,300" "${CMAKE_SOURCE_DIR}/resources/config.json")
+f3d_test_config(TestDefaultConfigFileAnotherBlock vase_4comp.vti "300,300" "${CMAKE_SOURCE_DIR}/resources/config.json")
 f3d_test(TestVolume HeadMRVolume.mhd "300,300" "-v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1")
 f3d_test(TestVolumeInverse HeadMRVolume.mhd "300,300" "-vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1")
 f3d_test(TestVolumeMag vase_4comp.vti "300,300" "-vb")
@@ -238,14 +264,14 @@ set_tests_properties(TestRecordPlay PROPERTIES PASS_REGULAR_EXPRESSION "Interact
 
 # Simple verbosity test
 f3d_test_no_render(TestVerbose dragon.vtu "-s --verbose")
-set_tests_properties(TestVerbose PROPERTIES PASS_REGULAR_EXPRESSION "Using first found array: Normals.*Number of points: 69827\nNumber of cells: 139650")
+set_tests_properties(TestVerbose PROPERTIES PASS_REGULAR_EXPRESSION "Number of points: 69827\nNumber of cells: 139650")
 
 # Unknown scalar array verbosity test
-f3d_test_no_render(TestVerboseWrongArray dragon.vtu "--scalars=dummy --verbose")
+f3d_test_no_baseline(TestVerboseWrongArray dragon.vtu "300,300" "--scalars=dummy --verbose")
 set_tests_properties(TestVerboseWrongArray PROPERTIES PASS_REGULAR_EXPRESSION "Unknown scalar array: dummy")
 
 # Default scalar array verbosity test
-f3d_test_no_render(TestVerboseDefaultScalar HeadMRVolume.mhd "-s --verbose")
+f3d_test_no_baseline(TestVerboseDefaultScalar HeadMRVolume.mhd "300,300" "-s --verbose")
 set_tests_properties(TestVerboseDefaultScalar PROPERTIES PASS_REGULAR_EXPRESSION "Using default scalar array: MetaImage")
 
 # Incorrect component test
@@ -305,12 +331,24 @@ f3d_test_no_render(TestUnsupportedFileText unsupportedFile.dummy "--filename")
 set_tests_properties(TestUnsupportedFileText PROPERTIES PASS_REGULAR_EXPRESSION ".*/data/testing/unsupportedFile.dummy is not a file of a supported file format")
 
 # Test invalid provided texture, do not add a dummy.png
-f3d_test_no_render(TestNonExistentTexture cow.vtp "--texture-material=${CMAKE_SOURCE_DIR}/data/testing/dummy.png")
+f3d_test_no_baseline(TestNonExistentTexture cow.vtp "300,300" "--texture-material=${CMAKE_SOURCE_DIR}/data/testing/dummy.png")
 set_tests_properties(TestNonExistentTexture PROPERTIES PASS_REGULAR_EXPRESSION "Cannot open texture file")
 
 # Test invalid provided HDRI, do not add a dummy.png
 f3d_test_no_baseline(TestNonExistentHDRI cow.vtp "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/dummy.png")
 set_tests_properties(TestNonExistentHDRI PROPERTIES PASS_REGULAR_EXPRESSION "Cannot open HDRI file")
+
+# Test invalid options, do not add a --dummy option
+f3d_test_no_data(TestInvalidOption "--dummy")
+set_tests_properties(TestInvalidOption PROPERTIES PASS_REGULAR_EXPRESSION "Error parsing options:")
+
+# Test non-existent config file, do not add a dummy.json
+f3d_test_config_no_baseline(TestNonExistentConfigFile cow.vtp "300,300" "${CMAKE_SOURCE_DIR}/configs/dummy.json")
+set_tests_properties(TestNonExistentConfigFile PROPERTIES PASS_REGULAR_EXPRESSION "Unable to open the configuration file")
+
+# Test invalid config file
+f3d_test_config_no_baseline(TestInvalidConfigFile cow.vtp "300,300" "${CMAKE_SOURCE_DIR}/configs/invalid.json")
+set_tests_properties(TestInvalidConfigFile PROPERTIES PASS_REGULAR_EXPRESSION "Unable to parse the configuration file")
 
 # Test help display
 f3d_test_no_data(TestHelp "--help")
@@ -320,7 +358,7 @@ set_tests_properties(TestHelp PROPERTIES PASS_REGULAR_EXPRESSION "Usage:")
 f3d_test_no_data(TestVersion "--version")
 set_tests_properties(TestVersion PROPERTIES PASS_REGULAR_EXPRESSION "Version:")
 
-# Test that f3d can try to read config file
+# Test that f3d can try to read a system config file
 add_test(NAME TestNoDryRun COMMAND $<TARGET_FILE:f3d> --no-render)
 set_tests_properties(TestNoDryRun PROPERTIES TIMEOUT 2)
 
