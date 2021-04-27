@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     F3DLoader loader;
     res = loader.Start(argc, argv);
   }
-  catch (F3DExNoProcess e)
+  catch (const F3DExNoProcess&)
   {
     // exit gracefully after cleanup when no process is required
     exit(EXIT_SUCCESS);
