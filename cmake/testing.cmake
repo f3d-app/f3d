@@ -12,7 +12,7 @@ function(f3d_test)
              --ref ${CMAKE_SOURCE_DIR}/data/baselines/${ARGV0}.png
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 12)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 20)
 endfunction()
 
 function(f3d_test_interaction)
@@ -26,7 +26,7 @@ function(f3d_test_interaction)
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
              --interaction-test-play ${CMAKE_SOURCE_DIR}/recordings/${ARGV0}.log
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 20)
 endfunction()
 
 function(f3d_test_config)
@@ -39,7 +39,7 @@ function(f3d_test_config)
              --ref ${CMAKE_SOURCE_DIR}/data/baselines/${ARGV0}.png
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 12)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 20)
 endfunction()
 
 function(f3d_test_no_baseline)
@@ -51,7 +51,7 @@ function(f3d_test_no_baseline)
              --resolution=${ARGV2}
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 12)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 20)
 endfunction()
 
 function(f3d_test_interaction_no_baseline)
@@ -64,7 +64,7 @@ function(f3d_test_interaction_no_baseline)
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/output.png
              --interaction-test-play ${CMAKE_SOURCE_DIR}/recordings/${ARGV0}.log
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 20)
 endfunction()
 
 function(f3d_test_config_no_baseline)
@@ -76,7 +76,7 @@ function(f3d_test_config_no_baseline)
              --config=${ARGV3}
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 12)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 20)
 endfunction()
 
 function(f3d_test_no_render)
@@ -87,7 +87,7 @@ function(f3d_test_no_render)
              --dry-run
              --no-render
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 12)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
 endfunction()
 
 function(f3d_test_no_data)
@@ -96,7 +96,7 @@ function(f3d_test_no_data)
            COMMAND $<TARGET_FILE:f3d>
              ${ARGV1}
              --dry-run)
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 12)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
 endfunction()
 
 f3d_test(TestPLY suzanne.ply "300,300")
@@ -374,7 +374,7 @@ set_tests_properties(TestNoRef PROPERTIES WILL_FAIL TRUE)
 # Test failure without a reference and  without an output, please do not create a TestNoRef.png file
 add_test(NAME TestNoRefNoOutput COMMAND $<TARGET_FILE:f3d> --dry-run --resolution=300,300 --ref ${CMAKE_SOURCE_DIR}/data/baselines/TestNoRef.png ${CMAKE_SOURCE_DIR}/data/baselines/cow.vtp)
 set_tests_properties(TestNoRefNoOutput PROPERTIES PASS_REGULAR_EXPRESSION "Reference image does not exists, use the --output option to output current rendering into an image file.")
-set_tests_properties(TestNoRefNoOutput PROPERTIES TIMEOUT 12)
+set_tests_properties(TestNoRefNoOutput PROPERTIES TIMEOUT 10)
 
 # Test failure with a bad reference, please do not create a good TestBadRef.png file
 f3d_test(TestBadRef cow.vtp "300,300")
@@ -383,4 +383,4 @@ set_tests_properties(TestBadRef PROPERTIES WILL_FAIL TRUE)
 # Test failure with a bed reference without an output, please do not create a good TestBadRef.png file
 add_test(NAME TestBadRefNoOutput COMMAND $<TARGET_FILE:f3d> --dry-run --resolution=300,300 --ref ${CMAKE_SOURCE_DIR}/data/baselines/TestBadRef.png ${CMAKE_SOURCE_DIR}/data/baselines/cow.vtp)
 set_tests_properties(TestBadRefNoOutput PROPERTIES PASS_REGULAR_EXPRESSION "Use the --output option to be able to output current rendering and diff images into files.")
-set_tests_properties(TestBadRefNoOutput PROPERTIES TIMEOUT 12)
+set_tests_properties(TestBadRefNoOutput PROPERTIES TIMEOUT 10)
