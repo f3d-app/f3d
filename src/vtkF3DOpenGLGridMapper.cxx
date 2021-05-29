@@ -10,6 +10,7 @@
 #include <vtkOpenGLVertexBufferObjectGroup.h>
 #include <vtkRenderer.h>
 #include <vtkShaderProgram.h>
+#include <vtkVersion.h>
 
 vtkStandardNewMacro(vtkF3DOpenGLGridMapper);
 
@@ -182,6 +183,10 @@ void vtkF3DOpenGLGridMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
 bool vtkF3DOpenGLGridMapper::GetNeedToRebuildShaders(
   vtkOpenGLHelper& cellBO, vtkRenderer* vtkNotUsed(ren), vtkActor* act)
 {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210506)
+  vtkMTimeType renderPassMTime = this->GetRenderPassStageMTime(act, &cellBO);
+#else
   vtkMTimeType renderPassMTime = this->GetRenderPassStageMTime(act);
+#endif
   return cellBO.Program == nullptr || cellBO.ShaderSourceTime < renderPassMTime;
 }
