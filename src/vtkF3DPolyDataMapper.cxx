@@ -12,6 +12,7 @@
 #include <vtkShaderProgram.h>
 #include <vtkShaderProperty.h>
 #include <vtkUniforms.h>
+#include <vtkVersion.h>
 
 vtkStandardNewMacro(vtkF3DPolyDataMapper);
 
@@ -145,7 +146,11 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
 
   posImpl += "  gl_Position = MCDCMatrix * posMC;\n";
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210506)
+  if (this->PrimitiveInfo[this->LastBoundBO].LastLightComplexity > 0)
+#else
   if (this->LastLightComplexity[this->LastBoundBO] > 0)
+#endif
   {
     posImpl += "  vertexVCVSOutput = MCVCMatrix * posMC;\n";
   }
