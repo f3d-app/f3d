@@ -99,6 +99,12 @@ int F3DLoader::Start(int argc, char** argv)
       });
     style->AddObserver(F3DLoader::ToggleAnimationEvent, toggleAnimationCallback);
 
+    // Offscreen rendering must be set before initializing interactor
+    if (!this->CommandLineOptions.Reference.empty() || !this->CommandLineOptions.Output.empty())
+    {
+      this->RenWin->OffScreenRenderingOn();
+    }
+
     interactor->SetRenderWindow(this->RenWin);
     interactor->SetInteractorStyle(style);
     interactor->Initialize();
