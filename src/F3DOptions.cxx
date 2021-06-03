@@ -173,7 +173,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     // clang-format off
     auto grp1 = cxxOptions.add_options();
     this->DeclareOption(grp1, "input", "", "Input file", inputs, false, false, "<files>");
-    this->DeclareOption(grp1, "output", "", "Render to file", options.Output, false, true,"<png file>");
+    this->DeclareOption(grp1, "output", "", "Render to file", options.Output, false, false,"<png file>");
     this->DeclareOption(grp1, "no-background", "", "No background when render to file", options.NoBackground);
     this->DeclareOption(grp1, "help", "h", "Print help");
     this->DeclareOption(grp1, "version", "", "Print version details");
@@ -249,10 +249,10 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping", options.ToneMapping);
 
     auto grp7 = cxxOptions.add_options("Testing");
-    this->DeclareOption(grp7, "ref", "", "Reference", options.Reference, false, true, "<png file>");
-    this->DeclareOption(grp7, "ref-threshold", "", "Testing threshold", options.RefThreshold, true, true, "<threshold>");
-    this->DeclareOption(grp7, "interaction-test-record", "", "Path to an interaction log file to record interactions events to", options.InteractionTestRecordFile, false, true, "<file_path>");
-    this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", options.InteractionTestPlayFile, false, true,"<file_path>");
+    this->DeclareOption(grp7, "ref", "", "Reference", options.Reference, false, false, "<png file>");
+    this->DeclareOption(grp7, "ref-threshold", "", "Testing threshold", options.RefThreshold, true, false, "<threshold>");
+    this->DeclareOption(grp7, "interaction-test-record", "", "Path to an interaction log file to record interactions events to", options.InteractionTestRecordFile, false, false, "<file_path>");
+    this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", options.InteractionTestPlayFile, false, false,"<file_path>");
     // clang-format on
 
     cxxOptions.parse_positional({ "input" });

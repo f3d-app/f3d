@@ -14,8 +14,6 @@
 int F3DOffscreenRender::RenderOffScreen(
   vtkRenderWindow* renWin, const std::string& output, bool noBg)
 {
-  renWin->OffScreenRenderingOn();
-
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(renWin);
 
@@ -53,9 +51,6 @@ int F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::string
     }
     return EXIT_FAILURE;
   }
-
-  renWin->OffScreenRenderingOn();
-
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(renWin);
 
