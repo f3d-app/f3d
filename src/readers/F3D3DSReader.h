@@ -9,7 +9,9 @@
 
 #include "F3DReaderFactory.h"
 
+#ifndef F3D_NO_VTK
 #include <vtk3DSImporter.h>
+#endif
 
 class F3D3DSReader : public F3DReader
 {
@@ -35,6 +37,7 @@ public:
     return ext;
   }
 
+#ifndef F3D_NO_VTK
   /*
    * Create the scene reader (VTK importer) for the given filename
    */
@@ -44,6 +47,7 @@ public:
     importer->SetFileName(fileName.c_str());
     return importer;
   }
+#endif
 };
 
 #endif

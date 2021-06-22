@@ -9,7 +9,9 @@
 
 #include "F3DReaderFactory.h"
 
+#ifndef F3D_NO_VTK
 #include <vtkTIFFReader.h>
+#endif
 
 class F3DTIFFReader : public F3DReader
 {
@@ -35,6 +37,7 @@ public:
     return ext;
   }
 
+#ifndef F3D_NO_VTK
   /*
    * Create the geometry reader (VTK reader) for the given filename
    */
@@ -44,6 +47,7 @@ public:
     reader->SetFileName(fileName.c_str());
     return reader;
   }
+#endif
 };
 
 #endif

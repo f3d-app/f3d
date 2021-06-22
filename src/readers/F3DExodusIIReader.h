@@ -9,7 +9,9 @@
 
 #include "F3DReaderFactory.h"
 
+#ifndef F3D_NO_VTK
 #include <vtkExodusIIReader.h>
+#endif
 
 #include <regex>
 
@@ -46,6 +48,7 @@ public:
     return std::regex_search(fileName, exodusRegex);
   }
 
+#ifndef F3D_NO_VTK
   /*
    * Create the geometry reader (VTK reader) for the given filename
    */
@@ -58,6 +61,7 @@ public:
     reader->SetAllArrayStatus(vtkExodusIIReader::ELEM_BLOCK, 1);
     return reader;
   }
+#endif
 };
 
 #endif
