@@ -2,22 +2,15 @@
 #include "F3DLoader.h"
 #include "F3DException.h"
 
-#include "vtkF3DObjectFactory.h"
-
 int main(int argc, char** argv)
 {
-#if NDEBUG
-  vtkObject::GlobalWarningDisplayOff();
-#endif
-
   int res = EXIT_FAILURE;
 
   try
   {
-    // instanciate our own polydata mapper and output windows
-    vtkNew<vtkF3DObjectFactory> factory;
-    vtkObjectFactory::RegisterFactory(factory);
-    vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
+#if NDEBUG
+    vtkObject::GlobalWarningDisplayOff();
+#endif
 
     F3DLoader loader;
     res = loader.Start(argc, argv);

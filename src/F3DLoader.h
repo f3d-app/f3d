@@ -14,6 +14,7 @@
 #include "F3DAnimationManager.h"
 
 class vtkF3DRenderer;
+class vtkImageData;
 class vtkImporter;
 class F3DReaderInstantiator;
 struct F3DOptions;
@@ -40,7 +41,7 @@ public:
    * This will initialize the following members:
    * Parser, CommandLineOptions, AnimationManager, RenWin
    */
-  int Start(int argc, char** argv);
+  int Start(int argc, char** argv, vtkImageData* image = nullptr);
 
   /**
    * Add a list of files or directory to be loaded

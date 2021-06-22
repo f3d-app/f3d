@@ -9,6 +9,7 @@
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
+#include "vtkF3DObjectFactory.h"
 #include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCallbackCommand.h>
@@ -40,6 +41,11 @@ typedef struct ProgressDataStruct {
 //----------------------------------------------------------------------------
 F3DLoader::F3DLoader()
 {
+  // instanciate our own polydata mapper and output windows
+  vtkNew<vtkF3DObjectFactory> factory;
+  vtkObjectFactory::RegisterFactory(factory);
+  vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
+
   this->ReaderInstantiator = new F3DReaderInstantiator();
 }
 
@@ -50,7 +56,7 @@ F3DLoader::~F3DLoader()
 }
 
 //----------------------------------------------------------------------------
-int F3DLoader::Start(int argc, char** argv)
+int F3DLoader::Start(int argc, char** argv, vtkImageData* image)
 {
   std::vector<std::string> files;
 
@@ -105,7 +111,7 @@ int F3DLoader::Start(int argc, char** argv)
     style->AddObserver(F3DLoader::ToggleAnimationEvent, toggleAnimationCallback);
 
     // Offscreen rendering must be set before initializing interactor
-    if (!this->CommandLineOptions.Reference.empty() || !this->CommandLineOptions.Output.empty())
+    if (!this->CommandLineOptions.Reference.empty() || !this->CommandLineOptions.Output.empty() || image)
     {
       this->RenWin->OffScreenRenderingOn();
     }
@@ -196,6 +202,12 @@ int F3DLoader::Start(int argc, char** argv)
           F3DOffscreenRender::RenderOffScreen(this->RenWin, this->Options.Output, this->Options.NoBackground) ?
           EXIT_SUCCESS : EXIT_FAILURE;
       }
+    }
+    else if (image)
+    {
+      retVal =
+        F3DOffscreenRender::RenderToImage(this->RenWin, image, this->Options.NoBackground) ?
+        EXIT_SUCCESS : EXIT_FAILURE;
     }
     else
     {
@@ -305,7 +317,7 @@ bool F3DLoader::LoadFile(int load)
   {
     this->Options = this->Parser.GetOptionsFromConfigFile(filePath);
   }
-  
+
   F3DLog::SetQuiet(this->Options.Quiet);
 
   if (this->Options.Verbose || this->Options.NoRender)

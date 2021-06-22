@@ -9,9 +9,10 @@
 
 #include "F3DReader.h"
 
+#ifndef F3D_NO_VTK
 #include "vtkF3DOCCTReader.h"
-
 #include <vtksys/SystemTools.hxx>
+#endif
 
 class F3DOpenCascadeReader : public F3DReader
 {
@@ -37,6 +38,7 @@ public:
     return ext;
   }
 
+#ifndef F3D_NO_VTK
   /*
    * Create the geometry reader (VTK reader) for the given filename
    */
@@ -54,6 +56,7 @@ public:
     reader->SetFileFormat((ext == ".stp" || ext == ".step") ? ff::STEP : ff::IGES);
     return reader;
   }
+#endif
 };
 
 #endif

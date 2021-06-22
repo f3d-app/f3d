@@ -1,5 +1,17 @@
 # F3D Installation
 
+# F3D
+install(TARGETS libf3d f3d
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  BUNDLE DESTINATION ".")
+
+# F3DShellExtension for Windows
+if (BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
+  install(TARGETS F3DShellExtension
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    BUNDLE DESTINATION ".")
+endif()
+
 # Documentation
 set(F3D_DOC_DIR ".")
 
