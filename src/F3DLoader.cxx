@@ -4,19 +4,18 @@
 #include "F3DNSDelegate.h"
 #include "F3DOffscreenRender.h"
 #include "F3DOptions.h"
+#include "F3DReaderFactory.h"
+#include "F3DReaderInstantiator.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRendererWithColoring.h"
 
-#include <vtk3DSImporter.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
 #include <vtkDoubleArray.h>
-#include <vtkGLTFImporter.h>
 #include <vtkImageData.h>
 #include <vtkNew.h>
-#include <vtkOBJImporter.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProgressBarRepresentation.h>
@@ -25,7 +24,6 @@
 #include <vtkScalarBarActor.h>
 #include <vtkStringArray.h>
 #include <vtkTimerLog.h>
-#include <vtkVRMLImporter.h>
 #include <vtkVersion.h>
 #include <vtksys/Directory.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -40,10 +38,16 @@ typedef struct ProgressDataStruct {
 } ProgressDataStruct;
 
 //----------------------------------------------------------------------------
-F3DLoader::F3DLoader() = default;
+F3DLoader::F3DLoader()
+{
+  this->ReaderInstantiator = new F3DReaderInstantiator();
+}
 
 //----------------------------------------------------------------------------
-F3DLoader::~F3DLoader() = default;
+F3DLoader::~F3DLoader()
+{
+  delete this->ReaderInstantiator;
+}
 
 //----------------------------------------------------------------------------
 int F3DLoader::Start(int argc, char** argv)
@@ -513,15 +517,15 @@ bool F3DLoader::LoadFile(int load)
       if (this->Options.Verbose)
       {
         double* position = cam->GetPosition();
-        F3DLog::Print(F3DLog::Severity::Info, "Camera position is : ", position[0], ", ", position[1],
+        F3DLog::Print(F3DLog::Severity::Info, "Camera position is: ", position[0], ", ", position[1],
           ", ", position[2], ".");
         double* focalPoint = cam->GetFocalPoint();
-        F3DLog::Print(F3DLog::Severity::Info, "Camera focal point is : ", focalPoint[0], ", ",
+        F3DLog::Print(F3DLog::Severity::Info, "Camera focal point is: ", focalPoint[0], ", ",
           focalPoint[1], ", ", focalPoint[2], ".");
         double* viewUp = cam->GetViewUp();
-        F3DLog::Print(F3DLog::Severity::Info, "Camera view up is : ", viewUp[0], ", ", viewUp[1], ", ",
+        F3DLog::Print(F3DLog::Severity::Info, "Camera view up is: ", viewUp[0], ", ", viewUp[1], ", ",
           viewUp[2], ".");
-        F3DLog::Print(F3DLog::Severity::Info, "Camera view angle is : ", cam->GetViewAngle(), ".\n");
+        F3DLog::Print(F3DLog::Severity::Info, "Camera view angle is: ", cam->GetViewAngle(), ".\n");
       }
     }
 
@@ -532,72 +536,29 @@ bool F3DLoader::LoadFile(int load)
 
 //----------------------------------------------------------------------------
 vtkSmartPointer<vtkImporter> F3DLoader::GetImporter(
-  const F3DOptions& options, const std::string& file)
+  const F3DOptions& options, const std::string& fileName)
 {
   if (!options.GeometryOnly)
   {
-    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(file);
-    ext = vtksys::SystemTools::LowerCase(ext);
-
-    if (ext == ".3ds")
+    // Try to find the first compatible reader with scene reading capabilities
+    F3DReader* reader = F3DReaderFactory::GetReader(fileName);
+    if (reader)
     {
-      vtkNew<vtk3DSImporter> importer;
-      importer->SetFileName(file.c_str());
-      importer->ComputeNormalsOn();
-      return importer;
-    }
-
-    if (ext == ".obj")
-    {
-      vtkNew<vtkOBJImporter> importer;
-      importer->SetFileName(file.c_str());
-
-      std::string path = vtksys::SystemTools::GetFilenamePath(file);
-      importer->SetTexturePath(path.c_str());
-
-#if VTK_VERSION_NUMBER <= VTK_VERSION_CHECK(9, 0, 20201129)
-      // This logic is partially implemented in the OBJ importer itself
-      // This has been backported in VTK 9.1
-      std::string mtlFile = file + ".mtl";
-      if (vtksys::SystemTools::FileExists(mtlFile))
+      vtkSmartPointer<vtkImporter> importer = reader->CreateSceneReader(fileName);
+      if (importer)
       {
-        importer->SetFileNameMTL(mtlFile.c_str());
+        return importer;
       }
-      else
-      {
-        mtlFile = path + "/" + vtksys::SystemTools::GetFilenameWithoutLastExtension(file) + ".mtl";
-        if (vtksys::SystemTools::FileExists(mtlFile))
-        {
-          importer->SetFileNameMTL(mtlFile.c_str());
-        }
-      }
-#endif
-      return importer;
-    }
-
-    if (ext == ".wrl")
-    {
-      vtkNew<vtkVRMLImporter> importer;
-      importer->SetFileName(file.c_str());
-      return importer;
-    }
-
-    if (ext == ".gltf" || ext == ".glb")
-    {
-      vtkNew<vtkGLTFImporter> importer;
-      importer->SetFileName(file.c_str());
-      return importer;
     }
   }
 
+  // Use the generic importer and check if it can process the file
   vtkNew<vtkF3DGenericImporter> importer;
-  importer->SetFileName(file.c_str());
+  importer->SetFileName(fileName.c_str());
   importer->SetOptions(options);
-
   if (!importer->CanReadFile())
   {
     return nullptr;
   }
-
   return importer;
 }
