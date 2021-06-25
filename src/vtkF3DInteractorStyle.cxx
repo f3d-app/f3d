@@ -42,9 +42,8 @@ void vtkF3DInteractorStyle::OnKeyPress()
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
   vtkF3DRendererWithColoring* renWithColor = vtkF3DRendererWithColoring::SafeDownCast(ren);
 
-  switch (rwi->GetKeyCode())
+  switch (std::toupper(rwi->GetKeyCode()))
   {
-    case 'c':
     case 'C':
       if (renWithColor)
       {
@@ -52,7 +51,6 @@ void vtkF3DInteractorStyle::OnKeyPress()
         renWin->Render();
       }
       break;
-    case 's':
     case 'S':
       if (renWithColor)
       {
@@ -60,7 +58,6 @@ void vtkF3DInteractorStyle::OnKeyPress()
         renWin->Render();
       }
       break;
-    case 'y':
     case 'Y':
       if (renWithColor)
       {
@@ -68,7 +65,6 @@ void vtkF3DInteractorStyle::OnKeyPress()
         renWin->Render();
       }
       break;
-    case 'b':
     case 'B':
       if (renWithColor)
       {
@@ -81,47 +77,38 @@ void vtkF3DInteractorStyle::OnKeyPress()
       ren->SetUseDepthPeelingPass(!ren->UsingDepthPeelingPass());
       renWin->Render();
       break;
-    case 'q':
     case 'Q':
       ren->SetUseSSAOPass(!ren->UsingSSAOPass());
       renWin->Render();
       break;
-    case 'a':
     case 'A':
       ren->SetUseFXAAPass(!ren->UsingFXAAPass());
       renWin->Render();
       break;
-    case 't':
     case 'T':
       ren->SetUseToneMappingPass(!ren->UsingToneMappingPass());
       renWin->Render();
       break;
-    case 'e':
     case 'E':
       ren->ShowEdge(!ren->IsEdgeVisible());
       renWin->Render();
       break;
-    case 'x':
     case 'X':
       ren->ShowAxis(!ren->IsAxisVisible());
       renWin->Render();
       break;
-    case 'g':
     case 'G':
       ren->ShowGrid(!ren->IsGridVisible());
       renWin->Render();
       break;
-    case 'n':
     case 'N':
       ren->ShowFilename(!ren->IsFilenameVisible());
       renWin->Render();
       break;
-    case 'm':
     case 'M':
       ren->ShowMetaData(!ren->IsMetaDataVisible());
       renWin->Render();
       break;
-    case 'z':
     case 'Z':
       ren->ShowTimer(!ren->IsTimerVisible());
       renWin->Render();
@@ -132,17 +119,14 @@ void vtkF3DInteractorStyle::OnKeyPress()
         renWin->Render();
       }
       break;
-    case 'r':
     case 'R':
       ren->SetUseRaytracing(!ren->UsingRaytracing());
       renWin->Render();
       break;
-    case 'd':
     case 'D':
       ren->SetUseRaytracingDenoiser(!ren->UsingRaytracingDenoiser());
       renWin->Render();
       break;
-    case 'v':
     case 'V':
       if (renWithColor)
       {
@@ -150,7 +134,6 @@ void vtkF3DInteractorStyle::OnKeyPress()
         renWin->Render();
       }
       break;
-    case 'i':
     case 'I':
       if (renWithColor)
       {
@@ -158,7 +141,6 @@ void vtkF3DInteractorStyle::OnKeyPress()
         renWin->Render();
       }
       break;
-    case 'o':
     case 'O':
       if (renWithColor)
       {
@@ -166,7 +148,6 @@ void vtkF3DInteractorStyle::OnKeyPress()
         renWin->Render();
       }
       break;
-    case 'f':
     case 'F':
       if (!renWin->GetFullScreen())
       {
@@ -196,17 +177,14 @@ void vtkF3DInteractorStyle::OnKeyPress()
 
       renWin->Render();
       break;
-    case 'u':
     case 'U':
       ren->SetUseBlurBackground(!ren->UsingBlurBackground());
       renWin->Render();
       break;
-    case 'k':
     case 'K':
       ren->SetUseTrackball(!ren->UsingTrackball());
       renWin->Render();
       break;
-    case 'h':
     case 'H':
       ren->ShowCheatSheet(!ren->IsCheatSheetVisible());
       renWin->Render();
@@ -216,6 +194,11 @@ void vtkF3DInteractorStyle::OnKeyPress()
       break;
     default:
       std::string keySym = rwi->GetKeySym();
+      if (keySym.length() > 0)
+      {
+        // Make sure key symbols starts with an upper char (e.g. "space")
+        keySym[0] = std::toupper(keySym[0]);
+      }
       if (keySym == "Left")
       {
         int load = F3DLoader::LOAD_PREVIOUS;
@@ -244,7 +227,7 @@ void vtkF3DInteractorStyle::OnKeyPress()
         ren->ResetCamera();
         renWin->Render();
       }
-      else if (keySym == "space")
+      else if (keySym == "Space")
       {
         this->InvokeEvent(F3DLoader::ToggleAnimationEvent);
         renWin->Render();

@@ -2,6 +2,7 @@
 
 #include "F3DLog.h"
 #include "F3DException.h"
+#include "F3DReaderFactory.h"
 
 #include <vtk_jsoncpp.h>
 #include <vtksys/SystemTools.hxx>
@@ -9,6 +10,8 @@
 
 #include <fstream>
 #include <regex>
+#include <sstream>
+#include <utility>
 #include <vector>
 
 #include "cxxopts.hpp"
@@ -151,6 +154,12 @@ protected:
   static std::string GetSystemSettingsDirectory();
   static std::string GetUserSettingsDirectory();
 
+  void PrintKeyHelp(const std::string& key, const std::string& help);
+  void PrintHelp(cxxopts::Options& cxxOptions);
+  void PrintVersion();
+  void PrintReadersList();
+  void PrintExtensionsList();
+
 private:
   int Argc;
   char** Argv;
@@ -177,6 +186,8 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp1, "no-background", "", "No background when render to file", options.NoBackground);
     this->DeclareOption(grp1, "help", "h", "Print help");
     this->DeclareOption(grp1, "version", "", "Print version details");
+    this->DeclareOption(grp1, "readers-list", "", "Print the list of file types");
+    this->DeclareOption(grp1, "extensions-list", "", "Print the list of supported extensions");
     this->DeclareOption(grp1, "verbose", "", "Enable verbose mode", options.Verbose);
     this->DeclareOption(grp1, "no-render", "", "Verbose mode without any rendering, only for the first file", options.NoRender);
     this->DeclareOption(grp1, "axis", "x", "Show axes", options.Axis);
@@ -233,7 +244,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grpCamera, "camera-position", "", "Camera position", options.CameraPosition, false, true, "<X,Y,Z>");
     this->DeclareOption(grpCamera, "camera-focal-point", "", "Camera focal point", options.CameraFocalPoint, false, true, "<X,Y,Z>");
     this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", options.CameraViewUp, false, true, "<X,Y,Z>");
-    this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degress)", options.CameraViewAngle, false, true, "<angle>");
+    this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degrees)", options.CameraViewAngle, false, true, "<angle>");
 
 #if F3D_MODULE_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
@@ -262,81 +273,25 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
 
     if (result.count("help") > 0)
     {
-      F3DLog::Print(F3DLog::Severity::Info, cxxOptions.help());
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Keys:\n"
-        " C         Cycle point/cell data coloring\n"
-        " S         Cycle array to color with\n"
-        " Y         Cycle array component to color with\n"
-        " B         Toggle the scalar bar display\n"
-        " V         Toggle volume rendering\n"
-        " I         Toggle inverse volume opacity\n"
-        " O         Toggle point sprites rendering\n"
-        " P         Toggle depth peeling\n"
-        " Q         Toggle SSAO\n"
-        " A         Toggle FXAA\n"
-        " T         Toggle tone mapping\n"
-        " E         Toggle the edges display\n"
-        " X         Toggle the axes display\n"
-        " G         Toggle the grid display\n"
-        " N         Toggle the filename display\n"
-        " M         Toggle the metadata display\n"
-        " Z         Toggle the FPS counter display\n"
-        " R         Toggle raytracing rendering\n"
-        " D         Toggle denoising when raytracing\n"
-        " F         Toggle full screen\n"
-        " U         Toggle blur background\n"
-        " K         Toggle trackball interaction\n"
-        " H         Toggle Cheat sheet display\n"
-        " ?         Dump camera state to the terminal\n"
-        " ESC       Quit\n"
-        " ENTER     Reset camera to initial parameters\n"
-        " SPACE     Play animation if any\n"
-        " LEFT      Previous file\n"
-        " RIGHT     Next file\n"
-        " UP        Reload current file\n"
-        );
+      this->PrintHelp(cxxOptions);
       throw F3DExNoProcess();
     }
 
     if (result.count("version") > 0)
     {
-      std::string version = f3d::AppTitle;
-      version += "\nVersion: ";
-      version += f3d::AppVersion;
-      version += "\nBuild date: ";
-      version += f3d::AppBuildDate;
-      version += "\nSystem: ";
-      version += f3d::AppBuildSystem;
-      version += "\nCompiler: ";
-      version += f3d::AppCompiler;
-      version += "\nRayTracing module: ";
-#if F3D_MODULE_RAYTRACING
-      version += "ON";
-#else
-      version += "OFF";
-#endif
-      version += "\nExodus module: ";
-#if F3D_MODULE_EXODUS
-      version += "ON";
-#else
-      version += "OFF";
-#endif
-      version += "\nCAD module: ";
-#if F3D_MODULE_OCCT
-#if F3D_MODULE_OCCT_XCAF
-      version += "ON (full support)";
-#else
-      version += "ON (no metadata)";
-#endif
-#else
-      version += "OFF";
-#endif
-      version += "\nVTK version: ";
-      version += std::string(VTK_VERSION) + std::string(" (build ") + std::to_string(VTK_BUILD_VERSION) + std::string(")");
-      version += "\nAuthor: Kitware SAS";
+      this->PrintVersion();
+      throw F3DExNoProcess();
+    }
 
-      F3DLog::Print(F3DLog::Severity::Info, version);
+    if (result.count("readers-list") > 0)
+    {
+      this->PrintReadersList();
+      throw F3DExNoProcess();
+    }
+
+    if (result.count("extensions-list") > 0)
+    {
+      this->PrintExtensionsList();
       throw F3DExNoProcess();
     }
   }
@@ -346,6 +301,191 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     throw;
   }
   return options;
+}
+
+
+//----------------------------------------------------------------------------
+void ConfigurationOptions::PrintKeyHelp(const std::string& key, const std::string& help)
+{
+  std::stringstream ss;
+  ss << "  " << std::left << std::setw(6) << key << " " << std::setw(70) << help;
+  F3DLog::Print(F3DLog::Severity::Info, ss.str());
+}
+
+//----------------------------------------------------------------------------
+void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
+{
+  const std::vector<std::pair<std::string, std::string> > keys =
+  {
+    { "C", "Cycle point/cell data coloring" },
+    { "S", "Cycle array to color with" },
+    { "Y", "Cycle array component to color with" },
+    { "B", "Toggle the scalar bar display" },
+    { "V", "Toggle volume rendering" },
+    { "I", "Toggle inverse volume opacity" },
+    { "O", "Toggle point sprites rendering" },
+    { "P", "Toggle depth peeling" },
+    { "Q", "Toggle SSAO" },
+    { "A", "Toggle FXAA" },
+    { "T", "Toggle tone mapping" },
+    { "E", "Toggle the edges display" },
+    { "X", "Toggle the axes display" },
+    { "G", "Toggle the grid display" },
+    { "N", "Toggle the filename display" },
+    { "M", "Toggle the metadata display" },
+    { "Z", "Toggle the FPS counter display" },
+    { "R", "Toggle raytracing rendering" },
+    { "D", "Toggle denoising when raytracing" },
+    { "F", "Toggle full screen" },
+    { "U", "Toggle blur background" },
+    { "K", "Toggle trackball interaction" },
+    { "H", "Toggle cheat sheet display" },
+    { "?", "Dump camera state to the terminal" },
+    { "Escape", "Quit" },
+    { "Enter", "Reset camera to initial parameters" },
+    { "Space", "Play animation if any" },
+    { "Left", "Previous file" },
+    { "Right", "Next file" },
+    { "Up", "Reload current file" }
+  };
+
+  F3DLog::Print(F3DLog::Severity::Info, cxxOptions.help());
+  F3DLog::Print(F3DLog::Severity::Info, " Keys:");
+  for (const auto& key : keys)
+  {
+    this->PrintKeyHelp(key.first, key.second);
+  }
+}
+
+//----------------------------------------------------------------------------
+void ConfigurationOptions::PrintVersion()
+{
+  std::string version = f3d::AppTitle;
+  version += "\nVersion: ";
+  version += f3d::AppVersion;
+  version += "\nBuild date: ";
+  version += f3d::AppBuildDate;
+  version += "\nSystem: ";
+  version += f3d::AppBuildSystem;
+  version += "\nCompiler: ";
+  version += f3d::AppCompiler;
+  version += "\nRayTracing module: ";
+#if F3D_MODULE_RAYTRACING
+  version += "ON";
+#else
+  version += "OFF";
+#endif
+  version += "\nExodus module: ";
+#if F3D_MODULE_EXODUS
+  version += "ON";
+#else
+  version += "OFF";
+#endif
+  version += "\nCAD module: ";
+#if F3D_MODULE_OCCT
+#if F3D_MODULE_OCCT_XCAF
+  version += "ON (full support)";
+#else
+  version += "ON (no metadata)";
+#endif
+#else
+  version += "OFF";
+#endif
+  version += "\nVTK version: ";
+  version += std::string(VTK_VERSION) + std::string(" (build ") +
+    std::to_string(VTK_BUILD_VERSION) + std::string(")");
+  version += "\nAuthor: Kitware SAS";
+
+  F3DLog::Print(F3DLog::Severity::Info, version);
+}
+
+//----------------------------------------------------------------------------
+void ConfigurationOptions::PrintReadersList()
+{
+  size_t nameColSize = 0;
+  size_t extsColSize = 0;
+  size_t descColSize = 0;
+
+  const auto& readers = F3DReaderFactory::GetInstance()->GetReaders();
+  if (readers.empty())
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, "No registered reader found!");
+    return;
+  }
+  // Compute the size of the 3 columns
+  for (const auto& reader : readers)
+  {
+    nameColSize = std::max(nameColSize, reader->GetName().length());
+    descColSize = std::max(descColSize, reader->GetLongDescription().length());
+    auto exts = reader->GetExtensions();
+    size_t extLen = 0;
+    int cnt = 0;
+    for (const auto& ext : exts)
+    {
+      if (cnt++ > 0)
+      {
+        extLen++;
+      }
+      extLen += ext.length();
+    }
+    extsColSize = std::max(extsColSize, extLen);
+  }
+  nameColSize++;
+  extsColSize++;
+  descColSize++;
+
+  // Print the rows split in 3 columns
+  std::stringstream headerLine;
+  headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(extsColSize)
+             << "Extensions" << std::setw(descColSize) << "Description";
+  F3DLog::Print(F3DLog::Severity::Info, headerLine.str());
+  F3DLog::Print(F3DLog::Severity::Info, std::string(nameColSize + extsColSize + descColSize, '-'));
+
+  for (const auto& reader : readers)
+  {
+    std::stringstream readerLine;
+    readerLine << std::left << std::setw(nameColSize) << reader->GetName()
+               << std::setw(extsColSize);
+    auto exts = reader->GetExtensions();
+    unsigned int cnt = 0;
+    std::string extLine;
+    for (const auto& ext : exts)
+    {
+      if (cnt++ > 0)
+      {
+        extLine += ";";
+      }
+      extLine += ext;
+    }
+    readerLine << extLine << std::setw(descColSize) << reader->GetLongDescription();
+    F3DLog::Print(F3DLog::Severity::Info, readerLine.str());
+  }
+}
+
+//----------------------------------------------------------------------------
+void ConfigurationOptions::PrintExtensionsList()
+{
+  const auto& readers = F3DReaderFactory::GetInstance()->GetReaders();
+  if (readers.size() == 0)
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, "No registered reader found!");
+    return;
+  }
+  std::stringstream extList;
+  unsigned int cnt = 0;
+  for (const auto& reader : readers)
+  {
+    auto exts = reader->GetExtensions();
+    for (const auto& ext : exts)
+    {
+      if (cnt++ > 0)
+      {
+        extList << ";";
+      }
+      extList << ext;
+    }
+  }
+  F3DLog::Print(F3DLog::Severity::Info, extList.str());
 }
 
 //----------------------------------------------------------------------------
