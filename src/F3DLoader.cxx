@@ -127,8 +127,7 @@ int F3DLoader::Start(int argc, char** argv)
   }
 
   this->AddFiles(files);
-  this->LoadFile();
-
+  bool loaded = this->LoadFile();
   int retVal = EXIT_SUCCESS;
 
   // Actual Options been parsed in LoadFile so use them
@@ -163,16 +162,35 @@ int F3DLoader::Start(int argc, char** argv)
     if (interactor->GetDone())
     {
       F3DLog::Print(F3DLog::Severity::Warning, "Interactor has been stopped, no rendering performed");
+      retVal = EXIT_FAILURE;
     }
     else if (!this->Options.Reference.empty())
     {
-      retVal =
-        F3DOffscreenRender::RenderTesting(this->RenWin, this->Options.Reference, this->Options.RefThreshold, this->Options.Output);
+      if (!loaded)
+      {
+        F3DLog::Print(F3DLog::Severity::Warning, "No file loaded, no rendering performed");
+        retVal = EXIT_FAILURE;
+      }
+      else
+      {
+        retVal =
+          F3DOffscreenRender::RenderTesting(this->RenWin, this->Options.Reference, this->Options.RefThreshold, this->Options.Output) ?
+          EXIT_SUCCESS : EXIT_FAILURE;
+      }
     }
     else if (!this->Options.Output.empty())
     {
-      retVal =
-        F3DOffscreenRender::RenderOffScreen(this->RenWin, this->Options.Output, this->Options.NoBackground);
+      if (!loaded)
+      {
+        F3DLog::Print(F3DLog::Severity::Warning, "No file loaded, no rendering performed");
+        retVal = EXIT_FAILURE;
+      }
+      else
+      {
+        retVal =
+          F3DOffscreenRender::RenderOffScreen(this->RenWin, this->Options.Output, this->Options.NoBackground) ?
+          EXIT_SUCCESS : EXIT_FAILURE;
+      }
     }
     else
     {
@@ -242,7 +260,8 @@ void F3DLoader::AddFile(const std::string& path, bool recursive)
 }
 
 //----------------------------------------------------------------------------
-void F3DLoader::LoadFile(int load)
+// TODO this method is long and complex, this should be improved
+bool F3DLoader::LoadFile(int load)
 {
   // Prevent the animation manager from playing
   this->AnimationManager.Finalize();
@@ -266,7 +285,7 @@ void F3DLoader::LoadFile(int load)
     if (this->CurrentFileIndex >= size)
     {
       F3DLog::Print(F3DLog::Severity::Error, "Cannot load file index ", this->CurrentFileIndex);
-      return;
+      return false;
     }
     filePath = this->FilesList[this->CurrentFileIndex];
     fileInfo = "(" + std::to_string(this->CurrentFileIndex + 1) + "/" + std::to_string(size) +
@@ -300,6 +319,7 @@ void F3DLoader::LoadFile(int load)
     this->RenWin->SetFullScreen(this->Options.FullScreen);
   }
 
+  bool loaded = false;
   if (filePath.empty())
   {
     if (!this->Options.NoRender)
@@ -311,7 +331,7 @@ void F3DLoader::LoadFile(int load)
       this->Renderer->Initialize(this->Options, fileInfo);
       this->Renderer->ShowOptions();
     }
-    return;
+    return loaded;
   }
 
   this->Importer = this->GetImporter(this->Options, filePath);
@@ -335,7 +355,11 @@ void F3DLoader::LoadFile(int load)
       this->Renderer->Initialize(this->Options, fileInfo);
       this->Renderer->ShowOptions();
     }
-    return;
+    return loaded;
+  }
+  else
+  {
+    loaded = true;
   }
 
   if (!this->Options.NoRender)
@@ -503,6 +527,7 @@ void F3DLoader::LoadFile(int load)
 
     this->Renderer->InitializeCamera();
   }
+  return loaded;
 }
 
 //----------------------------------------------------------------------------

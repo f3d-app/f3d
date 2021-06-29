@@ -3,6 +3,7 @@ docs:
     overview: index.html
     installation_and_build: installation_and_build.html
     configuration_file: configuration_file.html
+    thumbnailer: thumbnailer.html
   miscellaneous:
     limitations: limitations.html
     troubleshooting: troubleshooting.html

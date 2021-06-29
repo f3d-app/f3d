@@ -28,11 +28,12 @@ Alternatively, you can build it yourself following the build guide below.
 
 # How to use
 
-There are 3 main ways to use F3D:
+There are 4 main ways to use F3D:
 
 * By running F3D from a terminal with a set of command-line options.
 * By running F3D directly and then dragging and dropping files into it to open them.
 * By using F3D as an "Open with" program with specific file types.
+* As a [thumbnailer](#Thumbnailer) for all supported file formats with certain file managers.
 
 # Build
 
@@ -334,6 +335,14 @@ They are considered in the below order and only the first found will be used.
 If you are using the releases, a default configuration file is provided when installing F3D.
 On Linux, it will be installed in `/etc/f3d/`, on Windows, it will be installed in the install directory, on macOS, it will be installed in the bundle.
 
+# Thumbnailer
+
+F3D can be used as a thumbnailer in certain cases
+
+## Linux
+
+During instalation, F3D will install mime types files as defined by the [XDG standard](https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-latest.html) and a thumbnailer file as specified [here](https://wiki.archlinux.org/title/File_manager_functionality#Thumbnail_previews). Many file managers use this mechanism, including nautilus, thunar, pcmanfm and caja. Make sure to update the mime types database using [update-mime-database](https://linux.die.net/man/1/update-mime-database).
+
 # Known limitations
 
 * No categorical generic field data rendering support.
@@ -353,16 +362,26 @@ On Linux, it will be installed in `/etc/f3d/`, on Windows, it will be installed 
 
 Be sure that VTK has been built with *OpenImageDenoise* support (`VTKOSPRAY_ENABLE_DENOISER` option).
 
+## Linux
+> Thumbnails are not working in my file manager.
+
+ * Check that your file manager supports the thumbnailer mechanism.
+ * Check that you have updated your mime type database.
+ * If all fails, remove your .cache user dir and check that pcmanfm thumbnails are working.
+  * If they are working, then it is an issue specific to your file manager.
+  * If only a few format have working thumbnails, then it is an issue with mime types
+  * If no formats have working thumbnails, then it is an issue with the f3d.thumbnailer file
+
 ## Windows
 > I use F3D in a VM, the application fails to launch.
 
 OpenGL applications like F3D can have issues when launched from a guest Windows because the access to the GPU is restricted.
 You can try to use a software implementation of OpenGL, called [Mesa](https://github.com/pal1000/mesa-dist-win/releases).
- * Download the latest `release-msvc`
+ * Download the latest `release-msvc`.
  * copy `x64/OpenGL32.dll` and `x64/libglapi.dll` in the same folder as `f3d.exe`.
- * set the environment variable `MESA_GL_VERSION_OVERRIDE` to 4.5
- * run `f3d.exe`
+ * set the environment variable `MESA_GL_VERSION_OVERRIDE` to 4.5.
+ * run `f3d.exe`.
 
-> I run f3d from the command prompt and my Unicode characters are not displayed properly
+> I run f3d from the command prompt and my Unicode characters are not displayed properly.
 
 Set the codepage to UTF-8, run `chcp 65001`.
