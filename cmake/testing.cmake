@@ -170,8 +170,12 @@ f3d_test(TestTIFF logo.tif "300,300" "-sy --up=-Y")
 f3d_test(TestUTF8 "(ノಠ益ಠ )ノ.vtp" "300,300")
 f3d_test(TestGenericImporterAnimation small.ex2 "300,300")
 f3d_test(TestAnimationIndex InterpolationTest.glb "300,300" "--animation-index=7")
+
 f3d_test(TestNonExistentFile nonExistentFile.vtp "300,300" "--filename")
+set_tests_properties(TestNonExistentFile PROPERTIES WILL_FAIL TRUE)
+
 f3d_test(TestUnsupportedFile unsupportedFile.dummy "300,300" "--filename")
+set_tests_properties(TestUnsupportedFile PROPERTIES WILL_FAIL TRUE)
 
 # Tests that do not work with VTK 9.0.1 and have been
 # fixed prior to the date based versionning system
@@ -274,6 +278,9 @@ set_tests_properties(TestOutput PROPERTIES FIXTURES_SETUP OUTPUT_TEST)
 
 f3d_test_no_baseline(TestOutputOutput cow.vtp "300,300" "--ref=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutput.png")
 set_tests_properties(TestOutputOutput PROPERTIES FIXTURES_REQUIRED OUTPUT_TEST)
+
+f3d_test_no_baseline(TestUnsupportedInputOutput unsupportedFile.dummy "300,300")
+set_tests_properties(TestUnsupportedInputOutput PROPERTIES PASS_REGULAR_EXPRESSION "No file loaded, no rendering performed")
 
 # No background option cannot be tested with reference
 f3d_test_no_baseline(TestOutputNoBackground cow.vtp "300,300" "--no-background")
@@ -385,7 +392,7 @@ f3d_test(TestNoRef cow.vtp "300,300")
 set_tests_properties(TestNoRef PROPERTIES WILL_FAIL TRUE)
 
 # Test failure without a reference and  without an output, please do not create a TestNoRef.png file
-add_test(NAME TestNoRefNoOutput COMMAND $<TARGET_FILE:f3d> --dry-run --resolution=300,300 --ref ${CMAKE_SOURCE_DIR}/data/baselines/TestNoRef.png ${CMAKE_SOURCE_DIR}/data/baselines/cow.vtp)
+add_test(NAME TestNoRefNoOutput COMMAND $<TARGET_FILE:f3d> --dry-run --resolution=300,300 --ref ${CMAKE_SOURCE_DIR}/data/baselines/TestNoRef.png ${CMAKE_SOURCE_DIR}/data/testing/cow.vtp)
 set_tests_properties(TestNoRefNoOutput PROPERTIES PASS_REGULAR_EXPRESSION "Reference image does not exists, use the --output option to output current rendering into an image file.")
 set_tests_properties(TestNoRefNoOutput PROPERTIES TIMEOUT 10)
 
@@ -393,7 +400,7 @@ set_tests_properties(TestNoRefNoOutput PROPERTIES TIMEOUT 10)
 f3d_test(TestBadRef cow.vtp "300,300")
 set_tests_properties(TestBadRef PROPERTIES WILL_FAIL TRUE)
 
-# Test failure with a bed reference without an output, please do not create a good TestBadRef.png file
-add_test(NAME TestBadRefNoOutput COMMAND $<TARGET_FILE:f3d> --dry-run --resolution=300,300 --ref ${CMAKE_SOURCE_DIR}/data/baselines/TestBadRef.png ${CMAKE_SOURCE_DIR}/data/baselines/cow.vtp)
+# Test failure with a bad reference without an output, please do not create a good TestBadRef.png file
+add_test(NAME TestBadRefNoOutput COMMAND $<TARGET_FILE:f3d> --dry-run --resolution=300,300 --ref ${CMAKE_SOURCE_DIR}/data/baselines/TestBadRef.png ${CMAKE_SOURCE_DIR}/data/testing/cow.vtp)
 set_tests_properties(TestBadRefNoOutput PROPERTIES PASS_REGULAR_EXPRESSION "Use the --output option to be able to output current rendering and diff images into files.")
 set_tests_properties(TestBadRefNoOutput PROPERTIES TIMEOUT 10)

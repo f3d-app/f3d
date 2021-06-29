@@ -55,11 +55,12 @@ public:
 
   /**
    * Load a file if any have been added
-   * Set the load arguement to LOAD_PREVIOUS or LOAD_NEXT to change file index
+   * Set the load argument to LOAD_PREVIOUS or LOAD_NEXT to change file index
    * This will initialize the following members:
    * Options, Renderer, Importer
+   * Returns true if file is loaded sucessfully, false otherwise
    */
-  void LoadFile(int load = F3DLoader::LOAD_CURRENT);
+  bool LoadFile(int load = F3DLoader::LOAD_CURRENT);
 
   F3DLoader();
   ~F3DLoader();

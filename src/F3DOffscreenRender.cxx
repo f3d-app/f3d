@@ -11,7 +11,7 @@
 #include "F3DLog.h"
 
 //----------------------------------------------------------------------------
-int F3DOffscreenRender::RenderOffScreen(
+bool F3DOffscreenRender::RenderOffScreen(
   vtkRenderWindow* renWin, const std::string& output, bool noBg)
 {
   vtkNew<vtkWindowToImageFilter> rtW2if;
@@ -28,11 +28,11 @@ int F3DOffscreenRender::RenderOffScreen(
   writer->SetFileName(fullPath.c_str());
   writer->Write();
 
-  return EXIT_SUCCESS;
+  return true;
 }
 
 //----------------------------------------------------------------------------
-int F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::string& reference,
+bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::string& reference,
   double threshold, const std::string& output)
 {
   if (!vtksys::SystemTools::FileExists(reference))
@@ -49,7 +49,7 @@ int F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::string
       F3DLog::Print(F3DLog::Severity::Error,
         "Reference file does not exists, current rendering has been outputted to ", output, ".");
     }
-    return EXIT_FAILURE;
+    return false;
   }
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(renWin);
@@ -91,7 +91,7 @@ int F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::string
       F3DLog::Print(F3DLog::Severity::Error,
         "Current rendering and diff images have been outputted in ", output, " and ", diffFileName);
     }
-    return EXIT_FAILURE;
+    return false;
   }
-  return EXIT_SUCCESS;
+  return true;
 }
