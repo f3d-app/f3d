@@ -113,6 +113,15 @@ if(UNIX AND NOT APPLE)
     "F3D_INSTALL_DEFAULT_CONFIGURATION_FILE" OFF)
   mark_as_advanced(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
 endif()
+
+if(UNIX AND NOT APPLE)
+  option(F3D_INSTALL_THUMBNAILER_FILES "Install thumbnailer files" OFF)
+  mark_as_advanced(F3D_INSTALL_THUMBNAILER_FILES)
+
+  option(F3D_INSTALL_MIME_TYPES_FILE "Install mime types files" OFF)
+  mark_as_advanced(F3D_INSTALL_MIME_TYPES_FILE)
+endif()
+
 include(cmake/installing.cmake)
 
 # packaging

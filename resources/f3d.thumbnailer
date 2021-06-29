@@ -1,0 +1,6 @@
+[Thumbnailer Entry]
+Type=X-Thumbnailer
+Name=f3d Thumbnailer
+TryExec=f3d
+Exec=f3d --dry-run -sta --no-background --output=%o --resolution=%s,%s %i
+MimeType=application/gml+xml;application/dicom;model/vrml;model/obj;model/gltf-binary;model/gltf+json;application/vnd.vtk;application/vnd.vtp;application/vnd.vtu;application/vnd.vtr;application/vnd.vti;application/vnd.vts;application/vnd.vtm;application/vnd.ply;application/vnd.nrrd;application/vnd.mhd;application/vnd.exodus;application/vnd.pts;
