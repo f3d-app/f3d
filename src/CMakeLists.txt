@@ -15,7 +15,7 @@ if(WIN32)
 endif()
 
 add_custom_command(
-  OUTPUT F3DIcon.h
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h
   COMMAND $<TARGET_FILE:embed>
     "${CMAKE_CURRENT_SOURCE_DIR}/../resources/logo32.png"
     "${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h"
@@ -59,7 +59,64 @@ if(F3D_MODULE_OCCT)
   endif()
 endif()
 
-add_executable(f3d
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/Config.h"
+  @ONLY)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/Config.cxx.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/Config.cxx"
+  @ONLY)
+
+# Readers declaration
+macro(declare_f3d_reader reader)
+  list(APPEND F3D_READER_FILES "readers/${reader}.h")
+  set(F3D_READER_INCLUDES_CODE
+    "${F3D_READER_INCLUDES_CODE}#include \"${reader}.h\"\n")
+  set(F3D_READER_INSTANCES_CODE
+    "${F3D_READER_INSTANCES_CODE}  ${reader} InstanceOf${reader};\n")
+  set(F3D_READER_REGISTER_CODE
+    "${F3D_READER_REGISTER_CODE}    F3DReaderFactory::Register(&InstanceOf${reader});\n")
+  set(F3D_READER_UNREGISTER_CODE
+    "${F3D_READER_UNREGISTER_CODE}    F3DReaderFactory::Unregister(&InstanceOf${reader});\n")
+endmacro()
+
+declare_f3d_reader(F3D3DSReader)
+declare_f3d_reader(F3DCityGMLReader)
+declare_f3d_reader(F3DDICOMReader)
+declare_f3d_reader(F3DGLTFReader)
+declare_f3d_reader(F3DMetaImageReader)
+declare_f3d_reader(F3DNrrdReader)
+declare_f3d_reader(F3DOBJReader)
+declare_f3d_reader(F3DPLYReader)
+declare_f3d_reader(F3DPTSReader)
+declare_f3d_reader(F3DSTLReader)
+declare_f3d_reader(F3DTIFFReader)
+declare_f3d_reader(F3DVRMLReader)
+declare_f3d_reader(F3DVTKLegacyReader)
+declare_f3d_reader(F3DVTKXMLReader)
+
+if(F3D_MODULE_OCCT)
+  declare_f3d_reader(F3DOpenCascadeReader)
+endif()
+
+if(F3D_MODULE_EXODUS)
+  declare_f3d_reader(F3DExodusIIReader)
+endif()
+
+# Generate the code of the F3DReaderInstantiator class
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/F3DReaderInstantiator.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h"
+  @ONLY)
+
+list(LENGTH F3D_READER_FILES F3D_NB_READERS)
+message(STATUS "${F3D_NB_READERS} readers found.")
+
+# f3d executable
+
+set(F3D_SOURCE_FILES
   main.cxx
   vtkF3DConsoleOutputWindow.cxx
   vtkF3DGenericImporter.cxx
@@ -78,11 +135,49 @@ add_executable(f3d
   F3DLog.cxx
   F3DOffscreenRender.cxx
   F3DOptions.cxx
-  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h
+  readers/F3DReader.cxx
+  readers/F3DReaderFactory.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/Config.cxx
   ${PLATFORM_SPECIFIC_FILES}
   ${MODULES_SPECIFIC_SOURCE_FILES}
-)
+  )
+
+set(F3D_HEADER_FILES
+  vtkF3DConsoleOutputWindow.h
+  vtkF3DGenericImporter.h
+  vtkF3DInteractorEventRecorder.h
+  vtkF3DInteractorStyle.h
+  vtkF3DMetaReader.h
+  vtkF3DObjectFactory.h
+  vtkF3DOpenGLGridMapper.h
+  vtkF3DPolyDataMapper.h
+  vtkF3DPostProcessFilter.h
+  vtkF3DRenderPass.h
+  vtkF3DRenderer.h
+  vtkF3DRendererWithColoring.h
+  F3DAnimationManager.h
+  F3DLoader.h
+  F3DLog.h
+  F3DOffscreenRender.cxx
+  F3DOptions.cxx
+  readers/F3DReader.h
+  readers/F3DReaderFactory.h
+  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h
+  ${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h
+  )
+
+add_executable(f3d
+  ${F3D_SOURCE_FILES}
+  ${F3D_HEADER_FILES}
+  ${F3D_READER_FILES}
+  ${PLATFORM_SPECIFIC_FILES}
+  ${MODULES_SPECIFIC_SOURCE_FILES}
+  )
+
+target_include_directories(f3d PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/readers
+  )
 
 set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
@@ -147,16 +242,6 @@ endif()
 
 vtk_module_autoinit(TARGETS f3d MODULES ${F3D_VTK_MODULES})
 target_link_libraries(f3d PUBLIC ${F3D_VTK_MODULES} ${MODULES_SPECIFIC_LIBRARIES})
-
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/Config.h"
-  @ONLY)
-
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/Config.cxx.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/Config.cxx"
-  @ONLY)
 
 install(TARGETS f3d
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

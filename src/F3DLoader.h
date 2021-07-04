@@ -15,6 +15,7 @@
 
 class vtkF3DRenderer;
 class vtkImporter;
+class F3DReaderInstantiator;
 struct F3DOptions;
 
 class F3DLoader
@@ -67,7 +68,7 @@ public:
 
 protected:
   static vtkSmartPointer<vtkImporter> GetImporter(
-    const F3DOptions& options, const std::string& file);
+    const F3DOptions& options, const std::string& fileName);
 
   std::vector<std::string> FilesList;
   int CurrentFileIndex = 0;
@@ -78,6 +79,7 @@ protected:
   vtkSmartPointer<vtkF3DRenderer> Renderer;
   vtkSmartPointer<vtkImporter> Importer;
   vtkSmartPointer<vtkRenderWindow> RenWin;
+  F3DReaderInstantiator* ReaderInstantiator;
 
 private:
   F3DLoader(F3DLoader const&) = delete;
