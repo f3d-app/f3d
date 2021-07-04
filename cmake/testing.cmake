@@ -383,6 +383,14 @@ set_tests_properties(TestHelp PROPERTIES PASS_REGULAR_EXPRESSION "Usage:")
 f3d_test_no_data(TestVersion "--version")
 set_tests_properties(TestVersion PROPERTIES PASS_REGULAR_EXPRESSION "Version:")
 
+# Test readers-list display
+f3d_test_no_data(TestReadersList "--readers-list")
+set_tests_properties(TestReadersList PROPERTIES FAIL_REGULAR_EXPRESSION "No registered reader found")
+
+# Test extensions-list display
+f3d_test_no_data(TestExtensionsList "--extensions-list")
+set_tests_properties(TestExtensionsList PROPERTIES FAIL_REGULAR_EXPRESSION "No registered reader found")
+
 # Test that f3d can try to read a system config file
 add_test(NAME TestNoDryRun COMMAND $<TARGET_FILE:f3d> --no-render)
 set_tests_properties(TestNoDryRun PROPERTIES TIMEOUT 2)
