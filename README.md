@@ -210,7 +210,7 @@ Simple interaction with the displayed data is possible directly within the windo
 * *Click and drag* vertically with the *right* mouse button to zoom in/out.
 * *Move the mouse wheel* to zoom in/out.
 * *Click and drag* with the *middle* mouse button to translate the camera.
-* Drag and Drop a file or directory into the F3D window to load it
+* Drag and drop a file or directory into the F3D window to load it
 
 > Note: When playing an animation with a scene camera, camera interactions are locked.
 
@@ -348,12 +348,12 @@ During instalation, F3D will install mime types files as defined by the [XDG sta
 * No categorical generic field data rendering support.
 * No string array categorical rendering support.
 * No support for specifying manual lighting in the default scene.
-* Drag&Drop does not work with Thunar file manager.
 * Pressing the `z` hotkey to display the FPS timer triggers a double render.
 * Multiblock (.vtm, .gml) support is partial, non-surfacic data will be converted into surfaces.
 * Animation support with full scene data format require VTK >= 9.0.20201016.
+* Full drag and drop support require VTK >= 9.0.20210620
 * `Escape` interaction events cannot be recorded.
-* Drag&Drop interaction cannot be recorded nor played back.
+* Drag and drop interaction cannot be recorded nor played back.
 
 # Troubleshooting
 

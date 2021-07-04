@@ -161,7 +161,7 @@ Simple interaction with the displayed data is possible directly within the windo
 * *Click and drag* vertically with the *right* mouse button to zoom in/out.
 * *Move the mouse wheel* to zoom in/out.
 * *Click and drag* with the *middle* mouse button to translate the camera.
-* Drag and Drop a file or directory into the F3D window to load it
+* Drag and drop a file or directory into the F3D window to load it
 
 > Note: When playing an animation with a scene camera, camera interactions are locked.
 
