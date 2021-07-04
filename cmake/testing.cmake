@@ -168,7 +168,6 @@ f3d_test_long_timeout(TestHDRIBlur suzanne.ply "300,300" "-u --hdri=${CMAKE_SOUR
 f3d_test_long_timeout(TestHDRIEdges suzanne.ply "300,300" "-e --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
 f3d_test(TestTIFF logo.tif "300,300" "-sy --up=-Y")
 f3d_test(TestUTF8 "(ノಠ益ಠ )ノ.vtp" "300,300")
-f3d_test(TestGenericImporterAnimation small.ex2 "300,300")
 f3d_test(TestAnimationIndex InterpolationTest.glb "300,300" "--animation-index=7")
 
 f3d_test(TestNonExistentFile nonExistentFile.vtp "300,300" "--filename")
@@ -227,6 +226,7 @@ endif()
 
 if(F3D_MODULE_EXODUS)
   f3d_test(TestExodus disk_out_ref.ex2 "300,300" "-s --camera-position=-11,-2,-49")
+  f3d_test(TestGenericImporterAnimation small.ex2 "300,300")
 
   # Test animation with generic importer
   f3d_test_interaction_no_baseline(TestInteractionAnimationGenericImporter small.ex2  "300,300")#Space;Space;
