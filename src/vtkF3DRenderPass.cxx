@@ -169,6 +169,9 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainPass->SetDelegatePass(camP);
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
+
+    // Needed because VTK can pick the wrong format with certain drivers
+    this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);
   }
 
   this->InitializeTime = this->GetMTime();
