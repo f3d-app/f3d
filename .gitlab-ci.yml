@@ -229,7 +229,7 @@ test:lin:cov:
     - .when:dependent
   after_script:
     - cd build
-    - gcovr --xml-pretty --exclude-unreachable-branches --print-summary -o coverage.xml --root ${CI_PROJECT_DIR}
+    - gcovr --xml-pretty --exclude-unreachable-branches --exclude cxxopts.h --print-summary -o coverage.xml --root ${CI_PROJECT_DIR}
   coverage: /^\s*lines:\s*\d+.\d+\%/
   dependencies:
     - build:lin:cov
