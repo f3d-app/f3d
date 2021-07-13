@@ -53,6 +53,10 @@ if(UNIX AND NOT APPLE)
   install(FILES "${CMAKE_SOURCE_DIR}/resources/completion.fish"
     DESTINATION "share/fish/vendor_completions.d"
     RENAME "f3d.fish")
+  if(TARGET man)
+    install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
+      DESTINATION "share/man/man1/")
+  endif()
   if (F3D_INSTALL_THUMBNAILER_FILES)
     install(FILES "${CMAKE_SOURCE_DIR}/resources/f3d.thumbnailer"
       DESTINATION "share/thumbnailers/")

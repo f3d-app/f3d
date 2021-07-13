@@ -96,6 +96,9 @@ if(F3D_MODULE_EXODUS)
   endif()
 endif()
 
+option(F3D_GENERATE_MAN "Generate and install a man entry for f3d using help2man" OFF)
+mark_as_advanced(F3D_GENERATE_MAN)
+
 # Build f3d
 include(GNUInstallDirs)
 add_subdirectory(src)
