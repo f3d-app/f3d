@@ -1960,7 +1960,7 @@ Options::help_one_group(const std::string& g) const
 
   if (!g.empty())
   {
-    result += toLocalString(" " + g + " options:\n");
+    result += toLocalString(g + " options:\n");
   }
 
   for (const auto& o : group->second.options)
@@ -2055,14 +2055,14 @@ inline
 std::string
 Options::help(const std::vector<std::string>& help_groups) const
 {
-  String result = m_help_string + "\nUsage:\n  " +
+  String result = m_help_string + "\n\nUsage:  " +
     toLocalString(m_program) + " " + toLocalString(m_custom_help);
 
   if (m_positional.size() > 0 && m_positional_help.size() > 0) {
     result += " " + toLocalString(m_positional_help);
   }
 
-  result += "\n\n";
+  result += "\n\nOptions:\n";
 
   if (help_groups.size() == 0)
   {
