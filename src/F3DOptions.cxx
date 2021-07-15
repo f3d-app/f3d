@@ -154,7 +154,7 @@ protected:
   static std::string GetSystemSettingsDirectory();
   static std::string GetUserSettingsDirectory();
 
-  void PrintKeyHelp(const std::string& key, const std::string& help);
+  void PrintHelpPair(const std::string& key, const std::string& help, int keyWidth = 10, int helpWidth = 70);
   void PrintHelp(cxxopts::Options& cxxOptions);
   void PrintVersion();
   void PrintReadersList();
@@ -303,12 +303,11 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
   return options;
 }
 
-
 //----------------------------------------------------------------------------
-void ConfigurationOptions::PrintKeyHelp(const std::string& key, const std::string& help)
+void ConfigurationOptions::PrintHelpPair(const std::string& key, const std::string& help, int keyWidth, int helpWidth)
 {
   std::stringstream ss;
-  ss << "  " << std::left << std::setw(6) << key << " " << std::setw(70) << help;
+  ss << "  " << std::left << std::setw(keyWidth) << key << " " << std::setw(helpWidth) << help;
   F3DLog::Print(F3DLog::Severity::Info, ss.str());
 }
 
@@ -349,18 +348,37 @@ void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
     { "Up", "Reload current file" }
   };
 
+  const std::vector<std::pair<std::string, std::string> > examples =
+  {
+    { "f3d file.vtu -xtgans", "View a unstructured mesh in a typical nice looking sciviz style" },
+    { "f3d file.glb -tuqap --hdri=file.hdr", "View a gltf file in a realistic environment" },
+    { "f3d file.ply -so --point-size=0 --comp=-2", "View a point cloud file with direct scalars rendering" },
+    { "f3d folder", "View all files in folder" },
+  };
+
+  F3DLog::SetUseColoring(false);
   F3DLog::Print(F3DLog::Severity::Info, cxxOptions.help());
-  F3DLog::Print(F3DLog::Severity::Info, " Keys:");
+  F3DLog::Print(F3DLog::Severity::Info, "Keys:");
   for (const auto& key : keys)
   {
-    this->PrintKeyHelp(key.first, key.second);
+    this->PrintHelpPair(key.first, key.second);
   }
+
+  F3DLog::Print(F3DLog::Severity::Info, "\nExamples:");
+  for (const auto& example : examples)
+  {
+    this->PrintHelpPair(example.first, example.second, 50);
+  }
+  F3DLog::Print(F3DLog::Severity::Info, "\nReport bugs to https://gitlab.kitware.com/f3d/f3d/-/issues.");
+  F3DLog::SetUseColoring(true);
 }
 
 //----------------------------------------------------------------------------
 void ConfigurationOptions::PrintVersion()
 {
-  std::string version = f3d::AppTitle;
+  std::string version = f3d::AppName + " " + f3d::AppVersion + "\n\n";
+
+  version += f3d::AppTitle;
   version += "\nVersion: ";
   version += f3d::AppVersion;
   version += "\nBuild date: ";
@@ -394,9 +412,14 @@ void ConfigurationOptions::PrintVersion()
   version += "\nVTK version: ";
   version += std::string(VTK_VERSION) + std::string(" (build ") +
     std::to_string(VTK_BUILD_VERSION) + std::string(")");
-  version += "\nAuthor: Kitware SAS";
 
+  version += "\n\nCopyright (C) 2021 Kitware SAS.";
+  version += "\nLicense BSD-3-Clause.";
+  version += "\nWritten by Michael Migliore, Mathieu Westphal and Joachim Pouderoux.";
+
+  F3DLog::SetUseColoring(false);
   F3DLog::Print(F3DLog::Severity::Info, version);
+  F3DLog::SetUseColoring(true);
 }
 
 //----------------------------------------------------------------------------
