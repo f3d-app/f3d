@@ -21,11 +21,6 @@ It supports a range of file formats (including animated glTF, stl, step, ply, ob
 
 *A direct scalars render by F3D*
 
-# Installation
-
-You can find the release binary packages for Windows, Linux and macOS on the [Release page](https://gitlab.kitware.com/f3d/f3d/-/releases).
-Alternatively, you can build it yourself following the build guide below.
-
 # How to use
 
 There are 4 main ways to use F3D:
@@ -34,6 +29,41 @@ There are 4 main ways to use F3D:
 * By running F3D directly and then dragging and dropping files into it to open them.
 * By using F3D as an "Open with" program with specific file types.
 * As a [thumbnailer](#Thumbnailer) for all supported file formats with certain file managers.
+
+# Installation
+
+You can find the release binary packages for Windows, Linux and macOS on the [Release page](https://gitlab.kitware.com/f3d/f3d/-/releases).
+Alternatively, you can build it yourself following the [build](#Build) guide below.
+
+You can also find packages for the following operating systems:
+
+## Ubuntu
+
+Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home%3AAndnoVember%3ADebian/f3d).
+
+## OpenSuse
+
+Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home%3AAndnoVember%3Atest/f3d).
+
+## Archlinux
+
+Available in the [AUR](https://aur.archlinux.org/packages/f3d).
+
+## FreeBSD
+
+Avaiable in [FreshPORTS](https://www.freshports.org/graphics/f3d).
+
+## DragonFly BSD
+
+Available in [DPorts](https://github.com/DragonFlyBSD/DPorts/tree/master/graphics/f3d).
+
+## MacOS Brew
+
+Available in [Homebrew](https://github.com/DragonFlyBSD/DPorts/tree/master/graphics/f3d).
+
+## NixOS
+
+Available in [nixpkgs](https://github.com/NixOS/nixpkgs/blob/release-21.05/pkgs/applications/graphics/f3d/default.nix).
 
 # Build
 

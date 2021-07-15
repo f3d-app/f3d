@@ -46,14 +46,14 @@ Images and videos displayed below use public datasets, you can download them [he
 <div class="gallery">
     <a data-fancybox="gallery" href="can.webm"><video autoplay loop muted src="can.webm" type="video/webm"/></a>
     <div class="desc">Animated SciViz rendering
-      <span class="code">f3d can.ex2 -xtgans --up=+Z --scalars=VEL</span>
+      <span class="code">f3d can.ex2 -xtgans \-\-up=+Z \-\-scalars=VEL</span>
     </div>
 </div>
 
 <div class="gallery">
     <a data-fancybox="gallery" href="directScalars.png"><img src="directScalars.png"></a>
     <div class="desc">Direct scalars rendering of a point cloud
-      <span class="code">f3d Carola_PointCloud.ply --point-size=0 --comp=-2 -so --verbose --up=+Z --hdri=venice_sunset_8k.hdr</span>
+      <span class="code">f3d Carola_PointCloud.ply \-\-point-size=0 \-\-comp=-2 -so \-\-verbose \-\-up=+Z \-\-hdri=venice_sunset_8k.hdr</span>
     </div>
 </div>
 
