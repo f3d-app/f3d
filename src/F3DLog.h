@@ -22,6 +22,8 @@ public:
     PrintInternal(sev, ss.str());
   }
 
+  static void SetUseColoring(bool use);
+
 protected:
   static void AppendArg(std::stringstream&) {}
 

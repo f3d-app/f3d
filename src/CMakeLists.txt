@@ -192,6 +192,23 @@ if(F3D_STRICT_BUILD)
   endif()
 endif()
 
+# Create man
+if(F3D_GENERATE_MAN)
+  find_program(HELP2MAN help2man)
+  find_program(GZIP gzip)
+  if (HELP2MAN AND GZIP)
+    set(MAN_OUTPUT_FILE ${CMAKE_BINARY_DIR}/f3d.1)
+    add_custom_command(
+      OUTPUT ${MAN_OUTPUT_FILE}
+      COMMAND ${HELP2MAN} $<TARGET_FILE:f3d> -N > ${MAN_OUTPUT_FILE}
+      COMMAND ${GZIP} -f ${MAN_OUTPUT_FILE}
+      DEPENDS f3d)
+    add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
+  else (HELP2MAN)
+    message(WARNING "help2man or gzip not found, cannot create man entry")
+  endif()
+endif()
+
 # coverage
 cmake_dependent_option(F3D_COVERAGE "Emit coverage files" OFF "UNIX" OFF)
 if(F3D_COVERAGE)

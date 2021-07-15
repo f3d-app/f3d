@@ -1,9 +1,9 @@
 #include "F3DLog.h"
 
 #include "Config.h"
+#include "vtkF3DConsoleOutputWindow.h"
 
-#include <vtkOutputWindow.h>
-
+//----------------------------------------------------------------------------
 void F3DLog::PrintInternal(Severity sev, const std::string& str)
 {
   vtkOutputWindow* win = vtkOutputWindow::GetInstance();
@@ -19,5 +19,16 @@ void F3DLog::PrintInternal(Severity sev, const std::string& str)
     case F3DLog::Severity::Error:
       win->DisplayErrorText(str.c_str());
       break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void F3DLog::SetUseColoring(bool use)
+{
+  vtkOutputWindow* win = vtkOutputWindow::GetInstance();
+  vtkF3DConsoleOutputWindow* consoleWin = vtkF3DConsoleOutputWindow::SafeDownCast(win);
+  if (consoleWin)
+  {
+    consoleWin->SetUseColoring(use);
   }
 }
