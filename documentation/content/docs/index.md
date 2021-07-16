@@ -165,10 +165,12 @@ Simple interaction with the displayed data is possible directly within the windo
 
 > Note: When playing an animation with a scene camera, camera interactions are locked.
 
-The coloring can be controlled directly using hotkeys:
-* Press `C` key to cycle between coloring with array from point data and from cell data.
-* Press `S` key to cycle the array to color with.
-* Press `Y` key to cycle the component of the array to color with.
+The coloring can be controlled directly by pressing the following hotkeys:
+
+* `C`: cycle between coloring with array from point data and from cell data.
+* `S`: cycle the array to color with.
+* `Y`: cycle the component of the array to color with.
+
 See the coloring cycle section for more info.
 
 Other options can be toggled directly by pressing the following hotkeys:

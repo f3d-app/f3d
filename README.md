@@ -45,7 +45,7 @@ Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home%3AAndno
 
 Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home%3AAndnoVember%3Atest/f3d).
 
-## Archlinux
+## Arch Linux
 
 Available in the [AUR](https://aur.archlinux.org/packages/f3d).
 
@@ -194,7 +194,7 @@ Options|Default|Description
 Options|Default|Description
 ------|------|------
 -s, \-\-scalars=&lt;array_name&gt;||*Color by a specific scalar* array present in the file. If no array_name is provided, one will be picked if any are available. <br>This only makes sense when using the default scene.<br>Use verbose to recover the usable array names.
--y, \-\-comp=&lt;comp_index&gt;|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. -1 means *magnitude*. -2 or the short option, -y,  means *direct values*.<br>When using *direct values*, components are used as L, LA, RGB, RGBA values depending on the number of components.
+-y, \-\-comp=&lt;comp_index&gt;|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. -1 means *magnitude*. -2 or the short option, -y, means *direct values*.<br>When using *direct values*, components are used as L, LA, RGB, RGBA values depending on the number of components.
 -c, \-\-cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
 \-\-range=&lt;min,max&gt;||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
 -b, \-\-bar||Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
