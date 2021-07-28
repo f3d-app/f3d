@@ -3,9 +3,16 @@
 #include "Config.h"
 #include "vtkF3DConsoleOutputWindow.h"
 
+bool F3DLog::Quiet = false;
+
 //----------------------------------------------------------------------------
 void F3DLog::PrintInternal(Severity sev, const std::string& str)
 {
+  if (F3DLog::Quiet)
+  {
+    return;
+  }
+
   vtkOutputWindow* win = vtkOutputWindow::GetInstance();
   switch (sev)
   {
@@ -31,4 +38,10 @@ void F3DLog::SetUseColoring(bool use)
   {
     consoleWin->SetUseColoring(use);
   }
+}
+
+//----------------------------------------------------------------------------
+void F3DLog::SetQuiet(bool quiet)
+{
+  F3DLog::Quiet = quiet;
 }

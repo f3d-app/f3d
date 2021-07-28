@@ -358,6 +358,10 @@ set_tests_properties(TestVolumeNoArray PROPERTIES PASS_REGULAR_EXPRESSION "No ar
 f3d_test_no_render(TestVerboseNonExistentFile nonExistentFile.vtp "--filename --verbose")
 set_tests_properties(TestVerboseNonExistentFile PROPERTIES PASS_REGULAR_EXPRESSION "File .*/data/testing/nonExistentFile.vtp does not exist")
 
+# Test non existent file, do not create nonExistentFile.vtp
+f3d_test_no_render(TestQuietNonExistentFile nonExistentFile.vtp "--filename --verbose --quiet")
+set_tests_properties(TestQuietNonExistentFile PROPERTIES FAIL_REGULAR_EXPRESSION "File .*/data/testing/nonExistentFile.vtp does not exist")
+
 # Test non supported file, do not add support for .dummy file.
 f3d_test_no_render(TestUnsupportedFileText unsupportedFile.dummy "--filename")
 set_tests_properties(TestUnsupportedFileText PROPERTIES PASS_REGULAR_EXPRESSION ".*/data/testing/unsupportedFile.dummy is not a file of a supported file format")
