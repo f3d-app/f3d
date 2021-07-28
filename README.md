@@ -129,8 +129,9 @@ Options|Description
 \-\-output=&lt;png file&gt;|Instead of showing a render view and render into it, *render directly into a png file*. When used with ref option, only outputs on failure
 \-\-no-background|Output file is saved with a transparent background. Ignored when using ref option.
 -h, \-\-help|Print *help*.
-\-\-verbose|Enable *verbose* mode.
+\-\-verbose|Enable *verbose* mode, providing more information about the loaded data in the console output.
 \-\-no-render|Verbose mode without any rendering for the first provided file, to recover information about a file.
+\-\-quiet|Enable quiet mode, which superseed any verbose options. No console output will be generated at all.
 \-\-version|Show *version* information.
 -x, \-\-axis|Show *axes* as a trihedron in the scene.
 -g, \-\-grid|Show *a grid* aligned with the XZ plane.

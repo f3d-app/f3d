@@ -34,6 +34,7 @@ struct F3DOptions
   bool SSAO = false;
   bool Verbose = false;
   bool NoRender = false;
+  bool Quiet = false;
   bool PointSprites = false;
   bool FullScreen = false;
   bool ToneMapping = false;
