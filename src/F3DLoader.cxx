@@ -56,6 +56,7 @@ int F3DLoader::Start(int argc, char** argv)
 
   this->Parser.Initialize(argc, argv);
   this->CommandLineOptions = this->Parser.GetOptionsFromCommandLine(files);
+  F3DLog::SetQuiet(this->CommandLineOptions.Quiet);
   this->Parser.InitializeDictionaryFromConfigFile(this->CommandLineOptions.UserConfigFile);
 
   vtkNew<vtkRenderWindowInteractor> interactor;
@@ -304,6 +305,8 @@ bool F3DLoader::LoadFile(int load)
   {
     this->Options = this->Parser.GetOptionsFromConfigFile(filePath);
   }
+  
+  F3DLog::SetQuiet(this->Options.Quiet);
 
   if (this->Options.Verbose || this->Options.NoRender)
   {
