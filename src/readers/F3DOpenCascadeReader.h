@@ -11,6 +11,7 @@
 
 #ifndef F3D_NO_VTK
 #include "vtkF3DOCCTReader.h"
+
 #include <vtksys/SystemTools.hxx>
 #endif
 

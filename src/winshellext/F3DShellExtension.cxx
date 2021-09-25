@@ -117,7 +117,7 @@ STDAPI DllUnregisterServer()
 
 //------------------------------------------------------------------------------
 // Notify the Windows Shell that file associations have changed.
-STDAPI DllNotifyShell(void)
+STDAPI DllNotifyShell()
 {
   // Invalidate the thumbnail cache.
   SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
