@@ -1,6 +1,0 @@
-[Thumbnailer Entry]
-Type=X-Thumbnailer
-Name=f3d Thumbnailer
-TryExec=f3d
-Exec=f3d --dry-run -sta --no-background --up=+Z --output=%o --resolution=%s,%s %i
-MimeType=model/stl;model/iges;application/vnd.step;application/vnd.3ds;application/x-tgif;

@@ -21,19 +21,19 @@ add_custom_command(
     "${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h"
   DEPENDS embed)
 
-# f3d
 cmake_dependent_option(F3D_MACOS_BUNDLE "Build a macOS bundle application" ON "APPLE" OFF)
 cmake_dependent_option(F3D_WINDOWS_GUI "Build a non-console Win32 application" ON "WIN32" OFF)
 
-set(PLATFORM_SPECIFIC_FILES "")
+set(LIB_PLATFORM_SPECIFIC_FILES "")
+set(EXEC_PLATFORM_SPECIFIC_FILES "")
 if(WIN32)
-  set(PLATFORM_SPECIFIC_FILES "${CMAKE_SOURCE_DIR}/resources/f3d.rc")
+  set(EXEC_PLATFORM_SPECIFIC_FILES "${CMAKE_SOURCE_DIR}/resources/f3d.rc")
   if(F3D_WINDOWS_GUI)
-    set(PLATFORM_SPECIFIC_FILES ${PLATFORM_SPECIFIC_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DWin32OutputWindow.cxx")
+    set(LIB_PLATFORM_SPECIFIC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DWin32OutputWindow.cxx")
   endif()
 endif()
 if(APPLE)
-  set(PLATFORM_SPECIFIC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm")
+  set(LIB_PLATFORM_SPECIFIC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm")
 endif()
 
 set(MODULES_SPECIFIC_SOURCE_FILES "")
@@ -114,10 +114,33 @@ configure_file(
 list(LENGTH F3D_READER_FILES F3D_NB_READERS)
 message(STATUS "${F3D_NB_READERS} readers found.")
 
-# f3d executable
+# configure_win32_exts and run it to create the NSIS install scripts
+# for registering/unregistering available file extensions
+
+if(WIN32)
+  add_executable(configure_win32_exts
+    configure_win32_exts.cxx
+    readers/F3DReader.cxx
+    readers/F3DReaderFactory.cxx
+    "${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h")
+
+  target_compile_definitions(configure_win32_exts PUBLIC "-DF3D_NO_VTK")
+
+  target_include_directories(configure_win32_exts PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/readers)
+
+  add_custom_command(TARGET configure_win32_exts POST_BUILD
+    COMMAND $<TARGET_FILE:configure_win32_exts>
+      "${CMAKE_BINARY_DIR}/NSIS.RegisterCommands.nsh"
+      "${CMAKE_BINARY_DIR}/NSIS.UnregisterCommands.nsh"
+      "${CMAKE_BINARY_DIR}/F3DShellExtension.h"
+    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h")
+endif()
+
+# libf3d
 
 set(F3D_SOURCE_FILES
-  main.cxx
   vtkF3DConsoleOutputWindow.cxx
   vtkF3DGenericImporter.cxx
   vtkF3DInteractorEventRecorder.cxx
@@ -138,7 +161,6 @@ set(F3D_SOURCE_FILES
   readers/F3DReader.cxx
   readers/F3DReaderFactory.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/Config.cxx
-  ${PLATFORM_SPECIFIC_FILES}
   ${MODULES_SPECIFIC_SOURCE_FILES}
   )
 
@@ -166,29 +188,39 @@ set(F3D_HEADER_FILES
   ${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h
   )
 
-add_executable(f3d
+add_library(libf3d
   ${F3D_SOURCE_FILES}
   ${F3D_HEADER_FILES}
   ${F3D_READER_FILES}
-  ${PLATFORM_SPECIFIC_FILES}
-  ${MODULES_SPECIFIC_SOURCE_FILES}
+  ${LIB_PLATFORM_SPECIFIC_FILES}
   )
 
-target_include_directories(f3d PUBLIC
+target_include_directories(libf3d PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/readers
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${MODULES_SPECIFIC_INCLUDE_DIRS}
   )
 
-set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set_target_properties(libf3d PROPERTIES
+  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+  WINDOWS_EXPORT_ALL_SYMBOLS ON
+  PREFIX ""
+  )
 
-set(F3D_STRICT_BUILD OFF CACHE BOOL "Use strict warning and errors flags for building F3D")
+vtk_module_autoinit(TARGETS libf3d MODULES ${F3D_VTK_MODULES})
+
+target_link_libraries(libf3d PUBLIC ${F3D_VTK_MODULES} ${MODULES_SPECIFIC_LIBRARIES})
+
+set(F3D_STRICT_BUILD OFF CACHE BOOL "Use strict warnings and errors flags for building F3D")
 mark_as_advanced(F3D_STRICT_BUILD)
 if(F3D_STRICT_BUILD)
   if(MSVC)
     # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
-    target_compile_options(f3d PRIVATE /W4 /WX /wd4275)
+    target_compile_options(libf3d PUBLIC /W4 /WX /wd4275)
   else()
-    target_compile_options(f3d PRIVATE -Wall -Wextra -Werror)
+    target_compile_options(libf3d PUBLIC -Wall -Wextra -Werror)
   endif()
 endif()
 
@@ -212,17 +244,23 @@ endif()
 # coverage
 cmake_dependent_option(F3D_COVERAGE "Emit coverage files" OFF "UNIX" OFF)
 if(F3D_COVERAGE)
-  target_compile_options(f3d PRIVATE -g -O0 --coverage)
-  target_link_options(f3d PRIVATE --coverage)
+  target_compile_options(libf3d PUBLIC -g -O0 --coverage)
+  target_link_options(libf3d PUBLIC --coverage)
 endif()
 
-target_include_directories(f3d
-  PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${MODULES_SPECIFIC_INCLUDE_DIRS})
+# f3d
 
-target_compile_definitions(f3d
-  PRIVATE VTK_VERSION_MAJOR=${VTK_VERSION_MAJOR}
-  PRIVATE VTK_VERSION_MINOR=${VTK_VERSION_MINOR}
-)
+add_executable(f3d main.cxx ${EXEC_PLATFORM_SPECIFIC_FILES})
+target_link_libraries(f3d PUBLIC libf3d)
+set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+if(F3D_STRICT_BUILD)
+  if(MSVC)
+    # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
+    target_compile_options(f3d PUBLIC /W4 /WX /wd4275)
+  else()
+    target_compile_options(f3d PUBLIC -Wall -Wextra -Werror)
+  endif()
+endif()
 
 # MacOS Bundle app
 if(F3D_MACOS_BUNDLE)
@@ -257,9 +295,6 @@ if(WIN32)
   endif()
 endif()
 
-vtk_module_autoinit(TARGETS f3d MODULES ${F3D_VTK_MODULES})
-target_link_libraries(f3d PUBLIC ${F3D_VTK_MODULES} ${MODULES_SPECIFIC_LIBRARIES})
-
-install(TARGETS f3d
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  BUNDLE DESTINATION ".")
+if(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
+  add_subdirectory(winshellext)
+endif()
