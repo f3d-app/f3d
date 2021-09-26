@@ -1,5 +1,6 @@
 #include "F3DOffscreenRender.h"
 
+#include <vtkImageData.h>
 #include <vtkImageDifference.h>
 #include <vtkNew.h>
 #include <vtkPNGReader.h>
@@ -11,8 +12,8 @@
 #include "F3DLog.h"
 
 //----------------------------------------------------------------------------
-bool F3DOffscreenRender::RenderOffScreen(
-  vtkRenderWindow* renWin, const std::string& output, bool noBg)
+bool F3DOffscreenRender::RenderToImage(
+  vtkRenderWindow* renWin, vtkImageData* image, bool noBg)
 {
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(renWin);
@@ -22,8 +23,22 @@ bool F3DOffscreenRender::RenderOffScreen(
     rtW2if->SetInputBufferTypeToRGBA();
   }
 
+  rtW2if->Update();
+  vtkImageData* outImg = rtW2if->GetOutput();
+  image->ShallowCopy(outImg);
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool F3DOffscreenRender::RenderOffScreen(
+  vtkRenderWindow* renWin, const std::string& output, bool noBg)
+{
+  vtkNew<vtkImageData> image;
+  F3DOffscreenRender::RenderToImage(renWin, image, noBg);
+
   vtkNew<vtkPNGWriter> writer;
-  writer->SetInputConnection(rtW2if->GetOutputPort());
+  writer->SetInputData(image);
   std::string fullPath = vtksys::SystemTools::CollapseFullPath(output);
   writer->SetFileName(fullPath.c_str());
   writer->Write();

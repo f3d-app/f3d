@@ -47,6 +47,9 @@ if(${VTK_VERSION} VERSION_LESS 9.0)
   message(FATAL_ERROR "VTK >= 9.0 is REQUIRED")
 endif()
 
+
+option(BUILD_SHARED_LIBS "Build f3d with shared libraries" ON)
+
 # Modules
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 option(F3D_MODULE_EXODUS "ExodusII module" ON)
@@ -98,6 +101,11 @@ endif()
 
 option(F3D_GENERATE_MAN "Generate and install a man entry for f3d using help2man" OFF)
 mark_as_advanced(F3D_GENERATE_MAN)
+
+# Windows Shell Extension DLL
+if(WIN32)
+  option(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION "Build the Windows Shell Extension to produce thumbnails" ON)
+endif()
 
 # Build f3d
 include(GNUInstallDirs)
