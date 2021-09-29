@@ -246,6 +246,8 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grpCamera, "camera-focal-point", "", "Camera focal point", options.CameraFocalPoint, false, true, "<X,Y,Z>");
     this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", options.CameraViewUp, false, true, "<X,Y,Z>");
     this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degrees)", options.CameraViewAngle, false, true, "<angle>");
+    this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees)", options.CameraAzimuthAngle, true, true, "<angle>");
+    this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees)", options.CameraElevationAngle, true, true, "<angle>");
 
 #if F3D_MODULE_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
