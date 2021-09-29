@@ -528,6 +528,8 @@ bool F3DLoader::LoadFile(int load)
       {
         cam->SetViewAngle(this->Options.CameraViewAngle);
       }
+      cam->Azimuth(this->Options.CameraAzimuthAngle);
+      cam->Elevation(this->Options.CameraElevationAngle);
       cam->OrthogonalizeViewUp();
       if (this->Options.Verbose)
       {

@@ -179,8 +179,10 @@ Options|Description
 \-\-camera-index|Select the scene camera to use.<br>Any negative value means custom camera.<br>The default scene always has a custom camera.
 \-\-camera-position=&lt;X,Y,Z&gt;|The position of the camera. Automatically computed or recovered from the file if not provided.
 \-\-camera-focal-point=&lt;X,Y,Z&gt;|The focal point of the camera. Automatically computed or recovered from the file if not provided.
-\-\-camera-view-up=&lt;X,Y,Z&gt;|The focal point of the camera. Will be orthogonalized even when provided. Automatically computed or recovered from the file if not provided.
+\-\-camera-view-up=&lt;X,Y,Z&gt;|The view up vector of the camera. Will be orthogonalized even when provided. Automatically computed or recovered from the file if not provided.
 \-\-camera-view-angle=&lt;angle&gt;|The view angle of the camera, non-zero value in degrees. Automatically computed or recovered from the file if not provided.
+\-\-camera-azimuth-angle=&lt;angle&gt;|The azimuth angle of the camera in degrees (default: 0.0).<br>This angle will be applied after setting the position of the camera, focal point of the camera, and view up vector of the camera.
+\-\-camera-elevation-angle=&lt;angle&gt;|The elevation angle of the camera in degrees (default: 0.0).<br>This angle will be applied after setting the position of the camera, focal point of the camera, and view up vector of the camera.
 
 ## Raytracing options
 

@@ -44,6 +44,8 @@ struct F3DOptions
   bool BlurBackground = false;
   bool Trackball = false;
   double CameraViewAngle;
+  double CameraAzimuthAngle = 0.0;
+  double CameraElevationAngle = 0.0;
   double Metallic = 0.0;
   double Opacity = 1.0;
   double PointSize = 10.0;
