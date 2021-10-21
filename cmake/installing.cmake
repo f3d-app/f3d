@@ -65,6 +65,8 @@ if(UNIX AND NOT APPLE)
   install(FILES "${CMAKE_SOURCE_DIR}/resources/completion.fish"
     DESTINATION "share/fish/vendor_completions.d"
     RENAME "f3d.fish")
+  install(FILES "${CMAKE_SOURCE_DIR}/resources/com.kitware.F3D.metainfo.xml"
+    DESTINATION "share/metainfo")
   if(TARGET man)
     install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
       DESTINATION "share/man/man1/")
