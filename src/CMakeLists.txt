@@ -188,7 +188,13 @@ set(F3D_HEADER_FILES
   ${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h
   )
 
-add_library(libf3d
+# Force static library when creating a macOS bundle
+set(F3D_LIBRARY_TYPE "")
+if(F3D_MACOS_BUNDLE)
+  set(F3D_LIBRARY_TYPE "STATIC")
+endif()
+
+add_library(libf3d ${F3D_LIBRARY_TYPE}
   ${F3D_SOURCE_FILES}
   ${F3D_HEADER_FILES}
   ${F3D_READER_FILES}
@@ -253,6 +259,12 @@ endif()
 add_executable(f3d main.cxx ${EXEC_PLATFORM_SPECIFIC_FILES})
 target_link_libraries(f3d PUBLIC libf3d)
 set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+if (APPLE)
+  set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../lib)
+elseif (UNIX)
+  set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../lib)
+endif ()
+
 if(F3D_STRICT_BUILD)
   if(MSVC)
     # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
