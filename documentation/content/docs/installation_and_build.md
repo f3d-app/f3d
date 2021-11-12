@@ -12,7 +12,7 @@ There are 4 main ways to use F3D:
 
 # Installation
 
-You can find the release binary packages for Windows, Linux and macOS on the [Release page](https://gitlab.kitware.com/f3d/f3d/-/releases).
+You can find the release binary packages for Windows, Linux and macOS on the [Release page](https://github.com/f3d-app/f3d/releases).
 Alternatively, you can build it yourself following the [build](#Build) guide below.
 
 You can also find packages for the following operating systems:

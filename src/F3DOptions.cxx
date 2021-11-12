@@ -372,7 +372,7 @@ void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
   {
     this->PrintHelpPair(example.first, example.second, 50);
   }
-  F3DLog::Print(F3DLog::Severity::Info, "\nReport bugs to https://gitlab.kitware.com/f3d/f3d/-/issues.");
+  F3DLog::Print(F3DLog::Severity::Info, "\nReport bugs to https://github.com/f3d-app/f3d/issues");
   F3DLog::SetUseColoring(true);
 }
 
