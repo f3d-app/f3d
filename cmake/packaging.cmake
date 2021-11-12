@@ -14,7 +14,7 @@ set(CPACK_CREATE_DESKTOP_LINKS f3d)
 set(CPACK_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 if(WIN32 AND NOT UNIX)
-  set(f3d_url "https://gitlab.kitware.com/f3d/f3d")
+  set(f3d_url "https://github.com/f3d-app/f3d")
   set(f3d_ico "${CMAKE_SOURCE_DIR}/resources/logo.ico")
   set(CPACK_GENERATOR NSIS64 ZIP)
   # For some reason, we need Windows backslashes
