@@ -1,7 +1,6 @@
 #include "vtkF3DWin32OutputWindow.h"
 
 #include <vtkObjectFactory.h>
-#include <vtkUnicodeString.h>
 #include <vtkWindows.h>
 
 #include <codecvt>
@@ -60,8 +59,6 @@ void vtkF3DWin32OutputWindow::DisplayText(const char* someText)
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   std::wstring wstr = converter.from_bytes(str);
   wstr += L"\r\n";
-
-  std::vector<vtkTypeUInt16> utf16data = vtkUnicodeString::from_utf8(someText).utf16_str();
 
   HWND hWnd = static_cast<HWND>(this->EditControlHandle);
 
