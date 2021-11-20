@@ -9,15 +9,15 @@ F3D (pronounced `/fɛd/`) is a [VTK-based](https://vtk.org) 3D viewer following 
 F3D is open-source and cross-platform (tested on Windows, Linux and macOS).
 It supports a range of file formats (including animated glTF, stl, step, ply, obj), and provides numerous rendering and texturing options.
 
-<img src="https://f3d-app.github.io/F3D/gallery/04-f3d.png"  width="640">
+<img src="https://f3d-app.github.io/f3d/gallery/04-f3d.png"  width="640">
 
 *A typical render by F3D*
 
-<img src="https://f3d-app.github.io/F3D/gallery/dota.gif"  width="640">
+<img src="https://f3d-app.github.io/f3d/gallery/dota.gif"  width="640">
 
 *Animation of a glTF file within F3D*
 
-<img src="https://f3d-app.github.io/F3D/gallery/directScalars.png"  width="640">
+<img src="https://f3d-app.github.io/f3d/gallery/directScalars.png"  width="640">
 
 *A direct scalars render by F3D*
 
