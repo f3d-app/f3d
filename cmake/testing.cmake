@@ -12,7 +12,7 @@ function(f3d_test)
              --ref ${CMAKE_SOURCE_DIR}/data/baselines/${ARGV0}.png
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 20)
 endfunction()
 
 function(f3d_test_long_timeout)
@@ -25,7 +25,7 @@ function(f3d_test_long_timeout)
              --ref ${CMAKE_SOURCE_DIR}/data/baselines/${ARGV0}.png
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 60)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 120)
 endfunction()
 
 function(f3d_test_interaction)
@@ -39,7 +39,7 @@ function(f3d_test_interaction)
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
              --interaction-test-play ${CMAKE_SOURCE_DIR}/recordings/${ARGV0}.log
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 60)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 120)
 endfunction()
 
 function(f3d_test_config)
@@ -52,7 +52,7 @@ function(f3d_test_config)
              --ref ${CMAKE_SOURCE_DIR}/data/baselines/${ARGV0}.png
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 20)
 endfunction()
 
 function(f3d_test_no_baseline)
@@ -64,7 +64,7 @@ function(f3d_test_no_baseline)
              --resolution=${ARGV2}
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 20)
 endfunction()
 
 function(f3d_test_interaction_no_baseline)
@@ -77,7 +77,7 @@ function(f3d_test_interaction_no_baseline)
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/output.png
              --interaction-test-play ${CMAKE_SOURCE_DIR}/recordings/${ARGV0}.log
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 60)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 120)
 endfunction()
 
 function(f3d_test_config_no_baseline)
@@ -89,7 +89,7 @@ function(f3d_test_config_no_baseline)
              --config=${ARGV3}
              --output ${CMAKE_BINARY_DIR}/Testing/Temporary/${ARGV0}.png
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 20)
 endfunction()
 
 function(f3d_test_no_render)
@@ -100,7 +100,7 @@ function(f3d_test_no_render)
              --dry-run
              --no-render
              ${CMAKE_SOURCE_DIR}/data/testing/${ARGV1})
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 20)
 endfunction()
 
 function(f3d_test_no_data)
@@ -109,7 +109,7 @@ function(f3d_test_no_data)
            COMMAND $<TARGET_FILE:f3d>
              ${ARGV1}
              --dry-run)
-  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 10)
+  set_tests_properties(${ARGV0} PROPERTIES TIMEOUT 20)
 endfunction()
 
 f3d_test(TestPLY suzanne.ply "300,300")
@@ -166,12 +166,18 @@ f3d_test(TestVolumeNonScalars waveletArrays.vti "300,300" "-vb --scalars=RandomP
 f3d_test(TestTextures WaterBottle.glb "300,300" "--geometry-only --texture-material=${CMAKE_SOURCE_DIR}/data/testing/red.jpg --roughness=1 --metallic=1 --texture-base-color=${CMAKE_SOURCE_DIR}/data/testing/albedo.png --texture-normal=${CMAKE_SOURCE_DIR}/data/testing/normal.png --texture-emissive=${CMAKE_SOURCE_DIR}/data/testing/red.jpg --emissive-factor=0.1,0.1,0.1")
 f3d_test(TestMetaDataImporter BoxAnimated.gltf "300,300" "-m")
 f3d_test(TestMultiblockMetaData mb.vtm "300,300" "-m")
-f3d_test_long_timeout(TestHDRI suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
-f3d_test_long_timeout(TestHDRIBlur suzanne.ply "300,300" "-u --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
-f3d_test_long_timeout(TestHDRIEdges suzanne.ply "300,300" "-e --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
 f3d_test(TestTIFF logo.tif "300,300" "-sy --up=-Y")
 f3d_test(TestUTF8 "(ノಠ益ಠ )ノ.vtp" "300,300")
 f3d_test(TestAnimationIndex InterpolationTest.glb "300,300" "--animation-index=7")
+
+f3d_test_long_timeout(TestHDRI suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
+set_tests_properties(TestHDRI PROPERTIES LABELS "HDRI")
+
+f3d_test_long_timeout(TestHDRIBlur suzanne.ply "300,300" "-u --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
+set_tests_properties(TestHDRIBlur PROPERTIES LABELS "HDRI")
+
+f3d_test_long_timeout(TestHDRIEdges suzanne.ply "300,300" "-e --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
+set_tests_properties(TestHDRIEdges PROPERTIES LABELS "HDRI")
 
 f3d_test(TestNonExistentFile nonExistentFile.vtp "300,300" "--filename")
 set_tests_properties(TestNonExistentFile PROPERTIES WILL_FAIL TRUE)
@@ -186,11 +192,17 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(TestGLTFImporterUnlit UnlitTest.glb "300,300")
   f3d_test(TestMaterial suzanne.ply "300,300" "--color=0.72,0.45,0.2 --metallic=1 --roughness=0.1")
   f3d_test(TestMetaData pdiag.vtu "300,300" "-m")
-  f3d_test_long_timeout(TestHDRI8Bit suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/logo.tif")
-  f3d_test_long_timeout(TestHDRIOrient suzanne.stl "300,300" "--up=+Z --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
-  f3d_test_interaction(TestInteractionHDRIMove suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr") #Shift+MouseRight;
   f3d_test_interaction(TestInteractionAnimation InterpolationTest.glb "300,300")#Space;Space;
   f3d_test_interaction(TestInteractionAnimationMovement KameraAnim.glb "300,300" "--camera-index=1")#Space;MouseMovement;Space;
+
+  f3d_test_long_timeout(TestHDRI8Bit suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/logo.tif")
+  set_tests_properties(TestHDRI8Bit PROPERTIES LABELS "HDRI")
+
+  f3d_test_long_timeout(TestHDRIOrient suzanne.stl "300,300" "--up=+Z --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
+  set_tests_properties(TestHDRIOrient PROPERTIES LABELS "HDRI")
+
+  f3d_test_interaction(TestInteractionHDRIMove suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr") #Shift+MouseRight;
+  set_tests_properties(TestInteractionHDRIMove PROPERTIES LABELS "HDRI")
 
   # Test exit hotkey
   f3d_test_interaction_no_baseline(TestInteractionSimpleExit cow.vtp "300,300") #Escape;
@@ -262,12 +274,14 @@ f3d_test_interaction(TestInteractionCycleComp dragon.vtu "300,300") #SYYYY
 f3d_test_interaction(TestInteractionCycleScalars dragon.vtu "300,300") #BSSSS
 f3d_test_interaction(TestInteractionVolumeInverse HeadMRVolume.mhd "300,300" "--camera-position=127.5,-400,127.5 --camera-view-up=0,0,1") #VI
 f3d_test_interaction(TestInteractionPointCloud pointsCloud.vtp "300,300" "--point-size=20") #O
-f3d_test_interaction(TestInteractionHDRIBlur suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr") #U
 f3d_test_interaction(TestInteractionDirectory mb "300,300") #Right;Right;Right;Left;Up;
 f3d_test_interaction_no_baseline(TestInteractionAnimationNotStopped InterpolationTest.glb "300,300")#Space;Space;
 f3d_test_interaction(TestInteractionResetCamera dragon.vtu "300,300")#MouseMovements;Return;
 f3d_test_interaction(TestInteractionTensorsCycleComp tensors.vti "300,300" "--scalars --comp=-2") #SYYYYYYYYYY
 f3d_test_interaction(TestInteractionCycleScalarsCompCheck dragon.vtu "300,300" "-b --scalars --comp=2") #S
+
+f3d_test_interaction(TestInteractionHDRIBlur suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr") #U
+set_tests_properties(TestInteractionHDRIBlur PROPERTIES LABELS "HDRI")
 
 # Test ? hotkey
 f3d_test_interaction_no_baseline(TestInteractionDumpSceneState dragon.vtu "300,300")#?
@@ -413,7 +427,7 @@ set_tests_properties(TestNoRef PROPERTIES WILL_FAIL TRUE)
 # Test failure without a reference and  without an output, please do not create a TestNoRef.png file
 add_test(NAME TestNoRefNoOutput COMMAND $<TARGET_FILE:f3d> --dry-run --resolution=300,300 --ref ${CMAKE_SOURCE_DIR}/data/baselines/TestNoRef.png ${CMAKE_SOURCE_DIR}/data/testing/cow.vtp)
 set_tests_properties(TestNoRefNoOutput PROPERTIES PASS_REGULAR_EXPRESSION "Reference image does not exists, use the --output option to output current rendering into an image file.")
-set_tests_properties(TestNoRefNoOutput PROPERTIES TIMEOUT 10)
+set_tests_properties(TestNoRefNoOutput PROPERTIES TIMEOUT 20)
 
 # Test failure with a bad reference, please do not create a good TestBadRef.png file
 f3d_test(TestBadRef cow.vtp "300,300")
@@ -422,4 +436,4 @@ set_tests_properties(TestBadRef PROPERTIES WILL_FAIL TRUE)
 # Test failure with a bad reference without an output, please do not create a good TestBadRef.png file
 add_test(NAME TestBadRefNoOutput COMMAND $<TARGET_FILE:f3d> --dry-run --resolution=300,300 --ref ${CMAKE_SOURCE_DIR}/data/baselines/TestBadRef.png ${CMAKE_SOURCE_DIR}/data/testing/cow.vtp)
 set_tests_properties(TestBadRefNoOutput PROPERTIES PASS_REGULAR_EXPRESSION "Use the --output option to be able to output current rendering and diff images into files.")
-set_tests_properties(TestBadRefNoOutput PROPERTIES TIMEOUT 10)
+set_tests_properties(TestBadRefNoOutput PROPERTIES TIMEOUT 20)
