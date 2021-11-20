@@ -73,6 +73,20 @@ jobs:
       working-directory: ${{github.workspace}}/dependencies/occt_build
       run: cmake --build . --parallel 2 --target install --config Release
 
+    - name: Patch OCCT install macos
+      if: |
+        steps.cache-occt.outputs.cache-hit != 'true' &&
+        matrix.os == 'macos-latest'
+      working-directory: ${{github.workspace}}/dependencies
+      run: sed -i '' 's/OpenCASCADE_LIBRARIES [A-Za-z0-9;]\+/OpenCASCADE_LIBRARIES TKSTEP;TKSTEPAttr;TKSTEP209;TKSTEPBase;TKIGES;TKBool;TKMesh;TKXSBase;TKBO;TKPrim;TKShHealing;TKTopAlgo;TKBRep;TKGeomAlgo;TKGeomBase;TKG3d;TKG2d;TKMath;TKernel/' occt_install/lib/cmake/opencascade/OpenCASCADEConfig.cmake
+
+    - name: Patch OCCT install ubuntu
+      if: |
+        steps.cache-occt.outputs.cache-hit != 'true' &&
+        matrix.os == 'ubuntu-latest'
+      working-directory: ${{github.workspace}}/dependencies
+      run: sed -i 's/OpenCASCADE_LIBRARIES [A-Za-z0-9;]\+/OpenCASCADE_LIBRARIES TKSTEP;TKSTEPAttr;TKSTEP209;TKSTEPBase;TKIGES;TKBool;TKMesh;TKXSBase;TKBO;TKPrim;TKShHealing;TKTopAlgo;TKBRep;TKGeomAlgo;TKGeomBase;TKG3d;TKG2d;TKMath;TKernel/' occt_install/lib/cmake/opencascade/OpenCASCADEConfig.cmake
+
     # TODO rename cache 25/11
     - name: Cache VTK
       id: cache-vtk
