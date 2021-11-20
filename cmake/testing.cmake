@@ -201,6 +201,9 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test_long_timeout(TestHDRIOrient suzanne.stl "300,300" "--up=+Z --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
   set_tests_properties(TestHDRIOrient PROPERTIES LABELS "HDRI")
 
+  f3d_test_long_timeout(TestHDRIToneMapping suzanne.ply "300,300" "-t --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr")
+  set_tests_properties(TestHDRIToneMapping PROPERTIES LABELS "HDRI")
+
   f3d_test_interaction(TestInteractionHDRIMove suzanne.ply "300,300" "--hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr") #Shift+MouseRight;
   set_tests_properties(TestInteractionHDRIMove PROPERTIES LABELS "HDRI")
 
@@ -233,6 +236,10 @@ if(VTK_VERSION VERSION_GREATER 9.0.20210228)
   # Test Verbose camera
   f3d_test_no_render(TestVerboseCamera Cameras.gltf "--camera-index=1 --verbose")
   set_tests_properties(TestVerboseCamera PROPERTIES PASS_REGULAR_EXPRESSION "0:.*1:")
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211006)
+  f3d_test(TestNoBackground cow.vtp "300,300" "--no-background")
 endif()
 
 if(F3D_MODULE_RAYTRACING)
@@ -303,7 +310,6 @@ set_tests_properties(TestOutputOutput PROPERTIES FIXTURES_REQUIRED OUTPUT_TEST)
 f3d_test_no_baseline(TestUnsupportedInputOutput unsupportedFile.dummy "300,300")
 set_tests_properties(TestUnsupportedInputOutput PROPERTIES PASS_REGULAR_EXPRESSION "No file loaded, no rendering performed")
 
-# No background option cannot be tested with reference
 f3d_test_no_baseline(TestOutputNoBackground cow.vtp "300,300" "--no-background")
 
 # Basic record and play test

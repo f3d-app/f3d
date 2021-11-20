@@ -32,7 +32,7 @@ public:
    * Returns true if successful, false otherwise.
    */
   static bool RenderTesting(vtkRenderWindow* renWin, const std::string& reference, double threshold,
-    const std::string& output);
+    bool noBg, const std::string& output);
 };
 
 #endif
