@@ -336,7 +336,13 @@ void vtkF3DRenderer::SetupRenderPasses()
   vtkOSPRayRendererNode::SetDenoiserThreshold(0, this);
 
   bool hasHDRI = this->GetEnvironmentTexture() != nullptr;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210123)
+  vtkOSPRayRendererNode::SetBackgroundMode(
+    hasHDRI ? vtkOSPRayRendererNode::Environment : vtkOSPRayRendererNode::Backplate, this);
+#else
   vtkOSPRayRendererNode::SetBackgroundMode(hasHDRI ? 2 : 1, this);
+#endif
+
 #else
   if (this->UseRaytracing || this->UseRaytracingDenoiser)
   {
