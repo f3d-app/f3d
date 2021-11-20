@@ -173,6 +173,7 @@ jobs:
 
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
+      shell: bash
       run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- data/testing/ data/baselines/)" >> $GITHUB_ENV
 
     - name: Cache LFS data
