@@ -185,7 +185,7 @@ int F3DLoader::Start(int argc, char** argv, vtkImageData* image)
       else
       {
         retVal =
-          F3DOffscreenRender::RenderTesting(this->RenWin, this->Options.Reference, this->Options.RefThreshold, this->Options.Output) ?
+          F3DOffscreenRender::RenderTesting(this->RenWin, this->Options.Reference, this->Options.RefThreshold, this->Options.NoBackground, this->Options.Output) ?
           EXIT_SUCCESS : EXIT_FAILURE;
       }
     }
