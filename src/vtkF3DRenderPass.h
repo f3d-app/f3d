@@ -50,6 +50,10 @@ public:
   vtkSetMacro(UseBlurBackground, bool);
   vtkBooleanMacro(UseBlurBackground, bool);
 
+  vtkGetMacro(ForceOpaqueBackground, bool);
+  vtkSetMacro(ForceOpaqueBackground, bool);
+  vtkBooleanMacro(ForceOpaqueBackground, bool);
+
   vtkGetVector6Macro(Bounds, double);
   vtkSetVector6Macro(Bounds, double);
 
@@ -67,6 +71,7 @@ protected:
   bool UseSSAOPass = false;
   bool UseDepthPeelingPass = false;
   bool UseBlurBackground = false;
+  bool ForceOpaqueBackground = false;
 
   vtkSmartPointer<vtkFramebufferPass> BackgroundPass;
   vtkSmartPointer<vtkFramebufferPass> MainPass;

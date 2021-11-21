@@ -6,6 +6,7 @@
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
 #include <vtkRenderWindow.h>
+#include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -48,7 +49,7 @@ bool F3DOffscreenRender::RenderOffScreen(
 
 //----------------------------------------------------------------------------
 bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::string& reference,
-  double threshold, const std::string& output)
+  double threshold, bool noBg, const std::string& output)
 {
   if (!vtksys::SystemTools::FileExists(reference))
   {
@@ -60,14 +61,32 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
     }
     else
     {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20211007)
+      F3DOffscreenRender::RenderOffScreen(renWin, output, noBg);
+#else
       F3DOffscreenRender::RenderOffScreen(renWin, output);
+#endif
       F3DLog::Print(F3DLog::Severity::Error,
         "Reference file does not exists, current rendering has been outputted to ", output, ".");
     }
     return false;
   }
+
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(renWin);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20211007)
+  if (noBg)
+  {
+    rtW2if->SetInputBufferTypeToRGBA();
+  }
+  else
+  {
+    rtW2if->SetInputBufferTypeToRGB();
+  }
+#else
+  static_cast<void>(noBg);
+  rtW2if->SetInputBufferTypeToRGB();
+#endif
 
   vtkNew<vtkPNGReader> reader;
   reader->SetFileName(reference.c_str());
