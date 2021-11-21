@@ -116,11 +116,11 @@ jobs:
         path: './dependencies/vtk'
         ref: ${{env.VTK_SHA}}
 
-    - name: Patch VTK 9.0.1 source macos
+    - name: Patch VTK 9.0 source macos
       if: |
         steps.cache-vtk.outputs.cache-hit != 'true' &&
         matrix.os == 'macos-latest' &&
-        matrix.vtk_version == 'v9.0.1'
+        matrix.vtk_version == 'v9.0.0'
       working-directory: ${{github.workspace}}/dependencies/vtk
       run: |
         sed -i '' '57i\'$'\n''herr_t H5O__fsinfo_set_version(H5F_t *f, H5O_fsinfo_t *fsinfo);' ThirdParty/hdf5/vtkhdf5/src/H5Fsuper.c
