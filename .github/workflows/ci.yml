@@ -1,4 +1,4 @@
-name: Cross Platform Build And Test
+name: Build And Test
 
 on:
   pull_request:
@@ -87,13 +87,12 @@ jobs:
       working-directory: ${{github.workspace}}/dependencies
       run: sed -i 's/OpenCASCADE_LIBRARIES [A-Za-z0-9;]\+/OpenCASCADE_LIBRARIES TKSTEP;TKSTEPAttr;TKSTEP209;TKSTEPBase;TKIGES;TKBool;TKMesh;TKXSBase;TKBO;TKPrim;TKShHealing;TKTopAlgo;TKBRep;TKGeomAlgo;TKGeomBase;TKG3d;TKG2d;TKMath;TKernel/' occt_install/lib/cmake/opencascade/OpenCASCADEConfig.cmake
 
-    # TODO rename cache 25/11
     - name: Cache VTK
       id: cache-vtk
       uses: actions/cache@v2
       with:
         path: dependencies/vtk_install
-        key: vtk-unversioned-${{matrix.vtk_version}}-${{matrix.os}}
+        key: vtk-${{matrix.vtk_version}}-${{matrix.os}}
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
