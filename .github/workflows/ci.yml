@@ -121,15 +121,16 @@ jobs:
         path: dependencies/vtk_install
         key: vtk-${{matrix.vtk_version}}-${{matrix.os}}
 
-    - name: Setup VTK
+    - name: Setup VTK and clone bare
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
       run: |
         mkdir vtk_build
         mkdir vtk_install
+        git clone --bare https://github.com/Kitware/VTK.git bare
 
     - name: Set VTK env var
-      working-directory: ${{github.workspace}}/source
+      working-directory: ${{github.workspace}}/dependencies/bare
       shell: bash
       run: echo "VTK_SHA=$(git rev-parse ${{matrix.vtk_version}})" >> $GITHUB_ENV
 
