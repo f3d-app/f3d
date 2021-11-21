@@ -103,6 +103,7 @@ jobs:
         git clone --bare https://github.com/Kitware/VTK.git bare
 
     - name: Set VTK env var
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/bare
       shell: bash
       run: echo "VTK_SHA=$(git rev-parse ${{matrix.vtk_version}})" >> $GITHUB_ENV
