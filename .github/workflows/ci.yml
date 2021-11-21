@@ -8,19 +8,15 @@ on:
       - master
 
 jobs:
-  ci:
+  occt:
     if: github.event.pull_request.draft == false
 
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        vtk_version: [c36e214568, v9.1.0, v9.0.0]
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
-
-    env:
-      DISPLAY: :0
 
     steps:
     - name: Dependencies Dir
@@ -86,6 +82,36 @@ jobs:
         matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}/dependencies
       run: sed -i 's/OpenCASCADE_LIBRARIES [A-Za-z0-9;]\+/OpenCASCADE_LIBRARIES TKSTEP;TKSTEPAttr;TKSTEP209;TKSTEPBase;TKIGES;TKBool;TKMesh;TKXSBase;TKBO;TKPrim;TKShHealing;TKTopAlgo;TKBRep;TKGeomAlgo;TKGeomBase;TKG3d;TKG2d;TKMath;TKernel/' occt_install/lib/cmake/opencascade/OpenCASCADEConfig.cmake
+
+  ci:
+    if: github.event.pull_request.draft == false
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        vtk_version: [c36e214568, v9.1.0, v9.0.0]
+
+    runs-on: ${{matrix.os}}
+    container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+
+    env:
+      DISPLAY: :0
+
+    steps:
+    - name: Dependencies Dir
+      working-directory: ${{github.workspace}}
+      run: mkdir dependencies
+
+    - name: Cache OCCT
+      id: cache-occt
+      uses: actions/cache@v2
+      with:
+        path: dependencies/occt_install
+        key: occt-V7_6_0-${{matrix.os}}
+
+    - name: Check OCCT
+      if: steps.cache-occt.outputs.cache-hit != 'true'
+      run: exit 1
 
     - name: Cache VTK
       id: cache-vtk
