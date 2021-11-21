@@ -239,6 +239,7 @@ void vtkF3DRenderer::SetupRenderPasses()
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseDepthPeelingPass(this->UseDepthPeelingPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
+  newPass->SetForceOpaqueBackground(!this->Options.HDRIFile.empty());
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
