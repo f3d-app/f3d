@@ -2,7 +2,7 @@
 
 # F3D - Fast and minimalist 3D viewer
 
-By [Kitware SAS](https://www.kitware.eu), 2019-2021
+By Michael Migliore and Mathieu Westphal
 
 F3D (pronounced `/fɛd/`) is a [VTK-based](https://vtk.org) 3D viewer following the [KISS principle](https://en.wikipedia.org/wiki/KISS_principle), so it is minimalist, efficient, has no GUI, has simple interaction mechanisms and is fully controllable using arguments in the command line.
 
@@ -11,6 +11,10 @@ It supports a range of file formats (including animated glTF, stl, step, ply, ob
 
 ![F3D Demo](../gallery/04-f3d.png)
 *A typical render by F3D*
+
+# Acknowledgments
+
+F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/) and [Assimp](https://dev.opencascade.org/).
 
 # File formats
 
