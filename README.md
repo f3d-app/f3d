@@ -61,11 +61,15 @@ Available in [DPorts](https://github.com/DragonFlyBSD/DPorts/tree/master/graphic
 
 ## MacOS Brew
 
-Available in [Homebrew](https://github.com/DragonFlyBSD/DPorts/tree/master/graphics/f3d).
+Available in [Homebrew](https://formulae.brew.sh/formula/f3d).
 
 ## NixOS
 
-Available in [nixpkgs](https://github.com/NixOS/nixpkgs/blob/release-21.05/pkgs/applications/graphics/f3d/default.nix).
+Available in [nixpkgs](https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/graphics/f3d/default.nix).
+
+## Flathub
+
+Available in [Flathub](https://flathub.org/apps/details/com.kitware.F3D).
 
 # Build
 
