@@ -1,5 +1,6 @@
 #include "Config.h"
 #include "F3DLoader.h"
+#include "F3DLog.h"
 #include "F3DException.h"
 
 int main(int argc, char** argv)
@@ -22,6 +23,7 @@ int main(int argc, char** argv)
   }
   catch(...)
   {
+    F3DLog::Print(F3DLog::Severity::Error, "F3D encountered an expected exception");
     exit(EXIT_FAILURE);
   }
 
