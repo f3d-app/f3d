@@ -12,6 +12,7 @@ RUN apt update && apt install -y \
     help2man \
     lcov \
     libx11-dev \
+    libxt-dev \
     openssh-client \
     software-properties-common \
     wget \

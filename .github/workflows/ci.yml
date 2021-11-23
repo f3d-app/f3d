@@ -1,4 +1,4 @@
-name: Cross Platform Build And Test
+name: Build And Test
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        vtk_version: [c36e214568a58be23f963e70f342e4b1480c8cc9, v9.1.0, v9.0.1]
+        vtk_version: [c36e214568, v9.1.0, v9.0.0]
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -87,20 +87,26 @@ jobs:
       working-directory: ${{github.workspace}}/dependencies
       run: sed -i 's/OpenCASCADE_LIBRARIES [A-Za-z0-9;]\+/OpenCASCADE_LIBRARIES TKSTEP;TKSTEPAttr;TKSTEP209;TKSTEPBase;TKIGES;TKBool;TKMesh;TKXSBase;TKBO;TKPrim;TKShHealing;TKTopAlgo;TKBRep;TKGeomAlgo;TKGeomBase;TKG3d;TKG2d;TKMath;TKernel/' occt_install/lib/cmake/opencascade/OpenCASCADEConfig.cmake
 
-    # TODO rename cache 25/11
     - name: Cache VTK
       id: cache-vtk
       uses: actions/cache@v2
       with:
         path: dependencies/vtk_install
-        key: vtk-unversioned-${{matrix.vtk_version}}-${{matrix.os}}
+        key: vtk-${{matrix.vtk_version}}-${{matrix.os}}
 
-    - name: Setup VTK
+    - name: Setup VTK and clone bare
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
       run: |
         mkdir vtk_build
         mkdir vtk_install
+        git clone --bare https://github.com/Kitware/VTK.git bare
+
+    - name: Set VTK env var
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/bare
+      shell: bash
+      run: echo "VTK_SHA=$(git rev-parse ${{matrix.vtk_version}})" >> $GITHUB_ENV
 
     - name: Checkout VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -109,13 +115,13 @@ jobs:
         repository: Kitware/VTK
         submodules: 'true'
         path: './dependencies/vtk'
-        ref: ${{matrix.vtk_version}}
+        ref: ${{env.VTK_SHA}}
 
-    - name: Patch VTK 9.0.1 source macos
+    - name: Patch VTK 9.0 source macos
       if: |
         steps.cache-vtk.outputs.cache-hit != 'true' &&
         matrix.os == 'macos-latest' &&
-        matrix.vtk_version == 'v9.0.1'
+        matrix.vtk_version == 'v9.0.0'
       working-directory: ${{github.workspace}}/dependencies/vtk
       run: |
         sed -i '' '57i\'$'\n''herr_t H5O__fsinfo_set_version(H5F_t *f, H5O_fsinfo_t *fsinfo);' ThirdParty/hdf5/vtkhdf5/src/H5Fsuper.c
