@@ -221,7 +221,7 @@ jobs:
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
         ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
         ${{ matrix.os == 'macos-latest' && '-DF3D_MACOS_BUNDLE=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
-        ${{ matrix.os == 'ubuntu-latest' && '-DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON' || null }}
+        ${{ matrix.os == 'ubuntu-latest' && '-DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
 
     - name: Build
       working-directory: ${{github.workspace}}/build
@@ -243,10 +243,9 @@ jobs:
         cp x64\opengl32.dll ..\..\build\bin\Release\
         cp x64\libglapi.dll ..\..\build\bin\Release\
 
-    # Disable HDRI testing on MacOS as it way too slow
     - name: Test
       working-directory: ${{github.workspace}}/build
-      run: ctest -C Release -j 2 --output-on-failure -LE ${{ matrix.os == 'macos-latest' && 'HDRI' || null }}
+      run: ctest -C Release -j 2 --output-on-failure
 
     - name: Install
       working-directory: ${{github.workspace}}/build
@@ -293,6 +292,7 @@ jobs:
       run: >
         cmake ./
         -DBUILD_TESTING=ON
+        -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_OCCT=ON
         -DCMAKE_BUILD_TYPE=Release

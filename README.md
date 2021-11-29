@@ -398,6 +398,7 @@ It is also possible to manually register it using `regsvr32 F3DShellExtension.dl
 * Full drag and drop support require VTK >= 9.0.20210620
 * `Escape` interaction events cannot be recorded.
 * Drag and drop interaction cannot be recorded nor played back.
+* Volume rendering and HDRI support requires a decent GPU
 
 # Troubleshooting
 
