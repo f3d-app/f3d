@@ -10,3 +10,4 @@ title: Known limitations
 * Full drag and drop support require VTK >= 9.0.20210620
 * `Escape` interaction events cannot be recorded.
 * Drag and drop interaction cannot be recorded nor played back.
+* Volume rendering and HDRI support requires a decent GPU
