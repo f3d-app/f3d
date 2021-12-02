@@ -254,14 +254,20 @@ void F3DLoader::AddFile(const std::string& path, bool recursive)
     {
       vtksys::Directory dir;
       dir.Load(fullPath);
+      std::set<std::string> sortedFiles;
 
+      // Sorting is necessary as KWSys can provide unsorted files
       for (unsigned long i = 0; i < dir.GetNumberOfFiles(); i++)
       {
         std::string currentFile = dir.GetFile(i);
         if (currentFile != "." && currentFile != "..")
         {
-          this->AddFile(vtksys::SystemTools::JoinPath({ "", fullPath, currentFile }), false);
+          sortedFiles.insert(currentFile);
         }
+      }
+      for (std::string currentFile : sortedFiles)
+      {
+        this->AddFile(vtksys::SystemTools::JoinPath({ "", fullPath, currentFile }), false);
       }
     }
   }
