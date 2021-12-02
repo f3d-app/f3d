@@ -33,7 +33,6 @@ function(f3d_test_interaction)
   add_test(NAME ${ARGV0}
            COMMAND $<TARGET_FILE:f3d>
              ${ARGV3}
-             --verbose
              --dry-run
              --resolution=${ARGV2}
              --ref ${CMAKE_SOURCE_DIR}/data/baselines/${ARGV0}.png
