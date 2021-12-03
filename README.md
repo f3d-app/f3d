@@ -25,7 +25,7 @@ It supports a range of file formats (including animated glTF, stl, step, ply, ob
 
 # Acknowledgments
 
-F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/) and [Assimp](https://dev.opencascade.org/).
+F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/) and [Assimp](https://www.assimp.org/).
 
 # How to use
 
