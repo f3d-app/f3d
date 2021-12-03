@@ -94,6 +94,7 @@ Some modules depending on external libraries can be optionally enabled with the 
 * `F3D_MODULE_EXODUS`: Support for ExodusII (.ex2) file format. Requires that VTK has been built with `IOExodus` module (and `hdf5`). Enabled by default.
 * `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay`. Disabled by default.
 * `F3D_MODULE_OCCT`: Support for STEP and IGES file formats. Requires `OpenCASCADE`. Disabled by default.
+* `F3D_MODULE_ASSIMP`: Support for FBX, DAE, OFF and DXF file formats. Requires `Assimp`. Disabled by default.
 
 Then build the software using your build system.
 
@@ -118,6 +119,10 @@ Here is the list of supported file formats:
 * **.gltf/.glb** : GL Transmission Format (full scene)
 * **.3ds** : Autodesk 3D Studio file format (full scene)
 * **.wrl** : VRML file format (full scene)
+* **.fbx** : Autodesk Filmbox (full scene)
+* **.dae** : COLLADA (full scene)
+* **.off** : Object File Format (full scene)
+* **.dxf** : Drawing Exchange Format (full scene)
 
 # Scene construction
 
@@ -145,7 +150,7 @@ Options|Description
 -k, \-\-trackball|Enable trackball interaction.
 \-\-progress|Show a *progress bar* when loading the file.
 \-\-up|Define the Up direction (default: +Y)
-\-\-animation-index|Select the animation to show.<br>Any negative value means all animations.<br>The default scene always has a single animation if any.
+\-\-animation-index|Select the animation to show.<br>Any negative value means all animations.<br>The default scene always has at most one animation.<br>If the option is not specified, the first animation is enabled.
 \-\-geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-dry-run|Do not read the configuration file but consider only the command line options
 \-\-config|Read a provided configuration file instead of default one
@@ -399,6 +404,14 @@ It is also possible to manually register it using `regsvr32 F3DShellExtension.dl
 * `Escape` interaction events cannot be recorded.
 * Drag and drop interaction cannot be recorded nor played back.
 * Volume rendering and HDRI support requires a decent GPU
+
+## Assimp
+
+FBX, DAE, OFF, and DXF file formats rely on [Assimp](https://github.com/assimp/assimp) library. It comes with some known limitations:
+- PBR materials are not supported for FBX file format
+- Animations are not working very well with Assimp 5.1, it's recommended to use Assimp 5.0
+- Some files can be empty, crash, or show artifacts
+- DXF support is very limited: only files with polylines and 3D faces are displayed.
 
 # Troubleshooting
 
