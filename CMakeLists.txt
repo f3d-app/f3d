@@ -10,6 +10,7 @@ string(TIMESTAMP F3D_BUILD_DATE "%Y-%m-%d %H:%M:%S")
 
 # CMake variables
 option(BUILD_TESTING "Build the tests" OFF)
+cmake_dependent_option(F3D_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" ON)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
