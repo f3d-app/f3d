@@ -87,6 +87,52 @@ jobs:
       working-directory: ${{github.workspace}}/dependencies
       run: sed -i 's/OpenCASCADE_LIBRARIES [A-Za-z0-9;]\+/OpenCASCADE_LIBRARIES TKSTEP;TKSTEPAttr;TKSTEP209;TKSTEPBase;TKIGES;TKBool;TKMesh;TKXSBase;TKBO;TKPrim;TKShHealing;TKTopAlgo;TKBRep;TKGeomAlgo;TKGeomBase;TKG3d;TKG2d;TKMath;TKernel/' occt_install/lib/cmake/opencascade/OpenCASCADEConfig.cmake
 
+    - name: Cache ASSIMP
+      id: cache-assimp
+      uses: actions/cache@v2
+      with:
+        path: dependencies/assimp_install
+        key: assimp-v5.1.1-${{matrix.os}}
+
+    - name: Checkout ASSIMP
+      if: steps.cache-assimp.outputs.cache-hit != 'true'
+      uses: actions/checkout@v2
+      with:
+        repository: assimp/assimp
+        path: './dependencies/assimp'
+        ref: v5.1.1
+
+    - name: Setup ASSIMP
+      if: steps.cache-assimp.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      run: |
+        mkdir assimp_build
+        mkdir assimp_install
+
+    - name: Configure ASSIMP
+      if: steps.cache-assimp.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/assimp_build
+      run: >
+        cmake ../assimp
+        -DBUILD_SHARED_LIBS=OFF
+        -DASSIMP_NO_EXPORT=ON
+        -DASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT=OFF
+        -DASSIMP_BUILD_FBX_IMPORTER=ON
+        -DASSIMP_BUILD_OFF_IMPORTER=ON
+        -DASSIMP_BUILD_COLLADA_IMPORTER=ON
+        -DASSIMP_BUILD_DXF_IMPORTER=ON
+        -DASSIMP_BUILD_TESTS=OFF
+        -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
+        -DASSIMP_BUILD_SAMPLES=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../assimp_install
+        ${{ matrix.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+
+    - name: Build ASSIMP
+      if: steps.cache-assimp.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/assimp_build
+      run: cmake --build . --parallel 2 --target install --config Release
+
     - name: Cache VTK
       id: cache-vtk
       uses: actions/cache@v2
@@ -207,7 +253,7 @@ jobs:
          mkdir build
          mkdir install
 
-    # pwd seems necessary for OpenCASCADE from some reasons
+    # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     - name: Configure
       working-directory: ${{github.workspace}}/build
       run: >
@@ -216,8 +262,10 @@ jobs:
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_OCCT=ON
+        -DF3D_MODULE_ASSIMP=ON
         -DCMAKE_BUILD_TYPE=Release
         -DVTK_DIR:PATH=../dependencies/vtk_install/lib/cmake/vtk
+        -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
         ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
         ${{ matrix.os == 'macos-latest' && '-DF3D_MACOS_BUNDLE=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
@@ -284,7 +332,7 @@ jobs:
         path: ./build/f3d-*
         name: f3d-${{matrix.os}}-${{matrix.vtk_version}}
 
-    # pwd seems necessary for OpenCASCADE from some reasons
+    # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     # coverage build is done in source as it seems to be required for codecov
     - name: Configure Coverage
       if: matrix.os == 'ubuntu-latest'
@@ -295,9 +343,11 @@ jobs:
         -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_OCCT=ON
+        -DF3D_MODULE_ASSIMP=ON
         -DCMAKE_BUILD_TYPE=Release
         -DVTK_DIR:PATH=../dependencies/vtk_install/lib/cmake/vtk
         -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade
+        -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
         -DF3D_COVERAGE=ON
 
     - name: Build Coverage

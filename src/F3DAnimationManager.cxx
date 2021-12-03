@@ -85,20 +85,19 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
     F3DLog::Print(F3DLog::Severity::Info, "\n");
   }
 
-  if (options.AnimationIndex >= 0)
+  if (options.AnimationIndex != 0 && availAnimations <= 0)
   {
-    if (availAnimations > 0 && options.AnimationIndex >= availAnimations)
-    {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "Specified animation index is greater than the highest possible animation index, enabling all animations.");
-    }
-    else if (availAnimations <= 0)
-    {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "An animation index has been specified but there are no animations available.");
-    }
+    F3DLog::Print(F3DLog::Severity::Warning,
+      "An animation index has been specified but there are no animation available.");
   }
-  if (options.AnimationIndex <= -1 || options.AnimationIndex >= availAnimations)
+  else if (options.AnimationIndex >= 0 && options.AnimationIndex >= availAnimations)
+  {
+    F3DLog::Print(F3DLog::Severity::Warning,
+      "Specified animation index is greater than the highest possible animation index, enabling the first animation.");
+
+    this->Importer->EnableAnimation(0);
+  }
+  else if (options.AnimationIndex <= -1)
   {
     for (int i = 0; i < availAnimations; i++)
     {

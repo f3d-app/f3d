@@ -17,9 +17,13 @@
   {
     "volume": true
   },
-  ".*(3ds|stl)":
+  ".*(3ds|stl|off)":
   {
     "up": "+Z"
+  },
+  ".*(dxf)":
+  {
+    "up": "-Z"
   },
   ".*(step|stp|iges|igs)":
   {

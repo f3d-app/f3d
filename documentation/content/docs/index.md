@@ -33,6 +33,10 @@ Here is the list of supported file formats:
 * **.gltf/.glb** : GL Transmission Format (full scene)
 * **.3ds** : Autodesk 3D Studio file format (full scene)
 * **.wrl** : VRML file format (full scene)
+* **.fbx** : Autodesk Filmbox (full scene)
+* **.dae** : COLLADA (full scene)
+* **.off** : Object File Format (full scene)
+* **.dxf** : Drawing Exchange Format (full scene)
 
 # Scene construction
 
@@ -59,7 +63,7 @@ Options &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 -k, \-\-trackball|Enable trackball interaction.
 \-\-progress|Show a *progress bar* when loading the file.
 \-\-up|Define the Up direction (default: +Y)
-\-\-animation-index|Select the animation to show.<br>Any negative value means all animations.<br>The default scene always has a single animation if any.
+\-\-animation-index|Select the animation to show.<br>Any negative value means all animations.<br>The default scene always has at most one animation.<br>If the option is not specified, the first animation is enabled.
 \-\-geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-dry-run|Do not read the configuration file but consider only the command line options
 \-\-config|Read a provided configuration file instead of default one
