@@ -4,6 +4,8 @@
 #include <BRepMesh_IncrementalMesh.hxx>
 #include <BRep_Tool.hxx>
 #include <IGESControl_Reader.hxx>
+#include <Message.hxx>
+#include <Message_PrinterOStream.hxx>
 #include <Message_ProgressIndicator.hxx>
 #include <Poly.hxx>
 #include <Poly_Triangulation.hxx>
@@ -451,6 +453,8 @@ bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Docume
 int vtkF3DOCCTReader::RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
   vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outputVector);
+
+  Message::DefaultMessenger()->RemovePrinters(STANDARD_TYPE(Message_PrinterOStream));
 
 #if F3D_MODULE_OCCT_XCAF
   Handle(TDocStd_Document) doc;
