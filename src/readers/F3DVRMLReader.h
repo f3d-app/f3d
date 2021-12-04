@@ -37,6 +37,15 @@ public:
     return ext;
   }
 
+  /*
+   * Get the mimetypes supported by this reader
+   */
+  virtual const std::vector<std::string> GetMimeTypes() const override
+  {
+    static const std::vector<std::string> types = { "model/vrml" };
+    return types;
+  }
+
 #ifndef F3D_NO_VTK
   /*
    * Create the scene reader (VTK importer) for the given filename

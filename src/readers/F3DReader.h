@@ -49,6 +49,11 @@ public:
   virtual const std::vector<std::string> GetExtensions() const = 0;
 
   /*
+   * Get the mimetypes supported by this reader
+   */
+  virtual const std::vector<std::string> GetMimeTypes() const = 0;
+
+  /*
    * Check if this reader can read the given filename - generally according its extension
    */
   virtual bool CanRead(const std::string& fileName) const;

@@ -25,4 +25,8 @@
     </magic>
     <glob pattern="*.3ds"/>
   </mime-type>
+  <mime-type type="application/vnd.pts">
+    <comment>Point Cloud file</comment>
+    <glob pattern="*.pts"/>
+  </mime-type>
 </mime-info>

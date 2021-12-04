@@ -284,8 +284,59 @@
 				<array>
 					<string>ex2</string>
 					<string>exo</string>
-					<string>g</string>
 					<string>e</string>
+				</array>
+			</dict>
+			<!-- FBX -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>Filmbox</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>fbx</string>
+				</array>
+			</dict>
+			<!-- DAE -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>Collada</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>dae</string>
+				</array>
+			</dict>
+			<!-- DXF -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>AutoCAD DXF</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>dxf</string>
+				</array>
+			</dict>
+			<!-- OFF -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>Object File Format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>off</string>
 				</array>
 			</dict>
 			<!-- File type associations -->
