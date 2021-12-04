@@ -1,9 +1,5 @@
 ### OUT OF DATE ###
 
-# How to generate the documentation files
-
-By [Kitware SAS](https://www.kitware.eu), 2020-2021
-
 # How to generate the documentation static page
 
 node-js with npm is required to generate the files. The following packages are required:

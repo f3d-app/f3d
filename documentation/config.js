@@ -6,7 +6,7 @@ module.exports = {
     title: 'F3D',
     description: '"A fast and minimalist 3D viewer"',
     subtitle: '"A fast and minimalist 3D viewer"',
-    author: 'Kitware SAS',
+    author: 'Kitware SAS, Michael Migliore, Mathieu Westphal',
     timezone: 'CET',
     url: 'https://f3d-app.github.io/f3d/',
     root: '/F3D/',
