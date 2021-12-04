@@ -35,17 +35,17 @@ public:
    */
   const std::vector<std::string> GetExtensions() const override
   {
-    static const std::vector<std::string> ext = { ".g", ".exo", ".ex2", ".e" };
+    static const std::vector<std::string> ext = { ".exo", ".ex2", ".e" };
     return ext;
   }
 
   /*
-   * Check if this reader can read the given filename - generally according its extension
+   * Get the mimetypes supported by this reader
    */
-  bool CanRead(const std::string& fileName) const override
+  virtual const std::vector<std::string> GetMimeTypes() const override
   {
-    std::regex exodusRegex("\\.(g|exo|ex2|e)(-s[0-9]+)?(\\.[0-9]+\\.[0-9]+)?$");
-    return std::regex_search(fileName, exodusRegex);
+    static const std::vector<std::string> types = { "application/vnd.exodus" };
+    return types;
   }
 
 #ifndef F3D_NO_VTK

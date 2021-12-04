@@ -5,10 +5,5 @@
     <glob pattern="*.ex2"/>
     <glob pattern="*.exo"/>
     <glob pattern="*.e"/>
-    <glob pattern="*.g**"/>
-  </mime-type>
-  <mime-type type="application/vnd.pts">
-    <comment>Point Cloud file</comment>
-    <glob pattern="*.pts"/>
   </mime-type>
 </mime-info>

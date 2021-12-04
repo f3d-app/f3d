@@ -37,6 +37,15 @@ public:
     return ext;
   }
 
+  /*
+   * Get the mimetypes supported by this reader
+   */
+  virtual const std::vector<std::string> GetMimeTypes() const override
+  {
+    static const std::vector<std::string> types = { "application/vnd.fbx", "application/vnd.dae", "image/vnd.dxf", "application/vnd.off" };
+    return types;
+  }
+
 #ifndef F3D_NO_VTK
   /*
    * Create the scene reader (VTK importer) for the given filename

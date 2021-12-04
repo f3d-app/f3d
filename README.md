@@ -33,7 +33,7 @@ There are 4 main ways to use F3D:
 
 * By running F3D from a terminal with a set of command-line options.
 * By running F3D directly and then dragging and dropping files into it to open them.
-* By using F3D as an "Open with" program with specific file types.
+* By using F3D automatically in the file manager when opening file.
 * As a [thumbnailer](#Thumbnailer) for all supported file formats with certain file managers.
 
 # Installation
@@ -383,18 +383,19 @@ They are considered in the below order and only the first found will be used.
 If you are using the releases, a default configuration file is provided when installing F3D.
 On Linux, it will be installed in `/etc/f3d/`, on Windows, it will be installed in the install directory, on macOS, it will be installed in the bundle.
 
-# Thumbnailer
+# Desktop Integration
 
-F3D can be used as a thumbnailer in certain cases
+F3D can be integrated in the desktop experience in certain cases
 
 ## Linux
 
-During instalation, F3D will install mime types files as defined by the [XDG standard](https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-latest.html) and a thumbnailer file as specified [here](https://wiki.archlinux.org/title/File_manager_functionality#Thumbnail_previews). Many file managers use this mechanism, including nautilus, thunar, pcmanfm and caja. Make sure to update the mime types database using [update-mime-database](https://linux.die.net/man/1/update-mime-database).
+During instalation, F3D will install mime types files as defined by the [XDG standard](https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-latest.html), a .thumbnailer file as specified [here](https://wiki.archlinux.org/title/File_manager_functionality#Thumbnail_previews) and a .desktop as specified [here](https://wiki.archlinux.org/title/desktop_entries). Many file managers use this mechanism, including nautilus, thunar, pcmanfm and caja. Make sure to update the mime types database using [update-mime-database](https://linux.die.net/man/1/update-mime-database) as well as the desktop entries database using [update-desktop-database](https://linuxcommandlibrary.com/man/update-desktop-database).
 
 ## Windows
 
 Using the F3D NSIS installer is the simplest way to enable thumbnails on windows, you can find it in the release section. It will automatically register it when installing F3D and unregister it when uninstalling F3D.
 It is also possible to manually register it using `regsvr32 F3DShellExtension.dll`. To unregister it, use `regsvr32 /u F3DShellExtension.dll`.
+The NSIS installer also register/unregister extensions support on installation/deinstallation.
 
 # Known limitations
 

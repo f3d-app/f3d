@@ -39,41 +39,6 @@ endif()
 set(MODULES_SPECIFIC_SOURCE_FILES "")
 set(MODULES_SPECIFIC_INCLUDE_DIRS "")
 set(MODULES_SPECIFIC_LIBRARIES "")
-set(F3D_MODULE_OCCT_XCAF 0)
-if(F3D_MODULE_OCCT)
-  find_package(OpenCASCADE REQUIRED)
-  if(OpenCASCADE_FOUND)
-    set(F3D_OCCT_VERSION "${OpenCASCADE_VERSION}" CACHE INTERNAL "OpenCASCADE version" FORCE)
-    if((TARGET "TKXDESTEP") AND (TARGET "TKXDEIGES"))
-      set(F3D_MODULE_OCCT_XCAF 1)
-    else()
-      message(WARNING "OpenCASCADE: TKXDESTEP and TKXDEIGES are not found. Parts color and name are not supported.")
-    endif()
-    if((NOT TARGET "TKSTEP") AND (NOT TARGET "TKIGES") AND (NOT TARGET "TKMesh"))
-      message(FATAL_ERROR "OpenCASCADE does not contain required modules")
-    endif()
-    set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DOCCTReader.cxx")
-    set(MODULES_SPECIFIC_INCLUDE_DIRS ${MODULES_SPECIFIC_INCLUDE_DIRS} ${OpenCASCADE_INCLUDE_DIR})
-    # Note: OpenCASCADE does not declare the libs in the correct dependency order.
-    # This could be an issue on Linux when linking with static libraries.
-    set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} ${OpenCASCADE_LIBRARIES})
-  endif()
-endif()
-
-if(F3D_MODULE_ASSIMP)
-  find_package(assimp 5.0 REQUIRED)
-  if(assimp_FOUND)
-    set(F3D_ASSIMP_VERSION "${assimp_VERSION}" CACHE INTERNAL "Assimp version" FORCE)
-    set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DAssimpImporter.cxx")
-    set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} assimp::assimp)
-
-    # Note: Assimp CMake module file does not declare Debug target properties, just map it to Release properties
-    get_target_property(F3D_ASSIMP_DEBUG_VAR assimp::assimp IMPORTED_IMPLIB_RELEASE)
-    if(NOT F3D_ASSIMP_DEBUG_VAR)
-      set_target_properties(assimp::assimp PROPERTIES MAP_IMPORTED_CONFIG_DEBUG Release)
-    endif()
-  endif()
-endif()
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in"
@@ -114,10 +79,26 @@ declare_f3d_reader(F3DVTKLegacyReader)
 declare_f3d_reader(F3DVTKXMLReader)
 
 if(F3D_MODULE_OCCT)
+  set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DOCCTReader.cxx")
+  set(MODULES_SPECIFIC_INCLUDE_DIRS ${MODULES_SPECIFIC_INCLUDE_DIRS} ${OpenCASCADE_INCLUDE_DIR})
+  # Note: OpenCASCADE does not declare the libs in the correct dependency order.
+  # This could be an issue on Linux when linking with static libraries.
+  # See .github/workflows/ci.yml for a scripted fix 
+  set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} ${OpenCASCADE_LIBRARIES})
+  
   declare_f3d_reader(F3DOpenCascadeReader)
 endif()
 
 if(F3D_MODULE_ASSIMP)
+  set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DAssimpImporter.cxx")
+  set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} assimp::assimp)
+
+  # Note: Assimp CMake module file does not declare Debug target properties, just map it to Release properties
+  get_target_property(F3D_ASSIMP_DEBUG_VAR assimp::assimp IMPORTED_IMPLIB_RELEASE)
+  if(NOT F3D_ASSIMP_DEBUG_VAR)
+    set_target_properties(assimp::assimp PROPERTIES MAP_IMPORTED_CONFIG_DEBUG Release)
+  endif()
+
   declare_f3d_reader(F3DAssimpReader)
 endif()
 
@@ -155,6 +136,29 @@ if(WIN32)
       "${CMAKE_BINARY_DIR}/NSIS.RegisterCommands.nsh"
       "${CMAKE_BINARY_DIR}/NSIS.UnregisterCommands.nsh"
       "${CMAKE_BINARY_DIR}/F3DShellExtension.h"
+    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h")
+endif()
+
+# configure_linux_mime_types and run it to create the a dynamic mime_type
+# list for registering/unregistering available mime types in .desktop
+# and .thumbnailer file
+
+if(UNIX AND NOT APPLE)
+  add_executable(configure_linux_mime_types
+    configure_linux_mime_types.cxx
+    readers/F3DReader.cxx
+    readers/F3DReaderFactory.cxx
+    "${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h")
+
+  target_compile_definitions(configure_linux_mime_types PUBLIC "-DF3D_NO_VTK")
+
+  target_include_directories(configure_linux_mime_types PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/readers)
+
+  add_custom_command(TARGET configure_linux_mime_types POST_BUILD
+    COMMAND $<TARGET_FILE:configure_linux_mime_types>
+      "${CMAKE_BINARY_DIR}/mime_types"
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h")
 endif()
 
