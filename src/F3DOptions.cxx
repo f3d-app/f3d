@@ -423,7 +423,8 @@ void ConfigurationOptions::PrintVersion()
   version += std::string(VTK_VERSION) + std::string(" (build ") +
     std::to_string(VTK_BUILD_VERSION) + std::string(")");
 
-  version += "\n\nCopyright (C) 2021 Kitware SAS.";
+  version += "\n\nCopyright (C) 2019-2021 Kitware SAS.";
+  version += "\nCopyright (C) 2021-2022 Michael Migliore, Mathieu Westphal.";
   version += "\nLicense BSD-3-Clause.";
   version += "\nWritten by Michael Migliore, Mathieu Westphal and Joachim Pouderoux.";
 
