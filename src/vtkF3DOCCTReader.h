@@ -29,7 +29,7 @@ public:
   vtkTypeMacro(vtkF3DOCCTReader, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  enum class FILE_FORMAT : unsigned char
+  enum FILE_FORMAT : unsigned char
   {
     STEP, IGES
   };
