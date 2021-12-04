@@ -51,7 +51,7 @@ configure_file(
   @ONLY)
 
 # Readers declaration
-function(declare_f3d_reader)
+macro(declare_f3d_reader)
   cmake_parse_arguments(READER "SCENE_READER;GEOMETRY_READER;CUSTOM_CODE" "NAME;DESCRIPTION;EXTENSIONS;MIME_TYPES;VTK_IMPORTER;VTK_READER" "ARGS" ${ARGN})
 
   if(READER_SCENE_READER)
@@ -69,7 +69,7 @@ function(declare_f3d_reader)
   if(NOT READER_CUSTOM_CODE)
     configure_file(
       "${CMAKE_CURRENT_SOURCE_DIR}/readers/F3DReaderBoilerplate.h.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/readers/F3D${READER_NAME}Reader.h"
+      "${CMAKE_CURRENT_BINARY_DIR}/F3D${READER_NAME}Reader.h"
     @ONLY)
   endif()
 
@@ -82,7 +82,7 @@ function(declare_f3d_reader)
     "${F3D_READER_REGISTER_CODE}    F3DReaderFactory::Register(&InstanceOfF3D${READER_NAME}Reader);\n")
   set(F3D_READER_UNREGISTER_CODE
     "${F3D_READER_UNREGISTER_CODE}    F3DReaderFactory::Unregister(&InstanceOfF3D${READER_NAME}Reader);\n")
-endfunction()
+endmacro()
 
 declare_f3d_reader(NAME 3DS DESCRIPTION 3DS files Reader EXTENSIONS \".3ds\"  MIME_TYPES \"application/vnd.3ds\" SCENE_READER VTK_IMPORTER vtk3DSImporter)
 declare_f3d_reader(NAME CityGML DESCRIPTION CityGMLReader EXTENSIONS \".gml\" MIME_TYPES \"application/gml+xml\" GEOMETRY_READER VTK_READER vtkCityGMLReader)
@@ -95,7 +95,7 @@ declare_f3d_reader(NAME PLY DESCRIPTION PLY files reader EXTENSIONS \".ply\" MIM
 declare_f3d_reader(NAME PTS DESCRIPTION PTS files reader EXTENSIONS \".pts\" MIME_TYPES \"application/vnd.pts\" GEOMETRY_READER VTK_READER vtkPTSReader)
 declare_f3d_reader(NAME STL DESCRIPTION STK files reader EXTENSIONS \".stl\" MIME_TYPES \"model/stl\" CUSTOM_CODE)
 declare_f3d_reader(NAME TIFF DESCRIPTION TIFF files reader EXTENSIONS \".tif\", \".tiff\" MIME_TYPES \"application/x-tgif\" GEOMETRY_READER VTK_READER vtkTIFFReader)
-declare_f3d_reader(NAME VRML DESCRIPTION VRML files reader EXTENSIONS \".wrl\", \".vrml\" MIME_TYPES \"model/vrml\" GEOMETRY_READER VTK_READER vtkVRMLReader)
+declare_f3d_reader(NAME VRML DESCRIPTION VRML files reader EXTENSIONS \".wrl\", \".vrml\" MIME_TYPES \"model/vrml\" SCENE_READER VTK_IMPORTER vtkVRMLImporter)
 declare_f3d_reader(NAME VTKLegacy DESCRIPTION VTK Legacy files reader EXTENSIONS \".vtk\" MIME_TYPES \"application/vnd.vtk\" GEOMETRY_READER VTK_READER vtkPDataSetReader)
 declare_f3d_reader(NAME VTKXML DESCRIPTION VTK XML files reader EXTENSIONS  \".vtp\", \".vtu\", \".vtr\", \".vti\", \".vts\", \".vtm\" MIME_TYPES  \"application/vnd.vtp\", \"application/vnd.vtu\", \"application/vnd.vtr\", \"application/vnd.vti\", \"application/vnd.vts\", \"application/vnd.vtm\" GEOMETRY_READER VTK_READER vtkGenericDataObjectReader)
 
