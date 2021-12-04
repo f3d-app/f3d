@@ -29,8 +29,14 @@
   {
     "up": "+Z",
     "ssao": true,
-    "cells": true,
-    "scalars": "Colors",
-    "comp": -2
+    "scalars": "",
+    "comp": "-2",
+    "cells": "true"
+  },
+  ".*(tif|tiff)":
+  {
+    "up": "-Y",
+    "scalars": "",
+    "comp": "-2"
   }
 }
