@@ -415,6 +415,8 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}/source
       run: ctest -C Release -j 2 --output-on-failure
+      env:
+        LD_LIBRARY_PATH:../dependencies/assimp_5_0_install/lib/
 
     - name: Generate XML Coverage
       if: matrix.os == 'ubuntu-latest'
