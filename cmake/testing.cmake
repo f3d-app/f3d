@@ -201,11 +201,16 @@ if(F3D_MODULE_ASSIMP)
 
   if(VTK_VERSION VERSION_GREATER 9.0.20210728) # for TGA support and embedded textures
     f3d_test(NAME TestDAE DATA duck.dae)
-    f3d_test(NAME TestTexturedFBX DATA slime.fbx)
+
+    # Embeded texture are only working with assimp 5.1.X
+    if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.1.0")
+      f3d_test(NAME TestTexturedFBX DATA slime.fbx)
+    endif()
   endif()
 
-  # animations are broken with Assimp 5.1
-  if("${F3D_ASSIMP_VERSION}" VERSION_EQUAL "5.0")
+  # Animation are working only with assimp 5.0.0 and 5.0.1.
+  # Both report a assimp version 5.0.0 when using find_package
+  if("${F3D_ASSIMP_VERSION}" VERSION_EQUAL "5.0.0")
     f3d_test(NAME TestFBXAnim DATA robot_kyle_walking.fbx INTERACTION) #Space;Space;
   endif()
 endif()

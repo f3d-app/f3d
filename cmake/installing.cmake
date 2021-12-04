@@ -48,7 +48,14 @@ endif()
 
 # Other ressoure files
 if(UNIX AND NOT APPLE)
-  install(FILES "${CMAKE_SOURCE_DIR}/resources/f3d.desktop"
+  file(TOUCH "${CMAKE_BINARY_DIR}/mime_types")
+  file(READ "${CMAKE_BINARY_DIR}/mime_types" F3D_MIME_TYPES)
+  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_BINARY_DIR}/mime_types")
+  configure_file(
+    "${CMAKE_SOURCE_DIR}/resources/f3d.desktop.in"
+    "${CMAKE_BINARY_DIR}/resources/f3d.desktop")
+
+  install(FILES "${CMAKE_BINARY_DIR}/resources/f3d.desktop"
     DESTINATION "share/applications")
   install(FILES "${CMAKE_SOURCE_DIR}/resources/logo32.png"
     DESTINATION "share/icons/hicolor/32x32/apps"
@@ -78,9 +85,10 @@ if(UNIX AND NOT APPLE)
       DESTINATION "share/man/man1/")
   endif()
   if (F3D_INSTALL_THUMBNAILER_FILES)
-    install(FILES "${CMAKE_SOURCE_DIR}/resources/f3d.thumbnailer"
-      DESTINATION "share/thumbnailers/")
-    install(FILES "${CMAKE_SOURCE_DIR}/resources/f3d_z.thumbnailer"
+    configure_file(
+      "${CMAKE_SOURCE_DIR}/resources/f3d.thumbnailer.in"
+      "${CMAKE_BINARY_DIR}/resources/f3d.thumbnailer")
+    install(FILES "${CMAKE_BINARY_DIR}/resources/f3d.thumbnailer"
       DESTINATION "share/thumbnailers/")
   endif()
   if (F3D_INSTALL_MIME_TYPES_FILE)
@@ -90,16 +98,23 @@ if(UNIX AND NOT APPLE)
     install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-3d-image-formats.xml"
       DESTINATION "share/mime/packages"
       RENAME "f3d-3d-image-formats.xml")
-    install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-3d-misc-formats.xml"
-      DESTINATION "share/mime/packages"
-      RENAME "f3d-3d-misc-formats.xml")
     install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-vtk-formats.xml"
       DESTINATION "share/mime/packages"
       RENAME "f3d-vtk-formats.xml")
+    if (F3D_MODULE_EXODUS)
+      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-exodus-formats.xml"
+        DESTINATION "share/mime/packages"
+        RENAME "f3d-3d-exodus-formats.xml")
+    endif()
     if (F3D_MODULE_OCCT)
       install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-cad-formats.xml"
         DESTINATION "share/mime/packages"
         RENAME "f3d-cad-formats.xml")
+    endif()
+    if (F3D_MODULE_ASSIMP)
+      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-assimp-formats.xml"
+        DESTINATION "share/mime/packages"
+        RENAME "f3d-assimp-formats.xml")
     endif()
   endif()
 elseif(WIN32 AND NOT UNIX)

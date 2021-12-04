@@ -7,7 +7,7 @@ There are 4 main ways to use F3D:
 
 * By running F3D from a terminal with a set of command-line options.
 * By running F3D directly and then dragging and dropping files into it to open them.
-* By using F3D as an "Open with" program with specific file types.
+* By using F3D automatically in the file manager when opening file.
 * As a thumbnailer for all supported file formats with certain file managers.
 
 # Installation
