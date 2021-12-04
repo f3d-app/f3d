@@ -30,7 +30,9 @@ PinkEggFromLW.dxf: assimp test models: BSD
 pointsCloud*: F3D: BSD
 RectGrid2.vtr: VTK Data: BSD
 red.jpg: glTF-Sample-Models: Public Domain
+Robot_Color.tga: Unity Asset Store: Free to use
 robot_kyle_walking.fbx: Unity Asset Store: Free to use
+Robot_Normal.tga: Unity Asset Store: Free to use
 samplePTS.pts: VTK Data: BSD
 SimpleMorph.gltf: glTF-Sample-Models: Public Domain
 SimpleSkin.gltf: glTF-Sample-Models: Public Domain
