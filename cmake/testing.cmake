@@ -138,7 +138,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestGLTFImporterUnlit DATA UnlitTest.glb)
   f3d_test(NAME TestMaterial DATA suzanne.ply ARGS --color=0.72,0.45,0.2 --metallic=1 --roughness=0.1)
   f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m)
-  f3d_test(NAME TestInteractionAnimation DATA InterpolationTest.glb INTERACTION)#Space;Space;
+  f3d_test(NAME TestInteractionAnimation DATA InterpolationTest.glb ARGS --animation-index=-1 INTERACTION)#Space;Space;
   f3d_test(NAME TestInteractionAnimationMovement DATA KameraAnim.glb ARGS --camera-index=1 INTERACTION)#Space;MouseMovement;Space;
   f3d_test(NAME TestHDRI8Bit DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/data/testing/logo.tif LONG_TIMEOUT)
   f3d_test(NAME TestHDRIOrient DATA suzanne.stl ARGS --up=+Z --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr LONG_TIMEOUT)
