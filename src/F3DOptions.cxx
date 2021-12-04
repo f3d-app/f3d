@@ -158,7 +158,6 @@ protected:
   void PrintHelp(cxxopts::Options& cxxOptions);
   void PrintVersion();
   void PrintReadersList();
-  void PrintExtensionsList();
 
 private:
   int Argc;
@@ -187,7 +186,6 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp1, "help", "h", "Print help");
     this->DeclareOption(grp1, "version", "", "Print version details");
     this->DeclareOption(grp1, "readers-list", "", "Print the list of file types");
-    this->DeclareOption(grp1, "extensions-list", "", "Print the list of supported extensions");
     this->DeclareOption(grp1, "verbose", "", "Enable verbose mode, providing more information about the loaded data in the console output", options.Verbose);
     this->DeclareOption(grp1, "no-render", "", "Verbose mode without any rendering, only for the first file", options.NoRender);
     this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which superseed any verbose options and prevent any console output to be generated at all", options.Quiet);
@@ -289,12 +287,6 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     if (result.count("readers-list") > 0)
     {
       this->PrintReadersList();
-      throw F3DExNoProcess();
-    }
-
-    if (result.count("extensions-list") > 0)
-    {
-      this->PrintExtensionsList();
       throw F3DExNoProcess();
     }
   }
@@ -438,6 +430,7 @@ void ConfigurationOptions::PrintReadersList()
 {
   size_t nameColSize = 0;
   size_t extsColSize = 0;
+  size_t mimeColSize = 0;
   size_t descColSize = 0;
 
   const auto& readers = F3DReaderFactory::GetInstance()->GetReaders();
@@ -449,77 +442,66 @@ void ConfigurationOptions::PrintReadersList()
   // Compute the size of the 3 columns
   for (const auto& reader : readers)
   {
+    // sanity check
+    if (reader->GetExtensions().size() < reader->GetMimeTypes().size())
+    {
+      F3DLog::Print(F3DLog::Severity::Error, reader->GetName(), " have different extensions and mime-types count.");
+      return;
+    }
+
     nameColSize = std::max(nameColSize, reader->GetName().length());
     descColSize = std::max(descColSize, reader->GetLongDescription().length());
-    auto exts = reader->GetExtensions();
-    size_t extLen = 0;
-    int cnt = 0;
-    for (const auto& ext : exts)
+
+    for (const auto& ext : reader->GetExtensions())
     {
-      if (cnt++ > 0)
-      {
-        extLen++;
-      }
-      extLen += ext.length();
+      extsColSize = std::max(extsColSize, ext.length());
     }
-    extsColSize = std::max(extsColSize, extLen);
+    for (const auto& mime : reader->GetMimeTypes())
+    {
+      mimeColSize = std::max(mimeColSize, mime.length());
+    }
   }
   nameColSize++;
   extsColSize++;
+  mimeColSize++;
   descColSize++;
+
+  std::string separator = std::string(nameColSize + extsColSize + descColSize + mimeColSize, '-');
 
   // Print the rows split in 3 columns
   std::stringstream headerLine;
-  headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(extsColSize)
-             << "Extensions" << std::setw(descColSize) << "Description";
+  headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(descColSize)
+             << "Description" << std::setw(extsColSize) << "Exts" << std::setw(mimeColSize) << "Mime-types";
   F3DLog::Print(F3DLog::Severity::Info, headerLine.str());
-  F3DLog::Print(F3DLog::Severity::Info, std::string(nameColSize + extsColSize + descColSize, '-'));
+  F3DLog::Print(F3DLog::Severity::Info, separator);
 
   for (const auto& reader : readers)
   {
-    std::stringstream readerLine;
-    readerLine << std::left << std::setw(nameColSize) << reader->GetName()
-               << std::setw(extsColSize);
-    auto exts = reader->GetExtensions();
-    unsigned int cnt = 0;
-    std::string extLine;
-    for (const auto& ext : exts)
+    for (size_t i = 0; i < reader->GetExtensions().size(); i++)
     {
-      if (cnt++ > 0)
-      {
-        extLine += ";";
-      }
-      extLine += ext;
-    }
-    readerLine << extLine << std::setw(descColSize) << reader->GetLongDescription();
-    F3DLog::Print(F3DLog::Severity::Info, readerLine.str());
-  }
-}
+      std::stringstream readerLine;
 
-//----------------------------------------------------------------------------
-void ConfigurationOptions::PrintExtensionsList()
-{
-  const auto& readers = F3DReaderFactory::GetInstance()->GetReaders();
-  if (readers.size() == 0)
-  {
-    F3DLog::Print(F3DLog::Severity::Warning, "No registered reader found!");
-    return;
-  }
-  std::stringstream extList;
-  unsigned int cnt = 0;
-  for (const auto& reader : readers)
-  {
-    auto exts = reader->GetExtensions();
-    for (const auto& ext : exts)
-    {
-      if (cnt++ > 0)
+      if (i == 0)
       {
-        extList << ";";
+        readerLine << std::left << std::setw(nameColSize) << reader->GetName()
+               << std::setw(descColSize) << reader->GetLongDescription();
       }
-      extList << ext;
+      else
+      {
+        readerLine << std::left << std::setw(nameColSize + descColSize) << " ";
+      }
+
+      readerLine << std::setw(extsColSize) << reader->GetExtensions()[i];
+
+      if (i < reader->GetMimeTypes().size())
+      {
+        readerLine << std::setw(mimeColSize) << reader->GetMimeTypes()[i];
+      }
+
+      F3DLog::Print(F3DLog::Severity::Info, readerLine.str());
     }
+    F3DLog::Print(F3DLog::Severity::Info, separator);
   }
-  F3DLog::Print(F3DLog::Severity::Info, extList.str());
 }
 
 //----------------------------------------------------------------------------

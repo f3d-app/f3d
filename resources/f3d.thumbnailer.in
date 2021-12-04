@@ -3,4 +3,4 @@ Type=X-Thumbnailer
 Name=f3d Thumbnailer
 TryExec=f3d
 Exec=f3d --dry-run -sta --no-background --output=%o --resolution=%s,%s %i
-MimeType=${F3D_MIME_TYPES}
+MimeType=${F3D_SUPPORTED_MIME_TYPES}

@@ -48,9 +48,6 @@ endif()
 
 # Other ressoure files
 if(UNIX AND NOT APPLE)
-  file(TOUCH "${CMAKE_BINARY_DIR}/mime_types")
-  file(READ "${CMAKE_BINARY_DIR}/mime_types" F3D_MIME_TYPES)
-  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_BINARY_DIR}/mime_types")
   configure_file(
     "${CMAKE_SOURCE_DIR}/resources/f3d.desktop.in"
     "${CMAKE_BINARY_DIR}/resources/f3d.desktop")
