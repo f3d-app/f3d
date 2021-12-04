@@ -5,9 +5,19 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/F3DThumbnailConfig.h"
   @ONLY)
 
+set(F3D_SUPPORTED_EXTENSIONS_INITIALIZER_LIST ${F3D_SUPPORTED_EXTENSIONS})
+
+list(TRANSFORM F3D_SUPPORTED_EXTENSIONS_INITIALIZER_LIST PREPEND "L\".")
+list(TRANSFORM F3D_SUPPORTED_EXTENSIONS_INITIALIZER_LIST APPEND "\"")
+list(JOIN F3D_SUPPORTED_EXTENSIONS_INITIALIZER_LIST ", " F3D_SUPPORTED_EXTENSIONS_INITIALIZER_LIST)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/F3DShellExtension.cxx.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/F3DShellExtension.cxx"
+  @ONLY)
+
 add_library(F3DShellExtension SHARED
-  "${CMAKE_CURRENT_BINARY_DIR}/F3DThumbnailConfig.h"
-  F3DShellExtension.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/F3DShellExtension.cxx
   F3DShellExtensionClassFactory.h
   F3DThumbnailProvider.h
   F3DThumbnailProvider.cxx
@@ -16,7 +26,7 @@ add_library(F3DShellExtension SHARED
 
 target_compile_definitions(F3DShellExtension PUBLIC UNICODE)
 
-target_include_directories(F3DShellExtension PUBLIC ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(F3DShellExtension PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(F3DShellExtension PUBLIC libf3d PRIVATE pathcch shlwapi windowscodecs)
 

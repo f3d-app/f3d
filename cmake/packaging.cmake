@@ -40,9 +40,12 @@ if(WIN32 AND NOT UNIX)
    !include \\\"${PATH_TO_PLUGINS}\\\\FileAssociation.nsh\\\"")
 
   # Create association on install
+  set(F3D_REGISTER_LIST "${F3D_FILE_ASSOCIATION_NSIS}")
+  list(TRANSFORM F3D_REGISTER_LIST PREPEND "\\\${RegisterExtension} '\\\"$INSTDIR\\\\bin\\\\f3d.exe\\\"' ")
+  list(JOIN F3D_REGISTER_LIST "\n      " F3D_REGISTER_STRING)
   set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "\
     StrCmp $REGISTER_EXTENSIONS \\\"0\\\" doNotRegisterExtensions\n\
-      !include \\\"NSIS.RegisterCommands.nsh\\\"\n\
+      ${F3D_REGISTER_STRING}\n\
       \\\${RefreshShellIcons}\n\
     doNotRegisterExtensions:\n\n")
 
@@ -59,9 +62,12 @@ if(WIN32 AND NOT UNIX)
   endif()
 
   # Remove association on uninstall
+  set(F3D_UNREGISTER_LIST "${F3D_FILE_ASSOCIATION_NSIS}")
+  list(TRANSFORM F3D_UNREGISTER_LIST PREPEND "\\\${UnRegisterExtension} ")
+  list(JOIN F3D_UNREGISTER_LIST "\n      " F3D_UNREGISTER_STRING)
   set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "\
     StrCmp $REGISTER_EXTENSIONS \\\"0\\\" doNotUnregisterExtensions\n\
-      !include \\\"NSIS.UnregisterCommands.nsh\\\"\n\
+      ${F3D_UNREGISTER_STRING}\n\
       \\\${RefreshShellIcons}\n\
     doNotUnregisterExtensions:\n\n")
 
