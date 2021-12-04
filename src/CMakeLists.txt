@@ -51,32 +51,53 @@ configure_file(
   @ONLY)
 
 # Readers declaration
-macro(declare_f3d_reader reader)
-  list(APPEND F3D_READER_FILES "readers/${reader}.h")
-  set(F3D_READER_INCLUDES_CODE
-    "${F3D_READER_INCLUDES_CODE}#include \"${reader}.h\"\n")
-  set(F3D_READER_INSTANCES_CODE
-    "${F3D_READER_INSTANCES_CODE}  ${reader} InstanceOf${reader};\n")
-  set(F3D_READER_REGISTER_CODE
-    "${F3D_READER_REGISTER_CODE}    F3DReaderFactory::Register(&InstanceOf${reader});\n")
-  set(F3D_READER_UNREGISTER_CODE
-    "${F3D_READER_UNREGISTER_CODE}    F3DReaderFactory::Unregister(&InstanceOf${reader});\n")
-endmacro()
+function(declare_f3d_reader)
+  cmake_parse_arguments(READER "SCENE_READER;GEOMETRY_READER;CUSTOM_CODE" "NAME;DESCRIPTION;EXTENSIONS;MIME_TYPES;VTK_IMPORTER;VTK_READER" "ARGS" ${ARGN})
 
-declare_f3d_reader(F3D3DSReader)
-declare_f3d_reader(F3DCityGMLReader)
-declare_f3d_reader(F3DDICOMReader)
-declare_f3d_reader(F3DGLTFReader)
-declare_f3d_reader(F3DMetaImageReader)
-declare_f3d_reader(F3DNrrdReader)
-declare_f3d_reader(F3DOBJReader)
-declare_f3d_reader(F3DPLYReader)
-declare_f3d_reader(F3DPTSReader)
-declare_f3d_reader(F3DSTLReader)
-declare_f3d_reader(F3DTIFFReader)
-declare_f3d_reader(F3DVRMLReader)
-declare_f3d_reader(F3DVTKLegacyReader)
-declare_f3d_reader(F3DVTKXMLReader)
+  if(READER_SCENE_READER)
+    set(READER_HAS_SCENE_READER 1)
+  else()
+    set(READER_HAS_SCENE_READER 0)
+  endif()
+
+  if(READER_GEOMETRY_READER)
+    set(READER_HAS_GEOMETRY_READER 1)
+  else()
+    set(READER_HAS_GEOMETRY_READER 0)
+  endif()
+
+  if(NOT READER_CUSTOM_CODE)
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/readers/F3DReaderBoilerplate.h.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/readers/F3D${READER_NAME}Reader.h"
+    @ONLY)
+  endif()
+
+  list(APPEND F3D_READER_FILES "readers/F3D${READER_NAME}Reader.h")
+  set(F3D_READER_INCLUDES_CODE
+    "${F3D_READER_INCLUDES_CODE}#include \"F3D${READER_NAME}Reader.h\"\n")
+  set(F3D_READER_INSTANCES_CODE
+    "${F3D_READER_INSTANCES_CODE}  F3D${READER_NAME}Reader InstanceOfF3D${READER_NAME}Reader;\n")
+  set(F3D_READER_REGISTER_CODE
+    "${F3D_READER_REGISTER_CODE}    F3DReaderFactory::Register(&InstanceOfF3D${READER_NAME}Reader);\n")
+  set(F3D_READER_UNREGISTER_CODE
+    "${F3D_READER_UNREGISTER_CODE}    F3DReaderFactory::Unregister(&InstanceOfF3D${READER_NAME}Reader);\n")
+endfunction()
+
+declare_f3d_reader(NAME 3DS DESCRIPTION 3DS files Reader EXTENSIONS \".3ds\"  MIME_TYPES \"application/vnd.3ds\" SCENE_READER VTK_IMPORTER vtk3DSImporter)
+declare_f3d_reader(NAME CityGML DESCRIPTION CityGMLReader EXTENSIONS \".gml\" MIME_TYPES \"application/gml+xml\" GEOMETRY_READER VTK_READER vtkCityGMLReader)
+declare_f3d_reader(NAME DICOM DESCRIPTION DICOMReader EXTENSIONS \".dcm\" MIME_TYPES \"application/dicom\" GEOMETRY_READER VTK_READER vtkDICOMImageReader)
+declare_f3d_reader(NAME GLTF DESCRIPTION glTF files reader EXTENSIONS \".gltf\", \".glb\" MIME_TYPES \"model/gltf-binary\", \"model/gltf+json\" CUSTOM_CODE)
+declare_f3d_reader(NAME MetaImage DESCRIPTION MetaImage files reader EXTENSIONS \".mha\", \".mhd\" MIME_TYPES \"application/vnd.mhd\" GEOMETRY_READER VTK_READER vtkMetaImageReader)
+declare_f3d_reader(NAME Nrrd DESCRIPTION Nrrd files reader EXTENSIONS \".nrrd\", \".nhdr\" MIME_TYPES \"application/vnd.nrrd\" GEOMETRY_READER VTK_READER vtkNrrdReader)
+declare_f3d_reader(NAME OBJ DESCRIPTION OBJ files reader EXTENSIONS \".obj\" MIME_TYPES \"model/obj\" CUSTOM_CODE)
+declare_f3d_reader(NAME PLY DESCRIPTION PLY files reader EXTENSIONS \".ply\" MIME_TYPES \"application/vnd.ply\" GEOMETRY_READER VTK_READER vtkPLYReader)
+declare_f3d_reader(NAME PTS DESCRIPTION PTS files reader EXTENSIONS \".pts\" MIME_TYPES \"application/vnd.pts\" GEOMETRY_READER VTK_READER vtkPTSReader)
+declare_f3d_reader(NAME STL DESCRIPTION STK files reader EXTENSIONS \".stl\" MIME_TYPES \"model/stl\" CUSTOM_CODE)
+declare_f3d_reader(NAME TIFF DESCRIPTION TIFF files reader EXTENSIONS \".tif\", \".tiff\" MIME_TYPES \"application/x-tgif\" GEOMETRY_READER VTK_READER vtkTIFFReader)
+declare_f3d_reader(NAME VRML DESCRIPTION VRML files reader EXTENSIONS \".wrl\", \".vrml\" MIME_TYPES \"model/vrml\" GEOMETRY_READER VTK_READER vtkVRMLReader)
+declare_f3d_reader(NAME VTKLegacy DESCRIPTION VTK Legacy files reader EXTENSIONS \".vtk\" MIME_TYPES \"application/vnd.vtk\" GEOMETRY_READER VTK_READER vtkPDataSetReader)
+declare_f3d_reader(NAME VTKXML DESCRIPTION VTK XML files reader EXTENSIONS  \".vtp\", \".vtu\", \".vtr\", \".vti\", \".vts\", \".vtm\" MIME_TYPES  \"application/vnd.vtp\", \"application/vnd.vtu\", \"application/vnd.vtr\", \"application/vnd.vti\", \"application/vnd.vts\", \"application/vnd.vtm\" GEOMETRY_READER VTK_READER vtkGenericDataObjectReader)
 
 if(F3D_MODULE_OCCT)
   set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DOCCTReader.cxx")
@@ -86,7 +107,7 @@ if(F3D_MODULE_OCCT)
   # See .github/workflows/ci.yml for a scripted fix 
   set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} ${OpenCASCADE_LIBRARIES})
   
-  declare_f3d_reader(F3DOpenCascadeReader)
+  declare_f3d_reader(NAME OpenCascade DESCRIPTION OpenCascade files reader (STEP and IGES files) EXTENSIONS \".stp\", \".step\", \".igs\", \".iges\" MIME_TYPES \"model/iges\", \"application/vnd.step\" CUSTOM_CODE)
 endif()
 
 if(F3D_MODULE_ASSIMP)
@@ -99,11 +120,11 @@ if(F3D_MODULE_ASSIMP)
     set_target_properties(assimp::assimp PROPERTIES MAP_IMPORTED_CONFIG_DEBUG Release)
   endif()
 
-  declare_f3d_reader(F3DAssimpReader)
+  declare_f3d_reader(NAME Assimp iDESCRIPTION Assimp files Reader (FBX, DAE, DXF and OFF files) EXTENSIONS \".fbx\", \".dae\", \".dxf\", \".off\"  MIME_TYPES  \"application/vnd.fbx\", \"application/vnd.dae\", \"image/vnd.dxf\", \"application/vnd.off\" SCENE_READER VTK_IMPORTER vtkF3DAssimpImporter)
 endif()
 
 if(F3D_MODULE_EXODUS)
-  declare_f3d_reader(F3DExodusIIReader)
+  declare_f3d_reader(NAME ExodusII DESCRIPTION ExodusII files reader EXTENSIONS \".exo\", \".ex2\", \".e\" MIME_TYPES \"application/vnd.exodus\" CUSTOM_CODE)
 endif()
 
 # Generate the code of the F3DReaderInstantiator class
