@@ -104,22 +104,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-
-******************************************************************************
-
-AN EXCEPTION applies to all files in the ./test/models-nonbsd folder.
-These are 3d models for testing purposes, from various free sources
-on the internet. They are - unless otherwise stated - copyright of
-their respective creators, which may impose additional requirements
-on the use of their work. For any of these models, see
-<model-name>.source.txt for more legal information. Contact us if you
-are a copyright holder and believe that we credited you inproperly or
-if you don't want your files to appear in the repository.
-
-
-******************************************************************************
-
 Poly2Tri Copyright (c) 2009-2010, Poly2Tri Contributors
 http://code.google.com/p/poly2tri/
 
