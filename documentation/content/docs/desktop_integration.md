@@ -9,6 +9,4 @@ During installation, F3D will install mime types files as defined by the [XDG st
 
 ## Windows
 
-Using the F3D NSIS installer is the simplest way to enable thumbnails on windows, you can find it in the release section. It will automatically register it when installing F3D and unregister it when uninstalling F3D.
-It is also possible to manually register it using `regsvr32 F3DShellExtension.dll`. To unregister it, use `regsvr32 /u F3DShellExtension.dll`.
-The NSIS installer also register/unregister extensions support on installation/deinstallation.
+Using the F3D NSIS installer is the simplest way to enable thumbnails on windows, you can find it in the release section. It will automatically register it when installing F3D and unregister it when uninstalling F3D. It is also possible to manually register it using `regsvr32 F3DShellExtension.dll`. To unregister it, use `regsvr32 /u F3DShellExtension.dll`. The NSIS installer also register/unregister extensions support on installation/deinstallation.

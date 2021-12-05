@@ -17,13 +17,9 @@ Alternatively, you can build it yourself following the [build](#Build) guide bel
 
 You can also find packages for the following operating systems:
 
-## Ubuntu
+## Ubuntu/Debian/openSuse
 
-Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home%3AAndnoVember%3ADebian/f3d).
-
-## OpenSuse
-
-Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home%3AAndnoVember%3Atest/f3d).
+Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home:AndnoVember:F3D/f3d).
 
 ## Arch Linux
 
@@ -39,11 +35,15 @@ Available in [DPorts](https://github.com/DragonFlyBSD/DPorts/tree/master/graphic
 
 ## MacOS Brew
 
-Available in [Homebrew](https://github.com/DragonFlyBSD/DPorts/tree/master/graphics/f3d).
+Available in [Homebrew](https://formulae.brew.sh/formula/f3d).
 
 ## NixOS
 
 Available in [nixpkgs](https://github.com/NixOS/nixpkgs/blob/release-21.05/pkgs/applications/graphics/f3d/default.nix).
+
+## Flathub
+
+Available in [Flathub](https://flathub.org/apps/details/com.kitware.F3D).
 
 # Build
 
