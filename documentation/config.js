@@ -11,7 +11,7 @@ module.exports = {
     url: 'https://f3d-app.github.io/f3d/',
     root: '/F3D/',
     github: 'f3d-app/f3d',
-    google_analytics: 'UA-161732554-1',
+    google_analytics: 'G-QQJSFRXCT0',
   },
   copy: [],
 };
