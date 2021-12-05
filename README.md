@@ -43,13 +43,9 @@ Alternatively, you can build it yourself following the [build](#Build) guide bel
 
 You can also find packages for the following operating systems:
 
-## Ubuntu
+## Ubuntu/Debian/openSuse
 
-Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home%3AAndnoVember%3ADebian/f3d).
-
-## OpenSuse
-
-Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home%3AAndnoVember%3Atest/f3d).
+Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home:AndnoVember:F3D/f3d).
 
 ## Arch Linux
 
