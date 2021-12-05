@@ -1,7 +1,7 @@
 title: Gallery
 ---
 
-Images and videos displayed below use public datasets, you can download them [here](https://drive.google.com/uc?export=download&id=1BVoJsyvdVIPqhUj9u5Ap9-glPLeQ_0gF).
+Images and videos displayed below use public datasets, you can download them [here](https://drive.google.com/file/d/1iRh0OeJjMjjaBDLG6b_iJSkC_Jt_YQuo/view?usp=sharing).
 
 <style>
   div.gallery {
@@ -46,14 +46,14 @@ Images and videos displayed below use public datasets, you can download them [he
 <div class="gallery">
     <a data-fancybox="gallery" href="can.webm"><video autoplay loop muted src="can.webm" type="video/webm"/></a>
     <div class="desc">Animated SciViz rendering
-      <span class="code">f3d can.ex2 -xtgans --up=+Z --scalars=VEL</span>
+      <span class="code">f3d can.ex2 -xtgans \-\-up=+Z \-\-scalars=VEL</span>
     </div>
 </div>
 
 <div class="gallery">
     <a data-fancybox="gallery" href="directScalars.png"><img src="directScalars.png"></a>
     <div class="desc">Direct scalars rendering of a point cloud
-      <span class="code">f3d Carola_PointCloud.ply --point-size=0 --comp=-2 -so --verbose --up=+Z --hdri=venice_sunset_8k.hdr</span>
+      <span class="code">f3d Carola_PointCloud.ply \-\-point-size=0 \-\-comp=-2 -so \-\-up=+Z \-\-hdri=venice_sunset_8k.hdr</span>
     </div>
 </div>
 
@@ -82,6 +82,20 @@ Images and videos displayed below use public datasets, you can download them [he
     <a data-fancybox="gallery" href="04-f3d.png"><img src="04-f3d.png"></a>
     <div class="desc">Showcase of interactive widgets
       <span class="code">f3d dragon.vtu -xtganse \-\-comp=0</span>
+    </div>
+</div>
+
+<div class="gallery">
+    <a data-fancybox="gallery" href="brass.png"><img src="brass.png"></a>
+    <div class="desc">Metallic Rendering of a STEP file
+      <span class="code">f3d eta_asm.stp --hdri=future_parking_2k.hdr -uqxtga --up=+Z --metallic=1 --roughness=0.6 <br>--color=0.98,0.90,0.59</span>
+    </div>
+</div>
+
+<div class="gallery">
+    <a data-fancybox="gallery" href="zelda.png"><img src="zelda.png"></a>
+    <div class="desc">Rendering of a FBX file
+      <span class="code">f3d zeldaPosed001.fbx --hdri=hikers_cave_2k.hdr -uqxtga</span>
     </div>
 </div>
 
@@ -122,11 +136,18 @@ https://sketchfab.com/ScottishMaritimeMuseum
 Gearbox Animation by DZHUSI ØNE
 https://sketchfab.com/dzhusione
 
+Watch movement by Greg Brown
+https://grabcad.com/greg.brown
+
+Zelda - Breath Of The Wild by theStoff
+https://sketchfab.com/theStoff
+
 Venice Sunset HDRI by Greg Zaal
-https://hdrihaven.com/hdris/?a=Greg%20Zaal
+Hiker's Cave HDRI by Greg Zaal
+https://polyhaven.com/hdris?a=Greg%20Zaal
 
 Future Parking HDRI by Sergej Majboroda
-https://hdrihaven.com/hdris/?a=Sergej%20Majboroda
+https://polyhaven.com/hdris?a=Sergej%20Majboroda
 
 <!-- hidden gif to be used by README.md -->
 <p hidden><img src="dota.gif"></p>

@@ -22,6 +22,10 @@ public:
     PrintInternal(sev, ss.str());
   }
 
+  static void SetUseColoring(bool use);
+
+  static void SetQuiet(bool quiet);
+
 protected:
   static void AppendArg(std::stringstream&) {}
 
@@ -33,6 +37,8 @@ protected:
   }
 
   static void PrintInternal(Severity sev, const std::string& msg);
+
+  static bool Quiet;
 };
 
 #endif

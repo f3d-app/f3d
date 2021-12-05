@@ -1,20 +1,21 @@
 #include "F3DOffscreenRender.h"
 
+#include <vtkImageData.h>
 #include <vtkImageDifference.h>
 #include <vtkNew.h>
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
 #include <vtkRenderWindow.h>
+#include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
 #include <vtksys/SystemTools.hxx>
 
 #include "F3DLog.h"
 
-int F3DOffscreenRender::RenderOffScreen(
-  vtkRenderWindow* renWin, const std::string& output, bool noBg)
+//----------------------------------------------------------------------------
+bool F3DOffscreenRender::RenderToImage(
+  vtkRenderWindow* renWin, vtkImageData* image, bool noBg)
 {
-  renWin->OffScreenRenderingOn();
-
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(renWin);
 
@@ -23,43 +24,69 @@ int F3DOffscreenRender::RenderOffScreen(
     rtW2if->SetInputBufferTypeToRGBA();
   }
 
+  rtW2if->Update();
+  vtkImageData* outImg = rtW2if->GetOutput();
+  image->ShallowCopy(outImg);
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool F3DOffscreenRender::RenderOffScreen(
+  vtkRenderWindow* renWin, const std::string& output, bool noBg)
+{
+  vtkNew<vtkImageData> image;
+  F3DOffscreenRender::RenderToImage(renWin, image, noBg);
+
   vtkNew<vtkPNGWriter> writer;
-  writer->SetInputConnection(rtW2if->GetOutputPort());
+  writer->SetInputData(image);
   std::string fullPath = vtksys::SystemTools::CollapseFullPath(output);
   writer->SetFileName(fullPath.c_str());
   writer->Write();
 
-  return EXIT_SUCCESS;
+  return true;
 }
 
-int F3DOffscreenRender::RenderTesting(
-  vtkRenderWindow* renWin, const std::string& reference, double threshold)
+//----------------------------------------------------------------------------
+bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::string& reference,
+  double threshold, bool noBg, const std::string& output)
 {
-  renWin->OffScreenRenderingOn();
+  if (!vtksys::SystemTools::FileExists(reference))
+  {
+    if (output.empty())
+    {
+      F3DLog::Print(F3DLog::Severity::Error,
+        "Reference image does not exists, use the --output option to output current rendering into "
+        "an image file.");
+    }
+    else
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20211007)
+      F3DOffscreenRender::RenderOffScreen(renWin, output, noBg);
+#else
+      F3DOffscreenRender::RenderOffScreen(renWin, output);
+#endif
+      F3DLog::Print(F3DLog::Severity::Error,
+        "Reference file does not exists, current rendering has been outputted to ", output, ".");
+    }
+    return false;
+  }
 
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(renWin);
-
-  if (vtksys::SystemTools::HasEnv("F3D_GEN_REF"))
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20211007)
+  if (noBg)
   {
-    vtkNew<vtkPNGWriter> writer;
-    writer->SetInputConnection(rtW2if->GetOutputPort());
-    std::string fullPath = vtksys::SystemTools::CollapseFullPath(reference);
-    writer->SetFileName(fullPath.c_str());
-    writer->Write();
-
-    F3DLog::Print(F3DLog::Severity::Info, "Reference generated!");
-
-    return EXIT_SUCCESS;
+    rtW2if->SetInputBufferTypeToRGBA();
   }
-
-  if (!vtksys::SystemTools::FileExists(reference))
+  else
   {
-    F3DLog::Print(F3DLog::Severity::Error,
-      "Reference file does not exists, "
-      "generate it first (set F3D_GEN_REF variable and run test again).");
-    return EXIT_FAILURE;
+    rtW2if->SetInputBufferTypeToRGB();
   }
+#else
+  static_cast<void>(noBg);
+  rtW2if->SetInputBufferTypeToRGB();
+#endif
 
   vtkNew<vtkPNGReader> reader;
   reader->SetFileName(reference.c_str());
@@ -73,23 +100,32 @@ int F3DOffscreenRender::RenderTesting(
   F3DLog::Print(F3DLog::Severity::Info, "Diff threshold error = ", error);
   if (error > threshold)
   {
-    std::string fileName = vtksys::SystemTools::GetFilenameName(reference.c_str());
-    std::string testFileName = vtksys::SystemTools::CollapseFullPath(fileName);
+    F3DLog::Print(F3DLog::Severity::Error,
+      "Current rendering difference with reference image is higher than the threshold of ",
+      threshold, ".");
+    if (output.empty())
+    {
+      F3DLog::Print(F3DLog::Severity::Error,
+        "Use the --output option to be able to output current rendering and diff images into "
+        "files.");
+    }
+    else
+    {
+      std::string diffFileName = output.c_str();
+      vtksys::SystemTools::ReplaceString(diffFileName, ".png", ".diff.png");
 
-    std::string modFileName = fileName;
-    vtksys::SystemTools::ReplaceString(modFileName, ".png", ".diff.png");
-    std::string diffFileName = vtksys::SystemTools::CollapseFullPath(modFileName);
+      vtkNew<vtkPNGWriter> writer;
+      writer->SetInputConnection(rtW2if->GetOutputPort());
+      writer->SetFileName(output.c_str());
+      writer->Write();
 
-    vtkNew<vtkPNGWriter> writer;
-    writer->SetInputConnection(rtW2if->GetOutputPort());
-    writer->SetFileName(fileName.c_str());
-    writer->Write();
-
-    writer->SetInputConnection(diff->GetOutputPort());
-    writer->SetFileName(diffFileName.c_str());
-    writer->Write();
-
-    return EXIT_FAILURE;
+      writer->SetInputConnection(diff->GetOutputPort());
+      writer->SetFileName(diffFileName.c_str());
+      writer->Write();
+      F3DLog::Print(F3DLog::Severity::Error,
+        "Current rendering and diff images have been outputted in ", output, " and ", diffFileName);
+    }
+    return false;
   }
-  return EXIT_SUCCESS;
+  return true;
 }

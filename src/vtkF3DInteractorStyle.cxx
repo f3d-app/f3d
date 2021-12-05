@@ -1,13 +1,17 @@
 #include "vtkF3DInteractorStyle.h"
 
+#include "F3DAnimationManager.h"
+#include "F3DIncludes.h"
 #include "F3DLoader.h"
-#include "vtkF3DRenderer.h"
+#include "F3DLog.h"
+#include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
 #include <vtkMath.h>
 #include <vtkMatrix3x3.h>
 #include <vtkObjectFactory.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 #include <vtkStringArray.h>
@@ -17,6 +21,13 @@ vtkStandardNewMacro(vtkF3DInteractorStyle);
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
 {
+  if (files == nullptr)
+  {
+    F3DLog::Print(F3DLog::Severity::Warning,
+      "Drop event without any provided files.");
+    return;
+  }
+
   vtkRenderWindowInteractor* rwi = this->GetInteractor();
   vtkRenderWindow* renWin = rwi->GetRenderWindow();
   this->InvokeEvent(F3DLoader::NewFilesEvent, files);
@@ -29,65 +40,75 @@ void vtkF3DInteractorStyle::OnKeyPress()
   vtkRenderWindowInteractor* rwi = this->GetInteractor();
   vtkRenderWindow* renWin = rwi->GetRenderWindow();
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  vtkF3DRendererWithColoring* renWithColor = vtkF3DRendererWithColoring::SafeDownCast(ren);
 
-  switch (rwi->GetKeyCode())
+  switch (std::toupper(rwi->GetKeyCode()))
   {
-    case 's':
-    case 'S':
-      ren->ShowScalars(!ren->AreScalarsVisible());
-      renWin->Render();
+    case 'C':
+      if (renWithColor)
+      {
+        renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
+        renWin->Render();
+      }
       break;
-    case 'b':
+    case 'S':
+      if (renWithColor)
+      {
+        renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
+        renWin->Render();
+      }
+      break;
+    case 'Y':
+      if (renWithColor)
+      {
+        renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
+        renWin->Render();
+      }
+      break;
     case 'B':
-      ren->ShowScalarBar(!ren->IsScalarBarVisible());
-      renWin->Render();
+      if (renWithColor)
+      {
+        renWithColor->ShowScalarBar(!renWithColor->IsScalarBarVisible());
+        renWin->Render();
+      }
       break;
     case 'p':
     case 'P':
       ren->SetUseDepthPeelingPass(!ren->UsingDepthPeelingPass());
       renWin->Render();
       break;
-    case 'q':
     case 'Q':
       ren->SetUseSSAOPass(!ren->UsingSSAOPass());
       renWin->Render();
       break;
-    case 'a':
     case 'A':
       ren->SetUseFXAAPass(!ren->UsingFXAAPass());
       renWin->Render();
       break;
-    case 't':
     case 'T':
       ren->SetUseToneMappingPass(!ren->UsingToneMappingPass());
       renWin->Render();
       break;
-    case 'e':
     case 'E':
       ren->ShowEdge(!ren->IsEdgeVisible());
       renWin->Render();
       break;
-    case 'x':
     case 'X':
       ren->ShowAxis(!ren->IsAxisVisible());
       renWin->Render();
       break;
-    case 'g':
     case 'G':
       ren->ShowGrid(!ren->IsGridVisible());
       renWin->Render();
       break;
-    case 'n':
     case 'N':
       ren->ShowFilename(!ren->IsFilenameVisible());
       renWin->Render();
       break;
-    case 'm':
     case 'M':
       ren->ShowMetaData(!ren->IsMetaDataVisible());
       renWin->Render();
       break;
-    case 'z':
     case 'Z':
       ren->ShowTimer(!ren->IsTimerVisible());
       renWin->Render();
@@ -98,34 +119,55 @@ void vtkF3DInteractorStyle::OnKeyPress()
         renWin->Render();
       }
       break;
-    case 'r':
     case 'R':
       ren->SetUseRaytracing(!ren->UsingRaytracing());
       renWin->Render();
       break;
-    case 'd':
     case 'D':
       ren->SetUseRaytracingDenoiser(!ren->UsingRaytracingDenoiser());
       renWin->Render();
       break;
-    case 'v':
     case 'V':
-      ren->SetUseVolume(!ren->UsingVolume());
-      renWin->Render();
+      if (renWithColor)
+      {
+        renWithColor->SetUseVolume(!renWithColor->UsingVolume());
+        renWin->Render();
+      }
       break;
-    case 'i':
     case 'I':
-      ren->SetUseInverseOpacityFunction(!ren->UsingInverseOpacityFunction());
-      renWin->Render();
+      if (renWithColor)
+      {
+        renWithColor->SetUseInverseOpacityFunction(!renWithColor->UsingInverseOpacityFunction());
+        renWin->Render();
+      }
       break;
-    case 'o':
     case 'O':
-      ren->SetUsePointSprites(!ren->UsingPointSprites());
-      renWin->Render();
+      if (renWithColor)
+      {
+        renWithColor->SetUsePointSprites(!renWithColor->UsingPointSprites());
+        renWin->Render();
+      }
       break;
-    case 'f':
     case 'F':
+      if (!renWin->GetFullScreen())
+      {
+        // save current window position and size
+        int* pos = renWin->GetPosition();
+        this->WindowPos[0] = pos[0];
+        this->WindowPos[1] = pos[1];
+        int* size = renWin->GetSize();
+        this->WindowSize[0] = size[0];
+        this->WindowSize[1] = size[1];
+      }
+
       renWin->SetFullScreen(!renWin->GetFullScreen());
+
+      if (!renWin->GetFullScreen() && this->WindowSize[0] > 0)
+      {
+        // restore previous window position and size
+        renWin->SetPosition(this->WindowPos);
+        renWin->SetSize(this->WindowSize);
+      }
 
       // when going full screen, the OpenGL context changes, we need to reinitialize
       // the interactor, the render passes and the grid actor.
@@ -135,17 +177,14 @@ void vtkF3DInteractorStyle::OnKeyPress()
 
       renWin->Render();
       break;
-    case 'u':
     case 'U':
       ren->SetUseBlurBackground(!ren->UsingBlurBackground());
       renWin->Render();
       break;
-    case 'k':
     case 'K':
       ren->SetUseTrackball(!ren->UsingTrackball());
       renWin->Render();
       break;
-    case 'h':
     case 'H':
       ren->ShowCheatSheet(!ren->IsCheatSheetVisible());
       renWin->Render();
@@ -155,6 +194,11 @@ void vtkF3DInteractorStyle::OnKeyPress()
       break;
     default:
       std::string keySym = rwi->GetKeySym();
+      if (keySym.length() > 0)
+      {
+        // Make sure key symbols starts with an upper char (e.g. "space")
+        keySym[0] = std::toupper(keySym[0]);
+      }
       if (keySym == "Left")
       {
         int load = F3DLoader::LOAD_PREVIOUS;
@@ -173,9 +217,9 @@ void vtkF3DInteractorStyle::OnKeyPress()
         this->InvokeEvent(F3DLoader::LoadFileEvent, &load);
         renWin->Render();
       }
-      else if (keySym == "Escape")
+      else if (keySym == F3D::EXIT_HOTKEY_SYM)
       {
-        rwi->RemoveAllObservers();
+        rwi->RemoveObservers(vtkCommand::TimerEvent);
         rwi->ExitCallback();
       }
       else if (keySym == "Return")
@@ -183,7 +227,7 @@ void vtkF3DInteractorStyle::OnKeyPress()
         ren->ResetCamera();
         renWin->Render();
       }
-      else if (keySym == "space")
+      else if (keySym == "Space")
       {
         this->InvokeEvent(F3DLoader::ToggleAnimationEvent);
         renWin->Render();
@@ -195,6 +239,11 @@ void vtkF3DInteractorStyle::OnKeyPress()
 //------------------------------------------------------------------------------
 void vtkF3DInteractorStyle::Rotate()
 {
+  if (this->IsUserInteractionBlocked())
+  {
+    return;
+  }
+
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
 
   if (ren == nullptr)
@@ -258,6 +307,46 @@ void vtkF3DInteractorStyle::Rotate()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DInteractorStyle::Spin()
+{
+  if (this->IsUserInteractionBlocked())
+  {
+    return;
+  }
+  this->Superclass::Spin();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DInteractorStyle::Pan()
+{
+  if (this->IsUserInteractionBlocked())
+  {
+    return;
+  }
+  this->Superclass::Pan();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DInteractorStyle::Dolly()
+{
+  if (this->IsUserInteractionBlocked())
+  {
+    return;
+  }
+  this->Superclass::Dolly();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DInteractorStyle::Dolly(double factor)
+{
+  if (this->IsUserInteractionBlocked())
+  {
+    return;
+  }
+  this->Superclass::Dolly(factor);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::EnvironmentRotate()
 {
   this->Superclass::EnvironmentRotate();
@@ -277,4 +366,10 @@ void vtkF3DInteractorStyle::EnvironmentRotate()
 
     this->Interactor->Render();
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DInteractorStyle::IsUserInteractionBlocked()
+{
+  return this->AnimationManager->IsPlaying() && this->Options->CameraIndex >= 0;
 }

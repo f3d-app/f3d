@@ -20,7 +20,6 @@ class vtkF3DPostProcessFilter : public vtkDataObjectAlgorithm
 public:
   static vtkF3DPostProcessFilter* New();
   vtkTypeMacro(vtkF3DPostProcessFilter, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkF3DPostProcessFilter();

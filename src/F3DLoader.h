@@ -7,14 +7,16 @@
 #ifndef F3DLoader_h
 #define F3DLoader_h
 
+#include <vtkCommand.h>
 #include <vtkNew.h>
 #include <vtkSmartPointer.h>
 
-#include "vtkF3DRenderer.h"
 #include "F3DAnimationManager.h"
 
 class vtkF3DRenderer;
+class vtkImageData;
 class vtkImporter;
+class F3DReaderInstantiator;
 struct F3DOptions;
 
 class F3DLoader
@@ -36,41 +38,49 @@ public:
 
   /**
    * Parse the options, create an importer and start the rendering
+   * This will initialize the following members:
+   * Parser, CommandLineOptions, AnimationManager, RenWin
    */
-  int Start(int argc, char** argv);
+  int Start(int argc, char** argv, vtkImageData* image = nullptr);
 
   /**
    * Add a list of files or directory to be loaded
+   * to the FilesList
    */
   void AddFiles(const std::vector<std::string>& files);
 
   /**
-   * Add a file or directory to be loaded
+   * Add a file or directory to be loaded to the FilesList
    * Set recursive to true to add all the file in a directory
    */
   void AddFile(const std::string& path, bool recursive = true);
 
   /**
    * Load a file if any have been added
-   * Set the load arguement to LOAD_PREVIOUS or LOAD_NEXT to change file index
+   * Set the load argument to LOAD_PREVIOUS or LOAD_NEXT to change file index
+   * This will initialize the following members:
+   * Options, Renderer, Importer
+   * Returns true if file is loaded sucessfully, false otherwise
    */
-  void LoadFile(int load = F3DLoader::LOAD_CURRENT);
+  bool LoadFile(int load = F3DLoader::LOAD_CURRENT);
 
   F3DLoader();
   ~F3DLoader();
 
 protected:
   static vtkSmartPointer<vtkImporter> GetImporter(
-    const F3DOptions& options, const std::string& file);
+    const F3DOptions& options, const std::string& fileName);
 
   std::vector<std::string> FilesList;
   int CurrentFileIndex = 0;
   F3DOptionsParser Parser;
+  F3DOptions CommandLineOptions;
   F3DOptions Options;
   F3DAnimationManager AnimationManager;
   vtkSmartPointer<vtkF3DRenderer> Renderer;
   vtkSmartPointer<vtkImporter> Importer;
   vtkSmartPointer<vtkRenderWindow> RenWin;
+  F3DReaderInstantiator* ReaderInstantiator;
 
 private:
   F3DLoader(F3DLoader const&) = delete;

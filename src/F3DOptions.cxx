@@ -1,39 +1,22 @@
 #include "F3DOptions.h"
 
 #include "F3DLog.h"
+#include "F3DException.h"
+#include "F3DReaderFactory.h"
 
 #include <vtk_jsoncpp.h>
 #include <vtksys/SystemTools.hxx>
+#include <vtkVersion.h>
 
 #include <fstream>
 #include <regex>
+#include <sstream>
+#include <utility>
 #include <vector>
 
 #include "cxxopts.hpp"
 
 //----------------------------------------------------------------------------
-namespace
-{
-template<typename T>
-bool CompareVectors(const std::vector<T>& v1, const std::vector<T>& v2)
-{
-  if (v1.size() != v2.size())
-  {
-    return false;
-  }
-
-  for (size_t i = 0; i < v1.size(); i++)
-  {
-    if (v1[i] != v2[i])
-    {
-      return false;
-    }
-  }
-
-  return true;
-}
-}  // namespace
-
 class ConfigurationOptions
 {
 public:
@@ -44,30 +27,57 @@ public:
   }
 
   F3DOptions GetOptionsFromArgs(std::vector<std::string>& inputs);
-  bool InitializeDictionaryFromConfigFile(const std::string& filePath);
+  bool InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
+
+  void SetFilePathForConfigBlock(const std::string& filePath) { this->FilePathForConfigBlock = filePath; }
 
 protected:
-  template<class T>
-  std::string GetOptionDefault(const std::string& option, T currValue) const
+  bool GetOptionConfig(const std::string& option, std::string& configValue) const
   {
-    auto it = this->ConfigDic.find(option);
-    if (it == this->ConfigDic.end())
+    bool ret = false;
+    for (auto const& it : this->ConfigDic)
     {
-      std::stringstream ss;
-      ss << currValue;
-      return ss.str();
+      std::regex re(it.first);
+      std::smatch matches;
+      if (std::regex_match(this->FilePathForConfigBlock, matches, re))
+      {
+        auto localIt = it.second.find(option);
+        if (localIt != it.second.end())
+        {
+          configValue = localIt->second;
+          ret = true;
+        }
+      }
     }
-    return it->second;
+    return ret;
   }
 
-  std::string GetOptionDefault(const std::string& option, bool currValue) const
+  template<class T>
+  static std::string ToString(T currValue)
   {
-    auto it = this->ConfigDic.find(option);
-    if (it == this->ConfigDic.end())
+    std::stringstream ss;
+    ss << currValue;
+    return ss.str();
+  }
+
+  static std::string ToString(bool currValue)
+  {
+    return currValue ? "true" : "false";
+  }
+
+  template<class T>
+  static std::string ToString(const std::vector<T>& currValue)
+  {
+    std::stringstream ss;
+    for (size_t i = 0; i < currValue.size(); i++)
     {
-      return currValue ? "true" : "false";
+      ss << currValue[i];
+      if (i != currValue.size() - 1)
+      {
+        ss << ",";
+      }
     }
-    return it->second;
+    return ss.str();
   }
 
   std::string CollapseName(const std::string& longName, const std::string& shortName) const
@@ -81,26 +91,6 @@ protected:
     return ss.str();
   }
 
-  template<class T>
-  std::string GetOptionDefault(const std::string& option, const std::vector<T>& currValue) const
-  {
-    auto it = this->ConfigDic.find(option);
-    if (it == this->ConfigDic.end())
-    {
-      std::stringstream ss;
-      for (size_t i = 0; i < currValue.size(); i++)
-      {
-        ss << currValue[i];
-        if (i != currValue.size() - 1)
-        {
-          ss << ",";
-        }
-      }
-      return ss.str();
-    }
-    return it->second;
-  }
-
   void DeclareOption(cxxopts::OptionAdder& group, const std::string& longName,
     const std::string& shortName, const std::string& doc) const
   {
@@ -109,13 +99,24 @@ protected:
 
   template<class T>
   void DeclareOption(cxxopts::OptionAdder& group, const std::string& longName,
-    const std::string& shortName, const std::string& doc, T& var, bool hasDefault = true,
+    const std::string& shortName, const std::string& doc, T& var, bool hasDefault = true, bool mayHaveConfig = true,
     const std::string& argHelp = "") const
   {
     auto val = cxxopts::value<T>(var);
+    std::string defaultVal;
     if (hasDefault)
     {
-      val = val->default_value(this->GetOptionDefault(longName, var));
+      defaultVal = ConfigurationOptions::ToString(var);
+    }
+
+    if (mayHaveConfig)
+    {
+      hasDefault |= this->GetOptionConfig(longName, defaultVal);
+    }
+
+    if (hasDefault)
+    {
+      val = val->default_value(defaultVal);
     }
     var = {};
     group(this->CollapseName(longName, shortName), doc, val, argHelp);
@@ -124,13 +125,25 @@ protected:
   template<class T>
   void DeclareOptionWithImplicitValue(cxxopts::OptionAdder& group, const std::string& longName,
     const std::string& shortName, const std::string& doc, T& var, const std::string& implicitValue,
-    bool hasDefault = true, const std::string& argHelp = "") const
+    bool hasDefault = true, bool mayHaveConfig = true, const std::string& argHelp = "") const
   {
     auto val = cxxopts::value<T>(var)->implicit_value(implicitValue);
+    std::string defaultVal;
     if (hasDefault)
     {
-      val = val->default_value(this->GetOptionDefault(longName, var));
+      defaultVal = ConfigurationOptions::ToString(var);
     }
+
+    if (mayHaveConfig)
+    {
+      hasDefault |= this->GetOptionConfig(longName, defaultVal);
+    }
+
+    if (hasDefault)
+    {
+      val = val->default_value(defaultVal);
+    }
+
     var = {};
     group(this->CollapseName(longName, shortName), doc, val, argHelp);
   }
@@ -141,11 +154,19 @@ protected:
   static std::string GetSystemSettingsDirectory();
   static std::string GetUserSettingsDirectory();
 
+  void PrintHelpPair(const std::string& key, const std::string& help, int keyWidth = 10, int helpWidth = 70);
+  void PrintHelp(cxxopts::Options& cxxOptions);
+  void PrintVersion();
+  void PrintReadersList();
+  void PrintExtensionsList();
+
 private:
   int Argc;
   char** Argv;
 
-  using Dictionnary = std::map<std::string, std::string>;
+  std::string FilePathForConfigBlock;
+
+  using Dictionnary = std::map<std::string, std::map<std::string, std::string>>;
   Dictionnary ConfigDic;
 };
 
@@ -160,42 +181,49 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
 
     // clang-format off
     auto grp1 = cxxOptions.add_options();
-    this->DeclareOption(grp1, "input", "", "Input file", inputs, false, "<files>");
-    this->DeclareOption(grp1, "output", "", "Render to file", options.Output, false, "<png file>");
+    this->DeclareOption(grp1, "input", "", "Input file", inputs, false, false, "<files>");
+    this->DeclareOption(grp1, "output", "", "Render to file", options.Output, false, false,"<png file>");
     this->DeclareOption(grp1, "no-background", "", "No background when render to file", options.NoBackground);
     this->DeclareOption(grp1, "help", "h", "Print help");
     this->DeclareOption(grp1, "version", "", "Print version details");
-    this->DeclareOption(grp1, "verbose", "", "Enable verbose mode", options.Verbose);
+    this->DeclareOption(grp1, "readers-list", "", "Print the list of file types");
+    this->DeclareOption(grp1, "extensions-list", "", "Print the list of supported extensions");
+    this->DeclareOption(grp1, "verbose", "", "Enable verbose mode, providing more information about the loaded data in the console output", options.Verbose);
     this->DeclareOption(grp1, "no-render", "", "Verbose mode without any rendering, only for the first file", options.NoRender);
+    this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which superseed any verbose options and prevent any console output to be generated at all", options.Quiet);
     this->DeclareOption(grp1, "axis", "x", "Show axes", options.Axis);
     this->DeclareOption(grp1, "grid", "g", "Show grid", options.Grid);
     this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.Edges);
     this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", options.Trackball);
     this->DeclareOption(grp1, "progress", "", "Show progress bar", options.Progress);
     this->DeclareOption(grp1, "up", "", "Up direction", options.Up, true, "[-X|+X|-Y|+Y|-Z|+Z]");
-    this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.AnimationIndex, true, "<index>");
+    this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.AnimationIndex, true, true, "<index>");
+#if VTK_VERSION_NUMBER > VTK_VERSION_CHECK(9, 0, 20210228)
+    this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", options.CameraIndex, true, true, "<index>");
+#endif
     this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", options.GeometryOnly);
-    this->DeclareOption(grp1, "dry-run", "", "Do not read the configuration file", options.DryRun);
+    this->DeclareOption(grp1, "dry-run", "", "Do not read the configuration file", options.DryRun, true, false);
+    this->DeclareOption(grp1, "config", "", "Read a provided configuration file instead of default one", options.UserConfigFile, false, false, "<file path>");
 
     auto grp2 = cxxOptions.add_options("Material");
     this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.PointSprites);
-    this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.PointSize, true, "<size>");
-    this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", options.LineWidth, true, "<width>");
-    this->DeclareOption(grp2, "color", "", "Solid color", options.SolidColor, true, "<R,G,B>");
-    this->DeclareOption(grp2, "opacity", "", "Opacity", options.Opacity, true, "<opacity>");
-    this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.Roughness, true, "<roughness>");
-    this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.Metallic, true, "<metallic>");
-    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.HDRIFile, false, "<file path>");
-    this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.BaseColorTex, false, "<file path>");
-    this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.ORMTex, false, "<file path>");
-    this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emited light of the object", options.EmissiveTex, false, "<file path>");
-    this->DeclareOption(grp2, "emissive-factor", "", "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present", options.EmissiveFactor, true, "<R,G,B>");
-    this->DeclareOption(grp2, "texture-normal", "", "Path to a texture file that sets the normal map of the object", options.NormalTex, false, "<file path>");
-    this->DeclareOption(grp2, "normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", options.NormalScale, true, "<normalScale>");
+    this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.PointSize, true, true, "<size>");
+    this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", options.LineWidth, true, true, "<width>");
+    this->DeclareOption(grp2, "color", "", "Solid color", options.SolidColor, true, true, "<R,G,B>");
+    this->DeclareOption(grp2, "opacity", "", "Opacity", options.Opacity, true, true, "<opacity>");
+    this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.Roughness, true, true, "<roughness>");
+    this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.Metallic, true, true, "<metallic>");
+    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.HDRIFile, false, true, "<file path>");
+    this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.BaseColorTex, false, true, "<file path>");
+    this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.ORMTex, false, true, "<file path>");
+    this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emitted light of the object", options.EmissiveTex, false, true, "<file path>");
+    this->DeclareOption(grp2, "emissive-factor", "", "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present", options.EmissiveFactor, true, true, "<R,G,B>");
+    this->DeclareOption(grp2, "texture-normal", "", "Path to a texture file that sets the normal map of the object", options.NormalTex, false, true, "<file path>");
+    this->DeclareOption(grp2, "normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", options.NormalScale, true, true, "<normalScale>");
 
     auto grp3 = cxxOptions.add_options("Window");
-    this->DeclareOption(grp3, "bg-color", "", "Background color", options.BackgroundColor, true, "<R,G,B>");
-    this->DeclareOption(grp3, "resolution", "", "Window resolution", options.WindowSize, true, "<width,height>");
+    this->DeclareOption(grp3, "bg-color", "", "Background color", options.BackgroundColor, true, true, "<R,G,B>");
+    this->DeclareOption(grp3, "resolution", "", "Window resolution", options.WindowSize, true, true, "<width,height>");
     this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.FPS);
     this->DeclareOption(grp3, "filename", "n", "Display filename", options.Filename);
     this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.MetaData);
@@ -203,10 +231,10 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp3, "blur-background", "u", "Blur background", options.BlurBackground);
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
-    this->DeclareOptionWithImplicitValue(grp4, "scalars", "s", "Color by scalars", options.Scalars, std::string(""), true, "<array_name>");
-    this->DeclareOption(grp4, "comp", "", "Component from the scalar array to color with", options.Component, true, "<comp_index>");
+    this->DeclareOptionWithImplicitValue(grp4, "scalars", "s", "Color by scalars", options.Scalars, std::string(""), true, true, "<array_name>");
+    this->DeclareOptionWithImplicitValue(grp4, "comp", "y", "Component from the scalar array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", options.Component, "-2", true, true, "<comp_index>");
     this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.Cells);
-    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.Range, false, "<min,max>");
+    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.Range, false, true, "<min,max>");
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.Bar);
     this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.LookupPoints,
       true, "<color_list>");
@@ -214,15 +242,17 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.InverseOpacityFunction);
 
     auto grpCamera = cxxOptions.add_options("Camera");
-    this->DeclareOption(grpCamera, "camera-position", "", "Camera position", options.CameraPosition, false, "<X,Y,Z>");
-    this->DeclareOption(grpCamera, "camera-focal-point", "", "Camera focal point", options.CameraFocalPoint, false, "<X,Y,Z>");
-    this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", options.CameraViewUp, false, "<X,Y,Z>");
-    this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degress)", options.CameraViewAngle, false, "<angle>");
+    this->DeclareOption(grpCamera, "camera-position", "", "Camera position", options.CameraPosition, false, true, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-focal-point", "", "Camera focal point", options.CameraFocalPoint, false, true, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", options.CameraViewUp, false, true, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degrees)", options.CameraViewAngle, false, true, "<angle>");
+    this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees)", options.CameraAzimuthAngle, true, true, "<angle>");
+    this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees)", options.CameraElevationAngle, true, true, "<angle>");
 
-#if F3D_HAS_RAYTRACING
+#if F3D_MODULE_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
     this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.Raytracing);
-    this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.Samples, true, "<samples>");
+    this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.Samples, true, true, "<samples>");
     this->DeclareOption(grp5, "denoise", "d", "Denoise the image", options.Denoise);
 #endif
 
@@ -233,8 +263,10 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping", options.ToneMapping);
 
     auto grp7 = cxxOptions.add_options("Testing");
-    this->DeclareOption(grp7, "ref", "", "Reference", options.Reference, false, "<png file>");
-    this->DeclareOption(grp7, "ref-threshold", "", "Testing threshold", options.RefThreshold, false, "<threshold>");
+    this->DeclareOption(grp7, "ref", "", "Reference", options.Reference, false, false, "<png file>");
+    this->DeclareOption(grp7, "ref-threshold", "", "Testing threshold", options.RefThreshold, true, false, "<threshold>");
+    this->DeclareOption(grp7, "interaction-test-record", "", "Path to an interaction log file to record interactions events to", options.InteractionTestRecordFile, false, false, "<file_path>");
+    this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", options.InteractionTestPlayFile, false, false,"<file_path>");
     // clang-format on
 
     cxxOptions.parse_positional({ "input" });
@@ -244,78 +276,266 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
 
     if (result.count("help") > 0)
     {
-      F3DLog::Print(F3DLog::Severity::Info, cxxOptions.help());
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Keys:\n"
-        " S         Toggle the coloration by scalar\n"
-        " B         Toggle the scalar bar display\n"
-        " P         Toggle depth peeling\n"
-        " Q         Toggle SSAO\n"
-        " A         Toggle FXAA\n"
-        " T         Toggle tone mapping\n"
-        " E         Toggle the edges display\n"
-        " X         Toggle the axes display\n"
-        " G         Toggle the grid display\n"
-        " N         Toggle the filename display\n"
-        " M         Toggle the metadata display\n"
-        " Z         Toggle the FPS counter display\n"
-        " R         Toggle raytracing rendering\n"
-        " D         Toggle denoising when raytracing\n"
-        " V         Toggle volume rendering\n"
-        " I         Toggle inverse opacity\n"
-        " O         Toggle point sprites rendering\n"
-        " F         Toggle full screen\n"
-        " U         Toggle blur background\n"
-        " K         Toggle trackball interaction\n"
-        " H         Toggle Cheat sheet display\n"
-        " ?         Dump camera state to the terminal\n"
-        " ESC       Quit\n"
-        " ENTER     Reset camera to initial parameters\n"
-        " SPACE     Play animation if any\n"
-        " LEFT      Previous file\n"
-        " RIGHT     Next file\n"
-        " UP        Reload current file\n"
-        );
-      exit(EXIT_SUCCESS);
+      this->PrintHelp(cxxOptions);
+      throw F3DExNoProcess();
     }
 
     if (result.count("version") > 0)
     {
-      std::string version = f3d::AppTitle;
-      version += "\nVersion: ";
-      version += f3d::AppVersion;
-      version += "\nBuild date: ";
-      version += f3d::AppBuildDate;
-      version += "\nSystem: ";
-      version += f3d::AppBuildSystem;
-      version += "\nCompiler: ";
-      version += f3d::AppCompiler;
-      version += "\nRayTracing module: ";
-#if F3D_HAS_RAYTRACING
-      version += "ON";
-#else
-      version += "OFF";
-#endif
-      version += "\nAuthor: Kitware SAS";
+      this->PrintVersion();
+      throw F3DExNoProcess();
+    }
 
-      F3DLog::Print(F3DLog::Severity::Info, version);
-      exit(EXIT_SUCCESS);
+    if (result.count("readers-list") > 0)
+    {
+      this->PrintReadersList();
+      throw F3DExNoProcess();
+    }
+
+    if (result.count("extensions-list") > 0)
+    {
+      this->PrintExtensionsList();
+      throw F3DExNoProcess();
     }
   }
   catch (const cxxopts::OptionException& e)
   {
     F3DLog::Print(F3DLog::Severity::Error, "Error parsing options: ", e.what());
-    exit(EXIT_FAILURE);
+    throw;
   }
   return options;
 }
 
 //----------------------------------------------------------------------------
-bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string& filePath)
+void ConfigurationOptions::PrintHelpPair(const std::string& key, const std::string& help, int keyWidth, int helpWidth)
+{
+  std::stringstream ss;
+  ss << "  " << std::left << std::setw(keyWidth) << key << " " << std::setw(helpWidth) << help;
+  F3DLog::Print(F3DLog::Severity::Info, ss.str());
+}
+
+//----------------------------------------------------------------------------
+void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
+{
+  const std::vector<std::pair<std::string, std::string> > keys =
+  {
+    { "C", "Cycle point/cell data coloring" },
+    { "S", "Cycle array to color with" },
+    { "Y", "Cycle array component to color with" },
+    { "B", "Toggle the scalar bar display" },
+    { "V", "Toggle volume rendering" },
+    { "I", "Toggle inverse volume opacity" },
+    { "O", "Toggle point sprites rendering" },
+    { "P", "Toggle depth peeling" },
+    { "Q", "Toggle SSAO" },
+    { "A", "Toggle FXAA" },
+    { "T", "Toggle tone mapping" },
+    { "E", "Toggle the edges display" },
+    { "X", "Toggle the axes display" },
+    { "G", "Toggle the grid display" },
+    { "N", "Toggle the filename display" },
+    { "M", "Toggle the metadata display" },
+    { "Z", "Toggle the FPS counter display" },
+    { "R", "Toggle raytracing rendering" },
+    { "D", "Toggle denoising when raytracing" },
+    { "F", "Toggle full screen" },
+    { "U", "Toggle blur background" },
+    { "K", "Toggle trackball interaction" },
+    { "H", "Toggle cheat sheet display" },
+    { "?", "Dump camera state to the terminal" },
+    { "Escape", "Quit" },
+    { "Enter", "Reset camera to initial parameters" },
+    { "Space", "Play animation if any" },
+    { "Left", "Previous file" },
+    { "Right", "Next file" },
+    { "Up", "Reload current file" }
+  };
+
+  const std::vector<std::pair<std::string, std::string> > examples =
+  {
+    { "f3d file.vtu -xtgans", "View a unstructured mesh in a typical nice looking sciviz style" },
+    { "f3d file.glb -tuqap --hdri=file.hdr", "View a gltf file in a realistic environment" },
+    { "f3d file.ply -so --point-size=0 --comp=-2", "View a point cloud file with direct scalars rendering" },
+    { "f3d folder", "View all files in folder" },
+  };
+
+  F3DLog::SetUseColoring(false);
+  F3DLog::Print(F3DLog::Severity::Info, cxxOptions.help());
+  F3DLog::Print(F3DLog::Severity::Info, "Keys:");
+  for (const auto& key : keys)
+  {
+    this->PrintHelpPair(key.first, key.second);
+  }
+
+  F3DLog::Print(F3DLog::Severity::Info, "\nExamples:");
+  for (const auto& example : examples)
+  {
+    this->PrintHelpPair(example.first, example.second, 50);
+  }
+  F3DLog::Print(F3DLog::Severity::Info, "\nReport bugs to https://github.com/f3d-app/f3d/issues");
+  F3DLog::SetUseColoring(true);
+}
+
+//----------------------------------------------------------------------------
+void ConfigurationOptions::PrintVersion()
+{
+  std::string version = f3d::AppName + " " + f3d::AppVersion + "\n\n";
+
+  version += f3d::AppTitle;
+  version += "\nVersion: ";
+  version += f3d::AppVersion;
+  version += "\nBuild date: ";
+  version += f3d::AppBuildDate;
+  version += "\nSystem: ";
+  version += f3d::AppBuildSystem;
+  version += "\nCompiler: ";
+  version += f3d::AppCompiler;
+  version += "\nRayTracing module: ";
+#if F3D_MODULE_RAYTRACING
+  version += "ON";
+#else
+  version += "OFF";
+#endif
+  version += "\nExodus module: ";
+#if F3D_MODULE_EXODUS
+  version += "ON";
+#else
+  version += "OFF";
+#endif
+  version += "\nOpenCASCADE module: ";
+#if F3D_MODULE_OCCT
+  version += F3D_OCCT_VERSION;
+#if F3D_MODULE_OCCT_XCAF
+  version += " (full support)";
+#else
+  version += " (no metadata)";
+#endif
+#else
+  version += "OFF";
+#endif
+  version += "\nAssimp module: ";
+#if F3D_MODULE_ASSIMP
+  version += F3D_ASSIMP_VERSION;
+#else
+  version += "OFF";
+#endif
+  version += "\nVTK version: ";
+  version += std::string(VTK_VERSION) + std::string(" (build ") +
+    std::to_string(VTK_BUILD_VERSION) + std::string(")");
+
+  version += "\n\nCopyright (C) 2019-2021 Kitware SAS.";
+  version += "\nCopyright (C) 2021-2022 Michael Migliore, Mathieu Westphal.";
+  version += "\nLicense BSD-3-Clause.";
+  version += "\nWritten by Michael Migliore, Mathieu Westphal and Joachim Pouderoux.";
+
+  F3DLog::SetUseColoring(false);
+  F3DLog::Print(F3DLog::Severity::Info, version);
+  F3DLog::SetUseColoring(true);
+}
+
+//----------------------------------------------------------------------------
+void ConfigurationOptions::PrintReadersList()
+{
+  size_t nameColSize = 0;
+  size_t extsColSize = 0;
+  size_t descColSize = 0;
+
+  const auto& readers = F3DReaderFactory::GetInstance()->GetReaders();
+  if (readers.empty())
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, "No registered reader found!");
+    return;
+  }
+  // Compute the size of the 3 columns
+  for (const auto& reader : readers)
+  {
+    nameColSize = std::max(nameColSize, reader->GetName().length());
+    descColSize = std::max(descColSize, reader->GetLongDescription().length());
+    auto exts = reader->GetExtensions();
+    size_t extLen = 0;
+    int cnt = 0;
+    for (const auto& ext : exts)
+    {
+      if (cnt++ > 0)
+      {
+        extLen++;
+      }
+      extLen += ext.length();
+    }
+    extsColSize = std::max(extsColSize, extLen);
+  }
+  nameColSize++;
+  extsColSize++;
+  descColSize++;
+
+  // Print the rows split in 3 columns
+  std::stringstream headerLine;
+  headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(extsColSize)
+             << "Extensions" << std::setw(descColSize) << "Description";
+  F3DLog::Print(F3DLog::Severity::Info, headerLine.str());
+  F3DLog::Print(F3DLog::Severity::Info, std::string(nameColSize + extsColSize + descColSize, '-'));
+
+  for (const auto& reader : readers)
+  {
+    std::stringstream readerLine;
+    readerLine << std::left << std::setw(nameColSize) << reader->GetName()
+               << std::setw(extsColSize);
+    auto exts = reader->GetExtensions();
+    unsigned int cnt = 0;
+    std::string extLine;
+    for (const auto& ext : exts)
+    {
+      if (cnt++ > 0)
+      {
+        extLine += ";";
+      }
+      extLine += ext;
+    }
+    readerLine << extLine << std::setw(descColSize) << reader->GetLongDescription();
+    F3DLog::Print(F3DLog::Severity::Info, readerLine.str());
+  }
+}
+
+//----------------------------------------------------------------------------
+void ConfigurationOptions::PrintExtensionsList()
+{
+  const auto& readers = F3DReaderFactory::GetInstance()->GetReaders();
+  if (readers.size() == 0)
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, "No registered reader found!");
+    return;
+  }
+  std::stringstream extList;
+  unsigned int cnt = 0;
+  for (const auto& reader : readers)
+  {
+    auto exts = reader->GetExtensions();
+    for (const auto& ext : exts)
+    {
+      if (cnt++ > 0)
+      {
+        extList << ";";
+      }
+      extList << ext;
+    }
+  }
+  F3DLog::Print(F3DLog::Severity::Info, extList.str());
+}
+
+//----------------------------------------------------------------------------
+bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string& userConfigFile)
 {
   this->ConfigDic.clear();
 
-  const std::string& configFilePath = this->GetSettingsFilePath();
+  std::string configFilePath;
+  if (!userConfigFile.empty())
+  {
+    configFilePath = userConfigFile;
+  }
+  else
+  {
+    configFilePath = this->GetSettingsFilePath();
+  }
   if (configFilePath.empty())
   {
     return false;
@@ -347,18 +567,14 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
 
   for (auto const& id : root.getMemberNames())
   {
-    std::regex re(id);
-    std::smatch matches;
-    if (std::regex_match(filePath, matches, re))
+    const Json::Value node = root[id];
+    std::map<std::string, std::string> localDic;
+    for (auto const& nl : node.getMemberNames())
     {
-      const Json::Value node = root[id];
-
-      for (auto const& nl : node.getMemberNames())
-      {
-        const Json::Value v = node[nl];
-        this->ConfigDic[nl] = v.asString();
-      }
+      const Json::Value v = node[nl];
+      localDic[nl] = v.asString();
     }
+    this->ConfigDic[id] = localDic;
   }
 
   return true;
@@ -453,7 +669,7 @@ std::string ConfigurationOptions::GetBinarySettingsDirectory()
     directoryPath += separator;
 #endif
     directoryPath += "..";
-#ifdef F3D_OSX_BUNDLE
+#if F3D_MACOS_BUNDLE
     if (vtksys::SystemTools::FileExists(directoryPath + "/Resources"))
     {
       directoryPath += "/Resources";
@@ -498,318 +714,22 @@ void F3DOptionsParser::Initialize(int argc, char** argv)
 }
 
 //----------------------------------------------------------------------------
-F3DOptions F3DOptionsParser::GetOptionsFromCommandLine()
+void F3DOptionsParser::InitializeDictionaryFromConfigFile(const std::string& userConfigFile)
 {
-  std::vector<std::string> dummy;
-  return this->GetOptionsFromCommandLine(dummy);
-}
-
-//----------------------------------------------------------------------------
-F3DOptions F3DOptionsParser::GetOptionsFromCommandLine(std::vector<std::string>& files)
-{
-  return this->ConfigOptions->GetOptionsFromArgs(files);
+  this->ConfigOptions->InitializeDictionaryFromConfigFile(userConfigFile);
 }
 
 //----------------------------------------------------------------------------
 F3DOptions F3DOptionsParser::GetOptionsFromConfigFile(const std::string& filePath)
 {
-  this->ConfigOptions->InitializeDictionaryFromConfigFile(filePath);
-  F3DOptions options = this->GetOptionsFromCommandLine();
-
-  // Check the validity of the options
-  if (options.Verbose || options.NoRender)
-  {
-    F3DOptionsParser::CheckValidity(options, filePath);
-  }
-
-  return options;
+  this->ConfigOptions->SetFilePathForConfigBlock(filePath);
+  std::vector<std::string> dummy;
+  return this->ConfigOptions->GetOptionsFromArgs(dummy);
 }
 
 //----------------------------------------------------------------------------
-bool F3DOptionsParser::CheckValidity(const F3DOptions& options, const std::string& filePath)
+F3DOptions F3DOptionsParser::GetOptionsFromCommandLine(std::vector<std::string>& files)
 {
-  bool ret = true;
-  F3DOptions defaultOptions;
-  bool usingDefaultScene = true;
-
-  if (!options.GeometryOnly)
-  {
-    std::string ext = vtksys::SystemTools::GetFilenameLastExtension(filePath);
-    ext = vtksys::SystemTools::LowerCase(ext);
-
-    if (ext == ".3ds" || ext == ".obj" || ext == ".wrl" || ext == ".gltf" || ext == ".glb")
-    {
-      usingDefaultScene = false;
-    }
-  }
-
-  if (!usingDefaultScene)
-  {
-    if (defaultOptions.MetaData != options.MetaData)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to show meta data while not using the default scene has no effect.");
-      ret = false;
-    }
-    if (defaultOptions.PointSprites != options.PointSprites)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to show sphere sprites while not using the default scene has no effect.");
-      ret = false;
-    }
-    if (!::CompareVectors(defaultOptions.SolidColor, options.SolidColor))
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying a Solid Color while not using the default scene has no effect.");
-      ret = false;
-    }
-    if (defaultOptions.Opacity != options.Opacity)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying an Opacity while not using the default scene has no effect.");
-      ret = false;
-    }
-    if (defaultOptions.Roughness != options.Roughness)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying a Roughness coefficient while not using the default scene has no effect.");
-      ret = false;
-    }
-    if (defaultOptions.Metallic != options.Metallic)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying a Metallic coefficient while not using the default scene has no effect.");
-      ret = false;
-    }
-    if (defaultOptions.Scalars != options.Scalars)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying Scalars to color with while not using the default scene has no effect.");
-      ret = false;
-    }
-    if (defaultOptions.Component != options.Component)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying a Component to color with while not using the default scene has no effect.");
-      ret = false;
-    }
-    if (defaultOptions.Cells != options.Cells)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to color with Cells while not using the default scene has no effect.");
-      ret = false;
-    }
-    if (!::CompareVectors(defaultOptions.Range, options.Range))
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying a Range to color with while not using the default scene has no effect.");
-      ret = false;
-    }
-    if (defaultOptions.Bar != options.Bar)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to show a scalar Bar while not using the default scene has no effect.");
-      ret = false;
-    }
-    if (!::CompareVectors(defaultOptions.LookupPoints, options.LookupPoints))
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying a custom colormap while not using the default scene has no effect.");
-      ret = false;
-    }
-  }
-  else
-  {
-    if (defaultOptions.AnimationIndex != options.AnimationIndex)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying an Animation Index has no effect while using the default scene.");
-      ret = false;
-    }
-
-    if (defaultOptions.Scalars == options.Scalars)
-    {
-      if (defaultOptions.Component != options.Component)
-      {
-        F3DLog::Print(F3DLog::Severity::Info,
-          "Specifying a Component to color with has no effect without specifying Scalars to color "
-          "with.");
-        ret = false;
-      }
-      if (defaultOptions.Cells != options.Cells)
-      {
-        F3DLog::Print(F3DLog::Severity::Info,
-          "Specifying to color with Cells has no effect without specifying Scalars to color with.");
-        ret = false;
-      }
-      if (!::CompareVectors(defaultOptions.Range, options.Range))
-      {
-        F3DLog::Print(F3DLog::Severity::Info,
-          "Specifying a Range to color with has no effect without specifying Scalars to color "
-          "with.");
-        ret = false;
-      }
-      if (defaultOptions.Bar != options.Bar)
-      {
-        F3DLog::Print(F3DLog::Severity::Info,
-          "Specifying to show a scalar Bar has no effect without specifying Scalars to color "
-          "with.");
-        ret = false;
-      }
-    }
-  }
-
-  if (options.Volume)
-  {
-    if (defaultOptions.PointSprites != options.PointSprites)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to show sphere sprites while using volume rendering has no effect.");
-      ret = false;
-    }
-    if (!::CompareVectors(defaultOptions.SolidColor, options.SolidColor))
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying a Solid Color while using volume rendering has no effect.");
-      ret = false;
-    }
-    if (defaultOptions.Opacity != options.Opacity)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying an Opacity while using volume rendering has no effect.");
-      ret = false;
-    }
-    if (defaultOptions.Roughness != options.Roughness)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying a Roughness coefficient while using volume rendering has no effect.");
-      ret = false;
-    }
-    if (defaultOptions.Metallic != options.Metallic)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying a Metallic coefficient while using volume rendering has no effect.");
-      ret = false;
-    }
-  }
-  else
-  {
-    if (defaultOptions.InverseOpacityFunction != options.InverseOpacityFunction)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying inverse opacity function while not using volume rendering has no effect.");
-      ret = false;
-    }
-  }
-
-  if (options.Raytracing)
-  {
-    if (defaultOptions.Volume != options.Volume)
-    {
-      F3DLog::Print(
-        F3DLog::Severity::Info, "Specifying to show volume has no effect when using Raytracing.");
-      ret = false;
-    }
-    if (defaultOptions.PointSprites != options.PointSprites)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to show point sprites has no effect when using Raytracing.");
-      ret = false;
-    }
-    if (defaultOptions.FPS != options.FPS)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to display the Frame per second counter has no effect when using Raytracing.");
-      ret = false;
-    }
-    if (defaultOptions.DepthPeeling != options.DepthPeeling)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to render using Depth Peeling has no effect when using Raytracing.");
-      ret = false;
-    }
-    if (defaultOptions.SSAO != options.SSAO)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to render using SSAO has no effect when using Raytracing.");
-      ret = false;
-    }
-  }
-  else
-  {
-    if (defaultOptions.Samples != options.Samples)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying a Number of samples per pixel has no effect when not using Raytracing.");
-      ret = false;
-    }
-    if (defaultOptions.Denoise != options.Denoise)
-    {
-      F3DLog::Print(F3DLog::Severity::Info,
-        "Specifying to Denoise the image has no effect when not using Raytracing.");
-      ret = false;
-    }
-    if (defaultOptions.PointSprites != options.PointSprites)
-    {
-      if (defaultOptions.Opacity != options.Opacity)
-      {
-        F3DLog::Print(
-          F3DLog::Severity::Info, "Specifying an Opacity while using point sprites has no effect.");
-        ret = false;
-      }
-      if (defaultOptions.Roughness != options.Roughness)
-      {
-        F3DLog::Print(F3DLog::Severity::Info,
-          "Specifying a Roughness coefficient while using point sprites has no effect.");
-        ret = false;
-      }
-      if (defaultOptions.Metallic != options.Metallic)
-      {
-        F3DLog::Print(F3DLog::Severity::Info,
-          "Specifying a Metallic coefficient while using point sprites has no effect.");
-        ret = false;
-      }
-    }
-  }
-
-  if (options.NoBackground && options.Output.empty())
-  {
-    F3DLog::Print(F3DLog::Severity::Info,
-      "Specifying no background while not outputing to file has no effect.");
-    ret = false;
-  }
-
-  if (!options.HDRIFile.empty())
-  {
-    if (!::CompareVectors(defaultOptions.BackgroundColor, options.BackgroundColor))
-    {
-      F3DLog::Print(
-        F3DLog::Severity::Info, "Specifying a background color while a HDRI file has no effect.");
-      ret = false;
-    }
-  }
-
-  if (!::CompareVectors(defaultOptions.CameraPosition, options.CameraPosition) &&
-    options.CameraPosition.size() != 3)
-  {
-    F3DLog::Print(
-      F3DLog::Severity::Info, "Specifying a camera position of not 3 component has no effect.");
-    ret = false;
-  }
-  if (!::CompareVectors(defaultOptions.CameraFocalPoint, options.CameraFocalPoint) &&
-    options.CameraFocalPoint.size() != 3)
-  {
-    F3DLog::Print(
-      F3DLog::Severity::Info, "Specifying a camera focal point of not 3 component has no effect.");
-    ret = false;
-  }
-  if (!::CompareVectors(defaultOptions.CameraViewUp, options.CameraViewUp) &&
-    options.CameraViewUp.size() != 3)
-  {
-    F3DLog::Print(
-      F3DLog::Severity::Info, "Specifying a camera view up of not 3 component has no effect.");
-    ret = false;
-  }
-  // No check for --no-render option
-  return ret;
+  this->ConfigOptions->SetFilePathForConfigBlock("");
+  return this->ConfigOptions->GetOptionsFromArgs(files);
 }

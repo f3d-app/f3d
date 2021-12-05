@@ -1,57 +1,38 @@
 #include "vtkF3DRenderer.h"
 
-#include "F3DLoader.h"
-#include "F3DOptions.h"
-
+#include "F3DLog.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
 
-#include <vtkAbstractArray.h>
-#include <vtkActor.h>
-#include <vtkActor2DCollection.h>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
-#include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
-#include <vtkCellData.h>
+#include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
-#include <vtkDataArray.h>
-#include <vtkFieldData.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
-#include <vtkImporter.h>
-#include <vtkLightsPass.h>
+#include <vtkMath.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLTexture.h>
-#include <vtkPiecewiseFunction.h>
-#include <vtkPointData.h>
 #include <vtkProperty.h>
-#include <vtkRenderPassCollection.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkRendererCollection.h>
-#include <vtkSkybox.h>
+#include <vtkRenderWindow.h>
+#include <vtkTextActor.h>
 #include <vtkTextProperty.h>
 #include <vtkToneMappingPass.h>
 #include <vtkVersion.h>
-#include <vtkVolumeProperty.h>
-#include <vtksys/Directory.hxx>
 #include <vtksys/SystemTools.hxx>
 
-#include <vtk_glew.h>
-
-#if F3D_HAS_RAYTRACING
-#include <vtkOSPRayPass.h>
+#if F3D_MODULE_RAYTRACING
 #include <vtkOSPRayRendererNode.h>
 #endif
 
-#include "F3DLog.h"
+#include <vtk_glew.h>
 
 #include <cctype>
 #include <chrono>
-#include <cmath>
 
 vtkStandardNewMacro(vtkF3DRenderer);
 
@@ -60,6 +41,9 @@ vtkF3DRenderer::vtkF3DRenderer()
 {
   this->Cullers->RemoveAllItems();
 }
+
+//----------------------------------------------------------------------------
+vtkF3DRenderer::~vtkF3DRenderer() = default;
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
@@ -92,47 +76,14 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->TimerVisible = this->Options.FPS;
   this->FilenameVisible = this->Options.Filename;
   this->MetaDataVisible = this->Options.MetaData;
-  this->ScalarBarVisible = this->Options.Bar;
-  this->ScalarsVisible = this->Options.Scalars != f3d::F3DReservedString;
   this->UseRaytracing = this->Options.Raytracing;
   this->UseRaytracingDenoiser = this->Options.Denoise;
   this->UseDepthPeelingPass = this->Options.DepthPeeling;
   this->UseSSAOPass = this->Options.SSAO;
   this->UseFXAAPass = this->Options.FXAA;
   this->UseToneMappingPass = this->Options.ToneMapping;
-  this->UsePointSprites = this->Options.PointSprites;
-  this->UseVolume = this->Options.Volume;
-  this->UseInverseOpacityFunction = this->Options.InverseOpacityFunction;
   this->UseBlurBackground = this->Options.BlurBackground;
   this->UseTrackball = this->Options.Trackball;
-
-  // parse up vector
-  if (this->Options.Up.size() == 2)
-  {
-    char sign = this->Options.Up[0];
-    char axis = std::toupper(this->Options.Up[1]);
-    if ((sign == '-' || sign == '+') && (axis >= 'X' && axis <= 'Z'))
-    {
-      this->UpIndex = axis - 'X';
-      std::fill(this->UpVector, this->UpVector + 3, 0);
-      this->UpVector[this->UpIndex] = (sign == '+') ? 1.0 : -1.0;
-
-      std::fill(this->RightVector, this->RightVector + 3, 0);
-      this->RightVector[this->UpIndex == 0 ? 1 : 0] = 1.0;
-
-      double pos[3];
-      vtkMath::Cross(this->UpVector, this->RightVector, pos);
-      vtkMath::MultiplyScalar(pos, -1.0);
-
-      vtkCamera* cam = this->GetActiveCamera();
-      cam->SetFocalPoint(0.0, 0.0, 0.0);
-      cam->SetPosition(pos);
-      cam->SetViewUp(this->UpVector);
-
-      this->SetEnvironmentUp(this->UpVector);
-      this->SetEnvironmentRight(this->RightVector);
-    }
-  }
 
   if (!this->Options.HDRIFile.empty() && !this->GetUseImageBasedLighting())
   {
@@ -162,10 +113,6 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
       this->SetEnvironmentTexture(texture);
 
       // Skybox OpenGL
-      double front[3];
-      vtkMath::Cross(this->RightVector, this->UpVector, front);
-      this->Skybox->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
-      this->Skybox->SetFloorRight(front[0], front[1], front[2]);
       this->Skybox->SetProjection(vtkSkybox::Sphere);
       this->Skybox->SetTexture(texture);
 
@@ -176,9 +123,43 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
     }
     else
     {
-      vtkWarningMacro("Cannot open HDRI file " << fullPath);
+      F3DLog::Print(F3DLog::Severity::Warning, "Cannot open HDRI file ", fullPath);
     }
   }
+
+  // parse up vector
+  if (this->Options.Up.size() == 2)
+  {
+    char sign = this->Options.Up[0];
+    char axis = std::toupper(this->Options.Up[1]);
+    if ((sign == '-' || sign == '+') && (axis >= 'X' && axis <= 'Z'))
+    {
+      this->UpIndex = axis - 'X';
+      std::fill(this->UpVector, this->UpVector + 3, 0);
+      this->UpVector[this->UpIndex] = (sign == '+') ? 1.0 : -1.0;
+
+      std::fill(this->RightVector, this->RightVector + 3, 0);
+      this->RightVector[this->UpIndex == 0 ? 1 : 0] = 1.0;
+
+      double pos[3];
+      vtkMath::Cross(this->UpVector, this->RightVector, pos);
+      vtkMath::MultiplyScalar(pos, -1.0);
+
+      vtkCamera* cam = this->GetActiveCamera();
+      cam->SetFocalPoint(0.0, 0.0, 0.0);
+      cam->SetPosition(pos);
+      cam->SetViewUp(this->UpVector);
+
+      this->SetEnvironmentUp(this->UpVector);
+      this->SetEnvironmentRight(this->RightVector);
+    }
+  }
+
+  // skybox orientation
+  double front[3];
+  vtkMath::Cross(this->RightVector, this->UpVector, front);
+  this->Skybox->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
+  this->Skybox->SetFloorRight(front[0], front[1], front[2]);
 
   if (this->GetUseImageBasedLighting())
   {
@@ -240,50 +221,7 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
 //----------------------------------------------------------------------------
 std::string vtkF3DRenderer::GenerateMetaDataDescription()
 {
-  std::string description;
-  description += " \n";
-  if (this->PolyDataMapper)
-  {
-    vtkDataSet* dataset = this->PolyDataMapper->GetInput();
-    if (dataset)
-    {
-      description += " Number of points: ";
-      description += std::to_string(dataset->GetNumberOfPoints());
-      description += " \n Number of cells: ";
-      description += std::to_string(dataset->GetNumberOfCells());
-      description += " \n";
-
-      // Field Data
-      vtkFieldData* fieldData = dataset->GetFieldData();
-      int nbArrays = fieldData->GetNumberOfArrays();
-      for (vtkIdType i = 0; i < nbArrays; i++)
-      {
-        vtkAbstractArray* array = fieldData->GetAbstractArray(i);
-        if (array)
-        {
-          vtkIdType nbTuples = array->GetNumberOfTuples();
-          if (nbTuples == 1)
-          {
-            description += " ";
-            description += array->GetName();
-            description += " = ";
-            description += array->GetVariantValue(0).ToString();
-            description += " \n";
-          }
-        }
-      }
-    }
-    else
-    {
-      description += " Unavailable\n";
-    }
-  }
-  else
-  {
-    description += " Unavailable\n";
-  }
-
-  return description;
+  return " Unavailable\n";
 }
 
 //----------------------------------------------------------------------------
@@ -297,10 +235,11 @@ void vtkF3DRenderer::SetupRenderPasses()
   }
 
   vtkNew<vtkF3DRenderPass> newPass;
-  newPass->SetUseRaytracing(F3D_HAS_RAYTRACING && this->UseRaytracing);
+  newPass->SetUseRaytracing(F3D_MODULE_RAYTRACING && this->UseRaytracing);
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseDepthPeelingPass(this->UseDepthPeelingPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
+  newPass->SetForceOpaqueBackground(!this->Options.HDRIFile.empty());
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -329,7 +268,7 @@ void vtkF3DRenderer::SetupRenderPasses()
 
   this->SetPass(renderingPass);
 
-#if F3D_HAS_RAYTRACING
+#if F3D_MODULE_RAYTRACING
   vtkOSPRayRendererNode::SetRendererType("pathtracer", this);
   vtkOSPRayRendererNode::SetSamplesPerPixel(this->Options.Samples, this);
   vtkOSPRayRendererNode::SetEnableDenoiser(this->UseRaytracingDenoiser, this);
@@ -347,9 +286,23 @@ void vtkF3DRenderer::SetupRenderPasses()
   if (this->UseRaytracing || this->UseRaytracingDenoiser)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
-        "Raytracing options can't be used if F3D has not been built with raytracing");
+      "Raytracing options can't be used if F3D has not been built with raytracing");
   }
 #endif
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowOptions()
+{
+  this->ShowGrid(this->GridVisible);
+  this->ShowAxis(this->AxisVisible);
+  this->ShowTimer(this->TimerVisible);
+  this->ShowEdge(this->EdgesVisible);
+  this->ShowFilename(this->FilenameVisible);
+  this->ShowCheatSheet(this->CheatSheetVisible);
+  this->ShowMetaData(this->MetaDataVisible);
+
+  this->UpdateInternalActors();
 }
 
 //----------------------------------------------------------------------------
@@ -400,10 +353,10 @@ void vtkF3DRenderer::ShowGrid(bool show)
     double unitSquare = pow(10.0, round(log10(diag * 0.1)));
 
     double gridPos[3];
-    for (int i=0; i<3; i++)
+    for (int i = 0; i < 3; i++)
     {
-      double size = bounds[2*i+1] - bounds[2*i];
-      gridPos[i] = 0.5 * (bounds[2*i] + bounds[2*i+1] - this->UpVector[i] * size);
+      double size = bounds[2 * i + 1] - bounds[2 * i];
+      gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
     }
 
     if (this->Options.Verbose && show)
@@ -514,67 +467,10 @@ bool vtkF3DRenderer::UsingToneMappingPass()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUsePointSprites(bool use)
-{
-  this->UsePointSprites = use;
-  this->UpdateActorsVisibility();
-  this->SetupRenderPasses();
-  this->CheatSheetNeedUpdate = true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::UsingPointSprites()
-{
-  return this->UsePointSprites;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseVolume(bool use)
-{
-  this->UseVolume = use;
-  this->UpdateActorsVisibility();
-  this->SetupRenderPasses();
-  this->CheatSheetNeedUpdate = true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::UsingVolume()
-{
-  return this->UseVolume;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
-{
-  this->UseInverseOpacityFunction = use;
-  if (this->VolumeProp)
-  {
-    vtkPiecewiseFunction* pwf = this->VolumeProp->GetProperty()->GetScalarOpacity();
-    if (pwf->GetSize() == 2)
-    {
-      double range[2];
-      pwf->GetRange(range);
-
-      pwf->RemoveAllPoints();
-      pwf->AddPoint(range[0], this->UseInverseOpacityFunction ? 1.0 : 0.0);
-      pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
-    }
-    this->SetupRenderPasses();
-  }
-  this->CheatSheetNeedUpdate = true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::UsingInverseOpacityFunction()
-{
-  return this->UseInverseOpacityFunction;
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseRaytracing(bool use)
 {
   this->UseRaytracing = use;
-  this->UpdateActorsVisibility();
+  this->UpdateInternalActors();
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
@@ -597,41 +493,6 @@ void vtkF3DRenderer::SetUseRaytracingDenoiser(bool use)
 bool vtkF3DRenderer::UsingRaytracingDenoiser()
 {
   return this->UseRaytracingDenoiser;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::ShowScalars(bool show)
-{
-  this->ScalarsVisible = show;
-  if (this->GeometryActor && this->PointGaussianMapper && this->PolyDataMapper && this->ScalarsAvailable)
-  {
-    this->PolyDataMapper->SetScalarVisibility(show);
-    this->PointGaussianMapper->SetScalarVisibility(show);
-    this->UpdateScalarBarVisibility();
-  }
-  this->SetupRenderPasses();
-  this->CheatSheetNeedUpdate = true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::AreScalarsVisible()
-{
-  return this->ScalarsVisible;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::ShowScalarBar(bool show)
-{
-  this->ScalarBarVisible = show;
-  this->UpdateScalarBarVisibility();
-  this->SetupRenderPasses();
-  this->CheatSheetNeedUpdate = true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::IsScalarBarVisible()
-{
-  return this->ScalarBarVisible;
 }
 
 //----------------------------------------------------------------------------
@@ -729,31 +590,8 @@ void vtkF3DRenderer::UpdateCheatSheet()
   if (this->CheatSheetVisible)
   {
     std::stringstream cheatSheetText;
-    cheatSheetText << "\n S: Scalars coloring " << (this->ScalarsVisible ? "[ON]" : "[OFF]")
-                   << "\n";
-    cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " P: Depth peeling " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]")
-                   << "\n";
-    cheatSheetText << " Q: SSAO " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " A: FXAA " << (this->UseFXAAPass ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " T: Tone mapping " << (this->UseToneMappingPass ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " E: Edge visibility " << (this->EdgesVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " X: Axis " << (this->AxisVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " G: Grid " << (this->GridVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " N: File name " << (this->FilenameVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " M: Metadata " << (this->MetaDataVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " Z: FPS Timer " << (this->TimerVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " R: Raytracing " << (this->UseRaytracing ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " D: Denoiser " << (this->UseRaytracingDenoiser ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " V: Volume representation " << (this->UseVolume ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " I: Inverse volume opacity "
-                   << (this->UseInverseOpacityFunction ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " O: Point sprites " << (this->UsePointSprites ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " F: Full screen "
-                   << (this->GetRenderWindow()->GetFullScreen() ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " U: Blur background " << (this->UseBlurBackground ? "[ON]" : "[OFF]")
-                   << "\n";
-    cheatSheetText << " K: Trackball interaction " << (this->UseTrackball ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << "\n";
+    this->FillCheatSheetHotkeys(cheatSheetText);
     cheatSheetText << "\n   H  : Cheat sheet \n";
     cheatSheetText << "   ?  : Dump camera state to the terminal\n";
     cheatSheetText << "  ESC : Quit \n";
@@ -761,11 +599,34 @@ void vtkF3DRenderer::UpdateCheatSheet()
     cheatSheetText << " SPACE: Play animation if any\n";
     cheatSheetText << " LEFT : Previous file \n";
     cheatSheetText << " RIGHT: Next file \n";
-    cheatSheetText << " UP   : Reload current file \n";
+    cheatSheetText << "  UP  : Reload current file \n";
 
     this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, cheatSheetText.str().c_str());
     this->CheatSheetActor->RenderOpaqueGeometry(this);
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
+{
+  cheatSheetText << " P: Depth peeling " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " Q: SSAO " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " A: FXAA " << (this->UseFXAAPass ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " T: Tone mapping " << (this->UseToneMappingPass ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " E: Edge visibility " << (this->EdgesVisible ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " X: Axis " << (this->AxisVisible ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " G: Grid " << (this->GridVisible ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " N: File name " << (this->FilenameVisible ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " M: Metadata " << (this->MetaDataVisible ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " Z: FPS Timer " << (this->TimerVisible ? "[ON]" : "[OFF]") << "\n";
+#if F3D_MODULE_RAYTRACING
+  cheatSheetText << " R: Raytracing " << (this->UseRaytracing ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " D: Denoiser " << (this->UseRaytracingDenoiser ? "[ON]" : "[OFF]") << "\n";
+#endif
+  cheatSheetText << " F: Full screen "
+                 << (this->GetRenderWindow()->GetFullScreen() ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " U: Blur background " << (this->UseBlurBackground ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " K: Trackball interaction " << (this->UseTrackball ? "[ON]" : "[OFF]") << "\n";
 }
 
 //----------------------------------------------------------------------------
@@ -802,24 +663,6 @@ void vtkF3DRenderer::SetUseTrackball(bool use)
 bool vtkF3DRenderer::UsingTrackball()
 {
   return this->UseTrackball;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::ShowOptions()
-{
-  this->ShowGrid(this->GridVisible);
-  this->ShowAxis(this->AxisVisible);
-  this->ShowScalars(this->ScalarsVisible);
-  this->ShowTimer(this->TimerVisible);
-  this->ShowEdge(this->EdgesVisible);
-  this->ShowFilename(this->FilenameVisible);
-  this->ShowCheatSheet(this->CheatSheetVisible);
-  this->ShowMetaData(this->MetaDataVisible);
-
-  // Set the initial camera once all options
-  // have been shown as they may have an effect on it
-  vtkCamera* cam = this->GetActiveCamera();
-  this->InitialCamera->DeepCopy(cam);
 }
 
 //----------------------------------------------------------------------------
@@ -870,38 +713,7 @@ void vtkF3DRenderer::Render()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::InitializeCamera()
 {
-  this->Superclass::ResetCamera();
-  vtkCamera* cam = this->GetActiveCamera();
-  if (this->Options.CameraPosition.size() == 3)
-  {
-    cam->SetPosition(this->Options.CameraPosition.data());
-  }
-  if (this->Options.CameraFocalPoint.size() == 3)
-  {
-    cam->SetFocalPoint(this->Options.CameraFocalPoint.data());
-  }
-  if (this->Options.CameraViewUp.size() == 3)
-  {
-    cam->SetViewUp(this->Options.CameraViewUp.data());
-  }
-  if (this->Options.CameraViewAngle != 0)
-  {
-    cam->SetViewAngle(this->Options.CameraViewAngle);
-  }
-  cam->OrthogonalizeViewUp();
-  if (this->Options.Verbose)
-  {
-    double* position = cam->GetPosition();
-    F3DLog::Print(F3DLog::Severity::Info, "Camera position is : ", position[0], ", ", position[1],
-      ", ", position[2], ".");
-    double* focalPoint = cam->GetFocalPoint();
-    F3DLog::Print(F3DLog::Severity::Info, "Camera focal point is : ", focalPoint[0], ", ",
-      focalPoint[1], ", ", focalPoint[2], ".");
-    double* viewUp = cam->GetViewUp();
-    F3DLog::Print(F3DLog::Severity::Info, "Camera view up is : ", viewUp[0], ", ", viewUp[1], ", ",
-      viewUp[2], ".");
-    F3DLog::Print(F3DLog::Severity::Info, "Camera view angle is : ", cam->GetViewAngle(), ".\n");
-  }
+  this->InitialCamera->DeepCopy(this->GetActiveCamera());
 }
 
 //----------------------------------------------------------------------------
@@ -910,45 +722,6 @@ void vtkF3DRenderer::ResetCamera()
   vtkCamera* cam = this->GetActiveCamera();
   cam->DeepCopy(this->InitialCamera);
   cam->Modified();
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::UpdateActorsVisibility()
-{
-  if (this->GeometryActor)
-  {
-    this->GeometryActor->SetVisibility(
-      this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites));
-  }
-  if (this->PointSpritesActor)
-  {
-    this->PointSpritesActor->SetVisibility(
-      !this->UseRaytracing && !this->UseVolume && this->UsePointSprites);
-  }
-  if (this->VolumeProp)
-  {
-    bool visibility = !this->UseRaytracing && this->UseVolume;
-    vtkSmartVolumeMapper* mapper =
-      vtkSmartVolumeMapper::SafeDownCast(this->VolumeProp->GetMapper());
-    if (visibility && (!mapper || !mapper->GetInput() || !this->ScalarsAvailable))
-    {
-      F3DLog::Print(
-        F3DLog::Severity::Error, "Cannot use volume with this dataset or with the requested array");
-      visibility = false;
-    }
-    this->VolumeProp->SetVisibility(visibility);
-  }
-  this->UpdateScalarBarVisibility();
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::UpdateScalarBarVisibility()
-{
-  if (this->ScalarBarActor)
-  {
-    this->ScalarBarActor->SetVisibility(this->ScalarBarVisible && this->ScalarsAvailable &&
-      (this->ScalarsVisible || this->UseVolume));
-  }
 }
 
 //----------------------------------------------------------------------------

@@ -1,17 +1,3 @@
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    vtkF3DRenderPass.h
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
 /**
  * @class   vtkF3DRenderPass
  * @brief   Implement the basic render passes.
@@ -64,6 +50,10 @@ public:
   vtkSetMacro(UseBlurBackground, bool);
   vtkBooleanMacro(UseBlurBackground, bool);
 
+  vtkGetMacro(ForceOpaqueBackground, bool);
+  vtkSetMacro(ForceOpaqueBackground, bool);
+  vtkBooleanMacro(ForceOpaqueBackground, bool);
+
   vtkGetVector6Macro(Bounds, double);
   vtkSetVector6Macro(Bounds, double);
 
@@ -81,6 +71,7 @@ protected:
   bool UseSSAOPass = false;
   bool UseDepthPeelingPass = false;
   bool UseBlurBackground = false;
+  bool ForceOpaqueBackground = false;
 
   vtkSmartPointer<vtkFramebufferPass> BackgroundPass;
   vtkSmartPointer<vtkFramebufferPass> MainPass;
