@@ -98,7 +98,7 @@ public:
           // meshing
           BRepMesh_IncrementalMesh(edge, this->Parent->GetLinearDeflection(),
                                     this->Parent->GetRelativeDeflection(),
-                                    this->Parent->GetAngularDeflection());
+                                    this->Parent->GetAngularDeflection(), Standard_True);
         }
 
         if (poly.IsNull())
@@ -154,7 +154,7 @@ public:
         // meshing
         BRepMesh_IncrementalMesh(face, this->Parent->GetLinearDeflection(),
                                   this->Parent->GetRelativeDeflection(),
-                                  this->Parent->GetAngularDeflection());
+                                  this->Parent->GetAngularDeflection(), Standard_True);
       }
 
       if (poly.IsNull())
