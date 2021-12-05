@@ -1,6 +1,7 @@
 #include "F3DAnimationManager.h"
 
 #include "F3DLog.h"
+#include "vtkF3DRenderer.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkDoubleArray.h>
@@ -8,10 +9,11 @@
 #include <vtkProgressBarRepresentation.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 
 //----------------------------------------------------------------------------
-void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* importer, vtkRenderWindow* renWin)
+void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* importer, vtkRenderWindow* renWin, vtkF3DRenderer* renderer)
 {
   this->Importer = importer;
   if (!this->Importer)
@@ -24,6 +26,13 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
   if (!this->RenderWindow)
   {
     F3DLog::Print(F3DLog::Severity::Error, "RenderWindow is empty");
+    return;
+  }
+
+  this->Renderer = renderer;
+  if (!this->Renderer)
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "Renderer is empty");
     return;
   }
 
@@ -67,30 +76,28 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
     }
     else
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Animations available in this file are:");
+      F3DLog::Print(F3DLog::Severity::Info, "Animation(s) available in this file are:");
     }
-    for (int i = 0; i < this->Importer->GetNumberOfAnimations(); i++)
+    for (int i = 0; i < availAnimations; i++)
     {
       F3DLog::Print(F3DLog::Severity::Info, i, ": ", this->Importer->GetAnimationName(i));
     }
     F3DLog::Print(F3DLog::Severity::Info, "\n");
-
   }
 
-  if (options.AnimationIndex >= 0)
+  if (options.AnimationIndex != 0 && availAnimations <= 0)
   {
-    if (availAnimations > 0 && options.AnimationIndex >= availAnimations)
-    {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "Specified animation index is greater than the highest possible animation index, enabling all animations.");
-    }
-    else if (availAnimations <= 0)
-    {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "An animation index has been specified but there are no animations available.");
-    }
+    F3DLog::Print(F3DLog::Severity::Warning,
+      "An animation index has been specified but there are no animation available.");
   }
-  if (options.AnimationIndex <= -1 || options.AnimationIndex >= availAnimations)
+  else if (options.AnimationIndex > 0 && options.AnimationIndex >= availAnimations)
+  {
+    F3DLog::Print(F3DLog::Severity::Warning,
+      "Specified animation index is greater than the highest possible animation index, enabling the first animation.");
+
+    this->Importer->EnableAnimation(0);
+  }
+  else if (options.AnimationIndex <= -1)
   {
     for (int i = 0; i < availAnimations; i++)
     {
@@ -130,6 +137,7 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
   }
 
   this->CurrentTimeStep = std::begin(this->TimeSteps);
+  this->Playing = false;
 }
 
 //----------------------------------------------------------------------------
@@ -145,7 +153,7 @@ void F3DAnimationManager::Finalize()
 //----------------------------------------------------------------------------
 void F3DAnimationManager::ToggleAnimation()
 {
-  if (this->Importer && this->RenderWindow)
+  if (this->Importer && this->RenderWindow && this->TimeSteps.size() > 1)
   {
     this->Playing = !this->Playing;
 
@@ -179,6 +187,7 @@ void F3DAnimationManager::Tick()
 
     this->Importer->UpdateTimeStep(*this->CurrentTimeStep);
     this->RenderWindow->Render();
+    this->Renderer->InitializeCamera();
 
     this->CurrentTimeStep++;
 
@@ -188,15 +197,4 @@ void F3DAnimationManager::Tick()
       this->CurrentTimeStep = std::begin(this->TimeSteps);
     }
   }
-}
-
-//----------------------------------------------------------------------------
-double F3DAnimationManager::GetAnimationProgress()
-{
-  if (this->TimeSteps.size() > 1)
-  {
-    int idx = std::distance(std::begin(this->TimeSteps), this->CurrentTimeStep);
-    return idx / static_cast<double>(this->TimeSteps.size() - 1);
-  }
-  return 0.0;
 }

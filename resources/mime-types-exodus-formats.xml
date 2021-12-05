@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/vnd.exodus">
+    <comment>Exodus 2 file</comment>
+    <glob pattern="*.ex2"/>
+    <glob pattern="*.exo"/>
+    <glob pattern="*.e"/>
+  </mime-type>
+</mime-info>

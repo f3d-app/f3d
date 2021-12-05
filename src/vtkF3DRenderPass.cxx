@@ -1,17 +1,3 @@
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    vtkF3DRenderPass.cxx
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
 #include "vtkF3DRenderPass.h"
 
 #include "Config.h"
@@ -42,7 +28,7 @@
 #include <vtkTranslucentPass.h>
 #include <vtkVolumetricPass.h>
 
-#if F3D_HAS_RAYTRACING
+#if F3D_MODULE_RAYTRACING
 #include <vtkOSPRayPass.h>
 #endif
 
@@ -111,9 +97,9 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   this->BackgroundPass->SetColorFormat(vtkTextureObject::Float32);
 
   // main pass
-  if (F3D_HAS_RAYTRACING && this->UseRaytracing)
+  if (F3D_MODULE_RAYTRACING && this->UseRaytracing)
   {
-#if F3D_HAS_RAYTRACING
+#if F3D_MODULE_RAYTRACING
     vtkNew<vtkOSPRayPass> ospP;
     this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainPass->SetDelegatePass(ospP);
@@ -183,6 +169,9 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainPass->SetDelegatePass(camP);
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
+
+    // Needed because VTK can pick the wrong format with certain drivers
+    this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);
   }
 
   this->InitializeTime = this->GetMTime();
@@ -265,8 +254,16 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
     {
       ssImpl << "  vec3 bgCol = texture(texBackground, texCoord).rgb;\n";
     }
-    ssImpl << "  vec3 result = bgCol * (1.0 - mainSample.a) + mainSample.rgb * mainSample.a;\n"
-              "  gl_FragData[0] = vec4(result.rgb, 1.0);\n";
+    ssImpl << "  vec3 result = mix(bgCol, mainSample.rgb, mainSample.a);\n";
+
+    if (this->ForceOpaqueBackground)
+    {
+      ssImpl << "  gl_FragData[0] = vec4(result.rgb, 1.0);\n";
+    }
+    else
+    {
+      ssImpl << "  gl_FragData[0] = vec4(result.rgb, mainSample.a);\n";
+    }
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl", ssImpl.str());
 

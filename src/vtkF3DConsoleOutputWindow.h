@@ -16,6 +16,9 @@ public:
 
   void DisplayText(const char*) override;
 
+  vtkSetMacro(UseColoring, bool);
+  vtkGetMacro(UseColoring, bool);
+
 protected:
   vtkF3DConsoleOutputWindow();
   ~vtkF3DConsoleOutputWindow() override = default;
@@ -23,6 +26,8 @@ protected:
 private:
   vtkF3DConsoleOutputWindow(const vtkF3DConsoleOutputWindow&) = delete;
   void operator=(const vtkF3DConsoleOutputWindow&) = delete;
+
+  bool UseColoring = true;
 };
 
 #endif

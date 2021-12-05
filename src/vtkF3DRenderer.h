@@ -1,34 +1,24 @@
 /**
  * @class   vtkF3DRenderer
- * @brief   The main viewer class
+ * @brief   A F3D dedicated renderer
  *
+ * This renderers all the generic actors added by F3D which includes
+ * axis, grid, edges, timer, filename, metadata and cheatsheet.
+ * It also handles the different rendering passes, including
+ * raytracing, ssao, fxaa, tonemapping.
  */
 
 #ifndef vtkF3DRenderer_h
 #define vtkF3DRenderer_h
 
-#include "Config.h"
 #include "F3DOptions.h"
-#include "vtkF3DInteractorStyle.h"
 
-#include <vtkActor.h>
-#include <vtkActor2D.h>
-#include <vtkCornerAnnotation.h>
-#include <vtkMapper.h>
-#include <vtkNew.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOrientationMarkerWidget.h>
-#include <vtkProgressBarRepresentation.h>
-#include <vtkProgressBarWidget.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkRenderer.h>
 #include <vtkSkybox.h>
-#include <vtkSmartPointer.h>
-#include <vtkSmartVolumeMapper.h>
-#include <vtkTextActor.h>
 
-struct F3DOptions;
+class vtkCornerAnnotation;
+class vtkTextActor;
 
 class vtkF3DRenderer : public vtkOpenGLRenderer
 {
@@ -36,127 +26,83 @@ public:
   static vtkF3DRenderer* New();
   vtkTypeMacro(vtkF3DRenderer, vtkOpenGLRenderer);
 
+  //@{
+  /**
+   * Set/Get visibility of different actors
+   */
   void ShowAxis(bool show);
   void ShowGrid(bool show);
-  void ShowScalarBar(bool show);
   void ShowEdge(bool show);
   void ShowTimer(bool show);
   void ShowMetaData(bool show);
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
-  void ShowScalars(bool show);
-  void SetUseRaytracing(bool use);
-  void SetUseRaytracingDenoiser(bool use);
-  void SetUseDepthPeelingPass(bool use);
-  void SetUseSSAOPass(bool use);
-  void SetUseFXAAPass(bool use);
-  void SetUsePointSprites(bool use);
-  void SetUseToneMappingPass(bool use);
-  void SetUseVolume(bool use);
-  void SetUseInverseOpacityFunction(bool use);
-  void SetUseBlurBackground(bool use);
-  void SetUseTrackball(bool use);
-
   bool IsAxisVisible();
   bool IsGridVisible();
-  bool IsScalarBarVisible();
   bool IsEdgeVisible();
   bool IsTimerVisible();
   bool IsFilenameVisible();
   bool IsMetaDataVisible();
   bool IsCheatSheetVisible();
-  bool AreScalarsVisible();
+  //@}
+
+  //@{
+  /**
+   * Set/Get usages of different render passes
+   */
+  void SetUseRaytracing(bool use);
+  void SetUseRaytracingDenoiser(bool use);
+  void SetUseDepthPeelingPass(bool use);
+  void SetUseSSAOPass(bool use);
+  void SetUseFXAAPass(bool use);
+  void SetUseToneMappingPass(bool use);
+  void SetUseBlurBackground(bool use);
+  void SetUseTrackball(bool use);
   bool UsingRaytracing();
   bool UsingRaytracingDenoiser();
   bool UsingDepthPeelingPass();
   bool UsingSSAOPass();
   bool UsingFXAAPass();
-  bool UsingPointSprites();
   bool UsingToneMappingPass();
-  bool UsingVolume();
-  bool UsingInverseOpacityFunction();
   bool UsingBlurBackground();
   bool UsingTrackball();
+  //@}
 
+  /**
+   * Reimplemented to handle cheat sheet and timer
+   */
   void Render() override;
 
   /**
-   * Should be called after being added to a vtkRenderWindow
+   * Initialize the renderer to be used with provided options and file.
+   * Should be called after being added to a vtkRenderWindow.
    */
-  void Initialize(const F3DOptions& options, const std::string& fileInfo);
+  virtual void Initialize(const F3DOptions& options, const std::string& fileInfo);
 
+  //@{
+  /**
+   * Set/Get the axis widget
+   */
   vtkGetSmartPointerMacro(AxisWidget, vtkOrientationMarkerWidget);
   vtkSetSmartPointerMacro(AxisWidget, vtkOrientationMarkerWidget);
-
-  //@{
-  /**
-   * Set/Get the scalar bar actor, used for hotkey purposes
-   */
-  vtkGetSmartPointerMacro(ScalarBarActor, vtkActor2D);
-  vtkSetSmartPointerMacro(ScalarBarActor, vtkActor2D);
   //@}
-
-  //@{
-  /**
-   * Set/Get the geometry actor, used for hotkey purposes
-   */
-  vtkGetSmartPointerMacro(GeometryActor, vtkActor);
-  vtkSetSmartPointerMacro(GeometryActor, vtkActor);
-  //@}
-
-  //@{
-  /**
-   * Set/Get the point sprites actor, used for hotkey purposes
-   */
-  vtkGetSmartPointerMacro(PointSpritesActor, vtkActor);
-  vtkSetSmartPointerMacro(PointSpritesActor, vtkActor);
-  //@}
-
-  //@{
-  /**
-   * Set/Get the volume prop, used for hotkey purposes
-   */
-  vtkGetSmartPointerMacro(VolumeProp, vtkVolume);
-  vtkSetSmartPointerMacro(VolumeProp, vtkVolume);
-  //@}
-
-  //@{
-  /**
-   * Set/Get the polydata mapper, used for hotkey purposes
-   */
-  vtkGetSmartPointerMacro(PolyDataMapper, vtkMapper);
-  vtkSetSmartPointerMacro(PolyDataMapper, vtkMapper);
-  //@}
-
-  //@{
-  /**
-   * Set/Get the point gaussian mapper, used for hotkey purposes
-   */
-  vtkGetSmartPointerMacro(PointGaussianMapper, vtkMapper);
-  vtkSetSmartPointerMacro(PointGaussianMapper, vtkMapper);
-  //@}
-
-  //@{
-  /**
-   * Set/Get the volume mapper, used for hotkey purposes
-   */
-  vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
-  vtkSetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
-  //@}
-
-  /**
-   * Set the ScalarsAvailable flag to inform the renderer that
-   * scalars rendering can be done.
-   */
-  vtkSetMacro(ScalarsAvailable, bool);
 
   /**
    * Get the OpenGL skybox
    */
   vtkGetObjectMacro(Skybox, vtkSkybox);
 
+  /**
+   * Set the visibility of the different actors
+   * as they were set by the options during the initialization.
+   * Also call UpdateInternalActors
+   */
   void ShowOptions();
 
+  /**
+   * Setup the different render passes
+   * as they were set by the options during the initialization.
+   */
   void SetupRenderPasses();
 
   /**
@@ -175,12 +121,6 @@ public:
    */
   void DumpSceneState();
 
-  /**
-   * This considers the state of the renderer and update
-   * actor visibilities accordingly
-   */
-  void UpdateActorsVisibility();
-
   //@{
   /**
    * Set/Get up vector
@@ -197,29 +137,40 @@ public:
   vtkSetVector3Macro(RightVector, double);
   //@}
 
+  /**
+   * Override to update internal actors that display data
+   * in a specific way
+   */
+  virtual void UpdateInternalActors(){};
+
 protected:
   vtkF3DRenderer();
-  ~vtkF3DRenderer() override = default;
+  ~vtkF3DRenderer() override;
 
   void ReleaseGraphicsResources(vtkWindow* w) override;
-  void UpdateScalarBarVisibility();
 
   bool IsBackgroundDark();
 
+  /**
+   * Update the text of the cheatsheet and mark it for rendering
+   */
   void UpdateCheatSheet();
 
-  std::string GenerateMetaDataDescription();
+  /**
+   * Add related hotkeys options to the cheatsheet.
+   * Override to add other hotkeys
+   */
+  virtual void FillCheatSheetHotkeys(std::stringstream& sheet);
+
+  /**
+   * Override to generate a data description
+   */
+  virtual std::string GenerateMetaDataDescription();
 
   F3DOptions Options;
 
   vtkNew<vtkActor> GridActor;
-  vtkSmartPointer<vtkActor2D> ScalarBarActor;
-  vtkSmartPointer<vtkActor> GeometryActor;
-  vtkSmartPointer<vtkActor> PointSpritesActor;
-  vtkSmartPointer<vtkVolume> VolumeProp;
-  vtkSmartPointer<vtkMapper> PolyDataMapper;
-  vtkSmartPointer<vtkMapper> PointGaussianMapper;
-  vtkSmartPointer<vtkSmartVolumeMapper> VolumeMapper;
+
   vtkNew<vtkSkybox> Skybox;
   vtkNew<vtkCamera> InitialCamera;
 
@@ -229,7 +180,6 @@ protected:
   vtkNew<vtkCornerAnnotation> MetaDataActor;
   vtkNew<vtkCornerAnnotation> CheatSheetActor;
   bool CheatSheetNeedUpdate = false;
-  bool ScalarsAvailable = false;
 
   // vtkCornerAnnotation building is too slow for the timer
   vtkNew<vtkTextActor> TimerActor;
@@ -241,18 +191,13 @@ protected:
   bool TimerVisible = false;
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
-  bool ScalarBarVisible = false;
-  bool ScalarsVisible = false;
   bool CheatSheetVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
   bool UseFXAAPass = false;
   bool UseSSAOPass = false;
-  bool UsePointSprites = false;
   bool UseToneMappingPass = false;
-  bool UseVolume = false;
-  bool UseInverseOpacityFunction = false;
   bool UseBlurBackground = false;
   bool UseTrackball = false;
 

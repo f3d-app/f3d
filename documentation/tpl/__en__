@@ -19,6 +19,7 @@ sidebar:
     overview: Overview
     installation_and_build: Installation and build
     configuration_file: Configuration file
+    desktop_integration: Desktop Integration
     miscellaneous: Miscellaneous
     limitations: Limitations
     troubleshooting: Troubleshooting

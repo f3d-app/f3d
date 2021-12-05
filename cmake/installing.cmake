@@ -1,5 +1,23 @@
 # F3D Installation
 
+# F3D
+install(TARGETS f3d
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  BUNDLE DESTINATION ".")
+
+get_target_property(LIBF3D_TYPE libf3d TYPE)
+if(LIBF3D_TYPE STREQUAL "SHARED_LIBRARY")
+  install(TARGETS libf3d
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif()
+
+# F3DShellExtension for Windows
+if (BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
+  install(TARGETS F3DShellExtension
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+
 # Documentation
 set(F3D_DOC_DIR ".")
 
@@ -7,7 +25,7 @@ if (UNIX AND NOT APPLE)
   set(F3D_DOC_DIR ${CMAKE_INSTALL_DOCDIR})
 endif()
 
-install(FILES LICENSE README.md
+install(FILES LICENSE THIRD_PARTY_LICENSES.md README.md
   DESTINATION ${F3D_DOC_DIR})
 
 # Default config file
@@ -30,7 +48,14 @@ endif()
 
 # Other ressoure files
 if(UNIX AND NOT APPLE)
-  install(FILES "${CMAKE_SOURCE_DIR}/resources/f3d.desktop"
+  file(TOUCH "${CMAKE_BINARY_DIR}/mime_types")
+  file(READ "${CMAKE_BINARY_DIR}/mime_types" F3D_MIME_TYPES)
+  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_BINARY_DIR}/mime_types")
+  configure_file(
+    "${CMAKE_SOURCE_DIR}/resources/f3d.desktop.in"
+    "${CMAKE_BINARY_DIR}/resources/f3d.desktop")
+
+  install(FILES "${CMAKE_BINARY_DIR}/resources/f3d.desktop"
     DESTINATION "share/applications")
   install(FILES "${CMAKE_SOURCE_DIR}/resources/logo32.png"
     DESTINATION "share/icons/hicolor/32x32/apps"
@@ -53,6 +78,45 @@ if(UNIX AND NOT APPLE)
   install(FILES "${CMAKE_SOURCE_DIR}/resources/completion.fish"
     DESTINATION "share/fish/vendor_completions.d"
     RENAME "f3d.fish")
+  install(FILES "${CMAKE_SOURCE_DIR}/resources/com.f3d-app.F3D.metainfo.xml"
+    DESTINATION "share/metainfo")
+  if(TARGET man)
+    install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
+      DESTINATION "share/man/man1/")
+  endif()
+  if (F3D_INSTALL_THUMBNAILER_FILES)
+    configure_file(
+      "${CMAKE_SOURCE_DIR}/resources/f3d.thumbnailer.in"
+      "${CMAKE_BINARY_DIR}/resources/f3d.thumbnailer")
+    install(FILES "${CMAKE_BINARY_DIR}/resources/f3d.thumbnailer"
+      DESTINATION "share/thumbnailers/")
+  endif()
+  if (F3D_INSTALL_MIME_TYPES_FILE)
+    install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-3d-formats.xml"
+      DESTINATION "share/mime/packages"
+      RENAME "f3d-3d-formats.xml")
+    install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-3d-image-formats.xml"
+      DESTINATION "share/mime/packages"
+      RENAME "f3d-3d-image-formats.xml")
+    install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-vtk-formats.xml"
+      DESTINATION "share/mime/packages"
+      RENAME "f3d-vtk-formats.xml")
+    if (F3D_MODULE_EXODUS)
+      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-exodus-formats.xml"
+        DESTINATION "share/mime/packages"
+        RENAME "f3d-3d-exodus-formats.xml")
+    endif()
+    if (F3D_MODULE_OCCT)
+      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-cad-formats.xml"
+        DESTINATION "share/mime/packages"
+        RENAME "f3d-cad-formats.xml")
+    endif()
+    if (F3D_MODULE_ASSIMP)
+      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-assimp-formats.xml"
+        DESTINATION "share/mime/packages"
+        RENAME "f3d-assimp-formats.xml")
+    endif()
+  endif()
 elseif(WIN32 AND NOT UNIX)
   install(FILES "${CMAKE_SOURCE_DIR}/resources/logo.ico"
     DESTINATION ".")
@@ -60,7 +124,7 @@ elseif(WIN32 AND NOT UNIX)
     install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
       DESTINATION ".")
   endif()
-elseif(APPLE AND NOT MACOSX_BUILD_BUNDLE)
+elseif(APPLE AND NOT F3D_MACOS_BUNDLE)
   if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
     install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
       DESTINATION ".")

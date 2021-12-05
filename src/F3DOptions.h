@@ -34,6 +34,7 @@ struct F3DOptions
   bool SSAO = false;
   bool Verbose = false;
   bool NoRender = false;
+  bool Quiet = false;
   bool PointSprites = false;
   bool FullScreen = false;
   bool ToneMapping = false;
@@ -43,6 +44,8 @@ struct F3DOptions
   bool BlurBackground = false;
   bool Trackball = false;
   double CameraViewAngle;
+  double CameraAzimuthAngle = 0.0;
+  double CameraElevationAngle = 0.0;
   double Metallic = 0.0;
   double Opacity = 1.0;
   double PointSize = 10.0;
@@ -52,10 +55,14 @@ struct F3DOptions
   int Component = -1;
   int Samples = 5;
   std::string Up = "+Y";
-  int AnimationIndex = -1;
+  int AnimationIndex = 0;
+  int CameraIndex = -1;
+  std::string UserConfigFile = "";
   std::string Output = "";
   std::string Reference = "";
   std::string Scalars = f3d::F3DReservedString;
+  std::string InteractionTestRecordFile = "";
+  std::string InteractionTestPlayFile = "";
   std::vector<double> BackgroundColor = { 0.2, 0.2, 0.2 };
   std::vector<double> CameraPosition;
   std::vector<double> CameraFocalPoint;
@@ -79,34 +86,30 @@ class F3DOptionsParser
 public:
   void Initialize(int argc, char** argv);
 
+   /**
+   * Find and parse a config file, if any, into the config file dictionnary.
+   * If a non-empty userConfigFile is provided, it will be considered instead
+   * of standard settings config file
+   */
+  void InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
+
   /**
    * Parse the command line and return the options passed
    * The provided inputs arguments will also be filled by the
    * positional inputs or inputs arguments from command line.
+   * This will also reset the FilePathForConfigFile in order to
+   * ignore config file options.
    * Returns the resulting options.
    */
   F3DOptions GetOptionsFromCommandLine(std::vector<std::string>& inputs);
 
   /**
-   * Parse the command line and return the options passed.
-   * Convenience method that does not allows to recover the inputs.
-   */
-  F3DOptions GetOptionsFromCommandLine();
-
-  /**
-   * Parse the config file in different potential location
-   * using the provided filepath to match the regexp in
-   * the config files. Then parse the command line for any supplemental.
+   * Use the config file dictionnary using the provided filepath
+   * to match the regexp from the config files.
+   * Then parse the command line for any supplemental.
    * Returns the resulting options.
    */
   F3DOptions GetOptionsFromConfigFile(const std::string& filePath);
-
-  /**
-   * Check the validity of a provided option
-   * and print to the log if they are not.
-   * return true if all options are compatible, false otherwise.
-   */
-  static bool CheckValidity(const F3DOptions& options, const std::string& filePath);
 
   F3DOptionsParser();
   ~F3DOptionsParser();
