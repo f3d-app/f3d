@@ -14,7 +14,7 @@ It supports a range of file formats (including animated glTF, stl, step, ply, ob
 
 # Acknowledgments
 
-F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/) and [Assimp](https://dev.opencascade.org/).
+F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/) and [Assimp](https://www.assimp.org/).
 
 # File formats
 
@@ -60,6 +60,7 @@ Options &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 -h, \-\-help|Print *help*.
 \-\-verbose|Enable *verbose* mode.
 \-\-no-render|Verbose mode without any rendering for the first provided file, to recover information about a file.
+\-\-quiet|Enable quiet mode, which superseed any verbose options. No console output will be generated at all.
 \-\-version|Show *version* information.
 -x, \-\-axis|Show *axes* as a trihedron in the scene.
 -g, \-\-grid|Show *a grid* aligned with the XZ plane.
@@ -228,9 +229,6 @@ It will loop back to not coloring unless using volume rendering.
 * `Y`: cycle the component available on the currently selected array, looping to -2 for direct scalars rendering
 if the array contains 4 or less components, -1 otherwise.
 
-When changing the array, the component in use will be kept if valid with the new array, if not it will be reset to 0
-when coloring with an invalid higher than zero component, and to -1 when using direct scalars rendering with an array
-having more than 4 components.
+When changing the array, the component in use will be kept if valid with the new array, if not it will be reset to 0. when coloring with an invalid higher than zero component, and to -1 when using direct scalars rendering with an array having more than 4 components.
 
-When changing the type of data to color with, the index of the array within the data will be kept if valid
-with the new data. If not, it will cycle until a valid array is found. After that, the component will be checked as well.
+When changing the type of data to color with, the index of the array within the data will be kept if valid with the new data. If not, it will cycle until a valid array is found. After that, the component will be checked as well.
