@@ -50,8 +50,10 @@
 #include <vtkMultiBlockDataSet.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <array>
 #include <numeric>
 #include <unordered_map>
+#include <vector>
 
 class vtkF3DOCCTReaderInternal
 {
