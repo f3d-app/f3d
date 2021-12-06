@@ -71,6 +71,10 @@ Available in [nixpkgs](https://github.com/NixOS/nixpkgs/blob/master/pkgs/applica
 
 Available in [Flathub](https://flathub.org/apps/details/com.kitware.F3D).
 
+## Spack
+
+Available in [Spack](https://spack.readthedocs.io/en/latest/package_list.html#f3d).
+
 # Build
 
 ## Dependencies
