@@ -98,7 +98,7 @@ f3d_test(NAME TestGLTFReaderWithAnimation DATA BoxAnimated.gltf ARGS --geometry-
 f3d_test(NAME TestDicom DATA IM-0001-1983.dcm ARGS --scalars --roughness=1)
 f3d_test(NAME TestMHD DATA HeadMRVolume.mhd ARGS --scalars --roughness=1)
 f3d_test(NAME TestVTICell DATA waveletMaterial.vti ARGS --scalars=Material -c --roughness=1)
-f3d_test(NAME TestSSAO DATA suzanne.ply ARGS -u)
+f3d_test(NAME TestSSAO LONG_TIMEOUT DATA suzanne.ply ARGS -u)
 f3d_test(NAME TestDepthPeeling DATA suzanne.ply ARGS -sp --opacity=0.9)
 f3d_test(NAME TestBackground DATA suzanne.ply ARGS --bg-color=0.8,0.2,0.9)
 f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity 0.2)
