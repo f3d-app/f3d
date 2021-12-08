@@ -42,7 +42,7 @@ public:
   /*
    * Get the mimetypes supported by this reader
    */
-  virtual const std::vector<std::string> GetMimeTypes() const override
+  const std::vector<std::string> GetMimeTypes() const override
   {
     static const std::vector<std::string> types = { "application/vnd.exodus" };
     return types;

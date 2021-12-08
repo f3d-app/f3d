@@ -1,43 +1,58 @@
-#include "vtkF3DInteractorStyle.h"
+#include "vtkF3DInteractionHandler.h"
+
+#include <vtkInteractorStyle.h>
+#include <vtkObjectFactory.h>
+#include <vtkRendererCollection.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkStringArray.h>
 
 #include "F3DAnimationManager.h"
 #include "F3DIncludes.h"
-#include "F3DLoader.h"
 #include "F3DLog.h"
+#include "F3DLoader.h"
+#include "F3DOptions.h"
 #include "vtkF3DRendererWithColoring.h"
 
-#include <vtkCallbackCommand.h>
-#include <vtkCamera.h>
-#include <vtkMath.h>
-#include <vtkMatrix3x3.h>
-#include <vtkObjectFactory.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkRendererCollection.h>
-#include <vtkStringArray.h>
+vtkF3DInteractionHandler* vtkF3DInteractionHandler::Instance = nullptr;
 
-vtkStandardNewMacro(vtkF3DInteractorStyle);
+vtkStandardNewMacro(vtkF3DInteractionHandler);
 
 //----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
+void vtkF3DInteractionHandler::SetupInteractorStyles(
+  vtkRenderWindowInteractor* interactor, F3DAnimationManager* animManager, F3DOptions* options)
+{
+  this->Style3D->SetAnimationManager(*animManager);
+  // Will only be used when interacting with a animated file
+  this->Style3D->SetOptions(*options);
+
+  this->Style2D->SetAnimationManager(*animManager);
+  // Will only be used when interacting with a animated file
+  this->Style2D->SetOptions(*options);
+
+  interactor->SetInteractorStyle(this->Style2D);
+  this->Interactor = interactor;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DInteractionHandler::OnDropFiles(vtkInteractorStyle* style, vtkStringArray* files)
 {
   if (files == nullptr)
   {
-    F3DLog::Print(F3DLog::Severity::Warning,
-      "Drop event without any provided files.");
+    F3DLog::Print(F3DLog::Severity::Warning, "Drop event without any provided files.");
     return;
   }
 
-  vtkRenderWindowInteractor* rwi = this->GetInteractor();
+  vtkRenderWindowInteractor* rwi = style->GetInteractor();
   vtkRenderWindow* renWin = rwi->GetRenderWindow();
   this->InvokeEvent(F3DLoader::NewFilesEvent, files);
   renWin->Render();
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::OnKeyPress()
+bool vtkF3DInteractionHandler::HandleKeyPress(vtkInteractorStyle* style)
 {
-  vtkRenderWindowInteractor* rwi = this->GetInteractor();
+  vtkRenderWindowInteractor* rwi = style->GetInteractor();
   vtkRenderWindow* renWin = rwi->GetRenderWindow();
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
   vtkF3DRendererWithColoring* renWithColor = vtkF3DRendererWithColoring::SafeDownCast(ren);
@@ -72,7 +87,6 @@ void vtkF3DInteractorStyle::OnKeyPress()
         renWin->Render();
       }
       break;
-    case 'p':
     case 'P':
       ren->SetUseDepthPeelingPass(!ren->UsingDepthPeelingPass());
       renWin->Render();
@@ -192,6 +206,12 @@ void vtkF3DInteractorStyle::OnKeyPress()
     case '?':
       ren->DumpSceneState();
       break;
+    case '2':
+      this->Interactor->SetInteractorStyle(this->Style2D);
+      break;
+    case '3':
+      this->Interactor->SetInteractorStyle(this->Style3D);
+      break;
     default:
       std::string keySym = rwi->GetKeySym();
       if (keySym.length() > 0)
@@ -202,19 +222,19 @@ void vtkF3DInteractorStyle::OnKeyPress()
       if (keySym == "Left")
       {
         int load = F3DLoader::LOAD_PREVIOUS;
-        this->InvokeEvent(F3DLoader::LoadFileEvent, &load);
+        style->InvokeEvent(F3DLoader::LoadFileEvent, &load);
         renWin->Render();
       }
       else if (keySym == "Right")
       {
         int load = F3DLoader::LOAD_NEXT;
-        this->InvokeEvent(F3DLoader::LoadFileEvent, &load);
+        style->InvokeEvent(F3DLoader::LoadFileEvent, &load);
         renWin->Render();
       }
       else if (keySym == "Up")
       {
         int load = F3DLoader::LOAD_CURRENT;
-        this->InvokeEvent(F3DLoader::LoadFileEvent, &load);
+        style->InvokeEvent(F3DLoader::LoadFileEvent, &load);
         renWin->Render();
       }
       else if (keySym == F3D::EXIT_HOTKEY_SYM)
@@ -229,147 +249,14 @@ void vtkF3DInteractorStyle::OnKeyPress()
       }
       else if (keySym == "Space")
       {
-        this->InvokeEvent(F3DLoader::ToggleAnimationEvent);
+        style->InvokeEvent(F3DLoader::ToggleAnimationEvent);
         renWin->Render();
+      }
+      else
+      {
+        return false;
       }
       break;
   }
-}
-
-//------------------------------------------------------------------------------
-void vtkF3DInteractorStyle::Rotate()
-{
-  if (this->IsUserInteractionBlocked())
-  {
-    return;
-  }
-
-  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
-
-  if (ren == nullptr)
-  {
-    return;
-  }
-
-  vtkRenderWindowInteractor* rwi = this->Interactor;
-
-  int dx = rwi->GetEventPosition()[0] - rwi->GetLastEventPosition()[0];
-  int dy = rwi->GetEventPosition()[1] - rwi->GetLastEventPosition()[1];
-
-  const int* size = ren->GetRenderWindow()->GetSize();
-
-  double delta_elevation = -20.0 / size[1];
-  double delta_azimuth = -20.0 / size[0];
-
-  double rxf = dx * delta_azimuth * this->MotionFactor;
-  double ryf = dy * delta_elevation * this->MotionFactor;
-
-  vtkCamera* camera = ren->GetActiveCamera();
-  double dir[3];
-  camera->GetDirectionOfProjection(dir);
-  double* up = ren->GetUpVector();
-
-  double dot = vtkMath::Dot(dir, up);
-
-  bool canElevate = ren->UsingTrackball() || std::abs(dot) < 0.99 || !std::signbit(dot * ryf);
-
-  camera->Azimuth(rxf);
-
-  if (canElevate)
-  {
-    camera->Elevation(ryf);
-  }
-
-  if (!ren->UsingTrackball())
-  {
-    // orthogonalize up vector based on focal direction
-    vtkMath::MultiplyScalar(dir, dot);
-    vtkMath::Subtract(up, dir, dir);
-    vtkMath::Normalize(dir);
-    camera->SetViewUp(dir);
-  }
-  else
-  {
-    camera->OrthogonalizeViewUp();
-  }
-
-  if (this->AutoAdjustCameraClippingRange)
-  {
-    this->CurrentRenderer->ResetCameraClippingRange();
-  }
-
-  if (rwi->GetLightFollowCamera())
-  {
-    this->CurrentRenderer->UpdateLightsGeometryToFollowCamera();
-  }
-
-  rwi->Render();
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::Spin()
-{
-  if (this->IsUserInteractionBlocked())
-  {
-    return;
-  }
-  this->Superclass::Spin();
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::Pan()
-{
-  if (this->IsUserInteractionBlocked())
-  {
-    return;
-  }
-  this->Superclass::Pan();
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::Dolly()
-{
-  if (this->IsUserInteractionBlocked())
-  {
-    return;
-  }
-  this->Superclass::Dolly();
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::Dolly(double factor)
-{
-  if (this->IsUserInteractionBlocked())
-  {
-    return;
-  }
-  this->Superclass::Dolly(factor);
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::EnvironmentRotate()
-{
-  this->Superclass::EnvironmentRotate();
-
-  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
-  if (ren)
-  {
-    // update skybox orientation
-    double* up = ren->GetEnvironmentUp();
-    double* right = ren->GetEnvironmentRight();
-
-    double front[3];
-    vtkMath::Cross(right, up, front);
-
-    ren->GetSkybox()->SetFloorPlane(up[0], up[1], up[2], 0.0);
-    ren->GetSkybox()->SetFloorRight(front[0], front[1], front[2]);
-
-    this->Interactor->Render();
-  }
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DInteractorStyle::IsUserInteractionBlocked()
-{
-  return this->AnimationManager->IsPlaying() && this->Options->CameraIndex >= 0;
+  return true;
 }

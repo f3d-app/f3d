@@ -71,6 +71,10 @@ protected:
   static vtkSmartPointer<vtkImporter> GetImporter(
     const F3DOptions& options, const std::string& fileName);
 
+  static void OnNewFiles(vtkObject*, unsigned long, void*, void*);
+  static void OnLoadFile(vtkObject*, unsigned long, void*, void*);
+  static void OnToggleAnimation(vtkObject*, unsigned long, void*, void*);
+
   std::vector<std::string> FilesList;
   int CurrentFileIndex = 0;
   F3DOptionsParser Parser;

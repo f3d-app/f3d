@@ -1,21 +1,21 @@
 /**
- * @class   vtkF3DInteractorStyle
- * @brief   custom interactor style based on default trackball camera
+ * @class   vtkF3DInteractorStyle2D
+ * @brief   custom interactor style based on default style image
  */
 
 #ifndef vtkF3DInteractorStyle_h
 #define vtkF3DInteractorStyle_h
 
-#include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkInteractorStyleImage.h>
 
 class F3DAnimationManager;
 struct F3DOptions;
 
-class vtkF3DInteractorStyle : public vtkInteractorStyleTrackballCamera
+class vtkF3DInteractorStyle2D : public vtkInteractorStyleImage
 {
 public:
-  static vtkF3DInteractorStyle* New();
-  vtkTypeMacro(vtkF3DInteractorStyle, vtkInteractorStyleTrackballCamera);
+  static vtkF3DInteractorStyle2D* New();
+  vtkTypeMacro(vtkF3DInteractorStyle2D, vtkInteractorStyleImage);
 
   /**
    * Handle key presses
@@ -76,9 +76,6 @@ protected:
 
   const F3DAnimationManager* AnimationManager = nullptr;
   const F3DOptions* Options = nullptr;
-
-  int WindowSize[2] = { -1, -1 };
-  int WindowPos[2] = { 0, 0 };
 };
 
 #endif

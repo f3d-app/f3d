@@ -67,10 +67,12 @@ declare_f3d_reader(F3D3DSReader)
 declare_f3d_reader(F3DCityGMLReader)
 declare_f3d_reader(F3DDICOMReader)
 declare_f3d_reader(F3DGLTFReader)
+declare_f3d_reader(F3DJPEGReader)
 declare_f3d_reader(F3DMetaImageReader)
 declare_f3d_reader(F3DNrrdReader)
 declare_f3d_reader(F3DOBJReader)
 declare_f3d_reader(F3DPLYReader)
+declare_f3d_reader(F3DPNGReader)
 declare_f3d_reader(F3DPTSReader)
 declare_f3d_reader(F3DSTLReader)
 declare_f3d_reader(F3DTIFFReader)
@@ -83,9 +85,9 @@ if(F3D_MODULE_OCCT)
   set(MODULES_SPECIFIC_INCLUDE_DIRS ${MODULES_SPECIFIC_INCLUDE_DIRS} ${OpenCASCADE_INCLUDE_DIR})
   # Note: OpenCASCADE does not declare the libs in the correct dependency order.
   # This could be an issue on Linux when linking with static libraries.
-  # See .github/workflows/ci.yml for a scripted fix 
+  # See .github/workflows/ci.yml for a scripted fix
   set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} ${OpenCASCADE_LIBRARIES})
-  
+
   declare_f3d_reader(F3DOpenCascadeReader)
 endif()
 
@@ -168,7 +170,9 @@ set(F3D_SOURCE_FILES
   vtkF3DConsoleOutputWindow.cxx
   vtkF3DGenericImporter.cxx
   vtkF3DInteractorEventRecorder.cxx
-  vtkF3DInteractorStyle.cxx
+  vtkF3DInteractorStyle2D.cxx
+  vtkF3DInteractorStyle3D.cxx
+  vtkF3DInteractionHandler.cxx
   vtkF3DMetaReader.cxx
   vtkF3DObjectFactory.cxx
   vtkF3DOpenGLGridMapper.cxx
@@ -192,7 +196,9 @@ set(F3D_HEADER_FILES
   vtkF3DConsoleOutputWindow.h
   vtkF3DGenericImporter.h
   vtkF3DInteractorEventRecorder.h
-  vtkF3DInteractorStyle.h
+  vtkF3DInteractorStyle2D.h
+  vtkF3DInteractorStyle3D.h
+  vtkF3DInteractionHandler.h
   vtkF3DMetaReader.h
   vtkF3DObjectFactory.h
   vtkF3DOpenGLGridMapper.h

@@ -25,6 +25,12 @@
 class F3DReader
 {
 public:
+  enum DataTypeEnum
+  {
+    DATA_TYPE_MESH = 0,
+    DATA_TYPE_IMAGE = 1
+  };
+
   F3DReader() = default;
   virtual ~F3DReader() = default;
 
@@ -57,6 +63,16 @@ public:
    * Check if this reader can read the given filename - generally according its extension
    */
   virtual bool CanRead(const std::string& fileName) const;
+
+  /*
+   * Get the data dimension (3 or 2 for respectively 3D or 2D)
+   */
+  virtual int DataDimension() const { return 3; }
+
+  /*
+   * Get the data type ()
+   */
+  virtual int DataType() const { return DATA_TYPE_MESH; }
 
 #ifndef F3D_NO_VTK
   /*

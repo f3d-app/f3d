@@ -1,39 +1,39 @@
 /**
- * @class   F3DTIFFReader
- * @brief   The TIFF reader class
+ * @class   F3DJPEGReader
+ * @brief   The JPEG reader class
  *
  */
 
-#ifndef F3DTIFFReader_h
-#define F3DTIFFReader_h
+#ifndef F3DJPEGReader_h
+#define F3DJPEGReader_h
 
 #include "F3DReaderFactory.h"
 
 #ifndef F3D_NO_VTK
-#include <vtkTIFFReader.h>
+#include <vtkJPEGReader.h>
 #endif
 
-class F3DTIFFReader : public F3DReader
+class F3DJPEGReader : public F3DReader
 {
 public:
-  F3DTIFFReader() = default;
+  F3DJPEGReader() = default;
 
   /*
    * Get the name of this reader
    */
-  const std::string GetName() const override { return "TIFFReader"; }
+  const std::string GetName() const override { return "JPEGReader"; }
 
   /*
    * Get the short description of this reader
    */
-  const std::string GetShortDescription() const override { return "TIFF files reader"; }
+  const std::string GetShortDescription() const override { return "JPEG files reader"; }
 
   /*
    * Get the extensions supported by this reader
    */
   const std::vector<std::string> GetExtensions() const override
   {
-    static const std::vector<std::string> ext = { ".tif", ".tiff" };
+    static const std::vector<std::string> ext = { ".jpg", ".jpeg" };
     return ext;
   }
 
@@ -42,19 +42,19 @@ public:
    */
   const std::vector<std::string> GetMimeTypes() const override
   {
-    static const std::vector<std::string> types = { "application/x-tgif" };
+    static const std::vector<std::string> types = { "image/jpeg" };
     return types;
   }
 
   /*
    * Get the data dimension
    */
-  virtual int DataDimension() const { return 2; }
+  int DataDimension() const override { return 2; }
 
   /*
    * Get the data type
    */
-  virtual int DataType() const { return DATA_TYPE_IMAGE; }
+  int DataType() const override  { return DATA_TYPE_IMAGE; }
 
 #ifndef F3D_NO_VTK
   /*
@@ -62,7 +62,7 @@ public:
    */
   vtkSmartPointer<vtkAlgorithm> CreateGeometryReader(const std::string& fileName) const override
   {
-    vtkSmartPointer<vtkTIFFReader> reader = vtkSmartPointer<vtkTIFFReader>::New();
+    vtkSmartPointer<vtkJPEGReader> reader = vtkSmartPointer<vtkJPEGReader>::New();
     reader->SetFileName(fileName.c_str());
     return reader;
   }
