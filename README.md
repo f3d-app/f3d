@@ -34,11 +34,11 @@ There are 4 main ways to use F3D:
 * By running F3D from a terminal with a set of command-line options.
 * By running F3D directly and then dragging and dropping files into it to open them.
 * By using F3D automatically in the file manager when opening file.
-* As a [thumbnailer](#Thumbnailer) for all supported file formats with certain file managers.
+* As a thumbnailer for all supported file formats with certain file managers.
 
 # Installation
 
-You can find the release binary packages for Windows, Linux and macOS on the [Release page](https://github.com/f3d-app/f3d).
+You can find the release binary packages for Windows, Linux and macOS on the [Release page](https://github.com/f3d-app/f3d). See the [desktop integration](#Desktop Integration) section in order actually integrate the binary release in your desktop.
 Alternatively, you can build it yourself following the [build](#Build) guide below.
 
 You can also find packages for the following operating systems:
@@ -385,17 +385,57 @@ On Linux, it will be installed in `/etc/f3d/`, on Windows, it will be installed 
 
 # Desktop Integration
 
-F3D can be integrated in the desktop experience in certain cases
+F3D can be integrated in the desktop experience.
 
 ## Linux
 
-During instalation, F3D will install mime types files as defined by the [XDG standard](https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-latest.html), a .thumbnailer file as specified [here](https://wiki.archlinux.org/title/File_manager_functionality#Thumbnail_previews) and a .desktop as specified [here](https://wiki.archlinux.org/title/desktop_entries). Many file managers use this mechanism, including nautilus, thunar, pcmanfm and caja. Make sure to update the mime types database using [update-mime-database](https://linux.die.net/man/1/update-mime-database) as well as the desktop entries database using [update-desktop-database](https://linuxcommandlibrary.com/man/update-desktop-database).
+For Linux desktop integration, F3D rely on mime types files as defined by the [XDG standard](https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-latest.html), .thumbnailer file as specified [here](https://wiki.archlinux.org/title/File_manager_functionality#Thumbnail_previews) and .desktop file as specified [here](https://wiki.archlinux.org/title/desktop_entries). Many file managers use this mechanism, including nautilus, thunar, pcmanfm and caja.
+
+The simplest way to obtain desktop integration on linux is to use a package for your distribution.
+If there is none, you can use the binary release for this.
+
+0. Make sure ~/.local/bin is part of your PATH
+1. Extract F3D archive in a TEMP folder
+2. move $TEMP/config.json to ~/.config/f3d/
+3. copy $TEMP/* to ~/.local/
+4. Update your [mime database](https://linux.die.net/man/1/update-mime-database) pointing to ~/.local/share/mime
+5. Update your [desktop database](update-desktop-database](https://linuxcommandlibrary.com/man/update-desktop-database) pointing to ~/.local/share/application
+
+```bash
+tar -xzvf f3d-1.2.0-Linux.tar.gz
+cd f3d-1.2.0-Linux
+mkdir -p ~/.config/f3d/
+mv config.json /.config/f3d/
+cp -r ./* ~/.local/
+sudo update-mime-database ~/.local/share/mime/
+sudo update-desktop-database ~/.local/share/applications
+```
+
+If you have any issues, read the [troubleshooting](#Troubleshooting) section.
 
 ## Windows
 
-Using the F3D NSIS installer is the simplest way to enable thumbnails on windows, you can find it in the release section. It will automatically register it when installing F3D and unregister it when uninstalling F3D.
-It is also possible to manually register it using `regsvr32 F3DShellExtension.dll`. To unregister it, use `regsvr32 /u F3DShellExtension.dll`.
-The NSIS installer also register/unregister extensions support on installation/deinstallation.
+For Windows desktop integration, f3d rely on a registered shell extension.
+
+Using the F3D NSIS installer (.exe) is the simplest way to enable thumbnails and integrate F3D on windows.
+
+It is also possible to do it manually when using the zipped binary release, on installation, just run:
+
+```
+cd C:\path\to\f3d\bin\
+regsvr32 F3DShellExtension.dll
+```
+
+To remove the shell extension, run:
+
+```
+cd C:\path\to\f3d\bin\
+regsvr32 /u F3DShellExtension.dll
+```
+
+## MacOS
+
+There is no support for thumbnails on MacOS, the .dmg binary release should provide automatic file openings.
 
 # Known limitations
 
@@ -436,6 +476,15 @@ Be sure that VTK has been built with *OpenImageDenoise* support (`VTKOSPRAY_ENAB
   * If no formats have working thumbnails, then it is an issue with the f3d.thumbnailer file
 
 ## Windows
+> After installing F3D or registering the shell extension, my explorer is broken
+
+Unregister the shell extension by running:
+
+```
+cd C:\path\to\f3d\bin\
+regsvr32 /u F3DShellExtension.dll
+```
+
 > I use F3D in a VM, the application fails to launch.
 
 OpenGL applications like F3D can have issues when launched from a guest Windows because the access to the GPU is restricted.
