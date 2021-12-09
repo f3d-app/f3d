@@ -1,7 +1,9 @@
 #include "vtkF3DInteractionHandler.h"
 
+#include <vtkBoundingBox.h>
 #include <vtkInteractorStyle.h>
 #include <vtkObjectFactory.h>
+#include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
@@ -14,7 +16,6 @@
 #include "F3DOptions.h"
 #include "vtkF3DRendererWithColoring.h"
 
-vtkF3DInteractionHandler* vtkF3DInteractionHandler::Instance = nullptr;
 
 vtkStandardNewMacro(vtkF3DInteractionHandler);
 
@@ -23,15 +24,35 @@ void vtkF3DInteractionHandler::SetupInteractorStyles(
   vtkRenderWindowInteractor* interactor, F3DAnimationManager* animManager, F3DOptions* options)
 {
   this->Style3D->SetAnimationManager(*animManager);
+  this->Style3D->SetInteractionHandler(this);
   // Will only be used when interacting with a animated file
   this->Style3D->SetOptions(*options);
 
   this->Style2D->SetAnimationManager(*animManager);
+  this->Style2D->SetInteractionHandler(this);
   // Will only be used when interacting with a animated file
   this->Style2D->SetOptions(*options);
 
   interactor->SetInteractorStyle(this->Style2D);
   this->Interactor = interactor;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DInteractionHandler::SetDefaultStyle(vtkRenderer* renderer)
+{
+  double bounds[6], lengths[3];
+  renderer->ComputeVisiblePropBounds(bounds);
+  vtkBoundingBox box(bounds);
+  box.GetLengths(lengths);
+  bool is2D = (lengths[0] == 0 || lengths[1] == 0 || lengths[2] == 0);
+  if (is2D)
+  {
+    this->Interactor->SetInteractorStyle(this->Style2D);
+  }
+  else
+  {
+    this->Interactor->SetInteractorStyle(this->Style3D);
+  }
 }
 
 //----------------------------------------------------------------------------

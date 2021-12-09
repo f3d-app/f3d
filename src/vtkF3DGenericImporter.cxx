@@ -2,6 +2,7 @@
 
 #include "F3DLog.h"
 #include "F3DOptions.h"
+#include "F3DReader.h"
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
@@ -332,7 +333,7 @@ void vtkF3DGenericImporter::ImportLights(vtkRenderer* ren)
   ren->RemoveAllLights();
   ren->AutomaticLightCreationOff();
 
-  if (!ren->GetUseImageBasedLighting())
+  if (!ren->GetUseImageBasedLighting() && this->Reader->GetReader()->GetDataType() == F3DReader::DATA_TYPE_MESH)
   {
     vtkNew<vtkLightKit> lightKit;
     lightKit->AddLightsToRenderer(ren);

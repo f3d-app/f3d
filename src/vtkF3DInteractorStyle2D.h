@@ -8,6 +8,7 @@
 
 #include <vtkInteractorStyleImage.h>
 
+class vtkF3DInteractionHandler;
 class F3DAnimationManager;
 struct F3DOptions;
 
@@ -59,12 +60,17 @@ public:
   /**
    * Set animation manager
    */
-  void SetAnimationManager(const F3DAnimationManager& mgr) { this->AnimationManager = &mgr; };
+  void SetAnimationManager(const F3DAnimationManager& mgr) { this->AnimationManager = &mgr; }
+
+  /**
+   * Set interaction handler
+   */
+  void SetInteractionHandler(vtkF3DInteractionHandler* handler) { this->InteractionHandler = handler; }
 
   /**
    * Set options
    */
-  void SetOptions(const F3DOptions& options) { this->Options = &options; };
+  void SetOptions(const F3DOptions& options) { this->Options = &options; }
 
 protected:
   /**
@@ -76,6 +82,7 @@ protected:
 
   const F3DAnimationManager* AnimationManager = nullptr;
   const F3DOptions* Options = nullptr;
+  vtkF3DInteractionHandler* InteractionHandler = nullptr;
 };
 
 #endif

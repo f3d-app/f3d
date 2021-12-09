@@ -13,6 +13,7 @@
 
 #include "F3DAnimationManager.h"
 
+class vtkF3DInteractionHandler;
 class vtkF3DRenderer;
 class vtkImageData;
 class vtkImporter;
@@ -84,6 +85,7 @@ protected:
   vtkSmartPointer<vtkF3DRenderer> Renderer;
   vtkSmartPointer<vtkImporter> Importer;
   vtkSmartPointer<vtkRenderWindow> RenWin;
+  vtkSmartPointer<vtkF3DInteractionHandler> InteractionHandler;
   F3DReaderInstantiator* ReaderInstantiator;
 
 private:

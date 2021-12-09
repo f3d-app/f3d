@@ -320,7 +320,7 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
                                                   this->ArrayForColoring->GetName(), 19)
                                               : "OFF")
                    << "]\n";
-    cheatSheetText << " Y: Coloring compponent ["
+    cheatSheetText << " Y: Coloring component ["
                    << vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring)
                    << "]\n";
     cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";

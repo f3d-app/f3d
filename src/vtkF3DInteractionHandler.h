@@ -16,23 +16,18 @@
 class F3DAnimationManager;
 class vtkInteractorStyle;
 class vtkStringArray;
+class vtkRenderer;
 class vtkRenderWindowInteractor;
 
 class vtkF3DInteractionHandler : public vtkObject
 {
 public:
+  static vtkF3DInteractionHandler* New();
   vtkTypeMacro(vtkF3DInteractionHandler, vtkObject);
 
-  static vtkF3DInteractionHandler* GetInstance()
-  {
-    if (!vtkF3DInteractionHandler::Instance)
-    {
-      vtkF3DInteractionHandler::Instance = vtkF3DInteractionHandler::New();
-    }
-    return vtkF3DInteractionHandler::Instance;
-  }
-
   void SetupInteractorStyles(vtkRenderWindowInteractor*, F3DAnimationManager*, F3DOptions*);
+
+  void SetDefaultStyle(vtkRenderer*);
 
   void OnDropFiles(vtkInteractorStyle*, vtkStringArray*);
 
@@ -45,13 +40,10 @@ public:
 protected:
   vtkF3DInteractionHandler() = default;
   ~vtkF3DInteractionHandler() override = default;
-  static vtkF3DInteractionHandler* New();
 
 private:
   vtkF3DInteractionHandler(const vtkF3DInteractionHandler&) = delete;
   void operator=(const vtkF3DInteractionHandler&) = delete;
-
-  static vtkF3DInteractionHandler* Instance;
 
   vtkRenderWindowInteractor* Interactor = nullptr;
   vtkNew<vtkF3DInteractorStyle2D> Style2D;

@@ -47,14 +47,9 @@ public:
   }
 
   /*
-   * Get the data dimension
-   */
-  int DataDimension() const override { return 2; }
-
-  /*
    * Get the data type
    */
-  int DataType() const override  { return DATA_TYPE_IMAGE; }
+  int GetDataType() const override  { return DATA_TYPE_IMAGE; }
 
 #ifndef F3D_NO_VTK
   /*

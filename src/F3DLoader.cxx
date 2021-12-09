@@ -103,23 +103,23 @@ int F3DLoader::Start(int argc, char** argv, vtkImageData* image)
     this->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
     this->RenWin->SetWindowName(f3d::AppTitle.c_str());
 
-    vtkF3DInteractionHandler* keyHandler = vtkF3DInteractionHandler::GetInstance();
+    this->InteractionHandler = vtkSmartPointer<vtkF3DInteractionHandler>::New();
 
     // Setup the observers for the interactor style events
     vtkNew<vtkCallbackCommand> newFilesCallback;
     newFilesCallback->SetClientData(this);
     newFilesCallback->SetCallback(F3DLoader::OnNewFiles);
-    keyHandler->AddObserver(F3DLoader::NewFilesEvent, newFilesCallback);
+    this->InteractionHandler->AddObserver(F3DLoader::NewFilesEvent, newFilesCallback);
 
     vtkNew<vtkCallbackCommand> loadFileCallback;
     loadFileCallback->SetClientData(this);
     loadFileCallback->SetCallback(F3DLoader::OnLoadFile);
-    keyHandler->AddObserver(F3DLoader::LoadFileEvent, loadFileCallback);
+    this->InteractionHandler->AddObserver(F3DLoader::LoadFileEvent, loadFileCallback);
 
     vtkNew<vtkCallbackCommand> toggleAnimationCallback;
     toggleAnimationCallback->SetClientData(&this->AnimationManager);
     toggleAnimationCallback->SetCallback(F3DLoader::OnToggleAnimation);
-    keyHandler->AddObserver(F3DLoader::ToggleAnimationEvent, toggleAnimationCallback);
+    this->InteractionHandler->AddObserver(F3DLoader::ToggleAnimationEvent, toggleAnimationCallback);
 
     // Offscreen rendering must be set before initializing interactor
     if (!this->CommandLineOptions.Reference.empty() || !this->CommandLineOptions.Output.empty() ||
@@ -129,7 +129,7 @@ int F3DLoader::Start(int argc, char** argv, vtkImageData* image)
     }
 
     interactor->SetRenderWindow(this->RenWin);
-    keyHandler->SetupInteractorStyles(interactor, &this->AnimationManager, &this->Options);
+    this->InteractionHandler->SetupInteractorStyles(interactor, &this->AnimationManager, &this->Options);
     interactor->Initialize();
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200615)
@@ -526,6 +526,8 @@ bool F3DLoader::LoadFile(int load)
     this->Renderer->SetupRenderPasses();
     this->Renderer->UpdateInternalActors();
     this->Renderer->ShowOptions();
+
+    this->InteractionHandler->SetDefaultStyle(this->Renderer);
 
     // Set the initial camera once all options
     // have been shown as they may have an effect on it

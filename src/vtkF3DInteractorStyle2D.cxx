@@ -14,13 +14,13 @@ vtkStandardNewMacro(vtkF3DInteractorStyle2D);
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle2D::OnDropFiles(vtkStringArray* files)
 {
-  vtkF3DInteractionHandler::GetInstance()->OnDropFiles(this, files);
+  this->InteractionHandler->OnDropFiles(this, files);
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle2D::OnKeyPress()
 {
-  vtkF3DInteractionHandler::GetInstance()->HandleKeyPress(this);
+  this->InteractionHandler->HandleKeyPress(this);
 }
 
 //------------------------------------------------------------------------------

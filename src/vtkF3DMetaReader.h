@@ -10,6 +10,8 @@
 #include <vtkDataObjectAlgorithm.h>
 #include <vtkSmartPointer.h>
 
+class F3DReader;
+
 class vtkF3DMetaReader : public vtkDataObjectAlgorithm
 {
 public:
@@ -40,6 +42,11 @@ public:
    */
   vtkInformation* GetOutputInformation(int port);
 
+  /**
+   * Get the F3D reader (set once filename has been provided).
+   */
+  F3DReader* GetReader() { return this->Reader; }
+
 protected:
   vtkF3DMetaReader();
   ~vtkF3DMetaReader() override;
@@ -59,6 +66,7 @@ private:
   void operator=(const vtkF3DMetaReader&) = delete;
 
   vtkSmartPointer<vtkAlgorithm> InternalReader;
+  F3DReader* Reader = nullptr;
   char* FileName = nullptr;
 };
 

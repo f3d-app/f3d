@@ -47,14 +47,9 @@ public:
   }
 
   /*
-   * Get the data dimension
-   */
-  virtual int DataDimension() const { return 2; }
-
-  /*
    * Get the data type
    */
-  virtual int DataType() const { return DATA_TYPE_IMAGE; }
+  virtual int GetDataType() const { return DATA_TYPE_IMAGE; }
 
 #ifndef F3D_NO_VTK
   /*

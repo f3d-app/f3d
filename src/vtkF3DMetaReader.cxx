@@ -97,10 +97,10 @@ void vtkF3DMetaReader::SetFileName(const std::string& fileName)
     return;
   }
 
-  F3DReader* reader = F3DReaderFactory::GetReader(fileName);
-  if (reader)
+  this->Reader = F3DReaderFactory::GetReader(fileName);
+  if (this->Reader)
   {
-    this->InternalReader = reader->CreateGeometryReader(fileName);
+    this->InternalReader = this->Reader->CreateGeometryReader(fileName);
   }
 
   if (this->InternalReader)
