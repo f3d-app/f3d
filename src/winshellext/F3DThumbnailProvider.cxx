@@ -8,6 +8,7 @@
 #include <vtkNew.h>
 
 #include <clocale>
+#include <csignal>
 #include <codecvt>
 #include <locale>
 #include <pathcch.h>
@@ -80,7 +81,7 @@ HRESULT CreateBitmapFromBuffer(vtkImageData* image, HBITMAP* phbmp)
     {
       memcpy(bitmapPtr, imagePtr, lineLen);
       // Convert RGBA to BGRA
-      for (int x = 0; x < width * 3; x += 3) 
+      for (int x = 0; x < width * 3; x += 3)
       {
         std::swap(bitmapPtr[x], bitmapPtr[x + 2]);
       }
@@ -92,6 +93,13 @@ HRESULT CreateBitmapFromBuffer(vtkImageData* image, HBITMAP* phbmp)
   SetDIBits(NULL, *phbmp, 0, height, bitmapBuffer, &bi, DIB_RGB_COLORS);
 
   return NOERROR;
+}
+
+//------------------------------------------------------------------------------
+void SignalHandler(int signum)
+{
+  // we cannot exit here as it will actually exit explorer.exe,
+  // we just keep executing the software in case of signal.
 }
 }
 
@@ -160,6 +168,15 @@ IFACEMETHODIMP F3DThumbnailProvider::GetThumbnail(UINT cx, HBITMAP* phbmp, WTS_A
   char** argv;
   ::ConvertWCommandLineToArgs(warg, argc, argv);
 
+  // Shell extension CANNOT segfault, we must catch the signal
+  // or it can completelly break explorer.exe
+  signal(SIGTERM, ::SignalHandler);
+  signal(SIGSEGV, ::SignalHandler);
+  signal(SIGINT, ::SignalHandler);
+  signal(SIGILL, ::SignalHandler);
+  signal(SIGABRT, ::SignalHandler);
+  signal(SIGFPE, ::SignalHandler);
+
   try
   {
 #if NDEBUG
@@ -183,7 +200,7 @@ IFACEMETHODIMP F3DThumbnailProvider::GetThumbnail(UINT cx, HBITMAP* phbmp, WTS_A
   }
 
   for (int i = 0; i < argc; i++)
-  {  
+  {
     delete[] argv[i];
   }
   delete[] argv;
