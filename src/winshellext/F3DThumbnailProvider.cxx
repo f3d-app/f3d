@@ -96,7 +96,7 @@ HRESULT CreateBitmapFromBuffer(vtkImageData* image, HBITMAP* phbmp)
 }
 
 //------------------------------------------------------------------------------
-void SignalHandler(int signum)
+void SignalHandler(int)
 {
   // we cannot exit here as it will actually exit explorer.exe,
   // we just keep executing the software in case of signal.
@@ -170,12 +170,12 @@ IFACEMETHODIMP F3DThumbnailProvider::GetThumbnail(UINT cx, HBITMAP* phbmp, WTS_A
 
   // Shell extension CANNOT segfault, we must catch the signal
   // or it can completelly break explorer.exe
-  signal(SIGTERM, ::SignalHandler);
-  signal(SIGSEGV, ::SignalHandler);
-  signal(SIGINT, ::SignalHandler);
-  signal(SIGILL, ::SignalHandler);
-  signal(SIGABRT, ::SignalHandler);
-  signal(SIGFPE, ::SignalHandler);
+  auto sigtermPreviousHandler = signal(SIGTERM, ::SignalHandler);
+  auto sigsegvPreviousHandler = signal(SIGSEGV, ::SignalHandler);
+  auto sigintPreviousHandler = signal(SIGINT, ::SignalHandler);
+  auto sigillPreviousHandler = signal(SIGILL, ::SignalHandler);
+  auto sigabrtPreviousHandler = signal(SIGABRT, ::SignalHandler);
+  auto sigfprPreviousHandler = signal(SIGFPE, ::SignalHandler);
 
   try
   {
@@ -198,6 +198,13 @@ IFACEMETHODIMP F3DThumbnailProvider::GetThumbnail(UINT cx, HBITMAP* phbmp, WTS_A
   catch (...)
   {
   }
+
+  signal(SIGTERM, sigtermPreviousHandler);
+  signal(SIGSEGV, sigsegvPreviousHandler);
+  signal(SIGINT, sigintPreviousHandler);
+  signal(SIGILL, sigillPreviousHandler);
+  signal(SIGABRT, sigabrtPreviousHandler);
+  signal(SIGFPE, sigfprPreviousHandler);
 
   for (int i = 0; i < argc; i++)
   {
