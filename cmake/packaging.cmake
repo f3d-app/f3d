@@ -74,7 +74,7 @@ if(WIN32 AND NOT UNIX)
 
 else()
   if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set(CPACK_GENERATOR TGZ TXZ)
+    set(CPACK_GENERATOR TGZ TXZ DEB)
   elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CPACK_GENERATOR DragNDrop)
     set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/resources/logo.icns")
