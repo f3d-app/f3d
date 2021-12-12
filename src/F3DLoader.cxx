@@ -86,10 +86,10 @@ int F3DLoader::Start(int argc, char** argv, vtkImageData* image)
       {
         F3DLoader* loader = static_cast<F3DLoader*>(clientData);
         loader->CurrentFileIndex = static_cast<int>(loader->FilesList.size());
-        vtkStringArray* files = static_cast<vtkStringArray*>(callData);
-        for (int i = 0; i < files->GetNumberOfTuples(); i++)
+        vtkStringArray* filesArr = static_cast<vtkStringArray*>(callData);
+        for (int i = 0; i < filesArr->GetNumberOfTuples(); i++)
         {
-          loader->AddFile(files->GetValue(i));
+          loader->AddFile(filesArr->GetValue(i));
         }
         loader->LoadFile();
       });
@@ -425,11 +425,11 @@ bool F3DLoader::LoadFile(int load)
       progressCallback->SetCallback(
         [](vtkObject*, unsigned long, void* clientData, void* callData)
         {
-          auto data = static_cast<ProgressDataStruct*>(clientData);
-          data->timer->StopTimer();
-          vtkProgressBarWidget* widget = data->widget;
+          auto progressData = static_cast<ProgressDataStruct*>(clientData);
+          progressData->timer->StopTimer();
+          vtkProgressBarWidget* widget = progressData->widget;
           // Only show and render the progress bar if loading takes more than 0.15 seconds
-          if (data->timer->GetElapsedTime() > 0.15)
+          if (progressData->timer->GetElapsedTime() > 0.15)
           {
             widget->On();
             vtkProgressBarRepresentation* rep =
