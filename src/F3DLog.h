@@ -37,8 +37,6 @@ protected:
   }
 
   static void PrintInternal(Severity sev, const std::string& msg);
-
-  static bool Quiet;
 };
 
 #endif
