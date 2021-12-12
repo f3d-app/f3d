@@ -250,7 +250,7 @@ if(F3D_STRICT_BUILD)
     # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
     target_compile_options(libf3d PUBLIC /W4 /WX /wd4275)
   else()
-    target_compile_options(libf3d PUBLIC -Wall -Wextra -Werror)
+    target_compile_options(libf3d PUBLIC -Wall -Wextra -Wshadow -Werror)
   endif()
 endif()
 
@@ -294,7 +294,7 @@ if(F3D_STRICT_BUILD)
     # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
     target_compile_options(f3d PUBLIC /W4 /WX /wd4275)
   else()
-    target_compile_options(f3d PUBLIC -Wall -Wextra -Werror)
+    target_compile_options(f3d PUBLIC -Wall -Wextra -Wshadow -Werror)
   endif()
 endif()
 
