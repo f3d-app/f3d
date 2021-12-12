@@ -16,6 +16,7 @@
 #include <vtkCamera.h>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
+#include <vtkLogger.h>
 #include <vtkNew.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkPolyDataMapper.h>
@@ -41,6 +42,10 @@ typedef struct ProgressDataStruct {
 //----------------------------------------------------------------------------
 F3DLoader::F3DLoader()
 {
+  // Disable vtkLogger in case VTK was built with log support
+  vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_OFF);
+  vtkLogger::SetInternalVerbosityLevel(vtkLogger::VERBOSITY_OFF);
+
   // instanciate our own polydata mapper and output windows
   vtkNew<vtkF3DObjectFactory> factory;
   vtkObjectFactory::RegisterFactory(factory);
