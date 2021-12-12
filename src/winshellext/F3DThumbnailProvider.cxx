@@ -2,6 +2,7 @@
 
 #include "F3DException.h"
 #include "F3DLoader.h"
+#include "F3DThumbnailConfig.h"
 #include "vtkF3DObjectFactory.h"
 
 #include <vtkImageData.h>
@@ -11,7 +12,10 @@
 #include <codecvt>
 #include <locale>
 #include <pathcch.h>
+#include <shlwapi.h>
 #include <sstream>
+#include <thumbcache.h>
+#include <wincodec.h>
 
 extern HINSTANCE g_hInst;
 extern long g_cDllRef;
@@ -19,79 +23,76 @@ extern long g_cDllRef;
 namespace
 {
 //------------------------------------------------------------------------------
-// Convert wide string command line to argc,argv
-void ConvertWCommandLineToArgs(wchar_t* args, int &argc, char** &argv)
+HRESULT ConvertBitmapSourceTo32BPPHBITMAP(
+  IWICBitmapSource* pBitmapSource, IWICImagingFactory* pImagingFactory, HBITMAP* phbmp)
 {
-  std::setlocale(LC_ALL, "en_US.utf8");
-  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> conversion;
+  IWICBitmapSource* pBitmapSourceConverted = nullptr;
+  WICPixelFormatGUID guidPixelFormatSource;
 
-  wchar_t** wargv = CommandLineToArgvW(args, &argc);
-  argv = new char*[argc];
-  for (int i = 0; i < argc; i++)
+  *phbmp = nullptr;
+  HRESULT hr = pBitmapSource->GetPixelFormat(&guidPixelFormatSource);
+
+  if (SUCCEEDED(hr) && (guidPixelFormatSource != GUID_WICPixelFormat32bppBGRA))
   {
-    std::string mbs = conversion.to_bytes(wargv[i]);
-    argv[i] = new char[mbs.size() + 1];
-    std::copy(mbs.begin(), mbs.end(), argv[i]);
-    argv[i][mbs.size()] = 0;
-  }
-}
-
-//------------------------------------------------------------------------------
-HRESULT CreateBitmapFromBuffer(vtkImageData* image, HBITMAP* phbmp)
-{
-  // Fill in image information.
-  int* dims = image->GetDimensions();
-  int width = dims[0];
-  int height = dims[1];
-  int depth = image->GetNumberOfScalarComponents();
-
-  size_t rowLen = (depth == 4) ? (width * 4) : ((width * 3 + 3) & ~3);
-
-  BITMAPINFO bi = {};
-  ZeroMemory(&bi.bmiHeader, sizeof(BITMAPINFOHEADER));
-  bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-  bi.bmiHeader.biWidth = width;
-  bi.bmiHeader.biHeight = height;
-  bi.bmiHeader.biPlanes = 1;
-  bi.bmiHeader.biBitCount = 8 * depth;
-  bi.bmiHeader.biCompression = BI_RGB;
-  bi.bmiHeader.biSizeImage = static_cast<DWORD>(rowLen * height);
-
-  LPBYTE bitmapBuffer = nullptr;
-  *phbmp = CreateDIBSection(NULL, &bi, DIB_RGB_COLORS, (void**)&bitmapBuffer, NULL, 0);
-
-  void* imageBuffer = image->GetScalarPointer();
-  if (rowLen == width * depth)
-  {
-    // Copy image buffer
-    memcpy(bitmapBuffer, imageBuffer, width * height * depth);
-    // Convert RGBA to BGRA
-    for (int i = 0; i < width * height * depth; i += depth)
+    IWICFormatConverter* pFormatConverter;
+    hr = pImagingFactory->CreateFormatConverter(&pFormatConverter);
+    if (SUCCEEDED(hr))
     {
-      std::swap(bitmapBuffer[i], bitmapBuffer[i + 2]);
+      // Create the appropriate pixel format converter
+      hr = pFormatConverter->Initialize(pBitmapSource, GUID_WICPixelFormat32bppBGRA,
+        WICBitmapDitherTypeNone, nullptr, 0, WICBitmapPaletteTypeCustom);
+      if (SUCCEEDED(hr))
+      {
+        hr = pFormatConverter->QueryInterface(&pBitmapSourceConverted);
+      }
+      pFormatConverter->Release();
     }
   }
   else
   {
-    LPBYTE bitmapPtr = bitmapBuffer;
-    LPBYTE imagePtr = reinterpret_cast<LPBYTE>(imageBuffer);
-    int lineLen = width * depth;
-    for (int y = 0; y < height; y++)
-    {
-      memcpy(bitmapPtr, imagePtr, lineLen);
-      // Convert RGBA to BGRA
-      for (int x = 0; x < width * 3; x += 3) 
-      {
-        std::swap(bitmapPtr[x], bitmapPtr[x + 2]);
-      }
-      bitmapPtr += rowLen;
-      imagePtr += lineLen;
-    }
+    // Conversion not necessary
+    hr = pBitmapSource->QueryInterface(&pBitmapSourceConverted);
   }
 
-  SetDIBits(NULL, *phbmp, 0, height, bitmapBuffer, &bi, DIB_RGB_COLORS);
+  if (!SUCCEEDED(hr))
+  {
+    return hr;
+  }
 
-  return NOERROR;
+  UINT nWidth, nHeight;
+  hr = pBitmapSourceConverted->GetSize(&nWidth, &nHeight);
+  if (SUCCEEDED(hr))
+  {
+    BITMAPINFO bmi = {};
+    bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
+    bmi.bmiHeader.biWidth = nWidth;
+    bmi.bmiHeader.biHeight = -static_cast<LONG>(nHeight);
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biCompression = BI_RGB;
+
+    BYTE* pBits;
+    HBITMAP hbmp =
+      CreateDIBSection(nullptr, &bmi, DIB_RGB_COLORS, reinterpret_cast<void**>(&pBits), nullptr, 0);
+    hr = hbmp ? S_OK : E_OUTOFMEMORY;
+    if (SUCCEEDED(hr))
+    {
+      WICRect rect = { 0, 0, static_cast<INT>(nWidth), static_cast<INT>(nHeight) };
+
+      // Convert the pixels and store them in the HBITMAP.
+      hr = pBitmapSourceConverted->CopyPixels(&rect, nWidth * 4, nWidth * nHeight * 4, pBits);
+      if (SUCCEEDED(hr))
+      {
+        *phbmp = hbmp;
+      }
+      else
+      {
+        DeleteObject(hbmp);
+      }
+    }
+  }
+  pBitmapSourceConverted->Release();
+  return hr;
 }
 }
 
@@ -107,6 +108,7 @@ F3DThumbnailProvider::F3DThumbnailProvider()
   if (GetModuleFileName(g_hInst, dll_path, ARRAYSIZE(dll_path)) != 0)
   {
     ::PathCchRemoveFileSpec(dll_path, MAX_PATH);
+    PathCchCombine(m_f3dPath, MAX_PATH, dll_path, L"f3d.exe");
   }
 }
 
@@ -151,42 +153,110 @@ IFACEMETHODIMP F3DThumbnailProvider::Initialize(LPCWSTR pszFilePath, DWORD)
 // Generate the thumbnail bitmap for the requested file.
 IFACEMETHODIMP F3DThumbnailProvider::GetThumbnail(UINT cx, HBITMAP* phbmp, WTS_ALPHATYPE* pdwAlpha)
 {
-  HRESULT ret = E_FAIL;
-  wchar_t warg[MAX_PATH * 2];
-  swprintf_s(warg, MAX_PATH * 2,
-    L"f3d --dry-run --quiet -sta --no-background --resolution=%d,%d \"%s\"",
-    cx, cx, m_filePath);
-  int argc;
-  char** argv;
-  ::ConvertWCommandLineToArgs(warg, argc, argv);
+  // Get a temporary PNG image file name
+  wchar_t lpTempPathBuffer[MAX_PATH];
+  wchar_t image_filename[MAX_PATH];
 
-  try
+  DWORD dwRetVal = GetTempPathW(MAX_PATH, lpTempPathBuffer);
+  if (dwRetVal > MAX_PATH || (dwRetVal == 0))
   {
-#if NDEBUG
-    vtkObject::GlobalWarningDisplayOff();
-#endif
-
-    F3DLoader loader;
-    vtkNew<vtkImageData> image;
-    int r = loader.Start(argc, argv, image);
-    UINT imgWidth = static_cast<UINT>(image->GetDimensions()[0]);
-
-    if (imgWidth == cx && r == EXIT_SUCCESS)
-    {
-      ::CreateBitmapFromBuffer(image, phbmp);
-      *pdwAlpha = WTSAT_ARGB;
-      ret = NOERROR;
-    }
+    return HRESULT_FROM_WIN32(GetLastError());
   }
-  catch (...)
+
+  if (GetTempFileName(lpTempPathBuffer, L"f3d", 0, image_filename) == 0)
   {
+    return HRESULT_FROM_WIN32(GetLastError());
   }
 
-  for (int i = 0; i < argc; i++)
-  {  
-    delete[] argv[i];
-  }
-  delete[] argv;
+  wcscat_s(image_filename, L".png");
 
-  return ret;
+  // Create command to run
+  wchar_t command[MAX_PATH * 3 + 20];
+  swprintf_s(command, MAX_PATH * 3 + 20,
+    L"\"%s\" --input \"%s\" --output \"%s\" --dry-run -sta --no-background --quiet --resolution %d,%d\"",
+    m_f3dPath, m_filePath, image_filename, cx, cx);
+
+  // Let's launch the process
+  PROCESS_INFORMATION pi;
+  ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
+
+  STARTUPINFO si;
+  ZeroMemory(&si, sizeof(STARTUPINFO));
+  si.cb = sizeof(STARTUPINFO);
+  si.dwFlags |= STARTF_USESTDHANDLES;
+
+  if (!CreateProcess(
+        m_f3dPath, command, nullptr, nullptr, TRUE, CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi))
+  {
+    return HRESULT_FROM_WIN32(GetLastError());
+  }
+
+  DWORD waitCode = WaitForSingleObject(pi.hProcess, F3D_WINDOWS_THUMBNAIL_TIMEOUT);
+
+  // Clean up
+  DWORD exitCode = EXIT_SUCCESS;
+  GetExitCodeProcess(pi.hProcess, &exitCode);
+
+  CloseHandle(pi.hThread);
+  CloseHandle(pi.hProcess);
+
+  // Return here if f3d failed
+  if (waitCode != WAIT_OBJECT_0 || exitCode != EXIT_SUCCESS)
+  {
+    DeleteFile(image_filename);
+    return E_FAIL;
+  }
+
+  // Load the created image
+
+  // Create WIC factory
+  IWICImagingFactory* pIWICFactory = nullptr;
+  HRESULT hr = CoCreateInstance(
+    CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pIWICFactory));
+
+  if (FAILED(hr))
+  {
+    DeleteFile(image_filename);
+    return hr;
+  }
+
+  // Create image decoder
+  IWICBitmapDecoder* pDecoder = nullptr;
+  hr = pIWICFactory->CreateDecoderFromFilename(
+    LPCWSTR(image_filename), nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pDecoder);
+
+  if (FAILED(hr))
+  {
+    pIWICFactory->Release();
+    DeleteFile(image_filename);
+    return hr;
+  }
+
+  // Load the first image frame
+  IWICBitmapFrameDecode* pFrame = nullptr;
+  hr = pDecoder->GetFrame(0, &pFrame);
+
+  if (FAILED(hr))
+  {
+    pDecoder->Release();
+    pIWICFactory->Release();
+    DeleteFile(image_filename);
+    return hr;
+  }
+
+  // Convert to 32bpp BGRA format with pre-multiplied alpha
+  hr = ::ConvertBitmapSourceTo32BPPHBITMAP(pFrame, pIWICFactory, phbmp);
+  *pdwAlpha = WTSAT_ARGB;
+
+  pFrame->Release();
+  pDecoder->Release();
+  pIWICFactory->Release();
+
+  // Delete the temporary image file
+  if (!DeleteFile(image_filename))
+  {
+    return E_FAIL;
+  }
+
+  return hr;
 }
