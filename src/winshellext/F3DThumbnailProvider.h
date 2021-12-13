@@ -42,5 +42,6 @@ protected:
 
 private:
   long m_cRef;
+  wchar_t m_f3dPath[MAX_PATH];  // The path to f3d executable that will be used to produce the thumbnail
   wchar_t m_filePath[MAX_PATH]; // The path to the file for which we will have to produce the thumbnail
 };
