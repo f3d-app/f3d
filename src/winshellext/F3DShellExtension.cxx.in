@@ -11,8 +11,6 @@
 #include "F3DShellExtensionClassFactory.h"
 #include "RegistryHelpers.h"
 
-#include "F3DShellExtension.h"
-
 // Unique F3D Thumbnail Provider GUID
 static const GUID CLSID_F3DThumbnailProvider =
   { 0x0f3d0f3d0, 0x7d37, 0x4ccc, { 0x89, 0x99, 0x4f, 0xdd, 0xde, 0xbc, 0x5b, 0xe6 } };
@@ -78,9 +76,9 @@ STDAPI DllRegisterServer()
   }
   // Register the thumbnail handler. The thumbnail handler is associated
   // with the f3d file class.
-  for (auto ext : extensions)
+  for (auto ext : { @F3D_SUPPORTED_EXTENSIONS_INITIALIZER_LIST@ })
   {
-    hr |= RegisterShellExtThumbnailHandler(ext.c_str(), CLSID_F3DThumbnailProvider);
+    hr |= RegisterShellExtThumbnailHandler(ext, CLSID_F3DThumbnailProvider);
   }
   if (SUCCEEDED(hr))
   {
@@ -106,9 +104,9 @@ STDAPI DllUnregisterServer()
   if (SUCCEEDED(hr))
   {
     // Unregister the thumbnail handler.
-    for (auto ext : extensions)
+    for (auto ext : { @F3D_SUPPORTED_EXTENSIONS_INITIALIZER_LIST@ })
     {
-      hr |= UnregisterShellExtThumbnailHandler(ext.c_str());
+      hr |= UnregisterShellExtThumbnailHandler(ext);
     }
   }
 

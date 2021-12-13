@@ -51,32 +51,7 @@ configure_file(
   @ONLY)
 
 # Readers declaration
-macro(declare_f3d_reader reader)
-  list(APPEND F3D_READER_FILES "readers/${reader}.h")
-  set(F3D_READER_INCLUDES_CODE
-    "${F3D_READER_INCLUDES_CODE}#include \"${reader}.h\"\n")
-  set(F3D_READER_INSTANCES_CODE
-    "${F3D_READER_INSTANCES_CODE}  ${reader} InstanceOf${reader};\n")
-  set(F3D_READER_REGISTER_CODE
-    "${F3D_READER_REGISTER_CODE}    F3DReaderFactory::Register(&InstanceOf${reader});\n")
-  set(F3D_READER_UNREGISTER_CODE
-    "${F3D_READER_UNREGISTER_CODE}    F3DReaderFactory::Unregister(&InstanceOf${reader});\n")
-endmacro()
-
-declare_f3d_reader(F3D3DSReader)
-declare_f3d_reader(F3DCityGMLReader)
-declare_f3d_reader(F3DDICOMReader)
-declare_f3d_reader(F3DGLTFReader)
-declare_f3d_reader(F3DMetaImageReader)
-declare_f3d_reader(F3DNrrdReader)
-declare_f3d_reader(F3DOBJReader)
-declare_f3d_reader(F3DPLYReader)
-declare_f3d_reader(F3DPTSReader)
-declare_f3d_reader(F3DSTLReader)
-declare_f3d_reader(F3DTIFFReader)
-declare_f3d_reader(F3DVRMLReader)
-declare_f3d_reader(F3DVTKLegacyReader)
-declare_f3d_reader(F3DVTKXMLReader)
+add_subdirectory(readers)
 
 if(F3D_MODULE_OCCT)
   set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DOCCTReader.cxx")
@@ -85,8 +60,6 @@ if(F3D_MODULE_OCCT)
   # This could be an issue on Linux when linking with static libraries.
   # See .github/workflows/ci.yml for a scripted fix 
   set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} ${OpenCASCADE_LIBRARIES})
-  
-  declare_f3d_reader(F3DOpenCascadeReader)
 endif()
 
 if(F3D_MODULE_ASSIMP)
@@ -98,68 +71,6 @@ if(F3D_MODULE_ASSIMP)
   if(NOT F3D_ASSIMP_DEBUG_VAR)
     set_target_properties(assimp::assimp PROPERTIES MAP_IMPORTED_CONFIG_DEBUG Release)
   endif()
-
-  declare_f3d_reader(F3DAssimpReader)
-endif()
-
-if(F3D_MODULE_EXODUS)
-  declare_f3d_reader(F3DExodusIIReader)
-endif()
-
-# Generate the code of the F3DReaderInstantiator class
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/F3DReaderInstantiator.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h"
-  @ONLY)
-
-list(LENGTH F3D_READER_FILES F3D_NB_READERS)
-message(STATUS "${F3D_NB_READERS} readers found.")
-
-# configure_win32_exts and run it to create the NSIS install scripts
-# for registering/unregistering available file extensions
-
-if(WIN32)
-  add_executable(configure_win32_exts
-    configure_win32_exts.cxx
-    readers/F3DReader.cxx
-    readers/F3DReaderFactory.cxx
-    "${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h")
-
-  target_compile_definitions(configure_win32_exts PUBLIC "-DF3D_NO_VTK")
-
-  target_include_directories(configure_win32_exts PUBLIC
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/readers)
-
-  add_custom_command(TARGET configure_win32_exts POST_BUILD
-    COMMAND $<TARGET_FILE:configure_win32_exts>
-      "${CMAKE_BINARY_DIR}/NSIS.RegisterCommands.nsh"
-      "${CMAKE_BINARY_DIR}/NSIS.UnregisterCommands.nsh"
-      "${CMAKE_BINARY_DIR}/F3DShellExtension.h"
-    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h")
-endif()
-
-# configure_linux_mime_types and run it to create the a dynamic mime_type
-# list for registering/unregistering available mime types in .desktop
-# and .thumbnailer file
-
-if(UNIX AND NOT APPLE)
-  add_executable(configure_linux_mime_types
-    configure_linux_mime_types.cxx
-    readers/F3DReader.cxx
-    readers/F3DReaderFactory.cxx
-    "${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h")
-
-  target_compile_definitions(configure_linux_mime_types PUBLIC "-DF3D_NO_VTK")
-
-  target_include_directories(configure_linux_mime_types PUBLIC
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/readers)
-
-  add_custom_command(TARGET configure_linux_mime_types POST_BUILD
-    COMMAND $<TARGET_FILE:configure_linux_mime_types>
-      "${CMAKE_BINARY_DIR}/mime_types"
-    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h")
 endif()
 
 # libf3d
@@ -209,7 +120,7 @@ set(F3D_HEADER_FILES
   readers/F3DReader.h
   readers/F3DReaderFactory.h
   ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h
-  ${CMAKE_CURRENT_BINARY_DIR}/F3DReaderInstantiator.h
+  ${CMAKE_CURRENT_BINARY_DIR}/readers/F3DReaderInstantiator.h
   )
 
 # Force static library when creating a macOS bundle
@@ -221,7 +132,6 @@ endif()
 add_library(libf3d ${F3D_LIBRARY_TYPE}
   ${F3D_SOURCE_FILES}
   ${F3D_HEADER_FILES}
-  ${F3D_READER_FILES}
   ${LIB_PLATFORM_SPECIFIC_FILES}
   )
 
@@ -229,6 +139,7 @@ target_include_directories(libf3d PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/readers
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}/readers
   ${MODULES_SPECIFIC_INCLUDE_DIRS}
   )
 
@@ -258,7 +169,7 @@ endif()
 if(F3D_GENERATE_MAN)
   find_program(HELP2MAN help2man)
   find_program(GZIP gzip)
-  if (HELP2MAN AND GZIP)
+  if(HELP2MAN AND GZIP)
     set(MAN_OUTPUT_FILE ${CMAKE_BINARY_DIR}/f3d.1)
     add_custom_command(
       OUTPUT ${MAN_OUTPUT_FILE}
@@ -266,7 +177,7 @@ if(F3D_GENERATE_MAN)
       COMMAND ${GZIP} -f ${MAN_OUTPUT_FILE}
       DEPENDS f3d)
     add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
-  else (HELP2MAN)
+  else()
     message(WARNING "help2man or gzip not found, cannot create man entry")
   endif()
 endif()

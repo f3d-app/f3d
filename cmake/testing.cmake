@@ -324,9 +324,6 @@ f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")
 # Test readers-list display
 f3d_test(NAME TestReadersList ARGS --readers-list REGEXP_FAIL "No registered reader found")
 
-# Test extensions-list display
-f3d_test(NAME TestExtensionsList ARGS --extensions-list REGEXP_FAIL "No registered reader found")
-
 # Test that f3d can try to read a system config file
 add_test(NAME TestNoDryRun COMMAND $<TARGET_FILE:f3d> --no-render)
 set_tests_properties(TestNoDryRun PROPERTIES TIMEOUT 2)
