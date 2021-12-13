@@ -1,0 +1,6 @@
+#ifndef F3DThumbnailConfig_h
+#define F3DThumbnailConfig_h
+
+#cmakedefine F3D_WINDOWS_THUMBNAIL_TIMEOUT @F3D_WINDOWS_THUMBNAIL_TIMEOUT@
+
+#endif
