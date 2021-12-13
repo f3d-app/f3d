@@ -293,7 +293,7 @@ jobs:
 
     - name: Test
       working-directory: ${{github.workspace}}/build
-      run: ctest -C Release -j 2 --output-on-failure
+      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed
 
     - name: Install
       working-directory: ${{github.workspace}}/build
