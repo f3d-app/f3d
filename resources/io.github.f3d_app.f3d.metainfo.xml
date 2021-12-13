@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
-    <id>com.f3d-app.F3D</id>
+    <id>io.github.f3d_app.f3d</id>
     <launchable type="desktop-id">f3d.desktop</launchable>
     <name>F3D</name>
     <summary>A fast and minimalist 3D viewer</summary>
