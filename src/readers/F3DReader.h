@@ -13,11 +13,9 @@
 #ifndef F3DReader_h
 #define F3DReader_h
 
-#ifndef F3D_NO_VTK
 #include <vtkAlgorithm.h>
 #include <vtkImporter.h>
 #include <vtkSmartPointer.h>
-#endif
 
 #include <string>
 #include <vector>
@@ -58,17 +56,25 @@ public:
    */
   virtual bool CanRead(const std::string& fileName) const;
 
-#ifndef F3D_NO_VTK
   /*
    * Create the geometry reader (VTK reader) for the given filename
    */
   virtual vtkSmartPointer<vtkAlgorithm> CreateGeometryReader(const std::string&) const { return nullptr; }
 
   /*
+   * Apply custom code for the reader
+   */
+  virtual void ApplyCustomReader(vtkAlgorithm*, const std::string&) const {}
+
+  /*
    * Create the scene reader (VTK importer) for the given filename
    */
   virtual vtkSmartPointer<vtkImporter> CreateSceneReader(const std::string&) const { return nullptr; }
-#endif
+
+  /*
+   * Apply custom code for the importer
+   */
+  virtual void ApplyCustomImporter(vtkImporter*, const std::string&) const {}
 };
 
 #endif
