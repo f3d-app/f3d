@@ -48,6 +48,9 @@ F3DLoader::F3DLoader()
   vtkLogger::SetInternalVerbosityLevel(vtkLogger::VERBOSITY_OFF);
 #endif
 
+  // Make sure to initialize Quiet mode
+  F3DLog::SetQuiet(false);
+
   // instanciate our own polydata mapper and output windows
   vtkNew<vtkF3DObjectFactory> factory;
   vtkObjectFactory::RegisterFactory(factory);
