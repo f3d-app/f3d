@@ -62,10 +62,8 @@ void vtkF3DWin32OutputWindow::DisplayText(const char* someText)
 
   HWND hWnd = static_cast<HWND>(this->EditControlHandle);
 
-  int index = GetWindowTextLength(hWnd);
-  SetFocus(hWnd);
-
   // select end of text
+  int index = GetWindowTextLength(hWnd);
   SendMessageW(hWnd, EM_SETSEL, (WPARAM)index, (LPARAM)index);
 
   // print text
