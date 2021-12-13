@@ -55,7 +55,7 @@ F3DLoader::F3DLoader()
 
   // Make sure to initialize the output window
   // after the object factory and before the first usage.
-  F3DLog::SetQuiet(true);
+  F3DLog::SetQuiet(false);
 
   this->ReaderInstantiator = new F3DReaderInstantiator();
 }
