@@ -48,13 +48,14 @@ F3DLoader::F3DLoader()
   vtkLogger::SetInternalVerbosityLevel(vtkLogger::VERBOSITY_OFF);
 #endif
 
-  // Make sure to initialize Quiet mode
-  F3DLog::SetQuiet(false);
-
   // instanciate our own polydata mapper and output windows
   vtkNew<vtkF3DObjectFactory> factory;
   vtkObjectFactory::RegisterFactory(factory);
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
+
+  // Make sure to initialize the output window
+  // after the object factory and before the first usage.
+  F3DLog::SetQuiet(true);
 
   this->ReaderInstantiator = new F3DReaderInstantiator();
 }
