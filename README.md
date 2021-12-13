@@ -38,7 +38,7 @@ There are 4 main ways to use F3D:
 
 # Installation
 
-You can find the release binary packages for Windows, Linux and macOS on the [Release page](https://github.com/f3d-app/f3d). See the [desktop integration](#Desktop Integration) section in order actually integrate the binary release in your desktop.
+You can find the release binary packages for Windows, Linux and macOS on the [Release page](https://github.com/f3d-app/f3d/releases). See the [desktop integration](#Desktop Integration) section in order actually integrate the binary release in your desktop.
 Alternatively, you can build it yourself following the [build](#Build) guide below.
 
 You can also find packages for the following operating systems:
