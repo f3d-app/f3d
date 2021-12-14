@@ -54,6 +54,10 @@ F3DLoader::F3DLoader()
   vtkObjectFactory::RegisterFactory(factory);
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
 
+  // Make sure to initialize the output window
+  // after the object factory and before the first usage.
+  F3DLog::SetQuiet(false);
+
   this->ReaderInstantiator = new F3DReaderInstantiator();
 }
 

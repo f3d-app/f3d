@@ -48,6 +48,11 @@ int vtkF3DWin32OutputWindow::Initialize()
 
 void vtkF3DWin32OutputWindow::DisplayText(const char* someText)
 {
+  if (this->GetDisplayStream(this->GetCurrentMessageType()) == StreamType::Null)
+  {
+    return;
+  }
+
   if (!this->Initialize())
   {
     return;

@@ -69,7 +69,7 @@ Available in [nixpkgs](https://github.com/NixOS/nixpkgs/blob/master/pkgs/applica
 
 ## Flathub
 
-Available in [Flathub](https://flathub.org/apps/details/com.kitware.F3D).
+Available in [Flathub](https://flathub.org/apps/details/io.github.f3d_app.f3d).
 
 ## Spack
 
