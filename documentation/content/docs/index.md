@@ -7,7 +7,7 @@ By Michael Migliore and Mathieu Westphal
 F3D (pronounced `/fɛd/`) is a [VTK-based](https://vtk.org) 3D viewer following the [KISS principle](https://en.wikipedia.org/wiki/KISS_principle), so it is minimalist, efficient, has no GUI, has simple interaction mechanisms and is fully controllable using arguments in the command line.
 
 F3D is open-source and cross-platform (tested on Windows, Linux and macOS).
-It supports a range of file formats (including animated glTF, stl, step, ply, obj, STEP, FBX), and provides numerous rendering and texturing options.
+It supports a range of file formats (including animated glTF, stl, step, ply, obj, fbx), and provides numerous rendering and texturing options.
 
 ![F3D Demo](../gallery/04-f3d.png)
 *A typical render by F3D*
