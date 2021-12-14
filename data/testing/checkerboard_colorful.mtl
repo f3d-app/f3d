@@ -1,0 +1,9 @@
+newmtl cb_even
+Kd 1 1 0
+illum 0
+newmtl cb_odd
+Kd 1 0 1
+illum 0
+newmtl cb_border
+Kd 0 0.6 0
+illum 0
