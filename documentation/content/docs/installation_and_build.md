@@ -12,14 +12,14 @@ There are 4 main ways to use F3D:
 
 # Installation
 
-You can find the release binary packages for Windows, Linux and macOS on the [Release page](https://github.com/f3d-app/f3d/releases).
+You can find the release binary packages for Windows, Linux and macOS on the [Release page](https://github.com/f3d-app/f3d/releases). See the desktop integration section in order actually integrate the binary release in your desktop.
 Alternatively, you can build it yourself following the [build](#Build) guide below.
 
 You can also find packages for the following operating systems:
 
-## Ubuntu/Debian/openSuse
+## OpenSuse
 
-Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home:AndnoVember:F3D/f3d).
+Available in [OpenSuse](https://build.opensuse.org/package/show/graphics/f3d).
 
 ## Arch Linux
 
@@ -39,11 +39,19 @@ Available in [Homebrew](https://formulae.brew.sh/formula/f3d).
 
 ## NixOS
 
-Available in [nixpkgs](https://github.com/NixOS/nixpkgs/blob/release-21.05/pkgs/applications/graphics/f3d/default.nix).
+Available in [nixpkgs](https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/graphics/f3d/default.nix).
+
+## Ubuntu/Debian/Fedora
+
+Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home:AndnoVember:F3D/f3d).
 
 ## Flathub
 
 Available in [Flathub](https://flathub.org/apps/details/io.github.f3d_app.f3d).
+
+## Spack
+
+Available in [Spack](https://spack.readthedocs.io/en/latest/package_list.html#f3d).
 
 # Build
 

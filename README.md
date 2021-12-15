@@ -43,9 +43,9 @@ Alternatively, you can build it yourself following the [build](#Build) guide bel
 
 You can also find packages for the following operating systems:
 
-## Ubuntu/Debian/openSuse
+## OpenSuse
 
-Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home:AndnoVember:F3D/f3d).
+Available in [OpenSuse](https://build.opensuse.org/package/show/graphics/f3d).
 
 ## Arch Linux
 
@@ -66,6 +66,10 @@ Available in [Homebrew](https://formulae.brew.sh/formula/f3d).
 ## NixOS
 
 Available in [nixpkgs](https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/graphics/f3d/default.nix).
+
+## Ubuntu/Debian/Fedora
+
+Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home:AndnoVember:F3D/f3d).
 
 ## Flathub
 
@@ -391,15 +395,15 @@ F3D can be integrated in the desktop experience.
 
 For Linux desktop integration, F3D rely on mime types files as defined by the [XDG standard](https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-latest.html), .thumbnailer file as specified [here](https://wiki.archlinux.org/title/File_manager_functionality#Thumbnail_previews) and .desktop file as specified [here](https://wiki.archlinux.org/title/desktop_entries). Many file managers use this mechanism, including nautilus, thunar, pcmanfm and caja.
 
-The simplest way to obtain desktop integration on linux is to use a package for your distribution.
-If there is none, you can use the binary release for this.
+The simplest way to obtain desktop integration on linux is to use a package for your distribution, or the .deb binary package we provide if compatible with your distribution.
+In other cases, the binary archive can be used like this:
 
 0. Make sure ~/.local/bin is part of your PATH
 1. Extract F3D archive in a TEMP folder
 2. move $TEMP/config.json to ~/.config/f3d/
 3. copy $TEMP/* to ~/.local/
 4. Update your [mime database](https://linux.die.net/man/1/update-mime-database) pointing to ~/.local/share/mime
-5. Update your [desktop database](update-desktop-database](https://linuxcommandlibrary.com/man/update-desktop-database) pointing to ~/.local/share/application
+5. Update your [desktop database](https://linuxcommandlibrary.com/man/update-desktop-database) pointing to ~/.local/share/application
 
 ```bash
 tar -xzvf f3d-1.2.0-Linux.tar.gz
@@ -415,7 +419,7 @@ If you have any issues, read the [troubleshooting](#Troubleshooting) section.
 
 ## Windows
 
-For Windows desktop integration, f3d rely on a registered shell extension.
+For Windows desktop integration, F3D rely on a registered shell extension.
 
 Using the F3D NSIS installer (.exe) is the simplest way to enable thumbnails and integrate F3D on windows.
 
