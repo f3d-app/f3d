@@ -2,54 +2,47 @@
 
 # Copyrights and Licenses
 
-albedo.png: glTF-Sample-Models: Public Domain
-beach.nrrd: VTK Data: BSD
-bluntfin.vts: VTK Data: BSD
-bot2.wrl: VTK Data: BSD
-BoxAnimated*: glTF-Sample-Models/Cesium: (CC-BY 4.0)[https://creativecommons.org/licenses/by/4.0/] 
-Cameras.gltf: glTF-Sample-Models: Public Domain
-cow.vtk: VTK Data: BSD
-cow.vtp: VTK Data: BSD
-cube.stp: F3D: BSD 
-disk_out_ref.ex2: VTK Data: BSD
-dragon.vtu: Stanford: Public Domain
-duck.dae: assimp test models: BSD
-HeadMRVolume*: VTK Data: BSD
-iflamigm.3ds: VTK Data: BSD
-IM-0001-1983.dcm: VTK Data: BSD
-InterpolationTest.glb: glTF-Sample-Models: Public Domain
-KameraAnim.glb: flying dog software
-logo.tif: F3D: BSD
-mb*: F3D: BSD
-normal.png: glTF-Sample-Models: Public Domain
-palermo_park_1k.hdr: Polyhaven: Public Domain
-Part-4-Buildings-V4-one.gml: VTK Data: BSD
-pdiag.vtu: F3D: BSD
-phong_cube.fbx: assimp test models: BSD
-PinkEggFromLW.dxf: assimp test models: BSD
-pointsCloud*: F3D: BSD
-RectGrid2.vtr: VTK Data: BSD
-red.jpg: glTF-Sample-Models: Public Domain
-Robot_Color.tga: Unity Asset Store: Free to use
-robot_kyle_walking.fbx: Unity Asset Store: Free to use
-Robot_Normal.tga: Unity Asset Store: Free to use
-samplePTS.pts: VTK Data: BSD
-SimpleMorph.gltf: glTF-Sample-Models: Public Domain
-SimpleSkin.gltf: glTF-Sample-Models: Public Domain
-slime.fbx: Turbosquid: Turbosquid 3D Model License
-small.ex2: VTK Data: BSD 
-spacer.igs: GrabCad/Michel Deville: Cross License
-suzanne*: F3D: BSD
-teapot.off: Utah Teapot: Public Domain
-tensors.vti: VTK Data: BSD
-UnlitTest.glb: glTF-Sample-Models/Analytical Graphics, Inc.: (CC-BY 4.0)[https://creativecommons.org/licenses/by/4.0/]
-unsupportedFile.dummy: F3D: BSD
-vase_4comp.vti: VTK Data: BSD
-WaterBottle.glb: glTF-Sample-Models: Public Domain
-waveletArrays.vti: F3D: BSD
-waveletMaterial.vti: F3D: BSD
-world*: VTK Data: BSD
-(ノಠ益ಠ )ノ.vtp: VTK Data: BSD
+- albedo.png: glTF-Sample-Models: Public Domain
+- beach.nrrd: VTK Data: BSD
+- bluntfin.vts: VTK Data: BSD
+- bot2.wrl: VTK Data: BSD
+- BoxAnimated*: glTF-Sample-Models/Cesium: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- Cameras.gltf: glTF-Sample-Models: Public Domain
+- cow.vtk: VTK Data: BSD
+- cow.vtp: VTK Data: BSD
+- disk_out_ref.ex2: VTK Data: BSD
+- dragon.vtu: Stanford: Public Domain
+- duck.dae: assimp test models: BSD
+- HeadMRVolume*: VTK Data: BSD
+- iflamigm.3ds: VTK Data: BSD
+- IM-0001-1983.dcm: VTK Data: BSD
+- InterpolationTest.glb: glTF-Sample-Models: Public Domain
+- KameraAnim.glb: flying dog software
+- normal.png: glTF-Sample-Models: Public Domain
+- palermo_park_1k.hdr: Polyhaven: Public Domain
+- Part-4-Buildings-V4-one.gml: VTK Data: BSD
+- phong_cube.fbx: assimp test models: BSD
+- PinkEggFromLW.dxf: assimp test models: BSD
+- RectGrid2.vtr: VTK Data: BSD
+- red.jpg: glTF-Sample-Models: Public Domain
+- Robot_Color.tga: Unity Asset Store: Free to use
+- robot_kyle_walking.fbx: Unity Asset Store: Free to use
+- Robot_Normal.tga: Unity Asset Store: Free to use
+- samplePTS.pts: VTK Data: BSD
+- SimpleMorph.gltf: glTF-Sample-Models: Public Domain
+- SimpleSkin.gltf: glTF-Sample-Models: Public Domain
+- slime.fbx: Turbosquid: Turbosquid 3D Model License
+- small.ex2: VTK Data: BSD 
+- spacer.igs: GrabCad/Michel Deville: Cross License
+- teapot.off: Utah Teapot: Public Domain
+- tensors.vti: VTK Data: BSD
+- UnlitTest.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- vase_4comp.vti: VTK Data: BSD
+- WaterBottle.glb: glTF-Sample-Models: Public Domain
+- world*: VTK Data: BSD
+- (ノಠ益ಠ )ノ.vtp: VTK Data: BSD
+
+All other datasets are licensed under the F3D license terms.
 
 # VTK Data: BSD license
 
