@@ -713,6 +713,7 @@ void vtkF3DRenderer::Render()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::InitializeCamera()
 {
+  this->ResetCameraClippingRange();
   this->InitialCamera->DeepCopy(this->GetActiveCamera());
 }
 
