@@ -162,6 +162,7 @@ Options|Description
 \-\-geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-dry-run|Do not read the configuration file but consider only the command line options
 \-\-config|Read a provided configuration file instead of default one
+\-\-font-file|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.
 
 ## Material options
 

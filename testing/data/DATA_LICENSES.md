@@ -3,6 +3,7 @@
 # Copyrights and Licenses
 
 - albedo.png: glTF-Sample-Models: Public Domain
+- AttackGraffiti-3zRBM.ttf: wepfont: [Freeware](https://www.fontspace.com/a-attack-graffiti-font-f45529)
 - beach.nrrd: VTK Data: BSD
 - bluntfin.vts: VTK Data: BSD
 - bot2.wrl: VTK Data: BSD
