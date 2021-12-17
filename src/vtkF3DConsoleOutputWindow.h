@@ -14,8 +14,15 @@ public:
   vtkTypeMacro(vtkF3DConsoleOutputWindow, vtkOutputWindow);
   static vtkF3DConsoleOutputWindow* New();
 
+  /**
+   * Reimplemented to support coloring
+   */
   void DisplayText(const char*) override;
 
+  /**
+   * Set/Get the coloring usage.
+   * Default is true.
+   */
   vtkSetMacro(UseColoring, bool);
   vtkGetMacro(UseColoring, bool);
 
