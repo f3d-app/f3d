@@ -13,7 +13,7 @@ function(f3d_test)
   endif()
 
   if(NOT F3D_TEST_NO_BASELINE)
-    list(APPEND F3D_TEST_ARGS "--ref=${CMAKE_SOURCE_DIR}/data/baselines/${F3D_TEST_NAME}.png")
+    list(APPEND F3D_TEST_ARGS "--ref=${CMAKE_SOURCE_DIR}/testing/baselines/${F3D_TEST_NAME}.png")
   endif()
 
   if(F3D_TEST_NO_RENDER)
@@ -31,11 +31,11 @@ function(f3d_test)
   endif()
 
   if(F3D_TEST_INTERACTION)
-    list(APPEND F3D_TEST_ARGS "--interaction-test-play=${CMAKE_SOURCE_DIR}/recordings/${F3D_TEST_NAME}.log")
+    list(APPEND F3D_TEST_ARGS "--interaction-test-play=${CMAKE_SOURCE_DIR}/testing/recordings/${F3D_TEST_NAME}.log")
   endif()
 
   if (F3D_TEST_DATA)
-    list(APPEND F3D_TEST_ARGS "${CMAKE_SOURCE_DIR}/data/testing/${F3D_TEST_DATA}")
+    list(APPEND F3D_TEST_ARGS "${CMAKE_SOURCE_DIR}/testing/data/${F3D_TEST_DATA}")
   endif()
 
   add_test(NAME "${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
@@ -108,7 +108,7 @@ f3d_test(NAME TestCityGML DATA Part-4-Buildings-V4-one.gml)
 f3d_test(NAME TestPTS DATA samplePTS.pts)
 f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalars --roughness=1 --colormap=0,1,0,0,1,0,1,0)
 f3d_test(NAME TestCameraConfiguration DATA suzanne.obj ARGS --camera-position=0,0,-10 -x --camera-view-up=1,0,0 --camera-focal-point=1,0,0 --camera-view-angle=20 --camera-azimuth-angle=40 --camera-elevation-angle=-80)
-f3d_test(NAME TestCameraClipping DATA checkerboard_colorful.obj CONFIG ${CMAKE_SOURCE_DIR}/data/testing/checkerboard_colorful.json RESOLUTION 800,600)
+f3d_test(NAME TestCameraClipping DATA checkerboard_colorful.obj CONFIG ${CMAKE_SOURCE_DIR}/testing/data/checkerboard_colorful.json RESOLUTION 800,600)
 f3d_test(NAME TestToneMapping DATA suzanne.ply ARGS -t)
 f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt)
 f3d_test(NAME TestDefaultConfigFile DATA dragon.vtu CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json)
@@ -120,15 +120,15 @@ f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --comp=3 LONG_TIMEOUT)
 f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --comp=-2 LONG_TIMEOUT)
 f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --cells LONG_TIMEOUT)
 f3d_test(NAME TestVolumeNonScalars DATA waveletArrays.vti ARGS -vb --scalars=RandomPointScalars LONG_TIMEOUT)
-f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --geometry-only --texture-material=${CMAKE_SOURCE_DIR}/data/testing/red.jpg --roughness=1 --metallic=1 --texture-base-color=${CMAKE_SOURCE_DIR}/data/testing/albedo.png --texture-normal=${CMAKE_SOURCE_DIR}/data/testing/normal.png --texture-emissive=${CMAKE_SOURCE_DIR}/data/testing/red.jpg --emissive-factor=0.1,0.1,0.1)
+f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --geometry-only --texture-material=${CMAKE_SOURCE_DIR}/testing/data/red.jpg --roughness=1 --metallic=1 --texture-base-color=${CMAKE_SOURCE_DIR}/testing/data/albedo.png --texture-normal=${CMAKE_SOURCE_DIR}/testing/data/normal.png --texture-emissive=${CMAKE_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1)
 f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m)
 f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m)
 f3d_test(NAME TestTIFF DATA logo.tif ARGS -sy --up=-Y)
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp")
 f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-index=7)
-f3d_test(NAME TestHDRI LONG_TIMEOUT DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr)
-f3d_test(NAME TestHDRIBlur LONG_TIMEOUT DATA suzanne.ply ARGS -u --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr)
-f3d_test(NAME TestHDRIEdges LONG_TIMEOUT DATA suzanne.ply ARGS -e --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr)
+f3d_test(NAME TestHDRI LONG_TIMEOUT DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr)
+f3d_test(NAME TestHDRIBlur LONG_TIMEOUT DATA suzanne.ply ARGS -u --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr)
+f3d_test(NAME TestHDRIEdges LONG_TIMEOUT DATA suzanne.ply ARGS -e --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr)
 f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_FAIL)
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
 
@@ -141,10 +141,10 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m)
   f3d_test(NAME TestInteractionAnimation DATA InterpolationTest.glb ARGS --animation-index=-1 INTERACTION)#Space;Space;
   f3d_test(NAME TestInteractionAnimationMovement DATA KameraAnim.glb ARGS --camera-index=1 INTERACTION)#Space;MouseMovement;Space;
-  f3d_test(NAME TestHDRI8Bit DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/data/testing/logo.tif LONG_TIMEOUT)
-  f3d_test(NAME TestHDRIOrient DATA suzanne.stl ARGS --up=+Z --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr LONG_TIMEOUT)
-  f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply ARGS -t --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr LONG_TIMEOUT)
-  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr LONG_TIMEOUT INTERACTION) #Shift+MouseRight;
+  f3d_test(NAME TestHDRI8Bit DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/logo.tif LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIOrient DATA suzanne.stl ARGS --up=+Z --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply ARGS -t --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT)
+  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT INTERACTION) #Shift+MouseRight;
   # Test exit hotkey
   f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped, no rendering performed" INTERACTION NO_BASELINE) #Escape;
   # Test Verbose animation, no baseline needed
@@ -234,7 +234,7 @@ f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_B
 f3d_test(NAME TestInteractionResetCamera DATA dragon.vtu INTERACTION)#MouseMovements;Return;
 f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --scalars --comp=-2  INTERACTION) #SYYYYYYYYYY
 f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --scalars --comp=2 INTERACTION) #S
-f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/data/testing/palermo_park_1k.hdr INTERACTION) #U
+f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION) #U
 f3d_test(NAME TestInteractionDumpSceneState DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Camera position: 2.26745,3.82625,507.698")#?
 
 # Test a drop event without files. Actual drop can't be tested.
@@ -293,28 +293,28 @@ f3d_test(NAME TestTensorsVolumeDirect DATA tensors.vti ARGS -v --scalars=tensors
 f3d_test(NAME TestVolumeNoArray DATA cow.vtp ARGS -v REGEXP "No array to color with" NO_BASELINE)
 
 # Test non existent file, do not create nonExistentFile.vtp
-f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose REGEXP "File .*/data/testing/nonExistentFile.vtp does not exist" NO_RENDER)
+f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose REGEXP "File .*/testing/data/nonExistentFile.vtp does not exist" NO_RENDER)
 
 # Test non existent file, do not create nonExistentFile.vtp
-f3d_test(NAME TestQuietNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose --quiet REGEXP_FAIL "File .*/data/testing/nonExistentFile.vtp does not exist" NO_RENDER)
+f3d_test(NAME TestQuietNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose --quiet REGEXP_FAIL "File .*/testing/data/nonExistentFile.vtp does not exist" NO_RENDER)
 
 # Test non supported file, do not add support for .dummy file.
-f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename REGEXP ".*/data/testing/unsupportedFile.dummy is not a file of a supported file format" NO_RENDER)
+f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename REGEXP ".*/testing/data/unsupportedFile.dummy is not a file of a supported file format" NO_RENDER)
 
 # Test invalid provided texture, do not add a dummy.png
-f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${CMAKE_SOURCE_DIR}/data/testing/dummy.png REGEXP "Cannot open texture file" NO_BASELINE)
+f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${CMAKE_SOURCE_DIR}/testing/data/dummy.png REGEXP "Cannot open texture file" NO_BASELINE)
 
 # Test invalid provided HDRI, do not add a dummy.png
-f3d_test(NAME TestNonExistentHDRI DATA cow.vtp ARGS --hdri=${CMAKE_SOURCE_DIR}/data/testing/dummy.png REGEXP "Cannot open HDRI file" NO_BASELINE)
+f3d_test(NAME TestNonExistentHDRI DATA cow.vtp ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/dummy.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
 # Test invalid options, do not add a --dummy option
 f3d_test(NAME TestInvalidOption ARGS --dummy REGEXP "Error parsing options:")
 
 # Test non-existent config file, do not add a dummy.json
-f3d_test(NAME TestNonExistentConfigFile DATA cow.vtp CONFIG "${CMAKE_SOURCE_DIR}/configs/dummy.json" REGEXP "Unable to open the configuration file" NO_BASELINE)
+f3d_test(NAME TestNonExistentConfigFile DATA cow.vtp CONFIG "${CMAKE_SOURCE_DIR}/testing/configs/dummy.json" REGEXP "Unable to open the configuration file" NO_BASELINE)
 
 # Test invalid config file
-f3d_test(NAME TestInvalidConfigFile DATA cow.vtp CONFIG ${CMAKE_SOURCE_DIR}/configs/invalid.json REGEXP "Unable to parse the configuration file" NO_BASELINE)
+f3d_test(NAME TestInvalidConfigFile DATA cow.vtp CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/invalid.json REGEXP "Unable to parse the configuration file" NO_BASELINE)
 
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
@@ -333,10 +333,10 @@ set_tests_properties(TestNoDryRun PROPERTIES TIMEOUT 2)
 f3d_test(NAME TestNoRef DATA cow.vtp WILL_FAIL)
 
 # Test failure without a reference and without an output, please do not create a TestNoRef.png file
-f3d_test(NAME TestNoRefNoOutput DATA cow.vtp ARGS --ref ${CMAKE_SOURCE_DIR}/data/baselines/TestNoRef.png REGEXP "Reference image does not exists, use the --output option to output current rendering into an image file." NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestNoRefNoOutput DATA cow.vtp ARGS --ref ${CMAKE_SOURCE_DIR}/testing/baselines/TestNoRef.png REGEXP "Reference image does not exists, use the --output option to output current rendering into an image file." NO_BASELINE NO_OUTPUT)
 
 # Test failure with a bad reference, please do not create a good TestBadRef.png file
 f3d_test(NAME TestBadRef DATA cow.vtp WILL_FAIL)
 
 # Test failure with a bad reference without an output, please do not create a good TestBadRef.png file
-f3d_test(NAME TestBadRefNoOutput DATA cow.vtp ARGS --ref ${CMAKE_SOURCE_DIR}/data/baselines/TestBadRef.png REGEXP "Use the --output option to be able to output current rendering and diff images into files." NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestBadRefNoOutput DATA cow.vtp ARGS --ref ${CMAKE_SOURCE_DIR}/testing/baselines/TestBadRef.png REGEXP "Use the --output option to be able to output current rendering and diff images into files." NO_BASELINE NO_OUTPUT)
