@@ -32,7 +32,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: dependencies/occt_install
-        key: occt-V7_6_0-${{matrix.os}}
+        key: occt-V7_6_0-1-${{matrix.os}}
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -92,7 +92,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: dependencies/assimp_install
-        key: assimp-v5.1.1-${{matrix.os}}
+        key: assimp-v5.1.1-1-${{matrix.os}}
 
     - name: Checkout ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
@@ -138,7 +138,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: dependencies/vtk_install
-        key: vtk-trigger-${{matrix.vtk_version}}-${{matrix.os}}
+        key: vtk-${{matrix.vtk_version}}-1-${{matrix.os}}
 
     - name: Setup VTK and clone bare
       if: steps.cache-vtk.outputs.cache-hit != 'true'
