@@ -226,7 +226,7 @@ jobs:
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- data/testing/ data/baselines/)" >> $GITHUB_ENV
+      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
 
     - name: Cache LFS data
       id: cache-lfs
@@ -245,7 +245,9 @@ jobs:
 
     - name: Setup LFS data
       working-directory: ${{github.workspace}}
-      run: cmake -E copy_directory ./lfs_data/data ./source/data
+      run: |
+         cmake -E copy_directory ./lfs_data/testing/data ./source/testing/data
+         cmake -E copy_directory ./lfs_data/testing/baselines ./source/testing/baselines
 
     - name: Setup Directories
       working-directory: ${{github.workspace}}
@@ -302,7 +304,7 @@ jobs:
     - name: Check Install ubuntu
       if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}/install
-      run: ./bin/f3d ../source/data/testing/suzanne.obj --output=../output.png
+      run: ./bin/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
     - name: Check Install windows
       if: matrix.os == 'windows-latest'
@@ -310,12 +312,12 @@ jobs:
       run: |
          cp ..\dependencies\mesa\x64\opengl32.dll .\bin\
          cp ..\dependencies\mesa\x64\libglapi.dll .\bin\
-         .\bin\f3d.exe ..\source\data\testing\suzanne.obj --output=..\output.png
+         .\bin\f3d.exe ..\source\testing\data\suzanne.obj --output=..\output.png
 
     - name: Check Install macos
       if: matrix.os == 'macos-latest'
       working-directory: ${{github.workspace}}/install
-      run: ./f3d.app/Contents/MacOS/f3d ../source/data/testing/suzanne.obj --output=../output.png
+      run: ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
     - name: Setup NSIS
       if: matrix.os == 'windows-latest'
