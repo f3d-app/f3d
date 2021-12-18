@@ -1,6 +1,6 @@
 #include "F3DLog.h"
 
-#include "Config.h"
+#include "F3DConfig.h"
 #include "vtkF3DConsoleOutputWindow.h"
 
 //----------------------------------------------------------------------------

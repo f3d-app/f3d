@@ -1,4 +1,4 @@
-#include "Config.h"
+#include "F3DConfig.h"
 #include "vtkF3DObjectFactory.h"
 #include "vtkVersion.h"
 

@@ -1,4 +1,4 @@
-#include "Config.h"
+#include "F3DConfig.h"
 #include "F3DLoader.h"
 #include "F3DLog.h"
 #include "F3DException.h"

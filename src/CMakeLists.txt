@@ -16,10 +16,10 @@ if(WIN32)
 endif()
 
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/core/F3DIcon.h
   COMMAND $<TARGET_FILE:embed>
     "${CMAKE_CURRENT_SOURCE_DIR}/../resources/logo32.png"
-    "${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/core/F3DIcon.h"
   DEPENDS embed)
 
 cmake_dependent_option(F3D_MACOS_BUNDLE "Build a macOS bundle application" ON "APPLE" OFF)
@@ -97,6 +97,7 @@ set(F3D_SOURCE_FILES
   readers/F3DReader.cxx
   readers/F3DReaderFactory.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/core/F3DConfig.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/core/F3DIcon.h
   ${MODULES_SPECIFIC_SOURCE_FILES}
   )
 
@@ -121,7 +122,7 @@ target_include_directories(libf3d PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/misc
   ${CMAKE_CURRENT_SOURCE_DIR}/readers
   ${CMAKE_CURRENT_SOURCE_DIR}/third_party
-  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}/core
   ${CMAKE_CURRENT_BINARY_DIR}/readers
   ${MODULES_SPECIFIC_INCLUDE_DIRS}
   )
