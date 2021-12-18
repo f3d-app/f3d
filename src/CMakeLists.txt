@@ -29,7 +29,7 @@ set(EXEC_PLATFORM_SPECIFIC_FILES "")
 if(WIN32)
   set(EXEC_PLATFORM_SPECIFIC_FILES "${CMAKE_SOURCE_DIR}/resources/f3d.rc")
   if(F3D_WINDOWS_GUI)
-    set(LIB_PLATFORM_SPECIFIC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DWin32OutputWindow.cxx")
+    set(LIB_PLATFORM_SPECIFIC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions/Misc/vtkF3DWin32OutputWindow.cxx")
   endif()
 endif()
 if(APPLE)
@@ -54,7 +54,7 @@ configure_file(
 add_subdirectory(readers)
 
 if(F3D_MODULE_OCCT)
-  set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DOCCTReader.cxx")
+  set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions/IO/vtkF3DOCCTReader.cxx")
   set(MODULES_SPECIFIC_INCLUDE_DIRS ${MODULES_SPECIFIC_INCLUDE_DIRS} ${OpenCASCADE_INCLUDE_DIR})
   # Note: OpenCASCADE does not declare the libs in the correct dependency order.
   # This could be an issue on Linux when linking with static libraries.
@@ -63,7 +63,7 @@ if(F3D_MODULE_OCCT)
 endif()
 
 if(F3D_MODULE_ASSIMP)
-  set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DAssimpImporter.cxx")
+  set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions/IO/vtkF3DAssimpImporter.cxx")
   set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} assimp::assimp)
 
   # Note: Assimp CMake module file does not declare Debug target properties, just map it to Release properties
@@ -76,18 +76,18 @@ endif()
 # libf3d
 
 set(F3D_SOURCE_FILES
-  vtkF3DConsoleOutputWindow.cxx
-  vtkF3DGenericImporter.cxx
-  vtkF3DInteractorEventRecorder.cxx
-  vtkF3DInteractorStyle.cxx
-  vtkF3DMetaReader.cxx
-  vtkF3DObjectFactory.cxx
-  vtkF3DOpenGLGridMapper.cxx
-  vtkF3DPolyDataMapper.cxx
-  vtkF3DPostProcessFilter.cxx
-  vtkF3DRenderPass.cxx
-  vtkF3DRenderer.cxx
-  vtkF3DRendererWithColoring.cxx
+  VTKExtensions/IO/vtkF3DGenericImporter.cxx
+  VTKExtensions/IO/vtkF3DMetaReader.cxx
+  VTKExtensions/Interaction/vtkF3DInteractorEventRecorder.cxx
+  VTKExtensions/Interaction/vtkF3DInteractorStyle.cxx
+  VTKExtensions/Misc/vtkF3DConsoleOutputWindow.cxx
+  VTKExtensions/Misc/vtkF3DObjectFactory.cxx
+  VTKExtensions/Misc/vtkF3DPostProcessFilter.cxx
+  VTKExtensions/Rendering/vtkF3DOpenGLGridMapper.cxx
+  VTKExtensions/Rendering/vtkF3DPolyDataMapper.cxx
+  VTKExtensions/Rendering/vtkF3DRenderPass.cxx
+  VTKExtensions/Rendering/vtkF3DRenderer.cxx
+  VTKExtensions/Rendering/vtkF3DRendererWithColoring.cxx
   F3DAnimationManager.cxx
   F3DLoader.cxx
   F3DLog.cxx
@@ -100,18 +100,21 @@ set(F3D_SOURCE_FILES
   )
 
 set(F3D_HEADER_FILES
-  vtkF3DConsoleOutputWindow.h
-  vtkF3DGenericImporter.h
-  vtkF3DInteractorEventRecorder.h
-  vtkF3DInteractorStyle.h
-  vtkF3DMetaReader.h
-  vtkF3DObjectFactory.h
-  vtkF3DOpenGLGridMapper.h
-  vtkF3DPolyDataMapper.h
-  vtkF3DPostProcessFilter.h
-  vtkF3DRenderPass.h
-  vtkF3DRenderer.h
-  vtkF3DRendererWithColoring.h
+  VTKExtensions/IO/vtkF3DAssimpImporter.h
+  VTKExtensions/IO/vtkF3DGenericImporter.h
+  VTKExtensions/IO/vtkF3DMetaReader.h
+  VTKExtensions/IO/vtkF3DOCCTReader.h
+  VTKExtensions/Interaction/vtkF3DInteractorEventRecorder.h
+  VTKExtensions/Interaction/vtkF3DInteractorStyle.h
+  VTKExtensions/Misc/vtkF3DConsoleOutputWindow.h
+  VTKExtensions/Misc/vtkF3DObjectFactory.h
+  VTKExtensions/Misc/vtkF3DPostProcessFilter.h
+  VTKExtensions/Misc/vtkF3DWin32OutputWindow.h
+  VTKExtensions/Rendering/vtkF3DOpenGLGridMapper.h
+  VTKExtensions/Rendering/vtkF3DPolyDataMapper.h
+  VTKExtensions/Rendering/vtkF3DRenderPass.h
+  VTKExtensions/Rendering/vtkF3DRenderer.h
+  VTKExtensions/Rendering/vtkF3DRendererWithColoring.h
   F3DAnimationManager.h
   F3DLoader.h
   F3DLog.h
@@ -138,6 +141,10 @@ add_library(libf3d ${F3D_LIBRARY_TYPE}
 target_include_directories(libf3d PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/readers
+  ${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions/IO
+  ${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions/Interaction
+  ${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions/Misc
+  ${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions/Rendering
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}/readers
   ${MODULES_SPECIFIC_INCLUDE_DIRS}
