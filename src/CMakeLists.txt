@@ -1,5 +1,6 @@
+# TODO subdir
 # Generate F3DIcon.h
-add_executable(embed embed.cxx)
+add_executable(embed tools/embed.cxx)
 target_link_libraries(embed PUBLIC VTK::IOImage)
 
 # On Windows, add VTK IOImage library to PATH
@@ -41,13 +42,13 @@ set(MODULES_SPECIFIC_INCLUDE_DIRS "")
 set(MODULES_SPECIFIC_LIBRARIES "")
 
 configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/Config.h"
+  "${CMAKE_CURRENT_SOURCE_DIR}/core/F3DConfig.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/core/F3DConfig.h"
   @ONLY)
 
 configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/Config.cxx.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/Config.cxx"
+  "${CMAKE_CURRENT_SOURCE_DIR}/core/F3DConfig.cxx.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/core/F3DConfig.cxx"
   @ONLY)
 
 # Readers declaration
@@ -88,42 +89,15 @@ set(F3D_SOURCE_FILES
   VTKExtensions/Rendering/vtkF3DRenderPass.cxx
   VTKExtensions/Rendering/vtkF3DRenderer.cxx
   VTKExtensions/Rendering/vtkF3DRendererWithColoring.cxx
-  F3DAnimationManager.cxx
-  F3DLoader.cxx
-  F3DLog.cxx
-  F3DOffscreenRender.cxx
-  F3DOptions.cxx
+  core/F3DAnimationManager.cxx
+  core/F3DLoader.cxx
+  core/F3DLog.cxx
+  core/F3DOffscreenRender.cxx
+  core/F3DOptions.cxx
   readers/F3DReader.cxx
   readers/F3DReaderFactory.cxx
-  ${CMAKE_CURRENT_BINARY_DIR}/Config.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/core/F3DConfig.cxx
   ${MODULES_SPECIFIC_SOURCE_FILES}
-  )
-
-set(F3D_HEADER_FILES
-  VTKExtensions/IO/vtkF3DAssimpImporter.h
-  VTKExtensions/IO/vtkF3DGenericImporter.h
-  VTKExtensions/IO/vtkF3DMetaReader.h
-  VTKExtensions/IO/vtkF3DOCCTReader.h
-  VTKExtensions/Interaction/vtkF3DInteractorEventRecorder.h
-  VTKExtensions/Interaction/vtkF3DInteractorStyle.h
-  VTKExtensions/Misc/vtkF3DConsoleOutputWindow.h
-  VTKExtensions/Misc/vtkF3DObjectFactory.h
-  VTKExtensions/Misc/vtkF3DPostProcessFilter.h
-  VTKExtensions/Misc/vtkF3DWin32OutputWindow.h
-  VTKExtensions/Rendering/vtkF3DOpenGLGridMapper.h
-  VTKExtensions/Rendering/vtkF3DPolyDataMapper.h
-  VTKExtensions/Rendering/vtkF3DRenderPass.h
-  VTKExtensions/Rendering/vtkF3DRenderer.h
-  VTKExtensions/Rendering/vtkF3DRendererWithColoring.h
-  F3DAnimationManager.h
-  F3DLoader.h
-  F3DLog.h
-  F3DOffscreenRender.cxx
-  F3DOptions.cxx
-  readers/F3DReader.h
-  readers/F3DReaderFactory.h
-  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h
-  ${CMAKE_CURRENT_BINARY_DIR}/readers/F3DReaderInstantiator.h
   )
 
 # Force static library when creating a macOS bundle
@@ -134,17 +108,19 @@ endif()
 
 add_library(libf3d ${F3D_LIBRARY_TYPE}
   ${F3D_SOURCE_FILES}
-  ${F3D_HEADER_FILES}
   ${LIB_PLATFORM_SPECIFIC_FILES}
   )
 
 target_include_directories(libf3d PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/readers
   ${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions/IO
   ${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions/Interaction
   ${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions/Misc
   ${CMAKE_CURRENT_SOURCE_DIR}/VTKExtensions/Rendering
+  ${CMAKE_CURRENT_SOURCE_DIR}/core
+  ${CMAKE_CURRENT_SOURCE_DIR}/misc
+  ${CMAKE_CURRENT_SOURCE_DIR}/readers
+  ${CMAKE_CURRENT_SOURCE_DIR}/third_party
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}/readers
   ${MODULES_SPECIFIC_INCLUDE_DIRS}
@@ -198,7 +174,7 @@ endif()
 
 # f3d
 
-add_executable(f3d main.cxx ${EXEC_PLATFORM_SPECIFIC_FILES})
+add_executable(f3d exec/main.cxx ${EXEC_PLATFORM_SPECIFIC_FILES})
 target_link_libraries(f3d PUBLIC libf3d)
 set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 if (APPLE)

@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace F3D
+namespace f3d
 {
   static const std::string EXIT_HOTKEY_SYM = "Escape";
 };

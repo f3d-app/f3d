@@ -48,7 +48,7 @@ void vtkF3DInteractorEventRecorder::ProcessEvents(
         break;
 
       default:
-        if (rwi->GetKeySym() && rwi->GetKeySym() == std::string(F3D::EXIT_HOTKEY_SYM))
+        if (rwi->GetKeySym() && rwi->GetKeySym() == std::string(f3d::EXIT_HOTKEY_SYM))
         {
           self->Off();
         }

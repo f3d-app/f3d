@@ -217,7 +217,7 @@ void vtkF3DInteractorStyle::OnKeyPress()
         this->InvokeEvent(F3DLoader::LoadFileEvent, &load);
         renWin->Render();
       }
-      else if (keySym == F3D::EXIT_HOTKEY_SYM)
+      else if (keySym == f3d::EXIT_HOTKEY_SYM)
       {
         rwi->RemoveObservers(vtkCommand::TimerEvent);
         rwi->ExitCallback();
