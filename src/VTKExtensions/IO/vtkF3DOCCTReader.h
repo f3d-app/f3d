@@ -14,8 +14,6 @@
 #ifndef vtkF3DOCCTReader_h
 #define vtkF3DOCCTReader_h
 
-#include "Config.h"
-
 #include <vtkMultiBlockDataSetAlgorithm.h>
 #include <vtkVersion.h>
 
