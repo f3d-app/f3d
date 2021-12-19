@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        vtk_version: [568b279cd2, v9.1.0, v9.0.0]
+        vtk_version: [a4bdbcd4b2, v9.1.0, v9.0.0]
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -32,7 +32,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: dependencies/occt_install
-        key: occt-V7_6_0-${{matrix.os}}
+        key: occt-V7_6_0-1-${{matrix.os}}
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -92,7 +92,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: dependencies/assimp_install
-        key: assimp-v5.1.1-${{matrix.os}}
+        key: assimp-v5.1.1-1-${{matrix.os}}
 
     - name: Checkout ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
@@ -138,7 +138,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: dependencies/vtk_install
-        key: vtk-${{matrix.vtk_version}}-${{matrix.os}}
+        key: vtk-${{matrix.vtk_version}}-1-${{matrix.os}}
 
     - name: Setup VTK and clone bare
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -180,6 +180,7 @@ jobs:
       run: >
         cmake ../vtk
         -DVTK_ENABLE_LOGGING=OFF
+        -DVTK_ENABLE_WRAPPING=OFF
         -DVTK_BUILD_TESTING=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DVTK_LEGACY_REMOVE=ON
@@ -209,6 +210,7 @@ jobs:
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_jsoncpp=YES
+        ${{ matrix.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread' || null }}
         ${{ matrix.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
 
     - name: Build VTK
