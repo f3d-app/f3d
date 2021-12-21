@@ -190,6 +190,12 @@ if(F3D_PYTHON_BINDINGS)
   add_subdirectory(python)
 endif()
 
+# JNI bindings
+option(F3D_JAVA_BINDINGS "Create Java bindings" OFF)
+if(F3D_JAVA_BINDINGS)
+  add_subdirectory(java)
+endif()
+
 # Installation
 option(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE "Install a default configuration file" OFF)
 mark_as_advanced(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
