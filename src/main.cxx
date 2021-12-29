@@ -23,7 +23,7 @@ int main(int argc, char** argv)
   }
   catch(...)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "F3D encountered an expected exception");
+    F3DLog::Print(F3DLog::Severity::Error, "F3D encountered an unexpected exception");
     exit(EXIT_FAILURE);
   }
 
