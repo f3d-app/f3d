@@ -272,7 +272,7 @@ The coloring can be controlled directly by pressing the following hotkeys:
 * `S`: cycle the array to color with.
 * `Y`: cycle the component of the array to color with.
 
-See the [coloring cycle](#Cycling Coloring) section for more info.
+See the [coloring cycle](#cycling-coloring) section for more info.
 
 Other options can be toggled directly by pressing the following hotkeys:
 
