@@ -73,6 +73,17 @@ if(F3D_MODULE_ASSIMP)
   endif()
 endif()
 
+if(F3D_MODULE_ALEMBIC)
+  set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DAlembicImporter.cxx")
+  set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} Alembic::Alembic)
+
+  # Note: Alembic CMake module file does not declare Debug target properties, just map it to Release properties
+  get_target_property(F3D_ALEMBIC_DEBUG_VAR Alembic::Alembic IMPORTED_IMPLIB_RELEASE)
+  if(NOT F3D_ALEMBIC_DEBUG_VAR)
+    set_target_properties(Alembic::Alembic PROPERTIES MAP_IMPORTED_CONFIG_DEBUG Release)
+  endif()
+endif()
+
 # libf3d
 
 set(F3D_SOURCE_FILES
