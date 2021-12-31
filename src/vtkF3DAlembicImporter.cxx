@@ -74,9 +74,9 @@ public:
 	}
 	void ProcessIPolyMesh(vtkRenderer* renderer, const Alembic::AbcGeom::IPolyMesh& pmesh)
 	{
-		vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-		vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
-		vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
+		vtkNew<vtkPoints> points;
+		vtkNew<vtkCellArray> polys;
+		vtkNew<vtkPolyData> polydata;
 
 		Alembic::AbcGeom::IPolyMeshSchema::Sample samp;
 		if ( pmesh.getSchema().getNumSamples() > 0 )
@@ -92,13 +92,9 @@ public:
 			size_t indices_size = indices->size();
 			size_t counts_size = counts->size();
 
-			std::cout << "P size = " << P_size << std::endl;
-			std::cout << "indices size = " << indices_size << std::endl;
-			std::cout << "counts size = " << counts_size << std::endl;
 			if (v != 0)
 			{
 				size_t v_size = v->size();
-				std::cout << "v size = " << v_size << std::endl;
 			}
 
 			for (size_t i=0;i<P_size;i++)
@@ -131,56 +127,40 @@ public:
 						const Alembic::Abc::IObject &parent,
 						const Alembic::Abc::ObjectHeader &ohead)
 	{
-		std::cout << "Parent Full name " << parent.getFullName() << std::endl;
-		std::cout << "ohead Full name " << ohead.getFullName() << std::endl;
-
 		//set this if we should continue traversing
 		Alembic::Abc::IObject nextParentObject;
 
 		if ( Alembic::AbcGeom::IXform::matches( ohead ) )
 		{
-			std::cout << "iterate_iobject match IXform" << std::endl;
 			Alembic::AbcGeom::IXform xform( parent, ohead.getName() );
 
 			nextParentObject = xform;
-
 		}
 		else if ( Alembic::AbcGeom::ISubD::matches( ohead ) )
 		{
-			std::cout << "iterate_iobject match ISubD" << std::endl;
 			Alembic::AbcGeom::ISubD subd( parent, ohead.getName() );
 			nextParentObject = subd;
-
 		}
 		else if ( Alembic::AbcGeom::IPolyMesh::matches( ohead ) )
 		{
-			std::cout << "iterate_iobject match IPolyMesh" << std::endl;
 			Alembic::AbcGeom::IPolyMesh polymesh( parent, ohead.getName() );
 			ProcessIPolyMesh(renderer, polymesh);
 			nextParentObject = polymesh;
-
 		}
 		else if ( Alembic::AbcGeom::INuPatch::matches( ohead ) )
 		{
-			std::cout << "iterate_iobject match INuPatch" << std::endl;
-
 		}
 		else if ( Alembic::AbcGeom::IPoints::matches( ohead ) )
 		{
-			std::cout << "iterate_iobject match IPoints" << std::endl;
 			Alembic::AbcGeom::IPoints points( parent, ohead.getName() );
 			// ProcessIPoints(points);
 			nextParentObject = points;
 		}
 		else if ( Alembic::AbcGeom::ICurves::matches( ohead ) )
 		{
-			std::cout << "iterate_iobject match ICurves" << std::endl;
-
 		}
 		else if ( Alembic::AbcGeom::IFaceSet::matches( ohead ) )
 		{
-			std::cout << "iterate_iobject match IFaceSet" << std::endl;
-			std::cerr << "DOH !" << std::endl;
 		}
 
 		// Recursion
@@ -195,11 +175,8 @@ public:
 	}
 	void ImportRoot(vtkRenderer* renderer)
 	{
-		Alembic::Abc::IObject top = _archive.getTop();
+		Alembic::Abc::IObject top = Archive.getTop();
 		size_t top_num_children = top.getNumChildren();
-
-		//   vtkDebugMacro("Done with " << this->GetClassName() << "::" << __FUNCTION__);
-		std::cout <<  top_num_children << std::endl;
 
 	    for ( size_t i = 0; i < top.getNumChildren(); ++i )
 	    {
@@ -217,24 +194,11 @@ public:
 		Alembic::AbcCoreFactory::IFactory factory;
 		Alembic::AbcCoreFactory::IFactory::CoreType core_type;
 
-		_archive = factory.getArchive(filePath, core_type);
+		Archive = factory.getArchive(filePath, core_type);
 
 	}
-	std::string Description;
-	std::vector<vtkSmartPointer<vtkPolyData> > Meshes;
-	std::vector<vtkSmartPointer<vtkProperty> > Properties;
-	std::vector<vtkSmartPointer<vtkTexture> > EmbeddedTextures;
-	vtkIdType ActiveAnimation = 0;
-	std::vector<std::pair<std::string, vtkSmartPointer<vtkLight> > > Lights;
-	std::vector<std::pair<std::string, vtkSmartPointer<vtkCamera> > > Cameras;
-	vtkIdType ActiveCameraIndex = -1;
-	std::unordered_map<std::string, vtkSmartPointer<vtkActorCollection> > NodeActors;
-	std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4> > NodeLocalMatrix;
-	std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4> > NodeTRSMatrix;
-	std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4> > NodeGlobalMatrix;
 	vtkF3DAlembicImporter* Parent;
-	//
-	Alembic::Abc::IArchive _archive;
+	Alembic::Abc::IArchive Archive;
 
 };
 
@@ -256,7 +220,6 @@ int vtkF3DAlembicImporter::ImportBegin()
 {
 	this->InternalsEx->ReadScene(this->FileName);
 
-	std::cout << "vtkF3DAlembicImporter::ImportBegin()" << std::endl;
 	return 1;
 }
 
