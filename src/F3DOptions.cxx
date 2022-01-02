@@ -269,8 +269,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
 
     cxxOptions.parse_positional({ "input" });
 
-    int argc = this->Argc;
-    auto result = cxxOptions.parse(argc, this->Argv);
+    auto result = cxxOptions.parse(this->Argc, this->Argv);
 
     if (result.count("help") > 0)
     {
