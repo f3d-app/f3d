@@ -231,7 +231,7 @@ void vtkF3DAlembicImporter::ImportActors(vtkRenderer* renderer)
 //----------------------------------------------------------------------------
 std::string vtkF3DAlembicImporter::GetOutputsDescription()
 {
-	return "";
+	return "Alembic";
 }
 
 //----------------------------------------------------------------------------
@@ -275,22 +275,6 @@ bool vtkF3DAlembicImporter::GetTemporalInformation(vtkIdType animationIndex, dou
 	return true;
 }
 
-//----------------------------------------------------------------------------
-vtkIdType vtkF3DAlembicImporter::GetNumberOfCameras()
-{
-	return 0;
-}
-
-//----------------------------------------------------------------------------
-std::string vtkF3DAlembicImporter::GetCameraName(vtkIdType camIndex)
-{
-	return "";
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DAlembicImporter::SetCamera(vtkIdType camIndex)
-{
-}
 #endif // VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
 
 //----------------------------------------------------------------------------
