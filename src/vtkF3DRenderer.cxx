@@ -193,25 +193,45 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   }
 
   this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, fileInfo.c_str());
-  this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
   this->FilenameActor->GetTextProperty()->SetColor(textColor);
 
-  this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
   this->MetaDataActor->GetTextProperty()->SetFontSize(15);
   this->MetaDataActor->GetTextProperty()->SetOpacity(0.5);
   this->MetaDataActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
   this->MetaDataActor->GetTextProperty()->SetBackgroundOpacity(0.5);
 
-  this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetColor(textColor);
   this->TimerActor->GetTextProperty()->SetFontSize(15);
   this->TimerActor->SetPosition(10, 10);
 
-  this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontSize(15);
   this->CheatSheetActor->GetTextProperty()->SetOpacity(0.5);
   this->CheatSheetActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
   this->CheatSheetActor->GetTextProperty()->SetBackgroundOpacity(0.5);
+
+  std::string fontPath = vtksys::SystemTools::CollapseFullPath(this->Options.FontFile);
+  if (vtksys::SystemTools::FileExists(fontPath, true))
+  {
+    this->FilenameActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+    this->FilenameActor->GetTextProperty()->SetFontFile(fontPath.c_str());
+    this->MetaDataActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+    this->MetaDataActor->GetTextProperty()->SetFontFile(fontPath.c_str());
+    this->TimerActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+    this->TimerActor->GetTextProperty()->SetFontFile(fontPath.c_str());
+    this->CheatSheetActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+    this->CheatSheetActor->GetTextProperty()->SetFontFile(fontPath.c_str());
+  }
+  else
+  {
+    if (!this->Options.FontFile.empty())
+    {
+      F3DLog::Print(F3DLog::Severity::Warning, "Cannot find \"", this->Options.FontFile, "\" font file.");
+    }
+    this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
+    this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
+    this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
+    this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
+  }
 
   this->TimerActor->SetInput("0 fps");
 
