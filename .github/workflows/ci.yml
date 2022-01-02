@@ -425,6 +425,7 @@ jobs:
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_OCCT=ON
         -DF3D_MODULE_ASSIMP=ON
+        -DF3D_MODULE_ALEMBIC=ON
         -DCMAKE_BUILD_TYPE=Release
         -DVTK_DIR:PATH=../dependencies/vtk_install/lib/cmake/vtk
         -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade
