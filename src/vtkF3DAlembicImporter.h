@@ -3,6 +3,10 @@
  * @brief   Importer using Alembic library
  *
  * This importer is based on Alembic 1.7
+ * Currently, only polygonal points positions are retrieved
+ * to build polygonal geometries. Vertex normals and texture
+ * coordinates are not supported yet.
+ *
  * @sa https://github.com/alembic/alembic/blob/master/README.txt
  *
  */
