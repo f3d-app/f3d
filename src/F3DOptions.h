@@ -79,6 +79,7 @@ struct F3DOptions
   std::vector<double> EmissiveFactor = { 1., 1., 1. };
   std::string NormalTex;
   double NormalScale = 1.0;
+  std::string FontFile = "";
 };
 
 class F3DOptionsParser
