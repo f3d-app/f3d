@@ -70,7 +70,6 @@ endfunction()
 
 f3d_test(NAME TestPLY DATA suzanne.ply)
 f3d_test(NAME TestOBJ DATA suzanne.obj ARGS --geometry-only)
-f3d_test(NAME TestABC DATA suzanne.abc)
 f3d_test(NAME TestSTL DATA suzanne.stl)
 f3d_test(NAME TestVTU DATA dragon.vtu)
 f3d_test(NAME TestVTP DATA cow.vtp)
@@ -216,6 +215,10 @@ if(F3D_MODULE_ASSIMP)
   if("${F3D_ASSIMP_VERSION}" VERSION_EQUAL "5.0.0")
     f3d_test(NAME TestFBXAnim DATA robot_kyle_walking.fbx INTERACTION) #Space;Space;
   endif()
+endif()
+
+if(F3D_MODULE_ALEMBIC)
+  f3d_test(NAME TestABC DATA suzanne.abc)
 endif()
 
 ## Interaction Tests
