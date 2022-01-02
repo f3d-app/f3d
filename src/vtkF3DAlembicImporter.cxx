@@ -29,7 +29,6 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <Alembic/AbcGeom/All.h>
-// #include <Alembic/AbcCoreHDF5/All.h> Not sure if we want to support legacy HDF5 stuff
 #include <Alembic/AbcCoreOgawa/All.h>
 #include <Alembic/Util/All.h>
 #include <Alembic/Abc/All.h>
