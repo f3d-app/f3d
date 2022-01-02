@@ -70,6 +70,7 @@ endfunction()
 
 f3d_test(NAME TestPLY DATA suzanne.ply)
 f3d_test(NAME TestOBJ DATA suzanne.obj ARGS --geometry-only)
+f3d_test(NAME TestABC DATA suzanne.abc)
 f3d_test(NAME TestSTL DATA suzanne.stl)
 f3d_test(NAME TestVTU DATA dragon.vtu)
 f3d_test(NAME TestVTP DATA cow.vtp)
