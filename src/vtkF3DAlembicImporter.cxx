@@ -85,16 +85,9 @@ public:
 			Alembic::AbcGeom::P3fArraySamplePtr P = samp.getPositions();
 			Alembic::AbcGeom::Int32ArraySamplePtr indices = samp.getFaceIndices();
 			Alembic::AbcGeom::Int32ArraySamplePtr counts = samp.getFaceCounts();
-			Alembic::AbcGeom::V3fArraySamplePtr v = samp.getVelocities();
 
 			size_t P_size = P->size();
-			size_t indices_size = indices->size();
 			size_t counts_size = counts->size();
-
-			if (v != 0)
-			{
-				size_t v_size = v->size();
-			}
 
 			for (size_t i=0;i<P_size;i++)
 			{
@@ -175,7 +168,6 @@ public:
 	void ImportRoot(vtkRenderer* renderer)
 	{
 		Alembic::Abc::IObject top = Archive.getTop();
-		size_t top_num_children = top.getNumChildren();
 
 	    for ( size_t i = 0; i < top.getNumChildren(); ++i )
 	    {
@@ -183,10 +175,10 @@ public:
 	    }
 
 	}
-	void ImportCameras(vtkRenderer* renderer)
+	void ImportCameras(vtkRenderer* vtkNotUsed(renderer))
 	{
 	}
-	void ImportLights(vtkRenderer* renderer)
+	void ImportLights(vtkRenderer* vtkNotUsed(renderer))
 	{
 	}
 	void ReadScene(const std::string& filePath)
@@ -237,7 +229,7 @@ std::string vtkF3DAlembicImporter::GetOutputsDescription()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DAlembicImporter::UpdateTimeStep(double timestep)
+void vtkF3DAlembicImporter::UpdateTimeStep(double vtkNotUsed(timestep))
 {
 }
 
@@ -248,13 +240,13 @@ vtkIdType vtkF3DAlembicImporter::GetNumberOfAnimations()
 }
 
 //----------------------------------------------------------------------------
-std::string vtkF3DAlembicImporter::GetAnimationName(vtkIdType animationIndex)
+std::string vtkF3DAlembicImporter::GetAnimationName(vtkIdType vtkNotUsed(animationIndex))
 {
 	return "";
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DAlembicImporter::EnableAnimation(vtkIdType animationIndex)
+void vtkF3DAlembicImporter::EnableAnimation(vtkIdType vtkNotUsed(animationIndex))
 {
 }
 
@@ -264,15 +256,15 @@ void vtkF3DAlembicImporter::DisableAnimation(vtkIdType vtkNotUsed(animationIndex
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DAlembicImporter::IsAnimationEnabled(vtkIdType animationIndex)
+bool vtkF3DAlembicImporter::IsAnimationEnabled(vtkIdType vtkNotUsed(animationIndex))
 {
 	return false;
 }
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
 //----------------------------------------------------------------------------
-bool vtkF3DAlembicImporter::GetTemporalInformation(vtkIdType animationIndex, double frameRate,
-												   int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
+bool vtkF3DAlembicImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationIndex), double vtkNotUsed(frameRate),
+												   int& vtkNotUsed(nbTimeSteps), double vtkNotUsed(timeRange)[2], vtkDoubleArray* vtkNotUsed(timeSteps))
 {
 	return true;
 }
