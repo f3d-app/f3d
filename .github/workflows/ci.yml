@@ -430,7 +430,7 @@ jobs:
         -DVTK_DIR:PATH=../dependencies/vtk_install/lib/cmake/vtk
         -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade
         -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
-        -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/alembic
+        -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
         -DF3D_COVERAGE=ON
 
     - name: Build Coverage
