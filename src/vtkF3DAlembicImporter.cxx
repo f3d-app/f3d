@@ -185,7 +185,9 @@ public:
 	}
 	void ImportCameras(vtkRenderer* renderer)
 	{
-
+	}
+	void ImportLights(vtkRenderer* renderer)
+	{
 	}
 	void ReadScene(const std::string& filePath)
 	{
@@ -286,7 +288,7 @@ void vtkF3DAlembicImporter::ImportCameras(vtkRenderer* renderer)
 //----------------------------------------------------------------------------
 void vtkF3DAlembicImporter::ImportLights(vtkRenderer* renderer)
 {
-	// Alembic has no concept of lights
+	this->InternalsEx->ImportLights(renderer);
 }
 
 //----------------------------------------------------------------------------
