@@ -30,6 +30,7 @@
 
 #if defined(_MSC_VER)
 #pragma warning(push, 0)
+#pragma warning( disable : 4267 )		// conversion from 'size_t' to 'int'
 #endif
 #include <Alembic/AbcGeom/All.h>
 #include <Alembic/AbcCoreOgawa/All.h>
