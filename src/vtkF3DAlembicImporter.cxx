@@ -28,7 +28,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-#ifdef WIN32
+#if defined(_MSC_VER)
 #pragma warning(push, 0)
 #endif
 #include <Alembic/AbcGeom/All.h>
@@ -37,7 +37,7 @@
 #include <Alembic/Abc/All.h>
 #include <Alembic/AbcCoreAbstract/All.h>
 #include <Alembic/AbcCoreFactory/All.h>
-#ifdef WIN32
+#if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
 
