@@ -1,13 +1,11 @@
 #include "vtkF3DConsoleOutputWindow.h"
 
 #include <vtkObjectFactory.h>
-
-#ifdef WIN32
-#include "windows.h"
-#endif
+#include <vtkWindows.h>
 
 vtkStandardNewMacro(vtkF3DConsoleOutputWindow);
 
+//----------------------------------------------------------------------------
 vtkF3DConsoleOutputWindow::vtkF3DConsoleOutputWindow()
 {
 #ifdef WIN32
@@ -19,6 +17,7 @@ vtkF3DConsoleOutputWindow::vtkF3DConsoleOutputWindow()
 #endif
 }
 
+//----------------------------------------------------------------------------
 void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
 {
   std::string fmtText;
@@ -43,10 +42,10 @@ void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
   switch (this->GetDisplayStream(this->GetCurrentMessageType()))
   {
     case StreamType::StdOutput:
-      cout.flush();
+      std::cout.flush();
       break;
     case StreamType::StdError:
-      cerr.flush();
+      std::cerr.flush();
       break;
     default:
       break;
