@@ -9,12 +9,14 @@
 vtkStandardNewMacro(vtkF3DWin32OutputWindow);
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201207)
+//------------------------------------------------------------------------------
 const char* vtkF3DWin32OutputWindow::GetWindowTitle()
 {
   return "F3D log window";
 }
 #endif
 
+//------------------------------------------------------------------------------
 int vtkF3DWin32OutputWindow::Initialize()
 {
   int rc = this->Superclass::Initialize();
@@ -46,7 +48,8 @@ int vtkF3DWin32OutputWindow::Initialize()
   return rc;
 }
 
-void vtkF3DWin32OutputWindow::DisplayText(const char* someText)
+//------------------------------------------------------------------------------
+void vtkF3DWin32OutputWindow::DisplayText(const char* text)
 {
   if (this->GetDisplayStream(this->GetCurrentMessageType()) == StreamType::Null)
   {
@@ -58,7 +61,7 @@ void vtkF3DWin32OutputWindow::DisplayText(const char* someText)
     return;
   }
 
-  std::string str(someText);
+  std::string str(text);
   str = std::regex_replace(str, std::regex("\n"), "\r\n");
 
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -74,7 +77,19 @@ void vtkF3DWin32OutputWindow::DisplayText(const char* someText)
   // print text
   SendMessageW(hWnd, EM_REPLACESEL, 0, reinterpret_cast<LPARAM>(wstr.c_str()));
 
-  // print text to cout for testing purpose
-  std::cout<<someText;
+  // still print text to std::cout in
+  // order to be able to test verbose outputs
+  std::cout << text;
   std::cout.flush();
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DWin32OutputWindow::WaitForUser()
+{
+  if (getenv("DASHBOARD_TEST_FROM_CTEST") || getenv("CTEST_INTERACTIVE_DEBUG_MODE"))
+  {
+    // This ensure that WaitForUser will not do anything when using ctest
+    return;
+  }
+  MessageBoxW(nullptr, L"Press OK to continue.", L"F3D", MB_ICONINFORMATION | MB_OK);
 }
