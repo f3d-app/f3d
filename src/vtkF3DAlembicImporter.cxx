@@ -28,12 +28,18 @@
 
 #include <vtksys/SystemTools.hxx>
 
+#ifdef WIN32
+#pragma warning(push, 0)
+#endif
 #include <Alembic/AbcGeom/All.h>
 #include <Alembic/AbcCoreOgawa/All.h>
 #include <Alembic/Util/All.h>
 #include <Alembic/Abc/All.h>
 #include <Alembic/AbcCoreAbstract/All.h>
 #include <Alembic/AbcCoreFactory/All.h>
+#ifdef WIN32
+#pragma warning(pop)
+#endif
 
 vtkStandardNewMacro(vtkF3DAlembicImporter);
 
