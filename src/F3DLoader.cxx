@@ -18,6 +18,7 @@
 #include <vtkImageData.h>
 #include <vtkLogger.h>
 #include <vtkNew.h>
+#include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProgressBarRepresentation.h>
@@ -140,14 +141,12 @@ int F3DLoader::Start(int argc, char** argv, vtkImageData* image)
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200615)
     // set icon
-    vtkNew<vtkImageData> icon;
-    icon->SetDimensions(F3DIconDimX, F3DIconDimY, 1);
-    icon->AllocateScalars(VTK_UNSIGNED_CHAR, F3DIconNbComp);
+    vtkNew<vtkPNGReader> iconReader;
+    iconReader->SetMemoryBuffer(F3DIcon);
+    iconReader->SetMemoryBufferLength(sizeof(F3DIcon));
+    iconReader->Update();
 
-    unsigned char* p = static_cast<unsigned char*>(icon->GetScalarPointer(0, 0, 0));
-    std::copy(F3DIconBuffer, F3DIconBuffer + F3DIconDimX * F3DIconDimY * F3DIconNbComp, p);
-
-    this->RenWin->SetIcon(icon);
+    this->RenWin->SetIcon(iconReader->GetOutput());
 #endif
 
 #if __APPLE__
