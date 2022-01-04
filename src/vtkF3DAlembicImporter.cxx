@@ -134,31 +134,11 @@ public:
 
 			nextParentObject = xform;
 		}
-		else if ( Alembic::AbcGeom::ISubD::matches( ohead ) )
-		{
-			Alembic::AbcGeom::ISubD subd( parent, ohead.getName() );
-			nextParentObject = subd;
-		}
 		else if ( Alembic::AbcGeom::IPolyMesh::matches( ohead ) )
 		{
 			Alembic::AbcGeom::IPolyMesh polymesh( parent, ohead.getName() );
 			ProcessIPolyMesh(renderer, polymesh);
 			nextParentObject = polymesh;
-		}
-		else if ( Alembic::AbcGeom::INuPatch::matches( ohead ) )
-		{
-		}
-		else if ( Alembic::AbcGeom::IPoints::matches( ohead ) )
-		{
-			Alembic::AbcGeom::IPoints points( parent, ohead.getName() );
-			// ProcessIPoints(points);
-			nextParentObject = points;
-		}
-		else if ( Alembic::AbcGeom::ICurves::matches( ohead ) )
-		{
-		}
-		else if ( Alembic::AbcGeom::IFaceSet::matches( ohead ) )
-		{
 		}
 
 		// Recursion
