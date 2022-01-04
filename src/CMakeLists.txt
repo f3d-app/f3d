@@ -1,25 +1,11 @@
-# Generate F3DIcon.h
-add_executable(embed embed.cxx)
-target_link_libraries(embed PUBLIC VTK::IOImage)
-
-# On Windows, add VTK IOImage library to PATH
-# It is required to run `embed` with `add_custom_command`
-# Other systems supports RPATH so it is not required
-if(WIN32)
-  get_target_property(_confs VTK::IOImage IMPORTED_CONFIGURATIONS)
-  foreach(_conf ${_confs})
-    get_target_property(_runtime_path VTK::IOImage IMPORTED_LOCATION_${_conf})
-    get_filename_component(_runtime_dir ${_runtime_path} DIRECTORY)
-    list(APPEND CMAKE_MSVCIDE_RUN_PATH "${_runtime_dir}")
-  endforeach()
-endif()
-
-add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h
-  COMMAND $<TARGET_FILE:embed>
-    "${CMAKE_CURRENT_SOURCE_DIR}/../resources/logo32.png"
-    "${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h"
-  DEPENDS embed)
+# Generate F3DIcon buffer
+vtk_encode_string(
+  INPUT "${CMAKE_SOURCE_DIR}/resources/logo32.png"
+  NAME F3DIcon
+  HEADER_OUTPUT F3D_ICON_HEADER
+  SOURCE_OUTPUT F3D_ICON_SOURCE
+  BINARY
+  NUL_TERMINATE)
 
 cmake_dependent_option(F3D_MACOS_BUNDLE "Build a macOS bundle application" ON "APPLE" OFF)
 cmake_dependent_option(F3D_WINDOWS_GUI "Build a non-console Win32 application" ON "WIN32" OFF)
@@ -100,6 +86,7 @@ set(F3D_SOURCE_FILES
   F3DOptions.cxx
   readers/F3DReader.cxx
   readers/F3DReaderFactory.cxx
+  ${F3D_ICON_SOURCE}
   ${CMAKE_CURRENT_BINARY_DIR}/Config.cxx
   ${MODULES_SPECIFIC_SOURCE_FILES}
   )
@@ -120,11 +107,9 @@ set(F3D_HEADER_FILES
   F3DAnimationManager.h
   F3DLoader.h
   F3DLog.h
-  F3DOffscreenRender.cxx
-  F3DOptions.cxx
   readers/F3DReader.h
   readers/F3DReaderFactory.h
-  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.h
+  ${F3D_ICON_HEADER}
   ${CMAKE_CURRENT_BINARY_DIR}/readers/F3DReaderInstantiator.h
   )
 

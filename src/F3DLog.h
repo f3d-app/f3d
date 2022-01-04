@@ -1,3 +1,9 @@
+/**
+ * @class   F3DLog
+ * @brief   Class used to show logs in F3D
+ *
+ */
+
 #ifndef F3DLog_h
 #define F3DLog_h
 
@@ -22,9 +28,23 @@ public:
     PrintInternal(sev, ss.str());
   }
 
+  /**
+   * If output window is a vtkF3DConsoleOutputWindow,
+   * set the coloring usage.
+   */
   static void SetUseColoring(bool use);
 
+  /**
+   * Set if any log should be shown or not.
+   */
   static void SetQuiet(bool quiet);
+
+  /**
+   * If output window is a vtkF3DWin32OutputWindow,
+   * this calls WaitForUser on the output window.
+   * No effect otherwise.
+   */
+  static void WaitForUser();
 
 protected:
   static void AppendArg(std::stringstream&) {}

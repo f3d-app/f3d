@@ -366,6 +366,7 @@ void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
   }
   F3DLog::Print(F3DLog::Severity::Info, "\nReport bugs to https://github.com/f3d-app/f3d/issues");
   F3DLog::SetUseColoring(true);
+  F3DLog::WaitForUser();
 }
 
 //----------------------------------------------------------------------------
@@ -423,6 +424,7 @@ void ConfigurationOptions::PrintVersion()
   F3DLog::SetUseColoring(false);
   F3DLog::Print(F3DLog::Severity::Info, version);
   F3DLog::SetUseColoring(true);
+  F3DLog::WaitForUser();
 }
 
 //----------------------------------------------------------------------------
@@ -480,7 +482,6 @@ void ConfigurationOptions::PrintReadersList()
     for (size_t i = 0; i < reader->GetExtensions().size(); i++)
     {
       std::stringstream readerLine;
-
       if (i == 0)
       {
         readerLine << std::left << std::setw(nameColSize) << reader->GetName()
@@ -502,6 +503,7 @@ void ConfigurationOptions::PrintReadersList()
     }
     F3DLog::Print(F3DLog::Severity::Info, separator);
   }
+  F3DLog::WaitForUser();
 }
 
 //----------------------------------------------------------------------------
