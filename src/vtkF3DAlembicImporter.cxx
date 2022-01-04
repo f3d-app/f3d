@@ -30,7 +30,6 @@
 
 #if defined(_MSC_VER)
 #pragma warning(push, 0)
-#pragma warning( disable : 4267 )		// conversion from 'size_t' to 'int'
 #endif
 #include <Alembic/AbcGeom/All.h>
 #include <Alembic/AbcCoreOgawa/All.h>
@@ -104,9 +103,9 @@ public:
 			size_t face_index = 0;
 			for (size_t i=0;i<counts_size;i++)
 			{
-				size_t polyface_vertex_count = counts->get()[i];
+				auto polyface_vertex_count = counts->get()[i];
 				polys->InsertNextCell(polyface_vertex_count);
-				for (size_t j=0;j<polyface_vertex_count;j++)
+				for (auto j=0;j<polyface_vertex_count;j++)
 				{
 					polys->InsertCellPoint(indices->get()[face_index++]);
 				}
