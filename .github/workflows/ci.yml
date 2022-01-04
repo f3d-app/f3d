@@ -176,7 +176,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: dependencies/alembic_install
-        key: alembic-v1.8.3-2-${{matrix.os}}
+        key: alembic-v1.8.3-3-${{matrix.os}}
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -198,7 +198,8 @@ jobs:
       working-directory: ${{github.workspace}}/dependencies/alembic_build
       run: >
         cmake ../alembic
-        -DBUILD_SHARED_LIBS=OFF
+        -DALEMBIC_SHARED_LIBS=OFF
+        -DUSE_BINARIES=OFF
         -DBUILD_TESTING=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DImath_DIR:PATH=$(pwd)/../imath_install/lib/cmake/Imath
