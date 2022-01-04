@@ -258,18 +258,6 @@ bool vtkF3DAlembicImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animatio
 #endif // VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
 
 //----------------------------------------------------------------------------
-void vtkF3DAlembicImporter::ImportCameras(vtkRenderer* renderer)
-{
-	this->InternalsEx->ImportCameras(renderer);
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DAlembicImporter::ImportLights(vtkRenderer* renderer)
-{
-	this->InternalsEx->ImportLights(renderer);
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DAlembicImporter::PrintSelf(ostream& os, vtkIndent indent)
 {
 	this->Superclass::PrintSelf(os, indent);

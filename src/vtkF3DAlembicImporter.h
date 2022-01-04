@@ -107,8 +107,6 @@ protected:
 
   int ImportBegin() override;
   void ImportActors(vtkRenderer*) override;
-  void ImportCameras(vtkRenderer*) override;
-  void ImportLights(vtkRenderer*) override;
 
   std::string FileName;
 
