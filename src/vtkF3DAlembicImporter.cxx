@@ -50,6 +50,7 @@ class vtkF3DAlembicImporterInternalEx
 
 public:
   vtkF3DAlembicImporterInternalEx(vtkF3DAlembicImporter* parent) { this->Parent = parent; }
+
   void CreatePODStringMap(PODStringMap& podStringMap)
   {
     podStringMap[Alembic::AbcGeom::kBooleanPOD] = "kBooleanPOD";
@@ -69,12 +70,14 @@ public:
     podStringMap[Alembic::AbcGeom::kNumPlainOldDataTypes] = "kNumPlainOldDataTypes";
     podStringMap[Alembic::AbcGeom::kUnknownPOD] = "kUnknownPOD";
   }
+
   void CreatePropertyTypeStringMap(PropertyTypeStringMap& propertyTypeStringMap)
   {
     propertyTypeStringMap[Alembic::AbcGeom::kCompoundProperty] = "kCompoundProperty";
     propertyTypeStringMap[Alembic::AbcGeom::kScalarProperty] = "kScalarProperty";
     propertyTypeStringMap[Alembic::AbcGeom::kArrayProperty] = "kArrayProperty";
   }
+
   void ProcessIPolyMesh(vtkRenderer* renderer, const Alembic::AbcGeom::IPolyMesh& pmesh)
   {
     vtkNew<vtkPoints> points;
@@ -148,6 +151,7 @@ public:
       }
     }
   }
+
   void ImportRoot(vtkRenderer* renderer)
   {
     Alembic::Abc::IObject top = Archive.getTop();
@@ -157,8 +161,11 @@ public:
       IterateIObject(renderer, top, top.getChildHeader(i));
     }
   }
+
   void ImportCameras(vtkRenderer* vtkNotUsed(renderer)) {}
+
   void ImportLights(vtkRenderer* vtkNotUsed(renderer)) {}
+
   void ReadScene(const std::string& filePath)
   {
 
