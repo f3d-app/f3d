@@ -184,13 +184,12 @@ public:
 //----------------------------------------------------------------------------
 vtkF3DAlembicImporter::vtkF3DAlembicImporter()
 {
-	this->InternalsEx = new vtkF3DAlembicImporterInternalEx(this);
+	this->InternalsEx.reset(new vtkF3DAlembicImporterInternalEx(this));
 }
 
 //----------------------------------------------------------------------------
 vtkF3DAlembicImporter::~vtkF3DAlembicImporter()
 {
-	delete this->InternalsEx;
 }
 
 //----------------------------------------------------------------------------

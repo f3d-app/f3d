@@ -14,6 +14,7 @@
 #ifndef vtkF3DAlembicImporter_h
 #define vtkF3DAlembicImporter_h
 
+#include <memory>
 #include <vtkImporter.h>
 #include <vtkVersion.h>
 
@@ -114,7 +115,7 @@ private:
   vtkF3DAlembicImporter(const vtkF3DAlembicImporter&) = delete;
   void operator=(const vtkF3DAlembicImporter&) = delete;
 
-  vtkF3DAlembicImporterInternalEx* InternalsEx = nullptr;
+  std::shared_ptr<vtkF3DAlembicImporterInternalEx> InternalsEx;
 };
 
 #endif
