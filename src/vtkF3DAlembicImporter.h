@@ -101,7 +101,7 @@ public:
 #endif
 
 protected:
-  vtkF3DAlembicImporter();
+  vtkF3DAlembicImporter() = default;
   ~vtkF3DAlembicImporter() override;
 
   int ImportBegin() override;

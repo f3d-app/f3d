@@ -180,11 +180,6 @@ vtkStandardNewMacro(vtkF3DAlembicImporterInternal);
 vtkStandardNewMacro(vtkF3DAlembicImporter);
 
 //----------------------------------------------------------------------------
-vtkF3DAlembicImporter::vtkF3DAlembicImporter()
-{
-}
-
-//----------------------------------------------------------------------------
 vtkF3DAlembicImporter::~vtkF3DAlembicImporter() {}
 
 //----------------------------------------------------------------------------
