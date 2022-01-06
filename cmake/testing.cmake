@@ -217,6 +217,10 @@ if(F3D_MODULE_ASSIMP)
   endif()
 endif()
 
+if(F3D_MODULE_ALEMBIC)
+  f3d_test(NAME TestABC DATA suzanne.abc)
+endif()
+
 ## Interaction Tests
 # Test hotkeys
 f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION) #PQAT
