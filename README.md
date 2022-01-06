@@ -25,7 +25,7 @@ It supports a range of file formats (including animated glTF, stl, step, ply, ob
 
 # Acknowledgments
 
-F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/) and [Assimp](https://www.assimp.org/).
+F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/), [Assimp](https://www.assimp.org/) and [Alembic](https://github.com/alembic/alembic).
 
 # How to use
 
@@ -103,6 +103,7 @@ Some modules depending on external libraries can be optionally enabled with the 
 * `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay`. Disabled by default.
 * `F3D_MODULE_OCCT`: Support for STEP and IGES file formats. Requires `OpenCASCADE`. Disabled by default.
 * `F3D_MODULE_ASSIMP`: Support for FBX, DAE, OFF and DXF file formats. Requires `Assimp`. Disabled by default.
+* `F3D_MODULE_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.
 
 Then build the software using your build system.
 
@@ -462,6 +463,14 @@ FBX, DAE, OFF, and DXF file formats rely on [Assimp](https://github.com/assimp/a
 - Animations are not working very well with Assimp 5.1, it's recommended to use Assimp 5.0
 - Some files can be empty, crash, or show artifacts
 - DXF support is very limited: only files with polylines and 3D faces are displayed.
+
+## Alembic
+ABC file formats rely on [Alembic](https://github.com/alembic/alembic) library. It comes with some known limitations:
+- Supports Alembic 1.7 or later
+- Supports only simple polygonal geometry
+- Does not support ArbGeomParam feature in Alembic
+- Does not support Subdivision Meshes
+- Does not support Materials
 
 # Troubleshooting
 

@@ -192,6 +192,16 @@ if(F3D_MODULE_ASSIMP)
   )
 endif()
 
+if(F3D_MODULE_ALEMBIC)
+  declare_f3d_reader(
+    NAME Alembic
+    EXTENSIONS abc
+    MIMETYPES application/vnd.abc
+    VTK_IMPORTER vtkF3DAlembicImporter
+    DESCRIPTION "Alembic files reader"
+  )
+endif()
+
 if(F3D_MODULE_EXODUS)
   declare_f3d_reader(
     NAME ExodusII

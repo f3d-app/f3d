@@ -55,6 +55,7 @@ option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 option(F3D_MODULE_EXODUS "ExodusII module" ON)
 option(F3D_MODULE_OCCT "OpenCASCADE module (STEP and IGES files)" OFF)
 option(F3D_MODULE_ASSIMP "Assimp module (FBX, OFF, DAE anf DXF files)" OFF)
+option(F3D_MODULE_ALEMBIC "Alembic module (ABC files)" OFF)
 
 set(F3D_VTK_MODULES
   VTK::CommonSystem
@@ -128,6 +129,14 @@ if(F3D_MODULE_ASSIMP)
     if("${F3D_ASSIMP_VERSION}" VERSION_LESS "5.1.0")
       message(WARNING "Module: assimp: Embedded texture are only working with assimp 5.1.X and newer.")
     endif()
+  endif()
+endif()
+
+if(F3D_MODULE_ALEMBIC)
+  find_package(Alembic 1.7 REQUIRED)
+  if(Alembic_FOUND)
+    set(F3D_ALEMBIC_VERSION "${Alembic_VERSION}")
+    message(STATUS "Module: alembic ${Alembic_VERSION} found")
   endif()
 endif()
 
