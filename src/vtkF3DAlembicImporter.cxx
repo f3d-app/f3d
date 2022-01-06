@@ -124,7 +124,7 @@ public:
 						const Alembic::Abc::IObject &parent,
 						const Alembic::Abc::ObjectHeader &ohead)
 	{
-		//set this if we should continue traversing
+		// Set this if we should continue traversing
 		Alembic::Abc::IObject nextParentObject;
 
 		if ( Alembic::AbcGeom::IXform::matches( ohead ) )
