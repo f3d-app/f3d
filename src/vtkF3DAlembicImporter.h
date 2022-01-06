@@ -17,8 +17,9 @@
 #include <memory>
 #include <vtkImporter.h>
 #include <vtkVersion.h>
+#include <vtkNew.h>
 
-class vtkF3DAlembicImporterInternalEx;
+class vtkF3DAlembicImporterInternal;
 
 class vtkF3DAlembicImporter : public vtkImporter
 {
@@ -112,7 +113,7 @@ private:
   vtkF3DAlembicImporter(const vtkF3DAlembicImporter&) = delete;
   void operator=(const vtkF3DAlembicImporter&) = delete;
 
-  std::shared_ptr<vtkF3DAlembicImporterInternalEx> InternalsEx;
+  vtkNew<vtkF3DAlembicImporterInternal> Internals;
 };
 
 #endif

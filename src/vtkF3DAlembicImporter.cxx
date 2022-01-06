@@ -25,7 +25,7 @@
 #include <vtkTransform.h>
 #include <vtkUniforms.h>
 #include <vtkUnsignedShortArray.h>
-
+#
 #include <vtksys/SystemTools.hxx>
 
 #if defined(_MSC_VER)
@@ -41,16 +41,14 @@
 #pragma warning(pop)
 #endif
 
-vtkStandardNewMacro(vtkF3DAlembicImporter);
-
-class vtkF3DAlembicImporterInternalEx
+class vtkF3DAlembicImporterInternal : public vtkObjectBase
 {
   typedef std::map<Alembic::AbcGeom::PlainOldDataType, std::string> PODStringMap;
   typedef std::map<Alembic::AbcGeom::PropertyType, std::string> PropertyTypeStringMap;
-
+protected:
+  vtkF3DAlembicImporterInternal() {}
 public:
-  vtkF3DAlembicImporterInternalEx(vtkF3DAlembicImporter* parent) { this->Parent = parent; }
-
+  static vtkF3DAlembicImporterInternal* New();
   void CreatePODStringMap(PODStringMap& podStringMap)
   {
     podStringMap[Alembic::AbcGeom::kBooleanPOD] = "kBooleanPOD";
@@ -174,14 +172,16 @@ public:
 
     Archive = factory.getArchive(filePath, core_type);
   }
-  vtkF3DAlembicImporter* Parent;
   Alembic::Abc::IArchive Archive;
 };
+
+vtkStandardNewMacro(vtkF3DAlembicImporterInternal);
+
+vtkStandardNewMacro(vtkF3DAlembicImporter);
 
 //----------------------------------------------------------------------------
 vtkF3DAlembicImporter::vtkF3DAlembicImporter()
 {
-  this->InternalsEx.reset(new vtkF3DAlembicImporterInternalEx(this));
 }
 
 //----------------------------------------------------------------------------
@@ -190,7 +190,7 @@ vtkF3DAlembicImporter::~vtkF3DAlembicImporter() {}
 //----------------------------------------------------------------------------
 int vtkF3DAlembicImporter::ImportBegin()
 {
-  this->InternalsEx->ReadScene(this->FileName);
+  this->Internals->ReadScene(this->FileName);
 
   return 1;
 }
@@ -198,7 +198,7 @@ int vtkF3DAlembicImporter::ImportBegin()
 //----------------------------------------------------------------------------
 void vtkF3DAlembicImporter::ImportActors(vtkRenderer* renderer)
 {
-  this->InternalsEx->ImportRoot(renderer);
+  this->Internals->ImportRoot(renderer);
 }
 
 //----------------------------------------------------------------------------
