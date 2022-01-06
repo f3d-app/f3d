@@ -39,10 +39,7 @@ public:
   /**
    * Get the filename
    */
-  const char* GetFileName()
-  {
-    return this->FileName.c_str();
-  }
+  const char* GetFileName() { return this->FileName.c_str(); }
 
   /**
    * Set the filename
