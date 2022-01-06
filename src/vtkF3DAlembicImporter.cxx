@@ -87,16 +87,16 @@ public:
 		{
 			pmesh.getSchema().get( samp );
 
-			Alembic::AbcGeom::P3fArraySamplePtr P = samp.getPositions();
+			Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
 			Alembic::AbcGeom::Int32ArraySamplePtr indices = samp.getFaceIndices();
 			Alembic::AbcGeom::Int32ArraySamplePtr counts = samp.getFaceCounts();
 
-			size_t P_size = P->size();
+			size_t P_size = positions->size();
 			size_t counts_size = counts->size();
 
 			for (size_t i=0;i<P_size;i++)
 			{
-				points->InsertNextPoint(P->get()[i].x, P->get()[i].y, P->get()[i].z);
+				points->InsertNextPoint(positions->get()[i].x, positions->get()[i].y, positions->get()[i].z);
 			}
 
 			size_t face_index = 0;
