@@ -46,7 +46,7 @@ class vtkF3DAlembicImporterInternal : public vtkObjectBase
   typedef std::map<Alembic::AbcGeom::PlainOldDataType, std::string> PODStringMap;
   typedef std::map<Alembic::AbcGeom::PropertyType, std::string> PropertyTypeStringMap;
 protected:
-  vtkF3DAlembicImporterInternal() {}
+  vtkF3DAlembicImporterInternal() = default;
 public:
   static vtkF3DAlembicImporterInternal* New();
   void CreatePODStringMap(PODStringMap& podStringMap)
