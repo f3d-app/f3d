@@ -43,7 +43,6 @@
 
 vtkStandardNewMacro(vtkF3DAlembicImporter);
 
-
 class vtkF3DAlembicImporterInternalEx
 {
 	typedef std::map<Alembic::AbcGeom::PlainOldDataType,std::string> PODStringMap;
