@@ -1,3 +1,8 @@
+set(EXEC_PLATFORM_SPECIFIC_FILES "")
+if(WIN32)
+  set(EXEC_PLATFORM_SPECIFIC_FILES "${CMAKE_SOURCE_DIR}/resources/f3d.rc")
+endif()
+
 # Define f3d target
 add_executable(f3d main.cxx ${EXEC_PLATFORM_SPECIFIC_FILES})
 target_link_libraries(f3d PUBLIC libf3d)
