@@ -17,6 +17,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
 
+option(F3D_INSTALL_SDK "Install F3D library SDK" OFF)
+
 # VTK dependency
 find_package(VTK 9.0 REQUIRED
   COMPONENTS
@@ -43,12 +45,6 @@ find_package(VTK 9.0 REQUIRED
   OPTIONAL_COMPONENTS
     IOExodus
     RenderingRayTracing)
-
-if(${VTK_VERSION} VERSION_LESS 9.0)
-  message(FATAL_ERROR "VTK >= 9.0 is REQUIRED")
-endif()
-
-option(BUILD_SHARED_LIBS "Build f3d with shared libraries" ON)
 
 # Modules
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
@@ -144,9 +140,7 @@ option(F3D_GENERATE_MAN "Generate and install a man entry for f3d using help2man
 mark_as_advanced(F3D_GENERATE_MAN)
 
 # Windows Shell Extension DLL
-if(WIN32)
-  option(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION "Build the Windows Shell Extension to produce thumbnails" ON)
-endif()
+cmake_dependent_option(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION "Build the Windows Shell Extension to produce thumbnails" ON "WIN32" OFF)
 
 # Build f3d
 include(GNUInstallDirs)

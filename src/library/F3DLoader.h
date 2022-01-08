@@ -7,17 +7,12 @@
 #ifndef F3DLoader_h
 #define F3DLoader_h
 
-#include <vtkCommand.h>
-#include <vtkNew.h>
-#include <vtkSmartPointer.h>
+#include <memory>
+#include <string>
+#include <vector>
 
-#include "F3DAnimationManager.h"
-
-class vtkF3DRenderer;
+class F3DLoaderInternals;
 class vtkImageData;
-class vtkImporter;
-class F3DReaderInstantiator;
-struct F3DOptions;
 
 class F3DLoader
 {
@@ -27,13 +22,6 @@ public:
     LOAD_PREVIOUS = -1,
     LOAD_CURRENT = 0,
     LOAD_NEXT = 1
-  };
-
-  enum vtkCustomEvents
-  {
-    NewFilesEvent = vtkCommand::UserEvent + 100,
-    LoadFileEvent,
-    ToggleAnimationEvent
   };
 
   /**
@@ -67,22 +55,9 @@ public:
   F3DLoader();
   ~F3DLoader();
 
-protected:
-  static vtkSmartPointer<vtkImporter> GetImporter(
-    const F3DOptions& options, const std::string& fileName);
-
-  std::vector<std::string> FilesList;
-  int CurrentFileIndex = 0;
-  F3DOptionsParser Parser;
-  F3DOptions CommandLineOptions;
-  F3DOptions Options;
-  F3DAnimationManager AnimationManager;
-  vtkSmartPointer<vtkF3DRenderer> Renderer;
-  vtkSmartPointer<vtkImporter> Importer;
-  vtkSmartPointer<vtkRenderWindow> RenWin;
-  F3DReaderInstantiator* ReaderInstantiator;
-
 private:
+  std::unique_ptr<F3DLoaderInternals> Internals;
+
   F3DLoader(F3DLoader const&) = delete;
   void operator=(F3DLoader const&) = delete;
 };

@@ -2,10 +2,7 @@
 vtk_encode_string(
   INPUT "${CMAKE_SOURCE_DIR}/resources/logo32.png"
   NAME F3DIcon
-  HEADER_OUTPUT F3D_ICON_HEADER
-  SOURCE_OUTPUT F3D_ICON_SOURCE
-  BINARY
-  NUL_TERMINATE)
+  BINARY)
 
 # Define libf3d target
 set(LIB_PLATFORM_SPECIFIC_FILES "")
@@ -59,89 +56,80 @@ if(F3D_MODULE_ALEMBIC)
 endif()
 
 set(F3D_SOURCE_FILES
-  vtkF3DConsoleOutputWindow.cxx
-  vtkF3DGenericImporter.cxx
-  vtkF3DInteractorEventRecorder.cxx
-  vtkF3DInteractorStyle.cxx
-  vtkF3DMetaReader.cxx
-  vtkF3DObjectFactory.cxx
-  vtkF3DOpenGLGridMapper.cxx
-  vtkF3DPolyDataMapper.cxx
-  vtkF3DPostProcessFilter.cxx
-  vtkF3DRenderPass.cxx
-  vtkF3DRenderer.cxx
-  vtkF3DRendererWithColoring.cxx
-  F3DAnimationManager.cxx
-  F3DLoader.cxx
-  F3DLog.cxx
-  F3DOffscreenRender.cxx
-  F3DOptions.cxx
-  readers/F3DReader.cxx
-  readers/F3DReaderFactory.cxx
-  ${F3D_ICON_SOURCE}
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DConsoleOutputWindow.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DGenericImporter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DInteractorEventRecorder.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DInteractorStyle.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DMetaReader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DObjectFactory.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DOpenGLGridMapper.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DPolyDataMapper.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DPostProcessFilter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DRenderPass.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DRenderer.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DRendererWithColoring.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DAnimationManager.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DLoader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DLog.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DOffscreenRender.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptions.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/readers/F3DReader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/readers/F3DReaderFactory.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/Config.cxx
   ${MODULES_SPECIFIC_SOURCE_FILES}
-  )
-
-set(F3D_HEADER_FILES
-  vtkF3DConsoleOutputWindow.h
-  vtkF3DGenericImporter.h
-  vtkF3DInteractorEventRecorder.h
-  vtkF3DInteractorStyle.h
-  vtkF3DMetaReader.h
-  vtkF3DObjectFactory.h
-  vtkF3DOpenGLGridMapper.h
-  vtkF3DPolyDataMapper.h
-  vtkF3DPostProcessFilter.h
-  vtkF3DRenderPass.h
-  vtkF3DRenderer.h
-  vtkF3DRendererWithColoring.h
-  F3DAnimationManager.h
-  F3DLoader.h
-  F3DLog.h
-  readers/F3DReader.h
-  readers/F3DReaderFactory.h
-  ${F3D_ICON_HEADER}
-  ${CMAKE_CURRENT_BINARY_DIR}/readers/F3DReaderInstantiator.h
-  )
-
-# Force static library when creating a macOS bundle
-set(F3D_LIBRARY_TYPE "")
-if(F3D_MACOS_BUNDLE)
-  set(F3D_LIBRARY_TYPE "STATIC")
-endif()
-
-add_library(libf3d ${F3D_LIBRARY_TYPE}
-  ${F3D_SOURCE_FILES}
-  ${F3D_HEADER_FILES}
   ${LIB_PLATFORM_SPECIFIC_FILES}
   )
 
-target_include_directories(libf3d PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/readers
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}/readers
-  ${MODULES_SPECIFIC_INCLUDE_DIRS}
+# List of headers that will be installed
+set(F3D_PUBLIC_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DLoader.h
+  )
+
+add_library(libf3d
+  ${F3D_SOURCE_FILES}
+  )
+
+target_include_directories(libf3d
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/readers>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/readers>
+  $<BUILD_INTERFACE:${MODULES_SPECIFIC_INCLUDE_DIRS}>
   )
 
 set_target_properties(libf3d PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
   WINDOWS_EXPORT_ALL_SYMBOLS ON
-  PREFIX ""
+  OUTPUT_NAME "f3d"
   )
+
+target_compile_features(libf3d PUBLIC cxx_std_11)
+
+if(F3D_INSTALL_SDK)
+  target_include_directories(libf3d
+    INTERFACE
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    )
+
+  set_target_properties(libf3d PROPERTIES
+    PUBLIC_HEADER "${F3D_PUBLIC_HEADERS}"
+    )
+endif()
 
 vtk_module_autoinit(TARGETS libf3d MODULES ${F3D_VTK_MODULES})
 
-target_link_libraries(libf3d PUBLIC ${F3D_VTK_MODULES} ${MODULES_SPECIFIC_LIBRARIES})
+target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES} ${MODULES_SPECIFIC_LIBRARIES})
 
 if(F3D_STRICT_BUILD)
   if(MSVC)
     # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
-    target_compile_options(libf3d PUBLIC /W4 /WX /wd4275)
+    target_compile_options(libf3d PRIVATE /W4 /WX /wd4275)
   else()
-    target_compile_options(libf3d PUBLIC -Wall -Wextra -Wshadow -Werror)
+    target_compile_options(libf3d PRIVATE -Wall -Wextra -Wshadow -Werror)
   endif()
 endif()
 
