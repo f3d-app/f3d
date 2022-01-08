@@ -6,6 +6,7 @@
 #ifndef vtkF3DInteractorStyle_h
 #define vtkF3DInteractorStyle_h
 
+#include <vtkCommand.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 
 class F3DAnimationManager;
@@ -16,6 +17,16 @@ class vtkF3DInteractorStyle : public vtkInteractorStyleTrackballCamera
 public:
   static vtkF3DInteractorStyle* New();
   vtkTypeMacro(vtkF3DInteractorStyle, vtkInteractorStyleTrackballCamera);
+
+  /**
+   * Custom events invoked by this class
+   */
+  enum vtkCustomEvents
+  {
+    NewFilesEvent = vtkCommand::UserEvent + 100,
+    LoadFileEvent,
+    ToggleAnimationEvent
+  };
 
   /**
    * Handle key presses

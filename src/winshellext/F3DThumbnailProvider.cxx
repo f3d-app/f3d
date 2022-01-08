@@ -3,10 +3,6 @@
 #include "F3DException.h"
 #include "F3DLoader.h"
 #include "F3DThumbnailConfig.h"
-#include "vtkF3DObjectFactory.h"
-
-#include <vtkImageData.h>
-#include <vtkNew.h>
 
 #include <clocale>
 #include <codecvt>

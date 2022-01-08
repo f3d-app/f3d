@@ -9,10 +9,6 @@ int main(int argc, char** argv)
 
   try
   {
-#if NDEBUG
-    vtkObject::GlobalWarningDisplayOff();
-#endif
-
     F3DLoader loader;
     res = loader.Start(argc, argv);
   }

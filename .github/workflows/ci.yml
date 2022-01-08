@@ -352,9 +352,9 @@ jobs:
         -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
         -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
-        ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+        ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_INSTALL_SDK=ON -DF3D_WINDOWS_GUI=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
         ${{ matrix.os == 'macos-latest' && '-DF3D_MACOS_BUNDLE=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
-        ${{ matrix.os == 'ubuntu-latest' && '-DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON -DF3D_INSTALL_MIME_TYPES_FILE=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
+        ${{ matrix.os == 'ubuntu-latest' && '-DF3D_INSTALL_SDK=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON -DF3D_INSTALL_MIME_TYPES_FILE=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
 
     - name: Build
       working-directory: ${{github.workspace}}/build
@@ -393,14 +393,21 @@ jobs:
       if: matrix.os == 'windows-latest'
       working-directory: ${{github.workspace}}/install
       run: |
-         cp ..\dependencies\mesa\x64\opengl32.dll .\bin\
-         cp ..\dependencies\mesa\x64\libglapi.dll .\bin\
-         .\bin\f3d.exe ..\source\testing\data\suzanne.obj --output=..\output.png
+        cp ..\dependencies\mesa\x64\opengl32.dll .\bin\
+        cp ..\dependencies\mesa\x64\libglapi.dll .\bin\
+        .\bin\f3d.exe ..\source\testing\data\suzanne.obj --output=..\output.png
 
     - name: Check Install macos
       if: matrix.os == 'macos-latest'
       working-directory: ${{github.workspace}}/install
       run: ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
+
+    - name: Check SDK
+      if: matrix.os != 'macos-latest'
+      working-directory: ${{github.workspace}}
+      run: |
+        cmake -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -B test_sdk source/.github/test_sdk 
+        cmake --build test_sdk
 
     - name: Setup NSIS
       if: matrix.os == 'windows-latest'
