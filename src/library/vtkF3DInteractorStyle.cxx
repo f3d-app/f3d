@@ -30,7 +30,7 @@ void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
 
   vtkRenderWindowInteractor* rwi = this->GetInteractor();
   vtkRenderWindow* renWin = rwi->GetRenderWindow();
-  this->InvokeEvent(F3DLoader::NewFilesEvent, files);
+  this->InvokeEvent(vtkF3DInteractorStyle::NewFilesEvent, files);
   renWin->Render();
 }
 
@@ -202,19 +202,19 @@ void vtkF3DInteractorStyle::OnKeyPress()
       if (keySym == "Left")
       {
         int load = F3DLoader::LOAD_PREVIOUS;
-        this->InvokeEvent(F3DLoader::LoadFileEvent, &load);
+        this->InvokeEvent(vtkF3DInteractorStyle::LoadFileEvent, &load);
         renWin->Render();
       }
       else if (keySym == "Right")
       {
         int load = F3DLoader::LOAD_NEXT;
-        this->InvokeEvent(F3DLoader::LoadFileEvent, &load);
+        this->InvokeEvent(vtkF3DInteractorStyle::LoadFileEvent, &load);
         renWin->Render();
       }
       else if (keySym == "Up")
       {
         int load = F3DLoader::LOAD_CURRENT;
-        this->InvokeEvent(F3DLoader::LoadFileEvent, &load);
+        this->InvokeEvent(vtkF3DInteractorStyle::LoadFileEvent, &load);
         renWin->Render();
       }
       else if (keySym == F3D::EXIT_HOTKEY_SYM)
@@ -229,7 +229,7 @@ void vtkF3DInteractorStyle::OnKeyPress()
       }
       else if (keySym == "Space")
       {
-        this->InvokeEvent(F3DLoader::ToggleAnimationEvent);
+        this->InvokeEvent(vtkF3DInteractorStyle::ToggleAnimationEvent);
         renWin->Render();
       }
       break;

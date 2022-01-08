@@ -1,15 +1,17 @@
 # F3D Installation
-
-# F3D
 install(TARGETS f3d
+  EXPORT f3dTargets
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   BUNDLE DESTINATION ".")
 
 get_target_property(LIBF3D_TYPE libf3d TYPE)
-if(LIBF3D_TYPE STREQUAL "SHARED_LIBRARY")
+if(LIBF3D_TYPE STREQUAL "SHARED_LIBRARY" OR F3D_INSTALL_SDK)
   install(TARGETS libf3d
+    EXPORT f3dTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 endif()
 
 # F3DShellExtension for Windows
@@ -126,4 +128,23 @@ elseif(APPLE AND NOT F3D_MACOS_BUNDLE)
     install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
       DESTINATION ".")
   endif()
+endif()
+
+# SDK
+if(F3D_INSTALL_SDK)
+  install(EXPORT f3dTargets
+    NAMESPACE f3d::
+    DESTINATION "lib/cmake/f3d")
+
+  include(CMakePackageConfigHelpers)
+  configure_package_config_file(
+    "cmake/f3dConfig.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake"
+    INSTALL_DESTINATION "lib/cmake/${PROJECT_NAME}")
+  write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
+    VERSION "${PROJECT_VERSION}.${f3d_VERSION_BUILD}"
+    COMPATIBILITY SameMinorVersion)
+  install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
+    DESTINATION "lib/cmake/${PROJECT_NAME}")
 endif()
