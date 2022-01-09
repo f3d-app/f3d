@@ -40,14 +40,27 @@ function(f3d_test)
 
   add_test(NAME "${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
 
+  set(_timeout "30")
   if(F3D_TEST_LONG_TIMEOUT OR F3D_TEST_INTERACTION)
-    set_tests_properties(${F3D_TEST_NAME} PROPERTIES TIMEOUT 120)
-    if(NOT F3D_ENABLE_LONG_TIMEOUT_TESTS)
-      set_tests_properties(${F3D_TEST_NAME} PROPERTIES DISABLED ON)
-    endif()
-  else()
-    set_tests_properties(${F3D_TEST_NAME} PROPERTIES TIMEOUT 30)
+    set(_timeout "120")
   endif()
+
+  # sanitizer multipliers (multipliers are coming from ASan documentation)
+  # "undefined" and "leak" have no overhead
+  if(F3D_SANITIZER STREQUAL "address")
+    math(EXPR _timeout "2 * ${_timeout}")
+  endif()
+  if(F3D_SANITIZER STREQUAL "thread")
+    math(EXPR _timeout "15 * ${_timeout}")
+  endif()
+  if(F3D_SANITIZER STREQUAL "memory")
+    math(EXPR _timeout "3 * ${_timeout}")
+  endif()
+
+  if(NOT F3D_ENABLE_LONG_TIMEOUT_TESTS)
+    set_tests_properties(${F3D_TEST_NAME} PROPERTIES DISABLED ON)
+  endif()
+  set_tests_properties(${F3D_TEST_NAME} PROPERTIES TIMEOUT ${_timeout})
 
   if(F3D_TEST_WILL_FAIL)
     set_tests_properties(${F3D_TEST_NAME} PROPERTIES WILL_FAIL TRUE)
