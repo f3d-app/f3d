@@ -6,7 +6,7 @@ project(f3d
   DESCRIPTION "F3D - A fast and minimalist 3D viewer"
   LANGUAGES C CXX)
 
-string(TIMESTAMP F3D_BUILD_DATE "%Y-%m-%d %H:%M:%S")
+string(TIMESTAMP F3D_BUILD_DATE "%Y-%m-%d %H:%M:%S" UTC)
 
 # CMake variables
 option(BUILD_TESTING "Build the tests" OFF)
