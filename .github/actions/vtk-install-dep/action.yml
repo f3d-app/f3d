@@ -14,19 +14,6 @@ runs:
   using: "composite"
   steps:
 
-    - name: ls
-      if: inputs.os != 'windows-latest'
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: |
-        ls source/
-        ls source/.github/
-        ls source/.github/actions/
-        ls source/.github/actions/vtk-install-dep/
-        ls source/.github/actions/vtk-install-dep/vtk_commit_sha
-        cat source/.github/actions/vtk-install-dep/vtk_commit_sha
-        cat $(pwd)/source/.github/actions/vtk-install-dep/vtk_commit_sha
-
     - name: Recover VTK Short SHA from file
       if: |
         steps.cache-vtk.outputs.cache-hit != 'true' &&
