@@ -13,7 +13,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: dependencies/occt_install
-        key: occt-V7_6_0-1-${{inputs.os}}
+        key: occt-V7_6_0-2-${{inputs.os}}
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'

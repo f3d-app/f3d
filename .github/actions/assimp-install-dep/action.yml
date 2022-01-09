@@ -13,7 +13,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: dependencies/assimp_install
-        key: assimp-v5.1.1-1-${{inputs.os}}
+        key: assimp-v5.1.1-2-${{inputs.os}}
 
     - name: Checkout ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
