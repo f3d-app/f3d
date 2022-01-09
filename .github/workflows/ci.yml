@@ -58,7 +58,7 @@ jobs:
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_version: ${{matrix.vtk_version}}
-        vtk_sha_file: ${{github.workspace}}/source/.github/actions/vtk-install-dep/vtk_commit_sha
+        vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
         os: ${{matrix.os}}
 
     - name: Set LFS env var
