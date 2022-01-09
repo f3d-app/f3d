@@ -8,7 +8,7 @@ on:
       - master
 
 jobs:
-  ci:
+  build_and_test:
     if: github.event.pull_request.draft == false
 
     strategy:
