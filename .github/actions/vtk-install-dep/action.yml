@@ -17,7 +17,7 @@ runs:
     - name: Recover VTK Short SHA from file
       if: |
         steps.cache-vtk.outputs.cache-hit != 'true' &&
-        inputs.vtk_version == 'SHA'
+        inputs.vtk_version == 'commit'
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: echo "VTK_SHORT_SHA_OR_TAG=$(<${{ inputs.vtk_sha_file }})" >> $GITHUB_ENV
@@ -25,7 +25,7 @@ runs:
     - name: Copy VTK version to env var
       if: |
         steps.cache-vtk.outputs.cache-hit != 'true' &&
-        inputs.vtk_version != 'SHA'
+        inputs.vtk_version != 'commit'
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: echo "VTK_SHORT_SHA_OR_TAG=${{inputs.vtk_version}}" >> $GITHUB_ENV
