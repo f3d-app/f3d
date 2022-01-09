@@ -27,6 +27,13 @@ jobs:
       working-directory: ${{github.workspace}}
       run: mkdir dependencies
 
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: 'false'
+
     - name: Cache OCCT
       id: cache-occt
       uses: actions/cache@v2
@@ -216,13 +223,6 @@ jobs:
       with:
         vtk_version: ${{matrix.vtk_version}}
         os: ${{matrix.os}}
-
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: 'false'
 
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
