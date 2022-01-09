@@ -15,7 +15,7 @@ runs:
   steps:
 
     - name: ls
-      if: inputs.os == 'ubuntu-latest'
+      if: inputs.os != 'windows-latest'
       working-directory: ${{github.workspace}}
       shell: bash
       run: |
