@@ -28,7 +28,9 @@ runs:
         inputs.vtk_version != 'SHA'
       working-directory: ${{github.workspace}}/dependencies/bare
       shell: bash
-      run: echo "VTK_SHORT_SHA_OR_TAG=${{inputs.vtk_version}}" >> $GITHUB_ENV
+      run: echo "ENV_NAME=prod" >> $GITHUB_ENV
+
+#      echo "VTK_SHORT_SHA_OR_TAG=${{inputs.vtk_version}}" >> $GITHUB_ENV
 
     - name: Cache VTK
       id: cache-vtk
