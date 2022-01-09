@@ -90,6 +90,9 @@ jobs:
       working-directory: ${{github.workspace}}/source
       run: cmake --build . --parallel 2 --config Release
 
+    - name: Run Xvfb
+      run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
+
     - name: Test
       working-directory: ${{github.workspace}}/source
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed
