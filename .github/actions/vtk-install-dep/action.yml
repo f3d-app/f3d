@@ -15,11 +15,10 @@ runs:
   steps:
 
     - name: ls
+      if: inputs.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}
       shell: bash
       run: |
-        ls ${{ inputs.vtk_sha_file }}
-        cat ${{ inputs.vtk_sha_file }}
         ls source/
         ls source/.github/
         ls source/.github/actions/
