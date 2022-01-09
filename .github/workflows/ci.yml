@@ -12,6 +12,7 @@ jobs:
     if: github.event.pull_request.draft == false
 
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         vtk_version: [commit, v9.1.0, v9.0.0]
