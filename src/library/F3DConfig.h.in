@@ -1,5 +1,5 @@
-#ifndef Config_h
-#define Config_h
+#ifndef F3DConfig_h
+#define F3DConfig_h
 
 #include <string>
 
@@ -12,6 +12,8 @@ namespace f3d
   extern const std::string AppBuildDate;
   extern const std::string AppCompiler;
   extern const std::string F3DReservedString;
+
+  static const std::string EXIT_HOTKEY_SYM = "Escape";
 }
 
 #cmakedefine01 F3D_MODULE_RAYTRACING

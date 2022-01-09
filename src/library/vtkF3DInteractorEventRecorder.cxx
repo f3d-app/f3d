@@ -1,4 +1,4 @@
-#include "F3DIncludes.h"
+#include "F3DConfig.h"
 #include "vtkF3DInteractorEventRecorder.h"
 
 #include <vtkCallbackCommand.h>
@@ -48,7 +48,7 @@ void vtkF3DInteractorEventRecorder::ProcessEvents(
         break;
 
       default:
-        if (rwi->GetKeySym() && rwi->GetKeySym() == std::string(F3D::EXIT_HOTKEY_SYM))
+        if (rwi->GetKeySym() && rwi->GetKeySym() == std::string(f3d::EXIT_HOTKEY_SYM))
         {
           self->Off();
         }
