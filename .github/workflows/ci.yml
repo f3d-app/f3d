@@ -453,7 +453,7 @@ jobs:
     - name: Test Coverage
       if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}/source
-      run: ctest -C Release -j 2 --output-on-failure
+      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed
 
     - name: Generate XML Coverage
       if: matrix.os == 'ubuntu-latest'
