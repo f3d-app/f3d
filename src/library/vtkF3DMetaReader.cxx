@@ -1,6 +1,5 @@
 #include "vtkF3DMetaReader.h"
 
-#include "Config.h"
 #include "F3DReaderFactory.h"
 
 #include <vtkDemandDrivenPipeline.h>

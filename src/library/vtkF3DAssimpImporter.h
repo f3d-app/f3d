@@ -15,7 +15,7 @@
 #include <vtkImporter.h>
 #include <vtkVersion.h>
 
-class vtkF3DAssimpImporterInternal;
+#include <memory>
 
 class vtkF3DAssimpImporter : public vtkImporter
 {
@@ -122,7 +122,8 @@ private:
   vtkF3DAssimpImporter(const vtkF3DAssimpImporter&) = delete;
   void operator=(const vtkF3DAssimpImporter&) = delete;
 
-  vtkF3DAssimpImporterInternal* Internals = nullptr;
+  class vtkInternals;
+  std::unique_ptr<vtkInternals> Internals;
 };
 
 #endif

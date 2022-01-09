@@ -6,8 +6,6 @@
 #ifndef vtkF3DGenericImporter_h
 #define vtkF3DGenericImporter_h
 
-#include "Config.h"
-
 #include "vtkF3DMetaReader.h"
 #include "vtkF3DPostProcessFilter.h"
 

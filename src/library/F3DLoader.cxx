@@ -16,7 +16,6 @@
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
 #include <vtkDoubleArray.h>
-#include <vtkImageData.h>
 #include <vtkLogger.h>
 #include <vtkNew.h>
 #include <vtkPNGReader.h>
@@ -74,7 +73,7 @@ typedef struct ProgressDataStruct
   vtkProgressBarWidget* widget;
 } ProgressDataStruct;
 
-class F3DLoaderInternals
+class F3DLoader::F3DInternals
 {
 public:
   std::vector<std::string> FilesList;
@@ -91,7 +90,7 @@ public:
 
 
 //----------------------------------------------------------------------------
-F3DLoader::F3DLoader() : Internals(new F3DLoaderInternals)
+F3DLoader::F3DLoader() : Internals(new F3DLoader::F3DInternals)
 {
 #if NDEBUG
     vtkObject::GlobalWarningDisplayOff();
@@ -117,7 +116,7 @@ F3DLoader::F3DLoader() : Internals(new F3DLoaderInternals)
 F3DLoader::~F3DLoader() = default;
 
 //----------------------------------------------------------------------------
-int F3DLoader::Start(int argc, char** argv, vtkImageData* image)
+int F3DLoader::Start(int argc, char** argv)
 {
   std::vector<std::string> files;
 
@@ -177,8 +176,7 @@ int F3DLoader::Start(int argc, char** argv, vtkImageData* image)
     style->AddObserver(vtkF3DInteractorStyle::ToggleAnimationEvent, toggleAnimationCallback);
 
     // Offscreen rendering must be set before initializing interactor
-    if (!this->Internals->CommandLineOptions.Reference.empty() || !this->Internals->CommandLineOptions.Output.empty() ||
-      image)
+    if (!this->Internals->CommandLineOptions.Reference.empty() || !this->Internals->CommandLineOptions.Output.empty())
     {
       this->Internals->RenWin->OffScreenRenderingOn();
     }
@@ -271,12 +269,6 @@ int F3DLoader::Start(int argc, char** argv, vtkImageData* image)
           ? EXIT_SUCCESS
           : EXIT_FAILURE;
       }
-    }
-    else if (image)
-    {
-      retVal = F3DOffscreenRender::RenderToImage(this->Internals->RenWin, image, this->Internals->Options.NoBackground)
-        ? EXIT_SUCCESS
-        : EXIT_FAILURE;
     }
     else
     {

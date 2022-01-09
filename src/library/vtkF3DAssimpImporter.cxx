@@ -35,11 +35,14 @@
 
 vtkStandardNewMacro(vtkF3DAssimpImporter);
 
-class vtkF3DAssimpImporterInternal
+class vtkF3DAssimpImporter::vtkInternals
 {
 public:
   //----------------------------------------------------------------------------
-  vtkF3DAssimpImporterInternal(vtkF3DAssimpImporter* parent) { this->Parent = parent; }
+  vtkInternals(vtkF3DAssimpImporter* parent)
+    : Parent(parent)
+  {
+  }
 
   //----------------------------------------------------------------------------
   /**
@@ -159,7 +162,7 @@ public:
         if (!vtksys::SystemTools::FileExists(texturePath))
         {
           std::string fileName = vtksys::SystemTools::GetFilenameName(path);
-          texturePath = vtksys::SystemTools::CollapseFullPath(fileName, dir); 
+          texturePath = vtksys::SystemTools::CollapseFullPath(fileName, dir);
         }
 
         if (vtksys::SystemTools::FileExists(texturePath))
@@ -818,15 +821,12 @@ public:
 
 //----------------------------------------------------------------------------
 vtkF3DAssimpImporter::vtkF3DAssimpImporter()
+  : Internals(new vtkF3DAssimpImporter::vtkInternals(this))
 {
-  this->Internals = new vtkF3DAssimpImporterInternal(this);
 }
 
 //----------------------------------------------------------------------------
-vtkF3DAssimpImporter::~vtkF3DAssimpImporter()
-{
-  delete this->Internals;
-}
+vtkF3DAssimpImporter::~vtkF3DAssimpImporter() = default;
 
 //----------------------------------------------------------------------------
 int vtkF3DAssimpImporter::ImportBegin()
