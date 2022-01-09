@@ -4,6 +4,9 @@ inputs:
   vtk_version:
     description: 'VTK version'
     required: true
+  vtk_sha_file:
+    description: 'VTK SHA file'
+    required: true
   os:
     description: 'OS to build on'
     required: true
@@ -27,8 +30,18 @@ runs:
         mkdir vtk_install
         git clone --bare https://github.com/Kitware/VTK.git bare
 
-    - name: Set VTK env var
-      if: steps.cache-vtk.outputs.cache-hit != 'true'
+    - name: Recover VTK SHA from file
+      if: |
+        steps.cache-vtk.outputs.cache-hit != 'true'
+        inputs.vtk_version == 'SHA'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: echo "VTK_SHA=$(<${{ inputs.vtk_sha_file }})" >> $GITHUB_ENV
+
+    - name: Recover VTK SHA from bare repo
+      if: |
+        steps.cache-vtk.outputs.cache-hit != 'true'
+        inputs.vtk_version != 'SHA'
       working-directory: ${{github.workspace}}/dependencies/bare
       shell: bash
       run: echo "VTK_SHA=$(git rev-parse ${{inputs.vtk_version}})" >> $GITHUB_ENV

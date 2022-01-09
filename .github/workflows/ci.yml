@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        vtk_version: [e6e10357dc, v9.1.0, v9.0.0]
+        vtk_version: [SHA, v9.1.0, v9.0.0]
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -58,6 +58,7 @@ jobs:
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_version: ${{matrix.vtk_version}}
+        vtk_sha_file: ${{github.workspace}}/source/.github/actions/vtk-install-dep/vtk_sha
         os: ${{matrix.os}}
 
     - name: Set LFS env var
