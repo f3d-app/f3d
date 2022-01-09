@@ -7,7 +7,7 @@
 #ifndef vtkF3DOptions_h
 #define vtkF3DOptions_h
 
-#include "Config.h"
+#include "F3DConfig.h"
 
 #include <memory>
 #include <vector>
