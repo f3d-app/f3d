@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef vtkF3DOptions_h
-#define vtkF3DOptions_h
+#ifndef F3DOptions_h
+#define F3DOptions_h
 
 #include "F3DConfig.h"
 
