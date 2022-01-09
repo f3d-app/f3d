@@ -219,7 +219,7 @@ jobs:
       run: cmake --build . --parallel 2 --target install --config Release
 
     - name: Install VTK dependency
-      uses: ./.github/actions/vtk-install-dep
+      uses: ${{github.workspace}}/source/.github/actions/vtk-install-dep
       with:
         vtk_version: ${{matrix.vtk_version}}
         os: ${{matrix.os}}
