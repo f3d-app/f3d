@@ -68,7 +68,7 @@ jobs:
 
     # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     # coverage build is done in source as it seems to be required for codecov
-    - name: Configure Coverage
+    - name: Configure
       working-directory: ${{github.workspace}}/source
       run: >
         cmake ./
@@ -86,11 +86,11 @@ jobs:
         -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
         -DF3D_COVERAGE=ON
 
-    - name: Build Coverage
+    - name: Build
       working-directory: ${{github.workspace}}/source
       run: cmake --build . --parallel 2 --config Release
 
-    - name: Test Coverage
+    - name: Test
       working-directory: ${{github.workspace}}/source
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed
 
