@@ -35,7 +35,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: dependencies/vtk_install
-        key: vtk-${{inputs.vtk_version}}-2-${{inputs.os}}
+        key: vtk-${{env.VTK_SHORT_SHA_OR_TAG}}-2-${{inputs.os}}
 
     - name: Setup VTK and clone bare
       if: steps.cache-vtk.outputs.cache-hit != 'true'
