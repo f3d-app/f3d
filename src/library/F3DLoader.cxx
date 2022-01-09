@@ -73,7 +73,7 @@ typedef struct ProgressDataStruct
   vtkProgressBarWidget* widget;
 } ProgressDataStruct;
 
-class F3DLoaderInternals
+class F3DLoader::F3DInternals
 {
 public:
   std::vector<std::string> FilesList;
@@ -90,7 +90,7 @@ public:
 
 
 //----------------------------------------------------------------------------
-F3DLoader::F3DLoader() : Internals(new F3DLoaderInternals)
+F3DLoader::F3DLoader() : Internals(new F3DLoader::F3DInternals)
 {
 #if NDEBUG
     vtkObject::GlobalWarningDisplayOff();

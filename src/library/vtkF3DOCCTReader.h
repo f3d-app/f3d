@@ -8,7 +8,7 @@
  * The quality of the generated mesh is configured using RelativeDeflection, LinearDeflection,
  * and LinearDeflection.
  * Reading 1D cells (wires) is optional.
- * 
+ *
  */
 
 #ifndef vtkF3DOCCTReader_h
@@ -17,8 +17,9 @@
 #include <vtkMultiBlockDataSetAlgorithm.h>
 #include <vtkVersion.h>
 
+#include <memory>
+
 class vtkInformationDoubleVectorKey;
-class vtkF3DOCCTReaderInternal;
 
 class vtkF3DOCCTReader : public vtkMultiBlockDataSetAlgorithm
 {
@@ -120,7 +121,9 @@ private:
   vtkF3DOCCTReader(const vtkF3DOCCTReader&) = delete;
   void operator=(const vtkF3DOCCTReader&) = delete;
 
-  vtkF3DOCCTReaderInternal* Internals;
+  class vtkInternals;
+  std::unique_ptr<vtkInternals> Internals;
+
   std::string FileName;
 
   double LinearDeflection = 0.1;
