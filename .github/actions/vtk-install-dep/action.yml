@@ -14,11 +14,25 @@ runs:
   using: "composite"
   steps:
 
+    - name: ls
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: |
+        ls ${{ inputs.vtk_sha_file }}
+        cat ${{ inputs.vtk_sha_file }}
+        ls source/
+        ls source/.github/
+        ls source/.github/actions/
+        ls source/.github/actions/vtk-install-dep/
+        ls source/.github/actions/vtk-install-dep/vtk_commit_sha
+        cat source/.github/actions/vtk-install-dep/vtk_commit_sha
+        cat $(pwd)/source/.github/actions/vtk-install-dep/vtk_commit_sha
+
     - name: Recover VTK Short SHA from file
       if: |
         steps.cache-vtk.outputs.cache-hit != 'true' &&
         inputs.vtk_version == 'commit'
-      working-directory: ${{github.workspace}}/dependencies
+      working-directory: ${{github.workspace}}
       shell: bash
       run: echo "VTK_SHORT_SHA_OR_TAG=$(<${{ inputs.vtk_sha_file }})" >> $GITHUB_ENV
 
@@ -26,7 +40,7 @@ runs:
       if: |
         steps.cache-vtk.outputs.cache-hit != 'true' &&
         inputs.vtk_version != 'commit'
-      working-directory: ${{github.workspace}}/dependencies
+      working-directory: ${{github.workspace}}
       shell: bash
       run: echo "VTK_SHORT_SHA_OR_TAG=${{inputs.vtk_version}}" >> $GITHUB_ENV
 
