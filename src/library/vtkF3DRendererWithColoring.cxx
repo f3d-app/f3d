@@ -1,6 +1,7 @@
 #include "vtkF3DRendererWithColoring.h"
 
 #include "F3DLog.h"
+#include "f3d_options.h"
 
 #include <vtkColorTransferFunction.h>
 #include <vtkDataSetAttributes.h>
@@ -13,7 +14,7 @@
 vtkStandardNewMacro(vtkF3DRendererWithColoring);
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::Initialize(const F3DOptions& options, const std::string& fileInfo)
+void vtkF3DRendererWithColoring::Initialize(const f3d::options& options, const std::string& fileInfo)
 {
   this->Superclass::Initialize(options, fileInfo);
 
@@ -25,10 +26,13 @@ void vtkF3DRendererWithColoring::Initialize(const F3DOptions& options, const std
   this->SetPointGaussianMapper(nullptr);
   this->SetVolumeMapper(nullptr);
 
-  this->UsePointSprites = this->Options.PointSprites;
-  this->UseVolume = this->Options.Volume;
-  this->UseInverseOpacityFunction = this->Options.InverseOpacityFunction;
-  this->ScalarBarVisible = this->Options.Bar;
+  options.get("point-sprites", this->UsePointSprites);
+  options.get("volume", this->UseVolume);
+  options.get("inverse", this->UseInverseOpacityFunction);
+  options.get("bar", this->ScalarBarVisible);
+  
+  options.get("range", this->SpecifiedRange);
+  options.get("colormap", this->Colormap);
 
   this->PointDataForColoring = nullptr;
   this->CellDataForColoring = nullptr;
@@ -349,7 +353,7 @@ void vtkF3DRendererWithColoring::UpdateInternalActors()
     this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
   }
 
-  if (this->Options.Verbose)
+  if (this->Verbose)
   {
     this->PrintColoringInfo();
   }
@@ -582,14 +586,14 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(vtkDataArray* a
   }
 
   // Get range
-  if (this->Options.Range.size() == 2)
+  if (this->SpecifiedRange.size() == 2)
   {
-    this->ColorRange[0] = this->Options.Range[0];
-    this->ColorRange[1] = this->Options.Range[1];
+    this->ColorRange[0] = this->SpecifiedRange[0];
+    this->ColorRange[1] = this->SpecifiedRange[1];
   }
   else
   {
-    if (this->Options.Range.size() > 0)
+    if (this->SpecifiedRange.size() > 0)
     {
       F3DLog::Print(F3DLog::Severity::Warning,
         "The range specified does not have exactly 2 values, using automatic range.");
@@ -599,16 +603,16 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(vtkDataArray* a
 
   // Create lookup table
   this->ColorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-  if (this->Options.LookupPoints.size() > 0)
+  if (this->Colormap.size() > 0)
   {
-    if (this->Options.LookupPoints.size() % 4 == 0)
+    if (this->Colormap.size() % 4 == 0)
     {
-      for (size_t i = 0; i < this->Options.LookupPoints.size(); i += 4)
+      for (size_t i = 0; i < this->Colormap.size(); i += 4)
       {
-        double val = this->Options.LookupPoints[i];
-        double r = this->Options.LookupPoints[i + 1];
-        double g = this->Options.LookupPoints[i + 2];
-        double b = this->Options.LookupPoints[i + 3];
+        double val = this->Colormap[i];
+        double r = this->Colormap[i + 1];
+        double g = this->Colormap[i + 2];
+        double b = this->Colormap[i + 3];
         this->ColorTransferFunction->AddRGBPoint(
           this->ColorRange[0] + val * (this->ColorRange[1] - this->ColorRange[0]), r, g, b);
       }

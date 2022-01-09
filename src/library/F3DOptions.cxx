@@ -16,6 +16,8 @@
 
 #include "cxxopts.hpp"
 
+#include "f3d_options.h"
+
 //----------------------------------------------------------------------------
 class ConfigurationOptions
 {
@@ -222,7 +224,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
 
     auto grp3 = cxxOptions.add_options("Window");
     this->DeclareOption(grp3, "bg-color", "", "Background color", options.BackgroundColor, true, true, "<R,G,B>");
-    this->DeclareOption(grp3, "resolution", "", "Window resolution", options.WindowSize, true, true, "<width,height>");
+    this->DeclareOption(grp3, "resolution", "", "Window resolution", options.Resolution, true, true, "<width,height>");
     this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.FPS);
     this->DeclareOption(grp3, "filename", "n", "Display filename", options.Filename);
     this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.MetaData);
@@ -235,7 +237,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.Cells);
     this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.Range, false, true, "<min,max>");
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.Bar);
-    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.LookupPoints,
+    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.Colormap,
       true, "<color_list>");
     this->DeclareOption(grp4, "volume", "v", "Show volume if the file is compatible", options.Volume);
     this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.InverseOpacityFunction);
@@ -716,4 +718,73 @@ F3DOptions F3DOptionsParser::GetOptionsFromCommandLine(std::vector<std::string>&
 {
   this->ConfigOptions->SetFilePathForConfigBlock("");
   return this->ConfigOptions->GetOptionsFromArgs(files);
+}
+
+//----------------------------------------------------------------------------
+void F3DOptionsParser::ConvertToNewAPI(const F3DOptions& oldOptions, f3d::options* newOptions)
+{
+  // TODO rework option names
+  newOptions->set("animation-index", oldOptions.AnimationIndex);
+  newOptions->set("axis", oldOptions.Axis);
+  newOptions->set("background-color", oldOptions.BackgroundColor);
+  newOptions->set("bar", oldOptions.Bar);
+  newOptions->set("blur-background", oldOptions.BlurBackground);
+  newOptions->set("camera-azimuth-angle", oldOptions.CameraAzimuthAngle);
+  newOptions->set("camera-elevation-angle", oldOptions.CameraElevationAngle);
+  newOptions->set("camera-focal-point", oldOptions.CameraFocalPoint);
+  newOptions->set("camera-index", oldOptions.CameraIndex);
+  newOptions->set("camera-position", oldOptions.CameraPosition);
+  newOptions->set("camera-view-angle", oldOptions.CameraViewAngle);
+  newOptions->set("camera-view-up", oldOptions.CameraViewUp);
+  newOptions->set("cells", oldOptions.Cells);
+  newOptions->set("color", oldOptions.SolidColor);
+  newOptions->set("colormap", oldOptions.Colormap);
+  newOptions->set("component", oldOptions.Component);
+  newOptions->set("config", oldOptions.UserConfigFile);
+  newOptions->set("denoise", oldOptions.Denoise);
+  newOptions->set("depth-peeling", oldOptions.DepthPeeling);
+  newOptions->set("dry-run", oldOptions.DryRun);
+  newOptions->set("edges", oldOptions.Edges);
+  newOptions->set("emissive-factor", oldOptions.EmissiveFactor);
+  newOptions->set("filename", oldOptions.Filename);
+  newOptions->set("font-file", oldOptions.FontFile);
+  newOptions->set("fps", oldOptions.FPS);
+  newOptions->set("fullscreen", oldOptions.FullScreen);
+  newOptions->set("fxaa", oldOptions.FXAA);
+  newOptions->set("geometry-only", oldOptions.GeometryOnly);
+  newOptions->set("grid", oldOptions.Grid);
+  newOptions->set("hdri", oldOptions.HDRIFile);
+  newOptions->set("interaction-test-play", oldOptions.InteractionTestPlayFile);
+  newOptions->set("interaction-test-record", oldOptions.InteractionTestRecordFile);
+  newOptions->set("inverse", oldOptions.InverseOpacityFunction);
+  newOptions->set("line-width", oldOptions.LineWidth);
+  newOptions->set("metadata", oldOptions.MetaData);
+  newOptions->set("metallic", oldOptions.Metallic);
+  newOptions->set("no-background", oldOptions.NoBackground);
+  newOptions->set("no-render", oldOptions.NoRender);
+  newOptions->set("normal-scale", oldOptions.NormalScale);
+  newOptions->set("opacity", oldOptions.Opacity);
+  newOptions->set("output", oldOptions.Output);
+  newOptions->set("point-size", oldOptions.PointSize);
+  newOptions->set("point-sprites", oldOptions.PointSprites);
+  newOptions->set("progress", oldOptions.Progress);
+  newOptions->set("quiet", oldOptions.Quiet);
+  newOptions->set("range", oldOptions.Range);
+  newOptions->set("raytracing", oldOptions.Raytracing);
+  newOptions->set("ref-threshold", oldOptions.RefThreshold);
+  newOptions->set("reference", oldOptions.Reference);
+  newOptions->set("resolution", oldOptions.Resolution);
+  newOptions->set("roughness", oldOptions.Roughness);
+  newOptions->set("samples", oldOptions.Samples);
+  newOptions->set("scalars", oldOptions.Scalars);
+  newOptions->set("ssao", oldOptions.SSAO);
+  newOptions->set("texture-base-color", oldOptions.BaseColorTex);
+  newOptions->set("texture-emissive", oldOptions.EmissiveTex);
+  newOptions->set("texture-material", oldOptions.ORMTex);
+  newOptions->set("texture-normal", oldOptions.NormalTex);
+  newOptions->set("tone-mapping", oldOptions.ToneMapping);
+  newOptions->set("trackball", oldOptions.Trackball);
+  newOptions->set("up", oldOptions.Up);
+  newOptions->set("verbose", oldOptions.Verbose);
+  newOptions->set("volume", oldOptions.Volume);
 }

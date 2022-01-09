@@ -1,7 +1,8 @@
 #include "vtkF3DGenericImporter.h"
 
+#include "F3DConfig.h"
 #include "F3DLog.h"
-#include "F3DOptions.h"
+#include "f3d_options.h"
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
@@ -142,15 +143,16 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       F3DLog::Severity::Error, "File '", this->Reader->GetFileName(), "' cannot be read.");
     return;
   }
-
-  bool print = (this->Options->Verbose || this->Options->NoRender);
+  
+  bool noRender = this->Options->get<bool>("no-render");
+  bool print = (this->Options->get<bool>("verbose") || noRender);
   if (print)
   {
     this->OutputDescription =
       vtkF3DGenericImporter::GetDataObjectDescription(this->Reader->GetOutput());
   }
 
-  if (this->Options->NoRender)
+  if (noRender)
   {
     return;
   }
@@ -171,13 +173,14 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   surface->GetBounds(bounds);
   vtkBoundingBox bbox(bounds);
 
-  double pointSize = 1.0;
+  double pointSize = this->Options->get<double>("point-size");
+  double gaussianPointSize = 1.0;
   if (bbox.IsValid())
   {
-    pointSize = this->Options->PointSize * bbox.GetDiagonalLength() * 0.001;
+    gaussianPointSize = pointSize * bbox.GetDiagonalLength() * 0.001;
   }
   this->PointGaussianMapper->SetInputConnection(this->PostPro->GetOutputPort(1));
-  this->PointGaussianMapper->SetScaleFactor(pointSize);
+  this->PointGaussianMapper->SetScaleFactor(gaussianPointSize);
   this->PointGaussianMapper->EmissiveOff();
   this->PointGaussianMapper->SetSplatShaderCode(
     "//VTK::Color::Impl\n"
@@ -195,11 +198,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     ? vtkDataSet::SafeDownCast(image)
     : vtkDataSet::SafeDownCast(surface);
 
-  std::string usedArray = this->Options->Scalars;
+  std::string usedArray = this->Options->get<std::string>("scalars");
   this->PointDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
   this->CellDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetCellData());
   vtkDataSetAttributes* dataForColoring =
-    this->Options->Cells ? this->CellDataForColoring : this->PointDataForColoring;
+     this->Options->get<bool>("cells") ? this->CellDataForColoring : this->PointDataForColoring;
 
   // Recover an array for coloring if we ever need it
   this->ArrayIndexForColoring = -1;
@@ -261,29 +264,28 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->GeometryActor->SetMapper(this->PolyDataMapper);
   this->GeometryActor->GetProperty()->SetInterpolationToPBR();
 
-  double col[3];
-  std::copy(this->Options->SolidColor.begin(), this->Options->SolidColor.end(), col);
-
-  this->GeometryActor->GetProperty()->SetColor(col);
-  this->GeometryActor->GetProperty()->SetOpacity(this->Options->Opacity);
-  this->GeometryActor->GetProperty()->SetRoughness(this->Options->Roughness);
-  this->GeometryActor->GetProperty()->SetMetallic(this->Options->Metallic);
-  this->GeometryActor->GetProperty()->SetPointSize(this->Options->PointSize);
-  this->GeometryActor->GetProperty()->SetLineWidth(this->Options->LineWidth);
+  std::vector<double> color = this->Options->get<std::vector<double>>("color");
+  double opacity = this->Options->get<double>("opacity");
+  this->GeometryActor->GetProperty()->SetColor(color.data());
+  this->GeometryActor->GetProperty()->SetOpacity(opacity);
+  this->GeometryActor->GetProperty()->SetRoughness(this->Options->get<double>("roughness"));
+  this->GeometryActor->GetProperty()->SetMetallic(this->Options->get<double>("metallic"));
+  this->GeometryActor->GetProperty()->SetLineWidth(this->Options->get<double>("line-width"));
+  this->GeometryActor->GetProperty()->SetPointSize(pointSize);
 
   this->PointSpritesActor->SetMapper(this->PointGaussianMapper);
-  this->PointSpritesActor->GetProperty()->SetColor(col);
-  this->PointSpritesActor->GetProperty()->SetOpacity(this->Options->Opacity);
+  this->PointSpritesActor->GetProperty()->SetColor(color.data());
+  this->PointSpritesActor->GetProperty()->SetOpacity(opacity);
 
   // Textures
   this->GeometryActor->GetProperty()->SetBaseColorTexture(
-    this->GetTexture(this->Options->BaseColorTex, true));
-  this->GeometryActor->GetProperty()->SetORMTexture(this->GetTexture(this->Options->ORMTex));
+    this->GetTexture(this->Options->get<std::string>("texture-base-color"), true));
+  this->GeometryActor->GetProperty()->SetORMTexture(this->GetTexture(this->Options->get<std::string>("texture-material")));
   this->GeometryActor->GetProperty()->SetEmissiveTexture(
-    this->GetTexture(this->Options->EmissiveTex, true));
-  this->GeometryActor->GetProperty()->SetEmissiveFactor(this->Options->EmissiveFactor.data());
-  this->GeometryActor->GetProperty()->SetNormalTexture(this->GetTexture(this->Options->NormalTex));
-  this->GeometryActor->GetProperty()->SetNormalScale(this->Options->NormalScale);
+    this->GetTexture(this->Options->get<std::string>("texture-emissive"), true));
+  this->GeometryActor->GetProperty()->SetEmissiveFactor(this->Options->get<std::vector<double>>("emissive-factor").data());
+  this->GeometryActor->GetProperty()->SetNormalTexture(this->GetTexture(this->Options->get<std::string>("texture-normal")));
+  this->GeometryActor->GetProperty()->SetNormalScale(this->Options->get<double>("normal-scale"));
 
   // add props
   ren->AddActor2D(this->ScalarBarActor);
@@ -356,7 +358,7 @@ void vtkF3DGenericImporter::SetFileName(const char* arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::SetOptions(const F3DOptions& options)
+void vtkF3DGenericImporter::SetOptions(const f3d::options& options)
 {
   this->Options = &options;
 }

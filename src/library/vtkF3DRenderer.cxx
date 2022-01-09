@@ -1,6 +1,8 @@
 #include "vtkF3DRenderer.h"
 
+#include "F3DConfig.h"
 #include "F3DLog.h"
+#include "f3d_options.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
 
@@ -57,7 +59,7 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fileInfo)
+void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& fileInfo)
 {
   if (!this->RenderWindow)
   {
@@ -68,26 +70,27 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->RemoveAllViewProps();
   this->RemoveAllLights();
 
-  this->Options = options;
+  options.get("grid", this->GridVisible);
+  options.get("axis", this->AxisVisible);
+  options.get("edges", this->EdgesVisible);
+  options.get("fps", this->TimerVisible);
+  options.get("filename", this->FilenameVisible);
+  options.get("metadata", this->MetaDataVisible);
+  options.get("raytracing", this->UseRaytracing);
+  options.get("samples", this->RaytracingSamples);
+  options.get("denoise", this->UseRaytracingDenoiser);
+  options.get("depth-peeling", this->UseDepthPeeling);
+  options.get("ssao", this->UseSSAOPass);
+  options.get("fxaa", this->UseFXAAPass);
+  options.get("tone-mapping", this->UseToneMappingPass);
+  options.get("blur-background", this->UseBlurBackground);
+  options.get("trackball", this->UseTrackball);
+  options.get("hdri", this->HDRIFile);
+  options.get("verbose", this->Verbose);
 
-  this->GridVisible = this->Options.Grid;
-  this->AxisVisible = this->Options.Axis;
-  this->EdgesVisible = this->Options.Edges;
-  this->TimerVisible = this->Options.FPS;
-  this->FilenameVisible = this->Options.Filename;
-  this->MetaDataVisible = this->Options.MetaData;
-  this->UseRaytracing = this->Options.Raytracing;
-  this->UseRaytracingDenoiser = this->Options.Denoise;
-  this->UseDepthPeelingPass = this->Options.DepthPeeling;
-  this->UseSSAOPass = this->Options.SSAO;
-  this->UseFXAAPass = this->Options.FXAA;
-  this->UseToneMappingPass = this->Options.ToneMapping;
-  this->UseBlurBackground = this->Options.BlurBackground;
-  this->UseTrackball = this->Options.Trackball;
-
-  if (!this->Options.HDRIFile.empty() && !this->GetUseImageBasedLighting())
+  if (!this->HDRIFile.empty() && !this->GetUseImageBasedLighting())
   {
-    std::string fullPath = vtksys::SystemTools::CollapseFullPath(this->Options.HDRIFile);
+    std::string fullPath = vtksys::SystemTools::CollapseFullPath(this->HDRIFile);
 
     auto reader = vtkSmartPointer<vtkImageReader2>::Take(
       vtkImageReader2Factory::CreateImageReader2(fullPath.c_str()));
@@ -128,10 +131,11 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   }
 
   // parse up vector
-  if (this->Options.Up.size() == 2)
+  std::string up = options.get<std::string>("up");
+  if (up.size() == 2)
   {
-    char sign = this->Options.Up[0];
-    char axis = std::toupper(this->Options.Up[1]);
+    char sign = up[0];
+    char axis = std::toupper(up[1]);
     if ((sign == '-' || sign == '+') && (axis >= 'X' && axis <= 'Z'))
     {
       this->UpIndex = axis - 'X';
@@ -168,16 +172,15 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   }
   else
   {
-    if (this->Options.NoBackground && !this->Options.Output.empty())
+    if (options.get<bool>("no-background") && ! options.get<std::string>("output").empty())
     {
       // we need to set the background to black to avoid blending issues with translucent
-      // objetcs when saving to file with no background
+      // objects when saving to file with no background
       this->SetBackground(0, 0, 0);
     }
     else
     {
-      this->SetBackground(this->Options.BackgroundColor[0], this->Options.BackgroundColor[1],
-        this->Options.BackgroundColor[2]);
+      this->SetBackground(options.get<std::vector<double>>("background-color").data());
     }
     this->AutomaticLightCreationOn();
   }
@@ -209,7 +212,8 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   this->CheatSheetActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
   this->CheatSheetActor->GetTextProperty()->SetBackgroundOpacity(0.5);
 
-  std::string fontPath = vtksys::SystemTools::CollapseFullPath(this->Options.FontFile);
+  std::string fontFile = options.get<std::string>("font-file");
+  std::string fontPath = vtksys::SystemTools::CollapseFullPath(fontFile);
   if (vtksys::SystemTools::FileExists(fontPath, true))
   {
     this->FilenameActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
@@ -223,9 +227,9 @@ void vtkF3DRenderer::Initialize(const F3DOptions& options, const std::string& fi
   }
   else
   {
-    if (!this->Options.FontFile.empty())
+    if (!fontFile.empty())
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "Cannot find \"", this->Options.FontFile, "\" font file.");
+      F3DLog::Print(F3DLog::Severity::Warning, "Cannot find \"", fontFile, "\" font file.");
     }
     this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
     this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
@@ -259,7 +263,7 @@ void vtkF3DRenderer::SetupRenderPasses()
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseDepthPeelingPass(this->UseDepthPeelingPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
-  newPass->SetForceOpaqueBackground(!this->Options.HDRIFile.empty());
+  newPass->SetForceOpaqueBackground(!this->HDRIFile.empty());
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -290,7 +294,7 @@ void vtkF3DRenderer::SetupRenderPasses()
 
 #if F3D_MODULE_RAYTRACING
   vtkOSPRayRendererNode::SetRendererType("pathtracer", this);
-  vtkOSPRayRendererNode::SetSamplesPerPixel(this->Options.Samples, this);
+  vtkOSPRayRendererNode::SetSamplesPerPixel(this->RaytracingSamples, this);
   vtkOSPRayRendererNode::SetEnableDenoiser(this->UseRaytracingDenoiser, this);
   vtkOSPRayRendererNode::SetDenoiserThreshold(0, this);
 
@@ -379,7 +383,7 @@ void vtkF3DRenderer::ShowGrid(bool show)
       gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
     }
 
-    if (this->Options.Verbose && show)
+    if (this->Verbose && show)
     {
       F3DLog::Print(F3DLog::Severity::Info, "Using grid unit square size = ", unitSquare, "\n",
         "Grid origin set to [", gridPos[0], ", ", gridPos[1], ", ", gridPos[2], "]\n");
