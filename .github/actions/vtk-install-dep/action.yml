@@ -3,13 +3,16 @@ description: 'Install VTK Dependency using cache when possible'
 inputs:
   vtk_version:
     description: 'VTK version'
-    required: true
+    required: false
+    default: 'commit'
   vtk_sha_file:
     description: 'VTK SHA file'
-    required: true
+    required: false
+    default: ''
   os:
     description: 'OS to build on'
-    required: true
+    required: false
+    default: 'ubuntu-latest'
 runs:
   using: "composite"
   steps:

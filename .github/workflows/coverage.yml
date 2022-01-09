@@ -31,30 +31,20 @@ jobs:
 
     - name: Install OCCT dependency
       uses: ./source/.github/actions/occt-install-dep
-      with:
-        os: ubuntu-latest
 
     - name: Install Assimp dependency
       uses: ./source/.github/actions/assimp-install-dep
-      with:
-        os: ubuntu-latest
 
     - name: Install Imath dependency
       uses: ./source/.github/actions/imath-install-dep
-      with:
-        os: ubuntu-latest
 
     - name: Install Alembic dependency
       uses: ./source/.github/actions/alembic-install-dep
-      with:
-        os: ubuntu-latest
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        vtk_version: commit
         vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
-        os: ubuntu-latest
 
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source

@@ -3,7 +3,8 @@ description: 'Install Imath Dependency using cache when possible'
 inputs:
   os:
     description: 'OS to build on'
-    required: true
+    required: false
+    default: 'ubuntu-latest'
 runs:
   using: "composite"
   steps:

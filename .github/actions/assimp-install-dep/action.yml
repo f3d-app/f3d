@@ -2,8 +2,9 @@ name: 'Install Assimpp Dependency'
 description: 'Install Assimp Depency using cache when possible'
 inputs:
   os:
-    description: 'OS to build VTK on'
-    required: true
+    description: 'OS to build on'
+    required: false
+    default: 'ubuntu-latest'
 runs:
   using: "composite"
   steps:
