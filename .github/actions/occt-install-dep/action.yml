@@ -54,6 +54,7 @@ runs:
     - name: Build OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/occt_build
+      shell: bash
       run: cmake --build . --parallel 2 --target install --config Release
 
     - name: Patch OCCT install macos
