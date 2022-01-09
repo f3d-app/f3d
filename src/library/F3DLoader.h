@@ -11,8 +11,6 @@
 #include <string>
 #include <vector>
 
-class F3DLoaderInternals;
-
 class F3DLoader
 {
 public:
@@ -55,7 +53,8 @@ public:
   ~F3DLoader();
 
 private:
-  std::unique_ptr<F3DLoaderInternals> Internals;
+  class F3DInternals;
+  std::unique_ptr<F3DInternals> Internals;
 
   F3DLoader(F3DLoader const&) = delete;
   void operator=(F3DLoader const&) = delete;

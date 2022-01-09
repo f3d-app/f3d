@@ -41,14 +41,13 @@
 #pragma warning(pop)
 #endif
 
-class vtkF3DAlembicImporterInternal : public vtkObjectBase
+class vtkF3DAlembicImporter::vtkInternals
 {
   typedef std::map<Alembic::AbcGeom::PlainOldDataType, std::string> PODStringMap;
   typedef std::map<Alembic::AbcGeom::PropertyType, std::string> PropertyTypeStringMap;
-protected:
-  vtkF3DAlembicImporterInternal() = default;
+
 public:
-  static vtkF3DAlembicImporterInternal* New();
+
   void CreatePODStringMap(PODStringMap& podStringMap)
   {
     podStringMap[Alembic::AbcGeom::kBooleanPOD] = "kBooleanPOD";
@@ -175,12 +174,16 @@ public:
   Alembic::Abc::IArchive Archive;
 };
 
-vtkStandardNewMacro(vtkF3DAlembicImporterInternal);
-
 vtkStandardNewMacro(vtkF3DAlembicImporter);
 
 //----------------------------------------------------------------------------
-vtkF3DAlembicImporter::~vtkF3DAlembicImporter() {}
+vtkF3DAlembicImporter::vtkF3DAlembicImporter()
+  : Internals(new vtkF3DAlembicImporter::vtkInternals())
+{
+}
+
+//----------------------------------------------------------------------------
+vtkF3DAlembicImporter::~vtkF3DAlembicImporter() = default;
 
 //----------------------------------------------------------------------------
 int vtkF3DAlembicImporter::ImportBegin()
