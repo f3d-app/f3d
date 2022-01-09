@@ -55,17 +55,14 @@
 #include <unordered_map>
 #include <vector>
 
-class vtkF3DOCCTReaderInternal
+class vtkF3DOCCTReader::vtkInternals
 {
 public:
   //----------------------------------------------------------------------------
-  vtkF3DOCCTReaderInternal(vtkF3DOCCTReader* parent)
+  vtkInternals(vtkF3DOCCTReader* parent)
+    : Parent(parent)
   {
-    this->Parent = parent;
   }
-
-  //----------------------------------------------------------------------------
-  ~vtkF3DOCCTReaderInternal() = default;
 
   //----------------------------------------------------------------------------
   vtkSmartPointer<vtkPolyData> CreateShape(const TopoDS_Shape& shape)
@@ -393,15 +390,12 @@ vtkStandardNewMacro(vtkF3DOCCTReader);
 
 //----------------------------------------------------------------------------
 vtkF3DOCCTReader::vtkF3DOCCTReader()
+  : Internals(new vtkF3DOCCTReader::vtkInternals(this))
 {
-  this->Internals = new vtkF3DOCCTReaderInternal(this);
 }
 
 //----------------------------------------------------------------------------
-vtkF3DOCCTReader::~vtkF3DOCCTReader()
-{
-  delete this->Internals;
-}
+vtkF3DOCCTReader::~vtkF3DOCCTReader() = default;
 
 //----------------------------------------------------------------------------
 class ProgressIndicator : public Message_ProgressIndicator

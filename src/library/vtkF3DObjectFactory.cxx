@@ -1,6 +1,4 @@
-#include "Config.h"
 #include "vtkF3DObjectFactory.h"
-#include "vtkVersion.h"
 
 #include "vtkF3DPolyDataMapper.h"
 
@@ -9,6 +7,8 @@
 #else
 #include "vtkF3DConsoleOutputWindow.h"
 #endif
+
+#include <vtkVersion.h>
 
 vtkStandardNewMacro(vtkF3DObjectFactory);
 

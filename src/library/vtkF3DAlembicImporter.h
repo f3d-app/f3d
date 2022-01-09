@@ -19,8 +19,6 @@
 #include <vtkVersion.h>
 #include <vtkNew.h>
 
-class vtkF3DAlembicImporterInternal;
-
 class vtkF3DAlembicImporter : public vtkImporter
 {
 public:
@@ -101,7 +99,7 @@ public:
 #endif
 
 protected:
-  vtkF3DAlembicImporter() = default;
+  vtkF3DAlembicImporter();
   ~vtkF3DAlembicImporter() override;
 
   int ImportBegin() override;
@@ -113,7 +111,8 @@ private:
   vtkF3DAlembicImporter(const vtkF3DAlembicImporter&) = delete;
   void operator=(const vtkF3DAlembicImporter&) = delete;
 
-  vtkNew<vtkF3DAlembicImporterInternal> Internals;
+  class vtkInternals;
+  std::unique_ptr<vtkInternals> Internals;
 };
 
 #endif

@@ -1,6 +1,6 @@
 #include "vtkF3DRenderPass.h"
 
-#include "Config.h"
+#include "F3DConfig.h"
 
 #include <vtkBoundingBox.h>
 #include <vtkCameraPass.h>

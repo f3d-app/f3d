@@ -18,13 +18,13 @@ set(MODULES_SPECIFIC_INCLUDE_DIRS "")
 set(MODULES_SPECIFIC_LIBRARIES "")
 
 configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/Config.h"
+  "${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.h"
   @ONLY)
 
 configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/Config.cxx.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/Config.cxx"
+  "${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.cxx.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.cxx"
   @ONLY)
 
 # Readers declaration
@@ -76,7 +76,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/readers/F3DReader.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/readers/F3DReaderFactory.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
-  ${CMAKE_CURRENT_BINARY_DIR}/Config.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.cxx
   ${MODULES_SPECIFIC_SOURCE_FILES}
   ${LIB_PLATFORM_SPECIFIC_FILES}
   )
