@@ -1,0 +1,52 @@
+name: 'Install Alembic Dependency'
+description: 'Install Alembic Dependency using cache when possible'
+inputs:
+  os:
+    description: 'OS to build on'
+    required: true
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache Alembic
+      id: cache-alembic
+      uses: actions/cache@v2
+      with:
+        path: dependencies/alembic_install
+        key: alembic-v1.8.3-3-${{inputs.os}}
+
+    - name: Checkout Alembic
+      if: steps.cache-alembic.outputs.cache-hit != 'true'
+      uses: actions/checkout@v2
+      with:
+        repository: alembic/alembic
+        path: './dependencies/alembic'
+        ref: 1.8.3
+
+    - name: Setup Alembic
+      if: steps.cache-alembic.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir alembic_build
+        mkdir alembic_install
+
+    - name: Configure Alembic
+      if: steps.cache-alembic.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/alembic_build
+      shell: bash
+      run: >
+        cmake ../alembic
+        -DALEMBIC_SHARED_LIBS=OFF
+        -DUSE_BINARIES=OFF
+        -DBUILD_TESTING=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DImath_DIR:PATH=$(pwd)/../imath_install/lib/cmake/Imath
+        -DCMAKE_INSTALL_PREFIX:PATH=../alembic_install
+        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+
+    - name: Build Alembic
+      if: steps.cache-alembic.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/alembic_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release

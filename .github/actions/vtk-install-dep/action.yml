@@ -1,11 +1,11 @@
 name: 'Install VTK Dependency'
-description: 'Install VTK Depency using cache when possible'
+description: 'Install VTK Dependency using cache when possible'
 inputs:
   vtk_version:
     description: 'VTK version'
     required: true
   os:
-    description: 'OS to build VTK on'
+    description: 'OS to build on'
     required: true
 runs:
   using: "composite"

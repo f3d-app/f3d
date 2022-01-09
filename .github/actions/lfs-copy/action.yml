@@ -1,0 +1,33 @@
+name: 'Copy LFS data'
+description: 'Copy LFS data using cache when possible'
+inputs:
+  lfs_sha:
+    description: 'LFS sha to recover'
+    required: true
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache LFS data
+      id: cache-lfs
+      uses: actions/cache@v2
+      with:
+        path: lfs_data
+        key: lfs-data-${{inputs.lfs_sha}}
+
+    - name: Checkout LFS data
+      if: steps.cache-lfs.outputs.cache-hit != 'true'
+      uses: actions/checkout@v2
+      with:
+        path: 'lfs_data'
+        fetch-depth: 0
+        lfs: 'true'
+
+    - name: Setup LFS data
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: |
+         cmake -E copy_directory ./lfs_data/testing/data ./source/testing/data
+         cmake -E copy_directory ./lfs_data/testing/baselines ./source/testing/baselines
+
+
