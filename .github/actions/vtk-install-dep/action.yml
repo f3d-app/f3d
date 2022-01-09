@@ -21,6 +21,7 @@ runs:
     - name: Setup VTK and clone bare
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
+      shell: bash
       run: |
         mkdir vtk_build
         mkdir vtk_install
@@ -47,6 +48,7 @@ runs:
         inputs.os == 'macos-latest' &&
         inputs.vtk_version == 'v9.0.0'
       working-directory: ${{github.workspace}}/dependencies/vtk
+      shell: bash
       run: |
         sed -i '' '57i\'$'\n''herr_t H5O__fsinfo_set_version(H5F_t *f, H5O_fsinfo_t *fsinfo);' ThirdParty/hdf5/vtkhdf5/src/H5Fsuper.c
         sed -i '' '46i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Oint.c
@@ -55,6 +57,7 @@ runs:
     - name: Configure VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/vtk_build
+      shell: bash
       run: >
         cmake ../vtk
         -DVTK_ENABLE_LOGGING=OFF
@@ -94,4 +97,5 @@ runs:
     - name: Build VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/vtk_build
+      shell: bash
       run: cmake --build . --parallel 2 --target install --config Release
