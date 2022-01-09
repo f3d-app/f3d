@@ -12,7 +12,6 @@
 #include <vector>
 
 class F3DLoaderInternals;
-class vtkImageData;
 
 class F3DLoader
 {
@@ -29,7 +28,7 @@ public:
    * This will initialize the following members:
    * Parser, CommandLineOptions, AnimationManager, RenWin
    */
-  int Start(int argc, char** argv, vtkImageData* image = nullptr);
+  int Start(int argc, char** argv);
 
   /**
    * Add a list of files or directory to be loaded
