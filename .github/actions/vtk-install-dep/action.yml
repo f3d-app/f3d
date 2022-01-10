@@ -23,7 +23,7 @@ runs:
         inputs.vtk_version == 'commit'
       working-directory: ${{github.workspace}}
       shell: bash
-      run: echo "VTK_SHORT_SHA_OR_TAG=$(<${{ inputs.vtk_sha_file }})" >> $GITHUB_ENV
+      run: echo "VTK_SHA_OR_TAG=$(<${{ inputs.vtk_sha_file }})" >> $GITHUB_ENV
 
     - name: Copy VTK version to env var
       if: |
@@ -31,30 +31,22 @@ runs:
         inputs.vtk_version != 'commit'
       working-directory: ${{github.workspace}}
       shell: bash
-      run: echo "VTK_SHORT_SHA_OR_TAG=${{inputs.vtk_version}}" >> $GITHUB_ENV
+      run: echo "VTK_SHA_OR_TAG=${{inputs.vtk_version}}" >> $GITHUB_ENV
 
     - name: Cache VTK
       id: cache-vtk
       uses: actions/cache@v2
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHORT_SHA_OR_TAG}}-2-${{inputs.os}}
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-3-${{inputs.os}}
 
-    - name: Setup VTK and clone bare
+    - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: |
         mkdir vtk_build
         mkdir vtk_install
-        git clone --bare https://github.com/Kitware/VTK.git bare
-
-    - name: Recover VTK SHA from bare repo
-      if: |
-        steps.cache-vtk.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/bare
-      shell: bash
-      run: echo "VTK_SHA=$(git rev-parse ${{env.VTK_SHORT_SHA_OR_TAG}})" >> $GITHUB_ENV
 
     - name: Checkout VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -63,7 +55,7 @@ runs:
         repository: Kitware/VTK
         submodules: 'true'
         path: './dependencies/vtk'
-        ref: ${{env.VTK_SHA}}
+        ref: ${{env.VTK_SHA_OR_TAG}}
 
     - name: Patch VTK 9.0 source macos
       if: |
