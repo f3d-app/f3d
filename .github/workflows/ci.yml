@@ -234,6 +234,7 @@ jobs:
   coverage:
     if: github.event.pull_request.draft == false
 
+    needs: deps
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
