@@ -10,6 +10,35 @@ on:
 jobs:
 
 #----------------------------------------------------------------------------
+# SOURCE: Checkout the sources and recover git lfs data
+#----------------------------------------------------------------------------
+  source:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: 'false'
+
+    - name: Set LFS env var
+      working-directory: ${{github.workspace}}/source
+      shell: bash
+      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{env.LFS_SHA}}
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: source
+        path: ./source
+
+#----------------------------------------------------------------------------
 # MAIN CI: Build and test with a cross-platform, cross-vtk build matrix
 #----------------------------------------------------------------------------
   ci:
@@ -21,6 +50,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         vtk_version: [commit, v9.1.0, v9.0.0]
 
+    needs: source
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
@@ -28,16 +58,14 @@ jobs:
       DISPLAY: :0
 
     steps:
+    - uses: actions/download-artifact@master
+      with:
+        name: source
+        path: ./source
+
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
       run: mkdir dependencies
-
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: 'false'
 
     - name: Install OCCT dependency
       uses: ./source/.github/actions/occt-install-dep
@@ -65,16 +93,6 @@ jobs:
         vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
         os: ${{matrix.os}}
-
-    - name: Set LFS env var
-      working-directory: ${{github.workspace}}/source
-      shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
-
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{env.LFS_SHA}}
 
     - name: Setup Directories
       working-directory: ${{github.workspace}}
