@@ -66,7 +66,7 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: source
-        path: ./source.tar
+        path: ./
 
     - name: Untar source
       working-directory: ${{github.workspace}}
@@ -129,12 +129,12 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: source
-        path: ./source.tar
+        path: ./
 
     - uses: actions/download-artifact@v2
       with:
         name: dependencies-${{matrix.os}}
-        path: ./dependencies.tar
+        path: ./
 
     - name: Untar source and deps
       working-directory: ${{github.workspace}}
