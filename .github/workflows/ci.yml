@@ -39,6 +39,9 @@ jobs:
         name: source
         path: ./source
 
+    - name: Tar source
+      run: tar -cvf source.tar ./source
+
 #----------------------------------------------------------------------------
 # DEPENDENCIES: Install all F3D dependencies except VTK
 #----------------------------------------------------------------------------
@@ -121,12 +124,18 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: source
-        path: ./source
+        path: ./source.tar
 
     - uses: actions/download-artifact@v2
       with:
         name: dependencies-${{matrix.os}}
-        path: ./dependencies
+        path: ./dependencies.tar
+
+    - name: Untar source and deps
+      working-directory: ${{github.workspace}}
+      run: |
+        tar -xvf dependencies.tar
+        tar -xvf source.tar
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -248,12 +257,18 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: source
-        path: ./source
+        path: ./source.tar
 
     - uses: actions/download-artifact@v2
       with:
         name: dependencies-ubuntu-latest
-        path: ./dependencies
+        path: ./dependencies.tar
+
+    - name: Untar source and deps
+      working-directory: ${{github.workspace}}
+      run: |
+        tar -xvf dependencies.tar
+        tar -xvf source.tar
 
     # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     # coverage build is done in source as it seems to be required for codecov
