@@ -34,7 +34,7 @@ jobs:
       with:
         lfs_sha: ${{env.LFS_SHA}}
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v2
       with:
         name: source
         path: ./source
@@ -60,7 +60,7 @@ jobs:
 
     steps:
 
-    - uses: actions/download-artifact@master
+    - uses: actions/download-artifact@v2
       with:
         name: source
         path: ./source
