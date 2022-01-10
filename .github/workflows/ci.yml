@@ -40,7 +40,7 @@ jobs:
         path: ./source
 
 #----------------------------------------------------------------------------
-# DEPENDENCIES: Install all F3D dependencies
+# DEPENDENCIES: Install all F3D dependencies except VTK
 #----------------------------------------------------------------------------
   deps:
     if: github.event.pull_request.draft == false
@@ -49,7 +49,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        vtk_version: [commit, v9.1.0, v9.0.0]
 
     needs: source
     runs-on: ${{matrix.os}}
@@ -89,13 +88,6 @@ jobs:
       with:
         os: ${{matrix.os}}
 
-    - name: Install VTK dependency
-      uses: ./source/.github/actions/vtk-install-dep
-      with:
-        vtk_version: ${{matrix.vtk_version}}
-        vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
-        os: ${{matrix.os}}
-
     # a single dir for installs instead TODO
     - uses: actions/upload-artifact@v2
       with:
@@ -132,6 +124,13 @@ jobs:
       with:
         name: dependencies-${{matrix.os}}
         path: ./dependencies
+
+    - name: Install VTK dependency
+      uses: ./source/.github/actions/vtk-install-dep
+      with:
+        vtk_version: ${{matrix.vtk_version}}
+        vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
+        os: ${{matrix.os}}
 
     - name: Setup Directories
       working-directory: ${{github.workspace}}
