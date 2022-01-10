@@ -34,13 +34,14 @@ jobs:
       with:
         lfs_sha: ${{env.LFS_SHA}}
 
+    - name: Tar source
+      working-directory: ${{github.workspace}}
+      run: tar -cvf source.tar ./source
+
     - uses: actions/upload-artifact@v2
       with:
         name: source
-        path: ./source
-
-    - name: Tar source
-      run: tar -cvf source.tar ./source
+        path: ./source.tar
 
 #----------------------------------------------------------------------------
 # DEPENDENCIES: Install all F3D dependencies except VTK
@@ -65,7 +66,11 @@ jobs:
     - uses: actions/download-artifact@v2
       with:
         name: source
-        path: ./source
+        path: ./source.tar
+
+    - name: Untar source
+      working-directory: ${{github.workspace}}
+      run: tar -xvf source.tar
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
