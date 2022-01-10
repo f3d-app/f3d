@@ -88,11 +88,14 @@ jobs:
       with:
         os: ${{matrix.os}}
 
+    - name: Tar all deps
+      run: tar -cvf dependencies.tar ./dependencies/*_install
+
     # a single dir for installs instead TODO
     - uses: actions/upload-artifact@v2
       with:
         name: dependencies-${{matrix.os}}
-        path: ./dependencies
+        path: ./dependencies.tar
 
 #----------------------------------------------------------------------------
 # MAIN CI: Build and test with a cross-platform, cross-vtk build matrix
