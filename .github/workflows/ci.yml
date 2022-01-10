@@ -40,9 +40,9 @@ jobs:
         path: ./source
 
 #----------------------------------------------------------------------------
-# MAIN CI: Build and test with a cross-platform, cross-vtk build matrix
+# DEPENDENCIES: Install all F3D dependencies
 #----------------------------------------------------------------------------
-  ci:
+  deps:
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -95,6 +95,43 @@ jobs:
         vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
         os: ${{matrix.os}}
+
+    # a single dir for installs instead TODO
+    - uses: actions/upload-artifact@v2
+      with:
+        name: dependencies-${{matrix.os}}
+        path: ./dependencies
+
+#----------------------------------------------------------------------------
+# MAIN CI: Build and test with a cross-platform, cross-vtk build matrix
+#----------------------------------------------------------------------------
+  ci:
+    if: github.event.pull_request.draft == false
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        vtk_version: [commit, v9.1.0, v9.0.0]
+
+    needs: deps
+    runs-on: ${{matrix.os}}
+    container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+
+    env:
+      DISPLAY: :0
+
+    steps:
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: source
+        path: ./source
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: dependencies-${{matrix.os}}
+        path: ./dependencies
 
     - name: Setup Directories
       working-directory: ${{github.workspace}}
@@ -204,43 +241,16 @@ jobs:
       DISPLAY: :0
 
     steps:
-    - name: Dependencies Dir
-      working-directory: ${{github.workspace}}
-      run: mkdir dependencies
 
-    - name: Checkout
-      uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
       with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: 'false'
+        name: source
+        path: ./source
 
-    - name: Install OCCT dependency
-      uses: ./source/.github/actions/occt-install-dep
-
-    - name: Install Assimp dependency
-      uses: ./source/.github/actions/assimp-install-dep
-
-    - name: Install Imath dependency
-      uses: ./source/.github/actions/imath-install-dep
-
-    - name: Install Alembic dependency
-      uses: ./source/.github/actions/alembic-install-dep
-
-    - name: Install VTK dependency
-      uses: ./source/.github/actions/vtk-install-dep
+    - uses: actions/download-artifact@v2
       with:
-        vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
-
-    - name: Set LFS env var
-      working-directory: ${{github.workspace}}/source
-      shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
-
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{env.LFS_SHA}}
+        name: dependencies-ubuntu-latest
+        path: ./dependencies
 
     # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     # coverage build is done in source as it seems to be required for codecov
