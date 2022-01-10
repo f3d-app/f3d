@@ -15,6 +15,7 @@ jobs:
   source:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    steps:
 
     - name: Checkout
       uses: actions/checkout@v2
@@ -58,6 +59,7 @@ jobs:
       DISPLAY: :0
 
     steps:
+
     - uses: actions/download-artifact@master
       with:
         name: source
