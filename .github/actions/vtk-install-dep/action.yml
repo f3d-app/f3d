@@ -1,0 +1,116 @@
+name: 'Install VTK Dependency'
+description: 'Install VTK Dependency using cache when possible'
+inputs:
+  vtk_version:
+    description: 'VTK version'
+    required: false
+    default: 'commit'
+  vtk_sha_file:
+    description: 'VTK SHA file'
+    required: false
+    default: ''
+  os:
+    description: 'OS to build on'
+    required: false
+    default: 'ubuntu-latest'
+runs:
+  using: "composite"
+  steps:
+
+    - name: Recover VTK Short SHA from file
+      if: |
+        steps.cache-vtk.outputs.cache-hit != 'true' &&
+        inputs.vtk_version == 'commit'
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: echo "VTK_SHA_OR_TAG=$(<${{ inputs.vtk_sha_file }})" >> $GITHUB_ENV
+
+    - name: Copy VTK version to env var
+      if: |
+        steps.cache-vtk.outputs.cache-hit != 'true' &&
+        inputs.vtk_version != 'commit'
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: echo "VTK_SHA_OR_TAG=${{inputs.vtk_version}}" >> $GITHUB_ENV
+
+    - name: Cache VTK
+      id: cache-vtk
+      uses: actions/cache@v2
+      with:
+        path: dependencies/vtk_install
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-3-${{inputs.os}}
+
+    - name: Setup VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir vtk_build
+        mkdir vtk_install
+
+    - name: Checkout VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      uses: actions/checkout@v2
+      with:
+        repository: Kitware/VTK
+        submodules: 'true'
+        path: './dependencies/vtk'
+        ref: ${{env.VTK_SHA_OR_TAG}}
+
+    - name: Patch VTK 9.0 source macos
+      if: |
+        steps.cache-vtk.outputs.cache-hit != 'true' &&
+        inputs.os == 'macos-latest' &&
+        inputs.vtk_version == 'v9.0.0'
+      working-directory: ${{github.workspace}}/dependencies/vtk
+      shell: bash
+      run: |
+        sed -i '' '57i\'$'\n''herr_t H5O__fsinfo_set_version(H5F_t *f, H5O_fsinfo_t *fsinfo);' ThirdParty/hdf5/vtkhdf5/src/H5Fsuper.c
+        sed -i '' '46i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Oint.c
+        sed -i '' '36i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Rint.c
+
+    - name: Configure VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/vtk_build
+      shell: bash
+      run: >
+        cmake ../vtk
+        -DVTK_ENABLE_LOGGING=OFF
+        -DVTK_ENABLE_WRAPPING=OFF
+        -DVTK_BUILD_TESTING=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DVTK_LEGACY_REMOVE=ON
+        -DVTK_VERSIONED_INSTALL=OFF
+        -DBUILD_SHARED_LIBS=OFF
+        -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
+        -DVTK_GROUP_ENABLE_Rendering=DEFAULT
+        -DVTK_GROUP_ENABLE_StandAlone=DEFAULT
+        -DVTK_MODULE_ENABLE_VTK_CommonSystem=YES
+        -DVTK_MODULE_ENABLE_VTK_FiltersGeneral=YES
+        -DVTK_MODULE_ENABLE_VTK_FiltersGeometry=YES
+        -DVTK_MODULE_ENABLE_VTK_ImagingCore=YES
+        -DVTK_MODULE_ENABLE_VTK_ImagingHybrid=YES
+        -DVTK_MODULE_ENABLE_VTK_InteractionStyle=YES
+        -DVTK_MODULE_ENABLE_VTK_InteractionWidgets=YES
+        -DVTK_MODULE_ENABLE_VTK_IOCityGML=YES
+        -DVTK_MODULE_ENABLE_VTK_IOExodus=YES
+        -DVTK_MODULE_ENABLE_VTK_IOGeometry=YES
+        -DVTK_MODULE_ENABLE_VTK_IOImage=YES
+        -DVTK_MODULE_ENABLE_VTK_IOImport=YES
+        -DVTK_MODULE_ENABLE_VTK_IOParallel=YES
+        -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
+        -DVTK_MODULE_ENABLE_VTK_IOXML=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingAnnotation=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingLabel=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
+        -DVTK_MODULE_ENABLE_VTK_jsoncpp=YES
+        ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread' || null }}
+        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+
+    - name: Build VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/vtk_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
