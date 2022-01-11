@@ -209,30 +209,20 @@ jobs:
 
     - name: Install OCCT dependency
       uses: ./source/.github/actions/occt-install-dep
-      with:
-        os: ${{matrix.os}}
 
     - name: Install Assimp dependency
       uses: ./source/.github/actions/assimp-install-dep
-      with:
-        os: ${{matrix.os}}
 
     - name: Install Imath dependency
       uses: ./source/.github/actions/imath-install-dep
-      with:
-        os: ${{matrix.os}}
 
     - name: Install Alembic dependency
       uses: ./source/.github/actions/alembic-install-dep
-      with:
-        os: ${{matrix.os}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
-        os: ${{matrix.os}}
 
     # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     # coverage build is done in source as it seems to be required for codecov
