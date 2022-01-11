@@ -57,4 +57,3 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/assimp_build
       shell: bash
       run: cmake --build . --parallel 2 --target install --config Release
-
