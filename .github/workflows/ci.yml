@@ -10,11 +10,23 @@ on:
 jobs:
 
 #----------------------------------------------------------------------------
-# SOURCE: Checkout the sources and recover git lfs data
+# MAIN CI: Build and test with a cross-platform, cross-vtk build matrix
 #----------------------------------------------------------------------------
-  source:
+  ci:
     if: github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        vtk_version: [commit, v9.1.0, v9.0.0]
+
+    runs-on: ${{matrix.os}}
+    container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+
+    env:
+      DISPLAY: :0
+
     steps:
 
     - name: Checkout
@@ -33,44 +45,6 @@ jobs:
       uses: ./source/.github/actions/lfs-copy
       with:
         lfs_sha: ${{env.LFS_SHA}}
-
-    - name: Tar source
-      working-directory: ${{github.workspace}}
-      run: tar -cvf source.tar ./source
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: source
-        path: ./source.tar
-
-#----------------------------------------------------------------------------
-# DEPENDENCIES: Install all F3D dependencies except VTK
-#----------------------------------------------------------------------------
-  deps:
-    if: github.event.pull_request.draft == false
-
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
-    needs: source
-    runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
-
-    env:
-      DISPLAY: :0
-
-    steps:
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: source
-        path: ./
-
-    - name: Untar source
-      working-directory: ${{github.workspace}}
-      run: tar -xvf source.tar
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
@@ -95,52 +69,6 @@ jobs:
       uses: ./source/.github/actions/alembic-install-dep
       with:
         os: ${{matrix.os}}
-
-    - name: Tar all deps
-      run: tar -cvf dependencies.tar ./dependencies/*_install
-
-    # a single dir for installs instead TODO
-    - uses: actions/upload-artifact@v2
-      with:
-        name: dependencies-${{matrix.os}}
-        path: ./dependencies.tar
-
-#----------------------------------------------------------------------------
-# MAIN CI: Build and test with a cross-platform, cross-vtk build matrix
-#----------------------------------------------------------------------------
-  ci:
-    if: github.event.pull_request.draft == false
-
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        vtk_version: [commit, v9.1.0, v9.0.0]
-
-    needs: deps
-    runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
-
-    env:
-      DISPLAY: :0
-
-    steps:
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: source
-        path: ./
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: dependencies-${{matrix.os}}
-        path: ./
-
-    - name: Untar source and deps
-      working-directory: ${{github.workspace}}
-      run: |
-        tar -xvf dependencies.tar
-        tar -xvf source.tar
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -250,7 +178,6 @@ jobs:
   coverage:
     if: github.event.pull_request.draft == false
 
-    needs: deps
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
@@ -259,21 +186,53 @@ jobs:
 
     steps:
 
-    - uses: actions/download-artifact@v2
+    - name: Checkout
+      uses: actions/checkout@v2
       with:
-        name: source
-        path: ./source.tar
+        path: 'source'
+        fetch-depth: 0
+        lfs: 'false'
 
-    - uses: actions/download-artifact@v2
+    - name: Set LFS env var
+      working-directory: ${{github.workspace}}/source
+      shell: bash
+      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
       with:
-        name: dependencies-ubuntu-latest
-        path: ./dependencies.tar
+        lfs_sha: ${{env.LFS_SHA}}
 
-    - name: Untar source and deps
+    - name: Dependencies Dir
       working-directory: ${{github.workspace}}
-      run: |
-        tar -xvf dependencies.tar
-        tar -xvf source.tar
+      run: mkdir dependencies
+
+    - name: Install OCCT dependency
+      uses: ./source/.github/actions/occt-install-dep
+      with:
+        os: ${{matrix.os}}
+
+    - name: Install Assimp dependency
+      uses: ./source/.github/actions/assimp-install-dep
+      with:
+        os: ${{matrix.os}}
+
+    - name: Install Imath dependency
+      uses: ./source/.github/actions/imath-install-dep
+      with:
+        os: ${{matrix.os}}
+
+    - name: Install Alembic dependency
+      uses: ./source/.github/actions/alembic-install-dep
+      with:
+        os: ${{matrix.os}}
+
+    - name: Install VTK dependency
+      uses: ./source/.github/actions/vtk-install-dep
+      with:
+        vtk_version: ${{matrix.vtk_version}}
+        vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
+        os: ${{matrix.os}}
 
     # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     # coverage build is done in source as it seems to be required for codecov
