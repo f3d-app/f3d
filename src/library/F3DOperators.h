@@ -18,7 +18,7 @@ public:
     : std::ctype<char>(&ctype_table[0], false, refs)
     {
       std::copy_n(classic_table(), table_size, ctype_table);
-      int comma = ',';
+      unsigned char comma = ',';
       ctype_table[comma] = (mask)space;
     }
 };
