@@ -7,8 +7,6 @@
 #include <sstream>
 #include <vector>
 
-static const char* comma = ",";
-
 //----------------------------------------------------------------------------
 // Make the istream_iterator works with comma
 // Uses std coding style for consistency
@@ -20,7 +18,7 @@ public:
     : std::ctype<char>(&ctype_table[0], false, refs)
     {
       std::copy_n(classic_table(), table_size, ctype_table);
-      ctype_table[*comma] = (mask)space;
+      ctype_table[','] = (mask)space;
     }
 };
 
@@ -31,7 +29,7 @@ static std::locale comma_locale(std::locale::classic(), new comma_ctype);
 template<typename T>
 std::ostream& operator<< (std::ostream &stream, const std::vector<T>& vector)
 {
-  std::copy(vector.begin(), vector.end(), std::ostream_iterator<T>(stream, comma));
+  std::copy(vector.begin(), vector.end(), std::ostream_iterator<T>(stream, ","));
   return stream;
 }
 
