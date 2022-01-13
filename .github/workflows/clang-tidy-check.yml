@@ -63,7 +63,6 @@ jobs:
       run: cmake --build . --parallel 2 --config Release
 
     - uses: ZedThree/clang-tidy-review@v0.7.0
-      working-directory: ${{github.workspace}}/source
       id: review
       with:
         build_dir: ./build
