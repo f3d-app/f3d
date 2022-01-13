@@ -7,14 +7,13 @@
 #ifndef F3DAnimationManager_h
 #define F3DAnimationManager_h
 
-#include "F3DOptions.h"
-
 #include <vtkNew.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkSmartPointer.h>
 
 #include <set>
 
+namespace f3d{class options;}
 class vtkF3DRenderer;
 class vtkImporter;
 class vtkRenderWindow;
@@ -28,7 +27,7 @@ public:
   /**
    * Initialize the animation manager, required before playing the animation
    */
-  void Initialize(const F3DOptions& options, vtkImporter* importer, vtkRenderWindow* renWin, vtkF3DRenderer* renderer);
+  void Initialize(const f3d::options& options, vtkImporter* importer, vtkRenderWindow* renWin, vtkF3DRenderer* renderer);
 
   /**
    * Start/Stop playing the animation

@@ -1,6 +1,7 @@
 #include "F3DAnimationManager.h"
 
 #include "F3DLog.h"
+#include "f3d_options.h"
 #include "vtkF3DRenderer.h"
 
 #include <vtkCallbackCommand.h>
@@ -13,7 +14,7 @@
 #include <vtkVersion.h>
 
 //----------------------------------------------------------------------------
-void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* importer, vtkRenderWindow* renWin, vtkF3DRenderer* renderer)
+void F3DAnimationManager::Initialize(const f3d::options& options, vtkImporter* importer, vtkRenderWindow* renWin, vtkF3DRenderer* renderer)
 {
   this->Importer = importer;
   if (!this->Importer)
@@ -68,7 +69,7 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
     this->ProgressWidget = nullptr;
   }
 
-  if (options.Verbose || options.NoRender)
+  if (options.get<bool>("verbose") || options.get<bool>("no-render"))
   {
     if (availAnimations <= 0)
     {
@@ -85,19 +86,20 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
     F3DLog::Print(F3DLog::Severity::Info, "\n");
   }
 
-  if (options.AnimationIndex != 0 && availAnimations <= 0)
+  int animationIndex = options.get<int>("animation-index");
+  if (animationIndex != 0 && availAnimations <= 0)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
       "An animation index has been specified but there are no animation available.");
   }
-  else if (options.AnimationIndex > 0 && options.AnimationIndex >= availAnimations)
+  else if (animationIndex > 0 && animationIndex >= availAnimations)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
       "Specified animation index is greater than the highest possible animation index, enabling the first animation.");
 
     this->Importer->EnableAnimation(0);
   }
-  else if (options.AnimationIndex <= -1)
+  else if (animationIndex <= -1)
   {
     for (int i = 0; i < availAnimations; i++)
     {
@@ -106,7 +108,7 @@ void F3DAnimationManager::Initialize(const F3DOptions& options, vtkImporter* imp
   }
   else
   {
-    this->Importer->EnableAnimation(options.AnimationIndex);
+    this->Importer->EnableAnimation(animationIndex);
   }
 
   this->TimeSteps.clear();
