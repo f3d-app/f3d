@@ -104,8 +104,8 @@ bool vtkF3DGenericImporter::IsAnimationEnabled(vtkIdType animationIndex)
 bool vtkF3DGenericImporter::GetTemporalInformation(vtkIdType animationIndex,
   double vtkNotUsed(frameRate), int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
 #else
-bool vtkF3DGenericImporter::GetTemporalInformation(vtkIdType animationIndex,
-  int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
+bool vtkF3DGenericImporter::GetTemporalInformation(
+  vtkIdType animationIndex, int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
 #endif
 {
   if (animationIndex < this->GetNumberOfAnimations())
@@ -143,7 +143,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       F3DLog::Severity::Error, "File '", this->Reader->GetFileName(), "' cannot be read.");
     return;
   }
-  
+
   bool noRender = this->Options->get<bool>("no-render");
   bool print = (this->Options->get<bool>("verbose") || noRender);
   if (print)
@@ -202,7 +202,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->PointDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
   this->CellDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetCellData());
   vtkDataSetAttributes* dataForColoring =
-     this->Options->get<bool>("cells") ? this->CellDataForColoring : this->PointDataForColoring;
+    this->Options->get<bool>("cells") ? this->CellDataForColoring : this->PointDataForColoring;
 
   // Recover an array for coloring if we ever need it
   this->ArrayIndexForColoring = -1;
@@ -264,7 +264,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->GeometryActor->SetMapper(this->PolyDataMapper);
   this->GeometryActor->GetProperty()->SetInterpolationToPBR();
 
-  std::vector<double> color = this->Options->get<std::vector<double>>("color");
+  std::vector<double> color = this->Options->get<std::vector<double> >("color");
   double opacity = this->Options->get<double>("opacity");
   this->GeometryActor->GetProperty()->SetColor(color.data());
   this->GeometryActor->GetProperty()->SetOpacity(opacity);
@@ -280,11 +280,14 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   // Textures
   this->GeometryActor->GetProperty()->SetBaseColorTexture(
     this->GetTexture(this->Options->get<std::string>("texture-base-color"), true));
-  this->GeometryActor->GetProperty()->SetORMTexture(this->GetTexture(this->Options->get<std::string>("texture-material")));
+  this->GeometryActor->GetProperty()->SetORMTexture(
+    this->GetTexture(this->Options->get<std::string>("texture-material")));
   this->GeometryActor->GetProperty()->SetEmissiveTexture(
     this->GetTexture(this->Options->get<std::string>("texture-emissive"), true));
-  this->GeometryActor->GetProperty()->SetEmissiveFactor(this->Options->get<std::vector<double>>("emissive-factor").data());
-  this->GeometryActor->GetProperty()->SetNormalTexture(this->GetTexture(this->Options->get<std::string>("texture-normal")));
+  this->GeometryActor->GetProperty()->SetEmissiveFactor(
+    this->Options->get<std::vector<double> >("emissive-factor").data());
+  this->GeometryActor->GetProperty()->SetNormalTexture(
+    this->GetTexture(this->Options->get<std::string>("texture-normal")));
   this->GeometryActor->GetProperty()->SetNormalScale(this->Options->get<double>("normal-scale"));
 
   // add props

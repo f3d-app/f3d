@@ -183,7 +183,8 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
   this->Initialize(s);
 
   vtkRenderState backgroundState(s->GetRenderer());
-  backgroundState.SetPropArrayAndCount(this->BackgroundProps.data(), static_cast<int>(this->BackgroundProps.size()));
+  backgroundState.SetPropArrayAndCount(
+    this->BackgroundProps.data(), static_cast<int>(this->BackgroundProps.size()));
   backgroundState.SetFrameBuffer(s->GetFrameBuffer());
 
   this->BackgroundPass->Render(&backgroundState);

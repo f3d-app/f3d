@@ -1,12 +1,12 @@
 #include "F3DOptions.h"
 
-#include "F3DLog.h"
 #include "F3DException.h"
+#include "F3DLog.h"
 #include "F3DReaderFactory.h"
 
+#include <vtkVersion.h>
 #include <vtk_jsoncpp.h>
 #include <vtksys/SystemTools.hxx>
-#include <vtkVersion.h>
 
 #include <fstream>
 #include <regex>
@@ -31,7 +31,10 @@ public:
   F3DOptions GetOptionsFromArgs(std::vector<std::string>& inputs);
   bool InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
 
-  void SetFilePathForConfigBlock(const std::string& filePath) { this->FilePathForConfigBlock = filePath; }
+  void SetFilePathForConfigBlock(const std::string& filePath)
+  {
+    this->FilePathForConfigBlock = filePath;
+  }
 
 protected:
   bool GetOptionConfig(const std::string& option, std::string& configValue) const
@@ -62,10 +65,7 @@ protected:
     return ss.str();
   }
 
-  static std::string ToString(bool currValue)
-  {
-    return currValue ? "true" : "false";
-  }
+  static std::string ToString(bool currValue) { return currValue ? "true" : "false"; }
 
   template<class T>
   static std::string ToString(const std::vector<T>& currValue)
@@ -101,8 +101,8 @@ protected:
 
   template<class T>
   void DeclareOption(cxxopts::OptionAdder& group, const std::string& longName,
-    const std::string& shortName, const std::string& doc, T& var, bool hasDefault = true, bool mayHaveConfig = true,
-    const std::string& argHelp = "") const
+    const std::string& shortName, const std::string& doc, T& var, bool hasDefault = true,
+    bool mayHaveConfig = true, const std::string& argHelp = "") const
   {
     auto val = cxxopts::value<T>(var);
     std::string defaultVal;
@@ -156,7 +156,8 @@ protected:
   static std::string GetSystemSettingsDirectory();
   static std::string GetUserSettingsDirectory();
 
-  void PrintHelpPair(const std::string& key, const std::string& help, int keyWidth = 10, int helpWidth = 70);
+  void PrintHelpPair(
+    const std::string& key, const std::string& help, int keyWidth = 10, int helpWidth = 70);
   void PrintHelp(cxxopts::Options& cxxOptions);
   void PrintVersion();
   void PrintReadersList();
@@ -167,7 +168,7 @@ private:
 
   std::string FilePathForConfigBlock;
 
-  using Dictionnary = std::map<std::string, std::map<std::string, std::string>>;
+  using Dictionnary = std::map<std::string, std::map<std::string, std::string> >;
   Dictionnary ConfigDic;
 };
 
@@ -301,7 +302,8 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
 }
 
 //----------------------------------------------------------------------------
-void ConfigurationOptions::PrintHelpPair(const std::string& key, const std::string& help, int keyWidth, int helpWidth)
+void ConfigurationOptions::PrintHelpPair(
+  const std::string& key, const std::string& help, int keyWidth, int helpWidth)
 {
   std::stringstream ss;
   ss << "  " << std::left << std::setw(keyWidth) << key << " " << std::setw(helpWidth) << help;
@@ -311,6 +313,7 @@ void ConfigurationOptions::PrintHelpPair(const std::string& key, const std::stri
 //----------------------------------------------------------------------------
 void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
 {
+  // clang-format off
   const std::vector<std::pair<std::string, std::string> > keys =
   {
     { "C", "Cycle point/cell data coloring" },
@@ -352,6 +355,7 @@ void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
     { "f3d file.ply -so --point-size=0 --comp=-2", "View a point cloud file with direct scalars rendering" },
     { "f3d folder", "View all files in folder" },
   };
+  // clang-format on
 
   F3DLog::SetUseColoring(false);
   F3DLog::Print(F3DLog::Severity::Info, cxxOptions.help());
@@ -449,7 +453,8 @@ void ConfigurationOptions::PrintReadersList()
     // sanity check
     if (reader->GetExtensions().size() < reader->GetMimeTypes().size())
     {
-      F3DLog::Print(F3DLog::Severity::Error, reader->GetName(), " have different extensions and mime-types count.");
+      F3DLog::Print(F3DLog::Severity::Error, reader->GetName(),
+        " have different extensions and mime-types count.");
       return;
     }
 
@@ -475,7 +480,8 @@ void ConfigurationOptions::PrintReadersList()
   // Print the rows split in 3 columns
   std::stringstream headerLine;
   headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(descColSize)
-             << "Description" << std::setw(extsColSize) << "Exts" << std::setw(mimeColSize) << "Mime-types";
+             << "Description" << std::setw(extsColSize) << "Exts" << std::setw(mimeColSize)
+             << "Mime-types";
   F3DLog::Print(F3DLog::Severity::Info, headerLine.str());
   F3DLog::Print(F3DLog::Severity::Info, separator);
 
@@ -487,7 +493,7 @@ void ConfigurationOptions::PrintReadersList()
       if (i == 0)
       {
         readerLine << std::left << std::setw(nameColSize) << reader->GetName()
-               << std::setw(descColSize) << reader->GetLongDescription();
+                   << std::setw(descColSize) << reader->GetLongDescription();
       }
       else
       {

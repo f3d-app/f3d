@@ -13,8 +13,7 @@
 #include "F3DLog.h"
 
 //----------------------------------------------------------------------------
-bool F3DOffscreenRender::RenderToImage(
-  vtkRenderWindow* renWin, vtkImageData* image, bool noBg)
+bool F3DOffscreenRender::RenderToImage(vtkRenderWindow* renWin, vtkImageData* image, bool noBg)
 {
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(renWin);

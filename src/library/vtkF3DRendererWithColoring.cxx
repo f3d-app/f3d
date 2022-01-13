@@ -14,7 +14,8 @@
 vtkStandardNewMacro(vtkF3DRendererWithColoring);
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::Initialize(const f3d::options& options, const std::string& fileInfo)
+void vtkF3DRendererWithColoring::Initialize(
+  const f3d::options& options, const std::string& fileInfo)
 {
   this->Superclass::Initialize(options, fileInfo);
 
@@ -30,7 +31,7 @@ void vtkF3DRendererWithColoring::Initialize(const f3d::options& options, const s
   options.get("volume", this->UseVolume);
   options.get("inverse", this->UseInverseOpacityFunction);
   options.get("bar", this->ScalarBarVisible);
-  
+
   options.get("range", this->SpecifiedRange);
   options.get("colormap", this->Colormap);
 

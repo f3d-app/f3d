@@ -1,5 +1,5 @@
-#include "F3DConfig.h"
 #include "vtkF3DInteractorEventRecorder.h"
+#include "F3DConfig.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkObjectFactory.h>
@@ -36,7 +36,8 @@ void vtkF3DInteractorEventRecorder::SetInteractor(vtkRenderWindowInteractor* int
 void vtkF3DInteractorEventRecorder::ProcessEvents(
   vtkObject* object, unsigned long event, void* clientData, void* vtkNotUsed(callData))
 {
-  vtkF3DInteractorEventRecorder* self = reinterpret_cast<vtkF3DInteractorEventRecorder*>(clientData);
+  vtkF3DInteractorEventRecorder* self =
+    reinterpret_cast<vtkF3DInteractorEventRecorder*>(clientData);
   vtkRenderWindowInteractor* rwi = vtkRenderWindowInteractor::SafeDownCast(object);
 
   // all events are processed

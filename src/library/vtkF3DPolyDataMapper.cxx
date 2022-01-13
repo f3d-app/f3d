@@ -49,8 +49,10 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
   auto vertexShader = shaders[vtkShader::Vertex];
   auto VSSource = vertexShader->GetSource();
 
-  bool hasTangents = this->VBOs->GetNumberOfComponents("tangentMC") == 3 && actor->GetProperty()->GetLighting();
-  bool hasNormals = this->VBOs->GetNumberOfComponents("normalMC") == 3 && actor->GetProperty()->GetLighting();
+  bool hasTangents =
+    this->VBOs->GetNumberOfComponents("tangentMC") == 3 && actor->GetProperty()->GetLighting();
+  bool hasNormals =
+    this->VBOs->GetNumberOfComponents("normalMC") == 3 && actor->GetProperty()->GetLighting();
 
   vtkUniforms* uniforms = actor->GetShaderProperty()->GetVertexCustomUniforms();
 

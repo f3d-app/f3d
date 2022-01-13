@@ -7,7 +7,6 @@
 #include <wincodec.h>
 #include <windows.h>
 
-
 // Class to provide thumbnails using F3D
 // This is using a standard windows API
 class F3DThumbnailProvider
@@ -42,6 +41,10 @@ protected:
 
 private:
   long m_cRef;
-  wchar_t m_f3dPath[MAX_PATH];  // The path to f3d executable that will be used to produce the thumbnail
-  wchar_t m_filePath[MAX_PATH]; // The path to the file for which we will have to produce the thumbnail
+
+  // The path to f3d executable that will be used to produce the thumbnail
+  wchar_t m_f3dPath[MAX_PATH];
+
+  // The path to the file for which we will have to produce the thumbnail
+  wchar_t m_filePath[MAX_PATH];
 };

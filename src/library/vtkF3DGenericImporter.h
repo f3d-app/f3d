@@ -12,7 +12,10 @@
 #include <vtkImporter.h>
 #include <vtkVersion.h>
 
-namespace f3d{class options;}
+namespace f3d
+{
+class options;
+}
 class vtkActor;
 class vtkVolume;
 class vtkPolyDataMapper;
@@ -120,8 +123,8 @@ public:
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
 #else
-  bool GetTemporalInformation(vtkIdType animationIndex, int& nbTimeSteps,
-    double timeRange[2], vtkDoubleArray* timeSteps) override;
+  bool GetTemporalInformation(vtkIdType animationIndex, int& nbTimeSteps, double timeRange[2],
+    vtkDoubleArray* timeSteps) override;
 #endif
 
 protected:

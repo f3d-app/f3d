@@ -59,7 +59,10 @@ public:
   /*
    * Create the geometry reader (VTK reader) for the given filename
    */
-  virtual vtkSmartPointer<vtkAlgorithm> CreateGeometryReader(const std::string&) const { return nullptr; }
+  virtual vtkSmartPointer<vtkAlgorithm> CreateGeometryReader(const std::string&) const
+  {
+    return nullptr;
+  }
 
   /*
    * Apply custom code for the reader
@@ -69,7 +72,10 @@ public:
   /*
    * Create the scene reader (VTK importer) for the given filename
    */
-  virtual vtkSmartPointer<vtkImporter> CreateSceneReader(const std::string&) const { return nullptr; }
+  virtual vtkSmartPointer<vtkImporter> CreateSceneReader(const std::string&) const
+  {
+    return nullptr;
+  }
 
   /*
    * Apply custom code for the importer

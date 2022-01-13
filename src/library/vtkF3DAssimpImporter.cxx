@@ -58,14 +58,16 @@ public:
         vtkNew<vtkCamera> vCam;
         vCam->SetPosition(aCam->mPosition[0], aCam->mPosition[1], aCam->mPosition[2]);
         vCam->SetViewUp(aCam->mUp[0], aCam->mUp[1], aCam->mUp[2]);
-        vCam->SetFocalPoint(aCam->mPosition[0] + aCam->mLookAt[0], aCam->mPosition[1] + aCam->mLookAt[1], aCam->mPosition[2] + aCam->mLookAt[2]);
+        vCam->SetFocalPoint(aCam->mPosition[0] + aCam->mLookAt[0],
+          aCam->mPosition[1] + aCam->mLookAt[1], aCam->mPosition[2] + aCam->mLookAt[2]);
         this->Cameras.push_back({ aCam->mName.data, vCam });
       }
 
       // update camera global matrix nodes
       this->UpdateCameras();
 
-      if (this->ActiveCameraIndex >= 0 && this->ActiveCameraIndex < static_cast<vtkIdType>(this->Cameras.size()))
+      if (this->ActiveCameraIndex >= 0 &&
+        this->ActiveCameraIndex < static_cast<vtkIdType>(this->Cameras.size()))
       {
         renderer->SetActiveCamera(this->Cameras[this->ActiveCameraIndex].second);
       }
@@ -92,11 +94,17 @@ public:
 
           vtkNew<vtkLight> light;
           light->SetPosition(aLight->mPosition[0], aLight->mPosition[1], aLight->mPosition[2]);
-          light->SetFocalPoint(aLight->mPosition[0] + aLight->mDirection[0], aLight->mPosition[1] + aLight->mDirection[1], aLight->mPosition[2] + aLight->mDirection[2]);
-          light->SetAttenuationValues(aLight->mAttenuationConstant, aLight->mAttenuationLinear, aLight->mAttenuationQuadratic);
-          light->SetAmbientColor(aLight->mColorAmbient[0], aLight->mColorAmbient[1], aLight->mColorAmbient[2]);
-          light->SetDiffuseColor(aLight->mColorDiffuse[0], aLight->mColorDiffuse[1], aLight->mColorDiffuse[2]);
-          light->SetSpecularColor(aLight->mColorSpecular[0], aLight->mColorSpecular[1], aLight->mColorSpecular[2]);
+          light->SetFocalPoint(aLight->mPosition[0] + aLight->mDirection[0],
+            aLight->mPosition[1] + aLight->mDirection[1],
+            aLight->mPosition[2] + aLight->mDirection[2]);
+          light->SetAttenuationValues(aLight->mAttenuationConstant, aLight->mAttenuationLinear,
+            aLight->mAttenuationQuadratic);
+          light->SetAmbientColor(
+            aLight->mColorAmbient[0], aLight->mColorAmbient[1], aLight->mColorAmbient[2]);
+          light->SetDiffuseColor(
+            aLight->mColorDiffuse[0], aLight->mColorDiffuse[1], aLight->mColorDiffuse[2]);
+          light->SetSpecularColor(
+            aLight->mColorSpecular[0], aLight->mColorSpecular[1], aLight->mColorSpecular[2]);
           light->SetLightTypeToSceneLight();
 
           switch (aLight->mType)
@@ -116,7 +124,8 @@ public:
               break;
             case aiLightSourceType::aiLightSource_AREA:
             default:
-              vtkWarningWithObjectMacro(this->Parent, "Unsupported light type: " << aLight->mName.data);
+              vtkWarningWithObjectMacro(
+                this->Parent, "Unsupported light type: " << aLight->mName.data);
               break;
           }
 
@@ -172,7 +181,8 @@ public:
 
           if (!reader)
           {
-            vtkWarningWithObjectMacro(this->Parent, "Cannot instanciate the image reader for texture: " << texturePath);
+            vtkWarningWithObjectMacro(
+              this->Parent, "Cannot instanciate the image reader for texture: " << texturePath);
             return nullptr;
           }
 
@@ -210,7 +220,8 @@ public:
       std::string fileType = aTexture->achFormatHint;
 
       vtkSmartPointer<vtkImageReader2> reader;
-      reader.TakeReference(vtkImageReader2Factory::CreateImageReader2FromExtension(fileType.c_str()));
+      reader.TakeReference(
+        vtkImageReader2Factory::CreateImageReader2FromExtension(fileType.c_str()));
 
       if (reader)
       {
@@ -219,7 +230,8 @@ public:
         vTexture->SetInputConnection(reader->GetOutputPort());
       }
 #else
-      vtkWarningWithObjectMacro(this->Parent, "Embedded texture are supported by VTK >= 9.0.20210728");
+      vtkWarningWithObjectMacro(
+        this->Parent, "Embedded texture are supported by VTK >= 9.0.20210728");
 #endif
     }
     else
@@ -535,7 +547,7 @@ public:
     {
       this->Scene = this->Importer.ReadFile(filePath, aiProcess_LimitBoneWeights);
     }
-    catch(const DeadlyImportError& e)
+    catch (const DeadlyImportError& e)
     {
       vtkWarningWithObjectMacro(this->Parent, "Assimp exception: " << e.what());
     }
@@ -851,7 +863,8 @@ std::string vtkF3DAssimpImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 void vtkF3DAssimpImporter::UpdateTimeStep(double timestep)
 {
-  if (this->Internals->ActiveAnimation < 0 || this->Internals->ActiveAnimation >= this->GetNumberOfAnimations())
+  if (this->Internals->ActiveAnimation < 0 ||
+    this->Internals->ActiveAnimation >= this->GetNumberOfAnimations())
   {
     return;
   }
