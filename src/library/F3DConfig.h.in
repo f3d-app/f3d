@@ -5,15 +5,15 @@
 
 namespace f3d
 {
-  extern const std::string AppName;
-  extern const std::string AppTitle;
-  extern const std::string AppVersion;
-  extern const std::string AppBuildSystem;
-  extern const std::string AppBuildDate;
-  extern const std::string AppCompiler;
-  extern const std::string F3DReservedString;
+extern const std::string AppName;
+extern const std::string AppTitle;
+extern const std::string AppVersion;
+extern const std::string AppBuildSystem;
+extern const std::string AppBuildDate;
+extern const std::string AppCompiler;
+extern const std::string F3DReservedString;
 
-  static const std::string EXIT_HOTKEY_SYM = "Escape";
+static const std::string EXIT_HOTKEY_SYM = "Escape";
 }
 
 #cmakedefine01 F3D_MODULE_RAYTRACING

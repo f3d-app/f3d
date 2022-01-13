@@ -12,8 +12,8 @@
 #include "RegistryHelpers.h"
 
 // Unique F3D Thumbnail Provider GUID
-static const GUID CLSID_F3DThumbnailProvider =
-  { 0x0f3d0f3d0, 0x7d37, 0x4ccc, { 0x89, 0x99, 0x4f, 0xdd, 0xde, 0xbc, 0x5b, 0xe6 } };
+static const GUID CLSID_F3DThumbnailProvider = { 0x0f3d0f3d0, 0x7d37, 0x4ccc,
+  { 0x89, 0x99, 0x4f, 0xdd, 0xde, 0xbc, 0x5b, 0xe6 } };
 
 // Handle the the DLL's module
 HINSTANCE g_hInst = NULL;
@@ -68,8 +68,8 @@ STDAPI DllRegisterServer()
   }
 
   // Register the component.
-  HRESULT hr = RegisterInprocServer(szModuleName, CLSID_F3DThumbnailProvider,
-    L"F3DShellExtension.F3DThumbnailProvider Class");
+  HRESULT hr = RegisterInprocServer(
+    szModuleName, CLSID_F3DThumbnailProvider, L"F3DShellExtension.F3DThumbnailProvider Class");
   if (!SUCCEEDED(hr))
   {
     return hr;

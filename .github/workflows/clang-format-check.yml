@@ -6,8 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Run clang-format style check for C/C++/Protobuf programs.
-      uses: jidicula/clang-format-action@v4.4.1
+    - uses: DoozyX/clang-format-lint-action@v0.13
       with:
-        clang-format-version: '13'
-        check-path: 'src'
+        source: './src'
+        exclude: './src/library/cxxopts.hpp'
+        extensions: 'h,cxx'
+        clangFormatVersion: 13
