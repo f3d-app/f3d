@@ -12,6 +12,7 @@
 #include <vtkImporter.h>
 #include <vtkVersion.h>
 
+namespace f3d{class options;}
 class vtkActor;
 class vtkVolume;
 class vtkPolyDataMapper;
@@ -21,7 +22,6 @@ class vtkPolyDataMapper;
 class vtkSmartVolumeMapper;
 class vtkScalarBarActor;
 class vtkTexture;
-struct F3DOptions;
 
 class vtkF3DGenericImporter : public vtkImporter
 {
@@ -39,7 +39,7 @@ public:
   /**
    * Set options.
    */
-  void SetOptions(const F3DOptions& options);
+  void SetOptions(const f3d::options& options);
 
   /**
    * Check if the file can be read.
@@ -138,7 +138,7 @@ protected:
 
   vtkNew<vtkF3DMetaReader> Reader;
 
-  const F3DOptions* Options = nullptr;
+  const f3d::options* Options = nullptr;
   vtkNew<vtkScalarBarActor> ScalarBarActor;
   vtkNew<vtkActor> GeometryActor;
   vtkNew<vtkActor> PointSpritesActor;

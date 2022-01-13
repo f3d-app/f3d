@@ -11,12 +11,11 @@
 #ifndef vtkF3DRenderer_h
 #define vtkF3DRenderer_h
 
-#include "F3DOptions.h"
-
 #include <vtkOpenGLRenderer.h>
 #include <vtkOrientationMarkerWidget.h>
 #include <vtkSkybox.h>
 
+namespace f3d{class options;}
 class vtkCornerAnnotation;
 class vtkTextActor;
 
@@ -77,7 +76,7 @@ public:
    * Initialize the renderer to be used with provided options and file.
    * Should be called after being added to a vtkRenderWindow.
    */
-  virtual void Initialize(const F3DOptions& options, const std::string& fileInfo);
+  virtual void Initialize(const f3d::options& options, const std::string& fileInfo);
 
   //@{
   /**
@@ -167,8 +166,6 @@ protected:
    */
   virtual std::string GenerateMetaDataDescription();
 
-  F3DOptions Options;
-
   vtkNew<vtkActor> GridActor;
 
   vtkNew<vtkSkybox> Skybox;
@@ -200,10 +197,14 @@ protected:
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;
   bool UseTrackball = false;
+  bool Verbose = false;
 
+  int RaytracingSamples = 0;
+  int UpIndex = 1;
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
-  int UpIndex = 1;
+  
+  std::string HDRIFile;
 };
 
 #endif

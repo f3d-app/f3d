@@ -13,6 +13,7 @@
 #include <vector>
 
 class ConfigurationOptions;
+namespace f3d{ class options;}
 
 struct F3DOptions
 {
@@ -67,11 +68,11 @@ struct F3DOptions
   std::vector<double> CameraPosition;
   std::vector<double> CameraFocalPoint;
   std::vector<double> CameraViewUp;
-  std::vector<double> LookupPoints = { 0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0,
+  std::vector<double> Colormap = { 0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0,
     1.0, 1.0, 1.0, 1.0 };
   std::vector<double> Range;
   std::vector<double> SolidColor = { 1., 1., 1. };
-  std::vector<int> WindowSize = { 1000, 600 };
+  std::vector<int> Resolution = { 1000, 600 };
   std::string HDRIFile;
   std::string BaseColorTex;
   std::string ORMTex;
@@ -114,6 +115,8 @@ public:
 
   F3DOptionsParser();
   ~F3DOptionsParser();
+
+  static void ConvertToNewAPI(const F3DOptions& oldOptions, f3d::options* newOptions);
 
 private:
   F3DOptionsParser(F3DOptionsParser const&) = delete;

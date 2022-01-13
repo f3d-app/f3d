@@ -10,7 +10,7 @@
 #include <vtkInteractorStyleTrackballCamera.h>
 
 class F3DAnimationManager;
-struct F3DOptions;
+namespace f3d{class options;}
 
 class vtkF3DInteractorStyle : public vtkInteractorStyleTrackballCamera
 {
@@ -75,7 +75,7 @@ public:
   /**
    * Set options
    */
-  void SetOptions(const F3DOptions& options) { this->Options = &options; };
+  void SetOptions(const f3d::options& options) { this->Options = &options; };
 
 protected:
   /**
@@ -86,7 +86,7 @@ protected:
   virtual bool IsUserInteractionBlocked();
 
   const F3DAnimationManager* AnimationManager = nullptr;
-  const F3DOptions* Options = nullptr;
+  const f3d::options* Options = nullptr;
 
   int WindowSize[2] = { -1, -1 };
   int WindowPos[2] = { 0, 0 };

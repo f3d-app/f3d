@@ -4,6 +4,7 @@
 #include "F3DConfig.h"
 #include "F3DLoader.h"
 #include "F3DLog.h"
+#include "f3d_options.h"
 #include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCallbackCommand.h>
@@ -371,5 +372,5 @@ void vtkF3DInteractorStyle::EnvironmentRotate()
 //----------------------------------------------------------------------------
 bool vtkF3DInteractorStyle::IsUserInteractionBlocked()
 {
-  return this->AnimationManager->IsPlaying() && this->Options->CameraIndex >= 0;
+  return this->AnimationManager->IsPlaying() && this->Options->get<int>("camera-index") >= 0;
 }
