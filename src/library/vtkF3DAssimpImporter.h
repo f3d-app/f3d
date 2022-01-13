@@ -1,11 +1,11 @@
 /**
  * @class   vtkF3DAssimpImporter
  * @brief   Importer using Assimp library
- * 
+ *
  * This importer is based on Assimp 5 and supports all related file format.
  * The list of supported file format is available here:
  * https://github.com/assimp/assimp/blob/master/doc/Fileformats.md
- * 
+ *
  * The following formats have been tested and are supported by f3d: FBX, DAE, OFF, DXF
  */
 
@@ -36,10 +36,7 @@ public:
   /**
    * Get the filename
    */
-  const char* GetFileName()
-  {
-    return this->FileName.c_str();
-  }
+  const char* GetFileName() { return this->FileName.c_str(); }
 
   /**
    * Set the filename

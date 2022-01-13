@@ -8,7 +8,6 @@
 #include <vtkInformationVector.h>
 #include <vtkObjectFactory.h>
 
-
 vtkStandardNewMacro(vtkF3DMetaReader);
 
 //----------------------------------------------------------------------------

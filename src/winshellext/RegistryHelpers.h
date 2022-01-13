@@ -3,22 +3,26 @@
 #include <cstdio>
 #include <windows.h>
 
-#define RETURNONFAILURE(_hr) if (!SUCCEEDED(_hr)) { return hr; }
+#define RETURNONFAILURE(_hr)                                                                       \
+  if (!SUCCEEDED(_hr))                                                                             \
+  {                                                                                                \
+    return hr;                                                                                     \
+  }
 
 //------------------------------------------------------------------------------
 // This function creates and set a HKCU registry key string value
 HRESULT RegSetHKCUKeyValue(const wchar_t* subKey, const wchar_t* valueName, const wchar_t* value)
 {
   HKEY key = nullptr;
-  HRESULT hr = HRESULT_FROM_WIN32(RegCreateKeyEx(
-    HKEY_CURRENT_USER, subKey, 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &key, nullptr));
+  HRESULT hr = HRESULT_FROM_WIN32(RegCreateKeyEx(HKEY_CURRENT_USER, subKey, 0, nullptr,
+    REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &key, nullptr));
 
   RETURNONFAILURE(hr);
 
   if (value != nullptr)
   {
-    hr = HRESULT_FROM_WIN32(RegSetValueEx(
-      key, valueName, 0, REG_SZ, reinterpret_cast<const BYTE*>(value), lstrlen(value) * sizeof(*value)));
+    hr = HRESULT_FROM_WIN32(RegSetValueEx(key, valueName, 0, REG_SZ,
+      reinterpret_cast<const BYTE*>(value), lstrlen(value) * sizeof(*value)));
   }
   RegCloseKey(key);
   return hr;
@@ -29,8 +33,8 @@ HRESULT RegSetHKCUKeyValue(const wchar_t* subKey, const wchar_t* valueName, cons
 HRESULT RegSetHKCUKeyValue(const wchar_t* subKey, const wchar_t* valueName, DWORD value)
 {
   HKEY hKey = nullptr;
-  HRESULT hr = HRESULT_FROM_WIN32(RegCreateKeyEx(
-    HKEY_CURRENT_USER, subKey, 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, nullptr));
+  HRESULT hr = HRESULT_FROM_WIN32(RegCreateKeyEx(HKEY_CURRENT_USER, subKey, 0, nullptr,
+    REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &hKey, nullptr));
   RETURNONFAILURE(hr);
 
   hr = HRESULT_FROM_WIN32(RegSetValueEx(
@@ -41,7 +45,8 @@ HRESULT RegSetHKCUKeyValue(const wchar_t* subKey, const wchar_t* valueName, DWOR
 
 //------------------------------------------------------------------------------
 // Get the data from a HKCU registry subkey
-HRESULT RegGetHKCUKeyValue(const wchar_t* subKey, const wchar_t* valueName, wchar_t* buffer, DWORD bufferLen)
+HRESULT RegGetHKCUKeyValue(
+  const wchar_t* subKey, const wchar_t* valueName, wchar_t* buffer, DWORD bufferLen)
 {
   HKEY hKey = nullptr;
   HRESULT hr = HRESULT_FROM_WIN32(RegOpenKeyEx(HKEY_CURRENT_USER, subKey, 0, KEY_READ, &hKey));
@@ -100,7 +105,8 @@ HRESULT UnregisterInprocServer(const CLSID& clsid)
 HRESULT RegisterShellExtThumbnailHandler(const wchar_t* fileType, const CLSID& clsid)
 {
   // If fileType starts with '.', try to read the default value of the
-  // HKCU\Software\Classes\<fileType> key which contains the ProgID to which the file type is linked.
+  // HKCU\Software\Classes\<fileType> key which contains the ProgID to which the file type is
+  // linked.
   wchar_t subkey[MAX_PATH];
   wchar_t defaultVal[MAX_PATH];
   if (*fileType == L'.')

@@ -172,7 +172,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   }
   else
   {
-    if (options.get<bool>("no-background") && ! options.get<std::string>("output").empty())
+    if (options.get<bool>("no-background") && !options.get<std::string>("output").empty())
     {
       // we need to set the background to black to avoid blending issues with translucent
       // objects when saving to file with no background
@@ -180,7 +180,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
     }
     else
     {
-      this->SetBackground(options.get<std::vector<double>>("background-color").data());
+      this->SetBackground(options.get<std::vector<double> >("background-color").data());
     }
     this->AutomaticLightCreationOn();
   }

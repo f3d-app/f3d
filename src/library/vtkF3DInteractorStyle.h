@@ -10,7 +10,10 @@
 #include <vtkInteractorStyleTrackballCamera.h>
 
 class F3DAnimationManager;
-namespace f3d{class options;}
+namespace f3d
+{
+class options;
+}
 
 class vtkF3DInteractorStyle : public vtkInteractorStyleTrackballCamera
 {

@@ -32,8 +32,7 @@ int vtkF3DWin32OutputWindow::Initialize()
     {
       break;
     }
-  }
-  while (hCurWnd != nullptr);
+  } while (hCurWnd != nullptr);
 
   if (hCurWnd == nullptr)
   {
@@ -64,7 +63,7 @@ void vtkF3DWin32OutputWindow::DisplayText(const char* text)
   std::string str(text);
   str = std::regex_replace(str, std::regex("\n"), "\r\n");
 
-  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > converter;
   std::wstring wstr = converter.from_bytes(str);
   wstr += L"\r\n";
 

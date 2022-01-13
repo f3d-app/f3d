@@ -1,21 +1,21 @@
 #include "vtkF3DPostProcessFilter.h"
 
 #include "vtkAppendPolyData.h"
+#include "vtkDataObject.h"
+#include "vtkDataObjectTreeIterator.h"
+#include "vtkDataSetSurfaceFilter.h"
+#include "vtkImageData.h"
+#include "vtkImageToPoints.h"
+#include "vtkInformation.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkInformation.h"
 #include "vtkPolyData.h"
-#include "vtkImageData.h"
-#include "vtkDataObject.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkDataSetSurfaceFilter.h"
-#include "vtkImageToPoints.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkVertexGlyphFilter.h"
-#include "vtkDataObjectTreeIterator.h"
 #include "vtkRectilinearGridToPointSet.h"
 #include "vtkResampleToImage.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkVertexGlyphFilter.h"
 
 #include "F3DLog.h"
 
@@ -90,7 +90,7 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
       verts->InsertNextCell(pd->GetNumberOfPoints(), polyVertex.data());
       pd->SetVerts(verts);
     }
-    else if(ug)
+    else if (ug)
     {
       ug->InsertNextCell(VTK_POLY_VERTEX, ug->GetNumberOfPoints(), polyVertex.data());
     }

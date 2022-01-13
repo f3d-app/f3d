@@ -15,7 +15,10 @@
 #include <vtkOrientationMarkerWidget.h>
 #include <vtkSkybox.h>
 
-namespace f3d{class options;}
+namespace f3d
+{
+class options;
+}
 class vtkCornerAnnotation;
 class vtkTextActor;
 
@@ -203,7 +206,7 @@ protected:
   int UpIndex = 1;
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
-  
+
   std::string HDRIFile;
 };
 

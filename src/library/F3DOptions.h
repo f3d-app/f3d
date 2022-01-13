@@ -13,7 +13,10 @@
 #include <vector>
 
 class ConfigurationOptions;
-namespace f3d{ class options;}
+namespace f3d
+{
+class options;
+}
 
 struct F3DOptions
 {
@@ -68,8 +71,8 @@ struct F3DOptions
   std::vector<double> CameraPosition;
   std::vector<double> CameraFocalPoint;
   std::vector<double> CameraViewUp;
-  std::vector<double> Colormap = { 0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0,
-    1.0, 1.0, 1.0, 1.0 };
+  std::vector<double> Colormap = { 0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0,
+    1.0, 1.0, 1.0 };
   std::vector<double> Range;
   std::vector<double> SolidColor = { 1., 1., 1. };
   std::vector<int> Resolution = { 1000, 600 };
@@ -88,7 +91,7 @@ class F3DOptionsParser
 public:
   void Initialize(int argc, char** argv);
 
-   /**
+  /**
    * Find and parse a config file, if any, into the config file dictionnary.
    * If a non-empty userConfigFile is provided, it will be considered instead
    * of standard settings config file

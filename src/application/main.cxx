@@ -1,7 +1,7 @@
 #include "F3DConfig.h"
+#include "F3DException.h"
 #include "F3DLoader.h"
 #include "F3DLog.h"
-#include "F3DException.h"
 
 int main(int argc, char** argv)
 {
@@ -17,7 +17,7 @@ int main(int argc, char** argv)
     // exit gracefully after cleanup when no process is required
     exit(EXIT_SUCCESS);
   }
-  catch(...)
+  catch (...)
   {
     F3DLog::Print(F3DLog::Severity::Error, "F3D encountered an unexpected exception");
     exit(EXIT_FAILURE);
