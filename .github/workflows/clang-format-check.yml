@@ -5,21 +5,10 @@ jobs:
     name: Formatting Check
     runs-on: ubuntu-latest
     steps:
-    
     - uses: actions/checkout@v2
-    
     - uses: DoozyX/clang-format-lint-action@v0.13
       with:
         source: './src'
         exclude: './src/library/cxxopts.hpp'
         extensions: 'h,cxx'
         clangFormatVersion: 13
-    
-    - name: comment PR
-      if: ${{ failure() }}
-      uses: unsplash/comment-on-pr@v1.3.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        msg: "clang-format failure"
-

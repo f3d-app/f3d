@@ -357,7 +357,7 @@ void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
   };
   // clang-format on
 
-  F3DLog::SetUseColoring (false);
+  F3DLog::SetUseColoring(false);
   F3DLog::Print(F3DLog::Severity::Info, cxxOptions.help());
   F3DLog::Print(F3DLog::Severity::Info, "Keys:");
   for (const auto& key : keys)
