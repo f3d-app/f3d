@@ -14,7 +14,8 @@
 #include <vtkVersion.h>
 
 //----------------------------------------------------------------------------
-void F3DAnimationManager::Initialize(const f3d::options& options, vtkImporter* importer, vtkRenderWindow* renWin, vtkF3DRenderer* renderer)
+void F3DAnimationManager::Initialize(const f3d::options& options, vtkImporter* importer,
+  vtkRenderWindow* renWin, vtkF3DRenderer* renderer)
 {
   this->Importer = importer;
   if (!this->Importer)
@@ -95,7 +96,8 @@ void F3DAnimationManager::Initialize(const f3d::options& options, vtkImporter* i
   else if (animationIndex > 0 && animationIndex >= availAnimations)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
-      "Specified animation index is greater than the highest possible animation index, enabling the first animation.");
+      "Specified animation index is greater than the highest possible animation index, enabling "
+      "the first animation.");
 
     this->Importer->EnableAnimation(0);
   }
@@ -127,8 +129,7 @@ void F3DAnimationManager::Initialize(const f3d::options& options, vtkImporter* i
       this->Importer->GetTemporalInformation(
         animIndex, this->FrameRate, nbTimeSteps, this->TimeRange, timeSteps);
 #else
-      this->Importer->GetTemporalInformation(
-        animIndex, nbTimeSteps, this->TimeRange, timeSteps);
+      this->Importer->GetTemporalInformation(animIndex, nbTimeSteps, this->TimeRange, timeSteps);
 #endif
 
       for (vtkIdType i = 0; i < timeSteps->GetNumberOfTuples(); i++)
@@ -167,10 +168,12 @@ void F3DAnimationManager::ToggleAnimation()
     {
       vtkNew<vtkCallbackCommand> tickCallback;
       tickCallback->SetClientData(this);
-      tickCallback->SetCallback([](vtkObject*, unsigned long, void* clientData, void*) {
-        F3DAnimationManager* animMgr = static_cast<F3DAnimationManager*>(clientData);
-        animMgr->Tick();
-      });
+      tickCallback->SetCallback(
+        [](vtkObject*, unsigned long, void* clientData, void*)
+        {
+          F3DAnimationManager* animMgr = static_cast<F3DAnimationManager*>(clientData);
+          animMgr->Tick();
+        });
       interactor->AddObserver(vtkCommand::TimerEvent, tickCallback);
       interactor->CreateRepeatingTimer(1000.0 / this->FrameRate);
     }

@@ -8,7 +8,7 @@
  *  1/ the surface (hull) of the dataset as a vtkPolyData
  *  2/ a point cloud of the dataset as a vtkPolyData
  *  3/ a 3D image sampling of the dataset as a volumic vtkImageData (if supported)
-*/
+ */
 
 #ifndef vtkF3DPostProcessFilter_h
 #define vtkF3DPostProcessFilter_h

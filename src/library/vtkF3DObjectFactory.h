@@ -11,12 +11,12 @@
 class vtkF3DObjectFactory : public vtkObjectFactory
 {
 public:
-  static vtkF3DObjectFactory * New();
+  static vtkF3DObjectFactory* New();
   vtkTypeMacro(vtkF3DObjectFactory, vtkObjectFactory);
 
-  const char * GetDescription() override { return "F3D factory overrides."; }
+  const char* GetDescription() override { return "F3D factory overrides."; }
 
-  const char * GetVTKSourceVersion() override;
+  const char* GetVTKSourceVersion() override;
 
 protected:
   vtkF3DObjectFactory();

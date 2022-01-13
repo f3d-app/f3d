@@ -21,7 +21,7 @@ vtkF3DConsoleOutputWindow::vtkF3DConsoleOutputWindow()
 void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
 {
   std::string fmtText;
-  switch(this->GetCurrentMessageType())
+  switch (this->GetCurrentMessageType())
   {
     case vtkOutputWindow::MESSAGE_TYPE_ERROR:
       fmtText = this->UseColoring ? "\033[31;1m" : "";

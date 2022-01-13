@@ -25,11 +25,12 @@ public:
    * Render renWin into output png provided.
    * Returns true if successful, false otherwise.
    */
-  static bool RenderOffScreen(vtkRenderWindow* renWin, const std::string& output, bool noBg = false);
+  static bool RenderOffScreen(
+    vtkRenderWindow* renWin, const std::string& output, bool noBg = false);
 
   /**
-   * Render renWin and compare with reference using provided threshold. Output png is generated in case of failure.
-   * Returns true if successful, false otherwise.
+   * Render renWin and compare with reference using provided threshold. Output png is generated in
+   * case of failure. Returns true if successful, false otherwise.
    */
   static bool RenderTesting(vtkRenderWindow* renWin, const std::string& reference, double threshold,
     bool noBg, const std::string& output);

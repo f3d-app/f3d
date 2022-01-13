@@ -16,8 +16,8 @@
 
 #include <memory>
 #include <vtkImporter.h>
-#include <vtkVersion.h>
 #include <vtkNew.h>
+#include <vtkVersion.h>
 
 class vtkF3DAlembicImporter : public vtkImporter
 {

@@ -15,8 +15,8 @@
 #include <TColgp_Array1OfVec.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
-#include <TopoDS_Solid.hxx>
 #include <TopoDS_Edge.hxx>
+#include <TopoDS_Solid.hxx>
 
 #if F3D_MODULE_OCCT_XCAF
 #include <IGESCAFControl_Reader.hxx>
@@ -39,6 +39,7 @@
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkMatrix4x4.h>
+#include <vtkMultiBlockDataSet.h>
 #include <vtkNew.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
@@ -47,7 +48,6 @@
 #include <vtkTransformFilter.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedIntArray.h>
-#include <vtkMultiBlockDataSet.h>
 #include <vtksys/SystemTools.hxx>
 
 #include <array>
@@ -96,8 +96,8 @@ public:
         {
           // meshing
           BRepMesh_IncrementalMesh(edge, this->Parent->GetLinearDeflection(),
-                                    this->Parent->GetRelativeDeflection(),
-                                    this->Parent->GetAngularDeflection(), Standard_True);
+            this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(),
+            Standard_True);
         }
 
         if (poly.IsNull())
@@ -115,7 +115,7 @@ public:
           points->InsertNextPoint(pt.X(), pt.Y(), pt.Z());
 
           // normals and uvs make no sense for lines
-          float fn[3] = {0.0, 0.0, 1.0};
+          float fn[3] = { 0.0, 0.0, 1.0 };
           normals->InsertNextTypedTuple(fn);
           uvs->InsertNextTypedTuple(fn);
         }
@@ -124,7 +124,7 @@ public:
         std::iota(polyline.begin(), polyline.end(), shift);
         linesCells->InsertNextCell(polyline.size(), polyline.data());
 
-  #if F3D_MODULE_OCCT_XCAF
+#if F3D_MODULE_OCCT_XCAF
         std::array<unsigned char, 3> rgb = { 0, 0, 0 };
         Quantity_Color aColor;
         if (this->ColorTool->GetColor(edge, XCAFDoc_ColorCurv, aColor))
@@ -134,7 +134,7 @@ public:
           rgb[2] = static_cast<unsigned char>(255.0 * aColor.Blue());
         }
         colors->InsertNextTypedTuple(rgb.data());
-  #endif
+#endif
 
         shift += nbV;
       }
@@ -152,8 +152,8 @@ public:
       {
         // meshing
         BRepMesh_IncrementalMesh(face, this->Parent->GetLinearDeflection(),
-                                  this->Parent->GetRelativeDeflection(),
-                                  this->Parent->GetAngularDeflection(), Standard_True);
+          this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(),
+          Standard_True);
       }
 
       if (poly.IsNull())
@@ -177,10 +177,11 @@ public:
       // Normals
       if (poly->HasNormals())
       {
-        for (Standard_Integer i = 1; i <= nbV; i ++)
+        for (Standard_Integer i = 1; i <= nbV; i++)
         {
           gp_Dir n = poly->Normal(i);
-          float fn[3] = {static_cast<float>(n.X()), static_cast<float>(n.Y()), static_cast<float>(n.Z())};
+          float fn[3] = { static_cast<float>(n.X()), static_cast<float>(n.Y()),
+            static_cast<float>(n.Z()) };
           if (faceOrientation == TopAbs_Orientation::TopAbs_REVERSED)
           {
             vtkMath::MultiplyScalar(fn, -1.f);
@@ -191,7 +192,7 @@ public:
       else
       {
         // just in case a face does not have normals, add a dummy normal
-        float fn[3] = {0.0, 0.0, 1.0};
+        float fn[3] = { 0.0, 0.0, 1.0 };
         for (Standard_Integer i = 1; i <= nbV; i++)
         {
           normals->InsertNextTypedTuple(fn);
@@ -204,13 +205,13 @@ public:
         for (Standard_Integer i = 1; i <= nbV; i++)
         {
           gp_Pnt2d uv = poly->UVNode(i);
-          float fn[2] = {static_cast<float>(uv.X()), static_cast<float>(uv.Y())};
+          float fn[2] = { static_cast<float>(uv.X()), static_cast<float>(uv.Y()) };
           uvs->InsertNextTypedTuple(fn);
         }
       }
       else
       {
-        float fn[3] = {0.0, 0.0};
+        float fn[3] = { 0.0, 0.0 };
         for (Standard_Integer i = 1; i <= nbV; i++)
         {
           uvs->InsertNextTypedTuple(fn);
@@ -377,7 +378,7 @@ public:
     }
   }
 
-  std::unordered_map<int, vtkSmartPointer<vtkPolyData>> ShapeMap;
+  std::unordered_map<int, vtkSmartPointer<vtkPolyData> > ShapeMap;
   Handle(XCAFDoc_ShapeTool) ShapeTool;
   Handle(XCAFDoc_ColorTool) ColorTool;
 #endif
@@ -401,13 +402,10 @@ vtkF3DOCCTReader::~vtkF3DOCCTReader() = default;
 class ProgressIndicator : public Message_ProgressIndicator
 {
 public:
-  ProgressIndicator(vtkF3DOCCTReader* reader)
-  {
-    this->Reader = reader;
-  }
+  ProgressIndicator(vtkF3DOCCTReader* reader) { this->Reader = reader; }
 
 protected:
-  void Show (const Message_ProgressScope& , const Standard_Boolean ) override
+  void Show(const Message_ProgressScope&, const Standard_Boolean) override
   {
     double currentPosition = this->GetPosition();
     if (currentPosition - this->LastPosition > 0.01)
@@ -446,7 +444,8 @@ bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Docume
 #endif
 
 //----------------------------------------------------------------------------
-int vtkF3DOCCTReader::RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
+int vtkF3DOCCTReader::RequestData(
+  vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
   vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outputVector);
 
@@ -481,7 +480,8 @@ int vtkF3DOCCTReader::RequestData(vtkInformation*, vtkInformationVector**, vtkIn
     TopoDS_Shape shape;
     this->Internals->ShapeTool->GetShape(label, shape);
 
-    this->Internals->ShapeMap[this->Internals->GetHash(label)] = this->Internals->CreateShape(shape);
+    this->Internals->ShapeMap[this->Internals->GetHash(label)] =
+      this->Internals->CreateShape(shape);
 
     double progress = 0.5 + static_cast<double>(iLabel) / topLevelShapes.Length();
     this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
@@ -542,5 +542,6 @@ void vtkF3DOCCTReader::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AngularDeflection: " << this->AngularDeflection << "\n";
   os << indent << "RelativeDeflection: " << (this->RelativeDeflection ? "true" : "false") << "\n";
   os << indent << "ReadWire: " << (this->ReadWire ? "true" : "false") << "\n";
-  os << indent << "FileFormat: " << (this->FileFormat == FILE_FORMAT::STEP ? "STEP" : "IGES") << "\n";
+  os << indent << "FileFormat: " << (this->FileFormat == FILE_FORMAT::STEP ? "STEP" : "IGES")
+     << "\n";
 }
