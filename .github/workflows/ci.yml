@@ -243,6 +243,7 @@ jobs:
         -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
         -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
         -DF3D_COVERAGE=ON
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
     - name: Build
       working-directory: ${{github.workspace}}/source
@@ -266,3 +267,10 @@ jobs:
       uses: codecov/codecov-action@v2
       with:
         files: ${{github.workspace}}/source/coverage.info
+
+    - uses: ZedThree/clang-tidy-review@v0.7.0
+      id: review
+
+    # If there are any comments, fail the check
+    - if: steps.review.outputs.total_comments > 0
+      run: exit 1
