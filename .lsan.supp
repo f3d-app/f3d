@@ -1,0 +1,6 @@
+# NVIDIA driver
+leak:nvidia-glcore
+
+# OCCT
+leak:TKernel
+leak:TKXSBase
