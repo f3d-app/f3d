@@ -320,11 +320,20 @@ f3d_test(NAME TestQuietNonExistentFile DATA nonExistentFile.vtp ARGS --filename 
 # Test non supported file, do not add support for .dummy file.
 f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename REGEXP ".*/testing/data/unsupportedFile.dummy is not a file of a supported file format" NO_RENDER)
 
-# Test invalid provided texture, do not add a dummy.png
-f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${CMAKE_SOURCE_DIR}/testing/data/dummy.png REGEXP "Cannot open texture file" NO_BASELINE)
+# Test non existent texture, do not add a dummy.png
+f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${CMAKE_SOURCE_DIR}/testing/data/dummy.png REGEXP "Texture file does not exist" NO_BASELINE)
 
-# Test invalid provided HDRI, do not add a dummy.png
-f3d_test(NAME TestNonExistentHDRI DATA cow.vtp ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/dummy.png REGEXP "Cannot open HDRI file" NO_BASELINE)
+# Test invalid texture
+f3d_test(NAME TestInvalidTexture DATA cow.vtp ARGS --texture-material=${CMAKE_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open texture file" NO_BASELINE)
+
+# Test non existent HDRI, do not add a dummy.png
+f3d_test(NAME TestNonExistentHDRI DATA cow.vtp ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/dummy.png REGEXP "HDRI file does not exist" NO_BASELINE)
+
+# Test non existent interaction file, do not add a TestNonExistentInteraction
+f3d_test(NAME TestNonExistentInteraction DATA cow.vtp INTERACTION REGEXP "Interaction record file to play does not exist" NO_BASELINE)
+
+# Test invalid provided HDRI
+f3d_test(NAME TestInvalidHDRI DATA cow.vtp ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
 # Test invalid options, do not add a --dummy option
 f3d_test(NAME TestInvalidOption ARGS --dummy REGEXP "Error parsing options:")

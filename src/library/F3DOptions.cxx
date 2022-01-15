@@ -533,13 +533,14 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
     return false;
   }
 
+  configFilePath = vtksys::SystemTools::CollapseFullPath(configFilePath);
   std::ifstream file;
   file.open(configFilePath.c_str());
 
   if (!file.is_open())
   {
     F3DLog::Print(
-      F3DLog::Severity::Error, "Unable to open the configuration file ", configFilePath);
+      F3DLog::Severity::Error, "Unable to open the configuration file: ", configFilePath);
     return false;
   }
 
