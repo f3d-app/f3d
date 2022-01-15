@@ -241,6 +241,37 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
               "  }\n"
               "  return acc / vec3(SAMPLES);\n"
               "}\n"
+              "vec4 cubic(float v)\n"
+              "{\n"
+              "  vec4 n = vec4(1.0, 2.0, 3.0, 4.0) - v;\n"
+              "  vec4 s = n * n * n;\n"
+              "  float x = s.x;\n"
+              "  float y = s.y - 4.0 * s.x;\n"
+              "  float z = s.z - 4.0 * s.y + 6.0 * s.x;\n"
+              "  float w = 6.0 - x - y - z;\n"
+              "  return vec4(x, y, z, w) * (1.0/6.0);\n"
+              "}\n"
+              "vec4 textureBicubic(vec2 texCoords)\n"
+              "{\n"
+              "  vec2 texSize = textureSize(texBackground, 0);\n"
+              "  vec2 invTexSize = 1.0 / texSize;\n"
+              "  texCoords = texCoords * texSize - 0.5;\n"
+              "  vec2 fxy = fract(texCoords);\n"
+              "  texCoords -= fxy;\n"
+              "  vec4 xcubic = cubic(fxy.x);\n"
+              "  vec4 ycubic = cubic(fxy.y);\n"
+              "  vec4 c = texCoords.xxyy + vec2(-0.5, 1.5).xyxy;\n"
+              "  vec4 s = vec4(xcubic.xz + xcubic.yw, ycubic.xz + ycubic.yw);\n"
+              "  vec4 offset = c + vec4(xcubic.yw, ycubic.yw) / s;\n"
+              "  offset *= invTexSize.xxyy;\n"
+              "  vec4 sample0 = texture(texBackground, offset.xz);\n"
+              "  vec4 sample1 = texture(texBackground, offset.yz);\n"
+              "  vec4 sample2 = texture(texBackground, offset.xw);\n"
+              "  vec4 sample3 = texture(texBackground, offset.yw);\n"
+              "  float sx = s.x / (s.x + s.y);\n"
+              "  float sy = s.z / (s.z + s.w);\n"
+              "  return mix(mix(sample3, sample2, sx), mix(sample1, sample0, sx), sy);\n"
+              "}\n"
               "//VTK::FSQ::Decl";
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl", ssDecl.str());
@@ -253,7 +284,7 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
     }
     else
     {
-      ssImpl << "  vec3 bgCol = texture(texBackground, texCoord).rgb;\n";
+      ssImpl << "  vec3 bgCol = textureBicubic(texCoord).rgb;\n";
     }
     ssImpl << "  vec3 result = mix(bgCol, mainSample.rgb, mainSample.a);\n";
 
