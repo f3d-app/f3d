@@ -6,6 +6,7 @@ RUN apt update && apt install -y \
     apt-transport-https \
     build-essential \
     ca-certificates \
+    clang-10 \
     curl \
     gnupg \
     gzip \
