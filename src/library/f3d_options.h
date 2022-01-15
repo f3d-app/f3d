@@ -13,6 +13,8 @@ class options
 public:
   options();
   ~options();
+  options(const options& opt);
+  options& operator=(const options& opt);
 
   template<typename T>
   void set(const std::string& name, const T& value);

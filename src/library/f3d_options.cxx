@@ -16,7 +16,22 @@ public:
 //----------------------------------------------------------------------------
 options::options()
   : Internals(new options::F3DInternals){};
+
+//----------------------------------------------------------------------------
 options::~options() = default;
+
+//----------------------------------------------------------------------------
+options::options(const options& opt)
+{
+  this->Internals->Options = opt.Internals->Options;
+}
+
+//----------------------------------------------------------------------------
+options& options::operator=(const options& opt)
+{
+  this->Internals->Options = opt.Internals->Options;
+  return *this;
+}
 
 //----------------------------------------------------------------------------
 template<typename T>

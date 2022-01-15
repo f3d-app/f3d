@@ -144,16 +144,16 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     return;
   }
 
-  bool noRender = this->Options->get<bool>("no-render");
-  bool print = (this->Options->get<bool>("verbose") || noRender);
-  if (print)
+  bool verbose = (this->Options->get<bool>("verbose"));
+  if (verbose)
   {
     this->OutputDescription =
       vtkF3DGenericImporter::GetDataObjectDescription(this->Reader->GetOutput());
   }
 
-  if (noRender)
+  if (!this->GetRenderWindow())
   {
+    // No render window provided, do not setup the mappers and actors
     return;
   }
 
@@ -216,7 +216,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       {
         usedArray = arrayName;
       }
-      if (print)
+      if (verbose)
       {
         F3DLog::Print(F3DLog::Severity::Info, "Using default scalar array: ", usedArray);
       }
@@ -234,7 +234,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
           {
             usedArray = arrayName;
           }
-          if (print)
+          if (verbose)
           {
             F3DLog::Print(F3DLog::Severity::Info, "Using first found array: ", usedArray);
           }
@@ -252,7 +252,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   {
     F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: ", usedArray);
   }
-  if (this->ArrayIndexForColoring == -1 && print)
+  if (this->ArrayIndexForColoring == -1 && verbose)
   {
     F3DLog::Print(
       F3DLog::Severity::Info, "No array found for scalar coloring and volume rendering");
@@ -361,9 +361,9 @@ void vtkF3DGenericImporter::SetFileName(const char* arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::SetOptions(const f3d::options& options)
+void vtkF3DGenericImporter::SetOptions(const f3d::options* options)
 {
-  this->Options = &options;
+  this->Options = options;
 }
 
 //----------------------------------------------------------------------------

@@ -190,7 +190,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp1, "version", "", "Print version details");
     this->DeclareOption(grp1, "readers-list", "", "Print the list of file types");
     this->DeclareOption(grp1, "verbose", "", "Enable verbose mode, providing more information about the loaded data in the console output", options.Verbose);
-    this->DeclareOption(grp1, "no-render", "", "Verbose mode without any rendering, only for the first file", options.NoRender);
+    this->DeclareOption(grp1, "no-render", "", "Verbose mode without any rendering, only for the first file", options.NoRender, true, false);
     this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which superseed any verbose options and prevent any console output to be generated at all", options.Quiet);
     this->DeclareOption(grp1, "axis", "x", "Show axes", options.Axis);
     this->DeclareOption(grp1, "grid", "g", "Show grid", options.Grid);
@@ -730,6 +730,7 @@ F3DOptions F3DOptionsParser::GetOptionsFromCommandLine(std::vector<std::string>&
 void F3DOptionsParser::ConvertToNewAPI(const F3DOptions& oldOptions, f3d::options* newOptions)
 {
   // TODO rework option names
+  // TODO remove some options that do not exist in libf3d (like no-render)
   newOptions->set("animation-index", oldOptions.AnimationIndex);
   newOptions->set("axis", oldOptions.Axis);
   newOptions->set("background-color", oldOptions.BackgroundColor);
@@ -767,7 +768,7 @@ void F3DOptionsParser::ConvertToNewAPI(const F3DOptions& oldOptions, f3d::option
   newOptions->set("metadata", oldOptions.MetaData);
   newOptions->set("metallic", oldOptions.Metallic);
   newOptions->set("no-background", oldOptions.NoBackground);
-  newOptions->set("no-render", oldOptions.NoRender);
+  //  newOptions->set("no-render", oldOptions.NoRender);
   newOptions->set("normal-scale", oldOptions.NormalScale);
   newOptions->set("opacity", oldOptions.Opacity);
   newOptions->set("output", oldOptions.Output);
