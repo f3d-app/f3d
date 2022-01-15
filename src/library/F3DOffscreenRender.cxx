@@ -39,8 +39,7 @@ bool F3DOffscreenRender::RenderOffScreen(
 
   vtkNew<vtkPNGWriter> writer;
   writer->SetInputData(image);
-  std::string fullPath = vtksys::SystemTools::CollapseFullPath(output);
-  writer->SetFileName(fullPath.c_str());
+  writer->SetFileName(vtksys::SystemTools::CollapseFullPath(output).c_str());
   writer->Write();
 
   return true;
@@ -50,7 +49,8 @@ bool F3DOffscreenRender::RenderOffScreen(
 bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::string& reference,
   double threshold, bool noBg, const std::string& output)
 {
-  if (!vtksys::SystemTools::FileExists(reference))
+  std::string referenceFullPath = vtksys::SystemTools::CollapseFullPath(reference);
+  if (!vtksys::SystemTools::FileExists(referenceFullPath))
   {
     if (output.empty())
     {
@@ -88,7 +88,7 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
 #endif
 
   vtkNew<vtkPNGReader> reader;
-  reader->SetFileName(reference.c_str());
+  reader->SetFileName(referenceFullPath.c_str());
 
   vtkNew<vtkImageDifference> diff;
   diff->SetInputConnection(rtW2if->GetOutputPort());
