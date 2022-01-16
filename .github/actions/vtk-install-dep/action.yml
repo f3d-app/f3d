@@ -38,7 +38,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-3-${{inputs.os}}
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-4-${{inputs.os}}
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -98,6 +98,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_IOImage=YES
         -DVTK_MODULE_ENABLE_VTK_IOImport=YES
         -DVTK_MODULE_ENABLE_VTK_IOParallel=YES
+        -DVTK_MODULE_ENABLE_VTK_IOPDAL=YES
         -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
         -DVTK_MODULE_ENABLE_VTK_IOXML=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingAnnotation=YES
