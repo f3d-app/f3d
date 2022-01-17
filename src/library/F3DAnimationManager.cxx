@@ -70,7 +70,7 @@ void F3DAnimationManager::Initialize(const f3d::options& options, vtkImporter* i
     this->ProgressWidget = nullptr;
   }
 
-  if (options.get<bool>("verbose") || options.get<bool>("no-render"))
+  if (options.get<bool>("verbose"))
   {
     if (availAnimations <= 0)
     {

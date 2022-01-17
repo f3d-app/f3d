@@ -11,22 +11,23 @@
 #include <string>
 #include <vector>
 
+namespace f3d
+{
+class options;
+};
+class vtkF3DInteractorStyle;
+
 class F3DLoader
 {
 public:
-  enum LoadFileEnum
+  enum class LoadFileEnum
   {
-    LOAD_PREVIOUS = -1,
-    LOAD_CURRENT = 0,
-    LOAD_NEXT = 1
+    LOAD_FIRST,
+    LOAD_PREVIOUS,
+    LOAD_CURRENT,
+    LOAD_NEXT,
+    LOAD_LAST
   };
-
-  /**
-   * Parse the options, create an importer and start the rendering
-   * This will initialize the following members:
-   * Parser, CommandLineOptions, AnimationManager, RenWin
-   */
-  int Start(int argc, char** argv);
 
   /**
    * Add a list of files or directory to be loaded
@@ -47,10 +48,47 @@ public:
    * Options, Renderer, Importer
    * Returns true if file is loaded sucessfully, false otherwise
    */
-  bool LoadFile(int load = F3DLoader::LOAD_CURRENT);
+  bool LoadFile(LoadFileEnum load, const f3d::options& options);
+
+  /**
+   * Forward to AnimationManager
+   */
+  void ToggleAnimation();
+
+  /**
+   * Initialize the rendering stack managed by the loader
+   * This will initialize the following members:
+   * AnimationManager, RenWin, Interactor, Style
+   */
+  void InitializeRendering(std::string, bool offscreen, const void* iconBuffer, size_t inconLength);
+
+  /**
+   * Convenience method to get the interactor style
+   * TODO Remove
+   */
+  vtkF3DInteractorStyle* GetInteractorStyle();
+
+  /**
+   * Get information about the next file to load according to the load param
+   * Set the load argument to LOAD_FIRST, LOAD_PREVIOUS, LOAD_NEXT or LOAD_LAST as needed
+   * nextFileIndex will provide the index of the file or -1 if not available
+   * filePath the path to the file and fileInfo a more complete information about the file
+   * Return true if there is a file or false otherwise
+   */
+  void GetNextFile(
+    LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const;
+
+  /**
+   * Start the interaction/rendering
+   * Return true if rendering and interaction is successful, false otherwise
+   */
+  bool Start();
 
   F3DLoader();
   ~F3DLoader();
+
+protected:
+  void InitializeRenderer();
 
 private:
   class F3DInternals;

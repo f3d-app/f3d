@@ -201,19 +201,19 @@ void vtkF3DInteractorStyle::OnKeyPress()
       }
       if (keySym == "Left")
       {
-        int load = F3DLoader::LOAD_PREVIOUS;
+        F3DLoader::LoadFileEnum load = F3DLoader::LoadFileEnum::LOAD_PREVIOUS;
         this->InvokeEvent(vtkF3DInteractorStyle::LoadFileEvent, &load);
         renWin->Render();
       }
       else if (keySym == "Right")
       {
-        int load = F3DLoader::LOAD_NEXT;
+        F3DLoader::LoadFileEnum load = F3DLoader::LoadFileEnum::LOAD_NEXT;
         this->InvokeEvent(vtkF3DInteractorStyle::LoadFileEvent, &load);
         renWin->Render();
       }
       else if (keySym == "Up")
       {
-        int load = F3DLoader::LOAD_CURRENT;
+        F3DLoader::LoadFileEnum load = F3DLoader::LoadFileEnum::LOAD_CURRENT;
         this->InvokeEvent(vtkF3DInteractorStyle::LoadFileEvent, &load);
         renWin->Render();
       }
