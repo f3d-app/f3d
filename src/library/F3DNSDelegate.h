@@ -9,13 +9,13 @@
 #ifndef F3DNSDelegate_h
 #define F3DNSDelegate_h
 
-class F3DLoader;
+class F3DStarter;
 class vtkRenderWindow;
 
 class F3DNSDelegate
 {
 public:
-  static void InitializeDelegate(F3DLoader* loader, vtkRenderWindow* renWin);
+  static void InitializeDelegate(F3DStarter* Starter);
 };
 
 #endif

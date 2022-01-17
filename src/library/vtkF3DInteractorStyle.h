@@ -78,7 +78,7 @@ public:
   /**
    * Set options
    */
-  void SetOptions(const f3d::options& options) { this->Options = &options; };
+  void SetOptions(const f3d::options* options) { this->Options = options; };
 
 protected:
   /**

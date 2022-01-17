@@ -1,7 +1,7 @@
 #include "F3DConfig.h"
 #include "F3DException.h"
-#include "F3DLoader.h"
 #include "F3DLog.h"
+#include "F3DStarter.h"
 
 int main(int argc, char** argv)
 {
@@ -9,8 +9,8 @@ int main(int argc, char** argv)
 
   try
   {
-    F3DLoader loader;
-    res = loader.Start(argc, argv);
+    F3DStarter starter;
+    res = starter.Start(argc, argv);
   }
   catch (const F3DExNoProcess&)
   {

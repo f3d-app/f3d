@@ -42,7 +42,7 @@ public:
   /**
    * Set options.
    */
-  void SetOptions(const f3d::options& options);
+  void SetOptions(const f3d::options* options);
 
   /**
    * Check if the file can be read.

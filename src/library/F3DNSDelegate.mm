@@ -2,37 +2,32 @@
 
 #import "Cocoa/Cocoa.h"
 
-#import "F3DLoader.h"
-#import "vtkRenderWindow.h"
+#import "F3DStarter.h"
 
 // This is a subclass of NSApplicationDelegate.
 @interface F3DNSDelegateInternal : NSObject<NSApplicationDelegate>
-@property F3DLoader* Loader;
-@property vtkRenderWindow* RenderWindow;
+@property F3DStarter* Starter;
 @end
 
 @implementation F3DNSDelegateInternal
-@synthesize Loader;
-@synthesize RenderWindow;
+@synthesize Starter;
 
 // ----------------------------------------------------------------------------
 - (BOOL)application:(NSApplication*)theApplication openFile:(NSString*)filename
 {
   (void)theApplication;
-  Loader->AddFile([filename UTF8String]);
-  Loader->LoadFile();
-  RenderWindow->Render();
+  Starter->AddFile([filename UTF8String]);
+  Starter->LoadFile();
   return YES;
 }
 
 @end
 
 // ----------------------------------------------------------------------------
-void F3DNSDelegate::InitializeDelegate(F3DLoader* loader, vtkRenderWindow* renWin)
+void F3DNSDelegate::InitializeDelegate(F3DStarter* Starter)
 {
   F3DNSDelegateInternal* delegate = [F3DNSDelegateInternal alloc];
   [NSApplication sharedApplication];
   [NSApp setDelegate:delegate];
-  [delegate setLoader:loader];
-  [delegate setRenderWindow:renWin];
+  [delegate setStarter:Starter];
 }
