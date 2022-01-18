@@ -300,31 +300,37 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 //----------------------------------------------------------------------------
 // TODO : add this function in a utils file for rendering in VTK directly
 vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(
-  const std::string& fileName, bool isSRGB)
+  const std::string& filePath, bool isSRGB)
 {
   vtkSmartPointer<vtkTexture> texture;
-  if (!fileName.empty())
+  if (!filePath.empty())
   {
-    std::string fullPath = vtksys::SystemTools::CollapseFullPath(fileName);
-
-    auto reader = vtkSmartPointer<vtkImageReader2>::Take(
-      vtkImageReader2Factory::CreateImageReader2(fullPath.c_str()));
-    if (reader)
+    std::string fullPath = vtksys::SystemTools::CollapseFullPath(filePath);
+    if (!vtksys::SystemTools::FileExists(fullPath))
     {
-      reader->SetFileName(fullPath.c_str());
-      reader->Update();
-      texture = vtkSmartPointer<vtkTexture>::New();
-      texture->SetInputConnection(reader->GetOutputPort());
-      if (isSRGB)
-      {
-        texture->UseSRGBColorSpaceOn();
-      }
-      texture->InterpolateOn();
-      return texture;
+      F3DLog::Print(F3DLog::Severity::Warning, "Texture file does not exist ", fullPath);
     }
     else
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "Cannot open texture file ", fullPath);
+      auto reader = vtkSmartPointer<vtkImageReader2>::Take(
+        vtkImageReader2Factory::CreateImageReader2(fullPath.c_str()));
+      if (reader)
+      {
+        reader->SetFileName(fullPath.c_str());
+        reader->Update();
+        texture = vtkSmartPointer<vtkTexture>::New();
+        texture->SetInputConnection(reader->GetOutputPort());
+        if (isSRGB)
+        {
+          texture->UseSRGBColorSpaceOn();
+        }
+        texture->InterpolateOn();
+        return texture;
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning, "Cannot open texture file ", fullPath);
+      }
     }
   }
 

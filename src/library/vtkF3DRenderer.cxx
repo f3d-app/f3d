@@ -90,43 +90,49 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
 
   if (!this->HDRIFile.empty() && !this->GetUseImageBasedLighting())
   {
-    std::string fullPath = vtksys::SystemTools::CollapseFullPath(this->HDRIFile);
-
-    auto reader = vtkSmartPointer<vtkImageReader2>::Take(
-      vtkImageReader2Factory::CreateImageReader2(fullPath.c_str()));
-    if (reader)
+    this->HDRIFile = vtksys::SystemTools::CollapseFullPath(this->HDRIFile);
+    if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
     {
-      reader->SetFileName(fullPath.c_str());
-      reader->Update();
-
-      vtkNew<vtkTexture> texture;
-      texture->SetColorModeToDirectScalars();
-      texture->MipmapOn();
-      texture->InterpolateOn();
-      texture->SetInputConnection(reader->GetOutputPort());
-
-      // 8-bit textures are usually gamma-corrected
-      if (reader->GetOutput() && reader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
-      {
-        texture->UseSRGBColorSpaceOn();
-      }
-
-      // HDRI OpenGL
-      this->UseImageBasedLightingOn();
-      this->SetEnvironmentTexture(texture);
-
-      // Skybox OpenGL
-      this->Skybox->SetProjection(vtkSkybox::Sphere);
-      this->Skybox->SetTexture(texture);
-
-// First version of VTK including the version check (and the feature used)
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
-      this->Skybox->GammaCorrectOn();
-#endif
+      F3DLog::Print(F3DLog::Severity::Warning, "HDRI file does not exist ", this->HDRIFile);
     }
     else
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "Cannot open HDRI file ", fullPath);
+      auto reader = vtkSmartPointer<vtkImageReader2>::Take(
+        vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
+      if (reader)
+      {
+        reader->SetFileName(this->HDRIFile.c_str());
+        reader->Update();
+
+        vtkNew<vtkTexture> texture;
+        texture->SetColorModeToDirectScalars();
+        texture->MipmapOn();
+        texture->InterpolateOn();
+        texture->SetInputConnection(reader->GetOutputPort());
+
+        // 8-bit textures are usually gamma-corrected
+        if (reader->GetOutput() && reader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
+        {
+          texture->UseSRGBColorSpaceOn();
+        }
+
+        // HDRI OpenGL
+        this->UseImageBasedLightingOn();
+        this->SetEnvironmentTexture(texture);
+
+        // Skybox OpenGL
+        this->Skybox->SetProjection(vtkSkybox::Sphere);
+        this->Skybox->SetTexture(texture);
+
+        // First version of VTK including the version check (and the feature used)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
+        this->Skybox->GammaCorrectOn();
+#endif
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning, "Cannot open HDRI file ", this->HDRIFile);
+      }
     }
   }
 
@@ -212,29 +218,30 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   this->CheatSheetActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
   this->CheatSheetActor->GetTextProperty()->SetBackgroundOpacity(0.5);
 
+  this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
+
   std::string fontFile = options.get<std::string>("font-file");
-  std::string fontPath = vtksys::SystemTools::CollapseFullPath(fontFile);
-  if (vtksys::SystemTools::FileExists(fontPath, true))
+  if (!fontFile.empty())
   {
-    this->FilenameActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-    this->FilenameActor->GetTextProperty()->SetFontFile(fontPath.c_str());
-    this->MetaDataActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-    this->MetaDataActor->GetTextProperty()->SetFontFile(fontPath.c_str());
-    this->TimerActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-    this->TimerActor->GetTextProperty()->SetFontFile(fontPath.c_str());
-    this->CheatSheetActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-    this->CheatSheetActor->GetTextProperty()->SetFontFile(fontPath.c_str());
-  }
-  else
-  {
-    if (!fontFile.empty())
+    fontFile = vtksys::SystemTools::CollapseFullPath(fontFile);
+    if (vtksys::SystemTools::FileExists(fontFile, true))
+    {
+      this->FilenameActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->FilenameActor->GetTextProperty()->SetFontFile(fontFile.c_str());
+      this->MetaDataActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->MetaDataActor->GetTextProperty()->SetFontFile(fontFile.c_str());
+      this->TimerActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->TimerActor->GetTextProperty()->SetFontFile(fontFile.c_str());
+      this->CheatSheetActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->CheatSheetActor->GetTextProperty()->SetFontFile(fontFile.c_str());
+    }
+    else
     {
       F3DLog::Print(F3DLog::Severity::Warning, "Cannot find \"", fontFile, "\" font file.");
     }
-    this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
-    this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
-    this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
-    this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
   }
 
   this->TimerActor->SetInput("0 fps");
