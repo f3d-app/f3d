@@ -243,13 +243,17 @@ void F3DLoader::AddFiles(const std::vector<std::string>& files)
 //----------------------------------------------------------------------------
 void F3DLoader::AddFile(const std::string& path, bool recursive)
 {
-  if (path.empty() || !vtksys::SystemTools::FileExists(path))
+  if (path.empty())
   {
-    F3DLog::Print(F3DLog::Severity::Error, "File ", path, " does not exist");
     return;
   }
 
   std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
+  if (!vtksys::SystemTools::FileExists(fullPath))
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "File ", fullPath, " does not exist");
+    return;
+  }
 
   if (vtksys::SystemTools::FileIsDirectory(fullPath))
   {
@@ -576,17 +580,28 @@ bool F3DLoader::Start()
       if (play)
       {
         F3DLog::Print(F3DLog::Severity::Warning,
-          "Interaction test record and play files have been provided, play file ignored.");
+          "Interaction test record and play files have been provided, play file ignored");
       }
+      interactionTestRecordFile = vtksys::SystemTools::CollapseFullPath(interactionTestRecordFile);
       recorder->SetFileName(interactionTestRecordFile.c_str());
       recorder->On();
       recorder->Record();
     }
     else
     {
-      recorder->SetFileName(interactionTestPlayFile.c_str());
-      recorder->Play();
-      recorder->Off();
+      if (!vtksys::SystemTools::FileExists(interactionTestPlayFile))
+      {
+        F3DLog::Print(F3DLog::Severity::Error, "Interaction record file to play does not exist ",
+          interactionTestPlayFile);
+        retVal = false;
+      }
+      else
+      {
+        interactionTestPlayFile = vtksys::SystemTools::CollapseFullPath(interactionTestPlayFile);
+        recorder->SetFileName(interactionTestPlayFile.c_str());
+        recorder->Play();
+        recorder->Off();
+      }
     }
   }
 
@@ -597,14 +612,14 @@ bool F3DLoader::Start()
   // Recorder can stop the interactor, make sure it is still running
   if (this->Internals->Interactor->GetDone())
   {
-    F3DLog::Print(F3DLog::Severity::Warning, "Interactor has been stopped, no rendering performed");
+    F3DLog::Print(F3DLog::Severity::Error, "Interactor has been stopped, no rendering performed");
     retVal = false;
   }
   else if (!reference.empty())
   {
     if (!this->Internals->LoadedFile)
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "No file loaded, no rendering performed");
+      F3DLog::Print(F3DLog::Severity::Error, "No file loaded, no rendering performed");
       retVal = false;
     }
     else
@@ -617,7 +632,7 @@ bool F3DLoader::Start()
   {
     if (!this->Internals->LoadedFile)
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "No file loaded, no rendering performed");
+      F3DLog::Print(F3DLog::Severity::Error, "No file loaded, no rendering performed");
       retVal = false;
     }
     else
