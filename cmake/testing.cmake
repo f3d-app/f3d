@@ -142,6 +142,7 @@ f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${CMAKE_SOURCE_DIR}/
 f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-index=7)
 f3d_test(NAME TestHDRI LONG_TIMEOUT DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr)
 f3d_test(NAME TestHDRIBlur LONG_TIMEOUT DATA suzanne.ply ARGS -u --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr)
+f3d_test(NAME TestHDRIBlurRatio LONG_TIMEOUT DATA suzanne.ply RESOLUTION 600,100 ARGS -u --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr)
 f3d_test(NAME TestHDRIEdges LONG_TIMEOUT DATA suzanne.ply ARGS -e --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr)
 f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_FAIL)
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
