@@ -31,7 +31,14 @@ static std::locale comma_locale(std::locale::classic(), new comma_ctype);
 template<typename T>
 std::ostream& operator<<(std::ostream& stream, const std::vector<T>& vector)
 {
-  std::copy(vector.begin(), vector.end(), std::ostream_iterator<T>(stream, ","));
+  if (vector.size() > 0)
+  {
+    stream << vector[0];
+    for (auto it = std::next(vector.begin()); it != vector.end(); it++)
+    {
+      stream << "," << *it;
+    }
+  }
   return stream;
 }
 
