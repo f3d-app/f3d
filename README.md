@@ -147,7 +147,7 @@ Options|Description
 ------|------
 \-\-input=&lt;file&gt;|The *input* file or files to read, can also be provided as a positional argument.
 \-\-output=&lt;png file&gt;|Instead of showing a render view and render into it, *render directly into a png file*. When used with ref option, only outputs on failure
-\-\-no-background|Output file is saved with a transparent background. Ignored when using ref option.
+\-\-no-background|Output file is saved with a transparent background.
 -h, \-\-help|Print *help*.
 \-\-verbose|Enable *verbose* mode, providing more information about the loaded data in the console output.
 \-\-no-render|Verbose mode without any rendering for the first provided file, to recover information about a file.
