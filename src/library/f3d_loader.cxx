@@ -1,14 +1,14 @@
-#include "F3DLoader.h"
+#include "f3d_loader.h"
 
 #include "F3DAnimationManager.h"
 #include "F3DLog.h"
 #include "F3DOffscreenRender.h"
 #include "F3DReaderFactory.h"
 #include "F3DReaderInstantiator.h"
+#include "f3d_interactor.h"
 #include "f3d_options.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DInteractorEventRecorder.h"
-#include "vtkF3DInteractorStyle.h"
 #include "vtkF3DObjectFactory.h"
 #include "vtkF3DRendererWithColoring.h"
 
@@ -21,7 +21,6 @@
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
 #include <vtkTimerLog.h>
 #include <vtkVersion.h>
 #include <vtksys/Directory.hxx>
@@ -65,7 +64,7 @@ vtkSmartPointer<vtkImporter> GetImporter(const f3d::options& options, const std:
 }
 
 void CreateProgressRepresentationAndCallback(
-  ProgressDataStruct* data, vtkImporter* importer, vtkRenderWindowInteractor* interactor)
+  ProgressDataStruct* data, vtkImporter* importer, f3d::interactor* interactor)
 {
   vtkNew<vtkCallbackCommand> progressCallback;
   progressCallback->SetClientData(data);
@@ -82,12 +81,12 @@ void CreateProgressRepresentationAndCallback(
         vtkProgressBarRepresentation* rep =
           vtkProgressBarRepresentation::SafeDownCast(widget->GetRepresentation());
         rep->SetProgressRate(*static_cast<double*>(callData));
-        widget->GetInteractor()->GetRenderWindow()->Render();
+        widget->Render();
       }
     });
   importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
 
-  data->widget->SetInteractor(interactor);
+  interactor->SetInteractorOn(data->widget);
 
   vtkProgressBarRepresentation* progressRep =
     vtkProgressBarRepresentation::SafeDownCast(data->widget->GetRepresentation());
@@ -144,25 +143,91 @@ void DisplayCameraInformation(vtkCamera* cam)
 }
 }
 
-class F3DLoader::F3DInternals
+namespace f3d
+{
+class loader::F3DInternals
 {
 public:
+  F3DInternals(const options& options)
+    : Options(options)
+  {
+  }
+
+  void InitializeRenderer()
+  {
+    if (this->Renderer)
+    {
+      // Actors are loaded, use the bounds to reset camera and set-up SSAO
+      this->Renderer->SetupRenderPasses();
+      this->Renderer->UpdateInternalActors();
+      this->Renderer->ShowOptions();
+
+      // Set the initial camera once all options
+      // have been shown as they may have an effect on it
+      if (this->Options.get<int>("camera-index") < 0)
+      {
+        // set a default camera from bounds using VTK method
+        this->Renderer->vtkRenderer::ResetCamera();
+
+        // use options to overwrite camera parameters
+        vtkCamera* cam = this->Renderer->GetActiveCamera();
+
+        std::vector<double> cameraPosition =
+          this->Options.get<std::vector<double> >("camera-position");
+        if (cameraPosition.size() == 3)
+        {
+          cam->SetPosition(cameraPosition.data());
+        }
+
+        std::vector<double> cameraFocalPoint =
+          this->Options.get<std::vector<double> >("camera-focal-point");
+        if (cameraFocalPoint.size() == 3)
+        {
+          cam->SetFocalPoint(cameraFocalPoint.data());
+        }
+
+        std::vector<double> cameraViewUp =
+          this->Options.get<std::vector<double> >("camera-view-up");
+        if (cameraViewUp.size() == 3)
+        {
+          cam->SetViewUp(cameraViewUp.data());
+        }
+
+        double cameraViewAngle = this->Options.get<double>("camera-view-angle");
+        if (cameraViewAngle != 0)
+        {
+          cam->SetViewAngle(cameraViewAngle);
+        }
+
+        cam->Azimuth(this->Options.get<double>("camera-azimuth-angle"));
+        cam->Elevation(this->Options.get<double>("camera-elevation-angle"));
+        cam->OrthogonalizeViewUp();
+
+        if (this->Options.get<bool>("verbose"))
+        {
+          ::DisplayCameraInformation(cam);
+        }
+      }
+
+      this->Renderer->InitializeCamera();
+    }
+  }
+
   std::vector<std::string> FilesList;
   int CurrentFileIndex = 0;
   bool LoadedFile = false;
-  f3d::options Options;
+  const f3d::options& Options;
+  f3d::interactor* Interactor = nullptr;
   F3DAnimationManager AnimationManager;
   vtkSmartPointer<vtkF3DRenderer> Renderer;
   vtkSmartPointer<vtkImporter> Importer;
   vtkSmartPointer<vtkRenderWindow> RenWin;
-  vtkSmartPointer<vtkF3DInteractorStyle> Style;
-  vtkSmartPointer<vtkRenderWindowInteractor> Interactor;
   F3DReaderInstantiator ReaderInstantiator;
 };
 
 //----------------------------------------------------------------------------
-F3DLoader::F3DLoader()
-  : Internals(new F3DLoader::F3DInternals)
+loader::loader(const options& options)
+  : Internals(new loader::F3DInternals(options))
 {
 #if NDEBUG
   vtkObject::GlobalWarningDisplayOff();
@@ -185,16 +250,10 @@ F3DLoader::F3DLoader()
 }
 
 //----------------------------------------------------------------------------
-F3DLoader::~F3DLoader() = default;
+loader::~loader() = default;
 
 //----------------------------------------------------------------------------
-vtkF3DInteractorStyle* F3DLoader::GetInteractorStyle()
-{
-  return this->Internals->Style;
-}
-
-//----------------------------------------------------------------------------
-void F3DLoader::InitializeRendering(
+void loader::InitializeRendering(
   std::string windowName, bool offscreen, const void* icon, size_t iconSize)
 {
   this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
@@ -204,13 +263,10 @@ void F3DLoader::InitializeRendering(
   // Offscreen rendering must be set before initializing interactor
   this->Internals->RenWin->SetOffScreenRendering(offscreen);
 
-  this->Internals->Style = vtkSmartPointer<vtkF3DInteractorStyle>::New();
-  this->Internals->Style->SetAnimationManager(this->Internals->AnimationManager);
-
-  this->Internals->Interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-  this->Internals->Interactor->SetRenderWindow(this->Internals->RenWin);
-  this->Internals->Interactor->SetInteractorStyle(this->Internals->Style);
-  this->Internals->Interactor->Initialize();
+  if (this->Internals->Interactor)
+  {
+    this->Internals->Interactor->SetLoader(this);
+  }
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200615)
   // set icon
@@ -226,22 +282,22 @@ void F3DLoader::InitializeRendering(
 }
 
 //----------------------------------------------------------------------------
-void F3DLoader::ToggleAnimation()
+void loader::toggleAnimation()
 {
   this->Internals->AnimationManager.ToggleAnimation();
 }
 
 //----------------------------------------------------------------------------
-void F3DLoader::AddFiles(const std::vector<std::string>& files)
+void loader::addFiles(const std::vector<std::string>& files)
 {
   for (auto& file : files)
   {
-    this->AddFile(file);
+    this->addFile(file);
   }
 }
 
 //----------------------------------------------------------------------------
-void F3DLoader::AddFile(const std::string& path, bool recursive)
+void loader::addFile(const std::string& path, bool recursive)
 {
   if (path.empty())
   {
@@ -274,7 +330,7 @@ void F3DLoader::AddFile(const std::string& path, bool recursive)
       }
       for (std::string currentFile : sortedFiles)
       {
-        this->AddFile(vtksys::SystemTools::JoinPath({ "", fullPath, currentFile }), false);
+        this->addFile(vtksys::SystemTools::JoinPath({ "", fullPath, currentFile }), false);
       }
     }
   }
@@ -291,7 +347,7 @@ void F3DLoader::AddFile(const std::string& path, bool recursive)
 }
 
 //----------------------------------------------------------------------------
-void F3DLoader::GetNextFile(
+void loader::getFileInfo(
   LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const
 {
   int size = static_cast<int>(this->Internals->FilesList.size());
@@ -300,19 +356,19 @@ void F3DLoader::GetNextFile(
     int addToIndex = 0;
     switch (load)
     {
-      case F3DLoader::LoadFileEnum::LOAD_FIRST:
+      case loader::LoadFileEnum::LOAD_FIRST:
         nextFileIndex = 0;
         break;
-      case F3DLoader::LoadFileEnum::LOAD_LAST:
+      case loader::LoadFileEnum::LOAD_LAST:
         nextFileIndex = size - 1;
         break;
-      case F3DLoader::LoadFileEnum::LOAD_PREVIOUS:
+      case loader::LoadFileEnum::LOAD_PREVIOUS:
         addToIndex = -1;
         break;
-      case F3DLoader::LoadFileEnum::LOAD_NEXT:
+      case loader::LoadFileEnum::LOAD_NEXT:
         addToIndex = 1;
         break;
-      case F3DLoader::LoadFileEnum::LOAD_CURRENT:
+      case loader::LoadFileEnum::LOAD_CURRENT:
       default:
         break;
     }
@@ -332,23 +388,42 @@ void F3DLoader::GetNextFile(
 }
 
 //----------------------------------------------------------------------------
-bool F3DLoader::LoadFile(F3DLoader::LoadFileEnum load, const f3d::options& options)
+std::vector<std::string> loader::getFiles()
+{
+  return this->Internals->FilesList;
+}
+
+//----------------------------------------------------------------------------
+void loader::setCurrentFileIndex(int index)
+{
+  this->Internals->CurrentFileIndex = index;
+}
+
+//----------------------------------------------------------------------------
+int loader::getCurrentFileIndex()
+{
+  return this->Internals->CurrentFileIndex;
+}
+
+//----------------------------------------------------------------------------
+const f3d::options& loader::getOptions()
+{
+  return this->Internals->Options;
+}
+
+//----------------------------------------------------------------------------
+void loader::setInteractor(f3d::interactor* interactor)
+{
+  this->Internals->Interactor = interactor;
+}
+
+//----------------------------------------------------------------------------
+bool loader::loadFile(loader::LoadFileEnum load)
 {
   // Reset loadedFile
   this->Internals->LoadedFile = false;
 
-  // TODO should Copy provided options
-  this->Internals->Options = options;
-
-  // Respect quiet option
   F3DLog::SetQuiet(this->Internals->Options.get<bool>("quiet"));
-
-  // XXX May need to go somewhere else
-  // Will only be used when interacting with a animated file
-  if (this->Internals->Style)
-  {
-    this->Internals->Style->SetOptions(&this->Internals->Options);
-  }
 
   // Prevent the animation manager from playing
   this->Internals->AnimationManager.Finalize();
@@ -369,7 +444,7 @@ bool F3DLoader::LoadFile(F3DLoader::LoadFileEnum load, const f3d::options& optio
 
   // Recover information about the file to load
   std::string filePath, fileInfo;
-  this->GetNextFile(load, this->Internals->CurrentFileIndex, filePath, fileInfo);
+  this->getFileInfo(load, this->Internals->CurrentFileIndex, filePath, fileInfo);
   bool verbose = this->Internals->Options.get<bool>("verbose");
   if (verbose)
   {
@@ -443,7 +518,7 @@ bool F3DLoader::LoadFile(F3DLoader::LoadFileEnum load, const f3d::options& optio
 #endif
 
     // Manage progress bar
-    if (this->Internals->Options.get<bool>("progress"))
+    if (this->Internals->Options.get<bool>("progress") && this->Internals->Interactor)
     {
       ::CreateProgressRepresentationAndCallback(
         &callbackData, this->Internals->Importer, this->Internals->Interactor);
@@ -467,23 +542,8 @@ bool F3DLoader::LoadFile(F3DLoader::LoadFileEnum load, const f3d::options& optio
   {
     this->Internals->AnimationManager.Initialize(this->Internals->Options,
       this->Internals->Importer, this->Internals->RenWin, this->Internals->Renderer);
-  }
 
-  // Initialize renderer using data read by the importer
-  this->InitializeRenderer();
-
-  this->Internals->LoadedFile = true;
-  return this->Internals->LoadedFile;
-}
-
-//----------------------------------------------------------------------------
-void F3DLoader::InitializeRenderer()
-{
-  if (this->Internals->Renderer)
-  {
     // Recover generic importer specific actors and mappers to set on the renderer with coloring
-    vtkF3DGenericImporter* genericImporter =
-      vtkF3DGenericImporter::SafeDownCast(this->Internals->Importer);
     if (genericImporter)
     {
       // no sanity test needed
@@ -502,66 +562,21 @@ void F3DLoader::InitializeRenderer()
         genericImporter->GetArrayIndexForColoring(),
         this->Internals->Options.get<int>("component"));
     }
-
-    // Actors are loaded, use the bounds to reset camera and set-up SSAO
-    this->Internals->Renderer->SetupRenderPasses();
-    this->Internals->Renderer->UpdateInternalActors();
-    this->Internals->Renderer->ShowOptions();
-
-    // Set the initial camera once all options
-    // have been shown as they may have an effect on it
-    if (this->Internals->Options.get<int>("camera-index") < 0)
-    {
-      // set a default camera from bounds using VTK method
-      this->Internals->Renderer->vtkRenderer::ResetCamera();
-
-      // use options to overwrite camera parameters
-      vtkCamera* cam = this->Internals->Renderer->GetActiveCamera();
-
-      std::vector<double> cameraPosition =
-        this->Internals->Options.get<std::vector<double> >("camera-position");
-      if (cameraPosition.size() == 3)
-      {
-        cam->SetPosition(cameraPosition.data());
-      }
-
-      std::vector<double> cameraFocalPoint =
-        this->Internals->Options.get<std::vector<double> >("camera-focal-point");
-      if (cameraFocalPoint.size() == 3)
-      {
-        cam->SetFocalPoint(cameraFocalPoint.data());
-      }
-
-      std::vector<double> cameraViewUp =
-        this->Internals->Options.get<std::vector<double> >("camera-view-up");
-      if (cameraViewUp.size() == 3)
-      {
-        cam->SetViewUp(cameraViewUp.data());
-      }
-
-      double cameraViewAngle = this->Internals->Options.get<double>("camera-view-angle");
-      if (cameraViewAngle != 0)
-      {
-        cam->SetViewAngle(cameraViewAngle);
-      }
-
-      cam->Azimuth(this->Internals->Options.get<double>("camera-azimuth-angle"));
-      cam->Elevation(this->Internals->Options.get<double>("camera-elevation-angle"));
-      cam->OrthogonalizeViewUp();
-
-      if (this->Internals->Options.get<bool>("verbose"))
-      {
-        ::DisplayCameraInformation(cam);
-      }
-    }
-
-    this->Internals->Renderer->InitializeCamera();
   }
+
+  // Initialize renderer using data read by the importer
+  this->Internals->InitializeRenderer();
+
+  this->Internals->LoadedFile = true;
+
+  return this->Internals->LoadedFile;
 }
 
 //----------------------------------------------------------------------------
-bool F3DLoader::Start()
+bool loader::start()
 {
+  // TODO rework this method completelly
+
   bool retVal = true;
 
   // Manage recording options
@@ -574,33 +589,43 @@ bool F3DLoader::Start()
   bool play = !interactionTestPlayFile.empty();
   if (record || play)
   {
-    recorder->SetInteractor(this->Internals->Interactor);
-    if (record)
+    if (!this->Internals->Interactor)
     {
-      if (play)
-      {
-        F3DLog::Print(F3DLog::Severity::Warning,
-          "Interaction test record and play files have been provided, play file ignored");
-      }
-      interactionTestRecordFile = vtksys::SystemTools::CollapseFullPath(interactionTestRecordFile);
-      recorder->SetFileName(interactionTestRecordFile.c_str());
-      recorder->On();
-      recorder->Record();
+      F3DLog::Print(F3DLog::Severity::Warning,
+        "Cannot use interaction test record and play without an interactor");
+      retVal = false;
     }
     else
     {
-      if (!vtksys::SystemTools::FileExists(interactionTestPlayFile))
+      this->Internals->Interactor->SetInteractorOn(recorder);
+      if (record)
       {
-        F3DLog::Print(F3DLog::Severity::Error, "Interaction record file to play does not exist ",
-          interactionTestPlayFile);
-        retVal = false;
+        if (play)
+        {
+          F3DLog::Print(F3DLog::Severity::Warning,
+            "Interaction test record and play files have been provided, play file ignored");
+        }
+        interactionTestRecordFile =
+          vtksys::SystemTools::CollapseFullPath(interactionTestRecordFile);
+        recorder->SetFileName(interactionTestRecordFile.c_str());
+        recorder->On();
+        recorder->Record();
       }
       else
       {
-        interactionTestPlayFile = vtksys::SystemTools::CollapseFullPath(interactionTestPlayFile);
-        recorder->SetFileName(interactionTestPlayFile.c_str());
-        recorder->Play();
-        recorder->Off();
+        if (!vtksys::SystemTools::FileExists(interactionTestPlayFile))
+        {
+          F3DLog::Print(F3DLog::Severity::Error, "Interaction record file to play does not exist ",
+            interactionTestPlayFile);
+          retVal = false;
+        }
+        else
+        {
+          interactionTestPlayFile = vtksys::SystemTools::CollapseFullPath(interactionTestPlayFile);
+          recorder->SetFileName(interactionTestPlayFile.c_str());
+          recorder->Play();
+          recorder->Off();
+        }
       }
     }
   }
@@ -610,7 +635,7 @@ bool F3DLoader::Start()
   std::string output = this->Internals->Options.get<std::string>("output");
 
   // Recorder can stop the interactor, make sure it is still running
-  if (this->Internals->Interactor->GetDone())
+  if (this->Internals->Interactor && this->Internals->Interactor->GetDone())
   {
     F3DLog::Print(F3DLog::Severity::Error, "Interactor has been stopped, no rendering performed");
     retVal = false;
@@ -640,10 +665,15 @@ bool F3DLoader::Start()
       retVal = F3DOffscreenRender::RenderOffScreen(this->Internals->RenWin, output, noBackground);
     }
   }
-  else
+  else if (this->Internals->Interactor)
   {
     this->Internals->RenWin->Render();
     this->Internals->Interactor->Start();
+  }
+  else
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, "No rendering performed");
+    retVal = false;
   }
 
   // The axis widget should be disabled before destruction
@@ -655,4 +685,33 @@ bool F3DLoader::Start()
     recorder->Off();
   }
   return retVal;
+}
+
+//----------------------------------------------------------------------------
+void loader::render()
+{
+  this->Internals->RenWin->Render();
+}
+
+//----------------------------------------------------------------------------
+void loader::updateOptionsForRendering()
+{
+  if (this->Internals->Renderer)
+  {
+    this->Internals->Renderer->UpdateOptions(this->Internals->Options);
+    this->Internals->InitializeRenderer();
+  }
+}
+
+//----------------------------------------------------------------------------
+const F3DAnimationManager* loader::GetAnimationManager()
+{
+  return &this->Internals->AnimationManager;
+}
+
+//----------------------------------------------------------------------------
+vtkRenderWindow* loader::GetRenderWindow()
+{
+  return this->Internals->RenWin;
+}
 }

@@ -7,13 +7,13 @@
 #ifndef F3DStarter_h
 #define F3DStarter_h
 
-#include "F3DLoader.h"
+#include "f3d_loader.h"
 
 class F3DStarter
 {
 public:
   /**
-   * Parse the options and configure a F3DLoader accordingly
+   * Parse the options and configure a f3d::loader accordingly
    */
   int Start(int argc, char** argv);
 
@@ -27,7 +27,7 @@ public:
    * Set the load argument to LOAD_FIRST, LOAD_PREVIOUS, LOAD_NEXT or LOAD_LAST to change file index
    * Returns true if file is loaded sucessfully, false otherwise
    */
-  bool LoadFile(F3DLoader::LoadFileEnum load = F3DLoader::LoadFileEnum::LOAD_CURRENT);
+  bool LoadFile(f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
   F3DStarter();
   ~F3DStarter();
