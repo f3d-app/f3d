@@ -16,6 +16,7 @@
 namespace f3d
 {
 class options;
+class window;
 }
 class vtkF3DRenderer;
 class vtkImporter;
@@ -30,8 +31,7 @@ public:
   /**
    * Initialize the animation manager, required before playing the animation
    */
-  void Initialize(const f3d::options& options, vtkImporter* importer, vtkRenderWindow* renWin,
-    vtkF3DRenderer* renderer);
+  void Initialize(const f3d::options& options, vtkImporter* importer, f3d::window* window);
 
   /**
    * Start/Stop playing the animation

@@ -2,6 +2,7 @@
 
 #include "F3DLog.h"
 #include "f3d_options.h"
+#include "f3d_window.h"
 #include "vtkF3DRenderer.h"
 
 #include <vtkCallbackCommand.h>
@@ -15,7 +16,7 @@
 
 //----------------------------------------------------------------------------
 void F3DAnimationManager::Initialize(const f3d::options& options, vtkImporter* importer,
-  vtkRenderWindow* renWin, vtkF3DRenderer* renderer)
+  f3d::window* window)
 {
   this->Importer = importer;
   if (!this->Importer)
@@ -24,14 +25,14 @@ void F3DAnimationManager::Initialize(const f3d::options& options, vtkImporter* i
     return;
   }
 
-  this->RenderWindow = renWin;
+  this->RenderWindow = window->GetRenderWindow();
   if (!this->RenderWindow)
   {
     F3DLog::Print(F3DLog::Severity::Error, "RenderWindow is empty");
     return;
   }
 
-  this->Renderer = renderer;
+  this->Renderer = window->GetRenderer();
   if (!this->Renderer)
   {
     F3DLog::Print(F3DLog::Severity::Error, "Renderer is empty");
@@ -44,7 +45,7 @@ void F3DAnimationManager::Initialize(const f3d::options& options, vtkImporter* i
   if (availAnimations > 0)
   {
     this->ProgressWidget = vtkSmartPointer<vtkProgressBarWidget>::New();
-    this->ProgressWidget->SetInteractor(renWin->GetInteractor());
+    this->ProgressWidget->SetInteractor(this->RenderWindow->GetInteractor());
 
     vtkProgressBarRepresentation* progressRep =
       vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());

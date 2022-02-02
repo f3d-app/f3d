@@ -7,6 +7,7 @@
 #include "F3DNSDelegate.h"
 #include "f3d_interactor.h"
 #include "f3d_options.h"
+#include "f3d_window.h"
 
 class F3DStarter::F3DInternals
 {
@@ -15,6 +16,15 @@ public:
     : Loader(this->NewOptions)
   {
   }
+  
+  ~F3DInternals()
+  {
+    // TODO
+    if (this->Window)
+    {
+      delete this->Window;
+    }
+  }
 
   F3DOptionsParser Parser;
   F3DOptions CommandLineOptions;
@@ -22,6 +32,7 @@ public:
   f3d::options NewOptions;
   f3d::loader Loader;
   f3d::interactor Interactor;
+  f3d::window* Window = nullptr;
 };
 
 //----------------------------------------------------------------------------
@@ -93,12 +104,13 @@ int F3DStarter::Start(int argc, char** argv)
         return true;
       });
 
-    this->Internals->Loader.setInteractor(&this->Internals->Interactor);
 
-    // TODO For now with an initialize
     bool offscreen = !this->Internals->CommandLineOptions.Reference.empty() ||
       !this->Internals->CommandLineOptions.Output.empty();
-    this->Internals->Loader.InitializeRendering(f3d::AppTitle, offscreen, F3DIcon, sizeof(F3DIcon));
+    this->Internals->Window = new f3d::window(f3d::AppTitle, offscreen, F3DIcon, sizeof(F3DIcon));
+    this->Internals->Loader.setWindow(this->Internals->Window);
+    
+    this->Internals->Loader.setInteractor(&this->Internals->Interactor);
   }
 
   // Add and load file

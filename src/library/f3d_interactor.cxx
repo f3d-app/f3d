@@ -9,6 +9,7 @@
 
 #include "F3DConfig.h"
 #include "f3d_loader.h"
+#include "f3d_window.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRendererWithColoring.h"
 
@@ -288,7 +289,7 @@ interactor::~interactor() = default;
 void interactor::SetLoader(f3d::loader* loader)
 {
   this->Internals->Loader = loader;
-  this->Internals->Interactor->SetRenderWindow(loader->GetRenderWindow());
+  this->Internals->Interactor->SetRenderWindow(loader->getWindow()->GetRenderWindow());
   this->Internals->Interactor->SetInteractorStyle(this->Internals->Style);
   this->Internals->Interactor->Initialize();
 

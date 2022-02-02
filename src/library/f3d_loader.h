@@ -12,10 +12,11 @@ namespace f3d
 {
 class options;
 class interactor;
+class window;
 class loader
 {
 public:
-  loader(const f3d::options& options);
+  loader(const options& options);
   ~loader();
 
   // XXX is this needed ?
@@ -35,13 +36,19 @@ public:
   /**
    * Get the options used by the loader
    */
-  const f3d::options& getOptions();
+  const options& getOptions();
   //@}
 
   /**
    * Set the interactor to use when interacting
    */
-  void setInteractor(f3d::interactor* interactor);
+  void setInteractor(interactor* interactor);
+
+  /**
+   * Set/get the window to use when rendering
+   */
+   window* getWindow();
+   void setWindow(window* interactor);
 
   /**
    * Add a list of files or directory to be loaded
@@ -100,13 +107,6 @@ public:
   bool start();
 
   /**
-   * Take dynamic options into account for the next render
-   * TODO Move to another class
-   * TODO Add ways of testing API
-   */
-  void updateOptionsForRendering();
-
-  /**
    * Forward to AnimationManager to start the animation
    * TODO Move that to another class
    */
@@ -118,11 +118,10 @@ public:
    * AnimationManager, RenWin
    * TODO Manage that internally depending on the type of context provided
    */
-  void InitializeRendering(std::string, bool offscreen, const void* iconBuffer, size_t inconLength);
+//  void InitializeRendering(std::string, bool offscreen, const void* iconBuffer, size_t inconLength);
 
   // TODO PRIVATE API
   const F3DAnimationManager* GetAnimationManager();
-  vtkRenderWindow* GetRenderWindow();
 
 private:
   class F3DInternals;
