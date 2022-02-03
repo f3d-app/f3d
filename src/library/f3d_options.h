@@ -14,6 +14,7 @@ public:
   options();
   ~options();
   options(const options& opt);
+
   options& operator=(const options& opt);
 
   template<typename T>

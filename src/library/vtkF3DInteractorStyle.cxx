@@ -2,8 +2,8 @@
 
 #include "F3DAnimationManager.h"
 #include "F3DConfig.h"
-#include "F3DLoader.h"
 #include "F3DLog.h"
+#include "f3d_loader.h"
 #include "f3d_options.h"
 #include "vtkF3DRendererWithColoring.h"
 
@@ -27,213 +27,13 @@ void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
     F3DLog::Print(F3DLog::Severity::Warning, "Drop event without any provided files.");
     return;
   }
-
-  vtkRenderWindowInteractor* rwi = this->GetInteractor();
-  vtkRenderWindow* renWin = rwi->GetRenderWindow();
-  this->InvokeEvent(vtkF3DInteractorStyle::NewFilesEvent, files);
-  renWin->Render();
+  this->InvokeEvent(vtkF3DInteractorStyle::DropFilesEvent, files);
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::OnKeyPress()
 {
-  vtkRenderWindowInteractor* rwi = this->GetInteractor();
-  vtkRenderWindow* renWin = rwi->GetRenderWindow();
-  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-  vtkF3DRendererWithColoring* renWithColor = vtkF3DRendererWithColoring::SafeDownCast(ren);
-
-  switch (std::toupper(rwi->GetKeyCode()))
-  {
-    case 'C':
-      if (renWithColor)
-      {
-        renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
-        renWin->Render();
-      }
-      break;
-    case 'S':
-      if (renWithColor)
-      {
-        renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
-        renWin->Render();
-      }
-      break;
-    case 'Y':
-      if (renWithColor)
-      {
-        renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
-        renWin->Render();
-      }
-      break;
-    case 'B':
-      if (renWithColor)
-      {
-        renWithColor->ShowScalarBar(!renWithColor->IsScalarBarVisible());
-        renWin->Render();
-      }
-      break;
-    case 'p':
-    case 'P':
-      ren->SetUseDepthPeelingPass(!ren->UsingDepthPeelingPass());
-      renWin->Render();
-      break;
-    case 'Q':
-      ren->SetUseSSAOPass(!ren->UsingSSAOPass());
-      renWin->Render();
-      break;
-    case 'A':
-      ren->SetUseFXAAPass(!ren->UsingFXAAPass());
-      renWin->Render();
-      break;
-    case 'T':
-      ren->SetUseToneMappingPass(!ren->UsingToneMappingPass());
-      renWin->Render();
-      break;
-    case 'E':
-      ren->ShowEdge(!ren->IsEdgeVisible());
-      renWin->Render();
-      break;
-    case 'X':
-      ren->ShowAxis(!ren->IsAxisVisible());
-      renWin->Render();
-      break;
-    case 'G':
-      ren->ShowGrid(!ren->IsGridVisible());
-      renWin->Render();
-      break;
-    case 'N':
-      ren->ShowFilename(!ren->IsFilenameVisible());
-      renWin->Render();
-      break;
-    case 'M':
-      ren->ShowMetaData(!ren->IsMetaDataVisible());
-      renWin->Render();
-      break;
-    case 'Z':
-      ren->ShowTimer(!ren->IsTimerVisible());
-      renWin->Render();
-      if (ren->IsTimerVisible())
-      {
-        // Needed to show a correct value, computed at the previous render
-        // TODO: Improve this by computing it and displaying it within a single render
-        renWin->Render();
-      }
-      break;
-    case 'R':
-      ren->SetUseRaytracing(!ren->UsingRaytracing());
-      renWin->Render();
-      break;
-    case 'D':
-      ren->SetUseRaytracingDenoiser(!ren->UsingRaytracingDenoiser());
-      renWin->Render();
-      break;
-    case 'V':
-      if (renWithColor)
-      {
-        renWithColor->SetUseVolume(!renWithColor->UsingVolume());
-        renWin->Render();
-      }
-      break;
-    case 'I':
-      if (renWithColor)
-      {
-        renWithColor->SetUseInverseOpacityFunction(!renWithColor->UsingInverseOpacityFunction());
-        renWin->Render();
-      }
-      break;
-    case 'O':
-      if (renWithColor)
-      {
-        renWithColor->SetUsePointSprites(!renWithColor->UsingPointSprites());
-        renWin->Render();
-      }
-      break;
-    case 'F':
-      if (!renWin->GetFullScreen())
-      {
-        // save current window position and size
-        int* pos = renWin->GetPosition();
-        this->WindowPos[0] = pos[0];
-        this->WindowPos[1] = pos[1];
-        int* size = renWin->GetSize();
-        this->WindowSize[0] = size[0];
-        this->WindowSize[1] = size[1];
-      }
-
-      renWin->SetFullScreen(!renWin->GetFullScreen());
-
-      if (!renWin->GetFullScreen() && this->WindowSize[0] > 0)
-      {
-        // restore previous window position and size
-        renWin->SetPosition(this->WindowPos);
-        renWin->SetSize(this->WindowSize);
-      }
-
-      // when going full screen, the OpenGL context changes, we need to reinitialize
-      // the interactor, the render passes and the grid actor.
-      ren->ShowGrid(ren->IsGridVisible());
-      ren->SetupRenderPasses();
-      rwi->ReInitialize();
-
-      renWin->Render();
-      break;
-    case 'U':
-      ren->SetUseBlurBackground(!ren->UsingBlurBackground());
-      renWin->Render();
-      break;
-    case 'K':
-      ren->SetUseTrackball(!ren->UsingTrackball());
-      renWin->Render();
-      break;
-    case 'H':
-      ren->ShowCheatSheet(!ren->IsCheatSheetVisible());
-      renWin->Render();
-      break;
-    case '?':
-      ren->DumpSceneState();
-      break;
-    default:
-      std::string keySym = rwi->GetKeySym();
-      if (keySym.length() > 0)
-      {
-        // Make sure key symbols starts with an upper char (e.g. "space")
-        keySym[0] = std::toupper(keySym[0]);
-      }
-      if (keySym == "Left")
-      {
-        F3DLoader::LoadFileEnum load = F3DLoader::LoadFileEnum::LOAD_PREVIOUS;
-        this->InvokeEvent(vtkF3DInteractorStyle::LoadFileEvent, &load);
-        renWin->Render();
-      }
-      else if (keySym == "Right")
-      {
-        F3DLoader::LoadFileEnum load = F3DLoader::LoadFileEnum::LOAD_NEXT;
-        this->InvokeEvent(vtkF3DInteractorStyle::LoadFileEvent, &load);
-        renWin->Render();
-      }
-      else if (keySym == "Up")
-      {
-        F3DLoader::LoadFileEnum load = F3DLoader::LoadFileEnum::LOAD_CURRENT;
-        this->InvokeEvent(vtkF3DInteractorStyle::LoadFileEvent, &load);
-        renWin->Render();
-      }
-      else if (keySym == f3d::EXIT_HOTKEY_SYM)
-      {
-        rwi->RemoveObservers(vtkCommand::TimerEvent);
-        rwi->ExitCallback();
-      }
-      else if (keySym == "Return")
-      {
-        ren->ResetCamera();
-        renWin->Render();
-      }
-      else if (keySym == "Space")
-      {
-        this->InvokeEvent(vtkF3DInteractorStyle::ToggleAnimationEvent);
-        renWin->Render();
-      }
-      break;
-  }
+  this->InvokeEvent(vtkF3DInteractorStyle::KeyPressEvent, nullptr);
 }
 
 //------------------------------------------------------------------------------
@@ -371,5 +171,6 @@ void vtkF3DInteractorStyle::EnvironmentRotate()
 //----------------------------------------------------------------------------
 bool vtkF3DInteractorStyle::IsUserInteractionBlocked()
 {
+  // TODO better impl
   return this->AnimationManager->IsPlaying() && this->Options->get<int>("camera-index") >= 0;
 }

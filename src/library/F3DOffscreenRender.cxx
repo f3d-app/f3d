@@ -6,6 +6,8 @@
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
+#include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
 #include <vtksys/SystemTools.hxx>
@@ -20,6 +22,9 @@ bool F3DOffscreenRender::RenderToImage(vtkRenderWindow* renWin, vtkImageData* im
 
   if (noBg)
   {
+    // we need to set the background to black to avoid blending issues with translucent
+    // objects when saving to file with no background
+    renWin->GetRenderers()->GetFirstRenderer()->SetBackground(0, 0, 0);
     rtW2if->SetInputBufferTypeToRGBA();
   }
 
@@ -76,6 +81,9 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20211007)
   if (noBg)
   {
+    // we need to set the background to black to avoid blending issues with translucent
+    // objects when saving to file with no background
+    renWin->GetRenderers()->GetFirstRenderer()->SetBackground(0, 0, 0);
     rtW2if->SetInputBufferTypeToRGBA();
   }
   else
