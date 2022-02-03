@@ -1,7 +1,4 @@
 #include "F3DThumbnailProvider.h"
-
-#include "F3DException.h"
-#include "F3DLoader.h"
 #include "F3DThumbnailConfig.h"
 
 #include <clocale>

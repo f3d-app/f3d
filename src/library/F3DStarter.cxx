@@ -5,24 +5,23 @@
 
 #include "F3DLog.h"
 #include "F3DNSDelegate.h"
+#include "f3d_interactor.h"
 #include "f3d_options.h"
-
-// TODO to remove when possible
-#include "vtkF3DInteractorStyle.h"
-
-// TODO to remove when possible
-#include <vtkCallbackCommand.h>
-#include <vtkNew.h>
-#include <vtkStringArray.h>
 
 class F3DStarter::F3DInternals
 {
 public:
+  F3DInternals()
+    : Loader(this->NewOptions)
+  {
+  }
+
   F3DOptionsParser Parser;
   F3DOptions CommandLineOptions;
   F3DOptions Options;
   f3d::options NewOptions;
-  F3DLoader Loader;
+  f3d::loader Loader;
+  f3d::interactor Interactor;
 };
 
 //----------------------------------------------------------------------------
@@ -37,7 +36,7 @@ F3DStarter::~F3DStarter() = default;
 //----------------------------------------------------------------------------
 void F3DStarter::AddFile(const std::string& path)
 {
-  this->Internals->Loader.AddFile(path);
+  this->Internals->Loader.addFile(path);
 }
 
 //----------------------------------------------------------------------------
@@ -62,60 +61,54 @@ int F3DStarter::Start(int argc, char** argv)
 
   if (!this->Internals->CommandLineOptions.NoRender)
   {
+    // TODO Test this multiconfig behavior
+    this->Internals->Interactor.setKeyPressCallBack(
+      [this](int, std::string keySym) -> bool
+      {
+        if (keySym == "Left")
+        {
+          f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_PREVIOUS;
+          this->LoadFile(load);
+          this->Internals->Loader.render();
+          return true;
+        }
+        else if (keySym == "Right")
+        {
+          f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_NEXT;
+          this->LoadFile(load);
+          this->Internals->Loader.render();
+          return true;
+        }
+        return false;
+      });
+
+    this->Internals->Interactor.setDropFilesCallBack(
+      [this](std::vector<std::string> filesVec) -> bool
+      {
+        for (std::string file : filesVec)
+        {
+          this->AddFile(file);
+        }
+        this->LoadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
+        return true;
+      });
+
+    this->Internals->Loader.setInteractor(&this->Internals->Interactor);
+
     // TODO For now with an initialize
     bool offscreen = !this->Internals->CommandLineOptions.Reference.empty() ||
       !this->Internals->CommandLineOptions.Output.empty();
     this->Internals->Loader.InitializeRendering(f3d::AppTitle, offscreen, F3DIcon, sizeof(F3DIcon));
-
-    // TODO introduce clean f3d::interactor
-    vtkF3DInteractorStyle* style = this->Internals->Loader.GetInteractorStyle();
-
-    // Setup the observers for the interactor style events
-    vtkNew<vtkCallbackCommand> newFilesCallback;
-    newFilesCallback->SetClientData(this);
-    newFilesCallback->SetCallback(
-      [](vtkObject*, unsigned long, void* clientData, void* callData)
-      {
-        F3DStarter* starter = static_cast<F3DStarter*>(clientData);
-        vtkStringArray* filesArr = static_cast<vtkStringArray*>(callData);
-        for (int i = 0; i < filesArr->GetNumberOfTuples(); i++)
-        {
-          starter->AddFile(filesArr->GetValue(i));
-        }
-        starter->LoadFile(F3DLoader::LoadFileEnum::LOAD_LAST);
-      });
-    style->AddObserver(vtkF3DInteractorStyle::NewFilesEvent, newFilesCallback);
-
-    vtkNew<vtkCallbackCommand> loadFileCallback;
-    loadFileCallback->SetClientData(this);
-    loadFileCallback->SetCallback(
-      [](vtkObject*, unsigned long, void* clientData, void* callData)
-      {
-        F3DStarter* starter = static_cast<F3DStarter*>(clientData);
-        F3DLoader::LoadFileEnum* load = static_cast<F3DLoader::LoadFileEnum*>(callData);
-        starter->LoadFile(*load);
-      });
-    style->AddObserver(vtkF3DInteractorStyle::LoadFileEvent, loadFileCallback);
-
-    vtkNew<vtkCallbackCommand> toggleAnimationCallback;
-    toggleAnimationCallback->SetClientData(this);
-    toggleAnimationCallback->SetCallback(
-      [](vtkObject*, unsigned long, void* clientData, void*)
-      {
-        F3DStarter* starter = static_cast<F3DStarter*>(clientData);
-        starter->Internals->Loader.ToggleAnimation();
-      });
-    style->AddObserver(vtkF3DInteractorStyle::ToggleAnimationEvent, toggleAnimationCallback);
   }
 
   // Add and load file
-  this->Internals->Loader.AddFiles(files);
+  this->Internals->Loader.addFiles(files);
   this->LoadFile();
 
   if (!this->Internals->CommandLineOptions.NoRender)
   {
     // Start rendering and interaction
-    if (!this->Internals->Loader.Start())
+    if (!this->Internals->Loader.start())
     {
       return EXIT_FAILURE;
     }
@@ -125,12 +118,12 @@ int F3DStarter::Start(int argc, char** argv)
 }
 
 //----------------------------------------------------------------------------
-bool F3DStarter::LoadFile(F3DLoader::LoadFileEnum load)
+bool F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
 {
   // Recover info about the file to be loaded
   int index;
   std::string filePath, fileInfo;
-  this->Internals->Loader.GetNextFile(load, index, filePath, fileInfo);
+  this->Internals->Loader.getFileInfo(load, index, filePath, fileInfo);
 
   if (this->Internals->CommandLineOptions.DryRun)
   {
@@ -152,5 +145,5 @@ bool F3DStarter::LoadFile(F3DLoader::LoadFileEnum load)
   }
 
   // Load the file
-  return this->Internals->Loader.LoadFile(load, this->Internals->NewOptions);
+  return this->Internals->Loader.loadFile(load);
 }

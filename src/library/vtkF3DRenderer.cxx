@@ -59,17 +59,8 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& fileInfo)
+void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
 {
-  if (!this->RenderWindow)
-  {
-    F3DLog::Print(F3DLog::Severity::Error, "No render window linked");
-    return;
-  }
-
-  this->RemoveAllViewProps();
-  this->RemoveAllLights();
-
   options.get("grid", this->GridVisible);
   options.get("axis", this->AxisVisible);
   options.get("edges", this->EdgesVisible);
@@ -87,8 +78,22 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   options.get("trackball", this->UseTrackball);
   options.get("hdri", this->HDRIFile);
   options.get("verbose", this->Verbose);
+}
 
-  if (!this->HDRIFile.empty() && !this->GetUseImageBasedLighting())
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& fileInfo)
+{
+  if (!this->RenderWindow)
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "No render window linked");
+    return;
+  }
+
+  this->RemoveAllViewProps();
+  this->RemoveAllLights();
+  this->UpdateOptions(options);
+
+  if (!this->HDRIFile.empty())
   {
     this->HDRIFile = vtksys::SystemTools::CollapseFullPath(this->HDRIFile);
     if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
@@ -101,6 +106,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
         vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
       if (reader)
       {
+        // TODO avoid doing that everytime if file does not change
         reader->SetFileName(this->HDRIFile.c_str());
         reader->Update();
 
@@ -178,16 +184,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   }
   else
   {
-    if (options.get<bool>("no-background") && !options.get<std::string>("output").empty())
-    {
-      // we need to set the background to black to avoid blending issues with translucent
-      // objects when saving to file with no background
-      this->SetBackground(0, 0, 0);
-    }
-    else
-    {
-      this->SetBackground(options.get<std::vector<double> >("background-color").data());
-    }
+    this->SetBackground(options.get<std::vector<double> >("background-color").data());
     this->AutomaticLightCreationOn();
   }
 

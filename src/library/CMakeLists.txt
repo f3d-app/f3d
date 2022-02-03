@@ -69,7 +69,8 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DRenderer.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DRendererWithColoring.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DAnimationManager.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/F3DLoader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_interactor.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DStarter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DLog.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DOffscreenRender.cxx
@@ -85,7 +86,9 @@ set(F3D_SOURCE_FILES
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
-  ${CMAKE_CURRENT_SOURCE_DIR}/F3DLoader.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_interactor.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_options.h
   )
 
 add_library(libf3d

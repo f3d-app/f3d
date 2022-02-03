@@ -26,9 +26,8 @@ public:
    */
   enum vtkCustomEvents
   {
-    NewFilesEvent = vtkCommand::UserEvent + 100,
-    LoadFileEvent,
-    ToggleAnimationEvent
+    DropFilesEvent = vtkCommand::UserEvent + 100,
+    KeyPressEvent
   };
 
   /**
@@ -73,7 +72,7 @@ public:
   /**
    * Set animation manager
    */
-  void SetAnimationManager(const F3DAnimationManager& mgr) { this->AnimationManager = &mgr; };
+  void SetAnimationManager(const F3DAnimationManager* mgr) { this->AnimationManager = mgr; };
 
   /**
    * Set options
@@ -90,9 +89,6 @@ protected:
 
   const F3DAnimationManager* AnimationManager = nullptr;
   const f3d::options* Options = nullptr;
-
-  int WindowSize[2] = { -1, -1 };
-  int WindowPos[2] = { 0, 0 };
 };
 
 #endif
