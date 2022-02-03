@@ -70,7 +70,8 @@ int F3DStarter::Start(int argc, char** argv)
   F3DNSDelegate::InitializeDelegate(this);
 #endif
 
-  if (!this->Internals->CommandLineOptions.NoRender)
+  // TODO add f3d::noRenderWindow
+//  if (!this->Internals->CommandLineOptions.NoRender)
   {
     // TODO Test this multiconfig behavior
     this->Internals->Interactor.setKeyPressCallBack(

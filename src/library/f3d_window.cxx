@@ -172,8 +172,8 @@ void window::update()
     this->Internals->Renderer->UpdateOptions(*this->Internals->Options);
     
     // Actors are loaded, use the bounds to reset camera and set-up SSAO
-    this->Internals->UpdateCamera();
     this->Internals->Renderer->ShowOptions();
+    this->Internals->UpdateCamera();
   }
 }
 
