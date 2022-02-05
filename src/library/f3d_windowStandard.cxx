@@ -45,8 +45,7 @@ public:
         // use options to overwrite camera parameters
         vtkCamera* cam = this->Renderer->GetActiveCamera();
 
-        std::vector<double> cameraPosition =
-          options->get<std::vector<double> >("camera-position");
+        std::vector<double> cameraPosition = options->get<std::vector<double> >("camera-position");
         if (cameraPosition.size() == 3)
         {
           cam->SetPosition(cameraPosition.data());
@@ -59,8 +58,7 @@ public:
           cam->SetFocalPoint(cameraFocalPoint.data());
         }
 
-        std::vector<double> cameraViewUp =
-          options->get<std::vector<double> >("camera-view-up");
+        std::vector<double> cameraViewUp = options->get<std::vector<double> >("camera-view-up");
         if (cameraViewUp.size() == 3)
         {
           cam->SetViewUp(cameraViewUp.data());
@@ -91,7 +89,8 @@ public:
 };
 
 //----------------------------------------------------------------------------
-windowStandard::windowStandard(const std::string& windowName, bool offscreen, const void* icon, size_t iconSize)
+windowStandard::windowStandard(
+  const std::string& windowName, bool offscreen, const void* icon, size_t iconSize)
   : Internals(new windowStandard::F3DInternals)
 {
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
@@ -130,8 +129,7 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
   // TODO test should not be needed
   if (this->Internals->RenWin)
   {
-    this->Internals->RenWin->SetSize(
-      this->Options->get<std::vector<int> >("resolution").data());
+    this->Internals->RenWin->SetSize(this->Options->get<std::vector<int> >("resolution").data());
     this->Internals->RenWin->SetFullScreen(this->Options->get<bool>("fullscreen"));
 
     if (withColoring)

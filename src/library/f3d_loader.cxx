@@ -429,7 +429,7 @@ bool loader::loadFile(loader::LoadFileEnum load)
 
   // Recover generic importer specific actors and mappers to set on the renderer with coloring
   vtkF3DRendererWithColoring* renWithColor =
-      vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Window->GetRenderer());
+    vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Window->GetRenderer());
   if (renWithColor && genericImporter)
   {
     renWithColor->SetScalarBarActor(genericImporter->GetScalarBarActor());

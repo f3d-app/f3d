@@ -14,7 +14,8 @@ public:
 //----------------------------------------------------------------------------
 windowNoRender::windowNoRender()
   : Internals(new windowNoRender::F3DInternals)
-{}
+{
+}
 
 //----------------------------------------------------------------------------
 windowNoRender::~windowNoRender() = default;

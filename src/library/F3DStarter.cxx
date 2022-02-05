@@ -113,7 +113,8 @@ int F3DStarter::Start(int argc, char** argv)
 
     bool offscreen = !this->Internals->CommandLineOptions.Reference.empty() ||
       !this->Internals->CommandLineOptions.Output.empty();
-    this->Internals->Window = new f3d::windowStandard(f3d::AppTitle, offscreen, F3DIcon, sizeof(F3DIcon));
+    this->Internals->Window =
+      new f3d::windowStandard(f3d::AppTitle, offscreen, F3DIcon, sizeof(F3DIcon));
     this->Internals->Loader.setWindow(this->Internals->Window);
 
     this->Internals->Loader.setInteractor(&this->Internals->Interactor);

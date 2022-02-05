@@ -5,16 +5,16 @@
 namespace f3d
 {
 //----------------------------------------------------------------------------
-void window::update(){}
+void window::update() {}
 
 //----------------------------------------------------------------------------
 void window::SetOptions(const options* options)
 {
   this->Options = options;
 }
-  
+
 //----------------------------------------------------------------------------
-void window::Initialize(bool, std::string){}
+void window::Initialize(bool, std::string) {}
 
 //----------------------------------------------------------------------------
 vtkF3DRenderer* window::GetRenderer()
