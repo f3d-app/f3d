@@ -71,7 +71,12 @@ int F3DStarter::Start(int argc, char** argv)
 #endif
 
   // TODO add f3d::noRenderWindow
-//  if (!this->Internals->CommandLineOptions.NoRender)
+  if (this->Internals->CommandLineOptions.NoRender)
+  {
+    this->Internals->Window = new f3d::window(f3d::AppTitle, true, F3DIcon, sizeof(F3DIcon));
+    this->Internals->Loader.setWindow(this->Internals->Window);
+  }
+  else
   {
     // TODO Test this multiconfig behavior
     this->Internals->Interactor.setKeyPressCallBack(
