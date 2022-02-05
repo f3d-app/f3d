@@ -15,8 +15,8 @@
 #include <vtkVersion.h>
 
 //----------------------------------------------------------------------------
-void F3DAnimationManager::Initialize(const f3d::options& options, vtkImporter* importer,
-  f3d::window* window)
+void F3DAnimationManager::Initialize(
+  const f3d::options& options, vtkImporter* importer, f3d::window* window)
 {
   this->Importer = importer;
   if (!this->Importer)

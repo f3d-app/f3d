@@ -343,8 +343,7 @@ bool loader::loadFile(loader::LoadFileEnum load)
 
   if (!this->Internals->Window)
   {
-    F3DLog::Print(
-      F3DLog::Severity::Error, "No window provided, aborting\n");
+    F3DLog::Print(F3DLog::Severity::Error, "No window provided, aborting\n");
     return this->Internals->LoadedFile;
   }
 
@@ -395,7 +394,7 @@ bool loader::loadFile(loader::LoadFileEnum load)
   ::ProgressDataStruct callbackData;
   callbackData.timer = timer;
   callbackData.widget = progressWidget;
-    
+
   this->Internals->Window->Initialize(genericImporter != nullptr, fileInfo);
 
   // Initialize importer for rendering
@@ -424,8 +423,8 @@ bool loader::loadFile(loader::LoadFileEnum load)
 
   // Initialize the animation manager using temporal
   // information from the importer
-  this->Internals->AnimationManager.Initialize(this->Internals->Options,
-    this->Internals->Importer, this->Internals->Window);
+  this->Internals->AnimationManager.Initialize(
+    this->Internals->Options, this->Internals->Importer, this->Internals->Window);
 
   // Recover generic importer specific actors and mappers to set on the renderer with coloring
   if (genericImporter)
@@ -443,8 +442,7 @@ bool loader::loadFile(loader::LoadFileEnum load)
     renWithColor->SetVolumeMapper(genericImporter->GetVolumeMapper());
     renWithColor->SetColoring(genericImporter->GetPointDataForColoring(),
       genericImporter->GetCellDataForColoring(), this->Internals->Options.get<bool>("cells"),
-      genericImporter->GetArrayIndexForColoring(),
-      this->Internals->Options.get<int>("component"));
+      genericImporter->GetArrayIndexForColoring(), this->Internals->Options.get<int>("component"));
   }
 
   // Initialize renderer using data read by the importer

@@ -1,14 +1,14 @@
 #include "f3d_window.h"
 
-#include "vtkF3DRendererWithColoring.h"
 #include "F3DLog.h"
-#include "f3d_options.h"
 #include "f3d_loader.h"
+#include "f3d_options.h"
+#include "vtkF3DRendererWithColoring.h"
 
-#include <vtkVersion.h>
-#include <vtkRenderWindow.h>
 #include <vtkCamera.h>
 #include <vtkPNGReader.h>
+#include <vtkRenderWindow.h>
+#include <vtkVersion.h>
 
 namespace
 {
@@ -32,9 +32,7 @@ namespace f3d
 class window::F3DInternals
 {
 public:
-  F3DInternals()
-  {
-  }
+  F3DInternals() {}
 
   void UpdateCamera()
   {
@@ -132,7 +130,7 @@ void window::SetLoader(loader* loader)
   this->Internals->Loader = loader;
   this->Internals->Options = &loader->getOptions();
 }
-  
+
 //----------------------------------------------------------------------------
 void window::Initialize(bool withColoring, std::string fileInfo)
 {
@@ -170,7 +168,7 @@ void window::update()
   {
     // Make sure options are up to date
     this->Internals->Renderer->UpdateOptions(*this->Internals->Options);
-    
+
     // Actors are loaded, use the bounds to reset camera and set-up SSAO
     this->Internals->Renderer->ShowOptions();
     this->Internals->UpdateCamera();

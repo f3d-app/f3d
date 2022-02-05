@@ -47,8 +47,8 @@ public:
   /**
    * Set/get the window to use when rendering
    */
-   window* getWindow();
-   void setWindow(window* interactor);
+  window* getWindow();
+  void setWindow(window* interactor);
 
   /**
    * Add a list of files or directory to be loaded
@@ -118,7 +118,8 @@ public:
    * AnimationManager, RenWin
    * TODO Manage that internally depending on the type of context provided
    */
-//  void InitializeRendering(std::string, bool offscreen, const void* iconBuffer, size_t inconLength);
+  //  void InitializeRendering(std::string, bool offscreen, const void* iconBuffer, size_t
+  //  inconLength);
 
   // TODO PRIVATE API
   const F3DAnimationManager* GetAnimationManager();
