@@ -323,7 +323,7 @@ void loader::setWindow(window* window)
   this->Internals->Window = window;
   if (this->Internals->Window)
   {
-    this->Internals->Window->SetLoader(this);
+    this->Internals->Window->SetOptions(&this->Internals->Options);
   }
 }
 
@@ -423,16 +423,15 @@ bool loader::loadFile(loader::LoadFileEnum load)
 
   // Initialize the animation manager using temporal
   // information from the importer
+  // TODO improve this API
   this->Internals->AnimationManager.Initialize(
     this->Internals->Options, this->Internals->Importer, this->Internals->Window);
 
   // Recover generic importer specific actors and mappers to set on the renderer with coloring
-  if (genericImporter)
-  {
-    // no sanity test needed
-    vtkF3DRendererWithColoring* renWithColor =
+  vtkF3DRendererWithColoring* renWithColor =
       vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Window->GetRenderer());
-
+  if (renWithColor && genericImporter)
+  {
     renWithColor->SetScalarBarActor(genericImporter->GetScalarBarActor());
     renWithColor->SetGeometryActor(genericImporter->GetGeometryActor());
     renWithColor->SetPointSpritesActor(genericImporter->GetPointSpritesActor());

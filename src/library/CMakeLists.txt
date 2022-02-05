@@ -79,6 +79,8 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_options.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_windowStandard.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_windowNoRender.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/readers/F3DReader.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/readers/F3DReaderFactory.cxx
   ${MODULES_SPECIFIC_SOURCE_FILES}

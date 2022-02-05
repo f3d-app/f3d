@@ -7,7 +7,8 @@
 #include "F3DNSDelegate.h"
 #include "f3d_interactor.h"
 #include "f3d_options.h"
-#include "f3d_window.h"
+#include "f3d_windowNoRender.h"
+#include "f3d_windowStandard.h"
 
 class F3DStarter::F3DInternals
 {
@@ -73,7 +74,7 @@ int F3DStarter::Start(int argc, char** argv)
   // TODO add f3d::noRenderWindow
   if (this->Internals->CommandLineOptions.NoRender)
   {
-    this->Internals->Window = new f3d::window(f3d::AppTitle, true, F3DIcon, sizeof(F3DIcon));
+    this->Internals->Window = new f3d::windowNoRender();
     this->Internals->Loader.setWindow(this->Internals->Window);
   }
   else
@@ -112,7 +113,7 @@ int F3DStarter::Start(int argc, char** argv)
 
     bool offscreen = !this->Internals->CommandLineOptions.Reference.empty() ||
       !this->Internals->CommandLineOptions.Output.empty();
-    this->Internals->Window = new f3d::window(f3d::AppTitle, offscreen, F3DIcon, sizeof(F3DIcon));
+    this->Internals->Window = new f3d::windowStandard(f3d::AppTitle, offscreen, F3DIcon, sizeof(F3DIcon));
     this->Internals->Loader.setWindow(this->Internals->Window);
 
     this->Internals->Loader.setInteractor(&this->Internals->Interactor);
