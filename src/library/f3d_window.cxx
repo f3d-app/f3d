@@ -14,7 +14,7 @@ void window::SetOptions(const options* options)
 }
   
 //----------------------------------------------------------------------------
-void window::Initialize(bool withColoring, std::string fileInfo){}
+void window::Initialize(bool, std::string){}
 
 //----------------------------------------------------------------------------
 vtkF3DRenderer* window::GetRenderer()

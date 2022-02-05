@@ -17,10 +17,6 @@ public:
   windowStandard(const std::string& windowName, bool offscreen, const void* icon, size_t iconSize);
   ~windowStandard();
 
-  // XXX is this needed ?
-  //  windowStandard(const windowStandard& opt);
-  //  windowStandard& operator=(const windowStandard& opt);
-
   void update() override;
 
   // TODO Private API

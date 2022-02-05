@@ -12,7 +12,7 @@ class window
 {
 public:
   virtual ~window() = default;
-  
+
   virtual void update();
 
   // TODO Private API
@@ -23,10 +23,6 @@ public:
 
 protected:
   window() = default;
-
-  // XXX is this needed ?
-  //  window(const window& opt);
-  //  window& operator=(const window& opt);\
 
   const f3d::options* Options;
 };

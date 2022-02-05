@@ -17,10 +17,6 @@ public:
   windowNoRender();
   ~windowNoRender();
 
-  // XXX is this needed ?
-  //  windowNoRender(const windowNoRender& opt);
-  //  windowNoRender& operator=(const windowNoRender& opt);
-  
   // TODO Private API
   vtkRenderWindow* GetRenderWindow() override;
 
