@@ -58,7 +58,9 @@ function(f3d_test)
   endif()
 
   if(NOT F3D_ENABLE_LONG_TIMEOUT_TESTS)
-    set_tests_properties(${F3D_TEST_NAME} PROPERTIES DISABLED ON)
+    if(F3D_TEST_LONG_TIMEOUT OR F3D_TEST_INTERACTION)
+      set_tests_properties(${F3D_TEST_NAME} PROPERTIES DISABLED ON)
+    endif()
   endif()
   set_tests_properties(${F3D_TEST_NAME} PROPERTIES TIMEOUT ${_timeout})
 
