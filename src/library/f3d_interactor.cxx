@@ -440,6 +440,13 @@ bool interactor::playInteraction(const std::string& file)
 //----------------------------------------------------------------------------
 bool interactor::recordInteraction(const std::string& file)
 {
+  if (file.empty())
+  {
+    // TODO improve VTK to check file opening
+    F3DLog::Print(F3DLog::Severity::Error, "Interaction record file is empty");
+    return false;
+  }
+
   // Make sure the recorder is off
   this->Internals->Recorder->Off();
 

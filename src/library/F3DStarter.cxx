@@ -143,7 +143,7 @@ int F3DStarter::Start(int argc, char** argv)
     if (!this->Internals->CommandLineOptions.InteractionTestRecordFile.empty())
     {
       if (!this->Internals->Interactor.recordInteraction(
-            this->Internals->CommandLineOptions.InteractionTestPlayFile))
+            this->Internals->CommandLineOptions.InteractionTestRecordFile))
       {
         return EXIT_FAILURE;
       }
