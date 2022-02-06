@@ -18,6 +18,7 @@ public:
   ~windowStandard();
 
   void update() override;
+  void render() override;
 
   // TODO Private API
   void Initialize(bool withColoring, std::string fileInfo) override;

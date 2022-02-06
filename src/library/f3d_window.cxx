@@ -8,6 +8,9 @@ namespace f3d
 void window::update() {}
 
 //----------------------------------------------------------------------------
+void window::render() {}
+
+//----------------------------------------------------------------------------
 void window::SetOptions(const options* options)
 {
   this->Options = options;

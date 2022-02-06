@@ -46,9 +46,10 @@ public:
 
   /**
    * Set/get the window to use when rendering
+   * TODO since this is absolutely needed, maybe this API is not the right one
    */
   window* getWindow();
-  void setWindow(window* interactor);
+  void setWindow(window* window);
 
   /**
    * Add a list of files or directory to be loaded
@@ -94,12 +95,6 @@ public:
     LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const;
 
   /**
-   * Trigger a rendering
-   * TODO Move that to another class
-   */
-  void render();
-
-  /**
    * Start the interaction/rendering
    * Return true if rendering and interaction is successful, false otherwise
    * TODO Move that to another class
@@ -111,15 +106,6 @@ public:
    * TODO Move that to another class
    */
   void toggleAnimation();
-
-  /**
-   * Initialize the rendering stack managed by the loader
-   * This will initialize the following members:
-   * AnimationManager, RenWin
-   * TODO Manage that internally depending on the type of context provided
-   */
-  //  void InitializeRendering(std::string, bool offscreen, const void* iconBuffer, size_t
-  //  inconLength);
 
   // TODO PRIVATE API
   const F3DAnimationManager* GetAnimationManager();

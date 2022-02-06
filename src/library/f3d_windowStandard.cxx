@@ -126,23 +126,19 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
     this->Internals->RenWin->RemoveRenderer(this->Internals->Renderer);
   }
 
-  // TODO test should not be needed
-  if (this->Internals->RenWin)
-  {
-    this->Internals->RenWin->SetSize(this->Options->get<std::vector<int> >("resolution").data());
-    this->Internals->RenWin->SetFullScreen(this->Options->get<bool>("fullscreen"));
+  this->Internals->RenWin->SetSize(this->Options->get<std::vector<int> >("resolution").data());
+  this->Internals->RenWin->SetFullScreen(this->Options->get<bool>("fullscreen"));
 
-    if (withColoring)
-    {
-      this->Internals->Renderer = vtkSmartPointer<vtkF3DRendererWithColoring>::New();
-    }
-    else
-    {
-      this->Internals->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
-    }
-    this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
-    this->Internals->Renderer->Initialize(*this->Options, fileInfo);
+  if (withColoring)
+  {
+    this->Internals->Renderer = vtkSmartPointer<vtkF3DRendererWithColoring>::New();
   }
+  else
+  {
+    this->Internals->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
+  }
+  this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
+  this->Internals->Renderer->Initialize(*this->Options, fileInfo);
 }
 
 //----------------------------------------------------------------------------
@@ -169,5 +165,11 @@ vtkRenderWindow* windowStandard::GetRenderWindow()
 vtkF3DRenderer* windowStandard::GetRenderer()
 {
   return this->Internals->Renderer;
+}
+
+//----------------------------------------------------------------------------
+void windowStandard::render()
+{
+  this->Internals->RenWin->Render();
 }
 };

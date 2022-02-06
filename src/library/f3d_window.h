@@ -14,6 +14,7 @@ public:
   virtual ~window() = default;
 
   virtual void update();
+  virtual void render();
 
   // TODO Private API
   virtual void SetOptions(const f3d::options* options);

@@ -569,13 +569,6 @@ bool loader::start()
 }
 
 //----------------------------------------------------------------------------
-void loader::render()
-{
-  // TODO
-  this->Internals->Window->GetRenderWindow()->Render();
-}
-
-//----------------------------------------------------------------------------
 const F3DAnimationManager* loader::GetAnimationManager()
 {
   return &this->Internals->AnimationManager;

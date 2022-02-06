@@ -87,14 +87,14 @@ int F3DStarter::Start(int argc, char** argv)
         {
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_PREVIOUS;
           this->LoadFile(load);
-          this->Internals->Loader.render();
+          this->Internals->Window->render();
           return true;
         }
         else if (keySym == "Right")
         {
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_NEXT;
           this->LoadFile(load);
-          this->Internals->Loader.render();
+          this->Internals->Window->render();
           return true;
         }
         return false;
