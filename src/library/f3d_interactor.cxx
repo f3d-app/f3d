@@ -279,7 +279,7 @@ public:
   f3d::loader* Loader;
   int WindowSize[2] = { -1, -1 };
   int WindowPos[2] = { 0, 0 };
-  std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
+  std::map<unsigned long, std::pair<int, std::function<void()> > > TimerCallBacks;
 };
 
 //----------------------------------------------------------------------------
@@ -349,10 +349,11 @@ unsigned long interactor::createTimerCallBack(double time, std::function<void()>
   timerCallBack->SetCallback(
     [](vtkObject*, unsigned long, void* clientData, void*)
     {
-    std::function<void()>* callBackPtr = static_cast<std::function<void()>*>(clientData);
-    (*callBackPtr)();
+      std::function<void()>* callBackPtr = static_cast<std::function<void()>*>(clientData);
+      (*callBackPtr)();
     });
-  unsigned long id = this->Internals->Interactor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
+  unsigned long id =
+    this->Internals->Interactor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
 
   // Store the user callback and set it as client data
   this->Internals->TimerCallBacks[id] = std::make_pair(timerId, callBack);

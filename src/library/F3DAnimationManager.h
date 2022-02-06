@@ -32,7 +32,8 @@ public:
   /**
    * Initialize the animation manager, required before playing the animation
    */
-  void Initialize(const f3d::options& options, f3d::interactor* interactor, f3d::window* window, vtkImporter* importer);
+  void Initialize(const f3d::options& options, f3d::interactor* interactor, f3d::window* window,
+    vtkImporter* importer);
 
   /**
    * Start/Stop playing the animation

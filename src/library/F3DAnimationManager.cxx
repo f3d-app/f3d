@@ -1,9 +1,9 @@
 #include "F3DAnimationManager.h"
 
 #include "F3DLog.h"
+#include "f3d_interactor.h"
 #include "f3d_options.h"
 #include "f3d_window.h"
-#include "f3d_interactor.h"
 #include "vtkF3DRenderer.h"
 
 #include <vtkCallbackCommand.h>
@@ -18,8 +18,8 @@
 #include <functional>
 
 //----------------------------------------------------------------------------
-void F3DAnimationManager::Initialize(
-  const f3d::options& options, f3d::interactor* interactor, f3d::window* window, vtkImporter* importer)
+void F3DAnimationManager::Initialize(const f3d::options& options, f3d::interactor* interactor,
+  f3d::window* window, vtkImporter* importer)
 {
   this->HasAnimation = false;
 
@@ -186,11 +186,8 @@ void F3DAnimationManager::ToggleAnimation()
 
     if (this->Playing)
     {
-      this->CallBackId = this->Interactor->createTimerCallBack(1000.0 / this->FrameRate,
-      [this]()
-      {
-        this->Tick();
-      });
+      this->CallBackId =
+        this->Interactor->createTimerCallBack(1000.0 / this->FrameRate, [this]() { this->Tick(); });
     }
   }
 }
