@@ -14,7 +14,6 @@ public:
   virtual ~window() = default;
 
   virtual bool update();
-  virtual bool updateCamera();
   virtual bool render();
   virtual bool renderToFile(const std::string& file, bool noBackground = false);
   virtual bool renderAndCompareWithFile(const std::string& file, double threshold,

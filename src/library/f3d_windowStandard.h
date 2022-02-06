@@ -18,7 +18,6 @@ public:
   ~windowStandard();
 
   bool update() override;
-  bool updateCamera() override;
   bool render() override;
   bool renderToFile(const std::string& file, bool noBackground = false) override;
   bool renderAndCompareWithFile(const std::string& file, double threshold,

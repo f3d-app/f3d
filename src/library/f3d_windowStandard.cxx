@@ -146,12 +146,6 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
 }
 
 //----------------------------------------------------------------------------
-bool windowStandard::updateCamera()
-{
-  return this->Internals->UpdateCamera(this->Options);
-}
-
-//----------------------------------------------------------------------------
 bool windowStandard::update()
 {
   if (this->Internals->Renderer)
@@ -161,7 +155,7 @@ bool windowStandard::update()
 
     // Actors are loaded, use the bounds to reset camera and set-up SSAO
     this->Internals->Renderer->ShowOptions();
-    return this->updateCamera();
+    return this->Internals->UpdateCamera(this->Options);
   }
   return false;
 }
