@@ -302,9 +302,6 @@ void interactor::SetLoader(f3d::loader* loader)
   // Disable standard interactor behavior with timer event
   // in order to be able to be able to interact while animating
   this->Internals->Interactor->RemoveObservers(vtkCommand::TimerEvent);
-
-  this->Internals->Style->SetAnimationManager(&this->Internals->AnimationManager);
-  this->Internals->Style->SetOptions(&loader->getOptions());
 }
 
 //----------------------------------------------------------------------------
@@ -316,7 +313,7 @@ void interactor::InitializeAnimation(vtkImporter* importer)
     return;
   }
   this->Internals->AnimationManager.Initialize(
-    this->Internals->Loader->getOptions(), this, this->Internals->Loader->getWindow(), importer);
+    &this->Internals->Loader->getOptions(), this, this->Internals->Loader->getWindow(), importer);
 }
 
 //----------------------------------------------------------------------------
@@ -377,6 +374,18 @@ void interactor::startAnimation()
 void interactor::stopAnimation()
 {
   this->Internals->AnimationManager.StopAnimation();
+}
+
+//----------------------------------------------------------------------------
+void interactor::enableCameraMovement()
+{
+  this->Internals->Style->SetCameraMovementDisabled(false);
+}
+
+//----------------------------------------------------------------------------
+void interactor::disableCameraMovement()
+{
+  this->Internals->Style->SetCameraMovementDisabled(true);
 }
 
 //----------------------------------------------------------------------------

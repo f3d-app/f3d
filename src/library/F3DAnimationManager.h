@@ -32,7 +32,7 @@ public:
   /**
    * Initialize the animation manager, required before playing the animation
    */
-  void Initialize(const f3d::options& options, f3d::interactor* interactor, f3d::window* window,
+  void Initialize(const f3d::options* options, f3d::interactor* interactor, f3d::window* window,
     vtkImporter* importer);
 
   /**
@@ -53,6 +53,7 @@ protected:
   vtkImporter* Importer = nullptr;
   f3d::window* Window;
   f3d::interactor* Interactor;
+  const f3d::options* Options;
 
   std::set<double> TimeSteps;
   std::set<double>::iterator CurrentTimeStep;

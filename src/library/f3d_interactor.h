@@ -34,6 +34,12 @@ public:
   void startAnimation();
   void stopAnimation();
 
+  /**
+   * Control if camera movements are enabled, which they are by default
+   */
+  void enableCameraMovement();
+  void disableCameraMovement();
+
   // PRIVATE API TODO
   void SetInteractorOn(vtkInteractorObserver* observer);
   void SetLoader(f3d::loader* loader);

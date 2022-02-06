@@ -69,15 +69,8 @@ public:
    */
   void EnvironmentRotate() override;
 
-  /**
-   * Set animation manager
-   */
-  void SetAnimationManager(const F3DAnimationManager* mgr) { this->AnimationManager = mgr; };
-
-  /**
-   * Set options
-   */
-  void SetOptions(const f3d::options* options) { this->Options = options; };
+  vtkSetMacro(CameraMovementDisabled, bool);
+  vtkGetMacro(CameraMovementDisabled, bool);
 
 protected:
   /**
@@ -85,10 +78,7 @@ protected:
    */
   void Dolly(double factor) override;
 
-  virtual bool IsUserInteractionBlocked();
-
-  const F3DAnimationManager* AnimationManager = nullptr;
-  const f3d::options* Options = nullptr;
+  bool CameraMovementDisabled = false;
 };
 
 #endif

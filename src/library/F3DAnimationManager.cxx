@@ -18,10 +18,17 @@
 #include <functional>
 
 //----------------------------------------------------------------------------
-void F3DAnimationManager::Initialize(const f3d::options& options, f3d::interactor* interactor,
+void F3DAnimationManager::Initialize(const f3d::options* options, f3d::interactor* interactor,
   f3d::window* window, vtkImporter* importer)
 {
   this->HasAnimation = false;
+
+  this->Options = options;
+  if (!this->Options)
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "Options is empty");
+    return;
+  }
 
   this->Interactor = interactor;
   if (!this->Interactor)
@@ -76,7 +83,7 @@ void F3DAnimationManager::Initialize(const f3d::options& options, f3d::interacto
     this->ProgressWidget = nullptr;
   }
 
-  if (options.get<bool>("verbose"))
+  if (options->get<bool>("verbose"))
   {
     if (availAnimations <= 0)
     {
@@ -93,7 +100,7 @@ void F3DAnimationManager::Initialize(const f3d::options& options, f3d::interacto
     F3DLog::Print(F3DLog::Severity::Info, "\n");
   }
 
-  int animationIndex = options.get<int>("animation-index");
+  int animationIndex = options->get<int>("animation-index");
   if (animationIndex != 0 && availAnimations <= 0)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
@@ -188,6 +195,14 @@ void F3DAnimationManager::ToggleAnimation()
     {
       this->CallBackId =
         this->Interactor->createTimerCallBack(1000.0 / this->FrameRate, [this]() { this->Tick(); });
+      if (this->Options->get<int>("camera-index") >= 0)
+      {
+        this->Interactor->disableCameraMovement();
+      }
+      else
+      {
+        this->Interactor->enableCameraMovement();
+      }
     }
   }
 }
