@@ -4,7 +4,7 @@
 #include <string>
 
 class vtkRenderWindow;
-class vtkF3DRenderer;
+class vtkF3DGenericImporter;
 namespace f3d
 {
 class options;
@@ -18,12 +18,13 @@ public:
   virtual bool renderToFile(const std::string& file, bool noBackground = false);
   virtual bool renderAndCompareWithFile(const std::string& file, double threshold,
     bool noBackground, const std::string& outputFile = "");
+  virtual void setIcon(const void* icon, size_t iconSize){};
 
   // TODO Private API
-  virtual void SetOptions(const f3d::options* options);
+  void SetOptions(const f3d::options* options);
   virtual void Initialize(bool withColoring, std::string fileInfo);
+  virtual void InitializeRendererWithColoring(vtkF3DGenericImporter* importer);
   virtual vtkRenderWindow* GetRenderWindow() = 0;
-  virtual vtkF3DRenderer* GetRenderer();
 
 protected:
   window() = default;

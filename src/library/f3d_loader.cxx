@@ -15,7 +15,6 @@
 #include <vtkLogger.h>
 #include <vtkNew.h>
 #include <vtkPNGReader.h>
-#include <vtkPointGaussianMapper.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkRenderWindow.h>
@@ -416,20 +415,9 @@ bool loader::loadFile(loader::LoadFileEnum load)
   }
 
   // Recover generic importer specific actors and mappers to set on the renderer with coloring
-  vtkF3DRendererWithColoring* renWithColor =
-    vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Window->GetRenderer());
-  if (renWithColor && genericImporter)
+  if (genericImporter)
   {
-    renWithColor->SetScalarBarActor(genericImporter->GetScalarBarActor());
-    renWithColor->SetGeometryActor(genericImporter->GetGeometryActor());
-    renWithColor->SetPointSpritesActor(genericImporter->GetPointSpritesActor());
-    renWithColor->SetVolumeProp(genericImporter->GetVolumeProp());
-    renWithColor->SetPolyDataMapper(genericImporter->GetPolyDataMapper());
-    renWithColor->SetPointGaussianMapper(genericImporter->GetPointGaussianMapper());
-    renWithColor->SetVolumeMapper(genericImporter->GetVolumeMapper());
-    renWithColor->SetColoring(genericImporter->GetPointDataForColoring(),
-      genericImporter->GetCellDataForColoring(), this->Internals->Options.get<bool>("cells"),
-      genericImporter->GetArrayIndexForColoring(), this->Internals->Options.get<int>("component"));
+    this->Internals->Window->InitializeRendererWithColoring(genericImporter);
   }
 
   // Initialize renderer using data read by the importer

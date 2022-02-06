@@ -38,8 +38,6 @@ void window::SetOptions(const options* options)
 void window::Initialize(bool, std::string) {}
 
 //----------------------------------------------------------------------------
-vtkF3DRenderer* window::GetRenderer()
-{
-  return nullptr;
-}
+void window::InitializeRendererWithColoring(vtkF3DGenericImporter* importer) {}
+
 };

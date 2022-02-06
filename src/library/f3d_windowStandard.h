@@ -7,14 +7,14 @@
 #include <string>
 
 class vtkRenderWindow;
-class vtkF3DRenderer;
+class vtkF3DGenericImporter;
 namespace f3d
 {
 class loader;
 class windowStandard : public window
 {
 public:
-  windowStandard(const std::string& windowName, bool offscreen, const void* icon, size_t iconSize);
+  windowStandard(const std::string& windowName, bool offscreen);
   ~windowStandard();
 
   bool update() override;
@@ -22,11 +22,12 @@ public:
   bool renderToFile(const std::string& file, bool noBackground = false) override;
   bool renderAndCompareWithFile(const std::string& file, double threshold,
     bool noBackground = false, const std::string& outputFile = "") override;
+  void setIcon(const void* icon, size_t iconSize) override;
 
   // TODO Private API
   void Initialize(bool withColoring, std::string fileInfo) override;
   vtkRenderWindow* GetRenderWindow() override;
-  vtkF3DRenderer* GetRenderer() override;
+  void InitializeRendererWithColoring(vtkF3DGenericImporter* importer) override;
 
 private:
   class F3DInternals;

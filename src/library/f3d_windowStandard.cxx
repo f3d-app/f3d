@@ -4,8 +4,10 @@
 #include "F3DOffscreenRender.h"
 #include "f3d_options.h"
 #include "vtkF3DRendererWithColoring.h"
+#include "vtkF3DGenericImporter.h"
 
 #include <vtkCamera.h>
+#include <vtkPointGaussianMapper.h>
 #include <vtkPNGReader.h>
 #include <vtkRenderWindow.h>
 #include <vtkVersion.h>
@@ -94,23 +96,28 @@ public:
 
 //----------------------------------------------------------------------------
 windowStandard::windowStandard(
-  const std::string& windowName, bool offscreen, const void* icon, size_t iconSize)
+  const std::string& windowName, bool offscreen)
   : Internals(new windowStandard::F3DInternals)
 {
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
   this->Internals->RenWin->SetWindowName(windowName.c_str());
-
-  // Offscreen rendering must be set before initializing interactor
   this->Internals->RenWin->SetOffScreenRendering(offscreen);
+}
 
+
+//----------------------------------------------------------------------------
+void windowStandard::setIcon(
+  const void* icon, size_t iconSize)
+{
+  // XXX This code requires that the interactor has already been set on the render window
+  // This is not great, improve VTK on that regard
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200615)
   // set icon
   vtkNew<vtkPNGReader> iconReader;
   iconReader->SetMemoryBuffer(icon);
   iconReader->SetMemoryBufferLength(iconSize);
   iconReader->Update();
-  // TODO
-//  this->Internals->RenWin->SetIcon(iconReader->GetOutput());
+  this->Internals->RenWin->SetIcon(iconReader->GetOutput());
 #else
   (void)icon;
   (void)iconSize;
@@ -126,7 +133,8 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
   // Clear renderer if already present
   if (this->Internals->Renderer)
   {
-    this->Internals->Renderer->ShowAxis(false);
+    // That does not seems necessseray TODO
+//    this->Internals->Renderer->ShowAxis(false);
     this->Internals->RenWin->RemoveRenderer(this->Internals->Renderer);
   }
 
@@ -167,12 +175,6 @@ vtkRenderWindow* windowStandard::GetRenderWindow()
 }
 
 //----------------------------------------------------------------------------
-vtkF3DRenderer* windowStandard::GetRenderer()
-{
-  return this->Internals->Renderer;
-}
-
-//----------------------------------------------------------------------------
 bool windowStandard::render()
 {
   this->Internals->RenWin->Render();
@@ -191,5 +193,25 @@ bool windowStandard::renderAndCompareWithFile(
 {
   return F3DOffscreenRender::RenderTesting(
     this->Internals->RenWin, file, threshold, noBackground, outputFile);
+}
+
+//----------------------------------------------------------------------------
+void windowStandard::InitializeRendererWithColoring(vtkF3DGenericImporter* importer)
+{
+  vtkF3DRendererWithColoring* renWithColor =
+    vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
+  if (renWithColor && importer)
+  {
+    renWithColor->SetScalarBarActor(importer->GetScalarBarActor());
+    renWithColor->SetGeometryActor(importer->GetGeometryActor());
+    renWithColor->SetPointSpritesActor(importer->GetPointSpritesActor());
+    renWithColor->SetVolumeProp(importer->GetVolumeProp());
+    renWithColor->SetPolyDataMapper(importer->GetPolyDataMapper());
+    renWithColor->SetPointGaussianMapper(importer->GetPointGaussianMapper());
+    renWithColor->SetVolumeMapper(importer->GetVolumeMapper());
+    renWithColor->SetColoring(importer->GetPointDataForColoring(),
+      importer->GetCellDataForColoring(), this->Options->get<bool>("cells"),
+      importer->GetArrayIndexForColoring(), this->Options->get<int>("component"));
+  }
 }
 };
