@@ -296,6 +296,10 @@ void interactor::SetLoader(f3d::loader* loader)
   this->Internals->Interactor->SetInteractorStyle(this->Internals->Style);
   this->Internals->Interactor->Initialize();
 
+  // Disable standard interactor behavior with timer event
+  // in order to be able to be able to interact while animating
+  this->Internals->Interactor->RemoveObservers(vtkCommand::TimerEvent);
+
   this->Internals->Style->SetAnimationManager(loader->GetAnimationManager());
   this->Internals->Style->SetOptions(&loader->getOptions());
 }
@@ -322,9 +326,10 @@ void interactor::removeTimerCallBack(unsigned long id)
 //----------------------------------------------------------------------------
 unsigned long interactor::createTimerCallBack(double time, std::function<void()> callBack)
 {
-  // TODO not super clear implementation
+  // Create the timer
   int timerId = this->Internals->Interactor->CreateRepeatingTimer(time);
 
+  // Create the callback and get the observer id
   vtkNew<vtkCallbackCommand> timerCallBack;
   timerCallBack->SetCallback(
     [](vtkObject*, unsigned long, void* clientData, void*)
@@ -333,8 +338,9 @@ unsigned long interactor::createTimerCallBack(double time, std::function<void()>
     (*callBackPtr)();
     });
   unsigned long id = this->Internals->Interactor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
+
+  // Store the user callback and set it as client data
   this->Internals->TimerCallBacks[id] = std::make_pair(timerId, callBack);
-  
   timerCallBack->SetClientData(&this->Internals->TimerCallBacks[id].second);
   return id;
 }

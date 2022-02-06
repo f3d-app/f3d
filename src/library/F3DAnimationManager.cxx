@@ -197,7 +197,11 @@ void F3DAnimationManager::Tick()
       static_cast<double>(this->TimeSteps.size() - 1));
 
     this->Importer->UpdateTimeStep(*this->CurrentTimeStep);
+
+    // TODO this is changing the behavior of the camera when animating and move the camera to follow
+    // the data if the camera has not been set by the user, it is better imo.
     this->Window->updateCamera();
+
     this->Window->render();
 
     this->CurrentTimeStep++;
