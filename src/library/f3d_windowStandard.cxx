@@ -1,6 +1,7 @@
 #include "f3d_windowStandard.h"
 
 #include "F3DLog.h"
+#include "F3DOffscreenRender.h"
 #include "f3d_options.h"
 #include "vtkF3DRendererWithColoring.h"
 
@@ -31,57 +32,60 @@ namespace f3d
 class windowStandard::F3DInternals
 {
 public:
-  void UpdateCamera(const f3d::options* options)
+  bool UpdateCamera(const f3d::options* options)
   {
-    if (this->Renderer)
+    if (!this->Renderer)
     {
-      // Set the initial camera once all options
-      // have been shown as they may have an effect on it
-      if (options->get<int>("camera-index") < 0)
+      return false;
+    }
+
+    // Set the initial camera once all options
+    // have been shown as they may have an effect on it
+    if (options->get<int>("camera-index") < 0)
+    {
+      // set a default camera from bounds using VTK method
+      this->Renderer->vtkRenderer::ResetCamera();
+
+      // use options to overwrite camera parameters
+      vtkCamera* cam = this->Renderer->GetActiveCamera();
+
+      std::vector<double> cameraPosition = options->get<std::vector<double> >("camera-position");
+      if (cameraPosition.size() == 3)
       {
-        // set a default camera from bounds using VTK method
-        this->Renderer->vtkRenderer::ResetCamera();
-
-        // use options to overwrite camera parameters
-        vtkCamera* cam = this->Renderer->GetActiveCamera();
-
-        std::vector<double> cameraPosition = options->get<std::vector<double> >("camera-position");
-        if (cameraPosition.size() == 3)
-        {
-          cam->SetPosition(cameraPosition.data());
-        }
-
-        std::vector<double> cameraFocalPoint =
-          options->get<std::vector<double> >("camera-focal-point");
-        if (cameraFocalPoint.size() == 3)
-        {
-          cam->SetFocalPoint(cameraFocalPoint.data());
-        }
-
-        std::vector<double> cameraViewUp = options->get<std::vector<double> >("camera-view-up");
-        if (cameraViewUp.size() == 3)
-        {
-          cam->SetViewUp(cameraViewUp.data());
-        }
-
-        double cameraViewAngle = options->get<double>("camera-view-angle");
-        if (cameraViewAngle != 0)
-        {
-          cam->SetViewAngle(cameraViewAngle);
-        }
-
-        cam->Azimuth(options->get<double>("camera-azimuth-angle"));
-        cam->Elevation(options->get<double>("camera-elevation-angle"));
-        cam->OrthogonalizeViewUp();
-
-        if (options->get<bool>("verbose"))
-        {
-          ::DisplayCameraInformation(cam);
-        }
+        cam->SetPosition(cameraPosition.data());
       }
 
-      this->Renderer->InitializeCamera();
+      std::vector<double> cameraFocalPoint =
+        options->get<std::vector<double> >("camera-focal-point");
+      if (cameraFocalPoint.size() == 3)
+      {
+        cam->SetFocalPoint(cameraFocalPoint.data());
+      }
+
+      std::vector<double> cameraViewUp = options->get<std::vector<double> >("camera-view-up");
+      if (cameraViewUp.size() == 3)
+      {
+        cam->SetViewUp(cameraViewUp.data());
+      }
+
+      double cameraViewAngle = options->get<double>("camera-view-angle");
+      if (cameraViewAngle != 0)
+      {
+        cam->SetViewAngle(cameraViewAngle);
+      }
+
+      cam->Azimuth(options->get<double>("camera-azimuth-angle"));
+      cam->Elevation(options->get<double>("camera-elevation-angle"));
+      cam->OrthogonalizeViewUp();
+
+      if (options->get<bool>("verbose"))
+      {
+        ::DisplayCameraInformation(cam);
+      }
     }
+
+    this->Renderer->InitializeCamera();
+    return true;
   }
 
   vtkNew<vtkRenderWindow> RenWin;
@@ -142,13 +146,13 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
 }
 
 //----------------------------------------------------------------------------
-void windowStandard::updateCamera()
+bool windowStandard::updateCamera()
 {
-  this->Internals->UpdateCamera(this->Options);
+  return this->Internals->UpdateCamera(this->Options);
 }
 
 //----------------------------------------------------------------------------
-void windowStandard::update()
+bool windowStandard::update()
 {
   if (this->Internals->Renderer)
   {
@@ -157,8 +161,9 @@ void windowStandard::update()
 
     // Actors are loaded, use the bounds to reset camera and set-up SSAO
     this->Internals->Renderer->ShowOptions();
-    this->updateCamera();
+    return this->updateCamera();
   }
+  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -174,8 +179,21 @@ vtkF3DRenderer* windowStandard::GetRenderer()
 }
 
 //----------------------------------------------------------------------------
-void windowStandard::render()
+bool windowStandard::render()
 {
   this->Internals->RenWin->Render();
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool windowStandard::renderToFile(const std::string& file, bool noBackground)
+{
+  return F3DOffscreenRender::RenderOffScreen(this->Internals->RenWin, file, noBackground);
+}
+
+//----------------------------------------------------------------------------
+bool windowStandard::renderAndCompareWithFile(const std::string& file, double threshold, bool noBackground, const std::string& outputFile)
+{
+  return F3DOffscreenRender::RenderTesting(this->Internals->RenWin, file, threshold, noBackground, outputFile);
 }
 };

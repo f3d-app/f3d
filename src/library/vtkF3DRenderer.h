@@ -152,7 +152,7 @@ public:
 
 protected:
   vtkF3DRenderer();
-  ~vtkF3DRenderer() override;
+  ~vtkF3DRenderer() override; // TODO Show axis false ?
 
   void ReleaseGraphicsResources(vtkWindow* w) override;
 

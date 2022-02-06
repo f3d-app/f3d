@@ -17,9 +17,11 @@ public:
   windowStandard(const std::string& windowName, bool offscreen, const void* icon, size_t iconSize);
   ~windowStandard();
 
-  void update() override;
-  void updateCamera() override;
-  void render() override;
+  bool update() override;
+  bool updateCamera() override;
+  bool render() override;
+  bool renderToFile(const std::string& file, bool noBackground = false) override;
+  bool renderAndCompareWithFile(const std::string& file, double threshold, bool noBackground = false, const std::string& outputFile = "") override;
 
   // TODO Private API
   void Initialize(bool withColoring, std::string fileInfo) override;

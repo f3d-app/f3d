@@ -1,12 +1,5 @@
 #include "f3d_interactor.h"
 
-#include <vtkCallbackCommand.h>
-#include <vtkNew.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkRendererCollection.h>
-#include <vtkStringArray.h>
-
 #include "F3DAnimationManager.h"
 #include "F3DConfig.h"
 #include "F3DLog.h"
@@ -14,6 +7,15 @@
 #include "f3d_window.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRendererWithColoring.h"
+#include "vtkF3DInteractorEventRecorder.h"
+
+#include <vtkCallbackCommand.h>
+#include <vtkNew.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkRendererCollection.h>
+#include <vtkStringArray.h>
+#include <vtksys/SystemTools.hxx>
 
 #include <map>
 
@@ -33,6 +35,14 @@ public:
     dropFilesCallback->SetClientData(this);
     dropFilesCallback->SetCallback(OnDropFiles);
     this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
+
+    this->Recorder->SetInteractor(this->Interactor);
+  }
+
+  ~F3DInternals()
+  {
+    // Turn off the recorder in case its on
+    this->Recorder->Off();
   }
 
   static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
@@ -276,6 +286,7 @@ public:
   F3DAnimationManager AnimationManager;
   vtkNew<vtkRenderWindowInteractor> Interactor;
   vtkNew<vtkF3DInteractorStyle> Style;
+  vtkNew<vtkF3DInteractorEventRecorder> Recorder;
   f3d::loader* Loader;
   int WindowSize[2] = { -1, -1 };
   int WindowPos[2] = { 0, 0 };
@@ -393,6 +404,48 @@ void interactor::disableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(true);
 }
+  
+//----------------------------------------------------------------------------
+bool interactor::playInteraction(const std::string& file)
+{
+  if (!vtksys::SystemTools::FileExists(file))
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "Interaction record file to play does not exist ", file);
+    return false;
+  }
+  else
+  {
+    // Make sure the recorder is off
+    this->Internals->Recorder->Off();
+    
+    std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
+    this->Internals->Recorder->SetFileName(cleanFile.c_str());
+    this->Internals->Recorder->Play();
+    this->Internals->Recorder->Off();
+  }
+
+  // Recorder can stop the interactor, make sure it is still running
+  if (this->Internals->Interactor->GetDone())
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "Interactor has been stopped");
+    return false;
+  }
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool interactor::recordInteraction(const std::string& file)
+{
+  // Make sure the recorder is off
+  this->Internals->Recorder->Off();
+
+  std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
+  this->Internals->Recorder->SetFileName(cleanFile.c_str());
+  this->Internals->Recorder->On();
+  this->Internals->Recorder->Record();
+
+  return true;
+}
 
 //----------------------------------------------------------------------------
 void interactor::SetInteractorOn(vtkInteractorObserver* observer)
@@ -401,13 +454,7 @@ void interactor::SetInteractorOn(vtkInteractorObserver* observer)
 }
 
 //----------------------------------------------------------------------------
-bool interactor::GetDone()
-{
-  return this->Internals->Interactor->GetDone();
-}
-
-//----------------------------------------------------------------------------
-void interactor::Start()
+void interactor::start()
 {
   this->Internals->Interactor->Start();
 }

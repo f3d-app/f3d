@@ -1,14 +1,12 @@
 #include "f3d_loader.h"
 
 #include "F3DLog.h"
-#include "F3DOffscreenRender.h"
 #include "F3DReaderFactory.h"
 #include "F3DReaderInstantiator.h"
 #include "f3d_interactor.h"
 #include "f3d_options.h"
 #include "f3d_window.h"
 #include "vtkF3DGenericImporter.h"
-#include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DObjectFactory.h"
 #include "vtkF3DRendererWithColoring.h"
 
@@ -439,126 +437,5 @@ bool loader::loadFile(loader::LoadFileEnum load)
 
   this->Internals->LoadedFile = true;
   return this->Internals->LoadedFile;
-}
-
-//----------------------------------------------------------------------------
-bool loader::start()
-{
-  // TODO rework this method completelly
-
-  bool retVal = true;
-
-  // Manage recording options
-  vtkNew<vtkF3DInteractorEventRecorder> recorder;
-  std::string interactionTestRecordFile =
-    this->Internals->Options.get<std::string>("interaction-test-record");
-  std::string interactionTestPlayFile =
-    this->Internals->Options.get<std::string>("interaction-test-play");
-  bool record = !interactionTestRecordFile.empty();
-  bool play = !interactionTestPlayFile.empty();
-  if (record || play)
-  {
-    if (!this->Internals->Interactor)
-    {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "Cannot use interaction test record and play without an interactor");
-      retVal = false;
-    }
-    else
-    {
-      this->Internals->Interactor->SetInteractorOn(recorder);
-      if (record)
-      {
-        if (play)
-        {
-          F3DLog::Print(F3DLog::Severity::Warning,
-            "Interaction test record and play files have been provided, play file ignored");
-        }
-        interactionTestRecordFile =
-          vtksys::SystemTools::CollapseFullPath(interactionTestRecordFile);
-        recorder->SetFileName(interactionTestRecordFile.c_str());
-        recorder->On();
-        recorder->Record();
-      }
-      else
-      {
-        if (!vtksys::SystemTools::FileExists(interactionTestPlayFile))
-        {
-          F3DLog::Print(F3DLog::Severity::Error, "Interaction record file to play does not exist ",
-            interactionTestPlayFile);
-          retVal = false;
-        }
-        else
-        {
-          interactionTestPlayFile = vtksys::SystemTools::CollapseFullPath(interactionTestPlayFile);
-          recorder->SetFileName(interactionTestPlayFile.c_str());
-          recorder->Play();
-          recorder->Off();
-        }
-      }
-    }
-  }
-
-  bool noBackground = this->Internals->Options.get<bool>("no-background");
-  std::string reference = this->Internals->Options.get<std::string>("reference");
-  std::string output = this->Internals->Options.get<std::string>("output");
-
-  vtkRenderWindow* renWin = this->Internals->Window->GetRenderWindow();
-
-  // Recorder can stop the interactor, make sure it is still running
-  if (this->Internals->Interactor && this->Internals->Interactor->GetDone())
-  {
-    F3DLog::Print(F3DLog::Severity::Error, "Interactor has been stopped, no rendering performed");
-    retVal = false;
-  }
-  else if (!reference.empty())
-  {
-    if (!this->Internals->LoadedFile)
-    {
-      F3DLog::Print(F3DLog::Severity::Error, "No file loaded, no rendering performed");
-      retVal = false;
-    }
-    else
-    {
-      retVal = F3DOffscreenRender::RenderTesting(renWin, reference,
-        this->Internals->Options.get<double>("ref-threshold"), noBackground, output);
-    }
-  }
-  else if (!output.empty())
-  {
-    if (!this->Internals->LoadedFile)
-    {
-      F3DLog::Print(F3DLog::Severity::Error, "No file loaded, no rendering performed");
-      retVal = false;
-    }
-    else
-    {
-      retVal = F3DOffscreenRender::RenderOffScreen(renWin, output, noBackground);
-    }
-  }
-  else if (this->Internals->Interactor)
-  {
-    renWin->Render();
-    this->Internals->Interactor->Start();
-  }
-  else
-  {
-    F3DLog::Print(F3DLog::Severity::Warning, "No rendering performed");
-    retVal = false;
-  }
-
-  // The axis widget should be disabled before destruction
-  this->Internals->Window->GetRenderer()->ShowAxis(false);
-
-  if (this->Internals->Interactor)
-  {
-    this->Internals->Interactor->stopAnimation();
-  }
-
-  if (record)
-  {
-    recorder->Off();
-  }
-  return retVal;
 }
 }

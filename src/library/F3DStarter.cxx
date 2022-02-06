@@ -122,14 +122,61 @@ int F3DStarter::Start(int argc, char** argv)
 
   // Add and load file
   this->Internals->Loader.addFiles(files);
-  this->LoadFile();
+  bool loaded = this->LoadFile();
 
   if (!this->Internals->CommandLineOptions.NoRender)
   {
-    // Start rendering and interaction
-    if (!this->Internals->Loader.start())
+    // Play recording if any
+    if (!this->Internals->CommandLineOptions.InteractionTestPlayFile.empty())
     {
-      return EXIT_FAILURE;
+      if (!this->Internals->Interactor.playInteraction(this->Internals->CommandLineOptions.InteractionTestPlayFile))
+      {
+        return EXIT_FAILURE;
+      }
+    }
+
+    // Start recording if needed
+    if (!this->Internals->CommandLineOptions.InteractionTestRecordFile.empty())
+    {
+      if (!this->Internals->Interactor.recordInteraction(this->Internals->CommandLineOptions.InteractionTestPlayFile))
+      {
+        return EXIT_FAILURE;
+      }
+    }
+
+    // Render and compare with file if needed
+    if (!this->Internals->CommandLineOptions.Reference.empty())
+    {
+      if (!loaded)
+      {
+        F3DLog::Print(F3DLog::Severity::Error, "No file loaded, no rendering performed");
+        return EXIT_FAILURE;
+      }
+
+      if (!this->Internals->Window->renderAndCompareWithFile(this->Internals->CommandLineOptions.Reference,
+      this->Internals->CommandLineOptions.RefThreshold, this->Internals->CommandLineOptions.NoBackground, this->Internals->CommandLineOptions.Output))
+      {
+        return EXIT_FAILURE;
+      }
+    }
+    // Render to file if needed
+    else if(!this->Internals->CommandLineOptions.Output.empty())
+    {
+      if (!loaded)
+      {
+        F3DLog::Print(F3DLog::Severity::Error, "No file loaded, no rendering performed");
+        return EXIT_FAILURE;
+      }
+
+      if (!this->Internals->Window->renderToFile(this->Internals->CommandLineOptions.Output, this->Internals->CommandLineOptions.NoBackground))
+      {
+        return EXIT_FAILURE;
+      }
+    }
+    // Start interaction
+    else 
+    {
+      this->Internals->Interactor.start();
     }
   }
 

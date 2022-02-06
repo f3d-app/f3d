@@ -37,20 +37,30 @@ public:
   bool isPlayingAnimation();
   //@}
 
+  //@{
   /**
    * Control if camera movements are enabled, which they are by default
    */
   void enableCameraMovement();
   void disableCameraMovement();
+  //@}
+
+  /**
+   * Play a VTK interaction file
+   */
+  bool playInteraction(const std::string& file);
+
+  /**
+   * Start interaction and record it all in a VTK interaction file
+   */
+  bool recordInteraction(const std::string& file);
+  
+  void start();
 
   // PRIVATE API TODO
   void SetInteractorOn(vtkInteractorObserver* observer);
   void SetLoader(f3d::loader* loader);
   void InitializeAnimation(vtkImporter* importer);
-
-  // TODO Remove
-  bool GetDone();
-  void Start();
 
 private:
   class F3DInternals;

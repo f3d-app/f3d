@@ -5,13 +5,19 @@
 namespace f3d
 {
 //----------------------------------------------------------------------------
-void window::update() {}
+bool window::update() { return false; }
 
 //----------------------------------------------------------------------------
-void window::updateCamera() {}
+bool window::updateCamera() { return false; }
 
 //----------------------------------------------------------------------------
-void window::render() {}
+bool window::render() { return false; }
+
+//----------------------------------------------------------------------------
+bool window::renderToFile(const std::string&, bool) { return false; }
+
+//----------------------------------------------------------------------------
+bool window::renderAndCompareWithFile(const std::string&, double, bool, const std::string&) { return false;}
 
 //----------------------------------------------------------------------------
 void window::SetOptions(const options* options)
