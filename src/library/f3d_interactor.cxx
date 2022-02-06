@@ -450,6 +450,7 @@ bool interactor::recordInteraction(const std::string& file)
   // Make sure the recorder is off
   this->Internals->Recorder->Off();
 
+  // TODO Does not seems to work
   std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
   this->Internals->Recorder->SetFileName(cleanFile.c_str());
   this->Internals->Recorder->On();
