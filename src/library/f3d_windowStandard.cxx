@@ -132,8 +132,6 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
   // Clear renderer if already present
   if (this->Internals->Renderer)
   {
-    // That does not seems necessseray TODO
-    //    this->Internals->Renderer->ShowAxis(false);
     this->Internals->RenWin->RemoveRenderer(this->Internals->Renderer);
   }
 

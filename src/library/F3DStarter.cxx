@@ -18,22 +18,13 @@ public:
   {
   }
 
-  ~F3DInternals()
-  {
-    // TODO
-    if (this->Window)
-    {
-      delete this->Window;
-    }
-  }
-
   F3DOptionsParser Parser;
   F3DOptions CommandLineOptions;
   F3DOptions Options;
   f3d::options NewOptions;
   f3d::loader Loader;
   f3d::interactor Interactor;
-  f3d::window* Window = nullptr;
+  std::unique_ptr<f3d::window> Window = nullptr;
 };
 
 //----------------------------------------------------------------------------
@@ -71,11 +62,10 @@ int F3DStarter::Start(int argc, char** argv)
   F3DNSDelegate::InitializeDelegate(this);
 #endif
 
-  // TODO add f3d::noRenderWindow
   if (this->Internals->CommandLineOptions.NoRender)
   {
-    this->Internals->Window = new f3d::windowNoRender();
-    this->Internals->Loader.setWindow(this->Internals->Window);
+    this->Internals->Window = std::unique_ptr<f3d::window>(new f3d::windowNoRender());
+    this->Internals->Loader.setWindow(this->Internals->Window.get());
   }
   else
   {
@@ -116,8 +106,8 @@ int F3DStarter::Start(int argc, char** argv)
 
     bool offscreen = !this->Internals->CommandLineOptions.Reference.empty() ||
       !this->Internals->CommandLineOptions.Output.empty();
-    this->Internals->Window = new f3d::windowStandard(f3d::AppTitle, offscreen);
-    this->Internals->Loader.setWindow(this->Internals->Window);
+    this->Internals->Window = std::unique_ptr<f3d::window>(new f3d::windowStandard(f3d::AppTitle, offscreen));
+    this->Internals->Loader.setWindow(this->Internals->Window.get());
 
     this->Internals->Loader.setInteractor(&this->Internals->Interactor);
     this->Internals->Window->setIcon(F3DIcon, sizeof(F3DIcon));
