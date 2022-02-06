@@ -22,7 +22,7 @@ public:
   bool renderToFile(const std::string& file, bool noBackground = false) override;
   bool renderAndCompareWithFile(const std::string& file, double threshold,
     bool noBackground = false, const std::string& outputFile = "") override;
-  void setIcon(const void* icon, size_t iconSize) override;
+  bool setIcon(const void* icon, size_t iconSize) override;
 
   // TODO Private API
   void Initialize(bool withColoring, std::string fileInfo) override;

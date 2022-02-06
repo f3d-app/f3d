@@ -18,7 +18,7 @@ public:
   virtual bool renderToFile(const std::string& file, bool noBackground = false);
   virtual bool renderAndCompareWithFile(const std::string& file, double threshold,
     bool noBackground, const std::string& outputFile = "");
-  virtual void setIcon(const void* icon, size_t iconSize){};
+  virtual bool setIcon(const void* icon, size_t iconSize);
 
   // TODO Private API
   void SetOptions(const f3d::options* options);

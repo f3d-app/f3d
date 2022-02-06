@@ -104,7 +104,7 @@ windowStandard::windowStandard(const std::string& windowName, bool offscreen)
 }
 
 //----------------------------------------------------------------------------
-void windowStandard::setIcon(const void* icon, size_t iconSize)
+bool windowStandard::setIcon(const void* icon, size_t iconSize)
 {
   // XXX This code requires that the interactor has already been set on the render window
   // This is not great, improve VTK on that regard
@@ -115,9 +115,11 @@ void windowStandard::setIcon(const void* icon, size_t iconSize)
   iconReader->SetMemoryBufferLength(iconSize);
   iconReader->Update();
   this->Internals->RenWin->SetIcon(iconReader->GetOutput());
+  return true;
 #else
   (void)icon;
   (void)iconSize;
+  return false;
 #endif
 }
 

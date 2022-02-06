@@ -28,6 +28,11 @@ bool window::renderAndCompareWithFile(const std::string&, double, bool, const st
   return false;
 }
 
+bool window::setIcon(const void*, size_t)
+{
+  return false;
+}
+
 //----------------------------------------------------------------------------
 void window::SetOptions(const options* options)
 {
@@ -38,6 +43,6 @@ void window::SetOptions(const options* options)
 void window::Initialize(bool, std::string) {}
 
 //----------------------------------------------------------------------------
-void window::InitializeRendererWithColoring(vtkF3DGenericImporter* importer) {}
+void window::InitializeRendererWithColoring(vtkF3DGenericImporter*) {}
 
 };
