@@ -17,6 +17,7 @@ namespace f3d
 {
 class options;
 class window;
+class interactor;
 }
 class vtkF3DRenderer;
 class vtkImporter;
@@ -31,7 +32,7 @@ public:
   /**
    * Initialize the animation manager, required before playing the animation
    */
-  void Initialize(const f3d::options& options, vtkImporter* importer, f3d::window* window);
+  void Initialize(const f3d::options& options, f3d::interactor* interactor, f3d::window* window, vtkImporter* importer);
 
   /**
    * Start/Stop playing the animation
@@ -52,16 +53,16 @@ protected:
   void Tick();
 
   vtkImporter* Importer = nullptr;
-  vtkRenderWindow* RenderWindow = nullptr;
-  vtkF3DRenderer* Renderer = nullptr;
+  f3d::window* Window;
+  f3d::interactor* Interactor;
 
   std::set<double> TimeSteps;
   std::set<double>::iterator CurrentTimeStep;
   double FrameRate = 30;
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
-  int TimerId = 0;
-  unsigned long ObserverId = 0;
+  bool HasAnimation = false;
+  unsigned long CallBackId = 0;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
 

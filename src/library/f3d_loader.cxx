@@ -425,7 +425,7 @@ bool loader::loadFile(loader::LoadFileEnum load)
   // information from the importer
   // TODO improve this API
   this->Internals->AnimationManager.Initialize(
-    this->Internals->Options, this->Internals->Importer, this->Internals->Window);
+    this->Internals->Options, this->Internals->Interactor, this->Internals->Window, this->Internals->Importer);
 
   // Recover generic importer specific actors and mappers to set on the renderer with coloring
   vtkF3DRendererWithColoring* renWithColor =

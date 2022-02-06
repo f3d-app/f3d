@@ -13,6 +13,8 @@
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRendererWithColoring.h"
 
+#include <map>
+
 namespace f3d
 {
 class interactor::F3DInternals
@@ -274,6 +276,7 @@ public:
   f3d::loader* Loader;
   int WindowSize[2] = { -1, -1 };
   int WindowPos[2] = { 0, 0 };
+  std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
 };
 
 //----------------------------------------------------------------------------
@@ -307,6 +310,33 @@ void interactor::setKeyPressCallBack(std::function<bool(int, std::string)> callB
 void interactor::setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack)
 {
   this->Internals->DropFilesUserCallBack = callBack;
+}
+
+//----------------------------------------------------------------------------
+void interactor::removeTimerCallBack(unsigned long id)
+{
+  this->Internals->Interactor->RemoveObserver(id);
+  this->Internals->Interactor->DestroyTimer(this->Internals->TimerCallBacks[id].first);
+}
+
+//----------------------------------------------------------------------------
+unsigned long interactor::createTimerCallBack(double time, std::function<void()> callBack)
+{
+  // TODO not super clear implementation
+  int timerId = this->Internals->Interactor->CreateRepeatingTimer(time);
+
+  vtkNew<vtkCallbackCommand> timerCallBack;
+  timerCallBack->SetCallback(
+    [](vtkObject*, unsigned long, void* clientData, void*)
+    {
+    std::function<void()>* callBackPtr = static_cast<std::function<void()>*>(clientData);
+    (*callBackPtr)();
+    });
+  unsigned long id = this->Internals->Interactor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
+  this->Internals->TimerCallBacks[id] = std::make_pair(timerId, callBack);
+  
+  timerCallBack->SetClientData(&this->Internals->TimerCallBacks[id].second);
+  return id;
 }
 
 //----------------------------------------------------------------------------

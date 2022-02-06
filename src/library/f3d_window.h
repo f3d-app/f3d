@@ -14,6 +14,7 @@ public:
   virtual ~window() = default;
 
   virtual void update();
+  virtual void updateCamera();
   virtual void render();
 
   // TODO Private API

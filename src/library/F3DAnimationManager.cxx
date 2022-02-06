@@ -3,6 +3,7 @@
 #include "F3DLog.h"
 #include "f3d_options.h"
 #include "f3d_window.h"
+#include "f3d_interactor.h"
 #include "vtkF3DRenderer.h"
 
 #include <vtkCallbackCommand.h>
@@ -14,28 +15,32 @@
 #include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 
+#include <functional>
+
 //----------------------------------------------------------------------------
 void F3DAnimationManager::Initialize(
-  const f3d::options& options, vtkImporter* importer, f3d::window* window)
+  const f3d::options& options, f3d::interactor* interactor, f3d::window* window, vtkImporter* importer)
 {
+  this->HasAnimation = false;
+
+  this->Interactor = interactor;
+  if (!this->Interactor)
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "Interactor is empty");
+    return;
+  }
+
+  this->Window = window;
+  if (!this->Window)
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "Window is empty");
+    return;
+  }
+
   this->Importer = importer;
   if (!this->Importer)
   {
     F3DLog::Print(F3DLog::Severity::Error, "Importer is empty");
-    return;
-  }
-
-  this->RenderWindow = window->GetRenderWindow();
-  if (!this->RenderWindow)
-  {
-    F3DLog::Print(F3DLog::Severity::Error, "RenderWindow is empty");
-    return;
-  }
-
-  this->Renderer = window->GetRenderer();
-  if (!this->Renderer)
-  {
-    F3DLog::Print(F3DLog::Severity::Error, "Renderer is empty");
     return;
   }
 
@@ -45,7 +50,7 @@ void F3DAnimationManager::Initialize(
   if (availAnimations > 0)
   {
     this->ProgressWidget = vtkSmartPointer<vtkProgressBarWidget>::New();
-    this->ProgressWidget->SetInteractor(this->RenderWindow->GetInteractor());
+    interactor->SetInteractorOn(this->ProgressWidget);
 
     vtkProgressBarRepresentation* progressRep =
       vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());
@@ -140,7 +145,11 @@ void F3DAnimationManager::Initialize(
     }
   }
 
-  this->CurrentTimeStep = std::begin(this->TimeSteps);
+  if (this->TimeSteps.size() > 0)
+  {
+    this->CurrentTimeStep = std::begin(this->TimeSteps);
+    this->HasAnimation = true;
+  }
   this->Playing = false;
 }
 
@@ -157,26 +166,22 @@ void F3DAnimationManager::Finalize()
 //----------------------------------------------------------------------------
 void F3DAnimationManager::ToggleAnimation()
 {
-  if (this->Importer && this->RenderWindow && this->TimeSteps.size() > 1)
+  if (this->HasAnimation)
   {
     this->Playing = !this->Playing;
 
-    vtkRenderWindowInteractor* interactor = this->RenderWindow->GetInteractor();
-    interactor->RemoveObservers(vtkCommand::TimerEvent);
-    interactor->DestroyTimer();
+    if (this->CallBackId != 0)
+    {
+      this->Interactor->removeTimerCallBack(this->CallBackId);
+    }
 
     if (this->Playing)
     {
-      vtkNew<vtkCallbackCommand> tickCallback;
-      tickCallback->SetClientData(this);
-      tickCallback->SetCallback(
-        [](vtkObject*, unsigned long, void* clientData, void*)
-        {
-          F3DAnimationManager* animMgr = static_cast<F3DAnimationManager*>(clientData);
-          animMgr->Tick();
-        });
-      interactor->AddObserver(vtkCommand::TimerEvent, tickCallback);
-      interactor->CreateRepeatingTimer(1000.0 / this->FrameRate);
+      this->CallBackId = this->Interactor->createTimerCallBack(1000.0 / this->FrameRate,
+      [this]()
+      {
+        this->Tick();
+      });
     }
   }
 }
@@ -184,7 +189,7 @@ void F3DAnimationManager::ToggleAnimation()
 //----------------------------------------------------------------------------
 void F3DAnimationManager::Tick()
 {
-  if (this->TimeSteps.size() > 0)
+  if (this->HasAnimation)
   {
     vtkProgressBarRepresentation* progressRep =
       vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());
@@ -192,8 +197,8 @@ void F3DAnimationManager::Tick()
       static_cast<double>(this->TimeSteps.size() - 1));
 
     this->Importer->UpdateTimeStep(*this->CurrentTimeStep);
-    this->RenderWindow->Render();
-    this->Renderer->InitializeCamera();
+    this->Window->updateCamera();
+    this->Window->render();
 
     this->CurrentTimeStep++;
 

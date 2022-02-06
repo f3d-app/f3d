@@ -23,6 +23,9 @@ public:
   void setKeyPressCallBack(std::function<bool(int, std::string)> callBack);
   void setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack);
 
+  unsigned long createTimerCallBack(double time, std::function<void()> callBack);
+  void removeTimerCallBack(unsigned long id);
+
   // PRIVATE API TODO
   void SetInteractorOn(vtkInteractorObserver* observer);
   void SetLoader(f3d::loader* loader);

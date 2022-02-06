@@ -18,6 +18,7 @@ public:
   ~windowStandard();
 
   void update() override;
+  void updateCamera() override;
   void render() override;
 
   // TODO Private API
