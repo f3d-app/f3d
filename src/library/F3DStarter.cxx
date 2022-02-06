@@ -85,6 +85,7 @@ int F3DStarter::Start(int argc, char** argv)
       {
         if (keySym == "Left")
         {
+          this->Internals->Interactor.stopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_PREVIOUS;
           this->LoadFile(load);
           this->Internals->Window->render();
@@ -92,6 +93,7 @@ int F3DStarter::Start(int argc, char** argv)
         }
         else if (keySym == "Right")
         {
+          this->Internals->Interactor.stopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_NEXT;
           this->LoadFile(load);
           this->Internals->Window->render();
@@ -103,6 +105,7 @@ int F3DStarter::Start(int argc, char** argv)
     this->Internals->Interactor.setDropFilesCallBack(
       [this](std::vector<std::string> filesVec) -> bool
       {
+        this->Internals->Interactor.stopAnimation();
         for (std::string file : filesVec)
         {
           this->AddFile(file);

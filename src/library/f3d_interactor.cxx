@@ -220,18 +220,21 @@ public:
       default:
         if (keySym == "Left")
         {
+          self->AnimationManager.StopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_PREVIOUS;
           self->Loader->loadFile(load);
           renWin->Render();
         }
         else if (keySym == "Right")
         {
+          self->AnimationManager.StopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_NEXT;
           self->Loader->loadFile(load);
           renWin->Render();
         }
         else if (keySym == "Up")
         {
+          self->AnimationManager.StopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_CURRENT;
           self->Loader->loadFile(load);
           renWin->Render();
@@ -271,6 +274,7 @@ public:
     }
 
     // No user defined behavior, use standard behavior
+    self->AnimationManager.StopAnimation();
     for (std::string file : filesVec)
     {
       self->Loader->addFile(file);
