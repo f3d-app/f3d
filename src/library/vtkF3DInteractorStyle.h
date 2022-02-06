@@ -9,12 +9,6 @@
 #include <vtkCommand.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 
-class F3DAnimationManager;
-namespace f3d
-{
-class options;
-}
-
 class vtkF3DInteractorStyle : public vtkInteractorStyleTrackballCamera
 {
 public:
@@ -57,7 +51,7 @@ public:
 
   //@{
   /**
-   * Overriden to disable during animation
+   * Overriden to support being disabled
    */
   void Spin() override;
   void Pan() override;
@@ -69,12 +63,17 @@ public:
    */
   void EnvironmentRotate() override;
 
+  //@{
+  /**
+   * Set/Get is camera movement are disabled
+   */
   vtkSetMacro(CameraMovementDisabled, bool);
   vtkGetMacro(CameraMovementDisabled, bool);
+  //@}
 
 protected:
   /**
-   * Overriden to disable during animation
+   * Overriden to support being disabled
    */
   void Dolly(double factor) override;
 

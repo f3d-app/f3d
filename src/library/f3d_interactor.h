@@ -27,12 +27,15 @@ public:
   unsigned long createTimerCallBack(double time, std::function<void()> callBack);
   void removeTimerCallBack(unsigned long id);
 
+  //@{
   /**
    * Control the animation
    */
   void toggleAnimation();
   void startAnimation();
   void stopAnimation();
+  bool isPlayingAnimation();
+  //@}
 
   /**
    * Control if camera movements are enabled, which they are by default

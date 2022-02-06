@@ -377,6 +377,12 @@ void interactor::stopAnimation()
 }
 
 //----------------------------------------------------------------------------
+void interactor::isPlayingAnimation()
+{
+  return this->Internals->AnimationManager.IsPlaying();
+}
+
+//----------------------------------------------------------------------------
 void interactor::enableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(false);
