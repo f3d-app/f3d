@@ -94,13 +94,6 @@ public:
   void getFileInfo(
     LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const;
 
-  /**
-   * Start the interaction/rendering
-   * Return true if rendering and interaction is successful, false otherwise
-   * TODO Move that to another class
-   */
-  //  bool start();
-
 private:
   class F3DInternals;
   std::unique_ptr<F3DInternals> Internals;
