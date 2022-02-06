@@ -377,7 +377,7 @@ void interactor::stopAnimation()
 }
 
 //----------------------------------------------------------------------------
-void interactor::isPlayingAnimation()
+bool interactor::isPlayingAnimation()
 {
   return this->Internals->AnimationManager.IsPlaying();
 }
