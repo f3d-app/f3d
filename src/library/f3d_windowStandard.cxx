@@ -3,12 +3,12 @@
 #include "F3DLog.h"
 #include "F3DOffscreenRender.h"
 #include "f3d_options.h"
-#include "vtkF3DRendererWithColoring.h"
 #include "vtkF3DGenericImporter.h"
+#include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCamera.h>
-#include <vtkPointGaussianMapper.h>
 #include <vtkPNGReader.h>
+#include <vtkPointGaussianMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkVersion.h>
 
@@ -95,8 +95,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-windowStandard::windowStandard(
-  const std::string& windowName, bool offscreen)
+windowStandard::windowStandard(const std::string& windowName, bool offscreen)
   : Internals(new windowStandard::F3DInternals)
 {
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
@@ -104,10 +103,8 @@ windowStandard::windowStandard(
   this->Internals->RenWin->SetOffScreenRendering(offscreen);
 }
 
-
 //----------------------------------------------------------------------------
-void windowStandard::setIcon(
-  const void* icon, size_t iconSize)
+void windowStandard::setIcon(const void* icon, size_t iconSize)
 {
   // XXX This code requires that the interactor has already been set on the render window
   // This is not great, improve VTK on that regard
@@ -134,7 +131,7 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
   if (this->Internals->Renderer)
   {
     // That does not seems necessseray TODO
-//    this->Internals->Renderer->ShowAxis(false);
+    //    this->Internals->Renderer->ShowAxis(false);
     this->Internals->RenWin->RemoveRenderer(this->Internals->Renderer);
   }
 
