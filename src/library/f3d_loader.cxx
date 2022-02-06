@@ -1,6 +1,5 @@
 #include "f3d_loader.h"
 
-#include "F3DAnimationManager.h"
 #include "F3DLog.h"
 #include "F3DOffscreenRender.h"
 #include "F3DReaderFactory.h"
@@ -28,6 +27,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <algorithm>
+#include <set>
 
 namespace
 {
@@ -145,7 +145,6 @@ public:
   const options& Options;
   interactor* Interactor = nullptr;
   window* Window = nullptr;
-  F3DAnimationManager AnimationManager;
   vtkSmartPointer<vtkImporter> Importer;
   F3DReaderInstantiator ReaderInstantiator;
 };
@@ -176,12 +175,6 @@ loader::loader(const options& options)
 
 //----------------------------------------------------------------------------
 loader::~loader() = default;
-
-//----------------------------------------------------------------------------
-void loader::toggleAnimation()
-{
-  this->Internals->AnimationManager.ToggleAnimation();
-}
 
 //----------------------------------------------------------------------------
 void loader::addFiles(const std::vector<std::string>& files)
@@ -347,9 +340,6 @@ bool loader::loadFile(loader::LoadFileEnum load)
     return this->Internals->LoadedFile;
   }
 
-  // Prevent the animation manager from playing
-  this->Internals->AnimationManager.Finalize();
-
   // Recover information about the file to load
   std::string filePath, fileInfo;
   this->getFileInfo(load, this->Internals->CurrentFileIndex, filePath, fileInfo);
@@ -421,11 +411,11 @@ bool loader::loadFile(loader::LoadFileEnum load)
   this->Internals->Importer->RemoveObservers(vtkCommand::ProgressEvent);
   progressWidget->Off();
 
-  // Initialize the animation manager using temporal
-  // information from the importer
-  // TODO improve this API
-  this->Internals->AnimationManager.Initialize(
-    this->Internals->Options, this->Internals->Interactor, this->Internals->Window, this->Internals->Importer);
+  if (this->Internals->Interactor)
+  {
+    // Initialize the animation using temporal information from the importer
+    this->Internals->Interactor->InitializeAnimation(this->Internals->Importer);
+  }
 
   // Recover generic importer specific actors and mappers to set on the renderer with coloring
   vtkF3DRendererWithColoring* renWithColor =
@@ -559,18 +549,16 @@ bool loader::start()
 
   // The axis widget should be disabled before destruction
   this->Internals->Window->GetRenderer()->ShowAxis(false);
-  this->Internals->AnimationManager.Finalize();
+
+  if (this->Internals->Interactor)
+  {
+    this->Internals->Interactor->stopAnimation();
+  }
 
   if (record)
   {
     recorder->Off();
   }
   return retVal;
-}
-
-//----------------------------------------------------------------------------
-const F3DAnimationManager* loader::GetAnimationManager()
-{
-  return &this->Internals->AnimationManager;
 }
 }

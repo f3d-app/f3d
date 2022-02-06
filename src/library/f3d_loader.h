@@ -101,15 +101,6 @@ public:
    */
   bool start();
 
-  /**
-   * Forward to AnimationManager to start the animation
-   * TODO Move that to another class
-   */
-  void toggleAnimation();
-
-  // TODO PRIVATE API
-  const F3DAnimationManager* GetAnimationManager();
-
 private:
   class F3DInternals;
   std::unique_ptr<F3DInternals> Internals;

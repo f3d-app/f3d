@@ -38,16 +38,13 @@ public:
    * Start/Stop playing the animation
    */
   void ToggleAnimation();
+  void StartAnimation();
+  void StopAnimation();
 
   /**
    * Return true if the animation manager is playing the animation
    */
   bool IsPlaying() const { return Playing; }
-
-  /**
-   * Finalize different objects managed by the animation manager
-   */
-  void Finalize();
 
 protected:
   void Tick();

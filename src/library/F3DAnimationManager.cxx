@@ -154,7 +154,16 @@ void F3DAnimationManager::Initialize(
 }
 
 //----------------------------------------------------------------------------
-void F3DAnimationManager::Finalize()
+void F3DAnimationManager::StartAnimation()
+{
+  if (!this->IsPlaying())
+  {
+    this->ToggleAnimation();
+  }
+}
+
+//----------------------------------------------------------------------------
+void F3DAnimationManager::StopAnimation()
 {
   if (this->IsPlaying())
   {

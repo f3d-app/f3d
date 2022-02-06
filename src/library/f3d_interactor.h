@@ -7,6 +7,7 @@
 #include <vector>
 
 class vtkInteractorObserver;
+class vtkImporter;
 namespace f3d
 {
 class loader;
@@ -26,9 +27,17 @@ public:
   unsigned long createTimerCallBack(double time, std::function<void()> callBack);
   void removeTimerCallBack(unsigned long id);
 
+  /**
+   * Control the animation
+   */
+  void toggleAnimation();
+  void startAnimation();
+  void stopAnimation();
+
   // PRIVATE API TODO
   void SetInteractorOn(vtkInteractorObserver* observer);
   void SetLoader(f3d::loader* loader);
+  void InitializeAnimation(vtkImporter* importer);
 
   // TODO Remove
   bool GetDone();

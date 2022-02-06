@@ -7,7 +7,9 @@
 #include <vtkRendererCollection.h>
 #include <vtkStringArray.h>
 
+#include "F3DAnimationManager.h"
 #include "F3DConfig.h"
+#include "F3DLog.h"
 #include "f3d_loader.h"
 #include "f3d_window.h"
 #include "vtkF3DInteractorStyle.h"
@@ -236,7 +238,7 @@ public:
         }
         else if (keySym == "Space")
         {
-          self->Loader->toggleAnimation();
+          self->AnimationManager.ToggleAnimation();
           renWin->Render();
         }
         break;
@@ -271,6 +273,7 @@ public:
   std::function<bool(std::vector<std::string>)> DropFilesUserCallBack = [](std::vector<std::string>)
   { return false; };
 
+  F3DAnimationManager AnimationManager;
   vtkNew<vtkRenderWindowInteractor> Interactor;
   vtkNew<vtkF3DInteractorStyle> Style;
   f3d::loader* Loader;
@@ -300,8 +303,20 @@ void interactor::SetLoader(f3d::loader* loader)
   // in order to be able to be able to interact while animating
   this->Internals->Interactor->RemoveObservers(vtkCommand::TimerEvent);
 
-  this->Internals->Style->SetAnimationManager(loader->GetAnimationManager());
+  this->Internals->Style->SetAnimationManager(&this->Internals->AnimationManager);
   this->Internals->Style->SetOptions(&loader->getOptions());
+}
+
+//----------------------------------------------------------------------------
+void interactor::InitializeAnimation(vtkImporter* importer)
+{
+  if (!this->Internals->Loader)
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "Please SetLoader before initializing the animation");
+    return;
+  }
+  this->Internals->AnimationManager.Initialize(
+    this->Internals->Loader->getOptions(), this, this->Internals->Loader->getWindow(), importer);
 }
 
 //----------------------------------------------------------------------------
@@ -343,6 +358,24 @@ unsigned long interactor::createTimerCallBack(double time, std::function<void()>
   this->Internals->TimerCallBacks[id] = std::make_pair(timerId, callBack);
   timerCallBack->SetClientData(&this->Internals->TimerCallBacks[id].second);
   return id;
+}
+
+//----------------------------------------------------------------------------
+void interactor::toggleAnimation()
+{
+  this->Internals->AnimationManager.ToggleAnimation();
+}
+
+//----------------------------------------------------------------------------
+void interactor::startAnimation()
+{
+  this->Internals->AnimationManager.StartAnimation();
+}
+
+//----------------------------------------------------------------------------
+void interactor::stopAnimation()
+{
+  this->Internals->AnimationManager.StopAnimation();
 }
 
 //----------------------------------------------------------------------------
