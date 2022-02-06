@@ -54,7 +54,7 @@ public:
    * Start interaction and record it all in a VTK interaction file
    */
   bool recordInteraction(const std::string& file);
-  
+
   void start();
 
   // PRIVATE API TODO

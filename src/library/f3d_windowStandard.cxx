@@ -192,8 +192,10 @@ bool windowStandard::renderToFile(const std::string& file, bool noBackground)
 }
 
 //----------------------------------------------------------------------------
-bool windowStandard::renderAndCompareWithFile(const std::string& file, double threshold, bool noBackground, const std::string& outputFile)
+bool windowStandard::renderAndCompareWithFile(
+  const std::string& file, double threshold, bool noBackground, const std::string& outputFile)
 {
-  return F3DOffscreenRender::RenderTesting(this->Internals->RenWin, file, threshold, noBackground, outputFile);
+  return F3DOffscreenRender::RenderTesting(
+    this->Internals->RenWin, file, threshold, noBackground, outputFile);
 }
 };

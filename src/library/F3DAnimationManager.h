@@ -27,7 +27,7 @@ class F3DAnimationManager
 {
 public:
   F3DAnimationManager() = default;
-  ~F3DAnimationManager() = default; //TODO Stop animation ?
+  ~F3DAnimationManager() = default; // TODO Stop animation ?
 
   /**
    * Initialize the animation manager, required before playing the animation

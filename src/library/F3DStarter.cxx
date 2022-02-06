@@ -132,7 +132,8 @@ int F3DStarter::Start(int argc, char** argv)
     // Play recording if any
     if (!this->Internals->CommandLineOptions.InteractionTestPlayFile.empty())
     {
-      if (!this->Internals->Interactor.playInteraction(this->Internals->CommandLineOptions.InteractionTestPlayFile))
+      if (!this->Internals->Interactor.playInteraction(
+            this->Internals->CommandLineOptions.InteractionTestPlayFile))
       {
         return EXIT_FAILURE;
       }
@@ -141,7 +142,8 @@ int F3DStarter::Start(int argc, char** argv)
     // Start recording if needed
     if (!this->Internals->CommandLineOptions.InteractionTestRecordFile.empty())
     {
-      if (!this->Internals->Interactor.recordInteraction(this->Internals->CommandLineOptions.InteractionTestPlayFile))
+      if (!this->Internals->Interactor.recordInteraction(
+            this->Internals->CommandLineOptions.InteractionTestPlayFile))
       {
         return EXIT_FAILURE;
       }
@@ -156,14 +158,17 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      if (!this->Internals->Window->renderAndCompareWithFile(this->Internals->CommandLineOptions.Reference,
-      this->Internals->CommandLineOptions.RefThreshold, this->Internals->CommandLineOptions.NoBackground, this->Internals->CommandLineOptions.Output))
+      if (!this->Internals->Window->renderAndCompareWithFile(
+            this->Internals->CommandLineOptions.Reference,
+            this->Internals->CommandLineOptions.RefThreshold,
+            this->Internals->CommandLineOptions.NoBackground,
+            this->Internals->CommandLineOptions.Output))
       {
         return EXIT_FAILURE;
       }
     }
     // Render to file if needed
-    else if(!this->Internals->CommandLineOptions.Output.empty())
+    else if (!this->Internals->CommandLineOptions.Output.empty())
     {
       if (!loaded)
       {
@@ -171,13 +176,14 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      if (!this->Internals->Window->renderToFile(this->Internals->CommandLineOptions.Output, this->Internals->CommandLineOptions.NoBackground))
+      if (!this->Internals->Window->renderToFile(this->Internals->CommandLineOptions.Output,
+            this->Internals->CommandLineOptions.NoBackground))
       {
         return EXIT_FAILURE;
       }
     }
     // Start interaction
-    else 
+    else
     {
       this->Internals->Interactor.start();
     }

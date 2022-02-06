@@ -5,9 +5,9 @@
 #include "F3DLog.h"
 #include "f3d_loader.h"
 #include "f3d_window.h"
+#include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRendererWithColoring.h"
-#include "vtkF3DInteractorEventRecorder.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkNew.h>
@@ -408,7 +408,7 @@ void interactor::disableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(true);
 }
-  
+
 //----------------------------------------------------------------------------
 bool interactor::playInteraction(const std::string& file)
 {
@@ -421,7 +421,7 @@ bool interactor::playInteraction(const std::string& file)
   {
     // Make sure the recorder is off
     this->Internals->Recorder->Off();
-    
+
     std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
     this->Internals->Recorder->SetFileName(cleanFile.c_str());
     this->Internals->Recorder->Play();

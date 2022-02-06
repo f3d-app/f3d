@@ -99,7 +99,7 @@ public:
    * Return true if rendering and interaction is successful, false otherwise
    * TODO Move that to another class
    */
-//  bool start();
+  //  bool start();
 
 private:
   class F3DInternals;

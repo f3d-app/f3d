@@ -17,7 +17,8 @@ public:
   virtual bool updateCamera();
   virtual bool render();
   virtual bool renderToFile(const std::string& file, bool noBackground = false);
-  virtual bool renderAndCompareWithFile(const std::string& file, double threshold, bool noBackground, const std::string& outputFile = "");
+  virtual bool renderAndCompareWithFile(const std::string& file, double threshold,
+    bool noBackground, const std::string& outputFile = "");
 
   // TODO Private API
   virtual void SetOptions(const f3d::options* options);
