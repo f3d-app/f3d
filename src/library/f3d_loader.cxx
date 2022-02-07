@@ -8,22 +8,17 @@
 #include "f3d_window.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DObjectFactory.h"
-#include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCallbackCommand.h>
-#include <vtkCamera.h>
 #include <vtkLogger.h>
 #include <vtkNew.h>
-#include <vtkPNGReader.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
-#include <vtkRenderWindow.h>
 #include <vtkTimerLog.h>
 #include <vtkVersion.h>
 #include <vtksys/Directory.hxx>
 #include <vtksys/SystemTools.hxx>
 
-#include <algorithm>
 #include <set>
 
 namespace

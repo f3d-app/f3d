@@ -5,9 +5,6 @@
 #include <string>
 #include <vector>
 
-class F3DAnimationManager;
-class vtkRenderWindow;
-
 namespace f3d
 {
 class options;
