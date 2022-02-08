@@ -39,6 +39,12 @@ public:
     this->Recorder->SetInteractor(this->Interactor);
   }
 
+  ~F3DInternals()
+  {
+    // Turn off the recorder in case its on
+    this->Recorder->Off();
+  }
+
   static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
   {
     F3DInternals* self = static_cast<F3DInternals*>(clientData);
@@ -235,7 +241,8 @@ public:
         }
         else if (keySym == f3d::EXIT_HOTKEY_SYM)
         {
-          rwi->TerminateApp();
+          rwi->RemoveObservers(vtkCommand::TimerEvent);
+          rwi->ExitCallback();
         }
         else if (keySym == "Return")
         {
@@ -418,6 +425,7 @@ bool interactor::playInteraction(const std::string& file)
     std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
     this->Internals->Recorder->SetFileName(cleanFile.c_str());
     this->Internals->Recorder->Play();
+    this->Internals->Recorder->Off();
   }
 
   // Recorder can stop the interactor, make sure it is still running
@@ -439,6 +447,10 @@ bool interactor::recordInteraction(const std::string& file)
     return false;
   }
 
+  // Make sure the recorder is off
+  this->Internals->Recorder->Off();
+
+  // TODO Does not seems to work
   std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
   this->Internals->Recorder->SetFileName(cleanFile.c_str());
   this->Internals->Recorder->On();

@@ -12,7 +12,6 @@ vtkF3DInteractorEventRecorder::vtkF3DInteractorEventRecorder()
 {
   // Override the process event callback
   this->EventCallbackCommand->SetCallback(vtkF3DInteractorEventRecorder::ProcessEvents);
-  this->EventCallbackCommand->PassiveObserverOff();
 }
 
 //------------------------------------------------------------------------------
@@ -50,21 +49,28 @@ void vtkF3DInteractorEventRecorder::ProcessEvents(
         break;
 
       default:
-        int mod = 0;
-        if (rwi->GetShiftKey())
+        if (rwi->GetKeySym() && rwi->GetKeySym() == std::string(f3d::EXIT_HOTKEY_SYM))
         {
-          mod |= ModifierKey::ShiftKey;
+          self->Off();
         }
-        if (rwi->GetControlKey())
+        else
         {
-          mod |= ModifierKey::ControlKey;
+          int mod = 0;
+          if (rwi->GetShiftKey())
+          {
+            mod |= ModifierKey::ShiftKey;
+          }
+          if (rwi->GetControlKey())
+          {
+            mod |= ModifierKey::ControlKey;
+          }
+          if (rwi->GetAltKey())
+          {
+            mod |= ModifierKey::AltKey;
+          }
+          self->WriteEvent(vtkCommand::GetStringFromEventId(event), rwi->GetEventPosition(), mod,
+            rwi->GetKeyCode(), rwi->GetRepeatCount(), rwi->GetKeySym());
         }
-        if (rwi->GetAltKey())
-        {
-          mod |= ModifierKey::AltKey;
-        }
-        self->WriteEvent(vtkCommand::GetStringFromEventId(event), rwi->GetEventPosition(), mod,
-          rwi->GetKeyCode(), rwi->GetRepeatCount(), rwi->GetKeySym());
     }
     self->OutputStream->flush();
   }
