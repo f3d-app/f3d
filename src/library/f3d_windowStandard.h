@@ -15,7 +15,7 @@ class windowStandard : public window
 {
 public:
   windowStandard(const std::string& windowName, bool offscreen);
-  ~windowStandard();
+  ~windowStandard() override;
 
   bool update() override;
   bool render() override;

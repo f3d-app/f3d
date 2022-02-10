@@ -15,7 +15,7 @@ class windowNoRender : public window
 {
 public:
   windowNoRender();
-  ~windowNoRender();
+  ~windowNoRender() override;
 
   // TODO Private API
   vtkRenderWindow* GetRenderWindow() override;
