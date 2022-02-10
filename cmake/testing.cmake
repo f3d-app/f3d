@@ -163,7 +163,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply ARGS -t --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT)
   f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT INTERACTION) #Shift+MouseRight;
   # Test exit hotkey
-  f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped, no rendering performed" INTERACTION NO_BASELINE) #Escape;
+  f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
   # Test Verbose animation, no baseline needed
   f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_BASELINE REGEXP "7: CubicSpline Translation")
   # Test Animation index out of domain error
@@ -271,9 +271,6 @@ f3d_test(NAME TestOutputNoBackground DATA cow.vtp ARGS --no-background NO_BASELI
 # Basic record and play test
 f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log NO_BASELINE)
 f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log DEPENDS TestInteractionRecord NO_BASELINE)
-
-# Interaction record and play
-f3d_test(NAME TestRecordPlay DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/record.log REGEXP "Interaction test record and play files have been provided, play file ignored." NO_BASELINE INTERACTION)
 
 # Simple verbosity test
 f3d_test(NAME TestVerbose DATA dragon.vtu ARGS -s --verbose REGEXP "Number of points: 69827\nNumber of cells: 139650" NO_RENDER)

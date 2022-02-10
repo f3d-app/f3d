@@ -737,12 +737,12 @@ void F3DOptionsParser::ConvertToNewAPI(const F3DOptions& oldOptions, f3d::option
   // newOptions->set("config", oldOptions.UserConfigFile);
   // newOptions->set("dry-run", oldOptions.DryRun);
   // newOptions->set("no-render", oldOptions.NoRender);
-  newOptions->set("interaction-test-play", oldOptions.InteractionTestPlayFile);
-  newOptions->set("interaction-test-record", oldOptions.InteractionTestRecordFile);
-  newOptions->set("output", oldOptions.Output);
-  newOptions->set("ref-threshold", oldOptions.RefThreshold);
-  newOptions->set("reference", oldOptions.Reference);
-  newOptions->set("no-background", oldOptions.NoBackground);
+  //  newOptions->set("interaction-test-play", oldOptions.InteractionTestPlayFile);
+  //  newOptions->set("interaction-test-record", oldOptions.InteractionTestRecordFile);
+  //  newOptions->set("output", oldOptions.Output);
+  //  newOptions->set("ref-threshold", oldOptions.RefThreshold);
+  //  newOptions->set("reference", oldOptions.Reference);
+  //  newOptions->set("no-background", oldOptions.NoBackground);
 
   // General
   newOptions->set("quiet", oldOptions.Quiet);

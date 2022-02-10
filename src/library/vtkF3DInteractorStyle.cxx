@@ -39,7 +39,7 @@ void vtkF3DInteractorStyle::OnKeyPress()
 //------------------------------------------------------------------------------
 void vtkF3DInteractorStyle::Rotate()
 {
-  if (this->IsUserInteractionBlocked())
+  if (this->CameraMovementDisabled)
   {
     return;
   }
@@ -109,7 +109,7 @@ void vtkF3DInteractorStyle::Rotate()
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::Spin()
 {
-  if (this->IsUserInteractionBlocked())
+  if (this->CameraMovementDisabled)
   {
     return;
   }
@@ -119,7 +119,7 @@ void vtkF3DInteractorStyle::Spin()
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::Pan()
 {
-  if (this->IsUserInteractionBlocked())
+  if (this->CameraMovementDisabled)
   {
     return;
   }
@@ -129,7 +129,7 @@ void vtkF3DInteractorStyle::Pan()
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::Dolly()
 {
-  if (this->IsUserInteractionBlocked())
+  if (this->CameraMovementDisabled)
   {
     return;
   }
@@ -139,7 +139,7 @@ void vtkF3DInteractorStyle::Dolly()
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::Dolly(double factor)
 {
-  if (this->IsUserInteractionBlocked())
+  if (this->CameraMovementDisabled)
   {
     return;
   }
@@ -166,11 +166,4 @@ void vtkF3DInteractorStyle::EnvironmentRotate()
 
     this->Interactor->Render();
   }
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DInteractorStyle::IsUserInteractionBlocked()
-{
-  // TODO better impl
-  return this->AnimationManager->IsPlaying() && this->Options->get<int>("camera-index") >= 0;
 }
