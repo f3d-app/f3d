@@ -7,6 +7,8 @@
 #include "F3DNSDelegate.h"
 #include "f3d_interactor.h"
 #include "f3d_options.h"
+#include "f3d_windowNoRender.h"
+#include "f3d_windowStandard.h"
 
 class F3DStarter::F3DInternals
 {
@@ -22,6 +24,7 @@ public:
   f3d::options NewOptions;
   f3d::loader Loader;
   f3d::interactor Interactor;
+  std::unique_ptr<f3d::window> Window = nullptr;
 };
 
 //----------------------------------------------------------------------------
@@ -59,7 +62,12 @@ int F3DStarter::Start(int argc, char** argv)
   F3DNSDelegate::InitializeDelegate(this);
 #endif
 
-  if (!this->Internals->CommandLineOptions.NoRender)
+  if (this->Internals->CommandLineOptions.NoRender)
+  {
+    this->Internals->Window = std::unique_ptr<f3d::window>(new f3d::windowNoRender());
+    this->Internals->Loader.setWindow(this->Internals->Window.get());
+  }
+  else
   {
     // TODO Test this multiconfig behavior
     this->Internals->Interactor.setKeyPressCallBack(
@@ -67,16 +75,18 @@ int F3DStarter::Start(int argc, char** argv)
       {
         if (keySym == "Left")
         {
+          this->Internals->Interactor.stopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_PREVIOUS;
           this->LoadFile(load);
-          this->Internals->Loader.render();
+          this->Internals->Window->render();
           return true;
         }
         else if (keySym == "Right")
         {
+          this->Internals->Interactor.stopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_NEXT;
           this->LoadFile(load);
-          this->Internals->Loader.render();
+          this->Internals->Window->render();
           return true;
         }
         return false;
@@ -85,6 +95,7 @@ int F3DStarter::Start(int argc, char** argv)
     this->Internals->Interactor.setDropFilesCallBack(
       [this](std::vector<std::string> filesVec) -> bool
       {
+        this->Internals->Interactor.stopAnimation();
         for (std::string file : filesVec)
         {
           this->AddFile(file);
@@ -93,24 +104,79 @@ int F3DStarter::Start(int argc, char** argv)
         return true;
       });
 
-    this->Internals->Loader.setInteractor(&this->Internals->Interactor);
-
-    // TODO For now with an initialize
     bool offscreen = !this->Internals->CommandLineOptions.Reference.empty() ||
       !this->Internals->CommandLineOptions.Output.empty();
-    this->Internals->Loader.InitializeRendering(f3d::AppTitle, offscreen, F3DIcon, sizeof(F3DIcon));
+    this->Internals->Window =
+      std::unique_ptr<f3d::window>(new f3d::windowStandard(f3d::AppTitle, offscreen));
+    this->Internals->Loader.setWindow(this->Internals->Window.get());
+
+    this->Internals->Loader.setInteractor(&this->Internals->Interactor);
+    this->Internals->Window->setIcon(F3DIcon, sizeof(F3DIcon));
   }
 
   // Add and load file
   this->Internals->Loader.addFiles(files);
-  this->LoadFile();
+  bool loaded = this->LoadFile();
 
   if (!this->Internals->CommandLineOptions.NoRender)
   {
-    // Start rendering and interaction
-    if (!this->Internals->Loader.start())
+    // Play recording if any
+    if (!this->Internals->CommandLineOptions.InteractionTestPlayFile.empty())
     {
-      return EXIT_FAILURE;
+      if (!this->Internals->Interactor.playInteraction(
+            this->Internals->CommandLineOptions.InteractionTestPlayFile))
+      {
+        return EXIT_FAILURE;
+      }
+    }
+
+    // Start recording if needed
+    if (!this->Internals->CommandLineOptions.InteractionTestRecordFile.empty())
+    {
+      if (!this->Internals->Interactor.recordInteraction(
+            this->Internals->CommandLineOptions.InteractionTestRecordFile))
+      {
+        return EXIT_FAILURE;
+      }
+    }
+
+    // Render and compare with file if needed
+    if (!this->Internals->CommandLineOptions.Reference.empty())
+    {
+      if (!loaded)
+      {
+        F3DLog::Print(F3DLog::Severity::Error, "No file loaded, no rendering performed");
+        return EXIT_FAILURE;
+      }
+
+      if (!this->Internals->Window->renderAndCompareWithFile(
+            this->Internals->CommandLineOptions.Reference,
+            this->Internals->CommandLineOptions.RefThreshold,
+            this->Internals->CommandLineOptions.NoBackground,
+            this->Internals->CommandLineOptions.Output))
+      {
+        return EXIT_FAILURE;
+      }
+    }
+    // Render to file if needed
+    else if (!this->Internals->CommandLineOptions.Output.empty())
+    {
+      if (!loaded)
+      {
+        F3DLog::Print(F3DLog::Severity::Error, "No file loaded, no rendering performed");
+        return EXIT_FAILURE;
+      }
+
+      if (!this->Internals->Window->renderToFile(this->Internals->CommandLineOptions.Output,
+            this->Internals->CommandLineOptions.NoBackground))
+      {
+        return EXIT_FAILURE;
+      }
+    }
+    // Start interaction
+    else
+    {
+      this->Internals->Interactor.start();
     }
   }
 
