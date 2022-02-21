@@ -26,28 +26,28 @@ void F3DAnimationManager::Initialize(const f3d::options* options, f3d::interacto
   this->Options = options;
   if (!this->Options)
   {
-    f3d::log::print(f3d::log::Severity::Error, "Options is empty");
+    f3d::log::error("Options is empty");
     return;
   }
 
   this->Interactor = interactor;
   if (!this->Interactor)
   {
-    f3d::log::print(f3d::log::Severity::Error, "Interactor is empty");
+    f3d::log::error("Interactor is empty");
     return;
   }
 
   this->Window = window;
   if (!this->Window)
   {
-    f3d::log::print(f3d::log::Severity::Error, "Window is empty");
+    f3d::log::error("Window is empty");
     return;
   }
 
   this->Importer = importer;
   if (!this->Importer)
   {
-    f3d::log::print(f3d::log::Severity::Error, "Importer is empty");
+    f3d::log::error("Importer is empty");
     return;
   }
 
@@ -87,28 +87,28 @@ void F3DAnimationManager::Initialize(const f3d::options* options, f3d::interacto
   {
     if (availAnimations <= 0)
     {
-      f3d::log::print(f3d::log::Severity::Info, "No animations available in this file");
+      f3d::log::info("No animations available in this file");
     }
     else
     {
-      f3d::log::print(f3d::log::Severity::Info, "Animation(s) available in this file are:");
+      f3d::log::info("Animation(s) available in this file are:");
     }
     for (int i = 0; i < availAnimations; i++)
     {
-      f3d::log::print(f3d::log::Severity::Info, i, ": ", this->Importer->GetAnimationName(i));
+      f3d::log::info(i, ": ", this->Importer->GetAnimationName(i));
     }
-    f3d::log::print(f3d::log::Severity::Info, "\n");
+    f3d::log::info("\n");
   }
 
   int animationIndex = options->get<int>("animation-index");
   if (animationIndex != 0 && availAnimations <= 0)
   {
-    f3d::log::print(f3d::log::Severity::Warning,
+    f3d::log::warn(
       "An animation index has been specified but there are no animation available.");
   }
   else if (animationIndex > 0 && animationIndex >= availAnimations)
   {
-    f3d::log::print(f3d::log::Severity::Warning,
+    f3d::log::warn(
       "Specified animation index is greater than the highest possible animation index, enabling "
       "the first animation.");
 

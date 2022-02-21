@@ -16,6 +16,50 @@ namespace f3d
 class log
 {
 public:
+  /**
+   * Log provided args as an info.
+   */
+  template<typename... Args>
+  static void info(Args... args)
+  {
+    log::print(log::Severity::Info, args...);
+  }
+
+  /**
+   * Log provided args as a warning.
+   */
+  template<typename... Args>
+  static void warn(Args... args)
+  {
+    log::print(log::Severity::Info, args...);
+  }
+
+  /**
+   * Log provided args as an error.
+   */
+  template<typename... Args>
+  static void error(Args... args)
+  {
+    log::print(log::Severity::Error, args...);
+  }
+
+  /**
+   * Set the coloring usage, if applicable (eg: console output).
+   */
+  static void setUseColoring(bool use);
+
+  /**
+   * Set if any log should be shown or not.
+   */
+  static void setQuiet(bool quiet);
+
+  /**
+   * Wait for user if applicable (eg: win32 output window)
+   * No effect otherwise.
+   */
+  static void waitForUser();
+
+protected:
   enum class Severity : unsigned char
   {
     Info,
@@ -27,36 +71,17 @@ public:
   static void print(Severity sev, Args... args)
   {
     std::stringstream ss;
-    appendArg(ss, args...);
-    printInternal(sev, ss.str());
+    log::appendArg(ss, args...);
+    log::printInternal(sev, ss.str());
   }
 
-  /**
-   * If output window is a vtkF3DConsoleOutputWindow,
-   * set the coloring usage.
-   */
-  static void setUseColoring(bool use);
-
-  /**
-   * Set if any log should be shown or not.
-   */
-  static void setQuiet(bool quiet);
-
-  /**
-   * If output window is a vtkF3DWin32OutputWindow,
-   * this calls WaitForUser on the output window.
-   * No effect otherwise.
-   */
-  static void waitForUser();
-
-protected:
   static void appendArg(std::stringstream&) {}
 
   template<typename T, typename... Args>
   static void appendArg(std::stringstream& ss, T value, Args... args)
   {
     ss << value;
-    appendArg(ss, args...);
+    log::appendArg(ss, args...);
   }
 
   static void printInternal(Severity sev, const std::string& msg);

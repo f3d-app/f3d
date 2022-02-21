@@ -145,7 +145,7 @@ int F3DStarter::Start(int argc, char** argv)
     {
       if (!loaded)
       {
-        f3d::log::print(f3d::log::Severity::Error, "No file loaded, no rendering performed");
+        f3d::log::error("No file loaded, no rendering performed");
         return EXIT_FAILURE;
       }
 
@@ -163,7 +163,7 @@ int F3DStarter::Start(int argc, char** argv)
     {
       if (!loaded)
       {
-        f3d::log::print(f3d::log::Severity::Error, "No file loaded, no rendering performed");
+        f3d::log::error("No file loaded, no rendering performed");
         return EXIT_FAILURE;
       }
 

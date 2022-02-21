@@ -295,7 +295,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
   }
   catch (const cxxopts::OptionException& e)
   {
-    f3d::log::print(f3d::log::Severity::Error, "Error parsing options: ", e.what());
+    f3d::log::error("Error parsing options: ", e.what());
     throw;
   }
   return options;
@@ -307,7 +307,7 @@ void ConfigurationOptions::PrintHelpPair(
 {
   std::stringstream ss;
   ss << "  " << std::left << std::setw(keyWidth) << key << " " << std::setw(helpWidth) << help;
-  f3d::log::print(f3d::log::Severity::Info, ss.str());
+  f3d::log::info(ss.str());
 }
 
 //----------------------------------------------------------------------------
@@ -358,20 +358,20 @@ void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
   // clang-format on
 
   f3d::log::setUseColoring(false);
-  f3d::log::print(f3d::log::Severity::Info, cxxOptions.help());
-  f3d::log::print(f3d::log::Severity::Info, "Keys:");
+  f3d::log::info(cxxOptions.help());
+  f3d::log::info("Keys:");
   for (const auto& key : keys)
   {
     this->PrintHelpPair(key.first, key.second);
   }
 
-  f3d::log::print(f3d::log::Severity::Info, "\nExamples:");
+  f3d::log::info("\nExamples:");
   for (const auto& example : examples)
   {
     this->PrintHelpPair(example.first, example.second, 50);
   }
-  f3d::log::print(
-    f3d::log::Severity::Info, "\nReport bugs to https://github.com/f3d-app/f3d/issues");
+  f3d::log::info(
+    "\nReport bugs to https://github.com/f3d-app/f3d/issues");
   f3d::log::setUseColoring(true);
   f3d::log::waitForUser();
 }
@@ -429,7 +429,7 @@ void ConfigurationOptions::PrintVersion()
   version += "\nWritten by Michael Migliore, Mathieu Westphal and Joachim Pouderoux.";
 
   f3d::log::setUseColoring(false);
-  f3d::log::print(f3d::log::Severity::Info, version);
+  f3d::log::info(version);
   f3d::log::setUseColoring(true);
   f3d::log::waitForUser();
 }
@@ -445,7 +445,7 @@ void ConfigurationOptions::PrintReadersList()
   const auto& readers = F3DReaderFactory::GetInstance()->GetReaders();
   if (readers.empty())
   {
-    f3d::log::print(f3d::log::Severity::Warning, "No registered reader found!");
+    f3d::log::warn("No registered reader found!");
     return;
   }
   // Compute the size of the 3 columns
@@ -454,7 +454,7 @@ void ConfigurationOptions::PrintReadersList()
     // sanity check
     if (reader->GetExtensions().size() < reader->GetMimeTypes().size())
     {
-      f3d::log::print(f3d::log::Severity::Error, reader->GetName(),
+      f3d::log::error(reader->GetName(),
         " have different extensions and mime-types count.");
       return;
     }
@@ -483,8 +483,8 @@ void ConfigurationOptions::PrintReadersList()
   headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(descColSize)
              << "Description" << std::setw(extsColSize) << "Exts" << std::setw(mimeColSize)
              << "Mime-types";
-  f3d::log::print(f3d::log::Severity::Info, headerLine.str());
-  f3d::log::print(f3d::log::Severity::Info, separator);
+  f3d::log::info(headerLine.str());
+  f3d::log::info(separator);
 
   for (const auto& reader : readers)
   {
@@ -508,9 +508,9 @@ void ConfigurationOptions::PrintReadersList()
         readerLine << std::setw(mimeColSize) << reader->GetMimeTypes()[i];
       }
 
-      f3d::log::print(f3d::log::Severity::Info, readerLine.str());
+      f3d::log::info(readerLine.str());
     }
-    f3d::log::print(f3d::log::Severity::Info, separator);
+    f3d::log::info(separator);
   }
   f3d::log::waitForUser();
 }
@@ -540,8 +540,8 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
 
   if (!file.is_open())
   {
-    f3d::log::print(
-      f3d::log::Severity::Error, "Unable to open the configuration file: ", configFilePath);
+    f3d::log::error(
+      "Unable to open the configuration file: ", configFilePath);
     return false;
   }
 
@@ -553,9 +553,9 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
   bool success = Json::parseFromStream(builder, file, &root, &errs);
   if (!success)
   {
-    f3d::log::print(
-      f3d::log::Severity::Error, "Unable to parse the configuration file ", configFilePath);
-    f3d::log::print(f3d::log::Severity::Error, errs);
+    f3d::log::error(
+      "Unable to parse the configuration file ", configFilePath);
+    f3d::log::error(errs);
     return false;
   }
 
