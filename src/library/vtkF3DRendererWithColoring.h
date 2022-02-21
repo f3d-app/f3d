@@ -144,6 +144,11 @@ public:
    */
   void UpdateInternalActors() override;
 
+  /**
+   * Return coloring info about the current coloring array
+   */
+  std::string GetColoringInfo();
+
 protected:
   vtkF3DRendererWithColoring() = default;
   ~vtkF3DRendererWithColoring() override = default;
@@ -196,11 +201,6 @@ protected:
    * if not, it will reset it to 0
    */
   void CheckCurrentComponentForColoring();
-
-  /**
-   * Print info about the current coloring array
-   */
-  void PrintColoringInfo();
 
   std::string GenerateMetaDataDescription() override;
 

@@ -253,19 +253,23 @@ void vtkF3DRendererWithColoring::CycleFieldForColoring()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::PrintColoringInfo()
+std::string vtkF3DRendererWithColoring::GetColoringInfo()
 {
-/*  if (this->ArrayForColoring)
+  std::string output;
+  if (this->ArrayForColoring)
   {
-    F3DLog::Print(F3DLog::Severity::Info, "Coloring using ",
-      (this->DataForColoring == this->PointDataForColoring ? "point" : "cell"), " array named ",
-      this->ArrayForColoring->GetName(), ", ",
-      vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring), ".");
+    output = "Coloring using ";
+    output += (this->DataForColoring == this->PointDataForColoring ? "point" : "cell");
+    output += " array named ";
+    output += this->ArrayForColoring->GetName();
+    output += ", ";
+    output += vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring);
   }
   else
   {
-    F3DLog::Print(F3DLog::Severity::Info, "Not coloring");
-  }*/ // TODO Rework this output
+    output = "Not coloring";
+  }
+  return output;
 }
 
 //----------------------------------------------------------------------------
@@ -351,11 +355,6 @@ void vtkF3DRendererWithColoring::UpdateInternalActors()
   if (this->DataForColoring)
   {
     this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
-  }
-
-  if (this->Verbose)
-  {
-    this->PrintColoringInfo();
   }
 
   bool volumeVisibility = !this->UseRaytracing && this->UseVolume;
