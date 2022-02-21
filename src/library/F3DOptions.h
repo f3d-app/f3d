@@ -8,6 +8,7 @@
 #define F3DOptions_h
 
 #include "F3DConfig.h"
+#include "vtkF3DConfigure.h"
 
 #include <memory>
 #include <vector>
@@ -64,7 +65,8 @@ struct F3DOptions
   std::string UserConfigFile = "";
   std::string Output = "";
   std::string Reference = "";
-  std::string Scalars = f3d::F3DReservedString;
+  std::string Scalars =
+    F3D_RESERVED_STRING; // XXX this will be initialized by f3d_options in another MR, to remove
   std::string InteractionTestRecordFile = "";
   std::string InteractionTestPlayFile = "";
   std::vector<double> BackgroundColor = { 0.2, 0.2, 0.2 };

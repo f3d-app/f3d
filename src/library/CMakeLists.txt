@@ -18,13 +18,13 @@ set(MODULES_SPECIFIC_INCLUDE_DIRS "")
 set(MODULES_SPECIFIC_LIBRARIES "")
 
 configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.h"
+  "${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.cxx.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.cxx"
   @ONLY)
 
 configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.cxx.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.cxx"
+  "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DConfigure.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkF3DConfigure.h"
   @ONLY)
 
 # Readers declaration
