@@ -145,9 +145,10 @@ public:
   void UpdateInternalActors() override;
 
   /**
-   * Return coloring info about the current coloring array
+   * Return info about the current rendering array
+   * Uses superclass methods and adds coloring info
    */
-  std::string GetColoringInfo();
+  std::string GetRenderingInfo() override;
 
 protected:
   vtkF3DRendererWithColoring() = default;

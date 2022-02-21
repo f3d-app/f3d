@@ -150,6 +150,12 @@ public:
    */
   virtual void UpdateInternalActors(){};
 
+  /**
+   * Return info about the current rendering array
+   * Output info about the grid size f any
+   */
+  virtual std::string GetRenderingInfo();
+
 protected:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -213,6 +219,8 @@ protected:
   double RightVector[3] = { 1.0, 0.0, 0.0 };
 
   std::string HDRIFile;
+
+  std::string GridInfo;
 };
 
 #endif

@@ -164,12 +164,7 @@ bool windowStandard::update()
     // Print coloring info when available
     if (this->Options->get<bool>("verbose"))
     {
-      vtkF3DRendererWithColoring* renWithColor =
-        vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
-      if (renWithColor)
-      { 
-        f3d::log::print(f3d::log::Severity::Info, renWithColor->GetColoringInfo());
-      }
+      f3d::log::print(f3d::log::Severity::Info, this->Internals->Renderer->GetRenderingInfo());
     }
 
     return this->Internals->UpdateCamera(this->Options);

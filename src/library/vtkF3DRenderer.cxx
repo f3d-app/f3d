@@ -312,8 +312,7 @@ void vtkF3DRenderer::SetupRenderPasses()
 #else
   if (this->UseRaytracing || this->UseRaytracingDenoiser)
   {
-    vtkWarningMacro(
-      "Raytracing options can't be used if F3D has not been built with raytracing");
+    vtkWarningMacro("Raytracing options can't be used if F3D has not been built with raytracing");
   }
 #endif
 }
@@ -330,6 +329,12 @@ void vtkF3DRenderer::ShowOptions()
   this->ShowMetaData(this->MetaDataVisible);
 
   this->UpdateInternalActors();
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DRenderer::GetRenderingInfo()
+{
+  return this->GridInfo;
 }
 
 //----------------------------------------------------------------------------
@@ -372,7 +377,12 @@ void vtkF3DRenderer::ShowGrid(bool show)
 
   vtkBoundingBox bbox(bounds);
 
-  if (bbox.IsValid())
+  if (!bbox.IsValid())
+  {
+    show = false;
+  }
+
+  if (show)
   {
     this->SetClippingRangeExpansion(0.99);
 
@@ -386,11 +396,11 @@ void vtkF3DRenderer::ShowGrid(bool show)
       gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
     }
 
-/*    if (this->Verbose && show)
-    {
-      F3DLog::Print(F3DLog::Severity::Info, "Using grid unit square size = ", unitSquare, "\n",
-        "Grid origin set to [", gridPos[0], ", ", gridPos[1], ", ", gridPos[2], "]\n");
-    }*/// TODO Rethinkg this output
+    std::stringstream stream;
+    stream << "Using grid unit square size = " << unitSquare << "\n"
+           << "Grid origin set to [" << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2]
+           << "]\n\n";
+    this->GridInfo = stream.str();
 
     vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
     gridMapper->SetFadeDistance(diag);
@@ -409,8 +419,9 @@ void vtkF3DRenderer::ShowGrid(bool show)
   else
   {
     this->SetClippingRangeExpansion(0);
-    show = false;
+    this->GridInfo = "";
   }
+
   this->GridActor->SetVisibility(show);
   this->ResetCameraClippingRange();
   this->SetupRenderPasses();
@@ -770,9 +781,10 @@ void vtkF3DRenderer::DumpSceneState()
   cam->GetPosition(position);
   cam->GetFocalPoint(focal);
   cam->GetViewUp(up);
-/*  F3DLog::Print(
-    F3DLog::Severity::Info, "Camera position: ", position[0], ",", position[1], ",", position[2]);
-  F3DLog::Print(
-    F3DLog::Severity::Info, "Camera focal point: ", focal[0], ",", focal[1], ",", focal[2]);
-  F3DLog::Print(F3DLog::Severity::Info, "Camera view up: ", up[0], ",", up[1], ",", up[2], "\n");*/ // TODO Rethink this output
+  /*  F3DLog::Print(
+      F3DLog::Severity::Info, "Camera position: ", position[0], ",", position[1], ",", position[2]);
+    F3DLog::Print(
+      F3DLog::Severity::Info, "Camera focal point: ", focal[0], ",", focal[1], ",", focal[2]);
+    F3DLog::Print(F3DLog::Severity::Info, "Camera view up: ", up[0], ",", up[1], ",", up[2],
+    "\n");*/ // TODO Rethink this output
 }

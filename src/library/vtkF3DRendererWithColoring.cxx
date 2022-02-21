@@ -253,23 +253,22 @@ void vtkF3DRendererWithColoring::CycleFieldForColoring()
 }
 
 //----------------------------------------------------------------------------
-std::string vtkF3DRendererWithColoring::GetColoringInfo()
+std::string vtkF3DRendererWithColoring::GetRenderingInfo()
 {
-  std::string output;
+  std::stringstream stream;
+  stream << this->Superclass::GetRenderingInfo();
   if (this->ArrayForColoring)
   {
-    output = "Coloring using ";
-    output += (this->DataForColoring == this->PointDataForColoring ? "point" : "cell");
-    output += " array named ";
-    output += this->ArrayForColoring->GetName();
-    output += ", ";
-    output += vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring);
+    stream << "Coloring using "
+           << (this->DataForColoring == this->PointDataForColoring ? "point" : "cell")
+           << " array named " << this->ArrayForColoring->GetName() << ", "
+           << vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring) << "\n";
   }
   else
   {
-    output = "Not coloring";
+    stream << "Not coloring\n";
   }
-  return output;
+  return stream.str();
 }
 
 //----------------------------------------------------------------------------
@@ -511,8 +510,8 @@ void vtkF3DRendererWithColoring::ConfigureVolumeForColoring(vtkSmartVolumeMapper
     if (array->GetNumberOfComponents() > 4)
     {
       // comp > 4 is actually not supported and would fail with an error
-      vtkWarningWithObjectMacro(nullptr,
-        "Direct scalars rendering not supported by array with more than 4 components");
+      vtkWarningWithObjectMacro(
+        nullptr, "Direct scalars rendering not supported by array with more than 4 components");
     }
     else
     {
@@ -553,8 +552,8 @@ void vtkF3DRendererWithColoring::ConfigureMapperForColoring(vtkPolyDataMapper* m
     if (array->GetNumberOfComponents() > 4)
     {
       // comp > 4 is actually not supported and would fail with an error
-      vtkWarningWithObjectMacro(nullptr,
-        "Direct scalars rendering not supported by array with more than 4 components");
+      vtkWarningWithObjectMacro(
+        nullptr, "Direct scalars rendering not supported by array with more than 4 components");
     }
     else
     {
@@ -593,8 +592,7 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(vtkDataArray* a
   {
     if (this->SpecifiedRange.size() > 0)
     {
-      vtkWarningMacro(
-        "The range specified does not have exactly 2 values, using automatic range.");
+      vtkWarningMacro("The range specified does not have exactly 2 values, using automatic range.");
     }
     array->GetRange(this->ColorRange, component);
   }
@@ -617,8 +615,7 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(vtkDataArray* a
     }
     else
     {
-      vtkWarningMacro(
-        "Specified color map list count is not a multiple of 4, ignoring it.");
+      vtkWarningMacro("Specified color map list count is not a multiple of 4, ignoring it.");
     }
   }
 
