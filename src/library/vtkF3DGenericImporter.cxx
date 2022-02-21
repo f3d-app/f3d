@@ -213,10 +213,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       {
         usedArray = arrayName;
       }
-/*      if (verbose)
-      {
-        F3DLog::Print(F3DLog::Severity::Info, "Using default scalar array: ", usedArray);
-      }*/ // TODO rethink this output
+      this->OutputDescription += "\nUsing default scalar array: ";
+      this->OutputDescription += usedArray;
     }
     else
     {
@@ -231,10 +229,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
           {
             usedArray = arrayName;
           }
-/*          if (verbose)
-          {
-            F3DLog::Print(F3DLog::Severity::Info, "Using first found array: ", usedArray);
-          }*/ // TODO Rething this output
+          this->OutputDescription += "\nUsing first found array: ";
+          this->OutputDescription += usedArray;
           break;
         }
       }
@@ -249,11 +245,10 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   {
     vtkWarningMacro(<< "Unknown scalar array: " << usedArray);
   }
-/*  if (this->ArrayIndexForColoring == -1 && verbose)
+  if (this->ArrayIndexForColoring == -1)
   {
-    F3DLog::Print(
-      F3DLog::Severity::Info, "No array found for scalar coloring and volume rendering");
-  }*/ // TODO rething this output
+    this->OutputDescription += "\nNo array found for scalar coloring and volume rendering";
+  }
 
   // configure props
   this->VolumeProp->SetMapper(this->VolumeMapper);
