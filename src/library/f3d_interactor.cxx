@@ -70,7 +70,7 @@ public:
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
           if (self->Loader->getOptions().get<bool>("verbose"))
           {
-            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetColoringInfo());
+            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetRenderingInfo());
           }
 
           renWin->Render();
@@ -82,7 +82,7 @@ public:
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
           if (self->Loader->getOptions().get<bool>("verbose"))
           {
-            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetColoringInfo());
+            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetRenderingInfo());
           }
 
           renWin->Render();
@@ -94,7 +94,7 @@ public:
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
           if (self->Loader->getOptions().get<bool>("verbose"))
           {
-            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetColoringInfo());
+            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetRenderingInfo());
           }
 
           renWin->Render();
@@ -168,7 +168,7 @@ public:
           renWithColor->SetUseVolume(!renWithColor->UsingVolume());
           if (self->Loader->getOptions().get<bool>("verbose"))
           {
-            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetColoringInfo());
+            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetRenderingInfo());
           }
 
           renWin->Render();
@@ -187,7 +187,7 @@ public:
           renWithColor->SetUsePointSprites(!renWithColor->UsingPointSprites());
           if (self->Loader->getOptions().get<bool>("verbose"))
           {
-            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetColoringInfo());
+            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetRenderingInfo());
           }
 
           renWin->Render();
