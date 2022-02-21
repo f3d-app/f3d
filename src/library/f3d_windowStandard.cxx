@@ -17,15 +17,15 @@ namespace
 void DisplayCameraInformation(vtkCamera* cam)
 {
   double* position = cam->GetPosition();
-  f3d::log::print(f3d::log::Severity::Info, "Camera position is: ", position[0], ", ", position[1],
+  f3d::log::info("Camera position is: ", position[0], ", ", position[1],
     ", ", position[2], ".");
   double* focalPoint = cam->GetFocalPoint();
-  f3d::log::print(f3d::log::Severity::Info, "Camera focal point is: ", focalPoint[0], ", ",
+  f3d::log::info("Camera focal point is: ", focalPoint[0], ", ",
     focalPoint[1], ", ", focalPoint[2], ".");
   double* viewUp = cam->GetViewUp();
-  f3d::log::print(f3d::log::Severity::Info, "Camera view up is: ", viewUp[0], ", ", viewUp[1], ", ",
+  f3d::log::info("Camera view up is: ", viewUp[0], ", ", viewUp[1], ", ",
     viewUp[2], ".");
-  f3d::log::print(f3d::log::Severity::Info, "Camera view angle is: ", cam->GetViewAngle(), ".\n");
+  f3d::log::info("Camera view angle is: ", cam->GetViewAngle(), ".\n");
 }
 }
 
@@ -164,7 +164,7 @@ bool windowStandard::update()
     // Print coloring info when available
     if (this->Options->get<bool>("verbose"))
     {
-      f3d::log::print(f3d::log::Severity::Info, this->Internals->Renderer->GetRenderingInfo());
+      f3d::log::info(this->Internals->Renderer->GetRenderingInfo());
     }
 
     return this->Internals->UpdateCamera(this->Options);

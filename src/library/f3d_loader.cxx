@@ -106,19 +106,19 @@ void DisplayImporterDescription(vtkImporter* importer)
   vtkIdType availCameras = importer->GetNumberOfCameras();
   if (availCameras <= 0)
   {
-    f3d::log::print(f3d::log::Severity::Info, "No camera available in this file");
+    f3d::log::info("No camera available in this file");
   }
   else
   {
-    f3d::log::print(f3d::log::Severity::Info, "Camera(s) available in this file are:");
+    f3d::log::info("Camera(s) available in this file are:");
   }
   for (int i = 0; i < availCameras; i++)
   {
-    f3d::log::print(f3d::log::Severity::Info, i, ": ", importer->GetCameraName(i));
+    f3d::log::info(i, ": ", importer->GetCameraName(i));
   }
-  f3d::log::print(f3d::log::Severity::Info, "\n");
+  f3d::log::info("\n");
 #endif
-  f3d::log::print(f3d::log::Severity::Info, importer->GetOutputsDescription());
+  f3d::log::info(importer->GetOutputsDescription());
 }
 }
 
@@ -188,7 +188,7 @@ void loader::addFile(const std::string& path, bool recursive)
   std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
   if (!vtksys::SystemTools::FileExists(fullPath))
   {
-    f3d::log::print(f3d::log::Severity::Error, "File ", fullPath, " does not exist");
+    f3d::log::error("File ", fullPath, " does not exist");
     return;
   }
 
@@ -328,7 +328,7 @@ bool loader::loadFile(loader::LoadFileEnum load)
 
   if (!this->Internals->Window)
   {
-    f3d::log::print(f3d::log::Severity::Error, "No window provided, aborting\n");
+    f3d::log::error("No window provided, aborting\n");
     return this->Internals->LoadedFile;
   }
 
@@ -340,11 +340,11 @@ bool loader::loadFile(loader::LoadFileEnum load)
   {
     if (filePath.empty())
     {
-      f3d::log::print(f3d::log::Severity::Info, "No file to load provided\n");
+      f3d::log::info("No file to load provided\n");
     }
     else
     {
-      f3d::log::print(f3d::log::Severity::Info, "Loading: ", filePath, "\n");
+      f3d::log::info("Loading: ", filePath, "\n");
     }
   }
 
@@ -363,8 +363,8 @@ bool loader::loadFile(loader::LoadFileEnum load)
     vtkF3DGenericImporter::SafeDownCast(this->Internals->Importer);
   if (!this->Internals->Importer)
   {
-    f3d::log::print(
-      f3d::log::Severity::Warning, filePath, " is not a file of a supported file format\n");
+    f3d::log::warn(
+      filePath, " is not a file of a supported file format\n");
     fileInfo += " [UNSUPPORTED]";
     this->Internals->Window->Initialize(false, fileInfo);
     this->Internals->Window->update();
