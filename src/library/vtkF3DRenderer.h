@@ -124,9 +124,9 @@ public:
   void ResetCamera() override;
 
   /**
-   * Dump useful scene state. Currently supports only camera state.
+   * Get useful scene state information. Currently supports only camera state.
    */
-  void DumpSceneState();
+  std::string GetSceneState();
 
   //@{
   /**

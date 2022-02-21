@@ -235,8 +235,11 @@ public:
         renWin->Render();
         break;
       case '?':
-        ren->DumpSceneState();
-        break;
+      {
+        std::string output = ren->GetSceneState();
+        f3d::log::print(f3d::log::Severity::Info, output);
+      }
+      break;
       default:
         if (keySym == "Left")
         {

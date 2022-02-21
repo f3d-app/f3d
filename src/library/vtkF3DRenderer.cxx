@@ -772,7 +772,7 @@ bool vtkF3DRenderer::IsBackgroundDark()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::DumpSceneState()
+std::string vtkF3DRenderer::GetSceneState()
 {
   vtkCamera* cam = this->GetActiveCamera();
   double position[3];
@@ -781,10 +781,10 @@ void vtkF3DRenderer::DumpSceneState()
   cam->GetPosition(position);
   cam->GetFocalPoint(focal);
   cam->GetViewUp(up);
-  /*  F3DLog::Print(
-      F3DLog::Severity::Info, "Camera position: ", position[0], ",", position[1], ",", position[2]);
-    F3DLog::Print(
-      F3DLog::Severity::Info, "Camera focal point: ", focal[0], ",", focal[1], ",", focal[2]);
-    F3DLog::Print(F3DLog::Severity::Info, "Camera view up: ", up[0], ",", up[1], ",", up[2],
-    "\n");*/ // TODO Rethink this output
+
+  std::stringstream stream;
+  stream << "Camera position: " << position[0] << "," << position[1] << "," << position[2] << "\n"
+         << "Camera focal point: " << focal[0] << "," << focal[1] << "," << focal[2] << "\n"
+         << "Camera view up: " << up[0] << "," << up[1] << "," << up[2] << "\n";
+  return stream.str();
 }
