@@ -3,6 +3,8 @@
 #include "F3DConfig.h"
 #include "F3DOperators.h"
 
+#include "F3DLog.h"
+
 #include <map>
 
 namespace f3d
@@ -12,6 +14,7 @@ class options::F3DInternals
 {
 public:
   std::map<std::string, std::string> Options;
+  bool CheckExists = false;
 };
 
 //----------------------------------------------------------------------------
@@ -81,6 +84,9 @@ options::options()
   this->set("tone-mapping", false);
   this->set("trackball", false);
   this->set("volume", false);
+
+  // After initialization, set CheckExists flag to true
+  this->Internals->CheckExists = true;
 };
 
 //----------------------------------------------------------------------------
@@ -103,6 +109,12 @@ options& options::operator=(const options& opt)
 template<typename T>
 void options::set(const std::string& name, const T& value)
 {
+  if (this->Internals->CheckExists && this->Internals->Options.find(name) == this->Internals->Options.end())
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
+    return;
+  }
+
   std::stringstream ss;
   ss << value;
   this->Internals->Options[name] = ss.str();
@@ -120,7 +132,13 @@ template void options::set<>(const std::string& name, const std::vector<double>&
 template<typename T>
 void options::get(const std::string& name, T& value) const
 {
-  std::stringstream ss(this->Internals->Options.at(name));
+  if (this->Internals->CheckExists && this->Internals->Options.find(name) == this->Internals->Options.end())
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
+    return;
+  }
+
+  std::stringstream ss(this->Internals->Options[name]);
   ss >> value;
 }
 
