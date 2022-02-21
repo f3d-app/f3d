@@ -730,6 +730,8 @@ F3DOptions F3DOptionsParser::GetOptionsFromCommandLine(std::vector<std::string>&
 //----------------------------------------------------------------------------
 void F3DOptionsParser::ConvertToNewAPI(const F3DOptions& oldOptions, f3d::options* newOptions)
 {
+  f3d::options::initialize(*newOptions);
+
   // TODO rework option names
   // TODO remove some options that do not exist in libf3d (like no-render)
 

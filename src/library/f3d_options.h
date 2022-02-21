@@ -26,6 +26,8 @@ public:
   template<typename T>
   T get(const std::string& name) const;
 
+  static void initialize(options& options);
+
 private:
   class F3DInternals;
   std::unique_ptr<F3DInternals> Internals;
