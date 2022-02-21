@@ -1,7 +1,7 @@
 #include "vtkF3DRenderer.h"
 
-#include "F3DConfig.h"
 #include "f3d_options.h"
+#include "vtkF3DConfigure.h"
 #include "vtkF3DLog.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
