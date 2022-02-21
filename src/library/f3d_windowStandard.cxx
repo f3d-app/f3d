@@ -160,6 +160,18 @@ bool windowStandard::update()
 
     // Actors are loaded, use the bounds to reset camera and set-up SSAO
     this->Internals->Renderer->ShowOptions();
+
+    // Print coloring info when available
+    if (this->Options->get<bool>("verbose"))
+    {
+      vtkF3DRendererWithColoring* renWithColor =
+        vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
+      if (renWithColor)
+      { 
+        f3d::log::print(f3d::log::Severity::Info, renWithColor->GetColoringInfo());
+      }
+    }
+
     return this->Internals->UpdateCamera(this->Options);
   }
   return false;

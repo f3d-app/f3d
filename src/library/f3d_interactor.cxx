@@ -5,6 +5,7 @@
 #include "f3d_log.h"
 #include "f3d_loader.h"
 #include "f3d_window.h"
+#include "f3d_options.h"
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRendererWithColoring.h"
@@ -67,6 +68,11 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
+          if (self->Loader->getOptions().get<bool>("verbose"))
+          {
+            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetColoringInfo());
+          }
+
           renWin->Render();
         }
         break;
@@ -74,6 +80,11 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
+          if (self->Loader->getOptions().get<bool>("verbose"))
+          {
+            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetColoringInfo());
+          }
+
           renWin->Render();
         }
         break;
@@ -81,6 +92,11 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
+          if (self->Loader->getOptions().get<bool>("verbose"))
+          {
+            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetColoringInfo());
+          }
+
           renWin->Render();
         }
         break;
@@ -150,6 +166,11 @@ public:
         if (renWithColor)
         {
           renWithColor->SetUseVolume(!renWithColor->UsingVolume());
+          if (self->Loader->getOptions().get<bool>("verbose"))
+          {
+            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetColoringInfo());
+          }
+
           renWin->Render();
         }
         break;
@@ -164,6 +185,11 @@ public:
         if (renWithColor)
         {
           renWithColor->SetUsePointSprites(!renWithColor->UsingPointSprites());
+          if (self->Loader->getOptions().get<bool>("verbose"))
+          {
+            f3d::log::print(f3d::log::Severity::Info, renWithColor->GetColoringInfo());
+          }
+
           renWin->Render();
         }
         break;
