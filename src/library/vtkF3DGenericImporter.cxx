@@ -1,7 +1,6 @@
 #include "vtkF3DGenericImporter.h"
 
 #include "F3DConfig.h"
-#include "F3DLog.h"
 #include "f3d_options.h"
 
 #include <vtkActor.h>
@@ -49,7 +48,7 @@ void vtkF3DGenericImporter::UpdateTemporalInformation()
   {
     if (!this->Reader->IsReaderValid())
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Reader is not valid");
+      vtkWarningMacro("Reader is not valid");
       return;
     }
     this->Reader->UpdateInformation();
@@ -124,8 +123,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
   if (!this->Reader->IsReaderValid())
   {
-    F3DLog::Print(
-      F3DLog::Severity::Error, "File '", this->Reader->GetFileName(), "' cannot be read.");
+    vtkErrorMacro(<< "File '" << this->Reader->GetFileName() << "' cannot be read.");
     return;
   }
 
@@ -139,8 +137,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   if (!ret)
   {
-    F3DLog::Print(
-      F3DLog::Severity::Error, "File '", this->Reader->GetFileName(), "' cannot be read.");
+    vtkErrorMacro(<< "File '" << this->Reader->GetFileName() << "' cannot be read.");
     return;
   }
 
@@ -216,10 +213,10 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       {
         usedArray = arrayName;
       }
-      if (verbose)
+/*      if (verbose)
       {
         F3DLog::Print(F3DLog::Severity::Info, "Using default scalar array: ", usedArray);
-      }
+      }*/ // TODO rethink this output
     }
     else
     {
@@ -234,10 +231,10 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
           {
             usedArray = arrayName;
           }
-          if (verbose)
+/*          if (verbose)
           {
             F3DLog::Print(F3DLog::Severity::Info, "Using first found array: ", usedArray);
-          }
+          }*/ // TODO Rething this output
           break;
         }
       }
@@ -250,13 +247,13 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   if (this->ArrayIndexForColoring == -1 && !usedArray.empty() &&
     usedArray != f3d::F3DReservedString)
   {
-    F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: ", usedArray);
+    vtkWarningMacro(<< "Unknown scalar array: " << usedArray);
   }
-  if (this->ArrayIndexForColoring == -1 && verbose)
+/*  if (this->ArrayIndexForColoring == -1 && verbose)
   {
     F3DLog::Print(
       F3DLog::Severity::Info, "No array found for scalar coloring and volume rendering");
-  }
+  }*/ // TODO rething this output
 
   // configure props
   this->VolumeProp->SetMapper(this->VolumeMapper);
@@ -308,7 +305,7 @@ vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(
     std::string fullPath = vtksys::SystemTools::CollapseFullPath(filePath);
     if (!vtksys::SystemTools::FileExists(fullPath))
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "Texture file does not exist ", fullPath);
+      vtkWarningMacro(<< "Texture file does not exist " << fullPath);
     }
     else
     {
@@ -329,7 +326,7 @@ vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(
       }
       else
       {
-        F3DLog::Print(F3DLog::Severity::Warning, "Cannot open texture file ", fullPath);
+        vtkWarningMacro(<< "Cannot open texture file " << fullPath);
       }
     }
   }

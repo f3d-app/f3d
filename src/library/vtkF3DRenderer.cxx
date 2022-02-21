@@ -1,7 +1,6 @@
 #include "vtkF3DRenderer.h"
 
 #include "F3DConfig.h"
-#include "F3DLog.h"
 #include "f3d_options.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
@@ -85,7 +84,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
 {
   if (!this->RenderWindow)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "No render window linked");
+    vtkErrorMacro("No render window linked");
     return;
   }
 
@@ -98,7 +97,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
     this->HDRIFile = vtksys::SystemTools::CollapseFullPath(this->HDRIFile);
     if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "HDRI file does not exist ", this->HDRIFile);
+      vtkWarningMacro(<< "HDRI file does not exist " << this->HDRIFile);
     }
     else
     {
@@ -137,7 +136,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
       }
       else
       {
-        F3DLog::Print(F3DLog::Severity::Warning, "Cannot open HDRI file ", this->HDRIFile);
+        vtkWarningMacro(<< "Cannot open HDRI file " << this->HDRIFile);
       }
     }
   }
@@ -237,7 +236,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
     }
     else
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "Cannot find \"", fontFile, "\" font file.");
+      vtkWarningMacro(<< "Cannot find \"" << fontFile << "\" font file.");
     }
   }
 
@@ -313,7 +312,7 @@ void vtkF3DRenderer::SetupRenderPasses()
 #else
   if (this->UseRaytracing || this->UseRaytracingDenoiser)
   {
-    F3DLog::Print(F3DLog::Severity::Warning,
+    vtkWarningMacro(
       "Raytracing options can't be used if F3D has not been built with raytracing");
   }
 #endif
@@ -387,11 +386,11 @@ void vtkF3DRenderer::ShowGrid(bool show)
       gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
     }
 
-    if (this->Verbose && show)
+/*    if (this->Verbose && show)
     {
       F3DLog::Print(F3DLog::Severity::Info, "Using grid unit square size = ", unitSquare, "\n",
         "Grid origin set to [", gridPos[0], ", ", gridPos[1], ", ", gridPos[2], "]\n");
-    }
+    }*/// TODO Rethinkg this output
 
     vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
     gridMapper->SetFadeDistance(diag);
@@ -771,9 +770,9 @@ void vtkF3DRenderer::DumpSceneState()
   cam->GetPosition(position);
   cam->GetFocalPoint(focal);
   cam->GetViewUp(up);
-  F3DLog::Print(
+/*  F3DLog::Print(
     F3DLog::Severity::Info, "Camera position: ", position[0], ",", position[1], ",", position[2]);
   F3DLog::Print(
     F3DLog::Severity::Info, "Camera focal point: ", focal[0], ",", focal[1], ",", focal[2]);
-  F3DLog::Print(F3DLog::Severity::Info, "Camera view up: ", up[0], ",", up[1], ",", up[2], "\n");
+  F3DLog::Print(F3DLog::Severity::Info, "Camera view up: ", up[0], ",", up[1], ",", up[2], "\n");*/ // TODO Rethink this output
 }

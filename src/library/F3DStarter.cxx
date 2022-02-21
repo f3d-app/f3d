@@ -3,9 +3,9 @@
 #include "F3DIcon.h"
 #include "F3DOptions.h"
 
-#include "F3DLog.h"
 #include "F3DNSDelegate.h"
 #include "f3d_interactor.h"
+#include "f3d_log.h"
 #include "f3d_options.h"
 #include "f3d_windowNoRender.h"
 #include "f3d_windowStandard.h"
@@ -51,7 +51,7 @@ int F3DStarter::Start(int argc, char** argv)
   this->Internals->CommandLineOptions = this->Internals->Parser.GetOptionsFromCommandLine(files);
 
   // Respect quiet option
-  F3DLog::SetQuiet(this->Internals->CommandLineOptions.Quiet);
+  f3d::log::setQuiet(this->Internals->CommandLineOptions.Quiet);
 
   // Initialize the config file dictionary
   this->Internals->Parser.InitializeDictionaryFromConfigFile(
@@ -145,7 +145,7 @@ int F3DStarter::Start(int argc, char** argv)
     {
       if (!loaded)
       {
-        F3DLog::Print(F3DLog::Severity::Error, "No file loaded, no rendering performed");
+        f3d::log::print(f3d::log::Severity::Error, "No file loaded, no rendering performed");
         return EXIT_FAILURE;
       }
 
@@ -163,7 +163,7 @@ int F3DStarter::Start(int argc, char** argv)
     {
       if (!loaded)
       {
-        F3DLog::Print(F3DLog::Severity::Error, "No file loaded, no rendering performed");
+        f3d::log::print(f3d::log::Severity::Error, "No file loaded, no rendering performed");
         return EXIT_FAILURE;
       }
 

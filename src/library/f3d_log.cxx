@@ -1,4 +1,4 @@
-#include "F3DLog.h"
+#include "f3d_log.h"
 
 #include "vtkF3DConsoleOutputWindow.h"
 
@@ -6,27 +6,29 @@
 #include "vtkF3DWin32OutputWindow.h"
 #endif
 
+namespace f3d
+{
 //----------------------------------------------------------------------------
-void F3DLog::PrintInternal(Severity sev, const std::string& str)
+void log::printInternal(Severity sev, const std::string& str)
 {
   vtkOutputWindow* win = vtkOutputWindow::GetInstance();
   switch (sev)
   {
     default:
-    case F3DLog::Severity::Info:
+    case log::Severity::Info:
       win->DisplayText(str.c_str());
       break;
-    case F3DLog::Severity::Warning:
+    case log::Severity::Warning:
       win->DisplayWarningText(str.c_str());
       break;
-    case F3DLog::Severity::Error:
+    case log::Severity::Error:
       win->DisplayErrorText(str.c_str());
       break;
   }
 }
 
 //----------------------------------------------------------------------------
-void F3DLog::SetUseColoring(bool use)
+void log::setUseColoring(bool use)
 {
   vtkOutputWindow* win = vtkOutputWindow::GetInstance();
   vtkF3DConsoleOutputWindow* consoleWin = vtkF3DConsoleOutputWindow::SafeDownCast(win);
@@ -37,14 +39,14 @@ void F3DLog::SetUseColoring(bool use)
 }
 
 //----------------------------------------------------------------------------
-void F3DLog::SetQuiet(bool quiet)
+void log::setQuiet(bool quiet)
 {
   vtkOutputWindow* win = vtkOutputWindow::GetInstance();
   win->SetDisplayMode(quiet ? vtkOutputWindow::NEVER : vtkOutputWindow::ALWAYS);
 }
 
 //----------------------------------------------------------------------------
-void F3DLog::WaitForUser()
+void log::waitForUser()
 {
 #if F3D_WINDOWS_GUI
   vtkOutputWindow* win = vtkOutputWindow::GetInstance();
@@ -56,4 +58,5 @@ void F3DLog::WaitForUser()
 // No need for a #else as terminal output stays visible after
 // F3D is closed.
 #endif
+}
 }

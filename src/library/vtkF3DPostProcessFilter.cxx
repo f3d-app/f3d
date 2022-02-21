@@ -17,8 +17,6 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkVertexGlyphFilter.h"
 
-#include "F3DLog.h"
-
 #include <numeric>
 
 vtkStandardNewMacro(vtkF3DPostProcessFilter);
@@ -57,8 +55,7 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
       vtkSmartPointer<vtkPolyData> leafPD = vtkPolyData::SafeDownCast(leafDS);
       if (!leafDS)
       {
-        F3DLog::Print(F3DLog::Severity::Warning,
-          "A non data set block was ignored while reading a multiblock.");
+        vtkWarningMacro("A non data set block was ignored while reading a multiblock.");
       }
       else
       {
@@ -138,7 +135,7 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
     }
     else
     {
-      F3DLog::Print(F3DLog::Severity::Warning,
+      vtkWarningMacro(
         "Provided dataset is not convertible to a point cloud for sprites rendering, using its "
         "surface instead.");
       cloud = surface;
