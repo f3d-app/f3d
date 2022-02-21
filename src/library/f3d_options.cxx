@@ -109,7 +109,8 @@ options& options::operator=(const options& opt)
 template<typename T>
 void options::set(const std::string& name, const T& value)
 {
-  if (this->Internals->CheckExists && this->Internals->Options.find(name) == this->Internals->Options.end())
+  if (this->Internals->CheckExists &&
+    this->Internals->Options.find(name) == this->Internals->Options.end())
   {
     F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
     return;
@@ -132,7 +133,8 @@ template void options::set<>(const std::string& name, const std::vector<double>&
 template<typename T>
 void options::get(const std::string& name, T& value) const
 {
-  if (this->Internals->CheckExists && this->Internals->Options.find(name) == this->Internals->Options.end())
+  if (this->Internals->CheckExists &&
+    this->Internals->Options.find(name) == this->Internals->Options.end())
   {
     F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
     return;
