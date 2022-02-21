@@ -347,8 +347,7 @@ void interactor::InitializeAnimation(vtkImporter* importer)
 {
   if (!this->Internals->Loader)
   {
-    f3d::log::error(
-      "Please SetLoader before initializing the animation");
+    f3d::log::error("Please SetLoader before initializing the animation");
     return;
   }
   this->Internals->AnimationManager.Initialize(
@@ -438,8 +437,7 @@ bool interactor::playInteraction(const std::string& file)
 {
   if (!vtksys::SystemTools::FileExists(file))
   {
-    f3d::log::error(
-      "Interaction record file to play does not exist ", file);
+    f3d::log::error("Interaction record file to play does not exist ", file);
     return false;
   }
   else

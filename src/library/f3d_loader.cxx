@@ -363,8 +363,7 @@ bool loader::loadFile(loader::LoadFileEnum load)
     vtkF3DGenericImporter::SafeDownCast(this->Internals->Importer);
   if (!this->Internals->Importer)
   {
-    f3d::log::warn(
-      filePath, " is not a file of a supported file format\n");
+    f3d::log::warn(filePath, " is not a file of a supported file format\n");
     fileInfo += " [UNSUPPORTED]";
     this->Internals->Window->Initialize(false, fileInfo);
     this->Internals->Window->update();

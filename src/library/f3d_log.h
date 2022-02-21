@@ -31,7 +31,7 @@ public:
   template<typename... Args>
   static void warn(Args... args)
   {
-    log::print(log::Severity::Info, args...);
+    log::print(log::Severity::Warning, args...);
   }
 
   /**
