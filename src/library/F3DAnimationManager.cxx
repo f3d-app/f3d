@@ -1,7 +1,7 @@
 #include "F3DAnimationManager.h"
 
-#include "f3d_log.h"
 #include "f3d_interactor.h"
+#include "f3d_log.h"
 #include "f3d_options.h"
 #include "f3d_window.h"
 #include "vtkF3DRenderer.h"
