@@ -2,10 +2,10 @@
 
 #include "F3DAnimationManager.h"
 #include "F3DConfig.h"
-#include "f3d_log.h"
 #include "f3d_loader.h"
-#include "f3d_window.h"
+#include "f3d_log.h"
 #include "f3d_options.h"
+#include "f3d_window.h"
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRendererWithColoring.h"
@@ -344,7 +344,8 @@ void interactor::InitializeAnimation(vtkImporter* importer)
 {
   if (!this->Internals->Loader)
   {
-    f3d::log::print(f3d::log::Severity::Error, "Please SetLoader before initializing the animation");
+    f3d::log::print(
+      f3d::log::Severity::Error, "Please SetLoader before initializing the animation");
     return;
   }
   this->Internals->AnimationManager.Initialize(
@@ -434,7 +435,8 @@ bool interactor::playInteraction(const std::string& file)
 {
   if (!vtksys::SystemTools::FileExists(file))
   {
-    f3d::log::print(f3d::log::Severity::Error, "Interaction record file to play does not exist ", file);
+    f3d::log::print(
+      f3d::log::Severity::Error, "Interaction record file to play does not exist ", file);
     return false;
   }
   else
