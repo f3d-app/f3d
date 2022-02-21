@@ -1,16 +1,19 @@
 /**
- * @class   F3DLog
+ * @class   log
  * @brief   Class used to show logs in F3D
  *
+ * TODO improve doc
  */
 
-#ifndef F3DLog_h
-#define F3DLog_h
+#ifndef f3d_log_h
+#define f3d_log_h
 
 #include <sstream>
 #include <string>
 
-class F3DLog
+namespace f3d
+{
+class log
 {
 public:
   enum class Severity : unsigned char
@@ -21,42 +24,43 @@ public:
   };
 
   template<typename... Args>
-  static void Print(Severity sev, Args... args)
+  static void print(Severity sev, Args... args)
   {
     std::stringstream ss;
-    AppendArg(ss, args...);
-    PrintInternal(sev, ss.str());
+    appendArg(ss, args...);
+    printInternal(sev, ss.str());
   }
 
   /**
    * If output window is a vtkF3DConsoleOutputWindow,
    * set the coloring usage.
    */
-  static void SetUseColoring(bool use);
+  static void setUseColoring(bool use);
 
   /**
    * Set if any log should be shown or not.
    */
-  static void SetQuiet(bool quiet);
+  static void setQuiet(bool quiet);
 
   /**
    * If output window is a vtkF3DWin32OutputWindow,
    * this calls WaitForUser on the output window.
    * No effect otherwise.
    */
-  static void WaitForUser();
+  static void waitForUser();
 
 protected:
-  static void AppendArg(std::stringstream&) {}
+  static void appendArg(std::stringstream&) {}
 
   template<typename T, typename... Args>
-  static void AppendArg(std::stringstream& ss, T value, Args... args)
+  static void appendArg(std::stringstream& ss, T value, Args... args)
   {
     ss << value;
-    AppendArg(ss, args...);
+    appendArg(ss, args...);
   }
 
-  static void PrintInternal(Severity sev, const std::string& msg);
+  static void printInternal(Severity sev, const std::string& msg);
 };
+}
 
 #endif

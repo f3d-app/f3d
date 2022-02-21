@@ -2,7 +2,7 @@
 
 #include "F3DAnimationManager.h"
 #include "F3DConfig.h"
-#include "F3DLog.h"
+#include "f3d_log.h"
 #include "f3d_loader.h"
 #include "f3d_window.h"
 #include "vtkF3DInteractorEventRecorder.h"
@@ -318,7 +318,7 @@ void interactor::InitializeAnimation(vtkImporter* importer)
 {
   if (!this->Internals->Loader)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Please SetLoader before initializing the animation");
+    f3d::log::print(f3d::log::Severity::Error, "Please SetLoader before initializing the animation");
     return;
   }
   this->Internals->AnimationManager.Initialize(
@@ -408,7 +408,7 @@ bool interactor::playInteraction(const std::string& file)
 {
   if (!vtksys::SystemTools::FileExists(file))
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Interaction record file to play does not exist ", file);
+    f3d::log::print(f3d::log::Severity::Error, "Interaction record file to play does not exist ", file);
     return false;
   }
   else
@@ -424,7 +424,7 @@ bool interactor::playInteraction(const std::string& file)
   // Recorder can stop the interactor, make sure it is still running
   if (this->Internals->Interactor->GetDone())
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Interactor has been stopped");
+    f3d::log::print(f3d::log::Severity::Error, "Interactor has been stopped");
     return false;
   }
   return true;
@@ -436,7 +436,7 @@ bool interactor::recordInteraction(const std::string& file)
   if (file.empty())
   {
     // TODO improve VTK to check file opening
-    F3DLog::Print(F3DLog::Severity::Error, "Interaction record file is empty");
+    f3d::log::print(f3d::log::Severity::Error, "Interaction record file is empty");
     return false;
   }
 

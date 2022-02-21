@@ -1,7 +1,7 @@
 #include "F3DConfig.h"
 #include "F3DException.h"
-#include "F3DLog.h"
 #include "F3DStarter.h"
+#include "f3d_log.h"
 
 int main(int argc, char** argv)
 {
@@ -19,7 +19,7 @@ int main(int argc, char** argv)
   }
   catch (...)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "F3D encountered an unexpected exception");
+    f3d::log::print(f3d::log::Severity::Error, "F3D encountered an unexpected exception");
     exit(EXIT_FAILURE);
   }
 

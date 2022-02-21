@@ -1,9 +1,9 @@
 #include "f3d_loader.h"
 
-#include "F3DLog.h"
 #include "F3DReaderFactory.h"
 #include "F3DReaderInstantiator.h"
 #include "f3d_interactor.h"
+#include "f3d_log.h"
 #include "f3d_options.h"
 #include "f3d_window.h"
 #include "vtkF3DGenericImporter.h"
@@ -106,19 +106,19 @@ void DisplayImporterDescription(vtkImporter* importer)
   vtkIdType availCameras = importer->GetNumberOfCameras();
   if (availCameras <= 0)
   {
-    F3DLog::Print(F3DLog::Severity::Info, "No camera available in this file");
+    f3d::log::print(f3d::log::Severity::Info, "No camera available in this file");
   }
   else
   {
-    F3DLog::Print(F3DLog::Severity::Info, "Camera(s) available in this file are:");
+    f3d::log::print(f3d::log::Severity::Info, "Camera(s) available in this file are:");
   }
   for (int i = 0; i < availCameras; i++)
   {
-    F3DLog::Print(F3DLog::Severity::Info, i, ": ", importer->GetCameraName(i));
+    f3d::log::print(f3d::log::Severity::Info, i, ": ", importer->GetCameraName(i));
   }
-  F3DLog::Print(F3DLog::Severity::Info, "\n");
+  f3d::log::print(f3d::log::Severity::Info, "\n");
 #endif
-  F3DLog::Print(F3DLog::Severity::Info, importer->GetOutputsDescription());
+  f3d::log::print(f3d::log::Severity::Info, importer->GetOutputsDescription());
 }
 }
 
@@ -162,7 +162,7 @@ loader::loader(const options& options)
 
   // Make sure to initialize the output window
   // after the object factory and before the first usage.
-  F3DLog::SetQuiet(false);
+  f3d::log::setQuiet(false);
 }
 
 //----------------------------------------------------------------------------
@@ -188,7 +188,7 @@ void loader::addFile(const std::string& path, bool recursive)
   std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
   if (!vtksys::SystemTools::FileExists(fullPath))
   {
-    F3DLog::Print(F3DLog::Severity::Error, "File ", fullPath, " does not exist");
+    f3d::log::print(f3d::log::Severity::Error, "File ", fullPath, " does not exist");
     return;
   }
 
@@ -324,11 +324,11 @@ bool loader::loadFile(loader::LoadFileEnum load)
   // Reset loadedFile
   this->Internals->LoadedFile = false;
 
-  F3DLog::SetQuiet(this->Internals->Options.get<bool>("quiet"));
+  f3d::log::setQuiet(this->Internals->Options.get<bool>("quiet"));
 
   if (!this->Internals->Window)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "No window provided, aborting\n");
+    f3d::log::print(f3d::log::Severity::Error, "No window provided, aborting\n");
     return this->Internals->LoadedFile;
   }
 
@@ -340,11 +340,11 @@ bool loader::loadFile(loader::LoadFileEnum load)
   {
     if (filePath.empty())
     {
-      F3DLog::Print(F3DLog::Severity::Info, "No file to load provided\n");
+      f3d::log::print(f3d::log::Severity::Info, "No file to load provided\n");
     }
     else
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Loading: ", filePath, "\n");
+      f3d::log::print(f3d::log::Severity::Info, "Loading: ", filePath, "\n");
     }
   }
 
@@ -363,8 +363,8 @@ bool loader::loadFile(loader::LoadFileEnum load)
     vtkF3DGenericImporter::SafeDownCast(this->Internals->Importer);
   if (!this->Internals->Importer)
   {
-    F3DLog::Print(
-      F3DLog::Severity::Warning, filePath, " is not a file of a supported file format\n");
+    f3d::log::print(
+      f3d::log::Severity::Warning, filePath, " is not a file of a supported file format\n");
     fileInfo += " [UNSUPPORTED]";
     this->Internals->Window->Initialize(false, fileInfo);
     this->Internals->Window->update();

@@ -1,6 +1,6 @@
 #include "F3DAnimationManager.h"
 
-#include "F3DLog.h"
+#include "f3d_log.h"
 #include "f3d_interactor.h"
 #include "f3d_options.h"
 #include "f3d_window.h"
@@ -26,28 +26,28 @@ void F3DAnimationManager::Initialize(const f3d::options* options, f3d::interacto
   this->Options = options;
   if (!this->Options)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Options is empty");
+    f3d::log::print(f3d::log::Severity::Error, "Options is empty");
     return;
   }
 
   this->Interactor = interactor;
   if (!this->Interactor)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Interactor is empty");
+    f3d::log::print(f3d::log::Severity::Error, "Interactor is empty");
     return;
   }
 
   this->Window = window;
   if (!this->Window)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Window is empty");
+    f3d::log::print(f3d::log::Severity::Error, "Window is empty");
     return;
   }
 
   this->Importer = importer;
   if (!this->Importer)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Importer is empty");
+    f3d::log::print(f3d::log::Severity::Error, "Importer is empty");
     return;
   }
 
@@ -87,28 +87,28 @@ void F3DAnimationManager::Initialize(const f3d::options* options, f3d::interacto
   {
     if (availAnimations <= 0)
     {
-      F3DLog::Print(F3DLog::Severity::Info, "No animations available in this file");
+      f3d::log::print(f3d::log::Severity::Info, "No animations available in this file");
     }
     else
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Animation(s) available in this file are:");
+      f3d::log::print(f3d::log::Severity::Info, "Animation(s) available in this file are:");
     }
     for (int i = 0; i < availAnimations; i++)
     {
-      F3DLog::Print(F3DLog::Severity::Info, i, ": ", this->Importer->GetAnimationName(i));
+      f3d::log::print(f3d::log::Severity::Info, i, ": ", this->Importer->GetAnimationName(i));
     }
-    F3DLog::Print(F3DLog::Severity::Info, "\n");
+    f3d::log::print(f3d::log::Severity::Info, "\n");
   }
 
   int animationIndex = options->get<int>("animation-index");
   if (animationIndex != 0 && availAnimations <= 0)
   {
-    F3DLog::Print(F3DLog::Severity::Warning,
+    f3d::log::print(f3d::log::Severity::Warning,
       "An animation index has been specified but there are no animation available.");
   }
   else if (animationIndex > 0 && animationIndex >= availAnimations)
   {
-    F3DLog::Print(F3DLog::Severity::Warning,
+    f3d::log::print(f3d::log::Severity::Warning,
       "Specified animation index is greater than the highest possible animation index, enabling "
       "the first animation.");
 
