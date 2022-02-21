@@ -1,11 +1,11 @@
 #include "f3d_options.h"
 
 #include "F3DConfig.h"
-#include "F3DOperators.h"
 
 #include "F3DLog.h"
 
 #include <map>
+#include <variant>
 
 namespace f3d
 {
@@ -13,7 +13,66 @@ namespace f3d
 class options::F3DInternals
 {
 public:
-  std::map<std::string, std::string> Options;
+  template<typename T>
+  void set(const std::string& name, const T& value)
+  {
+    if (this->CheckExists)
+    {
+      try
+      {
+        T& opt = std::get<T>(this->Options.at(name));
+        opt = value;
+      }
+      catch (std::bad_variant_access const&)
+      {
+        F3DLog::Print(
+          F3DLog::Severity::Error, "Trying to set option ", name, " with incompatible type");
+        return;
+      }
+      catch (const std::out_of_range&)
+      {
+        F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
+        return;
+      }
+    }
+    else
+    {
+      this->Options[name] = value;
+    }
+  }
+
+  template<typename T>
+  void get(const std::string& name, T& value) const
+  {
+    try
+    {
+      const T& opt = std::get<T>(this->Options.at(name));
+      value = opt;
+    }
+    catch (const std::bad_variant_access&)
+    {
+      F3DLog::Print(
+        F3DLog::Severity::Error, "Trying to get option ", name, " with incompatible type");
+      return;
+    }
+    catch (const std::out_of_range&)
+    {
+      F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
+      return;
+    }
+  }
+
+  template<typename T>
+  T get(const std::string& name) const
+  {
+    T val = {};
+    this->get(name, val);
+    return val;
+  }
+
+  std::map<std::string,
+    std::variant<bool, int, double, std::string, std::vector<int>, std::vector<double> > >
+    Options;
   bool CheckExists = false;
 };
 
@@ -30,8 +89,8 @@ options::options()
   this->set("geometry-only", false);
   this->set("progress", false);
   this->set("camera-index", 0);
-  this->set("color", std::vector<double>({ 1., 1., 1. }));
-  this->set("emissive-factor", std::vector<double>({ 1., 1., 1. }));
+  this->set("color", { 1., 1., 1. });
+  this->set("emissive-factor", { 1., 1., 1. });
   this->set("line-width", 1.0);
   this->set("metallic", 0.0);
   this->set("normal-scale", 1.0);
@@ -48,9 +107,9 @@ options::options()
   this->set("scalars", F3DReservedString);
   this->set("component", -1);
   this->set("fullscreen", false);
-  this->set("resolution", std::vector<int>(1000, 600));
+  this->set("resolution", { 1000, 600 });
   this->set("hdri", "");
-  this->set("background-color", std::vector<double>({ 0.2, 0.2, 0.2 }));
+  this->set("background-color", { 0.2, 0.2, 0.2 });
   this->set("up", "+Y");
   this->set("font-file", "");
 
@@ -64,9 +123,8 @@ options::options()
   this->set("camera-position", std::vector<double>());
   this->set("camera-view-angle", 0.0);
   this->set("camera-view-up", std::vector<double>());
-  this->set("colormap",
-    std::vector<double>(
-      { 0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 }));
+  this->set(
+    "colormap", { 0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 });
   this->set("denoise", false);
   this->set("depth-peeling", false);
   this->set("edges", false);
@@ -106,67 +164,129 @@ options& options::operator=(const options& opt)
 }
 
 //----------------------------------------------------------------------------
-template<typename T>
-void options::set(const std::string& name, const T& value)
+void options::set(const std::string& name, bool value)
 {
-  if (this->Internals->CheckExists &&
-    this->Internals->Options.find(name) == this->Internals->Options.end())
-  {
-    F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
-    return;
-  }
-
-  std::stringstream ss;
-  ss << value;
-  this->Internals->Options[name] = ss.str();
+  this->Internals->set(name, value);
 }
 
 //----------------------------------------------------------------------------
-template void options::set<>(const std::string& name, const bool& value);
-template void options::set<>(const std::string& name, const int& value);
-template void options::set<>(const std::string& name, const double& value);
-template void options::set<>(const std::string& name, const std::string& value);
-template void options::set<>(const std::string& name, const std::vector<int>& value);
-template void options::set<>(const std::string& name, const std::vector<double>& value);
-
-//----------------------------------------------------------------------------
-template<typename T>
-void options::get(const std::string& name, T& value) const
+void options::set(const std::string& name, int value)
 {
-  if (this->Internals->CheckExists &&
-    this->Internals->Options.find(name) == this->Internals->Options.end())
-  {
-    F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
-    return;
-  }
-
-  std::stringstream ss(this->Internals->Options[name]);
-  ss >> value;
+  this->Internals->set(name, value);
 }
 
 //----------------------------------------------------------------------------
-template void options::get<>(const std::string& name, bool& value) const;
-template void options::get<>(const std::string& name, int& value) const;
-template void options::get<>(const std::string& name, double& value) const;
-template void options::get<>(const std::string& name, std::string& value) const;
-template void options::get<>(const std::string& name, std::vector<int>& value) const;
-template void options::get<>(const std::string& name, std::vector<double>& value) const;
-
-//----------------------------------------------------------------------------
-template<typename T>
-T options::get(const std::string& name) const
+void options::set(const std::string& name, double value)
 {
-  T value;
-  std::stringstream ss(this->Internals->Options.at(name));
-  ss >> value;
-  return value;
+  this->Internals->set(name, value);
 }
 
 //----------------------------------------------------------------------------
-template bool options::get<>(const std::string& name) const;
-template int options::get<>(const std::string& name) const;
-template double options::get<>(const std::string& name) const;
-template std::string options::get<>(const std::string& name) const;
-template std::vector<int> options::get<>(const std::string& name) const;
-template std::vector<double> options::get<>(const std::string& name) const;
+void options::set(const std::string& name, const std::string& value)
+{
+  this->Internals->set(name, value);
+}
+
+//----------------------------------------------------------------------------
+void options::set(const std::string& name, const char* value)
+{
+  this->Internals->set(name, std::string(value));
+}
+
+//----------------------------------------------------------------------------
+void options::set(const std::string& name, const std::vector<int>& values)
+{
+  this->Internals->set(name, values);
+}
+
+//----------------------------------------------------------------------------
+void options::set(const std::string& name, const std::vector<double>& values)
+{
+  this->Internals->set(name, values);
+}
+
+//----------------------------------------------------------------------------
+void options::set(const std::string& name, std::initializer_list<int> values)
+{
+  this->Internals->set(name, std::vector<int>(values));
+}
+
+//----------------------------------------------------------------------------
+void options::set(const std::string& name, std::initializer_list<double> values)
+{
+  this->Internals->set(name, std::vector<double>(values));
+}
+
+//----------------------------------------------------------------------------
+void options::get(const std::string& name, bool& value) const
+{
+  this->Internals->get(name, value);
+}
+
+//----------------------------------------------------------------------------
+void options::get(const std::string& name, int& value) const
+{
+  this->Internals->get(name, value);
+}
+
+//----------------------------------------------------------------------------
+void options::get(const std::string& name, double& value) const
+{
+  this->Internals->get(name, value);
+}
+
+//----------------------------------------------------------------------------
+void options::get(const std::string& name, std::string& value) const
+{
+  this->Internals->get(name, value);
+}
+
+//----------------------------------------------------------------------------
+void options::get(const std::string& name, std::vector<int>& value) const
+{
+  this->Internals->get(name, value);
+}
+
+//----------------------------------------------------------------------------
+void options::get(const std::string& name, std::vector<double>& value) const
+{
+  this->Internals->get(name, value);
+}
+
+//----------------------------------------------------------------------------
+bool options::getAsBool(const std::string& name) const
+{
+  return this->Internals->get<bool>(name);
+}
+
+//----------------------------------------------------------------------------
+int options::getAsInt(const std::string& name) const
+{
+  return this->Internals->get<int>(name);
+}
+
+//----------------------------------------------------------------------------
+double options::getAsDouble(const std::string& name) const
+{
+  return this->Internals->get<double>(name);
+}
+
+//----------------------------------------------------------------------------
+std::string options::getAsString(const std::string& name) const
+{
+  return this->Internals->get<std::string>(name);
+}
+
+//----------------------------------------------------------------------------
+std::vector<int> options::getAsIntVector(const std::string& name) const
+{
+  return this->Internals->get<std::vector<int> >(name);
+}
+
+//----------------------------------------------------------------------------
+std::vector<double> options::getAsDoubleVector(const std::string& name) const
+{
+  return this->Internals->get<std::vector<double> >(name);
+}
+
 }

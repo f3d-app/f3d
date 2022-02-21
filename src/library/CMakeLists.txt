@@ -115,7 +115,7 @@ set_target_properties(libf3d PROPERTIES
   OUTPUT_NAME "f3d"
   )
 
-target_compile_features(libf3d PUBLIC cxx_std_11)
+target_compile_features(libf3d PRIVATE cxx_std_17)
 
 if(F3D_INSTALL_SDK)
   target_include_directories(libf3d
@@ -136,6 +136,9 @@ if(F3D_STRICT_BUILD)
   if(MSVC)
     # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
     target_compile_options(libf3d PRIVATE /W4 /WX /wd4275)
+
+    # There are warnings in VTK related to deprecated features in C++17
+    target_compile_definitions(libf3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
   else()
     target_compile_options(libf3d PRIVATE -Wall -Wextra -Wshadow -Werror)
   endif()
