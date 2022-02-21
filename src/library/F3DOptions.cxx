@@ -370,8 +370,7 @@ void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
   {
     this->PrintHelpPair(example.first, example.second, 50);
   }
-  f3d::log::info(
-    "\nReport bugs to https://github.com/f3d-app/f3d/issues");
+  f3d::log::info("\nReport bugs to https://github.com/f3d-app/f3d/issues");
   f3d::log::setUseColoring(true);
   f3d::log::waitForUser();
 }
@@ -454,8 +453,7 @@ void ConfigurationOptions::PrintReadersList()
     // sanity check
     if (reader->GetExtensions().size() < reader->GetMimeTypes().size())
     {
-      f3d::log::error(reader->GetName(),
-        " have different extensions and mime-types count.");
+      f3d::log::error(reader->GetName(), " have different extensions and mime-types count.");
       return;
     }
 
@@ -540,8 +538,7 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
 
   if (!file.is_open())
   {
-    f3d::log::error(
-      "Unable to open the configuration file: ", configFilePath);
+    f3d::log::error("Unable to open the configuration file: ", configFilePath);
     return false;
   }
 
@@ -553,8 +550,7 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
   bool success = Json::parseFromStream(builder, file, &root, &errs);
   if (!success)
   {
-    f3d::log::error(
-      "Unable to parse the configuration file ", configFilePath);
+    f3d::log::error("Unable to parse the configuration file ", configFilePath);
     f3d::log::error(errs);
     return false;
   }
