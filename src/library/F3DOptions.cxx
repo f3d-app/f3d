@@ -1,8 +1,8 @@
 #include "F3DOptions.h"
 
-#include "f3d_log.h"
 #include "F3DException.h"
 #include "F3DReaderFactory.h"
+#include "f3d_log.h"
 
 #include <vtkVersion.h>
 #include <vtk_jsoncpp.h>
@@ -370,7 +370,8 @@ void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
   {
     this->PrintHelpPair(example.first, example.second, 50);
   }
-  f3d::log::print(f3d::log::Severity::Info, "\nReport bugs to https://github.com/f3d-app/f3d/issues");
+  f3d::log::print(
+    f3d::log::Severity::Info, "\nReport bugs to https://github.com/f3d-app/f3d/issues");
   f3d::log::setUseColoring(true);
   f3d::log::waitForUser();
 }
