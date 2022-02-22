@@ -145,10 +145,10 @@ public:
 loader::loader(const options& options)
   : Internals(new loader::F3DInternals(options))
 {
-//#if NDEBUG
-//  vtkObject::GlobalWarningDisplayOff();
-//#endif
-// TODO  
+  //#if NDEBUG
+  //  vtkObject::GlobalWarningDisplayOff();
+  //#endif
+  // TODO
 
   // Disable vtkLogger in case VTK was built with log support
   vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_OFF);
