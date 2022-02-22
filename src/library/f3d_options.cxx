@@ -3,7 +3,7 @@
 #include "F3DConfig.h"
 #include "F3DOperators.h"
 
-#include "F3DLog.h"
+#include "f3d_log.h"
 
 #include <map>
 
@@ -112,7 +112,7 @@ void options::set(const std::string& name, const T& value)
   if (this->Internals->CheckExists &&
     this->Internals->Options.find(name) == this->Internals->Options.end())
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
+    f3d::log::error("Options ", name, " does not exist");
     return;
   }
 
@@ -136,7 +136,7 @@ void options::get(const std::string& name, T& value) const
   if (this->Internals->CheckExists &&
     this->Internals->Options.find(name) == this->Internals->Options.end())
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
+    f3d::log::error("Options ", name, " does not exist");
     return;
   }
 
