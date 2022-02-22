@@ -37,7 +37,7 @@
 #include <vtkVolumeProperty.h>
 #include <vtksys/SystemTools.hxx>
 
-#include "vtkF3DPostProcessFilter.h"
+#include <sstream>
 
 vtkStandardNewMacro(vtkF3DGenericImporter);
 

@@ -10,6 +10,8 @@
 #include <vtkPolyData.h>
 #include <vtkVolumeProperty.h>
 
+#include <sstream>
+
 vtkStandardNewMacro(vtkF3DRendererWithColoring);
 
 //----------------------------------------------------------------------------
