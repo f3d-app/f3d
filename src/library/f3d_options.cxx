@@ -14,30 +14,27 @@ class options::F3DInternals
 {
 public:
   template<typename T>
+  void init(const std::string& name, const T& value)
+  {
+    this->Options[name] = value;
+  }
+
+  template<typename T>
   void set(const std::string& name, const T& value)
   {
-    if (this->CheckExists)
+    try
     {
-      try
-      {
-        T& opt = std::get<T>(this->Options.at(name));
-        opt = value;
-      }
-      catch (std::bad_variant_access const&)
-      {
-        F3DLog::Print(
-          F3DLog::Severity::Error, "Trying to set option ", name, " with incompatible type");
-        return;
-      }
-      catch (const std::out_of_range&)
-      {
-        F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
-        return;
-      }
+      T& opt = std::get<T>(this->Options.at(name));
+      opt = value;
     }
-    else
+    catch (std::bad_variant_access const&)
     {
-      this->Options[name] = value;
+      F3DLog::Print(
+        F3DLog::Severity::Error, "Trying to set option ", name, " with incompatible type");
+    }
+    catch (const std::out_of_range&)
+    {
+      F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
     }
   }
 
@@ -73,7 +70,6 @@ public:
   std::map<std::string,
     std::variant<bool, int, double, std::string, std::vector<int>, std::vector<double> > >
     Options;
-  bool CheckExists = false;
 };
 
 //----------------------------------------------------------------------------
@@ -81,70 +77,68 @@ options::options()
   : Internals(new options::F3DInternals)
 {
   // General
-  this->set("quiet", false);
-  this->set("verbose", false);
+  this->Internals->init("quiet", false);
+  this->Internals->init("verbose", false);
 
   // Loader/Loading
-  this->set("animation-index", 0);
-  this->set("geometry-only", false);
-  this->set("progress", false);
-  this->set("camera-index", 0);
-  this->set("color", { 1., 1., 1. });
-  this->set("emissive-factor", { 1., 1., 1. });
-  this->set("line-width", 1.0);
-  this->set("metallic", 0.0);
-  this->set("normal-scale", 1.0);
-  this->set("opacity", 1.0);
-  this->set("point-size", 10.0);
-  this->set("roughness", 0.3);
-  this->set("texture-base-color", "");
-  this->set("texture-emissive", "");
-  this->set("texture-material", "");
-  this->set("texture-normal", "");
+  this->Internals->init("animation-index", 0);
+  this->Internals->init("geometry-only", false);
+  this->Internals->init("progress", false);
+  this->Internals->init("camera-index", 0);
+  this->Internals->init("color", std::vector<double>{ 1., 1., 1. });
+  this->Internals->init("emissive-factor", std::vector<double>{ 1., 1., 1. });
+  this->Internals->init("line-width", 1.0);
+  this->Internals->init("metallic", 0.0);
+  this->Internals->init("normal-scale", 1.0);
+  this->Internals->init("opacity", 1.0);
+  this->Internals->init("point-size", 10.0);
+  this->Internals->init("roughness", 0.3);
+  this->Internals->init("texture-base-color", "");
+  this->Internals->init("texture-emissive", "");
+  this->Internals->init("texture-material", "");
+  this->Internals->init("texture-normal", "");
 
   // Loading but should not
-  this->set("cells", false);
-  this->set("scalars", F3DReservedString);
-  this->set("component", -1);
-  this->set("fullscreen", false);
-  this->set("resolution", { 1000, 600 });
-  this->set("hdri", "");
-  this->set("background-color", { 0.2, 0.2, 0.2 });
-  this->set("up", "+Y");
-  this->set("font-file", "");
+  this->Internals->init("cells", false);
+  this->Internals->init("scalars", F3DReservedString);
+  this->Internals->init("component", -1);
+  this->Internals->init("fullscreen", false);
+  this->Internals->init("resolution", std::vector<int>{ 1000, 600 });
+  this->Internals->init("hdri", "");
+  this->Internals->init("background-color", std::vector<double>{ 0.2, 0.2, 0.2 });
+  this->Internals->init("up", "+Y");
+  this->Internals->init("font-file", "");
 
   // Rendering/Dynamic
-  this->set("axis", false);
-  this->set("bar", false);
-  this->set("blur-background", false);
-  this->set("camera-azimuth-angle", 0.0);
-  this->set("camera-elevation-angle", 0.0);
-  this->set("camera-focal-point", std::vector<double>());
-  this->set("camera-position", std::vector<double>());
-  this->set("camera-view-angle", 0.0);
-  this->set("camera-view-up", std::vector<double>());
-  this->set(
-    "colormap", { 0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 });
-  this->set("denoise", false);
-  this->set("depth-peeling", false);
-  this->set("edges", false);
-  this->set("filename", false);
-  this->set("fps", false);
-  this->set("fxaa", false);
-  this->set("grid", false);
-  this->set("inverse", false);
-  this->set("metadata", false);
-  this->set("point-sprites", false);
-  this->set("range", std::vector<double>());
-  this->set("raytracing", false);
-  this->set("samples", 5);
-  this->set("ssao", false);
-  this->set("tone-mapping", false);
-  this->set("trackball", false);
-  this->set("volume", false);
-
-  // After initialization, set CheckExists flag to true
-  this->Internals->CheckExists = true;
+  this->Internals->init("axis", false);
+  this->Internals->init("bar", false);
+  this->Internals->init("blur-background", false);
+  this->Internals->init("camera-azimuth-angle", 0.0);
+  this->Internals->init("camera-elevation-angle", 0.0);
+  this->Internals->init("camera-focal-point", std::vector<double>());
+  this->Internals->init("camera-position", std::vector<double>());
+  this->Internals->init("camera-view-angle", 0.0);
+  this->Internals->init("camera-view-up", std::vector<double>());
+  this->Internals->init("colormap",
+    std::vector<double>{
+      0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 });
+  this->Internals->init("denoise", false);
+  this->Internals->init("depth-peeling", false);
+  this->Internals->init("edges", false);
+  this->Internals->init("filename", false);
+  this->Internals->init("fps", false);
+  this->Internals->init("fxaa", false);
+  this->Internals->init("grid", false);
+  this->Internals->init("inverse", false);
+  this->Internals->init("metadata", false);
+  this->Internals->init("point-sprites", false);
+  this->Internals->init("range", std::vector<double>());
+  this->Internals->init("raytracing", false);
+  this->Internals->init("samples", 5);
+  this->Internals->init("ssao", false);
+  this->Internals->init("tone-mapping", false);
+  this->Internals->init("trackball", false);
+  this->Internals->init("volume", false);
 };
 
 //----------------------------------------------------------------------------
