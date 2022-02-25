@@ -93,10 +93,10 @@ options::options()
   this->Internals->init("opacity", 1.0);
   this->Internals->init("point-size", 10.0);
   this->Internals->init("roughness", 0.3);
-  this->Internals->init("texture-base-color", "");
-  this->Internals->init("texture-emissive", "");
-  this->Internals->init("texture-material", "");
-  this->Internals->init("texture-normal", "");
+  this->Internals->init("texture-base-color", std::string());
+  this->Internals->init("texture-emissive", std::string());
+  this->Internals->init("texture-material", std::string());
+  this->Internals->init("texture-normal", std::string());
 
   // Loading but should not
   this->Internals->init("cells", false);
@@ -104,10 +104,10 @@ options::options()
   this->Internals->init("component", -1);
   this->Internals->init("fullscreen", false);
   this->Internals->init("resolution", std::vector<int>{ 1000, 600 });
-  this->Internals->init("hdri", "");
+  this->Internals->init("hdri", std::string());
   this->Internals->init("background-color", std::vector<double>{ 0.2, 0.2, 0.2 });
   this->Internals->init("up", "+Y");
-  this->Internals->init("font-file", "");
+  this->Internals->init("font-file", std::string());
 
   // Rendering/Dynamic
   this->Internals->init("axis", false);
