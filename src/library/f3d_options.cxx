@@ -5,6 +5,7 @@
 #include "F3DLog.h"
 
 #include <map>
+#include <type_traits>
 #include <variant>
 
 namespace f3d
@@ -16,12 +17,14 @@ public:
   template<typename T>
   void init(const std::string& name, const T& value)
   {
+    static_assert(!std::is_array_v<T> && !std::is_pointer_v<T>);
     this->Options[name] = value;
   }
 
   template<typename T>
   void set(const std::string& name, const T& value)
   {
+    static_assert(!std::is_array_v<T> && !std::is_pointer_v<T>);
     try
     {
       T& opt = std::get<T>(this->Options.at(name));
@@ -106,7 +109,7 @@ options::options()
   this->Internals->init("resolution", std::vector<int>{ 1000, 600 });
   this->Internals->init("hdri", std::string());
   this->Internals->init("background-color", std::vector<double>{ 0.2, 0.2, 0.2 });
-  this->Internals->init("up", "+Y");
+  this->Internals->init("up", std::string("+Y"));
   this->Internals->init("font-file", std::string());
 
   // Rendering/Dynamic
