@@ -14,10 +14,21 @@ namespace f3d
 class options::F3DInternals
 {
 public:
+  using OptionVariant =
+    std::variant<bool, int, double, std::string, std::vector<int>, std::vector<double> >;
+
+  template<typename T, typename U>
+  struct IsTypeValid;
+
+  template<typename T, typename... Ts>
+  struct IsTypeValid<T, std::variant<Ts...> > : public std::disjunction<std::is_same<T, Ts>...>
+  {
+  };
+
   template<typename T>
   void init(const std::string& name, const T& value)
   {
-    static_assert(!std::is_array_v<T> && !std::is_pointer_v<T>);
+    static_assert(IsTypeValid<T, OptionVariant>::value);
     this->Options[name] = value;
   }
 
@@ -70,9 +81,7 @@ public:
     return val;
   }
 
-  std::map<std::string,
-    std::variant<bool, int, double, std::string, std::vector<int>, std::vector<double> > >
-    Options;
+  std::map<std::string, OptionVariant> Options;
 };
 
 //----------------------------------------------------------------------------
