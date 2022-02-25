@@ -30,7 +30,7 @@ public:
       T& opt = std::get<T>(this->Options.at(name));
       opt = value;
     }
-    catch (std::bad_variant_access const&)
+    catch (const std::bad_variant_access&)
     {
       F3DLog::Print(
         F3DLog::Severity::Error, "Trying to set option ", name, " with incompatible type");
