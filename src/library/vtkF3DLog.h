@@ -7,7 +7,7 @@
 #ifndef vtkF3DLog_h
 #define vtkF3DLog_h
 
-#include <vtkObject>
+#include <vtkObject.h>
 
 #include <sstream>
 #include <string>
@@ -23,13 +23,10 @@ public:
     Error
   };
 
-  template<typename... Args>
-  static void Print(Severity sev, Args... args)
-  {
-    std::stringstream ss;
-    AppendArg(ss, args...);
-    PrintInternal(sev, ss.str());
-  }
+  /** 
+   * Print a message with corresponding severitry in the output window
+   */
+  static void Print(Severity sev, const std::string& msg);
 
   /**
    * If output window is a vtkF3DConsoleOutputWindow,
@@ -48,18 +45,6 @@ public:
    * No effect otherwise.
    */
   static void WaitForUser();
-
-protected:
-  static void AppendArg(std::stringstream&) {}
-
-  template<typename T, typename... Args>
-  static void AppendArg(std::stringstream& ss, T value, Args... args)
-  {
-    ss << value;
-    AppendArg(ss, args...);
-  }
-
-  static void PrintInternal(Severity sev, const std::string& msg);
 };
 
 #endif

@@ -4,42 +4,40 @@
 
 namespace f3d
 {
+
 //----------------------------------------------------------------------------
-template<typename... Args>
-static void log::info(Args... args)
+void log::infoInternal(const std::string& str)
 {
-  vtkF3DLog::print(log::Severity::Info, args...);
+  vtkF3DLog::Print(vtkF3DLog::Severity::Info, str);
 }
 
 //----------------------------------------------------------------------------
-template<typename... Args>
-static void log::warn(Args... args)
+void log::warnInternal(const std::string& str)
 {
-  vtkF3DLog::print(log::Severity::Warning, args...);
+  vtkF3DLog::Print(vtkF3DLog::Severity::Warning, str);
 }
 
 //----------------------------------------------------------------------------
-template<typename... Args>
-static void log::error(Args... args)
+void log::errorInternal(const std::string& str)
 {
-  vtkF3DLog::print(log::Severity::Error, args...);
+  vtkF3DLog::Print(vtkF3DLog::Severity::Error, str);
 }
 
 //----------------------------------------------------------------------------
 void log::setUseColoring(bool use)
 {
-  vtkF3DLog::setUseColoring(use);
+  vtkF3DLog::SetUseColoring(use);
 }
 
 //----------------------------------------------------------------------------
 void log::setQuiet(bool quiet)
 {
-  vtkF3DLog::setQuiet(quiet);
+  vtkF3DLog::SetQuiet(quiet);
 }
 
 //----------------------------------------------------------------------------
 void log::waitForUser()
 {
-  vtkF3DLog::waitForUser();
+  vtkF3DLog::WaitForUser();
 }
 }
