@@ -100,7 +100,8 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
     this->HDRIFile = vtksys::SystemTools::CollapseFullPath(this->HDRIFile);
     if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
     {
-      vtkF3DLog::Print(vtkF3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
+      vtkF3DLog::Print(
+        vtkF3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
     }
     else
     {
@@ -139,7 +140,8 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
       }
       else
       {
-        vtkF3DLog::Print(vtkF3DLog::Severity::Warning, std::string("Cannot open HDRI file ") + this->HDRIFile);
+        vtkF3DLog::Print(
+          vtkF3DLog::Severity::Warning, std::string("Cannot open HDRI file ") + this->HDRIFile);
       }
     }
   }
@@ -239,7 +241,8 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
     }
     else
     {
-      vtkF3DLog::Print(vtkF3DLog::Severity::Warning, std::string("Cannot find \"") + fontFile + "\" font file.");
+      vtkF3DLog::Print(
+        vtkF3DLog::Severity::Warning, std::string("Cannot find \"") + fontFile + "\" font file.");
     }
   }
 

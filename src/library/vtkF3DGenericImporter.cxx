@@ -122,8 +122,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
   if (!this->Reader->IsReaderValid())
   {
-    vtkF3DLog::Print(
-      vtkF3DLog::Severity::Error, std::string("File '") + this->Reader->GetFileName() + "' cannot be read.");
+    vtkF3DLog::Print(vtkF3DLog::Severity::Error,
+      std::string("File '") + this->Reader->GetFileName() + "' cannot be read.");
     return;
   }
 
@@ -137,8 +137,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   if (!ret)
   {
-    vtkF3DLog::Print(
-      vtkF3DLog::Severity::Error, std::string("File '") + this->Reader->GetFileName() + "' cannot be read.");
+    vtkF3DLog::Print(vtkF3DLog::Severity::Error,
+      std::string("File '") + this->Reader->GetFileName() + "' cannot be read.");
     return;
   }
 

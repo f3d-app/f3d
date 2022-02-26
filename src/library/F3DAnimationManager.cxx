@@ -103,8 +103,7 @@ void F3DAnimationManager::Initialize(const f3d::options* options, f3d::interacto
   int animationIndex = options->getAsInt("animation-index");
   if (animationIndex != 0 && availAnimations <= 0)
   {
-    f3d::log::warn(
-      "An animation index has been specified but there are no animation available.");
+    f3d::log::warn("An animation index has been specified but there are no animation available.");
   }
   else if (animationIndex > 0 && animationIndex >= availAnimations)
   {

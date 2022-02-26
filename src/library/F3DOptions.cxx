@@ -2,10 +2,10 @@
 
 #include "cxxopts.hpp"
 
-#include "f3d_options.h"
-#include "f3d_log.h"
 #include "F3DException.h"
 #include "F3DReaderFactory.h"
+#include "f3d_log.h"
+#include "f3d_options.h"
 
 #include <vtkVersion.h>
 #include <vtk_jsoncpp.h>
@@ -452,8 +452,7 @@ void ConfigurationOptions::PrintReadersList()
     // sanity check
     if (reader->GetExtensions().size() < reader->GetMimeTypes().size())
     {
-      f3d::log::error(reader->GetName(),
-        " have different extensions and mime-types count.");
+      f3d::log::error(reader->GetName(), " have different extensions and mime-types count.");
       return;
     }
 

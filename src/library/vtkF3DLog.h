@@ -23,7 +23,7 @@ public:
     Error
   };
 
-  /** 
+  /**
    * Print a message with corresponding severitry in the output window
    */
   static void Print(Severity sev, const std::string& msg);

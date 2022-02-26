@@ -1,7 +1,7 @@
 #include "vtkF3DRendererWithColoring.h"
 
-#include "vtkF3DLog.h"
 #include "f3d_options.h"
+#include "vtkF3DLog.h"
 
 #include <vtkColorTransferFunction.h>
 #include <vtkDataSetAttributes.h>
@@ -429,8 +429,8 @@ void vtkF3DRendererWithColoring::UpdateInternalActors()
       vtkSmartVolumeMapper::SafeDownCast(this->VolumeProp->GetMapper());
     if (volumeVisibility && (!mapper || !mapper->GetInput() || !this->ArrayForColoring))
     {
-      vtkF3DLog::Print(
-        vtkF3DLog::Severity::Error, "Cannot use volume with this dataset or with the requested array");
+      vtkF3DLog::Print(vtkF3DLog::Severity::Error,
+        "Cannot use volume with this dataset or with the requested array");
       volumeVisibility = false;
     }
     if (volumeVisibility && this->VolumeMapper && this->VolumeMapper->GetInput() &&
@@ -580,7 +580,8 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(vtkDataArray* a
 
   if (component >= array->GetNumberOfComponents())
   {
-    vtkF3DLog::Print(vtkF3DLog::Severity::Warning, std::string("Invalid component index: ") + std::to_string(component));
+    vtkF3DLog::Print(vtkF3DLog::Severity::Warning,
+      std::string("Invalid component index: ") + std::to_string(component));
     return;
   }
 
