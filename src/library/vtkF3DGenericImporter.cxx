@@ -144,7 +144,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     return;
   }
 
-  bool verbose = (this->Options->get<bool>("verbose"));
+  bool verbose = (this->Options->getAsBool("verbose"));
   if (verbose)
   {
     this->OutputDescription =
@@ -173,7 +173,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   surface->GetBounds(bounds);
   vtkBoundingBox bbox(bounds);
 
-  double pointSize = this->Options->get<double>("point-size");
+  double pointSize = this->Options->getAsDouble("point-size");
   double gaussianPointSize = 1.0;
   if (bbox.IsValid())
   {
@@ -198,11 +198,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     ? vtkDataSet::SafeDownCast(image)
     : vtkDataSet::SafeDownCast(surface);
 
-  std::string usedArray = this->Options->get<std::string>("scalars");
+  std::string usedArray = this->Options->getAsString("scalars");
   this->PointDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
   this->CellDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetCellData());
   vtkDataSetAttributes* dataForColoring =
-    this->Options->get<bool>("cells") ? this->CellDataForColoring : this->PointDataForColoring;
+    this->Options->getAsBool("cells") ? this->CellDataForColoring : this->PointDataForColoring;
 
   // Recover an array for coloring if we ever need it
   this->ArrayIndexForColoring = -1;
@@ -264,13 +264,13 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->GeometryActor->SetMapper(this->PolyDataMapper);
   this->GeometryActor->GetProperty()->SetInterpolationToPBR();
 
-  std::vector<double> color = this->Options->get<std::vector<double> >("color");
-  double opacity = this->Options->get<double>("opacity");
+  std::vector<double> color = this->Options->getAsDoubleVector("color");
+  double opacity = this->Options->getAsDouble("opacity");
   this->GeometryActor->GetProperty()->SetColor(color.data());
   this->GeometryActor->GetProperty()->SetOpacity(opacity);
-  this->GeometryActor->GetProperty()->SetRoughness(this->Options->get<double>("roughness"));
-  this->GeometryActor->GetProperty()->SetMetallic(this->Options->get<double>("metallic"));
-  this->GeometryActor->GetProperty()->SetLineWidth(this->Options->get<double>("line-width"));
+  this->GeometryActor->GetProperty()->SetRoughness(this->Options->getAsDouble("roughness"));
+  this->GeometryActor->GetProperty()->SetMetallic(this->Options->getAsDouble("metallic"));
+  this->GeometryActor->GetProperty()->SetLineWidth(this->Options->getAsDouble("line-width"));
   this->GeometryActor->GetProperty()->SetPointSize(pointSize);
 
   this->PointSpritesActor->SetMapper(this->PointGaussianMapper);
@@ -279,16 +279,16 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   // Textures
   this->GeometryActor->GetProperty()->SetBaseColorTexture(
-    this->GetTexture(this->Options->get<std::string>("texture-base-color"), true));
+    this->GetTexture(this->Options->getAsString("texture-base-color"), true));
   this->GeometryActor->GetProperty()->SetORMTexture(
-    this->GetTexture(this->Options->get<std::string>("texture-material")));
+    this->GetTexture(this->Options->getAsString("texture-material")));
   this->GeometryActor->GetProperty()->SetEmissiveTexture(
-    this->GetTexture(this->Options->get<std::string>("texture-emissive"), true));
+    this->GetTexture(this->Options->getAsString("texture-emissive"), true));
   this->GeometryActor->GetProperty()->SetEmissiveFactor(
-    this->Options->get<std::vector<double> >("emissive-factor").data());
+    this->Options->getAsDoubleVector("emissive-factor").data());
   this->GeometryActor->GetProperty()->SetNormalTexture(
-    this->GetTexture(this->Options->get<std::string>("texture-normal")));
-  this->GeometryActor->GetProperty()->SetNormalScale(this->Options->get<double>("normal-scale"));
+    this->GetTexture(this->Options->getAsString("texture-normal")));
+  this->GeometryActor->GetProperty()->SetNormalScale(this->Options->getAsDouble("normal-scale"));
 
   // add props
   ren->AddActor2D(this->ScalarBarActor);

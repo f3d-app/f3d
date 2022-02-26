@@ -83,7 +83,7 @@ void F3DAnimationManager::Initialize(const f3d::options* options, f3d::interacto
     this->ProgressWidget = nullptr;
   }
 
-  if (options->get<bool>("verbose"))
+  if (options->getAsBool("verbose"))
   {
     if (availAnimations <= 0)
     {
@@ -100,7 +100,7 @@ void F3DAnimationManager::Initialize(const f3d::options* options, f3d::interacto
     F3DLog::Print(F3DLog::Severity::Info, "\n");
   }
 
-  int animationIndex = options->get<int>("animation-index");
+  int animationIndex = options->getAsInt("animation-index");
   if (animationIndex != 0 && availAnimations <= 0)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
@@ -195,7 +195,7 @@ void F3DAnimationManager::ToggleAnimation()
     {
       this->CallBackId =
         this->Interactor->createTimerCallBack(1000.0 / this->FrameRate, [this]() { this->Tick(); });
-      if (this->Options->get<int>("camera-index") >= 0)
+      if (this->Options->getAsInt("camera-index") >= 0)
       {
         this->Interactor->disableCameraMovement();
       }

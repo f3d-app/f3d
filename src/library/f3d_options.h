@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 // TODO documentation
 
@@ -17,14 +18,29 @@ public:
 
   options& operator=(const options& opt);
 
-  template<typename T>
-  void set(const std::string& name, const T& value);
+  void set(const std::string& name, bool value);
+  void set(const std::string& name, int value);
+  void set(const std::string& name, double value);
+  void set(const std::string& name, const std::string& value);
+  void set(const std::string& name, const char* value);
+  void set(const std::string& name, const std::vector<int>& values);
+  void set(const std::string& name, const std::vector<double>& values);
+  void set(const std::string& name, std::initializer_list<int> values);
+  void set(const std::string& name, std::initializer_list<double> values);
 
-  template<typename T>
-  void get(const std::string& name, T& value) const;
+  void get(const std::string& name, bool& value) const;
+  void get(const std::string& name, int& value) const;
+  void get(const std::string& name, double& value) const;
+  void get(const std::string& name, std::string& value) const;
+  void get(const std::string& name, std::vector<int>& value) const;
+  void get(const std::string& name, std::vector<double>& value) const;
 
-  template<typename T>
-  T get(const std::string& name) const;
+  bool getAsBool(const std::string& name) const;
+  int getAsInt(const std::string& name) const;
+  double getAsDouble(const std::string& name) const;
+  std::string getAsString(const std::string& name) const;
+  std::vector<int> getAsIntVector(const std::string& name) const;
+  std::vector<double> getAsDoubleVector(const std::string& name) const;
 
 private:
   class F3DInternals;

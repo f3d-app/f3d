@@ -70,7 +70,6 @@ void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
   options.get("raytracing", this->UseRaytracing);
   options.get("samples", this->RaytracingSamples);
   options.get("denoise", this->UseRaytracingDenoiser);
-  options.get("depth-peeling", this->UseDepthPeeling);
   options.get("ssao", this->UseSSAOPass);
   options.get("fxaa", this->UseFXAAPass);
   options.get("tone-mapping", this->UseToneMappingPass);
@@ -78,6 +77,10 @@ void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
   options.get("trackball", this->UseTrackball);
   options.get("hdri", this->HDRIFile);
   options.get("verbose", this->Verbose);
+
+  // this->UseDepthPeeling is a vtkTypeBool (aka int), so we have to use the explicit
+  // type function to avoid a type mismatch
+  this->UseDepthPeeling = options.getAsBool("depth-peeling");
 }
 
 //----------------------------------------------------------------------------
@@ -143,7 +146,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   }
 
   // parse up vector
-  std::string up = options.get<std::string>("up");
+  std::string up = options.getAsString("up");
   if (up.size() == 2)
   {
     char sign = up[0];
@@ -184,7 +187,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   }
   else
   {
-    this->SetBackground(options.get<std::vector<double> >("background-color").data());
+    this->SetBackground(options.getAsDoubleVector("background-color").data());
     this->AutomaticLightCreationOn();
   }
 
@@ -220,7 +223,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
 
-  std::string fontFile = options.get<std::string>("font-file");
+  std::string fontFile = options.getAsString("font-file");
   if (!fontFile.empty())
   {
     fontFile = vtksys::SystemTools::CollapseFullPath(fontFile);
