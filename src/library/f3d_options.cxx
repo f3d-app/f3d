@@ -1,8 +1,7 @@
 #include "f3d_options.h"
 
+#include "f3d_log.h"
 #include "F3DConfig.h"
-
-#include "F3DLog.h"
 
 #include <map>
 #include <type_traits>
@@ -43,12 +42,11 @@ public:
     }
     catch (const std::bad_variant_access&)
     {
-      F3DLog::Print(
-        F3DLog::Severity::Error, "Trying to set option ", name, " with incompatible type");
+      f3d::log::error("Trying to set option ", name, " with incompatible type");
     }
     catch (const std::out_of_range&)
     {
-      F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
+      f3d::log::error("Options ", name, " does not exist");
     }
   }
 
@@ -62,13 +60,12 @@ public:
     }
     catch (const std::bad_variant_access&)
     {
-      F3DLog::Print(
-        F3DLog::Severity::Error, "Trying to get option ", name, " with incompatible type");
+      f3d::log::error("Trying to get option ", name, " with incompatible type");
       return;
     }
     catch (const std::out_of_range&)
     {
-      F3DLog::Print(F3DLog::Severity::Error, "Options ", name, " does not exist");
+      f3d::log::error("Options ", name, " does not exist");
       return;
     }
   }

@@ -1,8 +1,8 @@
 #include "vtkF3DRenderer.h"
 
 #include "F3DConfig.h"
-#include "F3DLog.h"
 #include "f3d_options.h"
+#include "vtkF3DLog.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
 
@@ -76,7 +76,6 @@ void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
   options.get("blur-background", this->UseBlurBackground);
   options.get("trackball", this->UseTrackball);
   options.get("hdri", this->HDRIFile);
-  options.get("verbose", this->Verbose);
 
   // this->UseDepthPeeling is a vtkTypeBool (aka int), so we have to use the explicit
   // type function to avoid a type mismatch
@@ -88,7 +87,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
 {
   if (!this->RenderWindow)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "No render window linked");
+    vtkF3DLog::Print(vtkF3DLog::Severity::Error, "No render window linked");
     return;
   }
 
@@ -101,7 +100,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
     this->HDRIFile = vtksys::SystemTools::CollapseFullPath(this->HDRIFile);
     if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "HDRI file does not exist ", this->HDRIFile);
+      vtkF3DLog::Print(vtkF3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
     }
     else
     {
@@ -140,7 +139,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
       }
       else
       {
-        F3DLog::Print(F3DLog::Severity::Warning, "Cannot open HDRI file ", this->HDRIFile);
+        vtkF3DLog::Print(vtkF3DLog::Severity::Warning, std::string("Cannot open HDRI file ") + this->HDRIFile);
       }
     }
   }
@@ -240,7 +239,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
     }
     else
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "Cannot find \"", fontFile, "\" font file.");
+      vtkF3DLog::Print(vtkF3DLog::Severity::Warning, std::string("Cannot find \"") + fontFile + "\" font file.");
     }
   }
 
@@ -316,7 +315,7 @@ void vtkF3DRenderer::SetupRenderPasses()
 #else
   if (this->UseRaytracing || this->UseRaytracingDenoiser)
   {
-    F3DLog::Print(F3DLog::Severity::Warning,
+    vtkF3DLog::Print(vtkF3DLog::Severity::Warning,
       "Raytracing options can't be used if F3D has not been built with raytracing");
   }
 #endif
@@ -334,6 +333,12 @@ void vtkF3DRenderer::ShowOptions()
   this->ShowMetaData(this->MetaDataVisible);
 
   this->UpdateInternalActors();
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DRenderer::GetRenderingDescription()
+{
+  return this->GridInfo;
 }
 
 //----------------------------------------------------------------------------
@@ -376,7 +381,12 @@ void vtkF3DRenderer::ShowGrid(bool show)
 
   vtkBoundingBox bbox(bounds);
 
-  if (bbox.IsValid())
+  if (!bbox.IsValid())
+  {
+    show = false;
+  }
+
+  if (show)
   {
     this->SetClippingRangeExpansion(0.99);
 
@@ -390,11 +400,11 @@ void vtkF3DRenderer::ShowGrid(bool show)
       gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
     }
 
-    if (this->Verbose && show)
-    {
-      F3DLog::Print(F3DLog::Severity::Info, "Using grid unit square size = ", unitSquare, "\n",
-        "Grid origin set to [", gridPos[0], ", ", gridPos[1], ", ", gridPos[2], "]\n");
-    }
+    std::stringstream stream;
+    stream << "Using grid unit square size = " << unitSquare << "\n"
+           << "Grid origin set to [" << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2]
+           << "]\n\n";
+    this->GridInfo = stream.str();
 
     vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
     gridMapper->SetFadeDistance(diag);
@@ -413,7 +423,7 @@ void vtkF3DRenderer::ShowGrid(bool show)
   else
   {
     this->SetClippingRangeExpansion(0);
-    show = false;
+    this->GridInfo = "";
   }
   this->GridActor->SetVisibility(show);
   this->ResetCameraClippingRange();
@@ -765,7 +775,7 @@ bool vtkF3DRenderer::IsBackgroundDark()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::DumpSceneState()
+std::string vtkF3DRenderer::GetSceneDescription()
 {
   vtkCamera* cam = this->GetActiveCamera();
   double position[3];
@@ -774,9 +784,9 @@ void vtkF3DRenderer::DumpSceneState()
   cam->GetPosition(position);
   cam->GetFocalPoint(focal);
   cam->GetViewUp(up);
-  F3DLog::Print(
-    F3DLog::Severity::Info, "Camera position: ", position[0], ",", position[1], ",", position[2]);
-  F3DLog::Print(
-    F3DLog::Severity::Info, "Camera focal point: ", focal[0], ",", focal[1], ",", focal[2]);
-  F3DLog::Print(F3DLog::Severity::Info, "Camera view up: ", up[0], ",", up[1], ",", up[2], "\n");
+  std::stringstream stream;
+  stream << "Camera position: " << position[0] << "," << position[1] << "," << position[2] << "\n"
+         << "Camera focal point: " << focal[0] << "," << focal[1] << "," << focal[2] << "\n"
+         << "Camera view up: " << up[0] << "," << up[1] << "," << up[2] << "\n";
+  return stream.str();
 }

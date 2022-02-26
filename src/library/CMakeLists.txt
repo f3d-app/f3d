@@ -60,6 +60,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DGenericImporter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DInteractorEventRecorder.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DInteractorStyle.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DLog.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DMetaReader.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DObjectFactory.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DOpenGLGridMapper.cxx
@@ -71,12 +72,12 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DAnimationManager.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/F3DLog.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DOffscreenRender.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptions.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DStarter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_interactor.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_log.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_options.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_windowStandard.cxx

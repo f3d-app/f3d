@@ -1,8 +1,8 @@
 #include "vtkF3DGenericImporter.h"
 
 #include "F3DConfig.h"
-#include "F3DLog.h"
 #include "f3d_options.h"
+#include "vtkF3DLog.h"
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
@@ -38,8 +38,6 @@
 #include <vtkVolumeProperty.h>
 #include <vtksys/SystemTools.hxx>
 
-#include "vtkF3DPostProcessFilter.h"
-
 vtkStandardNewMacro(vtkF3DGenericImporter);
 
 //----------------------------------------------------------------------------
@@ -49,7 +47,7 @@ void vtkF3DGenericImporter::UpdateTemporalInformation()
   {
     if (!this->Reader->IsReaderValid())
     {
-      F3DLog::Print(F3DLog::Severity::Info, "Reader is not valid");
+      vtkF3DLog::Print(vtkF3DLog::Severity::Warning, "Reader is not valid");
       return;
     }
     this->Reader->UpdateInformation();
@@ -124,8 +122,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
   if (!this->Reader->IsReaderValid())
   {
-    F3DLog::Print(
-      F3DLog::Severity::Error, "File '", this->Reader->GetFileName(), "' cannot be read.");
+    vtkF3DLog::Print(
+      vtkF3DLog::Severity::Error, std::string("File '") + this->Reader->GetFileName() + "' cannot be read.");
     return;
   }
 
@@ -139,17 +137,13 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   if (!ret)
   {
-    F3DLog::Print(
-      F3DLog::Severity::Error, "File '", this->Reader->GetFileName(), "' cannot be read.");
+    vtkF3DLog::Print(
+      vtkF3DLog::Severity::Error, std::string("File '") + this->Reader->GetFileName() + "' cannot be read.");
     return;
   }
 
-  bool verbose = (this->Options->getAsBool("verbose"));
-  if (verbose)
-  {
-    this->OutputDescription =
-      vtkF3DGenericImporter::GetDataObjectDescription(this->Reader->GetOutput());
-  }
+  this->OutputDescription =
+    vtkF3DGenericImporter::GetDataObjectDescription(this->Reader->GetOutput());
 
   if (!this->GetRenderWindow())
   {
@@ -216,10 +210,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       {
         usedArray = arrayName;
       }
-      if (verbose)
-      {
-        F3DLog::Print(F3DLog::Severity::Info, "Using default scalar array: ", usedArray);
-      }
+      this->OutputDescription += "\nUsing default scalar array: ";
+      this->OutputDescription += usedArray;
     }
     else
     {
@@ -234,10 +226,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
           {
             usedArray = arrayName;
           }
-          if (verbose)
-          {
-            F3DLog::Print(F3DLog::Severity::Info, "Using first found array: ", usedArray);
-          }
+          this->OutputDescription += "\nUsing first found array: ";
+          this->OutputDescription += usedArray;
           break;
         }
       }
@@ -250,12 +240,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   if (this->ArrayIndexForColoring == -1 && !usedArray.empty() &&
     usedArray != f3d::F3DReservedString)
   {
-    F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: ", usedArray);
+    vtkF3DLog::Print(vtkF3DLog::Severity::Warning, "Unknown scalar array: " + usedArray);
   }
-  if (this->ArrayIndexForColoring == -1 && verbose)
+  if (this->ArrayIndexForColoring == -1)
   {
-    F3DLog::Print(
-      F3DLog::Severity::Info, "No array found for scalar coloring and volume rendering");
+    this->OutputDescription += "\nNo array found for scalar coloring and volume rendering";
   }
 
   // configure props
@@ -308,7 +297,7 @@ vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(
     std::string fullPath = vtksys::SystemTools::CollapseFullPath(filePath);
     if (!vtksys::SystemTools::FileExists(fullPath))
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "Texture file does not exist ", fullPath);
+      vtkF3DLog::Print(vtkF3DLog::Severity::Warning, "Texture file does not exist " + fullPath);
     }
     else
     {
@@ -329,7 +318,7 @@ vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(
       }
       else
       {
-        F3DLog::Print(F3DLog::Severity::Warning, "Cannot open texture file ", fullPath);
+        vtkF3DLog::Print(vtkF3DLog::Severity::Warning, "Cannot open texture file " + fullPath);
       }
     }
   }

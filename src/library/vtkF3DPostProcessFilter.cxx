@@ -1,23 +1,23 @@
 #include "vtkF3DPostProcessFilter.h"
 
-#include "vtkAppendPolyData.h"
-#include "vtkDataObject.h"
-#include "vtkDataObjectTreeIterator.h"
-#include "vtkDataSetSurfaceFilter.h"
-#include "vtkImageData.h"
-#include "vtkImageToPoints.h"
-#include "vtkInformation.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkNew.h"
-#include "vtkObjectFactory.h"
-#include "vtkPolyData.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkRectilinearGridToPointSet.h"
-#include "vtkResampleToImage.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkVertexGlyphFilter.h"
+#include "vtkF3DLog.h"
 
-#include "F3DLog.h"
+#include <vtkAppendPolyData.h>
+#include <vtkDataObject.h>
+#include <vtkDataObjectTreeIterator.h>
+#include <vtkDataSetSurfaceFilter.h>
+#include <vtkImageData.h>
+#include <vtkImageToPoints.h>
+#include <vtkInformation.h>
+#include <vtkMultiBlockDataSet.h>
+#include <vtkNew.h>
+#include <vtkObjectFactory.h>
+#include <vtkPolyData.h>
+#include <vtkRectilinearGrid.h>
+#include <vtkRectilinearGridToPointSet.h>
+#include <vtkResampleToImage.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkVertexGlyphFilter.h>
 
 #include <numeric>
 
@@ -57,7 +57,7 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
       vtkSmartPointer<vtkPolyData> leafPD = vtkPolyData::SafeDownCast(leafDS);
       if (!leafDS)
       {
-        F3DLog::Print(F3DLog::Severity::Warning,
+        vtkF3DLog::Print(vtkF3DLog::Severity::Warning,
           "A non data set block was ignored while reading a multiblock.");
       }
       else
@@ -138,7 +138,7 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
     }
     else
     {
-      F3DLog::Print(F3DLog::Severity::Warning,
+      vtkF3DLog::Print(vtkF3DLog::Severity::Warning,
         "Provided dataset is not convertible to a point cloud for sprites rendering, using its "
         "surface instead.");
       cloud = surface;
