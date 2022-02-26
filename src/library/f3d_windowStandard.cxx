@@ -43,7 +43,7 @@ public:
 
     // Set the initial camera once all options
     // have been shown as they may have an effect on it
-    if (options->get<int>("camera-index") < 0)
+    if (options->getAsInt("camera-index") < 0)
     {
       // set a default camera from bounds using VTK method
       this->Renderer->vtkRenderer::ResetCamera();
@@ -51,36 +51,35 @@ public:
       // use options to overwrite camera parameters
       vtkCamera* cam = this->Renderer->GetActiveCamera();
 
-      std::vector<double> cameraPosition = options->get<std::vector<double> >("camera-position");
+      std::vector<double> cameraPosition = options->getAsDoubleVector("camera-position");
       if (cameraPosition.size() == 3)
       {
         cam->SetPosition(cameraPosition.data());
       }
 
-      std::vector<double> cameraFocalPoint =
-        options->get<std::vector<double> >("camera-focal-point");
+      std::vector<double> cameraFocalPoint = options->getAsDoubleVector("camera-focal-point");
       if (cameraFocalPoint.size() == 3)
       {
         cam->SetFocalPoint(cameraFocalPoint.data());
       }
 
-      std::vector<double> cameraViewUp = options->get<std::vector<double> >("camera-view-up");
+      std::vector<double> cameraViewUp = options->getAsDoubleVector("camera-view-up");
       if (cameraViewUp.size() == 3)
       {
         cam->SetViewUp(cameraViewUp.data());
       }
 
-      double cameraViewAngle = options->get<double>("camera-view-angle");
+      double cameraViewAngle = options->getAsDouble("camera-view-angle");
       if (cameraViewAngle != 0)
       {
         cam->SetViewAngle(cameraViewAngle);
       }
 
-      cam->Azimuth(options->get<double>("camera-azimuth-angle"));
-      cam->Elevation(options->get<double>("camera-elevation-angle"));
+      cam->Azimuth(options->getAsDouble("camera-azimuth-angle"));
+      cam->Elevation(options->getAsDouble("camera-elevation-angle"));
       cam->OrthogonalizeViewUp();
 
-      if (options->get<bool>("verbose"))
+      if (options->getAsBool("verbose"))
       {
         ::DisplayCameraInformation(cam);
       }
@@ -135,8 +134,8 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
     this->Internals->RenWin->RemoveRenderer(this->Internals->Renderer);
   }
 
-  this->Internals->RenWin->SetSize(this->Options->get<std::vector<int> >("resolution").data());
-  this->Internals->RenWin->SetFullScreen(this->Options->get<bool>("fullscreen"));
+  this->Internals->RenWin->SetSize(this->Options->getAsIntVector("resolution").data());
+  this->Internals->RenWin->SetFullScreen(this->Options->getAsBool("fullscreen"));
 
   if (withColoring)
   {
@@ -207,8 +206,8 @@ void windowStandard::InitializeRendererWithColoring(vtkF3DGenericImporter* impor
     renWithColor->SetPointGaussianMapper(importer->GetPointGaussianMapper());
     renWithColor->SetVolumeMapper(importer->GetVolumeMapper());
     renWithColor->SetColoring(importer->GetPointDataForColoring(),
-      importer->GetCellDataForColoring(), this->Options->get<bool>("cells"),
-      importer->GetArrayIndexForColoring(), this->Options->get<int>("component"));
+      importer->GetCellDataForColoring(), this->Options->getAsBool("cells"),
+      importer->GetArrayIndexForColoring(), this->Options->getAsInt("component"));
   }
 }
 };

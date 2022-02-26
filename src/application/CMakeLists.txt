@@ -13,6 +13,8 @@ elseif (UNIX)
   set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../lib)
 endif ()
 
+target_compile_features(f3d PRIVATE cxx_std_11)
+
 if(F3D_STRICT_BUILD)
   if(MSVC)
     target_compile_options(f3d PRIVATE /W4 /WX)

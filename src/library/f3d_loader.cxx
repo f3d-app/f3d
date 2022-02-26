@@ -31,7 +31,7 @@ typedef struct ProgressDataStruct
 
 vtkSmartPointer<vtkImporter> GetImporter(const f3d::options& options, const std::string& fileName)
 {
-  if (!options.get<bool>("geometry-only"))
+  if (!options.getAsBool("geometry-only"))
   {
     // Try to find the first compatible reader with scene reading capabilities
     F3DReader* reader = F3DReaderFactory::GetReader(fileName);
@@ -324,7 +324,7 @@ bool loader::loadFile(loader::LoadFileEnum load)
   // Reset loadedFile
   this->Internals->LoadedFile = false;
 
-  F3DLog::SetQuiet(this->Internals->Options.get<bool>("quiet"));
+  F3DLog::SetQuiet(this->Internals->Options.getAsBool("quiet"));
 
   if (!this->Internals->Window)
   {
@@ -335,7 +335,7 @@ bool loader::loadFile(loader::LoadFileEnum load)
   // Recover information about the file to load
   std::string filePath, fileInfo;
   this->getFileInfo(load, this->Internals->CurrentFileIndex, filePath, fileInfo);
-  bool verbose = this->Internals->Options.get<bool>("verbose");
+  bool verbose = this->Internals->Options.getAsBool("verbose");
   if (verbose)
   {
     if (filePath.empty())
@@ -382,11 +382,11 @@ bool loader::loadFile(loader::LoadFileEnum load)
   // Initialize importer for rendering
   this->Internals->Importer->SetRenderWindow(this->Internals->Window->GetRenderWindow());
 #if VTK_VERSION_NUMBER > VTK_VERSION_CHECK(9, 0, 20210228)
-  this->Internals->Importer->SetCamera(this->Internals->Options.get<int>("camera-index"));
+  this->Internals->Importer->SetCamera(this->Internals->Options.getAsInt("camera-index"));
 #endif
 
   // Manage progress bar
-  if (this->Internals->Options.get<bool>("progress") && this->Internals->Interactor)
+  if (this->Internals->Options.getAsBool("progress") && this->Internals->Interactor)
   {
     ::CreateProgressRepresentationAndCallback(
       &callbackData, this->Internals->Importer, this->Internals->Interactor);
