@@ -124,9 +124,15 @@ public:
   void ResetCamera() override;
 
   /**
-   * Dump useful scene state. Currently supports only camera state.
+   * Get useful scene state description. Currently contains only camera state.
    */
-  void DumpSceneState();
+  virtual std::string GetSceneDescription();
+
+  /**
+   * Return description about the current rendering status
+   * Currently contains only information about the grid size if any
+   */
+  virtual std::string GetRenderingDescription();
 
   //@{
   /**
@@ -205,7 +211,6 @@ protected:
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;
   bool UseTrackball = false;
-  bool Verbose = false;
 
   int RaytracingSamples = 0;
   int UpIndex = 1;
@@ -213,6 +218,7 @@ protected:
   double RightVector[3] = { 1.0, 0.0, 0.0 };
 
   std::string HDRIFile;
+  std::string GridInfo;
 };
 
 #endif
