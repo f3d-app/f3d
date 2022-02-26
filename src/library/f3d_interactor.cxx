@@ -230,11 +230,11 @@ public:
         renWin->Render();
         break;
       case '?':
-        {
-          std::string output = ren->GetSceneDescription();
-          f3d::log::info(output);
-        }
-        break;
+      {
+        std::string output = ren->GetSceneDescription();
+        f3d::log::info(output);
+      }
+      break;
       default:
         if (keySym == "Left")
         {

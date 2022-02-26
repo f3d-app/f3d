@@ -14,7 +14,6 @@
 #include <vtkWindowToImageFilter.h>
 #include <vtksys/SystemTools.hxx>
 
-
 //----------------------------------------------------------------------------
 bool F3DOffscreenRender::RenderToImage(vtkRenderWindow* renWin, vtkImageData* image, bool noBg)
 {
