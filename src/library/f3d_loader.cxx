@@ -375,7 +375,8 @@ bool loader::loadFile(loader::LoadFileEnum load)
   }
 
   // Recover the importer
-  this->Internals->Importer = ::GetImporter(filePath, this->Internals->Options.getAsBool("geometry-only"));
+  this->Internals->Importer =
+    ::GetImporter(filePath, this->Internals->Options.getAsBool("geometry-only"));
   vtkF3DGenericImporter* genericImporter =
     vtkF3DGenericImporter::SafeDownCast(this->Internals->Importer);
   if (!this->Internals->Importer)

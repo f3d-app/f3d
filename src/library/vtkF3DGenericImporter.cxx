@@ -266,14 +266,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   // Textures
   this->GeometryActor->GetProperty()->SetBaseColorTexture(
     this->GetTexture(this->TextureBaseColor, true));
-  this->GeometryActor->GetProperty()->SetORMTexture(
-    this->GetTexture(this->TextureMaterial));
+  this->GeometryActor->GetProperty()->SetORMTexture(this->GetTexture(this->TextureMaterial));
   this->GeometryActor->GetProperty()->SetEmissiveTexture(
     this->GetTexture(this->TextureEmissive, true));
-  this->GeometryActor->GetProperty()->SetEmissiveFactor(
-    this->EmissiveFactor);
-  this->GeometryActor->GetProperty()->SetNormalTexture(
-    this->GetTexture(this->TextureNormal));
+  this->GeometryActor->GetProperty()->SetEmissiveFactor(this->EmissiveFactor);
+  this->GeometryActor->GetProperty()->SetNormalTexture(this->GetTexture(this->TextureNormal));
   this->GeometryActor->GetProperty()->SetNormalScale(this->NormalScale);
 
   // add props
