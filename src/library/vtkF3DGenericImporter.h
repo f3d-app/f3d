@@ -193,8 +193,8 @@ protected:
   double Metallic = 0.;
   double LineWidth = 1.;
   double NormalScale = 1.;
-  double SurfaceColor[3] = {1., 1., 1.};
-  double EmissiveFactor[3] = {1., 1., 1.};
+  double SurfaceColor[3] = { 1., 1., 1. };
+  double EmissiveFactor[3] = { 1., 1., 1. };
   std::string ScalarArray;
   std::string TextureBaseColor;
   std::string TextureMaterial;
