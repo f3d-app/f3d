@@ -1,7 +1,7 @@
 #include "f3d_options.h"
 
-#include "vtkF3DConfigure.h"
 #include "f3d_log.h"
+#include "vtkF3DConfigure.h"
 
 #include <map>
 #include <type_traits>
