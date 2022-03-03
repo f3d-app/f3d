@@ -200,6 +200,71 @@ void vtkF3DRenderer::UpdateInternalActors()
 {
   // TODO test this dynamically
 
+  // Simple dynamic actors
+  // TODO: maybe avoid using UpdateInternalActors for simple actor as it can be expansive
+  this->FilenameActor->SetVisibility(this->FilenameVisible);
+  this->TimerActor->SetVisibility(this->TimerVisible);
+  this->MetaDataActor->SetVisibility(this->MetaDataVisible);
+  this->CheatSheetActor->SetVisibility(this->CheatSheetVisible);
+
+  // Update metadata info
+  std::string MetaDataDesc = this->GenerateMetaDataDescription();
+  this->MetaDataActor->SetText(vtkCornerAnnotation::RightEdge, MetaDataDesc.c_str());
+
+  // Dynamic Grid
+  if (this->GridVisible)
+  {
+    bool show = this->GridVisible;
+    double bounds[6];
+    this->ComputeVisiblePropBounds(bounds);
+
+    vtkBoundingBox bbox(bounds);
+
+    if (!bbox.IsValid())
+    {
+      show = false;
+    }
+
+    if (show)
+    {
+      this->SetClippingRangeExpansion(0.99);
+
+      double diag = bbox.GetDiagonalLength();
+      double unitSquare = pow(10.0, round(log10(diag * 0.1)));
+
+      double gridPos[3];
+      for (int i = 0; i < 3; i++)
+      {
+        double size = bounds[2 * i + 1] - bounds[2 * i];
+        gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
+      }
+
+      std::stringstream stream;
+      stream << "Using grid unit square size = " << unitSquare << "\n"
+        << "Grid origin set to [" << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2]
+        << "]\n\n";
+      this->GridInfo = stream.str();
+
+      vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
+      gridMapper->SetFadeDistance(diag);
+      gridMapper->SetUnitSquare(unitSquare);
+      gridMapper->SetUpIndex(this->UpIndex);
+
+      this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
+      this->GridActor->ForceTranslucentOn();
+      this->GridActor->SetPosition(gridPos);
+      this->GridActor->SetMapper(gridMapper);
+      this->GridActor->UseBoundsOff();
+    }
+    else
+    {
+      this->SetClippingRangeExpansion(0);
+      this->GridInfo = "";
+    }
+    this->GridActor->SetVisibility(show);
+    this->ResetCameraClippingRange();
+  }
+
   // Read HDRI when needed
   vtkNew<vtkTexture> hdriTexture;
   if (this->HDRINeedUpdate)
@@ -323,10 +388,6 @@ void vtkF3DRenderer::UpdateInternalActors()
         vtkF3DLog::Severity::Warning, std::string("Cannot find \"") + fontFile + "\" font file.");
     }
   }
-
-  // Update metadata info
-  std::string MetaDataDesc = this->GenerateMetaDataDescription();
-  this->MetaDataActor->SetText(vtkCornerAnnotation::RightEdge, MetaDataDesc.c_str());
 }
 
 //----------------------------------------------------------------------------
@@ -423,6 +484,7 @@ std::string vtkF3DRenderer::GetRenderingDescription()
 void vtkF3DRenderer::ShowAxis(bool show)
 {
   // Dynamic visible axis
+  // Widget can't be managed like an actor
   if (show)
   {
     vtkNew<vtkAxesActor> axes;
@@ -455,55 +517,7 @@ void vtkF3DRenderer::ShowGrid(bool show)
 {
   // TODO Test interactive
   this->GridVisible = show;
-
-  double bounds[6];
-  this->ComputeVisiblePropBounds(bounds);
-
-  vtkBoundingBox bbox(bounds);
-
-  if (!bbox.IsValid())
-  {
-    show = false;
-  }
-
-  if (show)
-  {
-    this->SetClippingRangeExpansion(0.99);
-
-    double diag = bbox.GetDiagonalLength();
-    double unitSquare = pow(10.0, round(log10(diag * 0.1)));
-
-    double gridPos[3];
-    for (int i = 0; i < 3; i++)
-    {
-      double size = bounds[2 * i + 1] - bounds[2 * i];
-      gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
-    }
-
-    std::stringstream stream;
-    stream << "Using grid unit square size = " << unitSquare << "\n"
-           << "Grid origin set to [" << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2]
-           << "]\n\n";
-    this->GridInfo = stream.str();
-
-    vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
-    gridMapper->SetFadeDistance(diag);
-    gridMapper->SetUnitSquare(unitSquare);
-    gridMapper->SetUpIndex(this->UpIndex);
-
-    this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
-    this->GridActor->ForceTranslucentOn();
-    this->GridActor->SetPosition(gridPos);
-    this->GridActor->SetMapper(gridMapper);
-    this->GridActor->UseBoundsOff();
-  }
-  else
-  {
-    this->SetClippingRangeExpansion(0);
-    this->GridInfo = "";
-  }
-  this->GridActor->SetVisibility(show);
-  this->ResetCameraClippingRange();
+  this->InternalActorsNeedUpdate = true;
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
@@ -616,9 +630,8 @@ bool vtkF3DRenderer::UsingRaytracingDenoiser()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowTimer(bool show)
 {
-  this->TimerActor->SetVisibility(show);
   this->TimerVisible = show;
-
+  this->InternalActorsNeedUpdate = true;
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
@@ -632,8 +645,8 @@ bool vtkF3DRenderer::IsTimerVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowFilename(bool show)
 {
-  this->FilenameActor->SetVisibility(show);
   this->FilenameVisible = show;
+  this->InternalActorsNeedUpdate = true;
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
@@ -647,9 +660,8 @@ bool vtkF3DRenderer::IsFilenameVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowMetaData(bool show)
 {
-  // generate field data description
-  this->MetaDataActor->SetVisibility(show);
   this->MetaDataVisible = show;
+  this->InternalActorsNeedUpdate = true;
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
@@ -663,8 +675,8 @@ bool vtkF3DRenderer::IsMetaDataVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowCheatSheet(bool show)
 {
-  this->CheatSheetActor->SetVisibility(show);
   this->CheatSheetVisible = show;
+  this->InternalActorsNeedUpdate = true;
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
