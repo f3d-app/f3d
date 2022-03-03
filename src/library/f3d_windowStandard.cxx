@@ -135,6 +135,7 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
   this->Internals->RenWin->SetSize(this->Options->getAsIntVector("resolution").data());
   this->Internals->RenWin->SetFullScreen(this->Options->getAsBool("fullscreen"));
 
+  // TODO Keep existing renderer if valid as it is expansive to create one
   if (withColoring)
   {
     this->Internals->Renderer = vtkSmartPointer<vtkF3DRendererWithColoring>::New();

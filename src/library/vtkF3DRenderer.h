@@ -223,6 +223,9 @@ protected:
   std::string Up;
   std::vector<double> BackgroundColor;
   std::string FontFile;
+
+  bool HDRINeedUpdate = false;
+  bool HasHDRI = false;
 };
 
 #endif

@@ -63,15 +63,12 @@ void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
 {
   options.get("grid", this->GridVisible);
   // custom pass cheat
-  
 
   options.get("axis", this->AxisVisible);
   // custom pass? cheat
 
-
   options.get("edges", this->EdgesVisible);
   // custom cheat
-
 
   options.get("fps", this->TimerVisible);
   // custom pass cheat
@@ -83,14 +80,13 @@ void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
   // custom pass chear
 
   options.get("raytracing", this->UseRaytracing);
-  // internal cheat pass 
+  // internal cheat pass
 
   options.get("samples", this->RaytracingSamples);
   // pass
 
-
   options.get("denoise", this->UseRaytracingDenoiser);
-  // cheat pass 
+  // cheat pass
 
   options.get("ssao", this->UseSSAOPass);
   // cheat pass
@@ -108,8 +104,8 @@ void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
   // cheat
 
   options.get("hdri", this->HDRIFile);
+  this->HDRINeedUpdate = true;
   // init pass
-
 
   // this->UseDepthPeeling is a vtkTypeBool (aka int), so we have to use the explicit
   // type function to avoid a type mismatch
@@ -136,57 +132,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   this->BackgroundColor = options.getAsDoubleVector("background-color");
   this->FontFile = options.getAsString("font-file");
 
-  if (!this->HDRIFile.empty())
-  {
-    this->HDRIFile = vtksys::SystemTools::CollapseFullPath(this->HDRIFile);
-    if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
-    {
-      vtkF3DLog::Print(
-        vtkF3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
-    }
-    else
-    {
-      auto reader = vtkSmartPointer<vtkImageReader2>::Take(
-        vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
-      if (reader)
-      {
-        // TODO avoid doing that everytime if file does not change
-        reader->SetFileName(this->HDRIFile.c_str());
-        reader->Update();
-
-        vtkNew<vtkTexture> texture;
-        texture->SetColorModeToDirectScalars();
-        texture->MipmapOn();
-        texture->InterpolateOn();
-        texture->SetInputConnection(reader->GetOutputPort());
-
-        // 8-bit textures are usually gamma-corrected
-        if (reader->GetOutput() && reader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
-        {
-          texture->UseSRGBColorSpaceOn();
-        }
-
-        // HDRI OpenGL
-        this->UseImageBasedLightingOn();
-        this->SetEnvironmentTexture(texture);
-
-        // Skybox OpenGL
-        this->Skybox->SetProjection(vtkSkybox::Sphere);
-        this->Skybox->SetTexture(texture);
-
-        // First version of VTK including the version check (and the feature used)
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
-        this->Skybox->GammaCorrectOn();
-#endif
-      }
-      else
-      {
-        vtkF3DLog::Print(
-          vtkF3DLog::Severity::Warning, std::string("Cannot open HDRI file ") + this->HDRIFile);
-      }
-    }
-  }
-
+  // TODO somehow cant be set after initialization
   // parse up vector
   std::string up = this->Up;
   if (up.size() == 2)
@@ -216,20 +162,94 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
     }
   }
 
-  // skybox orientation
-  double front[3];
-  vtkMath::Cross(this->RightVector, this->UpVector, front);
-  this->Skybox->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
-  this->Skybox->SetFloorRight(front[0], front[1], front[2]);
+  this->UpdateInternalActors();
+  this->SetupRenderPasses();
+}
 
-  if (this->GetUseImageBasedLighting())
+//----------------------------------------------------------------------------
+std::string vtkF3DRenderer::GenerateMetaDataDescription()
+{
+  return " Unavailable\n";
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateInternalActors()
+{
+
+  // TODO test this
+  vtkNew<vtkTexture> hdriTexture;
+  if (this->HDRINeedUpdate)
   {
+    this->HasHDRI = false;
+    if(!this->HDRIFile.empty())
+    {
+      this->HDRIFile = vtksys::SystemTools::CollapseFullPath(this->HDRIFile);
+      if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
+      {
+        vtkF3DLog::Print(
+          vtkF3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
+      }
+      else
+      {
+        auto reader = vtkSmartPointer<vtkImageReader2>::Take(
+          vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
+        if (reader)
+        {
+          reader->SetFileName(this->HDRIFile.c_str());
+          reader->Update();
+
+          hdriTexture->SetColorModeToDirectScalars();
+          hdriTexture->MipmapOn();
+          hdriTexture->InterpolateOn();
+          hdriTexture->SetInputConnection(reader->GetOutputPort());
+
+          // 8-bit textures are usually gamma-corrected
+          if (reader->GetOutput() && reader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
+          {
+            hdriTexture->UseSRGBColorSpaceOn();
+          }
+
+          this->HasHDRI = true;
+        }
+        else
+        {
+          vtkF3DLog::Print(
+            vtkF3DLog::Severity::Warning, std::string("Cannot open HDRI file ") + this->HDRIFile);
+        }
+      }
+    }
+  }
+
+  if (this->HasHDRI)
+  {
+    // HDRI OpenGL
+    this->UseImageBasedLightingOn();
+    this->SetEnvironmentTexture(hdriTexture);
+
+    // Skybox OpenGL
+    this->Skybox->SetProjection(vtkSkybox::Sphere);
+    this->Skybox->SetTexture(hdriTexture);
+
+    // First version of VTK including the version check (and the feature used)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
+    this->Skybox->GammaCorrectOn();
+#endif
+
+    // skybox orientation
+    double front[3];
+    vtkMath::Cross(this->RightVector, this->UpVector, front);
+    this->Skybox->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
+    this->Skybox->SetFloorRight(front[0], front[1], front[2]);
+
     this->AddActor(this->Skybox);
     this->AutomaticLightCreationOff();
   }
   else
   {
     this->SetBackground(this->BackgroundColor.data());
+    this->UseImageBasedLightingOff();
+    this->SetEnvironmentTexture(nullptr);
+    this->RemoveActor(this->Skybox);
     this->AutomaticLightCreationOn();
   }
 
@@ -288,23 +308,6 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   }
 
   this->TimerActor->SetInput("0 fps");
-
-
-
-
-  this->UpdateInternalActors();
-  this->SetupRenderPasses();
-}
-
-//----------------------------------------------------------------------------
-std::string vtkF3DRenderer::GenerateMetaDataDescription()
-{
-  return " Unavailable\n";
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::UpdateInternalActors()
-{
 
 }
 
