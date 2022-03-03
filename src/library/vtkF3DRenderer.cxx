@@ -57,6 +57,7 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->CheatSheetActor->GetTextProperty()->SetOpacity(0.5);
   this->CheatSheetActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
   this->CheatSheetActor->GetTextProperty()->SetBackgroundOpacity(0.5);
+
 }
 
 //----------------------------------------------------------------------------
@@ -140,6 +141,13 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
 
   this->RemoveAllViewProps();
   this->RemoveAllLights();
+
+  this->AddActor(this->FilenameActor);
+  this->AddActor(this->GridActor);
+  this->AddActor(this->TimerActor);
+  this->AddActor(this->MetaDataActor);
+  this->AddActor(this->CheatSheetActor);
+
   this->UpdateOptions(options);
 
   this->FileInfo = fileInfo;
@@ -190,7 +198,7 @@ std::string vtkF3DRenderer::GenerateMetaDataDescription()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateInternalActors()
 {
-  // TODO test this dinamically
+  // TODO test this dynamically
 
   // Read HDRI when needed
   vtkNew<vtkTexture> hdriTexture;
@@ -315,6 +323,10 @@ void vtkF3DRenderer::UpdateInternalActors()
         vtkF3DLog::Severity::Warning, std::string("Cannot find \"") + fontFile + "\" font file.");
     }
   }
+
+  // Update metadata info
+  std::string MetaDataDesc = this->GenerateMetaDataDescription();
+  this->MetaDataActor->SetText(vtkCornerAnnotation::RightEdge, MetaDataDesc.c_str());
 }
 
 //----------------------------------------------------------------------------
@@ -439,7 +451,7 @@ bool vtkF3DRenderer::IsAxisVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowGrid(bool show)
 {
-  // TODO not tested interactive
+  // TODO Test interactive
   this->GridVisible = show;
 
   double bounds[6];
@@ -482,9 +494,6 @@ void vtkF3DRenderer::ShowGrid(bool show)
     this->GridActor->SetPosition(gridPos);
     this->GridActor->SetMapper(gridMapper);
     this->GridActor->UseBoundsOff();
-
-    this->RemoveActor(this->GridActor);
-    this->AddActor(this->GridActor);
   }
   else
   {
@@ -605,13 +614,7 @@ bool vtkF3DRenderer::UsingRaytracingDenoiser()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowTimer(bool show)
 {
-  if (this->TimerActor)
-  {
-    // TODO again
-    this->RemoveActor(this->TimerActor);
-    this->AddActor(this->TimerActor);
-    this->TimerActor->SetVisibility(show);
-  }
+  this->TimerActor->SetVisibility(show);
   this->TimerVisible = show;
 
   this->SetupRenderPasses();
@@ -627,13 +630,7 @@ bool vtkF3DRenderer::IsTimerVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowFilename(bool show)
 {
-  if (this->FilenameActor)
-  {
-    // TODO why remove add ?
-    this->RemoveActor(this->FilenameActor);
-    this->AddActor(this->FilenameActor);
-    this->FilenameActor->SetVisibility(show);
-  }
+  this->FilenameActor->SetVisibility(show);
   this->FilenameVisible = show;
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
@@ -648,18 +645,8 @@ bool vtkF3DRenderer::IsFilenameVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowMetaData(bool show)
 {
-  if (this->MetaDataActor)
-  {
-    // TODO Strange that this is here
-    this->RemoveActor(this->MetaDataActor);
-    this->AddActor(this->MetaDataActor);
-
-    // generate field data description
-    std::string MetaDataDesc = this->GenerateMetaDataDescription();
-    this->MetaDataActor->SetText(vtkCornerAnnotation::RightEdge, MetaDataDesc.c_str());
-
-    this->MetaDataActor->SetVisibility(show);
-  }
+  // generate field data description
+  this->MetaDataActor->SetVisibility(show);
   this->MetaDataVisible = show;
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
@@ -674,16 +661,7 @@ bool vtkF3DRenderer::IsMetaDataVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowCheatSheet(bool show)
 {
-  if (this->CheatSheetActor)
-  {
-    this->RemoveActor(this->CheatSheetActor);
-
-    if (show)
-    {
-      this->AddActor(this->CheatSheetActor);
-      this->CheatSheetActor->SetVisibility(show);
-    }
-  }
+  this->CheatSheetActor->SetVisibility(show);
   this->CheatSheetVisible = show;
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
@@ -743,7 +721,6 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowEdge(bool show)
 {
-  // TODO
   vtkActor* anActor;
   vtkActorCollection* ac = this->GetActors();
   vtkCollectionSimpleIterator ait;
