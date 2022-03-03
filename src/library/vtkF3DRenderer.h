@@ -196,7 +196,7 @@ protected:
 
   bool GridVisible = false;
   bool AxisVisible = false;
-  bool EdgesVisible = false;
+  bool EdgeVisible = false;
   bool TimerVisible = false;
   bool FilenameVisible = false;
   bool MetaDataVisible = false;

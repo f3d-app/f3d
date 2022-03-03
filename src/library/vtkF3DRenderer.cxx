@@ -83,7 +83,7 @@ void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
   options.get("axis", this->AxisVisible);
   // custom pass? cheat
 
-  options.get("edges", this->EdgesVisible);
+  options.get("edges", this->EdgeVisible);
   // custom cheat
 
   options.get("fps", this->TimerVisible);
@@ -211,59 +211,68 @@ void vtkF3DRenderer::UpdateInternalActors()
   std::string MetaDataDesc = this->GenerateMetaDataDescription();
   this->MetaDataActor->SetText(vtkCornerAnnotation::RightEdge, MetaDataDesc.c_str());
 
-  // Dynamic Grid
-  if (this->GridVisible)
+  // Dynamic edges
+  vtkActor* anActor;
+  vtkActorCollection* ac = this->GetActors();
+  vtkCollectionSimpleIterator ait;
+  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
   {
-    bool show = this->GridVisible;
-    double bounds[6];
-    this->ComputeVisiblePropBounds(bounds);
-
-    vtkBoundingBox bbox(bounds);
-
-    if (!bbox.IsValid())
+    if (vtkSkybox::SafeDownCast(anActor) == nullptr)
     {
-      show = false;
+      anActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
     }
-
-    if (show)
-    {
-      this->SetClippingRangeExpansion(0.99);
-
-      double diag = bbox.GetDiagonalLength();
-      double unitSquare = pow(10.0, round(log10(diag * 0.1)));
-
-      double gridPos[3];
-      for (int i = 0; i < 3; i++)
-      {
-        double size = bounds[2 * i + 1] - bounds[2 * i];
-        gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
-      }
-
-      std::stringstream stream;
-      stream << "Using grid unit square size = " << unitSquare << "\n"
-        << "Grid origin set to [" << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2]
-        << "]\n\n";
-      this->GridInfo = stream.str();
-
-      vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
-      gridMapper->SetFadeDistance(diag);
-      gridMapper->SetUnitSquare(unitSquare);
-      gridMapper->SetUpIndex(this->UpIndex);
-
-      this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
-      this->GridActor->ForceTranslucentOn();
-      this->GridActor->SetPosition(gridPos);
-      this->GridActor->SetMapper(gridMapper);
-      this->GridActor->UseBoundsOff();
-    }
-    else
-    {
-      this->SetClippingRangeExpansion(0);
-      this->GridInfo = "";
-    }
-    this->GridActor->SetVisibility(show);
-    this->ResetCameraClippingRange();
   }
+
+  // Dynamic Grid
+  bool show = this->GridVisible;
+  double bounds[6];
+  this->ComputeVisiblePropBounds(bounds);
+
+  vtkBoundingBox bbox(bounds);
+
+  if (!bbox.IsValid())
+  {
+    show = false;
+  }
+
+  if (show)
+  {
+    this->SetClippingRangeExpansion(0.99);
+
+    double diag = bbox.GetDiagonalLength();
+    double unitSquare = pow(10.0, round(log10(diag * 0.1)));
+
+    double gridPos[3];
+    for (int i = 0; i < 3; i++)
+    {
+      double size = bounds[2 * i + 1] - bounds[2 * i];
+      gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
+    }
+
+    std::stringstream stream;
+    stream << "Using grid unit square size = " << unitSquare << "\n"
+      << "Grid origin set to [" << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2]
+      << "]\n\n";
+    this->GridInfo = stream.str();
+
+    vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
+    gridMapper->SetFadeDistance(diag);
+    gridMapper->SetUnitSquare(unitSquare);
+    gridMapper->SetUpIndex(this->UpIndex);
+
+    this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
+    this->GridActor->ForceTranslucentOn();
+    this->GridActor->SetPosition(gridPos);
+    this->GridActor->SetMapper(gridMapper);
+    this->GridActor->UseBoundsOff();
+  }
+  else
+  {
+    this->SetClippingRangeExpansion(0);
+    this->GridInfo = "";
+  }
+  this->GridActor->SetVisibility(show);
+  this->ResetCameraClippingRange();
 
   // Read HDRI when needed
   vtkNew<vtkTexture> hdriTexture;
@@ -463,13 +472,16 @@ void vtkF3DRenderer::UpdateRenderPasses()
 void vtkF3DRenderer::ShowOptions()
 {
   // TODO is this method needed anymore ?
-  this->ShowGrid(this->GridVisible);
   this->ShowAxis(this->AxisVisible);
+
+  /*
+  this->ShowGrid(this->GridVisible);
   this->ShowTimer(this->TimerVisible);
-  this->ShowEdge(this->EdgesVisible);
+  this->ShowEdge(this->EdgeVisible);
   this->ShowFilename(this->FilenameVisible);
   this->ShowCheatSheet(this->CheatSheetVisible);
   this->ShowMetaData(this->MetaDataVisible);
+  */
 
   this->UpdateInternalActors();
 }
@@ -716,7 +728,7 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
   cheatSheetText << " Q: SSAO " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText << " A: FXAA " << (this->UseFXAAPass ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText << " T: Tone mapping " << (this->UseToneMappingPass ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " E: Edge visibility " << (this->EdgesVisible ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " E: Edge visibility " << (this->EdgeVisible ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText << " X: Axis " << (this->AxisVisible ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText << " G: Grid " << (this->GridVisible ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText << " N: File name " << (this->FilenameVisible ? "[ON]" : "[OFF]") << "\n";
@@ -735,24 +747,14 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowEdge(bool show)
 {
-  vtkActor* anActor;
-  vtkActorCollection* ac = this->GetActors();
-  vtkCollectionSimpleIterator ait;
-  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
-  {
-    if (vtkSkybox::SafeDownCast(anActor) == nullptr)
-    {
-      anActor->GetProperty()->SetEdgeVisibility(show);
-    }
-  }
-  this->EdgesVisible = show;
+  this->EdgeVisible = show;
   this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::IsEdgeVisible()
 {
-  return this->EdgesVisible;
+  return this->EdgeVisible;
 }
 
 //----------------------------------------------------------------------------
