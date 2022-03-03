@@ -104,7 +104,7 @@ void vtkF3DRendererWithColoring::SetUsePointSprites(bool use)
 {
   this->UsePointSprites = use;
   this->UpdateInternalActors();
-  this->SetupRenderPasses();
+  this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -119,7 +119,7 @@ void vtkF3DRendererWithColoring::SetUseVolume(bool use)
 {
   this->UseVolume = use;
   this->UpdateInternalActors();
-  this->SetupRenderPasses();
+  this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -145,7 +145,7 @@ void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
       pwf->AddPoint(range[0], this->UseInverseOpacityFunction ? 1.0 : 0.0);
       pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
     }
-    this->SetupRenderPasses();
+    this->RenderPassesNeedUpdate = true;
   }
   this->CheatSheetNeedUpdate = true;
 }
@@ -297,7 +297,7 @@ void vtkF3DRendererWithColoring::CycleScalars(int cycleType)
   this->ScalarBarActorConfigured = false;
 
   this->UpdateInternalActors();
-  this->SetupRenderPasses();
+  this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -306,7 +306,7 @@ void vtkF3DRendererWithColoring::ShowScalarBar(bool show)
 {
   this->ScalarBarVisible = show;
   this->UpdateScalarBarVisibility();
-  this->SetupRenderPasses();
+  this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
 

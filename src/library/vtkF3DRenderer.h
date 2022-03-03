@@ -107,10 +107,9 @@ public:
   void ShowOptions();
 
   /**
-   * Setup the different render passes
-   * as they were set by the options during the initialization.
+   * Update the different render passes which can be needed when changing some options
    */
-  void SetupRenderPasses();
+  void UpdateRenderPasses();
 
   /**
    * Initialize the camera position, focal point,
@@ -226,6 +225,9 @@ protected:
 
   bool HDRINeedUpdate = false;
   bool HasHDRI = false;
+
+  bool InternalActorsNeedUpdate = false;
+  bool RenderPassesNeedUpdate = false;
 };
 
 #endif

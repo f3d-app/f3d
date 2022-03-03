@@ -213,7 +213,7 @@ public:
         // when going full screen, the OpenGL context changes, we need to reinitialize
         // the interactor, the render passes and the grid actor.
         ren->ShowGrid(ren->IsGridVisible());
-        ren->SetupRenderPasses();
+        ren->UpdateRenderPasses();
         rwi->ReInitialize();
 
         renWin->Render();
