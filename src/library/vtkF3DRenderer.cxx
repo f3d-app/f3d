@@ -42,6 +42,21 @@ vtkStandardNewMacro(vtkF3DRenderer);
 vtkF3DRenderer::vtkF3DRenderer()
 {
   this->Cullers->RemoveAllItems();
+
+  // Init actors
+  this->MetaDataActor->GetTextProperty()->SetFontSize(15);
+  this->MetaDataActor->GetTextProperty()->SetOpacity(0.5);
+  this->MetaDataActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
+  this->MetaDataActor->GetTextProperty()->SetBackgroundOpacity(0.5);
+
+  this->TimerActor->GetTextProperty()->SetFontSize(15);
+  this->TimerActor->SetPosition(10, 10);
+  this->TimerActor->SetInput("0 fps");
+
+  this->CheatSheetActor->GetTextProperty()->SetFontSize(15);
+  this->CheatSheetActor->GetTextProperty()->SetOpacity(0.5);
+  this->CheatSheetActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
+  this->CheatSheetActor->GetTextProperty()->SetBackgroundOpacity(0.5);
 }
 
 //----------------------------------------------------------------------------
@@ -175,8 +190,9 @@ std::string vtkF3DRenderer::GenerateMetaDataDescription()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateInternalActors()
 {
+  // TODO test this dinamically
 
-  // TODO test this
+  // Read HDRI when needed
   vtkNew<vtkTexture> hdriTexture;
   if (this->HDRINeedUpdate)
   {
@@ -220,8 +236,12 @@ void vtkF3DRenderer::UpdateInternalActors()
     }
   }
 
+  // Dynamic HDRI
   if (this->HasHDRI)
   {
+    // Reset background for coherency
+    this->SetBackground(0, 0, 0);
+
     // HDRI OpenGL
     this->UseImageBasedLightingOn();
     this->SetEnvironmentTexture(hdriTexture);
@@ -253,6 +273,10 @@ void vtkF3DRenderer::UpdateInternalActors()
     this->AutomaticLightCreationOn();
   }
 
+  // Dynamic filename actor text
+  this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, this->FileInfo.c_str());
+
+  // Dynamic text color
   double textColor[3];
   if (this->IsBackgroundDark())
   {
@@ -262,29 +286,14 @@ void vtkF3DRenderer::UpdateInternalActors()
   {
     textColor[0] = textColor[1] = textColor[2] = 0.0;
   }
-
-  this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, this->FileInfo.c_str());
   this->FilenameActor->GetTextProperty()->SetColor(textColor);
-
-  this->MetaDataActor->GetTextProperty()->SetFontSize(15);
-  this->MetaDataActor->GetTextProperty()->SetOpacity(0.5);
-  this->MetaDataActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
-  this->MetaDataActor->GetTextProperty()->SetBackgroundOpacity(0.5);
-
   this->TimerActor->GetTextProperty()->SetColor(textColor);
-  this->TimerActor->GetTextProperty()->SetFontSize(15);
-  this->TimerActor->SetPosition(10, 10);
 
-  this->CheatSheetActor->GetTextProperty()->SetFontSize(15);
-  this->CheatSheetActor->GetTextProperty()->SetOpacity(0.5);
-  this->CheatSheetActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
-  this->CheatSheetActor->GetTextProperty()->SetBackgroundOpacity(0.5);
-
+  // Dynamic font management
   this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
   this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
-
   std::string fontFile = this->FontFile;
   if (!fontFile.empty())
   {
@@ -306,9 +315,6 @@ void vtkF3DRenderer::UpdateInternalActors()
         vtkF3DLog::Severity::Warning, std::string("Cannot find \"") + fontFile + "\" font file.");
     }
   }
-
-  this->TimerActor->SetInput("0 fps");
-
 }
 
 //----------------------------------------------------------------------------
