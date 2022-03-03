@@ -151,10 +151,9 @@ public:
   //@}
 
   /**
-   * Override to update internal actors that display data
-   * in a specific way
+   * Update the actors using the configuration of the renderer
    */
-  virtual void UpdateInternalActors(){};
+  virtual void UpdateInternalActors();
 
 protected:
   vtkF3DRenderer();
@@ -219,6 +218,11 @@ protected:
 
   std::string HDRIFile;
   std::string GridInfo;
+
+  std::string FileInfo;
+  std::string Up;
+  std::vector<double> BackgroundColor;
+  std::string FontFile;
 };
 
 #endif

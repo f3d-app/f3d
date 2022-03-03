@@ -62,24 +62,60 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
 {
   options.get("grid", this->GridVisible);
+  // custom pass cheat
+  
+
   options.get("axis", this->AxisVisible);
+  // custom pass? cheat
+
+
   options.get("edges", this->EdgesVisible);
+  // custom cheat
+
+
   options.get("fps", this->TimerVisible);
+  // custom pass cheat
+
   options.get("filename", this->FilenameVisible);
+  // custom pass cheat
+
   options.get("metadata", this->MetaDataVisible);
+  // custom pass chear
+
   options.get("raytracing", this->UseRaytracing);
+  // internal cheat pass 
+
   options.get("samples", this->RaytracingSamples);
+  // pass
+
+
   options.get("denoise", this->UseRaytracingDenoiser);
+  // cheat pass 
+
   options.get("ssao", this->UseSSAOPass);
+  // cheat pass
+
   options.get("fxaa", this->UseFXAAPass);
+  // cheat pass
+
   options.get("tone-mapping", this->UseToneMappingPass);
+  // cheat pass
+
   options.get("blur-background", this->UseBlurBackground);
+  // cheat pass
+
   options.get("trackball", this->UseTrackball);
+  // cheat
+
   options.get("hdri", this->HDRIFile);
+  // init pass
+
 
   // this->UseDepthPeeling is a vtkTypeBool (aka int), so we have to use the explicit
   // type function to avoid a type mismatch
   this->UseDepthPeeling = options.getAsBool("depth-peeling");
+  // pass cheat
+
 }
 
 //----------------------------------------------------------------------------
@@ -94,6 +130,11 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   this->RemoveAllViewProps();
   this->RemoveAllLights();
   this->UpdateOptions(options);
+
+  this->FileInfo = fileInfo;
+  this->Up = options.getAsString("up");
+  this->BackgroundColor = options.getAsDoubleVector("background-color");
+  this->FontFile = options.getAsString("font-file");
 
   if (!this->HDRIFile.empty())
   {
@@ -147,7 +188,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   }
 
   // parse up vector
-  std::string up = options.getAsString("up");
+  std::string up = this->Up;
   if (up.size() == 2)
   {
     char sign = up[0];
@@ -188,7 +229,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   }
   else
   {
-    this->SetBackground(options.getAsDoubleVector("background-color").data());
+    this->SetBackground(this->BackgroundColor.data());
     this->AutomaticLightCreationOn();
   }
 
@@ -202,7 +243,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
     textColor[0] = textColor[1] = textColor[2] = 0.0;
   }
 
-  this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, fileInfo.c_str());
+  this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, this->FileInfo.c_str());
   this->FilenameActor->GetTextProperty()->SetColor(textColor);
 
   this->MetaDataActor->GetTextProperty()->SetFontSize(15);
@@ -224,7 +265,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
 
-  std::string fontFile = options.getAsString("font-file");
+  std::string fontFile = this->FontFile;
   if (!fontFile.empty())
   {
     fontFile = vtksys::SystemTools::CollapseFullPath(fontFile);
@@ -248,6 +289,10 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
 
   this->TimerActor->SetInput("0 fps");
 
+
+
+
+  this->UpdateInternalActors();
   this->SetupRenderPasses();
 }
 
@@ -255,6 +300,12 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
 std::string vtkF3DRenderer::GenerateMetaDataDescription()
 {
   return " Unavailable\n";
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateInternalActors()
+{
+
 }
 
 //----------------------------------------------------------------------------
@@ -364,6 +415,8 @@ void vtkF3DRenderer::ShowAxis(bool show)
   }
 
   this->AxisVisible = show;
+
+  // XXX may not be needed
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
@@ -377,6 +430,7 @@ bool vtkF3DRenderer::IsAxisVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowGrid(bool show)
 {
+  // TODO not tested interactive
   this->GridVisible = show;
 
   double bounds[6];
@@ -544,11 +598,13 @@ void vtkF3DRenderer::ShowTimer(bool show)
 {
   if (this->TimerActor)
   {
+    // TODO again
     this->RemoveActor(this->TimerActor);
     this->AddActor(this->TimerActor);
     this->TimerActor->SetVisibility(show);
   }
   this->TimerVisible = show;
+
   this->SetupRenderPasses();
   this->CheatSheetNeedUpdate = true;
 }
@@ -564,6 +620,7 @@ void vtkF3DRenderer::ShowFilename(bool show)
 {
   if (this->FilenameActor)
   {
+    // TODO why remove add ?
     this->RemoveActor(this->FilenameActor);
     this->AddActor(this->FilenameActor);
     this->FilenameActor->SetVisibility(show);
@@ -584,6 +641,7 @@ void vtkF3DRenderer::ShowMetaData(bool show)
 {
   if (this->MetaDataActor)
   {
+    // TODO Strange that this is here
     this->RemoveActor(this->MetaDataActor);
     this->AddActor(this->MetaDataActor);
 
@@ -676,6 +734,7 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowEdge(bool show)
 {
+  // TODO
   vtkActor* anActor;
   vtkActorCollection* ac = this->GetActors();
   vtkCollectionSimpleIterator ait;
