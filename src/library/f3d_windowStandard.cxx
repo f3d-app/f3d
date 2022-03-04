@@ -153,11 +153,24 @@ bool windowStandard::update()
 {
   if (this->Internals->Renderer)
   {
-    // Make sure options are up to date
-    this->Internals->Renderer->UpdateOptions(*this->Options);
-
-    // Actors are loaded, use the bounds to reset camera and set-up SSAO
-    this->Internals->Renderer->ShowOptions();
+    this->Internals->Renderer->ShowAxis(this->Options->getAsBool("axis"));
+    this->Internals->Renderer->ShowGrid(this->Options->getAsBool("grid"));
+    this->Internals->Renderer->ShowEdge(this->Options->getAsBool("edges"));
+    this->Internals->Renderer->ShowTimer(this->Options->getAsBool("fps"));
+    this->Internals->Renderer->ShowFilename(this->Options->getAsBool("filename"));
+    this->Internals->Renderer->ShowMetaData(this->Options->getAsBool("metadata"));
+    this->Internals->Renderer->SetUseRaytracing(this->Options->getAsBool("raytracing"));
+    this->Internals->Renderer->SetRaytracingSamples(this->Options->getAsInt("samples"));
+    this->Internals->Renderer->SetUseRaytracingDenoiser(this->Options->getAsBool("denoise"));
+    this->Internals->Renderer->SetUseSSAOPass(this->Options->getAsBool("ssao"));
+    this->Internals->Renderer->SetUseFXAAPass(this->Options->getAsBool("fxaa"));
+    this->Internals->Renderer->SetUseToneMappingPass(this->Options->getAsBool("tone-mapping"));
+    this->Internals->Renderer->SetUseBlurBackground(this->Options->getAsBool("blur-background"));
+    this->Internals->Renderer->SetUseTrackball(this->Options->getAsBool("trackball"));
+    this->Internals->Renderer->SetHDRIFile(this->Options->getAsString("hdri"));
+    this->Internals->Renderer->SetUseDepthPeelingPass(this->Options->getAsBool("depth-peeling"));
+    this->Internals->Renderer->SetBackgroundColor(this->Options->getAsDoubleVector("background-color").data());
+    this->Internals->Renderer->SetFontFile(this->Options->getAsString("font-file"));
 
     // Print coloring info when available
     if (this->Options->getAsBool("verbose"))

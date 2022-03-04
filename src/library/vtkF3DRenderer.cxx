@@ -75,30 +75,7 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
-{
-  this->ShowAxis(options.getAsBool("axis"));
-  this->ShowGrid(options.getAsBool("grid"));
-  this->ShowEdge(options.getAsBool("edges"));
-  this->ShowTimer(options.getAsBool("fps"));
-  this->ShowFilename(options.getAsBool("filename"));
-  this->ShowMetaData(options.getAsBool("metadata"));
-  this->SetUseRaytracing(options.getAsBool("raytracing"));
-  this->SetRaytracingSamples(options.getAsInt("samples"));
-  this->SetUseRaytracingDenoiser(options.getAsBool("denoise"));
-  this->SetUseSSAOPass(options.getAsBool("ssao"));
-  this->SetUseFXAAPass(options.getAsBool("fxaa"));
-  this->SetUseToneMappingPass(options.getAsBool("tone-mapping"));
-  this->SetUseBlurBackground(options.getAsBool("blur-background"));
-  this->SetUseTrackball(options.getAsBool("trackball"));
-  this->SetHDRIFile(options.getAsString("hdri"));
-  this->SetUseDepthPeelingPass(options.getAsBool("depth-peeling"));
-  this->SetBackgroundColor(options.getAsDoubleVector("background-color").data());
-  this->SetFontFile(options.getAsString("font-file"));
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& fileInfo, const std::string& up)
+void vtkF3DRenderer::Initialize(const f3d::options&, const std::string& fileInfo, const std::string& up)
 {
   if (!this->RenderWindow)
   {
@@ -114,8 +91,6 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   this->AddActor(this->TimerActor);
   this->AddActor(this->MetaDataActor);
   this->AddActor(this->CheatSheetActor);
-
-  this->UpdateOptions(options);
 
   this->FileInfo = fileInfo;
 
@@ -162,6 +137,8 @@ std::string vtkF3DRenderer::GenerateMetaDataDescription()
 void vtkF3DRenderer::UpdateInternalActors()
 {
   // TODO test this dynamically
+
+  // XXX this code could be put into each individual setter
 
   // Update metadata info
   std::string MetaDataDesc = this->GenerateMetaDataDescription();
@@ -421,24 +398,6 @@ void vtkF3DRenderer::UpdateRenderPasses()
 #endif
 
   this->RenderPassesNeedUpdate = false;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::ShowOptions()
-{
-  // TODO is this method needed anymore ?
-//  this->ShowAxis(this->AxisVisible);
-
-  /*
-  this->ShowGrid(this->GridVisible);
-  this->ShowTimer(this->TimerVisible);
-  this->ShowEdge(this->EdgeVisible);
-  this->ShowFilename(this->FilenameVisible);
-  this->ShowCheatSheet(this->CheatSheetVisible);
-  this->ShowMetaData(this->MetaDataVisible);
-  */
-
-//  this->UpdateInternalActors();
 }
 
 //----------------------------------------------------------------------------

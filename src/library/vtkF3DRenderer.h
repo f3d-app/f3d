@@ -86,11 +86,6 @@ public:
   void Render() override;
 
   /**
-   * Update internal options using provided options
-   */
-  virtual void UpdateOptions(const f3d::options& options);
-
-  /**
    * Initialize the renderer to be used with provided options and file.
    * Should be called after being added to a vtkRenderWindow.
    */
