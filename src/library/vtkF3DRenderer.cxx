@@ -78,6 +78,7 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
 {
   this->ShowAxis(options.getAsBool("axis"));
+  
   this->ShowGrid(options.getAsBool("grid"));
   this->ShowEdge(options.getAsBool("edges"));
   this->ShowTimer(options.getAsBool("fps"));
@@ -114,7 +115,6 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   this->AddActor(this->TimerActor);
   this->AddActor(this->MetaDataActor);
   this->AddActor(this->CheatSheetActor);
-
 
   this->UpdateOptions(options);
 
@@ -170,21 +170,6 @@ void vtkF3DRenderer::UpdateInternalActors()
   this->TimerActor->SetVisibility(this->TimerVisible);
   this->MetaDataActor->SetVisibility(this->MetaDataVisible);
   this->CheatSheetActor->SetVisibility(this->CheatSheetVisible);
-
-  // Dynamic axis widget
-  if (this->AxisVisible)
-  {
-
-    vtkNew<vtkAxesActor> axes;
-    this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
-    this->AxisWidget->SetOrientationMarker(axes);
-    this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
-
-    this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
-    this->AxisWidget->On();
-    this->AxisWidget->InteractiveOff();
-    this->AxisWidget->SetKeyPressActivation(false);
-  }
 
   // Update metadata info
   std::string MetaDataDesc = this->GenerateMetaDataDescription();
@@ -450,7 +435,7 @@ void vtkF3DRenderer::UpdateRenderPasses()
 void vtkF3DRenderer::ShowOptions()
 {
   // TODO is this method needed anymore ?
-//  this->ShowAxis(this->AxisVisible);
+  this->ShowAxis(this->AxisVisible);
 
   /*
   this->ShowGrid(this->GridVisible);
@@ -473,17 +458,25 @@ std::string vtkF3DRenderer::GetRenderingDescription()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowAxis(bool show)
 {
-  // XXX Widget needs to be created/destructed outside of rendering
+  // Dynamic visible axis
+  // Widget can't be managed like an actor
   if (show)
   {
+    vtkNew<vtkAxesActor> axes;
     this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
+    this->AxisWidget->SetOrientationMarker(axes);
+    this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
+    this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
+    this->AxisWidget->On();
+    this->AxisWidget->InteractiveOff();
+    this->AxisWidget->SetKeyPressActivation(false);
   }
   else
   {
     this->AxisWidget = nullptr;
   }
+
   this->AxisVisible = show;
-  this->InternalActorsNeedUpdate = true;
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
