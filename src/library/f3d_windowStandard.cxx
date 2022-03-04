@@ -145,7 +145,7 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
     this->Internals->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
   }
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
-  this->Internals->Renderer->Initialize(*this->Options, fileInfo);
+  this->Internals->Renderer->Initialize(*this->Options, fileInfo, this->Options->getAsString("up"));
 }
 
 //----------------------------------------------------------------------------

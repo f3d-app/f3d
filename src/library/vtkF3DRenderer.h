@@ -84,7 +84,7 @@ public:
    * Initialize the renderer to be used with provided options and file.
    * Should be called after being added to a vtkRenderWindow.
    */
-  virtual void Initialize(const f3d::options& options, const std::string& fileInfo);
+  virtual void Initialize(const f3d::options& options, const std::string& fileInfo, const std::string& up);
 
   //@{
   /**

@@ -131,7 +131,7 @@ void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& fileInfo)
+void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& fileInfo, const std::string& up)
 {
   if (!this->RenderWindow)
   {
@@ -151,13 +151,11 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   this->UpdateOptions(options);
 
   this->FileInfo = fileInfo;
-  this->Up = options.getAsString("up");
   this->BackgroundColor = options.getAsDoubleVector("background-color");
   this->FontFile = options.getAsString("font-file");
 
   // TODO somehow cant be set after initialization
   // parse up vector
-  std::string up = this->Up;
   if (up.size() == 2)
   {
     char sign = up[0];

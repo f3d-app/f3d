@@ -15,9 +15,9 @@ vtkStandardNewMacro(vtkF3DRendererWithColoring);
 
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::Initialize(
-  const f3d::options& options, const std::string& fileInfo)
+  const f3d::options& options, const std::string& fileInfo, const std::string& up)
 {
-  this->Superclass::Initialize(options, fileInfo);
+  this->Superclass::Initialize(options, fileInfo, up);
 
   this->SetScalarBarActor(nullptr);
   this->SetGeometryActor(nullptr);

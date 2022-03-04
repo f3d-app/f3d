@@ -25,7 +25,7 @@ public:
   static vtkF3DRendererWithColoring* New();
   vtkTypeMacro(vtkF3DRendererWithColoring, vtkF3DRenderer);
 
-  void Initialize(const f3d::options& options, const std::string& fileInfo) override;
+  void Initialize(const f3d::options& options, const std::string& fileInfo, const std::string& up) override;
 
   //@{
   /**
