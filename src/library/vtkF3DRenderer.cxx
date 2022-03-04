@@ -92,10 +92,10 @@ void vtkF3DRenderer::Initialize(const f3d::options&, const std::string& fileInfo
   this->AddActor(this->MetaDataActor);
   this->AddActor(this->CheatSheetActor);
 
-  this->FileInfo = fileInfo;
+  this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, fileInfo.c_str());
 
-  // TODO somehow cant be set after initialization
-  // parse up vector
+  // Many things depends on UpVector being set
+  // Simpler to set on initialization only
   if (up.size() == 2)
   {
     char sign = up[0];
@@ -122,214 +122,12 @@ void vtkF3DRenderer::Initialize(const f3d::options&, const std::string& fileInfo
       this->SetEnvironmentRight(this->RightVector);
     }
   }
-
-  this->UpdateInternalActors();
-  this->UpdateRenderPasses();
 }
 
 //----------------------------------------------------------------------------
 std::string vtkF3DRenderer::GenerateMetaDataDescription()
 {
   return " Unavailable\n";
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::UpdateInternalActors()
-{
-  // TODO test this dynamically
-
-  // XXX this code could be put into each individual setter
-
-  // Update metadata info
-  std::string MetaDataDesc = this->GenerateMetaDataDescription();
-  this->MetaDataActor->SetText(vtkCornerAnnotation::RightEdge, MetaDataDesc.c_str());
-
-  // Dynamic edges
-  vtkActor* anActor;
-  vtkActorCollection* ac = this->GetActors();
-  vtkCollectionSimpleIterator ait;
-  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
-  {
-    if (vtkSkybox::SafeDownCast(anActor) == nullptr)
-    {
-      anActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
-    }
-  }
-
-  // Dynamic Grid
-  bool show = this->GridVisible;
-  double bounds[6];
-  this->ComputeVisiblePropBounds(bounds);
-
-  vtkBoundingBox bbox(bounds);
-
-  if (!bbox.IsValid())
-  {
-    show = false;
-  }
-
-  if (show)
-  {
-    this->SetClippingRangeExpansion(0.99);
-
-    double diag = bbox.GetDiagonalLength();
-    double unitSquare = pow(10.0, round(log10(diag * 0.1)));
-
-    double gridPos[3];
-    for (int i = 0; i < 3; i++)
-    {
-      double size = bounds[2 * i + 1] - bounds[2 * i];
-      gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
-    }
-
-    std::stringstream stream;
-    stream << "Using grid unit square size = " << unitSquare << "\n"
-      << "Grid origin set to [" << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2]
-      << "]\n\n";
-    this->GridInfo = stream.str();
-
-    vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
-    gridMapper->SetFadeDistance(diag);
-    gridMapper->SetUnitSquare(unitSquare);
-    gridMapper->SetUpIndex(this->UpIndex);
-
-    this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
-    this->GridActor->ForceTranslucentOn();
-    this->GridActor->SetPosition(gridPos);
-    this->GridActor->SetMapper(gridMapper);
-    this->GridActor->UseBoundsOff();
-  }
-  else
-  {
-    this->SetClippingRangeExpansion(0);
-    this->GridInfo = "";
-  }
-  this->GridActor->SetVisibility(show);
-  this->ResetCameraClippingRange();
-
-  // Read HDRI when needed
-  vtkNew<vtkTexture> hdriTexture;
-  if (this->HDRINeedUpdate)
-  {
-    this->HasHDRI = false;
-    if(!this->HDRIFile.empty())
-    {
-      this->HDRIFile = vtksys::SystemTools::CollapseFullPath(this->HDRIFile);
-      if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
-      {
-        vtkF3DLog::Print(
-          vtkF3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
-      }
-      else
-      {
-        auto reader = vtkSmartPointer<vtkImageReader2>::Take(
-          vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
-        if (reader)
-        {
-          reader->SetFileName(this->HDRIFile.c_str());
-          reader->Update();
-
-          hdriTexture->SetColorModeToDirectScalars();
-          hdriTexture->MipmapOn();
-          hdriTexture->InterpolateOn();
-          hdriTexture->SetInputConnection(reader->GetOutputPort());
-
-          // 8-bit textures are usually gamma-corrected
-          if (reader->GetOutput() && reader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
-          {
-            hdriTexture->UseSRGBColorSpaceOn();
-          }
-
-          this->HasHDRI = true;
-        }
-        else
-        {
-          vtkF3DLog::Print(
-            vtkF3DLog::Severity::Warning, std::string("Cannot open HDRI file ") + this->HDRIFile);
-        }
-      }
-    }
-  }
-
-  // Dynamic HDRI
-  if (this->HasHDRI)
-  {
-    // Reset background for coherency
-    this->SetBackground(0, 0, 0);
-
-    // HDRI OpenGL
-    this->UseImageBasedLightingOn();
-    this->SetEnvironmentTexture(hdriTexture);
-
-    // Skybox OpenGL
-    this->Skybox->SetProjection(vtkSkybox::Sphere);
-    this->Skybox->SetTexture(hdriTexture);
-
-    // First version of VTK including the version check (and the feature used)
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
-    this->Skybox->GammaCorrectOn();
-#endif
-
-    // skybox orientation
-    double front[3];
-    vtkMath::Cross(this->RightVector, this->UpVector, front);
-    this->Skybox->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
-    this->Skybox->SetFloorRight(front[0], front[1], front[2]);
-
-    this->AddActor(this->Skybox);
-    this->AutomaticLightCreationOff();
-  }
-  else
-  {
-    this->SetBackground(this->BackgroundColor);
-    this->UseImageBasedLightingOff();
-    this->SetEnvironmentTexture(nullptr);
-    this->RemoveActor(this->Skybox);
-    this->AutomaticLightCreationOn();
-  }
-
-  // Dynamic filename actor text
-  this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, this->FileInfo.c_str());
-
-  // Dynamic text color
-  double textColor[3];
-  if (this->IsBackgroundDark())
-  {
-    textColor[0] = textColor[1] = textColor[2] = 1.0;
-  }
-  else
-  {
-    textColor[0] = textColor[1] = textColor[2] = 0.0;
-  }
-  this->FilenameActor->GetTextProperty()->SetColor(textColor);
-  this->TimerActor->GetTextProperty()->SetColor(textColor);
-
-  // Dynamic font management
-  this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
-  this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
-  this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
-  this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
-  std::string fontFile = this->FontFile;
-  if (!fontFile.empty())
-  {
-    fontFile = vtksys::SystemTools::CollapseFullPath(fontFile);
-    if (vtksys::SystemTools::FileExists(fontFile, true))
-    {
-      this->FilenameActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->FilenameActor->GetTextProperty()->SetFontFile(fontFile.c_str());
-      this->MetaDataActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->MetaDataActor->GetTextProperty()->SetFontFile(fontFile.c_str());
-      this->TimerActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->TimerActor->GetTextProperty()->SetFontFile(fontFile.c_str());
-      this->CheatSheetActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->CheatSheetActor->GetTextProperty()->SetFontFile(fontFile.c_str());
-    }
-    else
-    {
-      vtkF3DLog::Print(
-        vtkF3DLog::Severity::Warning, std::string("Cannot find \"") + fontFile + "\" font file.");
-    }
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -410,7 +208,6 @@ std::string vtkF3DRenderer::GetRenderingDescription()
 void vtkF3DRenderer::ShowAxis(bool show)
 {
   // Dynamic visible axis
-  // Widget can't be managed like an actor as turning it on triggers a render
   if (show)
   {
     vtkNew<vtkAxesActor> axes;
@@ -443,7 +240,57 @@ void vtkF3DRenderer::ShowGrid(bool show)
 {
   // TODO Test interactive
   this->GridVisible = show;
-  this->UpdateInternalActors();
+
+  // Dynamic Grid
+  double bounds[6];
+  this->ComputeVisiblePropBounds(bounds);
+
+  vtkBoundingBox bbox(bounds);
+
+  if (!bbox.IsValid())
+  {
+    show = false;
+  }
+
+  if (show)
+  {
+    this->SetClippingRangeExpansion(0.99);
+
+    double diag = bbox.GetDiagonalLength();
+    double unitSquare = pow(10.0, round(log10(diag * 0.1)));
+
+    double gridPos[3];
+    for (int i = 0; i < 3; i++)
+    {
+      double size = bounds[2 * i + 1] - bounds[2 * i];
+      gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
+    }
+
+    std::stringstream stream;
+    stream << "Using grid unit square size = " << unitSquare << "\n"
+      << "Grid origin set to [" << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2]
+      << "]\n\n";
+    this->GridInfo = stream.str();
+
+    vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
+    gridMapper->SetFadeDistance(diag);
+    gridMapper->SetUnitSquare(unitSquare);
+    gridMapper->SetUpIndex(this->UpIndex);
+
+    this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
+    this->GridActor->ForceTranslucentOn();
+    this->GridActor->SetPosition(gridPos);
+    this->GridActor->SetMapper(gridMapper);
+    this->GridActor->UseBoundsOff();
+  }
+  else
+  {
+    this->SetClippingRangeExpansion(0);
+    this->GridInfo = "";
+  }
+  this->GridActor->SetVisibility(show);
+  this->ResetCameraClippingRange();
+
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
@@ -457,26 +304,149 @@ bool vtkF3DRenderer::IsGridVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
 {
-  this->HDRIFile = hdriFile;
-  this->HDRINeedUpdate = true;
-  this->UpdateInternalActors();
+  // Check HDRI is different than current one
+  if (this->HDRIFile != hdriFile)
+  {
+    this->HDRIFile = hdriFile;
+
+    // Read HDRI when needed
+    vtkNew<vtkTexture> hdriTexture;
+    this->HasHDRI = false;
+    if(!this->HDRIFile.empty())
+    {
+      this->HDRIFile = vtksys::SystemTools::CollapseFullPath(this->HDRIFile);
+      if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
+      {
+        vtkF3DLog::Print(
+          vtkF3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
+      }
+      else
+      {
+        auto reader = vtkSmartPointer<vtkImageReader2>::Take(
+          vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
+        if (reader)
+        {
+          reader->SetFileName(this->HDRIFile.c_str());
+          reader->Update();
+
+          hdriTexture->SetColorModeToDirectScalars();
+          hdriTexture->MipmapOn();
+          hdriTexture->InterpolateOn();
+          hdriTexture->SetInputConnection(reader->GetOutputPort());
+
+          // 8-bit textures are usually gamma-corrected
+          if (reader->GetOutput() && reader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
+          {
+            hdriTexture->UseSRGBColorSpaceOn();
+          }
+
+          this->HasHDRI = true;
+        }
+        else
+        {
+          vtkF3DLog::Print(
+            vtkF3DLog::Severity::Warning, std::string("Cannot open HDRI file ") + this->HDRIFile);
+        }
+      }
+    }
+
+    // Dynamic HDRI
+    if (this->HasHDRI)
+    {
+      // HDRI OpenGL
+      this->UseImageBasedLightingOn();
+      this->SetEnvironmentTexture(hdriTexture);
+
+      // Skybox OpenGL
+      this->Skybox->SetProjection(vtkSkybox::Sphere);
+      this->Skybox->SetTexture(hdriTexture);
+
+      // First version of VTK including the version check (and the feature used)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
+      this->Skybox->GammaCorrectOn();
+#endif
+
+      // skybox orientation
+      double front[3];
+      vtkMath::Cross(this->RightVector, this->UpVector, front);
+      this->Skybox->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
+      this->Skybox->SetFloorRight(front[0], front[1], front[2]);
+
+      this->AddActor(this->Skybox);
+      this->AutomaticLightCreationOff();
+    }
+    else
+    {
+      this->UseImageBasedLightingOff();
+      this->SetEnvironmentTexture(nullptr);
+      this->RemoveActor(this->Skybox);
+      this->AutomaticLightCreationOn();
+    }
+
+    // Dynamic text color
+    double textColor[3];
+    if (this->IsBackgroundDark())
+    {
+      textColor[0] = textColor[1] = textColor[2] = 1.0;
+    }
+    else
+    {
+      textColor[0] = textColor[1] = textColor[2] = 0.0;
+    }
+    this->FilenameActor->GetTextProperty()->SetColor(textColor);
+    this->TimerActor->GetTextProperty()->SetColor(textColor);
+  }
+
   this->RenderPassesNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetFontFile(const std::string& fontFile)
 {
-  this->FontFile = fontFile;
-  this->UpdateInternalActors();
+  // Dynamic font management
+  this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
+  if (!fontFile.empty())
+  {
+    std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(fontFile);
+    if (vtksys::SystemTools::FileExists(tmpFontFile, true))
+    {
+      this->FilenameActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->FilenameActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+      this->MetaDataActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->MetaDataActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+      this->TimerActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->TimerActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+      this->CheatSheetActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->CheatSheetActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+    }
+    else
+    {
+      vtkF3DLog::Print(
+        vtkF3DLog::Severity::Warning, std::string("Cannot find \"") + tmpFontFile + "\" font file.");
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetBackgroundColor(const double* color)
+void vtkF3DRenderer::SetBackground(const double* color)
 {
-  this->BackgroundColor[0] = color[0];
-  this->BackgroundColor[1] = color[1];
-  this->BackgroundColor[2] = color[2];
-  this->UpdateInternalActors();
+  this->Superclass::SetBackground(color);
+
+  // Dynamic text color
+  double textColor[3];
+  if (this->IsBackgroundDark())
+  {
+    textColor[0] = textColor[1] = textColor[2] = 1.0;
+  }
+  else
+  {
+    textColor[0] = textColor[1] = textColor[2] = 0.0;
+  }
+  this->FilenameActor->GetTextProperty()->SetColor(textColor);
+  this->TimerActor->GetTextProperty()->SetColor(textColor);
 }
 
 //----------------------------------------------------------------------------
@@ -553,7 +523,6 @@ bool vtkF3DRenderer::UsingToneMappingPass()
 void vtkF3DRenderer::SetUseRaytracing(bool use)
 {
   this->UseRaytracing = use;
-  this->UpdateInternalActors();
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
@@ -620,6 +589,13 @@ void vtkF3DRenderer::ShowMetaData(bool show)
 {
   this->MetaDataVisible = show;
   this->MetaDataActor->SetVisibility(show);
+  if (show)
+  {
+    // Update metadata info
+    std::string MetaDataDesc = this->GenerateMetaDataDescription();
+    this->MetaDataActor->SetText(vtkCornerAnnotation::RightEdge, MetaDataDesc.c_str());
+  }
+
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
@@ -694,6 +670,19 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 void vtkF3DRenderer::ShowEdge(bool show)
 {
   this->EdgeVisible = show;
+
+  // Dynamic edges
+  vtkActor* anActor;
+  vtkActorCollection* ac = this->GetActors();
+  vtkCollectionSimpleIterator ait;
+  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
+  {
+    if (vtkSkybox::SafeDownCast(anActor) == nullptr)
+    {
+      anActor->GetProperty()->SetEdgeVisibility(show);
+    }
+  }
+
   this->CheatSheetNeedUpdate = true;
 }
 
@@ -787,7 +776,7 @@ bool vtkF3DRenderer::IsBackgroundDark()
 {
   double luminance =
     0.299 * this->Background[0] + 0.587 * this->Background[1] + 0.114 * this->Background[2];
-  return luminance < 0.5;
+  return this->HasHDRI ? true : luminance < 0.5;
 }
 
 //----------------------------------------------------------------------------

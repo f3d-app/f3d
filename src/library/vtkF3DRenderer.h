@@ -54,7 +54,7 @@ public:
    */
   void SetFontFile(const std::string& fontFile);
   void SetHDRIFile(const std::string& hdriFile);
-  void SetBackgroundColor(const double* backgroundColor);
+  void SetBackground(const double* backgroundColor) override;
   //@}
 
   //@{
@@ -97,16 +97,15 @@ public:
   vtkGetObjectMacro(Skybox, vtkSkybox);
 
   /**
-   * Set the visibility of the different actors
-   * as they were set by the options during the initialization.
-   * Also call UpdateInternalActors
-   */
-  void ShowOptions();
-
-  /**
    * Update the different render passes which can be needed when changing some options
    */
   void UpdateRenderPasses();
+
+  /**
+   * Update the actors using the configuration of the renderer
+   * TODO to remove
+   */
+  virtual void UpdateInternalActors(){};
 
   /**
    * Initialize the camera position, focal point,
@@ -139,11 +138,6 @@ public:
    * Set/Get right vector
    */
   vtkGetVector3Macro(RightVector, double);
-
-  /**
-   * Update the actors using the configuration of the renderer
-   */
-  virtual void UpdateInternalActors();
 
 protected:
   vtkF3DRenderer();

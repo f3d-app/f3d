@@ -169,8 +169,11 @@ bool windowStandard::update()
     this->Internals->Renderer->SetUseTrackball(this->Options->getAsBool("trackball"));
     this->Internals->Renderer->SetHDRIFile(this->Options->getAsString("hdri"));
     this->Internals->Renderer->SetUseDepthPeelingPass(this->Options->getAsBool("depth-peeling"));
-    this->Internals->Renderer->SetBackgroundColor(this->Options->getAsDoubleVector("background-color").data());
+    this->Internals->Renderer->SetBackground(this->Options->getAsDoubleVector("background-color").data());
     this->Internals->Renderer->SetFontFile(this->Options->getAsString("font-file"));
+
+    // TODO to remove
+    this->Internals->Renderer->UpdateInternalActors();
 
     // Print coloring info when available
     if (this->Options->getAsBool("verbose"))

@@ -351,8 +351,6 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::UpdateInternalActors()
 {
-  this->Superclass::UpdateInternalActors();
-
   // Make sure ArrayForColoring is pointing to the right array
   if (this->DataForColoring)
   {
