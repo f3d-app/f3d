@@ -128,6 +128,8 @@ void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
   this->UseDepthPeeling = options.getAsBool("depth-peeling");
   // pass cheat
 
+  this->SetBackgroundColor(options.getAsDoubleVector("background-color").data());
+  this->SetFontFile(options.getAsString("font-file"));
 }
 
 //----------------------------------------------------------------------------
@@ -151,8 +153,6 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
   this->UpdateOptions(options);
 
   this->FileInfo = fileInfo;
-  this->BackgroundColor = options.getAsDoubleVector("background-color");
-  this->FontFile = options.getAsString("font-file");
 
   // TODO somehow cant be set after initialization
   // parse up vector
@@ -346,7 +346,7 @@ void vtkF3DRenderer::UpdateInternalActors()
   }
   else
   {
-    this->SetBackground(this->BackgroundColor.data());
+    this->SetBackground(this->BackgroundColor);
     this->UseImageBasedLightingOff();
     this->SetEnvironmentTexture(nullptr);
     this->RemoveActor(this->Skybox);
@@ -536,6 +536,22 @@ void vtkF3DRenderer::ShowGrid(bool show)
 bool vtkF3DRenderer::IsGridVisible()
 {
   return this->GridVisible;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetFontFile(const std::string& file)
+{
+  this->FontFile = file;
+  this->InternalActorsNeedUpdate = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetBackgroundColor(const double* color)
+{
+  this->BackgroundColor[0] = color[0];
+  this->BackgroundColor[1] = color[1];
+  this->BackgroundColor[2] = color[2];
+  this->InternalActorsNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------

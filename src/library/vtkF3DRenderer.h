@@ -50,6 +50,14 @@ public:
 
   //@{
   /**
+   * Set different actors parameters
+   */
+  void SetFontFile(const std::string& file);
+  void SetBackgroundColor(const double* backgroundColor);
+  //@}
+
+  //@{
+  /**
    * Set/Get usages of different render passes
    */
   void SetUseRaytracing(bool use);
@@ -85,14 +93,6 @@ public:
    * Should be called after being added to a vtkRenderWindow.
    */
   virtual void Initialize(const f3d::options& options, const std::string& fileInfo, const std::string& up);
-
-  //@{
-  /**
-   * Set/Get the axis widget
-   */
-  vtkGetSmartPointerMacro(AxisWidget, vtkOrientationMarkerWidget);
-  vtkSetSmartPointerMacro(AxisWidget, vtkOrientationMarkerWidget);
-  //@}
 
   /**
    * Get the OpenGL skybox
@@ -133,21 +133,15 @@ public:
    */
   virtual std::string GetRenderingDescription();
 
-  //@{
   /**
-   * Set/Get up vector
+   * Get up vector
    */
   vtkGetVector3Macro(UpVector, double);
-  vtkSetVector3Macro(UpVector, double);
-  //@}
 
-  //@{
   /**
    * Set/Get right vector
    */
   vtkGetVector3Macro(RightVector, double);
-  vtkSetVector3Macro(RightVector, double);
-  //@}
 
   /**
    * Update the actors using the configuration of the renderer
@@ -220,7 +214,7 @@ protected:
 
   std::string FileInfo;
   std::string Up;
-  std::vector<double> BackgroundColor;
+  double BackgroundColor[3];
   std::string FontFile;
 
   bool HDRINeedUpdate = false;
