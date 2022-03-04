@@ -220,10 +220,8 @@ protected:
   std::string FontFile;
 
   bool HDRINeedUpdate = false;
-  bool HasHDRI = false;
-
-  bool InternalActorsNeedUpdate = false;
   bool RenderPassesNeedUpdate = false;
+  bool HasHDRI = false;
 };
 
 #endif

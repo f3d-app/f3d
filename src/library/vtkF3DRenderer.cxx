@@ -78,7 +78,6 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
 {
   this->ShowAxis(options.getAsBool("axis"));
-  
   this->ShowGrid(options.getAsBool("grid"));
   this->ShowEdge(options.getAsBool("edges"));
   this->ShowTimer(options.getAsBool("fps"));
@@ -163,13 +162,6 @@ std::string vtkF3DRenderer::GenerateMetaDataDescription()
 void vtkF3DRenderer::UpdateInternalActors()
 {
   // TODO test this dynamically
-
-  // Simple dynamic actors
-  // TODO: maybe avoid using UpdateInternalActors for simple actor as it can be expansive
-  this->FilenameActor->SetVisibility(this->FilenameVisible);
-  this->TimerActor->SetVisibility(this->TimerVisible);
-  this->MetaDataActor->SetVisibility(this->MetaDataVisible);
-  this->CheatSheetActor->SetVisibility(this->CheatSheetVisible);
 
   // Update metadata info
   std::string MetaDataDesc = this->GenerateMetaDataDescription();
@@ -435,7 +427,7 @@ void vtkF3DRenderer::UpdateRenderPasses()
 void vtkF3DRenderer::ShowOptions()
 {
   // TODO is this method needed anymore ?
-  this->ShowAxis(this->AxisVisible);
+//  this->ShowAxis(this->AxisVisible);
 
   /*
   this->ShowGrid(this->GridVisible);
@@ -446,7 +438,7 @@ void vtkF3DRenderer::ShowOptions()
   this->ShowMetaData(this->MetaDataVisible);
   */
 
-  this->UpdateInternalActors();
+//  this->UpdateInternalActors();
 }
 
 //----------------------------------------------------------------------------
@@ -459,7 +451,7 @@ std::string vtkF3DRenderer::GetRenderingDescription()
 void vtkF3DRenderer::ShowAxis(bool show)
 {
   // Dynamic visible axis
-  // Widget can't be managed like an actor
+  // Widget can't be managed like an actor as turning it on triggers a render
   if (show)
   {
     vtkNew<vtkAxesActor> axes;
@@ -492,7 +484,7 @@ void vtkF3DRenderer::ShowGrid(bool show)
 {
   // TODO Test interactive
   this->GridVisible = show;
-  this->InternalActorsNeedUpdate = true;
+  this->UpdateInternalActors();
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
@@ -508,7 +500,7 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
 {
   this->HDRIFile = hdriFile;
   this->HDRINeedUpdate = true;
-  this->InternalActorsNeedUpdate = true;
+  this->UpdateInternalActors();
   this->RenderPassesNeedUpdate = true;
 }
 
@@ -516,7 +508,7 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
 void vtkF3DRenderer::SetFontFile(const std::string& fontFile)
 {
   this->FontFile = fontFile;
-  this->InternalActorsNeedUpdate = true;
+  this->UpdateInternalActors();
 }
 
 //----------------------------------------------------------------------------
@@ -525,7 +517,7 @@ void vtkF3DRenderer::SetBackgroundColor(const double* color)
   this->BackgroundColor[0] = color[0];
   this->BackgroundColor[1] = color[1];
   this->BackgroundColor[2] = color[2];
-  this->InternalActorsNeedUpdate = true;
+  this->UpdateInternalActors();
 }
 
 //----------------------------------------------------------------------------
@@ -602,7 +594,7 @@ bool vtkF3DRenderer::UsingToneMappingPass()
 void vtkF3DRenderer::SetUseRaytracing(bool use)
 {
   this->UseRaytracing = use;
-  this->InternalActorsNeedUpdate = true;
+  this->UpdateInternalActors();
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
@@ -638,7 +630,7 @@ bool vtkF3DRenderer::UsingRaytracingDenoiser()
 void vtkF3DRenderer::ShowTimer(bool show)
 {
   this->TimerVisible = show;
-  this->InternalActorsNeedUpdate = true;
+  this->TimerActor->SetVisibility(show);
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
@@ -653,7 +645,7 @@ bool vtkF3DRenderer::IsTimerVisible()
 void vtkF3DRenderer::ShowFilename(bool show)
 {
   this->FilenameVisible = show;
-  this->InternalActorsNeedUpdate = true;
+  this->FilenameActor->SetVisibility(show);
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
@@ -668,7 +660,7 @@ bool vtkF3DRenderer::IsFilenameVisible()
 void vtkF3DRenderer::ShowMetaData(bool show)
 {
   this->MetaDataVisible = show;
-  this->InternalActorsNeedUpdate = true;
+  this->MetaDataActor->SetVisibility(show);
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
@@ -683,7 +675,7 @@ bool vtkF3DRenderer::IsMetaDataVisible()
 void vtkF3DRenderer::ShowCheatSheet(bool show)
 {
   this->CheatSheetVisible = show;
-  this->InternalActorsNeedUpdate = true;
+  this->CheatSheetActor->SetVisibility(show);
   this->RenderPassesNeedUpdate = true;
   this->CheatSheetNeedUpdate = true;
 }
@@ -768,12 +760,6 @@ bool vtkF3DRenderer::UsingTrackball()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
-  if (this->InternalActorsNeedUpdate)
-  {
-    this->UpdateInternalActors();
-    this->InternalActorsNeedUpdate = false;
-  }
-
   if (this->RenderPassesNeedUpdate)
   {
     this->UpdateRenderPasses();
