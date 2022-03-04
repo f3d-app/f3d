@@ -52,13 +52,14 @@ public:
   /**
    * Set different actors parameters
    */
-  void SetFontFile(const std::string& file);
+  void SetFontFile(const std::string& fontFile);
+  void SetHDRIFile(const std::string& hdriFile);
   void SetBackgroundColor(const double* backgroundColor);
   //@}
 
   //@{
   /**
-   * Set/Get usages of different render passes
+   * Set/Get usages and configurations of different render passes
    */
   void SetUseRaytracing(bool use);
   void SetUseRaytracingDenoiser(bool use);
@@ -68,6 +69,7 @@ public:
   void SetUseToneMappingPass(bool use);
   void SetUseBlurBackground(bool use);
   void SetUseTrackball(bool use);
+  void SetRaytracingSamples(int samples);
   bool UsingRaytracing();
   bool UsingRaytracingDenoiser();
   bool UsingDepthPeelingPass();

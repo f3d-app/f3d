@@ -77,57 +77,23 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateOptions(const f3d::options& options)
 {
-  options.get("grid", this->GridVisible);
-  // custom pass cheat
-
-  options.get("axis", this->AxisVisible);
-  // custom pass? cheat
-
-  options.get("edges", this->EdgeVisible);
-  // custom cheat
-
-  options.get("fps", this->TimerVisible);
-  // custom pass cheat
-
-  options.get("filename", this->FilenameVisible);
-  // custom pass cheat
-
-  options.get("metadata", this->MetaDataVisible);
-  // custom pass chear
-
-  options.get("raytracing", this->UseRaytracing);
-  // internal cheat pass
-
-  options.get("samples", this->RaytracingSamples);
-  // pass
-
-  options.get("denoise", this->UseRaytracingDenoiser);
-  // cheat pass
-
-  options.get("ssao", this->UseSSAOPass);
-  // cheat pass
-
-  options.get("fxaa", this->UseFXAAPass);
-  // cheat pass
-
-  options.get("tone-mapping", this->UseToneMappingPass);
-  // cheat pass
-
-  options.get("blur-background", this->UseBlurBackground);
-  // cheat pass
-
-  options.get("trackball", this->UseTrackball);
-  // cheat
-
-  options.get("hdri", this->HDRIFile);
-  this->HDRINeedUpdate = true;
-  // init pass
-
-  // this->UseDepthPeeling is a vtkTypeBool (aka int), so we have to use the explicit
-  // type function to avoid a type mismatch
-  this->UseDepthPeeling = options.getAsBool("depth-peeling");
-  // pass cheat
-
+  this->ShowAxis(options.getAsBool("axis"));
+  
+  this->ShowGrid(options.getAsBool("grid"));
+  this->ShowEdge(options.getAsBool("edges"));
+  this->ShowTimer(options.getAsBool("fps"));
+  this->ShowFilename(options.getAsBool("filename"));
+  this->ShowMetaData(options.getAsBool("metadata"));
+  this->SetUseRaytracing(options.getAsBool("raytracing"));
+  this->SetRaytracingSamples(options.getAsInt("samples"));
+  this->SetUseRaytracingDenoiser(options.getAsBool("denoise"));
+  this->SetUseSSAOPass(options.getAsBool("ssao"));
+  this->SetUseFXAAPass(options.getAsBool("fxaa"));
+  this->SetUseToneMappingPass(options.getAsBool("tone-mapping"));
+  this->SetUseBlurBackground(options.getAsBool("blur-background"));
+  this->SetUseTrackball(options.getAsBool("trackball"));
+  this->SetHDRIFile(options.getAsString("hdri"));
+  this->SetUseDepthPeelingPass(options.getAsBool("depth-peeling"));
   this->SetBackgroundColor(options.getAsDoubleVector("background-color").data());
   this->SetFontFile(options.getAsString("font-file"));
 }
@@ -412,7 +378,7 @@ void vtkF3DRenderer::UpdateRenderPasses()
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseDepthPeelingPass(this->UseDepthPeelingPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
-  newPass->SetForceOpaqueBackground(!this->HDRIFile.empty());
+  newPass->SetForceOpaqueBackground(this->HasHDRI);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -447,12 +413,11 @@ void vtkF3DRenderer::UpdateRenderPasses()
   vtkOSPRayRendererNode::SetEnableDenoiser(this->UseRaytracingDenoiser, this);
   vtkOSPRayRendererNode::SetDenoiserThreshold(0, this);
 
-  bool hasHDRI = this->GetEnvironmentTexture() != nullptr;
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210123)
   vtkOSPRayRendererNode::SetBackgroundMode(
-    hasHDRI ? vtkOSPRayRendererNode::Environment : vtkOSPRayRendererNode::Backplate, this);
+    this->HasHDRI ? vtkOSPRayRendererNode::Environment : vtkOSPRayRendererNode::Backplate, this);
 #else
-  vtkOSPRayRendererNode::SetBackgroundMode(hasHDRI ? 2 : 1, this);
+  vtkOSPRayRendererNode::SetBackgroundMode(this->HasHDRI ? 2 : 1, this);
 #endif
 
 #else
@@ -539,9 +504,18 @@ bool vtkF3DRenderer::IsGridVisible()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetFontFile(const std::string& file)
+void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
 {
-  this->FontFile = file;
+  this->HDRIFile = hdriFile;
+  this->HDRINeedUpdate = true;
+  this->InternalActorsNeedUpdate = true;
+  this->RenderPassesNeedUpdate = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetFontFile(const std::string& fontFile)
+{
+  this->FontFile = fontFile;
   this->InternalActorsNeedUpdate = true;
 }
 
@@ -637,6 +611,13 @@ void vtkF3DRenderer::SetUseRaytracing(bool use)
 bool vtkF3DRenderer::UsingRaytracing()
 {
   return this->UseRaytracing;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetRaytracingSamples(int samples)
+{
+  this->RaytracingSamples = samples;
+  this->RenderPassesNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
