@@ -58,6 +58,10 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->CheatSheetActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
   this->CheatSheetActor->GetTextProperty()->SetBackgroundOpacity(0.5);
 
+  this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
 }
 
 //----------------------------------------------------------------------------
@@ -208,25 +212,28 @@ std::string vtkF3DRenderer::GetRenderingDescription()
 void vtkF3DRenderer::ShowAxis(bool show)
 {
   // Dynamic visible axis
-  if (show)
+  if (this->AxisVisible != show)
   {
-    vtkNew<vtkAxesActor> axes;
-    this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
-    this->AxisWidget->SetOrientationMarker(axes);
-    this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
-    this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
-    this->AxisWidget->On();
-    this->AxisWidget->InteractiveOff();
-    this->AxisWidget->SetKeyPressActivation(false);
-  }
-  else
-  {
-    this->AxisWidget = nullptr;
-  }
+    if (show)
+    {
+      vtkNew<vtkAxesActor> axes;
+      this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
+      this->AxisWidget->SetOrientationMarker(axes);
+      this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
+      this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
+      this->AxisWidget->On();
+      this->AxisWidget->InteractiveOff();
+      this->AxisWidget->SetKeyPressActivation(false);
+    }
+    else
+    {
+      this->AxisWidget = nullptr;
+    }
 
-  this->AxisVisible = show;
-  this->RenderPassesNeedUpdate = true;
-  this->CheatSheetNeedUpdate = true;
+    this->AxisVisible = show;
+    this->RenderPassesNeedUpdate = true;
+    this->CheatSheetNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -238,61 +245,64 @@ bool vtkF3DRenderer::IsAxisVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowGrid(bool show)
 {
-  // TODO Test interactive
-  this->GridVisible = show;
-
-  // Dynamic Grid
-  double bounds[6];
-  this->ComputeVisiblePropBounds(bounds);
-
-  vtkBoundingBox bbox(bounds);
-
-  if (!bbox.IsValid())
+  if (this->GridVisible != show)
   {
-    show = false;
-  }
+    // TODO Test interactive
+    this->GridVisible = show;
 
-  if (show)
-  {
-    this->SetClippingRangeExpansion(0.99);
+    // Dynamic Grid
+    double bounds[6];
+    this->ComputeVisiblePropBounds(bounds);
 
-    double diag = bbox.GetDiagonalLength();
-    double unitSquare = pow(10.0, round(log10(diag * 0.1)));
+    vtkBoundingBox bbox(bounds);
 
-    double gridPos[3];
-    for (int i = 0; i < 3; i++)
+    if (!bbox.IsValid())
     {
-      double size = bounds[2 * i + 1] - bounds[2 * i];
-      gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
+      show = false;
     }
 
-    std::stringstream stream;
-    stream << "Using grid unit square size = " << unitSquare << "\n"
-      << "Grid origin set to [" << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2]
-      << "]\n\n";
-    this->GridInfo = stream.str();
+    if (show)
+    {
+      this->SetClippingRangeExpansion(0.99);
 
-    vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
-    gridMapper->SetFadeDistance(diag);
-    gridMapper->SetUnitSquare(unitSquare);
-    gridMapper->SetUpIndex(this->UpIndex);
+      double diag = bbox.GetDiagonalLength();
+      double unitSquare = pow(10.0, round(log10(diag * 0.1)));
 
-    this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
-    this->GridActor->ForceTranslucentOn();
-    this->GridActor->SetPosition(gridPos);
-    this->GridActor->SetMapper(gridMapper);
-    this->GridActor->UseBoundsOff();
+      double gridPos[3];
+      for (int i = 0; i < 3; i++)
+      {
+        double size = bounds[2 * i + 1] - bounds[2 * i];
+        gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
+      }
+
+      std::stringstream stream;
+      stream << "Using grid unit square size = " << unitSquare << "\n"
+        << "Grid origin set to [" << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2]
+        << "]\n\n";
+      this->GridInfo = stream.str();
+
+      vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
+      gridMapper->SetFadeDistance(diag);
+      gridMapper->SetUnitSquare(unitSquare);
+      gridMapper->SetUpIndex(this->UpIndex);
+
+      this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
+      this->GridActor->ForceTranslucentOn();
+      this->GridActor->SetPosition(gridPos);
+      this->GridActor->SetMapper(gridMapper);
+      this->GridActor->UseBoundsOff();
+    }
+    else
+    {
+      this->SetClippingRangeExpansion(0);
+      this->GridInfo = "";
+    }
+    this->GridActor->SetVisibility(show);
+    this->ResetCameraClippingRange();
+
+    this->RenderPassesNeedUpdate = true;
+    this->CheatSheetNeedUpdate = true;
   }
-  else
-  {
-    this->SetClippingRangeExpansion(0);
-    this->GridInfo = "";
-  }
-  this->GridActor->SetVisibility(show);
-  this->ResetCameraClippingRange();
-
-  this->RenderPassesNeedUpdate = true;
-  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -404,28 +414,32 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
 void vtkF3DRenderer::SetFontFile(const std::string& fontFile)
 {
   // Dynamic font management
-  this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
-  this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
-  this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
-  this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
-  if (!fontFile.empty())
+  if (this->FontFile != fontFile)
   {
-    std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(fontFile);
-    if (vtksys::SystemTools::FileExists(tmpFontFile, true))
+    this->FontFile = fontFile;
+    this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
+    this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
+    this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
+    this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
+    if (!fontFile.empty())
     {
-      this->FilenameActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->FilenameActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
-      this->MetaDataActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->MetaDataActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
-      this->TimerActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->TimerActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
-      this->CheatSheetActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->CheatSheetActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
-    }
-    else
-    {
-      vtkF3DLog::Print(
-        vtkF3DLog::Severity::Warning, std::string("Cannot find \"") + tmpFontFile + "\" font file.");
+      std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(fontFile);
+      if (vtksys::SystemTools::FileExists(tmpFontFile, true))
+      {
+        this->FilenameActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+        this->FilenameActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+        this->MetaDataActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+        this->MetaDataActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+        this->TimerActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+        this->TimerActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+        this->CheatSheetActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+        this->CheatSheetActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+      }
+      else
+      {
+        vtkF3DLog::Print(
+          vtkF3DLog::Severity::Warning, std::string("Cannot find \"") + tmpFontFile + "\" font file.");
+      }
     }
   }
 }
@@ -452,9 +466,12 @@ void vtkF3DRenderer::SetBackground(const double* color)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseDepthPeelingPass(bool use)
 {
-  this->UseDepthPeelingPass = use;
-  this->RenderPassesNeedUpdate = true;
-  this->CheatSheetNeedUpdate = true;
+  if (this->UseDepthPeelingPass != use)
+  {
+    this->UseDepthPeelingPass = use;
+    this->RenderPassesNeedUpdate = true;
+    this->CheatSheetNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -466,9 +483,12 @@ bool vtkF3DRenderer::UsingBlurBackground()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseBlurBackground(bool use)
 {
-  this->UseBlurBackground = use;
-  this->RenderPassesNeedUpdate = true;
-  this->CheatSheetNeedUpdate = true;
+  if (this->UseBlurBackground != use)
+  {
+    this->UseBlurBackground = use;
+    this->RenderPassesNeedUpdate = true;
+    this->CheatSheetNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -480,9 +500,12 @@ bool vtkF3DRenderer::UsingDepthPeelingPass()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseSSAOPass(bool use)
 {
-  this->UseSSAOPass = use;
-  this->RenderPassesNeedUpdate = true;
-  this->CheatSheetNeedUpdate = true;
+  if (this->UseSSAOPass != use)
+  {
+    this->UseSSAOPass = use;
+    this->RenderPassesNeedUpdate = true;
+    this->CheatSheetNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -494,9 +517,12 @@ bool vtkF3DRenderer::UsingSSAOPass()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseFXAAPass(bool use)
 {
-  this->UseFXAAPass = use;
-  this->RenderPassesNeedUpdate = true;
-  this->CheatSheetNeedUpdate = true;
+  if (this->UseFXAAPass != use)
+  {
+    this->UseFXAAPass = use;
+    this->RenderPassesNeedUpdate = true;
+    this->CheatSheetNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -508,9 +534,12 @@ bool vtkF3DRenderer::UsingFXAAPass()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseToneMappingPass(bool use)
 {
-  this->UseToneMappingPass = use;
-  this->RenderPassesNeedUpdate = true;
-  this->CheatSheetNeedUpdate = true;
+  if (this->UseToneMappingPass != use)
+  {
+    this->UseToneMappingPass = use;
+    this->RenderPassesNeedUpdate = true;
+    this->CheatSheetNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -522,9 +551,12 @@ bool vtkF3DRenderer::UsingToneMappingPass()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseRaytracing(bool use)
 {
-  this->UseRaytracing = use;
-  this->RenderPassesNeedUpdate = true;
-  this->CheatSheetNeedUpdate = true;
+  if (this->UseRaytracing != use)
+  {
+    this->UseRaytracing = use;
+    this->RenderPassesNeedUpdate = true;
+    this->CheatSheetNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -536,16 +568,22 @@ bool vtkF3DRenderer::UsingRaytracing()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetRaytracingSamples(int samples)
 {
-  this->RaytracingSamples = samples;
-  this->RenderPassesNeedUpdate = true;
+  if (this->RaytracingSamples != samples)
+  {
+    this->RaytracingSamples = samples;
+    this->RenderPassesNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseRaytracingDenoiser(bool use)
 {
-  this->UseRaytracingDenoiser = use;
-  this->RenderPassesNeedUpdate = true;
-  this->CheatSheetNeedUpdate = true;
+  if (this->UseRaytracingDenoiser != use)
+  {
+    this->UseRaytracingDenoiser = use;
+    this->RenderPassesNeedUpdate = true;
+    this->CheatSheetNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -557,10 +595,13 @@ bool vtkF3DRenderer::UsingRaytracingDenoiser()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowTimer(bool show)
 {
-  this->TimerVisible = show;
-  this->TimerActor->SetVisibility(show);
-  this->RenderPassesNeedUpdate = true;
-  this->CheatSheetNeedUpdate = true;
+  if (this->TimerVisible != show)
+  {
+    this->TimerVisible = show;
+    this->TimerActor->SetVisibility(show);
+    this->RenderPassesNeedUpdate = true;
+    this->CheatSheetNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -572,10 +613,13 @@ bool vtkF3DRenderer::IsTimerVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowFilename(bool show)
 {
-  this->FilenameVisible = show;
-  this->FilenameActor->SetVisibility(show);
-  this->RenderPassesNeedUpdate = true;
-  this->CheatSheetNeedUpdate = true;
+  if (this->FilenameVisible != show)
+  {
+    this->FilenameVisible = show;
+    this->FilenameActor->SetVisibility(show);
+    this->RenderPassesNeedUpdate = true;
+    this->CheatSheetNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -587,17 +631,20 @@ bool vtkF3DRenderer::IsFilenameVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowMetaData(bool show)
 {
-  this->MetaDataVisible = show;
-  this->MetaDataActor->SetVisibility(show);
-  if (show)
+  if (this->MetaDataVisible != show)
   {
-    // Update metadata info
-    std::string MetaDataDesc = this->GenerateMetaDataDescription();
-    this->MetaDataActor->SetText(vtkCornerAnnotation::RightEdge, MetaDataDesc.c_str());
-  }
+    this->MetaDataVisible = show;
+    this->MetaDataActor->SetVisibility(show);
+    if (show)
+    {
+      // Update metadata info
+      std::string MetaDataDesc = this->GenerateMetaDataDescription();
+      this->MetaDataActor->SetText(vtkCornerAnnotation::RightEdge, MetaDataDesc.c_str());
+    }
 
-  this->RenderPassesNeedUpdate = true;
-  this->CheatSheetNeedUpdate = true;
+    this->RenderPassesNeedUpdate = true;
+    this->CheatSheetNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -609,10 +656,12 @@ bool vtkF3DRenderer::IsMetaDataVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowCheatSheet(bool show)
 {
-  this->CheatSheetVisible = show;
-  this->CheatSheetActor->SetVisibility(show);
-  this->RenderPassesNeedUpdate = true;
-  this->CheatSheetNeedUpdate = true;
+  if (this->CheatSheetVisible != show)
+  {
+    this->CheatSheetVisible = show;
+    this->CheatSheetActor->SetVisibility(show);
+    this->RenderPassesNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -669,21 +718,24 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowEdge(bool show)
 {
-  this->EdgeVisible = show;
-
-  // Dynamic edges
-  vtkActor* anActor;
-  vtkActorCollection* ac = this->GetActors();
-  vtkCollectionSimpleIterator ait;
-  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
+  if (this->EdgeVisible != show)
   {
-    if (vtkSkybox::SafeDownCast(anActor) == nullptr)
-    {
-      anActor->GetProperty()->SetEdgeVisibility(show);
-    }
-  }
+    this->EdgeVisible = show;
 
-  this->CheatSheetNeedUpdate = true;
+    // Dynamic edges
+    vtkActor* anActor;
+    vtkActorCollection* ac = this->GetActors();
+    vtkCollectionSimpleIterator ait;
+    for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
+    {
+      if (vtkSkybox::SafeDownCast(anActor) == nullptr)
+      {
+        anActor->GetProperty()->SetEdgeVisibility(show);
+      }
+    }
+
+    this->CheatSheetNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -695,8 +747,11 @@ bool vtkF3DRenderer::IsEdgeVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseTrackball(bool use)
 {
-  this->UseTrackball = use;
-  this->CheatSheetNeedUpdate = true;
+  if (this->UseTrackball != use)
+  {
+    this->UseTrackball = use;
+    this->CheatSheetNeedUpdate = true;
+  }
 }
 
 //----------------------------------------------------------------------------
