@@ -102,12 +102,6 @@ public:
   void SetupRenderPasses();
 
   /**
-   * Update the actors using the configuration of the renderer
-   * TODO to remove
-   */
-  virtual void UpdateInternalActors(){};
-
-  /**
    * Initialize the camera position, focal point,
    * view up and view angle according to the options if any
    */

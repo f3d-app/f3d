@@ -33,7 +33,7 @@ public:
    * It will only be shown when coloring and not
    * using direct scalars rendering.
    */
-  void ShowScalarBar(bool show);
+  void ShowScalarBar(bool show, bool update = true);
   bool IsScalarBarVisible();
   //@}
 
@@ -42,7 +42,7 @@ public:
    * Set/Get the visibility of the point sprites actor.
    * It will inly be shown if raytracing and volume are not enabled
    */
-  void SetUsePointSprites(bool use);
+  void SetUsePointSprites(bool use, bool update = true);
   bool UsingPointSprites();
   //@}
 
@@ -52,7 +52,7 @@ public:
    * It will inly be shown if the data is compatible with volume rendering
    * and raytracing is not enabled
    */
-  void SetUseVolume(bool use);
+  void SetUseVolume(bool use, bool update = true);
   bool UsingVolume();
   //@}
 
@@ -62,8 +62,20 @@ public:
    * for volume rendering..
    */
   bool UsingInverseOpacityFunction();
-  void SetUseInverseOpacityFunction(bool use);
+  void SetUseInverseOpacityFunction(bool use, bool update = true);
   //@}
+
+  /**
+   * Set the range of the scalar bar
+   * Setting an empty vector will use automatic range
+   */
+  void SetScalarBarRange(std::vector<double> range, bool update = true);
+
+  /**
+   * Set the colormap to use
+   * Setting an empty vector will use defaut color map
+   */
+  void SetColormap(std::vector<double> colormap, bool update = true);
 
   enum CycleTypeEnum
   {
@@ -142,7 +154,7 @@ public:
   /**
    * Update the visibility and coloring of internal actors as well as the scalar bar actors
    */
-  void UpdateInternalActors() override;
+  void UpdateColoringActors();
 
   /**
    * Get information about the current rendering
@@ -248,7 +260,7 @@ protected:
   bool UseVolume = false;
   bool UseInverseOpacityFunction = false;
 
-  std::vector<double> SpecifiedRange;
+  std::vector<double> UserScalarBarRange;
   std::vector<double> Colormap;
 };
 

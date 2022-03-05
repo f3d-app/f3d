@@ -173,8 +173,19 @@ bool windowStandard::update()
     this->Internals->Renderer->SetBackground(this->Options->getAsDoubleVector("background-color").data());
     this->Internals->Renderer->SetFontFile(this->Options->getAsString("font-file"));
 
-    // TODO to remove
-    this->Internals->Renderer->UpdateInternalActors();
+    vtkF3DRendererWithColoring* renWithColor =
+      vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
+
+    if (renWithColor)
+    {
+      renWithColor->SetUsePointSprites(this->Options->getAsBool("point-sprites"), false);
+      renWithColor->SetUseVolume(this->Options->getAsBool("volume"), false);
+      renWithColor->SetUseInverseOpacityFunction(this->Options->getAsBool("inverse"), false);
+      renWithColor->ShowScalarBar(this->Options->getAsBool("bar"), false);
+      renWithColor->SetScalarBarRange(this->Options->getAsDoubleVector("range"), false);
+      renWithColor->SetColormap(this->Options->getAsDoubleVector("colormap"), false);
+      renWithColor->UpdateColoringActors();
+    }
 
     // Print coloring info when available
     if (this->Options->getAsBool("verbose"))
