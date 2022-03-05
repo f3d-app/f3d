@@ -136,6 +136,7 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
   this->Internals->RenWin->SetFullScreen(this->Options->getAsBool("fullscreen"));
 
   // TODO Keep existing renderer if valid as it is expansive to create one
+  // TODO test interactive switching form one coloring/without coloring
   if (withColoring)
   {
     this->Internals->Renderer = vtkSmartPointer<vtkF3DRendererWithColoring>::New();

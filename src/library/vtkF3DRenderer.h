@@ -99,7 +99,7 @@ public:
   /**
    * Update the different render passes which can be needed when changing some options
    */
-  void UpdateRenderPasses();
+  void SetupRenderPasses();
 
   /**
    * Update the actors using the configuration of the renderer
@@ -200,17 +200,11 @@ protected:
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
 
+  bool HasHDRI = false;
   std::string HDRIFile;
-  std::string GridInfo;
-
-  std::string FileInfo;
-  std::string Up;
-  double BackgroundColor[3];
   std::string FontFile;
 
-  bool HDRINeedUpdate = false;
-  bool RenderPassesNeedUpdate = false;
-  bool HasHDRI = false;
+  std::string GridInfo;
 };
 
 #endif

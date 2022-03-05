@@ -135,8 +135,10 @@ std::string vtkF3DRenderer::GenerateMetaDataDescription()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::UpdateRenderPasses()
+void vtkF3DRenderer::SetupRenderPasses()
 {
+  // TODO maybe this could be called only before rendering, when needed
+
   // clean up previous pass
   vtkRenderPass* pass = this->GetPass();
   if (pass)
@@ -198,8 +200,6 @@ void vtkF3DRenderer::UpdateRenderPasses()
       "Raytracing options can't be used if F3D has not been built with raytracing");
   }
 #endif
-
-  this->RenderPassesNeedUpdate = false;
 }
 
 //----------------------------------------------------------------------------
@@ -231,7 +231,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
     }
 
     this->AxisVisible = show;
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
 }
@@ -300,7 +300,7 @@ void vtkF3DRenderer::ShowGrid(bool show)
     this->GridActor->SetVisibility(show);
     this->ResetCameraClippingRange();
 
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
 }
@@ -407,7 +407,7 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
     this->TimerActor->GetTextProperty()->SetColor(textColor);
   }
 
-  this->RenderPassesNeedUpdate = true;
+  this->SetupRenderPasses();
 }
 
 //----------------------------------------------------------------------------
@@ -469,7 +469,7 @@ void vtkF3DRenderer::SetUseDepthPeelingPass(bool use)
   if (this->UseDepthPeelingPass != use)
   {
     this->UseDepthPeelingPass = use;
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
 }
@@ -486,7 +486,7 @@ void vtkF3DRenderer::SetUseBlurBackground(bool use)
   if (this->UseBlurBackground != use)
   {
     this->UseBlurBackground = use;
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
 }
@@ -503,7 +503,7 @@ void vtkF3DRenderer::SetUseSSAOPass(bool use)
   if (this->UseSSAOPass != use)
   {
     this->UseSSAOPass = use;
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
 }
@@ -520,7 +520,7 @@ void vtkF3DRenderer::SetUseFXAAPass(bool use)
   if (this->UseFXAAPass != use)
   {
     this->UseFXAAPass = use;
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
 }
@@ -537,7 +537,7 @@ void vtkF3DRenderer::SetUseToneMappingPass(bool use)
   if (this->UseToneMappingPass != use)
   {
     this->UseToneMappingPass = use;
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
 }
@@ -554,7 +554,7 @@ void vtkF3DRenderer::SetUseRaytracing(bool use)
   if (this->UseRaytracing != use)
   {
     this->UseRaytracing = use;
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
 }
@@ -571,7 +571,7 @@ void vtkF3DRenderer::SetRaytracingSamples(int samples)
   if (this->RaytracingSamples != samples)
   {
     this->RaytracingSamples = samples;
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
   }
 }
 
@@ -581,7 +581,7 @@ void vtkF3DRenderer::SetUseRaytracingDenoiser(bool use)
   if (this->UseRaytracingDenoiser != use)
   {
     this->UseRaytracingDenoiser = use;
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
 }
@@ -599,7 +599,7 @@ void vtkF3DRenderer::ShowTimer(bool show)
   {
     this->TimerVisible = show;
     this->TimerActor->SetVisibility(show);
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
 }
@@ -617,7 +617,7 @@ void vtkF3DRenderer::ShowFilename(bool show)
   {
     this->FilenameVisible = show;
     this->FilenameActor->SetVisibility(show);
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
 }
@@ -642,7 +642,7 @@ void vtkF3DRenderer::ShowMetaData(bool show)
       this->MetaDataActor->SetText(vtkCornerAnnotation::RightEdge, MetaDataDesc.c_str());
     }
 
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
 }
@@ -660,7 +660,7 @@ void vtkF3DRenderer::ShowCheatSheet(bool show)
   {
     this->CheatSheetVisible = show;
     this->CheatSheetActor->SetVisibility(show);
-    this->RenderPassesNeedUpdate = true;
+    this->SetupRenderPasses();
   }
 }
 
@@ -763,12 +763,6 @@ bool vtkF3DRenderer::UsingTrackball()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
-  if (this->RenderPassesNeedUpdate)
-  {
-    this->UpdateRenderPasses();
-    this->RenderPassesNeedUpdate = false;
-  }
-
   if (this->CheatSheetNeedUpdate)
   {
     this->UpdateCheatSheet();
