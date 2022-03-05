@@ -1,6 +1,5 @@
 #include "vtkF3DRenderer.h"
 
-#include "f3d_options.h"
 #include "vtkF3DConfigure.h"
 #include "vtkF3DLog.h"
 #include "vtkF3DOpenGLGridMapper.h"
@@ -79,7 +78,7 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::Initialize(const f3d::options&, const std::string& fileInfo, const std::string& up)
+void vtkF3DRenderer::Initialize(const std::string& fileInfo, const std::string& up)
 {
   if (!this->RenderWindow)
   {

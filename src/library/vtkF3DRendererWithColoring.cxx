@@ -1,6 +1,5 @@
 #include "vtkF3DRendererWithColoring.h"
 
-#include "f3d_options.h"
 #include "vtkF3DLog.h"
 
 #include <vtkColorTransferFunction.h>
@@ -14,10 +13,9 @@
 vtkStandardNewMacro(vtkF3DRendererWithColoring);
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::Initialize(
-  const f3d::options& options, const std::string& fileInfo, const std::string& up)
+void vtkF3DRendererWithColoring::Initialize(const std::string& fileInfo, const std::string& up)
 {
-  this->Superclass::Initialize(options, fileInfo, up);
+  this->Superclass::Initialize(fileInfo, up);
 
   this->SetScalarBarActor(nullptr);
   this->SetGeometryActor(nullptr);

@@ -15,10 +15,6 @@
 #include <vtkOrientationMarkerWidget.h>
 #include <vtkSkybox.h>
 
-namespace f3d
-{
-class options;
-}
 class vtkCornerAnnotation;
 class vtkTextActor;
 
@@ -86,10 +82,10 @@ public:
   void Render() override;
 
   /**
-   * Initialize the renderer to be used with provided options and file.
+   * Initialize the renderer actors and flags.
    * Should be called after being added to a vtkRenderWindow.
    */
-  virtual void Initialize(const f3d::options& options, const std::string& fileInfo, const std::string& up);
+  virtual void Initialize(const std::string& fileInfo, const std::string& up);
 
   /**
    * Get the OpenGL skybox
@@ -97,13 +93,13 @@ public:
   vtkGetObjectMacro(Skybox, vtkSkybox);
 
   /**
-   * Update the different render passes which can be needed when changing some options
+   * Setup the different render passes
    */
   void SetupRenderPasses();
 
   /**
    * Initialize the camera position, focal point,
-   * view up and view angle according to the options if any
+   * view up and view angle.
    */
   void InitializeCamera();
 
