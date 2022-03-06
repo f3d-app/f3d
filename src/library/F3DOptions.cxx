@@ -764,17 +764,15 @@ void F3DOptionsParser::ConvertToNewAPI(const F3DOptions& oldOptions, f3d::option
 
   // Loading but should not
   newOptions->set("cells", oldOptions.Cells);
-  newOptions->set("scalars", oldOptions.Scalars);
   newOptions->set("component", oldOptions.Component);
   newOptions->set("fullscreen", oldOptions.FullScreen);
   newOptions->set("resolution", oldOptions.Resolution);
-  newOptions->set("hdri", oldOptions.HDRIFile);
-  newOptions->set("background-color", oldOptions.BackgroundColor);
+  newOptions->set("scalars", oldOptions.Scalars);
   newOptions->set("up", oldOptions.Up);
-  newOptions->set("font-file", oldOptions.FontFile);
 
   // Rendering/Dynamic
   newOptions->set("axis", oldOptions.Axis);
+  newOptions->set("background-color", oldOptions.BackgroundColor);
   newOptions->set("bar", oldOptions.Bar);
   newOptions->set("blur-background", oldOptions.BlurBackground);
   newOptions->set("camera-azimuth-angle", oldOptions.CameraAzimuthAngle);
@@ -788,9 +786,11 @@ void F3DOptionsParser::ConvertToNewAPI(const F3DOptions& oldOptions, f3d::option
   newOptions->set("depth-peeling", oldOptions.DepthPeeling);
   newOptions->set("edges", oldOptions.Edges);
   newOptions->set("filename", oldOptions.Filename);
+  newOptions->set("font-file", oldOptions.FontFile);
   newOptions->set("fps", oldOptions.FPS);
   newOptions->set("fxaa", oldOptions.FXAA);
   newOptions->set("grid", oldOptions.Grid);
+  newOptions->set("hdri", oldOptions.HDRIFile);
   newOptions->set("inverse", oldOptions.InverseOpacityFunction);
   newOptions->set("metadata", oldOptions.MetaData);
   newOptions->set("point-sprites", oldOptions.PointSprites);
