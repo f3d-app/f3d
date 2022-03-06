@@ -7,7 +7,7 @@
 #endif
 
 //----------------------------------------------------------------------------
-void F3DLog::PrintInternal(Severity sev, const std::string& str)
+void F3DLog::Print(Severity sev, const std::string& str)
 {
   vtkOutputWindow* win = vtkOutputWindow::GetInstance();
   switch (sev)

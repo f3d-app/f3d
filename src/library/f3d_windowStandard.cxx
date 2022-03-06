@@ -1,7 +1,7 @@
 #include "f3d_windowStandard.h"
 
-#include "F3DLog.h"
 #include "F3DOffscreenRender.h"
+#include "f3d_log.h"
 #include "f3d_options.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DRendererWithColoring.h"
@@ -17,15 +17,13 @@ namespace
 void DisplayCameraInformation(vtkCamera* cam)
 {
   double* position = cam->GetPosition();
-  F3DLog::Print(F3DLog::Severity::Info, "Camera position is: ", position[0], ", ", position[1],
-    ", ", position[2], ".");
+  f3d::log::info("Camera position is: ", position[0], ", ", position[1], ", ", position[2], ".");
   double* focalPoint = cam->GetFocalPoint();
-  F3DLog::Print(F3DLog::Severity::Info, "Camera focal point is: ", focalPoint[0], ", ",
-    focalPoint[1], ", ", focalPoint[2], ".");
+  f3d::log::info(
+    "Camera focal point is: ", focalPoint[0], ", ", focalPoint[1], ", ", focalPoint[2], ".");
   double* viewUp = cam->GetViewUp();
-  F3DLog::Print(F3DLog::Severity::Info, "Camera view up is: ", viewUp[0], ", ", viewUp[1], ", ",
-    viewUp[2], ".");
-  F3DLog::Print(F3DLog::Severity::Info, "Camera view angle is: ", cam->GetViewAngle(), ".\n");
+  f3d::log::info("Camera view up is: ", viewUp[0], ", ", viewUp[1], ", ", viewUp[2], ".");
+  f3d::log::info("Camera view angle is: ", cam->GetViewAngle(), ".\n");
 }
 }
 
@@ -159,6 +157,13 @@ bool windowStandard::update()
 
     // Actors are loaded, use the bounds to reset camera and set-up SSAO
     this->Internals->Renderer->ShowOptions();
+
+    // Print coloring info when available
+    if (this->Options->getAsBool("verbose"))
+    {
+      f3d::log::info(this->Internals->Renderer->GetRenderingDescription());
+    }
+
     return this->Internals->UpdateCamera(this->Options);
   }
   return false;

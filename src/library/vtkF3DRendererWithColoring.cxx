@@ -11,6 +11,8 @@
 #include <vtkPolyData.h>
 #include <vtkVolumeProperty.h>
 
+#include <sstream>
+
 vtkStandardNewMacro(vtkF3DRendererWithColoring);
 
 //----------------------------------------------------------------------------
@@ -254,19 +256,22 @@ void vtkF3DRendererWithColoring::CycleFieldForColoring()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::PrintColoringInfo()
+std::string vtkF3DRendererWithColoring::GetRenderingDescription()
 {
+  std::stringstream stream;
+  stream << this->Superclass::GetRenderingDescription();
   if (this->ArrayForColoring)
   {
-    F3DLog::Print(F3DLog::Severity::Info, "Coloring using ",
-      (this->DataForColoring == this->PointDataForColoring ? "point" : "cell"), " array named ",
-      this->ArrayForColoring->GetName(), ", ",
-      vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring), ".");
+    stream << "Coloring using "
+           << (this->DataForColoring == this->PointDataForColoring ? "point" : "cell")
+           << " array named " << this->ArrayForColoring->GetName() << ", "
+           << vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring) << "\n";
   }
   else
   {
-    F3DLog::Print(F3DLog::Severity::Info, "Not coloring");
+    stream << "Not coloring\n";
   }
+  return stream.str();
 }
 
 //----------------------------------------------------------------------------
@@ -352,11 +357,6 @@ void vtkF3DRendererWithColoring::UpdateInternalActors()
   if (this->DataForColoring)
   {
     this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
-  }
-
-  if (this->Verbose)
-  {
-    this->PrintColoringInfo();
   }
 
   bool volumeVisibility = !this->UseRaytracing && this->UseVolume;
@@ -582,7 +582,8 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(vtkDataArray* a
 
   if (component >= array->GetNumberOfComponents())
   {
-    F3DLog::Print(F3DLog::Severity::Warning, "Invalid component index: ", component);
+    F3DLog::Print(F3DLog::Severity::Warning,
+      std::string("Invalid component index: ") + std::to_string(component));
     return;
   }
 

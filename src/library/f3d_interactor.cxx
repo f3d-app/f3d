@@ -2,8 +2,9 @@
 
 #include "F3DAnimationManager.h"
 #include "F3DConfig.h"
-#include "F3DLog.h"
 #include "f3d_loader.h"
+#include "f3d_log.h"
+#include "f3d_options.h"
 #include "f3d_window.h"
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
@@ -67,6 +68,10 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
+          if (self->Loader->getOptions().getAsBool("verbose"))
+          {
+            f3d::log::info(renWithColor->GetRenderingDescription());
+          }
           renWin->Render();
         }
         break;
@@ -74,6 +79,10 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
+          if (self->Loader->getOptions().getAsBool("verbose"))
+          {
+            f3d::log::info(renWithColor->GetRenderingDescription());
+          }
           renWin->Render();
         }
         break;
@@ -81,6 +90,10 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
+          if (self->Loader->getOptions().getAsBool("verbose"))
+          {
+            f3d::log::info(renWithColor->GetRenderingDescription());
+          }
           renWin->Render();
         }
         break;
@@ -150,6 +163,10 @@ public:
         if (renWithColor)
         {
           renWithColor->SetUseVolume(!renWithColor->UsingVolume());
+          if (self->Loader->getOptions().getAsBool("verbose"))
+          {
+            f3d::log::info(renWithColor->GetRenderingDescription());
+          }
           renWin->Render();
         }
         break;
@@ -164,6 +181,10 @@ public:
         if (renWithColor)
         {
           renWithColor->SetUsePointSprites(!renWithColor->UsingPointSprites());
+          if (self->Loader->getOptions().getAsBool("verbose"))
+          {
+            f3d::log::info(renWithColor->GetRenderingDescription());
+          }
           renWin->Render();
         }
         break;
@@ -209,8 +230,11 @@ public:
         renWin->Render();
         break;
       case '?':
-        ren->DumpSceneState();
-        break;
+      {
+        std::string output = ren->GetSceneDescription();
+        f3d::log::info(output);
+      }
+      break;
       default:
         if (keySym == "Left")
         {
@@ -318,7 +342,7 @@ void interactor::InitializeAnimation(vtkImporter* importer)
 {
   if (!this->Internals->Loader)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Please SetLoader before initializing the animation");
+    f3d::log::error("Please SetLoader before initializing the animation");
     return;
   }
   this->Internals->AnimationManager.Initialize(
@@ -408,7 +432,7 @@ bool interactor::playInteraction(const std::string& file)
 {
   if (!vtksys::SystemTools::FileExists(file))
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Interaction record file to play does not exist ", file);
+    f3d::log::error("Interaction record file to play does not exist ", file);
     return false;
   }
   else
@@ -424,7 +448,7 @@ bool interactor::playInteraction(const std::string& file)
   // Recorder can stop the interactor, make sure it is still running
   if (this->Internals->Interactor->GetDone())
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Interactor has been stopped");
+    f3d::log::error("Interactor has been stopped");
     return false;
   }
   return true;
@@ -436,7 +460,7 @@ bool interactor::recordInteraction(const std::string& file)
   if (file.empty())
   {
     // TODO improve VTK to check file opening
-    F3DLog::Print(F3DLog::Severity::Error, "Interaction record file is empty");
+    f3d::log::error("Interaction record file is empty");
     return false;
   }
 
