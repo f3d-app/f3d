@@ -29,9 +29,9 @@ typedef struct ProgressDataStruct
   vtkProgressBarWidget* widget;
 } ProgressDataStruct;
 
-vtkSmartPointer<vtkImporter> GetImporter(const f3d::options& options, const std::string& fileName)
+vtkSmartPointer<vtkImporter> GetImporter(const std::string& fileName, bool geometry)
 {
-  if (!options.getAsBool("geometry-only"))
+  if (!geometry)
   {
     // Try to find the first compatible reader with scene reading capabilities
     F3DReader* reader = F3DReaderFactory::GetReader(fileName);
@@ -48,12 +48,29 @@ vtkSmartPointer<vtkImporter> GetImporter(const f3d::options& options, const std:
   // Use the generic importer and check if it can process the file
   vtkNew<vtkF3DGenericImporter> importer;
   importer->SetFileName(fileName.c_str());
-  importer->SetOptions(&options);
   if (!importer->CanReadFile())
   {
     return nullptr;
   }
   return importer;
+}
+
+void InitializeImporterWithOptions(const f3d::options& options, vtkF3DGenericImporter* importer)
+{
+  importer->SetPointSize(options.getAsDouble("point-size"));
+  importer->SetScalarArray(options.getAsString("scalars"));
+  importer->SetUseCellScalars(options.getAsBool("cells"));
+  importer->SetSurfaceColor(options.getAsDoubleVector("color").data());
+  importer->SetOpacity(options.getAsDouble("opacity"));
+  importer->SetRoughness(options.getAsDouble("roughness"));
+  importer->SetMetallic(options.getAsDouble("metallic"));
+  importer->SetLineWidth(options.getAsDouble("line-width"));
+  importer->SetTextureBaseColor(options.getAsString("texture-base-color"));
+  importer->SetTextureEmissive(options.getAsString("texture-emissive"));
+  importer->SetEmissiveFactor(options.getAsDoubleVector("emissive-factor").data());
+  importer->SetTextureMaterial(options.getAsString("texture-material"));
+  importer->SetTextureNormal(options.getAsString("texture-normal"));
+  importer->SetNormalScale(options.getAsDouble("normal-scale"));
 }
 
 void CreateProgressRepresentationAndCallback(
@@ -358,7 +375,7 @@ bool loader::loadFile(loader::LoadFileEnum load)
   }
 
   // Recover the importer
-  this->Internals->Importer = ::GetImporter(this->Internals->Options, filePath);
+  this->Internals->Importer = ::GetImporter(filePath, this->Internals->Options.getAsBool("geometry-only"));
   vtkF3DGenericImporter* genericImporter =
     vtkF3DGenericImporter::SafeDownCast(this->Internals->Importer);
   if (!this->Internals->Importer)
@@ -389,6 +406,12 @@ bool loader::loadFile(loader::LoadFileEnum load)
   {
     ::CreateProgressRepresentationAndCallback(
       &callbackData, this->Internals->Importer, this->Internals->Interactor);
+  }
+
+  // Initialize genericImporter with options
+  if (genericImporter)
+  {
+    ::InitializeImporterWithOptions(this->Internals->Options, genericImporter);
   }
 
   // Read the file
