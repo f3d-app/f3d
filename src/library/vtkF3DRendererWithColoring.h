@@ -144,6 +144,12 @@ public:
    */
   void UpdateInternalActors() override;
 
+  /**
+   * Get information about the current rendering
+   * Use the superclass then append coloring information on it
+   */
+  std::string GetRenderingDescription() override;
+
 protected:
   vtkF3DRendererWithColoring() = default;
   ~vtkF3DRendererWithColoring() override = default;
@@ -196,11 +202,6 @@ protected:
    * if not, it will reset it to 0
    */
   void CheckCurrentComponentForColoring();
-
-  /**
-   * Print info about the current coloring array
-   */
-  void PrintColoringInfo();
 
   std::string GenerateMetaDataDescription() override;
 

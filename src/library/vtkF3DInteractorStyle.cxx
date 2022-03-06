@@ -1,20 +1,13 @@
 #include "vtkF3DInteractorStyle.h"
 
-#include "F3DAnimationManager.h"
-#include "F3DConfig.h"
 #include "F3DLog.h"
-#include "f3d_loader.h"
-#include "f3d_options.h"
-#include "vtkF3DRendererWithColoring.h"
+#include "vtkF3DRenderer.h"
 
-#include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
 #include <vtkMath.h>
-#include <vtkMatrix3x3.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkRendererCollection.h>
 #include <vtkStringArray.h>
 
 vtkStandardNewMacro(vtkF3DInteractorStyle);
