@@ -1,4 +1,6 @@
-#include <F3DConfig.h>
+#include <f3d_config.h>
+
+#include "vtkF3DConfigure.h"
 
 namespace f3d
 {
@@ -8,5 +10,5 @@ const std::string AppVersion = "@PROJECT_VERSION@";
 const std::string AppBuildSystem = "@CMAKE_SYSTEM_NAME@ @CMAKE_SYSTEM_PROCESSOR@";
 const std::string AppBuildDate = "@F3D_BUILD_DATE@";
 const std::string AppCompiler = "@CMAKE_CXX_COMPILER_ID@ @CMAKE_CXX_COMPILER_VERSION@";
-const std::string F3DReservedString = "f3d_reserved";
+const std::string ReservedString = F3D_RESERVED_STRING;
 }

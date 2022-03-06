@@ -7,7 +7,7 @@
 #ifndef F3DOptions_h
 #define F3DOptions_h
 
-#include "F3DConfig.h"
+#include "f3d_config.h"
 
 #include <memory>
 #include <vector>
@@ -64,7 +64,7 @@ struct F3DOptions
   std::string UserConfigFile = "";
   std::string Output = "";
   std::string Reference = "";
-  std::string Scalars = f3d::F3DReservedString;
+  std::string Scalars = f3d::ReservedString; // XXX this should be removable at some point
   std::string InteractionTestRecordFile = "";
   std::string InteractionTestPlayFile = "";
   std::vector<double> BackgroundColor = { 0.2, 0.2, 0.2 };
