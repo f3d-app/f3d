@@ -1,7 +1,7 @@
 #include "f3d_options.h"
 
-#include "F3DConfig.h"
 #include "f3d_log.h"
+#include "vtkF3DConfigure.h"
 
 #include <map>
 #include <type_traits>
@@ -109,7 +109,7 @@ options::options()
 
   // Loading but should not
   this->Internals->init("cells", false);
-  this->Internals->init("scalars", F3DReservedString);
+  this->Internals->init("scalars", F3D_RESERVED_STRING);
   this->Internals->init("component", -1);
   this->Internals->init("fullscreen", false);
   this->Internals->init("resolution", std::vector<int>{ 1000, 600 });

@@ -1,11 +1,12 @@
 #include "f3d_interactor.h"
 
 #include "F3DAnimationManager.h"
-#include "F3DConfig.h"
 #include "f3d_loader.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
 #include "f3d_window.h"
+
+#include "vtkF3DConfigure.h"
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRendererWithColoring.h"
@@ -257,7 +258,7 @@ public:
           self->Loader->loadFile(load);
           renWin->Render();
         }
-        else if (keySym == f3d::EXIT_HOTKEY_SYM)
+        else if (keySym == F3D_EXIT_HOTKEY_SYM)
         {
           rwi->RemoveObservers(vtkCommand::TimerEvent);
           rwi->ExitCallback();
