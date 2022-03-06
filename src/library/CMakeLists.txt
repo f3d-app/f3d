@@ -18,13 +18,13 @@ set(MODULES_SPECIFIC_INCLUDE_DIRS "")
 set(MODULES_SPECIFIC_LIBRARIES "")
 
 configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.h"
+  "${CMAKE_CURRENT_SOURCE_DIR}/f3d_config.cxx.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/f3d_config.cxx"
   @ONLY)
 
 configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.cxx.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.cxx"
+  "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DConfigure.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkF3DConfigure.h"
   @ONLY)
 
 # Readers declaration
@@ -69,12 +69,12 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DRenderer.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DRendererWithColoring.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DAnimationManager.cxx
-  ${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DLog.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DOffscreenRender.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptions.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DStarter.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/f3d_config.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_interactor.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_log.cxx

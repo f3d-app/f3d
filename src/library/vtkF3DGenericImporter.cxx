@@ -1,8 +1,8 @@
 #include "vtkF3DGenericImporter.h"
 
-#include "F3DConfig.h"
 #include "F3DLog.h"
 #include "f3d_options.h"
+#include "vtkF3DConfigure.h"
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
@@ -239,8 +239,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   {
     dataForColoring->GetArray(usedArray.c_str(), this->ArrayIndexForColoring);
   }
-  if (this->ArrayIndexForColoring == -1 && !usedArray.empty() &&
-    usedArray != f3d::F3DReservedString)
+  if (this->ArrayIndexForColoring == -1 && !usedArray.empty() && usedArray != F3D_RESERVED_STRING)
   {
     F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: " + usedArray);
   }
