@@ -1,7 +1,7 @@
 #include "vtkF3DRendererWithColoring.h"
 
+#include "F3DLog.h"
 #include "f3d_options.h"
-#include "vtkF3DLog.h"
 
 #include <vtkColorTransferFunction.h>
 #include <vtkDataSetAttributes.h>
@@ -368,7 +368,7 @@ void vtkF3DRendererWithColoring::UpdateInternalActors()
 
     if (!this->ArrayForColoring)
     {
-      vtkF3DLog::Print(vtkF3DLog::Severity::Warning, "No array to color with");
+      F3DLog::Print(F3DLog::Severity::Warning, "No array to color with");
     }
     if (!this->ColorTransferFunctionConfigured)
     {
@@ -429,8 +429,8 @@ void vtkF3DRendererWithColoring::UpdateInternalActors()
       vtkSmartVolumeMapper::SafeDownCast(this->VolumeProp->GetMapper());
     if (volumeVisibility && (!mapper || !mapper->GetInput() || !this->ArrayForColoring))
     {
-      vtkF3DLog::Print(vtkF3DLog::Severity::Error,
-        "Cannot use volume with this dataset or with the requested array");
+      F3DLog::Print(
+        F3DLog::Severity::Error, "Cannot use volume with this dataset or with the requested array");
       volumeVisibility = false;
     }
     if (volumeVisibility && this->VolumeMapper && this->VolumeMapper->GetInput() &&
@@ -479,7 +479,7 @@ void vtkF3DRendererWithColoring::SetColoring(vtkDataSetAttributes* pointData,
     this->ArrayIndexForColoring >= this->DataForColoring->GetNumberOfArrays() ||
     this->ArrayIndexForColoring < -1)
   {
-    vtkF3DLog::Print(vtkF3DLog::Severity::Error, "Invalid coloring values");
+    F3DLog::Print(F3DLog::Severity::Error, "Invalid coloring values");
     this->ArrayIndexForColoring = -1;
   }
 }
@@ -512,7 +512,7 @@ void vtkF3DRendererWithColoring::ConfigureVolumeForColoring(vtkSmartVolumeMapper
     if (array->GetNumberOfComponents() > 4)
     {
       // comp > 4 is actually not supported and would fail with a vtk error
-      vtkF3DLog::Print(vtkF3DLog::Severity::Warning,
+      F3DLog::Print(F3DLog::Severity::Warning,
         "Direct scalars rendering not supported by array with more than 4 components");
     }
     else
@@ -554,7 +554,7 @@ void vtkF3DRendererWithColoring::ConfigureMapperForColoring(vtkPolyDataMapper* m
     if (array->GetNumberOfComponents() > 4)
     {
       // comp > 4 is actually not supported and would fail with a vtk error
-      vtkF3DLog::Print(vtkF3DLog::Severity::Warning,
+      F3DLog::Print(F3DLog::Severity::Warning,
         "Direct scalars rendering not supported by array with more than 4 components");
     }
     else
@@ -580,7 +580,7 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(vtkDataArray* a
 
   if (component >= array->GetNumberOfComponents())
   {
-    vtkF3DLog::Print(vtkF3DLog::Severity::Warning,
+    F3DLog::Print(F3DLog::Severity::Warning,
       std::string("Invalid component index: ") + std::to_string(component));
     return;
   }
@@ -595,7 +595,7 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(vtkDataArray* a
   {
     if (this->SpecifiedRange.size() > 0)
     {
-      vtkF3DLog::Print(vtkF3DLog::Severity::Warning,
+      F3DLog::Print(F3DLog::Severity::Warning,
         "The range specified does not have exactly 2 values, using automatic range.");
     }
     array->GetRange(this->ColorRange, component);
@@ -619,7 +619,7 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(vtkDataArray* a
     }
     else
     {
-      vtkF3DLog::Print(vtkF3DLog::Severity::Warning,
+      F3DLog::Print(F3DLog::Severity::Warning,
         "Specified color map list count is not a multiple of 4, ignoring it.");
     }
   }

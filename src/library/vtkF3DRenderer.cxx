@@ -1,8 +1,8 @@
 #include "vtkF3DRenderer.h"
 
 #include "F3DConfig.h"
+#include "F3DLog.h"
 #include "f3d_options.h"
-#include "vtkF3DLog.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
 
@@ -87,7 +87,7 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
 {
   if (!this->RenderWindow)
   {
-    vtkF3DLog::Print(vtkF3DLog::Severity::Error, "No render window linked");
+    F3DLog::Print(F3DLog::Severity::Error, "No render window linked");
     return;
   }
 
@@ -100,8 +100,8 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
     this->HDRIFile = vtksys::SystemTools::CollapseFullPath(this->HDRIFile);
     if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
     {
-      vtkF3DLog::Print(
-        vtkF3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
+      F3DLog::Print(
+        F3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
     }
     else
     {
@@ -140,8 +140,8 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
       }
       else
       {
-        vtkF3DLog::Print(
-          vtkF3DLog::Severity::Warning, std::string("Cannot open HDRI file ") + this->HDRIFile);
+        F3DLog::Print(
+          F3DLog::Severity::Warning, std::string("Cannot open HDRI file ") + this->HDRIFile);
       }
     }
   }
@@ -241,8 +241,8 @@ void vtkF3DRenderer::Initialize(const f3d::options& options, const std::string& 
     }
     else
     {
-      vtkF3DLog::Print(
-        vtkF3DLog::Severity::Warning, std::string("Cannot find \"") + fontFile + "\" font file.");
+      F3DLog::Print(
+        F3DLog::Severity::Warning, std::string("Cannot find \"") + fontFile + "\" font file.");
     }
   }
 
@@ -318,7 +318,7 @@ void vtkF3DRenderer::SetupRenderPasses()
 #else
   if (this->UseRaytracing || this->UseRaytracingDenoiser)
   {
-    vtkF3DLog::Print(vtkF3DLog::Severity::Warning,
+    F3DLog::Print(F3DLog::Severity::Warning,
       "Raytracing options can't be used if F3D has not been built with raytracing");
   }
 #endif

@@ -1,6 +1,6 @@
 #include "vtkF3DInteractorStyle.h"
 
-#include "vtkF3DLog.h"
+#include "F3DLog.h"
 #include "vtkF3DRenderer.h"
 
 #include <vtkCamera.h>
@@ -17,7 +17,7 @@ void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
 {
   if (files == nullptr)
   {
-    vtkF3DLog::Print(vtkF3DLog::Severity::Warning, "Drop event without any provided files.");
+    F3DLog::Print(F3DLog::Severity::Warning, "Drop event without any provided files.");
     return;
   }
   this->InvokeEvent(vtkF3DInteractorStyle::DropFilesEvent, files);
