@@ -38,6 +38,8 @@
 #include <vtkVolumeProperty.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <sstream>
+
 vtkStandardNewMacro(vtkF3DGenericImporter);
 
 //----------------------------------------------------------------------------

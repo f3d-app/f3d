@@ -35,6 +35,7 @@
 
 #include <cctype>
 #include <chrono>
+#include <sstream>
 
 vtkStandardNewMacro(vtkF3DRenderer);
 
