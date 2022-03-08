@@ -12,10 +12,6 @@
 #include <vtkImporter.h>
 #include <vtkVersion.h>
 
-namespace f3d
-{
-class options;
-}
 class vtkActor;
 class vtkVolume;
 class vtkPolyDataMapper;
@@ -38,11 +34,6 @@ public:
    * Specify the name of the file to read.
    */
   void SetFileName(const char* arg);
-
-  /**
-   * Set options.
-   */
-  void SetOptions(const f3d::options* options);
 
   /**
    * Check if the file can be read.
@@ -127,6 +118,40 @@ public:
     vtkDoubleArray* timeSteps) override;
 #endif
 
+  //@{
+  /**
+   * Setter/Getter for all actor loading options
+   */
+  vtkSetMacro(PointSize, double);
+  vtkGetMacro(PointSize, double);
+  vtkSetMacro(ScalarArray, std::string);
+  vtkGetMacro(ScalarArray, std::string);
+  vtkSetMacro(UseCellScalars, bool);
+  vtkGetMacro(UseCellScalars, bool);
+  vtkSetVector3Macro(SurfaceColor, double);
+  vtkGetVector3Macro(SurfaceColor, double);
+  vtkSetVector3Macro(EmissiveFactor, double);
+  vtkGetVector3Macro(EmissiveFactor, double);
+  vtkSetMacro(Opacity, double);
+  vtkGetMacro(Opacity, double);
+  vtkSetMacro(Roughness, double);
+  vtkGetMacro(Roughness, double);
+  vtkSetMacro(Metallic, double);
+  vtkGetMacro(Metallic, double);
+  vtkSetMacro(LineWidth, double);
+  vtkGetMacro(LineWidth, double);
+  vtkSetMacro(NormalScale, double);
+  vtkGetMacro(NormalScale, double);
+  vtkSetMacro(TextureBaseColor, std::string);
+  vtkGetMacro(TextureBaseColor, std::string);
+  vtkSetMacro(TextureMaterial, std::string);
+  vtkGetMacro(TextureMaterial, std::string);
+  vtkSetMacro(TextureEmissive, std::string);
+  vtkGetMacro(TextureEmissive, std::string);
+  vtkSetMacro(TextureNormal, std::string);
+  vtkGetMacro(TextureNormal, std::string);
+  //@}
+
 protected:
   vtkF3DGenericImporter() = default;
   ~vtkF3DGenericImporter() override = default;
@@ -141,7 +166,6 @@ protected:
 
   vtkNew<vtkF3DMetaReader> Reader;
 
-  const f3d::options* Options = nullptr;
   vtkNew<vtkScalarBarActor> ScalarBarActor;
   vtkNew<vtkActor> GeometryActor;
   vtkNew<vtkActor> PointSpritesActor;
@@ -161,6 +185,21 @@ protected:
   double* TimeSteps = nullptr;
   double* TimeRange = nullptr;
   vtkNew<vtkF3DPostProcessFilter> PostPro;
+
+  bool UseCellScalars = false;
+  double PointSize = 10.;
+  double Opacity = 1.;
+  double Roughness = 0.3;
+  double Metallic = 0.;
+  double LineWidth = 1.;
+  double NormalScale = 1.;
+  double SurfaceColor[3] = { 1., 1., 1. };
+  double EmissiveFactor[3] = { 1., 1., 1. };
+  std::string ScalarArray;
+  std::string TextureBaseColor;
+  std::string TextureMaterial;
+  std::string TextureEmissive;
+  std::string TextureNormal;
 
 private:
   vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;
