@@ -72,13 +72,13 @@ public:
    * Set the range of the scalar bar
    * Setting an empty vector will use automatic range
    */
-  void SetScalarBarRange(std::vector<double> range, bool update = true);
+  void SetScalarBarRange(const std::vector<double>& range, bool update = true);
 
   /**
    * Set the colormap to use
    * Setting an empty vector will use defaut color map
    */
-  void SetColormap(std::vector<double> colormap, bool update = true);
+  void SetColormap(const std::vector<double>& colormap, bool update = true);
 
   enum CycleTypeEnum
   {

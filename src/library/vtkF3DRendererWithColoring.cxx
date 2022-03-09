@@ -166,7 +166,7 @@ bool vtkF3DRendererWithColoring::UsingInverseOpacityFunction()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetScalarBarRange(std::vector<double> range, bool update)
+void vtkF3DRendererWithColoring::SetScalarBarRange(const std::vector<double>& range, bool update)
 {
   if (this->UserScalarBarRange != range)
   {
@@ -179,7 +179,7 @@ void vtkF3DRendererWithColoring::SetScalarBarRange(std::vector<double> range, bo
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetColormap(std::vector<double> colormap, bool update)
+void vtkF3DRendererWithColoring::SetColormap(const std::vector<double>& colormap, bool update)
 {
   if (this->Colormap != colormap)
   {
