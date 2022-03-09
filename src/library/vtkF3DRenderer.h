@@ -15,10 +15,6 @@
 #include <vtkOrientationMarkerWidget.h>
 #include <vtkSkybox.h>
 
-namespace f3d
-{
-class options;
-}
 class vtkCornerAnnotation;
 class vtkTextActor;
 
@@ -50,7 +46,16 @@ public:
 
   //@{
   /**
-   * Set/Get usages of different render passes
+   * Set different actors parameters
+   */
+  void SetFontFile(const std::string& fontFile);
+  void SetHDRIFile(const std::string& hdriFile);
+  void SetBackground(const double* backgroundColor) override;
+  //@}
+
+  //@{
+  /**
+   * Set/Get usages and configurations of different render passes
    */
   void SetUseRaytracing(bool use);
   void SetUseRaytracingDenoiser(bool use);
@@ -60,6 +65,7 @@ public:
   void SetUseToneMappingPass(bool use);
   void SetUseBlurBackground(bool use);
   void SetUseTrackball(bool use);
+  void SetRaytracingSamples(int samples);
   bool UsingRaytracing();
   bool UsingRaytracingDenoiser();
   bool UsingDepthPeelingPass();
@@ -76,23 +82,10 @@ public:
   void Render() override;
 
   /**
-   * Update internal options using provided options
-   */
-  virtual void UpdateOptions(const f3d::options& options);
-
-  /**
-   * Initialize the renderer to be used with provided options and file.
+   * Initialize the renderer actors and flags.
    * Should be called after being added to a vtkRenderWindow.
    */
-  virtual void Initialize(const f3d::options& options, const std::string& fileInfo);
-
-  //@{
-  /**
-   * Set/Get the axis widget
-   */
-  vtkGetSmartPointerMacro(AxisWidget, vtkOrientationMarkerWidget);
-  vtkSetSmartPointerMacro(AxisWidget, vtkOrientationMarkerWidget);
-  //@}
+  virtual void Initialize(const std::string& fileInfo, const std::string& up);
 
   /**
    * Get the OpenGL skybox
@@ -100,21 +93,13 @@ public:
   vtkGetObjectMacro(Skybox, vtkSkybox);
 
   /**
-   * Set the visibility of the different actors
-   * as they were set by the options during the initialization.
-   * Also call UpdateInternalActors
-   */
-  void ShowOptions();
-
-  /**
    * Setup the different render passes
-   * as they were set by the options during the initialization.
    */
   void SetupRenderPasses();
 
   /**
    * Initialize the camera position, focal point,
-   * view up and view angle according to the options if any
+   * view up and view angle.
    */
   void InitializeCamera();
 
@@ -134,27 +119,15 @@ public:
    */
   virtual std::string GetRenderingDescription();
 
-  //@{
   /**
-   * Set/Get up vector
+   * Get up vector
    */
   vtkGetVector3Macro(UpVector, double);
-  vtkSetVector3Macro(UpVector, double);
-  //@}
 
-  //@{
   /**
    * Set/Get right vector
    */
   vtkGetVector3Macro(RightVector, double);
-  vtkSetVector3Macro(RightVector, double);
-  //@}
-
-  /**
-   * Override to update internal actors that display data
-   * in a specific way
-   */
-  virtual void UpdateInternalActors(){};
 
 protected:
   vtkF3DRenderer();
@@ -198,7 +171,7 @@ protected:
 
   bool GridVisible = false;
   bool AxisVisible = false;
-  bool EdgesVisible = false;
+  bool EdgeVisible = false;
   bool TimerVisible = false;
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
@@ -217,7 +190,10 @@ protected:
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
 
+  bool HasHDRI = false;
   std::string HDRIFile;
+  std::string FontFile;
+
   std::string GridInfo;
 };
 
