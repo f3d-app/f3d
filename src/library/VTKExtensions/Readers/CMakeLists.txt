@@ -233,3 +233,47 @@ endif()
 list(LENGTH F3D_READER_FILES F3D_NB_READERS)
 message(STATUS "${F3D_NB_READERS} readers found.")
 message(STATUS "Supported extensions: ${F3D_SUPPORTED_EXTENSIONS}")
+
+set(MODULES_SPECIFIC_INCLUDE_DIRS "")
+set(MODULES_SPECIFIC_LIBRARIES "")
+
+set(classes
+  vtkF3DGenericImporter
+  vtkF3DPostProcessFilter
+  vtkF3DMetaReader
+  F3DReader
+  F3DReaderFactory
+  )
+
+if(F3D_MODULE_ASSIMP)
+  list(APPEND classes vtkF3DAssimpImporter)
+
+  # Note: Assimp CMake module file does not declare Debug target properties, just map it to Release properties
+  get_target_property(F3D_ASSIMP_DEBUG_VAR assimp::assimp IMPORTED_IMPLIB_RELEASE)
+  if(NOT F3D_ASSIMP_DEBUG_VAR)
+    set_target_properties(assimp::assimp PROPERTIES MAP_IMPORTED_CONFIG_DEBUG Release)
+  endif()
+endif()
+
+if(F3D_MODULE_OCCT)
+  list(APPEND classes vtkF3DOCCTReader)
+  # Note: OpenCASCADE does not declare the libs in the correct dependency order.
+  # This could be an issue on Linux when linking with static libraries.
+  # See .github/workflows/ci.yml for a scripted fix
+endif()
+
+if(F3D_MODULE_ALEMBIC)
+  list(APPEND classes vtkF3DAlembicImporter)
+endif()
+
+vtk_module_add_module(f3d::VTKExtensionsReaders
+  FORCE_STATIC
+  CLASSES ${classes})
+
+vtk_module_include(f3d::VTKExtensionsReaders
+  PRIVATE
+    $<BUILD_INTERFACE:${OpenCASCADE_INCLUDE_DIR}>)
+
+vtk_module_link(f3d::VTKExtensionsReaders
+  PRIVATE
+    ${OpenCASCADE_LIBRARIES})
