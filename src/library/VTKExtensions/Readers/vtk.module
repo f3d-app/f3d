@@ -1,0 +1,28 @@
+NAME
+  f3d::VTKExtensionsReaders
+DESCRIPTION
+  A VTK module containing all F3D provided readers and reader factory logic
+DEPENDS
+  VTK::IOImport
+PRIVATE_DEPENDS
+  VTK::CommonExecutionModel
+  VTK::FiltersGeneral
+  VTK::FiltersGeometry
+  VTK::IOImage
+  VTK::ImagingHybrid
+  VTK::RenderingAnnotation
+  VTK::RenderingVolumeOpenGL2
+  f3d::VTKExtensionsCore
+OPTIONAL_DEPENDS
+  assimp::assimp
+  Alembic::Alembic
+TEST_DEPENDS
+  VTK::TestingCore
+  VTK::IOCityGML
+  VTK::IOGeometry
+  VTK::IOImage
+  VTK::IOPLY
+  VTK::IOParallel
+  VTK::IOXML
+TEST_OPTIONAL_DEPENDS  
+  VTK::IOExodus

@@ -1,6 +1,6 @@
 #include "F3DOffscreenRender.h"
 
-#include "f3d_log.h"
+#include "F3DLog.h"
 
 #include <vtkImageData.h>
 #include <vtkImageDifference.h>
@@ -59,7 +59,7 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
   {
     if (output.empty())
     {
-      f3d::log::error(
+      F3DLog::Print(F3DLog::Severity::Error,
         "Reference image does not exists, use the --output option to output current rendering into "
         "an image file.");
     }
@@ -70,8 +70,8 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
 #else
       F3DOffscreenRender::RenderOffScreen(renWin, output);
 #endif
-      f3d::log::error(
-        "Reference file does not exists, current rendering has been outputted to ", output, ".");
+      F3DLog::Print(F3DLog::Severity::Error,
+        "Reference file does not exists, current rendering has been outputted to " + output + ".");
     }
     return false;
   }
@@ -104,17 +104,17 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
   diff->Update();
 
   double error = diff->GetThresholdedError();
-  f3d::log::info("Diff threshold error = ", error);
+  F3DLog::Print(F3DLog::Severity::Info, "Diff threshold error = " + std::to_string(error) + "\n");
   if (error > threshold)
   {
-    f3d::log::error(
-      "Current rendering difference with reference image is higher than the threshold of ",
-      threshold, ".");
+    F3DLog::Print(F3DLog::Severity::Error,
+      "Current rendering difference with reference image is higher than the threshold of " +
+        std::to_string(threshold) + ".\n");
     if (output.empty())
     {
-      f3d::log::error(
+      F3DLog::Print(F3DLog::Severity::Error,
         "Use the --output option to be able to output current rendering and diff images into "
-        "files.");
+        "files.\n");
     }
     else
     {
@@ -129,8 +129,9 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
       writer->SetInputConnection(diff->GetOutputPort());
       writer->SetFileName(diffFileName.c_str());
       writer->Write();
-      f3d::log::error(
-        "Current rendering and diff images have been outputted in ", output, " and ", diffFileName);
+      F3DLog::Print(F3DLog::Severity::Error,
+        "Current rendering and diff images have been outputted in " + output + " and " +
+          diffFileName + "\n");
     }
     return false;
   }
