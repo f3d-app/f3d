@@ -1,0 +1,22 @@
+NAME
+  f3d::VTKExtensionsRendering
+DESCRIPTION
+  A VTK containing class related to rendering
+DEPENDS
+  VTK::RenderingOpenGL2
+  VTK::RenderingAnnotation
+  VTK::InteractionStyle
+  VTK::RenderingVolumeOpenGL2
+PRIVATE_DEPENDS
+  VTK::IOImage
+  VTK::InteractionWidgets
+  VTK::RenderingCore
+  f3d::VTKExtensionsCore
+OPTIONAL_DEPENDS
+  VTK::RenderingRayTracing
+TEST_DEPENDS
+  VTK::TestingCore
+  VTK::TestingRendering
+  VTK::IOXML
+  VTK::InteractionWidgets
+  f3d::VTKExtensionsCore

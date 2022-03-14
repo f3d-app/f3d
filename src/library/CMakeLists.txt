@@ -4,74 +4,92 @@ vtk_encode_string(
   NAME F3DIcon
   BINARY)
 
-# Define libf3d target
-set(LIB_PLATFORM_SPECIFIC_FILES "")
-if(WIN32 AND F3D_WINDOWS_GUI)
-  set(LIB_PLATFORM_SPECIFIC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DWin32OutputWindow.cxx")
-endif()
-if(APPLE)
-  set(LIB_PLATFORM_SPECIFIC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm")
+# Define VTK modules to link libf3d with
+# Note that readers/importers specific modules
+# should be listed here as reader instanciation is header only
+set(F3D_VTK_MODULES
+  VTK::CommonSystem
+  VTK::IOCityGML
+  VTK::IOGeometry
+  VTK::IOPLY
+  VTK::IOXML
+  VTK::IOParallel
+  VTK::InteractionWidgets
+  VTK::jsoncpp
+  f3d::VTKExtensionsApplicative
+  f3d::VTKExtensionsCore
+  f3d::VTKExtensionsReaders
+  f3d::VTKExtensionsRendering
+)
+
+# Check modules
+if(F3D_MODULE_EXODUS)
+  if(TARGET VTK::IOExodus)
+    message(STATUS "Module: VTK ExodusII found")
+    set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::IOExodus)
+  else()
+    message(FATAL_ERROR "F3D_MODULE_EXODUS option is enabled but VTK::IOExodus is not found")
+  endif()
 endif()
 
-set(MODULES_SPECIFIC_SOURCE_FILES "")
-set(MODULES_SPECIFIC_INCLUDE_DIRS "")
-set(MODULES_SPECIFIC_LIBRARIES "")
+if(F3D_MODULE_RAYTRACING)
+  if(TARGET VTK::RenderingRayTracing)
+    message(STATUS "VTK RayTracing enabled")
+  else()
+    message(FATAL_ERROR "F3D_MODULE_RAYTRACING option is enabled but VTK::RenderingRayTracing is not found")
+  endif()
+endif()
+
+if(F3D_MODULE_ASSIMP)
+  find_package(assimp 5.0 REQUIRED)
+  if(assimp_FOUND)
+    set(F3D_ASSIMP_VERSION "${assimp_VERSION}")
+    message(STATUS "Module: assimp ${F3D_ASSIMP_VERSION} found")
+    if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.1.0")
+      message(WARNING "Module: assimp: Animations are not working with assimp 5.1.0 and newer, use assimp 5.0.X for animation support with assimp formats.")
+    endif()
+    if("${F3D_ASSIMP_VERSION}" VERSION_LESS "5.1.0")
+      message(WARNING "Module: assimp: Embedded texture are only working with assimp 5.1.X and newer.")
+    endif()
+  endif()
+endif()
+
+set(F3D_MODULE_OCCT_XCAF 0)
+if(F3D_MODULE_OCCT)
+  find_package(OpenCASCADE REQUIRED)
+  if(OpenCASCADE_FOUND)
+    set(F3D_OCCT_VERSION "${OpenCASCADE_VERSION}")
+    message(STATUS "Module: OpenCASCADE ${F3D_OCCT_VERSION} found")
+    if((TARGET "TKXDESTEP") AND (TARGET "TKXDEIGES"))
+      set(F3D_MODULE_OCCT_XCAF 1)
+    else()
+      message(WARNING "Module: OpenCASCADE: TKXDESTEP and TKXDEIGES are not found. Parts color and name are not supported.")
+    endif()
+    if((NOT TARGET "TKSTEP") AND (NOT TARGET "TKIGES") AND (NOT TARGET "TKMesh"))
+      message(FATAL_ERROR "Module: OpenCASCADE does not contain required modules")
+    endif()
+  endif()
+endif()
+
+if(F3D_MODULE_ALEMBIC)
+  find_package(Alembic 1.7 REQUIRED)
+  if(Alembic_FOUND)
+    set(F3D_ALEMBIC_VERSION "${Alembic_VERSION}")
+    message(STATUS "Module: alembic ${Alembic_VERSION} found")
+  endif()
+endif()
+
+add_subdirectory(VTKExtensions)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/f3d_config.cxx.in"
   "${CMAKE_CURRENT_BINARY_DIR}/f3d_config.cxx"
   @ONLY)
 
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DConfigure.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkF3DConfigure.h"
-  @ONLY)
-
-# Readers declaration
-add_subdirectory(readers)
-
-if(F3D_MODULE_OCCT)
-  set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DOCCTReader.cxx")
-  set(MODULES_SPECIFIC_INCLUDE_DIRS ${MODULES_SPECIFIC_INCLUDE_DIRS} ${OpenCASCADE_INCLUDE_DIR})
-  # Note: OpenCASCADE does not declare the libs in the correct dependency order.
-  # This could be an issue on Linux when linking with static libraries.
-  # See .github/workflows/ci.yml for a scripted fix 
-  set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} ${OpenCASCADE_LIBRARIES})
-endif()
-
-if(F3D_MODULE_ASSIMP)
-  set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DAssimpImporter.cxx")
-  set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} assimp::assimp)
-
-  # Note: Assimp CMake module file does not declare Debug target properties, just map it to Release properties
-  get_target_property(F3D_ASSIMP_DEBUG_VAR assimp::assimp IMPORTED_IMPLIB_RELEASE)
-  if(NOT F3D_ASSIMP_DEBUG_VAR)
-    set_target_properties(assimp::assimp PROPERTIES MAP_IMPORTED_CONFIG_DEBUG Release)
-  endif()
-endif()
-
-if(F3D_MODULE_ALEMBIC)
-  set(MODULES_SPECIFIC_SOURCE_FILES ${MODULES_SPECIFIC_SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DAlembicImporter.cxx")
-  set(MODULES_SPECIFIC_LIBRARIES ${MODULES_SPECIFIC_LIBRARIES} Alembic::Alembic)
-endif()
-
+# Define libf3d target
 set(F3D_SOURCE_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DConsoleOutputWindow.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DGenericImporter.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DInteractorEventRecorder.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DInteractorStyle.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DMetaReader.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DObjectFactory.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DOpenGLGridMapper.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DPolyDataMapper.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DPostProcessFilter.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DRenderPass.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DRenderer.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DRendererWithColoring.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DAnimationManager.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/F3DLog.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/F3DOffscreenRender.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptions.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DStarter.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/f3d_config.cxx
@@ -82,11 +100,11 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_windowStandard.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_windowNoRender.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/readers/F3DReader.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/readers/F3DReaderFactory.cxx
-  ${MODULES_SPECIFIC_SOURCE_FILES}
-  ${LIB_PLATFORM_SPECIFIC_FILES}
   )
+
+if(APPLE)
+  list(APPEND F3D_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm")
+endif()
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
@@ -103,10 +121,6 @@ target_include_directories(libf3d
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-  PRIVATE
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/readers>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/readers>
-  $<BUILD_INTERFACE:${MODULES_SPECIFIC_INCLUDE_DIRS}>
   )
 
 set_target_properties(libf3d PROPERTIES
@@ -131,7 +145,7 @@ endif()
 
 vtk_module_autoinit(TARGETS libf3d MODULES ${F3D_VTK_MODULES})
 
-target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES} ${MODULES_SPECIFIC_LIBRARIES})
+target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES})
 
 if(F3D_STRICT_BUILD)
   if(MSVC)
