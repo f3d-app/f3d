@@ -10,11 +10,13 @@ class vtkInteractorObserver;
 class vtkImporter;
 namespace f3d
 {
+class options;
 class loader;
+class window;
 class interactor
 {
 public:
-  interactor();
+  interactor(const options& options, window& window, loader& loader);
   ~interactor();
 
   // XXX is this needed ?

@@ -13,7 +13,7 @@ class window;
 class loader
 {
 public:
-  loader(const options& options);
+  loader(const options& options, window& window);
   ~loader();
 
   // XXX is this needed ?
@@ -33,20 +33,15 @@ public:
   /**
    * Get the options used by the loader
    */
-  const options& getOptions();
+//  const options& getOptions();
   //@}
-
-  /**
-   * Set the interactor to use when interacting
-   */
-  void setInteractor(interactor* interactor);
 
   /**
    * Set/get the window to use when rendering
    * TODO since this is absolutely needed, maybe this API is not the right one
    */
-  window* getWindow();
-  void setWindow(window* window);
+//  window* getWindow();
+//  void setWindow(window* window);
 
   /**
    * Add a list of files or directory to be loaded
@@ -90,6 +85,12 @@ public:
    */
   void getFileInfo(
     LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const;
+
+  // TODO Internal API
+  /**
+   * Set the interactor to use when interacting
+   */
+  void setInteractor(interactor* interactor);
 
 private:
   class F3DInternals;

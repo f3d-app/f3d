@@ -32,7 +32,7 @@ namespace f3d
 class windowStandard::F3DInternals
 {
 public:
-  bool UpdateCamera(const f3d::options* options)
+  bool UpdateCamera(const f3d::options& options)
   {
     if (!this->Renderer)
     {
@@ -41,7 +41,7 @@ public:
 
     // Set the initial camera once all options
     // have been shown as they may have an effect on it
-    if (options->getAsInt("camera-index") < 0)
+    if (options.getAsInt("camera-index") < 0)
     {
       // set a default camera from bounds using VTK method
       this->Renderer->vtkRenderer::ResetCamera();
@@ -49,35 +49,35 @@ public:
       // use options to overwrite camera parameters
       vtkCamera* cam = this->Renderer->GetActiveCamera();
 
-      std::vector<double> cameraPosition = options->getAsDoubleVector("camera-position");
+      std::vector<double> cameraPosition = options.getAsDoubleVector("camera-position");
       if (cameraPosition.size() == 3)
       {
         cam->SetPosition(cameraPosition.data());
       }
 
-      std::vector<double> cameraFocalPoint = options->getAsDoubleVector("camera-focal-point");
+      std::vector<double> cameraFocalPoint = options.getAsDoubleVector("camera-focal-point");
       if (cameraFocalPoint.size() == 3)
       {
         cam->SetFocalPoint(cameraFocalPoint.data());
       }
 
-      std::vector<double> cameraViewUp = options->getAsDoubleVector("camera-view-up");
+      std::vector<double> cameraViewUp = options.getAsDoubleVector("camera-view-up");
       if (cameraViewUp.size() == 3)
       {
         cam->SetViewUp(cameraViewUp.data());
       }
 
-      double cameraViewAngle = options->getAsDouble("camera-view-angle");
+      double cameraViewAngle = options.getAsDouble("camera-view-angle");
       if (cameraViewAngle != 0)
       {
         cam->SetViewAngle(cameraViewAngle);
       }
 
-      cam->Azimuth(options->getAsDouble("camera-azimuth-angle"));
-      cam->Elevation(options->getAsDouble("camera-elevation-angle"));
+      cam->Azimuth(options.getAsDouble("camera-azimuth-angle"));
+      cam->Elevation(options.getAsDouble("camera-elevation-angle"));
       cam->OrthogonalizeViewUp();
 
-      if (options->getAsBool("verbose"))
+      if (options.getAsBool("verbose"))
       {
         ::DisplayCameraInformation(cam);
       }
@@ -92,11 +92,11 @@ public:
 };
 
 //----------------------------------------------------------------------------
-windowStandard::windowStandard(const std::string& windowName, bool offscreen)
-  : Internals(new windowStandard::F3DInternals)
+windowStandard::windowStandard(const options& options, bool offscreen)
+  : window(options)
+  ,  Internals(new windowStandard::F3DInternals)
 {
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
-  this->Internals->RenWin->SetWindowName(windowName.c_str());
   this->Internals->RenWin->SetOffScreenRendering(offscreen);
 }
 
@@ -121,6 +121,13 @@ bool windowStandard::setIcon(const void* icon, size_t iconSize)
 }
 
 //----------------------------------------------------------------------------
+bool windowStandard::setWindowName(const std::string& windowName)
+{
+  this->Internals->RenWin->SetWindowName(windowName.c_str());
+  return true;
+}
+
+//----------------------------------------------------------------------------
 windowStandard::~windowStandard() = default;
 
 //----------------------------------------------------------------------------
@@ -132,8 +139,8 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
     this->Internals->RenWin->RemoveRenderer(this->Internals->Renderer);
   }
 
-  this->Internals->RenWin->SetSize(this->Options->getAsIntVector("resolution").data());
-  this->Internals->RenWin->SetFullScreen(this->Options->getAsBool("fullscreen"));
+  this->Internals->RenWin->SetSize(this->Options.getAsIntVector("resolution").data());
+  this->Internals->RenWin->SetFullScreen(this->Options.getAsBool("fullscreen"));
 
   // TODO Keep existing renderer if valid as it is expansive to create one
   // TODO test interactive switching form one coloring/without coloring
@@ -146,7 +153,7 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
     this->Internals->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
   }
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
-  this->Internals->Renderer->Initialize(fileInfo, this->Options->getAsString("up"));
+  this->Internals->Renderer->Initialize(fileInfo, this->Options.getAsString("up"));
 }
 
 //----------------------------------------------------------------------------
@@ -154,42 +161,42 @@ bool windowStandard::update()
 {
   if (this->Internals->Renderer)
   {
-    this->Internals->Renderer->ShowAxis(this->Options->getAsBool("axis"));
-    this->Internals->Renderer->ShowGrid(this->Options->getAsBool("grid"));
-    this->Internals->Renderer->ShowEdge(this->Options->getAsBool("edges"));
-    this->Internals->Renderer->ShowTimer(this->Options->getAsBool("fps"));
-    this->Internals->Renderer->ShowFilename(this->Options->getAsBool("filename"));
-    this->Internals->Renderer->ShowMetaData(this->Options->getAsBool("metadata"));
-    this->Internals->Renderer->SetUseRaytracing(this->Options->getAsBool("raytracing"));
-    this->Internals->Renderer->SetRaytracingSamples(this->Options->getAsInt("samples"));
-    this->Internals->Renderer->SetUseRaytracingDenoiser(this->Options->getAsBool("denoise"));
-    this->Internals->Renderer->SetUseSSAOPass(this->Options->getAsBool("ssao"));
-    this->Internals->Renderer->SetUseFXAAPass(this->Options->getAsBool("fxaa"));
-    this->Internals->Renderer->SetUseToneMappingPass(this->Options->getAsBool("tone-mapping"));
-    this->Internals->Renderer->SetUseBlurBackground(this->Options->getAsBool("blur-background"));
-    this->Internals->Renderer->SetUseTrackball(this->Options->getAsBool("trackball"));
-    this->Internals->Renderer->SetHDRIFile(this->Options->getAsString("hdri"));
-    this->Internals->Renderer->SetUseDepthPeelingPass(this->Options->getAsBool("depth-peeling"));
+    this->Internals->Renderer->ShowAxis(this->Options.getAsBool("axis"));
+    this->Internals->Renderer->ShowGrid(this->Options.getAsBool("grid"));
+    this->Internals->Renderer->ShowEdge(this->Options.getAsBool("edges"));
+    this->Internals->Renderer->ShowTimer(this->Options.getAsBool("fps"));
+    this->Internals->Renderer->ShowFilename(this->Options.getAsBool("filename"));
+    this->Internals->Renderer->ShowMetaData(this->Options.getAsBool("metadata"));
+    this->Internals->Renderer->SetUseRaytracing(this->Options.getAsBool("raytracing"));
+    this->Internals->Renderer->SetRaytracingSamples(this->Options.getAsInt("samples"));
+    this->Internals->Renderer->SetUseRaytracingDenoiser(this->Options.getAsBool("denoise"));
+    this->Internals->Renderer->SetUseSSAOPass(this->Options.getAsBool("ssao"));
+    this->Internals->Renderer->SetUseFXAAPass(this->Options.getAsBool("fxaa"));
+    this->Internals->Renderer->SetUseToneMappingPass(this->Options.getAsBool("tone-mapping"));
+    this->Internals->Renderer->SetUseBlurBackground(this->Options.getAsBool("blur-background"));
+    this->Internals->Renderer->SetUseTrackball(this->Options.getAsBool("trackball"));
+    this->Internals->Renderer->SetHDRIFile(this->Options.getAsString("hdri"));
+    this->Internals->Renderer->SetUseDepthPeelingPass(this->Options.getAsBool("depth-peeling"));
     this->Internals->Renderer->SetBackground(
-      this->Options->getAsDoubleVector("background-color").data());
-    this->Internals->Renderer->SetFontFile(this->Options->getAsString("font-file"));
+      this->Options.getAsDoubleVector("background-color").data());
+    this->Internals->Renderer->SetFontFile(this->Options.getAsString("font-file"));
 
     vtkF3DRendererWithColoring* renWithColor =
       vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
 
     if (renWithColor)
     {
-      renWithColor->SetUsePointSprites(this->Options->getAsBool("point-sprites"), false);
-      renWithColor->SetUseVolume(this->Options->getAsBool("volume"), false);
-      renWithColor->SetUseInverseOpacityFunction(this->Options->getAsBool("inverse"), false);
-      renWithColor->ShowScalarBar(this->Options->getAsBool("bar"), false);
-      renWithColor->SetScalarBarRange(this->Options->getAsDoubleVector("range"), false);
-      renWithColor->SetColormap(this->Options->getAsDoubleVector("colormap"), false);
+      renWithColor->SetUsePointSprites(this->Options.getAsBool("point-sprites"), false);
+      renWithColor->SetUseVolume(this->Options.getAsBool("volume"), false);
+      renWithColor->SetUseInverseOpacityFunction(this->Options.getAsBool("inverse"), false);
+      renWithColor->ShowScalarBar(this->Options.getAsBool("bar"), false);
+      renWithColor->SetScalarBarRange(this->Options.getAsDoubleVector("range"), false);
+      renWithColor->SetColormap(this->Options.getAsDoubleVector("colormap"), false);
       renWithColor->UpdateColoringActors();
     }
 
     // Print coloring info when available
-    if (this->Options->getAsBool("verbose"))
+    if (this->Options.getAsBool("verbose"))
     {
       f3d::log::info(this->Internals->Renderer->GetRenderingDescription());
     }
@@ -241,8 +248,8 @@ void windowStandard::InitializeRendererWithColoring(vtkF3DGenericImporter* impor
     renWithColor->SetPointGaussianMapper(importer->GetPointGaussianMapper());
     renWithColor->SetVolumeMapper(importer->GetVolumeMapper());
     renWithColor->SetColoring(importer->GetPointDataForColoring(),
-      importer->GetCellDataForColoring(), this->Options->getAsBool("cells"),
-      importer->GetArrayIndexForColoring(), this->Options->getAsInt("component"));
+      importer->GetCellDataForColoring(), this->Options.getAsBool("cells"),
+      importer->GetArrayIndexForColoring(), this->Options.getAsInt("component"));
   }
 }
 };

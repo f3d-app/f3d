@@ -5,6 +5,10 @@
 namespace f3d
 {
 //----------------------------------------------------------------------------
+window::window(const options& options)
+  : Options(options) {}
+
+//----------------------------------------------------------------------------
 bool window::update()
 {
   return false;
@@ -28,15 +32,16 @@ bool window::renderAndCompareWithFile(const std::string&, double, bool, const st
   return false;
 }
 
+//----------------------------------------------------------------------------
 bool window::setIcon(const void*, size_t)
 {
   return false;
 }
 
 //----------------------------------------------------------------------------
-void window::SetOptions(const options* options)
+bool window::setWindowName(const std::string& windowName)
 {
-  this->Options = options;
+  return false;
 }
 
 //----------------------------------------------------------------------------

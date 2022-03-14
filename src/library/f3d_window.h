@@ -19,17 +19,17 @@ public:
   virtual bool renderAndCompareWithFile(const std::string& file, double threshold,
     bool noBackground, const std::string& outputFile = "");
   virtual bool setIcon(const void* icon, size_t iconSize);
+  virtual bool setWindowName(const std::string& windowName);
 
   // TODO Private API
-  void SetOptions(const f3d::options* options);
   virtual void Initialize(bool withColoring, std::string fileInfo);
   virtual void InitializeRendererWithColoring(vtkF3DGenericImporter* importer);
   virtual vtkRenderWindow* GetRenderWindow() = 0;
 
 protected:
-  window() = default;
+  window(const f3d::options&);
 
-  const f3d::options* Options;
+  const f3d::options& Options;
 };
 }
 

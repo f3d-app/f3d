@@ -64,7 +64,7 @@ int F3DStarter::Start(int argc, char** argv)
 
   if (this->Internals->CommandLineOptions.NoRender)
   {
-    this->Internals->Window = std::unique_ptr<f3d::window>(new f3d::windowNoRender());
+    this->Internals->Window = std::unique_ptr<f3d::window>(new f3d::windowNoRender(this->NewOptions));
     this->Internals->Loader.setWindow(this->Internals->Window.get());
   }
   else
@@ -107,7 +107,7 @@ int F3DStarter::Start(int argc, char** argv)
     bool offscreen = !this->Internals->CommandLineOptions.Reference.empty() ||
       !this->Internals->CommandLineOptions.Output.empty();
     this->Internals->Window =
-      std::unique_ptr<f3d::window>(new f3d::windowStandard(f3d::AppTitle, offscreen));
+      std::unique_ptr<f3d::window>(new f3d::windowStandard(this->NewOptions, f3d::AppTitle, offscreen));
     this->Internals->Loader.setWindow(this->Internals->Window.get());
 
     this->Internals->Loader.setInteractor(&this->Internals->Interactor);

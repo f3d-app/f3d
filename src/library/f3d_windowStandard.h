@@ -14,7 +14,7 @@ class loader;
 class windowStandard : public window
 {
 public:
-  windowStandard(const std::string& windowName, bool offscreen);
+  windowStandard(const options& options, bool offscreen);
   ~windowStandard() override;
 
   bool update() override;
@@ -23,6 +23,7 @@ public:
   bool renderAndCompareWithFile(const std::string& file, double threshold,
     bool noBackground = false, const std::string& outputFile = "") override;
   bool setIcon(const void* icon, size_t iconSize) override;
+  bool setWindowName(const std::string& windowName) override;
 
   // TODO Private API
   void Initialize(bool withColoring, std::string fileInfo) override;

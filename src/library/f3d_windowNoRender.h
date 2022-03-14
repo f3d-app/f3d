@@ -14,7 +14,7 @@ class loader;
 class windowNoRender : public window
 {
 public:
-  windowNoRender();
+  windowNoRender(const options& options);
   ~windowNoRender() override;
 
   // TODO Private API
