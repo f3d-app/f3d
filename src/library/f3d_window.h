@@ -9,7 +9,6 @@ namespace f3d
 class window
 {
 public:
-
   virtual bool update() = 0;
   virtual bool render() = 0;
   virtual bool renderToFile(const std::string& file, bool noBackground = false) = 0;

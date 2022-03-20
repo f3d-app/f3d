@@ -49,7 +49,8 @@ window& engine::getWindow()
         break;
       case (engine::WindowTypeEnum::WINDOW_STANDARD):
       default:
-        this->Internals->Window = std::make_unique<window_impl_standard>(this->getOptions(), this->Offscreen);
+        this->Internals->Window =
+          std::make_unique<window_impl_standard>(this->getOptions(), this->Offscreen);
         break;
     }
   }
@@ -61,7 +62,8 @@ loader& engine::getLoader()
 {
   if (!this->Internals->Loader)
   {
-    this->Internals->Loader = std::make_unique<loader_impl>(this->getOptions(), static_cast<window_impl&>(this->getWindow()));
+    this->Internals->Loader = std::make_unique<loader_impl>(
+      this->getOptions(), static_cast<window_impl&>(this->getWindow()));
   }
   return *this->Internals->Loader;
 }
@@ -71,8 +73,8 @@ interactor& engine::getInteractor()
 {
   if (!this->Internals->Interactor)
   {
-    this->Internals->Interactor =
-      std::make_unique<interactor_impl>(this->getOptions(), static_cast<window_impl&>(this->getWindow()), static_cast<loader_impl&>(this->getLoader()));
+    this->Internals->Interactor = std::make_unique<interactor_impl>(this->getOptions(),
+      static_cast<window_impl&>(this->getWindow()), static_cast<loader_impl&>(this->getLoader()));
   }
   return *this->Internals->Interactor;
 }

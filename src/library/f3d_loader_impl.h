@@ -54,8 +54,8 @@ public:
    * filePath the path to the file and fileInfo a more complete information about the file
    * Return true if there is a file or false otherwise
    */
-  void getFileInfo(
-    LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const override;
+  void getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
+    std::string& fileInfo) const override;
 
   /**
    * Implementation only API.

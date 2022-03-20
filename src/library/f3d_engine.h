@@ -37,7 +37,7 @@ private:
   // TODO use binary flags instead
   WindowTypeEnum WindowType;
   bool Offscreen = false;
-  
+
   class F3DInternals;
   std::unique_ptr<F3DInternals> Internals;
 };
