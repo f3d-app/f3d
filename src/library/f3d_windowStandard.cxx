@@ -128,7 +128,15 @@ bool windowStandard::setWindowName(const std::string& windowName)
 }
 
 //----------------------------------------------------------------------------
-windowStandard::~windowStandard() = default;
+windowStandard::~windowStandard()
+{
+  if (this->Internals->Renderer)
+  {
+    // The axis widget should be disabled before calling the renderer destructor
+    // if not, debug leaks wrongly reports a leak
+    this->Internals->Renderer->ShowAxis(false);
+  }
+}
 
 //----------------------------------------------------------------------------
 void windowStandard::Initialize(bool withColoring, std::string fileInfo)

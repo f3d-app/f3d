@@ -6,6 +6,7 @@
 #include <map>
 #include <type_traits>
 #include <variant>
+#include <iostream>
 
 namespace f3d
 {
@@ -81,6 +82,7 @@ public:
   std::map<std::string, OptionVariant> Options;
 };
 
+
 //----------------------------------------------------------------------------
 options::options()
   : Internals(new options::F3DInternals)
@@ -155,6 +157,7 @@ options::~options() = default;
 
 //----------------------------------------------------------------------------
 options::options(const options& opt)
+  : Internals(new options::F3DInternals)
 {
   this->Internals->Options = opt.Internals->Options;
 }

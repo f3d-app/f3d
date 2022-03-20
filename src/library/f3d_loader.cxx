@@ -316,7 +316,7 @@ void loader::setInteractor(interactor* interactor)
   this->Internals->Interactor = interactor;
   if (this->Internals->Interactor)
   {
-    this->Internals->Interactor->SetLoader(this);
+//    this->Internals->Interactor->SetLoader(this);
   }
 }
 

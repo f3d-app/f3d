@@ -278,6 +278,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   ren->AddActor(this->GeometryActor);
   ren->AddActor(this->PointSpritesActor);
   ren->AddVolume(this->VolumeProp);
+  
+  this->ScalarBarActor->SetVisibility(false);
+  this->GeometryActor->SetVisibility(false);
+  this->PointSpritesActor->SetVisibility(false);
+  this->VolumeProp->SetVisibility(false);
 }
 
 //----------------------------------------------------------------------------

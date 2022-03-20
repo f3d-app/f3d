@@ -61,7 +61,7 @@ public:
 
   // PRIVATE API TODO
   void SetInteractorOn(vtkInteractorObserver* observer);
-  void SetLoader(f3d::loader* loader);
+//  void SetLoader(f3d::loader* loader);
   void InitializeAnimation(vtkImporter* importer);
 
 private:
