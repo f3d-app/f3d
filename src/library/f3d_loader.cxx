@@ -136,6 +136,7 @@ void DisplayImporterDescription(vtkImporter* importer)
   f3d::log::info("\n");
 #endif
   f3d::log::info(importer->GetOutputsDescription());
+  f3d::log::info("\n");
 }
 }
 

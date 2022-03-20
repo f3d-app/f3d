@@ -170,7 +170,6 @@ bool windowStandard::update()
   if (this->Internals->Renderer)
   {
     this->Internals->Renderer->ShowAxis(this->Options.getAsBool("axis"));
-    this->Internals->Renderer->ShowGrid(this->Options.getAsBool("grid"));
     this->Internals->Renderer->ShowEdge(this->Options.getAsBool("edges"));
     this->Internals->Renderer->ShowTimer(this->Options.getAsBool("fps"));
     this->Internals->Renderer->ShowFilename(this->Options.getAsBool("filename"));
@@ -202,6 +201,9 @@ bool windowStandard::update()
       renWithColor->SetColormap(this->Options.getAsDoubleVector("colormap"), false);
       renWithColor->UpdateColoringActors();
     }
+
+    // Show grid last as it needs to know the bounding box to be able to compute its size
+    this->Internals->Renderer->ShowGrid(this->Options.getAsBool("grid"));
 
     // Print coloring info when available
     if (this->Options.getAsBool("verbose"))

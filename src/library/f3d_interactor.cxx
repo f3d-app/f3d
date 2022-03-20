@@ -317,7 +317,7 @@ public:
   std::function<bool(std::vector<std::string>)> DropFilesUserCallBack = [](std::vector<std::string>)
   { return false; };
 
-  const f3d::options Options;
+  const f3d::options& Options;
   f3d::window& Window;
   f3d::loader& Loader;
   F3DAnimationManager AnimationManager;
