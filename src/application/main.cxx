@@ -7,6 +7,8 @@ int main(int argc, char** argv)
 {
   int res = EXIT_FAILURE;
 
+  int* a = new int;
+  *a = 1;
   try
   {
     F3DStarter starter;
