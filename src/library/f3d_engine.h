@@ -26,6 +26,7 @@ public:
   };
 
   engine(WindowTypeEnum windowType, bool offscreen);
+  ~engine();
 
   options& getOptions();
   window& getWindow();
@@ -36,11 +37,9 @@ private:
   // TODO use binary flags instead
   WindowTypeEnum WindowType;
   bool Offscreen = false;
-
-  std::unique_ptr<options> Options;
-  std::unique_ptr<window> Window;
-  std::unique_ptr<loader> Loader;
-  std::unique_ptr<interactor> Interactor;
+  
+  class F3DInternals;
+  std::unique_ptr<F3DInternals> Internals;
 };
 }
 

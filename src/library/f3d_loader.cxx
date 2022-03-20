@@ -2,7 +2,7 @@
 
 #include "F3DReaderFactory.h"
 #include "F3DReaderInstantiator.h"
-#include "f3d_interactor.h"
+#include "f3d_interactor_impl.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
 #include "f3d_window.h"
@@ -74,7 +74,7 @@ void InitializeImporterWithOptions(const f3d::options& options, vtkF3DGenericImp
 }
 
 void CreateProgressRepresentationAndCallback(
-  ProgressDataStruct* data, vtkImporter* importer, f3d::interactor* interactor)
+  ProgressDataStruct* data, vtkImporter* importer, f3d::interactor_impl* interactor)
 {
   vtkNew<vtkCallbackCommand> progressCallback;
   progressCallback->SetClientData(data);
@@ -155,7 +155,7 @@ public:
   bool LoadedFile = false;
   const options& Options;
   window& Window;
-  interactor* Interactor = nullptr;
+  interactor_impl* Interactor = nullptr;
   vtkSmartPointer<vtkImporter> Importer;
   F3DReaderInstantiator ReaderInstantiator;
 };
@@ -306,7 +306,7 @@ int loader::getCurrentFileIndex()
 }
 
 //----------------------------------------------------------------------------
-void loader::setInteractor(interactor* interactor)
+void loader::setInteractor(interactor_impl* interactor)
 {
   this->Internals->Interactor = interactor;
 }

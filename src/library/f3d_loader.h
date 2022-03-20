@@ -8,7 +8,7 @@
 namespace f3d
 {
 class options;
-class interactor;
+class interactor_impl;
 class window;
 class loader
 {
@@ -76,7 +76,7 @@ public:
   /**
    * Set the interactor to use when interacting
    */
-  void setInteractor(interactor* interactor);
+  void setInteractor(interactor_impl* interactor);
 
 private:
   class F3DInternals;

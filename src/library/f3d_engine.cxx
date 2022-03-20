@@ -1,6 +1,6 @@
 #include "f3d_engine.h"
 
-#include "f3d_interactor.h"
+#include "f3d_interactor_impl.h"
 #include "f3d_loader.h"
 #include "f3d_options.h"
 #include "f3d_windowNoRender.h"
@@ -8,60 +8,72 @@
 
 namespace f3d
 {
+class engine::F3DInternals
+{
+public:
+  std::unique_ptr<options> Options;
+  std::unique_ptr<window> Window;
+  std::unique_ptr<loader> Loader;
+  std::unique_ptr<interactor_impl> Interactor;
+};
+
 //----------------------------------------------------------------------------
 engine::engine(WindowTypeEnum windowType, bool offscreen)
-  : WindowType(windowType)
+  : Internals(new engine::F3DInternals())
+  , WindowType(windowType)
   , Offscreen(offscreen)
 {
 }
+//----------------------------------------------------------------------------
+engine::~engine() = default;
 
 //----------------------------------------------------------------------------
 options& engine::getOptions()
 {
-  if (!this->Options)
+  if (!this->Internals->Options)
   {
-    this->Options = std::make_unique<options>();
+    this->Internals->Options = std::make_unique<options>();
   }
-  return *this->Options;
+  return *this->Internals->Options;
 }
 
 //----------------------------------------------------------------------------
 window& engine::getWindow()
 {
-  if (!this->Window)
+  if (!this->Internals->Window)
   {
     switch (this->WindowType)
     {
       case (engine::WindowTypeEnum::WINDOW_NO_RENDER):
-        this->Window = std::make_unique<windowNoRender>(this->getOptions());
+        this->Internals->Window = std::make_unique<windowNoRender>(this->getOptions());
         break;
       case (engine::WindowTypeEnum::WINDOW_STANDARD):
       default:
-        this->Window = std::make_unique<windowStandard>(this->getOptions(), this->Offscreen);
+        this->Internals->Window = std::make_unique<windowStandard>(this->getOptions(), this->Offscreen);
         break;
     }
   }
-  return *this->Window;
+  return *this->Internals->Window;
 }
 
 //----------------------------------------------------------------------------
 loader& engine::getLoader()
 {
-  if (!this->Loader)
+  if (!this->Internals->Loader)
   {
-    this->Loader = std::make_unique<loader>(this->getOptions(), this->getWindow());
+    this->Internals->Loader = std::make_unique<loader>(this->getOptions(), this->getWindow());
   }
-  return *this->Loader;
+  return *this->Internals->Loader;
 }
 
 //----------------------------------------------------------------------------
 interactor& engine::getInteractor()
 {
-  if (!this->Interactor)
+  if (!this->Internals->Interactor)
   {
-    this->Interactor =
-      std::make_unique<interactor>(this->getOptions(), this->getWindow(), this->getLoader());
+    this->Internals->Interactor =
+      std::make_unique<interactor_impl>(this->getOptions(), this->getWindow(), this->getLoader());
   }
-  return *this->Interactor;
+  return *this->Internals->Interactor;
 }
 }
