@@ -69,7 +69,7 @@ int F3DStarter::Start(int argc, char** argv)
       !this->Internals->CommandLineOptions.Output.empty();
 
     this->Internals->Engine =
-      std::make_unique<f3d::engine>(f3d::engine::WindowTypeEnum::WINDOW_NO_RENDER, offscreen);
+      std::make_unique<f3d::engine>(f3d::engine::WindowTypeEnum::WINDOW_STANDARD, offscreen);
 
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
