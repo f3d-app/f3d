@@ -288,7 +288,6 @@ jobs:
       DISPLAY: :0
       CC: clang-10
       CXX: clang++-10
-      LSAN_OPTIONS: suppressions=${{github.workspace}}/source/.lsan.supp use_tls=0
 
     steps:
 
@@ -362,4 +361,6 @@ jobs:
 
     - name: Test
       working-directory: ${{github.workspace}}/build
-      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+      run: |
+        export LSAN_OPTIONS=suppressions=$(pwd)/source/.lsan.supp use_tls=0
+        ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
