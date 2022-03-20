@@ -1,7 +1,7 @@
 #include "f3d_engine.h"
 
 #include "f3d_interactor_impl.h"
-#include "f3d_loader.h"
+#include "f3d_loader_impl.h"
 #include "f3d_options.h"
 #include "f3d_windowNoRender.h"
 #include "f3d_windowStandard.h"
@@ -13,7 +13,7 @@ class engine::F3DInternals
 public:
   std::unique_ptr<options> Options;
   std::unique_ptr<window> Window;
-  std::unique_ptr<loader> Loader;
+  std::unique_ptr<loader_impl> Loader;
   std::unique_ptr<interactor_impl> Interactor;
 };
 
@@ -61,7 +61,7 @@ loader& engine::getLoader()
 {
   if (!this->Internals->Loader)
   {
-    this->Internals->Loader = std::make_unique<loader>(this->getOptions(), this->getWindow());
+    this->Internals->Loader = std::make_unique<loader_impl>(this->getOptions(), this->getWindow());
   }
   return *this->Internals->Loader;
 }
@@ -72,7 +72,7 @@ interactor& engine::getInteractor()
   if (!this->Internals->Interactor)
   {
     this->Internals->Interactor =
-      std::make_unique<interactor_impl>(this->getOptions(), this->getWindow(), this->getLoader());
+      std::make_unique<interactor_impl>(this->getOptions(), this->getWindow(), static_cast<loader_impl&>(this->getLoader()));
   }
   return *this->Internals->Interactor;
 }

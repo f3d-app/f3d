@@ -10,12 +10,12 @@ class vtkImporter;
 namespace f3d
 {
 class options;
-class loader;
+class loader_impl;
 class window;
 class interactor_impl : public interactor
 {
 public:
-  interactor_impl(const options& options, window& window, loader& loader);
+  interactor_impl(const options& options, window& window, loader_impl& loader);
   ~interactor_impl();
 
   void setKeyPressCallBack(std::function<bool(int, std::string)> callBack) override;

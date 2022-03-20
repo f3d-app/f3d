@@ -95,7 +95,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_BINARY_DIR}/f3d_config.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_engine.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_interactor_impl.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_log.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_options.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window.cxx

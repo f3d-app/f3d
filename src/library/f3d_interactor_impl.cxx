@@ -1,7 +1,7 @@
 #include "f3d_interactor_impl.h"
 
 #include "F3DAnimationManager.h"
-#include "f3d_loader.h"
+#include "f3d_loader_impl.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
 #include "f3d_window.h"
@@ -26,7 +26,7 @@ namespace f3d
 class interactor_impl::F3DInternals
 {
 public:
-  F3DInternals(const options& options, window& window, loader& loader)
+  F3DInternals(const options& options, window& window, loader_impl& loader)
     : Options(options)
     , Window(window)
     , Loader(loader)
@@ -319,7 +319,7 @@ public:
 
   const f3d::options& Options;
   f3d::window& Window;
-  f3d::loader& Loader;
+  f3d::loader_impl& Loader;
   F3DAnimationManager AnimationManager;
   vtkNew<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
@@ -330,7 +330,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-interactor_impl::interactor_impl(const options& options, window& window, loader& loader)
+interactor_impl::interactor_impl(const options& options, window& window, loader_impl& loader)
   : Internals(new interactor_impl::F3DInternals(options, window, loader))
 {
   // Loader need the interactor

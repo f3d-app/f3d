@@ -1,4 +1,4 @@
-#include "f3d_loader.h"
+#include "f3d_loader_impl.h"
 
 #include "F3DReaderFactory.h"
 #include "F3DReaderInstantiator.h"
@@ -142,7 +142,7 @@ void DisplayImporterDescription(vtkImporter* importer)
 
 namespace f3d
 {
-class loader::F3DInternals
+class loader_impl::F3DInternals
 {
 public:
   F3DInternals(const options& options, window& window)
@@ -161,8 +161,8 @@ public:
 };
 
 //----------------------------------------------------------------------------
-loader::loader(const options& options, window& window)
-  : Internals(new loader::F3DInternals(options, window))
+loader_impl::loader_impl(const options& options, window& window)
+  : Internals(new loader_impl::F3DInternals(options, window))
 {
 #if NDEBUG
   vtkObject::GlobalWarningDisplayOff();
@@ -185,10 +185,10 @@ loader::loader(const options& options, window& window)
 }
 
 //----------------------------------------------------------------------------
-loader::~loader() = default;
+loader_impl::~loader_impl() = default;
 
 //----------------------------------------------------------------------------
-void loader::addFiles(const std::vector<std::string>& files)
+void loader_impl::addFiles(const std::vector<std::string>& files)
 {
   for (auto& file : files)
   {
@@ -197,7 +197,7 @@ void loader::addFiles(const std::vector<std::string>& files)
 }
 
 //----------------------------------------------------------------------------
-void loader::addFile(const std::string& path, bool recursive)
+void loader_impl::addFile(const std::string& path, bool recursive)
 {
   if (path.empty())
   {
@@ -247,7 +247,7 @@ void loader::addFile(const std::string& path, bool recursive)
 }
 
 //----------------------------------------------------------------------------
-void loader::getFileInfo(
+void loader_impl::getFileInfo(
   LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const
 {
   int size = static_cast<int>(this->Internals->FilesList.size());
@@ -288,31 +288,25 @@ void loader::getFileInfo(
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> loader::getFiles()
+std::vector<std::string> loader_impl::getFiles()
 {
   return this->Internals->FilesList;
 }
 
 //----------------------------------------------------------------------------
-void loader::setCurrentFileIndex(int index)
+void loader_impl::setCurrentFileIndex(int index)
 {
   this->Internals->CurrentFileIndex = index;
 }
 
 //----------------------------------------------------------------------------
-int loader::getCurrentFileIndex()
+int loader_impl::getCurrentFileIndex()
 {
   return this->Internals->CurrentFileIndex;
 }
 
 //----------------------------------------------------------------------------
-void loader::setInteractor(interactor_impl* interactor)
-{
-  this->Internals->Interactor = interactor;
-}
-
-//----------------------------------------------------------------------------
-bool loader::loadFile(loader::LoadFileEnum load)
+bool loader_impl::loadFile(loader::LoadFileEnum load)
 {
   // Reset loadedFile
   this->Internals->LoadedFile = false;
@@ -413,5 +407,11 @@ bool loader::loadFile(loader::LoadFileEnum load)
 
   this->Internals->LoadedFile = true;
   return this->Internals->LoadedFile;
+}
+
+//----------------------------------------------------------------------------
+void loader_impl::setInteractor(interactor_impl* interactor)
+{
+  this->Internals->Interactor = interactor;
 }
 }
