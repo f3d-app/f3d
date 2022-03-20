@@ -29,20 +29,6 @@ public:
     LOAD_LAST
   };
 
-  //@{
-  /**
-   * Get the options used by the loader
-   */
-//  const options& getOptions();
-  //@}
-
-  /**
-   * Set/get the window to use when rendering
-   * TODO since this is absolutely needed, maybe this API is not the right one
-   */
-//  window* getWindow();
-//  void setWindow(window* window);
-
   /**
    * Add a list of files or directory to be loaded
    */

@@ -6,7 +6,9 @@ namespace f3d
 {
 //----------------------------------------------------------------------------
 window::window(const options& options)
-  : Options(options) {}
+  : Options(options)
+{
+}
 
 //----------------------------------------------------------------------------
 bool window::update()
@@ -39,7 +41,7 @@ bool window::setIcon(const void*, size_t)
 }
 
 //----------------------------------------------------------------------------
-bool window::setWindowName(const std::string& windowName)
+bool window::setWindowName(const std::string&)
 {
   return false;
 }

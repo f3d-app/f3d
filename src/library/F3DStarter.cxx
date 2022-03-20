@@ -14,9 +14,7 @@
 class F3DStarter::F3DInternals
 {
 public:
-  F3DInternals()
-  {
-  }
+  F3DInternals() = default;
 
   F3DOptionsParser Parser;
   F3DOptions CommandLineOptions;
@@ -61,15 +59,17 @@ int F3DStarter::Start(int argc, char** argv)
 
   if (this->Internals->CommandLineOptions.NoRender)
   {
-    this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::WindowTypeEnum::WINDOW_NO_RENDER, false);
+    this->Internals->Engine =
+      std::make_unique<f3d::engine>(f3d::engine::WindowTypeEnum::WINDOW_NO_RENDER, false);
   }
   else
   {
     // TODO Test this multiconfig behavior
     bool offscreen = !this->Internals->CommandLineOptions.Reference.empty() ||
       !this->Internals->CommandLineOptions.Output.empty();
-    
-    this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::WindowTypeEnum::WINDOW_NO_RENDER, offscreen);
+
+    this->Internals->Engine =
+      std::make_unique<f3d::engine>(f3d::engine::WindowTypeEnum::WINDOW_NO_RENDER, offscreen);
 
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
@@ -116,12 +116,11 @@ int F3DStarter::Start(int argc, char** argv)
   if (!this->Internals->CommandLineOptions.NoRender)
   {
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
-    
+
     // Play recording if any
     if (!this->Internals->CommandLineOptions.InteractionTestPlayFile.empty())
     {
-      if (!interactor.playInteraction(
-            this->Internals->CommandLineOptions.InteractionTestPlayFile))
+      if (!interactor.playInteraction(this->Internals->CommandLineOptions.InteractionTestPlayFile))
       {
         return EXIT_FAILURE;
       }
@@ -164,7 +163,8 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      if (!this->Internals->Engine->getWindow().renderToFile(this->Internals->CommandLineOptions.Output,
+      if (!this->Internals->Engine->getWindow().renderToFile(
+            this->Internals->CommandLineOptions.Output,
             this->Internals->CommandLineOptions.NoBackground))
       {
         return EXIT_FAILURE;
@@ -192,8 +192,7 @@ bool F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
   if (this->Internals->CommandLineOptions.DryRun)
   {
     // Use command line options
-    F3DOptionsParser::ConvertToNewAPI(
-      this->Internals->CommandLineOptions, &options);
+    F3DOptionsParser::ConvertToNewAPI(this->Internals->CommandLineOptions, &options);
   }
   else
   {

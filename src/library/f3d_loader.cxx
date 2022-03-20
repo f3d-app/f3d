@@ -306,36 +306,10 @@ int loader::getCurrentFileIndex()
 }
 
 //----------------------------------------------------------------------------
-/*const options& loader::getOptions()
-{
-  return this->Internals->Options;
-}*/
-
-//----------------------------------------------------------------------------
 void loader::setInteractor(interactor* interactor)
 {
   this->Internals->Interactor = interactor;
-  if (this->Internals->Interactor)
-  {
-//    this->Internals->Interactor->SetLoader(this);
-  }
 }
-
-//----------------------------------------------------------------------------
-/*void loader::setWindow(window* window)
-{
-  this->Internals->Window = window;
-  if (this->Internals->Window)
-  {
-    this->Internals->Window->SetOptions(&this->Internals->Options);
-  }
-}
-
-//----------------------------------------------------------------------------
-window* loader::getWindow()
-{
-  return this->Internals->Window;
-}*/
 
 //----------------------------------------------------------------------------
 bool loader::loadFile(loader::LoadFileEnum load)

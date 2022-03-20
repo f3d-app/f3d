@@ -57,11 +57,13 @@ public:
    */
   bool recordInteraction(const std::string& file);
 
+  /**
+   * Start the interactor
+   */
   void start();
 
   // PRIVATE API TODO
   void SetInteractorOn(vtkInteractorObserver* observer);
-//  void SetLoader(f3d::loader* loader);
   void InitializeAnimation(vtkImporter* importer);
 
 private:

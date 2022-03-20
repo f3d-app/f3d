@@ -24,22 +24,22 @@ public:
     WINDOW_NO_RENDER,
     WINDOW_STANDARD
   };
-  
+
   engine(WindowTypeEnum windowType, bool offscreen);
 
   options& getOptions();
   window& getWindow();
   loader& getLoader();
   interactor& getInteractor();
-  
+
 private:
   // TODO use binary flags instead
   WindowTypeEnum WindowType;
   bool Offscreen = false;
 
-  std::unique_ptr<options> Options;  
-  std::unique_ptr<window> Window;  
-  std::unique_ptr<loader> Loader;  
+  std::unique_ptr<options> Options;
+  std::unique_ptr<window> Window;
+  std::unique_ptr<loader> Loader;
   std::unique_ptr<interactor> Interactor;
 };
 }

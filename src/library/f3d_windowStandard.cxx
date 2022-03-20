@@ -94,7 +94,7 @@ public:
 //----------------------------------------------------------------------------
 windowStandard::windowStandard(const options& options, bool offscreen)
   : window(options)
-  ,  Internals(new windowStandard::F3DInternals)
+  , Internals(new windowStandard::F3DInternals)
 {
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
   this->Internals->RenWin->SetOffScreenRendering(offscreen);

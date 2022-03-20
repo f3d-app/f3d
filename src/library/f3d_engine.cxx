@@ -12,7 +12,8 @@ namespace f3d
 engine::engine(WindowTypeEnum windowType, bool offscreen)
   : WindowType(windowType)
   , Offscreen(offscreen)
-{}
+{
+}
 
 //----------------------------------------------------------------------------
 options& engine::getOptions()
@@ -29,13 +30,15 @@ window& engine::getWindow()
 {
   if (!this->Window)
   {
-    switch(this->WindowType)
+    switch (this->WindowType)
     {
-      case(engine::WindowTypeEnum::WINDOW_NO_RENDER):
+      case (engine::WindowTypeEnum::WINDOW_NO_RENDER):
         this->Window = std::make_unique<windowNoRender>(this->getOptions());
-      case(engine::WindowTypeEnum::WINDOW_STANDARD):
+        break;
+      case (engine::WindowTypeEnum::WINDOW_STANDARD):
       default:
         this->Window = std::make_unique<windowStandard>(this->getOptions(), this->Offscreen);
+        break;
     }
   }
   return *this->Window;
@@ -56,7 +59,8 @@ interactor& engine::getInteractor()
 {
   if (!this->Interactor)
   {
-    this->Interactor = std::make_unique<interactor>(this->getOptions(), this->getWindow(), this->getLoader());
+    this->Interactor =
+      std::make_unique<interactor>(this->getOptions(), this->getWindow(), this->getLoader());
   }
   return *this->Interactor;
 }

@@ -341,19 +341,6 @@ interactor::interactor(const options& options, window& window, loader& loader)
 interactor::~interactor() = default;
 
 //----------------------------------------------------------------------------
-/*void interactor::SetLoader(f3d::loader* loader)
-{
-  this->Internals->Loader = loader;
-  this->Internals->Interactor->SetRenderWindow(Window->GetRenderWindow());
-  this->Internals->Interactor->SetInteractorStyle(this->Internals->Style);
-  this->Internals->Interactor->Initialize();
-
-  // Disable standard interactor behavior with timer event
-  // in order to be able to be able to interact while animating
-  this->Internals->Interactor->RemoveObservers(vtkCommand::TimerEvent);
-}*/
-
-//----------------------------------------------------------------------------
 void interactor::InitializeAnimation(vtkImporter* importer)
 {
   this->Internals->AnimationManager.Initialize(

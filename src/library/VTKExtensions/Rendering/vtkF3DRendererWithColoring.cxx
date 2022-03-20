@@ -2,9 +2,6 @@
 
 #include "F3DLog.h"
 
-#include <vtkScalarBarActor.h>
-#include <vtkSmartVolumeMapper.h>
-#include <vtkPolyDataMapper.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkDataArray.h>
 #include <vtkDataSetAttributes.h>
@@ -12,6 +9,9 @@
 #include <vtkObjectFactory.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkScalarBarActor.h>
+#include <vtkSmartVolumeMapper.h>
 #include <vtkVolumeProperty.h>
 
 #include <sstream>
