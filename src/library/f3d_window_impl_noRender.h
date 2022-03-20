@@ -1,23 +1,23 @@
-#ifndef f3d_windowNoRender_h
-#define f3d_windowNoRender_h
+#ifndef f3d_window_impl_noRender_h
+#define f3d_window_impl_noRender_h
 
-#include "f3d_window.h"
+#include "f3d_window_impl.h"
 
 #include <memory>
 #include <string>
 
+// TODO Doc
 class vtkRenderWindow;
 class vtkF3DRenderer;
 namespace f3d
 {
 class loader;
-class windowNoRender : public window
+class window_impl_noRender : public window_impl
 {
 public:
-  windowNoRender(const options& options);
-  ~windowNoRender() override;
+  window_impl_noRender(const options& options);
+  ~window_impl_noRender() override;
 
-  // TODO Private API
   vtkRenderWindow* GetRenderWindow() override;
 
 private:

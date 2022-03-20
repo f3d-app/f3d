@@ -7,11 +7,11 @@ namespace f3d
 {
 class options;
 class interactor_impl;
-class window;
+class window_impl;
 class loader_impl : public loader
 {
 public:
-  loader_impl(const options& options, window& window);
+  loader_impl(const options& options, window_impl& window);
   ~loader_impl();
 
   /**

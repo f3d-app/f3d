@@ -5,11 +5,10 @@
 
 #include "F3DNSDelegate.h"
 #include "f3d_engine.h"
-#include "f3d_interactor_impl.h"
+#include "f3d_interactor.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
-#include "f3d_windowNoRender.h"
-#include "f3d_windowStandard.h"
+#include "f3d_window.h"
 
 class F3DStarter::F3DInternals
 {

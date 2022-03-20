@@ -11,11 +11,11 @@ namespace f3d
 {
 class options;
 class loader_impl;
-class window;
+class window_impl;
 class interactor_impl : public interactor
 {
 public:
-  interactor_impl(const options& options, window& window, loader_impl& loader);
+  interactor_impl(const options& options, window_impl& window, loader_impl& loader);
   ~interactor_impl();
 
   void setKeyPressCallBack(std::function<bool(int, std::string)> callBack) override;

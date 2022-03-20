@@ -1,4 +1,4 @@
-#include "f3d_windowStandard.h"
+#include "f3d_window_impl_standard.h"
 
 #include "F3DOffscreenRender.h"
 #include "f3d_log.h"
@@ -29,7 +29,7 @@ void DisplayCameraInformation(vtkCamera* cam)
 
 namespace f3d
 {
-class windowStandard::F3DInternals
+class window_impl_standard::F3DInternals
 {
 public:
   bool UpdateCamera(const f3d::options& options)
@@ -92,16 +92,16 @@ public:
 };
 
 //----------------------------------------------------------------------------
-windowStandard::windowStandard(const options& options, bool offscreen)
-  : window(options)
-  , Internals(new windowStandard::F3DInternals)
+window_impl_standard::window_impl_standard(const options& options, bool offscreen)
+  : window_impl(options)
+  , Internals(new window_impl_standard::F3DInternals)
 {
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
   this->Internals->RenWin->SetOffScreenRendering(offscreen);
 }
 
 //----------------------------------------------------------------------------
-bool windowStandard::setIcon(const void* icon, size_t iconSize)
+bool window_impl_standard::setIcon(const void* icon, size_t iconSize)
 {
   // XXX This code requires that the interactor has already been set on the render window
   // This is not great, improve VTK on that regard
@@ -121,14 +121,14 @@ bool windowStandard::setIcon(const void* icon, size_t iconSize)
 }
 
 //----------------------------------------------------------------------------
-bool windowStandard::setWindowName(const std::string& windowName)
+bool window_impl_standard::setWindowName(const std::string& windowName)
 {
   this->Internals->RenWin->SetWindowName(windowName.c_str());
   return true;
 }
 
 //----------------------------------------------------------------------------
-windowStandard::~windowStandard()
+window_impl_standard::~window_impl_standard()
 {
   if (this->Internals->Renderer)
   {
@@ -139,7 +139,7 @@ windowStandard::~windowStandard()
 }
 
 //----------------------------------------------------------------------------
-void windowStandard::Initialize(bool withColoring, std::string fileInfo)
+void window_impl_standard::Initialize(bool withColoring, std::string fileInfo)
 {
   // Clear renderer if already present
   if (this->Internals->Renderer)
@@ -165,7 +165,7 @@ void windowStandard::Initialize(bool withColoring, std::string fileInfo)
 }
 
 //----------------------------------------------------------------------------
-bool windowStandard::update()
+bool window_impl_standard::update()
 {
   if (this->Internals->Renderer)
   {
@@ -217,26 +217,26 @@ bool windowStandard::update()
 }
 
 //----------------------------------------------------------------------------
-vtkRenderWindow* windowStandard::GetRenderWindow()
+vtkRenderWindow* window_impl_standard::GetRenderWindow()
 {
   return this->Internals->RenWin;
 }
 
 //----------------------------------------------------------------------------
-bool windowStandard::render()
+bool window_impl_standard::render()
 {
   this->Internals->RenWin->Render();
   return true;
 }
 
 //----------------------------------------------------------------------------
-bool windowStandard::renderToFile(const std::string& file, bool noBackground)
+bool window_impl_standard::renderToFile(const std::string& file, bool noBackground)
 {
   return F3DOffscreenRender::RenderOffScreen(this->Internals->RenWin, file, noBackground);
 }
 
 //----------------------------------------------------------------------------
-bool windowStandard::renderAndCompareWithFile(
+bool window_impl_standard::renderAndCompareWithFile(
   const std::string& file, double threshold, bool noBackground, const std::string& outputFile)
 {
   return F3DOffscreenRender::RenderTesting(
@@ -244,7 +244,7 @@ bool windowStandard::renderAndCompareWithFile(
 }
 
 //----------------------------------------------------------------------------
-void windowStandard::InitializeRendererWithColoring(vtkF3DGenericImporter* importer)
+void window_impl_standard::InitializeRendererWithColoring(vtkF3DGenericImporter* importer)
 {
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);

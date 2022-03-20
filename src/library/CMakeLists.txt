@@ -98,9 +98,9 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_log.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_options.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_windowStandard.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_windowNoRender.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window_impl.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window_impl_standard.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window_impl_noRender.cxx
   )
 
 if(APPLE)

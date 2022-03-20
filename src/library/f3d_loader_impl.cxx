@@ -5,7 +5,7 @@
 #include "f3d_interactor_impl.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
-#include "f3d_window.h"
+#include "f3d_window_impl.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DObjectFactory.h"
 
@@ -145,7 +145,7 @@ namespace f3d
 class loader_impl::F3DInternals
 {
 public:
-  F3DInternals(const options& options, window& window)
+  F3DInternals(const options& options, window_impl& window)
     : Options(options)
     , Window(window)
   {
@@ -154,14 +154,14 @@ public:
   int CurrentFileIndex = 0;
   bool LoadedFile = false;
   const options& Options;
-  window& Window;
+  window_impl& Window;
   interactor_impl* Interactor = nullptr;
   vtkSmartPointer<vtkImporter> Importer;
   F3DReaderInstantiator ReaderInstantiator;
 };
 
 //----------------------------------------------------------------------------
-loader_impl::loader_impl(const options& options, window& window)
+loader_impl::loader_impl(const options& options, window_impl& window)
   : Internals(new loader_impl::F3DInternals(options, window))
 {
 #if NDEBUG
