@@ -288,7 +288,7 @@ jobs:
       DISPLAY: :0
       CC: clang-10
       CXX: clang++-10
-      LSAN_OPTIONS: suppresions=${{github.workspace}}/source/.lsan.supp use_tls=0
+      LSAN_OPTIONS: suppressions=${{github.workspace}}/source/.lsan.supp use_tls=0
 
     steps:
 
