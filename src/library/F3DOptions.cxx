@@ -9,9 +9,9 @@
 #include "f3d_log.h"
 #include "f3d_options.h"
 
-#include <vtksys/SystemTools.hxx>
-
+#include <cstdlib>
 #include <fstream>
+#include <filesystem>
 #include <iomanip>
 #include <regex>
 #include <sstream>
@@ -150,11 +150,11 @@ protected:
     group(this->CollapseName(longName, shortName), doc, val, argHelp);
   }
 
-  std::string GetBinarySettingsDirectory();
-  std::string GetSettingsFilePath();
+  std::string GetBinaryConfigFileDirectory();
+  std::string GetConfigFilePath();
 
-  static std::string GetSystemSettingsDirectory();
-  static std::string GetUserSettingsDirectory();
+  static std::string GetSystemConfigFileDirectory();
+  static std::string GetUserConfigFileDirectory();
 
   void PrintHelpPair(
     const std::string& key, const std::string& help, int keyWidth = 10, int helpWidth = 70);
@@ -181,7 +181,6 @@ void ConfigurationOptions::GetOptionsFromArgs(F3DAppOptions& appOptions, f3d::op
     cxxOptions.positional_help("file1 file2 ...");
 
     // clang-format off
-
     auto grp0 = cxxOptions.add_options("Applicative");
     this->DeclareOption(grp0, "input", "", "Input file", inputs, false, false, "<files>");
     this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, false, false,"<png file>");
@@ -399,14 +398,25 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
   }
   else
   {
-    configFilePath = this->GetSettingsFilePath();
+    configFilePath = this->GetConfigFilePath();
   }
   if (configFilePath.empty())
   {
     return false;
   }
 
-  configFilePath = vtksys::SystemTools::CollapseFullPath(configFilePath);
+  // Recover an absolute canonical path to config file
+  try
+  {
+    configFilePath = std::filesystem::canonical(std::filesystem::path(configFilePath)).string();
+  }
+  catch (const std::filesystem::filesystem_error)
+  {
+    f3d::log::error("Configuration file does not exists: ", configFilePath);
+    return false;
+  }
+
+  // Read config file
   std::ifstream file;
   file.open(configFilePath.c_str());
 
@@ -455,11 +465,11 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
 }
 
 //----------------------------------------------------------------------------
-std::string ConfigurationOptions::GetUserSettingsDirectory()
+std::string ConfigurationOptions::GetUserConfigFileDirectory()
 {
   std::string applicationName = "f3d";
 #if defined(_WIN32)
-  const char* appData = vtksys::SystemTools::GetEnv("APPDATA");
+  const char* appData = std::getenv("APPDATA");
   if (!appData)
   {
     return std::string();
@@ -476,7 +486,7 @@ std::string ConfigurationOptions::GetUserSettingsDirectory()
   std::string separator("/");
 
   // Implementing XDG specifications
-  const char* xdgConfigHome = vtksys::SystemTools::GetEnv("XDG_CONFIG_HOME");
+  const char* xdgConfigHome = std::getenv("XDG_CONFIG_HOME");
   if (xdgConfigHome && strlen(xdgConfigHome) > 0)
   {
     directoryPath = xdgConfigHome;
@@ -487,7 +497,7 @@ std::string ConfigurationOptions::GetUserSettingsDirectory()
   }
   else
   {
-    const char* home = vtksys::SystemTools::GetEnv("HOME");
+    const char* home = std::getenv("HOME");
     if (!home)
     {
       return std::string();
@@ -505,10 +515,10 @@ std::string ConfigurationOptions::GetUserSettingsDirectory()
 }
 
 //----------------------------------------------------------------------------
-std::string ConfigurationOptions::GetSystemSettingsDirectory()
+std::string ConfigurationOptions::GetSystemConfigFileDirectory()
 {
   std::string directoryPath = "";
-// No support implemented for system wide settings on Windows yet
+// No support implemented for system wide config file on Windows yet
 #ifndef _WIN32
 #ifdef __APPLE__
   // Implementing simple /usr/local/etc/ system wide config
@@ -522,57 +532,61 @@ std::string ConfigurationOptions::GetSystemSettingsDirectory()
 }
 
 //----------------------------------------------------------------------------
-std::string ConfigurationOptions::GetBinarySettingsDirectory()
+std::string ConfigurationOptions::GetBinaryConfigFileDirectory()
 {
-  std::string directoryPath = "";
+  std::filesystem::path dirPath;
   std::string errorMsg, programFilePath;
-  if (vtksys::SystemTools::FindProgramPath(this->Argv[0], programFilePath, errorMsg))
+  try
   {
-    // resolve symlinks
-    programFilePath = vtksys::SystemTools::GetRealPath(programFilePath);
-    directoryPath = vtksys::SystemTools::GetProgramPath(programFilePath);
-    std::string separator;
-#if defined(_WIN32)
-    separator = "\\";
-    if (directoryPath[directoryPath.size() - 1] != separator[0])
-    {
-      directoryPath.append(separator);
-    }
-#else
-    separator = "/";
-    directoryPath += separator;
-#endif
-    directoryPath += "..";
+    // TODO may not work on windows ?
+    dirPath = std::filesystem::canonical(std::filesystem::path(this->Argv[0])).parent_path().parent_path().string();
 #if F3D_MACOS_BUNDLE
-    if (vtksys::SystemTools::FileExists(directoryPath + "/Resources"))
+    for (auto const& dirEntry : std::filesystem::directory_iterator{dirPath})
     {
-      directoryPath += "/Resources";
+      if (dirEntry.path().filename() == "Resources")
+      {
+        dirPath = dirEntry.path();
+      }
     }
 #endif
-    directoryPath = vtksys::SystemTools::CollapseFullPath(directoryPath);
-    directoryPath += separator;
   }
-  return directoryPath;
+  catch (const std::filesystem::filesystem_error)
+  {
+    f3d::log::error("Cannot recover binary config file directory: ", dirPath.string());
+    return std::string();
+  }
+
+  return dirPath.string();
 }
 
 //----------------------------------------------------------------------------
-std::string ConfigurationOptions::GetSettingsFilePath()
+std::string ConfigurationOptions::GetConfigFilePath()
 {
   std::string fileName = "config.json";
-  std::string filePath = ConfigurationOptions::GetUserSettingsDirectory() + fileName;
-  if (!vtksys::SystemTools::FileExists(filePath))
+  std::filesystem::path filePath;
+  try
   {
-    filePath = this->GetBinarySettingsDirectory() + fileName;
-    if (!vtksys::SystemTools::FileExists(filePath))
+    filePath = std::filesystem::path(ConfigurationOptions::GetUserConfigFileDirectory() + fileName);
+    if (!std::filesystem::exists(filePath))
     {
-      filePath = ConfigurationOptions::GetSystemSettingsDirectory() + fileName;
-      if (!vtksys::SystemTools::FileExists(filePath))
+      filePath = std::filesystem::path(this->GetBinaryConfigFileDirectory() + fileName);
+      if (!std::filesystem::exists(filePath))
       {
-        filePath = "";
+        filePath = std::filesystem::path(ConfigurationOptions::GetSystemConfigFileDirectory() + fileName);
+        if (!std::filesystem::exists(filePath))
+        {
+          return std::string();
+        }
       }
     }
   }
-  return filePath;
+  catch (const std::filesystem::filesystem_error)
+  {
+    f3d::log::error("Error recovering config file path: ", filePath.string());
+    return std::string();
+  }
+
+  return filePath.string();
 }
 
 //----------------------------------------------------------------------------
