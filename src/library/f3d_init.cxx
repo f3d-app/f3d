@@ -2,8 +2,8 @@
 
 #include "f3d_log.h"
 
-#include "vtkF3DObjectFactory.h"
 #include "F3DReaderInstantiator.h"
+#include "vtkF3DObjectFactory.h"
 
 #include <vtkLogger.h>
 #include <vtkNew.h>

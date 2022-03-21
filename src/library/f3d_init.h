@@ -15,8 +15,8 @@ namespace f3d
 class init
 {
 public:
-    init();
-    ~init() = default;
+  init();
+  ~init() = default;
 
 private:
   class F3DInternals;

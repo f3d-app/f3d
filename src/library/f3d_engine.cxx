@@ -89,7 +89,8 @@ interactor& engine::getInteractor()
 //----------------------------------------------------------------------------
 void engine::printVersion()
 {
-  // TODO engin should help with crafting the version string but should not be responsible for the printing itself, to improve 
+  // TODO engin should help with crafting the version string but should not be responsible for the
+  // printing itself, to improve
   std::string version = f3d::AppName + " " + f3d::AppVersion + "\n\n";
 
   version += f3d::AppTitle;
@@ -147,7 +148,8 @@ void engine::printVersion()
 
 void engine::printReadersList()
 {
-  // TODO engin should help with crafting the reader list string but should not be responsible for the printing itself, to improve 
+  // TODO engin should help with crafting the reader list string but should not be responsible for
+  // the printing itself, to improve
   size_t nameColSize = 0;
   size_t extsColSize = 0;
   size_t mimeColSize = 0;

@@ -160,7 +160,9 @@ public:
 
 //----------------------------------------------------------------------------
 loader_impl::loader_impl(const options& options, window_impl& window)
-  : Internals(new loader_impl::F3DInternals(options, window)){}
+  : Internals(new loader_impl::F3DInternals(options, window))
+{
+}
 
 //----------------------------------------------------------------------------
 loader_impl::~loader_impl() = default;
