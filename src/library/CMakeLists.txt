@@ -93,6 +93,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptions.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DStarter.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/f3d_config.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_init.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_engine.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_interactor_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader_impl.cxx

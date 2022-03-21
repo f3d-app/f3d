@@ -1,17 +1,13 @@
 #include "f3d_loader_impl.h"
 
 #include "F3DReaderFactory.h"
-#include "F3DReaderInstantiator.h"
 #include "f3d_interactor_impl.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
 #include "f3d_window_impl.h"
 #include "vtkF3DGenericImporter.h"
-#include "vtkF3DObjectFactory.h"
 
 #include <vtkCallbackCommand.h>
-#include <vtkLogger.h>
-#include <vtkNew.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkTimerLog.h>
@@ -160,7 +156,6 @@ public:
   interactor_impl* Interactor = nullptr;
 
   vtkSmartPointer<vtkImporter> Importer;
-  F3DReaderInstantiator ReaderInstantiator;
 };
 
 //----------------------------------------------------------------------------
