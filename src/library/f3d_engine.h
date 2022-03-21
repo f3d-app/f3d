@@ -34,6 +34,7 @@ public:
   interactor& getInteractor();
 
   static void printVersion();
+  static void printReadersList();
 
 private:
   class F3DInternals;

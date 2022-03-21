@@ -3,7 +3,6 @@
 #include "cxxopts.hpp"
 
 #include "F3DException.h"
-#include "F3DReaderFactory.h"
 #include "f3d_engine.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
@@ -12,6 +11,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <fstream>
+#include <iomanip>
 #include <regex>
 #include <sstream>
 #include <utility>
@@ -382,81 +382,7 @@ void ConfigurationOptions::PrintVersion()
 //----------------------------------------------------------------------------
 void ConfigurationOptions::PrintReadersList()
 {
-  size_t nameColSize = 0;
-  size_t extsColSize = 0;
-  size_t mimeColSize = 0;
-  size_t descColSize = 0;
-
-  const auto& readers = F3DReaderFactory::GetInstance()->GetReaders();
-  if (readers.empty())
-  {
-    f3d::log::warn("No registered reader found!");
-    return;
-  }
-  // Compute the size of the 3 columns
-  for (const auto& reader : readers)
-  {
-    // sanity check
-    if (reader->GetExtensions().size() < reader->GetMimeTypes().size())
-    {
-      f3d::log::error(reader->GetName(), " have different extensions and mime-types count.");
-      return;
-    }
-
-    nameColSize = std::max(nameColSize, reader->GetName().length());
-    descColSize = std::max(descColSize, reader->GetLongDescription().length());
-
-    for (const auto& ext : reader->GetExtensions())
-    {
-      extsColSize = std::max(extsColSize, ext.length());
-    }
-    for (const auto& mime : reader->GetMimeTypes())
-    {
-      mimeColSize = std::max(mimeColSize, mime.length());
-    }
-  }
-  nameColSize++;
-  extsColSize++;
-  mimeColSize++;
-  descColSize++;
-
-  std::string separator = std::string(nameColSize + extsColSize + descColSize + mimeColSize, '-');
-
-  // Print the rows split in 3 columns
-  std::stringstream headerLine;
-  headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(descColSize)
-             << "Description" << std::setw(extsColSize) << "Exts" << std::setw(mimeColSize)
-             << "Mime-types";
-  f3d::log::info(headerLine.str());
-  f3d::log::info(separator);
-
-  for (const auto& reader : readers)
-  {
-    for (size_t i = 0; i < reader->GetExtensions().size(); i++)
-    {
-      std::stringstream readerLine;
-      if (i == 0)
-      {
-        readerLine << std::left << std::setw(nameColSize) << reader->GetName()
-                   << std::setw(descColSize) << reader->GetLongDescription();
-      }
-      else
-      {
-        readerLine << std::left << std::setw(nameColSize + descColSize) << " ";
-      }
-
-      readerLine << std::setw(extsColSize) << reader->GetExtensions()[i];
-
-      if (i < reader->GetMimeTypes().size())
-      {
-        readerLine << std::setw(mimeColSize) << reader->GetMimeTypes()[i];
-      }
-
-      f3d::log::info(readerLine.str());
-    }
-    f3d::log::info(separator);
-  }
-  f3d::log::waitForUser();
+  f3d::engine::printReadersList();
 }
 
 //----------------------------------------------------------------------------
