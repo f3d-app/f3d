@@ -105,6 +105,7 @@ int F3DStarter::Start(int argc, char** argv)
         this->LoadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
         return true;
       });
+    this->Internals->Engine->getWindow().setWindowName(f3d::AppTitle);
     this->Internals->Engine->getWindow().setIcon(F3DIcon, sizeof(F3DIcon));
   }
 

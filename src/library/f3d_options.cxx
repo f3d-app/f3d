@@ -3,7 +3,6 @@
 #include "f3d_log.h"
 #include "vtkF3DConfigure.h"
 
-#include <iostream>
 #include <map>
 #include <type_traits>
 #include <variant>

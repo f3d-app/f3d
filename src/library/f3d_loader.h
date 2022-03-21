@@ -6,7 +6,6 @@
 #include <vector>
 
 // TODO doc
-
 namespace f3d
 {
 class loader

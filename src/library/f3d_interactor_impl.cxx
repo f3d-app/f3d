@@ -36,7 +36,7 @@ public:
     this->VTKInteractor->Initialize();
 
     // Disable standard interactor behavior with timer event
-    // in order to be able to be able to interact while animating
+    // in order to be able to interact while animating
     this->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
 
     vtkNew<vtkCallbackCommand> keyPressCallback;
@@ -320,6 +320,7 @@ public:
   const f3d::options& Options;
   f3d::window_impl& Window;
   f3d::loader_impl& Loader;
+
   F3DAnimationManager AnimationManager;
   vtkNew<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;

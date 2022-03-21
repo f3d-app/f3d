@@ -150,12 +150,15 @@ public:
     , Window(window)
   {
   }
+
   std::vector<std::string> FilesList;
   int CurrentFileIndex = 0;
   bool LoadedFile = false;
+
   const options& Options;
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
+
   vtkSmartPointer<vtkImporter> Importer;
   F3DReaderInstantiator ReaderInstantiator;
 };
