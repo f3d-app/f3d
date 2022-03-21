@@ -1,6 +1,7 @@
 #include "f3d_engine.h"
 
 #include "f3d_config.h"
+#include "f3d_init.h"
 #include "f3d_interactor_impl.h"
 #include "f3d_loader_impl.h"
 #include "f3d_log.h"
@@ -29,7 +30,7 @@ engine::engine(WindowTypeEnum windowType, bool offscreen)
   , WindowType(windowType)
   , Offscreen(offscreen)
 {
-  static_cast<void>(&gInitInstance);
+  //  static_cast<void>(&gInitInstance);
 }
 
 //----------------------------------------------------------------------------

@@ -8,8 +8,6 @@
 #ifndef f3d_engine_h
 #define f3d_engine_h
 
-#include "f3d_init.h"
-
 #include <memory>
 
 namespace f3d
