@@ -150,16 +150,21 @@ void window_impl_standard::Initialize(bool withColoring, std::string fileInfo)
   this->Internals->RenWin->SetSize(this->Options.getAsIntVector("resolution").data());
   this->Internals->RenWin->SetFullScreen(this->Options.getAsBool("fullscreen"));
 
-  // TODO Keep existing renderer if valid as it is expansive to create one
-  // TODO test interactive switching form one coloring/without coloring
-  if (withColoring)
+  vtkF3DRendererWithColoring* renWithColor =
+    vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
+
+  // Create the renderer only when needed
+  // Note: a vtkF3DRendererWithColoring could always be used instead of switching
+  // but it seems more efficient this way
+  if (withColoring && !renWithColor)
   {
     this->Internals->Renderer = vtkSmartPointer<vtkF3DRendererWithColoring>::New();
   }
-  else
+  else if (!withColoring && (renWithColor || !this->Internals->Renderer))
   {
     this->Internals->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
   }
+
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Renderer->Initialize(fileInfo, this->Options.getAsString("up"));
 }

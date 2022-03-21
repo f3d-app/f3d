@@ -395,6 +395,7 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
 void vtkF3DRendererWithColoring::UpdateColoringActors()
 {
   // Make sure ArrayForColoring is pointing to the right array
+  this->ArrayForColoring = nullptr;
   if (this->DataForColoring)
   {
     this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
