@@ -165,27 +165,7 @@ public:
 
 //----------------------------------------------------------------------------
 loader_impl::loader_impl(const options& options, window_impl& window)
-  : Internals(new loader_impl::F3DInternals(options, window))
-{
-#if NDEBUG
-  vtkObject::GlobalWarningDisplayOff();
-#endif
-
-  // Disable vtkLogger in case VTK was built with log support
-  vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_OFF);
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200701)
-  vtkLogger::SetInternalVerbosityLevel(vtkLogger::VERBOSITY_OFF);
-#endif
-
-  // instanciate our own polydata mapper and output windows
-  vtkNew<vtkF3DObjectFactory> factory;
-  vtkObjectFactory::RegisterFactory(factory);
-  vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
-
-  // Make sure to initialize the output window
-  // after the object factory and before the first usage.
-  f3d::log::setQuiet(false);
-}
+  : Internals(new loader_impl::F3DInternals(options, window)){}
 
 //----------------------------------------------------------------------------
 loader_impl::~loader_impl() = default;
