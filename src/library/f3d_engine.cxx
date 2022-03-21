@@ -2,6 +2,7 @@
 
 #include "f3d_config.h"
 #include "f3d_interactor_impl.h"
+#include "f3d_init.h" // This includes is needed on mac so that the global variable is created
 #include "f3d_loader_impl.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
