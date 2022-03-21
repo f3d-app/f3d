@@ -163,11 +163,6 @@ if(F3D_STRICT_BUILD)
   endif()
 endif()
 
-# Ensure global var are created
-if(APPLE)
-  target_link_options(libf3d PRIVATE -force_load)
-endif()
-
 # coverage
 cmake_dependent_option(F3D_COVERAGE "Emit coverage files" OFF "UNIX" OFF)
 if(F3D_COVERAGE)
