@@ -348,7 +348,7 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   // XXX There is no way to recover the init value yet, assume it is 0
   if (this->Internals->Options.getAsInt("camera-index") != 0)
   {
-    f3d::log::warning("This VTK version does not support specifying the camera index, ignored.");
+    f3d::log::warn("This VTK version does not support specifying the camera index, ignored.");
   }
 #endif
 
