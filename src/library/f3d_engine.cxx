@@ -29,6 +29,7 @@ engine::engine(WindowTypeEnum windowType, bool offscreen)
   , WindowType(windowType)
   , Offscreen(offscreen)
 {
+  static_cast<void>(&gInitInstance);
 }
 
 //----------------------------------------------------------------------------

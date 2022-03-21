@@ -40,6 +40,7 @@ init::init()
   // after the object factory and before the first usage.
   f3d::log::setQuiet(false);
 }
+//----------------------------------------------------------------------------
+init::~init() = default;
 }
 
-const f3d::init gInitInstance;

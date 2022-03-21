@@ -16,7 +16,7 @@ class init
 {
 public:
   init();
-  ~init() = default;
+  ~init();
 
 private:
   class F3DInternals;
@@ -24,4 +24,5 @@ private:
 };
 }
 
+static const f3d::init gInitInstance;
 #endif
