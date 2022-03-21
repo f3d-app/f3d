@@ -162,6 +162,9 @@ public:
 loader::loader(const options& options)
   : Internals(new loader::F3DInternals(options))
 {
+
+  int* a = new int;
+  *a = 1;
 #if NDEBUG
   vtkObject::GlobalWarningDisplayOff();
 #endif
