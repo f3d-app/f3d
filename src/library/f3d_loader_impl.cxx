@@ -347,6 +347,12 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   this->Internals->Importer->SetRenderWindow(this->Internals->Window.GetRenderWindow());
 #if VTK_VERSION_NUMBER > VTK_VERSION_CHECK(9, 0, 20210228)
   this->Internals->Importer->SetCamera(this->Internals->Options.getAsInt("camera-index"));
+#else
+  // XXX There is no way to recover the init value yet, assume it is 0
+  if (this->Internals->Options.getAsInt("camera-index") != 0)
+  {
+    f3d::log::warning("This VTK version does not support specifying the camera index, ignored.");
+  }
 #endif
 
   // Manage progress bar

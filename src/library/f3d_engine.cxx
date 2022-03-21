@@ -1,7 +1,9 @@
 #include "f3d_engine.h"
 
+#include "f3d_config.h"
 #include "f3d_interactor_impl.h"
 #include "f3d_loader_impl.h"
+#include "f3d_log.h"
 #include "f3d_options.h"
 #include "f3d_window_impl_noRender.h"
 #include "f3d_window_impl_standard.h"
@@ -98,5 +100,64 @@ interactor& engine::getInteractor()
       static_cast<window_impl&>(this->getWindow()), static_cast<loader_impl&>(this->getLoader()));
   }
   return *this->Internals->Interactor;
+}
+
+//----------------------------------------------------------------------------
+void engine::printVersion()
+{
+  // TODO engin should help with crafting the version string but should not be responsible for the printing itself, to improve 
+  std::string version = f3d::AppName + " " + f3d::AppVersion + "\n\n";
+
+  version += f3d::AppTitle;
+  version += "\nVersion: ";
+  version += f3d::AppVersion;
+  version += "\nBuild date: ";
+  version += f3d::AppBuildDate;
+  version += "\nSystem: ";
+  version += f3d::AppBuildSystem;
+  version += "\nCompiler: ";
+  version += f3d::AppCompiler;
+  version += "\nRayTracing module: ";
+#if F3D_MODULE_RAYTRACING
+  version += "ON";
+#else
+  version += "OFF";
+#endif
+  version += "\nExodus module: ";
+#if F3D_MODULE_EXODUS
+  version += "ON";
+#else
+  version += "OFF";
+#endif
+  version += "\nOpenCASCADE module: ";
+#if F3D_MODULE_OCCT
+  version += F3D_OCCT_VERSION;
+#if F3D_MODULE_OCCT_XCAF
+  version += " (full support)";
+#else
+  version += " (no metadata)";
+#endif
+#else
+  version += "OFF";
+#endif
+  version += "\nAssimp module: ";
+#if F3D_MODULE_ASSIMP
+  version += F3D_ASSIMP_VERSION;
+#else
+  version += "OFF";
+#endif
+  version += "\nVTK version: ";
+  version += std::string(VTK_VERSION) + std::string(" (build ") +
+    std::to_string(VTK_BUILD_VERSION) + std::string(")");
+
+  version += "\n\nCopyright (C) 2019-2021 Kitware SAS.";
+  version += "\nCopyright (C) 2021-2022 Michael Migliore, Mathieu Westphal.";
+  version += "\nLicense BSD-3-Clause.";
+  version += "\nWritten by Michael Migliore, Mathieu Westphal and Joachim Pouderoux.";
+
+  f3d::log::setUseColoring(false);
+  f3d::log::info(version);
+  f3d::log::setUseColoring(true);
+  f3d::log::waitForUser();
 }
 }

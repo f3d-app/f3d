@@ -4,10 +4,10 @@
 
 #include "F3DException.h"
 #include "F3DReaderFactory.h"
+#include "f3d_engine.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
 
-#include <vtkVersion.h>
 #include <vtk_jsoncpp.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -198,9 +198,7 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grp1, "progress", "", "Show progress bar", options.Progress);
     this->DeclareOption(grp1, "up", "", "Up direction", options.Up, true, "[-X|+X|-Y|+Y|-Z|+Z]");
     this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.AnimationIndex, true, true, "<index>");
-#if VTK_VERSION_NUMBER > VTK_VERSION_CHECK(9, 0, 20210228)
     this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", options.CameraIndex, true, true, "<index>");
-#endif
     this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", options.GeometryOnly);
     this->DeclareOption(grp1, "dry-run", "", "Do not read the configuration file", options.DryRun, true, false);
     this->DeclareOption(grp1, "config", "", "Read a provided configuration file instead of default one", options.UserConfigFile, false, false, "<file path>");
@@ -312,6 +310,7 @@ void ConfigurationOptions::PrintHelpPair(
 //----------------------------------------------------------------------------
 void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
 {
+  // TODO this should rely on f3d::engine/interactor in some capacity
   // clang-format off
   const std::vector<std::pair<std::string, std::string> > keys =
   {
@@ -377,59 +376,7 @@ void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
 //----------------------------------------------------------------------------
 void ConfigurationOptions::PrintVersion()
 {
-  std::string version = f3d::AppName + " " + f3d::AppVersion + "\n\n";
-
-  version += f3d::AppTitle;
-  version += "\nVersion: ";
-  version += f3d::AppVersion;
-  version += "\nBuild date: ";
-  version += f3d::AppBuildDate;
-  version += "\nSystem: ";
-  version += f3d::AppBuildSystem;
-  version += "\nCompiler: ";
-  version += f3d::AppCompiler;
-  version += "\nRayTracing module: ";
-#if F3D_MODULE_RAYTRACING
-  version += "ON";
-#else
-  version += "OFF";
-#endif
-  version += "\nExodus module: ";
-#if F3D_MODULE_EXODUS
-  version += "ON";
-#else
-  version += "OFF";
-#endif
-  version += "\nOpenCASCADE module: ";
-#if F3D_MODULE_OCCT
-  version += F3D_OCCT_VERSION;
-#if F3D_MODULE_OCCT_XCAF
-  version += " (full support)";
-#else
-  version += " (no metadata)";
-#endif
-#else
-  version += "OFF";
-#endif
-  version += "\nAssimp module: ";
-#if F3D_MODULE_ASSIMP
-  version += F3D_ASSIMP_VERSION;
-#else
-  version += "OFF";
-#endif
-  version += "\nVTK version: ";
-  version += std::string(VTK_VERSION) + std::string(" (build ") +
-    std::to_string(VTK_BUILD_VERSION) + std::string(")");
-
-  version += "\n\nCopyright (C) 2019-2021 Kitware SAS.";
-  version += "\nCopyright (C) 2021-2022 Michael Migliore, Mathieu Westphal.";
-  version += "\nLicense BSD-3-Clause.";
-  version += "\nWritten by Michael Migliore, Mathieu Westphal and Joachim Pouderoux.";
-
-  f3d::log::setUseColoring(false);
-  f3d::log::info(version);
-  f3d::log::setUseColoring(true);
-  f3d::log::waitForUser();
+  f3d::engine::printVersion();
 }
 
 //----------------------------------------------------------------------------

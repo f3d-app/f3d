@@ -33,6 +33,8 @@ public:
   loader& getLoader();
   interactor& getInteractor();
 
+  static void printVersion();
+
 private:
   class F3DInternals;
   std::unique_ptr<F3DInternals> Internals;
