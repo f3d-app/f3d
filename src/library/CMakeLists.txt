@@ -113,6 +113,7 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_engine.h
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_interactor.h
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_log.h
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_options.h
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window.h
   )
