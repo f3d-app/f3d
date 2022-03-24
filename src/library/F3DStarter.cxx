@@ -59,17 +59,20 @@ int F3DStarter::Start(int argc, char** argv)
   if (this->Internals->CommandLineOptions.NoRender)
   {
     this->Internals->Engine =
-      std::make_unique<f3d::engine>(f3d::engine::WindowTypeEnum::WINDOW_NO_RENDER, false);
+      std::make_unique<f3d::engine>(f3d::engine::WindowTypeEnum::WINDOW_NO_RENDER);
   }
   else
   {
     // TODO Test this multiconfig behavior
     bool offscreen = !this->Internals->CommandLineOptions.Reference.empty() ||
       !this->Internals->CommandLineOptions.Output.empty();
+    f3d::engine::WindowTypeEnum type = f3d::engine::WindowTypeEnum::WINDOW_STANDARD;
+    if (offscreen)
+    {
+      type = f3d::engine::WindowTypeEnum::WINDOW_OFFSCREEN;
+    }
 
-    this->Internals->Engine =
-      std::make_unique<f3d::engine>(f3d::engine::WindowTypeEnum::WINDOW_STANDARD, offscreen);
-
+    this->Internals->Engine = std::make_unique<f3d::engine>(type);
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
     interactor.setKeyPressCallBack(

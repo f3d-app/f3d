@@ -25,10 +25,9 @@ public:
 };
 
 //----------------------------------------------------------------------------
-engine::engine(WindowTypeEnum windowType, bool offscreen)
+engine::engine(WindowTypeEnum windowType)
   : Internals(new engine::F3DInternals())
   , WindowType(windowType)
-  , Offscreen(offscreen)
 {
 }
 
@@ -55,10 +54,11 @@ window& engine::getWindow()
       case (engine::WindowTypeEnum::WINDOW_NO_RENDER):
         this->Internals->Window = std::make_unique<window_impl_noRender>(this->getOptions());
         break;
+      case (engine::WindowTypeEnum::WINDOW_OFFSCREEN):
       case (engine::WindowTypeEnum::WINDOW_STANDARD):
       default:
         this->Internals->Window =
-          std::make_unique<window_impl_standard>(this->getOptions(), this->Offscreen);
+          std::make_unique<window_impl_standard>(this->getOptions(), this->WindowType == engine::WindowTypeEnum::WINDOW_OFFSCREEN);
         break;
     }
   }

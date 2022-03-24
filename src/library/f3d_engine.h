@@ -22,10 +22,11 @@ public:
   enum class WindowTypeEnum
   {
     WINDOW_NO_RENDER,
+    WINDOW_OFFSCREEN,
     WINDOW_STANDARD
   };
 
-  engine(WindowTypeEnum windowType, bool offscreen);
+  engine(WindowTypeEnum windowType);
   ~engine();
 
   options& getOptions();
@@ -42,7 +43,6 @@ private:
 
   // TODO use binary flags instead
   WindowTypeEnum WindowType;
-  bool Offscreen = false;
 };
 }
 
