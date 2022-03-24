@@ -12,10 +12,12 @@
 
 #include "vtkF3DRenderer.h"
 
+// Include needed because of the smart pointers macro
 #include <vtkPolyDataMapper.h>
 #include <vtkScalarBarActor.h>
 #include <vtkSmartVolumeMapper.h>
 
+class vtkDataArray;
 class vtkColorTransferFunction;
 class vtkDataSetAttributes;
 

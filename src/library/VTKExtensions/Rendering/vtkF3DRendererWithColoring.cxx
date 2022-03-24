@@ -3,11 +3,15 @@
 #include "F3DLog.h"
 
 #include <vtkColorTransferFunction.h>
+#include <vtkDataArray.h>
 #include <vtkDataSetAttributes.h>
 #include <vtkFieldData.h>
 #include <vtkObjectFactory.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkScalarBarActor.h>
+#include <vtkSmartVolumeMapper.h>
 #include <vtkVolumeProperty.h>
 
 #include <sstream>
@@ -391,6 +395,7 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
 void vtkF3DRendererWithColoring::UpdateColoringActors()
 {
   // Make sure ArrayForColoring is pointing to the right array
+  this->ArrayForColoring = nullptr;
   if (this->DataForColoring)
   {
     this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);

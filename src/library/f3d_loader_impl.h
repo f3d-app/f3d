@@ -1,57 +1,51 @@
-#ifndef f3d_loader_h
-#define f3d_loader_h
+#ifndef f3d_loader_impl_h
+#define f3d_loader_impl_h
 
-#include <memory>
-#include <string>
-#include <vector>
+#include "f3d_loader.h"
 
-// TODO doc
 namespace f3d
 {
-class loader
+class options;
+class interactor_impl;
+class window_impl;
+class loader_impl : public loader
 {
 public:
-  enum class LoadFileEnum
-  {
-    LOAD_FIRST,
-    LOAD_PREVIOUS,
-    LOAD_CURRENT,
-    LOAD_NEXT,
-    LOAD_LAST
-  };
+  loader_impl(const options& options, window_impl& window);
+  ~loader_impl();
 
   /**
    * Add a list of files or directory to be loaded
    */
-  virtual void addFiles(const std::vector<std::string>& files) = 0;
+  void addFiles(const std::vector<std::string>& files) override;
 
   /**
    * Add a file or directory to be loaded
    * Set recursive to true to add all the files in a directory
    */
-  virtual void addFile(const std::string& path, bool recursive = true) = 0;
+  void addFile(const std::string& path, bool recursive = true) override;
 
   /**
    * Get the vector of files to be loaded
    */
-  virtual std::vector<std::string> getFiles() = 0;
+  std::vector<std::string> getFiles() override;
 
   /**
    * Set the current file index
    */
-  virtual void setCurrentFileIndex(int index) = 0;
+  void setCurrentFileIndex(int index) override;
 
   /**
    * Get the current file index
    */
-  virtual int getCurrentFileIndex() = 0;
+  int getCurrentFileIndex() override;
 
   /**
    * Load a file if any have been added
    * Set the load argument to LOAD_FIRST, LOAD_PREVIOUS, LOAD_NEXT or LOAD_LAST to change file index
    * Returns true if a file is loaded sucessfully, false otherwise
    */
-  virtual bool loadFile(LoadFileEnum load) = 0;
+  bool loadFile(LoadFileEnum load) override;
 
   /**
    * Get information about the next file to load according to the load param
@@ -60,14 +54,18 @@ public:
    * filePath the path to the file and fileInfo a more complete information about the file
    * Return true if there is a file or false otherwise
    */
-  virtual void getFileInfo(
-    LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const = 0;
+  void getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
+    std::string& fileInfo) const override;
 
-protected:
-  loader() = default;
-  virtual ~loader() = default;
-  loader(const loader& opt) = delete;
-  loader& operator=(const loader& opt) = delete;
+  /**
+   * Implementation only API.
+   * Set the interactor to use when interacting
+   */
+  void setInteractor(interactor_impl* interactor);
+
+private:
+  class F3DInternals;
+  std::unique_ptr<F3DInternals> Internals;
 };
 }
 

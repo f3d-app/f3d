@@ -93,13 +93,15 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptions.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DStarter.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/f3d_config.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_interactor.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_init.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_engine.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_interactor_impl.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_log.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_options.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_windowStandard.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_windowNoRender.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window_impl.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window_impl_standard.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window_impl_noRender.cxx
   )
 
 if(APPLE)
@@ -108,9 +110,12 @@ endif()
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_engine.h
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_interactor.h
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_log.h
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_options.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window.h
   )
 
 add_library(libf3d

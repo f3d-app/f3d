@@ -12,10 +12,10 @@
 #define vtkF3DRenderer_h
 
 #include <vtkOpenGLRenderer.h>
-#include <vtkOrientationMarkerWidget.h>
-#include <vtkSkybox.h>
 
 class vtkCornerAnnotation;
+class vtkOrientationMarkerWidget;
+class vtkSkybox;
 class vtkTextActor;
 
 class vtkF3DRenderer : public vtkOpenGLRenderer

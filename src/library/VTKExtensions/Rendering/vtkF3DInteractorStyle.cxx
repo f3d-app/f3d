@@ -8,6 +8,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkSkybox.h>
 #include <vtkStringArray.h>
 
 vtkStandardNewMacro(vtkF3DInteractorStyle);

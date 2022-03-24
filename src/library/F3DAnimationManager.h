@@ -17,7 +17,7 @@ namespace f3d
 {
 class options;
 class window;
-class interactor;
+class interactor_impl;
 }
 class vtkF3DRenderer;
 class vtkImporter;
@@ -32,8 +32,8 @@ public:
   /**
    * Initialize the animation manager, required before playing the animation
    */
-  void Initialize(const f3d::options* options, f3d::interactor* interactor, f3d::window* window,
-    vtkImporter* importer);
+  void Initialize(const f3d::options* options, f3d::interactor_impl* interactor,
+    f3d::window* window, vtkImporter* importer);
 
   /**
    * Start/Stop playing the animation
@@ -52,7 +52,7 @@ protected:
 
   vtkImporter* Importer = nullptr;
   f3d::window* Window;
-  f3d::interactor* Interactor;
+  f3d::interactor_impl* Interactor;
   const f3d::options* Options;
 
   std::set<double> TimeSteps;
