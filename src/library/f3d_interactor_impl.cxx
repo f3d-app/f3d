@@ -1,10 +1,10 @@
-#include "f3d_interactor.h"
+#include "f3d_interactor_impl.h"
 
 #include "F3DAnimationManager.h"
-#include "f3d_loader.h"
+#include "f3d_loader_impl.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
-#include "f3d_window.h"
+#include "f3d_window_impl.h"
 
 #include "vtkF3DConfigure.h"
 #include "vtkF3DInteractorEventRecorder.h"
@@ -23,11 +23,22 @@
 
 namespace f3d
 {
-class interactor::F3DInternals
+class interactor_impl::F3DInternals
 {
 public:
-  F3DInternals()
+  F3DInternals(const options& options, window_impl& window, loader_impl& loader)
+    : Options(options)
+    , Window(window)
+    , Loader(loader)
   {
+    this->VTKInteractor->SetRenderWindow(this->Window.GetRenderWindow());
+    this->VTKInteractor->SetInteractorStyle(this->Style);
+    this->VTKInteractor->Initialize();
+
+    // Disable standard interactor behavior with timer event
+    // in order to be able to interact while animating
+    this->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
+
     vtkNew<vtkCallbackCommand> keyPressCallback;
     keyPressCallback->SetClientData(this);
     keyPressCallback->SetCallback(OnKeyPress);
@@ -38,7 +49,7 @@ public:
     dropFilesCallback->SetCallback(OnDropFiles);
     this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
 
-    this->Recorder->SetInteractor(this->Interactor);
+    this->Recorder->SetInteractor(this->VTKInteractor);
   }
 
   static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
@@ -69,7 +80,7 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
-          if (self->Loader->getOptions().getAsBool("verbose"))
+          if (self->Options.getAsBool("verbose"))
           {
             f3d::log::info(renWithColor->GetRenderingDescription());
           }
@@ -80,7 +91,7 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
-          if (self->Loader->getOptions().getAsBool("verbose"))
+          if (self->Options.getAsBool("verbose"))
           {
             f3d::log::info(renWithColor->GetRenderingDescription());
           }
@@ -91,7 +102,7 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
-          if (self->Loader->getOptions().getAsBool("verbose"))
+          if (self->Options.getAsBool("verbose"))
           {
             f3d::log::info(renWithColor->GetRenderingDescription());
           }
@@ -164,7 +175,7 @@ public:
         if (renWithColor)
         {
           renWithColor->SetUseVolume(!renWithColor->UsingVolume());
-          if (self->Loader->getOptions().getAsBool("verbose"))
+          if (self->Options.getAsBool("verbose"))
           {
             f3d::log::info(renWithColor->GetRenderingDescription());
           }
@@ -182,7 +193,7 @@ public:
         if (renWithColor)
         {
           renWithColor->SetUsePointSprites(!renWithColor->UsingPointSprites());
-          if (self->Loader->getOptions().getAsBool("verbose"))
+          if (self->Options.getAsBool("verbose"))
           {
             f3d::log::info(renWithColor->GetRenderingDescription());
           }
@@ -241,21 +252,21 @@ public:
         {
           self->AnimationManager.StopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_PREVIOUS;
-          self->Loader->loadFile(load);
+          self->Loader.loadFile(load);
           renWin->Render();
         }
         else if (keySym == "Right")
         {
           self->AnimationManager.StopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_NEXT;
-          self->Loader->loadFile(load);
+          self->Loader.loadFile(load);
           renWin->Render();
         }
         else if (keySym == "Up")
         {
           self->AnimationManager.StopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_CURRENT;
-          self->Loader->loadFile(load);
+          self->Loader.loadFile(load);
           renWin->Render();
         }
         else if (keySym == F3D_EXIT_HOTKEY_SYM)
@@ -296,9 +307,9 @@ public:
     self->AnimationManager.StopAnimation();
     for (std::string file : filesVec)
     {
-      self->Loader->addFile(file);
+      self->Loader.addFile(file);
     }
-    self->Loader->loadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
+    self->Loader.loadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
   }
 
   std::function<bool(int, std::string)> KeyPressUserCallBack = [](int, std::string)
@@ -306,74 +317,54 @@ public:
   std::function<bool(std::vector<std::string>)> DropFilesUserCallBack = [](std::vector<std::string>)
   { return false; };
 
+  const f3d::options& Options;
+  f3d::window_impl& Window;
+  f3d::loader_impl& Loader;
+
   F3DAnimationManager AnimationManager;
-  vtkNew<vtkRenderWindowInteractor> Interactor;
+  vtkNew<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
   vtkNew<vtkF3DInteractorEventRecorder> Recorder;
-  f3d::loader* Loader;
   int WindowSize[2] = { -1, -1 };
   int WindowPos[2] = { 0, 0 };
   std::map<unsigned long, std::pair<int, std::function<void()> > > TimerCallBacks;
 };
 
 //----------------------------------------------------------------------------
-interactor::interactor()
-  : Internals(new interactor::F3DInternals)
+interactor_impl::interactor_impl(const options& options, window_impl& window, loader_impl& loader)
+  : Internals(new interactor_impl::F3DInternals(options, window, loader))
 {
+  // Loader need the interactor
+  this->Internals->Loader.setInteractor(this);
 }
 
 //----------------------------------------------------------------------------
-interactor::~interactor() = default;
+interactor_impl::~interactor_impl() = default;
 
 //----------------------------------------------------------------------------
-void interactor::SetLoader(f3d::loader* loader)
-{
-  this->Internals->Loader = loader;
-  this->Internals->Interactor->SetRenderWindow(loader->getWindow()->GetRenderWindow());
-  this->Internals->Interactor->SetInteractorStyle(this->Internals->Style);
-  this->Internals->Interactor->Initialize();
-
-  // Disable standard interactor behavior with timer event
-  // in order to be able to be able to interact while animating
-  this->Internals->Interactor->RemoveObservers(vtkCommand::TimerEvent);
-}
-
-//----------------------------------------------------------------------------
-void interactor::InitializeAnimation(vtkImporter* importer)
-{
-  if (!this->Internals->Loader)
-  {
-    f3d::log::error("Please SetLoader before initializing the animation");
-    return;
-  }
-  this->Internals->AnimationManager.Initialize(
-    &this->Internals->Loader->getOptions(), this, this->Internals->Loader->getWindow(), importer);
-}
-
-//----------------------------------------------------------------------------
-void interactor::setKeyPressCallBack(std::function<bool(int, std::string)> callBack)
+void interactor_impl::setKeyPressCallBack(std::function<bool(int, std::string)> callBack)
 {
   this->Internals->KeyPressUserCallBack = callBack;
 }
 
 //----------------------------------------------------------------------------
-void interactor::setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack)
+void interactor_impl::setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack)
 {
   this->Internals->DropFilesUserCallBack = callBack;
 }
 
 //----------------------------------------------------------------------------
-void interactor::removeTimerCallBack(unsigned long id)
+void interactor_impl::removeTimerCallBack(unsigned long id)
 {
-  this->Internals->Interactor->RemoveObserver(id);
-  this->Internals->Interactor->DestroyTimer(this->Internals->TimerCallBacks[id].first);
+  this->Internals->VTKInteractor->RemoveObserver(id);
+  this->Internals->VTKInteractor->DestroyTimer(this->Internals->TimerCallBacks[id].first);
 }
 
 //----------------------------------------------------------------------------
-unsigned long interactor::createTimerCallBack(double time, std::function<void()> callBack)
+unsigned long interactor_impl::createTimerCallBack(double time, std::function<void()> callBack)
 {
   // Create the timer
-  int timerId = this->Internals->Interactor->CreateRepeatingTimer(time);
+  int timerId = this->Internals->VTKInteractor->CreateRepeatingTimer(time);
 
   // Create the callback and get the observer id
   vtkNew<vtkCallbackCommand> timerCallBack;
@@ -384,7 +375,7 @@ unsigned long interactor::createTimerCallBack(double time, std::function<void()>
       (*callBackPtr)();
     });
   unsigned long id =
-    this->Internals->Interactor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
+    this->Internals->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
 
   // Store the user callback and set it as client data
   this->Internals->TimerCallBacks[id] = std::make_pair(timerId, callBack);
@@ -393,43 +384,43 @@ unsigned long interactor::createTimerCallBack(double time, std::function<void()>
 }
 
 //----------------------------------------------------------------------------
-void interactor::toggleAnimation()
+void interactor_impl::toggleAnimation()
 {
   this->Internals->AnimationManager.ToggleAnimation();
 }
 
 //----------------------------------------------------------------------------
-void interactor::startAnimation()
+void interactor_impl::startAnimation()
 {
   this->Internals->AnimationManager.StartAnimation();
 }
 
 //----------------------------------------------------------------------------
-void interactor::stopAnimation()
+void interactor_impl::stopAnimation()
 {
   this->Internals->AnimationManager.StopAnimation();
 }
 
 //----------------------------------------------------------------------------
-bool interactor::isPlayingAnimation()
+bool interactor_impl::isPlayingAnimation()
 {
   return this->Internals->AnimationManager.IsPlaying();
 }
 
 //----------------------------------------------------------------------------
-void interactor::enableCameraMovement()
+void interactor_impl::enableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(false);
 }
 
 //----------------------------------------------------------------------------
-void interactor::disableCameraMovement()
+void interactor_impl::disableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(true);
 }
 
 //----------------------------------------------------------------------------
-bool interactor::playInteraction(const std::string& file)
+bool interactor_impl::playInteraction(const std::string& file)
 {
   if (!vtksys::SystemTools::FileExists(file))
   {
@@ -447,7 +438,7 @@ bool interactor::playInteraction(const std::string& file)
   }
 
   // Recorder can stop the interactor, make sure it is still running
-  if (this->Internals->Interactor->GetDone())
+  if (this->Internals->VTKInteractor->GetDone())
   {
     f3d::log::error("Interactor has been stopped");
     return false;
@@ -456,7 +447,7 @@ bool interactor::playInteraction(const std::string& file)
 }
 
 //----------------------------------------------------------------------------
-bool interactor::recordInteraction(const std::string& file)
+bool interactor_impl::recordInteraction(const std::string& file)
 {
   if (file.empty())
   {
@@ -477,15 +468,21 @@ bool interactor::recordInteraction(const std::string& file)
 }
 
 //----------------------------------------------------------------------------
-void interactor::SetInteractorOn(vtkInteractorObserver* observer)
+void interactor_impl::start()
 {
-  observer->SetInteractor(this->Internals->Interactor);
+  this->Internals->VTKInteractor->Start();
 }
 
 //----------------------------------------------------------------------------
-void interactor::start()
+void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 {
-  this->Internals->Interactor->Start();
+  observer->SetInteractor(this->Internals->VTKInteractor);
 }
 
+//----------------------------------------------------------------------------
+void interactor_impl::InitializeAnimation(vtkImporter* importer)
+{
+  this->Internals->AnimationManager.Initialize(
+    &this->Internals->Options, this, &this->Internals->Window, importer);
+}
 };

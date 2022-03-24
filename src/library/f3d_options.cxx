@@ -155,6 +155,7 @@ options::~options() = default;
 
 //----------------------------------------------------------------------------
 options::options(const options& opt)
+  : Internals(new options::F3DInternals)
 {
   this->Internals->Options = opt.Internals->Options;
 }

@@ -3,33 +3,25 @@
 
 #include <string>
 
-class vtkRenderWindow;
-class vtkF3DGenericImporter;
+// TODO DOC
 namespace f3d
 {
-class options;
 class window
 {
 public:
-  virtual ~window() = default;
-
-  virtual bool update();
-  virtual bool render();
-  virtual bool renderToFile(const std::string& file, bool noBackground = false);
+  virtual bool update() = 0;
+  virtual bool render() = 0;
+  virtual bool renderToFile(const std::string& file, bool noBackground = false) = 0;
   virtual bool renderAndCompareWithFile(const std::string& file, double threshold,
-    bool noBackground, const std::string& outputFile = "");
-  virtual bool setIcon(const void* icon, size_t iconSize);
-
-  // TODO Private API
-  void SetOptions(const f3d::options* options);
-  virtual void Initialize(bool withColoring, std::string fileInfo);
-  virtual void InitializeRendererWithColoring(vtkF3DGenericImporter* importer);
-  virtual vtkRenderWindow* GetRenderWindow() = 0;
+    bool noBackground, const std::string& outputFile = "") = 0;
+  virtual bool setIcon(const void* icon, size_t iconSize) = 0;
+  virtual bool setWindowName(const std::string& windowName) = 0;
 
 protected:
   window() = default;
-
-  const f3d::options* Options;
+  virtual ~window() = default;
+  window(const window&) = delete;
+  window& operator=(const window&) = delete;
 };
 }
 

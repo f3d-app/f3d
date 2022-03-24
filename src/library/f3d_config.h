@@ -5,6 +5,8 @@
 
 namespace f3d
 {
+// TODO all of this should be prefixed Lib
+// Or move to the app dir accordingly
 extern const std::string AppName;
 extern const std::string AppTitle;
 extern const std::string AppVersion;

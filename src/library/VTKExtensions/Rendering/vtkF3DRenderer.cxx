@@ -18,8 +18,10 @@
 #include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLTexture.h>
+#include <vtkOrientationMarkerWidget.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
+#include <vtkSkybox.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
 #include <vtkToneMappingPass.h>

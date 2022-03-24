@@ -1,13 +1,8 @@
-#include <f3d_loader.h>
-#include <f3d_options.h>
-#include <f3d_interactor.h>
+#include <f3d_engine.h>
 
 int main()
 {
-  f3d::options options;
-  f3d::loader loader(options);
-  f3d::interactor interactor;
-  loader.setInteractor(&interactor);
+  f3d::engine eng(f3d::engine::WindowTypeEnum::WINDOW_STANDARD);
 
   // TODO Actual test
 

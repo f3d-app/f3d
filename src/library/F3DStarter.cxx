@@ -4,27 +4,21 @@
 #include "F3DOptions.h"
 
 #include "F3DNSDelegate.h"
+#include "f3d_engine.h"
 #include "f3d_interactor.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
-#include "f3d_windowNoRender.h"
-#include "f3d_windowStandard.h"
+#include "f3d_window.h"
 
 class F3DStarter::F3DInternals
 {
 public:
-  F3DInternals()
-    : Loader(this->NewOptions)
-  {
-  }
+  F3DInternals() = default;
 
   F3DOptionsParser Parser;
   F3DOptions CommandLineOptions;
   F3DOptions Options;
-  f3d::options NewOptions;
-  f3d::loader Loader;
-  f3d::interactor Interactor;
-  std::unique_ptr<f3d::window> Window = nullptr;
+  std::unique_ptr<f3d::engine> Engine;
 };
 
 //----------------------------------------------------------------------------
@@ -39,7 +33,7 @@ F3DStarter::~F3DStarter() = default;
 //----------------------------------------------------------------------------
 void F3DStarter::AddFile(const std::string& path)
 {
-  this->Internals->Loader.addFile(path);
+  this->Internals->Engine->getLoader().addFile(path);
 }
 
 //----------------------------------------------------------------------------
@@ -64,38 +58,49 @@ int F3DStarter::Start(int argc, char** argv)
 
   if (this->Internals->CommandLineOptions.NoRender)
   {
-    this->Internals->Window = std::unique_ptr<f3d::window>(new f3d::windowNoRender());
-    this->Internals->Loader.setWindow(this->Internals->Window.get());
+    this->Internals->Engine =
+      std::make_unique<f3d::engine>(f3d::engine::WindowTypeEnum::WINDOW_NO_RENDER);
   }
   else
   {
     // TODO Test this multiconfig behavior
-    this->Internals->Interactor.setKeyPressCallBack(
+    bool offscreen = !this->Internals->CommandLineOptions.Reference.empty() ||
+      !this->Internals->CommandLineOptions.Output.empty();
+    f3d::engine::WindowTypeEnum type = f3d::engine::WindowTypeEnum::WINDOW_STANDARD;
+    if (offscreen)
+    {
+      type = f3d::engine::WindowTypeEnum::WINDOW_OFFSCREEN;
+    }
+
+    this->Internals->Engine = std::make_unique<f3d::engine>(type);
+    f3d::interactor& interactor = this->Internals->Engine->getInteractor();
+
+    interactor.setKeyPressCallBack(
       [this](int, std::string keySym) -> bool
       {
         if (keySym == "Left")
         {
-          this->Internals->Interactor.stopAnimation();
+          this->Internals->Engine->getInteractor().stopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_PREVIOUS;
           this->LoadFile(load);
-          this->Internals->Window->render();
+          this->Internals->Engine->getWindow().render();
           return true;
         }
         else if (keySym == "Right")
         {
-          this->Internals->Interactor.stopAnimation();
+          this->Internals->Engine->getInteractor().stopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_NEXT;
           this->LoadFile(load);
-          this->Internals->Window->render();
+          this->Internals->Engine->getWindow().render();
           return true;
         }
         return false;
       });
 
-    this->Internals->Interactor.setDropFilesCallBack(
+    this->Internals->Engine->getInteractor().setDropFilesCallBack(
       [this](std::vector<std::string> filesVec) -> bool
       {
-        this->Internals->Interactor.stopAnimation();
+        this->Internals->Engine->getInteractor().stopAnimation();
         for (std::string file : filesVec)
         {
           this->AddFile(file);
@@ -103,28 +108,22 @@ int F3DStarter::Start(int argc, char** argv)
         this->LoadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
         return true;
       });
-
-    bool offscreen = !this->Internals->CommandLineOptions.Reference.empty() ||
-      !this->Internals->CommandLineOptions.Output.empty();
-    this->Internals->Window =
-      std::unique_ptr<f3d::window>(new f3d::windowStandard(f3d::AppTitle, offscreen));
-    this->Internals->Loader.setWindow(this->Internals->Window.get());
-
-    this->Internals->Loader.setInteractor(&this->Internals->Interactor);
-    this->Internals->Window->setIcon(F3DIcon, sizeof(F3DIcon));
+    this->Internals->Engine->getWindow().setWindowName(f3d::AppTitle);
+    this->Internals->Engine->getWindow().setIcon(F3DIcon, sizeof(F3DIcon));
   }
 
   // Add and load file
-  this->Internals->Loader.addFiles(files);
+  this->Internals->Engine->getLoader().addFiles(files);
   bool loaded = this->LoadFile();
 
   if (!this->Internals->CommandLineOptions.NoRender)
   {
+    f3d::interactor& interactor = this->Internals->Engine->getInteractor();
+
     // Play recording if any
     if (!this->Internals->CommandLineOptions.InteractionTestPlayFile.empty())
     {
-      if (!this->Internals->Interactor.playInteraction(
-            this->Internals->CommandLineOptions.InteractionTestPlayFile))
+      if (!interactor.playInteraction(this->Internals->CommandLineOptions.InteractionTestPlayFile))
       {
         return EXIT_FAILURE;
       }
@@ -133,7 +132,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Start recording if needed
     if (!this->Internals->CommandLineOptions.InteractionTestRecordFile.empty())
     {
-      if (!this->Internals->Interactor.recordInteraction(
+      if (!interactor.recordInteraction(
             this->Internals->CommandLineOptions.InteractionTestRecordFile))
       {
         return EXIT_FAILURE;
@@ -149,7 +148,7 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      if (!this->Internals->Window->renderAndCompareWithFile(
+      if (!this->Internals->Engine->getWindow().renderAndCompareWithFile(
             this->Internals->CommandLineOptions.Reference,
             this->Internals->CommandLineOptions.RefThreshold,
             this->Internals->CommandLineOptions.NoBackground,
@@ -167,7 +166,8 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      if (!this->Internals->Window->renderToFile(this->Internals->CommandLineOptions.Output,
+      if (!this->Internals->Engine->getWindow().renderToFile(
+            this->Internals->CommandLineOptions.Output,
             this->Internals->CommandLineOptions.NoBackground))
       {
         return EXIT_FAILURE;
@@ -176,7 +176,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Start interaction
     else
     {
-      this->Internals->Interactor.start();
+      this->Internals->Engine->getInteractor().start();
     }
   }
 
@@ -189,27 +189,27 @@ bool F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
   // Recover info about the file to be loaded
   int index;
   std::string filePath, fileInfo;
-  this->Internals->Loader.getFileInfo(load, index, filePath, fileInfo);
+  this->Internals->Engine->getLoader().getFileInfo(load, index, filePath, fileInfo);
 
+  f3d::options& options = this->Internals->Engine->getOptions();
   if (this->Internals->CommandLineOptions.DryRun)
   {
     // Use command line options
-    F3DOptionsParser::ConvertToNewAPI(
-      this->Internals->CommandLineOptions, &this->Internals->NewOptions);
+    F3DOptionsParser::ConvertToNewAPI(this->Internals->CommandLineOptions, &options);
   }
   else
   {
     // Recover options for the file to load
     F3DOptionsParser::ConvertToNewAPI(
-      this->Internals->Parser.GetOptionsFromConfigFile(filePath), &this->Internals->NewOptions);
+      this->Internals->Parser.GetOptionsFromConfigFile(filePath), &options);
   }
 
   // With NoRender, force verbose
   if (this->Internals->CommandLineOptions.NoRender)
   {
-    this->Internals->NewOptions.set("verbose", true);
+    options.set("verbose", true);
   }
 
   // Load the file
-  return this->Internals->Loader.loadFile(load);
+  return this->Internals->Engine->getLoader().loadFile(load);
 }

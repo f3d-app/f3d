@@ -2,69 +2,62 @@
 #define f3d_interactor_h
 
 #include <functional>
-#include <memory>
 #include <string>
 #include <vector>
 
-class vtkInteractorObserver;
-class vtkImporter;
+// TODO Doc
 namespace f3d
 {
+class options;
 class loader;
+class window;
 class interactor
 {
 public:
-  interactor();
-  ~interactor();
+  virtual void setKeyPressCallBack(std::function<bool(int, std::string)> callBack) = 0;
+  virtual void setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack) = 0;
 
-  // XXX is this needed ?
-  //  interactor(const interactor& opt);
-  //  interactor& operator=(const interactor& opt);
-
-  void setKeyPressCallBack(std::function<bool(int, std::string)> callBack);
-  void setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack);
-
-  unsigned long createTimerCallBack(double time, std::function<void()> callBack);
-  void removeTimerCallBack(unsigned long id);
+  virtual unsigned long createTimerCallBack(double time, std::function<void()> callBack) = 0;
+  virtual void removeTimerCallBack(unsigned long id) = 0;
 
   //@{
   /**
    * Control the animation
    */
-  void toggleAnimation();
-  void startAnimation();
-  void stopAnimation();
-  bool isPlayingAnimation();
+  virtual void toggleAnimation() = 0;
+  virtual void startAnimation() = 0;
+  virtual void stopAnimation() = 0;
+  virtual bool isPlayingAnimation() = 0;
   //@}
 
   //@{
   /**
    * Control if camera movements are enabled, which they are by default
    */
-  void enableCameraMovement();
-  void disableCameraMovement();
+  virtual void enableCameraMovement() = 0;
+  virtual void disableCameraMovement() = 0;
   //@}
 
   /**
    * Play a VTK interaction file
    */
-  bool playInteraction(const std::string& file);
+  virtual bool playInteraction(const std::string& file) = 0;
 
   /**
    * Start interaction and record it all in a VTK interaction file
    */
-  bool recordInteraction(const std::string& file);
+  virtual bool recordInteraction(const std::string& file) = 0;
 
-  void start();
+  /**
+   * Start the interactor
+   */
+  virtual void start() = 0;
 
-  // PRIVATE API TODO
-  void SetInteractorOn(vtkInteractorObserver* observer);
-  void SetLoader(f3d::loader* loader);
-  void InitializeAnimation(vtkImporter* importer);
-
-private:
-  class F3DInternals;
-  std::unique_ptr<F3DInternals> Internals;
+protected:
+  interactor() = default;
+  virtual ~interactor() = default;
+  interactor(const interactor& opt) = delete;
+  interactor& operator=(const interactor& opt) = delete;
 };
 }
 

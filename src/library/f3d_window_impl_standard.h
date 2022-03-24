@@ -1,21 +1,22 @@
-#ifndef f3d_windowStandard_h
-#define f3d_windowStandard_h
+#ifndef f3d_window_impl_standard_h
+#define f3d_window_impl_standard_h
 
-#include "f3d_window.h"
+#include "f3d_window_impl.h"
 
 #include <memory>
 #include <string>
 
+// TODO Doc
 class vtkRenderWindow;
 class vtkF3DGenericImporter;
 namespace f3d
 {
 class loader;
-class windowStandard : public window
+class window_impl_standard : public window_impl
 {
 public:
-  windowStandard(const std::string& windowName, bool offscreen);
-  ~windowStandard() override;
+  window_impl_standard(const options& options, bool offscreen);
+  ~window_impl_standard() override;
 
   bool update() override;
   bool render() override;
@@ -23,8 +24,8 @@ public:
   bool renderAndCompareWithFile(const std::string& file, double threshold,
     bool noBackground = false, const std::string& outputFile = "") override;
   bool setIcon(const void* icon, size_t iconSize) override;
+  bool setWindowName(const std::string& windowName) override;
 
-  // TODO Private API
   void Initialize(bool withColoring, std::string fileInfo) override;
   vtkRenderWindow* GetRenderWindow() override;
   void InitializeRendererWithColoring(vtkF3DGenericImporter* importer) override;

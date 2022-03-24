@@ -1,17 +1,13 @@
-#include "f3d_loader.h"
+#include "f3d_loader_impl.h"
 
 #include "F3DReaderFactory.h"
-#include "F3DReaderInstantiator.h"
-#include "f3d_interactor.h"
+#include "f3d_interactor_impl.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
-#include "f3d_window.h"
+#include "f3d_window_impl.h"
 #include "vtkF3DGenericImporter.h"
-#include "vtkF3DObjectFactory.h"
 
 #include <vtkCallbackCommand.h>
-#include <vtkLogger.h>
-#include <vtkNew.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkTimerLog.h>
@@ -74,7 +70,7 @@ void InitializeImporterWithOptions(const f3d::options& options, vtkF3DGenericImp
 }
 
 void CreateProgressRepresentationAndCallback(
-  ProgressDataStruct* data, vtkImporter* importer, f3d::interactor* interactor)
+  ProgressDataStruct* data, vtkImporter* importer, f3d::interactor_impl* interactor)
 {
   vtkNew<vtkCallbackCommand> progressCallback;
   progressCallback->SetClientData(data);
@@ -136,57 +132,43 @@ void DisplayImporterDescription(vtkImporter* importer)
   f3d::log::info("\n");
 #endif
   f3d::log::info(importer->GetOutputsDescription());
+  f3d::log::info("\n");
 }
 }
 
 namespace f3d
 {
-class loader::F3DInternals
+class loader_impl::F3DInternals
 {
 public:
-  F3DInternals(const options& options)
+  F3DInternals(const options& options, window_impl& window)
     : Options(options)
+    , Window(window)
   {
   }
+
   std::vector<std::string> FilesList;
   int CurrentFileIndex = 0;
   bool LoadedFile = false;
+
   const options& Options;
-  interactor* Interactor = nullptr;
-  window* Window = nullptr;
+  window_impl& Window;
+  interactor_impl* Interactor = nullptr;
+
   vtkSmartPointer<vtkImporter> Importer;
-  F3DReaderInstantiator ReaderInstantiator;
 };
 
 //----------------------------------------------------------------------------
-loader::loader(const options& options)
-  : Internals(new loader::F3DInternals(options))
+loader_impl::loader_impl(const options& options, window_impl& window)
+  : Internals(new loader_impl::F3DInternals(options, window))
 {
-#if NDEBUG
-  vtkObject::GlobalWarningDisplayOff();
-#endif
-
-  // Disable vtkLogger in case VTK was built with log support
-  vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_OFF);
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200701)
-  vtkLogger::SetInternalVerbosityLevel(vtkLogger::VERBOSITY_OFF);
-#endif
-
-  // instanciate our own polydata mapper and output windows
-  vtkNew<vtkF3DObjectFactory> factory;
-  vtkObjectFactory::RegisterFactory(factory);
-  vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
-
-  // Make sure to initialize the output window
-  // after the object factory and before the first usage.
-  f3d::log::setQuiet(false);
 }
 
 //----------------------------------------------------------------------------
-loader::~loader() = default;
+loader_impl::~loader_impl() = default;
 
 //----------------------------------------------------------------------------
-void loader::addFiles(const std::vector<std::string>& files)
+void loader_impl::addFiles(const std::vector<std::string>& files)
 {
   for (auto& file : files)
   {
@@ -195,7 +177,7 @@ void loader::addFiles(const std::vector<std::string>& files)
 }
 
 //----------------------------------------------------------------------------
-void loader::addFile(const std::string& path, bool recursive)
+void loader_impl::addFile(const std::string& path, bool recursive)
 {
   if (path.empty())
   {
@@ -245,7 +227,7 @@ void loader::addFile(const std::string& path, bool recursive)
 }
 
 //----------------------------------------------------------------------------
-void loader::getFileInfo(
+void loader_impl::getFileInfo(
   LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const
 {
   int size = static_cast<int>(this->Internals->FilesList.size());
@@ -286,68 +268,30 @@ void loader::getFileInfo(
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> loader::getFiles()
+std::vector<std::string> loader_impl::getFiles()
 {
   return this->Internals->FilesList;
 }
 
 //----------------------------------------------------------------------------
-void loader::setCurrentFileIndex(int index)
+void loader_impl::setCurrentFileIndex(int index)
 {
   this->Internals->CurrentFileIndex = index;
 }
 
 //----------------------------------------------------------------------------
-int loader::getCurrentFileIndex()
+int loader_impl::getCurrentFileIndex()
 {
   return this->Internals->CurrentFileIndex;
 }
 
 //----------------------------------------------------------------------------
-const options& loader::getOptions()
-{
-  return this->Internals->Options;
-}
-
-//----------------------------------------------------------------------------
-void loader::setInteractor(interactor* interactor)
-{
-  this->Internals->Interactor = interactor;
-  if (this->Internals->Interactor)
-  {
-    this->Internals->Interactor->SetLoader(this);
-  }
-}
-
-//----------------------------------------------------------------------------
-void loader::setWindow(window* window)
-{
-  this->Internals->Window = window;
-  if (this->Internals->Window)
-  {
-    this->Internals->Window->SetOptions(&this->Internals->Options);
-  }
-}
-
-//----------------------------------------------------------------------------
-window* loader::getWindow()
-{
-  return this->Internals->Window;
-}
-
-//----------------------------------------------------------------------------
-bool loader::loadFile(loader::LoadFileEnum load)
+bool loader_impl::loadFile(loader::LoadFileEnum load)
 {
   // Reset loadedFile
   this->Internals->LoadedFile = false;
 
   f3d::log::setQuiet(this->Internals->Options.getAsBool("quiet"));
-
-  if (!this->Internals->Window)
-  {
-    f3d::log::error("No window provided, aborting\n");
-    return this->Internals->LoadedFile;
-  }
 
   // Recover information about the file to load
   std::string filePath, fileInfo;
@@ -369,8 +313,8 @@ bool loader::loadFile(loader::LoadFileEnum load)
   if (filePath.empty())
   {
     fileInfo += "No file to load provided, please drop one into this window";
-    this->Internals->Window->Initialize(false, fileInfo);
-    this->Internals->Window->update();
+    this->Internals->Window.Initialize(false, fileInfo);
+    this->Internals->Window.update();
     return this->Internals->LoadedFile;
   }
 
@@ -383,8 +327,8 @@ bool loader::loadFile(loader::LoadFileEnum load)
   {
     f3d::log::warn(filePath, " is not a file of a supported file format\n");
     fileInfo += " [UNSUPPORTED]";
-    this->Internals->Window->Initialize(false, fileInfo);
-    this->Internals->Window->update();
+    this->Internals->Window.Initialize(false, fileInfo);
+    this->Internals->Window.update();
     return this->Internals->LoadedFile;
   }
 
@@ -394,12 +338,18 @@ bool loader::loadFile(loader::LoadFileEnum load)
   callbackData.timer = timer;
   callbackData.widget = progressWidget;
 
-  this->Internals->Window->Initialize(genericImporter != nullptr, fileInfo);
+  this->Internals->Window.Initialize(genericImporter != nullptr, fileInfo);
 
   // Initialize importer for rendering
-  this->Internals->Importer->SetRenderWindow(this->Internals->Window->GetRenderWindow());
+  this->Internals->Importer->SetRenderWindow(this->Internals->Window.GetRenderWindow());
 #if VTK_VERSION_NUMBER > VTK_VERSION_CHECK(9, 0, 20210228)
   this->Internals->Importer->SetCamera(this->Internals->Options.getAsInt("camera-index"));
+#else
+  // XXX There is no way to recover the init value yet, assume it is 0
+  if (this->Internals->Options.getAsInt("camera-index") != 0)
+  {
+    f3d::log::warn("This VTK version does not support specifying the camera index, ignored.");
+  }
 #endif
 
   // Manage progress bar
@@ -435,13 +385,19 @@ bool loader::loadFile(loader::LoadFileEnum load)
   // Recover generic importer specific actors and mappers to set on the renderer with coloring
   if (genericImporter)
   {
-    this->Internals->Window->InitializeRendererWithColoring(genericImporter);
+    this->Internals->Window.InitializeRendererWithColoring(genericImporter);
   }
 
   // Initialize renderer using data read by the importer
-  this->Internals->Window->update();
+  this->Internals->Window.update();
 
   this->Internals->LoadedFile = true;
   return this->Internals->LoadedFile;
+}
+
+//----------------------------------------------------------------------------
+void loader_impl::setInteractor(interactor_impl* interactor)
+{
+  this->Internals->Interactor = interactor;
 }
 }
