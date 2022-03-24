@@ -9,10 +9,10 @@ namespace f3d
 // Or move to the app dir accordingly
 extern const std::string AppName;
 extern const std::string AppTitle;
-extern const std::string AppVersion;
-extern const std::string AppBuildSystem;
-extern const std::string AppBuildDate;
-extern const std::string AppCompiler;
+extern const std::string LibVersion;
+extern const std::string LibBuildSystem;
+extern const std::string LibBuildDate;
+extern const std::string LibCompiler;
 extern const std::string ReservedString; // TODO to remove once not necessary
 extern const bool HasRaytracingModule;
 }

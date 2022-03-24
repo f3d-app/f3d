@@ -2,6 +2,8 @@
 
 include("${CMAKE_CURRENT_LIST_DIR}/f3dTargets.cmake")
 
+include("${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake")
+
 set_and_check(f3d_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/include")
 
 check_required_components(f3d)

@@ -144,7 +144,12 @@ if(F3D_INSTALL_SDK)
     "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
     VERSION "${PROJECT_VERSION}.${f3d_VERSION_BUILD}"
     COMPATIBILITY SameMinorVersion)
+
   install(
-    FILES "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
-    DESTINATION "lib/cmake/${PROJECT_NAME}")
+    FILES
+      "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake"
+      "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake"
+    DESTINATION
+      "lib/cmake/${PROJECT_NAME}")
 endif()
