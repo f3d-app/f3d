@@ -2,7 +2,8 @@
 
 int main()
 {
-  f3d::engine(f3d::engine::WindowTypeEnum::WINDOW_STANDARD);
+  f3d::engine::WindowTypeEnum type = f3d::engine::WindowTypeEnum::WINDOW_STANDARD;
+  f3d::engine(type);
 
   // TODO Actual test
 
