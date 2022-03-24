@@ -31,7 +31,7 @@
     "ssao": true,
     "scalars": "",
     "comp": "-2",
-    "cells": "true"
+    "cells": true
   },
   ".*(tif|tiff)":
   {

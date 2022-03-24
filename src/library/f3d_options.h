@@ -15,9 +15,6 @@ class F3D_EXPORT options
 public:
   options();
   ~options();
-  options(const options& opt);
-
-  options& operator=(const options& opt);
 
   void set(const std::string& name, bool value);
   void set(const std::string& name, int value);
@@ -46,6 +43,8 @@ public:
 private:
   class F3DInternals;
   F3DInternals* Internals;
+  options(const options& opt) = delete;
+  options& operator=(const options& opt) = delete;
 };
 }
 

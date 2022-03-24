@@ -91,21 +91,27 @@ interactor& engine::getInteractor()
 }
 
 //----------------------------------------------------------------------------
+const std::string& engine::getAppTitle()
+{
+  return f3d::AppTitle;
+}
+
+//----------------------------------------------------------------------------
 void engine::printVersion()
 {
   // TODO engine should help with crafting the version string but should not be responsible for the
   // printing itself, to improve
-  std::string version = f3d::AppName + " " + f3d::AppVersion + "\n\n";
+  std::string version = f3d::AppName + " " + f3d::LibVersion + "\n\n";
 
   version += f3d::AppTitle;
   version += "\nVersion: ";
-  version += f3d::AppVersion;
+  version += f3d::LibVersion;
   version += "\nBuild date: ";
-  version += f3d::AppBuildDate;
+  version += f3d::LibBuildDate;
   version += "\nSystem: ";
-  version += f3d::AppBuildSystem;
+  version += f3d::LibBuildSystem;
   version += "\nCompiler: ";
-  version += f3d::AppCompiler;
+  version += f3d::LibCompiler;
   version += "\nRaytracing module: ";
 #if F3D_MODULE_RAYTRACING
   version += "ON";

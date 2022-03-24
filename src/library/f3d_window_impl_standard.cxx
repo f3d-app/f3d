@@ -1,6 +1,7 @@
 #include "f3d_window_impl_standard.h"
 
 #include "F3DOffscreenRender.h"
+
 #include "f3d_log.h"
 #include "f3d_options.h"
 #include "vtkF3DGenericImporter.h"

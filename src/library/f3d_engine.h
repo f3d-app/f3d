@@ -10,8 +10,7 @@
 
 #include "f3d_export.h"
 
-#include <cstdint>
-#include <exception>
+#include <string>
 
 namespace f3d
 {
@@ -52,12 +51,17 @@ public:
   loader& getLoader();
   interactor& getInteractor();
 
+  // TODO: remove this function
+  static const std::string& getAppTitle();
+
   static void printVersion();
   static void printReadersList();
 
 private:
   class F3DInternals;
   F3DInternals* Internals;
+  engine(const engine& opt) = delete;
+  engine& operator=(const engine& opt) = delete;
 };
 }
 
