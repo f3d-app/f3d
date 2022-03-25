@@ -279,7 +279,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        santype: [address, thread, undefined]
+        santype: [thread, undefined]
+#        santype: [address, thread, undefined] # adress is disabled because it just do not detects leaks, cf: https://github.com/f3d-app/f3d/pull/244
 
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
@@ -288,7 +289,7 @@ jobs:
       DISPLAY: :0
       CC: clang-10
       CXX: clang++-10
-      LSAN_OPTIONS: suppresions=${{github.workspace}}/source/.lsan.supp
+#      LSAN_OPTIONS: suppressions=${{github.workspace}}/source/.lsan.supp # only needed for adress
 
     steps:
 
