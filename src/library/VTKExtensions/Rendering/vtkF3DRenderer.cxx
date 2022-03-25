@@ -668,6 +668,7 @@ void vtkF3DRenderer::ShowCheatSheet(bool show)
     this->CheatSheetVisible = show;
     this->CheatSheetActor->SetVisibility(show);
     this->SetupRenderPasses();
+    this->CheatSheetNeedUpdate = true;
   }
 }
 
