@@ -54,7 +54,7 @@ struct F3DOptions
   double Opacity = 1.0;
   double PointSize = 10.0;
   double LineWidth = 1.0;
-  double RefThreshold = 0.1;
+  double RefThreshold = 50;
   double Roughness = 0.3;
   int Component = -1;
   int Samples = 5;
