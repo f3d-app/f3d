@@ -103,7 +103,7 @@ void engine::printVersion()
   version += f3d::AppBuildSystem;
   version += "\nCompiler: ";
   version += f3d::AppCompiler;
-  version += "\nRayTracing module: ";
+  version += "\nRaytracing module: ";
 #if F3D_MODULE_RAYTRACING
   version += "ON";
 #else

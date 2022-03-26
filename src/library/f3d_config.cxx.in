@@ -13,8 +13,8 @@ const std::string AppCompiler = "@CMAKE_CXX_COMPILER_ID@ @CMAKE_CXX_COMPILER_VER
 const std::string ReservedString = F3D_RESERVED_STRING;
 
 #if F3D_MODULE_RAYTRACING
-const bool F3DHasRaytracing = true;
+const bool HasRaytracingModule = true;
 #else
-const bool F3DHasRaytracing = false;
+const bool HasRaytracingModule = false;
 #endif
 }
