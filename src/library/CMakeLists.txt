@@ -34,7 +34,7 @@ endif()
 
 if(F3D_MODULE_RAYTRACING)
   if(TARGET VTK::RenderingRayTracing)
-    message(STATUS "VTK RayTracing enabled")
+    message(STATUS "VTK RayTracing found")
   else()
     message(FATAL_ERROR "F3D_MODULE_RAYTRACING option is enabled but VTK::RenderingRayTracing is not found")
   endif()
