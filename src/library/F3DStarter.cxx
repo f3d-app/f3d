@@ -123,6 +123,8 @@ int F3DStarter::Start(int argc, char** argv)
     // Play recording if any
     if (!this->Internals->CommandLineOptions.InteractionTestPlayFile.empty())
     {
+      // For better testing, render once before the interaction
+      this->Internals->Engine->getWindow().render();
       if (!interactor.playInteraction(this->Internals->CommandLineOptions.InteractionTestPlayFile))
       {
         return EXIT_FAILURE;
