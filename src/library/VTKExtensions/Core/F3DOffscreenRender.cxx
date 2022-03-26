@@ -99,6 +99,9 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
   reader->SetFileName(referenceFullPath.c_str());
 
   vtkNew<vtkImageDifference> diff;
+  // handle threshold outside of vtkImageDifference:
+  // https://gitlab.kitware.com/vtk/vtk/-/issues/18152
+  diff->SetThreshold(0);
   diff->SetInputConnection(rtW2if->GetOutputPort());
   diff->SetImageConnection(reader->GetOutputPort());
   diff->Update();
