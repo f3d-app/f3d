@@ -10,7 +10,9 @@ string(TIMESTAMP F3D_BUILD_DATE "%Y-%m-%d %H:%M:%S" UTC)
 
 # CMake variables
 option(BUILD_TESTING "Build the tests" OFF)
+cmake_dependent_option(F3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON "Disable image comparison on tests using the default lights" OFF "BUILD_TESTING" ON)
 cmake_dependent_option(F3D_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" ON)
+cmake_dependent_option(F3D_ENABLE_HDRI_TESTS "Enable HDRi related tests" ON "F3D_ENABLE_LONG_TIMEOUT_TESTS" ON "BUILD_TESTING" ON)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
