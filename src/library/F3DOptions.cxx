@@ -3,6 +3,7 @@
 #include "cxxopts.hpp"
 
 #include "F3DException.h"
+#include "f3d_config.h"
 #include "f3d_engine.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
@@ -248,12 +249,13 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees)", options.CameraAzimuthAngle, true, true, "<angle>");
     this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees)", options.CameraElevationAngle, true, true, "<angle>");
 
-#if F3D_MODULE_RAYTRACING
-    auto grp5 = cxxOptions.add_options("Raytracing");
-    this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.Raytracing);
-    this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.Samples, true, true, "<samples>");
-    this->DeclareOption(grp5, "denoise", "d", "Denoise the image", options.Denoise);
-#endif
+    if (f3d::HasRaytracingModule)
+    {
+      auto grp5 = cxxOptions.add_options("Raytracing");
+      this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.Raytracing);
+      this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.Samples, true, true, "<samples>");
+      this->DeclareOption(grp5, "denoise", "d", "Denoise the image", options.Denoise);
+    }
 
     auto grp6 = cxxOptions.add_options("PostFX (OpenGL)");
     this->DeclareOption(grp6, "depth-peeling", "p", "Enable depth peeling", options.DepthPeeling);
