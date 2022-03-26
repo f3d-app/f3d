@@ -14,6 +14,6 @@ extern const std::string AppBuildSystem;
 extern const std::string AppBuildDate;
 extern const std::string AppCompiler;
 extern const std::string ReservedString; // TODO to remove once not necessary
-extern const bool F3DHasRaytracing;
+extern const bool HasRaytracingModule;
 }
 #endif
