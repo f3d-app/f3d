@@ -1,6 +1,9 @@
 # NVIDIA driver
 leak:nvidia-glcore
 
+# Kernel
+leak:ld-linux-x86-64
+
 # OCCT
 leak:TKernel
 leak:TKXSBase

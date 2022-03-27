@@ -156,7 +156,7 @@ jobs:
       if: matrix.os != 'macos-latest'
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -B test_sdk source/.github/test_sdk 
+        cmake -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -B test_sdk source/.github/test_sdk
         cmake --build test_sdk
 
     - name: Setup NSIS
@@ -290,7 +290,6 @@ jobs:
       DISPLAY: :0
       CC: clang-10
       CXX: clang++-10
-      LSAN_OPTIONS: suppresions=${{github.workspace}}/source/.lsan.supp
 
     steps:
 
@@ -364,4 +363,6 @@ jobs:
 
     - name: Test
       working-directory: ${{github.workspace}}/build
-      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+      run: |
+        export LSAN_OPTIONS=suppressions=$(pwd)/../source/.lsan.supp:use_tls=0
+        ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
