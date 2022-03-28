@@ -67,7 +67,8 @@ window& engine::getWindow()
       this->getOptions(), static_cast<window_impl&>(*this->Internals->Window));
 
     this->Internals->Interactor = std::make_unique<interactor_impl>(this->getOptions(),
-      static_cast<window_impl&>(*this->Internals->Window), static_cast<loader_impl&>(*this->Internals->Loader));
+      static_cast<window_impl&>(*this->Internals->Window),
+      static_cast<loader_impl&>(*this->Internals->Loader));
 #endif
   }
   return *this->Internals->Window;

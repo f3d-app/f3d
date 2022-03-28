@@ -1,7 +1,7 @@
 #include <f3d_engine.h>
-#include <f3d_window.h>
-#include <f3d_loader.h>
 #include <f3d_interactor.h>
+#include <f3d_loader.h>
+#include <f3d_window.h>
 
 int render_and_interact_test(int argc, char* argv[])
 {
@@ -11,7 +11,7 @@ int render_and_interact_test(int argc, char* argv[])
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
   f3d::window& win = eng.getWindow();
 
-  win.render(); 
+  win.render();
 
   f3d::interactor& inter = eng.getInteractor();
   inter.createTimerCallBack(1000, [&inter]() { inter.stop(); });
