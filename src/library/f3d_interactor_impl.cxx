@@ -272,7 +272,6 @@ public:
         else if (keySym == F3D_EXIT_HOTKEY_SYM)
         {
           rwi->RemoveObservers(vtkCommand::TimerEvent);
-//          rwi->SetDone(true);
           rwi->ExitCallback();
         }
         else if (keySym == "Return")
