@@ -271,8 +271,7 @@ public:
         }
         else if (keySym == F3D_EXIT_HOTKEY_SYM)
         {
-          rwi->RemoveObservers(vtkCommand::TimerEvent);
-          rwi->ExitCallback();
+          self->StopInteractor();
         }
         else if (keySym == "Return")
         {
@@ -316,6 +315,17 @@ public:
   { return false; };
   std::function<bool(std::vector<std::string>)> DropFilesUserCallBack = [](std::vector<std::string>)
   { return false; };
+
+  void StartInteractor()
+  {
+    this->VTKInteractor->Start();
+  }
+
+  void StopInteractor()
+  {
+    this->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
+    this->VTKInteractor->ExitCallback();
+  }
 
   const f3d::options& Options;
   f3d::window_impl& Window;
@@ -470,7 +480,13 @@ bool interactor_impl::recordInteraction(const std::string& file)
 //----------------------------------------------------------------------------
 void interactor_impl::start()
 {
-  this->Internals->VTKInteractor->Start();
+  this->Internals->StartInteractor();
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::stop()
+{
+  this->Internals->StopInteractor();
 }
 
 //----------------------------------------------------------------------------

@@ -58,6 +58,11 @@ public:
    */
   void start() override;
 
+  /**
+   * Stop the interactor
+   */
+  void stop() override;
+
   //@{
   /**
    * Implementation only API

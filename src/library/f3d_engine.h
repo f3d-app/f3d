@@ -43,6 +43,8 @@ private:
 
   // TODO use binary flags instead
   WindowTypeEnum WindowType;
+
+  bool FirstCall = true;
 };
 }
 

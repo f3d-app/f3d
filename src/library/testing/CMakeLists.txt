@@ -2,6 +2,7 @@
 create_test_sourcelist (Tests
   sdk_tests.cxx
   simple_sdk_test.cxx
+  render_and_interact_test.cxx
   )
 
 # add the executable
