@@ -3,7 +3,7 @@
 #include <f3d_loader.h>
 #include <f3d_window.h>
 
-int render_and_interact_test(int argc, char* argv[])
+int TestSDKRenderAndInteract(int argc, char* argv[])
 {
   f3d::engine eng(f3d::engine::WindowTypeEnum::WINDOW_STANDARD);
   f3d::loader& load = eng.getLoader();

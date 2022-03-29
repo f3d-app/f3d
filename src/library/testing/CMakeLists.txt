@@ -1,23 +1,24 @@
+#TODO add more tests
+
 # create the testing file and list of tests
-create_test_sourcelist (Tests
-  sdk_tests.cxx
-  simple_sdk_test.cxx
-  render_and_interact_test.cxx
+create_test_sourcelist(libf3dSDKTests_list
+  libf3dSDKTests.cxx
+  TestSDKCompareWithFile.cxx
+  TestSDKRenderAndInteract.cxx
   )
 
 # add the executable
-add_executable (sdk_tests ${Tests})
-set_target_properties(sdk_tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+add_executable(libf3dSDKTests ${libf3dSDKTests_list})
+set_target_properties(libf3dSDKTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # remove the test driver source file
-set (TestsToRun ${Tests})
-remove (TestsToRun sdk_tests.cxx)
+remove (libf3dSDKTests_list libf3dSDKTests.cxx)
 
 # Add all the ADD_TEST for each test
-foreach (test ${TestsToRun})
+foreach (test ${libf3dSDKTests_list})
   get_filename_component (TName ${test} NAME_WE)
-  add_test (NAME libf3d::${TName} COMMAND sdk_tests ${TName}  ${CMAKE_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
+  add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName}  ${CMAKE_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 endforeach ()
 
-target_link_libraries(sdk_tests libf3d)
-target_compile_features(sdk_tests PRIVATE cxx_std_11)
+target_link_libraries(libf3dSDKTests libf3d)
+target_compile_features(libf3dSDKTests PRIVATE cxx_std_11)
