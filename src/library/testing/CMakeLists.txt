@@ -19,3 +19,4 @@ foreach (test ${TestsToRun})
 endforeach ()
 
 target_link_libraries(sdk_tests libf3d)
+target_compile_features(sdk_tests PRIVATE cxx_std_11)
