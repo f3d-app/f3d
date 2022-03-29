@@ -263,6 +263,7 @@ jobs:
         lcov --base-directory . --directory . -c -o coverage.info
         lcov --remove coverage.info "*/dependencies/*" -o coverage.info
         lcov --remove coverage.info "*/cxxopts.hpp" -o coverage.info
+        lcov --remove coverage.info "*/sdk_tests.cxx" -o coverage.info
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
