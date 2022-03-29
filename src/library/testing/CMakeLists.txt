@@ -7,6 +7,7 @@ create_test_sourcelist (Tests
 
 # add the executable
 add_executable (sdk_tests ${Tests})
+set_target_properties(sdk_tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # remove the test driver source file
 set (TestsToRun ${Tests})
