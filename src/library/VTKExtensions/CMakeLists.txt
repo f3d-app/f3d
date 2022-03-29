@@ -4,6 +4,6 @@ vtk_module_scan(
   MODULE_FILES      ${vtk_module_files}
   PROVIDES_MODULES  modules
   WANT_BY_DEFAULT   ON
-  ENABLE_TESTS      ON)
+  ENABLE_TESTS      ${BUILD_TESTING})
 
 vtk_module_build(MODULES ${modules})
