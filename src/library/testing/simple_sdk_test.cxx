@@ -17,10 +17,10 @@ int simple_sdk_test(int argc, char* argv[])
 
   win.renderToFile(std::string(argv[2]) + "simple_sdk_test.png");
 
- // f3d::interactor& inter = eng.getInteractor();
+  // f3d::interactor& inter = eng.getInteractor();
   //  inter.createTimerCallBack(2.0, [&inter]() { inter.stop(); });
-  //inter.start();
-//  inter.playInteraction(std::string(argv[1]) + "recordings/TestInteractionMisc.log");
+  // inter.start();
+  //  inter.playInteraction(std::string(argv[1]) + "recordings/TestInteractionMisc.log");
 
   return 0;
 }
