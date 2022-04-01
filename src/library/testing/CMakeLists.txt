@@ -3,7 +3,12 @@
 # create the testing file and list of tests
 create_test_sourcelist(libf3dSDKTests_list
   libf3dSDKTests.cxx
+
+# VTK 9.0.X lighting is incorrect, so do not test image comparison
+if(VTK_VERSION VERSION_GREATER 9.0.1)
   TestSDKCompareWithFile.cxx
+endif()
+
   TestSDKRenderAndInteract.cxx
   )
 

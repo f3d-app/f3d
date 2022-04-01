@@ -62,7 +62,12 @@ window& engine::getWindow()
         break;
     }
 
-#if VTK_VERSION_NUMBER <= VTK_VERSION_CHECK(9, 1, 20400912) // TODO Actual version check
+// Because of this issue https://gitlab.kitware.com/vtk/vtk/-/issues/18372
+// We need to ensure that, before the fix of this issue, interactor is created
+// before any usage of the window.
+// This force the creation of window, loader and interactor
+// whenever the window, loader or interactor is needed.
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 1, 20220331)
     this->Internals->Loader = std::make_unique<loader_impl>(
       this->getOptions(), static_cast<window_impl&>(*this->Internals->Window));
 
@@ -79,7 +84,7 @@ loader& engine::getLoader()
 {
   if (!this->Internals->Loader)
   {
-#if VTK_VERSION_NUMBER <= VTK_VERSION_CHECK(9, 1, 20400912) // TODO Actual version check
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 1, 20220331)
     this->getWindow();
 #else
     this->Internals->Loader = std::make_unique<loader_impl>(
@@ -94,7 +99,7 @@ interactor& engine::getInteractor()
 {
   if (!this->Internals->Interactor)
   {
-#if VTK_VERSION_NUMBER <= VTK_VERSION_CHECK(9, 1, 20400912) // TODO Actual version check
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 1, 20220331)
     this->getWindow();
 #else
     this->Internals->Interactor = std::make_unique<interactor_impl>(this->getOptions(),
