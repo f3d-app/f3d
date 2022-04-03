@@ -21,5 +21,5 @@ int TestSDKRenderAndInteract(int argc, char* argv[])
   inter.createTimerCallBack(1000, [&inter]() { inter.stop(); });
   inter.start();
 
-  return 0;
+  return EXIT_SUCCESS;
 }
