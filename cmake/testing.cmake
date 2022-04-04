@@ -44,7 +44,7 @@ function(f3d_test)
     endif()
   endif()
 
-  add_test(NAME "${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
+  add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
 
   set(_timeout "30")
   if(F3D_TEST_LONG_TIMEOUT OR F3D_TEST_INTERACTION OR F3D_TEST_HDRI)
@@ -65,30 +65,30 @@ function(f3d_test)
 
   if(NOT F3D_ENABLE_LONG_TIMEOUT_TESTS)
     if(F3D_TEST_LONG_TIMEOUT OR F3D_TEST_INTERACTION OR F3D_TEST_HDRI)
-      set_tests_properties(${F3D_TEST_NAME} PROPERTIES DISABLED ON)
+      set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
     endif()
   elseif(NOT F3D_ENABLE_HDRI_TESTS)
     if(F3D_TEST_HDRI)
-      set_tests_properties(${F3D_TEST_NAME} PROPERTIES DISABLED ON)
+      set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
     endif()
   endif()
-  set_tests_properties(${F3D_TEST_NAME} PROPERTIES TIMEOUT ${_timeout})
+  set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES TIMEOUT ${_timeout})
 
   if(F3D_TEST_WILL_FAIL)
-    set_tests_properties(${F3D_TEST_NAME} PROPERTIES WILL_FAIL TRUE)
+    set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES WILL_FAIL TRUE)
   endif()
 
   if(F3D_TEST_REGEXP)
-    set_tests_properties(${F3D_TEST_NAME} PROPERTIES PASS_REGULAR_EXPRESSION "${F3D_TEST_REGEXP}")
+    set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES PASS_REGULAR_EXPRESSION "${F3D_TEST_REGEXP}")
   endif()
 
   if(F3D_TEST_REGEXP_FAIL)
-    set_tests_properties(${F3D_TEST_NAME} PROPERTIES FAIL_REGULAR_EXPRESSION "${F3D_TEST_REGEXP_FAIL}")
+    set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES FAIL_REGULAR_EXPRESSION "${F3D_TEST_REGEXP_FAIL}")
   endif()
 
   if(F3D_TEST_DEPENDS)
-    set_tests_properties(${F3D_TEST_DEPENDS} PROPERTIES FIXTURES_SETUP ${F3D_TEST_DEPENDS}_FIXTURE)
-    set_tests_properties(${F3D_TEST_NAME} PROPERTIES FIXTURES_REQUIRED ${F3D_TEST_DEPENDS}_FIXTURE)
+    set_tests_properties(f3d::${F3D_TEST_DEPENDS} PROPERTIES FIXTURES_SETUP f3d::${F3D_TEST_DEPENDS}_FIXTURE)
+    set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES FIXTURES_REQUIRED f3d::${F3D_TEST_DEPENDS}_FIXTURE)
   endif()
 
 endfunction()
@@ -366,8 +366,8 @@ f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")
 f3d_test(NAME TestReadersList ARGS --readers-list REGEXP_FAIL "No registered reader found")
 
 # Test that f3d can try to read a system config file
-add_test(NAME TestNoDryRun COMMAND $<TARGET_FILE:f3d> --no-render)
-set_tests_properties(TestNoDryRun PROPERTIES TIMEOUT 2)
+add_test(NAME f3d::TestNoDryRun COMMAND $<TARGET_FILE:f3d> --no-render)
+set_tests_properties(f3d::TestNoDryRun PROPERTIES TIMEOUT 2)
 
 # Test failure without a reference, please do not create a TestNoRef.png file
 f3d_test(NAME TestNoRef DATA cow.vtp WILL_FAIL)
