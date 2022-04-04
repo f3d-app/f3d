@@ -93,7 +93,7 @@ options::options()
   this->Internals->init("animation-index", 0);
   this->Internals->init("geometry-only", false);
   this->Internals->init("progress", false);
-  this->Internals->init("camera-index", 0);
+  this->Internals->init("camera-index", -1);
   this->Internals->init("color", std::vector<double>{ 1., 1., 1. });
   this->Internals->init("emissive-factor", std::vector<double>{ 1., 1., 1. });
   this->Internals->init("line-width", 1.0);

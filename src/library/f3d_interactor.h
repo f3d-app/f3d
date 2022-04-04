@@ -53,6 +53,11 @@ public:
    */
   virtual void start() = 0;
 
+  /**
+   * Stop the interactor
+   */
+  virtual void stop() = 0;
+
 protected:
   interactor() = default;
   virtual ~interactor() = default;

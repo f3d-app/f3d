@@ -61,6 +61,23 @@ window& engine::getWindow()
           this->getOptions(), this->WindowType == engine::WindowTypeEnum::WINDOW_OFFSCREEN);
         break;
     }
+
+// Because of this issue https://gitlab.kitware.com/vtk/vtk/-/issues/18372
+// We need to ensure that, before the fix of this issue, interactor is created
+// before any usage of the window.
+// This force the creation of window, loader and interactor
+// whenever the window, loader or interactor is needed.
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 1, 20220331)
+    this->Internals->Loader = std::make_unique<loader_impl>(
+      this->getOptions(), static_cast<window_impl&>(*this->Internals->Window));
+
+    if (this->WindowType != engine::WindowTypeEnum::WINDOW_NO_RENDER)
+    {
+      this->Internals->Interactor = std::make_unique<interactor_impl>(this->getOptions(),
+        static_cast<window_impl&>(*this->Internals->Window),
+        static_cast<loader_impl&>(*this->Internals->Loader));
+    }
+#endif
   }
   return *this->Internals->Window;
 }
@@ -70,8 +87,12 @@ loader& engine::getLoader()
 {
   if (!this->Internals->Loader)
   {
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 1, 20220331)
+    this->getWindow();
+#else
     this->Internals->Loader = std::make_unique<loader_impl>(
       this->getOptions(), static_cast<window_impl&>(this->getWindow()));
+#endif
   }
   return *this->Internals->Loader;
 }
@@ -81,8 +102,12 @@ interactor& engine::getInteractor()
 {
   if (!this->Internals->Interactor)
   {
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 1, 20220331)
+    this->getWindow();
+#else
     this->Internals->Interactor = std::make_unique<interactor_impl>(this->getOptions(),
       static_cast<window_impl&>(this->getWindow()), static_cast<loader_impl&>(this->getLoader()));
+#endif
   }
   return *this->Internals->Interactor;
 }
@@ -90,7 +115,7 @@ interactor& engine::getInteractor()
 //----------------------------------------------------------------------------
 void engine::printVersion()
 {
-  // TODO engin should help with crafting the version string but should not be responsible for the
+  // TODO engine should help with crafting the version string but should not be responsible for the
   // printing itself, to improve
   std::string version = f3d::AppName + " " + f3d::AppVersion + "\n\n";
 

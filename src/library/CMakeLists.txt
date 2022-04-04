@@ -191,3 +191,8 @@ if(NOT F3D_SANITIZER STREQUAL "none")
   endif()
   target_link_options(libf3d PUBLIC -fsanitize=${F3D_SANITIZER})
 endif()
+
+# testing
+if(BUILD_TESTING)
+  add_subdirectory(testing)
+endif()
