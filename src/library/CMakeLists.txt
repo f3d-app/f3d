@@ -79,9 +79,9 @@ if(F3D_MODULE_ALEMBIC)
   endif()
 endif()
 
-set(libf3d_compile_options_public "")
-set(libf3d_compile_options_private "")
-set(libf3d_link_options_public "")
+set(libf3d_compile_options_public)
+set(libf3d_compile_options_private)
+set(libf3d_link_options_public)
 
 if(F3D_STRICT_BUILD)
   if(MSVC)
