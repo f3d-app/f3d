@@ -195,6 +195,13 @@ target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES})
 target_compile_options(libf3d PUBLIC ${libf3d_compile_options_public} PRIVATE ${libf3d_compile_options_private})
 target_link_options(libf3d PUBLIC ${libf3d_link_options_public})
 
+if(F3D_STRICT_BUILD)
+  if(MSVC)
+    # There are warnings in VTK related to deprecated features in C++17
+    target_compile_definitions(libf3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+  else()
+endif()
+
 # testing
 if(BUILD_TESTING)
   add_subdirectory(testing)
