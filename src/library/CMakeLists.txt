@@ -105,7 +105,7 @@ endif()
 # sanitizer
 if(NOT F3D_SANITIZER)
   set(F3D_SANITIZER "none" CACHE list "Sanitizer type" FORCE)
-  set_property(CACHE F3D_SANITIZER PROPERTY listS "none" "address" "thread" "leak" "memory" "undefined")
+  set_property(CACHE F3D_SANITIZER PROPERTY STRINGS "none" "address" "thread" "leak" "memory" "undefined")
 endif()
 
 if(NOT UNIX)
@@ -200,5 +200,5 @@ target_link_options(libf3d PUBLIC ${libf3d_link_options_public})
 
 # testing
 if(BUILD_TESTING)
-  add_subdirectory(testing)
+#  add_subdirectory(testing)
 endif()
