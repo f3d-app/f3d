@@ -79,6 +79,50 @@ if(F3D_MODULE_ALEMBIC)
   endif()
 endif()
 
+set(libf3d_compile_options_public "")
+set(libf3d_compile_options_private "")
+set(libf3d_link_options_public "")
+
+if(F3D_STRICT_BUILD)
+  if(MSVC)
+    # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
+    list(APPEND libf3d_compile_options_private /W4 /WX /wd4275)
+
+    # There are warnings in VTK related to deprecated features in C++17
+    list(APPEND libf3d_compile_options_private _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+  else()
+    list(APPEND libf3d_compile_options_private -Wall -Wextra -Wshadow -Werror)
+  endif()
+endif()
+
+# coverage
+cmake_dependent_option(F3D_COVERAGE "Emit coverage files" OFF "UNIX" OFF)
+if(F3D_COVERAGE)
+  list(APPEND libf3d_compile_options_public -g -O0 --coverage)
+  list(APPEND libf3d_link_options_public --coverage)
+endif()
+
+# sanitizer
+if(NOT F3D_SANITIZER)
+  set(F3D_SANITIZER "none" CACHE list "Sanitizer type" FORCE)
+  set_property(CACHE F3D_SANITIZER PROPERTY listS "none" "address" "thread" "leak" "memory" "undefined")
+endif()
+
+if(NOT UNIX)
+  set_property(CACHE F3D_SANITIZER PROPERTY TYPE INTERNAL)
+endif()
+
+if(NOT F3D_SANITIZER STREQUAL "none")
+  list(APPEND libf3d_compile_options_public -fsanitize=${F3D_SANITIZER} -fno-optimize-sibling-calls -fno-omit-frame-pointer -g)
+  if(${F3D_SANITIZER} STREQUAL "address")
+    list(APPEND libf3d_compile_options_public -fsanitize-address-use-after-scope)
+  endif()
+  if(${F3D_SANITIZER} STREQUAL "memory")
+    list(APPEND libf3d_compile_options_public -fsanitize-memory-track-origins)
+  endif()
+  list(APPEND libf3d_link_options_public -fsanitize=${F3D_SANITIZER})
+endif()
+
 add_subdirectory(VTKExtensions)
 
 configure_file(
@@ -151,46 +195,8 @@ endif()
 vtk_module_autoinit(TARGETS libf3d MODULES ${F3D_VTK_MODULES})
 
 target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES})
-
-if(F3D_STRICT_BUILD)
-  if(MSVC)
-    # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
-    target_compile_options(libf3d PRIVATE /W4 /WX /wd4275)
-
-    # There are warnings in VTK related to deprecated features in C++17
-    target_compile_definitions(libf3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
-  else()
-    target_compile_options(libf3d PRIVATE -Wall -Wextra -Wshadow -Werror)
-  endif()
-endif()
-
-# coverage
-cmake_dependent_option(F3D_COVERAGE "Emit coverage files" OFF "UNIX" OFF)
-if(F3D_COVERAGE)
-  target_compile_options(libf3d PUBLIC -g -O0 --coverage)
-  target_link_options(libf3d PUBLIC --coverage)
-endif()
-
-# sanitizer
-if(NOT F3D_SANITIZER)
-  set(F3D_SANITIZER "none" CACHE STRING "Sanitizer type" FORCE)
-  set_property(CACHE F3D_SANITIZER PROPERTY STRINGS "none" "address" "thread" "leak" "memory" "undefined")
-endif()
-
-if(NOT UNIX)
-  set_property(CACHE F3D_SANITIZER PROPERTY TYPE INTERNAL)
-endif()
-
-if(NOT F3D_SANITIZER STREQUAL "none")
-  target_compile_options(libf3d PUBLIC -fsanitize=${F3D_SANITIZER} -fno-optimize-sibling-calls -fno-omit-frame-pointer -g)
-  if(${F3D_SANITIZER} STREQUAL "address")
-    target_compile_options(libf3d PUBLIC -fsanitize-address-use-after-scope)
-  endif()
-  if(${F3D_SANITIZER} STREQUAL "memory")
-    target_compile_options(libf3d PUBLIC -fsanitize-memory-track-origins)
-  endif()
-  target_link_options(libf3d PUBLIC -fsanitize=${F3D_SANITIZER})
-endif()
+target_compile_options(libf3d PUBLIC ${libf3d_compile_options_public} PRIVATE ${libf3d_compile_options_private})
+target_link_options(libf3d PUBLIC ${libf3d_link_options_public})
 
 # testing
 if(BUILD_TESTING)
