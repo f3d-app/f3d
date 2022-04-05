@@ -87,9 +87,6 @@ if(F3D_STRICT_BUILD)
   if(MSVC)
     # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
     list(APPEND libf3d_compile_options_private /W4 /WX /wd4275)
-
-    # There are warnings in VTK related to deprecated features in C++17
-    list(APPEND libf3d_compile_options_private _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
   else()
     list(APPEND libf3d_compile_options_private -Wall -Wextra -Wshadow -Werror)
   endif()
@@ -200,5 +197,5 @@ target_link_options(libf3d PUBLIC ${libf3d_link_options_public})
 
 # testing
 if(BUILD_TESTING)
-#  add_subdirectory(testing)
+  add_subdirectory(testing)
 endif()
