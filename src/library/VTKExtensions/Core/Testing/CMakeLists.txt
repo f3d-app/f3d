@@ -5,4 +5,7 @@ vtk_add_test_cxx(VTKExtensionsCoreTests tests
   ${CMAKE_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(VTKExtensionsCoreTests tests)
 
-set_tests_properties(f3d::VTKExtensionsCoreCxx-TestF3DLog PROPERTIES PASS_REGULAR_EXPRESSION "Test Info Test Warning Test Error Test Info Test Warning Test Error")
+if(UNIX)
+  # On windows, the default window output message does not redirect to cout
+  set_tests_properties(f3d::VTKExtensionsCoreCxx-TestF3DLog PROPERTIES PASS_REGULAR_EXPRESSION "Test Info Test Warning Test Error Test Info Coloring Test Warning Coloring Test Error Coloring")
+endif()
