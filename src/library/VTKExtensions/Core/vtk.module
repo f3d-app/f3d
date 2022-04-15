@@ -9,4 +9,7 @@ PRIVATE_DEPENDS
   VTK::RenderingCore
   VTK::IOImage
 TEST_DEPENDS
+  VTK::IOXML
+  VTK::RenderingCore
+  VTK::RenderingOpenGL2
   VTK::TestingCore
