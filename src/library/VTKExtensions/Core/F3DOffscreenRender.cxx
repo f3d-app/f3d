@@ -108,7 +108,7 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
   diff->Update();
 
   double error = diff->GetThresholdedError();
-  std::cerr<<error<<std::endl;
+  std::cerr << error << std::endl;
   F3DLog::Print(F3DLog::Severity::Info, "Diff threshold error = " + std::to_string(error) + "\n");
   if (error > threshold)
   {
