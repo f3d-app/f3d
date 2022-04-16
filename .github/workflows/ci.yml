@@ -131,11 +131,11 @@ jobs:
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
-      if: success() || failure()
+      if: failure()
       uses: actions/upload-artifact@v2
       with:
         path: ./build/Testing/Temporary
-        name: f3d-tests-artifact
+        name: f3d-tests-artifact-${{matrix.os}}-${{matrix.vtk_version}}
 
     - name: Install
       working-directory: ${{github.workspace}}/build
