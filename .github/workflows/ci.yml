@@ -130,12 +130,6 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
-   - name: Archive Test Results
-     uses: actions/upload-artifact@v2
-     with:
-       path: ./build/Testing/Temporary/*
-       name: test-results
-
     - name: Install
       working-directory: ${{github.workspace}}/build
       run: cmake --install .
