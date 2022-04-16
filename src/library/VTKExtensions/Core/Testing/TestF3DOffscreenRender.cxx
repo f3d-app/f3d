@@ -46,21 +46,9 @@ int TestF3DOffscreenRender(int argc, char* argv[])
   std::string baseline = std::string(argv[0]) + ".png";
   std::string baselinePath = std::string(argv[1]) + "baselines/" + baseline;
   std::string outputPath = std::string(argv[2]) + baseline;
-  if (!F3DOffscreenRender::RenderTesting(
-        renderWindow, baselinePath, 60, false, outputPath))
+  if (!F3DOffscreenRender::RenderTesting(renderWindow, baselinePath, 60, false, outputPath))
   {
     std::cerr << "RenderTesting failed" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  // Test RenderTesting no background
-  std::string baselineNoBG = std::string(argv[0]) + "NoBG.png";
-  std::string baselineNoBGPath = std::string(argv[1]) + "baselines/" + baselineNoBG;
-  std::string outputNoBGPath = std::string(argv[2]) + baselineNoBG;
-  if (!F3DOffscreenRender::RenderTesting(
-        renderWindow, baselineNoBGPath, 100, true, outputNoBGPath))
-  {
-    std::cerr << "RenderTesting no background failed" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -72,23 +60,9 @@ int TestF3DOffscreenRender(int argc, char* argv[])
     std::cerr << "RenderOffscreen failed" << std::endl;
     return EXIT_FAILURE;
   }
-  if (!F3DOffscreenRender::RenderTesting(
-        renderWindow, tmpOutputPath, 5, false, tmp2OutputPath))
+  if (!F3DOffscreenRender::RenderTesting(renderWindow, tmpOutputPath, 5, false, tmp2OutputPath))
   {
     std::cerr << "RenderTesting on RenderOffscreen result failed" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  // Test RenderOffscreen no background
-  if (!F3DOffscreenRender::RenderOffScreen(renderWindow, tmpOutputPath, true))
-  {
-    std::cerr << "RenderOffScreen no background failed" << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (!F3DOffscreenRender::RenderTesting(
-        renderWindow, tmpOutputPath, 5, true, tmp2OutputPath))
-  {
-    std::cerr << "RenderTesting on RenderOffscreen result with no background failed" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -130,6 +104,30 @@ int TestF3DOffscreenRender(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+// No background related testing
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20211007)
+  // Test RenderTesting no background
+  std::string baselineNoBG = std::string(argv[0]) + "NoBG.png";
+  std::string baselineNoBGPath = std::string(argv[1]) + "baselines/" + baselineNoBG;
+  std::string outputNoBGPath = std::string(argv[2]) + baselineNoBG;
+  if (!F3DOffscreenRender::RenderTesting(renderWindow, baselineNoBGPath, 100, true, outputNoBGPath))
+  {
+    std::cerr << "RenderTesting no background failed" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Test RenderOffscreen no background
+  if (!F3DOffscreenRender::RenderOffScreen(renderWindow, tmpOutputPath, true))
+  {
+    std::cerr << "RenderOffScreen no background failed" << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (!F3DOffscreenRender::RenderTesting(renderWindow, tmpOutputPath, 5, true, tmp2OutputPath))
+  {
+    std::cerr << "RenderTesting on RenderOffscreen result with no background failed" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   // Test RenderToImage no background
   if (!F3DOffscreenRender::RenderToImage(renderWindow, img, true))
   {
@@ -147,6 +145,7 @@ int TestF3DOffscreenRender(int argc, char* argv[])
     std::cerr << "RenderTesting on RenderToImage result with no background failed" << std::endl;
     return EXIT_FAILURE;
   }
+#endif
 
   return EXIT_SUCCESS;
 }
