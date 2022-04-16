@@ -44,7 +44,7 @@ int TestF3DRenderer(int argc, char* argv[])
   std::string baseline = std::string(argv[0]) + ".png";
   std::string basefileName = std::string(argv[1]) + "baselines/" + baseline;
   std::string outputFileName = std::string(argv[2]) + baseline;
-  return F3DOffscreenRender::RenderTesting(renderWindow, basefileName, 50, false, outputFileName)
+  return F3DOffscreenRender::RenderTesting(renderWindow, basefileName, 100, false, outputFileName)
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }
