@@ -130,6 +130,13 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
+   - name: Archive Test Results
+     if: always()
+     uses: actions/upload-artifact@v1
+     with:
+       name: test-results
+       path: ./build/Testing/Temporary/*
+
     - name: Install
       working-directory: ${{github.workspace}}/build
       run: cmake --install .
