@@ -13,7 +13,7 @@
 
 #include <iostream>
 
-int constexpr DIFF_THRESHOLD=50;
+int constexpr DIFF_THRESHOLD=100;
 
 int TestF3DOffscreenRender(int argc, char* argv[])
 {
