@@ -130,6 +130,12 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
+    - name: Upload Tests Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        path: ./build/Testing/Temporary
+        name: f3d-tests-artifact
+
     - name: Install
       working-directory: ${{github.workspace}}/build
       run: cmake --install .
