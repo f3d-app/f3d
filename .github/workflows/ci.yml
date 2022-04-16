@@ -131,7 +131,6 @@ jobs:
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
    - name: Archive Test Results
-     if: success() || failure()
      uses: actions/upload-artifact@v2
      with:
        path: ./build/Testing/Temporary/*
