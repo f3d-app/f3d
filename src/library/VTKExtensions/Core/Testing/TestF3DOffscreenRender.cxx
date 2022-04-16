@@ -13,8 +13,6 @@
 
 #include <iostream>
 
-int constexpr DIFF_THRESHOLD = 100;
-
 int TestF3DOffscreenRender(int argc, char* argv[])
 {
   std::string filename = std::string(argv[1]) + "data/cow.vtp";
@@ -49,7 +47,7 @@ int TestF3DOffscreenRender(int argc, char* argv[])
   std::string baselinePath = std::string(argv[1]) + "baselines/" + baseline;
   std::string outputPath = std::string(argv[2]) + baseline;
   if (!F3DOffscreenRender::RenderTesting(
-        renderWindow, baselinePath, DIFF_THRESHOLD, false, outputPath))
+        renderWindow, baselinePath, 50, false, outputPath))
   {
     std::cerr << "RenderTesting failed" << std::endl;
     return EXIT_FAILURE;
@@ -60,7 +58,7 @@ int TestF3DOffscreenRender(int argc, char* argv[])
   std::string baselineNoBGPath = std::string(argv[1]) + "baselines/" + baselineNoBG;
   std::string outputNoBGPath = std::string(argv[2]) + baselineNoBG;
   if (!F3DOffscreenRender::RenderTesting(
-        renderWindow, baselineNoBGPath, DIFF_THRESHOLD, true, outputNoBGPath))
+        renderWindow, baselineNoBGPath, 100, true, outputNoBGPath))
   {
     std::cerr << "RenderTesting no background failed" << std::endl;
     return EXIT_FAILURE;
@@ -75,7 +73,7 @@ int TestF3DOffscreenRender(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   if (!F3DOffscreenRender::RenderTesting(
-        renderWindow, tmpOutputPath, DIFF_THRESHOLD, false, tmp2OutputPath))
+        renderWindow, tmpOutputPath, 5, false, tmp2OutputPath))
   {
     std::cerr << "RenderTesting on RenderOffscreen result failed" << std::endl;
     return EXIT_FAILURE;
@@ -88,7 +86,7 @@ int TestF3DOffscreenRender(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   if (!F3DOffscreenRender::RenderTesting(
-        renderWindow, tmpOutputPath, DIFF_THRESHOLD, true, tmp2OutputPath))
+        renderWindow, tmpOutputPath, 5, true, tmp2OutputPath))
   {
     std::cerr << "RenderTesting on RenderOffscreen result with no background failed" << std::endl;
     return EXIT_FAILURE;
@@ -126,7 +124,7 @@ int TestF3DOffscreenRender(int argc, char* argv[])
   std::string baselineImgPath = std::string(argv[1]) + "baselines/" + baselineImg;
   std::string outputImgPath = std::string(argv[2]) + baselineImg;
   if (!F3DOffscreenRender::RenderTesting(
-        imgRenderWindow, baselineImgPath, DIFF_THRESHOLD, false, outputImgPath))
+        imgRenderWindow, baselineImgPath, 150, false, outputImgPath))
   {
     std::cerr << "RenderTesting on RenderToImage result failed" << std::endl;
     return EXIT_FAILURE;
@@ -144,7 +142,7 @@ int TestF3DOffscreenRender(int argc, char* argv[])
   std::string baselineImgNoBGPath = std::string(argv[1]) + "baselines/" + baselineImgNoBG;
   std::string outputImgNoBGPath = std::string(argv[2]) + baselineImgNoBG;
   if (!F3DOffscreenRender::RenderTesting(
-        imgRenderWindow, baselineImgNoBGPath, DIFF_THRESHOLD, false, outputImgNoBGPath))
+        imgRenderWindow, baselineImgNoBGPath, 150, false, outputImgNoBGPath))
   {
     std::cerr << "RenderTesting on RenderToImage result with no background failed" << std::endl;
     return EXIT_FAILURE;
