@@ -207,6 +207,8 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestOSPRayPointCloud DATA pointsCloud.vtp ARGS -r --point-size=20)
   f3d_test(NAME TestOSPRayDenoise DATA suzanne.ply ARGS -rd --samples=1)
   f3d_test(NAME TestInteractionOSPRayDenoise DATA suzanne.ply ARGS --samples=1 INTERACTION) #RD
+else(F3D_MODULE_RAYTRACING)
+  f3d_test(NAME TestInteractionOSPRayDenoiseNoRaytracing DATA suzanne.ply ARGS INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
 endif()
 
 if(F3D_MODULE_EXODUS)
