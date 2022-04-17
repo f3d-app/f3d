@@ -60,7 +60,7 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
     if (output.empty())
     {
       F3DLog::Print(F3DLog::Severity::Error,
-        "Reference image does not exists, use the --output option to output current rendering into "
+        "Reference image " + reference + " does not exists, use the output option to output current rendering into "
         "an image file.\n");
     }
     else
@@ -71,8 +71,7 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
       F3DOffscreenRender::RenderOffScreen(renWin, output);
 #endif
       F3DLog::Print(F3DLog::Severity::Error,
-        "Reference file does not exists, current rendering has been outputted to " + output +
-          ".\n");
+        "Reference image " + reference + " does not exists, current rendering has been outputted to " + output + ".\n");
     }
     return false;
   }
