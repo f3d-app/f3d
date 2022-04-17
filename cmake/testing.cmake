@@ -373,7 +373,7 @@ set_tests_properties(f3d::TestNoDryRun PROPERTIES TIMEOUT 2)
 f3d_test(NAME TestNoRef DATA cow.vtp WILL_FAIL)
 
 # Test failure without a reference and without an output, please do not create a TestNoRef.png file
-f3d_test(NAME TestNoRefNoOutput DATA cow.vtp ARGS --ref ${CMAKE_SOURCE_DIR}/testing/baselines/TestNoRef.png REGEXP "Reference image does not exists, use the --output option to output current rendering into an image file." NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestNoRefNoOutput DATA cow.vtp ARGS --ref ${CMAKE_SOURCE_DIR}/testing/baselines/TestNoRef.png REGEXP "use the output option to output current rendering into an image file." NO_BASELINE NO_OUTPUT)
 
 # Test failure with a bad reference, please do not create a good TestBadRef.png file
 f3d_test(NAME TestBadRef DATA cow.vtp WILL_FAIL)
