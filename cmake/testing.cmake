@@ -269,6 +269,7 @@ f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --scalars --
 f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --scalars --comp=2 INTERACTION DEFAULT_LIGHTS) #S
 f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #U
 f3d_test(NAME TestInteractionDumpSceneState DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Camera position: 2.26745,3.82625,507.698")#?
+f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring")#SYVC
 
 # Test a drop event without files. Actual drop can't be tested.
 f3d_test(NAME TestInteractionEmptyDrop DATA cow.vtp NO_BASELINE INTERACTION REGEXP "Drop event without any provided files.")#DropEvent;
