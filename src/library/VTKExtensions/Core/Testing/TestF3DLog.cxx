@@ -1,6 +1,3 @@
-#include <vtkNew.h>
-#include <vtkTestUtilities.h>
-
 #include "F3DLog.h"
 
 int TestF3DLog(int argc, char* argv[])
