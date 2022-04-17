@@ -121,10 +121,11 @@ jobs:
       run: |
         mkdir mesa
         cd mesa
-        curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/20.3.2/mesa3d-20.3.2-release-msvc.7z
+        curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/22.0.1/mesa3d-22.0.1-release-msvc.7z
         "C:\Program Files\7-Zip\7z.exe" x mesa.7z
         cp x64\opengl32.dll ..\..\build\bin\Release\
         cp x64\libglapi.dll ..\..\build\bin\Release\
+        cp x64\libgallium_wgl.dll ..\..\build\bin\Release\
 
     - name: Test
       working-directory: ${{github.workspace}}/build
@@ -152,6 +153,7 @@ jobs:
       run: |
         cp ..\dependencies\mesa\x64\opengl32.dll .\bin\
         cp ..\dependencies\mesa\x64\libglapi.dll .\bin\
+        cp ..\dependencies\mesa\x64\libgallium_wgl.dll .\bin\
         .\bin\f3d.exe ..\source\testing\data\suzanne.obj --output=..\output.png
 
     - name: Check Install macos
