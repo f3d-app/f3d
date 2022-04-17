@@ -380,3 +380,6 @@ f3d_test(NAME TestBadRef DATA cow.vtp WILL_FAIL)
 
 # Test failure with a bad reference without an output, please do not create a good TestBadRef.png file
 f3d_test(NAME TestBadRefNoOutput DATA cow.vtp ARGS --ref ${CMAKE_SOURCE_DIR}/testing/baselines/TestBadRef.png REGEXP "Use the --output option to be able to output current rendering and diff images into files." NO_BASELINE NO_OUTPUT)
+
+# Test failure with a bad interaction play file, please do not create a dummy.log
+f3d_test(NAME TestPlayNoFile DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/dummy.log WILL_FAIL)
