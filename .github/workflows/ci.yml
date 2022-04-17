@@ -272,7 +272,7 @@ jobs:
         lcov --remove coverage.info "*/cxxopts.hpp" -o coverage.info
         lcov --remove coverage.info "*/libf3dSDKTests.cxx" -o coverage.info
         lcov --remove coverage.info "*/VTKExtensionsCoreTests.cxx" -o coverage.info
-        lcov --remove coverage.info "*/VTKExtensionsReadersTests.cxx" -o coverage.info
+        lcov --remove coverage.info "*/VTKExtensionsReaderTests.cxx" -o coverage.info
         lcov --remove coverage.info "*/VTKExtensionsRenderingTests.cxx" -o coverage.info
         lcov --remove coverage.info "*/VTKExtensionsApplicativeTests.cxx" -o coverage.info
 
