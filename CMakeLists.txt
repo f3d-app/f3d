@@ -65,7 +65,7 @@ cmake_dependent_option(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION "Build the Windo
 # testing
 if(BUILD_TESTING)
   enable_testing()
-#  include(cmake/testing.cmake)
+  include(cmake/testing.cmake)
 endif()
 
 # Build f3d
