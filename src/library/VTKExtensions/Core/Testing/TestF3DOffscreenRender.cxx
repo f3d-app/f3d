@@ -9,8 +9,8 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
 #include <vtkTestUtilities.h>
-#include <vtkXMLPolyDataReader.h>
 #include <vtkVersion.h>
+#include <vtkXMLPolyDataReader.h>
 
 #include <iostream>
 
@@ -153,26 +153,30 @@ int TestF3DOffscreenRender(int argc, char* argv[])
   std::string baselineDummy = "dummy.png";
   std::string baselineDummyPath = std::string(argv[1]) + "baselines/" + baselineDummy;
   std::string outputDummyPath = std::string(argv[2]) + baselineDummy;
-  if (F3DOffscreenRender::RenderTesting(renderWindow, baselineDummyPath, 100, false, outputDummyPath))
+  if (F3DOffscreenRender::RenderTesting(
+        renderWindow, baselineDummyPath, 100, false, outputDummyPath))
   {
     std::cerr << "RenderTesting unexpectedely returns true with a dummy baseline" << std::endl;
     return EXIT_FAILURE;
   }
   if (F3DOffscreenRender::RenderTesting(renderWindow, baselineDummyPath, 100, false, ""))
   {
-    std::cerr << "RenderTesting unexpectedely returns true with a dummy baseline and empty output" << std::endl;
+    std::cerr << "RenderTesting unexpectedely returns true with a dummy baseline and empty output"
+              << std::endl;
     return EXIT_FAILURE;
   }
 
   std::string baselineWrongPath = std::string(argv[1]) + "baselines/TestVTU.png";
-  if (F3DOffscreenRender::RenderTesting(renderWindow, baselineWrongPath, 100, false, outputDummyPath))
+  if (F3DOffscreenRender::RenderTesting(
+        renderWindow, baselineWrongPath, 100, false, outputDummyPath))
   {
     std::cerr << "RenderTesting unexpectedely returns true with a wrong baseline" << std::endl;
     return EXIT_FAILURE;
   }
   if (F3DOffscreenRender::RenderTesting(renderWindow, baselineWrongPath, 100, false, ""))
   {
-    std::cerr << "RenderTesting unexpectedely returns true with a wrong baseline and empty output" << std::endl;
+    std::cerr << "RenderTesting unexpectedely returns true with a wrong baseline and empty output"
+              << std::endl;
     return EXIT_FAILURE;
   }
 
