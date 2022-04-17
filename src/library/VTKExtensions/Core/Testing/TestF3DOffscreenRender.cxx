@@ -141,7 +141,7 @@ int TestF3DOffscreenRender(int argc, char* argv[])
   std::string baselineImgNoBGPath = std::string(argv[1]) + "baselines/" + baselineImgNoBG;
   std::string outputImgNoBGPath = std::string(argv[2]) + baselineImgNoBG;
   if (!F3DOffscreenRender::RenderTesting(
-        imgRenderWindow, baselineImgNoBGPath, 300, false, outputImgNoBGPath))
+        imgRenderWindow, baselineImgNoBGPath, 150, false, outputImgNoBGPath))
   {
     std::cerr << "RenderTesting on RenderToImage result with no background failed" << std::endl;
     return EXIT_FAILURE;
