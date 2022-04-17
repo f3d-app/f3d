@@ -1,6 +1,7 @@
 #TODO add more tests
 list(APPEND libf3dSDKTests_list
      TestSDKRenderAndInteract.cxx
+     TestSDKAnimation.cxx
     )
 
 # Test image comparison only with VTK > 9.0.1
