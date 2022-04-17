@@ -34,6 +34,9 @@ option(F3D_MODULE_ALEMBIC "Alembic module (ABC files)" OFF)
 # VTK dependency
 find_package(VTK 9.0 REQUIRED
   COMPONENTS
+    CommonCore
+    CommonDataModel
+    CommonExecutionModel
     FiltersGeneral
     FiltersGeometry
     ImagingCore

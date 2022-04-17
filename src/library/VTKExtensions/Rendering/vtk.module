@@ -16,7 +16,6 @@ OPTIONAL_DEPENDS
   VTK::RenderingRayTracing
 TEST_DEPENDS
   VTK::TestingCore
-  VTK::TestingRendering
   VTK::IOXML
   VTK::InteractionWidgets
   f3d::VTKExtensionsCore
