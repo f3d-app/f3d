@@ -104,9 +104,15 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
   diff->SetThreshold(0);
   diff->SetInputConnection(rtW2if->GetOutputPort());
   diff->SetImageConnection(reader->GetOutputPort());
-  diff->Update();
-
+  diff->UpdateInformation();
   double error = diff->GetThresholdedError();
+
+  if (error <= threshold)
+  {
+    diff->Update();
+    error = diff->GetThresholdedError();
+  }
+
   F3DLog::Print(F3DLog::Severity::Info, "Diff threshold error = " + std::to_string(error) + "\n");
   if (error > threshold)
   {
