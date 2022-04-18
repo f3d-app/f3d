@@ -20,11 +20,14 @@ int TestSDKInteractionDirectory(int argc, char* argv[])
   f3d::interactor& inter = eng.getInteractor();
 
   std::string filename = "TestSDKInteractionDirectory";
-  inter.playInteraction(std::string(argv[1]) + "recordings/" + filename + ".log"); // Right;Right;Right;Left;Up;
+  inter.playInteraction(
+    std::string(argv[1]) + "recordings/" + filename + ".log"); // Right;Right;Right;Left;Up;
 
   if (load.getCurrentFileIndex() != 2)
   {
-    std::cerr << std::string("Expecting a file index of 2, got ") + std::to_string(load.getCurrentFileIndex()) + "." << std::endl;
+    std::cerr << std::string("Expecting a file index of 2, got ") +
+        std::to_string(load.getCurrentFileIndex()) +
+        "." << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -33,7 +36,9 @@ int TestSDKInteractionDirectory(int argc, char* argv[])
 
   if (load.getCurrentFileIndex() != 3)
   {
-    std::cerr << std::string("Expecting a file index of 3, got ") + std::to_string(load.getCurrentFileIndex()) + "." << std::endl;
+    std::cerr << std::string("Expecting a file index of 3, got ") +
+        std::to_string(load.getCurrentFileIndex()) +
+        "." << std::endl;
     return EXIT_FAILURE;
   }
 
