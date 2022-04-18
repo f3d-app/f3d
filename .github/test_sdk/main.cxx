@@ -2,7 +2,7 @@
 
 int main()
 {
-  f3d::engine eng(f3d::engine::WindowTypeEnum::WINDOW_STANDARD);
+  f3d::engine eng();
 
   // TODO Actual test
 

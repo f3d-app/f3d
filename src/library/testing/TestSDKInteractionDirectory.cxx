@@ -9,7 +9,7 @@
 int TestSDKInteractionDirectory(int argc, char* argv[])
 {
   // This test mimics TestInteractionDirectory.
-  f3d::engine eng(f3d::engine::WindowTypeEnum::WINDOW_STANDARD);
+  f3d::engine eng(f3d::engine::WINDOW_OFFSCREEN);
   f3d::options& options = eng.getOptions();
   options.set("resolution", { 300, 300 });
   options.set("scalars", "");
