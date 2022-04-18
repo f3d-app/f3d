@@ -17,28 +17,28 @@ int TestSDKAnimation(int argc, char* argv[])
   inter.startAnimation();
   if (!inter.isPlayingAnimation())
   {
-    std::cerr << "Animation is not playing even being started." << std::endl;
+    std::cerr << "Animation is not playing after being started." << std::endl;
     return EXIT_FAILURE;
   }
 
   inter.toggleAnimation();
   if (inter.isPlayingAnimation())
   {
-    std::cerr << "Animation is playing even after being toggled off." << std::endl;
+    std::cerr << "Animation is playing after being toggled off." << std::endl;
     return EXIT_FAILURE;
   }
 
   inter.toggleAnimation();
   if (!inter.isPlayingAnimation())
   {
-    std::cerr << "Animation is not playing even after being toggled on." << std::endl;
+    std::cerr << "Animation is not playing after being toggled on." << std::endl;
     return EXIT_FAILURE;
   }
 
   inter.stopAnimation();
   if (inter.isPlayingAnimation())
   {
-    std::cerr << "Animation is playing even after being stopped." << std::endl;
+    std::cerr << "Animation is playing after being stopped." << std::endl;
     return EXIT_FAILURE;
   }
 
