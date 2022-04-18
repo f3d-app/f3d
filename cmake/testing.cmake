@@ -207,6 +207,8 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestOSPRayPointCloud DATA pointsCloud.vtp ARGS -r --point-size=20)
   f3d_test(NAME TestOSPRayDenoise DATA suzanne.ply ARGS -rd --samples=1)
   f3d_test(NAME TestInteractionOSPRayDenoise DATA suzanne.ply ARGS --samples=1 INTERACTION) #RD
+else(F3D_MODULE_RAYTRACING)
+  f3d_test(NAME TestInteractionOSPRayDenoiseNoRaytracing DATA suzanne.ply ARGS INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
 endif()
 
 if(F3D_MODULE_EXODUS)
@@ -267,6 +269,7 @@ f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --scalars --
 f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --scalars --comp=2 INTERACTION DEFAULT_LIGHTS) #S
 f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #U
 f3d_test(NAME TestInteractionDumpSceneState DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Camera position: 2.26745,3.82625,507.698")#?
+f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring")#SYVC
 
 # Test a drop event without files. Actual drop can't be tested.
 f3d_test(NAME TestInteractionEmptyDrop DATA cow.vtp NO_BASELINE INTERACTION REGEXP "Drop event without any provided files.")#DropEvent;
@@ -370,10 +373,13 @@ set_tests_properties(f3d::TestNoDryRun PROPERTIES TIMEOUT 2)
 f3d_test(NAME TestNoRef DATA cow.vtp WILL_FAIL)
 
 # Test failure without a reference and without an output, please do not create a TestNoRef.png file
-f3d_test(NAME TestNoRefNoOutput DATA cow.vtp ARGS --ref ${CMAKE_SOURCE_DIR}/testing/baselines/TestNoRef.png REGEXP "Reference image does not exists, use the --output option to output current rendering into an image file." NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestNoRefNoOutput DATA cow.vtp ARGS --ref ${CMAKE_SOURCE_DIR}/testing/baselines/TestNoRef.png REGEXP "use the output option to output current rendering into an image file." NO_BASELINE NO_OUTPUT)
 
 # Test failure with a bad reference, please do not create a good TestBadRef.png file
 f3d_test(NAME TestBadRef DATA cow.vtp WILL_FAIL)
 
 # Test failure with a bad reference without an output, please do not create a good TestBadRef.png file
 f3d_test(NAME TestBadRefNoOutput DATA cow.vtp ARGS --ref ${CMAKE_SOURCE_DIR}/testing/baselines/TestBadRef.png REGEXP "Use the --output option to be able to output current rendering and diff images into files." NO_BASELINE NO_OUTPUT)
+
+# Test failure with a bad interaction play file, please do not create a dummy.log
+f3d_test(NAME TestPlayNoFile DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/dummy.log WILL_FAIL)

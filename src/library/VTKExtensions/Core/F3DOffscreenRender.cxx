@@ -60,8 +60,9 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
     if (output.empty())
     {
       F3DLog::Print(F3DLog::Severity::Error,
-        "Reference image does not exists, use the --output option to output current rendering into "
-        "an image file.\n");
+        "Reference image " + reference +
+          " does not exists, use the output option to output current rendering into "
+          "an image file.\n");
     }
     else
     {
@@ -71,8 +72,8 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
       F3DOffscreenRender::RenderOffScreen(renWin, output);
 #endif
       F3DLog::Print(F3DLog::Severity::Error,
-        "Reference file does not exists, current rendering has been outputted to " + output +
-          ".\n");
+        "Reference image " + reference +
+          " does not exists, current rendering has been outputted to " + output + ".\n");
     }
     return false;
   }
@@ -105,9 +106,15 @@ bool F3DOffscreenRender::RenderTesting(vtkRenderWindow* renWin, const std::strin
   diff->SetThreshold(0);
   diff->SetInputConnection(rtW2if->GetOutputPort());
   diff->SetImageConnection(reader->GetOutputPort());
-  diff->Update();
-
+  diff->UpdateInformation();
   double error = diff->GetThresholdedError();
+
+  if (error <= threshold)
+  {
+    diff->Update();
+    error = diff->GetThresholdedError();
+  }
+
   F3DLog::Print(F3DLog::Severity::Info, "Diff threshold error = " + std::to_string(error) + "\n");
   if (error > threshold)
   {

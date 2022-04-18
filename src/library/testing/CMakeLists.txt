@@ -5,8 +5,16 @@ list(APPEND libf3dSDKTests_list
 
 # Test image comparison only with VTK > 9.0.1
 if(VTK_VERSION VERSION_GREATER 9.0.1)
-list(APPEND libf3dSDKTests_list
-     TestSDKCompareWithFile.cxx
+  list(APPEND libf3dSDKTests_list
+    TestSDKCompareWithFile.cxx
+    TestSDKInteractionDirectory.cxx
+    )
+endif()
+
+# Animation works only with a recent version of VTK
+if(VTK_VERSION VERSION_GREATER 9.0.20201016)
+  list(APPEND libf3dSDKTests_list
+    TestSDKAnimation.cxx
     )
 endif()
 
