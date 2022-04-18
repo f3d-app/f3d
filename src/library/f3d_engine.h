@@ -21,8 +21,24 @@ class engine
 {
 public:
 
+  struct engine_exception : public std::exception{};
+  struct window_engine_exception : public engine_exception
+  {
+    const char* what() const throw()
+    {
+      return "Cannot create window with this engine";
+    }
+  };
+  struct interactor_engine_exception : public engine_exception
+  {
+    const char* what() const throw()
+    {
+      return "Cannot create interactor with this engine";
+    }
+  };
+
   //======== Engine Flags =============
-  // engine::NO_WINDOW: Do not create a window to render into
+  // engine::NO_WINDOW: Do not create a window to render into.
   // engine::NO_INTERACTOR: Do not create an interactor to interact with
   // engine::WINDOW_OFFSCREEN: Create an offscreen window to render into, ignored with NO_WINDOW
   using engine_flags_t = std::bitset<8>;

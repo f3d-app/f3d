@@ -28,23 +28,25 @@ public:
 engine::engine(const engine_flags_t& flags)
   : Internals(new engine::F3DInternals())
 {
+  this->Internals->Options = std::make_unique<options>();
+
   if ((flags & NO_WINDOW).any())
   {
-    this->Internals->Window = std::make_unique<window_impl_noRender>(this->getOptions());
+    this->Internals->Window = std::make_unique<window_impl_noRender>(*this->Internals->Options);
   }
   else
   {
     this->Internals->Window = std::make_unique<window_impl_standard>(
-      this->getOptions(), (flags & WINDOW_OFFSCREEN).any());
+      *this->Internals->Options, (flags & WINDOW_OFFSCREEN).any());
   }
 
   this->Internals->Loader = std::make_unique<loader_impl>(
-    this->getOptions(), static_cast<window_impl&>(this->getWindow()));
+    *this->Internals->Options, *this->Internals->Window);
 
   if ((flags & NO_INTERACTOR).none())
   {
-    this->Internals->Interactor = std::make_unique<interactor_impl>(this->getOptions(),
-      static_cast<window_impl&>(this->getWindow()), static_cast<loader_impl&>(this->getLoader()));
+    this->Internals->Interactor = std::make_unique<interactor_impl>(*this->Internals->Options,
+      *this->Internals->Window, *this->Internals->Loader);
   }
 }
 
@@ -54,19 +56,15 @@ engine::~engine() = default;
 //----------------------------------------------------------------------------
 options& engine::getOptions()
 {
-  if (!this->Internals->Options)
-  {
-    this->Internals->Options = std::make_unique<options>();
-  }
   return *this->Internals->Options;
 }
 
 //----------------------------------------------------------------------------
 window& engine::getWindow()
 {
-  if (!this->Internals->Window)
+  if (!this->Internals->Window || dynamic_cast<window_impl_noRender*>(this->Internals->Window.get()))
   {
-    // TODO exception
+    throw window_engine_exception();
   }
   return *this->Internals->Window;
 }
@@ -74,10 +72,6 @@ window& engine::getWindow()
 //----------------------------------------------------------------------------
 loader& engine::getLoader()
 {
-  if (!this->Internals->Loader)
-  {
-    // TODO exception
-  }
   return *this->Internals->Loader;
 }
 
@@ -86,7 +80,7 @@ interactor& engine::getInteractor()
 {
   if (!this->Internals->Interactor)
   {
-    // TODO exception
+    throw interactor_engine_exception();
   }
   return *this->Internals->Interactor;
 }

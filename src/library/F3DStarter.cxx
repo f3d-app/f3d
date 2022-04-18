@@ -59,7 +59,7 @@ int F3DStarter::Start(int argc, char** argv)
   if (this->Internals->CommandLineOptions.NoRender)
   {
     this->Internals->Engine =
-      std::make_unique<f3d::engine>(f3d::engine::NO_WINDOW);
+      std::make_unique<f3d::engine>(f3d::engine::NO_WINDOW | f3d::engine::NO_INTERACTOR);
   }
   else
   {
