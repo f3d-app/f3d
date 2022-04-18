@@ -20,21 +20,16 @@ class interactor;
 class engine
 {
 public:
-
-  struct engine_exception : public std::exception{};
+  struct engine_exception : public std::exception
+  {
+  };
   struct window_engine_exception : public engine_exception
   {
-    const char* what() const throw()
-    {
-      return "Cannot create window with this engine";
-    }
+    const char* what() const throw() { return "Cannot create window with this engine"; }
   };
   struct interactor_engine_exception : public engine_exception
   {
-    const char* what() const throw()
-    {
-      return "Cannot create interactor with this engine";
-    }
+    const char* what() const throw() { return "Cannot create interactor with this engine"; }
   };
 
   //======== Engine Flags =============

@@ -40,13 +40,13 @@ engine::engine(const engine_flags_t& flags)
       *this->Internals->Options, (flags & WINDOW_OFFSCREEN).any());
   }
 
-  this->Internals->Loader = std::make_unique<loader_impl>(
-    *this->Internals->Options, *this->Internals->Window);
+  this->Internals->Loader =
+    std::make_unique<loader_impl>(*this->Internals->Options, *this->Internals->Window);
 
   if ((flags & NO_INTERACTOR).none())
   {
-    this->Internals->Interactor = std::make_unique<interactor_impl>(*this->Internals->Options,
-      *this->Internals->Window, *this->Internals->Loader);
+    this->Internals->Interactor = std::make_unique<interactor_impl>(
+      *this->Internals->Options, *this->Internals->Window, *this->Internals->Loader);
   }
 }
 
@@ -62,7 +62,8 @@ options& engine::getOptions()
 //----------------------------------------------------------------------------
 window& engine::getWindow()
 {
-  if (!this->Internals->Window || dynamic_cast<window_impl_noRender*>(this->Internals->Window.get()))
+  if (!this->Internals->Window ||
+    dynamic_cast<window_impl_noRender*>(this->Internals->Window.get()))
   {
     throw window_engine_exception();
   }
