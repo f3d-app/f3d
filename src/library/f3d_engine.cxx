@@ -66,7 +66,7 @@ window& engine::getWindow()
   if (!this->Internals->Window ||
     dynamic_cast<window_impl_noRender*>(this->Internals->Window.get()))
   {
-    throw window_engine_exception();
+    throw window_exception();
   }
   return *this->Internals->Window;
 }
@@ -82,7 +82,7 @@ interactor& engine::getInteractor()
 {
   if (!this->Internals->Interactor)
   {
-    throw interactor_engine_exception();
+    throw interactor_exception();
   }
   return *this->Internals->Interactor;
 }
