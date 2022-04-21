@@ -58,8 +58,7 @@ int F3DStarter::Start(int argc, char** argv)
 
   if (this->Internals->CommandLineOptions.NoRender)
   {
-    this->Internals->Engine =
-      std::make_unique<f3d::engine>(f3d::engine::FLAGS_NONE);
+    this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::FLAGS_NONE);
   }
   else
   {
@@ -67,7 +66,8 @@ int F3DStarter::Start(int argc, char** argv)
     bool offscreen = !this->Internals->CommandLineOptions.Reference.empty() ||
       !this->Internals->CommandLineOptions.Output.empty();
 
-    f3d::engine::flags_t flags = f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR | (offscreen ? f3d::engine::WINDOW_OFFSCREEN : f3d::engine::FLAGS_NONE);
+    f3d::engine::flags_t flags = f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR |
+      (offscreen ? f3d::engine::WINDOW_OFFSCREEN : f3d::engine::FLAGS_NONE);
     this->Internals->Engine = std::make_unique<f3d::engine>(flags);
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 

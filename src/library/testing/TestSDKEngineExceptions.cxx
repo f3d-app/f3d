@@ -8,7 +8,7 @@
 int TestSDKEngineExceptions(int argc, char* argv[])
 {
   f3d::engine eng(f3d::engine::FLAGS_NONE);
-  
+
   try
   {
     f3d::window& win = eng.getWindow();
@@ -17,7 +17,7 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   {
     std::cout << ex.what() << std::endl;
   }
- 
+
   try
   {
     f3d::interactor& inter = eng.getInteractor();
