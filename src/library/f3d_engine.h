@@ -33,16 +33,16 @@ public:
   };
 
   //======== Engine Flags =============
-  // engine::NO_WINDOW: Do not create a window to render into.
-  // engine::NO_INTERACTOR: Do not create an interactor to interact with
-  // engine::WINDOW_OFFSCREEN: Create an offscreen window to render into, ignored with NO_WINDOW
-  using engine_flags_t = std::bitset<8>;
-  static constexpr engine_flags_t FLAGS_NONE = engine_flags_t(0x0000);
-  static constexpr engine_flags_t NO_WINDOW = engine_flags_t(0x0001);
-  static constexpr engine_flags_t NO_INTERACTOR = engine_flags_t(0x0002);
-  static constexpr engine_flags_t WINDOW_OFFSCREEN = engine_flags_t(0x0004);
+  // engine::CREATE_WINDOW: Create a window to render into.
+  // engine::CREATE_INTERACTOR: Create an interactor to interact with
+  // engine::WINDOW_OFFSCREEN: Create an offscreen window to render into, need CREATE_WINDOW
+  using flags_t = std::bitset<8>;
+  static constexpr flags_t FLAGS_NONE = flags_t(0x0000);
+  static constexpr flags_t CREATE_WINDOW = flags_t(0x0001);
+  static constexpr flags_t CREATE_INTERACTOR = flags_t(0x0002);
+  static constexpr flags_t WINDOW_OFFSCREEN = flags_t(0x0004);
 
-  engine(const engine_flags_t& flags = engine_flags_t());
+  engine(const flags_t& flags);
   ~engine();
 
   options& getOptions();
