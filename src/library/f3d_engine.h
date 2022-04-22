@@ -34,10 +34,10 @@ public:
   // engine::CREATE_INTERACTOR: Create an interactor to interact with
   // engine::WINDOW_OFFSCREEN: Create an offscreen window to render into, need CREATE_WINDOW
   using flags_t = std::bitset<8>;
-  static constexpr flags_t FLAGS_NONE = flags_t(0x0000);
-  static constexpr flags_t CREATE_WINDOW = flags_t(0x0001);
-  static constexpr flags_t CREATE_INTERACTOR = flags_t(0x0002);
-  static constexpr flags_t WINDOW_OFFSCREEN = flags_t(0x0004);
+  static const flags_t FLAGS_NONE;
+  static const flags_t CREATE_WINDOW;
+  static const flags_t CREATE_INTERACTOR;
+  static const flags_t WINDOW_OFFSCREEN;
 
   engine(const flags_t& flags);
   ~engine();
@@ -55,11 +55,5 @@ private:
   std::unique_ptr<F3DInternals> Internals;
 };
 }
-
-//----------------------------------------------------------------------------
-constexpr f3d::engine::flags_t FLAGS_NONE;
-constexpr f3d::engine::flags_t CREATE_WINDOW;
-constexpr f3d::engine::flags_t CREATE_INTERACTOR;
-constexpr f3d::engine::flags_t WINDOW_OFFSCREEN;
 
 #endif

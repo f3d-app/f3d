@@ -13,6 +13,11 @@
 
 #include <vtkVersion.h>
 
+const f3d::engine::flags_t f3d::engine::FLAGS_NONE = f3d::engine::flags_t(0x0000);
+const f3d::engine::flags_t f3d::engine::CREATE_WINDOW = f3d::engine::flags_t(0x0001);
+const f3d::engine::flags_t f3d::engine::CREATE_INTERACTOR = f3d::engine::flags_t(0x0002);
+const f3d::engine::flags_t f3d::engine::WINDOW_OFFSCREEN = f3d::engine::flags_t(0x0004);
+
 namespace f3d
 {
 class engine::F3DInternals
