@@ -56,4 +56,10 @@ private:
 };
 }
 
+//----------------------------------------------------------------------------
+constexpr f3d::engine::flags_t FLAGS_NONE;
+constexpr f3d::engine::flags_t CREATE_WINDOW;
+constexpr f3d::engine::flags_t CREATE_INTERACTOR;
+constexpr f3d::engine::flags_t WINDOW_OFFSCREEN;
+
 #endif
