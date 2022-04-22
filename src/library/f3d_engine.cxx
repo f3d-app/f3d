@@ -15,11 +15,6 @@
 
 namespace f3d
 {
-constexpr engine::flags_t engine::FLAGS_NONE;
-constexpr engine::flags_t engine::CREATE_WINDOW;
-constexpr engine::flags_t engine::CREATE_INTERACTOR;
-constexpr engine::flags_t engine::WINDOW_OFFSCREEN;
-
 class engine::F3DInternals
 {
 public:
@@ -35,10 +30,10 @@ engine::engine(const flags_t& flags)
 {
   this->Internals->Options = std::make_unique<options>();
 
-  if ((flags & CREATE_WINDOW).any())
+  if (flags & CREATE_WINDOW)
   {
     this->Internals->Window = std::make_unique<window_impl_standard>(
-      *this->Internals->Options, (flags & WINDOW_OFFSCREEN).any());
+      *this->Internals->Options, flags & WINDOW_OFFSCREEN);
   }
   else
   {
@@ -49,7 +44,7 @@ engine::engine(const flags_t& flags)
   this->Internals->Loader =
     std::make_unique<loader_impl>(*this->Internals->Options, *this->Internals->Window);
 
-  if ((flags & CREATE_INTERACTOR).any())
+  if (flags & CREATE_INTERACTOR)
   {
     this->Internals->Interactor = std::make_unique<interactor_impl>(
       *this->Internals->Options, *this->Internals->Window, *this->Internals->Loader);

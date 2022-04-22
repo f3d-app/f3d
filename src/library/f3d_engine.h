@@ -33,11 +33,14 @@ public:
   // engine::CREATE_WINDOW: Create a window to render into.
   // engine::CREATE_INTERACTOR: Create an interactor to interact with
   // engine::WINDOW_OFFSCREEN: Create an offscreen window to render into, need CREATE_WINDOW
-  using flags_t = std::bitset<8>;
-  static constexpr flags_t FLAGS_NONE = flags_t(0x0000);
-  static constexpr flags_t CREATE_WINDOW = flags_t(0x0001);
-  static constexpr flags_t CREATE_INTERACTOR = flags_t(0x0002);
-  static constexpr flags_t WINDOW_OFFSCREEN = flags_t(0x0004);
+  using flags_t = int;
+  enum Flags : flags_t
+  {
+    FLAGS_NONE = 0,
+    CREATE_WINDOW = 1 << 0, // binary 0001
+    CREATE_INTERACTOR = 1 << 1, // binary 0010
+    WINDOW_OFFSCREEN = 1 << 2 // binary 0100
+  };
 
   engine(const flags_t& flags);
   ~engine();
