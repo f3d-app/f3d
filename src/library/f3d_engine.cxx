@@ -25,6 +25,12 @@ public:
 };
 
 //----------------------------------------------------------------------------
+constexpr engine::flags_t FLAGS_NONE;
+constexpr engine::flags_t CREATE_WINDOW;
+constexpr engine::flags_t CREATE_INTERACTOR;
+constexpr engine::flags_t WINDOW_OFFSCREEN;
+
+//----------------------------------------------------------------------------
 engine::engine(const flags_t& flags)
   : Internals(new engine::F3DInternals())
 {
