@@ -32,8 +32,8 @@ engine::engine(const flags_t& flags)
 
   if (flags & CREATE_WINDOW)
   {
-    this->Internals->Window = std::make_unique<window_impl_standard>(
-      *this->Internals->Options, flags & WINDOW_OFFSCREEN);
+    this->Internals->Window =
+      std::make_unique<window_impl_standard>(*this->Internals->Options, flags & WINDOW_OFFSCREEN);
   }
   else
   {

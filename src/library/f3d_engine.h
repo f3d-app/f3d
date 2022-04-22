@@ -36,10 +36,10 @@ public:
   using flags_t = int;
   enum Flags : flags_t
   {
-    FLAGS_NONE = 0,
-    CREATE_WINDOW = 1 << 0, // binary 0001
-    CREATE_INTERACTOR = 1 << 1, // binary 0010
-    WINDOW_OFFSCREEN = 1 << 2 // binary 0100
+    FLAGS_NONE = 0,             // 0000
+    CREATE_WINDOW = 1 << 0,     // 0001
+    CREATE_INTERACTOR = 1 << 1, // 0010
+    WINDOW_OFFSCREEN = 1 << 2   // 0100
   };
 
   engine(const flags_t& flags);
