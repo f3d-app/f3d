@@ -31,8 +31,8 @@ public:
 
   //======== Engine Flags =============
   // engine::CREATE_WINDOW: Create a window to render into.
-  // engine::CREATE_INTERACTOR: Create an interactor to interact with
-  // engine::WINDOW_OFFSCREEN: Create an offscreen window to render into, need CREATE_WINDOW
+  // engine::CREATE_INTERACTOR: Create an interactor to interact with.
+  // engine::WINDOW_OFFSCREEN: Create an offscreen window to render into, need CREATE_WINDOW.
   using flags_t = int;
   enum Flags : flags_t
   {
