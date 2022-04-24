@@ -33,7 +33,7 @@ public:
   // engine::CREATE_WINDOW: Create a window to render into.
   // engine::CREATE_INTERACTOR: Create an interactor to interact with.
   // engine::WINDOW_OFFSCREEN: Create an offscreen window to render into, need CREATE_WINDOW.
-  using flags_t = int;
+  using flags_t = uint32_t;
   enum Flags : flags_t
   {
     FLAGS_NONE = 0,             // 0000
