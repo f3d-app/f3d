@@ -25,10 +25,30 @@ public:
 };
 
 //----------------------------------------------------------------------------
-engine::engine(WindowTypeEnum windowType)
+engine::engine(const flags_t& flags)
   : Internals(new engine::F3DInternals())
-  , WindowType(windowType)
 {
+  this->Internals->Options = std::make_unique<options>();
+
+  if (flags & CREATE_WINDOW)
+  {
+    this->Internals->Window =
+      std::make_unique<window_impl_standard>(*this->Internals->Options, flags & WINDOW_OFFSCREEN);
+  }
+  else
+  {
+    // Without the window flag, we still need to create a window noRender
+    this->Internals->Window = std::make_unique<window_impl_noRender>(*this->Internals->Options);
+  }
+
+  this->Internals->Loader =
+    std::make_unique<loader_impl>(*this->Internals->Options, *this->Internals->Window);
+
+  if (flags & CREATE_INTERACTOR)
+  {
+    this->Internals->Interactor = std::make_unique<interactor_impl>(
+      *this->Internals->Options, *this->Internals->Window, *this->Internals->Loader);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -37,47 +57,16 @@ engine::~engine() = default;
 //----------------------------------------------------------------------------
 options& engine::getOptions()
 {
-  if (!this->Internals->Options)
-  {
-    this->Internals->Options = std::make_unique<options>();
-  }
   return *this->Internals->Options;
 }
 
 //----------------------------------------------------------------------------
 window& engine::getWindow()
 {
-  if (!this->Internals->Window)
+  if (!this->Internals->Window ||
+    dynamic_cast<window_impl_noRender*>(this->Internals->Window.get()))
   {
-    switch (this->WindowType)
-    {
-      case (engine::WindowTypeEnum::WINDOW_NO_RENDER):
-        this->Internals->Window = std::make_unique<window_impl_noRender>(this->getOptions());
-        break;
-      case (engine::WindowTypeEnum::WINDOW_OFFSCREEN):
-      case (engine::WindowTypeEnum::WINDOW_STANDARD):
-      default:
-        this->Internals->Window = std::make_unique<window_impl_standard>(
-          this->getOptions(), this->WindowType == engine::WindowTypeEnum::WINDOW_OFFSCREEN);
-        break;
-    }
-
-// Because of this issue https://gitlab.kitware.com/vtk/vtk/-/issues/18372
-// We need to ensure that, before the fix of this issue, interactor is created
-// before any usage of the window.
-// This force the creation of window, loader and interactor
-// whenever the window, loader or interactor is needed.
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 1, 20220331)
-    this->Internals->Loader = std::make_unique<loader_impl>(
-      this->getOptions(), static_cast<window_impl&>(*this->Internals->Window));
-
-    if (this->WindowType != engine::WindowTypeEnum::WINDOW_NO_RENDER)
-    {
-      this->Internals->Interactor = std::make_unique<interactor_impl>(this->getOptions(),
-        static_cast<window_impl&>(*this->Internals->Window),
-        static_cast<loader_impl&>(*this->Internals->Loader));
-    }
-#endif
+    throw window_exception();
   }
   return *this->Internals->Window;
 }
@@ -85,15 +74,6 @@ window& engine::getWindow()
 //----------------------------------------------------------------------------
 loader& engine::getLoader()
 {
-  if (!this->Internals->Loader)
-  {
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 1, 20220331)
-    this->getWindow();
-#else
-    this->Internals->Loader = std::make_unique<loader_impl>(
-      this->getOptions(), static_cast<window_impl&>(this->getWindow()));
-#endif
-  }
   return *this->Internals->Loader;
 }
 
@@ -102,12 +82,7 @@ interactor& engine::getInteractor()
 {
   if (!this->Internals->Interactor)
   {
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 1, 20220331)
-    this->getWindow();
-#else
-    this->Internals->Interactor = std::make_unique<interactor_impl>(this->getOptions(),
-      static_cast<window_impl&>(this->getWindow()), static_cast<loader_impl&>(this->getLoader()));
-#endif
+    throw interactor_exception();
   }
   return *this->Internals->Interactor;
 }

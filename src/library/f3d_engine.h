@@ -8,6 +8,7 @@
 #ifndef f3d_engine_h
 #define f3d_engine_h
 
+#include <bitset>
 #include <memory>
 
 namespace f3d
@@ -19,14 +20,29 @@ class interactor;
 class engine
 {
 public:
-  enum class WindowTypeEnum
+  struct window_exception : public std::exception
   {
-    WINDOW_NO_RENDER,
-    WINDOW_OFFSCREEN,
-    WINDOW_STANDARD
+    const char* what() const throw() { return "Cannot create window with this engine"; }
+  };
+  struct interactor_exception : public std::exception
+  {
+    const char* what() const throw() { return "Cannot create interactor with this engine"; }
   };
 
-  engine(WindowTypeEnum windowType);
+  //======== Engine Flags =============
+  // engine::CREATE_WINDOW: Create a window to render into.
+  // engine::CREATE_INTERACTOR: Create an interactor to interact with.
+  // engine::WINDOW_OFFSCREEN: Create an offscreen window to render into, need CREATE_WINDOW.
+  using flags_t = uint32_t;
+  enum Flags : flags_t
+  {
+    FLAGS_NONE = 0,             // 0000
+    CREATE_WINDOW = 1 << 0,     // 0001
+    CREATE_INTERACTOR = 1 << 1, // 0010
+    WINDOW_OFFSCREEN = 1 << 2   // 0100
+  };
+
+  engine(const flags_t& flags);
   ~engine();
 
   options& getOptions();
@@ -40,9 +56,6 @@ public:
 private:
   class F3DInternals;
   std::unique_ptr<F3DInternals> Internals;
-
-  // TODO use binary flags instead
-  WindowTypeEnum WindowType;
 };
 }
 
