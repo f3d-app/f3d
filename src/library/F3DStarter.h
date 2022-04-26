@@ -7,9 +7,13 @@
 #ifndef F3DStarter_h
 #define F3DStarter_h
 
+// TODO: this file is used in the application so it needs to be exported.
+// However, it will be moved completely in the application at some point, so export will be removed
+#include "f3d_export.h"
+
 #include "f3d_loader.h"
 
-class F3DStarter
+class F3D_EXPORT F3DStarter
 {
 public:
   /**

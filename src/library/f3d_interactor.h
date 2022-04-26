@@ -1,6 +1,8 @@
 #ifndef f3d_interactor_h
 #define f3d_interactor_h
 
+#include "f3d_export.h"
+
 #include <functional>
 #include <string>
 #include <vector>
@@ -11,7 +13,7 @@ namespace f3d
 class options;
 class loader;
 class window;
-class interactor
+class F3D_EXPORT interactor
 {
 public:
   virtual void setKeyPressCallBack(std::function<bool(int, std::string)> callBack) = 0;

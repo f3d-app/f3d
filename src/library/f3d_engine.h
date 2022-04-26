@@ -8,7 +8,8 @@
 #ifndef f3d_engine_h
 #define f3d_engine_h
 
-#include <bitset>
+#include "f3d_export.h"
+
 #include <memory>
 
 namespace f3d
@@ -17,7 +18,7 @@ class options;
 class window;
 class loader;
 class interactor;
-class engine
+class F3D_EXPORT engine
 {
 public:
   struct window_exception : public std::exception

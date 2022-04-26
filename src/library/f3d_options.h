@@ -1,6 +1,8 @@
 #ifndef f3d_options_h
 #define f3d_options_h
 
+#include "f3d_export.h"
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -9,7 +11,7 @@
 
 namespace f3d
 {
-class options
+class F3D_EXPORT options
 {
 public:
   options();
