@@ -3,7 +3,6 @@
 
 #include "f3d_export.h"
 
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -46,7 +45,7 @@ public:
 
 private:
   class F3DInternals;
-  std::unique_ptr<F3DInternals> Internals;
+  F3DInternals* Internals;
 };
 }
 
