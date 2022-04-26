@@ -10,6 +10,9 @@
 
 #include "f3d_export.h"
 
+#include <cstdint>
+#include <exception>
+
 namespace f3d
 {
 class options;
