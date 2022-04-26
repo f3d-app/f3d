@@ -7,7 +7,8 @@
 
 int TestSDKAnimation(int argc, char* argv[])
 {
-  f3d::engine eng(f3d::engine::WindowTypeEnum::WINDOW_OFFSCREEN);
+  f3d::engine eng(
+    f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR | f3d::engine::WINDOW_OFFSCREEN);
   f3d::loader& load = eng.getLoader();
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();
