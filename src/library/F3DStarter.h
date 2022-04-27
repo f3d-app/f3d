@@ -7,6 +7,11 @@
 #ifndef F3DStarter_h
 #define F3DStarter_h
 
+// TODO: this file is used in the application so it needs to be exported.
+// However, it will be moved completely in the application at some point, then export of used APIs
+// can be removed
+#include "f3d_export.h"
+
 #include "f3d_loader.h"
 
 class F3DStarter
@@ -15,7 +20,7 @@ public:
   /**
    * Parse the options and configure a f3d::loader accordingly
    */
-  int Start(int argc, char** argv);
+  F3D_EXPORT int Start(int argc, char** argv);
 
   /**
    * Add a file or directory to be forwarded to the loader
@@ -29,8 +34,8 @@ public:
    */
   bool LoadFile(f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
-  F3DStarter();
-  ~F3DStarter();
+  F3D_EXPORT F3DStarter();
+  F3D_EXPORT ~F3DStarter();
 
 private:
   class F3DInternals;

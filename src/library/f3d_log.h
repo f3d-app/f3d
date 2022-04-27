@@ -8,12 +8,14 @@
 #ifndef f3d_log_h
 #define f3d_log_h
 
+#include "f3d_export.h"
+
 #include <sstream>
 #include <string>
 
 namespace f3d
 {
-class log
+class F3D_EXPORT log
 {
 public:
   /**

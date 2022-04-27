@@ -52,7 +52,10 @@ engine::engine(const flags_t& flags)
 }
 
 //----------------------------------------------------------------------------
-engine::~engine() = default;
+engine::~engine()
+{
+  delete this->Internals;
+}
 
 //----------------------------------------------------------------------------
 options& engine::getOptions()

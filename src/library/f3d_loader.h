@@ -1,6 +1,8 @@
 #ifndef f3d_loader_h
 #define f3d_loader_h
 
+#include "f3d_export.h"
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -8,7 +10,7 @@
 // TODO doc
 namespace f3d
 {
-class loader
+class F3D_EXPORT loader
 {
 public:
   enum class LoadFileEnum
