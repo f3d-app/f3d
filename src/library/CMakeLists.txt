@@ -151,6 +151,7 @@ endif()
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
+  ${CMAKE_CURRENT_BINARY_DIR}/f3d_export.h
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_engine.h
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_interactor.h
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader.h
@@ -172,9 +173,16 @@ target_include_directories(libf3d
 set_target_properties(libf3d PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-  WINDOWS_EXPORT_ALL_SYMBOLS ON
+  CXX_VISIBILITY_PRESET hidden
   OUTPUT_NAME "f3d"
   )
+
+# Generate export macros for exported public APIs
+include(GenerateExportHeader)
+
+generate_export_header(libf3d
+  EXPORT_FILE_NAME f3d_export.h
+  EXPORT_MACRO_NAME F3D_EXPORT)
 
 target_compile_features(libf3d PRIVATE cxx_std_17)
 

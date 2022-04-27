@@ -1,7 +1,8 @@
 #ifndef f3d_options_h
 #define f3d_options_h
 
-#include <memory>
+#include "f3d_export.h"
+
 #include <string>
 #include <vector>
 
@@ -9,7 +10,7 @@
 
 namespace f3d
 {
-class options
+class F3D_EXPORT options
 {
 public:
   options();
@@ -44,7 +45,7 @@ public:
 
 private:
   class F3DInternals;
-  std::unique_ptr<F3DInternals> Internals;
+  F3DInternals* Internals;
 };
 }
 

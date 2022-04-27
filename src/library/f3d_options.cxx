@@ -151,7 +151,10 @@ options::options()
 };
 
 //----------------------------------------------------------------------------
-options::~options() = default;
+options::~options()
+{
+  delete this->Internals;
+}
 
 //----------------------------------------------------------------------------
 options::options(const options& opt)

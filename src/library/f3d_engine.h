@@ -8,8 +8,10 @@
 #ifndef f3d_engine_h
 #define f3d_engine_h
 
-#include <bitset>
-#include <memory>
+#include "f3d_export.h"
+
+#include <cstdint>
+#include <exception>
 
 namespace f3d
 {
@@ -17,7 +19,7 @@ class options;
 class window;
 class loader;
 class interactor;
-class engine
+class F3D_EXPORT engine
 {
 public:
   struct window_exception : public std::exception
@@ -55,7 +57,7 @@ public:
 
 private:
   class F3DInternals;
-  std::unique_ptr<F3DInternals> Internals;
+  F3DInternals* Internals;
 };
 }
 
