@@ -14,6 +14,8 @@ static const std::string F3D_EXIT_HOTKEY_SYM = "Escape";
 #cmakedefine01 F3D_MODULE_OCCT
 #cmakedefine01 F3D_MODULE_OCCT_XCAF
 #cmakedefine01 F3D_MODULE_ASSIMP
+#cmakedefine01 F3D_MODULE_ALEMBIC
 #cmakedefine F3D_OCCT_VERSION "@F3D_OCCT_VERSION@"
 #cmakedefine F3D_ASSIMP_VERSION "@F3D_ASSIMP_VERSION@"
+#cmakedefine F3D_ALEMBIC_VERSION "@F3D_ALEMBIC_VERSION@"
 #endif
