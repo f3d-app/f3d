@@ -207,6 +207,7 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestOSPRayPointCloud DATA pointsCloud.vtp ARGS -r --point-size=20)
   f3d_test(NAME TestOSPRayDenoise DATA suzanne.ply ARGS -rd --samples=1)
   f3d_test(NAME TestInteractionOSPRayDenoise DATA suzanne.ply ARGS --samples=1 INTERACTION) #RD
+  f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Raytracing module: ON")
 else(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionOSPRayDenoiseNoRaytracing DATA suzanne.ply ARGS INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
 endif()
@@ -218,17 +219,23 @@ if(F3D_MODULE_EXODUS)
   f3d_test(NAME TestInteractionAnimationGenericImporter DATA small.ex2 INTERACTION NO_BASELINE)#Space;Space;
   # Test Generic Importer Verbose animation
   f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --verbose NO_BASELINE REGEXP "0: default")
+
+  f3d_test(NAME TestVersionExodus ARGS --version REGEXP "Exodus module: ON")
 endif()
 
 if(F3D_MODULE_OCCT)
   f3d_test(NAME TestSTEP DATA cube.stp DEFAULT_LIGHTS)
   f3d_test(NAME TestIGES DATA spacer.igs DEFAULT_LIGHTS)
+
+  f3d_test(NAME TestVersionOCCT ARGS --version REGEXP "OpenCASCADE module: .\\..\\.. (.+)")
 endif()
 
 if(F3D_MODULE_ASSIMP)
   f3d_test(NAME TestOFF DATA teapot.off ARGS --up=+Z)
   f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p)
   f3d_test(NAME TestFBX DATA phong_cube.fbx)
+
+  f3d_test(NAME TestVersionAssimp ARGS --version REGEXP "Assimp module: .\\..\\..")
 
   if(VTK_VERSION VERSION_GREATER 9.0.20210728) # for TGA support and embedded textures
     f3d_test(NAME TestDAE DATA duck.dae)
@@ -248,6 +255,7 @@ endif()
 
 if(F3D_MODULE_ALEMBIC)
   f3d_test(NAME TestABC DATA suzanne.abc)
+  f3d_test(NAME TestVersionAlembic ARGS --version REGEXP "Alembic module: .\\..\\..")
 endif()
 
 ## Interaction Tests

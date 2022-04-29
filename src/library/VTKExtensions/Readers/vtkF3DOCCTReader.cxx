@@ -1,5 +1,7 @@
 #include "vtkF3DOCCTReader.h"
 
+#include "vtkF3DConfigure.h"
+
 #include <BRepAdaptor_Surface.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
 #include <BRep_Tool.hxx>

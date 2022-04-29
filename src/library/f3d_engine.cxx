@@ -11,6 +11,8 @@
 
 #include "F3DReaderFactory.h"
 
+#include "vtkF3DConfigure.h"
+
 #include <vtkVersion.h>
 
 namespace f3d
@@ -132,6 +134,12 @@ void engine::printVersion()
   version += "\nAssimp module: ";
 #if F3D_MODULE_ASSIMP
   version += F3D_ASSIMP_VERSION;
+#else
+  version += "OFF";
+#endif
+  version += "\nAlembic module: ";
+#if F3D_MODULE_ALEMBIC
+  version += F3D_ALEMBIC_VERSION;
 #else
   version += "OFF";
 #endif
