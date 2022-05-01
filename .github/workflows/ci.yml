@@ -313,7 +313,7 @@ jobs:
 
     - name: gcc
       run: |
-        gcc-8 --version
+        gcc --version
       shell: bash
 
     - name: Set LFS env var
