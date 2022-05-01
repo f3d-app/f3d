@@ -40,7 +40,7 @@ public:
   std::string getAsString(const std::string& name) const;
   std::vector<int> getAsIntVector(const std::string& name) const;
   std::vector<double> getAsDoubleVector(const std::string& name) const;
-  
+
   bool& getAsBoolRef(const std::string& name);
   int& getAsIntRef(const std::string& name);
   double& getAsDoubleRef(const std::string& name);

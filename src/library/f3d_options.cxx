@@ -56,7 +56,6 @@ public:
     try
     {
       value = std::get<T>(this->Options.at(name));
-      //value = opt;
     }
     catch (const std::bad_variant_access&)
     {
