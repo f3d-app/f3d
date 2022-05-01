@@ -1,7 +1,7 @@
 #include "F3DStarter.h"
 
 #include "F3DIcon.h"
-#include "F3DOptions.h"
+#include "F3DOptionsParser.h"
 
 #include "F3DNSDelegate.h"
 #include "f3d_engine.h"

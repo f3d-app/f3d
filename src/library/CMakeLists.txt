@@ -124,7 +124,6 @@ configure_file(
 # Define libf3d target
 set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DAnimationManager.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptions.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/f3d_config.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_init.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_engine.cxx

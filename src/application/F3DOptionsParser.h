@@ -1,14 +1,11 @@
 /**
- * @class   F3DOptions
- * @brief   The class that holds and manages options
+ * @class   F3DOptionsParser
+ * @brief   A class to parse application and library options
  *
  */
 
-#ifndef F3DOptions_h
-#define F3DOptions_h
-
-// todo: remove export when this file is in app
-#include "f3d_export.h"
+#ifndef F3DOptionsParser_h
+#define F3DOptionsParser_h
 
 #include <memory>
 #include <string>
@@ -36,14 +33,14 @@ struct F3DAppOptions
 class F3DOptionsParser
 {
 public:
-  F3D_EXPORT void Initialize(int argc, char** argv);
+  void Initialize(int argc, char** argv);
 
   /**
    * Find and parse a config file, if any, into the config file dictionnary.
    * If a non-empty userConfigFile is provided, it will be considered instead
    * of standard settings config file
    */
-  F3D_EXPORT void InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
+  void InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
 
   /**
    * Parse the command line and return the options passed
@@ -53,7 +50,7 @@ public:
    * ignore config file options.
    * Returns the resulting options.
    */
-  F3D_EXPORT void GetOptionsFromCommandLine(F3DAppOptions& addOptions, f3d::options& options, std::vector<std::string>& inputs);
+  void GetOptionsFromCommandLine(F3DAppOptions& addOptions, f3d::options& options, std::vector<std::string>& inputs);
 
   /**
    * Use the config file dictionnary using the provided filepath
@@ -61,10 +58,10 @@ public:
    * Then parse the command line for any supplemental.
    * Returns the resulting options.
    */
-  F3D_EXPORT void GetOptionsFromConfigFile(const std::string& filePath, f3d::options& options);
+  void GetOptionsFromConfigFile(const std::string& filePath, f3d::options& options);
 
-  F3D_EXPORT F3DOptionsParser();
-  F3D_EXPORT ~F3DOptionsParser();
+  F3DOptionsParser();
+  ~F3DOptionsParser();
 
 private:
   F3DOptionsParser(F3DOptionsParser const&) = delete;

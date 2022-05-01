@@ -1,4 +1,4 @@
-#include "F3DOptions.h"
+#include "F3DOptionsParser.h"
 
 #include "cxxopts.hpp"
 #include "json.hpp"
@@ -177,7 +177,8 @@ void ConfigurationOptions::GetOptionsFromArgs(F3DAppOptions& appOptions, f3d::op
 {
   try
   {
-    cxxopts::Options cxxOptions(f3d::AppName, f3d::AppTitle);
+    // TODO From where ?
+    cxxopts::Options cxxOptions("F3D", "F3D");
     cxxOptions.positional_help("file1 file2 ...");
 
     // clang-format off
@@ -249,13 +250,11 @@ void ConfigurationOptions::GetOptionsFromArgs(F3DAppOptions& appOptions, f3d::op
     this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees)", options.getAsDoubleRef("camera-azimuth-angle"), true, true, "<angle>");
     this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees)", options.getAsDoubleRef("camera-elevation-angle"), true, true, "<angle>");
 
-    if (f3d::HasRaytracingModule)
-    {
-      auto grp5 = cxxOptions.add_options("Raytracing");
-      this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.getAsBoolRef("raytracing"));
-      this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.getAsIntRef("samples"), true, true, "<samples>");
-      this->DeclareOption(grp5, "denoise", "d", "Denoise the image", options.getAsBoolRef("denoise"));
-    }
+    // TODO find the right way to deal with modular options
+    auto grp5 = cxxOptions.add_options("Raytracing");
+    this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.getAsBoolRef("raytracing"));
+    this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.getAsIntRef("samples"), true, true, "<samples>");
+    this->DeclareOption(grp5, "denoise", "d", "Denoise the image", options.getAsBoolRef("denoise"));
 
     auto grp6 = cxxOptions.add_options("PostFX (OpenGL)");
     this->DeclareOption(grp6, "depth-peeling", "p", "Enable depth peeling", options.getAsBoolRef("depth-peeling"));
