@@ -41,7 +41,8 @@ target_include_directories(f3d
 
 if(F3D_STRICT_BUILD)
   if(MSVC)
-    target_compile_options(f3d PRIVATE /W4 /WX _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+    target_compile_options(f3d PRIVATE /W4 /WX)
+    target_compile_definitions(f3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
   else()
     target_compile_options(f3d PRIVATE -Wall -Wextra -Wshadow -Werror)
   endif()
