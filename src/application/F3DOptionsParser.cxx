@@ -411,7 +411,7 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
   {
     configFilePath = std::filesystem::canonical(std::filesystem::path(configFilePath)).string();
   }
-  catch (const std::filesystem::filesystem_error& ex)
+  catch (const std::filesystem::filesystem_error&)
   {
     f3d::log::error("Configuration file does not exists: ", configFilePath);
     return false;
@@ -554,7 +554,7 @@ std::string ConfigurationOptions::GetBinaryConfigFileDirectory()
     }
 #endif
   }
-  catch (const std::filesystem::filesystem_error& ex)
+  catch (const std::filesystem::filesystem_error&)
   {
     f3d::log::error("Cannot recover binary config file directory: ", dirPath.string());
     return std::string();
@@ -585,7 +585,7 @@ std::string ConfigurationOptions::GetConfigFilePath()
       }
     }
   }
-  catch (const std::filesystem::filesystem_error& ex)
+  catch (const std::filesystem::filesystem_error&)
   {
     f3d::log::error("Error recovering config file path: ", filePath.string());
     return std::string();
