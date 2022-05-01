@@ -32,7 +32,7 @@ elseif (UNIX)
 endif ()
 
 # Cannot upgrade to C++17 here, because <codecvt> header is deprecated and produces warnings on Windows
-target_compile_features(f3d PRIVATE cxx_std_14)
+target_compile_features(f3d PRIVATE cxx_std_17)
 
 target_include_directories(f3d
   PUBLIC
