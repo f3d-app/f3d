@@ -36,6 +36,11 @@ jobs:
         fetch-depth: 0
         lfs: 'false'
 
+    - name: Select GCC version
+      working-directory: ${{github.workspace}}/source
+      shell: bash
+      run: echo "CC=gcc-8" >> $GITHUB_ENV
+
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
@@ -204,6 +209,11 @@ jobs:
         fetch-depth: 0
         lfs: 'false'
 
+    - name: Select GCC version
+      working-directory: ${{github.workspace}}/source
+      shell: bash
+      run: echo "CC=gcc-8" >> $GITHUB_ENV
+
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
@@ -310,6 +320,11 @@ jobs:
         path: 'source'
         fetch-depth: 0
         lfs: 'false'
+
+    - name: Select GCC version
+      working-directory: ${{github.workspace}}/source
+      shell: bash
+      run: echo "CC=gcc-8" >> $GITHUB_ENV
 
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
