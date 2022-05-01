@@ -15,6 +15,7 @@ class F3D_EXPORT options
 public:
   options();
   ~options();
+  options& operator=(const options& opt);
 
   void set(const std::string& name, bool value);
   void set(const std::string& name, int value);
@@ -40,13 +41,17 @@ public:
   std::vector<int> getAsIntVector(const std::string& name) const;
   std::vector<double> getAsDoubleVector(const std::string& name) const;
   
-  bool& getAsBoolRef(const std::string& name) const;
+  bool& getAsBoolRef(const std::string& name);
+  int& getAsIntRef(const std::string& name);
+  double& getAsDoubleRef(const std::string& name);
+  std::string& getAsStringRef(const std::string& name);
+  std::vector<int>& getAsIntVectorRef(const std::string& name);
+  std::vector<double>& getAsDoubleVectorRef(const std::string& name);
 
 private:
   class F3DInternals;
   F3DInternals* Internals;
   options(const options& opt) = delete;
-  options& operator=(const options& opt) = delete;
 };
 }
 

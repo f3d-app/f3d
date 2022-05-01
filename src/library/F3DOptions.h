@@ -7,12 +7,11 @@
 #ifndef F3DOptions_h
 #define F3DOptions_h
 
-#include "f3d_config.h"
-
 // todo: remove export when this file is in app
 #include "f3d_export.h"
 
 #include <memory>
+#include <string>
 #include <vector>
 
 class ConfigurationOptions;
@@ -21,74 +20,17 @@ namespace f3d
 class options;
 }
 
-struct F3DOptions
+struct F3DAppOptions
 {
-  F3D_EXPORT F3DOptions();
-
-  bool Axis = false;
-  bool Bar = false;
-  bool Cells = false;
-  bool Denoise = false;
-  bool DepthPeeling = false;
-  bool DryRun = false;
-  bool Edges = false;
-  bool FPS = false;
-  bool Filename = false;
-  bool MetaData = false;
-  bool FXAA = false;
-  bool GeometryOnly = false;
-  bool Grid = false;
-  bool Progress = false;
-  bool Raytracing = false;
-  bool SSAO = false;
-  bool Verbose = false;
-  bool NoRender = false;
-  bool Quiet = false;
-  bool PointSprites = false;
-  bool FullScreen = false;
-  bool ToneMapping = false;
-  bool Volume = false;
-  bool InverseOpacityFunction = false;
-  bool NoBackground = false;
-  bool BlurBackground = false;
-  bool Trackball = false;
-  double CameraViewAngle;
-  double CameraAzimuthAngle = 0.0;
-  double CameraElevationAngle = 0.0;
-  double Metallic = 0.0;
-  double Opacity = 1.0;
-  double PointSize = 10.0;
-  double LineWidth = 1.0;
-  double RefThreshold = 50;
-  double Roughness = 0.3;
-  int Component = -1;
-  int Samples = 5;
-  std::string Up = "+Y";
-  int AnimationIndex = 0;
-  int CameraIndex = -1;
   std::string UserConfigFile = "";
+  bool DryRun = false;
   std::string Output = "";
   std::string Reference = "";
-  std::string Scalars;
   std::string InteractionTestRecordFile = "";
   std::string InteractionTestPlayFile = "";
-  std::vector<double> BackgroundColor = { 0.2, 0.2, 0.2 };
-  std::vector<double> CameraPosition;
-  std::vector<double> CameraFocalPoint;
-  std::vector<double> CameraViewUp;
-  std::vector<double> Colormap = { 0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0,
-    1.0, 1.0, 1.0 };
-  std::vector<double> Range;
-  std::vector<double> SolidColor = { 1., 1., 1. };
-  std::vector<int> Resolution = { 1000, 600 };
-  std::string HDRIFile;
-  std::string BaseColorTex;
-  std::string ORMTex;
-  std::string EmissiveTex;
-  std::vector<double> EmissiveFactor = { 1., 1., 1. };
-  std::string NormalTex;
-  double NormalScale = 1.0;
-  std::string FontFile = "";
+  bool NoBackground = false;
+  bool NoRender = false;
+  double RefThreshold = 50;
 };
 
 class F3DOptionsParser
@@ -111,7 +53,7 @@ public:
    * ignore config file options.
    * Returns the resulting options.
    */
-  F3D_EXPORT F3DOptions GetOptionsFromCommandLine(std::vector<std::string>& inputs);
+  F3D_EXPORT void GetOptionsFromCommandLine(F3DAppOptions& addOptions, f3d::options& options, std::vector<std::string>& inputs);
 
   /**
    * Use the config file dictionnary using the provided filepath
@@ -119,12 +61,10 @@ public:
    * Then parse the command line for any supplemental.
    * Returns the resulting options.
    */
-  F3D_EXPORT F3DOptions GetOptionsFromConfigFile(const std::string& filePath);
+  F3D_EXPORT void GetOptionsFromConfigFile(const std::string& filePath, f3d::options& options);
 
   F3D_EXPORT F3DOptionsParser();
   F3D_EXPORT ~F3DOptionsParser();
-
-  F3D_EXPORT static void ConvertToNewAPI(const F3DOptions& oldOptions, f3d::options* newOptions);
 
 private:
   F3DOptionsParser(F3DOptionsParser const&) = delete;

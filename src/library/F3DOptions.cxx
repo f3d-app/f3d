@@ -19,12 +19,6 @@
 #include <vector>
 
 //----------------------------------------------------------------------------
-F3DOptions::F3DOptions()
-{
-  this->Scalars = f3d::ReservedString; // XXX this should be removable at some point
-}
-
-//----------------------------------------------------------------------------
 class ConfigurationOptions
 {
 public:
@@ -34,7 +28,7 @@ public:
   {
   }
 
-  F3DOptions GetOptionsFromArgs(std::vector<std::string>& inputs);
+  void GetOptionsFromArgs(F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& inputs);
   bool InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
 
   void SetFilePathForConfigBlock(const std::string& filePath)
@@ -179,101 +173,102 @@ private:
 };
 
 //----------------------------------------------------------------------------
-F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& inputs)
+void ConfigurationOptions::GetOptionsFromArgs(F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& inputs)
 {
-  F3DOptions options;
   try
   {
     cxxopts::Options cxxOptions(f3d::AppName, f3d::AppTitle);
     cxxOptions.positional_help("file1 file2 ...");
 
     // clang-format off
-    auto grp1 = cxxOptions.add_options();
-    this->DeclareOption(grp1, "input", "", "Input file", inputs, false, false, "<files>");
-    this->DeclareOption(grp1, "output", "", "Render to file", options.Output, false, false,"<png file>");
-    this->DeclareOption(grp1, "no-background", "", "No background when render to file", options.NoBackground);
-    this->DeclareOption(grp1, "help", "h", "Print help");
-    this->DeclareOption(grp1, "version", "", "Print version details");
-    this->DeclareOption(grp1, "readers-list", "", "Print the list of file types");
-    this->DeclareOption(grp1, "verbose", "", "Enable verbose mode, providing more information about the loaded data in the console output", options.Verbose);
-    this->DeclareOption(grp1, "no-render", "", "Verbose mode without any rendering, only for the first file", options.NoRender, true, false);
-    this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which superseed any verbose options and prevent any console output to be generated at all", options.Quiet);
-    this->DeclareOption(grp1, "axis", "x", "Show axes", options.Axis);
-    this->DeclareOption(grp1, "grid", "g", "Show grid", options.Grid);
-    this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.Edges);
-    this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", options.Trackball);
-    this->DeclareOption(grp1, "progress", "", "Show progress bar", options.Progress);
-    this->DeclareOption(grp1, "up", "", "Up direction", options.Up, true, "[-X|+X|-Y|+Y|-Z|+Z]");
-    this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.AnimationIndex, true, true, "<index>");
-    this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", options.CameraIndex, true, true, "<index>");
-    this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", options.GeometryOnly);
-    this->DeclareOption(grp1, "dry-run", "", "Do not read the configuration file", options.DryRun, true, false);
-    this->DeclareOption(grp1, "config", "", "Read a provided configuration file instead of default one", options.UserConfigFile, false, false, "<file path>");
-    this->DeclareOption(grp1, "font-file", "", "Path to a FreeType compatible font file", options.FontFile, false, false, "<file_path>");
+
+    auto grp0 = cxxOptions.add_options("Applicative");
+    this->DeclareOption(grp0, "input", "", "Input file", inputs, false, false, "<files>");
+    this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, false, false,"<png file>");
+    this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground);
+    this->DeclareOption(grp0, "help", "h", "Print help");
+    this->DeclareOption(grp0, "version", "", "Print version details");
+    this->DeclareOption(grp0, "readers-list", "", "Print the list of file types");
+    this->DeclareOption(grp0, "config", "", "Read a provided configuration file instead of default one", appOptions.UserConfigFile, false, false, "<file path>");
+    this->DeclareOption(grp0, "dry-run", "", "Do not read the configuration file", appOptions.DryRun, true, false);
+    this->DeclareOption(grp0, "no-render", "", "Verbose mode without any rendering, only for the first file", appOptions.NoRender, true, false);
+
+    auto grp1 = cxxOptions.add_options("General");
+    this->DeclareOption(grp1, "verbose", "", "Enable verbose mode, providing more information about the loaded data in the console output", options.getAsBoolRef("verbose"));
+    this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which superseed any verbose options and prevent any console output to be generated at all", options.getAsBoolRef("quiet"));
+    this->DeclareOption(grp1, "progress", "", "Show progress bar", options.getAsBoolRef("progress"));
+    this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", options.getAsBoolRef("geometry-only"));
+    this->DeclareOption(grp1, "up", "", "Up direction", options.getAsStringRef("up"), true, "[-X|+X|-Y|+Y|-Z|+Z]");
+    this->DeclareOption(grp1, "axis", "x", "Show axes", options.getAsBoolRef("axis"));
+    this->DeclareOption(grp1, "grid", "g", "Show grid", options.getAsBoolRef("grid"));
+    this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.getAsBoolRef("edges"));
+    this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", options.getAsIntRef("camera-index"), true, true, "<index>");
+    this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", options.getAsBoolRef("trackball"));
+    this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.getAsIntRef("animation-index"), true, true, "<index>");
+    this->DeclareOption(grp1, "font-file", "", "Path to a FreeType compatible font file", options.getAsStringRef("font-file"), false, false, "<file_path>");
 
     auto grp2 = cxxOptions.add_options("Material");
-    this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.PointSprites);
-    this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.PointSize, true, true, "<size>");
-    this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", options.LineWidth, true, true, "<width>");
-    this->DeclareOption(grp2, "color", "", "Solid color", options.SolidColor, true, true, "<R,G,B>");
-    this->DeclareOption(grp2, "opacity", "", "Opacity", options.Opacity, true, true, "<opacity>");
-    this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.Roughness, true, true, "<roughness>");
-    this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.Metallic, true, true, "<metallic>");
-    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.HDRIFile, false, true, "<file path>");
-    this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.BaseColorTex, false, true, "<file path>");
-    this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.ORMTex, false, true, "<file path>");
-    this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emitted light of the object", options.EmissiveTex, false, true, "<file path>");
-    this->DeclareOption(grp2, "emissive-factor", "", "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present", options.EmissiveFactor, true, true, "<R,G,B>");
-    this->DeclareOption(grp2, "texture-normal", "", "Path to a texture file that sets the normal map of the object", options.NormalTex, false, true, "<file path>");
-    this->DeclareOption(grp2, "normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", options.NormalScale, true, true, "<normalScale>");
+    this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.getAsBoolRef("point-sprites"));
+    this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.getAsDoubleRef("point-size"), true, true, "<size>");
+    this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", options.getAsDoubleRef("line-width"), true, true, "<width>");
+    this->DeclareOption(grp2, "color", "", "Solid color", options.getAsDoubleVectorRef("color"), true, true, "<R,G,B>");
+    this->DeclareOption(grp2, "opacity", "", "Opacity", options.getAsDoubleRef("opacity"), true, true, "<opacity>");
+    this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.getAsDoubleRef("roughness"), true, true, "<roughness>");
+    this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.getAsDoubleRef("metallic"), true, true, "<metallic>");
+    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.getAsStringRef("hdri"), false, true, "<file path>");
+    this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.getAsStringRef("texture-base-color"), false, true, "<file path>");
+    this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.getAsStringRef("texture-material"), false, true, "<file path>");
+    this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emitted light of the object", options.getAsStringRef("texture-emissive"), false, true, "<file path>");
+    this->DeclareOption(grp2, "emissive-factor", "", "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present", options.getAsDoubleVectorRef("emissive-factor"), true, true, "<R,G,B>");
+    this->DeclareOption(grp2, "texture-normal", "", "Path to a texture file that sets the normal map of the object", options.getAsStringRef("texture-normal"), false, true, "<file path>");
+    this->DeclareOption(grp2, "normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", options.getAsDoubleRef("normal-scale"), true, true, "<normalScale>");
 
     auto grp3 = cxxOptions.add_options("Window");
-    this->DeclareOption(grp3, "bg-color", "", "Background color", options.BackgroundColor, true, true, "<R,G,B>");
-    this->DeclareOption(grp3, "resolution", "", "Window resolution", options.Resolution, true, true, "<width,height>");
-    this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.FPS);
-    this->DeclareOption(grp3, "filename", "n", "Display filename", options.Filename);
-    this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.MetaData);
-    this->DeclareOption(grp3, "fullscreen", "f", "Full screen", options.FullScreen);
-    this->DeclareOption(grp3, "blur-background", "u", "Blur background", options.BlurBackground);
+    this->DeclareOption(grp3, "bg-color", "", "Background color", options.getAsDoubleVectorRef("background-color"), true, true, "<R,G,B>"); // TODO change name ?
+    this->DeclareOption(grp3, "resolution", "", "Window resolution", options.getAsIntVectorRef("resolution"), true, true, "<width,height>");
+    this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.getAsBoolRef("fps"));
+    this->DeclareOption(grp3, "filename", "n", "Display filename", options.getAsBoolRef("filename"));
+    this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.getAsBoolRef("metadata"));
+    this->DeclareOption(grp3, "fullscreen", "f", "Full screen", options.getAsBoolRef("fullscreen"));
+    this->DeclareOption(grp3, "blur-background", "u", "Blur background", options.getAsBoolRef("blur-background"));
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
-    this->DeclareOptionWithImplicitValue(grp4, "scalars", "s", "Color by scalars", options.Scalars, std::string(""), true, true, "<array_name>");
-    this->DeclareOptionWithImplicitValue(grp4, "comp", "y", "Component from the scalar array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", options.Component, "-2", true, true, "<comp_index>");
-    this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.Cells);
-    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.Range, false, true, "<min,max>");
-    this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.Bar);
-    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.Colormap,
-      true, "<color_list>");
-    this->DeclareOption(grp4, "volume", "v", "Show volume if the file is compatible", options.Volume);
-    this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.InverseOpacityFunction);
+    this->DeclareOptionWithImplicitValue(grp4, "scalars", "s", "Color by scalars", options.getAsStringRef("scalars"), std::string(""), true, true, "<array_name>");
+    this->DeclareOptionWithImplicitValue(grp4, "comp", "y", "Component from the scalar array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", options.getAsIntRef("component"), "-2", true, true, "<comp_index>");
+    this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.getAsBoolRef("cells"));
+    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.getAsDoubleVectorRef("range"), false, true, "<min,max>");
+    this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.getAsBoolRef("bar"));
+    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.getAsDoubleVectorRef("colormap"), true, "<color_list>");
+    this->DeclareOption(grp4, "volume", "v", "Show volume if the file is compatible", options.getAsBoolRef("volume"));
+    this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.getAsBoolRef("inverse"));
 
     auto grpCamera = cxxOptions.add_options("Camera");
-    this->DeclareOption(grpCamera, "camera-position", "", "Camera position", options.CameraPosition, false, true, "<X,Y,Z>");
-    this->DeclareOption(grpCamera, "camera-focal-point", "", "Camera focal point", options.CameraFocalPoint, false, true, "<X,Y,Z>");
-    this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", options.CameraViewUp, false, true, "<X,Y,Z>");
-    this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degrees)", options.CameraViewAngle, false, true, "<angle>");
-    this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees)", options.CameraAzimuthAngle, true, true, "<angle>");
-    this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees)", options.CameraElevationAngle, true, true, "<angle>");
+    this->DeclareOption(grpCamera, "camera-position", "", "Camera position", options.getAsDoubleVectorRef("camera-position"), false, true, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-focal-point", "", "Camera focal point", options.getAsDoubleVectorRef("camera-focal-point"), false, true, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", options.getAsDoubleVectorRef("camera-view-up"), false, true, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degrees)", options.getAsDoubleRef("camera-view-angle"), false, true, "<angle>");
+    this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees)", options.getAsDoubleRef("camera-azimuth-angle"), true, true, "<angle>");
+    this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees)", options.getAsDoubleRef("camera-elevation-angle"), true, true, "<angle>");
 
     if (f3d::HasRaytracingModule)
     {
       auto grp5 = cxxOptions.add_options("Raytracing");
-      this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.Raytracing);
-      this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.Samples, true, true, "<samples>");
-      this->DeclareOption(grp5, "denoise", "d", "Denoise the image", options.Denoise);
+      this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.getAsBoolRef("raytracing"));
+      this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.getAsIntRef("samples"), true, true, "<samples>");
+      this->DeclareOption(grp5, "denoise", "d", "Denoise the image", options.getAsBoolRef("denoise"));
     }
 
     auto grp6 = cxxOptions.add_options("PostFX (OpenGL)");
-    this->DeclareOption(grp6, "depth-peeling", "p", "Enable depth peeling", options.DepthPeeling);
-    this->DeclareOption(grp6, "ssao", "q", "Enable Screen-Space Ambient Occlusion", options.SSAO);
-    this->DeclareOption(grp6, "fxaa", "a", "Enable Fast Approximate Anti-Aliasing", options.FXAA);
-    this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping", options.ToneMapping);
-
+    this->DeclareOption(grp6, "depth-peeling", "p", "Enable depth peeling", options.getAsBoolRef("depth-peeling"));
+    this->DeclareOption(grp6, "ssao", "q", "Enable Screen-Space Ambient Occlusion", options.getAsBoolRef("ssao"));
+    this->DeclareOption(grp6, "fxaa", "a", "Enable Fast Approximate Anti-Aliasing", options.getAsBoolRef("fxaa"));
+    this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping", options.getAsBoolRef("tone-mapping"));
+    
     auto grp7 = cxxOptions.add_options("Testing");
-    this->DeclareOption(grp7, "ref", "", "Reference", options.Reference, false, false, "<png file>");
-    this->DeclareOption(grp7, "ref-threshold", "", "Testing threshold", options.RefThreshold, true, false, "<threshold>");
-    this->DeclareOption(grp7, "interaction-test-record", "", "Path to an interaction log file to record interactions events to", options.InteractionTestRecordFile, false, false, "<file_path>");
-    this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", options.InteractionTestPlayFile, false, false,"<file_path>");
+    this->DeclareOption(grp7, "ref", "", "Reference", appOptions.Reference, false, false, "<png file>");
+    this->DeclareOption(grp7, "ref-threshold", "", "Testing threshold", appOptions.RefThreshold, true, false, "<threshold>");
+    this->DeclareOption(grp7, "interaction-test-record", "", "Path to an interaction log file to record interactions events to", appOptions.InteractionTestRecordFile, false, false, "<file_path>");
+    this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", appOptions.InteractionTestPlayFile, false, false,"<file_path>");
     // clang-format on
 
     cxxOptions.parse_positional({ "input" });
@@ -303,7 +298,6 @@ F3DOptions ConfigurationOptions::GetOptionsFromArgs(std::vector<std::string>& in
     f3d::log::error("Error parsing options: ", e.what());
     throw;
   }
-  return options;
 }
 
 //----------------------------------------------------------------------------
@@ -600,20 +594,23 @@ void F3DOptionsParser::InitializeDictionaryFromConfigFile(const std::string& use
 }
 
 //----------------------------------------------------------------------------
-F3DOptions F3DOptionsParser::GetOptionsFromConfigFile(const std::string& filePath)
+void F3DOptionsParser::GetOptionsFromConfigFile(const std::string& filePath, f3d::options& options)
 {
   this->ConfigOptions->SetFilePathForConfigBlock(filePath);
-  std::vector<std::string> dummy;
-  return this->ConfigOptions->GetOptionsFromArgs(dummy);
+  std::vector<std::string> dummyFiles;
+  F3DAppOptions dummyAppOptions;
+  return this->ConfigOptions->GetOptionsFromArgs(dummyAppOptions, options, dummyFiles);
 }
 
 //----------------------------------------------------------------------------
-F3DOptions F3DOptionsParser::GetOptionsFromCommandLine(std::vector<std::string>& files)
+void F3DOptionsParser::GetOptionsFromCommandLine(F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& files)
 {
   this->ConfigOptions->SetFilePathForConfigBlock("");
-  return this->ConfigOptions->GetOptionsFromArgs(files);
+  return this->ConfigOptions->GetOptionsFromArgs(appOptions, options, files);
 }
 
+// TODO Remove
+#if 0
 //----------------------------------------------------------------------------
 void F3DOptionsParser::ConvertToNewAPI(const F3DOptions& oldOptions, f3d::options* newOptions)
 {
@@ -693,3 +690,4 @@ void F3DOptionsParser::ConvertToNewAPI(const F3DOptions& oldOptions, f3d::option
   newOptions->set("trackball", oldOptions.Trackball);
   newOptions->set("volume", oldOptions.Volume);
 }
+#endif
