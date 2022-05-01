@@ -1,6 +1,7 @@
 #include "F3DOptions.h"
 
 #include "cxxopts.hpp"
+#include "json.hpp"
 
 #include "F3DException.h"
 #include "f3d_config.h"
@@ -8,7 +9,6 @@
 #include "f3d_log.h"
 #include "f3d_options.h"
 
-#include <vtk_jsoncpp.h>
 #include <vtksys/SystemTools.hxx>
 
 #include <fstream>
@@ -17,6 +17,12 @@
 #include <sstream>
 #include <utility>
 #include <vector>
+
+//----------------------------------------------------------------------------
+F3DOptions::F3DOptions()
+{
+  this->Scalars = f3d::ReservedString; // XXX this should be removable at some point
+}
 
 //----------------------------------------------------------------------------
 class ConfigurationOptions
@@ -416,29 +422,39 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
     return false;
   }
 
-  Json::Value root;
-  Json::CharReaderBuilder builder;
-  builder["collectComments"] = false;
-  std::string errs;
-  std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
-  bool success = Json::parseFromStream(builder, file, &root, &errs);
-  if (!success)
+  nlohmann::json j;
+
+  try
+  {
+    file >> j;
+  }
+  catch (const std::exception& ex)
   {
     f3d::log::error("Unable to parse the configuration file ", configFilePath);
-    f3d::log::error(errs);
+    f3d::log::error(ex.what());
     return false;
   }
 
-  for (auto const& id : root.getMemberNames())
+  for (const auto& regexpConfig : j.items())
   {
-    const Json::Value node = root[id];
     std::map<std::string, std::string> localDic;
-    for (auto const& nl : node.getMemberNames())
+    for (const auto& prop : regexpConfig.value().items())
     {
-      const Json::Value v = node[nl];
-      localDic[nl] = v.asString();
+      if (prop.value().is_number() || prop.value().is_boolean())
+      {
+        localDic[prop.key()] = ToString(prop.value());
+      }
+      else if (prop.value().is_string())
+      {
+        localDic[prop.key()] = prop.value().get<std::string>();
+      }
+      else
+      {
+        f3d::log::error(prop.key(), " must be a string, a boolean or a number");
+        return false;
+      }
     }
-    this->ConfigDic[id] = localDic;
+    this->ConfigDic[regexpConfig.key()] = localDic;
   }
 
   return true;

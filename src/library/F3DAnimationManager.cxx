@@ -4,15 +4,10 @@
 #include "f3d_log.h"
 #include "f3d_options.h"
 #include "f3d_window.h"
-#include "vtkF3DRenderer.h"
 
-#include <vtkCallbackCommand.h>
 #include <vtkDoubleArray.h>
 #include <vtkImporter.h>
 #include <vtkProgressBarRepresentation.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 
 #include <functional>

@@ -6,7 +6,7 @@ vtk_module_scan(
   WANT_BY_DEFAULT   ON
   ENABLE_TESTS      ${BUILD_TESTING})
 
-vtk_module_build(MODULES ${modules})
+vtk_module_build(MODULES ${modules} INSTALL_HEADERS OFF)
 
 foreach (module IN LISTS modules)
   if(NOT "${libf3d_compile_options_public}" STREQUAL "")

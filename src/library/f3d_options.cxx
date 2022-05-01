@@ -157,20 +157,6 @@ options::~options()
 }
 
 //----------------------------------------------------------------------------
-options::options(const options& opt)
-  : Internals(new options::F3DInternals)
-{
-  this->Internals->Options = opt.Internals->Options;
-}
-
-//----------------------------------------------------------------------------
-options& options::operator=(const options& opt)
-{
-  this->Internals->Options = opt.Internals->Options;
-  return *this;
-}
-
-//----------------------------------------------------------------------------
 void options::set(const std::string& name, bool value)
 {
   this->Internals->set(name, value);

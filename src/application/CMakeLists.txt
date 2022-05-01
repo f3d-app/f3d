@@ -1,10 +1,27 @@
-set(EXEC_PLATFORM_SPECIFIC_FILES "")
+# Generate F3DIcon buffer
+include("${CMAKE_SOURCE_DIR}/cmake/f3dEmbed.cmake")
+
+f3d_embed_file(
+  INPUT "${CMAKE_SOURCE_DIR}/resources/logo32.png"
+  NAME F3DIcon
+  BINARY)
+
+set(F3D_SOURCE_FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/main.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DStarter.cxx
+)
+
 if(WIN32)
-  set(EXEC_PLATFORM_SPECIFIC_FILES "${CMAKE_SOURCE_DIR}/resources/f3d.rc")
+  list(APPEND F3D_SOURCE_FILES "${CMAKE_SOURCE_DIR}/resources/f3d.rc")
+endif()
+
+if(APPLE)
+  list(APPEND F3D_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm")
 endif()
 
 # Define f3d target
-add_executable(f3d main.cxx ${EXEC_PLATFORM_SPECIFIC_FILES})
+add_executable(f3d ${F3D_SOURCE_FILES})
 target_link_libraries(f3d PUBLIC libf3d)
 set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 if (APPLE)
@@ -13,7 +30,13 @@ elseif (UNIX)
   set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../lib)
 endif ()
 
-target_compile_features(f3d PRIVATE cxx_std_11)
+# Cannot upgrade to C++17 here, because <codecvt> header is deprecated and produces warnings on Windows
+target_compile_features(f3d PRIVATE cxx_std_14)
+
+target_include_directories(f3d
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  )
 
 if(F3D_STRICT_BUILD)
   if(MSVC)
