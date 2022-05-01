@@ -55,8 +55,8 @@ public:
   {
     try
     {
-      const T& opt = std::get<T>(this->Options.at(name));
-      value = opt;
+      value = std::get<T>(this->Options.at(name));
+      //value = opt;
     }
     catch (const std::bad_variant_access&)
     {
@@ -76,6 +76,13 @@ public:
     T val = {};
     this->get(name, val);
     return val;
+  }
+
+  template<typename T>
+  T& getRef(const std::string& name)
+  {
+    // TODO exceptions
+    return std::get<T>(this->Options.at(name));
   }
 
   std::map<std::string, OptionVariant> Options;
@@ -250,6 +257,12 @@ void options::get(const std::string& name, std::vector<double>& value) const
 bool options::getAsBool(const std::string& name) const
 {
   return this->Internals->get<bool>(name);
+}
+
+//----------------------------------------------------------------------------
+bool& options::getAsBoolRef(const std::string& name) const
+{
+  return this->Internals->getRef<bool>(name);
 }
 
 //----------------------------------------------------------------------------

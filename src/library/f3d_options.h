@@ -39,6 +39,8 @@ public:
   std::string getAsString(const std::string& name) const;
   std::vector<int> getAsIntVector(const std::string& name) const;
   std::vector<double> getAsDoubleVector(const std::string& name) const;
+  
+  bool& getAsBoolRef(const std::string& name) const;
 
 private:
   class F3DInternals;

@@ -32,6 +32,12 @@ engine::engine(const flags_t& flags)
 {
   this->Internals->Options = std::make_unique<options>();
 
+  bool& val = this->Internals->Options->getAsBoolRef(std::string("quiet"));
+  std::cout<<val<<std::endl;
+  val = true;
+  std::cout<<val<<std::endl;
+  std::cout<<this->Internals->Options->getAsBool(std::string("quiet"))<<std::endl;
+
   if (flags & CREATE_WINDOW)
   {
     this->Internals->Window =
