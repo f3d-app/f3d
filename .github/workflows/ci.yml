@@ -36,13 +36,6 @@ jobs:
         fetch-depth: 0
         lfs: 'false'
 
-    - name: Set up GCC
-      if: matrix.os == 'ubuntu-latest'
-      uses: egor-tensin/setup-gcc@v1
-      with:
-        version: 8
-        platform: x64
-
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
@@ -211,13 +204,6 @@ jobs:
         fetch-depth: 0
         lfs: 'false'
 
-    - name: Set up GCC
-      if: matrix.os == 'ubuntu-latest'
-      uses: egor-tensin/setup-gcc@v1
-      with:
-        version: 8
-        platform: x64
-
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
@@ -325,12 +311,10 @@ jobs:
         fetch-depth: 0
         lfs: 'false'
 
-    - name: Set up GCC
-      if: matrix.os == 'ubuntu-latest'
-      uses: egor-tensin/setup-gcc@v1
-      with:
-        version: 8
-        platform: x64
+    - name: gcc
+      run: |
+        gcc-8 --version
+      shell: bash
 
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
