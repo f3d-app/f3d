@@ -42,7 +42,8 @@ int F3DStarter::Start(int argc, char** argv)
   std::vector<std::string> files;
   this->Internals->Parser.Initialize(argc, argv);
   f3d::options commandLineOptions;
-  this->Internals->Parser.GetOptionsFromCommandLine(this->Internals->AppOptions, commandLineOptions, files);
+  this->Internals->Parser.GetOptionsFromCommandLine(
+    this->Internals->AppOptions, commandLineOptions, files);
 
   // Respect quiet option
   f3d::log::setQuiet(commandLineOptions.getAsBool("quiet"));
@@ -63,8 +64,8 @@ int F3DStarter::Start(int argc, char** argv)
   else
   {
     // TODO Test this multiconfig behavior
-    bool offscreen = !this->Internals->AppOptions.Reference.empty() ||
-      !this->Internals->AppOptions.Output.empty();
+    bool offscreen =
+      !this->Internals->AppOptions.Reference.empty() || !this->Internals->AppOptions.Output.empty();
 
     f3d::engine::flags_t flags = f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR |
       (offscreen ? f3d::engine::WINDOW_OFFSCREEN : f3d::engine::FLAGS_NONE);
@@ -134,8 +135,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Start recording if needed
     if (!this->Internals->AppOptions.InteractionTestRecordFile.empty())
     {
-      if (!interactor.recordInteraction(
-            this->Internals->AppOptions.InteractionTestRecordFile))
+      if (!interactor.recordInteraction(this->Internals->AppOptions.InteractionTestRecordFile))
       {
         return EXIT_FAILURE;
       }
@@ -151,10 +151,8 @@ int F3DStarter::Start(int argc, char** argv)
       }
 
       if (!this->Internals->Engine->getWindow().renderAndCompareWithFile(
-            this->Internals->AppOptions.Reference,
-            this->Internals->AppOptions.RefThreshold,
-            this->Internals->AppOptions.NoBackground,
-            this->Internals->AppOptions.Output))
+            this->Internals->AppOptions.Reference, this->Internals->AppOptions.RefThreshold,
+            this->Internals->AppOptions.NoBackground, this->Internals->AppOptions.Output))
       {
         return EXIT_FAILURE;
       }
@@ -169,8 +167,7 @@ int F3DStarter::Start(int argc, char** argv)
       }
 
       if (!this->Internals->Engine->getWindow().renderToFile(
-            this->Internals->AppOptions.Output,
-            this->Internals->AppOptions.NoBackground))
+            this->Internals->AppOptions.Output, this->Internals->AppOptions.NoBackground))
       {
         return EXIT_FAILURE;
       }

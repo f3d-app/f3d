@@ -50,7 +50,8 @@ public:
    * ignore config file options.
    * Returns the resulting options.
    */
-  void GetOptionsFromCommandLine(F3DAppOptions& addOptions, f3d::options& options, std::vector<std::string>& inputs);
+  void GetOptionsFromCommandLine(
+    F3DAppOptions& addOptions, f3d::options& options, std::vector<std::string>& inputs);
 
   /**
    * Use the config file dictionnary using the provided filepath

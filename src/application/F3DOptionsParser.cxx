@@ -10,8 +10,8 @@
 #include "f3d_options.h"
 
 #include <cstdlib>
-#include <fstream>
 #include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <regex>
 #include <sstream>
@@ -28,7 +28,8 @@ public:
   {
   }
 
-  void GetOptionsFromArgs(F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& inputs);
+  void GetOptionsFromArgs(
+    F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& inputs);
   bool InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
 
   void SetFilePathForConfigBlock(const std::string& filePath)
@@ -173,7 +174,8 @@ private:
 };
 
 //----------------------------------------------------------------------------
-void ConfigurationOptions::GetOptionsFromArgs(F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& inputs)
+void ConfigurationOptions::GetOptionsFromArgs(
+  F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& inputs)
 {
   try
   {
@@ -538,9 +540,12 @@ std::string ConfigurationOptions::GetBinaryConfigFileDirectory()
   try
   {
     // TODO may not work on windows ?
-    dirPath = std::filesystem::canonical(std::filesystem::path(this->Argv[0])).parent_path().parent_path().string();
+    dirPath = std::filesystem::canonical(std::filesystem::path(this->Argv[0]))
+                .parent_path()
+                .parent_path()
+                .string();
 #if F3D_MACOS_BUNDLE
-    for (auto const& dirEntry : std::filesystem::directory_iterator{dirPath})
+    for (auto const& dirEntry : std::filesystem::directory_iterator{ dirPath })
     {
       if (dirEntry.path().filename() == "Resources")
       {
@@ -571,7 +576,8 @@ std::string ConfigurationOptions::GetConfigFilePath()
       filePath = std::filesystem::path(this->GetBinaryConfigFileDirectory() + fileName);
       if (!std::filesystem::exists(filePath))
       {
-        filePath = std::filesystem::path(ConfigurationOptions::GetSystemConfigFileDirectory() + fileName);
+        filePath =
+          std::filesystem::path(ConfigurationOptions::GetSystemConfigFileDirectory() + fileName);
         if (!std::filesystem::exists(filePath))
         {
           return std::string();
@@ -616,7 +622,8 @@ void F3DOptionsParser::GetOptionsFromConfigFile(const std::string& filePath, f3d
 }
 
 //----------------------------------------------------------------------------
-void F3DOptionsParser::GetOptionsFromCommandLine(F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& files)
+void F3DOptionsParser::GetOptionsFromCommandLine(
+  F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& files)
 {
   this->ConfigOptions->SetFilePathForConfigBlock("");
   return this->ConfigOptions->GetOptionsFromArgs(appOptions, options, files);
