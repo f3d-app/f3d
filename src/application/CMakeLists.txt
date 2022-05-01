@@ -24,6 +24,11 @@ endif()
 # Define f3d target
 add_executable(f3d ${F3D_SOURCE_FILES})
 target_link_libraries(f3d PUBLIC libf3d)
+
+if (UNIX)
+  target_link_libraries(f3d PRIVATE stdc++fs)
+endif ()
+
 set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 if (APPLE)
   set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../lib)

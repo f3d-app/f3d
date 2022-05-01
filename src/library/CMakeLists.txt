@@ -193,7 +193,7 @@ if(F3D_STRICT_BUILD)
   endif()
 endif()
 
-target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES} stdc++fs)
+target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES})
 target_compile_options(libf3d PUBLIC ${libf3d_compile_options_public} PRIVATE ${libf3d_compile_options_private})
 target_link_options(libf3d PUBLIC ${libf3d_link_options_public})
 
