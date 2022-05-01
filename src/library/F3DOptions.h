@@ -9,6 +9,9 @@
 
 #include "f3d_config.h"
 
+// todo: remove export when this file is in app
+#include "f3d_export.h"
+
 #include <memory>
 #include <vector>
 
@@ -20,6 +23,8 @@ class options;
 
 struct F3DOptions
 {
+  F3D_EXPORT F3DOptions();
+
   bool Axis = false;
   bool Bar = false;
   bool Cells = false;
@@ -64,7 +69,7 @@ struct F3DOptions
   std::string UserConfigFile = "";
   std::string Output = "";
   std::string Reference = "";
-  std::string Scalars = f3d::ReservedString; // XXX this should be removable at some point
+  std::string Scalars;
   std::string InteractionTestRecordFile = "";
   std::string InteractionTestPlayFile = "";
   std::vector<double> BackgroundColor = { 0.2, 0.2, 0.2 };
@@ -89,14 +94,14 @@ struct F3DOptions
 class F3DOptionsParser
 {
 public:
-  void Initialize(int argc, char** argv);
+  F3D_EXPORT void Initialize(int argc, char** argv);
 
   /**
    * Find and parse a config file, if any, into the config file dictionnary.
    * If a non-empty userConfigFile is provided, it will be considered instead
    * of standard settings config file
    */
-  void InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
+  F3D_EXPORT void InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
 
   /**
    * Parse the command line and return the options passed
@@ -106,7 +111,7 @@ public:
    * ignore config file options.
    * Returns the resulting options.
    */
-  F3DOptions GetOptionsFromCommandLine(std::vector<std::string>& inputs);
+  F3D_EXPORT F3DOptions GetOptionsFromCommandLine(std::vector<std::string>& inputs);
 
   /**
    * Use the config file dictionnary using the provided filepath
@@ -114,12 +119,12 @@ public:
    * Then parse the command line for any supplemental.
    * Returns the resulting options.
    */
-  F3DOptions GetOptionsFromConfigFile(const std::string& filePath);
+  F3D_EXPORT F3DOptions GetOptionsFromConfigFile(const std::string& filePath);
 
-  F3DOptionsParser();
-  ~F3DOptionsParser();
+  F3D_EXPORT F3DOptionsParser();
+  F3D_EXPORT ~F3DOptionsParser();
 
-  static void ConvertToNewAPI(const F3DOptions& oldOptions, f3d::options* newOptions);
+  F3D_EXPORT static void ConvertToNewAPI(const F3DOptions& oldOptions, f3d::options* newOptions);
 
 private:
   F3DOptionsParser(F3DOptionsParser const&) = delete;

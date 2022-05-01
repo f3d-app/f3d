@@ -1,9 +1,3 @@
-# Generate F3DIcon buffer
-vtk_encode_string(
-  INPUT "${CMAKE_SOURCE_DIR}/resources/logo32.png"
-  NAME F3DIcon
-  BINARY)
-
 # Define VTK modules to link libf3d with
 # Note that readers/importers specific modules
 # should be listed here as reader instanciation is header only
@@ -130,9 +124,7 @@ configure_file(
 # Define libf3d target
 set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DAnimationManager.cxx
-  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptions.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/F3DStarter.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/f3d_config.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_init.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_engine.cxx
@@ -144,10 +136,6 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window_impl_standard.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_window_impl_noRender.cxx
   )
-
-if(APPLE)
-  list(APPEND F3D_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm")
-endif()
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
