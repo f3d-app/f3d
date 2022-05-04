@@ -269,7 +269,7 @@ jobs:
     - name: Generate XML Coverage
       working-directory: ${{github.workspace}}/source
       run: |
-        lcov --base-directory . --directory . -c -o coverage.info
+        lcov --base-directory . --directory . -c -o coverage.info --gcov-tool /usr/bin/gcov-8
         lcov --remove coverage.info "*/dependencies/*" -o coverage.info
         lcov --remove coverage.info "*/cxxopts.hpp" -o coverage.info
         lcov --remove coverage.info "*/json.hpp" -o coverage.info
