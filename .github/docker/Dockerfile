@@ -17,6 +17,7 @@ RUN apt update && apt install -y \
     libx11-dev \
     libxt-dev \
     openssh-client \
+    python3-dev \
     software-properties-common \
     wget \
     xvfb
