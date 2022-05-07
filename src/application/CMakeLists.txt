@@ -25,7 +25,7 @@ endif()
 add_executable(f3d ${F3D_SOURCE_FILES})
 target_link_libraries(f3d PUBLIC libf3d)
 
-if (UNIX AND NOT APPLE)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   target_link_libraries(f3d PRIVATE stdc++fs)
 endif ()
 

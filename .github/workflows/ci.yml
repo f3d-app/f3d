@@ -311,11 +311,6 @@ jobs:
         fetch-depth: 0
         lfs: 'false'
 
-    - name: gcc
-      run: |
-        gcc --version
-      shell: bash
-
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
