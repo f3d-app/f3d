@@ -18,7 +18,6 @@
 #include <utility>
 #include <vector>
 
-#include "F3DExecPath.h"
 //----------------------------------------------------------------------------
 class ConfigurationOptions
 {
