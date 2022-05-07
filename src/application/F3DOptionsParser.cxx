@@ -535,15 +535,34 @@ std::string ConfigurationOptions::GetSystemConfigFileDirectory()
 //----------------------------------------------------------------------------
 std::string ConfigurationOptions::GetBinaryConfigFileDirectory()
 {
+  std::string execPath;
   std::filesystem::path dirPath;
   std::string errorMsg, programFilePath;
   try
   {
-    // TODO may not work on windows ?
-    dirPath = std::filesystem::canonical(std::filesystem::path(this->Argv[0]))
-                .parent_path()
-                .parent_path()
-                .string();
+    execPath = std::to_string(this->Argv[0]);
+
+#ifdef _WIN32
+    if (execPath.empty())
+    {
+      WCHAR winPath[MAX_PATH];
+      GetModuleFileNameW(NULL, winPath, MAX_PATH);
+
+      //convert from wide char to narrow char array
+      char ch[MAX_PATH];
+      char DefChar = ' ';
+      WideCharToMultiByte(CP_ACP, 0, wc, -1, ch, MAX_PATH, &DefChar, nullptr);
+
+      //A std:string  using the char* constructor.
+      execPath = std::to_string(ch);
+    }
+#endif
+
+    dirPath = std::filesystem::canonical(std::filesystem::path(execPath))
+      .parent_path()
+      .parent_path()
+      .string();
+
 #if F3D_MACOS_BUNDLE
     for (auto const& dirEntry : std::filesystem::directory_iterator{ dirPath })
     {
