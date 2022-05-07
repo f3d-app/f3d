@@ -541,8 +541,7 @@ std::string ConfigurationOptions::GetBinaryConfigFileDirectory()
   std::string errorMsg, programFilePath;
   try
   {
-    execPath = F3DExecPath::getExecPath(this->Argv[0]);
-    dirPath = std::filesystem::canonical(std::filesystem::path(execPath))
+    dirPath = std::filesystem::canonical(std::filesystem::path(this->Argv[0]))
       .parent_path()
       .parent_path()
       .string();
@@ -563,6 +562,7 @@ std::string ConfigurationOptions::GetBinaryConfigFileDirectory()
     return std::string();
   }
 
+  // Add last separator that may be missing
   dirPath += "/";
   return dirPath.string();
 }
