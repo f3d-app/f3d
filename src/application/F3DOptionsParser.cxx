@@ -541,9 +541,9 @@ std::string ConfigurationOptions::GetBinaryConfigFileDirectory()
   try
   {
     dirPath = std::filesystem::canonical(std::filesystem::path(this->Argv[0]))
-      .parent_path()
-      .parent_path()
-      .string();
+                .parent_path()
+                .parent_path()
+                .string();
 
 #if F3D_MACOS_BUNDLE
     for (auto const& dirEntry : std::filesystem::directory_iterator{ dirPath })
