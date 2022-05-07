@@ -18,6 +18,7 @@
 #include <utility>
 #include <vector>
 
+#include "F3DExecPath.h"
 //----------------------------------------------------------------------------
 class ConfigurationOptions
 {
@@ -540,24 +541,7 @@ std::string ConfigurationOptions::GetBinaryConfigFileDirectory()
   std::string errorMsg, programFilePath;
   try
   {
-    execPath = std::to_string(this->Argv[0]);
-
-#ifdef _WIN32
-    if (execPath.empty())
-    {
-      WCHAR winPath[MAX_PATH];
-      GetModuleFileNameW(NULL, winPath, MAX_PATH);
-
-      //convert from wide char to narrow char array
-      char ch[MAX_PATH];
-      char DefChar = ' ';
-      WideCharToMultiByte(CP_ACP, 0, wc, -1, ch, MAX_PATH, &DefChar, nullptr);
-
-      //A std:string  using the char* constructor.
-      execPath = std::to_string(ch);
-    }
-#endif
-
+    execPath = F3DExecPath::getExecPath(this->Argv[0]);
     dirPath = std::filesystem::canonical(std::filesystem::path(execPath))
       .parent_path()
       .parent_path()
