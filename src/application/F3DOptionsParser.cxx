@@ -563,6 +563,7 @@ std::string ConfigurationOptions::GetBinaryConfigFileDirectory()
     return std::string();
   }
 
+  dirPath += "/";
   return dirPath.string();
 }
 
