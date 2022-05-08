@@ -27,6 +27,18 @@ protected:
   static void ProcessEvents(
     vtkObject* object, unsigned long event, void* clientdata, void* calldata);
 
+  /**
+   * A method that write an event to log file, with a trailing 0
+   */
+  virtual void WriteEvent(
+    const char* event, int pos[2], int modifiers, int keyCode, int repeatCount, char* keySym);
+
+  /**
+   * A method that parse a event line and invoke the corresponding event
+   * support reading a serialized vtkStringArray 
+   */
+  virtual void ReadEvent(std::string line);
+
 private:
   vtkF3DInteractorEventRecorder(const vtkF3DInteractorEventRecorder&) = delete;
   void operator=(const vtkF3DInteractorEventRecorder&) = delete;
