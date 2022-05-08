@@ -103,6 +103,7 @@ int F3DStarter::Start(int argc, char** argv)
           this->AddFile(file);
         }
         this->LoadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
+        this->Internals->Engine->getWindow().render();
         return true;
       });
     this->Internals->Engine->getWindow().setWindowName(f3d::engine::getAppTitle());
