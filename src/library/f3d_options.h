@@ -3,9 +3,9 @@
 
 #include "f3d_export.h"
 
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <stdexcept>
 
 // TODO documentation
 
@@ -22,7 +22,10 @@ public:
   class options_exception : public std::runtime_error
   {
   public:
-    options_exception(const std::string& what = "") : std::runtime_error(what) {}
+    options_exception(const std::string& what = "")
+      : std::runtime_error(what)
+    {
+    }
   };
 
   void set(const std::string& name, bool value);
