@@ -163,18 +163,19 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestGLTFImporterUnlit DATA UnlitTest.glb)
   f3d_test(NAME TestMaterial DATA suzanne.ply ARGS --color=0.72,0.45,0.2 --metallic=1 --roughness=0.1)
   f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m)
-  f3d_test(NAME TestInteractionAnimation DATA InterpolationTest.glb ARGS --animation-index=-1 INTERACTION)#Space;Space;
-  f3d_test(NAME TestInteractionAnimationMovement DATA KameraAnim.glb ARGS --camera-index=1 INTERACTION)#Space;MouseMovement;Space;
   f3d_test(NAME TestHDRI8Bit DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/logo.tif HDRI)
   f3d_test(NAME TestHDRIOrient DATA suzanne.stl ARGS --up=+Z --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI)
   f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply ARGS -t --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI)
-  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI INTERACTION) #Shift+MouseRight;
-  # Test exit hotkey
-  f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
   # Test Verbose animation, no baseline needed
   f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_BASELINE REGEXP "7: CubicSpline Translation")
   # Test Animation index out of domain error
   f3d_test(NAME TestVerboseAnimationIndexError1 DATA InterpolationTest.glb ARGS --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
+
+  f3d_test(NAME TestInteractionAnimation DATA InterpolationTest.glb ARGS --animation-index=-1 INTERACTION)#Space;Space;
+  f3d_test(NAME TestInteractionAnimationMovement DATA KameraAnim.glb ARGS --camera-index=1 INTERACTION)#Space;MouseMovement;Space;
+  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI INTERACTION) #Shift+MouseRight;
+  # Test exit hotkey
+  f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
   if(NOT F3D_MODULE_RAYTRACING) # TODO fix this once we have OSPray in CI
     f3d_test(NAME TestInteractionCheatsheet DATA cow.vtp INTERACTION) #H
     f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalars --comp=-2 INTERACTION) #HSSS
@@ -206,8 +207,8 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestOSPRayBackground DATA suzanne.ply ARGS -r --samples=1 --bg-color=1,0,0)
   f3d_test(NAME TestOSPRayPointCloud DATA pointsCloud.vtp ARGS -r --point-size=20)
   f3d_test(NAME TestOSPRayDenoise DATA suzanne.ply ARGS -rd --samples=1)
-  f3d_test(NAME TestInteractionOSPRayDenoise DATA suzanne.ply ARGS --samples=1 INTERACTION) #RD
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Raytracing module: ON")
+  f3d_test(NAME TestInteractionOSPRayDenoise DATA suzanne.ply ARGS --samples=1 INTERACTION) #RD
 else(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionOSPRayDenoiseNoRaytracing DATA suzanne.ply ARGS INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
 endif()
@@ -215,12 +216,12 @@ endif()
 if(F3D_MODULE_EXODUS)
   f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS -s --camera-position=-11,-2,-49 DEFAULT_LIGHTS)
   f3d_test(NAME TestGenericImporterAnimation DATA small.ex2 DEFAULT_LIGHTS)
-  # Test animation with generic importer
-  f3d_test(NAME TestInteractionAnimationGenericImporter DATA small.ex2 INTERACTION NO_BASELINE)#Space;Space;
   # Test Generic Importer Verbose animation
   f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --verbose NO_BASELINE REGEXP "0: default")
-
   f3d_test(NAME TestVersionExodus ARGS --version REGEXP "Exodus module: ON")
+
+  # Test animation with generic importer
+  f3d_test(NAME TestInteractionAnimationGenericImporter DATA small.ex2 INTERACTION NO_BASELINE)#Space;Space;
 endif()
 
 if(F3D_MODULE_OCCT)
@@ -258,6 +259,7 @@ if(F3D_MODULE_ALEMBIC)
   f3d_test(NAME TestVersionAlembic ARGS --version REGEXP "Alembic module: .\\..\\..")
 endif()
 
+
 ## Interaction Tests
 # Test hotkeys
 f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #PQAT
@@ -278,9 +280,15 @@ f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --sca
 f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #U
 f3d_test(NAME TestInteractionDumpSceneState DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Camera position: 2.26745,3.82625,507.698")#?
 f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring")#SYVC
+f3d_test(NAME TestInteractionEmptyDrop INTERACTION REGEXP "Drop event without any provided files.")#DropEvent Empty;
+ 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220510) # F3D uses its own log format for drop files
 
-# Test a drop event without files. Actual drop can't be tested.
-f3d_test(NAME TestInteractionEmptyDrop DATA cow.vtp NO_BASELINE INTERACTION REGEXP "Drop event without any provided files.")#DropEvent;
+  configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestInteractionDropFiles.log.in"
+    "${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")
+
+  f3d_test(NAME TestInteractionDropFiles ARGS -x "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")#DropEvent cow.vtp;#DropEvent dragon.vtu suzanne.stl;
+endif()
 
 ## Tests to increase coverage
 # Output option test
@@ -288,6 +296,7 @@ f3d_test(NAME TestOutput DATA cow.vtp NO_BASELINE)
 f3d_test(NAME TestOutputOutput DATA cow.vtp ARGS --ref=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutput.png DEPENDS TestOutput NO_BASELINE)
 f3d_test(NAME TestUnsupportedInputOutput DATA unsupportedFile.dummy REGEXP "No file loaded, no rendering performed" NO_BASELINE)
 f3d_test(NAME TestOutputNoBackground DATA cow.vtp ARGS --no-background NO_BASELINE)
+
 # Basic record and play test
 f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log NO_BASELINE)
 f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log DEPENDS TestInteractionRecord NO_BASELINE)

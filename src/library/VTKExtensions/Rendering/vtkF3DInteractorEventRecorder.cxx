@@ -6,6 +6,8 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkStringArray.h>
 
+#include <sstream>
+
 vtkStandardNewMacro(vtkF3DInteractorEventRecorder);
 
 //------------------------------------------------------------------------------
@@ -77,8 +79,9 @@ void vtkF3DInteractorEventRecorder::ProcessEvents(
   }
 }
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220510)
 //------------------------------------------------------------------------------
-void vtkF3DInteractorEventRecorder::ReadEvent(std::string line)
+void vtkF3DInteractorEventRecorder::ReadEvent(const std::string& line)
 {
   // Read events and invoke them on the object in question
   char event[256] = {}, keySym[256] = {};
@@ -184,3 +187,4 @@ void vtkF3DInteractorEventRecorder::WriteEvent(
   // Add a trailing 0 for potential file paths to add.
   *this->OutputStream << "0\n";
 }
+#endif
