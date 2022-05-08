@@ -134,7 +134,7 @@ window_impl_standard::~window_impl_standard()
   if (this->Internals->Renderer)
   {
     // The axis widget should be disabled before calling the renderer destructor
-    // if not, debug leaks wrongly reports a leak
+    // As there is a register loop if not
     this->Internals->Renderer->ShowAxis(false);
   }
 }
@@ -145,6 +145,8 @@ void window_impl_standard::Initialize(bool withColoring, std::string fileInfo)
   // Clear renderer if already present
   if (this->Internals->Renderer)
   {
+    // Hide axis to make sure the renderer can be deleted if needed
+    this->Internals->Renderer->ShowAxis(false);
     this->Internals->RenWin->RemoveRenderer(this->Internals->Renderer);
   }
 
