@@ -249,7 +249,7 @@ if(F3D_MODULE_ASSIMP)
   # Animation are working only with assimp 5.0.0 and 5.0.1.
   # Both report a assimp version 5.0.0 when using find_package
   if("${F3D_ASSIMP_VERSION}" VERSION_EQUAL "5.0.0")
-    f3d_test(NAME TestFBXAnim DATA robot_kyle_walking.fbx INTERACTION) #Space;Space;
+    f3d_test(NAME TestInteractionFBXAnim DATA robot_kyle_walking.fbx INTERACTION) #Space;Space;
   endif()
 endif()
 
