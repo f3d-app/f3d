@@ -5,6 +5,7 @@
 
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 // TODO documentation
 
@@ -17,6 +18,12 @@ public:
   ~options();
   options(const options& opt);
   options& operator=(const options& opt);
+
+  class options_exception : public std::runtime_error
+  {
+  public:
+    options_exception(const std::string& what = "") : std::runtime_error(what) {}
+  };
 
   void set(const std::string& name, bool value);
   void set(const std::string& name, int value);
@@ -42,6 +49,7 @@ public:
   std::vector<int> getAsIntVector(const std::string& name) const;
   std::vector<double> getAsDoubleVector(const std::string& name) const;
 
+  // can throw options_exception
   bool& getAsBoolRef(const std::string& name);
   int& getAsIntRef(const std::string& name);
   double& getAsDoubleRef(const std::string& name);

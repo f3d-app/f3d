@@ -293,9 +293,9 @@ void ConfigurationOptions::GetOptionsFromArgs(
       throw F3DExNoProcess();
     }
   }
-  catch (const cxxopts::OptionException& e)
+  catch (const cxxopts::OptionException& ex)
   {
-    f3d::log::error("Error parsing options: ", e.what());
+    f3d::log::error("Error parsing options: ", ex.what());
     throw;
   }
 }
@@ -631,86 +631,3 @@ void F3DOptionsParser::GetOptionsFromCommandLine(
   this->ConfigOptions->SetFilePathForConfigBlock("");
   return this->ConfigOptions->GetOptionsFromArgs(appOptions, options, files);
 }
-
-// TODO Remove
-#if 0
-//----------------------------------------------------------------------------
-void F3DOptionsParser::ConvertToNewAPI(const F3DOptions& oldOptions, f3d::options* newOptions)
-{
-  // TODO rework option names
-  // TODO remove some options that do not exist in libf3d (like no-render)
-
-  // Application
-  // newOptions->set("config", oldOptions.UserConfigFile);
-  // newOptions->set("dry-run", oldOptions.DryRun);
-  // newOptions->set("no-render", oldOptions.NoRender);
-  //  newOptions->set("interaction-test-play", oldOptions.InteractionTestPlayFile);
-  //  newOptions->set("interaction-test-record", oldOptions.InteractionTestRecordFile);
-  //  newOptions->set("output", oldOptions.Output);
-  //  newOptions->set("ref-threshold", oldOptions.RefThreshold);
-  //  newOptions->set("reference", oldOptions.Reference);
-  //  newOptions->set("no-background", oldOptions.NoBackground);
-
-  // General
-  newOptions->set("quiet", oldOptions.Quiet);
-  newOptions->set("verbose", oldOptions.Verbose);
-
-  // Loader/Loading
-  newOptions->set("animation-index", oldOptions.AnimationIndex);
-  newOptions->set("geometry-only", oldOptions.GeometryOnly);
-  newOptions->set("progress", oldOptions.Progress);
-  newOptions->set("camera-index", oldOptions.CameraIndex);
-  newOptions->set("color", oldOptions.SolidColor);
-  newOptions->set("emissive-factor", oldOptions.EmissiveFactor);
-  newOptions->set("line-width", oldOptions.LineWidth);
-  newOptions->set("metallic", oldOptions.Metallic);
-  newOptions->set("normal-scale", oldOptions.NormalScale);
-  newOptions->set("opacity", oldOptions.Opacity);
-  newOptions->set("point-size", oldOptions.PointSize);
-  newOptions->set("roughness", oldOptions.Roughness);
-  newOptions->set("texture-base-color", oldOptions.BaseColorTex);
-  newOptions->set("texture-emissive", oldOptions.EmissiveTex);
-  newOptions->set("texture-material", oldOptions.ORMTex);
-  newOptions->set("texture-normal", oldOptions.NormalTex);
-
-  // Loading but should not
-  newOptions->set("cells", oldOptions.Cells);
-  newOptions->set("component", oldOptions.Component);
-  newOptions->set("fullscreen", oldOptions.FullScreen);
-  newOptions->set("resolution", oldOptions.Resolution);
-  newOptions->set("scalars", oldOptions.Scalars);
-  newOptions->set("up", oldOptions.Up);
-
-  // Rendering/Dynamic
-  newOptions->set("axis", oldOptions.Axis);
-  newOptions->set("background-color", oldOptions.BackgroundColor);
-  newOptions->set("bar", oldOptions.Bar);
-  newOptions->set("blur-background", oldOptions.BlurBackground);
-  newOptions->set("camera-azimuth-angle", oldOptions.CameraAzimuthAngle);
-  newOptions->set("camera-elevation-angle", oldOptions.CameraElevationAngle);
-  newOptions->set("camera-focal-point", oldOptions.CameraFocalPoint);
-  newOptions->set("camera-position", oldOptions.CameraPosition);
-  newOptions->set("camera-view-angle", oldOptions.CameraViewAngle);
-  newOptions->set("camera-view-up", oldOptions.CameraViewUp);
-  newOptions->set("colormap", oldOptions.Colormap);
-  newOptions->set("denoise", oldOptions.Denoise);
-  newOptions->set("depth-peeling", oldOptions.DepthPeeling);
-  newOptions->set("edges", oldOptions.Edges);
-  newOptions->set("filename", oldOptions.Filename);
-  newOptions->set("font-file", oldOptions.FontFile);
-  newOptions->set("fps", oldOptions.FPS);
-  newOptions->set("fxaa", oldOptions.FXAA);
-  newOptions->set("grid", oldOptions.Grid);
-  newOptions->set("hdri", oldOptions.HDRIFile);
-  newOptions->set("inverse", oldOptions.InverseOpacityFunction);
-  newOptions->set("metadata", oldOptions.MetaData);
-  newOptions->set("point-sprites", oldOptions.PointSprites);
-  newOptions->set("range", oldOptions.Range);
-  newOptions->set("raytracing", oldOptions.Raytracing);
-  newOptions->set("samples", oldOptions.Samples);
-  newOptions->set("ssao", oldOptions.SSAO);
-  newOptions->set("tone-mapping", oldOptions.ToneMapping);
-  newOptions->set("trackball", oldOptions.Trackball);
-  newOptions->set("volume", oldOptions.Volume);
-}
-#endif

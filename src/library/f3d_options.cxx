@@ -80,20 +80,21 @@ public:
   template<typename T>
   T& getRef(const std::string& name)
   {
-    // TODO better exceptions
     try
     {
       return std::get<T>(this->Options.at(name));
     }
     catch (const std::bad_variant_access&)
     {
-      f3d::log::error("Trying to set option ", name, " with incompatible type");
-      throw std::runtime_error("Error\n");
+      std::string error = "Trying to set option " + name + " with incompatible type";
+      f3d::log::error(error);
+      throw options_exception(error + "\n");
     }
     catch (const std::out_of_range&)
     {
-      f3d::log::error("Options ", name, " does not exist");
-      throw std::runtime_error("Error\n");
+      std::string error = "Options " + name + " does not exist";
+      f3d::log::error(error);
+      throw options_exception(error + "\n");
     }
   }
 
