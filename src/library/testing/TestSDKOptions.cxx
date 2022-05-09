@@ -76,7 +76,8 @@ int TestSDKOptions(int argc, char* argv[])
   }
 
   // Test string
-  opt.set("texture-base-color", "test");
+  std::string inputString = "test";
+  opt.set("texture-base-color", inputString);
   if (opt.getAsString("texture-base-color") != "test")
   {
     std::cerr << "Options set/getAs string is not behaving as expected." << std::endl;
@@ -89,8 +90,8 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options get string is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  valString = "testChar";
-  opt.set("texture-base-color", valString.c_str());
+  inputString = "testChar";
+  opt.set("texture-base-color", inputString.c_str());
   if (opt.getAsString("texture-base-color") != "testChar")
   {
     std::cerr << "Options set char* is not behaving as expected." << std::endl;
@@ -194,14 +195,15 @@ int TestSDKOptions(int argc, char* argv[])
   }
 
   // Test copy operator and constructor
-  f3d::options opt2(opt);
+  f3d::options opt2 = opt;
   if (opt2.getAsDouble("line-width") != 2.13)
   {
     std::cerr << "Options copy constructor not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
 
-  f3d::options opt3 = opt2;
+  f3d::options opt3;
+  opt3 = opt2;
   if (opt3.getAsDouble("line-width") != 2.13)
   {
     std::cerr << "Options copy operator not behaving as expected." << std::endl;
