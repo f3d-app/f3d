@@ -88,13 +88,13 @@ public:
     {
       std::string error = "Trying to set option " + name + " with incompatible type";
       f3d::log::error(error);
-      throw options_exception(error + "\n");
+      throw f3d::options::exception(error + "\n");
     }
     catch (const std::out_of_range&)
     {
       std::string error = "Options " + name + " does not exist";
       f3d::log::error(error);
-      throw options_exception(error + "\n");
+      throw f3d::options::exception(error + "\n");
     }
   }
 

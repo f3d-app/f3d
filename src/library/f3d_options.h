@@ -20,10 +20,10 @@ public:
   options(const options& opt);
   options& operator=(const options& opt);
 
-  class options_exception : public std::runtime_error
+  class exception : public std::runtime_error
   {
   public:
-    options_exception(const std::string& what = "")
+    exception(const std::string& what = "")
       : std::runtime_error(what)
     {
     }
