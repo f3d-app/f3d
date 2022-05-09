@@ -3,6 +3,7 @@
 
 #include "f3d_export.h"
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -15,6 +16,19 @@ class F3D_EXPORT options
 public:
   options();
   ~options();
+  options(const options& opt);
+  options& operator=(const options& opt);
+  options(options&& other);
+  options& operator=(options&& other);
+
+  class exception : public std::runtime_error
+  {
+  public:
+    exception(const std::string& what = "")
+      : std::runtime_error(what)
+    {
+    }
+  };
 
   void set(const std::string& name, bool value);
   void set(const std::string& name, int value);
@@ -40,11 +54,17 @@ public:
   std::vector<int> getAsIntVector(const std::string& name) const;
   std::vector<double> getAsDoubleVector(const std::string& name) const;
 
+  // can throw exception
+  bool& getAsBoolRef(const std::string& name);
+  int& getAsIntRef(const std::string& name);
+  double& getAsDoubleRef(const std::string& name);
+  std::string& getAsStringRef(const std::string& name);
+  std::vector<int>& getAsIntVectorRef(const std::string& name);
+  std::vector<double>& getAsDoubleVectorRef(const std::string& name);
+
 private:
   class F3DInternals;
   F3DInternals* Internals;
-  options(const options& opt) = delete;
-  options& operator=(const options& opt) = delete;
 };
 }
 

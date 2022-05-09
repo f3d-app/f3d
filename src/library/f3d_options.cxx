@@ -55,8 +55,7 @@ public:
   {
     try
     {
-      const T& opt = std::get<T>(this->Options.at(name));
-      value = opt;
+      value = std::get<T>(this->Options.at(name));
     }
     catch (const std::bad_variant_access&)
     {
@@ -76,6 +75,27 @@ public:
     T val = {};
     this->get(name, val);
     return val;
+  }
+
+  template<typename T>
+  T& getRef(const std::string& name)
+  {
+    try
+    {
+      return std::get<T>(this->Options.at(name));
+    }
+    catch (const std::bad_variant_access&)
+    {
+      std::string error = "Trying to set option " + name + " with incompatible type";
+      f3d::log::error(error);
+      throw f3d::options::exception(error + "\n");
+    }
+    catch (const std::out_of_range&)
+    {
+      std::string error = "Options " + name + " does not exist";
+      f3d::log::error(error);
+      throw f3d::options::exception(error + "\n");
+    }
   }
 
   std::map<std::string, OptionVariant> Options;
@@ -154,6 +174,39 @@ options::options()
 options::~options()
 {
   delete this->Internals;
+}
+
+//----------------------------------------------------------------------------
+options::options(const options& opt)
+  : Internals(new options::F3DInternals)
+{
+  this->Internals->Options = opt.Internals->Options;
+}
+
+//----------------------------------------------------------------------------
+options& options::operator=(const options& opt)
+{
+  this->Internals->Options = opt.Internals->Options;
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+options::options(options&& other)
+{
+  this->Internals = other.Internals;
+  other.Internals = nullptr;
+}
+
+//----------------------------------------------------------------------------
+options& options::operator=(options&& other)
+{
+  if (this != &other)
+  {
+    delete this->Internals;
+    this->Internals = other.Internals;
+    other.Internals = nullptr;
+  }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -280,6 +333,42 @@ std::vector<int> options::getAsIntVector(const std::string& name) const
 std::vector<double> options::getAsDoubleVector(const std::string& name) const
 {
   return this->Internals->get<std::vector<double> >(name);
+}
+
+//----------------------------------------------------------------------------
+bool& options::getAsBoolRef(const std::string& name)
+{
+  return this->Internals->getRef<bool>(name);
+}
+
+//----------------------------------------------------------------------------
+int& options::getAsIntRef(const std::string& name)
+{
+  return this->Internals->getRef<int>(name);
+}
+
+//----------------------------------------------------------------------------
+double& options::getAsDoubleRef(const std::string& name)
+{
+  return this->Internals->getRef<double>(name);
+}
+
+//----------------------------------------------------------------------------
+std::string& options::getAsStringRef(const std::string& name)
+{
+  return this->Internals->getRef<std::string>(name);
+}
+
+//----------------------------------------------------------------------------
+std::vector<int>& options::getAsIntVectorRef(const std::string& name)
+{
+  return this->Internals->getRef<std::vector<int> >(name);
+}
+
+//----------------------------------------------------------------------------
+std::vector<double>& options::getAsDoubleVectorRef(const std::string& name)
+{
+  return this->Internals->getRef<std::vector<double> >(name);
 }
 
 }
