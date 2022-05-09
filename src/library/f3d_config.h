@@ -13,7 +13,5 @@ extern const std::string LibVersion;
 extern const std::string LibBuildSystem;
 extern const std::string LibBuildDate;
 extern const std::string LibCompiler;
-extern const std::string ReservedString; // TODO to remove once not necessary
-extern const bool HasRaytracingModule;
 }
 #endif
