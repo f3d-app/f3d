@@ -10,6 +10,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DStarter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptionsParser.cxx
 )
 
 if(WIN32)
@@ -23,6 +24,11 @@ endif()
 # Define f3d target
 add_executable(f3d ${F3D_SOURCE_FILES})
 target_link_libraries(f3d PUBLIC libf3d)
+
+if (UNIX AND NOT APPLE)
+  target_link_libraries(f3d PRIVATE stdc++fs)
+endif ()
+
 set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 if (APPLE)
   set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../lib)
@@ -30,8 +36,7 @@ elseif (UNIX)
   set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../lib)
 endif ()
 
-# Cannot upgrade to C++17 here, because <codecvt> header is deprecated and produces warnings on Windows
-target_compile_features(f3d PRIVATE cxx_std_14)
+target_compile_features(f3d PRIVATE cxx_std_17)
 
 target_include_directories(f3d
   PUBLIC
@@ -41,6 +46,7 @@ target_include_directories(f3d
 if(F3D_STRICT_BUILD)
   if(MSVC)
     target_compile_options(f3d PRIVATE /W4 /WX)
+    target_compile_definitions(f3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
   else()
     target_compile_options(f3d PRIVATE -Wall -Wextra -Wshadow -Werror)
   endif()
