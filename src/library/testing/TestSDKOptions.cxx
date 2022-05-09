@@ -171,9 +171,9 @@ int TestSDKOptions(int argc, char* argv[])
   {
     double& refVal = opt.getAsDoubleRef("quiet");
   }
-  catch(const f3d::options::exception& ex)
+  catch (const f3d::options::exception& ex)
   {
-    std::cout<< "Expected exception:" << ex.what() << std::endl;
+    std::cout << "Expected exception:" << ex.what() << std::endl;
   }
 
   opt.set("dummy", 2.13);
@@ -182,9 +182,9 @@ int TestSDKOptions(int argc, char* argv[])
   {
     double& refVal = opt.getAsDoubleRef("dummy");
   }
-  catch(const f3d::options::exception& ex)
+  catch (const f3d::options::exception& ex)
   {
-    std::cout<< "Expected exception:" << ex.what() << std::endl;
+    std::cout << "Expected exception:" << ex.what() << std::endl;
   }
 
   if (opt.getAsBool("quiet") != false)
@@ -200,7 +200,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options copy constructor not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  
+
   f3d::options opt3 = opt2;
   if (opt3.getAsDouble("line-width") != 2.13)
   {
