@@ -8,6 +8,8 @@ RUN apt update && apt install -y \
     ca-certificates \
     clang-10 \
     curl \
+    g++-8 \
+    gcc-8 \
     gnupg \
     gzip \
     help2man \
@@ -17,10 +19,13 @@ RUN apt update && apt install -y \
     openssh-client \
     software-properties-common \
     wget \
-    xvfb 
+    xvfb
 
 # Install uptodate needed packages
 RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
 RUN apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
 RUN add-apt-repository ppa:git-core/ppa
 RUN apt update && apt install -y cmake git git-lfs
+
+# Use gcc-8 by default
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
