@@ -15,7 +15,7 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   }
   catch (const f3d::engine::window_exception& ex)
   {
-    std::cout << ex.what() << std::endl;
+    std::cerr << ex.what() << std::endl;
   }
 
   try
@@ -24,7 +24,7 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   }
   catch (const f3d::engine::interactor_exception& ex)
   {
-    std::cout << ex.what() << std::endl;
+    std::cerr << ex.what() << std::endl;
     exit(EXIT_SUCCESS);
   }
 
