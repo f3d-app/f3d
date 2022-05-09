@@ -291,6 +291,7 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   // Reset loadedFile
   this->Internals->LoadedFile = false;
 
+  // Make sure quiet is respected
   f3d::log::setQuiet(this->Internals->Options.getAsBool("quiet"));
 
   // Recover information about the file to load
