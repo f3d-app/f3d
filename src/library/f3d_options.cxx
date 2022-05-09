@@ -191,6 +191,25 @@ options& options::operator=(const options& opt)
 }
 
 //----------------------------------------------------------------------------
+options::options(options&& other)
+{
+  this->Internals = other.Internals;
+  other.Internals = nullptr;
+}
+
+//----------------------------------------------------------------------------
+options& options::operator=(options&& other)
+{
+  if (this != &other)
+  {
+    delete this->Internals;
+    this->Internals = other.Internals;
+    other.Internals = nullptr;
+  }
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 void options::set(const std::string& name, bool value)
 {
   this->Internals->set(name, value);

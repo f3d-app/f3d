@@ -46,6 +46,10 @@ public:
   engine(const flags_t& flags);
   ~engine();
 
+  // Engine provide a default options
+  // use this setter to use other options
+  void setOptions(f3d::options& options);
+
   options& getOptions();
   window& getWindow();
   loader& getLoader();

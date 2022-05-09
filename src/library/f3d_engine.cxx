@@ -60,6 +60,12 @@ engine::~engine()
 }
 
 //----------------------------------------------------------------------------
+void engine::setOptions(options& opt)
+{
+  *this->Internals->Options = std::move(opt);
+}
+
+//----------------------------------------------------------------------------
 options& engine::getOptions()
 {
   return *this->Internals->Options;

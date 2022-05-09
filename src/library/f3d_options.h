@@ -19,6 +19,8 @@ public:
   ~options();
   options(const options& opt);
   options& operator=(const options& opt);
+  options(options&& other);
+  options& operator=(options&& other);
 
   class exception : public std::runtime_error
   {

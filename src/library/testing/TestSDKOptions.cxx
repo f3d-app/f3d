@@ -208,5 +208,20 @@ int TestSDKOptions(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  f3d::options opt4 = std::move(opt3);
+  if (opt4.getAsDouble("line-width") != 2.13)
+  {
+    std::cerr << "Options move constructor not behaving as expected." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  f3d::options opt5;
+  opt5 = std::move(opt4);
+  if (opt5.getAsDouble("line-width") != 2.13)
+  {
+    std::cerr << "Options move operator not behaving as expected." << std::endl;
+    return EXIT_FAILURE;
+  }
+
   return EXIT_SUCCESS;
 }

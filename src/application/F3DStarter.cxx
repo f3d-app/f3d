@@ -109,9 +109,8 @@ int F3DStarter::Start(int argc, char** argv)
     this->Internals->Engine->getWindow().setIcon(F3DIcon, sizeof(F3DIcon));
   }
 
-  // Copy command line options into the actual engine options
-  f3d::options& options = this->Internals->Engine->getOptions();
-  options = commandLineOptions;
+  // Move command line options into the actual engine options
+  this->Internals->Engine->setOptions(commandLineOptions);
 
   // Add and load file
   this->Internals->Engine->getLoader().addFiles(files);
