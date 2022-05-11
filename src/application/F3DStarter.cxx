@@ -1,7 +1,7 @@
 #include "F3DStarter.h"
 
 #include "F3DIcon.h"
-#include "F3DOptions.h"
+#include "F3DOptionsParser.h"
 
 #include "F3DNSDelegate.h"
 #include "f3d_engine.h"
@@ -16,8 +16,7 @@ public:
   F3DInternals() = default;
 
   F3DOptionsParser Parser;
-  F3DOptions CommandLineOptions;
-  F3DOptions Options;
+  F3DAppOptions AppOptions;
   std::unique_ptr<f3d::engine> Engine;
 };
 
@@ -42,29 +41,31 @@ int F3DStarter::Start(int argc, char** argv)
   // Parse command line options
   std::vector<std::string> files;
   this->Internals->Parser.Initialize(argc, argv);
-  this->Internals->CommandLineOptions = this->Internals->Parser.GetOptionsFromCommandLine(files);
+  f3d::options commandLineOptions;
+  this->Internals->Parser.GetOptionsFromCommandLine(
+    this->Internals->AppOptions, commandLineOptions, files);
 
   // Respect quiet option
-  f3d::log::setQuiet(this->Internals->CommandLineOptions.Quiet);
+  f3d::log::setQuiet(commandLineOptions.getAsBool("quiet"));
 
   // Initialize the config file dictionary
   this->Internals->Parser.InitializeDictionaryFromConfigFile(
-    this->Internals->CommandLineOptions.UserConfigFile);
+    this->Internals->AppOptions.UserConfigFile);
 
 #if __APPLE__
   // Initialize MacOS delegate
   F3DNSDelegate::InitializeDelegate(this);
 #endif
 
-  if (this->Internals->CommandLineOptions.NoRender)
+  if (this->Internals->AppOptions.NoRender)
   {
     this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::FLAGS_NONE);
   }
   else
   {
     // TODO Test this multiconfig behavior
-    bool offscreen = !this->Internals->CommandLineOptions.Reference.empty() ||
-      !this->Internals->CommandLineOptions.Output.empty();
+    bool offscreen =
+      !this->Internals->AppOptions.Reference.empty() || !this->Internals->AppOptions.Output.empty();
 
     f3d::engine::flags_t flags = f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR |
       (offscreen ? f3d::engine::WINDOW_OFFSCREEN : f3d::engine::FLAGS_NONE);
@@ -108,37 +109,39 @@ int F3DStarter::Start(int argc, char** argv)
     this->Internals->Engine->getWindow().setIcon(F3DIcon, sizeof(F3DIcon));
   }
 
+  // Move command line options into the actual engine options
+  this->Internals->Engine->setOptions(commandLineOptions);
+
   // Add and load file
   this->Internals->Engine->getLoader().addFiles(files);
   bool loaded = this->LoadFile();
 
-  if (!this->Internals->CommandLineOptions.NoRender)
+  if (!this->Internals->AppOptions.NoRender)
   {
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
     // Play recording if any
-    if (!this->Internals->CommandLineOptions.InteractionTestPlayFile.empty())
+    if (!this->Internals->AppOptions.InteractionTestPlayFile.empty())
     {
       // For better testing, render once before the interaction
       this->Internals->Engine->getWindow().render();
-      if (!interactor.playInteraction(this->Internals->CommandLineOptions.InteractionTestPlayFile))
+      if (!interactor.playInteraction(this->Internals->AppOptions.InteractionTestPlayFile))
       {
         return EXIT_FAILURE;
       }
     }
 
     // Start recording if needed
-    if (!this->Internals->CommandLineOptions.InteractionTestRecordFile.empty())
+    if (!this->Internals->AppOptions.InteractionTestRecordFile.empty())
     {
-      if (!interactor.recordInteraction(
-            this->Internals->CommandLineOptions.InteractionTestRecordFile))
+      if (!interactor.recordInteraction(this->Internals->AppOptions.InteractionTestRecordFile))
       {
         return EXIT_FAILURE;
       }
     }
 
     // Render and compare with file if needed
-    if (!this->Internals->CommandLineOptions.Reference.empty())
+    if (!this->Internals->AppOptions.Reference.empty())
     {
       if (!loaded)
       {
@@ -147,16 +150,14 @@ int F3DStarter::Start(int argc, char** argv)
       }
 
       if (!this->Internals->Engine->getWindow().renderAndCompareWithFile(
-            this->Internals->CommandLineOptions.Reference,
-            this->Internals->CommandLineOptions.RefThreshold,
-            this->Internals->CommandLineOptions.NoBackground,
-            this->Internals->CommandLineOptions.Output))
+            this->Internals->AppOptions.Reference, this->Internals->AppOptions.RefThreshold,
+            this->Internals->AppOptions.NoBackground, this->Internals->AppOptions.Output))
       {
         return EXIT_FAILURE;
       }
     }
     // Render to file if needed
-    else if (!this->Internals->CommandLineOptions.Output.empty())
+    else if (!this->Internals->AppOptions.Output.empty())
     {
       if (!loaded)
       {
@@ -165,8 +166,7 @@ int F3DStarter::Start(int argc, char** argv)
       }
 
       if (!this->Internals->Engine->getWindow().renderToFile(
-            this->Internals->CommandLineOptions.Output,
-            this->Internals->CommandLineOptions.NoBackground))
+            this->Internals->AppOptions.Output, this->Internals->AppOptions.NoBackground))
       {
         return EXIT_FAILURE;
       }
@@ -190,20 +190,14 @@ bool F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
   this->Internals->Engine->getLoader().getFileInfo(load, index, filePath, fileInfo);
 
   f3d::options& options = this->Internals->Engine->getOptions();
-  if (this->Internals->CommandLineOptions.DryRun)
-  {
-    // Use command line options
-    F3DOptionsParser::ConvertToNewAPI(this->Internals->CommandLineOptions, &options);
-  }
-  else
+  if (!this->Internals->AppOptions.DryRun)
   {
     // Recover options for the file to load
-    F3DOptionsParser::ConvertToNewAPI(
-      this->Internals->Parser.GetOptionsFromConfigFile(filePath), &options);
+    this->Internals->Parser.GetOptionsFromConfigFile(filePath, options);
   }
 
   // With NoRender, force verbose
-  if (this->Internals->CommandLineOptions.NoRender)
+  if (this->Internals->AppOptions.NoRender)
   {
     options.set("verbose", true);
   }

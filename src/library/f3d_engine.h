@@ -46,6 +46,16 @@ public:
   engine(const flags_t& flags);
   ~engine();
 
+  // Engine provide a default options
+  // use this setter to use other options
+  // copy options into engine
+  void setOptions(const options& opt);
+
+  // Engine provide a default options
+  // use this setter to use other options
+  // move options into engine
+  void setOptions(options&& opt);
+
   options& getOptions();
   window& getWindow();
   loader& getLoader();
