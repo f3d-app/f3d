@@ -10,11 +10,4 @@ const std::string LibVersion = "@PROJECT_VERSION@";
 const std::string LibBuildSystem = "@CMAKE_SYSTEM_NAME@ @CMAKE_SYSTEM_PROCESSOR@";
 const std::string LibBuildDate = "@F3D_BUILD_DATE@";
 const std::string LibCompiler = "@CMAKE_CXX_COMPILER_ID@ @CMAKE_CXX_COMPILER_VERSION@";
-const std::string ReservedString = F3D_RESERVED_STRING;
-
-#if F3D_MODULE_RAYTRACING
-const bool HasRaytracingModule = true;
-#else
-const bool HasRaytracingModule = false;
-#endif
 }
