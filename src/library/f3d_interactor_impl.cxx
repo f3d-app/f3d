@@ -309,6 +309,7 @@ public:
       self->Loader.addFile(file);
     }
     self->Loader.loadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
+    self->Window.render();
   }
 
   std::function<bool(int, std::string)> KeyPressUserCallBack = [](int, std::string)
