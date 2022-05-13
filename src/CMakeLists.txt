@@ -11,7 +11,10 @@ if(MSVC)
   # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
   set(f3d_strict_build_compile_options /W4 /WX /wd4275)
 else()
-  set(f3d_strict_build_compile_options -Wall -Wextra -Wshadow -Woverloaded-virtual -Wno-deprecated -Wno-strict-overflow -Wno-array-bounds -Wunreachable-code -Wsuggest-override -Wno-missing-field-initializers -Wno-unused-parameter -Wmissing-declarations -Wredundant-decls -Wpointer-arith -Werror)
+  set(f3d_strict_build_compile_options -Wall -Wextra -Wshadow -Woverloaded-virtual -Wno-deprecated -Wno-strict-overflow -Wno-array-bounds -Wunreachable-code -Wno-missing-field-initializers -Wno-unused-parameter -Wmissing-declarations -Wredundant-decls -Wpointer-arith -Werror)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    list(APPEND f3d_strict_build_compile_options -Wsuggest-override)
+  endif()
 endif()
 
 # libf3d target
