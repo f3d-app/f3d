@@ -9,12 +9,12 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(f3d, m)
+PYBIND11_MODULE(f3d, module)
 {
-  m.doc() = "f3d library bindings";
+  module.doc() = "f3d library bindings";
 
   // f3d::options
-  py::class_<f3d::options>(m, "options")
+  py::class_<f3d::options>(module, "options")
     .def(py::init<>())
     .def("set", py::overload_cast<const std::string&, bool>(&f3d::options::set),
       "Set a boolean option")
@@ -39,7 +39,7 @@ PYBIND11_MODULE(f3d, m)
     .def("getAsDoubleVector", &f3d::options::getAsDoubleVector);
 
   // f3d::interactor
-  py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete> >(m, "interactor")
+  py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete> >(module, "interactor")
     .def("start", &f3d::interactor::start, "Start the interactor")
     .def("stop", &f3d::interactor::start, "Stop the interactor")
     .def("setKeyPressCallBack", &f3d::interactor::setKeyPressCallBack,
@@ -63,7 +63,7 @@ PYBIND11_MODULE(f3d, m)
     .def("recordInteraction", &f3d::interactor::recordInteraction, "Record an interaction file");
 
   // f3d::loader
-  py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete> > loader(m, "loader");
+  py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete> > loader(module, "loader");
 
   py::enum_<f3d::loader::LoadFileEnum>(loader, "LoadFileEnum")
     .value("LOAD_FIRST", f3d::loader::LoadFileEnum::LOAD_FIRST)
@@ -86,7 +86,7 @@ PYBIND11_MODULE(f3d, m)
       "getFileInfo", &f3d::loader::getFileInfo, "Get the file index, path, and information string");
 
   // f3d::window
-  py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> >(m, "window")
+  py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> >(module, "window")
     .def("update", &f3d::window::update, "Update the window")
     .def("render", &f3d::window::render, "Render the window")
     .def("renderToFile", &f3d::window::renderToFile, "Render the window to a file", py::arg("path"),
@@ -98,7 +98,7 @@ PYBIND11_MODULE(f3d, m)
     .def("setWindowName", &f3d::window::setWindowName, "Set the window name");
 
   // f3d::engine
-  py::class_<f3d::engine> engine(m, "engine");
+  py::class_<f3d::engine> engine(module, "engine");
 
   py::enum_<f3d::engine::Flags>(engine, "Flags", py::arithmetic())
     .value("FLAGS_NONE", f3d::engine::FLAGS_NONE)

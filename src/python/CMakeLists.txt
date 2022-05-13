@@ -3,7 +3,7 @@ find_package(pybind11 CONFIG)
 
 pybind11_add_module(pyf3d F3DPythonBindings.cxx)
 
-target_compile_features(pyf3d PRIVATE cxx_std_17)
+target_compile_features(pyf3d PRIVATE cxx_std_14)
 
 target_link_libraries(pyf3d PRIVATE libf3d)
 
