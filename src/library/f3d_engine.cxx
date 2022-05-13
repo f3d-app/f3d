@@ -83,7 +83,7 @@ window& engine::getWindow()
   if (!this->Internals->Window ||
     dynamic_cast<window_impl_noRender*>(this->Internals->Window.get()))
   {
-    throw window_exception();
+    throw f3d::engine::exception("Cannot create window with this engine");
   }
   return *this->Internals->Window;
 }
@@ -99,7 +99,7 @@ interactor& engine::getInteractor()
 {
   if (!this->Internals->Interactor)
   {
-    throw interactor_exception();
+    throw f3d::engine::exception("Cannot create interactor with this engine");
   }
   return *this->Internals->Interactor;
 }
