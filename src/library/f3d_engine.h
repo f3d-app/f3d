@@ -22,14 +22,13 @@ class interactor;
 class F3D_EXPORT engine
 {
 public:
-
   class exception : public std::runtime_error
   {
   public:
-    exception(const std::string& what = "") 
+    exception(const std::string& what = "")
       : std::runtime_error(what)
-    {   
-    }   
+    {
+    }
   };
 
   //======== Engine Flags =============
