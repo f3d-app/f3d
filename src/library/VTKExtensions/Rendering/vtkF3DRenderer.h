@@ -44,6 +44,7 @@ public:
   bool IsCheatSheetVisible();
   //@}
 
+  using vtkOpenGLRenderer::SetBackground;
   //@{
   /**
    * Set different actors parameters
@@ -103,6 +104,7 @@ public:
    */
   void InitializeCamera();
 
+  using vtkOpenGLRenderer::ResetCamera;
   /**
    * Reset the camera to its initial parameters
    */
