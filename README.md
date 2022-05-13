@@ -85,7 +85,7 @@ Available in [Spack](https://spack.readthedocs.io/en/latest/package_list.html#f3
 
 * [CMake](https://cmake.org) >= 3.1.
 * [VTK](https://vtk.org) >= 9.0.0 (optionally with raytracing capabilities to enable OSPray rendering).
-* A C++11 compiler.
+* A C++17 compiler.
 * A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 
 ## Configuration and building
@@ -124,6 +124,7 @@ Here is the list of supported file formats:
 * **.pts** : Point Cloud file format
 * **.step/.stp** : CAD STEP exchange ISO format
 * **.iges/.igs** : CAD Initial Graphics Exchange Specification format
+* **.abc** : Alembic format
 * **.obj** : Wavefront OBJ file format (full scene)
 * **.gltf/.glb** : GL Transmission Format (full scene)
 * **.3ds** : Autodesk 3D Studio file format (full scene)
