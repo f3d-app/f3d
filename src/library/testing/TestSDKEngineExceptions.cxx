@@ -13,7 +13,7 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   {
     f3d::window& win = eng.getWindow();
   }
-  catch (const f3d::engine::window_exception& ex)
+  catch (const f3d::engine::exception& ex)
   {
     std::cerr << ex.what() << std::endl;
   }
@@ -22,7 +22,7 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   {
     f3d::interactor& inter = eng.getInteractor();
   }
-  catch (const f3d::engine::interactor_exception& ex)
+  catch (const f3d::engine::exception& ex)
   {
     std::cerr << ex.what() << std::endl;
     exit(EXIT_SUCCESS);

@@ -41,6 +41,7 @@ public:
   vtkGetMacro(UpIndex, int);
   //@}
 
+  using vtkOpenGLPolyDataMapper::GetBounds;
   double* GetBounds() override;
 
 protected:

@@ -77,13 +77,9 @@ set(libf3d_compile_options_public)
 set(libf3d_compile_options_private)
 set(libf3d_link_options_public)
 
+# F3D_STRICT_BUILD
 if(F3D_STRICT_BUILD)
-  if(MSVC)
-    # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
-    list(APPEND libf3d_compile_options_private /W4 /WX /wd4275)
-  else()
-    list(APPEND libf3d_compile_options_private -Wall -Wextra -Wshadow -Werror)
-  endif()
+  list(APPEND libf3d_compile_options_private ${f3d_strict_build_compile_options})
 endif()
 
 # coverage
