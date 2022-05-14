@@ -535,3 +535,8 @@ You can try to use a software implementation of OpenGL, called [Mesa](https://gi
 > I run f3d from the command prompt and my Unicode characters are not displayed properly.
 
 Set the codepage to UTF-8, run `chcp 65001`.
+
+# License
+
+F3D can be used and distributed under the 3-Clause BSD License, see LICENSE.
+F3D rely on other libraries and tools, all under permissive licenses, see THIRD_PARTY_LICENSES.md.
