@@ -1,18 +1,18 @@
 # StreamVersion 1.1
-ExposeEvent 0 599 0 0 0 0 0
-RenderEvent 0 599 0 0 0 0 0
-KeyPressEvent 1412 255 0 115 1 s 0
-CharEvent 1412 255 0 115 1 s 0
-KeyReleaseEvent 1412 255 0 115 1 s 0
-KeyPressEvent 1412 255 0 121 1 y 0
-CharEvent 1412 255 0 121 1 y 0
-KeyReleaseEvent 1412 255 0 121 1 y 0
-KeyPressEvent 1412 255 0 121 1 y 0
-CharEvent 1412 255 0 121 1 y 0
-KeyReleaseEvent 1412 255 0 121 1 y 0
-KeyPressEvent 1412 255 0 121 1 y 0
-CharEvent 1412 255 0 121 1 y 0
-KeyReleaseEvent 1412 255 0 121 1 y 0
-KeyPressEvent 1412 255 0 121 1 y 0
-CharEvent 1412 255 0 121 1 y 0
-KeyReleaseEvent 1412 255 0 121 1 y 0
+ExposeEvent 0 599 0 0 0 0
+RenderEvent 0 599 0 0 0 0
+KeyPressEvent 1412 255 0 115 1 s
+CharEvent 1412 255 0 115 1 s
+KeyReleaseEvent 1412 255 0 115 1 s
+KeyPressEvent 1412 255 0 121 1 y
+CharEvent 1412 255 0 121 1 y
+KeyReleaseEvent 1412 255 0 121 1 y
+KeyPressEvent 1412 255 0 121 1 y
+CharEvent 1412 255 0 121 1 y
+KeyReleaseEvent 1412 255 0 121 1 y
+KeyPressEvent 1412 255 0 121 1 y
+CharEvent 1412 255 0 121 1 y
+KeyReleaseEvent 1412 255 0 121 1 y
+KeyPressEvent 1412 255 0 121 1 y
+CharEvent 1412 255 0 121 1 y
+KeyReleaseEvent 1412 255 0 121 1 y
