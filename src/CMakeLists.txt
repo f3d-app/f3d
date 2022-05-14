@@ -27,6 +27,11 @@ if(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
   add_subdirectory(winshellext)
 endif()
 
+# python bindings
+if(F3D_PYTHON_BINDINGS)
+  add_subdirectory(python)
+endif()
+
 # Create man
 if(F3D_GENERATE_MAN)
   find_program(HELP2MAN help2man)

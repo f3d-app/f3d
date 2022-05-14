@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.3)
 include(CMakeDependentOption)
 
 project(f3d
@@ -18,6 +18,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
+
+option(F3D_PYTHON_BINDINGS "Create Python bindings" OFF)
 
 option(F3D_INSTALL_SDK "Install F3D library SDK" OFF)
 
