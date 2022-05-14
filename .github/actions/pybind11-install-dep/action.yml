@@ -1,0 +1,49 @@
+name: 'Install pybind11 Dependency'
+description: 'Install pybind11 Dependency using cache when possible'
+inputs:
+  os:
+    description: 'OS to build on'
+    required: false
+    default: 'ubuntu-latest'
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache pybind11
+      id: cache-pybind11
+      uses: actions/cache@v2
+      with:
+        path: dependencies/pybind11_install
+        key: pybind11-v2.9.2-1-${{inputs.os}}
+
+    - name: Checkout pybind11
+      if: steps.cache-pybind11.outputs.cache-hit != 'true'
+      uses: actions/checkout@v2
+      with:
+        repository: pybind/pybind11
+        submodules: 'true'
+        path: './dependencies/pybind11'
+        ref: v2.9.2
+
+    - name: Setup pybind11
+      if: steps.cache-pybind11.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir pybind11_build
+        mkdir pybind11_install
+
+    - name: Configure pybind11
+      if: steps.cache-pybind11.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/pybind11_build
+      shell: bash
+      run: >
+        cmake ../pybind11
+        -DPYBIND11_TEST=OFF
+        -DCMAKE_INSTALL_PREFIX:PATH=../pybind11_install
+
+    - name: Install pybind11
+      if: steps.cache-pybind11.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/pybind11_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release

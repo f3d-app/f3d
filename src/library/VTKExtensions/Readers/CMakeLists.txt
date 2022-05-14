@@ -270,10 +270,12 @@ vtk_module_add_module(f3d::VTKExtensionsReaders
   FORCE_STATIC
   CLASSES ${classes})
 
-vtk_module_include(f3d::VTKExtensionsReaders
-  PRIVATE
-    $<BUILD_INTERFACE:${OpenCASCADE_INCLUDE_DIR}>)
+if(F3D_MODULE_OCCT)
+  vtk_module_include(f3d::VTKExtensionsReaders
+    PRIVATE
+      $<BUILD_INTERFACE:${OpenCASCADE_INCLUDE_DIR}>)
 
-vtk_module_link(f3d::VTKExtensionsReaders
-  PRIVATE
-    ${OpenCASCADE_LIBRARIES})
+  vtk_module_link(f3d::VTKExtensionsReaders
+    PRIVATE
+      ${OpenCASCADE_LIBRARIES})
+endif()
