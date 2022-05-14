@@ -1,3 +1,4 @@
+# TODO: add more tests to cover all bindings
 list(APPEND pyf3dTests_list
      TestOptions.py
     )
