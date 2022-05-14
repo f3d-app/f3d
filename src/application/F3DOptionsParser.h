@@ -27,6 +27,7 @@ struct F3DAppOptions
   std::string InteractionTestPlayFile = "";
   bool NoBackground = false;
   bool NoRender = false;
+  bool Headless = false;
   double RefThreshold = 50;
 };
 

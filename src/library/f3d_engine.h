@@ -37,13 +37,15 @@ public:
   // engine::CREATE_WINDOW: Create a window to render into.
   // engine::CREATE_INTERACTOR: Create an interactor to interact with.
   // engine::WINDOW_OFFSCREEN: Create an offscreen window to render into, need CREATE_WINDOW.
+  // engine::WINDOW_HEADLESS: Create an headless window to render into, need CREATE_WINDOW.
   using flags_t = uint32_t;
   enum Flags : flags_t
   {
     FLAGS_NONE = 0,             // 0000
     CREATE_WINDOW = 1 << 0,     // 0001
     CREATE_INTERACTOR = 1 << 1, // 0010
-    WINDOW_OFFSCREEN = 1 << 2   // 0100
+    WINDOW_OFFSCREEN = 1 << 2,  // 0100
+    WINDOW_HEADLESS = 1 << 3    // 1000
   };
 
   engine(const flags_t& flags);

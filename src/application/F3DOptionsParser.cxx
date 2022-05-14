@@ -187,6 +187,7 @@ void ConfigurationOptions::GetOptionsFromArgs(
     auto grp0 = cxxOptions.add_options("Applicative");
     this->DeclareOption(grp0, "input", "", "Input file", inputs, false, false, "<files>");
     this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, false, false,"<png file>");
+    this->DeclareOption(grp0, "headless", "", "Run using a headless context", appOptions.Headless);
     this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground);
     this->DeclareOption(grp0, "help", "h", "Print help");
     this->DeclareOption(grp0, "version", "", "Print version details");

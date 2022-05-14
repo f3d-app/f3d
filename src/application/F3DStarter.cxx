@@ -64,13 +64,28 @@ int F3DStarter::Start(int argc, char** argv)
   }
   else
   {
-    // TODO Test this multiconfig behavior
-    bool offscreen =
-      !this->Internals->AppOptions.Reference.empty() || !this->Internals->AppOptions.Output.empty();
+    f3d::engine::flags_t flags = f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR;
 
-    f3d::engine::flags_t flags = f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR |
-      (offscreen ? f3d::engine::WINDOW_OFFSCREEN : f3d::engine::FLAGS_NONE);
-    this->Internals->Engine = std::make_unique<f3d::engine>(flags);
+    if (this->Internals->AppOptions.Headless)
+    {
+      flags |= f3d::engine::WINDOW_HEADLESS;
+    }
+    else if (!this->Internals->AppOptions.Reference.empty() || !this->Internals->AppOptions.Output.empty())
+    {
+      flags |= f3d::engine::WINDOW_OFFSCREEN;
+    }
+
+    // TODO Test this multiconfig behavior
+    try
+    {
+      this->Internals->Engine = std::make_unique<f3d::engine>(flags);
+    }
+    catch (const f3d::engine::exception& ex)
+    {
+      f3d::log::error("Cannot create F3D engine: ", ex.what());
+      return EXIT_FAILURE;
+    }
+
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
     interactor.setKeyPressCallBack(

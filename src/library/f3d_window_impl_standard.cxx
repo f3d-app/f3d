@@ -4,6 +4,7 @@
 
 #include "f3d_log.h"
 #include "f3d_options.h"
+#include "vtkF3DConfigure.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DRendererWithColoring.h"
 
@@ -12,6 +13,10 @@
 #include <vtkPointGaussianMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkVersion.h>
+
+#if F3D_HAS_EGL_SUPPORT
+#include <vtkEGLRenderWindow.h>
+#endif
 
 namespace
 {
@@ -88,17 +93,27 @@ public:
     return true;
   }
 
-  vtkNew<vtkRenderWindow> RenWin;
+  vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkSmartPointer<vtkF3DRenderer> Renderer;
 };
 
 //----------------------------------------------------------------------------
-window_impl_standard::window_impl_standard(const options& options, bool offscreen)
+window_impl_standard::window_impl_standard(const options& options, WindowType type)
   : window_impl(options)
   , Internals(new window_impl_standard::F3DInternals)
 {
+  if (type == WindowType::HEADLESS)
+  {
+#if F3D_HAS_EGL_SUPPORT
+    this->Internals->RenWin = vtkSmartPointer<vtkEGLRenderWindow>::New();
+#endif
+  }
+  else
+  {
+    this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
+    this->Internals->RenWin->SetOffScreenRendering(type == WindowType::OFFSCREEN);
+  }
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
-  this->Internals->RenWin->SetOffScreenRendering(offscreen);
 }
 
 //----------------------------------------------------------------------------

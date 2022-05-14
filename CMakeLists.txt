@@ -54,6 +54,8 @@ find_package(VTK 9.0 REQUIRED
     IOExodus
     RenderingRayTracing)
 
+set(F3D_HAS_EGL_SUPPORT ${VTK_OPENGL_HAS_EGL})
+
 # Windows Shell Extension DLL
 cmake_dependent_option(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION "Build the Windows Shell Extension to produce thumbnails" ON "WIN32" OFF)
 

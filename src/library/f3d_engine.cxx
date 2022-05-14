@@ -34,8 +34,30 @@ engine::engine(const flags_t& flags)
 
   if (flags & CREATE_WINDOW)
   {
+    window_impl_standard::WindowType type = window_impl_standard::WindowType::VISIBLE;
+
+    bool offscreen = flags & WINDOW_OFFSCREEN;
+    bool headless = flags & WINDOW_HEADLESS;
+
+    if (offscreen && headless)
+    {
+      throw exception("WINDOW_OFFSCREEN and WINDOW_HEADLESS flags are exclusives");
+    }
+    if (offscreen)
+    {
+      type = window_impl_standard::WindowType::OFFSCREEN;
+    }
+    else if (headless)
+    {
+#if F3D_HAS_EGL_SUPPORT
+      type = window_impl_standard::WindowType::HEADLESS;
+#else
+      throw exception("WINDOW_HEADLESS flag is specified but F3D is not built with EGL support");
+#endif
+    }
+
     this->Internals->Window =
-      std::make_unique<window_impl_standard>(*this->Internals->Options, flags & WINDOW_OFFSCREEN);
+      std::make_unique<window_impl_standard>(*this->Internals->Options, type);
   }
   else
   {
