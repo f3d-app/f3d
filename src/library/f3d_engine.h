@@ -10,6 +10,7 @@
 
 #include "f3d_export.h"
 
+#include <stdexcept>
 #include <string>
 
 namespace f3d
@@ -21,13 +22,13 @@ class interactor;
 class F3D_EXPORT engine
 {
 public:
-  struct window_exception : public std::exception
+  class exception : public std::runtime_error
   {
-    const char* what() const throw() { return "Cannot create window with this engine"; }
-  };
-  struct interactor_exception : public std::exception
-  {
-    const char* what() const throw() { return "Cannot create interactor with this engine"; }
+  public:
+    exception(const std::string& what = "")
+      : std::runtime_error(what)
+    {
+    }
   };
 
   //======== Engine Flags =============

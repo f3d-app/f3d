@@ -43,12 +43,11 @@ target_include_directories(f3d
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
   )
 
+# F3D_STRICT_BUILD
 if(F3D_STRICT_BUILD)
+  list(APPEND libf3d_compile_options_private ${f3d_strict_build_compile_options})
   if(MSVC)
-    target_compile_options(f3d PRIVATE /W4 /WX)
     target_compile_definitions(f3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
-  else()
-    target_compile_options(f3d PRIVATE -Wall -Wextra -Wshadow -Werror)
   endif()
 endif()
 
