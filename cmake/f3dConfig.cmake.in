@@ -1,9 +1,33 @@
+# When this file is run by CMake through the find_package command, the
+# following targets will exist:
+#
+#   f3d::f3d           Target that contains the F3D executable
+#
+#   f3d::libf3d        Target that contains the libf3d
+#
+# The following local variables will also be defined:
+#
+#   f3d_INCLUDE_DIR        Path to the include directory of public f3d library classes
+#
+#   f3d_MODULE_RAYTRACING  Will be enabled if F3D was built with raytracing support
+#   f3d_MODULE_EXODUS      Will be enabled if F3D was built with exodus support
+#   f3d_MODULE_OCCT        Will be enabled if F3D was built with open cascade support
+#   f3d_MODULE_ASSIMP      Will be enabled if F3D was built with assimp support
+#   f3d_MODULE_ALEMBIC     Will be enabled if F3D was built with alembic support
+#   f3d_PYTHON_BINDINGS    Will be enabled if F3D was built with python bindings
+
 @PACKAGE_INIT@
 
-include("${CMAKE_CURRENT_LIST_DIR}/f3dTargets.cmake")
+set(f3d_MODULE_RAYTRACING "@F3D_MODULE_RAYTRACING@")
+set(f3d_MODULE_EXODUS "@F3D_MODULE_EXODUS@")
+set(f3d_MODULE_OCCT "@F3D_MODULE_OCCT@")
+set(f3d_MODULE_ASSIMP "@F3D_MODULE_ASSIMP@")
+set(f3d_MODULE_ALEMBIC "@F3D_MODULE_ALEMBIC@")
+set(f3d_PYTHON_BINDINGS "@F3D_PYTHON_BINDINGS@")
 
+# Provide a f3d_embed_file method for embedding image into source code
 include("${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake")
 
+include("${CMAKE_CURRENT_LIST_DIR}/f3dTargets.cmake")
 set_and_check(f3d_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/include")
-
 check_required_components(f3d)
