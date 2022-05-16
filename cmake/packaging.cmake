@@ -89,4 +89,8 @@ else()
   endif()
 endif()
 
+# Do not package "pythonmodule" and "vtkext" components
+set(CPACK_COMPONENTS_ALL assets bundle cmake documentation headers library shellext)
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_COMPONENTS_GROUPING ALL_COMPONENTS_IN_ONE)
 include(CPack)
