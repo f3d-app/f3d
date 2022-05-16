@@ -1,5 +1,6 @@
-cmake_dependent_option(F3D_MACOS_BUNDLE "Build a macOS bundle application" ON "APPLE" OFF)
+# Shared options between application and library
 cmake_dependent_option(F3D_WINDOWS_GUI "Build a non-console Win32 application" ON "WIN32" OFF)
+cmake_dependent_option(F3D_MACOS_BUNDLE "Build a macOS bundle application" ON "APPLE" OFF)
 
 # Force static library when creating a macOS bundle
 cmake_dependent_option(BUILD_SHARED_LIBS "Build f3d with shared libraries" ON "NOT F3D_MACOS_BUNDLE" OFF)
@@ -17,6 +18,34 @@ else()
   endif()
 endif()
 
+# Coverage
+cmake_dependent_option(F3D_COVERAGE "Emit coverage files" OFF "UNIX" OFF)
+if(F3D_COVERAGE)
+  set(f3d_coverage_compile_options -g -O0 --coverage)
+  set(f3d_coverage_link_options --coverage)
+endif()
+
+# Sanitizer
+if(NOT F3D_SANITIZER)
+  set(F3D_SANITIZER "none" CACHE STRING "Sanitizer type" FORCE)
+  set_property(CACHE F3D_SANITIZER PROPERTY STRINGS "none" "address" "thread" "leak" "memory" "undefined")
+endif()
+
+if(NOT UNIX)
+  set_property(CACHE F3D_SANITIZER PROPERTY TYPE INTERNAL)
+endif()
+
+if(NOT F3D_SANITIZER STREQUAL "none")
+  set(sanitizer_compile_options -fsanitize=${F3D_SANITIZER} -fno-optimize-sibling-calls -fno-omit-frame-pointer -g)
+  if(${F3D_SANITIZER} STREQUAL "address")
+    list(APPEND sanitizer_compile_options -fsanitize-address-use-after-scope)
+  endif()
+  if(${F3D_SANITIZER} STREQUAL "memory")
+    list(APPEND sanitizer_compile_options -fsanitize-memory-track-origins)
+  endif()
+  set(sanitizer_link_options -fsanitize=${F3D_SANITIZER})
+endif()
+
 # libf3d target
 add_subdirectory(library)
 
@@ -28,23 +57,7 @@ if(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
 endif()
 
 # python bindings
+option(F3D_PYTHON_BINDINGS "Create Python bindings" OFF)
 if(F3D_PYTHON_BINDINGS)
   add_subdirectory(python)
-endif()
-
-# Create man
-if(F3D_GENERATE_MAN)
-  find_program(HELP2MAN help2man)
-  find_program(GZIP gzip)
-  if(HELP2MAN AND GZIP)
-    set(MAN_OUTPUT_FILE ${CMAKE_BINARY_DIR}/f3d.1)
-    add_custom_command(
-      OUTPUT ${MAN_OUTPUT_FILE}
-      COMMAND ${HELP2MAN} $<TARGET_FILE:f3d> -N -n "F3D - Fast and minimalist 3D viewer" > ${MAN_OUTPUT_FILE}
-      COMMAND ${GZIP} -f ${MAN_OUTPUT_FILE}
-      DEPENDS f3d)
-    add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
-  else()
-    message(WARNING "help2man or gzip not found, cannot create man entry")
-  endif()
 endif()
