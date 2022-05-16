@@ -78,37 +78,15 @@ set(libf3d_compile_options_private)
 set(libf3d_link_options_public)
 
 # F3D_STRICT_BUILD
-if(F3D_STRICT_BUILD)
-  list(APPEND libf3d_compile_options_private ${f3d_strict_build_compile_options})
-endif()
+list(APPEND libf3d_compile_options_private ${f3d_strict_build_compile_options})
 
-# coverage
-cmake_dependent_option(F3D_COVERAGE "Emit coverage files" OFF "UNIX" OFF)
-if(F3D_COVERAGE)
-  list(APPEND libf3d_compile_options_public -g -O0 --coverage)
-  list(APPEND libf3d_link_options_public --coverage)
-endif()
+# Coverage
+list(APPEND libf3d_compile_options_public ${f3d_coverage_compile_options})
+list(APPEND libf3d_link_options_public ${f3d_coverage_link_options})
 
-# sanitizer
-if(NOT F3D_SANITIZER)
-  set(F3D_SANITIZER "none" CACHE list "Sanitizer type" FORCE)
-  set_property(CACHE F3D_SANITIZER PROPERTY STRINGS "none" "address" "thread" "leak" "memory" "undefined")
-endif()
-
-if(NOT UNIX)
-  set_property(CACHE F3D_SANITIZER PROPERTY TYPE INTERNAL)
-endif()
-
-if(NOT F3D_SANITIZER STREQUAL "none")
-  list(APPEND libf3d_compile_options_public -fsanitize=${F3D_SANITIZER} -fno-optimize-sibling-calls -fno-omit-frame-pointer -g)
-  if(${F3D_SANITIZER} STREQUAL "address")
-    list(APPEND libf3d_compile_options_public -fsanitize-address-use-after-scope)
-  endif()
-  if(${F3D_SANITIZER} STREQUAL "memory")
-    list(APPEND libf3d_compile_options_public -fsanitize-memory-track-origins)
-  endif()
-  list(APPEND libf3d_link_options_public -fsanitize=${F3D_SANITIZER})
-endif()
+# Sanitizer
+list(APPEND libf3d_compile_options_public ${f3d_sanitizer_compile_options})
+list(APPEND libf3d_link_options_public ${f3d_sanitizer_link_options})
 
 add_subdirectory(VTKExtensions)
 
@@ -123,6 +101,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_BINARY_DIR}/f3d_config.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_init.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_engine.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/f3d_interactor.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_interactor_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_loader_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/f3d_log.cxx
@@ -183,16 +162,14 @@ endif()
 
 vtk_module_autoinit(TARGETS libf3d MODULES ${F3D_VTK_MODULES})
 
-if(F3D_STRICT_BUILD)
-  if(MSVC)
-    # There are warnings in VTK related to deprecated features in C++17
-    target_compile_definitions(libf3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
-  endif()
-endif()
-
 target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES})
 target_compile_options(libf3d PUBLIC ${libf3d_compile_options_public} PRIVATE ${libf3d_compile_options_private})
 target_link_options(libf3d PUBLIC ${libf3d_link_options_public})
+
+if(F3D_STRICT_BUILD AND MSVC)
+  # There are warnings in VTK related to deprecated features in C++17
+  target_compile_definitions(libf3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+endif()
 
 # testing
 if(BUILD_TESTING)

@@ -6,6 +6,9 @@ f3d_embed_file(
   NAME F3DIcon
   BINARY)
 
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.h")
+
 set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cxx
@@ -43,13 +46,23 @@ target_include_directories(f3d
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
   )
 
+set(f3d_compile_options_public)
+set(f3d_compile_options_private)
+set(f3d_link_options_public)
+
 # F3D_STRICT_BUILD
-if(F3D_STRICT_BUILD)
-  list(APPEND libf3d_compile_options_private ${f3d_strict_build_compile_options})
-  if(MSVC)
-    target_compile_definitions(f3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
-  endif()
+list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})
+if(F3D_STRICT_BUILD AND MSVC)
+  target_compile_definitions(f3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
 endif()
+
+# Coverage
+list(APPEND f3d_compile_options_public ${f3d_coverage_compile_options})
+list(APPEND f3d_link_options_public ${f3d_coverage_link_options})
+
+# Sanitizer
+list(APPEND f3d_compile_options_public ${f3d_sanitizer_compile_options})
+list(APPEND f3d_link_options_public ${f3d_sanitizer_link_options})
 
 # MacOS Bundle app
 if(F3D_MACOS_BUNDLE)
@@ -80,6 +93,28 @@ if(WIN32)
     set_target_properties(f3d PROPERTIES WIN32_EXECUTABLE TRUE)
   else()
     # force usage of wWinMainCRTStartup in console mode for Unicode support
-    target_link_options(f3d PUBLIC "/ENTRY:wWinMainCRTStartup")
+    list(APPEND f3d_link_options_public "/ENTRY:wWinMainCRTStartup")
+  endif()
+endif()
+
+target_compile_options(f3d PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
+target_link_options(f3d PUBLIC ${f3d_link_options_public})
+
+# Create man
+option(F3D_GENERATE_MAN "Generate and install a man entry for f3d using help2man" OFF)
+mark_as_advanced(F3D_GENERATE_MAN)
+if(F3D_GENERATE_MAN)
+  find_program(HELP2MAN help2man)
+  find_program(GZIP gzip)
+  if(HELP2MAN AND GZIP)
+    set(MAN_OUTPUT_FILE ${CMAKE_BINARY_DIR}/f3d.1)
+    add_custom_command(
+      OUTPUT ${MAN_OUTPUT_FILE}
+      COMMAND ${HELP2MAN} $<TARGET_FILE:f3d> -N -n "F3D - Fast and minimalist 3D viewer" > ${MAN_OUTPUT_FILE}
+      COMMAND ${GZIP} -f ${MAN_OUTPUT_FILE}
+      DEPENDS f3d)
+    add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
+  else()
+    message(WARNING "help2man or gzip not found, cannot create man entry")
   endif()
 endif()

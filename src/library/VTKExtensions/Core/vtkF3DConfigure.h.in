@@ -7,7 +7,6 @@ static const std::string F3D_RESERVED_STRING = "f3d_reserved";
 static const std::string F3D_EXIT_HOTKEY_SYM = "Escape";
 
 #cmakedefine01 F3D_WINDOWS_GUI
-#cmakedefine01 F3D_MACOS_BUNDLE
 
 #cmakedefine01 F3D_MODULE_RAYTRACING
 #cmakedefine01 F3D_MODULE_EXODUS
