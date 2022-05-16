@@ -8,23 +8,11 @@ project(f3d
 
 string(TIMESTAMP F3D_BUILD_DATE "%Y-%m-%d %H:%M:%S" UTC)
 
-# CMake variables
-option(BUILD_TESTING "Build the tests" OFF)
-cmake_dependent_option(F3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON "Disable image comparison on tests using the default lights" OFF "BUILD_TESTING" ON)
-cmake_dependent_option(F3D_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" ON)
-cmake_dependent_option(F3D_ENABLE_HDRI_TESTS "Enable HDRi related tests" ON "F3D_ENABLE_LONG_TIMEOUT_TESTS" ON "BUILD_TESTING" ON)
-
+# Generic CMake variables
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 endif()
-
-option(F3D_PYTHON_BINDINGS "Create Python bindings" OFF)
-
-option(F3D_INSTALL_SDK "Install F3D library SDK" OFF)
-
-option(F3D_GENERATE_MAN "Generate and install a man entry for f3d using help2man" OFF)
-mark_as_advanced(F3D_GENERATE_MAN)
 
 # Modules
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
@@ -32,6 +20,8 @@ option(F3D_MODULE_EXODUS "ExodusII module" ON)
 option(F3D_MODULE_OCCT "OpenCASCADE module (STEP and IGES files)" OFF)
 option(F3D_MODULE_ASSIMP "Assimp module (FBX, OFF, DAE anf DXF files)" OFF)
 option(F3D_MODULE_ALEMBIC "Alembic module (ABC files)" OFF)
+
+option(F3D_INSTALL_SDK "Install F3D library SDK" OFF)
 
 # VTK dependency
 find_package(VTK 9.0 REQUIRED
@@ -67,7 +57,12 @@ find_package(VTK 9.0 REQUIRED
 # Windows Shell Extension DLL
 cmake_dependent_option(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION "Build the Windows Shell Extension to produce thumbnails" ON "WIN32" OFF)
 
-# testing
+# Testing
+option(BUILD_TESTING "Build the tests" OFF)
+cmake_dependent_option(F3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON "Disable image comparison on tests using the default lights" OFF "BUILD_TESTING" ON)
+cmake_dependent_option(F3D_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" ON)
+cmake_dependent_option(F3D_ENABLE_HDRI_TESTS "Enable HDRi related tests" ON "F3D_ENABLE_LONG_TIMEOUT_TESTS" ON "BUILD_TESTING" ON)
+
 if(BUILD_TESTING)
   enable_testing()
   include(cmake/testing.cmake)
@@ -77,7 +72,7 @@ endif()
 include(GNUInstallDirs)
 add_subdirectory(src)
 
-# installation
+# Installation
 option(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE "Install a default configuration file" OFF)
 mark_as_advanced(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
 if(UNIX AND NOT APPLE)

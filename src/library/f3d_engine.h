@@ -10,8 +10,10 @@
 
 #include "f3d_export.h"
 
+#include <map>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace f3d
 {
@@ -62,11 +64,19 @@ public:
   loader& getLoader();
   interactor& getInteractor();
 
-  // TODO: remove this function
-  static const std::string& getAppTitle();
+  // Get a map containing info about the libf3d
+  static std::map<std::string, std::string> getLibInfo();
 
-  static void printVersion();
-  static void printReadersList();
+  struct readerInformation
+  {
+    std::string name;
+    std::string description;
+    std::vector<std::string> extensions;
+    std::vector<std::string> mimetypes;
+  };
+
+  // Get a vector containing info about the supported readers
+  static std::vector<readerInformation> getReadersInfo();
 
 private:
   class F3DInternals;

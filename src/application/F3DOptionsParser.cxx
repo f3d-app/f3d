@@ -3,9 +3,10 @@
 #include "cxxopts.hpp"
 #include "json.hpp"
 
+#include "F3DConfig.h"
 #include "F3DException.h"
-#include "f3d_config.h"
 #include "f3d_engine.h"
+#include "f3d_interactor.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
 
@@ -179,8 +180,7 @@ void ConfigurationOptions::GetOptionsFromArgs(
 {
   try
   {
-    // TODO From where ?
-    cxxopts::Options cxxOptions("F3D", "F3D");
+    cxxopts::Options cxxOptions(F3D::AppName, F3D::AppTitle);
     cxxOptions.positional_help("file1 file2 ...");
 
     // clang-format off
@@ -252,18 +252,19 @@ void ConfigurationOptions::GetOptionsFromArgs(
     this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees)", options.getAsDoubleRef("camera-azimuth-angle"), true, true, "<angle>");
     this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees)", options.getAsDoubleRef("camera-elevation-angle"), true, true, "<angle>");
 
-    // TODO find the right way to deal with modular options
+#if F3D_MODULE_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
     this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.getAsBoolRef("raytracing"));
     this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.getAsIntRef("samples"), true, true, "<samples>");
     this->DeclareOption(grp5, "denoise", "d", "Denoise the image", options.getAsBoolRef("denoise"));
+#endif
 
     auto grp6 = cxxOptions.add_options("PostFX (OpenGL)");
     this->DeclareOption(grp6, "depth-peeling", "p", "Enable depth peeling", options.getAsBoolRef("depth-peeling"));
     this->DeclareOption(grp6, "ssao", "q", "Enable Screen-Space Ambient Occlusion", options.getAsBoolRef("ssao"));
     this->DeclareOption(grp6, "fxaa", "a", "Enable Fast Approximate Anti-Aliasing", options.getAsBoolRef("fxaa"));
     this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping", options.getAsBoolRef("tone-mapping"));
-    
+
     auto grp7 = cxxOptions.add_options("Testing");
     this->DeclareOption(grp7, "ref", "", "Reference", appOptions.Reference, false, false, "<png file>");
     this->DeclareOption(grp7, "ref-threshold", "", "Testing threshold", appOptions.RefThreshold, true, false, "<threshold>");
@@ -278,19 +279,19 @@ void ConfigurationOptions::GetOptionsFromArgs(
     if (result.count("help") > 0)
     {
       this->PrintHelp(cxxOptions);
-      throw F3DExNoProcess();
+      throw F3DExNoProcess("help requested");
     }
 
     if (result.count("version") > 0)
     {
       this->PrintVersion();
-      throw F3DExNoProcess();
+      throw F3DExNoProcess("version requested");
     }
 
     if (result.count("readers-list") > 0)
     {
       this->PrintReadersList();
-      throw F3DExNoProcess();
+      throw F3DExNoProcess("reader list requested");
     }
   }
   catch (const cxxopts::OptionException& ex)
@@ -312,42 +313,7 @@ void ConfigurationOptions::PrintHelpPair(
 //----------------------------------------------------------------------------
 void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
 {
-  // TODO this should rely on f3d::engine/interactor in some capacity
   // clang-format off
-  const std::vector<std::pair<std::string, std::string> > keys =
-  {
-    { "C", "Cycle point/cell data coloring" },
-    { "S", "Cycle array to color with" },
-    { "Y", "Cycle array component to color with" },
-    { "B", "Toggle the scalar bar display" },
-    { "V", "Toggle volume rendering" },
-    { "I", "Toggle inverse volume opacity" },
-    { "O", "Toggle point sprites rendering" },
-    { "P", "Toggle depth peeling" },
-    { "Q", "Toggle SSAO" },
-    { "A", "Toggle FXAA" },
-    { "T", "Toggle tone mapping" },
-    { "E", "Toggle the edges display" },
-    { "X", "Toggle the axes display" },
-    { "G", "Toggle the grid display" },
-    { "N", "Toggle the filename display" },
-    { "M", "Toggle the metadata display" },
-    { "Z", "Toggle the FPS counter display" },
-    { "R", "Toggle raytracing rendering" },
-    { "D", "Toggle denoising when raytracing" },
-    { "F", "Toggle full screen" },
-    { "U", "Toggle blur background" },
-    { "K", "Toggle trackball interaction" },
-    { "H", "Toggle cheat sheet display" },
-    { "?", "Dump camera state to the terminal" },
-    { "Escape", "Quit" },
-    { "Enter", "Reset camera to initial parameters" },
-    { "Space", "Play animation if any" },
-    { "Left", "Previous file" },
-    { "Right", "Next file" },
-    { "Up", "Reload current file" }
-  };
-
   const std::vector<std::pair<std::string, std::string> > examples =
   {
     { "f3d file.vtu -xtgans", "View a unstructured mesh in a typical nice looking sciviz style" },
@@ -360,7 +326,7 @@ void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
   f3d::log::setUseColoring(false);
   f3d::log::info(cxxOptions.help());
   f3d::log::info("Keys:");
-  for (const auto& key : keys)
+  for (const auto& key : f3d::interactor::getDefaultInteractionsInfo())
   {
     this->PrintHelpPair(key.first, key.second);
   }
@@ -378,13 +344,106 @@ void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
 //----------------------------------------------------------------------------
 void ConfigurationOptions::PrintVersion()
 {
-  f3d::engine::printVersion();
+  f3d::log::setUseColoring(false);
+  f3d::log::info(F3D::AppName + " " + F3D::AppVersion + "\n");
+  f3d::log::info(F3D::AppTitle);
+  auto libInfo = f3d::engine::getLibInfo();
+  f3d::log::info("Version: " + libInfo["Version"] + ".");
+  f3d::log::info("Build date: " + libInfo["Build date"] + ".");
+  f3d::log::info("Build system: " + libInfo["Build system"] + ".");
+  f3d::log::info("Compiler: " + libInfo["Compiler"] + ".");
+  f3d::log::info("Raytracing module: " + libInfo["Raytracing module"] + ".");
+  f3d::log::info("Exodus module: " + libInfo["Exodus module"] + ".");
+  f3d::log::info("OpenCASCADE module: " + libInfo["OpenCASCADE module"] + ".");
+  f3d::log::info("Assimp module: " + libInfo["Assimp module"] + ".");
+  f3d::log::info("Alembic module: " + libInfo["Alembic module"] + ".");
+  f3d::log::info("VTK version: " + libInfo["VTK version"] + ".");
+  f3d::log::info(libInfo["Copyright_previous"] + ".");
+  f3d::log::info(libInfo["Copyright"] + ".");
+  f3d::log::info("License " + libInfo["License"] + ".");
+  f3d::log::info("By " + libInfo["Authors"] + ".");
+  f3d::log::setUseColoring(true);
+  f3d::log::waitForUser();
 }
 
 //----------------------------------------------------------------------------
 void ConfigurationOptions::PrintReadersList()
 {
-  f3d::engine::printReadersList();
+  size_t nameColSize = 0;
+  size_t extsColSize = 0;
+  size_t mimeColSize = 0;
+  size_t descColSize = 0;
+
+  std::vector<f3d::engine::readerInformation> readersInfo = f3d::engine::getReadersInfo();
+  if (readersInfo.empty())
+  {
+    f3d::log::warn("No registered reader found!");
+    return;
+  }
+  // Compute the size of the 3 columns
+  for (const auto& reader : readersInfo)
+  {
+    // sanity check
+    if (reader.extensions.size() < reader.mimetypes.size())
+    {
+      f3d::log::error(reader.name, "More mimetypes than extensions, unexpected.");
+      return;
+    }
+
+    nameColSize = std::max(nameColSize, reader.name.length());
+    descColSize = std::max(descColSize, reader.description.length());
+
+    for (const auto& ext : reader.extensions)
+    {
+      extsColSize = std::max(extsColSize, ext.length());
+    }
+    for (const auto& mime : reader.mimetypes)
+    {
+      mimeColSize = std::max(mimeColSize, mime.length());
+    }
+  }
+  nameColSize++;
+  extsColSize++;
+  mimeColSize++;
+  descColSize++;
+
+  std::string separator = std::string(nameColSize + extsColSize + descColSize + mimeColSize, '-');
+
+  // Print the rows split in 3 columns
+  std::stringstream headerLine;
+  headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(descColSize)
+             << "Description" << std::setw(extsColSize) << "Exts" << std::setw(mimeColSize)
+             << "Mime-types";
+  f3d::log::info(headerLine.str());
+  f3d::log::info(separator);
+
+  for (const auto& reader : readersInfo)
+  {
+    for (size_t i = 0; i < reader.extensions.size(); i++)
+    {
+      std::stringstream readerLine;
+      if (i == 0)
+      {
+        readerLine << std::left << std::setw(nameColSize) << reader.name << std::setw(descColSize)
+                   << reader.description;
+      }
+      else
+      {
+        readerLine << std::left << std::setw(nameColSize + descColSize) << " ";
+      }
+
+      readerLine << std::setw(extsColSize) << reader.extensions[i];
+
+      if (i < reader.mimetypes.size())
+      {
+        readerLine << std::setw(mimeColSize) << reader.mimetypes[i];
+      }
+
+      f3d::log::info(readerLine.str());
+    }
+    f3d::log::info(separator);
+  }
+  f3d::log::waitForUser();
 }
 
 //----------------------------------------------------------------------------
