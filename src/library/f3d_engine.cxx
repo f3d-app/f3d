@@ -105,155 +105,81 @@ interactor& engine::getInteractor()
 }
 
 //----------------------------------------------------------------------------
-const std::string& engine::getAppTitle()
+std::map<std::string, std::string> engine::getLibInfo()
 {
-  return f3d::AppTitle;
+  std::map<std::string, std::string> libInfo;
+  libInfo["Version"] = f3d::LibVersion;
+  libInfo["Build date"] = f3d::LibBuildDate;
+  libInfo["Build system"] = f3d::LibBuildSystem;
+  libInfo["Compiler"] = f3d::LibCompiler;
+
+  std::string tmp;
+
+#if F3D_MODULE_RAYTRACING
+  tmp = "ON";
+#else
+  tmp = "OFF";
+#endif
+  libInfo["Raytracing module"] = tmp;
+
+#if F3D_MODULE_EXODUS
+  tmp = "ON";
+#else
+  tmp = "OFF";
+#endif
+  libInfo["Exodus module"] = tmp;
+
+#if F3D_MODULE_OCCT
+  tmp = F3D_OCCT_VERSION;
+#if F3D_MODULE_OCCT_XCAF
+  tmp += " (full support)";
+#else
+  tmp += " (no metadata)";
+#endif
+#else
+  tmp = "OFF";
+#endif
+  libInfo["OpenCASCADE module"] = tmp;
+
+#if F3D_MODULE_ASSIMP
+  tmp = F3D_ASSIMP_VERSION;
+#else
+  tmp = "OFF";
+#endif
+  libInfo["Assimp module"] = tmp;
+
+#if F3D_MODULE_ALEMBIC
+  tmp = F3D_ALEMBIC_VERSION;
+#else
+  tmp = "OFF";
+#endif
+  libInfo["Alembic module"] = tmp;
+
+  libInfo["VTK version"] = std::string(VTK_VERSION) + std::string(" (build ") +
+    std::to_string(VTK_BUILD_VERSION) + std::string(")");
+
+  libInfo["Copyright_previous"] = "Copyright (C) 2019-2021 Kitware SAS";
+  libInfo["Copyright"] = "Copyright (C) 2021-2022 Michael Migliore, Mathieu Westphal";
+  libInfo["License"] = "BSD-3-Clause";
+  libInfo["Authors"] = "Michael Migliore, Mathieu Westphal and Joachim Pouderoux";
+
+  return libInfo;
 }
 
 //----------------------------------------------------------------------------
-void engine::printVersion()
+std::vector<f3d::engine::readerInformation> engine::getReadersInfo()
 {
-  // TODO engine should help with crafting the version string but should not be responsible for the
-  // printing itself, to improve
-  std::string version = f3d::AppName + " " + f3d::LibVersion + "\n\n";
-
-  version += f3d::AppTitle;
-  version += "\nVersion: ";
-  version += f3d::LibVersion;
-  version += "\nBuild date: ";
-  version += f3d::LibBuildDate;
-  version += "\nSystem: ";
-  version += f3d::LibBuildSystem;
-  version += "\nCompiler: ";
-  version += f3d::LibCompiler;
-  version += "\nRaytracing module: ";
-#if F3D_MODULE_RAYTRACING
-  version += "ON";
-#else
-  version += "OFF";
-#endif
-  version += "\nExodus module: ";
-#if F3D_MODULE_EXODUS
-  version += "ON";
-#else
-  version += "OFF";
-#endif
-  version += "\nOpenCASCADE module: ";
-#if F3D_MODULE_OCCT
-  version += F3D_OCCT_VERSION;
-#if F3D_MODULE_OCCT_XCAF
-  version += " (full support)";
-#else
-  version += " (no metadata)";
-#endif
-#else
-  version += "OFF";
-#endif
-  version += "\nAssimp module: ";
-#if F3D_MODULE_ASSIMP
-  version += F3D_ASSIMP_VERSION;
-#else
-  version += "OFF";
-#endif
-  version += "\nAlembic module: ";
-#if F3D_MODULE_ALEMBIC
-  version += F3D_ALEMBIC_VERSION;
-#else
-  version += "OFF";
-#endif
-  version += "\nVTK version: ";
-  version += std::string(VTK_VERSION) + std::string(" (build ") +
-    std::to_string(VTK_BUILD_VERSION) + std::string(")");
-
-  version += "\n\nCopyright (C) 2019-2021 Kitware SAS.";
-  version += "\nCopyright (C) 2021-2022 Michael Migliore, Mathieu Westphal.";
-  version += "\nLicense BSD-3-Clause.";
-  version += "\nWritten by Michael Migliore, Mathieu Westphal and Joachim Pouderoux.";
-
-  f3d::log::setUseColoring(false);
-  f3d::log::info(version);
-  f3d::log::setUseColoring(true);
-  f3d::log::waitForUser();
-}
-
-void engine::printReadersList()
-{
-  // TODO engin should help with crafting the reader list string but should not be responsible for
-  // the printing itself, to improve
-  size_t nameColSize = 0;
-  size_t extsColSize = 0;
-  size_t mimeColSize = 0;
-  size_t descColSize = 0;
-
+  std::vector<readerInformation> readersInfo;
   const auto& readers = F3DReaderFactory::GetInstance()->GetReaders();
-  if (readers.empty())
-  {
-    f3d::log::warn("No registered reader found!");
-    return;
-  }
-  // Compute the size of the 3 columns
   for (const auto& reader : readers)
   {
-    // sanity check
-    if (reader->GetExtensions().size() < reader->GetMimeTypes().size())
-    {
-      f3d::log::error(reader->GetName(), " have different extensions and mime-types count.");
-      return;
-    }
-
-    nameColSize = std::max(nameColSize, reader->GetName().length());
-    descColSize = std::max(descColSize, reader->GetLongDescription().length());
-
-    for (const auto& ext : reader->GetExtensions())
-    {
-      extsColSize = std::max(extsColSize, ext.length());
-    }
-    for (const auto& mime : reader->GetMimeTypes())
-    {
-      mimeColSize = std::max(mimeColSize, mime.length());
-    }
+    readerInformation info;
+    info.name = reader->GetName();
+    info.description = reader->GetLongDescription();
+    info.extensions = reader->GetExtensions();
+    info.mimetypes = reader->GetMimeTypes();
+    readersInfo.push_back(info);
   }
-  nameColSize++;
-  extsColSize++;
-  mimeColSize++;
-  descColSize++;
-
-  std::string separator = std::string(nameColSize + extsColSize + descColSize + mimeColSize, '-');
-
-  // Print the rows split in 3 columns
-  std::stringstream headerLine;
-  headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(descColSize)
-             << "Description" << std::setw(extsColSize) << "Exts" << std::setw(mimeColSize)
-             << "Mime-types";
-  f3d::log::info(headerLine.str());
-  f3d::log::info(separator);
-
-  for (const auto& reader : readers)
-  {
-    for (size_t i = 0; i < reader->GetExtensions().size(); i++)
-    {
-      std::stringstream readerLine;
-      if (i == 0)
-      {
-        readerLine << std::left << std::setw(nameColSize) << reader->GetName()
-                   << std::setw(descColSize) << reader->GetLongDescription();
-      }
-      else
-      {
-        readerLine << std::left << std::setw(nameColSize + descColSize) << " ";
-      }
-
-      readerLine << std::setw(extsColSize) << reader->GetExtensions()[i];
-
-      if (i < reader->GetMimeTypes().size())
-      {
-        readerLine << std::setw(mimeColSize) << reader->GetMimeTypes()[i];
-      }
-
-      f3d::log::info(readerLine.str());
-    }
-    f3d::log::info(separator);
-  }
-  f3d::log::waitForUser();
+  return readersInfo;
 }
 }

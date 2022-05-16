@@ -1,12 +1,16 @@
 #ifndef F3Dexception_h
 #define F3Dexception_h
 
-#include <exception>
+#include <stdexcept>
 #include <string>
 
-struct F3DExNoProcess : std::exception
+class F3DExNoProcess : public std::runtime_error
 {
-  const char* what() const throw() { return "no process required"; }
+public:
+  F3DExNoProcess(const std::string& what = "")
+    : std::runtime_error(what)
+  {
+  }
 };
 
 #endif

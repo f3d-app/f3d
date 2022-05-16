@@ -60,6 +60,11 @@ public:
    */
   virtual void stop() = 0;
 
+  /**
+   * Get a structure of strings describing default interactions
+   */
+  static const std::vector<std::pair<std::string, std::string> >& getDefaultInteractionsInfo();
+
 protected:
   interactor() = default;
   virtual ~interactor() = default;

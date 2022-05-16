@@ -1,5 +1,6 @@
 #include "F3DStarter.h"
 
+#include "F3DConfig.h"
 #include "F3DIcon.h"
 #include "F3DOptionsParser.h"
 
@@ -106,7 +107,7 @@ int F3DStarter::Start(int argc, char** argv)
         this->Internals->Engine->getWindow().render();
         return true;
       });
-    this->Internals->Engine->getWindow().setWindowName(f3d::engine::getAppTitle());
+    this->Internals->Engine->getWindow().setWindowName(F3D::AppTitle);
     this->Internals->Engine->getWindow().setIcon(F3DIcon, sizeof(F3DIcon));
   }
 
