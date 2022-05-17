@@ -4,9 +4,6 @@
 #include <vtkCallbackCommand.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkStringArray.h>
-
-#include <sstream>
 
 vtkStandardNewMacro(vtkF3DInteractorEventRecorder);
 

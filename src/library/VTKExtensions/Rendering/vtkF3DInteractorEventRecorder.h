@@ -9,8 +9,6 @@
 
 #include <vtkInteractorEventRecorder.h>
 
-#include <vtkVersion.h>
-
 class vtkF3DInteractorEventRecorder : public vtkInteractorEventRecorder
 {
 public:
