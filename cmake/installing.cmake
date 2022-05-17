@@ -4,15 +4,12 @@ install(TARGETS f3d
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT application
   BUNDLE DESTINATION "." COMPONENT bundle)
 
-get_target_property(LIBF3D_TYPE libf3d TYPE)
-if(LIBF3D_TYPE STREQUAL "SHARED_LIBRARY" OR F3D_INSTALL_SDK)
-  install(TARGETS libf3d
-    EXPORT f3dTargets
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT library
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT headers)
-endif()
+install(TARGETS libf3d
+  EXPORT f3dTargets
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT library
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT headers)
 
 # F3DShellExtension for Windows
 if (BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
@@ -143,27 +140,25 @@ elseif(APPLE AND NOT F3D_MACOS_BUNDLE)
 endif()
 
 # SDK
-if(F3D_INSTALL_SDK)
-  install(EXPORT f3dTargets
-    NAMESPACE f3d::
-    DESTINATION "lib/cmake/f3d"
-    COMPONENT cmake)
+install(EXPORT f3dTargets
+  NAMESPACE f3d::
+  DESTINATION "lib/cmake/f3d"
+  COMPONENT cmake)
 
-  include(CMakePackageConfigHelpers)
-  configure_package_config_file(
-    "cmake/f3dConfig.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake"
-    INSTALL_DESTINATION "lib/cmake/${PROJECT_NAME}")
-  write_basic_package_version_file(
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+  "cmake/f3dConfig.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake"
+  INSTALL_DESTINATION "lib/cmake/${PROJECT_NAME}")
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
+  VERSION "${PROJECT_VERSION}.${f3d_VERSION_BUILD}"
+  COMPATIBILITY SameMinorVersion)
+
+install(
+  FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
-    VERSION "${PROJECT_VERSION}.${f3d_VERSION_BUILD}"
-    COMPATIBILITY SameMinorVersion)
-
-  install(
-    FILES
-      "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake"
-      "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
-      "${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake"
-    DESTINATION
-      "lib/cmake/${PROJECT_NAME}"
-    COMPONENT cmake)
-endif()
+    "${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake"
+  DESTINATION
+    "lib/cmake/${PROJECT_NAME}"
+  COMPONENT cmake)

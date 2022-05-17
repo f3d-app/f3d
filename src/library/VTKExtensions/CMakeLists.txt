@@ -10,6 +10,7 @@ vtk_module_scan(
 # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9192
 vtk_module_build(
   MODULES ${modules}
+  INSTALL_EXPORT f3dTargets
   INSTALL_HEADERS OFF
   HEADERS_COMPONENT vtkext
   TARGETS_COMPONENT vtkext)

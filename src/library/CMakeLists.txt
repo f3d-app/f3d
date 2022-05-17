@@ -137,6 +137,7 @@ set_target_properties(libf3d PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
   CXX_VISIBILITY_PRESET hidden
+  POSITION_INDEPENDENT_CODE ON
   OUTPUT_NAME "f3d"
   )
 
@@ -149,16 +150,14 @@ generate_export_header(libf3d
 
 target_compile_features(libf3d PRIVATE cxx_std_17)
 
-if(F3D_INSTALL_SDK)
-  target_include_directories(libf3d
-    INTERFACE
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    )
+target_include_directories(libf3d
+  INTERFACE
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+  )
 
-  set_target_properties(libf3d PROPERTIES
-    PUBLIC_HEADER "${F3D_PUBLIC_HEADERS}"
-    )
-endif()
+set_target_properties(libf3d PROPERTIES
+  PUBLIC_HEADER "${F3D_PUBLIC_HEADERS}"
+  )
 
 vtk_module_autoinit(TARGETS libf3d MODULES ${F3D_VTK_MODULES})
 

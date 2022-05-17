@@ -54,6 +54,7 @@ find_package(VTK 9.0 REQUIRED
     IOExodus
     RenderingRayTracing)
 
+option(F3D_PYTHON_BINDINGS "Create Python bindings" OFF)
 if(F3D_PYTHON_BINDINGS)
   find_package(Python COMPONENTS Interpreter Development)
 endif()

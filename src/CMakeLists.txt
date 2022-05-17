@@ -57,7 +57,6 @@ if(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
 endif()
 
 # python bindings
-option(F3D_PYTHON_BINDINGS "Create Python bindings" OFF)
 if(F3D_PYTHON_BINDINGS)
   add_subdirectory(python)
 endif()
