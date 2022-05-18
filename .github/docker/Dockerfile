@@ -16,6 +16,7 @@ RUN apt update && apt install -y \
     help2man \
     lcov \
     libgl1-mesa-dev \
+    libglfw3-dev \
     libglu1-mesa \
     libjson-perl \
     libperlio-gzip-perl \
@@ -24,6 +25,7 @@ RUN apt update && apt install -y \
     libxt-dev \
     openssh-client \
     python3-dev \
+    qtbase5-dev \
     software-properties-common \
     wget \
     xvfb

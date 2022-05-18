@@ -44,6 +44,7 @@ find_package(VTK 9.0 REQUIRED
     IOXML
     RenderingAnnotation
     RenderingCore
+    RenderingExternal
     RenderingLabel
     RenderingOpenGL2
     RenderingVolumeOpenGL2

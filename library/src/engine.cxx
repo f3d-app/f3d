@@ -34,8 +34,20 @@ engine::engine(const flags_t& flags)
 
   if (flags & CREATE_WINDOW)
   {
-    this->Internals->Window = std::make_unique<detail::window_impl_standard>(
-      *this->Internals->Options, flags & WINDOW_OFFSCREEN);
+    detail::window_impl_standard::WindowType type =
+      detail::window_impl_standard::WindowType::NATIVE;
+
+    if (flags & WINDOW_EXTERNAL)
+    {
+      type = detail::window_impl_standard::WindowType::EXTERNAL;
+    }
+    else if (flags & WINDOW_OFFSCREEN)
+    {
+      type = detail::window_impl_standard::WindowType::NATIVE_OFFSCREEN;
+    }
+
+    this->Internals->Window =
+      std::make_unique<detail::window_impl_standard>(*this->Internals->Options, type);
   }
   else
   {

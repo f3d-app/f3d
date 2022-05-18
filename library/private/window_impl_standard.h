@@ -27,10 +27,20 @@ class window_impl_standard : public window_impl
 {
 public:
   /**
+   * Enumeration of valid standard window type
+   */
+  enum class WindowType : unsigned char
+  {
+    NATIVE,
+    NATIVE_OFFSCREEN,
+    EXTERNAL
+  };
+
+  /**
    * Create the internal vtkRenderWindow using the offscreen param
    * and store option ref for later usage
    */
-  window_impl_standard(const options& options, bool offscreen);
+  window_impl_standard(const options& options, WindowType type);
 
   /**
    * Default destructor
