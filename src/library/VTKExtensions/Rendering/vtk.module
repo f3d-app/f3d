@@ -7,6 +7,7 @@ DEPENDS
   VTK::RenderingAnnotation
   VTK::RenderingOpenGL2
   VTK::RenderingVolumeOpenGL2
+  VTK::opengl
 PRIVATE_DEPENDS
   VTK::IOImage
   VTK::InteractionWidgets

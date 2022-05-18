@@ -1,4 +1,3 @@
-find_package(Python COMPONENTS Interpreter Development)
 find_package(pybind11 2.2 REQUIRED)
 
 pybind11_add_module(pyf3d F3DPythonBindings.cxx)
