@@ -172,6 +172,46 @@ if(F3D_STRICT_BUILD AND MSVC)
   target_compile_definitions(libf3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
 endif()
 
+if (APPLE OR UNIX)
+  # Make sure rpath is correctly set for libf3d dependencies
+
+  # VTK
+  get_target_property(target_type VTK::CommonCore TYPE)
+  if (target_type STREQUAL SHARED_LIBRARY)
+    set(absolute_rpaths "$<TARGET_FILE_DIR:VTK::CommonCore>")
+  endif ()
+
+  # assimp
+  if(F3D_MODULE_ASSIMP)
+    get_target_property(target_type assimp::assimp TYPE)
+    if (target_type STREQUAL SHARED_LIBRARY)
+      list(APPEND absolute_rpaths "$<TARGET_FILE_DIR:assimp::assimp>")
+    endif ()
+  endif ()
+
+  # OCCT
+  if(F3D_MODULE_OCCT)
+    get_target_property(target_type OpenCASCADE::TKernel TYPE)
+    if (target_type STREQUAL SHARED_LIBRARY)
+      list(APPEND absolute_rpaths "${OpenCASCADE_LIBRARY_DIR}")
+    endif ()
+  endif ()
+
+  # Alembic/Imath
+  if(F3D_MODULE_ALEMBIC)
+    get_target_property(target_type Alembic::Alembic TYPE)
+    if (target_type STREQUAL SHARED_LIBRARY)
+      list(APPEND absolute_rpaths "$<TARGET_FILE_DIR:Alembic::Alembic>" "$<TARGET_FILE_DIR:Imath::Imath>")
+    endif ()
+    get_target_property(target_type Imath::Imath TYPE)
+    if (target_type STREQUAL SHARED_LIBRARY)
+      list(APPEND absolute_rpaths "$<TARGET_FILE_DIR:Alembic::Alembic>" "$<TARGET_FILE_DIR:Imath::Imath>")
+    endif ()
+  endif ()
+
+  set_target_properties(libf3d PROPERTIES INSTALL_RPATH "${absolute_rpaths}")
+endif ()
+
 # testing
 if(BUILD_TESTING)
   add_subdirectory(testing)
