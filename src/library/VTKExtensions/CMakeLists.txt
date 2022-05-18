@@ -6,7 +6,14 @@ vtk_module_scan(
   WANT_BY_DEFAULT   ON
   ENABLE_TESTS      ${BUILD_TESTING})
 
-vtk_module_build(MODULES ${modules} INSTALL_HEADERS OFF)
+# We need HEADERS_COMPONENT because of a bug in vtk_module_build in VTK <= 9.1
+# See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9192
+vtk_module_build(
+  MODULES ${modules}
+  INSTALL_EXPORT f3dTargets
+  INSTALL_HEADERS OFF
+  HEADERS_COMPONENT vtkext
+  TARGETS_COMPONENT vtkext)
 
 foreach (module IN LISTS modules)
   if(NOT "${libf3d_compile_options_public}" STREQUAL "")

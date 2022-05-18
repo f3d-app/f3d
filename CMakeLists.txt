@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.12)
 include(CMakeDependentOption)
 
 project(f3d
@@ -53,6 +53,11 @@ find_package(VTK 9.0 REQUIRED
   OPTIONAL_COMPONENTS
     IOExodus
     RenderingRayTracing)
+
+option(F3D_PYTHON_BINDINGS "Create Python bindings" OFF)
+if(F3D_PYTHON_BINDINGS)
+  find_package(Python COMPONENTS Interpreter Development)
+endif()
 
 # Windows Shell Extension DLL
 cmake_dependent_option(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION "Build the Windows Shell Extension to produce thumbnails" ON "WIN32" OFF)
