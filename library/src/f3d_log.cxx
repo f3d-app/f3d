@@ -4,7 +4,6 @@
 
 namespace f3d
 {
-
 //----------------------------------------------------------------------------
 void log::infoInternal(const std::string& str)
 {

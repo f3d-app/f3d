@@ -11,8 +11,12 @@ class vtkImporter;
 namespace f3d
 {
 class options;
+
+namespace detail
+{
 class loader_impl;
 class window_impl;
+
 class interactor_impl : public interactor
 {
 public:
@@ -72,9 +76,10 @@ public:
   //@}
 
 private:
-  class F3DInternals;
-  std::unique_ptr<F3DInternals> Internals;
+  class internals;
+  std::unique_ptr<internals> Internals;
 };
+}
 }
 
 #endif

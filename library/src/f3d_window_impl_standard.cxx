@@ -13,27 +13,24 @@
 #include <vtkRenderWindow.h>
 #include <vtkVersion.h>
 
-namespace
+namespace f3d::detail
 {
-void DisplayCameraInformation(vtkCamera* cam)
-{
-  double* position = cam->GetPosition();
-  f3d::log::info("Camera position is: ", position[0], ", ", position[1], ", ", position[2], ".");
-  double* focalPoint = cam->GetFocalPoint();
-  f3d::log::info(
-    "Camera focal point is: ", focalPoint[0], ", ", focalPoint[1], ", ", focalPoint[2], ".");
-  double* viewUp = cam->GetViewUp();
-  f3d::log::info("Camera view up is: ", viewUp[0], ", ", viewUp[1], ", ", viewUp[2], ".");
-  f3d::log::info("Camera view angle is: ", cam->GetViewAngle(), ".\n");
-}
-}
-
-namespace f3d
-{
-class window_impl_standard::F3DInternals
+class window_impl_standard::internals
 {
 public:
-  bool UpdateCamera(const f3d::options& options)
+  static void DisplayCameraInformation(vtkCamera* cam)
+  {
+    double* position = cam->GetPosition();
+    log::info("Camera position is: ", position[0], ", ", position[1], ", ", position[2], ".");
+    double* focalPoint = cam->GetFocalPoint();
+    log::info(
+      "Camera focal point is: ", focalPoint[0], ", ", focalPoint[1], ", ", focalPoint[2], ".");
+    double* viewUp = cam->GetViewUp();
+    log::info("Camera view up is: ", viewUp[0], ", ", viewUp[1], ", ", viewUp[2], ".");
+    log::info("Camera view angle is: ", cam->GetViewAngle(), ".\n");
+  }
+
+  bool UpdateCamera(const options& options)
   {
     if (!this->Renderer)
     {
@@ -80,7 +77,7 @@ public:
 
       if (options.getAsBool("verbose"))
       {
-        ::DisplayCameraInformation(cam);
+        window_impl_standard::internals::DisplayCameraInformation(cam);
       }
     }
 
@@ -95,7 +92,7 @@ public:
 //----------------------------------------------------------------------------
 window_impl_standard::window_impl_standard(const options& options, bool offscreen)
   : window_impl(options)
-  , Internals(new window_impl_standard::F3DInternals)
+  , Internals(new window_impl_standard::internals)
 {
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
   this->Internals->RenWin->SetOffScreenRendering(offscreen);
@@ -216,7 +213,7 @@ bool window_impl_standard::update()
     // Print coloring info when available
     if (this->Options.getAsBool("verbose"))
     {
-      f3d::log::info(this->Internals->Renderer->GetRenderingDescription());
+      log::info(this->Internals->Renderer->GetRenderingDescription());
     }
 
     return this->Internals->UpdateCamera(this->Options);

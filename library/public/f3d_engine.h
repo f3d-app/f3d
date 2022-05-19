@@ -79,8 +79,8 @@ public:
   static std::vector<readerInformation> getReadersInfo();
 
 private:
-  class F3DInternals;
-  F3DInternals* Internals;
+  class internals;
+  internals* Internals;
   engine(const engine& opt) = delete;
   engine& operator=(const engine& opt) = delete;
 };

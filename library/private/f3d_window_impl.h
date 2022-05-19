@@ -9,6 +9,9 @@ class vtkF3DGenericImporter;
 namespace f3d
 {
 class options;
+
+namespace detail
+{
 class window_impl : public window
 {
 public:
@@ -28,10 +31,11 @@ public:
   virtual vtkRenderWindow* GetRenderWindow() = 0;
 
 protected:
-  window_impl(const f3d::options&);
+  window_impl(const options&);
 
-  const f3d::options& Options;
+  const options& Options;
 };
+}
 }
 
 #endif
