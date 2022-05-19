@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace f3d
+namespace f3d::detail
 {
 extern const std::string LibVersion;
 extern const std::string LibBuildSystem;

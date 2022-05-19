@@ -17,134 +17,131 @@
 
 #include <set>
 
-namespace
+namespace f3d::detail
 {
-typedef struct ProgressDataStruct
-{
-  vtkTimerLog* timer;
-  vtkProgressBarWidget* widget;
-} ProgressDataStruct;
-
-vtkSmartPointer<vtkImporter> GetImporter(const std::string& fileName, bool geometry)
-{
-  if (!geometry)
-  {
-    // Try to find the first compatible reader with scene reading capabilities
-    F3DReader* reader = F3DReaderFactory::GetReader(fileName);
-    if (reader)
-    {
-      vtkSmartPointer<vtkImporter> importer = reader->CreateSceneReader(fileName);
-      if (importer)
-      {
-        return importer;
-      }
-    }
-  }
-
-  // Use the generic importer and check if it can process the file
-  vtkNew<vtkF3DGenericImporter> importer;
-  importer->SetFileName(fileName.c_str());
-  if (!importer->CanReadFile())
-  {
-    return nullptr;
-  }
-  return importer;
-}
-
-void InitializeImporterWithOptions(const f3d::options& options, vtkF3DGenericImporter* importer)
-{
-  importer->SetPointSize(options.getAsDouble("point-size"));
-  importer->SetScalarArray(options.getAsString("scalars"));
-  importer->SetUseCellScalars(options.getAsBool("cells"));
-  importer->SetSurfaceColor(options.getAsDoubleVector("color").data());
-  importer->SetOpacity(options.getAsDouble("opacity"));
-  importer->SetRoughness(options.getAsDouble("roughness"));
-  importer->SetMetallic(options.getAsDouble("metallic"));
-  importer->SetLineWidth(options.getAsDouble("line-width"));
-  importer->SetTextureBaseColor(options.getAsString("texture-base-color"));
-  importer->SetTextureEmissive(options.getAsString("texture-emissive"));
-  importer->SetEmissiveFactor(options.getAsDoubleVector("emissive-factor").data());
-  importer->SetTextureMaterial(options.getAsString("texture-material"));
-  importer->SetTextureNormal(options.getAsString("texture-normal"));
-  importer->SetNormalScale(options.getAsDouble("normal-scale"));
-}
-
-void CreateProgressRepresentationAndCallback(
-  ProgressDataStruct* data, vtkImporter* importer, f3d::interactor_impl* interactor)
-{
-  vtkNew<vtkCallbackCommand> progressCallback;
-  progressCallback->SetClientData(data);
-  progressCallback->SetCallback(
-    [](vtkObject*, unsigned long, void* clientData, void* callData)
-    {
-      auto progressData = static_cast<ProgressDataStruct*>(clientData);
-      progressData->timer->StopTimer();
-      vtkProgressBarWidget* widget = progressData->widget;
-      // Only show and render the progress bar if loading takes more than 0.15 seconds
-      if (progressData->timer->GetElapsedTime() > 0.15)
-      {
-        widget->On();
-        vtkProgressBarRepresentation* rep =
-          vtkProgressBarRepresentation::SafeDownCast(widget->GetRepresentation());
-        rep->SetProgressRate(*static_cast<double*>(callData));
-        widget->Render();
-      }
-    });
-  importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
-
-  interactor->SetInteractorOn(data->widget);
-
-  vtkProgressBarRepresentation* progressRep =
-    vtkProgressBarRepresentation::SafeDownCast(data->widget->GetRepresentation());
-  progressRep->SetProgressRate(0.0);
-  progressRep->ProportionalResizeOff();
-  progressRep->SetPosition(0.0, 0.0);
-  progressRep->SetPosition2(1.0, 0.0);
-  progressRep->SetMinimumSize(0, 5);
-  progressRep->SetProgressBarColor(1, 1, 1);
-  progressRep->DrawBackgroundOff();
-  progressRep->DragableOff();
-  progressRep->SetShowBorderToOff();
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201027)
-  progressRep->DrawFrameOff();
-  progressRep->SetPadding(0.0, 0.0);
-#endif
-  data->timer->StartTimer();
-}
-
-void DisplayImporterDescription(vtkImporter* importer)
-{
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210228)
-  vtkIdType availCameras = importer->GetNumberOfCameras();
-  if (availCameras <= 0)
-  {
-    f3d::log::info("No camera available in this file");
-  }
-  else
-  {
-    f3d::log::info("Camera(s) available in this file are:");
-  }
-  for (int i = 0; i < availCameras; i++)
-  {
-    f3d::log::info(i, ": ", importer->GetCameraName(i));
-  }
-  f3d::log::info("\n");
-#endif
-  f3d::log::info(importer->GetOutputsDescription());
-  f3d::log::info("\n");
-}
-}
-
-namespace f3d
-{
-class loader_impl::F3DInternals
+class loader_impl::internals
 {
 public:
-  F3DInternals(const options& options, window_impl& window)
+  internals(const options& options, window_impl& window)
     : Options(options)
     , Window(window)
   {
+  }
+
+  typedef struct ProgressDataStruct
+  {
+    vtkTimerLog* timer;
+    vtkProgressBarWidget* widget;
+  } ProgressDataStruct;
+
+  static vtkSmartPointer<vtkImporter> GetImporter(const std::string& fileName, bool geometry)
+  {
+    if (!geometry)
+    {
+      // Try to find the first compatible reader with scene reading capabilities
+      F3DReader* reader = F3DReaderFactory::GetReader(fileName);
+      if (reader)
+      {
+        vtkSmartPointer<vtkImporter> importer = reader->CreateSceneReader(fileName);
+        if (importer)
+        {
+          return importer;
+        }
+      }
+    }
+
+    // Use the generic importer and check if it can process the file
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetFileName(fileName.c_str());
+    if (!importer->CanReadFile())
+    {
+      return nullptr;
+    }
+    return importer;
+  }
+
+  static void InitializeImporterWithOptions(const options& options, vtkF3DGenericImporter* importer)
+  {
+    importer->SetPointSize(options.getAsDouble("point-size"));
+    importer->SetScalarArray(options.getAsString("scalars"));
+    importer->SetUseCellScalars(options.getAsBool("cells"));
+    importer->SetSurfaceColor(options.getAsDoubleVector("color").data());
+    importer->SetOpacity(options.getAsDouble("opacity"));
+    importer->SetRoughness(options.getAsDouble("roughness"));
+    importer->SetMetallic(options.getAsDouble("metallic"));
+    importer->SetLineWidth(options.getAsDouble("line-width"));
+    importer->SetTextureBaseColor(options.getAsString("texture-base-color"));
+    importer->SetTextureEmissive(options.getAsString("texture-emissive"));
+    importer->SetEmissiveFactor(options.getAsDoubleVector("emissive-factor").data());
+    importer->SetTextureMaterial(options.getAsString("texture-material"));
+    importer->SetTextureNormal(options.getAsString("texture-normal"));
+    importer->SetNormalScale(options.getAsDouble("normal-scale"));
+  }
+
+  static void CreateProgressRepresentationAndCallback(
+    ProgressDataStruct* data, vtkImporter* importer, interactor_impl* interactor)
+  {
+    vtkNew<vtkCallbackCommand> progressCallback;
+    progressCallback->SetClientData(data);
+    progressCallback->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void* callData)
+      {
+        auto progressData = static_cast<ProgressDataStruct*>(clientData);
+        progressData->timer->StopTimer();
+        vtkProgressBarWidget* widget = progressData->widget;
+        // Only show and render the progress bar if loading takes more than 0.15 seconds
+        if (progressData->timer->GetElapsedTime() > 0.15)
+        {
+          widget->On();
+          vtkProgressBarRepresentation* rep =
+            vtkProgressBarRepresentation::SafeDownCast(widget->GetRepresentation());
+          rep->SetProgressRate(*static_cast<double*>(callData));
+          widget->Render();
+        }
+      });
+    importer->AddObserver(vtkCommand::ProgressEvent, progressCallback);
+
+    interactor->SetInteractorOn(data->widget);
+
+    vtkProgressBarRepresentation* progressRep =
+      vtkProgressBarRepresentation::SafeDownCast(data->widget->GetRepresentation());
+    progressRep->SetProgressRate(0.0);
+    progressRep->ProportionalResizeOff();
+    progressRep->SetPosition(0.0, 0.0);
+    progressRep->SetPosition2(1.0, 0.0);
+    progressRep->SetMinimumSize(0, 5);
+    progressRep->SetProgressBarColor(1, 1, 1);
+    progressRep->DrawBackgroundOff();
+    progressRep->DragableOff();
+    progressRep->SetShowBorderToOff();
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201027)
+    progressRep->DrawFrameOff();
+    progressRep->SetPadding(0.0, 0.0);
+#endif
+    data->timer->StartTimer();
+  }
+
+  static void DisplayImporterDescription(vtkImporter* importer)
+  {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210228)
+    vtkIdType availCameras = importer->GetNumberOfCameras();
+    if (availCameras <= 0)
+    {
+      log::info("No camera available in this file");
+    }
+    else
+    {
+      log::info("Camera(s) available in this file are:");
+    }
+    for (int i = 0; i < availCameras; i++)
+    {
+      log::info(i, ": ", importer->GetCameraName(i));
+    }
+    log::info("\n");
+#endif
+    log::info(importer->GetOutputsDescription());
+    log::info("\n");
   }
 
   std::vector<std::string> FilesList;
@@ -160,7 +157,7 @@ public:
 
 //----------------------------------------------------------------------------
 loader_impl::loader_impl(const options& options, window_impl& window)
-  : Internals(new loader_impl::F3DInternals(options, window))
+  : Internals(new loader_impl::internals(options, window))
 {
 }
 
@@ -187,7 +184,7 @@ void loader_impl::addFile(const std::string& path, bool recursive)
   std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
   if (!vtksys::SystemTools::FileExists(fullPath))
   {
-    f3d::log::error("File ", fullPath, " does not exist");
+    log::error("File ", fullPath, " does not exist");
     return;
   }
 
@@ -292,7 +289,7 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   this->Internals->LoadedFile = false;
 
   // Make sure quiet is respected
-  f3d::log::setQuiet(this->Internals->Options.getAsBool("quiet"));
+  log::setQuiet(this->Internals->Options.getAsBool("quiet"));
 
   // Recover information about the file to load
   std::string filePath, fileInfo;
@@ -302,11 +299,11 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   {
     if (filePath.empty())
     {
-      f3d::log::info("No file to load provided\n");
+      log::info("No file to load provided\n");
     }
     else
     {
-      f3d::log::info("Loading: ", filePath, "\n");
+      log::info("Loading: ", filePath, "\n");
     }
   }
 
@@ -320,13 +317,13 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   }
 
   // Recover the importer
-  this->Internals->Importer =
-    ::GetImporter(filePath, this->Internals->Options.getAsBool("geometry-only"));
+  this->Internals->Importer = loader_impl::internals::GetImporter(
+    filePath, this->Internals->Options.getAsBool("geometry-only"));
   vtkF3DGenericImporter* genericImporter =
     vtkF3DGenericImporter::SafeDownCast(this->Internals->Importer);
   if (!this->Internals->Importer)
   {
-    f3d::log::warn(filePath, " is not a file of a supported file format\n");
+    log::warn(filePath, " is not a file of a supported file format\n");
     fileInfo += " [UNSUPPORTED]";
     this->Internals->Window.Initialize(false, fileInfo);
     this->Internals->Window.update();
@@ -335,7 +332,7 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
 
   vtkNew<vtkProgressBarWidget> progressWidget;
   vtkNew<vtkTimerLog> timer;
-  ::ProgressDataStruct callbackData;
+  loader_impl::internals::ProgressDataStruct callbackData;
   callbackData.timer = timer;
   callbackData.widget = progressWidget;
 
@@ -349,28 +346,29 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   // XXX There is no way to recover the init value yet, assume it is -1
   if (this->Internals->Options.getAsInt("camera-index") != -1)
   {
-    f3d::log::warn("This VTK version does not support specifying the camera index, ignored.");
+    log::warn("This VTK version does not support specifying the camera index, ignored.");
   }
 #endif
 
   // Manage progress bar
   if (this->Internals->Options.getAsBool("progress") && this->Internals->Interactor)
   {
-    ::CreateProgressRepresentationAndCallback(
+    loader_impl::internals::CreateProgressRepresentationAndCallback(
       &callbackData, this->Internals->Importer, this->Internals->Interactor);
   }
 
   // Initialize genericImporter with options
   if (genericImporter)
   {
-    ::InitializeImporterWithOptions(this->Internals->Options, genericImporter);
+    loader_impl::internals::InitializeImporterWithOptions(
+      this->Internals->Options, genericImporter);
   }
 
   // Read the file
   this->Internals->Importer->Update();
   if (verbose)
   {
-    ::DisplayImporterDescription(this->Internals->Importer);
+    loader_impl::internals::DisplayImporterDescription(this->Internals->Importer);
   }
 
   // Remove anything progress related if any

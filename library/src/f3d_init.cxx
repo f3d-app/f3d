@@ -9,9 +9,9 @@
 #include <vtkNew.h>
 #include <vtkVersion.h>
 
-namespace f3d
+namespace f3d::detail
 {
-class init::F3DInternals
+class init::internals
 {
 public:
   F3DReaderInstantiator ReaderInstantiator;
@@ -19,7 +19,7 @@ public:
 
 //----------------------------------------------------------------------------
 init::init()
-  : Internals(new init::F3DInternals())
+  : Internals(new init::internals())
 {
 #if NDEBUG
   vtkObject::GlobalWarningDisplayOff();
@@ -38,7 +38,7 @@ init::init()
 
   // Make sure to initialize the output window
   // after the object factory and before the first usage.
-  f3d::log::setQuiet(false);
+  log::setQuiet(false);
 }
 
 //----------------------------------------------------------------------------

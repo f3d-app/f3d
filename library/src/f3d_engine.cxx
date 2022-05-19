@@ -17,38 +17,39 @@
 
 namespace f3d
 {
-class engine::F3DInternals
+class engine::internals
 {
 public:
   std::unique_ptr<options> Options;
-  std::unique_ptr<window_impl> Window;
-  std::unique_ptr<loader_impl> Loader;
-  std::unique_ptr<interactor_impl> Interactor;
+  std::unique_ptr<detail::window_impl> Window;
+  std::unique_ptr<detail::loader_impl> Loader;
+  std::unique_ptr<detail::interactor_impl> Interactor;
 };
 
 //----------------------------------------------------------------------------
 engine::engine(const flags_t& flags)
-  : Internals(new engine::F3DInternals())
+  : Internals(new engine::internals())
 {
   this->Internals->Options = std::make_unique<options>();
 
   if (flags & CREATE_WINDOW)
   {
-    this->Internals->Window =
-      std::make_unique<window_impl_standard>(*this->Internals->Options, flags & WINDOW_OFFSCREEN);
+    this->Internals->Window = std::make_unique<detail::window_impl_standard>(
+      *this->Internals->Options, flags & WINDOW_OFFSCREEN);
   }
   else
   {
     // Without the window flag, we still need to create a window noRender
-    this->Internals->Window = std::make_unique<window_impl_noRender>(*this->Internals->Options);
+    this->Internals->Window =
+      std::make_unique<detail::window_impl_noRender>(*this->Internals->Options);
   }
 
   this->Internals->Loader =
-    std::make_unique<loader_impl>(*this->Internals->Options, *this->Internals->Window);
+    std::make_unique<detail::loader_impl>(*this->Internals->Options, *this->Internals->Window);
 
   if (flags & CREATE_INTERACTOR)
   {
-    this->Internals->Interactor = std::make_unique<interactor_impl>(
+    this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
       *this->Internals->Options, *this->Internals->Window, *this->Internals->Loader);
   }
 }
@@ -81,9 +82,9 @@ options& engine::getOptions()
 window& engine::getWindow()
 {
   if (!this->Internals->Window ||
-    dynamic_cast<window_impl_noRender*>(this->Internals->Window.get()))
+    dynamic_cast<detail::window_impl_noRender*>(this->Internals->Window.get()))
   {
-    throw f3d::engine::exception("Cannot create window with this engine");
+    throw engine::exception("Cannot create window with this engine");
   }
   return *this->Internals->Window;
 }
@@ -99,7 +100,7 @@ interactor& engine::getInteractor()
 {
   if (!this->Internals->Interactor)
   {
-    throw f3d::engine::exception("Cannot create interactor with this engine");
+    throw engine::exception("Cannot create interactor with this engine");
   }
   return *this->Internals->Interactor;
 }
@@ -108,10 +109,10 @@ interactor& engine::getInteractor()
 std::map<std::string, std::string> engine::getLibInfo()
 {
   std::map<std::string, std::string> libInfo;
-  libInfo["Version"] = f3d::LibVersion;
-  libInfo["Build date"] = f3d::LibBuildDate;
-  libInfo["Build system"] = f3d::LibBuildSystem;
-  libInfo["Compiler"] = f3d::LibCompiler;
+  libInfo["Version"] = detail::LibVersion;
+  libInfo["Build date"] = detail::LibBuildDate;
+  libInfo["Build system"] = detail::LibBuildSystem;
+  libInfo["Compiler"] = detail::LibCompiler;
 
   std::string tmp;
 
@@ -167,7 +168,7 @@ std::map<std::string, std::string> engine::getLibInfo()
 }
 
 //----------------------------------------------------------------------------
-std::vector<f3d::engine::readerInformation> engine::getReadersInfo()
+std::vector<engine::readerInformation> engine::getReadersInfo()
 {
   std::vector<readerInformation> readersInfo;
   const auto& readers = F3DReaderFactory::GetInstance()->GetReaders();

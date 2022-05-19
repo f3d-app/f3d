@@ -12,6 +12,9 @@ class vtkF3DGenericImporter;
 namespace f3d
 {
 class loader;
+
+namespace detail
+{
 class window_impl_standard : public window_impl
 {
 public:
@@ -31,9 +34,10 @@ public:
   void InitializeRendererWithColoring(vtkF3DGenericImporter* importer) override;
 
 private:
-  class F3DInternals;
-  std::unique_ptr<F3DInternals> Internals;
+  class internals;
+  std::unique_ptr<internals> Internals;
 };
+}
 }
 
 #endif

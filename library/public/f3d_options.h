@@ -63,8 +63,8 @@ public:
   std::vector<double>& getAsDoubleVectorRef(const std::string& name);
 
 private:
-  class F3DInternals;
-  F3DInternals* Internals;
+  class internals;
+  internals* Internals;
 };
 }
 

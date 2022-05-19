@@ -3,9 +3,9 @@
 #include <vtkNew.h>
 #include <vtkRenderWindow.h>
 
-namespace f3d
+namespace f3d::detail
 {
-class window_impl_noRender::F3DInternals
+class window_impl_noRender::internals
 {
 public:
   vtkNew<vtkRenderWindow> RenWin;
@@ -14,7 +14,7 @@ public:
 //----------------------------------------------------------------------------
 window_impl_noRender::window_impl_noRender(const options& options)
   : window_impl(options)
-  , Internals(new window_impl_noRender::F3DInternals)
+  , Internals(new window_impl_noRender::internals)
 {
 }
 

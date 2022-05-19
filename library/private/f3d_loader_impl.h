@@ -6,6 +6,9 @@
 namespace f3d
 {
 class options;
+
+namespace detail
+{
 class interactor_impl;
 class window_impl;
 class loader_impl : public loader
@@ -64,9 +67,10 @@ public:
   void setInteractor(interactor_impl* interactor);
 
 private:
-  class F3DInternals;
-  std::unique_ptr<F3DInternals> Internals;
+  class internals;
+  std::unique_ptr<internals> Internals;
 };
+}
 }
 
 #endif
