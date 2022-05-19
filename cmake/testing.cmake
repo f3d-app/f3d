@@ -282,7 +282,7 @@ f3d_test(NAME TestInteractionDumpSceneState DATA dragon.vtu NO_BASELINE INTERACT
 f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring")#SYVC
 f3d_test(NAME TestInteractionEmptyDrop INTERACTION REGEXP "Drop event without any provided files.")#DropEvent Empty;
  
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220517) # Drop file test uses stream version 1.2
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2
 
   configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestInteractionDropFiles.log.in"
     "${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")
