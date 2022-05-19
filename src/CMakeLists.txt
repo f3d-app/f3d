@@ -8,13 +8,15 @@ cmake_dependent_option(BUILD_SHARED_LIBS "Build f3d with shared libraries" ON "N
 # F3D_STRICT_BUILD
 set(F3D_STRICT_BUILD OFF CACHE BOOL "Use strict warnings and errors flags for building F3D")
 mark_as_advanced(F3D_STRICT_BUILD)
-if(MSVC)
-  # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
-  set(f3d_strict_build_compile_options /W4 /WX /wd4275)
-else()
-  set(f3d_strict_build_compile_options -Wall -Wextra -Wshadow -Woverloaded-virtual -Wno-deprecated -Wno-strict-overflow -Wno-array-bounds -Wunreachable-code -Wno-missing-field-initializers -Wno-unused-parameter -Wmissing-declarations -Wredundant-decls -Wpointer-arith -Werror)
-  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    list(APPEND f3d_strict_build_compile_options -Wsuggest-override)
+if(F3D_STRICT_BUILD)
+  if(MSVC)
+    # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
+    set(f3d_strict_build_compile_options /W4 /WX /wd4275)
+  else()
+    set(f3d_strict_build_compile_options -Wall -Wextra -Wshadow -Woverloaded-virtual -Wno-deprecated -Wno-strict-overflow -Wno-array-bounds -Wunreachable-code -Wno-missing-field-initializers -Wno-unused-parameter -Wmissing-declarations -Wredundant-decls -Wpointer-arith -Werror)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+      list(APPEND f3d_strict_build_compile_options -Wsuggest-override)
+    endif()
   endif()
 endif()
 
