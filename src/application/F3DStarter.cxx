@@ -19,6 +19,7 @@ public:
   F3DOptionsParser Parser;
   F3DAppOptions AppOptions;
   std::unique_ptr<f3d::engine> Engine;
+  bool LoadedFile = false;
 };
 
 //----------------------------------------------------------------------------
@@ -116,7 +117,7 @@ int F3DStarter::Start(int argc, char** argv)
 
   // Add and load file
   this->Internals->Engine->getLoader().addFiles(files);
-  bool loaded = this->LoadFile();
+  this->LoadFile();
 
   if (!this->Internals->AppOptions.NoRender)
   {
@@ -145,7 +146,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Render and compare with file if needed
     if (!this->Internals->AppOptions.Reference.empty())
     {
-      if (!loaded)
+      if (!this->Internals->LoadedFile)
       {
         f3d::log::error("No file loaded, no rendering performed");
         return EXIT_FAILURE;
@@ -161,7 +162,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Render to file if needed
     else if (!this->Internals->AppOptions.Output.empty())
     {
-      if (!loaded)
+      if (!this->Internals->LoadedFile)
       {
         f3d::log::error("No file loaded, no rendering performed");
         return EXIT_FAILURE;
@@ -184,7 +185,7 @@ int F3DStarter::Start(int argc, char** argv)
 }
 
 //----------------------------------------------------------------------------
-bool F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
+void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
 {
   // Recover info about the file to be loaded
   int index;
@@ -205,5 +206,6 @@ bool F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
   }
 
   // Load the file
-  return this->Internals->Engine->getLoader().loadFile(load);
+  this->Internals->LoadedFile = this->Internals->Engine->getLoader().loadFile(load);
+  return;
 }
