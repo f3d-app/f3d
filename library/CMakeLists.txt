@@ -91,24 +91,24 @@ list(APPEND libf3d_link_options_public ${f3d_sanitizer_link_options})
 add_subdirectory(VTKExtensions)
 
 configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_config.cxx.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/src/f3d_config.cxx"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/config.cxx.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx"
   @ONLY)
 
 # Define libf3d target
 set(F3D_SOURCE_FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/src/f3d_config.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_animationManager.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_init.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_engine.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_interactor.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_interactor_impl.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_loader_impl.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_log.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_options.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_window_impl.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_window_impl_standard.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_window_impl_noRender.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/animationManager.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/init.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/engine.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/interactor.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/interactor_impl.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/loader_impl.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/log.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/options.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl_standard.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl_noRender.cxx
   )
 
 # List of headers that will be installed
