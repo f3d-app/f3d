@@ -1,13 +1,13 @@
-#include "f3d_engine.h"
+#include "engine.h"
 
-#include "f3d_config.h"
-#include "f3d_init.h" // This includes is needed on mac so that the global variable is created
-#include "f3d_interactor_impl.h"
-#include "f3d_loader_impl.h"
-#include "f3d_log.h"
-#include "f3d_options.h"
-#include "f3d_window_impl_noRender.h"
-#include "f3d_window_impl_standard.h"
+#include "config.h"
+#include "init.h" // This includes is needed on mac so that the global variable is created
+#include "interactor_impl.h"
+#include "loader_impl.h"
+#include "log.h"
+#include "options.h"
+#include "window_impl_noRender.h"
+#include "window_impl_standard.h"
 
 #include "F3DReaderFactory.h"
 

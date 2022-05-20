@@ -8,7 +8,7 @@
 #ifndef f3d_engine_h
 #define f3d_engine_h
 
-#include "f3d_export.h"
+#include "export.h"
 
 #include <map>
 #include <stdexcept>

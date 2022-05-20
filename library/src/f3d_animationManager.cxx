@@ -1,9 +1,9 @@
-#include "f3d_animationManager.h"
+#include "animationManager.h"
 
-#include "f3d_interactor_impl.h"
-#include "f3d_log.h"
-#include "f3d_options.h"
-#include "f3d_window.h"
+#include "interactor_impl.h"
+#include "log.h"
+#include "options.h"
+#include "window.h"
 
 #include <vtkDoubleArray.h>
 #include <vtkImporter.h>

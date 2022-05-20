@@ -1,6 +1,6 @@
-#include "f3d_init.h"
+#include "init.h"
 
-#include "f3d_log.h"
+#include "log.h"
 
 #include "F3DReaderInstantiator.h"
 #include "vtkF3DObjectFactory.h"

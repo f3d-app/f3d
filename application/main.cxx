@@ -1,6 +1,7 @@
 #include "F3DException.h"
 #include "F3DStarter.h"
-#include "f3d_log.h"
+
+#include "log.h"
 
 int main(int argc, char** argv)
 {
