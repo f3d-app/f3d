@@ -147,9 +147,6 @@ void window_impl_standard::Initialize(bool withColoring, std::string fileInfo)
     this->Internals->RenWin->RemoveRenderer(this->Internals->Renderer);
   }
 
-  this->Internals->RenWin->SetSize(this->Options.getAsIntVector("resolution").data());
-  this->Internals->RenWin->SetFullScreen(this->Options.getAsBool("fullscreen"));
-
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
 
@@ -172,6 +169,9 @@ void window_impl_standard::Initialize(bool withColoring, std::string fileInfo)
 //----------------------------------------------------------------------------
 bool window_impl_standard::update()
 {
+  this->Internals->RenWin->SetSize(this->Options.getAsIntVector("resolution").data());
+  this->Internals->RenWin->SetFullScreen(this->Options.getAsBool("fullscreen"));
+
   if (this->Internals->Renderer)
   {
     this->Internals->Renderer->ShowAxis(this->Options.getAsBool("axis"));
