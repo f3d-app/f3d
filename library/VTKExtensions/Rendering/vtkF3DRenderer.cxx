@@ -144,8 +144,6 @@ std::string vtkF3DRenderer::GenerateMetaDataDescription()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetupRenderPasses()
 {
-  // TODO maybe this could be called only before rendering, when needed
-
   // clean up previous pass
   vtkRenderPass* pass = this->GetPass();
   if (pass)
