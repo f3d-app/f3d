@@ -191,7 +191,7 @@ if (APPLE OR UNIX)
 
   # OCCT
   if(F3D_MODULE_OCCT)
-    get_target_property(target_type OpenCASCADE::TKernel TYPE)
+    get_target_property(target_type OpenCASCADE::TKSTEP TYPE)
     if (target_type STREQUAL SHARED_LIBRARY)
       list(APPEND absolute_rpaths "${OpenCASCADE_LIBRARY_DIR}")
     endif ()
