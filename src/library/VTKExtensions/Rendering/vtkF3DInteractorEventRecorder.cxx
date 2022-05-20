@@ -4,6 +4,7 @@
 #include <vtkCallbackCommand.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkVersion.h>
 
 vtkStandardNewMacro(vtkF3DInteractorEventRecorder);
 
@@ -34,7 +35,7 @@ void vtkF3DInteractorEventRecorder::SetInteractor(vtkRenderWindowInteractor* int
 
 //------------------------------------------------------------------------------
 void vtkF3DInteractorEventRecorder::ProcessEvents(
-  vtkObject* object, unsigned long event, void* clientData, void* vtkNotUsed(callData))
+  vtkObject* object, unsigned long event, void* clientData, void* callData)
 {
   vtkF3DInteractorEventRecorder* self =
     reinterpret_cast<vtkF3DInteractorEventRecorder*>(clientData);
@@ -68,8 +69,14 @@ void vtkF3DInteractorEventRecorder::ProcessEvents(
           {
             mod |= ModifierKey::AltKey;
           }
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220519)
+          self->WriteEvent(vtkCommand::GetStringFromEventId(event), rwi->GetEventPosition(), mod,
+            rwi->GetKeyCode(), rwi->GetRepeatCount(), rwi->GetKeySym(), callData);
+#else
+          (void)callData;
           self->WriteEvent(vtkCommand::GetStringFromEventId(event), rwi->GetEventPosition(), mod,
             rwi->GetKeyCode(), rwi->GetRepeatCount(), rwi->GetKeySym());
+#endif
         }
     }
     self->OutputStream->flush();
