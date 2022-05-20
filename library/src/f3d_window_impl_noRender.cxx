@@ -1,4 +1,4 @@
-#include "f3d_window_impl_noRender.h"
+#include "window_impl_noRender.h"
 
 #include <vtkNew.h>
 #include <vtkRenderWindow.h>

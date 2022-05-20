@@ -1,12 +1,14 @@
 #ifndef f3d_window_h
 #define f3d_window_h
 
+#include "export.h"
+
 #include <string>
 
 // TODO DOC
 namespace f3d
 {
-class window
+class F3D_EXPORT window
 {
 public:
   virtual bool update() = 0;

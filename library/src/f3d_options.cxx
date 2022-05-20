@@ -1,6 +1,7 @@
-#include "f3d_options.h"
+#include "options.h"
 
-#include "f3d_log.h"
+#include "log.h"
+
 #include "vtkF3DConfigure.h"
 
 #include <map>

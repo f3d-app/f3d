@@ -1,7 +1,7 @@
-#include <f3d_engine.h>
-#include <f3d_interactor.h>
-#include <f3d_loader.h>
-#include <f3d_window.h>
+#include <engine.h>
+#include <interactor.h>
+#include <loader.h>
+#include <window.h>
 
 #include <iostream>
 
