@@ -1,7 +1,7 @@
 #ifndef f3d_window_impl_noRender_h
 #define f3d_window_impl_noRender_h
 
-#include "f3d_window_impl.h"
+#include "window_impl.h"
 
 #include <memory>
 #include <string>

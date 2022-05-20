@@ -1,4 +1,4 @@
-#include "f3d_interactor.h"
+#include "interactor.h"
 
 namespace f3d
 {

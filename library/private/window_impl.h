@@ -1,7 +1,7 @@
 #ifndef f3d_window_impl_h
 #define f3d_window_impl_h
 
-#include "f3d_window.h"
+#include "window.h"
 
 // TODO Doc
 class vtkRenderWindow;

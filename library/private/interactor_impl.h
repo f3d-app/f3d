@@ -1,7 +1,7 @@
 #ifndef f3d_interactor_impl_h
 #define f3d_interactor_impl_h
 
-#include "f3d_interactor.h"
+#include "interactor.h"
 
 #include <memory>
 

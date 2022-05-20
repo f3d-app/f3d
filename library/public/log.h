@@ -8,7 +8,7 @@
 #ifndef f3d_log_h
 #define f3d_log_h
 
-#include "f3d_export.h"
+#include "export.h"
 
 #include <sstream>
 #include <string>

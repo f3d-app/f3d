@@ -2,14 +2,14 @@
 
 #include "F3DConfig.h"
 #include "F3DIcon.h"
+#include "F3DNSDelegate.h"
 #include "F3DOptionsParser.h"
 
-#include "F3DNSDelegate.h"
-#include "f3d_engine.h"
-#include "f3d_interactor.h"
-#include "f3d_log.h"
-#include "f3d_options.h"
-#include "f3d_window.h"
+#include "engine.h"
+#include "interactor.h"
+#include "log.h"
+#include "options.h"
+#include "window.h"
 
 class F3DStarter::F3DInternals
 {
