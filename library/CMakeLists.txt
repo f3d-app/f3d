@@ -91,35 +91,35 @@ list(APPEND libf3d_link_options_public ${f3d_sanitizer_link_options})
 add_subdirectory(VTKExtensions)
 
 configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_config.cxx.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/src/f3d_config.cxx"
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/config.cxx.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx"
   @ONLY)
 
 # Define libf3d target
 set(F3D_SOURCE_FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/src/f3d_config.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_animationManager.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_init.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_engine.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_interactor.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_interactor_impl.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_loader_impl.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_log.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_options.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_window_impl.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_window_impl_standard.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/f3d_window_impl_noRender.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/animationManager.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/init.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/engine.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/interactor.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/interactor_impl.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/loader_impl.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/log.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/options.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl_standard.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl_noRender.cxx
   )
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
-  ${CMAKE_CURRENT_BINARY_DIR}/public/f3d_export.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/f3d_engine.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/f3d_interactor.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/f3d_loader.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/f3d_log.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/f3d_options.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/f3d_window.h
+  ${CMAKE_CURRENT_BINARY_DIR}/public/export.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/engine.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/interactor.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/loader.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/log.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/options.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
   )
 
 add_library(libf3d
@@ -147,7 +147,7 @@ set_target_properties(libf3d PROPERTIES
 # Generate export macros for exported public APIs
 include(GenerateExportHeader)
 generate_export_header(libf3d
-  EXPORT_FILE_NAME public/f3d_export.h
+  EXPORT_FILE_NAME public/export.h
   EXPORT_MACRO_NAME F3D_EXPORT)
 
 target_compile_features(libf3d PRIVATE cxx_std_17)

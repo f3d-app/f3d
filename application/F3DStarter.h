@@ -7,7 +7,7 @@
 #ifndef F3DStarter_h
 #define F3DStarter_h
 
-#include "f3d_loader.h"
+#include "loader.h"
 
 class F3DStarter
 {

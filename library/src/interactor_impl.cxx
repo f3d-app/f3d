@@ -1,10 +1,10 @@
-#include "f3d_interactor_impl.h"
+#include "interactor_impl.h"
 
-#include "f3d_animationManager.h"
-#include "f3d_loader_impl.h"
-#include "f3d_log.h"
-#include "f3d_options.h"
-#include "f3d_window_impl.h"
+#include "animationManager.h"
+#include "loader_impl.h"
+#include "log.h"
+#include "options.h"
+#include "window_impl.h"
 
 #include "vtkF3DConfigure.h"
 #include "vtkF3DInteractorEventRecorder.h"

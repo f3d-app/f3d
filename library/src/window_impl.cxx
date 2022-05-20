@@ -1,6 +1,6 @@
-#include "f3d_window_impl.h"
+#include "window_impl.h"
 
-#include "f3d_options.h"
+#include "options.h"
 
 namespace f3d::detail
 {
