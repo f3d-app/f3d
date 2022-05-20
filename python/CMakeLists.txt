@@ -20,6 +20,10 @@ if(WIN32)
     )
 endif()
 
+if (APPLE OR UNIX)
+  set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+endif ()
+
 # testing
 if(BUILD_TESTING)
   add_subdirectory(testing)
