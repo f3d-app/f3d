@@ -10,7 +10,7 @@
 
 #include <memory>
 
-namespace f3d
+namespace f3d::detail
 {
 class init
 {
@@ -19,10 +19,10 @@ public:
   ~init();
 
 private:
-  class F3DInternals;
-  std::unique_ptr<F3DInternals> Internals;
+  class internals;
+  std::unique_ptr<internals> Internals;
 };
 }
 
-static const f3d::init gInitInstance;
+static const f3d::detail::init gInitInstance;
 #endif

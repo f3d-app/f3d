@@ -12,6 +12,9 @@ class vtkF3DRenderer;
 namespace f3d
 {
 class loader;
+
+namespace detail
+{
 class window_impl_noRender : public window_impl
 {
 public:
@@ -21,9 +24,10 @@ public:
   vtkRenderWindow* GetRenderWindow() override;
 
 private:
-  class F3DInternals;
-  std::unique_ptr<F3DInternals> Internals;
+  class internals;
+  std::unique_ptr<internals> Internals;
 };
+}
 }
 
 #endif

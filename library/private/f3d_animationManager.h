@@ -1,11 +1,11 @@
 /**
- * @class   F3DAnimationManager
+ * @class   animationManager
  * @brief   The animation manager class
  *
  */
 
-#ifndef F3DAnimationManager_h
-#define F3DAnimationManager_h
+#ifndef f3d_animationManager_h
+#define f3d_animationManager_h
 
 #include <vtkNew.h>
 #include <vtkProgressBarWidget.h>
@@ -13,27 +13,30 @@
 
 #include <set>
 
-namespace f3d
-{
-class options;
-class window;
-class interactor_impl;
-}
 class vtkF3DRenderer;
 class vtkImporter;
 class vtkRenderWindow;
 
-class F3DAnimationManager
+namespace f3d
+{
+class options;
+class window;
+
+namespace detail
+{
+class interactor_impl;
+
+class animationManager
 {
 public:
-  F3DAnimationManager() = default;
-  ~F3DAnimationManager() = default;
+  animationManager() = default;
+  ~animationManager() = default;
 
   /**
    * Initialize the animation manager, required before playing the animation
    */
-  void Initialize(const f3d::options* options, f3d::interactor_impl* interactor,
-    f3d::window* window, vtkImporter* importer);
+  void Initialize(
+    const options* options, interactor_impl* interactor, window* window, vtkImporter* importer);
 
   /**
    * Start/Stop playing the animation
@@ -51,9 +54,9 @@ protected:
   void Tick();
 
   vtkImporter* Importer = nullptr;
-  f3d::window* Window;
-  f3d::interactor_impl* Interactor;
-  const f3d::options* Options;
+  window* Window;
+  interactor_impl* Interactor;
+  const options* Options;
 
   std::set<double> TimeSteps;
   std::set<double>::iterator CurrentTimeStep;
@@ -66,8 +69,9 @@ protected:
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
 
 private:
-  F3DAnimationManager(F3DAnimationManager const&) = delete;
-  void operator=(F3DAnimationManager const&) = delete;
+  animationManager(animationManager const&) = delete;
+  void operator=(animationManager const&) = delete;
 };
-
+}
+}
 #endif

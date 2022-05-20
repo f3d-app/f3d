@@ -1,6 +1,6 @@
 #include "f3d_interactor_impl.h"
 
-#include "F3DAnimationManager.h"
+#include "f3d_animationManager.h"
 #include "f3d_loader_impl.h"
 #include "f3d_log.h"
 #include "f3d_options.h"
@@ -21,12 +21,12 @@
 
 #include <map>
 
-namespace f3d
+namespace f3d::detail
 {
-class interactor_impl::F3DInternals
+class interactor_impl::internals
 {
 public:
-  F3DInternals(const options& options, window_impl& window, loader_impl& loader)
+  internals(const options& options, window_impl& window, loader_impl& loader)
     : Options(options)
     , Window(window)
     , Loader(loader)
@@ -54,7 +54,7 @@ public:
 
   static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
   {
-    F3DInternals* self = static_cast<F3DInternals*>(clientData);
+    internals* self = static_cast<internals*>(clientData);
     vtkRenderWindowInteractor* rwi = self->Style->GetInteractor();
     int keyCode = std::toupper(rwi->GetKeyCode());
     std::string keySym = rwi->GetKeySym();
@@ -82,7 +82,7 @@ public:
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
           if (self->Options.getAsBool("verbose"))
           {
-            f3d::log::info(renWithColor->GetRenderingDescription());
+            log::info(renWithColor->GetRenderingDescription());
           }
           renWin->Render();
         }
@@ -93,7 +93,7 @@ public:
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
           if (self->Options.getAsBool("verbose"))
           {
-            f3d::log::info(renWithColor->GetRenderingDescription());
+            log::info(renWithColor->GetRenderingDescription());
           }
           renWin->Render();
         }
@@ -104,7 +104,7 @@ public:
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
           if (self->Options.getAsBool("verbose"))
           {
-            f3d::log::info(renWithColor->GetRenderingDescription());
+            log::info(renWithColor->GetRenderingDescription());
           }
           renWin->Render();
         }
@@ -177,7 +177,7 @@ public:
           renWithColor->SetUseVolume(!renWithColor->UsingVolume());
           if (self->Options.getAsBool("verbose"))
           {
-            f3d::log::info(renWithColor->GetRenderingDescription());
+            log::info(renWithColor->GetRenderingDescription());
           }
           renWin->Render();
         }
@@ -195,7 +195,7 @@ public:
           renWithColor->SetUsePointSprites(!renWithColor->UsingPointSprites());
           if (self->Options.getAsBool("verbose"))
           {
-            f3d::log::info(renWithColor->GetRenderingDescription());
+            log::info(renWithColor->GetRenderingDescription());
           }
           renWin->Render();
         }
@@ -244,28 +244,28 @@ public:
       case '?':
       {
         std::string output = ren->GetSceneDescription();
-        f3d::log::info(output);
+        log::info(output);
       }
       break;
       default:
         if (keySym == "Left")
         {
           self->AnimationManager.StopAnimation();
-          f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_PREVIOUS;
+          loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_PREVIOUS;
           self->Loader.loadFile(load);
           renWin->Render();
         }
         else if (keySym == "Right")
         {
           self->AnimationManager.StopAnimation();
-          f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_NEXT;
+          loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_NEXT;
           self->Loader.loadFile(load);
           renWin->Render();
         }
         else if (keySym == "Up")
         {
           self->AnimationManager.StopAnimation();
-          f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_CURRENT;
+          loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_CURRENT;
           self->Loader.loadFile(load);
           renWin->Render();
         }
@@ -289,7 +289,7 @@ public:
 
   static void OnDropFiles(vtkObject*, unsigned long, void* clientData, void* callData)
   {
-    F3DInternals* self = static_cast<F3DInternals*>(clientData);
+    internals* self = static_cast<internals*>(clientData);
     vtkStringArray* filesArr = static_cast<vtkStringArray*>(callData);
     std::vector<std::string> filesVec;
     for (int i = 0; i < filesArr->GetNumberOfTuples(); i++)
@@ -308,7 +308,7 @@ public:
     {
       self->Loader.addFile(file);
     }
-    self->Loader.loadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
+    self->Loader.loadFile(loader::LoadFileEnum::LOAD_LAST);
     self->Window.render();
   }
 
@@ -325,11 +325,11 @@ public:
     this->VTKInteractor->ExitCallback();
   }
 
-  const f3d::options& Options;
-  f3d::window_impl& Window;
-  f3d::loader_impl& Loader;
+  const options& Options;
+  window_impl& Window;
+  loader_impl& Loader;
+  animationManager AnimationManager;
 
-  F3DAnimationManager AnimationManager;
   vtkNew<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
   vtkNew<vtkF3DInteractorEventRecorder> Recorder;
@@ -340,7 +340,7 @@ public:
 
 //----------------------------------------------------------------------------
 interactor_impl::interactor_impl(const options& options, window_impl& window, loader_impl& loader)
-  : Internals(new interactor_impl::F3DInternals(options, window, loader))
+  : Internals(new interactor_impl::internals(options, window, loader))
 {
   // Loader need the interactor
   this->Internals->Loader.setInteractor(this);
@@ -432,7 +432,7 @@ bool interactor_impl::playInteraction(const std::string& file)
 {
   if (!vtksys::SystemTools::FileExists(file))
   {
-    f3d::log::error("Interaction record file to play does not exist ", file);
+    log::error("Interaction record file to play does not exist ", file);
     return false;
   }
   else
@@ -448,7 +448,7 @@ bool interactor_impl::playInteraction(const std::string& file)
   // Recorder can stop the interactor, make sure it is still running
   if (this->Internals->VTKInteractor->GetDone())
   {
-    f3d::log::error("Interactor has been stopped");
+    log::error("Interactor has been stopped");
     return false;
   }
   return true;
@@ -460,7 +460,7 @@ bool interactor_impl::recordInteraction(const std::string& file)
   if (file.empty())
   {
     // TODO improve VTK to check file opening
-    f3d::log::error("Interaction record file is empty");
+    log::error("Interaction record file is empty");
     return false;
   }
 
@@ -499,5 +499,4 @@ void interactor_impl::InitializeAnimation(vtkImporter* importer)
   this->Internals->AnimationManager.Initialize(
     &this->Internals->Options, this, &this->Internals->Window, importer);
 }
-
-};
+}
