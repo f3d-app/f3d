@@ -10,7 +10,7 @@
 namespace f3d
 {
 //----------------------------------------------------------------------------
-class options::F3DInternals
+class options::internals
 {
 public:
   using OptionVariant =
@@ -42,11 +42,11 @@ public:
     }
     catch (const std::bad_variant_access&)
     {
-      f3d::log::error("Trying to set option ", name, " with incompatible type");
+      log::error("Trying to set option ", name, " with incompatible type");
     }
     catch (const std::out_of_range&)
     {
-      f3d::log::error("Options ", name, " does not exist");
+      log::error("Options ", name, " does not exist");
     }
   }
 
@@ -59,12 +59,12 @@ public:
     }
     catch (const std::bad_variant_access&)
     {
-      f3d::log::error("Trying to get option ", name, " with incompatible type");
+      log::error("Trying to get option ", name, " with incompatible type");
       return;
     }
     catch (const std::out_of_range&)
     {
-      f3d::log::error("Options ", name, " does not exist");
+      log::error("Options ", name, " does not exist");
       return;
     }
   }
@@ -87,14 +87,14 @@ public:
     catch (const std::bad_variant_access&)
     {
       std::string error = "Trying to set option " + name + " with incompatible type";
-      f3d::log::error(error);
-      throw f3d::options::exception(error + "\n");
+      log::error(error);
+      throw options::exception(error + "\n");
     }
     catch (const std::out_of_range&)
     {
       std::string error = "Options " + name + " does not exist";
-      f3d::log::error(error);
-      throw f3d::options::exception(error + "\n");
+      log::error(error);
+      throw options::exception(error + "\n");
     }
   }
 
@@ -103,7 +103,7 @@ public:
 
 //----------------------------------------------------------------------------
 options::options()
-  : Internals(new options::F3DInternals)
+  : Internals(new options::internals)
 {
   // General
   this->Internals->init("quiet", false);
@@ -178,7 +178,7 @@ options::~options()
 
 //----------------------------------------------------------------------------
 options::options(const options& opt)
-  : Internals(new options::F3DInternals)
+  : Internals(new options::internals)
 {
   this->Internals->Options = opt.Internals->Options;
 }

@@ -2,7 +2,7 @@
 
 #include "f3d_options.h"
 
-namespace f3d
+namespace f3d::detail
 {
 //----------------------------------------------------------------------------
 window_impl::window_impl(const options& options)

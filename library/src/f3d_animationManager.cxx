@@ -1,4 +1,4 @@
-#include "F3DAnimationManager.h"
+#include "f3d_animationManager.h"
 
 #include "f3d_interactor_impl.h"
 #include "f3d_log.h"
@@ -12,37 +12,39 @@
 
 #include <functional>
 
+namespace f3d::detail
+{
 //----------------------------------------------------------------------------
-void F3DAnimationManager::Initialize(const f3d::options* options, f3d::interactor_impl* interactor,
-  f3d::window* window, vtkImporter* importer)
+void animationManager::Initialize(
+  const options* options, interactor_impl* interactor, window* window, vtkImporter* importer)
 {
   this->HasAnimation = false;
 
   this->Options = options;
   if (!this->Options)
   {
-    f3d::log::error("Options is empty");
+    log::error("Options is empty");
     return;
   }
 
   this->Interactor = interactor;
   if (!this->Interactor)
   {
-    f3d::log::error("Interactor is empty");
+    log::error("Interactor is empty");
     return;
   }
 
   this->Window = window;
   if (!this->Window)
   {
-    f3d::log::error("Window is empty");
+    log::error("Window is empty");
     return;
   }
 
   this->Importer = importer;
   if (!this->Importer)
   {
-    f3d::log::error("Importer is empty");
+    log::error("Importer is empty");
     return;
   }
 
@@ -82,27 +84,27 @@ void F3DAnimationManager::Initialize(const f3d::options* options, f3d::interacto
   {
     if (availAnimations <= 0)
     {
-      f3d::log::info("No animations available in this file");
+      log::info("No animations available in this file");
     }
     else
     {
-      f3d::log::info("Animation(s) available in this file are:");
+      log::info("Animation(s) available in this file are:");
     }
     for (int i = 0; i < availAnimations; i++)
     {
-      f3d::log::info(i, ": ", this->Importer->GetAnimationName(i));
+      log::info(i, ": ", this->Importer->GetAnimationName(i));
     }
-    f3d::log::info("\n");
+    log::info("\n");
   }
 
   int animationIndex = options->getAsInt("animation-index");
   if (animationIndex != 0 && availAnimations <= 0)
   {
-    f3d::log::warn("An animation index has been specified but there are no animation available.");
+    log::warn("An animation index has been specified but there are no animation available.");
   }
   else if (animationIndex > 0 && animationIndex >= availAnimations)
   {
-    f3d::log::warn(
+    log::warn(
       "Specified animation index is greater than the highest possible animation index, enabling "
       "the first animation.");
 
@@ -155,7 +157,7 @@ void F3DAnimationManager::Initialize(const f3d::options* options, f3d::interacto
 }
 
 //----------------------------------------------------------------------------
-void F3DAnimationManager::StartAnimation()
+void animationManager::StartAnimation()
 {
   if (!this->IsPlaying())
   {
@@ -164,7 +166,7 @@ void F3DAnimationManager::StartAnimation()
 }
 
 //----------------------------------------------------------------------------
-void F3DAnimationManager::StopAnimation()
+void animationManager::StopAnimation()
 {
   if (this->IsPlaying())
   {
@@ -174,7 +176,7 @@ void F3DAnimationManager::StopAnimation()
 }
 
 //----------------------------------------------------------------------------
-void F3DAnimationManager::ToggleAnimation()
+void animationManager::ToggleAnimation()
 {
   if (this->HasAnimation)
   {
@@ -202,7 +204,7 @@ void F3DAnimationManager::ToggleAnimation()
 }
 
 //----------------------------------------------------------------------------
-void F3DAnimationManager::Tick()
+void animationManager::Tick()
 {
   if (this->HasAnimation)
   {
@@ -222,4 +224,5 @@ void F3DAnimationManager::Tick()
       this->CurrentTimeStep = std::begin(this->TimeSteps);
     }
   }
+}
 }
