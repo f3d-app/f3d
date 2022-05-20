@@ -3,6 +3,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKRenderAndInteract.cxx
      TestSDKEngineExceptions.cxx
      TestSDKOptions.cxx
+     TestSDKLog.cxx
     )
 
 # Test image comparison only with VTK > 9.0.1
@@ -35,6 +36,11 @@ foreach (test ${libf3dSDKTests_list})
   get_filename_component (TName ${test} NAME_WE)
   add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName}  ${CMAKE_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 endforeach ()
+
+# Specific test properties to check
+
+# CTest cant check colored output, info is not colored
+set_tests_properties(libf3d::TestSDKLog PROPERTIES PASS_REGULAR_EXPRESSION "Test Info\nTest Warning\nTest Error\nTest Info Coloring")
 
 target_link_libraries(libf3dSDKTests libf3d)
 target_compile_features(libf3dSDKTests PRIVATE cxx_std_11)
