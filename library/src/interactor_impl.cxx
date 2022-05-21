@@ -116,7 +116,6 @@ public:
           renWin->Render();
         }
         break;
-      case 'p':
       case 'P':
         ren->SetUseDepthPeelingPass(!ren->UsingDepthPeelingPass());
         renWin->Render();
@@ -242,6 +241,7 @@ public:
         renWin->Render();
         break;
       case '?':
+      case '/':
       {
         std::string output = ren->GetSceneDescription();
         log::info(output);

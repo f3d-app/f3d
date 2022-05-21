@@ -305,7 +305,7 @@ Note that some hotkeys can be available or not depending on the file being loade
 Other hotkeys are available:
 
 * `H`: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
-* `?`: key to dump camera state to the terminal.
+* `?` or `/` : key to dump camera state to the terminal.
 * `ESC`: close the window and quit F3D.
 * `ENTER`: reset the camera to its initial parameters.
 * `SPACE`: play the animation if any.
