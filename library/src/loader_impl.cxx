@@ -191,24 +191,25 @@ void loader_impl::addFile(const std::string& path, bool recursive)
 
   if (vtksys::SystemTools::FileIsDirectory(fullPath))
   {
-    if (recursive)
-    {
-      vtksys::Directory dir;
-      dir.Load(fullPath);
-      std::set<std::string> sortedFiles;
+    vtksys::Directory dir;
+    dir.Load(fullPath);
+    std::set<std::string> sortedFiles;
 
-      // Sorting is necessary as KWSys can provide unsorted files
-      for (unsigned long i = 0; i < dir.GetNumberOfFiles(); i++)
+    // Sorting is necessary as KWSys can provide unsorted files
+    for (unsigned long i = 0; i < dir.GetNumberOfFiles(); i++)
+    {
+      std::string currentFile = dir.GetFile(i);
+      if (currentFile != "." && currentFile != "..")
       {
-        std::string currentFile = dir.GetFile(i);
-        if (currentFile != "." && currentFile != "..")
-        {
-          sortedFiles.insert(currentFile);
-        }
+        sortedFiles.insert(currentFile);
       }
-      for (std::string currentFile : sortedFiles)
+    }
+    for (std::string currentFile : sortedFiles)
+    {
+      std::string newPath = vtksys::SystemTools::JoinPath({ "", fullPath, currentFile });
+      if (recursive || !vtksys::SystemTools::FileIsDirectory(newPath))
       {
-        this->addFile(vtksys::SystemTools::JoinPath({ "", fullPath, currentFile }), false);
+        this->addFile(newPath, recursive);
       }
     }
   }

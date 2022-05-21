@@ -4,6 +4,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKEngineExceptions.cxx
      TestSDKOptions.cxx
      TestSDKLog.cxx
+     TestSDKLoader.cxx
     )
 
 # Test image comparison only with VTK > 9.0.1
