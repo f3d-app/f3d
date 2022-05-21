@@ -8,3 +8,5 @@ PRIVATE_DEPENDS
   f3d::VTKExtensionsRendering
 TEST_DEPENDS
   VTK::TestingCore
+  f3d::VTKExtensionsCore
+  f3d::VTKExtensionsRendering
