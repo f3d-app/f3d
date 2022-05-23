@@ -2,6 +2,7 @@
 #define f3d_window_h
 
 #include "export.h"
+#include "image.h"
 
 #include <string>
 
@@ -13,9 +14,7 @@ class F3D_EXPORT window
 public:
   virtual bool update() = 0;
   virtual bool render() = 0;
-  virtual bool renderToFile(const std::string& file, bool noBackground = false) = 0;
-  virtual bool renderAndCompareWithFile(const std::string& file, double threshold,
-    bool noBackground, const std::string& outputFile = "") = 0;
+  virtual image renderToImage(bool noBackground = false) = 0;
   virtual bool setIcon(const void* icon, size_t iconSize) = 0;
   virtual bool setWindowName(const std::string& windowName) = 0;
 

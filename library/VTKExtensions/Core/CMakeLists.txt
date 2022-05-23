@@ -5,7 +5,6 @@ configure_file(
 
 set(classes
   F3DLog
-  F3DOffscreenRender
   vtkF3DConsoleOutputWindow
   )
 

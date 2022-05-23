@@ -3,15 +3,18 @@
 #include "log.h"
 #include "options.h"
 
-#include "F3DOffscreenRender.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCamera.h>
+#include <vtkImageData.h>
+#include <vtkImageExport.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkRenderWindow.h>
+#include <vtkRendererCollection.h>
 #include <vtkVersion.h>
+#include <vtkWindowToImageFilter.h>
 
 namespace f3d::detail
 {
@@ -235,17 +238,33 @@ bool window_impl_standard::render()
 }
 
 //----------------------------------------------------------------------------
-bool window_impl_standard::renderToFile(const std::string& file, bool noBackground)
+image window_impl_standard::renderToImage(bool noBackground)
 {
-  return F3DOffscreenRender::RenderOffScreen(this->Internals->RenWin, file, noBackground);
-}
+  vtkNew<vtkWindowToImageFilter> rtW2if;
+  rtW2if->SetInput(this->Internals->RenWin);
 
-//----------------------------------------------------------------------------
-bool window_impl_standard::renderAndCompareWithFile(
-  const std::string& file, double threshold, bool noBackground, const std::string& outputFile)
-{
-  return F3DOffscreenRender::RenderTesting(
-    this->Internals->RenWin, file, threshold, noBackground, outputFile);
+  if (noBackground)
+  {
+    // we need to set the background to black to avoid blending issues with translucent
+    // objects when saving to file with no background
+    this->Internals->RenWin->GetRenderers()->GetFirstRenderer()->SetBackground(0, 0, 0);
+    rtW2if->SetInputBufferTypeToRGBA();
+  }
+
+  vtkNew<vtkImageExport> exporter;
+  exporter->SetInputConnection(rtW2if->GetOutputPort());
+  exporter->ImageLowerLeftOn();
+
+  int* dims = exporter->GetDataDimensions();
+  int cmp = exporter->GetDataNumberOfScalarComponents();
+
+  image output;
+  output.setResolution(dims[0], dims[1]);
+  output.setChannelCount(cmp);
+
+  exporter->Export(output.getData());
+
+  return output;
 }
 
 //----------------------------------------------------------------------------

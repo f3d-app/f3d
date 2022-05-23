@@ -46,8 +46,16 @@ int TestSDKInteractionDirectory(int argc, char* argv[])
   load.setCurrentFileIndex(2);
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
-  return win.renderAndCompareWithFile(std::string(argv[1]) + "/baselines/" + filename + ".png", 50,
-           false, std::string(argv[2]) + filename + ".png")
-    ? EXIT_SUCCESS
-    : EXIT_FAILURE;
+  f3d::image result = win.renderToImage();
+  f3d::image diff;
+  bool ret =
+    result.compare(f3d::image(std::string(argv[1]) + "/baselines/" + filename + ".png"), diff, 50);
+  if (!ret)
+  {
+    result.save(std::string(argv[2]) + filename + ".png");
+    diff.save(std::string(argv[2]) + filename + ".diff.png");
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
 }

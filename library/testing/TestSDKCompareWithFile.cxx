@@ -13,8 +13,15 @@ int TestSDKCompareWithFile(int argc, char* argv[])
   load.addFile(std::string(argv[1]) + "/data/cow.vtp");
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
   f3d::window& win = eng.getWindow();
-  bool ret =
-    win.renderAndCompareWithFile(std::string(argv[1]) + "/baselines/TestSDKCompareWithFile.png", 50,
-      false, std::string(argv[2]) + "TestSDKCompareWithFile.png");
-  return ret ? EXIT_SUCCESS : EXIT_FAILURE;
+  f3d::image result = win.renderToImage();
+  f3d::image diff;
+  bool ret = result.compare(
+    f3d::image(std::string(argv[1]) + "/baselines/TestSDKCompareWithFile.png"), diff, 50);
+  if (!ret)
+  {
+    result.save(std::string(argv[2]) + "TestSDKCompareWithFile.png");
+    diff.save(std::string(argv[2]) + "TestSDKCompareWithFile.diff.png");
+    return EXIT_FAILURE;
+  }
+  return EXIT_SUCCESS;
 }
