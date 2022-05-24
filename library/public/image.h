@@ -25,6 +25,9 @@ public:
   image(const image& img);
   image& operator=(const image& img);
 
+  image(image&& img);
+  image& operator=(image&& img);
+
   int getWidth() const;
   int getHeight() const;
 

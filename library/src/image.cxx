@@ -92,6 +92,20 @@ image& image::operator=(const image& img)
 }
 
 //----------------------------------------------------------------------------
+image::image(image&& img)
+{
+  this->Internals = img.Internals;
+  img.Internals = nullptr;
+}
+
+//----------------------------------------------------------------------------
+image& image::operator=(image&& img)
+{
+  std::swap(this->Internals, img.Internals);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 int image::getWidth() const
 {
   return this->Internals->Width;
