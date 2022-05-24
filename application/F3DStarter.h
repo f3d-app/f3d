@@ -9,6 +9,8 @@
 
 #include "loader.h"
 
+#include <memory>
+
 class F3DStarter
 {
 public:

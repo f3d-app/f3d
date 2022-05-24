@@ -3,7 +3,6 @@
 
 #include "export.h"
 
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -36,7 +35,7 @@ public:
   /**
    * Get the vector of files to be loaded
    */
-  virtual std::vector<std::string> getFiles() = 0;
+  virtual const std::vector<std::string>& getFiles() const = 0;
 
   /**
    * Set the current file index
@@ -46,7 +45,7 @@ public:
   /**
    * Get the current file index
    */
-  virtual int getCurrentFileIndex() = 0;
+  virtual int getCurrentFileIndex() const = 0;
 
   /**
    * Load a file if any have been added
