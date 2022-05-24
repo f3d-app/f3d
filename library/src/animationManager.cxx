@@ -216,7 +216,7 @@ void animationManager::Tick()
     this->Importer->UpdateTimeStep(*this->CurrentTimeStep);
     this->Window->render();
 
-    this->CurrentTimeStep++;
+    ++this->CurrentTimeStep;
 
     // repeat
     if (this->CurrentTimeStep == std::end(this->TimeSteps))
