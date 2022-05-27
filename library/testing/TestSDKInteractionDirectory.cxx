@@ -47,8 +47,8 @@ int TestSDKInteractionDirectory(int argc, char* argv[])
   load.setCurrentFileIndex(2);
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
-  return TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "/baselines/" + filename + ".png",
-           std::string(argv[2]) + filename + ".png", std::string(argv[2]) + filename + ".diff.png")
+  return TestSDKHelpers::RenderTest(
+           win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename)
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }
