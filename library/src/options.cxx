@@ -211,57 +211,67 @@ options& options::operator=(options&& other)
 }
 
 //----------------------------------------------------------------------------
-void options::set(const std::string& name, bool value)
+options& options::set(const std::string& name, bool value)
 {
   this->Internals->set(name, value);
+  return *this;
+
 }
 
 //----------------------------------------------------------------------------
-void options::set(const std::string& name, int value)
+options& options::set(const std::string& name, int value)
 {
   this->Internals->set(name, value);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void options::set(const std::string& name, double value)
+options& options::set(const std::string& name, double value)
 {
   this->Internals->set(name, value);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void options::set(const std::string& name, const std::string& value)
+options& options::set(const std::string& name, const std::string& value)
 {
   this->Internals->set(name, value);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void options::set(const std::string& name, const char* value)
+options& options::set(const std::string& name, const char* value)
 {
   this->Internals->set(name, std::string(value));
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void options::set(const std::string& name, const std::vector<int>& values)
+options& options::set(const std::string& name, const std::vector<int>& values)
 {
   this->Internals->set(name, values);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void options::set(const std::string& name, const std::vector<double>& values)
+options& options::set(const std::string& name, const std::vector<double>& values)
 {
   this->Internals->set(name, values);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void options::set(const std::string& name, std::initializer_list<int> values)
+options& options::set(const std::string& name, std::initializer_list<int> values)
 {
   this->Internals->set(name, std::vector<int>(values));
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void options::set(const std::string& name, std::initializer_list<double> values)
+options& options::set(const std::string& name, std::initializer_list<double> values)
 {
   this->Internals->set(name, std::vector<double>(values));
+  return *this;
 }
 
 //----------------------------------------------------------------------------

@@ -8,6 +8,9 @@
 #include "vtkPNGWriter.h"
 #include "vtkSmartPointer.h"
 
+#include "engine.h"
+
+#include <filesystem>
 #include <vector>
 
 namespace f3d
@@ -24,6 +27,11 @@ public:
 
   vtkSmartPointer<vtkImageImport> GetVTKImporter() const
   {
+    if (this->Buffer.size() != this->Width * this->Height * this->Channels)
+    {
+      throw engine::exception("Image size mitmatch");
+    }
+
     vtkNew<vtkImageImport> importer;
     importer->CopyImportVoidPointer(
       const_cast<unsigned char*>(this->Buffer.data()), this->Buffer.size());
@@ -61,6 +69,11 @@ image::image()
 image::image(const std::string& path)
   : Internals(new image::internals())
 {
+  if (!std::filesystem::exists(path))
+  {
+    throw engine::exception("Cannot open image " + path);
+  }
+
   auto reader = vtkSmartPointer<vtkImageReader2>::Take(
     vtkImageReader2Factory::CreateImageReader2(path.c_str()));
 

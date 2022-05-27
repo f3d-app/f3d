@@ -6,14 +6,15 @@
 
 #include <iostream>
 
+#include "TestSDKHelpers.h"
+
 int TestSDKInteractionDirectory(int argc, char* argv[])
 {
   // This test mimics TestInteractionDirectory.
   f3d::engine eng(
     f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR | f3d::engine::WINDOW_OFFSCREEN);
   f3d::options& options = eng.getOptions();
-  options.set("resolution", { 300, 300 });
-  options.set("scalars", "");
+  options.set("resolution", { 300, 300 }).set("scalars", "");
   f3d::loader& load = eng.getLoader();
   load.addFile(std::string(argv[1]) + "/data/mb");
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
@@ -46,16 +47,8 @@ int TestSDKInteractionDirectory(int argc, char* argv[])
   load.setCurrentFileIndex(2);
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
-  f3d::image result = win.renderToImage();
-  f3d::image diff;
-  bool ret =
-    result.compare(f3d::image(std::string(argv[1]) + "/baselines/" + filename + ".png"), diff, 50);
-  if (!ret)
-  {
-    result.save(std::string(argv[2]) + filename + ".png");
-    diff.save(std::string(argv[2]) + filename + ".diff.png");
-    return EXIT_FAILURE;
-  }
-
-  return EXIT_SUCCESS;
+  return TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "/baselines/" + filename + ".png",
+           std::string(argv[2]) + filename + ".png", std::string(argv[2]) + filename + ".diff.png")
+    ? EXIT_SUCCESS
+    : EXIT_FAILURE;
 }
