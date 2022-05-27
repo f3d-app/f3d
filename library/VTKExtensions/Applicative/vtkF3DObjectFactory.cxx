@@ -1,5 +1,6 @@
 #include "vtkF3DObjectFactory.h"
 
+#include "vtkF3DConfigure.h"
 #include "vtkF3DPolyDataMapper.h"
 
 #if F3D_WINDOWS_GUI
