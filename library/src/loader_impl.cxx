@@ -266,7 +266,7 @@ void loader_impl::getFileInfo(
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> loader_impl::getFiles()
+const std::vector<std::string>& loader_impl::getFiles() const
 {
   return this->Internals->FilesList;
 }
@@ -278,7 +278,7 @@ void loader_impl::setCurrentFileIndex(int index)
 }
 
 //----------------------------------------------------------------------------
-int loader_impl::getCurrentFileIndex()
+int loader_impl::getCurrentFileIndex() const
 {
   return this->Internals->CurrentFileIndex;
 }

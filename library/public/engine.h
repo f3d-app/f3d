@@ -46,7 +46,7 @@ public:
     WINDOW_OFFSCREEN = 1 << 2   // 0100
   };
 
-  engine(const flags_t& flags);
+  explicit engine(const flags_t& flags);
   ~engine();
 
   // Engine provide a default options
