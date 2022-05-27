@@ -23,7 +23,8 @@ int TestSDKImage(int argc, char* argv[])
 
   f3d::image baseline(std::string(argv[1]) + "/baselines/TestSDKImage.png");
 
-  if (baseline.getWidth() != width || baseline.getHeight() != height || baseline.getChannelCount() != channels)
+  if (baseline.getWidth() != width || baseline.getHeight() != height ||
+    baseline.getChannelCount() != channels)
   {
     std::cerr << "Baseline has wrong dimensions" << std::endl;
     return EXIT_FAILURE;
