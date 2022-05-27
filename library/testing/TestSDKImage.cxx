@@ -52,24 +52,29 @@ int TestSDKImage(int argc, char* argv[])
 
   f3d::image baseline(std::string(argv[1]) + "/baselines/TestSDKImage.png");
 
-  if (baseline.getWidth() != width || baseline.getHeight() != height ||
-    baseline.getChannelCount() != channels)
+  if (generated.getWidth() != width || generated.getHeight() != height)
   {
-    std::cerr << "Baseline has wrong dimensions" << std::endl;
+    std::cerr << "Image has wrong dimensions" << std::endl;
     return EXIT_FAILURE;
   }
 
-  if (baseline.getChannelCount() != channels)
+  if (generated.getChannelCount() != channels)
   {
-    std::cerr << "Baseline has wrong number of channels" << std::endl;
+    std::cerr << "Image has wrong number of channels" << std::endl;
     return EXIT_FAILURE;
   }
 
-  if (baseline.getData() == nullptr)
+  if (generated.getData() == nullptr)
   {
-    std::cerr << "Baseline has no data" << std::endl;
+    std::cerr << "Image has no data" << std::endl;
     return EXIT_FAILURE;
   }
+
+  // test operators
+  f3d::image imgCopy = generated; // copy constructor
+  imgCopy = baseline; // copy assignment
+  f3d::image imgMove = std::move(imgCopy); // move constructor
+  imgCopy = std::move(imgMove); // move assignment
 
   return generated != baseline ? EXIT_FAILURE : EXIT_SUCCESS;
 }

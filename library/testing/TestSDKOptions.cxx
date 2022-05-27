@@ -164,6 +164,14 @@ int TestSDKOptions(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Test chaining options
+  opt.set("quiet", true).set("quiet", false);
+  if (opt.getAsBool("quiet") != false)
+  {
+    std::cerr << "Chaining options is not working." << std::endl;
+    return EXIT_FAILURE;
+  }
+
   // Test error paths
   double val;
   opt.set("quiet", 2.13);

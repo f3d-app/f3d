@@ -5,7 +5,7 @@ class TestSDKHelpers
 {
 public:
   static bool RenderTest(f3d::window& win, const std::string& baselinePath,
-    const std::string& outputPath, const std::string& name)
+    const std::string& outputPath, const std::string& name, double threshold)
   {
     std::string baseline = baselinePath + name + ".png";
     std::string output = outputPath + name + ".png";
@@ -14,7 +14,7 @@ public:
     f3d::image result = win.renderToImage();
     f3d::image diffRes;
 
-    bool ret = result.compare(f3d::image(baseline), diffRes, 50);
+    bool ret = result.compare(f3d::image(baseline), diffRes, threshold);
     if (!ret)
     {
       result.save(output);

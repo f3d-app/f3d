@@ -16,7 +16,7 @@ int TestSDKCompareWithFile(int argc, char* argv[])
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-           std::string(argv[2]), "TestSDKCompareWithFile")
+           std::string(argv[2]), "TestSDKCompareWithFile", 50)
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }
