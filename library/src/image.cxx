@@ -200,6 +200,11 @@ image& image::save(const std::string& path)
   writer->SetInputConnection(importer->GetOutputPort());
   writer->Write();
 
+  if (writer->GetErrorCode() != 0)
+  {
+    throw exception("Cannot write " + path);
+  }
+
   return *this;
 }
 }
