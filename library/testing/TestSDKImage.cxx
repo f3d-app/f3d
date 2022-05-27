@@ -71,10 +71,10 @@ int TestSDKImage(int argc, char* argv[])
   }
 
   // test operators
-  f3d::image imgCopy = generated; // copy constructor
-  imgCopy = baseline; // copy assignment
+  f3d::image imgCopy = generated;          // copy constructor
+  imgCopy = baseline;                      // copy assignment
   f3d::image imgMove = std::move(imgCopy); // move constructor
-  imgCopy = std::move(imgMove); // move assignment
+  imgCopy = std::move(imgMove);            // move assignment
 
   return generated != baseline ? EXIT_FAILURE : EXIT_SUCCESS;
 }
