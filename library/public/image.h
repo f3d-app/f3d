@@ -10,6 +10,7 @@
 
 #include "export.h"
 
+#include <stdexcept>
 #include <string>
 
 namespace f3d
@@ -17,6 +18,15 @@ namespace f3d
 class F3D_EXPORT image
 {
 public:
+  class exception : public std::runtime_error
+  {
+  public:
+    exception(const std::string& what = "")
+      : std::runtime_error(what)
+    {
+    }
+  };
+
   image();
   explicit image(const std::string& path);
 

@@ -8,8 +8,6 @@
 #include "vtkPNGWriter.h"
 #include "vtkSmartPointer.h"
 
-#include "engine.h"
-
 #include <filesystem>
 #include <vector>
 
@@ -29,7 +27,7 @@ public:
   {
     if (this->Buffer.size() != this->Width * this->Height * this->Channels)
     {
-      throw engine::exception("Image size mitmatch");
+      throw exception("Image size mitmatch");
     }
 
     vtkNew<vtkImageImport> importer;
@@ -71,7 +69,7 @@ image::image(const std::string& path)
 {
   if (!std::filesystem::exists(path))
   {
-    throw engine::exception("Cannot open image " + path);
+    throw exception("Cannot open image " + path);
   }
 
   auto reader = vtkSmartPointer<vtkImageReader2>::Take(
