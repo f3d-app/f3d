@@ -78,7 +78,7 @@ void vtkF3DWin32OutputWindow::DisplayText(const char* text)
 
   // still print text to std::cout in
   // order to be able to test verbose outputs
-  std::cout << text;
+  std::cout << text << "\n";
   std::cout.flush();
 }
 
