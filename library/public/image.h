@@ -51,6 +51,8 @@ public:
 
   bool compare(const image& reference, image& result, double threshold) const;
 
+  bool operator==(const image& reference);
+
   image& save(const std::string& path);
 
 private:

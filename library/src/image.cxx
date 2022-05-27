@@ -154,7 +154,7 @@ image& image::setChannelCount(unsigned int dim)
 //----------------------------------------------------------------------------
 image& image::setData(unsigned char* buffer)
 {
-  std::copy(this->Internals->Buffer.begin(), this->Internals->Buffer.end(), buffer);
+  std::copy(buffer, buffer + this->Internals->Buffer.size(), this->Internals->Buffer.begin());
   return *this;
 }
 
@@ -188,6 +188,13 @@ bool image::compare(const image& reference, image& result, double threshold) con
   result.Internals->SetFromVTK(diff);
 
   return error <= threshold;
+}
+
+//----------------------------------------------------------------------------
+bool image::operator==(const image& reference)
+{
+  f3d::image diff;
+  return this->compare(reference, diff, 0);
 }
 
 //----------------------------------------------------------------------------
