@@ -28,13 +28,13 @@ public:
   image(image&& img);
   image& operator=(image&& img);
 
-  int getWidth() const;
-  int getHeight() const;
+  unsigned int getWidth() const;
+  unsigned int getHeight() const;
 
-  image& setResolution(int width, int height);
+  image& setResolution(unsigned int width, unsigned int height);
 
-  int getChannelCount() const;
-  image& setChannelCount(int dim);
+  unsigned int getChannelCount() const;
+  image& setChannelCount(unsigned int dim);
 
   image& setData(unsigned char* buffer);
   unsigned char* getData() const;

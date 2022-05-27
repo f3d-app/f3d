@@ -19,9 +19,9 @@ class image::internals
 {
 public:
   std::vector<unsigned char> Buffer;
-  int Width = 0;
-  int Height = 0;
-  int Channels = 0;
+  unsigned int Width = 0;
+  unsigned int Height = 0;
+  unsigned int Channels = 0;
 
   void UpdateBufferSize() { this->Buffer.resize(this->Width * this->Height * this->Channels); }
 
@@ -119,19 +119,19 @@ image& image::operator=(image&& img)
 }
 
 //----------------------------------------------------------------------------
-int image::getWidth() const
+unsigned int image::getWidth() const
 {
   return this->Internals->Width;
 }
 
 //----------------------------------------------------------------------------
-int image::getHeight() const
+unsigned int image::getHeight() const
 {
   return this->Internals->Height;
 }
 
 //----------------------------------------------------------------------------
-image& image::setResolution(int width, int height)
+image& image::setResolution(unsigned int width, unsigned int height)
 {
   this->Internals->Width = width;
   this->Internals->Height = height;
@@ -140,13 +140,13 @@ image& image::setResolution(int width, int height)
 }
 
 //----------------------------------------------------------------------------
-int image::getChannelCount() const
+unsigned int image::getChannelCount() const
 {
   return this->Internals->Channels;
 }
 
 //----------------------------------------------------------------------------
-image& image::setChannelCount(int dim)
+image& image::setChannelCount(unsigned int dim)
 {
   this->Internals->Channels = dim;
   this->Internals->UpdateBufferSize();
