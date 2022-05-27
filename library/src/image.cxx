@@ -1,14 +1,14 @@
 #include "image.h"
 
-#include "vtkImageDifference.h"
-#include "vtkImageExport.h"
-#include "vtkImageImport.h"
-#include "vtkImageReader2.h"
-#include "vtkImageReader2Factory.h"
-#include "vtkPNGWriter.h"
-#include "vtkSmartPointer.h"
+#include <vtkImageDifference.h>
+#include <vtkImageExport.h>
+#include <vtkImageImport.h>
+#include <vtkImageReader2.h>
+#include <vtkImageReader2Factory.h>
+#include <vtkPNGWriter.h>
+#include <vtkSmartPointer.h>
+#include <vtksys/SystemTools.hxx>
 
-#include <filesystem>
 #include <vector>
 
 namespace f3d
@@ -67,7 +67,8 @@ image::image()
 image::image(const std::string& path)
   : Internals(new image::internals())
 {
-  if (!std::filesystem::exists(path))
+  std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
+  if (!vtksys::SystemTools::FileExists(path))
   {
     throw exception("Cannot open image " + path);
   }
