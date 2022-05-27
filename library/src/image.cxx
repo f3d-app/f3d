@@ -191,10 +191,16 @@ bool image::compare(const image& reference, image& result, double threshold) con
 }
 
 //----------------------------------------------------------------------------
-bool image::operator==(const image& reference)
+bool image::operator==(const image& reference) const
 {
   f3d::image diff;
   return this->compare(reference, diff, 0);
+}
+
+//----------------------------------------------------------------------------
+bool image::operator!=(const image& reference) const
+{
+  return !this->operator==(reference);
 }
 
 //----------------------------------------------------------------------------

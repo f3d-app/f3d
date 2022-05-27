@@ -1,3 +1,4 @@
+#include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -18,6 +19,8 @@ PYBIND11_MODULE(f3d, module)
   py::class_<f3d::image>(module, "image")
     .def(py::init<>())
     .def(py::init<const std::string&>())
+    .def(py::self == py::self)
+    .def(py::self != py::self)
     .def("getWidth", &f3d::image::getWidth)
     .def("getHeight", &f3d::image::getHeight)
     .def("setResolution", &f3d::image::setResolution)
@@ -104,7 +107,8 @@ PYBIND11_MODULE(f3d, module)
   py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> >(module, "window")
     .def("update", &f3d::window::update, "Update the window")
     .def("render", &f3d::window::render, "Render the window")
-    .def("renderToImage", &f3d::window::renderToImage, "Render the window to an image", py::arg("noBackground") = false)
+    .def("renderToImage", &f3d::window::renderToImage, "Render the window to an image",
+      py::arg("noBackground") = false)
     .def("setIcon", &f3d::window::setIcon,
       "Set the icon of the window using a memory buffer representing a PNG file")
     .def("setWindowName", &f3d::window::setWindowName, "Set the window name");
