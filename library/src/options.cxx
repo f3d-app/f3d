@@ -215,7 +215,6 @@ options& options::set(const std::string& name, bool value)
 {
   this->Internals->set(name, value);
   return *this;
-
 }
 
 //----------------------------------------------------------------------------

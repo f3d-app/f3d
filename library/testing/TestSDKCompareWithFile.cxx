@@ -15,7 +15,8 @@ int TestSDKCompareWithFile(int argc, char* argv[])
   load.addFile(std::string(argv[1]) + "/data/cow.vtp");
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
-  return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "/baselines/TestSDKCompareWithFile.png",
+  return TestSDKHelpers::RenderTest(eng.getWindow(),
+           std::string(argv[1]) + "/baselines/TestSDKCompareWithFile.png",
            std::string(argv[2]) + "TestSDKCompareWithFile.png",
            std::string(argv[2]) + "TestSDKCompareWithFile.diff.png")
     ? EXIT_SUCCESS
