@@ -23,6 +23,33 @@ int TestSDKImage(int argc, char* argv[])
   generated.setResolution(width, height).setChannelCount(channels).setData(pixels.data());
   generated.save(std::string(argv[2]) + "TestSDKImage.png");
 
+  // test exceptions
+  int nbCatch = 0;
+
+  try
+  {
+    generated.save("/dummy/folder/img.png");
+  }
+  catch (const f3d::image::exception&)
+  {
+    nbCatch++;
+  }
+
+  try
+  {
+    f3d::image("/dummy/folder/img.png");
+  }
+  catch (const f3d::image::exception&)
+  {
+    nbCatch++;
+  }
+
+  if (nbCatch != 2)
+  {
+    std::cerr << "An exception has not been thrown" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   f3d::image baseline(std::string(argv[1]) + "/baselines/TestSDKImage.png");
 
   if (baseline.getWidth() != width || baseline.getHeight() != height ||
@@ -44,5 +71,5 @@ int TestSDKImage(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  return generated == baseline ? EXIT_SUCCESS : EXIT_FAILURE;
+  return generated != baseline ? EXIT_FAILURE : EXIT_SUCCESS;
 }
