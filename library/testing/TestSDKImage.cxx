@@ -14,8 +14,10 @@ int TestSDKImage(int argc, char* argv[])
   std::vector<unsigned char> pixels(width * height * channels);
 
   // fill with deterministic random values
-  auto rand = std::bind(std::uniform_int_distribution<>(0, 255), std::mt19937());
-  std::generate(std::begin(pixels), std::end(pixels), rand);
+  // do not use std::uniform_int_distribution, it's not giving the same result on different
+  // platforms
+  std::mt19937 rand_generator;
+  std::generate(std::begin(pixels), std::end(pixels), [&]() { return rand_generator() % 256; });
 
   f3d::image generated;
   generated.setResolution(width, height).setChannelCount(channels).setData(pixels.data());
