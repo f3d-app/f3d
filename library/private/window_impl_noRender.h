@@ -18,7 +18,7 @@ namespace detail
 class window_impl_noRender : public window_impl
 {
 public:
-  window_impl_noRender(const options& options);
+  explicit window_impl_noRender(const options& options);
   ~window_impl_noRender() override;
 
   vtkRenderWindow* GetRenderWindow() override;

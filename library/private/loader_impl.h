@@ -3,6 +3,8 @@
 
 #include "loader.h"
 
+#include <memory>
+
 namespace f3d
 {
 class options;
@@ -31,7 +33,7 @@ public:
   /**
    * Get the vector of files to be loaded
    */
-  std::vector<std::string> getFiles() override;
+  const std::vector<std::string>& getFiles() const override;
 
   /**
    * Set the current file index
@@ -41,7 +43,7 @@ public:
   /**
    * Get the current file index
    */
-  int getCurrentFileIndex() override;
+  int getCurrentFileIndex() const override;
 
   /**
    * Load a file if any have been added

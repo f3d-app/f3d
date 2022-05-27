@@ -1,7 +1,6 @@
 #include <engine.h>
 #include <interactor.h>
 #include <loader.h>
-#include <window.h>
 
 #include <iostream>
 
@@ -10,7 +9,6 @@ int TestSDKAnimation(int argc, char* argv[])
   f3d::engine eng(
     f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR | f3d::engine::WINDOW_OFFSCREEN);
   f3d::loader& load = eng.getLoader();
-  f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();
   load.addFile(std::string(argv[1]) + "/data/InterpolationTest.glb");
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
