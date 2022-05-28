@@ -105,9 +105,9 @@ image& image::operator=(const image& img)
 
 //----------------------------------------------------------------------------
 image::image(image&& img)
+  : Internals(new image::internals())
 {
-  this->Internals = img.Internals;
-  img.Internals = nullptr;
+  std::swap(this->Internals, img.Internals);
 }
 
 //----------------------------------------------------------------------------

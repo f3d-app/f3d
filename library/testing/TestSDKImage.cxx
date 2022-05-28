@@ -24,30 +24,26 @@ int TestSDKImage(int argc, char* argv[])
   generated.save(std::string(argv[2]) + "TestSDKImage.png");
 
   // test exceptions
-  int nbCatch = 0;
-
   try
   {
     generated.save("/dummy/folder/img.png");
+
+    std::cerr << "An exception has not been thrown when saving to an incorrect path" << std::endl;
+    return EXIT_FAILURE;
   }
   catch (const f3d::image::exception&)
   {
-    nbCatch++;
   }
 
   try
   {
     f3d::image("/dummy/folder/img.png");
+
+    std::cerr << "An exception has not been thrown when reading an incorrect path" << std::endl;
+    return EXIT_FAILURE;
   }
   catch (const f3d::image::exception&)
   {
-    nbCatch++;
-  }
-
-  if (nbCatch != 2)
-  {
-    std::cerr << "An exception has not been thrown" << std::endl;
-    return EXIT_FAILURE;
   }
 
   f3d::image baseline(std::string(argv[1]) + "/baselines/TestSDKImage.png");
@@ -70,11 +66,44 @@ int TestSDKImage(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // test operators
-  f3d::image imgCopy = generated;          // copy constructor
-  imgCopy = baseline;                      // copy assignment
-  f3d::image imgMove = std::move(imgCopy); // move constructor
-  imgCopy = std::move(imgMove);            // move assignment
+  if (generated != baseline)
+  {
+    std::cerr << "Generated image is different from the baseline" << std::endl;
+    return EXIT_FAILURE;
+  }
 
-  return generated != baseline ? EXIT_FAILURE : EXIT_SUCCESS;
+  // test operators
+  f3d::image imgCopy = generated; // copy constructor
+
+  if (imgCopy != generated)
+  {
+    std::cerr << "Copy constructor failed" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  imgCopy = baseline; // copy assignment
+
+  if (imgCopy != baseline)
+  {
+    std::cerr << "Copy assignment failed" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  f3d::image imgMove = std::move(imgCopy); // move constructor
+
+  if (imgMove != baseline)
+  {
+    std::cerr << "Move constructor failed" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  imgCopy = std::move(imgMove); // move assignment
+
+  if (imgCopy != baseline)
+  {
+    std::cerr << "Move assignment failed" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
 }
