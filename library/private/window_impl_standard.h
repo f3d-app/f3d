@@ -23,9 +23,7 @@ public:
 
   bool update() override;
   bool render() override;
-  bool renderToFile(const std::string& file, bool noBackground = false) override;
-  bool renderAndCompareWithFile(const std::string& file, double threshold,
-    bool noBackground = false, const std::string& outputFile = "") override;
+  image renderToImage(bool noBackground = false) override;
   bool setIcon(const void* icon, size_t iconSize) override;
   bool setWindowName(const std::string& windowName) override;
 

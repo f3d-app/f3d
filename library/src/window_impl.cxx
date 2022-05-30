@@ -23,15 +23,9 @@ bool window_impl::render()
 }
 
 //----------------------------------------------------------------------------
-bool window_impl::renderToFile(const std::string&, bool)
+image window_impl::renderToImage(bool)
 {
-  return false;
-}
-
-//----------------------------------------------------------------------------
-bool window_impl::renderAndCompareWithFile(const std::string&, double, bool, const std::string&)
-{
-  return false;
+  return image();
 }
 
 //----------------------------------------------------------------------------

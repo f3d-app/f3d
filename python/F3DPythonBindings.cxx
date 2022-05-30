@@ -1,7 +1,9 @@
+#include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 #include "engine.h"
+#include "image.h"
 #include "interactor.h"
 #include "loader.h"
 #include "options.h"
@@ -12,6 +14,22 @@ namespace py = pybind11;
 PYBIND11_MODULE(f3d, module)
 {
   module.doc() = "f3d library bindings";
+
+  // f3d::image
+  py::class_<f3d::image>(module, "image")
+    .def(py::init<>())
+    .def(py::init<const std::string&>())
+    .def(py::self == py::self)
+    .def(py::self != py::self)
+    .def("getWidth", &f3d::image::getWidth)
+    .def("getHeight", &f3d::image::getHeight)
+    .def("setResolution", &f3d::image::setResolution)
+    .def("getChannelCount", &f3d::image::getChannelCount)
+    .def("setChannelCount", &f3d::image::setChannelCount)
+    .def("setData", &f3d::image::setData)
+    .def("getData", &f3d::image::getData)
+    .def("compare", &f3d::image::compare)
+    .def("save", &f3d::image::save);
 
   // f3d::options
   py::class_<f3d::options>(module, "options")
@@ -89,10 +107,8 @@ PYBIND11_MODULE(f3d, module)
   py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> >(module, "window")
     .def("update", &f3d::window::update, "Update the window")
     .def("render", &f3d::window::render, "Render the window")
-    .def("renderToFile", &f3d::window::renderToFile, "Render the window to a file", py::arg("path"),
+    .def("renderToImage", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("noBackground") = false)
-    .def("renderAndCompareWithFile", &f3d::window::renderAndCompareWithFile,
-      "Render the window and compare the result with a file")
     .def("setIcon", &f3d::window::setIcon,
       "Set the icon of the window using a memory buffer representing a PNG file")
     .def("setWindowName", &f3d::window::setWindowName, "Set the window name");
