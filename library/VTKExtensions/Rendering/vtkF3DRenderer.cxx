@@ -219,20 +219,24 @@ void vtkF3DRenderer::ShowAxis(bool show)
   // Dynamic visible axis
   if (this->AxisVisible != show)
   {
+    this->AxisWidget = nullptr;
     if (show)
     {
-      vtkNew<vtkAxesActor> axes;
-      this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
-      this->AxisWidget->SetOrientationMarker(axes);
-      this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
-      this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
-      this->AxisWidget->On();
-      this->AxisWidget->InteractiveOff();
-      this->AxisWidget->SetKeyPressActivation(false);
-    }
-    else
-    {
-      this->AxisWidget = nullptr;
+      if (this->RenderWindow->GetInteractor())
+      {
+        vtkNew<vtkAxesActor> axes;
+        this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
+        this->AxisWidget->SetOrientationMarker(axes);
+        this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
+        this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
+        this->AxisWidget->On();
+        this->AxisWidget->InteractiveOff();
+        this->AxisWidget->SetKeyPressActivation(false);
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Error, "Axis widget cannot be shown without an interactor");
+      }
     }
 
     this->AxisVisible = show;
