@@ -16,6 +16,7 @@ window_impl_noRender::window_impl_noRender(const options& options)
   : window_impl(options)
   , Internals(new window_impl_noRender::internals)
 {
+  this->Internals->RenWin->SetOffScreenRendering(true);
 }
 
 //----------------------------------------------------------------------------
