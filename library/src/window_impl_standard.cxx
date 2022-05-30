@@ -172,56 +172,58 @@ void window_impl_standard::Initialize(bool withColoring, std::string fileInfo)
 //----------------------------------------------------------------------------
 bool window_impl_standard::update()
 {
+  if (!this->Internals->Renderer)
+  {
+    // Renderer is missing, create a default one
+    this->Initialize(false, "");
+  }
+
   this->Internals->RenWin->SetSize(this->Options.getAsIntVector("resolution").data());
   this->Internals->RenWin->SetFullScreen(this->Options.getAsBool("fullscreen"));
 
-  if (this->Internals->Renderer)
+  this->Internals->Renderer->ShowAxis(this->Options.getAsBool("axis"));
+  this->Internals->Renderer->ShowEdge(this->Options.getAsBool("edges"));
+  this->Internals->Renderer->ShowTimer(this->Options.getAsBool("fps"));
+  this->Internals->Renderer->ShowFilename(this->Options.getAsBool("filename"));
+  this->Internals->Renderer->ShowMetaData(this->Options.getAsBool("metadata"));
+  this->Internals->Renderer->SetUseRaytracing(this->Options.getAsBool("raytracing"));
+  this->Internals->Renderer->SetRaytracingSamples(this->Options.getAsInt("samples"));
+  this->Internals->Renderer->SetUseRaytracingDenoiser(this->Options.getAsBool("denoise"));
+  this->Internals->Renderer->SetUseSSAOPass(this->Options.getAsBool("ssao"));
+  this->Internals->Renderer->SetUseFXAAPass(this->Options.getAsBool("fxaa"));
+  this->Internals->Renderer->SetUseToneMappingPass(this->Options.getAsBool("tone-mapping"));
+  this->Internals->Renderer->SetUseBlurBackground(this->Options.getAsBool("blur-background"));
+  this->Internals->Renderer->SetUseTrackball(this->Options.getAsBool("trackball"));
+  this->Internals->Renderer->SetHDRIFile(this->Options.getAsString("hdri"));
+  this->Internals->Renderer->SetUseDepthPeelingPass(this->Options.getAsBool("depth-peeling"));
+  this->Internals->Renderer->SetBackground(
+    this->Options.getAsDoubleVector("background-color").data());
+  this->Internals->Renderer->SetFontFile(this->Options.getAsString("font-file"));
+
+  vtkF3DRendererWithColoring* renWithColor =
+    vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
+
+  if (renWithColor)
   {
-    this->Internals->Renderer->ShowAxis(this->Options.getAsBool("axis"));
-    this->Internals->Renderer->ShowEdge(this->Options.getAsBool("edges"));
-    this->Internals->Renderer->ShowTimer(this->Options.getAsBool("fps"));
-    this->Internals->Renderer->ShowFilename(this->Options.getAsBool("filename"));
-    this->Internals->Renderer->ShowMetaData(this->Options.getAsBool("metadata"));
-    this->Internals->Renderer->SetUseRaytracing(this->Options.getAsBool("raytracing"));
-    this->Internals->Renderer->SetRaytracingSamples(this->Options.getAsInt("samples"));
-    this->Internals->Renderer->SetUseRaytracingDenoiser(this->Options.getAsBool("denoise"));
-    this->Internals->Renderer->SetUseSSAOPass(this->Options.getAsBool("ssao"));
-    this->Internals->Renderer->SetUseFXAAPass(this->Options.getAsBool("fxaa"));
-    this->Internals->Renderer->SetUseToneMappingPass(this->Options.getAsBool("tone-mapping"));
-    this->Internals->Renderer->SetUseBlurBackground(this->Options.getAsBool("blur-background"));
-    this->Internals->Renderer->SetUseTrackball(this->Options.getAsBool("trackball"));
-    this->Internals->Renderer->SetHDRIFile(this->Options.getAsString("hdri"));
-    this->Internals->Renderer->SetUseDepthPeelingPass(this->Options.getAsBool("depth-peeling"));
-    this->Internals->Renderer->SetBackground(
-      this->Options.getAsDoubleVector("background-color").data());
-    this->Internals->Renderer->SetFontFile(this->Options.getAsString("font-file"));
-
-    vtkF3DRendererWithColoring* renWithColor =
-      vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
-
-    if (renWithColor)
-    {
-      renWithColor->SetUsePointSprites(this->Options.getAsBool("point-sprites"), false);
-      renWithColor->SetUseVolume(this->Options.getAsBool("volume"), false);
-      renWithColor->SetUseInverseOpacityFunction(this->Options.getAsBool("inverse"), false);
-      renWithColor->ShowScalarBar(this->Options.getAsBool("bar"), false);
-      renWithColor->SetScalarBarRange(this->Options.getAsDoubleVector("range"), false);
-      renWithColor->SetColormap(this->Options.getAsDoubleVector("colormap"), false);
-      renWithColor->UpdateColoringActors();
-    }
-
-    // Show grid last as it needs to know the bounding box to be able to compute its size
-    this->Internals->Renderer->ShowGrid(this->Options.getAsBool("grid"));
-
-    // Print coloring info when available
-    if (this->Options.getAsBool("verbose"))
-    {
-      log::info(this->Internals->Renderer->GetRenderingDescription());
-    }
-
-    return this->Internals->UpdateCamera(this->Options);
+    renWithColor->SetUsePointSprites(this->Options.getAsBool("point-sprites"), false);
+    renWithColor->SetUseVolume(this->Options.getAsBool("volume"), false);
+    renWithColor->SetUseInverseOpacityFunction(this->Options.getAsBool("inverse"), false);
+    renWithColor->ShowScalarBar(this->Options.getAsBool("bar"), false);
+    renWithColor->SetScalarBarRange(this->Options.getAsDoubleVector("range"), false);
+    renWithColor->SetColormap(this->Options.getAsDoubleVector("colormap"), false);
+    renWithColor->UpdateColoringActors();
   }
-  return false;
+
+  // Show grid last as it needs to know the bounding box to be able to compute its size
+  this->Internals->Renderer->ShowGrid(this->Options.getAsBool("grid"));
+
+  // Print coloring info when available
+  if (this->Options.getAsBool("verbose"))
+  {
+    log::info(this->Internals->Renderer->GetRenderingDescription());
+  }
+
+  return this->Internals->UpdateCamera(this->Options);
 }
 
 //----------------------------------------------------------------------------
