@@ -49,7 +49,7 @@ public:
   image& setData(unsigned char* buffer);
   unsigned char* getData() const;
 
-  bool compare(const image& reference, image& result, double threshold) const;
+  bool compare(const image& reference, image& result, double threshold, double& error) const;
 
   bool operator==(const image& reference) const;
   bool operator!=(const image& reference) const;

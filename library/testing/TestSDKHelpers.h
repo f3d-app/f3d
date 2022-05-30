@@ -1,26 +1,48 @@
 #ifndef TestSDKHelpers_h
 #define TestSDKHelpers_h
 
+#include <filesystem>
+#include <iostream>
+
 class TestSDKHelpers
 {
 public:
   static bool RenderTest(f3d::window& win, const std::string& baselinePath,
-    const std::string& outputPath, const std::string& name, double threshold)
+    const std::string& outputPath, const std::string& name, double threshold = 50,
+    bool noBackground = false)
   {
+    if (baselinePath.empty() || outputPath.empty() || name.empty())
+    {
+      std::cerr << "A path or name is empty, aborting" << std::endl;
+      return false;
+    }
+
     std::string baseline = baselinePath + name + ".png";
     std::string output = outputPath + name + ".png";
     std::string diff = outputPath + name + ".diff.png";
 
-    f3d::image result = win.renderToImage();
-    f3d::image diffRes;
-
-    bool ret = result.compare(f3d::image(baseline), diffRes, threshold);
-    if (!ret)
+    if (!std::filesystem::exists(baseline))
     {
+      win.renderToImage(noBackground).save(output);
+      std::cerr << "Reference image "
+                << baseline + " does not exists, current rendering has been outputted to " << output
+                << std::endl;
+      return false;
+    }
+
+    f3d::image result = win.renderToImage(noBackground);
+    f3d::image diffRes;
+    double error;
+
+    if (!result.compare(f3d::image(baseline), diffRes, threshold, error))
+    {
+      std::cerr << "Current rendering difference with reference image: " << error
+                << "  is higher than the threshold of " << threshold << std::endl;
       result.save(output);
       diffRes.save(diff);
+      return false;
     }
-    return ret;
+    return true;
   }
 };
 #endif
