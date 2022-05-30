@@ -1,12 +1,12 @@
 # TODO: add more tests to cover all bindings
 list(APPEND pyf3dTests_list
-     TestOptions.py
+     TestPythonOptions.py
     )
 
 # Test image comparison only with VTK > 9.0.1
 if(VTK_VERSION VERSION_GREATER 9.0.1)
   list(APPEND pyf3dTests_list
-       TestRender.py
+       TestPythonCompareWithFile.py
       )
 endif()
 

@@ -166,7 +166,7 @@ unsigned char* image::getData() const
 }
 
 //----------------------------------------------------------------------------
-bool image::compare(const image& reference, image& result, double threshold) const
+bool image::compare(const image& reference, image& result, double threshold, double& error) const
 {
   auto importerThis = this->Internals->GetVTKImporter();
   auto importerRef = reference.Internals->GetVTKImporter();
@@ -178,7 +178,7 @@ bool image::compare(const image& reference, image& result, double threshold) con
   diff->SetInputConnection(importerThis->GetOutputPort());
   diff->SetImageConnection(importerRef->GetOutputPort());
   diff->UpdateInformation();
-  double error = diff->GetThresholdedError();
+  error = diff->GetThresholdedError();
 
   if (error <= threshold)
   {
@@ -186,16 +186,23 @@ bool image::compare(const image& reference, image& result, double threshold) con
     error = diff->GetThresholdedError();
   }
 
-  result.Internals->SetFromVTK(diff);
-
-  return error <= threshold;
+  if (error <= threshold)
+  {
+    return true;
+  }
+  else
+  {
+    result.Internals->SetFromVTK(diff);
+    return false;
+  }
 }
 
 //----------------------------------------------------------------------------
 bool image::operator==(const image& reference) const
 {
   f3d::image diff;
-  return this->compare(reference, diff, 0);
+  double error;
+  return this->compare(reference, diff, 0, error);
 }
 
 //----------------------------------------------------------------------------
