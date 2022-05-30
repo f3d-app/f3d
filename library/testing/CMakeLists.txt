@@ -13,6 +13,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
     TestSDKCompareWithFile.cxx
     TestSDKInteractionDirectory.cxx
     TestSDKImage.cxx
+    TestSDKWindowStandard.cxx
     )
 endif()
 
@@ -45,4 +46,8 @@ endforeach ()
 set_tests_properties(libf3d::TestSDKLog PROPERTIES PASS_REGULAR_EXPRESSION "Test Info\nTest Warning\nTest Error\nTest Info Coloring")
 
 target_link_libraries(libf3dSDKTests libf3d)
-target_compile_features(libf3dSDKTests PRIVATE cxx_std_11)
+if (UNIX AND NOT APPLE)
+  target_link_libraries(libf3dSDKTests stdc++fs)
+endif ()
+
+target_compile_features(libf3dSDKTests PRIVATE cxx_std_17)
