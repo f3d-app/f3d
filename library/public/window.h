@@ -1,3 +1,11 @@
+/**
+ * @class   window
+ * @brief   Abstract class to render in a window or an image
+ *
+ * A class to render things in a window or an image.
+ * An icon and windowName can be set which can be shown by a window manager.
+ */
+
 #ifndef f3d_window_h
 #define f3d_window_h
 
@@ -6,16 +14,45 @@
 
 #include <string>
 
-// TODO DOC
 namespace f3d
 {
 class F3D_EXPORT window
 {
 public:
+  /**
+   * Use all the rendering related options to update the configuration of the window
+   * and the rendering stack below. This also initialize the rendering stack if needed.
+   * This will be called automatically when calling loader::loadFile but can also be called manually
+   * when needed. This must be called, either manually or automatically, before any render call.
+   * Return true on success, false otherwise.
+   */
   virtual bool update() = 0;
+
+  /**
+   * Perform a render of the window to the screen.
+   * Return true on success, false otherwise.
+   */
   virtual bool render() = 0;
+
+  /**
+   * Perform a render of the window to the screen and save the result in a f3d::image.
+   * Set noBackground to true to have a transparent background.
+   * Return the resulting f3d::image.
+   */
   virtual image renderToImage(bool noBackground = false) = 0;
+
+  /**
+   * Set the icon to be shown by a window manager.
+   * icon should be an unsigned char array
+   * iconSize should be the sizeof(icon)
+   * Return true on success, false otherwise.
+   */
   virtual bool setIcon(const void* icon, size_t iconSize) = 0;
+
+  /**
+   * Set the window name to be shown by a window manager.
+   * Return true on success, false otherwise.
+   */
   virtual bool setWindowName(const std::string& windowName) = 0;
 
 protected:
