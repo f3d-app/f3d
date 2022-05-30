@@ -179,7 +179,8 @@ int F3DStarter::Start(int argc, char** argv)
         this->Internals->AppOptions.NoBackground);
       f3d::image ref(this->Internals->AppOptions.Reference);
       f3d::image diff;
-      if (!img.compare(ref, diff, this->Internals->AppOptions.RefThreshold))
+      double error;
+      if (!img.compare(ref, diff, this->Internals->AppOptions.RefThreshold, error))
       {
         if (this->Internals->AppOptions.Output.empty())
         {
@@ -188,9 +189,8 @@ int F3DStarter::Start(int argc, char** argv)
         }
         else
         {
-          f3d::log::error(
-            "Current rendering difference with reference image is higher than the threshold of ",
-            this->Internals->AppOptions.RefThreshold, ".\n");
+          f3d::log::error("Current rendering difference with reference image: ", error,
+            " is higher than the threshold of ", this->Internals->AppOptions.RefThreshold, ".\n");
 
           img.save(this->Internals->AppOptions.Output);
           diff.save(std::filesystem::path(this->Internals->AppOptions.Output)
