@@ -2,7 +2,7 @@ import f3d
 import sys
 
 dataset = sys.argv[1] + "data/cow.vtp"
-reference = sys.argv[1] + "baselines/TestSDKCompareWithFile.png"
+reference = sys.argv[1] + "baselines/TestPythonCompareWithFile.png"
 output = sys.argv[2] + "TestPythonCompareWithFile.png"
 outputDiff = sys.argv[2] + "TestPythonCompareWithFile.diff.png"
 
@@ -21,7 +21,11 @@ img = engine.getWindow().renderToImage()
 img.save(output)
 
 diff = f3d.image()
+error = 0.0
 
-assert img.compare(f3d.image(reference), diff, 50) is True
+ret = img.compare(f3d.image(reference), diff, 50, error)
 
-diff.save(outputDiff)
+if not ret:
+  diff.save(outputDiff)
+  
+assert ret is True
