@@ -12,21 +12,25 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   try
   {
     f3d::window& win = eng.getWindow();
+    std::cerr << "An exception has not been thrown when getting a non-existent window" << std::endl;
+    return EXIT_FAILURE;
   }
   catch (const f3d::engine::exception& ex)
   {
-    std::cerr << ex.what() << std::endl;
+    std::cout << ex.what() << std::endl;
   }
 
   try
   {
     f3d::interactor& inter = eng.getInteractor();
+    std::cerr << "An exception has not been thrown when getting a non-existent interactor"
+              << std::endl;
+    return EXIT_FAILURE;
   }
   catch (const f3d::engine::exception& ex)
   {
-    std::cerr << ex.what() << std::endl;
-    exit(EXIT_SUCCESS);
+    std::cout << ex.what() << std::endl;
   }
 
-  return EXIT_FAILURE;
+  return EXIT_SUCCESS;
 }

@@ -6,7 +6,7 @@
 int TestSDKRenderAndInteract(int argc, char* argv[])
 {
   // Order of allocation matter for VTK
-  // This tests ensure that rendering then creating
+  // This tests ensure that rendering then using
   // an interactor works
 
   f3d::engine eng(f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR);
