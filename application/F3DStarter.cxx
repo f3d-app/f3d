@@ -11,6 +11,8 @@
 #include "options.h"
 #include "window.h"
 
+#include <filesystem>
+
 class F3DStarter::F3DInternals
 {
 public:
@@ -152,10 +154,49 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      if (!this->Internals->Engine->getWindow().renderAndCompareWithFile(
-            this->Internals->AppOptions.Reference, this->Internals->AppOptions.RefThreshold,
-            this->Internals->AppOptions.NoBackground, this->Internals->AppOptions.Output))
+      if (!std::filesystem::exists(this->Internals->AppOptions.Reference))
       {
+        if (this->Internals->AppOptions.Output.empty())
+        {
+          f3d::log::error("Reference image ", this->Internals->AppOptions.Reference,
+            " does not exists, use the output option to output current rendering into an image "
+            "file.\n");
+        }
+        else
+        {
+          this->Internals->Engine->getWindow()
+            .renderToImage(this->Internals->AppOptions.NoBackground)
+            .save(this->Internals->AppOptions.Output);
+
+          f3d::log::error("Reference image " + this->Internals->AppOptions.Reference +
+            " does not exists, current rendering has been outputted to " +
+            this->Internals->AppOptions.Output + ".\n");
+        }
+        return EXIT_FAILURE;
+      }
+
+      f3d::image img = this->Internals->Engine->getWindow().renderToImage(
+        this->Internals->AppOptions.NoBackground);
+      f3d::image ref(this->Internals->AppOptions.Reference);
+      f3d::image diff;
+      if (!img.compare(ref, diff, this->Internals->AppOptions.RefThreshold))
+      {
+        if (this->Internals->AppOptions.Output.empty())
+        {
+          f3d::log::error("Use the --output option to be able to output current rendering and diff "
+                          "images into files.\n");
+        }
+        else
+        {
+          f3d::log::error(
+            "Current rendering difference with reference image is higher than the threshold of ",
+            this->Internals->AppOptions.RefThreshold, ".\n");
+
+          img.save(this->Internals->AppOptions.Output);
+          diff.save(std::filesystem::path(this->Internals->AppOptions.Output)
+                      .replace_extension(".diff.png")
+                      .string());
+        }
         return EXIT_FAILURE;
       }
     }
@@ -168,11 +209,9 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      if (!this->Internals->Engine->getWindow().renderToFile(
-            this->Internals->AppOptions.Output, this->Internals->AppOptions.NoBackground))
-      {
-        return EXIT_FAILURE;
-      }
+      f3d::image img = this->Internals->Engine->getWindow().renderToImage(
+        this->Internals->AppOptions.NoBackground);
+      img.save(this->Internals->AppOptions.Output);
     }
     // Start interaction
     else

@@ -6,14 +6,15 @@
 
 #include <iostream>
 
+#include "TestSDKHelpers.h"
+
 int TestSDKInteractionDirectory(int argc, char* argv[])
 {
   // This test mimics TestInteractionDirectory.
   f3d::engine eng(
     f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR | f3d::engine::WINDOW_OFFSCREEN);
   f3d::options& options = eng.getOptions();
-  options.set("resolution", { 300, 300 });
-  options.set("scalars", "");
+  options.set("resolution", { 300, 300 }).set("scalars", "");
   f3d::loader& load = eng.getLoader();
   load.addFile(std::string(argv[1]) + "/data/mb");
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
@@ -46,8 +47,8 @@ int TestSDKInteractionDirectory(int argc, char* argv[])
   load.setCurrentFileIndex(2);
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
-  return win.renderAndCompareWithFile(std::string(argv[1]) + "/baselines/" + filename + ".png", 50,
-           false, std::string(argv[2]) + filename + ".png")
+  return TestSDKHelpers::RenderTest(
+           win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename, 50)
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }

@@ -30,15 +30,15 @@ public:
     }
   };
 
-  void set(const std::string& name, bool value);
-  void set(const std::string& name, int value);
-  void set(const std::string& name, double value);
-  void set(const std::string& name, const std::string& value);
-  void set(const std::string& name, const char* value);
-  void set(const std::string& name, const std::vector<int>& values);
-  void set(const std::string& name, const std::vector<double>& values);
-  void set(const std::string& name, std::initializer_list<int> values);
-  void set(const std::string& name, std::initializer_list<double> values);
+  options& set(const std::string& name, bool value);
+  options& set(const std::string& name, int value);
+  options& set(const std::string& name, double value);
+  options& set(const std::string& name, const std::string& value);
+  options& set(const std::string& name, const char* value);
+  options& set(const std::string& name, const std::vector<int>& values);
+  options& set(const std::string& name, const std::vector<double>& values);
+  options& set(const std::string& name, std::initializer_list<int> values);
+  options& set(const std::string& name, std::initializer_list<double> values);
 
   void get(const std::string& name, bool& value) const;
   void get(const std::string& name, int& value) const;
