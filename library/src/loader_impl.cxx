@@ -237,13 +237,16 @@ void loader_impl::getFileInfo(
   if (size > 0)
   {
     int addToIndex = 0;
+    bool compute = true;
     switch (load)
     {
       case loader::LoadFileEnum::LOAD_FIRST:
         nextFileIndex = 0;
+        compute = false;
         break;
       case loader::LoadFileEnum::LOAD_LAST:
         nextFileIndex = size - 1;
+        compute = false;
         break;
       case loader::LoadFileEnum::LOAD_PREVIOUS:
         addToIndex = -1;
@@ -256,9 +259,12 @@ void loader_impl::getFileInfo(
         break;
     }
 
-    // Compute the correct file index
-    nextFileIndex = (this->Internals->CurrentFileIndex + addToIndex) % size;
-    nextFileIndex = nextFileIndex < 0 ? nextFileIndex + size : nextFileIndex;
+    // Compute the correct file index if needed
+    if (compute)
+    {
+      nextFileIndex = (this->Internals->CurrentFileIndex + addToIndex) % size;
+      nextFileIndex = nextFileIndex < 0 ? nextFileIndex + size : nextFileIndex;
+    }
 
     filePath = this->Internals->FilesList[nextFileIndex];
     fileInfo = "(" + std::to_string(nextFileIndex + 1) + "/" + std::to_string(size) + ") " +
@@ -299,7 +305,8 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
 
   // Recover information about the file to load
   std::string filePath, fileInfo;
-  this->getFileInfo(load, this->Internals->CurrentFileIndex, filePath, fileInfo);
+  int nextFileIndex;
+  this->getFileInfo(load, nextFileIndex, filePath, fileInfo);
   bool verbose = this->Internals->Options.getAsBool("verbose");
   if (verbose)
   {
@@ -313,14 +320,17 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
     }
   }
 
-  // No file provided, show a drop zone instead
   if (filePath.empty())
   {
+    // No file provided, show a drop zone instead
     fileInfo += "No file to load provided, please drop one into this window";
     this->Internals->Window.Initialize(false, fileInfo);
     this->Internals->Window.update();
     return this->Internals->LoadedFile;
   }
+
+  // There is a file to load, update CurrentFileIndex
+  this->Internals->CurrentFileIndex = nextFileIndex;
 
   // Recover the importer
   this->Internals->Importer = loader_impl::internals::GetImporter(
