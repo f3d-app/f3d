@@ -77,7 +77,7 @@ public:
    * Set the load argument to LOAD_FIRST, LOAD_PREVIOUS, LOAD_NEXT or LOAD_LAST as needed.
    * nextFileIndex will provide the index of the file or -1 if not available.
    * filePath the path to the file and fileInfo a more complete information about the file,
-   * including index in list. Return true if there is a file or false otherwise.
+   * including index in list.
    */
   virtual void getFileInfo(
     LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const = 0;

@@ -1,6 +1,7 @@
 #TODO add more tests
 list(APPEND libf3dSDKTests_list
      TestSDKRenderAndInteract.cxx
+     TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
      TestSDKOptions.cxx
      TestSDKLog.cxx
