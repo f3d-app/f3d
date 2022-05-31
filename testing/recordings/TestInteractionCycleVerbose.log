@@ -14,3 +14,6 @@ KeyReleaseEvent -1198 382 0 118 1 v
 KeyPressEvent -1198 382 0 99 1 c
 CharEvent -1198 382 0 99 1 c
 KeyReleaseEvent -1198 382 0 99 1 c
+KeyPressEvent -1198 382 0 99 1 o
+CharEvent -1198 382 0 99 1 o
+KeyReleaseEvent -1198 382 0 99 1 o
