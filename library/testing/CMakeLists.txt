@@ -12,8 +12,9 @@ list(APPEND libf3dSDKTests_list
 if(VTK_VERSION VERSION_GREATER 9.0.1)
   list(APPEND libf3dSDKTests_list
     TestSDKCompareWithFile.cxx
-    TestSDKInteractionDirectory.cxx
     TestSDKImage.cxx
+    TestSDKInteractionDirectory.cxx
+    TestSDKInteractorCallBack.cxx
     TestSDKWindowStandard.cxx
     )
 endif()
@@ -24,6 +25,10 @@ if(VTK_VERSION VERSION_GREATER 9.0.20201016)
     TestSDKAnimation.cxx
     )
 endif()
+
+# Configure the log file for dropfile test
+configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack.log.in"
+               "${CMAKE_BINARY_DIR}/TestSDKInteractorCallBack.log") # Dragon.vtu; S
 
 # create the testing file and list of tests
 create_test_sourcelist(_libf3dSDKTests libf3dSDKTests.cxx ${libf3dSDKTests_list})
