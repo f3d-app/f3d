@@ -51,7 +51,6 @@ public:
   bool IsPlaying() const { return Playing; }
 
 protected:
-
   /**
    * Called by an internal timer to advance one animation tick
    */

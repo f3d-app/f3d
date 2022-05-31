@@ -27,7 +27,6 @@ class window_impl;
 class interactor_impl : public interactor
 {
 public:
-
   //@{
   /**
    * Documented public API

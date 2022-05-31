@@ -26,7 +26,6 @@ namespace detail
 class window_impl_standard : public window_impl
 {
 public:
-
   /**
    * Create the internal vtkRenderWindow using the offscreen param
    * and store option ref for later usage

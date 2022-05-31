@@ -24,7 +24,6 @@ class window_impl;
 class loader_impl : public loader
 {
 public:
-
   //@{
   /**
    * Documented public API
