@@ -236,7 +236,9 @@ if(F3D_MODULE_ASSIMP)
   f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p)
   f3d_test(NAME TestFBX DATA phong_cube.fbx)
 
-  f3d_test(NAME TestVersionAssimp ARGS --version REGEXP "Assimp module: .\\..\\..")
+  f3d_test(NAME TestVersionAssimp ARGS --version NO_BASELINE REGEXP "Assimp module: .\\..\\..")
+  f3d_test(NAME TestVerboseAssimp DATA robot_kyle_walking.fbx ARGS --verbose NO_BASELINE REGEXP "Robot2")
+  f3d_test(NAME TestVerboseCameraAssimp DATA duck.dae ARGS --verbose NO_BASELINE REGEXP "camera1")
 
   if(VTK_VERSION VERSION_GREATER 9.0.20210728) # for TGA support and embedded textures
     f3d_test(NAME TestDAE DATA duck.dae)

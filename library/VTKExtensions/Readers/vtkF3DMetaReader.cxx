@@ -46,7 +46,7 @@ vtkInformation* vtkF3DMetaReader::GetOutputInformation(int port)
   {
     vtkErrorMacro("InternalReader has not been created yet, "
                   "make sure to set to use a supported file format and to set the FileName");
-    return 0;
+    return nullptr;
   }
 
   return this->InternalReader->GetOutputInformation(port);

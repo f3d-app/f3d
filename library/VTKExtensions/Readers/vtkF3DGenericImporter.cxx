@@ -48,7 +48,7 @@ void vtkF3DGenericImporter::UpdateTemporalInformation()
   {
     if (!this->Reader->IsReaderValid())
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "Reader is not valid");
+      F3DLog::Print(F3DLog::Severity::Warning, "Reader is not valid\n");
       return;
     }
     this->Reader->UpdateInformation();
@@ -124,7 +124,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   if (!this->Reader->IsReaderValid())
   {
     F3DLog::Print(F3DLog::Severity::Error,
-      std::string("File '") + this->Reader->GetFileName() + "' cannot be read.");
+      std::string("File '") + this->Reader->GetFileName() + "' cannot be read.\n");
     return;
   }
 
@@ -139,18 +139,12 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   if (!ret)
   {
     F3DLog::Print(F3DLog::Severity::Error,
-      std::string("File '") + this->Reader->GetFileName() + "' cannot be read.");
+      std::string("File '") + this->Reader->GetFileName() + "' cannot be read.\n");
     return;
   }
 
   this->OutputDescription =
     vtkF3DGenericImporter::GetDataObjectDescription(this->Reader->GetOutput());
-
-  if (!this->GetRenderWindow())
-  {
-    // No render window provided, do not setup the mappers and actors
-    return;
-  }
 
   vtkPolyData* surface = vtkPolyData::SafeDownCast(this->PostPro->GetOutput());
   vtkImageData* image = vtkImageData::SafeDownCast(this->PostPro->GetOutput(2));
@@ -239,7 +233,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   }
   if (this->ArrayIndexForColoring == -1 && !usedArray.empty() && usedArray != F3D_RESERVED_STRING)
   {
-    F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: " + usedArray);
+    F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: " + usedArray + "\n");
   }
   if (this->ArrayIndexForColoring == -1)
   {
@@ -296,7 +290,7 @@ vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(
     std::string fullPath = vtksys::SystemTools::CollapseFullPath(filePath);
     if (!vtksys::SystemTools::FileExists(fullPath))
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "Texture file does not exist " + fullPath);
+      F3DLog::Print(F3DLog::Severity::Warning, "Texture file does not exist " + fullPath + "\n");
     }
     else
     {
@@ -317,7 +311,7 @@ vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(
       }
       else
       {
-        F3DLog::Print(F3DLog::Severity::Warning, "Cannot open texture file " + fullPath);
+        F3DLog::Print(F3DLog::Severity::Warning, "Cannot open texture file " + fullPath + "\n");
       }
     }
   }
@@ -348,10 +342,10 @@ void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::SetFileName(const char* arg)
+void vtkF3DGenericImporter::SetFileName(std::string name)
 {
   this->TemporalInformationUpdated = false;
-  this->Reader->SetFileName(std::string(arg));
+  this->Reader->SetFileName(name);
 }
 
 //----------------------------------------------------------------------------

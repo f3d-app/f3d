@@ -24,29 +24,13 @@ public:
   vtkTypeMacro(vtkF3DAssimpImporter, vtkImporter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210118)
   //@{
   /**
-   * Get/Set the file name.
+   * Set/Get the file name.
    */
-  vtkSetStdStringFromCharMacro(FileName);
-  vtkGetCharFromStdStringMacro(FileName);
+  vtkSetMacro(FileName, std::string);
+  vtkGetMacro(FileName, std::string);
   //@}
-#else
-  /**
-   * Get the filename
-   */
-  const char* GetFileName() { return this->FileName.c_str(); }
-
-  /**
-   * Set the filename
-   */
-  void SetFileName(const char* fileName)
-  {
-    this->FileName = fileName;
-    this->Modified();
-  }
-#endif
 
   /**
    * Update actors at the given timestep.

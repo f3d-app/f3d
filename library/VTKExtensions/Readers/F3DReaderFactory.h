@@ -38,11 +38,6 @@ public:
   static F3DReader* GetReader(const std::string& fileName);
 
   /*
-   * Get the reader with the given name, nullptr if none
-   */
-  static F3DReader* GetReaderByName(const std::string& name);
-
-  /*
    * Get the list of the registered reader classes
    */
   static const std::list<F3DReader*>& GetReaders();

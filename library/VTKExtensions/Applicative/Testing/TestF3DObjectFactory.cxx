@@ -11,6 +11,7 @@
 #include <vtkNew.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkTestUtilities.h>
+#include <vtkVersion.h>
 
 int TestF3DObjectFactory(int argc, char* argv[])
 {
@@ -18,6 +19,19 @@ int TestF3DObjectFactory(int argc, char* argv[])
   vtkObjectFactory::RegisterFactory(factory);
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
 
+  // Check factory utility methods
+  if (strcmp(factory->GetVTKSourceVersion(), VTK_SOURCE_VERSION) != 0)
+  {
+    std::cerr << "vtkF3DObjectFactory failed to provide correct VTK_SOURCE_VERSION" << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (strcmp(factory->GetDescription(), "F3D factory overrides." ) != 0)
+  {
+    std::cerr << "vtkF3DObjectFactory failed to provide expected description" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Check actual factory mechanism
   vtkNew<vtkPolyDataMapper> mapper;
   vtkF3DPolyDataMapper* mapperPtr = vtkF3DPolyDataMapper::SafeDownCast(mapper);
   if (mapperPtr == nullptr)

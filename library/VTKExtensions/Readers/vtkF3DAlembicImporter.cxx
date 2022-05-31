@@ -197,50 +197,6 @@ void vtkF3DAlembicImporter::ImportActors(vtkRenderer* renderer)
 }
 
 //----------------------------------------------------------------------------
-std::string vtkF3DAlembicImporter::GetOutputsDescription()
-{
-  return "Alembic";
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DAlembicImporter::UpdateTimeStep(double vtkNotUsed(timestep)) {}
-
-//----------------------------------------------------------------------------
-vtkIdType vtkF3DAlembicImporter::GetNumberOfAnimations()
-{
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-std::string vtkF3DAlembicImporter::GetAnimationName(vtkIdType vtkNotUsed(animationIndex))
-{
-  return "";
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DAlembicImporter::EnableAnimation(vtkIdType vtkNotUsed(animationIndex)) {}
-
-//----------------------------------------------------------------------------
-void vtkF3DAlembicImporter::DisableAnimation(vtkIdType vtkNotUsed(animationIndex)) {}
-
-//----------------------------------------------------------------------------
-bool vtkF3DAlembicImporter::IsAnimationEnabled(vtkIdType vtkNotUsed(animationIndex))
-{
-  return false;
-}
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
-//----------------------------------------------------------------------------
-bool vtkF3DAlembicImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationIndex),
-  double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double vtkNotUsed(timeRange)[2],
-  vtkDoubleArray* vtkNotUsed(timeSteps))
-{
-  return true;
-}
-
-#endif // VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
-
-//----------------------------------------------------------------------------
 void vtkF3DAlembicImporter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

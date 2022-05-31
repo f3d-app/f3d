@@ -20,11 +20,10 @@ public:
   void DisplayText(const char*) override;
 
   /**
-   * Set/Get the coloring usage.
+   * Set the coloring usage.
    * Default is true.
    */
   vtkSetMacro(UseColoring, bool);
-  vtkGetMacro(UseColoring, bool);
 
 protected:
   vtkF3DConsoleOutputWindow();
