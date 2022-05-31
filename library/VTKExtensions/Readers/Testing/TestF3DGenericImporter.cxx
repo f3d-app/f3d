@@ -9,7 +9,7 @@
 int TestF3DGenericImporter(int argc, char* argv[])
 {
   F3DReaderInstantiator ReaderInstantiator;
-  
+
   vtkNew<vtkF3DGenericImporter> importer;
 
   // Test invalid reader filepath

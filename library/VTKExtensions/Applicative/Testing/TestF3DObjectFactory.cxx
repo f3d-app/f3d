@@ -25,7 +25,7 @@ int TestF3DObjectFactory(int argc, char* argv[])
     std::cerr << "vtkF3DObjectFactory failed to provide correct VTK_SOURCE_VERSION" << std::endl;
     return EXIT_FAILURE;
   }
-  if (strcmp(factory->GetDescription(), "F3D factory overrides." ) != 0)
+  if (strcmp(factory->GetDescription(), "F3D factory overrides.") != 0)
   {
     std::cerr << "vtkF3DObjectFactory failed to provide expected description" << std::endl;
     return EXIT_FAILURE;
