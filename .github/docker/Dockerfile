@@ -20,6 +20,7 @@ RUN apt update && apt install -y \
     libglu1-mesa \
     libjson-perl \
     libperlio-gzip-perl \
+    libqt5opengl5-dev \
     libx11-dev \
     libxcursor1 \
     libxt-dev \
