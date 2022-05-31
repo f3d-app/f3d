@@ -35,11 +35,6 @@ public:
 
   bool UpdateCamera(const options& options)
   {
-    if (!this->Renderer)
-    {
-      return false;
-    }
-
     // Set the initial camera once all options
     // have been shown as they may have an effect on it
     if (options.getAsInt("camera-index") < 0)

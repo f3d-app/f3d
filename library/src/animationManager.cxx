@@ -21,32 +21,9 @@ void animationManager::Initialize(
   this->HasAnimation = false;
 
   this->Options = options;
-  if (!this->Options)
-  {
-    log::error("Options is empty");
-    return;
-  }
-
   this->Interactor = interactor;
-  if (!this->Interactor)
-  {
-    log::error("Interactor is empty");
-    return;
-  }
-
   this->Window = window;
-  if (!this->Window)
-  {
-    log::error("Window is empty");
-    return;
-  }
-
   this->Importer = importer;
-  if (!this->Importer)
-  {
-    log::error("Importer is empty");
-    return;
-  }
 
   // This can be -1 if animation support is not implemented in the importer
   int availAnimations = this->Importer->GetNumberOfAnimations();
