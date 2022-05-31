@@ -49,7 +49,10 @@ public:
     dropFilesCallback->SetCallback(OnDropFiles);
     this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
 
+#if 0 // TODO VTK Version
+    this->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
     this->Recorder->SetInteractor(this->VTKInteractor);
+#endif
   }
 
   static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
@@ -332,7 +335,7 @@ public:
 
   vtkNew<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
-  vtkNew<vtkF3DInteractorEventRecorder> Recorder;
+  vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
   int WindowSize[2] = { -1, -1 };
   int WindowPos[2] = { 0, 0 };
   std::map<unsigned long, std::pair<int, std::function<void()> > > TimerCallBacks;
@@ -437,8 +440,15 @@ bool interactor_impl::playInteraction(const std::string& file)
   }
   else
   {
-    // Make sure the recorder is off
+#if 0 // TODO VTK_VERSION
+    // Make sure the recorder is off and streams are cleared
     this->Internals->Recorder->Off();
+    this->Internals->Recorder->Clear();
+#else
+    // Create a clean recorder as its internal state matters
+    this->Internals->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
+    this->Internals->Recorder->SetInteractor(this->Internals->VTKInteractor);
+#endif
 
     std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
     this->Internals->Recorder->SetFileName(cleanFile.c_str());
@@ -460,12 +470,19 @@ bool interactor_impl::recordInteraction(const std::string& file)
   if (file.empty())
   {
     // TODO improve VTK to check file opening
-    log::error("Interaction record file is empty");
+    log::error("No interaction record file provided");
     return false;
   }
 
-  // Make sure the recorder is off
-  this->Internals->Recorder->Off();
+#if 0 // TODO VTK_VERSION
+    // Make sure the recorder is off and streams are cleared
+    this->Internals->Recorder->Off();
+    this->Internals->Recorder->Clear();
+#else
+  // Create a clean recorder as its internal state matters
+  this->Internals->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
+  this->Internals->Recorder->SetInteractor(this->Internals->VTKInteractor);
+#endif
 
   std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
   this->Internals->Recorder->SetFileName(cleanFile.c_str());
