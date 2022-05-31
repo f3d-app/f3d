@@ -44,7 +44,7 @@ endif()
 
 # External window test using QT
 find_package(Qt5 QUIET COMPONENTS OpenGL)
-if(Qt5_FOUND)
+if(Qt5_FOUND AND VTK_VERSION VERSION_GREATER 9.0.1)
   list(APPEND libf3dSDKTests_list
        TestSDKExternalWindowQT.cxx
       )
