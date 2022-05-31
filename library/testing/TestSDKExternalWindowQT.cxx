@@ -46,7 +46,8 @@ protected:
       .setData(frameBuffer.bits());
 
     f3d::image diff;
-    if (!img.compare(f3d::image(mBaseline), diff, 50))
+    double error;
+    if (!img.compare(f3d::image(mBaseline), diff, 50, error))
     {
       QCoreApplication::exit(EXIT_FAILURE);
     }
