@@ -166,24 +166,24 @@ unsigned char* image::getData() const
 }
 
 //----------------------------------------------------------------------------
-bool image::compare(const image& reference, image& result, double threshold, double& error) const
+bool image::compare(const image& reference, image& diff, double threshold, double& error) const
 {
   auto importerThis = this->Internals->GetVTKImporter();
   auto importerRef = reference.Internals->GetVTKImporter();
 
-  vtkNew<vtkImageDifference> diff;
+  vtkNew<vtkImageDifference> imDiff;
   // handle threshold outside of vtkImageDifference:
   // https://gitlab.kitware.com/vtk/vtk/-/issues/18152
-  diff->SetThreshold(0);
-  diff->SetInputConnection(importerThis->GetOutputPort());
-  diff->SetImageConnection(importerRef->GetOutputPort());
-  diff->UpdateInformation();
-  error = diff->GetThresholdedError();
+  imDiff->SetThreshold(0);
+  imDiff->SetInputConnection(importerThis->GetOutputPort());
+  imDiff->SetImageConnection(importerRef->GetOutputPort());
+  imDiff->UpdateInformation();
+  error = imDiff->GetThresholdedError();
 
   if (error <= threshold)
   {
-    diff->Update();
-    error = diff->GetThresholdedError();
+    imDiff->Update();
+    error = imDiff->GetThresholdedError();
   }
 
   if (error <= threshold)
@@ -192,7 +192,7 @@ bool image::compare(const image& reference, image& result, double threshold, dou
   }
   else
   {
-    result.Internals->SetFromVTK(diff);
+    diff.Internals->SetFromVTK(imDiff);
     return false;
   }
 }
