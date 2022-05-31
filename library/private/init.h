@@ -1,8 +1,9 @@
 /**
  * @class   init
- * @brief   Class used to initialize libf3d
+ * @brief   A private class used to initialize libf3d
  *
- * TODO improve doc
+ * A private class used to initialize libf3d, it relies on a global static instance
+ * that will call the necessary code when loading the libf3d symbols
  */
 
 #ifndef f3d_init_h
@@ -15,7 +16,18 @@ namespace f3d::detail
 class init
 {
 public:
+  /**
+   * libf3d initialization:
+   *  - Control VTK global warning mechanism
+   *  - Control VTK logger behavior
+   *  - Create and register VTK factories
+   *  - Set log::quiet to false to initialize the output window
+   */
   init();
+
+  /**
+   * Default dest
+   */
   ~init();
 
 private:

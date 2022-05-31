@@ -1,7 +1,6 @@
 /**
  * @class   animationManager
- * @brief   The animation manager class
- *
+ * @brief   A private class managing animation
  */
 
 #ifndef f3d_animationManager_h
@@ -33,7 +32,8 @@ public:
   ~animationManager() = default;
 
   /**
-   * Initialize the animation manager, required before playing the animation
+   * Initialize the animation manager, required before playing the animation.
+   * Provided pointers are expected to be not null.
    */
   void Initialize(
     const options* options, interactor_impl* interactor, window* window, vtkImporter* importer);
@@ -51,6 +51,10 @@ public:
   bool IsPlaying() const { return Playing; }
 
 protected:
+
+  /**
+   * Called by an internal timer to advance one animation tick
+   */
   void Tick();
 
   vtkImporter* Importer = nullptr;
