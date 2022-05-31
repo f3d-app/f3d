@@ -2,8 +2,8 @@
  * @class   image
  * @brief   Class used to represent an image
  *
- * A class to represent an image, which can be created from a file, a buffer and provided by a window.
- * It provides tools to save and compare images.
+ * A class to represent an image, which can be created from a file, a buffer and provided by a
+ * window. It provides tools to save and compare images.
  */
 
 #ifndef f3d_image_h

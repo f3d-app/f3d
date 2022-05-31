@@ -20,7 +20,6 @@ namespace f3d
 class F3D_EXPORT options
 {
 public:
-
   //@{
   /**
    * Default/Copy/move constructors/operators
