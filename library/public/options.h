@@ -84,7 +84,7 @@ public:
   //@{
   /**
    * Explicit reference getters for all supported types.
-   * Can throw a f3d::options::exception in case of failure.
+   * Can throw a options::exception in case of failure.
    */
   bool& getAsBoolRef(const std::string& name);
   int& getAsIntRef(const std::string& name);

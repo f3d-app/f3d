@@ -35,7 +35,8 @@ public:
 
   /**
    * Create an image from file, the following formats are supported:
-   * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA
+   * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA.
+   * Can throw an image::exception in case of failure.
    */
   explicit image(const std::string& path);
 
@@ -93,11 +94,13 @@ public:
    * Compare current image to a reference using the provided threshold.
    * If the comparison fails, output the resulting diff and error and return false,
    * return true otherwise.
+   * Can throw an image::exception if images are not sane.
    */
   bool compare(const image& reference, image& diff, double threshold, double& error) const;
 
   /**
    * Save an image to a file in .png format
+   * Can throw an image::exception if images is not sane.
    */
   image& save(const std::string& path);
 
