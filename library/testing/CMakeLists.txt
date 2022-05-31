@@ -80,7 +80,7 @@ endif()
 
 if(Qt5_FOUND)
   # external window test using QT
-  target_link_libraries(libf3dSDKTests Qt::OpenGL)
+  target_link_libraries(libf3dSDKTests Qt5::OpenGL)
 endif()
 
 if (UNIX AND NOT APPLE)
