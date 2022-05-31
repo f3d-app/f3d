@@ -7,9 +7,8 @@
 class TestSDKHelpers
 {
 public:
-  static bool RenderTest(f3d::window& win, const std::string& baselinePath,
-    const std::string& outputPath, const std::string& name, double threshold = 50,
-    bool noBackground = false)
+  static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
+    const std::string& outputPath, const std::string& name, double threshold = 50)
   {
     if (baselinePath.empty() || outputPath.empty() || name.empty())
     {
@@ -23,14 +22,14 @@ public:
 
     if (!std::filesystem::exists(baseline))
     {
-      win.renderToImage(noBackground).save(output);
+      img.save(output);
       std::cerr << "Reference image "
                 << baseline + " does not exists, current rendering has been outputted to " << output
                 << std::endl;
       return false;
     }
 
-    f3d::image result = win.renderToImage(noBackground);
+    f3d::image result = img;
     f3d::image diffRes;
     double error;
 
@@ -43,6 +42,14 @@ public:
       return false;
     }
     return true;
+  }
+
+  static bool RenderTest(f3d::window& win, const std::string& baselinePath,
+    const std::string& outputPath, const std::string& name, double threshold = 50,
+    bool noBackground = false)
+  {
+    return TestSDKHelpers::RenderTest(
+      win.renderToImage(noBackground), baselinePath, outputPath, name, threshold);
   }
 };
 #endif

@@ -52,6 +52,8 @@ public:
    * engine::CREATE_INTERACTOR: Create an interactor to interact with.
    * engine::WINDOW_OFFSCREEN: Create an offscreen window to render into, need CREATE_WINDOW.
    * engine::WINDOW_EXTERNAL: Use an external window to render into, need CREATE_WINDOW.
+   * WINDOW_OFFSCREEN and WINDOW_EXTERNAL are exclusive, if both are set, WINDOW_EXTERNAL has
+   * precedence.
    */
   using flags_t = uint32_t;
   enum Flags : flags_t

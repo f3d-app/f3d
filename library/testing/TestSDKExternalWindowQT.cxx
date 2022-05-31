@@ -7,13 +7,17 @@
 #include <QKeyEvent>
 #include <QOpenGLWindow>
 
+#include "TestSDKHelpers.h"
+
 class F3DWindow : public QOpenGLWindow
 {
 public:
-  F3DWindow(const std::string& filePath, const std::string& baseline)
+  F3DWindow(
+    const std::string& filePath, const std::string& baselinePath, const std::string& outputPath)
     : QOpenGLWindow()
     , mEngine(f3d::engine::CREATE_WINDOW | f3d::engine::WINDOW_EXTERNAL)
-    , mBaseline(baseline)
+    , mBaselinePath(baselinePath)
+    , mOutputPath(outputPath)
   {
     f3d::loader& load = mEngine.getLoader();
     load.addFile(filePath);
@@ -45,9 +49,8 @@ protected:
       .setChannelCount(3)
       .setData(frameBuffer.bits());
 
-    f3d::image diff;
-    double error;
-    if (!img.compare(f3d::image(mBaseline), diff, 50, error))
+    if (!TestSDKHelpers::RenderTest(
+          img, this->mBaselinePath, this->mOutputPath, "TestSDKExternalWindowQT"))
     {
       QCoreApplication::exit(EXIT_FAILURE);
     }
@@ -59,15 +62,16 @@ protected:
 
 private:
   f3d::engine mEngine;
-  std::string mBaseline;
+  std::string mBaselinePath;
+  std::string mOutputPath;
 };
 
 int TestSDKExternalWindowQT(int argc, char* argv[])
 {
   QGuiApplication a(argc, argv);
 
-  F3DWindow w(std::string(argv[1]) + "/data/cow.vtp",
-    std::string(argv[1]) + "/baselines/TestSDKExternalWindowQT.png");
+  F3DWindow w(
+    std::string(argv[1]) + "/data/cow.vtp", std::string(argv[1]) + "/baselines/", argv[2]);
   w.setTitle("F3D QT External Window");
   w.resize(300, 300);
   w.startTimer(1000);
