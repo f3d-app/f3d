@@ -29,26 +29,18 @@ public:
   };
 
   /**
-   * Create an empty image
-   */
-  image();
-
-  /**
    * Create an image from file, the following formats are supported:
    * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA.
    * Can throw an image::exception in case of failure.
    */
   explicit image(const std::string& path);
 
-  /**
-   * Image destructor
-   */
-  ~image();
-
   //@{
   /**
-   * Copy/move constructors/operators
+   * Default/copy/move constructors/operators
    */
+  image();
+  ~image();
   image(const image& img);
   image& operator=(const image& img);
   image(image&& img);
