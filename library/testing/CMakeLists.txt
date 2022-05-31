@@ -14,7 +14,6 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
     TestSDKCompareWithFile.cxx
     TestSDKImage.cxx
     TestSDKInteractionDirectory.cxx
-    TestSDKInteractorCallBack.cxx
     TestSDKWindowStandard.cxx
     )
 endif()
@@ -23,6 +22,12 @@ endif()
 if(VTK_VERSION VERSION_GREATER 9.0.20201016)
   list(APPEND libf3dSDKTests_list
     TestSDKAnimation.cxx
+    )
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Dropping files needs stream version 1.2
+  list(APPEND libf3dSDKTests_list
+    TestSDKInteractorCallBack.cxx
     )
 endif()
 

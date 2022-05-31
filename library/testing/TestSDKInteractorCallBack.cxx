@@ -18,6 +18,19 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();
 
+  // Sanity checks coverage
+  if (inter.playInteraction(""))
+  {
+    std::cerr << "Unexcepted playInteraction output" << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (inter.recordInteraction(""))
+  {
+    std::cerr << "Unexcepted recordInteraction output" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Test callbacks
   std::string filename = "TestSDKInteractorCallBack";
   std::string interactionFilePath = std::filesystem::path(argv[2])
                                       .parent_path()
