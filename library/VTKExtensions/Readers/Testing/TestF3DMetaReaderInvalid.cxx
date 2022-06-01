@@ -19,8 +19,9 @@ int TestF3DMetaReaderInvalid(int argc, char* argv[])
   reader->Print(cout);
   if (reader->GetOutputInformation(0))
   {
-    std::cerr << "Reader unexpectedly provide an output information for a non-existent file" <<
-      std::endl; return EXIT_SUCCESS;
+    std::cerr << "Reader unexpectedly provide an output information for a non-existent file"
+              << std::endl;
+    return EXIT_SUCCESS;
   }
 
   // This is a WILL_FAIL test
