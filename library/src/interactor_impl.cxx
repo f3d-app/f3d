@@ -476,9 +476,9 @@ bool interactor_impl::recordInteraction(const std::string& file)
   }
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
-    // Make sure the recorder is off and streams are cleared
-    this->Internals->Recorder->Off();
-    this->Internals->Recorder->Clear();
+  // Make sure the recorder is off and streams are cleared
+  this->Internals->Recorder->Off();
+  this->Internals->Recorder->Clear();
 #else
   // Create a clean recorder as its internal state matters
   this->Internals->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
