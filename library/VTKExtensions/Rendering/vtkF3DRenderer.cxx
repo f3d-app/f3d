@@ -88,12 +88,6 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Initialize(const std::string& fileInfo, const std::string& up)
 {
-  if (!this->RenderWindow)
-  {
-    F3DLog::Print(F3DLog::Severity::Error, "No render window linked");
-    return;
-  }
-
   this->RemoveAllViewProps();
   this->RemoveAllLights();
 
@@ -401,22 +395,28 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
       this->RemoveActor(this->Skybox);
       this->AutomaticLightCreationOn();
     }
-
-    // Dynamic text color
-    double textColor[3];
-    if (this->IsBackgroundDark())
-    {
-      textColor[0] = textColor[1] = textColor[2] = 1.0;
-    }
-    else
-    {
-      textColor[0] = textColor[1] = textColor[2] = 0.0;
-    }
-    this->FilenameActor->GetTextProperty()->SetColor(textColor);
-    this->TimerActor->GetTextProperty()->SetColor(textColor);
+    this->UpdateTextColor();
   }
-
   this->SetupRenderPasses();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateTextColor()
+{
+  // Dynamic text color
+  double textColor[3];
+  if (this->IsBackgroundDark())
+  {
+    textColor[0] = textColor[1] = textColor[2] = 1.0;
+  }
+  else
+  {
+    textColor[0] = textColor[1] = textColor[2] = 0.0;
+  }
+  this->FilenameActor->GetTextProperty()->SetColor(textColor);
+  this->MetaDataActor->GetTextProperty()->SetColor(textColor);
+  this->TimerActor->GetTextProperty()->SetColor(textColor);
+  this->CheatSheetActor->GetTextProperty()->SetColor(textColor);
 }
 
 //----------------------------------------------------------------------------
@@ -457,19 +457,7 @@ void vtkF3DRenderer::SetFontFile(const std::string& fontFile)
 void vtkF3DRenderer::SetBackground(const double* color)
 {
   this->Superclass::SetBackground(color);
-
-  // Dynamic text color
-  double textColor[3];
-  if (this->IsBackgroundDark())
-  {
-    textColor[0] = textColor[1] = textColor[2] = 1.0;
-  }
-  else
-  {
-    textColor[0] = textColor[1] = textColor[2] = 0.0;
-  }
-  this->FilenameActor->GetTextProperty()->SetColor(textColor);
-  this->TimerActor->GetTextProperty()->SetColor(textColor);
+  this->UpdateTextColor();
 }
 
 //----------------------------------------------------------------------------
