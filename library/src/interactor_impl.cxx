@@ -17,6 +17,7 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 #include <vtkStringArray.h>
+#include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
 #include <map>
