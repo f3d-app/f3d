@@ -345,7 +345,7 @@ void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 void vtkF3DGenericImporter::SetFileName(std::string name)
 {
   this->TemporalInformationUpdated = false;
-  this->Reader->SetFileName(name);
+  this->Reader->SetFileNameAndCreateInternalReader(name);
 }
 
 //----------------------------------------------------------------------------

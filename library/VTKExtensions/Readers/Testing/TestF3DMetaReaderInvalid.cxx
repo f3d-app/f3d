@@ -9,7 +9,7 @@ int TestF3DMetaReaderInvalid(int argc, char* argv[])
   F3DReaderInstantiator ReaderInstantiator;
   std::string dummyFilename = std::string(argv[1]) + "data/foo.dummy";
   vtkNew<vtkF3DMetaReader> reader;
-  reader->SetFileName(dummyFilename);
+  reader->SetFileNameAndCreateInternalReader(dummyFilename);
   if (reader->IsReaderValid())
   {
     std::cerr << "Reader unexpectedly can read a non-existent file" << std::endl;

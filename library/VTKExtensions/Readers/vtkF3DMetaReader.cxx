@@ -17,10 +17,7 @@ vtkF3DMetaReader::vtkF3DMetaReader()
 }
 
 //----------------------------------------------------------------------------
-vtkF3DMetaReader::~vtkF3DMetaReader()
-{
-  this->SetFileName(nullptr);
-}
+vtkF3DMetaReader::~vtkF3DMetaReader() = default;
 
 //----------------------------------------------------------------------------
 void vtkF3DMetaReader::PrintSelf(ostream& os, vtkIndent indent)
@@ -86,10 +83,10 @@ int vtkF3DMetaReader::FillOutputPortInformation(int port, vtkInformation* info)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DMetaReader::SetFileName(const std::string& fileName)
+void vtkF3DMetaReader::SetFileNameAndCreateInternalReader(const std::string& fileName)
 {
   vtkMTimeType time = this->GetMTime();
-  this->SetFileName(fileName.c_str());
+  this->SetFileName(fileName);
   if (time == this->GetMTime())
   {
     return;
