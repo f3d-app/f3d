@@ -98,7 +98,7 @@ int F3DStarter::Start(int argc, char** argv)
         return false;
       });
 
-    this->Internals->Engine->getInteractor().setDropFilesCallBack(
+    interactor.setDropFilesCallBack(
       [this](std::vector<std::string> filesVec) -> bool
       {
         this->Internals->Engine->getInteractor().stopAnimation();
