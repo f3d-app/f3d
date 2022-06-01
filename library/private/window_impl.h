@@ -22,9 +22,6 @@ namespace detail
 class window_impl : public window
 {
 public:
-  /**
-   * Default const
-   */
   ~window_impl() override = default;
 
   //@{

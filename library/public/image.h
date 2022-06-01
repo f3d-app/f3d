@@ -49,7 +49,7 @@ public:
 
   //@{
   /**
-   * Comparison operators, uses image::compare
+   * Comparison operators, uses image::compare with a threshold of 0
    */
   bool operator==(const image& reference) const;
   bool operator!=(const image& reference) const;
@@ -84,15 +84,21 @@ public:
 
   /**
    * Compare current image to a reference using the provided threshold.
-   * If the comparison fails, output the resulting diff and error and return false,
+   * If the comparison fails, ie. error is higher than the threshold,
+   * this outputs the resulting diff and error and return false,
    * return true otherwise.
+   * The error is based on the pixel value and accumulated over neighbors pixels.
+   * 0: Pixel perfect comparison
+   * 50: Visually indistinguishable
+   * 100: Small visible difference
+   * 300: Comparable images
    * Can throw an image::exception if images are not sane.
    */
   bool compare(const image& reference, double threshold, image& diff, double& error) const;
 
   /**
    * Save an image to a file in .png format
-   * Can throw an image::exception if images is not sane.
+   * Can throw an image::exception if image is not sane.
    */
   image& save(const std::string& path);
 

@@ -26,7 +26,7 @@ public:
   init();
 
   /**
-   * Default dest
+   * Default destructor
    */
   ~init();
 
