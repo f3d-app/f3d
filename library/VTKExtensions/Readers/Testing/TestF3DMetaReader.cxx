@@ -10,7 +10,8 @@ int TestF3DMetaReader(int argc, char* argv[])
   std::string filename = std::string(argv[1]) + "data/cow.vtp";
   vtkNew<vtkF3DMetaReader> reader;
   reader->SetFileNameAndCreateInternalReader(filename);
-  reader->SetFileNameAndCreateInternalReader(filename); // Double call for the MTime mechanism coverage
+  reader->SetFileNameAndCreateInternalReader(
+    filename); // Double call for the MTime mechanism coverage
   if (!reader->IsReaderValid())
   {
     std::cerr << "Reader unexpectedly can not read a valid file" << std::endl;
