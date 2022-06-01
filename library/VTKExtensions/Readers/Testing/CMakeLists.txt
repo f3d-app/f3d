@@ -1,5 +1,6 @@
 list(APPEND VTKExtensionsReaderTests_list
      TestF3DMetaReader.cxx
+     TestF3DMetaReaderInvalid.cxx
      TestF3DGenericImporter.cxx
     )
 
@@ -16,3 +17,5 @@ vtk_add_test_cxx(VTKExtensionsReaderTests tests
   ${VTKExtensionsReaderTests_list}
   ${CMAKE_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(VTKExtensionsReaderTests tests)
+
+set_tests_properties(f3d::VTKExtensionsReadersCxx-TestF3DMetaReaderInvalid PROPERTIES WILL_FAIL TRUE)
