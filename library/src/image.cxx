@@ -166,7 +166,7 @@ unsigned char* image::getData() const
 }
 
 //----------------------------------------------------------------------------
-bool image::compare(const image& reference, image& diff, double threshold, double& error) const
+bool image::compare(const image& reference, double threshold, image& diff, double& error) const
 {
   auto importerThis = this->Internals->GetVTKImporter();
   auto importerRef = reference.Internals->GetVTKImporter();
@@ -202,7 +202,7 @@ bool image::operator==(const image& reference) const
 {
   f3d::image diff;
   double error;
-  return this->compare(reference, diff, 0, error);
+  return this->compare(reference, 0, diff, error);
 }
 
 //----------------------------------------------------------------------------

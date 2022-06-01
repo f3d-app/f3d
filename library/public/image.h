@@ -88,7 +88,7 @@ public:
    * return true otherwise.
    * Can throw an image::exception if images are not sane.
    */
-  bool compare(const image& reference, image& diff, double threshold, double& error) const;
+  bool compare(const image& reference, double threshold, image& diff, double& error) const;
 
   /**
    * Save an image to a file in .png format
