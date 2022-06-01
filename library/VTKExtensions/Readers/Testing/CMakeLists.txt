@@ -6,11 +6,15 @@ list(APPEND VTKExtensionsReaderTests_list
 
 if(F3D_MODULE_ALEMBIC)
   list(APPEND VTKExtensionsReaderTests_list TestF3DAlembicImporter.cxx)
-endif()  
+endif()
 
 if(F3D_MODULE_ASSIMP)
   list(APPEND VTKExtensionsReaderTests_list TestF3DAssimpImporter.cxx)
-endif()  
+endif()
+
+if(F3D_MODULE_OCCT)
+  list(APPEND VTKExtensionsReaderTests_list TestF3DOCCTReader.cxx)
+endif()
 
 vtk_add_test_cxx(VTKExtensionsReaderTests tests
   NO_DATA NO_VALID NO_OUTPUT
