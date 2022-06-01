@@ -49,7 +49,7 @@ public:
     dropFilesCallback->SetCallback(OnDropFiles);
     this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
 
-#if 0 // TODO VTK Version
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
     this->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
     this->Recorder->SetInteractor(this->VTKInteractor);
 #endif
@@ -440,7 +440,7 @@ bool interactor_impl::playInteraction(const std::string& file)
   }
   else
   {
-#if 0 // TODO VTK_VERSION
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
     // Make sure the recorder is off and streams are cleared
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
@@ -474,7 +474,7 @@ bool interactor_impl::recordInteraction(const std::string& file)
     return false;
   }
 
-#if 0 // TODO VTK_VERSION
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
     // Make sure the recorder is off and streams are cleared
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
