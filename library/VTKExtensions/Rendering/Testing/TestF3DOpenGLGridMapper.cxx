@@ -8,7 +8,7 @@
 int TestF3DOpenGLGridMapper(int argc, char* argv[])
 {
   vtkNew<vtkF3DOpenGLGridMapper> mapper;
-  
+
   mapper->SetFadeDistance(5.0);
   mapper->Print(std::cout);
 
@@ -17,6 +17,6 @@ int TestF3DOpenGLGridMapper(int argc, char* argv[])
   {
     return EXIT_FAILURE;
   }
-  
+
   return EXIT_SUCCESS;
 }
