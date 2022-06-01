@@ -23,7 +23,7 @@ img.save(output)
 diff = f3d.image()
 error = 0.0
 
-ret = img.compare(f3d.image(reference), diff, 50, error)
+ret = img.compare(f3d.image(reference), 50, diff, error)
 
 if not ret:
   diff.save(outputDiff)
