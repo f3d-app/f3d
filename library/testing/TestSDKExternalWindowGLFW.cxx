@@ -3,6 +3,8 @@
 #include <options.h>
 #include <window.h>
 
+#include "TestSDKHelpers.h"
+
 #include <GLFW/glfw3.h>
 
 #include <iostream>
@@ -64,6 +66,14 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
     eng.getWindow().render();
     glfwSwapBuffers(window);
     glfwPollEvents();
+  }
+
+  // Ideally, we should not test the content of the window, but the GLFW framebuffer itself
+  // There is currently no API in GLFW that allows to do that unfortunately
+  if (!TestSDKHelpers::RenderTest(
+        eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowGLFW"))
+  {
+    return EXIT_FAILURE;
   }
 
   glfwTerminate();
