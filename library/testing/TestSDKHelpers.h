@@ -34,7 +34,7 @@ public:
     f3d::image diffRes;
     double error;
 
-    if (!result.compare(f3d::image(baseline), diffRes, threshold, error))
+    if (!result.compare(f3d::image(baseline), threshold, diffRes, error))
     {
       std::cerr << "Current rendering difference with reference image: " << error
                 << "  is higher than the threshold of " << threshold << std::endl;
