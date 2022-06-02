@@ -104,6 +104,7 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
   }
 
   // Recover the surface of the dataset if not available already
+  // Recover a cloud of pointer for the cloud output as well
   vtkSmartPointer<vtkPolyData> surface = vtkPolyData::SafeDownCast(dataset);
   vtkSmartPointer<vtkPolyData> cloud = surface;
   if (!surface)
@@ -135,13 +136,6 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
       vertexFilter->SetInputData(dataset);
       vertexFilter->Update();
       cloud = vtkPolyData::SafeDownCast(vertexFilter->GetOutput());
-    }
-    else
-    {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "Provided dataset is not convertible to a point cloud for sprites rendering, using its "
-        "surface instead.");
-      cloud = surface;
     }
   }
 

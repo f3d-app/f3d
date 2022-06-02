@@ -36,11 +36,10 @@ public:
 
   //@{
   /**
-   * Set/Get the file format to read.
+   * Set the file format to read.
    * It can be either STEP or IGES.
    * Default is FILE_FORMAT::STEP
    */
-  vtkGetMacro(FileFormat, FILE_FORMAT);
   vtkSetMacro(FileFormat, FILE_FORMAT);
   //@}
 
@@ -85,29 +84,13 @@ public:
   vtkBooleanMacro(ReadWire, bool);
   //@}
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210118)
   //@{
   /**
    * Get/Set the file name.
    */
-  vtkSetStdStringFromCharMacro(FileName);
-  vtkGetCharFromStdStringMacro(FileName);
+  vtkSetMacro(FileName, std::string);
+  vtkGetMacro(FileName, std::string);
   //@}
-#else
-  /**
-   * Get the filename
-   */
-  const char* GetFileName() { return this->FileName.c_str(); }
-
-  /**
-   * Set the filename
-   */
-  void SetFileName(const char* fileName)
-  {
-    this->FileName = fileName;
-    this->Modified();
-  }
-#endif
 
 protected:
   vtkF3DOCCTReader();

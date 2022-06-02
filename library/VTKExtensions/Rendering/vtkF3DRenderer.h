@@ -138,6 +138,7 @@ protected:
   void ReleaseGraphicsResources(vtkWindow* w) override;
 
   bool IsBackgroundDark();
+  void UpdateTextColor();
 
   /**
    * Update the text of the cheatsheet and mark it for rendering

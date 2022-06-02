@@ -25,6 +25,9 @@ vtkF3DOpenGLGridMapper::vtkF3DOpenGLGridMapper()
 void vtkF3DOpenGLGridMapper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "FadeDistance: " << this->FadeDistance << "\n";
+  os << indent << "UnitSquare: " << this->UnitSquare << "\n";
+  os << indent << "UpIndex: " << this->UpIndex << "\n";
 }
 
 //----------------------------------------------------------------------------

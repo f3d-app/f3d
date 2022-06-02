@@ -54,7 +54,7 @@ public:
 
     // Use the generic importer and check if it can process the file
     vtkNew<vtkF3DGenericImporter> importer;
-    importer->SetFileName(fileName.c_str());
+    importer->SetFileName(fileName);
     if (!importer->CanReadFile())
     {
       return nullptr;

@@ -40,6 +40,11 @@ vtkStandardNewMacro(vtkF3DRenderPass);
 void vtkF3DRenderPass::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "UseRaytracing: " << this->UseRaytracing << "\n";
+  os << indent << "UseSSAOPass: " << this->UseSSAOPass << "\n";
+  os << indent << "UseDepthPeelingPass: " << this->UseDepthPeelingPass << "\n";
+  os << indent << "UseBlurBackground: " << this->UseBlurBackground << "\n";
+  os << indent << "ForceOpaqueBackground: " << this->ForceOpaqueBackground << "\n";
 }
 
 // ----------------------------------------------------------------------------

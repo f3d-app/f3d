@@ -35,11 +35,6 @@ public:
 
   bool UpdateCamera(const options& options)
   {
-    if (!this->Renderer)
-    {
-      return false;
-    }
-
     // Set the initial camera once all options
     // have been shown as they may have an effect on it
     if (options.getAsInt("camera-index") < 0)
@@ -194,10 +189,10 @@ bool window_impl_standard::update()
   this->Internals->Renderer->SetUseToneMappingPass(this->Options.getAsBool("tone-mapping"));
   this->Internals->Renderer->SetUseBlurBackground(this->Options.getAsBool("blur-background"));
   this->Internals->Renderer->SetUseTrackball(this->Options.getAsBool("trackball"));
-  this->Internals->Renderer->SetHDRIFile(this->Options.getAsString("hdri"));
   this->Internals->Renderer->SetUseDepthPeelingPass(this->Options.getAsBool("depth-peeling"));
   this->Internals->Renderer->SetBackground(
     this->Options.getAsDoubleVector("background-color").data());
+  this->Internals->Renderer->SetHDRIFile(this->Options.getAsString("hdri"));
   this->Internals->Renderer->SetFontFile(this->Options.getAsString("font-file"));
 
   vtkF3DRendererWithColoring* renWithColor =

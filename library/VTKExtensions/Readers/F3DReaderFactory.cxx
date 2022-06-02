@@ -27,19 +27,6 @@ F3DReader* F3DReaderFactory::GetReader(const std::string& fileName)
 }
 
 //----------------------------------------------------------------------------
-F3DReader* F3DReaderFactory::GetReaderByName(const std::string& name)
-{
-  for (auto reader : F3DReaderFactory::GetInstance()->Readers)
-  {
-    if (reader->GetName() == name)
-    {
-      return reader;
-    }
-  }
-  return nullptr;
-}
-
-//----------------------------------------------------------------------------
 void F3DReaderFactory::Register(F3DReader* reader)
 {
   F3DReaderFactory::GetInstance()->Readers.push_back(reader);

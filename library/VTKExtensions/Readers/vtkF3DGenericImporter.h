@@ -33,7 +33,7 @@ public:
   /**
    * Specify the name of the file to read.
    */
-  void SetFileName(const char* arg);
+  void SetFileName(std::string name);
 
   /**
    * Check if the file can be read.
@@ -120,36 +120,22 @@ public:
 
   //@{
   /**
-   * Setter/Getter for all actor loading options
+   * Setter for all actor loading options
    */
   vtkSetMacro(PointSize, double);
-  vtkGetMacro(PointSize, double);
   vtkSetMacro(ScalarArray, std::string);
-  vtkGetMacro(ScalarArray, std::string);
   vtkSetMacro(UseCellScalars, bool);
-  vtkGetMacro(UseCellScalars, bool);
   vtkSetVector3Macro(SurfaceColor, double);
-  vtkGetVector3Macro(SurfaceColor, double);
   vtkSetVector3Macro(EmissiveFactor, double);
-  vtkGetVector3Macro(EmissiveFactor, double);
   vtkSetMacro(Opacity, double);
-  vtkGetMacro(Opacity, double);
   vtkSetMacro(Roughness, double);
-  vtkGetMacro(Roughness, double);
   vtkSetMacro(Metallic, double);
-  vtkGetMacro(Metallic, double);
   vtkSetMacro(LineWidth, double);
-  vtkGetMacro(LineWidth, double);
   vtkSetMacro(NormalScale, double);
-  vtkGetMacro(NormalScale, double);
   vtkSetMacro(TextureBaseColor, std::string);
-  vtkGetMacro(TextureBaseColor, std::string);
   vtkSetMacro(TextureMaterial, std::string);
-  vtkGetMacro(TextureMaterial, std::string);
   vtkSetMacro(TextureEmissive, std::string);
-  vtkGetMacro(TextureEmissive, std::string);
   vtkSetMacro(TextureNormal, std::string);
-  vtkGetMacro(TextureNormal, std::string);
   //@}
 
 protected:
