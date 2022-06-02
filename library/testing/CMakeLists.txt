@@ -36,7 +36,7 @@ configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack
 
 # External window test using GLFW
 find_package(glfw3 QUIET)
-if(glfw3_FOUND)
+if(glfw3_FOUND AND VTK_VERSION VERSION_GREATER 9.0.1)
   list(APPEND libf3dSDKTests_list
        TestSDKExternalWindowGLFW.cxx
       )
