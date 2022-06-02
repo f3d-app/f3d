@@ -29,15 +29,18 @@ public:
       return false;
     }
 
-    f3d::image result = img;
     f3d::image diffRes;
+    f3d::image reference(baseline);
     double error;
 
-    if (!result.compare(f3d::image(baseline), threshold, diffRes, error))
+    if (!img.compare(reference, threshold, diffRes, error))
     {
       std::cerr << "Current rendering difference with reference image: " << error
-                << "  is higher than the threshold of " << threshold << std::endl;
-      result.save(output);
+                << " is higher than the threshold of " << threshold << std::endl;
+      std::cerr << "Result resolution: " << img.getWidth() << "x" << img.getHeight() << std::endl;
+      std::cerr << "Reference resolution: " << reference.getWidth() << "x" << reference.getHeight()
+                << std::endl;
+      img.save(output);
       diffRes.save(diff);
       return false;
     }
