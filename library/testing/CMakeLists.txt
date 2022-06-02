@@ -1,4 +1,3 @@
-#TODO add more tests
 list(APPEND libf3dSDKTests_list
      TestSDKRenderAndInteract.cxx
      TestSDKEngine.cxx

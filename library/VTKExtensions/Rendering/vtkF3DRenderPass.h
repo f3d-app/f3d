@@ -34,27 +34,11 @@ public:
 
   void Render(const vtkRenderState* s) override;
 
-  vtkGetMacro(UseRaytracing, bool);
   vtkSetMacro(UseRaytracing, bool);
-  vtkBooleanMacro(UseRaytracing, bool);
-
-  vtkGetMacro(UseSSAOPass, bool);
   vtkSetMacro(UseSSAOPass, bool);
-  vtkBooleanMacro(UseSSAOPass, bool);
-
-  vtkGetMacro(UseDepthPeelingPass, bool);
   vtkSetMacro(UseDepthPeelingPass, bool);
-  vtkBooleanMacro(UseDepthPeelingPass, bool);
-
-  vtkGetMacro(UseBlurBackground, bool);
   vtkSetMacro(UseBlurBackground, bool);
-  vtkBooleanMacro(UseBlurBackground, bool);
-
-  vtkGetMacro(ForceOpaqueBackground, bool);
   vtkSetMacro(ForceOpaqueBackground, bool);
-  vtkBooleanMacro(ForceOpaqueBackground, bool);
-
-  vtkGetVector6Macro(Bounds, double);
   vtkSetVector6Macro(Bounds, double);
 
 protected:

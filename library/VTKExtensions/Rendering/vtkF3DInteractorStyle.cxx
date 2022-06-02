@@ -39,12 +39,6 @@ void vtkF3DInteractorStyle::Rotate()
   }
 
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
-
-  if (ren == nullptr)
-  {
-    return;
-  }
-
   vtkRenderWindowInteractor* rwi = this->Interactor;
 
   int dx = rwi->GetEventPosition()[0] - rwi->GetLastEventPosition()[0];

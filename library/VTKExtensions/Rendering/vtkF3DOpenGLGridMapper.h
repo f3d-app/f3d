@@ -19,26 +19,23 @@ public:
 
   //@{
   /**
-   * Set/Get the distance where the grid disappear.
+   * Set the distance where the grid disappear.
    */
   vtkSetMacro(FadeDistance, double);
-  vtkGetMacro(FadeDistance, double);
   //@}
 
   //@{
   /**
-   * Set/Get the size of a square on the grid.
+   * Set the size of a square on the grid.
    */
   vtkSetMacro(UnitSquare, double);
-  vtkGetMacro(UnitSquare, double);
   //@}
 
   //@{
   /**
-   * Set/Get the up vector index (X, Y, Z axis respectively).
+   * Set the up vector index (X, Y, Z axis respectively).
    */
   vtkSetClampMacro(UpIndex, int, 0, 2);
-  vtkGetMacro(UpIndex, int);
   //@}
 
   using vtkOpenGLPolyDataMapper::GetBounds;

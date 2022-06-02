@@ -395,6 +395,7 @@ vtkStandardNewMacro(vtkF3DOCCTReader);
 vtkF3DOCCTReader::vtkF3DOCCTReader()
   : Internals(new vtkF3DOCCTReader::vtkInternals(this))
 {
+  this->SetNumberOfInputPorts(0);
 }
 
 //----------------------------------------------------------------------------
@@ -432,7 +433,7 @@ bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Docume
   reader.SetNameMode(true);
   reader.SetLayerMode(true);
 
-  if (reader.ReadFile(that->GetFileName()) == IFSelect_RetDone)
+  if (reader.ReadFile(that->GetFileName().c_str()) == IFSelect_RetDone)
   {
     ProgressIndicator pi(that);
     return reader.Transfer(doc, pi.Start());
@@ -509,7 +510,7 @@ int vtkF3DOCCTReader::RequestData(
     reader = new IGESControl_Reader();
   }
 
-  if (reader && reader->ReadFile(this->GetFileName()) == IFSelect_RetDone)
+  if (reader && reader->ReadFile(this->GetFileName().c_str()) == IFSelect_RetDone)
   {
     ProgressIndicator pi(this);
     reader->TransferRoots(pi.Start());

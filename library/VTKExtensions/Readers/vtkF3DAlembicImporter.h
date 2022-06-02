@@ -26,77 +26,10 @@ public:
   vtkTypeMacro(vtkF3DAlembicImporter, vtkImporter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210118)
-  //@{
   /**
-   * Get/Set the file name.
+   * Set the file name.
    */
-  vtkSetStdStringFromCharMacro(FileName);
-  vtkGetCharFromStdStringMacro(FileName);
-  //@}
-#else
-  /**
-   * Get the filename
-   */
-  const char* GetFileName() { return this->FileName.c_str(); }
-
-  /**
-   * Set the filename
-   */
-  void SetFileName(const char* fileName)
-  {
-    this->FileName = fileName;
-    this->Modified();
-  }
-#endif
-
-  /**
-   * Update actors at the given timestep.
-   *
-   * \todo Cache/animation support not implemented yet
-   */
-  void UpdateTimeStep(double timestep) override;
-
-  /**
-   * Get the number of available animations.
-   *
-   * \todo Cache/animation support not implemented yet
-   */
-  vtkIdType GetNumberOfAnimations() override;
-
-  /**
-   * Return the name of the animation.
-   *
-   * \todo Cache/animation support not implemented yet
-   */
-  std::string GetAnimationName(vtkIdType animationIndex) override;
-
-  //@{
-  /**
-   * Enable/Disable/Get the status of specific animations
-   *
-   * \todo Cache/animation support not implemented yet
-   */
-  void EnableAnimation(vtkIdType animationIndex) override;
-  void DisableAnimation(vtkIdType animationIndex) override;
-  bool IsAnimationEnabled(vtkIdType animationIndex) override;
-  //@}
-
-  /**
-   * Return importer description.
-   */
-  std::string GetOutputsDescription() override;
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
-  /**
-   * Get temporal informations for the currently enabled animations.
-   *
-   * \todo Cache/animation support not implemented yet
-   */
-  bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
-    double timeRange[2], vtkDoubleArray* timeSteps) override;
-
-#endif
+  vtkSetMacro(FileName, std::string);
 
 protected:
   vtkF3DAlembicImporter();
