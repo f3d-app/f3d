@@ -212,7 +212,7 @@ bool image::operator!=(const image& reference) const
 }
 
 //----------------------------------------------------------------------------
-image& image::save(const std::string& path)
+const image& image::save(const std::string& path) const
 {
   auto importer = this->Internals->GetVTKImporter();
 

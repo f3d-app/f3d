@@ -7,9 +7,8 @@
 class TestSDKHelpers
 {
 public:
-  static bool RenderTest(f3d::window& win, const std::string& baselinePath,
-    const std::string& outputPath, const std::string& name, double threshold = 50,
-    bool noBackground = false)
+  static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
+    const std::string& outputPath, const std::string& name, double threshold = 50)
   {
     if (baselinePath.empty() || outputPath.empty() || name.empty())
     {
@@ -23,26 +22,37 @@ public:
 
     if (!std::filesystem::exists(baseline))
     {
-      win.renderToImage(noBackground).save(output);
+      img.save(output);
       std::cerr << "Reference image "
                 << baseline + " does not exists, current rendering has been outputted to " << output
                 << std::endl;
       return false;
     }
 
-    f3d::image result = win.renderToImage(noBackground);
     f3d::image diffRes;
+    f3d::image reference(baseline);
     double error;
 
-    if (!result.compare(f3d::image(baseline), threshold, diffRes, error))
+    if (!img.compare(reference, threshold, diffRes, error))
     {
       std::cerr << "Current rendering difference with reference image: " << error
-                << "  is higher than the threshold of " << threshold << std::endl;
-      result.save(output);
+                << " is higher than the threshold of " << threshold << std::endl;
+      std::cerr << "Result resolution: " << img.getWidth() << "x" << img.getHeight() << std::endl;
+      std::cerr << "Reference resolution: " << reference.getWidth() << "x" << reference.getHeight()
+                << std::endl;
+      img.save(output);
       diffRes.save(diff);
       return false;
     }
     return true;
+  }
+
+  static bool RenderTest(f3d::window& win, const std::string& baselinePath,
+    const std::string& outputPath, const std::string& name, double threshold = 50,
+    bool noBackground = false)
+  {
+    return TestSDKHelpers::RenderTest(
+      win.renderToImage(noBackground), baselinePath, outputPath, name, threshold);
   }
 };
 #endif

@@ -34,6 +34,22 @@ endif()
 configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack.log.in"
                "${CMAKE_BINARY_DIR}/TestSDKInteractorCallBack.log") # Dragon.vtu; S
 
+# External window test using GLFW
+find_package(glfw3 QUIET)
+if(glfw3_FOUND AND VTK_VERSION VERSION_GREATER 9.0.1)
+  list(APPEND libf3dSDKTests_list
+       TestSDKExternalWindowGLFW.cxx
+      )
+endif()
+
+# External window test using QT
+find_package(Qt5 QUIET COMPONENTS OpenGL)
+if(Qt5_FOUND AND VTK_VERSION VERSION_GREATER 9.0.1)
+  list(APPEND libf3dSDKTests_list
+       TestSDKExternalWindowQT.cxx
+      )
+endif()
+
 # create the testing file and list of tests
 create_test_sourcelist(_libf3dSDKTests libf3dSDKTests.cxx ${libf3dSDKTests_list})
 
@@ -56,6 +72,17 @@ endforeach ()
 set_tests_properties(libf3d::TestSDKLog PROPERTIES PASS_REGULAR_EXPRESSION "Test Info\nTest Warning\nTest Error\nTest Info Coloring")
 
 target_link_libraries(libf3dSDKTests libf3d)
+
+if(glfw3_FOUND)
+  # external window test using glfw
+  target_link_libraries(libf3dSDKTests glfw)
+endif()
+
+if(Qt5_FOUND)
+  # external window test using QT
+  target_link_libraries(libf3dSDKTests Qt5::OpenGL)
+endif()
+
 if (UNIX AND NOT APPLE)
   target_link_libraries(libf3dSDKTests stdc++fs)
 endif ()
