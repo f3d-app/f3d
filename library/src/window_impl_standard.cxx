@@ -4,6 +4,7 @@
 #include "options.h"
 
 #include "vtkF3DGenericImporter.h"
+#include "vtkF3DNoRenderWindow.h"
 #include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCamera.h>
@@ -93,7 +94,11 @@ window_impl_standard::window_impl_standard(const options& options, WindowType ty
   : window_impl(options)
   , Internals(new window_impl_standard::internals)
 {
-  if (type == WindowType::EXTERNAL)
+  if (type == WindowType::NO_RENDER)
+  {
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DNoRenderWindow>::New();;
+  }
+  else if (type == WindowType::EXTERNAL)
   {
     vtkNew<vtkExternalOpenGLRenderWindow> renWin;
     renWin->AutomaticWindowPositionAndResizeOff();

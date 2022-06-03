@@ -31,6 +31,7 @@ public:
    */
   enum class WindowType : unsigned char
   {
+    NO_RENDER,
     NATIVE,
     NATIVE_OFFSCREEN,
     EXTERNAL

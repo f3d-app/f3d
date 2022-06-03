@@ -6,12 +6,12 @@
 #include "loader_impl.h"
 #include "log.h"
 #include "options.h"
-#include "window_impl_noRender.h"
 #include "window_impl_standard.h"
 
 #include "F3DReaderFactory.h"
 
 #include "vtkF3DConfigure.h"
+#include "vtkF3DNoRenderWindow.h"
 
 #include <vtkVersion.h>
 
@@ -51,9 +51,9 @@ engine::engine(const flags_t& flags)
   }
   else
   {
-    // Without the window flag, we still need to create a window noRender
+    // Without the window flag, we still need to create a window NO_RENDER
     this->Internals->Window =
-      std::make_unique<detail::window_impl_noRender>(*this->Internals->Options);
+      std::make_unique<detail::window_impl_standard>(*this->Internals->Options, detail::window_impl_standard::WindowType::NO_RENDER);
   }
 
   this->Internals->Loader =
@@ -93,8 +93,7 @@ options& engine::getOptions()
 //----------------------------------------------------------------------------
 window& engine::getWindow()
 {
-  if (!this->Internals->Window ||
-    dynamic_cast<detail::window_impl_noRender*>(this->Internals->Window.get()))
+  if (!this->Internals->Window || vtkF3DNoRenderWindow::SafeDownCast(this->Internals->Window->GetRenderWindow()))
   {
     throw engine::exception("Cannot create window with this engine");
   }
