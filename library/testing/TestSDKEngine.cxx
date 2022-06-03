@@ -12,23 +12,23 @@ int TestSDKEngine(int argc, char* argv[])
   f3d::engine eng0(f3d::engine::FLAGS_NONE);
   f3d::loader& load = eng0.getLoader();
 
-  f3d::engine eng1(f3d::engine::CREATE_WINDOW);
+/*  f3d::engine eng1(f3d::engine::CREATE_WINDOW);
   f3d::loader& load1 = eng1.getLoader();
   f3d::window& window1 = eng1.getWindow();
 
   f3d::engine eng2(f3d::engine::CREATE_WINDOW | f3d::engine::WINDOW_OFFSCREEN);
   f3d::loader& load2 = eng2.getLoader();
-  f3d::window& window2 = eng2.getWindow();
+  f3d::window& window2 = eng2.getWindow();*/
 
-  f3d::engine eng3(f3d::engine::CREATE_INTERACTOR);
+ /* f3d::engine eng3(f3d::engine::CREATE_INTERACTOR);
   f3d::loader& load3 = eng3.getLoader();
-  f3d::interactor& inter3 = eng3.getInteractor();
+  f3d::interactor& inter3 = eng3.getInteractor();*/
 
-  f3d::engine eng4(
+/*  f3d::engine eng4(
     f3d::engine::CREATE_WINDOW | f3d::engine::WINDOW_OFFSCREEN | f3d::engine::CREATE_INTERACTOR);
   f3d::loader& load4 = eng4.getLoader();
   f3d::window& window4 = eng4.getWindow();
-  f3d::interactor& inter4 = eng4.getInteractor();
+  f3d::interactor& inter4 = eng4.getInteractor();*/
 
   // Test option setters
   f3d::options opt;
