@@ -6,7 +6,7 @@
 #include "loader_impl.h"
 #include "log.h"
 #include "options.h"
-#include "window_impl_standard.h"
+#include "window_impl.h"
 
 #include "F3DReaderFactory.h"
 
@@ -34,26 +34,26 @@ engine::engine(const flags_t& flags)
 
   if (flags & CREATE_WINDOW)
   {
-    detail::window_impl_standard::WindowType type =
-      detail::window_impl_standard::WindowType::NATIVE;
+    detail::window_impl::WindowType type =
+      detail::window_impl::WindowType::NATIVE;
 
     if (flags & WINDOW_EXTERNAL)
     {
-      type = detail::window_impl_standard::WindowType::EXTERNAL;
+      type = detail::window_impl::WindowType::EXTERNAL;
     }
     else if (flags & WINDOW_OFFSCREEN)
     {
-      type = detail::window_impl_standard::WindowType::NATIVE_OFFSCREEN;
+      type = detail::window_impl::WindowType::NATIVE_OFFSCREEN;
     }
 
     this->Internals->Window =
-      std::make_unique<detail::window_impl_standard>(*this->Internals->Options, type);
+      std::make_unique<detail::window_impl>(*this->Internals->Options, type);
   }
   else
   {
     // Without the window flag, we still need to create a window NO_RENDER
     this->Internals->Window =
-      std::make_unique<detail::window_impl_standard>(*this->Internals->Options, detail::window_impl_standard::WindowType::NO_RENDER);
+      std::make_unique<detail::window_impl>(*this->Internals->Options, detail::window_impl::WindowType::NO_RENDER);
   }
 
   this->Internals->Loader =

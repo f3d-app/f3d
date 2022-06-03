@@ -108,8 +108,6 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/log.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/options.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl_standard.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl_noRender.cxx
   )
 
 # List of headers that will be installed
