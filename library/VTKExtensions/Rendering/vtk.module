@@ -5,6 +5,7 @@ DESCRIPTION
 DEPENDS
   VTK::InteractionStyle
   VTK::RenderingAnnotation
+  VTK::RenderingExternal
   VTK::RenderingOpenGL2
   VTK::RenderingVolumeOpenGL2
   VTK::opengl

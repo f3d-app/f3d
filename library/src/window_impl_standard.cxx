@@ -7,6 +7,7 @@
 #include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCamera.h>
+#include <vtkExternalOpenGLRenderWindow.h>
 #include <vtkImageData.h>
 #include <vtkImageExport.h>
 #include <vtkPNGReader.h>
@@ -83,17 +84,27 @@ public:
     return true;
   }
 
-  vtkNew<vtkRenderWindow> RenWin;
+  vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkSmartPointer<vtkF3DRenderer> Renderer;
 };
 
 //----------------------------------------------------------------------------
-window_impl_standard::window_impl_standard(const options& options, bool offscreen)
+window_impl_standard::window_impl_standard(const options& options, WindowType type)
   : window_impl(options)
   , Internals(new window_impl_standard::internals)
 {
+  if (type == WindowType::EXTERNAL)
+  {
+    vtkNew<vtkExternalOpenGLRenderWindow> renWin;
+    renWin->AutomaticWindowPositionAndResizeOff();
+    this->Internals->RenWin = renWin;
+  }
+  else
+  {
+    this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
+    this->Internals->RenWin->SetOffScreenRendering(type == WindowType::NATIVE_OFFSCREEN);
+  }
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
-  this->Internals->RenWin->SetOffScreenRendering(offscreen);
 }
 
 //----------------------------------------------------------------------------
