@@ -8,7 +8,7 @@
 
 int main()
 {
-  f3d::engine eng;
+  f3d::engine eng(f3d::window::WindowType::NO_RENDER);
 
   f3d::log::info("F3D engine is loaded");
 
