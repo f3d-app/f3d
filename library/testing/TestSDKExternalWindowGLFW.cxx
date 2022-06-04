@@ -1,6 +1,5 @@
 #include <engine.h>
 #include <loader.h>
-#include <options.h>
 #include <window.h>
 
 #include "TestSDKHelpers.h"
@@ -13,7 +12,6 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
 {
   // create engine and load file
   f3d::engine eng(f3d::window::Type::EXTERNAL);
-  eng.getOptions().set("resolution", { 300, 300 });
   eng.getLoader().addFile(std::string(argv[1]) + "/data/cow.vtp");
   eng.getLoader().loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
@@ -40,16 +38,6 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
 
   glfwMakeContextCurrent(window);
   glfwSetWindowUserPointer(window, &eng);
-
-  // resize callback
-  glfwSetWindowSizeCallback(window,
-    [](GLFWwindow* window, int width, int height)
-    {
-      // notify f3d that the resolution has changed
-      f3d::engine* eng = static_cast<f3d::engine*>(glfwGetWindowUserPointer(window));
-      eng->getOptions().set("resolution", { width, height });
-      eng->getWindow().update();
-    });
 
   // key callback
   glfwSetKeyCallback(window,

@@ -44,6 +44,7 @@ public:
   bool update() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;
+  void setSize(int width, int heigth) override;
   bool setIcon(const void* icon, size_t iconSize) override;
   bool setWindowName(const std::string& windowName) override;
   //@}

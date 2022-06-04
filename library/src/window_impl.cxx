@@ -107,9 +107,7 @@ window_impl::window_impl(const options& options, Type type)
   }
   else if (type == Type::EXTERNAL)
   {
-    vtkNew<vtkExternalOpenGLRenderWindow> renWin;
-    renWin->AutomaticWindowPositionAndResizeOff();
-    this->Internals->RenWin = renWin;
+    this->Internals->RenWin = vtkSmartPointer<vtkExternalOpenGLRenderWindow>::New();
   }
   else
   {
@@ -123,6 +121,12 @@ window_impl::window_impl(const options& options, Type type)
 window_impl::Type window_impl::getType()
 {
   return this->Internals->WindowType;
+}
+
+//----------------------------------------------------------------------------
+void window_impl::setSize(int width, int height)
+{
+  this->Internals->RenWin->SetSize(width, height);
 }
 
 //----------------------------------------------------------------------------
@@ -201,7 +205,6 @@ bool window_impl::update()
     this->Initialize(false, "");
   }
 
-  this->Internals->RenWin->SetSize(this->Internals->Options.getAsIntVector("resolution").data());
   this->Internals->RenWin->SetFullScreen(this->Internals->Options.getAsBool("fullscreen"));
 
   this->Internals->Renderer->ShowAxis(this->Internals->Options.getAsBool("axis"));

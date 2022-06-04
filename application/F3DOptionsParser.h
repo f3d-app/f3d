@@ -28,6 +28,7 @@ struct F3DAppOptions
   bool NoBackground = false;
   bool NoRender = false;
   double RefThreshold = 50;
+  std::vector<int> Resolution{ 1000, 600 };
 };
 
 class F3DOptionsParser
