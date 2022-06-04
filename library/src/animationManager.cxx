@@ -71,7 +71,7 @@ void animationManager::Initialize(
   {
     log::debug(i, ": ", this->Importer->GetAnimationName(i));
   }
-  log::debug("\n");
+  log::debug("");
 
   int animationIndex = options->getAsInt("animation-index");
   if (animationIndex != 0 && availAnimations <= 0)

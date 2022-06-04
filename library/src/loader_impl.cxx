@@ -143,10 +143,9 @@ public:
     {
       log::debug(i, ": ", importer->GetCameraName(i));
     }
-    log::debug("\n");
+    log::debug("");
 #endif
-    log::debug(importer->GetOutputsDescription());
-    log::debug("\n");
+    log::debug(importer->GetOutputsDescription(), "\n");
   }
 
   std::vector<std::string> FilesList;
