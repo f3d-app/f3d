@@ -1,9 +1,9 @@
 /**
- * @class   window
+ * @class   window_impl
  * @brief   A concrete implementation of window
  *
- * A concrete implementation of window that provide a vtkRenderWindow
- * to render into.
+ * A concrete implementation of window that can provide a window to render into.
+ * It also defined implementation only API used by the libf3d.
  * See window.h for the class documentation
  */
 
@@ -19,7 +19,6 @@ class vtkRenderWindow;
 class vtkF3DGenericImporter;
 namespace f3d
 {
-class loader;
 class options;
 
 namespace detail

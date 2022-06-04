@@ -130,7 +130,6 @@ window_impl::WindowType window_impl::getType()
 bool window_impl::setIcon(const void* icon, size_t iconSize)
 {
   // XXX This code requires that the interactor has already been set on the render window
-  // This is not great, improve VTK on that regard
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200615)
   // set icon
   vtkNew<vtkPNGReader> iconReader;
