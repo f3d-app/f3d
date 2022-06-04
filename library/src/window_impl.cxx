@@ -108,7 +108,6 @@ window_impl::window_impl(const options& options, Type type)
   else if (type == Type::EXTERNAL)
   {
     vtkNew<vtkExternalOpenGLRenderWindow> renWin;
-    renWin->AutomaticWindowPositionAndResizeOff();
     this->Internals->RenWin = renWin;
   }
   else
