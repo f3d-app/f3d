@@ -7,6 +7,18 @@ int TestSDKLog(int argc, char* argv[])
   f3d::log::info("Test Info");
   f3d::log::warn("Test Warning");
   f3d::log::error("Test Error");
+  
+  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::WARN); // Next log calls should print warning and error only
+  f3d::log::debug("Test Debug");
+  f3d::log::info("Test Info");
+  f3d::log::warn("Test Warning");
+  f3d::log::error("Test Error");
+
+  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::ERROR); // Next log calls should print error only
+  f3d::log::debug("Test Debug");
+  f3d::log::info("Test Info");
+  f3d::log::warn("Test Warning");
+  f3d::log::error("Test Error");
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET); // Next log calls should print nothing
   f3d::log::debug("Test Debug Quiet");
