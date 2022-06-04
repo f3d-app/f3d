@@ -103,7 +103,7 @@ window_impl::window_impl(const options& options, WindowType type)
   this->Internals->Type = type;
   if (type == WindowType::NO_RENDER)
   {
-    this->Internals->RenWin = vtkSmartPointer<vtkF3DNoRenderWindow>::New();;
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DNoRenderWindow>::New();
   }
   else if (type == WindowType::EXTERNAL)
   {
@@ -213,13 +213,17 @@ bool window_impl::update()
   this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("metadata"));
   this->Internals->Renderer->SetUseRaytracing(this->Internals->Options.getAsBool("raytracing"));
   this->Internals->Renderer->SetRaytracingSamples(this->Internals->Options.getAsInt("samples"));
-  this->Internals->Renderer->SetUseRaytracingDenoiser(this->Internals->Options.getAsBool("denoise"));
+  this->Internals->Renderer->SetUseRaytracingDenoiser(
+    this->Internals->Options.getAsBool("denoise"));
   this->Internals->Renderer->SetUseSSAOPass(this->Internals->Options.getAsBool("ssao"));
   this->Internals->Renderer->SetUseFXAAPass(this->Internals->Options.getAsBool("fxaa"));
-  this->Internals->Renderer->SetUseToneMappingPass(this->Internals->Options.getAsBool("tone-mapping"));
-  this->Internals->Renderer->SetUseBlurBackground(this->Internals->Options.getAsBool("blur-background"));
+  this->Internals->Renderer->SetUseToneMappingPass(
+    this->Internals->Options.getAsBool("tone-mapping"));
+  this->Internals->Renderer->SetUseBlurBackground(
+    this->Internals->Options.getAsBool("blur-background"));
   this->Internals->Renderer->SetUseTrackball(this->Internals->Options.getAsBool("trackball"));
-  this->Internals->Renderer->SetUseDepthPeelingPass(this->Internals->Options.getAsBool("depth-peeling"));
+  this->Internals->Renderer->SetUseDepthPeelingPass(
+    this->Internals->Options.getAsBool("depth-peeling"));
   this->Internals->Renderer->SetBackground(
     this->Internals->Options.getAsDoubleVector("background-color").data());
   this->Internals->Renderer->SetHDRIFile(this->Internals->Options.getAsString("hdri"));
@@ -232,7 +236,8 @@ bool window_impl::update()
   {
     renWithColor->SetUsePointSprites(this->Internals->Options.getAsBool("point-sprites"), false);
     renWithColor->SetUseVolume(this->Internals->Options.getAsBool("volume"), false);
-    renWithColor->SetUseInverseOpacityFunction(this->Internals->Options.getAsBool("inverse"), false);
+    renWithColor->SetUseInverseOpacityFunction(
+      this->Internals->Options.getAsBool("inverse"), false);
     renWithColor->ShowScalarBar(this->Internals->Options.getAsBool("bar"), false);
     renWithColor->SetScalarBarRange(this->Internals->Options.getAsDoubleVector("range"), false);
     renWithColor->SetColormap(this->Internals->Options.getAsDoubleVector("colormap"), false);
