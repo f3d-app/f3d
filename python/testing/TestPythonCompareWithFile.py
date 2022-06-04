@@ -6,7 +6,7 @@ reference = sys.argv[1] + "baselines/TestPythonCompareWithFile.png"
 output = sys.argv[2] + "TestPythonCompareWithFile.png"
 outputDiff = sys.argv[2] + "TestPythonCompareWithFile.diff.png"
 
-engine = f3d.engine(f3d.engine.CREATE_WINDOW | f3d.engine.WINDOW_OFFSCREEN)
+engine = f3d.engine(f3d.window.NATIVE_OFFSCREEN)
 engine.getOptions().set("resolution", [ 600, 600 ])
 engine.getLoader().addFile(dataset)
 engine.getLoader().loadFile(f3d.loader.LoadFileEnum.LOAD_CURRENT)

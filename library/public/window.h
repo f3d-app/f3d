@@ -19,6 +19,28 @@ namespace f3d
 class F3D_EXPORT window
 {
 public:
+
+  /**
+   * Enumeration of supported window types 
+   * =====================================
+   * NO_RENDER: A mock window without rendering capabilities
+   * NATIVE_WINDOW: A window using the native graphical stack
+   * NATIVE_OFFSCREEN: A native window rendering to an offscreen buffer, not visible on screen
+   * EXTERNAL_WINDOW: An external window that assume the OpenGL context would have been created by another framework
+   */
+  enum class WindowType : unsigned char
+  {
+    NO_RENDER,
+    NATIVE,
+    NATIVE_OFFSCREEN,
+    EXTERNAL
+  };
+
+  /**
+   * Get the type of the window
+   */
+  virtual WindowType getType() = 0;
+
   /**
    * Use all the rendering related options to update the configuration of the window
    * and the rendering stack below. This also initialize the rendering stack if needed.

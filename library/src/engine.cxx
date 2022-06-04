@@ -27,39 +27,20 @@ public:
 };
 
 //----------------------------------------------------------------------------
-engine::engine(const flags_t& flags)
+engine::engine(window::WindowType windowType)
   : Internals(new engine::internals())
 {
   this->Internals->Options = std::make_unique<options>();
 
-  if (flags & CREATE_WINDOW)
-  {
-    detail::window_impl::WindowType type =
-      detail::window_impl::WindowType::NATIVE;
-
-    if (flags & WINDOW_EXTERNAL)
-    {
-      type = detail::window_impl::WindowType::EXTERNAL;
-    }
-    else if (flags & WINDOW_OFFSCREEN)
-    {
-      type = detail::window_impl::WindowType::NATIVE_OFFSCREEN;
-    }
-
-    this->Internals->Window =
-      std::make_unique<detail::window_impl>(*this->Internals->Options, type);
-  }
-  else
-  {
-    // Without the window flag, we still need to create a window NO_RENDER
-    this->Internals->Window =
-      std::make_unique<detail::window_impl>(*this->Internals->Options, detail::window_impl::WindowType::NO_RENDER);
-  }
+  this->Internals->Window =
+    std::make_unique<detail::window_impl>(*this->Internals->Options, windowType);
 
   this->Internals->Loader =
     std::make_unique<detail::loader_impl>(*this->Internals->Options, *this->Internals->Window);
 
-  if (flags & CREATE_INTERACTOR)
+  // Always create an interactor except in NO_RENDER mode
+  // or External TODO
+  if (windowType != window::WindowType::NO_RENDER && windowType != window::WindowType::EXTERNAL)
   {
     this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
       *this->Internals->Options, *this->Internals->Window, *this->Internals->Loader);
@@ -93,9 +74,9 @@ options& engine::getOptions()
 //----------------------------------------------------------------------------
 window& engine::getWindow()
 {
-  if (!this->Internals->Window || vtkF3DNoRenderWindow::SafeDownCast(this->Internals->Window->GetRenderWindow()))
+  if (this->Internals->Window->getType() == window::WindowType::NO_RENDER)
   {
-    throw engine::exception("Cannot create window with this engine");
+    throw engine::exception("No window with this engine");
   }
   return *this->Internals->Window;
 }
@@ -111,7 +92,7 @@ interactor& engine::getInteractor()
 {
   if (!this->Internals->Interactor)
   {
-    throw engine::exception("Cannot create interactor with this engine");
+    throw engine::exception("No interactor with this engine");
   }
   return *this->Internals->Interactor;
 }

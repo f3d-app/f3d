@@ -4,11 +4,17 @@
 
 #include "TestSDKHelpers.h"
 
-int TestSDKWindowStandard(int argc, char* argv[])
+int TestSDKWindowNative(int argc, char* argv[])
 {
-  f3d::engine eng(f3d::engine::CREATE_WINDOW);
+  f3d::engine eng;
   f3d::window& win = eng.getWindow();
   win.setWindowName("Test");
+
+  if (win.getType() != f3d::window::WindowType::NATIVE)
+  {
+    std::cerr << "Unexpected window type" << std::endl;
+    return EXIT_FAILURE;
+  }
 
   f3d::options& options = eng.getOptions();
   options.set("resolution", { 300, 300 })

@@ -8,8 +8,9 @@ int TestSDKRenderAndInteract(int argc, char* argv[])
   // Order of allocation matter for VTK
   // This tests ensure that rendering then using
   // an interactor works
+  // Using an onscreen window to mimic standard usage
 
-  f3d::engine eng(f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR);
+  f3d::engine eng(f3d::window::WindowType::NATIVE);
   f3d::loader& load = eng.getLoader();
   load.addFile(std::string(argv[1]) + "/data/cow.vtp");
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);

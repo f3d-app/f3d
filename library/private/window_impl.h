@@ -28,17 +28,6 @@ class window_impl : public window
 {
 public:
   /**
-   * Enumeration of valid standard window type
-   */
-  enum class WindowType : unsigned char
-  {
-    NO_RENDER,
-    NATIVE,
-    NATIVE_OFFSCREEN,
-    EXTERNAL
-  };
-
-  /**
    * Create the internal vtkRenderWindow using the offscreen param
    * and store option ref for later usage
    */
@@ -53,6 +42,7 @@ public:
   /**
    * Documented public API
    */
+  WindowType getType() override;
   bool update() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;

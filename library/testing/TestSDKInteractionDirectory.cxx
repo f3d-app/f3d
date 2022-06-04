@@ -11,8 +11,7 @@
 int TestSDKInteractionDirectory(int argc, char* argv[])
 {
   // This test mimics TestInteractionDirectory.
-  f3d::engine eng(
-    f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR | f3d::engine::WINDOW_OFFSCREEN);
+  f3d::engine eng(f3d::window::WindowType::NATIVE_OFFSCREEN);
   f3d::options& options = eng.getOptions();
   options.set("resolution", { 300, 300 }).set("scalars", "");
   f3d::loader& load = eng.getLoader();
