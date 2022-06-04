@@ -9,6 +9,7 @@ int TestSDKWindowNative(int argc, char* argv[])
   f3d::engine eng;
   f3d::window& win = eng.getWindow();
   win.setWindowName("Test");
+  win.setSize(300, 300);
 
   if (win.getType() != f3d::window::Type::NATIVE)
   {
@@ -17,9 +18,7 @@ int TestSDKWindowNative(int argc, char* argv[])
   }
 
   f3d::options& options = eng.getOptions();
-  options.set("resolution", { 300, 300 })
-    .set("background-color", { 0.8, 0.2, 0.9 })
-    .set("verbose", true);
+  options.set("background-color", { 0.8, 0.2, 0.9 }).set("verbose", true);
   win.update();
 
   // Use a higher threshold as background difference can be strong with mesa

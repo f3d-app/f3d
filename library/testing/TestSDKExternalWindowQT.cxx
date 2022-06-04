@@ -1,6 +1,5 @@
 #include <engine.h>
 #include <loader.h>
-#include <options.h>
 #include <window.h>
 
 #include <QGuiApplication>
@@ -25,12 +24,6 @@ public:
   }
 
 protected:
-  void resizeGL(int w, int h) override
-  {
-    mEngine.getOptions().set("resolution", { w, h });
-    mEngine.getWindow().update();
-  }
-
   void keyPressEvent(QKeyEvent* event) override
   {
     if (event->key() == Qt::Key_Escape)
