@@ -72,6 +72,7 @@ int F3DStarter::Start(int argc, char** argv)
       !this->Internals->AppOptions.Reference.empty() || !this->Internals->AppOptions.Output.empty();
     this->Internals->Engine = std::make_unique<f3d::engine>(
       offscreen ? f3d::window::Type::NATIVE_OFFSCREEN : f3d::window::Type::NATIVE);
+    f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
     interactor.setKeyPressCallBack(
@@ -108,8 +109,10 @@ int F3DStarter::Start(int argc, char** argv)
         this->Internals->Engine->getWindow().render();
         return true;
       });
-    this->Internals->Engine->getWindow().setWindowName(F3D::AppTitle);
-    this->Internals->Engine->getWindow().setIcon(F3DIcon, sizeof(F3DIcon));
+    window.setSize(
+      this->Internals->AppOptions.Resolution[0], this->Internals->AppOptions.Resolution[1]);
+    window.setWindowName(F3D::AppTitle);
+    window.setIcon(F3DIcon, sizeof(F3DIcon));
   }
 
   // Move command line options into the actual engine options
@@ -121,13 +124,14 @@ int F3DStarter::Start(int argc, char** argv)
 
   if (!this->Internals->AppOptions.NoRender)
   {
+    f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
     // Play recording if any
     if (!this->Internals->AppOptions.InteractionTestPlayFile.empty())
     {
       // For better testing, render once before the interaction
-      this->Internals->Engine->getWindow().render();
+      window.render();
       if (!interactor.playInteraction(this->Internals->AppOptions.InteractionTestPlayFile))
       {
         return EXIT_FAILURE;
@@ -162,8 +166,7 @@ int F3DStarter::Start(int argc, char** argv)
         }
         else
         {
-          this->Internals->Engine->getWindow()
-            .renderToImage(this->Internals->AppOptions.NoBackground)
+          window.renderToImage(this->Internals->AppOptions.NoBackground)
             .save(this->Internals->AppOptions.Output);
 
           f3d::log::error("Reference image " + this->Internals->AppOptions.Reference +
@@ -173,8 +176,7 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      f3d::image img = this->Internals->Engine->getWindow().renderToImage(
-        this->Internals->AppOptions.NoBackground);
+      f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
       f3d::image ref(this->Internals->AppOptions.Reference);
       f3d::image diff;
       double error;
@@ -207,14 +209,13 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      f3d::image img = this->Internals->Engine->getWindow().renderToImage(
-        this->Internals->AppOptions.NoBackground);
+      f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
       img.save(this->Internals->AppOptions.Output);
     }
     // Start interaction
     else
     {
-      this->Internals->Engine->getInteractor().start();
+      interactor.start();
     }
   }
 

@@ -64,6 +64,11 @@ public:
   virtual image renderToImage(bool noBackground = false) = 0;
 
   /**
+   * Set the size of the window
+   */
+  virtual void setSize(int width, int heigth) = 0;
+
+  /**
    * Set the icon to be shown by a window manager.
    * icon should be an unsigned char array
    * iconSize should be the sizeof(icon)

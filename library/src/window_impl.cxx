@@ -125,6 +125,12 @@ window_impl::Type window_impl::getType()
 }
 
 //----------------------------------------------------------------------------
+void window_impl::setSize(int width, int height)
+{
+  this->Internals->RenWin->SetSize(width, height);
+}
+
+//----------------------------------------------------------------------------
 bool window_impl::setIcon(const void* icon, size_t iconSize)
 {
   // XXX This code requires that the interactor has already been set on the render window
@@ -189,12 +195,6 @@ void window_impl::Initialize(bool withColoring, std::string fileInfo)
 
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Renderer->Initialize(fileInfo, this->Internals->Options.getAsString("up"));
-
-  auto initialResolution = this->Internals->Options.getAsIntVector("initial-resolution");
-  if (initialResolution[0] > 0 && initialResolution[1] > 0)
-  {
-    this->Internals->RenWin->SetSize(initialResolution.data());
-  }
 }
 
 //----------------------------------------------------------------------------

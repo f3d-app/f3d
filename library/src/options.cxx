@@ -129,7 +129,6 @@ options::options()
   this->Internals->init("texture-normal", std::string());
 
   // Loading but should be checked ?
-  this->Internals->init("initial-resolution", std::vector<int>{ -1, -1 });
   this->Internals->init("up", std::string("+Y"));
 
   this->Internals->init("cells", false);

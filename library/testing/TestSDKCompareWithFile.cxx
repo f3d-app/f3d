@@ -1,6 +1,5 @@
 #include <engine.h>
 #include <loader.h>
-#include <options.h>
 #include <window.h>
 
 #include "TestSDKHelpers.h"
@@ -8,9 +7,10 @@
 int TestSDKCompareWithFile(int argc, char* argv[])
 {
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
-  f3d::options& options = eng.getOptions();
-  options.set("initial-resolution", { 300, 300 });
   f3d::loader& load = eng.getLoader();
+  f3d::window& win = eng.getWindow();
+  win.setSize(300, 300);
+
   load.addFile(std::string(argv[1]) + "/data/cow.vtp");
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
