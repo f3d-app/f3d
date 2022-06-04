@@ -38,23 +38,23 @@ void log::setUseColoring(bool use)
 void log::setVerboseLevel(log::VerboseLevel level)
 {
   F3DLog::SetQuiet(level == log::VerboseLevel::QUIET);
-  switch(level)
+  switch (level)
   {
-    case(log::VerboseLevel::DEBUG):
+    case (log::VerboseLevel::DEBUG):
       F3DLog::VerboseLevel = F3DLog::Severity::Debug;
-    break;
-    case(log::VerboseLevel::INFO):
+      break;
+    case (log::VerboseLevel::INFO):
       F3DLog::VerboseLevel = F3DLog::Severity::Info;
-    break;
-    case(log::VerboseLevel::WARN):
+      break;
+    case (log::VerboseLevel::WARN):
       F3DLog::VerboseLevel = F3DLog::Severity::Warning;
-    break;
-    case(log::VerboseLevel::ERROR):
+      break;
+    case (log::VerboseLevel::ERROR):
       F3DLog::VerboseLevel = F3DLog::Severity::Error;
-    break;
-    case(log::VerboseLevel::QUIET):
+      break;
+    case (log::VerboseLevel::QUIET):
     default:
-    break;
+      break;
   }
 }
 
