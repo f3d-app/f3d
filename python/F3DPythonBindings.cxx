@@ -113,8 +113,7 @@ PYBIND11_MODULE(f3d, module)
     .value("EXTERNAL", f3d::window::WindowType::EXTERNAL)
     .export_values();
 
-  window
-    .def("update", &f3d::window::update, "Update the window")
+  window.def("update", &f3d::window::update, "Update the window")
     .def("render", &f3d::window::render, "Render the window")
     .def("renderToImage", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("noBackground") = false)
@@ -125,8 +124,7 @@ PYBIND11_MODULE(f3d, module)
   // f3d::engine
   py::class_<f3d::engine> engine(module, "engine");
 
-  engine
-    .def(py::init<f3d::window::WindowType>())
+  engine.def(py::init<f3d::window::WindowType>())
     .def("getInteractor", &f3d::engine::getInteractor, py::return_value_policy::reference)
     .def("getLoader", &f3d::engine::getLoader, py::return_value_policy::reference)
     .def("getOptions", &f3d::engine::getOptions, py::return_value_policy::reference)

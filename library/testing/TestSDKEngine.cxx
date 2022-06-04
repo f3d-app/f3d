@@ -25,7 +25,8 @@ int TestSDKEngine(int argc, char* argv[])
   f3d::engine eng3(f3d::window::WindowType::EXTERNAL);
   f3d::loader& load3 = eng3.getLoader();
   f3d::window& window3 = eng3.getWindow();
-//  f3d::interactor& inter3 = eng3.getInteractor(); TODO add support for interactor and external window
+  //  f3d::interactor& inter3 = eng3.getInteractor(); TODO add support for interactor and external
+  //  window
 
   // Test option setters
   f3d::options opt;
