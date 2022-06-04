@@ -107,8 +107,7 @@ window_impl::window_impl(const options& options, Type type)
   }
   else if (type == Type::EXTERNAL)
   {
-    vtkNew<vtkExternalOpenGLRenderWindow> renWin;
-    this->Internals->RenWin = renWin;
+    this->Internals->RenWin = vtkSmartPointer<vtkExternalOpenGLRenderWindow>::New();
   }
   else
   {
