@@ -106,34 +106,7 @@ int TestSDKOptions(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // Test int vector TODO cannot test without an option ?
-  /*  opt.set("initial-resolution", { 1000, 600 });
-    if (opt.getAsIntVector("initial-resolution") != std::vector<int>{ 1000, 600 })
-    {
-      std::cerr << "Options getAsIntVector is not behaving as expected." << std::endl;
-      return EXIT_FAILURE;
-    }
-    std::vector<int> valIntVec;
-    opt.get("initial-resolution", valIntVec);
-    if (valIntVec != std::vector<int>{ 1000, 600 })
-    {
-      std::cerr << "Options get int vector is not behaving as expected." << std::endl;
-      return EXIT_FAILURE;
-    }
-    opt.set("initial-resolution", std::vector<int>{ 1000, 700 });
-    if (opt.getAsIntVectorRef("initial-resolution") != std::vector<int>{ 1000, 700 })
-    {
-      std::cerr << "Options set int vector is not behaving as expected." << std::endl;
-      return EXIT_FAILURE;
-    }
-    std::vector<int>& refIntVec = opt.getAsIntVectorRef("initial-resolution");
-    refIntVec = std::vector<int>{ 1000, 800 };
-    opt.get("initial-resolution", valIntVec);
-    if (valIntVec != std::vector<int>{ 1000, 800 })
-    {
-      std::cerr << "Options getAsIntVectorRef is not behaving as expected." << std::endl;
-      return EXIT_FAILURE;
-    }*/
+  // XXX Test int vector is not done as their is currently no int vector option
 
   // Test double vector
   opt.set("background-color", { 0.1, 0.2, 0.3 });
