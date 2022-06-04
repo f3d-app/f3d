@@ -1,8 +1,9 @@
 /**
  * @class   window_impl
- * @brief   A private abstract implementation of window
+ * @brief   A concrete implementation of window
  *
- * A private abstract implementation of window that defines the private API
+ * A concrete implementation of window that can provide a window to render into.
+ * It also defined implementation only API used by the libf3d.
  * See window.h for the class documentation
  */
 
@@ -10,6 +11,8 @@
 #define f3d_window_impl_h
 
 #include "window.h"
+
+#include <memory>
 
 class vtkRenderWindow;
 class vtkF3DGenericImporter;
@@ -22,12 +25,22 @@ namespace detail
 class window_impl : public window
 {
 public:
-  ~window_impl() override = default;
+  /**
+   * Create the internal vtkRenderWindow using the offscreen param
+   * and store option ref for later usage
+   */
+  window_impl(const options& options, Type type);
+
+  /**
+   * Default destructor
+   */
+  ~window_impl() override;
 
   //@{
   /**
    * Documented public API
    */
+  Type getType() override;
   bool update() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;
@@ -53,12 +66,11 @@ public:
    * Implementation only API.
    * Get a pointer to the internal vtkRenderWindow
    */
-  virtual vtkRenderWindow* GetRenderWindow() = 0;
+  virtual vtkRenderWindow* GetRenderWindow();
 
-protected:
-  window_impl(const options&);
-
-  const options& Options;
+private:
+  class internals;
+  std::unique_ptr<internals> Internals;
 };
 }
 }

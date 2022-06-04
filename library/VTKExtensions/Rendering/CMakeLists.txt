@@ -1,6 +1,7 @@
 set(classes
   vtkF3DInteractorEventRecorder
   vtkF3DInteractorStyle
+  vtkF3DNoRenderWindow
   vtkF3DOpenGLGridMapper
   vtkF3DPolyDataMapper
   vtkF3DRenderPass

@@ -3,7 +3,7 @@
  * @brief   Class used to create instance of other classes
  *
  * The main class of the libf3d to create all other instances
- * Configured on creation using binary flags, then all objects
+ * Configured on creation using an enum, then all objects
  * can be accessed through their getter.
  *
  * Example usage:
@@ -22,6 +22,7 @@
 #define f3d_engine_h
 
 #include "export.h"
+#include "window.h"
 
 #include <map>
 #include <stdexcept>
@@ -31,7 +32,6 @@
 namespace f3d
 {
 class options;
-class window;
 class loader;
 class interactor;
 class F3D_EXPORT engine
@@ -47,29 +47,13 @@ public:
   };
 
   /**
-   * ======== Engine Flags =============
-   * engine::CREATE_WINDOW: Create a window to render into.
-   * engine::CREATE_INTERACTOR: Create an interactor to interact with.
-   * engine::WINDOW_OFFSCREEN: Create an offscreen window to render into, need CREATE_WINDOW.
-   * engine::WINDOW_EXTERNAL: Use an external window to render into, need CREATE_WINDOW.
-   * WINDOW_OFFSCREEN and WINDOW_EXTERNAL are exclusive, if both are set, WINDOW_EXTERNAL has
-   * precedence.
-   */
-  using flags_t = uint32_t;
-  enum Flags : flags_t
-  {
-    FLAGS_NONE = 0,             // 0000
-    CREATE_WINDOW = 1 << 0,     // 0001
-    CREATE_INTERACTOR = 1 << 1, // 0010
-    WINDOW_OFFSCREEN = 1 << 2,  // 0100
-    WINDOW_EXTERNAL = 1 << 3    // 1000
-  };
-
-  /**
-   * Engine constructor, configure it using the binary flags
+   * Engine constructor, choose the window type using the enum.
+   * see window.h for details about the window.
+   * When using window::Type::NONE, window and interactor will not be provided by the engine.
+   * When using window::Type::EXTERNAL, interactor will not be provided by the engine.
    * All objects instances will be created on construction
    */
-  explicit engine(const flags_t& flags);
+  explicit engine(window::Type windowType = window::Type::NATIVE);
 
   /**
    * Engine destructor, delete all object instances as well

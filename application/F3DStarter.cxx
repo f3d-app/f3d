@@ -63,17 +63,15 @@ int F3DStarter::Start(int argc, char** argv)
 
   if (this->Internals->AppOptions.NoRender)
   {
-    this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::FLAGS_NONE);
+    this->Internals->Engine = std::make_unique<f3d::engine>(f3d::window::Type::NONE);
   }
   else
   {
     // TODO Test this multiconfig behavior
     bool offscreen =
       !this->Internals->AppOptions.Reference.empty() || !this->Internals->AppOptions.Output.empty();
-
-    f3d::engine::flags_t flags = f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR |
-      (offscreen ? f3d::engine::WINDOW_OFFSCREEN : f3d::engine::FLAGS_NONE);
-    this->Internals->Engine = std::make_unique<f3d::engine>(flags);
+    this->Internals->Engine = std::make_unique<f3d::engine>(
+      offscreen ? f3d::window::Type::NATIVE_OFFSCREEN : f3d::window::Type::NATIVE);
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
     interactor.setKeyPressCallBack(

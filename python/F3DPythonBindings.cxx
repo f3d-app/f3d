@@ -104,8 +104,16 @@ PYBIND11_MODULE(f3d, module)
       "getFileInfo", &f3d::loader::getFileInfo, "Get the file index, path, and information string");
 
   // f3d::window
-  py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> >(module, "window")
-    .def("update", &f3d::window::update, "Update the window")
+  py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> > window(module, "window");
+
+  py::enum_<f3d::window::Type>(window, "Type")
+    .value("NONE", f3d::window::Type::NONE)
+    .value("NATIVE", f3d::window::Type::NATIVE)
+    .value("NATIVE_OFFSCREEN", f3d::window::Type::NATIVE_OFFSCREEN)
+    .value("EXTERNAL", f3d::window::Type::EXTERNAL)
+    .export_values();
+
+  window.def("update", &f3d::window::update, "Update the window")
     .def("render", &f3d::window::render, "Render the window")
     .def("renderToImage", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("noBackground") = false)
@@ -116,14 +124,7 @@ PYBIND11_MODULE(f3d, module)
   // f3d::engine
   py::class_<f3d::engine> engine(module, "engine");
 
-  py::enum_<f3d::engine::Flags>(engine, "Flags", py::arithmetic())
-    .value("FLAGS_NONE", f3d::engine::FLAGS_NONE)
-    .value("CREATE_WINDOW", f3d::engine::CREATE_WINDOW)
-    .value("CREATE_INTERACTOR", f3d::engine::CREATE_INTERACTOR)
-    .value("WINDOW_OFFSCREEN", f3d::engine::WINDOW_OFFSCREEN)
-    .export_values();
-
-  engine.def(py::init<f3d::engine::flags_t>())
+  engine.def(py::init<f3d::window::Type>())
     .def("getInteractor", &f3d::engine::getInteractor, py::return_value_policy::reference)
     .def("getLoader", &f3d::engine::getLoader, py::return_value_policy::reference)
     .def("getOptions", &f3d::engine::getOptions, py::return_value_policy::reference)

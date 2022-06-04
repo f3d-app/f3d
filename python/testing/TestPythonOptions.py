@@ -1,6 +1,6 @@
 import f3d
 
-engine = f3d.engine(f3d.engine.FLAGS_NONE)
+engine = f3d.engine(f3d.window.NONE)
 
 assert engine.getOptions().getAsBool("axis") is False
 assert engine.getOptions().getAsDouble("roughness") == 0.3

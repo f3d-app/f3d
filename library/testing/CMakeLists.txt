@@ -13,7 +13,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
     TestSDKCompareWithFile.cxx
     TestSDKImage.cxx
     TestSDKInteractionDirectory.cxx
-    TestSDKWindowStandard.cxx
+    TestSDKWindowNative.cxx
     )
 endif()
 
