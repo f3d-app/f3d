@@ -38,8 +38,7 @@ engine::engine(window::Type windowType)
   this->Internals->Loader =
     std::make_unique<detail::loader_impl>(*this->Internals->Options, *this->Internals->Window);
 
-  // Always create an interactor except in NONE mode
-  // or External TODO
+  // Do not create an interactor for NONE or EXTERNAL
   if (windowType != window::Type::NONE && windowType != window::Type::EXTERNAL)
   {
     this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
