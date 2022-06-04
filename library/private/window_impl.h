@@ -13,7 +13,6 @@
 #include "window.h"
 
 #include <memory>
-#include <string>
 
 class vtkRenderWindow;
 class vtkF3DGenericImporter;
