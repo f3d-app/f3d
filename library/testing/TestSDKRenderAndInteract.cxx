@@ -10,7 +10,7 @@ int TestSDKRenderAndInteract(int argc, char* argv[])
   // an interactor works
   // Using an onscreen window to mimic standard usage
 
-  f3d::engine eng(f3d::window::WindowType::NATIVE);
+  f3d::engine eng(f3d::window::Type::NATIVE);
   f3d::loader& load = eng.getLoader();
   load.addFile(std::string(argv[1]) + "/data/cow.vtp");
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);

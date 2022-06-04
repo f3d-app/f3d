@@ -15,7 +15,7 @@ public:
   F3DWindow(
     const std::string& filePath, const std::string& baselinePath, const std::string& outputPath)
     : QOpenGLWindow()
-    , mEngine(f3d::window::WindowType::EXTERNAL)
+    , mEngine(f3d::window::Type::EXTERNAL)
     , mBaselinePath(baselinePath)
     , mOutputPath(outputPath)
   {

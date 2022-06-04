@@ -92,38 +92,37 @@ public:
 
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkSmartPointer<vtkF3DRenderer> Renderer;
-  WindowType Type;
+  Type WindowType;
   const options& Options;
 };
 
 //----------------------------------------------------------------------------
-window_impl::window_impl(const options& options, WindowType type)
+window_impl::window_impl(const options& options, Type type)
   : Internals(new window_impl::internals(options))
 {
-  this->Internals->Type = type;
-  if (type == WindowType::NO_RENDER)
+  this->Internals->WindowType = type;
+  if (type == Type::NONE)
   {
     this->Internals->RenWin = vtkSmartPointer<vtkF3DNoRenderWindow>::New();
   }
-  else if (type == WindowType::EXTERNAL)
+  else if (type == Type::EXTERNAL)
   {
     vtkNew<vtkExternalOpenGLRenderWindow> renWin;
     renWin->AutomaticWindowPositionAndResizeOff();
     this->Internals->RenWin = renWin;
-    this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
   }
   else
   {
     this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
-    this->Internals->RenWin->SetOffScreenRendering(type == WindowType::NATIVE_OFFSCREEN);
+    this->Internals->RenWin->SetOffScreenRendering(type == Type::NATIVE_OFFSCREEN);
     this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
   }
 }
 
 //----------------------------------------------------------------------------
-window_impl::WindowType window_impl::getType()
+window_impl::Type window_impl::getType()
 {
-  return this->Internals->Type;
+  return this->Internals->WindowType;
 }
 
 //----------------------------------------------------------------------------

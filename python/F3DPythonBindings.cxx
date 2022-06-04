@@ -106,11 +106,11 @@ PYBIND11_MODULE(f3d, module)
   // f3d::window
   py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> > window(module, "window");
 
-  py::enum_<f3d::window::WindowType>(window, "WindowType")
-    .value("NO_RENDER", f3d::window::WindowType::NO_RENDER)
-    .value("NATIVE", f3d::window::WindowType::NATIVE)
-    .value("NATIVE_OFFSCREEN", f3d::window::WindowType::NATIVE_OFFSCREEN)
-    .value("EXTERNAL", f3d::window::WindowType::EXTERNAL)
+  py::enum_<f3d::window::Type>(window, "Type")
+    .value("NONE", f3d::window::Type::NONE)
+    .value("NATIVE", f3d::window::Type::NATIVE)
+    .value("NATIVE_OFFSCREEN", f3d::window::Type::NATIVE_OFFSCREEN)
+    .value("EXTERNAL", f3d::window::Type::EXTERNAL)
     .export_values();
 
   window.def("update", &f3d::window::update, "Update the window")
@@ -124,7 +124,7 @@ PYBIND11_MODULE(f3d, module)
   // f3d::engine
   py::class_<f3d::engine> engine(module, "engine");
 
-  engine.def(py::init<f3d::window::WindowType>())
+  engine.def(py::init<f3d::window::Type>())
     .def("getInteractor", &f3d::engine::getInteractor, py::return_value_policy::reference)
     .def("getLoader", &f3d::engine::getLoader, py::return_value_policy::reference)
     .def("getOptions", &f3d::engine::getOptions, py::return_value_policy::reference)

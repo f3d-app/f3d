@@ -30,7 +30,7 @@ public:
    * Create the internal vtkRenderWindow using the offscreen param
    * and store option ref for later usage
    */
-  window_impl(const options& options, WindowType type);
+  window_impl(const options& options, Type type);
 
   /**
    * Default destructor
@@ -41,7 +41,7 @@ public:
   /**
    * Documented public API
    */
-  WindowType getType() override;
+  Type getType() override;
   bool update() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;

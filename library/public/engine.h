@@ -48,12 +48,12 @@ public:
 
   /**
    * Engine constructor, choose the window type using the enum.
-   * see image.h for details about the window.
-   * When using ImageType::NO_RENDER, window and interactor will not be provided by the engine.
-   * When using ImageType::EXTERNAL, interactor will not be provided by the engine.
+   * see window.h for details about the window.
+   * When using window::Type::NONE, window and interactor will not be provided by the engine.
+   * When using window::Type::EXTERNAL, interactor will not be provided by the engine.
    * All objects instances will be created on construction
    */
-  explicit engine(window::WindowType type = window::WindowType::NATIVE);
+  explicit engine(window::Type windowType = window::Type::NATIVE);
 
   /**
    * Engine destructor, delete all object instances as well

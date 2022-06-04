@@ -8,7 +8,7 @@
 
 int TestSDKLoader(int argc, char* argv[])
 {
-  f3d::engine eng(f3d::window::WindowType::NO_RENDER);
+  f3d::engine eng(f3d::window::Type::NONE);
 
   // set some options to increase coverage
   f3d::options& opt = eng.getOptions();

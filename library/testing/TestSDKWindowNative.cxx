@@ -10,7 +10,7 @@ int TestSDKWindowNative(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   win.setWindowName("Test");
 
-  if (win.getType() != f3d::window::WindowType::NATIVE)
+  if (win.getType() != f3d::window::Type::NATIVE)
   {
     std::cerr << "Unexpected window type" << std::endl;
     return EXIT_FAILURE;

@@ -27,7 +27,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-engine::engine(window::WindowType windowType)
+engine::engine(window::Type windowType)
   : Internals(new engine::internals())
 {
   this->Internals->Options = std::make_unique<options>();
@@ -38,9 +38,9 @@ engine::engine(window::WindowType windowType)
   this->Internals->Loader =
     std::make_unique<detail::loader_impl>(*this->Internals->Options, *this->Internals->Window);
 
-  // Always create an interactor except in NO_RENDER mode
+  // Always create an interactor except in NONE mode
   // or External TODO
-  if (windowType != window::WindowType::NO_RENDER && windowType != window::WindowType::EXTERNAL)
+  if (windowType != window::Type::NONE && windowType != window::Type::EXTERNAL)
   {
     this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
       *this->Internals->Options, *this->Internals->Window, *this->Internals->Loader);
@@ -74,7 +74,7 @@ options& engine::getOptions()
 //----------------------------------------------------------------------------
 window& engine::getWindow()
 {
-  if (this->Internals->Window->getType() == window::WindowType::NO_RENDER)
+  if (this->Internals->Window->getType() == window::Type::NONE)
   {
     throw engine::exception("No window with this engine");
   }
