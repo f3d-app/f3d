@@ -74,7 +74,7 @@ public:
     }
 
     // No user defined behavior, use standard behavior
-    vtkRenderWindow* renWin = rwi->GetRenderWindow();
+    vtkRenderWindow* renWin = self->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
     vtkF3DRendererWithColoring* renWithColor = vtkF3DRendererWithColoring::SafeDownCast(ren);
 
