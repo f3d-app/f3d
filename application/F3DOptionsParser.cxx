@@ -228,7 +228,7 @@ void ConfigurationOptions::GetOptionsFromArgs(
 
     auto grp3 = cxxOptions.add_options("Window");
     this->DeclareOption(grp3, "bg-color", "", "Background color", options.getAsDoubleVectorRef("background-color"), true, true, "<R,G,B>"); // TODO change name ?
-    this->DeclareOption(grp3, "resolution", "", "Window resolution", options.getAsIntVectorRef("resolution"), true, true, "<width,height>");
+    this->DeclareOption(grp3, "resolution", "", "Window resolution", options.getAsIntVectorRef("initial-resolution"), true, true, "<width,height>");
     this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.getAsBoolRef("fps"));
     this->DeclareOption(grp3, "filename", "n", "Display filename", options.getAsBoolRef("filename"));
     this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.getAsBoolRef("metadata"));

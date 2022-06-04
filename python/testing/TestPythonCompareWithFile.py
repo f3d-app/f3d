@@ -7,15 +7,15 @@ output = sys.argv[2] + "TestPythonCompareWithFile.png"
 outputDiff = sys.argv[2] + "TestPythonCompareWithFile.diff.png"
 
 engine = f3d.engine(f3d.window.NATIVE_OFFSCREEN)
-engine.getOptions().set("resolution", [ 600, 600 ])
+engine.getOptions().set("initial-resolution", [ 600, 600 ])
 engine.getLoader().addFile(dataset)
 engine.getLoader().loadFile(f3d.loader.LoadFileEnum.LOAD_CURRENT)
 
 engine.getWindow().render()
 
-# check that the next render takes into consideration the resolution change
-engine.getOptions().set("resolution", [ 300, 300 ])
-engine.getWindow().update()
+# check that the next load takes into consideration the resolution change
+engine.getOptions().set("initial-resolution", [ 300, 300 ])
+engine.getLoader().loadFile(f3d.loader.LoadFileEnum.LOAD_CURRENT)
 
 img = engine.getWindow().renderToImage()
 img.save(output)

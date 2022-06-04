@@ -12,7 +12,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
 {
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
   f3d::options& options = eng.getOptions();
-  options.set("resolution", { 300, 300 });
+  options.set("initial-resolution", { 300, 300 });
   f3d::loader& load = eng.getLoader();
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();

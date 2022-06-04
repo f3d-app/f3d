@@ -128,15 +128,18 @@ options::options()
   this->Internals->init("texture-material", std::string());
   this->Internals->init("texture-normal", std::string());
 
-  // Loading but should not
+  // Loading but should be checked ?
+  this->Internals->init("initial-resolution", std::vector<int>{ -1, -1 });
+  this->Internals->init("up", std::string("+Y"));
+
   this->Internals->init("cells", false);
-  this->Internals->init("scalars", F3D_RESERVED_STRING);
   this->Internals->init("component", -1);
+
+  this->Internals->init("scalars", F3D_RESERVED_STRING);
+
   this->Internals->init("fullscreen", false);
-  this->Internals->init("resolution", std::vector<int>{ 1000, 600 });
   this->Internals->init("hdri", std::string());
   this->Internals->init("background-color", std::vector<double>{ 0.2, 0.2, 0.2 });
-  this->Internals->init("up", std::string("+Y"));
   this->Internals->init("font-file", std::string());
 
   // Rendering/Dynamic

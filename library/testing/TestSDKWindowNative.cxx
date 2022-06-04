@@ -17,7 +17,7 @@ int TestSDKWindowNative(int argc, char* argv[])
   }
 
   f3d::options& options = eng.getOptions();
-  options.set("resolution", { 300, 300 })
+  options.set("initial-resolution", { 300, 300 })
     .set("background-color", { 0.8, 0.2, 0.9 })
     .set("verbose", true);
   win.update();
