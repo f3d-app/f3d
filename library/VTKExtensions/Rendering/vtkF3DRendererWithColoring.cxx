@@ -1,6 +1,7 @@
 #include "vtkF3DRendererWithColoring.h"
 
 #include "F3DLog.h"
+#include "vtkF3DConfigure.h"
 
 #include <vtkColorTransferFunction.h>
 #include <vtkDataArray.h>
@@ -511,14 +512,13 @@ void vtkF3DRendererWithColoring::UpdateScalarBarVisibility()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetColoring(vtkDataSetAttributes* pointData,
-  vtkDataSetAttributes* cellData, bool useCellData, int arrayIndex, int component)
+void vtkF3DRendererWithColoring::SetColoring(
+  bool useCellData, const std::string& arrayName, int component, bool update)
 {
   this->ArrayForColoring = nullptr;
-  this->PointDataForColoring = pointData;
-  this->CellDataForColoring = cellData;
   this->DataForColoring = useCellData ? this->CellDataForColoring : this->PointDataForColoring;
-  this->ArrayIndexForColoring = arrayIndex;
+  this->ArrayIndexForColoring =
+    vtkF3DRendererWithColoring::FindArrayIndexForColoring(this->DataForColoring, arrayName);
   this->ComponentForColoring = component;
   if (!this->DataForColoring ||
     this->ArrayIndexForColoring >= this->DataForColoring->GetNumberOfArrays() ||
@@ -527,6 +527,68 @@ void vtkF3DRendererWithColoring::SetColoring(vtkDataSetAttributes* pointData,
     F3DLog::Print(F3DLog::Severity::Error, "Invalid coloring values");
     this->ArrayIndexForColoring = -1;
   }
+  if (update)
+  {
+    this->UpdateColoringActors();
+  }
+}
+
+//----------------------------------------------------------------------------
+int vtkF3DRendererWithColoring::FindArrayIndexForColoring(
+  vtkDataSetAttributes* dataForColoring, const std::string& arrayName)
+{
+  int index = -1;
+  if (dataForColoring)
+  {
+    std::string usedArray = arrayName;
+
+    // scalars == "", color with the first found array
+    if (usedArray.empty())
+    {
+      vtkDataArray* array = dataForColoring->GetScalars();
+      if (array)
+      {
+        const char* localArrayName = array->GetName();
+        if (localArrayName)
+        {
+          // store the name for find the index below
+          usedArray = localArrayName;
+        }
+      }
+      else
+      {
+        for (int i = 0; i < dataForColoring->GetNumberOfArrays(); i++)
+        {
+          array = dataForColoring->GetArray(i);
+          if (array)
+          {
+            index = i;
+            break;
+          }
+        }
+      }
+    }
+
+    if (index == -1)
+    {
+      // index not set yet, find it using the name if possible
+      dataForColoring->GetAbstractArray(usedArray.c_str(), index);
+    }
+    if (index == -1 && !usedArray.empty() && usedArray != F3D_RESERVED_STRING)
+    {
+      // index not set and name is not the one reserved for not coloring
+      F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: " + usedArray + "\n");
+    }
+  }
+  return index;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetColoringAttributes(
+  vtkDataSetAttributes* pointData, vtkDataSetAttributes* cellData)
+{
+  this->PointDataForColoring = pointData;
+  this->CellDataForColoring = cellData;
 }
 
 //----------------------------------------------------------------------------

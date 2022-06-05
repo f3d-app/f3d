@@ -125,11 +125,6 @@ options::options()
   this->Internals->init("texture-normal", std::string());
   this->Internals->init("up", std::string("+Y"));
 
-  // Loading but should be checked ?
-  this->Internals->init("cells", false);
-  this->Internals->init("component", -1);
-  this->Internals->init("scalars", F3D_RESERVED_STRING);
-
   // Rendering/Dynamic
   this->Internals->init("axis", false);
   this->Internals->init("background-color", std::vector<double>{ 0.2, 0.2, 0.2 });
@@ -141,16 +136,18 @@ options::options()
   this->Internals->init("camera-position", std::vector<double>());
   this->Internals->init("camera-view-angle", 0.0);
   this->Internals->init("camera-view-up", std::vector<double>());
-  this->Internals->init("fullscreen", false);
+  this->Internals->init("cells", false);
   this->Internals->init("colormap",
     std::vector<double>{
       0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 });
+  this->Internals->init("component", -1);
   this->Internals->init("denoise", false);
   this->Internals->init("depth-peeling", false);
   this->Internals->init("edges", false);
   this->Internals->init("filename", false);
   this->Internals->init("font-file", std::string());
   this->Internals->init("fps", false);
+  this->Internals->init("fullscreen", false);
   this->Internals->init("fxaa", false);
   this->Internals->init("grid", false);
   this->Internals->init("hdri", std::string());
@@ -160,6 +157,7 @@ options::options()
   this->Internals->init("range", std::vector<double>());
   this->Internals->init("raytracing", false);
   this->Internals->init("samples", 5);
+  this->Internals->init("scalars", F3D_RESERVED_STRING);
   this->Internals->init("ssao", false);
   this->Internals->init("tone-mapping", false);
   this->Internals->init("trackball", false);
