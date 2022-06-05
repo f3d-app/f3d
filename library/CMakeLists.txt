@@ -137,6 +137,7 @@ if (APPLE OR UNIX)
   # Make sure rpath is correctly set for libf3d dependencies
 
   # VTK
+  set(absolute_rpaths "")
   get_target_property(target_type VTK::CommonCore TYPE)
   if (target_type STREQUAL SHARED_LIBRARY)
     set(absolute_rpaths "$<TARGET_FILE_DIR:VTK::CommonCore>")

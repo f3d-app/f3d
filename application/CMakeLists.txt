@@ -82,6 +82,18 @@ if(F3D_MACOS_BUNDLE)
   set_source_files_properties(${f3d_ICON} PROPERTIES
     MACOSX_PACKAGE_LOCATION "Resources")
   target_sources(f3d PRIVATE ${f3d_ICON})
+
+  # Set other MacOS vars
+  set(MACOSX_BUNDLE_EXECUTABLE_NAME ${PROJECT_NAME})
+  set(MACOSX_BUNDLE_INFO_STRING ${PROJECT_DESCRIPTION})
+  set(MACOSX_BUNDLE_GUI_IDENTIFIER "io.github.f3d_app.f3d")
+  set(MACOSX_BUNDLE_LONG_VERSION_STRING ${PROJECT_VERSION})
+  set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
+  set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
+  set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+  set(MACOSX_BUNDLE_COPYRIGHT "Michael Migliore, Mathieu Westphal")
+
+  # Generate MacOS bundle
   configure_file("${CMAKE_SOURCE_DIR}/resources/BundleInfo.plist.in"
     "${CMAKE_CURRENT_BINARY_DIR}/BundleInfo.plist")
   set_target_properties(f3d PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/BundleInfo.plist")
