@@ -101,8 +101,7 @@ void vtkF3DRenderer::Initialize(const std::string& fileInfo, const std::string& 
   this->GridInitialized = false;
   this->GridInfo = "";
 
-  // Many things depends on UpVector being set
-  // Simpler to set on initialization only
+  // Importer rely on the Environment being set, so this is needed in the initialization
   if (up.size() == 2)
   {
     char sign = up[0];
