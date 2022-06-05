@@ -93,6 +93,9 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: >
         cmake ../source
+        -Werror=dev
+        -Werror=deprecated
+        --warn-uninitialized
         -DBUILD_TESTING=ON
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DF3D_STRICT_BUILD=ON
