@@ -54,6 +54,11 @@ macro(declare_f3d_reader)
     "${CMAKE_CURRENT_BINARY_DIR}/F3D${F3D_READER_NAME}Reader.h")
 endmacro()
 
+set(F3D_READER_INCLUDES_CODE "")
+set(F3D_READER_INSTANCES_CODE "")
+set(F3D_READER_REGISTER_CODE "")
+set(F3D_READER_UNREGISTER_CODE "")
+
 declare_f3d_reader(
   NAME 3DS
   EXTENSIONS 3ds

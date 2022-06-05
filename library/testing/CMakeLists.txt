@@ -51,7 +51,11 @@ if(Qt5_FOUND AND VTK_VERSION VERSION_GREATER 9.0.1)
 endif()
 
 # create the testing file and list of tests
-create_test_sourcelist(_libf3dSDKTests libf3dSDKTests.cxx ${libf3dSDKTests_list})
+# CMake variables are set to avoid work around this issue:
+# https://gitlab.kitware.com/cmake/cmake/-/issues/21049
+set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "")
+set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "")
+create_test_sourcelist(_libf3dSDKTests libf3dSDKTests.cxx ${libf3dSDKTests_list} EXTRA_INCLUDE "stdio.h" FUNCTION "")
 
 # add the executable
 add_executable(libf3dSDKTests ${_libf3dSDKTests})

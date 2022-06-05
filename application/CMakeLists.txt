@@ -46,9 +46,9 @@ target_include_directories(f3d
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
   )
 
-set(f3d_compile_options_public)
-set(f3d_compile_options_private)
-set(f3d_link_options_public)
+set(f3d_compile_options_private "")
+set(f3d_compile_options_public "")
+set(f3d_link_options_public "")
 
 # F3D_STRICT_BUILD
 list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})
