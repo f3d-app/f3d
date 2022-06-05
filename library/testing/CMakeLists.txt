@@ -14,6 +14,8 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
     TestSDKImage.cxx
     TestSDKInteractionDirectory.cxx
     TestSDKWindowNative.cxx
+    TestSDKDynamicBackgrounColor.cxx
+    TestSDKDynamicFontFile.cxx
     )
 endif()
 
@@ -21,6 +23,13 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20201016)
   list(APPEND libf3dSDKTests_list
     TestSDKAnimation.cxx
+    )
+endif()
+
+# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8825
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220117)
+  list(APPEND libf3dSDKTests_list
+    TestSDKDynamicHDRI.cxx
     )
 endif()
 
