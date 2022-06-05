@@ -185,6 +185,7 @@ void vtkF3DRenderer::SetupRenderPasses()
   vtkOSPRayRendererNode::SetEnableDenoiser(this->UseRaytracingDenoiser, this);
   vtkOSPRayRendererNode::SetDenoiserThreshold(0, this);
 
+// complete SetBackgroundMode needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7341
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210123)
   vtkOSPRayRendererNode::SetBackgroundMode(
     this->HasHDRI ? vtkOSPRayRendererNode::Environment : vtkOSPRayRendererNode::Backplate, this);

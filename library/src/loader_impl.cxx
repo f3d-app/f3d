@@ -117,6 +117,8 @@ public:
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
 
+// Complete vtkProgressBarRepresentation needs
+// https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7359
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201027)
     progressRep->DrawFrameOff();
     progressRep->SetPadding(0.0, 0.0);
@@ -126,7 +128,8 @@ public:
 
   static void DisplayImporterDescription(vtkImporter* importer)
   {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210228)
+// Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210303)
     vtkIdType availCameras = importer->GetNumberOfCameras();
     if (availCameras <= 0)
     {
@@ -356,7 +359,9 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
 
   // Initialize importer for rendering
   this->Internals->Importer->SetRenderWindow(this->Internals->Window.GetRenderWindow());
-#if VTK_VERSION_NUMBER > VTK_VERSION_CHECK(9, 0, 20210228)
+
+// Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210303)
   this->Internals->Importer->SetCamera(this->Internals->Options.getAsInt("camera-index"));
 #else
   // XXX There is no way to recover the init value yet, assume it is -1
