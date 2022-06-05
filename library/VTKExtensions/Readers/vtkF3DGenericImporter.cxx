@@ -1,7 +1,6 @@
 #include "vtkF3DGenericImporter.h"
 
 #include "F3DLog.h"
-#include "vtkF3DConfigure.h"
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
@@ -187,59 +186,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     ? vtkDataSet::SafeDownCast(image)
     : vtkDataSet::SafeDownCast(surface);
 
-  std::string usedArray = this->ScalarArray;
   this->PointDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
   this->CellDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetCellData());
-  vtkDataSetAttributes* dataForColoring =
-    this->UseCellScalars ? this->CellDataForColoring : this->PointDataForColoring;
-
-  // Recover an array for coloring if we ever need it
-  this->ArrayIndexForColoring = -1;
-  if (usedArray.empty())
-  {
-    vtkDataArray* array = dataForColoring->GetScalars();
-    if (array)
-    {
-      const char* arrayName = array->GetName();
-      if (arrayName)
-      {
-        usedArray = arrayName;
-      }
-      this->OutputDescription += "\nUsing default scalar array: ";
-      this->OutputDescription += usedArray;
-    }
-    else
-    {
-      for (int i = 0; i < dataForColoring->GetNumberOfArrays(); i++)
-      {
-        array = dataForColoring->GetArray(i);
-        if (array)
-        {
-          this->ArrayIndexForColoring = i;
-          const char* arrayName = array->GetName();
-          if (arrayName)
-          {
-            usedArray = arrayName;
-          }
-          this->OutputDescription += "\nUsing first found array: ";
-          this->OutputDescription += usedArray;
-          break;
-        }
-      }
-    }
-  }
-  if (this->ArrayIndexForColoring == -1)
-  {
-    dataForColoring->GetArray(usedArray.c_str(), this->ArrayIndexForColoring);
-  }
-  if (this->ArrayIndexForColoring == -1 && !usedArray.empty() && usedArray != F3D_RESERVED_STRING)
-  {
-    F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: " + usedArray + "\n");
-  }
-  if (this->ArrayIndexForColoring == -1)
-  {
-    this->OutputDescription += "\nNo array found for scalar coloring and volume rendering";
-  }
 
   // configure props
   this->VolumeProp->SetMapper(this->VolumeMapper);

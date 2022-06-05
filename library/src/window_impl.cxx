@@ -232,6 +232,9 @@ bool window_impl::update()
 
   if (renWithColor)
   {
+    renWithColor->SetColoring(this->Internals->Options.getAsBool("cells"),
+      this->Internals->Options.getAsString("scalars"),
+      this->Internals->Options.getAsInt("component"), false);
     renWithColor->SetUsePointSprites(this->Internals->Options.getAsBool("point-sprites"), false);
     renWithColor->SetUseVolume(this->Internals->Options.getAsBool("volume"), false);
     renWithColor->SetUseInverseOpacityFunction(
@@ -308,9 +311,8 @@ void window_impl::InitializeRendererWithColoring(vtkF3DGenericImporter* importer
     renWithColor->SetPolyDataMapper(importer->GetPolyDataMapper());
     renWithColor->SetPointGaussianMapper(importer->GetPointGaussianMapper());
     renWithColor->SetVolumeMapper(importer->GetVolumeMapper());
-    renWithColor->SetColoring(importer->GetPointDataForColoring(),
-      importer->GetCellDataForColoring(), this->Internals->Options.getAsBool("cells"),
-      importer->GetArrayIndexForColoring(), this->Internals->Options.getAsInt("component"));
+    renWithColor->SetColoringAttributes(
+      importer->GetPointDataForColoring(), importer->GetCellDataForColoring());
   }
 }
 };
