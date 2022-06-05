@@ -67,9 +67,11 @@ int TestSDKExternalWindowQT(int argc, char* argv[])
     std::string(argv[1]) + "/data/cow.vtp", std::string(argv[1]) + "/baselines/", argv[2]);
   w.setTitle("F3D QT External Window");
   w.resize(300, 300);
-  w.startTimer(1000);
+  int timerId = w.startTimer(1000);
 
   w.show();
 
-  return a.exec();
+  bool ret = a.exec();
+  w.killTimer(timerId);
+  return ret;
 }
