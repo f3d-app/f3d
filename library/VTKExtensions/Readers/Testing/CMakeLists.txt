@@ -16,6 +16,7 @@ if(F3D_MODULE_OCCT)
   list(APPEND VTKExtensionsReaderTests_list TestF3DOCCTReader.cxx)
 endif()
 
+cmake_policy(SET CMP0115 NEW)
 vtk_add_test_cxx(VTKExtensionsReaderTests tests
   NO_DATA NO_VALID NO_OUTPUT
   ${VTKExtensionsReaderTests_list}
