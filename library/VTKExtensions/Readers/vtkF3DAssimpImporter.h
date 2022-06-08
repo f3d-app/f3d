@@ -62,15 +62,19 @@ public:
    */
   std::string GetOutputsDescription() override;
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
   /**
    * Get temporal informations for the currently enabled animations.
    * the three returned arguments can be defined, or not.
    * Return true in case of success, false otherwise.
    */
+// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
+#endif
 
+// Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
   /**
    * Get the number of available cameras.
    */

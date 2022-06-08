@@ -27,6 +27,7 @@ init::init()
 
   // Disable vtkLogger in case VTK was built with log support
   vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_OFF);
+// SetInternalVerbosityLevel needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7078
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200701)
   vtkLogger::SetInternalVerbosityLevel(vtkLogger::VERBOSITY_OFF);
 #endif
