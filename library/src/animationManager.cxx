@@ -45,6 +45,8 @@ void animationManager::Initialize(
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
 
+// Complete vtkProgressBarRepresentation needs
+// https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7359
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201027)
     progressRep->DrawFrameOff();
     progressRep->SetPadding(0.0, 0.0);
@@ -111,6 +113,7 @@ void animationManager::Initialize(
       int nbTimeSteps;
       vtkNew<vtkDoubleArray> timeSteps;
 
+// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
       this->Importer->GetTemporalInformation(
         animIndex, this->FrameRate, nbTimeSteps, this->TimeRange, timeSteps);

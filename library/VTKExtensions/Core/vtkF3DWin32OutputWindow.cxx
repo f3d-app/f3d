@@ -8,6 +8,7 @@
 
 vtkStandardNewMacro(vtkF3DWin32OutputWindow);
 
+// WindowTitle needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7460
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201207)
 //------------------------------------------------------------------------------
 const char* vtkF3DWin32OutputWindow::GetWindowTitle()

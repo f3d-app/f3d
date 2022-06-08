@@ -149,10 +149,6 @@ f3d_test(NAME TestTIFF DATA logo.tif ARGS -sy --up=-Y DEFAULT_LIGHTS)
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp" DEFAULT_LIGHTS)
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${CMAKE_SOURCE_DIR}/testing/data/AttackGraffiti-3zRBM.ttf DEFAULT_LIGHTS)
 f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-index=7 DEFAULT_LIGHTS)
-f3d_test(NAME TestHDRI HDRI DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
-f3d_test(NAME TestHDRIBlur HDRI DATA suzanne.ply ARGS -u --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
-f3d_test(NAME TestHDRIBlurRatio HDRI DATA suzanne.ply RESOLUTION 600,100 ARGS -u --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
-f3d_test(NAME TestHDRIEdges HDRI DATA suzanne.ply ARGS -e --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
 f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_FAIL)
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
 
@@ -163,17 +159,15 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestGLTFImporterUnlit DATA UnlitTest.glb)
   f3d_test(NAME TestMaterial DATA suzanne.ply ARGS --color=0.72,0.45,0.2 --metallic=1 --roughness=0.1)
   f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m)
-  f3d_test(NAME TestHDRI8Bit DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/logo.tif HDRI)
-  f3d_test(NAME TestHDRIOrient DATA suzanne.stl ARGS --up=+Z --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI)
-  f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply ARGS -t --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI)
+  f3d_test(NAME TestEdges DATA suzanne.ply ARGS -e)
+  f3d_test(NAME TestLineWidth DATA cow.vtk ARGS -e --line-width=5)
+
   # Test Verbose animation, no baseline needed
   f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_BASELINE REGEXP "7: CubicSpline Translation")
   # Test Animation index out of domain error
   f3d_test(NAME TestVerboseAnimationIndexError1 DATA InterpolationTest.glb ARGS --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
-
   f3d_test(NAME TestInteractionAnimation DATA InterpolationTest.glb ARGS --animation-index=-1 INTERACTION)#Space;Space;
   f3d_test(NAME TestInteractionAnimationMovement DATA KameraAnim.glb ARGS --camera-index=1 INTERACTION)#Space;MouseMovement;Space;
-  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI INTERACTION) #Shift+MouseRight;
   # Test exit hotkey
   f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
   if(NOT F3D_MODULE_RAYTRACING) # TODO fix this once we have OSPray in CI
@@ -182,24 +176,35 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   endif()
 endif()
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210429)
-  f3d_test(NAME TestGLTFMorph DATA SimpleMorph.gltf)
-endif()
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20200527)
-  f3d_test(NAME TestEdges DATA suzanne.ply ARGS -e)
-  f3d_test(NAME TestLineWidth DATA cow.vtk ARGS -e --line-width=5)
-endif()
-
-if(VTK_VERSION VERSION_GREATER 9.0.20210228)
+# Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210303)
   f3d_test(NAME TestCameraPersp DATA Cameras.gltf ARGS --camera-index=0)
   f3d_test(NAME TestCameraOrtho DATA Cameras.gltf ARGS --camera-index=1)
   # Test Verbose camera
   f3d_test(NAME TestVerboseCamera DATA Cameras.gltf ARGS --camera-index=1 --verbose NO_RENDER REGEXP "0:.*1:")
 endif()
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211006)
+# Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7900
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210429)
+  f3d_test(NAME TestGLTFMorph DATA SimpleMorph.gltf)
+endif()
+
+# no-background test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8501
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
   f3d_test(NAME TestNoBackground DATA cow.vtp ARGS --no-background)
+endif()
+
+# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8825
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220117)
+  f3d_test(NAME TestHDRI HDRI DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIBlur HDRI DATA suzanne.ply ARGS -u --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIBlurRatio HDRI DATA suzanne.ply RESOLUTION 600,100 ARGS -u --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIEdges HDRI DATA suzanne.ply ARGS -e --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRI8Bit DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/logo.tif HDRI)
+  f3d_test(NAME TestHDRIOrient DATA suzanne.stl ARGS --up=+Z --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI)
+  f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply ARGS -t --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI)
+  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI INTERACTION) #Shift+MouseRight;
+  f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #U
 endif()
 
 if(F3D_MODULE_RAYTRACING)
@@ -239,7 +244,8 @@ if(F3D_MODULE_ASSIMP)
   f3d_test(NAME TestVersionAssimp ARGS --version NO_BASELINE REGEXP "Assimp module: .\\..\\..")
   f3d_test(NAME TestVerboseCameraAssimp DATA duck.dae ARGS --verbose NO_BASELINE REGEXP "camera1")
 
-  if(VTK_VERSION VERSION_GREATER 9.0.20210728) # for TGA support and embedded textures
+  # TGA Reader needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8224
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210805) # for TGA support and embedded textures
     f3d_test(NAME TestVerboseAssimp DATA robot_kyle_walking.fbx ARGS --verbose NO_BASELINE REGEXP "Robot2")
     f3d_test(NAME TestDAE DATA duck.dae)
 
@@ -261,7 +267,6 @@ if(F3D_MODULE_ALEMBIC)
   f3d_test(NAME TestVersionAlembic ARGS --version REGEXP "Alembic module: .\\..\\..")
 endif()
 
-
 ## Interaction Tests
 # Test hotkeys
 f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #PQAT
@@ -279,11 +284,11 @@ f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_B
 f3d_test(NAME TestInteractionResetCamera DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)#MouseMovements;Return;
 f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --scalars --comp=-2  INTERACTION DEFAULT_LIGHTS) #SYYYYYYYYYY
 f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --scalars --comp=2 INTERACTION DEFAULT_LIGHTS) #S
-f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #U
 f3d_test(NAME TestInteractionDumpSceneState DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Camera position: 2.26745,3.82625,507.698")#?
 f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring")#SYOVC
 f3d_test(NAME TestInteractionEmptyDrop INTERACTION REGEXP "Drop event without any provided files.")#DropEvent Empty;
  
+# Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2
 
   configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestInteractionDropFiles.log.in"

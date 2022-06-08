@@ -26,6 +26,7 @@ public:
    */
   void WaitForUser();
 
+// WindowTitle needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7460
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201207)
   /**
    * Get the window title to display
@@ -37,6 +38,7 @@ protected:
   vtkF3DWin32OutputWindow() = default;
   ~vtkF3DWin32OutputWindow() override = default;
 
+// virtual Initialize needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7460
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201207)
   int Initialize() override;
 #else

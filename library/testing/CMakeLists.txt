@@ -17,14 +17,15 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
     )
 endif()
 
-# Animation works only with a recent version of VTK
-if(VTK_VERSION VERSION_GREATER 9.0.20201016)
+# Animation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20201016)
   list(APPEND libf3dSDKTests_list
     TestSDKAnimation.cxx
     )
 endif()
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Dropping files needs stream version 1.2
+# Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519)
   list(APPEND libf3dSDKTests_list
     TestSDKInteractorCallBack.cxx
     )

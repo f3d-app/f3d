@@ -132,9 +132,9 @@ void window_impl::setSize(int width, int height)
 //----------------------------------------------------------------------------
 bool window_impl::setIcon(const void* icon, size_t iconSize)
 {
+// SetIcon needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7004
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200616)
   // XXX This code requires that the interactor has already been set on the render window
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200615)
-  // set icon
   vtkNew<vtkPNGReader> iconReader;
   iconReader->SetMemoryBuffer(icon);
   iconReader->SetMemoryBufferLength(iconSize);

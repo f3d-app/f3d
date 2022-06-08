@@ -50,6 +50,7 @@ public:
     dropFilesCallback->SetCallback(OnDropFiles);
     this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
 
+// Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
     this->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
     this->Recorder->SetInteractor(this->VTKInteractor);
@@ -441,6 +442,7 @@ bool interactor_impl::playInteraction(const std::string& file)
   }
   else
   {
+// Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
     // Make sure the recorder is off and streams are cleared
     this->Internals->Recorder->Off();
@@ -475,6 +477,7 @@ bool interactor_impl::recordInteraction(const std::string& file)
     return false;
   }
 
+// Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
   // Make sure the recorder is off and streams are cleared
   this->Internals->Recorder->Off();
