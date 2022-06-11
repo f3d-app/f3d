@@ -67,7 +67,6 @@ int F3DStarter::Start(int argc, char** argv)
   }
   else
   {
-    // TODO Test this multiconfig behavior
     bool offscreen =
       !this->Internals->AppOptions.Reference.empty() || !this->Internals->AppOptions.Output.empty();
     this->Internals->Engine = std::make_unique<f3d::engine>(
