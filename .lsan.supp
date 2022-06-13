@@ -14,4 +14,4 @@ leak:TKXSBase
 leak:libf3dSDKTests
 
 # False positive with Qt test
-src:TestSDKExternalWindowQT.cxx
+race:libQt5Core
