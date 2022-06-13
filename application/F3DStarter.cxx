@@ -67,7 +67,6 @@ int F3DStarter::Start(int argc, char** argv)
   }
   else
   {
-    // TODO Test this multiconfig behavior
     bool offscreen =
       !this->Internals->AppOptions.Reference.empty() || !this->Internals->AppOptions.Output.empty();
     this->Internals->Engine = std::make_unique<f3d::engine>(
@@ -230,16 +229,18 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
   std::string filePath, fileInfo;
   this->Internals->Engine->getLoader().getFileInfo(load, index, filePath, fileInfo);
 
-  f3d::options& options = this->Internals->Engine->getOptions();
   if (!this->Internals->AppOptions.DryRun)
   {
     // Recover options for the file to load
-    this->Internals->Parser.GetOptionsFromConfigFile(filePath, options);
+    f3d::options configFileOptions;
+    this->Internals->Parser.GetOptionsFromConfigFile(filePath, configFileOptions);
+    this->Internals->Engine->setOptions(std::move(configFileOptions));
   }
 
   // With NoRender, force verbose
   if (this->Internals->AppOptions.NoRender)
   {
+    f3d::options& options = this->Internals->Engine->getOptions();
     options.set("verbose", true);
   }
 
