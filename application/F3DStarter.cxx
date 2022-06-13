@@ -234,7 +234,7 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
     // Recover options for the file to load
     f3d::options configFileOptions;
     this->Internals->Parser.GetOptionsFromConfigFile(filePath, configFileOptions);
-    this->Internals->Engine->setOptions(configFileOptions);
+    this->Internals->Engine->setOptions(std::move(configFileOptions));
   }
 
   // With NoRender, force verbose
