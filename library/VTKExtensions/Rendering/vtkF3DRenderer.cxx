@@ -98,6 +98,8 @@ void vtkF3DRenderer::Initialize(const std::string& fileInfo, const std::string& 
   this->AddActor(this->CheatSheetActor);
 
   this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, fileInfo.c_str());
+  this->GridInitialized = false;
+  this->GridInfo = "";
 
   // Many things depends on UpVector being set
   // Simpler to set on initialization only
@@ -205,7 +207,12 @@ void vtkF3DRenderer::SetupRenderPasses()
 //----------------------------------------------------------------------------
 std::string vtkF3DRenderer::GetRenderingDescription()
 {
-  return this->GridInfo;
+  std::string descr;
+  if (this->GridVisible)
+  {
+    descr += this->GridInfo;
+  }
+  return descr;
 }
 
 //----------------------------------------------------------------------------
@@ -249,12 +256,10 @@ bool vtkF3DRenderer::IsAxisVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowGrid(bool show)
 {
-  if (this->GridVisible != show)
+  // Initialize grid using visible prop bounds
+  // Also initialize GridInfo
+  if (!this->GridInitialized)
   {
-    // TODO Test interactive
-    this->GridVisible = show;
-
-    // Dynamic Grid
     double bounds[6];
     this->ComputeVisiblePropBounds(bounds);
 
@@ -264,11 +269,8 @@ void vtkF3DRenderer::ShowGrid(bool show)
     {
       show = false;
     }
-
-    if (show)
+    else
     {
-      this->SetClippingRangeExpansion(0.99);
-
       double diag = bbox.GetDiagonalLength();
       double unitSquare = pow(10.0, round(log10(diag * 0.1)));
 
@@ -295,12 +297,18 @@ void vtkF3DRenderer::ShowGrid(bool show)
       this->GridActor->SetPosition(gridPos);
       this->GridActor->SetMapper(gridMapper);
       this->GridActor->UseBoundsOff();
-    }
-    else
-    {
+      this->GridActor->SetVisibility(false);
       this->SetClippingRangeExpansion(0);
-      this->GridInfo = "";
+      this->GridInitialized = true;
+      this->GridVisible = false;
     }
+  }
+
+  // Actual grid visibility code
+  if (this->GridVisible != show)
+  {
+    this->SetClippingRangeExpansion(show ? 0.99 : 0);
+    this->GridVisible = show;
     this->GridActor->SetVisibility(show);
     this->ResetCameraClippingRange();
 

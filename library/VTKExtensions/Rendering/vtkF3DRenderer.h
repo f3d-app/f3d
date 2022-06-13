@@ -188,6 +188,7 @@ protected:
   bool UseBlurBackground = false;
   bool UseTrackball = false;
 
+  bool GridInitialized = false;
   int RaytracingSamples = 0;
   int UpIndex = 1;
   double UpVector[3] = { 0.0, 1.0, 0.0 };
@@ -197,6 +198,7 @@ protected:
   std::string HDRIFile;
   std::string FontFile;
 
+  std::string CurrentGridInfo;
   std::string GridInfo;
 };
 
