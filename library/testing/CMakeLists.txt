@@ -51,7 +51,7 @@ if(Qt5_FOUND AND VTK_VERSION VERSION_GREATER 9.0.1)
 endif()
 
 # create the testing file and list of tests
-# CMake variables are set to avoid work around this issue:
+# CMake variables are set to work around this issue:
 # https://gitlab.kitware.com/cmake/cmake/-/issues/21049
 set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "")
 set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "")
