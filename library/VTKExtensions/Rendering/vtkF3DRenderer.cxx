@@ -256,6 +256,8 @@ bool vtkF3DRenderer::IsAxisVisible()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowGrid(bool show)
 {
+  // Initialize grid using visible prop bounds
+  // Also initialize GridInfo
   if (!this->GridInitialized)
   {
     double bounds[6];
@@ -302,10 +304,9 @@ void vtkF3DRenderer::ShowGrid(bool show)
     }
   }
 
+  // Actual grid visibility code
   if (this->GridVisible != show)
   {
-    std::cout << show << std::endl;
-    // TODO Test interactive
     this->SetClippingRangeExpansion(show ? 0.99 : 0);
     this->GridVisible = show;
     this->GridActor->SetVisibility(show);
