@@ -151,7 +151,7 @@ configure_package_config_file(
   INSTALL_DESTINATION "lib/cmake/${PROJECT_NAME}")
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
-  VERSION "${PROJECT_VERSION}.${f3d_VERSION_BUILD}"
+  VERSION "${PROJECT_VERSION}"
   COMPATIBILITY SameMinorVersion)
 
 install(
