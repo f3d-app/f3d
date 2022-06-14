@@ -36,8 +36,8 @@ if(WIN32 AND NOT UNIX)
   # FileAssociation.nsh, from https://nsis.sourceforge.io/File_Association, has to be installed in NSIS\Include
   set(CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS
    "\
-   !include \\\"${PATH_TO_PLUGINS}\\\\FileFunc.nsh\\\"\n\
-   !include \\\"${PATH_TO_PLUGINS}\\\\FileAssociation.nsh\\\"")
+   !include \\\"FileFunc.nsh\\\"\n\
+   !include \\\"FileAssociation.nsh\\\"")
 
   # Create association on install
   set(F3D_REGISTER_LIST "${F3D_FILE_ASSOCIATION_NSIS}")

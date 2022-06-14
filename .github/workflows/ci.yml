@@ -93,6 +93,9 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: >
         cmake ../source
+        -Werror=dev
+        -Werror=deprecated
+        --warn-uninitialized
         -DBUILD_TESTING=ON
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DF3D_STRICT_BUILD=ON
@@ -172,7 +175,7 @@ jobs:
       if: matrix.os != 'macos-latest'
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -B test_sdk source/.github/test_sdk
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -B test_sdk source/.github/test_sdk
         cmake --build test_sdk
 
     - name: Setup NSIS
@@ -248,6 +251,9 @@ jobs:
       working-directory: ${{github.workspace}}/source
       run: >
         cmake ./
+        -Werror=dev
+        -Werror=deprecated
+        --warn-uninitialized
         -DBUILD_TESTING=ON
         -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON
         -DF3D_STRICT_BUILD=ON
@@ -358,6 +364,9 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: >
         cmake ../source
+        -Werror=dev
+        -Werror=deprecated
+        --warn-uninitialized
         -DBUILD_TESTING=ON
         -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON
         -DF3D_STRICT_BUILD=ON
@@ -383,4 +392,5 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: |
         export LSAN_OPTIONS=suppressions=$(pwd)/../source/.lsan.supp:use_tls=0
+        export TSAN_OPTIONS=suppressions=$(pwd)/../source/.tsan.supp
         ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV

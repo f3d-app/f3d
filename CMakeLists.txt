@@ -55,6 +55,47 @@ find_package(VTK 9.0 REQUIRED
     IOExodus
     RenderingRayTracing)
 
+# Assimp depency
+if(F3D_MODULE_ASSIMP)
+  find_package(assimp 5.0 REQUIRED)
+  if(assimp_FOUND)
+    set(F3D_ASSIMP_VERSION "${assimp_VERSION}")
+    message(STATUS "Module: assimp ${F3D_ASSIMP_VERSION} found")
+    if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.1.0")
+      message(WARNING "Module: assimp: Animations are not working with assimp 5.1.0 and newer, use assimp 5.0.X for animation support with assimp formats.")
+    endif()
+    if("${F3D_ASSIMP_VERSION}" VERSION_LESS "5.1.0")
+      message(WARNING "Module: assimp: Embedded texture are only working with assimp 5.1.X and newer.")
+    endif()
+  endif()
+endif()
+
+# OCCT dependency
+set(F3D_MODULE_OCCT_XCAF 0)
+if(F3D_MODULE_OCCT)
+  find_package(OpenCASCADE REQUIRED)
+  if(OpenCASCADE_FOUND)
+    set(F3D_OCCT_VERSION "${OpenCASCADE_VERSION}")
+    message(STATUS "Module: OpenCASCADE ${F3D_OCCT_VERSION} found")
+    if((TARGET "TKXDESTEP") AND (TARGET "TKXDEIGES"))
+      set(F3D_MODULE_OCCT_XCAF 1)
+    else()
+      message(WARNING "Module: OpenCASCADE: TKXDESTEP and TKXDEIGES are not found. Parts color and name are not supported.")
+    endif()
+    if((NOT TARGET "TKSTEP") AND (NOT TARGET "TKIGES") AND (NOT TARGET "TKMesh"))
+      message(FATAL_ERROR "Module: OpenCASCADE does not contain required modules")
+    endif()
+  endif()
+endif()
+
+# Alembic dependency
+if(F3D_MODULE_ALEMBIC)
+  find_package(Alembic 1.7 REQUIRED)
+  if(Alembic_FOUND)
+    set(F3D_ALEMBIC_VERSION "${Alembic_VERSION}")
+    message(STATUS "Module: alembic ${Alembic_VERSION} found")
+  endif()
+endif()
 
 # Shared options between application and library
 include(GNUInstallDirs)
@@ -67,6 +108,7 @@ cmake_dependent_option(BUILD_SHARED_LIBS "Build f3d with shared libraries" ON "N
 # F3D_STRICT_BUILD
 set(F3D_STRICT_BUILD OFF CACHE BOOL "Use strict warnings and errors flags for building F3D")
 mark_as_advanced(F3D_STRICT_BUILD)
+set(f3d_strict_build_compile_options "")
 if(F3D_STRICT_BUILD)
   if(MSVC)
     # Warning C4275 is essentially noise, disabling it to silent an issue with jsoncpp library
@@ -81,6 +123,8 @@ endif()
 
 # Coverage
 cmake_dependent_option(F3D_COVERAGE "Emit coverage files" OFF "UNIX" OFF)
+set(f3d_coverage_compile_options "")
+set(f3d_coverage_link_options "")
 if(F3D_COVERAGE)
   set(f3d_coverage_compile_options -g -O0 --coverage)
   set(f3d_coverage_link_options --coverage)
@@ -96,15 +140,17 @@ if(NOT UNIX)
   set_property(CACHE F3D_SANITIZER PROPERTY TYPE INTERNAL)
 endif()
 
+set(f3d_sanitizer_compile_options "")
+set(f3d_sanitizer_link_options "")
 if(NOT F3D_SANITIZER STREQUAL "none")
-  set(sanitizer_compile_options -fsanitize=${F3D_SANITIZER} -fno-optimize-sibling-calls -fno-omit-frame-pointer -g)
+  set(f3d_sanitizer_compile_options -fsanitize=${F3D_SANITIZER} -fno-optimize-sibling-calls -fno-omit-frame-pointer -g)
   if(${F3D_SANITIZER} STREQUAL "address")
-    list(APPEND sanitizer_compile_options -fsanitize-address-use-after-scope)
+    list(APPEND f3d_sanitizer_compile_options -fsanitize-address-use-after-scope)
   endif()
   if(${F3D_SANITIZER} STREQUAL "memory")
-    list(APPEND sanitizer_compile_options -fsanitize-memory-track-origins)
+    list(APPEND f3d_sanitizer_compile_options -fsanitize-memory-track-origins)
   endif()
-  set(sanitizer_link_options -fsanitize=${F3D_SANITIZER})
+  set(f3d_sanitizer_link_options -fsanitize=${F3D_SANITIZER})
 endif()
 
 # Testing
