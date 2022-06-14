@@ -376,7 +376,7 @@ The third block specifies raytracing usage for .gltf and .glb files.
 The last block specifies that volume rendering should be used with .mhd files.
 
 The following command-line options <br>cannot</br> be set via config file:
-`help`, `version`, `config`, `dry-run`, `no-render`, `inputs`, `output` and all testing options.
+`help`, `version`, `config`, `dry-run`, `no-render`, `inputs`, `output`, `quiet`, `verbose` and all testing options.
 
 Boolean options that have been turned on in the configuration file can be turned
 off in the command line if needed, eg: `--point-sprites=false`

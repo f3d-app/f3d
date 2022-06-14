@@ -197,8 +197,8 @@ void ConfigurationOptions::GetOptionsFromArgs(
     this->DeclareOption(grp0, "no-render", "", "Verbose mode without any rendering, only for the first file", appOptions.NoRender, true, false);
 
     auto grp1 = cxxOptions.add_options("General");
-    this->DeclareOption(grp1, "verbose", "", "Enable verbose mode, providing more information about the loaded data in the console output", options.getAsBoolRef("verbose"));
-    this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which superseed any verbose options and prevent any console output to be generated at all", options.getAsBoolRef("quiet"));
+    this->DeclareOption(grp1, "verbose", "", "Enable verbose mode, providing more information about the loaded data in the console output", appOptions.Verbose);
+    this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which superseed any verbose options and prevent any console output to be generated at all", appOptions.Quiet);
     this->DeclareOption(grp1, "progress", "", "Show progress bar", options.getAsBoolRef("progress"));
     this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", options.getAsBoolRef("geometry-only"));
     this->DeclareOption(grp1, "up", "", "Up direction", options.getAsStringRef("up"), true, "[-X|+X|-Y|+Y|-Z|+Z]");

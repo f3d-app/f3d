@@ -31,13 +31,13 @@ public:
   static void DisplayCameraInformation(vtkCamera* cam)
   {
     double* position = cam->GetPosition();
-    log::info("Camera position is: ", position[0], ", ", position[1], ", ", position[2], ".");
+    log::debug("Camera position is: ", position[0], ", ", position[1], ", ", position[2], ".");
     double* focalPoint = cam->GetFocalPoint();
-    log::info(
+    log::debug(
       "Camera focal point is: ", focalPoint[0], ", ", focalPoint[1], ", ", focalPoint[2], ".");
     double* viewUp = cam->GetViewUp();
-    log::info("Camera view up is: ", viewUp[0], ", ", viewUp[1], ", ", viewUp[2], ".");
-    log::info("Camera view angle is: ", cam->GetViewAngle(), ".\n");
+    log::debug("Camera view up is: ", viewUp[0], ", ", viewUp[1], ", ", viewUp[2], ".");
+    log::debug("Camera view angle is: ", cam->GetViewAngle(), ".\n");
   }
 
   bool UpdateCamera(const options& options)
@@ -80,10 +80,7 @@ public:
       cam->Elevation(options.getAsDouble("camera-elevation-angle"));
       cam->OrthogonalizeViewUp();
 
-      if (options.getAsBool("verbose"))
-      {
-        window_impl::internals::DisplayCameraInformation(cam);
-      }
+      window_impl::internals::DisplayCameraInformation(cam);
     }
 
     this->Renderer->InitializeCamera();
@@ -249,10 +246,7 @@ bool window_impl::update()
   this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("grid"));
 
   // Print coloring info when available
-  if (this->Internals->Options.getAsBool("verbose"))
-  {
-    log::info(this->Internals->Renderer->GetRenderingDescription());
-  }
+  log::debug(this->Internals->Renderer->GetRenderingDescription());
 
   return this->Internals->UpdateCamera(this->Internals->Options);
 }

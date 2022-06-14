@@ -7,22 +7,22 @@ int TestSDKOptions(int argc, char* argv[])
   f3d::options opt;
 
   // Test bool
-  opt.set("quiet", true);
-  if (opt.getAsBool("quiet") != true)
+  opt.set("cells", true);
+  if (opt.getAsBool("cells") != true)
   {
     std::cerr << "Options set/getAs bool is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
   bool valBool;
-  opt.get("quiet", valBool);
+  opt.get("cells", valBool);
   if (valBool != true)
   {
     std::cerr << "Options get bool is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  bool& refBool = opt.getAsBoolRef("quiet");
+  bool& refBool = opt.getAsBoolRef("cells");
   refBool = false;
-  opt.get("quiet", valBool);
+  opt.get("cells", valBool);
   if (valBool != false)
   {
     std::cerr << "Options getAsBoolRef is not behaving as expected." << std::endl;
@@ -138,8 +138,8 @@ int TestSDKOptions(int argc, char* argv[])
   }
 
   // Test chaining options
-  opt.set("quiet", true).set("quiet", false);
-  if (opt.getAsBool("quiet") != false)
+  opt.set("cells", true).set("cells", false);
+  if (opt.getAsBool("cells") != false)
   {
     std::cerr << "Chaining options is not working." << std::endl;
     return EXIT_FAILURE;
@@ -147,11 +147,11 @@ int TestSDKOptions(int argc, char* argv[])
 
   // Test error paths
   double val;
-  opt.set("quiet", 2.13);
-  opt.get("quiet", val);
+  opt.set("cells", 2.13);
+  opt.get("cells", val);
   try
   {
-    double& refVal = opt.getAsDoubleRef("quiet");
+    double& refVal = opt.getAsDoubleRef("cells");
   }
   catch (const f3d::options::exception& ex)
   {
@@ -169,7 +169,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cout << "Expected exception:" << ex.what() << std::endl;
   }
 
-  if (opt.getAsBool("quiet") != false)
+  if (opt.getAsBool("cells") != false)
   {
     std::cerr << "Options error paths not behaving as expected." << std::endl;
     return EXIT_FAILURE;

@@ -59,22 +59,19 @@ void animationManager::Initialize(
     this->ProgressWidget = nullptr;
   }
 
-  if (options->getAsBool("verbose"))
+  if (availAnimations <= 0)
   {
-    if (availAnimations <= 0)
-    {
-      log::info("No animations available in this file");
-    }
-    else
-    {
-      log::info("Animation(s) available in this file are:");
-    }
-    for (int i = 0; i < availAnimations; i++)
-    {
-      log::info(i, ": ", this->Importer->GetAnimationName(i));
-    }
-    log::info("\n");
+    log::debug("No animations available in this file");
   }
+  else
+  {
+    log::debug("Animation(s) available in this file are:");
+  }
+  for (int i = 0; i < availAnimations; i++)
+  {
+    log::debug(i, ": ", this->Importer->GetAnimationName(i));
+  }
+  log::debug("\n");
 
   int animationIndex = options->getAsInt("animation-index");
   if (animationIndex != 0 && availAnimations <= 0)
