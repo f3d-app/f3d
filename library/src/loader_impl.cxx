@@ -133,20 +133,19 @@ public:
     vtkIdType availCameras = importer->GetNumberOfCameras();
     if (availCameras <= 0)
     {
-      log::info("No camera available in this file");
+      log::debug("No camera available in this file");
     }
     else
     {
-      log::info("Camera(s) available in this file are:");
+      log::debug("Camera(s) available in this file are:");
     }
     for (int i = 0; i < availCameras; i++)
     {
-      log::info(i, ": ", importer->GetCameraName(i));
+      log::debug(i, ": ", importer->GetCameraName(i));
     }
-    log::info("\n");
+    log::debug("");
 #endif
-    log::info(importer->GetOutputsDescription());
-    log::info("\n");
+    log::debug(importer->GetOutputsDescription(), "\n");
   }
 
   std::vector<std::string> FilesList;
@@ -303,29 +302,15 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   // Reset loadedFile
   this->Internals->LoadedFile = false;
 
-  // Make sure quiet is respected
-  log::setQuiet(this->Internals->Options.getAsBool("quiet"));
-
   // Recover information about the file to load
   std::string filePath, fileInfo;
   int nextFileIndex;
   this->getFileInfo(load, nextFileIndex, filePath, fileInfo);
-  bool verbose = this->Internals->Options.getAsBool("verbose");
-  if (verbose)
-  {
-    if (filePath.empty())
-    {
-      log::info("No file to load provided\n");
-    }
-    else
-    {
-      log::info("Loading: ", filePath, "\n");
-    }
-  }
 
   if (filePath.empty())
   {
     // No file provided, show a drop zone instead
+    log::debug("No file to load provided\n");
     fileInfo += "No file to load provided, please drop one into this window";
     this->Internals->Window.Initialize(false, fileInfo);
     this->Internals->Window.update();
@@ -333,6 +318,7 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   }
 
   // There is a file to load, update CurrentFileIndex
+  log::debug("Loading: ", filePath, "\n");
   this->Internals->CurrentFileIndex = nextFileIndex;
 
   // Recover the importer
@@ -387,10 +373,7 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
 
   // Read the file
   this->Internals->Importer->Update();
-  if (verbose)
-  {
-    loader_impl::internals::DisplayImporterDescription(this->Internals->Importer);
-  }
+  loader_impl::internals::DisplayImporterDescription(this->Internals->Importer);
 
   // Remove anything progress related if any
   this->Internals->Importer->RemoveObservers(vtkCommand::ProgressEvent);

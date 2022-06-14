@@ -7,6 +7,8 @@
 #include "vtkF3DWin32OutputWindow.h"
 #endif
 
+F3DLog::Severity F3DLog::VerboseLevel = F3DLog::Severity::Info;
+
 //----------------------------------------------------------------------------
 void F3DLog::Print(Severity sev, const std::string& str)
 {
@@ -14,14 +16,29 @@ void F3DLog::Print(Severity sev, const std::string& str)
   switch (sev)
   {
     default:
+    case F3DLog::Severity::Debug:
+      if (F3DLog::VerboseLevel <= F3DLog::Severity::Debug)
+      {
+        win->DisplayText(str.c_str());
+      }
+      break;
     case F3DLog::Severity::Info:
-      win->DisplayText(str.c_str());
+      if (F3DLog::VerboseLevel <= F3DLog::Severity::Info)
+      {
+        win->DisplayText(str.c_str());
+      }
       break;
     case F3DLog::Severity::Warning:
-      win->DisplayWarningText(str.c_str());
+      if (F3DLog::VerboseLevel <= F3DLog::Severity::Warning)
+      {
+        win->DisplayWarningText(str.c_str());
+      }
       break;
     case F3DLog::Severity::Error:
-      win->DisplayErrorText(str.c_str());
+      if (F3DLog::VerboseLevel <= F3DLog::Severity::Error)
+      {
+        win->DisplayErrorText(str.c_str());
+      }
       break;
   }
 }

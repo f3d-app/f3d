@@ -4,7 +4,7 @@
  *
  * A class to output logs to the standard output.
  * It supports different levels, errors, warnings and info, with associated coloring.
- * A few static methods exists to control the coloring and to quiet all class.
+ * A few static methods exists to control the coloring and the verbosity level
  * A waitForUser utility static method exist for windows.
  *
  */
@@ -22,6 +22,35 @@ namespace f3d
 class F3D_EXPORT log
 {
 public:
+  /**
+   * Enumeration of verbose levels
+   * =============================
+   * DEBUG: All logs are displayed
+   * INFO: Standard logging level, the default
+   * WARN: Only warnings and errors are displayed
+   * ERROR: Only errors are displayed
+   * QUIET: Logging is fully disabled
+   */
+  enum class VerboseLevel : unsigned char
+  {
+    DEBUG = 0,
+    INFO,
+    WARN,
+    ERROR,
+    QUIET
+  };
+
+  /**
+   * Log provided args as a debug.
+   */
+  template<typename... Args>
+  static void debug(Args... args)
+  {
+    std::stringstream ss;
+    log::appendArg(ss, args...);
+    log::debugInternal(ss.str());
+  }
+
   /**
    * Log provided args as an info.
    */
@@ -61,9 +90,9 @@ public:
   static void setUseColoring(bool use);
 
   /**
-   * Set if any log should be outputted or not.
+   * Set the verbose level
    */
-  static void setQuiet(bool quiet);
+  static void setVerboseLevel(VerboseLevel level);
 
   /**
    * Wait for user if applicable (eg: win32 output window)
@@ -84,6 +113,7 @@ protected:
   static void errorInternal(const std::string& msg);
   static void warnInternal(const std::string& msg);
   static void infoInternal(const std::string& msg);
+  static void debugInternal(const std::string& msg);
 };
 }
 

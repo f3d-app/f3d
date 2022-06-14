@@ -1,4 +1,5 @@
 #include <engine.h>
+#include <log.h>
 #include <options.h>
 #include <window.h>
 
@@ -6,6 +7,7 @@
 
 int TestSDKWindowNative(int argc, char* argv[])
 {
+  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
   f3d::engine eng;
   f3d::window& win = eng.getWindow();
   win.setWindowName("Test");
@@ -18,7 +20,7 @@ int TestSDKWindowNative(int argc, char* argv[])
   }
 
   f3d::options& options = eng.getOptions();
-  options.set("background-color", { 0.8, 0.2, 0.9 }).set("verbose", true);
+  options.set("background-color", { 0.8, 0.2, 0.9 });
   win.update();
 
   // Use a higher threshold as background difference can be strong with mesa

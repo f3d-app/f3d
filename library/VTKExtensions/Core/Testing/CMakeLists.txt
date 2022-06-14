@@ -10,5 +10,5 @@ vtk_test_cxx_executable(VTKExtensionsCoreTests tests)
 
 if(UNIX)
   # On windows, the default window output message does not redirect to cout
-  set_tests_properties(f3d::VTKExtensionsCoreCxx-TestF3DLog PROPERTIES PASS_REGULAR_EXPRESSION "Test Info Test Warning Test Error Test Info Coloring Test Warning Coloring Test Error Coloring")
+  set_tests_properties(f3d::VTKExtensionsCoreCxx-TestF3DLog PROPERTIES PASS_REGULAR_EXPRESSION "Test Info Test Warning Test Error\nTest Debug Test Info Test Warning Test Error\nTest Warning Test Error\nTest Error\nTest Info Coloring Test Warning Coloring Test Error Coloring\n")
 endif()

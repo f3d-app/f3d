@@ -21,7 +21,7 @@ public:
    *  - Control VTK global warning mechanism
    *  - Control VTK logger behavior
    *  - Create and register VTK factories
-   *  - Set log::quiet to false to initialize the output window
+   *  - Set log verbose level to info to initialize the output window
    */
   init();
 

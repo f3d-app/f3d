@@ -5,6 +5,12 @@
 namespace f3d
 {
 //----------------------------------------------------------------------------
+void log::debugInternal(const std::string& str)
+{
+  F3DLog::Print(F3DLog::Severity::Debug, str);
+}
+
+//----------------------------------------------------------------------------
 void log::infoInternal(const std::string& str)
 {
   F3DLog::Print(F3DLog::Severity::Info, str);
@@ -29,9 +35,27 @@ void log::setUseColoring(bool use)
 }
 
 //----------------------------------------------------------------------------
-void log::setQuiet(bool quiet)
+void log::setVerboseLevel(log::VerboseLevel level)
 {
-  F3DLog::SetQuiet(quiet);
+  F3DLog::SetQuiet(level == log::VerboseLevel::QUIET);
+  switch (level)
+  {
+    case (log::VerboseLevel::DEBUG):
+      F3DLog::VerboseLevel = F3DLog::Severity::Debug;
+      break;
+    case (log::VerboseLevel::INFO):
+      F3DLog::VerboseLevel = F3DLog::Severity::Info;
+      break;
+    case (log::VerboseLevel::WARN):
+      F3DLog::VerboseLevel = F3DLog::Severity::Warning;
+      break;
+    case (log::VerboseLevel::ERROR):
+      F3DLog::VerboseLevel = F3DLog::Severity::Error;
+      break;
+    case (log::VerboseLevel::QUIET):
+    default:
+      break;
+  }
 }
 
 //----------------------------------------------------------------------------

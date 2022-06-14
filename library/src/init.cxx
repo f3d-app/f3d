@@ -39,7 +39,7 @@ init::init()
 
   // Make sure to initialize the output window
   // after the object factory and before the first usage.
-  log::setQuiet(false);
+  log::setVerboseLevel(log::VerboseLevel::INFO);
 }
 
 //----------------------------------------------------------------------------
