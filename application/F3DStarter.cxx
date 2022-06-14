@@ -49,8 +49,15 @@ int F3DStarter::Start(int argc, char** argv)
   this->Internals->Parser.GetOptionsFromCommandLine(
     this->Internals->AppOptions, commandLineOptions, files);
 
-  // Respect quiet option
-  f3d::log::setQuiet(commandLineOptions.getAsBool("quiet"));
+  // Set verbosity level
+  if (this->Internals->AppOptions.Quiet)
+  {
+    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
+  }
+  else if (this->Internals->AppOptions.Verbose || this->Internals->AppOptions.NoRender)
+  {
+    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+  }
 
   // Initialize the config file dictionary
   this->Internals->Parser.InitializeDictionaryFromConfigFile(
@@ -235,13 +242,6 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
     f3d::options configFileOptions;
     this->Internals->Parser.GetOptionsFromConfigFile(filePath, configFileOptions);
     this->Internals->Engine->setOptions(std::move(configFileOptions));
-  }
-
-  // With NoRender, force verbose
-  if (this->Internals->AppOptions.NoRender)
-  {
-    f3d::options& options = this->Internals->Engine->getOptions();
-    options.set("verbose", true);
   }
 
   // Load the file

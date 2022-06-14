@@ -17,10 +17,17 @@ namespace F3DLog
 {
 enum class Severity : unsigned char
 {
+  Debug = 0,
   Info,
   Warning,
   Error
 };
+
+/**
+ * Set this global variable to control the verbose level
+ * that actually display something in Print
+ */
+extern Severity VerboseLevel;
 
 /**
  * Print a message with corresponding severity in the output window
@@ -35,6 +42,7 @@ void SetUseColoring(bool use);
 
 /**
  * Set if any log should be shown or not.
+ * Override the verbosity level completely.
  */
 void SetQuiet(bool quiet);
 

@@ -85,10 +85,7 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
-          if (self->Options.getAsBool("verbose"))
-          {
-            log::info(renWithColor->GetRenderingDescription());
-          }
+          log::debug(renWithColor->GetRenderingDescription());
           renWin->Render();
         }
         break;
@@ -96,10 +93,7 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
-          if (self->Options.getAsBool("verbose"))
-          {
-            log::info(renWithColor->GetRenderingDescription());
-          }
+          log::debug(renWithColor->GetRenderingDescription());
           renWin->Render();
         }
         break;
@@ -107,10 +101,7 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
-          if (self->Options.getAsBool("verbose"))
-          {
-            log::info(renWithColor->GetRenderingDescription());
-          }
+          log::debug(renWithColor->GetRenderingDescription());
           renWin->Render();
         }
         break;
@@ -180,10 +171,7 @@ public:
         if (renWithColor)
         {
           renWithColor->SetUseVolume(!renWithColor->UsingVolume());
-          if (self->Options.getAsBool("verbose"))
-          {
-            log::info(renWithColor->GetRenderingDescription());
-          }
+          log::debug(renWithColor->GetRenderingDescription());
           renWin->Render();
         }
         break;
@@ -198,10 +186,7 @@ public:
         if (renWithColor)
         {
           renWithColor->SetUsePointSprites(!renWithColor->UsingPointSprites());
-          if (self->Options.getAsBool("verbose"))
-          {
-            log::info(renWithColor->GetRenderingDescription());
-          }
+          log::debug(renWithColor->GetRenderingDescription());
           renWin->Render();
         }
         break;

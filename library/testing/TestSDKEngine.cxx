@@ -28,10 +28,10 @@ int TestSDKEngine(int argc, char* argv[])
 
   // Test option setters
   f3d::options opt;
-  opt.set("quiet", true);
+  opt.set("cells", true);
 
   eng0.setOptions(opt);
-  if (!eng0.getOptions().getAsBool("quiet"))
+  if (!eng0.getOptions().getAsBool("cells"))
   {
     std::cerr << "Unexpected options value using f3d::engine::setOptions(const options& opt)"
               << std::endl;

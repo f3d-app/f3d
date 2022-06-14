@@ -106,10 +106,6 @@ public:
 options::options()
   : Internals(new options::internals)
 {
-  // General
-  this->Internals->init("quiet", false);
-  this->Internals->init("verbose", false);
-
   // Loader/Loading
   this->Internals->init("animation-index", 0);
   this->Internals->init("geometry-only", false);
