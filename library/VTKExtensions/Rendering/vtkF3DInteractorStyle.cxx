@@ -59,7 +59,7 @@ void vtkF3DInteractorStyle::Rotate()
 
   double dot = vtkMath::Dot(dir, up);
 
-  bool canElevate = ren->UsingTrackball() || std::abs(dot) < 0.99 || !std::signbit(dot * ryf);
+  bool canElevate = ren->GetUseTrackball() || std::abs(dot) < 0.99 || !std::signbit(dot * ryf);
 
   camera->Azimuth(rxf);
 
@@ -68,7 +68,7 @@ void vtkF3DInteractorStyle::Rotate()
     camera->Elevation(ryf);
   }
 
-  if (!ren->UsingTrackball())
+  if (!ren->GetUseTrackball())
   {
     // orthogonalize up vector based on focal direction
     vtkMath::MultiplyScalar(dir, dot);

@@ -34,53 +34,49 @@ public:
 
   //@{
   /**
-   * Set/Get the visibility of the scalar bar.
+   * Set the visibility of the scalar bar.
    * It will only be shown when coloring and not
    * using direct scalars rendering.
    */
-  void ShowScalarBar(bool show, bool update = true);
-  bool IsScalarBarVisible();
+  void ShowScalarBar(bool show);
   //@}
 
   //@{
   /**
-   * Set/Get the visibility of the point sprites actor.
-   * It will inly be shown if raytracing and volume are not enabled
+   * Set the visibility of the point sprites actor.
+   * It will only be shown if raytracing and volume are not enabled
    */
-  void SetUsePointSprites(bool use, bool update = true);
-  bool UsingPointSprites();
+  void SetUsePointSprites(bool use);
   //@}
 
   //@{
   /**
-   * Set/Get the visibility of the volume actor.
-   * It will inly be shown if the data is compatible with volume rendering
+   * Set the visibility of the volume actor.
+   * It will only be shown if the data is compatible with volume rendering
    * and raytracing is not enabled
    */
-  void SetUseVolume(bool use, bool update = true);
-  bool UsingVolume();
+  void SetUseVolume(bool use);
   //@}
 
   //@{
   /**
-   * Set/Get the use of an inverted opacity function
+   * Set the use of an inverted opacity function
    * for volume rendering..
    */
-  bool UsingInverseOpacityFunction();
-  void SetUseInverseOpacityFunction(bool use, bool update = true);
+  void SetUseInverseOpacityFunction(bool use);
   //@}
 
   /**
    * Set the range of the scalar bar
    * Setting an empty vector will use automatic range
    */
-  void SetScalarBarRange(const std::vector<double>& range, bool update = true);
+  void SetScalarBarRange(const std::vector<double>& range);
 
   /**
    * Set the colormap to use
    * Setting an empty vector will use defaut color map
    */
-  void SetColormap(const std::vector<double>& colormap, bool update = true);
+  void SetColormap(const std::vector<double>& colormap);
 
   enum CycleTypeEnum
   {
@@ -151,17 +147,16 @@ public:
   //@}
 
   /**
-   * Set the coloring attributes
+   * Set the coloring attributes, call before SetColoring.
    */
   void SetColoringAttributes(vtkDataSetAttributes* pointData, vtkDataSetAttributes* cellData);
 
   /**
-   * Set the coloring.
+   * Set the coloring, call after SetColoringAttributes.
    * This method will try to find the corresponding array in the coloring attributes and will
    * position ArrayIndexForColoring and DataForColoring accordingly.
    */
-  void SetColoring(
-    bool useCellData, const std::string& arrayName, int component, bool update = true);
+  void SetColoring(bool useCellData, const std::string& arrayName, int component);
 
   /**
    * Get the current coloring configuration,
