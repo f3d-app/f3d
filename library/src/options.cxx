@@ -162,6 +162,7 @@ options::options()
   this->Internals->init("tone-mapping", false);
   this->Internals->init("trackball", false);
   this->Internals->init("volume", false);
+  this->Internals->init("cheatsheet", false);
 };
 
 //----------------------------------------------------------------------------
@@ -372,6 +373,13 @@ std::vector<int>& options::getAsIntVectorRef(const std::string& name)
 std::vector<double>& options::getAsDoubleVectorRef(const std::string& name)
 {
   return this->Internals->getRef<std::vector<double> >(name);
+}
+
+//----------------------------------------------------------------------------
+options& options::toggle(const std::string& name)
+{
+  this->Internals->set<bool>(name, !this->Internals->get<bool>(name));
+  return *this;
 }
 
 }

@@ -27,7 +27,7 @@ namespace f3d::detail
 class interactor_impl::internals
 {
 public:
-  internals(const options& options, window_impl& window, loader_impl& loader)
+  internals(options& options, window_impl& window, loader_impl& loader)
     : Options(options)
     , Window(window)
     , Loader(loader)
@@ -78,6 +78,8 @@ public:
     vtkRenderWindow* renWin = self->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
     vtkF3DRendererWithColoring* renWithColor = vtkF3DRendererWithColoring::SafeDownCast(ren);
+    bool checkColoring = false;
+    bool render = false;
 
     switch (keyCode)
     {
@@ -85,151 +87,139 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
-          log::debug(renWithColor->GetRenderingDescription());
-          renWin->Render();
+          checkColoring = true;
+          render = true;
         }
         break;
       case 'S':
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
-          log::debug(renWithColor->GetRenderingDescription());
-          renWin->Render();
+          checkColoring = true;
+          render = true;
         }
         break;
       case 'Y':
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
-          log::debug(renWithColor->GetRenderingDescription());
-          renWin->Render();
+          checkColoring = true;
+          render = true;
         }
         break;
       case 'B':
-        if (renWithColor)
-        {
-          renWithColor->ShowScalarBar(!renWithColor->IsScalarBarVisible());
-          renWin->Render();
-        }
+        self->Options.toggle("bar");
+        render = true;
         break;
       case 'p':
       case 'P':
-        ren->SetUseDepthPeelingPass(!ren->UsingDepthPeelingPass());
-        renWin->Render();
+        self->Options.toggle("depth-peeling");
+        render = true;
         break;
       case 'Q':
-        ren->SetUseSSAOPass(!ren->UsingSSAOPass());
-        renWin->Render();
+        self->Options.toggle("ssao");
+        render = true;
         break;
       case 'A':
-        ren->SetUseFXAAPass(!ren->UsingFXAAPass());
-        renWin->Render();
+        self->Options.toggle("fxaa");
+        render = true;
         break;
       case 'T':
-        ren->SetUseToneMappingPass(!ren->UsingToneMappingPass());
-        renWin->Render();
+        self->Options.toggle("tone-mapping");
+        render = true;
         break;
       case 'E':
-        ren->ShowEdge(!ren->IsEdgeVisible());
-        renWin->Render();
+        self->Options.toggle("edges");
+        render = true;
         break;
       case 'X':
-        ren->ShowAxis(!ren->IsAxisVisible());
-        renWin->Render();
+        self->Options.toggle("axis");
+        render = true;
         break;
       case 'G':
-        ren->ShowGrid(!ren->IsGridVisible());
-        renWin->Render();
+        self->Options.toggle("grid");
+        render = true;
         break;
       case 'N':
-        ren->ShowFilename(!ren->IsFilenameVisible());
-        renWin->Render();
+        self->Options.toggle("filename");
+        render = true;
         break;
       case 'M':
-        ren->ShowMetaData(!ren->IsMetaDataVisible());
-        renWin->Render();
+        self->Options.toggle("metadata");
+        render = true;
         break;
       case 'Z':
-        ren->ShowTimer(!ren->IsTimerVisible());
-        renWin->Render();
-        if (ren->IsTimerVisible())
-        {
-          // Needed to show a correct value, computed at the previous render
-          // TODO: Improve this by computing it and displaying it within a single render
-          renWin->Render();
-        }
+        self->Options.toggle("fps");
+        self->Window.update();
+        self->Window.render();
+        self->Window.render();
+        // XXX: Double render is needed here
         break;
       case 'R':
-        ren->SetUseRaytracing(!ren->UsingRaytracing());
-        renWin->Render();
+        self->Options.toggle("raytracing");
+        render = true;
         break;
       case 'D':
-        ren->SetUseRaytracingDenoiser(!ren->UsingRaytracingDenoiser());
-        renWin->Render();
+        self->Options.toggle("denoise");
+        render = true;
         break;
       case 'V':
-        if (renWithColor)
-        {
-          renWithColor->SetUseVolume(!renWithColor->UsingVolume());
-          log::debug(renWithColor->GetRenderingDescription());
-          renWin->Render();
-        }
+        self->Options.toggle("volume");
+        render = true;
         break;
       case 'I':
-        if (renWithColor)
-        {
-          renWithColor->SetUseInverseOpacityFunction(!renWithColor->UsingInverseOpacityFunction());
-          renWin->Render();
-        }
+        self->Options.toggle("inverse");
+        render = true;
         break;
       case 'O':
-        if (renWithColor)
-        {
-          renWithColor->SetUsePointSprites(!renWithColor->UsingPointSprites());
-          log::debug(renWithColor->GetRenderingDescription());
-          renWin->Render();
-        }
+        self->Options.toggle("point-sprites");
+        render = true;
         break;
       case 'F':
-        if (!renWin->GetFullScreen())
-        {
-          // save current window position and size
-          int* pos = renWin->GetPosition();
-          self->WindowPos[0] = pos[0];
-          self->WindowPos[1] = pos[1];
-          int* size = renWin->GetSize();
-          self->WindowSize[0] = size[0];
-          self->WindowSize[1] = size[1];
-        }
+        self->Options.toggle("fullscreen");
+        render = true;
+        /*        if (!renWin->GetFullScreen())
+                {
+                  // save current window position and size
+                  int* pos = renWin->GetPosition();
+                  self->WindowPos[0] = pos[0];
+                  self->WindowPos[1] = pos[1];
+                  int* size = renWin->GetSize();
+                  self->WindowSize[0] = size[0];
+                  self->WindowSize[1] = size[1];
+                }
 
-        renWin->SetFullScreen(!renWin->GetFullScreen());
+                renWin->SetFullScreen(!renWin->GetFullScreen());
 
-        if (!renWin->GetFullScreen() && self->WindowSize[0] > 0)
-        {
-          // restore previous window position and size
-          renWin->SetPosition(self->WindowPos);
-          renWin->SetSize(self->WindowSize);
-        }
+                if (!renWin->GetFullScreen() && self->WindowSize[0] > 0)
+                {
+                  // restore previous window position and size
+                  renWin->SetPosition(self->WindowPos);
+                  renWin->SetSize(self->WindowSize);
+                }
 
-        // when going full screen, the OpenGL context changes, we need to reinitialize
-        // the interactor, the render passes and the grid actor.
-        ren->ShowGrid(ren->IsGridVisible());
-        ren->SetupRenderPasses();
-        rwi->ReInitialize();
+                // when going full screen, the OpenGL context changes, we need to reinitialize
+                // the interactor, the render passes and the grid actor.
+                ren->ShowGrid(ren->IsGridVisible());
+                ren->SetupRenderPasses();
+                rwi->ReInitialize();
 
-        renWin->Render();
+                renWin->Render();*/ // TODO currently this breaks.
+        // should we just remove this hotkey as it is broken and nobody cares much about it ?
+
         break;
       case 'U':
-        ren->SetUseBlurBackground(!ren->UsingBlurBackground());
-        renWin->Render();
+        self->Options.toggle("blur-background");
+        render = true;
         break;
       case 'K':
-        ren->SetUseTrackball(!ren->UsingTrackball());
-        renWin->Render();
+        self->Options.toggle("trackball");
+        render = true;
         break;
       case 'H':
-        ren->ShowCheatSheet(!ren->IsCheatSheetVisible());
-        renWin->Render();
+        // Is this actually necessary ?
+        self->Options.toggle("cheatsheet");
+        render = true;
         break;
       case '?':
       {
@@ -243,21 +233,21 @@ public:
           self->AnimationManager.StopAnimation();
           loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_PREVIOUS;
           self->Loader.loadFile(load);
-          renWin->Render();
+          render = true;
         }
         else if (keySym == "Right")
         {
           self->AnimationManager.StopAnimation();
           loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_NEXT;
           self->Loader.loadFile(load);
-          renWin->Render();
+          render = true;
         }
         else if (keySym == "Up")
         {
           self->AnimationManager.StopAnimation();
           loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_CURRENT;
           self->Loader.loadFile(load);
-          renWin->Render();
+          render = true;
         }
         else if (keySym == F3D_EXIT_HOTKEY_SYM)
         {
@@ -266,14 +256,29 @@ public:
         else if (keySym == "Return")
         {
           ren->ResetCamera();
-          renWin->Render();
         }
         else if (keySym == "Space")
         {
           self->AnimationManager.ToggleAnimation();
-          renWin->Render();
         }
         break;
+    }
+
+    if (checkColoring)
+    {
+      // TODO This is not super great, do better ?
+      bool useCell;
+      std::string arrayName;
+      int component;
+      renWithColor->GetColoring(useCell, arrayName, component);
+      self->Options.set("cells", useCell);
+      self->Options.set("scalars", arrayName);
+      self->Options.set("component", component);
+    }
+    if (render)
+    {
+      self->Window.update();
+      self->Window.render();
     }
   }
 
@@ -315,7 +320,7 @@ public:
     this->VTKInteractor->ExitCallback();
   }
 
-  const options& Options;
+  options& Options;
   window_impl& Window;
   loader_impl& Loader;
   animationManager AnimationManager;
@@ -329,7 +334,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-interactor_impl::interactor_impl(const options& options, window_impl& window, loader_impl& loader)
+interactor_impl::interactor_impl(options& options, window_impl& window, loader_impl& loader)
   : Internals(new interactor_impl::internals(options, window, loader))
 {
   // Loader need the interactor

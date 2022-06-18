@@ -160,7 +160,14 @@ public:
    * This method will try to find the corresponding array in the coloring attributes and will
    * position ArrayIndexForColoring and DataForColoring accordingly.
    */
-  void SetColoring(bool useCellData, const std::string& arrayName, int component, bool update = false);
+  void SetColoring(
+    bool useCellData, const std::string& arrayName, int component, bool update = true);
+
+  /**
+   * Get the current coloring configuration,
+   * Usefull after using Cycle methods
+   */
+  void GetColoring(bool& useCellData, std::string& arrayName, int& component);
 
   /**
    * Update the visibility and coloring of internal actors as well as the scalar bar actors
