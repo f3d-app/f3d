@@ -22,7 +22,6 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
 
   // Change the hdri and make sure it is taken into account
   opt.set("hdri", std::string(argv[1]) + "data/palermo_park_1k.hdr");
-  win.update();
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
            std::string(argv[2]), "TestSDKDynamicHDRI", 50)
