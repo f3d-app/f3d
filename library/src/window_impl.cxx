@@ -40,53 +40,6 @@ public:
     log::debug("Camera view angle is: ", cam->GetViewAngle(), ".\n");
   }
 
-  bool UpdateCamera(const options& options)
-  {
-    // Set the initial camera once all options
-    // have been shown as they may have an effect on it
-    if (options.getAsInt("camera-index") < 0)
-    {
-      // set a default camera from bounds using VTK method
-      this->Renderer->vtkRenderer::ResetCamera();
-
-      // use options to overwrite camera parameters
-      vtkCamera* cam = this->Renderer->GetActiveCamera();
-
-      std::vector<double> cameraPosition = options.getAsDoubleVector("camera-position");
-      if (cameraPosition.size() == 3)
-      {
-        cam->SetPosition(cameraPosition.data());
-      }
-
-      std::vector<double> cameraFocalPoint = options.getAsDoubleVector("camera-focal-point");
-      if (cameraFocalPoint.size() == 3)
-      {
-        cam->SetFocalPoint(cameraFocalPoint.data());
-      }
-
-      std::vector<double> cameraViewUp = options.getAsDoubleVector("camera-view-up");
-      if (cameraViewUp.size() == 3)
-      {
-        cam->SetViewUp(cameraViewUp.data());
-      }
-
-      double cameraViewAngle = options.getAsDouble("camera-view-angle");
-      if (cameraViewAngle != 0)
-      {
-        cam->SetViewAngle(cameraViewAngle);
-      }
-
-      cam->Azimuth(options.getAsDouble("camera-azimuth-angle"));
-      cam->Elevation(options.getAsDouble("camera-elevation-angle"));
-      cam->OrthogonalizeViewUp();
-
-      window_impl::internals::DisplayCameraInformation(cam);
-    }
-
-    this->Renderer->InitializeCamera();
-    return true;
-  }
-
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkSmartPointer<vtkF3DRenderer> Renderer;
   Type WindowType;
@@ -194,7 +147,7 @@ void window_impl::Initialize(bool withColoring, std::string fileInfo)
 }
 
 //----------------------------------------------------------------------------
-bool window_impl::update()
+void window_impl::UpdateDynamicOptions()
 {
   if (!this->Internals->Renderer)
   {
@@ -251,8 +204,55 @@ bool window_impl::update()
 
   // Print coloring info when available
   log::debug(this->Internals->Renderer->GetRenderingDescription());
+}
 
-  return this->Internals->UpdateCamera(this->Internals->Options);
+//----------------------------------------------------------------------------
+void window_impl::InitializeCamera()
+{
+  // This should be called only once all options
+  // have been shown as they may have an effect on it
+  if (this->Internals->Options.getAsInt("camera-index") < 0)
+  {
+    // set a default camera from bounds using VTK method
+    this->Internals->Renderer->vtkRenderer::ResetCamera();
+
+    // use this->Internals->Options to overwrite camera parameters
+    vtkCamera* cam = this->Internals->Renderer->GetActiveCamera();
+
+    std::vector<double> cameraPosition =
+      this->Internals->Options.getAsDoubleVector("camera-position");
+    if (cameraPosition.size() == 3)
+    {
+      cam->SetPosition(cameraPosition.data());
+    }
+
+    std::vector<double> cameraFocalPoint =
+      this->Internals->Options.getAsDoubleVector("camera-focal-point");
+    if (cameraFocalPoint.size() == 3)
+    {
+      cam->SetFocalPoint(cameraFocalPoint.data());
+    }
+
+    std::vector<double> cameraViewUp = this->Internals->Options.getAsDoubleVector("camera-view-up");
+    if (cameraViewUp.size() == 3)
+    {
+      cam->SetViewUp(cameraViewUp.data());
+    }
+
+    double cameraViewAngle = this->Internals->Options.getAsDouble("camera-view-angle");
+    if (cameraViewAngle != 0)
+    {
+      cam->SetViewAngle(cameraViewAngle);
+    }
+
+    cam->Azimuth(this->Internals->Options.getAsDouble("camera-azimuth-angle"));
+    cam->Elevation(this->Internals->Options.getAsDouble("camera-elevation-angle"));
+    cam->OrthogonalizeViewUp();
+
+    window_impl::internals::DisplayCameraInformation(cam);
+  }
+
+  this->Internals->Renderer->InitializeCamera();
 }
 
 //----------------------------------------------------------------------------
@@ -264,6 +264,7 @@ vtkRenderWindow* window_impl::GetRenderWindow()
 //----------------------------------------------------------------------------
 bool window_impl::render()
 {
+  this->UpdateDynamicOptions();
   this->Internals->RenWin->Render();
   return true;
 }
@@ -271,6 +272,8 @@ bool window_impl::render()
 //----------------------------------------------------------------------------
 image window_impl::renderToImage(bool noBackground)
 {
+  this->UpdateDynamicOptions();
+
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(this->Internals->RenWin);
 
