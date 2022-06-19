@@ -37,6 +37,7 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& fileInfo, const s
   this->DataForColoring = nullptr;
   this->ArrayIndexForColoring = -1;
   this->ComponentForColoring = -1;
+  this->ColoringTimeStamp.Modified();
 
   this->ColorTransferFunctionConfigured = false;
   this->PolyDataMapperConfigured = false;
@@ -103,6 +104,7 @@ void vtkF3DRendererWithColoring::SetUsePointSprites(bool use)
   {
     this->UsePointSprites = use;
     this->CheatSheetNeedUpdate = true;
+    this->ColoringTimeStamp.Modified();
   }
 }
 
@@ -113,6 +115,7 @@ void vtkF3DRendererWithColoring::SetUseVolume(bool use)
   {
     this->UseVolume = use;
     this->CheatSheetNeedUpdate = true;
+    this->ColoringTimeStamp.Modified();
   }
 }
 
@@ -134,9 +137,9 @@ void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
         pwf->AddPoint(range[0], this->UseInverseOpacityFunction ? 1.0 : 0.0);
         pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
       }
-      this->CheatSheetNeedUpdate = true;
     }
     this->CheatSheetNeedUpdate = true;
+    this->ColoringTimeStamp.Modified();
   }
 }
 
@@ -146,6 +149,7 @@ void vtkF3DRendererWithColoring::SetScalarBarRange(const std::vector<double>& ra
   if (this->UserScalarBarRange != range)
   {
     this->UserScalarBarRange = range;
+    this->ColoringTimeStamp.Modified();
   }
 }
 
@@ -155,123 +159,8 @@ void vtkF3DRendererWithColoring::SetColormap(const std::vector<double>& colormap
   if (this->Colormap != colormap)
   {
     this->Colormap = colormap;
+    this->ColoringTimeStamp.Modified();
   }
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::CycleArrayIndexForColoring()
-{
-  if (this->UseVolume)
-  {
-    this->ArrayIndexForColoring =
-      (this->ArrayIndexForColoring + 1) % this->DataForColoring->GetNumberOfArrays();
-  }
-  else
-  {
-    // Cycle through arrays looping back to -1
-    // -1 0 1 2 -1 0 1 2 ...
-    this->ArrayIndexForColoring =
-      (this->ArrayIndexForColoring + 2) % (this->DataForColoring->GetNumberOfArrays() + 1) - 1;
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::CycleArrayForColoring(bool checkCurrent)
-{
-  if (this->DataForColoring)
-  {
-    for (int i = 0; i < this->DataForColoring->GetNumberOfArrays(); i++)
-    {
-      if (checkCurrent)
-      {
-        // Decrement before incrementing to keep this loop as simple as possible
-        this->ArrayIndexForColoring--;
-      }
-      this->CycleArrayIndexForColoring();
-      this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
-      if (this->ArrayForColoring || this->ArrayIndexForColoring == -1)
-      {
-        this->CheckCurrentComponentForColoring();
-        break;
-      }
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::CheckCurrentComponentForColoring()
-{
-  if (this->ArrayForColoring)
-  {
-    // Check direct scalars
-    if (this->ArrayForColoring->GetNumberOfComponents() > 4 && this->ComponentForColoring == -2)
-    {
-      this->ComponentForColoring = -1;
-    }
-    // Check number of comps
-    else if (this->ComponentForColoring >= this->ArrayForColoring->GetNumberOfComponents())
-    {
-      this->ComponentForColoring = this->ArrayForColoring->GetNumberOfComponents() - 1;
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::CycleComponentForColoring()
-{
-  if (this->ArrayForColoring)
-  {
-    if (this->ArrayForColoring->GetNumberOfComponents() > 4)
-    {
-      // -1 0 1 2 3 4 5 6
-      this->ComponentForColoring =
-        (this->ComponentForColoring + 2) % (this->ArrayForColoring->GetNumberOfComponents() + 1) -
-        1;
-    }
-    else
-    {
-      // -2 -1 0 1 2 3 4
-      this->ComponentForColoring =
-        (this->ComponentForColoring + 3) % (this->ArrayForColoring->GetNumberOfComponents() + 2) -
-        2;
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::CycleFieldForColoring()
-{
-  // A generic approach will be better when adding categorical field data coloring
-  if (this->DataForColoring == this->PointDataForColoring)
-  {
-    this->DataForColoring = this->CellDataForColoring;
-  }
-  else // if (this->DataForColoring == this->CellDataForColoring)
-  {
-    this->DataForColoring = this->PointDataForColoring;
-  }
-  // Check current index is a valid coloring index
-  // If not, find another one
-  this->CycleArrayForColoring(true);
-}
-
-//----------------------------------------------------------------------------
-std::string vtkF3DRendererWithColoring::GetRenderingDescription()
-{
-  std::stringstream stream;
-  stream << this->Superclass::GetRenderingDescription();
-  if (this->ArrayForColoring)
-  {
-    stream << "Coloring using "
-           << (this->DataForColoring == this->PointDataForColoring ? "point" : "cell")
-           << " array named " << this->ArrayForColoring->GetName() << ", "
-           << vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring) << "\n";
-  }
-  else
-  {
-    stream << "Not coloring\n";
-  }
-  return stream.str();
 }
 
 //----------------------------------------------------------------------------
@@ -292,12 +181,15 @@ void vtkF3DRendererWithColoring::CycleScalars(int cycleType)
       break;
   }
 
+  // TODO Check that
   this->ColorTransferFunctionConfigured = false;
   this->PolyDataMapperConfigured = false;
   this->PointGaussianMapperConfigured = false;
   this->VolumeConfigured = false;
   this->ScalarBarActorConfigured = false;
   this->CheatSheetNeedUpdate = true;
+
+  this->ColoringTimeStamp.Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -307,6 +199,7 @@ void vtkF3DRendererWithColoring::ShowScalarBar(bool show)
   {
     this->ScalarBarVisible = show;
     this->CheatSheetNeedUpdate = true;
+    this->ColoringTimeStamp.Modified();
   }
 }
 
@@ -345,7 +238,12 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::UpdateColoringActors()
 {
-  // TODO add a MTime logic
+  // Early return if nothing changed
+  if (this->ColoringUpdateTime >= this->ColoringTimeStamp.GetMTime())
+  {
+    return;
+  }
+  this->ColoringUpdateTime = this->ColoringTimeStamp.GetMTime();
 
   bool volumeVisibility = !this->UseRaytracing && this->UseVolume;
   if (this->ArrayForColoring || volumeVisibility)
@@ -738,4 +636,120 @@ std::string vtkF3DRendererWithColoring::ShortName(const std::string& name, int m
   {
     return name.substr(0, maxChar - 3) + "...";
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::CycleArrayIndexForColoring()
+{
+  if (this->UseVolume)
+  {
+    this->ArrayIndexForColoring =
+      (this->ArrayIndexForColoring + 1) % this->DataForColoring->GetNumberOfArrays();
+  }
+  else
+  {
+    // Cycle through arrays looping back to -1
+    // -1 0 1 2 -1 0 1 2 ...
+    this->ArrayIndexForColoring =
+      (this->ArrayIndexForColoring + 2) % (this->DataForColoring->GetNumberOfArrays() + 1) - 1;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::CycleArrayForColoring(bool checkCurrent)
+{
+  if (this->DataForColoring)
+  {
+    for (int i = 0; i < this->DataForColoring->GetNumberOfArrays(); i++)
+    {
+      if (checkCurrent)
+      {
+        // Decrement before incrementing to keep this loop as simple as possible
+        this->ArrayIndexForColoring--;
+      }
+      this->CycleArrayIndexForColoring();
+      this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
+      if (this->ArrayForColoring || this->ArrayIndexForColoring == -1)
+      {
+        this->CheckCurrentComponentForColoring();
+        break;
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::CheckCurrentComponentForColoring()
+{
+  if (this->ArrayForColoring)
+  {
+    // Check direct scalars
+    if (this->ArrayForColoring->GetNumberOfComponents() > 4 && this->ComponentForColoring == -2)
+    {
+      this->ComponentForColoring = -1;
+    }
+    // Check number of comps
+    else if (this->ComponentForColoring >= this->ArrayForColoring->GetNumberOfComponents())
+    {
+      this->ComponentForColoring = this->ArrayForColoring->GetNumberOfComponents() - 1;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::CycleComponentForColoring()
+{
+  if (this->ArrayForColoring)
+  {
+    if (this->ArrayForColoring->GetNumberOfComponents() > 4)
+    {
+      // -1 0 1 2 3 4 5 6
+      this->ComponentForColoring =
+        (this->ComponentForColoring + 2) % (this->ArrayForColoring->GetNumberOfComponents() + 1) -
+        1;
+    }
+    else
+    {
+      // -2 -1 0 1 2 3 4
+      this->ComponentForColoring =
+        (this->ComponentForColoring + 3) % (this->ArrayForColoring->GetNumberOfComponents() + 2) -
+        2;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::CycleFieldForColoring()
+{
+  // A generic approach will be better when adding categorical field data coloring
+  if (this->DataForColoring == this->PointDataForColoring)
+  {
+    this->DataForColoring = this->CellDataForColoring;
+  }
+  else // if (this->DataForColoring == this->CellDataForColoring)
+  {
+    this->DataForColoring = this->PointDataForColoring;
+  }
+  // Check current index is a valid coloring index
+  // If not, find another one
+  this->CycleArrayForColoring(true);
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DRendererWithColoring::GetRenderingDescription()
+{
+  std::stringstream stream;
+  stream << this->Superclass::GetRenderingDescription();
+  if (this->ArrayForColoring)
+  {
+    stream << "Coloring using "
+           << (this->DataForColoring == this->PointDataForColoring ? "point" : "cell")
+           << " array named " << this->ArrayForColoring->GetName() << ", "
+           << vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring) << "\n";
+  }
+  else
+  {
+    stream << "Not coloring\n";
+  }
+  return stream.str();
 }
