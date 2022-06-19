@@ -10,6 +10,7 @@
 #ifndef f3d_window_impl_h
 #define f3d_window_impl_h
 
+#include "log.h"
 #include "window.h"
 
 #include <memory>
@@ -76,6 +77,16 @@ public:
    * Should be called after UpdateDynamicOptions to get correct positioning
    */
   virtual void InitializeCamera();
+
+  /**
+   * Print scene description to log using provided verbose level
+   */
+  void PrintSceneDescription(log::VerboseLevel level);
+
+  /**
+   * Print coloring description to log using provided verbose level if available
+   */
+  void PrintColoringDescription(log::VerboseLevel level);
 
   /**
    * Implementation only API.

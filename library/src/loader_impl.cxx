@@ -390,6 +390,8 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   // Initialize renderer and camera using data read by the importer
   this->Internals->Window.UpdateDynamicOptions();
   this->Internals->Window.InitializeCamera();
+  this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+  this->Internals->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
 
   this->Internals->LoadedFile = true;
   return this->Internals->LoadedFile;

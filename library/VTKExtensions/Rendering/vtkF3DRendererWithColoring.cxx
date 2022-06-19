@@ -219,7 +219,7 @@ void vtkF3DRendererWithColoring::ShowScalarBar(bool show)
 void vtkF3DRendererWithColoring::SetColoringAttributes(
   vtkDataSetAttributes* pointData, vtkDataSetAttributes* cellData)
 {
-  if (this->PointDataForColoring !=  pointData || this->CellDataForColoring != cellData)
+  if (this->PointDataForColoring != pointData || this->CellDataForColoring != cellData)
   {
     this->PointDataForColoring = pointData;
     this->CellDataForColoring = cellData;
@@ -249,7 +249,8 @@ void vtkF3DRendererWithColoring::SetColoring(
   std::string currentArrayName;
   int currentComponent;
   this->GetColoring(currentUseCellData, currentArrayName, currentComponent);
-  if (!this->DataForColoring || currentUseCellData != useCellData || currentArrayName != arrayName || currentComponent != component)
+  if (!this->DataForColoring || currentUseCellData != useCellData ||
+    currentArrayName != arrayName || currentComponent != component)
   {
     this->ComponentForColoring = component;
     this->DataForColoring = useCellData ? this->CellDataForColoring : this->PointDataForColoring;
@@ -781,10 +782,9 @@ void vtkF3DRendererWithColoring::CycleFieldForColoring()
 }
 
 //----------------------------------------------------------------------------
-std::string vtkF3DRendererWithColoring::GetRenderingDescription()
+std::string vtkF3DRendererWithColoring::GetColoringDescription()
 {
   std::stringstream stream;
-  stream << this->Superclass::GetRenderingDescription();
   if (this->ArrayForColoring)
   {
     stream << "Coloring using "
