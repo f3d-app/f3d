@@ -41,6 +41,17 @@ public:
   };
 
   /**
+   * Log provided args as provided verbose level.
+   */
+  template<typename... Args>
+  static void print(VerboseLevel level, Args... args)
+  {
+    std::stringstream ss;
+    log::appendArg(ss, args...);
+    log::printInternal(level, ss.str());
+  }
+
+  /**
    * Log provided args as a debug.
    */
   template<typename... Args>
@@ -110,6 +121,7 @@ protected:
     log::appendArg(ss, args...);
   }
 
+  static void printInternal(VerboseLevel level, const std::string& msg);
   static void errorInternal(const std::string& msg);
   static void warnInternal(const std::string& msg);
   static void infoInternal(const std::string& msg);
