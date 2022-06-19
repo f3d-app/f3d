@@ -1,4 +1,14 @@
 # F3D Installation
+
+# Are we building a python wheel?
+if (DEFINED SKBUILD)
+  # If so, we only need the f3d binary and the python library
+  set_target_properties(pyf3d PROPERTIES PREFIX "_")
+  install(TARGETS pyf3d LIBRARY DESTINATION .)
+  install(TARGETS f3d RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  return() # early exit
+endif()
+
 install(TARGETS f3d
   EXPORT f3dTargets
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT application

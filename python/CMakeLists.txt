@@ -12,6 +12,11 @@ set_target_properties(pyf3d PROPERTIES
   OUTPUT_NAME "f3d"
   )
 
+if (DEFINED SKBUILD)
+  # If we are building a python wheel, we import _f3d.* in __init__.py
+  target_compile_definitions(pyf3d PRIVATE F3D_PYTHONLIB_NAME=_f3d)
+endif()
+
 if(WIN32)
   # On Windows, the python module needs to be in the same folder than f3d.dll
   # Usage of PATH to find the DLL is not possible, see https://stackoverflow.com/a/64303856/2609654

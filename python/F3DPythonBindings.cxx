@@ -11,7 +11,11 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(f3d, module)
+#ifndef F3D_PYTHONLIB_NAME
+#define F3D_PYTHONLIB_NAME f3d
+#endif
+
+PYBIND11_MODULE(F3D_PYTHONLIB_NAME, module)
 {
   module.doc() = "f3d library bindings";
 
