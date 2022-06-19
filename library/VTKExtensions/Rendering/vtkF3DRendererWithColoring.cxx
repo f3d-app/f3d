@@ -37,7 +37,6 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& fileInfo, const s
   this->DataForColoring = nullptr;
   this->ArrayIndexForColoring = -1;
   this->ComponentForColoring = -1;
-  this->ColoringTimeStamp.Modified();
 
   this->ColorTransferFunctionConfigured = false;
   this->PolyDataMapperConfigured = false;
@@ -46,6 +45,8 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& fileInfo, const s
   this->ScalarBarActorConfigured = false;
 
   this->CheatSheetNeedUpdate = true;
+
+  this->ColoringTimeStamp.Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -138,6 +139,7 @@ void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
         pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
       }
     }
+    this->VolumeConfigured = false;
     this->CheatSheetNeedUpdate = true;
     this->ColoringTimeStamp.Modified();
   }
@@ -149,6 +151,11 @@ void vtkF3DRendererWithColoring::SetScalarBarRange(const std::vector<double>& ra
   if (this->UserScalarBarRange != range)
   {
     this->UserScalarBarRange = range;
+    this->ColorTransferFunctionConfigured = false;
+    this->PolyDataMapperConfigured = false;
+    this->PointGaussianMapperConfigured = false;
+    this->VolumeConfigured = false;
+    this->ScalarBarActorConfigured = false;
     this->ColoringTimeStamp.Modified();
   }
 }
@@ -159,6 +166,12 @@ void vtkF3DRendererWithColoring::SetColormap(const std::vector<double>& colormap
   if (this->Colormap != colormap)
   {
     this->Colormap = colormap;
+
+    this->ColorTransferFunctionConfigured = false;
+    this->PolyDataMapperConfigured = false;
+    this->PointGaussianMapperConfigured = false;
+    this->VolumeConfigured = false;
+    this->ScalarBarActorConfigured = false;
     this->ColoringTimeStamp.Modified();
   }
 }
@@ -181,7 +194,6 @@ void vtkF3DRendererWithColoring::CycleScalars(int cycleType)
       break;
   }
 
-  // TODO Check that
   this->ColorTransferFunctionConfigured = false;
   this->PolyDataMapperConfigured = false;
   this->PointGaussianMapperConfigured = false;
@@ -204,35 +216,54 @@ void vtkF3DRendererWithColoring::ShowScalarBar(bool show)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
+void vtkF3DRendererWithColoring::SetColoringAttributes(
+  vtkDataSetAttributes* pointData, vtkDataSetAttributes* cellData)
 {
-  if (this->DataForColoring)
+  if (this->PointDataForColoring !=  pointData || this->CellDataForColoring != cellData)
   {
-    cheatSheetText << " C: Cell scalars coloring ["
-                   << (this->DataForColoring == this->CellDataForColoring ? "ON" : "OFF") << "]\n";
-    cheatSheetText << " S: Scalars coloring ["
-                   << (this->ArrayForColoring ? vtkF3DRendererWithColoring::ShortName(
-                                                  this->ArrayForColoring->GetName(), 19)
-                                              : "OFF")
-                   << "]\n";
-    cheatSheetText << " Y: Coloring compponent ["
-                   << vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring)
-                   << "]\n";
-    cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";
-  }
+    this->PointDataForColoring = pointData;
+    this->CellDataForColoring = cellData;
 
-  if (this->VolumeProp)
-  {
-    cheatSheetText << " V: Volume representation " << (this->UseVolume ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " I: Inverse volume opacity "
-                   << (this->UseInverseOpacityFunction ? "[ON]" : "[OFF]") << "\n";
-  }
+    this->DataForColoring = nullptr;
+    this->ArrayIndexForColoring = -1;
+    this->ComponentForColoring = -1;
+    this->ArrayForColoring = nullptr;
 
-  if (this->PointGaussianMapper)
-  {
-    cheatSheetText << " O: Point sprites " << (this->UsePointSprites ? "[ON]" : "[OFF]") << "\n";
+    this->ColorTransferFunctionConfigured = false;
+    this->PolyDataMapperConfigured = false;
+    this->PointGaussianMapperConfigured = false;
+    this->VolumeConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->ColoringTimeStamp.Modified();
   }
-  this->Superclass::FillCheatSheetHotkeys(cheatSheetText);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetColoring(
+  bool useCellData, const std::string& arrayName, int component)
+{
+  // This assumes this->PointDataForColoring and this->CellDataForColoring are set
+
+  // Check if the call is needed
+  bool currentUseCellData;
+  std::string currentArrayName;
+  int currentComponent;
+  this->GetColoring(currentUseCellData, currentArrayName, currentComponent);
+  if (!this->DataForColoring || currentUseCellData != useCellData || currentArrayName != arrayName || currentComponent != component)
+  {
+    this->ComponentForColoring = component;
+    this->DataForColoring = useCellData ? this->CellDataForColoring : this->PointDataForColoring;
+    this->ArrayIndexForColoring =
+      vtkF3DRendererWithColoring::FindArrayIndexForColoring(this->DataForColoring, arrayName);
+    this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
+
+    this->ColorTransferFunctionConfigured = false;
+    this->PolyDataMapperConfigured = false;
+    this->PointGaussianMapperConfigured = false;
+    this->VolumeConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->ColoringTimeStamp.Modified();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -243,6 +274,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   {
     return;
   }
+
   this->ColoringUpdateTime = this->ColoringTimeStamp.GetMTime();
 
   bool volumeVisibility = !this->UseRaytracing && this->UseVolume;
@@ -355,17 +387,6 @@ void vtkF3DRendererWithColoring::UpdateScalarBarVisibility()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetColoring(
-  bool useCellData, const std::string& arrayName, int component)
-{
-  this->ComponentForColoring = component;
-  this->DataForColoring = useCellData ? this->CellDataForColoring : this->PointDataForColoring;
-  this->ArrayIndexForColoring =
-    vtkF3DRendererWithColoring::FindArrayIndexForColoring(this->DataForColoring, arrayName);
-  this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::GetColoring(
   bool& useCellData, std::string& arrayName, int& component)
 {
@@ -425,11 +446,35 @@ int vtkF3DRendererWithColoring::FindArrayIndexForColoring(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetColoringAttributes(
-  vtkDataSetAttributes* pointData, vtkDataSetAttributes* cellData)
+void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 {
-  this->PointDataForColoring = pointData;
-  this->CellDataForColoring = cellData;
+  if (this->DataForColoring)
+  {
+    cheatSheetText << " C: Cell scalars coloring ["
+                   << (this->DataForColoring == this->CellDataForColoring ? "ON" : "OFF") << "]\n";
+    cheatSheetText << " S: Scalars coloring ["
+                   << (this->ArrayForColoring ? vtkF3DRendererWithColoring::ShortName(
+                                                  this->ArrayForColoring->GetName(), 19)
+                                              : "OFF")
+                   << "]\n";
+    cheatSheetText << " Y: Coloring compponent ["
+                   << vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring)
+                   << "]\n";
+    cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";
+  }
+
+  if (this->VolumeProp)
+  {
+    cheatSheetText << " V: Volume representation " << (this->UseVolume ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " I: Inverse volume opacity "
+                   << (this->UseInverseOpacityFunction ? "[ON]" : "[OFF]") << "\n";
+  }
+
+  if (this->PointGaussianMapper)
+  {
+    cheatSheetText << " O: Point sprites " << (this->UsePointSprites ? "[ON]" : "[OFF]") << "\n";
+  }
+  this->Superclass::FillCheatSheetHotkeys(cheatSheetText);
 }
 
 //----------------------------------------------------------------------------

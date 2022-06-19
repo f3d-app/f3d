@@ -201,7 +201,11 @@ void window_impl::UpdateDynamicOptions()
   // Show grid last as it needs to know the bounding box to be able to compute its size
   this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("grid"));
 
-  // Print coloring info when available
+  // Print rendering description when available
+  // XXX this will print on the terminal each time a hotkey is pressed
+  // There is no way to know if the description has changed
+  // This seems overkill to add such a mechanism.
+  // I wond
   log::debug(this->Internals->Renderer->GetRenderingDescription());
 }
 
