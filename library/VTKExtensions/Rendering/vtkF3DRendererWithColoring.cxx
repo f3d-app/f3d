@@ -45,6 +45,8 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& fileInfo, const s
   this->ScalarBarActorConfigured = false;
 
   this->CheatSheetNeedUpdate = true;
+
+  this->ColoringTimeStamp.Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -103,6 +105,7 @@ void vtkF3DRendererWithColoring::SetUsePointSprites(bool use)
   {
     this->UsePointSprites = use;
     this->CheatSheetNeedUpdate = true;
+    this->ColoringTimeStamp.Modified();
   }
 }
 
@@ -113,6 +116,7 @@ void vtkF3DRendererWithColoring::SetUseVolume(bool use)
   {
     this->UseVolume = use;
     this->CheatSheetNeedUpdate = true;
+    this->ColoringTimeStamp.Modified();
   }
 }
 
@@ -134,9 +138,10 @@ void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
         pwf->AddPoint(range[0], this->UseInverseOpacityFunction ? 1.0 : 0.0);
         pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
       }
-      this->CheatSheetNeedUpdate = true;
     }
+    this->VolumeConfigured = false;
     this->CheatSheetNeedUpdate = true;
+    this->ColoringTimeStamp.Modified();
   }
 }
 
@@ -146,6 +151,12 @@ void vtkF3DRendererWithColoring::SetScalarBarRange(const std::vector<double>& ra
   if (this->UserScalarBarRange != range)
   {
     this->UserScalarBarRange = range;
+    this->ColorTransferFunctionConfigured = false;
+    this->PolyDataMapperConfigured = false;
+    this->PointGaussianMapperConfigured = false;
+    this->VolumeConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->ColoringTimeStamp.Modified();
   }
 }
 
@@ -155,6 +166,13 @@ void vtkF3DRendererWithColoring::SetColormap(const std::vector<double>& colormap
   if (this->Colormap != colormap)
   {
     this->Colormap = colormap;
+
+    this->ColorTransferFunctionConfigured = false;
+    this->PolyDataMapperConfigured = false;
+    this->PointGaussianMapperConfigured = false;
+    this->VolumeConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->ColoringTimeStamp.Modified();
   }
 }
 
@@ -298,6 +316,8 @@ void vtkF3DRendererWithColoring::CycleScalars(int cycleType)
   this->VolumeConfigured = false;
   this->ScalarBarActorConfigured = false;
   this->CheatSheetNeedUpdate = true;
+
+  this->ColoringTimeStamp.Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -307,6 +327,7 @@ void vtkF3DRendererWithColoring::ShowScalarBar(bool show)
   {
     this->ScalarBarVisible = show;
     this->CheatSheetNeedUpdate = true;
+    this->ColoringTimeStamp.Modified();
   }
 }
 
@@ -345,7 +366,13 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::UpdateColoringActors()
 {
-  // TODO add a MTime logic
+  // Early return if nothing changed
+  if (this->ColoringUpdateTime >= this->ColoringTimeStamp.GetMTime())
+  {
+    return;
+  }
+
+  this->ColoringUpdateTime = this->ColoringTimeStamp.GetMTime();
 
   bool volumeVisibility = !this->UseRaytracing && this->UseVolume;
   if (this->ArrayForColoring || volumeVisibility)
@@ -460,11 +487,23 @@ void vtkF3DRendererWithColoring::UpdateScalarBarVisibility()
 void vtkF3DRendererWithColoring::SetColoring(
   bool useCellData, const std::string& arrayName, int component)
 {
-  this->ComponentForColoring = component;
-  this->DataForColoring = useCellData ? this->CellDataForColoring : this->PointDataForColoring;
-  this->ArrayIndexForColoring =
-    vtkF3DRendererWithColoring::FindArrayIndexForColoring(this->DataForColoring, arrayName);
-  this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
+  // This assumes this->PointDataForColoring and this->CellDataForColoring are set
+  if (!this->DataForColoring || this->GetColoringUseCell() != useCellData ||
+    this->GetColoringArrayName() != arrayName || this->GetColoringComponent() != component)
+  {
+    this->ComponentForColoring = component;
+    this->DataForColoring = useCellData ? this->CellDataForColoring : this->PointDataForColoring;
+    this->ArrayIndexForColoring =
+      vtkF3DRendererWithColoring::FindArrayIndexForColoring(this->DataForColoring, arrayName);
+    this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
+
+    this->ColorTransferFunctionConfigured = false;
+    this->PolyDataMapperConfigured = false;
+    this->PointGaussianMapperConfigured = false;
+    this->VolumeConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->ColoringTimeStamp.Modified();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -539,8 +578,23 @@ int vtkF3DRendererWithColoring::FindArrayIndexForColoring(
 void vtkF3DRendererWithColoring::SetColoringAttributes(
   vtkDataSetAttributes* pointData, vtkDataSetAttributes* cellData)
 {
-  this->PointDataForColoring = pointData;
-  this->CellDataForColoring = cellData;
+  if (this->PointDataForColoring != pointData || this->CellDataForColoring != cellData)
+  {
+    this->PointDataForColoring = pointData;
+    this->CellDataForColoring = cellData;
+
+    this->DataForColoring = nullptr;
+    this->ArrayIndexForColoring = -1;
+    this->ComponentForColoring = -1;
+    this->ArrayForColoring = nullptr;
+
+    this->ColorTransferFunctionConfigured = false;
+    this->PolyDataMapperConfigured = false;
+    this->PointGaussianMapperConfigured = false;
+    this->VolumeConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->ColoringTimeStamp.Modified();
+  }
 }
 
 //----------------------------------------------------------------------------
