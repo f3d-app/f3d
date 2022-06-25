@@ -28,6 +28,13 @@ int TestSDKLog(int argc, char* argv[])
   f3d::log::warn("Test Warning Quiet");
   f3d::log::error("Test Error Quiet");
 
+  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG); // All print should print except QUIET
+  f3d::log::print(f3d::log::VerboseLevel::QUIET, "Test Print Quiet");
+  f3d::log::print(f3d::log::VerboseLevel::DEBUG, "Test Print Debug");
+  f3d::log::print(f3d::log::VerboseLevel::INFO, "Test Print Info");
+  f3d::log::print(f3d::log::VerboseLevel::WARN, "Test Print Warning");
+  f3d::log::print(f3d::log::VerboseLevel::ERROR, "Test Print Error");
+
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG); // Next log calls should all be printed
   f3d::log::setUseColoring(true);
   f3d::log::info("Test Debug Coloring");
