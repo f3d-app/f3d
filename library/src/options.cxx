@@ -108,37 +108,31 @@ options::options()
 {
   // Loader/Loading
   this->Internals->init("animation-index", 0);
-  this->Internals->init("geometry-only", false);
-  this->Internals->init("progress", false);
   this->Internals->init("camera-index", -1);
   this->Internals->init("color", std::vector<double>{ 1., 1., 1. });
   this->Internals->init("emissive-factor", std::vector<double>{ 1., 1., 1. });
+  this->Internals->init("geometry-only", false);
   this->Internals->init("line-width", 1.0);
   this->Internals->init("metallic", 0.0);
   this->Internals->init("normal-scale", 1.0);
   this->Internals->init("opacity", 1.0);
   this->Internals->init("point-size", 10.0);
+  this->Internals->init("progress", false);
   this->Internals->init("roughness", 0.3);
   this->Internals->init("texture-base-color", std::string());
   this->Internals->init("texture-emissive", std::string());
   this->Internals->init("texture-material", std::string());
   this->Internals->init("texture-normal", std::string());
-
-  // Loading but should be checked ?
   this->Internals->init("up", std::string("+Y"));
 
+  // Loading but should be checked ?
   this->Internals->init("cells", false);
   this->Internals->init("component", -1);
-
   this->Internals->init("scalars", F3D_RESERVED_STRING);
-
-  this->Internals->init("fullscreen", false);
-  this->Internals->init("hdri", std::string());
-  this->Internals->init("background-color", std::vector<double>{ 0.2, 0.2, 0.2 });
-  this->Internals->init("font-file", std::string());
 
   // Rendering/Dynamic
   this->Internals->init("axis", false);
+  this->Internals->init("background-color", std::vector<double>{ 0.2, 0.2, 0.2 });
   this->Internals->init("bar", false);
   this->Internals->init("blur-background", false);
   this->Internals->init("camera-azimuth-angle", 0.0);
@@ -147,6 +141,7 @@ options::options()
   this->Internals->init("camera-position", std::vector<double>());
   this->Internals->init("camera-view-angle", 0.0);
   this->Internals->init("camera-view-up", std::vector<double>());
+  this->Internals->init("fullscreen", false);
   this->Internals->init("colormap",
     std::vector<double>{
       0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 });
@@ -154,9 +149,11 @@ options::options()
   this->Internals->init("depth-peeling", false);
   this->Internals->init("edges", false);
   this->Internals->init("filename", false);
+  this->Internals->init("font-file", std::string());
   this->Internals->init("fps", false);
   this->Internals->init("fxaa", false);
   this->Internals->init("grid", false);
+  this->Internals->init("hdri", std::string());
   this->Internals->init("inverse", false);
   this->Internals->init("metadata", false);
   this->Internals->init("point-sprites", false);
