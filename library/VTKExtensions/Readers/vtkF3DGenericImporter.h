@@ -74,9 +74,8 @@ public:
 
   //@{
   /**
-   * Access to specific flags
+   * Access to specific attributes
    */
-  vtkGetMacro(ArrayIndexForColoring, int);
   vtkGetObjectMacro(PointDataForColoring, vtkDataSetAttributes);
   vtkGetObjectMacro(CellDataForColoring, vtkDataSetAttributes);
   //@}
@@ -124,8 +123,6 @@ public:
    * Setter for all actor loading options
    */
   vtkSetMacro(PointSize, double);
-  vtkSetMacro(ScalarArray, std::string);
-  vtkSetMacro(UseCellScalars, bool);
   vtkSetVector3Macro(SurfaceColor, double);
   vtkSetVector3Macro(EmissiveFactor, double);
   vtkSetMacro(Opacity, double);
@@ -169,7 +166,6 @@ protected:
 
   vtkDataSetAttributes* PointDataForColoring = nullptr;
   vtkDataSetAttributes* CellDataForColoring = nullptr;
-  int ArrayIndexForColoring = 0;
 
   bool AnimationEnabled = false;
   bool TemporalInformationUpdated = false;
@@ -178,7 +174,6 @@ protected:
   double* TimeRange = nullptr;
   vtkNew<vtkF3DPostProcessFilter> PostPro;
 
-  bool UseCellScalars = false;
   double PointSize = 10.;
   double Opacity = 1.;
   double Roughness = 0.3;
@@ -187,7 +182,6 @@ protected:
   double NormalScale = 1.;
   double SurfaceColor[3] = { 1., 1., 1. };
   double EmissiveFactor[3] = { 1., 1., 1. };
-  std::string ScalarArray;
   std::string TextureBaseColor;
   std::string TextureMaterial;
   std::string TextureEmissive;

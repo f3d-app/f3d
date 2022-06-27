@@ -65,8 +65,6 @@ public:
   static void InitializeImporterWithOptions(const options& options, vtkF3DGenericImporter* importer)
   {
     importer->SetPointSize(options.getAsDouble("point-size"));
-    importer->SetScalarArray(options.getAsString("scalars"));
-    importer->SetUseCellScalars(options.getAsBool("cells"));
     importer->SetSurfaceColor(options.getAsDoubleVector("color").data());
     importer->SetOpacity(options.getAsDouble("opacity"));
     importer->SetRoughness(options.getAsDouble("roughness"));

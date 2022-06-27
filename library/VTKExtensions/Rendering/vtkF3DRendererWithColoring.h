@@ -151,10 +151,17 @@ public:
   //@}
 
   /**
-   * Set the coloring variables needed.
+   * Set the coloring attributes
    */
-  void SetColoring(vtkDataSetAttributes* pointData, vtkDataSetAttributes* cellData,
-    bool useCellData, int arrayIndex, int component);
+  void SetColoringAttributes(vtkDataSetAttributes* pointData, vtkDataSetAttributes* cellData);
+
+  /**
+   * Set the coloring.
+   * This method will try to find the corresponding array in the coloring attributes and will
+   * position ArrayIndexForColoring and DataForColoring accordingly.
+   */
+  void SetColoring(
+    bool useCellData, const std::string& arrayName, int component, bool update = false);
 
   /**
    * Update the visibility and coloring of internal actors as well as the scalar bar actors
@@ -180,6 +187,13 @@ protected:
 
   static void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, vtkDataArray* array,
     int component, vtkColorTransferFunction* ctf);
+
+  /**
+   * Look for an arrayIndex in a vtkDataSetAttributes based on an arrayName
+   * Returns the arrayIndex or -1 if not found
+   */
+  static int FindArrayIndexForColoring(
+    vtkDataSetAttributes* dataForColoring, const std::string& arrayName);
 
   void ConfigureRangeAndCTFForColoring(vtkDataArray* array, int component);
 
