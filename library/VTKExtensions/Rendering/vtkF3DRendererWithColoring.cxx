@@ -395,13 +395,6 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::UpdateColoringActors()
 {
-  // Make sure ArrayForColoring is pointing to the right array
-  this->ArrayForColoring = nullptr;
-  if (this->DataForColoring)
-  {
-    this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
-  }
-
   bool volumeVisibility = !this->UseRaytracing && this->UseVolume;
   if (this->ArrayForColoring || volumeVisibility)
   {
@@ -515,22 +508,51 @@ void vtkF3DRendererWithColoring::UpdateScalarBarVisibility()
 void vtkF3DRendererWithColoring::SetColoring(
   bool useCellData, const std::string& arrayName, int component, bool update)
 {
-  this->ArrayForColoring = nullptr;
-  this->DataForColoring = useCellData ? this->CellDataForColoring : this->PointDataForColoring;
-  this->ArrayIndexForColoring =
-    vtkF3DRendererWithColoring::FindArrayIndexForColoring(this->DataForColoring, arrayName);
   this->ComponentForColoring = component;
-  if (!this->DataForColoring ||
-    this->ArrayIndexForColoring >= this->DataForColoring->GetNumberOfArrays() ||
-    this->ArrayIndexForColoring < -1)
+  this->DataForColoring = useCellData ? this->CellDataForColoring : this->PointDataForColoring;
+
+  // TODO rework this logic
+  if (!this->DataForColoring)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Invalid coloring values");
+    F3DLog::Print(F3DLog::Severity::Error, "Please set coloring attributes first");
     this->ArrayIndexForColoring = -1;
+    this->ArrayForColoring = nullptr;
   }
+  else
+  {
+    this->ArrayIndexForColoring =
+      vtkF3DRendererWithColoring::FindArrayIndexForColoring(this->DataForColoring, arrayName);
+    if (this->ArrayIndexForColoring >= this->DataForColoring->GetNumberOfArrays() ||
+      this->ArrayIndexForColoring < -1)
+    {
+      F3DLog::Print(F3DLog::Severity::Error, "Invalid coloring values");
+      this->ArrayIndexForColoring = -1;
+    }
+    this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
+  }
+
   if (update)
   {
     this->UpdateColoringActors();
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRendererWithColoring::GetColoringUseCell()
+{
+  return this->DataForColoring ? this->DataForColoring == this->CellDataForColoring : false;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DRendererWithColoring::GetColoringArrayName()
+{
+  return this->ArrayForColoring ? this->ArrayForColoring->GetName() : F3D_RESERVED_STRING;
+}
+
+//----------------------------------------------------------------------------
+int vtkF3DRendererWithColoring::GetColoringComponent()
+{
+  return this->ComponentForColoring;
 }
 
 //----------------------------------------------------------------------------

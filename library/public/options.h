@@ -93,6 +93,11 @@ public:
   std::vector<double>& getAsDoubleVectorRef(const std::string& name);
   //@}
 
+  /**
+   * A boolean option specific method to toggle it
+   */
+  options& toggle(const std::string& name);
+
 private:
   class internals;
   internals* Internals;

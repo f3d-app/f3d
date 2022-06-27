@@ -209,6 +209,7 @@ bool window_impl::update()
   this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("fps"));
   this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("filename"));
   this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("metadata"));
+  this->Internals->Renderer->ShowCheatSheet(this->Internals->Options.getAsBool("cheatsheet"));
   this->Internals->Renderer->SetUseRaytracing(this->Internals->Options.getAsBool("raytracing"));
   this->Internals->Renderer->SetRaytracingSamples(this->Internals->Options.getAsInt("samples"));
   this->Internals->Renderer->SetUseRaytracingDenoiser(

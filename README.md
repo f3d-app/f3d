@@ -296,7 +296,6 @@ Other options can be toggled directly by pressing the following hotkeys:
 * `Z`: the display of the FPS counter.
 * `R`: raytracing.
 * `D`: the denoiser when raytracing.
-* `F`: full screen.
 * `U`: background blur.
 * `K`: trackball interaction mode.
 

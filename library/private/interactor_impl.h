@@ -31,7 +31,7 @@ public:
   /**
    * Documented public API
    */
-  interactor_impl(const options& options, window_impl& window, loader_impl& loader);
+  interactor_impl(options& options, window_impl& window, loader_impl& loader);
   ~interactor_impl();
 
   void setKeyPressCallBack(std::function<bool(int, std::string)> callBack) override;
