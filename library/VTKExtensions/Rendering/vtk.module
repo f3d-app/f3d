@@ -5,7 +5,6 @@ DESCRIPTION
 DEPENDS
   VTK::InteractionStyle
   VTK::RenderingAnnotation
-  VTK::RenderingExternal
   VTK::RenderingOpenGL2
   VTK::RenderingVolumeOpenGL2
   VTK::opengl
@@ -15,6 +14,7 @@ PRIVATE_DEPENDS
   VTK::RenderingCore
   f3d::VTKExtensionsCore
 OPTIONAL_DEPENDS
+  VTK::RenderingExternal
   VTK::RenderingRayTracing
 TEST_DEPENDS
   VTK::TestingCore

@@ -19,6 +19,15 @@ namespace f3d
 class F3D_EXPORT window
 {
 public:
+  class exception : public std::runtime_error
+  {
+  public:
+    exception(const std::string& what = "")
+      : std::runtime_error(what)
+    {
+    }
+  };
+
   /**
    * Enumeration of supported window types
    * =====================================

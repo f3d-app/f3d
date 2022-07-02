@@ -218,6 +218,10 @@ else(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionOSPRayDenoiseNoRaytracing DATA suzanne.ply ARGS INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
 endif()
 
+if(F3D_MODULE_EXTERNAL_RENDERING)
+  f3d_test(NAME TestVersionExternal ARGS --version REGEXP "External rendering module: ON")
+endif()
+
 if(F3D_MODULE_EXODUS)
   f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS -s --camera-position=-11,-2,-49 DEFAULT_LIGHTS)
   f3d_test(NAME TestGenericImporterAnimation DATA small.ex2 DEFAULT_LIGHTS)
