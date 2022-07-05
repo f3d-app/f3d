@@ -161,7 +161,17 @@ public:
    * position ArrayIndexForColoring and DataForColoring accordingly.
    */
   void SetColoring(
-    bool useCellData, const std::string& arrayName, int component, bool update = false);
+    bool useCellData, const std::string& arrayName, int component, bool update = true);
+
+  //@{
+  /**
+   * Get current coloring infomatiuons,
+   * Useful after using Cycle methods
+   */
+  bool GetColoringUseCell();
+  std::string GetColoringArrayName();
+  int GetColoringComponent();
+  //@}
 
   /**
    * Update the visibility and coloring of internal actors as well as the scalar bar actors
