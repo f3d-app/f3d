@@ -288,6 +288,7 @@ f3d_test(NAME TestInteractionDefaultConfigFileMulti DATA multi CONFIG ${CMAKE_SO
 f3d_test(NAME TestInteractionDumpSceneState DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Camera position: 2.26745,3.82625,507.698")#?
 f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring")#SYOVC
 f3d_test(NAME TestInteractionEmptyDrop INTERACTION REGEXP "Drop event without any provided files.")#DropEvent Empty;
+f3d_test(NAME TestInteractionCameraUpdate DATA dragon.vtu INTERACTION DEFAULT_LIGHTS) #MouseWheel;MouseWheel;MouseWheel;S
  
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2

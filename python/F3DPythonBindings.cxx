@@ -113,8 +113,7 @@ PYBIND11_MODULE(f3d, module)
     .value("EXTERNAL", f3d::window::Type::EXTERNAL)
     .export_values();
 
-  window.def("update", &f3d::window::update, "Update the window")
-    .def("render", &f3d::window::render, "Render the window")
+  window.def("render", &f3d::window::render, "Render the window")
     .def("renderToImage", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("noBackground") = false)
     .def("setSize", &f3d::window::setSize, "Set the window size")

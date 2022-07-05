@@ -150,7 +150,6 @@ public:
         break;
       case 'Z':
         self->Options.toggle("fps");
-        self->Window.update();
         self->Window.render();
         self->Window.render();
         // XXX: Double render is needed here
@@ -239,7 +238,6 @@ public:
     }
     if (render)
     {
-      self->Window.update();
       self->Window.render();
     }
   }
@@ -407,6 +405,7 @@ bool interactor_impl::playInteraction(const std::string& file)
 
     std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
     this->Internals->Recorder->SetFileName(cleanFile.c_str());
+    this->Internals->Window.UpdateDynamicOptions();
     this->Internals->Recorder->Play();
   }
 
@@ -451,6 +450,7 @@ bool interactor_impl::recordInteraction(const std::string& file)
 //----------------------------------------------------------------------------
 void interactor_impl::start()
 {
+  this->Internals->Window.UpdateDynamicOptions();
   this->Internals->StartInteractor();
 }
 

@@ -311,7 +311,6 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
     log::debug("No file to load provided\n");
     fileInfo += "No file to load provided, please drop one into this window";
     this->Internals->Window.Initialize(false, fileInfo);
-    this->Internals->Window.update();
     return this->Internals->LoadedFile;
   }
 
@@ -329,7 +328,6 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
     log::warn(filePath, " is not a file of a supported file format\n");
     fileInfo += " [UNSUPPORTED]";
     this->Internals->Window.Initialize(false, fileInfo);
-    this->Internals->Window.update();
     return this->Internals->LoadedFile;
   }
 
@@ -389,8 +387,9 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
     this->Internals->Window.InitializeRendererWithColoring(genericImporter);
   }
 
-  // Initialize renderer using data read by the importer
-  this->Internals->Window.update();
+  // Initialize renderer and camera using data read by the importer
+  this->Internals->Window.UpdateDynamicOptions();
+  this->Internals->Window.InitializeCamera();
 
   this->Internals->LoadedFile = true;
   return this->Internals->LoadedFile;

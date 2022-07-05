@@ -45,7 +45,6 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
       if (keySym == "S")
       {
         options.set("axis", true);
-        win.update();
         win.render();
         return true;
       }
