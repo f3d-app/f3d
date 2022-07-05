@@ -97,47 +97,27 @@ std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetUsePointSprites(bool use, bool update)
+void vtkF3DRendererWithColoring::SetUsePointSprites(bool use)
 {
   if (this->UsePointSprites != use)
   {
     this->UsePointSprites = use;
     this->CheatSheetNeedUpdate = true;
-    if (update)
-    {
-      this->UpdateColoringActors();
-    }
   }
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRendererWithColoring::UsingPointSprites()
-{
-  return this->UsePointSprites;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetUseVolume(bool use, bool update)
+void vtkF3DRendererWithColoring::SetUseVolume(bool use)
 {
   if (this->UseVolume != use)
   {
     this->UseVolume = use;
     this->CheatSheetNeedUpdate = true;
-    if (update)
-    {
-      this->UpdateColoringActors();
-    }
   }
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRendererWithColoring::UsingVolume()
-{
-  return this->UseVolume;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use, bool update)
+void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
 {
   if (this->UseInverseOpacityFunction != use)
   {
@@ -155,44 +135,26 @@ void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use, bool upd
         pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
       }
       this->CheatSheetNeedUpdate = true;
-      if (update)
-      {
-        this->SetupRenderPasses();
-      }
     }
     this->CheatSheetNeedUpdate = true;
   }
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRendererWithColoring::UsingInverseOpacityFunction()
-{
-  return this->UseInverseOpacityFunction;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetScalarBarRange(const std::vector<double>& range, bool update)
+void vtkF3DRendererWithColoring::SetScalarBarRange(const std::vector<double>& range)
 {
   if (this->UserScalarBarRange != range)
   {
     this->UserScalarBarRange = range;
-    if (update)
-    {
-      this->UpdateColoringActors();
-    }
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetColormap(const std::vector<double>& colormap, bool update)
+void vtkF3DRendererWithColoring::SetColormap(const std::vector<double>& colormap)
 {
   if (this->Colormap != colormap)
   {
     this->Colormap = colormap;
-    if (update)
-    {
-      this->UpdateColoringActors();
-    }
   }
 }
 
@@ -335,29 +297,17 @@ void vtkF3DRendererWithColoring::CycleScalars(int cycleType)
   this->PointGaussianMapperConfigured = false;
   this->VolumeConfigured = false;
   this->ScalarBarActorConfigured = false;
-
-  this->UpdateColoringActors();
   this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::ShowScalarBar(bool show, bool update)
+void vtkF3DRendererWithColoring::ShowScalarBar(bool show)
 {
   if (this->ScalarBarVisible != show)
   {
     this->ScalarBarVisible = show;
     this->CheatSheetNeedUpdate = true;
-    if (update)
-    {
-      this->UpdateColoringActors();
-    }
   }
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRendererWithColoring::IsScalarBarVisible()
-{
-  return this->ScalarBarVisible;
 }
 
 //----------------------------------------------------------------------------
@@ -395,6 +345,8 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::UpdateColoringActors()
 {
+  // TODO add a MTime logic
+
   bool volumeVisibility = !this->UseRaytracing && this->UseVolume;
   if (this->ArrayForColoring || volumeVisibility)
   {
@@ -506,35 +458,13 @@ void vtkF3DRendererWithColoring::UpdateScalarBarVisibility()
 
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetColoring(
-  bool useCellData, const std::string& arrayName, int component, bool update)
+  bool useCellData, const std::string& arrayName, int component)
 {
   this->ComponentForColoring = component;
   this->DataForColoring = useCellData ? this->CellDataForColoring : this->PointDataForColoring;
-
-  // TODO rework this logic
-  if (!this->DataForColoring)
-  {
-    F3DLog::Print(F3DLog::Severity::Error, "Please set coloring attributes first");
-    this->ArrayIndexForColoring = -1;
-    this->ArrayForColoring = nullptr;
-  }
-  else
-  {
-    this->ArrayIndexForColoring =
-      vtkF3DRendererWithColoring::FindArrayIndexForColoring(this->DataForColoring, arrayName);
-    if (this->ArrayIndexForColoring >= this->DataForColoring->GetNumberOfArrays() ||
-      this->ArrayIndexForColoring < -1)
-    {
-      F3DLog::Print(F3DLog::Severity::Error, "Invalid coloring values");
-      this->ArrayIndexForColoring = -1;
-    }
-    this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
-  }
-
-  if (update)
-  {
-    this->UpdateColoringActors();
-  }
+  this->ArrayIndexForColoring =
+    vtkF3DRendererWithColoring::FindArrayIndexForColoring(this->DataForColoring, arrayName);
+  this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
 }
 
 //----------------------------------------------------------------------------
