@@ -42,16 +42,8 @@ public:
   virtual Type getType() = 0;
 
   /**
-   * Use all the rendering related options to update the configuration of the window
-   * and the rendering stack below. This also initialize the rendering stack if needed.
-   * This will be called automatically when calling loader::loadFile but can also be called manually
-   * when needed. This must be called, either manually or automatically, before any render call.
-   * Return true on success, false otherwise.
-   */
-  virtual bool update() = 0;
-
-  /**
    * Perform a render of the window to the screen.
+   * All dynamic options are updated if needed.
    * Return true on success, false otherwise.
    */
   virtual bool render() = 0;
