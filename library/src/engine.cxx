@@ -114,6 +114,13 @@ std::map<std::string, std::string> engine::getLibInfo()
 #endif
   libInfo["Raytracing module"] = tmp;
 
+#if F3D_MODULE_EXTERNAL_RENDERING
+  tmp = "ON";
+#else
+  tmp = "OFF";
+#endif
+  libInfo["External rendering module"] = tmp;
+
 #if F3D_MODULE_EXODUS
   tmp = "ON";
 #else

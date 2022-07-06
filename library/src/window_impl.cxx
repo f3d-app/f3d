@@ -3,12 +3,13 @@
 #include "log.h"
 #include "options.h"
 
+#include "vtkF3DConfigure.h"
+
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DNoRenderWindow.h"
 #include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCamera.h>
-#include <vtkExternalOpenGLRenderWindow.h>
 #include <vtkImageData.h>
 #include <vtkImageExport.h>
 #include <vtkPNGReader.h>
@@ -17,6 +18,10 @@
 #include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
+
+#if F3D_MODULE_EXTERNAL_RENDERING
+#include <vtkExternalOpenGLRenderWindow.h>
+#endif
 
 namespace f3d::detail
 {
@@ -57,7 +62,11 @@ window_impl::window_impl(const options& options, Type type)
   }
   else if (type == Type::EXTERNAL)
   {
+#if F3D_MODULE_EXTERNAL_RENDERING
     this->Internals->RenWin = vtkSmartPointer<vtkExternalOpenGLRenderWindow>::New();
+#else
+    throw exception("Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
+#endif
   }
   else
   {

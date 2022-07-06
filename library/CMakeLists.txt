@@ -28,9 +28,17 @@ endif()
 
 if(F3D_MODULE_RAYTRACING)
   if(TARGET VTK::RenderingRayTracing)
-    message(STATUS "VTK RayTracing found")
+    message(STATUS "VTK::RenderingRayTracing module found")
   else()
     message(FATAL_ERROR "F3D_MODULE_RAYTRACING option is enabled but VTK::RenderingRayTracing is not found")
+  endif()
+endif()
+
+if(F3D_MODULE_EXTERNAL_RENDERING)
+  if(TARGET VTK::RenderingExternal)
+    message(STATUS "VTK::RenderingExternal module found")
+  else()
+    message(FATAL_ERROR "F3D_MODULE_EXTERNAL_RENDERING option is enabled but VTK::RenderingExternal is not found")
   endif()
 endif()
 
