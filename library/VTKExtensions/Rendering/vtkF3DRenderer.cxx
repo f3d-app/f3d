@@ -247,12 +247,6 @@ void vtkF3DRenderer::ShowAxis(bool show)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::IsAxisVisible()
-{
-  return this->AxisVisible;
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowGrid(bool show)
 {
   // Initialize grid using visible prop bounds
@@ -314,12 +308,6 @@ void vtkF3DRenderer::ShowGrid(bool show)
     this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::IsGridVisible()
-{
-  return this->GridVisible;
 }
 
 //----------------------------------------------------------------------------
@@ -480,12 +468,6 @@ void vtkF3DRenderer::SetUseDepthPeelingPass(bool use)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::UsingBlurBackground()
-{
-  return this->UseBlurBackground;
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseBlurBackground(bool use)
 {
   if (this->UseBlurBackground != use)
@@ -494,12 +476,6 @@ void vtkF3DRenderer::SetUseBlurBackground(bool use)
     this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::UsingDepthPeelingPass()
-{
-  return this->UseDepthPeelingPass;
 }
 
 //----------------------------------------------------------------------------
@@ -514,12 +490,6 @@ void vtkF3DRenderer::SetUseSSAOPass(bool use)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::UsingSSAOPass()
-{
-  return this->UseSSAOPass;
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseFXAAPass(bool use)
 {
   if (this->UseFXAAPass != use)
@@ -528,12 +498,6 @@ void vtkF3DRenderer::SetUseFXAAPass(bool use)
     this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::UsingFXAAPass()
-{
-  return this->UseFXAAPass;
 }
 
 //----------------------------------------------------------------------------
@@ -548,12 +512,6 @@ void vtkF3DRenderer::SetUseToneMappingPass(bool use)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::UsingToneMappingPass()
-{
-  return this->UseToneMappingPass;
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseRaytracing(bool use)
 {
   if (this->UseRaytracing != use)
@@ -562,12 +520,6 @@ void vtkF3DRenderer::SetUseRaytracing(bool use)
     this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::UsingRaytracing()
-{
-  return this->UseRaytracing;
 }
 
 //----------------------------------------------------------------------------
@@ -592,12 +544,6 @@ void vtkF3DRenderer::SetUseRaytracingDenoiser(bool use)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::UsingRaytracingDenoiser()
-{
-  return this->UseRaytracingDenoiser;
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowTimer(bool show)
 {
   if (this->TimerVisible != show)
@@ -610,12 +556,6 @@ void vtkF3DRenderer::ShowTimer(bool show)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::IsTimerVisible()
-{
-  return this->TimerVisible;
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowFilename(bool show)
 {
   if (this->FilenameVisible != show)
@@ -625,12 +565,6 @@ void vtkF3DRenderer::ShowFilename(bool show)
     this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::IsFilenameVisible()
-{
-  return this->FilenameVisible;
 }
 
 //----------------------------------------------------------------------------
@@ -653,12 +587,6 @@ void vtkF3DRenderer::ShowMetaData(bool show)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::IsMetaDataVisible()
-{
-  return this->MetaDataVisible;
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowCheatSheet(bool show)
 {
   if (this->CheatSheetVisible != show)
@@ -668,12 +596,6 @@ void vtkF3DRenderer::ShowCheatSheet(bool show)
     this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
   }
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::IsCheatSheetVisible()
-{
-  return this->CheatSheetVisible;
 }
 
 //----------------------------------------------------------------------------
@@ -745,12 +667,6 @@ void vtkF3DRenderer::ShowEdge(bool show)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::IsEdgeVisible()
-{
-  return this->EdgeVisible;
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseTrackball(bool use)
 {
   if (this->UseTrackball != use)
@@ -758,12 +674,6 @@ void vtkF3DRenderer::SetUseTrackball(bool use)
     this->UseTrackball = use;
     this->CheatSheetNeedUpdate = true;
   }
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::UsingTrackball()
-{
-  return this->UseTrackball;
 }
 
 //----------------------------------------------------------------------------

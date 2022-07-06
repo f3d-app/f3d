@@ -197,14 +197,13 @@ void window_impl::UpdateDynamicOptions()
   {
     renWithColor->SetColoring(this->Internals->Options.getAsBool("cells"),
       this->Internals->Options.getAsString("scalars"),
-      this->Internals->Options.getAsInt("component"), false);
-    renWithColor->SetUsePointSprites(this->Internals->Options.getAsBool("point-sprites"), false);
-    renWithColor->SetUseVolume(this->Internals->Options.getAsBool("volume"), false);
-    renWithColor->SetUseInverseOpacityFunction(
-      this->Internals->Options.getAsBool("inverse"), false);
-    renWithColor->ShowScalarBar(this->Internals->Options.getAsBool("bar"), false);
-    renWithColor->SetScalarBarRange(this->Internals->Options.getAsDoubleVector("range"), false);
-    renWithColor->SetColormap(this->Internals->Options.getAsDoubleVector("colormap"), false);
+      this->Internals->Options.getAsInt("component"));
+    renWithColor->SetUsePointSprites(this->Internals->Options.getAsBool("point-sprites"));
+    renWithColor->SetUseVolume(this->Internals->Options.getAsBool("volume"));
+    renWithColor->SetUseInverseOpacityFunction(this->Internals->Options.getAsBool("inverse"));
+    renWithColor->ShowScalarBar(this->Internals->Options.getAsBool("bar"));
+    renWithColor->SetScalarBarRange(this->Internals->Options.getAsDoubleVector("range"));
+    renWithColor->SetColormap(this->Internals->Options.getAsDoubleVector("colormap"));
     renWithColor->UpdateColoringActors();
   }
 

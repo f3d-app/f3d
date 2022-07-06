@@ -26,7 +26,7 @@ public:
 
   //@{
   /**
-   * Set/Get visibility of different actors
+   * Set visibility of different actors
    */
   void ShowAxis(bool show);
   void ShowGrid(bool show);
@@ -35,13 +35,6 @@ public:
   void ShowMetaData(bool show);
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
-  bool IsAxisVisible();
-  bool IsGridVisible();
-  bool IsEdgeVisible();
-  bool IsTimerVisible();
-  bool IsFilenameVisible();
-  bool IsMetaDataVisible();
-  bool IsCheatSheetVisible();
   //@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -56,7 +49,7 @@ public:
 
   //@{
   /**
-   * Set/Get usages and configurations of different render passes
+   * Set usages and configurations of different render passes
    */
   void SetUseRaytracing(bool use);
   void SetUseRaytracingDenoiser(bool use);
@@ -65,16 +58,15 @@ public:
   void SetUseFXAAPass(bool use);
   void SetUseToneMappingPass(bool use);
   void SetUseBlurBackground(bool use);
-  void SetUseTrackball(bool use);
   void SetRaytracingSamples(int samples);
-  bool UsingRaytracing();
-  bool UsingRaytracingDenoiser();
-  bool UsingDepthPeelingPass();
-  bool UsingSSAOPass();
-  bool UsingFXAAPass();
-  bool UsingToneMappingPass();
-  bool UsingBlurBackground();
-  bool UsingTrackball();
+  //@}
+
+  //@{
+  /**
+   * Set/Get UseTrackball
+   */
+  void SetUseTrackball(bool use);
+  vtkGetMacro(UseTrackball, bool);
   //@}
 
   /**
