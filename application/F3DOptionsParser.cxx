@@ -367,6 +367,7 @@ void ConfigurationOptions::PrintVersion()
   f3d::log::info("Build date: " + libInfo["Build date"] + ".");
   f3d::log::info("Build system: " + libInfo["Build system"] + ".");
   f3d::log::info("Compiler: " + libInfo["Compiler"] + ".");
+  f3d::log::info("External rendering module: " + libInfo["External rendering module"] + ".");
   f3d::log::info("Raytracing module: " + libInfo["Raytracing module"] + ".");
   f3d::log::info("Exodus module: " + libInfo["Exodus module"] + ".");
   f3d::log::info("OpenCASCADE module: " + libInfo["OpenCASCADE module"] + ".");

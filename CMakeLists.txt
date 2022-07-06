@@ -15,6 +15,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # Modules
+option(F3D_MODULE_EXTERNAL_RENDERING "External rendering module" OFF)
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 option(F3D_MODULE_EXODUS "ExodusII module" ON)
 option(F3D_MODULE_OCCT "OpenCASCADE module (STEP and IGES files)" OFF)
@@ -44,7 +45,6 @@ find_package(VTK 9.0 REQUIRED
     IOXML
     RenderingAnnotation
     RenderingCore
-    RenderingExternal
     RenderingLabel
     RenderingOpenGL2
     RenderingVolumeOpenGL2
@@ -53,6 +53,7 @@ find_package(VTK 9.0 REQUIRED
     opengl
   OPTIONAL_COMPONENTS
     IOExodus
+    RenderingExternal
     RenderingRayTracing)
 
 # Assimp depency

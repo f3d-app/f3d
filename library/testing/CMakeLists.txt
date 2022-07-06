@@ -44,20 +44,20 @@ endif()
 configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack.log.in"
                "${CMAKE_BINARY_DIR}/TestSDKInteractorCallBack.log") # Dragon.vtu; S
 
-# External window test using GLFW
-find_package(glfw3 QUIET)
-if(glfw3_FOUND AND VTK_VERSION VERSION_GREATER 9.0.1)
-  list(APPEND libf3dSDKTests_list
-       TestSDKExternalWindowGLFW.cxx
-      )
-endif()
-
-# External window test using QT
-find_package(Qt5 QUIET COMPONENTS OpenGL)
-if(Qt5_FOUND AND VTK_VERSION VERSION_GREATER 9.0.1)
-  list(APPEND libf3dSDKTests_list
-       TestSDKExternalWindowQT.cxx
-      )
+# External window tests
+if(F3D_MODULE_EXTERNAL_RENDERING AND VTK_VERSION VERSION_GREATER 9.0.1)
+  find_package(glfw3 QUIET)
+  if(glfw3_FOUND)
+    list(APPEND libf3dSDKTests_list
+        TestSDKExternalWindowGLFW.cxx
+        )
+  endif()
+  find_package(Qt5 QUIET COMPONENTS OpenGL)
+  if(Qt5_FOUND)
+    list(APPEND libf3dSDKTests_list
+        TestSDKExternalWindowQT.cxx
+        )
+  endif()
 endif()
 
 # create the testing file and list of tests
