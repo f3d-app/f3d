@@ -286,6 +286,9 @@ protected:
 
   std::vector<double> UserScalarBarRange;
   std::vector<double> Colormap;
+
+  vtkTimeStamp ColoringTimeStamp;
+  vtkMTimeType ColoringUpdateTime = 0;
 };
 
 #endif
