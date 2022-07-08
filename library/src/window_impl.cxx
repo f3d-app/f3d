@@ -210,7 +210,7 @@ void window_impl::UpdateDynamicOptions()
   // Show grid last as it needs to know the bounding box to be able to compute its size
   this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("grid"));
 
-  // Print coloring info when available
+  // Print rendering description when available
   log::debug(this->Internals->Renderer->GetRenderingDescription());
 }
 
