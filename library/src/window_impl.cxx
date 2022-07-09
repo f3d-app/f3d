@@ -33,18 +33,6 @@ public:
   {
   }
 
-  static void DisplayCameraInformation(vtkCamera* cam)
-  {
-    double* position = cam->GetPosition();
-    log::debug("Camera position is: ", position[0], ", ", position[1], ", ", position[2], ".");
-    double* focalPoint = cam->GetFocalPoint();
-    log::debug(
-      "Camera focal point is: ", focalPoint[0], ", ", focalPoint[1], ", ", focalPoint[2], ".");
-    double* viewUp = cam->GetViewUp();
-    log::debug("Camera view up is: ", viewUp[0], ", ", viewUp[1], ", ", viewUp[2], ".");
-    log::debug("Camera view angle is: ", cam->GetViewAngle(), ".\n");
-  }
-
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkSmartPointer<vtkF3DRenderer> Renderer;
   Type WindowType;
@@ -209,9 +197,6 @@ void window_impl::UpdateDynamicOptions()
 
   // Show grid last as it needs to know the bounding box to be able to compute its size
   this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("grid"));
-
-  // Print rendering description when available
-  log::debug(this->Internals->Renderer->GetRenderingDescription());
 }
 
 //----------------------------------------------------------------------------
@@ -256,11 +241,26 @@ void window_impl::InitializeCamera()
     cam->Azimuth(this->Internals->Options.getAsDouble("camera-azimuth-angle"));
     cam->Elevation(this->Internals->Options.getAsDouble("camera-elevation-angle"));
     cam->OrthogonalizeViewUp();
-
-    window_impl::internals::DisplayCameraInformation(cam);
   }
 
   this->Internals->Renderer->InitializeCamera();
+}
+
+//----------------------------------------------------------------------------
+void window_impl::PrintSceneDescription(log::VerboseLevel level)
+{
+  log::print(level, this->Internals->Renderer->GetSceneDescription());
+}
+
+//----------------------------------------------------------------------------
+void window_impl::PrintColoringDescription(log::VerboseLevel level)
+{
+  vtkF3DRendererWithColoring* renWithColor =
+    vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
+  if (renWithColor)
+  {
+    log::print(level, renWithColor->GetColoringDescription());
+  }
 }
 
 //----------------------------------------------------------------------------

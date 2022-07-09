@@ -204,9 +204,26 @@ void vtkF3DRenderer::SetupRenderPasses()
 }
 
 //----------------------------------------------------------------------------
-std::string vtkF3DRenderer::GetRenderingDescription()
+std::string vtkF3DRenderer::GetSceneDescription()
 {
   std::string descr;
+
+  // Camera Info
+  vtkCamera* cam = this->GetActiveCamera();
+  double position[3];
+  double focal[3];
+  double up[3];
+  cam->GetPosition(position);
+  cam->GetFocalPoint(focal);
+  cam->GetViewUp(up);
+  std::stringstream stream;
+  stream << "Camera position: " << position[0] << "," << position[1] << "," << position[2] << "\n"
+         << "Camera focal point: " << focal[0] << "," << focal[1] << "," << focal[2] << "\n"
+         << "Camera view up: " << up[0] << "," << up[1] << "," << up[2] << "\n"
+         << "Camera view angle: " << cam->GetViewAngle() << "\n\n";
+  descr += stream.str();
+
+  // Grid Info
   if (this->GridVisible)
   {
     descr += this->GridInfo;
@@ -607,7 +624,7 @@ void vtkF3DRenderer::UpdateCheatSheet()
     cheatSheetText << "\n";
     this->FillCheatSheetHotkeys(cheatSheetText);
     cheatSheetText << "\n   H  : Cheat sheet \n";
-    cheatSheetText << "   ?  : Dump camera state to the terminal\n";
+    cheatSheetText << "   ?  : Print scene descr to terminal\n";
     cheatSheetText << "  ESC : Quit \n";
     cheatSheetText << " ENTER: Reset camera to initial parameters\n";
     cheatSheetText << " SPACE: Play animation if any\n";
@@ -742,21 +759,4 @@ bool vtkF3DRenderer::IsBackgroundDark()
   double luminance =
     0.299 * this->Background[0] + 0.587 * this->Background[1] + 0.114 * this->Background[2];
   return this->HasHDRI ? true : luminance < 0.5;
-}
-
-//----------------------------------------------------------------------------
-std::string vtkF3DRenderer::GetSceneDescription()
-{
-  vtkCamera* cam = this->GetActiveCamera();
-  double position[3];
-  double focal[3];
-  double up[3];
-  cam->GetPosition(position);
-  cam->GetFocalPoint(focal);
-  cam->GetViewUp(up);
-  std::stringstream stream;
-  stream << "Camera position: " << position[0] << "," << position[1] << "," << position[2] << "\n"
-         << "Camera focal point: " << focal[0] << "," << focal[1] << "," << focal[2] << "\n"
-         << "Camera view up: " << up[0] << "," << up[1] << "," << up[2] << "\n";
-  return stream.str();
 }

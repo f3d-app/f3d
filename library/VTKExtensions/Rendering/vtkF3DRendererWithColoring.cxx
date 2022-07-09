@@ -333,10 +333,9 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
 }
 
 //----------------------------------------------------------------------------
-std::string vtkF3DRendererWithColoring::GetRenderingDescription()
+std::string vtkF3DRendererWithColoring::GetColoringDescription()
 {
   std::stringstream stream;
-  stream << this->Superclass::GetRenderingDescription();
   if (this->ArrayForColoring)
   {
     stream << "Coloring using "
