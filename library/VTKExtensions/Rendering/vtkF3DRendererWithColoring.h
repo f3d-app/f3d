@@ -193,18 +193,18 @@ protected:
   static void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, vtkDataArray* array,
     int component, vtkColorTransferFunction* ctf);
 
+  void ConfigureRangeAndCTFForColoring(vtkDataArray* array, int component);
+
+  void UpdateScalarBarVisibility();
+
+  void FillCheatSheetHotkeys(std::stringstream& sheet) override;
+
   /**
    * Look for an arrayIndex in a vtkDataSetAttributes based on an arrayName
    * Returns the arrayIndex or -1 if not found
    */
   static int FindArrayIndexForColoring(
     vtkDataSetAttributes* dataForColoring, const std::string& arrayName);
-
-  void ConfigureRangeAndCTFForColoring(vtkDataArray* array, int component);
-
-  void UpdateScalarBarVisibility();
-
-  void FillCheatSheetHotkeys(std::stringstream& sheet) override;
 
   /**
    * Switch between point data and cell data coloring
