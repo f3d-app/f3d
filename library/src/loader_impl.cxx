@@ -391,6 +391,10 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   this->Internals->Window.UpdateDynamicOptions();
   this->Internals->Window.InitializeCamera();
 
+  // Print info about scene and coloring
+  this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+  this->Internals->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
+
   this->Internals->LoadedFile = true;
   return this->Internals->LoadedFile;
 }

@@ -103,15 +103,10 @@ public:
   void ResetCamera() override;
 
   /**
-   * Get useful scene state description. Currently contains only camera state.
+   * Return description about the current rendering status
+   * Currently contains information about the camera and the grid if any
    */
   virtual std::string GetSceneDescription();
-
-  /**
-   * Return description about the current rendering status
-   * Currently contains only information about the grid size if any
-   */
-  virtual std::string GetRenderingDescription();
 
   /**
    * Get up vector

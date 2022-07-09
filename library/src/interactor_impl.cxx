@@ -87,6 +87,7 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
+          self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
         }
@@ -95,6 +96,7 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
+          self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
         }
@@ -103,6 +105,7 @@ public:
         if (renWithColor)
         {
           renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
+          self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
         }
@@ -187,11 +190,9 @@ public:
         render = true;
         break;
       case '?':
-      {
-        std::string output = ren->GetSceneDescription();
-        log::info(output);
-      }
-      break;
+        self->Window.PrintColoringDescription(log::VerboseLevel::INFO);
+        self->Window.PrintSceneDescription(log::VerboseLevel::INFO);
+        break;
       default:
         if (keySym == "Left")
         {
