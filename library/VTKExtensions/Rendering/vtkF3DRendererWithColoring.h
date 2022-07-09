@@ -174,10 +174,9 @@ public:
   void UpdateColoringActors();
 
   /**
-   * Get information about the current rendering
-   * Use the superclass then append coloring information on it
+   * Get information about the current coloring
    */
-  std::string GetRenderingDescription() override;
+  virtual std::string GetColoringDescription();
 
 protected:
   vtkF3DRendererWithColoring() = default;
