@@ -142,6 +142,10 @@ f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --comp=3 LONG_TIMEOUT)
 f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --comp=-2 LONG_TIMEOUT)
 f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --cells LONG_TIMEOUT)
 f3d_test(NAME TestVolumeNonScalars DATA waveletArrays.vti ARGS -vb --scalars=RandomPointScalars LONG_TIMEOUT)
+f3d_test(NAME TestTextureNormal DATA WaterBottle.glb ARGS --geometry-only --texture-normal=${CMAKE_SOURCE_DIR}/testing/data/normal.png --normal-scale=0.1 DEFAULT_LIGHTS)
+f3d_test(NAME TestTextureMaterial DATA WaterBottle.glb ARGS --geometry-only --texture-material=${CMAKE_SOURCE_DIR}/testing/data/red.jpg --roughness=1 --metallic=1 DEFAULT_LIGHTS) # roughness and metallic have no effect ?
+f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --geometry-only --texture-base-color=${CMAKE_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.1 --depth-peeling DEFAULT_LIGHTS) #may be impacted by https://github.com/f3d-app/f3d/issues/332
+f3d_test(NAME TestTextureEmissive DATA WaterBottle.glb ARGS --geometry-only --texture-emissive=${CMAKE_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1 DEFAULT_LIGHTS)
 f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --geometry-only --texture-material=${CMAKE_SOURCE_DIR}/testing/data/red.jpg --roughness=1 --metallic=1 --texture-base-color=${CMAKE_SOURCE_DIR}/testing/data/albedo.png --texture-normal=${CMAKE_SOURCE_DIR}/testing/data/normal.png --texture-emissive=${CMAKE_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1 DEFAULT_LIGHTS)
 f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m DEFAULT_LIGHTS)
 f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m DEFAULT_LIGHTS)
