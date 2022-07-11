@@ -22,10 +22,6 @@ int TestSDKEngine(int argc, char* argv[])
   f3d::window& window2 = eng2.getWindow();
   f3d::interactor& inter2 = eng2.getInteractor();
 
-  f3d::engine eng3(f3d::window::Type::EXTERNAL);
-  f3d::loader& load3 = eng3.getLoader();
-  f3d::window& window3 = eng3.getWindow();
-
   // Test option setters
   f3d::options opt;
   opt.set("cells", true);
