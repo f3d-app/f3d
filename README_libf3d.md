@@ -185,4 +185,4 @@ interactor.trackball|false|bool|Enable trackball interaction.|--trackball
 
 # Python Bindings
 
-TODO
+TODO Add Python bindings doc

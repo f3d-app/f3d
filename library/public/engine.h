@@ -99,7 +99,22 @@ public:
 
   /**
    * Get a map containing info about the libf3d
-   * TODO improve this doc to list the keys
+   * Available keys here:
+   * - "Version"
+   * - "Build date"
+   * - "Build system"
+   * - "Compiler"
+   * - "Raytracing module"
+   * - "External rendering module"
+   * - "Exodus module"
+   * - "OpenCASCADE module"
+   * - "Assimp module"
+   * - "Alembic module"
+   * - "VTK version"
+   * - "Copyright_previous"
+   * - "Copyright"
+   * - "License"
+   * - "Authors"
    */
   static std::map<std::string, std::string> getLibInfo();
 
