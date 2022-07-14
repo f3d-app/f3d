@@ -185,4 +185,13 @@ interactor.trackball|false|bool|Enable trackball interaction.|--trackball
 
 # Python Bindings
 
-TODO Add Python bindings doc
+Python bindings are provided by pybind11 and looks like this:
+
+```
+import f3d
+engine = f3d.engine()
+engine.getLoader().addFile("path/to/file.ext")
+engine.getLoader().loadFile()
+engine.getWindow().render()
+engine.getInteractor().start()
+```
