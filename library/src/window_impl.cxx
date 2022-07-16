@@ -1,5 +1,6 @@
 #include "window_impl.h"
 
+#include "camera_impl.h"
 #include "log.h"
 #include "options.h"
 
@@ -33,6 +34,7 @@ public:
   {
   }
 
+  std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkSmartPointer<vtkF3DRenderer> Renderer;
   Type WindowType;
@@ -62,12 +64,20 @@ window_impl::window_impl(const options& options, Type type)
     this->Internals->RenWin->SetOffScreenRendering(type == Type::NATIVE_OFFSCREEN);
     this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
   }
+
+  this->Internals->Camera = std::make_unique<detail::camera_impl>();
 }
 
 //----------------------------------------------------------------------------
 window_impl::Type window_impl::getType()
 {
   return this->Internals->WindowType;
+}
+
+//----------------------------------------------------------------------------
+camera& window_impl::getCamera()
+{
+  return *this->Internals->Camera;
 }
 
 //----------------------------------------------------------------------------
@@ -202,6 +212,12 @@ void window_impl::UpdateDynamicOptions()
 //----------------------------------------------------------------------------
 void window_impl::InitializeCamera()
 {
+  // Recover VTK provided camera and copy it to f3d::camera
+  // Then use f3d::camera in the renderer.
+  vtkCamera* originalCam = this->Internals->Renderer->GetActiveCamera();
+  this->Internals->Camera->CopyFromVTKCamera(originalCam);
+  this->Internals->Renderer->SetActiveCamera(this->Internals->Camera->GetVTKCamera());
+
   // This should be called only once all options
   // have been shown as they may have an effect on it
   if (this->Internals->Options.getAsInt("camera-index") < 0)

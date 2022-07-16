@@ -42,6 +42,7 @@ public:
    * Documented public API
    */
   Type getType() override;
+  camera& getCamera() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;
   void setSize(int width, int heigth) override;
