@@ -34,6 +34,7 @@ void camera_impl::setViewMatrix(const std::array<double, 16>& matrix)
 std::array<double, 16> camera_impl::getViewMatrix()
 {
   vtkMatrix4x4* mat = this->Internals->VTKCamera->GetModelViewTransformMatrix();
+  mat->Transpose();
   double* data = mat->GetData();
   std::array<double, 16> arr;
   std::move(data, data + 16, arr.begin());
