@@ -189,9 +189,43 @@ public:
         self->Options.toggle("cheatsheet");
         render = true;
         break;
+      case 'L':
+        {
+        std::array<double, 16> mat = {
+1,
+0,
+0,
+0,
+0,
+1,
+0,
+0,
+0,
+0,
+1,
+0,
+-0.776126,
+0.438658,
+-24.556,
+1,
+
+          
+        };
+        self->Window.getCamera().setViewMatrix(mat);
+        render = true;
+        }
+        break;
       case '?':
+      case '/':
+        {
         self->Window.PrintColoringDescription(log::VerboseLevel::INFO);
         self->Window.PrintSceneDescription(log::VerboseLevel::INFO);
+        auto mat = self->Window.getCamera().getViewMatrix();
+        for (const auto& val : mat)
+        {
+          std::cout<<val<<","<<std::endl;
+        }
+        }
         break;
       default:
         if (keySym == "Left")
