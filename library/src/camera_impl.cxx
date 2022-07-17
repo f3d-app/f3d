@@ -26,20 +26,35 @@ camera_impl::~camera_impl()
 //----------------------------------------------------------------------------
 void camera_impl::setViewMatrix(const std::array<double, 16>& matrix)
 {
-  // TODO Which API to implement ?
-  this->Internals->VTKCamera->SetPosition(0.776126,-0.438658,24.556);
-  this->Internals->VTKCamera->SetFocalPoint(0.776126,-0.438658,0);
-  this->Internals->VTKCamera->SetViewUp(0,1,0);
+  this->Internals->VTKCamera->SetPosition(matrix[12], matrix[13], matrix[14]);
+  this->Internals->VTKCamera->SetFocalPoint(matrix[8] + matrix[12], matrix[9] + matrix[13], matrix[10] + matrix[14]);
+  this->Internals->VTKCamera->SetViewUp(matrix[4], matrix[5], matrix[6]);
 }
 
 //----------------------------------------------------------------------------
 std::array<double, 16> camera_impl::getViewMatrix()
 {
-  vtkMatrix4x4* mat = this->Internals->VTKCamera->GetModelViewTransformMatrix();
-  mat->Transpose();
-  double* data = mat->GetData();
+  // Is this correct ?
   std::array<double, 16> arr;
-  std::move(data, data + 16, arr.begin());
+  double pos[3];
+  this->Internals->VTKCamera->GetPosition(pos);
+  double foc[3];
+  this->Internals->VTKCamera->GetFocalPoint(foc);
+  double up[3];
+  this->Internals->VTKCamera->GetViewUp(up);
+  double to[3];
+  vtkMath::Subtract(foc, pos, to);
+  double right[3];
+  vtkMath::Cross(to, up, right);
+
+  std::move(std::begin(right), std::end(right), arr.begin());
+  arr[3] = 0;
+  std::move(std::begin(up), std::end(up), arr.begin() + 4);
+  arr[7] = 0;
+  std::move(std::begin(to), std::end(to), arr.begin() + 8);
+  arr[11] = 0;
+  std::move(std::begin(pos), std::end(pos), arr.begin() + 12);
+  arr[15] = 1;
   return arr;
 }
 
