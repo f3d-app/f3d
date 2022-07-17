@@ -1,16 +1,15 @@
 #include "camera_impl.h"
 
-#include <vtkNew.h>
+#include <vtkCamera.h>
+#include <vtkWeakPointer.h>
 #include <vtkMatrix4x4.h>
-
-#include <vtkExternalOpenGLCamera.h>
 
 namespace f3d::detail
 {
 class camera_impl::internals
 {
 public:
-  vtkNew<vtkExternalOpenGLCamera> VTKCamera;
+  vtkWeakPointer<vtkCamera> VTKCamera;
 };
 
 //----------------------------------------------------------------------------
@@ -27,7 +26,10 @@ camera_impl::~camera_impl()
 //----------------------------------------------------------------------------
 void camera_impl::setViewMatrix(const std::array<double, 16>& matrix)
 {
-  this->Internals->VTKCamera->SetViewTransformMatrix(matrix.data());
+  // TODO Which API to implement ?
+  this->Internals->VTKCamera->SetPosition(0.776126,-0.438658,24.556);
+  this->Internals->VTKCamera->SetFocalPoint(0.776126,-0.438658,0);
+  this->Internals->VTKCamera->SetViewUp(0,1,0);
 }
 
 //----------------------------------------------------------------------------
@@ -42,17 +44,8 @@ std::array<double, 16> camera_impl::getViewMatrix()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::CopyFromVTKCamera(vtkCamera* cam)
+void camera_impl::SetVTKCamera(vtkCamera* cam)
 {
-  if (cam != this->Internals->VTKCamera)
-  {
-    this->Internals->VTKCamera->DeepCopy(cam);
-  }
-}
-
-//----------------------------------------------------------------------------
-vtkCamera* camera_impl::GetVTKCamera()
-{
-  return this->Internals->VTKCamera;
+  this->Internals->VTKCamera = cam;
 }
 };

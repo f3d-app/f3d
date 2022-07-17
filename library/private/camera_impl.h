@@ -31,7 +31,7 @@ public:
 
   //@{
   /**
-   * Documented public API
+   * Documented public API TODO
    */
   void setViewMatrix(const std::array<double, 16>& matrix) override;
   std::array<double, 16> getViewMatrix() override;
@@ -40,8 +40,7 @@ public:
   /**
    * Implementation only API.
    */
-  void CopyFromVTKCamera(vtkCamera* vtkCamera);
-  vtkCamera* GetVTKCamera();
+  void SetVTKCamera(vtkCamera* vtkCamera);
 
 private:
   class internals;

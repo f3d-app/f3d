@@ -214,9 +214,8 @@ void window_impl::InitializeCamera()
 {
   // Recover VTK provided camera and copy it to f3d::camera
   // Then use f3d::camera in the renderer.
-  vtkCamera* originalCam = this->Internals->Renderer->GetActiveCamera();
-  this->Internals->Camera->CopyFromVTKCamera(originalCam);
-  this->Internals->Renderer->SetActiveCamera(this->Internals->Camera->GetVTKCamera());
+  vtkCamera* cam = this->Internals->Renderer->GetActiveCamera();
+  this->Internals->Camera->SetVTKCamera(cam);
 
   // This should be called only once all options
   // have been shown as they may have an effect on it
@@ -226,8 +225,7 @@ void window_impl::InitializeCamera()
     this->Internals->Renderer->vtkRenderer::ResetCamera();
 
     // use this->Internals->Options to overwrite camera parameters
-    vtkCamera* cam = this->Internals->Renderer->GetActiveCamera();
-
+    // TODO rework this ?
     std::vector<double> cameraPosition =
       this->Internals->Options.getAsDoubleVector("camera-position");
     if (cameraPosition.size() == 3)
