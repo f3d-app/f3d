@@ -31,10 +31,23 @@ public:
 
   //@{
   /**
-   * Documented public API TODO
+   * Documented public API
    */
-  void setViewMatrix(const std::array<double, 16>& matrix) override;
-  std::array<double, 16> getViewMatrix() override;
+  void setPosition(const vector_t& pos) override;
+  vector_t getPosition() override;
+  void setFocalPoint(const vector_t& foc) override;
+  vector_t getFocalPoint() override;
+  void setViewUp(const vector_t& up) override;
+  vector_t getViewUp() override;
+  void setViewMatrix(const matrix_t& matrix) override;
+  matrix_t getViewMatrix() override;
+
+  void dolly(double val) override;
+  void roll(double angle) override;
+  void azimuth(double angle) override;
+  void yaw(double angle) override;
+  void elevation(double angle) override;
+  void pitch(double angle) override;
   //@}
 
   /**
