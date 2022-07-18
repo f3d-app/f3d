@@ -8,7 +8,7 @@ namespace f3d::detail
 class camera_impl::internals
 {
 public:
-  vtkRenderer* VTKRenderer;
+  vtkRenderer* VTKRenderer = nullptr;
   vtkNew<vtkCamera> DefaultVTKCamera;
 };
 
@@ -122,16 +122,22 @@ camera::matrix_t camera_impl::getViewMatrix()
   double right[3];
   vtkMath::Cross(to, up, right);
 
+  // TODO with normalize, the focal point is not at the right location
+  // with a get/set
+//  vtkMath::Normalize(right);
   std::move(std::begin(right), std::end(right), arr.begin());
   arr[3] = 0;
+//  vtkMath::Normalize(up);
   std::move(std::begin(up), std::end(up), arr.begin() + 4);
   arr[7] = 0;
+//  vtkMath::Normalize(to);
   std::move(std::begin(to), std::end(to), arr.begin() + 8);
   arr[11] = 0;
   std::move(std::begin(pos), std::end(pos), arr.begin() + 12);
   arr[15] = 1;
 #else
   // Why is this implementation not giving same result as above ?
+  // TODO 
   vtkMatrix4x4* mat = cam->GetModelViewTransformMatrix();
   mat->Transpose();
   double* data = mat->GetData();
@@ -225,6 +231,10 @@ void camera_impl::SetVTKRenderer(vtkRenderer* renderer)
 //----------------------------------------------------------------------------
 vtkCamera* camera_impl::GetVTKCamera()
 {
+  if (!this->Internals->VTKRenderer)
+  {
+    throw camera::exception("No camera available");
+  }
   vtkCamera* cam = this->Internals->VTKRenderer->GetActiveCamera();
   if (!cam)
   {

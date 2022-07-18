@@ -2,7 +2,7 @@
  * @class   camera
  * @brief   Abstract class to control a camera in a camera
  *
- * A class to control a camera in a camera.
+ * A class to control a camera in a window, use only after the first render of the window.
  */
 
 #ifndef f3d_camera_h
