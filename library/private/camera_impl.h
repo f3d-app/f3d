@@ -22,13 +22,14 @@ class camera_impl : public camera
 {
 public:
   /**
+   * Default constructor
    */
   camera_impl();
 
   /**
    * Default destructor
    */
-  ~camera_impl() override;
+  ~camera_impl() override = default;
 
   //@{
   /**
@@ -58,15 +59,20 @@ public:
   //@}
 
   /**
-   * Implementation only API.
+   * Implementation only api.
+   * Set the pointer to the renderer to control the camera of.
    */
   void SetVTKRenderer(vtkRenderer* renderer);
+
+  /**
+   * Implementation only api.
+   * Recover a pointer to the vtkCamera currently being controlled
+   */
   vtkCamera* GetVTKCamera();
 
 private:
   class internals;
   std::unique_ptr<internals> Internals;
-
 };
 }
 

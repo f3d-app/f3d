@@ -14,14 +14,7 @@ public:
 
 //----------------------------------------------------------------------------
 camera_impl::camera_impl()
- : Internals(new camera_impl::internals())
-{
-}
-
-//----------------------------------------------------------------------------
-camera_impl::~camera_impl()
-{
-}
+ : Internals(new camera_impl::internals()){}
 
 //----------------------------------------------------------------------------
 void camera_impl::setPosition(const vector_t& pos)

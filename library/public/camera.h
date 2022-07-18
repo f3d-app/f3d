@@ -30,6 +30,11 @@ public:
   typedef std::array<double, 3> vector_t;
   typedef std::array<double, 16> matrix_t;
 
+  //@{
+  /**
+   * Set/Get the canera parameters.
+   * Call render on the window before calling any of these methods, or they will throw an exception.
+   */
   virtual void setPosition(const vector_t& pos) = 0;
   virtual vector_t getPosition() = 0;
   virtual void setFocalPoint(const vector_t& foc) = 0;
@@ -38,19 +43,47 @@ public:
   virtual vector_t getViewUp() = 0;
   virtual void setViewAngle(const double& angle) = 0;
   virtual double getViewAngle() = 0;
+  //@}
+ 
+ //@{
+  /**
+   * TODO
+   * Call render on the window before calling any of these methods, or they will throw an exception.
+   */
   virtual void setViewMatrix(const matrix_t& matrix) = 0;
   virtual matrix_t getViewMatrix() = 0;
+  //@}
 
+  //@{
+  /**
+   * Standard camera manipulation methods.
+   * Call render on the window before calling any of these methods, or they will throw an exception.
+   */
   virtual void dolly(double val) = 0;
   virtual void roll(double angle) = 0;
   virtual void azimuth(double angle) = 0;
   virtual void yaw(double angle) = 0;
   virtual void elevation(double angle) = 0;
   virtual void pitch(double angle) = 0;
+  //@}
 
+  /**
+   * Store the current camera configuration as default.
+   * Call render on the window before calling this or it will throw an exception.
+   */
   virtual void setCurrentAsDefault() = 0;
+
+  /**
+   * Reset the camera to the stored default camera configuration.
+   * Call render on the window before calling this or it will throw an exception.
+   */
   virtual void resetToDefault() = 0;
-  virtual void reset() = 0;
+
+  /**
+   * Reset the camera using the bounds of actors in the scene.
+   * Call render on the window before calling this or it will throw an exception.
+   */
+  virtual void resetToBounds() = 0;
 
 protected:
   camera() = default;
