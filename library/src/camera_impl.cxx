@@ -2,6 +2,7 @@
 
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
+#include <vtkMatrix4x4.h>
 
 namespace f3d::detail
 {
@@ -96,7 +97,7 @@ void camera_impl::setViewMatrix(const matrix_t& matrix)
   cam->SetPosition(matrix[12], matrix[13], matrix[14]);
   cam->SetFocalPoint(matrix[8] + matrix[12], matrix[9] + matrix[13], matrix[10] + matrix[14]);
   cam->SetViewUp(matrix[4], matrix[5], matrix[6]);
-  cam->OrthogonalizeViewUp();
+//   cam->OrthogonalizeViewUp(); TODO NOT NEEDED ?
   this->Internals->VTKRenderer->ResetCameraClippingRange();
 }
 
@@ -105,7 +106,7 @@ camera::matrix_t camera_impl::getViewMatrix()
 {
   vtkCamera* cam = this->GetVTKCamera();
   matrix_t arr;
-#if 1
+#if 0
   // Is this correct ?
   double pos[3];
   cam->GetPosition(pos);
@@ -120,20 +121,19 @@ camera::matrix_t camera_impl::getViewMatrix()
 
   // TODO with normalize, the focal point is not at the right location
   // with a get/set
-//  vtkMath::Normalize(right);
+  vtkMath::Normalize(right);
   std::move(std::begin(right), std::end(right), arr.begin());
   arr[3] = 0;
-//  vtkMath::Normalize(up);
+  vtkMath::Normalize(up);
   std::move(std::begin(up), std::end(up), arr.begin() + 4);
   arr[7] = 0;
-//  vtkMath::Normalize(to);
+  vtkMath::Normalize(to);
   std::move(std::begin(to), std::end(to), arr.begin() + 8);
   arr[11] = 0;
   std::move(std::begin(pos), std::end(pos), arr.begin() + 12);
   arr[15] = 1;
 #else
-  // Why is this implementation not giving same result as above ?
-  // TODO 
+  // TODO  this implementation seems better
   vtkMatrix4x4* mat = cam->GetModelViewTransformMatrix();
   mat->Transpose();
   double* data = mat->GetData();
