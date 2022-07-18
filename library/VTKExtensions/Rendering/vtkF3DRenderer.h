@@ -94,13 +94,13 @@ public:
    * Initialize the camera position, focal point,
    * view up and view angle.
    */
-  void InitializeCamera();
+ // void InitializeCamera();
 
-  using vtkOpenGLRenderer::ResetCamera;
+  //using vtkOpenGLRenderer::ResetCamera;
   /**
    * Reset the camera to its initial parameters
    */
-  void ResetCamera() override;
+//  void ResetCamera() override;
 
   /**
    * Return description about the current rendering status

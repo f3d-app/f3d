@@ -11,12 +11,22 @@
 #include "export.h"
 
 #include <array>
+#include <stdexcept>
 
 namespace f3d
 {
 class F3D_EXPORT camera
 {
 public:
+  class exception : public std::runtime_error
+  {
+  public:
+    exception(const std::string& what = "")
+      : std::runtime_error(what)
+    {
+    }
+  };
+
   typedef std::array<double, 3> vector_t;
   typedef std::array<double, 16> matrix_t;
 
@@ -26,6 +36,8 @@ public:
   virtual vector_t getFocalPoint() = 0;
   virtual void setViewUp(const vector_t& up) = 0;
   virtual vector_t getViewUp() = 0;
+  virtual void setViewAngle(const double& angle) = 0;
+  virtual double getViewAngle() = 0;
   virtual void setViewMatrix(const matrix_t& matrix) = 0;
   virtual matrix_t getViewMatrix() = 0;
 
@@ -35,6 +47,10 @@ public:
   virtual void yaw(double angle) = 0;
   virtual void elevation(double angle) = 0;
   virtual void pitch(double angle) = 0;
+
+  virtual void setCurrentAsDefault() = 0;
+  virtual void resetToDefault() = 0;
+  virtual void reset() = 0;
 
 protected:
   camera() = default;

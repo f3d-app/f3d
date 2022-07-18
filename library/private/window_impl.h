@@ -77,7 +77,7 @@ public:
    * Initialize camera position based on the visible actors in the renderer
    * Should be called after UpdateDynamicOptions to get correct positioning
    */
-  virtual void InitializeCamera();
+//  virtual void InitializeCamera();
 
   /**
    * Print scene description to log using provided verbose level

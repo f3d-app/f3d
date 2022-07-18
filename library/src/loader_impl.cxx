@@ -387,9 +387,12 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
     this->Internals->Window.InitializeRendererWithColoring(genericImporter);
   }
 
-  // Initialize renderer and camera using data read by the importer
+  // Initialize renderer and reset camera to bounds if needed
   this->Internals->Window.UpdateDynamicOptions();
-  this->Internals->Window.InitializeCamera();
+  if (this->Internals->Options.getAsInt("camera-index") == -1)
+  {
+    this->Internals->Window.getCamera().reset();
+  }
 
   // Print info about scene and coloring
   this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);

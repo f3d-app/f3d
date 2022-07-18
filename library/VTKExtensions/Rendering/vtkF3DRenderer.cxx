@@ -738,6 +738,7 @@ void vtkF3DRenderer::Render()
   this->TimerActor->SetInput(str.c_str());
 }
 
+/*
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::InitializeCamera()
 {
@@ -751,7 +752,7 @@ void vtkF3DRenderer::ResetCamera()
   vtkCamera* cam = this->GetActiveCamera();
   cam->DeepCopy(this->InitialCamera);
   cam->Modified();
-}
+}*/
 
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::IsBackgroundDark()

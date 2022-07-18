@@ -260,12 +260,12 @@ void ConfigurationOptions::GetOptionsFromArgs(
     this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.getAsBoolRef("inverse"), HasDefault::YES, MayHaveConfig::YES);
 
     auto grpCamera = cxxOptions.add_options("Camera");
-    this->DeclareOption(grpCamera, "camera-position", "", "Camera position", options.getAsDoubleVectorRef("camera-position"), HasDefault::NO, MayHaveConfig::YES, "<X,Y,Z>");
-    this->DeclareOption(grpCamera, "camera-focal-point", "", "Camera focal point", options.getAsDoubleVectorRef("camera-focal-point"), HasDefault::NO, MayHaveConfig::YES, "<X,Y,Z>");
-    this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", options.getAsDoubleVectorRef("camera-view-up"), HasDefault::NO, MayHaveConfig::YES, "<X,Y,Z>");
-    this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degrees)", options.getAsDoubleRef("camera-view-angle"), HasDefault::NO, MayHaveConfig::YES, "<angle>");
-    this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees)", options.getAsDoubleRef("camera-azimuth-angle"), HasDefault::YES, MayHaveConfig::YES, "<angle>");
-    this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees)", options.getAsDoubleRef("camera-elevation-angle"), HasDefault::YES, MayHaveConfig::YES, "<angle>");
+    this->DeclareOption(grpCamera, "camera-position", "", "Camera position", appOptions.CameraPosition, HasDefault::NO, MayHaveConfig::YES, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-focal-point", "", "Camera focal point", appOptions.CameraFocalPoint, HasDefault::NO, MayHaveConfig::YES, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", appOptions.CameraViewUp, HasDefault::NO, MayHaveConfig::YES, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degrees)", appOptions.CameraViewAngle, HasDefault::NO, MayHaveConfig::YES, "<angle>");
+    this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees)", appOptions.CameraAzimuthAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
+    this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees)", appOptions.CameraElevationAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
 
 #if F3D_MODULE_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
@@ -691,12 +691,11 @@ void F3DOptionsParser::InitializeDictionaryFromConfigFile(const std::string& use
 }
 
 //----------------------------------------------------------------------------
-void F3DOptionsParser::GetOptionsFromConfigFile(const std::string& filePath, f3d::options& options)
+void F3DOptionsParser::GetOptionsFromConfigFile(const std::string& filePath, F3DAppOptions& appOptions, f3d::options& options)
 {
   this->ConfigOptions->SetFilePathForConfigBlock(filePath);
   std::vector<std::string> dummyFiles;
-  F3DAppOptions dummyAppOptions;
-  return this->ConfigOptions->GetOptionsFromArgs(dummyAppOptions, options, dummyFiles);
+  return this->ConfigOptions->GetOptionsFromArgs(appOptions, options, dummyFiles);
 }
 
 //----------------------------------------------------------------------------

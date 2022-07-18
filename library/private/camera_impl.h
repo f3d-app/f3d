@@ -14,6 +14,7 @@
 
 #include <memory>
 
+class vtkRenderer;
 class vtkCamera;
 namespace f3d::detail
 {
@@ -39,6 +40,8 @@ public:
   vector_t getFocalPoint() override;
   void setViewUp(const vector_t& up) override;
   vector_t getViewUp() override;
+  void setViewAngle(const double& angle) override;
+  double getViewAngle() override;
   void setViewMatrix(const matrix_t& matrix) override;
   matrix_t getViewMatrix() override;
 
@@ -48,16 +51,22 @@ public:
   void yaw(double angle) override;
   void elevation(double angle) override;
   void pitch(double angle) override;
+  
+  void setCurrentAsDefault() override;
+  void resetToDefault() override;
+  void reset() override;
   //@}
 
   /**
    * Implementation only API.
    */
-  void SetVTKCamera(vtkCamera* vtkCamera);
+  void SetVTKRenderer(vtkRenderer* renderer);
+  vtkCamera* GetVTKCamera();
 
 private:
   class internals;
   std::unique_ptr<internals> Internals;
+
 };
 }
 

@@ -18,6 +18,36 @@ class F3DStarter::F3DInternals
 public:
   F3DInternals() = default;
 
+  void SetupCamera(const F3DAppOptions& appOptions)
+  {
+    f3d::camera& cam = this->Engine->getWindow().getCamera();
+    if (appOptions.CameraPosition.size() == 3)
+    {
+      f3d::camera::vector_t pos;
+      std::copy_n(appOptions.CameraPosition.begin(), 3, pos.begin());
+      cam.setPosition(pos);
+    }
+    if (appOptions.CameraFocalPoint.size() == 3)
+    {
+      f3d::camera::vector_t foc;
+      std::copy_n(appOptions.CameraFocalPoint.begin(), 3, foc.begin());
+      cam.setFocalPoint(foc);
+    }
+    if (appOptions.CameraViewUp.size() == 3)
+    {
+      f3d::camera::vector_t up;
+      std::copy_n(appOptions.CameraViewUp.begin(), 3, up.begin());
+      cam.setViewUp(up);
+    }
+    if (appOptions.CameraViewAngle != 0)
+    {
+      cam.setViewAngle(appOptions.CameraViewAngle);
+    }
+    cam.azimuth(appOptions.CameraAzimuthAngle);
+    cam.elevation(appOptions.CameraElevationAngle);
+    cam.setCurrentAsDefault();
+  }
+
   F3DOptionsParser Parser;
   F3DAppOptions AppOptions;
   std::unique_ptr<f3d::engine> Engine;
@@ -221,6 +251,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Start interaction
     else
     {
+      window.render();
       interactor.start();
     }
   }
@@ -235,16 +266,25 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
   int index;
   std::string filePath, fileInfo;
   this->Internals->Engine->getLoader().getFileInfo(load, index, filePath, fileInfo);
-
+  
+  F3DAppOptions configFileAppOptions;
   if (!this->Internals->AppOptions.DryRun)
   {
     // Recover options for the file to load
     f3d::options configFileOptions;
-    this->Internals->Parser.GetOptionsFromConfigFile(filePath, configFileOptions);
+    this->Internals->Parser.GetOptionsFromConfigFile(filePath, configFileAppOptions, configFileOptions);
     this->Internals->Engine->setOptions(std::move(configFileOptions));
   }
 
   // Load the file
   this->Internals->LoadedFile = this->Internals->Engine->getLoader().loadFile(load);
+
+  if (!this->Internals->AppOptions.NoRender)
+  {
+    // Setup the camera according to options
+    this->Internals->SetupCamera(this->Internals->AppOptions.DryRun ? this->Internals->AppOptions : configFileAppOptions);
+  }
+
   return;
 }
+

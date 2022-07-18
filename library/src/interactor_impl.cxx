@@ -256,7 +256,7 @@ public:
         }
         else if (keySym == "Return")
         {
-          ren->ResetCamera();
+          self->Window.getCamera().resetToDefault();
         }
         else if (keySym == "Space")
         {
