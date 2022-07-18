@@ -29,7 +29,7 @@ public:
   /**
    * Default destructor
    */
-  ~camera_impl() override = default;
+  ~camera_impl() override;
 
   //@{
   /**
@@ -55,7 +55,7 @@ public:
   
   void setCurrentAsDefault() override;
   void resetToDefault() override;
-  void reset() override;
+  void resetToBounds() override;
   //@}
 
   /**

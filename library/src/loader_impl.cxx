@@ -391,7 +391,7 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   this->Internals->Window.UpdateDynamicOptions();
   if (this->Internals->Options.getAsInt("camera-index") == -1)
   {
-    this->Internals->Window.getCamera().reset();
+    this->Internals->Window.getCamera().resetToBounds();
   }
 
   // Print info about scene and coloring

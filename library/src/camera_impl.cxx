@@ -17,6 +17,9 @@ camera_impl::camera_impl()
  : Internals(new camera_impl::internals()){}
 
 //----------------------------------------------------------------------------
+camera_impl::~camera_impl() = default;
+
+//----------------------------------------------------------------------------
 void camera_impl::setPosition(const vector_t& pos)
 {
   vtkCamera* cam = this->GetVTKCamera();
@@ -209,7 +212,7 @@ void camera_impl::resetToDefault()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::reset()
+void camera_impl::resetToBounds()
 {
   this->Internals->VTKRenderer->ResetCamera();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
