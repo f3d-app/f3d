@@ -142,6 +142,20 @@ int TestSDKCamera(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Test dolly
+  cam.dolly(10);
+  expectedPos = {20.9, -11., -12.};
+  pos = cam.getPosition();
+  foc = cam.getViewUp();
+  up = cam.getFocalPoint();
+  if (!compareVec(pos, expectedPos) || !compareVec(foc, expectedFoc)|| !compareVec(up, expectedUp))
+  {
+    std::cerr << "Dolly is not behaving as expected: " << std::endl;
+    std::cerr << std::setprecision(12) << "position: " << pos[0] << "," << pos[1] << "," << pos[2] << std::endl;
+    std::cerr << std::setprecision(12) << "focal point: " << foc[0] << "," << foc[1] << "," << foc[2] << std::endl;
+    std::cerr << std::setprecision(12) << "view up: " << up[0] << "," << up[1] << "," << up[2] << std::endl;
+    return EXIT_FAILURE;
+  }
   // TODO get/set view matrix once fixed
 
   return EXIT_SUCCESS;
