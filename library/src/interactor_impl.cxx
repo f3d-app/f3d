@@ -191,6 +191,7 @@ public:
         break;
       case 'L':
         {
+        // TODO remove
         std::array<double, 16> mat = {
 
 1,
@@ -222,6 +223,8 @@ public:
         self->Window.PrintColoringDescription(log::VerboseLevel::INFO);
         self->Window.PrintSceneDescription(log::VerboseLevel::INFO);
         auto mat = self->Window.getCamera().getViewMatrix();
+
+        // TODO remove
         for (const auto& val : mat)
         {
           std::cout<<val<<","<<std::endl;
