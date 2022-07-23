@@ -11,6 +11,7 @@
 #include "export.h"
 
 #include <array>
+#include <string>
 #include <stdexcept>
 
 namespace f3d
