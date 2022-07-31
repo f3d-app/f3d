@@ -134,7 +134,7 @@ camera::matrix4_t camera_impl::getViewMatrix()
   matrix4_t matrix;
   this->getViewMatrix(matrix);
   return matrix;
- }
+}
 
 //----------------------------------------------------------------------------
 void camera_impl::getViewMatrix(matrix4_t& matrix)

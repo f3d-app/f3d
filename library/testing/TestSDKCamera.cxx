@@ -1,7 +1,7 @@
 #include <camera.h>
 #include <engine.h>
-#include <window.h>
 #include <loader.h>
+#include <window.h>
 
 #include <cmath>
 #include <iomanip>
@@ -21,7 +21,7 @@ bool compareVec(f3d::camera::vector3_t vec1, f3d::camera::vector3_t vec2)
 bool compareMat(f3d::camera::matrix4_t mat1, f3d::camera::matrix4_t mat2)
 {
   bool ret = true;
-  for(size_t i = 0; i < mat1.size(); i++)
+  for (size_t i = 0; i < mat1.size(); i++)
   {
     ret &= compareDouble(mat1[i], mat2[i]);
   }
@@ -191,12 +191,13 @@ int TestSDKCamera(int argc, char* argv[])
 
   // Test ViewMatrix
   f3d::camera::matrix4_t mat = cam.getViewMatrix();
-  f3d::camera::matrix4_t expectedMat = { 0., 0., -1., 0., 1., 0., 0., 0., 0., -1., 0., 0., 11., -12., 20.9, 1.};
+  f3d::camera::matrix4_t expectedMat = { 0., 0., -1., 0., 1., 0., 0., 0., 0., -1., 0., 0., 11.,
+    -12., 20.9, 1. };
 
   if (!compareMat(mat, expectedMat))
   {
     std::cerr << "getViewMatrix is not behaving as expected: " << std::endl;
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
       std::cerr << std::setprecision(12);
       for (int j = 0; j < 4; j++)
@@ -208,14 +209,16 @@ int TestSDKCamera(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  f3d::camera::matrix4_t setMat = { 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., -1., 0., 0.776126, -0.438658, 24.556, 1. };
+  f3d::camera::matrix4_t setMat = { 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., -1., 0., 0.776126,
+    -0.438658, 24.556, 1. };
   cam.setViewMatrix(setMat);
   mat = cam.getViewMatrix();
-  expectedMat = { 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., -0.776126, 0.438658, -24.556, 1. };
+  expectedMat = { 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., -0.776126, 0.438658, -24.556,
+    1. };
   if (!compareMat(mat, expectedMat))
   {
     std::cerr << "setViewMatrix is not behaving as expected: " << std::endl;
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
       std::cerr << std::setprecision(12);
       for (int j = 0; j < 4; j++)
