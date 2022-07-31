@@ -38,12 +38,16 @@ public:
    */
   virtual void setPosition(const vector3_t& pos) = 0;
   virtual vector3_t getPosition() = 0;
+  virtual void getPosition(vector3_t& pos) = 0;
   virtual void setFocalPoint(const vector3_t& foc) = 0;
   virtual vector3_t getFocalPoint() = 0;
+  virtual void getFocalPoint(vector3_t& foc) = 0;
   virtual void setViewUp(const vector3_t& up) = 0;
   virtual vector3_t getViewUp() = 0;
+  virtual void getViewUp(vector3_t& up) = 0;
   virtual void setViewAngle(const double& angle) = 0;
   virtual double getViewAngle() = 0;
+  virtual void getViewAngle(double& angle) = 0;
   //@}
 
   //@{
@@ -54,6 +58,7 @@ public:
    */
   virtual void setViewMatrix(const matrix4_t& matrix) = 0;
   virtual matrix4_t getViewMatrix() = 0;
+  virtual void getViewMatrix(matrix4_t& matrix) = 0;
   //@}
 
   //@{

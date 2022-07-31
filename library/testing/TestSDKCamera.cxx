@@ -29,7 +29,7 @@ bool compareMat(f3d::camera::matrix4_t mat1, f3d::camera::matrix4_t mat2)
 
 int TestSDKCamera(int argc, char* argv[])
 {
-  f3d::engine eng;
+  f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
   f3d::window& win = eng.getWindow();
   f3d::camera& cam = win.getCamera();
   win.render();

@@ -35,9 +35,15 @@ void camera_impl::setPosition(const vector3_t& pos)
 camera::vector3_t camera_impl::getPosition()
 {
   vector3_t pos;
+  this->getPosition(pos);
+  return pos;
+}
+
+//----------------------------------------------------------------------------
+void camera_impl::getPosition(vector3_t& pos)
+{
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetPosition(pos.data());
-  return pos;
 }
 
 //----------------------------------------------------------------------------
@@ -53,9 +59,15 @@ void camera_impl::setFocalPoint(const vector3_t& foc)
 camera::vector3_t camera_impl::getFocalPoint()
 {
   vector3_t foc;
+  this->getFocalPoint(foc);
+  return foc;
+}
+
+//----------------------------------------------------------------------------
+void camera_impl::getFocalPoint(vector3_t& foc)
+{
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetFocalPoint(foc.data());
-  return foc;
 }
 
 //----------------------------------------------------------------------------
@@ -71,9 +83,15 @@ void camera_impl::setViewUp(const vector3_t& up)
 camera::vector3_t camera_impl::getViewUp()
 {
   vector3_t up;
+  this->getViewUp(up);
+  return up;
+}
+
+//----------------------------------------------------------------------------
+void camera_impl::getViewUp(vector3_t& up)
+{
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetViewUp(up.data());
-  return up;
 }
 
 //----------------------------------------------------------------------------
@@ -88,8 +106,16 @@ void camera_impl::setViewAngle(const double& angle)
 //----------------------------------------------------------------------------
 double camera_impl::getViewAngle()
 {
+  double angle;
+  this->getViewAngle(angle);
+  return angle;
+}
+
+//----------------------------------------------------------------------------
+void camera_impl::getViewAngle(double& angle)
+{
   vtkCamera* cam = this->GetVTKCamera();
-  return cam->GetViewAngle();
+  angle = cam->GetViewAngle();
 }
 
 //----------------------------------------------------------------------------
@@ -105,14 +131,20 @@ void camera_impl::setViewMatrix(const matrix4_t& matrix)
 //----------------------------------------------------------------------------
 camera::matrix4_t camera_impl::getViewMatrix()
 {
+  matrix4_t matrix;
+  this->getViewMatrix(matrix);
+  return matrix;
+ }
+
+//----------------------------------------------------------------------------
+void camera_impl::getViewMatrix(matrix4_t& matrix)
+{
   vtkCamera* cam = this->GetVTKCamera();
-  matrix4_t arr;
   vtkMatrix4x4* mat = cam->GetModelViewTransformMatrix();
   vtkNew<vtkMatrix4x4> tMat;
   vtkMatrix4x4::Transpose(mat, tMat);
   double* data = tMat->GetData();
-  std::move(data, data + 16, arr.begin());
-  return arr;
+  std::move(data, data + 16, matrix.begin());
 }
 
 //----------------------------------------------------------------------------
