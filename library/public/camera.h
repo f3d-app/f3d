@@ -11,8 +11,8 @@
 #include "export.h"
 
 #include <array>
-#include <string>
 #include <stdexcept>
+#include <string>
 
 namespace f3d
 {
@@ -45,12 +45,12 @@ public:
   virtual void setViewAngle(const double& angle) = 0;
   virtual double getViewAngle() = 0;
   //@}
- 
- //@{
+
+  //@{
   /**
-   * Set/Get the camera view matrix. Please note that when using the view matrix API, using the other
-   * camera manipulation API may results in unexepected results due to normalization.
-   * Call render on the window before calling any of these methods, or they will throw an exception.
+   * Set/Get the camera view matrix. Please note that when using the view matrix API, using the
+   * other camera manipulation API may results in unexepected results due to normalization. Call
+   * render on the window before calling any of these methods, or they will throw an exception.
    */
   virtual void setViewMatrix(const matrix4_t& matrix) = 0;
   virtual matrix4_t getViewMatrix() = 0;

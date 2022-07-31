@@ -52,7 +52,7 @@ public:
   void yaw(double angle) override;
   void elevation(double angle) override;
   void pitch(double angle) override;
-  
+
   void setCurrentAsDefault() override;
   void resetToDefault() override;
   void resetToBounds() override;

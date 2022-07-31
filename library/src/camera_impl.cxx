@@ -1,8 +1,8 @@
 #include "camera_impl.h"
 
 #include <vtkCamera.h>
-#include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>
+#include <vtkRenderer.h>
 
 namespace f3d::detail
 {
@@ -15,7 +15,9 @@ public:
 
 //----------------------------------------------------------------------------
 camera_impl::camera_impl()
- : Internals(new camera_impl::internals()){}
+  : Internals(new camera_impl::internals())
+{
+}
 
 //----------------------------------------------------------------------------
 camera_impl::~camera_impl() = default;

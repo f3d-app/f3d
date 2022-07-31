@@ -68,7 +68,8 @@ public:
    * Then parse the command line for any supplemental.
    * Returns the resulting options.
    */
-  void GetOptionsFromConfigFile(const std::string& filePath, F3DAppOptions& appOptions, f3d::options& options);
+  void GetOptionsFromConfigFile(
+    const std::string& filePath, F3DAppOptions& appOptions, f3d::options& options);
 
   F3DOptionsParser();
   ~F3DOptionsParser();

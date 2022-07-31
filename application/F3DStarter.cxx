@@ -266,13 +266,14 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
   int index;
   std::string filePath, fileInfo;
   this->Internals->Engine->getLoader().getFileInfo(load, index, filePath, fileInfo);
-  
+
   F3DAppOptions configFileAppOptions;
   if (!this->Internals->AppOptions.DryRun)
   {
     // Recover options for the file to load
     f3d::options configFileOptions;
-    this->Internals->Parser.GetOptionsFromConfigFile(filePath, configFileAppOptions, configFileOptions);
+    this->Internals->Parser.GetOptionsFromConfigFile(
+      filePath, configFileAppOptions, configFileOptions);
     this->Internals->Engine->setOptions(std::move(configFileOptions));
   }
 
@@ -282,9 +283,9 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
   if (!this->Internals->AppOptions.NoRender)
   {
     // Setup the camera according to options
-    this->Internals->SetupCamera(this->Internals->AppOptions.DryRun ? this->Internals->AppOptions : configFileAppOptions);
+    this->Internals->SetupCamera(
+      this->Internals->AppOptions.DryRun ? this->Internals->AppOptions : configFileAppOptions);
   }
 
   return;
 }
-

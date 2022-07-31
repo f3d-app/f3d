@@ -691,7 +691,8 @@ void F3DOptionsParser::InitializeDictionaryFromConfigFile(const std::string& use
 }
 
 //----------------------------------------------------------------------------
-void F3DOptionsParser::GetOptionsFromConfigFile(const std::string& filePath, F3DAppOptions& appOptions, f3d::options& options)
+void F3DOptionsParser::GetOptionsFromConfigFile(
+  const std::string& filePath, F3DAppOptions& appOptions, f3d::options& options)
 {
   this->ConfigOptions->SetFilePathForConfigBlock(filePath);
   std::vector<std::string> dummyFiles;
