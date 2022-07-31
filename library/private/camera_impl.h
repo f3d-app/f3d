@@ -35,32 +35,32 @@ public:
   /**
    * Documented public API
    */
-  void setPosition(const vector3_t& pos) override;
+  camera& setPosition(const vector3_t& pos) override;
   vector3_t getPosition() override;
-  void getPosition(vector3_t& pos) override;
-  void setFocalPoint(const vector3_t& foc) override;
+  camera& getPosition(vector3_t& pos) override;
+  camera& setFocalPoint(const vector3_t& foc) override;
   vector3_t getFocalPoint() override;
-  void getFocalPoint(vector3_t& foc) override;
-  void setViewUp(const vector3_t& up) override;
+  camera& getFocalPoint(vector3_t& foc) override;
+  camera& setViewUp(const vector3_t& up) override;
   vector3_t getViewUp() override;
-  void getViewUp(vector3_t& up) override;
-  void setViewAngle(const double& angle) override;
+  camera& getViewUp(vector3_t& up) override;
+  camera& setViewAngle(const double& angle) override;
   double getViewAngle() override;
-  void getViewAngle(double& angle) override;
-  void setViewMatrix(const matrix4_t& matrix) override;
+  camera& getViewAngle(double& angle) override;
+  camera& setViewMatrix(const matrix4_t& matrix) override;
   matrix4_t getViewMatrix() override;
-  void getViewMatrix(matrix4_t& matrix) override;
+  camera& getViewMatrix(matrix4_t& matrix) override;
 
-  void dolly(double val) override;
-  void roll(double angle) override;
-  void azimuth(double angle) override;
-  void yaw(double angle) override;
-  void elevation(double angle) override;
-  void pitch(double angle) override;
+  camera& dolly(double val) override;
+  camera& roll(double angle) override;
+  camera& azimuth(double angle) override;
+  camera& yaw(double angle) override;
+  camera& elevation(double angle) override;
+  camera& pitch(double angle) override;
 
-  void setCurrentAsDefault() override;
-  void resetToDefault() override;
-  void resetToBounds() override;
+  camera& setCurrentAsDefault() override;
+  camera& resetToDefault() override;
+  camera& resetToBounds() override;
   //@}
 
   /**

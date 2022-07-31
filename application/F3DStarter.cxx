@@ -43,9 +43,9 @@ public:
     {
       cam.setViewAngle(appOptions.CameraViewAngle);
     }
-    cam.azimuth(appOptions.CameraAzimuthAngle);
-    cam.elevation(appOptions.CameraElevationAngle);
-    cam.setCurrentAsDefault();
+    cam.azimuth(appOptions.CameraAzimuthAngle)
+      .elevation(appOptions.CameraElevationAngle)
+      .setCurrentAsDefault();
   }
 
   F3DOptionsParser Parser;

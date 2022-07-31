@@ -23,12 +23,13 @@ camera_impl::camera_impl()
 camera_impl::~camera_impl() = default;
 
 //----------------------------------------------------------------------------
-void camera_impl::setPosition(const vector3_t& pos)
+camera& camera_impl::setPosition(const vector3_t& pos)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetPosition(pos.data());
   cam->OrthogonalizeViewUp();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -40,19 +41,21 @@ camera::vector3_t camera_impl::getPosition()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getPosition(vector3_t& pos)
+camera& camera_impl::getPosition(vector3_t& pos)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetPosition(pos.data());
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::setFocalPoint(const vector3_t& foc)
+camera& camera_impl::setFocalPoint(const vector3_t& foc)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetFocalPoint(foc.data());
   cam->OrthogonalizeViewUp();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -64,19 +67,21 @@ camera::vector3_t camera_impl::getFocalPoint()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getFocalPoint(vector3_t& foc)
+camera& camera_impl::getFocalPoint(vector3_t& foc)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetFocalPoint(foc.data());
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::setViewUp(const vector3_t& up)
+camera& camera_impl::setViewUp(const vector3_t& up)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetViewUp(up.data());
   cam->OrthogonalizeViewUp();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -88,19 +93,21 @@ camera::vector3_t camera_impl::getViewUp()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getViewUp(vector3_t& up)
+camera& camera_impl::getViewUp(vector3_t& up)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetViewUp(up.data());
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::setViewAngle(const double& angle)
+camera& camera_impl::setViewAngle(const double& angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetViewAngle(angle);
   cam->OrthogonalizeViewUp();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -112,20 +119,22 @@ double camera_impl::getViewAngle()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getViewAngle(double& angle)
+camera& camera_impl::getViewAngle(double& angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   angle = cam->GetViewAngle();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::setViewMatrix(const matrix4_t& matrix)
+camera& camera_impl::setViewMatrix(const matrix4_t& matrix)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetPosition(matrix[12], matrix[13], matrix[14]);
   cam->SetFocalPoint(matrix[8] + matrix[12], matrix[9] + matrix[13], matrix[10] + matrix[14]);
   cam->SetViewUp(matrix[4], matrix[5], matrix[6]);
   this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -137,7 +146,7 @@ camera::matrix4_t camera_impl::getViewMatrix()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getViewMatrix(matrix4_t& matrix)
+camera& camera_impl::getViewMatrix(matrix4_t& matrix)
 {
   vtkCamera* cam = this->GetVTKCamera();
   vtkMatrix4x4* mat = cam->GetModelViewTransformMatrix();
@@ -145,82 +154,92 @@ void camera_impl::getViewMatrix(matrix4_t& matrix)
   vtkMatrix4x4::Transpose(mat, tMat);
   double* data = tMat->GetData();
   std::move(data, data + 16, matrix.begin());
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::dolly(double val)
+camera& camera_impl::dolly(double val)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Dolly(val);
   cam->OrthogonalizeViewUp();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::roll(double angle)
+camera& camera_impl::roll(double angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Roll(angle);
   cam->OrthogonalizeViewUp();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::azimuth(double angle)
+camera& camera_impl::azimuth(double angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Azimuth(angle);
   cam->OrthogonalizeViewUp();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::yaw(double angle)
+camera& camera_impl::yaw(double angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Yaw(angle);
   cam->OrthogonalizeViewUp();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::elevation(double angle)
+camera& camera_impl::elevation(double angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Elevation(angle);
   cam->OrthogonalizeViewUp();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::pitch(double angle)
+camera& camera_impl::pitch(double angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Pitch(angle);
   cam->OrthogonalizeViewUp();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::setCurrentAsDefault()
+camera& camera_impl::setCurrentAsDefault()
 {
   vtkCamera* cam = this->GetVTKCamera();
   this->Internals->DefaultVTKCamera->DeepCopy(cam);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::resetToDefault()
+camera& camera_impl::resetToDefault()
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->DeepCopy(this->Internals->DefaultVTKCamera);
   this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::resetToBounds()
+camera& camera_impl::resetToBounds()
 {
   this->Internals->VTKRenderer->ResetCamera();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
 }
 
 //----------------------------------------------------------------------------

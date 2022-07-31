@@ -36,8 +36,7 @@ int TestSDKCamera(int argc, char* argv[])
 
   // Test position
   f3d::camera::vector3_t testPos = { 0., 0., 10. };
-  cam.setPosition(testPos);
-  f3d::camera::vector3_t pos = cam.getPosition();
+  f3d::camera::vector3_t pos = cam.setPosition(testPos).getPosition();
   if (pos != testPos)
   {
     std::cerr << "set/get position is not behaving as expected: " << pos[0] << "," << pos[1] << ","
@@ -47,8 +46,7 @@ int TestSDKCamera(int argc, char* argv[])
 
   // Test focal point
   f3d::camera::vector3_t testFoc = { 0., 0., -1. };
-  cam.setFocalPoint(testFoc);
-  f3d::camera::vector3_t foc = cam.getFocalPoint();
+  f3d::camera::vector3_t foc = cam.setFocalPoint(testFoc).getFocalPoint();
   if (foc != testFoc)
   {
     std::cerr << "set/get focal point is not behaving as expected: " << foc[0] << "," << foc[1]
@@ -58,8 +56,7 @@ int TestSDKCamera(int argc, char* argv[])
 
   // Test view up
   f3d::camera::vector3_t testUp = { 1., 0., 0. };
-  cam.setViewUp(testUp);
-  f3d::camera::vector3_t up = cam.getViewUp();
+  f3d::camera::vector3_t up = cam.setViewUp(testUp).getViewUp();
   if (up != testUp)
   {
     std::cerr << "set/get view up is not behaving as expected: " << up[0] << "," << up[1] << ","
@@ -69,8 +66,7 @@ int TestSDKCamera(int argc, char* argv[])
 
   // Test view angle
   double testAngle = 20;
-  cam.setViewAngle(testAngle);
-  double angle = cam.getViewAngle();
+  double angle = cam.setViewAngle(testAngle).getViewAngle();
   if (angle != testAngle)
   {
     std::cerr << "set/get view angle is not behaving as expected: " << angle << std::endl;

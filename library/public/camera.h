@@ -1,8 +1,11 @@
 /**
  * @class   camera
- * @brief   Abstract class to control a camera in a camera
+ * @brief   Abstract class to control a camera in a window
  *
- * A class to control a camera in a window, use only after the first render of the window.
+ * A class to control a camera in a window.
+ * There is in essence three API.
+ * The Position/FocalPoint/ViewUp API, the ViewMatrix API and the camera movements API.
+ * They can be mixed by using ViewMatrix API with the other APIs can result to unexpected results.
  */
 
 #ifndef f3d_camera_h
@@ -25,18 +28,18 @@ public:
   /**
    * Set/Get the canera parameters.
    */
-  virtual void setPosition(const vector3_t& pos) = 0;
+  virtual camera& setPosition(const vector3_t& pos) = 0;
   virtual vector3_t getPosition() = 0;
-  virtual void getPosition(vector3_t& pos) = 0;
-  virtual void setFocalPoint(const vector3_t& foc) = 0;
+  virtual camera& getPosition(vector3_t& pos) = 0;
+  virtual camera& setFocalPoint(const vector3_t& foc) = 0;
   virtual vector3_t getFocalPoint() = 0;
-  virtual void getFocalPoint(vector3_t& foc) = 0;
-  virtual void setViewUp(const vector3_t& up) = 0;
+  virtual camera& getFocalPoint(vector3_t& foc) = 0;
+  virtual camera& setViewUp(const vector3_t& up) = 0;
   virtual vector3_t getViewUp() = 0;
-  virtual void getViewUp(vector3_t& up) = 0;
-  virtual void setViewAngle(const double& angle) = 0;
+  virtual camera& getViewUp(vector3_t& up) = 0;
+  virtual camera& setViewAngle(const double& angle) = 0;
   virtual double getViewAngle() = 0;
-  virtual void getViewAngle(double& angle) = 0;
+  virtual camera& getViewAngle(double& angle) = 0;
   //@}
 
   //@{
@@ -44,37 +47,37 @@ public:
    * Set/Get the camera view matrix. Please note that when using the view matrix API, using the
    * other camera manipulation API may results in unexepected results due to normalization.
    */
-  virtual void setViewMatrix(const matrix4_t& matrix) = 0;
+  virtual camera& setViewMatrix(const matrix4_t& matrix) = 0;
   virtual matrix4_t getViewMatrix() = 0;
-  virtual void getViewMatrix(matrix4_t& matrix) = 0;
+  virtual camera& getViewMatrix(matrix4_t& matrix) = 0;
   //@}
 
   //@{
   /**
    * Standard camera manipulation methods.
    */
-  virtual void dolly(double val) = 0;
-  virtual void roll(double angle) = 0;
-  virtual void azimuth(double angle) = 0;
-  virtual void yaw(double angle) = 0;
-  virtual void elevation(double angle) = 0;
-  virtual void pitch(double angle) = 0;
+  virtual camera& dolly(double val) = 0;
+  virtual camera& roll(double angle) = 0;
+  virtual camera& azimuth(double angle) = 0;
+  virtual camera& yaw(double angle) = 0;
+  virtual camera& elevation(double angle) = 0;
+  virtual camera& pitch(double angle) = 0;
   //@}
 
   /**
    * Store the current camera configuration as default.
    */
-  virtual void setCurrentAsDefault() = 0;
+  virtual camera& setCurrentAsDefault() = 0;
 
   /**
    * Reset the camera to the stored default camera configuration.
    */
-  virtual void resetToDefault() = 0;
+  virtual camera& resetToDefault() = 0;
 
   /**
    * Reset the camera using the bounds of actors in the scene.
    */
-  virtual void resetToBounds() = 0;
+  virtual camera& resetToBounds() = 0;
 
 protected:
   camera() = default;
