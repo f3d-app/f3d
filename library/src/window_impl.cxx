@@ -39,6 +39,7 @@ public:
   vtkSmartPointer<vtkF3DRenderer> Renderer;
   Type WindowType;
   const options& Options;
+  bool Initialized = false;
 };
 
 //----------------------------------------------------------------------------
@@ -77,6 +78,13 @@ window_impl::Type window_impl::getType()
 //----------------------------------------------------------------------------
 camera& window_impl::getCamera()
 {
+  // Make sure the camera (and the whole rendering stack)
+  // is initialized before providing one.
+  if (!this->Internals->Initialized)
+  {
+    this->Initialize(false, "");
+  }
+
   return *this->Internals->Camera;
 }
 
@@ -152,6 +160,7 @@ void window_impl::Initialize(bool withColoring, std::string fileInfo)
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Renderer->Initialize(fileInfo, this->Internals->Options.getAsString("up"));
+  this->Internals->Initialized = true;
 }
 
 //----------------------------------------------------------------------------

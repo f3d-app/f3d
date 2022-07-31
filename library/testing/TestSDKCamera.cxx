@@ -1,6 +1,7 @@
 #include <camera.h>
 #include <engine.h>
 #include <window.h>
+#include <loader.h>
 
 #include <cmath>
 #include <iomanip>
@@ -32,7 +33,6 @@ int TestSDKCamera(int argc, char* argv[])
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
   f3d::window& win = eng.getWindow();
   f3d::camera& cam = win.getCamera();
-  win.render();
 
   // Test position
   f3d::camera::vector3_t testPos = { 0., 0., 10. };

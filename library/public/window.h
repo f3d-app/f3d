@@ -52,8 +52,7 @@ public:
   virtual Type getType() = 0;
 
   /**
-   * Get the camera provided by the window, if any.
-   * If not, will throw a window::exception
+   * Get the camera provided by the window.
    */
   virtual camera& getCamera() = 0;
 
