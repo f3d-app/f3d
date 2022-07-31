@@ -21,7 +21,7 @@ camera_impl::camera_impl()
 camera_impl::~camera_impl() = default;
 
 //----------------------------------------------------------------------------
-void camera_impl::setPosition(const vector_t& pos)
+void camera_impl::setPosition(const vector3_t& pos)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetPosition(pos.data());
@@ -30,16 +30,16 @@ void camera_impl::setPosition(const vector_t& pos)
 }
 
 //----------------------------------------------------------------------------
-camera::vector_t camera_impl::getPosition()
+camera::vector3_t camera_impl::getPosition()
 {
-  vector_t pos;
+  vector3_t pos;
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetPosition(pos.data());
   return pos;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::setFocalPoint(const vector_t& foc)
+void camera_impl::setFocalPoint(const vector3_t& foc)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetFocalPoint(foc.data());
@@ -48,16 +48,16 @@ void camera_impl::setFocalPoint(const vector_t& foc)
 }
 
 //----------------------------------------------------------------------------
-camera::vector_t camera_impl::getFocalPoint()
+camera::vector3_t camera_impl::getFocalPoint()
 {
-  vector_t foc;
+  vector3_t foc;
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetFocalPoint(foc.data());
   return foc;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::setViewUp(const vector_t& up)
+void camera_impl::setViewUp(const vector3_t& up)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetViewUp(up.data());
@@ -66,9 +66,9 @@ void camera_impl::setViewUp(const vector_t& up)
 }
 
 //----------------------------------------------------------------------------
-camera::vector_t camera_impl::getViewUp()
+camera::vector3_t camera_impl::getViewUp()
 {
-  vector_t up;
+  vector3_t up;
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetViewUp(up.data());
   return up;
@@ -91,54 +91,25 @@ double camera_impl::getViewAngle()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::setViewMatrix(const matrix_t& matrix)
+void camera_impl::setViewMatrix(const matrix4_t& matrix)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetPosition(matrix[12], matrix[13], matrix[14]);
   cam->SetFocalPoint(matrix[8] + matrix[12], matrix[9] + matrix[13], matrix[10] + matrix[14]);
   cam->SetViewUp(matrix[4], matrix[5], matrix[6]);
-//   cam->OrthogonalizeViewUp(); TODO NOT NEEDED ?
   this->Internals->VTKRenderer->ResetCameraClippingRange();
 }
 
 //----------------------------------------------------------------------------
-camera::matrix_t camera_impl::getViewMatrix()
+camera::matrix4_t camera_impl::getViewMatrix()
 {
   vtkCamera* cam = this->GetVTKCamera();
-  matrix_t arr;
-#if 0
-  // Is this correct ?
-  double pos[3];
-  cam->GetPosition(pos);
-  double foc[3];
-  cam->GetFocalPoint(foc);
-  double up[3];
-  cam->GetViewUp(up);
-  double to[3];
-  vtkMath::Subtract(foc, pos, to);
-  double right[3];
-  vtkMath::Cross(to, up, right);
-
-  // TODO with normalize, the focal point is not at the right location
-  // with a get/set
-  vtkMath::Normalize(right);
-  std::move(std::begin(right), std::end(right), arr.begin());
-  arr[3] = 0;
-  vtkMath::Normalize(up);
-  std::move(std::begin(up), std::end(up), arr.begin() + 4);
-  arr[7] = 0;
-  vtkMath::Normalize(to);
-  std::move(std::begin(to), std::end(to), arr.begin() + 8);
-  arr[11] = 0;
-  std::move(std::begin(pos), std::end(pos), arr.begin() + 12);
-  arr[15] = 1;
-#else
-  // TODO  this implementation seems better
+  matrix4_t arr;
   vtkMatrix4x4* mat = cam->GetModelViewTransformMatrix();
-  mat->Transpose();
-  double* data = mat->GetData();
+  vtkNew<vtkMatrix4x4> tMat;
+  vtkMatrix4x4::Transpose(mat, tMat);
+  double* data = tMat->GetData();
   std::move(data, data + 16, arr.begin());
-#endif
   return arr;
 }
 

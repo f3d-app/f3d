@@ -28,20 +28,20 @@ public:
     }
   };
 
-  typedef std::array<double, 3> vector_t;
-  typedef std::array<double, 16> matrix_t;
+  typedef std::array<double, 3> vector3_t;
+  typedef std::array<double, 16> matrix4_t;
 
   //@{
   /**
    * Set/Get the canera parameters.
    * Call render on the window before calling any of these methods, or they will throw an exception.
    */
-  virtual void setPosition(const vector_t& pos) = 0;
-  virtual vector_t getPosition() = 0;
-  virtual void setFocalPoint(const vector_t& foc) = 0;
-  virtual vector_t getFocalPoint() = 0;
-  virtual void setViewUp(const vector_t& up) = 0;
-  virtual vector_t getViewUp() = 0;
+  virtual void setPosition(const vector3_t& pos) = 0;
+  virtual vector3_t getPosition() = 0;
+  virtual void setFocalPoint(const vector3_t& foc) = 0;
+  virtual vector3_t getFocalPoint() = 0;
+  virtual void setViewUp(const vector3_t& up) = 0;
+  virtual vector3_t getViewUp() = 0;
   virtual void setViewAngle(const double& angle) = 0;
   virtual double getViewAngle() = 0;
   //@}
@@ -51,8 +51,8 @@ public:
    * TODO
    * Call render on the window before calling any of these methods, or they will throw an exception.
    */
-  virtual void setViewMatrix(const matrix_t& matrix) = 0;
-  virtual matrix_t getViewMatrix() = 0;
+  virtual void setViewMatrix(const matrix4_t& matrix) = 0;
+  virtual matrix4_t getViewMatrix() = 0;
   //@}
 
   //@{

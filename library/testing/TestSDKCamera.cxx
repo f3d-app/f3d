@@ -11,7 +11,7 @@ bool compareDouble(double a, double b)
   return std::fabs(a - b) < 128*std::numeric_limits<double>::epsilon();
 }
 
-bool compareVec(f3d::camera::vector_t vec1, f3d::camera::vector_t vec2)
+bool compareVec(f3d::camera::vector3_t vec1, f3d::camera::vector3_t vec2)
 {
   return compareDouble(vec1[0], vec2[0]) && compareDouble(vec1[1], vec2[1]) && compareDouble(vec1[2], vec2[2]);
 }
@@ -24,9 +24,9 @@ int TestSDKCamera(int argc, char* argv[])
   win.render();
 
   // Test position
-  f3d::camera::vector_t testPos = {0., 0., 10.};
+  f3d::camera::vector3_t testPos = {0., 0., 10.};
   cam.setPosition(testPos);
-  f3d::camera::vector_t pos = cam.getPosition();
+  f3d::camera::vector3_t pos = cam.getPosition();
   if (pos != testPos)
   {
     std::cerr << "set/get position is not behaving as expected: " << pos[0] << "," << pos[1] << "," << pos[2] << std::endl;
@@ -34,9 +34,9 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test focal point
-  f3d::camera::vector_t testFoc = {0., 0., -1.};
+  f3d::camera::vector3_t testFoc = {0., 0., -1.};
   cam.setFocalPoint(testFoc);
-  f3d::camera::vector_t foc = cam.getFocalPoint();
+  f3d::camera::vector3_t foc = cam.getFocalPoint();
   if (foc != testFoc)
   {
     std::cerr << "set/get focal point is not behaving as expected: " << foc[0] << "," << foc[1] << "," << foc[2] << std::endl;
@@ -44,9 +44,9 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test view up
-  f3d::camera::vector_t testUp = {1., 0., 0.};
+  f3d::camera::vector3_t testUp = {1., 0., 0.};
   cam.setViewUp(testUp);
-  f3d::camera::vector_t up = cam.getViewUp();
+  f3d::camera::vector3_t up = cam.getViewUp();
   if (up != testUp)
   {
     std::cerr << "set/get view up is not behaving as expected: " << up[0] << "," << up[1] << "," << up[2] << std::endl;
@@ -65,9 +65,9 @@ int TestSDKCamera(int argc, char* argv[])
 
   // Test azimuth
   cam.azimuth(90);
-  f3d::camera::vector_t expectedPos = {0., -11., -1.};
-  f3d::camera::vector_t expectedFoc = {1., 0., 0.};
-  f3d::camera::vector_t expectedUp = {0., 0., -1.};
+  f3d::camera::vector3_t expectedPos = {0., -11., -1.};
+  f3d::camera::vector3_t expectedFoc = {1., 0., 0.};
+  f3d::camera::vector3_t expectedUp = {0., 0., -1.};
   pos = cam.getPosition();
   foc = cam.getViewUp();
   up = cam.getFocalPoint();

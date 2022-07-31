@@ -35,16 +35,16 @@ public:
   /**
    * Documented public API
    */
-  void setPosition(const vector_t& pos) override;
-  vector_t getPosition() override;
-  void setFocalPoint(const vector_t& foc) override;
-  vector_t getFocalPoint() override;
-  void setViewUp(const vector_t& up) override;
-  vector_t getViewUp() override;
+  void setPosition(const vector3_t& pos) override;
+  vector3_t getPosition() override;
+  void setFocalPoint(const vector3_t& foc) override;
+  vector3_t getFocalPoint() override;
+  void setViewUp(const vector3_t& up) override;
+  vector3_t getViewUp() override;
   void setViewAngle(const double& angle) override;
   double getViewAngle() override;
-  void setViewMatrix(const matrix_t& matrix) override;
-  matrix_t getViewMatrix() override;
+  void setViewMatrix(const matrix4_t& matrix) override;
+  matrix4_t getViewMatrix() override;
 
   void dolly(double val) override;
   void roll(double angle) override;
