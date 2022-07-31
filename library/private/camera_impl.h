@@ -71,7 +71,9 @@ public:
 
   /**
    * Implementation only api.
-   * Recover a pointer to the vtkCamera currently being controlled
+   * Recover a pointer to the vtkCamera currently being controlled.
+   * This should only be called after the renderer have been set and initialized
+   * so that a camera is available.
    */
   vtkCamera* GetVTKCamera();
 

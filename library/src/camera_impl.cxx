@@ -232,15 +232,6 @@ void camera_impl::SetVTKRenderer(vtkRenderer* renderer)
 //----------------------------------------------------------------------------
 vtkCamera* camera_impl::GetVTKCamera()
 {
-  if (!this->Internals->VTKRenderer)
-  {
-    throw camera::exception("No camera available2");
-  }
-  vtkCamera* cam = this->Internals->VTKRenderer->GetActiveCamera();
-  if (!cam)
-  {
-    throw camera::exception("No camera available");
-  }
-  return cam;
+  return this->Internals->VTKRenderer->GetActiveCamera();
 }
 };
