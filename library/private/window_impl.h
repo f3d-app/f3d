@@ -76,13 +76,6 @@ public:
 
   /**
    * Implementation only API.
-   * Initialize camera position based on the visible actors in the renderer
-   * Should be called after UpdateDynamicOptions to get correct positioning
-   */
-//  virtual void InitializeCamera();
-
-  /**
-   * Implementation only API.
    * Print scene description to log using provided verbose level
    */
   void PrintSceneDescription(log::VerboseLevel level);
@@ -94,8 +87,8 @@ public:
   void PrintColoringDescription(log::VerboseLevel level);
 
   /**
-   * implementation only api.
-   * get a pointer to the internal vtkrenderwindow
+   * Implementation only API.
+   * Get a pointer to the internal vtkRenderWindow
    */
   virtual vtkRenderWindow* GetRenderWindow();
 

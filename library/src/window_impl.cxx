@@ -211,57 +211,6 @@ namespace f3d::detail
   }
 
   //----------------------------------------------------------------------------
-/*  void window_impl::InitializeCamera()
-  {
-    // Recover VTK provided camera and copy it to f3d::camera
-    // Then use f3d::camera in the renderer.
-    //vtkCamera* cam = this->Internals->Renderer->GetActiveCamera();
-//    this->Internals->Camera->SetVTKCamera(cam);
-
-    // This should be called only once all options
-    // have been shown as they may have an effect on it
-    if (this->Internals->Options.getAsInt("camera-index") < 0)
-    {
-      // set a default camera from bounds using VTK method
-      this->Internals->Renderer->vtkRenderer::ResetCamera();
-
-      // use this->Internals->Options to overwrite camera parameters
-      // TODO rework this ?
-      std::vector<double> cameraPosition =
-        this->Internals->Options.getAsDoubleVector("camera-position");
-      if (cameraPosition.size() == 3)
-      {
-        cam->SetPosition(cameraPosition.data());
-      }
-
-      std::vector<double> cameraFocalPoint =
-        this->Internals->Options.getAsDoubleVector("camera-focal-point");
-      if (cameraFocalPoint.size() == 3)
-      {
-        cam->SetFocalPoint(cameraFocalPoint.data());
-      }
-
-      std::vector<double> cameraViewUp = this->Internals->Options.getAsDoubleVector("camera-view-up");
-      if (cameraViewUp.size() == 3)
-      {
-        cam->SetViewUp(cameraViewUp.data());
-      }
-
-      double cameraViewAngle = this->Internals->Options.getAsDouble("camera-view-angle");
-      if (cameraViewAngle != 0)
-      {
-        cam->SetViewAngle(cameraViewAngle);
-      }
-
-      cam->Azimuth(this->Internals->Options.getAsDouble("camera-azimuth-angle"));
-      cam->Elevation(this->Internals->Options.getAsDouble("camera-elevation-angle"));
-      cam->OrthogonalizeViewUp();
-    }
-
-    this->Internals->Renderer->InitializeCamera();
-  }*/
-
-  //----------------------------------------------------------------------------
   void window_impl::PrintSceneDescription(log::VerboseLevel level)
   {
     log::print(level, this->Internals->Renderer->GetSceneDescription());

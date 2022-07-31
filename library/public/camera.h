@@ -48,7 +48,8 @@ public:
  
  //@{
   /**
-   * TODO
+   * Set/Get the camera view matrix. Please note that when using the view matrix API, using the other
+   * camera manipulation API may results in unexepected results due to normalization.
    * Call render on the window before calling any of these methods, or they will throw an exception.
    */
   virtual void setViewMatrix(const matrix4_t& matrix) = 0;
