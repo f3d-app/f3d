@@ -20,12 +20,14 @@ bool compareVec(f3d::camera::vector3_t vec1, f3d::camera::vector3_t vec2)
 
 bool compareMat(f3d::camera::matrix4_t mat1, f3d::camera::matrix4_t mat2)
 {
-  bool ret = true;
   for (size_t i = 0; i < mat1.size(); i++)
   {
-    ret &= compareDouble(mat1[i], mat2[i]);
+    if (!compareDouble(mat1[i], mat2[i]))
+    {
+      return false;
+    }
   }
-  return ret;
+  return true;
 }
 
 int TestSDKCamera(int argc, char* argv[])
