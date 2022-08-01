@@ -113,12 +113,12 @@ options::options()
   this->Internals->init("emissive-factor", std::vector<double>{ 1., 1., 1. });
   this->Internals->init("geometry-only", false);
   this->Internals->init("line-width", 1.0);
-  this->Internals->init("metallic", 0.0);
+  this->Internals->init("metallic", -1.0);
   this->Internals->init("normal-scale", 1.0);
   this->Internals->init("opacity", 1.0);
   this->Internals->init("point-size", 10.0);
   this->Internals->init("progress", false);
-  this->Internals->init("roughness", 0.3);
+  this->Internals->init("roughness", -1.0);
   this->Internals->init("texture-base-color", std::string());
   this->Internals->init("texture-emissive", std::string());
   this->Internals->init("texture-material", std::string());
