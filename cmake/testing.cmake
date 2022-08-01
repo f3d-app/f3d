@@ -162,7 +162,7 @@ f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WIL
 if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestOBJImporter DATA world.obj)
   f3d_test(NAME TestGLTFImporterUnlit DATA UnlitTest.glb)
-  f3d_test(NAME TestMaterial DATA suzanne.ply ARGS --color=0.72,0.45,0.2 --metallic=0.7 --roughness=0.3)
+  f3d_test(NAME TestMaterial DATA suzanne.ply ARGS --color=0.72,0.45,0.2 --metallic=0.7 --roughness=0.2)
   f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m)
   f3d_test(NAME TestEdges DATA suzanne.ply ARGS -e)
   f3d_test(NAME TestLineWidth DATA cow.vtk ARGS -e --line-width=5)
