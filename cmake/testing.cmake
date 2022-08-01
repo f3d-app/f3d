@@ -143,7 +143,7 @@ f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --comp=-2 LONG_TIMEO
 f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --cells LONG_TIMEOUT)
 f3d_test(NAME TestVolumeNonScalars DATA waveletArrays.vti ARGS -vb --scalars=RandomPointScalars LONG_TIMEOUT)
 f3d_test(NAME TestTextureNormal DATA WaterBottle.glb ARGS --geometry-only --texture-normal=${CMAKE_SOURCE_DIR}/testing/data/normal.png --normal-scale=0.1 DEFAULT_LIGHTS)
-f3d_test(NAME TestTextureMaterial DATA WaterBottle.glb ARGS --geometry-only --texture-material=${CMAKE_SOURCE_DIR}/testing/data/red_mod.jpg DEFAULT_LIGHTS)
+f3d_test(NAME TestTextureMaterial DATA WaterBottle.glb ARGS --geometry-only --texture-material=${CMAKE_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=1 --metallic=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMaterialWithOptions DATA WaterBottle.glb ARGS --geometry-only --texture-material=${CMAKE_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=0.5 --metallic=0.5 DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --geometry-only --texture-base-color=${CMAKE_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0 --depth-peeling DEFAULT_LIGHTS) # TODO add a texture-base-color test without --opacity and improve current test once https://github.com/f3d-app/f3d/issues/332 is fixed
 f3d_test(NAME TestTextureEmissive DATA WaterBottle.glb ARGS --geometry-only --texture-emissive=${CMAKE_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1 DEFAULT_LIGHTS)

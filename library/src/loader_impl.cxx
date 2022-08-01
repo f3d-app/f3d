@@ -64,20 +64,11 @@ public:
 
   static void InitializeImporterWithOptions(const options& options, vtkF3DGenericImporter* importer)
   {
-    // Use default roughness and metallic if needed
-    // XXX: This a bit on the smart side
-    double roughness = (options.getAsDouble("roughness") == -1.0)
-      ? (options.getAsString("texture-material").empty() ? 0.3 : 1.0)
-      : options.getAsDouble("roughness");
-    double metallic = (options.getAsDouble("metallic") == -1.0)
-      ? (options.getAsString("texture-material").empty() ? 0.0 : 1.0)
-      : options.getAsDouble("metallic");
-
     importer->SetPointSize(options.getAsDouble("point-size"));
     importer->SetSurfaceColor(options.getAsDoubleVector("color").data());
     importer->SetOpacity(options.getAsDouble("opacity"));
-    importer->SetRoughness(roughness);
-    importer->SetMetallic(metallic);
+    importer->SetRoughness(options.getAsDouble("roughness"));
+    importer->SetMetallic(options.getAsDouble("metallic"));
     importer->SetLineWidth(options.getAsDouble("line-width"));
     importer->SetTextureBaseColor(options.getAsString("texture-base-color"));
     importer->SetTextureEmissive(options.getAsString("texture-emissive"));
