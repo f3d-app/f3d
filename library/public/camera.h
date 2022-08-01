@@ -26,7 +26,7 @@ public:
 
   //@{
   /**
-   * Set/Get the canera parameters.
+   * Set/Get the camera parameters.
    */
   virtual camera& setPosition(const vector3_t& pos) = 0;
   virtual vector3_t getPosition() = 0;
