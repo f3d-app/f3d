@@ -25,6 +25,7 @@
 #include "window.h"
 
 #include <map>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -56,7 +57,7 @@ public:
   explicit engine(window::Type windowType = window::Type::NATIVE);
 
   /**
-   * Engine destructor, delete all object instances as well
+   * Engine default destructor.
    */
   ~engine();
 
@@ -117,7 +118,7 @@ public:
 
 private:
   class internals;
-  internals* Internals;
+  std::unique_ptr<internals> Internals;
   engine(const engine& opt) = delete;
   engine& operator=(const engine& opt) = delete;
 };

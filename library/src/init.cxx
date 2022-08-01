@@ -19,7 +19,7 @@ public:
 
 //----------------------------------------------------------------------------
 init::init()
-  : Internals(new init::internals())
+  : Internals(std::make_unique<init::internals>())
 {
 #if NDEBUG
   vtkObject::GlobalWarningDisplayOff();
