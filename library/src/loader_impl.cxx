@@ -66,8 +66,12 @@ public:
   {
     // Use default roughness and metallic if needed
     // XXX: This a bit on the smart side
-    double roughness = (options.getAsDouble("roughness") == -1.0) ? (options.getAsString("texture-material").empty() ? 0.3 : 1.0 ) : options.getAsDouble("roughness");
-    double metallic = (options.getAsDouble("metallic") == -1.0) ? (options.getAsString("texture-material").empty() ? 0.0 : 1.0 ) : options.getAsDouble("metallic");
+    double roughness = (options.getAsDouble("roughness") == -1.0)
+      ? (options.getAsString("texture-material").empty() ? 0.3 : 1.0)
+      : options.getAsDouble("roughness");
+    double metallic = (options.getAsDouble("metallic") == -1.0)
+      ? (options.getAsString("texture-material").empty() ? 0.0 : 1.0)
+      : options.getAsDouble("metallic");
 
     importer->SetPointSize(options.getAsDouble("point-size"));
     importer->SetSurfaceColor(options.getAsDoubleVector("color").data());
