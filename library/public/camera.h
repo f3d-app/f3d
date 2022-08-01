@@ -5,7 +5,7 @@
  * A class to control a camera in a window.
  * There is in essence three API.
  * The Position/FocalPoint/ViewUp API, the ViewMatrix API and the camera movements API.
- * They can be mixed by using ViewMatrix API with the other APIs can result to unexpected results.
+ * They can be mixed by using ViewMatrix API with the other APIs but it can result in unexpected results.
  */
 
 #ifndef f3d_camera_h
