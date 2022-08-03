@@ -251,7 +251,6 @@ int F3DStarter::Start(int argc, char** argv)
     // Start interaction
     else
     {
-      window.render();
       interactor.start();
     }
   }
