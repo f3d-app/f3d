@@ -393,7 +393,7 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
 
   // Initialize renderer and reset camera to bounds if needed
   this->Internals->Window.UpdateDynamicOptions();
-  if (this->Internals->Options.getAsInt("camera-index") == -1)
+  if (this->Internals->Options.getAsInt("loader.camera.index") == -1)
   {
     this->Internals->Window.getCamera().resetToBounds();
   }
