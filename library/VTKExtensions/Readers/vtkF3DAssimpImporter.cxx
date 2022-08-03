@@ -33,6 +33,8 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
+#include <memory>
+
 vtkStandardNewMacro(vtkF3DAssimpImporter);
 
 class vtkF3DAssimpImporter::vtkInternals
