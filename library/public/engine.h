@@ -35,6 +35,7 @@ namespace f3d
 class options;
 class loader;
 class interactor;
+class internals;
 class F3D_EXPORT engine
 {
 public:
@@ -117,7 +118,6 @@ public:
   static std::vector<readerInformation> getReadersInfo();
 
 private:
-  class internals;
   std::unique_ptr<internals> Internals;
 };
 }
