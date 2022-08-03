@@ -25,5 +25,6 @@ foreach (module IN LISTS modules)
   if (NOT "${libf3d_link_options_public}" STREQUAL "")
     vtk_module_link_options(${module} PUBLIC ${libf3d_link_options_public})
   endif()
+  vtk_module_compile_features(${module} PRIVATE cxx_std_17)
 endforeach ()
 
