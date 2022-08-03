@@ -45,11 +45,12 @@ engine::engine(window::Type windowType)
       *this->Internals->Options, *this->Internals->Window, *this->Internals->Loader);
   }
 }
+
 //----------------------------------------------------------------------------
 engine::~engine()
 {
   delete this->Internals;
-};
+}
 
 //----------------------------------------------------------------------------
 void engine::setOptions(const options& opt)
