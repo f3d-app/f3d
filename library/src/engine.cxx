@@ -28,7 +28,7 @@ public:
 
 //----------------------------------------------------------------------------
 engine::engine(window::Type windowType)
-  : Internals(std::make_unique<engine::internals>())
+  : Internals(new engine::internals)
 {
   this->Internals->Options = std::make_unique<options>();
 
@@ -46,7 +46,10 @@ engine::engine(window::Type windowType)
   }
 }
 //----------------------------------------------------------------------------
-engine::~engine(){};
+engine::~engine()
+{
+  delete this->Internals;
+};
 
 //----------------------------------------------------------------------------
 void engine::setOptions(const options& opt)
