@@ -83,8 +83,8 @@ public:
     std::string& fileInfo) const noexcept = 0;
 
 protected:
-  loader() = default;
-  virtual ~loader() = default;
+  loader() noexcept = default;
+  virtual ~loader() noexcept = default;
   loader(const loader& opt) = delete;
   loader& operator=(const loader& opt) = delete;
 };

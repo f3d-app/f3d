@@ -90,8 +90,8 @@ public:
   virtual bool setWindowName(const std::string& windowName) noexcept = 0;
 
 protected:
-  window() = default;
-  virtual ~window() = default;
+  window() noexcept = default;
+  virtual ~window() noexcept = default;
   window(const window&) = delete;
   window& operator=(const window&) = delete;
 };

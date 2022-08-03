@@ -103,8 +103,8 @@ public:
     noexcept;
 
 protected:
-  interactor() = default;
-  virtual ~interactor() = default;
+  interactor() noexcept = default;
+  virtual ~interactor() noexcept = default;
   interactor(const interactor& opt) = delete;
   interactor& operator=(const interactor& opt) = delete;
 };

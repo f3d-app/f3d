@@ -85,8 +85,8 @@ public:
 protected:
   camera() noexcept = default;
   virtual ~camera() noexcept = default;
-  camera(const camera&) noexcept = delete;
-  camera& operator=(const camera&) noexcept = delete;
+  camera(const camera&) = delete;
+  camera& operator=(const camera&) = delete;
 };
 }
 
