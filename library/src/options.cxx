@@ -130,12 +130,6 @@ options::options()
   this->Internals->init("background-color", std::vector<double>{ 0.2, 0.2, 0.2 });
   this->Internals->init("bar", false);
   this->Internals->init("blur-background", false);
-  this->Internals->init("camera-azimuth-angle", 0.0);
-  this->Internals->init("camera-elevation-angle", 0.0);
-  this->Internals->init("camera-focal-point", std::vector<double>());
-  this->Internals->init("camera-position", std::vector<double>());
-  this->Internals->init("camera-view-angle", 0.0);
-  this->Internals->init("camera-view-up", std::vector<double>());
   this->Internals->init("cells", false);
   this->Internals->init("colormap",
     std::vector<double>{

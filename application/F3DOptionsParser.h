@@ -31,6 +31,12 @@ struct F3DAppOptions
   std::vector<int> Resolution{ 1000, 600 };
   bool Quiet = false;
   bool Verbose = false;
+  double CameraAzimuthAngle = 0.0;
+  double CameraElevationAngle = 0.0;
+  std::vector<double> CameraFocalPoint;
+  std::vector<double> CameraPosition;
+  std::vector<double> CameraViewUp;
+  double CameraViewAngle = 0.0;
 };
 
 class F3DOptionsParser
@@ -54,7 +60,7 @@ public:
    * Returns the resulting options.
    */
   void GetOptionsFromCommandLine(
-    F3DAppOptions& addOptions, f3d::options& options, std::vector<std::string>& inputs);
+    F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& inputs);
 
   /**
    * Use the config file dictionnary using the provided filepath
@@ -62,7 +68,8 @@ public:
    * Then parse the command line for any supplemental.
    * Returns the resulting options.
    */
-  void GetOptionsFromConfigFile(const std::string& filePath, f3d::options& options);
+  void GetOptionsFromConfigFile(
+    const std::string& filePath, F3DAppOptions& appOptions, f3d::options& options);
 
   F3DOptionsParser();
   ~F3DOptionsParser();

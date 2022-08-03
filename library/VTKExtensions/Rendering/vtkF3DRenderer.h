@@ -91,18 +91,6 @@ public:
   void SetupRenderPasses();
 
   /**
-   * Initialize the camera position, focal point,
-   * view up and view angle.
-   */
-  void InitializeCamera();
-
-  using vtkOpenGLRenderer::ResetCamera;
-  /**
-   * Reset the camera to its initial parameters
-   */
-  void ResetCamera() override;
-
-  /**
    * Return description about the current rendering status
    * Currently contains information about the camera and the grid if any
    */

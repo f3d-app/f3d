@@ -68,6 +68,7 @@ configure_file(
 
 # Define libf3d target
 set(F3D_SOURCE_FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/camera_impl.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/animationManager.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/init.cxx
@@ -83,6 +84,7 @@ set(F3D_SOURCE_FILES
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/camera.h
   ${CMAKE_CURRENT_BINARY_DIR}/public/export.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/engine.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/image.h

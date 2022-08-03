@@ -9,6 +9,7 @@
 #ifndef f3d_window_h
 #define f3d_window_h
 
+#include "camera.h"
 #include "export.h"
 #include "image.h"
 
@@ -49,6 +50,11 @@ public:
    * Get the type of the window
    */
   virtual Type getType() = 0;
+
+  /**
+   * Get the camera provided by the window.
+   */
+  virtual camera& getCamera() = 0;
 
   /**
    * Perform a render of the window to the screen.
