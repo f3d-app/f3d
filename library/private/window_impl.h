@@ -42,6 +42,7 @@ public:
    * Documented public API
    */
   Type getType() override;
+  camera& getCamera() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;
   void setSize(int width, int heigth) override;
@@ -64,6 +65,7 @@ public:
   virtual void InitializeRendererWithColoring(vtkF3DGenericImporter* importer);
 
   /**
+   * Implementation only API.
    * Use all the rendering related options to update the configuration of the window
    * and the rendering stack below. This also initialize the rendering stack if needed.
    * This will be called automatically when calling loader::loadFile but can also be called manually
@@ -73,17 +75,13 @@ public:
   virtual void UpdateDynamicOptions();
 
   /**
-   * Initialize camera position based on the visible actors in the renderer
-   * Should be called after UpdateDynamicOptions to get correct positioning
-   */
-  virtual void InitializeCamera();
-
-  /**
+   * Implementation only API.
    * Print scene description to log using provided verbose level
    */
   void PrintSceneDescription(log::VerboseLevel level);
 
   /**
+   * Implementation only API.
    * Print coloring description to log using provided verbose level if available
    */
   void PrintColoringDescription(log::VerboseLevel level);

@@ -185,6 +185,7 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210303)
   f3d_test(NAME TestCameraPersp DATA Cameras.gltf ARGS --camera-index=0)
   f3d_test(NAME TestCameraOrtho DATA Cameras.gltf ARGS --camera-index=1)
+  f3d_test(NAME TestCameraIndexConfiguration DATA Cameras.gltf ARGS --camera-index=0  --camera-azimuth-angle=15 --camera-position=0.7,0.5,3)
   # Test Verbose camera
   f3d_test(NAME TestVerboseCamera DATA Cameras.gltf ARGS --camera-index=1 --verbose NO_RENDER REGEXP "0:.*1:")
 endif()

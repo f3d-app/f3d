@@ -1,5 +1,6 @@
 #include "window_impl.h"
 
+#include "camera_impl.h"
 #include "log.h"
 #include "options.h"
 
@@ -33,10 +34,12 @@ public:
   {
   }
 
+  std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkSmartPointer<vtkF3DRenderer> Renderer;
   Type WindowType;
   const options& Options;
+  bool Initialized = false;
 };
 
 //----------------------------------------------------------------------------
@@ -62,12 +65,27 @@ window_impl::window_impl(const options& options, Type type)
     this->Internals->RenWin->SetOffScreenRendering(type == Type::NATIVE_OFFSCREEN);
     this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
   }
+
+  this->Internals->Camera = std::make_unique<detail::camera_impl>();
 }
 
 //----------------------------------------------------------------------------
 window_impl::Type window_impl::getType()
 {
   return this->Internals->WindowType;
+}
+
+//----------------------------------------------------------------------------
+camera& window_impl::getCamera()
+{
+  // Make sure the camera (and the whole rendering stack)
+  // is initialized before providing one.
+  if (!this->Internals->Initialized)
+  {
+    this->Initialize(false, "");
+  }
+
+  return *this->Internals->Camera;
 }
 
 //----------------------------------------------------------------------------
@@ -79,7 +97,7 @@ void window_impl::setSize(int width, int height)
 //----------------------------------------------------------------------------
 bool window_impl::setIcon(const void* icon, size_t iconSize)
 {
-// SetIcon needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7004
+  // SetIcon needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7004
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200616)
   // XXX This code requires that the interactor has already been set on the render window
   vtkNew<vtkPNGReader> iconReader;
@@ -139,8 +157,10 @@ void window_impl::Initialize(bool withColoring, std::string fileInfo)
     this->Internals->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
   }
 
+  this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Renderer->Initialize(fileInfo, this->Internals->Options.getAsString("up"));
+  this->Internals->Initialized = true;
 }
 
 //----------------------------------------------------------------------------
@@ -197,53 +217,6 @@ void window_impl::UpdateDynamicOptions()
 
   // Show grid last as it needs to know the bounding box to be able to compute its size
   this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("grid"));
-}
-
-//----------------------------------------------------------------------------
-void window_impl::InitializeCamera()
-{
-  // This should be called only once all options
-  // have been shown as they may have an effect on it
-  if (this->Internals->Options.getAsInt("camera-index") < 0)
-  {
-    // set a default camera from bounds using VTK method
-    this->Internals->Renderer->vtkRenderer::ResetCamera();
-
-    // use this->Internals->Options to overwrite camera parameters
-    vtkCamera* cam = this->Internals->Renderer->GetActiveCamera();
-
-    std::vector<double> cameraPosition =
-      this->Internals->Options.getAsDoubleVector("camera-position");
-    if (cameraPosition.size() == 3)
-    {
-      cam->SetPosition(cameraPosition.data());
-    }
-
-    std::vector<double> cameraFocalPoint =
-      this->Internals->Options.getAsDoubleVector("camera-focal-point");
-    if (cameraFocalPoint.size() == 3)
-    {
-      cam->SetFocalPoint(cameraFocalPoint.data());
-    }
-
-    std::vector<double> cameraViewUp = this->Internals->Options.getAsDoubleVector("camera-view-up");
-    if (cameraViewUp.size() == 3)
-    {
-      cam->SetViewUp(cameraViewUp.data());
-    }
-
-    double cameraViewAngle = this->Internals->Options.getAsDouble("camera-view-angle");
-    if (cameraViewAngle != 0)
-    {
-      cam->SetViewAngle(cameraViewAngle);
-    }
-
-    cam->Azimuth(this->Internals->Options.getAsDouble("camera-azimuth-angle"));
-    cam->Elevation(this->Internals->Options.getAsDouble("camera-elevation-angle"));
-    cam->OrthogonalizeViewUp();
-  }
-
-  this->Internals->Renderer->InitializeCamera();
 }
 
 //----------------------------------------------------------------------------

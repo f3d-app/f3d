@@ -5,6 +5,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKOptions.cxx
      TestSDKLog.cxx
      TestSDKLoader.cxx
+     TestSDKCamera.cxx
     )
 
 # Test image comparison only with VTK > 9.0.1
