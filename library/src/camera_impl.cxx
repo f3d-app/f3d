@@ -14,16 +14,16 @@ public:
 };
 
 //----------------------------------------------------------------------------
-camera_impl::camera_impl()
+camera_impl::camera_impl() noexcept
   : Internals(std::make_unique<camera_impl::internals>())
 {
 }
 
 //----------------------------------------------------------------------------
-camera_impl::~camera_impl() = default;
+camera_impl::~camera_impl() noexcept = default;
 
 //----------------------------------------------------------------------------
-camera& camera_impl::setPosition(const vector3_t& pos)
+camera& camera_impl::setPosition(const vector3_t& pos) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetPosition(pos.data());
@@ -33,7 +33,7 @@ camera& camera_impl::setPosition(const vector3_t& pos)
 }
 
 //----------------------------------------------------------------------------
-camera::vector3_t camera_impl::getPosition()
+camera::vector3_t camera_impl::getPosition() noexcept
 {
   vector3_t pos;
   this->getPosition(pos);
@@ -41,7 +41,7 @@ camera::vector3_t camera_impl::getPosition()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::getPosition(vector3_t& pos)
+camera& camera_impl::getPosition(vector3_t& pos) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetPosition(pos.data());
@@ -49,7 +49,7 @@ camera& camera_impl::getPosition(vector3_t& pos)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::setFocalPoint(const vector3_t& foc)
+camera& camera_impl::setFocalPoint(const vector3_t& foc) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetFocalPoint(foc.data());
@@ -59,7 +59,7 @@ camera& camera_impl::setFocalPoint(const vector3_t& foc)
 }
 
 //----------------------------------------------------------------------------
-camera::vector3_t camera_impl::getFocalPoint()
+camera::vector3_t camera_impl::getFocalPoint() noexcept
 {
   vector3_t foc;
   this->getFocalPoint(foc);
@@ -67,7 +67,7 @@ camera::vector3_t camera_impl::getFocalPoint()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::getFocalPoint(vector3_t& foc)
+camera& camera_impl::getFocalPoint(vector3_t& foc) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetFocalPoint(foc.data());
@@ -75,7 +75,7 @@ camera& camera_impl::getFocalPoint(vector3_t& foc)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::setViewUp(const vector3_t& up)
+camera& camera_impl::setViewUp(const vector3_t& up) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetViewUp(up.data());
@@ -85,7 +85,7 @@ camera& camera_impl::setViewUp(const vector3_t& up)
 }
 
 //----------------------------------------------------------------------------
-camera::vector3_t camera_impl::getViewUp()
+camera::vector3_t camera_impl::getViewUp() noexcept
 {
   vector3_t up;
   this->getViewUp(up);
@@ -93,7 +93,7 @@ camera::vector3_t camera_impl::getViewUp()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::getViewUp(vector3_t& up)
+camera& camera_impl::getViewUp(vector3_t& up) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetViewUp(up.data());
@@ -101,7 +101,7 @@ camera& camera_impl::getViewUp(vector3_t& up)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::setViewAngle(const double& angle)
+camera& camera_impl::setViewAngle(const double& angle) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetViewAngle(angle);
@@ -111,7 +111,7 @@ camera& camera_impl::setViewAngle(const double& angle)
 }
 
 //----------------------------------------------------------------------------
-double camera_impl::getViewAngle()
+double camera_impl::getViewAngle() noexcept
 {
   double angle;
   this->getViewAngle(angle);
@@ -119,7 +119,7 @@ double camera_impl::getViewAngle()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::getViewAngle(double& angle)
+camera& camera_impl::getViewAngle(double& angle) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   angle = cam->GetViewAngle();
@@ -127,7 +127,7 @@ camera& camera_impl::getViewAngle(double& angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::setViewMatrix(const matrix4_t& matrix)
+camera& camera_impl::setViewMatrix(const matrix4_t& matrix) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetPosition(matrix[12], matrix[13], matrix[14]);
@@ -138,7 +138,7 @@ camera& camera_impl::setViewMatrix(const matrix4_t& matrix)
 }
 
 //----------------------------------------------------------------------------
-camera::matrix4_t camera_impl::getViewMatrix()
+camera::matrix4_t camera_impl::getViewMatrix() noexcept
 {
   matrix4_t matrix;
   this->getViewMatrix(matrix);
@@ -146,7 +146,7 @@ camera::matrix4_t camera_impl::getViewMatrix()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::getViewMatrix(matrix4_t& matrix)
+camera& camera_impl::getViewMatrix(matrix4_t& matrix) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   vtkMatrix4x4* mat = cam->GetModelViewTransformMatrix();
@@ -158,7 +158,7 @@ camera& camera_impl::getViewMatrix(matrix4_t& matrix)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::dolly(double val)
+camera& camera_impl::dolly(double val) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Dolly(val);
@@ -168,7 +168,7 @@ camera& camera_impl::dolly(double val)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::roll(double angle)
+camera& camera_impl::roll(double angle) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Roll(angle);
@@ -178,7 +178,7 @@ camera& camera_impl::roll(double angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::azimuth(double angle)
+camera& camera_impl::azimuth(double angle) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Azimuth(angle);
@@ -188,7 +188,7 @@ camera& camera_impl::azimuth(double angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::yaw(double angle)
+camera& camera_impl::yaw(double angle) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Yaw(angle);
@@ -198,7 +198,7 @@ camera& camera_impl::yaw(double angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::elevation(double angle)
+camera& camera_impl::elevation(double angle) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Elevation(angle);
@@ -208,7 +208,7 @@ camera& camera_impl::elevation(double angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::pitch(double angle)
+camera& camera_impl::pitch(double angle) noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Pitch(angle);
@@ -218,7 +218,7 @@ camera& camera_impl::pitch(double angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::setCurrentAsDefault()
+camera& camera_impl::setCurrentAsDefault() noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   this->Internals->DefaultVTKCamera->DeepCopy(cam);
@@ -226,7 +226,7 @@ camera& camera_impl::setCurrentAsDefault()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::resetToDefault()
+camera& camera_impl::resetToDefault() noexcept
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->DeepCopy(this->Internals->DefaultVTKCamera);
@@ -235,7 +235,7 @@ camera& camera_impl::resetToDefault()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::resetToBounds()
+camera& camera_impl::resetToBounds() noexcept
 {
   this->Internals->VTKRenderer->ResetCamera();
   this->Internals->VTKRenderer->ResetCameraClippingRange();

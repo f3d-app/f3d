@@ -24,43 +24,43 @@ public:
   /**
    * Default constructor
    */
-  camera_impl();
+  camera_impl() noexcept;
 
   /**
    * Default destructor
    */
-  ~camera_impl() override;
+  ~camera_impl() noexcept override;
 
   //@{
   /**
    * Documented public API
    */
-  camera& setPosition(const vector3_t& pos) override;
-  vector3_t getPosition() override;
-  camera& getPosition(vector3_t& pos) override;
-  camera& setFocalPoint(const vector3_t& foc) override;
-  vector3_t getFocalPoint() override;
-  camera& getFocalPoint(vector3_t& foc) override;
-  camera& setViewUp(const vector3_t& up) override;
-  vector3_t getViewUp() override;
-  camera& getViewUp(vector3_t& up) override;
-  camera& setViewAngle(const double& angle) override;
-  double getViewAngle() override;
-  camera& getViewAngle(double& angle) override;
-  camera& setViewMatrix(const matrix4_t& matrix) override;
-  matrix4_t getViewMatrix() override;
-  camera& getViewMatrix(matrix4_t& matrix) override;
+  camera& setPosition(const vector3_t& pos) noexcept override;
+  vector3_t getPosition() noexcept override;
+  camera& getPosition(vector3_t& pos) noexcept override;
+  camera& setFocalPoint(const vector3_t& foc) noexcept override;
+  vector3_t getFocalPoint() noexcept override;
+  camera& getFocalPoint(vector3_t& foc) noexcept override;
+  camera& setViewUp(const vector3_t& up) noexcept override;
+  vector3_t getViewUp() noexcept override;
+  camera& getViewUp(vector3_t& up) noexcept override;
+  camera& setViewAngle(const double& angle) noexcept override;
+  double getViewAngle() noexcept override;
+  camera& getViewAngle(double& angle) noexcept override;
+  camera& setViewMatrix(const matrix4_t& matrix) noexcept override;
+  matrix4_t getViewMatrix() noexcept override;
+  camera& getViewMatrix(matrix4_t& matrix) noexcept override;
 
-  camera& dolly(double val) override;
-  camera& roll(double angle) override;
-  camera& azimuth(double angle) override;
-  camera& yaw(double angle) override;
-  camera& elevation(double angle) override;
-  camera& pitch(double angle) override;
+  camera& dolly(double val) noexcept override;
+  camera& roll(double angle) noexcept override;
+  camera& azimuth(double angle) noexcept override;
+  camera& yaw(double angle) noexcept override;
+  camera& elevation(double angle) noexcept override;
+  camera& pitch(double angle) noexcept override;
 
-  camera& setCurrentAsDefault() override;
-  camera& resetToDefault() override;
-  camera& resetToBounds() override;
+  camera& setCurrentAsDefault() noexcept override;
+  camera& resetToDefault() noexcept override;
+  camera& resetToBounds() noexcept override;
   //@}
 
   /**
