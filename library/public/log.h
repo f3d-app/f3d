@@ -44,7 +44,7 @@ public:
    * Log provided args as provided verbose level.
    */
   template<typename... Args>
-  static void print(VerboseLevel level, Args... args)
+  static void print(VerboseLevel level, Args... args) noexcept
   {
     std::stringstream ss;
     log::appendArg(ss, args...);
@@ -55,7 +55,7 @@ public:
    * Log provided args as a debug.
    */
   template<typename... Args>
-  static void debug(Args... args)
+  static void debug(Args... args) noexcept
   {
     std::stringstream ss;
     log::appendArg(ss, args...);
@@ -66,7 +66,7 @@ public:
    * Log provided args as an info.
    */
   template<typename... Args>
-  static void info(Args... args)
+  static void info(Args... args) noexcept
   {
     std::stringstream ss;
     log::appendArg(ss, args...);
@@ -77,7 +77,7 @@ public:
    * Log provided args as a warning.
    */
   template<typename... Args>
-  static void warn(Args... args)
+  static void warn(Args... args) noexcept
   {
     std::stringstream ss;
     log::appendArg(ss, args...);
@@ -88,7 +88,7 @@ public:
    * Log provided args as an error.
    */
   template<typename... Args>
-  static void error(Args... args)
+  static void error(Args... args) noexcept
   {
     std::stringstream ss;
     log::appendArg(ss, args...);
@@ -98,34 +98,34 @@ public:
   /**
    * Set the coloring usage, if applicable (eg: console output).
    */
-  static void setUseColoring(bool use);
+  static void setUseColoring(bool use) noexcept;
 
   /**
    * Set the verbose level
    */
-  static void setVerboseLevel(VerboseLevel level);
+  static void setVerboseLevel(VerboseLevel level) noexcept;
 
   /**
    * Wait for user if applicable (eg: win32 output window)
    * No effect otherwise.
    */
-  static void waitForUser();
+  static void waitForUser() noexcept;
 
 protected:
-  static void appendArg(std::stringstream&) {}
+  static void appendArg(std::stringstream&) noexcept {}
 
   template<typename T, typename... Args>
-  static void appendArg(std::stringstream& ss, T value, Args... args)
+  static void appendArg(std::stringstream& ss, T value, Args... args) noexcept
   {
     ss << value;
     log::appendArg(ss, args...);
   }
 
-  static void printInternal(VerboseLevel level, const std::string& msg);
-  static void errorInternal(const std::string& msg);
-  static void warnInternal(const std::string& msg);
-  static void infoInternal(const std::string& msg);
-  static void debugInternal(const std::string& msg);
+  static void printInternal(VerboseLevel level, const std::string& msg) noexcept;
+  static void errorInternal(const std::string& msg) noexcept;
+  static void warnInternal(const std::string& msg) noexcept;
+  static void infoInternal(const std::string& msg) noexcept;
+  static void debugInternal(const std::string& msg) noexcept;
 };
 }
 
