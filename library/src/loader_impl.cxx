@@ -168,7 +168,7 @@ loader_impl::loader_impl(const options& options, window_impl& window) noexcept
 }
 
 //----------------------------------------------------------------------------
-loader_impl::~loader_impl() = default;
+loader_impl::~loader_impl() noexcept = default;
 
 //----------------------------------------------------------------------------
 void loader_impl::addFiles(const std::vector<std::string>& files) noexcept
