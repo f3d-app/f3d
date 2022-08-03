@@ -25,7 +25,6 @@
 #include "window.h"
 
 #include <map>
-#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -57,7 +56,7 @@ public:
   explicit engine(window::Type windowType = window::Type::NATIVE);
 
   /**
-   * Engine default destructor.
+   * Engine destructor, delete all object instances as well
    */
   ~engine();
 
