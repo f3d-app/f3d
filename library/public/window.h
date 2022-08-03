@@ -49,31 +49,31 @@ public:
   /**
    * Get the type of the window
    */
-  virtual Type getType() = 0;
+  virtual Type getType() noexcept = 0;
 
   /**
    * Get the camera provided by the window.
    */
-  virtual camera& getCamera() = 0;
+  virtual camera& getCamera() noexcept = 0;
 
   /**
    * Perform a render of the window to the screen.
    * All dynamic options are updated if needed.
    * Return true on success, false otherwise.
    */
-  virtual bool render() = 0;
+  virtual bool render() noexcept = 0;
 
   /**
    * Perform a render of the window to the screen and save the result in a f3d::image.
    * Set noBackground to true to have a transparent background.
    * Return the resulting f3d::image.
    */
-  virtual image renderToImage(bool noBackground = false) = 0;
+  virtual image renderToImage(bool noBackground = false) noexcept = 0;
 
   /**
    * Set the size of the window
    */
-  virtual void setSize(int width, int heigth) = 0;
+  virtual void setSize(int width, int heigth) noexcept = 0;
 
   /**
    * Set the icon to be shown by a window manager.
@@ -81,13 +81,13 @@ public:
    * iconSize should be the sizeof(icon)
    * Return true on success, false otherwise.
    */
-  virtual bool setIcon(const void* icon, size_t iconSize) = 0;
+  virtual bool setIcon(const void* icon, size_t iconSize) noexcept = 0;
 
   /**
    * Set the window name to be shown by a window manager.
    * Return true on success, false otherwise.
    */
-  virtual bool setWindowName(const std::string& windowName) = 0;
+  virtual bool setWindowName(const std::string& windowName) noexcept = 0;
 
 protected:
   window() = default;
