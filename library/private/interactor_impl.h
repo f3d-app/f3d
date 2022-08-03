@@ -31,28 +31,29 @@ public:
   /**
    * Documented public API
    */
-  interactor_impl(options& options, window_impl& window, loader_impl& loader);
-  ~interactor_impl();
+  interactor_impl(options& options, window_impl& window, loader_impl& loader) noexcept;
+  ~interactor_impl() noexcept;
 
-  void setKeyPressCallBack(std::function<bool(int, std::string)> callBack) override;
-  void setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack) override;
+  void setKeyPressCallBack(std::function<bool(int, std::string)> callBack) noexcept override;
+  void setDropFilesCallBack(
+    std::function<bool(std::vector<std::string>)> callBack) noexcept override;
 
-  unsigned long createTimerCallBack(double time, std::function<void()> callBack) override;
-  void removeTimerCallBack(unsigned long id) override;
+  unsigned long createTimerCallBack(double time, std::function<void()> callBack) noexcept override;
+  void removeTimerCallBack(unsigned long id) noexcept override;
 
-  void toggleAnimation() override;
-  void startAnimation() override;
-  void stopAnimation() override;
-  bool isPlayingAnimation() override;
+  void toggleAnimation() noexcept override;
+  void startAnimation() noexcept override;
+  void stopAnimation() noexcept override;
+  bool isPlayingAnimation() noexcept override;
 
-  void enableCameraMovement() override;
-  void disableCameraMovement() override;
+  void enableCameraMovement() noexcept override;
+  void disableCameraMovement() noexcept override;
 
-  bool playInteraction(const std::string& file) override;
-  bool recordInteraction(const std::string& file) override;
+  bool playInteraction(const std::string& file) noexcept override;
+  bool recordInteraction(const std::string& file) noexcept override;
 
-  void start() override;
-  void stop() override;
+  void start() noexcept override;
+  void stop() noexcept override;
   //@}
 
   /**
