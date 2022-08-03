@@ -44,7 +44,7 @@ public:
 
 //----------------------------------------------------------------------------
 window_impl::window_impl(const options& options, Type type)
-  : Internals(new window_impl::internals(options))
+  : Internals(std::make_unique<window_impl::internals>(options))
 {
   this->Internals->WindowType = type;
   if (type == Type::NONE)

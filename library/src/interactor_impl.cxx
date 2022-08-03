@@ -296,7 +296,7 @@ public:
 
 //----------------------------------------------------------------------------
 interactor_impl::interactor_impl(options& options, window_impl& window, loader_impl& loader)
-  : Internals(new interactor_impl::internals(options, window, loader))
+  : Internals(std::make_unique<interactor_impl::internals>(options, window, loader))
 {
   // Loader need the interactor
   this->Internals->Loader.setInteractor(this);

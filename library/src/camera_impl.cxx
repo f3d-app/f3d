@@ -15,7 +15,7 @@ public:
 
 //----------------------------------------------------------------------------
 camera_impl::camera_impl()
-  : Internals(new camera_impl::internals())
+  : Internals(std::make_unique<camera_impl::internals>())
 {
 }
 

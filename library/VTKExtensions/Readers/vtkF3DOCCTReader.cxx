@@ -393,7 +393,7 @@ vtkStandardNewMacro(vtkF3DOCCTReader);
 
 //----------------------------------------------------------------------------
 vtkF3DOCCTReader::vtkF3DOCCTReader()
-  : Internals(new vtkF3DOCCTReader::vtkInternals(this))
+  : Internals(std::make_unique<vtkF3DOCCTReader::vtkInternals>(this))
 {
   this->SetNumberOfInputPorts(0);
 }
