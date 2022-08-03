@@ -26,5 +26,8 @@ foreach (module IN LISTS modules)
     vtk_module_link_options(${module} PUBLIC ${libf3d_link_options_public})
   endif()
   vtk_module_compile_features(${module} PRIVATE cxx_std_17)
+  if(F3D_STRICT_BUILD AND MSVC)
+    # There are warnings in VTK related to deprecated features in C++17
+    vtk_module_compile_definitions(${module} PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+  endif()
 endforeach ()
-
