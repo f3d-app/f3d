@@ -53,31 +53,31 @@ public:
    * When using window::Type::EXTERNAL, interactor will not be provided by the engine.
    * All objects instances will be created on construction
    */
-  explicit engine(window::Type windowType = window::Type::NATIVE);
+  explicit engine(window::Type windowType = window::Type::NATIVE) noexcept;
 
   /**
    * Engine destructor, delete all object instances as well
    */
-  ~engine();
+  ~engine() noexcept;
 
   /**
    * Engine provide a default options that you can use using engine::getOptions()
    * But you can use this setter to use other options directly.
    * It will copy options into engine
    */
-  void setOptions(const options& opt);
+  void setOptions(const options& opt) noexcept;
 
   /**
    * Engine provide a default options that you can use using engine::getOptions()
    * But you can use this setter to use other options directly.
    * It will move options into engine
    */
-  void setOptions(options&& opt);
+  void setOptions(options&& opt) noexcept;
 
   /**
    * Get the default options provided by the engine
    */
-  options& getOptions();
+  options& getOptions() noexcept;
 
   /**
    * Get the window provided by the engine, if any.
@@ -88,7 +88,7 @@ public:
   /**
    * Get the loaded provided by the engine
    */
-  loader& getLoader();
+  loader& getLoader() noexcept;
 
   /**
    * Get the interactor provided by the engine, if any
@@ -100,7 +100,7 @@ public:
    * Get a map containing info about the libf3d
    * TODO improve this doc to list the keys
    */
-  static std::map<std::string, std::string> getLibInfo();
+  static std::map<std::string, std::string> getLibInfo() noexcept;
 
   struct readerInformation
   {
@@ -113,7 +113,7 @@ public:
   /**
    * Get a vector containing info about the supported readers
    */
-  static std::vector<readerInformation> getReadersInfo();
+  static std::vector<readerInformation> getReadersInfo() noexcept;
 
 private:
   class internals;

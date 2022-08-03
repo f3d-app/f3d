@@ -14,10 +14,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-camera_impl::camera_impl() noexcept
-  : Internals(std::make_unique<camera_impl::internals>())
-{
-}
+camera_impl::camera_impl() noexcept : Internals(std::make_unique<camera_impl::internals>()) {}
 
 //----------------------------------------------------------------------------
 camera_impl::~camera_impl() noexcept = default;
