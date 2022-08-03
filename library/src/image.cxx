@@ -41,7 +41,7 @@ public:
     return importer;
   }
 
-  void SetFromVTK(vtkAlgorithm* alg)
+  void SetFromVTK(vtkAlgorithm* alg) noexcept
   {
     vtkNew<vtkImageExport> exporter;
     exporter->SetInputConnection(alg->GetOutputPort());
@@ -58,10 +58,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-image::image()
-  : Internals(new image::internals())
-{
-}
+image::image() noexcept : Internals(new image::internals()) {}
 
 //----------------------------------------------------------------------------
 image::image(const std::string& path)
@@ -84,53 +81,51 @@ image::image(const std::string& path)
 }
 
 //----------------------------------------------------------------------------
-image::~image()
+image::~image() noexcept
 {
   delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
-image::image(const image& img)
-  : Internals(new image::internals())
+image::image(const image& img) noexcept : Internals(new image::internals())
 {
   *this->Internals = *img.Internals;
 }
 
 //----------------------------------------------------------------------------
-image& image::operator=(const image& img)
+image& image::operator=(const image& img) noexcept
 {
   *this->Internals = *img.Internals;
   return *this;
 }
 
 //----------------------------------------------------------------------------
-image::image(image&& img)
-  : Internals(new image::internals())
+image::image(image&& img) noexcept : Internals(new image::internals())
 {
   std::swap(this->Internals, img.Internals);
 }
 
 //----------------------------------------------------------------------------
-image& image::operator=(image&& img)
+image& image::operator=(image&& img) noexcept
 {
   std::swap(this->Internals, img.Internals);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-unsigned int image::getWidth() const
+unsigned int image::getWidth() const noexcept
 {
   return this->Internals->Width;
 }
 
 //----------------------------------------------------------------------------
-unsigned int image::getHeight() const
+unsigned int image::getHeight() const noexcept
 {
   return this->Internals->Height;
 }
 
 //----------------------------------------------------------------------------
-image& image::setResolution(unsigned int width, unsigned int height)
+image& image::setResolution(unsigned int width, unsigned int height) noexcept
 {
   this->Internals->Width = width;
   this->Internals->Height = height;
@@ -139,13 +134,13 @@ image& image::setResolution(unsigned int width, unsigned int height)
 }
 
 //----------------------------------------------------------------------------
-unsigned int image::getChannelCount() const
+unsigned int image::getChannelCount() const noexcept
 {
   return this->Internals->Channels;
 }
 
 //----------------------------------------------------------------------------
-image& image::setChannelCount(unsigned int dim)
+image& image::setChannelCount(unsigned int dim) noexcept
 {
   this->Internals->Channels = dim;
   this->Internals->UpdateBufferSize();
@@ -153,14 +148,14 @@ image& image::setChannelCount(unsigned int dim)
 }
 
 //----------------------------------------------------------------------------
-image& image::setData(unsigned char* buffer)
+image& image::setData(unsigned char* buffer) noexcept
 {
   std::copy(buffer, buffer + this->Internals->Buffer.size(), this->Internals->Buffer.begin());
   return *this;
 }
 
 //----------------------------------------------------------------------------
-unsigned char* image::getData() const
+unsigned char* image::getData() const noexcept
 {
   return this->Internals->Buffer.data();
 }

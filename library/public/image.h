@@ -39,12 +39,12 @@ public:
   /**
    * Default/copy/move constructors/operators
    */
-  image();
-  ~image();
-  image(const image& img);
-  image& operator=(const image& img);
-  image(image&& img);
-  image& operator=(image&& img);
+  image() noexcept;
+  ~image() noexcept;
+  image(const image& img) noexcept;
+  image& operator=(const image& img) noexcept;
+  image(image&& img) noexcept;
+  image& operator=(image&& img) noexcept;
   //@}
 
   //@{
@@ -59,17 +59,17 @@ public:
   /**
    * Set/Get image resolution
    */
-  unsigned int getWidth() const;
-  unsigned int getHeight() const;
-  image& setResolution(unsigned int width, unsigned int height);
+  unsigned int getWidth() const noexcept;
+  unsigned int getHeight() const noexcept;
+  image& setResolution(unsigned int width, unsigned int height) noexcept;
   //@}
 
   //@{
   /**
    * Set/Get image channel count
    */
-  unsigned int getChannelCount() const;
-  image& setChannelCount(unsigned int dim);
+  unsigned int getChannelCount() const noexcept;
+  image& setChannelCount(unsigned int dim) noexcept;
   //@}
 
   //@{
@@ -78,8 +78,8 @@ public:
    * Its size is expected to be width * height * channelCount
    *
    */
-  image& setData(unsigned char* buffer);
-  unsigned char* getData() const;
+  image& setData(unsigned char* buffer) noexcept;
+  unsigned char* getData() const noexcept;
   //@}
 
   /**
