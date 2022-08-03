@@ -33,6 +33,8 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
+#include <memory>
+
 vtkStandardNewMacro(vtkF3DAssimpImporter);
 
 class vtkF3DAssimpImporter::vtkInternals
@@ -834,7 +836,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkF3DAssimpImporter::vtkF3DAssimpImporter()
-  : Internals(new vtkF3DAssimpImporter::vtkInternals(this))
+  : Internals(std::make_unique<vtkF3DAssimpImporter::vtkInternals>(this))
 {
 }
 

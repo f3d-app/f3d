@@ -28,7 +28,7 @@ public:
 
 //----------------------------------------------------------------------------
 engine::engine(window::Type windowType)
-  : Internals(new engine::internals())
+  : Internals(new engine::internals)
 {
   this->Internals->Options = std::make_unique<options>();
 

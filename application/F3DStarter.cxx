@@ -56,7 +56,7 @@ public:
 
 //----------------------------------------------------------------------------
 F3DStarter::F3DStarter()
-  : Internals(new F3DStarter::F3DInternals)
+  : Internals(std::make_unique<F3DStarter::F3DInternals>())
 {
 }
 
