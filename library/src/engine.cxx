@@ -46,7 +46,7 @@ engine::engine(window::Type windowType)
   }
 }
 //----------------------------------------------------------------------------
-engine::~engine() = default;
+engine::~engine(){};
 
 //----------------------------------------------------------------------------
 void engine::setOptions(const options& opt)
