@@ -305,7 +305,7 @@ interactor_impl::interactor_impl(
 }
 
 //----------------------------------------------------------------------------
-interactor_impl::~interactor_impl() = default;
+interactor_impl::~interactor_impl() noexcept = default;
 
 //----------------------------------------------------------------------------
 void interactor_impl::setKeyPressCallBack(std::function<bool(int, std::string)> callBack) noexcept
