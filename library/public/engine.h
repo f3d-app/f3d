@@ -119,8 +119,8 @@ public:
 private:
   class internals;
   std::unique_ptr<internals> Internals;
-  engine(const engine& opt);
-  engine& operator=(const engine& opt);
+  engine(const engine& opt) = delete;
+  engine& operator=(const engine& opt) = delete;
 };
 }
 

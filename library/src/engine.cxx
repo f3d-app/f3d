@@ -48,9 +48,6 @@ engine::engine(window::Type windowType)
 //----------------------------------------------------------------------------
 engine::~engine(){};
 
-engine::engine(const engine& opt) = delete;
-engine& engine::operator=(const engine& opt) = delete;
-
 //----------------------------------------------------------------------------
 void engine::setOptions(const options& opt)
 {
