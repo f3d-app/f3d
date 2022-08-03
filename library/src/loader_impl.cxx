@@ -162,7 +162,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-loader_impl::loader_impl(const options& options, window_impl& window)
+loader_impl::loader_impl(const options& options, window_impl& window) noexcept
   : Internals(std::make_unique<loader_impl::internals>(options, window))
 {
 }
@@ -171,7 +171,7 @@ loader_impl::loader_impl(const options& options, window_impl& window)
 loader_impl::~loader_impl() = default;
 
 //----------------------------------------------------------------------------
-void loader_impl::addFiles(const std::vector<std::string>& files)
+void loader_impl::addFiles(const std::vector<std::string>& files) noexcept
 {
   for (auto& file : files)
   {
@@ -180,7 +180,7 @@ void loader_impl::addFiles(const std::vector<std::string>& files)
 }
 
 //----------------------------------------------------------------------------
-void loader_impl::addFile(const std::string& path, bool recursive)
+void loader_impl::addFile(const std::string& path, bool recursive) noexcept
 {
   if (path.empty())
   {
@@ -234,8 +234,8 @@ void loader_impl::addFile(const std::string& path, bool recursive)
 }
 
 //----------------------------------------------------------------------------
-void loader_impl::getFileInfo(
-  LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const
+void loader_impl::getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
+  std::string& fileInfo) const noexcept
 {
   int size = static_cast<int>(this->Internals->FilesList.size());
   if (size > 0)
@@ -281,25 +281,25 @@ void loader_impl::getFileInfo(
 }
 
 //----------------------------------------------------------------------------
-const std::vector<std::string>& loader_impl::getFiles() const
+const std::vector<std::string>& loader_impl::getFiles() const noexcept
 {
   return this->Internals->FilesList;
 }
 
 //----------------------------------------------------------------------------
-void loader_impl::setCurrentFileIndex(int index)
+void loader_impl::setCurrentFileIndex(int index) noexcept
 {
   this->Internals->CurrentFileIndex = index;
 }
 
 //----------------------------------------------------------------------------
-int loader_impl::getCurrentFileIndex() const
+int loader_impl::getCurrentFileIndex() const noexcept
 {
   return this->Internals->CurrentFileIndex;
 }
 
 //----------------------------------------------------------------------------
-bool loader_impl::loadFile(loader::LoadFileEnum load)
+bool loader_impl::loadFile(loader::LoadFileEnum load) noexcept
 {
   // Reset loadedFile
   this->Internals->LoadedFile = false;

@@ -28,21 +28,21 @@ public:
   /**
    * Documented public API
    */
-  loader_impl(const options& options, window_impl& window);
-  ~loader_impl();
+  loader_impl(const options& options, window_impl& window) noexcept;
+  ~loader_impl() noexcept;
 
-  void addFiles(const std::vector<std::string>& files) override;
-  void addFile(const std::string& path, bool recursive = true) override;
+  void addFiles(const std::vector<std::string>& files) noexcept override;
+  void addFile(const std::string& path, bool recursive = true) noexcept override;
 
-  const std::vector<std::string>& getFiles() const override;
+  const std::vector<std::string>& getFiles() const noexcept override;
 
-  void setCurrentFileIndex(int index) override;
-  int getCurrentFileIndex() const override;
+  void setCurrentFileIndex(int index) noexcept override;
+  int getCurrentFileIndex() const noexcept override;
 
-  bool loadFile(LoadFileEnum load) override;
+  bool loadFile(LoadFileEnum load) noexcept override;
 
   void getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
-    std::string& fileInfo) const override;
+    std::string& fileInfo) const noexcept override;
   //@}
 
   /**
