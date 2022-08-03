@@ -7,6 +7,8 @@
  * The Position/FocalPoint/ViewUp API, the ViewMatrix API and the camera movements API.
  * They can be mixed by using ViewMatrix API with the other APIs but it can result in unexpected
  * results.
+ * When using the Position/FocalPoint/ViewUp API or the camera movements API,
+ * the view up is automatically orthogonalized.
  */
 
 #ifndef f3d_camera_h
