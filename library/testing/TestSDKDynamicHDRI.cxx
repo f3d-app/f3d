@@ -13,7 +13,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
-  opt.set("filename", true);
+  opt.set("window.actor.filename", true);
 
   load.addFile(std::string(argv[1]) + "/data/cow.vtp");
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
@@ -21,7 +21,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   win.render();
 
   // Change the hdri and make sure it is taken into account
-  opt.set("hdri", std::string(argv[1]) + "data/palermo_park_1k.hdr");
+  opt.set("window.background.hdri", std::string(argv[1]) + "data/palermo_park_1k.hdr");
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
            std::string(argv[2]), "TestSDKDynamicHDRI", 50)

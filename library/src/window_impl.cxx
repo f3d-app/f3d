@@ -159,7 +159,8 @@ void window_impl::Initialize(bool withColoring, std::string fileInfo)
 
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
-  this->Internals->Renderer->Initialize(fileInfo, this->Internals->Options.getAsString("up"));
+  this->Internals->Renderer->Initialize(
+    fileInfo, this->Internals->Options.getAsString("loader.up-direction"));
   this->Internals->Initialized = true;
 }
 
@@ -172,51 +173,71 @@ void window_impl::UpdateDynamicOptions()
     this->Initialize(false, "");
   }
 
-  this->Internals->RenWin->SetFullScreen(this->Internals->Options.getAsBool("fullscreen"));
+  this->Internals->RenWin->SetFullScreen(this->Internals->Options.getAsBool("window.fullscreen"));
 
-  this->Internals->Renderer->ShowAxis(this->Internals->Options.getAsBool("axis"));
-  this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("edges"));
-  this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("fps"));
-  this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("filename"));
-  this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("metadata"));
-  this->Internals->Renderer->ShowCheatSheet(this->Internals->Options.getAsBool("cheatsheet"));
-  this->Internals->Renderer->SetUseRaytracing(this->Internals->Options.getAsBool("raytracing"));
-  this->Internals->Renderer->SetRaytracingSamples(this->Internals->Options.getAsInt("samples"));
+  this->Internals->Renderer->ShowAxis(this->Internals->Options.getAsBool("interactor.axis"));
+  this->Internals->Renderer->SetUseTrackball(
+    this->Internals->Options.getAsBool("interactor.trackball"));
+
+  this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("window.actor.edges"));
+  this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("window.actor.fps"));
+  this->Internals->Renderer->ShowFilename(
+    this->Internals->Options.getAsBool("window.actor.filename"));
+  this->Internals->Renderer->ShowMetaData(
+    this->Internals->Options.getAsBool("window.actor.metadata"));
+  this->Internals->Renderer->ShowCheatSheet(
+    this->Internals->Options.getAsBool("window.actor.cheatsheet"));
+
+  this->Internals->Renderer->SetUseRaytracing(
+    this->Internals->Options.getAsBool("window.raytracing.enable"));
+  this->Internals->Renderer->SetRaytracingSamples(
+    this->Internals->Options.getAsInt("window.raytracing.samples"));
   this->Internals->Renderer->SetUseRaytracingDenoiser(
-    this->Internals->Options.getAsBool("denoise"));
-  this->Internals->Renderer->SetUseSSAOPass(this->Internals->Options.getAsBool("ssao"));
-  this->Internals->Renderer->SetUseFXAAPass(this->Internals->Options.getAsBool("fxaa"));
+    this->Internals->Options.getAsBool("window.raytracing.denoise"));
+
+  this->Internals->Renderer->SetUseSSAOPass(
+    this->Internals->Options.getAsBool("window.render.ssao"));
+  this->Internals->Renderer->SetUseFXAAPass(
+    this->Internals->Options.getAsBool("window.render.fxaa"));
   this->Internals->Renderer->SetUseToneMappingPass(
-    this->Internals->Options.getAsBool("tone-mapping"));
-  this->Internals->Renderer->SetUseBlurBackground(
-    this->Internals->Options.getAsBool("blur-background"));
-  this->Internals->Renderer->SetUseTrackball(this->Internals->Options.getAsBool("trackball"));
+    this->Internals->Options.getAsBool("window.render.tone-mapping"));
   this->Internals->Renderer->SetUseDepthPeelingPass(
-    this->Internals->Options.getAsBool("depth-peeling"));
+    this->Internals->Options.getAsBool("window.render.depth-peeling"));
+
   this->Internals->Renderer->SetBackground(
-    this->Internals->Options.getAsDoubleVector("background-color").data());
-  this->Internals->Renderer->SetHDRIFile(this->Internals->Options.getAsString("hdri"));
-  this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("font-file"));
+    this->Internals->Options.getAsDoubleVector("window.background.color").data());
+  this->Internals->Renderer->SetUseBlurBackground(
+    this->Internals->Options.getAsBool("window.background.blur"));
+  this->Internals->Renderer->SetHDRIFile(
+    this->Internals->Options.getAsString("window.background.hdri"));
+
+  this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("window.font-file"));
 
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
 
   if (renWithColor)
   {
-    renWithColor->SetColoring(this->Internals->Options.getAsBool("cells"),
-      this->Internals->Options.getAsString("scalars"),
-      this->Internals->Options.getAsInt("component"));
-    renWithColor->SetUsePointSprites(this->Internals->Options.getAsBool("point-sprites"));
-    renWithColor->SetUseVolume(this->Internals->Options.getAsBool("volume"));
-    renWithColor->SetUseInverseOpacityFunction(this->Internals->Options.getAsBool("inverse"));
-    renWithColor->ShowScalarBar(this->Internals->Options.getAsBool("bar"));
-    renWithColor->SetScalarBarRange(this->Internals->Options.getAsDoubleVector("range"));
-    renWithColor->SetColormap(this->Internals->Options.getAsDoubleVector("colormap"));
+    renWithColor->SetColoring(this->Internals->Options.getAsBool("window.coloring.cells"),
+      this->Internals->Options.getAsString("window.coloring.name"),
+      this->Internals->Options.getAsInt("window.coloring.component"));
+    renWithColor->SetScalarBarRange(
+      this->Internals->Options.getAsDoubleVector("window.coloring.range"));
+    renWithColor->SetColormap(
+      this->Internals->Options.getAsDoubleVector("window.coloring.colormap"));
+    renWithColor->ShowScalarBar(this->Internals->Options.getAsBool("window.actor.bar"));
+
+    renWithColor->SetUsePointSprites(
+      this->Internals->Options.getAsBool("window.point-sprites.enable"));
+    renWithColor->SetUseVolume(this->Internals->Options.getAsBool("window.volume.enable"));
+    renWithColor->SetUseInverseOpacityFunction(
+      this->Internals->Options.getAsBool("window.volume.inverse"));
+
     renWithColor->UpdateColoringActors();
   }
 
   // Show grid last as it needs to know the bounding box to be able to compute its size
-  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("grid"));
+  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("window.actor.grid"));
 }
 
 //----------------------------------------------------------------------------

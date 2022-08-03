@@ -20,7 +20,7 @@ int TestSDKWindowNative(int argc, char* argv[])
   }
 
   f3d::options& options = eng.getOptions();
-  options.set("background-color", { 0.8, 0.2, 0.9 });
+  options.set("window.background.color", { 0.8, 0.2, 0.9 });
 
   // Use a higher threshold as background difference can be strong with mesa
   return TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),

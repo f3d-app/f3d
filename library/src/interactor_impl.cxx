@@ -111,82 +111,83 @@ public:
         }
         break;
       case 'B':
-        self->Options.toggle("bar");
+        self->Options.toggle("window.actor.bar");
         render = true;
         break;
       case 'p':
       case 'P':
-        self->Options.toggle("depth-peeling");
+        self->Options.toggle("window.render.depth-peeling");
         render = true;
         break;
       case 'Q':
-        self->Options.toggle("ssao");
+        self->Options.toggle("window.render.ssao");
         render = true;
         break;
       case 'A':
-        self->Options.toggle("fxaa");
+        self->Options.toggle("window.render.fxaa");
         render = true;
         break;
       case 'T':
-        self->Options.toggle("tone-mapping");
+        self->Options.toggle("window.render.tone-mapping");
         render = true;
         break;
       case 'E':
-        self->Options.toggle("edges");
+        self->Options.toggle("window.actor.edges");
         render = true;
         break;
       case 'X':
-        self->Options.toggle("axis");
+        self->Options.toggle("interactor.axis"); // XXX this should not be available in the
+                                                 // cheatsheet when not provided ?
         render = true;
         break;
       case 'G':
-        self->Options.toggle("grid");
+        self->Options.toggle("window.actor.grid");
         render = true;
         break;
       case 'N':
-        self->Options.toggle("filename");
+        self->Options.toggle("window.actor.filename");
         render = true;
         break;
       case 'M':
-        self->Options.toggle("metadata");
+        self->Options.toggle("window.actor.metadata");
         render = true;
         break;
       case 'Z':
-        self->Options.toggle("fps");
+        self->Options.toggle("window.actor.fps");
         self->Window.render();
         self->Window.render();
         // XXX: Double render is needed here
         break;
       case 'R':
-        self->Options.toggle("raytracing");
+        self->Options.toggle("window.raytracing.enable");
         render = true;
         break;
       case 'D':
-        self->Options.toggle("denoise");
+        self->Options.toggle("window.raytracing.denoise");
         render = true;
         break;
       case 'V':
-        self->Options.toggle("volume");
+        self->Options.toggle("window.volume.enable");
         render = true;
         break;
       case 'I':
-        self->Options.toggle("inverse");
+        self->Options.toggle("window.volume.inverse");
         render = true;
         break;
       case 'O':
-        self->Options.toggle("point-sprites");
+        self->Options.toggle("window.point-sprites.enable");
         render = true;
         break;
       case 'U':
-        self->Options.toggle("blur-background");
+        self->Options.toggle("window.background.blur");
         render = true;
         break;
       case 'K':
-        self->Options.toggle("trackball");
+        self->Options.toggle("interactor.trackball");
         render = true;
         break;
       case 'H':
-        self->Options.toggle("cheatsheet");
+        self->Options.toggle("window.actor.cheatsheet");
         render = true;
         break;
       case '?':
@@ -233,9 +234,9 @@ public:
     if (checkColoring)
     {
       // Resynchronise renderer coloring status with options
-      self->Options.set("cells", renWithColor->GetColoringUseCell());
-      self->Options.set("scalars", renWithColor->GetColoringArrayName());
-      self->Options.set("component", renWithColor->GetColoringComponent());
+      self->Options.set("window.coloring.cells", renWithColor->GetColoringUseCell());
+      self->Options.set("window.coloring.name", renWithColor->GetColoringArrayName());
+      self->Options.set("window.coloring.component", renWithColor->GetColoringComponent());
     }
     if (render)
     {

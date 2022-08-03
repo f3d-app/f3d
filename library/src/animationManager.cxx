@@ -73,7 +73,7 @@ void animationManager::Initialize(
   }
   log::debug("");
 
-  int animationIndex = options->getAsInt("animation-index");
+  int animationIndex = options->getAsInt("loader.animation.index");
   if (animationIndex != 0 && availAnimations <= 0)
   {
     log::warn("An animation index has been specified but there are no animation available.");
@@ -168,7 +168,7 @@ void animationManager::ToggleAnimation()
     {
       this->CallBackId =
         this->Interactor->createTimerCallBack(1000.0 / this->FrameRate, [this]() { this->Tick(); });
-      if (this->Options->getAsInt("camera-index") >= 0)
+      if (this->Options->getAsInt("loader.camera.index") >= 0)
       {
         this->Interactor->disableCameraMovement();
       }

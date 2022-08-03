@@ -64,18 +64,22 @@ public:
 
   static void InitializeImporterWithOptions(const options& options, vtkF3DGenericImporter* importer)
   {
-    importer->SetPointSize(options.getAsDouble("point-size"));
-    importer->SetSurfaceColor(options.getAsDoubleVector("color").data());
-    importer->SetOpacity(options.getAsDouble("opacity"));
-    importer->SetRoughness(options.getAsDouble("roughness"));
-    importer->SetMetallic(options.getAsDouble("metallic"));
-    importer->SetLineWidth(options.getAsDouble("line-width"));
-    importer->SetTextureBaseColor(options.getAsString("texture-base-color"));
-    importer->SetTextureEmissive(options.getAsString("texture-emissive"));
-    importer->SetEmissiveFactor(options.getAsDoubleVector("emissive-factor").data());
-    importer->SetTextureMaterial(options.getAsString("texture-material"));
-    importer->SetTextureNormal(options.getAsString("texture-normal"));
-    importer->SetNormalScale(options.getAsDouble("normal-scale"));
+    importer->SetLineWidth(options.getAsDouble("loader.default.line-width"));
+    importer->SetPointSize(options.getAsDouble("loader.default.point-size"));
+
+    importer->SetSurfaceColor(options.getAsDoubleVector("loader.default.color.rgb").data());
+    importer->SetOpacity(options.getAsDouble("loader.default.color.opacity"));
+    importer->SetTextureBaseColor(options.getAsString("loader.default.color.texture"));
+
+    importer->SetRoughness(options.getAsDouble("loader.default.material.roughness"));
+    importer->SetMetallic(options.getAsDouble("loader.default.material.metallic"));
+    importer->SetTextureMaterial(options.getAsString("loader.default.material.texture"));
+
+    importer->SetTextureEmissive(options.getAsString("loader.default.emissive.texture"));
+    importer->SetEmissiveFactor(options.getAsDoubleVector("loader.default.emissive.factor").data());
+
+    importer->SetTextureNormal(options.getAsString("loader.default.normal.texture"));
+    importer->SetNormalScale(options.getAsDouble("loader.default.normal.scale"));
   }
 
   static void CreateProgressRepresentationAndCallback(
@@ -320,7 +324,7 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
 
   // Recover the importer
   this->Internals->Importer = loader_impl::internals::GetImporter(
-    filePath, this->Internals->Options.getAsBool("geometry-only"));
+    filePath, this->Internals->Options.getAsBool("loader.geometry-only"));
   vtkF3DGenericImporter* genericImporter =
     vtkF3DGenericImporter::SafeDownCast(this->Internals->Importer);
   if (!this->Internals->Importer)
@@ -344,17 +348,17 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
 
 // Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210303)
-  this->Internals->Importer->SetCamera(this->Internals->Options.getAsInt("camera-index"));
+  this->Internals->Importer->SetCamera(this->Internals->Options.getAsInt("loader.camera.index"));
 #else
   // XXX There is no way to recover the init value yet, assume it is -1
-  if (this->Internals->Options.getAsInt("camera-index") != -1)
+  if (this->Internals->Options.getAsInt("loader.camera.index") != -1)
   {
     log::warn("This VTK version does not support specifying the camera index, ignored.");
   }
 #endif
 
   // Manage progress bar
-  if (this->Internals->Options.getAsBool("progress") && this->Internals->Interactor)
+  if (this->Internals->Options.getAsBool("loader.show-progress") && this->Internals->Interactor)
   {
     loader_impl::internals::CreateProgressRepresentationAndCallback(
       &callbackData, this->Internals->Importer, this->Internals->Interactor);
