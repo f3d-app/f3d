@@ -34,9 +34,9 @@ int TestSDKEngine(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  opt.set("model.line-width", 1.7);
+  opt.set("render.line-width", 1.7);
   eng0.setOptions(std::move(opt));
-  if (eng0.getOptions().getAsDouble("model.line-width") != 1.7)
+  if (eng0.getOptions().getAsDouble("render.line-width") != 1.7)
   {
     std::cerr << "Unexpected options value using f3d::engine::setOptions(options&& opt)"
               << std::endl;

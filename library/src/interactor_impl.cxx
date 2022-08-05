@@ -132,7 +132,7 @@ public:
         render = true;
         break;
       case 'E':
-        self->Options.toggle("scene.show-edges");
+        self->Options.toggle("render.show-edges");
         render = true;
         break;
       case 'X':
@@ -141,7 +141,7 @@ public:
         render = true;
         break;
       case 'G':
-        self->Options.toggle("ui.grid");
+        self->Options.toggle("render.grid");
         render = true;
         break;
       case 'N':

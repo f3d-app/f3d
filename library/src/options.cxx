@@ -111,9 +111,13 @@ options::options()
   this->Internals->init("scene.camera.index", -1);
   this->Internals->init("scene.geometry-only", false);
   this->Internals->init("scene.up-direction", std::string("+Y"));
-  this->Internals->init("scene.show-edges", false);
 
   // Render
+  this->Internals->init("render.show-edges", false);
+  this->Internals->init("render.line-width", 1.0);
+  this->Internals->init("render.point-size", 10.0);
+  this->Internals->init("render.grid", false);
+
   this->Internals->init("render.raytracing.enable", false);
   this->Internals->init("render.raytracing.denoise", false);
   this->Internals->init("render.raytracing.samples", 5);
@@ -127,16 +131,12 @@ options::options()
   this->Internals->init("ui.bar", false);
   this->Internals->init("ui.filename", false);
   this->Internals->init("ui.fps", false);
-  this->Internals->init("ui.grid", false);
   this->Internals->init("ui.cheatsheet", false);
   this->Internals->init("ui.metadata", false);
   this->Internals->init("ui.font-file", std::string());
   this->Internals->init("ui.loader-progress", false);
 
   // Model
-  this->Internals->init("model.line-width", 1.0);
-  this->Internals->init("model.point-size", 10.0);
-
   this->Internals->init(
     "model.color.rgb", std::vector<double>{ 1., 1., 1. }); // TODO Not compatible with scivis
   this->Internals->init("model.color.opacity", 1.0);

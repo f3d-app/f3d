@@ -53,22 +53,22 @@ int TestSDKOptions(int argc, char* argv[])
   }
 
   // Test double
-  opt.set("model.line-width", 1.7);
-  if (opt.getAsDouble("model.line-width") != 1.7)
+  opt.set("render.line-width", 1.7);
+  if (opt.getAsDouble("render.line-width") != 1.7)
   {
     std::cerr << "Options set/getAs double is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
   double valDouble;
-  opt.get("model.line-width", valDouble);
+  opt.get("render.line-width", valDouble);
   if (valDouble != 1.7)
   {
     std::cerr << "Options get double is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  double& refDouble = opt.getAsDoubleRef("model.line-width");
+  double& refDouble = opt.getAsDoubleRef("render.line-width");
   refDouble = 2.13;
-  opt.get("model.line-width", valDouble);
+  opt.get("render.line-width", valDouble);
   if (valDouble != 2.13)
   {
     std::cerr << "Options getAsDoubleRef is not behaving as expected." << std::endl;
@@ -177,7 +177,7 @@ int TestSDKOptions(int argc, char* argv[])
 
   // Test copy operator and constructor
   f3d::options opt2 = opt;
-  if (opt2.getAsDouble("model.line-width") != 2.13)
+  if (opt2.getAsDouble("render.line-width") != 2.13)
   {
     std::cerr << "Options copy constructor not behaving as expected." << std::endl;
     return EXIT_FAILURE;
@@ -185,14 +185,14 @@ int TestSDKOptions(int argc, char* argv[])
 
   f3d::options opt3;
   opt3 = opt2;
-  if (opt3.getAsDouble("model.line-width") != 2.13)
+  if (opt3.getAsDouble("render.line-width") != 2.13)
   {
     std::cerr << "Options copy operator not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
 
   f3d::options opt4 = std::move(opt3);
-  if (opt4.getAsDouble("model.line-width") != 2.13)
+  if (opt4.getAsDouble("render.line-width") != 2.13)
   {
     std::cerr << "Options move constructor not behaving as expected." << std::endl;
     return EXIT_FAILURE;
@@ -200,7 +200,7 @@ int TestSDKOptions(int argc, char* argv[])
 
   f3d::options opt5;
   opt5 = std::move(opt4);
-  if (opt5.getAsDouble("model.line-width") != 2.13)
+  if (opt5.getAsDouble("render.line-width") != 2.13)
   {
     std::cerr << "Options move operator not behaving as expected." << std::endl;
     return EXIT_FAILURE;

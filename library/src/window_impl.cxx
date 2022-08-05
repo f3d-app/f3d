@@ -179,7 +179,7 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetUseTrackball(
     this->Internals->Options.getAsBool("interactor.trackball"));
 
-  this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("scene.show-edges"));
+  this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("render.show-edges"));
   this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("ui.fps"));
   this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("ui.filename"));
   this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("ui.metadata"));
@@ -233,7 +233,7 @@ void window_impl::UpdateDynamicOptions()
   }
 
   // Show grid last as it needs to know the bounding box to be able to compute its size
-  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("ui.grid"));
+  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("render.grid"));
 }
 
 //----------------------------------------------------------------------------
