@@ -139,9 +139,11 @@ options::options()
   this->Internals->init("model.line-width", 1.0);
   this->Internals->init("model.point-size", 10.0);
 
-  this->Internals->init("model.color.rgb", std::vector<double>{ 1., 1., 1. }); // TODO Not compatible with scivis
+  this->Internals->init(
+    "model.color.rgb", std::vector<double>{ 1., 1., 1. }); // TODO Not compatible with scivis
   this->Internals->init("model.color.opacity", 1.0);
-  this->Internals->init("model.color.texture", std::string()); // TODO Strange stuff when using with scivis
+  this->Internals->init(
+    "model.color.texture", std::string()); // TODO Strange stuff when using with scivis
 
   this->Internals->init("model.emissive.factor", std::vector<double>{ 1., 1., 1. });
   this->Internals->init("model.emissive.texture", std::string());

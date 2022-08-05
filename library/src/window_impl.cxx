@@ -181,12 +181,9 @@ void window_impl::UpdateDynamicOptions()
 
   this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("scene.show-edges"));
   this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("ui.fps"));
-  this->Internals->Renderer->ShowFilename(
-    this->Internals->Options.getAsBool("ui.filename"));
-  this->Internals->Renderer->ShowMetaData(
-    this->Internals->Options.getAsBool("ui.metadata"));
-  this->Internals->Renderer->ShowCheatSheet(
-    this->Internals->Options.getAsBool("ui.cheatsheet"));
+  this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("ui.filename"));
+  this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("ui.metadata"));
+  this->Internals->Renderer->ShowCheatSheet(this->Internals->Options.getAsBool("ui.cheatsheet"));
 
   this->Internals->Renderer->SetUseRaytracing(
     this->Internals->Options.getAsBool("render.raytracing.enable"));
@@ -223,8 +220,7 @@ void window_impl::UpdateDynamicOptions()
       this->Internals->Options.getAsInt("model.scivis.component"));
     renWithColor->SetScalarBarRange(
       this->Internals->Options.getAsDoubleVector("model.scivis.range"));
-    renWithColor->SetColormap(
-      this->Internals->Options.getAsDoubleVector("model.scivis.colormap"));
+    renWithColor->SetColormap(this->Internals->Options.getAsDoubleVector("model.scivis.colormap"));
     renWithColor->ShowScalarBar(this->Internals->Options.getAsBool("ui.bar"));
 
     renWithColor->SetUsePointSprites(
