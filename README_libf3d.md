@@ -118,72 +118,82 @@ A class to control logging in the libf3d. Simple using the different decicated m
 This class lets you control the behavior of the libf3d. An option is basically a string used as a key associated with a value.
 Options are organized by categories and subcategories, here is a non-exhaustive explanation of the categories.
 
-* `loader` options are only taken into account when loading a file.
-  * `loader.default` options are impacting only the ##default scene##.
-* `window` options are taken into account on the next window::render() call.
-  * `window.coloring` options are only impacting the coloring, which is only available when using the ##default scene##.
-  * `window.actor` options are related to the presence, or not, of certain actors in the scene.
-  * `window.render` options are related to render effect
-* `interactor` options are taken into account on the next window::render() call but requires an interactor to be present to have any effect.
+ * `scene` options are related to how the scene is being shown
+ * `render` options are related to the way the render is done
+  * `render.effect` options are related to specific technique used that modify the render
+ * `ui` options are related to the screenspace UI element shown
+ * `model` options are related to modifications on the model, they are only meaningful when using the default scene
+ * `interactor` options requires an interactor to be present to have any effect.
 
-## Loader Options
-Options|Default|Type|Description|F3D option
-------|------|------|------|------
-loader.animation.index|0|int|Select the animation to load.<br>Any negative value means all animations.<br>The default scene always has at most one animation.<br>By default, the first animation is enabled.
-|--animation-index
-loader.camera.index|-1|int|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.|--camera-index
-loader.up-direction|+Y|string|Define the Up direction|--up
-loader.geometry-only|false|bool|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.|--geometry-only
-loader.show-progress|false|bool|Show a *progress bar* when loading the file.|--progress
-loader.default.line-width|1.0|double|Set the *width* of lines when showing edges.|--line-width
-loader.default.point-size|10.0|double|Set the *size* of points when showing vertices and point sprites.|--point-size
-loader.default.color.rgb|1.0,1.0,1.0|vector<double>|Set a *color* on the geometry. Multiplied with the `loader.default.color.texture` when present.|--color
-loader.default.color.opacity|1.0|double|Set *opacity* on the geometry. Usually used with Depth Peeling option. Multiplied with the `loader.default.color.texture` when present.|--opacity
-loader.default.color.texture||string|Path to a texture file that sets the color of the object. Will be mulitplied with rgb and opacity.|--texture-base-color
-loader.default.emissive.texture||string|Path to a texture file that sets the emitted light of the object. Multiplied with the `loader.default.emissive.factor`.|--texture-emissive
-loader.default.emissive.factor|1.0,1.0,1.0|vector<double>| Multiply the emissive color when an emissive texture is present.|--emissive-factor
-loader.default.normal.texture||string|Path to a texture file that sets the normal map of the object.|--texrture-normal
-loader.default.normal.scale|1.0|double|Normal scale affects the strength of the normal deviation from the normal texture.|--normal-scale
-loader.default.material.roughness|0.3|double|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the `loader.default.material.texture` when present.|--roughness
-loader.default.material.metallic|0.0|double|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the `loader.default.material.texture` when present.|--metallic
-loader.default.material.texture||string|Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object. Multiplied with the `loader.default.material.roughness` and `loader.default.material.metallic`, set both of them to 1.0 to get a true result.|--texture-material
+Please note certain options are taken into accout when rendering, other when loading a file.
+See the exhaustive list below, but note that this may change in the future.
 
-## Window Options
-Options|Default|Type|Description|Equivalent F3D option
-------|------|------|------|------
-window.background.color|0.2,0.2,0.2|vector<double>|Set the window *background color*.<br>Ignored if *hdri* is set.|--bg-color
-window.background.hdri||string|Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, png, jpg, pnm, tiff, bmp. Override the color.|--hdri
-window.background.blur|false|bool|Blur background.<br>This only makes sense when using a HDRI.|--blur-background
-window.coloring.cells|false|bool|Color the data with value found *on the cells* instead of points|--cells
-window.coloring.name|<reserved>|string|*Color by a specific data array* present in on the data. Set to <empty> to let libf3d find the first available array.|--scalars
-window.coloring.component|-1|int|Specify the component to color with. -1 means *magnitude*. -2 means *direct values*.|--comp
-window.coloring.colormap|<inferno>|vector<double>|Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).|--colormap
-window.coloring.range||vector<double>|Set a *custom range for the coloring*.|--range
-window.raytracing.enable|false|bool|Enable *raytracing*. Requires the raytracing module to be enabled.|--raytracing
-window.raytracing.denoise|false|bool|*Denoise* the raytracing rendering.|--denoise
-window.raytracing.samples|5|int|The number of *samples per pixel*.|--samples
-window.actor.bar|false|bool|Show *scalar bar* of the coloring by data array.|--bar
-window.actor.edges|false|bool|Show the *cell edges*|--edges
-window.actor.filename|false|bool|Display the *name of the file*.|--filename
-window.actor.fps|false|bool|Display a *frame per second counter*.|--fps
-window.actor.grid|false|bool|Show *a grid* aligned with the XZ plane.|--grid
-window.actor.cheatsheet|false|bool|Show a interactor cheatsheet|
-window.actor.metadata|false|bool|Display the *metadata*.|--metadata
-window.render.depth-peeling|false|bool|Enable *depth peeling*. This is a technique used to correctly render translucent objects.|--depth-peeling
-window.render.fxaa|false|bool|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.|--fxaa
-window.render.ssao|false|bool|Enable *Screen-Space Ambient Occlusion*. This is a technique used to improve the depth perception of the object.|--ssao
-window.render.tone-mapping|false|bool|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.|--tone-mapping
-window.fullscreen|false|bool|Display in fullscreen.|--fullscreen
-window.font-file||string|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.|--font-file
-window.point-sprites.enabled|false|bool|Show sphere *points sprites* instead of the geometry.|--point-sprites
-window.volume.enabled|false|bool|Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.|--volume
-window.volume.inverse|false|bool|Inverse the linear opacity function.|--inverse
+## Scene Options
+Options|Default|Type|Description|F3D option|Trigger
+------|------|------|------|------|------
+scene.animation.index|0|int|Select the animation to load.<br>Any negative value means all animations.<br>The default scene always has at most one animation.<br>By default, the first animation is enabled.|--animation-index|load
+scene.camera.index|-1|int|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.|--camera-index|load
+scene.geometry-only|false|bool|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.|--geometry-only|load
+scene.up-direction|+Y|string|Define the Up direction|--up|load
+scene.grid|false|bool|Show *a grid* aligned with the XZ plane.|--grid|render
+scene.background.blur|false|bool|Blur background.<br>This only makes sense when using a HDRI.|--blur-background|render
+scene.background.color|0.2,0.2,0.2|vector<double>|Set the window *background color*.<br>Ignored if *hdri* is set.|--bg-color|render
+scene.background.hdri||string|Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, png, jpg, pnm, tiff, bmp. Override the color.|--hdri|render
 
-## Interactor Options
-Options|Default|Type|Description|Equivalent F3D option
-------|------|------|------|------
-interactor.axis|false|bool|Show *axes* as a trihedron in the scene.|--axis
-interactor.trackball|false|bool|Enable trackball interaction.|--trackball
+interactor.axis|false|bool|Show *axes* as a trihedron in the scene.|--axis|render
+interactor.trackball|false|bool|Enable trackball interaction.|--trackball|render
+
+## Model Options
+Options|Default|Type|Description|F3D option|Trigger
+------|------|------|------|------|------
+model.color.opacity|1.0|double|Set *opacity* on the geometry. Usually used with Depth Peeling option. Multiplied with the `model.color.texture` when present.|--opacity|load
+model.color.rgb|1.0,1.0,1.0|vector<double>|Set a *color* on the geometry. Multiplied with the `model.color.texture` when present.|--color|load
+model.color.texture||string|Path to a texture file that sets the color of the object. Will be mulitplied with rgb and opacity.|--texture-base-color|load
+model.emissive.factor|1.0,1.0,1.0|vector<double>| Multiply the emissive color when an emissive texture is present.|--emissive-factor|load
+model.emissive.texture||string|Path to a texture file that sets the emitted light of the object. Multiplied with the `model.emissive.factor`.|--texture-emissive|load
+model.material.metallic|0.0|double|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the `model.material.texture` when present.|--metallic|load
+model.material.roughness|0.3|double|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the `model.material.texture` when present.|--roughness|load
+model.material.texture||string|Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object. Multiplied with the `model.material.roughness` and `model.material.metallic`, set both of them to 1.0 to get a true result.|--texture-material|load
+model.normal.scale|1.0|double|Normal scale affects the strength of the normal deviation from the normal texture.|--normal-scale|load
+model.normal.texture||string|Path to a texture file that sets the normal map of the object.|--texrture-normal|load
+model.scivis.cells|false|bool|Color the data with value found *on the cells* instead of points|--cells|render
+model.scivis.colormap|<inferno>|vector<double>|Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).|--colormap|render
+model.scivis.component|-1|int|Specify the component to color with. -1 means *magnitude*. -2 means *direct values*.|--comp|render
+model.scivis.array-name|<reserved>|string|*Color by a specific data array* present in on the data. Set to <empty> to let libf3d find the first available array.|--scalars|render
+model.scivis.range||vector<double>|Set a *custom range for the coloring*.|--range|render
+
+## Render Options
+Options|Default|Type|Description|F3D option|Trigger
+------|------|------|------|------|------
+render.effect.depth-peeling|false|bool|Enable *depth peeling*. This is a technique used to correctly render translucent objects.|--depth-peeling|render
+render.effect.fxaa|false|bool|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.|--fxaa|render
+render.effect.ssao|false|bool|Enable *Screen-Space Ambient Occlusion*. This is a technique used to improve the depth perception of the object.|--ssao|render
+render.effect.tone-mapping|false|bool|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.|--tone-mapping|render
+render.line-width|1.0|double|Set the *width* of lines when showing edges.|--line-width|render
+render.show-edges|false|bool|Show the *cell edges*|--edges|render
+render.point-size|10.0|double|Set the *size* of points when showing vertices and point sprites.|--point-size|render
+render.point-sprites.enabled|false|bool|Show sphere *points sprites* instead of the geometry.|--point-sprites|render
+render.volume.enabled|false|bool|Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.|--volume|render
+render.volume.inverse|false|bool|Inverse the linear opacity function.|--inverse|render
+render.raytracing.denoise|false|bool|*Denoise* the raytracing rendering.|--denoise|render
+render.raytracing.enable|false|bool|Enable *raytracing*. Requires the raytracing module to be enabled.|--raytracing|render
+render.raytracing.samples|5|int|The number of *samples per pixel*.|--samples|render
+
+## UI Options
+Options|Default|Type|Description|F3D option|Trigger
+------|------|------|------|------|------
+ui.bar|false|bool|Show *scalar bar* of the coloring by data array.|--bar|render
+ui.cheatsheet|false|bool|Show a interactor cheatsheet|render
+ui.filename|false|bool|Display the *name of the file*.|--filename|render
+ui.font-file||string|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.|--font-file|render
+ui.fps|false|bool|Display a *frame per second counter*.|--fps|render
+ui.loader-progress|false|bool|Show a *progress bar* when loading the file.|--progress|load
+ui.metadata|false|bool|Display the *metadata*.|--metadata|render
+
+## Window Options TODO remove
+Options|Default|Type|Description|F3D option|Trigger
+------|------|------|------|------|------
+window.fullscreen|false|bool|Display in fullscreen.|--fullscreen|render
 
 # Python Bindings
 
