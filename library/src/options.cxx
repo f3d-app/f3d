@@ -106,57 +106,77 @@ public:
 options::options()
   : Internals(new options::internals)
 {
-  // Loader/Loading
-  this->Internals->init("animation-index", 0);
-  this->Internals->init("camera-index", -1);
-  this->Internals->init("color", std::vector<double>{ 1., 1., 1. });
-  this->Internals->init("emissive-factor", std::vector<double>{ 1., 1., 1. });
-  this->Internals->init("geometry-only", false);
-  this->Internals->init("line-width", 1.0);
-  this->Internals->init("metallic", 0.0);
-  this->Internals->init("normal-scale", 1.0);
-  this->Internals->init("opacity", 1.0);
-  this->Internals->init("point-size", 10.0);
-  this->Internals->init("progress", false);
-  this->Internals->init("roughness", 0.3);
-  this->Internals->init("texture-base-color", std::string());
-  this->Internals->init("texture-emissive", std::string());
-  this->Internals->init("texture-material", std::string());
-  this->Internals->init("texture-normal", std::string());
-  this->Internals->init("up", std::string("+Y"));
+  // Scene
+  this->Internals->init("scene.animation.index", 0);
+  this->Internals->init("scene.camera.index", -1);
+  this->Internals->init("scene.geometry-only", false);
+  this->Internals->init("scene.up-direction", std::string("+Y"));
 
-  // Rendering/Dynamic
-  this->Internals->init("axis", false);
-  this->Internals->init("background-color", std::vector<double>{ 0.2, 0.2, 0.2 });
-  this->Internals->init("bar", false);
-  this->Internals->init("blur-background", false);
-  this->Internals->init("cells", false);
-  this->Internals->init("colormap",
+  // Render
+  this->Internals->init("render.show-edges", false);
+  this->Internals->init("render.line-width", 1.0);
+  this->Internals->init("render.point-size", 10.0);
+  this->Internals->init("render.grid", false);
+
+  this->Internals->init("render.raytracing.enable", false);
+  this->Internals->init("render.raytracing.denoise", false);
+  this->Internals->init("render.raytracing.samples", 5);
+
+  this->Internals->init("render.effect.depth-peeling", false);
+  this->Internals->init("render.effect.fxaa", false);
+  this->Internals->init("render.effect.ssao", false);
+  this->Internals->init("render.effect.tone-mapping", false);
+
+  this->Internals->init("render.background.color", std::vector<double>{ 0.2, 0.2, 0.2 });
+  this->Internals->init(
+    "render.background.hdri", std::string()); // XXX This overrides background.color
+  this->Internals->init("render.background.blur", false);
+
+  // UI
+  this->Internals->init("ui.bar", false);
+  this->Internals->init("ui.filename", false);
+  this->Internals->init("ui.fps", false);
+  this->Internals->init("ui.cheatsheet", false);
+  this->Internals->init("ui.metadata", false);
+  this->Internals->init("ui.font-file", std::string());
+  this->Internals->init("ui.loader-progress", false);
+
+  // Model
+  this->Internals->init(
+    "model.color.rgb", std::vector<double>{ 1., 1., 1. }); // TODO Not compatible with scivis
+  this->Internals->init("model.color.opacity", 1.0);
+  this->Internals->init(
+    "model.color.texture", std::string()); // TODO Strange stuff when using with scivis
+
+  this->Internals->init("model.emissive.factor", std::vector<double>{ 1., 1., 1. });
+  this->Internals->init("model.emissive.texture", std::string());
+
+  this->Internals->init("model.normal.texture", std::string());
+  this->Internals->init("model.normal.scale", 1.0);
+
+  this->Internals->init("model.material.metallic", 0.0);
+  this->Internals->init("model.material.roughness", 0.3);
+  this->Internals->init("model.material.texture", std::string());
+
+  this->Internals->init("model.scivis.cells", false);
+  this->Internals->init("model.scivis.array-name", F3D_RESERVED_STRING);
+  this->Internals->init("model.scivis.component", -1);
+  this->Internals->init("model.scivis.colormap",
     std::vector<double>{
       0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 });
-  this->Internals->init("component", -1);
-  this->Internals->init("denoise", false);
-  this->Internals->init("depth-peeling", false);
-  this->Internals->init("edges", false);
-  this->Internals->init("filename", false);
-  this->Internals->init("font-file", std::string());
-  this->Internals->init("fps", false);
-  this->Internals->init("fullscreen", false);
-  this->Internals->init("fxaa", false);
-  this->Internals->init("grid", false);
-  this->Internals->init("hdri", std::string());
-  this->Internals->init("inverse", false);
-  this->Internals->init("metadata", false);
-  this->Internals->init("point-sprites", false);
-  this->Internals->init("range", std::vector<double>());
-  this->Internals->init("raytracing", false);
-  this->Internals->init("samples", 5);
-  this->Internals->init("scalars", F3D_RESERVED_STRING);
-  this->Internals->init("ssao", false);
-  this->Internals->init("tone-mapping", false);
-  this->Internals->init("trackball", false);
-  this->Internals->init("volume", false);
-  this->Internals->init("cheatsheet", false);
+  this->Internals->init("model.scivis.range", std::vector<double>());
+
+  // TODO: Rename into a "rendering-mode" option
+  this->Internals->init("model.point-sprites.enable", false);
+  this->Internals->init("model.volume.enable", false);
+  this->Internals->init("model.volume.inverse", false);
+
+  // Window
+  this->Internals->init("window.fullscreen", false);
+
+  // Interactor
+  this->Internals->init("interactor.axis", false);
+  this->Internals->init("interactor.trackball", false);
 };
 
 //----------------------------------------------------------------------------

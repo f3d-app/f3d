@@ -159,7 +159,8 @@ void window_impl::Initialize(bool withColoring, std::string fileInfo)
 
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
-  this->Internals->Renderer->Initialize(fileInfo, this->Internals->Options.getAsString("up"));
+  this->Internals->Renderer->Initialize(
+    fileInfo, this->Internals->Options.getAsString("scene.up-direction"));
   this->Internals->Initialized = true;
 }
 
@@ -172,51 +173,67 @@ void window_impl::UpdateDynamicOptions()
     this->Initialize(false, "");
   }
 
-  this->Internals->RenWin->SetFullScreen(this->Internals->Options.getAsBool("fullscreen"));
+  this->Internals->RenWin->SetFullScreen(this->Internals->Options.getAsBool("window.fullscreen"));
 
-  this->Internals->Renderer->ShowAxis(this->Internals->Options.getAsBool("axis"));
-  this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("edges"));
-  this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("fps"));
-  this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("filename"));
-  this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("metadata"));
-  this->Internals->Renderer->ShowCheatSheet(this->Internals->Options.getAsBool("cheatsheet"));
-  this->Internals->Renderer->SetUseRaytracing(this->Internals->Options.getAsBool("raytracing"));
-  this->Internals->Renderer->SetRaytracingSamples(this->Internals->Options.getAsInt("samples"));
+  this->Internals->Renderer->ShowAxis(this->Internals->Options.getAsBool("interactor.axis"));
+  this->Internals->Renderer->SetUseTrackball(
+    this->Internals->Options.getAsBool("interactor.trackball"));
+
+  this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("render.show-edges"));
+  this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("ui.fps"));
+  this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("ui.filename"));
+  this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("ui.metadata"));
+  this->Internals->Renderer->ShowCheatSheet(this->Internals->Options.getAsBool("ui.cheatsheet"));
+
+  this->Internals->Renderer->SetUseRaytracing(
+    this->Internals->Options.getAsBool("render.raytracing.enable"));
+  this->Internals->Renderer->SetRaytracingSamples(
+    this->Internals->Options.getAsInt("render.raytracing.samples"));
   this->Internals->Renderer->SetUseRaytracingDenoiser(
-    this->Internals->Options.getAsBool("denoise"));
-  this->Internals->Renderer->SetUseSSAOPass(this->Internals->Options.getAsBool("ssao"));
-  this->Internals->Renderer->SetUseFXAAPass(this->Internals->Options.getAsBool("fxaa"));
+    this->Internals->Options.getAsBool("render.raytracing.denoise"));
+
+  this->Internals->Renderer->SetUseSSAOPass(
+    this->Internals->Options.getAsBool("render.effect.ssao"));
+  this->Internals->Renderer->SetUseFXAAPass(
+    this->Internals->Options.getAsBool("render.effect.fxaa"));
   this->Internals->Renderer->SetUseToneMappingPass(
-    this->Internals->Options.getAsBool("tone-mapping"));
-  this->Internals->Renderer->SetUseBlurBackground(
-    this->Internals->Options.getAsBool("blur-background"));
-  this->Internals->Renderer->SetUseTrackball(this->Internals->Options.getAsBool("trackball"));
+    this->Internals->Options.getAsBool("render.effect.tone-mapping"));
   this->Internals->Renderer->SetUseDepthPeelingPass(
-    this->Internals->Options.getAsBool("depth-peeling"));
+    this->Internals->Options.getAsBool("render.effect.depth-peeling"));
+
   this->Internals->Renderer->SetBackground(
-    this->Internals->Options.getAsDoubleVector("background-color").data());
-  this->Internals->Renderer->SetHDRIFile(this->Internals->Options.getAsString("hdri"));
-  this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("font-file"));
+    this->Internals->Options.getAsDoubleVector("render.background.color").data());
+  this->Internals->Renderer->SetUseBlurBackground(
+    this->Internals->Options.getAsBool("render.background.blur"));
+  this->Internals->Renderer->SetHDRIFile(
+    this->Internals->Options.getAsString("render.background.hdri"));
+
+  this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("ui.font-file"));
 
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
 
   if (renWithColor)
   {
-    renWithColor->SetColoring(this->Internals->Options.getAsBool("cells"),
-      this->Internals->Options.getAsString("scalars"),
-      this->Internals->Options.getAsInt("component"));
-    renWithColor->SetUsePointSprites(this->Internals->Options.getAsBool("point-sprites"));
-    renWithColor->SetUseVolume(this->Internals->Options.getAsBool("volume"));
-    renWithColor->SetUseInverseOpacityFunction(this->Internals->Options.getAsBool("inverse"));
-    renWithColor->ShowScalarBar(this->Internals->Options.getAsBool("bar"));
-    renWithColor->SetScalarBarRange(this->Internals->Options.getAsDoubleVector("range"));
-    renWithColor->SetColormap(this->Internals->Options.getAsDoubleVector("colormap"));
+    renWithColor->SetColoring(this->Internals->Options.getAsBool("model.scivis.cells"),
+      this->Internals->Options.getAsString("model.scivis.array-name"),
+      this->Internals->Options.getAsInt("model.scivis.component"));
+    renWithColor->SetScalarBarRange(
+      this->Internals->Options.getAsDoubleVector("model.scivis.range"));
+    renWithColor->SetColormap(this->Internals->Options.getAsDoubleVector("model.scivis.colormap"));
+    renWithColor->ShowScalarBar(this->Internals->Options.getAsBool("ui.bar"));
+
+    renWithColor->SetUsePointSprites(
+      this->Internals->Options.getAsBool("model.point-sprites.enable"));
+    renWithColor->SetUseVolume(this->Internals->Options.getAsBool("model.volume.enable"));
+    renWithColor->SetUseInverseOpacityFunction(
+      this->Internals->Options.getAsBool("model.volume.inverse"));
+
     renWithColor->UpdateColoringActors();
   }
 
   // Show grid last as it needs to know the bounding box to be able to compute its size
-  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("grid"));
+  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("render.grid"));
 }
 
 //----------------------------------------------------------------------------
