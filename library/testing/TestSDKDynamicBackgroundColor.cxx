@@ -20,7 +20,7 @@ int TestSDKDynamicBackgroundColor(int argc, char* argv[])
   win.render();
 
   // Change the background color and make sure it is taken into account
-  opt.set("window.background.color", { 1.0, 1.0, 1.0 });
+  opt.set("render.background.color", { 1.0, 1.0, 1.0 });
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
            std::string(argv[2]), "TestSDKDynamicBackgrounColor", 50)

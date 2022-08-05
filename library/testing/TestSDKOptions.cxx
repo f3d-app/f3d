@@ -109,28 +109,28 @@ int TestSDKOptions(int argc, char* argv[])
   // XXX Test int vector is not done as their is currently no int vector option
 
   // Test double vector
-  opt.set("window.background.color", { 0.1, 0.2, 0.3 });
-  if (opt.getAsDoubleVector("window.background.color") != std::vector<double>{ 0.1, 0.2, 0.3 })
+  opt.set("render.background.color", { 0.1, 0.2, 0.3 });
+  if (opt.getAsDoubleVector("render.background.color") != std::vector<double>{ 0.1, 0.2, 0.3 })
   {
     std::cerr << "Options getAsDoubleVector is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
   std::vector<double> valDoubleVec;
-  opt.get("window.background.color", valDoubleVec);
+  opt.get("render.background.color", valDoubleVec);
   if (valDoubleVec != std::vector<double>{ 0.1, 0.2, 0.3 })
   {
     std::cerr << "Options get double vector is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  opt.set("window.background.color", std::vector<double>{ 0.1, 0.2, 0.4 });
-  if (opt.getAsDoubleVectorRef("window.background.color") != std::vector<double>{ 0.1, 0.2, 0.4 })
+  opt.set("render.background.color", std::vector<double>{ 0.1, 0.2, 0.4 });
+  if (opt.getAsDoubleVectorRef("render.background.color") != std::vector<double>{ 0.1, 0.2, 0.4 })
   {
     std::cerr << "Options set double vector is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  std::vector<double>& refDoubleVec = opt.getAsDoubleVectorRef("window.background.color");
+  std::vector<double>& refDoubleVec = opt.getAsDoubleVectorRef("render.background.color");
   refDoubleVec = std::vector<double>{ 0.1, 0.2, 0.5 };
-  opt.get("window.background.color", valDoubleVec);
+  opt.get("render.background.color", valDoubleVec);
   if (valDoubleVec != std::vector<double>{ 0.1, 0.2, 0.5 })
   {
     std::cerr << "Options getAsDoubleVectorRef is not behaving as expected." << std::endl;

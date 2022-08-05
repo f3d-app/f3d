@@ -234,7 +234,7 @@ void ConfigurationOptions::GetOptionsFromArgs(
     this->DeclareOption(grp2, "opacity", "", "Opacity", options.getAsDoubleRef("model.color.opacity"), HasDefault::YES, MayHaveConfig::YES, "<opacity>");
     this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.roughness"), HasDefault::YES, MayHaveConfig::YES, "<roughness>");
     this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.metallic"), HasDefault::YES, MayHaveConfig::YES, "<metallic>");
-    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.getAsStringRef("window.background.hdri"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.getAsStringRef("render.background.hdri"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.getAsStringRef("model.color.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.getAsStringRef("model.material.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emitted light of the object", options.getAsStringRef("model.emissive.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
@@ -243,13 +243,13 @@ void ConfigurationOptions::GetOptionsFromArgs(
     this->DeclareOption(grp2, "normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", options.getAsDoubleRef("model.normal.scale"), HasDefault::YES, MayHaveConfig::YES, "<normalScale>");
 
     auto grp3 = cxxOptions.add_options("Window");
-    this->DeclareOption(grp3, "bg-color", "", "Background color", options.getAsDoubleVectorRef("window.background.color"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>"); // TODO change name ?
+    this->DeclareOption(grp3, "bg-color", "", "Background color", options.getAsDoubleVectorRef("render.background.color"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>"); // TODO change name ?
     this->DeclareOption(grp3, "resolution", "", "Window resolution", appOptions.Resolution, HasDefault::YES, MayHaveConfig::NO, "<width,height>");
     this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.getAsBoolRef("ui.fps"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp3, "filename", "n", "Display filename", options.getAsBoolRef("ui.filename"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.getAsBoolRef("ui.metadata"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp3, "fullscreen", "f", "Full screen", options.getAsBoolRef("window.fullscreen"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp3, "blur-background", "u", "Blur background", options.getAsBoolRef("window.background.blur"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp3, "blur-background", "u", "Blur background", options.getAsBoolRef("render.background.blur"), HasDefault::YES, MayHaveConfig::YES);
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
     this->DeclareOptionWithImplicitValue(grp4, "scalars", "s", "Color by scalars", options.getAsStringRef("model.scivis.array-name"), std::string(""), HasDefault::YES, MayHaveConfig::YES, "<array_name>");

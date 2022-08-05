@@ -202,11 +202,11 @@ void window_impl::UpdateDynamicOptions()
     this->Internals->Options.getAsBool("render.effect.depth-peeling"));
 
   this->Internals->Renderer->SetBackground(
-    this->Internals->Options.getAsDoubleVector("window.background.color").data());
+    this->Internals->Options.getAsDoubleVector("render.background.color").data());
   this->Internals->Renderer->SetUseBlurBackground(
-    this->Internals->Options.getAsBool("window.background.blur"));
+    this->Internals->Options.getAsBool("render.background.blur"));
   this->Internals->Renderer->SetHDRIFile(
-    this->Internals->Options.getAsString("window.background.hdri"));
+    this->Internals->Options.getAsString("render.background.hdri"));
 
   this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("ui.font-file"));
 

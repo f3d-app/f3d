@@ -127,6 +127,11 @@ options::options()
   this->Internals->init("render.effect.ssao", false);
   this->Internals->init("render.effect.tone-mapping", false);
 
+  this->Internals->init("render.background.color", std::vector<double>{ 0.2, 0.2, 0.2 });
+  this->Internals->init(
+    "render.background.hdri", std::string()); // XXX This overrides background.color
+  this->Internals->init("render.background.blur", false);
+
   // UI
   this->Internals->init("ui.bar", false);
   this->Internals->init("ui.filename", false);
@@ -167,10 +172,6 @@ options::options()
   this->Internals->init("model.volume.inverse", false);
 
   // Window
-  this->Internals->init("window.background.color", std::vector<double>{ 0.2, 0.2, 0.2 });
-  this->Internals->init(
-    "window.background.hdri", std::string()); // XXX This overrides window.background.color
-  this->Internals->init("window.background.blur", false);
   this->Internals->init("window.fullscreen", false);
 
   // Interactor

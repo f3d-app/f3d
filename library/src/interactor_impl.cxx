@@ -179,7 +179,7 @@ public:
         render = true;
         break;
       case 'U':
-        self->Options.toggle("window.background.blur");
+        self->Options.toggle("render.background.blur");
         render = true;
         break;
       case 'K':
