@@ -13,7 +13,7 @@ int TestSDKInteractionDirectory(int argc, char* argv[])
   // This test mimics TestInteractionDirectory.
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
   f3d::options& options = eng.getOptions();
-  options.set("window.coloring.name", "");
+  options.set("model.scivis.array-name", "");
   f3d::loader& load = eng.getLoader();
   load.addFile(std::string(argv[1]) + "/data/mb");
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);

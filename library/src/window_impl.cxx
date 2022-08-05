@@ -160,7 +160,7 @@ void window_impl::Initialize(bool withColoring, std::string fileInfo)
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Renderer->Initialize(
-    fileInfo, this->Internals->Options.getAsString("loader.up-direction"));
+    fileInfo, this->Internals->Options.getAsString("scene.up-direction"));
   this->Internals->Initialized = true;
 }
 
@@ -179,30 +179,30 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetUseTrackball(
     this->Internals->Options.getAsBool("interactor.trackball"));
 
-  this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("window.actor.edges"));
-  this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("window.actor.fps"));
+  this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("scene.show-edges"));
+  this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("ui.fps"));
   this->Internals->Renderer->ShowFilename(
-    this->Internals->Options.getAsBool("window.actor.filename"));
+    this->Internals->Options.getAsBool("ui.filename"));
   this->Internals->Renderer->ShowMetaData(
-    this->Internals->Options.getAsBool("window.actor.metadata"));
+    this->Internals->Options.getAsBool("ui.metadata"));
   this->Internals->Renderer->ShowCheatSheet(
-    this->Internals->Options.getAsBool("window.actor.cheatsheet"));
+    this->Internals->Options.getAsBool("ui.cheatsheet"));
 
   this->Internals->Renderer->SetUseRaytracing(
-    this->Internals->Options.getAsBool("window.raytracing.enable"));
+    this->Internals->Options.getAsBool("render.raytracing.enable"));
   this->Internals->Renderer->SetRaytracingSamples(
-    this->Internals->Options.getAsInt("window.raytracing.samples"));
+    this->Internals->Options.getAsInt("render.raytracing.samples"));
   this->Internals->Renderer->SetUseRaytracingDenoiser(
-    this->Internals->Options.getAsBool("window.raytracing.denoise"));
+    this->Internals->Options.getAsBool("render.raytracing.denoise"));
 
   this->Internals->Renderer->SetUseSSAOPass(
-    this->Internals->Options.getAsBool("window.render.ssao"));
+    this->Internals->Options.getAsBool("render.effect.ssao"));
   this->Internals->Renderer->SetUseFXAAPass(
-    this->Internals->Options.getAsBool("window.render.fxaa"));
+    this->Internals->Options.getAsBool("render.effect.fxaa"));
   this->Internals->Renderer->SetUseToneMappingPass(
-    this->Internals->Options.getAsBool("window.render.tone-mapping"));
+    this->Internals->Options.getAsBool("render.effect.tone-mapping"));
   this->Internals->Renderer->SetUseDepthPeelingPass(
-    this->Internals->Options.getAsBool("window.render.depth-peeling"));
+    this->Internals->Options.getAsBool("render.effect.depth-peeling"));
 
   this->Internals->Renderer->SetBackground(
     this->Internals->Options.getAsDoubleVector("window.background.color").data());
@@ -211,33 +211,33 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetHDRIFile(
     this->Internals->Options.getAsString("window.background.hdri"));
 
-  this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("window.font-file"));
+  this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("ui.font-file"));
 
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
 
   if (renWithColor)
   {
-    renWithColor->SetColoring(this->Internals->Options.getAsBool("window.coloring.cells"),
-      this->Internals->Options.getAsString("window.coloring.name"),
-      this->Internals->Options.getAsInt("window.coloring.component"));
+    renWithColor->SetColoring(this->Internals->Options.getAsBool("model.scivis.cells"),
+      this->Internals->Options.getAsString("model.scivis.array-name"),
+      this->Internals->Options.getAsInt("model.scivis.component"));
     renWithColor->SetScalarBarRange(
-      this->Internals->Options.getAsDoubleVector("window.coloring.range"));
+      this->Internals->Options.getAsDoubleVector("model.scivis.range"));
     renWithColor->SetColormap(
-      this->Internals->Options.getAsDoubleVector("window.coloring.colormap"));
-    renWithColor->ShowScalarBar(this->Internals->Options.getAsBool("window.actor.bar"));
+      this->Internals->Options.getAsDoubleVector("model.scivis.colormap"));
+    renWithColor->ShowScalarBar(this->Internals->Options.getAsBool("ui.bar"));
 
     renWithColor->SetUsePointSprites(
-      this->Internals->Options.getAsBool("window.point-sprites.enable"));
-    renWithColor->SetUseVolume(this->Internals->Options.getAsBool("window.volume.enable"));
+      this->Internals->Options.getAsBool("model.point-sprites.enable"));
+    renWithColor->SetUseVolume(this->Internals->Options.getAsBool("model.volume.enable"));
     renWithColor->SetUseInverseOpacityFunction(
-      this->Internals->Options.getAsBool("window.volume.inverse"));
+      this->Internals->Options.getAsBool("model.volume.inverse"));
 
     renWithColor->UpdateColoringActors();
   }
 
   // Show grid last as it needs to know the bounding box to be able to compute its size
-  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("window.actor.grid"));
+  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("ui.grid"));
 }
 
 //----------------------------------------------------------------------------

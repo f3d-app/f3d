@@ -12,7 +12,7 @@ int TestSDKDynamicFontFile(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
-  opt.set("window.actor.filename", true);
+  opt.set("ui.filename", true);
 
   load.addFile(std::string(argv[1]) + "/data/cow.vtp");
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
@@ -20,7 +20,7 @@ int TestSDKDynamicFontFile(int argc, char* argv[])
   win.render();
 
   // Change the font file and make sure it is taken into account
-  opt.set("window.font-file", std::string(argv[1]) + "data/AttackGraffiti-3zRBM.ttf");
+  opt.set("ui.font-file", std::string(argv[1]) + "data/AttackGraffiti-3zRBM.ttf");
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
            std::string(argv[2]), "TestSDKDynamicFontFile", 50)

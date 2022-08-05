@@ -12,7 +12,7 @@ int TestSDKDynamicBackgroundColor(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
-  opt.set("window.actor.filename", true);
+  opt.set("ui.filename", true);
 
   load.addFile(std::string(argv[1]) + "/data/cow.vtp");
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);

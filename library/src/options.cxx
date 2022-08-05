@@ -107,74 +107,71 @@ options::options()
   : Internals(new options::internals)
 {
   // Loader
-  this->Internals->init("loader.animation.index", 0);
-  this->Internals->init("loader.camera.index", -1);
-  this->Internals->init("loader.up-direction", std::string("+Y"));
-
   this->Internals->init("loader.geometry-only", false);
   this->Internals->init("loader.show-progress", false);
 
-  this->Internals->init("loader.default.line-width", 1.0);
-  this->Internals->init("loader.default.point-size", 10.0);
+  // Scene
+  this->Internals->init("scene.animation.index", 0);
+  this->Internals->init("scene.camera.index", -1);
+  this->Internals->init("scene.up-direction", std::string("+Y"));
+  this->Internals->init("scene.show-edges", false);
 
-  this->Internals->init("loader.default.color.rgb", std::vector<double>{ 1., 1., 1. });
-  this->Internals->init("loader.default.color.opacity", 1.0);
-  this->Internals->init("loader.default.color.texture", std::string());
+  // Render
+  this->Internals->init("render.raytracing.enable", false);
+  this->Internals->init("render.raytracing.denoise", false);
+  this->Internals->init("render.raytracing.samples", 5);
 
-  this->Internals->init("loader.default.emissive.factor", std::vector<double>{ 1., 1., 1. });
-  this->Internals->init("loader.default.emissive.texture", std::string());
+  this->Internals->init("render.effect.depth-peeling", false);
+  this->Internals->init("render.effect.fxaa", false);
+  this->Internals->init("render.effect.ssao", false);
+  this->Internals->init("render.effect.tone-mapping", false);
 
-  this->Internals->init("loader.default.normal.texture", std::string());
-  this->Internals->init("loader.default.normal.scale", 1.0);
+  // UI
+  this->Internals->init("ui.bar", false);
+  this->Internals->init("ui.filename", false);
+  this->Internals->init("ui.fps", false);
+  this->Internals->init("ui.grid", false);
+  this->Internals->init("ui.cheatsheet", false);
+  this->Internals->init("ui.metadata", false);
+  this->Internals->init("ui.font-file", std::string());
 
-  this->Internals->init("loader.default.material.metallic", 0.0);
-  this->Internals->init("loader.default.material.roughness", 0.3);
-  this->Internals->init("loader.default.material.texture", std::string());
+  // Model
+  this->Internals->init("model.line-width", 1.0);
+  this->Internals->init("model.point-size", 10.0);
+
+  this->Internals->init("model.color.rgb", std::vector<double>{ 1., 1., 1. }); // TODO Not compatible with scivis
+  this->Internals->init("model.color.opacity", 1.0);
+  this->Internals->init("model.color.texture", std::string()); // TODO Strange stuff when using with scivis
+
+  this->Internals->init("model.emissive.factor", std::vector<double>{ 1., 1., 1. });
+  this->Internals->init("model.emissive.texture", std::string());
+
+  this->Internals->init("model.normal.texture", std::string());
+  this->Internals->init("model.normal.scale", 1.0);
+
+  this->Internals->init("model.material.metallic", 0.0);
+  this->Internals->init("model.material.roughness", 0.3);
+  this->Internals->init("model.material.texture", std::string());
+
+  this->Internals->init("model.scivis.cells", false);
+  this->Internals->init("model.scivis.array-name", F3D_RESERVED_STRING);
+  this->Internals->init("model.scivis.component", -1);
+  this->Internals->init("model.scivis.colormap",
+    std::vector<double>{
+      0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 });
+  this->Internals->init("model.scivis.range", std::vector<double>());
+
+  // TODO: Rename into a "rendering-mode" option
+  this->Internals->init("model.point-sprites.enable", false);
+  this->Internals->init("model.volume.enable", false);
+  this->Internals->init("model.volume.inverse", false);
 
   // Window
   this->Internals->init("window.background.color", std::vector<double>{ 0.2, 0.2, 0.2 });
   this->Internals->init(
     "window.background.hdri", std::string()); // XXX This overrides window.background.color
   this->Internals->init("window.background.blur", false);
-
-  this->Internals->init("window.camera.azimuth-angle", 0.0);
-  this->Internals->init("window.camera.elevation-angle", 0.0);
-  this->Internals->init("window.camera.focal-point", std::vector<double>());
-  this->Internals->init("window.camera.position", std::vector<double>());
-  this->Internals->init("window.camera.view-angle", 0.0);
-  this->Internals->init("window.camera.view-up", std::vector<double>());
-
-  this->Internals->init("window.coloring.cells", false);
-  this->Internals->init("window.coloring.name", F3D_RESERVED_STRING);
-  this->Internals->init("window.coloring.component", -1);
-  this->Internals->init("window.coloring.colormap",
-    std::vector<double>{
-      0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 });
-  this->Internals->init("window.coloring.range", std::vector<double>());
-
-  this->Internals->init("window.raytracing.enable", false);
-  this->Internals->init("window.raytracing.denoise", false);
-  this->Internals->init("window.raytracing.samples", 5);
-  this->Internals->init("window.actor.bar", false);
-  this->Internals->init("window.actor.edges", false);
-  this->Internals->init("window.actor.filename", false);
-  this->Internals->init("window.actor.fps", false);
-  this->Internals->init("window.actor.grid", false);
-  this->Internals->init("window.actor.cheatsheet", false);
-  this->Internals->init("window.actor.metadata", false);
-
-  this->Internals->init("window.render.depth-peeling", false);
-  this->Internals->init("window.render.fxaa", false);
-  this->Internals->init("window.render.ssao", false);
-  this->Internals->init("window.render.tone-mapping", false);
-
   this->Internals->init("window.fullscreen", false);
-  this->Internals->init("window.font-file", std::string());
-
-  // TODO: Rename into a "rendering-mode" option
-  this->Internals->init("window.point-sprites.enable", false);
-  this->Internals->init("window.volume.enable", false);
-  this->Internals->init("window.volume.inverse", false);
 
   // Interactor
   this->Internals->init("interactor.axis", false);

@@ -217,49 +217,49 @@ void ConfigurationOptions::GetOptionsFromArgs(
     this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which superseed any verbose options and prevent any console output to be generated at all", appOptions.Quiet,  HasDefault::YES, MayHaveConfig::NO );
     this->DeclareOption(grp1, "progress", "", "Show progress bar", options.getAsBoolRef("loader.show-progress"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", options.getAsBoolRef("loader.geometry-only"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "up", "", "Up direction", options.getAsStringRef("loader.up-direction"), HasDefault::YES, MayHaveConfig::YES, "[-X|+X|-Y|+Y|-Z|+Z]"); // TODO add a config test, critical
+    this->DeclareOption(grp1, "up", "", "Up direction", options.getAsStringRef("scene.up-direction"), HasDefault::YES, MayHaveConfig::YES, "[-X|+X|-Y|+Y|-Z|+Z]"); // TODO add a config test, critical
     this->DeclareOption(grp1, "axis", "x", "Show axes", options.getAsBoolRef("interactor.axis"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "grid", "g", "Show grid", options.getAsBoolRef("window.actor.grid"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.getAsBoolRef("window.actor.edges"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", options.getAsIntRef("loader.camera.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
+    this->DeclareOption(grp1, "grid", "g", "Show grid", options.getAsBoolRef("ui.grid"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.getAsBoolRef("scene.show-edges"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", options.getAsIntRef("scene.camera.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
     this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", options.getAsBoolRef("interactor.trackball"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.getAsIntRef("loader.animation.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
-    this->DeclareOption(grp1, "font-file", "", "Path to a FreeType compatible font file", options.getAsStringRef("window.font-file"), HasDefault::NO, MayHaveConfig::NO, "<file_path>");
+    this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.getAsIntRef("scene.animation.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
+    this->DeclareOption(grp1, "font-file", "", "Path to a FreeType compatible font file", options.getAsStringRef("ui.font-file"), HasDefault::NO, MayHaveConfig::NO, "<file_path>");
 
     auto grp2 = cxxOptions.add_options("Material");
-    this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.getAsBoolRef("window.point-sprites.enable"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.getAsDoubleRef("loader.default.point-size"), HasDefault::YES, MayHaveConfig::YES, "<size>");
-    this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", options.getAsDoubleRef("loader.default.line-width"), HasDefault::YES, MayHaveConfig::YES, "<width>");
-    this->DeclareOption(grp2, "color", "", "Solid color", options.getAsDoubleVectorRef("loader.default.color.rgb"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
-    this->DeclareOption(grp2, "opacity", "", "Opacity", options.getAsDoubleRef("loader.default.color.opacity"), HasDefault::YES, MayHaveConfig::YES, "<opacity>");
-    this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.getAsDoubleRef("loader.default.material.roughness"), HasDefault::YES, MayHaveConfig::YES, "<roughness>");
-    this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.getAsDoubleRef("loader.default.material.metallic"), HasDefault::YES, MayHaveConfig::YES, "<metallic>");
+    this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.getAsBoolRef("model.point-sprites.enable"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.getAsDoubleRef("model.point-size"), HasDefault::YES, MayHaveConfig::YES, "<size>");
+    this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", options.getAsDoubleRef("model.line-width"), HasDefault::YES, MayHaveConfig::YES, "<width>");
+    this->DeclareOption(grp2, "color", "", "Solid color", options.getAsDoubleVectorRef("model.color.rgb"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
+    this->DeclareOption(grp2, "opacity", "", "Opacity", options.getAsDoubleRef("model.color.opacity"), HasDefault::YES, MayHaveConfig::YES, "<opacity>");
+    this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.roughness"), HasDefault::YES, MayHaveConfig::YES, "<roughness>");
+    this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.metallic"), HasDefault::YES, MayHaveConfig::YES, "<metallic>");
     this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.getAsStringRef("window.background.hdri"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.getAsStringRef("loader.default.color.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.getAsStringRef("loader.default.material.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emitted light of the object", options.getAsStringRef("loader.default.emissive.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "emissive-factor", "", "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present", options.getAsDoubleVectorRef("loader.default.emissive.factor"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
-    this->DeclareOption(grp2, "texture-normal", "", "Path to a texture file that sets the normal map of the object", options.getAsStringRef("loader.default.normal.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", options.getAsDoubleRef("loader.default.normal.scale"), HasDefault::YES, MayHaveConfig::YES, "<normalScale>");
+    this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.getAsStringRef("model.color.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.getAsStringRef("model.material.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emitted light of the object", options.getAsStringRef("model.emissive.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "emissive-factor", "", "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present", options.getAsDoubleVectorRef("model.emissive.factor"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
+    this->DeclareOption(grp2, "texture-normal", "", "Path to a texture file that sets the normal map of the object", options.getAsStringRef("model.normal.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", options.getAsDoubleRef("model.normal.scale"), HasDefault::YES, MayHaveConfig::YES, "<normalScale>");
 
     auto grp3 = cxxOptions.add_options("Window");
     this->DeclareOption(grp3, "bg-color", "", "Background color", options.getAsDoubleVectorRef("window.background.color"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>"); // TODO change name ?
     this->DeclareOption(grp3, "resolution", "", "Window resolution", appOptions.Resolution, HasDefault::YES, MayHaveConfig::NO, "<width,height>");
-    this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.getAsBoolRef("window.actor.fps"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp3, "filename", "n", "Display filename", options.getAsBoolRef("window.actor.filename"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.getAsBoolRef("window.actor.metadata"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.getAsBoolRef("ui.fps"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp3, "filename", "n", "Display filename", options.getAsBoolRef("ui.filename"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.getAsBoolRef("ui.metadata"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp3, "fullscreen", "f", "Full screen", options.getAsBoolRef("window.fullscreen"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp3, "blur-background", "u", "Blur background", options.getAsBoolRef("window.background.blur"), HasDefault::YES, MayHaveConfig::YES);
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
-    this->DeclareOptionWithImplicitValue(grp4, "scalars", "s", "Color by scalars", options.getAsStringRef("window.coloring.name"), std::string(""), HasDefault::YES, MayHaveConfig::YES, "<array_name>");
-    this->DeclareOptionWithImplicitValue(grp4, "comp", "y", "Component from the scalar array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", options.getAsIntRef("window.coloring.component"), "-2", HasDefault::YES, MayHaveConfig::YES, "<comp_index>");
-    this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.getAsBoolRef("window.coloring.cells"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.getAsDoubleVectorRef("window.coloring.range"), HasDefault::NO, MayHaveConfig::YES, "<min,max>");
-    this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.getAsBoolRef("window.actor.bar"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.getAsDoubleVectorRef("window.coloring.colormap"), HasDefault::YES, MayHaveConfig::YES, "<color_list>");
-    this->DeclareOption(grp4, "volume", "v", "Show volume if the file is compatible", options.getAsBoolRef("window.volume.enable"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.getAsBoolRef("window.volume.inverse"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOptionWithImplicitValue(grp4, "scalars", "s", "Color by scalars", options.getAsStringRef("model.scivis.array-name"), std::string(""), HasDefault::YES, MayHaveConfig::YES, "<array_name>");
+    this->DeclareOptionWithImplicitValue(grp4, "comp", "y", "Component from the scalar array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", options.getAsIntRef("model.scivis.component"), "-2", HasDefault::YES, MayHaveConfig::YES, "<comp_index>");
+    this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.getAsBoolRef("model.scivis.cells"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.getAsDoubleVectorRef("model.scivis.range"), HasDefault::NO, MayHaveConfig::YES, "<min,max>");
+    this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.getAsBoolRef("ui.bar"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.getAsDoubleVectorRef("model.scivis.colormap"), HasDefault::YES, MayHaveConfig::YES, "<color_list>");
+    this->DeclareOption(grp4, "volume", "v", "Show volume if the file is compatible", options.getAsBoolRef("model.volume.enable"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.getAsBoolRef("model.volume.inverse"), HasDefault::YES, MayHaveConfig::YES);
 
     auto grpCamera = cxxOptions.add_options("Camera");
     this->DeclareOption(grpCamera, "camera-position", "", "Camera position", appOptions.CameraPosition, HasDefault::NO, MayHaveConfig::YES, "<X,Y,Z>");
@@ -277,10 +277,10 @@ void ConfigurationOptions::GetOptionsFromArgs(
 #endif
 
     auto grp6 = cxxOptions.add_options("PostFX (OpenGL)");
-    this->DeclareOption(grp6, "depth-peeling", "p", "Enable depth peeling", options.getAsBoolRef("window.render.depth-peeling"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp6, "ssao", "q", "Enable Screen-Space Ambient Occlusion", options.getAsBoolRef("window.render.ssao"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp6, "fxaa", "a", "Enable Fast Approximate Anti-Aliasing", options.getAsBoolRef("window.render.fxaa"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping", options.getAsBoolRef("window.render.tone-mapping"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp6, "depth-peeling", "p", "Enable depth peeling", options.getAsBoolRef("render.effect.depth-peeling"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp6, "ssao", "q", "Enable Screen-Space Ambient Occlusion", options.getAsBoolRef("render.effect.ssao"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp6, "fxaa", "a", "Enable Fast Approximate Anti-Aliasing", options.getAsBoolRef("render.effect.fxaa"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping", options.getAsBoolRef("render.effect.tone-mapping"), HasDefault::YES, MayHaveConfig::YES);
 
     auto grp7 = cxxOptions.add_options("Testing");
     this->DeclareOption(grp7, "ref", "", "Reference", appOptions.Reference, HasDefault::NO, MayHaveConfig::NO, "<png file>");

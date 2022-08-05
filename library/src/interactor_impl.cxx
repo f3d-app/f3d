@@ -111,28 +111,28 @@ public:
         }
         break;
       case 'B':
-        self->Options.toggle("window.actor.bar");
+        self->Options.toggle("ui.bar");
         render = true;
         break;
       case 'p':
       case 'P':
-        self->Options.toggle("window.render.depth-peeling");
+        self->Options.toggle("render.effect.depth-peeling");
         render = true;
         break;
       case 'Q':
-        self->Options.toggle("window.render.ssao");
+        self->Options.toggle("render.effect.ssao");
         render = true;
         break;
       case 'A':
-        self->Options.toggle("window.render.fxaa");
+        self->Options.toggle("render.effect.fxaa");
         render = true;
         break;
       case 'T':
-        self->Options.toggle("window.render.tone-mapping");
+        self->Options.toggle("render.effect.tone-mapping");
         render = true;
         break;
       case 'E':
-        self->Options.toggle("window.actor.edges");
+        self->Options.toggle("scene.show-edges");
         render = true;
         break;
       case 'X':
@@ -141,41 +141,41 @@ public:
         render = true;
         break;
       case 'G':
-        self->Options.toggle("window.actor.grid");
+        self->Options.toggle("ui.grid");
         render = true;
         break;
       case 'N':
-        self->Options.toggle("window.actor.filename");
+        self->Options.toggle("ui.filename");
         render = true;
         break;
       case 'M':
-        self->Options.toggle("window.actor.metadata");
+        self->Options.toggle("ui.metadata");
         render = true;
         break;
       case 'Z':
-        self->Options.toggle("window.actor.fps");
+        self->Options.toggle("ui.fps");
         self->Window.render();
         self->Window.render();
         // XXX: Double render is needed here
         break;
       case 'R':
-        self->Options.toggle("window.raytracing.enable");
+        self->Options.toggle("render.raytracing.enable");
         render = true;
         break;
       case 'D':
-        self->Options.toggle("window.raytracing.denoise");
+        self->Options.toggle("render.raytracing.denoise");
         render = true;
         break;
       case 'V':
-        self->Options.toggle("window.volume.enable");
+        self->Options.toggle("model.volume.enable");
         render = true;
         break;
       case 'I':
-        self->Options.toggle("window.volume.inverse");
+        self->Options.toggle("model.volume.inverse");
         render = true;
         break;
       case 'O':
-        self->Options.toggle("window.point-sprites.enable");
+        self->Options.toggle("model.point-sprites.enable");
         render = true;
         break;
       case 'U':
@@ -187,7 +187,7 @@ public:
         render = true;
         break;
       case 'H':
-        self->Options.toggle("window.actor.cheatsheet");
+        self->Options.toggle("ui.cheatsheet");
         render = true;
         break;
       case '?':
@@ -234,9 +234,9 @@ public:
     if (checkColoring)
     {
       // Resynchronise renderer coloring status with options
-      self->Options.set("window.coloring.cells", renWithColor->GetColoringUseCell());
-      self->Options.set("window.coloring.name", renWithColor->GetColoringArrayName());
-      self->Options.set("window.coloring.component", renWithColor->GetColoringComponent());
+      self->Options.set("model.scivis.cells", renWithColor->GetColoringUseCell());
+      self->Options.set("model.scivis.array-name", renWithColor->GetColoringArrayName());
+      self->Options.set("model.scivis.component", renWithColor->GetColoringComponent());
     }
     if (render)
     {

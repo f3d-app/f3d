@@ -24,19 +24,19 @@ int TestSDKEngine(int argc, char* argv[])
 
   // Test option setters
   f3d::options opt;
-  opt.set("window.coloring.cells", true);
+  opt.set("model.scivis.cells", true);
 
   eng0.setOptions(opt);
-  if (!eng0.getOptions().getAsBool("window.coloring.cells"))
+  if (!eng0.getOptions().getAsBool("model.scivis.cells"))
   {
     std::cerr << "Unexpected options value using f3d::engine::setOptions(const options& opt)"
               << std::endl;
     return EXIT_FAILURE;
   }
 
-  opt.set("loader.default.line-width", 1.7);
+  opt.set("model.line-width", 1.7);
   eng0.setOptions(std::move(opt));
-  if (eng0.getOptions().getAsDouble("loader.default.line-width") != 1.7)
+  if (eng0.getOptions().getAsDouble("model.line-width") != 1.7)
   {
     std::cerr << "Unexpected options value using f3d::engine::setOptions(options&& opt)"
               << std::endl;
