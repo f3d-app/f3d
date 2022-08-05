@@ -106,13 +106,10 @@ public:
 options::options()
   : Internals(new options::internals)
 {
-  // Loader
-  this->Internals->init("loader.geometry-only", false);
-  this->Internals->init("loader.show-progress", false);
-
   // Scene
   this->Internals->init("scene.animation.index", 0);
   this->Internals->init("scene.camera.index", -1);
+  this->Internals->init("scene.geometry-only", false);
   this->Internals->init("scene.up-direction", std::string("+Y"));
   this->Internals->init("scene.show-edges", false);
 
@@ -134,6 +131,7 @@ options::options()
   this->Internals->init("ui.cheatsheet", false);
   this->Internals->init("ui.metadata", false);
   this->Internals->init("ui.font-file", std::string());
+  this->Internals->init("ui.loader-progress", false);
 
   // Model
   this->Internals->init("model.line-width", 1.0);

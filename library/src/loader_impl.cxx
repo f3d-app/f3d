@@ -324,7 +324,7 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
 
   // Recover the importer
   this->Internals->Importer = loader_impl::internals::GetImporter(
-    filePath, this->Internals->Options.getAsBool("loader.geometry-only"));
+    filePath, this->Internals->Options.getAsBool("scene.geometry-only"));
   vtkF3DGenericImporter* genericImporter =
     vtkF3DGenericImporter::SafeDownCast(this->Internals->Importer);
   if (!this->Internals->Importer)
@@ -359,7 +359,7 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
 #endif
 
   // Manage progress bar
-  if (this->Internals->Options.getAsBool("loader.show-progress") && this->Internals->Interactor)
+  if (this->Internals->Options.getAsBool("ui.loader-progress") && this->Internals->Interactor)
   {
     loader_impl::internals::CreateProgressRepresentationAndCallback(
       &callbackData, this->Internals->Importer, this->Internals->Interactor);
