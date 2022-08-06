@@ -197,9 +197,9 @@ window.fullscreen|false|bool|Display in fullscreen.|--fullscreen|render
 
 # Python Bindings
 
-If the python bindings are generated, F3D can be used directly from python.
+If the python bindings are generated, the libf3d can be used directly from python.
 Make sure to set `PYTHONPATH` to path where the python module is built.
-Here is an example showing how to use F3D python bindings:
+Here is an example showing how to use libf3d python bindings:
 
 ```python
 import f3d
