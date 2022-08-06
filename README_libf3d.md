@@ -13,26 +13,14 @@ Rendering a file and starting the interaction is very easy:
 // Create a f3d::engine
 f3d::engine eng();
 
-// Recover the file loader
-f3d::loader& load = eng.getLoader();
-
-// Add a file to the loader
-load.addFile("path/to/file.ext");
-
-// Load the file
-load.loadFile();
-
-// Recover the window
-f3d::window& win = eng.getWindow();
+/ Add a file to the loader and load it
+eng.getLoader().addFile("path/to/file.ext").loadFile();
 
 // Render the file in the window
-win.render();
-
-// Recover the interactor
-f3d::interactor& inter = eng.getInteractor();
+eng.getWindow().render();
 
 // Start interacting
-inter.start();
+eng.getInteractor().start();
 ```
 
 Changing some options can be done this way:
@@ -47,12 +35,8 @@ f3d::options& options = eng.getOptions();
 options.set("options.render.ssao", true);
 
 // Standard libf3d usage
-f3d::loader& load = eng.getLoader();
-load.addFile("path/to/file.ext");
-load.loadFile();
-f3d::window& win = eng.getWindow();
-f3d::interactor& inter = eng.getInteractor();
-inter.start();
+eng.getLoader().addFile("path/to/file.ext").loadFile();
+eng.getInteractor().start();
 ```
 Most options are dynamic, some are only taken into account when loading a file. See the ##options## documentation.
 
