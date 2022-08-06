@@ -84,7 +84,6 @@ public:
 
   /**
    * Set the window name to be shown by a window manager.
-   * Return true on success, false otherwise.
    */
   virtual window& setWindowName(const std::string& windowName) noexcept = 0;
 
