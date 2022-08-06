@@ -65,14 +65,14 @@ public:
    * But you can use this setter to use other options directly.
    * It will copy options into engine
    */
-  void setOptions(const options& opt) noexcept;
+  engine& setOptions(const options& opt) noexcept;
 
   /**
    * Engine provide a default options that you can use using engine::getOptions()
    * But you can use this setter to use other options directly.
    * It will move options into engine
    */
-  void setOptions(options&& opt) noexcept;
+  engine& setOptions(options&& opt) noexcept;
 
   /**
    * Get the default options provided by the engine

@@ -73,21 +73,20 @@ public:
   /**
    * Set the size of the window
    */
-  virtual void setSize(int width, int heigth) noexcept = 0;
+  virtual window& setSize(int width, int heigth) noexcept = 0;
 
   /**
    * Set the icon to be shown by a window manager.
-   * icon should be an unsigned char array
-   * iconSize should be the sizeof(icon)
-   * Return true on success, false otherwise.
+   * icon should be an unsigned char array.
+   * iconSize should be the sizeof(icon).
    */
-  virtual bool setIcon(const void* icon, size_t iconSize) noexcept = 0;
+  virtual window& setIcon(const void* icon, size_t iconSize) noexcept = 0;
 
   /**
    * Set the window name to be shown by a window manager.
    * Return true on success, false otherwise.
    */
-  virtual bool setWindowName(const std::string& windowName) noexcept = 0;
+  virtual window& setWindowName(const std::string& windowName) noexcept = 0;
 
 protected:
   window() noexcept = default;

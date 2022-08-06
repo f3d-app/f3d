@@ -89,13 +89,14 @@ camera& window_impl::getCamera() noexcept
 }
 
 //----------------------------------------------------------------------------
-void window_impl::setSize(int width, int height) noexcept
+window& window_impl::setSize(int width, int height) noexcept
 {
   this->Internals->RenWin->SetSize(width, height);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-bool window_impl::setIcon(const void* icon, size_t iconSize) noexcept
+window& window_impl::setIcon(const void* icon, size_t iconSize) noexcept
 {
   // SetIcon needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7004
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200616)
@@ -105,19 +106,19 @@ bool window_impl::setIcon(const void* icon, size_t iconSize) noexcept
   iconReader->SetMemoryBufferLength(iconSize);
   iconReader->Update();
   this->Internals->RenWin->SetIcon(iconReader->GetOutput());
-  return true;
 #else
+  // Silent noop
   (void)icon;
   (void)iconSize;
-  return false;
 #endif
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-bool window_impl::setWindowName(const std::string& windowName) noexcept
+window& window_impl::setWindowName(const std::string& windowName) noexcept
 {
   this->Internals->RenWin->SetWindowName(windowName.c_str());
-  return true;
+  return *this;
 }
 
 //----------------------------------------------------------------------------

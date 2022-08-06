@@ -37,19 +37,19 @@ public:
    */
   camera& setPosition(const vector3_t& pos) noexcept override;
   vector3_t getPosition() noexcept override;
-  camera& getPosition(vector3_t& pos) noexcept override;
+  void getPosition(vector3_t& pos) noexcept override;
   camera& setFocalPoint(const vector3_t& foc) noexcept override;
   vector3_t getFocalPoint() noexcept override;
-  camera& getFocalPoint(vector3_t& foc) noexcept override;
+  void getFocalPoint(vector3_t& foc) noexcept override;
   camera& setViewUp(const vector3_t& up) noexcept override;
   vector3_t getViewUp() noexcept override;
-  camera& getViewUp(vector3_t& up) noexcept override;
+  void getViewUp(vector3_t& up) noexcept override;
   camera& setViewAngle(const double& angle) noexcept override;
   double getViewAngle() noexcept override;
-  camera& getViewAngle(double& angle) noexcept override;
+  void getViewAngle(double& angle) noexcept override;
   camera& setViewMatrix(const matrix4_t& matrix) noexcept override;
   matrix4_t getViewMatrix() noexcept override;
-  camera& getViewMatrix(matrix4_t& matrix) noexcept override;
+  void getViewMatrix(matrix4_t& matrix) noexcept override;
 
   camera& dolly(double val) noexcept override;
   camera& roll(double angle) noexcept override;

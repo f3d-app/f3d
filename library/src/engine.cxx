@@ -52,15 +52,17 @@ engine::~engine() noexcept
 }
 
 //----------------------------------------------------------------------------
-void engine::setOptions(const options& opt) noexcept
+engine& engine::setOptions(const options& opt) noexcept
 {
   *this->Internals->Options = opt;
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void engine::setOptions(options&& opt) noexcept
+engine& engine::setOptions(options&& opt) noexcept
 {
   *this->Internals->Options = std::move(opt);
+  return *this;
 }
 
 //----------------------------------------------------------------------------

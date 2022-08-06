@@ -207,7 +207,7 @@ bool image::operator!=(const image& reference) const
 }
 
 //----------------------------------------------------------------------------
-const image& image::save(const std::string& path) const
+void image::save(const std::string& path) const
 {
   auto importer = this->Internals->GetVTKImporter();
 
@@ -220,7 +220,5 @@ const image& image::save(const std::string& path) const
   {
     throw exception("Cannot write " + path);
   }
-
-  return *this;
 }
 }

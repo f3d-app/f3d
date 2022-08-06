@@ -40,13 +40,13 @@ public:
    * Add a list of files or directories to be loaded.
    * Duplicate will not be added.
    */
-  virtual void addFiles(const std::vector<std::string>& files) noexcept = 0;
+  virtual loader& addFiles(const std::vector<std::string>& files) noexcept = 0;
 
   /**
    * Add a file or directory (all files in) to be loaded.
    * Set recursive to true to load folder recursively instead of only files.
    */
-  virtual void addFile(const std::string& path, bool recursive = false) noexcept = 0;
+  virtual loader& addFile(const std::string& path, bool recursive = false) noexcept = 0;
 
   /**
    * Get the vector of files to be loaded.
@@ -57,7 +57,7 @@ public:
    * Set the current file index, corresponding to the file that will be loaded
    * when calling loadFile(LOAD_CURRENT).
    */
-  virtual void setCurrentFileIndex(int index) noexcept = 0;
+  virtual loader& setCurrentFileIndex(int index) noexcept = 0;
 
   /**
    * Get the current file index.

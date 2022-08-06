@@ -32,7 +32,8 @@ public:
    * codes, eg: Left, Right, Up, Down, Space, Enter. Your callBack should return true if the key was
    * handled, false if you want standard interactor behavior instead.
    */
-  virtual void setKeyPressCallBack(std::function<bool(int, std::string)> callBack) noexcept = 0;
+  virtual interactor& setKeyPressCallBack(
+    std::function<bool(int, std::string)> callBack) noexcept = 0;
 
   /**
    * Use this method to specify your own drop files callback, with the expected API:
@@ -43,7 +44,7 @@ public:
    * Your callBack should return true if the event was handled, false if you want standard
    * interactor behavior instead.
    */
-  virtual void setDropFilesCallBack(
+  virtual interactor& setDropFilesCallBack(
     std::function<bool(std::vector<std::string>)> callBack) noexcept = 0;
 
   /**

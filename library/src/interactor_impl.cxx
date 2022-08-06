@@ -308,16 +308,19 @@ interactor_impl::interactor_impl(
 interactor_impl::~interactor_impl() noexcept = default;
 
 //----------------------------------------------------------------------------
-void interactor_impl::setKeyPressCallBack(std::function<bool(int, std::string)> callBack) noexcept
+interactor& interactor_impl::setKeyPressCallBack(
+  std::function<bool(int, std::string)> callBack) noexcept
 {
   this->Internals->KeyPressUserCallBack = callBack;
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::setDropFilesCallBack(
+interactor& interactor_impl::setDropFilesCallBack(
   std::function<bool(std::vector<std::string>)> callBack) noexcept
 {
   this->Internals->DropFilesUserCallBack = callBack;
+  return *this;
 }
 
 //----------------------------------------------------------------------------

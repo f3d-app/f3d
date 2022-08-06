@@ -171,27 +171,28 @@ loader_impl::loader_impl(const options& options, window_impl& window) noexcept
 loader_impl::~loader_impl() noexcept = default;
 
 //----------------------------------------------------------------------------
-void loader_impl::addFiles(const std::vector<std::string>& files) noexcept
+loader& loader_impl::addFiles(const std::vector<std::string>& files) noexcept
 {
   for (auto& file : files)
   {
     this->addFile(file);
   }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void loader_impl::addFile(const std::string& path, bool recursive) noexcept
+loader& loader_impl::addFile(const std::string& path, bool recursive) noexcept
 {
   if (path.empty())
   {
-    return;
+    return *this;
   }
 
   std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
   if (!vtksys::SystemTools::FileExists(fullPath))
   {
     log::error("File ", fullPath, " does not exist");
-    return;
+    return *this;
   }
 
   if (vtksys::SystemTools::FileIsDirectory(fullPath))
@@ -231,6 +232,7 @@ void loader_impl::addFile(const std::string& path, bool recursive) noexcept
       this->Internals->FilesList.push_back(fullPath);
     }
   }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -287,9 +289,10 @@ const std::vector<std::string>& loader_impl::getFiles() const noexcept
 }
 
 //----------------------------------------------------------------------------
-void loader_impl::setCurrentFileIndex(int index) noexcept
+loader& loader_impl::setCurrentFileIndex(int index) noexcept
 {
   this->Internals->CurrentFileIndex = index;
+  return *this;
 }
 
 //----------------------------------------------------------------------------

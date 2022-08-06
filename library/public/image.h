@@ -100,7 +100,7 @@ public:
    * Save an image to a file in .png format
    * Can throw an image::exception if image is not sane.
    */
-  const image& save(const std::string& path) const;
+  void save(const std::string& path) const;
 
 private:
   class internals;

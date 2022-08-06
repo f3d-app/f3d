@@ -33,16 +33,16 @@ public:
    */
   virtual camera& setPosition(const vector3_t& pos) noexcept = 0;
   virtual vector3_t getPosition() noexcept = 0;
-  virtual camera& getPosition(vector3_t& pos) noexcept = 0;
+  virtual void getPosition(vector3_t& pos) noexcept = 0;
   virtual camera& setFocalPoint(const vector3_t& foc) noexcept = 0;
   virtual vector3_t getFocalPoint() noexcept = 0;
-  virtual camera& getFocalPoint(vector3_t& foc) noexcept = 0;
+  virtual void getFocalPoint(vector3_t& foc) noexcept = 0;
   virtual camera& setViewUp(const vector3_t& up) noexcept = 0;
   virtual vector3_t getViewUp() noexcept = 0;
-  virtual camera& getViewUp(vector3_t& up) noexcept = 0;
+  virtual void getViewUp(vector3_t& up) noexcept = 0;
   virtual camera& setViewAngle(const double& angle) noexcept = 0;
   virtual double getViewAngle() noexcept = 0;
-  virtual camera& getViewAngle(double& angle) noexcept = 0;
+  virtual void getViewAngle(double& angle) noexcept = 0;
   //@}
 
   //@{
@@ -52,7 +52,7 @@ public:
    */
   virtual camera& setViewMatrix(const matrix4_t& matrix) noexcept = 0;
   virtual matrix4_t getViewMatrix() noexcept = 0;
-  virtual camera& getViewMatrix(matrix4_t& matrix) noexcept = 0;
+  virtual void getViewMatrix(matrix4_t& matrix) noexcept = 0;
   //@}
 
   //@{

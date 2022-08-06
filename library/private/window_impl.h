@@ -45,9 +45,9 @@ public:
   camera& getCamera() noexcept override;
   bool render() noexcept override;
   image renderToImage(bool noBackground = false) noexcept override;
-  void setSize(int width, int heigth) noexcept override;
-  bool setIcon(const void* icon, size_t iconSize) noexcept override;
-  bool setWindowName(const std::string& windowName) noexcept override;
+  window& setSize(int width, int heigth) noexcept override;
+  window& setIcon(const void* icon, size_t iconSize) noexcept override;
+  window& setWindowName(const std::string& windowName) noexcept override;
   //@}
 
   /**

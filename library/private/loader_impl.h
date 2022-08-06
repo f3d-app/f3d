@@ -31,12 +31,12 @@ public:
   loader_impl(const options& options, window_impl& window) noexcept;
   ~loader_impl() noexcept;
 
-  void addFiles(const std::vector<std::string>& files) noexcept override;
-  void addFile(const std::string& path, bool recursive = true) noexcept override;
+  loader& addFiles(const std::vector<std::string>& files) noexcept override;
+  loader& addFile(const std::string& path, bool recursive = true) noexcept override;
 
   const std::vector<std::string>& getFiles() const noexcept override;
 
-  void setCurrentFileIndex(int index) noexcept override;
+  loader& setCurrentFileIndex(int index) noexcept override;
   int getCurrentFileIndex() const noexcept override;
 
   bool loadFile(LoadFileEnum load) noexcept override;

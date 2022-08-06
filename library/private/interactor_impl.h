@@ -34,8 +34,8 @@ public:
   interactor_impl(options& options, window_impl& window, loader_impl& loader) noexcept;
   ~interactor_impl() noexcept;
 
-  void setKeyPressCallBack(std::function<bool(int, std::string)> callBack) noexcept override;
-  void setDropFilesCallBack(
+  interactor& setKeyPressCallBack(std::function<bool(int, std::string)> callBack) noexcept override;
+  interactor& setDropFilesCallBack(
     std::function<bool(std::vector<std::string>)> callBack) noexcept override;
 
   unsigned long createTimerCallBack(double time, std::function<void()> callBack) noexcept override;
