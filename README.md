@@ -390,27 +390,10 @@ They are considered in the below order and only the first found will be used.
 If you are using the releases, a default configuration file is provided when installing F3D.
 On Linux, it will be installed in `/etc/f3d/`, on Windows, it will be installed in the install directory, on macOS, it will be installed in the bundle.
 
-# Python Bindings
+# libf3d
 
-If the python bindings are generated, F3D can be used directly from python.
-Make sure to set `PYTHONPATH` to path where the python module is built.
-Here is an example showing how to use F3D python bindings:
-
-```python
-import f3d
-
-engine = f3d.engine(f3d.engine.CREATE_WINDOW | f3d.engine.CREATE_INTERACTOR)
-
-engine.getOptions().set("scalars", "Normals")
-engine.getOptions().set("component", 0)
-engine.getOptions().set("bar", True)
-engine.getOptions().set("grid", True)
-
-engine.getLoader().addFile("f3d/testing/data/dragon.vtu")
-engine.getLoader().loadFile(f3d.loader.LoadFileEnum.LOAD_CURRENT)
-
-engine.getInteractor().start()
-```
+F3D contains not only the F3D executable but also the libf3d, which can be used in C++ or Python.
+The libf3d is documented [here.](README_libf3d.md)
 
 # Desktop Integration
 

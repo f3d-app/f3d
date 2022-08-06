@@ -56,17 +56,17 @@ inter.start();
 ```
 Most options are dynamic, some are only taken into account when loading a file. See the ##options## documentation.
 
-For more advanced usage, please take a look in the testing directory.
+For more advanced usage, please take a look at the testing directory.
 
 # Engine class
 
-The engine class is the main class that needs to be instanciated. All other classes instance are provided by the engine using getters, `getLoader`, `getWindow`, `getInteractor`, `getOptions`.
+The engine class is the main class that needs to be instantiated. All other classes instance are provided by the engine using getters, `getLoader`, `getWindow`, `getInteractor`, `getOptions`.
 
-The engine constructor let you choose the type of window in its constructor, `NONE`, `NATIVE`, `NATIVE_OFFSCREEN`, `EXTERNAL`. Default is `NATIVE`. See ##Window class## documentation for more info. Please not that the engine will not provided a interactor with `NONE` and `EXTERNAL`.
+The engine constructor let you choose the type of window in its constructor, `NONE`, `NATIVE`, `NATIVE_OFFSCREEN`, `EXTERNAL`. Default is `NATIVE`. See ##Window class## documentation for more info. Please note that the engine will not provide a interactor with `NONE` and `EXTERNAL`.
 
 # Loader class
 
-The loader class is responsible to read and load the file from disk. It support reading multiple files and even folders.
+The loader class is responsible to read and load the file from the disk. It supports reading multiple files and even folders.
 
 # Window class
 
@@ -82,7 +82,7 @@ Default mode where a window is shown onscreen using native graphical capabilitie
 Use native graphical capabilities for rendering, but unto an offscreen window, which will not appear on screen, practical when generating screenshots.
 
 * EXTERNAL
-A window where the OpenGL context is not created but assumed to have been created externally. To be used with other framework like Qt or GLFW.
+A window where the OpenGL context is not created but assumed to have been created externally. To be used with other frameworks like Qt or GLFW.
 
 Window let you `render`, `renderToImage` and control other parameters of the window, like icon or windowName.
 
@@ -97,35 +97,35 @@ It also lets you define you own callbacks when needed.
 
 # Camera class
 
-Provided by the window, this class let you control the camera. There is essentially three API.
+Provided by the window, this class let you control the camera. There are essentially three API.
  1. A Position/FocalPoint/ViewUp API to put the camera where you want it.
  2. A camera movement API to move the camera around
  3. A ViewMatrix API to work with matrices directly.
 
-Please note the API 1. and 2. can be used together and always orthogonalize the view up after each call.
+Please note that the API 1. and 2. can be used together and always orthogonalize the view up after each call.
 API 3. is not intended to be used with other API as it can result to unexpected cameras.
 
 # Image class
 
-A generic image class that can either created from a window, from an image filepath or even from a data buffer. It supports comparison making it very practical in testing context.
+A generic image class that can either be created from a window, from an image filepath or even from a data buffer. It supports comparison making it very practical in testing context.
 
 # Log class
 
-A class to control logging in the libf3d. Simple using the different decicated methods (`print`, `debug`, `info`, `warn`, `error`) and `setVerboseLevel`, you can easily control what to display. Please note that, on windows, a dedicated output window may be created.
+A class to control logging in the libf3d. Simple using the different dedicated methods (`print`, `debug`, `info`, `warn`, `error`) and `setVerboseLevel`, you can easily control what to display. Please note that, on windows, a dedicated output window may be created.
 
 # Option class
 
 This class lets you control the behavior of the libf3d. An option is basically a string used as a key associated with a value.
 Options are organized by categories and subcategories, here is a non-exhaustive explanation of the categories.
 
- * `scene` options are related to how the scene is being shown
+ * `scene` options are related to how the scene is being displayed
  * `render` options are related to the way the render is done
-  * `render.effect` options are related to specific technique used that modify the render
- * `ui` options are related to the screenspace UI element shown
+ * `render.effect` options are related to specific techniques used that modify the render
+ * `ui` options are related to the screenspace UI element displayed
  * `model` options are related to modifications on the model, they are only meaningful when using the default scene
  * `interactor` options requires an interactor to be present to have any effect.
 
-Please note certain options are taken into accout when rendering, other when loading a file.
+Please note certain options are taken into account when rendering, others when loading a file.
 See the exhaustive list below, but note that this may change in the future.
 
 ## Scene Options
@@ -197,13 +197,22 @@ window.fullscreen|false|bool|Display in fullscreen.|--fullscreen|render
 
 # Python Bindings
 
-Python bindings are provided by pybind11 and looks like this:
+If the python bindings are generated, F3D can be used directly from python.
+Make sure to set `PYTHONPATH` to path where the python module is built.
+Here is an example showing how to use F3D python bindings:
 
-```
+```python
 import f3d
-engine = f3d.engine()
-engine.getLoader().addFile("path/to/file.ext")
-engine.getLoader().loadFile()
-engine.getWindow().render()
+
+engine = f3d.engine(f3d.engine.CREATE_WINDOW | f3d.engine.CREATE_INTERACTOR)
+
+engine.getOptions().set("scalars", "Normals")
+engine.getOptions().set("component", 0)
+engine.getOptions().set("bar", True)
+engine.getOptions().set("grid", True)
+
+engine.getLoader().addFile("f3d/testing/data/dragon.vtu")
+engine.getLoader().loadFile(f3d.loader.LoadFileEnum.LOAD_CURRENT)
+
 engine.getInteractor().start()
 ```
