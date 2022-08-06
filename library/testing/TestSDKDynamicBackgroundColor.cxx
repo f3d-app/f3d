@@ -14,8 +14,7 @@ int TestSDKDynamicBackgroundColor(int argc, char* argv[])
   win.setSize(300, 300);
   opt.set("ui.filename", true);
 
-  load.addFile(std::string(argv[1]) + "/data/cow.vtp")
-    .loadFile();
+  load.addFile(std::string(argv[1]) + "/data/cow.vtp").loadFile();
 
   win.render();
 
