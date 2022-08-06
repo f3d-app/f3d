@@ -16,7 +16,7 @@ int TestSDKInteractionDirectory(int argc, char* argv[])
   options.set("model.scivis.array-name", "");
 
   f3d::loader& load = eng.getLoader();
-  load.addFile(std::string(argv[1]) + "/data/mb").loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
+  load.addFile(std::string(argv[1]) + "/data/mb").loadFile();
 
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();
@@ -45,7 +45,7 @@ int TestSDKInteractionDirectory(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  load.setCurrentFileIndex(2).loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
+  load.setCurrentFileIndex(2).loadFile();
 
   return TestSDKHelpers::RenderTest(
            win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename, 50)
