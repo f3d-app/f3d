@@ -392,7 +392,7 @@ On Linux, it will be installed in `/etc/f3d/`, on Windows, it will be installed 
 
 # libf3d
 
-F3D contains not only the F3D executable but also the libf3d, which can be used in C++ or Python.
+F3D contains not only the F3D executable but also the libf3d, a library to render 3D meshes, which can be used in C++ or Python.
 The libf3d is documented [here.](README_libf3d.md)
 
 # Desktop Integration
