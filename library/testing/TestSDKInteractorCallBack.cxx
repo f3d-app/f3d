@@ -55,8 +55,8 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     [&](std::vector<std::string> filesVec) -> bool
     {
       std::string path = filesVec[0];
-      load.addFile(std::filesystem::path(path).replace_filename("suzanne.ply").string());
-      load.loadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
+      load.addFile(std::filesystem::path(path).replace_filename("suzanne.ply").string())
+        .loadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
       win.render();
       return true;
     });

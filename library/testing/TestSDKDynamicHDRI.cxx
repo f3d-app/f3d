@@ -15,8 +15,8 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   win.setSize(300, 300);
   opt.set("ui.filename", true);
 
-  load.addFile(std::string(argv[1]) + "/data/cow.vtp");
-  load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
+  load.addFile(std::string(argv[1]) + "/data/cow.vtp")
+    .loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
   win.render();
 

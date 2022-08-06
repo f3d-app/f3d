@@ -145,10 +145,10 @@ int F3DStarter::Start(int argc, char** argv)
         this->Internals->Engine->getWindow().render();
         return true;
       });
-    window.setSize(
-      this->Internals->AppOptions.Resolution[0], this->Internals->AppOptions.Resolution[1]);
-    window.setWindowName(F3D::AppTitle);
-    window.setIcon(F3DIcon, sizeof(F3DIcon));
+    window
+      .setSize(this->Internals->AppOptions.Resolution[0], this->Internals->AppOptions.Resolution[1])
+      .setWindowName(F3D::AppTitle)
+      .setIcon(F3DIcon, sizeof(F3DIcon));
   }
 
   // Move command line options into the actual engine options

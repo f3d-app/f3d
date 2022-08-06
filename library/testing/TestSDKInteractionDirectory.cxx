@@ -14,9 +14,10 @@ int TestSDKInteractionDirectory(int argc, char* argv[])
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
   f3d::options& options = eng.getOptions();
   options.set("model.scivis.array-name", "");
+  
   f3d::loader& load = eng.getLoader();
-  load.addFile(std::string(argv[1]) + "/data/mb");
-  load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
+  load.addFile(std::string(argv[1]) + "/data/mb").loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
+
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();
   win.setSize(300, 300);
@@ -44,8 +45,7 @@ int TestSDKInteractionDirectory(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  load.setCurrentFileIndex(2);
-  load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
+  load.setCurrentFileIndex(2).loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
   return TestSDKHelpers::RenderTest(
            win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename, 50)

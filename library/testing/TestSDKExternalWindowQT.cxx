@@ -19,8 +19,7 @@ public:
     , mOutputPath(outputPath)
   {
     f3d::loader& load = mEngine.getLoader();
-    load.addFile(filePath);
-    load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
+    load.addFile(filePath).loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
   }
 
 protected:
