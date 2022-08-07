@@ -37,19 +37,19 @@ public:
    */
   camera& setPosition(const vector3_t& pos) override;
   vector3_t getPosition() override;
-  camera& getPosition(vector3_t& pos) override;
+  void getPosition(vector3_t& pos) override;
   camera& setFocalPoint(const vector3_t& foc) override;
   vector3_t getFocalPoint() override;
-  camera& getFocalPoint(vector3_t& foc) override;
+  void getFocalPoint(vector3_t& foc) override;
   camera& setViewUp(const vector3_t& up) override;
   vector3_t getViewUp() override;
-  camera& getViewUp(vector3_t& up) override;
+  void getViewUp(vector3_t& up) override;
   camera& setViewAngle(const double& angle) override;
   double getViewAngle() override;
-  camera& getViewAngle(double& angle) override;
+  void getViewAngle(double& angle) override;
   camera& setViewMatrix(const matrix4_t& matrix) override;
   matrix4_t getViewMatrix() override;
-  camera& getViewMatrix(matrix4_t& matrix) override;
+  void getViewMatrix(matrix4_t& matrix) override;
 
   camera& dolly(double val) override;
   camera& roll(double angle) override;

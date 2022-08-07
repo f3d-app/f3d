@@ -42,9 +42,9 @@ public:
   image();
   ~image();
   image(const image& img);
-  image& operator=(const image& img);
-  image(image&& img);
-  image& operator=(image&& img);
+  image& operator=(const image& img) noexcept;
+  image(image&& img) noexcept;
+  image& operator=(image&& img) noexcept;
   //@}
 
   //@{
@@ -100,7 +100,7 @@ public:
    * Save an image to a file in .png format
    * Can throw an image::exception if image is not sane.
    */
-  const image& save(const std::string& path) const;
+  void save(const std::string& path) const;
 
 private:
   class internals;

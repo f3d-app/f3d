@@ -31,12 +31,12 @@ public:
   loader_impl(const options& options, window_impl& window);
   ~loader_impl();
 
-  void addFiles(const std::vector<std::string>& files) override;
-  void addFile(const std::string& path, bool recursive = true) override;
+  loader& addFiles(const std::vector<std::string>& files) override;
+  loader& addFile(const std::string& path, bool recursive = true) override;
 
   const std::vector<std::string>& getFiles() const override;
 
-  void setCurrentFileIndex(int index) override;
+  loader& setCurrentFileIndex(int index) override;
   int getCurrentFileIndex() const override;
 
   bool loadFile(LoadFileEnum load) override;

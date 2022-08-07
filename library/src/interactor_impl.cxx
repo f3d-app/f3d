@@ -307,15 +307,18 @@ interactor_impl::interactor_impl(options& options, window_impl& window, loader_i
 interactor_impl::~interactor_impl() = default;
 
 //----------------------------------------------------------------------------
-void interactor_impl::setKeyPressCallBack(std::function<bool(int, std::string)> callBack)
+interactor& interactor_impl::setKeyPressCallBack(std::function<bool(int, std::string)> callBack)
 {
   this->Internals->KeyPressUserCallBack = callBack;
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack)
+interactor& interactor_impl::setDropFilesCallBack(
+  std::function<bool(std::vector<std::string>)> callBack)
 {
   this->Internals->DropFilesUserCallBack = callBack;
+  return *this;
 }
 
 //----------------------------------------------------------------------------

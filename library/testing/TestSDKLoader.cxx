@@ -42,10 +42,7 @@ int TestSDKLoader(int argc, char* argv[])
   std::vector<std::string> filesVec{ dragon, suzanne };
   std::vector<std::string> filesVecCheck{ cow, dragon, suzanne };
 
-  load.addFile(dummy);
-  load.addFile(cow);
-  load.addFiles(filesVec);
-
+  load.addFile(dummy).addFile(cow).addFiles(filesVec);
   load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
   if (filePath != cow)
   {
@@ -98,8 +95,7 @@ int TestSDKLoader(int argc, char* argv[])
   }
 
   // Check current index
-  load.setCurrentFileIndex(1);
-  load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
+  load.setCurrentFileIndex(1).loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
   load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
   if (filePath != dragon)
   {

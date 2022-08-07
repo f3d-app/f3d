@@ -12,8 +12,9 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
 {
   // create engine and load file
   f3d::engine eng(f3d::window::Type::EXTERNAL);
-  eng.getLoader().addFile(std::string(argv[1]) + "/data/cow.vtp");
-  eng.getLoader().loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
+  eng.getLoader()
+    .addFile(std::string(argv[1]) + "/data/cow.vtp")
+    .loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
   // setup glfw window
   if (!glfwInit())
