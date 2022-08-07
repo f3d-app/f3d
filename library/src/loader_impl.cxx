@@ -171,27 +171,28 @@ loader_impl::loader_impl(const options& options, window_impl& window)
 loader_impl::~loader_impl() = default;
 
 //----------------------------------------------------------------------------
-void loader_impl::addFiles(const std::vector<std::string>& files)
+loader& loader_impl::addFiles(const std::vector<std::string>& files)
 {
   for (auto& file : files)
   {
     this->addFile(file);
   }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void loader_impl::addFile(const std::string& path, bool recursive)
+loader& loader_impl::addFile(const std::string& path, bool recursive)
 {
   if (path.empty())
   {
-    return;
+    return *this;
   }
 
   std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
   if (!vtksys::SystemTools::FileExists(fullPath))
   {
     log::error("File ", fullPath, " does not exist");
-    return;
+    return *this;
   }
 
   if (vtksys::SystemTools::FileIsDirectory(fullPath))
@@ -231,6 +232,7 @@ void loader_impl::addFile(const std::string& path, bool recursive)
       this->Internals->FilesList.push_back(fullPath);
     }
   }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -287,9 +289,10 @@ const std::vector<std::string>& loader_impl::getFiles() const
 }
 
 //----------------------------------------------------------------------------
-void loader_impl::setCurrentFileIndex(int index)
+loader& loader_impl::setCurrentFileIndex(int index)
 {
   this->Internals->CurrentFileIndex = index;
+  return *this;
 }
 
 //----------------------------------------------------------------------------

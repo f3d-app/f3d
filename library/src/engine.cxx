@@ -53,15 +53,17 @@ engine::~engine()
 }
 
 //----------------------------------------------------------------------------
-void engine::setOptions(const options& opt)
+engine& engine::setOptions(const options& opt)
 {
   *this->Internals->Options = opt;
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void engine::setOptions(options&& opt)
+engine& engine::setOptions(options&& opt)
 {
   *this->Internals->Options = std::move(opt);
+  return *this;
 }
 
 //----------------------------------------------------------------------------

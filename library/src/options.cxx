@@ -193,21 +193,21 @@ options::options(const options& opt)
 }
 
 //----------------------------------------------------------------------------
-options& options::operator=(const options& opt)
+options& options::operator=(const options& opt) noexcept
 {
   this->Internals->Options = opt.Internals->Options;
   return *this;
 }
 
 //----------------------------------------------------------------------------
-options::options(options&& other)
+options::options(options&& other) noexcept
 {
   this->Internals = other.Internals;
   other.Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
-options& options::operator=(options&& other)
+options& options::operator=(options&& other) noexcept
 {
   if (this != &other)
   {

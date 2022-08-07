@@ -10,8 +10,7 @@ int TestSDKWindowNative(int argc, char* argv[])
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
   f3d::engine eng;
   f3d::window& win = eng.getWindow();
-  win.setWindowName("Test");
-  win.setSize(300, 300);
+  win.setWindowName("Test").setSize(300, 300);
 
   if (win.getType() != f3d::window::Type::NATIVE)
   {

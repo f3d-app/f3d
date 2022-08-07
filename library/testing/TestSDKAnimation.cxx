@@ -9,8 +9,8 @@ int TestSDKAnimation(int argc, char* argv[])
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
   f3d::loader& load = eng.getLoader();
   f3d::interactor& inter = eng.getInteractor();
-  load.addFile(std::string(argv[1]) + "/data/InterpolationTest.glb");
-  load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
+  load.addFile(std::string(argv[1]) + "/data/InterpolationTest.glb")
+    .loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
   inter.startAnimation();
   if (!inter.isPlayingAnimation())

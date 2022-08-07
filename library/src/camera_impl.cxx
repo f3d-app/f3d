@@ -41,11 +41,10 @@ camera::vector3_t camera_impl::getPosition()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::getPosition(vector3_t& pos)
+void camera_impl::getPosition(vector3_t& pos)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetPosition(pos.data());
-  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -67,11 +66,10 @@ camera::vector3_t camera_impl::getFocalPoint()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::getFocalPoint(vector3_t& foc)
+void camera_impl::getFocalPoint(vector3_t& foc)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetFocalPoint(foc.data());
-  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -93,11 +91,10 @@ camera::vector3_t camera_impl::getViewUp()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::getViewUp(vector3_t& up)
+void camera_impl::getViewUp(vector3_t& up)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetViewUp(up.data());
-  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -119,11 +116,10 @@ double camera_impl::getViewAngle()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::getViewAngle(double& angle)
+void camera_impl::getViewAngle(double& angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   angle = cam->GetViewAngle();
-  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -146,7 +142,7 @@ camera::matrix4_t camera_impl::getViewMatrix()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::getViewMatrix(matrix4_t& matrix)
+void camera_impl::getViewMatrix(matrix4_t& matrix)
 {
   vtkCamera* cam = this->GetVTKCamera();
   vtkMatrix4x4* mat = cam->GetModelViewTransformMatrix();
@@ -154,7 +150,6 @@ camera& camera_impl::getViewMatrix(matrix4_t& matrix)
   vtkMatrix4x4::Transpose(mat, tMat);
   double* data = tMat->GetData();
   std::move(data, data + 16, matrix.begin());
-  return *this;
 }
 
 //----------------------------------------------------------------------------
