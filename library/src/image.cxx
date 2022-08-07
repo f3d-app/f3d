@@ -93,20 +93,20 @@ image::image(const image& img) : Internals(new image::internals())
 }
 
 //----------------------------------------------------------------------------
-image& image::operator=(const image& img)
+image& image::operator=(const image& img) noexcept
 {
   *this->Internals = *img.Internals;
   return *this;
 }
 
 //----------------------------------------------------------------------------
-image::image(image&& img) : Internals(new image::internals())
+image::image(image&& img) noexcept : Internals(nullptr)
 {
   std::swap(this->Internals, img.Internals);
 }
 
 //----------------------------------------------------------------------------
-image& image::operator=(image&& img)
+image& image::operator=(image&& img) noexcept
 {
   std::swap(this->Internals, img.Internals);
   return *this;

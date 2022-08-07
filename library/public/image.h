@@ -42,9 +42,9 @@ public:
   image();
   ~image();
   image(const image& img);
-  image& operator=(const image& img);
-  image(image&& img);
-  image& operator=(image&& img);
+  image& operator=(const image& img) noexcept;
+  image(image&& img) noexcept;
+  image& operator=(image&& img) noexcept;
   //@}
 
   //@{
