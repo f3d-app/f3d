@@ -35,19 +35,19 @@ public:
   /**
    * Default destructor
    */
-  ~window_impl() noexcept override;
+  ~window_impl() override;
 
   //@{
   /**
    * Documented public API
    */
-  Type getType() noexcept override;
-  camera& getCamera() noexcept override;
-  bool render() noexcept override;
-  image renderToImage(bool noBackground = false) noexcept override;
-  window& setSize(int width, int heigth) noexcept override;
-  window& setIcon(const void* icon, size_t iconSize) noexcept override;
-  window& setWindowName(const std::string& windowName) noexcept override;
+  Type getType() override;
+  camera& getCamera() override;
+  bool render() override;
+  image renderToImage(bool noBackground = false) override;
+  window& setSize(int width, int heigth) override;
+  window& setIcon(const void* icon, size_t iconSize) override;
+  window& setWindowName(const std::string& windowName) override;
   //@}
 
   /**

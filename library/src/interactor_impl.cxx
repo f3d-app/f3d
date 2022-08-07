@@ -297,7 +297,7 @@ public:
 
 //----------------------------------------------------------------------------
 interactor_impl::interactor_impl(
-  options& options, window_impl& window, loader_impl& loader) noexcept
+  options& options, window_impl& window, loader_impl& loader)
   : Internals(std::make_unique<interactor_impl::internals>(options, window, loader))
 {
   // Loader need the interactor
@@ -305,11 +305,11 @@ interactor_impl::interactor_impl(
 }
 
 //----------------------------------------------------------------------------
-interactor_impl::~interactor_impl() noexcept = default;
+interactor_impl::~interactor_impl() = default;
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::setKeyPressCallBack(
-  std::function<bool(int, std::string)> callBack) noexcept
+  std::function<bool(int, std::string)> callBack)
 {
   this->Internals->KeyPressUserCallBack = callBack;
   return *this;
@@ -317,14 +317,14 @@ interactor& interactor_impl::setKeyPressCallBack(
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::setDropFilesCallBack(
-  std::function<bool(std::vector<std::string>)> callBack) noexcept
+  std::function<bool(std::vector<std::string>)> callBack)
 {
   this->Internals->DropFilesUserCallBack = callBack;
   return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::removeTimerCallBack(unsigned long id) noexcept
+void interactor_impl::removeTimerCallBack(unsigned long id)
 {
   this->Internals->VTKInteractor->RemoveObserver(id);
   this->Internals->VTKInteractor->DestroyTimer(this->Internals->TimerCallBacks[id].first);
@@ -332,7 +332,7 @@ void interactor_impl::removeTimerCallBack(unsigned long id) noexcept
 
 //----------------------------------------------------------------------------
 unsigned long interactor_impl::createTimerCallBack(
-  double time, std::function<void()> callBack) noexcept
+  double time, std::function<void()> callBack)
 {
   // Create the timer
   int timerId = this->Internals->VTKInteractor->CreateRepeatingTimer(time);
@@ -355,43 +355,43 @@ unsigned long interactor_impl::createTimerCallBack(
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::toggleAnimation() noexcept
+void interactor_impl::toggleAnimation()
 {
   this->Internals->AnimationManager.ToggleAnimation();
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::startAnimation() noexcept
+void interactor_impl::startAnimation()
 {
   this->Internals->AnimationManager.StartAnimation();
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::stopAnimation() noexcept
+void interactor_impl::stopAnimation()
 {
   this->Internals->AnimationManager.StopAnimation();
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::isPlayingAnimation() noexcept
+bool interactor_impl::isPlayingAnimation()
 {
   return this->Internals->AnimationManager.IsPlaying();
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::enableCameraMovement() noexcept
+void interactor_impl::enableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(false);
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::disableCameraMovement() noexcept
+void interactor_impl::disableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(true);
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::playInteraction(const std::string& file) noexcept
+bool interactor_impl::playInteraction(const std::string& file)
 {
   if (!vtksys::SystemTools::FileExists(file))
   {
@@ -427,7 +427,7 @@ bool interactor_impl::playInteraction(const std::string& file) noexcept
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::recordInteraction(const std::string& file) noexcept
+bool interactor_impl::recordInteraction(const std::string& file)
 {
   if (file.empty())
   {
@@ -456,14 +456,14 @@ bool interactor_impl::recordInteraction(const std::string& file) noexcept
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::start() noexcept
+void interactor_impl::start()
 {
   this->Internals->Window.UpdateDynamicOptions();
   this->Internals->StartInteractor();
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::stop() noexcept
+void interactor_impl::stop()
 {
   this->Internals->StopInteractor();
 }

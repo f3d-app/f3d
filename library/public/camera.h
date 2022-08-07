@@ -31,18 +31,18 @@ public:
   /**
    * Set/Get the camera parameters.
    */
-  virtual camera& setPosition(const vector3_t& pos) noexcept = 0;
-  virtual vector3_t getPosition() noexcept = 0;
-  virtual void getPosition(vector3_t& pos) noexcept = 0;
-  virtual camera& setFocalPoint(const vector3_t& foc) noexcept = 0;
-  virtual vector3_t getFocalPoint() noexcept = 0;
-  virtual void getFocalPoint(vector3_t& foc) noexcept = 0;
-  virtual camera& setViewUp(const vector3_t& up) noexcept = 0;
-  virtual vector3_t getViewUp() noexcept = 0;
-  virtual void getViewUp(vector3_t& up) noexcept = 0;
-  virtual camera& setViewAngle(const double& angle) noexcept = 0;
-  virtual double getViewAngle() noexcept = 0;
-  virtual void getViewAngle(double& angle) noexcept = 0;
+  virtual camera& setPosition(const vector3_t& pos) = 0;
+  virtual vector3_t getPosition() = 0;
+  virtual void getPosition(vector3_t& pos) = 0;
+  virtual camera& setFocalPoint(const vector3_t& foc) = 0;
+  virtual vector3_t getFocalPoint() = 0;
+  virtual void getFocalPoint(vector3_t& foc) = 0;
+  virtual camera& setViewUp(const vector3_t& up) = 0;
+  virtual vector3_t getViewUp() = 0;
+  virtual void getViewUp(vector3_t& up) = 0;
+  virtual camera& setViewAngle(const double& angle) = 0;
+  virtual double getViewAngle() = 0;
+  virtual void getViewAngle(double& angle) = 0;
   //@}
 
   //@{
@@ -50,41 +50,41 @@ public:
    * Set/Get the camera view matrix. Please note that when using the view matrix API, using the
    * other camera manipulation API may results in unexepected results due to normalization.
    */
-  virtual camera& setViewMatrix(const matrix4_t& matrix) noexcept = 0;
-  virtual matrix4_t getViewMatrix() noexcept = 0;
-  virtual void getViewMatrix(matrix4_t& matrix) noexcept = 0;
+  virtual camera& setViewMatrix(const matrix4_t& matrix) = 0;
+  virtual matrix4_t getViewMatrix() = 0;
+  virtual void getViewMatrix(matrix4_t& matrix) = 0;
   //@}
 
   //@{
   /**
    * Standard camera manipulation methods.
    */
-  virtual camera& dolly(double val) noexcept = 0;
-  virtual camera& roll(double angle) noexcept = 0;
-  virtual camera& azimuth(double angle) noexcept = 0;
-  virtual camera& yaw(double angle) noexcept = 0;
-  virtual camera& elevation(double angle) noexcept = 0;
-  virtual camera& pitch(double angle) noexcept = 0;
+  virtual camera& dolly(double val) = 0;
+  virtual camera& roll(double angle) = 0;
+  virtual camera& azimuth(double angle) = 0;
+  virtual camera& yaw(double angle) = 0;
+  virtual camera& elevation(double angle) = 0;
+  virtual camera& pitch(double angle) = 0;
   //@}
 
   /**
    * Store the current camera configuration as default.
    */
-  virtual camera& setCurrentAsDefault() noexcept = 0;
+  virtual camera& setCurrentAsDefault() = 0;
 
   /**
    * Reset the camera to the stored default camera configuration.
    */
-  virtual camera& resetToDefault() noexcept = 0;
+  virtual camera& resetToDefault() = 0;
 
   /**
    * Reset the camera using the bounds of actors in the scene.
    */
-  virtual camera& resetToBounds() noexcept = 0;
+  virtual camera& resetToBounds() = 0;
 
 protected:
-  camera() noexcept = default;
-  virtual ~camera() noexcept = default;
+  camera() = default;
+  virtual ~camera() = default;
   camera(const camera&) = delete;
   camera& operator=(const camera&) = delete;
 };

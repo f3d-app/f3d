@@ -27,7 +27,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-engine::engine(window::Type windowType) noexcept : Internals(new engine::internals)
+engine::engine(window::Type windowType) : Internals(new engine::internals)
 {
   this->Internals->Options = std::make_unique<options>();
 
@@ -46,27 +46,27 @@ engine::engine(window::Type windowType) noexcept : Internals(new engine::interna
 }
 
 //----------------------------------------------------------------------------
-engine::~engine() noexcept
+engine::~engine()
 {
   delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
-engine& engine::setOptions(const options& opt) noexcept
+engine& engine::setOptions(const options& opt)
 {
   *this->Internals->Options = opt;
   return *this;
 }
 
 //----------------------------------------------------------------------------
-engine& engine::setOptions(options&& opt) noexcept
+engine& engine::setOptions(options&& opt)
 {
   *this->Internals->Options = std::move(opt);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-options& engine::getOptions() noexcept
+options& engine::getOptions()
 {
   return *this->Internals->Options;
 }
@@ -82,7 +82,7 @@ window& engine::getWindow()
 }
 
 //----------------------------------------------------------------------------
-loader& engine::getLoader() noexcept
+loader& engine::getLoader()
 {
   return *this->Internals->Loader;
 }
@@ -98,7 +98,7 @@ interactor& engine::getInteractor()
 }
 
 //----------------------------------------------------------------------------
-std::map<std::string, std::string> engine::getLibInfo() noexcept
+std::map<std::string, std::string> engine::getLibInfo()
 {
   std::map<std::string, std::string> libInfo;
   libInfo["Version"] = detail::LibVersion;
@@ -167,7 +167,7 @@ std::map<std::string, std::string> engine::getLibInfo() noexcept
 }
 
 //----------------------------------------------------------------------------
-std::vector<engine::readerInformation> engine::getReadersInfo() noexcept
+std::vector<engine::readerInformation> engine::getReadersInfo()
 {
   std::vector<readerInformation> readersInfo;
   const auto& readers = F3DReaderFactory::GetInstance()->GetReaders();

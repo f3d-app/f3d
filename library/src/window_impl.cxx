@@ -70,13 +70,13 @@ window_impl::window_impl(const options& options, Type type)
 }
 
 //----------------------------------------------------------------------------
-window_impl::Type window_impl::getType() noexcept
+window_impl::Type window_impl::getType()
 {
   return this->Internals->WindowType;
 }
 
 //----------------------------------------------------------------------------
-camera& window_impl::getCamera() noexcept
+camera& window_impl::getCamera()
 {
   // Make sure the camera (and the whole rendering stack)
   // is initialized before providing one.
@@ -89,14 +89,14 @@ camera& window_impl::getCamera() noexcept
 }
 
 //----------------------------------------------------------------------------
-window& window_impl::setSize(int width, int height) noexcept
+window& window_impl::setSize(int width, int height)
 {
   this->Internals->RenWin->SetSize(width, height);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-window& window_impl::setIcon(const void* icon, size_t iconSize) noexcept
+window& window_impl::setIcon(const void* icon, size_t iconSize)
 {
   // SetIcon needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7004
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200616)
@@ -115,14 +115,14 @@ window& window_impl::setIcon(const void* icon, size_t iconSize) noexcept
 }
 
 //----------------------------------------------------------------------------
-window& window_impl::setWindowName(const std::string& windowName) noexcept
+window& window_impl::setWindowName(const std::string& windowName)
 {
   this->Internals->RenWin->SetWindowName(windowName.c_str());
   return *this;
 }
 
 //----------------------------------------------------------------------------
-window_impl::~window_impl() noexcept
+window_impl::~window_impl()
 {
   if (this->Internals->Renderer)
   {
@@ -261,7 +261,7 @@ vtkRenderWindow* window_impl::GetRenderWindow()
 }
 
 //----------------------------------------------------------------------------
-bool window_impl::render() noexcept
+bool window_impl::render()
 {
   this->UpdateDynamicOptions();
   this->Internals->RenWin->Render();
@@ -269,7 +269,7 @@ bool window_impl::render() noexcept
 }
 
 //----------------------------------------------------------------------------
-image window_impl::renderToImage(bool noBackground) noexcept
+image window_impl::renderToImage(bool noBackground)
 {
   this->UpdateDynamicOptions();
 

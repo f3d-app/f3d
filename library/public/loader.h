@@ -40,29 +40,29 @@ public:
    * Add a list of files or directories to be loaded.
    * Duplicate will not be added.
    */
-  virtual loader& addFiles(const std::vector<std::string>& files) noexcept = 0;
+  virtual loader& addFiles(const std::vector<std::string>& files) = 0;
 
   /**
    * Add a file or directory (all files in) to be loaded.
    * Set recursive to true to load folder recursively instead of only files.
    */
-  virtual loader& addFile(const std::string& path, bool recursive = false) noexcept = 0;
+  virtual loader& addFile(const std::string& path, bool recursive = false) = 0;
 
   /**
    * Get the vector of files to be loaded.
    */
-  virtual const std::vector<std::string>& getFiles() const noexcept = 0;
+  virtual const std::vector<std::string>& getFiles() const = 0;
 
   /**
    * Set the current file index, corresponding to the file that will be loaded
    * when calling loadFile(LOAD_CURRENT).
    */
-  virtual loader& setCurrentFileIndex(int index) noexcept = 0;
+  virtual loader& setCurrentFileIndex(int index) = 0;
 
   /**
    * Get the current file index.
    */
-  virtual int getCurrentFileIndex() const noexcept = 0;
+  virtual int getCurrentFileIndex() const = 0;
 
   /**
    * Load a file if any have been added.
@@ -70,7 +70,7 @@ public:
    * index. This will change the current file index accordingly. Returns true if a file is loaded
    * sucessfully, false otherwise.
    */
-  virtual bool loadFile(LoadFileEnum load) noexcept = 0;
+  virtual bool loadFile(LoadFileEnum load) = 0;
 
   /**
    * Get information about the next file to load according to the load param.
@@ -80,11 +80,11 @@ public:
    * including index in list.
    */
   virtual void getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
-    std::string& fileInfo) const noexcept = 0;
+    std::string& fileInfo) const = 0;
 
 protected:
-  loader() noexcept = default;
-  virtual ~loader() noexcept = default;
+  loader() = default;
+  virtual ~loader() = default;
   loader(const loader& opt) = delete;
   loader& operator=(const loader& opt) = delete;
 };

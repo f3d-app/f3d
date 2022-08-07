@@ -6,7 +6,7 @@ namespace f3d
 {
 
 //----------------------------------------------------------------------------
-void log::printInternal(log::VerboseLevel level, const std::string& str) noexcept
+void log::printInternal(log::VerboseLevel level, const std::string& str)
 {
   switch (level)
   {
@@ -29,37 +29,37 @@ void log::printInternal(log::VerboseLevel level, const std::string& str) noexcep
 }
 
 //----------------------------------------------------------------------------
-void log::debugInternal(const std::string& str) noexcept
+void log::debugInternal(const std::string& str)
 {
   F3DLog::Print(F3DLog::Severity::Debug, str);
 }
 
 //----------------------------------------------------------------------------
-void log::infoInternal(const std::string& str) noexcept
+void log::infoInternal(const std::string& str)
 {
   F3DLog::Print(F3DLog::Severity::Info, str);
 }
 
 //----------------------------------------------------------------------------
-void log::warnInternal(const std::string& str) noexcept
+void log::warnInternal(const std::string& str)
 {
   F3DLog::Print(F3DLog::Severity::Warning, str);
 }
 
 //----------------------------------------------------------------------------
-void log::errorInternal(const std::string& str) noexcept
+void log::errorInternal(const std::string& str)
 {
   F3DLog::Print(F3DLog::Severity::Error, str);
 }
 
 //----------------------------------------------------------------------------
-void log::setUseColoring(bool use) noexcept
+void log::setUseColoring(bool use)
 {
   F3DLog::SetUseColoring(use);
 }
 
 //----------------------------------------------------------------------------
-void log::setVerboseLevel(log::VerboseLevel level) noexcept
+void log::setVerboseLevel(log::VerboseLevel level)
 {
   F3DLog::SetQuiet(level == log::VerboseLevel::QUIET);
   switch (level)
@@ -83,7 +83,7 @@ void log::setVerboseLevel(log::VerboseLevel level) noexcept
 }
 
 //----------------------------------------------------------------------------
-void log::waitForUser() noexcept
+void log::waitForUser()
 {
   F3DLog::WaitForUser();
 }

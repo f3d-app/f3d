@@ -103,7 +103,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-options::options() noexcept : Internals(new options::internals)
+options::options() : Internals(new options::internals)
 {
   // Scene
   this->Internals->init("scene.animation.index", 0);
@@ -179,33 +179,33 @@ options::options() noexcept : Internals(new options::internals)
 };
 
 //----------------------------------------------------------------------------
-options::~options() noexcept
+options::~options()
 {
   delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
-options::options(const options& opt) noexcept : Internals(new options::internals)
+options::options(const options& opt) : Internals(new options::internals)
 {
   this->Internals->Options = opt.Internals->Options;
 }
 
 //----------------------------------------------------------------------------
-options& options::operator=(const options& opt) noexcept
+options& options::operator=(const options& opt)
 {
   this->Internals->Options = opt.Internals->Options;
   return *this;
 }
 
 //----------------------------------------------------------------------------
-options::options(options&& other) noexcept
+options::options(options&& other)
 {
   this->Internals = other.Internals;
   other.Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
-options& options::operator=(options&& other) noexcept
+options& options::operator=(options&& other)
 {
   if (this != &other)
   {
@@ -217,136 +217,136 @@ options& options::operator=(options&& other) noexcept
 }
 
 //----------------------------------------------------------------------------
-options& options::set(const std::string& name, bool value) noexcept
+options& options::set(const std::string& name, bool value)
 {
   this->Internals->set(name, value);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-options& options::set(const std::string& name, int value) noexcept
+options& options::set(const std::string& name, int value)
 {
   this->Internals->set(name, value);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-options& options::set(const std::string& name, double value) noexcept
+options& options::set(const std::string& name, double value)
 {
   this->Internals->set(name, value);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-options& options::set(const std::string& name, const std::string& value) noexcept
+options& options::set(const std::string& name, const std::string& value)
 {
   this->Internals->set(name, value);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-options& options::set(const std::string& name, const char* value) noexcept
+options& options::set(const std::string& name, const char* value)
 {
   this->Internals->set(name, std::string(value));
   return *this;
 }
 
 //----------------------------------------------------------------------------
-options& options::set(const std::string& name, const std::vector<int>& values) noexcept
+options& options::set(const std::string& name, const std::vector<int>& values)
 {
   this->Internals->set(name, values);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-options& options::set(const std::string& name, const std::vector<double>& values) noexcept
+options& options::set(const std::string& name, const std::vector<double>& values)
 {
   this->Internals->set(name, values);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-options& options::set(const std::string& name, std::initializer_list<int> values) noexcept
+options& options::set(const std::string& name, std::initializer_list<int> values)
 {
   this->Internals->set(name, std::vector<int>(values));
   return *this;
 }
 
 //----------------------------------------------------------------------------
-options& options::set(const std::string& name, std::initializer_list<double> values) noexcept
+options& options::set(const std::string& name, std::initializer_list<double> values)
 {
   this->Internals->set(name, std::vector<double>(values));
   return *this;
 }
 
 //----------------------------------------------------------------------------
-void options::get(const std::string& name, bool& value) const noexcept
+void options::get(const std::string& name, bool& value) const
 {
   this->Internals->get(name, value);
 }
 
 //----------------------------------------------------------------------------
-void options::get(const std::string& name, int& value) const noexcept
+void options::get(const std::string& name, int& value) const
 {
   this->Internals->get(name, value);
 }
 
 //----------------------------------------------------------------------------
-void options::get(const std::string& name, double& value) const noexcept
+void options::get(const std::string& name, double& value) const
 {
   this->Internals->get(name, value);
 }
 
 //----------------------------------------------------------------------------
-void options::get(const std::string& name, std::string& value) const noexcept
+void options::get(const std::string& name, std::string& value) const
 {
   this->Internals->get(name, value);
 }
 
 //----------------------------------------------------------------------------
-void options::get(const std::string& name, std::vector<int>& value) const noexcept
+void options::get(const std::string& name, std::vector<int>& value) const
 {
   this->Internals->get(name, value);
 }
 
 //----------------------------------------------------------------------------
-void options::get(const std::string& name, std::vector<double>& value) const noexcept
+void options::get(const std::string& name, std::vector<double>& value) const
 {
   this->Internals->get(name, value);
 }
 
 //----------------------------------------------------------------------------
-bool options::getAsBool(const std::string& name) const noexcept
+bool options::getAsBool(const std::string& name) const
 {
   return this->Internals->get<bool>(name);
 }
 
 //----------------------------------------------------------------------------
-int options::getAsInt(const std::string& name) const noexcept
+int options::getAsInt(const std::string& name) const
 {
   return this->Internals->get<int>(name);
 }
 
 //----------------------------------------------------------------------------
-double options::getAsDouble(const std::string& name) const noexcept
+double options::getAsDouble(const std::string& name) const
 {
   return this->Internals->get<double>(name);
 }
 
 //----------------------------------------------------------------------------
-std::string options::getAsString(const std::string& name) const noexcept
+std::string options::getAsString(const std::string& name) const
 {
   return this->Internals->get<std::string>(name);
 }
 
 //----------------------------------------------------------------------------
-std::vector<int> options::getAsIntVector(const std::string& name) const noexcept
+std::vector<int> options::getAsIntVector(const std::string& name) const
 {
   return this->Internals->get<std::vector<int> >(name);
 }
 
 //----------------------------------------------------------------------------
-std::vector<double> options::getAsDoubleVector(const std::string& name) const noexcept
+std::vector<double> options::getAsDoubleVector(const std::string& name) const
 {
   return this->Internals->get<std::vector<double> >(name);
 }
@@ -388,7 +388,7 @@ std::vector<double>& options::getAsDoubleVectorRef(const std::string& name)
 }
 
 //----------------------------------------------------------------------------
-options& options::toggle(const std::string& name) noexcept
+options& options::toggle(const std::string& name)
 {
   this->Internals->set<bool>(name, !this->Internals->get<bool>(name));
   return *this;

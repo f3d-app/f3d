@@ -24,12 +24,12 @@ public:
   /**
    * Default/Copy/move constructors/operators
    */
-  options() noexcept;
-  ~options() noexcept;
-  options(const options& opt) noexcept;
-  options& operator=(const options& opt) noexcept;
-  options(options&& other) noexcept;
-  options& operator=(options&& other) noexcept;
+  options();
+  ~options();
+  options(const options& opt);
+  options& operator=(const options& opt);
+  options(options&& other);
+  options& operator=(options&& other);
   //@}
 
   class exception : public std::runtime_error
@@ -45,39 +45,39 @@ public:
   /**
    * Setters for all supported types
    */
-  options& set(const std::string& name, bool value) noexcept;
-  options& set(const std::string& name, int value) noexcept;
-  options& set(const std::string& name, double value) noexcept;
-  options& set(const std::string& name, const std::string& value) noexcept;
-  options& set(const std::string& name, const char* value) noexcept;
-  options& set(const std::string& name, const std::vector<int>& values) noexcept;
-  options& set(const std::string& name, const std::vector<double>& values) noexcept;
-  options& set(const std::string& name, std::initializer_list<int> values) noexcept;
-  options& set(const std::string& name, std::initializer_list<double> values) noexcept;
+  options& set(const std::string& name, bool value);
+  options& set(const std::string& name, int value);
+  options& set(const std::string& name, double value);
+  options& set(const std::string& name, const std::string& value);
+  options& set(const std::string& name, const char* value);
+  options& set(const std::string& name, const std::vector<int>& values);
+  options& set(const std::string& name, const std::vector<double>& values);
+  options& set(const std::string& name, std::initializer_list<int> values);
+  options& set(const std::string& name, std::initializer_list<double> values);
   //@}
 
   //@{
   /**
    * Reference getters for all supported types
    */
-  void get(const std::string& name, bool& value) const noexcept;
-  void get(const std::string& name, int& value) const noexcept;
-  void get(const std::string& name, double& value) const noexcept;
-  void get(const std::string& name, std::string& value) const noexcept;
-  void get(const std::string& name, std::vector<int>& value) const noexcept;
-  void get(const std::string& name, std::vector<double>& value) const noexcept;
+  void get(const std::string& name, bool& value) const;
+  void get(const std::string& name, int& value) const;
+  void get(const std::string& name, double& value) const;
+  void get(const std::string& name, std::string& value) const;
+  void get(const std::string& name, std::vector<int>& value) const;
+  void get(const std::string& name, std::vector<double>& value) const;
   //@}
 
   //@{
   /**
    * Explicit getters for all supported types
    */
-  bool getAsBool(const std::string& name) const noexcept;
-  int getAsInt(const std::string& name) const noexcept;
-  double getAsDouble(const std::string& name) const noexcept;
-  std::string getAsString(const std::string& name) const noexcept;
-  std::vector<int> getAsIntVector(const std::string& name) const noexcept;
-  std::vector<double> getAsDoubleVector(const std::string& name) const noexcept;
+  bool getAsBool(const std::string& name) const;
+  int getAsInt(const std::string& name) const;
+  double getAsDouble(const std::string& name) const;
+  std::string getAsString(const std::string& name) const;
+  std::vector<int> getAsIntVector(const std::string& name) const;
+  std::vector<double> getAsDoubleVector(const std::string& name) const;
   //@}
 
   //@{
@@ -96,7 +96,7 @@ public:
   /**
    * A boolean option specific method to toggle it
    */
-  options& toggle(const std::string& name) noexcept;
+  options& toggle(const std::string& name);
 
 private:
   class internals;

@@ -162,16 +162,16 @@ public:
 };
 
 //----------------------------------------------------------------------------
-loader_impl::loader_impl(const options& options, window_impl& window) noexcept
+loader_impl::loader_impl(const options& options, window_impl& window)
   : Internals(std::make_unique<loader_impl::internals>(options, window))
 {
 }
 
 //----------------------------------------------------------------------------
-loader_impl::~loader_impl() noexcept = default;
+loader_impl::~loader_impl() = default;
 
 //----------------------------------------------------------------------------
-loader& loader_impl::addFiles(const std::vector<std::string>& files) noexcept
+loader& loader_impl::addFiles(const std::vector<std::string>& files)
 {
   for (auto& file : files)
   {
@@ -181,7 +181,7 @@ loader& loader_impl::addFiles(const std::vector<std::string>& files) noexcept
 }
 
 //----------------------------------------------------------------------------
-loader& loader_impl::addFile(const std::string& path, bool recursive) noexcept
+loader& loader_impl::addFile(const std::string& path, bool recursive)
 {
   if (path.empty())
   {
@@ -237,7 +237,7 @@ loader& loader_impl::addFile(const std::string& path, bool recursive) noexcept
 
 //----------------------------------------------------------------------------
 void loader_impl::getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
-  std::string& fileInfo) const noexcept
+  std::string& fileInfo) const
 {
   int size = static_cast<int>(this->Internals->FilesList.size());
   if (size > 0)
@@ -283,26 +283,26 @@ void loader_impl::getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string
 }
 
 //----------------------------------------------------------------------------
-const std::vector<std::string>& loader_impl::getFiles() const noexcept
+const std::vector<std::string>& loader_impl::getFiles() const
 {
   return this->Internals->FilesList;
 }
 
 //----------------------------------------------------------------------------
-loader& loader_impl::setCurrentFileIndex(int index) noexcept
+loader& loader_impl::setCurrentFileIndex(int index)
 {
   this->Internals->CurrentFileIndex = index;
   return *this;
 }
 
 //----------------------------------------------------------------------------
-int loader_impl::getCurrentFileIndex() const noexcept
+int loader_impl::getCurrentFileIndex() const
 {
   return this->Internals->CurrentFileIndex;
 }
 
 //----------------------------------------------------------------------------
-bool loader_impl::loadFile(loader::LoadFileEnum load) noexcept
+bool loader_impl::loadFile(loader::LoadFileEnum load)
 {
   // Reset loadedFile
   this->Internals->LoadedFile = false;
