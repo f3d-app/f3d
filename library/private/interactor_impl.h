@@ -35,8 +35,7 @@ public:
   ~interactor_impl();
 
   interactor& setKeyPressCallBack(std::function<bool(int, std::string)> callBack) override;
-  interactor& setDropFilesCallBack(
-    std::function<bool(std::vector<std::string>)> callBack) override;
+  interactor& setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack) override;
 
   unsigned long createTimerCallBack(double time, std::function<void()> callBack) override;
   void removeTimerCallBack(unsigned long id) override;

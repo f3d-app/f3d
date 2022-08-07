@@ -296,8 +296,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-interactor_impl::interactor_impl(
-  options& options, window_impl& window, loader_impl& loader)
+interactor_impl::interactor_impl(options& options, window_impl& window, loader_impl& loader)
   : Internals(std::make_unique<interactor_impl::internals>(options, window, loader))
 {
   // Loader need the interactor
@@ -308,8 +307,7 @@ interactor_impl::interactor_impl(
 interactor_impl::~interactor_impl() = default;
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::setKeyPressCallBack(
-  std::function<bool(int, std::string)> callBack)
+interactor& interactor_impl::setKeyPressCallBack(std::function<bool(int, std::string)> callBack)
 {
   this->Internals->KeyPressUserCallBack = callBack;
   return *this;
@@ -331,8 +329,7 @@ void interactor_impl::removeTimerCallBack(unsigned long id)
 }
 
 //----------------------------------------------------------------------------
-unsigned long interactor_impl::createTimerCallBack(
-  double time, std::function<void()> callBack)
+unsigned long interactor_impl::createTimerCallBack(double time, std::function<void()> callBack)
 {
   // Create the timer
   int timerId = this->Internals->VTKInteractor->CreateRepeatingTimer(time);

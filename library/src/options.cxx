@@ -103,7 +103,8 @@ public:
 };
 
 //----------------------------------------------------------------------------
-options::options() : Internals(new options::internals)
+options::options()
+  : Internals(new options::internals)
 {
   // Scene
   this->Internals->init("scene.animation.index", 0);
@@ -185,7 +186,8 @@ options::~options()
 }
 
 //----------------------------------------------------------------------------
-options::options(const options& opt) : Internals(new options::internals)
+options::options(const options& opt)
+  : Internals(new options::internals)
 {
   this->Internals->Options = opt.Internals->Options;
 }

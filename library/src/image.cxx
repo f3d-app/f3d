@@ -58,7 +58,10 @@ public:
 };
 
 //----------------------------------------------------------------------------
-image::image() : Internals(new image::internals()) {}
+image::image()
+  : Internals(new image::internals())
+{
+}
 
 //----------------------------------------------------------------------------
 image::image(const std::string& path)
@@ -87,7 +90,8 @@ image::~image()
 }
 
 //----------------------------------------------------------------------------
-image::image(const image& img) : Internals(new image::internals())
+image::image(const image& img)
+  : Internals(new image::internals())
 {
   *this->Internals = *img.Internals;
 }

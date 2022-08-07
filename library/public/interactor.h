@@ -32,8 +32,7 @@ public:
    * codes, eg: Left, Right, Up, Down, Space, Enter. Your callBack should return true if the key was
    * handled, false if you want standard interactor behavior instead.
    */
-  virtual interactor& setKeyPressCallBack(
-    std::function<bool(int, std::string)> callBack) = 0;
+  virtual interactor& setKeyPressCallBack(std::function<bool(int, std::string)> callBack) = 0;
 
   /**
    * Use this method to specify your own drop files callback, with the expected API:
@@ -51,8 +50,7 @@ public:
    * Use this method to create your own timer callback. You callback will be called once every time
    * ms. Return an id to use in removeTimeCallBack
    */
-  virtual unsigned long createTimerCallBack(
-    double time, std::function<void()> callBack) = 0;
+  virtual unsigned long createTimerCallBack(double time, std::function<void()> callBack) = 0;
 
   /**
    * Remove a previously created timer callback using the id
@@ -100,8 +98,7 @@ public:
   /**
    * Get a structure of strings describing default interactions
    */
-  static const std::vector<std::pair<std::string, std::string> >& getDefaultInteractionsInfo()
-   ;
+  static const std::vector<std::pair<std::string, std::string> >& getDefaultInteractionsInfo();
 
 protected:
   interactor() = default;

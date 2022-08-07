@@ -14,7 +14,10 @@ public:
 };
 
 //----------------------------------------------------------------------------
-camera_impl::camera_impl() : Internals(std::make_unique<camera_impl::internals>()) {}
+camera_impl::camera_impl()
+  : Internals(std::make_unique<camera_impl::internals>())
+{
+}
 
 //----------------------------------------------------------------------------
 camera_impl::~camera_impl() = default;

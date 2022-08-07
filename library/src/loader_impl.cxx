@@ -236,8 +236,8 @@ loader& loader_impl::addFile(const std::string& path, bool recursive)
 }
 
 //----------------------------------------------------------------------------
-void loader_impl::getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
-  std::string& fileInfo) const
+void loader_impl::getFileInfo(
+  LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const
 {
   int size = static_cast<int>(this->Internals->FilesList.size());
   if (size > 0)

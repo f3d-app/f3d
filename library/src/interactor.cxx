@@ -3,7 +3,7 @@
 namespace f3d
 {
 const std::vector<std::pair<std::string, std::string> >& interactor::getDefaultInteractionsInfo()
- 
+
 {
   // clang-format off
   static const std::vector<std::pair<std::string, std::string> > DefaultInteractionsInfo{
