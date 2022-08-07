@@ -51,7 +51,8 @@ public:
    * see window.h for details about the window.
    * When using window::Type::NONE, window and interactor will not be provided by the engine.
    * When using window::Type::EXTERNAL, interactor will not be provided by the engine.
-   * All objects instances will be created on construction
+   * All objects instances will be created on construction.
+   * Default is  window::Type::NATIVE.
    */
   explicit engine(window::Type windowType = window::Type::NATIVE);
 
