@@ -29,23 +29,23 @@ f3d::engine eng();
 // Add a file to the loader and load it
 eng.getLoader().addFile("path/to/file.ext").loadFile();
 
-// Modify the window and render it
-f3d::window& win = eng.getWindow();
+// Set the window size and render to an image
+f3d::image& img = eng.getWindow().setSize(300, 300).renderToImage();
 
-// Set the window size and render to a file
-eng.getWindow().setSize(300, 300).renderToImage().save("/path/to/img.png");
+// Save the image to a file
+img.save("/path/to/img.png");
 ```
 
 Changing some options can be done this way:
 
 ```cpp
+// Create a f3d::engine
 f3d::engine eng();
 
-// Recover the options
-f3d::options& options = eng.getOptions();
-
-// Set the option to the wanted value
-options.set("options.render.ssao", true);
+// Recover the options and set the wanted value
+eng.getOptions()
+  .set("render.effect.ssao", true)
+  .set("render.effect.fxaa", true);
 
 // Standard libf3d usage
 eng.getLoader().addFile("path/to/file.ext").loadFile();
@@ -201,15 +201,13 @@ Here is an example showing how to use libf3d python bindings:
 ```python
 import f3d
 
-engine = f3d.engine(f3d.engine.CREATE_WINDOW | f3d.engine.CREATE_INTERACTOR)
+eng = f3d.engine()
+eng
+ .getOptions().set("model.scivis.array-name", "Normals")
+ .getOptions().set("model.scivis.component", 0)
+ .getOptions().set("ui.bar", True)
+ .getOptions().set("scene.grid", True)
 
-engine.getOptions().set("scalars", "Normals")
-engine.getOptions().set("component", 0)
-engine.getOptions().set("bar", True)
-engine.getOptions().set("grid", True)
-
-engine.getLoader().addFile("f3d/testing/data/dragon.vtu")
-engine.getLoader().loadFile(f3d.loader.LoadFileEnum.LOAD_CURRENT)
-
-engine.getInteractor().start()
+eng.getLoader().addFile("f3d/testing/data/dragon.vtu").loadFile()
+eng.getInteractor().start()
 ```
