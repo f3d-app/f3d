@@ -13,14 +13,30 @@ Rendering a file and starting the interaction is very easy:
 // Create a f3d::engine
 f3d::engine eng();
 
-/ Add a file to the loader and load it
+// Add a file to the loader and load it
 eng.getLoader().addFile("path/to/file.ext").loadFile();
 
-// Render the file in the window
-eng.getWindow().render();
-
-// Start interacting
+// Start rendering and interacting
 eng.getInteractor().start();
+```
+
+Manipulating the window directly can be done this way:
+
+```
+// Create a f3d::engine
+f3d::engine eng();
+
+// Add a file to the loader and load it
+eng.getLoader().addFile("path/to/file.ext").loadFile();
+
+// Modify the window and render it
+f3d::window& win = eng.getWindow();
+
+// Set the window size
+win.SetSize(300, 300);
+
+// Render to a file
+win.renderToImage().save("/path/to/img.png");
 ```
 
 Changing some options can be done this way:
@@ -46,7 +62,7 @@ For more advanced usage, please take a look at the testing directory.
 
 The engine class is the main class that needs to be instantiated. All other classes instance are provided by the engine using getters, `getLoader`, `getWindow`, `getInteractor`, `getOptions`.
 
-The engine constructor let you choose the type of window in its constructor, `NONE`, `NATIVE`, `NATIVE_OFFSCREEN`, `EXTERNAL`. Default is `NATIVE`. See ##Window class## documentation for more info. Please note that the engine will not provide a interactor with `NONE` and `EXTERNAL`.
+The engine constructor lets you choose the type of window in its constructor, `NONE`, `NATIVE`, `NATIVE_OFFSCREEN`, `EXTERNAL`. Default is `NATIVE`. See ##Window class## documentation for more info. Please note that the engine will not provide a interactor with `NONE` and `EXTERNAL`.
 
 # Loader class
 
@@ -68,7 +84,7 @@ Use native graphical capabilities for rendering, but unto an offscreen window, w
 * EXTERNAL
 A window where the OpenGL context is not created but assumed to have been created externally. To be used with other frameworks like Qt or GLFW.
 
-Window let you `render`, `renderToImage` and control other parameters of the window, like icon or windowName.
+Window lets you `render`, `renderToImage` and control other parameters of the window, like icon or windowName.
 
 # Interactor class
 
@@ -81,13 +97,13 @@ It also lets you define you own callbacks when needed.
 
 # Camera class
 
-Provided by the window, this class let you control the camera. There are essentially three API.
+Provided by the window, this class lets you control the camera. There are essentially three API.
  1. A Position/FocalPoint/ViewUp API to put the camera where you want it.
  2. A camera movement API to move the camera around
  3. A ViewMatrix API to work with matrices directly.
 
 Please note that the API 1. and 2. can be used together and always orthogonalize the view up after each call.
-API 3. is not intended to be used with other API as it can result to unexpected cameras.
+API 3. is intended for advanced users using 4x4 matrices and is not intended to be used with other API as it can result to unexpected cameras.
 
 # Image class
 
