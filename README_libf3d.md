@@ -9,7 +9,7 @@ libf3d API is simple and easy to learn. Python bindings are provided through pyb
 
 Rendering a file and starting the interaction is very easy:
 
-```
+```cpp
 // Create a f3d::engine
 f3d::engine eng();
 
@@ -22,7 +22,7 @@ eng.getInteractor().start();
 
 Manipulating the window directly can be done this way:
 
-```
+```cpp
 // Create a f3d::engine
 f3d::engine eng();
 
@@ -41,7 +41,7 @@ win.renderToImage().save("/path/to/img.png");
 
 Changing some options can be done this way:
 
-```
+```cpp
 f3d::engine eng();
 
 // Recover the options
