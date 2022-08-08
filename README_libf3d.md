@@ -32,11 +32,8 @@ eng.getLoader().addFile("path/to/file.ext").loadFile();
 // Modify the window and render it
 f3d::window& win = eng.getWindow();
 
-// Set the window size
-win.SetSize(300, 300);
-
-// Render to a file
-win.renderToImage().save("/path/to/img.png");
+// Set the window size and render to a file
+eng.getWindow().setSize(300, 300).renderToImage().save("/path/to/img.png");
 ```
 
 Changing some options can be done this way:
