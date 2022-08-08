@@ -211,3 +211,14 @@ eng
 eng.getLoader().addFile("f3d/testing/data/dragon.vtu").loadFile()
 eng.getInteractor().start()
 ```
+
+# Building against the libf3d
+
+Please follow instruction about building F3D in the main readme, then use CMake to find the libf3d
+and link agoinst it like this:
+
+```cmake
+find_package(f3d REQUIRED)
+[...]
+target_link_libraries(target f3d::libf3d)
+```
