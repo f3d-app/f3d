@@ -51,7 +51,8 @@ public:
    * see window.h for details about the window.
    * When using window::Type::NONE, window and interactor will not be provided by the engine.
    * When using window::Type::EXTERNAL, interactor will not be provided by the engine.
-   * All objects instances will be created on construction
+   * All objects instances will be created on construction.
+   * Default is window::Type::NATIVE.
    */
   explicit engine(window::Type windowType = window::Type::NATIVE);
 
@@ -98,7 +99,22 @@ public:
 
   /**
    * Get a map containing info about the libf3d
-   * TODO improve this doc to list the keys
+   * Available keys here:
+   * - "Version"
+   * - "Build date"
+   * - "Build system"
+   * - "Compiler"
+   * - "Raytracing module"
+   * - "External rendering module"
+   * - "Exodus module"
+   * - "OpenCASCADE module"
+   * - "Assimp module"
+   * - "Alembic module"
+   * - "VTK version"
+   * - "Copyright_previous"
+   * - "Copyright"
+   * - "License"
+   * - "Authors"
    */
   static std::map<std::string, std::string> getLibInfo();
 

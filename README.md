@@ -174,14 +174,14 @@ Options|Default|Description
 -o, \-\-point-sprites||Show sphere *points sprites* instead of the geometry.
 \-\-point-size|10.0|Set the *size* of points when showing vertices and point sprites.
 \-\-line-width|1.0|Set the *width* of lines when showing edges.
-\-\-color=&lt;R,G,B&gt;|1.0, 1.0, 1.0| Set a *color* on the geometry.<br>This only makes sense when using the default scene.
-\-\-opacity=&lt;opacity&gt;|1.0|Set *opacity* on the geometry.<br>This only makes sense when using the default scene. Usually used with Depth Peeling option.
-\-\-roughness=&lt;roughness&gt;|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
-\-\-metallic=&lt;metallic&gt;|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
+\-\-color=&lt;R,G,B&gt;|1.0, 1.0, 1.0| Set a *color* on the geometry. Multiplied with the base color texture when present. <br>This only makes sense when using the default scene.
+\-\-opacity=&lt;opacity&gt;|1.0|Set *opacity* on the geometry. Multiplied with the base color texture when present. <br>This only makes sense when using the default scene. Usually used with Depth Peeling option.
+\-\-roughness=&lt;roughness&gt;|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>This only makes sense when using the default scene.
+\-\-metallic=&lt;metallic&gt;|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>This only makes sense when using the default scene.
 \-\-hrdi=&lt;file path&gt;||Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, png, jpg, pnm, tiff, bmp.
-\-\-texture-base-color=&lt;file path&gt;||Path to a texture file that sets the color of the object.
-\-\-texture-material=&lt;file path&gt;||Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object.
-\-\-texture-emissive=&lt;file path&gt;||Path to a texture file that sets the emitted light of the object.
+\-\-texture-base-color=&lt;file path&gt;||Path to a texture file that sets the color of the object. Please note this will be multiplied with the color and opacity options.
+\-\-texture-material=&lt;file path&gt;||Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use `--roughness=1 --metallic=1`.
+\-\-texture-emissive=&lt;file path&gt;||Path to a texture file that sets the emitted light of the object. Please note this will be multiplied with the emissive factor.
 \-\-emissive-factor=&lt;R,G,B&gt;|1.0, 1.0, 1.0| Emissive factor. This value is multiplied with the emissive color when an emissive texture is present.
 \-\-texture-normal=&lt;file path&gt;||Path to a texture file that sets the normal map of the object.
 \-\-normal-scale=&lt;normal_scale&gt;|1.0|Normal scale affects the strength of the normal deviation from the normal texture.
@@ -390,27 +390,10 @@ They are considered in the below order and only the first found will be used.
 If you are using the releases, a default configuration file is provided when installing F3D.
 On Linux, it will be installed in `/etc/f3d/`, on Windows, it will be installed in the install directory, on macOS, it will be installed in the bundle.
 
-# Python Bindings
+# libf3d
 
-If the python bindings are generated, F3D can be used directly from python.
-Make sure to set `PYTHONPATH` to path where the python module is built.
-Here is an example showing how to use F3D python bindings:
-
-```python
-import f3d
-
-engine = f3d.engine(f3d.engine.CREATE_WINDOW | f3d.engine.CREATE_INTERACTOR)
-
-engine.getOptions().set("scalars", "Normals")
-engine.getOptions().set("component", 0)
-engine.getOptions().set("bar", True)
-engine.getOptions().set("grid", True)
-
-engine.getLoader().addFile("f3d/testing/data/dragon.vtu")
-engine.getLoader().loadFile(f3d.loader.LoadFileEnum.LOAD_CURRENT)
-
-engine.getInteractor().start()
-```
+F3D contains not only the F3D executable but also the libf3d, a library to render 3D meshes, which can be used in C++ or Python.
+The libf3d is documented [here.](README_libf3d.md)
 
 # Desktop Integration
 

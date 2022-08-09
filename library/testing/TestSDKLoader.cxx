@@ -24,7 +24,7 @@ int TestSDKLoader(int argc, char* argv[])
     std::cerr << "Unexpected idx with empty filelist: " << idx << std::endl;
     return EXIT_FAILURE;
   }
-  if (load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT))
+  if (load.loadFile())
   {
     std::cerr << "Unexpected loaded file with empty filelist" << std::endl;
     return EXIT_FAILURE;
@@ -49,7 +49,7 @@ int TestSDKLoader(int argc, char* argv[])
     std::cerr << "Unexpected file loaded on LOAD_CURRENT: " << filePath << std::endl;
     return EXIT_FAILURE;
   }
-  if (!load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT))
+  if (!load.loadFile())
   {
     std::cerr << "Failed to load a file on LOAD_CURRENT: " << filePath << std::endl;
     return EXIT_FAILURE;
@@ -95,7 +95,7 @@ int TestSDKLoader(int argc, char* argv[])
   }
 
   // Check current index
-  load.setCurrentFileIndex(1).loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
+  load.setCurrentFileIndex(1).loadFile();
   load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
   if (filePath != dragon)
   {
