@@ -3,7 +3,7 @@
  * @brief   Class used to control the different options
  *
  * A class to control the different options of f3d.
- * See the TODO for the full listing of options
+ * See the README_libf3d.md for the full listing of options
  */
 
 #ifndef f3d_options_h
