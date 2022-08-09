@@ -30,7 +30,7 @@ f3d::engine eng();
 eng.getLoader().addFile("path/to/file.ext").loadFile();
 
 // Set the window size and render to an image
-f3d::image& img = eng.getWindow().setSize(300, 300).renderToImage();
+f3d::image img = eng.getWindow().setSize(300, 300).renderToImage();
 
 // Save the image to a file
 img.save("/path/to/img.png");
@@ -202,11 +202,11 @@ Here is an example showing how to use libf3d python bindings:
 import f3d
 
 eng = f3d.engine()
-eng
- .getOptions().set("model.scivis.array-name", "Normals")
- .getOptions().set("model.scivis.component", 0)
- .getOptions().set("ui.bar", True)
- .getOptions().set("scene.grid", True)
+eng.getOptions()
+  .set("model.scivis.array-name", "Normals")
+  .set("model.scivis.component", 0)
+  .set("ui.bar", True)
+  .set("scene.grid", True)
 
 eng.getLoader().addFile("f3d/testing/data/dragon.vtu").loadFile()
 eng.getInteractor().start()
