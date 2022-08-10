@@ -1,4 +1,4 @@
-# libf3d API Public Review
+# *libf3d API Public Review*
 
 Hello and welcome to the public review of the libf3d
 
@@ -24,7 +24,7 @@ using it. But let's focus on the review for now
 
 > Ok, where do I start ?
 
-Take a look at the diff in this pull request.
+Take a look at the *Files Changed* tab in this pull request.
 
 For starters, you can review README_libf3d.md, it will give you some examples about how to use the libf3d,
 the different classes and options.
