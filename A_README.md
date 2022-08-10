@@ -9,7 +9,7 @@ The libf3d is a simple BSD licensed C++ library to render meshes, currently in d
 > Ok, but what is a public review ?
 
 The idea of a public review is to let anyone interested give us their remarks and ideas about the
-API of the libf3d. 
+API of the libf3d.
 
 While we have some understanding on how the libf3d could be used, there is many usecases
 that we may have missed. If you have such usecase in mind, now is the time to share.
@@ -19,18 +19,18 @@ We tried to do it right, but maybe you have some insight, which would be very we
 
 > Sounds good, can I try the libf3d already ?
 
-Yes, you can ! take a look here, the F3D project contains the libf3d as well as F3D, a executable
-using it. But let's focus on the review for now
+Yes, you can ! take a look here: https://github.com/f3d-app/f3d, the F3D project contains the libf3d as well as F3D,
+a executable using it. But let's focus on the review for now
 
 > Ok, where do I start ?
 
 Take a look at the *Files Changed* tab in this pull request.
 
 For starters, you can review README_libf3d.md, it will give you some examples about how to use the libf3d,
-the different classes and options.
+the different classes and options. Click on ... -> ViewFile for easier reading.
 
 Then you may want to reader README_F3D.md. While not everything there is related to the libf3d, it will give you some hindsight
-about how you could use the libf3d and what we do with it for now.
+about how you could use the libf3d and what we do with it for now. Click on ... -> ViewFile for easier reading.
 
 Finally, you can take a look in the library/public directory where each public class headers can be found.
 The in-header doc is quite extensive, although it may not be enough. Do not hesitate to ask questions, we will clarify and improve the doc in the process.
