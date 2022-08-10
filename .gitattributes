@@ -1,8 +1,0 @@
-testing/data/**/* filter=lfs diff=lfs merge=lfs -text
-testing/baselines/**/* filter=lfs diff=lfs merge=lfs -text
-testing/data/DATA_LICENSES.md !filter !diff !merge text
-documentation/content/icon/**/* filter=lfs diff=lfs merge=lfs -text
-documentation/content/gallery/*.jpg filter=lfs diff=lfs merge=lfs -text
-documentation/content/gallery/*.png filter=lfs diff=lfs merge=lfs -text
-documentation/content/gallery/*.gif filter=lfs diff=lfs merge=lfs -text
-documentation/content/gallery/*.webm filter=lfs diff=lfs merge=lfs -text

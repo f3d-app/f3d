@@ -1,8 +1,0 @@
-# StreamVersion 1.1
-ExposeEvent 0 299 0 0 0 0
-RenderEvent 0 299 0 0 0 0
-KeyPressEvent 1266 134 0 32 1 space
-CharEvent 1266 134 0 32 1 space
-TimerEvent 1266 134 0 32 1 space
-TimerEvent 1266 134 0 32 1 space
-KeyReleaseEvent 1266 134 0 32 1 space

@@ -1,9 +1,0 @@
-# StreamVersion 1.1
-ExposeEvent 0 599 0 0 0 0
-RenderEvent 0 599 0 0 0 0
-KeyPressEvent 535 802 0 0 1 Shift_L
-CharEvent 535 802 0 0 1 Shift_L
-KeyPressEvent 535 802 1 63 1 question
-CharEvent 535 802 1 63 1 question
-KeyReleaseEvent 535 802 1 63 1 question
-KeyReleaseEvent 535 802 1 0 1 Shift_L

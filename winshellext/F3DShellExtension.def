@@ -1,8 +1,0 @@
-LIBRARY "F3DShellExtension"
-
-EXPORTS
-    DllGetClassObject       PRIVATE
-    DllCanUnloadNow         PRIVATE
-    DllRegisterServer       PRIVATE
-    DllUnregisterServer     PRIVATE
-    DllNotifyShell          PRIVATE
