@@ -167,7 +167,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m)
   f3d_test(NAME TestEdges DATA suzanne.ply ARGS -e)
   f3d_test(NAME TestLineWidth DATA cow.vtk ARGS -e --line-width=5)
-  f3d_test(NAME TestLineWidthFullScene DATA WaterBottle.glb ARGS -e --line-width=5)
+  f3d_test(NAME TestLineWidthFullScene DATA suzanne.obj ARGS -e --line-width=3 --up=-Y)
   f3d_test(NAME TestPointCloudFullScene DATA pointsCloud.gltf ARGS --point-size=20)
 
   # Test Verbose animation, no baseline needed
