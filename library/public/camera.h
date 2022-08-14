@@ -38,6 +38,7 @@ public:
   struct matrix4_t : std::array<double, 16>
   {
   };
+  typedef double angle_deg_t;
   //@}
 
   //@{
@@ -54,9 +55,9 @@ public:
   virtual camera& setViewUp(const vector3_t& up) = 0;
   virtual vector3_t getViewUp() = 0;
   virtual void getViewUp(vector3_t& up) = 0;
-  virtual camera& setViewAngle(const double& angle) = 0;
-  virtual double getViewAngle() = 0;
-  virtual void getViewAngle(double& angle) = 0;
+  virtual camera& setViewAngle(const angle_deg_t& angle) = 0;
+  virtual angle_deg_t getViewAngle() = 0;
+  virtual void getViewAngle(angle_deg_t& angle) = 0;
   //@}
 
   //@{
@@ -75,11 +76,11 @@ public:
    * Angles are in degrees.
    */
   virtual camera& dolly(double val) = 0;
-  virtual camera& roll(double angle) = 0;
-  virtual camera& azimuth(double angle) = 0;
-  virtual camera& yaw(double angle) = 0;
-  virtual camera& elevation(double angle) = 0;
-  virtual camera& pitch(double angle) = 0;
+  virtual camera& roll(angle_deg_t angle) = 0;
+  virtual camera& azimuth(angle_deg_t angle) = 0;
+  virtual camera& yaw(angle_deg_t angle) = 0;
+  virtual camera& elevation(angle_deg_t angle) = 0;
+  virtual camera& pitch(angle_deg_t angle) = 0;
   //@}
 
   /**

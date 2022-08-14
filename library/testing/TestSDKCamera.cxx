@@ -73,8 +73,8 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test view angle
-  double testAngle = 20;
-  double angle = cam.setViewAngle(testAngle).getViewAngle();
+  f3d::camera::angle_deg_t testAngle = 20;
+  f3d::camera::angle_deg_t angle = cam.setViewAngle(testAngle).getViewAngle();
   if (angle != testAngle)
   {
     std::cerr << "set/get view angle is not behaving as expected: " << angle << std::endl;

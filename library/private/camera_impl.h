@@ -44,19 +44,19 @@ public:
   camera& setViewUp(const vector3_t& up) override;
   vector3_t getViewUp() override;
   void getViewUp(vector3_t& up) override;
-  camera& setViewAngle(const double& angle) override;
-  double getViewAngle() override;
-  void getViewAngle(double& angle) override;
+  camera& setViewAngle(const angle_deg_t& angle) override;
+  angle_deg_t getViewAngle() override;
+  void getViewAngle(angle_deg_t& angle) override;
   camera& setViewMatrix(const matrix4_t& matrix) override;
   matrix4_t getViewMatrix() override;
   void getViewMatrix(matrix4_t& matrix) override;
 
   camera& dolly(double val) override;
-  camera& roll(double angle) override;
-  camera& azimuth(double angle) override;
-  camera& yaw(double angle) override;
-  camera& elevation(double angle) override;
-  camera& pitch(double angle) override;
+  camera& roll(angle_deg_t angle) override;
+  camera& azimuth(angle_deg_t angle) override;
+  camera& yaw(angle_deg_t angle) override;
+  camera& elevation(angle_deg_t angle) override;
+  camera& pitch(angle_deg_t angle) override;
 
   camera& setCurrentAsDefault() override;
   camera& resetToDefault() override;
