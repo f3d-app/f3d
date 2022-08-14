@@ -35,12 +35,12 @@ public:
   /**
    * Documented public API
    */
-  camera& setPosition(const vector3_t& pos) override;
-  vector3_t getPosition() override;
-  void getPosition(vector3_t& pos) override;
-  camera& setFocalPoint(const vector3_t& foc) override;
-  vector3_t getFocalPoint() override;
-  void getFocalPoint(vector3_t& foc) override;
+  camera& setPosition(const point3_t& pos) override;
+  point3_t getPosition() override;
+  void getPosition(point3_t& pos) override;
+  camera& setFocalPoint(const point3_t& foc) override;
+  point3_t getFocalPoint() override;
+  void getFocalPoint(point3_t& foc) override;
   camera& setViewUp(const vector3_t& up) override;
   vector3_t getViewUp() override;
   void getViewUp(vector3_t& up) override;

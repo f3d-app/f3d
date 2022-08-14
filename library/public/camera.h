@@ -25,20 +25,32 @@ namespace f3d
 class F3D_EXPORT camera
 {
 public:
-  typedef std::array<double, 3> vector3_t;
-  typedef std::array<double, 16> matrix4_t;
+  //@{
+  /**
+   * Camera specific types.
+   */
+  struct point3_t : std::array<double, 3>
+  {
+  };
+  struct vector3_t : std::array<double, 3>
+  {
+  };
+  struct matrix4_t : std::array<double, 16>
+  {
+  };
+  //@}
 
   //@{
   /**
    * Set/Get the camera parameters.
    * Angles are in degrees.
    */
-  virtual camera& setPosition(const vector3_t& pos) = 0;
-  virtual vector3_t getPosition() = 0;
-  virtual void getPosition(vector3_t& pos) = 0;
-  virtual camera& setFocalPoint(const vector3_t& foc) = 0;
-  virtual vector3_t getFocalPoint() = 0;
-  virtual void getFocalPoint(vector3_t& foc) = 0;
+  virtual camera& setPosition(const point3_t& pos) = 0;
+  virtual point3_t getPosition() = 0;
+  virtual void getPosition(point3_t& pos) = 0;
+  virtual camera& setFocalPoint(const point3_t& foc) = 0;
+  virtual point3_t getFocalPoint() = 0;
+  virtual void getFocalPoint(point3_t& foc) = 0;
   virtual camera& setViewUp(const vector3_t& up) = 0;
   virtual vector3_t getViewUp() = 0;
   virtual void getViewUp(vector3_t& up) = 0;

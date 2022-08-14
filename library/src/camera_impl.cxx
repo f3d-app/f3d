@@ -23,7 +23,7 @@ camera_impl::camera_impl()
 camera_impl::~camera_impl() = default;
 
 //----------------------------------------------------------------------------
-camera& camera_impl::setPosition(const vector3_t& pos)
+camera& camera_impl::setPosition(const point3_t& pos)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetPosition(pos.data());
@@ -33,22 +33,22 @@ camera& camera_impl::setPosition(const vector3_t& pos)
 }
 
 //----------------------------------------------------------------------------
-camera::vector3_t camera_impl::getPosition()
+camera::point3_t camera_impl::getPosition()
 {
-  vector3_t pos;
+  point3_t pos;
   this->getPosition(pos);
   return pos;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getPosition(vector3_t& pos)
+void camera_impl::getPosition(point3_t& pos)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetPosition(pos.data());
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::setFocalPoint(const vector3_t& foc)
+camera& camera_impl::setFocalPoint(const point3_t& foc)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetFocalPoint(foc.data());
@@ -58,15 +58,15 @@ camera& camera_impl::setFocalPoint(const vector3_t& foc)
 }
 
 //----------------------------------------------------------------------------
-camera::vector3_t camera_impl::getFocalPoint()
+camera::point3_t camera_impl::getFocalPoint()
 {
-  vector3_t foc;
+  point3_t foc;
   this->getFocalPoint(foc);
   return foc;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getFocalPoint(vector3_t& foc)
+void camera_impl::getFocalPoint(point3_t& foc)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetFocalPoint(foc.data());
