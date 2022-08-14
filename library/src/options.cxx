@@ -398,10 +398,14 @@ options& options::toggle(const std::string& name)
 
 //----------------------------------------------------------------------------
 options::incompatible_exception::incompatible_exception(const std::string& what)
-: exception(what){}
+  : exception(what)
+{
+}
 
 //----------------------------------------------------------------------------
 options::inexistent_exception::inexistent_exception(const std::string& what)
-: exception(what){}
+  : exception(what)
+{
+}
 
 }

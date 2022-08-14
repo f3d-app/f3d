@@ -228,14 +228,20 @@ void image::save(const std::string& path) const
 
 //----------------------------------------------------------------------------
 image::write_exception::write_exception(const std::string& what)
-: exception(what){}
+  : exception(what)
+{
+}
 
 //----------------------------------------------------------------------------
 image::read_exception::read_exception(const std::string& what)
-: exception(what){}
+  : exception(what)
+{
+}
 
 //----------------------------------------------------------------------------
 image::buffer_exception::buffer_exception(const std::string& what)
-: exception(what){}
+  : exception(what)
+{
+}
 
 }

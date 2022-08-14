@@ -37,7 +37,6 @@ class interactor;
 class F3D_EXPORT engine
 {
 public:
-
   /**
    * Engine constructor, choose the window type using the enum.
    * see window.h for details about the window.
@@ -45,7 +44,8 @@ public:
    * When using window::Type::EXTERNAL, interactor will not be provided by the engine.
    * All objects instances will be created on construction.
    * Default is window::Type::NATIVE.
-   * Throw a no_window_exception when using a Using window::Type::EXTERNAL without the right cmake option.
+   * Throw a no_window_exception when using a Using window::Type::EXTERNAL without the right cmake
+   * option.
    */
   explicit engine(window::Type windowType = window::Type::NATIVE);
 
@@ -128,10 +128,15 @@ public:
   /**
    * Engine specific exceptions
    */
-  struct no_window_exception : public exception { no_window_exception(const std::string& what = ""); };
-  struct no_interactor_exception : public exception { no_interactor_exception(const std::string& what = ""); };
+  struct no_window_exception : public exception
+  {
+    no_window_exception(const std::string& what = "");
+  };
+  struct no_interactor_exception : public exception
+  {
+    no_interactor_exception(const std::string& what = "");
+  };
   //@}
-
 
 private:
   class internals;

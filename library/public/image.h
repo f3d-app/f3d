@@ -99,9 +99,18 @@ public:
   /**
    * Image specific exceptions
    */
-  struct write_exception : public exception { write_exception(const std::string& what = ""); };
-  struct read_exception : public exception { read_exception(const std::string& what = ""); };
-  struct buffer_exception : public exception { buffer_exception(const std::string& what = ""); };
+  struct write_exception : public exception
+  {
+    write_exception(const std::string& what = "");
+  };
+  struct read_exception : public exception
+  {
+    read_exception(const std::string& what = "");
+  };
+  struct buffer_exception : public exception
+  {
+    buffer_exception(const std::string& what = "");
+  };
   //@}
 
 private:

@@ -186,10 +186,14 @@ std::vector<engine::readerInformation> engine::getReadersInfo()
 
 //----------------------------------------------------------------------------
 engine::no_window_exception::no_window_exception(const std::string& what)
-: exception(what){}
+  : exception(what)
+{
+}
 
 //----------------------------------------------------------------------------
 engine::no_interactor_exception::no_interactor_exception(const std::string& what)
-: exception(what){}
+  : exception(what)
+{
+}
 
 }

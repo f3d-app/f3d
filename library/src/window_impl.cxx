@@ -57,7 +57,8 @@ window_impl::window_impl(const options& options, Type type)
 #if F3D_MODULE_EXTERNAL_RENDERING
     this->Internals->RenWin = vtkSmartPointer<vtkExternalOpenGLRenderWindow>::New();
 #else
-    throw engine::no_window_exception("Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
+    throw engine::no_window_exception(
+      "Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
 #endif
   }
   else
