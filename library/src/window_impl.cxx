@@ -96,7 +96,7 @@ window& window_impl::setSize(int width, int height)
 }
 
 //----------------------------------------------------------------------------
-window& window_impl::setIcon(const void* icon, size_t iconSize)
+window& window_impl::setIcon(const unsigned char* icon, size_t iconSize)
 {
   // SetIcon needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7004
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200616)
