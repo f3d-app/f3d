@@ -87,7 +87,9 @@ protected:
   loader() = default;
   virtual ~loader() = default;
   loader(const loader& opt) = delete;
+  loader(loader&& opt) = delete;
   loader& operator=(const loader& opt) = delete;
+  loader& operator=(loader&& opt) = delete;
 };
 }
 

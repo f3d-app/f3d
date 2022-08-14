@@ -135,7 +135,9 @@ private:
   class internals;
   internals* Internals;
   engine(const engine& opt) = delete;
+  engine(engine&& opt) = delete;
   engine& operator=(const engine& opt) = delete;
+  engine& operator=(engine&& opt) = delete;
 };
 }
 

@@ -91,7 +91,9 @@ protected:
   window() = default;
   virtual ~window() = default;
   window(const window&) = delete;
+  window(window&&) = delete;
   window& operator=(const window&) = delete;
+  window& operator=(window&&) = delete;
 };
 }
 
