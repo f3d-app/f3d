@@ -58,7 +58,7 @@ public:
 
   //@{
   /**
-   * Reference getters for all supported types
+   * Copy the option value into the provided reference, for all supported types,
    */
   void get(const std::string& name, bool& value) const;
   void get(const std::string& name, int& value) const;
@@ -82,7 +82,8 @@ public:
 
   //@{
   /**
-   * Explicit reference getters for all supported types.
+   * Explicit getters to actual reference to the options variable, for all supported types.
+   * Modifying the returned reference will modify the option.
    * Can throw a options::exception in case of failure.
    */
   bool& getAsBoolRef(const std::string& name);
