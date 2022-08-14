@@ -25,11 +25,6 @@ public:
 
   vtkSmartPointer<vtkImageImport> GetVTKImporter() const
   {
-    if (this->Buffer.size() != this->Width * this->Height * this->Channels)
-    {
-      throw buffer_exception("Image size mitmatch");
-    }
-
     vtkNew<vtkImageImport> importer;
     importer->CopyImportVoidPointer(
       const_cast<unsigned char*>(this->Buffer.data()), this->Buffer.size());
@@ -37,7 +32,6 @@ public:
     importer->SetDataScalarTypeToUnsignedChar();
     importer->SetWholeExtent(0, this->Width - 1, 0, this->Height - 1, 0, 0);
     importer->SetDataExtentToWholeExtent();
-
     return importer;
   }
 
@@ -234,12 +228,6 @@ image::write_exception::write_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 image::read_exception::read_exception(const std::string& what)
-  : exception(what)
-{
-}
-
-//----------------------------------------------------------------------------
-image::buffer_exception::buffer_exception(const std::string& what)
   : exception(what)
 {
 }

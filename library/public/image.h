@@ -41,7 +41,6 @@ public:
   //@{
   /**
    * Comparison operators, uses image::compare with a threshold of 0.
-   * Throw an image::buffer_exception if image is not sane,
    */
   bool operator==(const image& reference) const;
   bool operator!=(const image& reference) const;
@@ -84,14 +83,12 @@ public:
    * 50: Visually indistinguishable
    * 100: Small visible difference
    * 300: Comparable images
-   * Throw an image::buffer_exception if images are not sane.
    */
   bool compare(const image& reference, double threshold, image& diff, double& error) const;
 
   /**
    * Save an image to a file in .png format
-   * Throw an image::buffer_exception if image is not sane
-   * or an image::write_exception if image cannot be writen.
+   * Throw an image::write_exception if image cannot be writen.
    */
   void save(const std::string& path) const;
 
@@ -106,10 +103,6 @@ public:
   struct read_exception : public exception
   {
     read_exception(const std::string& what = "");
-  };
-  struct buffer_exception : public exception
-  {
-    buffer_exception(const std::string& what = "");
   };
   //@}
 
