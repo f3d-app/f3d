@@ -5,7 +5,6 @@
 #include "interactor_impl.h"
 #include "loader_impl.h"
 #include "log.h"
-#include "options.h"
 #include "window_impl.h"
 
 #include "F3DReaderFactory.h"

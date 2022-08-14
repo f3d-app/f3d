@@ -23,6 +23,9 @@
 
 #include "exception.h"
 #include "export.h"
+#include "interactor.h"
+#include "loader.h"
+#include "options.h"
 #include "window.h"
 
 #include <map>
@@ -31,9 +34,6 @@
 
 namespace f3d
 {
-class options;
-class loader;
-class interactor;
 class F3D_EXPORT engine
 {
 public:
