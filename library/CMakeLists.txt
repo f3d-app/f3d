@@ -84,7 +84,7 @@ set(F3D_SOURCE_FILES
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
-  ${CMAKE_CURRENT_BINARY_DIR}/public/exception.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/exception.h
   ${CMAKE_CURRENT_BINARY_DIR}/public/export.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/camera.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/engine.h
