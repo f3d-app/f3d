@@ -38,9 +38,10 @@ public:
 
   /**
    * Add a list of files or directories to be loaded.
+   * Set recursive to true to load folder recursively instead of only files.
    * Duplicate will not be added.
    */
-  virtual loader& addFiles(const std::vector<std::string>& files) = 0;
+  virtual loader& addFiles(const std::vector<std::string>& files, bool recursive = false) = 0;
 
   /**
    * Add a file or directory (all files in) to be loaded.
