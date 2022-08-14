@@ -77,7 +77,7 @@ window& engine::getWindow()
 {
   if (this->Internals->Window->getType() == window::Type::NONE)
   {
-    throw engine::exception("No window with this engine");
+    throw engine::no_window_exception("No window with this engine");
   }
   return *this->Internals->Window;
 }
@@ -93,7 +93,7 @@ interactor& engine::getInteractor()
 {
   if (!this->Internals->Interactor)
   {
-    throw engine::exception("No interactor with this engine");
+    throw engine::no_interactor_exception("No interactor with this engine");
   }
   return *this->Internals->Interactor;
 }
@@ -183,4 +183,13 @@ std::vector<engine::readerInformation> engine::getReadersInfo()
   }
   return readersInfo;
 }
+
+//----------------------------------------------------------------------------
+engine::no_window_exception::no_window_exception(const std::string& what)
+: exception(what){}
+
+//----------------------------------------------------------------------------
+engine::no_interactor_exception::no_interactor_exception(const std::string& what)
+: exception(what){}
+
 }

@@ -9,9 +9,9 @@
 #ifndef f3d_options_h
 #define f3d_options_h
 
+#include "exception.h"
 #include "export.h"
 
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -31,15 +31,6 @@ public:
   options(options&& other) noexcept;
   options& operator=(options&& other) noexcept;
   //@}
-
-  class exception : public std::runtime_error
-  {
-  public:
-    exception(const std::string& what = "")
-      : std::runtime_error(what)
-    {
-    }
-  };
 
   //@{
   /**
@@ -84,7 +75,8 @@ public:
   /**
    * Explicit getters to actual reference to the options variable, for all supported types.
    * Modifying the returned reference will modify the option.
-   * Can throw a options::exception in case of failure.
+   * Throw an options::incompatible_exception if the type is not compatible with the option.
+   * Throw an options::inexistent_exception if option does not exist.
    */
   bool& getAsBoolRef(const std::string& name);
   int& getAsIntRef(const std::string& name);
@@ -98,6 +90,14 @@ public:
    * A boolean option specific method to toggle it
    */
   options& toggle(const std::string& name);
+
+  //@{
+  /**
+   * Options specific exceptions
+   */
+  struct incompatible_exception : public exception { incompatible_exception(const std::string& what = ""); };
+  struct inexistent_exception : public exception { inexistent_exception(const std::string& what = ""); };
+  //@}
 
 private:
   class internals;

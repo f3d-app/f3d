@@ -89,13 +89,13 @@ public:
     {
       std::string error = "Trying to set option " + name + " with incompatible type";
       log::error(error);
-      throw options::exception(error + "\n");
+      throw options::incompatible_exception(error + "\n");
     }
     catch (const std::out_of_range&)
     {
       std::string error = "Options " + name + " does not exist";
       log::error(error);
-      throw options::exception(error + "\n");
+      throw options::inexistent_exception(error + "\n");
     }
   }
 
@@ -395,5 +395,13 @@ options& options::toggle(const std::string& name)
   this->Internals->set<bool>(name, !this->Internals->get<bool>(name));
   return *this;
 }
+
+//----------------------------------------------------------------------------
+options::incompatible_exception::incompatible_exception(const std::string& what)
+: exception(what){}
+
+//----------------------------------------------------------------------------
+options::inexistent_exception::inexistent_exception(const std::string& what)
+: exception(what){}
 
 }

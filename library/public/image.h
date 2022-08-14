@@ -9,9 +9,9 @@
 #ifndef f3d_image_h
 #define f3d_image_h
 
+#include "exception.h"
 #include "export.h"
 
-#include <stdexcept>
 #include <string>
 
 namespace f3d
@@ -19,19 +19,10 @@ namespace f3d
 class F3D_EXPORT image
 {
 public:
-  class exception : public std::runtime_error
-  {
-  public:
-    exception(const std::string& what = "")
-      : std::runtime_error(what)
-    {
-    }
-  };
-
   /**
    * Create an image from file, the following formats are supported:
    * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA.
-   * Can throw an image::exception in case of failure.
+   * Throw an image::read_exception in case of failure.
    */
   explicit image(const std::string& path);
 
@@ -49,7 +40,8 @@ public:
 
   //@{
   /**
-   * Comparison operators, uses image::compare with a threshold of 0
+   * Comparison operators, uses image::compare with a threshold of 0.
+   * Throw an image::buffer_exception if image is not sane,
    */
   bool operator==(const image& reference) const;
   bool operator!=(const image& reference) const;
@@ -92,15 +84,25 @@ public:
    * 50: Visually indistinguishable
    * 100: Small visible difference
    * 300: Comparable images
-   * Can throw an image::exception if images are not sane.
+   * Throw an image::buffer_exception if images are not sane.
    */
   bool compare(const image& reference, double threshold, image& diff, double& error) const;
 
   /**
    * Save an image to a file in .png format
-   * Can throw an image::exception if image is not sane.
+   * Throw an image::buffer_exception if image is not sane
+   * or an image::write_exception if image cannot be writen.
    */
   void save(const std::string& path) const;
+
+  //@{
+  /**
+   * Image specific exceptions
+   */
+  struct write_exception : public exception { write_exception(const std::string& what = ""); };
+  struct read_exception : public exception { read_exception(const std::string& what = ""); };
+  struct buffer_exception : public exception { buffer_exception(const std::string& what = ""); };
+  //@}
 
 private:
   class internals;

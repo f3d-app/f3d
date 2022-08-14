@@ -1,6 +1,7 @@
 #include "window_impl.h"
 
 #include "camera_impl.h"
+#include "engine.h"
 #include "log.h"
 #include "options.h"
 
@@ -56,7 +57,7 @@ window_impl::window_impl(const options& options, Type type)
 #if F3D_MODULE_EXTERNAL_RENDERING
     this->Internals->RenWin = vtkSmartPointer<vtkExternalOpenGLRenderWindow>::New();
 #else
-    throw exception("Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
+    throw engine::no_window_exception("Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
 #endif
   }
   else
