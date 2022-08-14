@@ -42,6 +42,8 @@ public:
   /**
    * Set different actors parameters
    */
+  void SetLineWidth(double lineWidth);
+  virtual void SetPointSize(double pointSize);
   void SetFontFile(const std::string& fontFile);
   void SetHDRIFile(const std::string& hdriFile);
   void SetBackground(const double* backgroundColor) override;

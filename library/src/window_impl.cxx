@@ -180,6 +180,10 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetUseTrackball(
     this->Internals->Options.getAsBool("interactor.trackball"));
 
+  this->Internals->Renderer->SetLineWidth(
+    this->Internals->Options.getAsDouble("render.line-width"));
+  this->Internals->Renderer->SetPointSize(
+    this->Internals->Options.getAsDouble("render.point-size"));
   this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("render.show-edges"));
   this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("ui.fps"));
   this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("ui.filename"));

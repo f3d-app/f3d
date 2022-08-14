@@ -13,6 +13,7 @@
 #include "vtkF3DRenderer.h"
 
 // Include needed because of the smart pointers macro
+#include <vtkPointGaussianMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkScalarBarActor.h>
 #include <vtkSmartVolumeMapper.h>
@@ -31,6 +32,11 @@ public:
    * Initialize all actors and flags
    */
   void Initialize(const std::string& fileInfo, const std::string& up) override;
+
+  /**
+   * Set the pointSize on the pointGaussianMapper as well as calls superclass implementation.
+   */
+  void SetPointSize(double pointSize) override;
 
   //@{
   /**
@@ -134,8 +140,8 @@ public:
   /**
    * Set/Get the point gaussian mapper, used for hotkey purposes
    */
-  vtkGetSmartPointerMacro(PointGaussianMapper, vtkPolyDataMapper);
-  vtkSetSmartPointerMacro(PointGaussianMapper, vtkPolyDataMapper);
+  vtkGetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
+  vtkSetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
   //@}
 
   //@{
@@ -260,7 +266,7 @@ protected:
   vtkSmartPointer<vtkPolyDataMapper> PolyDataMapper;
   bool PolyDataMapperConfigured = false;
 
-  vtkSmartPointer<vtkPolyDataMapper> PointGaussianMapper;
+  vtkSmartPointer<vtkPointGaussianMapper> PointGaussianMapper;
   bool PointGaussianMapperConfigured = false;
 
   vtkSmartPointer<vtkSmartVolumeMapper> VolumeMapper;
