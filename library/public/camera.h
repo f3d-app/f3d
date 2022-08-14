@@ -9,6 +9,7 @@
  * results.
  * When using the Position/FocalPoint/ViewUp API or the camera movements API,
  * the view up is automatically orthogonalized.
+ * All angles are in degrees.
  */
 
 #ifndef f3d_camera_h
@@ -30,6 +31,7 @@ public:
   //@{
   /**
    * Set/Get the camera parameters.
+   * Angles are in degrees.
    */
   virtual camera& setPosition(const vector3_t& pos) = 0;
   virtual vector3_t getPosition() = 0;
@@ -58,6 +60,7 @@ public:
   //@{
   /**
    * Standard camera manipulation methods.
+   * Angles are in degrees.
    */
   virtual camera& dolly(double val) = 0;
   virtual camera& roll(double angle) = 0;
