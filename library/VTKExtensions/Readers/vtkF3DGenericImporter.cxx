@@ -4,7 +4,6 @@
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
-#include <vtkBoundingBox.h>
 #include <vtkCellData.h>
 #include <vtkDataObjectTreeIterator.h>
 #include <vtkDataSetSurfaceFilter.h>
@@ -158,17 +157,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->PolyDataMapper->SetInputConnection(this->PostPro->GetOutputPort(0));
 
   // Configure Point Gaussian mapper
-  double bounds[6];
-  surface->GetBounds(bounds);
-  vtkBoundingBox bbox(bounds);
-
-  double gaussianPointSize = 1.0;
-  if (bbox.IsValid())
-  {
-    gaussianPointSize = this->PointSize * bbox.GetDiagonalLength() * 0.001;
-  }
   this->PointGaussianMapper->SetInputConnection(this->PostPro->GetOutputPort(1));
-  this->PointGaussianMapper->SetScaleFactor(gaussianPointSize);
   this->PointGaussianMapper->EmissiveOff();
   this->PointGaussianMapper->SetSplatShaderCode(
     "//VTK::Color::Impl\n"
@@ -181,7 +170,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     "  diffuseColor *= scale;\n"
     "}\n");
 
-  //
   vtkDataSet* dataSet = vtkImageData::SafeDownCast(this->PostPro->GetInput())
     ? vtkDataSet::SafeDownCast(image)
     : vtkDataSet::SafeDownCast(surface);
