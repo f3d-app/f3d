@@ -3,6 +3,7 @@
 #include "F3DLog.h"
 #include "vtkF3DConfigure.h"
 
+#include <vtkBoundingBox.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkDataArray.h>
 #include <vtkDataSetAttributes.h>
@@ -47,6 +48,27 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& fileInfo, const s
   this->CheatSheetNeedUpdate = true;
 
   this->ColoringTimeStamp.Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetPointSize(double pointSize)
+{
+  this->Superclass::SetPointSize(pointSize);
+
+  if (this->PointGaussianMapper)
+  {
+    vtkDataSet* dataset = this->PolyDataMapper->GetInput();
+    double bounds[6];
+    dataset->GetBounds(bounds);
+    vtkBoundingBox bbox(bounds);
+
+    double gaussianPointSize = 1.0;
+    if (bbox.IsValid())
+    {
+      gaussianPointSize = pointSize * bbox.GetDiagonalLength() * 0.001;
+    }
+    this->PointGaussianMapper->SetScaleFactor(gaussianPointSize);
+  }
 }
 
 //----------------------------------------------------------------------------

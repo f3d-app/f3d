@@ -433,6 +433,36 @@ void vtkF3DRenderer::UpdateTextColor()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetLineWidth(double lineWidth)
+{
+  vtkActor* anActor;
+  vtkActorCollection* ac = this->GetActors();
+  vtkCollectionSimpleIterator ait;
+  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
+  {
+    if (vtkSkybox::SafeDownCast(anActor) == nullptr)
+    {
+      anActor->GetProperty()->SetLineWidth(lineWidth);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetPointSize(double pointSize)
+{
+  vtkActor* anActor;
+  vtkActorCollection* ac = this->GetActors();
+  vtkCollectionSimpleIterator ait;
+  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
+  {
+    if (vtkSkybox::SafeDownCast(anActor) == nullptr)
+    {
+      anActor->GetProperty()->SetPointSize(pointSize);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetFontFile(const std::string& fontFile)
 {
   // Dynamic font management

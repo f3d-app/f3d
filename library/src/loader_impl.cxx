@@ -64,9 +64,6 @@ public:
 
   static void InitializeImporterWithOptions(const options& options, vtkF3DGenericImporter* importer)
   {
-    importer->SetLineWidth(options.getAsDouble("render.line-width"));
-    importer->SetPointSize(options.getAsDouble("render.point-size"));
-
     importer->SetSurfaceColor(options.getAsDoubleVector("model.color.rgb").data());
     importer->SetOpacity(options.getAsDouble("model.color.opacity"));
     importer->SetTextureBaseColor(options.getAsString("model.color.texture"));
