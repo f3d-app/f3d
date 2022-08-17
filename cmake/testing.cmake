@@ -158,7 +158,7 @@ f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
 
 # color texture with opacity needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9467
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.202208XX)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220811)
   f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --geometry-only --texture-base-color=${CMAKE_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.4 --depth-peeling DEFAULT_LIGHTS)
 endif()
 
