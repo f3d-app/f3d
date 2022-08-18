@@ -9,6 +9,7 @@
 #include <vtkSmartPointer.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <cassert>
 #include <vector>
 
 namespace f3d
@@ -25,6 +26,8 @@ public:
 
   vtkSmartPointer<vtkImageImport> GetVTKImporter() const
   {
+    assert(this->Buffer.size() == this->Width * this->Height * this->Channels);
+
     vtkNew<vtkImageImport> importer;
     importer->CopyImportVoidPointer(
       const_cast<unsigned char*>(this->Buffer.data()), this->Buffer.size());
