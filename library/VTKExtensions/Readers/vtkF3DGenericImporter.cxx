@@ -195,14 +195,20 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->PointSpritesActor->GetProperty()->SetOpacity(this->Opacity);
 
   // Textures
-  this->GeometryActor->GetProperty()->SetBaseColorTexture(
-    this->GetTexture(this->TextureBaseColor, true));
+  auto colorTex = this->GetTexture(this->TextureBaseColor, true);
+  this->GeometryActor->GetProperty()->SetBaseColorTexture(colorTex);
   this->GeometryActor->GetProperty()->SetORMTexture(this->GetTexture(this->TextureMaterial));
   this->GeometryActor->GetProperty()->SetEmissiveTexture(
     this->GetTexture(this->TextureEmissive, true));
   this->GeometryActor->GetProperty()->SetEmissiveFactor(this->EmissiveFactor);
   this->GeometryActor->GetProperty()->SetNormalTexture(this->GetTexture(this->TextureNormal));
   this->GeometryActor->GetProperty()->SetNormalScale(this->NormalScale);
+
+  // If the input texture is RGBA, flag the actor as translucent
+  if (colorTex && colorTex->GetImageDataInput(0)->GetNumberOfScalarComponents() == 4)
+  {
+    this->GeometryActor->ForceTranslucentOn();
+  }
 
   // add props
   ren->AddActor2D(this->ScalarBarActor);
