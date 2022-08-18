@@ -33,7 +33,7 @@ camera& camera_impl::setPosition(const point3_t& pos)
 }
 
 //----------------------------------------------------------------------------
-f3d::point3_t camera_impl::getPosition()
+point3_t camera_impl::getPosition()
 {
   point3_t pos;
   this->getPosition(pos);
@@ -58,7 +58,7 @@ camera& camera_impl::setFocalPoint(const point3_t& foc)
 }
 
 //----------------------------------------------------------------------------
-f3d::point3_t camera_impl::getFocalPoint()
+point3_t camera_impl::getFocalPoint()
 {
   point3_t foc;
   this->getFocalPoint(foc);
@@ -83,7 +83,7 @@ camera& camera_impl::setViewUp(const vector3_t& up)
 }
 
 //----------------------------------------------------------------------------
-f3d::vector3_t camera_impl::getViewUp()
+vector3_t camera_impl::getViewUp()
 {
   vector3_t up;
   this->getViewUp(up);
@@ -108,7 +108,7 @@ camera& camera_impl::setViewAngle(const angleDeg_t& angle)
 }
 
 //----------------------------------------------------------------------------
-f3d::angleDeg_t camera_impl::getViewAngle()
+angleDeg_t camera_impl::getViewAngle()
 {
   angleDeg_t angle;
   this->getViewAngle(angle);
@@ -134,7 +134,7 @@ camera& camera_impl::setViewMatrix(const matrix4_t& matrix)
 }
 
 //----------------------------------------------------------------------------
-f3d::matrix4_t camera_impl::getViewMatrix()
+matrix4_t camera_impl::getViewMatrix()
 {
   matrix4_t matrix;
   this->getViewMatrix(matrix);
