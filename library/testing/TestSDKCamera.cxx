@@ -7,24 +7,25 @@
 #include <iomanip>
 #include <iostream>
 
+// TODO these methodes should be put in types.h at some point.
 bool compareDouble(double a, double b)
 {
   return std::fabs(a - b) < 128 * std::numeric_limits<double>::epsilon();
 }
 
-bool compareVec(f3d::camera::vector3_t vec1, f3d::camera::vector3_t vec2)
+bool compareVec(f3d::vector3_t vec1, f3d::vector3_t vec2)
 {
   return compareDouble(vec1[0], vec2[0]) && compareDouble(vec1[1], vec2[1]) &&
     compareDouble(vec1[2], vec2[2]);
 }
 
-bool comparePoint(f3d::camera::point3_t vec1, f3d::camera::point3_t vec2)
+bool comparePoint(f3d::point3_t vec1, f3d::point3_t vec2)
 {
   return compareDouble(vec1[0], vec2[0]) && compareDouble(vec1[1], vec2[1]) &&
     compareDouble(vec1[2], vec2[2]);
 }
 
-bool compareMat(f3d::camera::matrix4_t mat1, f3d::camera::matrix4_t mat2)
+bool compareMat(f3d::matrix4_t mat1, f3d::matrix4_t mat2)
 {
   for (size_t i = 0; i < mat1.size(); i++)
   {
@@ -43,8 +44,8 @@ int TestSDKCamera(int argc, char* argv[])
   f3d::camera& cam = win.getCamera();
 
   // Test position
-  f3d::camera::point3_t testPos = { 0., 0., 10. };
-  f3d::camera::point3_t pos = cam.setPosition(testPos).getPosition();
+  f3d::point3_t testPos = { 0., 0., 10. };
+  f3d::point3_t pos = cam.setPosition(testPos).getPosition();
   if (pos != testPos)
   {
     std::cerr << "set/get position is not behaving as expected: " << pos[0] << "," << pos[1] << ","
@@ -53,8 +54,8 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test focal point
-  f3d::camera::point3_t testFoc = { 0., 0., -1. };
-  f3d::camera::point3_t foc = cam.setFocalPoint(testFoc).getFocalPoint();
+  f3d::point3_t testFoc = { 0., 0., -1. };
+  f3d::point3_t foc = cam.setFocalPoint(testFoc).getFocalPoint();
   if (foc != testFoc)
   {
     std::cerr << "set/get focal point is not behaving as expected: " << foc[0] << "," << foc[1]
@@ -63,8 +64,8 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test view up
-  f3d::camera::vector3_t testUp = { 1., 0., 0. };
-  f3d::camera::vector3_t up = cam.setViewUp(testUp).getViewUp();
+  f3d::vector3_t testUp = { 1., 0., 0. };
+  f3d::vector3_t up = cam.setViewUp(testUp).getViewUp();
   if (up != testUp)
   {
     std::cerr << "set/get view up is not behaving as expected: " << up[0] << "," << up[1] << ","
@@ -73,8 +74,8 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test view angle
-  f3d::camera::angle_deg_t testAngle = 20;
-  f3d::camera::angle_deg_t angle = cam.setViewAngle(testAngle).getViewAngle();
+  f3d::angleDeg_t testAngle = 20;
+  f3d::angleDeg_t angle = cam.setViewAngle(testAngle).getViewAngle();
   if (angle != testAngle)
   {
     std::cerr << "set/get view angle is not behaving as expected: " << angle << std::endl;
@@ -83,9 +84,9 @@ int TestSDKCamera(int argc, char* argv[])
 
   // Test azimuth
   cam.azimuth(90);
-  f3d::camera::point3_t expectedPos = { 0., -11., -1. };
-  f3d::camera::point3_t expectedFoc = { 0., 0., -1. };
-  f3d::camera::vector3_t expectedUp = { 1., 0., 0. };
+  f3d::point3_t expectedPos = { 0., -11., -1. };
+  f3d::point3_t expectedFoc = { 0., 0., -1. };
+  f3d::vector3_t expectedUp = { 1., 0., 0. };
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
   up = cam.getViewUp();
@@ -200,9 +201,9 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test ViewMatrix
-  f3d::camera::matrix4_t mat = cam.getViewMatrix();
-  f3d::camera::matrix4_t expectedMat = { 0., 0., -1., 0., 1., 0., 0., 0., 0., -1., 0., 0., 11.,
-    -12., 20.9, 1. };
+  f3d::matrix4_t mat = cam.getViewMatrix();
+  f3d::matrix4_t expectedMat = { 0., 0., -1., 0., 1., 0., 0., 0., 0., -1., 0., 0., 11., -12., 20.9,
+    1. };
 
   if (!compareMat(mat, expectedMat))
   {
@@ -219,8 +220,8 @@ int TestSDKCamera(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  f3d::camera::matrix4_t setMat = { 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., -1., 0., 0.776126,
-    -0.438658, 24.556, 1. };
+  f3d::matrix4_t setMat = { 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., -1., 0., 0.776126, -0.438658,
+    24.556, 1. };
   cam.setViewMatrix(setMat);
   mat = cam.getViewMatrix();
   expectedMat = { 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., -0.776126, 0.438658, -24.556,
