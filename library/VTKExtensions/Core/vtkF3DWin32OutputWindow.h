@@ -35,7 +35,7 @@ public:
 #endif
 
 protected:
-  vtkF3DWin32OutputWindow() = default;
+  vtkF3DWin32OutputWindow();
   ~vtkF3DWin32OutputWindow() override = default;
 
 // virtual Initialize needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7460

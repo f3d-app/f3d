@@ -3,6 +3,15 @@
 int TestSDKLog(int argc, char* argv[])
 {
   f3d::log::setUseColoring(false);
+
+  // Test default behavior
+  f3d::log::debug("Test Debug");
+  f3d::log::info("Test Info");
+  f3d::log::warn("Test Warning");
+  f3d::log::error("Test Error");
+
+  f3d::log::setVerboseLevel(
+    f3d::log::VerboseLevel::INFO); // Next log calls should print like default
   f3d::log::debug("Test Debug");
   f3d::log::info("Test Info");
   f3d::log::warn("Test Warning");
