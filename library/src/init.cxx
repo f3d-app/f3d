@@ -36,10 +36,6 @@ init::init()
   vtkNew<vtkF3DObjectFactory> factory;
   vtkObjectFactory::RegisterFactory(factory);
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
-
-  // Make sure to initialize the output window
-  // after the object factory and before the first usage.
-  // log::setVerboseLevel(log::VerboseLevel::INFO);
 }
 
 //----------------------------------------------------------------------------
