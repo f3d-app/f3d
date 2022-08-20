@@ -139,6 +139,7 @@ jobs:
         cp x64\libgallium_wgl.dll ..\..\build\bin\Release\
 
     - name: Test
+      if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}/build
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
@@ -173,7 +174,7 @@ jobs:
       run: ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
     - name: Check SDK
-      if: matrix.os != 'macos-latest'
+      if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}
       run: |
         cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -B test_sdk source/.github/test_sdk
