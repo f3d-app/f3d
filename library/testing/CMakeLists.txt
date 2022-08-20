@@ -87,6 +87,7 @@ endforeach ()
 set_tests_properties(libf3d::TestSDKLog PROPERTIES PASS_REGULAR_EXPRESSION
 "\
 Test Info\nTest Warning\nTest Error\n\
+Test Info\nTest Warning\nTest Error\n\
 Test Warning\nTest Error\nTest Error\n\
 Test Print Debug\nTest Print Info\nTest Print Warning\nTest Print Error\n\
 Test Debug Coloring")

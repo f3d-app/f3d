@@ -11,10 +11,9 @@ vtkStandardNewMacro(vtkF3DWin32OutputWindow);
 //------------------------------------------------------------------------------
 vtkF3DWin32OutputWindow::vtkF3DWin32OutputWindow()
 {
-	// Override base class behavior and set displayMode to default on creation
-	this->SetDisplayModeToDefault();
+  // Override base class behavior and set displayMode to default on creation
+  this->SetDisplayModeToDefault();
 }
-
 
 // WindowTitle needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7460
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201207)
