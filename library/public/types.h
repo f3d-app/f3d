@@ -34,7 +34,7 @@ struct matrix4_t : std::array<double, 16>
 /**
  * Describe an angle in degrees
  */
-using angleDeg_t = double;
+using angle_deg_t = double;
 }
 
 #endif
