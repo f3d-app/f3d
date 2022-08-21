@@ -10,16 +10,17 @@
 #define f3d_interactor_h
 
 #include "export.h"
+#include "loader.h"
+#include "options.h"
+#include "window.h"
 
 #include <functional>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace f3d
 {
-class options;
-class loader;
-class window;
 class F3D_EXPORT interactor
 {
 public:
@@ -104,7 +105,9 @@ protected:
   interactor() = default;
   virtual ~interactor() = default;
   interactor(const interactor& opt) = delete;
+  interactor(interactor&& opt) = delete;
   interactor& operator=(const interactor& opt) = delete;
+  interactor& operator=(interactor&& opt) = delete;
 };
 }
 

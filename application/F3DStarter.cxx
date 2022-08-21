@@ -23,19 +23,19 @@ public:
     f3d::camera& cam = this->Engine->getWindow().getCamera();
     if (appOptions.CameraPosition.size() == 3)
     {
-      f3d::camera::vector3_t pos;
+      f3d::point3_t pos;
       std::copy_n(appOptions.CameraPosition.begin(), 3, pos.begin());
       cam.setPosition(pos);
     }
     if (appOptions.CameraFocalPoint.size() == 3)
     {
-      f3d::camera::vector3_t foc;
+      f3d::point3_t foc;
       std::copy_n(appOptions.CameraFocalPoint.begin(), 3, foc.begin());
       cam.setFocalPoint(foc);
     }
     if (appOptions.CameraViewUp.size() == 3)
     {
-      f3d::camera::vector3_t up;
+      f3d::vector3_t up;
       std::copy_n(appOptions.CameraViewUp.begin(), 3, up.begin());
       cam.setViewUp(up);
     }

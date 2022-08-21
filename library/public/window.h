@@ -20,15 +20,6 @@ namespace f3d
 class F3D_EXPORT window
 {
 public:
-  class exception : public std::runtime_error
-  {
-  public:
-    exception(const std::string& what = "")
-      : std::runtime_error(what)
-    {
-    }
-  };
-
   /**
    * Enumeration of supported window types
    * =====================================
@@ -80,7 +71,7 @@ public:
    * icon should be an unsigned char array.
    * iconSize should be the sizeof(icon).
    */
-  virtual window& setIcon(const void* icon, size_t iconSize) = 0;
+  virtual window& setIcon(const unsigned char* icon, size_t iconSize) = 0;
 
   /**
    * Set the window name to be shown by a window manager.
@@ -91,7 +82,9 @@ protected:
   window() = default;
   virtual ~window() = default;
   window(const window&) = delete;
+  window(window&&) = delete;
   window& operator=(const window&) = delete;
+  window& operator=(window&&) = delete;
 };
 }
 

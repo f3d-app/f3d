@@ -153,7 +153,7 @@ int TestSDKOptions(int argc, char* argv[])
   {
     double& refVal = opt.getAsDoubleRef("model.scivis.cells");
   }
-  catch (const f3d::options::exception& ex)
+  catch (const f3d::options::incompatible_exception& ex)
   {
     std::cout << "Expected exception:" << ex.what() << std::endl;
   }
@@ -164,7 +164,7 @@ int TestSDKOptions(int argc, char* argv[])
   {
     double& refVal = opt.getAsDoubleRef("dummy");
   }
-  catch (const f3d::options::exception& ex)
+  catch (const f3d::options::inexistent_exception& ex)
   {
     std::cout << "Expected exception:" << ex.what() << std::endl;
   }

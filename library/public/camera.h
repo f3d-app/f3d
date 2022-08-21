@@ -9,12 +9,14 @@
  * results.
  * When using the Position/FocalPoint/ViewUp API or the camera movements API,
  * the view up is automatically orthogonalized.
+ * All angles are in degrees.
  */
 
 #ifndef f3d_camera_h
 #define f3d_camera_h
 
 #include "export.h"
+#include "types.h"
 
 #include <array>
 #include <string>
@@ -24,25 +26,23 @@ namespace f3d
 class F3D_EXPORT camera
 {
 public:
-  typedef std::array<double, 3> vector3_t;
-  typedef std::array<double, 16> matrix4_t;
-
   //@{
   /**
    * Set/Get the camera parameters.
+   * Angles are in degrees.
    */
-  virtual camera& setPosition(const vector3_t& pos) = 0;
-  virtual vector3_t getPosition() = 0;
-  virtual void getPosition(vector3_t& pos) = 0;
-  virtual camera& setFocalPoint(const vector3_t& foc) = 0;
-  virtual vector3_t getFocalPoint() = 0;
-  virtual void getFocalPoint(vector3_t& foc) = 0;
+  virtual camera& setPosition(const point3_t& pos) = 0;
+  virtual point3_t getPosition() = 0;
+  virtual void getPosition(point3_t& pos) = 0;
+  virtual camera& setFocalPoint(const point3_t& foc) = 0;
+  virtual point3_t getFocalPoint() = 0;
+  virtual void getFocalPoint(point3_t& foc) = 0;
   virtual camera& setViewUp(const vector3_t& up) = 0;
   virtual vector3_t getViewUp() = 0;
   virtual void getViewUp(vector3_t& up) = 0;
-  virtual camera& setViewAngle(const double& angle) = 0;
-  virtual double getViewAngle() = 0;
-  virtual void getViewAngle(double& angle) = 0;
+  virtual camera& setViewAngle(const angle_deg_t& angle) = 0;
+  virtual angle_deg_t getViewAngle() = 0;
+  virtual void getViewAngle(angle_deg_t& angle) = 0;
   //@}
 
   //@{
@@ -58,13 +58,14 @@ public:
   //@{
   /**
    * Standard camera manipulation methods.
+   * Angles are in degrees.
    */
   virtual camera& dolly(double val) = 0;
-  virtual camera& roll(double angle) = 0;
-  virtual camera& azimuth(double angle) = 0;
-  virtual camera& yaw(double angle) = 0;
-  virtual camera& elevation(double angle) = 0;
-  virtual camera& pitch(double angle) = 0;
+  virtual camera& roll(angle_deg_t angle) = 0;
+  virtual camera& azimuth(angle_deg_t angle) = 0;
+  virtual camera& yaw(angle_deg_t angle) = 0;
+  virtual camera& elevation(angle_deg_t angle) = 0;
+  virtual camera& pitch(angle_deg_t angle) = 0;
   //@}
 
   /**
@@ -86,7 +87,9 @@ protected:
   camera() = default;
   virtual ~camera() = default;
   camera(const camera&) = delete;
+  camera(camera&&) = delete;
   camera& operator=(const camera&) = delete;
+  camera& operator=(camera&&) = delete;
 };
 }
 

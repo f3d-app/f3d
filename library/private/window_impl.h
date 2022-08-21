@@ -46,7 +46,7 @@ public:
   bool render() override;
   image renderToImage(bool noBackground = false) override;
   window& setSize(int width, int heigth) override;
-  window& setIcon(const void* icon, size_t iconSize) override;
+  window& setIcon(const unsigned char* icon, size_t iconSize) override;
   window& setWindowName(const std::string& windowName) override;
   //@}
 

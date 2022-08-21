@@ -15,7 +15,7 @@ int TestSDKEngineExceptions(int argc, char* argv[])
     std::cerr << "An exception has not been thrown when getting a non-existent window" << std::endl;
     return EXIT_FAILURE;
   }
-  catch (const f3d::engine::exception& ex)
+  catch (const f3d::engine::no_window_exception& ex)
   {
     std::cout << ex.what() << std::endl;
   }
@@ -27,7 +27,7 @@ int TestSDKEngineExceptions(int argc, char* argv[])
               << std::endl;
     return EXIT_FAILURE;
   }
-  catch (const f3d::engine::exception& ex)
+  catch (const f3d::engine::no_interactor_exception& ex)
   {
     std::cout << ex.what() << std::endl;
   }

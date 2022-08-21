@@ -168,11 +168,11 @@ loader_impl::loader_impl(const options& options, window_impl& window)
 loader_impl::~loader_impl() = default;
 
 //----------------------------------------------------------------------------
-loader& loader_impl::addFiles(const std::vector<std::string>& files)
+loader& loader_impl::addFiles(const std::vector<std::string>& files, bool recursive)
 {
   for (auto& file : files)
   {
-    this->addFile(file);
+    this->addFile(file, recursive);
   }
   return *this;
 }
