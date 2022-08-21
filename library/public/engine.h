@@ -21,31 +21,22 @@
 #ifndef f3d_engine_h
 #define f3d_engine_h
 
+#include "exception.h"
 #include "export.h"
+#include "interactor.h"
+#include "loader.h"
+#include "options.h"
 #include "window.h"
 
 #include <map>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace f3d
 {
-class options;
-class loader;
-class interactor;
 class F3D_EXPORT engine
 {
 public:
-  class exception : public std::runtime_error
-  {
-  public:
-    exception(const std::string& what = "")
-      : std::runtime_error(what)
-    {
-    }
-  };
-
   /**
    * Engine constructor, choose the window type using the enum.
    * see window.h for details about the window.
@@ -53,6 +44,8 @@ public:
    * When using window::Type::EXTERNAL, interactor will not be provided by the engine.
    * All objects instances will be created on construction.
    * Default is window::Type::NATIVE.
+   * Throw a no_window_exception when using a Using window::Type::EXTERNAL without the right cmake
+   * option.
    */
   explicit engine(window::Type windowType = window::Type::NATIVE);
 
@@ -82,7 +75,7 @@ public:
 
   /**
    * Get the window provided by the engine, if any.
-   * If not, will throw a engine::exception
+   * If not, will throw a engine::no_window_exception
    */
   window& getWindow();
 
@@ -93,7 +86,7 @@ public:
 
   /**
    * Get the interactor provided by the engine, if any
-   * If not, will throw a engine::exception
+   * If not, will throw a engine::no_interactor_exception
    */
   interactor& getInteractor();
 
@@ -131,11 +124,27 @@ public:
    */
   static std::vector<readerInformation> getReadersInfo();
 
+  //@{
+  /**
+   * Engine specific exceptions
+   */
+  struct no_window_exception : public exception
+  {
+    no_window_exception(const std::string& what = "");
+  };
+  struct no_interactor_exception : public exception
+  {
+    no_interactor_exception(const std::string& what = "");
+  };
+  //@}
+
 private:
   class internals;
   internals* Internals;
   engine(const engine& opt) = delete;
+  engine(engine&& opt) = delete;
   engine& operator=(const engine& opt) = delete;
+  engine& operator=(engine&& opt) = delete;
 };
 }
 

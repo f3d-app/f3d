@@ -31,8 +31,8 @@ public:
   loader_impl(const options& options, window_impl& window);
   ~loader_impl();
 
-  loader& addFiles(const std::vector<std::string>& files) override;
-  loader& addFile(const std::string& path, bool recursive = true) override;
+  loader& addFiles(const std::vector<std::string>& files, bool recursive = false) override;
+  loader& addFile(const std::string& path, bool recursive = false) override;
 
   const std::vector<std::string>& getFiles() const override;
 

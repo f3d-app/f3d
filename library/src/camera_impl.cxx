@@ -23,7 +23,7 @@ camera_impl::camera_impl()
 camera_impl::~camera_impl() = default;
 
 //----------------------------------------------------------------------------
-camera& camera_impl::setPosition(const vector3_t& pos)
+camera& camera_impl::setPosition(const point3_t& pos)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetPosition(pos.data());
@@ -33,22 +33,22 @@ camera& camera_impl::setPosition(const vector3_t& pos)
 }
 
 //----------------------------------------------------------------------------
-camera::vector3_t camera_impl::getPosition()
+point3_t camera_impl::getPosition()
 {
-  vector3_t pos;
+  point3_t pos;
   this->getPosition(pos);
   return pos;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getPosition(vector3_t& pos)
+void camera_impl::getPosition(point3_t& pos)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetPosition(pos.data());
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::setFocalPoint(const vector3_t& foc)
+camera& camera_impl::setFocalPoint(const point3_t& foc)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetFocalPoint(foc.data());
@@ -58,15 +58,15 @@ camera& camera_impl::setFocalPoint(const vector3_t& foc)
 }
 
 //----------------------------------------------------------------------------
-camera::vector3_t camera_impl::getFocalPoint()
+point3_t camera_impl::getFocalPoint()
 {
-  vector3_t foc;
+  point3_t foc;
   this->getFocalPoint(foc);
   return foc;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getFocalPoint(vector3_t& foc)
+void camera_impl::getFocalPoint(point3_t& foc)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetFocalPoint(foc.data());
@@ -83,7 +83,7 @@ camera& camera_impl::setViewUp(const vector3_t& up)
 }
 
 //----------------------------------------------------------------------------
-camera::vector3_t camera_impl::getViewUp()
+vector3_t camera_impl::getViewUp()
 {
   vector3_t up;
   this->getViewUp(up);
@@ -98,7 +98,7 @@ void camera_impl::getViewUp(vector3_t& up)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::setViewAngle(const double& angle)
+camera& camera_impl::setViewAngle(const angle_deg_t& angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->SetViewAngle(angle);
@@ -108,15 +108,15 @@ camera& camera_impl::setViewAngle(const double& angle)
 }
 
 //----------------------------------------------------------------------------
-double camera_impl::getViewAngle()
+angle_deg_t camera_impl::getViewAngle()
 {
-  double angle;
+  angle_deg_t angle;
   this->getViewAngle(angle);
   return angle;
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getViewAngle(double& angle)
+void camera_impl::getViewAngle(angle_deg_t& angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   angle = cam->GetViewAngle();
@@ -134,7 +134,7 @@ camera& camera_impl::setViewMatrix(const matrix4_t& matrix)
 }
 
 //----------------------------------------------------------------------------
-camera::matrix4_t camera_impl::getViewMatrix()
+matrix4_t camera_impl::getViewMatrix()
 {
   matrix4_t matrix;
   this->getViewMatrix(matrix);
@@ -163,7 +163,7 @@ camera& camera_impl::dolly(double val)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::roll(double angle)
+camera& camera_impl::roll(angle_deg_t angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Roll(angle);
@@ -173,7 +173,7 @@ camera& camera_impl::roll(double angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::azimuth(double angle)
+camera& camera_impl::azimuth(angle_deg_t angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Azimuth(angle);
@@ -183,7 +183,7 @@ camera& camera_impl::azimuth(double angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::yaw(double angle)
+camera& camera_impl::yaw(angle_deg_t angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Yaw(angle);
@@ -193,7 +193,7 @@ camera& camera_impl::yaw(double angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::elevation(double angle)
+camera& camera_impl::elevation(angle_deg_t angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Elevation(angle);
@@ -203,7 +203,7 @@ camera& camera_impl::elevation(double angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::pitch(double angle)
+camera& camera_impl::pitch(angle_deg_t angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Pitch(angle);

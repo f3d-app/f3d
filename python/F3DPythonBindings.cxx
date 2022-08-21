@@ -92,7 +92,7 @@ PYBIND11_MODULE(f3d, module)
     .export_values();
 
   loader
-    .def("addFiles", &f3d::loader::addFiles, "Add files to the loader", py::arg("list of files"))
+    .def("addFiles", &f3d::loader::addFiles, "Add files to the loader", py::arg("list of files"), py::arg("recursive") = false)
     .def("addFile", &f3d::loader::addFile, "Add a file or directory to the loader", py::arg("path"),
       py::arg("recursive") = false)
     .def("loadFile", &f3d::loader::loadFile, "Load a specific file",

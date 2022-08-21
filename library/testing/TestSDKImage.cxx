@@ -31,7 +31,7 @@ int TestSDKImage(int argc, char* argv[])
     std::cerr << "An exception has not been thrown when saving to an incorrect path" << std::endl;
     return EXIT_FAILURE;
   }
-  catch (const f3d::image::exception&)
+  catch (const f3d::image::write_exception&)
   {
   }
 
@@ -42,7 +42,7 @@ int TestSDKImage(int argc, char* argv[])
     std::cerr << "An exception has not been thrown when reading an incorrect path" << std::endl;
     return EXIT_FAILURE;
   }
-  catch (const f3d::image::exception&)
+  catch (const f3d::image::read_exception&)
   {
   }
 

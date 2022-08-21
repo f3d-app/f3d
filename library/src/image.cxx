@@ -9,6 +9,7 @@
 #include <vtkSmartPointer.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <cassert>
 #include <vector>
 
 namespace f3d
@@ -25,10 +26,7 @@ public:
 
   vtkSmartPointer<vtkImageImport> GetVTKImporter() const
   {
-    if (this->Buffer.size() != this->Width * this->Height * this->Channels)
-    {
-      throw exception("Image size mitmatch");
-    }
+    assert(this->Buffer.size() == this->Width * this->Height * this->Channels);
 
     vtkNew<vtkImageImport> importer;
     importer->CopyImportVoidPointer(
@@ -37,7 +35,6 @@ public:
     importer->SetDataScalarTypeToUnsignedChar();
     importer->SetWholeExtent(0, this->Width - 1, 0, this->Height - 1, 0, 0);
     importer->SetDataExtentToWholeExtent();
-
     return importer;
   }
 
@@ -70,7 +67,7 @@ image::image(const std::string& path)
   std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
   if (!vtksys::SystemTools::FileExists(path))
   {
-    throw exception("Cannot open image " + path);
+    throw read_exception("Cannot open image " + path);
   }
 
   auto reader = vtkSmartPointer<vtkImageReader2>::Take(
@@ -222,7 +219,20 @@ void image::save(const std::string& path) const
 
   if (writer->GetErrorCode() != 0)
   {
-    throw exception("Cannot write " + path);
+    throw write_exception("Cannot write " + path);
   }
 }
+
+//----------------------------------------------------------------------------
+image::write_exception::write_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+image::read_exception::read_exception(const std::string& what)
+  : exception(what)
+{
+}
+
 }
