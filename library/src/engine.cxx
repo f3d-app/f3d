@@ -98,13 +98,13 @@ interactor& engine::getInteractor()
 }
 
 //----------------------------------------------------------------------------
-std::map<std::string, std::string> engine::getLibInfo()
+engine::libInformation engine::getLibInfo()
 {
-  std::map<std::string, std::string> libInfo;
-  libInfo["Version"] = detail::LibVersion;
-  libInfo["Build date"] = detail::LibBuildDate;
-  libInfo["Build system"] = detail::LibBuildSystem;
-  libInfo["Compiler"] = detail::LibCompiler;
+  libInformation libInfo;
+  libInfo.Version = detail::LibVersion;
+  libInfo.BuildDate = detail::LibBuildDate;
+  libInfo.BuildSystem = detail::LibBuildSystem;
+  libInfo.Compiler = detail::LibCompiler;
 
   std::string tmp;
 
@@ -113,21 +113,21 @@ std::map<std::string, std::string> engine::getLibInfo()
 #else
   tmp = "OFF";
 #endif
-  libInfo["Raytracing module"] = tmp;
+  libInfo.RaytracingModule = tmp;
 
 #if F3D_MODULE_EXTERNAL_RENDERING
   tmp = "ON";
 #else
   tmp = "OFF";
 #endif
-  libInfo["External rendering module"] = tmp;
+  libInfo.ExternalRenderingModule = tmp;
 
 #if F3D_MODULE_EXODUS
   tmp = "ON";
 #else
   tmp = "OFF";
 #endif
-  libInfo["Exodus module"] = tmp;
+  libInfo.ExodusModule = tmp;
 
 #if F3D_MODULE_OCCT
   tmp = F3D_OCCT_VERSION;
@@ -139,29 +139,29 @@ std::map<std::string, std::string> engine::getLibInfo()
 #else
   tmp = "OFF";
 #endif
-  libInfo["OpenCASCADE module"] = tmp;
+  libInfo.OpenCASCADEModule = tmp;
 
 #if F3D_MODULE_ASSIMP
   tmp = F3D_ASSIMP_VERSION;
 #else
   tmp = "OFF";
 #endif
-  libInfo["Assimp module"] = tmp;
+  libInfo.AssimpModule = tmp;
 
 #if F3D_MODULE_ALEMBIC
   tmp = F3D_ALEMBIC_VERSION;
 #else
   tmp = "OFF";
 #endif
-  libInfo["Alembic module"] = tmp;
+  libInfo.AlembicModule = tmp;
 
-  libInfo["VTK version"] = std::string(VTK_VERSION) + std::string(" (build ") +
+  libInfo.VTKVersion = std::string(VTK_VERSION) + std::string(" (build ") +
     std::to_string(VTK_BUILD_VERSION) + std::string(")");
 
-  libInfo["Copyright_previous"] = "Copyright (C) 2019-2021 Kitware SAS";
-  libInfo["Copyright"] = "Copyright (C) 2021-2022 Michael Migliore, Mathieu Westphal";
-  libInfo["License"] = "BSD-3-Clause";
-  libInfo["Authors"] = "Michael Migliore, Mathieu Westphal and Joachim Pouderoux";
+  libInfo.PreviousCopyright = "Copyright (C) 2019-2021 Kitware SAS";
+  libInfo.Copyright = "Copyright (C) 2021-2022 Michael Migliore, Mathieu Westphal";
+  libInfo.License = "BSD-3-Clause";
+  libInfo.Authors = "Michael Migliore, Mathieu Westphal and Joachim Pouderoux";
 
   return libInfo;
 }
@@ -174,10 +174,10 @@ std::vector<engine::readerInformation> engine::getReadersInfo()
   for (const auto& reader : readers)
   {
     readerInformation info;
-    info.name = reader->GetName();
-    info.description = reader->GetLongDescription();
-    info.extensions = reader->GetExtensions();
-    info.mimetypes = reader->GetMimeTypes();
+    info.Name = reader->GetName();
+    info.Description = reader->GetLongDescription();
+    info.Extensions = reader->GetExtensions();
+    info.MimeTypes = reader->GetMimeTypes();
     readersInfo.push_back(info);
   }
   return readersInfo;
