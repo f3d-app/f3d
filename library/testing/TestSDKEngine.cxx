@@ -45,7 +45,7 @@ int TestSDKEngine(int argc, char* argv[])
 
   // Test static information methods
   auto libInfo = f3d::engine::getLibInfo();
-  if (libInfo.find("VTK version") == libInfo.end())
+  if (libInfo.License != "BSD-3-Clause")
   {
     std::cerr << "Unexpected libInfo output" << std::endl;
     return EXIT_FAILURE;

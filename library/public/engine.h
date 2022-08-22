@@ -90,37 +90,40 @@ public:
    */
   interactor& getInteractor();
 
-  /**
-   * Get a map containing info about the libf3d
-   * Available keys here:
-   * - "Version"
-   * - "Build date"
-   * - "Build system"
-   * - "Compiler"
-   * - "Raytracing module"
-   * - "External rendering module"
-   * - "Exodus module"
-   * - "OpenCASCADE module"
-   * - "Assimp module"
-   * - "Alembic module"
-   * - "VTK version"
-   * - "Copyright_previous"
-   * - "Copyright"
-   * - "License"
-   * - "Authors"
-   */
-  static std::map<std::string, std::string> getLibInfo();
-
-  struct readerInformation
+  struct libInformation
   {
-    std::string name;
-    std::string description;
-    std::vector<std::string> extensions;
-    std::vector<std::string> mimetypes;
+    std::string Version;
+    std::string BuildDate;
+    std::string BuildSystem;
+    std::string Compiler;
+    std::string RaytracingModule;
+    std::string ExternalRenderingModule;
+    std::string ExodusModule;
+    std::string OpenCASCADEModule;
+    std::string AssimpModule;
+    std::string AlembicModule;
+    std::string VTKVersion;
+    std::string PreviousCopyright;
+    std::string Copyright;
+    std::string License;
+    std::string Authors;
   };
 
   /**
-   * Get a vector containing info about the supported readers
+   * Get a struct containing info about the libf3d
+   */
+  static libInformation getLibInfo();
+
+  struct readerInformation
+  {
+    std::string Name;
+    std::string Description;
+    std::vector<std::string> Extensions;
+    std::vector<std::string> MimeTypes;
+  };
+
+  /**
+   * Get a vector of struct containing info about the supported readers
    */
   static std::vector<readerInformation> getReadersInfo();
 
