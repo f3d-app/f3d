@@ -401,12 +401,8 @@ void ConfigurationOptions::PrintReadersList()
   // Compute the size of the 3 columns
   for (const auto& reader : readersInfo)
   {
-    // sanity check
-    if (reader.Extensions.size() < reader.MimeTypes.size())
-    {
-      f3d::log::error(reader.Name, "More mimetypes than extensions, unexpected.");
-      return;
-    }
+    // There is at least one MIME type for each extension
+    assert(reader.Extensions.size() >= reader.MimeTypes.size());
 
     nameColSize = std::max(nameColSize, reader.Name.length());
     descColSize = std::max(descColSize, reader.Description.length());
