@@ -365,21 +365,21 @@ void ConfigurationOptions::PrintVersion()
   f3d::log::info(F3D::AppName + " " + F3D::AppVersion + "\n");
   f3d::log::info(F3D::AppTitle);
   auto libInfo = f3d::engine::getLibInfo();
-  f3d::log::info("Version: " + libInfo["Version"] + ".");
-  f3d::log::info("Build date: " + libInfo["Build date"] + ".");
-  f3d::log::info("Build system: " + libInfo["Build system"] + ".");
-  f3d::log::info("Compiler: " + libInfo["Compiler"] + ".");
-  f3d::log::info("External rendering module: " + libInfo["External rendering module"] + ".");
-  f3d::log::info("Raytracing module: " + libInfo["Raytracing module"] + ".");
-  f3d::log::info("Exodus module: " + libInfo["Exodus module"] + ".");
-  f3d::log::info("OpenCASCADE module: " + libInfo["OpenCASCADE module"] + ".");
-  f3d::log::info("Assimp module: " + libInfo["Assimp module"] + ".");
-  f3d::log::info("Alembic module: " + libInfo["Alembic module"] + ".");
-  f3d::log::info("VTK version: " + libInfo["VTK version"] + ".");
-  f3d::log::info(libInfo["Copyright_previous"] + ".");
-  f3d::log::info(libInfo["Copyright"] + ".");
-  f3d::log::info("License " + libInfo["License"] + ".");
-  f3d::log::info("By " + libInfo["Authors"] + ".");
+  f3d::log::info("Version: " + libInfo.Version + ".");
+  f3d::log::info("Build date: " + libInfo.BuildDate + ".");
+  f3d::log::info("Build system: " + libInfo.BuildSystem + ".");
+  f3d::log::info("Compiler: " + libInfo.Compiler + ".");
+  f3d::log::info("External rendering module: " + libInfo.ExternalRenderingModule + ".");
+  f3d::log::info("Raytracing module: " + libInfo.RaytracingModule + ".");
+  f3d::log::info("Exodus module: " + libInfo.ExodusModule + ".");
+  f3d::log::info("OpenCASCADE module: " + libInfo.OpenCASCADEModule + ".");
+  f3d::log::info("Assimp module: " + libInfo.AssimpModule + ".");
+  f3d::log::info("Alembic module: " + libInfo.AlembicModule + ".");
+  f3d::log::info("VTK version: " + libInfo.VTKVersion + ".");
+  f3d::log::info(libInfo.PreviousCopyright + ".");
+  f3d::log::info(libInfo.Copyright + ".");
+  f3d::log::info("License " + libInfo.License + ".");
+  f3d::log::info("By " + libInfo.Authors + ".");
   f3d::log::setUseColoring(true);
   f3d::log::waitForUser();
 }
@@ -402,20 +402,20 @@ void ConfigurationOptions::PrintReadersList()
   for (const auto& reader : readersInfo)
   {
     // sanity check
-    if (reader.extensions.size() < reader.mimetypes.size())
+    if (reader.Extensions.size() < reader.MimeTypes.size())
     {
-      f3d::log::error(reader.name, "More mimetypes than extensions, unexpected.");
+      f3d::log::error(reader.Name, "More mimetypes than extensions, unexpected.");
       return;
     }
 
-    nameColSize = std::max(nameColSize, reader.name.length());
-    descColSize = std::max(descColSize, reader.description.length());
+    nameColSize = std::max(nameColSize, reader.Name.length());
+    descColSize = std::max(descColSize, reader.Description.length());
 
-    for (const auto& ext : reader.extensions)
+    for (const auto& ext : reader.Extensions)
     {
       extsColSize = std::max(extsColSize, ext.length());
     }
-    for (const auto& mime : reader.mimetypes)
+    for (const auto& mime : reader.MimeTypes)
     {
       mimeColSize = std::max(mimeColSize, mime.length());
     }
@@ -437,24 +437,24 @@ void ConfigurationOptions::PrintReadersList()
 
   for (const auto& reader : readersInfo)
   {
-    for (size_t i = 0; i < reader.extensions.size(); i++)
+    for (size_t i = 0; i < reader.Extensions.size(); i++)
     {
       std::stringstream readerLine;
       if (i == 0)
       {
-        readerLine << std::left << std::setw(nameColSize) << reader.name << std::setw(descColSize)
-                   << reader.description;
+        readerLine << std::left << std::setw(nameColSize) << reader.Name << std::setw(descColSize)
+                   << reader.Description;
       }
       else
       {
         readerLine << std::left << std::setw(nameColSize + descColSize) << " ";
       }
 
-      readerLine << std::setw(extsColSize) << reader.extensions[i];
+      readerLine << std::setw(extsColSize) << reader.Extensions[i];
 
-      if (i < reader.mimetypes.size())
+      if (i < reader.MimeTypes.size())
       {
-        readerLine << std::setw(mimeColSize) << reader.mimetypes[i];
+        readerLine << std::setw(mimeColSize) << reader.MimeTypes[i];
       }
 
       f3d::log::info(readerLine.str());
