@@ -6,6 +6,7 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 
 // TODO these methodes should be put in types.h at some point.
 bool compareDouble(double a, double b)
@@ -13,19 +14,19 @@ bool compareDouble(double a, double b)
   return std::fabs(a - b) < 128 * std::numeric_limits<double>::epsilon();
 }
 
-bool compareVec(f3d::vector3_t vec1, f3d::vector3_t vec2)
+bool compareVec(const f3d::vector3_t& vec1, const f3d::vector3_t& vec2)
 {
   return compareDouble(vec1[0], vec2[0]) && compareDouble(vec1[1], vec2[1]) &&
     compareDouble(vec1[2], vec2[2]);
 }
 
-bool comparePoint(f3d::point3_t vec1, f3d::point3_t vec2)
+bool comparePoint(const f3d::point3_t& vec1, const f3d::point3_t& vec2)
 {
   return compareDouble(vec1[0], vec2[0]) && compareDouble(vec1[1], vec2[1]) &&
     compareDouble(vec1[2], vec2[2]);
 }
 
-bool compareMat(f3d::matrix4_t mat1, f3d::matrix4_t mat2)
+bool compareMat(const f3d::matrix4_t& mat1, const f3d::matrix4_t& mat2)
 {
   for (size_t i = 0; i < mat1.size(); i++)
   {

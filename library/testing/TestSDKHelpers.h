@@ -1,7 +1,7 @@
 #ifndef TestSDKHelpers_h
 #define TestSDKHelpers_h
 
-#include <filesystem>
+#include <fstream>
 #include <iostream>
 
 class TestSDKHelpers
@@ -20,13 +20,16 @@ public:
     std::string output = outputPath + name + ".png";
     std::string diff = outputPath + name + ".diff.png";
 
-    if (!std::filesystem::exists(baseline))
     {
-      img.save(output);
-      std::cerr << "Reference image "
-                << baseline + " does not exists, current rendering has been outputted to " << output
-                << std::endl;
-      return false;
+      std::ifstream file(baseline.c_str());
+      if (!file.good())
+      {
+        img.save(output);
+        std::cerr << "Reference image "
+                  << baseline + " does not exists, current rendering has been outputted to "
+                  << output << std::endl;
+        return false;
+      }
     }
 
     f3d::image diffRes;

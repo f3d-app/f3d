@@ -108,4 +108,5 @@ if (UNIX AND NOT APPLE)
   target_link_libraries(libf3dSDKTests stdc++fs)
 endif ()
 
-target_compile_features(libf3dSDKTests PRIVATE cxx_std_17)
+# make sure the libf3d API is compatible with C++11
+set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 11)
