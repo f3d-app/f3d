@@ -15,6 +15,11 @@ namespace f3d
  */
 struct point3_t : std::array<double, 3>
 {
+  template<typename... Args>
+  point3_t(Args&&... args)
+    : array({ double(std::forward<Args>(args))... })
+  {
+  }
 };
 
 /**
@@ -22,6 +27,11 @@ struct point3_t : std::array<double, 3>
  */
 struct vector3_t : std::array<double, 3>
 {
+  template<typename... Args>
+  vector3_t(Args&&... args)
+    : array({ double(std::forward<Args>(args))... })
+  {
+  }
 };
 
 /**
@@ -29,6 +39,11 @@ struct vector3_t : std::array<double, 3>
  */
 struct matrix4_t : std::array<double, 16>
 {
+  template<typename... Args>
+  matrix4_t(Args&&... args)
+    : array({ double(std::forward<Args>(args))... })
+  {
+  }
 };
 
 /**

@@ -31,12 +31,12 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
 
   // Test callbacks
   std::string filename = "TestSDKInteractorCallBack";
-  std::string interactionFilePath = std::filesystem::path(argv[2])
-                                      .parent_path()
-                                      .parent_path()
-                                      .parent_path()
-                                      .append(filename + ".log")
-                                      .string();
+#if defined(_WIN32)
+  std::string interactionFilePath = std::string(argv[2]) + "..\\..\\" + filename + ".log";
+#else
+  std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
+#endif
+
   inter.playInteraction(interactionFilePath); // Dragon.vtu; S
 
   inter.setKeyPressCallBack(
@@ -55,7 +55,8 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     [&](std::vector<std::string> filesVec) -> bool
     {
       std::string path = filesVec[0];
-      load.addFile(std::filesystem::path(path).replace_filename("suzanne.ply").string())
+      size_t found = path.find_last_of("/\\");
+      load.addFile(path.substr(0, found + 1) + "suzanne.ply")
         .loadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
       win.render();
       return true;
