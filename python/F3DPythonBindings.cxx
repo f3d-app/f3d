@@ -18,8 +18,6 @@ PYBIND11_MODULE(f3d, module)
   module.doc() = "f3d library bindings";
 
   // types
-  py::class_<f3d::angle_deg_t>(module, "angle_deg_t")
-    .def(py::init<double>());
   py::class_<f3d::point3_t>(module, "point3_t")
     .def(py::init<double, double, double>());
   py::class_<f3d::vector3_t>(module, "vector3_t")
