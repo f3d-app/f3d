@@ -9,6 +9,7 @@
 #include <limits>
 
 // TODO these methodes should be put in types.h at some point.
+// https://github.com/f3d-app/f3d/issues/361
 bool compareDouble(double a, double b)
 {
   return std::fabs(a - b) < 128 * std::numeric_limits<double>::epsilon();

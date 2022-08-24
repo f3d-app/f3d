@@ -136,6 +136,7 @@ f3d_test(NAME TestToneMapping DATA suzanne.ply ARGS -t DEFAULT_LIGHTS)
 f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt DEFAULT_LIGHTS)
 f3d_test(NAME TestDefaultConfigFile DATA dragon.vtu CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json DEFAULT_LIGHTS)
 f3d_test(NAME TestDefaultConfigFileAnotherBlock DATA vase_4comp.vti CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json DEFAULT_LIGHTS)
+f3d_test(NAME TestDefaultConfigFileUp DATA suzanne.stl CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json DEFAULT_LIGHTS)
 f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT THRESHOLD 300) # High threshold for volume as it is dependent on the OpenGL implementation
 f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT)
 f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb LONG_TIMEOUT)
