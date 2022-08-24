@@ -135,8 +135,7 @@ public:
         render = true;
         break;
       case 'X':
-        self->Options.toggle("interactor.axis"); // XXX this should not be available in the
-                                                 // cheatsheet when not provided ?
+        self->Options.toggle("interactor.axis");
         render = true;
         break;
       case 'G':

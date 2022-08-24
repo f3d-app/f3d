@@ -142,11 +142,11 @@ options::options()
   this->Internals->init("ui.loader-progress", false);
 
   // Model
-  this->Internals->init(
-    "model.color.rgb", std::vector<double>{ 1., 1., 1. }); // TODO Not compatible with scivis
   this->Internals->init("model.color.opacity", 1.0);
-  this->Internals->init(
-    "model.color.texture", std::string()); // TODO Strange stuff when using with scivis
+  // XXX: Not compatible with scivis: https://github.com/f3d-app/f3d/issues/347
+  this->Internals->init("model.color.rgb", std::vector<double>{ 1., 1., 1. });
+  // XXX: Artifacts when using with scivis: https://github.com/f3d-app/f3d/issues/348
+  this->Internals->init("model.color.texture", std::string());
 
   this->Internals->init("model.emissive.factor", std::vector<double>{ 1., 1., 1. });
   this->Internals->init("model.emissive.texture", std::string());
@@ -166,7 +166,7 @@ options::options()
       0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 });
   this->Internals->init("model.scivis.range", std::vector<double>());
 
-  // TODO: Rename into a "rendering-mode" option
+  // XXX: Rename into a "rendering-mode" option: https://github.com/f3d-app/f3d/issues/345
   this->Internals->init("model.point-sprites.enable", false);
   this->Internals->init("model.volume.enable", false);
   this->Internals->init("model.volume.inverse", false);
