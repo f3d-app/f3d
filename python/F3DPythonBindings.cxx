@@ -2,11 +2,13 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include "camera.h"
 #include "engine.h"
 #include "image.h"
 #include "interactor.h"
 #include "loader.h"
 #include "options.h"
+#include "types.h"
 #include "window.h"
 
 namespace py = pybind11;
@@ -14,6 +16,16 @@ namespace py = pybind11;
 PYBIND11_MODULE(f3d, module)
 {
   module.doc() = "f3d library bindings";
+
+  // types
+  py::class_<f3d::point3_t>(module, "point3_t")
+    .def(py::init<double, double, double>());
+  py::class_<f3d::vector3_t>(module, "vector3_t")
+    .def(py::init<double, double, double>());
+  py::class_<f3d::matrix4_t>(module, "matrix4_t")
+    .def(py::init<double, double, double, double, double, double,
+         double, double, double, double, double,
+         double, double, double, double, double>());
 
   // f3d::image
   py::class_<f3d::image>(module, "image")
@@ -92,7 +104,8 @@ PYBIND11_MODULE(f3d, module)
     .export_values();
 
   loader
-    .def("addFiles", &f3d::loader::addFiles, "Add files to the loader", py::arg("list of files"), py::arg("recursive") = false)
+    .def("addFiles", &f3d::loader::addFiles, "Add files to the loader", py::arg("list of files"),
+      py::arg("recursive") = false)
     .def("addFile", &f3d::loader::addFile, "Add a file or directory to the loader", py::arg("path"),
       py::arg("recursive") = false)
     .def("loadFile", &f3d::loader::loadFile, "Load a specific file",
@@ -102,6 +115,34 @@ PYBIND11_MODULE(f3d, module)
     .def("getCurrentFileIndex", &f3d::loader::getCurrentFileIndex, "Get the current file index")
     .def(
       "getFileInfo", &f3d::loader::getFileInfo, "Get the file index, path, and information string");
+
+  // f3d::camera
+  py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "camera");
+
+  camera.def("setPosition", &f3d::camera::setPosition)
+    .def("getPosition", py::overload_cast<>(&f3d::camera::getPosition))
+    .def("getPosition", py::overload_cast<f3d::point3_t&>(&f3d::camera::getPosition))
+    .def("setFocalPoint", &f3d::camera::setFocalPoint)
+    .def("getFocalPoint", py::overload_cast<>(&f3d::camera::getFocalPoint))
+    .def("getFocalPoint", py::overload_cast<f3d::point3_t&>(&f3d::camera::getFocalPoint))
+    .def("setViewUp", &f3d::camera::setViewUp)
+    .def("getViewUp", py::overload_cast<>(&f3d::camera::getViewUp))
+    .def("getViewUp", py::overload_cast<f3d::vector3_t&>(&f3d::camera::getViewUp))
+    .def("setViewAngle", &f3d::camera::setViewAngle)
+    .def("getViewAngle", py::overload_cast<>(&f3d::camera::getViewAngle))
+    .def("getViewAngle", py::overload_cast<f3d::angle_deg_t&>(&f3d::camera::getViewAngle))
+    .def("setViewMatrix", &f3d::camera::setViewMatrix)
+    .def("getViewMatrix", py::overload_cast<>(&f3d::camera::getViewMatrix))
+    .def("getViewMatrix", py::overload_cast<f3d::matrix4_t&>(&f3d::camera::getViewMatrix))
+    .def("dolly", &f3d::camera::dolly)
+    .def("roll", &f3d::camera::roll)
+    .def("azimuth", &f3d::camera::azimuth)
+    .def("yaw", &f3d::camera::yaw)
+    .def("elevation", &f3d::camera::elevation)
+    .def("pitch", &f3d::camera::pitch)
+    .def("setCurrentAsDefault", &f3d::camera::setCurrentAsDefault)
+    .def("resetToDefault", &f3d::camera::resetToDefault)
+    .def("resetToBounds", &f3d::camera::resetToBounds);
 
   // f3d::window
   py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> > window(module, "window");
@@ -119,7 +160,8 @@ PYBIND11_MODULE(f3d, module)
     .def("setSize", &f3d::window::setSize, "Set the window size")
     .def("setIcon", &f3d::window::setIcon,
       "Set the icon of the window using a memory buffer representing a PNG file")
-    .def("setWindowName", &f3d::window::setWindowName, "Set the window name");
+    .def("setWindowName", &f3d::window::setWindowName, "Set the window name")
+    .def("getCamera", &f3d::window::getCamera, py::return_value_policy::reference);
 
   // f3d::engine
   py::class_<f3d::engine> engine(module, "engine");

@@ -1,5 +1,6 @@
 list(APPEND pyf3dTests_list
      TestPythonOptions.py
+     TestPythonCamera.py
     )
 
 # Test image comparison only with VTK > 9.0.1
