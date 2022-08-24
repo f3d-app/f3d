@@ -198,13 +198,11 @@ void ConfigurationOptions::GetOptionsFromArgs(
     cxxopts::Options cxxOptions(F3D::AppName, F3D::AppTitle);
     cxxOptions.positional_help("file1 file2 ...");
 
-    // TODO Rework order of options ?
-
     // clang-format off
     auto grp0 = cxxOptions.add_options("Applicative");
     this->DeclareOption(grp0, "input", "", "Input file", inputs, HasDefault::NO, MayHaveConfig::NO , "<files>");
     this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, HasDefault::NO, MayHaveConfig::NO, "<png file>");
-    this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES); // Is this OK  ? TODO
+    this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "help", "h", "Print help");
     this->DeclareOption(grp0, "version", "", "Print version details");
     this->DeclareOption(grp0, "readers-list", "", "Print the list of file types");
@@ -217,7 +215,7 @@ void ConfigurationOptions::GetOptionsFromArgs(
     this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which superseed any verbose options and prevent any console output to be generated at all", appOptions.Quiet,  HasDefault::YES, MayHaveConfig::NO );
     this->DeclareOption(grp1, "progress", "", "Show progress bar", options.getAsBoolRef("ui.loader-progress"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", options.getAsBoolRef("scene.geometry-only"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "up", "", "Up direction", options.getAsStringRef("scene.up-direction"), HasDefault::YES, MayHaveConfig::YES, "[-X|+X|-Y|+Y|-Z|+Z]"); // TODO add a config test, critical
+    this->DeclareOption(grp1, "up", "", "Up direction", options.getAsStringRef("scene.up-direction"), HasDefault::YES, MayHaveConfig::YES, "[-X|+X|-Y|+Y|-Z|+Z]");
     this->DeclareOption(grp1, "axis", "x", "Show axes", options.getAsBoolRef("interactor.axis"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "grid", "g", "Show grid", options.getAsBoolRef("render.grid"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.getAsBoolRef("render.show-edges"), HasDefault::YES, MayHaveConfig::YES);
@@ -243,7 +241,7 @@ void ConfigurationOptions::GetOptionsFromArgs(
     this->DeclareOption(grp2, "normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", options.getAsDoubleRef("model.normal.scale"), HasDefault::YES, MayHaveConfig::YES, "<normalScale>");
 
     auto grp3 = cxxOptions.add_options("Window");
-    this->DeclareOption(grp3, "bg-color", "", "Background color", options.getAsDoubleVectorRef("render.background.color"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>"); // TODO change name ?
+    this->DeclareOption(grp3, "bg-color", "", "Background color", options.getAsDoubleVectorRef("render.background.color"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
     this->DeclareOption(grp3, "resolution", "", "Window resolution", appOptions.Resolution, HasDefault::YES, MayHaveConfig::NO, "<width,height>");
     this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.getAsBoolRef("ui.fps"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp3, "filename", "n", "Display filename", options.getAsBoolRef("ui.filename"), HasDefault::YES, MayHaveConfig::YES);
