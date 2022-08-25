@@ -1,0 +1,13 @@
+# StreamVersion 1.1
+ExposeEvent 0 599 0 0 0 0
+RenderEvent 0 599 0 0 0 0
+KeyPressEvent 677 699 0 0 1 Super_L
+CharEvent 677 699 0 0 1 Super_L
+UpdateDropLocationEvent 677 699 0 0 1 Super_L
+EnterEvent 781 494 0 0 0 Super_L
+DropFilesEvent 781 494 0 0 0 Super_L
+RenderEvent 781 494 0 0 0 Super_L
+MouseMoveEvent 781 498 0 0 0 Super_L
+LeaveEvent 751 614 0 0 0 Super_L
+EnterEvent 700 570 0 0 0 Super_L
+MouseMoveEvent 700 570 0 0 0 Super_L

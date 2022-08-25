@@ -1,0 +1,14 @@
+# NVIDIA driver
+leak:nvidia-glcore
+
+# Kernel
+leak:ld-linux-x86-64
+
+# OCCT
+leak:TKernel
+leak:TKXSBase
+
+# Potential mesa/VTK leak with incomplete callstack
+# forces us to hide all leaks from the libf3dSDKTests
+# https://gitlab.kitware.com/vtk/vtk/-/issues/18504
+leak:libf3dSDKTests

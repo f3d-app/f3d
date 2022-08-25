@@ -1,16 +1,17 @@
 codecov:
   notify:
-    after_n_builds: 3
+    after_n_builds: 1
     wait_for_ci: yes
 
 coverage:
   range: 70..100
   round: down
   precision: 2
-  project:
-    default:
-      target: auto
-      threshold: 0.1%
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 0.1%
 
 comment:
   require_changes: true

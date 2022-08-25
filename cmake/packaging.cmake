@@ -36,13 +36,16 @@ if(WIN32 AND NOT UNIX)
   # FileAssociation.nsh, from https://nsis.sourceforge.io/File_Association, has to be installed in NSIS\Include
   set(CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS
    "\
-   !include \\\"${PATH_TO_PLUGINS}\\\\FileFunc.nsh\\\"\n\
-   !include \\\"${PATH_TO_PLUGINS}\\\\FileAssociation.nsh\\\"")
+   !include \\\"FileFunc.nsh\\\"\n\
+   !include \\\"FileAssociation.nsh\\\"")
 
   # Create association on install
+  set(F3D_REGISTER_LIST "${F3D_FILE_ASSOCIATION_NSIS}")
+  list(TRANSFORM F3D_REGISTER_LIST PREPEND "\\\${RegisterExtension} '\\\"$INSTDIR\\\\bin\\\\f3d.exe\\\"' ")
+  list(JOIN F3D_REGISTER_LIST "\n      " F3D_REGISTER_STRING)
   set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "\
     StrCmp $REGISTER_EXTENSIONS \\\"0\\\" doNotRegisterExtensions\n\
-      !include \\\"NSIS.RegisterCommands.nsh\\\"\n\
+      ${F3D_REGISTER_STRING}\n\
       \\\${RefreshShellIcons}\n\
     doNotRegisterExtensions:\n\n")
 
@@ -59,9 +62,12 @@ if(WIN32 AND NOT UNIX)
   endif()
 
   # Remove association on uninstall
+  set(F3D_UNREGISTER_LIST "${F3D_FILE_ASSOCIATION_NSIS}")
+  list(TRANSFORM F3D_UNREGISTER_LIST PREPEND "\\\${UnRegisterExtension} ")
+  list(JOIN F3D_UNREGISTER_LIST "\n      " F3D_UNREGISTER_STRING)
   set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "\
     StrCmp $REGISTER_EXTENSIONS \\\"0\\\" doNotUnregisterExtensions\n\
-      !include \\\"NSIS.UnregisterCommands.nsh\\\"\n\
+      ${F3D_UNREGISTER_STRING}\n\
       \\\${RefreshShellIcons}\n\
     doNotUnregisterExtensions:\n\n")
 
@@ -83,4 +89,19 @@ else()
   endif()
 endif()
 
+# Never package "pythonmodule" component
+# The SDK ("cmake" and "headers" components) is not packaged for macOS bundle
+# "vtkext" component must be packaged if libf3d is static and not a macOS bundle
+set(CPACK_COMPONENTS_ALL assets documentation shellext)
+if(F3D_MACOS_BUNDLE)
+  list(APPEND CPACK_COMPONENTS_ALL bundle)
+else()
+  list(APPEND CPACK_COMPONENTS_ALL application library cmake headers)
+  if(NOT BUILD_SHARED_LIBS)
+    list(APPEND CPACK_COMPONENTS_ALL vtkext)
+  endif()
+endif()
+
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_COMPONENTS_GROUPING ALL_COMPONENTS_IN_ONE)
 include(CPack)
