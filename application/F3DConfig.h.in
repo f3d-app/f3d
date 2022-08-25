@@ -1,0 +1,14 @@
+#ifndef F3DConfig_h
+#define F3DConfig_h
+
+namespace F3D
+{
+  const std::string AppName = "@PROJECT_NAME@";
+  const std::string AppTitle = "@PROJECT_DESCRIPTION@";
+  const std::string AppVersion = "@PROJECT_VERSION@";
+}
+
+#cmakedefine01 F3D_MACOS_BUNDLE
+#cmakedefine01 F3D_MODULE_RAYTRACING
+
+#endif

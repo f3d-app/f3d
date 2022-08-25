@@ -1,4 +1,4 @@
-[![CI](https://github.com/f3d-app/f3d/actions/workflows/ci.yml/badge.svg)](https://github.com/f3d-app/f3d/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/f3d-app/f3d/branch/master/graph/badge.svg?token=siwG82IXK7)](https://codecov.io/gh/f3d-app/f3d)
+[![CI](https://github.com/f3d-app/f3d/actions/workflows/ci.yml/badge.svg)](https://github.com/f3d-app/f3d/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/f3d-app/f3d/branch/master/graph/badge.svg?token=siwG82IXK7)](https://codecov.io/gh/f3d-app/f3d) [![Downloads](https://img.shields.io/github/downloads/f3d-app/f3d/total.svg)](https://github.com/f3d-app/f3d/releases)  [![Downloads](https://img.shields.io/reddit/subreddit-subscribers/f3d_app.svg)](https://www.reddit.com/r/f3d_app)
 
 ![F3D Logo](./resources/logo.svg)
 
@@ -9,7 +9,7 @@ By Michael Migliore and Mathieu Westphal.
 F3D (pronounced `/fɛd/`) is a [VTK-based](https://vtk.org) 3D viewer following the [KISS principle](https://en.wikipedia.org/wiki/KISS_principle), so it is minimalist, efficient, has no GUI, has simple interaction mechanisms and is fully controllable using arguments in the command line.
 
 F3D is open-source and cross-platform (tested on Windows, Linux and macOS).
-It supports a range of file formats (including animated glTF, stl, step, ply, obj), and provides numerous rendering and texturing options.
+It supports a range of file formats (including animated glTF, stl, step, ply, obj, fbx), and provides numerous rendering and texturing options.
 
 <img src="https://f3d-app.github.io/f3d/gallery/04-f3d.png"  width="640">
 
@@ -25,7 +25,7 @@ It supports a range of file formats (including animated glTF, stl, step, ply, ob
 
 # Acknowledgments
 
-F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/) and [Assimp](https://www.assimp.org/).
+F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/), [Assimp](https://www.assimp.org/) and [Alembic](https://github.com/alembic/alembic).
 
 # How to use
 
@@ -34,18 +34,18 @@ There are 4 main ways to use F3D:
 * By running F3D from a terminal with a set of command-line options.
 * By running F3D directly and then dragging and dropping files into it to open them.
 * By using F3D automatically in the file manager when opening file.
-* As a [thumbnailer](#Thumbnailer) for all supported file formats with certain file managers.
+* As a thumbnailer for all supported file formats with certain file managers.
 
 # Installation
 
-You can find the release binary packages for Windows, Linux and macOS on the [Release page](https://github.com/f3d-app/f3d).
+You can find the release binary packages for Windows, Linux and macOS on the [Release page](https://github.com/f3d-app/f3d/releases). See the [desktop integration](#desktop-integration) section in order actually integrate the binary release in your desktop.
 Alternatively, you can build it yourself following the [build](#Build) guide below.
 
 You can also find packages for the following operating systems:
 
-## Ubuntu/Debian/openSuse
+## OpenSuse
 
-Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home:AndnoVember:F3D/f3d).
+Available in [OpenSuse](https://build.opensuse.org/package/show/graphics/f3d).
 
 ## Arch Linux
 
@@ -67,9 +67,17 @@ Available in [Homebrew](https://formulae.brew.sh/formula/f3d).
 
 Available in [nixpkgs](https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/graphics/f3d/default.nix).
 
+## Ubuntu/Debian/Fedora
+
+Available on [OpenSuse OBS](https://build.opensuse.org/package/show/home:AndnoVember:F3D/f3d).
+
 ## Flathub
 
 Available in [Flathub](https://flathub.org/apps/details/io.github.f3d_app.f3d).
+
+## Spack
+
+Available in [Spack](https://spack.readthedocs.io/en/latest/package_list.html#f3d).
 
 # Build
 
@@ -77,7 +85,7 @@ Available in [Flathub](https://flathub.org/apps/details/io.github.f3d_app.f3d).
 
 * [CMake](https://cmake.org) >= 3.1.
 * [VTK](https://vtk.org) >= 9.0.0 (optionally with raytracing capabilities to enable OSPray rendering).
-* A C++11 compiler.
+* A C++17 compiler.
 * A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 
 ## Configuration and building
@@ -88,6 +96,7 @@ Configure and generate the project with CMake by providing the following CMake o
 * `BUILD_TESTING`: Enable the tests.
 * `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
 * `F3D_WINDOWS_GUI`: On Windows, build a Win32 application (without console).
+* `F3D_PYTHON_BINDINGS`: Generate python bindings (needs python and pybind11)
 
 Some modules depending on external libraries can be optionally enabled with the following CMake variables:
 
@@ -95,6 +104,7 @@ Some modules depending on external libraries can be optionally enabled with the 
 * `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay`. Disabled by default.
 * `F3D_MODULE_OCCT`: Support for STEP and IGES file formats. Requires `OpenCASCADE`. Disabled by default.
 * `F3D_MODULE_ASSIMP`: Support for FBX, DAE, OFF and DXF file formats. Requires `Assimp`. Disabled by default.
+* `F3D_MODULE_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.
 
 Then build the software using your build system.
 
@@ -115,6 +125,7 @@ Here is the list of supported file formats:
 * **.pts** : Point Cloud file format
 * **.step/.stp** : CAD STEP exchange ISO format
 * **.iges/.igs** : CAD Initial Graphics Exchange Specification format
+* **.abc** : Alembic format
 * **.obj** : Wavefront OBJ file format (full scene)
 * **.gltf/.glb** : GL Transmission Format (full scene)
 * **.3ds** : Autodesk 3D Studio file format (full scene)
@@ -138,7 +149,7 @@ Options|Description
 ------|------
 \-\-input=&lt;file&gt;|The *input* file or files to read, can also be provided as a positional argument.
 \-\-output=&lt;png file&gt;|Instead of showing a render view and render into it, *render directly into a png file*. When used with ref option, only outputs on failure
-\-\-no-background|Output file is saved with a transparent background. Ignored when using ref option.
+\-\-no-background|Output file is saved with a transparent background.
 -h, \-\-help|Print *help*.
 \-\-verbose|Enable *verbose* mode, providing more information about the loaded data in the console output.
 \-\-no-render|Verbose mode without any rendering for the first provided file, to recover information about a file.
@@ -154,6 +165,7 @@ Options|Description
 \-\-geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-dry-run|Do not read the configuration file but consider only the command line options
 \-\-config|Read a provided configuration file instead of default one
+\-\-font-file|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.
 
 ## Material options
 
@@ -162,14 +174,14 @@ Options|Default|Description
 -o, \-\-point-sprites||Show sphere *points sprites* instead of the geometry.
 \-\-point-size|10.0|Set the *size* of points when showing vertices and point sprites.
 \-\-line-width|1.0|Set the *width* of lines when showing edges.
-\-\-color=&lt;R,G,B&gt;|1.0, 1.0, 1.0| Set a *color* on the geometry.<br>This only makes sense when using the default scene.
-\-\-opacity=&lt;opacity&gt;|1.0|Set *opacity* on the geometry.<br>This only makes sense when using the default scene. Usually used with Depth Peeling option.
-\-\-roughness=&lt;roughness&gt;|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
-\-\-metallic=&lt;metallic&gt;|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0).<br>This only makes sense when using the default scene.
+\-\-color=&lt;R,G,B&gt;|1.0, 1.0, 1.0| Set a *color* on the geometry. Multiplied with the base color texture when present. <br>This only makes sense when using the default scene.
+\-\-opacity=&lt;opacity&gt;|1.0|Set *opacity* on the geometry. Multiplied with the base color texture when present. <br>This only makes sense when using the default scene. Usually used with Depth Peeling option.
+\-\-roughness=&lt;roughness&gt;|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>This only makes sense when using the default scene.
+\-\-metallic=&lt;metallic&gt;|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>This only makes sense when using the default scene.
 \-\-hrdi=&lt;file path&gt;||Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, png, jpg, pnm, tiff, bmp.
-\-\-texture-base-color=&lt;file path&gt;||Path to a texture file that sets the color of the object.
-\-\-texture-material=&lt;file path&gt;||Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object.
-\-\-texture-emissive=&lt;file path&gt;||Path to a texture file that sets the emitted light of the object.
+\-\-texture-base-color=&lt;file path&gt;||Path to a texture file that sets the color of the object. Please note this will be multiplied with the color and opacity options.
+\-\-texture-material=&lt;file path&gt;||Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use `--roughness=1 --metallic=1`.
+\-\-texture-emissive=&lt;file path&gt;||Path to a texture file that sets the emitted light of the object. Please note this will be multiplied with the emissive factor.
 \-\-emissive-factor=&lt;R,G,B&gt;|1.0, 1.0, 1.0| Emissive factor. This value is multiplied with the emissive color when an emissive texture is present.
 \-\-texture-normal=&lt;file path&gt;||Path to a texture file that sets the normal map of the object.
 \-\-normal-scale=&lt;normal_scale&gt;|1.0|Normal scale affects the strength of the normal deviation from the normal texture.
@@ -187,13 +199,13 @@ Options|Description
 
 Options|Description
 ------|------
-\-\-camera-index|Select the scene camera to use.<br>Any negative value means custom camera.<br>The default scene always has a custom camera.
-\-\-camera-position=&lt;X,Y,Z&gt;|The position of the camera. Automatically computed or recovered from the file if not provided.
-\-\-camera-focal-point=&lt;X,Y,Z&gt;|The focal point of the camera. Automatically computed or recovered from the file if not provided.
-\-\-camera-view-up=&lt;X,Y,Z&gt;|The view up vector of the camera. Will be orthogonalized even when provided. Automatically computed or recovered from the file if not provided.
-\-\-camera-view-angle=&lt;angle&gt;|The view angle of the camera, non-zero value in degrees. Automatically computed or recovered from the file if not provided.
-\-\-camera-azimuth-angle=&lt;angle&gt;|The azimuth angle of the camera in degrees (default: 0.0).<br>This angle will be applied after setting the position of the camera, focal point of the camera, and view up vector of the camera.
-\-\-camera-elevation-angle=&lt;angle&gt;|The elevation angle of the camera in degrees (default: 0.0).<br>This angle will be applied after setting the position of the camera, focal point of the camera, and view up vector of the camera.
+\-\-camera-index|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.
+\-\-camera-position=&lt;X,Y,Z&gt;|The position of the camera.
+\-\-camera-focal-point=&lt;X,Y,Z&gt;|The focal point of the camera.
+\-\-camera-view-up=&lt;X,Y,Z&gt;|The view up vector of the camera. Will be orthogonalized even when provided.
+\-\-camera-view-angle=&lt;angle&gt;|The view angle of the camera, non-zero value in degrees.
+\-\-camera-azimuth-angle=&lt;angle&gt;|Apply an azimuth transformation to the camera, in degrees (default: 0.0).
+\-\-camera-elevation-angle=&lt;angle&gt;|Apply an elevation transformation to the camera, in degrees (default: 0.0).
 
 ## Raytracing options
 
@@ -264,7 +276,7 @@ The coloring can be controlled directly by pressing the following hotkeys:
 * `S`: cycle the array to color with.
 * `Y`: cycle the component of the array to color with.
 
-See the [coloring cycle](#Cycling Coloring) section for more info.
+See the [coloring cycle](#cycling-coloring) section for more info.
 
 Other options can be toggled directly by pressing the following hotkeys:
 
@@ -284,7 +296,6 @@ Other options can be toggled directly by pressing the following hotkeys:
 * `Z`: the display of the FPS counter.
 * `R`: raytracing.
 * `D`: the denoiser when raytracing.
-* `F`: full screen.
 * `U`: background blur.
 * `K`: trackball interaction mode.
 
@@ -293,7 +304,7 @@ Note that some hotkeys can be available or not depending on the file being loade
 Other hotkeys are available:
 
 * `H`: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
-* `?`: key to dump camera state to the terminal.
+* `?`: key to print scene description to the terminal.
 * `ESC`: close the window and quit F3D.
 * `ENTER`: reset the camera to its initial parameters.
 * `SPACE`: play the animation if any.
@@ -364,7 +375,7 @@ The third block specifies raytracing usage for .gltf and .glb files.
 The last block specifies that volume rendering should be used with .mhd files.
 
 The following command-line options <br>cannot</br> be set via config file:
-`help`, `version`, `config`, `dry-run`, `no-render`, `inputs`, `output` and all testing options.
+`help`, `version`, `config`, `dry-run`, `no-render`, `inputs`, `output`, `quiet`, `verbose`, `resolution` and all testing options.
 
 Boolean options that have been turned on in the configuration file can be turned
 off in the command line if needed, eg: `--point-sprites=false`
@@ -379,19 +390,64 @@ They are considered in the below order and only the first found will be used.
 If you are using the releases, a default configuration file is provided when installing F3D.
 On Linux, it will be installed in `/etc/f3d/`, on Windows, it will be installed in the install directory, on macOS, it will be installed in the bundle.
 
+# libf3d
+
+F3D contains not only the F3D executable but also the libf3d, a library to render 3D meshes, which can be used in C++ or Python.
+The libf3d is documented [here.](README_libf3d.md)
+
 # Desktop Integration
 
-F3D can be integrated in the desktop experience in certain cases
+F3D can be integrated in the desktop experience.
 
 ## Linux
 
-During instalation, F3D will install mime types files as defined by the [XDG standard](https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-latest.html), a .thumbnailer file as specified [here](https://wiki.archlinux.org/title/File_manager_functionality#Thumbnail_previews) and a .desktop as specified [here](https://wiki.archlinux.org/title/desktop_entries). Many file managers use this mechanism, including nautilus, thunar, pcmanfm and caja. Make sure to update the mime types database using [update-mime-database](https://linux.die.net/man/1/update-mime-database) as well as the desktop entries database using [update-desktop-database](https://linuxcommandlibrary.com/man/update-desktop-database).
+For Linux desktop integration, F3D rely on mime types files as defined by the [XDG standard](https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-latest.html), .thumbnailer file as specified [here](https://wiki.archlinux.org/title/File_manager_functionality#Thumbnail_previews) and .desktop file as specified [here](https://wiki.archlinux.org/title/desktop_entries). Many file managers use this mechanism, including nautilus, thunar, pcmanfm and caja.
+
+The simplest way to obtain desktop integration on linux is to use a package for your distribution, or the .deb binary package we provide if compatible with your distribution.
+In other cases, the binary archive can be used like this:
+
+0. Make sure ~/.local/bin is part of your PATH
+1. Extract F3D archive in a TEMP folder
+2. move $TEMP/config.json to ~/.config/f3d/
+3. copy $TEMP/* to ~/.local/
+4. Update your [mime database](https://linux.die.net/man/1/update-mime-database) pointing to ~/.local/share/mime
+5. Update your [desktop database](https://linuxcommandlibrary.com/man/update-desktop-database) pointing to ~/.local/share/application
+
+```bash
+tar -xzvf f3d-1.2.0-Linux.tar.gz
+cd f3d-1.2.0-Linux
+mkdir -p ~/.config/f3d/
+mv config.json /.config/f3d/
+cp -r ./* ~/.local/
+sudo update-mime-database ~/.local/share/mime/
+sudo update-desktop-database ~/.local/share/applications
+```
+
+If you have any issues, read the [troubleshooting](#Troubleshooting) section.
 
 ## Windows
 
-Using the F3D NSIS installer is the simplest way to enable thumbnails on windows, you can find it in the release section. It will automatically register it when installing F3D and unregister it when uninstalling F3D.
-It is also possible to manually register it using `regsvr32 F3DShellExtension.dll`. To unregister it, use `regsvr32 /u F3DShellExtension.dll`.
-The NSIS installer also register/unregister extensions support on installation/deinstallation.
+For Windows desktop integration, F3D rely on a registered shell extension.
+
+Using the F3D NSIS installer (.exe) is the simplest way to enable thumbnails and integrate F3D on windows.
+
+It is also possible to do it manually when using the zipped binary release, on installation, just run:
+
+```
+cd C:\path\to\f3d\bin\
+regsvr32 F3DShellExtension.dll
+```
+
+To remove the shell extension, run:
+
+```
+cd C:\path\to\f3d\bin\
+regsvr32 /u F3DShellExtension.dll
+```
+
+## MacOS
+
+There is no support for thumbnails on MacOS, the .dmg binary release should provide automatic file openings.
 
 # Known limitations
 
@@ -414,6 +470,14 @@ FBX, DAE, OFF, and DXF file formats rely on [Assimp](https://github.com/assimp/a
 - Some files can be empty, crash, or show artifacts
 - DXF support is very limited: only files with polylines and 3D faces are displayed.
 
+## Alembic
+ABC file formats rely on [Alembic](https://github.com/alembic/alembic) library. It comes with some known limitations:
+- Supports Alembic 1.7 or later
+- Supports only simple polygonal geometry
+- Does not support ArbGeomParam feature in Alembic
+- Does not support Subdivision Meshes
+- Does not support Materials
+
 # Troubleshooting
 
 ## General
@@ -432,6 +496,15 @@ Be sure that VTK has been built with *OpenImageDenoise* support (`VTKOSPRAY_ENAB
   * If no formats have working thumbnails, then it is an issue with the f3d.thumbnailer file
 
 ## Windows
+> After installing F3D or registering the shell extension, my explorer is broken
+
+Unregister the shell extension by running:
+
+```
+cd C:\path\to\f3d\bin\
+regsvr32 /u F3DShellExtension.dll
+```
+
 > I use F3D in a VM, the application fails to launch.
 
 OpenGL applications like F3D can have issues when launched from a guest Windows because the access to the GPU is restricted.
@@ -444,3 +517,8 @@ You can try to use a software implementation of OpenGL, called [Mesa](https://gi
 > I run f3d from the command prompt and my Unicode characters are not displayed properly.
 
 Set the codepage to UTF-8, run `chcp 65001`.
+
+# License
+
+F3D can be used and distributed under the 3-Clause BSD License, see LICENSE.
+F3D rely on other libraries and tools, all under permissive licenses, see THIRD_PARTY_LICENSES.md.
