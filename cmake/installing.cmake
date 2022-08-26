@@ -44,13 +44,11 @@ if (UNIX AND NOT APPLE)
   if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
     if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
       install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
-        DESTINATION "." COMPONENT configuration)
+        DESTINATION "${CMAKE_INSTALL_SYSCONFDIR}/f3d" COMPONENT configuration)
     else()
-      if (NOT CMAKE_INSTALL_PREFIX STREQUAL "/usr")
-        message(WARNING "Enabling F3D_INSTALL_DEFAULT_CONFIGURATION_FILE, while not installing to /usr. "
-                "Default configuration file may be installed in a location that will not be scanned by F3D. "
-                "You can set F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX to ensure the file will be scanned.")
-      endif()
+      message(STATUS "Enabling F3D_INSTALL_DEFAULT_CONFIGURATION_FILE, while not enabling "
+              "F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX implies that installation of the config file rely on
+              CMAKE_INSTALL_FULL_SYSCONFDIR and that the config file will not be packaged by cmake.")
       install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
         DESTINATION "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d" COMPONENT configuration)
     endif()
