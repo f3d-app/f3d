@@ -9,15 +9,17 @@
 #
 #   f3d_INCLUDE_DIR        Path to the include directory of public f3d library classes
 #
-#   f3d_MODULE_RAYTRACING  Will be enabled if F3D was built with raytracing support
-#   f3d_MODULE_EXODUS      Will be enabled if F3D was built with exodus support
-#   f3d_MODULE_OCCT        Will be enabled if F3D was built with open cascade support
-#   f3d_MODULE_ASSIMP      Will be enabled if F3D was built with assimp support
-#   f3d_MODULE_ALEMBIC     Will be enabled if F3D was built with alembic support
-#   f3d_PYTHON_BINDINGS    Will be enabled if F3D was built with python bindings
+#   f3d_MODULE_EXTERNAL_RENDERING  Will be enabled if F3D was built with external rendering support
+#   f3d_MODULE_RAYTRACING          Will be enabled if F3D was built with raytracing support
+#   f3d_MODULE_EXODUS              Will be enabled if F3D was built with exodus support
+#   f3d_MODULE_OCCT                Will be enabled if F3D was built with open cascade support
+#   f3d_MODULE_ASSIMP              Will be enabled if F3D was built with assimp support
+#   f3d_MODULE_ALEMBIC             Will be enabled if F3D was built with alembic support
+#   f3d_PYTHON_BINDINGS            Will be enabled if F3D was built with python bindings
 
 @PACKAGE_INIT@
 
+set(f3d_MODULE_EXTERNAL_RENDERING "@F3D_MODULE_EXTERNAL_RENDERING@")
 set(f3d_MODULE_RAYTRACING "@F3D_MODULE_RAYTRACING@")
 set(f3d_MODULE_EXODUS "@F3D_MODULE_EXODUS@")
 set(f3d_MODULE_OCCT "@F3D_MODULE_OCCT@")
