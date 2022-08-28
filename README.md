@@ -383,12 +383,12 @@ off in the command line if needed, eg: `--point-sprites=false`
 The configuration file possible locations depends on your operating system.
 They are considered in the below order and only the first found will be used.
 
- * Linux: `/etc/f3d/config.json`, `[install_dir]/config.json`, `${XDG_CONFIG_HOME}/.config/f3d/config.json`, `~/.config/f3d/config.json`
- * Windows: `[install_dir]\config.json`, `%APPDATA%\f3d\config.json`
- * macOS: `/etc/f3d/config.json`, `f3d.app/Contents/Resources/config.json`, `[install_dir]/config.json`, `~/.config/f3d/config.json`
+ * Linux: `${XDG_CONFIG_HOME}/.config/f3d/config.json`, `~/.config/f3d/config.json`, `[install_dir]/etc/f3d/config.json`, `/usr/local/etc/f3d/config.json`, `/etc/f3d/config.json`
+ * Windows: `%APPDATA%\f3d\config.json`,  `[install_dir]\config.json`
+ * macOS: `${XDG_CONFIG_HOME}/.config/f3d/config.json`, `~/.config/f3d/config.json`, `f3d.app/Contents/Resources/config.json`,  `/usr/local/etc/f3d/config.json`, `/etc/f3d/config.json`
 
-If you are using the releases, a default configuration file is provided when installing F3D.
-On Linux, it will be installed in `/etc/f3d/`, on Windows, it will be installed in the install directory, on macOS, it will be installed in the bundle.
+If you are using the binary releases, a default configuration file is provided when installing F3D.
+On Linux, it will be installed in `[install_dir]/etc/f3d/`, on Windows, it will be installed in the install directory, on macOS, it will be installed in the bundle.
 
 # libf3d
 
