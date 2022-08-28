@@ -92,7 +92,7 @@ endif()
 # Never package "pythonmodule" component
 # The SDK ("cmake" and "headers" components) is not packaged for macOS bundle
 # "vtkext" component must be packaged if libf3d is static and not a macOS bundle
-set(CPACK_COMPONENTS_ALL assets documentation shellext)
+set(CPACK_COMPONENTS_ALL assets configuration documentation shellext mimetypes)
 if(F3D_MACOS_BUNDLE)
   list(APPEND CPACK_COMPONENTS_ALL bundle)
 else()
@@ -104,4 +104,5 @@ endif()
 
 set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 set(CPACK_COMPONENTS_GROUPING ALL_COMPONENTS_IN_ONE)
+set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_SOURCE_DIR}/cmake/cpack_project_config.cmake")
 include(CPack)

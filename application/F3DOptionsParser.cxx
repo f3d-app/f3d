@@ -1,6 +1,7 @@
 #include "F3DOptionsParser.h"
 
 #include "F3DConfig.h"
+#include "F3DConfigFileTools.h"
 #include "F3DException.h"
 
 #include "cxxopts.hpp"
@@ -11,7 +12,6 @@
 #include "log.h"
 #include "options.h"
 
-#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -166,12 +166,6 @@ protected:
     var = {};
     group(this->CollapseName(longName, shortName), doc, val, argHelp);
   }
-
-  std::string GetBinaryConfigFileDirectory();
-  std::string GetConfigFilePath();
-
-  static std::string GetSystemConfigFileDirectory();
-  static std::string GetUserConfigFileDirectory();
 
   void PrintHelpPair(
     const std::string& key, const std::string& help, int keyWidth = 10, int helpWidth = 70);
@@ -470,7 +464,7 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
   }
   else
   {
-    configFilePath = this->GetConfigFilePath();
+    configFilePath = F3DConfigFileTools::GetConfigFilePath();
   }
   if (configFilePath.empty())
   {
@@ -534,138 +528,6 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
   }
 
   return true;
-}
-
-//----------------------------------------------------------------------------
-std::string ConfigurationOptions::GetUserConfigFileDirectory()
-{
-  std::string applicationName = "f3d";
-#if defined(_WIN32)
-  const char* appData = std::getenv("APPDATA");
-  if (!appData)
-  {
-    return std::string();
-  }
-  std::string separator("\\");
-  std::string directoryPath(appData);
-  if (directoryPath[directoryPath.size() - 1] != separator[0])
-  {
-    directoryPath.append(separator);
-  }
-  directoryPath += applicationName + separator;
-#else
-  std::string directoryPath;
-  std::string separator("/");
-
-  // Implementing XDG specifications
-  const char* xdgConfigHome = std::getenv("XDG_CONFIG_HOME");
-  if (xdgConfigHome && strlen(xdgConfigHome) > 0)
-  {
-    directoryPath = xdgConfigHome;
-    if (directoryPath[directoryPath.size() - 1] != separator[0])
-    {
-      directoryPath += separator;
-    }
-  }
-  else
-  {
-    const char* home = std::getenv("HOME");
-    if (!home)
-    {
-      return std::string();
-    }
-    directoryPath = home;
-    if (directoryPath[directoryPath.size() - 1] != separator[0])
-    {
-      directoryPath += separator;
-    }
-    directoryPath += ".config/";
-  }
-  directoryPath += applicationName + separator;
-#endif
-  return directoryPath;
-}
-
-//----------------------------------------------------------------------------
-std::string ConfigurationOptions::GetSystemConfigFileDirectory()
-{
-  std::string directoryPath = "";
-// No support implemented for system wide config file on Windows yet
-#ifndef _WIN32
-#ifdef __APPLE__
-  // Implementing simple /usr/local/etc/ system wide config
-  directoryPath = "/usr/local/etc/f3d/";
-#else
-  // Implementing simple /etc/ system wide config
-  directoryPath = "/etc/f3d/";
-#endif
-#endif
-  return directoryPath;
-}
-
-//----------------------------------------------------------------------------
-std::string ConfigurationOptions::GetBinaryConfigFileDirectory()
-{
-  std::string execPath;
-  std::filesystem::path dirPath;
-  std::string errorMsg, programFilePath;
-  try
-  {
-    dirPath = std::filesystem::canonical(std::filesystem::path(this->Argv[0]))
-                .parent_path()
-                .parent_path()
-                .string();
-
-#if F3D_MACOS_BUNDLE
-    for (auto const& dirEntry : std::filesystem::directory_iterator{ dirPath })
-    {
-      if (dirEntry.path().filename() == "Resources")
-      {
-        dirPath = dirEntry.path();
-      }
-    }
-#endif
-  }
-  catch (const std::filesystem::filesystem_error&)
-  {
-    f3d::log::error("Cannot recover binary config file directory: ", dirPath.string());
-    return std::string();
-  }
-
-  // Add last separator that may be missing
-  dirPath += "/";
-  return dirPath.string();
-}
-
-//----------------------------------------------------------------------------
-std::string ConfigurationOptions::GetConfigFilePath()
-{
-  std::string fileName = "config.json";
-  std::filesystem::path filePath;
-  try
-  {
-    filePath = std::filesystem::path(ConfigurationOptions::GetUserConfigFileDirectory() + fileName);
-    if (!std::filesystem::exists(filePath))
-    {
-      filePath = std::filesystem::path(this->GetBinaryConfigFileDirectory() + fileName);
-      if (!std::filesystem::exists(filePath))
-      {
-        filePath =
-          std::filesystem::path(ConfigurationOptions::GetSystemConfigFileDirectory() + fileName);
-        if (!std::filesystem::exists(filePath))
-        {
-          return std::string();
-        }
-      }
-    }
-  }
-  catch (const std::filesystem::filesystem_error&)
-  {
-    f3d::log::error("Error recovering config file path: ", filePath.string());
-    return std::string();
-  }
-
-  return filePath.string();
 }
 
 //----------------------------------------------------------------------------
