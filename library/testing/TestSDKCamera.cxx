@@ -45,6 +45,16 @@ int TestSDKCamera(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   f3d::camera& cam = win.getCamera();
 
+  // check coordinates conversion
+  f3d::point3_t point = { 0.1, 0.1, 0.1 };
+  f3d::point3_t pointDC = win.getDisplayFromWorld(point);
+
+  if (!comparePoint(point, win.getWorldFromDisplay(pointDC)))
+  {
+    std::cerr << "coordinates conversion is not behaving as expected" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   // Test position
   f3d::point3_t testPos = { 0., 0., 10. };
   f3d::point3_t pos = cam.setPosition(testPos).getPosition();

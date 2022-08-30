@@ -45,9 +45,12 @@ public:
   camera& getCamera() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;
-  window& setSize(int width, int heigth) override;
+  void getSize(int& width, int& height) const override;
+  window& setSize(int width, int height) override;
   window& setIcon(const unsigned char* icon, size_t iconSize) override;
   window& setWindowName(const std::string& windowName) override;
+  point3_t getWorldFromDisplay(const point3_t& displayPoint) const override;
+  point3_t getDisplayFromWorld(const point3_t& worldPoint) const override;
   //@}
 
   /**

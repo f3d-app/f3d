@@ -12,6 +12,15 @@ int TestSDKWindowNative(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   win.setWindowName("Test").setSize(300, 300);
 
+  int w, h;
+  win.getSize(w, h);
+
+  if (w != 300 || h != 300)
+  {
+    std::cerr << "Unexpected window size: " << w << "x" << h << std::endl;
+    return EXIT_FAILURE;
+  }
+
   if (win.getType() != f3d::window::Type::NATIVE)
   {
     std::cerr << "Unexpected window type" << std::endl;
