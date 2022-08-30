@@ -12,6 +12,10 @@ if(WIN32 AND F3D_WINDOWS_GUI)
   list(APPEND classes vtkF3DWin32OutputWindow)
 endif()
 
+if(ANDROID)
+  list(APPEND classes vtkF3DAndroidLogOutputWindow)
+endif()
+
 vtk_module_add_module(f3d::VTKExtensionsCore
   FORCE_STATIC
   CLASSES ${classes})
