@@ -25,7 +25,6 @@ if (F3D_PYTHON_BINDINGS)
     set(PYTHON_INSTALL_PATH "${CMAKE_INSTALL_LIBDIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages")
   endif()
   install(TARGETS pyf3d
-    EXPORT f3dTargets
     LIBRARY DESTINATION ${PYTHON_INSTALL_PATH} COMPONENT pythonmodule)
 endif()
 
