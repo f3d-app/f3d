@@ -41,7 +41,7 @@ if(WIN32 AND NOT UNIX)
 
   # Create association on install
   set(F3D_REGISTER_LIST "${F3D_FILE_ASSOCIATION_NSIS}")
-  list(TRANSFORM F3D_REGISTER_LIST PREPEND "\\\${RegisterExtension} '\\\"$INSTDIR\\\\bin\\\\f3d.exe\\\"' ")
+  list(TRANSFORM F3D_REGISTER_LIST PREPEND "\\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' ")
   list(JOIN F3D_REGISTER_LIST "\n      " F3D_REGISTER_STRING)
   set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
     StrCmp $REGISTER_EXTENSIONS \\\"0\\\" doNotRegisterExtensions
