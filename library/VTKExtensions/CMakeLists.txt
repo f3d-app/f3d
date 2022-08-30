@@ -6,11 +6,18 @@ vtk_module_scan(
   WANT_BY_DEFAULT   ON
   ENABLE_TESTS      ${BUILD_TESTING})
 
+# if libf3d is built as a static library, VTK extension static libraries
+# must be exported as well for proper linkage
+set(export_name "")
+if(NOT BUILD_SHARED_LIBS)
+  set(export_name "f3dTargets")
+endif()
+
 # We need HEADERS_COMPONENT because of a bug in vtk_module_build in VTK <= 9.1
 # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9192
 vtk_module_build(
   MODULES ${modules}
-  INSTALL_EXPORT f3dTargets
+  INSTALL_EXPORT ${export_name}
   INSTALL_HEADERS OFF
   HEADERS_COMPONENT vtkext
   TARGETS_COMPONENT vtkext)
