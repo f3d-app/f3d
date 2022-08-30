@@ -188,6 +188,26 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: cpack
 
+    - name: Check Packaging Linux
+      if: matrix.os == 'ubuntu-latest'
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir package
+        tar -xzvf ./build/f3d-*.tar.gz -C ./package/
+        ./package/bin/f3d source/testing/data/suzanne.obj --output=output.png
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/package/lib/cmake/f3d -B test_sdk_package source/.github/test_sdk
+        cmake --build test_sdk
+
+    - name: Check Packaging Windows
+      if: matrix.os == 'windows-latest'
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir package
+        Expand-Archive .\build\f3d-*.zip -DestinationPath .\package
+        .\package\bin\f3d source\testing\data\suzanne.obj --output=output.png
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/package/lib/cmake/f3d -B test_sdk_package source/.github/test_sdk
+        cmake --build test_sdk
+
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       with:
