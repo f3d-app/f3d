@@ -89,7 +89,7 @@ std::string F3DConfigFileTools::GetBinaryConfigFileDirectory()
     dirPath /= "Resources";
 #endif
 #ifdef __linux__
-    dirPath /= "etc/f3d";
+    dirPath /= "share/f3d";
 #endif
   }
   catch (const std::filesystem::filesystem_error&)
@@ -110,11 +110,14 @@ std::string F3DConfigFileTools::GetConfigFilePath()
   try
   {
     dirsToCheck.emplace_back(F3DConfigFileTools::GetUserConfigFileDirectory());
-    dirsToCheck.emplace_back(F3DConfigFileTools::GetBinaryConfigFileDirectory());
-#ifndef _WIN32
+#ifdef __APPLE__
     dirsToCheck.emplace_back("/usr/local/etc/f3d");
-    dirsToCheck.emplace_back("/etc/f3d");
 #endif
+#ifdef __linux__
+    dirsToCheck.emplace_back("/etc/f3d");
+    dirsToCheck.emplace_back("/usr/share/f3d");
+#endif
+    dirsToCheck.emplace_back(F3DConfigFileTools::GetBinaryConfigFileDirectory());
 
     for (std::string dir : dirsToCheck)
     {
