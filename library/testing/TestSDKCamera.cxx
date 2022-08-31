@@ -27,18 +27,6 @@ bool comparePoint(const f3d::point3_t& vec1, const f3d::point3_t& vec2)
     compareDouble(vec1[2], vec2[2]);
 }
 
-bool compareMat(const f3d::matrix4_t& mat1, const f3d::matrix4_t& mat2)
-{
-  for (size_t i = 0; i < mat1.size(); i++)
-  {
-    if (!compareDouble(mat1[i], mat2[i]))
-    {
-      return false;
-    }
-  }
-  return true;
-}
-
 int TestSDKCamera(int argc, char* argv[])
 {
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
@@ -209,47 +197,6 @@ int TestSDKCamera(int argc, char* argv[])
               << foc[2] << std::endl;
     std::cerr << std::setprecision(12) << "view up: " << up[0] << "," << up[1] << "," << up[2]
               << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  // Test ViewMatrix
-  f3d::matrix4_t mat = cam.getViewMatrix();
-  f3d::matrix4_t expectedMat = { 0., 0., -1., 0., 1., 0., 0., 0., 0., -1., 0., 0., 11., -12., 20.9,
-    1. };
-
-  if (!compareMat(mat, expectedMat))
-  {
-    std::cerr << "getViewMatrix is not behaving as expected: " << std::endl;
-    for (int i = 0; i < 4; i++)
-    {
-      std::cerr << std::setprecision(12);
-      for (int j = 0; j < 4; j++)
-      {
-        std::cerr << mat[i * 4 + j] << " ";
-      }
-      std::cerr << std::endl;
-    }
-    return EXIT_FAILURE;
-  }
-
-  f3d::matrix4_t setMat = { 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., -1., 0., 0.776126, -0.438658,
-    24.556, 1. };
-  cam.setViewMatrix(setMat);
-  mat = cam.getViewMatrix();
-  expectedMat = { 1., 0., 0., 0., 0., 1., 0., 0., 0., 0., 1., 0., -0.776126, 0.438658, -24.556,
-    1. };
-  if (!compareMat(mat, expectedMat))
-  {
-    std::cerr << "setViewMatrix is not behaving as expected: " << std::endl;
-    for (int i = 0; i < 4; i++)
-    {
-      std::cerr << std::setprecision(12);
-      for (int j = 0; j < 4; j++)
-      {
-        std::cerr << mat[i * 4 + j] << " ";
-      }
-      std::cerr << std::endl;
-    }
     return EXIT_FAILURE;
   }
 

@@ -47,9 +47,6 @@ public:
   camera& setViewAngle(const angle_deg_t& angle) override;
   angle_deg_t getViewAngle() override;
   void getViewAngle(angle_deg_t& angle) override;
-  camera& setViewMatrix(const matrix4_t& matrix) override;
-  matrix4_t getViewMatrix() override;
-  void getViewMatrix(matrix4_t& matrix) override;
 
   camera& dolly(double val) override;
   camera& roll(angle_deg_t angle) override;
