@@ -43,19 +43,20 @@ if(WIN32 AND NOT UNIX)
   set(F3D_REGISTER_LIST "${F3D_FILE_ASSOCIATION_NSIS}")
   list(TRANSFORM F3D_REGISTER_LIST PREPEND "\\\${RegisterExtension} '\\\"$INSTDIR\\\\bin\\\\f3d.exe\\\"' ")
   list(JOIN F3D_REGISTER_LIST "\n      " F3D_REGISTER_STRING)
-  set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "\
-    StrCmp $REGISTER_EXTENSIONS \\\"0\\\" doNotRegisterExtensions\n\
-      ${F3D_REGISTER_STRING}\n\
-      \\\${RefreshShellIcons}\n\
+  set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+    StrCmp $REGISTER_EXTENSIONS \\\"0\\\" doNotRegisterExtensions
+      ${F3D_REGISTER_STRING}
+      \\\${RefreshShellIcons}
     doNotRegisterExtensions:\n\n")
 
   if (BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
-    list(APPEND CPACK_NSIS_EXTRA_INSTALL_COMMANDS "\
-      StrCmp $REGISTER_THUMBNAILS \\\"0\\\" doNotRegisterThumbnails\n\
-        ExecWait '\\\"$SYSDIR\\\\regsvr32.exe\\\" /s \\\"$INSTDIR\\\\bin\\\\F3DShellExtension.dll\\\"'\n\
+    set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
+      ; Register shell extension
+      StrCmp $REGISTER_THUMBNAILS \\\"0\\\" doNotRegisterThumbnails
+        ExecWait '\\\"$SYSDIR\\\\regsvr32.exe\\\" /s \\\"$INSTDIR\\\\bin\\\\F3DShellExtension.dll\\\"'
       doNotRegisterThumbnails:\n")
   else()
-    set(CPACK_NSIS_INSTALL_OPTIONS_PAGE_COMMANDS "\n\
+    set(CPACK_NSIS_INSTALL_OPTIONS_PAGE_COMMANDS "
       ; Disable thumbnail
       !insertmacro MUI_INSTALLOPTIONS_WRITE \\\"NSIS.InstallOptions.ini\\\" \\\"Field 7\\\" \\\"Flags\\\" \\\"DISABLED\\\"\n\
       !insertmacro MUI_INSTALLOPTIONS_WRITE \\\"NSIS.InstallOptions.ini\\\" \\\"Field 7\\\" \\\"State\\\" \\\"0\\\"\n")
@@ -65,16 +66,17 @@ if(WIN32 AND NOT UNIX)
   set(F3D_UNREGISTER_LIST "${F3D_FILE_ASSOCIATION_NSIS}")
   list(TRANSFORM F3D_UNREGISTER_LIST PREPEND "\\\${UnRegisterExtension} ")
   list(JOIN F3D_UNREGISTER_LIST "\n      " F3D_UNREGISTER_STRING)
-  set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "\
-    StrCmp $REGISTER_EXTENSIONS \\\"0\\\" doNotUnregisterExtensions\n\
-      ${F3D_UNREGISTER_STRING}\n\
-      \\\${RefreshShellIcons}\n\
+  set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
+    StrCmp $REGISTER_EXTENSIONS \\\"0\\\" doNotUnregisterExtensions
+      ${F3D_UNREGISTER_STRING}
+      \\\${RefreshShellIcons}
     doNotUnregisterExtensions:\n\n")
 
   if (BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
-    list(APPEND CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "\
-      StrCmp $REGISTER_THUMBNAILS \\\"0\\\" doNotUnregisterThumbnails\n\
-        ExecWait '\\\"$SYSDIR\\\\regsvr32.exe\\\" /s /u \\\"$INSTDIR\\\\bin\\\\F3DShellExtension.dll\\\"'\n\
+    set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
+      ; Unregister shell extension
+      StrCmp $REGISTER_THUMBNAILS \\\"0\\\" doNotUnregisterThumbnails
+        ExecWait '\\\"$SYSDIR\\\\regsvr32.exe\\\" /s /u \\\"$INSTDIR\\\\bin\\\\F3DShellExtension.dll\\\"'
       doNotUnregisterThumbnails:\n")
   endif()
 
