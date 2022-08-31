@@ -139,7 +139,9 @@ point3_t window_impl::getWorldFromDisplay(const point3_t& displayPoint) const
   this->Internals->Renderer->SetDisplayPoint(displayPoint.data());
   this->Internals->Renderer->DisplayToWorld();
   this->Internals->Renderer->GetWorldPoint(worldPt);
-  if (worldPt[3] > 1e-7)
+
+  constexpr double homogeneousThreshold = 1e-7;
+  if (worldPt[3] > homogeneousThreshold)
   {
     out[0] = worldPt[0] / worldPt[3];
     out[1] = worldPt[1] / worldPt[3];
