@@ -20,9 +20,6 @@ PYBIND11_MODULE(f3d, module)
   // types
   py::class_<f3d::point3_t>(module, "point3_t").def(py::init<double, double, double>());
   py::class_<f3d::vector3_t>(module, "vector3_t").def(py::init<double, double, double>());
-  py::class_<f3d::matrix4_t>(module, "matrix4_t")
-    .def(py::init<double, double, double, double, double, double, double, double, double, double,
-      double, double, double, double, double, double>());
 
   // f3d::image
   py::class_<f3d::image>(module, "image")
@@ -158,7 +155,9 @@ PYBIND11_MODULE(f3d, module)
     .def("setIcon", &f3d::window::setIcon,
       "Set the icon of the window using a memory buffer representing a PNG file")
     .def("setWindowName", &f3d::window::setWindowName, "Set the window name")
-    .def("getCamera", &f3d::window::getCamera, py::return_value_policy::reference);
+    .def("getCamera", &f3d::window::getCamera, py::return_value_policy::reference)
+    .def("getWorldFromDisplay", &f3d::window::getWorldFromDisplay, "Get world coordinate point from display coordinate")
+    .def("getDisplayFromWorld", &f3d::window::getDisplayFromWorld, "Get display coordinate point from world coordinate");
 
   // f3d::engine
   py::class_<f3d::engine> engine(module, "engine");
