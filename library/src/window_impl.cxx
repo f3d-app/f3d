@@ -91,6 +91,18 @@ camera& window_impl::getCamera()
 }
 
 //----------------------------------------------------------------------------
+int window_impl::getWidth() const
+{
+  return this->Internals->RenWin->GetSize()[0];
+}
+
+//----------------------------------------------------------------------------
+int window_impl::getHeight() const
+{
+  return this->Internals->RenWin->GetSize()[1];
+}
+
+//----------------------------------------------------------------------------
 window& window_impl::setSize(int width, int height)
 {
   this->Internals->RenWin->SetSize(width, height);
@@ -121,6 +133,35 @@ window& window_impl::setWindowName(const std::string& windowName)
 {
   this->Internals->RenWin->SetWindowName(windowName.c_str());
   return *this;
+}
+
+//----------------------------------------------------------------------------
+point3_t window_impl::getWorldFromDisplay(const point3_t& displayPoint) const
+{
+  point3_t out = { 0.0, 0.0, 0.0 };
+  double worldPt[4];
+  this->Internals->Renderer->SetDisplayPoint(displayPoint.data());
+  this->Internals->Renderer->DisplayToWorld();
+  this->Internals->Renderer->GetWorldPoint(worldPt);
+
+  constexpr double homogeneousThreshold = 1e-7;
+  if (worldPt[3] > homogeneousThreshold)
+  {
+    out[0] = worldPt[0] / worldPt[3];
+    out[1] = worldPt[1] / worldPt[3];
+    out[2] = worldPt[2] / worldPt[3];
+  }
+  return out;
+}
+
+//----------------------------------------------------------------------------
+point3_t window_impl::getDisplayFromWorld(const point3_t& worldPoint) const
+{
+  point3_t out;
+  this->Internals->Renderer->SetWorldPoint(worldPoint[0], worldPoint[1], worldPoint[2], 1.0);
+  this->Internals->Renderer->WorldToDisplay();
+  this->Internals->Renderer->GetDisplayPoint(out.data());
+  return out;
 }
 
 //----------------------------------------------------------------------------
