@@ -149,6 +149,8 @@ PYBIND11_MODULE(f3d, module)
     .def("renderToImage", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("noBackground") = false)
     .def("setSize", &f3d::window::setSize, "Set the window size")
+    .def("getWidth", &f3d::window::getWidth, "Get the window width")
+    .def("getHeight", &f3d::window::getHeight, "Get the window height")
     .def("setIcon", &f3d::window::setIcon,
       "Set the icon of the window using a memory buffer representing a PNG file")
     .def("setWindowName", &f3d::window::setWindowName, "Set the window name")

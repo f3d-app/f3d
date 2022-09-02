@@ -45,7 +45,8 @@ public:
   camera& getCamera() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;
-  void getSize(int& width, int& height) const override;
+  int getWidth() const override;
+  int getHeight() const override;
   window& setSize(int width, int height) override;
   window& setIcon(const unsigned char* icon, size_t iconSize) override;
   window& setWindowName(const std::string& windowName) override;

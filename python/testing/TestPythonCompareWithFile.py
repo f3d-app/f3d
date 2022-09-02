@@ -7,7 +7,12 @@ output = sys.argv[2] + "TestPythonCompareWithFile.png"
 outputDiff = sys.argv[2] + "TestPythonCompareWithFile.diff.png"
 
 engine = f3d.engine(f3d.window.NATIVE_OFFSCREEN)
-engine.getWindow().setSize(300, 300);
+engine.getWindow().setSize(300, 300)
+
+# verify the size is properly set
+assert engine.getWindow().getWidth() == 300
+assert engine.getWindow().getHeight() == 300
+
 engine.getLoader().addFile(dataset).loadFile()
 
 img = engine.getWindow().renderToImage()

@@ -67,9 +67,14 @@ public:
   virtual window& setSize(int width, int height) = 0;
 
   /**
-   * Get the size of the window
+   * Get the width of the window
    */
-  virtual void getSize(int& width, int& height) const = 0;
+  virtual int getWidth() const = 0;
+
+  /**
+   * Get the height of the window
+   */
+  virtual int getHeight() const = 0;
 
   /**
    * Set the icon to be shown by a window manager.

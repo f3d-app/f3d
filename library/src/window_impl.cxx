@@ -91,11 +91,15 @@ camera& window_impl::getCamera()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::getSize(int& width, int& height) const
+int window_impl::getWidth() const
 {
-  int* size = this->Internals->RenWin->GetSize();
-  width = size[0];
-  height = size[1];
+  return this->Internals->RenWin->GetSize()[0];
+}
+
+//----------------------------------------------------------------------------
+int window_impl::getHeight() const
+{
+  return this->Internals->RenWin->GetSize()[1];
 }
 
 //----------------------------------------------------------------------------
