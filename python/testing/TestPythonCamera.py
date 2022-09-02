@@ -25,11 +25,6 @@ camera.setViewUp(vector)
 camera.getViewUp(vector)
 vector = camera.getViewUp()
 
-matrix = f3d.matrix4_t(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0.5, -0.5, 10, 1)
-camera.setViewMatrix(matrix)
-camera.getViewMatrix(matrix)
-matrix = camera.getViewMatrix()
-
 camera.dolly(10)
 camera.roll(angle)
 camera.azimuth(angle)

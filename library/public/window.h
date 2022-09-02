@@ -64,7 +64,17 @@ public:
   /**
    * Set the size of the window
    */
-  virtual window& setSize(int width, int heigth) = 0;
+  virtual window& setSize(int width, int height) = 0;
+
+  /**
+   * Get the width of the window
+   */
+  virtual int getWidth() const = 0;
+
+  /**
+   * Get the height of the window
+   */
+  virtual int getHeight() const = 0;
 
   /**
    * Set the icon to be shown by a window manager.
@@ -77,6 +87,16 @@ public:
    * Set the window name to be shown by a window manager.
    */
   virtual window& setWindowName(const std::string& windowName) = 0;
+
+  /**
+   * Convert a point in display coordinate to world coordinate.
+   */
+  virtual point3_t getWorldFromDisplay(const point3_t& displayPoint) const = 0;
+
+  /**
+   * Convert a point in world coordinate to display coordinate.
+   */
+  virtual point3_t getDisplayFromWorld(const point3_t& worldPoint) const = 0;
 
 protected:
   window() = default;
