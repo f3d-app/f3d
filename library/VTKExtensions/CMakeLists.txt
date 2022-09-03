@@ -22,6 +22,8 @@ vtk_module_build(
   HEADERS_COMPONENT vtkext
   TARGETS_COMPONENT vtkext)
 
+# We need non empty cmake vars for these calls for VTK <= 9.1
+# See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9084
 foreach (module IN LISTS modules)
   if(NOT "${libf3d_compile_options_public}" STREQUAL "")
     vtk_module_compile_options(${module} PUBLIC ${libf3d_compile_options_public})
