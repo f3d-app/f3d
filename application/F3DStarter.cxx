@@ -89,9 +89,12 @@ int F3DStarter::Start(int argc, char** argv)
     f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
   }
 
-  // Initialize the config file dictionary
-  this->Internals->Parser.InitializeDictionaryFromConfigFile(
-    this->Internals->AppOptions.UserConfigFile);
+  if (!this->Internals->AppOptions.DryRun)
+  {
+    // Initialize the config file dictionary
+    this->Internals->Parser.InitializeDictionaryFromConfigFile(
+      this->Internals->AppOptions.UserConfigFile);
+  }
 
 #if __APPLE__
   // Initialize MacOS delegate
@@ -251,6 +254,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Start interaction
     else
     {
+      window.render();
       interactor.start();
     }
   }

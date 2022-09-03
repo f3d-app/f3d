@@ -58,16 +58,20 @@ void vtkF3DRendererWithColoring::SetPointSize(double pointSize)
   if (this->PointGaussianMapper)
   {
     vtkDataSet* dataset = this->PolyDataMapper->GetInput();
-    double bounds[6];
-    dataset->GetBounds(bounds);
-    vtkBoundingBox bbox(bounds);
 
-    double gaussianPointSize = 1.0;
-    if (bbox.IsValid())
+    if (dataset)
     {
-      gaussianPointSize = pointSize * bbox.GetDiagonalLength() * 0.001;
+      double bounds[6];
+      dataset->GetBounds(bounds);
+      vtkBoundingBox bbox(bounds);
+
+      double gaussianPointSize = 1.0;
+      if (bbox.IsValid())
+      {
+        gaussianPointSize = pointSize * bbox.GetDiagonalLength() * 0.001;
+      }
+      this->PointGaussianMapper->SetScaleFactor(gaussianPointSize);
     }
-    this->PointGaussianMapper->SetScaleFactor(gaussianPointSize);
   }
 }
 

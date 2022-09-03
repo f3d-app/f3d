@@ -3,11 +3,7 @@
  * @brief   Abstract class to control a camera in a window
  *
  * A class to control a camera in a window.
- * There is in essence three API.
- * The Position/FocalPoint/ViewUp API, the ViewMatrix API and the camera movements API.
- * They can be mixed by using ViewMatrix API with the other APIs but it can result in unexpected
- * results.
- * When using the Position/FocalPoint/ViewUp API or the camera movements API,
+ * When modifying the Position/FocalPoint/ViewUp API or the camera movements API,
  * the view up is automatically orthogonalized.
  * All angles are in degrees.
  */
@@ -43,16 +39,6 @@ public:
   virtual camera& setViewAngle(const angle_deg_t& angle) = 0;
   virtual angle_deg_t getViewAngle() = 0;
   virtual void getViewAngle(angle_deg_t& angle) = 0;
-  //@}
-
-  //@{
-  /**
-   * Set/Get the camera view matrix. Please note that when using the view matrix API, using the
-   * other camera manipulation API may results in unexepected results due to normalization.
-   */
-  virtual camera& setViewMatrix(const matrix4_t& matrix) = 0;
-  virtual matrix4_t getViewMatrix() = 0;
-  virtual void getViewMatrix(matrix4_t& matrix) = 0;
   //@}
 
   //@{
