@@ -123,36 +123,6 @@ void camera_impl::getViewAngle(angle_deg_t& angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::setViewMatrix(const matrix4_t& matrix)
-{
-  vtkCamera* cam = this->GetVTKCamera();
-  cam->SetPosition(matrix[12], matrix[13], matrix[14]);
-  cam->SetFocalPoint(matrix[8] + matrix[12], matrix[9] + matrix[13], matrix[10] + matrix[14]);
-  cam->SetViewUp(matrix[4], matrix[5], matrix[6]);
-  this->Internals->VTKRenderer->ResetCameraClippingRange();
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-matrix4_t camera_impl::getViewMatrix()
-{
-  matrix4_t matrix;
-  this->getViewMatrix(matrix);
-  return matrix;
-}
-
-//----------------------------------------------------------------------------
-void camera_impl::getViewMatrix(matrix4_t& matrix)
-{
-  vtkCamera* cam = this->GetVTKCamera();
-  vtkMatrix4x4* mat = cam->GetModelViewTransformMatrix();
-  vtkNew<vtkMatrix4x4> tMat;
-  vtkMatrix4x4::Transpose(mat, tMat);
-  double* data = tMat->GetData();
-  std::move(data, data + 16, matrix.begin());
-}
-
-//----------------------------------------------------------------------------
 camera& camera_impl::dolly(double val)
 {
   vtkCamera* cam = this->GetVTKCamera();

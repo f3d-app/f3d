@@ -94,13 +94,7 @@ It also lets you define you own callbacks when needed.
 
 # Camera class
 
-Provided by the window, this class lets you control the camera. There are essentially three API.
- 1. A Position/FocalPoint/ViewUp API to put the camera where you want it.
- 2. A camera movement API to move the camera around
- 3. A ViewMatrix API to work with matrices directly.
-
-Please note that the API 1. and 2. can be used together and always orthogonalize the view up after each call.
-API 3. is intended for advanced users using 4x4 matrices and is not intended to be used with other API as it can result to unexpected cameras.
+Provided by the window, this class lets you control the camera. You can either specify the camera position, target, and up direction directly, or specify movements relative to the current camera state.
 
 # Image class
 

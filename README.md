@@ -1,4 +1,4 @@
-[![CI](https://github.com/f3d-app/f3d/actions/workflows/ci.yml/badge.svg)](https://github.com/f3d-app/f3d/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/f3d-app/f3d/branch/master/graph/badge.svg?token=siwG82IXK7)](https://codecov.io/gh/f3d-app/f3d) [![Downloads](https://img.shields.io/github/downloads/f3d-app/f3d/total.svg)](https://github.com/f3d-app/f3d/releases)  [![Downloads](https://img.shields.io/reddit/subreddit-subscribers/f3d_app.svg)](https://www.reddit.com/r/f3d_app)
+[![CI](https://github.com/f3d-app/f3d/actions/workflows/ci.yml/badge.svg)](https://github.com/f3d-app/f3d/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/f3d-app/f3d/branch/master/graph/badge.svg?token=siwG82IXK7)](https://codecov.io/gh/f3d-app/f3d) [![Downloads](https://img.shields.io/github/downloads/f3d-app/f3d/total.svg)](https://github.com/f3d-app/f3d/releases) [![Downloads](https://img.shields.io/reddit/subreddit-subscribers/f3d_app.svg)](https://www.reddit.com/r/f3d_app)
 
 ![F3D Logo](./resources/logo.svg)
 
@@ -11,15 +11,15 @@ F3D (pronounced `/fɛd/`) is a [VTK-based](https://vtk.org) 3D viewer following 
 F3D is open-source and cross-platform (tested on Windows, Linux and macOS).
 It supports a range of file formats (including animated glTF, stl, step, ply, obj, fbx), and provides numerous rendering and texturing options.
 
-<img src="https://f3d-app.github.io/f3d/gallery/04-f3d.png"  width="640">
+<img src="https://f3d-app.github.io/f3d/gallery/04-f3d.png" width="640">
 
 *A typical render by F3D*
 
-<img src="https://f3d-app.github.io/f3d/gallery/dota.gif"  width="640">
+<img src="https://f3d-app.github.io/f3d/gallery/dota.gif" width="640">
 
 *Animation of a glTF file within F3D*
 
-<img src="https://f3d-app.github.io/f3d/gallery/directScalars.png"  width="640">
+<img src="https://f3d-app.github.io/f3d/gallery/directScalars.png" width="640">
 
 *A direct scalars render by F3D*
 
@@ -383,12 +383,12 @@ off in the command line if needed, eg: `--point-sprites=false`
 The configuration file possible locations depends on your operating system.
 They are considered in the below order and only the first found will be used.
 
- * Linux: `/etc/f3d/config.json`, `[install_dir]/config.json`, `${XDG_CONFIG_HOME}/.config/f3d/config.json`, `~/.config/f3d/config.json`
- * Windows: `[install_dir]\config.json`, `%APPDATA%\f3d\config.json`
- * macOS: `/etc/f3d/config.json`, `f3d.app/Contents/Resources/config.json`, `[install_dir]/config.json`, `~/.config/f3d/config.json`
+ * Linux: `${XDG_CONFIG_HOME}/.config/f3d/config.json`, `~/.config/f3d/config.json`, `/etc/f3d/config.json`, `/usr/share/f3d/config.json`, `[install_dir]/share/f3d/config.json`
+ * Windows: `%APPDATA%\f3d\config.json`, `[install_dir]\config.json`
+ * macOS: `${XDG_CONFIG_HOME}/.config/f3d/config.json`, `~/.config/f3d/config.json`, `/usr/local/etc/f3d/config.json`, `f3d.app/Contents/Resources/config.json`
 
-If you are using the releases, a default configuration file is provided when installing F3D.
-On Linux, it will be installed in `/etc/f3d/`, on Windows, it will be installed in the install directory, on macOS, it will be installed in the bundle.
+If you are using the binary releases, a default configuration file is provided when installing F3D.
+On Linux, it will be installed in `[install_dir]/etc/f3d/`, on Windows, it will be installed in the install directory, on macOS, it will be installed in the bundle.
 
 # libf3d
 
@@ -407,18 +407,13 @@ The simplest way to obtain desktop integration on linux is to use a package for 
 In other cases, the binary archive can be used like this:
 
 0. Make sure ~/.local/bin is part of your PATH
-1. Extract F3D archive in a TEMP folder
-2. move $TEMP/config.json to ~/.config/f3d/
-3. copy $TEMP/* to ~/.local/
-4. Update your [mime database](https://linux.die.net/man/1/update-mime-database) pointing to ~/.local/share/mime
-5. Update your [desktop database](https://linuxcommandlibrary.com/man/update-desktop-database) pointing to ~/.local/share/application
+1. Extract F3D archive in ~/.local/
+2. Update your [mime database](https://linux.die.net/man/1/update-mime-database) pointing to ~/.local/share/mime
+3. Update your [desktop database](https://linuxcommandlibrary.com/man/update-desktop-database) pointing to ~/.local/share/application
 
 ```bash
-tar -xzvf f3d-1.2.0-Linux.tar.gz
-cd f3d-1.2.0-Linux
-mkdir -p ~/.config/f3d/
-mv config.json /.config/f3d/
-cp -r ./* ~/.local/
+export PATH=$PATH:~/.local/bin
+tar -xzvf f3d-1.3.0-Linux.tar.gz -C ~/.local/
 sudo update-mime-database ~/.local/share/mime/
 sudo update-desktop-database ~/.local/share/applications
 ```
