@@ -66,6 +66,12 @@ window_impl::window_impl(const options& options, Type type)
     this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
     this->Internals->RenWin->SetOffScreenRendering(type == Type::NATIVE_OFFSCREEN);
     this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
+
+#ifdef __ANDROID__
+    // Since F3D_MODULE_EXTERNAL_RENDERING is not supported on Android yet, we need to call
+    // this workaround. It makes vtkEGLRenderWindow external if WindowInfo is not nullptr.
+    this->Internals->RenWin->SetWindowInfo("jni");
+#endif
   }
 
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
