@@ -3,7 +3,7 @@
 By Michael Migliore and Mathieu Westphal.
 
 libf3d is a BSD-licensed C++ library to open and render 3D meshes. It is of course used by F3D.
-libf3d API is simple and easy to learn. Python bindings are provided through pybind11.
+libf3d API is simple and easy to learn. Python bindings are provided through pybind11. Java bindings are also available.
 
 # Getting Started
 
@@ -186,7 +186,9 @@ Options|Default|Type|Description|F3D option|Trigger
 ------|------|------|------|------|------
 window.fullscreen|false|bool|Display in fullscreen.|--fullscreen|render
 
-# Python Bindings
+# Bindings
+
+## Python Bindings
 
 If the python bindings are generated, the libf3d can be used directly from python.
 Make sure to set `PYTHONPATH` to path where the python module is built.
@@ -204,6 +206,31 @@ eng.getOptions()
 
 eng.getLoader().addFile("f3d/testing/data/dragon.vtu").loadFile()
 eng.getInteractor().start()
+```
+
+## Java Bindings
+
+If the Java bindings are generated, the libf3d can be used directly from Java.
+You can import the `f3d.jar` package and use the provided Java classes directly.
+Make sure to set `java.library.path` to path where the JNI library is built.
+Here is an example showing how to use libf3d Java bindings:
+
+```java
+import io.github.f3d_app.f3d.*;
+
+public class F3DExample {
+  public static void main(String[] args) {
+
+    // Always use try-with-resources idiom to ensure the native engine is released
+    try (Engine engine = new Engine(Window.Type.NATIVE)) {
+      Loader loader = engine.getLoader();
+      loader.addFile("f3d/testing/data/dragon.vtu");
+      loader.loadFile(Loader.LoadFileEnum.LOAD_FIRST);
+
+      engine.getWindow().render();
+    }
+  }
+}
 ```
 
 # Building against the libf3d

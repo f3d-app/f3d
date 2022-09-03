@@ -19,6 +19,13 @@ if (BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT shellext)
 endif()
 
+# Java bindings
+if (F3D_JAVA_BINDINGS)
+  install(TARGETS javaf3d
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT java)
+  install_jar(f3d-jar DESTINATION "share/java" COMPONENT java)
+endif()
+
 # Python module
 if (F3D_PYTHON_BINDINGS)
   if(WIN32)
