@@ -308,7 +308,7 @@ std::string vtkF3DGenericImporter::GetMultiBlockDescription(
   vtkMultiBlockDataSet* mb, vtkIndent indent)
 {
   std::stringstream ss;
-  for (vtkIdType i = 0; i < mb->GetNumberOfBlocks(); i++)
+  for (unsigned int i = 0; i < mb->GetNumberOfBlocks(); i++)
   {
     const char* blockName = mb->GetMetaData(i)->Get(vtkCompositeDataSet::NAME());
     ss << indent << "Block: " << (blockName ? std::string(blockName) : std::to_string(i)) << "\n";

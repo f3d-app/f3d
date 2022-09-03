@@ -1,8 +1,10 @@
 # F3D Installation
-install(TARGETS f3d
-  EXPORT f3dTargets
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT application
-  BUNDLE DESTINATION "." COMPONENT bundle)
+if(F3D_BUILD_APPLICATION)
+  install(TARGETS f3d
+    EXPORT f3dTargets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT application
+    BUNDLE DESTINATION "." COMPONENT bundle)
+endif()
 
 install(TARGETS libf3d
   EXPORT f3dTargets
@@ -31,7 +33,7 @@ endif()
 # Documentation
 set(F3D_DOC_DIR ".")
 
-if (UNIX AND NOT APPLE)
+if (UNIX AND NOT APPLE AND NOT ANDROID)
   set(F3D_DOC_DIR ${CMAKE_INSTALL_DOCDIR})
 endif()
 
@@ -55,7 +57,7 @@ if (UNIX AND NOT APPLE)
 endif()
 
 # Other ressoure files
-if(UNIX AND NOT APPLE)
+if(UNIX AND NOT APPLE AND NOT ANDROID)
   configure_file(
     "${CMAKE_SOURCE_DIR}/resources/f3d.desktop.in"
     "${CMAKE_BINARY_DIR}/resources/f3d.desktop")

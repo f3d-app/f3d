@@ -104,7 +104,7 @@ cmake_dependent_option(F3D_WINDOWS_GUI "Build a non-console Win32 application" O
 cmake_dependent_option(F3D_MACOS_BUNDLE "Build a macOS bundle application" ON "APPLE" OFF)
 
 # Force static library when creating a macOS bundle
-cmake_dependent_option(BUILD_SHARED_LIBS "Build f3d with shared libraries" ON "NOT F3D_MACOS_BUNDLE" OFF)
+cmake_dependent_option(BUILD_SHARED_LIBS "Build f3d with shared libraries" ON "NOT F3D_MACOS_BUNDLE AND NOT ANDROID" OFF)
 
 # F3D_STRICT_BUILD
 set(F3D_STRICT_BUILD OFF CACHE BOOL "Use strict warnings and errors flags for building F3D")
@@ -161,14 +161,21 @@ cmake_dependent_option(F3D_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests"
 cmake_dependent_option(F3D_ENABLE_HDRI_TESTS "Enable HDRi related tests" ON "F3D_ENABLE_LONG_TIMEOUT_TESTS" ON "BUILD_TESTING" ON)
 if(BUILD_TESTING)
   enable_testing()
-  include(cmake/testing.cmake)
 endif()
 
 # libf3d target
 add_subdirectory(library)
 
 # f3d target
-add_subdirectory(application)
+cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID" OFF)
+if (F3D_BUILD_APPLICATION)
+  add_subdirectory(application)
+
+  # applicative tests
+  if(BUILD_TESTING)
+    include(cmake/testing.cmake)
+  endif()
+endif()
 
 # Windows Shell Extension
 cmake_dependent_option(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION "Build the Windows Shell Extension to produce thumbnails" ON "WIN32" OFF)
