@@ -133,6 +133,14 @@ int F3DStarter::Start(int argc, char** argv)
           this->Internals->Engine->getWindow().render();
           return true;
         }
+        else if (keySym == "Up")
+        {
+          this->Internals->Engine->getInteractor().stopAnimation();
+          f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_CURRENT;
+          this->LoadFile(load);
+          this->Internals->Engine->getWindow().render();
+          return true;
+        }
         return false;
       });
 
