@@ -221,6 +221,7 @@ public:
         else if (keySym == "Return")
         {
           self->Window.getCamera().resetToDefault();
+          render = true;
         }
         else if (keySym == "Space")
         {
