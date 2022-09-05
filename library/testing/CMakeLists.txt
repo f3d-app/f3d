@@ -79,6 +79,7 @@ set_target_properties(libf3dSDKTests PROPERTIES
 foreach (test ${libf3dSDKTests_list})
   get_filename_component (TName ${test} NAME_WE)
   add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName}  ${CMAKE_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
+  set_tests_properties(libf3d::${TName} PROPERTIES TIMEOUT 30)
 endforeach ()
 
 # Specific test properties to check
@@ -91,6 +92,13 @@ Test Info\nTest Warning\nTest Error\n\
 Test Warning\nTest Error\nTest Error\n\
 Test Print Debug\nTest Print Info\nTest Print Warning\nTest Print Error\n\
 Test Debug Coloring")
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519)
+  set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES TIMEOUT 90)
+  if(NOT F3D_ENABLE_HDRI_TESTS OR NOT F3D_ENABLE_LONG_TIMEOUT_TESTS)
+    set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)
+  endif()
+endif()
 
 target_link_libraries(libf3dSDKTests libf3d)
 
