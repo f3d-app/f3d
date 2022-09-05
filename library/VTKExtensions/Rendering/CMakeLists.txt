@@ -3,6 +3,7 @@ set(classes
   vtkF3DInteractorStyle
   vtkF3DNoRenderWindow
   vtkF3DOpenGLGridMapper
+  vtkF3DOrientationMarkerWidget
   vtkF3DPolyDataMapper
   vtkF3DRenderPass
   vtkF3DRenderer
