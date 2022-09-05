@@ -3,6 +3,7 @@
 #include "F3DLog.h"
 #include "vtkF3DConfigure.h"
 #include "vtkF3DOpenGLGridMapper.h"
+#include "vtkF3DOrientationMarkerWidget.h"
 #include "vtkF3DRenderPass.h"
 
 #include <vtkAxesActor.h>
@@ -18,7 +19,6 @@
 #include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLTexture.h>
-#include <vtkOrientationMarkerWidget.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
 #include <vtkSkybox.h>
@@ -243,12 +243,11 @@ void vtkF3DRenderer::ShowAxis(bool show)
       if (this->RenderWindow->GetInteractor())
       {
         vtkNew<vtkAxesActor> axes;
-        this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
+        this->AxisWidget = vtkSmartPointer<vtkF3DOrientationMarkerWidget>::New();
         this->AxisWidget->SetOrientationMarker(axes);
         this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
         this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
         this->AxisWidget->On();
-        this->AxisWidget->InteractiveOff();
         this->AxisWidget->SetKeyPressActivation(false);
       }
       else
