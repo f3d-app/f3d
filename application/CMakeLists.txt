@@ -100,6 +100,10 @@ if(F3D_MACOS_BUNDLE)
   set_target_properties(f3d PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/BundleInfo.plist")
 endif()
 
+if(APPLE)
+  target_link_libraries(f3d PRIVATE "-framework Cocoa")
+endif()
+
 # Windows executable without console
 if(WIN32)
   if(F3D_WINDOWS_GUI)
