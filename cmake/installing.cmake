@@ -96,7 +96,7 @@ if(UNIX AND NOT APPLE)
     install(FILES "${CMAKE_BINARY_DIR}/resources/f3d.thumbnailer"
       DESTINATION "share/thumbnailers/" COMPONENT shellext)
   endif()
-  if (F3D_INSTALL_MIME_TYPES_FILE)
+  if (F3D_INSTALL_MIME_TYPES_FILES)
     install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-3d-formats.xml"
       DESTINATION "share/mime/packages" COMPONENT mimetypes
       RENAME "f3d-3d-formats.xml")

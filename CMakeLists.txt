@@ -3,7 +3,7 @@ include(CMakeDependentOption)
 
 project(f3d
   VERSION "1.3.0"
-  DESCRIPTION "F3D - A fast and minimalist 3D viewer"
+  DESCRIPTION "F3D - A fast and minimalistic 3D viewer"
   LANGUAGES C CXX)
 
 string(TIMESTAMP F3D_BUILD_DATE "%Y-%m-%d %H:%M:%S" UTC)
@@ -196,8 +196,8 @@ if(UNIX AND NOT APPLE)
   option(F3D_INSTALL_THUMBNAILER_FILES "Install thumbnailer files" OFF)
   mark_as_advanced(F3D_INSTALL_THUMBNAILER_FILES)
 
-  option(F3D_INSTALL_MIME_TYPES_FILE "Install mime types files" OFF)
-  mark_as_advanced(F3D_INSTALL_MIME_TYPES_FILE)
+  option(F3D_INSTALL_MIME_TYPES_FILES "Install mime types files" OFF)
+  mark_as_advanced(F3D_INSTALL_MIME_TYPES_FILES)
 endif()
 
 include(cmake/installing.cmake)

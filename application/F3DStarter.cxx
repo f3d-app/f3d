@@ -200,7 +200,7 @@ int F3DStarter::Start(int argc, char** argv)
         if (this->Internals->AppOptions.Output.empty())
         {
           f3d::log::error("Reference image ", this->Internals->AppOptions.Reference,
-            " does not exists, use the output option to output current rendering into an image "
+            " does not exist, use the output option to output current rendering into an image "
             "file.\n");
         }
         else
@@ -209,7 +209,7 @@ int F3DStarter::Start(int argc, char** argv)
             .save(this->Internals->AppOptions.Output);
 
           f3d::log::error("Reference image " + this->Internals->AppOptions.Reference +
-            " does not exists, current rendering has been outputted to " +
+            " does not exist, current rendering has been outputted to " +
             this->Internals->AppOptions.Output + ".\n");
         }
         return EXIT_FAILURE;
