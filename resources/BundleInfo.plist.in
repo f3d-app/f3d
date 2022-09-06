@@ -339,6 +339,47 @@
 					<string>off</string>
 				</array>
 			</dict>
+			<!-- IGES -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>Initial Graphics Exchange Specification</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>iges</string>
+					<string>igs</string>
+				</array>
+			</dict>
+			<!-- STEP -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>STEP CAD file format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>step</string>
+					<string>stp</string>
+				</array>
+			</dict>
+			<!-- ABC -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>Alembic file format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>abc</string>
+				</array>
+			</dict>
 			<!-- File type associations -->
 		</array>
 	</dict>
