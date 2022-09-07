@@ -1,5 +1,7 @@
 #include "F3DConfigFileTools.h"
 
+#include "F3DConfig.h"
+
 #include "log.h"
 
 #include <cstring>

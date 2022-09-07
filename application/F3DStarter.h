@@ -30,6 +30,11 @@ public:
    */
   void LoadFile(f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_CURRENT);
 
+  /**
+   * Trigger a render
+   */
+  void Render();
+
   F3DStarter();
   ~F3DStarter();
 
