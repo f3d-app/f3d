@@ -3,12 +3,12 @@
     <id>io.github.f3d_app.f3d</id>
     <launchable type="desktop-id">f3d.desktop</launchable>
     <name>F3D</name>
-    <summary>A fast and minimalistic 3D viewer</summary>
+    <summary>A fast and minimalist 3D viewer</summary>
     <metadata_license>CC0-1.0</metadata_license>
     <project_license>BSD-3-Clause</project_license>
     <description>
         <p>
-            A VTK-based 3D viewer following the KISS principle, so it is minimalistic,
+            A VTK-based 3D viewer following the KISS principle, so it is minimalist,
             efficient, has no GUI, has simple interaction mechanisms and is fully
             controllable using arguments on the command line.
         </p>
