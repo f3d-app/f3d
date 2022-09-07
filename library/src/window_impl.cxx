@@ -66,6 +66,13 @@ window_impl::window_impl(const options& options, Type type)
     this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
     this->Internals->RenWin->SetOffScreenRendering(type == Type::NATIVE_OFFSCREEN);
     this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
+
+// The default position (50, 50) in VTK makes the window partially hidden because the position
+// correspond to the upper left corner and the Y position is defined from the bottom of the screen
+// The following code is a hack until we find a better solution
+#ifdef __APPLE__
+    this->Internals->RenWin->SetPosition(100, 800);
+#endif
   }
 
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
