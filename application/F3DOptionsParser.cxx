@@ -263,9 +263,9 @@ void ConfigurationOptions::GetOptionsFromArgs(
 
 #if F3D_MODULE_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
-    this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.getAsBoolRef("window.raytracing.enable"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.getAsIntRef("window.raytracin.samples"), HasDefault::YES, MayHaveConfig::YES, "<samples>");
-    this->DeclareOption(grp5, "denoise", "d", "Denoise the image", options.getAsBoolRef("window.raytracing.denoise"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.getAsBoolRef("render.raytracing.enable"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.getAsIntRef("render.raytracing.samples"), HasDefault::YES, MayHaveConfig::YES, "<samples>");
+    this->DeclareOption(grp5, "denoise", "d", "Denoise the image", options.getAsBoolRef("render.raytracing.denoise"), HasDefault::YES, MayHaveConfig::YES);
 #endif
 
     auto grp6 = cxxOptions.add_options("PostFX (OpenGL)");

@@ -10,7 +10,6 @@
 #define F3DNSDelegate_h
 
 class F3DStarter;
-class vtkRenderWindow;
 
 class F3DNSDelegate
 {
