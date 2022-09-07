@@ -1,0 +1,59 @@
+name: 'Install VTK Android Dependency'
+description: 'Install VTK Android Dependency using cache when possible'
+inputs:
+  arch:
+    description: 'Android CPU architecture'
+    required: true
+  api_level:
+    description: 'Android API level'
+    required: false
+    default: '27'
+runs:
+  using: "composite"
+  steps:
+
+    - name: Recover VTK Short SHA from file
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: echo "VTK_SHA=$(<./source/.github/actions/vtk_commit_sha)" >> $GITHUB_ENV
+
+    - name: Cache VTK
+      id: cache-vtk
+      uses: actions/cache@v2
+      with:
+        path: dependencies/vtk_build
+        key: vtk-android-${{env.VTK_SHA}}-1-${{inputs.api_level}}-${{inputs.arch}}
+
+    - name: Setup VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: mkdir vtk_build
+
+    - name: Checkout VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      uses: actions/checkout@v2
+      with:
+        repository: Kitware/VTK
+        submodules: 'true'
+        path: './dependencies/vtk'
+        ref: ${{env.VTK_SHA}}
+
+    - name: Configure VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/vtk_build
+      shell: bash
+      run: >
+        cmake ../vtk
+        -DCMAKE_BUILD_TYPE=Release
+        -DVTK_ANDROID_BUILD=ON
+        -DANDROID_ARCH_ABI=${{inputs.arch}}
+        -DANDROID_NATIVE_API_LEVEL=${{inputs.api_level}}
+        -DANDROID_NDK=$(pwd)/../../android-ndk
+
+    - name: Build VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/vtk_build
+      shell: bash
+      run: cmake --build . --parallel 2

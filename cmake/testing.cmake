@@ -399,7 +399,7 @@ f3d_test(NAME TestInvalidHDRI DATA cow.vtp ARGS --hdri=${CMAKE_SOURCE_DIR}/testi
 f3d_test(NAME TestInvalidOption ARGS --dummy REGEXP "Error parsing options:")
 
 # Test non-existent config file, do not add a dummy.json
-f3d_test(NAME TestNonExistentConfigFile DATA cow.vtp CONFIG "${CMAKE_SOURCE_DIR}/testing/configs/dummy.json" REGEXP "Configuration file does not exists" NO_BASELINE)
+f3d_test(NAME TestNonExistentConfigFile DATA cow.vtp CONFIG "${CMAKE_SOURCE_DIR}/testing/configs/dummy.json" REGEXP "Configuration file does not exist" NO_BASELINE)
 
 # Test invalid config file
 f3d_test(NAME TestInvalidConfigFile DATA cow.vtp CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/invalid.json REGEXP "Unable to parse the configuration file" NO_BASELINE)

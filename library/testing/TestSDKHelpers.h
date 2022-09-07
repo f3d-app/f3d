@@ -26,7 +26,7 @@ public:
       {
         img.save(output);
         std::cerr << "Reference image "
-                  << baseline + " does not exists, current rendering has been outputted to "
+                  << baseline + " does not exist, current rendering has been outputted to "
                   << output << std::endl;
         return false;
       }

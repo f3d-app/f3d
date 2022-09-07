@@ -29,7 +29,7 @@ public:
    * \code
    * bool callBack(int keyCode, std::string keySym)
    * \endcode
-   * keyCode being the pressed key, eg: `C` and keySym the key symbol for key which do not have
+   * keyCode being the pressed key, eg: `C` and keySym the key symbol for keys which do not have
    * codes, eg: Left, Right, Up, Down, Space, Enter. Your callBack should return true if the key was
    * handled, false if you want standard interactor behavior instead.
    */

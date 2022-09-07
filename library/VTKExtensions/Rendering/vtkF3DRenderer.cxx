@@ -743,7 +743,9 @@ void vtkF3DRenderer::Render()
     glGenQueries(1, &this->Timer);
   }
 
+#ifndef __ANDROID__
   glBeginQuery(GL_TIME_ELAPSED, this->Timer);
+#endif
 
   this->TimerActor->RenderOpaqueGeometry(this); // update texture
 
@@ -755,12 +757,14 @@ void vtkF3DRenderer::Render()
   int fps = static_cast<int>(std::round(
     1.0 / (std::chrono::duration_cast<std::chrono::microseconds>(cpuElapsed).count() * 1e-6)));
 
+#ifndef __ANDROID__
   glEndQuery(GL_TIME_ELAPSED);
   GLint elapsed;
   glGetQueryObjectiv(this->Timer, GL_QUERY_RESULT, &elapsed);
 
   // Get min between CPU frame per seconds and GPU frame per seconds
   fps = std::min(fps, static_cast<int>(std::round(1.0 / (elapsed * 1e-9))));
+#endif
 
   std::string str = std::to_string(fps);
   str += " fps";
