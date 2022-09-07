@@ -67,7 +67,6 @@ window_impl::window_impl(const options& options, Type type)
     this->Internals->RenWin->SetOffScreenRendering(type == Type::NATIVE_OFFSCREEN);
     this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
 
-
 // The default position (50, 50) in VTK makes the window partially hidden because the position
 // correspond to the upper left corner and the Y position is defined from the bottom of the screen
 // The following code is a hack until we find a better solution
@@ -80,7 +79,6 @@ window_impl::window_impl(const options& options, Type type)
     // this workaround. It makes vtkEGLRenderWindow external if WindowInfo is not nullptr.
     this->Internals->RenWin->SetWindowInfo("jni");
 #endif
-
   }
 
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
