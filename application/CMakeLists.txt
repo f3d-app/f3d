@@ -127,7 +127,7 @@ if(F3D_GENERATE_MAN)
     set(MAN_OUTPUT_FILE ${CMAKE_BINARY_DIR}/f3d.1)
     add_custom_command(
       OUTPUT ${MAN_OUTPUT_FILE}
-      COMMAND ${HELP2MAN} $<TARGET_FILE:f3d> -N -n "fast and minimalistic 3D viewer" > ${MAN_OUTPUT_FILE}
+      COMMAND ${HELP2MAN} $<TARGET_FILE:f3d> -N -n "fast and minimalist 3D viewer" > ${MAN_OUTPUT_FILE}
       COMMAND ${GZIP} -f ${MAN_OUTPUT_FILE}
       DEPENDS f3d)
     add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
