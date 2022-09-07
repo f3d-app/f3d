@@ -478,7 +478,7 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
   }
   catch (const std::filesystem::filesystem_error&)
   {
-    f3d::log::error("Configuration file does not exists: ", configFilePath);
+    f3d::log::error("Configuration file does not exist: ", configFilePath);
     return false;
   }
 
