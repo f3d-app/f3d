@@ -122,7 +122,7 @@ int F3DStarter::Start(int argc, char** argv)
           this->Internals->Engine->getInteractor().stopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_PREVIOUS;
           this->LoadFile(load);
-          this->Internals->Engine->getWindow().render();
+          this->Render();
           return true;
         }
         else if (keySym == "Right")
@@ -130,7 +130,7 @@ int F3DStarter::Start(int argc, char** argv)
           this->Internals->Engine->getInteractor().stopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_NEXT;
           this->LoadFile(load);
-          this->Internals->Engine->getWindow().render();
+          this->Render();
           return true;
         }
         else if (keySym == "Up")
@@ -138,7 +138,7 @@ int F3DStarter::Start(int argc, char** argv)
           this->Internals->Engine->getInteractor().stopAnimation();
           f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_CURRENT;
           this->LoadFile(load);
-          this->Internals->Engine->getWindow().render();
+          this->Render();
           return true;
         }
         return false;
@@ -153,7 +153,7 @@ int F3DStarter::Start(int argc, char** argv)
           this->AddFile(file);
         }
         this->LoadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
-        this->Internals->Engine->getWindow().render();
+        this->Render();
         return true;
       });
     window
@@ -297,6 +297,10 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
     this->Internals->SetupCamera(
       this->Internals->AppOptions.DryRun ? this->Internals->AppOptions : configFileAppOptions);
   }
+}
 
-  return;
+//----------------------------------------------------------------------------
+void F3DStarter::Render()
+{
+  this->Internals->Engine->getWindow().render();
 }
