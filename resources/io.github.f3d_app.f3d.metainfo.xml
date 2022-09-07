@@ -10,7 +10,7 @@
         <p>
             A VTK-based 3D viewer following the KISS principle, so it is minimalist,
             efficient, has no GUI, has simple interaction mechanisms and is fully
-            controllable using arguments in the command line.
+            controllable using arguments on the command line.
         </p>
     </description>
     <url type="homepage">https://f3d-app.github.io/f3d/</url>

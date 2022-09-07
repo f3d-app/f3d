@@ -79,7 +79,7 @@ jobs:
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_version: ${{matrix.vtk_version}}
-        vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         os: ${{matrix.os}}
 
     - name: Setup Directories
@@ -113,7 +113,7 @@ jobs:
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
         ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
         ${{ matrix.os == 'macos-latest' && '-DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
-        ${{ matrix.os == 'ubuntu-latest' && '-DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON -DF3D_INSTALL_MIME_TYPES_FILE=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
+        ${{ matrix.os == 'ubuntu-latest' && '-DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON -DF3D_INSTALL_MIME_TYPES_FILES=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
         ${{ matrix.vtk_version == 'commit' && '-DF3D_ENABLE_HDRI_TESTS=ON' || '-DF3D_ENABLE_HDRI_TESTS=OFF' }}
         ${{ matrix.vtk_version == 'v9.0.0' && '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=OFF' }}
 
@@ -264,7 +264,7 @@ jobs:
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
 
     # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     # coverage build is done in source as it seems to be required for codecov
@@ -375,7 +375,7 @@ jobs:
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
 
     - name: Setup Build Directory
       working-directory: ${{github.workspace}}

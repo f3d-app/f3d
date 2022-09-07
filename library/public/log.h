@@ -106,7 +106,7 @@ public:
   static void setVerboseLevel(VerboseLevel level);
 
   /**
-   * Wait for user if applicable (eg: win32 output window)
+   * Wait for user if applicable (eg: win32 output window).
    * No effect otherwise.
    */
   static void waitForUser();
