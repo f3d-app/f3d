@@ -155,13 +155,15 @@ PYBIND11_MODULE(f3d, module)
       "Set the icon of the window using a memory buffer representing a PNG file")
     .def("setWindowName", &f3d::window::setWindowName, "Set the window name")
     .def("getCamera", &f3d::window::getCamera, py::return_value_policy::reference)
-    .def("getWorldFromDisplay", &f3d::window::getWorldFromDisplay, "Get world coordinate point from display coordinate")
-    .def("getDisplayFromWorld", &f3d::window::getDisplayFromWorld, "Get display coordinate point from world coordinate");
+    .def("getWorldFromDisplay", &f3d::window::getWorldFromDisplay,
+      "Get world coordinate point from display coordinate")
+    .def("getDisplayFromWorld", &f3d::window::getDisplayFromWorld,
+      "Get display coordinate point from world coordinate");
 
   // f3d::engine
   py::class_<f3d::engine> engine(module, "engine");
 
-  engine.def(py::init<f3d::window::Type>())
+  engine.def(py::init<f3d::window::Type>(), py::arg("windowType") = f3d::window::Type::NATIVE)
     .def("getInteractor", &f3d::engine::getInteractor, py::return_value_policy::reference)
     .def("getLoader", &f3d::engine::getLoader, py::return_value_policy::reference)
     .def("getOptions", &f3d::engine::getOptions, py::return_value_policy::reference)
