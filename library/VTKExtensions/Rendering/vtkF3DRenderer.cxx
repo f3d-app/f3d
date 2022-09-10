@@ -3,7 +3,6 @@
 #include "F3DLog.h"
 #include "vtkF3DConfigure.h"
 #include "vtkF3DOpenGLGridMapper.h"
-#include "vtkF3DOrientationMarkerWidget.h"
 #include "vtkF3DRenderPass.h"
 
 #include <vtkAxesActor.h>
@@ -27,6 +26,12 @@
 #include <vtkToneMappingPass.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
+#include <vtkOrientationMarkerWidget.h>
+#else
+#include "vtkF3DOrientationMarkerWidget.h"
+#endif
 
 #if F3D_MODULE_RAYTRACING
 #include <vtkOSPRayRendererNode.h>
@@ -243,11 +248,18 @@ void vtkF3DRenderer::ShowAxis(bool show)
       if (this->RenderWindow->GetInteractor())
       {
         vtkNew<vtkAxesActor> axes;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
+        this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
+#else
         this->AxisWidget = vtkSmartPointer<vtkF3DOrientationMarkerWidget>::New();
+#endif
         this->AxisWidget->SetOrientationMarker(axes);
         this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
         this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
         this->AxisWidget->On();
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
+        this->AxisWidget->InteractiveOff();
+#endif
         this->AxisWidget->SetKeyPressActivation(false);
       }
       else
