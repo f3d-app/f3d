@@ -9,14 +9,12 @@
 #ifndef f3d_exception_h
 #define f3d_exception_h
 
-#include "export.h"
-
 #include <stdexcept>
 #include <string>
 
 namespace f3d
 {
-struct F3D_EXPORT exception : public std::runtime_error
+struct exception : public std::runtime_error
 {
   exception(const std::string& what = "")
     : std::runtime_error(what)
