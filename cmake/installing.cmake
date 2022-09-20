@@ -146,25 +146,27 @@ elseif(APPLE AND NOT F3D_MACOS_BUNDLE)
 endif()
 
 # SDK
-install(EXPORT f3dTargets
-  NAMESPACE f3d::
-  DESTINATION "lib/cmake/f3d"
-  COMPONENT cmake)
+if(F3D_INSTALL_SDK)
+  install(EXPORT f3dTargets
+    NAMESPACE f3d::
+    DESTINATION "lib/cmake/f3d"
+    COMPONENT cmake)
 
-include(CMakePackageConfigHelpers)
-configure_package_config_file(
-  "cmake/f3dConfig.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake"
-  INSTALL_DESTINATION "lib/cmake/${PROJECT_NAME}")
-write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
-  VERSION "${PROJECT_VERSION}"
-  COMPATIBILITY SameMinorVersion)
-
-install(
-  FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake"
+  include(CMakePackageConfigHelpers)
+  configure_package_config_file(
+    "cmake/f3dConfig.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake"
+    INSTALL_DESTINATION "lib/cmake/${PROJECT_NAME}")
+  write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
-    "${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake"
-  DESTINATION
-    "lib/cmake/${PROJECT_NAME}"
-  COMPONENT cmake)
+    VERSION "${PROJECT_VERSION}"
+    COMPATIBILITY SameMinorVersion)
+
+  install(
+    FILES
+      "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake"
+      "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake"
+    DESTINATION
+      "lib/cmake/${PROJECT_NAME}"
+    COMPONENT cmake)
+endif()

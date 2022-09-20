@@ -132,9 +132,11 @@ target_include_directories(libf3d
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
-set_target_properties(libf3d PROPERTIES
-  PUBLIC_HEADER "${F3D_PUBLIC_HEADERS}"
-  )
+if(F3D_INSTALL_SDK)
+  set_target_properties(libf3d PROPERTIES
+    PUBLIC_HEADER "${F3D_PUBLIC_HEADERS}"
+    )
+endif()
 
 vtk_module_autoinit(TARGETS libf3d MODULES ${F3D_VTK_MODULES})
 
