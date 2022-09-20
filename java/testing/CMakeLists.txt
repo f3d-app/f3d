@@ -32,4 +32,3 @@ foreach(test_file ${javaf3dTests_list})
 
     set_tests_properties(javaf3d::${TName} PROPERTIES DISABLED ${java_test_disabled})
 endforeach()
-
