@@ -62,6 +62,7 @@ jobs:
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_EXODUS=OFF
+        -DF3D_JAVA_BINDINGS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_build/CMakeExternals/Install/vtk-android/lib/cmake/vtk-9.2
 
