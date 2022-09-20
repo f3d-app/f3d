@@ -36,6 +36,12 @@ jobs:
         fetch-depth: 0
         lfs: 'false'
 
+    - name: Setup JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
@@ -104,6 +110,7 @@ jobs:
         -DF3D_MODULE_ASSIMP=ON
         -DF3D_MODULE_ALEMBIC=ON
         -DF3D_PYTHON_BINDINGS=ON
+        -DF3D_JAVA_BINDINGS=ON
         -DF3D_INSTALL_SDK=ON
         -DCMAKE_BUILD_TYPE=Release
         -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
