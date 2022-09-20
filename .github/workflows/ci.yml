@@ -104,6 +104,7 @@ jobs:
         -DF3D_MODULE_ASSIMP=ON
         -DF3D_MODULE_ALEMBIC=ON
         -DF3D_PYTHON_BINDINGS=ON
+        -DF3D_INSTALL_SDK=ON
         -DCMAKE_BUILD_TYPE=Release
         -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
         -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
