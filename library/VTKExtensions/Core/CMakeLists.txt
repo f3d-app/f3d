@@ -17,5 +17,6 @@ if(ANDROID)
 endif()
 
 vtk_module_add_module(f3d::VTKExtensionsCore
+  NO_INSTALL
   FORCE_STATIC
   CLASSES ${classes})
