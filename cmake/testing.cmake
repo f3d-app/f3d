@@ -341,9 +341,6 @@ f3d_test(NAME TestVerboseDefaultScalar DATA HeadMRVolume.mhd ARGS -s --verbose R
 # Incorrect component test
 f3d_test(NAME TestIncorrectComponent DATA dragon.vtu ARGS -s --comp=4 REGEXP "Invalid component index: 4" NO_BASELINE)
 
-# Incorrect range test
-f3d_test(NAME TestIncorrectRange DATA dragon.vtu ARGS -s --range=0 REGEXP "The range specified does not have exactly 2 values, using automatic range." NO_BASELINE)
-
 # Incorrect color map
 f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --scalars --roughness=1 --colormap=0,1,0,0,1,0,1 REGEXP "Specified color map list count is not a multiple of 4, ignoring it." NO_BASELINE)
 

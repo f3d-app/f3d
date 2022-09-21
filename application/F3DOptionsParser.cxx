@@ -85,6 +85,9 @@ protected:
   template<class T>
   static std::string ToString(const std::vector<T>& currValue)
   {
+    // cxxopts do not support an empty string as a value
+    // for vector<double> and vector<int>
+    assert(currValue.size() > 0);
     std::stringstream ss;
     for (size_t i = 0; i < currValue.size(); i++)
     {

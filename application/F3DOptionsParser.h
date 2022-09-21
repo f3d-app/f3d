@@ -33,9 +33,9 @@ struct F3DAppOptions
   bool Verbose = false;
   double CameraAzimuthAngle = 0.0;
   double CameraElevationAngle = 0.0;
-  std::vector<double> CameraFocalPoint;
-  std::vector<double> CameraPosition;
-  std::vector<double> CameraViewUp;
+  std::vector<double> CameraFocalPoint = { 0 };
+  std::vector<double> CameraPosition = { 0 };
+  std::vector<double> CameraViewUp = { 0 };
   double CameraViewAngle = 0.0;
 };
 
