@@ -312,6 +312,10 @@ Other hotkeys are available:
 * `RIGHT`: load the next file if any.
 * `UP`: reload the current file.
 
+When loading another file or reloading, options that have been changed before are kept but can be overridden
+by a dedicated regular expression block in the configuration file if any, see [configuration file](#configuration-file)
+for more info.
+
 # Cycling Coloring
 
 When using the default scene, the following hotkeys let you cycle the coloring of the data:
@@ -338,13 +342,18 @@ formatted file to provide default values for these options.
 These options can be organized by block using a regular expression for each block
 in order to provide different default values for the different filetypes.
 
+A special block, named `global`, will apply to all files.
 Using a command-line option will override the corresponding value in the config file.
+
+The `global` block and command-line options are only taken into account on the first load
+and not on subsequent loads.
+The regular expression blocks are always taken into account, even when loading further files.
+
 A typical config file may look like this:
 
 ```javascript
 {
-   ".*": {
-       "resolution": "1200,800",
+   "global": {
        "bg-color": "0.7,0.7,0.7",
        "color": "0.5,0.1,0.1",
        "fxaa": true,
@@ -352,9 +361,9 @@ A typical config file may look like this:
        "progress": true,
        "axis": true,
        "bar": true,
-       "verbose": true,
        "roughness": 0.2,
-       "grid": true
+       "grid": true,
+       "scalars": true,
    },
    ".*vt.": {
        "edges": true
@@ -369,13 +378,16 @@ A typical config file may look like this:
    }
 }
 ```
-Here, the first block defines a basic configuration with many desired options for all files.
+Here, the first block defines a basic global configuration with many desired options for all files.
 The second block specifies that all files ending with vt., eg: vtk, vtp, vtu, ... will be shown with edges visibility turned on.
 The third block specifies raytracing usage for .gltf and .glb files.
 The last block specifies that volume rendering should be used with .mhd files.
 
-The following command-line options <br>cannot</br> be set via config file:
-`help`, `version`, `config`, `dry-run`, `no-render`, `inputs`, `output`, `quiet`, `verbose`, `resolution` and all testing options.
+The following command-line options <br> cannot <br> be set via config file:
+`help`, `version`, `readers-list`, `config`, `dry-run`.
+
+The following command-line options <br>can only</br> be set in the global block of the config file:
+`no-render`, `inputs`, `output`, `quiet`, `verbose`, `resolution` and all testing options.
 
 Boolean options that have been turned on in the configuration file can be turned
 off on the command line if needed, eg: `--point-sprites=false`.

@@ -33,9 +33,9 @@ struct F3DAppOptions
   bool Verbose = false;
   double CameraAzimuthAngle = 0.0;
   double CameraElevationAngle = 0.0;
-  std::vector<double> CameraFocalPoint;
-  std::vector<double> CameraPosition;
-  std::vector<double> CameraViewUp;
+  std::vector<double> CameraFocalPoint = { 0 };
+  std::vector<double> CameraPosition = { 0 };
+  std::vector<double> CameraViewUp = { 0 };
   double CameraViewAngle = 0.0;
 };
 
@@ -55,21 +55,20 @@ public:
    * Parse the command line and return the options passed
    * The provided inputs arguments will also be filled by the
    * positional inputs or inputs arguments from command line.
-   * This will also reset the FilePathForConfigFile in order to
-   * ignore config file options.
+   * This will consider the global config file only
    * Returns the resulting options.
    */
-  void GetOptionsFromCommandLine(
+  void GetOptions(
     F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& inputs);
 
   /**
    * Use the config file dictionnary using the provided filepath
    * to match the regexp from the config files.
-   * Then parse the command line for any supplemental.
+   * This will not parse the command line.
    * Returns the resulting options.
    */
-  void GetOptionsFromConfigFile(
-    const std::string& filePath, F3DAppOptions& appOptions, f3d::options& options);
+  void UpdateOptions(const std::string& filePath, F3DAppOptions& appOptions, f3d::options& options,
+    bool parseCommandLine);
 
   F3DOptionsParser();
   ~F3DOptionsParser();

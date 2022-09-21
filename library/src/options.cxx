@@ -87,7 +87,7 @@ public:
     }
     catch (const std::bad_variant_access&)
     {
-      std::string error = "Trying to set option " + name + " with incompatible type";
+      std::string error = "Trying to get option reference " + name + " with incompatible type";
       log::error(error);
       throw options::incompatible_exception(error + "\n");
     }
@@ -164,7 +164,7 @@ options::options()
   this->Internals->init("model.scivis.colormap",
     std::vector<double>{
       0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 });
-  this->Internals->init("model.scivis.range", std::vector<double>());
+  this->Internals->init("model.scivis.range", std::vector<double>{ 0 });
 
   // XXX: Rename into a "rendering-mode" option: https://github.com/f3d-app/f3d/issues/345
   this->Internals->init("model.point-sprites.enable", false);
@@ -394,6 +394,48 @@ options& options::toggle(const std::string& name)
 {
   this->Internals->set<bool>(name, !this->Internals->get<bool>(name));
   return *this;
+}
+
+//----------------------------------------------------------------------------
+bool options::isSame(const options& other, const std::string& name) const
+{
+  try
+  {
+    return this->Internals->Options.at(name) == other.Internals->Options.at(name);
+  }
+  catch (const std::out_of_range&)
+  {
+    std::string error = "Options " + name + " does not exist";
+    log::error(error);
+    throw options::inexistent_exception(error + "\n");
+  }
+}
+
+//----------------------------------------------------------------------------
+options& options::copy(const options& from, const std::string& name)
+{
+  try
+  {
+    this->Internals->Options.at(name) = from.Internals->Options.at(name);
+  }
+  catch (const std::out_of_range&)
+  {
+    std::string error = "Options " + name + " does not exist";
+    log::error(error);
+    throw options::inexistent_exception(error + "\n");
+  }
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> options::getNames()
+{
+  std::vector<std::string> names;
+  for (const auto& [name, _] : this->Internals->Options)
+  {
+    names.emplace_back(name);
+  }
+  return names;
 }
 
 //----------------------------------------------------------------------------

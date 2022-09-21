@@ -508,11 +508,6 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(vtkDataArray* a
   }
   else
   {
-    if (this->UserScalarBarRange.size() > 0)
-    {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "The range specified does not have exactly 2 values, using automatic range.");
-    }
     array->GetRange(this->ColorRange, component);
   }
 

@@ -60,7 +60,10 @@ PYBIND11_MODULE(f3d, module)
     .def("getAsDouble", &f3d::options::getAsDouble)
     .def("getAsString", &f3d::options::getAsString)
     .def("getAsIntVector", &f3d::options::getAsIntVector)
-    .def("getAsDoubleVector", &f3d::options::getAsDoubleVector);
+    .def("getAsDoubleVector", &f3d::options::getAsDoubleVector)
+    .def("getNames", &f3d::options::getNames)
+    .def("isSame", &f3d::options::isSame)
+    .def("copy", &f3d::options::copy);
 
   // f3d::interactor
   py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete> >(module, "interactor")
