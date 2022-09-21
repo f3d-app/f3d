@@ -30,14 +30,10 @@ public:
   {
   }
 
-  void GetOptionsFromArgs(
-    F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& inputs);
+  void GetOptions(F3DAppOptions& appOptions, f3d::options& options,
+    std::vector<std::string>& inputs, std::string filePathForConfigBlock = "",
+    bool parseCommandLine = true);
   bool InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
-
-  void SetFilePathForConfigBlock(const std::string& filePath)
-  {
-    this->FilePathForConfigBlock = filePath;
-  }
 
   enum class HasDefault : bool
   {
@@ -51,21 +47,39 @@ public:
     NO = false
   };
 
+  enum class HasImplicitValue : bool
+  {
+    YES = true,
+    NO = false
+  };
+
 protected:
   bool GetOptionConfig(const std::string& option, std::string& configValue) const
   {
     bool ret = false;
-    for (auto const& it : this->ConfigDic)
+    if (this->FilePathForConfigBlock.empty())
     {
-      std::regex re(it.first);
-      std::smatch matches;
-      if (std::regex_match(this->FilePathForConfigBlock, matches, re))
+      auto localIt = this->GlobalConfigDicEntry.find(option);
+      if (localIt != this->GlobalConfigDicEntry.end())
       {
-        auto localIt = it.second.find(option);
-        if (localIt != it.second.end())
+        configValue = localIt->second;
+        ret = true;
+      }
+    }
+    else
+    {
+      for (auto const& it : this->ConfigDic)
+      {
+        std::regex re(it.first);
+        std::smatch matches;
+        if (std::regex_match(this->FilePathForConfigBlock, matches, re))
         {
-          configValue = localIt->second;
-          ret = true;
+          auto localIt = it.second.find(option);
+          if (localIt != it.second.end())
+          {
+            configValue = localIt->second;
+            ret = true;
+          }
         }
       }
     }
@@ -120,10 +134,18 @@ protected:
   template<class T>
   void DeclareOption(cxxopts::OptionAdder& group, const std::string& longName,
     const std::string& shortName, const std::string& doc, T& var, HasDefault hasDefault,
-    MayHaveConfig mayHaveConfig, const std::string& argHelp = "") const
+    MayHaveConfig mayHaveConfig, const std::string& argHelp = "",
+    HasImplicitValue hasImplicitValue = HasImplicitValue::NO,
+    const std::string& implicitValue = "") const
   {
     bool hasDefaultBool = hasDefault == HasDefault::YES;
     auto val = cxxopts::value<T>(var);
+
+    if (hasImplicitValue == HasImplicitValue::YES)
+    {
+      val->implicit_value(implicitValue);
+    }
+
     std::string defaultVal;
     if (hasDefaultBool)
     {
@@ -139,33 +161,6 @@ protected:
     {
       val = val->default_value(defaultVal);
     }
-    var = {};
-    group(this->CollapseName(longName, shortName), doc, val, argHelp);
-  }
-
-  template<class T>
-  void DeclareOptionWithImplicitValue(cxxopts::OptionAdder& group, const std::string& longName,
-    const std::string& shortName, const std::string& doc, T& var, const std::string& implicitValue,
-    HasDefault hasDefault, MayHaveConfig mayHaveConfig, const std::string& argHelp = "") const
-  {
-    bool hasDefaultBool = hasDefault == HasDefault::YES;
-    auto val = cxxopts::value<T>(var)->implicit_value(implicitValue);
-    std::string defaultVal;
-    if (hasDefaultBool)
-    {
-      defaultVal = ConfigurationOptions::ToString(var);
-    }
-
-    if (mayHaveConfig == MayHaveConfig::YES)
-    {
-      hasDefaultBool |= this->GetOptionConfig(longName, defaultVal);
-    }
-
-    if (hasDefaultBool)
-    {
-      val = val->default_value(defaultVal);
-    }
-
     var = {};
     group(this->CollapseName(longName, shortName), doc, val, argHelp);
   }
@@ -182,14 +177,22 @@ private:
 
   std::string FilePathForConfigBlock;
 
-  using Dictionnary = std::map<std::string, std::map<std::string, std::string> >;
+  using DictionnaryEntry = std::map<std::string, std::string>;
+  using Dictionnary = std::map<std::string, DictionnaryEntry>;
+  DictionnaryEntry GlobalConfigDicEntry;
   Dictionnary ConfigDic;
 };
 
 //----------------------------------------------------------------------------
-void ConfigurationOptions::GetOptionsFromArgs(
-  F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& inputs)
+void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& options,
+  std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool parseCommandLine)
 {
+  this->FilePathForConfigBlock = filePathForConfigBlock;
+
+  // When not parsing the command line, provided options are expected to be already initialized,
+  // which means they have a "default" in the cxxopts sense.
+  HasDefault LocalHasDefaultNo = parseCommandLine ? HasDefault::NO : HasDefault::YES;
+
   try
   {
     cxxopts::Options cxxOptions(F3D::AppName, F3D::AppTitle);
@@ -197,13 +200,13 @@ void ConfigurationOptions::GetOptionsFromArgs(
 
     // clang-format off
     auto grp0 = cxxOptions.add_options("Applicative");
-    this->DeclareOption(grp0, "input", "", "Input file", inputs, HasDefault::NO, MayHaveConfig::NO , "<files>");
-    this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, HasDefault::NO, MayHaveConfig::NO, "<png file>");
+    this->DeclareOption(grp0, "input", "", "Input file", inputs, LocalHasDefaultNo, MayHaveConfig::NO , "<files>");
+    this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, LocalHasDefaultNo, MayHaveConfig::NO, "<png file>");
     this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "help", "h", "Print help");
     this->DeclareOption(grp0, "version", "", "Print version details");
     this->DeclareOption(grp0, "readers-list", "", "Print the list of file types");
-    this->DeclareOption(grp0, "config", "", "Read a provided configuration file instead of default one", appOptions.UserConfigFile,  HasDefault::NO, MayHaveConfig::NO , "<file path>");
+    this->DeclareOption(grp0, "config", "", "Read a provided configuration file instead of default one", appOptions.UserConfigFile,  LocalHasDefaultNo, MayHaveConfig::NO , "<file path>");
     this->DeclareOption(grp0, "dry-run", "", "Do not read the configuration file", appOptions.DryRun,  HasDefault::YES, MayHaveConfig::NO );
     this->DeclareOption(grp0, "no-render", "", "Verbose mode without any rendering, only for the first file", appOptions.NoRender,  HasDefault::YES, MayHaveConfig::NO );
 
@@ -219,7 +222,7 @@ void ConfigurationOptions::GetOptionsFromArgs(
     this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", options.getAsIntRef("scene.camera.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
     this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", options.getAsBoolRef("interactor.trackball"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.getAsIntRef("scene.animation.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
-    this->DeclareOption(grp1, "font-file", "", "Path to a FreeType compatible font file", options.getAsStringRef("ui.font-file"), HasDefault::NO, MayHaveConfig::NO, "<file_path>");
+    this->DeclareOption(grp1, "font-file", "", "Path to a FreeType compatible font file", options.getAsStringRef("ui.font-file"), LocalHasDefaultNo, MayHaveConfig::NO, "<file_path>");
 
     auto grp2 = cxxOptions.add_options("Material");
     this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.getAsBoolRef("model.point-sprites.enable"), HasDefault::YES, MayHaveConfig::YES);
@@ -229,12 +232,12 @@ void ConfigurationOptions::GetOptionsFromArgs(
     this->DeclareOption(grp2, "opacity", "", "Opacity", options.getAsDoubleRef("model.color.opacity"), HasDefault::YES, MayHaveConfig::YES, "<opacity>");
     this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.roughness"), HasDefault::YES, MayHaveConfig::YES, "<roughness>");
     this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.metallic"), HasDefault::YES, MayHaveConfig::YES, "<metallic>");
-    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.getAsStringRef("render.background.hdri"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.getAsStringRef("model.color.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.getAsStringRef("model.material.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emitted light of the object", options.getAsStringRef("model.emissive.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.getAsStringRef("render.background.hdri"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.getAsStringRef("model.color.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.getAsStringRef("model.material.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emitted light of the object", options.getAsStringRef("model.emissive.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "emissive-factor", "", "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present", options.getAsDoubleVectorRef("model.emissive.factor"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
-    this->DeclareOption(grp2, "texture-normal", "", "Path to a texture file that sets the normal map of the object", options.getAsStringRef("model.normal.texture"), HasDefault::NO, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "texture-normal", "", "Path to a texture file that sets the normal map of the object", options.getAsStringRef("model.normal.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", options.getAsDoubleRef("model.normal.scale"), HasDefault::YES, MayHaveConfig::YES, "<normalScale>");
 
     auto grp3 = cxxOptions.add_options("Window");
@@ -247,20 +250,20 @@ void ConfigurationOptions::GetOptionsFromArgs(
     this->DeclareOption(grp3, "blur-background", "u", "Blur background", options.getAsBoolRef("render.background.blur"), HasDefault::YES, MayHaveConfig::YES);
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
-    this->DeclareOptionWithImplicitValue(grp4, "scalars", "s", "Color by scalars", options.getAsStringRef("model.scivis.array-name"), std::string(""), HasDefault::YES, MayHaveConfig::YES, "<array_name>");
-    this->DeclareOptionWithImplicitValue(grp4, "comp", "y", "Component from the scalar array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", options.getAsIntRef("model.scivis.component"), "-2", HasDefault::YES, MayHaveConfig::YES, "<comp_index>");
+    this->DeclareOption(grp4, "scalars", "s", "Color by scalars", options.getAsStringRef("model.scivis.array-name"), HasDefault::YES, MayHaveConfig::YES, "<array_name>", HasImplicitValue::YES, "");
+    this->DeclareOption(grp4, "comp", "y", "Component from the scalar array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", options.getAsIntRef("model.scivis.component"), HasDefault::YES, MayHaveConfig::YES, "<comp_index>", HasImplicitValue::YES, "-2");
     this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.getAsBoolRef("model.scivis.cells"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.getAsDoubleVectorRef("model.scivis.range"), HasDefault::NO, MayHaveConfig::YES, "<min,max>");
+    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.getAsDoubleVectorRef("model.scivis.range"), HasDefault::YES, MayHaveConfig::YES, "<min,max>");
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.getAsBoolRef("ui.bar"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.getAsDoubleVectorRef("model.scivis.colormap"), HasDefault::YES, MayHaveConfig::YES, "<color_list>");
     this->DeclareOption(grp4, "volume", "v", "Show volume if the file is compatible", options.getAsBoolRef("model.volume.enable"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.getAsBoolRef("model.volume.inverse"), HasDefault::YES, MayHaveConfig::YES);
 
     auto grpCamera = cxxOptions.add_options("Camera");
-    this->DeclareOption(grpCamera, "camera-position", "", "Camera position", appOptions.CameraPosition, HasDefault::NO, MayHaveConfig::YES, "<X,Y,Z>");
-    this->DeclareOption(grpCamera, "camera-focal-point", "", "Camera focal point", appOptions.CameraFocalPoint, HasDefault::NO, MayHaveConfig::YES, "<X,Y,Z>");
-    this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", appOptions.CameraViewUp, HasDefault::NO, MayHaveConfig::YES, "<X,Y,Z>");
-    this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degrees)", appOptions.CameraViewAngle, HasDefault::NO, MayHaveConfig::YES, "<angle>");
+    this->DeclareOption(grpCamera, "camera-position", "", "Camera position", appOptions.CameraPosition, HasDefault::YES, MayHaveConfig::YES, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-focal-point", "", "Camera focal point", appOptions.CameraFocalPoint, HasDefault::YES, MayHaveConfig::YES, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", appOptions.CameraViewUp, HasDefault::YES, MayHaveConfig::YES, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degrees)", appOptions.CameraViewAngle, LocalHasDefaultNo, MayHaveConfig::YES, "<angle>");
     this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees)", appOptions.CameraAzimuthAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
     this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees)", appOptions.CameraElevationAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
 
@@ -278,32 +281,40 @@ void ConfigurationOptions::GetOptionsFromArgs(
     this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping", options.getAsBoolRef("render.effect.tone-mapping"), HasDefault::YES, MayHaveConfig::YES);
 
     auto grp7 = cxxOptions.add_options("Testing");
-    this->DeclareOption(grp7, "ref", "", "Reference", appOptions.Reference, HasDefault::NO, MayHaveConfig::NO, "<png file>");
+    this->DeclareOption(grp7, "ref", "", "Reference", appOptions.Reference, LocalHasDefaultNo, MayHaveConfig::NO, "<png file>");
     this->DeclareOption(grp7, "ref-threshold", "", "Testing threshold", appOptions.RefThreshold, HasDefault::YES, MayHaveConfig::NO, "<threshold>");
-    this->DeclareOption(grp7, "interaction-test-record", "", "Path to an interaction log file to record interactions events to", appOptions.InteractionTestRecordFile, HasDefault::NO, MayHaveConfig::NO, "<file_path>");
-    this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", appOptions.InteractionTestPlayFile, HasDefault::NO, MayHaveConfig::NO,"<file_path>");
+    this->DeclareOption(grp7, "interaction-test-record", "", "Path to an interaction log file to record interactions events to", appOptions.InteractionTestRecordFile, LocalHasDefaultNo, MayHaveConfig::NO, "<file_path>");
+    this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", appOptions.InteractionTestPlayFile, LocalHasDefaultNo, MayHaveConfig::NO,"<file_path>");
     // clang-format on
 
     cxxOptions.parse_positional({ "input" });
 
-    auto result = cxxOptions.parse(this->Argc, this->Argv);
-
-    if (result.count("help") > 0)
+    if (parseCommandLine)
     {
-      this->PrintHelp(cxxOptions);
-      throw F3DExNoProcess("help requested");
+      auto result = cxxOptions.parse(this->Argc, this->Argv);
+
+      if (result.count("help") > 0)
+      {
+        this->PrintHelp(cxxOptions);
+        throw F3DExNoProcess("help requested");
+      }
+
+      if (result.count("version") > 0)
+      {
+        this->PrintVersion();
+        throw F3DExNoProcess("version requested");
+      }
+
+      if (result.count("readers-list") > 0)
+      {
+        this->PrintReadersList();
+        throw F3DExNoProcess("reader list requested");
+      }
     }
-
-    if (result.count("version") > 0)
+    else
     {
-      this->PrintVersion();
-      throw F3DExNoProcess("version requested");
-    }
-
-    if (result.count("readers-list") > 0)
-    {
-      this->PrintReadersList();
-      throw F3DExNoProcess("reader list requested");
+      // this will update the options using the config file without parsing actual argc/argv
+      cxxOptions.parse(1, nullptr);
     }
   }
   catch (const cxxopts::OptionException& ex)
@@ -527,7 +538,14 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
         return false;
       }
     }
-    this->ConfigDic[regexpConfig.key()] = localDic;
+    if (regexpConfig.key() == "global")
+    {
+      this->GlobalConfigDicEntry = localDic;
+    }
+    else
+    {
+      this->ConfigDic[regexpConfig.key()] = localDic;
+    }
   }
 
   return true;
@@ -552,18 +570,17 @@ void F3DOptionsParser::InitializeDictionaryFromConfigFile(const std::string& use
 }
 
 //----------------------------------------------------------------------------
-void F3DOptionsParser::GetOptionsFromConfigFile(
-  const std::string& filePath, F3DAppOptions& appOptions, f3d::options& options)
+void F3DOptionsParser::UpdateOptions(const std::string& filePath, F3DAppOptions& appOptions,
+  f3d::options& options, bool parseCommandLine)
 {
-  this->ConfigOptions->SetFilePathForConfigBlock(filePath);
   std::vector<std::string> dummyFiles;
-  return this->ConfigOptions->GetOptionsFromArgs(appOptions, options, dummyFiles);
+  return this->ConfigOptions->GetOptions(
+    appOptions, options, dummyFiles, filePath, parseCommandLine);
 }
 
 //----------------------------------------------------------------------------
-void F3DOptionsParser::GetOptionsFromCommandLine(
+void F3DOptionsParser::GetOptions(
   F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& files)
 {
-  this->ConfigOptions->SetFilePathForConfigBlock("");
-  return this->ConfigOptions->GetOptionsFromArgs(appOptions, options, files);
+  return this->ConfigOptions->GetOptions(appOptions, options, files);
 }
