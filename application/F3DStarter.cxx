@@ -246,6 +246,10 @@ int F3DStarter::Start(int argc, char** argv)
         }
         return EXIT_FAILURE;
       }
+      else
+      {
+        f3d::log::info("Image comparison success with an error difference of: ", error);
+      }
     }
     // Render to file if needed
     else if (!this->Internals->AppOptions.Output.empty())
