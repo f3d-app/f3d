@@ -272,7 +272,7 @@ if(F3D_MODULE_ALEMBIC)
 endif()
 
 vtk_module_add_module(f3d::VTKExtensionsReaders
-  NO_INSTALL
+  ${libf3d_vtk_no_install}
   FORCE_STATIC
   CLASSES ${classes})
 
