@@ -206,5 +206,71 @@ int TestSDKOptions(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Test getNames
+  auto names = opt.getNames();
+  if (names.size() == 0 || opt.getNames() != opt2.getNames())
+  {
+    std::cerr << "Options getNames not behaving as expected." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Test isSame/copy
+  if (!opt.isSame(opt2, "render.line-width"))
+  {
+    std::cerr << "Options isSame not behaving as expected." << std::endl;
+    return EXIT_FAILURE;
+  }
+  opt2.set("render.line-width", 3.12);
+  if (opt.isSame(opt2, "render.line-width"))
+  {
+    std::cerr << "Options isSame not behaving as expected when it should be different."
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  opt2.copy(opt, "render.line-width");
+  if (opt2.getAsDouble("render.line-width") != 2.13)
+  {
+    std::cerr << "Options copy method not behaving as expected." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Test isSame/copy vector
+  if (!opt.isSame(opt2, "render.background.color"))
+  {
+    std::cerr << "Options isSame not behaving as expected with vectors." << std::endl;
+    return EXIT_FAILURE;
+  }
+  opt2.set("render.background.color", { 0.1, 0.2, 0.6 });
+  if (opt.isSame(opt2, "render.background.color"))
+  {
+    std::cerr << "Options isSame not behaving as expected with vectors when it should be different."
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  opt2.copy(opt, "render.background.color");
+  if (opt2.getAsDoubleVector("render.background.color") != std::vector<double>{ 0.1, 0.2, 0.5 })
+  {
+    std::cerr << "Options copy method not behaving as expected with vectors." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Test isSame/copy error path
+  try
+  {
+    opt.isSame(opt2, "dummy");
+  }
+  catch (const f3d::options::inexistent_exception& ex)
+  {
+    std::cout << "Expected exception:" << ex.what() << std::endl;
+  }
+  try
+  {
+    opt.copy(opt2, "dummy");
+  }
+  catch (const f3d::options::inexistent_exception& ex)
+  {
+    std::cout << "Expected exception:" << ex.what() << std::endl;
+  }
+
   return EXIT_SUCCESS;
 }

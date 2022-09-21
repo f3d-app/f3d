@@ -91,6 +91,24 @@ public:
    */
   options& toggle(const std::string& name);
 
+  /**
+   * Compare an option between this and a provided other.
+   * Return true is they are the same value, false otherwise.
+   * Throw an options::inexistent_exception if option does not exist.
+   */
+  bool isSame(const options& other, const std::string& name) const;
+
+  /**
+   * Copy the value of an option from this to the provided other.
+   * Throw an options::inexistent_exception if option does not exist.
+   */
+  options& copy(const options& other, const std::string& name);
+
+  /**
+   * Get all available option names
+   */
+  std::vector<std::string> getNames();
+
   //@{
   /**
    * Options specific exceptions

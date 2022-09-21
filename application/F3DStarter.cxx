@@ -50,8 +50,11 @@ public:
 
   F3DOptionsParser Parser;
   F3DAppOptions AppOptions;
+  f3d::options DynamicOptions;
+  f3d::options FileOptions;
   std::unique_ptr<f3d::engine> Engine;
   bool LoadedFile = false;
+  bool UpdateWithCommandLineParsing = true;
 };
 
 //----------------------------------------------------------------------------
@@ -75,9 +78,20 @@ int F3DStarter::Start(int argc, char** argv)
   // Parse command line options
   std::vector<std::string> files;
   this->Internals->Parser.Initialize(argc, argv);
-  f3d::options commandLineOptions;
-  this->Internals->Parser.GetOptionsFromCommandLine(
-    this->Internals->AppOptions, commandLineOptions, files);
+  this->Internals->Parser.GetOptions(
+    this->Internals->AppOptions, this->Internals->DynamicOptions, files);
+
+  // Read config file if needed
+  if (!this->Internals->AppOptions.DryRun)
+  {
+    // Initialize the config file dictionary
+    this->Internals->Parser.InitializeDictionaryFromConfigFile(
+      this->Internals->AppOptions.UserConfigFile);
+
+    // Parse command line options with config file, global section only
+    this->Internals->Parser.GetOptions(
+      this->Internals->AppOptions, this->Internals->DynamicOptions, files);
+  }
 
   // Set verbosity level
   if (this->Internals->AppOptions.Quiet)
@@ -87,13 +101,6 @@ int F3DStarter::Start(int argc, char** argv)
   else if (this->Internals->AppOptions.Verbose || this->Internals->AppOptions.NoRender)
   {
     f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  }
-
-  if (!this->Internals->AppOptions.DryRun)
-  {
-    // Initialize the config file dictionary
-    this->Internals->Parser.InitializeDictionaryFromConfigFile(
-      this->Internals->AppOptions.UserConfigFile);
   }
 
 #if __APPLE__
@@ -161,9 +168,6 @@ int F3DStarter::Start(int argc, char** argv)
       .setWindowName(F3D::AppTitle)
       .setIcon(F3DIcon, sizeof(F3DIcon));
   }
-
-  // Move command line options into the actual engine options
-  this->Internals->Engine->setOptions(commandLineOptions);
 
   // Add and load file
   this->Internals->Engine->getLoader().addFiles(files);
@@ -246,6 +250,10 @@ int F3DStarter::Start(int argc, char** argv)
         }
         return EXIT_FAILURE;
       }
+      else
+      {
+        f3d::log::info("Image comparison success with an error difference of: ", error);
+      }
     }
     // Render to file if needed
     else if (!this->Internals->AppOptions.Output.empty())
@@ -273,20 +281,39 @@ int F3DStarter::Start(int argc, char** argv)
 //----------------------------------------------------------------------------
 void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
 {
+  if (this->Internals->LoadedFile)
+  {
+    // When loading a file after another, store the changed options
+    // into the dynamic options and use these dynamic option as the default
+    // for loading the next file while still applying file specific options on top of it
+
+    // Recover previous options from the engine
+    const f3d::options& previousOptions = this->Internals->Engine->getOptions();
+
+    // Detect changed options and apply the change to the dynamic options
+    // options names are shared between options instance
+    std::vector<std::string> optionNames = this->Internals->DynamicOptions.getNames();
+    for (auto name : optionNames)
+    {
+      if (!previousOptions.isSame(this->Internals->FileOptions, name))
+      {
+        this->Internals->DynamicOptions.copy(previousOptions, name);
+      }
+    }
+  }
+
   // Recover info about the file to be loaded
   int index;
   std::string filePath, fileInfo;
   this->Internals->Engine->getLoader().getFileInfo(load, index, filePath, fileInfo);
 
-  F3DAppOptions configFileAppOptions;
-  if (!this->Internals->AppOptions.DryRun)
-  {
-    // Recover options for the file to load
-    f3d::options configFileOptions;
-    this->Internals->Parser.GetOptionsFromConfigFile(
-      filePath, configFileAppOptions, configFileOptions);
-    this->Internals->Engine->setOptions(std::move(configFileOptions));
-  }
+  // Update options for the file to load, using dynamic options as default
+  this->Internals->FileOptions = this->Internals->DynamicOptions;
+  F3DAppOptions fileAppOptions = this->Internals->AppOptions;
+  this->Internals->Parser.UpdateOptions(filePath, fileAppOptions, this->Internals->FileOptions,
+    this->Internals->UpdateWithCommandLineParsing);
+  this->Internals->UpdateWithCommandLineParsing = false; // this is done only once
+  this->Internals->Engine->setOptions(this->Internals->FileOptions);
 
   // Load the file
   this->Internals->LoadedFile = this->Internals->Engine->getLoader().loadFile(load);
@@ -294,8 +321,7 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
   if (!this->Internals->AppOptions.NoRender)
   {
     // Setup the camera according to options
-    this->Internals->SetupCamera(
-      this->Internals->AppOptions.DryRun ? this->Internals->AppOptions : configFileAppOptions);
+    this->Internals->SetupCamera(fileAppOptions);
   }
 }
 
