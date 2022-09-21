@@ -1,0 +1,26 @@
+{
+  "global":
+  {
+    "scalars": "",
+    "axis": true,
+    "grid": true
+  },
+  ".*(vt.)":
+  {
+    "bar": true,
+    "ssao": true,
+    "filename": true
+  },
+  ".*(vti)":
+  {
+    "grid": true,
+    "volume": true
+  },
+  ".*(stl)":
+  {
+    "grid": true,
+    "up": "+Z",
+    "ssao": true,
+    "filename": false
+  }
+}

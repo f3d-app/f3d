@@ -137,6 +137,7 @@ f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -p
 f3d_test(NAME TestDefaultConfigFile DATA dragon.vtu CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json DEFAULT_LIGHTS)
 f3d_test(NAME TestDefaultConfigFileAnotherBlock DATA vase_4comp.vti CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json DEFAULT_LIGHTS)
 f3d_test(NAME TestDefaultConfigFileUp DATA suzanne.stl CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json DEFAULT_LIGHTS)
+f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json DEFAULT_LIGHTS)
 f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT THRESHOLD 300) # High threshold for volume as it is dependent on the OpenGL implementation
 f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT)
 f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb LONG_TIMEOUT)
@@ -303,7 +304,8 @@ f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_B
 f3d_test(NAME TestInteractionResetCamera DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)#MouseMovements;Return;
 f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --scalars --comp=-2  INTERACTION DEFAULT_LIGHTS) #SYYYYYYYYYY
 f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --scalars --comp=2 INTERACTION DEFAULT_LIGHTS) #S
-f3d_test(NAME TestInteractionDefaultConfigFileMulti DATA multi CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json INTERACTION DEFAULT_LIGHTS) #Right
+f3d_test(NAME TestInteractionConfigFileMulti DATA multi CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/complex.json INTERACTION DEFAULT_LIGHTS) #XG;Right;N;Right;Right
+f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/complex.json INTERACTION DEFAULT_LIGHTS) #O;Left
 f3d_test(NAME TestInteractionDumpSceneState DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Camera position: 2.26745,3.82625,507.698")#?
 f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring")#SSSSYC
 f3d_test(NAME TestInteractionEmptyDrop INTERACTION REGEXP "Drop event without any provided files.")#DropEvent Empty;
