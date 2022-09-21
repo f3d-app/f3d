@@ -22,3 +22,11 @@ assert engine.getOptions().getAsDouble("model.material.roughness") == 0.7
 assert engine.getOptions().getAsInt("render.raytracing.samples") == 2
 assert engine.getOptions().getAsDoubleVector("model.color.rgb") == [ 0., 1., 1.]
 assert engine.getOptions().getAsString("scene.up-direction") == "-Z"
+
+assert len(options.getNames()) > 0
+
+options2 = engine.getOptions();
+options2.set("interactor.axis", False);
+assert(not options2.isSame(options, "interactor.axis"))
+options2.copy(options, "interactor.axis")
+assert(options2.isSame(options, "interactor.axis"))
