@@ -163,8 +163,8 @@ Options|Description
 \-\-up|Define the Up direction (default: +Y)
 \-\-animation-index|Select the animation to show.<br>Any negative value means all animations.<br>The default scene always has at most one animation.<br>If the option is not specified, the first animation is enabled.
 \-\-geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
-\-\-dry-run|Do not read the configuration file but consider only the command line options
-\-\-config|Read a provided configuration file instead of default one
+\-\-dry-run|Do not read any configuration file but consider only the command line options
+\-\-config|Specify the configuration file to use. Supports absolute/relative path but also filename/filestem to search for in configuration file locations.
 \-\-font-file|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.
 
 ## Material options
@@ -399,8 +399,11 @@ They are considered in the below order and only the first found will be used.
  * Windows: `%APPDATA%\f3d\config.json`, `[install_dir]\config.json`
  * macOS: `${XDG_CONFIG_HOME}/.config/f3d/config.json`, `~/.config/f3d/config.json`, `/usr/local/etc/f3d/config.json`, `f3d.app/Contents/Resources/config.json`
 
-If you are using the binary releases, a default configuration file is provided when installing F3D.
-On Linux, it will be installed in `[install_dir]/etc/f3d/`, on Windows, it will be installed in the install directory, on macOS, it will be installed in the bundle.
+When installing F3D default configuration files can be installed, one for generic usage (`config.json`) and one for thumbnails (`thumbnail.json`).
+When installing the binary release, On Linux, they will be installed in `[install_dir]/share/f3d/`, on Windows, it will be installed in the install directory, on macOS, it will be installed in the bundle.
+
+Please note there is a command line option to control the configuration file to read. Using it, one can specify an absolute/relative path for the configuration path, but also
+only the filename or filestem (`.json` will be added) to look for in the locations listed above, instead of looking for `config.json`.
 
 # libf3d
 

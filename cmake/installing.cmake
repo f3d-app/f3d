@@ -47,17 +47,22 @@ endif()
 install(FILES LICENSE THIRD_PARTY_LICENSES.md README.md
   DESTINATION ${F3D_DOC_DIR} COMPONENT documentation)
 
+list(APPEND config_files
+     "${CMAKE_SOURCE_DIR}/resources/config.json"
+     "${CMAKE_SOURCE_DIR}/resources/thumbnail.json"
+    )
+
 # Default config file
 if (UNIX AND NOT APPLE)
   if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
     if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
-      install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
+      install(FILES ${config_files}
         DESTINATION "share/f3d" COMPONENT configuration)
     else()
       message(STATUS "Enabling F3D_INSTALL_DEFAULT_CONFIGURATION_FILE, while not enabling "
               "F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX implies that installation of the config file rely on
               CMAKE_INSTALL_FULL_SYSCONFDIR and that the config file will not be packaged by cpack.")
-      install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
+      install(FILES ${config_files}
         DESTINATION "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d" COMPONENT configuration)
     endif()
   endif()
@@ -135,12 +140,12 @@ elseif(WIN32 AND NOT UNIX)
   install(FILES "${CMAKE_SOURCE_DIR}/resources/logo.ico"
     DESTINATION "." COMPONENT assets)
   if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
-    install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
+    install(FILES ${config_files}
       DESTINATION "." COMPONENT configuration)
   endif()
 elseif(APPLE AND NOT F3D_MACOS_BUNDLE)
   if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
-    install(FILES "${CMAKE_SOURCE_DIR}/resources/config.json"
+    install(FILES ${config_files}
       DESTINATION "." COMPONENT configuration)
   endif()
 endif()

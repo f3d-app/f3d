@@ -208,6 +208,9 @@ endif()
 # no-background test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8501
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
   f3d_test(NAME TestNoBackground DATA cow.vtp ARGS --no-background)
+  f3d_test(NAME TestThumbnailConfigFile DATA dragon.vtu CONFIG ${CMAKE_SOURCE_DIR}/resources/thumbnail.json DEFAULT_LIGHTS)
+  f3d_test(NAME TestThumbnailConfigFileAnotherBlock DATA vase_4comp.vti CONFIG ${CMAKE_SOURCE_DIR}/resources/thumbnail.json DEFAULT_LIGHTS)
+  f3d_test(NAME TestThumbnailConfigFileUp DATA suzanne.stl CONFIG ${CMAKE_SOURCE_DIR}/resources/thumbnail.json DEFAULT_LIGHTS)
 endif()
 
 # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8825
@@ -397,11 +400,20 @@ f3d_test(NAME TestInvalidHDRI DATA cow.vtp ARGS --hdri=${CMAKE_SOURCE_DIR}/testi
 # Test invalid options, do not add a --dummy option
 f3d_test(NAME TestInvalidOption ARGS --dummy REGEXP "Error parsing options:")
 
-# Test non-existent config file, do not add a dummy.json
-f3d_test(NAME TestNonExistentConfigFile DATA cow.vtp CONFIG "${CMAKE_SOURCE_DIR}/testing/configs/dummy.json" REGEXP "Configuration file does not exist" NO_BASELINE)
+# Test non-existent config filepath, do not add a dummy.json
+f3d_test(NAME TestNonExistentConfigFilePath DATA cow.vtp CONFIG "${CMAKE_SOURCE_DIR}/testing/configs/dummy.json" REGEXP "Configuration file does not exist" NO_BASELINE)
+
+# Test non-existent config filename, do not add a dummy.json
+f3d_test(NAME TestNonExistentConfigFilename DATA cow.vtp CONFIG "dummy.json" REGEXP "Configuration file for \"dummy.json\" could not been found" NO_BASELINE)
+
+# Test non-existent config filename, do not add a dummy.json
+f3d_test(NAME TestNonExistentConfigFileStem DATA cow.vtp CONFIG "dummy" REGEXP "Configuration file for \"dummy\" could not been found" NO_BASELINE)
 
 # Test invalid config file
 f3d_test(NAME TestInvalidConfigFile DATA cow.vtp CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/invalid.json REGEXP "Unable to parse the configuration file" NO_BASELINE)
+
+# Test quiet in config file
+f3d_test(NAME TestConfigFileQuiet DATA nonExistentFile.vtp CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/quiet.json REGEXP_FAIL "File .*/testing/data/nonExistentFile.vtp does not exist" NO_RENDER)
 
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")

@@ -81,6 +81,16 @@ int F3DStarter::Start(int argc, char** argv)
   this->Internals->Parser.GetOptions(
     this->Internals->AppOptions, this->Internals->DynamicOptions, files);
 
+  // Set verbosity level early from command line
+  if (this->Internals->AppOptions.Quiet)
+  {
+    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
+  }
+  else if (this->Internals->AppOptions.Verbose || this->Internals->AppOptions.NoRender)
+  {
+    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+  }
+
   // Read config file if needed
   if (!this->Internals->AppOptions.DryRun)
   {
@@ -91,16 +101,16 @@ int F3DStarter::Start(int argc, char** argv)
     // Parse command line options with config file, global section only
     this->Internals->Parser.GetOptions(
       this->Internals->AppOptions, this->Internals->DynamicOptions, files);
-  }
 
-  // Set verbosity level
-  if (this->Internals->AppOptions.Quiet)
-  {
-    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
-  }
-  else if (this->Internals->AppOptions.Verbose || this->Internals->AppOptions.NoRender)
-  {
-    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+    // Set verbosity level again if it was defined in the configuration file global block
+    if (this->Internals->AppOptions.Quiet)
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
+    }
+    else if (this->Internals->AppOptions.Verbose || this->Internals->AppOptions.NoRender)
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+    }
   }
 
 #if __APPLE__
