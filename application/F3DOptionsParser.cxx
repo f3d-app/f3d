@@ -200,19 +200,19 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
     // clang-format off
     auto grp0 = cxxOptions.add_options("Applicative");
-    this->DeclareOption(grp0, "input", "", "Input file", inputs, LocalHasDefaultNo, MayHaveConfig::NO , "<files>");
-    this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, LocalHasDefaultNo, MayHaveConfig::NO, "<png file>");
+    this->DeclareOption(grp0, "input", "", "Input file", inputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
+    this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
     this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "help", "h", "Print help");
     this->DeclareOption(grp0, "version", "", "Print version details");
     this->DeclareOption(grp0, "readers-list", "", "Print the list of file types");
-    this->DeclareOption(grp0, "config", "", "Read a provided configuration file instead of default one", appOptions.UserConfigFile,  LocalHasDefaultNo, MayHaveConfig::NO , "<file path>");
+    this->DeclareOption(grp0, "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations.", appOptions.UserConfigFile,  LocalHasDefaultNo, MayHaveConfig::NO , "<filePath/filename/fileStem>");
     this->DeclareOption(grp0, "dry-run", "", "Do not read the configuration file", appOptions.DryRun,  HasDefault::YES, MayHaveConfig::NO );
-    this->DeclareOption(grp0, "no-render", "", "Verbose mode without any rendering, only for the first file", appOptions.NoRender,  HasDefault::YES, MayHaveConfig::NO );
+    this->DeclareOption(grp0, "no-render", "", "Verbose mode without any rendering, only for the first file", appOptions.NoRender,  HasDefault::YES, MayHaveConfig::YES );
 
     auto grp1 = cxxOptions.add_options("General");
-    this->DeclareOption(grp1, "verbose", "", "Enable verbose mode, providing more information about the loaded data in the console output", appOptions.Verbose,  HasDefault::YES, MayHaveConfig::NO );
-    this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which superseed any verbose options and prevent any console output to be generated at all", appOptions.Quiet,  HasDefault::YES, MayHaveConfig::NO );
+    this->DeclareOption(grp1, "verbose", "", "Enable verbose mode, providing more information about the loaded data in the console output", appOptions.Verbose,  HasDefault::YES, MayHaveConfig::YES );
+    this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which superseed any verbose options and prevent any console output to be generated at all", appOptions.Quiet,  HasDefault::YES, MayHaveConfig::YES );
     this->DeclareOption(grp1, "progress", "", "Show progress bar", options.getAsBoolRef("ui.loader-progress"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", options.getAsBoolRef("scene.geometry-only"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "up", "", "Up direction", options.getAsStringRef("scene.up-direction"), HasDefault::YES, MayHaveConfig::YES, "[-X|+X|-Y|+Y|-Z|+Z]");
@@ -242,7 +242,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
     auto grp3 = cxxOptions.add_options("Window");
     this->DeclareOption(grp3, "bg-color", "", "Background color", options.getAsDoubleVectorRef("render.background.color"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
-    this->DeclareOption(grp3, "resolution", "", "Window resolution", appOptions.Resolution, HasDefault::YES, MayHaveConfig::NO, "<width,height>");
+    this->DeclareOption(grp3, "resolution", "", "Window resolution", appOptions.Resolution, HasDefault::YES, MayHaveConfig::YES, "<width,height>");
     this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.getAsBoolRef("ui.fps"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp3, "filename", "n", "Display filename", options.getAsBoolRef("ui.filename"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.getAsBoolRef("ui.metadata"), HasDefault::YES, MayHaveConfig::YES);
@@ -281,10 +281,10 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping", options.getAsBoolRef("render.effect.tone-mapping"), HasDefault::YES, MayHaveConfig::YES);
 
     auto grp7 = cxxOptions.add_options("Testing");
-    this->DeclareOption(grp7, "ref", "", "Reference", appOptions.Reference, LocalHasDefaultNo, MayHaveConfig::NO, "<png file>");
-    this->DeclareOption(grp7, "ref-threshold", "", "Testing threshold", appOptions.RefThreshold, HasDefault::YES, MayHaveConfig::NO, "<threshold>");
-    this->DeclareOption(grp7, "interaction-test-record", "", "Path to an interaction log file to record interactions events to", appOptions.InteractionTestRecordFile, LocalHasDefaultNo, MayHaveConfig::NO, "<file_path>");
-    this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", appOptions.InteractionTestPlayFile, LocalHasDefaultNo, MayHaveConfig::NO,"<file_path>");
+    this->DeclareOption(grp7, "ref", "", "Reference", appOptions.Reference, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
+    this->DeclareOption(grp7, "ref-threshold", "", "Testing threshold", appOptions.RefThreshold, HasDefault::YES, MayHaveConfig::YES, "<threshold>");
+    this->DeclareOption(grp7, "interaction-test-record", "", "Path to an interaction log file to record interactions events to", appOptions.InteractionTestRecordFile, LocalHasDefaultNo, MayHaveConfig::YES, "<file_path>");
+    this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", appOptions.InteractionTestPlayFile, LocalHasDefaultNo, MayHaveConfig::YES,"<file_path>");
     // clang-format on
 
     cxxOptions.parse_positional({ "input" });
@@ -467,21 +467,49 @@ void ConfigurationOptions::PrintReadersList()
 }
 
 //----------------------------------------------------------------------------
-bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string& userConfigFile)
+bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string& config)
 {
   this->ConfigDic.clear();
 
-  std::string configFilePath;
-  if (!userConfigFile.empty())
+  std::string configFilename = "config.json";
+  bool search = true;
+
+  if (!config.empty())
   {
-    configFilePath = userConfigFile;
+    auto path = std::filesystem::path(config);
+    if (path.stem() == config)
+    {
+      // Only a stem, add .json to it
+      configFilename = config + ".json";
+    }
+    else if (path.filename() == config)
+    {
+      // config filename provided
+      configFilename = config;
+    }
+    else
+    {
+      // Assume its a full path and not search for a config file
+      search = false;
+    }
+  }
+
+  std::string configFilePath;
+  if (search)
+  {
+    configFilePath = F3DConfigFileTools::GetConfigFilePath(configFilename);
   }
   else
   {
-    configFilePath = F3DConfigFileTools::GetConfigFilePath();
+    configFilePath = config;
   }
+
   if (configFilePath.empty())
   {
+    if (!config.empty())
+    {
+      f3d::log::error("Configuration file for \"", config, "\" could not been found");
+    }
     return false;
   }
 
@@ -518,6 +546,8 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
     f3d::log::error(ex.what());
     return false;
   }
+
+  f3d::log::debug("Using config file ", configFilePath);
 
   for (const auto& regexpConfig : j.items())
   {
