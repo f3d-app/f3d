@@ -46,10 +46,14 @@ public:
 
   /**
    * Find and parse a config file, if any, into the config file dictionnary.
-   * If a non-empty userConfigFile is provided, it will be considered instead
-   * of standard settings config file
+   * If a non-empty configNameis provided, it will be considered instead
+   * of standard settings config file.
+   * supported config are:
+   *  - relative/absolute path to a config file
+   *  - name of file to look for in standard locations
+   *  - name of file without extension to look for in standard locations, .json will be added.
    */
-  void InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
+  void InitializeDictionaryFromConfigFile(const std::string& config);
 
   /**
    * Parse the command line and return the options passed

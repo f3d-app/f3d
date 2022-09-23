@@ -72,7 +72,7 @@ std::string F3DConfigFileTools::GetBinaryConfigFileDirectory()
     char buffer[size];
     if (_NSGetExecutablePath(buffer, &size) != 0)
     {
-      f3d::log::error("Executable is too long to recover path to config file");
+      f3d::log::error("Executable is too long to recover path to configuration file");
       return std::string();
     }
     execPath = buffer;
@@ -96,7 +96,7 @@ std::string F3DConfigFileTools::GetBinaryConfigFileDirectory()
   }
   catch (const std::filesystem::filesystem_error&)
   {
-    f3d::log::debug("Cannot recover binary config file directory: ", dirPath.string());
+    f3d::log::debug("Cannot recover binary configuration file directory: ", dirPath.string());
     return std::string();
   }
 
@@ -104,9 +104,8 @@ std::string F3DConfigFileTools::GetBinaryConfigFileDirectory()
 }
 
 //----------------------------------------------------------------------------
-std::string F3DConfigFileTools::GetConfigFilePath()
+std::string F3DConfigFileTools::GetConfigFilePath(const std::string& filename)
 {
-  std::string fileName = "config.json";
   std::filesystem::path filePath;
   std::vector<std::string> dirsToCheck;
   try
@@ -125,20 +124,19 @@ std::string F3DConfigFileTools::GetConfigFilePath()
     {
       if (!dir.empty())
       {
-        filePath = std::filesystem::path(dir) / fileName;
+        filePath = std::filesystem::path(dir) / filename;
         if (std::filesystem::exists(filePath))
         {
-          f3d::log::debug("Config file found in: ", filePath.string());
           return filePath.string();
         }
       }
     }
-    f3d::log::debug("No config file found");
+    f3d::log::debug("No configuration file (\"", filename, "\") found");
     return std::string();
   }
   catch (const std::filesystem::filesystem_error&)
   {
-    f3d::log::error("Error recovering config file path: ", filePath.string());
+    f3d::log::error("Error recovering configuration file path: ", filePath.string());
     return std::string();
   }
 }

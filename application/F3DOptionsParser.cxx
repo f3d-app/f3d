@@ -467,21 +467,49 @@ void ConfigurationOptions::PrintReadersList()
 }
 
 //----------------------------------------------------------------------------
-bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string& userConfigFile)
+bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string& config)
 {
   this->ConfigDic.clear();
 
-  std::string configFilePath;
-  if (!userConfigFile.empty())
+  std::string configFilename = "config.json";
+  bool search = true;
+
+  if (!config.empty())
   {
-    configFilePath = userConfigFile;
+    auto path = std::filesystem::path(config);
+    if (path.stem() == config)
+    {
+      // Only a stem, add .json to it
+      configFilename = config + ".json";
+    }
+    else if (path.filename() == config)
+    {
+      // config filename provided
+      configFilename = config;
+    }
+    else
+    {
+      // Assume its a full path and not search for a config file
+      search = false;
+    }
+  }
+
+  std::string configFilePath;
+  if (search)
+  {
+    configFilePath = F3DConfigFileTools::GetConfigFilePath(configFilename);
   }
   else
   {
-    configFilePath = F3DConfigFileTools::GetConfigFilePath();
+    configFilePath = config;
   }
+
   if (configFilePath.empty())
   {
+    if (!config.empty())
+    {
+      f3d::log::error("Configuration file for \"", config, "\" could not been found");
+    }
     return false;
   }
 
@@ -518,6 +546,8 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
     f3d::log::error(ex.what());
     return false;
   }
+
+  f3d::log::debug("Using config file ", configFilePath);
 
   for (const auto& regexpConfig : j.items())
   {
