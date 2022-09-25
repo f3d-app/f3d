@@ -508,8 +508,9 @@ Be sure that VTK has been built with *OpenImageDenoise* support (`VTKOSPRAY_ENAB
  * Check that you have updated your mime type database.
  * If all fails, remove your .cache user dir and check that pcmanfm thumbnails are working.
   * If they are working, then it is an issue specific to your file manager.
-  * If only a few format have working thumbnails, then it is an issue with mime types
-  * If no formats have working thumbnails, then it is an issue with the f3d.thumbnailer file
+  * If only a few format have working thumbnails, then it is an issue with mime types.
+  * If no formats have working thumbnails, then it is an issue with the f3d.thumbnailer file.
+  * If only big file do not have thumbnails, this is intended, you can modify this behavior in the tumbnail.json configuration file using the `max-size` option.
 
 ## Windows
 > After installing F3D or registering the shell extension, my explorer is broken
