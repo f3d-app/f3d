@@ -171,9 +171,6 @@ options::options()
   this->Internals->init("model.volume.enable", false);
   this->Internals->init("model.volume.inverse", false);
 
-  // Window
-  this->Internals->init("window.fullscreen", false);
-
   // Interactor
   this->Internals->init("interactor.axis", false);
   this->Internals->init("interactor.trackball", false);
