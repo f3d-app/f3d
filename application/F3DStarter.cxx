@@ -325,13 +325,24 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
   this->Internals->UpdateWithCommandLineParsing = false; // this is done only once
   this->Internals->Engine->setOptions(this->Internals->FileOptions);
 
-  // Load the file
-  this->Internals->LoadedFile = this->Internals->Engine->getLoader().loadFile(load);
-
-  if (!this->Internals->AppOptions.NoRender)
+  // Check the size of the file before loading it
+  static constexpr int BYTES_IN_MIB = 1048576;
+  if (fileAppOptions.MaxSize >= 0 &&
+    std::filesystem::file_size(std::filesystem::path(filePath)) >
+      static_cast<std::uintmax_t>(fileAppOptions.MaxSize) * BYTES_IN_MIB)
   {
-    // Setup the camera according to options
-    this->Internals->SetupCamera(fileAppOptions);
+    f3d::log::info("No file loaded, file is bigger than max size");
+  }
+  else
+  {
+    // Load the file
+    this->Internals->LoadedFile = this->Internals->Engine->getLoader().loadFile(load);
+
+    if (!this->Internals->AppOptions.NoRender)
+    {
+      // Setup the camera according to options
+      this->Internals->SetupCamera(fileAppOptions);
+    }
   }
 }
 
