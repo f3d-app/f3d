@@ -230,8 +230,6 @@ void window_impl::UpdateDynamicOptions()
     this->Initialize(false, "");
   }
 
-  this->Internals->RenWin->SetFullScreen(this->Internals->Options.getAsBool("window.fullscreen"));
-
   this->Internals->Renderer->ShowAxis(this->Internals->Options.getAsBool("interactor.axis"));
   this->Internals->Renderer->SetUseTrackball(
     this->Internals->Options.getAsBool("interactor.trackball"));
