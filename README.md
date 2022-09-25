@@ -246,7 +246,6 @@ Options|Default|Description
 -z, \-\-fps||Display a *frame per second counter*.
 -n, \-\-filename||Display the *name of the file*.
 -m, \-\-metadata||Display the *metadata*.<br>This only makes sense when using the default scene.
--f, \-\-fullscreen||Display in fullscreen.
 -u, \-\-blur-background||Blur background.<br>This only makes sense when using a HDRI.
 
 # Rendering precedence
