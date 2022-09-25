@@ -181,11 +181,6 @@ ui.fps|false|bool|Display a *frame per second counter*.|--fps|render
 ui.loader-progress|false|bool|Show a *progress bar* when loading the file.|--progress|load
 ui.metadata|false|bool|Display the *metadata*.|--metadata|render
 
-## Window Options
-Options|Default|Type|Description|F3D option|Trigger
-------|------|------|------|------|------
-window.fullscreen|false|bool|Display in fullscreen.|--fullscreen|render
-
 # Bindings
 
 ## Python Bindings
