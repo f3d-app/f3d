@@ -1,19 +1,19 @@
 /**
- * @class   vtkF3DInteractorStyle
+ * @class   vtkF3DInteractorStyle3D
  * @brief   custom interactor style based on default trackball camera
  */
 
-#ifndef vtkF3DInteractorStyle_h
-#define vtkF3DInteractorStyle_h
+#ifndef vtkF3DInteractorStyle3D_h
+#define vtkF3DInteractorStyle3D_h
 
 #include <vtkCommand.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 
-class vtkF3DInteractorStyle : public vtkInteractorStyleTrackballCamera
+class vtkF3DInteractorStyle3D : public vtkInteractorStyleTrackballCamera
 {
 public:
-  static vtkF3DInteractorStyle* New();
-  vtkTypeMacro(vtkF3DInteractorStyle, vtkInteractorStyleTrackballCamera);
+  static vtkF3DInteractorStyle3D* New();
+  vtkTypeMacro(vtkF3DInteractorStyle3D, vtkInteractorStyleTrackballCamera);
 
   /**
    * Custom events invoked by this class

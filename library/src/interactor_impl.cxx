@@ -7,9 +7,11 @@
 
 #include "vtkF3DConfigure.h"
 #include "vtkF3DInteractorEventRecorder.h"
-#include "vtkF3DInteractorStyle.h"
+#include "vtkF3DInteractorStyle2D.h"
+#include "vtkF3DInteractorStyle3D.h"
 #include "vtkF3DRendererWithColoring.h"
 
+#include <vtkBoundingBox.h>
 #include <vtkCallbackCommand.h>
 #include <vtkNew.h>
 #include <vtkRenderWindow.h>
@@ -32,7 +34,7 @@ public:
     , Loader(loader)
   {
     this->VTKInteractor->SetRenderWindow(this->Window.GetRenderWindow());
-    this->VTKInteractor->SetInteractorStyle(this->Style);
+    this->VTKInteractor->SetInteractorStyle(this->Style3D);
     this->VTKInteractor->Initialize();
 
     // Disable standard interactor behavior with timer event
@@ -42,12 +44,14 @@ public:
     vtkNew<vtkCallbackCommand> keyPressCallback;
     keyPressCallback->SetClientData(this);
     keyPressCallback->SetCallback(OnKeyPress);
-    this->Style->AddObserver(vtkF3DInteractorStyle::KeyPressEvent, keyPressCallback);
+    this->Style2D->AddObserver(vtkF3DInteractorStyle2D::KeyPressEvent, keyPressCallback);
+    this->Style3D->AddObserver(vtkF3DInteractorStyle3D::KeyPressEvent, keyPressCallback);
 
     vtkNew<vtkCallbackCommand> dropFilesCallback;
     dropFilesCallback->SetClientData(this);
     dropFilesCallback->SetCallback(OnDropFiles);
-    this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
+    this->Style2D->AddObserver(vtkF3DInteractorStyle2D::DropFilesEvent, dropFilesCallback);
+    this->Style3D->AddObserver(vtkF3DInteractorStyle3D::DropFilesEvent, dropFilesCallback);
 
 // Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
@@ -56,12 +60,14 @@ public:
 #endif
   }
 
-  static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
+  static void OnKeyPress(vtkObject* sender, unsigned long, void* clientData, void*)
   {
+    vtkInteractorStyle* style = vtkInteractorStyle::SafeDownCast(sender);
     internals* self = static_cast<internals*>(clientData);
-    vtkRenderWindowInteractor* rwi = self->Style->GetInteractor();
+    vtkRenderWindowInteractor* rwi = style->GetInteractor();
     int keyCode = std::toupper(rwi->GetKeyCode());
     std::string keySym = rwi->GetKeySym();
+
     if (keySym.length() > 0)
     {
       // Make sure key symbols starts with an upper char (e.g. "space")
@@ -113,7 +119,6 @@ public:
         self->Options.toggle("ui.bar");
         render = true;
         break;
-      case 'p':
       case 'P':
         self->Options.toggle("render.effect.depth-peeling");
         render = true;
@@ -193,7 +198,16 @@ public:
         self->Window.PrintSceneDescription(log::VerboseLevel::INFO);
         break;
       default:
-        if (keySym == "Left")
+
+        if (keyCode == '2' || keySym == "KP_Down")
+        {
+          self->VTKInteractor->SetInteractorStyle(self->Style2D);
+        }
+        else if (keyCode == '3' || keySym == "KP_Next")
+        {
+          self->VTKInteractor->SetInteractorStyle(self->Style3D);
+        }
+        else if (keySym == "Left")
         {
           self->AnimationManager.StopAnimation();
           loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_PREVIOUS;
@@ -287,7 +301,8 @@ public:
   animationManager AnimationManager;
 
   vtkNew<vtkRenderWindowInteractor> VTKInteractor;
-  vtkNew<vtkF3DInteractorStyle> Style;
+  vtkNew<vtkF3DInteractorStyle2D> Style2D;
+  vtkNew<vtkF3DInteractorStyle3D> Style3D;
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
   int WindowSize[2] = { -1, -1 };
   int WindowPos[2] = { 0, 0 };
@@ -377,13 +392,15 @@ bool interactor_impl::isPlayingAnimation()
 //----------------------------------------------------------------------------
 void interactor_impl::enableCameraMovement()
 {
-  this->Internals->Style->SetCameraMovementDisabled(false);
+  this->Internals->Style2D->SetCameraMovementDisabled(false);
+  this->Internals->Style3D->SetCameraMovementDisabled(false);
 }
 
 //----------------------------------------------------------------------------
 void interactor_impl::disableCameraMovement()
 {
-  this->Internals->Style->SetCameraMovementDisabled(true);
+  this->Internals->Style2D->SetCameraMovementDisabled(true);
+  this->Internals->Style3D->SetCameraMovementDisabled(true);
 }
 
 //----------------------------------------------------------------------------
@@ -476,4 +493,25 @@ void interactor_impl::InitializeAnimation(vtkImporter* importer)
   this->Internals->AnimationManager.Initialize(
     &this->Internals->Options, this, &this->Internals->Window, importer);
 }
+
+//----------------------------------------------------------------------------
+void interactor_impl::selectBestInteractor()
+{
+  vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+  vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  double bounds[6], lengths[3];
+  renderer->ComputeVisiblePropBounds(bounds);
+  vtkBoundingBox box(bounds);
+  box.GetLengths(lengths);
+  bool is2D = (lengths[0] == 0 || lengths[1] == 0 || lengths[2] == 0);
+  if (is2D)
+  {
+    this->Internals->VTKInteractor->SetInteractorStyle(this->Internals->Style2D);
+  }
+  else
+  {
+    this->Internals->VTKInteractor->SetInteractorStyle(this->Internals->Style3D);
+  }
+}
+
 }

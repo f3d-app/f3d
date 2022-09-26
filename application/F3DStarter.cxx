@@ -187,6 +187,7 @@ int F3DStarter::Start(int argc, char** argv)
   {
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
+    interactor.selectBestInteractor();
 
     // Play recording if any
     if (!this->Internals->AppOptions.InteractionTestPlayFile.empty())

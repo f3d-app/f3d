@@ -77,6 +77,11 @@ public:
   //@}
 
   /**
+   * Select the best interactor type depending of data is 2D or 3D
+   */
+  virtual void selectBestInteractor() = 0;
+
+  /**
    * Play a VTK interaction file
    */
   virtual bool playInteraction(const std::string& file) = 0;

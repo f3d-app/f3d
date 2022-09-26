@@ -1,4 +1,4 @@
-#include "vtkF3DInteractorStyle.h"
+#include "vtkF3DInteractorStyle3D.h"
 
 #include "F3DLog.h"
 #include "vtkF3DRenderer.h"
@@ -11,27 +11,27 @@
 #include <vtkSkybox.h>
 #include <vtkStringArray.h>
 
-vtkStandardNewMacro(vtkF3DInteractorStyle);
+vtkStandardNewMacro(vtkF3DInteractorStyle3D);
 
 //----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
+void vtkF3DInteractorStyle3D::OnDropFiles(vtkStringArray* files)
 {
   if (files == nullptr)
   {
     F3DLog::Print(F3DLog::Severity::Warning, "Drop event without any provided files.");
     return;
   }
-  this->InvokeEvent(vtkF3DInteractorStyle::DropFilesEvent, files);
+  this->InvokeEvent(vtkF3DInteractorStyle3D::DropFilesEvent, files);
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::OnKeyPress()
+void vtkF3DInteractorStyle3D::OnKeyPress()
 {
-  this->InvokeEvent(vtkF3DInteractorStyle::KeyPressEvent, nullptr);
+  this->InvokeEvent(vtkF3DInteractorStyle3D::KeyPressEvent, nullptr);
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DInteractorStyle::Rotate()
+void vtkF3DInteractorStyle3D::Rotate()
 {
   if (this->CameraMovementDisabled)
   {
@@ -95,7 +95,7 @@ void vtkF3DInteractorStyle::Rotate()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::Spin()
+void vtkF3DInteractorStyle3D::Spin()
 {
   if (this->CameraMovementDisabled)
   {
@@ -105,7 +105,7 @@ void vtkF3DInteractorStyle::Spin()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::Pan()
+void vtkF3DInteractorStyle3D::Pan()
 {
   if (this->CameraMovementDisabled)
   {
@@ -115,7 +115,7 @@ void vtkF3DInteractorStyle::Pan()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::Dolly()
+void vtkF3DInteractorStyle3D::Dolly()
 {
   if (this->CameraMovementDisabled)
   {
@@ -125,7 +125,7 @@ void vtkF3DInteractorStyle::Dolly()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::Dolly(double factor)
+void vtkF3DInteractorStyle3D::Dolly(double factor)
 {
   if (this->CameraMovementDisabled)
   {
@@ -135,7 +135,7 @@ void vtkF3DInteractorStyle::Dolly(double factor)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::EnvironmentRotate()
+void vtkF3DInteractorStyle3D::EnvironmentRotate()
 {
   this->Superclass::EnvironmentRotate();
 

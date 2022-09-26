@@ -48,6 +48,7 @@ public:
   void enableCameraMovement() override;
   void disableCameraMovement() override;
 
+  void selectBestInteractor() override;
   bool playInteraction(const std::string& file) override;
   bool recordInteraction(const std::string& file) override;
 
