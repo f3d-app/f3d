@@ -112,9 +112,5 @@ if(Qt5_FOUND)
   target_link_libraries(libf3dSDKTests Qt5::OpenGL)
 endif()
 
-if (UNIX AND NOT APPLE)
-  target_link_libraries(libf3dSDKTests stdc++fs)
-endif ()
-
 # make sure the libf3d API is compatible with C++11
 set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 11)
