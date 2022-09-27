@@ -490,6 +490,10 @@ Be sure that VTK has been built with *OpenImageDenoise* support (`VTKOSPRAY_ENAB
   * If only a few format have working thumbnails, then it is an issue with mime types
   * If no formats have working thumbnails, then it is an issue with the f3d.thumbnailer file
 
+> I have a link error related to `stdc++fs` not found.
+
+With some C++ STD library version, explicit linking to `stdc++fs` is not required. We provide a CMake option `F3D_APPLICATION_LINK_FILESYSTEM` that you can set to `OFF` to workaround this issue.
+
 ## Windows
 > After installing F3D or registering the shell extension, my explorer is broken
 
