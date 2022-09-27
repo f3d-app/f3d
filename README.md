@@ -143,28 +143,36 @@ For file formats that do not support it, **a default scene** will be created.
 
 # Options
 
-## Generic Options
+## Applicative Options
 
 Options|Description
 ------|------
 \-\-input=&lt;file&gt;|The *input* file or files to read, can also be provided as a positional argument.
-\-\-output=&lt;png file&gt;|Instead of showing a render view and render into it, *render directly into a png file*. When used with ref option, only outputs on failure
+\-\-output=&lt;png file&gt;|Instead of showing a render view and render into it, *render directly into a png file*. When used with ref option, only outputs on failure.
 \-\-no-background|Output file is saved with a transparent background.
 -h, \-\-help|Print *help*.
-\-\-verbose|Enable *verbose* mode, providing more information about the loaded data in the console output.
-\-\-no-render|Verbose mode without any rendering for the first provided file, to recover information about a file.
-\-\-quiet|Enable quiet mode, which superseed any verbose options. No console output will be generated at all.
 \-\-version|Show *version* information.
+\-\-readers-list|List available *readers*.
+\-\-config|Specify the configuration file to use. Supports absolute/relative path but also filename/filestem to search for in configuration file locations.
+\-\-dry-run|Do not read any configuration file but consider only the command line options.
+\-\-no-render|Verbose mode without any rendering for the first provided file, useful to recover information about a file.
+\-\-max-size|Maximum size in Mib of a file to load, -1 means unlimited, useful for thumbnails.
+
+## General Options
+
+Options|Description
+------|------
+\-\-verbose|Enable *verbose* mode, providing more information about the loaded data in the console output.
+\-\-quiet|Enable quiet mode, which superseed any verbose options. No console output will be generated at all.
+\-\-progress|Show a *progress bar* when loading the file.
+\-\-geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
+\-\-up|Define the Up direction (default: +Y).
 -x, \-\-axis|Show *axes* as a trihedron in the scene.
 -g, \-\-grid|Show *a grid* aligned with the XZ plane.
 -e, \-\-edges|Show the *cell edges*.
+\-\-camera-index|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.
 -k, \-\-trackball|Enable trackball interaction.
-\-\-progress|Show a *progress bar* when loading the file.
-\-\-up|Define the Up direction (default: +Y)
 \-\-animation-index|Select the animation to show.<br>Any negative value means all animations.<br>The default scene always has at most one animation.<br>If the option is not specified, the first animation is enabled.
-\-\-geometry-only|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
-\-\-dry-run|Do not read any configuration file but consider only the command line options
-\-\-config|Specify the configuration file to use. Supports absolute/relative path but also filename/filestem to search for in configuration file locations.
 \-\-font-file|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.
 
 ## Material options
@@ -186,20 +194,34 @@ Options|Default|Description
 \-\-texture-normal=&lt;file path&gt;||Path to a texture file that sets the normal map of the object.
 \-\-normal-scale=&lt;normal_scale&gt;|1.0|Normal scale affects the strength of the normal deviation from the normal texture.
 
-## PostFX (OpenGL) options
+## Window options
 
-Options|Description
-------|------
--p, \-\-depth-peeling|Enable *depth peeling*. This is a technique used to correctly render translucent objects.
--q, \-\-ssao|Enable *Screen-Space Ambient Occlusion*. This is a technique used to improve the depth perception of the object.
--a, \-\-fxaa|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.
--t, \-\-tone-mapping|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
+Options|Default|Description
+------|------|------
+\-\-bg-color=&lt;R,G,B&gt;|0.2, 0.2, 0.2|Set the window *background color*.<br>Ignored if *hdri* is set.
+\-\-resolution=&lt;width,height&gt;|1000, 600|Set the *window resolution*.
+-z, \-\-fps||Display a *frame per second counter*.
+-n, \-\-filename||Display the *name of the file*.
+-m, \-\-metadata||Display the *metadata*.<br>This only makes sense when using the default scene.
+-u, \-\-blur-background||Blur background.<br>This only makes sense when using a HDRI.
+
+## Scientific visualization options
+
+Options|Default|Description
+------|------|------
+-s, \-\-scalars=&lt;array_name&gt;||*Color by a specific scalar* array present in the file. If no array_name is provided, one will be picked if any are available. <br>This only makes sense when using the default scene.<br>Use verbose to recover the usable array names.
+-y, \-\-comp=&lt;comp_index&gt;|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. -1 means *magnitude*. -2 or the short option, -y, means *direct values*.<br>When using *direct values*, components are used as L, LA, RGB, RGBA values depending on the number of components.
+-c, \-\-cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
+\-\-range=&lt;min,max&gt;||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
+-b, \-\-bar||Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
+\-\-colormap=&lt;color_list&gt;||Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).<br>Use with the scalar option.
+-v, \-\-volume||Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.
+-i, \-\-inverse||Inverse the linear opacity function. Only makes sense with volume rendering.
 
 ## Camera configuration options
 
 Options|Description
 ------|------
-\-\-camera-index|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.
 \-\-camera-position=&lt;X,Y,Z&gt;|The position of the camera.
 \-\-camera-focal-point=&lt;X,Y,Z&gt;|The focal point of the camera.
 \-\-camera-view-up=&lt;X,Y,Z&gt;|The view up vector of the camera. Will be orthogonalized even when provided.
@@ -215,18 +237,14 @@ Options|Default|Description
 \-\-samples=&lt;samples&gt;|5|The number of *samples per pixel*. It only makes sense with raytracing enabled.
 -d, \-\-denoise||*Denoise* the image. It only makes sense with raytracing enabled.
 
-## Scientific visualization options
+## PostFX (OpenGL) options
 
-Options|Default|Description
-------|------|------
--s, \-\-scalars=&lt;array_name&gt;||*Color by a specific scalar* array present in the file. If no array_name is provided, one will be picked if any are available. <br>This only makes sense when using the default scene.<br>Use verbose to recover the usable array names.
--y, \-\-comp=&lt;comp_index&gt;|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. -1 means *magnitude*. -2 or the short option, -y, means *direct values*.<br>When using *direct values*, components are used as L, LA, RGB, RGBA values depending on the number of components.
--c, \-\-cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
-\-\-range=&lt;min,max&gt;||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
--b, \-\-bar||Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
-\-\-colormap=&lt;color_list&gt;||Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).<br>Use with the scalar option.
--v, \-\-volume||Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.
--i, \-\-inverse||Inverse the linear opacity function. Only makes sense with volume rendering.
+Options|Description
+------|------
+-p, \-\-depth-peeling|Enable *depth peeling*. This is a technique used to correctly render translucent objects.
+-q, \-\-ssao|Enable *Screen-Space Ambient Occlusion*. This is a technique used to improve the depth perception of the object.
+-a, \-\-fxaa|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.
+-t, \-\-tone-mapping|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
 
 ## Testing options
 
@@ -236,17 +254,6 @@ Options|Description
 \-\-ref-threshold=&lt;threshold&gt;|*Testing threshold* to trigger a test failure or success.
 \-\-interaction-test-record=&lt;log file&gt;|Path to an interaction log file to *record interaction events* to.
 \-\-interaction-test-play=&lt;log file&gt;|Path to an interaction log file to *play interactions events* from when loading a file.
-
-## Window options
-
-Options|Default|Description
-------|------|------
-\-\-bg-color=&lt;R,G,B&gt;|0.2, 0.2, 0.2|Set the window *background color*.<br>Ignored if *hdri* is set.
-\-\-resolution=&lt;width,height&gt;|1000, 600|Set the *window resolution*.
--z, \-\-fps||Display a *frame per second counter*.
--n, \-\-filename||Display the *name of the file*.
--m, \-\-metadata||Display the *metadata*.<br>This only makes sense when using the default scene.
--u, \-\-blur-background||Blur background.<br>This only makes sense when using a HDRI.
 
 # Rendering precedence
 
@@ -501,8 +508,9 @@ Be sure that VTK has been built with *OpenImageDenoise* support (`VTKOSPRAY_ENAB
  * Check that you have updated your mime type database.
  * If all fails, remove your .cache user dir and check that pcmanfm thumbnails are working.
   * If they are working, then it is an issue specific to your file manager.
-  * If only a few format have working thumbnails, then it is an issue with mime types
-  * If no formats have working thumbnails, then it is an issue with the f3d.thumbnailer file
+  * If only a few format have working thumbnails, then it is an issue with mime types.
+  * If no formats have working thumbnails, then it is an issue with the f3d.thumbnailer file.
+  * If only big file do not have thumbnails, this is intended, you can modify this behavior in the tumbnail.json configuration file using the `max-size` option.
 
 ## Windows
 > After installing F3D or registering the shell extension, my explorer is broken
