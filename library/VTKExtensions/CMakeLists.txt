@@ -13,7 +13,9 @@ set(libf3d_vtk_no_install "")
 if(NOT BUILD_SHARED_LIBS)
   set(export_name "f3dTargets")
 else()
-  set(libf3d_vtk_no_install "NO_INSTALL")
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220928)
+    set(libf3d_vtk_no_install "NO_INSTALL")
+  endif()
 endif()
 
 # We need HEADERS_COMPONENT because of a bug in vtk_module_build in VTK <= 9.1
