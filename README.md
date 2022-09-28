@@ -84,7 +84,7 @@ Available in [Spack](https://spack.readthedocs.io/en/latest/package_list.html#f3
 ## Dependencies
 
 * [CMake](https://cmake.org) >= 3.1.
-* [VTK](https://vtk.org) >= 9.0.0 (optionally with raytracing capabilities to enable OSPray rendering).
+* [VTK](https://vtk.org) >= 9.0.0 (9.2.2 recommended)
 * A C++17 compiler.
 * A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 
@@ -416,6 +416,10 @@ only the filename or filestem (`.json` will be added) to look for in the locatio
 
 F3D contains not only the F3D executable but also the libf3d, a library to render 3D meshes, which can be used in C++ or Python.
 The libf3d is documented [here.](README_libf3d.md)
+
+# VTK compatibility
+
+As stated in the dependencies, F3D is compatible with VTK >= 9.0.0, however, many features are only available in certain conditions. We suggest using VTK 9.2.2 with RenderingRayTracing, RenderingExternal and IOExodus modules enabled in order to get as many features as possible in F3D.
 
 # Desktop Integration
 
