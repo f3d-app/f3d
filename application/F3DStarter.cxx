@@ -177,6 +177,21 @@ int F3DStarter::Start(int argc, char** argv)
       .setSize(this->Internals->AppOptions.Resolution[0], this->Internals->AppOptions.Resolution[1])
       .setWindowName(F3D::AppTitle)
       .setIcon(F3DIcon, sizeof(F3DIcon));
+
+    if (this->Internals->AppOptions.Position.size() == 2)
+    {
+      window.setPosition(
+        this->Internals->AppOptions.Position[0], this->Internals->AppOptions.Position[1]);
+    }
+#ifdef __APPLE__
+    else
+    {
+      // The default position (50, 50) in VTK on MacOS is not a great fit for F3D as it can be
+      // partially hidden because the position correspond to the upper left corner and the Y
+      // position is defined from the bottom of the screen. Position it somewhere it makes sense.
+      window.setPosition(100, 800);
+    }
+#endif
   }
 
   // Add and load file

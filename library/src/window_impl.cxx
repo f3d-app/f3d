@@ -67,13 +67,6 @@ window_impl::window_impl(const options& options, Type type)
     this->Internals->RenWin->SetOffScreenRendering(type == Type::NATIVE_OFFSCREEN);
     this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
 
-// The default position (50, 50) in VTK makes the window partially hidden because the position
-// correspond to the upper left corner and the Y position is defined from the bottom of the screen
-// The following code is a hack until we find a better solution
-#ifdef __APPLE__
-    this->Internals->RenWin->SetPosition(100, 800);
-#endif
-
 #ifdef __ANDROID__
     // Since F3D_MODULE_EXTERNAL_RENDERING is not supported on Android yet, we need to call
     // this workaround. It makes vtkEGLRenderWindow external if WindowInfo is not nullptr.
@@ -119,6 +112,13 @@ int window_impl::getHeight() const
 window& window_impl::setSize(int width, int height)
 {
   this->Internals->RenWin->SetSize(width, height);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+window& window_impl::setPosition(int x, int y)
+{
+  this->Internals->RenWin->SetPosition(x, y);
   return *this;
 }
 
