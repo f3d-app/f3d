@@ -165,6 +165,8 @@ f3d_test(NAME TestMaxSizeBelow DATA suzanne.stl ARGS --max-size=1 DEFAULT_LIGHTS
 f3d_test(NAME TestMaxSizeAbove DATA WaterBottle.glb ARGS --max-size=1 REGEXP "No file loaded, file is bigger than max size" NO_BASELINE)
 f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_FAIL)
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
+f3d_test(NAME TestVerboseLoadPlugin ARGS --verbose REGEXP "Loading plugin \"core\"" NO_BASELINE)
+f3d_test(NAME TestNonExistentPlugin ARGS --load-plugins=dummy REGEXP "Plugin failed to load" NO_BASELINE)
 
 # color texture with opacity needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9467
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220811)
@@ -247,53 +249,48 @@ if(F3D_MODULE_EXTERNAL_RENDERING)
   f3d_test(NAME TestVersionExternal ARGS --version REGEXP "External rendering module: ON")
 endif()
 
-if(F3D_MODULE_EXODUS)
-  f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS -s --camera-position=-11,-2,-49 DEFAULT_LIGHTS)
-  f3d_test(NAME TestGenericImporterAnimation DATA small.ex2 DEFAULT_LIGHTS)
+if(F3D_PLUGIN_BUILD_EXODUS)
+  f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS --load-plugins=exodus -s --camera-position=-11,-2,-49 DEFAULT_LIGHTS)
+  f3d_test(NAME TestGenericImporterAnimation DATA small.ex2 DEFAULT_LIGHTS ARGS --load-plugins=exodus)
   # Test Generic Importer Verbose animation
-  f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --verbose NO_BASELINE REGEXP "0: default")
-  f3d_test(NAME TestVersionExodus ARGS --version REGEXP "Exodus module: ON")
+  f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "0: default")
 
   # Test animation with generic importer
-  f3d_test(NAME TestInteractionAnimationGenericImporter DATA small.ex2 INTERACTION NO_BASELINE)#Space;Space;
+  f3d_test(NAME TestInteractionAnimationGenericImporter DATA small.ex2 INTERACTION NO_BASELINE ARGS --load-plugins=exodus)#Space;Space;
 endif()
 
-if(F3D_MODULE_OCCT)
-  f3d_test(NAME TestSTEP DATA cube.stp DEFAULT_LIGHTS)
-  f3d_test(NAME TestIGES DATA spacer.igs DEFAULT_LIGHTS)
-
-  f3d_test(NAME TestVersionOCCT ARGS --version REGEXP "OpenCASCADE module: .\\..\\.. (.+)")
+if(F3D_PLUGIN_BUILD_OCCT)
+  f3d_test(NAME TestSTEP DATA cube.stp DEFAULT_LIGHTS ARGS --load-plugins=occt)
+  f3d_test(NAME TestIGES DATA spacer.igs DEFAULT_LIGHTS ARGS --load-plugins=occt)
 endif()
 
-if(F3D_MODULE_ASSIMP)
-  f3d_test(NAME TestOFF DATA teapot.off ARGS --up=+Z)
-  f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p)
-  f3d_test(NAME TestFBX DATA phong_cube.fbx)
+if(F3D_PLUGIN_BUILD_ASSIMP)
+  f3d_test(NAME TestOFF DATA teapot.off ARGS --up=+Z --load-plugins=assimp)
+  f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p --load-plugins=assimp)
+  f3d_test(NAME TestFBX DATA phong_cube.fbx ARGS --load-plugins=assimp)
 
-  f3d_test(NAME TestVersionAssimp ARGS --version NO_BASELINE REGEXP "Assimp module: .\\..\\..")
-  f3d_test(NAME TestVerboseCameraAssimp DATA duck.dae ARGS --verbose NO_BASELINE REGEXP "camera1")
+  f3d_test(NAME TestVerboseCameraAssimp DATA duck.dae ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "camera1")
 
   # TGA Reader needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8224
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210805) # for TGA support and embedded textures
-    f3d_test(NAME TestVerboseAssimp DATA robot_kyle_walking.fbx ARGS --verbose NO_BASELINE REGEXP "Robot2")
-    f3d_test(NAME TestDAE DATA duck.dae)
+    f3d_test(NAME TestVerboseAssimp DATA robot_kyle_walking.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "Robot2")
+    f3d_test(NAME TestDAE DATA duck.dae ARGS --load-plugins=assimp)
 
     # Embeded texture are only working with assimp 5.1.X
     if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.1.0")
-      f3d_test(NAME TestTexturedFBX DATA slime.fbx)
+      f3d_test(NAME TestTexturedFBX DATA slime.fbx ARGS --load-plugins=assimp)
     endif()
   endif()
 
   # Animation are working only with assimp 5.0.0 and 5.0.1.
   # Both report a assimp version 5.0.0 when using find_package
   if("${F3D_ASSIMP_VERSION}" VERSION_EQUAL "5.0.0")
-    f3d_test(NAME TestInteractionFBXAnim DATA robot_kyle_walking.fbx INTERACTION) #Space;Space;
+    f3d_test(NAME TestInteractionFBXAnim DATA robot_kyle_walking.fbx ARGS --load-plugins=assimp INTERACTION) #Space;Space;
   endif()
 endif()
 
-if(F3D_MODULE_ALEMBIC)
-  f3d_test(NAME TestABC DATA suzanne.abc)
-  f3d_test(NAME TestVersionAlembic ARGS --version REGEXP "Alembic module: .\\..\\..")
+if(F3D_PLUGIN_BUILD_ALEMBIC)
+  f3d_test(NAME TestABC DATA suzanne.abc ARGS --load-plugins=alembic)
 endif()
 
 ## Interaction Tests

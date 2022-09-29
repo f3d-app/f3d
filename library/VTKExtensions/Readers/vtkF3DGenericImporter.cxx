@@ -123,7 +123,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   if (!this->Reader->IsReaderValid())
   {
     F3DLog::Print(F3DLog::Severity::Error,
-      std::string("File '") + this->Reader->GetFileName() + "' cannot be read.\n");
+      std::string("Reader for '") + this->Reader->GetFileName() + "' is invalid.\n");
     return;
   }
 
@@ -288,7 +288,14 @@ void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 void vtkF3DGenericImporter::SetFileName(std::string name)
 {
   this->TemporalInformationUpdated = false;
-  this->Reader->SetFileNameAndCreateInternalReader(name);
+  this->Reader->SetFileName(name);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::SetInternalReader(vtkAlgorithm* reader)
+{
+  this->TemporalInformationUpdated = false;
+  this->Reader->SetInternalReader(reader);
 }
 
 //----------------------------------------------------------------------------

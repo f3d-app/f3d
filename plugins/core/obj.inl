@@ -1,4 +1,4 @@
-void ApplyCustomImporter(vtkImporter* importer, const std::string& fileName) const override
+void applyCustomImporter(vtkImporter* importer, const std::string& fileName) const override
 {
   vtkOBJImporter* objImporter = vtkOBJImporter::SafeDownCast(importer);
 

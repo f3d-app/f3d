@@ -1,15 +1,13 @@
 #include <vtkNew.h>
 #include <vtkTestUtilities.h>
 
-#include "F3DReaderInstantiator.h"
 #include "vtkF3DMetaReader.h"
 
 int TestF3DMetaReaderInvalid(int argc, char* argv[])
 {
-  F3DReaderInstantiator ReaderInstantiator;
   std::string dummyFilename = std::string(argv[1]) + "data/foo.dummy";
   vtkNew<vtkF3DMetaReader> reader;
-  reader->SetFileNameAndCreateInternalReader(dummyFilename);
+  reader->SetFileName(dummyFilename);
   if (reader->IsReaderValid())
   {
     std::cerr << "Reader unexpectedly can read a non-existent file" << std::endl;

@@ -4,20 +4,6 @@ list(APPEND VTKExtensionsReaderTests_list
      TestF3DGenericImporter.cxx
     )
 
-if(F3D_MODULE_ALEMBIC)
-  list(APPEND VTKExtensionsReaderTests_list TestF3DAlembicImporter.cxx)
-endif()
-
-if(F3D_MODULE_ASSIMP)
-  list(APPEND VTKExtensionsReaderTests_list
-      TestF3DAssimpImporter.cxx
-      TestF3DAssimpImportError.cxx)
-endif()
-
-if(F3D_MODULE_OCCT)
-  list(APPEND VTKExtensionsReaderTests_list TestF3DOCCTReader.cxx)
-endif()
-
 if(VTK_VERSION VERSION_LESS_EQUAL 9.1.0)
   cmake_policy(SET CMP0115 OLD)
 endif()

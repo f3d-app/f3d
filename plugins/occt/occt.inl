@@ -1,4 +1,4 @@
-void ApplyCustomReader(vtkAlgorithm* reader, const std::string& fileName) const override
+void applyCustomReader(vtkAlgorithm* reader, const std::string& fileName) const override
 {
   vtkF3DOCCTReader* occtReader = vtkF3DOCCTReader::SafeDownCast(reader);
 

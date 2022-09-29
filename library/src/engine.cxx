@@ -7,12 +7,16 @@
 #include "log.h"
 #include "window_impl.h"
 
-#include "F3DReaderFactory.h"
+#include "factory.h"
 
 #include "vtkF3DConfigure.h"
 #include "vtkF3DNoRenderWindow.h"
 
 #include <vtkVersion.h>
+
+#include <vtksys/DynamicLoader.hxx>
+#include <vtksys/Encoding.hxx>
+#include <vtksys/SystemTools.hxx>
 
 namespace f3d
 {
@@ -98,6 +102,72 @@ interactor& engine::getInteractor()
 }
 
 //----------------------------------------------------------------------------
+void engine::loadPlugin(const std::string& path)
+{
+  // check if the plugin is a known static plugin
+  f3d::factory* factory = f3d::factory::instance();
+  factory::plugin_initializer_t init_plugin = factory->getStaticInitializer(path);
+
+  if (init_plugin == nullptr)
+  {
+    // try if the path is a library full path
+    vtksys::DynamicLoader::LibraryHandle handle = vtksys::DynamicLoader::OpenLibrary(path);
+    if (!handle)
+    {
+      std::string fullPath;
+
+      // Right now, plugins should be located in the same folder than f3d.exe on Windows
+      // On Linux/macOS, when we are not using a full path, so we rely on LD_LIBRARY_PATH
+#ifdef _WIN32
+      std::vector<wchar_t> pathBuf(40000);
+      if (GetModuleFileNameW(
+            GetModuleHandle(nullptr), pathBuf.data(), static_cast<DWORD>(pathBuf.size())))
+      {
+        std::string progPath =
+          vtksys::SystemTools::GetProgramPath(vtksys::Encoding::ToNarrow(pathBuf.data()));
+        fullPath = vtksys::SystemTools::ConvertToWindowsOutputPath(progPath) + "\\";
+      }
+#endif
+
+      // construct the library file name from the plugin name
+      fullPath += vtksys::DynamicLoader::LibPrefix();
+      fullPath += "f3d-plugin-";
+      fullPath += path;
+      fullPath += vtksys::DynamicLoader::LibExtension();
+
+      handle = vtksys::DynamicLoader::OpenLibrary(fullPath);
+      if (!handle)
+      {
+        throw engine::plugin_exception(
+          "Cannot open the library \"" + path + "\": " + vtksys::DynamicLoader::LastError());
+      }
+    }
+
+    init_plugin = reinterpret_cast<factory::plugin_initializer_t>(
+      vtksys::DynamicLoader::GetSymbolAddress(handle, "init_plugin"));
+    if (init_plugin == nullptr)
+    {
+      throw engine::plugin_exception("Cannot find init_plugin symbol in library \"" + path +
+        "\": " + vtksys::DynamicLoader::LastError());
+    }
+  }
+
+  plugin* p = init_plugin();
+
+  f3d::log::info("Loading plugin \"" + p->getName() + "\"");
+  f3d::log::info("  Version: " + p->getVersion());
+  f3d::log::info("  Description: " + p->getDescription());
+  f3d::log::info("  Readers:");
+
+  for (auto r : p->getReaders())
+  {
+    f3d::log::info("    " + r->getLongDescription());
+  }
+
+  factory->load(p);
+}
+
+//----------------------------------------------------------------------------
 engine::libInformation engine::getLibInfo()
 {
   libInformation libInfo;
@@ -122,39 +192,6 @@ engine::libInformation engine::getLibInfo()
 #endif
   libInfo.ExternalRenderingModule = tmp;
 
-#if F3D_MODULE_EXODUS
-  tmp = "ON";
-#else
-  tmp = "OFF";
-#endif
-  libInfo.ExodusModule = tmp;
-
-#if F3D_MODULE_OCCT
-  tmp = F3D_OCCT_VERSION;
-#if F3D_MODULE_OCCT_XCAF
-  tmp += " (full support)";
-#else
-  tmp += " (no metadata)";
-#endif
-#else
-  tmp = "OFF";
-#endif
-  libInfo.OpenCASCADEModule = tmp;
-
-#if F3D_MODULE_ASSIMP
-  tmp = F3D_ASSIMP_VERSION;
-#else
-  tmp = "OFF";
-#endif
-  libInfo.AssimpModule = tmp;
-
-#if F3D_MODULE_ALEMBIC
-  tmp = F3D_ALEMBIC_VERSION;
-#else
-  tmp = "OFF";
-#endif
-  libInfo.AlembicModule = tmp;
-
   libInfo.VTKVersion = std::string(VTK_VERSION) + std::string(" (build ") +
     std::to_string(VTK_BUILD_VERSION) + std::string(")");
 
@@ -170,15 +207,19 @@ engine::libInformation engine::getLibInfo()
 std::vector<engine::readerInformation> engine::getReadersInfo()
 {
   std::vector<readerInformation> readersInfo;
-  const auto& readers = F3DReaderFactory::GetInstance()->GetReaders();
-  for (const auto& reader : readers)
+  const auto& plugins = f3d::factory::instance()->getPlugins();
+  for (const auto& plugin : plugins)
   {
-    readerInformation info;
-    info.Name = reader->GetName();
-    info.Description = reader->GetLongDescription();
-    info.Extensions = reader->GetExtensions();
-    info.MimeTypes = reader->GetMimeTypes();
-    readersInfo.push_back(info);
+    for (const auto& reader : plugin->getReaders())
+    {
+      readerInformation info;
+      info.PluginName = plugin->getName();
+      info.Name = reader->getName();
+      info.Description = reader->getLongDescription();
+      info.Extensions = reader->getExtensions();
+      info.MimeTypes = reader->getMimeTypes();
+      readersInfo.push_back(info);
+    }
   }
   return readersInfo;
 }
@@ -191,6 +232,12 @@ engine::no_window_exception::no_window_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 engine::no_interactor_exception::no_interactor_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+engine::plugin_exception::plugin_exception(const std::string& what)
   : exception(what)
 {
 }

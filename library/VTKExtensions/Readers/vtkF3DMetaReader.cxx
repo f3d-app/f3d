@@ -1,7 +1,5 @@
 #include "vtkF3DMetaReader.h"
 
-#include "F3DReaderFactory.h"
-
 #include <vtkDemandDrivenPipeline.h>
 #include <vtkEventForwarderCommand.h>
 #include <vtkInformation.h>
@@ -83,26 +81,20 @@ int vtkF3DMetaReader::FillOutputPortInformation(int port, vtkInformation* info)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DMetaReader::SetFileNameAndCreateInternalReader(const std::string& fileName)
+void vtkF3DMetaReader::SetInternalReader(vtkAlgorithm* reader)
 {
-  vtkMTimeType time = this->GetMTime();
-  this->SetFileName(fileName);
-  if (time == this->GetMTime())
+  if (this->InternalReader != reader)
   {
-    return;
-  }
+    this->InternalReader = reader;
 
-  F3DReader* reader = F3DReaderFactory::GetReader(fileName);
-  if (reader)
-  {
-    this->InternalReader = reader->CreateGeometryReader(fileName);
-  }
+    if (this->InternalReader)
+    {
+      // forward progress event
+      vtkNew<vtkEventForwarderCommand> forwarder;
+      forwarder->SetTarget(this);
+      this->InternalReader->AddObserver(vtkCommand::ProgressEvent, forwarder);
+    }
 
-  if (this->InternalReader)
-  {
-    // forward progress event
-    vtkNew<vtkEventForwarderCommand> forwarder;
-    forwarder->SetTarget(this);
-    this->InternalReader->AddObserver(vtkCommand::ProgressEvent, forwarder);
+    this->Modified();
   }
 }

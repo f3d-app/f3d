@@ -5,7 +5,7 @@
 #ifndef F3D@F3D_READER_NAME@_h
 #define F3D@F3D_READER_NAME@_h
 
-#include "F3DReaderFactory.h"
+#include "reader.h"
 
 #if @F3D_READER_HAS_GEOMETRY_READER@
 #include <@F3D_READER_VTK_READER@.h>
@@ -18,25 +18,25 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
-class F3D@F3D_READER_NAME@Reader : public F3DReader
+class reader_@F3D_READER_NAME@ : public f3d::reader
 {
 public:
-  F3D@F3D_READER_NAME@Reader() = default;
+  reader_@F3D_READER_NAME@() = default;
 
   /*
    * Get the name of this reader
    */
-  const std::string GetName() const override { return "@F3D_READER_NAME@"; }
+  const std::string getName() const override { return "@F3D_READER_NAME@"; }
 
   /*
    * Get the short description of this reader
    */
-  const std::string GetShortDescription() const override { return "@F3D_READER_DESCRIPTION@"; }
+  const std::string getShortDescription() const override { return "@F3D_READER_DESCRIPTION@"; }
 
   /*
    * Get the extensions supported by this reader
    */
-  const std::vector<std::string> GetExtensions() const override
+  const std::vector<std::string> getExtensions() const override
   {
     static const std::vector<std::string> ext = { @F3D_READER_EXTENSIONS@ };
     return ext;
@@ -45,22 +45,32 @@ public:
   /*
    * Get the mimetypes supported by this reader
    */
-  virtual const std::vector<std::string> GetMimeTypes() const override
+  virtual const std::vector<std::string> getMimeTypes() const override
   {
     static const std::vector<std::string> types = { @F3D_READER_MIMETYPES@ };
     return types;
+  }
+
+  /*
+   * Get the score of this reader.
+   * The score is used in case several readers are able to read the file.
+   * The reader having the best score (from 0 to 100) is used to read the file.
+   */
+  int getScore() const override
+  {
+    return @F3D_READER_SCORE@;
   }
 
 #if @F3D_READER_HAS_GEOMETRY_READER@
   /*
    * Create the geometry reader (VTK reader) for the given filename
    */
-  vtkSmartPointer<vtkAlgorithm> CreateGeometryReader(const std::string& fileName) const override
+  vtkSmartPointer<vtkAlgorithm> createGeometryReader(const std::string& fileName) const override
   {
     vtkNew<@F3D_READER_VTK_READER@> reader;
     reader->SetFileName(fileName.c_str());
 
-    this->ApplyCustomReader(reader, fileName);
+    this->applyCustomReader(reader, fileName);
 
     return reader;
   }
@@ -70,19 +80,19 @@ public:
   /*
    * Create the scene reader (VTK importer) for the given filename
    */
-  vtkSmartPointer<vtkImporter> CreateSceneReader(const std::string& fileName) const override
+  vtkSmartPointer<vtkImporter> createSceneReader(const std::string& fileName) const override
   {
     vtkNew<@F3D_READER_VTK_IMPORTER@> importer;
     importer->SetFileName(fileName.c_str());
 
-    this->ApplyCustomImporter(importer, fileName);
+    this->applyCustomImporter(importer, fileName);
 
     return importer;
   }
 #endif
 
-#if @F3D_READER_CUSTOM_CODE@
-#include "F3D@F3D_READER_NAME@Reader.inl"
+#if @F3D_READER_HAS_CUSTOM_CODE@
+#include "@F3D_READER_CUSTOM_CODE@"
 #endif
 
 };

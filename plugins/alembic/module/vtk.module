@@ -1,0 +1,11 @@
+NAME
+  f3d::VTKExtensionsAlembicReader
+DESCRIPTION
+  A VTK module for the Alembic plugin
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::IOImport
+  VTK::IOImage
+  Alembic::Alembic
+TEST_DEPENDS
+  VTK::TestingCore

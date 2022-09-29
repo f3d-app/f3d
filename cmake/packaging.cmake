@@ -39,6 +39,10 @@ if(WIN32 AND NOT UNIX)
    !include \\\"FileFunc.nsh\\\"\n\
    !include \\\"FileAssociation.nsh\\\"")
 
+  # Retrieve file association
+  get_property(F3D_FILE_ASSOCIATION_NSIS GLOBAL PROPERTY F3D_SUPPORTED_EXTENSIONS)
+  list(TRANSFORM F3D_FILE_ASSOCIATION_NSIS REPLACE "^(.+)$" "'.\\1' '\\1 file'")
+
   # Create association on install
   set(F3D_REGISTER_LIST "${F3D_FILE_ASSOCIATION_NSIS}")
   list(TRANSFORM F3D_REGISTER_LIST PREPEND "\\\${RegisterExtension} '$INSTDIR\\\\bin\\\\f3d.exe' ")

@@ -840,7 +840,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkF3DAssimpImporter::vtkF3DAssimpImporter()
-  : Internals(std::make_unique<vtkF3DAssimpImporter::vtkInternals>(this))
+  : Internals(new vtkF3DAssimpImporter::vtkInternals(this))
 {
 }
 

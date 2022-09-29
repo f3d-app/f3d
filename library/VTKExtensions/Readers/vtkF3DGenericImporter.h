@@ -36,6 +36,11 @@ public:
   void SetFileName(std::string name);
 
   /**
+   * Specify the VTK reader.
+   */
+  void SetInternalReader(vtkAlgorithm* reader);
+
+  /**
    * Check if the file can be read.
    */
   bool CanReadFile();

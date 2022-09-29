@@ -1,0 +1,76 @@
+#include "factory.h"
+
+@F3D_STATIC_PLUGIN_EXTERN@
+
+namespace f3d
+{
+//----------------------------------------------------------------------------
+factory* factory::instance()
+{
+  static factory instance;
+  return &instance;
+}
+
+//----------------------------------------------------------------------------
+factory::factory()
+{
+  @F3D_STATIC_PLUGIN_MAP@
+}
+
+//----------------------------------------------------------------------------
+const std::vector<plugin*>& factory::getPlugins()
+{
+  return this->Plugins;
+}
+
+//----------------------------------------------------------------------------
+factory::plugin_initializer_t factory::getStaticInitializer(const std::string& pluginName)
+{
+  auto it = this->StaticPluginInitializers.find(pluginName);
+  if (it != this->StaticPluginInitializers.end())
+  {
+    return it->second;
+  }
+  return nullptr;
+}
+
+//----------------------------------------------------------------------------
+reader* factory::getReader(const std::string& fileName)
+{
+  int bestScore = -1;
+  reader* bestReader = nullptr;
+
+  for (auto p : this->Plugins)
+  {
+    for (auto r : p->getReaders())
+    {
+      if (r->getScore() > bestScore && r->canRead(fileName))
+      {
+        bestScore = r->getScore();
+        bestReader = r.get();
+      }
+    }
+  }
+
+  return bestReader;
+}
+
+//----------------------------------------------------------------------------
+void factory::load(plugin* r)
+{
+  this->Plugins.push_back(r);
+}
+
+//----------------------------------------------------------------------------
+void factory::unload(plugin* r)
+{
+  for (auto iter = this->Plugins.begin(); iter != this->Plugins.end(); ++iter)
+  {
+    if (*iter == r)
+    {
+      this->Plugins.erase(iter);
+      return;
+    }
+  }
+}
+}

@@ -18,14 +18,15 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Set the name of the file from which to read and create the internal reader accordingly
+   * Set the internal reader
    */
-  void SetFileNameAndCreateInternalReader(const std::string& fileName);
+  void SetInternalReader(vtkAlgorithm* reader);
 
   /**
    * Get the filename in use
    */
   vtkGetMacro(FileName, std::string);
+  vtkSetMacro(FileName, std::string);
 
   /**
    * Returns true if the internal reader is correctly initialized.
@@ -45,11 +46,6 @@ public:
 protected:
   vtkF3DMetaReader();
   ~vtkF3DMetaReader() override;
-
-  /**
-   * Protected method used internally to set the filename
-   */
-  vtkSetMacro(FileName, std::string);
 
   /**
    * Transfer to the InternalReader

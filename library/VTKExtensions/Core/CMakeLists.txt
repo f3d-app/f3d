@@ -20,3 +20,7 @@ vtk_module_add_module(f3d::VTKExtensionsCore
   ${libf3d_vtk_no_install}
   FORCE_STATIC
   CLASSES ${classes})
+
+if(WIN32)
+  vtk_module_definitions(f3d::VTKExtensionsCore PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif()

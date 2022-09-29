@@ -20,10 +20,6 @@ endif()
 # Modules
 option(F3D_MODULE_EXTERNAL_RENDERING "External rendering module" OFF)
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
-option(F3D_MODULE_EXODUS "ExodusII module" ON)
-option(F3D_MODULE_OCCT "OpenCASCADE module (STEP and IGES files)" OFF)
-option(F3D_MODULE_ASSIMP "Assimp module (FBX, OFF, DAE anf DXF files)" OFF)
-option(F3D_MODULE_ALEMBIC "Alembic module (ABC files)" OFF)
 
 option(F3D_INSTALL_SDK "Install F3D library SDK" OFF)
 
@@ -59,51 +55,6 @@ find_package(VTK 9.0 REQUIRED
     RenderingExternal
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
-
-# Assimp depency
-if(F3D_MODULE_ASSIMP)
-  find_package(assimp 5.0 REQUIRED)
-  if(assimp_FOUND)
-    set(F3D_ASSIMP_VERSION "${assimp_VERSION}")
-    message(STATUS "Module: assimp ${F3D_ASSIMP_VERSION} found")
-    if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.1.0")
-      message(WARNING "Module: assimp: Animations are not working with assimp 5.1.0 and newer, use assimp 5.0.X for animation support with assimp formats.")
-    endif()
-    if("${F3D_ASSIMP_VERSION}" VERSION_LESS "5.1.0")
-      message(WARNING "Module: assimp: Embedded texture are only working with assimp 5.1.X and newer.")
-    endif()
-  endif()
-endif()
-
-# OCCT dependency
-set(F3D_MODULE_OCCT_XCAF 0)
-if(F3D_MODULE_OCCT)
-  find_package(OpenCASCADE REQUIRED)
-  if(OpenCASCADE_FOUND)
-    set(F3D_OCCT_VERSION "${OpenCASCADE_VERSION}")
-    if("${F3D_OCCT_VERSION}" VERSION_LESS "7.5.0")
-      message(FATAL_ERROR "Module: OpenCASCADE: ${F3D_OCCT_VERSION} is not supported by F3D, please update your OpenCASCADE installation.")
-    endif()
-    message(STATUS "Module: OpenCASCADE ${F3D_OCCT_VERSION} found")
-    if((TARGET "TKXDESTEP") AND (TARGET "TKXDEIGES"))
-      set(F3D_MODULE_OCCT_XCAF 1)
-    else()
-      message(WARNING "Module: OpenCASCADE: TKXDESTEP and TKXDEIGES are not found. Parts color and name are not supported.")
-    endif()
-    if((NOT TARGET "TKSTEP") AND (NOT TARGET "TKIGES") AND (NOT TARGET "TKMesh"))
-      message(FATAL_ERROR "Module: OpenCASCADE does not contain required modules")
-    endif()
-  endif()
-endif()
-
-# Alembic dependency
-if(F3D_MODULE_ALEMBIC)
-  find_package(Alembic 1.7 REQUIRED)
-  if(Alembic_FOUND)
-    set(F3D_ALEMBIC_VERSION "${Alembic_VERSION}")
-    message(STATUS "Module: alembic ${Alembic_VERSION} found")
-  endif()
-endif()
 
 # Shared options between application and library
 include(GNUInstallDirs)
@@ -168,6 +119,11 @@ cmake_dependent_option(F3D_ENABLE_HDRI_TESTS "Enable HDRi related tests" ON "F3D
 if(BUILD_TESTING)
   enable_testing()
 endif()
+
+# plugins
+option(F3D_PLUGINS_STATIC_BUILD "Make all plugins static (embedded into libf3d)" OFF)
+mark_as_advanced(F3D_PLUGINS_STATIC_BUILD)
+add_subdirectory(plugins)
 
 # libf3d target
 add_subdirectory(library)

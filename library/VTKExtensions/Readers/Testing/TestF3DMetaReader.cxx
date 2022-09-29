@@ -1,17 +1,17 @@
 #include <vtkNew.h>
 #include <vtkTestUtilities.h>
+#include <vtkXMLPolyDataReader.h>
 
-#include "F3DReaderInstantiator.h"
 #include "vtkF3DMetaReader.h"
 
 int TestF3DMetaReader(int argc, char* argv[])
 {
-  F3DReaderInstantiator ReaderInstantiator;
   std::string filename = std::string(argv[1]) + "data/cow.vtp";
+  vtkNew<vtkXMLPolyDataReader> internalReader;
+  internalReader->SetFileName(filename.c_str());
   vtkNew<vtkF3DMetaReader> reader;
-  reader->SetFileNameAndCreateInternalReader(filename);
-  reader->SetFileNameAndCreateInternalReader(
-    filename); // Double call for the MTime mechanism coverage
+  reader->SetFileName(filename);
+  reader->SetInternalReader(internalReader);
   if (!reader->IsReaderValid())
   {
     std::cerr << "Reader unexpectedly can not read a valid file" << std::endl;

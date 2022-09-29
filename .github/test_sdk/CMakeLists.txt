@@ -14,10 +14,6 @@ endfunction()
 
 check_variable_defined(f3d_MODULE_EXTERNAL_RENDERING)
 check_variable_defined(f3d_MODULE_RAYTRACING)
-check_variable_defined(f3d_MODULE_EXODUS)
-check_variable_defined(f3d_MODULE_OCCT)
-check_variable_defined(f3d_MODULE_ASSIMP)
-check_variable_defined(f3d_MODULE_ALEMBIC)
 check_variable_defined(f3d_BINDINGS_PYTHON)
 check_variable_defined(f3d_BINDINGS_JAVA)
 

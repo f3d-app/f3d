@@ -70,6 +70,9 @@ if (UNIX AND NOT APPLE)
   endif()
 endif()
 
+# Get supported mime types
+get_property(F3D_SUPPORTED_MIME_TYPES GLOBAL PROPERTY F3D_SUPPORTED_MIME_TYPES)
+
 # Other ressoure files
 if(UNIX AND NOT APPLE AND NOT ANDROID)
   configure_file(
@@ -122,17 +125,17 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
     install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-vtk-formats.xml"
       DESTINATION "share/mime/packages" COMPONENT mimetypes
       RENAME "f3d-vtk-formats.xml")
-    if (F3D_MODULE_EXODUS)
+    if (F3D_PLUGIN_BUILD_EXODUS)
       install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-exodus-formats.xml"
         DESTINATION "share/mime/packages" COMPONENT mimetypes
         RENAME "f3d-3d-exodus-formats.xml")
     endif()
-    if (F3D_MODULE_OCCT)
+    if (F3D_PLUGIN_BUILD_OCCT)
       install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-cad-formats.xml"
         DESTINATION "share/mime/packages" COMPONENT mimetypes
         RENAME "f3d-cad-formats.xml")
     endif()
-    if (F3D_MODULE_ASSIMP)
+    if (F3D_PLUGIN_BUILD_ASSIMP)
       install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-assimp-formats.xml"
         DESTINATION "share/mime/packages" COMPONENT mimetypes
         RENAME "f3d-assimp-formats.xml")

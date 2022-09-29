@@ -90,6 +90,14 @@ public:
    */
   interactor& getInteractor();
 
+  /**
+   * Load a plugin.
+   * Supports full path, relative path, and plugin name.
+   * On Linux and macOS, uses LD_LIBRARY_PATH to find the plugin.
+   * On Windows, the plugin should be located in the same folder as the executable.
+   */
+  static void loadPlugin(const std::string& path);
+
   struct libInformation
   {
     std::string Version;
@@ -98,10 +106,6 @@ public:
     std::string Compiler;
     std::string RaytracingModule;
     std::string ExternalRenderingModule;
-    std::string ExodusModule;
-    std::string OpenCASCADEModule;
-    std::string AssimpModule;
-    std::string AlembicModule;
     std::string VTKVersion;
     std::string PreviousCopyright;
     std::string Copyright;
@@ -120,6 +124,7 @@ public:
     std::string Description;
     std::vector<std::string> Extensions;
     std::vector<std::string> MimeTypes;
+    std::string PluginName;
   };
 
   /**
@@ -138,6 +143,10 @@ public:
   struct no_interactor_exception : public exception
   {
     no_interactor_exception(const std::string& what = "");
+  };
+  struct plugin_exception : public exception
+  {
+    plugin_exception(const std::string& what = "");
   };
   //@}
 
