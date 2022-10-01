@@ -41,7 +41,7 @@ set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DI
 if (APPLE)
   set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../lib)
 elseif (UNIX)
-  set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../lib)
+  set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../${CMAKE_INSTALL_LIBDIR})
 endif ()
 
 target_compile_features(f3d PRIVATE cxx_std_17)
