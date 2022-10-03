@@ -200,7 +200,7 @@ Options|Default|Description
 ------|------|------
 \-\-bg-color=&lt;R,G,B&gt;|0.2, 0.2, 0.2|Set the window *background color*.<br>Ignored if *hdri* is set.
 \-\-resolution=&lt;width,height&gt;|1000, 600|Set the *window resolution*.
-\-\-position=&lt;x,y&gt;||Set the *window position*, in pixels, starting from bottom left.
+\-\-position=&lt;x,y&gt;||Set the *window position* (top left corner) , in pixels, starting from the top left of your screens.
 -z, \-\-fps||Display a *frame per second counter*.
 -n, \-\-filename||Display the *name of the file*.
 -m, \-\-metadata||Display the *metadata*.<br>This only makes sense when using the default scene.
@@ -394,7 +394,7 @@ The following command-line options <br> cannot <br> be set via config file:
 `help`, `version`, `readers-list`, `config`, `dry-run`.
 
 The following command-line options <br>can only</br> be set in the global block of the config file:
-`no-render`, `inputs`, `output`, `quiet`, `verbose`, `resolution`, position and all testing options.
+`no-render`, `inputs`, `output`, `quiet`, `verbose`, `resolution`, `position` and all testing options.
 
 Boolean options that have been turned on in the configuration file can be turned
 off on the command line if needed, eg: `--point-sprites=false`.
