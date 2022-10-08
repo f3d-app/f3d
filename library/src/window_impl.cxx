@@ -118,7 +118,14 @@ window& window_impl::setSize(int width, int height)
 //----------------------------------------------------------------------------
 window& window_impl::setPosition(int x, int y)
 {
+#if __APPLE__
+  // vtkCocoaRenderWindow has a different behavior than other render windows
+  // https://gitlab.kitware.com/vtk/vtk/-/issues/18681
+  int* screenSize = this->Internals->RenWin->GetScreenSize();
+  this->Internals->RenWin->SetPosition(x, screenSize[1] - y);
+#else
   this->Internals->RenWin->SetPosition(x, y);
+#endif
   return *this;
 }
 
