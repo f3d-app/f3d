@@ -49,7 +49,7 @@ if(WIN32 AND NOT UNIX)
       \\\${RefreshShellIcons}
     doNotRegisterExtensions:\n\n")
 
-  if (BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
+  if (F3D_BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
     set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
       ; Register shell extension
       StrCmp $REGISTER_THUMBNAILS \\\"0\\\" doNotRegisterThumbnails
@@ -72,7 +72,7 @@ if(WIN32 AND NOT UNIX)
       \\\${RefreshShellIcons}
     doNotUnregisterExtensions:\n\n")
 
-  if (BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
+  if (F3D_BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
     set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "${CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS}
       ; Unregister shell extension
       StrCmp $REGISTER_THUMBNAILS \\\"0\\\" doNotUnregisterThumbnails
