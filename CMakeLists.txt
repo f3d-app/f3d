@@ -55,6 +55,7 @@ find_package(VTK 9.0 REQUIRED
     IOExodus
     RenderingExternal
     RenderingRayTracing)
+message(STATUS "VTK ${VTK_VERSION} found")
 
 # Assimp depency
 if(F3D_MODULE_ASSIMP)
@@ -77,6 +78,9 @@ if(F3D_MODULE_OCCT)
   find_package(OpenCASCADE REQUIRED)
   if(OpenCASCADE_FOUND)
     set(F3D_OCCT_VERSION "${OpenCASCADE_VERSION}")
+    if("${F3D_OCCT_VERSION}" VERSION_LESS "7.5.0")
+      message(FATAL_ERROR "Module: OpenCASCADE: ${F3D_OCCT_VERSION} is not supported by F3D, please update your OpenCASCADE installation.")
+    endif()
     message(STATUS "Module: OpenCASCADE ${F3D_OCCT_VERSION} found")
     if((TARGET "TKXDESTEP") AND (TARGET "TKXDEIGES"))
       set(F3D_MODULE_OCCT_XCAF 1)
@@ -183,15 +187,16 @@ if(F3D_BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
 endif()
 
 # Python bindings
-option(F3D_PYTHON_BINDINGS "Create Python bindings" OFF)
-if(F3D_PYTHON_BINDINGS)
-  find_package(Python COMPONENTS Interpreter Development)
+option(F3D_BINDINGS_PYTHON "Create Python bindings" OFF)
+if(F3D_BINDINGS_PYTHON)
+  find_package(Python 3.6 COMPONENTS Interpreter Development)
+  message(STATUS "Bindings: Python: Python ${Python_VERSION} found")
   add_subdirectory(python)
 endif()
 
 # JNI bindings
-option(F3D_JAVA_BINDINGS "Create Java bindings" OFF)
-if(F3D_JAVA_BINDINGS)
+option(F3D_BINDINGS_JAVA "Create Java bindings" OFF)
+if(F3D_BINDINGS_JAVA)
   add_subdirectory(java)
 endif()
 

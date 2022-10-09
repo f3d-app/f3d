@@ -1,10 +1,12 @@
+find_package(Java REQUIRED)
+message(STATUS "Bindings: Java: Java ${Java_VERSION} found")
+include(UseJava)
+
 # With Android NDK, JNI is automatically found
 if (NOT ANDROID)
   find_package(JNI REQUIRED)
+  message(STATUS "Bindings: Java: JNI found")
 endif()
-
-find_package(Java REQUIRED)
-include(UseJava)
 
 set(F3D_JAVA_SOURCES
   Camera.java

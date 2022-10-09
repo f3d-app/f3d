@@ -22,14 +22,14 @@ if (F3D_BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
 endif()
 
 # Java bindings
-if (F3D_JAVA_BINDINGS)
+if (F3D_BINDINGS_JAVA)
   install(TARGETS javaf3d
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT java)
   install_jar(f3d-jar DESTINATION "share/java" COMPONENT java)
 endif()
 
 # Python module
-if (F3D_PYTHON_BINDINGS)
+if (F3D_BINDINGS_PYTHON)
   if(WIN32)
     set(PYTHON_INSTALL_PATH ${CMAKE_INSTALL_BINDIR})
   else()
