@@ -1,4 +1,5 @@
 find_package(pybind11 2.2 REQUIRED)
+message(STATUS "Bindings: Python: pybind11 ${pybind11_VERSION} found")
 
 pybind11_add_module(pyf3d F3DPythonBindings.cxx)
 
