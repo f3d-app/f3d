@@ -96,7 +96,7 @@ Configure and generate the project with CMake by providing the following CMake o
 * `BUILD_TESTING`: Enable the tests.
 * `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
 * `F3D_WINDOWS_GUI`: On Windows, build a Win32 application (without console).
-* `F3D_PYTHON_BINDINGS`: Generate python bindings (needs python and pybind11)
+* `F3D_BINDINGS_PYTHON`: Generate python bindings (needs python and pybind11)
 
 Some modules depending on external libraries can be optionally enabled with the following CMake variables:
 

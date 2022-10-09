@@ -109,8 +109,8 @@ jobs:
         -DF3D_MODULE_OCCT=ON
         -DF3D_MODULE_ASSIMP=ON
         -DF3D_MODULE_ALEMBIC=ON
-        -DF3D_PYTHON_BINDINGS=ON
-        -DF3D_JAVA_BINDINGS=ON
+        -DF3D_BINDINGS_PYTHON=ON
+        -DF3D_BINDINGS_JAVA=ON
         -DF3D_INSTALL_SDK=ON
         -DCMAKE_BUILD_TYPE=Release
         -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
