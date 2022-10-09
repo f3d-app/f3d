@@ -177,8 +177,8 @@ if (F3D_BUILD_APPLICATION)
 endif()
 
 # Windows Shell Extension
-cmake_dependent_option(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION "Build the Windows Shell Extension to produce thumbnails" ON "WIN32" OFF)
-if(BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
+cmake_dependent_option(F3D_BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION "Build the Windows Shell Extension to produce thumbnails" ON "WIN32" OFF)
+if(F3D_BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION)
   add_subdirectory(winshellext)
 endif()
 
