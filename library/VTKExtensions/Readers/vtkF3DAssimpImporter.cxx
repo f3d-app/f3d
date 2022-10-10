@@ -184,7 +184,7 @@ public:
           if (!reader)
           {
             vtkWarningWithObjectMacro(
-              this->Parent, "Cannot instanciate the image reader for texture: " << texturePath);
+              this->Parent, "Cannot instantiate the image reader for texture: " << texturePath);
             return nullptr;
           }
 
