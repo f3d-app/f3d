@@ -32,7 +32,7 @@ init::init()
   vtkLogger::SetInternalVerbosityLevel(vtkLogger::VERBOSITY_OFF);
 #endif
 
-  // instanciate our own polydata mapper and output windows
+  // instantiate our own polydata mapper and output windows
   vtkNew<vtkF3DObjectFactory> factory;
   vtkObjectFactory::RegisterFactory(factory);
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
