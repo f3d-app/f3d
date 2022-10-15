@@ -123,7 +123,7 @@ window& window_impl::setPosition(int x, int y)
     // vtkCocoaRenderWindow has a different behavior than other render windows
     // https://gitlab.kitware.com/vtk/vtk/-/issues/18681
     int* screenSize = this->Internals->RenWin->GetScreenSize();
-    int* winSize = this->Internals->RenWin->GetWindowSize();
+    int* winSize = this->Internals->RenWin->GetSize();
     this->Internals->RenWin->SetPosition(x, screenSize[1] - winSize[1] - y);
   }
   else
