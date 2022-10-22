@@ -244,6 +244,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     auto grp3 = cxxOptions.add_options("Window");
     this->DeclareOption(grp3, "bg-color", "", "Background color", options.getAsDoubleVectorRef("render.background.color"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
     this->DeclareOption(grp3, "resolution", "", "Window resolution", appOptions.Resolution, HasDefault::YES, MayHaveConfig::YES, "<width,height>");
+    this->DeclareOption(grp3, "position", "", "Window position", appOptions.Position, HasDefault::YES, MayHaveConfig::YES, "<x,y>");
     this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.getAsBoolRef("ui.fps"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp3, "filename", "n", "Display filename", options.getAsBoolRef("ui.filename"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.getAsBoolRef("ui.metadata"), HasDefault::YES, MayHaveConfig::YES);

@@ -77,6 +77,11 @@ public:
   virtual int getHeight() const = 0;
 
   /**
+   * Set the position of the window
+   */
+  virtual window& setPosition(int x, int y) = 0;
+
+  /**
    * Set the icon to be shown by a window manager.
    * icon should be an unsigned char array.
    * iconSize should be the sizeof(icon).
