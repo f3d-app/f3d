@@ -31,6 +31,7 @@ struct F3DAppOptions
   int MaxSize = -1;
 
   std::vector<int> Resolution{ 1000, 600 };
+  std::vector<int> Position{ 0 };
   bool Quiet = false;
   bool Verbose = false;
   double CameraAzimuthAngle = 0.0;
