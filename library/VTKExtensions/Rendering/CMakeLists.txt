@@ -14,5 +14,6 @@ if(NOT VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220907)
 endif()
 
 vtk_module_add_module(f3d::VTKExtensionsRendering
+  ${libf3d_vtk_no_install}
   FORCE_STATIC
   CLASSES ${classes})
