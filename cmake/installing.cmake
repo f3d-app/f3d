@@ -142,7 +142,7 @@ elseif(WIN32)
   if (F3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING)
     install(FILES "${CMAKE_SOURCE_DIR}/resources/logo.ico"
       DESTINATION "." COMPONENT assets)
-    install(FILES "${CMAKE_SOURCE_DIR}/resources/logo.bmp"
+    install(FILES "${CMAKE_SOURCE_DIR}/resources/logotype64.bmp"
       DESTINATION "." COMPONENT assets)
   endif()
   if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
