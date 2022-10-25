@@ -442,12 +442,13 @@ public:
 
       if (face.mNumIndices == 1)
       {
-        vtkIdType vId = face.mIndices[0];
+        vtkIdType vId = static_cast<vtkIdType>(face.mIndices[0]);
         verticesCells->InsertNextCell(1, &vId);
       }
       else if (face.mNumIndices == 2)
       {
-        vtkIdType fId[2] = { face.mIndices[0], face.mIndices[1] };
+        vtkIdType fId[2] = { static_cast<vtkIdType>(face.mIndices[0]),
+          static_cast<vtkIdType>(face.mIndices[1]) };
         linesCells->InsertNextCell(2, fId);
       }
       else
@@ -455,7 +456,7 @@ public:
         vtkIdType fId[AI_MAX_FACE_INDICES];
         for (unsigned int j = 0; j < face.mNumIndices; j++)
         {
-          fId[j] = face.mIndices[j];
+          fId[j] = static_cast<vtkIdType>(face.mIndices[j]);
         }
         polysCells->InsertNextCell(face.mNumIndices, fId);
       }
