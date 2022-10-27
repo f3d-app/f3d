@@ -11,8 +11,8 @@
 #ifndef vtkF3DRenderer_h
 #define vtkF3DRenderer_h
 
-#include <vtkOpenGLRenderer.h>
 #include <vtkLightKit.h>
+#include <vtkOpenGLRenderer.h>
 
 class vtkCornerAnnotation;
 class vtkOrientationMarkerWidget;
