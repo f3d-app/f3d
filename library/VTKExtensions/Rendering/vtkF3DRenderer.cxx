@@ -515,6 +515,29 @@ void vtkF3DRenderer::SetBackground(const double* color)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetLightIntensity(const double intensity)
+{
+  if (intensity > 0)
+  {
+    if (intensity != LightKit->GetKeyLightIntensity() || !this->LightKitAdded)
+    {
+      LightKit->SetKeyLightIntensity(intensity);
+      LightKit->SetKeyLightWarmth(.5);
+      if (!this->LightKitAdded)
+      {
+        LightKit->AddLightsToRenderer(this);
+        this->LightKitAdded = true;
+      }
+    }
+  }
+  else if (this->LightKitAdded)
+  {
+    LightKit->RemoveLightsFromRenderer(this);
+    this->LightKitAdded = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseDepthPeelingPass(bool use)
 {
   if (this->UseDepthPeelingPass != use)
