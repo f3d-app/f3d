@@ -280,7 +280,6 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetLightIntensity(
     this->Internals->Options.getAsDouble("render.light.intensity"));
 
-
   this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("ui.font-file"));
 
   vtkF3DRendererWithColoring* renWithColor =
