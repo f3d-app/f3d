@@ -277,6 +277,9 @@ void window_impl::UpdateDynamicOptions()
     this->Internals->Options.getAsBool("render.background.blur"));
   this->Internals->Renderer->SetHDRIFile(
     this->Internals->Options.getAsString("render.background.hdri"));
+  this->Internals->Renderer->SetLightIntensity(
+    this->Internals->Options.getAsDouble("render.light.intensity"));
+
 
   this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("ui.font-file"));
 

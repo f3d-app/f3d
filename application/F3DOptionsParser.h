@@ -40,6 +40,7 @@ struct F3DAppOptions
   std::vector<double> CameraPosition = { 0 };
   std::vector<double> CameraViewUp = { 0 };
   double CameraViewAngle = 0.0;
+  double LightIntensity = 0.0;
 };
 
 class F3DOptionsParser
