@@ -13,4 +13,4 @@ longopts=$(echo $f3dhelp | grep "[-]-" | sed 's/=.*>//g' | sed 's/-.,//g' | sed 
 arguments=("${(f)shortopts}")
 arguments+=("${(f)longopts}")
 
-_arguments "$arguments[@]"
+_arguments "$arguments[@]" "*:file:_files"
