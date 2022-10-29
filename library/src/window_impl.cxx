@@ -241,6 +241,9 @@ void window_impl::UpdateDynamicOptions()
     this->Initialize(false, "");
   }
 
+  // Make sure lights are created before we take options into account
+  this->Internals->Renderer->UpdateLights();
+
   this->Internals->Renderer->ShowAxis(this->Internals->Options.getAsBool("interactor.axis"));
   this->Internals->Renderer->SetUseTrackball(
     this->Internals->Options.getAsBool("interactor.trackball"));
