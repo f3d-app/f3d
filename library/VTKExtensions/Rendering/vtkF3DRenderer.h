@@ -12,7 +12,7 @@
 #define vtkF3DRenderer_h
 
 #include <map>
-#include <vtkLightKit.h>
+#include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
 
 class vtkCornerAnnotation;
@@ -178,7 +178,7 @@ protected:
   std::string HDRIFile;
   std::string FontFile;
 
-  std::map<vtkLight*, double> originalLightIntensities;
+  std::map<vtkLight*, double> OriginalLightIntensities;
 
   std::string CurrentGridInfo;
   std::string GridInfo;

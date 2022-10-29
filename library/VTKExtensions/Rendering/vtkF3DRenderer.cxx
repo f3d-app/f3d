@@ -97,7 +97,7 @@ void vtkF3DRenderer::Initialize(const std::string& fileInfo, const std::string& 
 {
   this->RemoveAllViewProps();
   this->RemoveAllLights();
-  this->originalLightIntensities.clear();
+  this->OriginalLightIntensities.clear();
 
   this->AddActor(this->FilenameActor);
   this->AddActor(this->GridActor);
@@ -525,14 +525,15 @@ void vtkF3DRenderer::SetLightIntensity(const double intensityFactor)
   vtkCollectionSimpleIterator it;
   for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
   {
-    double originalIntensity = light->GetIntensity();
-    if (this->originalLightIntensities.count(light))
+    double originalIntensity;
+    if (this->OriginalLightIntensities.count(light))
     {
-      originalIntensity = this->originalLightIntensities[light];
+      originalIntensity = this->OriginalLightIntensities[light];
     }
     else
     {
-      this->originalLightIntensities[light] = originalIntensity;
+      originalIntensity = light->GetIntensity();
+      this->OriginalLightIntensities[light] = originalIntensity;
     }
 
     light->SetIntensity(originalIntensity * intensityFactor);
