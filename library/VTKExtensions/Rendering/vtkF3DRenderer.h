@@ -11,6 +11,7 @@
 #ifndef vtkF3DRenderer_h
 #define vtkF3DRenderer_h
 
+#include <map>
 #include <vtkLightKit.h>
 #include <vtkOpenGLRenderer.h>
 
@@ -177,8 +178,7 @@ protected:
   std::string HDRIFile;
   std::string FontFile;
 
-  vtkNew<vtkLightKit> LightKit;
-  bool LightKitAdded = false;
+  std::map<vtkLight*, double> originalLightIntensities;
 
   std::string CurrentGridInfo;
   std::string GridInfo;
