@@ -5,6 +5,8 @@
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
 
+#include "vtkLight.h"
+#include "vtkLightCollection.h"
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -95,6 +97,7 @@ void vtkF3DRenderer::Initialize(const std::string& fileInfo, const std::string& 
 {
   this->RemoveAllViewProps();
   this->RemoveAllLights();
+  this->originalLightIntensities.clear();
 
   this->AddActor(this->FilenameActor);
   this->AddActor(this->GridActor);
@@ -515,25 +518,24 @@ void vtkF3DRenderer::SetBackground(const double* color)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetLightIntensity(const double intensity)
+void vtkF3DRenderer::SetLightIntensity(const double intensityFactor)
 {
-  if (intensity > 0)
+  vtkLightCollection* lc = this->GetLights();
+  vtkLight* light;
+  vtkCollectionSimpleIterator it;
+  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
   {
-    if (intensity != LightKit->GetKeyLightIntensity() || !this->LightKitAdded)
+    double originalIntensity = light->GetIntensity();
+    if (this->originalLightIntensities.count(light))
     {
-      LightKit->SetKeyLightIntensity(intensity);
-      LightKit->SetKeyLightWarmth(.5);
-      if (!this->LightKitAdded)
-      {
-        LightKit->AddLightsToRenderer(this);
-        this->LightKitAdded = true;
-      }
+      originalIntensity = this->originalLightIntensities[light];
     }
-  }
-  else if (this->LightKitAdded)
-  {
-    LightKit->RemoveLightsFromRenderer(this);
-    this->LightKitAdded = false;
+    else
+    {
+      this->originalLightIntensities[light] = originalIntensity;
+    }
+
+    light->SetIntensity(originalIntensity * intensityFactor);
   }
 }
 
