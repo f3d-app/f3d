@@ -205,6 +205,7 @@ Options|Default|Description
 -n, \-\-filename||Display the *name of the file*.
 -m, \-\-metadata||Display the *metadata*.<br>This only makes sense when using the default scene.
 -u, \-\-blur-background||Blur background.<br>This only makes sense when using a HDRI.
+\-\-light-intensity|1.0|*Adjust the intensity* of every light in the scene.
 
 ## Scientific visualization options
 

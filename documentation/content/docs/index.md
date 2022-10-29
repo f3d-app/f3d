@@ -154,6 +154,7 @@ Options|Default|Description
 -m, \-\-metadata||Display the *metadata*.<br>This only makes sense when using the default scene.
 -f, \-\-fullscreen||Display in fullscreen.
 -u, \-\-blur-background||Blur background.<br>This only makes sense when using a HDRI.
+\-\-light-intensity|1.0|*Adjust the intensity* of every light in the scene.
 
 # Rendering precedence
 
