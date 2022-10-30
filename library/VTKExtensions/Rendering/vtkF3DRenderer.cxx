@@ -5,6 +5,8 @@
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
 
+#include "vtkLight.h"
+#include "vtkLightCollection.h"
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -95,6 +97,7 @@ void vtkF3DRenderer::Initialize(const std::string& fileInfo, const std::string& 
 {
   this->RemoveAllViewProps();
   this->RemoveAllLights();
+  this->OriginalLightIntensities.clear();
 
   this->AddActor(this->FilenameActor);
   this->AddActor(this->GridActor);
@@ -512,6 +515,29 @@ void vtkF3DRenderer::SetBackground(const double* color)
 {
   this->Superclass::SetBackground(color);
   this->UpdateTextColor();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetLightIntensity(const double intensityFactor)
+{
+  vtkLightCollection* lc = this->GetLights();
+  vtkLight* light;
+  vtkCollectionSimpleIterator it;
+  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
+  {
+    double originalIntensity;
+    if (this->OriginalLightIntensities.count(light))
+    {
+      originalIntensity = this->OriginalLightIntensities[light];
+    }
+    else
+    {
+      originalIntensity = light->GetIntensity();
+      this->OriginalLightIntensities[light] = originalIntensity;
+    }
+
+    light->SetIntensity(originalIntensity * intensityFactor);
+  }
 }
 
 //----------------------------------------------------------------------------
