@@ -11,7 +11,10 @@
 #ifndef vtkF3DRenderer_h
 #define vtkF3DRenderer_h
 
+#include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
+
+#include <map>
 
 class vtkCornerAnnotation;
 class vtkOrientationMarkerWidget;
@@ -47,6 +50,7 @@ public:
   void SetFontFile(const std::string& fontFile);
   void SetHDRIFile(const std::string& hdriFile);
   void SetBackground(const double* backgroundColor) override;
+  void SetLightIntensity(const double intensity);
   //@}
 
   //@{
@@ -174,6 +178,8 @@ protected:
   bool HasHDRI = false;
   std::string HDRIFile;
   std::string FontFile;
+
+  std::map<vtkLight*, double> OriginalLightIntensities;
 
   std::string CurrentGridInfo;
   std::string GridInfo;
