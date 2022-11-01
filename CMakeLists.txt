@@ -212,6 +212,11 @@ if(UNIX AND NOT APPLE)
   mark_as_advanced(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
 endif()
 
+if(WIN32)
+  option(F3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING "Install logos for nsis packaging" OFF)
+  mark_as_advanced(F3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING)
+endif()
+
 if(UNIX AND NOT APPLE)
   option(F3D_INSTALL_THUMBNAILER_FILES "Install thumbnailer files" OFF)
   mark_as_advanced(F3D_INSTALL_THUMBNAILER_FILES)
