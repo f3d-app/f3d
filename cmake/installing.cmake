@@ -138,9 +138,13 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
         RENAME "f3d-assimp-formats.xml")
     endif()
   endif()
-elseif(WIN32 AND NOT UNIX)
-  install(FILES "${CMAKE_SOURCE_DIR}/resources/logo.ico"
-    DESTINATION "." COMPONENT assets)
+elseif(WIN32)
+  if (F3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING)
+    install(FILES "${CMAKE_SOURCE_DIR}/resources/logo.ico"
+      DESTINATION "." COMPONENT assets)
+    install(FILES "${CMAKE_SOURCE_DIR}/resources/logo.bmp"
+      DESTINATION "." COMPONENT assets)
+  endif()
   if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
     install(FILES ${config_files}
       DESTINATION "." COMPONENT configuration)
