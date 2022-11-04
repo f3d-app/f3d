@@ -582,6 +582,9 @@ public:
     else
     {
       vtkWarningWithObjectMacro(this->Parent, "Assimp failed to load: " << filePath);
+
+      auto errorDescription = this->Importer.GetErrorString();
+      vtkWarningWithObjectMacro(this->Parent, "Assimp error: " << errorDescription);
     }
   }
 
