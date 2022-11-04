@@ -9,7 +9,9 @@ if(F3D_MODULE_ALEMBIC)
 endif()
 
 if(F3D_MODULE_ASSIMP)
-  list(APPEND VTKExtensionsReaderTests_list TestF3DAssimpImporter.cxx)
+  list(APPEND VTKExtensionsReaderTests_list
+      TestF3DAssimpImporter.cxx
+      TestF3DAssimpImportError.cxx)
 endif()
 
 if(F3D_MODULE_OCCT)
