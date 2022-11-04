@@ -32,8 +32,23 @@ PYBIND11_MODULE(f3d, module)
     .def("setResolution", &f3d::image::setResolution)
     .def("getChannelCount", &f3d::image::getChannelCount)
     .def("setChannelCount", &f3d::image::setChannelCount)
-    .def("setData", &f3d::image::setData)
-    .def("getData", &f3d::image::getData)
+    .def("setData",
+      [](f3d::image& img, const py::bytes& data)
+      {
+        const py::buffer_info info(py::buffer(data).request());
+        if (info.itemsize != 1 ||
+          info.size != img.getChannelCount() * img.getWidth() * img.getHeight())
+        {
+          throw py::value_error();
+        }
+        img.setData((unsigned char*)info.ptr);
+      })
+    .def("getData",
+      [](const f3d::image& img)
+      {
+        return py::bytes(
+          (char*)img.getData(), img.getChannelCount() * img.getWidth() * img.getHeight());
+      })
     .def("compare", &f3d::image::compare)
     .def("save", &f3d::image::save);
 
