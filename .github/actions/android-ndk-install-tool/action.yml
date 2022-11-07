@@ -11,7 +11,7 @@ runs:
 
     - name: Cache NDK
       id: cache-ndk
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: android-ndk
         key: android-ndk-${{inputs.ndk_version}}-4

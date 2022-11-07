@@ -11,7 +11,7 @@ runs:
 
     - name: Cache Alembic
       id: cache-alembic
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: dependencies/alembic_install
         key: alembic-v1.8.3-5-${{inputs.os}}
