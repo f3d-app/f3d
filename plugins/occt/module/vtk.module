@@ -2,7 +2,7 @@ NAME
   f3d::VTKExtensionsOCCTReader
 DESCRIPTION
   A VTK module for the OCCT plugin
-PRIVATE_DEPENDS
+DEPENDS
   VTK::CommonCore
   VTK::CommonExecutionModel
 TEST_DEPENDS

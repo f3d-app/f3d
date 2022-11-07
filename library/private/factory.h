@@ -32,14 +32,9 @@ public:
   static factory* instance();
 
   /**
-   * Register a reader class to the factory
+   * Register a plugin to the factory
    */
   void load(plugin*);
-
-  /**
-   * Unregister a reader class from the factory
-   */
-  void unload(plugin*);
 
   /**
    * Get the reader that can read the given file, nullptr if none
@@ -47,7 +42,7 @@ public:
   reader* getReader(const std::string& fileName);
 
   /**
-   * Get the list of the registered reader classes
+   * Get the list of the registered plugins
    */
   const std::vector<plugin*>& getPlugins();
 

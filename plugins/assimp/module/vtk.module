@@ -2,7 +2,7 @@ NAME
   f3d::VTKExtensionsAssimpReader
 DESCRIPTION
   A VTK module for the Assimp plugin
-PRIVATE_DEPENDS
+DEPENDS
   VTK::CommonCore
   VTK::IOImport
   VTK::IOImage

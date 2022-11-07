@@ -16,16 +16,22 @@ f3d_plugin_init()
 
 f3d_plugin_declare_reader(
   NAME Assimp
-  SCORE 30
   EXTENSIONS fbx dae dxf off
   MIMETYPES application/vnd.fbx application/vnd.dae image/vnd.dxf application/vnd.off
   VTK_IMPORTER vtkF3DAssimpImporter
   DESCRIPTION "Assimp files reader"
 )
 
+set(rpaths "")
+get_target_property(target_type assimp::assimp TYPE)
+if (target_type STREQUAL SHARED_LIBRARY)
+  list(APPEND rpaths "$<TARGET_FILE_DIR:assimp::assimp>")
+endif ()
+
 f3d_plugin_build(
   NAME assimp
   VERSION 1.0
   DESCRIPTION "Assimp support (version ${assimp_VERSION})"
   VTK_MODULES CommonCore CommonExecutionModel IOImport
+  ADDITIONAL_RPATHS ${rpaths}
 )

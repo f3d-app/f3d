@@ -38,7 +38,7 @@ public:
 
   static vtkSmartPointer<vtkImporter> GetImporter(const std::string& fileName, bool geometry)
   {
-    // Try to find the first compatible reader with scene reading capabilities
+    // Find the best compatible reader with scene reading capabilities based on reader scores
     f3d::reader* reader = f3d::factory::instance()->getReader(fileName);
 
     if (!reader)
@@ -57,7 +57,6 @@ public:
 
     // Use the generic importer and check if it can process the file
     vtkNew<vtkF3DGenericImporter> importer;
-    importer->SetFileName(fileName);
     importer->SetInternalReader(reader->createGeometryReader(fileName));
     if (!importer->CanReadFile())
     {

@@ -1,7 +1,6 @@
 set(classes
   vtkF3DGenericImporter
   vtkF3DPostProcessFilter
-  vtkF3DMetaReader
   )
 
 vtk_module_add_module(f3d::VTKExtensionsReaders

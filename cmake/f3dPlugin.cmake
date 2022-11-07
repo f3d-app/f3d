@@ -86,7 +86,7 @@ macro(f3d_plugin_declare_reader)
     set(F3D_READER_HAS_GEOMETRY_READER 0)
   endif()
 
-  configure_file("${CMAKE_SOURCE_DIR}/cmake/readerTpl.h.in"
+  configure_file("${CMAKE_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/reader_${F3D_READER_NAME}.h")
 endmacro()
 
@@ -99,6 +99,7 @@ f3d_plugin_build(
   [DESCRIPTION           <string>]
   [VERSION               <string>]
   [VTK_MODULES           <string>...]
+  [ADDITIONAL_RPATHS     <path>...]
   [FORCE_STATIC])
 ~~~
 
@@ -110,11 +111,12 @@ The `NAME` argument is required. The arguments are as follows:
   * `DESCRIPTION`: The description of the plugin.
   * `VERSION`: The version of the plugin.
   * `VTK_MODULES`: The list of VTK modules used by the plugin to link with.
+  * `ADDITIONAL_RPATHS`: The list of additional RPATH for the installed binaries on Unix. VTK path is added automatically.
   * `FORCE_STATIC`: If specified, the plugin is built as a static library and embedded into libf3d.
 #]==]
 
 macro(f3d_plugin_build)
-  cmake_parse_arguments(F3D_PLUGIN "FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES" ${ARGN})
+  cmake_parse_arguments(F3D_PLUGIN "FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS" ${ARGN})
 
   if(F3D_PLUGIN_FORCE_STATIC OR F3D_PLUGINS_STATIC_BUILD)
     set(F3D_PLUGIN_TYPE "STATIC")
@@ -173,9 +175,8 @@ macro(f3d_plugin_build)
     get_target_property(target_type VTK::CommonCore TYPE)
     if (target_type STREQUAL SHARED_LIBRARY)
       set_target_properties(f3d-plugin-${F3D_PLUGIN_NAME} PROPERTIES
-        INSTALL_RPATH "$<TARGET_FILE_DIR:VTK::CommonCore>")
+        INSTALL_RPATH "$<TARGET_FILE_DIR:VTK::CommonCore>;${F3D_PLUGIN_ADDITIONAL_RPATHS}")
     endif ()
-    # TODO: add third party paths to RPATH
   endif()
 
   if(WIN32)
@@ -200,9 +201,11 @@ macro(f3d_plugin_build)
     ${F3D_PLUGIN_VTK_MODULES}
     ${modules})
 
-  install(TARGETS f3d-plugin-${F3D_PLUGIN_NAME}
-    EXPORT ${export_name}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT plugin
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT plugin
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT plugin)
+  if (NOT F3D_PLUGIN_IS_STATIC OR NOT BUILD_SHARED_LIBS)
+    install(TARGETS f3d-plugin-${F3D_PLUGIN_NAME}
+      EXPORT ${export_name}
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT plugin
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT plugin
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT plugin)
+  endif()
 endmacro()

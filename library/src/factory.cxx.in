@@ -60,17 +60,4 @@ void factory::load(plugin* r)
 {
   this->Plugins.push_back(r);
 }
-
-//----------------------------------------------------------------------------
-void factory::unload(plugin* r)
-{
-  for (auto iter = this->Plugins.begin(); iter != this->Plugins.end(); ++iter)
-  {
-    if (*iter == r)
-    {
-      this->Plugins.erase(iter);
-      return;
-    }
-  }
-}
 }

@@ -31,9 +31,16 @@ f3d_plugin_declare_reader(
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/occt.inl"
 )
 
+set(rpaths "")
+get_target_property(target_type TKernel TYPE)
+if (target_type STREQUAL SHARED_LIBRARY)
+  list(APPEND rpaths "${OpenCASCADE_LIBRARY_DIR}")
+endif ()
+
 f3d_plugin_build(
   NAME occt
   VERSION 1.0
   DESCRIPTION "OpenCASCADE support (version ${OpenCASCADE_VERSION})"
   VTK_MODULES CommonCore CommonExecutionModel IOImport
+  ADDITIONAL_RPATHS ${rpaths}
 )

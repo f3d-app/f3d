@@ -1,4 +1,4 @@
-#include <vtkExodusIIReader.h>
+#include <vtkGLTFReader.h>
 #include <vtkNew.h>
 #include <vtkTestUtilities.h>
 
@@ -10,32 +10,28 @@ int TestF3DGenericImporter(int argc, char* argv[])
 {
   vtkNew<vtkF3DGenericImporter> importer;
 
-  // todo: we should probably use another reader here (exodus is in a plugin)
-  vtkNew<vtkExodusIIReader> exodusReader;
-
-  // Test invalid reader filepath
-  std::string dummyFilename = std::string(argv[1]) + "data/foo.dummy";
-  importer->SetFileName(dummyFilename);
   if (importer->CanReadFile())
   {
-    std::cerr << "Importer unexpectedly can read a non-existent file" << std::endl;
+    std::cerr << "Importer unexpectedly can read a file without internal reader" << std::endl;
     return EXIT_FAILURE;
   }
   importer->Update();
   importer->Print(cout);
 
-  // Test valid reader filepath
-  std::string filename = std::string(argv[1]) + "data/small.ex2";
-  exodusReader->SetFileName(filename.c_str());
-  importer->SetFileName(filename);
-  importer->SetInternalReader(exodusReader);
+  // Test valid reader
+  vtkNew<vtkGLTFReader> reader;
+
+  std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
+  reader->SetFileName(filename.c_str());
+  reader->UpdateInformation();
+  reader->EnableAnimation(0);
+
+  importer->SetInternalReader(reader);
   if (!importer->CanReadFile())
   {
     std::cerr << "Importer unexpectedly can not read a valid file" << std::endl;
     return EXIT_FAILURE;
   }
-
-  exodusReader->UpdateInformation(); // TODO: why is it required?
 
   importer->Update();
   importer->Print(cout);

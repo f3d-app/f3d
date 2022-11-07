@@ -15,11 +15,5 @@ PRIVATE_DEPENDS
   f3d::VTKExtensionsCore
 TEST_DEPENDS
   VTK::TestingCore
-  VTK::IOCityGML
   VTK::IOGeometry
-  VTK::IOImage
-  VTK::IOPLY
-  VTK::IOParallel
   VTK::IOXML
-TEST_OPTIONAL_DEPENDS
-  VTK::IOExodus

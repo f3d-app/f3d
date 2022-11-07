@@ -293,6 +293,10 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestABC DATA suzanne.abc ARGS --load-plugins=alembic)
 endif()
 
+if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
+  f3d_test(NAME TestMultiplePluginsLoad DATA cow.vtp ARGS --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
+endif()
+
 ## Interaction Tests
 # Test hotkeys
 f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #PQAT
