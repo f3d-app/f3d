@@ -2,12 +2,15 @@ remote_theme: just-the-docs/just-the-docs
 plugins:
   - jekyll-remote-theme
   - jekyll-relative-links
+  - jekyll-optional-front-matter
 relative_links:
   enabled: true
   collections: true
 include:
-  - _readme.md
+  - README.md
+  - LICENSE.md
   - _licenses.md
+  - _license.md
 exclude:
   - testing/data/DATA_LICENSES.md
 title: F3D

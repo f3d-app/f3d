@@ -1,3 +1,11 @@
+---
+layout: default
+title: Home
+nav_order: 0
+description: "F3D - Fast and minimalist 3D viewer"
+permalink: /
+---
+
 [![CI](https://github.com/f3d-app/f3d/actions/workflows/ci.yml/badge.svg)](https://github.com/f3d-app/f3d/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/f3d-app/f3d/branch/master/graph/badge.svg?token=siwG82IXK7)](https://codecov.io/gh/f3d-app/f3d) [![Downloads](https://img.shields.io/github/downloads/f3d-app/f3d/total.svg)](https://github.com/f3d-app/f3d/releases)
 
 # F3D - Fast and minimalist 3D viewer
@@ -48,7 +56,7 @@ man f3d # Linux only
 
 # Documentation
 
-- To get started, please take a look at the [user documentation](doc/README.md).
+- To get started, please take a look at the [user documentation](doc/user/README.md).
 - If you need any help, are looking for a feature or found a bug, please open an [issue](https://github.com/f3d-app/f3d/issues).
 - If you want to use the libf3d, please take a look at its [documentation](doc/libf3d/README.md).
 - If you want to build F3D and contribute to it, please take a look at the [developper documentation](doc/dev/README.md).
@@ -63,5 +71,5 @@ F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relyi
 
 # License
 
-F3D can be used and distributed under the 3-Clause BSD License, see the [license](_license.md).
+F3D can be used and distributed under the 3-Clause BSD License, see the [license](LICENSE.md).
 F3D rely on other libraries and tools, all under permissive licenses, see the [third party licenses](doc/THIRD_PARTY_LICENSES.md).
