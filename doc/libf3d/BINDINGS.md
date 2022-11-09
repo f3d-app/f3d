@@ -16,6 +16,8 @@ Here is an example showing how to use libf3d python bindings:
 ```python
 import f3d
 
+f3d.engine.loadPlugin("native")
+
 eng = f3d.engine(f3d.window.NATIVE)
 eng.getOptions()
   .set("model.scivis.array-name", "Normals")

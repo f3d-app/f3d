@@ -131,9 +131,9 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
         RENAME "f3d-3d-exodus-formats.xml")
     endif()
     if (F3D_PLUGIN_BUILD_OCCT)
-      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-cad-formats.xml"
+      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-occt-formats.xml"
         DESTINATION "share/mime/packages" COMPONENT mimetypes
-        RENAME "f3d-cad-formats.xml")
+        RENAME "f3d-occt-formats.xml")
     endif()
     if (F3D_PLUGIN_BUILD_ASSIMP)
       install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-assimp-formats.xml"

@@ -1,9 +1,9 @@
-option(F3D_PLUGIN_BUILD_EXODUS "ExodusII plugin (.EX2 files)" ON)
+option(F3D_PLUGIN_BUILD_EXODUS "ExodusII plugin (EX2 files)" ON)
 option(F3D_PLUGIN_BUILD_OCCT "OpenCASCADE plugin (STEP and IGES files)" OFF)
 option(F3D_PLUGIN_BUILD_ASSIMP "Assimp plugin (FBX, OFF, DAE anf DXF files)" OFF)
 option(F3D_PLUGIN_BUILD_ALEMBIC "Alembic plugin (ABC files)" OFF)
 
-add_subdirectory(core)
+add_subdirectory(native)
 
 if (F3D_PLUGIN_BUILD_EXODUS)
   add_subdirectory(exodus)

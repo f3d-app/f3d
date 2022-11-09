@@ -17,6 +17,11 @@ int TestF3DGenericImporter(int argc, char* argv[])
   }
   importer->Update();
   importer->Print(cout);
+  if (importer->GetNumberOfAnimations() != 0)
+  {
+    std::cerr << "Unexpected number of animations" << std::endl;
+    return EXIT_FAILURE;
+  }
 
   // Test valid reader
   vtkNew<vtkGLTFReader> reader;

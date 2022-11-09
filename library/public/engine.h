@@ -95,6 +95,10 @@ public:
    * Supports full path, relative path, and plugin name.
    * On Linux and macOS, uses LD_LIBRARY_PATH to find the plugin.
    * On Windows, the plugin should be located in the same folder as the executable.
+   * The plugin "native" is always available and includes native VTK readers.
+   * If built and available in your build, f3d is providing 4 additional plugins:
+   * "exodus", "occt", "assimp", "alembic"
+   * Custom plugins can also be available that f3d is not supporting officially.
    */
   static void loadPlugin(const std::string& path);
 

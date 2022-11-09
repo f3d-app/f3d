@@ -165,7 +165,7 @@ f3d_test(NAME TestMaxSizeBelow DATA suzanne.stl ARGS --max-size=1 DEFAULT_LIGHTS
 f3d_test(NAME TestMaxSizeAbove DATA WaterBottle.glb ARGS --max-size=1 REGEXP "No file loaded, file is bigger than max size" NO_BASELINE)
 f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_FAIL)
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
-f3d_test(NAME TestVerboseLoadPlugin ARGS --verbose REGEXP "Loading plugin \"core\"" NO_BASELINE)
+f3d_test(NAME TestVerboseLoadPlugin ARGS --verbose REGEXP "Loading plugin \"native\"" NO_BASELINE)
 f3d_test(NAME TestNonExistentPlugin ARGS --load-plugins=dummy REGEXP "Plugin failed to load" NO_BASELINE)
 
 # color texture with opacity needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9467

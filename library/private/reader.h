@@ -77,7 +77,7 @@ public:
   /*
    * Get the score of this reader.
    * The score is used in case several readers are able to read the file.
-   * The reader having the best score (from 0 to 100) is used to read the file.
+   * The reader having the highest score (from 0 to 100) is used to read the file.
    * Default is 50.
    */
   virtual int getScore() const { return 50; }

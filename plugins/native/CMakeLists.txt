@@ -123,9 +123,9 @@ f3d_plugin_declare_reader(
 )
 
 f3d_plugin_build(
-  NAME core
+  NAME native
   VERSION 1.0
-  DESCRIPTION "Core VTK I/O support"
+  DESCRIPTION "Native VTK I/O support"
   VTK_MODULES CommonCore CommonExecutionModel IOImport IOXML IOParallel IOCityGML IOImage IOGeometry IOPLY
   FORCE_STATIC
 )

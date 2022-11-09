@@ -186,7 +186,7 @@ void ConfigurationOptions::LoadPlugins(const F3DAppOptions& appOptions) const
 {
   try
   {
-    f3d::engine::loadPlugin("core"); // always load core plugin
+    f3d::engine::loadPlugin("native"); // always load native plugin
 
     for (const std::string& plugin : appOptions.Plugins)
     {

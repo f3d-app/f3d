@@ -13,6 +13,8 @@ The engine class is the main class that needs to be instantiated. All other clas
 
 The engine constructor lets you choose the type of window in its constructor, `NONE`, `NATIVE`, `NATIVE_OFFSCREEN`, `EXTERNAL`. Default is `NATIVE`. See [Window class](window-class) documentation for more info. Please note that the engine will not provide a interactor with `NONE` and `EXTERNAL`.
 
+A static function `loadPlugin` can also be called to load reader plugins. It must be called before loading any file. An internal plugin containing VTK native readers can be loaded by calling `f3d::engine::loadPlugin("native");`
+
 ## Loader class
 
 The loader class is responsible to read and load the file from the disk. It supports reading multiple files and even folders.
