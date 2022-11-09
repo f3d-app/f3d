@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="10.895 5 216.16562 124.71093"
+   width="520"
+   height="300"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="logo-transparent_bg.svg"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14, custom)"
+   inkscape:export-filename="logo.png"
+   inkscape:export-xdpi="33.8667"
+   inkscape:export-ydpi="33.8667"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     id="namedview8"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="1.6210938"
+     inkscape:cx="173.33975"
+     inkscape:cy="136.94457"
+     inkscape:window-width="1920"
+     inkscape:window-height="1080"
+     inkscape:window-x="0"
+     inkscape:window-y="390"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg6" />
+  <g
+     id="g1157"
+     transform="translate(-18.997222,9.1454662)">
+    <g
+       id="Sketch">
+      <path
+         id="red"
+         d="M 36.12,63.3 64.3,5 h 23.35 z"
+         fill="#c0202a" />
+      <path
+         id="green"
+         d="M 60.3,65 H 36.42 L 88.45,6.7 Z"
+         fill="#209949" />
+      <path
+         id="blue"
+         d="M 39.59,111.42 68.71,51.1 h 23.37 z"
+         fill="#074e8e" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="color:#000000;font-weight:bold;font-size:71.9168px;line-height:3.8056px;font-family:'Inria Sans';-inkscape-font-specification:'Inria Sans Bold';text-decoration:none;text-decoration-line:none;text-decoration-color:#000000;letter-spacing:0px;word-spacing:0px;overflow:visible;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:4.15702;stroke-linecap:round;stroke-linejoin:round;paint-order:markers stroke fill;stop-color:#000000"
+       x="96.231201"
+       y="84.549965"
+       id="text293"
+       transform="scale(1.0163775,0.98388641)"><tspan
+         sodipodi:role="line"
+         id="tspan291"
+         style="font-style:oblique;font-variant:normal;font-weight:600;font-stretch:normal;font-family:FreeSans;-inkscape-font-specification:'FreeSans Semi-Bold Oblique';fill:#adadad;fill-opacity:1;stroke:none;stroke-width:4.15702"
+         x="96.231201"
+         y="84.549965">F3D</tspan></text>
+  </g>
+</svg>

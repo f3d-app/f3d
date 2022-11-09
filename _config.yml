@@ -1,0 +1,29 @@
+remote_theme: just-the-docs/just-the-docs
+plugins:
+  - jekyll-remote-theme
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: true
+include:
+  - _readme.md
+  - _licenses.md
+exclude:
+  - testing/data/DATA_LICENSES.md
+title: F3D
+description: Fast and minimalist 3D viewer
+logo: /resources/logotype.svg
+color_scheme: dark
+
+# Aux links for the upper right navigation
+aux_links:
+  "<img src=\"https://user-images.githubusercontent.com/3129530/197903476-11d9c41d-73b0-461f-93e8-c8c00c680e6e.png\" width=\"30px\">":
+    - "//github.com/f3d-app/f3d"
+
+# Makes Aux links open in a new tab.
+aux_links_new_tab: true
+
+# External navigation links
+nav_external_links:
+  - title: Download F3D
+    url: https://github.com/f3d-app/f3d/releases
