@@ -1,15 +1,8 @@
----
-layout: default
-title: License
-parent: Licenses
-nav_order: 0
----
-
 BSD 3-Clause License
 
-```
-Copyright 2019-2021 Kitware SAS
-Copyright 2021-2022 Michael Migliore, Mathieu Westphal
+* Copyright 2019-2021 Kitware SAS
+* Copyright 2021-2022 Michael Migliore, Mathieu Westphal
+
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,4 +29,3 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-```

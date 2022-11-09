@@ -63,5 +63,5 @@ F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relyi
 
 # License
 
-F3D can be used and distributed under the 3-Clause BSD License, see the [license](LICENSE.md).
+F3D can be used and distributed under the 3-Clause BSD License, see the [license](_license.md).
 F3D rely on other libraries and tools, all under permissive licenses, see the [third party licenses](doc/THIRD_PARTY_LICENSES.md).
