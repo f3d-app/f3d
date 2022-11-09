@@ -14,6 +14,8 @@ public class TestJavaBindings {
 
   public static void main(String[] args) {
 
+    Engine.loadPlugin("native");
+
     // Always use try-with-resources idiom to ensure the native engine is released
     try (Engine engine = new Engine(Window.Type.NATIVE_OFFSCREEN)) {
 
@@ -25,6 +27,10 @@ public class TestJavaBindings {
       assert pos[0] == 0.0 : "Position X is not valid";
       assert pos[1] == 1.0 : "Position Y is not valid";
       assert pos[2] == 2.0 : "Position Z is not valid";
+
+      Loader loader = engine.getLoader();
+      loader.addFile(args[0] + "data/cow.vtp");
+      loader.loadFile(Loader.LoadFileEnum.LOAD_CURRENT);
     }
   }
 }

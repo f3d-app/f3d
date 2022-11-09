@@ -42,6 +42,8 @@ import io.github.f3d_app.f3d.*;
 public class F3DExample {
   public static void main(String[] args) {
 
+    Engine.loadPlugin("native");
+
     // Always use try-with-resources idiom to ensure the native engine is released
     try (Engine engine = new Engine(Window.Type.NATIVE)) {
       Loader loader = engine.getLoader();

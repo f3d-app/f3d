@@ -24,6 +24,13 @@ inline f3d::engine* GetEngine(JNIEnv* env, jobject self)
 extern "C"
 {
   // Engine
+  JNIEXPORT void JAVA_BIND(Engine, loadPlugin)(JNIEnv* env, jclass, jstring str)
+  {
+    const char* plugin = env->GetStringUTFChars(str, nullptr);
+    f3d::engine::loadPlugin(plugin);
+    env->ReleaseStringUTFChars(str, plugin);
+  }
+
   JNIEXPORT jlong JAVA_BIND(Engine, construct)(JNIEnv* env, jobject self, jobject windowType)
   {
     // read cursor
@@ -78,7 +85,8 @@ extern "C"
     return GetEngine(env, self)->getWindow().getHeight();
   }
 
-  JNIEXPORT jdoubleArray JAVA_BIND(Window, getDisplayFromWorld)(JNIEnv* env, jobject self, jdoubleArray pt)
+  JNIEXPORT jdoubleArray JAVA_BIND(Window, getDisplayFromWorld)(
+    JNIEnv* env, jobject self, jdoubleArray pt)
   {
     double* arr = env->GetDoubleArrayElements(pt, nullptr);
     f3d::point3_t newPt =
@@ -91,7 +99,8 @@ extern "C"
     return ret;
   }
 
-  JNIEXPORT jdoubleArray JAVA_BIND(Window, getWorldFromDisplay)(JNIEnv* env, jobject self, jdoubleArray pt)
+  JNIEXPORT jdoubleArray JAVA_BIND(Window, getWorldFromDisplay)(
+    JNIEnv* env, jobject self, jdoubleArray pt)
   {
     double* arr = env->GetDoubleArrayElements(pt, nullptr);
     f3d::point3_t newPt =
