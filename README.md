@@ -11,7 +11,7 @@ permalink: /
 # F3D - Fast and minimalist 3D viewer
 By Michael Migliore and Mathieu Westphal.
 
-<img src="https://user-images.githubusercontent.com/3129530/195972584-11ebb000-4939-47f4-9719-9d55e18867b0.png" align="left" width="20px"/>
+<img src="resources/logo.svg" align="left" width="20px"/>
 F3D (pronounced `/fɛd/`) is a fast and minimalist 3D viewer. It supports many file formats, from digital content to scientific datasets (including glTF, STL, STEP, PLY, OBJ, FBX, Alembic), can show animations and support lot of rendering and texturing options including real time physically based rendering and raytracing.
 <br clear="left"/>
 
