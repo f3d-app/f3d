@@ -1,9 +1,0 @@
-docs:
-  getting_started:
-    overview: index.html
-    installation_and_build: installation_and_build.html
-    configuration_file: configuration_file.html
-    desktop_integration: desktop_integration.html
-  miscellaneous:
-    limitations: limitations.html
-    troubleshooting: troubleshooting.html
