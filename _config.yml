@@ -18,6 +18,12 @@ description: Fast and minimalist 3D viewer
 logo: /resources/logotype.svg
 color_scheme: dark
 
+# Set a seo image from the gallery
+image:
+  path: https://user-images.githubusercontent.com/3129530/194735416-3f386437-456c-4145-9b5e-6bb6451d7e9a.png
+  height: 100
+  width: 100
+
 # Aux links for the upper right navigation
 aux_links:
   "<img src=\"https://user-images.githubusercontent.com/3129530/197903476-11d9c41d-73b0-461f-93e8-c8c00c680e6e.png\" width=\"30px\">":
