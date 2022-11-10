@@ -1,5 +1,13 @@
+---
+layout: default
+title: Home
+nav_order: 0
+description: "F3D - Fast and minimalist 3D viewer"
+permalink: /
+---
+
 <!---
-This file is very similar to _home.md, any changes made here should be reflected there too.
+This file is very similar to README.md, any changes made here should be reflected there too.
 -->
 
 [![CI](https://github.com/f3d-app/f3d/actions/workflows/ci.yml/badge.svg)](https://github.com/f3d-app/f3d/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/f3d-app/f3d/branch/master/graph/badge.svg?token=siwG82IXK7)](https://codecov.io/gh/f3d-app/f3d) [![Downloads](https://img.shields.io/github/downloads/f3d-app/f3d/total.svg)](https://github.com/f3d-app/f3d/releases)
@@ -19,7 +27,7 @@ F3D also contains the libf3d, a simple library to render meshes, with C++, Pytho
 
 *A typical render by F3D*
 
-<img src="https://user-images.githubusercontent.com/3129530/194735261-dd6f1c1c-fa57-47b0-9d27-f735d18ccd5e.gif" width="640">
+<video src='https://user-images.githubusercontent.com/3129530/194734947-f34bc377-8ee4-472a-b130-30ce9e86facf.webm' autoplay="autoplay" loop="loop" width="640"></video>
 
 *Animation of a glTF file within F3D*
 
