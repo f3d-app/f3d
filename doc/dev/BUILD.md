@@ -16,8 +16,8 @@ needed dependencies, configuring and building.
 * [VTK](https://vtk.org) >= 9.0.0 (9.2.2 recommended).
 * A C++17 compiler.
 * A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
-* Optionally, [Assimp](https://flathub.org/apps/details/io.github.f3d_app.f3d) >= 5.0.
-* Optionally, Open CASCADE [OCCT](https://flathub.org/apps/details/io.github.f3d_app.f3d) >= 7.5.2.
+* Optionally, [Assimp](https://www.assimp.org/) >= 5.0.
+* Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.5.2.
 * Optionally, [Alembic](http://www.alembic.io/) >= 1.7.
 * Optionally, [Python](https://www.python.org/) >= 3.6 and [pybind11](https://github.com/pybind/pybind11) >= 2.2.
 * Optionally, [Java](https://www.java.com) >= 18.
