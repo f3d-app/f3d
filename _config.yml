@@ -7,7 +7,7 @@ relative_links:
   enabled: true
   collections: true
 include:
-  - README.md
+  - _home.md
   - LICENSE.md
   - _licenses.md
   - _license.md
