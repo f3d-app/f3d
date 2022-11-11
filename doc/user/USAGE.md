@@ -47,3 +47,16 @@ The **full scene** formats (.gltf/.glb, .3ds, .wrl, .obj, .fbx, .dae, .off) cont
 but also some scene information like *lights*, *cameras*, *actors* in the scene, as well as *texture* properties.
 By default, all this information will be loaded from the file and displayed. Use the `--geometry-only` [options](OPTIONS.md)
 to modify this behavior. For file formats that do not support it, **a default scene** is created.
+
+## Plugins
+
+If you installed F3D using a package manager, it's possible that the packager chose to bundle the plugins in different packages to reduce the reduce the number of dependencies of the main package.
+In this case, you will have to specify which plugin you want to load in order to extend the number of supported file format. You can either use the `--load-plugin` option or add a line in the [configuration file](CONFIGURATION_FILE.md).
+Here is the list of plugins provided officially by F3D:
+
+- **assimp**: FBX, DAE, OFF and DXF support
+- **occt**: STEP and IGES support
+- **alembic**: ABC support
+- **exodus**: EX2 support
+
+> Note: If you downloaded the binaries from the Release page, it's not necessary to specify manually the plugins above, all of them are loaded automatically.

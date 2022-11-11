@@ -62,7 +62,7 @@ void factory::load(plugin * r)
 {
   if (!this->registerOnce(r))
   {
-    log::warn("Plugin \"" + r->getName() + "\" is already loaded.");
+    log::debug("Plugin \"" + r->getName() + "\" is already loaded.");
   }
 }
 
