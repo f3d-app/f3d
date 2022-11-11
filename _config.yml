@@ -53,7 +53,7 @@ defaults:
 # user doc
   -
     scope:
-      path: "doc/user/README.md"
+      path: "doc/user/README_USER.md"
     values:
       nav_order: 2
       has_children: true
@@ -112,7 +112,7 @@ defaults:
 # libf3d doc
   -
     scope:
-      path: "doc/libf3d/README.md"
+      path: "doc/libf3d/README_LIBF3D.md"
     values:
       nav_order: 3
       has_children: true
@@ -150,7 +150,7 @@ defaults:
 # dev doc
   -
     scope:
-      path: "doc/dev/README.md"
+      path: "doc/dev/README_DEV.md"
     values:
       nav_order: 4
       has_children: true

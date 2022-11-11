@@ -54,8 +54,8 @@ man f3d # Linux only
 
 - To get started, please take a look at the [user documentation](doc/user/README_USER.md).
 - If you need any help, are looking for a feature or found a bug, please open an [issue](https://github.com/f3d-app/f3d/issues).
-- If you want to use the libf3d, please take a look at its [documentation](doc/libf3d/README.md).
-- If you want to build F3D and contribute to it, please take a look at the [developper documentation](doc/dev/README.md).
+- If you want to use the libf3d, please take a look at its [documentation](doc/libf3d/README_LIBF3D.md).
+- If you want to build F3D and contribute to it, please take a look at the [developper documentation](doc/dev/README_DEV.md).
 
 # Support
 
