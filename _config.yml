@@ -21,10 +21,13 @@ color_scheme: dark
 # Set a opengraph image from the gallery for all pages
 defaults:
   -
-    image:
-      path: https://user-images.githubusercontent.com/3129530/194735416-3f386437-456c-4145-9b5e-6bb6451d7e9a.png
-      height: 1200
-      width: 630
+    scope:
+      path: "" # an empty string here means all files in the project
+    values:
+      image:
+        path: https://user-images.githubusercontent.com/3129530/194735416-3f386437-456c-4145-9b5e-6bb6451d7e9a.png
+        height: 1200
+        width: 630
 
 # Aux links for the upper right navigation
 aux_links:
