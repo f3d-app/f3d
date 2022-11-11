@@ -4,10 +4,6 @@ title: Home
 nav_order: 0
 description: "F3D - Fast and minimalist 3D viewer"
 permalink: /
-image:
-  path: https://user-images.githubusercontent.com/3129530/194735416-3f386437-456c-4145-9b5e-6bb6451d7e9a.png
-  height: 100
-  width: 100
 ---
 
 <!---
