@@ -121,7 +121,7 @@ if(BUILD_TESTING)
 endif()
 
 # plugins
-option(F3D_PLUGINS_STATIC_BUILD "Make all plugins static (embedded into libf3d)" ON)
+option(F3D_PLUGINS_STATIC_BUILD "Make all plugins static (embedded into libf3d) and automatically loaded by F3D" ON)
 mark_as_advanced(F3D_PLUGINS_STATIC_BUILD)
 add_subdirectory(plugins)
 
