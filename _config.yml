@@ -14,7 +14,7 @@ include:
   - _licenses.md
 exclude:
   - testing/data/DATA_LICENSES.md
-  - doc/user/README.md
+  - doc/user/
 title: F3D
 tagline: Fast and minimalist 3D viewer
 description: F3D - Fast and minimalist 3D viewer
