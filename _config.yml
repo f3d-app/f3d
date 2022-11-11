@@ -38,7 +38,7 @@ defaults:
 
   -
     scope:
-      path: "README.*"
+      path: "README.md"
     values:
       title: Home
       nav_order: 0
@@ -46,35 +46,35 @@ defaults:
 
   -
     scope:
-      path: "doc/GALLERY.*"
+      path: "doc/GALLERY.md"
     values:
       nav_order: 1
 
 # user doc
   -
     scope:
-      path: "doc/user/README_USER.md"
+      path: "doc/user/README.md"
     values:
       nav_order: 2
       has_children: true
 
   -
     scope:
-      path: "doc/user/USAGE.*"
+      path: "doc/user/USAGE.md"
     values:
       parent: User Documentation
       nav_order: 0
 
   -
     scope:
-      path: "doc/user/INSTALLATION.*"
+      path: "doc/user/INSTALLATION.md"
     values:
       parent: User Documentation
       nav_order: 1
 
   -
     scope:
-      path: "doc/user/OPTIONS.*"
+      path: "doc/user/OPTIONS.md"
     values:
       title: Options
       parent: User Documentation
@@ -82,28 +82,28 @@ defaults:
 
   -
     scope:
-      path: "doc/user/INTERACTIONS.*"
+      path: "doc/user/INTERACTIONS.md"
     values:
       parent: User Documentation
       nav_order: 3
 
   -
     scope:
-      path: "doc/user/CONFIGURATION_FILE.*"
+      path: "doc/user/CONFIGURATION_FILE.md"
     values:
       parent: User Documentation
       nav_order: 4
 
   -
     scope:
-      path: "doc/user/DESKTOP_INTEGRATION.*"
+      path: "doc/user/DESKTOP_INTEGRATION.md"
     values:
       parent: User Documentation
       nav_order: 5
 
   -
     scope:
-      path: "doc/user/LIMITATIONS_AND_TROUBLESHOOTING.*"
+      path: "doc/user/LIMITATIONS_AND_TROUBLESHOOTING.md"
     values:
       title: Limitations and Troubleshooting
       parent: User Documentation
@@ -112,14 +112,14 @@ defaults:
 # libf3d doc
   -
     scope:
-      path: "doc/libf3d/README.*"
+      path: "doc/libf3d/README.md"
     values:
       nav_order: 3
       has_children: true
 
   -
     scope:
-      path: "doc/libf3d/OVERVIEW.*"
+      path: "doc/libf3d/OVERVIEW.md"
     values:
       title: Overview
       parent: libf3d Documentation
@@ -127,14 +127,14 @@ defaults:
 
   -
     scope:
-      path: "doc/libf3d/CLASSES.*"
+      path: "doc/libf3d/CLASSES.md"
     values:
       parent: libf3d Documentation
       nav_order: 1
 
   -
     scope:
-      path: "doc/libf3d/OPTIONS.*"
+      path: "doc/libf3d/OPTIONS.md"
     values:
       title: Options
       parent: libf3d Documentation
@@ -142,7 +142,7 @@ defaults:
 
   -
     scope:
-      path: "doc/libf3d/BINDINGS.*"
+      path: "doc/libf3d/BINDINGS.md"
     values:
       parent: libf3d Documentation
       nav_order: 3
@@ -150,14 +150,14 @@ defaults:
 # dev doc
   -
     scope:
-      path: "doc/dev/README.*"
+      path: "doc/dev/README.md"
     values:
       nav_order: 4
       has_children: true
 
   -
     scope:
-      path: "doc/dev/BUILD.*"
+      path: "doc/dev/BUILD.md"
     values:
       title: Build
       parent: Developer Documentation
@@ -165,14 +165,14 @@ defaults:
 
   -
     scope:
-      path: "doc/dev/TESTING.*"
+      path: "doc/dev/TESTING.md"
     values:
       parent: Developer Documentation
       nav_order: 1
 
   -
     scope:
-      path: "doc/dev/CONTRIBUTE.*"
+      path: "doc/dev/CONTRIBUTE.md"
     values:
       title: Contribute
       parent: Developer Documentation
@@ -180,7 +180,7 @@ defaults:
 
   -
     scope:
-      path: "doc/dev/GENERATE.*"
+      path: "doc/dev/GENERATE.md"
     values:
       title: Generate
       parent: Developer Documentation
@@ -188,7 +188,7 @@ defaults:
 
   -
     scope:
-      path: "doc/dev/CODING_STYLE.*"
+      path: "doc/dev/CODING_STYLE.md"
     values:
       parent: Developer Documentation
       nav_order: 4
@@ -197,7 +197,7 @@ defaults:
 # _licenses.md uses front matter      
   -
     scope:
-      path: "LICENSE.*"
+      path: "LICENSE.md"
     values:
       title: License
       parent: Licenses
@@ -205,7 +205,7 @@ defaults:
 
   -
     scope:
-      path: "doc/THIRD_PARTY_LICENSES.*"
+      path: "doc/THIRD_PARTY_LICENSES.md"
     values:
       title: Third Party Licenses
       parent: Licenses
@@ -213,7 +213,7 @@ defaults:
 
   -
     scope:
-      path: "doc/CHANGELOG.*"
+      path: "doc/CHANGELOG.md"
     values:
       nav_order: 6
 
