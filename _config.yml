@@ -14,7 +14,6 @@ include:
   - _licenses.md
 exclude:
   - testing/data/DATA_LICENSES.md
-  - doc/user/
 title: F3D
 tagline: Fast and minimalist 3D viewer
 description: F3D - Fast and minimalist 3D viewer
@@ -54,7 +53,7 @@ defaults:
 # user doc
   -
     scope:
-      path: "doc/user/README.*"
+      path: "doc/user/README_USER.md"
     values:
       nav_order: 2
       has_children: true
