@@ -37,6 +37,11 @@ public:
   void load(plugin*);
 
   /**
+   * Register all static plugins to the factory
+   */
+  void autoload();
+
+  /**
    * Get the reader that can read the given file, nullptr if none
    */
   reader* getReader(const std::string& fileName);
@@ -55,6 +60,8 @@ public:
 protected:
   factory();
   virtual ~factory() = default;
+
+  bool registerOnce(plugin* p);
 
   std::vector<plugin*> Plugins;
 

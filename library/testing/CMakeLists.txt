@@ -65,7 +65,7 @@ endif()
 # create the testing file and list of tests
 # CMake variables are set to work around this issue:
 # https://gitlab.kitware.com/cmake/cmake/-/issues/21049
-set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "f3d::engine::loadPlugin(\"native\");")
+set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "f3d::engine::autoloadPlugins();")
 set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "")
 set(CMAKE_TESTDRIVER_ARGVC_FUNCTION "")
 create_test_sourcelist(_libf3dSDKTests libf3dSDKTests.cxx ${libf3dSDKTests_list} EXTRA_INCLUDE engine.h)

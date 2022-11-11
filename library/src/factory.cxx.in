@@ -1,5 +1,7 @@
 #include "factory.h"
 
+#include "log.h"
+
 @F3D_STATIC_PLUGIN_EXTERN@
 
 namespace f3d
@@ -56,8 +58,43 @@ reader* factory::getReader(const std::string& fileName)
 }
 
 //----------------------------------------------------------------------------
-void factory::load(plugin* r)
+void factory::load(plugin * r)
 {
-  this->Plugins.push_back(r);
+  if (!this->registerOnce(r))
+  {
+    log::warn("Plugin \"" + r->getName() + "\" is already loaded.");
+  }
+}
+
+//----------------------------------------------------------------------------
+void factory::autoload()
+{
+  for (auto& [str, init] : this->StaticPluginInitializers)
+  {
+    this->registerOnce(init());
+  }
+}
+
+//----------------------------------------------------------------------------
+bool factory::registerOnce(plugin* p)
+{
+  if (std::find(this->Plugins.begin(), this->Plugins.end(), p) == this->Plugins.end())
+  {
+    this->Plugins.push_back(p);
+
+    log::debug("Loading plugin \"" + p->getName() + "\"");
+    log::debug("  Version: " + p->getVersion());
+    log::debug("  Description: " + p->getDescription());
+    log::debug("  Readers:");
+
+    for (auto r : p->getReaders())
+    {
+      log::debug("    " + r->getLongDescription());
+    }
+
+    return true;
+  }
+
+  return false;
 }
 }

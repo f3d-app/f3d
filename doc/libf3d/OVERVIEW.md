@@ -23,7 +23,7 @@ Rendering a file and starting the interaction is very easy:
 #include <f3d/loader.h>
 
 // Load VTK native readers
-f3d::engine::loadPlugin("native");
+f3d::engine::autoloadPlugins();
 
 // Create a f3d::engine
 f3d::engine eng();
@@ -44,7 +44,7 @@ Manipulating the window directly can be done this way:
 #include <f3d/window.h>
 
 // Load VTK native readers
-f3d::engine::loadPlugin("native");
+f3d::engine::autoloadPlugins();
 
 // Create a f3d::engine
 f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
@@ -68,7 +68,7 @@ Changing some options can be done this way:
 #include <f3d/loader.h>
 
 // Load VTK native readers
-f3d::engine::loadPlugin("native");
+f3d::engine::autoloadPlugins();
 
 // Create a f3d::engine
 f3d::engine eng();

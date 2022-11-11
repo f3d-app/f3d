@@ -31,6 +31,11 @@ extern "C"
     env->ReleaseStringUTFChars(str, plugin);
   }
 
+  JNIEXPORT void JAVA_BIND(Engine, autoloadPlugins)(JNIEnv*, jclass)
+  {
+    f3d::engine::autoloadPlugins();
+  }
+
   JNIEXPORT jlong JAVA_BIND(Engine, construct)(JNIEnv* env, jobject self, jobject windowType)
   {
     // read cursor

@@ -102,6 +102,12 @@ public:
    */
   static void loadPlugin(const std::string& path);
 
+  /**
+   * Automatically load all the static plugins.
+   * The plugin "native" is guaranteed to be static.
+   */
+  static void autoloadPlugins();
+
   struct libInformation
   {
     std::string Version;

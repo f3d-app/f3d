@@ -105,7 +105,7 @@ interactor& engine::getInteractor()
 void engine::loadPlugin(const std::string& path)
 {
   // check if the plugin is a known static plugin
-  f3d::factory* factory = f3d::factory::instance();
+  factory* factory = factory::instance();
   factory::plugin_initializer_t init_plugin = factory->getStaticInitializer(path);
 
   if (init_plugin == nullptr)
@@ -154,17 +154,13 @@ void engine::loadPlugin(const std::string& path)
 
   plugin* p = init_plugin();
 
-  f3d::log::info("Loading plugin \"" + p->getName() + "\"");
-  f3d::log::info("  Version: " + p->getVersion());
-  f3d::log::info("  Description: " + p->getDescription());
-  f3d::log::info("  Readers:");
-
-  for (auto r : p->getReaders())
-  {
-    f3d::log::info("    " + r->getLongDescription());
-  }
-
   factory->load(p);
+}
+
+//----------------------------------------------------------------------------
+void engine::autoloadPlugins()
+{
+  factory::instance()->autoload();
 }
 
 //----------------------------------------------------------------------------
@@ -207,7 +203,7 @@ engine::libInformation engine::getLibInfo()
 std::vector<engine::readerInformation> engine::getReadersInfo()
 {
   std::vector<readerInformation> readersInfo;
-  const auto& plugins = f3d::factory::instance()->getPlugins();
+  const auto& plugins = factory::instance()->getPlugins();
   for (const auto& plugin : plugins)
   {
     for (const auto& reader : plugin->getReaders())

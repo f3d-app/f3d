@@ -22,6 +22,7 @@ public class Engine implements AutoCloseable {
     }
 
     static public native void loadPlugin(String plugin);
+    static public native void autoloadPlugins();
 
     public Loader getLoader() { return mLoader; }
     public Options getOptions() { return mOptions; }

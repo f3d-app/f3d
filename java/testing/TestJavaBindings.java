@@ -14,7 +14,7 @@ public class TestJavaBindings {
 
   public static void main(String[] args) {
 
-    Engine.loadPlugin("native");
+    Engine.autoloadPlugins();
 
     // Always use try-with-resources idiom to ensure the native engine is released
     try (Engine engine = new Engine(Window.Type.NATIVE_OFFSCREEN)) {
