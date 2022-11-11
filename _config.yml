@@ -1,33 +1,220 @@
 remote_theme: just-the-docs/just-the-docs
 plugins:
-  - jekyll-remote-theme
-  - jekyll-relative-links
   - jekyll-optional-front-matter
+  - jekyll-relative-links
+  - jekyll-remote-theme
+  - jekyll-seo-tag
+  - jekyll-titles-from-headings
 relative_links:
   enabled: true
   collections: true
 include:
-  - _home.md
+  - README.md
   - LICENSE.md
   - _licenses.md
-  - _license.md
 exclude:
   - testing/data/DATA_LICENSES.md
 title: F3D
-description: Fast and minimalist 3D viewer
+tagline: Fast and minimalist 3D viewer
+description: F3D - Fast and minimalist 3D viewer
+url: https://f3d-app.github.io/f3d/
 logo: /resources/logotype.svg
 color_scheme: dark
 
-# Set a opengraph image from the gallery for all pages
+# Set default front matter values
 defaults:
   -
     scope:
-      path: "" # an empty string here means all files in the project
+      path: ""
     values:
-      image:
-        path: https://user-images.githubusercontent.com/3129530/194735416-3f386437-456c-4145-9b5e-6bb6451d7e9a.png
+      image: # Set a opengraph image from the gallery for all pages
+        path: https://user-images.githubusercontent.com/3129530/201317344-092db03d-8616-45b9-b606-30d22cda2eff.png
         height: 1200
         width: 630
+      layout: default
+      description: "F3D - Fast and minimalist 3D viewer"
+      has_toc: false
+
+  -
+    scope:
+      path: "README.*"
+    values:
+      title: Home
+      nav_order: 0
+      permalink: /
+
+  -
+    scope:
+      path: "doc/GALLERY.*"
+    values:
+      nav_order: 1
+
+# user doc
+  -
+    scope:
+      path: "doc/user/README.*"
+    values:
+      nav_order: 2
+      has_children: true
+
+  -
+    scope:
+      path: "doc/user/USAGE.*"
+    values:
+      parent: User Documentation
+      nav_order: 0
+
+  -
+    scope:
+      path: "doc/user/INSTALLATION.*"
+    values:
+      parent: User Documentation
+      nav_order: 1
+
+  -
+    scope:
+      path: "doc/user/OPTIONS.*"
+    values:
+      title: Options
+      parent: User Documentation
+      nav_order: 2
+
+  -
+    scope:
+      path: "doc/user/INTERACTIONS.*"
+    values:
+      parent: User Documentation
+      nav_order: 3
+
+  -
+    scope:
+      path: "doc/user/CONFIGURATION_FILE.*"
+    values:
+      parent: User Documentation
+      nav_order: 4
+
+  -
+    scope:
+      path: "doc/user/DESKTOP_INTEGRATION.*"
+    values:
+      parent: User Documentation
+      nav_order: 5
+
+  -
+    scope:
+      path: "doc/user/LIMITATIONS_AND_TROUBLESHOOTING.*"
+    values:
+      title: Limitations and Troubleshooting
+      parent: User Documentation
+      nav_order: 6
+
+# libf3d doc
+  -
+    scope:
+      path: "doc/libf3d/README.*"
+    values:
+      nav_order: 3
+      has_children: true
+
+  -
+    scope:
+      path: "doc/libf3d/OVERVIEW.*"
+    values:
+      title: Overview
+      parent: libf3d Documentation
+      nav_order: 0
+
+  -
+    scope:
+      path: "doc/libf3d/CLASSES.*"
+    values:
+      parent: libf3d Documentation
+      nav_order: 1
+
+  -
+    scope:
+      path: "doc/libf3d/OPTIONS.*"
+    values:
+      title: Options
+      parent: libf3d Documentation
+      nav_order: 2
+
+  -
+    scope:
+      path: "doc/libf3d/BINDINGS.*"
+    values:
+      parent: libf3d Documentation
+      nav_order: 3
+
+# dev doc
+  -
+    scope:
+      path: "doc/dev/README.*"
+    values:
+      nav_order: 4
+      has_children: true
+
+  -
+    scope:
+      path: "doc/dev/BUILD.*"
+    values:
+      title: Build
+      parent: Developer Documentation
+      nav_order: 0
+
+  -
+    scope:
+      path: "doc/dev/TESTING.*"
+    values:
+      parent: Developer Documentation
+      nav_order: 1
+
+  -
+    scope:
+      path: "doc/dev/CONTRIBUTE.*"
+    values:
+      title: Contribute
+      parent: Developer Documentation
+      nav_order: 2
+
+  -
+    scope:
+      path: "doc/dev/GENERATE.*"
+    values:
+      title: Generate
+      parent: Developer Documentation
+      nav_order: 3
+
+  -
+    scope:
+      path: "doc/dev/CODING_STYLE.*"
+    values:
+      parent: Developer Documentation
+      nav_order: 4
+
+# Licenses doc
+# _licenses.md uses front matter      
+  -
+    scope:
+      path: "LICENSE.*"
+    values:
+      title: License
+      parent: Licenses
+      nav_order: 0
+
+  -
+    scope:
+      path: "doc/THIRD_PARTY_LICENSES.*"
+    values:
+      title: Third Party Licenses
+      parent: Licenses
+      nav_order: 1
+
+  -
+    scope:
+      path: "doc/CHANGELOG.*"
+    values:
+      nav_order: 6
 
 # Aux links for the upper right navigation
 aux_links:

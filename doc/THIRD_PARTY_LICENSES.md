@@ -1,10 +1,3 @@
----
-layout: default
-title: Third Party Licenses
-parent: Licenses
-nav_order: 1
----
-
 # Third Party Copyrights and License within F3D source
 
 ## cxxopts.hpp:

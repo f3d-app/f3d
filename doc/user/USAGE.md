@@ -1,10 +1,3 @@
----
-layout: default
-title: Usage
-parent: User Documentation
-nav_order: 0
----
-
 # Usage
 
 Once F3D has been [installed](INSTALLATION.md), you should be able to open any [supported file](#supported-file-formats),

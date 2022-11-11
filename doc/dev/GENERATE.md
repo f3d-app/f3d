@@ -1,10 +1,3 @@
----
-layout: default
-title: Generate
-parent: Developer Documentation
-nav_order: 3
----
-
 # How to generate the full coverage report
 
 Requires `gcovr` program and `gcc` toolchain.

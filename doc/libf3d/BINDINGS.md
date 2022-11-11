@@ -1,10 +1,3 @@
----
-layout: default
-title: Bindings
-parent: libf3d Documentation
-nav_order: 3
----
-
 # Bindings
 
 ## Python Bindings

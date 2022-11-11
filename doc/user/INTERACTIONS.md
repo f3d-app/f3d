@@ -1,10 +1,3 @@
----
-layout: default
-title: Interactions
-parent: User Documentation
-nav_order: 4
----
-
 # Interactions
 
 ## Mouse Interactions

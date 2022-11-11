@@ -1,10 +1,3 @@
----
-layout: default
-title: Build
-parent: Developer Documentation
-nav_order: 0
----
-
 # Build guide
 
 F3D uses a CMake based build system, so building F3D just requires installing

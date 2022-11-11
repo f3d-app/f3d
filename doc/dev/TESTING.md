@@ -1,11 +1,4 @@
----
-layout: default
-title: Testing
-parent: Developer Documentation
-nav_order: 1
----
-
-# Testing in F3D
+# Testing
 
 F3D has an expansive suite of tests, you may want to run them locally,
 either to validate your build or because you are contributing to F3D and want to add/modify a test.
