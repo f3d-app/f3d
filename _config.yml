@@ -20,7 +20,6 @@ description: F3D - Fast and minimalist 3D viewer
 url: https://f3d-app.github.io/f3d/
 logo: /resources/logotype.svg
 color_scheme: dark
-google_analytics: UA-214422763-1
 
 # Set default front matter values
 defaults:
@@ -229,3 +228,7 @@ aux_links_new_tab: true
 nav_external_links:
   - title: Download F3D
     url: https://github.com/f3d-app/f3d/releases
+
+# Google Analytics Tracking
+ga_tracking: G-ZCWEYB9KVG
+ga_tracking_anonymize_ip: true
