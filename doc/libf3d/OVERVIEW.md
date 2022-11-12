@@ -1,10 +1,3 @@
----
-layout: default
-title: Overview
-parent: libf3d Documentation
-nav_order: 0
----
-
 # libf3d - A library to render 3D meshes
 
 By Michael Migliore and Mathieu Westphal.

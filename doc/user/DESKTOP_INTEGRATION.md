@@ -1,10 +1,3 @@
----
-layout: default
-title: Desktop Integration
-parent: User Documentation
-nav_order: 6
----
-
 # Desktop Integration
 
 F3D can be integrated in the desktop experience.

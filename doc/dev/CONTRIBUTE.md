@@ -1,10 +1,3 @@
----
-layout: default
-title: Contribute
-parent: Developer Documentation
-nav_order: 2
----
-
 # How to contribute
 
 F3D welcomes all contributors, regardless of skill level or experience!

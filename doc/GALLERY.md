@@ -1,9 +1,3 @@
----
-layout: default
-title: Gallery
-nav_order: 1
----
-
 # Gallery
 
 Examples renderings with their associated command lines.

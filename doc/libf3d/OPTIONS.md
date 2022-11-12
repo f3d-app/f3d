@@ -1,10 +1,3 @@
----
-layout: default
-title: Options
-parent: libf3d Documentation
-nav_order: 2
----
-
 # Options exhaustive list
 
 An option is a string used as a key associated with a value, which are stored in an `options` instance.
