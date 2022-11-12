@@ -1,11 +1,3 @@
----
-layout: default
-title: User Documentation
-nav_order: 2
-has_children: true
-has_toc: false
----
-
 # User Documentation
 
 - [How to use F3D.](USAGE.md)

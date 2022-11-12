@@ -1,10 +1,3 @@
----
-layout: default
-title: Class listing
-parent: libf3d Documentation
-nav_order: 1
----
-
 # Class Listing
 
 ## Engine class

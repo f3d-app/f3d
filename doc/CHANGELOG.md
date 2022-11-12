@@ -1,9 +1,3 @@
----
-layout: default
-title: Changelog
-nav_order: 6
----
-
 # Changelog
 
 ## v1.3.1

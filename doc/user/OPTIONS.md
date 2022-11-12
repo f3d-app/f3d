@@ -1,10 +1,3 @@
----
-layout: default
-title: Options
-parent: User Documentation
-nav_order: 3
----
-
 # Command line options
 
 F3D behavior can be fully controled from the command line using the following options.

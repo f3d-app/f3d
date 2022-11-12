@@ -1,10 +1,3 @@
----
-layout: default
-title: Configuration File
-parent: User Documentation
-nav_order: 5
----
-
 # Configuration File
 
 Almost all the command-line options can be controlled using a configuration file.

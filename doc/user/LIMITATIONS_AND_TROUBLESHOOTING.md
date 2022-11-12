@@ -1,10 +1,3 @@
----
-layout: default
-title: Limitations and Troubleshooting
-parent: User Documentation
-nav_order: 7
----
-
 # Limitations
 
 Here is a non exhaustive list of F3D limitations:

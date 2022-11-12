@@ -1,10 +1,3 @@
----
-layout: default
-title: Installation
-parent: User Documentation
-nav_order: 1
----
-
 # Installation
 
 You can find the binary release packages for Windows, Linux and macOS on the [releases page](https://github.com/f3d-app/f3d/releases).

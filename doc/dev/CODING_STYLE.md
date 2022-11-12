@@ -1,11 +1,4 @@
----
-layout: default
-title: Coding Style
-parent: Developer Documentation
-nav_order: 4
----
-
-# F3D Coding Style
+# Coding Style
 
 F3D use different coding styles in each component, however there are some common rules
 
