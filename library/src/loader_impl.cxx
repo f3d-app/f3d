@@ -5,7 +5,7 @@
 #include "options.h"
 #include "window_impl.h"
 
-#include "F3DReaderFactory.h"
+#include "factory.h"
 #include "vtkF3DGenericImporter.h"
 
 #include <vtkCallbackCommand.h>
@@ -38,23 +38,26 @@ public:
 
   static vtkSmartPointer<vtkImporter> GetImporter(const std::string& fileName, bool geometry)
   {
+    // Find the best compatible reader with scene reading capabilities based on reader scores
+    f3d::reader* reader = f3d::factory::instance()->getReader(fileName);
+
+    if (!reader)
+    {
+      return nullptr;
+    }
+
     if (!geometry)
     {
-      // Try to find the first compatible reader with scene reading capabilities
-      F3DReader* reader = F3DReaderFactory::GetReader(fileName);
-      if (reader)
+      vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(fileName);
+      if (importer)
       {
-        vtkSmartPointer<vtkImporter> importer = reader->CreateSceneReader(fileName);
-        if (importer)
-        {
-          return importer;
-        }
+        return importer;
       }
     }
 
     // Use the generic importer and check if it can process the file
     vtkNew<vtkF3DGenericImporter> importer;
-    importer->SetFileName(fileName);
+    importer->SetInternalReader(reader->createGeometryReader(fileName));
     if (!importer->CanReadFile())
     {
       return nullptr;

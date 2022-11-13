@@ -91,6 +91,9 @@ int F3DStarter::Start(int argc, char** argv)
     f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
   }
 
+  // Load plugins from the app options
+  this->Internals->Parser.LoadPlugins(this->Internals->AppOptions);
+
   // Read config file if needed
   if (!this->Internals->AppOptions.DryRun)
   {

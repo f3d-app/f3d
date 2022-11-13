@@ -9,6 +9,8 @@ Here is an example showing how to use libf3d python bindings:
 ```python
 import f3d
 
+f3d.engine.autoloadPlugins()
+
 eng = f3d.engine(f3d.window.NATIVE)
 eng.getOptions()
   .set("model.scivis.array-name", "Normals")
@@ -32,6 +34,8 @@ import io.github.f3d_app.f3d.*;
 
 public class F3DExample {
   public static void main(String[] args) {
+
+    Engine.autoloadPlugins();
 
     // Always use try-with-resources idiom to ensure the native engine is released
     try (Engine engine = new Engine(Window.Type.NATIVE)) {

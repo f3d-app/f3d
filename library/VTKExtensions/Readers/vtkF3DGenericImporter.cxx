@@ -42,21 +42,17 @@ vtkStandardNewMacro(vtkF3DGenericImporter);
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::UpdateTemporalInformation()
 {
-  if (!this->TemporalInformationUpdated)
+  if (!this->Reader)
   {
-    if (!this->Reader->IsReaderValid())
-    {
-      F3DLog::Print(F3DLog::Severity::Warning, "Reader is not valid\n");
-      return;
-    }
-    this->Reader->UpdateInformation();
-    vtkInformation* readerInfo = this->Reader->GetOutputInformation(0);
-
-    this->NbTimeSteps = readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    this->TimeRange = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
-    this->TimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    this->TemporalInformationUpdated = true;
+    F3DLog::Print(F3DLog::Severity::Warning, "Reader is not valid\n");
+    return;
   }
+  this->Reader->UpdateInformation();
+  vtkInformation* readerInfo = this->Reader->GetOutputInformation(0);
+
+  this->NbTimeSteps = readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  this->TimeRange = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+  this->TimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 }
 
 //----------------------------------------------------------------------------
@@ -120,30 +116,16 @@ bool vtkF3DGenericImporter::GetTemporalInformation(
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
-  if (!this->Reader->IsReaderValid())
-  {
-    F3DLog::Print(F3DLog::Severity::Error,
-      std::string("File '") + this->Reader->GetFileName() + "' cannot be read.\n");
-    return;
-  }
-
   // forward progress event
   vtkNew<vtkEventForwarderCommand> forwarder;
   forwarder->SetTarget(this);
   this->Reader->AddObserver(vtkCommand::ProgressEvent, forwarder);
 
   this->PostPro->SetInputConnection(this->Reader->GetOutputPort());
-  bool ret = this->PostPro->GetExecutive()->Update();
-
-  if (!ret)
-  {
-    F3DLog::Print(F3DLog::Severity::Error,
-      std::string("File '") + this->Reader->GetFileName() + "' cannot be read.\n");
-    return;
-  }
+  this->PostPro->Update();
 
   this->OutputDescription =
-    vtkF3DGenericImporter::GetDataObjectDescription(this->Reader->GetOutput());
+    vtkF3DGenericImporter::GetDataObjectDescription(this->Reader->GetOutputDataObject(0));
 
   vtkPolyData* surface = vtkPolyData::SafeDownCast(this->PostPro->GetOutput());
   vtkImageData* image = vtkImageData::SafeDownCast(this->PostPro->GetOutput(2));
@@ -285,16 +267,16 @@ void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::SetFileName(std::string name)
+void vtkF3DGenericImporter::SetInternalReader(vtkAlgorithm* reader)
 {
-  this->TemporalInformationUpdated = false;
-  this->Reader->SetFileNameAndCreateInternalReader(name);
+  this->Reader = reader;
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
 bool vtkF3DGenericImporter::CanReadFile()
 {
-  return this->Reader->IsReaderValid();
+  return this->Reader != nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -347,4 +329,16 @@ std::string vtkF3DGenericImporter::GetDataObjectDescription(vtkDataObject* objec
 void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
 {
   this->PostPro->UpdateTimeStep(timestep);
+}
+
+//----------------------------------------------------------------------------
+int vtkF3DGenericImporter::ImportBegin()
+{
+  if (this->Reader)
+  {
+    this->Reader->Update();
+    return 1;
+  }
+
+  return 0;
 }

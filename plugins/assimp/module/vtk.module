@@ -1,0 +1,12 @@
+NAME
+  f3d::VTKExtensionsAssimpReader
+DESCRIPTION
+  A VTK module for the Assimp plugin
+DEPENDS
+  VTK::CommonCore
+  VTK::IOImport
+  VTK::IOImage
+  VTK::RenderingOpenGL2
+  assimp::assimp
+TEST_DEPENDS
+  VTK::TestingCore

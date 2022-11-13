@@ -1,0 +1,10 @@
+NAME
+  f3d::VTKExtensionsOCCTReader
+DESCRIPTION
+  A VTK module for the OCCT plugin
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+TEST_DEPENDS
+  VTK::TestingCore
+  VTK::CommonDataModel

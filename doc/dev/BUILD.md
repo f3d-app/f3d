@@ -31,14 +31,15 @@ Here is some CMake options of interest::
 * `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
 * `F3D_WINDOWS_GUI`: On Windows, build a Win32 application (without console).
 * `F3D_BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION`: On Windows, build the shell thumbnails extension.
+* `F3D_PLUGINS_STATIC_BUILD`: Build all plugins as static library (embedded into `libf3d`) and automatically loaded by the application.
 
-Some modules and bindings depending on external libraries can be optionally enabled with the following CMake variables:
+Some modules, plugins and bindings depending on external libraries can be optionally enabled with the following CMake variables:
 
-* `F3D_MODULE_EXODUS`: Support for ExodusII (.ex2) file format. Requires that VTK has been built with `IOExodus` module (and `hdf5`). Enabled by default.
 * `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `VTK_MODULE_ENABLE_VTK_RenderingRayTracing` turned on. Disabled by default.
 * `F3D_MODULE_EXTERNAL_RENDERING`: Support for external render window, Requires that VTK has been built with `VTK_MODULE_ENABLE_VTK_RenderingExternal` turned on. Disabled by default.
-* `F3D_MODULE_OCCT`: Support for STEP and IGES file formats. Requires `OpenCASCADE`. Disabled by default.
-* `F3D_MODULE_ASSIMP`: Support for FBX, DAE, OFF and DXF file formats. Requires `Assimp`. Disabled by default.
-* `F3D_MODULE_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.
+* `F3D_PLUGIN_BUILD_EXODUS`: Support for ExodusII (.ex2) file format. Requires that VTK has been built with `IOExodus` module (and `hdf5`). Enabled by default.
+* `F3D_PLUGIN_BUILD_OCCT`: Support for STEP and IGES file formats. Requires `OpenCASCADE`. Disabled by default.
+* `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF and DXF file formats. Requires `Assimp`. Disabled by default.
+* `F3D_PLUGIN_BUILD_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.
 * `F3D_BINDINGS_PYTHON`: Generate python bindings (requires `Python` and `pybind11`). Disabled by default.
 * `F3D_BINDINGS_JAVA`: Generate java bindings (requires `Java` and `JNI`). Disabled by default.

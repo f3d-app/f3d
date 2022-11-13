@@ -3,11 +3,7 @@
 # should be listed here as reader instanciation is header only
 set(F3D_VTK_MODULES
   VTK::CommonSystem
-  VTK::IOCityGML
-  VTK::IOGeometry
-  VTK::IOPLY
-  VTK::IOXML
-  VTK::IOParallel
+  VTK::IOImage
   VTK::InteractionWidgets
   VTK::jsoncpp
   f3d::VTKExtensionsApplicative
@@ -17,15 +13,6 @@ set(F3D_VTK_MODULES
 )
 
 # Check modules
-if(F3D_MODULE_EXODUS)
-  if(TARGET VTK::IOExodus)
-    message(STATUS "Module: VTK ExodusII found")
-    set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::IOExodus)
-  else()
-    message(FATAL_ERROR "F3D_MODULE_EXODUS option is enabled but VTK::IOExodus is not found")
-  endif()
-endif()
-
 if(F3D_MODULE_RAYTRACING)
   if(TARGET VTK::RenderingRayTracing)
     message(STATUS "VTK::RenderingRayTracing module found")
@@ -72,6 +59,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/camera_impl.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/engine.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/src/factory.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/init.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/interactor.cxx
@@ -141,7 +129,27 @@ endif()
 
 vtk_module_autoinit(TARGETS libf3d MODULES ${F3D_VTK_MODULES})
 
-target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES})
+# The initialize function pointer of the static plugins must be added to the map of static plugins
+# in the factory constructor. When loading a plugin, there's a lookup into this map.
+get_property(F3D_STATIC_PLUGIN_TARGETS GLOBAL PROPERTY F3D_STATIC_PLUGINS)
+set(F3D_STATIC_PLUGIN_MAP "${F3D_STATIC_PLUGIN_TARGETS}")
+set(F3D_STATIC_PLUGIN_EXTERN "${F3D_STATIC_PLUGIN_TARGETS}")
+
+list(TRANSFORM F3D_STATIC_PLUGIN_EXTERN REPLACE "^(.+)$" "extern f3d::plugin* init_plugin_static_\\1()\\\;")
+list(JOIN F3D_STATIC_PLUGIN_EXTERN "\n" F3D_STATIC_PLUGIN_EXTERN)
+
+list(TRANSFORM F3D_STATIC_PLUGIN_MAP REPLACE "^(.+)$" "this->StaticPluginInitializers[\"\\1\"] = init_plugin_static_\\1\\\;")
+list(JOIN F3D_STATIC_PLUGIN_MAP "\n  " F3D_STATIC_PLUGIN_MAP)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/factory.cxx.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/src/factory.cxx"
+  @ONLY)
+
+# libf3d links with the static plugins.
+list(TRANSFORM F3D_STATIC_PLUGIN_TARGETS PREPEND "f3d-plugin-")
+
+target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES} ${F3D_STATIC_PLUGIN_TARGETS})
 target_compile_options(libf3d PUBLIC ${libf3d_compile_options_public} PRIVATE ${libf3d_compile_options_private})
 target_link_options(libf3d PUBLIC ${libf3d_link_options_public})
 
@@ -151,44 +159,11 @@ if(F3D_STRICT_BUILD AND MSVC)
 endif()
 
 if (APPLE OR UNIX)
-  # Make sure rpath is correctly set for libf3d dependencies
-
-  # VTK
-  set(absolute_rpaths "")
+  # Make sure rpath is correctly set for libf3d
   get_target_property(target_type VTK::CommonCore TYPE)
   if (target_type STREQUAL SHARED_LIBRARY)
-    set(absolute_rpaths "$<TARGET_FILE_DIR:VTK::CommonCore>")
+    set_target_properties(libf3d PROPERTIES INSTALL_RPATH "$<TARGET_FILE_DIR:VTK::CommonCore>")
   endif ()
-
-  # assimp
-  if(F3D_MODULE_ASSIMP)
-    get_target_property(target_type assimp::assimp TYPE)
-    if (target_type STREQUAL SHARED_LIBRARY)
-      list(APPEND absolute_rpaths "$<TARGET_FILE_DIR:assimp::assimp>")
-    endif ()
-  endif ()
-
-  # OCCT
-  if(F3D_MODULE_OCCT)
-    get_target_property(target_type TKernel TYPE)
-    if (target_type STREQUAL SHARED_LIBRARY)
-      list(APPEND absolute_rpaths "${OpenCASCADE_LIBRARY_DIR}")
-    endif ()
-  endif ()
-
-  # Alembic/Imath
-  if(F3D_MODULE_ALEMBIC)
-    get_target_property(target_type Alembic::Alembic TYPE)
-    if (target_type STREQUAL SHARED_LIBRARY)
-      list(APPEND absolute_rpaths "$<TARGET_FILE_DIR:Alembic::Alembic>")
-    endif ()
-    get_target_property(target_type Imath::Imath TYPE)
-    if (target_type STREQUAL SHARED_LIBRARY)
-      list(APPEND absolute_rpaths "$<TARGET_FILE_DIR:Imath::Imath>")
-    endif ()
-  endif ()
-
-  set_target_properties(libf3d PROPERTIES INSTALL_RPATH "${absolute_rpaths}")
 endif ()
 
 # testing

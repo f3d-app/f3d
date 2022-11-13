@@ -14,10 +14,11 @@
 #ifndef vtkF3DAlembicImporter_h
 #define vtkF3DAlembicImporter_h
 
-#include <memory>
 #include <vtkImporter.h>
 #include <vtkNew.h>
 #include <vtkVersion.h>
+
+#include <memory>
 
 class vtkF3DAlembicImporter : public vtkImporter
 {

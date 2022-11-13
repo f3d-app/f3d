@@ -21,6 +21,9 @@ public class Engine implements AutoCloseable {
         destroy(mNativeAddress);
     }
 
+    static public native void loadPlugin(String plugin);
+    static public native void autoloadPlugins();
+
     public Loader getLoader() { return mLoader; }
     public Options getOptions() { return mOptions; }
     public Window getWindow() { return mWindow; }

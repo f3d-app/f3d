@@ -1,7 +1,5 @@
 #include "vtkF3DOCCTReader.h"
 
-#include "vtkF3DConfigure.h"
-
 #include <BRepAdaptor_Surface.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
 #include <BRep_Tool.hxx>
@@ -20,7 +18,7 @@
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Solid.hxx>
 
-#if F3D_MODULE_OCCT_XCAF
+#if F3D_PLUGIN_OCCT_XCAF
 #include <IGESCAFControl_Reader.hxx>
 #include <STEPCAFControl_Reader.hxx>
 #include <TDF_ChildIterator.hxx>
@@ -126,7 +124,7 @@ public:
         std::iota(polyline.begin(), polyline.end(), shift);
         linesCells->InsertNextCell(polyline.size(), polyline.data());
 
-#if F3D_MODULE_OCCT_XCAF
+#if F3D_PLUGIN_OCCT_XCAF
         std::array<unsigned char, 3> rgb = { 0, 0, 0 };
         Quantity_Color aColor;
         if (this->ColorTool->GetColor(edge, XCAFDoc_ColorCurv, aColor))
@@ -232,7 +230,7 @@ public:
         }
         trianglesCells->InsertNextCell(3, cell);
 
-#if F3D_MODULE_OCCT_XCAF
+#if F3D_PLUGIN_OCCT_XCAF
         std::array<unsigned char, 3> rgb = { 255, 255, 255 };
         Quantity_Color aColor;
         if (this->ColorTool->GetColor(face, XCAFDoc_ColorSurf, aColor))
@@ -255,7 +253,7 @@ public:
     polydata->SetPolys(trianglesCells);
     polydata->SetLines(linesCells);
 
-#if F3D_MODULE_OCCT_XCAF
+#if F3D_PLUGIN_OCCT_XCAF
     polydata->GetCellData()->SetScalars(colors);
 #endif
 
@@ -263,7 +261,7 @@ public:
     return polydata;
   }
 
-#if F3D_MODULE_OCCT_XCAF
+#if F3D_PLUGIN_OCCT_XCAF
   //----------------------------------------------------------------------------
   void AddLabel(const TDF_Label& label, vtkMatrix4x4* position, vtkMultiBlockDataSet* mb)
   {
@@ -393,7 +391,7 @@ vtkStandardNewMacro(vtkF3DOCCTReader);
 
 //----------------------------------------------------------------------------
 vtkF3DOCCTReader::vtkF3DOCCTReader()
-  : Internals(std::make_unique<vtkF3DOCCTReader::vtkInternals>(this))
+  : Internals(new vtkF3DOCCTReader::vtkInternals(this))
 {
   this->SetNumberOfInputPorts(0);
 }
@@ -424,7 +422,7 @@ private:
   vtkF3DOCCTReader* Reader = nullptr;
 };
 
-#if F3D_MODULE_OCCT_XCAF
+#if F3D_PLUGIN_OCCT_XCAF
 //----------------------------------------------------------------------------
 template<typename T>
 bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Document) doc)
@@ -454,7 +452,7 @@ int vtkF3DOCCTReader::RequestData(
 
   Message::DefaultMessenger()->RemovePrinters(STANDARD_TYPE(Message_PrinterOStream));
 
-#if F3D_MODULE_OCCT_XCAF
+#if F3D_PLUGIN_OCCT_XCAF
   Handle(TDocStd_Document) doc;
   XCAFApp_Application::GetApplication()->NewDocument("MDTV-XCAF", doc);
   if (this->FileFormat == FILE_FORMAT::STEP)

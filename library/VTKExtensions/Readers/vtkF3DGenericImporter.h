@@ -6,10 +6,11 @@
 #ifndef vtkF3DGenericImporter_h
 #define vtkF3DGenericImporter_h
 
-#include "vtkF3DMetaReader.h"
 #include "vtkF3DPostProcessFilter.h"
 
+#include <vtkAlgorithm.h>
 #include <vtkImporter.h>
+#include <vtkSmartPointer.h>
 #include <vtkVersion.h>
 
 class vtkActor;
@@ -31,9 +32,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Specify the name of the file to read.
+   * Specify the VTK reader.
    */
-  void SetFileName(std::string name);
+  void SetInternalReader(vtkAlgorithm* reader);
 
   /**
    * Check if the file can be read.
@@ -140,6 +141,8 @@ protected:
   vtkF3DGenericImporter() = default;
   ~vtkF3DGenericImporter() override = default;
 
+  int ImportBegin() override;
+
   //@{
   /* Standard importer API
    * None of the actors are shown by default
@@ -153,7 +156,7 @@ protected:
 
   void UpdateTemporalInformation();
 
-  vtkNew<vtkF3DMetaReader> Reader;
+  vtkSmartPointer<vtkAlgorithm> Reader;
 
   vtkNew<vtkScalarBarActor> ScalarBarActor;
   vtkNew<vtkActor> GeometryActor;
@@ -168,7 +171,6 @@ protected:
   vtkDataSetAttributes* CellDataForColoring = nullptr;
 
   bool AnimationEnabled = false;
-  bool TemporalInformationUpdated = false;
   int NbTimeSteps = -1;
   double* TimeSteps = nullptr;
   double* TimeRange = nullptr;
