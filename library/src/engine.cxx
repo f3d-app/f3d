@@ -117,7 +117,7 @@ void engine::loadPlugin(const std::string& path)
       std::string fullPath;
 
       // Right now, plugins should be located in the same folder than f3d.exe on Windows
-      // On Linux/macOS, when we are not using a full path, so we rely on LD_LIBRARY_PATH
+      // On Linux/macOS, when we are not using a full path, we rely on LD_LIBRARY_PATH
 #ifdef _WIN32
       std::vector<wchar_t> pathBuf(40000);
       if (GetModuleFileNameW(

@@ -51,7 +51,7 @@ to modify this behavior. For file formats that do not support it, **a default sc
 ## Plugins
 
 If you installed F3D using a package manager, it's possible that the packager chose to bundle the plugins in different packages or to list plugin dependencies as optional dependencies to reduce the reduce the number of dependencies of the main package.
-In this case, in order to open a file that requires a plugin, you will have to make sure all needed dependencies are installed and specify which plugin you want to load in order to be able to open this file. You can either use the `--load-plugin` option or add a line in the [configuration file](CONFIGURATION_FILE.md), if not already.
+In this case, in order to open a file that requires a plugin, you will have to make sure all needed dependencies are installed and specify which plugin you want to load in order to be able to open this file. You can either use the `--load-plugins` option or add a line in the [configuration file](CONFIGURATION_FILE.md), if not already.
 Here is the list of plugins provided officially by F3D:
 
 - **assimp**: FBX, DAE, OFF and DXF support
