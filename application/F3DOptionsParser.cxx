@@ -34,6 +34,7 @@ public:
     std::vector<std::string>& inputs, std::string filePathForConfigBlock = "",
     bool parseCommandLine = true);
   bool InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
+  void LoadPlugins(const F3DAppOptions& appOptions) const;
 
   enum class HasDefault : bool
   {
@@ -181,6 +182,24 @@ private:
 };
 
 //----------------------------------------------------------------------------
+void ConfigurationOptions::LoadPlugins(const F3DAppOptions& appOptions) const
+{
+  try
+  {
+    f3d::engine::autoloadPlugins();
+
+    for (const std::string& plugin : appOptions.Plugins)
+    {
+      f3d::engine::loadPlugin(plugin);
+    }
+  }
+  catch (const f3d::engine::plugin_exception& e)
+  {
+    f3d::log::warn("Plugin failed to load: ", e.what());
+  }
+}
+
+//----------------------------------------------------------------------------
 void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& options,
   std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool parseCommandLine)
 {
@@ -202,11 +221,12 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "help", "h", "Print help");
     this->DeclareOption(grp0, "version", "", "Print version details");
-    this->DeclareOption(grp0, "readers-list", "", "Print the list of file types");
+    this->DeclareOption(grp0, "readers-list", "", "Print the list of readers");
     this->DeclareOption(grp0, "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations.", appOptions.UserConfigFile,  LocalHasDefaultNo, MayHaveConfig::NO , "<filePath/filename/fileStem>");
     this->DeclareOption(grp0, "dry-run", "", "Do not read the configuration file", appOptions.DryRun,  HasDefault::YES, MayHaveConfig::NO );
     this->DeclareOption(grp0, "no-render", "", "Verbose mode without any rendering, only for the first file", appOptions.NoRender,  HasDefault::YES, MayHaveConfig::YES );
     this->DeclareOption(grp0, "max-size", "", "Maximum size in Mib of a file to load, -1 means unlimited", appOptions.MaxSize,  HasDefault::YES, MayHaveConfig::YES, "<size in Mib>");
+    this->DeclareOption(grp0, "load-plugins", "", "List of plugins to load separated with a comma", appOptions.Plugins, LocalHasDefaultNo, MayHaveConfig::YES, "<paths or names>");
 
     auto grp1 = cxxOptions.add_options("General");
     this->DeclareOption(grp1, "verbose", "", "Enable verbose mode, providing more information about the loaded data in the console output", appOptions.Verbose,  HasDefault::YES, MayHaveConfig::YES );
@@ -306,6 +326,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
       if (result.count("readers-list") > 0)
       {
+        this->LoadPlugins(appOptions);
         this->PrintReadersList();
         throw F3DExNoProcess("reader list requested");
       }
@@ -376,10 +397,6 @@ void ConfigurationOptions::PrintVersion()
   f3d::log::info("Compiler: " + libInfo.Compiler + ".");
   f3d::log::info("External rendering module: " + libInfo.ExternalRenderingModule + ".");
   f3d::log::info("Raytracing module: " + libInfo.RaytracingModule + ".");
-  f3d::log::info("Exodus module: " + libInfo.ExodusModule + ".");
-  f3d::log::info("OpenCASCADE module: " + libInfo.OpenCASCADEModule + ".");
-  f3d::log::info("Assimp module: " + libInfo.AssimpModule + ".");
-  f3d::log::info("Alembic module: " + libInfo.AlembicModule + ".");
   f3d::log::info("VTK version: " + libInfo.VTKVersion + ".");
   f3d::log::info(libInfo.PreviousCopyright + ".");
   f3d::log::info(libInfo.Copyright + ".");
@@ -612,4 +629,10 @@ void F3DOptionsParser::GetOptions(
   F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& files)
 {
   return this->ConfigOptions->GetOptions(appOptions, options, files);
+}
+
+//----------------------------------------------------------------------------
+void F3DOptionsParser::LoadPlugins(const F3DAppOptions& appOptions) const
+{
+  return this->ConfigOptions->LoadPlugins(appOptions);
 }

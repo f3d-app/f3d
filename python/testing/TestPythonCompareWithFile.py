@@ -6,6 +6,8 @@ reference = sys.argv[1] + "baselines/TestPythonCompareWithFile.png"
 output = sys.argv[2] + "TestPythonCompareWithFile.png"
 outputDiff = sys.argv[2] + "TestPythonCompareWithFile.diff.png"
 
+f3d.engine.autoloadPlugins()
+
 engine = f3d.engine(f3d.window.NATIVE_OFFSCREEN)
 engine.getWindow().setSize(300, 300)
 

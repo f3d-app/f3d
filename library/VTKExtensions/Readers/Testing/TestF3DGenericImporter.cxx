@@ -1,31 +1,37 @@
+#include <vtkGLTFReader.h>
 #include <vtkNew.h>
 #include <vtkTestUtilities.h>
 
-#include "F3DReaderInstantiator.h"
 #include "vtkF3DGenericImporter.h"
 
 #include <iostream>
 
 int TestF3DGenericImporter(int argc, char* argv[])
 {
-  F3DReaderInstantiator ReaderInstantiator;
-
   vtkNew<vtkF3DGenericImporter> importer;
 
-  // Test invalid reader filepath
-  std::string dummyFilename = std::string(argv[1]) + "data/foo.dummy";
-  importer->SetFileName(dummyFilename);
   if (importer->CanReadFile())
   {
-    std::cerr << "Importer unexpectedly can read a non-existent file" << std::endl;
+    std::cerr << "Importer unexpectedly can read a file without internal reader" << std::endl;
     return EXIT_FAILURE;
   }
   importer->Update();
   importer->Print(cout);
+  if (importer->GetNumberOfAnimations() != 0)
+  {
+    std::cerr << "Unexpected number of animations" << std::endl;
+    return EXIT_FAILURE;
+  }
 
-  // Test valid reader filepath
-  std::string filename = std::string(argv[1]) + "data/small.ex2";
-  importer->SetFileName(filename);
+  // Test valid reader
+  vtkNew<vtkGLTFReader> reader;
+
+  std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
+  reader->SetFileName(filename.c_str());
+  reader->UpdateInformation();
+  reader->EnableAnimation(0);
+
+  importer->SetInternalReader(reader);
   if (!importer->CanReadFile())
   {
     std::cerr << "Importer unexpectedly can not read a valid file" << std::endl;

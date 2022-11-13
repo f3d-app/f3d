@@ -1,0 +1,100 @@
+#include "factory.h"
+
+#include "log.h"
+
+@F3D_STATIC_PLUGIN_EXTERN@
+
+namespace f3d
+{
+//----------------------------------------------------------------------------
+factory* factory::instance()
+{
+  static factory instance;
+  return &instance;
+}
+
+//----------------------------------------------------------------------------
+factory::factory()
+{
+  @F3D_STATIC_PLUGIN_MAP@
+}
+
+//----------------------------------------------------------------------------
+const std::vector<plugin*>& factory::getPlugins()
+{
+  return this->Plugins;
+}
+
+//----------------------------------------------------------------------------
+factory::plugin_initializer_t factory::getStaticInitializer(const std::string& pluginName)
+{
+  auto it = this->StaticPluginInitializers.find(pluginName);
+  if (it != this->StaticPluginInitializers.end())
+  {
+    return it->second;
+  }
+  return nullptr;
+}
+
+//----------------------------------------------------------------------------
+reader* factory::getReader(const std::string& fileName)
+{
+  int bestScore = -1;
+  reader* bestReader = nullptr;
+
+  for (auto p : this->Plugins)
+  {
+    for (auto r : p->getReaders())
+    {
+      if (r->getScore() > bestScore && r->canRead(fileName))
+      {
+        bestScore = r->getScore();
+        bestReader = r.get();
+      }
+    }
+  }
+
+  return bestReader;
+}
+
+//----------------------------------------------------------------------------
+void factory::load(plugin * r)
+{
+  if (!this->registerOnce(r))
+  {
+    log::debug("Plugin \"" + r->getName() + "\" is already loaded.");
+  }
+}
+
+//----------------------------------------------------------------------------
+void factory::autoload()
+{
+  for (auto& [str, init] : this->StaticPluginInitializers)
+  {
+    this->registerOnce(init());
+  }
+}
+
+//----------------------------------------------------------------------------
+bool factory::registerOnce(plugin* p)
+{
+  if (std::find(this->Plugins.begin(), this->Plugins.end(), p) == this->Plugins.end())
+  {
+    this->Plugins.push_back(p);
+
+    log::debug("Loading plugin \"" + p->getName() + "\"");
+    log::debug("  Version: " + p->getVersion());
+    log::debug("  Description: " + p->getDescription());
+    log::debug("  Readers:");
+
+    for (auto r : p->getReaders())
+    {
+      log::debug("    " + r->getLongDescription());
+    }
+
+    return true;
+  }
+
+  return false;
+}
+}

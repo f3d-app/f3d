@@ -175,7 +175,7 @@ vtkStandardNewMacro(vtkF3DAlembicImporter);
 
 //----------------------------------------------------------------------------
 vtkF3DAlembicImporter::vtkF3DAlembicImporter()
-  : Internals(std::make_unique<vtkF3DAlembicImporter::vtkInternals>())
+  : Internals(new vtkF3DAlembicImporter::vtkInternals())
 {
 }
 

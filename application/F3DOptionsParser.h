@@ -40,6 +40,7 @@ struct F3DAppOptions
   std::vector<double> CameraPosition = { 0 };
   std::vector<double> CameraViewUp = { 0 };
   double CameraViewAngle = 0.0;
+  std::vector<std::string> Plugins;
 };
 
 class F3DOptionsParser
@@ -76,6 +77,11 @@ public:
    */
   void UpdateOptions(const std::string& filePath, F3DAppOptions& appOptions, f3d::options& options,
     bool parseCommandLine);
+
+  /**
+   * Load the plugins specified in the app options.
+   */
+  void LoadPlugins(const F3DAppOptions& appOptions) const;
 
   F3DOptionsParser();
   ~F3DOptionsParser();

@@ -186,5 +186,8 @@ PYBIND11_MODULE(f3d, module)
     .def("getLoader", &f3d::engine::getLoader, py::return_value_policy::reference)
     .def("getOptions", &f3d::engine::getOptions, py::return_value_policy::reference)
     .def("setOptions", py::overload_cast<const f3d::options&>(&f3d::engine::setOptions))
-    .def("getWindow", &f3d::engine::getWindow, py::return_value_policy::reference);
+    .def("getWindow", &f3d::engine::getWindow, py::return_value_policy::reference)
+    .def_static("loadPlugin", &f3d::engine::loadPlugin, "Load a plugin")
+    .def_static(
+      "autoloadPlugins", &f3d::engine::autoloadPlugins, "Automatically load internal plugins");
 }
