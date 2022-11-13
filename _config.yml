@@ -31,7 +31,6 @@ defaults:
         path: https://user-images.githubusercontent.com/3129530/201317344-092db03d-8616-45b9-b606-30d22cda2eff.png
         height: 1200
         width: 630
-      layout: default
       description: "F3D - Fast and minimalist 3D viewer"
       has_toc: false
 
@@ -42,6 +41,13 @@ defaults:
       title: Home
       nav_order: 0
       permalink: /
+      layout: default
+
+  -
+    scope:
+      path: "doc/*"
+    values:
+      layout: default
 
   -
     scope:
@@ -201,6 +207,7 @@ defaults:
       title: License
       parent: Licenses
       nav_order: 0
+      layout: default
 
   -
     scope:
