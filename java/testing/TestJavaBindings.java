@@ -1,4 +1,4 @@
-import io.github.f3d_app.f3d.*;
+import app.f3d.F3D.*;
 
 public class TestJavaBindings {
 

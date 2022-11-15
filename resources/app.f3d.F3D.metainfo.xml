@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+    <id>app.f3d.F3D</id>
+    <launchable type="desktop-id">f3d.desktop</launchable>
+    <name>F3D</name>
+    <summary>A fast and minimalist 3D viewer</summary>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>BSD-3-Clause</project_license>
+    <description>
+        <p>
+            A VTK-based 3D viewer following the KISS principle, so it is minimalist,
+            efficient, has no GUI, has simple interaction mechanisms and is fully
+            controllable using arguments on the command line.
+        </p> 
+    </description>
+    <url type="homepage">https://f3d.app/</url>
+    <url type="help">https://f3d.app/doc/user/README_USER.html</url>
+    <url type="bugtracker">https://github.com/f3d-app/f3d/issues</url>
+    <screenshots>
+        <screenshot type="default">
+            <image>https://user-images.githubusercontent.com/3129530/194735416-3f386437-456c-4145-9b5e-6bb6451d7e9a.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://user-images.githubusercontent.com/3129530/194735363-d2be23bb-90b6-4e90-941d-14b6dc24b476.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://user-images.githubusercontent.com/3129530/194735370-4d1f067c-704c-4118-9d94-c1adf4039c39.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://user-images.githubusercontent.com/3129530/194735376-3a476643-00d6-4cfc-9a88-e0dd33658564.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://user-images.githubusercontent.com/3129530/194735272-5bcd3e7c-a333-41f5-8066-9b0bec9885e8.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://user-images.githubusercontent.com/3129530/194735378-b8be4df2-e030-4d13-b12f-24806cbb385b.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://user-images.githubusercontent.com/3129530/194735377-127fa5d8-ece5-40c7-8176-672279ebdacc.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://user-images.githubusercontent.com/3129530/194735354-486999dd-3c57-4ab1-a9ad-b8e97bac0da0.png</image>
+        </screenshot>
+    </screenshots>
+    <content_rating type="oars-1.1"/>
+</component>
