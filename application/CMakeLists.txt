@@ -57,8 +57,12 @@ set(f3d_link_options_public "")
 
 # F3D_STRICT_BUILD
 list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})
-if(F3D_STRICT_BUILD AND MSVC)
-  target_compile_definitions(f3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
+if(F3D_STRICT_BUILD)
+  if(MSVC)
+    target_compile_definitions(f3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
+  elseif(APPLE)
+    target_compile_definitions(f3d PRIVATE GL_SILENCE_DEPRECATION)
+  endif()
 endif()
 
 # Coverage
