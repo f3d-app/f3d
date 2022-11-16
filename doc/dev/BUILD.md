@@ -26,7 +26,7 @@ then build the software using your build system.
 
 Here is some CMake options of interest::
 * `F3D_BUILD_APPLICATION`: Build the F3D executable.
-* `F3D_INSTALL_SDK`: Install the F3D SDK for the [libf3d](../libf3d/README.md).
+* `F3D_INSTALL_SDK`: Install the F3D SDK for the [libf3d](../libf3d/README_LIBF3D.md).
 * `BUILD_TESTING`: Enable the [tests](TESTING.md).
 * `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
 * `F3D_WINDOWS_GUI`: On Windows, build a Win32 application (without console).

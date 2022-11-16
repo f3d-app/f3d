@@ -102,7 +102,7 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
   install(FILES "${CMAKE_SOURCE_DIR}/resources/completion.fish"
     DESTINATION "share/fish/vendor_completions.d" COMPONENT shellext
     RENAME "f3d.fish")
-  install(FILES "${CMAKE_SOURCE_DIR}/resources/io.github.f3d_app.f3d.metainfo.xml"
+  install(FILES "${CMAKE_SOURCE_DIR}/resources/app.f3d.F3D.metainfo.xml"
     DESTINATION "share/metainfo" COMPONENT assets)
   if(TARGET man)
     install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
