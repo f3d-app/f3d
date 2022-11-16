@@ -30,7 +30,7 @@ Make sure to set `java.library.path` to the path where the JNI library is built.
 Here is an example showing how to use libf3d Java bindings:
 
 ```java
-import io.github.f3d_app.f3d.*;
+import app.f3d.F3D.*;
 
 public class F3DExample {
   public static void main(String[] args) {

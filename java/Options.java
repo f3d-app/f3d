@@ -1,4 +1,4 @@
-package io.github.f3d_app.f3d;
+package app.f3d.F3D;
 
 public class Options {
 

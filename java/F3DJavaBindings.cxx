@@ -1,16 +1,16 @@
 // Automatically generated headers
-#include <io_github_f3d_app_f3d_Camera.h>
-#include <io_github_f3d_app_f3d_Engine.h>
-#include <io_github_f3d_app_f3d_Loader.h>
-#include <io_github_f3d_app_f3d_Options.h>
-#include <io_github_f3d_app_f3d_Window.h>
+#include <app_f3d_F3D_Camera.h>
+#include <app_f3d_F3D_Engine.h>
+#include <app_f3d_F3D_Loader.h>
+#include <app_f3d_F3D_Options.h>
+#include <app_f3d_F3D_Window.h>
 
 #include <engine.h>
 #include <log.h>
 
 #include <cassert>
 
-#define JAVA_BIND(Cls, Func) JNICALL Java_io_github_f3d_1app_f3d_##Cls##_##Func
+#define JAVA_BIND(Cls, Func) JNICALL Java_app_f3d_F3D_##Cls##_##Func
 
 inline f3d::engine* GetEngine(JNIEnv* env, jobject self)
 {
@@ -40,7 +40,7 @@ extern "C"
   {
     // read cursor
     jmethodID method =
-      env->GetMethodID(env->FindClass("io/github/f3d_app/f3d/Window$Type"), "ordinal", "()I");
+      env->GetMethodID(env->FindClass("app/f3d/F3D/Window$Type"), "ordinal", "()I");
     jint itype = env->CallIntMethod(windowType, method);
 
     return reinterpret_cast<jlong>(new f3d::engine(static_cast<f3d::window::Type>(itype)));
@@ -56,7 +56,7 @@ extern "C"
   {
     // read cursor
     jmethodID method = env->GetMethodID(
-      env->FindClass("io/github/f3d_app/f3d/Loader$LoadFileEnum"), "ordinal", "()I");
+      env->FindClass("app/f3d/F3D/Loader$LoadFileEnum"), "ordinal", "()I");
     jint icursor = env->CallIntMethod(cursor, method);
 
     GetEngine(env, self)->getLoader().loadFile(static_cast<f3d::loader::LoadFileEnum>(icursor));
