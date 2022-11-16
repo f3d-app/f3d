@@ -188,6 +188,7 @@ macro(f3d_plugin_build)
   set_target_properties(f3d-plugin-${F3D_PLUGIN_NAME} PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${F3D_PLUGIN_OUTPUT_DIRECTORY}"
     POSITION_INDEPENDENT_CODE ON
+    CXX_VISIBILITY_PRESET hidden
     )
 
   target_include_directories(f3d-plugin-${F3D_PLUGIN_NAME}
