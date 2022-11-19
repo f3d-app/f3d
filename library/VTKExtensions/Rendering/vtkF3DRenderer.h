@@ -27,7 +27,7 @@ public:
   static vtkF3DRenderer* New();
   vtkTypeMacro(vtkF3DRenderer, vtkOpenGLRenderer);
 
-  //@{
+  ///@{
   /**
    * Set visibility of different actors
    */
@@ -38,10 +38,10 @@ public:
   void ShowMetaData(bool show);
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
-  //@}
+  ///@}
 
   using vtkOpenGLRenderer::SetBackground;
-  //@{
+  ///@{
   /**
    * Set different actors parameters
    */
@@ -51,9 +51,9 @@ public:
   void SetHDRIFile(const std::string& hdriFile);
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set usages and configurations of different render passes
    */
@@ -65,15 +65,15 @@ public:
   void SetUseToneMappingPass(bool use);
   void SetUseBlurBackground(bool use);
   void SetRaytracingSamples(int samples);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get UseTrackball
    */
   void SetUseTrackball(bool use);
   vtkGetMacro(UseTrackball, bool);
-  //@}
+  ///@}
 
   /**
    * Reimplemented to handle cheat sheet and timer

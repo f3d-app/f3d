@@ -1,14 +1,3 @@
-/**
- * @class   log
- * @brief   Class used to show logs in F3D
- *
- * A class to output logs to the standard output.
- * It supports different levels, errors, warnings and info, with associated coloring.
- * A few static methods exists to control the coloring and the verbosity level
- * A waitForUser utility static method exist for windows.
- *
- */
-
 #ifndef f3d_log_h
 #define f3d_log_h
 
@@ -19,6 +8,16 @@
 
 namespace f3d
 {
+/**
+ * @class   log
+ * @brief   Class used to show logs in F3D
+ *
+ * A class to output logs to the standard output.
+ * It supports different levels, errors, warnings and info, with associated coloring.
+ * A few static methods exists to control the coloring and the verbosity level
+ * A waitForUser utility static method exist for windows.
+ *
+ */
 class F3D_EXPORT log
 {
 public:

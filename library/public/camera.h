@@ -1,13 +1,3 @@
-/**
- * @class   camera
- * @brief   Abstract class to control a camera in a window
- *
- * A class to control a camera in a window.
- * When modifying the Position/FocalPoint/ViewUp API or the camera movements API,
- * the view up is automatically orthogonalized.
- * All angles are in degrees.
- */
-
 #ifndef f3d_camera_h
 #define f3d_camera_h
 
@@ -19,10 +9,19 @@
 
 namespace f3d
 {
+/**
+ * @class   camera
+ * @brief   Abstract class to control a camera in a window
+ *
+ * A class to control a camera in a window.
+ * When modifying the Position/FocalPoint/ViewUp API or the camera movements API,
+ * the view up is automatically orthogonalized.
+ * All angles are in degrees.
+ */
 class F3D_EXPORT camera
 {
 public:
-  //@{
+  ///@{
   /**
    * Set/Get the camera parameters.
    * Angles are in degrees.
@@ -39,9 +38,9 @@ public:
   virtual camera& setViewAngle(const angle_deg_t& angle) = 0;
   virtual angle_deg_t getViewAngle() = 0;
   virtual void getViewAngle(angle_deg_t& angle) = 0;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Standard camera manipulation methods.
    * Angles are in degrees.
@@ -52,7 +51,7 @@ public:
   virtual camera& yaw(angle_deg_t angle) = 0;
   virtual camera& elevation(angle_deg_t angle) = 0;
   virtual camera& pitch(angle_deg_t angle) = 0;
-  //@}
+  ///@}
 
   /**
    * Store the current camera configuration as default.

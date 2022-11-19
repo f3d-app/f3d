@@ -24,13 +24,13 @@ public:
   vtkTypeMacro(vtkF3DAssimpImporter, vtkImporter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  //@{
+  ///@{
   /**
    * Set/Get the file name.
    */
   vtkSetMacro(FileName, std::string);
   vtkGetMacro(FileName, std::string);
-  //@}
+  ///@}
 
   /**
    * Update actors at the given timestep.
@@ -47,7 +47,7 @@ public:
    */
   std::string GetAnimationName(vtkIdType animationIndex) override;
 
-  //@{
+  ///@{
   /**
    * Enable/Disable/Get the status of specific animations
    * Only one single animation can be enabled
@@ -55,7 +55,7 @@ public:
   void EnableAnimation(vtkIdType animationIndex) override;
   void DisableAnimation(vtkIdType animationIndex) override;
   bool IsAnimationEnabled(vtkIdType animationIndex) override;
-  //@}
+  ///@}
 
   /**
    * Return importer description.

@@ -24,7 +24,7 @@ class window_impl;
 class loader_impl : public loader
 {
 public:
-  //@{
+  ///@{
   /**
    * Documented public API
    */
@@ -43,7 +43,7 @@ public:
 
   void getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
     std::string& fileInfo) const override;
-  //@}
+  ///@}
 
   /**
    * Implementation only API.

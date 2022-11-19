@@ -1,11 +1,3 @@
-/**
- * @class   window
- * @brief   Abstract class to render in a window or an image
- *
- * A class to render things in a window or an image.
- * An icon and windowName can be set which can be shown by a window manager.
- */
-
 #ifndef f3d_window_h
 #define f3d_window_h
 
@@ -17,6 +9,13 @@
 
 namespace f3d
 {
+/**
+ * @class   window
+ * @brief   Abstract class to render in a window or an image
+ *
+ * A class to render things in a window or an image.
+ * An icon and windowName can be set which can be shown by a window manager.
+ */
 class F3D_EXPORT window
 {
 public:

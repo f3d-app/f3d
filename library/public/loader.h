@@ -1,3 +1,13 @@
+#ifndef f3d_loader_h
+#define f3d_loader_h
+
+#include "export.h"
+
+#include <string>
+#include <vector>
+
+namespace f3d
+{
 /**
  * @class   loader
  * @brief   Class to load files in F3D
@@ -10,17 +20,6 @@
  * The current file can be changed either on loadFile with a dedicated enum or
  * by using setCurrentFileIndex.
  */
-
-#ifndef f3d_loader_h
-#define f3d_loader_h
-
-#include "export.h"
-
-#include <string>
-#include <vector>
-
-namespace f3d
-{
 class F3D_EXPORT loader
 {
 public:

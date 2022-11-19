@@ -1,11 +1,3 @@
-/**
- * @class   interactor
- * @brief   Class used to control interaction and animation
- *
- * A class to control interaction with the window as well as animation.
- * It also provide a timer callback if needed and can record/play interaction file.
- */
-
 #ifndef f3d_interactor_h
 #define f3d_interactor_h
 
@@ -21,6 +13,13 @@
 
 namespace f3d
 {
+/**
+ * @class   interactor
+ * @brief   Class used to control interaction and animation
+ *
+ * A class to control interaction with the window as well as animation.
+ * It also provide a timer callback if needed and can record/play interaction file.
+ */
 class F3D_EXPORT interactor
 {
 public:
@@ -58,7 +57,7 @@ public:
    */
   virtual void removeTimerCallBack(unsigned long id) = 0;
 
-  //@{
+  ///@{
   /**
    * Control the animation
    */
@@ -66,15 +65,15 @@ public:
   virtual void startAnimation() = 0;
   virtual void stopAnimation() = 0;
   virtual bool isPlayingAnimation() = 0;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Control if camera movements are enabled, which they are by default
    */
   virtual void enableCameraMovement() = 0;
   virtual void disableCameraMovement() = 0;
-  //@}
+  ///@}
 
   /**
    * Play a VTK interaction file

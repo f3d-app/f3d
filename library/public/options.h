@@ -1,11 +1,3 @@
-/**
- * @class   options
- * @brief   Class used to control the different options
- *
- * A class to control the different options of f3d.
- * See the README_libf3d.md for the full listing of options
- */
-
 #ifndef f3d_options_h
 #define f3d_options_h
 
@@ -17,10 +9,17 @@
 
 namespace f3d
 {
+/**
+ * @class   options
+ * @brief   Class used to control the different options
+ *
+ * A class to control the different options of f3d.
+ * See the README_libf3d.md for the full listing of options
+ */
 class F3D_EXPORT options
 {
 public:
-  //@{
+  ///@{
   /**
    * Default/Copy/move constructors/operators
    */
@@ -30,9 +29,9 @@ public:
   options& operator=(const options& opt) noexcept;
   options(options&& other) noexcept;
   options& operator=(options&& other) noexcept;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Setters for all supported types
    */
@@ -45,9 +44,9 @@ public:
   options& set(const std::string& name, const std::vector<double>& values);
   options& set(const std::string& name, std::initializer_list<int> values);
   options& set(const std::string& name, std::initializer_list<double> values);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Copy the option value into the provided reference, for all supported types,
    */
@@ -57,9 +56,9 @@ public:
   void get(const std::string& name, std::string& value) const;
   void get(const std::string& name, std::vector<int>& value) const;
   void get(const std::string& name, std::vector<double>& value) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Explicit getters for all supported types
    */
@@ -69,9 +68,9 @@ public:
   std::string getAsString(const std::string& name) const;
   std::vector<int> getAsIntVector(const std::string& name) const;
   std::vector<double> getAsDoubleVector(const std::string& name) const;
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Explicit getters to actual reference to the options variable, for all supported types.
    * Modifying the returned reference will modify the option.
@@ -84,7 +83,7 @@ public:
   std::string& getAsStringRef(const std::string& name);
   std::vector<int>& getAsIntVectorRef(const std::string& name);
   std::vector<double>& getAsDoubleVectorRef(const std::string& name);
-  //@}
+  ///@}
 
   /**
    * A boolean option specific method to toggle it
@@ -109,19 +108,24 @@ public:
    */
   std::vector<std::string> getNames();
 
-  //@{
   /**
-   * Options specific exceptions
+   * An exception that can be thrown by the options 
+   * when a provided option type is incompatible with 
+   * its internal type.
    */
   struct incompatible_exception : public exception
   {
     incompatible_exception(const std::string& what = "");
   };
+
+  /**
+   * An exception that can be thrown by the options 
+   * when a provided option does not exist.
+   */
   struct inexistent_exception : public exception
   {
     inexistent_exception(const std::string& what = "");
   };
-  //@}
 
 private:
   class internals;

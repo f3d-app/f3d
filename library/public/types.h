@@ -1,8 +1,3 @@
-/**
- * @namespace   types
- * @brief   Namespace containing types used in the libf3d API
- */
-
 #ifndef f3d_types_h
 #define f3d_types_h
 
