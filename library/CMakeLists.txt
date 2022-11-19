@@ -1,6 +1,6 @@
 # Define VTK modules to link libf3d with
 # Note that readers/importers specific modules
-# should be listed here as reader instanciation is header only
+# should be listed here as reader instantiation is header only
 set(F3D_VTK_MODULES
   VTK::CommonSystem
   VTK::IOImage

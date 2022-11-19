@@ -86,7 +86,7 @@ public:
 
   /**
    * Save an image to a file in .png format.
-   * Throw an image::write_exception if image cannot be writen.
+   * Throw an image::write_exception if image cannot be written.
    */
   void save(const std::string& path) const;
 

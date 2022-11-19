@@ -63,7 +63,7 @@ public:
   std::string GetOutputsDescription() override;
 
   /**
-   * Get temporal informations for the currently enabled animations.
+   * Get temporal information for the currently enabled animations.
    * the three returned arguments can be defined, or not.
    * Return true in case of success, false otherwise.
    */

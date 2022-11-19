@@ -1,5 +1,5 @@
 name: 'Install Assimpp Dependency'
-description: 'Install Assimp Depency using cache when possible'
+description: 'Install Assimp Dependency using cache when possible'
 inputs:
   os:
     description: 'OS to build on'
