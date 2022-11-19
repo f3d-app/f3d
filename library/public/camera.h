@@ -21,7 +21,7 @@ namespace f3d
 class F3D_EXPORT camera
 {
 public:
-  ///@{
+  ///@{ @name Parameters
   /**
    * Set/Get the camera parameters.
    * Angles are in degrees.
@@ -40,7 +40,7 @@ public:
   virtual void getViewAngle(angle_deg_t& angle) = 0;
   ///@}
 
-  ///@{
+  ///@{ @name Manipulation
   /**
    * Standard camera manipulation methods.
    * Angles are in degrees.

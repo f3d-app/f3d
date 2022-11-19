@@ -25,9 +25,9 @@ public:
    */
   explicit image(const std::string& path);
 
-  ///@{
+  ///@{ @name Constructors
   /**
-   * Default/copy/move constructors/operators
+   * Default/copy/move constructors/operators.
    */
   image();
   ~image();
@@ -37,7 +37,7 @@ public:
   image& operator=(image&& img) noexcept;
   ///@}
 
-  ///@{
+  ///@{ @name Operators
   /**
    * Comparison operators, uses image::compare with a threshold of 0.
    */
@@ -45,28 +45,27 @@ public:
   bool operator!=(const image& reference) const;
   ///@}
 
-  ///@{
+  ///@{ @name Resolution
   /**
-   * Set/Get image resolution
+   * Set/Get image resolution.
    */
   unsigned int getWidth() const;
   unsigned int getHeight() const;
   image& setResolution(unsigned int width, unsigned int height);
   ///@}
 
-  ///@{
+  ///@{ @name Channel Count
   /**
-   * Set/Get image channel count
+   * Set/Get image channel count.
    */
   unsigned int getChannelCount() const;
   image& setChannelCount(unsigned int dim);
   ///@}
 
-  ///@{
+  ///@{ @name Buffer Data
   /**
-   * Set/Get image buffer data
-   * Its size is expected to be width * height * channelCount
-   *
+   * Set/Get image buffer data.
+   * Its size is expected to be `width * height * channelCount`.
    */
   image& setData(unsigned char* buffer);
   unsigned char* getData() const;
@@ -78,21 +77,21 @@ public:
    * this outputs the resulting diff and error and return false,
    * return true otherwise.
    * The error is based on the pixel value and accumulated over neighbors pixels.
-   * 0: Pixel perfect comparison
-   * 50: Visually indistinguishable
-   * 100: Small visible difference
-   * 300: Comparable images
+   * 0: Pixel perfect comparison.
+   * 50: Visually indistinguishable.
+   * 100: Small visible difference.
+   * 300: Comparable images.
    */
   bool compare(const image& reference, double threshold, image& diff, double& error) const;
 
   /**
-   * Save an image to a file in .png format
+   * Save an image to a file in .png format.
    * Throw an image::write_exception if image cannot be writen.
    */
   void save(const std::string& path) const;
 
   /**
-   * An exception that can be thrown by the image when there 
+   * An exception that can be thrown by the image when there.
    * is an error on write.
    */
   struct write_exception : public exception
@@ -101,7 +100,7 @@ public:
   };
 
   /**
-   * An exception that can be thrown by the image 
+   * An exception that can be thrown by the image.
    * when there is an error on read.
    */
   struct read_exception : public exception

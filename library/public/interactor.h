@@ -48,18 +48,18 @@ public:
 
   /**
    * Use this method to create your own timer callback. You callback will be called once every time
-   * ms. Return an id to use in removeTimeCallBack
+   * ms. Return an id to use in removeTimeCallBack.
    */
   virtual unsigned long createTimerCallBack(double time, std::function<void()> callBack) = 0;
 
   /**
-   * Remove a previously created timer callback using the id
+   * Remove a previously created timer callback using the id.
    */
   virtual void removeTimerCallBack(unsigned long id) = 0;
 
-  ///@{
+  ///@{ @name Animation
   /**
-   * Control the animation
+   * Control the animation.
    */
   virtual void toggleAnimation() = 0;
   virtual void startAnimation() = 0;
@@ -67,36 +67,36 @@ public:
   virtual bool isPlayingAnimation() = 0;
   ///@}
 
-  ///@{
+  ///@{ @name Movement
   /**
-   * Control if camera movements are enabled, which they are by default
+   * Control if camera movements are enabled, which they are by default.
    */
   virtual void enableCameraMovement() = 0;
   virtual void disableCameraMovement() = 0;
   ///@}
 
   /**
-   * Play a VTK interaction file
+   * Play a VTK interaction file.
    */
   virtual bool playInteraction(const std::string& file) = 0;
 
   /**
-   * Start interaction and record it all in a VTK interaction file
+   * Start interaction and record it all in a VTK interaction file.
    */
   virtual bool recordInteraction(const std::string& file) = 0;
 
   /**
-   * Start the interactor
+   * Start the interactor.
    */
   virtual void start() = 0;
 
   /**
-   * Stop the interactor
+   * Stop the interactor.
    */
   virtual void stop() = 0;
 
   /**
-   * Get a structure of strings describing default interactions
+   * Get a structure of strings describing default interactions.
    */
   static const std::vector<std::pair<std::string, std::string> >& getDefaultInteractionsInfo();
 

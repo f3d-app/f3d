@@ -22,10 +22,10 @@ public:
   /**
    * Enumeration of supported window types
    * =====================================
-   * NONE: A mock window without rendering capabilities
-   * NATIVE: A window using the native graphical stack
-   * NATIVE_OFFSCREEN: A native window rendering to an offscreen buffer, not visible on screen
-   * EXTERNAL: An external window that assume the OpenGL context would have been created by
+   * NONE: A mock window without rendering capabilities.
+   * NATIVE: A window using the native graphical stack.
+   * NATIVE_OFFSCREEN: A native window rendering to an offscreen buffer, not visible on screen.
+   * EXTERNAL: An external window that assume the OpenGL context would have been created by.
    * another framework
    */
   enum class Type : unsigned char
@@ -37,7 +37,7 @@ public:
   };
 
   /**
-   * Get the type of the window
+   * Get the type of the window.
    */
   virtual Type getType() = 0;
 
@@ -61,22 +61,22 @@ public:
   virtual image renderToImage(bool noBackground = false) = 0;
 
   /**
-   * Set the size of the window
+   * Set the size of the window.
    */
   virtual window& setSize(int width, int height) = 0;
 
   /**
-   * Get the width of the window
+   * Get the width of the window.
    */
   virtual int getWidth() const = 0;
 
   /**
-   * Get the height of the window
+   * Get the height of the window.
    */
   virtual int getHeight() const = 0;
 
   /**
-   * Set the position of the window
+   * Set the position of the window.
    */
   virtual window& setPosition(int x, int y) = 0;
 

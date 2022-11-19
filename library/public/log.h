@@ -24,11 +24,11 @@ public:
   /**
    * Enumeration of verbose levels
    * =============================
-   * DEBUG: All logs are displayed
-   * INFO: Standard logging level, the default
-   * WARN: Only warnings and errors are displayed
-   * ERROR: Only errors are displayed
-   * QUIET: Logging is fully disabled
+   * DEBUG: All logs are displayed.
+   * INFO: Standard logging level, the default.
+   * WARN: Only warnings and errors are displayed.
+   * ERROR: Only errors are displayed.
+   * QUIET: Logging is fully disabled.
    */
   enum class VerboseLevel : unsigned char
   {
@@ -100,7 +100,7 @@ public:
   static void setUseColoring(bool use);
 
   /**
-   * Set the verbose level
+   * Set the verbose level.
    */
   static void setVerboseLevel(VerboseLevel level);
 

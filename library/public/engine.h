@@ -18,7 +18,7 @@ namespace f3d
  * @class   engine
  * @brief   Class used to create instance of other classes
  *
- * The main class of the libf3d to create all other instances
+ * The main class of the libf3d to create all other instances.
  * Configured on creation using an enum, then all objects
  * can be accessed through their getter.
  *
@@ -96,7 +96,7 @@ public:
    * On Windows, the plugin should be located in the same folder as the executable.
    * The plugin "native" is always available and includes native VTK readers.
    * If built and available in your build, f3d is providing 4 additional plugins:
-   * "exodus", "occt", "assimp", "alembic"
+   * "exodus", "occt", "assimp", "alembic".
    * Custom plugins can also be available that f3d is not supporting officially.
    * Throw a plugin_exception if the plugin can't be loaded for some reason.
    */
