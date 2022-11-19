@@ -11,6 +11,7 @@
 #include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCallbackCommand.h>
+#include <vtkMath.h>
 #include <vtkNew.h>
 #include <vtkPointPicker.h>
 #include <vtkRenderWindow.h>
