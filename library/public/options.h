@@ -109,8 +109,8 @@ public:
   std::vector<std::string> getNames();
 
   /**
-   * An exception that can be thrown by the options 
-   * when a provided option type is incompatible with 
+   * An exception that can be thrown by the options
+   * when a provided option type is incompatible with
    * its internal type.
    */
   struct incompatible_exception : public exception
@@ -119,7 +119,7 @@ public:
   };
 
   /**
-   * An exception that can be thrown by the options 
+   * An exception that can be thrown by the options
    * when a provided option does not exist.
    */
   struct inexistent_exception : public exception
