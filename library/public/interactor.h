@@ -101,12 +101,14 @@ public:
   static const std::vector<std::pair<std::string, std::string> >& getDefaultInteractionsInfo();
 
 protected:
+  //! @cond
   interactor() = default;
   virtual ~interactor() = default;
   interactor(const interactor& opt) = delete;
   interactor(interactor&& opt) = delete;
   interactor& operator=(const interactor& opt) = delete;
   interactor& operator=(interactor&& opt) = delete;
+  //! @endcond
 };
 }
 

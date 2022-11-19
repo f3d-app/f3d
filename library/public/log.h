@@ -111,6 +111,7 @@ public:
   static void waitForUser();
 
 protected:
+  //! @cond
   static void appendArg(std::stringstream&) {}
 
   template<typename T, typename... Args>
@@ -125,6 +126,7 @@ protected:
   static void warnInternal(const std::string& msg);
   static void infoInternal(const std::string& msg);
   static void debugInternal(const std::string& msg);
+  //! @endcond
 };
 }
 

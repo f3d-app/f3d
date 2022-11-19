@@ -84,12 +84,14 @@ public:
     LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const = 0;
 
 protected:
+  //! @cond
   loader() = default;
   virtual ~loader() = default;
   loader(const loader& opt) = delete;
   loader(loader&& opt) = delete;
   loader& operator=(const loader& opt) = delete;
   loader& operator=(loader&& opt) = delete;
+  //! @endcond
 };
 }
 

@@ -69,12 +69,14 @@ public:
   virtual camera& resetToBounds() = 0;
 
 protected:
+  //! @cond
   camera() = default;
   virtual ~camera() = default;
   camera(const camera&) = delete;
   camera(camera&&) = delete;
   camera& operator=(const camera&) = delete;
   camera& operator=(camera&&) = delete;
+  //! @endcond
 };
 }
 

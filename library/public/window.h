@@ -103,12 +103,14 @@ public:
   virtual point3_t getDisplayFromWorld(const point3_t& worldPoint) const = 0;
 
 protected:
+  //! @cond
   window() = default;
   virtual ~window() = default;
   window(const window&) = delete;
   window(window&&) = delete;
   window& operator=(const window&) = delete;
   window& operator=(window&&) = delete;
+  //! @endcond
 };
 }
 
