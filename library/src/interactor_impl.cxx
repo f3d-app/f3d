@@ -321,7 +321,7 @@ public:
               const double linear_t =
                 std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() /
                 (double)self->TransitionDuration;
-              const double tween_t = (1 - std::cos(M_PI * linear_t)) / 2;
+              const double tween_t = (1 - std::cos(vtkMath::Pi() * linear_t)) / 2;
 
               self->Window.getCamera().setFocalPoint(
                 { foc[0] + dx * tween_t, foc[1] + dy * tween_t, foc[2] + dz * tween_t });

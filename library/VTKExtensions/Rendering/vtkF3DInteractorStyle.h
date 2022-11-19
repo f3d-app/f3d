@@ -48,7 +48,7 @@ public:
    * Handle left mouse button
    */
   void OnLeftButtonPress();
-  
+
   /**
    * Overriden for turntable mode
    */
