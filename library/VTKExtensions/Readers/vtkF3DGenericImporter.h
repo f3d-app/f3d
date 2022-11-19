@@ -106,7 +106,7 @@ public:
   ///@}
 
   /**
-   * Get temporal informations for the currently enabled animations.
+   * Get temporal information for the currently enabled animations.
    * Framerate is ignored in this implementation.
    * the three return arguments are defined in this implementation.
    */

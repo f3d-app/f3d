@@ -56,7 +56,7 @@ Bug fixes and features:
 - Fixed a build issue on MacOS
 - Fixed a critical issue with the Windows Thumbnailer that could crash explorer.exe
 - Fixed the --quiet option so that it actually quiets VTK errors and warnings
-- Fixed an issue with output window poping up at each log on Windows
+- Fixed an issue with output window popping up at each log on Windows
 - Added a `.deb` package for Linux Debian-based distros
 
 For Packagers:
@@ -72,7 +72,7 @@ Main New Features:
 - Added FBX, DAE, OFF, and DXF file format support thanks to @assimp /[assimp](https://github.com/assimp/assimp)
 - Added thumbnail support with many linux file managers
 - Added thumbnail support on Windows
-- Added desktop environnement integration in linux
+- Added desktop environment integration in linux
 - Added scalar and scalar component looping
 
 Other New Features:
@@ -99,7 +99,7 @@ Issue Fixes:
 - Fixed a potential sorting issue when opening a folder
 - Fixed a crash with unsupported glTF files in VTK
 
-For Developpers:
+For Developers:
 - Full rework of the CI framework, including coverage report support
 - Full rework of the testing framework
 - Separation of vtkF3DRenderer in two classes
@@ -108,7 +108,7 @@ For Developpers:
 For Packagers:
 - New CMake options to select file to install, all documented and starting with F3D_
 - mime types file can be installed, make sure to trigger update-mime-databse
-- dekstop file can be installed, make sure to trigger update-desktop-database
+- desktop file can be installed, make sure to trigger update-desktop-database
 
 Packagers: AndnoVember @jokersus @kevinsmia1939 @yurivict @bcdarwin @mzf-guest @Meakk @mwestphal
 

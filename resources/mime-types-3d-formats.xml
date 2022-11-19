@@ -16,7 +16,7 @@
     <comment>GL Transmission file Binary</comment>
     <glob pattern="*.glb"/>
   </mime-type>
-  <!-- Relying to x-3ds does not seems to work reliably, forcing use of unregistred mime type using magic number -->
+  <!-- Relying to x-3ds does not seems to work reliably, forcing use of unregistered mime type using magic number -->
   <!-- https://gitlab.freedesktop.org/xdg/shared-mime-info/-/issues/163 -->
   <mime-type type="application/vnd.3ds">
     <comment>Autodesk 3D Studio file</comment>

@@ -49,7 +49,7 @@ public:
   void Initialize(int argc, char** argv);
 
   /**
-   * Find and parse a config file, if any, into the config file dictionnary.
+   * Find and parse a config file, if any, into the config file dictionary.
    * If a non-empty configNameis provided, it will be considered instead
    * of standard settings config file.
    * supported config are:
@@ -70,7 +70,7 @@ public:
     F3DAppOptions& appOptions, f3d::options& options, std::vector<std::string>& inputs);
 
   /**
-   * Use the config file dictionnary using the provided filepath
+   * Use the config file dictionary using the provided filepath
    * to match the regexp from the config files.
    * This will not parse the command line.
    * Returns the resulting options.
