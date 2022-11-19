@@ -30,6 +30,12 @@ void vtkF3DInteractorStyle::OnKeyPress()
   this->InvokeEvent(vtkF3DInteractorStyle::KeyPressEvent, nullptr);
 }
 
+//----------------------------------------------------------------------------
+void vtkF3DInteractorStyle::OnLeftButtonPress()
+{
+  this->InvokeEvent(vtkCommand::LeftButtonPressEvent, nullptr);
+}
+
 //------------------------------------------------------------------------------
 void vtkF3DInteractorStyle::Rotate()
 {

@@ -12,6 +12,7 @@
 
 #include <vtkCallbackCommand.h>
 #include <vtkNew.h>
+#include <vtkPointPicker.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
@@ -19,6 +20,7 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <chrono>
 #include <map>
 
 namespace f3d::detail
@@ -48,6 +50,15 @@ public:
     dropFilesCallback->SetClientData(this);
     dropFilesCallback->SetCallback(OnDropFiles);
     this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
+
+    vtkNew<vtkPointPicker> pointPicker;
+    pointPicker->SetTolerance(0.01);
+    this->VTKInteractor->SetPicker(pointPicker);
+
+    vtkNew<vtkCallbackCommand> LeftButtonPressCallback;
+    LeftButtonPressCallback->SetClientData(this);
+    LeftButtonPressCallback->SetCallback(OnLeftButtonPress);
+    this->Style->AddObserver(vtkCommand::LeftButtonPressEvent, LeftButtonPressCallback);
 
 // Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
@@ -268,6 +279,80 @@ public:
     self->Window.render();
   }
 
+  static void OnLeftButtonPress(vtkObject*, unsigned long, void* clientData, void*)
+  {
+    internals* self = static_cast<internals*>(clientData);
+
+    const auto click_pos = self->VTKInteractor->GetEventPosition();
+    const auto click_time = std::chrono::high_resolution_clock::now();
+
+    const auto time_delta = click_time - self->LeftClickTime;
+    const auto x_delta = click_pos[0] - self->LeftClickPosision[0];
+    const auto y_delta = click_pos[1] - self->LeftClickPosision[1];
+    const auto sq_pos_delta = x_delta * x_delta + y_delta * y_delta;
+    if (sq_pos_delta < self->DoubleClickDistTol * self->DoubleClickDistTol &&
+      std::chrono::duration_cast<std::chrono::milliseconds>(time_delta).count() <
+        self->DoubleClickTimeTol)
+    {
+      vtkPointPicker* picker = dynamic_cast<vtkPointPicker*>(self->VTKInteractor->GetPicker());
+      if (picker != nullptr)
+      {
+        picker->Pick(self->LeftClickPosision[0], self->LeftClickPosision[1], 0,
+          self->VTKInteractor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+        if (picker->GetActors()->GetNumberOfItems() > 0)
+        {
+          double picked[3];
+          picker->GetPickPosition(picked);
+
+          const auto pos = self->Window.getCamera().getPosition();
+          const auto foc = self->Window.getCamera().getFocalPoint();
+
+          const auto dx = picked[0] - foc[0];
+          const auto dy = picked[1] - foc[1];
+          const auto dz = picked[2] - foc[2];
+
+          if (self->TransitionDuration > 0)
+          {
+            const auto start = std::chrono::high_resolution_clock::now();
+            const auto end = start + std::chrono::milliseconds(self->TransitionDuration);
+            auto now = start;
+            while (now < end)
+            {
+              const double linear_t =
+                std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() /
+                (double)self->TransitionDuration;
+              const double tween_t = (1 - std::cos(M_PI * linear_t)) / 2;
+
+              self->Window.getCamera().setFocalPoint(
+                { foc[0] + dx * tween_t, foc[1] + dy * tween_t, foc[2] + dz * tween_t });
+              self->Window.getCamera().setPosition(
+                { pos[0] + dx * tween_t, pos[1] + dy * tween_t, pos[2] + dz * tween_t });
+              self->Window.render();
+
+              now = std::chrono::high_resolution_clock::now();
+            }
+          }
+
+          self->Window.getCamera().setFocalPoint({ foc[0] + dx, foc[1] + dy, foc[2] + dz });
+          self->Window.getCamera().setPosition({ pos[0] + dx, pos[1] + dy, pos[2] + dz });
+          self->Window.render();
+        }
+      }
+      else
+      {
+        f3d::log::error("unexpected picker type");
+      }
+    }
+    else
+    {
+      self->Style->OnLeftButtonDown();
+
+      self->LeftClickTime = click_time;
+      self->LeftClickPosision[0] = click_pos[0];
+      self->LeftClickPosision[1] = click_pos[1];
+    }
+  }
+
   std::function<bool(int, std::string)> KeyPressUserCallBack = [](int, std::string)
   { return false; };
   std::function<bool(std::vector<std::string>)> DropFilesUserCallBack = [](std::vector<std::string>)
@@ -292,6 +377,13 @@ public:
   int WindowSize[2] = { -1, -1 };
   int WindowPos[2] = { 0, 0 };
   std::map<unsigned long, std::pair<int, std::function<void()> > > TimerCallBacks;
+
+  int LeftClickPosision[2] = { 0, 0 };
+  std::chrono::time_point<std::chrono::high_resolution_clock> LeftClickTime;
+
+  int DoubleClickDistTol = 4;   /* px */
+  int DoubleClickTimeTol = 500; /* ms */
+  int TransitionDuration = 100; /* ms */
 };
 
 //----------------------------------------------------------------------------

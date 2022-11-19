@@ -45,6 +45,11 @@ public:
   void OnDropFiles(vtkStringArray* files) override;
 
   /**
+   * Handle left mouse button
+   */
+  void OnLeftButtonPress();
+  
+  /**
    * Overriden for turntable mode
    */
   void Rotate() override;
