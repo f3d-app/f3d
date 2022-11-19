@@ -11,6 +11,7 @@
 #include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCallbackCommand.h>
+#include <vtkCellPicker.h>
 #include <vtkMath.h>
 #include <vtkNew.h>
 #include <vtkPointPicker.h>
@@ -51,10 +52,6 @@ public:
     dropFilesCallback->SetClientData(this);
     dropFilesCallback->SetCallback(OnDropFiles);
     this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
-
-    vtkNew<vtkPointPicker> pointPicker;
-    pointPicker->SetTolerance(0.01);
-    this->VTKInteractor->SetPicker(pointPicker);
 
     vtkNew<vtkCallbackCommand> LeftButtonPressCallback;
     LeftButtonPressCallback->SetClientData(this);
@@ -295,54 +292,59 @@ public:
       std::chrono::duration_cast<std::chrono::milliseconds>(time_delta).count() <
         self->DoubleClickTimeTol)
     {
-      vtkPointPicker* picker = dynamic_cast<vtkPointPicker*>(self->VTKInteractor->GetPicker());
-      if (picker != nullptr)
+      double picked[3];
+      self->cellPicker->Pick(self->LeftClickPosision[0], self->LeftClickPosision[1], 0,
+        self->VTKInteractor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+      if (self->cellPicker->GetActors()->GetNumberOfItems() > 0)
       {
-        picker->Pick(self->LeftClickPosision[0], self->LeftClickPosision[1], 0,
-          self->VTKInteractor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
-        if (picker->GetActors()->GetNumberOfItems() > 0)
-        {
-          double picked[3];
-          picker->GetPickPosition(picked);
-
-          const auto pos = self->Window.getCamera().getPosition();
-          const auto foc = self->Window.getCamera().getFocalPoint();
-
-          const auto dx = picked[0] - foc[0];
-          const auto dy = picked[1] - foc[1];
-          const auto dz = picked[2] - foc[2];
-
-          if (self->TransitionDuration > 0)
-          {
-            const auto start = std::chrono::high_resolution_clock::now();
-            const auto end = start + std::chrono::milliseconds(self->TransitionDuration);
-            auto now = start;
-            while (now < end)
-            {
-              const double linear_t =
-                std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() /
-                (double)self->TransitionDuration;
-              const double tween_t = (1 - std::cos(vtkMath::Pi() * linear_t)) / 2;
-
-              self->Window.getCamera().setFocalPoint(
-                { foc[0] + dx * tween_t, foc[1] + dy * tween_t, foc[2] + dz * tween_t });
-              self->Window.getCamera().setPosition(
-                { pos[0] + dx * tween_t, pos[1] + dy * tween_t, pos[2] + dz * tween_t });
-              self->Window.render();
-
-              now = std::chrono::high_resolution_clock::now();
-            }
-          }
-
-          self->Window.getCamera().setFocalPoint({ foc[0] + dx, foc[1] + dy, foc[2] + dz });
-          self->Window.getCamera().setPosition({ pos[0] + dx, pos[1] + dy, pos[2] + dz });
-          self->Window.render();
-        }
+        self->cellPicker->GetPickPosition(picked);
       }
       else
       {
-        f3d::log::error("unexpected picker type");
+        self->pointPicker->Pick(self->LeftClickPosision[0], self->LeftClickPosision[1], 0,
+          self->VTKInteractor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+        if (self->pointPicker->GetActors()->GetNumberOfItems() > 0)
+        {
+          self->pointPicker->GetPickPosition(picked);
+        }
+        else
+        {
+          return;
+        }
       }
+
+      const auto pos = self->Window.getCamera().getPosition();
+      const auto foc = self->Window.getCamera().getFocalPoint();
+
+      const auto dx = picked[0] - foc[0];
+      const auto dy = picked[1] - foc[1];
+      const auto dz = picked[2] - foc[2];
+
+      if (self->TransitionDuration > 0)
+      {
+        const auto start = std::chrono::high_resolution_clock::now();
+        const auto end = start + std::chrono::milliseconds(self->TransitionDuration);
+        auto now = start;
+        while (now < end)
+        {
+          const double linear_t =
+            std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() /
+            (double)self->TransitionDuration;
+          const double tween_t = (1 - std::cos(vtkMath::Pi() * linear_t)) / 2;
+
+          self->Window.getCamera().setFocalPoint(
+            { foc[0] + dx * tween_t, foc[1] + dy * tween_t, foc[2] + dz * tween_t });
+          self->Window.getCamera().setPosition(
+            { pos[0] + dx * tween_t, pos[1] + dy * tween_t, pos[2] + dz * tween_t });
+          self->Window.render();
+
+          now = std::chrono::high_resolution_clock::now();
+        }
+      }
+
+      self->Window.getCamera().setFocalPoint({ foc[0] + dx, foc[1] + dy, foc[2] + dz });
+      self->Window.getCamera().setPosition({ pos[0] + dx, pos[1] + dy, pos[2] + dz });
+      self->Window.render();
     }
     else
     {
@@ -378,6 +380,9 @@ public:
   int WindowSize[2] = { -1, -1 };
   int WindowPos[2] = { 0, 0 };
   std::map<unsigned long, std::pair<int, std::function<void()> > > TimerCallBacks;
+
+  vtkNew<vtkCellPicker> cellPicker;
+  vtkNew<vtkPointPicker> pointPicker;
 
   int LeftClickPosision[2] = { 0, 0 };
   std::chrono::time_point<std::chrono::high_resolution_clock> LeftClickTime;
