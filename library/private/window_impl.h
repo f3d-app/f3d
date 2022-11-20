@@ -37,7 +37,7 @@ public:
    */
   ~window_impl() override;
 
-  //@{
+  ///@{
   /**
    * Documented public API
    */
@@ -53,7 +53,7 @@ public:
   window& setWindowName(const std::string& windowName) override;
   point3_t getWorldFromDisplay(const point3_t& displayPoint) const override;
   point3_t getDisplayFromWorld(const point3_t& worldPoint) const override;
-  //@}
+  ///@}
 
   /**
    * Implementation only API.

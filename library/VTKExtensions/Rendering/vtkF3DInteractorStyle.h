@@ -49,27 +49,27 @@ public:
    */
   void Rotate() override;
 
-  //@{
+  ///@{
   /**
    * Overriden to support being disabled
    */
   void Spin() override;
   void Pan() override;
   void Dolly() override;
-  //@}
+  ///@}
 
   /**
    * Overriden to rotate the skybox as well
    */
   void EnvironmentRotate() override;
 
-  //@{
+  ///@{
   /**
    * Set/Get is camera movement are disabled
    */
   vtkSetMacro(CameraMovementDisabled, bool);
   vtkGetMacro(CameraMovementDisabled, bool);
-  //@}
+  ///@}
 
 protected:
   /**
