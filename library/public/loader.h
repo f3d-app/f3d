@@ -69,7 +69,7 @@ public:
    * Set the load argument to LOAD_FIRST, LOAD_PREVIOUS, LOAD_NEXT or LOAD_LAST to change file
    * index. This will change the current file index accordingly.
    * Default is LOAD_CURRENT.
-   * Returns true if a file is loaded sucessfully, false otherwise.
+   * Returns true if a file is loaded successfully, false otherwise.
    */
   virtual bool loadFile(LoadFileEnum load = LoadFileEnum::LOAD_CURRENT) = 0;
 

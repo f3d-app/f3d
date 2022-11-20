@@ -4,7 +4,7 @@
  *
  * In VTK, calling vtkF3DOrientationMarkerWidget::InteractiveOff triggers a render
  * which we do not want as the renderer may not be ready to render when setting up the
- * widget. This intialize Interactive to false, removing the need to call the setter.
+ * widget. This initialize Interactive to false, removing the need to call the setter.
  * See https://gitlab.kitware.com/vtk/vtk/-/issues/18660.
  */
 

@@ -39,7 +39,7 @@ Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
 model.color.opacity|double<br>1.0<br>load|Set *opacity* on the geometry. Usually used with Depth Peeling option. Multiplied with the `model.color.texture` when present.|\-\-opacity
 model.color.rgb|vector\<double\><br>1.0,1.0,1.0<br>load|Set a *color* on the geometry. Multiplied with the `model.color.texture` when present.|\-\-color
-model.color.texture|string<br>-<br>load|Path to a texture file that sets the color of the object. Will be mulitplied with rgb and opacity.|\-\-texture-base-color
+model.color.texture|string<br>-<br>load|Path to a texture file that sets the color of the object. Will be multiplied with rgb and opacity.|\-\-texture-base-color
 model.emissive.factor|vector\<double\><br>1.0,1.0,1.0<br>load| Multiply the emissive color when an emissive texture is present.|\-\-emissive-factor
 model.emissive.texture|string<br>-<br>load|Path to a texture file that sets the emitted light of the object. Multiplied with the `model.emissive.factor`.|\-\-texture-emissive
 model.material.metallic|double<br>0.0<br>load|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the `model.material.texture` when present.|\-\-metallic

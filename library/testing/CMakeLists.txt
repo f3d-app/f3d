@@ -86,7 +86,7 @@ endforeach ()
 
 # Specific test properties to check
 
-# CTest cant check colored output as it contains special chars
+# CTest can't check colored output as it contains special chars
 set_tests_properties(libf3d::TestSDKLog PROPERTIES PASS_REGULAR_EXPRESSION
 "\
 Test Info\nTest Warning\nTest Error\n\

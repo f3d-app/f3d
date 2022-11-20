@@ -80,7 +80,7 @@ public:
 
   /**
    * Set the colormap to use
-   * Setting an empty vector will use defaut color map
+   * Setting an empty vector will use default color map
    */
   void SetColormap(const std::vector<double>& colormap);
 

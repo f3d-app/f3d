@@ -175,10 +175,10 @@ private:
 
   std::string FilePathForConfigBlock;
 
-  using DictionnaryEntry = std::map<std::string, std::string>;
-  using Dictionnary = std::map<std::string, DictionnaryEntry>;
-  DictionnaryEntry GlobalConfigDicEntry;
-  Dictionnary ConfigDic;
+  using DictionaryEntry = std::map<std::string, std::string>;
+  using Dictionary = std::map<std::string, DictionaryEntry>;
+  DictionaryEntry GlobalConfigDicEntry;
+  Dictionary ConfigDic;
 };
 
 //----------------------------------------------------------------------------

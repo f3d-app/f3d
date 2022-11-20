@@ -46,7 +46,7 @@ public:
   ///@{
   /**
    * Set/Get the linear deflection.
-   * This value limits the distance between a curve and the resulting tesselation.
+   * This value limits the distance between a curve and the resulting tessellation.
    * Default is 0.1
    */
   vtkGetMacro(LinearDeflection, double);
