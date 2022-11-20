@@ -46,15 +46,15 @@ public:
    */
   std::string GetOutputsDescription() override;
 
-  //@{
+  ///@{
   /**
    * Static methods to recover information about data
    */
   static std::string GetMultiBlockDescription(vtkMultiBlockDataSet* mb, vtkIndent indent);
   static std::string GetDataObjectDescription(vtkDataObject* object);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Access to specific actors
    */
@@ -62,24 +62,24 @@ public:
   vtkGetSmartPointerMacro(GeometryActor, vtkActor);
   vtkGetSmartPointerMacro(PointSpritesActor, vtkActor);
   vtkGetSmartPointerMacro(VolumeProp, vtkVolume);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Access to specific mappers
    */
   vtkGetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
   vtkGetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
   vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Access to specific attributes
    */
   vtkGetObjectMacro(PointDataForColoring, vtkDataSetAttributes);
   vtkGetObjectMacro(CellDataForColoring, vtkDataSetAttributes);
-  //@}
+  ///@}
 
   void UpdateTimeStep(double timestep) override;
 
@@ -95,7 +95,7 @@ public:
    */
   std::string GetAnimationName(vtkIdType animationIndex) override;
 
-  //@{
+  ///@{
   /**
    * Enable/Disable/Get the status of specific animations
    * Only the first animation can be enabled
@@ -103,7 +103,7 @@ public:
   void EnableAnimation(vtkIdType animationIndex) override;
   void DisableAnimation(vtkIdType animationIndex) override;
   bool IsAnimationEnabled(vtkIdType animationIndex) override;
-  //@}
+  ///@}
 
   /**
    * Get temporal informations for the currently enabled animations.
@@ -119,7 +119,7 @@ public:
     vtkDoubleArray* timeSteps) override;
 #endif
 
-  //@{
+  ///@{
   /**
    * Setter for all actor loading options
    */
@@ -135,7 +135,7 @@ public:
   vtkSetMacro(TextureMaterial, std::string);
   vtkSetMacro(TextureEmissive, std::string);
   vtkSetMacro(TextureNormal, std::string);
-  //@}
+  ///@}
 
 protected:
   vtkF3DGenericImporter() = default;
@@ -143,14 +143,14 @@ protected:
 
   int ImportBegin() override;
 
-  //@{
+  ///@{
   /* Standard importer API
    * None of the actors are shown by default
    */
   void ImportActors(vtkRenderer*) override;
   void ImportLights(vtkRenderer*) override;
   void ImportProperties(vtkRenderer*) override;
-  //@}
+  ///@}
 
   vtkSmartPointer<vtkTexture> GetTexture(const std::string& fileName, bool isSRGB = false);
 

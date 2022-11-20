@@ -31,7 +31,7 @@ public:
    */
   ~camera_impl() override;
 
-  //@{
+  ///@{
   /**
    * Documented public API
    */
@@ -58,7 +58,7 @@ public:
   camera& setCurrentAsDefault() override;
   camera& resetToDefault() override;
   camera& resetToBounds() override;
-  //@}
+  ///@}
 
   /**
    * Implementation only api.

@@ -38,39 +38,39 @@ public:
    */
   void SetPointSize(double pointSize) override;
 
-  //@{
+  ///@{
   /**
    * Set the visibility of the scalar bar.
    * It will only be shown when coloring and not
    * using direct scalars rendering.
    */
   void ShowScalarBar(bool show);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the visibility of the point sprites actor.
    * It will only be shown if raytracing and volume are not enabled
    */
   void SetUsePointSprites(bool use);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the visibility of the volume actor.
    * It will only be shown if the data is compatible with volume rendering
    * and raytracing is not enabled
    */
   void SetUseVolume(bool use);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set the use of an inverted opacity function
    * for volume rendering..
    */
   void SetUseInverseOpacityFunction(bool use);
-  //@}
+  ///@}
 
   /**
    * Set the range of the scalar bar
@@ -96,61 +96,61 @@ public:
    */
   void CycleScalars(int cycleType);
 
-  //@{
+  ///@{
   /**
    * Set/Get the scalar bar actor, used for hotkey purposes
    */
   vtkGetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
   vtkSetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the geometry actor
    */
   vtkGetSmartPointerMacro(GeometryActor, vtkActor);
   vtkSetSmartPointerMacro(GeometryActor, vtkActor);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the point sprites actor
    */
   vtkGetSmartPointerMacro(PointSpritesActor, vtkActor);
   vtkSetSmartPointerMacro(PointSpritesActor, vtkActor);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the volume prop
    */
   vtkGetSmartPointerMacro(VolumeProp, vtkVolume);
   vtkSetSmartPointerMacro(VolumeProp, vtkVolume);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the polydata mapper
    */
   vtkGetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
   vtkSetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the point gaussian mapper, used for hotkey purposes
    */
   vtkGetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
   vtkSetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get the volume mapper, used for hotkey purposes
    */
   vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
   vtkSetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
-  //@}
+  ///@}
 
   /**
    * Set the coloring attributes, call before SetColoring.
@@ -164,7 +164,7 @@ public:
    */
   void SetColoring(bool useCellData, const std::string& arrayName, int component);
 
-  //@{
+  ///@{
   /**
    * Get current coloring infomatiuons,
    * Useful after using Cycle methods
@@ -172,7 +172,7 @@ public:
   bool GetColoringUseCell();
   std::string GetColoringArrayName();
   int GetColoringComponent();
-  //@}
+  ///@}
 
   /**
    * Update the visibility and coloring of internal actors as well as the scalar bar actors
