@@ -37,7 +37,7 @@ of test, but it could make sense to cover it with more if necessary.
 
 ### Application layer
 
-All application test are just a command line runned by ctest using the `f3d` executable.
+All application test are just a command line run by ctest using the `f3d` executable.
 ctest then check the output for any failure. Most of these tests are just using the `--output`
 and `--ref` F3D option in order to check if a rendering behave correctly with specific options.
 

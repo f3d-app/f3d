@@ -1,6 +1,6 @@
 # Command line options
 
-F3D behavior can be fully controled from the command line using the following options.
+F3D behavior can be fully controlled from the command line using the following options.
 
 ## Applicative Options
 

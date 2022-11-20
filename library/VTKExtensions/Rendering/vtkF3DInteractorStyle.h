@@ -45,13 +45,13 @@ public:
   void OnDropFiles(vtkStringArray* files) override;
 
   /**
-   * Overriden for turntable mode
+   * Overridden for turntable mode
    */
   void Rotate() override;
 
   ///@{
   /**
-   * Overriden to support being disabled
+   * Overridden to support being disabled
    */
   void Spin() override;
   void Pan() override;
@@ -59,7 +59,7 @@ public:
   ///@}
 
   /**
-   * Overriden to rotate the skybox as well
+   * Overridden to rotate the skybox as well
    */
   void EnvironmentRotate() override;
 
@@ -73,7 +73,7 @@ public:
 
 protected:
   /**
-   * Overriden to support being disabled
+   * Overridden to support being disabled
    */
   void Dolly(double factor) override;
 

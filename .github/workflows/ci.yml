@@ -326,7 +326,7 @@ jobs:
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
 #----------------------------------------------------------------------------
-# "leak" is run by defaut with "address" so we do not need to run it in CI
+# "leak" is run by default with "address" so we do not need to run it in CI
 # "memory" returns false positives in VTK:
 # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:

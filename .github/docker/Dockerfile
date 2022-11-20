@@ -32,7 +32,7 @@ RUN apt update && apt install -y \
     wget \
     xvfb
 
-# Install uptodate needed packages
+# Install up-to-date needed packages
 RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
 RUN apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
 RUN add-apt-repository ppa:git-core/ppa

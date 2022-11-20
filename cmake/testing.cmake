@@ -174,7 +174,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220811)
 endif()
 
 # Tests that do not work with VTK 9.0.1 and have been
-# fixed prior to the date based versionning system
+# fixed prior to the date based versioning system
 if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestOBJImporter DATA world.obj)
   f3d_test(NAME TestGLTFImporterUnlit DATA UnlitTest.glb)
@@ -276,7 +276,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     f3d_test(NAME TestVerboseAssimp DATA robot_kyle_walking.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "Robot2")
     f3d_test(NAME TestDAE DATA duck.dae ARGS --load-plugins=assimp)
 
-    # Embeded texture are only working with assimp 5.1.X
+    # Embedded texture are only working with assimp 5.1.X
     if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.1.0")
       f3d_test(NAME TestTexturedFBX DATA slime.fbx ARGS --load-plugins=assimp)
     endif()

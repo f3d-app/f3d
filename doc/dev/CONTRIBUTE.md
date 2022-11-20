@@ -25,7 +25,7 @@ F3D uses the [gitlab flow](https://docs.gitlab.com/ee/topics/gitlab_flow.html). 
 ## Continuous Integration
 
 F3D has a pretty extensive continuous integration trying to cover all usecases for F3D.
-It means that if your change break the CI in your PR, it will not be merged until the breaking change are adressed.
+It means that if your change break the CI in your PR, it will not be merged until the breaking change are addressed.
 It also means that adding a new feature or behavior means adding a associated test.
 Make sure to check the results for yourself, and ask for help if needed.
 
@@ -37,7 +37,7 @@ However, some [formatting rules](CODING_STYLE.md) are not enforced by clang-form
 
 ## F3D architecture
 
-F3D is seperated in three main components:
+F3D is separated in three main components:
 - The F3D application, in the application folder.
 - The libf3d, in the library folder.
 - The VTKExtensions in the library/VTKExtensions folder.
