@@ -30,7 +30,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: 'source'
         fetch-depth: 0
@@ -152,7 +152,7 @@ jobs:
 
     - name: Upload Tests Artifact
       if: failure()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: ./build/Testing/Temporary
         name: f3d-tests-artifact-${{matrix.os}}-${{matrix.vtk_version}}
@@ -217,7 +217,7 @@ jobs:
         cmake --build test_sdk
 
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: ./build/f3d-*
         name: f3d-${{matrix.os}}-${{matrix.vtk_version}}
@@ -237,7 +237,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: 'source'
         fetch-depth: 0
@@ -319,7 +319,7 @@ jobs:
         lcov --remove coverage.info "*Test*" -o coverage.info
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
       with:
         files: ${{github.workspace}}/source/coverage.info
 
@@ -348,7 +348,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: 'source'
         fetch-depth: 0
