@@ -1,0 +1,43 @@
+name: Generate Website
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches:
+      - master
+
+jobs:
+
+  generate-website:
+    name: Generate Website
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Build Jekyll
+      uses: actions/jekyll-build-pages@v1
+
+    - name: Install exhale and doxygen
+      working-directory: ${{github.workspace}}
+      run: |
+        pip install sphinx sphinx-book-theme exhale
+        sudo apt-get install doxygen
+
+    - name: Build doxygen
+      working-directory: ${{github.workspace}}/library/doxygen
+      run: make html
+
+    - name: Copy doxygen
+      working-directory: ${{github.workspace}}
+      run: sudo mv library/doxygen/build/html _site/doc/libf3d/doxygen
+
+    - name: Deploy
+      if: ${{ github.event.pull_request.merged }}
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: _site
+        token: ${{ secrets.GITHUB_TOKEN }}
+        clean: true
