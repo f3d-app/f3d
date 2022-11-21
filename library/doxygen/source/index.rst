@@ -9,8 +9,8 @@ libf3d doxygen documentation
 This is the automatically generated doxygen documentation for the libf3d_,
 which is part of F3D_.
 
-.. _libf3d: https://mwestphal.github.io/f3d/doc/libf3d/OVERVIEW.html
-.. _F3D: https://mwestphal.github.io/f3d/doc/libf3d/OVERVIEW.html
+.. _libf3d: https://f3d.app/doc/libf3d/OVERVIEW.html
+.. _F3D: https://f3d.app/doc/libf3d/OVERVIEW.html
 
 
 .. toctree::

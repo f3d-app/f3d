@@ -79,7 +79,7 @@ Most options are dynamic, some are only taken into account when loading a file. 
 
 For more advanced usage, please take a look in the [testing directory](https://github.com/f3d-app/f3d/tree/master/library/testing).
 
-For the complete documentation, please consult the [libf3d doxygen documentation.](https://mwestphal.github.io/f3d/doc/libf3d/doxygen/).
+For the complete documentation, please consult the [libf3d doxygen documentation.](https://f3d.app/doc/libf3d/doxygen/).
 
 ## Building against the libf3d
 
