@@ -45,16 +45,6 @@ public:
   void OnDropFiles(vtkStringArray* files) override;
 
   /**
-   * Handle middle mouse button
-   */
-  void OnMiddleButtonPress();
-
-  /**
-   * Handle middle mouse button
-   */
-  void OnMiddleButtonRelease();
-
-  /**
    * Overriden for turntable mode
    */
   void Rotate() override;

@@ -30,18 +30,6 @@ void vtkF3DInteractorStyle::OnKeyPress()
   this->InvokeEvent(vtkF3DInteractorStyle::KeyPressEvent, nullptr);
 }
 
-//----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::OnMiddleButtonPress()
-{
-  this->InvokeEvent(vtkCommand::MiddleButtonPressEvent, nullptr);
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DInteractorStyle::OnMiddleButtonRelease()
-{
-  this->InvokeEvent(vtkCommand::MiddleButtonReleaseEvent, nullptr);
-}
-
 //------------------------------------------------------------------------------
 void vtkF3DInteractorStyle::Rotate()
 {

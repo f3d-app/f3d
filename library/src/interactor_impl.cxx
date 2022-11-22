@@ -286,9 +286,7 @@ public:
   {
     internals* self = static_cast<internals*>(clientData);
 
-    const auto click_pos = self->VTKInteractor->GetEventPosition();
-    self->MiddleClickPosision[0] = click_pos[0];
-    self->MiddleClickPosision[1] = click_pos[1];
+    self->VTKInteractor->GetEventPosition(self->MiddleButtonDownPosition);
 
     self->Style->OnMiddleButtonDown();
   }
@@ -297,41 +295,44 @@ public:
   {
     internals* self = static_cast<internals*>(clientData);
 
-    const auto click_pos = self->VTKInteractor->GetEventPosition();
+    const int* MiddleButtonUpPosition = self->VTKInteractor->GetEventPosition();
 
-    const auto x_delta = click_pos[0] - self->MiddleClickPosision[0];
-    const auto y_delta = click_pos[1] - self->MiddleClickPosision[1];
-    const auto sq_pos_delta = x_delta * x_delta + y_delta * y_delta;
-    if (sq_pos_delta < self->DragDistanceTol * self->DragDistanceTol)
+    const int xDelta = MiddleButtonUpPosition[0] - self->MiddleButtonDownPosition[0];
+    const int yDelta = MiddleButtonUpPosition[1] - self->MiddleButtonDownPosition[1];
+    const int sqPosDelta = xDelta * xDelta + yDelta * yDelta;
+    if (sqPosDelta < self->DragDistanceTol * self->DragDistanceTol)
     {
-      bool pick_successful = false;
-      double picked_pos[3];
-      self->CellPicker->Pick(self->MiddleClickPosision[0], self->MiddleClickPosision[1], 0,
-        self->VTKInteractor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+      const int x = self->MiddleButtonDownPosition[0];
+      const int y = self->MiddleButtonDownPosition[1];
+      vtkRenderer* renderer =
+        self->VTKInteractor->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
+
+      bool pickSuccessful = false;
+      double pickedPos[3];
+      self->CellPicker->Pick(x, y, 0, renderer);
       if (self->CellPicker->GetActors()->GetNumberOfItems() > 0)
       {
-        self->CellPicker->GetPickPosition(picked_pos);
-        pick_successful = true;
+        self->CellPicker->GetPickPosition(pickedPos);
+        pickSuccessful = true;
       }
       else
       {
-        self->PointPicker->Pick(self->MiddleClickPosision[0], self->MiddleClickPosision[1], 0,
-          self->VTKInteractor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+        self->PointPicker->Pick(x, y, 0, renderer);
         if (self->PointPicker->GetActors()->GetNumberOfItems() > 0)
         {
-          self->PointPicker->GetPickPosition(picked_pos);
-          pick_successful = true;
+          self->PointPicker->GetPickPosition(pickedPos);
+          pickSuccessful = true;
         }
       }
 
-      if (pick_successful)
+      if (pickSuccessful)
       {
-        const auto pos = self->Window.getCamera().getPosition();
-        const auto foc = self->Window.getCamera().getFocalPoint();
+        const point3_t pos = self->Window.getCamera().getPosition();
+        const point3_t foc = self->Window.getCamera().getFocalPoint();
 
-        const auto dx = picked_pos[0] - foc[0];
-        const auto dy = picked_pos[1] - foc[1];
-        const auto dz = picked_pos[2] - foc[2];
+        const double dx = pickedPos[0] - foc[0];
+        const double dy = pickedPos[1] - foc[1];
+        const double dz = pickedPos[2] - foc[2];
 
         if (self->TransitionDuration > 0)
         {
@@ -340,15 +341,15 @@ public:
           auto now = start;
           while (now < end)
           {
-            const double linear_t =
+            const double t =
               std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() /
               (double)self->TransitionDuration;
-            const double tween_t = (1 - std::cos(vtkMath::Pi() * linear_t)) / 2;
+            const double u = (1 - std::cos(vtkMath::Pi() * t)) / 2;
 
             self->Window.getCamera().setFocalPoint(
-              { foc[0] + dx * tween_t, foc[1] + dy * tween_t, foc[2] + dz * tween_t });
+              { foc[0] + dx * u, foc[1] + dy * u, foc[2] + dz * u });
             self->Window.getCamera().setPosition(
-              { pos[0] + dx * tween_t, pos[1] + dy * tween_t, pos[2] + dz * tween_t });
+              { pos[0] + dx * u, pos[1] + dy * u, pos[2] + dz * u });
             self->Window.render();
 
             now = std::chrono::high_resolution_clock::now();
@@ -392,7 +393,7 @@ public:
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;
 
-  int MiddleClickPosision[2] = { 0, 0 };
+  int MiddleButtonDownPosition[2] = { 0, 0 };
 
   int DragDistanceTol = 3;      /* px */
   int TransitionDuration = 100; /* ms */
