@@ -53,10 +53,15 @@ public:
     dropFilesCallback->SetCallback(OnDropFiles);
     this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
 
-    vtkNew<vtkCallbackCommand> LeftButtonPressCallback;
-    LeftButtonPressCallback->SetClientData(this);
-    LeftButtonPressCallback->SetCallback(OnLeftButtonPress);
-    this->Style->AddObserver(vtkCommand::LeftButtonPressEvent, LeftButtonPressCallback);
+    vtkNew<vtkCallbackCommand> MiddleButtonPressCallback;
+    MiddleButtonPressCallback->SetClientData(this);
+    MiddleButtonPressCallback->SetCallback(OnMiddleButtonPress);
+    this->Style->AddObserver(vtkCommand::MiddleButtonPressEvent, MiddleButtonPressCallback);
+
+    vtkNew<vtkCallbackCommand> MiddleButtonReleaseCallback;
+    MiddleButtonReleaseCallback->SetClientData(this);
+    MiddleButtonReleaseCallback->SetCallback(OnMiddleButtonRelease);
+    this->Style->AddObserver(vtkCommand::MiddleButtonReleaseEvent, MiddleButtonReleaseCallback);
 
 // Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
@@ -277,83 +282,86 @@ public:
     self->Window.render();
   }
 
-  static void OnLeftButtonPress(vtkObject*, unsigned long, void* clientData, void*)
+  static void OnMiddleButtonPress(vtkObject*, unsigned long, void* clientData, void*)
   {
     internals* self = static_cast<internals*>(clientData);
 
     const auto click_pos = self->VTKInteractor->GetEventPosition();
-    const auto click_time = std::chrono::high_resolution_clock::now();
+    self->MiddleClickPosision[0] = click_pos[0];
+    self->MiddleClickPosision[1] = click_pos[1];
 
-    const auto time_delta = click_time - self->LeftClickTime;
-    const auto x_delta = click_pos[0] - self->LeftClickPosision[0];
-    const auto y_delta = click_pos[1] - self->LeftClickPosision[1];
+    self->Style->OnMiddleButtonDown();
+  }
+
+  static void OnMiddleButtonRelease(vtkObject*, unsigned long, void* clientData, void*)
+  {
+    internals* self = static_cast<internals*>(clientData);
+
+    const auto click_pos = self->VTKInteractor->GetEventPosition();
+
+    const auto x_delta = click_pos[0] - self->MiddleClickPosision[0];
+    const auto y_delta = click_pos[1] - self->MiddleClickPosision[1];
     const auto sq_pos_delta = x_delta * x_delta + y_delta * y_delta;
-    if (sq_pos_delta < self->DoubleClickDistTol * self->DoubleClickDistTol &&
-      std::chrono::duration_cast<std::chrono::milliseconds>(time_delta).count() <
-        self->DoubleClickTimeTol)
+    if (sq_pos_delta < self->DragDistanceTol * self->DragDistanceTol)
     {
-      double picked[3];
-      self->cellPicker->Pick(self->LeftClickPosision[0], self->LeftClickPosision[1], 0,
+      bool pick_successful = false;
+      double picked_pos[3];
+      self->CellPicker->Pick(self->MiddleClickPosision[0], self->MiddleClickPosision[1], 0,
         self->VTKInteractor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
-      if (self->cellPicker->GetActors()->GetNumberOfItems() > 0)
+      if (self->CellPicker->GetActors()->GetNumberOfItems() > 0)
       {
-        self->cellPicker->GetPickPosition(picked);
+        self->CellPicker->GetPickPosition(picked_pos);
+        pick_successful = true;
       }
       else
       {
-        self->pointPicker->Pick(self->LeftClickPosision[0], self->LeftClickPosision[1], 0,
+        self->PointPicker->Pick(self->MiddleClickPosision[0], self->MiddleClickPosision[1], 0,
           self->VTKInteractor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
-        if (self->pointPicker->GetActors()->GetNumberOfItems() > 0)
+        if (self->PointPicker->GetActors()->GetNumberOfItems() > 0)
         {
-          self->pointPicker->GetPickPosition(picked);
-        }
-        else
-        {
-          return;
+          self->PointPicker->GetPickPosition(picked_pos);
+          pick_successful = true;
         }
       }
 
-      const auto pos = self->Window.getCamera().getPosition();
-      const auto foc = self->Window.getCamera().getFocalPoint();
-
-      const auto dx = picked[0] - foc[0];
-      const auto dy = picked[1] - foc[1];
-      const auto dz = picked[2] - foc[2];
-
-      if (self->TransitionDuration > 0)
+      if (pick_successful)
       {
-        const auto start = std::chrono::high_resolution_clock::now();
-        const auto end = start + std::chrono::milliseconds(self->TransitionDuration);
-        auto now = start;
-        while (now < end)
+        const auto pos = self->Window.getCamera().getPosition();
+        const auto foc = self->Window.getCamera().getFocalPoint();
+
+        const auto dx = picked_pos[0] - foc[0];
+        const auto dy = picked_pos[1] - foc[1];
+        const auto dz = picked_pos[2] - foc[2];
+
+        if (self->TransitionDuration > 0)
         {
-          const double linear_t =
-            std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() /
-            (double)self->TransitionDuration;
-          const double tween_t = (1 - std::cos(vtkMath::Pi() * linear_t)) / 2;
+          const auto start = std::chrono::high_resolution_clock::now();
+          const auto end = start + std::chrono::milliseconds(self->TransitionDuration);
+          auto now = start;
+          while (now < end)
+          {
+            const double linear_t =
+              std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() /
+              (double)self->TransitionDuration;
+            const double tween_t = (1 - std::cos(vtkMath::Pi() * linear_t)) / 2;
 
-          self->Window.getCamera().setFocalPoint(
-            { foc[0] + dx * tween_t, foc[1] + dy * tween_t, foc[2] + dz * tween_t });
-          self->Window.getCamera().setPosition(
-            { pos[0] + dx * tween_t, pos[1] + dy * tween_t, pos[2] + dz * tween_t });
-          self->Window.render();
+            self->Window.getCamera().setFocalPoint(
+              { foc[0] + dx * tween_t, foc[1] + dy * tween_t, foc[2] + dz * tween_t });
+            self->Window.getCamera().setPosition(
+              { pos[0] + dx * tween_t, pos[1] + dy * tween_t, pos[2] + dz * tween_t });
+            self->Window.render();
 
-          now = std::chrono::high_resolution_clock::now();
+            now = std::chrono::high_resolution_clock::now();
+          }
         }
+
+        self->Window.getCamera().setFocalPoint({ foc[0] + dx, foc[1] + dy, foc[2] + dz });
+        self->Window.getCamera().setPosition({ pos[0] + dx, pos[1] + dy, pos[2] + dz });
+        self->Window.render();
       }
-
-      self->Window.getCamera().setFocalPoint({ foc[0] + dx, foc[1] + dy, foc[2] + dz });
-      self->Window.getCamera().setPosition({ pos[0] + dx, pos[1] + dy, pos[2] + dz });
-      self->Window.render();
     }
-    else
-    {
-      self->Style->OnLeftButtonDown();
 
-      self->LeftClickTime = click_time;
-      self->LeftClickPosision[0] = click_pos[0];
-      self->LeftClickPosision[1] = click_pos[1];
-    }
+    self->Style->OnMiddleButtonUp();
   }
 
   std::function<bool(int, std::string)> KeyPressUserCallBack = [](int, std::string)
@@ -381,14 +389,12 @@ public:
   int WindowPos[2] = { 0, 0 };
   std::map<unsigned long, std::pair<int, std::function<void()> > > TimerCallBacks;
 
-  vtkNew<vtkCellPicker> cellPicker;
-  vtkNew<vtkPointPicker> pointPicker;
+  vtkNew<vtkCellPicker> CellPicker;
+  vtkNew<vtkPointPicker> PointPicker;
 
-  int LeftClickPosision[2] = { 0, 0 };
-  std::chrono::time_point<std::chrono::high_resolution_clock> LeftClickTime;
+  int MiddleClickPosision[2] = { 0, 0 };
 
-  int DoubleClickDistTol = 4;   /* px */
-  int DoubleClickTimeTol = 500; /* ms */
+  int DragDistanceTol = 3;      /* px */
   int TransitionDuration = 100; /* ms */
 };
 
