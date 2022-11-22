@@ -1,4 +1,13 @@
 #[==[
+@file f3dPlugin.cmake
+
+This module contains all the macros required to define a plugin to extend
+the reader capabilities of F3D.
+#]==]
+
+set(_f3dPlugin_dir "${CMAKE_CURRENT_LIST_DIR}")
+
+#[==[
 @brief Initialize the plugin.
 
 ~~~
@@ -86,7 +95,7 @@ macro(f3d_plugin_declare_reader)
     set(F3D_READER_HAS_GEOMETRY_READER 0)
   endif()
 
-  configure_file("${CMAKE_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
+  configure_file("${_f3dPlugin_dir}/readerBoilerPlate.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/reader_${F3D_READER_NAME}.h")
 endmacro()
 
@@ -118,6 +127,8 @@ The `NAME` argument is required. The arguments are as follows:
 macro(f3d_plugin_build)
   cmake_parse_arguments(F3D_PLUGIN "FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS" ${ARGN})
 
+  find_package(VTK 9.0 REQUIRED COMPONENTS ${F3D_PLUGIN_VTK_MODULES})
+
   if(F3D_PLUGIN_FORCE_STATIC OR F3D_PLUGINS_STATIC_BUILD)
     set(F3D_PLUGIN_TYPE "STATIC")
     set(F3D_PLUGIN_IS_STATIC ON)
@@ -128,7 +139,10 @@ macro(f3d_plugin_build)
 
     get_target_property(target_type VTK::CommonCore TYPE)
     if (target_type STREQUAL STATIC_LIBRARY)
-      message(FATAL_ERROR "\"${F3D_PLUGIN_NAME}\" plugin is built as a shared module, but VTK is built as a static library. Please flag the plugin as FORCE_STATIC, enable option F3D_PLUGINS_STATIC_BUILD, or rebuild VTK as a shared library.")
+      message(WARNING "\"${F3D_PLUGIN_NAME}\" plugin is built as a shared module, but VTK is built as a static library. "
+                      "It will result in a large plugin binary and unexpected behavior. "
+                      "If the plugin is internal, consider building it with FORCE_STATIC, "
+                      "enable option F3D_PLUGINS_STATIC_BUILD, or rebuild VTK as a shared library.")
     endif ()
   endif()
 
@@ -138,8 +152,6 @@ macro(f3d_plugin_build)
   if(NOT BUILD_SHARED_LIBS AND F3D_PLUGIN_IS_STATIC)
     set(export_name "f3dTargets")
   endif()
-
-  find_package(VTK 9.0 REQUIRED COMPONENTS ${F3D_PLUGIN_VTK_MODULES})
 
   vtk_module_find_modules(vtk_module_files "${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -162,7 +174,7 @@ macro(f3d_plugin_build)
     set(modules "")
   endif()
 
-  configure_file("${CMAKE_SOURCE_DIR}/cmake/plugin.cxx.in" "${CMAKE_CURRENT_BINARY_DIR}/plugin.cxx")
+  configure_file("${_f3dPlugin_dir}/plugin.cxx.in" "${CMAKE_CURRENT_BINARY_DIR}/plugin.cxx")
 
   add_library(f3d-plugin-${F3D_PLUGIN_NAME} ${F3D_PLUGIN_TYPE} "${CMAKE_CURRENT_BINARY_DIR}/plugin.cxx")
 
@@ -191,9 +203,17 @@ macro(f3d_plugin_build)
     CXX_VISIBILITY_PRESET hidden
     )
 
+  if(DEFINED f3d_INCLUDE_DIR)
+    # External plugin path
+    set(_f3d_include_path "${f3d_INCLUDE_DIR}/f3d")
+  else()
+    # In-source plugin path
+    set(_f3d_include_path "${CMAKE_SOURCE_DIR}/library/public")
+  endif()
+
   target_include_directories(f3d-plugin-${F3D_PLUGIN_NAME}
     PRIVATE
-      "${CMAKE_SOURCE_DIR}/library/private"
+      "${_f3d_include_path}"
       "${CMAKE_CURRENT_BINARY_DIR}")
 
   list(TRANSFORM F3D_PLUGIN_VTK_MODULES PREPEND "VTK::")

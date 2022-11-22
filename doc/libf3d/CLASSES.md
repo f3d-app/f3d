@@ -56,3 +56,11 @@ A class to control logging in the libf3d. Simple using the different dedicated m
 ## Options class
 
 This class lets you control the behavior of the libf3d. An option is basically a string used as a key associated with a value, see the exhaustive [list](OPTIONS.md).
+
+## Reader class
+
+This class is used internally by the [plugin SDK](PLUGINS.md) and is not intended to be used directly.
+
+## Plugin class
+
+This class is used internally by the [plugin SDK](PLUGINS.md) and is not intended to be used directly.

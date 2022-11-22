@@ -91,3 +91,7 @@ find_package(f3d REQUIRED)
 [...]
 target_link_libraries(target f3d::libf3d)
 ```
+
+## Extending libf3d with plugins
+
+In order to add new supported file format to libf3d, you can create a plugin using CMake macros. Please follow instructions in the [F3D plugin SDK guide](PLUGINS.md).

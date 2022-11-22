@@ -180,6 +180,9 @@ if(F3D_INSTALL_SDK)
       "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake"
       "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
       "${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/f3dPlugin.cmake"
+      "${CMAKE_CURRENT_LIST_DIR}/plugin.cxx.in"
+      "${CMAKE_CURRENT_LIST_DIR}/readerBoilerPlate.h.in"
     DESTINATION
       "lib/cmake/${PROJECT_NAME}"
     COMPONENT cmake)

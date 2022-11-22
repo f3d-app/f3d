@@ -180,12 +180,25 @@ jobs:
       working-directory: ${{github.workspace}}/install
       run: ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
+    # TODO: This job should be replaced by a useful example using the libf3d API and merged with the next job
     - name: Check SDK
       if: matrix.os != 'macos-latest'
       working-directory: ${{github.workspace}}
       run: |
         cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -B test_sdk source/.github/test_sdk
         cmake --build test_sdk
+
+    # TODO when VTK is built as a shared library:
+    # - Enable on all OS
+    # - Add -Werror=dev CMake option
+    # - Run ctest
+    - name: Validate plugin example
+      if: matrix.os == 'ubuntu-latest'
+      working-directory: ${{github.workspace}}
+      run: |
+        cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DVTK_DIR:PATH=$(pwd)/dependencies/vtk_install/lib/cmake/vtk -B build_plugin source/examples/plugin
+        cmake --build build_plugin --config Release
+        ctest --test-dir build_plugin -C Release -VV
 
     - name: Setup NSIS
       if: matrix.os == 'windows-latest'
