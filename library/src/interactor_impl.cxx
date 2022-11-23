@@ -295,10 +295,10 @@ public:
   {
     internals* self = static_cast<internals*>(clientData);
 
-    const int* MiddleButtonUpPosition = self->VTKInteractor->GetEventPosition();
+    const int* middleButtonUpPosition = self->VTKInteractor->GetEventPosition();
 
-    const int xDelta = MiddleButtonUpPosition[0] - self->MiddleButtonDownPosition[0];
-    const int yDelta = MiddleButtonUpPosition[1] - self->MiddleButtonDownPosition[1];
+    const int xDelta = middleButtonUpPosition[0] - self->MiddleButtonDownPosition[0];
+    const int yDelta = middleButtonUpPosition[1] - self->MiddleButtonDownPosition[1];
     const int sqPosDelta = xDelta * xDelta + yDelta * yDelta;
     if (sqPosDelta < self->DragDistanceTol * self->DragDistanceTol)
     {
@@ -308,11 +308,11 @@ public:
         self->VTKInteractor->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
 
       bool pickSuccessful = false;
-      double pickedPos[3];
+      double picked[3];
       self->CellPicker->Pick(x, y, 0, renderer);
       if (self->CellPicker->GetActors()->GetNumberOfItems() > 0)
       {
-        self->CellPicker->GetPickPosition(pickedPos);
+        self->CellPicker->GetPickPosition(picked);
         pickSuccessful = true;
       }
       else
@@ -320,19 +320,32 @@ public:
         self->PointPicker->Pick(x, y, 0, renderer);
         if (self->PointPicker->GetActors()->GetNumberOfItems() > 0)
         {
-          self->PointPicker->GetPickPosition(pickedPos);
+          self->PointPicker->GetPickPosition(picked);
           pickSuccessful = true;
         }
       }
 
       if (pickSuccessful)
       {
+        /*     pos.--------------------.foc
+         *       /|                   /
+         *      / |                  /
+         *     .--.-----------------.picked
+         * pos1     pos2
+         */
         const point3_t pos = self->Window.getCamera().getPosition();
         const point3_t foc = self->Window.getCamera().getFocalPoint();
 
-        const double dx = pickedPos[0] - foc[0];
-        const double dy = pickedPos[1] - foc[1];
-        const double dz = pickedPos[2] - foc[2];
+        double focV[3];
+        vtkMath::Subtract(picked, foc.data(), focV); /* foc -> picked */
+
+        double v[3];
+        vtkMath::Subtract(foc.data(), pos.data(), v); /* pos -> foc */
+        vtkMath::ProjectVector(focV, v, v);           /* pos2 -> pos1 */
+
+        double posV[3];
+        vtkMath::Subtract(picked, foc.data(), posV); /* pos -> pos1, parallel to focV */
+        vtkMath::Subtract(posV, v, posV);            /* pos -> pos2, keeps on camera plane */
 
         if (self->TransitionDuration > 0)
         {
@@ -347,17 +360,18 @@ public:
             const double u = (1 - std::cos(vtkMath::Pi() * t)) / 2;
 
             self->Window.getCamera().setFocalPoint(
-              { foc[0] + dx * u, foc[1] + dy * u, foc[2] + dz * u });
+              { foc[0] + focV[0] * u, foc[1] + focV[1] * u, foc[2] + focV[2] * u });
             self->Window.getCamera().setPosition(
-              { pos[0] + dx * u, pos[1] + dy * u, pos[2] + dz * u });
+              { pos[0] + posV[0] * u, pos[1] + posV[1] * u, pos[2] + posV[2] * u });
             self->Window.render();
 
             now = std::chrono::high_resolution_clock::now();
           }
         }
 
-        self->Window.getCamera().setFocalPoint({ foc[0] + dx, foc[1] + dy, foc[2] + dz });
-        self->Window.getCamera().setPosition({ pos[0] + dx, pos[1] + dy, pos[2] + dz });
+        self->Window.getCamera().setFocalPoint({ picked[0], picked[1], picked[2] });
+        self->Window.getCamera().setPosition(
+          { pos[0] + posV[0], pos[1] + posV[1], pos[2] + posV[2] });
         self->Window.render();
       }
     }
