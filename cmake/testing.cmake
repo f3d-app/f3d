@@ -322,6 +322,7 @@ f3d_test(NAME TestInteractionEmptyDrop INTERACTION REGEXP "Drop event without an
 f3d_test(NAME TestInteractionCameraUpdate DATA dragon.vtu INTERACTION DEFAULT_LIGHTS) #MouseWheel;MouseWheel;MouseWheel;S
 f3d_test(NAME TestInteractionFocalPointPicking DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionFocalPointPicking2 DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)
+f3d_test(NAME TestInteractionFocalPointPicking3 DATA pointsCloud.vtp INTERACTION DEFAULT_LIGHTS)
  
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2
