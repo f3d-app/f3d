@@ -11,7 +11,10 @@
 #include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCallbackCommand.h>
+#include <vtkCellPicker.h>
+#include <vtkMath.h>
 #include <vtkNew.h>
+#include <vtkPointPicker.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
@@ -19,6 +22,7 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <chrono>
 #include <map>
 
 namespace f3d::detail
@@ -48,6 +52,16 @@ public:
     dropFilesCallback->SetClientData(this);
     dropFilesCallback->SetCallback(OnDropFiles);
     this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
+
+    vtkNew<vtkCallbackCommand> middleButtonPressCallback;
+    middleButtonPressCallback->SetClientData(this);
+    middleButtonPressCallback->SetCallback(OnMiddleButtonPress);
+    this->Style->AddObserver(vtkCommand::MiddleButtonPressEvent, middleButtonPressCallback);
+
+    vtkNew<vtkCallbackCommand> middleButtonReleaseCallback;
+    middleButtonReleaseCallback->SetClientData(this);
+    middleButtonReleaseCallback->SetCallback(OnMiddleButtonRelease);
+    this->Style->AddObserver(vtkCommand::MiddleButtonReleaseEvent, middleButtonReleaseCallback);
 
 // Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
@@ -268,6 +282,103 @@ public:
     self->Window.render();
   }
 
+  static void OnMiddleButtonPress(vtkObject*, unsigned long, void* clientData, void*)
+  {
+    internals* self = static_cast<internals*>(clientData);
+
+    self->VTKInteractor->GetEventPosition(self->MiddleButtonDownPosition);
+
+    self->Style->OnMiddleButtonDown();
+  }
+
+  static void OnMiddleButtonRelease(vtkObject*, unsigned long, void* clientData, void*)
+  {
+    internals* self = static_cast<internals*>(clientData);
+
+    const int* middleButtonUpPosition = self->VTKInteractor->GetEventPosition();
+
+    const int xDelta = middleButtonUpPosition[0] - self->MiddleButtonDownPosition[0];
+    const int yDelta = middleButtonUpPosition[1] - self->MiddleButtonDownPosition[1];
+    const int sqPosDelta = xDelta * xDelta + yDelta * yDelta;
+    if (sqPosDelta < self->DragDistanceTol * self->DragDistanceTol)
+    {
+      const int x = self->MiddleButtonDownPosition[0];
+      const int y = self->MiddleButtonDownPosition[1];
+      vtkRenderer* renderer =
+        self->VTKInteractor->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
+
+      bool pickSuccessful = false;
+      double picked[3];
+      self->CellPicker->Pick(x, y, 0, renderer);
+      if (self->CellPicker->GetActors()->GetNumberOfItems() > 0)
+      {
+        self->CellPicker->GetPickPosition(picked);
+        pickSuccessful = true;
+      }
+      else
+      {
+        self->PointPicker->Pick(x, y, 0, renderer);
+        if (self->PointPicker->GetActors()->GetNumberOfItems() > 0)
+        {
+          self->PointPicker->GetPickPosition(picked);
+          pickSuccessful = true;
+        }
+      }
+
+      if (pickSuccessful)
+      {
+        /*     pos.--------------------.foc
+         *       /|                   /
+         *      / |                  /
+         *     .--.-----------------.picked
+         * pos1    pos2
+         */
+        camera& cam = self->Window.getCamera();
+        const point3_t pos = cam.getPosition();
+        const point3_t foc = cam.getFocalPoint();
+
+        double focV[3];
+        vtkMath::Subtract(picked, foc.data(), focV); /* foc -> picked */
+
+        double posV[3];
+        vtkMath::Subtract(picked, foc.data(), posV); /* pos -> pos1, parallel to focV */
+        if (!self->Style->GetInteractor()->GetShiftKey())
+        {
+          double v[3];
+          vtkMath::Subtract(foc.data(), pos.data(), v); /* pos -> foc */
+          vtkMath::ProjectVector(focV, v, v);           /* pos2 -> pos1 */
+          vtkMath::Subtract(posV, v, posV);             /* pos -> pos2, keeps on camera plane */
+        }
+
+        if (self->TransitionDuration > 0)
+        {
+          const auto start = std::chrono::high_resolution_clock::now();
+          const auto end = start + std::chrono::milliseconds(self->TransitionDuration);
+          auto now = start;
+          while (now < end)
+          {
+            const double t =
+              std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() /
+              static_cast<double>(self->TransitionDuration);
+            const double u = (1 - std::cos(vtkMath::Pi() * t)) / 2;
+
+            cam.setFocalPoint({ foc[0] + focV[0] * u, foc[1] + focV[1] * u, foc[2] + focV[2] * u });
+            cam.setPosition({ pos[0] + posV[0] * u, pos[1] + posV[1] * u, pos[2] + posV[2] * u });
+            self->Window.render();
+
+            now = std::chrono::high_resolution_clock::now();
+          }
+        }
+
+        cam.setFocalPoint({ picked[0], picked[1], picked[2] });
+        cam.setPosition({ pos[0] + posV[0], pos[1] + posV[1], pos[2] + posV[2] });
+        self->Window.render();
+      }
+    }
+
+    self->Style->OnMiddleButtonUp();
+  }
+
   std::function<bool(int, std::string)> KeyPressUserCallBack = [](int, std::string)
   { return false; };
   std::function<bool(std::vector<std::string>)> DropFilesUserCallBack = [](std::vector<std::string>)
@@ -292,6 +403,14 @@ public:
   int WindowSize[2] = { -1, -1 };
   int WindowPos[2] = { 0, 0 };
   std::map<unsigned long, std::pair<int, std::function<void()> > > TimerCallBacks;
+
+  vtkNew<vtkCellPicker> CellPicker;
+  vtkNew<vtkPointPicker> PointPicker;
+
+  int MiddleButtonDownPosition[2] = { 0, 0 };
+
+  int DragDistanceTol = 3;      /* px */
+  int TransitionDuration = 100; /* ms */
 };
 
 //----------------------------------------------------------------------------
