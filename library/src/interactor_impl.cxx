@@ -331,21 +331,24 @@ public:
          *       /|                   /
          *      / |                  /
          *     .--.-----------------.picked
-         * pos1     pos2
+         * pos1    pos2
          */
-        const point3_t pos = self->Window.getCamera().getPosition();
-        const point3_t foc = self->Window.getCamera().getFocalPoint();
+        camera& cam = self->Window.getCamera();
+        const point3_t pos = cam.getPosition();
+        const point3_t foc = cam.getFocalPoint();
 
         double focV[3];
         vtkMath::Subtract(picked, foc.data(), focV); /* foc -> picked */
 
-        double v[3];
-        vtkMath::Subtract(foc.data(), pos.data(), v); /* pos -> foc */
-        vtkMath::ProjectVector(focV, v, v);           /* pos2 -> pos1 */
-
         double posV[3];
         vtkMath::Subtract(picked, foc.data(), posV); /* pos -> pos1, parallel to focV */
-        vtkMath::Subtract(posV, v, posV);            /* pos -> pos2, keeps on camera plane */
+        if (!self->Style->GetInteractor()->GetShiftKey())
+        {
+          double v[3];
+          vtkMath::Subtract(foc.data(), pos.data(), v); /* pos -> foc */
+          vtkMath::ProjectVector(focV, v, v);           /* pos2 -> pos1 */
+          vtkMath::Subtract(posV, v, posV);             /* pos -> pos2, keeps on camera plane */
+        }
 
         if (self->TransitionDuration > 0)
         {
@@ -359,19 +362,16 @@ public:
               (double)self->TransitionDuration;
             const double u = (1 - std::cos(vtkMath::Pi() * t)) / 2;
 
-            self->Window.getCamera().setFocalPoint(
-              { foc[0] + focV[0] * u, foc[1] + focV[1] * u, foc[2] + focV[2] * u });
-            self->Window.getCamera().setPosition(
-              { pos[0] + posV[0] * u, pos[1] + posV[1] * u, pos[2] + posV[2] * u });
+            cam.setFocalPoint({ foc[0] + focV[0] * u, foc[1] + focV[1] * u, foc[2] + focV[2] * u });
+            cam.setPosition({ pos[0] + posV[0] * u, pos[1] + posV[1] * u, pos[2] + posV[2] * u });
             self->Window.render();
 
             now = std::chrono::high_resolution_clock::now();
           }
         }
 
-        self->Window.getCamera().setFocalPoint({ picked[0], picked[1], picked[2] });
-        self->Window.getCamera().setPosition(
-          { pos[0] + posV[0], pos[1] + posV[1], pos[2] + posV[2] });
+        cam.setFocalPoint({ picked[0], picked[1], picked[2] });
+        cam.setPosition({ pos[0] + posV[0], pos[1] + posV[1], pos[2] + posV[2] });
         self->Window.render();
       }
     }
