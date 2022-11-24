@@ -53,15 +53,15 @@ public:
     dropFilesCallback->SetCallback(OnDropFiles);
     this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
 
-    vtkNew<vtkCallbackCommand> MiddleButtonPressCallback;
-    MiddleButtonPressCallback->SetClientData(this);
-    MiddleButtonPressCallback->SetCallback(OnMiddleButtonPress);
-    this->Style->AddObserver(vtkCommand::MiddleButtonPressEvent, MiddleButtonPressCallback);
+    vtkNew<vtkCallbackCommand> middleButtonPressCallback;
+    middleButtonPressCallback->SetClientData(this);
+    middleButtonPressCallback->SetCallback(OnMiddleButtonPress);
+    this->Style->AddObserver(vtkCommand::MiddleButtonPressEvent, middleButtonPressCallback);
 
-    vtkNew<vtkCallbackCommand> MiddleButtonReleaseCallback;
-    MiddleButtonReleaseCallback->SetClientData(this);
-    MiddleButtonReleaseCallback->SetCallback(OnMiddleButtonRelease);
-    this->Style->AddObserver(vtkCommand::MiddleButtonReleaseEvent, MiddleButtonReleaseCallback);
+    vtkNew<vtkCallbackCommand> middleButtonReleaseCallback;
+    middleButtonReleaseCallback->SetClientData(this);
+    middleButtonReleaseCallback->SetCallback(OnMiddleButtonRelease);
+    this->Style->AddObserver(vtkCommand::MiddleButtonReleaseEvent, middleButtonReleaseCallback);
 
 // Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
@@ -359,7 +359,7 @@ public:
           {
             const double t =
               std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() /
-              (double)self->TransitionDuration;
+              static_cast<double>(self->TransitionDuration);
             const double u = (1 - std::cos(vtkMath::Pi() * t)) / 2;
 
             cam.setFocalPoint({ foc[0] + focV[0] * u, foc[1] + focV[1] * u, foc[2] + focV[2] * u });
