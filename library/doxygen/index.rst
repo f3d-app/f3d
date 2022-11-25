@@ -10,7 +10,7 @@ This is the automatically generated doxygen documentation for the libf3d_,
 which is part of F3D_.
 
 .. _libf3d: https://f3d.app/doc/libf3d/OVERVIEW.html
-.. _F3D: https://f3d.app/doc/libf3d/OVERVIEW.html
+.. _F3D: https://f3d.app
 
 
 .. toctree::

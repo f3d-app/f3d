@@ -20,19 +20,12 @@ jobs:
     - name: Build Jekyll
       uses: actions/jekyll-build-pages@v1
 
-    - name: Install exhale and doxygen
+    - name: Install doxygen and build doxygen doc
       working-directory: ${{github.workspace}}
       run: |
         pip install sphinx sphinx-book-theme exhale
         sudo apt-get install doxygen
-
-    - name: Build doxygen
-      working-directory: ${{github.workspace}}/library/doxygen
-      run: make html
-
-    - name: Copy doxygen
-      working-directory: ${{github.workspace}}
-      run: sudo mv library/doxygen/build/html _site/doc/libf3d/doxygen
+        sphinx-build -M html ./library/doxygen _site/doc/libf3d/doxygen
 
     - name: Deploy
       if: ${{ github.event.pull_request.merged }}

@@ -28,6 +28,5 @@ Please note the favicon and search bar are not working locally, this is expected
 
 1. Install Python, pip and doxygen
 2. `pip install sphinx sphinx-book-theme exhale`
-3. `cd ./library/doxygen`
-4. `make html`
-5. `build` directory now contains a html website
+3. `sphinx-build -M html ./library/doxygen /path/to/build`
+4. `/path/to/build` directory now contains a html website
