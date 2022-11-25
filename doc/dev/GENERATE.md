@@ -20,5 +20,13 @@ Requires `clang` toolchain.
 1. Install `ruby` and make sure ruby binaries directory is added to your `PATH`
 2. Install jekyll and all dependencies: `gem install jekyll jekyll-remote-theme jekyll-relative-links jekyll-seo-tag jekyll-optional-front-matter jekyll-titles-from-headings`
 3. Run jekyll locally: `jekyll server`
+4. Open http://127.0.0.1:4000/ in a browser
 
 Please note the favicon and search bar are not working locally, this is expected.
+
+# How to locally generate the doxygen documentation
+
+1. Install Python, pip and doxygen
+2. `pip install sphinx sphinx-book-theme exhale`
+3. `sphinx-build -M html ./library/doxygen /path/to/build`
+4. `/path/to/build` directory now contains a html website
