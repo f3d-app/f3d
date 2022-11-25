@@ -13,7 +13,16 @@ include:
   - LICENSE.md
   - _licenses.md
 exclude:
-  - testing/data/DATA_LICENSES.md
+  - CMakeLists.txt
+  - codecov.yml
+  - application
+  - cmake
+  - java
+  - library
+  - plugins
+  - python
+  - testing
+  - winshellext
 title: F3D
 tagline: Fast and minimalist 3D viewer
 description: F3D - Fast and minimalist 3D viewer

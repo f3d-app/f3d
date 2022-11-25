@@ -1,4 +1,7 @@
-# Class Listing
+# Classes Introduction
+
+This is only an introduction to libf3d classes.
+For the complete documentation, please consult the [libf3d doxygen documentation.](https://f3d.app/doc/libf3d/doxygen/).
 
 ## Engine class
 
