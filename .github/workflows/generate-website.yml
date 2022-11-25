@@ -25,7 +25,8 @@ jobs:
       run: |
         pip install sphinx sphinx-book-theme exhale
         sudo apt install doxygen
-        sudo sphinx-build -M html ./library/doxygen _site/doc/libf3d/doxygen
+        sphinx-build -M html ./library/doxygen ./library/doxygen/build/
+        sudo mv library/doxygen/build/html _site/doc/libf3d/doxygen
 
     - name: Deploy
       if: ${{ github.event.pull_request.merged }}
