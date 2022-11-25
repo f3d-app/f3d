@@ -24,8 +24,8 @@ jobs:
       working-directory: ${{github.workspace}}
       run: |
         pip install sphinx sphinx-book-theme exhale
-        sudo apt-get install doxygen
-        sphinx-build -M html ./library/doxygen _site/doc/libf3d/doxygen
+        sudo apt install doxygen
+        sudo sphinx-build -M html ./library/doxygen _site/doc/libf3d/doxygen
 
     - name: Deploy
       if: ${{ github.event.pull_request.merged }}
