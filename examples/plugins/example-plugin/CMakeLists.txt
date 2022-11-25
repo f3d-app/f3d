@@ -11,7 +11,6 @@ f3d_plugin_init()
 f3d_plugin_declare_reader(
   NAME ExampleReader
   EXTENSIONS expl
-  MIMETYPES application/vnd.expl
   VTK_READER vtkF3DExampleReader
   DESCRIPTION "Example reader"
 )
