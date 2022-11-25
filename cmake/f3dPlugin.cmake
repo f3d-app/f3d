@@ -2,7 +2,7 @@
 @file f3dPlugin.cmake
 
 This module contains all the macros required to define a plugin to extend
-the reader capabilities of F3D.
+the reading capabilities of F3D.
 #]==]
 
 set(_f3dPlugin_dir "${CMAKE_CURRENT_LIST_DIR}")

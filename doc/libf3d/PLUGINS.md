@@ -1,7 +1,7 @@
 # Plugin SDK
 
 When calling `find_package(f3d)` in CMake, a few macros are made available to you to generate a plugin which allow you to extend libf3d to support your own file format.
-> Please consider adding your plugin in [F3D directly](https://github.com/f3d-app/f3d/tree/master/plugins) if you think it can be useful to the community.
+> Please consider [contributing](../dev/CONTRIBUTE.md) your plugin in [F3D directly](https://github.com/f3d-app/f3d/tree/master/plugins) if you think it can be useful to the community. You can also consider contributing directly [in VTK](https://gitlab.kitware.com/vtk/vtk/blob/master/Documentation/dev/git/develop.md).
 
 ## Creating a plugin
 
@@ -36,4 +36,4 @@ If the build succeeds, a library called `libf3d-plugin-<name>.so` will be create
 
 ## Loading your plugin
 
-The plugin can be loaded using `f3d::engine::loadPlugin("path or name")` api if you are using libf3d, or `--load-plugins="path or name"` option if you are using f3d application.
+The plugin can be loaded using `f3d::engine::loadPlugin("path or name")` api if you are using libf3d, or `--load-plugins="path or name"` option if you are using F3D application.

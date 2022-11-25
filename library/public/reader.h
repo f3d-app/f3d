@@ -23,7 +23,7 @@ namespace f3d
  * automatically done when the plugin is loaded by CMake when declaring every reader
  * with the f3d_declare_reader() macro.
  *
- * @warning This file is used internally by the plugin SDK, it should not be included
+ * @warning This file is used internally by the plugin SDK, it is not intended to be included
  * directly by libf3d users.
  */
 class reader

@@ -1,7 +1,0 @@
-NAME
-  f3d::VTKExtensionsExampleReader
-DESCRIPTION
-  A VTK module for the example plugin
-DEPENDS
-  VTK::CommonCore
-  VTK::CommonExecutionModel

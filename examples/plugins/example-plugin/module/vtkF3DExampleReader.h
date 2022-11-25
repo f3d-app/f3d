@@ -31,6 +31,10 @@ protected:
   vtkF3DExampleReader();
   ~vtkF3DExampleReader() override;
 
+  /**
+   * Since the reader generate a vtkPolyData, we just have to derive from vtkPolyDataAlgorithm
+   * and override this function.
+   */
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
