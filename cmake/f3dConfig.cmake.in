@@ -23,6 +23,9 @@ set(f3d_BINDINGS_JAVA "@F3D_BINDINGS_JAVA@")
 # Provide a f3d_embed_file method for embedding image into source code
 include("${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake")
 
+# Provide macros used to create a plugin
+include("${CMAKE_CURRENT_LIST_DIR}/f3dPlugin.cmake")
+
 include("${CMAKE_CURRENT_LIST_DIR}/f3dTargets.cmake")
 set_and_check(f3d_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/include")
 check_required_components(f3d)

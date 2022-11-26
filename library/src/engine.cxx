@@ -102,19 +102,31 @@ interactor& engine::getInteractor()
 }
 
 //----------------------------------------------------------------------------
-void engine::loadPlugin(const std::string& path)
+void engine::loadPlugin(const std::string& pathOrName)
 {
   // check if the plugin is a known static plugin
   factory* factory = factory::instance();
-  factory::plugin_initializer_t init_plugin = factory->getStaticInitializer(path);
+  factory::plugin_initializer_t init_plugin = factory->getStaticInitializer(pathOrName);
+
+  vtksys::DynamicLoader::LibraryHandle handle = nullptr;
 
   if (init_plugin == nullptr)
   {
-    // try if the path is a library full path
-    vtksys::DynamicLoader::LibraryHandle handle = vtksys::DynamicLoader::OpenLibrary(path);
-    if (!handle)
+    std::string fullPath = vtksys::SystemTools::CollapseFullPath(pathOrName);
+    if (vtksys::SystemTools::FileExists(fullPath))
     {
-      std::string fullPath;
+      // plugin provided as full path
+      handle = vtksys::DynamicLoader::OpenLibrary(fullPath);
+
+      if (!handle)
+      {
+        throw engine::plugin_exception(
+          "Cannot open the library \"" + fullPath + "\": " + vtksys::DynamicLoader::LastError());
+      }
+    }
+    else
+    {
+      std::string libName;
 
       // Right now, plugins should be located in the same folder than f3d.exe on Windows
       // On Linux/macOS, when we are not using a full path, we rely on LD_LIBRARY_PATH
@@ -125,21 +137,21 @@ void engine::loadPlugin(const std::string& path)
       {
         std::string progPath =
           vtksys::SystemTools::GetProgramPath(vtksys::Encoding::ToNarrow(pathBuf.data()));
-        fullPath = vtksys::SystemTools::ConvertToWindowsOutputPath(progPath) + "\\";
+        libName = vtksys::SystemTools::ConvertToWindowsOutputPath(progPath) + "\\";
       }
 #endif
 
       // construct the library file name from the plugin name
-      fullPath += vtksys::DynamicLoader::LibPrefix();
-      fullPath += "f3d-plugin-";
-      fullPath += path;
-      fullPath += vtksys::DynamicLoader::LibExtension();
+      libName += vtksys::DynamicLoader::LibPrefix();
+      libName += "f3d-plugin-";
+      libName += pathOrName;
+      libName += vtksys::DynamicLoader::LibExtension();
 
-      handle = vtksys::DynamicLoader::OpenLibrary(fullPath);
+      handle = vtksys::DynamicLoader::OpenLibrary(libName);
       if (!handle)
       {
         throw engine::plugin_exception(
-          "Cannot open the library \"" + path + "\": " + vtksys::DynamicLoader::LastError());
+          "Cannot open the library \"" + pathOrName + "\": " + vtksys::DynamicLoader::LastError());
       }
     }
 
@@ -147,7 +159,7 @@ void engine::loadPlugin(const std::string& path)
       vtksys::DynamicLoader::GetSymbolAddress(handle, "init_plugin"));
     if (init_plugin == nullptr)
     {
-      throw engine::plugin_exception("Cannot find init_plugin symbol in library \"" + path +
+      throw engine::plugin_exception("Cannot find init_plugin symbol in library \"" + pathOrName +
         "\": " + vtksys::DynamicLoader::LastError());
     }
   }
