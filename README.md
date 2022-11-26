@@ -25,6 +25,8 @@ F3D also contains the libf3d, a simple library to render meshes, with C++, Pytho
 
 See the [gallery](doc/GALLERY.md) for more images, take a look at the [changelog](doc/CHANGELOG.md) or go to the [releases page](https://github.com/f3d-app/f3d/releases) to download F3D!
 
+If you need any help or want to discuss with other F3D users and developers, head over to our [discord](https://discord.gg/ZYHzNeEdX5).
+
 # Quickstart
 
 Open a file and visualize it interactively:
