@@ -161,6 +161,13 @@ defaults:
       parent: libf3d Documentation
       nav_order: 3
 
+  -
+    scope:
+      path: "doc/libf3d/PLUGINS.md"
+    values:
+      parent: libf3d Documentation
+      nav_order: 4
+
 # dev doc
   -
     scope:
