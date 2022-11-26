@@ -1,4 +1,4 @@
-[![CI](https://github.com/f3d-app/f3d/actions/workflows/ci.yml/badge.svg)](https://github.com/f3d-app/f3d/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/f3d-app/f3d/branch/master/graph/badge.svg?token=siwG82IXK7)](https://codecov.io/gh/f3d-app/f3d) [![Downloads](https://img.shields.io/github/downloads/f3d-app/f3d/total.svg)](https://github.com/f3d-app/f3d/releases)
+[![CI](https://github.com/f3d-app/f3d/actions/workflows/ci.yml/badge.svg)](https://github.com/f3d-app/f3d/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/f3d-app/f3d/branch/master/graph/badge.svg?token=siwG82IXK7)](https://codecov.io/gh/f3d-app/f3d) [![Downloads](https://img.shields.io/github/downloads/f3d-app/f3d/total.svg)](https://github.com/f3d-app/f3d/releases) ![Discord](https://discordapp.com/api/guilds/1046005690809978911/widget.png?style=shield)
 
 # F3D - Fast and minimalist 3D viewer
 By Michael Migliore and Mathieu Westphal.
@@ -24,6 +24,8 @@ F3D also contains the libf3d, a simple library to render meshes, with C++, Pytho
 *A direct scalars render by F3D*
 
 See the [gallery](doc/GALLERY.md) for more images, take a look at the [changelog](doc/CHANGELOG.md) or go to the [releases page](https://github.com/f3d-app/f3d/releases) to download F3D!
+
+If you need any help or want to discuss with other F3D users and developers, head over to our [discord](https://discord.gg/ZYHzNeEdX5).
 
 # Quickstart
 
