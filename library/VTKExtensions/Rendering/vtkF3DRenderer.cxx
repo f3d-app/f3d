@@ -538,6 +538,8 @@ void vtkF3DRenderer::SetLightIntensity(const double intensityFactor)
 
     light->SetIntensity(originalIntensity * intensityFactor);
   }
+  this->LightIntensity = intensityFactor;
+  this->CheatSheetNeedUpdate = true;
 }
 
 //----------------------------------------------------------------------------
@@ -723,6 +725,10 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 #endif
   cheatSheetText << " U: Blur background " << (this->UseBlurBackground ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText << " K: Trackball interaction " << (this->UseTrackball ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText.precision(2);
+  cheatSheetText << std::fixed;
+  cheatSheetText << " L: Light (increase, shift+L: decrease) [" << this->LightIntensity << "]"
+                 << " \n";
 }
 
 //----------------------------------------------------------------------------

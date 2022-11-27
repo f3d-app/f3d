@@ -198,6 +198,14 @@ public:
         self->Options.toggle("interactor.trackball");
         render = true;
         break;
+      case 'L':
+      {
+        const double intensity = self->Options.getAsDouble("render.light.intensity");
+        const double factor = rwi->GetShiftKey() ? 0.95 : 1.05;
+        self->Options.set("render.light.intensity", intensity * factor);
+        render = true;
+        break;
+      }
       case 'H':
         self->Options.toggle("ui.cheatsheet");
         render = true;
