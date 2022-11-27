@@ -179,6 +179,7 @@ protected:
   std::string HDRIFile;
   std::string FontFile;
 
+  double LightIntensity = 1.0;
   std::map<vtkLight*, double> OriginalLightIntensities;
 
   std::string CurrentGridInfo;
