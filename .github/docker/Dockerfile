@@ -7,6 +7,7 @@ RUN apt update && apt install -y \
     ca-certificates \
     clang-10 \
     curl \
+    chrpath \
     default-jdk \
     freeglut3 \
     freeglut3-dev \
