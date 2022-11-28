@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/alembic_install
-        key: alembic-v1.8.3-5-${{inputs.os}}
+        key: alembic-v1.8.3-6-${{inputs.os}}
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -40,7 +40,7 @@ runs:
         cmake ../alembic
         -DALEMBIC_SHARED_LIBS=OFF
         -DUSE_BINARIES=OFF
-        -DBUILD_TESTING=OFF
+        -DUSE_TESTS=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DImath_DIR:PATH=$(pwd)/../imath_install/lib/cmake/Imath
         -DCMAKE_INSTALL_PREFIX:PATH=../alembic_install
