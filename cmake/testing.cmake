@@ -253,6 +253,10 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestABC DATA suzanne.abc ARGS --load-plugins=alembic)
 endif()
 
+if(F3D_PLUGIN_BUILD_DRACO)
+  f3d_test(NAME TestDRACO DATA suzanne.drc DEFAULT_LIGHTS ARGS --load-plugins=draco)
+endif()
+
 if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestOFF DATA teapot.off ARGS --up=+Z --load-plugins=assimp)
   f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p --load-plugins=assimp)
