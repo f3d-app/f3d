@@ -1,4 +1,4 @@
-[![CI](https://github.com/f3d-app/f3d/actions/workflows/ci.yml/badge.svg)](https://github.com/f3d-app/f3d/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/f3d-app/f3d/branch/master/graph/badge.svg?token=siwG82IXK7)](https://codecov.io/gh/f3d-app/f3d) [![Downloads](https://img.shields.io/github/downloads/f3d-app/f3d/total.svg)](https://github.com/f3d-app/f3d/releases) [![Discord](https://discordapp.com/api/guilds/1046005690809978911/widget.png?style=shield)](https://discord.f3d.app)
+[![CI](https://github.com/f3d-app/f3d/actions/workflows/ci.yml/badge.svg)](https://github.com/f3d-app/f3d/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/f3d-app/f3d/branch/master/graph/badge.svg?token=siwG82IXK7)](https://codecov.io/gh/f3d-app/f3d) [![Downloads](https://img.shields.io/github/downloads/f3d-app/f3d/total.svg)](https://github.com/f3d-app/f3d/releases) [![Discord](https://discordapp.com/api/guilds/1046005690809978911/widget.png?style=shield)](https://discord.f3d.app) [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/f3d-app)
 
 # F3D - Fast and minimalist 3D viewer
 By Michael Migliore and Mathieu Westphal.
@@ -57,7 +57,7 @@ man f3d # Linux only
 
 # Support
 
-F3D is developed by a team of passionate devs. Please use F3D and star it on github to support us!
+F3D is developed by a team of passionate devs. Please use F3D, star it on github or even become a [sponsor](https://github.com/sponsors/f3d-app) to support us!
 
 # Acknowledgments
 
