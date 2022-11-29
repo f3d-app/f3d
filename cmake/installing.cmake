@@ -135,6 +135,11 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
         DESTINATION "share/mime/packages" COMPONENT mimetypes
         RENAME "f3d-assimp-formats.xml")
     endif()
+    if (F3D_PLUGIN_BUILD_DRACO)
+      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-draco-formats.xml"
+        DESTINATION "share/mime/packages" COMPONENT mimetypes
+        RENAME "f3d-draco-formats.xml")
+    endif()
     if (F3D_PLUGIN_BUILD_EXODUS)
       install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-exodus-formats.xml"
         DESTINATION "share/mime/packages" COMPONENT mimetypes

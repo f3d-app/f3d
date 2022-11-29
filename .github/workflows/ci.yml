@@ -66,6 +66,11 @@ jobs:
       with:
         os: ${{matrix.os}}
 
+    - name: Install Draco dependency
+      uses: ./source/.github/actions/draco-install-dep
+      with:
+        os: ${{matrix.os}}
+
     - name: Install Imath dependency
       uses: ./source/.github/actions/imath-install-dep
       with:
@@ -106,9 +111,10 @@ jobs:
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
-        -DF3D_PLUGIN_BUILD_OCCT=ON
-        -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
+        -DF3D_PLUGIN_BUILD_OCCT=ON
         -DF3D_BINDINGS_JAVA=ON
         -DF3D_INSTALL_SDK=ON
         -DF3D_INSTALL_SDK_PLUGIN=ON
@@ -117,6 +123,7 @@ jobs:
         -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
         -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
         -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
+        -Ddraco_DIR:PATH=$(pwd)/../dependencies/draco_install/share/cmake/draco
         -Dpybind11_DIR:PATH=$(pwd)/../dependencies/pybind11_install/share/cmake/pybind11
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
         ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DF3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
@@ -276,6 +283,9 @@ jobs:
     - name: Install Assimp dependency
       uses: ./source/.github/actions/assimp-install-dep
 
+    - name: Install Draco dependency
+      uses: ./source/.github/actions/draco-install-dep
+
     - name: Install Imath dependency
       uses: ./source/.github/actions/imath-install-dep
 
@@ -300,15 +310,17 @@ jobs:
         -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
-        -DF3D_PLUGIN_BUILD_OCCT=ON
-        -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
+        -DF3D_PLUGIN_BUILD_OCCT=ON
         -DCMAKE_BUILD_TYPE=Release
         -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
         -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade
         -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
         -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
         -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
+        -Ddraco_DIR:PATH=$(pwd)/../dependencies/draco_install/share/cmake/draco
         -DF3D_COVERAGE=ON
 
     - name: Build
@@ -387,6 +399,11 @@ jobs:
     - name: Install Assimp dependency
       uses: ./source/.github/actions/assimp-install-dep
 
+    - name: Install Draco dependency
+      uses: ./source/.github/actions/draco-install-dep
+      with:
+        os: ${{matrix.os}}
+
     - name: Install Imath dependency
       uses: ./source/.github/actions/imath-install-dep
 
@@ -414,15 +431,17 @@ jobs:
         -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
-        -DF3D_PLUGIN_BUILD_OCCT=ON
-        -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
+        -DF3D_PLUGIN_BUILD_OCCT=ON
         -DCMAKE_BUILD_TYPE=Release
         -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
         -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade
         -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
         -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
         -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
+        -Ddraco_DIR:PATH=$(pwd)/../dependencies/draco_install/share/cmake/draco
         -DF3D_SANITIZER=${{matrix.santype}}
 
     - name: Build
