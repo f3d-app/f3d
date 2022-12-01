@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-2019, macos-latest]
         vtk_version: [commit, v9.2.2, v9.1.0, v9.0.0]
 
     runs-on: ${{matrix.os}}
@@ -119,7 +119,7 @@ jobs:
         -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
         -Dpybind11_DIR:PATH=$(pwd)/../dependencies/pybind11_install/share/cmake/pybind11
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
-        ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DF3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+        ${{ matrix.os == 'windows-2019' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DF3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
         ${{ matrix.os == 'macos-latest' && '-DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
         ${{ matrix.os == 'ubuntu-latest' && '-DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON -DF3D_INSTALL_MIME_TYPES_FILES=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
         ${{ matrix.vtk_version == 'commit' && '-DF3D_ENABLE_HDRI_TESTS=ON' || '-DF3D_ENABLE_HDRI_TESTS=OFF' }}
@@ -135,7 +135,7 @@ jobs:
 
     - name: Install Mesa windows
       shell: cmd
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2019'
       working-directory: ${{github.workspace}}/dependencies/
       run: |
         mkdir mesa
@@ -167,7 +167,7 @@ jobs:
       run: ./bin/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
     - name: Check Install windows
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2019'
       working-directory: ${{github.workspace}}/install
       run: |
         cp ..\dependencies\mesa\x64\opengl32.dll .\bin\
@@ -201,7 +201,7 @@ jobs:
         ctest --test-dir build_plugin -C Release -VV
 
     - name: Setup NSIS
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2019'
       working-directory: ${{github.workspace}}
       run: cp source\.github\nsis\FileAssociation.nsh "C:/Program Files (x86)/NSIS/Include"
 
@@ -220,7 +220,7 @@ jobs:
         cmake --build test_sdk
 
     - name: Check Packaging Windows
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2019'
       working-directory: ${{github.workspace}}
       run: |
         mkdir package
