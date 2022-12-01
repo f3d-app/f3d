@@ -24,6 +24,7 @@
 
 #include <chrono>
 #include <map>
+#include <math.h>
 
 namespace f3d::detail
 {
@@ -201,8 +202,24 @@ public:
       case 'L':
       {
         const double intensity = self->Options.getAsDouble("render.light.intensity");
-        const double factor = rwi->GetShiftKey() ? 0.95 : 1.05;
-        self->Options.set("render.light.intensity", intensity * factor);
+        const bool down = rwi->GetShiftKey();
+
+        /* `ref < x` is equivalent to:
+         * - `intensity <= x` when going down
+         * - `intensity < x` when going up */
+        const double ref = down ? intensity - 1e-6 : intensity;
+        // clang-format off
+        /* offset in percentage points */
+        const int offsetPp = ref < .5 ?  1
+                           : ref <  1 ?  2
+                           : ref <  5 ?  5
+                           : ref < 10 ? 10
+                           :            25;
+        // clang-format on
+        /* new intensity in percents */
+        const int newIntensityPct = std::lround(intensity * 100) + (down ? -offsetPp : +offsetPp);
+
+        self->Options.set("render.light.intensity", std::max(newIntensityPct, 0) / 100.0);
         render = true;
         break;
       }
