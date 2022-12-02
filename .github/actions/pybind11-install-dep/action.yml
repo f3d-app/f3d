@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/pybind11_install
-        key: pybind11-v2.9.2-2-${{inputs.os}}
+        key: pybind11-v2.10.1-1-${{inputs.os}}
 
     - name: Checkout pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'
