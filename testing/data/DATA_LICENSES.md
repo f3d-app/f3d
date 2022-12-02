@@ -11,6 +11,7 @@
 - Cameras.gltf: glTF-Sample-Models: Public Domain
 - cow.vtk: VTK Data: BSD
 - cow.vtp: VTK Data: BSD
+- cube.stp: GrabCad/Skip Baker: Cross License
 - disk_out_ref.ex2: VTK Data: BSD
 - dragon.vtu: Stanford: Public Domain
 - duck.dae: assimp test models: BSD
