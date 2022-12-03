@@ -50,7 +50,7 @@ runs:
 
     - name: Checkout VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: Kitware/VTK
         submodules: 'true'
