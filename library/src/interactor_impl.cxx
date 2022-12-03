@@ -23,8 +23,8 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <chrono>
+#include <cmath>
 #include <map>
-#include <math.h>
 
 namespace f3d::detail
 {
