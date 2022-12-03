@@ -17,7 +17,7 @@ runs:
 
     - name: Checkout LFS data
       if: steps.cache-lfs.outputs.cache-hit != 'true'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: 'lfs_data'
         fetch-depth: 0
