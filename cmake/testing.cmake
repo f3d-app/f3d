@@ -323,6 +323,7 @@ f3d_test(NAME TestInteractionCameraUpdate DATA dragon.vtu INTERACTION DEFAULT_LI
 f3d_test(NAME TestInteractionFocalPointPickingDefault DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionFocalPointPickingShift DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionFocalPointPickingPoints DATA pointsCloud.vtp INTERACTION DEFAULT_LIGHTS)
+f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)
  
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2
