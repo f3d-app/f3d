@@ -5,3 +5,4 @@ DESCRIPTION
 DEPENDS
   VTK::CommonCore
   VTK::CommonExecutionModel
+  VTK::IOImport
