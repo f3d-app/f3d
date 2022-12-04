@@ -249,19 +249,8 @@ if(F3D_MODULE_EXTERNAL_RENDERING)
   f3d_test(NAME TestVersionExternal ARGS --version REGEXP "External rendering module: ON")
 endif()
 
-if(F3D_PLUGIN_BUILD_EXODUS)
-  f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS --load-plugins=exodus -s --camera-position=-11,-2,-49 DEFAULT_LIGHTS)
-  f3d_test(NAME TestGenericImporterAnimation DATA small.ex2 DEFAULT_LIGHTS ARGS --load-plugins=exodus)
-  # Test Generic Importer Verbose animation
-  f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "0: default")
-
-  # Test animation with generic importer
-  f3d_test(NAME TestInteractionAnimationGenericImporter DATA small.ex2 INTERACTION NO_BASELINE ARGS --load-plugins=exodus)#Space;Space;
-endif()
-
-if(F3D_PLUGIN_BUILD_OCCT)
-  f3d_test(NAME TestSTEP DATA cube.stp DEFAULT_LIGHTS ARGS --load-plugins=occt)
-  f3d_test(NAME TestIGES DATA spacer.igs DEFAULT_LIGHTS ARGS --load-plugins=occt)
+if(F3D_PLUGIN_BUILD_ALEMBIC)
+  f3d_test(NAME TestABC DATA suzanne.abc ARGS --load-plugins=alembic)
 endif()
 
 if(F3D_PLUGIN_BUILD_ASSIMP)
@@ -289,8 +278,19 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   endif()
 endif()
 
-if(F3D_PLUGIN_BUILD_ALEMBIC)
-  f3d_test(NAME TestABC DATA suzanne.abc ARGS --load-plugins=alembic)
+if(F3D_PLUGIN_BUILD_EXODUS)
+  f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS --load-plugins=exodus -s --camera-position=-11,-2,-49 DEFAULT_LIGHTS)
+  f3d_test(NAME TestGenericImporterAnimation DATA small.ex2 DEFAULT_LIGHTS ARGS --load-plugins=exodus)
+  # Test Generic Importer Verbose animation
+  f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "0: default")
+
+  # Test animation with generic importer
+  f3d_test(NAME TestInteractionAnimationGenericImporter DATA small.ex2 INTERACTION NO_BASELINE ARGS --load-plugins=exodus)#Space;Space;
+endif()
+
+if(F3D_PLUGIN_BUILD_OCCT)
+  f3d_test(NAME TestSTEP DATA cube.stp DEFAULT_LIGHTS ARGS --load-plugins=occt)
+  f3d_test(NAME TestIGES DATA spacer.igs DEFAULT_LIGHTS ARGS --load-plugins=occt)
 endif()
 
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
