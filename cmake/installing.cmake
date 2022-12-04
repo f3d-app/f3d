@@ -125,6 +125,16 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
     install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-vtk-formats.xml"
       DESTINATION "share/mime/packages" COMPONENT mimetypes
       RENAME "f3d-vtk-formats.xml")
+    if (F3D_PLUGIN_BUILD_ALEMBIC)
+      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-alembic-formats.xml"
+        DESTINATION "share/mime/packages" COMPONENT mimetypes
+        RENAME "f3d-alembic-formats.xml")
+    endif()
+    if (F3D_PLUGIN_BUILD_ASSIMP)
+      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-assimp-formats.xml"
+        DESTINATION "share/mime/packages" COMPONENT mimetypes
+        RENAME "f3d-assimp-formats.xml")
+    endif()
     if (F3D_PLUGIN_BUILD_EXODUS)
       install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-exodus-formats.xml"
         DESTINATION "share/mime/packages" COMPONENT mimetypes
@@ -134,11 +144,6 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
       install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-occt-formats.xml"
         DESTINATION "share/mime/packages" COMPONENT mimetypes
         RENAME "f3d-occt-formats.xml")
-    endif()
-    if (F3D_PLUGIN_BUILD_ASSIMP)
-      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-assimp-formats.xml"
-        DESTINATION "share/mime/packages" COMPONENT mimetypes
-        RENAME "f3d-assimp-formats.xml")
     endif()
   endif()
 elseif(WIN32)
