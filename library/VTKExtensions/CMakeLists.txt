@@ -39,7 +39,7 @@ foreach (module IN LISTS modules)
   if (NOT "${libf3d_link_options_public}" STREQUAL "")
     vtk_module_link_options(${module} PUBLIC ${libf3d_link_options_public})
   endif()
-  vtk_module_compile_features(${module} PRIVATE cxx_std_17)
+  vtk_module_set_property(${module} PROPERTY CXX_STANDARD VALUE 17)
   if(F3D_STRICT_BUILD AND MSVC)
     # There are warnings in VTK related to deprecated features in C++17
     vtk_module_definitions(${module} PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)

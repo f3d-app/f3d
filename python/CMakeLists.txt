@@ -3,12 +3,11 @@ message(STATUS "Bindings: Python: pybind11 ${pybind11_VERSION} found")
 
 pybind11_add_module(pyf3d F3DPythonBindings.cxx)
 
-target_compile_features(pyf3d PRIVATE cxx_std_14)
-
 target_link_libraries(pyf3d PRIVATE libf3d)
 
 set_target_properties(pyf3d PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+  CXX_STANDARD 14
   CXX_VISIBILITY_PRESET hidden
   OUTPUT_NAME "f3d"
   )
