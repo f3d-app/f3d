@@ -12,7 +12,7 @@ class WarningEventCallback : public vtkCommand
 public:
   static WarningEventCallback* New() { return new WarningEventCallback; }
 
-  void Execute(vtkObject* caller, unsigned long evId, void* data) override
+  void Execute(vtkObject* caller, unsigned long vtkNotUsed(evId), void* data) override
   {
     auto importer = reinterpret_cast<vtkF3DAssimpImporter*>(caller);
     char* message = static_cast<char*>(data);
@@ -28,7 +28,7 @@ private:
   std::vector<std::string> Messages;
 };
 
-int TestF3DAssimpImportError(int argc, char* argv[])
+int TestF3DAssimpImportError(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
 {
   vtkObject::GlobalWarningDisplayOn();
   vtkNew<vtkF3DAssimpImporter> importer;

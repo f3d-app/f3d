@@ -51,6 +51,7 @@ public:
     return types;
   }
 
+#if @F3D_READER_HAS_SCORE@
   /*
    * Get the score of this reader.
    * The score is used in case several readers are able to read the file.
@@ -61,6 +62,7 @@ public:
   {
     return @F3D_READER_SCORE@;
   }
+#endif
 
 #if @F3D_READER_HAS_GEOMETRY_READER@
   /*
@@ -68,12 +70,12 @@ public:
    */
   vtkSmartPointer<vtkAlgorithm> createGeometryReader(const std::string& fileName) const override
   {
-    vtkNew<@F3D_READER_VTK_READER@> reader;
-    reader->SetFileName(fileName.c_str());
+    vtkNew<@F3D_READER_VTK_READER@> geomReader;
+    geomReader->SetFileName(fileName.c_str());
 
-    this->applyCustomReader(reader, fileName);
+    this->applyCustomReader(geomReader, fileName);
 
-    return reader;
+    return geomReader;
   }
 #endif
 

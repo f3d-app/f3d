@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-int TestF3DOCCTReader(int argc, char* argv[])
+int TestF3DOCCTReader(int vtkNotUsed(argc), char* argv[])
 {
   std::string filename = std::string(argv[1]) + "data/cube.stp";
   vtkNew<vtkF3DOCCTReader> reader;
