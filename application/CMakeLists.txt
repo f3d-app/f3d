@@ -40,6 +40,7 @@ endif()
 set_target_properties(f3d PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
   CXX_VISIBILITY_PRESET hidden
+  CXX_STANDARD 17
   )
 
 if (APPLE)
@@ -47,8 +48,6 @@ if (APPLE)
 elseif (UNIX)
   set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../${CMAKE_INSTALL_LIBDIR})
 endif ()
-
-target_compile_features(f3d PRIVATE cxx_std_17)
 
 target_include_directories(f3d
   PUBLIC
