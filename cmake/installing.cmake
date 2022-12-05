@@ -180,15 +180,22 @@ if(F3D_INSTALL_SDK)
     VERSION "${PROJECT_VERSION}"
     COMPATIBILITY SameMinorVersion)
 
-  install(
-    FILES
-      "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake"
-      "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
-      "${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake"
+  set(sdk_cmake_files
+    "${CMAKE_CURRENT_BINARY_DIR}/f3dConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/f3dConfigVersion.cmake"
+    "${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake")
+
+  if (F3D_INSTALL_SDK_PLUGIN)
+    list(APPEND sdk_cmake_files
       "${CMAKE_CURRENT_LIST_DIR}/f3dPlugin.cmake"
       "${CMAKE_CURRENT_LIST_DIR}/plugin.cxx.in"
-      "${CMAKE_CURRENT_LIST_DIR}/readerBoilerPlate.h.in"
+      "${CMAKE_CURRENT_LIST_DIR}/readerBoilerPlate.h.in")
+  endif ()
+
+  install(
+    FILES ${sdk_cmake_files}
     DESTINATION
       "lib/cmake/${PROJECT_NAME}"
     COMPONENT cmake)
+
 endif()
