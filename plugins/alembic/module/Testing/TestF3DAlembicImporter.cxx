@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-int TestF3DAlembicImporter(int argc, char* argv[])
+int TestF3DAlembicImporter(int vtkNotUsed(argc), char* argv[])
 {
   std::string filename = std::string(argv[1]) + "data/suzanne.abc";
   vtkNew<vtkF3DAlembicImporter> importer;

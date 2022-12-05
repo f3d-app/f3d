@@ -63,8 +63,10 @@ macro(f3d_plugin_declare_reader)
     set(F3D_READER_HAS_CUSTOM_CODE 0)
   endif()
 
-  if(NOT F3D_READER_SCORE)
-    set(F3D_READER_SCORE 50)
+  if(F3D_READER_SCORE)
+    set(F3D_READER_HAS_SCORE 1)
+  else()
+    set(F3D_READER_HAS_SCORE 0)
   endif()
 
   set(F3D_READER_INCLUDES_CODE
@@ -146,6 +148,15 @@ macro(f3d_plugin_build)
     endif ()
   endif()
 
+  set(f3d_plugin_compile_options "")
+  list(APPEND f3d_plugin_compile_options "${f3d_strict_build_compile_options}")
+  list(APPEND f3d_plugin_compile_options "${f3d_coverage_compile_options}")
+  list(APPEND f3d_plugin_compile_options "${f3d_sanitizer_compile_options}")
+
+  set(f3d_plugin_link_options "")
+  list(APPEND f3d_plugin_link_options "${f3d_coverage_link_options}")
+  list(APPEND f3d_plugin_link_options "${f3d_sanitizer_link_options}")
+
   # if libf3d is built as a static library, VTK extension static libraries
   # must be exported as well for proper linkage
   set(export_name "")
@@ -170,6 +181,15 @@ macro(f3d_plugin_build)
       HEADERS_COMPONENT vtkext
       TARGETS_COMPONENT vtkext
       PACKAGE "f3d-plugin-${F3D_PLUGIN_NAME}")
+
+    foreach (module IN LISTS modules)
+      if(NOT "${f3d_plugin_compile_options}" STREQUAL "")
+        vtk_module_compile_options(${module} PUBLIC "${f3d_plugin_compile_options}")
+      endif()
+      if(NOT "${f3d_plugin_link_options}" STREQUAL "")
+        vtk_module_link_options(${module} PUBLIC "${f3d_plugin_link_options}")
+      endif()
+    endforeach ()
   else()
     set(modules "")
   endif()
@@ -215,6 +235,9 @@ macro(f3d_plugin_build)
     PRIVATE
       "${_f3d_include_path}"
       "${CMAKE_CURRENT_BINARY_DIR}")
+
+  target_compile_options(f3d-plugin-${F3D_PLUGIN_NAME} PUBLIC "${f3d_plugin_compile_options}")
+  target_link_options(f3d-plugin-${F3D_PLUGIN_NAME} PUBLIC "${f3d_plugin_link_options}")
 
   list(TRANSFORM F3D_PLUGIN_VTK_MODULES PREPEND "VTK::")
 
