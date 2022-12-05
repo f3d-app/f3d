@@ -1,6 +1,6 @@
-void applyCustomReader(vtkAlgorithm* reader, const std::string&) const override
+void applyCustomReader(vtkAlgorithm* algo, const std::string&) const override
 {
-  vtkGLTFReader* gltfReader = vtkGLTFReader::SafeDownCast(reader);
+  vtkGLTFReader* gltfReader = vtkGLTFReader::SafeDownCast(algo);
 
   // Enable all animations in the GLTFReader
   gltfReader->SetFrameRate(30);
