@@ -49,6 +49,7 @@ Here is the list of plugins provided officially by F3D:
 
 - **alembic**: ABC support
 - **assimp**: FBX, DAE, OFF and DXF support
+- **draco**: DRC support
 - **exodus**: EX2 support
 - **occt**: STEP and IGES support
 
