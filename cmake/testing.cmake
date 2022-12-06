@@ -278,6 +278,10 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   endif()
 endif()
 
+if(F3D_PLUGIN_BUILD_DRACO)
+  f3d_test(NAME TestDRACO DATA suzanne.drc DEFAULT_LIGHTS ARGS --load-plugins=draco)
+endif()
+
 if(F3D_PLUGIN_BUILD_EXODUS)
   f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS --load-plugins=exodus -s --camera-position=-11,-2,-49 DEFAULT_LIGHTS)
   f3d_test(NAME TestGenericImporterAnimation DATA small.ex2 DEFAULT_LIGHTS ARGS --load-plugins=exodus)

@@ -1,0 +1,12 @@
+NAME
+  f3d::VTKExtensionsDracoReader
+DESCRIPTION
+  A VTK module for the Draco plugin
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  VTK::IOImport
+  draco::draco
+TEST_DEPENDS
+  VTK::TestingCore
+  VTK::CommonDataModel
