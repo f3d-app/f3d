@@ -16,6 +16,7 @@ check_variable_defined(f3d_MODULE_EXTERNAL_RENDERING)
 check_variable_defined(f3d_MODULE_RAYTRACING)
 check_variable_defined(f3d_BINDINGS_PYTHON)
 check_variable_defined(f3d_BINDINGS_JAVA)
+check_variable_defined(f3d_SDK_PLUGIN)
 
 add_executable(test_sdk main.cxx)
 target_link_libraries(test_sdk f3d::libf3d)
