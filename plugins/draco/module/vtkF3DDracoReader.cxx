@@ -107,19 +107,24 @@ public:
             vtkNew<vtkPoints> points;
             points->SetData(dataArray);
             output->SetPoints(points);
+            dataArray->SetName("Positions");
           }
           break;
           case draco::GeometryAttribute::Type::NORMAL:
             output->GetPointData()->SetNormals(dataArray);
+            dataArray->SetName("Normals");
             break;
           case draco::GeometryAttribute::Type::COLOR:
             output->GetPointData()->SetScalars(dataArray);
+            dataArray->SetName("Colors");
             break;
           case draco::GeometryAttribute::Type::TEX_COORD:
             output->GetPointData()->SetTCoords(dataArray);
+            dataArray->SetName("TCoords");
             break;
           default:
             output->GetPointData()->AddArray(dataArray);
+            dataArray->SetName((std::string("Generic#") + std::to_string(i)).c_str());
             break;
         }
       }
