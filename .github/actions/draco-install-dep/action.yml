@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/draco_install
-        key: draco-1.5.5-1-${{inputs.os}}
+        key: draco-1.5.5-2-${{inputs.os}}
 
     - name: Checkout Draco
       if: steps.cache-draco.outputs.cache-hit != 'true'
@@ -23,15 +23,6 @@ runs:
         repository: google/draco
         path: './dependencies/draco'
         ref: 1.5.5
-
-    # Issues opened upstream:
-    # - https://github.com/google/draco/issues/954
-    # - https://github.com/google/draco/issues/955
-    - name: Patch Draco
-      if: steps.cache-draco.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: cat $(pwd)/source/.github/actions/draco-install-dep/*.patch | patch -p1 -d $(pwd)/dependencies/draco
 
     - name: Setup Draco
       if: steps.cache-draco.outputs.cache-hit != 'true'
@@ -50,7 +41,8 @@ runs:
         -DBUILD_SHARED_LIBS=OFF
         -DDRACO_JS_GLUE=OFF
         -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_INSTALL_PREFIX:PATH=../draco_install
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -DCMAKE_INSTALL_PREFIX=../draco_install
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
 
