@@ -162,7 +162,7 @@ f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp" DEFAULT_LIGHTS)
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${CMAKE_SOURCE_DIR}/testing/data/AttackGraffiti-3zRBM.ttf DEFAULT_LIGHTS)
 f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-index=7 DEFAULT_LIGHTS)
 f3d_test(NAME TestMaxSizeBelow DATA suzanne.stl ARGS --max-size=1 DEFAULT_LIGHTS)
-f3d_test(NAME TestMaxSizeAbove DATA WaterBottle.glb ARGS --max-size=1 REGEXP "No file loaded, file is bigger than max size" NO_BASELINE)
+f3d_test(NAME TestMaxSizeAbove DATA WaterBottle.glb ARGS --max-size=0.2 REGEXP "No file loaded, file is bigger than max size" NO_BASELINE)
 f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_FAIL)
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
 f3d_test(NAME TestVerboseLoadPlugin ARGS --verbose REGEXP "Loading plugin \"native\"" NO_BASELINE)
@@ -321,7 +321,7 @@ f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --scalars --
 f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --scalars --comp=2 INTERACTION DEFAULT_LIGHTS) #S
 f3d_test(NAME TestInteractionConfigFileMulti DATA multi CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/complex.json INTERACTION DEFAULT_LIGHTS) #XG;Right;N;Right;Right
 f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/complex.json INTERACTION DEFAULT_LIGHTS) #O;Left
-f3d_test(NAME TestInteractionDumpSceneState DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Camera position: 2.26745,3.82625,507.698")#?
+f3d_test(NAME TestInteractionDumpSceneState DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Camera position: 2.23745,3.83305,507.598")#?
 f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring")#SSSSYC
 f3d_test(NAME TestInteractionEmptyDrop INTERACTION REGEXP "Drop event without any provided files.")#DropEvent Empty;
 f3d_test(NAME TestInteractionCameraUpdate DATA dragon.vtu INTERACTION DEFAULT_LIGHTS) #MouseWheel;MouseWheel;MouseWheel;S
@@ -354,7 +354,7 @@ f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CM
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
 
 # Simple verbosity test
-f3d_test(NAME TestVerbose DATA dragon.vtu ARGS -s --verbose REGEXP "Number of points: 69827\nNumber of cells: 139650" NO_RENDER)
+f3d_test(NAME TestVerbose DATA dragon.vtu ARGS -s --verbose REGEXP "Number of points: 13268\nNumber of cells: 26532" NO_RENDER)
 
 # Unknown scalar array verbosity test
 f3d_test(NAME TestVerboseWrongArray DATA dragon.vtu ARGS --scalars=dummy --verbose REGEXP "Unknown scalar array: dummy" NO_BASELINE)

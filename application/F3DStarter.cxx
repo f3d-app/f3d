@@ -345,9 +345,9 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
 
   // Check the size of the file before loading it
   static constexpr int BYTES_IN_MIB = 1048576;
-  if (fileAppOptions.MaxSize >= 0 &&
+  if (fileAppOptions.MaxSize >= 0.0 &&
     std::filesystem::file_size(std::filesystem::path(filePath)) >
-      static_cast<std::uintmax_t>(fileAppOptions.MaxSize) * BYTES_IN_MIB)
+      static_cast<std::uintmax_t>(fileAppOptions.MaxSize * BYTES_IN_MIB))
   {
     f3d::log::info("No file loaded, file is bigger than max size");
   }

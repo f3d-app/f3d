@@ -15,7 +15,7 @@ Options|Default|Description
 \-\-config=\<config file path/name/stem\>|config|Specify the [configuration file](CONFIGURATION_FILE.md) to use. Supports absolute/relative path but also filename/filestem to search for in standard configuration file locations.
 \-\-dry-run||Do not read any configuration file and consider only the command line options.
 \-\-no-render||Print information about the first provided file (as with \-\-verbose) and exit, without rendering anything, useful to recover information about a file.
-\-\-max-size=\<size in MiB\>|-1|Prevent F3D to load a file bigger than the provided size in Mib, -1 means unlimited, useful for thumbnails.
+\-\-max-size=\<size in MiB\>|-1|Prevent F3D to load a file bigger than the provided size in Mib, negative value means unlimited, useful for thumbnails.
 \-\-load-plugins=\<paths or names\>||List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `exodus`, `occt`. See [usage](USAGE.md) for more info.
 
 ## General Options
