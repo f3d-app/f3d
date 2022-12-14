@@ -28,7 +28,7 @@ struct F3DAppOptions
   bool NoBackground = false;
   bool NoRender = false;
   double RefThreshold = 50;
-  int MaxSize = -1;
+  double MaxSize = -1.0;
 
   std::vector<int> Resolution{ 1000, 600 };
   std::vector<int> Position{ 0 };
