@@ -195,7 +195,7 @@ protected:
     vtkDataArray* array, int component, vtkColorTransferFunction* ctf, double range[2],
     bool cellFlag = false, bool inverseOpacityFlag = false);
 
-  static void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, vtkDataArray* array,
+  void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, vtkDataArray* array,
     int component, vtkColorTransferFunction* ctf);
 
   void ConfigureRangeAndCTFForColoring(vtkDataArray* array, int component);
@@ -248,8 +248,9 @@ protected:
 
   /**
    * Convert a component index into a string
+   * Change this method to a non-static method to access a member variable ArrayForColoring
    */
-  static std::string ComponentToString(int component);
+  std::string ComponentToString(int component);
 
   /**
    * Shorten a provided name with "..."
