@@ -811,8 +811,7 @@ std::string vtkF3DRendererWithColoring::ComponentToString(int component)
       ret += std::to_string(component);
       return ret;
     } 
-    else 
-    {
+    else {
       return std::string(compName);
     }
   }
