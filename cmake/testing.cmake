@@ -167,9 +167,9 @@ f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
 f3d_test(NAME TestVerboseLoadPlugin ARGS --verbose REGEXP "Loading plugin \"native\"" NO_BASELINE)
 f3d_test(NAME TestNonExistentPlugin ARGS --load-plugins=dummy REGEXP "Plugin failed to load" NO_BASELINE)
-f3d_test(NAME TestComponentName0 DATA from_abq.vtu --scalars --bar --comp=0 DEFAULT_LIGHTS)
-f3d_test(NAME TestComponentName1 DATA from_abq.vtu --scalars --bar --comp=1 DEFAULT_LIGHTS)
-f3d_test(NAME TestComponentName2 DATA from_abq.vtu --scalars --bar --comp=2 DEFAULT_LIGHTS)
+f3d_test(NAME TestComponentName0 DATA from_abq.vtu ARGS --scalars --bar --comp=0 DEFAULT_LIGHTS)
+f3d_test(NAME TestComponentName1 DATA from_abq.vtu ARGS --scalars --bar --comp=1 DEFAULT_LIGHTS)
+f3d_test(NAME TestComponentName2 DATA from_abq.vtu ARGS --scalars --bar --comp=2 DEFAULT_LIGHTS)
 
 # color texture with opacity needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9467
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220811)
