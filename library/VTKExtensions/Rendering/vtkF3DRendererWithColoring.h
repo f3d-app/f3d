@@ -248,7 +248,8 @@ protected:
 
   /**
    * Convert a component index into a string
-   * Change this method to a non-static method to access a member variable ArrayForColoring
+   * If there is a component name defined in the data array, display it.
+   * Otherwise, use component #number as the default value. 
    */
   std::string ComponentToString(int component);
 
