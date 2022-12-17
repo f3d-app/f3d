@@ -1,0 +1,52 @@
+name: 'Install rkcommon Dependency'
+description: 'Install rkcommon Dependency using cache when possible'
+inputs:
+  os:
+    description: 'OS to build on'
+    required: false
+    default: 'ubuntu-latest'
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache rkcommon
+      id: cache-rkcommon
+      uses: actions/cache@v3
+      with:
+        path: dependencies/rkcommon_install
+        key: rkcommon-v1.7.0-0-${{inputs.os}}
+
+    - name: Checkout rkcommon
+      if: steps.cache-rkcommon.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        repository: ospray/rkcommon
+        path: './dependencies/rkcommon'
+        ref: v1.7.0
+
+    - name: Setup rkcommon
+      if: steps.cache-rkcommon.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir rkcommon_build
+        mkdir rkcommon_install
+
+    - name: Configure rkcommon
+      if: steps.cache-rkcommon.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/rkcommon_build
+      shell: bash
+      run: >
+        cmake ../rkcommon
+        -DBUILD_TESTING:BOOL=OFF
+        -DINSTALL_DEPS:BOOL=OFF
+        -DTBB_ROOT:PATH=$(pwd)/../tbb_install/
+        -DCMAKE_INSTALL_PREFIX:PATH=../rkcommon_install
+        ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+
+    - name: Build rkcommon
+      if: steps.cache-rkcommon.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/rkcommon_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release

@@ -1,0 +1,56 @@
+name: 'Install Embree Dependency'
+description: 'Install Embree Dependency using cache when possible'
+inputs:
+  os:
+    description: 'OS to build on'
+    required: false
+    default: 'ubuntu-latest'
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache embree
+      id: cache-embree
+      uses: actions/cache@v3
+      with:
+        path: dependencies/embree_install
+        key: embree-v3.13.1-0-${{inputs.os}}
+
+    - name: Checkout embree
+      if: steps.cache-embree.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        repository: embree/embree
+        path: './dependencies/embree'
+        ref: v3.13.1
+
+    - name: Setup embree
+      if: steps.cache-embree.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir embree_build
+        mkdir embree_install
+
+    - name: Configure embree
+      if: steps.cache-embree.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/embree_build
+      shell: bash
+      run: >
+        cmake ../embree
+        -DBUILD_TESTING:BOOL=OFF
+        -DEMBREE_ISPC_EXECUTABLE:PATH=$(pwd)/../ispc/bin/ispc
+        -DEMBREE_GEOMETRY_HAIR:BOOL=ON
+        -DEMBREE_GEOMETRY_LINES:BOOL=OFF
+        -DEMBREE_GEOMETRY_QUADS:BOOL=OFF
+        -DEMBREE_GEOMETRY_SUBDIV:BOOL=OFF
+        -DEMBREE_TUTORIALS:BOOL=OFF
+        -DCMAKE_INSTALL_PREFIX:PATH=../embree_install
+        ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+
+    - name: Build embree
+      if: steps.cache-embree.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/embree_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release

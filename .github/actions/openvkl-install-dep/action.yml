@@ -1,0 +1,55 @@
+name: 'Install openvkl Dependency'
+description: 'Install openvkl Dependency using cache when possible'
+inputs:
+  os:
+    description: 'OS to build on'
+    required: false
+    default: 'ubuntu-latest'
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache openvkl
+      id: cache-openvkl
+      uses: actions/cache@v3
+      with:
+        path: dependencies/openvkl_install
+        key: openvkl-v1.0.1-0-${{inputs.os}}
+
+    - name: Checkout openvkl
+      if: steps.cache-openvkl.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        repository: OpenVKL/openvkl
+        path: './dependencies/openvkl'
+        ref: v1.0.1
+
+    - name: Setup openvkl
+      if: steps.cache-openvkl.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir openvkl_build
+        mkdir openvkl_install
+
+    - name: Configure openvkl
+      if: steps.cache-openvkl.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/openvkl_build
+      shell: bash
+      run: >
+        cmake ../openvkl
+        -DBUILD_BENCHMARKS:BOOL=OFF
+        -DBUILD_EXAMPLES:BOOL=OFF
+        -DBUILD_TESTING:BOOL=OFF
+        -DISPC_EXECUTABLE:PATH=$(pwd)/../ispc/bin/ispc
+        -Dembree_DIR=$(pwd)/../embree_install/lib/cmake/embree-3.13.1/
+        -Drkcommon_DIR=$(pwd)/../rkcommon_install/lib/cmake/rkcommon-1.7.0/
+        -DCMAKE_INSTALL_PREFIX:PATH=../openvkl_install
+        ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+
+    - name: Build openvkl
+      if: steps.cache-openvkl.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/openvkl_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release

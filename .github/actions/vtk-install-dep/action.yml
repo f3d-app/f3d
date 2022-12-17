@@ -38,7 +38,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-0-${{inputs.os}}
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-1-${{inputs.os}}
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -83,6 +83,7 @@ runs:
         -DVTK_VERSIONED_INSTALL=OFF
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
+        -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_GROUP_ENABLE_Rendering=DEFAULT
         -DVTK_GROUP_ENABLE_StandAlone=DEFAULT
         -DVTK_MODULE_ENABLE_VTK_CommonSystem=YES
@@ -105,9 +106,10 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingExternal=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingLabel=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
-        ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread' || null }}
+        ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF -DVTK_SMP_IMPLEMENTATION_TYPE=TBB' || null }}
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
 

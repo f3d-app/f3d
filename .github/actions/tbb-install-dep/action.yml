@@ -1,0 +1,50 @@
+name: 'Install tbb Dependency'
+description: 'Install tbb Dependency using cache when possible'
+inputs:
+  os:
+    description: 'OS to build on'
+    required: false
+    default: 'ubuntu-latest'
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache tbb
+      id: cache-tbb
+      uses: actions/cache@v3
+      with:
+        path: dependencies/tbb_install
+        key: tbb-v2021.5.0-0-${{inputs.os}}
+
+    - name: Checkout tbb
+      if: steps.cache-tbb.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        repository: oneapi-src/oneTBB
+        path: './dependencies/tbb'
+        ref: v2021.5.0
+
+    - name: Setup tbb
+      if: steps.cache-tbb.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir tbb_build
+        mkdir tbb_install
+
+    - name: Configure tbb
+      if: steps.cache-tbb.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/tbb_build
+      shell: bash
+      run: >
+        cmake ../tbb
+        -DTBB_TEST:BOOL=OFF
+        -DCMAKE_INSTALL_PREFIX:PATH=../tbb_install
+        ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+
+    - name: Build tbb
+      if: steps.cache-tbb.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/tbb_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
