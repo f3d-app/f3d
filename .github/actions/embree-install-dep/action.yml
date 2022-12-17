@@ -40,10 +40,9 @@ runs:
         cmake ../embree
         -DBUILD_TESTING:BOOL=OFF
         -DEMBREE_ISPC_EXECUTABLE:PATH=$(pwd)/../ispc/bin/ispc
-        -DEMBREE_GEOMETRY_HAIR:BOOL=ON
-        -DEMBREE_GEOMETRY_LINES:BOOL=OFF
-        -DEMBREE_GEOMETRY_QUADS:BOOL=OFF
-        -DEMBREE_GEOMETRY_SUBDIV:BOOL=OFF
+        -DTBB_ROOT:PATH=$(pwd)/../tbb_install/
+        -DEMBREE_GEOMETRY_QUAD:BOOL=OFF
+        -DEMBREE_GEOMETRY_SUBDIVISION:BOOL=OFF
         -DEMBREE_TUTORIALS:BOOL=OFF
         -DCMAKE_INSTALL_PREFIX:PATH=../embree_install
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
