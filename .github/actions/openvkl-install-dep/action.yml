@@ -42,6 +42,7 @@ runs:
         -DBUILD_EXAMPLES:BOOL=OFF
         -DBUILD_TESTING:BOOL=OFF
         -DISPC_EXECUTABLE:PATH=$(pwd)/../ispc/bin/ispc
+        -DTBB_ROOT:PATH=$(pwd)/../tbb_install/
         -Dembree_DIR=$(pwd)/../embree_install/lib/cmake/embree-3.13.1/
         -Drkcommon_DIR=$(pwd)/../rkcommon_install/lib/cmake/rkcommon-1.7.0/
         -DCMAKE_INSTALL_PREFIX:PATH=../openvkl_install

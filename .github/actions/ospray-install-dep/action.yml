@@ -46,7 +46,8 @@ runs:
         -DOSPRAY_MODULE_MPI:BOOL=OFF
         -DOSPRAY_MPI_BUILD_TUTORIALS:BOOL=OFF
         -DISPC_EXECUTABLE:PATH=$(pwd)/../ispc/bin/ispc
-        -DOpenImageDenoise_DIR=$(pwd)/../oidn_install/lib/cmake/OpenImageDenoise-1.1.0
+        -DTBB_ROOT:PATH=$(pwd)/../tbb_install/
+        -DOpenImageDenoise_DIR=$(pwd)/../oidn_install/lib/cmake/OpenImageDenoise-1.4.3
         -Dembree_DIR=$(pwd)/../embree_install/lib/cmake/embree-3.13.1
         -Dopenvkl_DIR=$(pwd)/../openvkl_install/lib/cmake/openvkl-1.0.1
         -Drkcommon_DIR=$(pwd)/../rkcommon_install/lib/cmake/rkcommon-1.7.0
