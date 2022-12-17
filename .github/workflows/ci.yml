@@ -126,7 +126,7 @@ jobs:
         -Ddraco_DIR:PATH=$(pwd)/../dependencies/draco_install/share/cmake/draco
         -Dpybind11_DIR:PATH=$(pwd)/../dependencies/pybind11_install/share/cmake/pybind11
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
-        ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DF3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+        ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
         ${{ matrix.os == 'macos-latest' && '-DF3D_BINDINGS_PYTHON=ON -DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
         ${{ matrix.os == 'ubuntu-latest' && '-DF3D_BINDINGS_PYTHON=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON -DF3D_INSTALL_MIME_TYPES_FILES=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
         ${{ matrix.vtk_version == 'commit' && '-DF3D_ENABLE_HDRI_TESTS=ON' || '-DF3D_ENABLE_HDRI_TESTS=OFF' }}
@@ -206,41 +206,6 @@ jobs:
         cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DVTK_DIR:PATH=$(pwd)/dependencies/vtk_install/lib/cmake/vtk -B build_plugin source/examples/plugins/example-plugin
         cmake --build build_plugin --config Release
         ctest --test-dir build_plugin -C Release -VV
-
-    - name: Setup NSIS
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}
-      run: cp source\.github\nsis\FileAssociation.nsh "C:/Program Files (x86)/NSIS/Include"
-
-    - name: Packaging
-      working-directory: ${{github.workspace}}/build
-      run: cpack
-
-    - name: Check Packaging Linux
-      if: matrix.os == 'ubuntu-latest'
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir package
-        tar -xzvf ./build/f3d-*.tar.gz -C ./package/
-        ./package/bin/f3d source/testing/data/suzanne.obj --output=output.png
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/package/lib/cmake/f3d -B test_sdk_package source/.github/test_sdk
-        cmake --build test_sdk
-
-    - name: Check Packaging Windows
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir package
-        Expand-Archive .\build\f3d-*.zip -DestinationPath .\package
-        .\package\bin\f3d source\testing\data\suzanne.obj --output=output.png
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/package/lib/cmake/f3d -B test_sdk_package source/.github/test_sdk
-        cmake --build test_sdk
-
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        path: ./build/f3d-*
-        name: f3d-${{matrix.os}}-${{matrix.vtk_version}}
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
