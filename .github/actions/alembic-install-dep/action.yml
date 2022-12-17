@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/alembic_install
-        key: alembic-v1.8.3-7-${{inputs.os}}
+        key: alembic-v1.8.3-8-${{inputs.os}}
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -38,7 +38,7 @@ runs:
       shell: bash
       run: >
         cmake ../alembic
-        -DALEMBIC_SHARED_LIBS=OFF
+        -DALEMBIC_SHARED_LIBS=ON
         -DUSE_BINARIES=OFF
         -DUSE_TESTS=OFF
         -DCMAKE_BUILD_TYPE=Release
