@@ -19,9 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        config:
-          - { name: "Commit", vtk_version: commit }
-          - { name: "9.2.2", vtk_version: v9.2.2 }
+        vtk_version: [commit, v9.2.2, v9.1.0, v9.0.0]
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -129,6 +127,7 @@ jobs:
         vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         os: ${{matrix.os}}
+        enable_tbb: 'true'
 
     - name: Setup Directories
       working-directory: ${{github.workspace}}

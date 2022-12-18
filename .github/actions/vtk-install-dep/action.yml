@@ -13,6 +13,11 @@ inputs:
     description: 'OS to build on'
     required: false
     default: 'ubuntu-latest'
+  enable_tbb:
+    description: 'Enable TBB or not'
+    required: false
+    default: 'false'
+
 runs:
   using: "composite"
   steps:
@@ -109,7 +114,9 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
-        ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF -DVTK_SMP_IMPLEMENTATION_TYPE=TBB' || null }}
+        -DVTK_SMP_IMPLEMENTATION_TYPE= ${{ inputs.enable_tbb == 'true' && 'TBB' || 'Sequential' }}
+        -DTBB_DIR:PATH=$(pwd)/../tbb_install/
+        ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF' || null }}
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
 
