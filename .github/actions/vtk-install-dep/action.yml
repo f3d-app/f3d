@@ -119,7 +119,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.enable_raytracing == 'true' && 'YES' || 'DEFAULT' }}
         -Dospray_DIR:PATH=$(pwd)/../ospray_install/
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
-        -DVTK_SMP_IMPLEMENTATION_TYPE= ${{ inputs.enable_tbb == 'true' && 'TBB' || 'Sequential' }}
+        -DVTK_SMP_IMPLEMENTATION_TYPE=${{ inputs.enable_tbb == 'true' && 'TBB' || 'Sequential' }}
         -DTBB_DIR:PATH=$(pwd)/../tbb_install/
         ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF' || null }}
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
