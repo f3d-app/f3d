@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/alembic_install
-        key: alembic-v1.8.3-8-${{inputs.os}}
+        key: alembic-v1.8.3-9-${{inputs.os}}
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -43,6 +43,7 @@ runs:
         -DUSE_TESTS=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DImath_DIR:PATH=$(pwd)/../imath_install/lib/cmake/Imath
+        -DCMAKE_INSTALL_RPATH=$(pwd)/../imath_install/lib
         -DCMAKE_INSTALL_PREFIX:PATH=../alembic_install
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
