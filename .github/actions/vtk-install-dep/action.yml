@@ -74,6 +74,7 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/vtk
       shell: bash
       run: |
+        git describe
         sed -i '' '57i\'$'\n''herr_t H5O__fsinfo_set_version(H5F_t *f, H5O_fsinfo_t *fsinfo);' ThirdParty/hdf5/vtkhdf5/src/H5Fsuper.c
         sed -i '' '46i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Oint.c
         sed -i '' '36i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Rint.c
