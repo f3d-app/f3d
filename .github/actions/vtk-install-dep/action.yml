@@ -17,6 +17,10 @@ inputs:
     description: 'Enable TBB or not'
     required: false
     default: 'false'
+  enable_raytracing:
+    description: 'Enable Raytracing or not'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
@@ -111,8 +115,9 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingExternal=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingLabel=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
-        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.enable_raytracing == 'true' && 'YES' || 'DEFAULT' }}
+        -Dospray_DIR:PATH=$(pwd)/../ospray_install/
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_SMP_IMPLEMENTATION_TYPE= ${{ inputs.enable_tbb == 'true' && 'TBB' || 'Sequential' }}
         -DTBB_DIR:PATH=$(pwd)/../tbb_install/
