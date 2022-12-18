@@ -19,7 +19,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        vtk_version: [commit, v9.2.2, v9.1.0, v9.0.0]
+        config:
+          - { name: "VTK", vtk_version: commit, enable_tbb: 'true' }
+          - { name: "VTK-9.2.2", vtk_version: v9.2.2, enable_tbb: 'true' }
+          - { name: "VTK-9.1.0", vtk_version: v9.1.0, enable_tbb: 'true' }
+          - { name: "VTK-9.0.0", vtk_version: v9.0.0, enable_tbb: 'false' }
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -124,10 +128,10 @@ jobs:
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        vtk_version: ${{matrix.vtk_version}}
+        vtk_version: ${{matrix.config.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         os: ${{matrix.os}}
-        enable_tbb: 'true'
+        enable_tbb: ${{matrix.config.enable_tbb}}
         enable_raytracing: 'true'
 
     - name: Setup Directories
@@ -166,8 +170,8 @@ jobs:
         ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
         ${{ matrix.os == 'macos-latest' && '-DF3D_BINDINGS_PYTHON=ON -DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
         ${{ matrix.os == 'ubuntu-latest' && '-DF3D_BINDINGS_PYTHON=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON -DF3D_INSTALL_MIME_TYPES_FILES=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
-        ${{ matrix.vtk_version == 'commit' && '-DF3D_ENABLE_HDRI_TESTS=ON' || '-DF3D_ENABLE_HDRI_TESTS=OFF' }}
-        ${{ matrix.vtk_version == 'v9.0.0' && '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=OFF' }}
+        ${{ matrix.config.vtk_version == 'commit' && '-DF3D_ENABLE_HDRI_TESTS=ON' || '-DF3D_ENABLE_HDRI_TESTS=OFF' }}
+        ${{ matrix.config.vtk_version == 'v9.0.0' && '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=OFF' }}
 
     - name: Build
       working-directory: ${{github.workspace}}/build
@@ -199,7 +203,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         path: ./build/Testing/Temporary
-        name: f3d-tests-artifact-${{matrix.os}}-${{matrix.vtk_version}}
+        name: f3d-tests-artifact-${{matrix.os}}-${{matrix.config.vtk_version}}
 
     - name: Install
       working-directory: ${{github.workspace}}/build
