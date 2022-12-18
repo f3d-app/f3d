@@ -20,10 +20,10 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         config:
-          - { name: "VTK", vtk_version: commit, enable_tbb: 'true' }
-          - { name: "VTK-9.2.2", vtk_version: v9.2.2, enable_tbb: 'true' }
-          - { name: "VTK-9.1.0", vtk_version: v9.1.0, enable_tbb: 'true' }
-          - { name: "VTK-9.0.0", vtk_version: v9.0.0, enable_tbb: 'false' }
+          - { name: "VTK", vtk_version: commit, enable_tbb: 'true', enable_raytracing: 'true' }
+          - { name: "VTK-9.2.2", vtk_version: v9.2.2, enable_tbb: 'true', enable_raytracing: 'true' }
+          - { name: "VTK-9.1.0", vtk_version: v9.1.0, enable_tbb: 'true', enable_raytracing: 'true' }
+          - { name: "VTK-9.0.0", vtk_version: v9.0.0, enable_tbb: 'false', enable_raytracing: 'false' }
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -61,36 +61,45 @@ jobs:
       run: mkdir dependencies
 
     - name: Install tbb dependency
+      if: |
+        matrix.config.enable_raytracing == 'true' ||
+        matrix.config.enable_tbb == 'true'
       uses: ./source/.github/actions/tbb-install-dep
       with:
         os: ${{matrix.os}}
 
     - name: Install ispc dependency
+      if: matrix.config.enable_raytracing == 'true'
       uses: ./source/.github/actions/ispc-install-tool
       with:
         os: ${{matrix.os}}
 
     - name: Install oidn dependency
+      if: matrix.config.enable_raytracing == 'true'
       uses: ./source/.github/actions/oidn-install-dep
       with:
         os: ${{matrix.os}}
 
     - name: Install rkcommon dependency
+      if: matrix.config.enable_raytracing == 'true'
       uses: ./source/.github/actions/rkcommon-install-dep
       with:
         os: ${{matrix.os}}
 
     - name: Install embree dependency
+      if: matrix.config.enable_raytracing == 'true'
       uses: ./source/.github/actions/embree-install-dep
       with:
         os: ${{matrix.os}}
 
     - name: Install openvkl dependency
+      if: matrix.config.enable_raytracing == 'true'
       uses: ./source/.github/actions/openvkl-install-dep
       with:
         os: ${{matrix.os}}
 
     - name: Install ospray dependency
+      if: matrix.config.enable_raytracing == 'true'
       uses: ./source/.github/actions/ospray-install-dep
       with:
         os: ${{matrix.os}}

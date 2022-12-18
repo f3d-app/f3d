@@ -120,6 +120,7 @@ runs:
         -Dospray_DIR:PATH=$(pwd)/../ospray_install/lib/cmake/ospray-2.7.1/
         -Dembree_DIR:PATH=$(pwd)/../embree_install/lib/cmake/embree-3.13.1
         -Drkcommon_DIR:PATH=$(pwd)/../rkcommon_install/lib/cmake/rkcommon-1.7.0
+        -Dopenvkl_DIR:PATH=$(pwd)/../openvkl_install/lib/cmake/openvkl-1.0.1
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_SMP_IMPLEMENTATION_TYPE=${{ inputs.enable_tbb == 'true' && 'TBB' || 'Sequential' }}
         -DTBB_DIR:PATH=$(pwd)/../tbb_install/lib/cmake/TBB/
