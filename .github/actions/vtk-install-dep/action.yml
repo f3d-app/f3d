@@ -64,6 +64,7 @@ runs:
         repository: Kitware/VTK
         submodules: 'true'
         path: './dependencies/vtk'
+        fetch-depth: 0
         ref: ${{env.VTK_SHA_OR_TAG}}
 
     - name: Check VTK
