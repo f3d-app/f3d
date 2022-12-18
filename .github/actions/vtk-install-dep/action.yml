@@ -67,13 +67,6 @@ runs:
         fetch-depth: 0
         ref: ${{env.VTK_SHA_OR_TAG}}
 
-    - name: Check VTK
-      if: steps.cache-vtk.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/vtk
-      shell: bash
-      run: |
-        git describe
-
     - name: Patch VTK 9.0 source macos
       if: |
         steps.cache-vtk.outputs.cache-hit != 'true' &&
