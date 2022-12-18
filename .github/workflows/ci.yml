@@ -403,8 +403,6 @@ jobs:
 
     - name: Install Draco dependency
       uses: ./source/.github/actions/draco-install-dep
-      with:
-        os: ${{matrix.os}}
 
     - name: Install Imath dependency
       uses: ./source/.github/actions/imath-install-dep
