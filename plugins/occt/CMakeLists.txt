@@ -43,4 +43,5 @@ f3d_plugin_build(
   DESCRIPTION "OpenCASCADE support (version ${OpenCASCADE_VERSION})"
   VTK_MODULES CommonCore CommonExecutionModel IOImport
   ADDITIONAL_RPATHS ${rpaths}
+  MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-occt-formats.xml"
 )

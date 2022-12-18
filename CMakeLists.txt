@@ -180,9 +180,6 @@ endif()
 if(UNIX AND NOT APPLE)
   option(F3D_INSTALL_THUMBNAILER_FILES "Install thumbnailer files" OFF)
   mark_as_advanced(F3D_INSTALL_THUMBNAILER_FILES)
-
-  option(F3D_INSTALL_MIME_TYPES_FILES "Install mime types files" OFF)
-  mark_as_advanced(F3D_INSTALL_MIME_TYPES_FILES)
 endif()
 
 include(cmake/installing.cmake)

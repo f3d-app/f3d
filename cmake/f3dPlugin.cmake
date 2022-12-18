@@ -111,6 +111,7 @@ f3d_plugin_build(
   [VERSION               <string>]
   [VTK_MODULES           <string>...]
   [ADDITIONAL_RPATHS     <path>...]
+  [MIMETYPE_XML_FILES    <path>...]
   [FORCE_STATIC])
 ~~~
 
@@ -123,11 +124,12 @@ The `NAME` argument is required. The arguments are as follows:
   * `VERSION`: The version of the plugin.
   * `VTK_MODULES`: The list of VTK modules used by the plugin to link with.
   * `ADDITIONAL_RPATHS`: The list of additional RPATH for the installed binaries on Unix. VTK path is added automatically.
+  * `MIMETYPE_XML_FILES`: The list of mimetype files to install. It's useful for file association on OS using Freedesktop specifications.
   * `FORCE_STATIC`: If specified, the plugin is built as a static library and embedded into libf3d.
 #]==]
 
 macro(f3d_plugin_build)
-  cmake_parse_arguments(F3D_PLUGIN "FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS" ${ARGN})
+  cmake_parse_arguments(F3D_PLUGIN "FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS;MIMETYPE_XML_FILES" ${ARGN})
 
   find_package(VTK 9.0 REQUIRED COMPONENTS ${F3D_PLUGIN_VTK_MODULES})
 
@@ -228,7 +230,7 @@ macro(f3d_plugin_build)
     set(_f3d_include_path "${f3d_INCLUDE_DIR}/f3d")
   else()
     # In-source plugin path
-    set(_f3d_include_path "${CMAKE_SOURCE_DIR}/library/public")
+    set(_f3d_include_path "${CMAKE_SOURCE_DIR}/library/plugin")
   endif()
 
   target_include_directories(f3d-plugin-${F3D_PLUGIN_NAME}
@@ -245,11 +247,19 @@ macro(f3d_plugin_build)
     ${F3D_PLUGIN_VTK_MODULES}
     ${modules})
 
-  if (NOT F3D_PLUGIN_IS_STATIC OR NOT BUILD_SHARED_LIBS)
+  if(NOT F3D_PLUGIN_IS_STATIC OR NOT BUILD_SHARED_LIBS)
     install(TARGETS f3d-plugin-${F3D_PLUGIN_NAME}
       EXPORT ${export_name}
       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT plugin
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT plugin
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT plugin)
   endif()
+
+  foreach(mimetype_xml ${F3D_PLUGIN_MIMETYPE_XML_FILES})
+    install(FILES "${mimetype_xml}"
+      DESTINATION "share/mime/packages"
+      COMPONENT mimetypes
+      EXCLUDE_FROM_ALL)
+  endforeach()
+
 endmacro()

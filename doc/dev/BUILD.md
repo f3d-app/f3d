@@ -45,3 +45,21 @@ Some modules, plugins and bindings depending on external libraries can be option
 * `F3D_PLUGIN_BUILD_DRACO`: Support for DRC file format. Requires `Draco`. Disabled by default.
 * `F3D_BINDINGS_PYTHON`: Generate python bindings (requires `Python` and `pybind11`). Disabled by default.
 * `F3D_BINDINGS_JAVA`: Generate java bindings (requires `Java` and `JNI`). Disabled by default.
+
+## Installing
+
+Installation can be done through CMake, by running the following command:
+
+```
+cmake --install ${your_build_dir}
+```
+
+Optional components can be installed by specifying the component name:
+
+```
+cmake --install ${your_build_dir} --component ${component_name}
+```
+
+Here is the list of the optional components you can install:
+
+* `mimetypes`: Install plugins mimetype XML files for integration with Freedesktop (Linux only)
