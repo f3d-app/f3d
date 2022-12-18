@@ -47,10 +47,10 @@ runs:
         -DOSPRAY_MPI_BUILD_TUTORIALS:BOOL=OFF
         -DISPC_EXECUTABLE:PATH=$(pwd)/../ispc/bin/ispc
         -DTBB_ROOT:PATH=$(pwd)/../tbb_install/
-        -DOpenImageDenoise_DIR=$(pwd)/../oidn_install/lib/cmake/OpenImageDenoise-1.4.3
-        -Dembree_DIR=$(pwd)/../embree_install/lib/cmake/embree-3.13.1
-        -Dopenvkl_DIR=$(pwd)/../openvkl_install/lib/cmake/openvkl-1.0.1
-        -Drkcommon_DIR=$(pwd)/../rkcommon_install/lib/cmake/rkcommon-1.7.0
+        -DOpenImageDenoise_DIR:PATH=$(pwd)/../oidn_install/lib/cmake/OpenImageDenoise-1.4.3
+        -Dembree_DIR:PATH=$(pwd)/../embree_install/lib/cmake/embree-3.13.1
+        -Dopenvkl_DIR:PATH=$(pwd)/../openvkl_install/lib/cmake/openvkl-1.0.1
+        -Drkcommon_DIR:PATH=$(pwd)/../rkcommon_install/lib/cmake/rkcommon-1.7.0
         -DCMAKE_INSTALL_PREFIX:PATH=../ospray_install
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}

@@ -118,6 +118,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.enable_raytracing == 'true' && 'YES' || 'DEFAULT' }}
         -Dospray_DIR:PATH=$(pwd)/../ospray_install/lib/cmake/ospray-2.7.1/
+        -Dembree_DIR:PATH=$(pwd)/../embree_install/lib/cmake/embree-3.13.1
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_SMP_IMPLEMENTATION_TYPE=${{ inputs.enable_tbb == 'true' && 'TBB' || 'Sequential' }}
         -DTBB_DIR:PATH=$(pwd)/../tbb_install/lib/cmake/TBB/
