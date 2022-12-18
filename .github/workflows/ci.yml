@@ -141,7 +141,7 @@ jobs:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         os: ${{matrix.os}}
         enable_tbb: ${{matrix.config.enable_tbb}}
-        enable_raytracing: 'true'
+        enable_raytracing: ${{matrix.config.enable_raytracing}}
 
     - name: Setup Directories
       working-directory: ${{github.workspace}}

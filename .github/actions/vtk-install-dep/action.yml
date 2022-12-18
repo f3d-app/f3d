@@ -121,6 +121,7 @@ runs:
         -Dembree_DIR:PATH=$(pwd)/../embree_install/lib/cmake/embree-3.13.1
         -Drkcommon_DIR:PATH=$(pwd)/../rkcommon_install/lib/cmake/rkcommon-1.7.0
         -Dopenvkl_DIR:PATH=$(pwd)/../openvkl_install/lib/cmake/openvkl-1.0.1
+        -DOpenImageDenoise_DIR:PATH=$(pwd)/../oidn_install/lib/cmake/OpenImageDenoise-1.4.3
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_SMP_IMPLEMENTATION_TYPE=${{ inputs.enable_tbb == 'true' && 'TBB' || 'Sequential' }}
         -DTBB_DIR:PATH=$(pwd)/../tbb_install/lib/cmake/TBB/
