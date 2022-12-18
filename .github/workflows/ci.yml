@@ -161,6 +161,7 @@ jobs:
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_MODULE_RAYTRACING=${{ inputs.enable_raytracing == 'true' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
@@ -175,6 +176,12 @@ jobs:
         -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
         -Ddraco_DIR:PATH=$(pwd)/../dependencies/draco_install/share/cmake/draco
         -Dpybind11_DIR:PATH=$(pwd)/../dependencies/pybind11_install/share/cmake/pybind11
+        -Dospray_DIR:PATH=$(pwd)/../ospray_install/lib/cmake/ospray-2.7.1/
+        -Dembree_DIR:PATH=$(pwd)/../embree_install/lib/cmake/embree-3.13.1
+        -Drkcommon_DIR:PATH=$(pwd)/../rkcommon_install/lib/cmake/rkcommon-1.7.0
+        -Dopenvkl_DIR:PATH=$(pwd)/../openvkl_install/lib/cmake/openvkl-1.0.1
+        -DOpenImageDenoise_DIR:PATH=$(pwd)/../oidn_install/lib/cmake/OpenImageDenoise-1.4.3
+        -DTBB_DIR:PATH=$(pwd)/../tbb_install/lib/cmake/TBB/
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
         ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
         ${{ matrix.os == 'macos-latest' && '-DF3D_BINDINGS_PYTHON=ON -DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
