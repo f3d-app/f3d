@@ -185,13 +185,21 @@ jobs:
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
         ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
         ${{ matrix.os == 'macos-latest' && '-DF3D_BINDINGS_PYTHON=ON -DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
-        ${{ matrix.os == 'ubuntu-latest' && '-DF3D_BINDINGS_PYTHON=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON -DF3D_INSTALL_MIME_TYPES_FILES=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
+        ${{ matrix.os == 'ubuntu-latest' && '-DF3D_BINDINGS_PYTHON=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_INSTALL_MIME_TYPES_FILES=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
         ${{ matrix.config.vtk_version == 'commit' && '-DF3D_ENABLE_HDRI_TESTS=ON' || '-DF3D_ENABLE_HDRI_TESTS=OFF' }}
         ${{ matrix.config.vtk_version == 'v9.0.0' && '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=OFF' }}
 
     - name: Build
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --config Release
+
+    - name: Set path env vars ubuntu
+      working-directory: ${{github.workspace}}/dependencies/
+      shell: bash
+      run: |
+        echo "LD_LIBRARY_PATH=$(pwd)/oidn_install/lib" >> $GITHUB_ENV
+        echo "DYLD_FALLBACK_LIBRARY_PATH=$(pwd)/oidn_install/lib" >> $GITHUB_ENV
+        echo "PATH=$(pwd)\oidn_install\lib" >> $GITHUB_ENV
 
     - name: Run Xvfb ubuntu
       if: matrix.os == 'ubuntu-latest'
