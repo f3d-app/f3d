@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/imath_install
-        key: imath-v1.8.3-5-${{inputs.os}}
+        key: imath-v1.8.3-4-${{inputs.os}}
 
     - name: Checkout Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'
@@ -38,7 +38,7 @@ runs:
       shell: bash
       run: >
         cmake ../imath
-        -DBUILD_SHARED_LIBS=ON
+        -DBUILD_SHARED_LIBS=OFF
         -DBUILD_TESTING=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../imath_install
