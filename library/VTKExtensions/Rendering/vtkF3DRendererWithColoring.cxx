@@ -473,7 +473,7 @@ void vtkF3DRendererWithColoring::ConfigureScalarBarActorForColoring(
 
   std::string title = array->GetName();
   title += " (";
-  title += vtkF3DRendererWithColoring::ComponentToString(component);
+  title += this->ComponentToString(component);
   title += ")";
 
   scalarBar->SetLookupTable(ctf);
@@ -804,9 +804,15 @@ std::string vtkF3DRendererWithColoring::ComponentToString(int component)
   }
   else
   {
-    std::string ret = "Component #";
-    ret += std::to_string(component);
-    return ret;
+    const char* compName = this->ArrayForColoring->GetComponentName(component);
+    if (compName == nullptr)
+    {
+      std::string ret = "Component #";
+      ret += std::to_string(component);
+      return ret;
+    }
+
+    return std::string(compName);
   }
 }
 
