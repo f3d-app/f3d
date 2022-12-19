@@ -197,9 +197,9 @@ jobs:
       working-directory: ${{github.workspace}}/dependencies/
       shell: bash
       run: |
-        echo "LD_LIBRARY_PATH=$(pwd)/oidn_install/lib:$(pwd)/vtk_install/lib:$(pwd)/assimp_install/lib:$(pwd)/alembic_install/lib:$(pwd)/imath_install/lib:$(pwd)/draco_install/lib:ospray_install:$(pwd)/embree_install/lib:$(pwd)/rkcommon_install/lib:$(pwd)/openvkl_install/lib:$(pwd)/tbb_install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-        echo "DYLD_FALLBACK_LIBRARY_PATH=$(pwd)/oidn_install/lib" >> $GITHUB_ENV
-        echo "PATH=$(pwd)\oidn_install\lib" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=$(pwd)/oidn_install/lib:$(pwd)/vtk_install/lib:$(pwd)/assimp_install/lib:$(pwd)/alembic_install/lib:$(pwd)/imath_install/lib:$(pwd)/draco_install/lib:$(pwd)/ospray_install/lib::$(pwd)/embree_install/lib:$(pwd)/rkcommon_install/lib:$(pwd)/openvkl_install/lib:$(pwd)/tbb_install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        echo "DYLD_FALLBACK_LIBRARY_PATH=$(pwd)/oidn_install/lib:$(pwd)/vtk_install/lib:$(pwd)/assimp_install/lib:$(pwd)/alembic_install/lib:$(pwd)/imath_install/lib:$(pwd)/draco_install/lib:$(pwd)/ospray_install/lib::$(pwd)/embree_install/lib:$(pwd)/rkcommon_install/lib:$(pwd)/openvkl_install/lib:$(pwd)/tbb_install/lib:$DYLD_FALLBACK_LIBRARY_PATH" >> $GITHUB_ENV
+        echo "PATH=$(pwd)\oidn_install\lib:$(pwd)\vtk_install\lib:$(pwd)\assimp_install\lib:$(pwd)\alembic_install\lib:$(pwd)\imath_install\lib:$(pwd)\draco_install\lib:$(pwd)\ospray_install\lib::$(pwd)\embree_install\lib:$(pwd)\rkcommon_install\lib:$(pwd)\openvkl_install\lib:$(pwd)\tbb_install\lib:$PATH" >> $GITHUB_ENV
 
     - name: Run Xvfb ubuntu
       if: matrix.os == 'ubuntu-latest'
