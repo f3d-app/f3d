@@ -200,6 +200,11 @@ jobs:
         echo "LD_LIBRARY_PATH=$(pwd)/oidn_install/lib:$(pwd)/vtk_install/lib:$(pwd)/assimp_install/lib:$(pwd)/alembic_install/lib:$(pwd)/imath_install/lib:$(pwd)/draco_install/lib:$(pwd)/ospray_install/lib:$(pwd)/embree_install/lib:$(pwd)/rkcommon_install/lib:$(pwd)/openvkl_install/lib:$(pwd)/tbb_install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
         echo "DYLD_LIBRARY_PATH=$(pwd)/oidn_install/lib:$(pwd)/vtk_install/lib:$(pwd)/assimp_install/lib:$(pwd)/alembic_install/lib:$(pwd)/imath_install/lib:$(pwd)/draco_install/lib:$(pwd)/ospray_install/lib:$(pwd)/embree_install/lib:$(pwd)/rkcommon_install/lib:$(pwd)/openvkl_install/lib:$(pwd)/tbb_install/lib:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
 
+    - name: env var win
+      if: matrix.os == 'windows-latest'
+      shell: powershell
+      run: echo "$(pwd)\oidn_install\lib:$(pwd)\vtk_install\lib:$(pwd)\assimp_install\lib:$(pwd)\alembic_install\lib:$(pwd)\imath_install\lib:$(pwd)\draco_install\lib:$(pwd)\ospray_install\lib:$(pwd)\embree_install\lib:$(pwd)\rkcommon_install\lib:$(pwd)\openvkl_install\lib:$(pwd)\tbb_install\lib" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
     - name: Run Xvfb ubuntu
       if: matrix.os == 'ubuntu-latest'
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
