@@ -267,7 +267,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DVTK_DIR:PATH=$(pwd)/dependencies/vtk_install/lib/cmake/vtk -DTBB_DIR:PATH=$(pwd)/../dependencies/tbb_install/lib/cmake/TBB/ -B build_plugin source/examples/plugins/example-plugin
+        cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DVTK_DIR:PATH=$(pwd)/dependencies/vtk_install/lib/cmake/vtk -DTBB_DIR:PATH=$(pwd)/dependencies/tbb_install/lib/cmake/TBB/ -B build_plugin source/examples/plugins/example-plugin
         cmake --build build_plugin --config Release
         ctest --test-dir build_plugin -C Release -VV
 
