@@ -216,6 +216,15 @@ std::string vtkF3DRenderer::GetSceneDescription()
 {
   std::string descr;
 
+  std::stringstream stream;
+
+  // Bounding box
+  double bounds[6];
+  this->ComputeVisiblePropBounds(bounds);
+
+  stream << "Scene bounding box: " << bounds[0] << "," << bounds[1] << "," << bounds[2] << ","
+         << bounds[3] << "," << bounds[4] << "," << bounds[5] << "\n\n";
+
   // Camera Info
   vtkCamera* cam = this->GetActiveCamera();
   double position[3];
@@ -224,7 +233,7 @@ std::string vtkF3DRenderer::GetSceneDescription()
   cam->GetPosition(position);
   cam->GetFocalPoint(focal);
   cam->GetViewUp(up);
-  std::stringstream stream;
+
   stream << "Camera position: " << position[0] << "," << position[1] << "," << position[2] << "\n"
          << "Camera focal point: " << focal[0] << "," << focal[1] << "," << focal[2] << "\n"
          << "Camera view up: " << up[0] << "," << up[1] << "," << up[2] << "\n"
