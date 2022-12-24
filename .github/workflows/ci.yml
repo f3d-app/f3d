@@ -8,8 +8,8 @@ on:
       - master
 
 jobs:
-
-  install_dependencies:
+  job_1:
+    name: Install Dependencies
     if: github.event.pull_request.draft == false
     strategy:
       fail-fast: false
@@ -71,7 +71,7 @@ jobs:
 #----------------------------------------------------------------------------
   ci:
     if: github.event.pull_request.draft == false
-    needs: install_dependencies
+    needs: job_1
     strategy:
       fail-fast: false
       matrix:
