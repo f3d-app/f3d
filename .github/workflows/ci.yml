@@ -9,7 +9,7 @@ on:
 
 jobs:
 
-  dependencies:
+  install_dependencies:
     if: github.event.pull_request.draft == false
     strategy:
       fail-fast: false
@@ -71,7 +71,7 @@ jobs:
 #----------------------------------------------------------------------------
   ci:
     if: github.event.pull_request.draft == false
-    needs: dependencies
+    needs: install_dependencies
     strategy:
       fail-fast: false
       matrix:
