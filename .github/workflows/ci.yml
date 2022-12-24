@@ -30,7 +30,7 @@ jobs:
 
   job_2:
     name: Multiply by 9
-    needs: job_1
+    needs: dependencies
     runs-on: windows-latest
     steps:
       - name: Download math result for job 1
