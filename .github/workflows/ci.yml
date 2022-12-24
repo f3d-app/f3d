@@ -222,59 +222,6 @@ jobs:
         cp x64\libglapi.dll ..\..\build\bin\Release\
         cp x64\libgallium_wgl.dll ..\..\build\bin\Release\
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
-
-    - name: Upload Tests Artifact
-      if: failure()
-      uses: actions/upload-artifact@v3
-      with:
-        path: ./build/Testing/Temporary
-        name: f3d-tests-artifact-${{matrix.os}}-${{matrix.config.vtk_version}}
-
-    - name: Install
-      working-directory: ${{github.workspace}}/build
-      run: cmake --install .
-
-    - name: Check Install ubuntu
-      if: matrix.os == 'ubuntu-latest'
-      working-directory: ${{github.workspace}}/install
-      run: ./bin/f3d ../source/testing/data/suzanne.obj --output=../output.png
-
-    - name: Check Install windows
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/install
-      run: |
-        cp ..\dependencies\mesa\x64\opengl32.dll .\bin\
-        cp ..\dependencies\mesa\x64\libglapi.dll .\bin\
-        cp ..\dependencies\mesa\x64\libgallium_wgl.dll .\bin\
-        .\bin\f3d.exe ..\source\testing\data\suzanne.obj --output=..\output.png
-
-    - name: Check Install macos
-      if: matrix.os == 'macos-latest'
-      working-directory: ${{github.workspace}}/install
-      run: ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
-
-    # TODO: This job should be replaced by a useful example using the libf3d API and merged with the next job
-    - name: Check SDK
-      if: matrix.os != 'macos-latest'
-      working-directory: ${{github.workspace}}
-      run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -B test_sdk source/.github/test_sdk
-        cmake --build test_sdk
-
-    # TODO when VTK is built as a shared library:
-    # - Enable on all OS
-    # - Add -Werror=dev CMake option
-    # - Run ctest
-    - name: Validate plugin example
-      if: matrix.os == 'ubuntu-latest'
-      working-directory: ${{github.workspace}}
-      run: |
-        cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DVTK_DIR:PATH=$(pwd)/dependencies/vtk_install/lib/cmake/vtk -DTBB_DIR:PATH=$(pwd)/dependencies/tbb_install/lib/cmake/TBB/ -B build_plugin source/examples/plugins/example-plugin
-        cmake --build build_plugin --config Release
-        ctest --test-dir build_plugin -C Release -VV
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
