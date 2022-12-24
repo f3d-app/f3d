@@ -106,10 +106,10 @@ jobs:
         with:
           lfs_sha: ${{env.LFS_SHA}}
 
-     - name: Download dependencies
-       uses: actions/download-artifact@v3
-       with:
-         name: dependencies-${{matrix.os}}
+      - name: Download dependencies
+        uses: actions/download-artifact@v3
+        with:
+          name: dependencies-${{matrix.os}}
 
       - name: Install VTK dependency
         uses: ./source/.github/actions/vtk-install-dep
