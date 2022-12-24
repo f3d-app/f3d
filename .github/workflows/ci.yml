@@ -203,7 +203,7 @@ jobs:
     - name: env var win
       if: matrix.os == 'windows-latest'
       shell: powershell
-      run: echo "PATH=$env:PATH;$(pwd)\oidn_install\lib:$(pwd)\vtk_install\lib:$(pwd)\assimp_install\lib:$(pwd)\alembic_install\lib:$(pwd)\imath_install\lib:$(pwd)\draco_install\lib:$(pwd)\ospray_install\lib:$(pwd)\embree_install\lib:$(pwd)\rkcommon_install\lib:$(pwd)\openvkl_install\lib:$(pwd)\tbb_install\lib" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      run: echo "PATH=$env:PATH;$(pwd)\oidn_install\bin:$(pwd)\vtk_install\bin:$(pwd)\assimp_install\bin:$(pwd)\alembic_install\bin:$(pwd)\imath_install\bin:$(pwd)\draco_install\bin:$(pwd)\ospray_install\bin:$(pwd)\embree_install\bin:$(pwd)\rkcommon_install\bin:$(pwd)\openvkl_install\bin:$(pwd)\tbb_install\bin" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Run Xvfb ubuntu
       if: matrix.os == 'ubuntu-latest'
@@ -224,7 +224,9 @@ jobs:
 
     - name: Test
       working-directory: ${{github.workspace}}/build
-      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+      run: |
+        echo $DYLD_LIBRARY_PATH
+        ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
       if: failure()
