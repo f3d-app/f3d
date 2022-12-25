@@ -79,6 +79,42 @@ runs:
         sed -i '' '46i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Oint.c
         sed -i '' '36i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Rint.c
 
+    - name: Install tools Windows
+      if: |
+        steps.cache-vtk.outputs.cache-hit != 'true' &&
+        inputs.os == 'windows-latest'
+      shell: cmd
+      run: choco install sccache
+
+    - name: Install tools MacOS
+      if: |
+        steps.cache-vtk.outputs.cache-hit != 'true' &&
+        inputs.os == 'macos-latest'
+      shell: bash
+      run: brew install sccache
+
+    - name: Initialize sccache environnement
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        echo SCCACHE_CACHE=$(sccache --show-stats | grep Local | cut -d '"' -f2) >> $GITHUB_ENV
+        echo DATE_STRING=$(date +'%Y%m%d') >> $GITHUB_ENV
+        sccache --stop-server
+
+    - name: Recover sccache cache
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      uses: actions/cache@v3
+      with:
+        path: ${{env.SCCACHE_CACHE}}
+        key: sccache-cache-1-${{matrix.os}}-${{env.DATE_STRING}}
+        restore-keys: sccache-cache-1-${{matrix.os}}
+
+    - name: Start sccache
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: sccache --start-server
+
     - name: Configure VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/vtk_build
@@ -137,3 +173,8 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/vtk_build
       shell: bash
       run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Cleanup sccache
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: sccache --stop-server

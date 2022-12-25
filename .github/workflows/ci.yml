@@ -53,35 +53,6 @@ jobs:
       with:
         lfs_sha: ${{env.LFS_SHA}}
 
-    - name: Install tools Windows
-      if: matrix.os == 'windows-latest'
-      shell: cmd
-      run: choco install sccache
-
-    - name: Install tools MacOS
-      if: matrix.os == 'macos-latest'
-      shell: bash
-      run: brew install sccache
-
-    - name: Initialize sccache environnement
-      shell: bash
-      run: |
-        echo SCCACHE_CACHE=$(sccache --show-stats | grep Local | cut -d '"' -f2) >> $GITHUB_ENV
-        echo DATE_STRING=$(date +'%Y%m%d') >> $GITHUB_ENV
-        sccache --stop-server
-
-    - name: Recover sccache cache
-      uses: actions/cache@v3
-      with:
-        path: ${{env.SCCACHE_CACHE}}
-        key: sccache-cache-1-${{matrix.os}}-${{env.DATE_STRING}}
-        restore-keys: sccache-cache-1-${{matrix.os}}
-
-    - name: Start sccache
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: sccache --start-server
-
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
       run: mkdir dependencies
@@ -222,7 +193,4 @@ jobs:
         cmake --build build_plugin --config Release
         ctest --test-dir build_plugin -C Release -VV
 
-    - name: Cleanup sccache
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: sccache --stop-server
+
