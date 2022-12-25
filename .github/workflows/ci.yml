@@ -221,7 +221,6 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: |
-        otool -l ./bin/f3d
         ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
