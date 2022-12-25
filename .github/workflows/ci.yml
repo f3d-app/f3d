@@ -138,11 +138,11 @@ jobs:
         cp x64\libgallium_wgl.dll ..\..\build\bin\Release\
 
     - name: Install VTK windows
-      shell: cmd
+      shell: bash
       if: matrix.os == 'windows-latest'
       working-directory: ${{github.workspace}}/dependencies/
       run: |
-        cp vtk_install\bin\* ..\..\build\bin\Release\
+        cp vtk_install/bin/* ../build/bin/Release/
 
     - name: Test
       working-directory: ${{github.workspace}}/build
