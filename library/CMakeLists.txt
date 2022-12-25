@@ -164,6 +164,7 @@ if (APPLE OR UNIX)
   get_target_property(target_type VTK::CommonCore TYPE)
   if (target_type STREQUAL SHARED_LIBRARY)
     set_target_properties(libf3d PROPERTIES INSTALL_RPATH "$<TARGET_FILE_DIR:VTK::CommonCore>")
+    message(WARNING "$<TARGET_FILE_DIR:VTK::CommonCore>")
   endif ()
 endif ()
 
