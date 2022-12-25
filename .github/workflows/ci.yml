@@ -30,6 +30,29 @@ jobs:
 
     steps:
 
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: 'false'
+
+    - name: Setup JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Set LFS env var
+      working-directory: ${{github.workspace}}/source
+      shell: bash
+      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{env.LFS_SHA}}
+
     - name: Install tools Windows
       if: matrix.os == 'windows-latest'
       shell: cmd
@@ -57,30 +80,9 @@ jobs:
     - name: Start sccache
       shell: bash
       working-directory: ${{github.workspace}}
-      run: sccache --start-server
-
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: 'false'
-
-    - name: Setup JDK
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
-    - name: Set LFS env var
-      working-directory: ${{github.workspace}}/source
-      shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
-
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{env.LFS_SHA}}
+      run: |
+        sccache --start-server
+        sccache --show-stats
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
@@ -95,6 +97,10 @@ jobs:
         enable_tbb: ${{matrix.config.enable_tbb}}
         enable_raytracing: ${{matrix.config.enable_raytracing}}
 
+    - name: Stats sccache
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: sccache --show-stats
 
     - name: Cleanup sccache
       working-directory: ${{github.workspace}}
