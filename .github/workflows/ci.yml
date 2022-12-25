@@ -194,13 +194,6 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --config Release
 
-    - name: Set path env vars ubuntu
-      working-directory: ${{github.workspace}}/dependencies/
-      shell: bash
-      run: |
-        echo "LD_LIBRARY_PATH=$(pwd)/oidn_install/lib:$(pwd)/vtk_install/lib:$(pwd)/assimp_install/lib:$(pwd)/alembic_install/lib:$(pwd)/imath_install/lib:$(pwd)/draco_install/lib:$(pwd)/ospray_install/lib:$(pwd)/embree_install/lib:$(pwd)/rkcommon_install/lib:$(pwd)/openvkl_install/lib:$(pwd)/tbb_install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-        echo "DYLD_LIBRARY_PATH=$(pwd)/oidn_install/lib:$(pwd)/vtk_install/lib:$(pwd)/assimp_install/lib:$(pwd)/alembic_install/lib:$(pwd)/imath_install/lib:$(pwd)/draco_install/lib:$(pwd)/ospray_install/lib:$(pwd)/embree_install/lib:$(pwd)/rkcommon_install/lib:$(pwd)/openvkl_install/lib:$(pwd)/tbb_install/lib:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
-
     - name: env var win
       if: matrix.os == 'windows-latest'
       working-directory: ${{github.workspace}}/dependencies/
@@ -227,7 +220,7 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: |
-        echo $DYLD_LIBRARY_PATH
+        otool -l ./bin/f3d
         ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
