@@ -193,7 +193,9 @@ jobs:
     - name: Check Install macos
       if: matrix.os == 'macos-latest'
       working-directory: ${{github.workspace}}/install
-      run: ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
+      run: |
+        otool -l ./f3d.app/Contents/MacOS/f3d
+        ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
     # TODO: This job should be replaced by a useful example using the libf3d API and merged with the next job
     - name: Check SDK
