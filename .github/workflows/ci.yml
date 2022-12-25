@@ -194,6 +194,8 @@ jobs:
       if: matrix.os == 'macos-latest'
       working-directory: ${{github.workspace}}/install
       run: |
+        ls /Users/runner/work/f3d/f3d/dependencies/vtk_install/lib/
+        ls /Users/runner/work/f3d/f3d/dependencies/vtk_install/lib/libvtkInteractionWidgets.1.dylib
         otool -l ./f3d.app/Contents/MacOS/f3d
         ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
