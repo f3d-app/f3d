@@ -173,8 +173,3 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/vtk_build
       shell: bash
       run: cmake --build . --parallel 2 --target install --config Release
-
-    - name: Cleanup sccache
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: sccache --stop-server
