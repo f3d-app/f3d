@@ -32,7 +32,20 @@ jobs:
     - name: Dependencies Dir
       shell: powershell
       working-directory: ${{github.workspace}}
-      run: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.34.31933/bin/Hostx64/x64/cl.exe/dumpbin.exe"
+      run: |
+        C:
+        cd "Program Files"
+        cd "Microsoft Visual Studio"
+        cd "2022"
+        cd "Enterprise"
+        cd "VC"
+        cd "Tools"
+        cd "MSVC"
+        cd "14.34.31933"
+        cd "bin"
+        cd "Hostx64"
+        cd "x64"
+        .\dumpbin.exe
 
     - name: Checkout
       uses: actions/checkout@v3
