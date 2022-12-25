@@ -29,6 +29,10 @@ jobs:
 
     steps:
 
+    - name: Dependencies Dir
+      working-directory: ${{github.workspace}}
+      run: dumpbin.exe
+
     - name: Checkout
       uses: actions/checkout@v3
       with:
