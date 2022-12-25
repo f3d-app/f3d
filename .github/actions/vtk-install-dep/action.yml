@@ -47,7 +47,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-3-${{inputs.enable_raytracing}}-${{inputs.enable_tbb}}-${{inputs.os}}-
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-4-${{inputs.enable_raytracing}}-${{inputs.enable_tbb}}-${{inputs.os}}
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -85,6 +85,8 @@ runs:
       shell: bash
       run: >
         cmake ../vtk
+        -DCMAKE_C_COMPILER_LAUNCHER=sccache
+        -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
         -DVTK_ENABLE_LOGGING=OFF
         -DVTK_ENABLE_WRAPPING=OFF
         -DVTK_BUILD_TESTING=OFF
