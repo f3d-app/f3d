@@ -31,12 +31,12 @@ jobs:
     steps:
 
     - name: Install tools Windows
-      if: inputs.os == 'windows-latest'
+      if: matrix.os == 'windows-latest'
       shell: cmd
       run: choco install sccache
 
     - name: Install tools MacOS
-      if: inputs.os == 'macos-latest'
+      if: matrix.os == 'macos-latest'
       shell: bash
       run: brew install sccache
 
@@ -51,8 +51,8 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ${{env.SCCACHE_CACHE}}
-        key: sccache-cache-1-${{inputs.os}}-${{env.DATE_STRING}}
-        restore-keys: sccache-cache-1-${{inputs.os}}
+        key: sccache-cache-1-${{matrix.os}}-${{env.DATE_STRING}}
+        restore-keys: sccache-cache-1-${{matrix.os}}
 
     - name: Start sccache
       shell: bash
