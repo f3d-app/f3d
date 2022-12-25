@@ -92,3 +92,152 @@ jobs:
         vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         os: ${{matrix.os}}
+
+    - name: Setup Directories
+      working-directory: ${{github.workspace}}
+      run: |
+         mkdir build
+         mkdir install
+
+    # pwd seems necessary for OpenCASCADE and Assimp for some reasons
+    - name: Configure
+      working-directory: ${{github.workspace}}/build
+      run: >
+        cmake ../source
+        -Werror=dev
+        -Werror=deprecated
+        --warn-uninitialized
+        -DBUILD_TESTING=ON
+        -DCMAKE_INSTALL_PREFIX:PATH=../install
+        -DF3D_STRICT_BUILD=ON
+        -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
+        -DF3D_PLUGIN_BUILD_OCCT=ON
+        -DF3D_BINDINGS_JAVA=ON
+        -DF3D_INSTALL_SDK=ON
+        -DF3D_INSTALL_SDK_PLUGIN=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
+        -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
+        -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
+        -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
+        -Ddraco_DIR:PATH=$(pwd)/../dependencies/draco_install/share/cmake/draco
+        -Dpybind11_DIR:PATH=$(pwd)/../dependencies/pybind11_install/share/cmake/pybind11
+        -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
+        ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DF3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+        ${{ matrix.os == 'macos-latest' && '-DF3D_BINDINGS_PYTHON=ON -DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
+        ${{ matrix.os == 'ubuntu-latest' && '-DF3D_BINDINGS_PYTHON=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON -DF3D_INSTALL_MIME_TYPES_FILES=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
+        ${{ matrix.vtk_version == 'commit' && '-DF3D_ENABLE_HDRI_TESTS=ON' || '-DF3D_ENABLE_HDRI_TESTS=OFF' }}
+        ${{ matrix.vtk_version == 'v9.0.0' && '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=OFF' }}
+
+    - name: Build
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --parallel 2 --config Release
+
+    - name: Run Xvfb ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
+
+    - name: Install Mesa windows
+      shell: cmd
+      if: matrix.os == 'windows-latest'
+      working-directory: ${{github.workspace}}/dependencies/
+      run: |
+        mkdir mesa
+        cd mesa
+        curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/22.0.1/mesa3d-22.0.1-release-msvc.7z
+        "C:\Program Files\7-Zip\7z.exe" x mesa.7z
+        cp x64\opengl32.dll ..\..\build\bin\Release\
+        cp x64\libglapi.dll ..\..\build\bin\Release\
+        cp x64\libgallium_wgl.dll ..\..\build\bin\Release\
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+
+    - name: Upload Tests Artifact
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./build/Testing/Temporary
+        name: f3d-tests-artifact-${{matrix.os}}-${{matrix.vtk_version}}
+
+    - name: Install
+      working-directory: ${{github.workspace}}/build
+      run: cmake --install .
+
+    - name: Check Install ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      working-directory: ${{github.workspace}}/install
+      run: ./bin/f3d ../source/testing/data/suzanne.obj --output=../output.png
+
+    - name: Check Install windows
+      if: matrix.os == 'windows-latest'
+      working-directory: ${{github.workspace}}/install
+      run: |
+        cp ..\dependencies\mesa\x64\opengl32.dll .\bin\
+        cp ..\dependencies\mesa\x64\libglapi.dll .\bin\
+        cp ..\dependencies\mesa\x64\libgallium_wgl.dll .\bin\
+        .\bin\f3d.exe ..\source\testing\data\suzanne.obj --output=..\output.png
+
+    - name: Check Install macos
+      if: matrix.os == 'macos-latest'
+      working-directory: ${{github.workspace}}/install
+      run: ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
+
+    # TODO: This job should be replaced by a useful example using the libf3d API and merged with the next job
+    - name: Check SDK
+      if: matrix.os != 'macos-latest'
+      working-directory: ${{github.workspace}}
+      run: |
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -B test_sdk source/.github/test_sdk
+        cmake --build test_sdk
+
+    # TODO when VTK is built as a shared library:
+    # - Enable on all OS
+    # - Add -Werror=dev CMake option
+    # - Run ctest
+    - name: Validate plugin example
+      if: matrix.os == 'ubuntu-latest'
+      working-directory: ${{github.workspace}}
+      run: |
+        cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DVTK_DIR:PATH=$(pwd)/dependencies/vtk_install/lib/cmake/vtk -B build_plugin source/examples/plugins/example-plugin
+        cmake --build build_plugin --config Release
+        ctest --test-dir build_plugin -C Release -VV
+
+    - name: Setup NSIS
+      if: matrix.os == 'windows-latest'
+      working-directory: ${{github.workspace}}
+      run: cp source\.github\nsis\FileAssociation.nsh "C:/Program Files (x86)/NSIS/Include"
+
+    - name: Packaging
+      working-directory: ${{github.workspace}}/build
+      run: cpack
+
+    - name: Check Packaging Linux
+      if: matrix.os == 'ubuntu-latest'
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir package
+        tar -xzvf ./build/f3d-*.tar.gz -C ./package/
+        ./package/bin/f3d source/testing/data/suzanne.obj --output=output.png
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/package/lib/cmake/f3d -B test_sdk_package source/.github/test_sdk
+        cmake --build test_sdk
+
+    - name: Check Packaging Windows
+      if: matrix.os == 'windows-latest'
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir package
+        Expand-Archive .\build\f3d-*.zip -DestinationPath .\package
+        .\package\bin\f3d source\testing\data\suzanne.obj --output=output.png
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/package/lib/cmake/f3d -B test_sdk_package source/.github/test_sdk
+        cmake --build test_sdk
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./build/f3d-*
+        name: f3d-${{matrix.os}}-${{matrix.vtk_version}}
