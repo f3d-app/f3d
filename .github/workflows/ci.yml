@@ -137,6 +137,13 @@ jobs:
         cp x64\libglapi.dll ..\..\build\bin\Release\
         cp x64\libgallium_wgl.dll ..\..\build\bin\Release\
 
+    - name: Install VTK windows
+      shell: cmd
+      if: matrix.os == 'windows-latest'
+      working-directory: ${{github.workspace}}/dependencies/
+      run: |
+        cp vtk_install\bin\* ..\..\build\bin\Release\
+
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: |
