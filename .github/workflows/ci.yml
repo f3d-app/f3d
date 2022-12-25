@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [macos-latest]
         config:
           - { name: "VTK", vtk_version: commit, enable_tbb: 'false', enable_raytracing: 'false' }
 
@@ -135,13 +135,6 @@ jobs:
     - name: Build
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --config Release
-
-    - name: Set path env vars ubuntu
-      working-directory: ${{github.workspace}}/dependencies/
-      shell: bash
-      run: |
-        echo "LD_LIBRARY_PATH=$(pwd)/vtk_install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-        echo "DYLD_LIBRARY_PATH=$(pwd)/vtk_install/lib:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
 
     - name: env var win
       if: matrix.os == 'windows-latest'
