@@ -80,9 +80,7 @@ jobs:
     - name: Start sccache
       shell: bash
       working-directory: ${{github.workspace}}
-      run: |
-        sccache --start-server
-        sccache --show-stats
+      run: sccache --start-server
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
