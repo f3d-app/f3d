@@ -47,7 +47,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-4-${{inputs.enable_raytracing}}-${{inputs.enable_tbb}}-${{inputs.os}}
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-11-${{inputs.enable_raytracing}}-${{inputs.enable_tbb}}-${{inputs.os}}
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
