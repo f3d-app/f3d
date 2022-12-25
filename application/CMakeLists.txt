@@ -44,9 +44,14 @@ set_target_properties(f3d PROPERTIES
   )
 
 if (APPLE)
-  set_target_properties(f3d PROPERTIES INSTALL_RPATH "@loader_path/../lib:$<TARGET_FILE_DIR:VTK::CommonCore>")
+  set_property(
+    TARGET f3d
+    PROPERTY INSTALL_RPATH
+    "@loader_path/../lib"
+    "$<TARGET_FILE_DIR:VTK::CommonCore>"
+    )
 elseif (UNIX)
-  set_target_properties(f3d PROPERTIES INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}:$<TARGET_FILE_DIR:VTK::CommonCore>")
+  set_target_properties(f3d PROPERTIES INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
 endif ()
 
 target_include_directories(f3d
