@@ -182,6 +182,7 @@ jobs:
         -Drkcommon_DIR:PATH=$(pwd)/../dependencies/rkcommon_install/lib/cmake/rkcommon-1.7.0
         -Dopenvkl_DIR:PATH=$(pwd)/../dependencies/openvkl_install/lib/cmake/openvkl-1.0.1
         -DOpenImageDenoise_DIR:PATH=$(pwd)/../dependencies/oidn_install/lib/cmake/OpenImageDenoise-1.4.3
+        -DCMAKE_BUILD_RPATH:PATH=$(pwd)/../dependencies/oidn_install/lib/
         -DTBB_DIR:PATH=$(pwd)/../dependencies/tbb_install/lib/cmake/TBB/
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
         ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
