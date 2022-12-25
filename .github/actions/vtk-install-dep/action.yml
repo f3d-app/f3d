@@ -38,7 +38,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-9-${{inputs.os}}
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-0-${{inputs.os}}
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -81,7 +81,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DVTK_LEGACY_REMOVE=ON
         -DVTK_VERSIONED_INSTALL=OFF
-        -DBUILD_SHARED_LIBS=OFF
+        -DBUILD_SHARED_LIBS=ON
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
         -DVTK_GROUP_ENABLE_Rendering=DEFAULT
         -DVTK_GROUP_ENABLE_StandAlone=DEFAULT
