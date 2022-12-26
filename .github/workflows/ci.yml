@@ -152,12 +152,9 @@ jobs:
         cp x64\opengl32.dll ..\..\build\bin\Release\
         cp x64\libglapi.dll ..\..\build\bin\Release\
         cp x64\libgallium_wgl.dll ..\..\build\bin\Release\
-        cd ../
-        mkdir zlib
-        cd zlib
-        curl.exe -L --output zlib1__.zip --url  https://github.com/rust-lang/rust/files/6550164/zlib1__.zip
-        "C:\Program Files\7-Zip\7z.exe" x zlib1__.zip
-        cp zlib1__.dll ..\..\build\bin\Release\
+        cp x64\opengl32.dll ..\vtk_install\bin\
+        cp x64\libglapi.dll ..\vtk_install\bin\
+        cp x64\libgallium_wgl.dll ..\vtk_install\bin\
 
     - name: env var win
       if: matrix.os == 'windows-latest'
