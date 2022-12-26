@@ -29,24 +29,6 @@ jobs:
 
     steps:
 
-    - name: Dependencies Dir
-      shell: powershell
-      working-directory: ${{github.workspace}}
-      run: |
-        C:
-        cd "Program Files"
-        cd "Microsoft Visual Studio"
-        cd "2022"
-        cd "Enterprise"
-        cd "VC"
-        cd "Tools"
-        cd "MSVC"
-        cd "14.34.31933"
-        cd "bin"
-        cd "Hostx64"
-        cd "x64"
-        .\dumpbin.exe
-
     - name: Checkout
       uses: actions/checkout@v3
       with:
@@ -189,6 +171,20 @@ jobs:
       with:
         path: ./build/Testing/Temporary
         name: f3d-tests-artifact-${{matrix.os}}-${{matrix.vtk_version}}
+
+    - name: Upload Artifact VTK
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./dependencies/vtk_install
+        name: f3d-VTK-artifact-${{matrix.os}}-${{matrix.vtk_version}}
+
+    - name: Upload Artifact F3D
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./build
+        name: f3d-F3D-artifact-${{matrix.os}}-${{matrix.vtk_version}}
 
     - name: Install
       working-directory: ${{github.workspace}}/build
