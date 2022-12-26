@@ -40,7 +40,7 @@ runs:
         cmake ../embree
         -DBUILD_TESTING:BOOL=OFF
         -DEMBREE_ISPC_EXECUTABLE:PATH=$(pwd)/../ispc/bin/ispc
-        -DTBB_ROOT:PATH=$(pwd)/../tbb_install/
+        -DTBB_ROOT:PATH=$(pwd)/../install/
         -DEMBREE_GEOMETRY_QUAD:BOOL=OFF
         -DEMBREE_GEOMETRY_SUBDIVISION:BOOL=OFF
         -DEMBREE_TUTORIALS:BOOL=OFF
