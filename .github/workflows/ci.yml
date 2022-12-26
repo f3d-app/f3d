@@ -167,10 +167,10 @@ jobs:
         echo "PATH=$env:PATH;$(pwd)\vtk_install\bin;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         echo $env:PATH
 
-    - name: Test
+    - name: Test without ctest
       working-directory: ${{github.workspace}}/build
       shell: bash
-      run: ./bin/Release/f3d.exe
+      run: ./bin/Release/f3d.exe --version
 
     - name: Test
       working-directory: ${{github.workspace}}/build
