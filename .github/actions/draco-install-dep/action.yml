@@ -51,3 +51,8 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/draco_build
       shell: bash
       run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/draco_install
+      shell: bash
+      run: cp -r ./* ../install/

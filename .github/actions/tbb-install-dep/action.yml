@@ -48,3 +48,8 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/tbb_build
       shell: bash
       run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/tbb_install
+      shell: bash
+      run: cp -r ./* ../install/

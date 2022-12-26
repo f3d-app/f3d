@@ -93,6 +93,7 @@ runs:
         -DVTK_VERSIONED_INSTALL=OFF
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_GROUP_ENABLE_Rendering=DEFAULT
         -DVTK_GROUP_ENABLE_StandAlone=DEFAULT
@@ -118,14 +119,8 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.enable_raytracing == 'true' && 'YES' || 'DEFAULT' }}
-        -Dospray_DIR:PATH=$(pwd)/../ospray_install/lib/cmake/ospray-2.7.1/
-        -Dembree_DIR:PATH=$(pwd)/../embree_install/lib/cmake/embree-3.13.1
-        -Drkcommon_DIR:PATH=$(pwd)/../rkcommon_install/lib/cmake/rkcommon-1.7.0
-        -Dopenvkl_DIR:PATH=$(pwd)/../openvkl_install/lib/cmake/openvkl-1.0.1
-        -DOpenImageDenoise_DIR:PATH=$(pwd)/../oidn_install/lib/cmake/OpenImageDenoise-1.4.3
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_SMP_IMPLEMENTATION_TYPE=${{ inputs.enable_tbb == 'true' && 'TBB' || 'Sequential' }}
-        -DTBB_DIR:PATH=$(pwd)/../tbb_install/lib/cmake/TBB/
         ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF' || null }}
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
@@ -135,3 +130,8 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/vtk_build
       shell: bash
       run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/vtk_install
+      shell: bash
+      run: cp -r ./* ../install/

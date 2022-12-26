@@ -75,3 +75,8 @@ runs:
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: sed -i 's/OpenCASCADE_LIBRARIES [A-Za-z0-9;]\+/OpenCASCADE_LIBRARIES TKSTEP;TKSTEPAttr;TKSTEP209;TKSTEPBase;TKIGES;TKBool;TKMesh;TKXSBase;TKBO;TKPrim;TKShHealing;TKTopAlgo;TKBRep;TKGeomAlgo;TKGeomBase;TKG3d;TKG2d;TKMath;TKernel/' occt_install/lib/cmake/opencascade/OpenCASCADEConfig.cmake
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/occt_install
+      shell: bash
+      run: cp -r ./* ../install/

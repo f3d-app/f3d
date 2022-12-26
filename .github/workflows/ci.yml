@@ -58,7 +58,10 @@ jobs:
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
-      run: mkdir dependencies
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
 
     - name: Install tbb dependency
       if: |
@@ -158,6 +161,9 @@ jobs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_RPATH:PATH=$(pwd)/../dependencies/install/lib/
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DF3D_STRICT_BUILD=ON
@@ -170,36 +176,16 @@ jobs:
         -DF3D_BINDINGS_JAVA=ON
         -DF3D_INSTALL_SDK=ON
         -DF3D_INSTALL_SDK_PLUGIN=ON
-        -DCMAKE_BUILD_TYPE=Release
-        -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
-        -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
-        -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
-        -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
-        -Ddraco_DIR:PATH=$(pwd)/../dependencies/draco_install/share/cmake/draco
-        -Dpybind11_DIR:PATH=$(pwd)/../dependencies/pybind11_install/share/cmake/pybind11
-        -Dospray_DIR:PATH=$(pwd)/../dependencies/ospray_install/lib/cmake/ospray-2.7.1/
-        -Dembree_DIR:PATH=$(pwd)/../dependencies/embree_install/lib/cmake/embree-3.13.1
-        -Drkcommon_DIR:PATH=$(pwd)/../dependencies/rkcommon_install/lib/cmake/rkcommon-1.7.0
-        -Dopenvkl_DIR:PATH=$(pwd)/../dependencies/openvkl_install/lib/cmake/openvkl-1.0.1
-        -DOpenImageDenoise_DIR:PATH=$(pwd)/../dependencies/oidn_install/lib/cmake/OpenImageDenoise-1.4.3
-        -DCMAKE_BUILD_RPATH:PATH=$(pwd)/../dependencies/oidn_install/lib/
-        -DTBB_DIR:PATH=$(pwd)/../dependencies/tbb_install/lib/cmake/TBB/
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
-        ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
-        ${{ matrix.os == 'macos-latest' && '-DF3D_BINDINGS_PYTHON=ON -DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
-        ${{ matrix.os == 'ubuntu-latest' && '-DF3D_BINDINGS_PYTHON=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_INSTALL_MIME_TYPES_FILES=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
+        ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+        ${{ matrix.os == 'macos-latest' && '-DF3D_BINDINGS_PYTHON=ON -DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ matrix.os == 'ubuntu-latest' && '-DF3D_BINDINGS_PYTHON=ON -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_INSTALL_MIME_TYPES_FILES=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
         ${{ matrix.config.vtk_version == 'commit' && '-DF3D_ENABLE_HDRI_TESTS=ON' || '-DF3D_ENABLE_HDRI_TESTS=OFF' }}
         ${{ matrix.config.vtk_version == 'v9.0.0' && '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=OFF' }}
 
     - name: Build
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --config Release
-
-    - name: env var win
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/dependencies/
-      shell: powershell
-      run: echo "PATH=$env:PATH;$(pwd)\oidn_install\bin;$(pwd)\vtk_install\bin;$(pwd)\assimp_install\bin;$(pwd)\alembic_install\bin;$(pwd)\imath_install\bin;$(pwd)\draco_install\bin;$(pwd)\ospray_install\bin;$(pwd)\embree_install\bin;$(pwd)\rkcommon_install\bin;$(pwd)\openvkl_install\bin;$(pwd)\tbb_install\bin" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Run Xvfb ubuntu
       if: matrix.os == 'ubuntu-latest'
@@ -217,6 +203,11 @@ jobs:
         cp x64\opengl32.dll ..\..\build\bin\Release\
         cp x64\libglapi.dll ..\..\build\bin\Release\
         cp x64\libgallium_wgl.dll ..\..\build\bin\Release\
+
+    - name: Set path env vars ubuntu
+      working-directory: ${{github.workspace}}/dependencies/
+      shell: bash
+      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
     - name: Test
       working-directory: ${{github.workspace}}/build
@@ -269,7 +260,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DVTK_DIR:PATH=$(pwd)/dependencies/vtk_install/lib/cmake/vtk -DTBB_DIR:PATH=$(pwd)/dependencies/tbb_install/lib/cmake/TBB/ -B build_plugin source/examples/plugins/example-plugin
+        cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/ -B build_plugin source/examples/plugins/example-plugin
         cmake --build build_plugin --config Release
         ctest --test-dir build_plugin -C Release -VV
 
