@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/openvkl_install
-        key: openvkl-v1.0.1-0-${{inputs.os}}
+        key: openvkl-v1.0.1-1-${{inputs.os}}
 
     - name: Checkout openvkl
       if: steps.cache-openvkl.outputs.cache-hit != 'true'

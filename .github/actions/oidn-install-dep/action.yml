@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/oidn_install
-        key: oidn-v1.4.3-0-${{inputs.os}}
+        key: oidn-v1.4.3-1-${{inputs.os}}
 
     - name: Checkout oidn manually
       if: steps.cache-oidn.outputs.cache-hit != 'true'

@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/rkcommon_install
-        key: rkcommon-v1.7.0-0-${{inputs.os}}
+        key: rkcommon-v1.7.0-1-${{inputs.os}}
 
     - name: Checkout rkcommon
       if: steps.cache-rkcommon.outputs.cache-hit != 'true'

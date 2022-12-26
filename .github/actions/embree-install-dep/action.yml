@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/embree_install
-        key: embree-v3.13.1-0-${{inputs.os}}
+        key: embree-v3.13.1-1-${{inputs.os}}
 
     - name: Checkout embree
       if: steps.cache-embree.outputs.cache-hit != 'true'
