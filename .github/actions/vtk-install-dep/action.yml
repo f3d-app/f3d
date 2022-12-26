@@ -38,7 +38,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-1-${{inputs.os}}
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-0-${{inputs.os}}
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
