@@ -212,6 +212,7 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: |
+        otool -l /Users/runner/work/f3d/f3d/dependencies/install/lib/libospray_module_ispc.dylib
         ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
@@ -260,7 +261,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/ -B build_plugin source/examples/plugins/example-plugin
+        cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -B build_plugin source/examples/plugins/example-plugin
         cmake --build build_plugin --config Release
         ctest --test-dir build_plugin -C Release -VV
 
