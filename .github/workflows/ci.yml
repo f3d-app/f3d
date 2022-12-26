@@ -179,6 +179,14 @@ jobs:
         path: ./dependencies/vtk_install
         name: f3d-VTK-artifact-${{matrix.os}}-${{matrix.vtk_version}}
 
+    - name: Upload Artifact VTK build
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./dependencies/vtk_build
+        name: f3d-VTKBuild-artifact-${{matrix.os}}-${{matrix.vtk_version}}
+
+
     - name: Upload Artifact F3D
       if: failure()
       uses: actions/upload-artifact@v3
