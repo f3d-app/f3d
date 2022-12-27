@@ -168,19 +168,19 @@ jobs:
       if: matrix.os == 'windows-latest'
       working-directory: ${{github.workspace}}/build/bin/Release
       shell: powershell
-      run: D:\a\f3d\f3d\build\bin\Release\f3d.exe "--dry-run" "D:/a/f3d/f3d/source/testing/data/suzanne.ply" "--resolution=300,300" "--output=D:/a/f3d/f3d/build/Testing/Temporary/TestPLY.png" "--ref=D:/a/f3d/f3d/source/testing/baselines/TestPLY.png"
+      run: D:\a\f3d\f3d\build\bin\Release\f3d.exe "--dry-run" "D:/a/f3d/f3d/source/testing/data/suzanne.ply" "--resolution=300,300" "--output=D:/a/f3d/f3d/build/Testing/Temporary/TestPLY.png" "--ref=D:/a/f3d/f3d/source/testing/baselines/TestPLY.png" "--verbose"
 
     - name: test pw
       if: failure()
       working-directory: ${{github.workspace}}/build/bin/Release
       shell: bash
-      run: D:\a\f3d\f3d\build\bin\Release\f3d.exe "--dry-run" "D:/a/f3d/f3d/source/testing/data/suzanne.ply" "--resolution=300,300" "--output=D:/a/f3d/f3d/build/Testing/Temporary/TestPLY.png" "--ref=D:/a/f3d/f3d/source/testing/baselines/TestPLY.png"
+      run: D:/a/f3d/f3d/build/bin/Release/f3d.exe "--dry-run" "D:/a/f3d/f3d/source/testing/data/suzanne.ply" "--resolution=300,300" "--output=D:/a/f3d/f3d/build/Testing/Temporary/TestPLY.png" "--ref=D:/a/f3d/f3d/source/testing/baselines/TestPLY.png" "--verbose"
 
     - name: test pw
       if: failure()
       working-directory: ${{github.workspace}}/build/bin/Release
       shell: cmd
-      run: D:\a\f3d\f3d\build\bin\Release\f3d.exe "--dry-run" "D:/a/f3d/f3d/source/testing/data/suzanne.ply" "--resolution=300,300" "--output=D:/a/f3d/f3d/build/Testing/Temporary/TestPLY.png" "--ref=D:/a/f3d/f3d/source/testing/baselines/TestPLY.png"
+      run: D:\a\f3d\f3d\build\bin\Release\f3d.exe "--dry-run" "D:/a/f3d/f3d/source/testing/data/suzanne.ply" "--resolution=300,300" "--output=D:/a/f3d/f3d/build/Testing/Temporary/TestPLY.png" "--ref=D:/a/f3d/f3d/source/testing/baselines/TestPLY.png" "--verbose"
 
     - name: Test
       if: failure()
