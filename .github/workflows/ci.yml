@@ -20,9 +20,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         config:
-          - { name: "VTK", vtk_version: commit, enable_tbb: 'true', enable_raytracing: 'true' }
-          - { name: "VTK-9.2.2", vtk_version: v9.2.2, enable_tbb: 'true', enable_raytracing: 'true' }
-          - { name: "VTK-9.1.0", vtk_version: v9.1.0, enable_tbb: 'true', enable_raytracing: 'true' }
+          - { name: "VTK", vtk_version: commit, enable_tbb: 'false', enable_raytracing: 'true' }
+          - { name: "VTK-9.2.2", vtk_version: v9.2.2, enable_tbb: 'false', enable_raytracing: 'true' }
+          - { name: "VTK-9.1.0", vtk_version: v9.1.0, enable_tbb: 'false', enable_raytracing: 'true' }
           - { name: "VTK-9.0.0", vtk_version: v9.0.0, enable_tbb: 'false', enable_raytracing: 'false' }
 
     runs-on: ${{matrix.os}}

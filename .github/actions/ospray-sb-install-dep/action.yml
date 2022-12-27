@@ -46,7 +46,7 @@ runs:
         -DBUILD_OSPRAY_APPS=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DDOWNLOAD_ISPC=ON
-        -DDOWNLOAD_TBB=OFF
+        -DDOWNLOAD_TBB=ON
         -DINSTALL_DEPENDENCIES=ON
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
