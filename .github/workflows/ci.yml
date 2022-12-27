@@ -64,46 +64,14 @@ jobs:
         mkdir install
 
     - name: Install tbb dependency
-      if: |
-        matrix.config.enable_raytracing == 'true' ||
-        matrix.config.enable_tbb == 'true'
+      if: matrix.config.enable_tbb == 'true'
       uses: ./source/.github/actions/tbb-install-dep
       with:
         os: ${{matrix.os}}
 
-    - name: Install ispc dependency
+    - name: Install ospray sb dependency
       if: matrix.config.enable_raytracing == 'true'
-      uses: ./source/.github/actions/ispc-install-tool
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install oidn dependency
-      if: matrix.config.enable_raytracing == 'true'
-      uses: ./source/.github/actions/oidn-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install rkcommon dependency
-      if: matrix.config.enable_raytracing == 'true'
-      uses: ./source/.github/actions/rkcommon-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install embree dependency
-      if: matrix.config.enable_raytracing == 'true'
-      uses: ./source/.github/actions/embree-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install openvkl dependency
-      if: matrix.config.enable_raytracing == 'true'
-      uses: ./source/.github/actions/openvkl-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install ospray dependency
-      if: matrix.config.enable_raytracing == 'true'
-      uses: ./source/.github/actions/ospray-install-dep
+      uses: ./source/.github/actions/ospray-sb-install-dep
       with:
         os: ${{matrix.os}}
 
@@ -211,9 +179,7 @@ jobs:
 
     - name: Test
       working-directory: ${{github.workspace}}/build
-      run: |
-        otool -l /Users/runner/work/f3d/f3d/dependencies/install/lib/libospray_module_ispc.dylib
-        ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
       if: failure()
