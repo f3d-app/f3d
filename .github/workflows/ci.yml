@@ -164,15 +164,15 @@ jobs:
         echo "PATH=$env:PATH;$(pwd)\vtk_install\bin;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         echo $env:PATH
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: ctest -C Release -R TestPLY -VV
-
     - name: test pw
       if: matrix.os == 'windows-latest'
       working-directory: ${{github.workspace}}/build/bin/Release
       shell: powershell
       run: D:\a\f3d\f3d\build\bin\Release\f3d.exe "--dry-run" "D:/a/f3d/f3d/source/testing/data/suzanne.ply" "--resolution=300,300" "--output=D:/a/f3d/f3d/build/Testing/Temporary/TestPLY.png" "--ref=D:/a/f3d/f3d/source/testing/baselines/TestPLY.png"
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C Release -R TestPLY -VV
 
     - name: Upload Tests Artifact
       if: failure()
