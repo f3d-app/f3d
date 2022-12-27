@@ -172,6 +172,7 @@ jobs:
 
     - name: Test
       working-directory: ${{github.workspace}}/build
+      shell: powershell
       run: ctest -C Release -R TestPLY -VV
 
     - name: Upload Tests Artifact
