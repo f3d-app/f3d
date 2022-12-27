@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_shared: 'false'
+        vtk_shared: ['false']
         config:
           - { name: "Linux Commit", os: ubuntu-latest, vtk_version: commit, vtk_shared: 'true', enable_raytracing: 'true', enable_python: 'true', enable_long_tests: 'true' }
           - { name: "MacOS Commit", os: macos-latest, vtk_version: commit, enable_raytracing: 'true', enable_python: 'true', enable_long_tests: 'true', os_specific_flags: -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 }
