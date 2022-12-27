@@ -164,15 +164,15 @@ jobs:
         echo "PATH=$env:PATH;$(pwd)\vtk_install\bin;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         echo $env:PATH
 
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C Release -R TestPLY -VV
+
     - name: test pw
       if: matrix.os == 'windows-latest'
       working-directory: ${{github.workspace}}/build/bin/Release
       shell: powershell
-      run: .\f3d.exe "D:/a/f3d/f3d/source/testing/data/cow.vtp" "--output=D:/a/f3d/f3d/source/testing/data/TestCow.png" --verbose
-
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+      run: D:\a\f3d\f3d\build\bin\Release\f3d.exe "--dry-run" "D:/a/f3d/f3d/source/testing/data/suzanne.ply" "--resolution=300,300" "--output=D:/a/f3d/f3d/build/Testing/Temporary/TestPLY.png" "--ref=D:/a/f3d/f3d/source/testing/baselines/TestPLY.png"
 
     - name: Upload Tests Artifact
       if: failure()
@@ -180,28 +180,6 @@ jobs:
       with:
         path: ./build/Testing/Temporary
         name: f3d-tests-artifact-${{matrix.os}}-${{matrix.vtk_version}}
-
-    - name: Upload Artifact VTK
-      if: failure()
-      uses: actions/upload-artifact@v3
-      with:
-        path: ./dependencies/vtk_install
-        name: f3d-VTK-artifact-${{matrix.os}}-${{matrix.vtk_version}}
-
-    - name: Upload Artifact VTK build
-      if: failure()
-      uses: actions/upload-artifact@v3
-      with:
-        path: ./dependencies/vtk_build
-        name: f3d-VTKBuild-artifact-${{matrix.os}}-${{matrix.vtk_version}}
-
-
-    - name: Upload Artifact F3D
-      if: failure()
-      uses: actions/upload-artifact@v3
-      with:
-        path: ./build
-        name: f3d-F3D-artifact-${{matrix.os}}-${{matrix.vtk_version}}
 
     - name: Install
       working-directory: ${{github.workspace}}/build
