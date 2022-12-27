@@ -40,12 +40,6 @@ jobs:
         fetch-depth: 0
         lfs: 'false'
 
-    - name: Setup JDK
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
@@ -63,45 +57,14 @@ jobs:
         cd dependencies
         mkdir install
 
-    - name: Install tbb dependency
-      if: matrix.config.enable_tbb == 'true'
-      uses: ./source/.github/actions/tbb-install-dep
+    - name: Install F3D dependencies
+      uses: ./source/.github/actions/f3d-dependencies
       with:
         os: ${{matrix.os}}
 
     - name: Install ospray sb dependency
       if: matrix.config.enable_raytracing == 'true'
       uses: ./source/.github/actions/ospray-sb-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install OCCT dependency
-      uses: ./source/.github/actions/occt-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install Assimp dependency
-      uses: ./source/.github/actions/assimp-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install Draco dependency
-      uses: ./source/.github/actions/draco-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install Imath dependency
-      uses: ./source/.github/actions/imath-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install Alembic dependency
-      uses: ./source/.github/actions/alembic-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install pybind11 dependency
-      uses: ./source/.github/actions/pybind11-install-dep
       with:
         os: ${{matrix.os}}
 
