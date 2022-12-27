@@ -168,19 +168,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       working-directory: ${{github.workspace}}/build/bin/Release
       shell: powershell
-      run: .\f3d.exe --version
-
-    - name: test cmd
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/build/bin/Release
-      shell: cmd
-      run: .\f3d.exe --version
-
-    - name: test bash
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/build/bin/Release
-      shell: bash
-      run: .\f3d.exe --version
+      run: .\f3d.exe "D:/a/f3d/f3d/source/testing/data/cow.vtp" "--output=D:/a/f3d/f3d/build/Testing/Temporary/TestNoRef.png" --verbose
 
     - name: Test
       working-directory: ${{github.workspace}}/build
