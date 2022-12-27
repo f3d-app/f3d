@@ -9,14 +9,14 @@ inputs:
     description: 'VTK SHA file'
     required: false
     default: ''
+  vtk_shared:
+    description: 'VTK Shared Libs'
+    required: false
+    default: 'true'
   os:
     description: 'OS to build on'
     required: false
     default: 'ubuntu-latest'
-  enable_tbb:
-    description: 'Enable TBB or not'
-    required: false
-    default: 'false'
   enable_raytracing:
     description: 'Enable Raytracing or not'
     required: false
@@ -47,7 +47,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-12-${{inputs.enable_raytracing}}-${{inputs.enable_tbb}}-${{inputs.os}}
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-12-${{inputs.enable_raytracing}}-${{inputs.os}}
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -91,7 +91,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DVTK_LEGACY_REMOVE=ON
         -DVTK_VERSIONED_INSTALL=OFF
-        -DBUILD_SHARED_LIBS=ON
+        -DBUILD_SHARED_LIBS==${{ inputs.vtk_shared == 'true' && 'ON' || 'OFF' }}
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DVTKOSPRAY_ENABLE_DENOISER=ON
@@ -120,7 +120,6 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.enable_raytracing == 'true' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
-        -DVTK_SMP_IMPLEMENTATION_TYPE=${{ inputs.enable_tbb == 'true' && 'TBB' || 'Sequential' }}
         ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF' || null }}
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}

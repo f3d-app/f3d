@@ -18,12 +18,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         config:
-          - { name: "VTK", vtk_version: commit, enable_tbb: 'false', enable_raytracing: 'true' }
-          - { name: "VTK-9.2.2", vtk_version: v9.2.2, enable_tbb: 'false', enable_raytracing: 'true' }
-          - { name: "VTK-9.1.0", vtk_version: v9.1.0, enable_tbb: 'false', enable_raytracing: 'true' }
-          - { name: "VTK-9.0.0", vtk_version: v9.0.0, enable_tbb: 'false', enable_raytracing: 'false' }
+          - { name: "Linux Commit", os: ubuntu-latest, vtk_version: commit, vtk_shared: 'true', enable_raytracing: 'true', enable_python: 'true', enable_long_tests: 'true' }
+          - { name: "MacOS Commit", os: ubuntu-latest, vtk_version: commit, vtk_shared: 'true', enable_raytracing: 'true', enable_python: 'true', enable_long_tests: 'true', os_specific_flags: -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 }
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -57,12 +54,7 @@ jobs:
         cd dependencies
         mkdir install
 
-    - name: Install F3D dependencies
-      uses: ./source/.github/actions/f3d-dependencies
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install ospray sb dependency
+    - name: Install Raytracing Dependencies
       if: matrix.config.enable_raytracing == 'true'
       uses: ./source/.github/actions/ospray-sb-install-dep
       with:
@@ -73,9 +65,14 @@ jobs:
       with:
         vtk_version: ${{matrix.config.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-        os: ${{matrix.os}}
-        enable_tbb: ${{matrix.config.enable_tbb}}
+        vtk_shared: ${{matrix.config.vtk_shared}}
+        os: ${{matrix.config.os}}
         enable_raytracing: ${{matrix.config.enable_raytracing}}
+
+    - name: Install F3D dependencies
+      uses: ./source/.github/actions/f3d-dependencies
+      with:
+        os: ${{matrix.os}}
 
     - name: Setup Directories
       working-directory: ${{github.workspace}}
@@ -83,7 +80,6 @@ jobs:
          mkdir build
          mkdir install
 
-    # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     - name: Configure
       working-directory: ${{github.workspace}}/build
       run: >
@@ -92,12 +88,12 @@ jobs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
-        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_BUILD_RPATH:PATH=$(pwd)/../dependencies/install/lib/
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DF3D_STRICT_BUILD=ON
+        -DF3D_ENABLE_LONG_TIMEOUT_TESTS=${{ matrix.config.enable_long_tests == 'true' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_MODULE_RAYTRACING=${{ matrix.config.enable_raytracing == 'true' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
@@ -105,14 +101,19 @@ jobs:
         -DF3D_PLUGIN_BUILD_DRACO=ON
         -DF3D_PLUGIN_BUILD_OCCT=ON
         -DF3D_BINDINGS_JAVA=ON
+        -DF3D_BINDINGS_PYTHON=${{ matrix.config.enable_python == 'true' && 'ON' || 'OFF' }}
         -DF3D_INSTALL_SDK=ON
         -DF3D_INSTALL_SDK_PLUGIN=ON
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
-        ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
-        ${{ matrix.os == 'macos-latest' && '-DF3D_BINDINGS_PYTHON=ON -DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ matrix.os == 'ubuntu-latest' && '-DF3D_BINDINGS_PYTHON=ON -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_INSTALL_MIME_TYPES_FILES=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
-        ${{ matrix.config.vtk_version == 'commit' && '-DF3D_ENABLE_HDRI_TESTS=ON' || '-DF3D_ENABLE_HDRI_TESTS=OFF' }}
-        ${{ matrix.config.vtk_version == 'v9.0.0' && '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=OFF' }}
+
+        -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
+        -DF3D_INSTALL_MIME_TYPES_FILES=ON
+        -DF3D_INSTALL_THUMBNAILER_FILES=ON
+
+        -DF3D_MACOS_BUNDLE=ON
+
+        ${{ matrix.config.os_specific_flags }}
+
 
     - name: Build
       working-directory: ${{github.workspace}}/build
