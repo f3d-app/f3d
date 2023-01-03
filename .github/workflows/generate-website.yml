@@ -23,7 +23,7 @@ jobs:
     - name: Install doxygen and build doxygen doc
       working-directory: ${{github.workspace}}
       run: |
-        pip install sphinx sphinx-book-theme exhale
+        pip install "sphinx==5.3.0" sphinx-book-theme exhale
         sudo apt install doxygen
         sphinx-build -M html ./library/doxygen ./library/doxygen/build/
         sudo mv library/doxygen/build/html _site/doc/libf3d/doxygen
