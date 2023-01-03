@@ -11,6 +11,10 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
       )
 endif()
 
+list(APPEND pyf3dTestsNoRender_list
+     TestPythonOptions
+    )
+
 # Add all the ADD_TEST for each test
 foreach(test ${pyf3dTests_list})
   get_filename_component (TName ${test} NAME_WE)
@@ -18,4 +22,7 @@ foreach(test ${pyf3dTests_list})
   set_tests_properties(pyf3d::${TName} PROPERTIES
     ENVIRONMENT "PYTHONPATH=$<TARGET_FILE_DIR:pyf3d>"
     FAIL_REGULAR_EXPRESSION "AssertionError")
+  if (NOT F3D_TESTING_ENABLE_RENDERING_TESTS AND NOT ${TName} IN_LIST pyf3dTestsNoRender_list)
+    set_tests_properties(pyf3d::${TName} PROPERTIES DISABLED ON)
+  endif ()
 endforeach()

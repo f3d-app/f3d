@@ -8,11 +8,16 @@ if(APPLE)
   list(APPEND java_test_args "-XstartOnFirstThread")
 endif()
 
+set(java_test_disabled OFF)
+
+if(NOT F3D_TESTING_ENABLE_RENDERING_TESTS)
+  set(java_test_disabled ON)
+endif ()
+
 # On macOS, VTK 9.1 is crashing in modifyDPIForBackingScaleFactorOfWindow, see:
 # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/6845 (introduces the crash)
 # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9372 (fixes the crash)
 # Disabling the tests if we are between these two commits
-set(java_test_disabled OFF)
 if(APPLE AND VTK_VERSION VERSION_GREATER 9.0.0 AND VTK_VERSION VERSION_LESS_EQUAL 9.1.20220617)
   set(java_test_disabled ON)
 endif()
