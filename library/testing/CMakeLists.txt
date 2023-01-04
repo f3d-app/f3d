@@ -77,11 +77,21 @@ set_target_properties(libf3dSDKTests PROPERTIES
   CXX_VISIBILITY_PRESET hidden
   )
 
+# List tests that do not require rendering
+list(APPEND libf3dSDKTestsNoRender_list
+     TestSDKEngineExceptions
+     TestSDKOptions
+     TestSDKLog
+     TestSDKLoader)
+
 # Add all the ADD_TEST for each test
 foreach (test ${libf3dSDKTests_list})
   get_filename_component (TName ${test} NAME_WE)
   add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName}  ${CMAKE_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
   set_tests_properties(libf3d::${TName} PROPERTIES TIMEOUT 30)
+  if (NOT F3D_TESTING_ENABLE_RENDERING_TESTS AND NOT ${TName} IN_LIST libf3dSDKTestsNoRender_list)
+    set_tests_properties(libf3d::${TName} PROPERTIES DISABLED ON)
+  endif ()
 endforeach ()
 
 # Specific test properties to check
@@ -97,7 +107,7 @@ Test Debug Coloring")
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519)
   set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES TIMEOUT 90)
-  if(NOT F3D_ENABLE_HDRI_TESTS OR NOT F3D_ENABLE_LONG_TIMEOUT_TESTS)
+  if(NOT F3D_TESTING_ENABLE_HDRI_TESTS OR NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
     set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)
   endif()
 endif()

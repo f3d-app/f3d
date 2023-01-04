@@ -5,10 +5,13 @@ either to validate your build or because you are contributing to F3D and want to
 
 ## CMake Options
 
-There is a few CMake options to enable when configuring F3D with testing:
-* `BUILD_TESTING`: Enable the tests, enable this one.
-* `F3D_ENABLE_LONG_TIMEOUT_TESTS`: Certain tests can take a bit longer to run, hence they are disabled by default, you may want to enable this one.
-* `F3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON`: With VTK < 9.0.0, rendering can be very different, although not incorrect, so this option is provided, you may want to keep this one disabled
+There is a few CMake options to F3D testing configuration:
+* `BUILD_TESTING`: Enable the tests, off by default.
+* `F3D_TESTING_ENABLE_RENDERING_TESTS`: An option to enable/disable test that require rendering capabilities, on by default.
+* `F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS`: Certain tests can take some time to run, off by default, requires rendering tests.
+* `F3D_TESTING_ENABLE_HDRI_TESTS`: An option to enable/disable test that uses HDRis, on by default if rendering and long tests are enabled.
+* `F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON`: With VTK < 9.0.0, rendering can be very different, although not incorrect, so this option is provided, off by default.
+
 
 ## Running the tests
 
