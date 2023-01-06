@@ -145,6 +145,12 @@ jobs:
       if: matrix.os == 'windows-latest'
       working-directory: ${{github.workspace}}/dependencies/
       run: |
+        mkdir dependencies
+        cd dependencies
+        curl.exe -L --output Dependencies_x64_Release.zip  https://github.com/lucasg/Dependencies/releases/download/v1.11.1/Dependencies_x64_Release.zip
+        "C:\Program Files\7-Zip\7z.exe" x Dependencies_x64_Release.zip
+        cd ..
+        dependencies\Dependencies.exe -chain ..\build\bin\Release\f3d.exe
         mkdir mesa
         cd mesa
         curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/22.0.1/mesa3d-22.0.1-release-msvc.7z
@@ -152,6 +158,8 @@ jobs:
         cp x64\opengl32.dll ..\..\build\bin\Release\
         cp x64\libglapi.dll ..\..\build\bin\Release\
         cp x64\libgallium_wgl.dll ..\..\build\bin\Release\
+        cd ..
+        dependencies\Dependencies.exe -chain ..\build\bin\Release\f3d.exe
 
     - name: Test
       working-directory: ${{github.workspace}}/build
