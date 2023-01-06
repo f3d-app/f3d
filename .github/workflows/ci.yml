@@ -117,7 +117,6 @@ jobs:
         -Werror=dev
         -Werror=deprecated
         --warn-uninitialized
-        -DCMAKE_TOOLCHAIN_FILE="%vcpkg_root%\scripts\buildsystems\vcpkg.cmake"
         -DBUILD_TESTING=ON
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DF3D_STRICT_BUILD=ON
