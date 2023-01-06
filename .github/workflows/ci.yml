@@ -42,6 +42,10 @@ jobs:
         fetch-depth: 0
         lfs: 'false'
 
+    - name: Install Mesa windows
+      if: matrix.os == 'windows-latest'
+      run: vcpkg install mesa
+
     - name: Setup JDK
       uses: actions/setup-java@v3
       with:
@@ -113,6 +117,7 @@ jobs:
         -Werror=dev
         -Werror=deprecated
         --warn-uninitialized
+        -DCMAKE_TOOLCHAIN_FILE="%vcpkg_root%\scripts\buildsystems\vcpkg.cmake"
         -DBUILD_TESTING=ON
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DF3D_STRICT_BUILD=ON
@@ -146,28 +151,6 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
-    - name: Install Mesa windows
-      shell: cmd
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/dependencies/
-      run: |
-        mkdir mesa
-        cd mesa
-        curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/22.0.1/mesa3d-22.0.1-release-msvc.7z
-        "C:\Program Files\7-Zip\7z.exe" x mesa.7z
-        cp x64\opengl32.dll C:\vcpkg\
-        cp x64\libglapi.dll C:\vcpkg\
-        cp x64\libgallium_wgl.dll C:\vcpkg\
-        cp x64\opengl32.dll C:\
-        cp x64\libglapi.dll C:\
-        cp x64\libgallium_wgl.dll C:\
-        cp x64\opengl32.dll C:\Windows\system32\
-        cp x64\libglapi.dll C:\Windows\system32\
-        cp x64\libgallium_wgl.dll C:\Windows\system32\
-        cp x64\opengl32.dll C:\Windows\
-        cp x64\libglapi.dll C:\Windows\
-        cp x64\libgallium_wgl.dll C:\Windows\
-
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
@@ -187,15 +170,6 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}/install
       run: ./bin/f3d ../source/testing/data/suzanne.obj --output=../output.png
-
-    - name: Check Install windows
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/install
-      run: |
-        cp ..\dependencies\mesa\x64\opengl32.dll .\bin\
-        cp ..\dependencies\mesa\x64\libglapi.dll .\bin\
-        cp ..\dependencies\mesa\x64\libgallium_wgl.dll .\bin\
-        .\bin\f3d.exe ..\source\testing\data\suzanne.obj --output=..\output.png
 
     - name: Check Install macos
       if: matrix.os == 'macos-latest'
