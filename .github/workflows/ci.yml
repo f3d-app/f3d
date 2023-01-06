@@ -29,6 +29,13 @@ jobs:
 
     steps:
 
+    - name: system dir
+      shell: powershell
+      if: matrix.os == 'windows-latest'
+      working-directory: ${{github.workspace}}/dependencies/
+      run: |
+        [System.Environment]::SystemDirectory
+
     - name: Checkout
       uses: actions/checkout@v3
       with:
@@ -155,6 +162,9 @@ jobs:
         cp x64\opengl32.dll C:\
         cp x64\libglapi.dll C:\
         cp x64\libgallium_wgl.dll C:\
+        cp x64\opengl32.dll C:\Windows\system32\
+        cp x64\libglapi.dll C:\Windows\system32\
+        cp x64\libgallium_wgl.dll C:\Windows\system32\
 
     - name: Test
       working-directory: ${{github.workspace}}/build
