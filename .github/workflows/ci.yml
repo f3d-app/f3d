@@ -32,7 +32,6 @@ jobs:
     - name: system dir
       shell: powershell
       if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/dependencies/
       run: |
         [System.Environment]::SystemDirectory
 
