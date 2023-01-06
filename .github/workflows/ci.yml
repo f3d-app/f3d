@@ -164,6 +164,9 @@ jobs:
         cp x64\opengl32.dll C:\Windows\system32\
         cp x64\libglapi.dll C:\Windows\system32\
         cp x64\libgallium_wgl.dll C:\Windows\system32\
+        cp x64\opengl32.dll C:\Windows\
+        cp x64\libglapi.dll C:\Windows\
+        cp x64\libgallium_wgl.dll C:\Windows\
 
     - name: Test
       working-directory: ${{github.workspace}}/build
