@@ -20,6 +20,13 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         vtk_version: [commit, v9.2.2, v9.1.0, v9.0.0]
+        include:
+          - os: ubuntu-latest
+            vtk_shared: 'true'
+          - os: macos-latest
+            vtk_shared: 'false'
+          - os: windows-latest
+            vtk_shared: 'false'
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -45,7 +52,10 @@ jobs:
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
+      run: |
+        echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
+        echo ${{matrix.os}}
+        echo ${{matrix.vtk_shared}}
 
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
@@ -91,6 +101,7 @@ jobs:
       with:
         vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+        vtk_shared: ${{matrix.vtk_shared}}
         os: ${{matrix.os}}
 
     - name: Setup Directories
