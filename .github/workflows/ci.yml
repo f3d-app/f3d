@@ -52,10 +52,7 @@ jobs:
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
-      run: |
-        echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
-        echo ${{matrix.os}}
-        echo ${{matrix.vtk_shared}}
+      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
 
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
