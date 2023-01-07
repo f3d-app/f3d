@@ -12,7 +12,7 @@ inputs:
   vtk_shared:
     description: 'VTK BUILD_SHARED_LIBS'
     required: false
-    default: 'false'
+    default: 'true'
   os:
     description: 'OS to build on'
     required: false
