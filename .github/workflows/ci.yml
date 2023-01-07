@@ -281,7 +281,10 @@ jobs:
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
-      run: mkdir dependencies
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
 
     - name: Install OCCT dependency
       uses: ./source/.github/actions/occt-install-dep
@@ -392,7 +395,10 @@ jobs:
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
-      run: mkdir dependencies
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
 
     - name: Install OCCT dependency
       uses: ./source/.github/actions/occt-install-dep
