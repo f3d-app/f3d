@@ -115,7 +115,6 @@ jobs:
       shell: bash
       run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
-    # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     - name: Configure
       working-directory: ${{github.workspace}}/build
       run: >
@@ -306,7 +305,6 @@ jobs:
       with:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
 
-    # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     # coverage build is done in source as it seems to be required for codecov
     - name: Configure
       working-directory: ${{github.workspace}}/source
@@ -424,7 +422,6 @@ jobs:
       working-directory: ${{github.workspace}}
       run: mkdir build
 
-    # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     - name: Configure
       working-directory: ${{github.workspace}}/build
       run: >
