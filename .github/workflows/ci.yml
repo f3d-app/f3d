@@ -140,18 +140,11 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
-    - name: Install Mesa windows
-      shell: cmd
+    - name: Install Mesa Windows
       if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/dependencies/
-      run: |
-        mkdir mesa
-        cd mesa
-        curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/22.0.1/mesa3d-22.0.1-release-msvc.7z
-        "C:\Program Files\7-Zip\7z.exe" x mesa.7z
-        cp x64\opengl32.dll ..\..\build\bin\Release\
-        cp x64\libglapi.dll ..\..\build\bin\Release\
-        cp x64\libgallium_wgl.dll ..\..\build\bin\Release\
+      uses: ./source/.github/actions/mesa-install
+      with:
+        path: ${{github.workspace}}\build\bin\Release
 
     - name: Test
       working-directory: ${{github.workspace}}/build
@@ -173,14 +166,16 @@ jobs:
       working-directory: ${{github.workspace}}/install
       run: ./bin/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
+    - name: Install Mesa Windows in install
+      if: matrix.os == 'windows-latest'
+      uses: ./source/.github/actions/mesa-install
+      with:
+        path: ${{github.workspace}}\install\bin\
+
     - name: Check Install windows
       if: matrix.os == 'windows-latest'
       working-directory: ${{github.workspace}}/install
-      run: |
-        cp ..\dependencies\mesa\x64\opengl32.dll .\bin\
-        cp ..\dependencies\mesa\x64\libglapi.dll .\bin\
-        cp ..\dependencies\mesa\x64\libgallium_wgl.dll .\bin\
-        .\bin\f3d.exe ..\source\testing\data\suzanne.obj --output=..\output.png
+      run: .\bin\f3d.exe ..\source\testing\data\suzanne.obj --output=..\output.png
 
     - name: Check Install macos
       if: matrix.os == 'macos-latest'
