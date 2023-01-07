@@ -64,7 +64,10 @@ jobs:
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
-      run: mkdir dependencies
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
 
     - name: Install OCCT dependency
       uses: ./source/.github/actions/occt-install-dep
@@ -130,12 +133,7 @@ jobs:
         -DF3D_INSTALL_SDK=ON
         -DF3D_INSTALL_SDK_PLUGIN=ON
         -DCMAKE_BUILD_TYPE=Release
-        -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
-        -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
-        -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
-        -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
-        -Ddraco_DIR:PATH=$(pwd)/../dependencies/draco_install/share/cmake/draco
-        -Dpybind11_DIR:PATH=$(pwd)/../dependencies/pybind11_install/share/cmake/pybind11
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
         ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DF3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
         ${{ matrix.os == 'macos-latest' && '-DF3D_BINDINGS_PYTHON=ON -DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
@@ -146,6 +144,11 @@ jobs:
     - name: Build
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --config Release
+
+    - name: Set LD_LIBRARY_PATH ubuntu
+      working-directory: ${{github.workspace}}/dependencies/
+      shell: bash
+      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
     - name: Run Xvfb ubuntu
       if: matrix.os == 'ubuntu-latest'
@@ -209,7 +212,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DVTK_DIR:PATH=$(pwd)/dependencies/vtk_install/lib/cmake/vtk -B build_plugin source/examples/plugins/example-plugin
+        cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -B build_plugin source/examples/plugins/example-plugin
         cmake --build build_plugin --config Release
         ctest --test-dir build_plugin -C Release -VV
 
@@ -321,12 +324,7 @@ jobs:
         -DF3D_PLUGIN_BUILD_DRACO=ON
         -DF3D_PLUGIN_BUILD_OCCT=ON
         -DCMAKE_BUILD_TYPE=Release
-        -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
-        -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade
-        -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
-        -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
-        -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
-        -Ddraco_DIR:PATH=$(pwd)/../dependencies/draco_install/share/cmake/draco
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_COVERAGE=ON
 
     - name: Build
@@ -440,12 +438,7 @@ jobs:
         -DF3D_PLUGIN_BUILD_DRACO=ON
         -DF3D_PLUGIN_BUILD_OCCT=ON
         -DCMAKE_BUILD_TYPE=Release
-        -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
-        -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade
-        -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
-        -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
-        -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
-        -Ddraco_DIR:PATH=$(pwd)/../dependencies/draco_install/share/cmake/draco
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_SANITIZER=${{matrix.santype}}
 
     - name: Build
