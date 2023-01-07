@@ -110,6 +110,11 @@ jobs:
          mkdir build
          mkdir install
 
+    - name: Set LD_LIBRARY_PATH ubuntu
+      working-directory: ${{github.workspace}}/dependencies/
+      shell: bash
+      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
     # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     - name: Configure
       working-directory: ${{github.workspace}}/build
@@ -141,11 +146,6 @@ jobs:
     - name: Build
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --config Release
-
-    - name: Set LD_LIBRARY_PATH ubuntu
-      working-directory: ${{github.workspace}}/dependencies/
-      shell: bash
-      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
     - name: Run Xvfb ubuntu
       if: matrix.os == 'ubuntu-latest'
