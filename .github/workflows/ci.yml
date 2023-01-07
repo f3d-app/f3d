@@ -166,6 +166,9 @@ jobs:
         cp x64\opengl32.dll ..\..\build\bin\Release\
         cp x64\libglapi.dll ..\..\build\bin\Release\
         cp x64\libgallium_wgl.dll ..\..\build\bin\Release\
+        cp x64\opengl32.dll ..\vtk_install\bin\Release\
+        cp x64\libglapi.dll ..\vtk_install\bin\Release\
+        cp x64\libgallium_wgl.dll ..\vtk_install\bin\Release\
         cd ..
         dependencies\Dependencies.exe -chain ..\build\bin\Release\f3d.exe
 
