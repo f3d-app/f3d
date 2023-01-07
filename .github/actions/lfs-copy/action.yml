@@ -13,7 +13,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: lfs_data
-        key: lfs-data-1-${{inputs.lfs_sha}}
+        key: lfs-data-${{inputs.lfs_sha}}-0
 
     - name: Checkout LFS data
       if: steps.cache-lfs.outputs.cache-hit != 'true'
