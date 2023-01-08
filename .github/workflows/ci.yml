@@ -24,7 +24,7 @@ jobs:
           - os: ubuntu-latest
             vtk_shared: 'true'
           - os: macos-latest
-            vtk_shared: 'false'
+            vtk_shared: 'true'
           - os: windows-latest
             vtk_shared: 'false'
 
@@ -262,6 +262,11 @@ jobs:
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
 
+    - name: Set LD_LIBRARY_PATH ubuntu
+      working-directory: ${{github.workspace}}/dependencies/
+      shell: bash
+      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
     # coverage build is done in source as it seems to be required for codecov
     - name: Configure
       working-directory: ${{github.workspace}}/source
@@ -366,6 +371,11 @@ jobs:
     - name: Setup Build Directory
       working-directory: ${{github.workspace}}
       run: mkdir build
+
+    - name: Set LD_LIBRARY_PATH ubuntu
+      working-directory: ${{github.workspace}}/dependencies/
+      shell: bash
+      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
     - name: Configure
       working-directory: ${{github.workspace}}/build
