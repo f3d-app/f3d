@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/assimp_install
-        key: assimp-v5.1.1-${{inputs.os}}-0
+        key: assimp-v5.1.1-${{inputs.os}}-1
 
     - name: Checkout ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
@@ -38,7 +38,7 @@ runs:
       shell: bash
       run: >
         cmake ../assimp
-        -DBUILD_SHARED_LIBS=OFF
+        -DBUILD_SHARED_LIBS=ON
         -DASSIMP_NO_EXPORT=ON
         -DASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT=OFF
         -DASSIMP_BUILD_FBX_IMPORTER=ON
