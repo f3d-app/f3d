@@ -52,12 +52,14 @@ runs:
         mkdir vtk_build
         mkdir vtk_install
 
+    # MacOS needs fetch-depth: 0 to avoid an issue with version in linker
     - name: Checkout VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       uses: actions/checkout@v3
       with:
         repository: Kitware/VTK
         submodules: 'true'
+        fetch-depth: 0
         path: './dependencies/vtk'
         ref: ${{env.VTK_SHA_OR_TAG}}
 
