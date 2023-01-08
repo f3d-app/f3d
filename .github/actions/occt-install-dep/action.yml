@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/occt_install
-        key: occt-V7_6_0-${{inputs.os}}-0
+        key: occt-V7_6_0-${{inputs.os}}-1
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -39,7 +39,7 @@ runs:
       shell: bash
       run: >
         cmake ../occt
-        -DBUILD_LIBRARY_TYPE=Static
+        -DBUILD_LIBRARY_TYPE=Shared
         -DBUILD_ADDITIONAL_TOOLKITS="TKSTEP;TKIGES;TKMesh"
         -DBUILD_MODULE_ApplicationFramework=OFF
         -DBUILD_MODULE_DataExchange=OFF
