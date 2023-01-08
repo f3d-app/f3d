@@ -79,11 +79,6 @@ jobs:
          mkdir build
          mkdir install
 
-    - name: Set LD_LIBRARY_PATH ubuntu
-      working-directory: ${{github.workspace}}/dependencies/
-      shell: bash
-      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-
     - name: Set PATH windows
       if: matrix.os == 'windows-latest'
       working-directory: ${{github.workspace}}/dependencies/
@@ -269,11 +264,6 @@ jobs:
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
 
-    - name: Set LD_LIBRARY_PATH ubuntu
-      working-directory: ${{github.workspace}}/dependencies/
-      shell: bash
-      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-
     # coverage build is done in source as it seems to be required for codecov
     - name: Configure
       working-directory: ${{github.workspace}}/source
@@ -283,6 +273,7 @@ jobs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
@@ -379,11 +370,6 @@ jobs:
       working-directory: ${{github.workspace}}
       run: mkdir build
 
-    - name: Set LD_LIBRARY_PATH ubuntu
-      working-directory: ${{github.workspace}}/dependencies/
-      shell: bash
-      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-
     - name: Configure
       working-directory: ${{github.workspace}}/build
       run: >
@@ -392,6 +378,7 @@ jobs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
