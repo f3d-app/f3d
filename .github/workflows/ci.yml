@@ -83,7 +83,10 @@ jobs:
     # This is a simple workaround for it
     # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8210
     - name: Set LD_LIBRARY_PATH ubuntu
-      if: matrix.os == 'ubuntu-latest'
+      if: |
+        matrix.os == 'ubuntu-latest' &&
+        ( matrix.vtk_version == 'v9.0.0' ||
+          matrix.vtk_version == 'v9.1.0' )
       working-directory: ${{github.workspace}}/dependencies/
       shell: bash
       run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
