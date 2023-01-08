@@ -18,7 +18,7 @@ runs:
 
     - name: Checkout Draco
       if: steps.cache-draco.outputs.cache-hit != 'true'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: google/draco
         path: './dependencies/draco'
