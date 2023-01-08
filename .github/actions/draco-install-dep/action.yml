@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/draco_install
-        key: draco-1.5.5-${{inputs.os}}-0
+        key: draco-1.5.5-${{inputs.os}}-1
 
     - name: Checkout Draco
       if: steps.cache-draco.outputs.cache-hit != 'true'
@@ -38,7 +38,7 @@ runs:
       shell: bash
       run: >
         cmake ../draco
-        -DBUILD_SHARED_LIBS=OFF
+        -DBUILD_SHARED_LIBS=ON
         -DDRACO_JS_GLUE=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
