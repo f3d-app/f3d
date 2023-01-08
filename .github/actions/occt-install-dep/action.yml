@@ -29,7 +29,7 @@ runs:
       if: steps.cache-occt.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/occt
       shell: bash
-      run: patch -p1 < $GITHUB_ACTION_PATH/0001-Adding-INSTALL_RPATH.patc
+      run: patch -p1 < $GITHUB_ACTION_PATH/0001-Adding-INSTALL_RPATH.patch
 
     - name: Setup OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
