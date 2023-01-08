@@ -127,9 +127,9 @@ jobs:
       with:
         path: ${{github.workspace}}\build\bin\Release
 
-    - name: Run Xvfb ubuntu
+    - name: ldd
       if: matrix.os == 'ubuntu-latest'
-      run: ldd ./build/bin/libf3d.so
+      run: ldd ./build/lib/libf3d.so
 
     - name: Test
       working-directory: ${{github.workspace}}/build
