@@ -93,6 +93,7 @@ jobs:
         --warn-uninitialized
         -DBUILD_TESTING=ON
         -DCMAKE_INSTALL_PREFIX:PATH=../install
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
