@@ -79,6 +79,15 @@ jobs:
          mkdir build
          mkdir install
 
+    # There is a RPATH issue with VTK < 9.2.0
+    # This is a simple workaround for it
+    # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8210
+    - name: Set LD_LIBRARY_PATH ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      working-directory: ${{github.workspace}}/dependencies/
+      shell: bash
+      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
     - name: Set PATH windows
       if: matrix.os == 'windows-latest'
       working-directory: ${{github.workspace}}/dependencies/
@@ -126,10 +135,6 @@ jobs:
       uses: ./source/.github/actions/mesa-install
       with:
         path: ${{github.workspace}}\build\bin\Release
-
-    - name: ldd
-      if: matrix.os == 'ubuntu-latest'
-      run: ldd ./build/lib/libf3d.so
 
     - name: Test
       working-directory: ${{github.workspace}}/build
