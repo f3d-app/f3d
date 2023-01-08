@@ -24,7 +24,7 @@ jobs:
           - os: ubuntu-latest
             vtk_shared: 'true'
           - os: macos-latest
-            vtk_shared: 'false'
+            vtk_shared: 'true'
           - os: windows-latest
             vtk_shared: 'false'
 
@@ -79,10 +79,23 @@ jobs:
          mkdir build
          mkdir install
 
+    # There is a RPATH issue with VTK < 9.2.0
+    # This is a simple workaround for it
+    # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8210
     - name: Set LD_LIBRARY_PATH ubuntu
+      if: |
+        matrix.os == 'ubuntu-latest' &&
+        ( matrix.vtk_version == 'v9.0.0' ||
+          matrix.vtk_version == 'v9.1.0' )
       working-directory: ${{github.workspace}}/dependencies/
       shell: bash
       run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
+    - name: Set PATH windows
+      if: matrix.os == 'windows-latest'
+      working-directory: ${{github.workspace}}/dependencies/
+      shell: powershell
+      run: echo "PATH=$env:PATH;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Configure
       working-directory: ${{github.workspace}}/build
@@ -93,6 +106,7 @@ jobs:
         --warn-uninitialized
         -DBUILD_TESTING=ON
         -DCMAKE_INSTALL_PREFIX:PATH=../install
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
@@ -271,6 +285,7 @@ jobs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
@@ -375,6 +390,7 @@ jobs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
