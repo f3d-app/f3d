@@ -1,0 +1,25 @@
+From c5d58d06e0af5a867828e24cf78ce2b1af62c37a Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Sun, 8 Jan 2023 19:13:41 +0100
+Subject: [PATCH] Fix an issue with ALEMBIC_LIB_INSTALL_DIR
+
+---
+ lib/Alembic/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/Alembic/CMakeLists.txt b/lib/Alembic/CMakeLists.txt
+index 20acfeda..2e5adc97 100644
+--- a/lib/Alembic/CMakeLists.txt
++++ b/lib/Alembic/CMakeLists.txt
+@@ -78,7 +78,7 @@ TARGET_LINK_LIBRARIES(Alembic
+     ${ZLIB_LIBRARY}
+   )
+ 
+-SET( ALEMBIC_LIB_INSTALL_DIR lib CACHE PATH "Where to install the Alembic libs")
++SET( ALEMBIC_LIB_INSTALL_DIR lib CACHE STRING "Where to install the Alembic libs")
+ INSTALL(TARGETS Alembic
+         EXPORT AlembicTargets
+         LIBRARY DESTINATION ${ALEMBIC_LIB_INSTALL_DIR}
+-- 
+2.39.0
+
