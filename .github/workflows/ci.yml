@@ -139,18 +139,6 @@ jobs:
       with:
         path: ${{github.workspace}}\build\bin\Release
 
-    - name: Run dependencies
-      shell: cmd
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/dependencies/
-      run: |
-        mkdir dependencies
-        cd dependencies
-        curl.exe -L --output Dependencies_x64_Release.zip  https://github.com/lucasg/Dependencies/releases/download/v1.11.1/Dependencies_x64_Release.zip
-        "C:\Program Files\7-Zip\7z.exe" x Dependencies_x64_Release.zip
-        cd ..
-        dependencies\Dependencies.exe -chain ..\build\bin\Release\f3d.exe
-
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
