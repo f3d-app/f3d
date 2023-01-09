@@ -1,0 +1,29 @@
+From da2c4da560a32f8857965afbae75994427f63358 Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Sun, 8 Jan 2023 09:09:46 +0100
+Subject: [PATCH] use install rpath for Imath
+
+---
+ lib/Alembic/CMakeLists.txt | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/lib/Alembic/CMakeLists.txt b/lib/Alembic/CMakeLists.txt
+index c18aceea..69112cad 100644
+--- a/lib/Alembic/CMakeLists.txt
++++ b/lib/Alembic/CMakeLists.txt
+@@ -65,6 +65,12 @@ IF (ALEMBIC_SHARED_LIBS)
+   SET_TARGET_PROPERTIES(Alembic PROPERTIES DEFINE_SYMBOL ALEMBIC_EXPORTS
+     SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+     VERSION ${PROJECT_VERSION})
++
++  if (ALEMBIC_USING_IMATH_3)
++    if (APPLE OR UNIX)
++      set_target_properties(Alembic PROPERTIES INSTALL_RPATH "$<TARGET_FILE_DIR:${ALEMBIC_ILMBASE_LIBS}>")
++    endif ()
++  endif ()
+ ENDIF()
+ 
+ 
+-- 
+2.39.0
+
