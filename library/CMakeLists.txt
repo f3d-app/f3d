@@ -81,11 +81,15 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/loader.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/log.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/options.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/reader.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/plugin.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
   )
+
+if (F3D_INSTALL_SDK_PLUGIN)
+  list(APPEND F3D_PUBLIC_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/plugin/reader.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.h)
+endif ()
 
 add_library(libf3d
   ${F3D_SOURCE_FILES}
@@ -98,6 +102,8 @@ target_include_directories(libf3d
   PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/private>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/private>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/plugin>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/plugin>
   )
 
 set_target_properties(libf3d PROPERTIES

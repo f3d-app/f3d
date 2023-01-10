@@ -115,42 +115,6 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
     install(FILES "${CMAKE_BINARY_DIR}/resources/f3d.thumbnailer"
       DESTINATION "share/thumbnailers/" COMPONENT shellext)
   endif()
-  if (F3D_INSTALL_MIME_TYPES_FILES)
-    install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-3d-formats.xml"
-      DESTINATION "share/mime/packages" COMPONENT mimetypes
-      RENAME "f3d-3d-formats.xml")
-    install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-3d-image-formats.xml"
-      DESTINATION "share/mime/packages" COMPONENT mimetypes
-      RENAME "f3d-3d-image-formats.xml")
-    install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-vtk-formats.xml"
-      DESTINATION "share/mime/packages" COMPONENT mimetypes
-      RENAME "f3d-vtk-formats.xml")
-    if (F3D_PLUGIN_BUILD_ALEMBIC)
-      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-alembic-formats.xml"
-        DESTINATION "share/mime/packages" COMPONENT mimetypes
-        RENAME "f3d-alembic-formats.xml")
-    endif()
-    if (F3D_PLUGIN_BUILD_ASSIMP)
-      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-assimp-formats.xml"
-        DESTINATION "share/mime/packages" COMPONENT mimetypes
-        RENAME "f3d-assimp-formats.xml")
-    endif()
-    if (F3D_PLUGIN_BUILD_DRACO)
-      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-draco-formats.xml"
-        DESTINATION "share/mime/packages" COMPONENT mimetypes
-        RENAME "f3d-draco-formats.xml")
-    endif()
-    if (F3D_PLUGIN_BUILD_EXODUS)
-      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-exodus-formats.xml"
-        DESTINATION "share/mime/packages" COMPONENT mimetypes
-        RENAME "f3d-3d-exodus-formats.xml")
-    endif()
-    if (F3D_PLUGIN_BUILD_OCCT)
-      install(FILES "${CMAKE_SOURCE_DIR}/resources/mime-types-occt-formats.xml"
-        DESTINATION "share/mime/packages" COMPONENT mimetypes
-        RENAME "f3d-occt-formats.xml")
-    endif()
-  endif()
 elseif(WIN32)
   if (F3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING)
     install(FILES "${CMAKE_SOURCE_DIR}/resources/logo.ico"
