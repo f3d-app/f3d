@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/occt_install
-        key: occt-V7_6_0-${{inputs.os}}-2
+        key: occt-V7_6_0-${{inputs.os}}-3
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -45,8 +45,9 @@ runs:
       shell: bash
       run: >
         cmake ../occt
-        -DBUILD_LIBRARY_TYPE=Shared
         -DBUILD_ADDITIONAL_TOOLKITS="TKSTEP;TKIGES;TKMesh"
+        -DBUILD_DOC_Overview=OFF
+        -DBUILD_LIBRARY_TYPE=Shared
         -DBUILD_MODULE_ApplicationFramework=OFF
         -DBUILD_MODULE_DataExchange=OFF
         -DBUILD_MODULE_Draw=OFF
@@ -54,9 +55,9 @@ runs:
         -DBUILD_MODULE_ModelingAlgorithms=OFF
         -DBUILD_MODULE_ModelingData=OFF
         -DBUILD_MODULE_Visualization=OFF
-        -DBUILD_DOC_Overview=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../occt_install
+        -DINSTALL_DIR_BIN:PATH=bin
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
 
