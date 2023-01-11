@@ -155,6 +155,20 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
+    - name: Upload Deps Artifact
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./dependencies/install/
+        name: f3d-deps-artifact-${{matrix.os}}-${{matrix.vtk_version}}
+
+    - name: Upload F3D Artifact
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./build
+        name: f3d-deps-artifact-${{matrix.os}}-${{matrix.vtk_version}}
+
     - name: Upload Tests Artifact
       if: failure()
       uses: actions/upload-artifact@v3
