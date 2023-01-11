@@ -167,7 +167,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         path: ./build
-        name: f3d-deps-artifact-${{matrix.os}}-${{matrix.vtk_version}}
+        name: f3d-F3D-artifact-${{matrix.os}}-${{matrix.vtk_version}}
 
     - name: Upload Tests Artifact
       if: failure()
