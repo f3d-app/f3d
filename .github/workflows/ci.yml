@@ -23,10 +23,13 @@ jobs:
         include:
           - os: ubuntu-latest
             vtk_shared: 'true'
+            enable_raytracing: 'true'
           - os: macos-latest
             vtk_shared: 'true'
+            enable_raytracing: 'true'
           - os: windows-latest
             vtk_shared: 'false'
+            enable_raytracing: 'false'
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -60,12 +63,19 @@ jobs:
         cd dependencies
         mkdir install
 
+    - name: Install Raytracing Dependencies
+      if: matrix.enable_raytracing == 'true'
+      uses: ./source/.github/actions/ospray-sb-install-dep
+      with:
+        os: ${{matrix.config.os}}
+
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         vtk_shared: ${{matrix.vtk_shared}}
+        enable_raytracing: ${{matrix.enable_raytracing}}
         os: ${{matrix.os}}
 
     - name: Install F3D dependencies
@@ -109,6 +119,7 @@ jobs:
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_MODULE_RAYTRACING=${{ matrix.enable_raytracing == 'true' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
