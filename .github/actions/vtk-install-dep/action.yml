@@ -88,7 +88,7 @@ runs:
         -DBUILD_SHARED_LIBS=${{ inputs.vtk_shared == 'true' && 'ON' || 'OFF' }}
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
-        -DCMAKE_PREFIX_PATH:PATH=../install/
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_BUILD_TESTING=OFF
         -DVTK_ENABLE_LOGGING=OFF
