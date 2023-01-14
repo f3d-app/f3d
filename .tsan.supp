@@ -1,2 +1,3 @@
 # False positive with Qt test
 race:libQt5Core
+race:ospray
