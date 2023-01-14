@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-v2.7.1-0-${{inputs.os}}
+        key: ospray-sb-v2.7.1-${{inputs.os}}-0
 
     - name: Checkout ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
@@ -23,6 +23,12 @@ runs:
         repository: ospray/ospray
         path: './dependencies/ospray'
         ref: v2.7.1
+
+    - name: Patch ospray rkcommon superbuild
+      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/ospray
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/0001-Fix-INSTALL_RPATH-in-rkcommon-superbuild.patch
 
     - name: Setup ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
