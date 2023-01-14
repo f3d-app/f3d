@@ -23,13 +23,10 @@ jobs:
         include:
           - os: ubuntu-latest
             vtk_shared: 'true'
-            static_plugin: 'OFF'
           - os: macos-latest
             vtk_shared: 'true'
-            static_plugin: 'OFF'
           - os: windows-latest
             vtk_shared: 'false'
-            static_plugin: 'ON'
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -112,7 +109,6 @@ jobs:
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
-        -DF3D_PLUGINS_STATIC_BUILD=${{matrix.static_plugin}}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
