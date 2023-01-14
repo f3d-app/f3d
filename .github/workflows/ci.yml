@@ -30,6 +30,8 @@ jobs:
           - os: windows-latest
             vtk_shared: 'false'
             enable_raytracing: 'false'
+          - vtk_version: v9.0.0
+            enable_raytracing: 'false'
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
