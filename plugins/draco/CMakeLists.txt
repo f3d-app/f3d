@@ -11,7 +11,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS drc
   MIMETYPES application/vnd.drc
   VTK_READER vtkF3DDracoReader
-  DESCRIPTION "Draco files reader"
+  FORMAT_DESCRIPTION "Draco"
 )
 
 set(rpaths "")

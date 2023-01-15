@@ -7,7 +7,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS exo ex2 e
   MIMETYPES application/vnd.exodus
   VTK_READER vtkExodusIIReader
-  DESCRIPTION "ExodusII files reader"
+  FORMAT_DESCRIPTION "Exodus II"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/exodus.inl"
 )
 
