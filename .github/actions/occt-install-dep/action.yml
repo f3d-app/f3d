@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/occt_install
-        key: occt-V7_6_0-${{inputs.os}}-4
+        key: occt-V7_6_0-${{inputs.os}}-3
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -24,6 +24,12 @@ runs:
         submodules: 'true'
         path: './dependencies/occt'
         ref: V7_6_0
+
+    - name: Patch OCCT INSTALL_RPATH
+      if: steps.cache-occt.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/occt
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/0001-Adding-INSTALL_RPATH.patch
 
     - name: Setup OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
