@@ -413,11 +413,6 @@ jobs:
       working-directory: ${{github.workspace}}
       run: mkdir build
 
-    - name: Set LD_LIBRARY_PATH
-      working-directory: ${{github.workspace}}/dependencies/
-      shell: bash
-      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-
     - name: Configure
       working-directory: ${{github.workspace}}/build
       run: >
@@ -426,7 +421,7 @@ jobs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
-        -DCMAKE_BUILD_TYPE=Debug
+        -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
