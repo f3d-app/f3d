@@ -1,7 +1,5 @@
 # NVIDIA driver
 leak:nvidia-glcore
-leak:ospray
-leak:rkcommon
 
 # Kernel
 leak:ld-linux-x86-64
