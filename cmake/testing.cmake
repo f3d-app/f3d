@@ -200,9 +200,10 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestInteractionAnimationMovement DATA KameraAnim.glb ARGS --camera-index=1 INTERACTION)#Space;MouseMovement;Space;
   # Test exit hotkey
   f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
-
-  f3d_test(NAME TestInteractionCheatsheet DATA cow.vtp INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalars --comp=-2 INTERACTION) #HSSS
+  if(NOT F3D_MODULE_RAYTRACING) # TODO fix this once we have OSPray in CI
+    f3d_test(NAME TestInteractionCheatsheet DATA cow.vtp INTERACTION) #H
+    f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalars --comp=-2 INTERACTION) #HSSS
+  endif()
 endif()
 
 # Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
