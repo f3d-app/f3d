@@ -200,7 +200,12 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestInteractionAnimationMovement DATA KameraAnim.glb ARGS --camera-index=1 INTERACTION)#Space;MouseMovement;Space;
   # Test exit hotkey
   f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
-  if(NOT F3D_MODULE_RAYTRACING) # TODO fix this once we have OSPray in CI
+
+  # No alternative baseline supports in F3D
+  if(F3D_MODULE_RAYTRACING)
+    f3d_test(NAME TestInteractionCheatsheetRaytracing DATA cow.vtp INTERACTION) #H
+    f3d_test(NAME TestInteractionCheatsheetScalarsRaytracing DATA dragon.vtu ARGS --scalars --comp=-2 INTERACTION) #HSSS
+  else()
     f3d_test(NAME TestInteractionCheatsheet DATA cow.vtp INTERACTION) #H
     f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalars --comp=-2 INTERACTION) #HSSS
   endif()
