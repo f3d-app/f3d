@@ -97,6 +97,12 @@ public:
    */
   virtual vtkRenderWindow* GetRenderWindow();
 
+  /**
+   * Implementation only API.
+   * Set the cache path.
+   */
+  void SetCachePath(const std::string& cachePath);
+
 private:
   class internals;
   std::unique_ptr<internals> Internals;

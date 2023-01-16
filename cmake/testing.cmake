@@ -228,8 +228,8 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
   f3d_test(NAME TestThumbnailConfigFileUp DATA suzanne.stl CONFIG ${CMAKE_SOURCE_DIR}/resources/thumbnail.json DEFAULT_LIGHTS)
 endif()
 
-# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8825
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220117)
+# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestHDRI HDRI DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
   f3d_test(NAME TestHDRIBlur HDRI DATA suzanne.ply ARGS -u --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
   f3d_test(NAME TestHDRIBlurRatio HDRI DATA suzanne.ply RESOLUTION 600,100 ARGS -u --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)

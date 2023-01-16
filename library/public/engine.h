@@ -54,6 +54,16 @@ public:
   ~engine();
 
   /**
+   * Set the cache path. Must be an absolute path.
+   * Currently, it's only used to store HDRI baked textures.
+   * By default, the cache path is:
+   * - Windows: %LOCALAPPDATA%\f3d
+   * - Linux: ~/.cache/f3d
+   * - macOS: ~/Library/Caches/f3d
+   */
+  void setCachePath(const std::string& cachePath);
+
+  /**
    * Engine provide a default options that you can use using engine::getOptions().
    * But you can use this setter to use other options directly.
    * It will copy options into engine.
