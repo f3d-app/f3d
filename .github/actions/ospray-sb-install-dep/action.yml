@@ -24,6 +24,7 @@ runs:
         path: './dependencies/ospray'
         ref: v2.7.1
 
+      # https://github.com/ospray/ospray/pull/550
     - name: Patch ospray rkcommon superbuild
       if: steps.cache-ospray.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/ospray
