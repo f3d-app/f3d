@@ -1,0 +1,37 @@
+From 86a7a752d30dfbdbb301523edaf448cc09bb347e Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Sat, 14 Jan 2023 08:53:25 +0100
+Subject: [PATCH] Fix INSTALL_RPATH in rkcommon superbuild
+
+---
+ scripts/superbuild/dependencies/dep_rkcommon.cmake | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/scripts/superbuild/dependencies/dep_rkcommon.cmake b/scripts/superbuild/dependencies/dep_rkcommon.cmake
+index 4c40ea66c..e75e38f68 100644
+--- a/scripts/superbuild/dependencies/dep_rkcommon.cmake
++++ b/scripts/superbuild/dependencies/dep_rkcommon.cmake
+@@ -12,6 +12,12 @@ if (RKCOMMON_HASH)
+   set(RKCOMMON_URL_HASH URL_HASH SHA256=${RKCOMMON_HASH})
+ endif()
+ 
++if (APPLE)
++    set(RKCOMMON_INSTALL_RPATH "@loader_path/" "@loader_path/../${CMAKE_INSTALL_LIBDIR}")
++else ()
++    set(RKCOMMON_INSTALL_RPATH "\$ORIGIN:\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
++endif ()
++
+ string(REGEX REPLACE "(^[0-9]+\.[0-9]+\.[0-9]+$)" "v\\1" RKCOMMON_ARCHIVE ${RKCOMMON_VERSION})
+ 
+ ExternalProject_Add(${COMPONENT_NAME}
+@@ -30,6 +36,7 @@ ExternalProject_Add(${COMPONENT_NAME}
+     -DCMAKE_INSTALL_DOCDIR=${CMAKE_INSTALL_DOCDIR}
+     -DCMAKE_INSTALL_BINDIR=${CMAKE_INSTALL_BINDIR}
+     -DCMAKE_BUILD_TYPE=${DEPENDENCIES_BUILD_TYPE}
++    -DCMAKE_INSTALL_RPATH=${RKCOMMON_INSTALL_RPATH}
+     -DINSTALL_DEPS=OFF
+     -DBUILD_TESTING=OFF
+     $<$<BOOL:${DOWNLOAD_TBB}>:-DRKCOMMON_TBB_ROOT=${TBB_PATH}>
+-- 
+2.39.0
+
