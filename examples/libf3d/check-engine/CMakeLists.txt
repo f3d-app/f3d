@@ -1,4 +1,4 @@
-project(test_sdk)
+project(check-engine)
 
 cmake_minimum_required(VERSION 3.2)
 
@@ -18,8 +18,13 @@ check_variable_defined(f3d_BINDINGS_PYTHON)
 check_variable_defined(f3d_BINDINGS_JAVA)
 check_variable_defined(f3d_SDK_PLUGIN)
 
-add_executable(test_sdk main.cxx)
-target_link_libraries(test_sdk f3d::libf3d)
+add_executable(check-engine main.cxx)
+target_link_libraries(check-engine f3d::libf3d)
 
 # make sure the libf3d API is compatible with C++11
-set_target_properties(test_sdk PROPERTIES CXX_STANDARD 11)
+set_target_properties(check-engine PROPERTIES CXX_STANDARD 11)
+
+if(BUILD_TESTING)
+  enable_testing()
+  add_test(NAME test_check-engine COMMAND "$<TARGET_FILE:check-engine>")
+endif()
