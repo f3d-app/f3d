@@ -13,6 +13,10 @@ inputs:
     description: 'VTK BUILD_SHARED_LIBS'
     required: false
     default: 'true'
+  enable_raytracing:
+    description: 'Enable Raytracing'
+    required: false
+    default: 'false'
   os:
     description: 'OS to build on'
     required: false
@@ -42,7 +46,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{inputs.os}}-${{inputs.vtk_shared}}-1
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{inputs.os}}-${{inputs.vtk_shared}}-${{inputs.enable_raytracing}}-1
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -81,38 +85,41 @@ runs:
       shell: bash
       run: >
         cmake ../vtk
+        -DBUILD_SHARED_LIBS=${{ inputs.vtk_shared == 'true' && 'ON' || 'OFF' }}
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -DVTKOSPRAY_ENABLE_DENOISER=ON
+        -DVTK_BUILD_TESTING=OFF
         -DVTK_ENABLE_LOGGING=OFF
         -DVTK_ENABLE_WRAPPING=OFF
-        -DVTK_BUILD_TESTING=OFF
-        -DCMAKE_BUILD_TYPE=Release
-        -DVTK_LEGACY_REMOVE=ON
-        -DVTK_VERSIONED_INSTALL=OFF
-        -DBUILD_SHARED_LIBS=${{ inputs.vtk_shared == 'true' && 'ON' || 'OFF' }}
-        -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
         -DVTK_GROUP_ENABLE_Rendering=DEFAULT
         -DVTK_GROUP_ENABLE_StandAlone=DEFAULT
+        -DVTK_LEGACY_REMOVE=ON
         -DVTK_MODULE_ENABLE_VTK_CommonSystem=YES
         -DVTK_MODULE_ENABLE_VTK_FiltersGeneral=YES
         -DVTK_MODULE_ENABLE_VTK_FiltersGeometry=YES
-        -DVTK_MODULE_ENABLE_VTK_ImagingCore=YES
-        -DVTK_MODULE_ENABLE_VTK_ImagingHybrid=YES
-        -DVTK_MODULE_ENABLE_VTK_InteractionStyle=YES
-        -DVTK_MODULE_ENABLE_VTK_InteractionWidgets=YES
         -DVTK_MODULE_ENABLE_VTK_IOCityGML=YES
         -DVTK_MODULE_ENABLE_VTK_IOExodus=YES
         -DVTK_MODULE_ENABLE_VTK_IOGeometry=YES
         -DVTK_MODULE_ENABLE_VTK_IOImage=YES
         -DVTK_MODULE_ENABLE_VTK_IOImport=YES
-        -DVTK_MODULE_ENABLE_VTK_IOParallel=YES
         -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
+        -DVTK_MODULE_ENABLE_VTK_IOParallel=YES
         -DVTK_MODULE_ENABLE_VTK_IOXML=YES
+        -DVTK_MODULE_ENABLE_VTK_ImagingCore=YES
+        -DVTK_MODULE_ENABLE_VTK_ImagingHybrid=YES
+        -DVTK_MODULE_ENABLE_VTK_InteractionStyle=YES
+        -DVTK_MODULE_ENABLE_VTK_InteractionWidgets=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingAnnotation=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingExternal=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingLabel=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.enable_raytracing == 'true' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
+        -DVTK_VERSIONED_INSTALL=OFF
         ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread' || null }}
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}

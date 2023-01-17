@@ -1,0 +1,71 @@
+name: 'Install ospray sb Dependency'
+description: 'Install ospray sb Dependency using cache when possible'
+inputs:
+  os:
+    description: 'OS to build on'
+    required: false
+    default: 'ubuntu-latest'
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache ospray
+      id: cache-ospray
+      uses: actions/cache@v3
+      with:
+        path: dependencies/ospray_install
+        key: ospray-sb-v2.7.1-${{inputs.os}}-0
+
+    - name: Checkout ospray
+      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        repository: ospray/ospray
+        path: './dependencies/ospray'
+        ref: v2.7.1
+
+      # https://github.com/ospray/ospray/pull/550
+    - name: Patch ospray rkcommon superbuild
+      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/ospray
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/0001-Fix-INSTALL_RPATH-in-rkcommon-superbuild.patch
+
+    - name: Setup ospray
+      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir ospray_build
+        mkdir ospray_install
+
+    - name: Configure ospray
+      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/ospray_build
+      shell: bash
+      run: >
+        cmake ../ospray/scripts/superbuild/
+        -DCMAKE_INSTALL_PREFIX:PATH=../ospray_install
+        -DINSTALL_IN_SEPARATE_DIRECTORIES=OFF
+        -DBUILD_EMBREE_FROM_SOURCE=OFF
+        -DBUILD_OIDN=ON
+        -DBUILD_GLFW=OFF
+        -DBUILD_OIDN_FROM_SOURCE=OFF
+        -DBUILD_OSPRAY_APPS=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DDOWNLOAD_ISPC=ON
+        -DDOWNLOAD_TBB=ON
+        -DINSTALL_DEPENDENCIES=ON
+        ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+
+    - name: Build ospray
+      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/ospray_build
+      shell: bash
+      run: cmake --build . 
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/ospray_install
+      shell: bash
+      run: cp -r ./* ../install/
