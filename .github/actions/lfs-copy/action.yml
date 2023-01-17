@@ -26,6 +26,4 @@ runs:
     - name: Setup LFS data
       working-directory: ${{github.workspace}}
       shell: bash
-      run: |
-         cmake -E copy_directory ./lfs_data/testing/data ./source/testing/data
-         cmake -E copy_directory ./lfs_data/testing/baselines ./source/testing/baselines
+      run: cmake -E copy_directory ./lfs_data ./source

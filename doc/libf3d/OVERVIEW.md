@@ -77,7 +77,8 @@ eng.getInteractor().start();
 ```
 Most options are dynamic, some are only taken into account when loading a file. See the [options](OPTIONS.md) documentation.
 
-For more advanced usage, please take a look in the [testing directory](https://github.com/f3d-app/f3d/tree/master/library/testing).
+Find more examples in the [examples directory](https://github.com/f3d-app/f3d/tree/master/examples),
+you can also find other usages in the [testing directory](https://github.com/f3d-app/f3d/tree/master/library/testing).
 
 For the complete documentation, please consult the [libf3d doxygen documentation.](https://f3d.app/doc/libf3d/doxygen/).
 
