@@ -9,4 +9,5 @@ if(BUILD_TESTING)
 endif()
 
 add_subdirectory(check-engine)
-add_subdirectory(native-render)
+add_subdirectory(render-image)
+add_subdirectory(render-interact)
