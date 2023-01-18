@@ -20,17 +20,17 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         vtk_version: [commit, v9.2.2, v9.1.0, v9.0.0]
+        rendering: [ON]
         include:
-          - os: ubuntu-latest
-            vtk_shared: 'true'
-            enable_raytracing: 'true'
-          - os: macos-latest
-            vtk_shared: 'true'
-            enable_raytracing: 'true'
+          - enable_raytracing: 'true'
+          - vtk_shared: 'true'
           - os: windows-latest
             vtk_shared: 'false'
             enable_raytracing: 'false'
-          - vtk_version: v9.0.0
+          - os: windows-latest
+            vtk_version: commit
+            rendering: OFF
+            vtk_shared: 'true'
             enable_raytracing: 'false'
 
     runs-on: ${{matrix.os}}
@@ -120,6 +120,7 @@ jobs:
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DF3D_STRICT_BUILD=ON
+        -DF3D_TESTING_ENABLE_RENDERING_TESTS=${{ matrix.rendering }}
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_MODULE_RAYTRACING=${{ matrix.enable_raytracing == 'true' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
