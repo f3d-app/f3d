@@ -244,7 +244,7 @@ macro(f3d_plugin_build)
 
   list(TRANSFORM F3D_PLUGIN_VTK_MODULES PREPEND "VTK::")
 
-  target_link_libraries(f3d-plugin-${F3D_PLUGIN_NAME} PUBLIC
+  target_link_libraries(f3d-plugin-${F3D_PLUGIN_NAME} PRIVATE
     ${F3D_PLUGIN_VTK_MODULES}
     ${modules})
 
