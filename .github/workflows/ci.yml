@@ -24,6 +24,8 @@ jobs:
         include:
           - enable_raytracing: 'true'
           - vtk_shared: 'true'
+          - vtk_version: v9.0.0
+            enable_raytracing: 'false'
           - os: windows-latest
             vtk_shared: 'false'
             enable_raytracing: 'false'
