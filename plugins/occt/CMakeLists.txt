@@ -23,12 +23,21 @@ endif()
 f3d_plugin_init()
 
 f3d_plugin_declare_reader(
-  NAME OCCT
-  EXTENSIONS stp step igs iges
-  MIMETYPES model/iges application/vnd.step
+  NAME STEP
+  EXTENSIONS stp step stpnc p21 210
+  MIMETYPES application/vnd.step
   VTK_READER vtkF3DOCCTReader
-  DESCRIPTION "OpenCascade files reader"
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/occt.inl"
+  FORMAT_DESCRIPTION "STEP ISO 10303"
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/step.inl"
+)
+
+f3d_plugin_declare_reader(
+  NAME IGES
+  EXTENSIONS igs iges
+  MIMETYPES model/iges
+  VTK_READER vtkF3DOCCTReader
+  FORMAT_DESCRIPTION "Initial Graphics Exchange Specification"
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/iges.inl"
 )
 
 set(rpaths "")

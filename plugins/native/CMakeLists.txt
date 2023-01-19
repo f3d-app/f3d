@@ -7,7 +7,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS 3ds
   MIMETYPES application/vnd.3ds
   VTK_IMPORTER vtk3DSImporter
-  DESCRIPTION "3DS files reader"
+  FORMAT_DESCRIPTION "Autodesk 3D Studio"
 )
 
 f3d_plugin_declare_reader(
@@ -15,7 +15,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS gml
   MIMETYPES application/gml+xml
   VTK_READER vtkCityGMLReader
-  DESCRIPTION "CityGML files reader"
+  FORMAT_DESCRIPTION "CityGML"
 )
 
 f3d_plugin_declare_reader(
@@ -23,7 +23,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS dcm
   MIMETYPES application/dicom
   VTK_READER vtkDICOMImageReader
-  DESCRIPTION "DICOM images files reader"
+  FORMAT_DESCRIPTION "DICOM"
 )
 
 f3d_plugin_declare_reader(
@@ -33,7 +33,7 @@ f3d_plugin_declare_reader(
   MIMETYPES model/gltf-binary model/gltf+json
   VTK_READER vtkGLTFReader
   VTK_IMPORTER vtkGLTFImporter
-  DESCRIPTION "glTF files reader"
+  FORMAT_DESCRIPTION "GL Transmission Format"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/gltf.inl"
 )
 
@@ -42,7 +42,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS mha mhd
   MIMETYPES application/vnd.mhd
   VTK_READER vtkMetaImageReader
-  DESCRIPTION "MetaImage files reader"
+  FORMAT_DESCRIPTION "MetaImage"
 )
 
 f3d_plugin_declare_reader(
@@ -50,7 +50,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS nrrd nhdr
   MIMETYPES application/vnd.nrrd
   VTK_READER vtkNrrdReader
-  DESCRIPTION "Nrrd files reader"
+  FORMAT_DESCRIPTION "Nearly Raw Raster Data"
 )
 
 f3d_plugin_declare_reader(
@@ -59,7 +59,7 @@ f3d_plugin_declare_reader(
   MIMETYPES model/obj
   VTK_READER vtkOBJReader
   VTK_IMPORTER vtkOBJImporter
-  DESCRIPTION "OBJ files reader"
+  FORMAT_DESCRIPTION "Wavefront OBJ"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/obj.inl"
 )
 
@@ -68,7 +68,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS ply
   MIMETYPES application/vnd.ply
   VTK_READER vtkPLYReader
-  DESCRIPTION "PLY files reader"
+  FORMAT_DESCRIPTION "Polygon"
 )
 
 f3d_plugin_declare_reader(
@@ -76,7 +76,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS pts
   MIMETYPES application/vnd.pts
   VTK_READER vtkPTSReader
-  DESCRIPTION "PTS files reader"
+  FORMAT_DESCRIPTION "Point Cloud"
 )
 
 f3d_plugin_declare_reader(
@@ -84,7 +84,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS stl
   MIMETYPES model/stl
   VTK_READER vtkSTLReader
-  DESCRIPTION "STL files reader"
+  FORMAT_DESCRIPTION "Standard Triangle Language"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/stl.inl"
 )
 
@@ -93,15 +93,15 @@ f3d_plugin_declare_reader(
   EXTENSIONS tiff tif
   MIMETYPES application/x-tgif
   VTK_READER vtkTIFFReader
-  DESCRIPTION "TIFF files reader"
+  FORMAT_DESCRIPTION "TIFF"
 )
 
 f3d_plugin_declare_reader(
   NAME VRMLReader
-  EXTENSIONS wrl vmrl
+  EXTENSIONS wrl vrml
   MIMETYPES model/vrml
   VTK_IMPORTER vtkVRMLImporter
-  DESCRIPTION "VRML files reader"
+  FORMAT_DESCRIPTION "VRML"
 )
 
 f3d_plugin_declare_reader(
@@ -110,16 +110,61 @@ f3d_plugin_declare_reader(
   EXTENSIONS vtk
   MIMETYPES application/vnd.vtk
   VTK_READER vtkPDataSetReader
-  DESCRIPTION "VTK Legacy files reader"
+  FORMAT_DESCRIPTION "VTK Legacy"
 )
 
 f3d_plugin_declare_reader(
-  NAME VTKXML
+  NAME VTKXMLVTU
   SCORE 99
-  EXTENSIONS vtp vtu vtr vti vts vtm
-  MIMETYPES application/vnd.vtp application/vnd.vtu application/vnd.vtr application/vnd.vti application/vnd.vts application/vnd.vtm
+  EXTENSIONS vtu
+  MIMETYPES application/vnd.vtu
   VTK_READER vtkXMLGenericDataObjectReader
-  DESCRIPTION "VTK XML files reader"
+  FORMAT_DESCRIPTION "VTK XML UnstructuredGrid"
+)
+
+f3d_plugin_declare_reader(
+  NAME VTKXMLVTP
+  SCORE 99
+  EXTENSIONS vtp
+  MIMETYPES application/vnd.vtp
+  VTK_READER vtkXMLGenericDataObjectReader
+  FORMAT_DESCRIPTION "VTK XML PolyData"
+)
+
+f3d_plugin_declare_reader(
+  NAME VTKXMLVTI
+  SCORE 99
+  EXTENSIONS vti
+  MIMETYPES application/vnd.vti
+  VTK_READER vtkXMLGenericDataObjectReader
+  FORMAT_DESCRIPTION "VTK XML ImageData"
+)
+
+f3d_plugin_declare_reader(
+  NAME VTKXMLVTR
+  SCORE 99
+  EXTENSIONS vtr
+  MIMETYPES application/vnd.vtr
+  VTK_READER vtkXMLGenericDataObjectReader
+  FORMAT_DESCRIPTION "VTK XML RectangularGrid"
+)
+
+f3d_plugin_declare_reader(
+  NAME VTKXMLVTS
+  SCORE 99
+  EXTENSIONS vts
+  MIMETYPES application/vnd.vts
+  VTK_READER vtkXMLGenericDataObjectReader
+  FORMAT_DESCRIPTION "VTK XML StructuredGrid"
+)
+
+f3d_plugin_declare_reader(
+  NAME VTKXMLVTM
+  SCORE 99
+  EXTENSIONS vtm
+  MIMETYPES application/vnd.vtm
+  VTK_READER vtkXMLGenericDataObjectReader
+  FORMAT_DESCRIPTION "VTK XML MultiBlock"
 )
 
 f3d_plugin_build(
