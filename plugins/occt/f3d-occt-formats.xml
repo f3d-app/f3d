@@ -4,5 +4,8 @@
     <comment>CAD STEP exchange ISO file</comment>
     <glob pattern="*.step"/>
     <glob pattern="*.stp"/>
+    <glob pattern="*.stpnc"/>
+    <glob pattern="*.p21"/>
+    <glob pattern="*.210"/>
   </mime-type>
 </mime-info>

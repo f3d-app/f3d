@@ -31,7 +31,7 @@ public:
   /*
    * Get the short description of this reader
    */
-  const std::string getShortDescription() const override { return "@F3D_READER_DESCRIPTION@"; }
+  const std::string getShortDescription() const override { return "@F3D_READER_FORMAT_DESCRIPTION@"; }
 
   /*
    * Get the extensions supported by this reader

@@ -32,7 +32,7 @@ f3d_plugin_declare_reader(
   NAME                   <string>
   [VTK_IMPORTER          <class>]
   [VTK_READER            <class>]
-  [DESCRIPTION           <string>]
+  [FORMAT_DESCRIPTION    <string>]
   [SCORE                 <integer>]
   [CUSTOM_CODE           <file>]
   EXTENSIONS             <string>...
@@ -46,7 +46,7 @@ The `NAME` argument is required. The arguments are as follows:
   * `NAME`: (Required) The name of the reader.
   * `VTK_IMPORTER`: The VTK importer class to use.
   * `VTK_READER`: The VTK reader class to use.
-  * `DESCRIPTION`: The description of the reader.
+  * `FORMAT_DESCRIPTION`: The description of the format read by the reader.
   * `SCORE`: The score of the reader (from 0 to 100). Default value is 50.
   * `CUSTOM_CODE`: A custom code file containing the implementation of ``applyCustomReader`` function.
   * `EXTENSIONS`: (Required) The list of file extensions supported by the reader.
@@ -55,7 +55,7 @@ The `NAME` argument is required. The arguments are as follows:
 #]==]
 
 macro(f3d_plugin_declare_reader)
-  cmake_parse_arguments(F3D_READER "" "NAME;VTK_IMPORTER;VTK_READER;DESCRIPTION;SCORE;CUSTOM_CODE" "EXTENSIONS;MIMETYPES" ${ARGN})
+  cmake_parse_arguments(F3D_READER "" "NAME;VTK_IMPORTER;VTK_READER;FORMAT_DESCRIPTION;SCORE;CUSTOM_CODE" "EXTENSIONS;MIMETYPES" ${ARGN})
 
   if(F3D_READER_CUSTOM_CODE)
     set(F3D_READER_HAS_CUSTOM_CODE 1)

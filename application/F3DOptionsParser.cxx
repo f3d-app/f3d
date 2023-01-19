@@ -413,6 +413,7 @@ void ConfigurationOptions::PrintReadersList()
   size_t extsColSize = 0;
   size_t mimeColSize = 0;
   size_t descColSize = 0;
+  size_t plugColSize = 0;
 
   std::vector<f3d::engine::readerInformation> readersInfo = f3d::engine::getReadersInfo();
   if (readersInfo.empty())
@@ -420,7 +421,7 @@ void ConfigurationOptions::PrintReadersList()
     f3d::log::warn("No registered reader found!");
     return;
   }
-  // Compute the size of the 3 columns
+  // Compute the size of the 5 columns
   for (const auto& reader : readersInfo)
   {
     // There is at least one MIME type for each extension
@@ -428,6 +429,7 @@ void ConfigurationOptions::PrintReadersList()
 
     nameColSize = std::max(nameColSize, reader.Name.length());
     descColSize = std::max(descColSize, reader.Description.length());
+    plugColSize = std::max(plugColSize, reader.PluginName.length());
 
     for (const auto& ext : reader.Extensions)
     {
@@ -442,14 +444,16 @@ void ConfigurationOptions::PrintReadersList()
   extsColSize++;
   mimeColSize++;
   descColSize++;
+  plugColSize++;
 
-  std::string separator = std::string(nameColSize + extsColSize + descColSize + mimeColSize, '-');
+  std::string separator =
+    std::string(nameColSize + extsColSize + descColSize + mimeColSize + plugColSize, '-');
 
   // Print the rows split in 3 columns
   std::stringstream headerLine;
-  headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(descColSize)
-             << "Description" << std::setw(extsColSize) << "Exts" << std::setw(mimeColSize)
-             << "Mime-types";
+  headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(plugColSize) << "Plugin"
+             << std::setw(descColSize) << "Description" << std::setw(extsColSize) << "Exts"
+             << std::setw(mimeColSize) << "Mime-types";
   f3d::log::info(headerLine.str());
   f3d::log::info(separator);
 
@@ -460,12 +464,12 @@ void ConfigurationOptions::PrintReadersList()
       std::stringstream readerLine;
       if (i == 0)
       {
-        readerLine << std::left << std::setw(nameColSize) << reader.Name << std::setw(descColSize)
-                   << reader.Description;
+        readerLine << std::left << std::setw(nameColSize) << reader.Name << std::setw(plugColSize)
+                   << reader.PluginName << std::setw(descColSize) << reader.Description;
       }
       else
       {
-        readerLine << std::left << std::setw(nameColSize + descColSize) << " ";
+        readerLine << std::left << std::setw(nameColSize + descColSize + plugColSize) << " ";
       }
 
       readerLine << std::setw(extsColSize) << reader.Extensions[i];

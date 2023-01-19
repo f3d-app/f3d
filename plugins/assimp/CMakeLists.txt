@@ -15,11 +15,35 @@ endif()
 f3d_plugin_init()
 
 f3d_plugin_declare_reader(
-  NAME Assimp
-  EXTENSIONS fbx dae dxf off
-  MIMETYPES application/vnd.fbx application/vnd.dae image/vnd.dxf application/vnd.off
+  NAME FBX
+  EXTENSIONS fbx
+  MIMETYPES application/vnd.fbx
   VTK_IMPORTER vtkF3DAssimpImporter
-  DESCRIPTION "Assimp files reader"
+  FORMAT_DESCRIPTION "Filmbox"
+)
+
+f3d_plugin_declare_reader(
+  NAME Collada
+  EXTENSIONS dae
+  MIMETYPES application/vnd.dae
+  VTK_IMPORTER vtkF3DAssimpImporter
+  FORMAT_DESCRIPTION "Collada"
+)
+
+f3d_plugin_declare_reader(
+  NAME DXF
+  EXTENSIONS dxf
+  MIMETYPES image/vnd.dxf
+  VTK_IMPORTER vtkF3DAssimpImporter
+  FORMAT_DESCRIPTION "AutoCAD DXF"
+)
+
+f3d_plugin_declare_reader(
+  NAME OFF
+  EXTENSIONS off
+  MIMETYPES application/vnd.off
+  VTK_IMPORTER vtkF3DAssimpImporter
+  FORMAT_DESCRIPTION "Object File Format"
 )
 
 set(rpaths "")
