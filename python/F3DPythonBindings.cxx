@@ -187,6 +187,7 @@ PYBIND11_MODULE(f3d, module)
     .def("getOptions", &f3d::engine::getOptions, py::return_value_policy::reference)
     .def("setOptions", py::overload_cast<const f3d::options&>(&f3d::engine::setOptions))
     .def("getWindow", &f3d::engine::getWindow, py::return_value_policy::reference)
+    .def("setCachePath", &f3d::engine::setCachePath, "Set the cache path directory")
     .def_static("loadPlugin", &f3d::engine::loadPlugin, "Load a plugin")
     .def_static(
       "autoloadPlugins", &f3d::engine::autoloadPlugins, "Automatically load internal plugins");

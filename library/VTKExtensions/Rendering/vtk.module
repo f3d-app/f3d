@@ -10,6 +10,7 @@ DEPENDS
   VTK::opengl
 PRIVATE_DEPENDS
   VTK::IOImage
+  VTK::IOXML
   VTK::InteractionWidgets
   VTK::RenderingCore
   f3d::VTKExtensionsCore

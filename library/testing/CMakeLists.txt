@@ -28,8 +28,8 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20201016)
     )
 endif()
 
-# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8825
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220117)
+# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   list(APPEND libf3dSDKTests_list
     TestSDKDynamicHDRI.cxx
     )
@@ -105,7 +105,7 @@ Test Warning\nTest Error\nTest Error\n\
 Test Print Debug\nTest Print Info\nTest Print Warning\nTest Print Error\n\
 Test Debug Coloring")
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES TIMEOUT 90)
   if(NOT F3D_TESTING_ENABLE_HDRI_TESTS OR NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
     set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)

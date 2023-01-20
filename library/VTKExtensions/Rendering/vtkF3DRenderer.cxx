@@ -1,32 +1,46 @@
 #include "vtkF3DRenderer.h"
 
 #include "F3DLog.h"
+#include "vtkF3DCachedLUTTexture.h"
+#include "vtkF3DCachedSpecularTexture.h"
 #include "vtkF3DConfigure.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
 
-#include "vtkLight.h"
-#include "vtkLightCollection.h"
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
+#include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
+#include <vtkLight.h>
+#include <vtkLightCollection.h>
 #include <vtkMath.h>
+#include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLTexture.h>
+#include <vtkPBRLUTTexture.h>
+#include <vtkPixelBufferObject.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
 #include <vtkSkybox.h>
+#include <vtkTable.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
+#include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
 #include <vtkVersion.h>
+#include <vtkXMLImageDataReader.h>
+#include <vtkXMLImageDataWriter.h>
+#include <vtkXMLMultiBlockDataWriter.h>
+#include <vtkXMLTableReader.h>
+#include <vtkXMLTableWriter.h>
+#include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
@@ -46,6 +60,59 @@
 #include <sstream>
 
 vtkStandardNewMacro(vtkF3DRenderer);
+
+namespace
+{
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
+//----------------------------------------------------------------------------
+// Compute the MD5 hash of the scalar field of an image data
+std::string ComputeImageHash(vtkImageData* image)
+{
+  unsigned char digest[16];
+  char md5Hash[33];
+  md5Hash[32] = '\0';
+
+  unsigned char* content = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
+  int* dims = image->GetDimensions();
+  int nbComp = image->GetNumberOfScalarComponents();
+  int scalarSize = image->GetScalarSize();
+  int size = nbComp * scalarSize * dims[0] * dims[1] * dims[2];
+
+  vtksysMD5* md5 = vtksysMD5_New();
+  vtksysMD5_Initialize(md5);
+  vtksysMD5_Append(md5, content, size);
+  vtksysMD5_Finalize(md5, digest);
+  vtksysMD5_DigestToHex(digest, md5Hash);
+  vtksysMD5_Delete(md5);
+
+  return md5Hash;
+}
+
+//----------------------------------------------------------------------------
+// Download texture from the GPU to a vtkImageData
+vtkSmartPointer<vtkImageData> SaveTextureToImage(
+  vtkTextureObject* tex, unsigned int target, unsigned int level, unsigned int size, int type)
+{
+  unsigned int dims[2] = { size, size };
+  vtkIdType incr[2] = { 0, 0 };
+
+  unsigned int nbFaces = tex->GetTarget() == GL_TEXTURE_CUBE_MAP ? 6 : 1;
+
+  vtkNew<vtkImageData> img;
+  img->SetDimensions(size, size, nbFaces);
+  img->AllocateScalars(type, tex->GetComponents());
+
+  for (unsigned int i = 0; i < nbFaces; i++)
+  {
+    vtkPixelBufferObject* pbo = tex->Download(target + i, level);
+
+    pbo->Download2D(type, img->GetScalarPointer(0, 0, i), dims, tex->GetComponents(), incr);
+  }
+
+  return img;
+}
+#endif
+}
 
 //----------------------------------------------------------------------------
 vtkF3DRenderer::vtkF3DRenderer()
@@ -354,9 +421,15 @@ void vtkF3DRenderer::ShowGrid(bool show)
 void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
 {
   // Check HDRI is different than current one
-  if (this->HDRIFile != hdriFile)
+  std::string collapsedHdriFile;
+  if (!hdriFile.empty())
   {
-    this->HDRIFile = hdriFile;
+    collapsedHdriFile = vtksys::SystemTools::CollapseFullPath(hdriFile);
+  }
+
+  if (this->HDRIFile != collapsedHdriFile)
+  {
+    this->HDRIFile = collapsedHdriFile;
 
     // Read HDRI when needed
     vtkNew<vtkTexture> hdriTexture;
@@ -402,6 +475,51 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
     // Dynamic HDRI
     if (this->HasHDRI)
     {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
+      // Check LUT cache
+      std::string lutCachePath = this->CachePath + "/lut.vti";
+      bool lutCacheExists = vtksys::SystemTools::FileExists(lutCachePath, true);
+      if (lutCacheExists)
+      {
+        vtkF3DCachedLUTTexture* lut = vtkF3DCachedLUTTexture::New();
+        lut->SetFileName(lutCachePath.c_str());
+        this->EnvMapLookupTable = lut;
+      }
+
+      // Compute HDRI MD5
+      std::string hash = ::ComputeImageHash(hdriTexture->GetInput());
+
+      // Cache folder for this HDRI
+      std::string currentCachePath = this->CachePath + "/" + hash;
+
+      // Create the folder if it does not exists
+      vtksys::SystemTools::MakeDirectory(currentCachePath);
+
+      // Check spherical harmonics cache
+      std::string shCachePath = this->CachePath + "/" + hash + "/sh.vtt";
+      bool shCacheExists = vtksys::SystemTools::FileExists(shCachePath, true);
+      if (shCacheExists)
+      {
+        vtkNew<vtkXMLTableReader> reader;
+        reader->SetFileName(shCachePath.c_str());
+        reader->Update();
+
+        this->SphericalHarmonics = vtkFloatArray::SafeDownCast(reader->GetOutput()->GetColumn(0));
+      }
+
+      // Check specular cache
+      std::string specCachePath = this->CachePath + "/" + hash + "/specular.vtm";
+      bool specCacheExists = vtksys::SystemTools::FileExists(specCachePath, true);
+      if (specCacheExists)
+      {
+        vtkF3DCachedSpecularTexture* spec = vtkF3DCachedSpecularTexture::New();
+        spec->SetFileName(specCachePath.c_str());
+        this->EnvMapPrefiltered = spec;
+      }
+
+      this->GetEnvMapPrefiltered()->HalfPrecisionOff();
+#endif
+
       // HDRI OpenGL
       this->UseImageBasedLightingOn();
       this->SetEnvironmentTexture(hdriTexture);
@@ -423,6 +541,65 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
 
       this->AddActor(this->Skybox);
       this->AutomaticLightCreationOff();
+
+      // build HDRI textures and spherical harmonics
+      this->Render();
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
+      // Create LUT cache file
+      if (!lutCacheExists)
+      {
+        vtkPBRLUTTexture* lut = this->GetEnvMapLookupTable();
+
+        vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
+          lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize(), VTK_UNSIGNED_SHORT);
+
+        if (img)
+        {
+          vtkNew<vtkXMLImageDataWriter> writer;
+          writer->SetFileName(lutCachePath.c_str());
+          writer->SetInputData(img);
+          writer->Write();
+        }
+      }
+
+      // Create spherical harmonics cache file
+      if (!shCacheExists)
+      {
+        vtkNew<vtkTable> table;
+        table->AddColumn(this->SphericalHarmonics);
+
+        vtkNew<vtkXMLTableWriter> writer;
+        writer->SetInputData(table);
+        writer->SetFileName(shCachePath.c_str());
+        writer->Write();
+      }
+
+      // Create specular cache file
+      if (!specCacheExists)
+      {
+        vtkPBRPrefilterTexture* spec = this->GetEnvMapPrefiltered();
+
+        unsigned int nbLevels = spec->GetPrefilterLevels();
+        unsigned int size = spec->GetPrefilterSize();
+
+        vtkNew<vtkMultiBlockDataSet> mb;
+        mb->SetNumberOfBlocks(6 * nbLevels);
+
+        for (unsigned int i = 0; i < nbLevels; i++)
+        {
+          vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
+            spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i, VTK_FLOAT);
+
+          mb->SetBlock(i, img);
+        }
+
+        vtkNew<vtkXMLMultiBlockDataWriter> writer;
+        writer->SetFileName(specCachePath.c_str());
+        writer->SetInputData(mb);
+        writer->Write();
+      }
+#endif
     }
     else
     {
