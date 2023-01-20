@@ -101,7 +101,9 @@ jobs:
           matrix.vtk_version == 'v9.1.0' )
       working-directory: ${{github.workspace}}/dependencies/
       shell: bash
-      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+      run: |
+        apt install -y gdb
+        echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
     - name: Set PATH windows
       if: matrix.os == 'windows-latest'
@@ -214,7 +216,8 @@ jobs:
     - name: gdb examples
       if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}
-      run: gdb --command=$(pwd)/source/a.cmd --args /__w/f3d/f3d/build_examples/render-image/render-image "/__w/f3d/f3d/source/examples/libf3d/render-image/data/cow.vtp" "/__w/f3d/f3d/build_examples/render-image/cow.png"
+      run: |
+        gdb --command=$(pwd)/source/a.cmd --args /__w/f3d/f3d/build_examples/render-image/render-image "/__w/f3d/f3d/source/examples/libf3d/render-image/data/cow.vtp" "/__w/f3d/f3d/build_examples/render-image/cow.png"
 
     - name: Validate plugin examples
       if: matrix.os == 'ubuntu-latest'
