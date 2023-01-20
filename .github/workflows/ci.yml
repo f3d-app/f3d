@@ -212,12 +212,12 @@ jobs:
         path: ${{github.workspace}}\build_examples\render-interact\Release\
 
     - name: gdb examples
-      if: matrix.vtk_shared == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}
       run: gdb --command=$(pwd)/source/a.cmd --args /__w/f3d/f3d/build_examples/render-image/render-image "/__w/f3d/f3d/source/examples/libf3d/render-image/data/cow.vtp" "/__w/f3d/f3d/build_examples/render-image/cow.png"
 
     - name: Validate plugin examples
-      if: matrix.vtk_shared == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}
       run: |
         cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
