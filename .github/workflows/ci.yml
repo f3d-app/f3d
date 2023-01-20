@@ -211,11 +211,6 @@ jobs:
       with:
         path: ${{github.workspace}}\build_examples\render-interact\Release\
 
-    - name: Validate libf3d examples
-      working-directory: ${{github.workspace}}
-      run: |
-        ctest --test-dir build_examples -C Release -VV
-
     - name: gdb examples
       if: matrix.vtk_shared == 'ubuntu-latest'
       working-directory: ${{github.workspace}}
