@@ -150,8 +150,6 @@ endif()
 # Python bindings
 option(F3D_BINDINGS_PYTHON "Create Python bindings" OFF)
 if(F3D_BINDINGS_PYTHON)
-  find_package(Python 3.6 COMPONENTS Interpreter Development)
-  message(STATUS "Bindings: Python: Python ${Python_VERSION} found")
   add_subdirectory(python)
 endif()
 

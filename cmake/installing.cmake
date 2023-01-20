@@ -28,17 +28,6 @@ if (F3D_BINDINGS_JAVA)
   install_jar(f3d-jar DESTINATION "share/java" COMPONENT java)
 endif()
 
-# Python module
-if (F3D_BINDINGS_PYTHON)
-  if(WIN32)
-    set(PYTHON_INSTALL_PATH ${CMAKE_INSTALL_BINDIR})
-  else()
-    set(PYTHON_INSTALL_PATH "${CMAKE_INSTALL_LIBDIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages")
-  endif()
-  install(TARGETS pyf3d
-    LIBRARY DESTINATION ${PYTHON_INSTALL_PATH} COMPONENT pythonmodule)
-endif()
-
 # Documentation
 set(F3D_DOC_DIR ".")
 
