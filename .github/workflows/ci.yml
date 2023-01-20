@@ -48,6 +48,10 @@ jobs:
         fetch-depth: 0
         lfs: 'false'
 
+    - name: gdb
+      if: matrix.os == 'ubuntu-latest'
+      run: apt install -y gdb
+
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
@@ -102,7 +106,6 @@ jobs:
       working-directory: ${{github.workspace}}/dependencies/
       shell: bash
       run: |
-        apt install -y gdb
         echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
     - name: Set PATH windows
