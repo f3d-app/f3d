@@ -20,6 +20,7 @@
 #include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
+#include <vtksys/SystemTools.hxx>
 
 #if F3D_MODULE_EXTERNAL_RENDERING
 #include <vtkExternalOpenGLRenderWindow.h>
@@ -35,12 +36,21 @@ public:
   {
   }
 
+  std::string GetCachePath()
+  {
+    // create directories if they do not exist
+    vtksys::SystemTools::MakeDirectory(this->CachePath);
+
+    return this->CachePath;
+  }
+
   std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkSmartPointer<vtkF3DRenderer> Renderer;
   Type WindowType;
   const options& Options;
   bool Initialized = false;
+  std::string CachePath;
 };
 
 //----------------------------------------------------------------------------
@@ -225,6 +235,8 @@ void window_impl::Initialize(bool withColoring, std::string fileInfo)
     this->Internals->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
   }
 
+  this->Internals->Renderer->SetCachePath(this->Internals->GetCachePath());
+
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Renderer->Initialize(
@@ -391,5 +403,11 @@ void window_impl::InitializeRendererWithColoring(vtkF3DGenericImporter* importer
     renWithColor->SetColoringAttributes(
       importer->GetPointDataForColoring(), importer->GetCellDataForColoring());
   }
+}
+
+//----------------------------------------------------------------------------
+void window_impl::SetCachePath(const std::string& cachePath)
+{
+  this->Internals->CachePath = cachePath;
 }
 };

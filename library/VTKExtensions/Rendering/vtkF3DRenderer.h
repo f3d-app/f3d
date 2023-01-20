@@ -112,6 +112,11 @@ public:
    */
   vtkGetVector3Macro(RightVector, double);
 
+  /**
+   * Set cache path
+   */
+  vtkSetMacro(CachePath, std::string);
+
 protected:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -184,6 +189,8 @@ protected:
 
   std::string CurrentGridInfo;
   std::string GridInfo;
+
+  std::string CachePath;
 };
 
 #endif

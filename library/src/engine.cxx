@@ -33,10 +33,26 @@ public:
 engine::engine(window::Type windowType)
   : Internals(new engine::internals)
 {
+  // build default cache path
+#if defined(_WIN32)
+  std::string cachePath = vtksys::SystemTools::GetEnv("LOCALAPPDATA");
+  cachePath = cachePath + "/f3d";
+#else
+  std::string cachePath = vtksys::SystemTools::GetEnv("HOME");
+#if defined(__APPLE__)
+  cachePath = cachePath + "/Library/Caches/f3d";
+#elif defined(__unix__)
+  cachePath = cachePath + "/.cache/f3d";
+#else
+#error "Unsupported platform"
+#endif
+#endif
+
   this->Internals->Options = std::make_unique<options>();
 
   this->Internals->Window =
     std::make_unique<detail::window_impl>(*this->Internals->Options, windowType);
+  this->Internals->Window->SetCachePath(cachePath);
 
   this->Internals->Loader =
     std::make_unique<detail::loader_impl>(*this->Internals->Options, *this->Internals->Window);
@@ -230,6 +246,12 @@ std::vector<engine::readerInformation> engine::getReadersInfo()
     }
   }
   return readersInfo;
+}
+
+//----------------------------------------------------------------------------
+void engine::setCachePath(const std::string& cachePath)
+{
+  this->Internals->Window->SetCachePath(cachePath);
 }
 
 //----------------------------------------------------------------------------

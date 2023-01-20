@@ -1,4 +1,6 @@
 set(classes
+  vtkF3DCachedLUTTexture
+  vtkF3DCachedSpecularTexture
   vtkF3DInteractorEventRecorder
   vtkF3DInteractorStyle
   vtkF3DNoRenderWindow
