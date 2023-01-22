@@ -43,6 +43,23 @@ jobs:
 
     steps:
 
+    - name: windbg
+      if: matrix.os == 'windows-latest'
+      run: |
+        choco install windows-sdk-10-version-2004-windbg
+        cd C:\
+        dir
+        cd "Program Files (x86)"
+        dir
+        cd "Windows Kits"
+        dir
+        cd "10"
+        dir
+        cd "Debuggers"
+        dir
+        cd "x64"
+        dir
+
     - name: Checkout
       uses: actions/checkout@v3
       with:
@@ -148,10 +165,6 @@ jobs:
     - name: Run Xvfb ubuntu
       if: matrix.os == 'ubuntu-latest'
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
-
-    - name: windbg
-      if: matrix.os == 'windows-latest'
-      run: choco install windows-sdk-10-version-2004-windbg
 
     - name: Install Mesa Windows
       if: matrix.os == 'windows-latest'
