@@ -149,7 +149,7 @@ jobs:
         -DF3D_BINDINGS_JAVA=ON
         -DF3D_INSTALL_SDK=ON
         -DF3D_INSTALL_SDK_PLUGIN=ON
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=Debug
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
         ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DF3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
@@ -171,6 +171,11 @@ jobs:
       uses: ./source/.github/actions/mesa-install
       with:
         path: ${{github.workspace}}\build\bin\Release
+
+    - name: Test cdb
+      if: matrix.os == 'windows-latest'
+      working-directory: ${{github.workspace}}
+      run: "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe" -y "$(pwd)\build\bin" -c ".symfix;.lines;g;kv;q" "$(pwd)\build\bin\VTKExtensionsReaderTests.exe" "TestF3DGenericImporter"  "$(pwd)/source/testing/" "$(pwd)/build/Testing/Temporary/"
 
     - name: Test
       working-directory: ${{github.workspace}}/build
