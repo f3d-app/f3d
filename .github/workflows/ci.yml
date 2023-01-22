@@ -149,6 +149,10 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
+    - name: windbg
+      if: matrix.os == 'windows-latest'
+      run: choco install windbg
+
     - name: Install Mesa Windows
       if: matrix.os == 'windows-latest'
       uses: ./source/.github/actions/mesa-install
