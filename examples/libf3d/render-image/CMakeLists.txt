@@ -6,9 +6,11 @@ find_package(f3d REQUIRED)
 
 add_executable(render-image main.cxx)
 target_link_libraries(render-image f3d::libf3d)
+set_target_properties(render-image PROPERTIES CXX_STANDARD 11)
 
 add_executable(check-image check.cxx)
 target_link_libraries(check-image f3d::libf3d)
+set_target_properties(check-image PROPERTIES CXX_STANDARD 11)
 
 # Simple testing
 if(BUILD_TESTING)

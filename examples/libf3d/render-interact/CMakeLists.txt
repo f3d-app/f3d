@@ -6,6 +6,7 @@ find_package(f3d REQUIRED)
 
 add_executable(render-interact main.cxx)
 target_link_libraries(render-interact f3d::libf3d)
+set_target_properties(check-interact PROPERTIES CXX_STANDARD 11)
 
 # Simple testing
 if(BUILD_TESTING)
