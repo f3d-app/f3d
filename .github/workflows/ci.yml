@@ -194,29 +194,34 @@ jobs:
       working-directory: ${{github.workspace}}/install
       run: ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
-    - name: Validate libf3d examples
+    - name: Build and configure libf3d examples
       working-directory: ${{github.workspace}}
       run: |
         cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -B build_examples source/examples/libf3d
         cmake --build build_examples --config Release
 
-    - name: Install Mesa Windows Examples1
+    - name: Install Mesa Windows render-image
       if: matrix.os == 'windows-latest'
       uses: ./source/.github/actions/mesa-install
       with:
         path: ${{github.workspace}}\build_examples\render-image\Release\
 
-    - name: Install Mesa Windows Examples2
+    - name: Install Mesa Windows render-interact
       if: matrix.os == 'windows-latest'
       uses: ./source/.github/actions/mesa-install
       with:
         path: ${{github.workspace}}\build_examples\render-interact\Release\
 
-    - name: Validate libf3d examples test
+    # older VTK version create different renderings so the are not tested
+    - name: Test libf3d examples
       if: matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0'
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_examples -C Release -VV
 
+    # TODO when VTK is built as a shared library:
+    # - Enable on all OS
+    # - Add -Werror=dev CMake option
+    # - Run ctest
     - name: Validate plugin examples
       if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}
