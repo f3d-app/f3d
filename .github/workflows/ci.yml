@@ -220,7 +220,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}
       run: |
-        gdb --command=$(pwd)/source/a.cmd --args /__w/f3d/f3d/build_examples/render-image/render-image "/__w/f3d/f3d/source/examples/libf3d/render-image/data/cow.vtp" "/__w/f3d/f3d/build_examples/render-image/cow.png"
+        gdb --command=$(pwd)/source/a.cmd --args /__w/f3d/f3d/build_examples/render-image/render-image "$(pwd)/source/examples/libf3d/render-image/data/cow.vtp" "$(pwd)/build_examples/render-image/cow.png"
 
     - name: Validate plugin examples
       if: matrix.os == 'ubuntu-latest'
