@@ -177,7 +177,7 @@ jobs:
       working-directory: ${{github.workspace}}
       shell: cmd
       run: |
-        "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe" -y "$(pwd)\build\bin" -c ".symfix;.lines;g;kv;q" "$(pwd)\build\bin\VTKExtensionsReaderTests.exe" "TestF3DGenericImporter"  "$(pwd)/source/testing/" "$(pwd)/build/Testing/Temporary/"
+        "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe" -y "D:\a\f3d\f3d\build\bin" -c ".symfix;.lines;g;kv;q" "D:\a\f3d\f3d\build\bin\VTKExtensionsReaderTests.exe" "TestF3DGenericImporter"  "D:\a\f3d\f3d\source\testing\" "D:\a\f3d\f3d\build\Testing\Temporary\"
 
     - name: Test
       working-directory: ${{github.workspace}}/build
