@@ -208,9 +208,10 @@ macro(f3d_plugin_build)
   if(NOT WIN32)
     get_target_property(target_type VTK::CommonCore TYPE)
     if (target_type STREQUAL SHARED_LIBRARY)
-      set_target_properties(f3d-plugin-${F3D_PLUGIN_NAME} PROPERTIES
-        INSTALL_RPATH "$<TARGET_FILE_DIR:VTK::CommonCore>;${F3D_PLUGIN_ADDITIONAL_RPATHS}")
+      list(APPEND F3D_PLUGIN_ADDITIONAL_RPATHS "$<TARGET_FILE_DIR:VTK::CommonCore>")
     endif ()
+    set_target_properties(f3d-plugin-${F3D_PLUGIN_NAME} PROPERTIES
+      INSTALL_RPATH "${F3D_PLUGIN_ADDITIONAL_RPATHS}")
   endif()
 
   if(WIN32)
