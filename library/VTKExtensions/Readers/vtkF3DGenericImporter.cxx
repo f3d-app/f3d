@@ -124,6 +124,13 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->PostPro->SetInputConnection(this->Reader->GetOutputPort());
   this->PostPro->Update();
 
+  vtkDataObject* readerOutput = this->Reader->GetOutputDataObject(0);
+  if (!readerOutput)
+  {
+    F3DLog::Print(F3DLog::Severity::Error, "Reader did not produce any output");
+    return;
+  }
+
   this->OutputDescription =
     vtkF3DGenericImporter::GetDataObjectDescription(this->Reader->GetOutputDataObject(0));
 
