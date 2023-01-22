@@ -172,13 +172,6 @@ jobs:
       with:
         path: ${{github.workspace}}\build\bin\Debug
 
-    - name: Test cdb
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}
-      shell: cmd
-      run: |
-        "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe" -y "D:\a\f3d\f3d\build\bin\Debug" -c ".symfix;.lines;g;kv;q" "D:\a\f3d\f3d\build\bin\Debug\VTKExtensionsReaderTests.exe" "TestF3DGenericImporter"  "D:\a\f3d\f3d\source\testing\" "D:\a\f3d\f3d\build\Testing\Temporary\"
-
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: ctest -C Debug -j 2 --output-on-failure || ctest -C Debug -j 1 --rerun-failed -VV
