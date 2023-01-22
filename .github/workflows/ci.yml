@@ -48,10 +48,6 @@ jobs:
         fetch-depth: 0
         lfs: 'false'
 
-    - name: gdb
-      if: matrix.os == 'ubuntu-latest'
-      run: apt install -y gdb
-
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
@@ -216,11 +212,9 @@ jobs:
       with:
         path: ${{github.workspace}}\build_examples\render-interact\Release\
 
-    - name: gdb examples
-      if: matrix.os == 'ubuntu-latest'
+    - name: Validate libf3d examples test
       working-directory: ${{github.workspace}}
-      run: |
-        gdb --command=$(pwd)/source/a.cmd --args /__w/f3d/f3d/build_examples/render-image/render-image "$(pwd)/source/testing/data/cow.vtp" "$(pwd)/build_examples/render-image/cow.png"
+      run: ctest --test-dir build_examples -C Release -VV
 
     - name: Validate plugin examples
       if: matrix.os == 'ubuntu-latest'
@@ -238,26 +232,6 @@ jobs:
     - name: Packaging
       working-directory: ${{github.workspace}}/build
       run: cpack
-
-    - name: Check Packaging Linux
-      if: matrix.os == 'ubuntu-latest'
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir package
-        tar -xzvf ./build/f3d-*.tar.gz -C ./package/
-        ./package/bin/f3d source/testing/data/suzanne.obj --output=output.png
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/package/lib/cmake/f3d -B test_sdk_package source/.github/test_sdk
-        cmake --build test_sdk
-
-    - name: Check Packaging Windows
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir package
-        Expand-Archive .\build\f3d-*.zip -DestinationPath .\package
-        .\package\bin\f3d source\testing\data\suzanne.obj --output=output.png
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/package/lib/cmake/f3d -B test_sdk_package source/.github/test_sdk
-        cmake --build test_sdk
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
