@@ -218,12 +218,9 @@ jobs:
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_examples -C Release -VV
 
-    # TODO when VTK is built as a shared library:
-    # - Enable on all OS
-    # - Add -Werror=dev CMake option
-    # - Run ctest
-    - name: Validate plugin examples
-      if: matrix.os == 'ubuntu-latest'
+    # Windows do not support shared VTK in CI yet
+    - name: Validate plugin exaples
+      if: matrix.os != 'windows-latest'
       working-directory: ${{github.workspace}}
       run: |
         cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
