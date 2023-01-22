@@ -192,12 +192,12 @@ jobs:
 
     - name: Install (ALL)
       working-directory: ${{github.workspace}}/build
-      run: cmake --install . -C Debug
+      run: cmake --install . --config Debug
 
     - name: Install (mimetypes on Linux)
       if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}/build
-      run: cmake --install . --component mimetypes -C Debug
+      run: cmake --install . --component mimetypes --config Debug
 
     - name: Check Install ubuntu
       if: matrix.os == 'ubuntu-latest'
