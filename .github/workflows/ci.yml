@@ -160,7 +160,7 @@ jobs:
 
     - name: Build
       working-directory: ${{github.workspace}}/build
-      run: cmake --build . --parallel 2 --config Release
+      run: cmake --build . --parallel 2 --config Debug
 
     - name: Run Xvfb ubuntu
       if: matrix.os == 'ubuntu-latest'
@@ -170,18 +170,11 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: ./source/.github/actions/mesa-install
       with:
-        path: ${{github.workspace}}\build\bin\Release
-
-    - name: Test cdb
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}
-      shell: cmd
-      run: |
-        "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe" -y "D:\a\f3d\f3d\build\bin\Release" -c ".symfix;.lines;g;kv;q" "D:\a\f3d\f3d\build\bin\Release\VTKExtensionsReaderTests.exe" "TestF3DGenericImporter"  "D:\a\f3d\f3d\source\testing\" "D:\a\f3d\f3d\build\Testing\Temporary\"
+        path: ${{github.workspace}}\build\bin\Debug
 
     - name: Test
       working-directory: ${{github.workspace}}/build
-      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+      run: ctest -C Debug -j 2 --output-on-failure || ctest -C Debug -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
       if: failure()
@@ -237,8 +230,8 @@ jobs:
       working-directory: ${{github.workspace}}
       run: |
         cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -B build_plugin source/examples/plugins/example-plugin
-        cmake --build build_plugin --config Release
-        ctest --test-dir build_plugin -C Release -VV
+        cmake --build build_plugin --config Debug
+        ctest --test-dir build_plugin -C Debug -VV
 
     - name: Setup NSIS
       if: matrix.os == 'windows-latest'
@@ -336,7 +329,7 @@ jobs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=Debug
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_COVERAGE=ON
@@ -351,14 +344,14 @@ jobs:
 
     - name: Build
       working-directory: ${{github.workspace}}/source
-      run: cmake --build . --parallel 2 --config Release
+      run: cmake --build . --parallel 2 --config Debug
 
     - name: Run Xvfb
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
     - name: Test
       working-directory: ${{github.workspace}}/source
-      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+      run: ctest -C Debug -j 2 --output-on-failure || ctest -C Debug -j 1 --rerun-failed -VV
 
     - name: Generate XML Coverage
       working-directory: ${{github.workspace}}/source
@@ -442,7 +435,7 @@ jobs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=Debug
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
@@ -456,7 +449,7 @@ jobs:
 
     - name: Build
       working-directory: ${{github.workspace}}/build
-      run: cmake --build . --parallel 2 --config Release
+      run: cmake --build . --parallel 2 --config Debug
 
     - name: Run Xvfb
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
@@ -466,4 +459,4 @@ jobs:
       run: |
         export LSAN_OPTIONS=suppressions=$(pwd)/../source/.lsan.supp:use_tls=0
         export TSAN_OPTIONS=suppressions=$(pwd)/../source/.tsan.supp
-        ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+        ctest -C Debug -j 2 --output-on-failure || ctest -C Debug -j 1 --rerun-failed -VV
