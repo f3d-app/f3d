@@ -36,6 +36,13 @@ extern "C"
     f3d::engine::autoloadPlugins();
   }
 
+  JNIEXPORT void JAVA_BIND(Engine, setCachePath)(JNIEnv* env, jobject self, jstring path)
+  {
+    const char* str = env->GetStringUTFChars(path, nullptr);
+    GetEngine(env, self)->setCachePath(str);
+    env->ReleaseStringUTFChars(path, str);
+  }
+
   JNIEXPORT jlong JAVA_BIND(Engine, construct)(JNIEnv* env, jobject self, jobject windowType)
   {
     // read cursor
