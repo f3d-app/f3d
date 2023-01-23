@@ -21,6 +21,8 @@ public class Engine implements AutoCloseable {
         destroy(mNativeAddress);
     }
 
+    public native void setCachePath(String cachePath);
+
     static public native void loadPlugin(String plugin);
     static public native void autoloadPlugins();
 
