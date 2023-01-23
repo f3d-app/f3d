@@ -46,7 +46,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{inputs.os}}-${{inputs.vtk_shared}}-${{inputs.enable_raytracing}}-1
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{inputs.os}}-${{inputs.vtk_shared}}-${{inputs.enable_raytracing}}-debug
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -86,7 +86,7 @@ runs:
       run: >
         cmake ../vtk
         -DBUILD_SHARED_LIBS=${{ inputs.vtk_shared == 'true' && 'ON' || 'OFF' }}
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=Debug
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DVTKOSPRAY_ENABLE_DENOISER=ON
@@ -128,7 +128,7 @@ runs:
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/vtk_build
       shell: bash
-      run: cmake --build . --parallel 2 --target install --config Release
+      run: cmake --build . --parallel 2 --target install --config Debug
 
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/vtk_install
