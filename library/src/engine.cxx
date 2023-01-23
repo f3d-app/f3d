@@ -37,15 +37,16 @@ engine::engine(window::Type windowType)
 #if defined(_WIN32)
   std::string cachePath = vtksys::SystemTools::GetEnv("LOCALAPPDATA");
   cachePath = cachePath + "/f3d";
-#else
+#elif defined(__APPLE__)
   std::string cachePath = vtksys::SystemTools::GetEnv("HOME");
-#if defined(__APPLE__)
-  cachePath = cachePath + "/Library/Caches/f3d";
+  cachePath += "/Library/Caches/f3d";
+#elif defined(__ANDROID__)
+  std::string cachePath = ""; // no default
 #elif defined(__unix__)
-  cachePath = cachePath + "/.cache/f3d";
+  std::string cachePath = vtksys::SystemTools::GetEnv("HOME");
+  cachePath += "/.cache/f3d";
 #else
 #error "Unsupported platform"
-#endif
 #endif
 
   this->Internals->Options = std::make_unique<options>();
