@@ -175,7 +175,7 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       shell: cmd
-      run: D:\a\f3d\f3d\build\bin\Debug\VTKExtensionsPluginAssimp.exe "TestF3DAssimpImporter" "D:/a/f3d/f3d/source/testing/" "D:/a/f3d/f3d/build/Testing/Temporary/"
+      run: "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe" D:\a\f3d\f3d\build\bin\Debug\VTKExtensionsPluginAssimp.exe "TestF3DAssimpImporter" "D:/a/f3d/f3d/source/testing/" "D:/a/f3d/f3d/build/Testing/Temporary/"
 
     - name: Upload Tests Artifact
       if: failure()
