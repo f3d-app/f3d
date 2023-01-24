@@ -130,7 +130,7 @@ jobs:
         -DF3D_BINDINGS_JAVA=ON
         -DF3D_INSTALL_SDK=ON
         -DF3D_INSTALL_SDK_PLUGIN=ON
-        -DCMAKE_BUILD_TYPE=Debug
+        -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
         ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DF3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
@@ -219,7 +219,7 @@ jobs:
       run: ctest --test-dir build_examples -C Release -VV
 
     # Windows do not support shared VTK in CI yet
-    - name: Validate plugin exaples
+    - name: Validate plugin examples
       if: matrix.os != 'windows-latest'
       working-directory: ${{github.workspace}}
       run: |
