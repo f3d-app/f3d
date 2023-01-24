@@ -17,7 +17,7 @@ Each example is intended to be built as a separate CMake project, however top le
 
 ```
 cmake -Df3d_DIR=/path/to/f3d/install/lib/cmake/f3d /path/to/example/dir
-cmake --build
+cmake --build .
 ```
 
 Then run the example

@@ -1,6 +1,6 @@
 project(check-engine)
 
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.1)
 
 find_package(f3d REQUIRED)
 
