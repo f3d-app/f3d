@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/assimp_install
-        key: assimp-v5.1.1-${{inputs.os}}-1
+        key: assimp-v5.2.5-${{inputs.os}}-0
 
     - name: Checkout ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
@@ -22,7 +22,7 @@ runs:
       with:
         repository: assimp/assimp
         path: './dependencies/assimp'
-        ref: v5.1.1
+        ref: v5.2.5
 
     - name: Setup ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
@@ -48,6 +48,7 @@ runs:
         -DASSIMP_BUILD_TESTS=OFF
         -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
         -DASSIMP_BUILD_SAMPLES=OFF
+        -DASSIMP_WARNINGS_AS_ERRORS=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../assimp_install
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
