@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-v2.7.1-${{inputs.os}}-0
+        key: ospray-sb-v2.7.1-${{inputs.os}}-1
 
     - name: Checkout ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
@@ -57,7 +57,7 @@ runs:
         -DDOWNLOAD_TBB=ON
         -DINSTALL_DEPENDENCIES=ON
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'

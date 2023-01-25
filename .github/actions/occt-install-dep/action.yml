@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/occt_install
-        key: occt-V7_6_0-${{inputs.os}}-5
+        key: occt-V7_6_0-${{inputs.os}}-7
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -48,7 +48,7 @@ runs:
         cmake ../occt
         -DBUILD_ADDITIONAL_TOOLKITS="TKSTEP;TKIGES;TKMesh"
         -DBUILD_DOC_Overview=OFF
-        -DBUILD_LIBRARY_TYPE=${{ inputs.os == 'windows-latest' && 'Static' || 'Shared' }}
+        -DBUILD_LIBRARY_TYPE=Shared
         -DBUILD_MODULE_ApplicationFramework=OFF
         -DBUILD_MODULE_DataExchange=OFF
         -DBUILD_MODULE_Draw=OFF
@@ -60,7 +60,7 @@ runs:
         -DCMAKE_INSTALL_PREFIX:PATH=../occt_install
         -DINSTALL_DIR_BIN:PATH=bin
         ${{ inputs.os == 'macos-latest' && '-DINSTALL_NAME_DIR:STRING=@rpath -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
