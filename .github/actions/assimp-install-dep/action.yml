@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/assimp_install
-        key: assimp-v5.2.5-${{inputs.os}}-0
+        key: assimp-v5.2.5-${{inputs.os}}-1
 
     - name: Checkout ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
@@ -52,7 +52,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../assimp_install
         ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
