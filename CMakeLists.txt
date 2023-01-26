@@ -181,6 +181,3 @@ if(UNIX AND NOT APPLE)
 endif()
 
 include(cmake/installing.cmake)
-
-# packaging
-include(cmake/packaging.cmake)

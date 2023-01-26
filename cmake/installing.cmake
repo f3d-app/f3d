@@ -50,9 +50,6 @@ if (UNIX AND NOT APPLE)
       install(FILES ${config_files}
         DESTINATION "share/f3d" COMPONENT configuration)
     else()
-      message(STATUS "Enabling F3D_INSTALL_DEFAULT_CONFIGURATION_FILE, while not enabling "
-              "F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX implies that installation of the config file rely on
-              CMAKE_INSTALL_FULL_SYSCONFDIR and that the config file will not be packaged by cpack.")
       install(FILES ${config_files}
         DESTINATION "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d" COMPONENT configuration)
     endif()
