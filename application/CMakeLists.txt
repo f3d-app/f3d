@@ -151,6 +151,11 @@ if(F3D_GENERATE_MAN)
   endif()
 endif()
 
+# Testing
+if(BUILD_TESTING)
+  include("${CMAKE_CURRENT_SOURCE_DIR}/testing/testing.cmake")
+endif()
+
 # Installing
 install(TARGETS f3d
   EXPORT f3dTargets

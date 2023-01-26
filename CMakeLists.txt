@@ -130,15 +130,10 @@ add_subdirectory(plugins)
 # libf3d target
 add_subdirectory(library)
 
-# f3d target
+# F3D Application
 cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID" OFF)
 if (F3D_BUILD_APPLICATION)
   add_subdirectory(application)
-
-  # applicative tests
-  if(BUILD_TESTING)
-    include(cmake/testing.cmake)
-  endif()
 endif()
 
 # Windows Shell Extension
