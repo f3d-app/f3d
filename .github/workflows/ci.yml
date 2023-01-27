@@ -50,7 +50,7 @@ jobs:
 
     - name: Install Mesa Windows
       if: matrix.os == 'windows-latest'
-      uses: ./source/.github/actions/new-mesa-install
+      uses: ./source/.github/actions/mesa-install
       with:
         path: ${{github.workspace}}\source\*\testing
 
@@ -159,7 +159,7 @@ jobs:
 
     - name: Install Mesa Windows
       if: matrix.os == 'windows-latest'
-      uses: ./source/.github/actions/new-mesa-install
+      uses: ./source/.github/actions/mesa-install
       with:
         path: ${{github.workspace}}\build\bin\Release
 
@@ -190,7 +190,7 @@ jobs:
 
     - name: Install Mesa Windows in install
       if: matrix.os == 'windows-latest'
-      uses: ./source/.github/actions/new-mesa-install
+      uses: ./source/.github/actions/mesa-install
       with:
         path: ${{github.workspace}}\install\bin
 
@@ -212,7 +212,7 @@ jobs:
 
     - name: Install Mesa Windows examples
       if: matrix.os == 'windows-latest'
-      uses: ./source/.github/actions/new-mesa-install
+      uses: ./source/.github/actions/mesa-install
       with:
         path: ${{github.workspace}}\build_examples\*\Release
 

@@ -2,7 +2,7 @@ name: 'Install Mesa Windows'
 description: 'Install Mesa Windows binaries to a specific directory'
 inputs:
   path:
-    description: 'path to install binaries to'
+    description: 'path to install binaries to, supports wildcard'
     required: true
 runs:
   using: "composite"
@@ -15,6 +15,7 @@ runs:
         cd mesa
         curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/22.0.1/mesa3d-22.0.1-release-msvc.7z
         C:\'Program Files'\7-Zip\7z.exe x mesa.7z
-        Get-ChildItem ${{inputs.path}} | ForEach-Object { Copy-Item -Path .\x64\opengl32.dll, .\x64\libglapi.dll, .\x64\libgallium_wgl.dll -Destination $_ }
+        # A * is added next line to force Get-ChildItem to look for directory within the path
+        Get-ChildItem -Directory ${{inputs.path}}* | ForEach-Object { Copy-Item -Path .\x64\opengl32.dll, .\x64\libglapi.dll, .\x64\libgallium_wgl.dll -Destination $_ }
         cd ..
         rm .\mesa -r -force
