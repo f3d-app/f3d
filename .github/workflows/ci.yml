@@ -200,17 +200,11 @@ jobs:
         cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -B build_examples source/examples/libf3d
         cmake --build build_examples --config Release
 
-    - name: Install Mesa Windows render-image
+    - name: Install Mesa Windows examples
       if: matrix.os == 'windows-latest'
       uses: ./source/.github/actions/mesa-install
       with:
-        path: ${{github.workspace}}\build_examples\render-image\Release\
-
-    - name: Install Mesa Windows render-interact
-      if: matrix.os == 'windows-latest'
-      uses: ./source/.github/actions/mesa-install
-      with:
-        path: ${{github.workspace}}\build_examples\render-interact\Release\
+        path: ${{github.workspace}}\build_examples\*\Release\
 
     # older VTK version create different renderings so the are not tested
     - name: Test libf3d examples
