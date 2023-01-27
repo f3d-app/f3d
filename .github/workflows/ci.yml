@@ -52,7 +52,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: ./source/.github/actions/new-mesa-install
       with:
-        path: ${{github.workspace}}\source\*\testing\
+        path: ${{github.workspace}}\source\*\testing
 
     - name: Install Mesa Windows
       if: matrix.os == 'windows-latest'
@@ -161,7 +161,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: ./source/.github/actions/new-mesa-install
       with:
-        path: ${{github.workspace}}\build\bin\Release\
+        path: ${{github.workspace}}\build\bin\Release
 
     - name: Test
       working-directory: ${{github.workspace}}/build
@@ -192,7 +192,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: ./source/.github/actions/new-mesa-install
       with:
-        path: ${{github.workspace}}\install\bin\
+        path: ${{github.workspace}}\install\bin
 
     - name: Check Install windows
       if: matrix.os == 'windows-latest'
@@ -214,7 +214,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: ./source/.github/actions/new-mesa-install
       with:
-        path: ${{github.workspace}}\build_examples\*\Release\
+        path: ${{github.workspace}}\build_examples\*\Release
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
