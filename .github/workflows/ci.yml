@@ -161,7 +161,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: ./source/.github/actions/new-mesa-install
       with:
-        path: ${{github.workspace}}\build\bin\Release
+        path: ${{github.workspace}}\build\bin\Release\
 
     - name: Test
       working-directory: ${{github.workspace}}/build
