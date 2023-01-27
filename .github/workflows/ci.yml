@@ -54,6 +54,11 @@ jobs:
       with:
         path: ${{github.workspace}}\source\*\testing\
 
+    - name: Install Mesa Windows
+      if: matrix.os == 'windows-latest'
+      shell: bash
+      run: ls ./*/testing/
+
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
