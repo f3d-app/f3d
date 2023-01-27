@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/imath_install
-        key: imath-v1.8.3-${{inputs.os}}-2
+        key: imath-v1.8.3-${{inputs.os}}-3
 
     - name: Checkout Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'

@@ -23,7 +23,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_build
-        key: vtk-android-${{env.VTK_SHA}}-${{inputs.api_level}}-${{inputs.arch}}-0
+        key: vtk-android-${{env.VTK_SHA}}-${{inputs.api_level}}-${{inputs.arch}}-1
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
