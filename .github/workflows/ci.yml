@@ -48,6 +48,12 @@ jobs:
         fetch-depth: 0
         lfs: 'false'
 
+    - name: Install Mesa Windows
+      if: matrix.os == 'windows-latest'
+      uses: ./source/.github/actions/mesa-install
+      with:
+        path: ${{github.workspace}}\source\*\testing\
+
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
