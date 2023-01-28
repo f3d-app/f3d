@@ -153,7 +153,7 @@ endif()
 
 # Testing
 if(BUILD_TESTING)
-  include("${CMAKE_CURRENT_SOURCE_DIR}/testing/testing.cmake")
+  add_subdirectory(testing)
 endif()
 
 # Installing
