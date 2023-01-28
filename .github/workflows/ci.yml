@@ -51,7 +51,7 @@ jobs:
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
+      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/)" >> $GITHUB_ENV
 
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
@@ -105,9 +105,9 @@ jobs:
 
     - name: Set PATH windows
       if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/dependencies/
+      working-directory: ${{github.workspace}}
       shell: powershell
-      run: echo "PATH=$env:PATH;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Configure
       working-directory: ${{github.workspace}}/build
@@ -148,7 +148,7 @@ jobs:
 
     - name: Install Mesa Windows
       if: matrix.os == 'windows-latest'
-      uses: ./source/.github/actions/mesa-install
+      uses: ./source/.github/actions/mesa-install-bin
       with:
         path: ${{github.workspace}}\build\bin\Release
 
@@ -179,9 +179,9 @@ jobs:
 
     - name: Install Mesa Windows in install
       if: matrix.os == 'windows-latest'
-      uses: ./source/.github/actions/mesa-install
+      uses: ./source/.github/actions/mesa-install-bin
       with:
-        path: ${{github.workspace}}\install\bin\
+        path: ${{github.workspace}}\install\bin
 
     - name: Check Install windows
       if: matrix.os == 'windows-latest'
@@ -193,25 +193,32 @@ jobs:
       working-directory: ${{github.workspace}}/install
       run: ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
-    # TODO: This job should be replaced by a useful example using the libf3d API and merged with the next job
-    - name: Check SDK
-      if: matrix.os != 'macos-latest'
+    - name: Build and configure libf3d examples
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -B test_sdk source/.github/test_sdk
-        cmake --build test_sdk
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -B build_examples source/examples/libf3d
+        cmake --build build_examples --config Release
 
-    # TODO when VTK is built as a shared library:
-    # - Enable on all OS
-    # - Add -Werror=dev CMake option
-    # - Run ctest
-    - name: Validate plugin example
-      if: matrix.os == 'ubuntu-latest'
+    - name: Install Mesa Windows examples
+      if: |
+        matrix.os == 'windows-latest' &&
+        matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0'
+      uses: ./source/.github/actions/mesa-install-bin
+      with:
+        path: ${{github.workspace}}\build_examples\*\Release
+
+    # older VTK version create different renderings so they are not tested
+    - name: Test libf3d examples
+      if: matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0'
+      working-directory: ${{github.workspace}}
+      run: ctest --test-dir build_examples -C Release -VV
+
+    - name: Validate plugin examples
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -B build_plugin source/examples/plugins/example-plugin
-        cmake --build build_plugin --config Release
-        ctest --test-dir build_plugin -C Release -VV
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
+        cmake --build build_plugins --config Release
+        ctest --test-dir build_plugins -C Release -VV
 
     - name: Setup NSIS
       if: matrix.os == 'windows-latest'
@@ -221,26 +228,6 @@ jobs:
     - name: Packaging
       working-directory: ${{github.workspace}}/build
       run: cpack
-
-    - name: Check Packaging Linux
-      if: matrix.os == 'ubuntu-latest'
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir package
-        tar -xzvf ./build/f3d-*.tar.gz -C ./package/
-        ./package/bin/f3d source/testing/data/suzanne.obj --output=output.png
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/package/lib/cmake/f3d -B test_sdk_package source/.github/test_sdk
-        cmake --build test_sdk
-
-    - name: Check Packaging Windows
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir package
-        Expand-Archive .\build\f3d-*.zip -DestinationPath .\package
-        .\package\bin\f3d source\testing\data\suzanne.obj --output=output.png
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/package/lib/cmake/f3d -B test_sdk_package source/.github/test_sdk
-        cmake --build test_sdk
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
