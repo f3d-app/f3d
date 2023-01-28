@@ -175,15 +175,15 @@ if(UNIX AND NOT APPLE)
   mark_as_advanced(F3D_INSTALL_THUMBNAILER_FILES)
 endif()
 
-# Installing Documentation
-set(F3D_DOC_DIR ".")
+# Installing licenses
+set(F3D_LIC_DIR ".")
 
 if (UNIX AND NOT APPLE AND NOT ANDROID)
-  set(F3D_DOC_DIR ${CMAKE_INSTALL_DOCDIR})
+  set(F3D_LIC_DIR ${CMAKE_INSTALL_DOCDIR})
 endif()
 
 install(FILES LICENSE.md doc/THIRD_PARTY_LICENSES.md
-  DESTINATION ${F3D_DOC_DIR} COMPONENT documentation)
+  DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
 
 # Installling resources
 add_subdirectory(resources)
