@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-v2.7.1-${{inputs.os}}-1
+        key: ospray-sb-v2.7.1-${{inputs.os}}-2
 
     - name: Checkout ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
