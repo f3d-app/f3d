@@ -173,7 +173,52 @@ if (APPLE OR UNIX)
   endif ()
 endif ()
 
-# testing
+# Testing
 if(BUILD_TESTING)
   add_subdirectory(testing)
+endif()
+
+# Installing
+if(F3D_INSTALL_SDK OR BUILD_SHARED_LIBS)
+  install(TARGETS libf3d
+    EXPORT f3dTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT library
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${CMAKE_PROJECT_NAME} COMPONENT headers)
+endif()
+
+if(F3D_INSTALL_SDK)
+  install(EXPORT f3dTargets
+    NAMESPACE f3d::
+    DESTINATION "lib/cmake/f3d"
+    COMPONENT cmake)
+
+  include(CMakePackageConfigHelpers)
+  configure_package_config_file(
+    "${CMAKE_SOURCE_DIR}/cmake/f3dConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
+    INSTALL_DESTINATION "lib/cmake/${PROJECT_NAME}")
+  write_basic_package_version_file(
+    "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
+    VERSION "${PROJECT_VERSION}"
+    COMPATIBILITY SameMinorVersion)
+
+  set(sdk_cmake_files
+    "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
+    "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
+    "${CMAKE_SOURCE_DIR}/cmake/f3dEmbed.cmake")
+
+  if (F3D_INSTALL_SDK_PLUGIN)
+    list(APPEND sdk_cmake_files
+      "${CMAKE_SOURCE_DIR}/cmake/f3dPlugin.cmake"
+      "${CMAKE_SOURCE_DIR}/cmake/plugin.cxx.in"
+      "${CMAKE_SOURCE_DIR}/cmake/readerBoilerPlate.h.in")
+  endif ()
+
+  install(
+    FILES ${sdk_cmake_files}
+    DESTINATION
+      "lib/cmake/${PROJECT_NAME}"
+    COMPONENT cmake)
+
 endif()

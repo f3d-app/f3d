@@ -130,15 +130,10 @@ add_subdirectory(plugins)
 # libf3d target
 add_subdirectory(library)
 
-# f3d target
+# F3D Application
 cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID" OFF)
 if (F3D_BUILD_APPLICATION)
   add_subdirectory(application)
-
-  # applicative tests
-  if(BUILD_TESTING)
-    include(cmake/testing.cmake)
-  endif()
 endif()
 
 # Windows Shell Extension
@@ -180,7 +175,20 @@ if(UNIX AND NOT APPLE)
   mark_as_advanced(F3D_INSTALL_THUMBNAILER_FILES)
 endif()
 
-include(cmake/installing.cmake)
+# Installing licenses
+set(F3D_LIC_DIR ".")
 
-# packaging
-include(cmake/packaging.cmake)
+if (UNIX AND NOT APPLE AND NOT ANDROID)
+  set(F3D_LIC_DIR ${CMAKE_INSTALL_DOCDIR})
+endif()
+
+install(FILES LICENSE.md
+  DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
+
+if (F3D_BUILD_APPLICATION)
+  install(FILES doc/THIRD_PARTY_LICENSES.md
+    DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
+endif ()
+
+# Installling resources
+add_subdirectory(resources)

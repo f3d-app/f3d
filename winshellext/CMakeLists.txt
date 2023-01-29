@@ -33,3 +33,7 @@ target_link_libraries(F3DShellExtension PUBLIC libf3d PRIVATE pathcch shlwapi wi
 
 set_target_properties(F3DShellExtension PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+# Installing
+install(TARGETS F3DShellExtension
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT shellext)
