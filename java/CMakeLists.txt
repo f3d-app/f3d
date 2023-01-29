@@ -41,7 +41,12 @@ set_target_properties(javaf3d PROPERTIES
   OUTPUT_NAME "f3d-java"
   )
 
-# testing
+# Testing
 if(BUILD_TESTING)
   add_subdirectory(testing)
 endif()
+
+# Installing
+install(TARGETS javaf3d
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT java)
+install_jar(f3d-jar DESTINATION "share/java" COMPONENT java)

@@ -150,3 +150,14 @@ if(F3D_GENERATE_MAN)
     message(WARNING "help2man or gzip not found, cannot create man entry")
   endif()
 endif()
+
+# Testing
+if(BUILD_TESTING)
+  add_subdirectory(testing)
+endif()
+
+# Installing
+install(TARGETS f3d
+  EXPORT f3dTargets
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT application
+  BUNDLE DESTINATION "." COMPONENT bundle)
