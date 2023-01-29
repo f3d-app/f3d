@@ -1,4 +1,4 @@
-# Third Party Copyrights and License within F3D source
+# Third Party Copyrights and License within F3D application source
 
 ## cxxopts.hpp:
 ```

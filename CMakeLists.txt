@@ -182,8 +182,13 @@ if (UNIX AND NOT APPLE AND NOT ANDROID)
   set(F3D_LIC_DIR ${CMAKE_INSTALL_DOCDIR})
 endif()
 
-install(FILES LICENSE.md doc/THIRD_PARTY_LICENSES.md
+install(FILES LICENSE.md
   DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
+
+if (F3D_BUILD_APPLICATION)
+  install(FILES doc/THIRD_PARTY_LICENSES.md
+    DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
+endif ()
 
 # Installling resources
 add_subdirectory(resources)
