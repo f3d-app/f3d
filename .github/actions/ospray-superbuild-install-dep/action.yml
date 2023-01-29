@@ -16,6 +16,10 @@ runs:
         path: dependencies/ospray_install
         key: ospray-sb-v2.7.1-${{inputs.os}}-3
 
+    - name: Setup ospray
+      working-directory: ${{github.workspace}}/dependencies
+      run: this is not run
+
     - name: Checkout ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
       uses: actions/checkout@v3
