@@ -1,0 +1,12 @@
+name: Clear all Github actions caches
+on:
+  workflow_dispatch:
+
+jobs:
+  my-job:
+    name: Delete all caches
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Clear caches
+        uses: easimon/wipe-cache@v1
