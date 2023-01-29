@@ -8,7 +8,22 @@ runs:
   using: "composite"
   steps:
 
-    - name: Buggy step
+    - name: Cache LFS data
+      id: cache-lfs
+      uses: actions/cache@v3
+      with:
+        path: lfs_data
+        key: lfs-data-${{inputs.lfs_sha}}-1
+
+    - name: Checkout LFS data
+      if: steps.cache-lfs.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        path: 'lfs_data'
+        fetch-depth: 0
+        lfs: 'true'
+
+    - name: Setup LFS data
       working-directory: ${{github.workspace}}
       shell: bash
-      run: this script is not executed
+      run: cmake -E copy_directory ./lfs_data ./source
