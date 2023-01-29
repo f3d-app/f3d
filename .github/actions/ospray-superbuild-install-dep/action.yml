@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-v2.7.1-${{inputs.os}}-2
+        key: ospray-sb-v2.7.1-${{inputs.os}}-3
 
     - name: Checkout ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
@@ -63,7 +63,7 @@ runs:
       if: steps.cache-ospray.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/ospray_build
       shell: bash
-      run: cmake --build . 
+      run: cmake --build . --parallel 2 --config Release
 
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/ospray_install
