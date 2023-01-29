@@ -21,15 +21,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         vtk_version: [commit, v9.2.2, v9.1.0, v9.0.0]
         include:
-          - os: ubuntu-latest
-            vtk_shared: 'true'
-            enable_raytracing: 'true'
-          - os: macos-latest
-            vtk_shared: 'true'
-            enable_raytracing: 'true'
-          - os: windows-latest
-            vtk_shared: 'true'
-            enable_raytracing: 'true'
+          - enable_raytracing: 'true'
           - vtk_version: v9.0.0
             enable_raytracing: 'false'
 
@@ -68,22 +60,16 @@ jobs:
     - name: Install Raytracing Dependencies
       if: matrix.enable_raytracing == 'true'
       uses: ./source/.github/actions/ospray-superbuild-install-dep
-      with:
-        os: ${{matrix.os}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-        vtk_shared: ${{matrix.vtk_shared}}
         enable_raytracing: ${{matrix.enable_raytracing}}
-        os: ${{matrix.os}}
 
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
-      with:
-        os: ${{matrix.os}}
 
     - name: Setup Directories
       working-directory: ${{github.workspace}}
@@ -117,24 +103,32 @@ jobs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
+        -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
-        -DF3D_STRICT_BUILD=ON
+        -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_BINDINGS_JAVA=ON
+        -DF3D_BINDINGS_PYTHON=ON
+        -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
+        -DF3D_INSTALL_SDK=ON
+        -DF3D_INSTALL_SDK_PLUGIN=ON
+        -DF3D_LINUX_GENERATE_MAN=ON
+        -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
+        -DF3D_LINUX_INSTALL_THUMBNAILER_FILES=ON        
+        -DF3D_MACOS_BUNDLE=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_MODULE_RAYTRACING=${{ matrix.enable_raytracing == 'true' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
         -DF3D_PLUGIN_BUILD_OCCT=ON
-        -DF3D_BINDINGS_JAVA=ON
-        -DF3D_INSTALL_SDK=ON
-        -DF3D_INSTALL_SDK_PLUGIN=ON
-        -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
-        -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
-        ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DF3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
-        ${{ matrix.os == 'macos-latest' && '-DF3D_BINDINGS_PYTHON=ON -DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
-        ${{ matrix.os == 'ubuntu-latest' && '-DF3D_BINDINGS_PYTHON=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
+        -DF3D_STRICT_BUILD=ON
+        -DF3D_WINDOWS_GUI=ON
+        -DF3D_WINDOWS_INSTALL_LOGOS_FOR_NSIS_PACKAGING=ON
+        ${{ matrix.os == 'windows-latest' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ matrix.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ matrix.os == 'ubuntu-latest' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
         ${{ matrix.vtk_version == 'commit' && '-DF3D_TESTING_ENABLE_HDRI_TESTS=ON' || '-DF3D_TESTING_ENABLE_HDRI_TESTS=OFF' }}
         ${{ matrix.vtk_version == 'v9.0.0' && '-DF3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || '-DF3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=OFF' }}
 

@@ -1,10 +1,6 @@
 name: 'Install Alembic Dependency'
 description: 'Install Alembic Dependency using cache when possible'
-inputs:
-  os:
-    description: 'OS to build on'
-    required: false
-    default: 'ubuntu-latest'
+
 runs:
   using: "composite"
   steps:
@@ -14,7 +10,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/alembic_install
-        key: alembic-v1.8.3-${{inputs.os}}-7
+        key: alembic-v1.8.3-${{runner.os}}-0
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -46,15 +42,15 @@ runs:
       shell: bash
       run: >
         cmake ../alembic
-        -DALEMBIC_LIB_INSTALL_DIR=${{ inputs.os == 'windows-latest' && 'bin' || 'lib' }}
+        -DALEMBIC_LIB_INSTALL_DIR=${{ runner.os == 'windows-latest' && 'bin' || 'lib' }}
         -DALEMBIC_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../alembic_install
         -DCMAKE_PREFIX_PATH:PATH=../install/
         -DUSE_BINARIES=OFF
         -DUSE_TESTS=OFF
-        ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'

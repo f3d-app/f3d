@@ -14,7 +14,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: android-ndk
-        key: android-ndk-${{inputs.ndk_version}}-5
+        key: android-ndk-${{inputs.ndk_version}}-0
 
     - name: Install NDK
       if: steps.cache-ndk.outputs.cache-hit != 'true'
