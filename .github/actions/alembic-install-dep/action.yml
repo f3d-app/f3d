@@ -42,15 +42,15 @@ runs:
       shell: bash
       run: >
         cmake ../alembic
-        -DALEMBIC_LIB_INSTALL_DIR=${{ runner.os == 'windows-latest' && 'bin' || 'lib' }}
+        -DALEMBIC_LIB_INSTALL_DIR=${{ runner.os == 'Windows' && 'bin' || 'lib' }}
         -DALEMBIC_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../alembic_install
         -DCMAKE_PREFIX_PATH:PATH=../install/
         -DUSE_BINARIES=OFF
         -DUSE_TESTS=OFF
-        ${{ runner.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'

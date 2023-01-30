@@ -53,8 +53,8 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../occt_install
         -DINSTALL_DIR_BIN:PATH=bin
-        ${{ runner.os == 'macos-latest' && '-DINSTALL_NAME_DIR:STRING=@rpath -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macOS' && '-DINSTALL_NAME_DIR:STRING=@rpath -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -65,7 +65,7 @@ runs:
     - name: Patch OCCT install macos
       if: |
         steps.cache-occt.outputs.cache-hit != 'true' &&
-        runner.os == 'macos-latest'
+        runner.os == 'macOS'
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: sed -i '' 's/OpenCASCADE_LIBRARIES [A-Za-z0-9;]\+/OpenCASCADE_LIBRARIES TKSTEP;TKSTEPAttr;TKSTEP209;TKSTEPBase;TKIGES;TKBool;TKMesh;TKXSBase;TKBO;TKPrim;TKShHealing;TKTopAlgo;TKBRep;TKGeomAlgo;TKGeomBase;TKG3d;TKG2d;TKMath;TKernel/' occt_install/lib/cmake/opencascade/OpenCASCADEConfig.cmake
@@ -73,7 +73,7 @@ runs:
     - name: Patch OCCT install ubuntu
       if: |
         steps.cache-occt.outputs.cache-hit != 'true' &&
-        runner.os == 'ubuntu-latest'
+        runner.os == 'Linux'
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: sed -i 's/OpenCASCADE_LIBRARIES [A-Za-z0-9;]\+/OpenCASCADE_LIBRARIES TKSTEP;TKSTEPAttr;TKSTEP209;TKSTEPBase;TKIGES;TKBool;TKMesh;TKXSBase;TKBO;TKPrim;TKShHealing;TKTopAlgo;TKBRep;TKGeomAlgo;TKGeomBase;TKG3d;TKG2d;TKMath;TKernel/' occt_install/lib/cmake/opencascade/OpenCASCADEConfig.cmake

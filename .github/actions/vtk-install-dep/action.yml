@@ -62,7 +62,7 @@ runs:
     - name: Patch VTK 9.0 source macos
       if: |
         steps.cache-vtk.outputs.cache-hit != 'true' &&
-        runner.os == 'macos-latest' &&
+        runner.os == 'macOS' &&
         inputs.vtk_version == 'v9.0.0'
       working-directory: ${{github.workspace}}/dependencies/vtk
       shell: bash
@@ -113,8 +113,8 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_VERSIONED_INSTALL=OFF
         ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread' || null }}
-        ${{ runner.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'

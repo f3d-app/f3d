@@ -51,8 +51,8 @@ runs:
         -DDOWNLOAD_TBB=ON
         -DINSTALL_DEPENDENCIES=ON
         -DINSTALL_IN_SEPARATE_DIRECTORIES=OFF
-        ${{ runner.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
