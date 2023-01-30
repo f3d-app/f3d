@@ -25,7 +25,7 @@ jobs:
           - vtk_version: v9.0.0
             enable_raytracing: 'false'
 
-    runs-on: ${{runner.os}}
+    runs-on: ${{matrix.os}}
     container: ${{ runner.os == 'Linux' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
