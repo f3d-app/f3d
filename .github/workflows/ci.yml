@@ -59,7 +59,7 @@ jobs:
 
     - name: Install Raytracing Dependencies
       if: matrix.enable_raytracing == 'true'
-      uses: ./source/.github/actions/ospray-superbuild-install-dep
+      uses: ./source/.github/actions/ospray-sb-install-dep
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
