@@ -26,7 +26,7 @@ jobs:
             enable_raytracing: 'false'
 
     runs-on: ${{matrix.os}}
-    container: ${{ runner.os == 'Linux' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       DISPLAY: :0
