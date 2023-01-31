@@ -131,7 +131,7 @@ add_subdirectory(plugins)
 add_subdirectory(library)
 
 # F3D Application
-cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID" OFF)
+cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
 if (F3D_BUILD_APPLICATION)
   add_subdirectory(application)
 endif()
@@ -153,6 +153,11 @@ option(F3D_BINDINGS_JAVA "Create Java bindings" OFF)
 if(F3D_BINDINGS_JAVA)
   add_subdirectory(java)
 endif()
+
+# webassembly bindings
+if(EMSCRIPTEN)
+  add_subdirectory(webassembly)
+endif ()
 
 # Installation
 option(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE "Install a default configuration file" OFF)
