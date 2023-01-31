@@ -1,10 +1,5 @@
 name: 'Install Imath Dependency'
 description: 'Install Imath Dependency using cache when possible'
-inputs:
-  os:
-    description: 'OS to build on'
-    required: false
-    default: 'ubuntu-latest'
 runs:
   using: "composite"
   steps:
@@ -14,7 +9,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/imath_install
-        key: imath-v1.8.3-${{inputs.os}}-3
+        key: imath-v1.8.3-${{runner.os}}-0
 
     - name: Checkout Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'
@@ -42,8 +37,8 @@ runs:
         -DBUILD_TESTING=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../imath_install
-        ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'

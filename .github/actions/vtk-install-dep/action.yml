@@ -9,18 +9,10 @@ inputs:
     description: 'VTK SHA file'
     required: false
     default: ''
-  vtk_shared:
-    description: 'VTK BUILD_SHARED_LIBS'
-    required: false
-    default: 'true'
   enable_raytracing:
     description: 'Enable Raytracing'
     required: false
     default: 'false'
-  os:
-    description: 'OS to build on'
-    required: false
-    default: 'ubuntu-latest'
 runs:
   using: "composite"
   steps:
@@ -46,7 +38,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{inputs.os}}-${{inputs.vtk_shared}}-${{inputs.enable_raytracing}}-4
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.enable_raytracing}}-0
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -70,7 +62,7 @@ runs:
     - name: Patch VTK 9.0 source macos
       if: |
         steps.cache-vtk.outputs.cache-hit != 'true' &&
-        inputs.os == 'macos-latest' &&
+        runner.os == 'macOS' &&
         inputs.vtk_version == 'v9.0.0'
       working-directory: ${{github.workspace}}/dependencies/vtk
       shell: bash
@@ -85,7 +77,7 @@ runs:
       shell: bash
       run: >
         cmake ../vtk
-        -DBUILD_SHARED_LIBS=${{ inputs.vtk_shared == 'true' && 'ON' || 'OFF' }}
+        -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
@@ -121,8 +113,8 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_VERSIONED_INSTALL=OFF
         ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread' || null }}
-        ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'

@@ -1,10 +1,5 @@
 name: 'Install OCCT Dependency'
 description: 'Install OCCT Dependency using cache when possible'
-inputs:
-  os:
-    description: 'OS to build on'
-    required: false
-    default: 'ubuntu-latest'
 runs:
   using: "composite"
   steps:
@@ -14,7 +9,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/occt_install
-        key: occt-V7_6_0-${{inputs.os}}-8
+        key: occt-V7_6_0-${{runner.os}}-0
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -39,7 +34,6 @@ runs:
         mkdir occt_build
         mkdir occt_install
 
-      # Windows OCCT Shared triggers 0xc0000409
     - name: Configure OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/occt_build
@@ -59,8 +53,8 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../occt_install
         -DINSTALL_DIR_BIN:PATH=bin
-        ${{ inputs.os == 'macos-latest' && '-DINSTALL_NAME_DIR:STRING=@rpath -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macOS' && '-DINSTALL_NAME_DIR:STRING=@rpath -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -71,7 +65,7 @@ runs:
     - name: Patch OCCT install macos
       if: |
         steps.cache-occt.outputs.cache-hit != 'true' &&
-        inputs.os == 'macos-latest'
+        runner.os == 'macOS'
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: sed -i '' 's/OpenCASCADE_LIBRARIES [A-Za-z0-9;]\+/OpenCASCADE_LIBRARIES TKSTEP;TKSTEPAttr;TKSTEP209;TKSTEPBase;TKIGES;TKBool;TKMesh;TKXSBase;TKBO;TKPrim;TKShHealing;TKTopAlgo;TKBRep;TKGeomAlgo;TKGeomBase;TKG3d;TKG2d;TKMath;TKernel/' occt_install/lib/cmake/opencascade/OpenCASCADEConfig.cmake
@@ -79,7 +73,7 @@ runs:
     - name: Patch OCCT install ubuntu
       if: |
         steps.cache-occt.outputs.cache-hit != 'true' &&
-        inputs.os == 'ubuntu-latest'
+        runner.os == 'Linux'
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: sed -i 's/OpenCASCADE_LIBRARIES [A-Za-z0-9;]\+/OpenCASCADE_LIBRARIES TKSTEP;TKSTEPAttr;TKSTEP209;TKSTEPBase;TKIGES;TKBool;TKMesh;TKXSBase;TKBO;TKPrim;TKShHealing;TKTopAlgo;TKBRep;TKGeomAlgo;TKGeomBase;TKG3d;TKG2d;TKMath;TKernel/' occt_install/lib/cmake/opencascade/OpenCASCADEConfig.cmake
