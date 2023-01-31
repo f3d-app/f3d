@@ -1,10 +1,5 @@
 name: 'Install pybind11 Dependency'
 description: 'Install pybind11 Dependency using cache when possible'
-inputs:
-  os:
-    description: 'OS to build on'
-    required: false
-    default: 'ubuntu-latest'
 runs:
   using: "composite"
   steps:
@@ -14,7 +9,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/pybind11_install
-        key: pybind11-v2.10.1-${{inputs.os}}-1
+        key: pybind11-v2.10.1-${{runner.os}}-0
 
     - name: Checkout pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'
@@ -39,8 +34,10 @@ runs:
       shell: bash
       run: >
         cmake ../pybind11
-        -DPYBIND11_TEST=OFF
         -DCMAKE_INSTALL_PREFIX:PATH=../pybind11_install
+        -DPYBIND11_TEST=OFF
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Install pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'

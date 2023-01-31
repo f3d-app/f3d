@@ -1,10 +1,5 @@
 name: 'Install ospray sb Dependency'
 description: 'Install ospray sb Dependency using cache when possible'
-inputs:
-  os:
-    description: 'OS to build on'
-    required: false
-    default: 'ubuntu-latest'
 runs:
   using: "composite"
   steps:
@@ -14,7 +9,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-v2.7.1-${{inputs.os}}-3
+        key: ospray-sb-v2.7.1-${{runner.os}}-0
 
     - name: Checkout ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
@@ -45,19 +40,19 @@ runs:
       shell: bash
       run: >
         cmake ../ospray/scripts/superbuild/
-        -DCMAKE_INSTALL_PREFIX:PATH=../ospray_install
-        -DINSTALL_IN_SEPARATE_DIRECTORIES=OFF
         -DBUILD_EMBREE_FROM_SOURCE=OFF
-        -DBUILD_OIDN=ON
         -DBUILD_GLFW=OFF
+        -DBUILD_OIDN=ON
         -DBUILD_OIDN_FROM_SOURCE=OFF
         -DBUILD_OSPRAY_APPS=OFF
         -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../ospray_install
         -DDOWNLOAD_ISPC=ON
         -DDOWNLOAD_TBB=ON
         -DINSTALL_DEPENDENCIES=ON
-        ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        -DINSTALL_IN_SEPARATE_DIRECTORIES=OFF
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'

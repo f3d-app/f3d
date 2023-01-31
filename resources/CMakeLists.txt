@@ -6,7 +6,7 @@ list(APPEND config_files
 # Default config file
 if (UNIX AND NOT APPLE)
   if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
-    if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
+    if (F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
       install(FILES ${config_files}
         DESTINATION "share/f3d" COMPONENT configuration)
     else()
@@ -54,7 +54,7 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
     install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
       DESTINATION "share/man/man1/" COMPONENT documentation)
   endif()
-  if (F3D_INSTALL_THUMBNAILER_FILES)
+  if (F3D_LINUX_INSTALL_THUMBNAILER_FILES)
     configure_file(
       "${CMAKE_CURRENT_SOURCE_DIR}/f3d.thumbnailer.in"
       "${CMAKE_CURRENT_BINARY_DIR}/f3d.thumbnailer")

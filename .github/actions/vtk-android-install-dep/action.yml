@@ -23,7 +23,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_build
-        key: vtk-android-${{env.VTK_SHA}}-${{inputs.api_level}}-${{inputs.arch}}-1
+        key: vtk-android-${{env.VTK_SHA}}-${{inputs.api_level}}-${{inputs.arch}}-0
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -46,11 +46,11 @@ runs:
       shell: bash
       run: >
         cmake ../vtk
-        -DCMAKE_BUILD_TYPE=Release
-        -DVTK_ANDROID_BUILD=ON
         -DANDROID_ARCH_ABI=${{inputs.arch}}
         -DANDROID_NATIVE_API_LEVEL=${{inputs.api_level}}
         -DANDROID_NDK=$(pwd)/../../android-ndk
+        -DCMAKE_BUILD_TYPE=Release
+        -DVTK_ANDROID_BUILD=ON
 
     - name: Build VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'

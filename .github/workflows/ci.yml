@@ -21,15 +21,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         vtk_version: [commit, v9.2.2, v9.1.0, v9.0.0]
         include:
-          - os: ubuntu-latest
-            vtk_shared: 'true'
-            enable_raytracing: 'true'
-          - os: macos-latest
-            vtk_shared: 'true'
-            enable_raytracing: 'true'
-          - os: windows-latest
-            vtk_shared: 'true'
-            enable_raytracing: 'true'
+          - enable_raytracing: 'true'
           - vtk_version: v9.0.0
             enable_raytracing: 'false'
 
@@ -67,23 +59,17 @@ jobs:
 
     - name: Install Raytracing Dependencies
       if: matrix.enable_raytracing == 'true'
-      uses: ./source/.github/actions/ospray-superbuild-install-dep
-      with:
-        os: ${{matrix.os}}
+      uses: ./source/.github/actions/ospray-sb-install-dep
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-        vtk_shared: ${{matrix.vtk_shared}}
         enable_raytracing: ${{matrix.enable_raytracing}}
-        os: ${{matrix.os}}
 
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
-      with:
-        os: ${{matrix.os}}
 
     - name: Setup Directories
       working-directory: ${{github.workspace}}
@@ -96,7 +82,7 @@ jobs:
     # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8210
     - name: Set LD_LIBRARY_PATH ubuntu
       if: |
-        matrix.os == 'ubuntu-latest' &&
+        runner.os == 'Linux' &&
         ( matrix.vtk_version == 'v9.0.0' ||
           matrix.vtk_version == 'v9.1.0' )
       working-directory: ${{github.workspace}}/dependencies/
@@ -104,7 +90,7 @@ jobs:
       run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
     - name: Set PATH windows
-      if: matrix.os == 'windows-latest'
+      if: runner.os == 'Windows'
       working-directory: ${{github.workspace}}
       shell: powershell
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
@@ -117,24 +103,32 @@ jobs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
+        -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
-        -DF3D_STRICT_BUILD=ON
+        -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_BINDINGS_JAVA=ON
+        -DF3D_BINDINGS_PYTHON=ON
+        -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
+        -DF3D_INSTALL_SDK=ON
+        -DF3D_INSTALL_SDK_PLUGIN=ON
+        -DF3D_LINUX_GENERATE_MAN=ON
+        -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
+        -DF3D_LINUX_INSTALL_THUMBNAILER_FILES=ON        
+        -DF3D_MACOS_BUNDLE=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_MODULE_RAYTRACING=${{ matrix.enable_raytracing == 'true' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
         -DF3D_PLUGIN_BUILD_OCCT=ON
-        -DF3D_BINDINGS_JAVA=ON
-        -DF3D_INSTALL_SDK=ON
-        -DF3D_INSTALL_SDK_PLUGIN=ON
-        -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
-        -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
-        ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DF3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
-        ${{ matrix.os == 'macos-latest' && '-DF3D_BINDINGS_PYTHON=ON -DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
-        ${{ matrix.os == 'ubuntu-latest' && '-DF3D_BINDINGS_PYTHON=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
+        -DF3D_STRICT_BUILD=ON
+        -DF3D_WINDOWS_GUI=ON
+        -DF3D_WINDOWS_INSTALL_LOGOS_FOR_NSIS_PACKAGING=ON
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Linux' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
         ${{ matrix.vtk_version == 'commit' && '-DF3D_TESTING_ENABLE_HDRI_TESTS=ON' || '-DF3D_TESTING_ENABLE_HDRI_TESTS=OFF' }}
         ${{ matrix.vtk_version == 'v9.0.0' && '-DF3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || '-DF3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=OFF' }}
 
@@ -143,11 +137,11 @@ jobs:
       run: cmake --build . --parallel 2 --config Release
 
     - name: Run Xvfb ubuntu
-      if: matrix.os == 'ubuntu-latest'
+      if: runner.os == 'Linux'
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
     - name: Install Mesa Windows
-      if: matrix.os == 'windows-latest'
+      if: runner.os == 'Windows'
       uses: ./source/.github/actions/mesa-install-bin
       with:
         path: ${{github.workspace}}\build\bin\Release
@@ -161,35 +155,35 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         path: ./build/Testing/Temporary
-        name: f3d-tests-artifact-${{matrix.os}}-${{matrix.vtk_version}}
+        name: f3d-tests-artifact-${{runner.os}}-${{matrix.vtk_version}}
 
     - name: Install (ALL)
       working-directory: ${{github.workspace}}/build
       run: cmake --install .
 
     - name: Install (mimetypes on Linux)
-      if: matrix.os == 'ubuntu-latest'
+      if: runner.os == 'Linux'
       working-directory: ${{github.workspace}}/build
       run: cmake --install . --component mimetypes
 
     - name: Check Install ubuntu
-      if: matrix.os == 'ubuntu-latest'
+      if: runner.os == 'Linux'
       working-directory: ${{github.workspace}}/install
       run: ./bin/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
     - name: Install Mesa Windows in install
-      if: matrix.os == 'windows-latest'
+      if: runner.os == 'Windows'
       uses: ./source/.github/actions/mesa-install-bin
       with:
         path: ${{github.workspace}}\install\bin
 
     - name: Check Install windows
-      if: matrix.os == 'windows-latest'
+      if: runner.os == 'Windows'
       working-directory: ${{github.workspace}}/install
       run: .\bin\f3d.exe ..\source\testing\data\suzanne.obj --output=..\output.png
 
     - name: Check Install macos
-      if: matrix.os == 'macos-latest'
+      if: runner.os == 'macOS'
       working-directory: ${{github.workspace}}/install
       run: ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
@@ -201,7 +195,7 @@ jobs:
 
     - name: Install Mesa Windows examples
       if: |
-        matrix.os == 'windows-latest' &&
+        runner.os == 'Windows' &&
         matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0'
       uses: ./source/.github/actions/mesa-install-bin
       with:
@@ -260,8 +254,6 @@ jobs:
 
     - name: Install Raytracing Dependencies
       uses: ./source/.github/actions/ospray-sb-install-dep
-      with:
-        os: ${{matrix.os}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep

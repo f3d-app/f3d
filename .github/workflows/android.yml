@@ -34,10 +34,14 @@ jobs:
       working-directory: ${{github.workspace}}
       run: mkdir dependencies
 
-    - name: Install NDK tool
-      uses: ./source/.github/actions/android-ndk-install-tool
-      with:
-        ndk_version: ${{env.NDK_VERSION}}
+    - name: Install NDK
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: |
+        apt-get install unzip
+        wget https://dl.google.com/android/repository/android-ndk-${{env.NDK_VERSION}}-linux-x86_64.zip
+        unzip -qq android-ndk-${{env.NDK_VERSION}}-linux-x86_64.zip
+        mv android-ndk-${{env.NDK_VERSION}} android-ndk
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-android-install-dep

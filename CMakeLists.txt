@@ -158,21 +158,21 @@ endif()
 option(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE "Install a default configuration file" OFF)
 mark_as_advanced(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
 if(UNIX AND NOT APPLE)
-  cmake_dependent_option(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX "Install the default configuration at the prefix root instead of system wide" OFF
+  cmake_dependent_option(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX "Install the default configuration at the prefix root instead of system wide" OFF
     "F3D_INSTALL_DEFAULT_CONFIGURATION_FILE" OFF)
-  mark_as_advanced(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
+  mark_as_advanced(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
 endif()
 
 if(WIN32)
-  option(F3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING "Install logos for nsis packaging" OFF)
-  mark_as_advanced(F3D_INSTALL_LOGOS_FOR_NSIS_PACKAGING)
+  option(F3D_WINDOWS_INSTALL_LOGOS_FOR_NSIS_PACKAGING "Install logos for nsis packaging" OFF)
+  mark_as_advanced(F3D_WINDOWS_INSTALL_LOGOS_FOR_NSIS_PACKAGING)
   option(F3D_WINDOWS_RESOURCES_INSTALL_DIR "Specify a directory to install resources to instead of root" "")
   mark_as_advanced(F3D_WINDOWS_RESOURCES_INSTALL_DIR)
 endif()
 
 if(UNIX AND NOT APPLE)
-  option(F3D_INSTALL_THUMBNAILER_FILES "Install thumbnailer files" OFF)
-  mark_as_advanced(F3D_INSTALL_THUMBNAILER_FILES)
+  option(F3D_LINUX_INSTALL_THUMBNAILER_FILES "Install thumbnailer files" OFF)
+  mark_as_advanced(F3D_LINUX_INSTALL_THUMBNAILER_FILES)
 endif()
 
 # Installing licenses
