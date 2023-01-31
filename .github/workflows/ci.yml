@@ -172,7 +172,7 @@ jobs:
       run: ./bin/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
     - name: Install Mesa Windows in install
-      if: runner.os == 'Linux'
+      if: runner.os == 'Windows'
       uses: ./source/.github/actions/mesa-install-bin
       with:
         path: ${{github.workspace}}\install\bin
@@ -254,8 +254,6 @@ jobs:
 
     - name: Install Raytracing Dependencies
       uses: ./source/.github/actions/ospray-sb-install-dep
-      with:
-        os: ${{runner.os}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
