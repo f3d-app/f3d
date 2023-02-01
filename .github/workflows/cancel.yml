@@ -8,4 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: cancel running workflows
-      uses: fkirc/skip-duplicate-actions@master
+      uses: GongT/cancel-previous-workflows@master
+      env:
+        GITHUB_TOKEN: ${{ github.token }}  # Required
