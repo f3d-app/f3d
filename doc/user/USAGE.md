@@ -54,3 +54,7 @@ Here is the list of plugins provided officially by F3D:
 - **occt**: STEP and IGES support
 
 > Note: If you downloaded the binaries from the Release page, it's not necessary to specify manually the plugins above, all of them are loaded automatically.
+
+You can also try plugins maintained by the community. If you have created a plugin and would like it to be listed here, please submit a pull request.
+
+- **Abaqus**: ODB support by @YangShen398 ([repository](https://github.com/YangShen398/F3D-ODB-Reader-Plugin))
