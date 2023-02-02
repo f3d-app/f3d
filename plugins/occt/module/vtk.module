@@ -5,6 +5,7 @@ DESCRIPTION
 DEPENDS
   VTK::CommonCore
   VTK::CommonExecutionModel
+  VTK::FiltersGeneral
 TEST_DEPENDS
   VTK::TestingCore
   VTK::CommonDataModel

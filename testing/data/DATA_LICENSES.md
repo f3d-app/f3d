@@ -10,10 +10,11 @@
 - Cameras.gltf: glTF-Sample-Models: Public Domain
 - cow.vtk: VTK Data: BSD
 - cow.vtp: VTK Data: BSD
-- cube.stp: GrabCad/Skip Baker: Cross License
 - disk_out_ref.ex2: VTK Data: BSD
 - dragon.vtu: Stanford: Public Domain
 - duck.dae: assimp test models: BSD
+- EngineBlock.iges: (c) 2011 Werner Mayer : [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/)
+- EngineBlock.step: (c) 2011 Werner Mayer : [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/)
 - HeadMRVolume*: VTK Data: BSD
 - iflamigm.3ds: VTK Data: BSD
 - IM-0001-1983.dcm: VTK Data: BSD
@@ -35,7 +36,6 @@
 - samplePTS.pts: VTK Data: BSD
 - slime.fbx: Turbosquid: Turbosquid 3D Model License
 - small.ex2: VTK Data: BSD
-- spacer.igs: GrabCad/Michel Deville: Cross License
 - teapot.off: Utah Teapot: Public Domain
 - tensors.vti: VTK Data: BSD
 - UnlitTest.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
