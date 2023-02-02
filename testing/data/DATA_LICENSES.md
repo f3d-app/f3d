@@ -3,7 +3,6 @@
 # Copyrights and Licenses
 
 - albedo.png: glTF-Sample-Models: Public Domain
-- AttackGraffiti-3zRBM.ttf: wepfont: [Freeware](https://www.fontspace.com/a-attack-graffiti-font-f45529)
 - beach.nrrd: VTK Data: BSD
 - bluntfin.vts: VTK Data: BSD
 - bot2.wrl: VTK Data: BSD
@@ -28,13 +27,14 @@
 - RectGrid2.vtr: VTK Data: BSD
 - red.jpg: glTF-Sample-Models: Public Domain
 - Robot_Color.tga: Unity Asset Store: Free to use
-- robot_kyle_walking.fbx: Unity Asset Store: Free to use
 - Robot_Normal.tga: Unity Asset Store: Free to use
-- samplePTS.pts: VTK Data: BSD
+- Crosterian.ttf: Denis Ignatov : [OFL (SIL Open Font License)](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)
 - SimpleMorph.gltf: glTF-Sample-Models: Public Domain
 - SimpleSkin.gltf: glTF-Sample-Models: Public Domain
+- robot_kyle_walking.fbx: Unity Asset Store: Free to use
+- samplePTS.pts: VTK Data: BSD
 - slime.fbx: Turbosquid: Turbosquid 3D Model License
-- small.ex2: VTK Data: BSD 
+- small.ex2: VTK Data: BSD
 - spacer.igs: GrabCad/Michel Deville: Cross License
 - teapot.off: Utah Teapot: Public Domain
 - tensors.vti: VTK Data: BSD

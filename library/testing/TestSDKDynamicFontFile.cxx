@@ -19,7 +19,7 @@ int TestSDKDynamicFontFile(int argc, char* argv[])
   win.render();
 
   // Change the font file and make sure it is taken into account
-  opt.set("ui.font-file", std::string(argv[1]) + "data/AttackGraffiti-3zRBM.ttf");
+  opt.set("ui.font-file", std::string(argv[1]) + "data/Crosterian.ttf");
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
            std::string(argv[2]), "TestSDKDynamicFontFile", 50)
