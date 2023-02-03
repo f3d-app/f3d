@@ -28,7 +28,7 @@ A typical config file may look like this:
        "bar": true,
        "roughness": 0.2,
        "grid": true,
-       "scalars": true,
+       "scalars": true
    },
    ".*vt.": {
        "edges": true
