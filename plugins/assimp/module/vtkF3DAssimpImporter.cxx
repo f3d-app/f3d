@@ -326,7 +326,6 @@ public:
       vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texNormal.data);
       if (tex)
       {
-        std::cout<<"normalTex"<<std::endl;
         property->SetTexture("normalTex", tex);
       }
     }
