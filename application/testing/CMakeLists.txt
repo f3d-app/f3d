@@ -279,7 +279,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
 
     # Embedded texture are only working with assimp 5.1.X
     if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.1.0")
-      f3d_test(NAME TestTexturedFBX DATA slime.fbx ARGS --load-plugins=assimp)
+      f3d_test(NAME TestTexturedFBX DATA texturedCube.fbx ARGS --load-plugins=assimp)
     endif()
   endif()
 

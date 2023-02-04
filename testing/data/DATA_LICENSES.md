@@ -33,7 +33,6 @@
 - SimpleSkin.gltf: glTF-Sample-Models: Public Domain
 - robot_kyle_walking.fbx: Unity Asset Store: Free to use
 - samplePTS.pts: VTK Data: BSD
-- slime.fbx: Turbosquid: Turbosquid 3D Model License
 - small.ex2: VTK Data: BSD
 - teapot.off: Utah Teapot: Public Domain
 - tensors.vti: VTK Data: BSD
