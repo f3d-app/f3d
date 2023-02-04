@@ -270,6 +270,10 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p --load-plugins=assimp)
   f3d_test(NAME TestFBX DATA phong_cube.fbx ARGS --load-plugins=assimp)
   f3d_test(NAME TestVerboseCameraAssimp DATA duck.dae ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "camera1")
+  
+  # This test baseline is incorrect because of https://github.com/f3d-app/f3d/issues/603
+  # It will need to be changed when fixed
+  f3d_test(NAME TestFBXNormalMapping DATA normalMapping.fbx ARGS --load-plugins=assimp)
 
   # TGA Reader needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8224
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210805) # for TGA support and embedded textures
