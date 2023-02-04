@@ -31,7 +31,7 @@ Here is some CMake options of interest::
 * `BUILD_TESTING`: Enable the [tests](TESTING.md).
 * `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
 * `F3D_WINDOWS_GUI`: On Windows, build a Win32 application (without console).
-* `F3D_BUILD_WINDOWS_SHELL_THUMBNAILS_EXTENSION`: On Windows, build the shell thumbnails extension.
+* `F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION`: On Windows, build the shell thumbnails extension.
 * `F3D_PLUGINS_STATIC_BUILD`: Build all plugins as static library (embedded into `libf3d`) and automatically loaded by the application.
 
 Some modules, plugins and bindings depending on external libraries can be optionally enabled with the following CMake variables:
