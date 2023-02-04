@@ -3,6 +3,7 @@
 # Copyrights and Licenses
 
 - albedo.png: glTF-Sample-Models: Public Domain
+- animatedWorld.fbx: VTK Data: BSD
 - beach.nrrd: VTK Data: BSD
 - bluntfin.vts: VTK Data: BSD
 - bot2.wrl: VTK Data: BSD
@@ -13,6 +14,7 @@
 - disk_out_ref.ex2: VTK Data: BSD
 - dragon.vtu: Stanford: Public Domain
 - duck.dae: assimp test models: BSD
+- duck.fbx: assimp test models: BSD
 - EngineBlock.iges: (c) 2011 Werner Mayer : [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/)
 - EngineBlock.step: (c) 2011 Werner Mayer : [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/)
 - HeadMRVolume*: VTK Data: BSD
@@ -26,12 +28,9 @@
 - PinkEggFromLW.dxf: assimp test models: BSD
 - RectGrid2.vtr: VTK Data: BSD
 - red.jpg: glTF-Sample-Models: Public Domain
-- Robot_Color.tga: Unity Asset Store: Free to use
-- Robot_Normal.tga: Unity Asset Store: Free to use
 - Crosterian.ttf: Denis Ignatov : [OFL (SIL Open Font License)](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)
 - SimpleMorph.gltf: glTF-Sample-Models: Public Domain
 - SimpleSkin.gltf: glTF-Sample-Models: Public Domain
-- robot_kyle_walking.fbx: Unity Asset Store: Free to use
 - samplePTS.pts: VTK Data: BSD
 - small.ex2: VTK Data: BSD
 - teapot.off: Utah Teapot: Public Domain

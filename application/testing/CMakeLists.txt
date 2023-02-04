@@ -274,20 +274,17 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
 
   # TGA Reader needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8224
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210805) # for TGA support and embedded textures
-    f3d_test(NAME TestVerboseAssimp DATA robot_kyle_walking.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "Robot2")
+    f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "LOD3sp")
+    f3d_test(NAME TestTGATextureFBX DATA duck.fbx ARGS --load-plugins=assimp)
     f3d_test(NAME TestDAE DATA duck.dae ARGS --load-plugins=assimp)
 
     # Embedded texture are only working with assimp 5.1.X
     if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.1.0")
-      f3d_test(NAME TestTexturedFBX DATA texturedCube.fbx ARGS --load-plugins=assimp)
+      f3d_test(NAME TestEmbeddedTextureFBX DATA texturedCube.fbx ARGS --load-plugins=assimp)
+      f3d_test(NAME TestInteractionFBXAnim DATA animatedWorld.fbx ARGS --load-plugins=assimp INTERACTION) #Space;Space;
     endif()
   endif()
 
-  # Animation are working only with assimp 5.0.0 and 5.0.1.
-  # Both report a assimp version 5.0.0 when using find_package
-  if("${F3D_ASSIMP_VERSION}" VERSION_EQUAL "5.0.0")
-    f3d_test(NAME TestInteractionFBXAnim DATA robot_kyle_walking.fbx ARGS --load-plugins=assimp INTERACTION) #Space;Space;
-  endif()
 endif()
 
 if(F3D_PLUGIN_BUILD_DRACO)
