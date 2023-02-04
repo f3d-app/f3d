@@ -19,7 +19,6 @@
 - iflamigm.3ds: VTK Data: BSD
 - IM-0001-1983.dcm: VTK Data: BSD
 - InterpolationTest.glb: glTF-Sample-Models: Public Domain
-- KameraAnim.glb: flying dog software
 - normal.png: glTF-Sample-Models: Public Domain
 - palermo_park_1k.hdr: Polyhaven: Public Domain
 - Part-4-Buildings-V4-one.gml: VTK Data: BSD
