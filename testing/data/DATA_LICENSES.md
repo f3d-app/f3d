@@ -3,47 +3,47 @@
 # Copyrights and Licenses
 
 - albedo.png: glTF-Sample-Models: Public Domain
-- animatedWorld.fbx: VTK Data: BSD
-- beach.nrrd: VTK Data: BSD
-- bluntfin.vts: VTK Data: BSD
-- bot2.wrl: VTK Data: BSD
+- animatedWorld.fbx: VTK Data: BSD-3-Clause
+- beach.nrrd: VTK Data: BSD-3-Clause
+- bluntfin.vts: VTK Data: BSD-3-Clause
+- bot2.wrl: VTK Data: BSD-3-Clause
 - BoxAnimated*: glTF-Sample-Models/Cesium: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - Cameras.gltf: glTF-Sample-Models: Public Domain
-- cow.vtk: VTK Data: BSD
-- cow.vtp: VTK Data: BSD
-- disk_out_ref.ex2: VTK Data: BSD
+- cow.vtk: VTK Data: BSD-3-Clause
+- cow.vtp: VTK Data: BSD-3-Clause
+- disk_out_ref.ex2: VTK Data: BSD-3-Clause
 - dragon.vtu: Stanford: Public Domain
-- duck.dae: assimp test models: BSD
-- duck.fbx: assimp test models: BSD
+- duck.dae: assimp test models: BSD-3-Clause
+- duck.fbx: assimp test models: BSD-3-Clause
 - EngineBlock.iges: (c) 2011 Werner Mayer : [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/)
 - EngineBlock.step: (c) 2011 Werner Mayer : [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/)
-- HeadMRVolume*: VTK Data: BSD
-- iflamigm.3ds: VTK Data: BSD
-- IM-0001-1983.dcm: VTK Data: BSD
+- HeadMRVolume*: VTK Data: BSD-3-Clause
+- iflamigm.3ds: VTK Data: BSD-3-Clause
+- IM-0001-1983.dcm: VTK Data: BSD-3-Clause
 - InterpolationTest.glb: glTF-Sample-Models: Public Domain
 - normal.png: glTF-Sample-Models: Public Domain
 - palermo_park_1k.hdr: Polyhaven: Public Domain
-- Part-4-Buildings-V4-one.gml: VTK Data: BSD
-- phong_cube.fbx: assimp test models: BSD
-- PinkEggFromLW.dxf: assimp test models: BSD
-- RectGrid2.vtr: VTK Data: BSD
+- Part-4-Buildings-V4-one.gml: VTK Data: BSD-3-Clause
+- phong_cube.fbx: assimp test models: BSD-3-Clause
+- PinkEggFromLW.dxf: assimp test models: BSD-3-Clause
+- RectGrid2.vtr: VTK Data: BSD-3-Clause
 - red.jpg: glTF-Sample-Models: Public Domain
 - Crosterian.ttf: Denis Ignatov : [OFL (SIL Open Font License)](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)
 - SimpleMorph.gltf: glTF-Sample-Models: Public Domain
 - SimpleSkin.gltf: glTF-Sample-Models: Public Domain
-- samplePTS.pts: VTK Data: BSD
-- small.ex2: VTK Data: BSD
+- samplePTS.pts: VTK Data: BSD-3-Clause
+- small.ex2: VTK Data: BSD-3-Clause
 - teapot.off: Utah Teapot: Public Domain
-- tensors.vti: VTK Data: BSD
+- tensors.vti: VTK Data: BSD-3-Clause
 - UnlitTest.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
-- vase_4comp.vti: VTK Data: BSD
+- vase_4comp.vti: VTK Data: BSD-3-Clause
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
-- world*: VTK Data: BSD
-- (ノಠ益ಠ )ノ.vtp: VTK Data: BSD
+- world*: VTK Data: BSD-3-Clause
+- (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
 
-All other datasets are licensed under the F3D license terms.
+All other datasets are licensed under the BSD-3-Clause F3D license.
 
-# VTK Data: BSD license
+# VTK Data: BSD-3-Clause license
 
 ```
   Program:   Visualization Toolkit
@@ -78,7 +78,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
-# assimp test models: BSD license
+# assimp test models: BSD-3-Clause license
 
 ```
 Open Asset Import Library (assimp)
