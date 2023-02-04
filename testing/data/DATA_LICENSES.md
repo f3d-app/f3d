@@ -16,8 +16,6 @@
 - dragon.vtu: Stanford: Public Domain
 - duck.dae: assimp test models: BSD-3-Clause
 - duck.fbx: assimp test models: BSD-3-Clause
-- EngineBlock.iges: (c) 2011 Werner Mayer : [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/)
-- EngineBlock.step: (c) 2011 Werner Mayer : [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/)
 - HeadMRVolume*: VTK Data: BSD-3-Clause
 - iflamigm.3ds: VTK Data: BSD-3-Clause
 - IM-0001-1983.dcm: VTK Data: BSD-3-Clause

@@ -304,8 +304,8 @@ if(F3D_PLUGIN_BUILD_EXODUS)
 endif()
 
 if(F3D_PLUGIN_BUILD_OCCT)
-  f3d_test(NAME TestSTEP DATA EngineBlock.step DEFAULT_LIGHTS ARGS --load-plugins=occt)
-  f3d_test(NAME TestIGES DATA EngineBlock.iges DEFAULT_LIGHTS ARGS --load-plugins=occt)
+  f3d_test(NAME TestSTEP DATA f3d.stp DEFAULT_LIGHTS ARGS --load-plugins=occt)
+  f3d_test(NAME TestIGES DATA f3d.igs DEFAULT_LIGHTS ARGS --load-plugins=occt)
 endif()
 
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)

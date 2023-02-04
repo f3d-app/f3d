@@ -8,7 +8,7 @@
 
 int TestF3DOCCTReader(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/EngineBlock.step";
+  std::string filename = std::string(argv[1]) + "data/f3d.stp";
   vtkNew<vtkF3DOCCTReader> reader;
   reader->RelativeDeflectionOn();
   reader->SetLinearDeflection(0.1);
