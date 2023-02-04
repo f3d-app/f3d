@@ -228,7 +228,6 @@ public:
         render = true;
         break;
       case '?':
-      case '/':
         self->Window.PrintColoringDescription(log::VerboseLevel::INFO);
         self->Window.PrintSceneDescription(log::VerboseLevel::INFO);
         break;
