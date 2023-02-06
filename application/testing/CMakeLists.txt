@@ -165,7 +165,7 @@ f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2 D
 f3d_test(NAME TestLightIntensityBrighterFullScene DATA WaterBottle.glb ARGS --light-intensity=5.0 DEFAULT_LIGHTS)
 f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --light-intensity=0.2 DEFAULT_LIGHTS)
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp" DEFAULT_LIGHTS)
-f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${CMAKE_SOURCE_DIR}/testing/data/AttackGraffiti-3zRBM.ttf DEFAULT_LIGHTS)
+f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${CMAKE_SOURCE_DIR}/testing/data/Crosterian.ttf DEFAULT_LIGHTS)
 f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-index=7 DEFAULT_LIGHTS)
 f3d_test(NAME TestMaxSizeBelow DATA suzanne.stl ARGS --max-size=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestMaxSizeAbove DATA WaterBottle.glb ARGS --max-size=0.2 REGEXP "No file loaded, file is bigger than max size" NO_BASELINE)
@@ -197,7 +197,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   # Test Animation index out of domain error
   f3d_test(NAME TestVerboseAnimationIndexError1 DATA InterpolationTest.glb ARGS --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
   f3d_test(NAME TestInteractionAnimation DATA InterpolationTest.glb ARGS --animation-index=-1 INTERACTION)#Space;Space;
-  f3d_test(NAME TestInteractionAnimationMovement DATA KameraAnim.glb ARGS --camera-index=1 INTERACTION)#Space;MouseMovement;Space;
+  f3d_test(NAME TestInteractionAnimationMovement DATA CameraAnimated.glb ARGS --camera-index=0 INTERACTION)#Space;MouseMovement;Space;
   # Test exit hotkey
   f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
 
@@ -269,25 +269,27 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestOFF DATA teapot.off ARGS --up=+Z --load-plugins=assimp)
   f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p --load-plugins=assimp)
   f3d_test(NAME TestFBX DATA phong_cube.fbx ARGS --load-plugins=assimp)
-
   f3d_test(NAME TestVerboseCameraAssimp DATA duck.dae ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "camera1")
 
   # TGA Reader needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8224
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210805) # for TGA support and embedded textures
-    f3d_test(NAME TestVerboseAssimp DATA robot_kyle_walking.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "Robot2")
+    f3d_test(NAME TestFBXBone DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08)
+    f3d_test(NAME TestInteractionFBXBoneAnim DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 INTERACTION) #Space;Space;
+    f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "LOD3sp")
+    f3d_test(NAME TestTGATextureFBX DATA duck.fbx ARGS --load-plugins=assimp)
     f3d_test(NAME TestDAE DATA duck.dae ARGS --load-plugins=assimp)
+
+    # This test baseline is incorrect because of https://github.com/f3d-app/f3d/issues/603
+    # It will need to be changed when fixed
+    f3d_test(NAME TestFBXNormalMapping DATA normalMapping.fbx ARGS --load-plugins=assimp)
 
     # Embedded texture are only working with assimp 5.1.X
     if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.1.0")
-      f3d_test(NAME TestTexturedFBX DATA slime.fbx ARGS --load-plugins=assimp)
+      f3d_test(NAME TestEmbeddedTextureFBX DATA texturedCube.fbx ARGS --load-plugins=assimp)
+      f3d_test(NAME TestInteractionFBXAnim DATA animatedWorld.fbx ARGS --load-plugins=assimp INTERACTION) #Space;Space;
     endif()
   endif()
 
-  # Animation are working only with assimp 5.0.0 and 5.0.1.
-  # Both report a assimp version 5.0.0 when using find_package
-  if("${F3D_ASSIMP_VERSION}" VERSION_EQUAL "5.0.0")
-    f3d_test(NAME TestInteractionFBXAnim DATA robot_kyle_walking.fbx ARGS --load-plugins=assimp INTERACTION) #Space;Space;
-  endif()
 endif()
 
 if(F3D_PLUGIN_BUILD_DRACO)
@@ -306,8 +308,8 @@ if(F3D_PLUGIN_BUILD_EXODUS)
 endif()
 
 if(F3D_PLUGIN_BUILD_OCCT)
-  f3d_test(NAME TestSTEP DATA cube.stp DEFAULT_LIGHTS ARGS --load-plugins=occt)
-  f3d_test(NAME TestIGES DATA spacer.igs DEFAULT_LIGHTS ARGS --load-plugins=occt)
+  f3d_test(NAME TestSTEP DATA f3d.stp DEFAULT_LIGHTS ARGS --load-plugins=occt)
+  f3d_test(NAME TestIGES DATA f3d.igs DEFAULT_LIGHTS ARGS --load-plugins=occt)
 endif()
 
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
@@ -341,7 +343,7 @@ f3d_test(NAME TestInteractionFocalPointPickingDefault DATA dragon.vtu INTERACTIO
 f3d_test(NAME TestInteractionFocalPointPickingShift DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionFocalPointPickingPoints DATA pointsCloud.vtp INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)
- 
+
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2
 

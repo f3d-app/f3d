@@ -6,7 +6,7 @@ set(F3D_ASSIMP_VERSION "${assimp_VERSION}" CACHE INTERNAL "")
 message(STATUS "Plugin: assimp ${assimp_VERSION} found")
 
 if("${assimp_VERSION}" VERSION_GREATER_EQUAL "5.1.0")
-  message(WARNING "Plugin: assimp: Animations are not working with assimp 5.1.0 and newer, use assimp 5.0.X for animation support with assimp formats.")
+  message(WARNING "Plugin: assimp: Complex animations are not working with assimp 5.1.0 and newer, use assimp 5.0.X for animation support with assimp formats.")
 endif()
 if("${assimp_VERSION}" VERSION_LESS "5.1.0")
   message(WARNING "Plugin: assimp: Embedded texture are only working with assimp 5.1.X and newer.")
