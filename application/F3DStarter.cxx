@@ -332,8 +332,8 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
 
   // Recover info about the file to be loaded
   int index;
-  std::string filePath, fileInfo;
-  this->Internals->Engine->getLoader().getFileInfo(load, index, filePath, fileInfo);
+  std::string filePath, fileName, fileInfo;
+  this->Internals->Engine->getLoader().getFileInfo(load, index, filePath, fileName, fileInfo);
 
   // Update options for the file to load, using dynamic options as default
   this->Internals->FileOptions = this->Internals->DynamicOptions;
@@ -360,6 +360,11 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
     {
       // Setup the camera according to options
       this->Internals->SetupCamera(fileAppOptions);
+    }
+
+    if (!fileName.empty())
+    {
+      this->Internals->Engine->getWindow().setWindowName(fileName + " - " + F3D::AppName);
     }
   }
 }

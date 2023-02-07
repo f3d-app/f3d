@@ -42,7 +42,7 @@ public:
   bool loadFile(LoadFileEnum load) override;
 
   void getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
-    std::string& fileInfo) const override;
+    std::string& fileName, std::string& fileInfo) const override;
   ///@}
 
   /**

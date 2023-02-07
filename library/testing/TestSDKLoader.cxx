@@ -12,13 +12,13 @@ int TestSDKLoader(int argc, char* argv[])
   f3d::engine eng(f3d::window::Type::NONE);
   f3d::loader& load = eng.getLoader();
 
-  std::string filePath, fileInfo;
+  std::string filePath, fileName, fileInfo;
   int idx;
 
   // Test empty file list
   std::string empty = "";
   load.addFile(empty);
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
+  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileName, fileInfo);
   if (idx != -1)
   {
     std::cerr << "Unexpected idx with empty filelist: " << idx << std::endl;
@@ -43,7 +43,7 @@ int TestSDKLoader(int argc, char* argv[])
   std::vector<std::string> filesVecCheck{ cow, dragon, suzanne };
 
   load.addFile(dummy).addFile(cow).addFiles(filesVec);
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
+  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileName, fileInfo);
   if (filePath != cow)
   {
     std::cerr << "Unexpected file loaded on LOAD_CURRENT: " << filePath << std::endl;
@@ -56,7 +56,7 @@ int TestSDKLoader(int argc, char* argv[])
   }
 
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
+  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileName, fileInfo);
   if (filePath != suzanne)
   {
     std::cerr << "Unexpected file loaded on LOAD_LAST: " << filePath << std::endl;
@@ -64,7 +64,7 @@ int TestSDKLoader(int argc, char* argv[])
   }
 
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_FIRST);
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
+  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileName, fileInfo);
   if (filePath != cow)
   {
     std::cerr << "Unexpected file loaded on LOAD_FIRST: " << filePath << std::endl;
@@ -72,7 +72,7 @@ int TestSDKLoader(int argc, char* argv[])
   }
 
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_NEXT);
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
+  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileName, fileInfo);
   if (filePath != dragon)
   {
     std::cerr << "Unexpected file loaded on LOAD_NEXT: " << filePath << std::endl;
@@ -80,7 +80,7 @@ int TestSDKLoader(int argc, char* argv[])
   }
 
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_NEXT);
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
+  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileName, fileInfo);
   if (filePath != suzanne)
   {
     std::cerr << "Unexpected file loaded on second LOAD_NEXT: " << filePath << std::endl;
@@ -96,7 +96,7 @@ int TestSDKLoader(int argc, char* argv[])
 
   // Check current index
   load.setCurrentFileIndex(1).loadFile();
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
+  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileName, fileInfo);
   if (filePath != dragon)
   {
     std::cerr << "Unexpected file loaded on LOAD_CURRENT after setCurrentFileIndex: " << filePath
