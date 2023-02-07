@@ -28,6 +28,7 @@ public:
     : Argc(argc)
     , Argv(argv)
   {
+    this->ExecutableName = argc > 0 && argv[0][0] ? argv[0] : "f3d";
   }
 
   void GetOptions(F3DAppOptions& appOptions, f3d::options& options,
@@ -179,6 +180,7 @@ private:
   using Dictionary = std::map<std::string, DictionaryEntry>;
   DictionaryEntry GlobalConfigDicEntry;
   Dictionary ConfigDic;
+  std::string ExecutableName;
 };
 
 //----------------------------------------------------------------------------
@@ -211,7 +213,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
   try
   {
-    cxxopts::Options cxxOptions(F3D::AppName, F3D::AppTitle);
+    cxxopts::Options cxxOptions(this->ExecutableName, F3D::AppTitle);
     cxxOptions.positional_help("file1 file2 ...");
 
     // clang-format off
@@ -357,12 +359,13 @@ void ConfigurationOptions::PrintHelpPair(
 void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
 {
   // clang-format off
+  const std::string f3d = this->ExecutableName;
   const std::vector<std::pair<std::string, std::string> > examples =
   {
-    { "f3d file.vtu -xtgans", "View a unstructured mesh in a typical nice looking sciviz style" },
-    { "f3d file.glb -tuqap --hdri=file.hdr", "View a gltf file in a realistic environment" },
-    { "f3d file.ply -so --point-size=0 --comp=-2", "View a point cloud file with direct scalars rendering" },
-    { "f3d folder", "View all files in folder" },
+    { f3d+" file.vtu -xtgans", "View a unstructured mesh in a typical nice looking sciviz style" },
+    { f3d+" file.glb -tuqap --hdri=file.hdr", "View a gltf file in a realistic environment" },
+    { f3d+" file.ply -so --point-size=0 --comp=-2", "View a point cloud file with direct scalars rendering" },
+    { f3d+" folder", "View all files in folder" },
   };
   // clang-format on
 
