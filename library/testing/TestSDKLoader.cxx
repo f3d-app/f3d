@@ -44,7 +44,7 @@ int TestSDKLoader(int argc, char* argv[])
 
   load.addFile(dummy).addFile(cow).addFiles(filesVec);
   load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileName, fileInfo);
-  if (filePath != cow)
+  if (filePath != cow || fileName != cowFilename)
   {
     std::cerr << "Unexpected file loaded on LOAD_CURRENT: " << filePath << std::endl;
     return EXIT_FAILURE;
@@ -57,7 +57,7 @@ int TestSDKLoader(int argc, char* argv[])
 
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
   load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileName, fileInfo);
-  if (filePath != suzanne)
+  if (filePath != suzanne || fileName != suzanneFilename)
   {
     std::cerr << "Unexpected file loaded on LOAD_LAST: " << filePath << std::endl;
     return EXIT_FAILURE;
@@ -65,7 +65,7 @@ int TestSDKLoader(int argc, char* argv[])
 
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_FIRST);
   load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileName, fileInfo);
-  if (filePath != cow)
+  if (filePath != cow || fileName != cowFilename)
   {
     std::cerr << "Unexpected file loaded on LOAD_FIRST: " << filePath << std::endl;
     return EXIT_FAILURE;
@@ -73,7 +73,7 @@ int TestSDKLoader(int argc, char* argv[])
 
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_NEXT);
   load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileName, fileInfo);
-  if (filePath != dragon)
+  if (filePath != dragon || fileName != dragonFilename)
   {
     std::cerr << "Unexpected file loaded on LOAD_NEXT: " << filePath << std::endl;
     return EXIT_FAILURE;
@@ -81,7 +81,7 @@ int TestSDKLoader(int argc, char* argv[])
 
   load.loadFile(f3d::loader::LoadFileEnum::LOAD_NEXT);
   load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileName, fileInfo);
-  if (filePath != suzanne)
+  if (filePath != suzanne || fileName != suzanneFilename)
   {
     std::cerr << "Unexpected file loaded on second LOAD_NEXT: " << filePath << std::endl;
     return EXIT_FAILURE;
@@ -97,7 +97,7 @@ int TestSDKLoader(int argc, char* argv[])
   // Check current index
   load.setCurrentFileIndex(1).loadFile();
   load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileName, fileInfo);
-  if (filePath != dragon)
+  if (filePath != dragon || fileName != dragonFilename)
   {
     std::cerr << "Unexpected file loaded on LOAD_CURRENT after setCurrentFileIndex: " << filePath
               << std::endl;
