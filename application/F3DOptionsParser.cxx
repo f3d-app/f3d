@@ -358,15 +358,15 @@ void ConfigurationOptions::PrintHelpPair(
 //----------------------------------------------------------------------------
 void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
 {
-  // clang-format off
-  const std::vector<std::pair<std::string, std::string> > examples =
-  {
-    { this->ExecutableName+" file.vtu -xtgans", "View a unstructured mesh in a typical nice looking sciviz style" },
-    { this->ExecutableName+" file.glb -tuqap --hdri=file.hdr", "View a gltf file in a realistic environment" },
-    { this->ExecutableName+" file.ply -so --point-size=0 --comp=-2", "View a point cloud file with direct scalars rendering" },
-    { this->ExecutableName+" folder", "View all files in folder" },
+  const std::vector<std::pair<std::string, std::string> > examples = {
+    { this->ExecutableName + " file.vtu -xtgans",
+      "View a unstructured mesh in a typical nice looking sciviz style" },
+    { this->ExecutableName + " file.glb -tuqap --hdri=file.hdr",
+      "View a gltf file in a realistic environment" },
+    { this->ExecutableName + " file.ply -so --point-size=0 --comp=-2",
+      "View a point cloud file with direct scalars rendering" },
+    { this->ExecutableName + " folder", "View all files in folder" },
   };
-  // clang-format on
 
   f3d::log::setUseColoring(false);
   f3d::log::info(cxxOptions.help());
