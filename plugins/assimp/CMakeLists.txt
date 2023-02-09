@@ -28,6 +28,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.dae
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "Collada"
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/collada.inl"
 )
 
 f3d_plugin_declare_reader(

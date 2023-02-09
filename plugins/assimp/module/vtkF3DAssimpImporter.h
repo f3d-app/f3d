@@ -62,6 +62,14 @@ public:
    */
   std::string GetOutputsDescription() override;
 
+  ///@{
+  /**
+   * Set/Get collada fixup flag.
+   */
+  vtkSetMacro(ColladaFixup, bool);
+  vtkGetMacro(ColladaFixup, bool);
+  ///@}
+
   /**
    * Get temporal information for the currently enabled animations.
    * the three returned arguments can be defined, or not.
@@ -90,6 +98,7 @@ public:
    * If a negative index is provided, no camera from the importer is used.
    */
   void SetCamera(vtkIdType camIndex) override;
+
 #endif
 
 protected:
@@ -102,6 +111,7 @@ protected:
   void ImportLights(vtkRenderer*) override;
 
   std::string FileName;
+  bool ColladaFixup = false;
 
 private:
   vtkF3DAssimpImporter(const vtkF3DAssimpImporter&) = delete;

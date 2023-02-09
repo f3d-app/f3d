@@ -99,8 +99,9 @@ public:
           light->SetFocalPoint(aLight->mPosition[0] + aLight->mDirection[0],
             aLight->mPosition[1] + aLight->mDirection[1],
             aLight->mPosition[2] + aLight->mDirection[2]);
-          light->SetAttenuationValues(aLight->mAttenuationConstant, aLight->mAttenuationLinear,
-            aLight->mAttenuationQuadratic);
+
+          // XXX There is nothing preventing assimp to provide very high values
+          // but most models with lights seems to be normalized with 1.
           light->SetAmbientColor(
             aLight->mColorAmbient[0], aLight->mColorAmbient[1], aLight->mColorAmbient[2]);
           light->SetDiffuseColor(
@@ -111,28 +112,39 @@ public:
 
           switch (aLight->mType)
           {
-            case aiLightSourceType::aiLightSource_POINT:
-              light->PositionalOn();
-              break;
             case aiLightSourceType::aiLightSource_DIRECTIONAL:
               light->PositionalOff();
               break;
-            case aiLightSourceType::aiLightSource_AMBIENT:
-              light->PositionalOff();
+            case aiLightSourceType::aiLightSource_POINT:
+              light->SetConeAngle(90);
+              light->PositionalOn();
+              // Needed because of https://github.com/assimp/assimp/issues/4948
+              light->SetAttenuationValues(/*aLight->mAttenuationConstant*/ 1.0, aLight->mAttenuationLinear, aLight->mAttenuationQuadratic);
               break;
             case aiLightSourceType::aiLightSource_SPOT:
-              light->SetConeAngle(vtkMath::DegreesFromRadians(aLight->mAngleInnerCone));
+              if (this->Parent->GetColladaFixup())
+              {
+                // Needed because of https://github.com/assimp/assimp/issues/4949
+                light->SetConeAngle(vtkMath::DegreesFromRadians(aLight->mAngleInnerCone)/2);
+              }
+              else
+              {
+                light->SetConeAngle(vtkMath::DegreesFromRadians(aLight->mAngleOuterCone)/2);
+              }
               light->PositionalOn();
+              // Needed because of https://github.com/assimp/assimp/issues/4948
+              light->SetAttenuationValues(/*aLight->mAttenuationConstant*/ 1.0, aLight->mAttenuationLinear, aLight->mAttenuationQuadratic);
               break;
             case aiLightSourceType::aiLightSource_AREA:
+            case aiLightSourceType::aiLightSource_AMBIENT:
             default:
               vtkWarningWithObjectMacro(
                 this->Parent, "Unsupported light type: " << aLight->mName.data);
+              continue;
               break;
           }
 
           renderer->AddLight(light);
-
           this->Lights.push_back({ aLight->mName.data, light });
         }
       }
@@ -737,16 +749,7 @@ public:
   {
     for (auto& light : this->Lights)
     {
-      vtkMatrix4x4* mat = this->NodeGlobalMatrix[light.first];
-
-      double position[4] = { 0.0, 0.0, 0.0, 1.0 };
-      double focal[4] = { 0.0, 0.0, -1.0, 1.0 };
-
-      mat->MultiplyPoint(position, position);
-      mat->MultiplyPoint(focal, focal);
-
-      light.second->SetPosition(position);
-      light.second->SetFocalPoint(focal);
+      light.second->SetTransformMatrix(this->NodeGlobalMatrix[light.first]);
     }
   }
 
