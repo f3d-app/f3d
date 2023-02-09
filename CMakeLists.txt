@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 include(CMakeDependentOption)
 
-project(f3d
+project(F3D
   VERSION "1.3.1"
   DESCRIPTION "F3D - A fast and minimalist 3D viewer"
   LANGUAGES C CXX)

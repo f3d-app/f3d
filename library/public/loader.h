@@ -80,8 +80,8 @@ public:
    * filePath the path to the file and fileInfo a more complete information about the file,
    * including index in list.
    */
-  virtual void getFileInfo(
-    LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const = 0;
+  virtual void getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
+    std::string& fileName, std::string& fileInfo) const = 0;
 
 protected:
   //! @cond
