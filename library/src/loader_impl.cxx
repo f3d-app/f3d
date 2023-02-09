@@ -236,8 +236,8 @@ loader& loader_impl::addFile(const std::string& path, bool recursive)
 }
 
 //----------------------------------------------------------------------------
-void loader_impl::getFileInfo(
-  LoadFileEnum load, int& nextFileIndex, std::string& filePath, std::string& fileInfo) const
+void loader_impl::getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
+  std::string& fileName, std::string& fileInfo) const
 {
   int size = static_cast<int>(this->Internals->FilesList.size());
   if (size > 0)
@@ -273,8 +273,9 @@ void loader_impl::getFileInfo(
     }
 
     filePath = this->Internals->FilesList[nextFileIndex];
-    fileInfo = "(" + std::to_string(nextFileIndex + 1) + "/" + std::to_string(size) + ") " +
-      vtksys::SystemTools::GetFilenameName(filePath);
+    fileName = vtksys::SystemTools::GetFilenameName(filePath);
+    fileInfo =
+      "(" + std::to_string(nextFileIndex + 1) + "/" + std::to_string(size) + ") " + fileName;
   }
   else
   {
@@ -308,9 +309,9 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   this->Internals->LoadedFile = false;
 
   // Recover information about the file to load
-  std::string filePath, fileInfo;
+  std::string filePath, fileName, fileInfo;
   int nextFileIndex;
-  this->getFileInfo(load, nextFileIndex, filePath, fileInfo);
+  this->getFileInfo(load, nextFileIndex, filePath, fileName, fileInfo);
 
   if (filePath.empty())
   {
