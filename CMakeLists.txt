@@ -166,7 +166,7 @@ endif()
 if(WIN32)
   option(F3D_WINDOWS_INSTALL_LOGOS_FOR_NSIS_PACKAGING "Install logos for nsis packaging" OFF)
   mark_as_advanced(F3D_WINDOWS_INSTALL_LOGOS_FOR_NSIS_PACKAGING)
-  option(F3D_WINDOWS_RESOURCES_INSTALL_DIR "Specify a directory to install resources to instead of root" "")
+  set(F3D_WINDOWS_RESOURCES_INSTALL_DIR "" CACHE STRING "Specify a directory to install resources to instead of root")
   mark_as_advanced(F3D_WINDOWS_RESOURCES_INSTALL_DIR)
 endif()
 
