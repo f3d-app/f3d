@@ -185,7 +185,7 @@ if(F3D_INSTALL_SDK OR BUILD_SHARED_LIBS)
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT library
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${CMAKE_PROJECT_NAME} COMPONENT headers)
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/f3d COMPONENT headers)
 endif()
 
 if(F3D_INSTALL_SDK)
@@ -197,7 +197,7 @@ if(F3D_INSTALL_SDK)
   include(CMakePackageConfigHelpers)
   configure_package_config_file(
     "${CMAKE_SOURCE_DIR}/cmake/f3dConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
-    INSTALL_DESTINATION "lib/cmake/${PROJECT_NAME}")
+    INSTALL_DESTINATION "lib/cmake/f3d")
   write_basic_package_version_file(
     "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
     VERSION "${PROJECT_VERSION}"
@@ -218,7 +218,7 @@ if(F3D_INSTALL_SDK)
   install(
     FILES ${sdk_cmake_files}
     DESTINATION
-      "lib/cmake/${PROJECT_NAME}"
+      "lib/cmake/f3d"
     COMPONENT cmake)
 
 endif()
