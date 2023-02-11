@@ -287,6 +287,8 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.1.0")
       f3d_test(NAME TestEmbeddedTextureFBX DATA texturedCube.fbx ARGS --load-plugins=assimp)
       f3d_test(NAME TestInteractionFBXAnim DATA animatedWorld.fbx ARGS --load-plugins=assimp INTERACTION) #Space;Space;
+      f3d_test(NAME TestInteractionFBXLights DATA animatedLights.fbx ARGS --load-plugins=assimp INTERACTION) #Space;Space;
+      f3d_test(NAME TestInteractionDAELights DATA animatedLights.dae ARGS --load-plugins=assimp INTERACTION) #Space;Space;
     endif()
   endif()
 
