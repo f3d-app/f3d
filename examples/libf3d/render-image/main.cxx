@@ -1,7 +1,7 @@
 #include <f3d/engine.h>
 #include <f3d/image.h>
-#include <f3d/window.h>
 #include <f3d/log.h>
+#include <f3d/window.h>
 
 #include <iostream>
 

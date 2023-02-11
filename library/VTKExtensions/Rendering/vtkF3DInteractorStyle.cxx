@@ -8,9 +8,9 @@
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkRendererCollection.h>
 #include <vtkSkybox.h>
 #include <vtkStringArray.h>
-#include <vtkRendererCollection.h>
 
 vtkStandardNewMacro(vtkF3DInteractorStyle);
 
@@ -148,7 +148,7 @@ void vtkF3DInteractorStyle::EnvironmentRotate()
     this->Interactor->Render();
   }
 }
-  
+
 //------------------------------------------------------------------------------
 void vtkF3DInteractorStyle::UpdateRendererAfterInteraction()
 {
@@ -174,5 +174,5 @@ void vtkF3DInteractorStyle::UpdateRendererAfterInteraction()
 void vtkF3DInteractorStyle::FindPokedRenderer(int vtkNotUsed(x), int vtkNotUsed(y))
 {
   // No need for picking, F3D interaction are only with the first renderer
-  this->SetCurrentRenderer(this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer()); 
+  this->SetCurrentRenderer(this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
 }
