@@ -68,6 +68,14 @@ public:
    */
   void InitializeAnimation(vtkImporter* importer);
 
+  /**
+   * Implementation only API
+   * Forward to vtkF3DInteractorStyle so that
+   * it update the renderer as needed, especially
+   * the camera clipping range.
+   */
+  void UpdateRendererAfterInteraction();
+
 private:
   class internals;
   std::unique_ptr<internals> Internals;

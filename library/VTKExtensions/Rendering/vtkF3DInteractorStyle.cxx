@@ -10,6 +10,7 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSkybox.h>
 #include <vtkStringArray.h>
+#include <vtkRendererCollection.h>
 
 vtkStandardNewMacro(vtkF3DInteractorStyle);
 
@@ -81,15 +82,7 @@ void vtkF3DInteractorStyle::Rotate()
     camera->OrthogonalizeViewUp();
   }
 
-  if (this->AutoAdjustCameraClippingRange)
-  {
-    this->CurrentRenderer->ResetCameraClippingRange();
-  }
-
-  if (rwi->GetLightFollowCamera())
-  {
-    this->CurrentRenderer->UpdateLightsGeometryToFollowCamera();
-  }
+  this->UpdateRendererAfterInteraction();
 
   rwi->Render();
 }
@@ -154,4 +147,32 @@ void vtkF3DInteractorStyle::EnvironmentRotate()
 
     this->Interactor->Render();
   }
+}
+  
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::UpdateRendererAfterInteraction()
+{
+  // Make sure this->CurrentRenderer is set
+  this->FindPokedRenderer(0, 0);
+
+  if (this->CurrentRenderer)
+  {
+    if (this->AutoAdjustCameraClippingRange)
+    {
+      this->CurrentRenderer->ResetCameraClippingRange();
+    }
+
+    vtkRenderWindowInteractor* rwi = this->Interactor;
+    if (rwi->GetLightFollowCamera())
+    {
+      this->CurrentRenderer->UpdateLightsGeometryToFollowCamera();
+    }
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::FindPokedRenderer(int vtkNotUsed(x), int vtkNotUsed(y))
+{
+  // No need for picking, F3D interaction are only with the first renderer
+  this->SetCurrentRenderer(this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer()); 
 }
