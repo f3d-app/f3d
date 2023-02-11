@@ -288,6 +288,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
       f3d_test(NAME TestEmbeddedTextureFBX DATA texturedCube.fbx ARGS --load-plugins=assimp)
       f3d_test(NAME TestInteractionFBXAnim DATA animatedWorld.fbx ARGS --load-plugins=assimp INTERACTION) #Space;Space;
       f3d_test(NAME TestInteractionFBXLights DATA animatedLights.fbx ARGS --load-plugins=assimp INTERACTION) #Space;Space;
+      f3d_test(NAME TestInteractionFBXCamera DATA animatedCamera.fbx ARGS --load-plugins=assimp --camera-index=0 --animation-index=0 INTERACTION) #Space;Space;
       f3d_test(NAME TestInteractionDAELights DATA animatedLights.dae ARGS --load-plugins=assimp INTERACTION) #Space;Space;
     endif()
   endif()
