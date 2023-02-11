@@ -122,21 +122,23 @@ public:
               light->SetConeAngle(90);
               light->PositionalOn();
               // Needed because of https://github.com/assimp/assimp/issues/4948
-              light->SetAttenuationValues(/*aLight->mAttenuationConstant*/ 1.0, aLight->mAttenuationLinear, aLight->mAttenuationQuadratic);
+              light->SetAttenuationValues(/*aLight->mAttenuationConstant*/ 1.0,
+                aLight->mAttenuationLinear, aLight->mAttenuationQuadratic);
               break;
             case aiLightSourceType::aiLightSource_SPOT:
               if (this->Parent->GetColladaFixup())
               {
                 // Needed because of https://github.com/assimp/assimp/issues/4949
-                light->SetConeAngle(vtkMath::DegreesFromRadians(aLight->mAngleInnerCone)/2);
+                light->SetConeAngle(vtkMath::DegreesFromRadians(aLight->mAngleInnerCone) / 2);
               }
               else
               {
-                light->SetConeAngle(vtkMath::DegreesFromRadians(aLight->mAngleOuterCone)/2);
+                light->SetConeAngle(vtkMath::DegreesFromRadians(aLight->mAngleOuterCone) / 2);
               }
               light->PositionalOn();
               // Needed because of https://github.com/assimp/assimp/issues/4948
-              light->SetAttenuationValues(/*aLight->mAttenuationConstant*/ 1.0, aLight->mAttenuationLinear, aLight->mAttenuationQuadratic);
+              light->SetAttenuationValues(/*aLight->mAttenuationConstant*/ 1.0,
+                aLight->mAttenuationLinear, aLight->mAttenuationQuadratic);
               break;
             case aiLightSourceType::aiLightSource_AREA:
             case aiLightSourceType::aiLightSource_AMBIENT:
@@ -733,7 +735,7 @@ public:
 
       // Transform the camera
       cam.second.second->ApplyTransform(transform);
-   }
+    }
   }
 
   //----------------------------------------------------------------------------
@@ -827,7 +829,9 @@ public:
   std::vector<vtkSmartPointer<vtkTexture> > EmbeddedTextures;
   vtkIdType ActiveAnimation = 0;
   std::vector<std::pair<std::string, vtkSmartPointer<vtkLight> > > Lights;
-  std::vector<std::pair<std::string, std::pair<vtkSmartPointer<vtkCamera>, vtkSmartPointer<vtkCamera> > > > Cameras;
+  std::vector<
+    std::pair<std::string, std::pair<vtkSmartPointer<vtkCamera>, vtkSmartPointer<vtkCamera> > > >
+    Cameras;
   vtkIdType ActiveCameraIndex = -1;
   std::unordered_map<std::string, vtkSmartPointer<vtkActorCollection> > NodeActors;
   std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4> > NodeLocalMatrix;

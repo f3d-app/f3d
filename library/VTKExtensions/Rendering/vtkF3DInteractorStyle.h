@@ -84,6 +84,7 @@ public:
    * reasons.
    */
   void FindPokedRenderer(int vtkNotUsed(x), int vtkNotUsed(y));
+
 protected:
   /**
    * Overridden to support being disabled
