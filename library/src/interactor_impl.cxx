@@ -620,4 +620,10 @@ void interactor_impl::InitializeAnimation(vtkImporter* importer)
   this->Internals->AnimationManager.Initialize(
     &this->Internals->Options, this, &this->Internals->Window, importer);
 }
+
+//----------------------------------------------------------------------------
+void interactor_impl::UpdateRendererAfterInteraction()
+{
+  this->Internals->Style->UpdateRendererAfterInteraction();
+}
 }

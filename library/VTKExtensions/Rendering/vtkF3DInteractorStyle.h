@@ -71,6 +71,20 @@ public:
   vtkGetMacro(CameraMovementDisabled, bool);
   ///@}
 
+  /**
+   * Update the renderer as needed, especially
+   * the camera clipping range
+   */
+  void UpdateRendererAfterInteraction();
+
+  /**
+   * Reimplemented to always return the first
+   * renderer as this is the only one used
+   * for interaction. This is needed for performance
+   * reasons.
+   */
+  void FindPokedRenderer(int vtkNotUsed(x), int vtkNotUsed(y));
+
 protected:
   /**
    * Overridden to support being disabled
