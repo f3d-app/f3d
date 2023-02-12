@@ -15,6 +15,7 @@
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkPolyDataTangents.h>
 #include <vtkProperty.h>
 #include <vtkQuaternion.h>
 #include <vtkRenderer.h>
@@ -23,6 +24,7 @@
 #include <vtkStringArray.h>
 #include <vtkTexture.h>
 #include <vtkTransform.h>
+#include <vtkTriangleFilter.h>
 #include <vtkUniforms.h>
 #include <vtkUnsignedShortArray.h>
 
@@ -551,6 +553,20 @@ public:
 
       polyData->GetFieldData()->AddArray(bonesList);
       polyData->GetFieldData()->AddArray(bonesTransform);
+    }
+
+    if (mesh->HasNormals() && mesh->HasTextureCoords(0) && !mesh->HasTangentsAndBitangents())
+    {
+      // Let's compute tangents ourselves
+      vtkNew<vtkTriangleFilter> triangulate;
+      triangulate->SetInputData(polyData);
+
+      vtkNew<vtkPolyDataTangents> computeTangents;
+      computeTangents->SetInputConnection(triangulate->GetOutputPort());
+
+      computeTangents->Update();
+
+      return computeTangents->GetOutput();
     }
 
     return polyData;
