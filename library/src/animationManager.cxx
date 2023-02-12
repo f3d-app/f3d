@@ -192,6 +192,7 @@ void animationManager::Tick()
       static_cast<double>(this->TimeSteps.size() - 1));
 
     this->Importer->UpdateTimeStep(*this->CurrentTimeStep);
+    this->Interactor->UpdateRendererAfterInteraction();
     this->Window->render();
 
     ++this->CurrentTimeStep;

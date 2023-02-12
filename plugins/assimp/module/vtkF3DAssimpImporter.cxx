@@ -62,16 +62,19 @@ public:
         vCam->SetViewUp(aCam->mUp[0], aCam->mUp[1], aCam->mUp[2]);
         vCam->SetFocalPoint(aCam->mPosition[0] + aCam->mLookAt[0],
           aCam->mPosition[1] + aCam->mLookAt[1], aCam->mPosition[2] + aCam->mLookAt[2]);
-        this->Cameras.push_back({ aCam->mName.data, vCam });
+
+        // Store the non transformed camera alongside another camera that will be initialized later
+        vtkNew<vtkCamera> transformedCam;
+        this->Cameras.push_back({ aCam->mName.data, { vCam, transformedCam } });
       }
 
-      // update camera global matrix nodes
+      // update transformed camera using global matrix nodes and non transformed cameras
       this->UpdateCameras();
 
       if (this->ActiveCameraIndex >= 0 &&
         this->ActiveCameraIndex < static_cast<vtkIdType>(this->Cameras.size()))
       {
-        renderer->SetActiveCamera(this->Cameras[this->ActiveCameraIndex].second);
+        renderer->SetActiveCamera(this->Cameras[this->ActiveCameraIndex].second.second);
       }
     }
   }
@@ -119,21 +122,23 @@ public:
               light->SetConeAngle(90);
               light->PositionalOn();
               // Needed because of https://github.com/assimp/assimp/issues/4948
-              light->SetAttenuationValues(/*aLight->mAttenuationConstant*/ 1.0, aLight->mAttenuationLinear, aLight->mAttenuationQuadratic);
+              light->SetAttenuationValues(/*aLight->mAttenuationConstant*/ 1.0,
+                aLight->mAttenuationLinear, aLight->mAttenuationQuadratic);
               break;
             case aiLightSourceType::aiLightSource_SPOT:
               if (this->Parent->GetColladaFixup())
               {
                 // Needed because of https://github.com/assimp/assimp/issues/4949
-                light->SetConeAngle(vtkMath::DegreesFromRadians(aLight->mAngleInnerCone)/2);
+                light->SetConeAngle(vtkMath::DegreesFromRadians(aLight->mAngleInnerCone) / 2);
               }
               else
               {
-                light->SetConeAngle(vtkMath::DegreesFromRadians(aLight->mAngleOuterCone)/2);
+                light->SetConeAngle(vtkMath::DegreesFromRadians(aLight->mAngleOuterCone) / 2);
               }
               light->PositionalOn();
               // Needed because of https://github.com/assimp/assimp/issues/4948
-              light->SetAttenuationValues(/*aLight->mAttenuationConstant*/ 1.0, aLight->mAttenuationLinear, aLight->mAttenuationQuadratic);
+              light->SetAttenuationValues(/*aLight->mAttenuationConstant*/ 1.0,
+                aLight->mAttenuationLinear, aLight->mAttenuationQuadratic);
               break;
             case aiLightSourceType::aiLightSource_AREA:
             case aiLightSourceType::aiLightSource_AMBIENT:
@@ -717,27 +722,19 @@ public:
     }
   }
 
-  //----------------------------------------------------------------------------
-  /**
-   * Update cameras position
-   */
   void UpdateCameras()
   {
     for (auto& cam : this->Cameras)
     {
       vtkMatrix4x4* mat = this->NodeGlobalMatrix[cam.first];
+      vtkNew<vtkTransform> transform;
+      transform->SetMatrix(mat);
 
-      double position[4] = { 0.0, 0.0, 0.0, 1.0 };
-      double up[4] = { 0.0, 1.0, 0.0, 0.0 };
-      double focal[4] = { 0.0, 0.0, -1.0, 1.0 };
+      // Copy non transformed camera into transformed camera
+      cam.second.second->DeepCopy(cam.second.first);
 
-      mat->MultiplyPoint(position, position);
-      mat->MultiplyPoint(up, up);
-      mat->MultiplyPoint(focal, focal);
-
-      cam.second->SetPosition(position);
-      cam.second->SetViewUp(up);
-      cam.second->SetFocalPoint(focal);
+      // Transform the camera
+      cam.second.second->ApplyTransform(transform);
     }
   }
 
@@ -832,7 +829,9 @@ public:
   std::vector<vtkSmartPointer<vtkTexture> > EmbeddedTextures;
   vtkIdType ActiveAnimation = 0;
   std::vector<std::pair<std::string, vtkSmartPointer<vtkLight> > > Lights;
-  std::vector<std::pair<std::string, vtkSmartPointer<vtkCamera> > > Cameras;
+  std::vector<
+    std::pair<std::string, std::pair<vtkSmartPointer<vtkCamera>, vtkSmartPointer<vtkCamera> > > >
+    Cameras;
   vtkIdType ActiveCameraIndex = -1;
   std::unordered_map<std::string, vtkSmartPointer<vtkActorCollection> > NodeActors;
   std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4> > NodeLocalMatrix;
