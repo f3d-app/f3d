@@ -91,8 +91,6 @@ public:
 
       if (nbLights > 0)
       {
-        renderer->AutomaticLightCreationOff();
-
         for (int i = 0; i < nbLights; i++)
         {
           aiLight* aLight = this->Scene->mLights[i];
