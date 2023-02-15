@@ -1,6 +1,7 @@
 #include "vtkF3DRenderPass.h"
 
 #include "vtkF3DConfigure.h"
+#include "vtkF3DHexagonalBokehBlurPass.h"
 
 #include <vtkBoundingBox.h>
 #include <vtkCameraPass.h>
@@ -98,8 +99,18 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   vtkNew<vtkCameraPass> bgCamP;
   bgCamP->SetDelegatePass(bgP);
   this->BackgroundPass = vtkSmartPointer<vtkFramebufferPass>::New();
-  this->BackgroundPass->SetDelegatePass(bgCamP);
   this->BackgroundPass->SetColorFormat(vtkTextureObject::Float32);
+
+  if (this->UseBlurBackground)
+  {
+    vtkNew<vtkF3DHexagonalBokehBlurPass> blur;
+    blur->SetDelegatePass(bgCamP);
+    this->BackgroundPass->SetDelegatePass(blur);
+  }
+  else
+  {
+    this->BackgroundPass->SetDelegatePass(bgCamP);
+  }
 
   // main pass
   if (F3D_MODULE_RAYTRACING && this->UseRaytracing)
@@ -230,38 +241,13 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
     std::stringstream ssDecl;
     ssDecl << "uniform sampler2D texBackground;\n"
               "uniform sampler2D texMain;\n"
-              "#define SAMPLES 200\n"
-              "#define GOLDEN_ANGLE 2.399963\n"
-              "vec3 BokehBlur(vec2 tcoords, float radius)"
-              "{\n"
-              "  ivec2 textureSize = textureSize(texBackground, 0);\n"
-              "  float ratio = float(textureSize.x) / float(textureSize.y);\n"
-              "  vec3 acc = vec3(0.0);\n"
-              "  float factor = radius / sqrt(float(SAMPLES));\n"
-              "  for (int i = 0; i < SAMPLES; i++)\n"
-              "  {\n"
-              "    float theta = float(i) * GOLDEN_ANGLE;\n"
-              "    float r = factor * sqrt(float(i));\n"
-              "    vec2 pt = vec2(r * cos(theta) / ratio, r * sin(theta));\n"
-              "    vec3 col = texture(texBackground, tcoords + pt).rgb;\n"
-              "    acc += col;\n"
-              "  }\n"
-              "  return acc / vec3(SAMPLES);\n"
-              "}\n"
               "//VTK::FSQ::Decl";
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl", ssDecl.str());
 
     std::stringstream ssImpl;
     ssImpl << "  vec4 mainSample = texture(texMain, texCoord);\n";
-    if (this->UseBlurBackground)
-    {
-      ssImpl << "  vec3 bgCol = BokehBlur(texCoord, 0.05);\n";
-    }
-    else
-    {
-      ssImpl << "  vec3 bgCol = texture(texBackground, texCoord).rgb;\n";
-    }
+    ssImpl << "  vec3 bgCol = texture(texBackground, texCoord).rgb;\n";
     ssImpl << "  vec3 result = mix(bgCol, mainSample.rgb, mainSample.a);\n";
 
     if (this->ForceOpaqueBackground)
