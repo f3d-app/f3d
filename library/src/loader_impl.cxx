@@ -13,8 +13,6 @@
 #include <vtkProgressBarWidget.h>
 #include <vtkTimerLog.h>
 #include <vtkVersion.h>
-#include <vtksys/Directory.hxx>
-#include <vtksys/SystemTools.hxx>
 
 #include <algorithm>
 #include <vector>
@@ -150,10 +148,6 @@ public:
     log::debug(importer->GetOutputsDescription(), "\n");
   }
 
-  std::vector<std::string> FilesList;
-  int CurrentFileIndex = 0;
-  bool LoadedFile = false;
-
   const options& Options;
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
@@ -171,160 +165,21 @@ loader_impl::loader_impl(const options& options, window_impl& window)
 loader_impl::~loader_impl() = default;
 
 //----------------------------------------------------------------------------
-loader& loader_impl::addFiles(const std::vector<std::string>& files, bool recursive)
+bool loader_impl::loadFile(const std::string& filePath, const std::string& fileInfo)
 {
-  for (auto& file : files)
-  {
-    this->addFile(file, recursive);
-  }
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-loader& loader_impl::addFile(const std::string& path, bool recursive)
-{
-  if (path.empty())
-  {
-    return *this;
-  }
-
-  std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
-  if (!vtksys::SystemTools::FileExists(fullPath))
-  {
-    log::error("File ", fullPath, " does not exist");
-    return *this;
-  }
-
-  if (vtksys::SystemTools::FileIsDirectory(fullPath))
-  {
-    vtksys::Directory dir;
-    dir.Load(fullPath);
-    std::vector<std::string> sortedFiles;
-    sortedFiles.reserve(dir.GetNumberOfFiles());
-
-    // Sorting is necessary as KWSys can provide unsorted files
-    for (unsigned long i = 0; i < dir.GetNumberOfFiles(); i++)
-    {
-      std::string currentFile = dir.GetFile(i);
-      if (currentFile != "." && currentFile != "..")
-      {
-        sortedFiles.push_back(currentFile);
-      }
-    }
-    std::sort(sortedFiles.begin(), sortedFiles.end());
-
-    for (std::string currentFile : sortedFiles)
-    {
-      std::string newPath = vtksys::SystemTools::JoinPath({ "", fullPath, currentFile });
-      if (recursive || !vtksys::SystemTools::FileIsDirectory(newPath))
-      {
-        this->addFile(newPath, recursive);
-      }
-    }
-  }
-  else
-  {
-    auto it =
-      std::find(this->Internals->FilesList.begin(), this->Internals->FilesList.end(), fullPath);
-
-    if (it == this->Internals->FilesList.end())
-    {
-      this->Internals->FilesList.push_back(fullPath);
-    }
-  }
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-void loader_impl::getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
-  std::string& fileName, std::string& fileInfo) const
-{
-  int size = static_cast<int>(this->Internals->FilesList.size());
-  if (size > 0)
-  {
-    int addToIndex = 0;
-    bool compute = true;
-    switch (load)
-    {
-      case loader::LoadFileEnum::LOAD_FIRST:
-        nextFileIndex = 0;
-        compute = false;
-        break;
-      case loader::LoadFileEnum::LOAD_LAST:
-        nextFileIndex = size - 1;
-        compute = false;
-        break;
-      case loader::LoadFileEnum::LOAD_PREVIOUS:
-        addToIndex = -1;
-        break;
-      case loader::LoadFileEnum::LOAD_NEXT:
-        addToIndex = 1;
-        break;
-      case loader::LoadFileEnum::LOAD_CURRENT:
-      default:
-        break;
-    }
-
-    // Compute the correct file index if needed
-    if (compute)
-    {
-      nextFileIndex = (this->Internals->CurrentFileIndex + addToIndex) % size;
-      nextFileIndex = nextFileIndex < 0 ? nextFileIndex + size : nextFileIndex;
-    }
-
-    filePath = this->Internals->FilesList[nextFileIndex];
-    fileName = vtksys::SystemTools::GetFilenameName(filePath);
-    fileInfo =
-      "(" + std::to_string(nextFileIndex + 1) + "/" + std::to_string(size) + ") " + fileName;
-  }
-  else
-  {
-    nextFileIndex = -1;
-  }
-}
-
-//----------------------------------------------------------------------------
-const std::vector<std::string>& loader_impl::getFiles() const
-{
-  return this->Internals->FilesList;
-}
-
-//----------------------------------------------------------------------------
-loader& loader_impl::setCurrentFileIndex(int index)
-{
-  this->Internals->CurrentFileIndex = index;
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-int loader_impl::getCurrentFileIndex() const
-{
-  return this->Internals->CurrentFileIndex;
-}
-
-//----------------------------------------------------------------------------
-bool loader_impl::loadFile(loader::LoadFileEnum load)
-{
-  // Reset loadedFile
-  this->Internals->LoadedFile = false;
-
-  // Recover information about the file to load
-  std::string filePath, fileName, fileInfo;
-  int nextFileIndex;
-  this->getFileInfo(load, nextFileIndex, filePath, fileName, fileInfo);
-
   if (filePath.empty())
   {
     // No file provided, show a drop zone instead
     log::debug("No file to load provided\n");
-    fileInfo += "No file to load provided, please drop one into this window";
-    this->Internals->Window.Initialize(false, fileInfo);
-    return this->Internals->LoadedFile;
+    this->Internals->Window.Initialize(
+      false, fileInfo + "No file to load provided, please drop one into this window");
+    return false;
   }
+
+  // TODO empty fileinfo
 
   // There is a file to load, update CurrentFileIndex
   log::debug("Loading: ", filePath, "\n");
-  this->Internals->CurrentFileIndex = nextFileIndex;
 
   // Recover the importer
   this->Internals->Importer = loader_impl::internals::GetImporter(
@@ -334,9 +189,8 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   if (!this->Internals->Importer)
   {
     log::warn(filePath, " is not a file of a supported file format\n");
-    fileInfo += " [UNSUPPORTED]";
-    this->Internals->Window.Initialize(false, fileInfo);
-    return this->Internals->LoadedFile;
+    this->Internals->Window.Initialize(false, fileInfo + " [UNSUPPORTED]");
+    return false;
   }
 
   vtkNew<vtkProgressBarWidget> progressWidget;
@@ -407,8 +261,8 @@ bool loader_impl::loadFile(loader::LoadFileEnum load)
   this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
   this->Internals->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
 
-  this->Internals->LoadedFile = true;
-  return this->Internals->LoadedFile;
+  return true;
+  ;
 }
 
 //----------------------------------------------------------------------------

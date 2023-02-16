@@ -232,28 +232,28 @@ public:
         self->Window.PrintSceneDescription(log::VerboseLevel::INFO);
         break;
       default:
-        if (keySym == "Left")
-        {
-          self->AnimationManager.StopAnimation();
-          loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_PREVIOUS;
-          self->Loader.loadFile(load);
-          render = true;
-        }
-        else if (keySym == "Right")
-        {
-          self->AnimationManager.StopAnimation();
-          loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_NEXT;
-          self->Loader.loadFile(load);
-          render = true;
-        }
-        else if (keySym == "Up")
-        {
-          self->AnimationManager.StopAnimation();
-          loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_CURRENT;
-          self->Loader.loadFile(load);
-          render = true;
-        }
-        else if (keySym == F3D_EXIT_HOTKEY_SYM)
+        /*        if (keySym == "Left")
+                {
+                  self->AnimationManager.StopAnimation();
+                  loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_PREVIOUS;
+                  self->Loader.loadFile(load);
+                  render = true;
+                }
+                else if (keySym == "Right")
+                {
+                  self->AnimationManager.StopAnimation();
+                  loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_NEXT;
+                  self->Loader.loadFile(load);
+                  render = true;
+                }
+                else if (keySym == "Up")
+                {
+                  self->AnimationManager.StopAnimation();
+                  loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_CURRENT;
+                  self->Loader.loadFile(load);
+                  render = true;
+                }*/
+        if (keySym == F3D_EXIT_HOTKEY_SYM)
         {
           self->StopInteractor();
         }
@@ -297,14 +297,13 @@ public:
       return;
     }
 
-    // No user defined behavior, use standard behavior
-    self->AnimationManager.StopAnimation();
-    for (std::string file : filesVec)
+    // No user defined behavior, load the first file
+    if (filesVec.size() > 0)
     {
-      self->Loader.addFile(file);
+      self->AnimationManager.StopAnimation();
+      self->Loader.loadFile(filesVec[0]);
+      self->Window.render();
     }
-    self->Loader.loadFile(loader::LoadFileEnum::LOAD_LAST);
-    self->Window.render();
   }
 
   static void OnMiddleButtonPress(vtkObject*, unsigned long, void* clientData, void*)

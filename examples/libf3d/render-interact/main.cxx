@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 
   // Load a model
   f3d::loader& load = eng.getLoader();
-  load.addFile(std::string(argv[1])).loadFile();
+  load.loadFile(std::string(argv[1]));
 
   // Render
   f3d::window& win = eng.getWindow();

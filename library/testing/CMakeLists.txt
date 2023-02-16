@@ -13,7 +13,6 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   list(APPEND libf3dSDKTests_list
     TestSDKCompareWithFile.cxx
     TestSDKImage.cxx
-    TestSDKInteractionDirectory.cxx
     TestSDKWindowNative.cxx
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx

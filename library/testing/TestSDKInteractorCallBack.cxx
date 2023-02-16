@@ -56,8 +56,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     {
       std::string path = filesVec[0];
       size_t found = path.find_last_of("/\\");
-      load.addFile(path.substr(0, found + 1) + "suzanne.ply")
-        .loadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
+      load.loadFile(path.substr(0, found + 1) + "suzanne.ply");
       win.render();
       return true;
     });

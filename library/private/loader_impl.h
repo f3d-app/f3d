@@ -30,19 +30,7 @@ public:
    */
   loader_impl(const options& options, window_impl& window);
   ~loader_impl();
-
-  loader& addFiles(const std::vector<std::string>& files, bool recursive = false) override;
-  loader& addFile(const std::string& path, bool recursive = false) override;
-
-  const std::vector<std::string>& getFiles() const override;
-
-  loader& setCurrentFileIndex(int index) override;
-  int getCurrentFileIndex() const override;
-
-  bool loadFile(LoadFileEnum load) override;
-
-  void getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
-    std::string& fileName, std::string& fileInfo) const override;
+  bool loadFile(const std::string& filePath, const std::string& fileInfo = "") override;
   ///@}
 
   /**

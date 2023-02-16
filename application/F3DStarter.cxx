@@ -12,6 +12,7 @@
 #include "window.h"
 
 #include <filesystem>
+#include <set>
 
 class F3DStarter::F3DInternals
 {
@@ -53,6 +54,8 @@ public:
   f3d::options DynamicOptions;
   f3d::options FileOptions;
   std::unique_ptr<f3d::engine> Engine;
+  std::vector<std::string> FilesList; // TODO switch to path ?
+  int CurrentFileIndex = 0;
   bool LoadedFile = false;
   bool UpdateWithCommandLineParsing = true;
 };
@@ -65,12 +68,6 @@ F3DStarter::F3DStarter()
 
 //----------------------------------------------------------------------------
 F3DStarter::~F3DStarter() = default;
-
-//----------------------------------------------------------------------------
-void F3DStarter::AddFile(const std::string& path)
-{
-  this->Internals->Engine->getLoader().addFile(path);
-}
 
 //----------------------------------------------------------------------------
 int F3DStarter::Start(int argc, char** argv)
@@ -140,7 +137,7 @@ int F3DStarter::Start(int argc, char** argv)
         if (keySym == "Left")
         {
           this->Internals->Engine->getInteractor().stopAnimation();
-          f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_PREVIOUS;
+          LoadFileEnum load = LoadFileEnum::LOAD_PREVIOUS;
           this->LoadFile(load);
           this->Render();
           return true;
@@ -148,7 +145,7 @@ int F3DStarter::Start(int argc, char** argv)
         else if (keySym == "Right")
         {
           this->Internals->Engine->getInteractor().stopAnimation();
-          f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_NEXT;
+          LoadFileEnum load = LoadFileEnum::LOAD_NEXT;
           this->LoadFile(load);
           this->Render();
           return true;
@@ -156,7 +153,7 @@ int F3DStarter::Start(int argc, char** argv)
         else if (keySym == "Up")
         {
           this->Internals->Engine->getInteractor().stopAnimation();
-          f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_CURRENT;
+          LoadFileEnum load = LoadFileEnum::LOAD_CURRENT;
           this->LoadFile(load);
           this->Render();
           return true;
@@ -172,7 +169,7 @@ int F3DStarter::Start(int argc, char** argv)
         {
           this->AddFile(file);
         }
-        this->LoadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
+        this->LoadFile(LoadFileEnum::LOAD_LAST);
         this->Render();
         return true;
       });
@@ -197,8 +194,13 @@ int F3DStarter::Start(int argc, char** argv)
 #endif
   }
 
-  // Add and load file
-  this->Internals->Engine->getLoader().addFiles(files);
+  // Add all files
+  for (auto& file : files)
+  {
+    this->AddFile(file);
+  }
+
+  // Load a file
   this->LoadFile();
 
   if (!this->Internals->AppOptions.NoRender)
@@ -307,7 +309,7 @@ int F3DStarter::Start(int argc, char** argv)
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
+void F3DStarter::LoadFile(LoadFileEnum load)
 {
   if (this->Internals->LoadedFile)
   {
@@ -330,10 +332,33 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
     }
   }
 
-  // Recover info about the file to be loaded
-  int index;
+  // Recover file information
   std::string filePath, fileName, fileInfo;
-  this->Internals->Engine->getLoader().getFileInfo(load, index, filePath, fileName, fileInfo);
+  int size = static_cast<int>(this->Internals->FilesList.size());
+  if (size > 0)
+  {
+    if (load == LoadFileEnum::LOAD_LAST)
+    {
+      this->Internals->CurrentFileIndex = size - 1;
+    }
+    else
+    {
+      this->Internals->CurrentFileIndex += load;
+      this->Internals->CurrentFileIndex %= size;
+      this->Internals->CurrentFileIndex = this->Internals->CurrentFileIndex < 0
+        ? this->Internals->CurrentFileIndex + size
+        : this->Internals->CurrentFileIndex;
+    }
+
+    filePath = this->Internals->FilesList[this->Internals->CurrentFileIndex];
+    fileName = std::filesystem::path(filePath).filename().string();
+    fileInfo = "(" + std::to_string(this->Internals->CurrentFileIndex + 1) + "/" +
+      std::to_string(size) + ") " + fileName;
+  }
+  else
+  {
+    this->Internals->CurrentFileIndex = -1;
+  }
 
   // Update options for the file to load, using dynamic options as default
   this->Internals->FileOptions = this->Internals->DynamicOptions;
@@ -354,7 +379,7 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
   else
   {
     // Load the file
-    this->Internals->LoadedFile = this->Internals->Engine->getLoader().loadFile(load);
+    this->Internals->LoadedFile = this->Internals->Engine->getLoader().loadFile(filePath, fileInfo);
 
     if (!this->Internals->AppOptions.NoRender)
     {
@@ -373,4 +398,46 @@ void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
 void F3DStarter::Render()
 {
   this->Internals->Engine->getWindow().render();
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::AddFile(const std::string& filePath)
+{
+  if (filePath.empty())
+  {
+    return;
+  }
+
+  std::filesystem::path path(filePath);
+  path = std::filesystem::absolute(path);
+
+  if (!std::filesystem::exists(path))
+  {
+    f3d::log::error("File ", path, " does not exist");
+    return;
+  }
+
+  if (std::filesystem::is_directory(path))
+  {
+    std::set<std::filesystem::path> sortedPaths;
+    for (const auto& entry : std::filesystem::directory_iterator(path))
+    {
+      sortedPaths.insert(entry.path());
+    }
+    for (auto& entryPath : sortedPaths)
+    {
+      // Recursively add all files
+      this->AddFile(entryPath.string());
+    }
+  }
+  else
+  {
+    auto it = std::find(
+      this->Internals->FilesList.begin(), this->Internals->FilesList.end(), path.string());
+
+    if (it == this->Internals->FilesList.end())
+    {
+      this->Internals->FilesList.push_back(path.string());
+    }
+  }
 }

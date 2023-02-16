@@ -22,6 +22,7 @@ f3d::engine::autoloadPlugins();
 f3d::engine eng();
 
 // Add a file to the loader and load it
+// TODO
 eng.getLoader().addFile("path/to/file.ext").loadFile();
 
 // Start rendering and interacting
@@ -43,6 +44,7 @@ f3d::engine::autoloadPlugins();
 f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
 
 // Add a file to the loader and load it
+// TODO
 eng.getLoader().addFile("path/to/file.ext").loadFile();
 
 // Set the window size and render to an image
@@ -72,6 +74,7 @@ eng.getOptions()
   .set("render.effect.fxaa", true);
 
 // Standard libf3d usage
+// TODO
 eng.getLoader().addFile("path/to/file.ext").loadFile();
 eng.getInteractor().start();
 ```

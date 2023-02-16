@@ -19,7 +19,7 @@ public:
     , mOutputPath(outputPath)
   {
     f3d::loader& load = mEngine.getLoader();
-    load.addFile(filePath).loadFile();
+    load.loadFile(filePath);
   }
 
 protected:
