@@ -23,19 +23,20 @@ constexpr std::string_view BlurFunc()
   return R"#(
 const float PI = 3.14159265359;
 
-vec4 BlurTexture(sampler2D tex, vec2 uv, vec2 direction)
+vec3 BlurTexture(sampler2D tex, vec2 uv, vec2 direction)
 {
-  vec4 color = vec4(0.0f);
+  vec3 color = vec3(0.0);
   float acc = 0.0;
 
+  // fix for the Y shape artifacts
   uv += 0.5 * invViewDims * direction;
 
-  const float step = 0.05;
+  const float step = 0.1;
 
   for (float i = 0.0; i < 1.0; i += step)
   {
-    vec2 offset = ((i * coc) * direction) * invViewDims;
-    color += texture(tex, uv + offset);
+    vec2 offset = i * coc * direction * invViewDims;
+    color += texture(tex, uv + offset).rgb;
     acc += 1.0;
   }
 
@@ -176,11 +177,11 @@ void vtkF3DHexagonalBokehBlurPass::RenderDirectionalBlur(
     std::stringstream ssImpl;
 
     ssImpl << "  vec2 blurDir = vec2(cos(PI/2), sin(PI/2));\n";
-    ssImpl << "  vec4 color1 = BlurTexture(backgroundTexture, texCoord, blurDir);\n";
+    ssImpl << "  vec3 color1 = BlurTexture(backgroundTexture, texCoord, blurDir).rgb;\n";
     ssImpl << "  blurDir = vec2(cos(-PI/6), sin(-PI/6));\n";
-    ssImpl << "  vec4 color2 = BlurTexture(backgroundTexture, texCoord, blurDir);\n";
-    ssImpl << "  gl_FragData[0] = color1;\n";
-    ssImpl << "  gl_FragData[1] = (color1 + color2) * 0.5;\n";
+    ssImpl << "  vec3 color2 = BlurTexture(backgroundTexture, texCoord, blurDir).rgb;\n";
+    ssImpl << "  gl_FragData[0] = vec4(color1, 1.0);\n";
+    ssImpl << "  gl_FragData[1] = vec4(color1 + color2, 1.0);\n";
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl", ssImpl.str());
 
@@ -252,10 +253,10 @@ void vtkF3DHexagonalBokehBlurPass::RenderRhomboidBlur(vtkOpenGLRenderWindow* ren
     std::stringstream ssImpl;
 
     ssImpl << "  vec2 blurDir = vec2(cos(-PI/6), sin(-PI/6));\n";
-    ssImpl << "  vec4 color1 = BlurTexture(verticalBlurTexture, texCoord, blurDir);\n";
+    ssImpl << "  vec3 color1 = BlurTexture(verticalBlurTexture, texCoord, blurDir).rgb;\n";
     ssImpl << "  blurDir = vec2(cos(-5*PI/6), sin(-5*PI/6));\n";
-    ssImpl << "  vec4 color2 = BlurTexture(diagonalBlurTexture, texCoord, blurDir);\n";
-    ssImpl << "  gl_FragData[0] = (color1 + color2) * 0.5f;\n";
+    ssImpl << "  vec3 color2 = BlurTexture(diagonalBlurTexture, texCoord, blurDir).rgb;\n";
+    ssImpl << "  gl_FragData[0] = vec4((color1 + color2) / 3, 1.0);\n";
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl", ssImpl.str());
 

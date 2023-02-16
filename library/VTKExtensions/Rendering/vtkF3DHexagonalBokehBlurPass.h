@@ -3,6 +3,9 @@
  * @brief   Implement a two-passes hexagonal Bokeh blur.
  * 
  * This pass is used to blur the background and simulate a depth of field.
+ * Adapted from "Advances in Real-Time Rendering", Siggraph 2011
+ * https://colinbarrebrisebois.com/2017/04/18/hexagonal-bokeh-blur-revisited-part-1-basic-3-pass-version/
+ *
  */
 
 #ifndef vtkF3DHexagonalBokehBlurPass_h
