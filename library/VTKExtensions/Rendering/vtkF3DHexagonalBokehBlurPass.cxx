@@ -357,6 +357,12 @@ void vtkF3DHexagonalBokehBlurPass::ReleaseGraphicsResources(vtkWindow* w)
     delete this->BlurQuadHelper;
     this->BlurQuadHelper = nullptr;
   }
+  if (this->RhomboidQuadHelper != nullptr)
+  {
+    this->RhomboidQuadHelper->ReleaseGraphicsResources(w);
+    delete this->RhomboidQuadHelper;
+    this->RhomboidQuadHelper = nullptr;
+  }
   if (this->FrameBufferObject != nullptr)
   {
     this->FrameBufferObject->Delete();

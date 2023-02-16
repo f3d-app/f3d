@@ -1,6 +1,8 @@
 /**
  * @class   vtkF3DHexagonalBokehBlurPass
- * @brief   TODO
+ * @brief   Implement a two-passes hexagonal Bokeh blur.
+ * 
+ * This pass is used to blur the background and simulate a depth of field.
  */
 
 #ifndef vtkF3DHexagonalBokehBlurPass_h
@@ -51,7 +53,7 @@ protected:
   ~vtkF3DHexagonalBokehBlurPass() override;
 
   /**
-   * Intialize graphics resources.
+   * Initialize graphics resources.
    */
   void InitializeGraphicsResources(vtkOpenGLRenderWindow* renWin, int w, int h);
 
