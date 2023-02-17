@@ -49,36 +49,22 @@ vec3 BlurTexture(sampler2D tex, vec2 uv, vec2 direction)
 vtkF3DHexagonalBokehBlurPass::vtkF3DHexagonalBokehBlurPass() = default;
 
 //------------------------------------------------------------------------------
-vtkF3DHexagonalBokehBlurPass::~vtkF3DHexagonalBokehBlurPass()
-{
-  if (this->FrameBufferObject != nullptr)
-  {
-    vtkErrorMacro(<< "FrameBufferObject should have been deleted in ReleaseGraphicsResources().");
-  }
-  if (this->VerticalBlurTexture != nullptr)
-  {
-    vtkErrorMacro(<< "VerticalBlur should have been deleted in ReleaseGraphicsResources().");
-  }
-  if (this->DiagonalBlurTexture != nullptr)
-  {
-    vtkErrorMacro(<< "DiagonalBlur should have been deleted in ReleaseGraphicsResources().");
-  }
-}
+vtkF3DHexagonalBokehBlurPass::~vtkF3DHexagonalBokehBlurPass() = default;
 
 //------------------------------------------------------------------------------
 void vtkF3DHexagonalBokehBlurPass::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "CircleOfConfusion: " << this->CircleOfConfusion << std::endl;
+  os << indent << "CircleOfConfusion: " << this->CircleOfConfusionRadius << std::endl;
 }
 
 //------------------------------------------------------------------------------
 void vtkF3DHexagonalBokehBlurPass::InitializeGraphicsResources(
-  vtkOpenGLRenderWindow* renWin, int w, int h)
+  vtkOpenGLRenderWindow* renWin, int width, int height)
 {
   if (this->BackgroundTexture == nullptr)
   {
-    this->BackgroundTexture = vtkTextureObject::New();
+    this->BackgroundTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->BackgroundTexture->SetContext(renWin);
     this->BackgroundTexture->SetFormat(GL_RGBA);
     this->BackgroundTexture->SetInternalFormat(GL_RGBA32F);
@@ -87,12 +73,12 @@ void vtkF3DHexagonalBokehBlurPass::InitializeGraphicsResources(
     this->BackgroundTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->BackgroundTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->BackgroundTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->BackgroundTexture->Allocate2D(w, h, 4, VTK_FLOAT);
+    this->BackgroundTexture->Allocate2D(width, height, 4, VTK_FLOAT);
   }
 
   if (this->VerticalBlurTexture == nullptr)
   {
-    this->VerticalBlurTexture = vtkTextureObject::New();
+    this->VerticalBlurTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->VerticalBlurTexture->SetContext(renWin);
     this->VerticalBlurTexture->SetFormat(GL_RGBA);
     this->VerticalBlurTexture->SetInternalFormat(GL_RGBA32F);
@@ -101,12 +87,12 @@ void vtkF3DHexagonalBokehBlurPass::InitializeGraphicsResources(
     this->VerticalBlurTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->VerticalBlurTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->VerticalBlurTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->VerticalBlurTexture->Allocate2D(w, h, 4, VTK_FLOAT);
+    this->VerticalBlurTexture->Allocate2D(width, height, 4, VTK_FLOAT);
   }
 
   if (this->DiagonalBlurTexture == nullptr)
   {
-    this->DiagonalBlurTexture = vtkTextureObject::New();
+    this->DiagonalBlurTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->DiagonalBlurTexture->SetContext(renWin);
     this->DiagonalBlurTexture->SetFormat(GL_RGBA);
     this->DiagonalBlurTexture->SetInternalFormat(GL_RGBA32F);
@@ -115,18 +101,18 @@ void vtkF3DHexagonalBokehBlurPass::InitializeGraphicsResources(
     this->DiagonalBlurTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->DiagonalBlurTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->DiagonalBlurTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->DiagonalBlurTexture->Allocate2D(w, h, 4, VTK_FLOAT);
+    this->DiagonalBlurTexture->Allocate2D(width, height, 4, VTK_FLOAT);
   }
 
   if (this->FrameBufferObject == nullptr)
   {
-    this->FrameBufferObject = vtkOpenGLFramebufferObject::New();
+    this->FrameBufferObject = vtkSmartPointer<vtkOpenGLFramebufferObject>::New();
     this->FrameBufferObject->SetContext(renWin);
   }
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DHexagonalBokehBlurPass::RenderDelegate(const vtkRenderState* s, int w, int h)
+void vtkF3DHexagonalBokehBlurPass::RenderDelegate(const vtkRenderState* s, int width, int height)
 {
   this->PreRender(s);
 
@@ -135,7 +121,7 @@ void vtkF3DHexagonalBokehBlurPass::RenderDelegate(const vtkRenderState* s, int w
 
   this->FrameBufferObject->AddColorAttachment(0, this->BackgroundTexture);
   this->FrameBufferObject->ActivateDrawBuffers(1);
-  this->FrameBufferObject->StartNonOrtho(w, h);
+  this->FrameBufferObject->StartNonOrtho(width, height);
 
   vtkOpenGLRenderer* glRen = vtkOpenGLRenderer::SafeDownCast(s->GetRenderer());
 
@@ -153,14 +139,8 @@ void vtkF3DHexagonalBokehBlurPass::RenderDelegate(const vtkRenderState* s, int w
 
 //------------------------------------------------------------------------------
 void vtkF3DHexagonalBokehBlurPass::RenderDirectionalBlur(
-  vtkOpenGLRenderWindow* renWin, int w, int h)
+  vtkOpenGLRenderWindow* renWin, int width, int height)
 {
-  if (this->BlurQuadHelper && this->BlurQuadHelper->ShaderChangeValue < this->GetMTime())
-  {
-    delete this->BlurQuadHelper;
-    this->BlurQuadHelper = nullptr;
-  }
-
   if (!this->BlurQuadHelper)
   {
     std::string FSSource = vtkOpenGLRenderUtilities::GetFullScreenQuadFragmentShaderTemplate();
@@ -187,13 +167,9 @@ void vtkF3DHexagonalBokehBlurPass::RenderDirectionalBlur(
 
     this->BlurQuadHelper = new vtkOpenGLQuadHelper(renWin,
       vtkOpenGLRenderUtilities::GetFullScreenQuadVertexShader().c_str(), FSSource.c_str(), "");
+  }
 
-    this->BlurQuadHelper->ShaderChangeValue = this->GetMTime();
-  }
-  else
-  {
-    renWin->GetShaderCache()->ReadyShaderProgram(this->BlurQuadHelper->Program);
-  }
+  renWin->GetShaderCache()->ReadyShaderProgram(this->BlurQuadHelper->Program);
 
   if (!this->BlurQuadHelper->Program || !this->BlurQuadHelper->Program->GetCompiled())
   {
@@ -205,10 +181,10 @@ void vtkF3DHexagonalBokehBlurPass::RenderDirectionalBlur(
   this->BlurQuadHelper->Program->SetUniformi(
     "backgroundTexture", this->BackgroundTexture->GetTextureUnit());
 
-  float invViewDims[2] = { 1.f / static_cast<float>(w), 1.f / static_cast<float>(h) };
+  float invViewDims[2] = { 1.f / static_cast<float>(width), 1.f / static_cast<float>(height) };
   this->BlurQuadHelper->Program->SetUniform2f("invViewDims", invViewDims);
 
-  this->BlurQuadHelper->Program->SetUniformf("coc", this->CircleOfConfusion);
+  this->BlurQuadHelper->Program->SetUniformf("coc", this->CircleOfConfusionRadius);
 
   this->FrameBufferObject->GetContext()->GetState()->PushFramebufferBindings();
   this->FrameBufferObject->Bind();
@@ -216,7 +192,7 @@ void vtkF3DHexagonalBokehBlurPass::RenderDirectionalBlur(
   this->FrameBufferObject->AddColorAttachment(0, this->VerticalBlurTexture);
   this->FrameBufferObject->AddColorAttachment(1, this->DiagonalBlurTexture);
   this->FrameBufferObject->ActivateDrawBuffers(2);
-  this->FrameBufferObject->StartNonOrtho(w, h);
+  this->FrameBufferObject->StartNonOrtho(width, height);
 
   this->BlurQuadHelper->Render();
 
@@ -228,14 +204,9 @@ void vtkF3DHexagonalBokehBlurPass::RenderDirectionalBlur(
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DHexagonalBokehBlurPass::RenderRhomboidBlur(vtkOpenGLRenderWindow* renWin, int w, int h)
+void vtkF3DHexagonalBokehBlurPass::RenderRhomboidBlur(
+  vtkOpenGLRenderWindow* renWin, int width, int height)
 {
-  if (this->RhomboidQuadHelper && this->RhomboidQuadHelper->ShaderChangeValue < this->GetMTime())
-  {
-    delete this->RhomboidQuadHelper;
-    this->RhomboidQuadHelper = nullptr;
-  }
-
   if (!this->RhomboidQuadHelper)
   {
     std::string FSSource = vtkOpenGLRenderUtilities::GetFullScreenQuadFragmentShaderTemplate();
@@ -262,13 +233,9 @@ void vtkF3DHexagonalBokehBlurPass::RenderRhomboidBlur(vtkOpenGLRenderWindow* ren
 
     this->RhomboidQuadHelper = new vtkOpenGLQuadHelper(renWin,
       vtkOpenGLRenderUtilities::GetFullScreenQuadVertexShader().c_str(), FSSource.c_str(), "");
+  }
 
-    this->RhomboidQuadHelper->ShaderChangeValue = this->GetMTime();
-  }
-  else
-  {
-    renWin->GetShaderCache()->ReadyShaderProgram(this->RhomboidQuadHelper->Program);
-  }
+  renWin->GetShaderCache()->ReadyShaderProgram(this->RhomboidQuadHelper->Program);
 
   if (!this->RhomboidQuadHelper->Program || !this->RhomboidQuadHelper->Program->GetCompiled())
   {
@@ -283,10 +250,10 @@ void vtkF3DHexagonalBokehBlurPass::RenderRhomboidBlur(vtkOpenGLRenderWindow* ren
   this->RhomboidQuadHelper->Program->SetUniformi(
     "diagonalBlurTexture", this->DiagonalBlurTexture->GetTextureUnit());
 
-  float invViewDims[2] = { 1.f / static_cast<float>(w), 1.f / static_cast<float>(h) };
+  float invViewDims[2] = { 1.f / static_cast<float>(width), 1.f / static_cast<float>(height) };
   this->RhomboidQuadHelper->Program->SetUniform2f("invViewDims", invViewDims);
 
-  this->RhomboidQuadHelper->Program->SetUniformf("coc", this->CircleOfConfusion);
+  this->RhomboidQuadHelper->Program->SetUniformf("coc", this->CircleOfConfusionRadius);
 
   this->RhomboidQuadHelper->Render();
 
@@ -307,11 +274,7 @@ void vtkF3DHexagonalBokehBlurPass::Render(const vtkRenderState* s)
   vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
   vtkOpenGLState::ScopedglEnableDisable dsaver(ostate, GL_DEPTH_TEST);
 
-  if (this->DelegatePass == nullptr)
-  {
-    vtkWarningMacro("no delegate in vtkF3DHexagonalBokehBlurPass.");
-    return;
-  }
+  assert(this->DelegatePass != nullptr);
 
   // create FBO and texture
   int x = 0, y = 0, w, h;
@@ -346,42 +309,38 @@ void vtkF3DHexagonalBokehBlurPass::Render(const vtkRenderState* s)
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DHexagonalBokehBlurPass::ReleaseGraphicsResources(vtkWindow* w)
+void vtkF3DHexagonalBokehBlurPass::ReleaseGraphicsResources(vtkWindow* win)
 {
-  assert("pre: w_exists" && w != nullptr);
+  assert(win != nullptr);
 
-  this->Superclass::ReleaseGraphicsResources(w);
+  this->Superclass::ReleaseGraphicsResources(win);
 
   if (this->BlurQuadHelper != nullptr)
   {
-    this->BlurQuadHelper->ReleaseGraphicsResources(w);
+    this->BlurQuadHelper->ReleaseGraphicsResources(win);
     delete this->BlurQuadHelper;
     this->BlurQuadHelper = nullptr;
   }
   if (this->RhomboidQuadHelper != nullptr)
   {
-    this->RhomboidQuadHelper->ReleaseGraphicsResources(w);
+    this->RhomboidQuadHelper->ReleaseGraphicsResources(win);
     delete this->RhomboidQuadHelper;
     this->RhomboidQuadHelper = nullptr;
   }
   if (this->FrameBufferObject != nullptr)
   {
-    this->FrameBufferObject->Delete();
     this->FrameBufferObject = nullptr;
   }
   if (this->DiagonalBlurTexture != nullptr)
   {
-    this->DiagonalBlurTexture->Delete();
     this->DiagonalBlurTexture = nullptr;
   }
   if (this->VerticalBlurTexture != nullptr)
   {
-    this->VerticalBlurTexture->Delete();
     this->VerticalBlurTexture = nullptr;
   }
   if (this->BackgroundTexture != nullptr)
   {
-    this->BackgroundTexture->Delete();
     this->BackgroundTexture = nullptr;
   }
 }

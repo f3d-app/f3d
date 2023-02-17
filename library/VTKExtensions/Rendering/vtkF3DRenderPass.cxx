@@ -104,6 +104,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   if (this->UseBlurBackground)
   {
     vtkNew<vtkF3DHexagonalBokehBlurPass> blur;
+    blur->SetCircleOfConfusionRadius(this->CircleOfConfusionRadius);
     blur->SetDelegatePass(bgCamP);
     this->BackgroundPass->SetDelegatePass(blur);
   }

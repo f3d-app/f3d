@@ -64,6 +64,7 @@ public:
   void SetUseFXAAPass(bool use);
   void SetUseToneMappingPass(bool use);
   void SetUseBlurBackground(bool use);
+  void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);
   ///@}
 
@@ -179,6 +180,7 @@ protected:
   int UpIndex = 1;
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
+  double CircleOfConfusionRadius = 20.0;
 
   bool HasHDRI = false;
   std::string HDRIFile;

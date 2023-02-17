@@ -13,6 +13,8 @@
 
 #include "vtkImageProcessingPass.h"
 
+#include "vtkSmartPointer.h"
+
 class vtkOpenGLFramebufferObject;
 class vtkOpenGLQuadHelper;
 class vtkOpenGLRenderWindow;
@@ -40,8 +42,8 @@ public:
   /**
    * Get/Set the size of the circle of confusion.
    */
-  vtkGetMacro(CircleOfConfusion, float);
-  vtkSetMacro(CircleOfConfusion, float);
+  vtkGetMacro(CircleOfConfusionRadius, float);
+  vtkSetMacro(CircleOfConfusionRadius, float);
   ///@}
 
 protected:
@@ -58,24 +60,35 @@ protected:
   /**
    * Initialize graphics resources.
    */
-  void InitializeGraphicsResources(vtkOpenGLRenderWindow* renWin, int w, int h);
+  void InitializeGraphicsResources(vtkOpenGLRenderWindow* renWin, int width, int height);
 
-  void RenderDelegate(const vtkRenderState* s, int w, int h);
-  void RenderDirectionalBlur(vtkOpenGLRenderWindow* renWin, int w, int h);
-  void RenderRhomboidBlur(vtkOpenGLRenderWindow* renWin, int w, int h);
+  /**
+   * Render delegate pass.
+   */
+  void RenderDelegate(const vtkRenderState* s, int width, int height);
+
+  /**
+   * First pass: blur vertically and diagonally the input to produce two outputs.
+   */
+  void RenderDirectionalBlur(vtkOpenGLRenderWindow* renWin, int width, int height);
+
+  /**
+   * Second pass: Combine and blur the two inputs to get the final result.
+   */
+  void RenderRhomboidBlur(vtkOpenGLRenderWindow* renWin, int width, int height);
 
   /**
    * Graphics resources.
    */
-  vtkOpenGLFramebufferObject* FrameBufferObject = nullptr;
-  vtkTextureObject* VerticalBlurTexture = nullptr;
-  vtkTextureObject* DiagonalBlurTexture = nullptr;
-  vtkTextureObject* BackgroundTexture = nullptr;
+  vtkSmartPointer<vtkOpenGLFramebufferObject> FrameBufferObject;
+  vtkSmartPointer<vtkTextureObject> VerticalBlurTexture;
+  vtkSmartPointer<vtkTextureObject> DiagonalBlurTexture;
+  vtkSmartPointer<vtkTextureObject> BackgroundTexture;
 
   vtkOpenGLQuadHelper* BlurQuadHelper = nullptr;
   vtkOpenGLQuadHelper* RhomboidQuadHelper = nullptr;
 
-  float CircleOfConfusion = 20.f;
+  float CircleOfConfusionRadius = 20.f;
 
 private:
   vtkF3DHexagonalBokehBlurPass(const vtkF3DHexagonalBokehBlurPass&) = delete;
