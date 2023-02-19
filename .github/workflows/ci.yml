@@ -25,9 +25,9 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         vtk_version: [commit, v9.2.2, v9.1.0, v9.0.0]
         include:
-          - enable_raytracing: 'true'
+          - enable_raytracing: true
           - vtk_version: v9.0.0
-            enable_raytracing: 'false'
+            enable_raytracing: false
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -42,7 +42,7 @@ jobs:
       with:
         path: 'source'
         fetch-depth: 0
-        lfs: 'false'
+        lfs: false
 
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
@@ -62,7 +62,7 @@ jobs:
         mkdir install
 
     - name: Install Raytracing Dependencies
-      if: matrix.enable_raytracing == 'true'
+      if: matrix.enable_raytracing == true
       uses: ./source/.github/actions/ospray-sb-install-dep
 
     - name: Install VTK dependency
@@ -122,7 +122,7 @@ jobs:
         -DF3D_LINUX_INSTALL_THUMBNAILER_FILES=ON        
         -DF3D_MACOS_BUNDLE=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
-        -DF3D_MODULE_RAYTRACING=${{ matrix.enable_raytracing == 'true' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_RAYTRACING=${{ matrix.enable_raytracing == true && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
@@ -237,7 +237,7 @@ jobs:
       with:
         path: 'source'
         fetch-depth: 0
-        lfs: 'false'
+        lfs: false
 
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
@@ -263,7 +263,7 @@ jobs:
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-        enable_raytracing: 'true'
+        enable_raytracing: true
 
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
@@ -344,7 +344,7 @@ jobs:
       with:
         path: 'source'
         fetch-depth: 0
-        lfs: 'false'
+        lfs: false
 
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source

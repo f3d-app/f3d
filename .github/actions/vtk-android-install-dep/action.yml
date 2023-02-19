@@ -36,7 +36,7 @@ runs:
       uses: actions/checkout@v3
       with:
         repository: Kitware/VTK
-        submodules: 'true'
+        submodules: true
         path: './dependencies/vtk'
         ref: ${{env.VTK_SHA}}
 

@@ -21,7 +21,7 @@ runs:
       with:
         path: 'lfs_data'
         fetch-depth: 0
-        lfs: 'true'
+        lfs: true
 
     - name: Setup LFS data
       working-directory: ${{github.workspace}}
