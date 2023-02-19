@@ -16,7 +16,7 @@ runs:
       uses: actions/checkout@v3
       with:
         repository: pybind/pybind11
-        submodules: 'true'
+        submodules: true
         path: './dependencies/pybind11'
         ref: v2.9.2
 
