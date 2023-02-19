@@ -13,7 +13,7 @@ runs:
         key: alembic-v1.8.3-${{runner.os}}-0
 
     - name: Checkout Alembic
-      if: steps.cache-alembic.outputs.cache-hit != 'true'
+      if: steps.cache-alembic.outputs.cache-hit != true
       uses: actions/checkout@v3
       with:
         repository: alembic/alembic
@@ -21,7 +21,7 @@ runs:
         ref: 1.8.3
 
     - name: Patch Alembic
-      if: steps.cache-alembic.outputs.cache-hit != 'true'
+      if: steps.cache-alembic.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies/alembic
       shell: bash
       run: |
@@ -29,7 +29,7 @@ runs:
         patch -p1 < $GITHUB_ACTION_PATH/0002-Fix-an-issue-with-ALEMBIC_LIB_INSTALL_DIR.patch
 
     - name: Setup Alembic
-      if: steps.cache-alembic.outputs.cache-hit != 'true'
+      if: steps.cache-alembic.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: |
@@ -37,23 +37,23 @@ runs:
         mkdir alembic_install
 
     - name: Configure Alembic
-      if: steps.cache-alembic.outputs.cache-hit != 'true'
+      if: steps.cache-alembic.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies/alembic_build
       shell: bash
       run: >
         cmake ../alembic
-        -DALEMBIC_LIB_INSTALL_DIR=${{ runner.os == 'Windows' && 'bin' || 'lib' }}
+        -DALEMBIC_LIB_INSTALL_DIR=${{ runner.os == Windows && 'bin' || 'lib' }}
         -DALEMBIC_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../alembic_install
         -DCMAKE_PREFIX_PATH:PATH=../install/
         -DUSE_BINARIES=OFF
         -DUSE_TESTS=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == macOS && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == Windows && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build Alembic
-      if: steps.cache-alembic.outputs.cache-hit != 'true'
+      if: steps.cache-alembic.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies/alembic_build
       shell: bash
       run: cmake --build . --parallel 2 --target install --config Release

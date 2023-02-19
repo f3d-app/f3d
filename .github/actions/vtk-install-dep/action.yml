@@ -4,7 +4,7 @@ inputs:
   vtk_version:
     description: 'VTK version'
     required: false
-    default: 'commit'
+    default: commit
   vtk_sha_file:
     description: 'VTK SHA file'
     required: false
@@ -12,23 +12,23 @@ inputs:
   enable_raytracing:
     description: 'Enable Raytracing'
     required: false
-    default: 'false'
+    default: false
 runs:
   using: "composite"
   steps:
 
     - name: Recover VTK Short SHA from file
       if: |
-        steps.cache-vtk.outputs.cache-hit != 'true' &&
-        inputs.vtk_version == 'commit'
+        steps.cache-vtk.outputs.cache-hit != true &&
+        inputs.vtk_version == commit
       working-directory: ${{github.workspace}}
       shell: bash
       run: echo "VTK_SHA_OR_TAG=$(<${{ inputs.vtk_sha_file }})" >> $GITHUB_ENV
 
     - name: Copy VTK version to env var
       if: |
-        steps.cache-vtk.outputs.cache-hit != 'true' &&
-        inputs.vtk_version != 'commit'
+        steps.cache-vtk.outputs.cache-hit != true &&
+        inputs.vtk_version != commit
       working-directory: ${{github.workspace}}
       shell: bash
       run: echo "VTK_SHA_OR_TAG=${{inputs.vtk_version}}" >> $GITHUB_ENV
@@ -41,7 +41,7 @@ runs:
         key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.enable_raytracing}}-0
 
     - name: Setup VTK
-      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      if: steps.cache-vtk.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: |
@@ -50,20 +50,20 @@ runs:
 
     # MacOS needs fetch-depth: 0 to avoid an issue with version in linker
     - name: Checkout VTK
-      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      if: steps.cache-vtk.outputs.cache-hit != true
       uses: actions/checkout@v3
       with:
         repository: Kitware/VTK
-        submodules: 'true'
+        submodules: true
         fetch-depth: 0
         path: './dependencies/vtk'
         ref: ${{env.VTK_SHA_OR_TAG}}
 
     - name: Patch VTK 9.0 source macos
       if: |
-        steps.cache-vtk.outputs.cache-hit != 'true' &&
-        runner.os == 'macOS' &&
-        inputs.vtk_version == 'v9.0.0'
+        steps.cache-vtk.outputs.cache-hit != true &&
+        runner.os == macOS &&
+        inputs.vtk_version == v9.0.0
       working-directory: ${{github.workspace}}/dependencies/vtk
       shell: bash
       run: |
@@ -72,7 +72,7 @@ runs:
         sed -i '' '36i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Rint.c
 
     - name: Configure VTK
-      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      if: steps.cache-vtk.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies/vtk_build
       shell: bash
       run: >
@@ -108,16 +108,16 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingExternal=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingLabel=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
-        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.enable_raytracing == 'true' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.enable_raytracing == true && YES || DEFAULT }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_VERSIONED_INSTALL=OFF
-        ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread' || null }}
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ inputs.vtk_version != v9.0.0 && '-DVTK_ENABLE_REMOTE_MODULES=OFF -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread' || null }}
+        ${{ runner.os == macOS && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == Windows && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build VTK
-      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      if: steps.cache-vtk.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies/vtk_build
       shell: bash
       run: cmake --build . --parallel 2 --target install --config Release

@@ -12,7 +12,7 @@ runs:
         key: assimp-v5.2.5-${{runner.os}}-0
 
     - name: Checkout ASSIMP
-      if: steps.cache-assimp.outputs.cache-hit != 'true'
+      if: steps.cache-assimp.outputs.cache-hit != true
       uses: actions/checkout@v3
       with:
         repository: assimp/assimp
@@ -20,7 +20,7 @@ runs:
         ref: v5.2.5
 
     - name: Setup ASSIMP
-      if: steps.cache-assimp.outputs.cache-hit != 'true'
+      if: steps.cache-assimp.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: |
@@ -28,7 +28,7 @@ runs:
         mkdir assimp_install
 
     - name: Configure ASSIMP
-      if: steps.cache-assimp.outputs.cache-hit != 'true'
+      if: steps.cache-assimp.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies/assimp_build
       shell: bash
       run: >
@@ -46,11 +46,11 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../assimp_install
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == macOS && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == Windows && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build ASSIMP
-      if: steps.cache-assimp.outputs.cache-hit != 'true'
+      if: steps.cache-assimp.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies/assimp_build
       shell: bash
       run: cmake --build . --parallel 2 --target install --config Release

@@ -12,16 +12,16 @@ runs:
         key: pybind11-v2.10.1-${{runner.os}}-0
 
     - name: Checkout pybind11
-      if: steps.cache-pybind11.outputs.cache-hit != 'true'
+      if: steps.cache-pybind11.outputs.cache-hit != true
       uses: actions/checkout@v3
       with:
         repository: pybind/pybind11
-        submodules: 'true'
+        submodules: true
         path: './dependencies/pybind11'
         ref: v2.9.2
 
     - name: Setup pybind11
-      if: steps.cache-pybind11.outputs.cache-hit != 'true'
+      if: steps.cache-pybind11.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: |
@@ -29,18 +29,18 @@ runs:
         mkdir pybind11_install
 
     - name: Configure pybind11
-      if: steps.cache-pybind11.outputs.cache-hit != 'true'
+      if: steps.cache-pybind11.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies/pybind11_build
       shell: bash
       run: >
         cmake ../pybind11
         -DCMAKE_INSTALL_PREFIX:PATH=../pybind11_install
         -DPYBIND11_TEST=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == macOS && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == Windows && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Install pybind11
-      if: steps.cache-pybind11.outputs.cache-hit != 'true'
+      if: steps.cache-pybind11.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies/pybind11_build
       shell: bash
       run: cmake --build . --parallel 2 --target install --config Release

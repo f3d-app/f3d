@@ -12,7 +12,7 @@ runs:
         key: ospray-sb-v2.7.1-${{runner.os}}-0
 
     - name: Checkout ospray
-      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      if: steps.cache-ospray.outputs.cache-hit != true
       uses: actions/checkout@v3
       with:
         repository: ospray/ospray
@@ -21,13 +21,13 @@ runs:
 
       # https://github.com/ospray/ospray/pull/550
     - name: Patch ospray rkcommon superbuild
-      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      if: steps.cache-ospray.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies/ospray
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/0001-Fix-INSTALL_RPATH-in-rkcommon-superbuild.patch
 
     - name: Setup ospray
-      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      if: steps.cache-ospray.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: |
@@ -35,7 +35,7 @@ runs:
         mkdir ospray_install
 
     - name: Configure ospray
-      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      if: steps.cache-ospray.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies/ospray_build
       shell: bash
       run: >
@@ -51,11 +51,11 @@ runs:
         -DDOWNLOAD_TBB=ON
         -DINSTALL_DEPENDENCIES=ON
         -DINSTALL_IN_SEPARATE_DIRECTORIES=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == macOS && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == Windows && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build ospray
-      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      if: steps.cache-ospray.outputs.cache-hit != true
       working-directory: ${{github.workspace}}/dependencies/ospray_build
       shell: bash
       run: cmake --build . --parallel 2 --config Release

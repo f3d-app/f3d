@@ -7,8 +7,8 @@ runs:
     - name: Setup JDK
       uses: actions/setup-java@v3
       with:
-        distribution: 'temurin'
-        java-version: '17'
+        distribution: temurin
+        java-version: 17
 
     - name: Install OCCT dependency
       uses: ./source/.github/actions/occt-install-dep
