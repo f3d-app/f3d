@@ -32,7 +32,7 @@ jobs:
       with:
         path: 'source'
         fetch-depth: 0
-        lfs: 'false'
+        lfs: false
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
