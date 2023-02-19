@@ -86,15 +86,15 @@ jobs:
     # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8210
     - name: Set LD_LIBRARY_PATH ubuntu
       if: |
-        runner.os == Linux &&
-        ( matrix.vtk_version == v9.0.0 ||
-          matrix.vtk_version == v9.1.0 )
+        runner.os == 'Linux' &&
+        ( matrix.vtk_version == 'v9.0.0' ||
+          matrix.vtk_version == 'v9.1.0' )
       working-directory: ${{github.workspace}}/dependencies/
       shell: bash
       run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
     - name: Set PATH windows
-      if: runner.os == Windows
+      if: runner.os == 'Windows'
       working-directory: ${{github.workspace}}
       shell: powershell
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
@@ -141,11 +141,11 @@ jobs:
       run: cmake --build . --parallel 2 --config Release
 
     - name: Run Xvfb ubuntu
-      if: runner.os == Linux
+      if: runner.os == 'Linux'
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
     - name: Install Mesa Windows
-      if: runner.os == Windows
+      if: runner.os == 'Windows'
       uses: ./source/.github/actions/mesa-install-bin
       with:
         path: ${{github.workspace}}\build\bin\Release
@@ -166,28 +166,28 @@ jobs:
       run: cmake --install .
 
     - name: Install (mimetypes on Linux)
-      if: runner.os == Linux
+      if: runner.os == 'Linux'
       working-directory: ${{github.workspace}}/build
       run: cmake --install . --component mimetypes
 
     - name: Check Install ubuntu
-      if: runner.os == Linux
+      if: runner.os == 'Linux'
       working-directory: ${{github.workspace}}/install
       run: ./bin/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
     - name: Install Mesa Windows in install
-      if: runner.os == Windows
+      if: runner.os == 'Windows'
       uses: ./source/.github/actions/mesa-install-bin
       with:
         path: ${{github.workspace}}\install\bin
 
     - name: Check Install windows
-      if: runner.os == Windows
+      if: runner.os == 'Windows'
       working-directory: ${{github.workspace}}/install
       run: .\bin\f3d.exe ..\source\testing\data\suzanne.obj --output=..\output.png
 
     - name: Check Install macos
-      if: runner.os == macOS
+      if: runner.os == 'macOS'
       working-directory: ${{github.workspace}}/install
       run: ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
 
@@ -199,7 +199,7 @@ jobs:
 
     - name: Install Mesa Windows examples
       if: |
-        runner.os == Windows &&
+        runner.os == 'Windows' &&
         matrix.vtk_version != v9.0.0 && matrix.vtk_version != v9.1.0
       uses: ./source/.github/actions/mesa-install-bin
       with:
