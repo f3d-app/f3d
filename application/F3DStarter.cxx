@@ -141,6 +141,7 @@ int F3DStarter::Start(int argc, char** argv)
       !this->Internals->AppOptions.Reference.empty() || !this->Internals->AppOptions.Output.empty();
     this->Internals->Engine = std::make_unique<f3d::engine>(
       offscreen ? f3d::window::Type::NATIVE_OFFSCREEN : f3d::window::Type::NATIVE);
+
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
@@ -342,8 +343,9 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
   }
 
   // Recover file information
+  f3d::loader& loader = this->Internals->Engine->getLoader();
   fs::path filePath;
-  std::string fileName, fileInfo;
+  std::string filenameInfo;
   size_t size = this->Internals->FilesList.size();
   if (size != 0)
   {
@@ -359,9 +361,8 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
     this->Internals->CurrentFileIndex =
       ::fileModulo(this->Internals->CurrentFileIndex, static_cast<long long>(size));
     filePath = this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)];
-    fileName = filePath.filename().string();
-    fileInfo = "(" + std::to_string(this->Internals->CurrentFileIndex + 1) + "/" +
-      std::to_string(size) + ") " + fileName;
+    filenameInfo = "(" + std::to_string(this->Internals->CurrentFileIndex + 1) + "/" +
+      std::to_string(this->Internals->FilesList.size()) + ") " + filePath.filename().string();
   }
   else
   {
@@ -385,9 +386,8 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
   }
   else
   {
-    // Load the file
-    this->Internals->LoadedFile =
-      this->Internals->Engine->getLoader().loadFile(filePath.string(), fileInfo);
+    // Load the file with filenameInfo
+    this->Internals->LoadedFile = loader.setFilenameInfo(filenameInfo).loadFile(filePath.string());
 
     if (!this->Internals->AppOptions.NoRender)
     {
@@ -395,9 +395,10 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
       this->Internals->SetupCamera(fileAppOptions);
     }
 
-    if (!fileName.empty())
+    if (!filePath.empty())
     {
-      this->Internals->Engine->getWindow().setWindowName(fileName + " - " + F3D::AppName);
+      this->Internals->Engine->getWindow().setWindowName(
+        filePath.filename().string() + " - " + F3D::AppName);
     }
   }
 }

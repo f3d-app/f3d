@@ -106,8 +106,10 @@ PYBIND11_MODULE(f3d, module)
 
   // f3d::loader
   py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete> > loader(module, "loader");
-  loader.def(
-    "loadFile", &f3d::loader::loadFile, "Load a specific file", py::arg("path"), py::arg("info"));
+  loader.def("loadFile", &f3d::loader::loadFile, "Load a specific file", py::arg("path"))
+    .def("setFilenameInfo", &f3d::loader::setFilenameInfo,
+      "Set the filename info to use for display", py::arg("filenameInfo"));
+
   // TODO rework
 
   // f3d::camera

@@ -13,6 +13,7 @@
 #include <vtkProgressBarWidget.h>
 #include <vtkTimerLog.h>
 #include <vtkVersion.h>
+#include <vtksys/SystemTools.hxx>
 
 #include <algorithm>
 #include <vector>
@@ -148,6 +149,8 @@ public:
     log::debug(importer->GetOutputsDescription(), "\n");
   }
 
+  std::string FilenameInfo;
+
   const options& Options;
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
@@ -165,18 +168,23 @@ loader_impl::loader_impl(const options& options, window_impl& window)
 loader_impl::~loader_impl() = default;
 
 //----------------------------------------------------------------------------
-bool loader_impl::loadFile(const std::string& filePath, const std::string& fileInfo)
+bool loader_impl::loadFile(const std::string& filePath)
 {
+  // Recover fileNameInfo if any
+  std::string fileNameInfo = this->Internals->FilenameInfo;
+  if (fileNameInfo.empty())
+  {
+    fileNameInfo = vtksys::SystemTools::GetFilenameName(filePath);
+  }
+
   if (filePath.empty())
   {
     // No file provided, show a drop zone instead
     log::debug("No file to load provided\n");
     this->Internals->Window.Initialize(
-      false, fileInfo + "No file to load provided, please drop one into this window");
+      false, fileNameInfo + "No file to load provided, please drop one into this window");
     return false;
   }
-
-  // TODO empty fileinfo
 
   // There is a file to load, update CurrentFileIndex
   log::debug("Loading: ", filePath, "\n");
@@ -189,7 +197,7 @@ bool loader_impl::loadFile(const std::string& filePath, const std::string& fileI
   if (!this->Internals->Importer)
   {
     log::warn(filePath, " is not a file of a supported file format\n");
-    this->Internals->Window.Initialize(false, fileInfo + " [UNSUPPORTED]");
+    this->Internals->Window.Initialize(false, fileNameInfo + " [UNSUPPORTED]");
     return false;
   }
 
@@ -199,7 +207,7 @@ bool loader_impl::loadFile(const std::string& filePath, const std::string& fileI
   callbackData.timer = timer;
   callbackData.widget = progressWidget;
 
-  this->Internals->Window.Initialize(genericImporter != nullptr, fileInfo);
+  this->Internals->Window.Initialize(genericImporter != nullptr, fileNameInfo);
 
   // Initialize importer for rendering
   this->Internals->Importer->SetRenderWindow(this->Internals->Window.GetRenderWindow());
@@ -263,6 +271,13 @@ bool loader_impl::loadFile(const std::string& filePath, const std::string& fileI
 
   return true;
   ;
+}
+
+//----------------------------------------------------------------------------
+loader& loader_impl::setFilenameInfo(const std::string& filenameInfo)
+{
+  this->Internals->FilenameInfo = filenameInfo;
+  return *this;
 }
 
 //----------------------------------------------------------------------------

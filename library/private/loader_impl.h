@@ -30,7 +30,8 @@ public:
    */
   loader_impl(const options& options, window_impl& window);
   ~loader_impl();
-  bool loadFile(const std::string& filePath, const std::string& fileInfo = "") override;
+  bool loadFile(const std::string& filePath) override;
+  loader& setFilenameInfo(const std::string& filenameInfo) override;
   ///@}
 
   /**

@@ -3,6 +3,7 @@
 
 #include "export.h"
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -22,7 +23,13 @@ public:
    * Load the provided file and associated fileInfo TODO improve
    * Returns true if a file is loaded successfully, false otherwise.
    */
-  virtual bool loadFile(const std::string& filePath, const std::string& fileInfo = "") = 0;
+  virtual bool loadFile(const std::string& filePath) = 0;
+
+  /**
+   * Set filename info to display.
+   * If empty, the filename of provided filePath will be used.
+   */
+  virtual loader& setFilenameInfo(const std::string& filenameInfo) = 0;
 
 protected:
   //! @cond
