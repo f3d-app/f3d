@@ -59,6 +59,8 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
     argv[i][mbs.size()] = 0;
   }
 
+  LocalFree(wargv);
+
   int rc = main(argc, argv);
 
   for (int i = 0; i < argc; i++)
