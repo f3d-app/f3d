@@ -387,7 +387,10 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
   else
   {
     // Load the file with filenameInfo
-    this->Internals->LoadedFile = loader.setFilenameInfo(filenameInfo).loadFile(filePath.string());
+    this->Internals->LoadedFile = loader
+      .resetToDefaultScene()
+      .setFilenameInfo(filenameInfo)
+      .addGeometry(filePath.string());
 
     if (!this->Internals->AppOptions.NoRender)
     {

@@ -12,6 +12,9 @@
 #include <vtkImporter.h>
 #include <vtkSmartPointer.h>
 #include <vtkVersion.h>
+#include <vtkNew.h>
+
+#include <vector>
 
 class vtkActor;
 class vtkVolume;
@@ -34,7 +37,9 @@ public:
   /**
    * Specify the VTK reader.
    */
-  void SetInternalReader(vtkAlgorithm* reader);
+//  void SetInternalReader(vtkAlgorithm* reader);
+  void AddInternalReader(vtkAlgorithm* reader);
+  void RemoveInternalReaders();
 
   /**
    * Check if the file can be read.
@@ -141,7 +146,7 @@ protected:
   vtkF3DGenericImporter() = default;
   ~vtkF3DGenericImporter() override = default;
 
-  int ImportBegin() override;
+//  int ImportBegin() override;
 
   /* Standard ImportActors
    * None of the actors are shown by default
@@ -152,7 +157,15 @@ protected:
 
   void UpdateTemporalInformation();
 
-  vtkSmartPointer<vtkAlgorithm> Reader;
+  struct ReaderPipeline
+  {
+    vtkSmartPointer<vtkAlgorithm> Reader;
+    vtkNew<vtkF3DPostProcessFilter> PostPro;
+    std::string OutputDescription;
+  };
+
+  std::vector<ReaderPipeline> Readers;
+
 
   vtkNew<vtkScalarBarActor> ScalarBarActor;
   vtkNew<vtkActor> GeometryActor;
@@ -161,7 +174,6 @@ protected:
   vtkNew<vtkPolyDataMapper> PolyDataMapper;
   vtkNew<vtkPointGaussianMapper> PointGaussianMapper;
   vtkNew<vtkSmartVolumeMapper> VolumeMapper;
-  std::string OutputDescription;
 
   vtkDataSetAttributes* PointDataForColoring = nullptr;
   vtkDataSetAttributes* CellDataForColoring = nullptr;
@@ -170,7 +182,6 @@ protected:
   int NbTimeSteps = -1;
   double* TimeSteps = nullptr;
   double* TimeRange = nullptr;
-  vtkNew<vtkF3DPostProcessFilter> PostPro;
 
   double PointSize = 10.;
   double Opacity = 1.;

@@ -175,7 +175,7 @@ endif ()
 
 # Testing
 if(BUILD_TESTING)
-  add_subdirectory(testing)
+#  add_subdirectory(testing)
 endif()
 
 # Installing

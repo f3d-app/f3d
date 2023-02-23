@@ -301,7 +301,7 @@ public:
     if (filesVec.size() > 0)
     {
       self->AnimationManager.StopAnimation();
-      self->Loader.loadFile(filesVec[0]);
+//      self->Loader.loadFile(filesVec[0]); TODO
       self->Window.render();
     }
   }

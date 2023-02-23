@@ -23,7 +23,19 @@ public:
    * Load the provided file and associated fileInfo TODO improve
    * Returns true if a file is loaded successfully, false otherwise.
    */
-  virtual bool loadFile(const std::string& filePath) = 0;
+//  virtual bool loadFile(const std::string& filePath) = 0;
+
+  /**
+   */
+  virtual bool addGeometry(const std::string& filePath) = 0;
+
+  /**
+   */
+  virtual loader& resetToDefaultScene() = 0;
+
+  /**
+   */
+  virtual bool loadFullScene(const std::string& filePath) = 0;
 
   /**
    * Set filename info to display.

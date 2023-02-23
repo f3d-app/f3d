@@ -42,7 +42,7 @@ vtkStandardNewMacro(vtkF3DGenericImporter);
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::UpdateTemporalInformation()
 {
-  if (!this->Reader)
+/*  if (!this->Reader)
   {
     F3DLog::Print(F3DLog::Severity::Warning, "Reader is not valid\n");
     return;
@@ -52,7 +52,7 @@ void vtkF3DGenericImporter::UpdateTemporalInformation()
 
   this->NbTimeSteps = readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   this->TimeRange = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
-  this->TimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  this->TimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());*/ // TODO
 }
 
 //----------------------------------------------------------------------------
@@ -116,36 +116,44 @@ bool vtkF3DGenericImporter::GetTemporalInformation(
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
-  // forward progress event
-  vtkNew<vtkEventForwarderCommand> forwarder;
-  forwarder->SetTarget(this);
-  this->Reader->AddObserver(vtkCommand::ProgressEvent, forwarder);
+  // Clear all mappers
+  this->VolumeMapper->RemoveAllInputs();
+  this->PolyDataMapper->RemoveAllInputs();
+  this->PointGaussianMapper->RemoveAllInputs();
 
-  this->PostPro->SetInputConnection(this->Reader->GetOutputPort());
-  this->PostPro->Update();
-
-  vtkDataObject* readerOutput = this->Reader->GetOutputDataObject(0);
-  if (!readerOutput)
+  
+  // Update each reader
+  for(vtkF3DGenericImporter::ReaderPipeline& pipe : this->Readers)
   {
-    F3DLog::Print(F3DLog::Severity::Error, "Reader did not produce any output");
-    return;
+    // forward progress event
+    vtkNew<vtkEventForwarderCommand> forwarder;
+    forwarder->SetTarget(this);
+    pipe.Reader->AddObserver(vtkCommand::ProgressEvent, forwarder);
+    pipe.PostPro->Update();
+
+    vtkDataObject* readerOutput = pipe.Reader->GetOutputDataObject(0);
+    if (!readerOutput)
+    {
+      F3DLog::Print(F3DLog::Severity::Warning, "A reader did not produce any output");
+      continue;
+    }
+
+    pipe.OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(readerOutput);
+
+    vtkPolyData* surface = vtkPolyData::SafeDownCast(pipe.PostPro->GetOutput());
+    vtkImageData* image = vtkImageData::SafeDownCast(pipe.PostPro->GetOutput(2));
+
+    // Add filter outputs to mapper inputs
+    this->PolyDataMapper->AddInputConnection(pipe.PostPro->GetOutputPort(0));
+    this->PointGaussianMapper->AddInputConnection(pipe.PostPro->GetOutputPort(1));
+    this->VolumeMapper->AddInputConnection(pipe.PostPro->GetOutputPort(2));
   }
 
-  this->OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(readerOutput);
 
-  vtkPolyData* surface = vtkPolyData::SafeDownCast(this->PostPro->GetOutput());
-  vtkImageData* image = vtkImageData::SafeDownCast(this->PostPro->GetOutput(2));
 
-  // Configure volume mapper
-  this->VolumeMapper->SetInputConnection(this->PostPro->GetOutputPort(2));
+  // Configure mappers if not already //TODO not here ?
   this->VolumeMapper->SetRequestedRenderModeToGPU();
-
-  // Configure polydata mapper
   this->PolyDataMapper->InterpolateScalarsBeforeMappingOn();
-  this->PolyDataMapper->SetInputConnection(this->PostPro->GetOutputPort(0));
-
-  // Configure Point Gaussian mapper
-  this->PointGaussianMapper->SetInputConnection(this->PostPro->GetOutputPort(1));
   this->PointGaussianMapper->EmissiveOff();
   this->PointGaussianMapper->SetSplatShaderCode(
     "//VTK::Color::Impl\n"
@@ -158,12 +166,12 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     "  diffuseColor *= scale;\n"
     "}\n");
 
-  vtkDataSet* dataSet = vtkImageData::SafeDownCast(this->PostPro->GetInput())
-    ? vtkDataSet::SafeDownCast(image)
-    : vtkDataSet::SafeDownCast(surface);
+//  vtkDataSet* dataSet = vtkImageData::SafeDownCast(this->PostPro->GetInput())
+//    ? vtkDataSet::SafeDownCast(image)
+//    : vtkDataSet::SafeDownCast(surface);
 
-  this->PointDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
-  this->CellDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetCellData());
+//  this->PointDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
+//  this->CellDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetCellData()); TODO
 
   // configure props
   this->VolumeProp->SetMapper(this->VolumeMapper);
@@ -257,22 +265,47 @@ void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::SetInternalReader(vtkAlgorithm* reader)
+/*void vtkF3DGenericImporter::SetInternalReader(vtkAlgorithm* reader)
 {
   this->Reader = reader;
+  this->Modified();
+}*/
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::AddInternalReader(vtkAlgorithm* reader)
+{
+  vtkF3DGenericImporter::ReaderPipeline pipe;
+  pipe.Reader = reader;
+  pipe.PostPro->SetInputConnection(pipe.Reader->GetOutputPort());
+  this->Readers.push_back(std::move(pipe));
+
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DGenericImporter::RemoveInternalReaders()
+{
+  this->Readers.clear();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+/*void vtkF3DGenericImporter::SetInternalReader(vtkAlgorithm* reader)
+{
+  this->Reader = reader;
+  this->Modified();
+}*/
+
+//----------------------------------------------------------------------------
 bool vtkF3DGenericImporter::CanReadFile()
 {
-  return this->Reader != nullptr;
+  return this->Readers.size() > 0 && this->Readers[0].Reader != nullptr;
 }
 
 //----------------------------------------------------------------------------
 std::string vtkF3DGenericImporter::GetOutputsDescription()
 {
-  return this->OutputDescription;
+  return "";//return this->OutputDescription; // TODO
 }
 
 //----------------------------------------------------------------------------
@@ -318,11 +351,11 @@ std::string vtkF3DGenericImporter::GetDataObjectDescription(vtkDataObject* objec
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
 {
-  this->PostPro->UpdateTimeStep(timestep);
+//  this->PostPro->UpdateTimeStep(timestep); TODO
 }
 
 //----------------------------------------------------------------------------
-int vtkF3DGenericImporter::ImportBegin()
+/*int vtkF3DGenericImporter::ImportBegin()
 {
   if (this->Reader)
   {
@@ -331,4 +364,4 @@ int vtkF3DGenericImporter::ImportBegin()
   }
 
   return 0;
-}
+}*/

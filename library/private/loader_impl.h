@@ -30,8 +30,12 @@ public:
    */
   loader_impl(const options& options, window_impl& window);
   ~loader_impl();
-  bool loadFile(const std::string& filePath) override;
+//  bool loadFile(const std::string& filePath) override;
   loader& setFilenameInfo(const std::string& filenameInfo) override;
+  bool addGeometry(const std::string& filePath) override;
+  loader& resetToDefaultScene() override;
+  bool loadFullScene(const std::string& filePath) override;
+
   ///@}
 
   /**
