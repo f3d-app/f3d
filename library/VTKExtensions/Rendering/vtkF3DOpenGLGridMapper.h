@@ -33,6 +33,13 @@ public:
 
   ///@{
   /**
+   * Set the number of minor lines per square on the grid.
+   */
+  vtkSetMacro(MinorSquares, double);
+  ///@}
+
+  ///@{
+  /**
    * Set the up vector index (X, Y, Z axis respectively).
    */
   vtkSetClampMacro(UpIndex, int, 0, 2);
@@ -59,6 +66,7 @@ protected:
 
   double FadeDistance = 10.0;
   double UnitSquare = 1.0;
+  int MinorSquares = 10;
   int UpIndex = 1;
 
 private:
