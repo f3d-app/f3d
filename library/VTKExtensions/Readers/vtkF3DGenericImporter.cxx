@@ -371,3 +371,14 @@ std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > vtkF3DGenericImporter::Ge
   }
   return actorsAndMappers;
 }
+
+//----------------------------------------------------------------------------
+std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > vtkF3DGenericImporter::GetPointSpritesActorsAndMappers()
+{
+  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > actorsAndMappers;
+  for(vtkF3DGenericImporter::ReaderPipeline& pipe : this->Readers)
+  {
+    actorsAndMappers.emplace_back(std::make_pair(pipe.PointSpritesActor.Get(), pipe.PointGaussianMapper.Get()));
+  }
+  return actorsAndMappers;
+}

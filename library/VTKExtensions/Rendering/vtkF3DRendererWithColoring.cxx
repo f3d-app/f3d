@@ -364,6 +364,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   }*/
 
 
+  // Handle surface geometry
   bool geometriesVisible = this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
   auto actorsAndMappers = this->Importer->GetGeometryActorsAndMappers();
   for (auto actorAndMapper : actorsAndMappers)
@@ -377,6 +378,29 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
           this->ArrayForColoring, this->ComponentForColoring, this->ColorTransferFunction,
           this->ColorRange, this->DataForColoring == this->CellDataForColoring);
         this->PolyDataMapperConfigured = true;
+      }
+      actorAndMapper.second->ScalarVisibilityOn();
+    }
+    else
+    {
+      actorAndMapper.second->ScalarVisibilityOff();
+    }
+  }
+
+  // Handle point sprites
+  bool pointSpritesVisible = !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
+  auto psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
+  for (auto actorAndMapper : psActorsAndMappers)
+  {
+    actorAndMapper.first->SetVisibility(pointSpritesVisible);
+    if (pointSpritesVisible && this->ArrayForColoring)
+    {
+      if (!this->PointGaussianMapperConfigured)
+      {
+        vtkF3DRendererWithColoring::ConfigureMapperForColoring(actorAndMapper.second,
+          this->ArrayForColoring, this->ComponentForColoring, this->ColorTransferFunction,
+          this->ColorRange, this->DataForColoring == this->CellDataForColoring);
+        this->PointGaussianMapperConfigured = true;
       }
       actorAndMapper.second->ScalarVisibilityOn();
     }
@@ -613,17 +637,10 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
     cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";
   }
 
-/*  if (this->VolumeProp)
-  {
-    cheatSheetText << " V: Volume representation " << (this->UseVolume ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " I: Inverse volume opacity "
-                   << (this->UseInverseOpacityFunction ? "[ON]" : "[OFF]") << "\n";
-  }
-
-  if (this->PointGaussianMapper)
-  {
-    cheatSheetText << " O: Point sprites " << (this->UsePointSprites ? "[ON]" : "[OFF]") << "\n";
-  }*/
+  cheatSheetText << " V: Volume representation " << (this->UseVolume ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " I: Inverse volume opacity "
+    << (this->UseInverseOpacityFunction ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " O: Point sprites " << (this->UsePointSprites ? "[ON]" : "[OFF]") << "\n";
   this->Superclass::FillCheatSheetHotkeys(cheatSheetText);
 }
 

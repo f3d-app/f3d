@@ -69,6 +69,7 @@ public:
   vtkGetSmartPointerMacro(VolumeProp, vtkVolume);*/
   ///@}
   std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > GetGeometryActorsAndMappers();
+  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > GetPointSpritesActorsAndMappers();
 
   ///@{
   /**
