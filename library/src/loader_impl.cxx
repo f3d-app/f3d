@@ -78,6 +78,7 @@ public:
 
   static void InitializeImporterWithOptions(const options& options, vtkF3DGenericImporter* importer)
   {
+    // Move to interactor TODO
     importer->SetSurfaceColor(options.getAsDoubleVector("model.color.rgb").data());
     importer->SetOpacity(options.getAsDouble("model.color.opacity"));
     importer->SetTextureBaseColor(options.getAsString("model.color.texture"));
@@ -308,11 +309,18 @@ bool loader_impl::addGeometry(const std::string& filePath)
   if (!this->Internals->DefaultScene)
   {
     // TODO
+    log::warn("Cannot add a geometry as default scene is not currently in use\n");
     return false;
   }
 
   // Read the file
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
+  if (!reader)
+  {
+    log::warn(filePath, " is not a file of a supported file format\n");
+    return false;
+  }
+
   this->Internals->GenericImporter->AddInternalReader(reader->createGeometryReader(filePath));
   this->Internals->GenericImporter->Update();
   loader_impl::internals::DisplayImporterDescription(this->Internals->CurrentImporter);
@@ -326,8 +334,9 @@ bool loader_impl::addGeometry(const std::string& filePath)
   // Recover generic importer specific actors and mappers to set on the renderer with coloring
   this->Internals->Window.InitializeRendererWithColoring(this->Internals->GenericImporter);
 
-  // Initialize renderer and reset camera to bounds if needed
+  // Initialize renderer and reset camera to bounds
   this->Internals->Window.UpdateDynamicOptions();
+  this->Internals->Window.getCamera().resetToBounds();
 
   // Print info about scene and coloring
   this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);

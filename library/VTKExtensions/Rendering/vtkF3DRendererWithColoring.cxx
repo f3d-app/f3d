@@ -2,6 +2,7 @@
 
 #include "F3DLog.h"
 #include "vtkF3DConfigure.h"
+#include "vtkF3DGenericImporter.h"
 
 #include <vtkBoundingBox.h>
 #include <vtkColorTransferFunction.h>
@@ -19,19 +20,20 @@
 #include <sstream>
 
 vtkStandardNewMacro(vtkF3DRendererWithColoring);
+vtkCxxSetObjectMacro(vtkF3DRendererWithColoring, Importer, vtkF3DGenericImporter);
 
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::Initialize(const std::string& fileInfo, const std::string& up)
 {
   this->Superclass::Initialize(fileInfo, up);
 
-  this->SetScalarBarActor(nullptr);
+/*  this->SetScalarBarActor(nullptr);
   this->SetGeometryActor(nullptr);
   this->SetPointSpritesActor(nullptr);
   this->SetVolumeProp(nullptr);
   this->SetPolyDataMapper(nullptr);
   this->SetPointGaussianMapper(nullptr);
-  this->SetVolumeMapper(nullptr);
+  this->SetVolumeMapper(nullptr);*/
 
   this->PointDataForColoring = nullptr;
   this->CellDataForColoring = nullptr;
@@ -53,7 +55,7 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& fileInfo, const s
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetPointSize(double pointSize)
 {
-  this->Superclass::SetPointSize(pointSize);
+/*  this->Superclass::SetPointSize(pointSize);
 
   if (this->PointGaussianMapper)
   {
@@ -72,7 +74,7 @@ void vtkF3DRendererWithColoring::SetPointSize(double pointSize)
       }
       this->PointGaussianMapper->SetScaleFactor(gaussianPointSize);
     }
-  }
+  }*/ // TODO
 }
 
 //----------------------------------------------------------------------------
@@ -111,7 +113,7 @@ void vtkF3DRendererWithColoring::SetUseVolume(bool use)
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
 {
-  if (this->UseInverseOpacityFunction != use)
+/*  if (this->UseInverseOpacityFunction != use)
   {
     this->UseInverseOpacityFunction = use;
     if (this->VolumeProp)
@@ -130,7 +132,7 @@ void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
     this->VolumeConfigured = false;
     this->CheatSheetNeedUpdate = true;
     this->ColoringTimeStamp.Modified();
-  }
+  }*/ // TODO
 }
 
 //----------------------------------------------------------------------------
@@ -259,6 +261,11 @@ int vtkF3DRendererWithColoring::GetColoringComponent()
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::UpdateColoringActors()
 {
+  if (!this->Importer)
+  {
+    return;
+  }
+
   // Early return if nothing changed
   if (this->ColoringUpdateTime >= this->ColoringTimeStamp.GetMTime())
   {
@@ -267,7 +274,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
 
   this->ColoringUpdateTime = this->ColoringTimeStamp.GetMTime();
 
-  bool volumeVisibility = !this->UseRaytracing && this->UseVolume;
+/*  bool volumeVisibility = !this->UseRaytracing && this->UseVolume;
   if (this->ArrayForColoring || volumeVisibility)
   {
     // When showing volume, always try to find an array to color with
@@ -285,9 +292,9 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
       this->ConfigureRangeAndCTFForColoring(this->ArrayForColoring, this->ComponentForColoring);
       this->ColorTransferFunctionConfigured = true;
     }
-  }
+  }*/
 
-  if (this->GeometryActor)
+/*  if (this->GeometryActor)
   {
     bool visible = this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
     this->GeometryActor->SetVisibility(visible);
@@ -309,8 +316,9 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
         this->PolyDataMapper->ScalarVisibilityOff();
       }
     }
-  }
-  if (this->PointSpritesActor)
+  }*/
+
+/*  if (this->PointSpritesActor)
   {
     bool visible = !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
     this->PointSpritesActor->SetVisibility(visible);
@@ -332,8 +340,8 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
         this->PointGaussianMapper->ScalarVisibilityOff();
       }
     }
-  }
-  if (this->VolumeProp)
+  }*/
+/*  if (this->VolumeProp)
   {
     vtkSmartVolumeMapper* mapper =
       vtkSmartVolumeMapper::SafeDownCast(this->VolumeProp->GetMapper());
@@ -353,7 +361,31 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
       this->VolumeConfigured = true;
     }
     this->VolumeProp->SetVisibility(volumeVisibility);
+  }*/
+
+
+  bool geometriesVisible = this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
+  auto actorsAndMappers = this->Importer->GetGeometryActorsAndMappers();
+  for (auto actorAndMapper : actorsAndMappers)
+  {
+    actorAndMapper.first->SetVisibility(geometriesVisible);
+    if (geometriesVisible && this->ArrayForColoring)
+    {
+      if (!this->PolyDataMapperConfigured)
+      {
+        vtkF3DRendererWithColoring::ConfigureMapperForColoring(actorAndMapper.second,
+          this->ArrayForColoring, this->ComponentForColoring, this->ColorTransferFunction,
+          this->ColorRange, this->DataForColoring == this->CellDataForColoring);
+        this->PolyDataMapperConfigured = true;
+      }
+      actorAndMapper.second->ScalarVisibilityOn();
+    }
+    else
+    {
+      actorAndMapper.second->ScalarVisibilityOff();
+    }
   }
+
   this->UpdateScalarBarVisibility();
   this->SetupRenderPasses();
 }
@@ -548,7 +580,7 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(vtkDataArray* a
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::UpdateScalarBarVisibility()
 {
-  if (this->ScalarBarActor)
+/*  if (this->ScalarBarActor)
   {
     bool visible =
       this->ScalarBarVisible && this->ArrayForColoring && this->ComponentForColoring >= -1;
@@ -560,7 +592,7 @@ void vtkF3DRendererWithColoring::UpdateScalarBarVisibility()
         this->ArrayForColoring, this->ComponentForColoring, this->ColorTransferFunction);
       this->ScalarBarActorConfigured = true;
     }
-  }
+  }*/ // TODO
 }
 
 //----------------------------------------------------------------------------
@@ -581,7 +613,7 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
     cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";
   }
 
-  if (this->VolumeProp)
+/*  if (this->VolumeProp)
   {
     cheatSheetText << " V: Volume representation " << (this->UseVolume ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " I: Inverse volume opacity "
@@ -591,7 +623,7 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
   if (this->PointGaussianMapper)
   {
     cheatSheetText << " O: Point sprites " << (this->UsePointSprites ? "[ON]" : "[OFF]") << "\n";
-  }
+  }*/
   this->Superclass::FillCheatSheetHotkeys(cheatSheetText);
 }
 
@@ -745,7 +777,7 @@ void vtkF3DRendererWithColoring::CheckCurrentComponentForColoring()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
 {
-  std::string description;
+/*  std::string description;
   description += " \n";
   if (this->PolyDataMapper)
   {
@@ -788,7 +820,7 @@ std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
     description += " Unavailable\n";
   }
 
-  return description;
+  return description;*/ return ""; // TODO
 }
 
 //----------------------------------------------------------------------------

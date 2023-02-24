@@ -25,7 +25,7 @@
 #include <vtkRectilinearGrid.h>
 #include <vtkRectilinearGridToPointSet.h>
 #include <vtkRenderer.h>
-#include <vtkScalarBarActor.h>
+//#include <vtkScalarBarActor.h>
 #include <vtkScalarsToColors.h>
 #include <vtkSmartPointer.h>
 #include <vtkSmartVolumeMapper.h>
@@ -116,12 +116,6 @@ bool vtkF3DGenericImporter::GetTemporalInformation(
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
-  // Clear all mappers
-  this->VolumeMapper->RemoveAllInputs();
-  this->PolyDataMapper->RemoveAllInputs();
-  this->PointGaussianMapper->RemoveAllInputs();
-
-  
   // Update each reader
   for(vtkF3DGenericImporter::ReaderPipeline& pipe : this->Readers)
   {
@@ -144,41 +138,53 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     vtkImageData* image = vtkImageData::SafeDownCast(pipe.PostPro->GetOutput(2));
 
     // Add filter outputs to mapper inputs
-    this->PolyDataMapper->AddInputConnection(pipe.PostPro->GetOutputPort(0));
-    this->PointGaussianMapper->AddInputConnection(pipe.PostPro->GetOutputPort(1));
-    this->VolumeMapper->AddInputConnection(pipe.PostPro->GetOutputPort(2));
+    pipe.PolyDataMapper->SetInputConnection(pipe.PostPro->GetOutputPort(0));
+    pipe.PointGaussianMapper->SetInputConnection(pipe.PostPro->GetOutputPort(1));
+    pipe.VolumeMapper->SetInputConnection(pipe.PostPro->GetOutputPort(2));
+
+    // TODO not here ?
+    pipe.VolumeMapper->SetRequestedRenderModeToGPU();
+    pipe.PolyDataMapper->InterpolateScalarsBeforeMappingOn();
+    pipe.PointGaussianMapper->EmissiveOff();
+    pipe.PointGaussianMapper->SetSplatShaderCode(
+      "//VTK::Color::Impl\n"
+      "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
+      "if (dist > 1.0) {\n"
+      "  discard;\n"
+      "} else {\n"
+      "  float scale = (1.0 - dist);\n"
+      "  ambientColor *= scale;\n"
+      "  diffuseColor *= scale;\n"
+      "}\n");
+
+    vtkDataSet* dataSet = vtkImageData::SafeDownCast(pipe.PostPro->GetInput())
+      ? vtkDataSet::SafeDownCast(image)
+      : vtkDataSet::SafeDownCast(surface);
+
+    pipe.PointDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
+    pipe.CellDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetCellData());
+
+    // configure props
+    pipe.VolumeProp->SetMapper(pipe.VolumeMapper);
+
+    pipe.GeometryActor->SetMapper(pipe.PolyDataMapper);
+    pipe.GeometryActor->GetProperty()->SetInterpolationToPBR();
+
+    pipe.PointSpritesActor->SetMapper(pipe.PointGaussianMapper);
+
+    // add props
+//    ren->AddActor2D(pipe.ScalarBarActor); TODO handle in renderer ?
+    ren->AddActor(pipe.GeometryActor);
+    ren->AddActor(pipe.PointSpritesActor);
+    ren->AddVolume(pipe.VolumeProp);
+
+//    pipe.ScalarBarActor->SetVisibility(false);
+    pipe.GeometryActor->SetVisibility(false);
+    pipe.PointSpritesActor->SetVisibility(false);
+    pipe.VolumeProp->SetVisibility(false);
   }
 
-
-
-  // Configure mappers if not already //TODO not here ?
-  this->VolumeMapper->SetRequestedRenderModeToGPU();
-  this->PolyDataMapper->InterpolateScalarsBeforeMappingOn();
-  this->PointGaussianMapper->EmissiveOff();
-  this->PointGaussianMapper->SetSplatShaderCode(
-    "//VTK::Color::Impl\n"
-    "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
-    "if (dist > 1.0) {\n"
-    "  discard;\n"
-    "} else {\n"
-    "  float scale = (1.0 - dist);\n"
-    "  ambientColor *= scale;\n"
-    "  diffuseColor *= scale;\n"
-    "}\n");
-
-//  vtkDataSet* dataSet = vtkImageData::SafeDownCast(this->PostPro->GetInput())
-//    ? vtkDataSet::SafeDownCast(image)
-//    : vtkDataSet::SafeDownCast(surface);
-
-//  this->PointDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
-//  this->CellDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetCellData()); TODO
-
-  // configure props
-  this->VolumeProp->SetMapper(this->VolumeMapper);
-
-  this->GeometryActor->SetMapper(this->PolyDataMapper);
-  this->GeometryActor->GetProperty()->SetInterpolationToPBR();
-
+/* TODO move to renderer
   this->GeometryActor->GetProperty()->SetColor(this->SurfaceColor);
   this->GeometryActor->GetProperty()->SetOpacity(this->Opacity);
   this->GeometryActor->GetProperty()->SetRoughness(this->Roughness);
@@ -186,7 +192,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->GeometryActor->GetProperty()->SetLineWidth(this->LineWidth);
   this->GeometryActor->GetProperty()->SetPointSize(this->PointSize);
 
-  this->PointSpritesActor->SetMapper(this->PointGaussianMapper);
   this->PointSpritesActor->GetProperty()->SetColor(this->SurfaceColor);
   this->PointSpritesActor->GetProperty()->SetOpacity(this->Opacity);
 
@@ -205,17 +210,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   {
     this->GeometryActor->ForceTranslucentOn();
   }
-
-  // add props
-  ren->AddActor2D(this->ScalarBarActor);
-  ren->AddActor(this->GeometryActor);
-  ren->AddActor(this->PointSpritesActor);
-  ren->AddVolume(this->VolumeProp);
-
-  this->ScalarBarActor->SetVisibility(false);
-  this->GeometryActor->SetVisibility(false);
-  this->PointSpritesActor->SetVisibility(false);
-  this->VolumeProp->SetVisibility(false);
+*/
 }
 
 //----------------------------------------------------------------------------
@@ -365,3 +360,14 @@ void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
 
   return 0;
 }*/
+
+//----------------------------------------------------------------------------
+std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > vtkF3DGenericImporter::GetGeometryActorsAndMappers()
+{
+  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > actorsAndMappers;
+  for(vtkF3DGenericImporter::ReaderPipeline& pipe : this->Readers)
+  {
+    actorsAndMappers.emplace_back(std::make_pair(pipe.GeometryActor.Get(), pipe.PolyDataMapper.Get()));
+  }
+  return actorsAndMappers;
+}

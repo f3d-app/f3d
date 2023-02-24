@@ -18,9 +18,10 @@
 #include <vtkScalarBarActor.h>
 #include <vtkSmartVolumeMapper.h>
 
-class vtkDataArray;
 class vtkColorTransferFunction;
+class vtkDataArray;
 class vtkDataSetAttributes;
+class vtkF3DGenericImporter;
 
 class vtkF3DRendererWithColoring : public vtkF3DRenderer
 {
@@ -96,60 +97,61 @@ public:
    */
   void CycleScalars(int cycleType);
 
+  void SetImporter(vtkF3DGenericImporter* importer);
   ///@{
   /**
    * Set/Get the scalar bar actor, used for hotkey purposes
    */
-  vtkGetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
-  vtkSetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
+  //vtkGetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
+  //vtkSetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
   ///@}
 
   ///@{
   /**
    * Set/Get the geometry actor
    */
-  vtkGetSmartPointerMacro(GeometryActor, vtkActor);
-  vtkSetSmartPointerMacro(GeometryActor, vtkActor);
+//  vtkGetSmartPointerMacro(GeometryActor, vtkActor);
+//  vtkSetSmartPointerMacro(GeometryActor, vtkActor);
   ///@}
 
   ///@{
   /**
    * Set/Get the point sprites actor
    */
-  vtkGetSmartPointerMacro(PointSpritesActor, vtkActor);
-  vtkSetSmartPointerMacro(PointSpritesActor, vtkActor);
+//  vtkGetSmartPointerMacro(PointSpritesActor, vtkActor);
+//  vtkSetSmartPointerMacro(PointSpritesActor, vtkActor);
   ///@}
 
   ///@{
   /**
    * Set/Get the volume prop
    */
-  vtkGetSmartPointerMacro(VolumeProp, vtkVolume);
-  vtkSetSmartPointerMacro(VolumeProp, vtkVolume);
+//  vtkGetSmartPointerMacro(VolumeProp, vtkVolume);
+//  vtkSetSmartPointerMacro(VolumeProp, vtkVolume);
   ///@}
 
   ///@{
   /**
    * Set/Get the polydata mapper
    */
-  vtkGetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
-  vtkSetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
+//  vtkGetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
+//  vtkSetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
   ///@}
 
   ///@{
   /**
    * Set/Get the point gaussian mapper, used for hotkey purposes
    */
-  vtkGetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
-  vtkSetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
+//  vtkGetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
+//  vtkSetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
   ///@}
 
   ///@{
   /**
    * Set/Get the volume mapper, used for hotkey purposes
    */
-  vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
-  vtkSetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
+//  vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
+//  vtkSetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
   ///@}
 
   /**
@@ -258,20 +260,21 @@ protected:
    */
   static std::string ShortName(const std::string& name, int component);
 
-  vtkSmartPointer<vtkActor> GeometryActor;
-  vtkSmartPointer<vtkActor> PointSpritesActor;
-  vtkSmartPointer<vtkVolume> VolumeProp;
+  vtkF3DGenericImporter* Importer = nullptr;
+//  vtkSmartPointer<vtkActor> GeometryActor;
+//  vtkSmartPointer<vtkActor> PointSpritesActor;
+//  vtkSmartPointer<vtkVolume> VolumeProp;
 
-  vtkSmartPointer<vtkScalarBarActor> ScalarBarActor;
+//  vtkSmartPointer<vtkScalarBarActor> ScalarBarActor;
   bool ScalarBarActorConfigured = false;
 
-  vtkSmartPointer<vtkPolyDataMapper> PolyDataMapper;
+//  vtkSmartPointer<vtkPolyDataMapper> PolyDataMapper;
   bool PolyDataMapperConfigured = false;
 
-  vtkSmartPointer<vtkPointGaussianMapper> PointGaussianMapper;
+//  vtkSmartPointer<vtkPointGaussianMapper> PointGaussianMapper;
   bool PointGaussianMapperConfigured = false;
 
-  vtkSmartPointer<vtkSmartVolumeMapper> VolumeMapper;
+//  vtkSmartPointer<vtkSmartVolumeMapper> VolumeMapper;
   bool VolumeConfigured = false;
 
   vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;

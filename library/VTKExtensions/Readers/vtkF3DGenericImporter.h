@@ -61,29 +61,30 @@ public:
 
   ///@{
   /**
-   * Access to specific actors
+   * Access to specific actors TODO
    */
-  vtkGetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
+/*  vtkGetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
   vtkGetSmartPointerMacro(GeometryActor, vtkActor);
   vtkGetSmartPointerMacro(PointSpritesActor, vtkActor);
-  vtkGetSmartPointerMacro(VolumeProp, vtkVolume);
+  vtkGetSmartPointerMacro(VolumeProp, vtkVolume);*/
   ///@}
+  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > GetGeometryActorsAndMappers();
 
   ///@{
   /**
-   * Access to specific mappers
+   * Access to specific mappers TODO
    */
-  vtkGetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
+/*  vtkGetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
   vtkGetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
-  vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
+  vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);*/
   ///@}
 
   ///@{
   /**
-   * Access to specific attributes
+   * Access to specific attributes TODO
    */
-  vtkGetObjectMacro(PointDataForColoring, vtkDataSetAttributes);
-  vtkGetObjectMacro(CellDataForColoring, vtkDataSetAttributes);
+//  vtkGetObjectMacro(PointDataForColoring, vtkDataSetAttributes);
+//  vtkGetObjectMacro(CellDataForColoring, vtkDataSetAttributes);
   ///@}
 
   void UpdateTimeStep(double timestep) override;
@@ -126,7 +127,7 @@ public:
 
   ///@{
   /**
-   * Setter for all actor loading options
+   * Setter for all actor loading options TODO move
    */
   vtkSetMacro(PointSize, double);
   vtkSetVector3Macro(SurfaceColor, double);
@@ -157,26 +158,25 @@ protected:
 
   void UpdateTemporalInformation();
 
-  struct ReaderPipeline
+  struct ReaderPipeline //TODO in CXX
   {
     vtkSmartPointer<vtkAlgorithm> Reader;
     vtkNew<vtkF3DPostProcessFilter> PostPro;
     std::string OutputDescription;
+
+//    vtkNew<vtkScalarBarActor> ScalarBarActor;
+    vtkNew<vtkActor> GeometryActor;
+    vtkNew<vtkActor> PointSpritesActor;
+    vtkNew<vtkVolume> VolumeProp;
+    vtkNew<vtkPolyDataMapper> PolyDataMapper;
+    vtkNew<vtkPointGaussianMapper> PointGaussianMapper;
+    vtkNew<vtkSmartVolumeMapper> VolumeMapper;
+
+    vtkDataSetAttributes* PointDataForColoring = nullptr;
+    vtkDataSetAttributes* CellDataForColoring = nullptr;
   };
 
   std::vector<ReaderPipeline> Readers;
-
-
-  vtkNew<vtkScalarBarActor> ScalarBarActor;
-  vtkNew<vtkActor> GeometryActor;
-  vtkNew<vtkActor> PointSpritesActor;
-  vtkNew<vtkVolume> VolumeProp;
-  vtkNew<vtkPolyDataMapper> PolyDataMapper;
-  vtkNew<vtkPointGaussianMapper> PointGaussianMapper;
-  vtkNew<vtkSmartVolumeMapper> VolumeMapper;
-
-  vtkDataSetAttributes* PointDataForColoring = nullptr;
-  vtkDataSetAttributes* CellDataForColoring = nullptr;
 
   bool AnimationEnabled = false;
   int NbTimeSteps = -1;

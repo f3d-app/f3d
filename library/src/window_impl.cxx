@@ -397,15 +397,16 @@ void window_impl::InitializeRendererWithColoring(vtkF3DGenericImporter* importer
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
   if (renWithColor && importer)
   {
-    renWithColor->SetScalarBarActor(importer->GetScalarBarActor());
-    renWithColor->SetGeometryActor(importer->GetGeometryActor());
-    renWithColor->SetPointSpritesActor(importer->GetPointSpritesActor());
-    renWithColor->SetVolumeProp(importer->GetVolumeProp());
-    renWithColor->SetPolyDataMapper(importer->GetPolyDataMapper());
-    renWithColor->SetPointGaussianMapper(importer->GetPointGaussianMapper());
-    renWithColor->SetVolumeMapper(importer->GetVolumeMapper());
-    renWithColor->SetColoringAttributes(
-      importer->GetPointDataForColoring(), importer->GetCellDataForColoring());
+    renWithColor->SetImporter(importer);
+//    renWithColor->SetScalarBarActor(importer->GetScalarBarActor());
+//    renWithColor->SetGeometryActor(importer->GetGeometryActor());
+//    renWithColor->SetPointSpritesActor(importer->GetPointSpritesActor());
+//    renWithColor->SetVolumeProp(importer->GetVolumeProp());
+//    renWithColor->SetPolyDataMapper(importer->GetPolyDataMapper());
+//    renWithColor->SetPointGaussianMapper(importer->GetPointGaussianMapper());
+//    renWithColor->SetVolumeMapper(importer->GetVolumeMapper());
+//    renWithColor->SetColoringAttributes(
+//      importer->GetPointDataForColoring(), importer->GetCellDataForColoring());
   }
 }
 
