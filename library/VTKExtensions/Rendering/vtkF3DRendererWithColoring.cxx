@@ -295,6 +295,14 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   vtkF3DGenericImporter::ColoringInfo info;
   bool hasColoring = this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
 
+  bool volumeVisible = !this->UseRaytracing && this->UseVolume;
+  if (!hasColoring && volumeVisible)
+  {
+    // When showing volume, always try to find an array to color with
+    this->CycleArrayIndexForColoring();
+    hasColoring = this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
+  }
+
 /*  bool volumeVisibility = !this->UseRaytracing && this->UseVolume;
   if (this->ArrayForColoring || volumeVisibility)
   {
@@ -439,6 +447,37 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
     else
     {
       actorAndMapper.second->ScalarVisibilityOff();
+    }
+  }
+
+  // Handle Volume prop
+  auto volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
+  for (size_t i = 0; i < volPropsAndMappers.size(); i++)
+  {
+    auto propAndMapper = volPropsAndMappers[i];
+    vtkDataArray* coloringArray = nullptr;
+    if (hasColoring && info.Arrays.size() > i)
+    {
+      coloringArray = info.Arrays[i];
+    }
+    if (!volumeVisible)
+    {
+      propAndMapper.first->SetVisibility(false);
+    }
+    else if (volumeVisible && !coloringArray)
+    {
+      F3DLog::Print(
+        F3DLog::Severity::Error, "Cannot use volume with this dataset or with the requested array");
+      propAndMapper.first->SetVisibility(false);
+    }
+    else
+    {
+      vtkF3DRendererWithColoring::ConfigureVolumeForColoring(propAndMapper.second, propAndMapper.first,
+        coloringArray, this->ComponentForColoring, this->ColorTransferFunction,
+        this->ColorRange, this->UseCellColoring,
+        this->UseInverseOpacityFunction);
+//      this->VolumeConfigured = true; TODO does it matter ?
+      propAndMapper.first->SetVisibility(true);
     }
   }
 
@@ -763,6 +802,11 @@ void vtkF3DRendererWithColoring::CycleArrayIndexForColoring()
   }
 
   int nIndex = this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring);
+  if (nIndex <= 0)
+  {
+    return;
+  }
+
   if (this->UseVolume)
   {
     this->ArrayIndexForColoring =
@@ -823,7 +867,7 @@ void vtkF3DRendererWithColoring::CycleComponentForColoring()
 
   // -2 -1 0 1 2 3 4
   this->ComponentForColoring =
-    (this->ComponentForColoring + 3) % (info.MaximumNumberOfComponents + 2) - 2; // Rethink this
+    (this->ComponentForColoring + 3) % (info.MaximumNumberOfComponents + 2) - 2; // TODO Rethink this
   std::cout<<this->ComponentForColoring<<std::endl;
 }
 

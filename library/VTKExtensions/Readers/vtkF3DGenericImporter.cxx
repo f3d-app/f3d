@@ -391,6 +391,17 @@ std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > vtkF3DGenericImporte
 }
 
 //----------------------------------------------------------------------------
+std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > vtkF3DGenericImporter::GetVolumePropsAndMappers()
+{
+  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > propsAndMappers;
+  for(vtkF3DGenericImporter::ReaderPipeline& pipe : this->Readers)
+  {
+    propsAndMappers.emplace_back(std::make_pair(pipe.VolumeProp.Get(), pipe.VolumeMapper.Get()));
+  }
+  return propsAndMappers;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
 {
   // Recover all possible names

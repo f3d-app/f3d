@@ -78,6 +78,7 @@ public:
   ///@}
   std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > GetGeometryActorsAndMappers();
   std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > GetPointSpritesActorsAndMappers();
+  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > GetVolumePropsAndMappers();
   bool GetInfoForColoring(bool useCellData, int index, ColoringInfo& info);
   int GetNumberOfIndexesForColoring(bool useCellData);
   int FindIndexForColoring(bool useCellData, std::string arrayName);

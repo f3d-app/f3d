@@ -392,7 +392,7 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
       .setFilenameInfo(filenameInfo)
       .addGeometry(filePath.string());
 
-    loader.addGeometry("/home/glow/dev/f3d/f3d/src/testing/data/dragon.vtu");
+//    loader.addGeometry("/home/glow/dev/f3d/f3d/src/testing/data/dragon.vtu");
 
     if (!this->Internals->AppOptions.NoRender)
     {
