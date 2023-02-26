@@ -198,7 +198,7 @@ protected:
     vtkDataArray* array, int component, vtkColorTransferFunction* ctf, double range[2],
     bool cellFlag = false, bool inverseOpacityFlag = false);
 
-  void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, vtkDataArray* array,
+  void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, const std::string& arrayName,
     int component, vtkColorTransferFunction* ctf);
 
   void ConfigureRangeAndCTFForColoring(const vtkF3DGenericImporter::ColoringInfo& info);
@@ -267,6 +267,7 @@ protected:
 //  vtkSmartPointer<vtkVolume> VolumeProp;
 
 //  vtkSmartPointer<vtkScalarBarActor> ScalarBarActor;
+  vtkNew<vtkScalarBarActor> ScalarBarActor;
   bool ScalarBarActorConfigured = false;
 
 //  vtkSmartPointer<vtkPolyDataMapper> PolyDataMapper;

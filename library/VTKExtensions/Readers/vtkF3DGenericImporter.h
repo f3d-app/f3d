@@ -24,7 +24,7 @@ class vtkMultiBlockDataSet;
 class vtkPointGaussianMapper;
 class vtkPolyDataMapper;
 class vtkSmartVolumeMapper;
-class vtkScalarBarActor;
+//class vtkScalarBarActor;
 class vtkTexture;
 
 class vtkF3DGenericImporter : public vtkImporter

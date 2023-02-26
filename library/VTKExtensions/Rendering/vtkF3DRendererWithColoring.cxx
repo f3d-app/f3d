@@ -41,6 +41,9 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& fileInfo, const s
   this->ArrayIndexForColoring = -1;
   this->ComponentForColoring = -1;
 
+  this->AddActor2D(this->ScalarBarActor);
+  this->ScalarBarActor->SetVisibility(false);
+
   this->ColorTransferFunctionConfigured = false;
   this->PolyDataMapperConfigured = false;
   this->PointGaussianMapperConfigured = false;
@@ -487,7 +490,19 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
     }
   }
 
-  this->UpdateScalarBarVisibility();
+  //this->UpdateScalarBarVisibility();
+
+  // Handle scalar bar
+  bool barVisible =
+    this->ScalarBarVisible && hasColoring && this->ComponentForColoring >= -1;
+  this->ScalarBarActor->SetVisibility(barVisible);
+  if (barVisible && !this->ScalarBarActorConfigured)
+  {
+    vtkF3DRendererWithColoring::ConfigureScalarBarActorForColoring(this->ScalarBarActor,
+      info.Name, this->ComponentForColoring, this->ColorTransferFunction);
+    this->ScalarBarActorConfigured = true; // TODO do we keep it ?
+  }
+
   this->SetupRenderPasses();
 }
 
@@ -603,14 +618,9 @@ void vtkF3DRendererWithColoring::ConfigureVolumeForColoring(vtkSmartVolumeMapper
 
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::ConfigureScalarBarActorForColoring(
-  vtkScalarBarActor* scalarBar, vtkDataArray* array, int component, vtkColorTransferFunction* ctf)
+  vtkScalarBarActor* scalarBar, const std::string& arrayName, int component, vtkColorTransferFunction* ctf)
 {
-  if (!array)
-  {
-    return;
-  }
-
-  std::string title = array->GetName();
+  std::string title = arrayName;
   title += " (";
   title += this->ComponentToString(component);
   title += ")";
