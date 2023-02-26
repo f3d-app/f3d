@@ -70,6 +70,10 @@ public:
   ///@}
   std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > GetGeometryActorsAndMappers();
   std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > GetPointSpritesActorsAndMappers();
+  std::vector<vtkDataArray*> GetArrayVectorForColoring(bool useCellData, int index);
+  std::string GetArrayNameForColoring(bool useCellData, int index);
+  int GetNumberOfArrayVectorsForColoring(bool useCellData);
+  int FindArrayVectorIndexForColoring(bool useCellData, std::string arrayName);
 
   ///@{
   /**
@@ -159,6 +163,8 @@ protected:
 
   void UpdateTemporalInformation();
 
+  void UpdateColoringVectors(bool useCellData);
+
   struct ReaderPipeline //TODO in CXX
   {
     vtkSmartPointer<vtkAlgorithm> Reader;
@@ -173,11 +179,15 @@ protected:
     vtkNew<vtkPointGaussianMapper> PointGaussianMapper;
     vtkNew<vtkSmartVolumeMapper> VolumeMapper;
 
+    vtkDataSet* Output = nullptr;
     vtkDataSetAttributes* PointDataForColoring = nullptr;
     vtkDataSetAttributes* CellDataForColoring = nullptr;
   };
 
   std::vector<ReaderPipeline> Readers;
+  std::vector<std::pair<std::string, std::vector<vtkDataArray*> > > PointDataArrayVectorForColoring;
+  std::vector<std::pair<std::string, std::vector<vtkDataArray*> > > CellDataArrayVectorForColoring;
+
 
   bool AnimationEnabled = false;
   int NbTimeSteps = -1;

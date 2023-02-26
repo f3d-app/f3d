@@ -7,6 +7,7 @@
 #include <vtkCellData.h>
 #include <vtkDataObjectTreeIterator.h>
 #include <vtkDataSetSurfaceFilter.h>
+#include <vtkDataObject.h>
 #include <vtkDoubleArray.h>
 #include <vtkEventForwarderCommand.h>
 #include <vtkImageData.h>
@@ -34,6 +35,8 @@
 #include <vtkVertexGlyphFilter.h>
 #include <vtkVolumeProperty.h>
 #include <vtksys/SystemTools.hxx>
+#include <vtkPointData.h>
+#include <vtkCellData.h>
 
 #include <sstream>
 
@@ -161,6 +164,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       ? vtkDataSet::SafeDownCast(image)
       : vtkDataSet::SafeDownCast(surface);
 
+    pipe.Output = dataSet;
     pipe.PointDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
     pipe.CellDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetCellData());
 
@@ -211,6 +215,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     this->GeometryActor->ForceTranslucentOn();
   }
 */
+  this->UpdateColoringVectors(false);
+  this->UpdateColoringVectors(true);
 }
 
 //----------------------------------------------------------------------------
@@ -269,6 +275,7 @@ void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::AddInternalReader(vtkAlgorithm* reader)
 {
+  reader->Print(std::cout);
   vtkF3DGenericImporter::ReaderPipeline pipe;
   pipe.Reader = reader;
   pipe.PostPro->SetInputConnection(pipe.Reader->GetOutputPort());
@@ -381,4 +388,101 @@ std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > vtkF3DGenericImporte
     actorsAndMappers.emplace_back(std::make_pair(pipe.PointSpritesActor.Get(), pipe.PointGaussianMapper.Get()));
   }
   return actorsAndMappers;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
+{
+  // Recover all possible names
+  std::set<std::string> arrayNames;
+  for(vtkF3DGenericImporter::ReaderPipeline& pipe : this->Readers)
+  {
+    vtkDataSetAttributes* attr = useCellData
+      ? static_cast<vtkDataSetAttributes*>(pipe.Output->GetCellData())
+      : static_cast<vtkDataSetAttributes*>(pipe.Output->GetPointData());
+
+    for (int i = 0; i < attr->GetNumberOfArrays(); i++)
+    {
+      vtkDataArray* array = attr->GetArray(i);
+      if (array)
+      {
+        arrayNames.insert(array->GetName());
+      }
+    }
+  }
+
+  auto& data = useCellData
+    ? CellDataArrayVectorForColoring
+    : PointDataArrayVectorForColoring;
+  data.clear();
+
+  // Create a vector of arrays by name
+  for (std::string arrayName : arrayNames)
+  {
+    std::vector<vtkDataArray* > arrayVector;
+    for(vtkF3DGenericImporter::ReaderPipeline& pipe : this->Readers)
+    {
+      arrayVector.emplace_back(useCellData
+        ? pipe.Output->GetCellData()->GetArray(arrayName.c_str())
+        : pipe.Output->GetPointData()->GetArray(arrayName.c_str()));
+    }
+
+    data.emplace_back(std::make_pair(arrayName, arrayVector));
+    std::cout<<arrayName<<std::endl;
+  }
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkDataArray*> vtkF3DGenericImporter::GetArrayVectorForColoring(bool useCellData, int index)
+{
+  auto& data = useCellData
+    ? CellDataArrayVectorForColoring
+    : PointDataArrayVectorForColoring;
+
+  if (index < 0 || index >= static_cast<int>(data.size()))
+  {
+    return std::vector<vtkDataArray*>();
+  }
+
+  return data[index].second;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DGenericImporter::GetArrayNameForColoring(bool useCellData, int index)
+{
+  auto& data = useCellData
+    ? CellDataArrayVectorForColoring
+    : PointDataArrayVectorForColoring;
+
+  if (index < 0 || index >= static_cast<int>(data.size()))
+  {
+    return "";
+  }
+
+  return data[index].first;
+}
+
+//----------------------------------------------------------------------------
+int vtkF3DGenericImporter::GetNumberOfArrayVectorsForColoring(bool useCellData)
+{
+  auto& data = useCellData
+    ? CellDataArrayVectorForColoring
+    : PointDataArrayVectorForColoring;
+  return static_cast<int> (data.size());
+}
+
+//----------------------------------------------------------------------------
+int vtkF3DGenericImporter::FindArrayVectorIndexForColoring(bool useCellData, std::string arrayName)
+{
+  auto& data = useCellData
+    ? CellDataArrayVectorForColoring
+    : PointDataArrayVectorForColoring;
+  for (size_t i = 0; i < data.size(); i++)
+  {
+    if (data[i].first == arrayName)
+    {
+      return static_cast<int>(i);
+    }
+  }
+  return -1;
 }

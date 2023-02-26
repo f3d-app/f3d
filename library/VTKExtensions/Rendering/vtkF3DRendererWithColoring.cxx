@@ -35,9 +35,9 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& fileInfo, const s
   this->SetPointGaussianMapper(nullptr);
   this->SetVolumeMapper(nullptr);*/
 
-  this->PointDataForColoring = nullptr;
+/*  this->PointDataForColoring = nullptr;
   this->CellDataForColoring = nullptr;
-  this->DataForColoring = nullptr;
+  this->DataForColoring = nullptr;*/
   this->ArrayIndexForColoring = -1;
   this->ComponentForColoring = -1;
 
@@ -175,7 +175,7 @@ void vtkF3DRendererWithColoring::CycleScalars(int cycleType)
       this->CycleFieldForColoring();
       break;
     case (F3D_ARRAY_CYCLE):
-      this->CycleArrayForColoring();
+      this->CycleArrayIndexForColoring();
       break;
     case (F3D_COMPONENT_CYCLE):
       this->CycleComponentForColoring();
@@ -195,7 +195,7 @@ void vtkF3DRendererWithColoring::CycleScalars(int cycleType)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetColoringAttributes(
+/*void vtkF3DRendererWithColoring::SetColoringAttributes(
   vtkDataSetAttributes* pointData, vtkDataSetAttributes* cellData)
 {
   if (this->PointDataForColoring != pointData || this->CellDataForColoring != cellData)
@@ -215,21 +215,25 @@ void vtkF3DRendererWithColoring::SetColoringAttributes(
     this->ScalarBarActorConfigured = false;
     this->ColoringTimeStamp.Modified();
   }
-}
+}*/
 
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetColoring(
   bool useCellData, const std::string& arrayName, int component)
 {
-  // This assumes this->PointDataForColoring and this->CellDataForColoring are set
-  if (!this->DataForColoring || this->GetColoringUseCell() != useCellData ||
-    this->GetColoringArrayName() != arrayName || this->GetColoringComponent() != component)
+  if (!this->Importer)
   {
+    return;
+  }
+
+  if (this->GetColoringUseCell() != useCellData ||
+    this->GetColoringArrayName() != arrayName ||
+    this->GetColoringComponent() != component)
+  {
+    this->UseCellColoring = useCellData;
     this->ComponentForColoring = component;
-    this->DataForColoring = useCellData ? this->CellDataForColoring : this->PointDataForColoring;
-    this->ArrayIndexForColoring =
-      vtkF3DRendererWithColoring::FindArrayIndexForColoring(this->DataForColoring, arrayName);
-    this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
+    this->ArrayIndexForColoring = this->Importer->FindArrayVectorIndexForColoring(useCellData, arrayName);
+//    this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
 
     this->ColorTransferFunctionConfigured = false;
     this->PolyDataMapperConfigured = false;
@@ -243,13 +247,18 @@ void vtkF3DRendererWithColoring::SetColoring(
 //----------------------------------------------------------------------------
 bool vtkF3DRendererWithColoring::GetColoringUseCell()
 {
-  return this->DataForColoring ? this->DataForColoring == this->CellDataForColoring : false;
+  return this->UseCellColoring;
 }
 
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::GetColoringArrayName()
 {
-  return this->ArrayForColoring ? this->ArrayForColoring->GetName() : F3D_RESERVED_STRING;
+  if (!this->Importer)
+  {
+    return "";
+  }
+
+  return this->Importer->GetArrayNameForColoring(this->UseCellColoring, this->ArrayIndexForColoring);
 }
 
 //----------------------------------------------------------------------------
@@ -273,6 +282,10 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   }
 
   this->ColoringUpdateTime = this->ColoringTimeStamp.GetMTime();
+
+  // Recover coloring information
+  std::vector<vtkDataArray*> coloringVector =
+    this->Importer->GetArrayVectorForColoring(this->UseCellColoring, this->ArrayIndexForColoring);
 
 /*  bool volumeVisibility = !this->UseRaytracing && this->UseVolume;
   if (this->ArrayForColoring || volumeVisibility)
@@ -363,21 +376,26 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
     this->VolumeProp->SetVisibility(volumeVisibility);
   }*/
 
-
   // Handle surface geometry
   bool geometriesVisible = this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
   auto actorsAndMappers = this->Importer->GetGeometryActorsAndMappers();
-  for (auto actorAndMapper : actorsAndMappers)
+  for (size_t i = 0; i < actorsAndMappers.size(); i++)
   {
-    actorAndMapper.first->SetVisibility(geometriesVisible);
-    if (geometriesVisible && this->ArrayForColoring)
+    auto actorAndMapper = actorsAndMappers[i];
+    vtkDataArray* coloringArray = nullptr;
+    if (coloringVector.size() > i)
     {
-      if (!this->PolyDataMapperConfigured)
+      coloringArray = coloringVector[i];
+    }
+    actorAndMapper.first->SetVisibility(geometriesVisible);
+    if (geometriesVisible && coloringArray)
+    {
+//      if (!this->PolyDataMapperConfigured) // TODO should we skip this ?
       {
         vtkF3DRendererWithColoring::ConfigureMapperForColoring(actorAndMapper.second,
-          this->ArrayForColoring, this->ComponentForColoring, this->ColorTransferFunction,
-          this->ColorRange, this->DataForColoring == this->CellDataForColoring);
-        this->PolyDataMapperConfigured = true;
+          coloringArray, this->ComponentForColoring, this->ColorTransferFunction,
+          this->ColorRange, this->UseCellColoring);
+//        this->PolyDataMapperConfigured = true;
       }
       actorAndMapper.second->ScalarVisibilityOn();
     }
@@ -390,17 +408,23 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   // Handle point sprites
   bool pointSpritesVisible = !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
   auto psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
-  for (auto actorAndMapper : psActorsAndMappers)
+  for (size_t i = 0; i < psActorsAndMappers.size(); i++)
   {
-    actorAndMapper.first->SetVisibility(pointSpritesVisible);
-    if (pointSpritesVisible && this->ArrayForColoring)
+    auto actorAndMapper = psActorsAndMappers[i];
+    vtkDataArray* coloringArray = nullptr;
+    if (coloringVector.size() > i)
     {
-      if (!this->PointGaussianMapperConfigured)
+      coloringArray = coloringVector[i];
+    }
+    actorAndMapper.first->SetVisibility(pointSpritesVisible);
+    if (pointSpritesVisible && coloringArray)
+    {
+//      if (!this->PointGaussianMapperConfigured) // TODO should we skip this ?
       {
         vtkF3DRendererWithColoring::ConfigureMapperForColoring(actorAndMapper.second,
-          this->ArrayForColoring, this->ComponentForColoring, this->ColorTransferFunction,
-          this->ColorRange, this->DataForColoring == this->CellDataForColoring);
-        this->PointGaussianMapperConfigured = true;
+          coloringArray, this->ComponentForColoring, this->ColorTransferFunction,
+          this->ColorRange, this->UseCellColoring);
+//        this->PointGaussianMapperConfigured = true;
       }
       actorAndMapper.second->ScalarVisibilityOn();
     }
@@ -417,12 +441,17 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::GetColoringDescription()
 {
+  if (!this->Importer)
+  {
+    return "";
+  }
+
   std::stringstream stream;
-  if (this->ArrayForColoring)
+  if (this->ArrayIndexForColoring >= 0)
   {
     stream << "Coloring using "
-           << (this->DataForColoring == this->PointDataForColoring ? "point" : "cell")
-           << " array named " << this->ArrayForColoring->GetName() << ", "
+           << (this->UseCellColoring ? "point" : "cell")
+           << " array named " << this->Importer->GetArrayNameForColoring(this->UseCellColoring, this->ArrayIndexForColoring) << ", "
            << vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring) << "\n";
   }
   else
@@ -622,20 +651,22 @@ void vtkF3DRendererWithColoring::UpdateScalarBarVisibility()
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 {
-  if (this->DataForColoring)
+  if (!this->Importer)
   {
-    cheatSheetText << " C: Cell scalars coloring ["
-                   << (this->DataForColoring == this->CellDataForColoring ? "ON" : "OFF") << "]\n";
-    cheatSheetText << " S: Scalars coloring ["
-                   << (this->ArrayForColoring ? vtkF3DRendererWithColoring::ShortName(
-                                                  this->ArrayForColoring->GetName(), 19)
-                                              : "OFF")
-                   << "]\n";
-    cheatSheetText << " Y: Coloring component ["
-                   << vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring)
-                   << "]\n";
-    cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";
+    return;
   }
+
+  cheatSheetText << " C: Cell scalars coloring ["
+                 << (this->UseCellColoring ? "ON" : "OFF") << "]\n";
+  cheatSheetText << " S: Scalars coloring ["
+                 << (this->ArrayIndexForColoring >= 0 ? vtkF3DRendererWithColoring::ShortName(
+                                                this->Importer->GetArrayNameForColoring(this->UseCellColoring, this->ArrayIndexForColoring), 19)
+                                            : "OFF")
+                 << "]\n";
+  cheatSheetText << " Y: Coloring component ["
+                 << vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring)
+                 << "]\n";
+  cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";
 
   cheatSheetText << " V: Volume representation " << (this->UseVolume ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText << " I: Inverse volume opacity "
@@ -645,7 +676,7 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
 }
 
 //----------------------------------------------------------------------------
-int vtkF3DRendererWithColoring::FindArrayIndexForColoring(
+/*int vtkF3DRendererWithColoring::FindArrayIndexForColoring(
   vtkDataSetAttributes* dataForColoring, const std::string& arrayName)
 {
   int index = -1;
@@ -692,50 +723,52 @@ int vtkF3DRendererWithColoring::FindArrayIndexForColoring(
     }
   }
   return index;
-}
+}*/
 
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::CycleFieldForColoring()
 {
   // A generic approach will be better when adding categorical field data coloring
-  if (this->DataForColoring == this->PointDataForColoring)
+  this->UseCellColoring = !this->UseCellColoring;
+
+/*  if (this->DataForColoring == this->PointDataForColoring)
   {
     this->DataForColoring = this->CellDataForColoring;
   }
   else // if (this->DataForColoring == this->CellDataForColoring)
   {
     this->DataForColoring = this->PointDataForColoring;
-  }
+  }*/
   // Check current index is a valid coloring index
   // If not, find another one
-  this->CycleArrayForColoring(true);
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::CycleArrayForColoring(bool checkCurrent)
-{
-  if (this->DataForColoring)
-  {
-    for (int i = 0; i < this->DataForColoring->GetNumberOfArrays(); i++)
-    {
-      if (checkCurrent)
-      {
-        // Decrement before incrementing to keep this loop as simple as possible
-        this->ArrayIndexForColoring--;
-      }
-      this->CycleArrayIndexForColoring();
-      this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
-      if (this->ArrayForColoring || this->ArrayIndexForColoring == -1)
-      {
-        this->CheckCurrentComponentForColoring();
-        break;
-      }
-    }
-  }
+//  this->CycleArrayForColoring(true); TODO ?
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::CycleArrayIndexForColoring()
+{
+  if (!this->Importer)
+  {
+    return;
+  }
+
+  int nIndex = this->Importer->GetNumberOfArrayVectorsForColoring(this->UseCellColoring);
+  if (this->UseVolume)
+  {
+    this->ArrayIndexForColoring =
+      (this->ArrayIndexForColoring + 1) % nIndex;
+  }
+  else
+  {
+    // Cycle through arrays looping back to -1
+    // -1 0 1 2 -1 0 1 2 ...
+    this->ArrayIndexForColoring =
+      (this->ArrayIndexForColoring + 2) % (nIndex + 1) - 1;
+  }
+}
+
+//----------------------------------------------------------------------------
+/*void vtkF3DRendererWithColoring::CycleArrayIndexForColoring()
 {
   if (this->UseVolume)
   {
@@ -749,34 +782,34 @@ void vtkF3DRendererWithColoring::CycleArrayIndexForColoring()
     this->ArrayIndexForColoring =
       (this->ArrayIndexForColoring + 2) % (this->DataForColoring->GetNumberOfArrays() + 1) - 1;
   }
-}
+}*/
 
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::CycleComponentForColoring()
 {
-  if (this->ArrayForColoring)
+/*  if (this->ArrayForColoring)
   {
-    if (this->ArrayForColoring->GetNumberOfComponents() > 4)
+    if (this->ArrayForColoring->GetNumberOfComponents() > 4) // TODO cant really handle this case, does it matter ?
     {
       // -1 0 1 2 3 4 5 6
       this->ComponentForColoring =
         (this->ComponentForColoring + 2) % (this->ArrayForColoring->GetNumberOfComponents() + 1) -
         1;
     }
-    else
+    else*/
     {
       // -2 -1 0 1 2 3 4
-      this->ComponentForColoring =
-        (this->ComponentForColoring + 3) % (this->ArrayForColoring->GetNumberOfComponents() + 2) -
-        2;
+//      this->ComponentForColoring =
+//        (this->ComponentForColoring + 3) % (this->ArrayForColoring->GetNumberOfComponents() + 2) - // Rethink this
+//        2;
     }
-  }
+//  }
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::CheckCurrentComponentForColoring()
 {
-  if (this->ArrayForColoring)
+/*  if (this->ArrayForColoring) // TODO cant be done the same way
   {
     // Check direct scalars
     if (this->ArrayForColoring->GetNumberOfComponents() > 4 && this->ComponentForColoring == -2)
@@ -788,7 +821,7 @@ void vtkF3DRendererWithColoring::CheckCurrentComponentForColoring()
     {
       this->ComponentForColoring = this->ArrayForColoring->GetNumberOfComponents() - 1;
     }
-  }
+  }*/
 }
 
 //----------------------------------------------------------------------------
@@ -853,7 +886,8 @@ std::string vtkF3DRendererWithColoring::ComponentToString(int component)
   }
   else
   {
-    const char* compName = this->ArrayForColoring->GetComponentName(component);
+    const char* compName = nullptr;
+//    const char* compName = this->ArrayForColoring->GetComponentName(component); TODO rethink this
     if (compName == nullptr)
     {
       std::string ret = "Component #";

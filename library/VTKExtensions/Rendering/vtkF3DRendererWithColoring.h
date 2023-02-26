@@ -210,8 +210,8 @@ protected:
    * Look for an arrayIndex in a vtkDataSetAttributes based on an arrayName
    * Returns the arrayIndex or -1 if not found
    */
-  static int FindArrayIndexForColoring(
-    vtkDataSetAttributes* dataForColoring, const std::string& arrayName);
+//  static int FindArrayIndexForColoring(
+//    vtkDataSetAttributes* dataForColoring, const std::string& arrayName);
 
   /**
    * Switch between point data and cell data coloring
@@ -281,13 +281,14 @@ protected:
   double ColorRange[2];
   bool ColorTransferFunctionConfigured = false;
 
-  vtkDataSetAttributes* PointDataForColoring = nullptr;
-  vtkDataSetAttributes* CellDataForColoring = nullptr;
+//  vtkDataSetAttributes* PointDataForColoring = nullptr;
+//  vtkDataSetAttributes* CellDataForColoring = nullptr;
+  bool UseCellColoring = false;
   int ArrayIndexForColoring = -1;
   int ComponentForColoring = -1;
 
-  vtkDataSetAttributes* DataForColoring = nullptr;
-  vtkDataArray* ArrayForColoring = nullptr;
+//  vtkDataSetAttributes* DataForColoring = nullptr;
+//  vtkDataArray* ArrayForColoring = nullptr;
 
   bool ScalarBarVisible = false;
   bool UsePointSprites = false;
