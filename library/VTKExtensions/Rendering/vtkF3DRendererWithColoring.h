@@ -86,17 +86,18 @@ public:
    */
   void SetColormap(const std::vector<double>& colormap);
 
-  enum CycleTypeEnum
+  enum class CycleType
   {
-    F3D_FIELD_CYCLE = 0,
-    F3D_ARRAY_CYCLE,
-    F3D_COMPONENT_CYCLE
+    F3D_CYCLE_NONE,
+    F3D_CYCLE_FIELD,
+    F3D_CYCLE_ARRAY_INDEX,
+    F3D_CYCLE_COMPONENT
   };
 
   /**
    * Cycle the shown scalars according to the cycle type
    */
-  void CycleScalars(int cycleType);
+  void CycleScalars(CycleType type);
 
   void SetImporter(vtkF3DGenericImporter* importer);
   ///@{
@@ -181,6 +182,7 @@ public:
    * Update the visibility and coloring of internal actors as well as the scalar bar actors
    */
   void UpdateColoringActors();
+  CycleType CheckColoring();
 
   /**
    * Get information about the current coloring

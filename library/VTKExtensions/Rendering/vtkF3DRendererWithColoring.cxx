@@ -170,22 +170,28 @@ void vtkF3DRendererWithColoring::SetColormap(const std::vector<double>& colormap
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::CycleScalars(int cycleType)
+void vtkF3DRendererWithColoring::CycleScalars(CycleType type)
 {
-  switch (cycleType)
+  switch (type)
   {
-    case (F3D_FIELD_CYCLE):
+    case (CycleType::F3D_CYCLE_NONE):
+      return;
+      break;
+    case (CycleType::F3D_CYCLE_FIELD):
       this->CycleFieldForColoring();
       break;
-    case (F3D_ARRAY_CYCLE):
+    case (CycleType::F3D_CYCLE_ARRAY_INDEX):
       this->CycleArrayIndexForColoring();
       break;
-    case (F3D_COMPONENT_CYCLE):
+    case (CycleType::F3D_CYCLE_COMPONENT):
       this->CycleComponentForColoring();
       break;
     default:
       break;
   }
+
+  // Check attributes are valid and cycle recursively if needed
+  this->CycleScalars(this->CheckColoring());
 
   this->ColorTransferFunctionConfigured = false;
   this->PolyDataMapperConfigured = false;
@@ -195,6 +201,29 @@ void vtkF3DRendererWithColoring::CycleScalars(int cycleType)
   this->CheatSheetNeedUpdate = true;
 
   this->ColoringTimeStamp.Modified();
+}
+
+//----------------------------------------------------------------------------
+vtkF3DRendererWithColoring::CycleType vtkF3DRendererWithColoring::CheckColoring()
+{
+  // Check we can color with something
+  if (this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring) == 0)
+  {
+    return CycleType::F3D_CYCLE_NONE;
+  }
+
+  vtkF3DGenericImporter::ColoringInfo info;
+  if (!this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
+  {
+    return CycleType::F3D_CYCLE_ARRAY_INDEX;
+  }
+
+  if (this->ComponentForColoring >= info.MaximumNumberOfComponents)
+  {
+    return CycleType::F3D_CYCLE_COMPONENT;
+  }
+
+  return CycleType::F3D_CYCLE_NONE;
 }
 
 //----------------------------------------------------------------------------
@@ -302,7 +331,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   if (!hasColoring && volumeVisible)
   {
     // When showing volume, always try to find an array to color with
-    this->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
+    this->CycleScalars(vtkF3DRendererWithColoring::CycleType::F3D_CYCLE_ARRAY_INDEX);
     hasColoring = this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
   }
 
@@ -534,7 +563,7 @@ std::string vtkF3DRendererWithColoring::GetColoringDescription()
 void vtkF3DRendererWithColoring::ConfigureMapperForColoring(vtkPolyDataMapper* mapper,
   vtkDataArray* array, int component, vtkColorTransferFunction* ctf, double range[2], bool cellFlag)
 {
-  if (!array)
+  if (!array || component >= array->GetNumberOfCompoents())
   {
     return;
   }
@@ -571,7 +600,7 @@ void vtkF3DRendererWithColoring::ConfigureVolumeForColoring(vtkSmartVolumeMapper
   vtkVolume* volume, vtkDataArray* array, int component, vtkColorTransferFunction* ctf,
   double range[2], bool cellFlag, bool inverseOpacityFlag)
 {
-  if (!array)
+  if (!array || component >= array->GetNumberOfCompoents())
   {
     return;
   }
@@ -583,7 +612,7 @@ void vtkF3DRendererWithColoring::ConfigureVolumeForColoring(vtkSmartVolumeMapper
   if (component >= 0)
   {
     mapper->SetVectorMode(vtkSmartVolumeMapper::COMPONENT);
-    mapper->SetVectorComponent(component); // TODO what happens if component > numberOfComp ?
+    mapper->SetVectorComponent(component);
   }
   else if (component == -1)
   {
@@ -687,7 +716,7 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(const vtkF3DGen
   if (this->ComponentForColoring >= 0)
   {
     this->ColorTransferFunction->SetVectorModeToComponent();
-    this->ColorTransferFunction->SetVectorComponent(this->ComponentForColoring); // TODO what happens if higher than max comp ?
+    this->ColorTransferFunction->SetVectorComponent(this->ComponentForColoring);
   }
   else
   {
