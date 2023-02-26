@@ -15,6 +15,7 @@
 #include <vtkNew.h>
 
 #include <vector>
+#include <limits>
 
 class vtkActor;
 class vtkVolume;
@@ -64,6 +65,8 @@ public:
     std::string Name;
     int MaximumNumberOfComponents = 0;
     std::vector<std::string> ComponentNames;
+    std::vector<std::array<double, 2>> ComponentRanges;
+    std::array<double, 2> MagnitudeRange = {std::numeric_limits<float>::max(), std::numeric_limits<float>::min()};
     std::vector<vtkDataArray*> Arrays;
   };
 

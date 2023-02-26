@@ -299,8 +299,14 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   if (!hasColoring && volumeVisible)
   {
     // When showing volume, always try to find an array to color with
-    this->CycleArrayIndexForColoring();
+    this->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
     hasColoring = this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
+  }
+
+  if (hasColoring && !this->ColorTransferFunctionConfigured)
+  {
+    this->ConfigureRangeAndCTFForColoring(info);
+    this->ColorTransferFunctionConfigured = true; // TODO is this still working ?
   }
 
 /*  bool volumeVisibility = !this->UseRaytracing && this->UseVolume;
@@ -619,30 +625,31 @@ void vtkF3DRendererWithColoring::ConfigureScalarBarActorForColoring(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(vtkDataArray* array, int component)
+void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(const vtkF3DGenericImporter::ColoringInfo& info)
 {
-  if (!array || component == -2)
+  if (this->ComponentForColoring == -2) // TODO
   {
     return;
   }
 
-  if (component >= array->GetNumberOfComponents())
-  {
-    F3DLog::Print(F3DLog::Severity::Warning,
-      std::string("Invalid component index: ") + std::to_string(component)); // TODO handle differently
-    return;
-  }
-
-  // Get range
+  // Set range
   if (this->UserScalarBarRange.size() == 2)
   {
     this->ColorRange[0] = this->UserScalarBarRange[0];
     this->ColorRange[1] = this->UserScalarBarRange[1];
   }
+  else if (this->ComponentForColoring >= 0)
+  {
+    this->ColorRange[0] = info.ComponentRanges[this->ComponentForColoring][0];
+    this->ColorRange[1] = info.ComponentRanges[this->ComponentForColoring][1];
+  }
   else
   {
-    array->GetRange(this->ColorRange, component);
+    this->ColorRange[0] = info.MagnitudeRange[0];
+    this->ColorRange[1] = info.MagnitudeRange[1];
   }
+
+  std::cout<<this->ColorRange[0]<<" "<<this->ColorRange[1]<<std::endl;
 
   // Create lookup table
   this->ColorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
@@ -667,10 +674,10 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(vtkDataArray* a
     }
   }
 
-  if (component >= 0)
+  if (this->ComponentForColoring >= 0)
   {
     this->ColorTransferFunction->SetVectorModeToComponent();
-    this->ColorTransferFunction->SetVectorComponent(component); // TODO what happens is higher than max comp ?
+    this->ColorTransferFunction->SetVectorComponent(this->ComponentForColoring); // TODO what happens if higher than max comp ?
   }
   else
   {

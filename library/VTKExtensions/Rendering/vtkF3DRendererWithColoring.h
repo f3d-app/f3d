@@ -12,6 +12,8 @@
 
 #include "vtkF3DRenderer.h"
 
+#include "vtkF3DGenericImporter.h"
+
 // Include needed because of the smart pointers macro
 #include <vtkPointGaussianMapper.h>
 #include <vtkPolyDataMapper.h>
@@ -21,7 +23,6 @@
 class vtkColorTransferFunction;
 class vtkDataArray;
 class vtkDataSetAttributes;
-class vtkF3DGenericImporter;
 
 class vtkF3DRendererWithColoring : public vtkF3DRenderer
 {
@@ -200,7 +201,7 @@ protected:
   void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, vtkDataArray* array,
     int component, vtkColorTransferFunction* ctf);
 
-  void ConfigureRangeAndCTFForColoring(vtkDataArray* array, int component);
+  void ConfigureRangeAndCTFForColoring(const vtkF3DGenericImporter::ColoringInfo& info);
 
   void UpdateScalarBarVisibility();
 
