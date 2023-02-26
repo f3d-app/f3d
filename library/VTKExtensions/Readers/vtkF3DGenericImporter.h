@@ -59,6 +59,14 @@ public:
   static std::string GetDataObjectDescription(vtkDataObject* object);
   ///@}
 
+  struct ColoringInfo
+  {
+    std::string Name;
+    int MaximumNumberOfComponents = 0;
+    std::vector<std::string> ComponentNames;
+    std::vector<vtkDataArray*> Arrays;
+  };
+
   ///@{
   /**
    * Access to specific actors TODO
@@ -70,10 +78,9 @@ public:
   ///@}
   std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > GetGeometryActorsAndMappers();
   std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > GetPointSpritesActorsAndMappers();
-  std::vector<vtkDataArray*> GetArrayVectorForColoring(bool useCellData, int index);
-  std::string GetArrayNameForColoring(bool useCellData, int index);
-  int GetNumberOfArrayVectorsForColoring(bool useCellData);
-  int FindArrayVectorIndexForColoring(bool useCellData, std::string arrayName);
+  bool GetInfoForColoring(bool useCellData, int index, ColoringInfo& info);
+  int GetNumberOfIndexesForColoring(bool useCellData);
+  int FindIndexForColoring(bool useCellData, std::string arrayName);
 
   ///@{
   /**
@@ -185,8 +192,9 @@ protected:
   };
 
   std::vector<ReaderPipeline> Readers;
-  std::vector<std::pair<std::string, std::vector<vtkDataArray*> > > PointDataArrayVectorForColoring;
-  std::vector<std::pair<std::string, std::vector<vtkDataArray*> > > CellDataArrayVectorForColoring;
+
+  std::vector<ColoringInfo> PointDataArrayVectorForColoring;
+  std::vector<ColoringInfo> CellDataArrayVectorForColoring;
 
 
   bool AnimationEnabled = false;

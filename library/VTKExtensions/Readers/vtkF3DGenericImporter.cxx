@@ -419,21 +419,47 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
   // Create a vector of arrays by name
   for (std::string arrayName : arrayNames)
   {
-    std::vector<vtkDataArray* > arrayVector;
+    vtkF3DGenericImporter::ColoringInfo info;
+    info.Name = arrayName;
     for(vtkF3DGenericImporter::ReaderPipeline& pipe : this->Readers)
     {
-      arrayVector.emplace_back(useCellData
+      vtkDataArray* array = useCellData
         ? pipe.Output->GetCellData()->GetArray(arrayName.c_str())
-        : pipe.Output->GetPointData()->GetArray(arrayName.c_str()));
+        : pipe.Output->GetPointData()->GetArray(arrayName.c_str());
+      if (array)
+      {
+        info.MaximumNumberOfComponents = std::max(info.MaximumNumberOfComponents, array->GetNumberOfComponents());
+
+        if (array->HasAComponentName())
+        {
+          for (vtkIdType i = 0; i < array->GetNumberOfComponents(); i++)
+          {
+            // set non-coherent component names to empty string
+            if (i < info.ComponentNames.size())
+            {
+              if (info.ComponentNames[i] != std::string(array->GetComponentName(i)))
+              {
+                info.ComponentNames[i] = "";
+              }
+            }
+            else
+            {
+              // Add components names to the back of the component names vector
+              info.ComponentNames.emplace_back(array->GetComponentName(i));
+            }
+          }
+        }
+      }
+      info.Arrays.emplace_back(array);
     }
 
-    data.emplace_back(std::make_pair(arrayName, arrayVector));
+    data.emplace_back(info);
     std::cout<<arrayName<<std::endl;
   }
 }
 
 //----------------------------------------------------------------------------
-std::vector<vtkDataArray*> vtkF3DGenericImporter::GetArrayVectorForColoring(bool useCellData, int index)
+bool vtkF3DGenericImporter::GetInfoForColoring(bool useCellData, int index, vtkF3DGenericImporter::ColoringInfo& info)
 {
   auto& data = useCellData
     ? CellDataArrayVectorForColoring
@@ -441,29 +467,14 @@ std::vector<vtkDataArray*> vtkF3DGenericImporter::GetArrayVectorForColoring(bool
 
   if (index < 0 || index >= static_cast<int>(data.size()))
   {
-    return std::vector<vtkDataArray*>();
+    return false;
   }
-
-  return data[index].second;
+  info = data[index];
+  return true;
 }
 
 //----------------------------------------------------------------------------
-std::string vtkF3DGenericImporter::GetArrayNameForColoring(bool useCellData, int index)
-{
-  auto& data = useCellData
-    ? CellDataArrayVectorForColoring
-    : PointDataArrayVectorForColoring;
-
-  if (index < 0 || index >= static_cast<int>(data.size()))
-  {
-    return "";
-  }
-
-  return data[index].first;
-}
-
-//----------------------------------------------------------------------------
-int vtkF3DGenericImporter::GetNumberOfArrayVectorsForColoring(bool useCellData)
+int vtkF3DGenericImporter::GetNumberOfIndexesForColoring(bool useCellData)
 {
   auto& data = useCellData
     ? CellDataArrayVectorForColoring
@@ -472,14 +483,14 @@ int vtkF3DGenericImporter::GetNumberOfArrayVectorsForColoring(bool useCellData)
 }
 
 //----------------------------------------------------------------------------
-int vtkF3DGenericImporter::FindArrayVectorIndexForColoring(bool useCellData, std::string arrayName)
+int vtkF3DGenericImporter::FindIndexForColoring(bool useCellData, std::string arrayName)
 {
   auto& data = useCellData
     ? CellDataArrayVectorForColoring
     : PointDataArrayVectorForColoring;
   for (size_t i = 0; i < data.size(); i++)
   {
-    if (data[i].first == arrayName)
+    if (data[i].Name == arrayName)
     {
       return static_cast<int>(i);
     }
