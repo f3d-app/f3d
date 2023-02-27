@@ -7,12 +7,12 @@ int main(int argc, char** argv)
 {
   int res = EXIT_FAILURE;
 
-  try
+//  try
   {
     F3DStarter starter;
     res = starter.Start(argc, argv);
   }
-  catch (const F3DExNoProcess&)
+/*  catch (const F3DExNoProcess&)
   {
     // exit gracefully after cleanup when no process is required
     exit(EXIT_SUCCESS);
@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     f3d::log::error("F3D encountered an unexpected exception:");
     f3d::log::error(ex.what());
     exit(EXIT_FAILURE);
-  }
+  }*/
 
   return res;
 }

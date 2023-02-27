@@ -263,9 +263,18 @@ void vtkF3DRendererWithColoring::SetColoring(
     this->GetColoringComponent() != component)
   {
     this->UseCellColoring = useCellData;
+
+    if (arrayName.empty())
+    {
+      this->ArrayIndexForColoring = this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring) > 0 ? 0 : -1;
+    }
+    else
+    {
+      this->ArrayIndexForColoring = this->Importer->FindIndexForColoring(useCellData, arrayName);
+      //    this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
+    }
+
     this->ComponentForColoring = component;
-    this->ArrayIndexForColoring = this->Importer->FindIndexForColoring(useCellData, arrayName);
-//    this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
 
     this->ColorTransferFunctionConfigured = false;
     this->PolyDataMapperConfigured = false;
@@ -287,7 +296,7 @@ std::string vtkF3DRendererWithColoring::GetColoringArrayName()
 {
   if (!this->Importer)
   {
-    return "";
+    return F3D_RESERVED_STRING;
   }
 
   vtkF3DGenericImporter::ColoringInfo info;
@@ -297,7 +306,7 @@ std::string vtkF3DRendererWithColoring::GetColoringArrayName()
   }
   else
   {
-    return "";
+    return F3D_RESERVED_STRING;
   }
 }
 
@@ -563,7 +572,7 @@ std::string vtkF3DRendererWithColoring::GetColoringDescription()
 void vtkF3DRendererWithColoring::ConfigureMapperForColoring(vtkPolyDataMapper* mapper,
   vtkDataArray* array, int component, vtkColorTransferFunction* ctf, double range[2], bool cellFlag)
 {
-  if (!array || component >= array->GetNumberOfCompoents())
+  if (!array || component >= array->GetNumberOfComponents())
   {
     return;
   }
@@ -600,7 +609,7 @@ void vtkF3DRendererWithColoring::ConfigureVolumeForColoring(vtkSmartVolumeMapper
   vtkVolume* volume, vtkDataArray* array, int component, vtkColorTransferFunction* ctf,
   double range[2], bool cellFlag, bool inverseOpacityFlag)
 {
-  if (!array || component >= array->GetNumberOfCompoents())
+  if (!array || component >= array->GetNumberOfComponents())
   {
     return;
   }

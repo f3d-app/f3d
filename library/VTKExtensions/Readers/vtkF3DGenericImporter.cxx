@@ -186,35 +186,36 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     pipe.GeometryActor->SetVisibility(false);
     pipe.PointSpritesActor->SetVisibility(false);
     pipe.VolumeProp->SetVisibility(false);
+
+    // TODO move to renderer
+    pipe.GeometryActor->GetProperty()->SetColor(this->SurfaceColor);
+    pipe.GeometryActor->GetProperty()->SetOpacity(this->Opacity);
+    pipe.GeometryActor->GetProperty()->SetRoughness(this->Roughness);
+    pipe.GeometryActor->GetProperty()->SetMetallic(this->Metallic);
+    pipe.GeometryActor->GetProperty()->SetLineWidth(this->LineWidth);
+    pipe.GeometryActor->GetProperty()->SetPointSize(this->PointSize);
+
+    pipe.PointSpritesActor->GetProperty()->SetColor(this->SurfaceColor);
+    pipe.PointSpritesActor->GetProperty()->SetOpacity(this->Opacity);
+
+    // Textures
+    auto colorTex = this->GetTexture(this->TextureBaseColor, true);
+    pipe.GeometryActor->GetProperty()->SetBaseColorTexture(colorTex);
+    pipe.GeometryActor->GetProperty()->SetORMTexture(this->GetTexture(this->TextureMaterial));
+    pipe.GeometryActor->GetProperty()->SetEmissiveTexture(
+      this->GetTexture(this->TextureEmissive, true));
+    pipe.GeometryActor->GetProperty()->SetEmissiveFactor(this->EmissiveFactor);
+    pipe.GeometryActor->GetProperty()->SetNormalTexture(this->GetTexture(this->TextureNormal));
+    pipe.GeometryActor->GetProperty()->SetNormalScale(this->NormalScale);
+
+    // If the input texture is RGBA, flag the actor as translucent
+    if (colorTex && colorTex->GetImageDataInput(0)->GetNumberOfScalarComponents() == 4)
+    {
+      pipe.GeometryActor->ForceTranslucentOn();
+    }
+
   }
 
-/* TODO move to renderer
-  this->GeometryActor->GetProperty()->SetColor(this->SurfaceColor);
-  this->GeometryActor->GetProperty()->SetOpacity(this->Opacity);
-  this->GeometryActor->GetProperty()->SetRoughness(this->Roughness);
-  this->GeometryActor->GetProperty()->SetMetallic(this->Metallic);
-  this->GeometryActor->GetProperty()->SetLineWidth(this->LineWidth);
-  this->GeometryActor->GetProperty()->SetPointSize(this->PointSize);
-
-  this->PointSpritesActor->GetProperty()->SetColor(this->SurfaceColor);
-  this->PointSpritesActor->GetProperty()->SetOpacity(this->Opacity);
-
-  // Textures
-  auto colorTex = this->GetTexture(this->TextureBaseColor, true);
-  this->GeometryActor->GetProperty()->SetBaseColorTexture(colorTex);
-  this->GeometryActor->GetProperty()->SetORMTexture(this->GetTexture(this->TextureMaterial));
-  this->GeometryActor->GetProperty()->SetEmissiveTexture(
-    this->GetTexture(this->TextureEmissive, true));
-  this->GeometryActor->GetProperty()->SetEmissiveFactor(this->EmissiveFactor);
-  this->GeometryActor->GetProperty()->SetNormalTexture(this->GetTexture(this->TextureNormal));
-  this->GeometryActor->GetProperty()->SetNormalScale(this->NormalScale);
-
-  // If the input texture is RGBA, flag the actor as translucent
-  if (colorTex && colorTex->GetImageDataInput(0)->GetNumberOfScalarComponents() == 4)
-  {
-    this->GeometryActor->ForceTranslucentOn();
-  }
-*/
   this->UpdateColoringVectors(false);
   this->UpdateColoringVectors(true);
 }
@@ -466,18 +467,19 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
         {
           for (vtkIdType i = 0; i < array->GetNumberOfComponents(); i++)
           {
-            // set non-coherent component names to empty string
+            const char* compName = array->GetComponentName(i);
             if (i < info.ComponentNames.size())
             {
-              if (info.ComponentNames[i] != std::string(array->GetComponentName(i)))
+              if (compName && info.ComponentNames[i] != std::string(compName))
               {
+                // set non-coherent component names to empty string
                 info.ComponentNames[i] = "";
               }
             }
             else
             {
               // Add components names to the back of the component names vector
-              info.ComponentNames.emplace_back(array->GetComponentName(i));
+              info.ComponentNames.emplace_back(compName ? compName : "");
             }
           }
         }
