@@ -163,7 +163,7 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::Initialize(const std::string& fileInfo, const std::string& up)
+void vtkF3DRenderer::Initialize(const std::string& up)
 {
   this->RemoveAllViewProps();
   this->RemoveAllLights();
@@ -175,7 +175,6 @@ void vtkF3DRenderer::Initialize(const std::string& fileInfo, const std::string& 
   this->AddActor(this->MetaDataActor);
   this->AddActor(this->CheatSheetActor);
 
-  this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, fileInfo.c_str());
   this->GridInitialized = false;
   this->GridInfo = "";
 
@@ -732,6 +731,13 @@ void vtkF3DRenderer::SetLightIntensity(const double intensityFactor)
   }
   this->LightIntensity = intensityFactor;
   this->CheatSheetNeedUpdate = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetFilenameInfo(const std::string& info)
+{
+  this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, info.c_str());
+  this->SetupRenderPasses();
 }
 
 //----------------------------------------------------------------------------

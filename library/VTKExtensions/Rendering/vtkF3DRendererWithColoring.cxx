@@ -23,9 +23,9 @@ vtkStandardNewMacro(vtkF3DRendererWithColoring);
 vtkCxxSetObjectMacro(vtkF3DRendererWithColoring, Importer, vtkF3DGenericImporter);
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::Initialize(const std::string& fileInfo, const std::string& up)
+void vtkF3DRendererWithColoring::Initialize(const std::string& up)
 {
-  this->Superclass::Initialize(fileInfo, up);
+  this->Superclass::Initialize(up);
 
 /*  this->SetScalarBarActor(nullptr);
   this->SetGeometryActor(nullptr);

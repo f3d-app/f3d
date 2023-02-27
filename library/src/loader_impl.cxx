@@ -352,7 +352,7 @@ loader& loader_impl::resetToDefaultScene()
   this->Internals->GenericImporter->RemoveInternalReaders();
   this->Internals->CurrentImporter = this->Internals->GenericImporter;
 
-  this->Internals->Window.Initialize(true, ""); //TODO filenameinfo
+  this->Internals->Window.Initialize(true);
 
   // Initialize genericImporter with options
   loader_impl::internals::InitializeImporterWithOptions(
@@ -366,23 +366,8 @@ loader& loader_impl::resetToDefaultScene()
 //----------------------------------------------------------------------------
 bool loader_impl::loadFullScene(const std::string& filePath)
 {
-  // TODO use options
-  // Recover fileNameInfo if any
-  std::string fileNameInfo = this->Internals->FilenameInfo;
-  if (fileNameInfo.empty())
-  {
-    fileNameInfo = vtksys::SystemTools::GetFilenameName(filePath);
-  }
 
-  if (filePath.empty())
-  {
-    // No file provided, show a drop zone instead
-    // TODO replace with an actual drop zone, generify ?
-    log::debug("No file to load provided\n");
-    this->Internals->Window.Initialize(
-      false, fileNameInfo + "No file to load provided, please drop one into this window");
-    return false;
-  }
+  // TODO what if it is empty ?
 
   // There is a file to load, update CurrentFileIndex
   log::debug("Loading full scene: ", filePath, "\n");
@@ -392,7 +377,7 @@ bool loader_impl::loadFullScene(const std::string& filePath)
   if (!this->Internals->CurrentImporter)
   {
     log::warn(filePath, " is not a file of a supported file format for full scene\n");
-    this->Internals->Window.Initialize(false, fileNameInfo + " [UNSUPPORTED]");
+    this->Internals->Window.Initialize(false);
     return false;
   }
 
@@ -403,7 +388,7 @@ bool loader_impl::loadFullScene(const std::string& filePath)
   callbackData.timer = timer;
   callbackData.widget = progressWidget;
 
-  this->Internals->Window.Initialize(false, fileNameInfo);
+  this->Internals->Window.Initialize(false);
 
   // Initialize importer for rendering
   this->Internals->CurrentImporter->SetRenderWindow(this->Internals->Window.GetRenderWindow());

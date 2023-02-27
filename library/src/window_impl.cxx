@@ -100,7 +100,7 @@ camera& window_impl::getCamera()
   // is initialized before providing one.
   if (!this->Internals->Initialized)
   {
-    this->Initialize(false, "");
+    this->Initialize(false);
   }
 
   return *this->Internals->Camera;
@@ -210,7 +210,7 @@ window_impl::~window_impl()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::Initialize(bool withColoring, std::string fileInfo)
+void window_impl::Initialize(bool withColoring)
 {
   // Clear renderer if already present
   if (this->Internals->Renderer)
@@ -240,7 +240,7 @@ void window_impl::Initialize(bool withColoring, std::string fileInfo)
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Renderer->Initialize(
-    fileInfo, this->Internals->Options.getAsString("scene.up-direction"));
+    this->Internals->Options.getAsString("scene.up-direction"));
   this->Internals->Initialized = true;
 }
 
@@ -250,7 +250,7 @@ void window_impl::UpdateDynamicOptions()
   if (!this->Internals->Renderer)
   {
     // Renderer is missing, create a default one
-    this->Initialize(false, "");
+    this->Initialize(false);
   }
 
   // Make sure lights are created before we take options into account
@@ -267,6 +267,7 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("render.show-edges"));
   this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("ui.fps"));
   this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("ui.filename"));
+  this->Internals->Renderer->SetFilenameInfo(this->Internals->Options.getAsString("ui.filename-info"));
   this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("ui.metadata"));
   this->Internals->Renderer->ShowCheatSheet(this->Internals->Options.getAsBool("ui.cheatsheet"));
 

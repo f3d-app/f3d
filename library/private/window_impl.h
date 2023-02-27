@@ -60,7 +60,7 @@ public:
    * Create and initialize the internal vtkF3DRenderer with the provided parameters
    * Called by the loader right before reading a file
    */
-  virtual void Initialize(bool withColoring, std::string fileInfo);
+  virtual void Initialize(bool withColoring);
 
   /**
    * Implementation only API.

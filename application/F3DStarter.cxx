@@ -14,6 +14,7 @@
 #include <cassert>
 #include <filesystem>
 #include <set>
+#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -366,6 +367,7 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
   }
   else
   {
+    filenameInfo = "No file to load provided, please drop one into this window";
     this->Internals->CurrentFileIndex = -1;
   }
 
@@ -377,40 +379,48 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
   this->Internals->UpdateWithCommandLineParsing = false; // this is done only once
   this->Internals->Engine->setOptions(this->Internals->FileOptions);
 
-  // Check the size of the file before loading it
-  static constexpr int BYTES_IN_MIB = 1048576;
-  if (fileAppOptions.MaxSize >= 0.0 &&
-    fs::file_size(filePath) > static_cast<std::uintmax_t>(fileAppOptions.MaxSize * BYTES_IN_MIB))
+  if (this->Internals->CurrentFileIndex == -1)
   {
-    f3d::log::info("No file loaded, file is bigger than max size");
+    loader.resetToDefaultScene();
   }
   else
   {
-    if (loader.canReadScene(filePath.string()) && !fileAppOptions.GeometryOnly)
+    // Check the size of the file before loading it
+    static constexpr int BYTES_IN_MIB = 1048576;
+    if (fileAppOptions.MaxSize >= 0.0 &&
+      fs::file_size(filePath) > static_cast<std::uintmax_t>(fileAppOptions.MaxSize * BYTES_IN_MIB))
     {
-      this->Internals->LoadedFile = loader.loadFullScene(filePath.string());
+      f3d::log::info("No file loaded, file is bigger than max size");
+      filenameInfo = "No file loaded, file is bigger than max size";
     }
     else
     {
-      this->Internals->LoadedFile = loader
-        .resetToDefaultScene()
-        .addGeometry(filePath.string());
-    }
-    loader.setFilenameInfo(filenameInfo);
+      if (loader.canReadScene(filePath.string()) && !fileAppOptions.GeometryOnly)
+      {
+        this->Internals->LoadedFile = loader.loadFullScene(filePath.string());
+      }
+      else if (loader.canReadGeometry(filePath.string()))
+      {
+        this->Internals->LoadedFile = loader
+          .resetToDefaultScene()
+          .addGeometry(filePath.string());
+      }
+      else
+      {
+        filenameInfo += " [UNSUPPORTED]"; 
+      }
 
+      if (!this->Internals->AppOptions.NoRender)
+      {
+        // Setup the camera according to options
+        this->Internals->SetupCamera(fileAppOptions);
+      }
 
-    if (!this->Internals->AppOptions.NoRender)
-    {
-      // Setup the camera according to options
-      this->Internals->SetupCamera(fileAppOptions);
-    }
-
-    if (!filePath.empty())
-    {
       this->Internals->Engine->getWindow().setWindowName(
         filePath.filename().string() + " - " + F3D::AppName);
     }
   }
+  this->Internals->Engine->getOptions().set("ui.filename-info", filenameInfo);
 }
 
 //----------------------------------------------------------------------------

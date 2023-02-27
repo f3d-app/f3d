@@ -33,7 +33,7 @@ public:
   /**
    * Initialize all actors and flags
    */
-  void Initialize(const std::string& fileInfo, const std::string& up) override;
+  void Initialize(const std::string& up) override;
 
   /**
    * Set the pointSize on the pointGaussianMapper as well as calls superclass implementation.
