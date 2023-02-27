@@ -391,7 +391,7 @@ bool loader_impl::loadFullScene(const std::string& filePath)
   this->Internals->CurrentImporter = loader_impl::internals::GetFullSceneImporter(filePath);
   if (!this->Internals->CurrentImporter)
   {
-    log::warn(filePath, " is not a file of a supported file format\n");
+    log::warn(filePath, " is not a file of a supported file format for full scene\n");
     this->Internals->Window.Initialize(false, fileNameInfo + " [UNSUPPORTED]");
     return false;
   }
@@ -456,4 +456,25 @@ bool loader_impl::loadFullScene(const std::string& filePath)
   return true;
 }
 
+//----------------------------------------------------------------------------
+bool loader_impl::canReadScene(const std::string& filePath)
+{
+  f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
+  if (!reader)
+  {
+    return false;
+  }
+  return reader->hasSceneReader();
+}
+
+//----------------------------------------------------------------------------
+bool loader_impl::canReadGeometry(const std::string& filePath)
+{
+  f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
+  if (!reader)
+  {
+    return false;
+  }
+  return reader->hasGeometryReader();
+}
 }

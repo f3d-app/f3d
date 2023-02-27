@@ -19,7 +19,6 @@ Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
 scene.animation.index|int<br>0<br>load|Select the animation to load.<br>Any negative value means all animations.<br>The default scene always has at most one animation.|\-\-animation-index
 scene.camera.index|int<br>-1<br>load|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.|\-\-camera-index
-scene.geometry-only|bool<br>false<br>load|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.|\-\-geometry-only
 scene.up-direction|string<br>+Y<br>load|Define the Up direction|\-\-up
 scene.grid.enable|bool<br>false<br>render|Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.|\-\-grid
 scene.grid.unit|double<br>0<br>load|Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.|\-\-grid\-unit

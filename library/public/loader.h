@@ -43,6 +43,9 @@ public:
    */
   virtual loader& setFilenameInfo(const std::string& filenameInfo) = 0;
 
+  virtual bool canReadScene(const std::string& filePath) = 0;
+  virtual bool canReadGeometry(const std::string& filePath) = 0;
+
 protected:
   //! @cond
   loader() = default;

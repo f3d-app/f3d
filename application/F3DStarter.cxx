@@ -386,13 +386,18 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
   }
   else
   {
-    // Load the file with filenameInfo
-    this->Internals->LoadedFile = loader
-      .resetToDefaultScene()
-      .setFilenameInfo(filenameInfo)
-      .addGeometry(filePath.string());
+    if (loader.canReadScene(filePath.string()) && !fileAppOptions.GeometryOnly)
+    {
+      this->Internals->LoadedFile = loader.loadFullScene(filePath.string());
+    }
+    else
+    {
+      this->Internals->LoadedFile = loader
+        .resetToDefaultScene()
+        .addGeometry(filePath.string());
+    }
+    loader.setFilenameInfo(filenameInfo);
 
-//    loader.addGeometry("/home/glow/dev/f3d/f3d/src/testing/data/dragon.vtu");
 
     if (!this->Internals->AppOptions.NoRender)
     {
