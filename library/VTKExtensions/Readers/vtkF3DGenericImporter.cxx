@@ -119,6 +119,8 @@ bool vtkF3DGenericImporter::GetTemporalInformation(
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
+  this->GeometryBoundingBox.Reset();
+
   // Update each reader
   for(vtkF3DGenericImporter::ReaderPipeline& pipe : this->Readers)
   {
@@ -139,6 +141,12 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
     vtkPolyData* surface = vtkPolyData::SafeDownCast(pipe.PostPro->GetOutput());
     vtkImageData* image = vtkImageData::SafeDownCast(pipe.PostPro->GetOutput(2));
+    std::cout<<surface<<std::endl;
+
+    // Increase bounding box size if needed
+    double bounds[6];
+    surface->GetBounds(bounds);
+    this->GeometryBoundingBox.AddBounds(bounds);
 
     // Add filter outputs to mapper inputs
     pipe.PolyDataMapper->SetInputConnection(pipe.PostPro->GetOutputPort(0));
@@ -530,4 +538,10 @@ int vtkF3DGenericImporter::FindIndexForColoring(bool useCellData, std::string ar
     }
   }
   return -1;
+}
+
+//----------------------------------------------------------------------------
+const vtkBoundingBox& vtkF3DGenericImporter::GetGeometryBoundingBox()
+{
+  return this->GeometryBoundingBox;
 }

@@ -13,6 +13,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkVersion.h>
 #include <vtkNew.h>
+#include <vtkBoundingBox.h>
 
 #include <vector>
 #include <limits>
@@ -85,6 +86,7 @@ public:
   bool GetInfoForColoring(bool useCellData, int index, ColoringInfo& info);
   int GetNumberOfIndexesForColoring(bool useCellData);
   int FindIndexForColoring(bool useCellData, std::string arrayName);
+  const vtkBoundingBox& GetGeometryBoundingBox();
 
   ///@{
   /**
@@ -199,6 +201,7 @@ protected:
 
   std::vector<ColoringInfo> PointDataArrayVectorForColoring;
   std::vector<ColoringInfo> CellDataArrayVectorForColoring;
+  vtkBoundingBox GeometryBoundingBox;
 
 
   bool AnimationEnabled = false;
