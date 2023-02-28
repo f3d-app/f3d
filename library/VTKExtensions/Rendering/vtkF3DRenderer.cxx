@@ -390,6 +390,7 @@ void vtkF3DRenderer::ShowGrid(bool show)
       vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
       gridMapper->SetFadeDistance(diag);
       gridMapper->SetUnitSquare(unitSquare);
+      gridMapper->SetMinorSquare(10);
       gridMapper->SetUpIndex(this->UpIndex);
 
       this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
