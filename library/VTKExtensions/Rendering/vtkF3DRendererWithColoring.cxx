@@ -951,50 +951,12 @@ void vtkF3DRendererWithColoring::CheckCurrentComponentForColoring()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
 {
-/*  std::string description;
-  description += " \n";
-  if (this->PolyDataMapper)
+  if (!this->Importer)
   {
-    vtkDataSet* dataset = this->PolyDataMapper->GetInput();
-    if (dataset)
-    {
-      description += " Number of points: ";
-      description += std::to_string(dataset->GetNumberOfPoints());
-      description += " \n Number of cells: ";
-      description += std::to_string(dataset->GetNumberOfCells());
-      description += " \n";
-
-      // Field Data
-      vtkFieldData* fieldData = dataset->GetFieldData();
-      int nbArrays = fieldData->GetNumberOfArrays();
-      for (vtkIdType i = 0; i < nbArrays; i++)
-      {
-        vtkAbstractArray* array = fieldData->GetAbstractArray(i);
-        if (array)
-        {
-          vtkIdType nbTuples = array->GetNumberOfTuples();
-          if (nbTuples == 1)
-          {
-            description += " ";
-            description += array->GetName();
-            description += " = ";
-            description += array->GetVariantValue(0).ToString();
-            description += " \n";
-          }
-        }
-      }
-    }
-    else
-    {
-      description += " Unavailable\n";
-    }
-  }
-  else
-  {
-    description += " Unavailable\n";
+    return "";
   }
 
-  return description;*/ return ""; // TODO
+  return this->Importer->GetMetaDataDescription();
 }
 
 //----------------------------------------------------------------------------

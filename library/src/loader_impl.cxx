@@ -321,7 +321,7 @@ bool loader_impl::addGeometry(const std::string& filePath)
     return false;
   }
 
-  this->Internals->GenericImporter->AddInternalReader(reader->createGeometryReader(filePath));
+  this->Internals->GenericImporter->AddInternalReader(vtksys::SystemTools::GetFilenameName(filePath), reader->createGeometryReader(filePath));
   this->Internals->GenericImporter->Update();
   loader_impl::internals::DisplayImporterDescription(this->Internals->CurrentImporter);
 

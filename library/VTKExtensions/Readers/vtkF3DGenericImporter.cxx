@@ -141,7 +141,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
     vtkPolyData* surface = vtkPolyData::SafeDownCast(pipe.PostPro->GetOutput());
     vtkImageData* image = vtkImageData::SafeDownCast(pipe.PostPro->GetOutput(2));
-    std::cout<<surface<<std::endl;
 
     // Increase bounding box size if needed
     double bounds[6];
@@ -282,10 +281,11 @@ void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 }*/
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::AddInternalReader(vtkAlgorithm* reader)
+void vtkF3DGenericImporter::AddInternalReader(const std::string& name, vtkAlgorithm* reader)
 {
   reader->Print(std::cout);
   vtkF3DGenericImporter::ReaderPipeline pipe;
+  pipe.Name = name;
   pipe.Reader = reader;
   pipe.PostPro->SetInputConnection(pipe.Reader->GetOutputPort());
   this->Readers.push_back(std::move(pipe));
@@ -316,7 +316,16 @@ bool vtkF3DGenericImporter::CanReadFile()
 //----------------------------------------------------------------------------
 std::string vtkF3DGenericImporter::GetOutputsDescription()
 {
-  return "";//return this->OutputDescription; // TODO
+  std::string description;
+  for(vtkF3DGenericImporter::ReaderPipeline& pipe : this->Readers)
+  {
+    if (this->Readers.size() > 0)
+    {
+      description += "=== " + pipe.Name + " ===\n";
+    }
+    description += pipe.OutputDescription;
+  }
+  return description;
 }
 
 //----------------------------------------------------------------------------
@@ -357,6 +366,37 @@ std::string vtkF3DGenericImporter::GetDataObjectDescription(vtkDataObject* objec
     return vtkImporter::GetDataSetDescription(ds, vtkIndent(0));
   }
   return "";
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DGenericImporter::GetMetaDataDescription()
+{
+  vtkIdType nPoints = 0;
+  vtkIdType nCells = 0;
+  for(vtkF3DGenericImporter::ReaderPipeline& pipe : this->Readers)
+  {
+    vtkDataObject* object = pipe.Reader->GetOutputDataObject(0);
+    if (object)
+    {
+      nPoints += object->GetNumberOfElements(vtkDataObject::POINT);
+      nCells += object->GetNumberOfElements(vtkDataObject::CELL);
+    }
+  }
+
+  std::string description = " \n";
+  if (this->Readers.size() > 1)
+  {
+    description += " Number of geometries: ";
+    description += std::to_string(this->Readers.size());
+    description += "\n";
+  }
+  description += " Number of points: ";
+  description += std::to_string(nPoints);
+  description += "\n";
+  description += " Number of cells: ";
+  description += std::to_string(nCells);
+  description += "\n";
+  return description;
 }
 
 //----------------------------------------------------------------------------

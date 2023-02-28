@@ -40,7 +40,7 @@ public:
    * Specify the VTK reader.
    */
 //  void SetInternalReader(vtkAlgorithm* reader);
-  void AddInternalReader(vtkAlgorithm* reader);
+  void AddInternalReader(const std::string& name, vtkAlgorithm* reader);
   void RemoveInternalReaders();
 
   /**
@@ -52,6 +52,7 @@ public:
    * Get a string describing the outputs
    */
   std::string GetOutputsDescription() override;
+  std::string GetMetaDataDescription(); // TODO add to vtkImporter ?
 
   ///@{
   /**
@@ -59,6 +60,7 @@ public:
    */
   static std::string GetMultiBlockDescription(vtkMultiBlockDataSet* mb, vtkIndent indent);
   static std::string GetDataObjectDescription(vtkDataObject* object);
+  static std::string GetMetaDataDescription(vtkDataObject* object);
   ///@}
 
   struct ColoringInfo
@@ -180,6 +182,7 @@ protected:
 
   struct ReaderPipeline //TODO in CXX
   {
+    std::string Name;
     vtkSmartPointer<vtkAlgorithm> Reader;
     vtkNew<vtkF3DPostProcessFilter> PostPro;
     std::string OutputDescription;
@@ -202,6 +205,7 @@ protected:
   std::vector<ColoringInfo> PointDataArrayVectorForColoring;
   std::vector<ColoringInfo> CellDataArrayVectorForColoring;
   vtkBoundingBox GeometryBoundingBox;
+  std::string MetaDataDescription;
 
 
   bool AnimationEnabled = false;
