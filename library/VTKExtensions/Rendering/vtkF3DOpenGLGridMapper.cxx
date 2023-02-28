@@ -11,6 +11,7 @@
 #include <vtkRenderer.h>
 #include <vtkShaderProgram.h>
 #include <vtkVersion.h>
+
 vtkStandardNewMacro(vtkF3DOpenGLGridMapper);
 
 //----------------------------------------------------------------------------
