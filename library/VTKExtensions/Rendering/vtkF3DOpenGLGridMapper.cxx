@@ -44,7 +44,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
 
   // clang-format off
   vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec",
-    "uniform float fadeDist = 100.0;\n"
+    "uniform float fadeDist;\n"
     "out vec2 gridCoord;\n"
   );
   vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
@@ -53,30 +53,30 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
   );
   
   vtkShaderProgram::Substitute(FSSource, "//VTK::CustomUniforms::Dec",
-    "uniform float fadeDist = 100.0;\n"
-    "uniform float unitSquare = 10.0;\n"
-    "uniform int minorSquares = 1;\n"
-    "uniform float axesLineWidth = 1.0;\n"
-    "uniform float gridLineWidth = 1.0;\n"
-    "uniform float minorOpacity = 0.5;\n"
-    "uniform float lineAntialias = 1.0;\n"
-    "uniform vec4 axis1Color = vec4(1., 1., 1., 1.);\n"
-    "uniform vec4 axis2Color = vec4(1., 1., 1., 1.);\n"
+    "uniform float fadeDist;\n"
+    "uniform float unitSquare;\n"
+    "uniform int minorSquares;\n"
+    "uniform float axesLineWidth;\n"
+    "uniform float gridLineWidth;\n"
+    "uniform float minorOpacity;\n"
+    "uniform float lineAntialias;\n"
+    "uniform vec4 axis1Color;\n"
+    "uniform vec4 axis2Color;\n"
     "in vec2 gridCoord;\n"
 
     "float antialias(float dist, float linewidth){\n"
     "  float aa = lineAntialias;\n"
-    "  float lw = max(linewidth, 1.0) / 2;\n"
+    "  float lw = max(linewidth, 1.0) / 2.0;\n"
     "  float alpha = min(linewidth, 1.0);\n"
     "  float d = dist - lw;\n"
     "  return d < .0 ? alpha\n"
-    "       : d < aa ? (1 - d / aa) * alpha\n"
+    "       : d < aa ? (1.0 - d / aa) * alpha\n"
     "       : 0.0;\n"
     "}\n"
   );
   vtkShaderProgram::Substitute(FSSource, "//VTK::UniformFlow::Impl",
     "  vec2 majorCoord = gridCoord / unitSquare;\n"
-    "  vec2 minorCoord = majorCoord * minorSquares;\n"
+    "  vec2 minorCoord = majorCoord * float(minorSquares);\n"
     "  vec2 majorGrid = abs(fract(majorCoord - 0.5) - 0.5) / fwidth(majorCoord);\n"
     "  vec2 minorGrid = abs(fract(minorCoord - 0.5) - 0.5) / fwidth(minorCoord);\n"
   );
