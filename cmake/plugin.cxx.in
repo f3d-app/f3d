@@ -7,7 +7,7 @@
 
 #include <memory>
 
-@F3D_READER_INCLUDES_CODE@
+@F3D_PLUGIN_INCLUDES_CODE@
 
 static std::shared_ptr<f3d::plugin> gPlugin;
 
@@ -23,7 +23,7 @@ extern "C" F3D_PLUGIN_EXPORT f3d::plugin* init_plugin()
       "@F3D_PLUGIN_NAME@",
       "@F3D_PLUGIN_DESCRIPTION@",
       "@F3D_PLUGIN_VERSION@",
-      std::vector<std::shared_ptr<f3d::reader>>{ @F3D_READER_REGISTER_CODE@ }
+      std::vector<std::shared_ptr<f3d::reader>>{ @F3D_PLUGIN_REGISTER_CODE@ }
     );
   }
 
