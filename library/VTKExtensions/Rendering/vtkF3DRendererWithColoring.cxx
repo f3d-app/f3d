@@ -115,26 +115,31 @@ void vtkF3DRendererWithColoring::SetUseVolume(bool use)
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
 {
-/*  if (this->UseInverseOpacityFunction != use)
+  if (this->UseInverseOpacityFunction != use)
   {
     this->UseInverseOpacityFunction = use;
-    if (this->VolumeProp)
-    {
-      vtkPiecewiseFunction* pwf = this->VolumeProp->GetProperty()->GetScalarOpacity();
-      if (pwf->GetSize() == 2)
-      {
-        double range[2];
-        pwf->GetRange(range);
 
-        pwf->RemoveAllPoints();
-        pwf->AddPoint(range[0], this->UseInverseOpacityFunction ? 1.0 : 0.0);
-        pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
+    auto volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
+    for (auto volPropAndMapper : volPropsAndMappers)
+    {
+      if(volPropAndMapper.first)
+      {
+        vtkPiecewiseFunction* pwf = volPropAndMapper.first->GetProperty()->GetScalarOpacity();
+        if (pwf->GetSize() == 2)
+        {
+          double range[2];
+          pwf->GetRange(range);
+
+          pwf->RemoveAllPoints();
+          pwf->AddPoint(range[0], this->UseInverseOpacityFunction ? 1.0 : 0.0);
+          pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
+        }
       }
     }
     this->VolumeConfigured = false;
     this->CheatSheetNeedUpdate = true;
     this->ColoringTimeStamp.Modified();
-  }*/ // TODO
+  }
 }
 
 //----------------------------------------------------------------------------
