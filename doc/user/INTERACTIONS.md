@@ -67,8 +67,8 @@ documentation for more info.
 When using the default scene, the following hotkeys let you cycle the coloring of the data:
 
 * `C`: cycle between point data and cell data - field data is not supported.
-* `S`: cycle the array available on the currently selected data, skipping array not containing numeric data.
-It will loop back to not coloring unless using volume rendering.
+* `S`: cycle the array available on the currently selected data in alphabetical order,
+skipping array not containing numeric data. It will loop back to not coloring unless using volume rendering.
 * `Y`: cycle the component available on the currently selected array, looping to -2 for direct scalars rendering
 if the array contains 4 or less components, -1 otherwise.
 
