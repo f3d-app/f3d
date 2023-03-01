@@ -383,19 +383,18 @@ std::string vtkF3DGenericImporter::GetMetaDataDescription()
     }
   }
 
-  std::string description = " \n";
+  std::string description;
   if (this->Readers.size() > 1)
   {
-    description += " Number of geometries: ";
+    description += "Number of geometries: ";
     description += std::to_string(this->Readers.size());
     description += "\n";
   }
-  description += " Number of points: ";
+  description += "Number of points: ";
   description += std::to_string(nPoints);
   description += "\n";
-  description += " Number of cells: ";
+  description += "Number of cells: ";
   description += std::to_string(nCells);
-  description += "\n";
   return description;
 }
 

@@ -961,7 +961,26 @@ std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
     return "";
   }
 
-  return this->Importer->GetMetaDataDescription();
+  // XXX Padding should not be handled by manipulating string
+  // but on the actor directly, but it is not supported by VTK yet.
+
+  // add eol before/after the string
+  std::string description = "\n" + this->Importer->GetMetaDataDescription() + "\n";
+  size_t index = 0;
+  while (true)
+  {
+     index = description.find("\n", index);
+     if (index == std::string::npos)
+     {
+       break;
+     }
+     // Add spaces after/before eol
+     description.insert(index + 1, " ");
+     description.insert(index, " ");
+     index += 3;
+  }
+
+  return description;
 }
 
 //----------------------------------------------------------------------------
