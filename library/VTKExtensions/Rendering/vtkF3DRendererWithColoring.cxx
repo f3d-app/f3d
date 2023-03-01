@@ -210,18 +210,26 @@ void vtkF3DRendererWithColoring::CycleScalars(CycleType type)
 //----------------------------------------------------------------------------
 vtkF3DRendererWithColoring::CycleType vtkF3DRendererWithColoring::CheckColoring()
 {
-  // Check we can color with something
+  // Never force change of anything if we are currently not coloring
+  if (this->ArrayIndexForColoring == -1)
+  {
+    return CycleType::F3D_CYCLE_NONE;
+  }
+
+  // Never force change of CellData/PointData coloring on the user
   if (this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring) == 0)
   {
     return CycleType::F3D_CYCLE_NONE;
   }
 
+  // Change the array index only if current is not valid and user just change the field type
   vtkF3DGenericImporter::ColoringInfo info;
   if (!this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
   {
     return CycleType::F3D_CYCLE_ARRAY_INDEX;
   }
 
+  // Always change the component if invalid
   if (this->ComponentForColoring >= info.MaximumNumberOfComponents)
   {
     return CycleType::F3D_CYCLE_COMPONENT;
@@ -701,8 +709,6 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(const vtkF3DGen
     this->ColorRange[1] = info.MagnitudeRange[1];
   }
 
-  std::cout<<this->ColorRange[0]<<" "<<this->ColorRange[1]<<std::endl;
-
   // Create lookup table
   this->ColorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
   if (this->Colormap.size() > 0)
@@ -927,7 +933,6 @@ void vtkF3DRendererWithColoring::CycleComponentForColoring()
   // -2 -1 0 1 2 3 4
   this->ComponentForColoring =
     (this->ComponentForColoring + 3) % (info.MaximumNumberOfComponents + 2) - 2; // TODO Rethink this
-  std::cout<<this->ComponentForColoring<<std::endl;
 }
 
 //----------------------------------------------------------------------------
