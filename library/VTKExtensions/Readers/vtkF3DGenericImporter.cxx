@@ -45,24 +45,27 @@ vtkStandardNewMacro(vtkF3DGenericImporter);
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::UpdateTemporalInformation()
 {
-/*  if (!this->Reader)
-  {
-    F3DLog::Print(F3DLog::Severity::Warning, "Reader is not valid\n");
-    return;
-  }
-  this->Reader->UpdateInformation();
-  vtkInformation* readerInfo = this->Reader->GetOutputInformation(0);
+  this->TimeSteps.clear();
 
-  this->NbTimeSteps = readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-  this->TimeRange = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
-  this->TimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());*/ // TODO
+  // Update each reader
+  for(vtkF3DGenericImporter::ReaderPipeline& pipe : this->Readers)
+  {
+    pipe.Reader->UpdateInformation();
+    vtkInformation* readerInfo = pipe.Reader->GetOutputInformation(0);
+
+    int nbTimeSteps = readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    double* readerTimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    for (int i = 0; i < nbTimeSteps; i++)
+    {
+      this->TimeSteps.insert(readerTimeSteps[i]);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
 vtkIdType vtkF3DGenericImporter::GetNumberOfAnimations()
 {
-  this->UpdateTemporalInformation();
-  return this->NbTimeSteps > 0 ? 1 : 0;
+  return this->TimeSteps.size() > 0 ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -107,10 +110,14 @@ bool vtkF3DGenericImporter::GetTemporalInformation(
 {
   if (animationIndex < this->GetNumberOfAnimations())
   {
-    nbTimeSteps = this->NbTimeSteps;
-    timeRange[0] = this->TimeRange[0];
-    timeRange[1] = this->TimeRange[1];
-    timeSteps->SetArray(this->TimeSteps, this->NbTimeSteps, 1);
+    nbTimeSteps = static_cast<int>(this->TimeSteps.size());
+    timeRange[0] = *this->TimeSteps.cbegin();
+    timeRange[1] = *this->TimeSteps.crbegin();
+
+    for(double ts : this->TimeSteps)
+    {
+      timeSteps->InsertNextValue(ts);
+    }
     return true;
   }
   return false;
@@ -222,7 +229,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     }
 
   }
-
+  this->UpdateTemporalInformation();
   this->UpdateColoringVectors(false);
   this->UpdateColoringVectors(true);
 }
@@ -283,14 +290,15 @@ void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::AddInternalReader(const std::string& name, vtkAlgorithm* reader)
 {
-  reader->Print(std::cout);
-  vtkF3DGenericImporter::ReaderPipeline pipe;
-  pipe.Name = name;
-  pipe.Reader = reader;
-  pipe.PostPro->SetInputConnection(pipe.Reader->GetOutputPort());
-  this->Readers.push_back(std::move(pipe));
-
-  this->Modified();
+  if (reader)
+  {
+    vtkF3DGenericImporter::ReaderPipeline pipe;
+    pipe.Name = name;
+    pipe.Reader = reader;
+    pipe.PostPro->SetInputConnection(pipe.Reader->GetOutputPort());
+    this->Readers.push_back(std::move(pipe));
+    this->Modified();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -401,7 +409,13 @@ std::string vtkF3DGenericImporter::GetMetaDataDescription()
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
 {
-//  this->PostPro->UpdateTimeStep(timestep); TODO
+  // Update each reader
+  for(vtkF3DGenericImporter::ReaderPipeline& pipe : this->Readers)
+  {
+    pipe.PostPro->UpdateTimeStep(timestep);
+  }
+  this->UpdateColoringVectors(false);
+  this->UpdateColoringVectors(true);
 }
 
 //----------------------------------------------------------------------------
@@ -490,6 +504,7 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
         info.MaximumNumberOfComponents = std::max(info.MaximumNumberOfComponents, array->GetNumberOfComponents());
 
         // Set ranges
+        // XXX this does not take animation into account
         std::array<double, 2> range;
         array->GetRange(range.data(), -1);
         info.MagnitudeRange[0] = std::min(info.MagnitudeRange[0], range[0]);
@@ -535,7 +550,6 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
     }
 
     data.emplace_back(info);
-    std::cout<<arrayName<<std::endl;
   }
 }
 

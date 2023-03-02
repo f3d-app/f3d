@@ -15,8 +15,9 @@
 #include <vtkNew.h>
 #include <vtkBoundingBox.h>
 
-#include <vector>
 #include <limits>
+#include <set>
+#include <vector>
 
 class vtkActor;
 class vtkVolume;
@@ -209,9 +210,7 @@ protected:
 
 
   bool AnimationEnabled = false;
-  int NbTimeSteps = -1;
-  double* TimeSteps = nullptr;
-  double* TimeRange = nullptr;
+  std::set<double> TimeSteps;
 
   double PointSize = 10.;
   double Opacity = 1.;
