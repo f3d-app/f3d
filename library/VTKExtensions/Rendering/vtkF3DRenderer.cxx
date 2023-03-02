@@ -226,6 +226,7 @@ void vtkF3DRenderer::SetupRenderPasses()
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseDepthPeelingPass(this->UseDepthPeelingPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
+  newPass->SetCircleOfConfusionRadius(this->CircleOfConfusionRadius);
   newPass->SetForceOpaqueBackground(this->HasHDRI);
 
   double bounds[6];
@@ -748,6 +749,15 @@ void vtkF3DRenderer::SetUseBlurBackground(bool use)
     this->UseBlurBackground = use;
     this->SetupRenderPasses();
     this->CheatSheetNeedUpdate = true;
+  }
+}
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetBlurCircleOfConfusionRadius(double radius)
+{
+  if (this->CircleOfConfusionRadius != radius)
+  {
+    this->CircleOfConfusionRadius = radius;
+    this->SetupRenderPasses();
   }
 }
 
