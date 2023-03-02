@@ -62,7 +62,7 @@ When loading another file or reloading, options that have been changed interacti
 if a dedicated regular expression block in the configuration file is present, see the [configuration file](CONFIGURATION_FILE.md)
 documentation for more info.
 
-## Cycling Coloring
+## Cycling Coloring TODO Check after the devs
 
 When using the default scene, the following hotkeys let you cycle the coloring of the data:
 
