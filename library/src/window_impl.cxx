@@ -290,6 +290,8 @@ void window_impl::UpdateDynamicOptions()
     this->Internals->Options.getAsDoubleVector("render.background.color").data());
   this->Internals->Renderer->SetUseBlurBackground(
     this->Internals->Options.getAsBool("render.background.blur"));
+  this->Internals->Renderer->SetBlurCircleOfConfusionRadius(
+    this->Internals->Options.getAsDouble("render.background.blur.coc"));
   this->Internals->Renderer->SetHDRIFile(
     this->Internals->Options.getAsString("render.background.hdri"));
   this->Internals->Renderer->SetLightIntensity(

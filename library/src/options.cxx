@@ -131,6 +131,7 @@ options::options()
   this->Internals->init(
     "render.background.hdri", std::string()); // XXX This overrides background.color
   this->Internals->init("render.background.blur", false);
+  this->Internals->init("render.background.blur.coc", 20.0);
   this->Internals->init("render.light.intensity", 1.);
 
   // UI

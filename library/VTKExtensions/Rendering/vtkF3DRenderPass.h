@@ -40,6 +40,7 @@ public:
   vtkSetMacro(UseBlurBackground, bool);
   vtkSetMacro(ForceOpaqueBackground, bool);
   vtkSetVector6Macro(Bounds, double);
+  vtkSetMacro(CircleOfConfusionRadius, double);
 
 protected:
   vtkF3DRenderPass() = default;
@@ -56,6 +57,8 @@ protected:
   bool UseDepthPeelingPass = false;
   bool UseBlurBackground = false;
   bool ForceOpaqueBackground = false;
+
+  double CircleOfConfusionRadius = 20.0;
 
   vtkSmartPointer<vtkFramebufferPass> BackgroundPass;
   vtkSmartPointer<vtkFramebufferPass> MainPass;
