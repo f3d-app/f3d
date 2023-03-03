@@ -59,10 +59,20 @@ extern "C"
   }
 
   // Loader
-  JNIEXPORT void JAVA_BIND(Loader, loadFile)(JNIEnv* env, jobject self, jstring path)
+  JNIEXPORT void JAVA_BIND(Loader, loadFullScene)(JNIEnv* env, jobject self, jstring path)
   {
     const char* str = env->GetStringUTFChars(path, nullptr);
-    GetEngine(env, self)->getLoader().loadFile(str);
+    GetEngine(env, self)->getLoader().loadFullScene(str);
+    env->ReleaseStringUTFChars(path, str);
+  }
+  JNIEXPORT void JAVA_BIND(Loader, resetToDefaultScene)(JNIEnv* env, jobject self)
+  {
+    GetEngine(env, self)->getLoader().resetToDefaultScene();
+  }
+  JNIEXPORT void JAVA_BIND(Loader, addGeometry)(JNIEnv* env, jobject self, jstring path)
+  {
+    const char* str = env->GetStringUTFChars(path, nullptr);
+    GetEngine(env, self)->getLoader().addGeometry(str);
     env->ReleaseStringUTFChars(path, str);
   }
 

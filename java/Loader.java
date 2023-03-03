@@ -6,7 +6,9 @@ public class Loader {
         mNativeAddress = nativeAddress;
     }
 
-    public native void loadFile(String file);
+    public native void loadFullScene(String file);
+    public native void resetToDefaultScene();
+    public native void addGeometry(String file);
 
     private long mNativeAddress;
 }
