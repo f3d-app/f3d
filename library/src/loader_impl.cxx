@@ -314,6 +314,7 @@ bool loader_impl::addGeometry(const std::string& filePath)
   }
 
   // Read the file
+  log::debug("Loading: ", filePath, "\n");
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
   if (!reader)
   {
@@ -369,7 +370,6 @@ bool loader_impl::loadFullScene(const std::string& filePath)
 
   // TODO what if it is empty ?
 
-  // There is a file to load, update CurrentFileIndex
   log::debug("Loading full scene: ", filePath, "\n");
 
   // Recover the importer

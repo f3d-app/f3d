@@ -407,6 +407,7 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
       }
       else
       {
+        f3d::log::warn(filePath, " is not a file of a supported file format\n");
         filenameInfo += " [UNSUPPORTED]"; 
       }
 
@@ -414,10 +415,10 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
       {
         // Setup the camera according to options
         this->Internals->SetupCamera(fileAppOptions);
-      }
 
-      this->Internals->Engine->getWindow().setWindowName(
-        filePath.filename().string() + " - " + F3D::AppName);
+        this->Internals->Engine->getWindow().setWindowName(
+          filePath.filename().string() + " - " + F3D::AppName);
+      }
     }
   }
   this->Internals->Engine->getOptions().set("ui.filename-info", filenameInfo);

@@ -276,15 +276,34 @@ void vtkF3DRendererWithColoring::SetColoring(
   {
     this->UseCellColoring = useCellData;
 
-    if (arrayName.empty())
+    int nIndexes = this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring);
+    if (arrayName == F3D_RESERVED_STRING)
     {
-      this->ArrayIndexForColoring = this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring) > 0 ? 0 : -1;
+      // Not coloring
+      this->ArrayIndexForColoring = -1;
+    }
+    else if (arrayName != F3D_RESERVED_STRING && nIndexes == 0)
+    {
+      // Trying to color but no array available 
+      F3DLog::Print(F3DLog::Severity::Warning, "No array to color with");
+      this->ArrayIndexForColoring = -1;
+    }
+    else if (arrayName.empty())
+    {
+      // Coloring with first array
+      this->ArrayIndexForColoring = 0;
     }
     else
     {
+      // Coloring with named array
       this->ArrayIndexForColoring = this->Importer->FindIndexForColoring(useCellData, arrayName);
-      //    this->ArrayForColoring = this->DataForColoring->GetArray(this->ArrayIndexForColoring);
+      if (this->ArrayIndexForColoring == -1)
+      {
+        // Could not find named array
+        F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: " + arrayName + "\n");
+      }
     }
+
 
     this->ComponentForColoring = component;
 
@@ -569,7 +588,7 @@ std::string vtkF3DRendererWithColoring::GetColoringDescription()
   if (this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
   {
     stream << "Coloring using "
-           << (this->UseCellColoring ? "point" : "cell")
+           << (this->UseCellColoring ? "cell" : "point")
            << " array named " << info.Name << ", "
            << vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring) << "\n";
   }
@@ -689,6 +708,13 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(const vtkF3DGen
 {
   if (this->ComponentForColoring == -2) // TODO
   {
+    return;
+  }
+
+  if (this->ComponentForColoring >= info.MaximumNumberOfComponents)
+  {
+    F3DLog::Print(F3DLog::Severity::Warning,
+      std::string("Invalid component index: ") + std::to_string(this->ComponentForColoring));
     return;
   }
 

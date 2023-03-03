@@ -175,6 +175,7 @@ f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WIL
 f3d_test(NAME TestVerboseLoadPlugin ARGS --verbose REGEXP "Loading plugin \"native\"" NO_BASELINE)
 f3d_test(NAME TestNonExistentPlugin ARGS --load-plugins=dummy REGEXP "Plugin failed to load" NO_BASELINE)
 f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalars --bar --comp=2 DEFAULT_LIGHTS)
+f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
 
 if(UNIX AND NOT APPLE)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
@@ -381,7 +382,7 @@ f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CM
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
 
 # Simple verbosity test
-f3d_test(NAME TestVerbose DATA dragon.vtu ARGS -s --verbose REGEXP "Number of points: 13268\nNumber of cells: 26532" NO_RENDER)
+f3d_test(NAME TestVerbose DATA dragon.vtu ARGS --verbose REGEXP "Number of points: 13268\nNumber of cells: 26532" NO_RENDER)
 
 # Unknown scalar array verbosity test
 f3d_test(NAME TestVerboseWrongArray DATA dragon.vtu ARGS --scalars=dummy --verbose REGEXP "Unknown scalar array: dummy" NO_BASELINE)
@@ -396,7 +397,7 @@ f3d_test(NAME TestIncorrectComponent DATA dragon.vtu ARGS -s --comp=4 REGEXP "In
 f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --scalars --roughness=1 --colormap=0,1,0,0,1,0,1 REGEXP "Specified color map list count is not a multiple of 4, ignoring it." NO_BASELINE)
 
 # Test opening a directory
-f3d_test(NAME TestDirectory DATA mb REGEXP "Loading: .*mb_._0.vt." NO_RENDER)
+f3d_test(NAME TestVerboseDirectory DATA mb REGEXP "Loading: .*mb_._0.vt." NO_RENDER)
 
 # Test Animation invalid index
 f3d_test(NAME TestVerboseAnimationIndexError2 DATA cow.vtp ARGS --animation-index=1 --verbose REGEXP "An animation index has been specified but there are no animation available." NO_BASELINE)
@@ -417,7 +418,10 @@ f3d_test(NAME TestTensorsDirect DATA tensors.vti ARGS --scalars=tensors1 --comp=
 f3d_test(NAME TestTensorsVolumeDirect DATA tensors.vti ARGS -v --scalars=tensors1 --comp=-2 REGEXP "Direct scalars rendering not supported by array with more than 4 components" NO_BASELINE)
 
 # Test volume rendering without any array
-f3d_test(NAME TestVolumeNoArray DATA cow.vtp ARGS -v REGEXP "No array to color with" NO_BASELINE)
+f3d_test(NAME TestVerboseVolumeNoArray DATA cow.vtp ARGS -v REGEXP "Cannot use volume with this dataset" NO_BASELINE)
+
+# Test scalar rendering without any array
+f3d_test(NAME TestVerboseNoArray DATA cow.vtp ARGS -s REGEXP "No array to color with" NO_BASELINE)
 
 # Test non existent file, do not create nonExistentFile.vtp
 f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose REGEXP "File \".*nonExistentFile.vtp\" does not exist" NO_RENDER)
@@ -429,7 +433,7 @@ f3d_test(NAME TestVerboseNonExistentFont DATA suzanne.ply ARGS -n --font-file=${
 f3d_test(NAME TestQuietNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose --quiet REGEXP_FAIL "File \".*nonExistentFile.vtp\" does not exist" NO_RENDER)
 
 # Test non supported file, do not add support for .dummy file.
-f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename REGEXP ".*unsupportedFile.dummy is not a file of a supported file format" NO_RENDER)
+f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename REGEXP ".*unsupportedFile.dummy\" is not a file of a supported file format" NO_RENDER)
 
 # Test non existent texture, do not add a dummy.png
 f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${CMAKE_SOURCE_DIR}/testing/data/dummy.png REGEXP "Texture file does not exist" NO_BASELINE)
