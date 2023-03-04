@@ -36,7 +36,7 @@ Other options can be toggled directly by pressing the following hotkeys:
 * `T`: tone mapping.
 * `E`: the display of cell edges.
 * `X`: the trihedral axes display.
-* `G`: the XZ grid display.
+* `G`: the horizontal grid display.
 * `N`: the display of the file name.
 * `M`: the display of the metadata if exists.
 * `Z`: the display of the FPS counter.
