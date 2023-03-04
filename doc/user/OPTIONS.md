@@ -28,7 +28,9 @@ Options|Default|Description
 \-\-geometry-only||For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-up=\<[+\|-][X\|Y\|Z]\>|+Y|Define the Up direction.
 -x, \-\-axis||Show *axes* as a trihedron in the scene.
--g, \-\-grid||Show *a grid* aligned with the XZ plane.
+-g, \-\-grid||Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.
+\-\-grid\-unit=\<length\>||Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.
+\-\-grid\-subdivisions=\<count\>||Set the number of subdivisions for the grid.
 -e, \-\-edges||Show the *cell edges*.
 \-\-camera-index=\<idx\>|-1|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.
 -k, \-\-trackball||Enable trackball interaction.
