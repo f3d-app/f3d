@@ -32,7 +32,7 @@ public:
    * Set visibility of different actors
    */
   void ShowAxis(bool show);
-  void ShowGrid(bool show);
+  void ShowGrid(bool show, double unitSquare = 0, int subdivisions = 10);
   void ShowEdge(bool show);
   void ShowTimer(bool show);
   void ShowMetaData(bool show);
