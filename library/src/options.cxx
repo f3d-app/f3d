@@ -116,7 +116,9 @@ options::options()
   this->Internals->init("render.show-edges", false);
   this->Internals->init("render.line-width", 1.0);
   this->Internals->init("render.point-size", 10.0);
-  this->Internals->init("render.grid", false);
+  this->Internals->init("render.grid.enable", false);
+  this->Internals->init("render.grid.unit", 0.0);
+  this->Internals->init("render.grid.subdivisions", 10);
 
   this->Internals->init("render.raytracing.enable", false);
   this->Internals->init("render.raytracing.denoise", false);
