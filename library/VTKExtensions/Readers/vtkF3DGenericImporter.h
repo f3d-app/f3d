@@ -15,6 +15,7 @@
 #include <vtkNew.h>
 #include <vtkBoundingBox.h>
 
+#include <array>
 #include <limits>
 #include <set>
 #include <vector>
