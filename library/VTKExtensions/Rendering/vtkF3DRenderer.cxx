@@ -355,7 +355,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ShowGrid(bool show)
+void vtkF3DRenderer::ShowGrid(bool show, double unitSquare, int subdivisions)
 {
   // Initialize grid using visible prop bounds
   // Also initialize GridInfo
@@ -373,7 +373,10 @@ void vtkF3DRenderer::ShowGrid(bool show)
     else
     {
       double diag = bbox.GetDiagonalLength();
-      double unitSquare = pow(10.0, round(log10(diag * 0.1)));
+      if (unitSquare <= 0)
+      {
+        unitSquare = pow(10.0, round(log10(diag * 0.1)));
+      }
 
       double gridPos[3];
       for (int i = 0; i < 3; i++)
@@ -391,7 +394,7 @@ void vtkF3DRenderer::ShowGrid(bool show)
       vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
       gridMapper->SetFadeDistance(diag);
       gridMapper->SetUnitSquare(unitSquare);
-      gridMapper->SetMinorSquares(10);
+      gridMapper->SetSubdivisions(subdivisions);
       gridMapper->SetUpIndex(this->UpIndex);
 
       this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);

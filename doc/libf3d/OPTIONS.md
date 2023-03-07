@@ -21,7 +21,9 @@ scene.animation.index|int<br>0<br>load|Select the animation to load.<br>Any nega
 scene.camera.index|int<br>-1<br>load|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.|\-\-camera-index
 scene.geometry-only|bool<br>false<br>load|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.|\-\-geometry-only
 scene.up-direction|string<br>+Y<br>load|Define the Up direction|\-\-up
-scene.grid|bool<br>false<br>render|Show *a grid* aligned with the XZ plane.|\-\-grid
+scene.grid.enable|bool<br>false<br>render|Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.|\-\-grid
+scene.grid.unit|double<br>0<br>load|Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.|\-\-grid\-unit
+scene.grid.subdivisions|int<br>10<br>load|Set the number of subdivisions for the grid.|\-\-grid\-subdivisions
 scene.background.blur|bool<br>false<br>render|Blur background when using a HDRI.|\-\-blur-background
 render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-background-coc
 scene.background.color|vector\<double\><br>0.2,0.2,0.2<br>render|Set the window *background color*.<br>Ignored if *hdri* is set.|\-\-bg-color
