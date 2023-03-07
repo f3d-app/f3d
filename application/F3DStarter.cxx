@@ -14,7 +14,6 @@
 #include <cassert>
 #include <filesystem>
 #include <set>
-#include <iostream>
 
 namespace fs = std::filesystem;
 

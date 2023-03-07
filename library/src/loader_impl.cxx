@@ -35,47 +35,6 @@ public:
     vtkProgressBarWidget* widget;
   } ProgressDataStruct;
 
-  static vtkSmartPointer<vtkImporter> GetFullSceneImporter(const std::string& fileName)
-  {
-    // Find the best compatible reader with scene reading capabilities based on reader scores
-    f3d::reader* reader = f3d::factory::instance()->getReader(fileName);
-    if (!reader)
-    {
-      return nullptr;
-    }
-
-    return reader->createSceneReader(fileName);
-  }
-
-/*  static vtkSmartPointer<vtkImporter> GetImporter(const std::string& fileName, bool geometry)
-  {
-    // Find the best compatible reader with scene reading capabilities based on reader scores
-    f3d::reader* reader = f3d::factory::instance()->getReader(fileName);
-
-    if (!reader)
-    {
-      return nullptr;
-    }
-
-    if (!geometry)
-    {
-      vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(fileName);
-      if (importer)
-      {
-        return importer;
-      }
-    }
-
-    // Use the generic importer and check if it can process the file
-    vtkNew<vtkF3DGenericImporter> importer;
-    importer->SetInternalReader(reader->createGeometryReader(fileName));
-    if (!importer->CanReadFile())
-    {
-      return nullptr;
-    }
-    return importer;
-  }*/
-
   static void InitializeImporterWithOptions(const options& options, vtkF3DGenericImporter* importer)
   {
     // Move to interactor TODO
@@ -163,13 +122,12 @@ public:
   }
 
   bool DefaultScene = true;
-  std::string FilenameInfo;
 
   const options& Options;
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
 
-  vtkSmartPointer<vtkImporter> CurrentImporter; // TODO may not be needed
+  vtkSmartPointer<vtkImporter> CurrentFullSceneImporter;
   vtkNew<vtkF3DGenericImporter> GenericImporter;
 };
 
@@ -185,122 +143,27 @@ loader_impl::loader_impl(const options& options, window_impl& window)
 loader_impl::~loader_impl() = default;
 
 //----------------------------------------------------------------------------
-/*bool loader_impl::loadFile(const std::string& filePath)
-{
-  // Recover fileNameInfo if any
-  std::string fileNameInfo = this->Internals->FilenameInfo;
-  if (fileNameInfo.empty())
-  {
-    fileNameInfo = vtksys::SystemTools::GetFilenameName(filePath);
-  }
-
-  if (filePath.empty())
-  {
-    // No file provided, show a drop zone instead
-    log::debug("No file to load provided\n");
-    this->Internals->Window.Initialize(
-      false, fileNameInfo + "No file to load provided, please drop one into this window");
-    return false;
-  }
-
-  // There is a file to load, update CurrentFileIndex
-  log::debug("Loading: ", filePath, "\n");
-
-  // Recover the importer
-  this->Internals->CurrentImporter = loader_impl::internals::GetImporter(
-    filePath, this->Internals->Options.getAsBool("scene.geometry-only"));
-  vtkF3DGenericImporter* genericImporter =
-    vtkF3DGenericImporter::SafeDownCast(this->Internals->CurrentImporter);
-  if (!this->Internals->CurrentImporter)
-  {
-    log::warn(filePath, " is not a file of a supported file format\n");
-    this->Internals->Window.Initialize(false, fileNameInfo + " [UNSUPPORTED]");
-    return false;
-  }
-
-  vtkNew<vtkProgressBarWidget> progressWidget;
-  vtkNew<vtkTimerLog> timer;
-  loader_impl::internals::ProgressDataStruct callbackData;
-  callbackData.timer = timer;
-  callbackData.widget = progressWidget;
-
-  this->Internals->Window.Initialize(genericImporter != nullptr, fileNameInfo);
-
-  // Initialize importer for rendering
-  this->Internals->CurrentImporter->SetRenderWindow(this->Internals->Window.GetRenderWindow());
-
-  int cameraIndex = this->Internals->Options.getAsInt("scene.camera.index");
-// Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210303)
-  this->Internals->CurrentImporter->SetCamera(cameraIndex);
-#else
-  // XXX There is no way to recover the init value yet, assume it is -1
-  if (cameraIndex != -1)
-  {
-    log::warn("This VTK version does not support specifying the camera index, ignored.");
-  }
-#endif
-
-  // Manage progress bar
-  if (this->Internals->Options.getAsBool("ui.loader-progress") && this->Internals->Interactor)
-  {
-    loader_impl::internals::CreateProgressRepresentationAndCallback(
-      &callbackData, this->Internals->CurrentImporter, this->Internals->Interactor);
-  }
-
-  // Initialize genericImporter with options
-  if (genericImporter)
-  {
-    loader_impl::internals::InitializeImporterWithOptions(
-      this->Internals->Options, genericImporter);
-  }
-
-  // Read the file
-  this->Internals->CurrentImporter->Update();
-  loader_impl::internals::DisplayImporterDescription(this->Internals->CurrentImporter);
-
-  // Remove anything progress related if any
-  this->Internals->CurrentImporter->RemoveObservers(vtkCommand::ProgressEvent);
-  progressWidget->Off();
-
-  if (this->Internals->Interactor)
-  {
-    // Initialize the animation using temporal information from the importer
-    this->Internals->Interactor->InitializeAnimation(this->Internals->CurrentImporter);
-  }
-
-  // Recover generic importer specific actors and mappers to set on the renderer with coloring
-  if (genericImporter)
-  {
-    this->Internals->Window.InitializeRendererWithColoring(genericImporter);
-  }
-
-  // Initialize renderer and reset camera to bounds if needed
-  this->Internals->Window.UpdateDynamicOptions();
-  if (cameraIndex == -1)
-  {
-    this->Internals->Window.getCamera().resetToBounds();
-  }
-
-  // Print info about scene and coloring
-  this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-  this->Internals->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
-
-  return true;
-  ;
-}*/
-
-//----------------------------------------------------------------------------
-loader& loader_impl::setFilenameInfo(const std::string& filenameInfo)
-{
-  this->Internals->FilenameInfo = filenameInfo;
-  return *this;
-}
-
-//----------------------------------------------------------------------------
 void loader_impl::setInteractor(interactor_impl* interactor)
 {
   this->Internals->Interactor = interactor;
+}
+
+//----------------------------------------------------------------------------
+loader& loader_impl::resetToDefaultScene()
+{
+  // Reset the generic importer
+  this->Internals->GenericImporter->RemoveInternalReaders();
+
+  // Initialize the window
+  this->Internals->Window.Initialize(true);
+
+  // Initialize genericImporter with options
+  loader_impl::internals::InitializeImporterWithOptions(
+    this->Internals->Options, this->Internals->GenericImporter);
+
+  this->Internals->DefaultScene = true;
+
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -308,8 +171,14 @@ bool loader_impl::addGeometry(const std::string& filePath)
 {
   if (!this->Internals->DefaultScene)
   {
-    // TODO
+    // TODO should we reset to default scene ?
     log::warn("Cannot add a geometry as default scene is not currently in use\n");
+    return false;
+  }
+
+  if (filePath.empty())
+  {
+    log::debug("No file to add a geometry from provided\n");
     return false;
   }
 
@@ -322,14 +191,33 @@ bool loader_impl::addGeometry(const std::string& filePath)
     return false;
   }
 
+  // Manage progress bar
+  vtkNew<vtkProgressBarWidget> progressWidget;
+  vtkNew<vtkTimerLog> timer;
+  loader_impl::internals::ProgressDataStruct callbackData;
+  callbackData.timer = timer;
+  callbackData.widget = progressWidget;
+  if (this->Internals->Options.getAsBool("ui.loader-progress") && this->Internals->Interactor)
+  {
+    loader_impl::internals::CreateProgressRepresentationAndCallback(
+      &callbackData, this->Internals->GenericImporter, this->Internals->Interactor);
+  }
+
+  // Add a single internal reader
   this->Internals->GenericImporter->AddInternalReader(vtksys::SystemTools::GetFilenameName(filePath), reader->createGeometryReader(filePath));
+
+  // Update the importer
   this->Internals->GenericImporter->Update();
-  loader_impl::internals::DisplayImporterDescription(this->Internals->CurrentImporter);
+  loader_impl::internals::DisplayImporterDescription(this->Internals->GenericImporter);
+
+  // Remove anything progress related if any
+  this->Internals->GenericImporter->RemoveObservers(vtkCommand::ProgressEvent);
+  progressWidget->Off();
 
   if (this->Internals->Interactor)
   {
     // Initialize the animation using temporal information from the importer
-    this->Internals->Interactor->InitializeAnimation(this->Internals->CurrentImporter);
+    this->Internals->Interactor->InitializeAnimation(this->Internals->GenericImporter);
   }
 
   // Recover generic importer specific actors and mappers to set on the renderer with coloring
@@ -347,56 +235,40 @@ bool loader_impl::addGeometry(const std::string& filePath)
 }
 
 //----------------------------------------------------------------------------
-loader& loader_impl::resetToDefaultScene()
-{
-  // Recover the generic importer
-  this->Internals->GenericImporter->RemoveInternalReaders();
-  this->Internals->CurrentImporter = this->Internals->GenericImporter;
-
-  this->Internals->Window.Initialize(true);
-
-  // Initialize genericImporter with options
-  loader_impl::internals::InitializeImporterWithOptions(
-    this->Internals->Options, this->Internals->GenericImporter);
-
-  this->Internals->DefaultScene = true;
-
-  return *this;
-}
-
-//----------------------------------------------------------------------------
 bool loader_impl::loadFullScene(const std::string& filePath)
 {
-
-  // TODO what if it is empty ?
+  if (filePath.empty())
+  {
+    log::debug("No file to load a full scene provided\n");
+    return false;
+  }
 
   log::debug("Loading full scene: ", filePath, "\n");
 
-  // Recover the importer
-  this->Internals->CurrentImporter = loader_impl::internals::GetFullSceneImporter(filePath);
-  if (!this->Internals->CurrentImporter)
+  // Recover the importer for the provided file path
+  this->Internals->CurrentFullSceneImporter = nullptr;
+  f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
+  if (reader)
+  {
+    this->Internals->CurrentFullSceneImporter = reader->createSceneReader(filePath);
+  }
+
+  if (!this->Internals->CurrentFullSceneImporter)
   {
     log::warn(filePath, " is not a file of a supported file format for full scene\n");
     this->Internals->Window.Initialize(false);
     return false;
   }
 
-  // TODO generify ?
-  vtkNew<vtkProgressBarWidget> progressWidget;
-  vtkNew<vtkTimerLog> timer;
-  loader_impl::internals::ProgressDataStruct callbackData;
-  callbackData.timer = timer;
-  callbackData.widget = progressWidget;
-
   this->Internals->Window.Initialize(false);
 
   // Initialize importer for rendering
-  this->Internals->CurrentImporter->SetRenderWindow(this->Internals->Window.GetRenderWindow());
+  this->Internals->CurrentFullSceneImporter->SetRenderWindow(this->Internals->Window.GetRenderWindow());
 
   int cameraIndex = this->Internals->Options.getAsInt("scene.camera.index");
 // Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210303)
-  this->Internals->CurrentImporter->SetCamera(cameraIndex);
+  this->Internals->CurrentFullSceneImporter->SetCamera(cameraIndex);
 #else
   // XXX There is no way to recover the init value yet, assume it is -1
   if (cameraIndex != -1)
@@ -406,24 +278,29 @@ bool loader_impl::loadFullScene(const std::string& filePath)
 #endif
 
   // Manage progress bar
+  vtkNew<vtkProgressBarWidget> progressWidget;
+  vtkNew<vtkTimerLog> timer;
+  loader_impl::internals::ProgressDataStruct callbackData;
+  callbackData.timer = timer;
+  callbackData.widget = progressWidget;
   if (this->Internals->Options.getAsBool("ui.loader-progress") && this->Internals->Interactor)
   {
     loader_impl::internals::CreateProgressRepresentationAndCallback(
-      &callbackData, this->Internals->CurrentImporter, this->Internals->Interactor);
+      &callbackData, this->Internals->CurrentFullSceneImporter, this->Internals->Interactor);
   }
 
   // Read the file
-  this->Internals->CurrentImporter->Update();
-  loader_impl::internals::DisplayImporterDescription(this->Internals->CurrentImporter);
+  this->Internals->CurrentFullSceneImporter->Update();
+  loader_impl::internals::DisplayImporterDescription(this->Internals->CurrentFullSceneImporter);
 
   // Remove anything progress related if any
-  this->Internals->CurrentImporter->RemoveObservers(vtkCommand::ProgressEvent);
+  this->Internals->CurrentFullSceneImporter->RemoveObservers(vtkCommand::ProgressEvent);
   progressWidget->Off();
 
   if (this->Internals->Interactor)
   {
     // Initialize the animation using temporal information from the importer
-    this->Internals->Interactor->InitializeAnimation(this->Internals->CurrentImporter);
+    this->Internals->Interactor->InitializeAnimation(this->Internals->CurrentFullSceneImporter);
   }
 
   // Initialize renderer and reset camera to bounds if needed

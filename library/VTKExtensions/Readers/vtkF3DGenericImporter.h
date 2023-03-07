@@ -16,6 +16,7 @@
 
 #include <array>
 #include <limits>
+#include <memory>
 #include <set>
 #include <vector>
 
@@ -172,7 +173,7 @@ public:
   ///@}
 
 protected:
-  vtkF3DGenericImporter() = default;
+  vtkF3DGenericImporter();
   ~vtkF3DGenericImporter() override = default;
 
 //  int ImportBegin() override;
@@ -182,40 +183,20 @@ protected:
    */
   void ImportActors(vtkRenderer*) override;
 
-  vtkSmartPointer<vtkTexture> GetTexture(const std::string& fileName, bool isSRGB = false);
-
+  /**
+   * Update temporal information according to currently added readers
+   */
   void UpdateTemporalInformation();
 
+  /**
+   * Update coloring information vectors according to
+   * currently added vectors
+   */
   void UpdateColoringVectors(bool useCellData);
 
-  struct ReaderPipeline //TODO in CXX
-  {
-    std::string Name;
-    vtkSmartPointer<vtkAlgorithm> Reader;
-    vtkNew<vtkF3DPostProcessFilter> PostPro;
-    std::string OutputDescription;
-
-    vtkNew<vtkActor> GeometryActor;
-    vtkNew<vtkActor> PointSpritesActor;
-    vtkNew<vtkVolume> VolumeProp;
-    vtkNew<vtkPolyDataMapper> PolyDataMapper;
-    vtkNew<vtkPointGaussianMapper> PointGaussianMapper;
-    vtkNew<vtkSmartVolumeMapper> VolumeMapper;
-
-    vtkDataSet* Output = nullptr;
-    vtkDataSetAttributes* PointDataForColoring = nullptr;
-    vtkDataSetAttributes* CellDataForColoring = nullptr;
-  };
-
-  std::vector<ReaderPipeline> Readers;
-
-  std::vector<ColoringInfo> PointDataArrayVectorForColoring;
-  std::vector<ColoringInfo> CellDataArrayVectorForColoring;
-  vtkBoundingBox GeometryBoundingBox;
-  std::string MetaDataDescription;
-
-  bool AnimationEnabled = false;
-  std::set<double> TimeSteps;
+private:
+  vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;
+  void operator=(const vtkF3DGenericImporter&) = delete;
 
   double PointSize = 10.;
   double Opacity = 1.;
@@ -230,9 +211,8 @@ protected:
   std::string TextureEmissive;
   std::string TextureNormal;
 
-private:
-  vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;
-  void operator=(const vtkF3DGenericImporter&) = delete;
+  class vtkInternals;
+  std::unique_ptr<vtkInternals> Internals;
 };
 
 #endif
