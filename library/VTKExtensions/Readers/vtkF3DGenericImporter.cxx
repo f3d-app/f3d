@@ -510,7 +510,7 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
         info.MagnitudeRange[0] = std::min(info.MagnitudeRange[0], range[0]);
         info.MagnitudeRange[1] = std::max(info.MagnitudeRange[1], range[1]);
 
-        for (vtkIdType i = 0; i < array->GetNumberOfComponents(); i++)
+        for (size_t i = 0; i < static_cast<size_t>(array->GetNumberOfComponents()); i++)
         {
           array->GetRange(range.data(), i);
           if (i < info.ComponentRanges.size())
@@ -527,7 +527,7 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
         // Set component names
         if (array->HasAComponentName())
         {
-          for (vtkIdType i = 0; i < array->GetNumberOfComponents(); i++)
+          for (size_t i = 0; i < static_cast<size_t>(array->GetNumberOfComponents()); i++)
           {
             const char* compName = array->GetComponentName(i);
             if (i < info.ComponentNames.size())
