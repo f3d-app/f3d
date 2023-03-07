@@ -512,7 +512,7 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
 
         for (size_t i = 0; i < static_cast<size_t>(array->GetNumberOfComponents()); i++)
         {
-          array->GetRange(range.data(), i);
+          array->GetRange(range.data(), static_cast<int>(i));
           if (i < info.ComponentRanges.size())
           {
             info.ComponentRanges[i][0] = std::min(info.ComponentRanges[i][0], range[0]);
