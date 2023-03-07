@@ -42,7 +42,7 @@ public:
    * Specify the VTK reader.
    */
 //  void SetInternalReader(vtkAlgorithm* reader);
-  void AddInternalReader(const std::string& name, vtkAlgorithm* reader);
+  void AddInternalReader(const std::string& name, vtkSmartPointer<vtkAlgorithm> reader);
   void RemoveInternalReaders();
 
   /**

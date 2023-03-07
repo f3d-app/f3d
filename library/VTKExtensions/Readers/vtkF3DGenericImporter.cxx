@@ -288,7 +288,7 @@ void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 }*/
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::AddInternalReader(const std::string& name, vtkAlgorithm* reader)
+void vtkF3DGenericImporter::AddInternalReader(const std::string& name, vtkSmartPointer<vtkAlgorithm> reader)
 {
   if (reader)
   {
