@@ -27,7 +27,7 @@ void vtkF3DOpenGLGridMapper::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "FadeDistance: " << this->FadeDistance << "\n";
   os << indent << "UnitSquare: " << this->UnitSquare << "\n";
-  os << indent << "MinorSquare: " << this->MinorSquares << "\n";
+  os << indent << "Subdivisions: " << this->Subdivisions << "\n";
   os << indent << "UpIndex: " << this->UpIndex << "\n";
 }
 
@@ -55,7 +55,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
   vtkShaderProgram::Substitute(FSSource, "//VTK::CustomUniforms::Dec",
     "uniform float fadeDist;\n"
     "uniform float unitSquare;\n"
-    "uniform int minorSquares;\n"
+    "uniform int subdivisions;\n"
     "uniform float axesLineWidth;\n"
     "uniform float gridLineWidth;\n"
     "uniform float minorOpacity;\n"
@@ -76,7 +76,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
   );
   vtkShaderProgram::Substitute(FSSource, "//VTK::UniformFlow::Impl",
     "  vec2 majorCoord = gridCoord / unitSquare;\n"
-    "  vec2 minorCoord = majorCoord * float(minorSquares);\n"
+    "  vec2 minorCoord = majorCoord * float(subdivisions);\n"
     "  vec2 majorGrid = abs(fract(majorCoord - 0.5) - 0.5) / fwidth(majorCoord);\n"
     "  vec2 minorGrid = abs(fract(minorCoord - 0.5) - 0.5) / fwidth(minorCoord);\n"
   );
@@ -145,7 +145,7 @@ void vtkF3DOpenGLGridMapper::SetMapperShaderParameters(
 
   cellBO.Program->SetUniformf("fadeDist", this->FadeDistance);
   cellBO.Program->SetUniformf("unitSquare", this->UnitSquare);
-  cellBO.Program->SetUniformi("minorSquares", this->MinorSquares);
+  cellBO.Program->SetUniformi("subdivisions", this->Subdivisions);
   cellBO.Program->SetUniformf("axesLineWidth", 0.8);
   cellBO.Program->SetUniformf("gridLineWidth", 0.6);
   cellBO.Program->SetUniformf("minorOpacity", 0.5);

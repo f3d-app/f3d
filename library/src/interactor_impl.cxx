@@ -154,7 +154,7 @@ public:
         render = true;
         break;
       case 'G':
-        self->Options.toggle("render.grid");
+        self->Options.toggle("render.grid.enable");
         render = true;
         break;
       case 'N':
