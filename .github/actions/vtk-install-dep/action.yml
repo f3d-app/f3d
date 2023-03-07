@@ -38,7 +38,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.enable_raytracing}}-0
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.enable_raytracing}}-1
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -88,6 +88,7 @@ runs:
         -DVTK_GROUP_ENABLE_Rendering=DEFAULT
         -DVTK_GROUP_ENABLE_StandAlone=DEFAULT
         -DVTK_LEGACY_REMOVE=ON
+        -DVTK_DEBUG_LEAKS=ON
         -DVTK_MODULE_ENABLE_VTK_CommonSystem=YES
         -DVTK_MODULE_ENABLE_VTK_FiltersGeneral=YES
         -DVTK_MODULE_ENABLE_VTK_FiltersGeometry=YES
