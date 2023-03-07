@@ -212,7 +212,7 @@ private:
   std::string TextureEmissive;
   std::string TextureNormal;
 
-  class vtkInternals;
+  struct vtkInternals;
   std::unique_ptr<vtkInternals> Internals;
 };
 
