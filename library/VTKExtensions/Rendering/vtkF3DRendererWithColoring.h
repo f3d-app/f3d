@@ -126,7 +126,7 @@ protected:
    * Convenience method for configuring a poly data mapper for coloring
    */
   static void ConfigureMapperForColoring(vtkPolyDataMapper* mapper, vtkDataArray* array,
-   int component, vtkColorTransferFunction* ctf, double range[2], bool cellFlag = false);
+    int component, vtkColorTransferFunction* ctf, double range[2], bool cellFlag = false);
 
   /**
    * Convenience method for configuring a volume mapper and volume for coloring
@@ -138,9 +138,8 @@ protected:
   /**
    * Convenience method for configuring a scalar bar actor for coloring
    */
-  void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, const std::string& arrayName,
-    int component, vtkColorTransferFunction* ctf);
-
+  void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar,
+    const std::string& arrayName, int component, vtkColorTransferFunction* ctf);
 
   /**
    * Configure internal range and color transfer function according to provided

@@ -204,7 +204,8 @@ bool loader_impl::addGeometry(const std::string& filePath)
   }
 
   // Add a single internal reader
-  this->Internals->GenericImporter->AddInternalReader(vtksys::SystemTools::GetFilenameName(filePath), reader->createGeometryReader(filePath));
+  this->Internals->GenericImporter->AddInternalReader(
+    vtksys::SystemTools::GetFilenameName(filePath), reader->createGeometryReader(filePath));
 
   // Update the importer
   this->Internals->GenericImporter->Update();
@@ -263,7 +264,8 @@ bool loader_impl::loadFullScene(const std::string& filePath)
   this->Internals->Window.Initialize(false);
 
   // Initialize importer for rendering
-  this->Internals->CurrentFullSceneImporter->SetRenderWindow(this->Internals->Window.GetRenderWindow());
+  this->Internals->CurrentFullSceneImporter->SetRenderWindow(
+    this->Internals->Window.GetRenderWindow());
 
   int cameraIndex = this->Internals->Options.getAsInt("scene.camera.index");
 // Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701

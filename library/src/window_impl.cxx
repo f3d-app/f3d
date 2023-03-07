@@ -239,8 +239,7 @@ void window_impl::Initialize(bool withColoring)
 
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
-  this->Internals->Renderer->Initialize(
-    this->Internals->Options.getAsString("scene.up-direction"));
+  this->Internals->Renderer->Initialize(this->Internals->Options.getAsString("scene.up-direction"));
   this->Internals->Initialized = true;
 }
 
@@ -267,7 +266,8 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("render.show-edges"));
   this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("ui.fps"));
   this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("ui.filename"));
-  this->Internals->Renderer->SetFilenameInfo(this->Internals->Options.getAsString("ui.filename-info"));
+  this->Internals->Renderer->SetFilenameInfo(
+    this->Internals->Options.getAsString("ui.filename-info"));
   this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("ui.metadata"));
   this->Internals->Renderer->ShowCheatSheet(this->Internals->Options.getAsBool("ui.cheatsheet"));
 

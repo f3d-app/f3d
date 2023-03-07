@@ -8,11 +8,11 @@
 
 #include "vtkF3DPostProcessFilter.h"
 
+#include <vtkBoundingBox.h>
 #include <vtkImporter.h>
+#include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkVersion.h>
-#include <vtkNew.h>
-#include <vtkBoundingBox.h>
 
 #include <array>
 #include <limits>
@@ -84,8 +84,9 @@ public:
     std::string Name;
     int MaximumNumberOfComponents = 0;
     std::vector<std::string> ComponentNames;
-    std::vector<std::array<double, 2>> ComponentRanges;
-    std::array<double, 2> MagnitudeRange = {std::numeric_limits<float>::max(), std::numeric_limits<float>::min()};
+    std::vector<std::array<double, 2> > ComponentRanges;
+    std::array<double, 2> MagnitudeRange = { std::numeric_limits<float>::max(),
+      std::numeric_limits<float>::min() };
     std::vector<vtkDataArray*> Arrays;
   };
 

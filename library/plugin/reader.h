@@ -88,10 +88,7 @@ public:
    * Return true if this reader can create a geometry reader
    * false otherwise
    */
-  virtual bool hasGeometryReader()
-  {
-    return false;
-  }
+  virtual bool hasGeometryReader() { return false; }
 
   /**
    * Create the geometry reader (VTK reader) for the given filename
@@ -110,10 +107,7 @@ public:
    * Return true if this reader can create a scene reader
    * false otherwise
    */
-  virtual bool hasSceneReader()
-  {
-    return false;
-  }
+  virtual bool hasSceneReader() { return false; }
 
   /**
    * Create the scene reader (VTK importer) for the given filename

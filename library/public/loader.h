@@ -19,7 +19,6 @@ namespace f3d
 class F3D_EXPORT loader
 {
 public:
-
   /**
    */
   virtual bool addGeometry(const std::string& filePath) = 0;

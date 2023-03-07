@@ -400,14 +400,12 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
       }
       else if (loader.canReadGeometry(filePath.string()))
       {
-        this->Internals->LoadedFile = loader
-          .resetToDefaultScene()
-          .addGeometry(filePath.string());
+        this->Internals->LoadedFile = loader.resetToDefaultScene().addGeometry(filePath.string());
       }
       else
       {
         f3d::log::warn(filePath, " is not a file of a supported file format\n");
-        filenameInfo += " [UNSUPPORTED]"; 
+        filenameInfo += " [UNSUPPORTED]";
       }
 
       if (!this->Internals->AppOptions.NoRender)

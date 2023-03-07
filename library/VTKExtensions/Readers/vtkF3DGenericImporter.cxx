@@ -6,9 +6,9 @@
 #include <vtkAppendPolyData.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCellData.h>
+#include <vtkDataObject.h>
 #include <vtkDataObjectTreeIterator.h>
 #include <vtkDataSetSurfaceFilter.h>
-#include <vtkDataObject.h>
 #include <vtkDoubleArray.h>
 #include <vtkEventForwarderCommand.h>
 #include <vtkImageData.h>
@@ -35,16 +35,14 @@
 #include <vtkVertexGlyphFilter.h>
 #include <vtkVolumeProperty.h>
 #include <vtksys/SystemTools.hxx>
-#include <vtkPointData.h>
-#include <vtkCellData.h>
 
 #include <sstream>
 
-namespace{
+namespace
+{
 //----------------------------------------------------------------------------
 // TODO : add this function in a utils file for rendering in VTK directly
-vtkSmartPointer<vtkTexture> GetTexture(
-  const std::string& filePath, bool isSRGB = false)
+vtkSmartPointer<vtkTexture> GetTexture(const std::string& filePath, bool isSRGB = false)
 {
   vtkSmartPointer<vtkTexture> texture;
   if (!filePath.empty())
@@ -232,22 +230,22 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     ReaderPipeline& pipe = this->Internals->Readers[readerIndex];
 
     {
-    // Forward progress event
-    vtkNew<vtkCallbackCommand> progressCallback;
-    double progressRatio = static_cast<double>(readerIndex + 1) / this->Internals->Readers.size();
-    std::pair<vtkF3DGenericImporter*, double> progressPair = {this, progressRatio};
-    progressCallback->SetClientData(&progressPair);
-    progressCallback->SetCallback(
-      [](vtkObject*, unsigned long, void* clientData, void* callData)
-      {
-        auto localPair = static_cast<std::pair<vtkF3DGenericImporter*, double>*>(clientData);
-        vtkF3DGenericImporter* self = localPair->first;
-        double progress = *static_cast<double*>(callData) * localPair->second;
-        self->InvokeEvent(vtkCommand::ProgressEvent, &progress);
-      });
-    pipe.Reader->AddObserver(vtkCommand::ProgressEvent, progressCallback);
-    pipe.PostPro->Update();
-    pipe.Reader->RemoveObservers(vtkCommand::ProgressEvent);
+      // Forward progress event
+      vtkNew<vtkCallbackCommand> progressCallback;
+      double progressRatio = static_cast<double>(readerIndex + 1) / this->Internals->Readers.size();
+      std::pair<vtkF3DGenericImporter*, double> progressPair = { this, progressRatio };
+      progressCallback->SetClientData(&progressPair);
+      progressCallback->SetCallback(
+        [](vtkObject*, unsigned long, void* clientData, void* callData)
+        {
+          auto localPair = static_cast<std::pair<vtkF3DGenericImporter*, double>*>(clientData);
+          vtkF3DGenericImporter* self = localPair->first;
+          double progress = *static_cast<double*>(callData) * localPair->second;
+          self->InvokeEvent(vtkCommand::ProgressEvent, &progress);
+        });
+      pipe.Reader->AddObserver(vtkCommand::ProgressEvent, progressCallback);
+      pipe.PostPro->Update();
+      pipe.Reader->RemoveObservers(vtkCommand::ProgressEvent);
     }
 
     // Recover output
@@ -265,7 +263,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       ? vtkDataSet::SafeDownCast(image)
       : vtkDataSet::SafeDownCast(surface);
     pipe.Output = dataSet;
-    
+
     // Recover output description
     pipe.OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(readerOutput);
 
@@ -324,7 +322,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     {
       pipe.GeometryActor->ForceTranslucentOn();
     }
-
   }
   this->UpdateTemporalInformation();
   this->UpdateColoringVectors(false);
@@ -338,7 +335,8 @@ void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::AddInternalReader(const std::string& name, vtkSmartPointer<vtkAlgorithm> reader)
+void vtkF3DGenericImporter::AddInternalReader(
+  const std::string& name, vtkSmartPointer<vtkAlgorithm> reader)
 {
   if (reader)
   {
@@ -462,29 +460,34 @@ void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > vtkF3DGenericImporter::GetGeometryActorsAndMappers()
+std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> >
+vtkF3DGenericImporter::GetGeometryActorsAndMappers()
 {
   std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > actorsAndMappers;
   for (ReaderPipeline& pipe : this->Internals->Readers)
   {
-    actorsAndMappers.emplace_back(std::make_pair(pipe.GeometryActor.Get(), pipe.PolyDataMapper.Get()));
+    actorsAndMappers.emplace_back(
+      std::make_pair(pipe.GeometryActor.Get(), pipe.PolyDataMapper.Get()));
   }
   return actorsAndMappers;
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > vtkF3DGenericImporter::GetPointSpritesActorsAndMappers()
+std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> >
+vtkF3DGenericImporter::GetPointSpritesActorsAndMappers()
 {
   std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > actorsAndMappers;
   for (ReaderPipeline& pipe : this->Internals->Readers)
   {
-    actorsAndMappers.emplace_back(std::make_pair(pipe.PointSpritesActor.Get(), pipe.PointGaussianMapper.Get()));
+    actorsAndMappers.emplace_back(
+      std::make_pair(pipe.PointSpritesActor.Get(), pipe.PointGaussianMapper.Get()));
   }
   return actorsAndMappers;
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > vtkF3DGenericImporter::GetVolumePropsAndMappers()
+std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> >
+vtkF3DGenericImporter::GetVolumePropsAndMappers()
 {
   std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > propsAndMappers;
   for (ReaderPipeline& pipe : this->Internals->Readers)
@@ -515,9 +518,8 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
     }
   }
 
-  auto& data = useCellData
-    ? this->Internals->CellDataArrayVectorForColoring
-    : this->Internals->PointDataArrayVectorForColoring;
+  auto& data = useCellData ? this->Internals->CellDataArrayVectorForColoring
+                           : this->Internals->PointDataArrayVectorForColoring;
   data.clear();
 
   // Create a vector of arrays by name
@@ -527,12 +529,12 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
     info.Name = arrayName;
     for (ReaderPipeline& pipe : this->Internals->Readers)
     {
-      vtkDataArray* array = useCellData
-        ? pipe.Output->GetCellData()->GetArray(arrayName.c_str())
-        : pipe.Output->GetPointData()->GetArray(arrayName.c_str());
+      vtkDataArray* array = useCellData ? pipe.Output->GetCellData()->GetArray(arrayName.c_str())
+                                        : pipe.Output->GetPointData()->GetArray(arrayName.c_str());
       if (array)
       {
-        info.MaximumNumberOfComponents = std::max(info.MaximumNumberOfComponents, array->GetNumberOfComponents());
+        info.MaximumNumberOfComponents =
+          std::max(info.MaximumNumberOfComponents, array->GetNumberOfComponents());
 
         // Set ranges
         // XXX this does not take animation into account
@@ -585,11 +587,11 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DGenericImporter::GetInfoForColoring(bool useCellData, int index, vtkF3DGenericImporter::ColoringInfo& info)
+bool vtkF3DGenericImporter::GetInfoForColoring(
+  bool useCellData, int index, vtkF3DGenericImporter::ColoringInfo& info)
 {
-  auto& data = useCellData
-    ? this->Internals->CellDataArrayVectorForColoring
-    : this->Internals->PointDataArrayVectorForColoring;
+  auto& data = useCellData ? this->Internals->CellDataArrayVectorForColoring
+                           : this->Internals->PointDataArrayVectorForColoring;
 
   if (index < 0 || index >= static_cast<int>(data.size()))
   {
@@ -602,18 +604,16 @@ bool vtkF3DGenericImporter::GetInfoForColoring(bool useCellData, int index, vtkF
 //----------------------------------------------------------------------------
 int vtkF3DGenericImporter::GetNumberOfIndexesForColoring(bool useCellData)
 {
-  auto& data = useCellData
-    ? this->Internals->CellDataArrayVectorForColoring
-    : this->Internals->PointDataArrayVectorForColoring;
-  return static_cast<int> (data.size());
+  auto& data = useCellData ? this->Internals->CellDataArrayVectorForColoring
+                           : this->Internals->PointDataArrayVectorForColoring;
+  return static_cast<int>(data.size());
 }
 
 //----------------------------------------------------------------------------
 int vtkF3DGenericImporter::FindIndexForColoring(bool useCellData, std::string arrayName)
 {
-  auto& data = useCellData
-    ? this->Internals->CellDataArrayVectorForColoring
-    : this->Internals->PointDataArrayVectorForColoring;
+  auto& data = useCellData ? this->Internals->CellDataArrayVectorForColoring
+                           : this->Internals->PointDataArrayVectorForColoring;
   for (size_t i = 0; i < data.size(); i++)
   {
     if (data[i].Name == arrayName)
