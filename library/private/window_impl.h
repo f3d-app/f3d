@@ -64,10 +64,10 @@ public:
 
   /**
    * Implementation only API.
-   * Initialize an already created vtkF3DRendererWithColoring with the provided importer
+   * Set the importer on an already created vtkF3DRendererWithColoring
    * Called by the loader right after reading a file
    */
-  virtual void InitializeRendererWithColoring(vtkF3DGenericImporter* importer);
+  virtual void SetImporterForColoring(vtkF3DGenericImporter* importer);
 
   /**
    * Implementation only API.

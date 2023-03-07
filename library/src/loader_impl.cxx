@@ -221,8 +221,8 @@ bool loader_impl::addGeometry(const std::string& filePath)
     this->Internals->Interactor->InitializeAnimation(this->Internals->GenericImporter);
   }
 
-  // Recover generic importer specific actors and mappers to set on the renderer with coloring
-  this->Internals->Window.InitializeRendererWithColoring(this->Internals->GenericImporter);
+  // Set the importer to use for coloring and actors
+  this->Internals->Window.SetImporterForColoring(this->Internals->GenericImporter);
 
   // Initialize renderer and reset camera to bounds
   this->Internals->Window.UpdateDynamicOptions();

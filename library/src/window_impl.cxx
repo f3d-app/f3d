@@ -207,6 +207,14 @@ window_impl::~window_impl()
     // As there is a register loop if not
     this->Internals->Renderer->ShowAxis(false);
   }
+
+  vtkF3DRendererWithColoring* renWithColor =
+    vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
+  if (renWithColor)
+  {
+    // Make the the renderer with coloring release the importer
+    renWithColor->SetImporter(nullptr);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -222,10 +230,13 @@ void window_impl::Initialize(bool withColoring)
 
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
+  if (renWithColor)
+  {
+    // Make the the renderer with coloring release the importer
+    renWithColor->SetImporter(nullptr);
+  }
 
   // Create the renderer only when needed
-  // Note: a vtkF3DRendererWithColoring could always be used instead of switching
-  // but it seems more efficient this way
   if (withColoring && !renWithColor)
   {
     this->Internals->Renderer = vtkSmartPointer<vtkF3DRendererWithColoring>::New();
@@ -392,7 +403,7 @@ image window_impl::renderToImage(bool noBackground)
 }
 
 //----------------------------------------------------------------------------
-void window_impl::InitializeRendererWithColoring(vtkF3DGenericImporter* importer)
+void window_impl::SetImporterForColoring(vtkF3DGenericImporter* importer)
 {
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
