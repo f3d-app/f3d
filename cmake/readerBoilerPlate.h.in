@@ -69,7 +69,7 @@ public:
    * Return true if this reader can create a geometry reader
    * false otherwise
    */
-  virtual bool hasGeometryReader()
+  bool hasGeometryReader() override
   {
     return true;
   }
@@ -94,7 +94,7 @@ public:
    * Return true if this reader can create a scene reader
    * false otherwise
    */
-  virtual bool hasSceneReader()
+  bool hasSceneReader() override
   {
     return true;
   }
