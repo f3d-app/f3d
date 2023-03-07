@@ -31,7 +31,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
   reader->UpdateInformation();
   reader->EnableAnimation(0);
 
-  importer->SetInternalReader(reader);
+  importer->AddInternalReader("Test", reader);
   if (!importer->CanReadFile())
   {
     std::cerr << "Importer unexpectedly can not read a valid file" << std::endl;
