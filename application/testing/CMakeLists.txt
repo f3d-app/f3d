@@ -318,7 +318,7 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "0: default")
 
   # Test animation with generic importer and coloring
-  f3d_test(NAME TestInteractionAnimationGenericImporter DATA small.ex2 INTERACTION ARGS -sb --load-plugins=exodus)#Space;Space;
+  f3d_test(NAME TestInteractionAnimationGenericImporter DATA small.ex2 INTERACTION ARGS -sb --load-plugins=exodus DEFAULT_LIGHTS)#Space;Space;
 endif()
 
 if(F3D_PLUGIN_BUILD_OCCT)
