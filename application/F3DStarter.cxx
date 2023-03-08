@@ -17,16 +17,6 @@
 
 namespace fs = std::filesystem;
 
-namespace
-{
-int fileModulo(int index, int size)
-{
-  index %= size;
-  index = index < 0 ? index + size : index;
-  return index;
-}
-}
-
 class F3DStarter::F3DInternals
 {
 public:
@@ -180,7 +170,7 @@ int F3DStarter::Start(int argc, char** argv)
         {
           this->AddFile(fs::path(file));
         }
-        this->LoadFile(this->Internals->FilesList.size() - 1);
+        this->LoadFile(static_cast<int>(this->Internals->FilesList.size()) - 1);
         this->Render();
         return true;
       });
