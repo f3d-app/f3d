@@ -151,10 +151,7 @@ void vtkF3DGenericImporter::UpdateTemporalInformation()
 
     int nbTimeSteps = readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     double* readerTimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    for (int i = 0; i < nbTimeSteps; i++)
-    {
-      this->Internals->TimeSteps.insert(readerTimeSteps[i]);
-    }
+    this->Internals->TimeSteps.insert(readerTimeSteps, readerTimeSteps + nbTimeSteps);
   }
 }
 
@@ -523,7 +520,7 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
   data.clear();
 
   // Create a vector of arrays by name
-  for (std::string arrayName : arrayNames)
+  for (const std::string& arrayName : arrayNames)
   {
     vtkF3DGenericImporter::ColoringInfo info;
     info.Name = arrayName;

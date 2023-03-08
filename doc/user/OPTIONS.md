@@ -71,7 +71,7 @@ Options|Default|Description
 
 Options|Default|Description
 ------|------|------
--s, \-\-scalars=\<array_name\>||Specify an array to *Color* with if present in the file. If no array_name is provided, the first in alphabital order will be picked if any are available. <br>Requires a default scene.<br>Use \-\-verbose to recover the usable array names.
+-s, \-\-scalars=\<array_name\>||Specify an array to *Color* with if present in the file. If no array_name is provided, the first in alphabetical order will be picked if any are available. <br>Requires a default scene.<br>Use \-\-verbose to recover the usable array names.
 -y, \-\-comp=\<comp_index\>|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. -1 means *magnitude*. -2 or the short option, -y, means *direct values*.<br>When using *direct values*, components are used as L, LA, RGB, RGBA values depending on the number of components.
 -c, \-\-cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
 \-\-range=\<min,max\>||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.

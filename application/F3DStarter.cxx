@@ -19,7 +19,7 @@ namespace fs = std::filesystem;
 
 namespace
 {
-long long fileModulo(long long index, long long size)
+int fileModulo(int index, int size)
 {
   index %= size;
   index = index < 0 ? index + size : index;
@@ -68,7 +68,7 @@ public:
   f3d::options FileOptions;
   std::unique_ptr<f3d::engine> Engine;
   std::vector<fs::path> FilesList;
-  long long CurrentFileIndex = -1;
+  int CurrentFileIndex = -1;
   bool LoadedFile = false;
   bool UpdateWithCommandLineParsing = true;
 };
@@ -319,7 +319,7 @@ int F3DStarter::Start(int argc, char** argv)
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::LoadFile(long long index, bool relativeIndex)
+void F3DStarter::LoadFile(int index, bool relativeIndex)
 {
   if (this->Internals->LoadedFile)
   {
@@ -346,7 +346,7 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
   f3d::loader& loader = this->Internals->Engine->getLoader();
   fs::path filePath;
   std::string filenameInfo;
-  size_t size = this->Internals->FilesList.size();
+  int size = static_cast<int>(this->Internals->FilesList.size());
   if (size != 0)
   {
     if (relativeIndex)
@@ -358,8 +358,8 @@ void F3DStarter::LoadFile(long long index, bool relativeIndex)
     {
       this->Internals->CurrentFileIndex = index;
     }
-    this->Internals->CurrentFileIndex =
-      ::fileModulo(this->Internals->CurrentFileIndex, static_cast<long long>(size));
+    // XXX Do not work if CurrentFileIndex + size < 0
+    this->Internals->CurrentFileIndex = (this->Internals->CurrentFileIndex + size) % size;
     filePath = this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)];
     filenameInfo = "(" + std::to_string(this->Internals->CurrentFileIndex + 1) + "/" +
       std::to_string(this->Internals->FilesList.size()) + ") " + filePath.filename().string();

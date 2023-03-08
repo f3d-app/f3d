@@ -30,7 +30,7 @@ public:
    * Set the index to select the index of the file to load
    * Set relativeIndex to true to use the index as a relative index with the current index
    */
-  void LoadFile(long long index = 0, bool relativeIndex = false);
+  void LoadFile(int index = 0, bool relativeIndex = false);
 
   /**
    * Trigger a render

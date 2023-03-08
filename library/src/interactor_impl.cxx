@@ -232,27 +232,6 @@ public:
         self->Window.PrintSceneDescription(log::VerboseLevel::INFO);
         break;
       default:
-        /*        if (keySym == "Left")
-                {
-                  self->AnimationManager.StopAnimation();
-                  loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_PREVIOUS;
-                  self->Loader.loadFile(load);
-                  render = true;
-                }
-                else if (keySym == "Right")
-                {
-                  self->AnimationManager.StopAnimation();
-                  loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_NEXT;
-                  self->Loader.loadFile(load);
-                  render = true;
-                }
-                else if (keySym == "Up")
-                {
-                  self->AnimationManager.StopAnimation();
-                  loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_CURRENT;
-                  self->Loader.loadFile(load);
-                  render = true;
-                }*/
         if (keySym == F3D_EXIT_HOTKEY_SYM)
         {
           self->StopInteractor();

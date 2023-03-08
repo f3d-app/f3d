@@ -100,7 +100,7 @@ public:
 
   ///@{
   /**
-   * Get current coloring infomations,
+   * Get current coloring information,
    * Useful after using Cycle methods
    */
   bool GetColoringUseCell();
@@ -218,7 +218,6 @@ protected:
   std::vector<double> UserScalarBarRange;
   std::vector<double> Colormap;
 
-  vtkTimeStamp ConfigurationTimeStamp;
   vtkTimeStamp ColoringTimeStamp;
   vtkMTimeType ColoringUpdateTime = 0;
 };
