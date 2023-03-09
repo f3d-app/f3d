@@ -212,8 +212,8 @@ private:
   std::string TextureEmissive;
   std::string TextureNormal;
 
-  struct vtkInternals;
-  std::unique_ptr<vtkInternals> Internals;
+  struct Internals;
+  std::unique_ptr<Internals> Pimpl;
 };
 
 #endif

@@ -117,7 +117,7 @@ struct ReaderPipeline
   vtkDataSetAttributes* CellDataForColoring = nullptr;
 };
 
-struct vtkF3DGenericImporter::vtkInternals
+struct vtkF3DGenericImporter::Internals
 {
   std::vector<ReaderPipeline> Readers;
 
@@ -134,31 +134,31 @@ vtkStandardNewMacro(vtkF3DGenericImporter);
 
 //----------------------------------------------------------------------------
 vtkF3DGenericImporter::vtkF3DGenericImporter()
-  : Internals(new vtkF3DGenericImporter::vtkInternals())
+  : Pimpl(new vtkF3DGenericImporter::Internals())
 {
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::UpdateTemporalInformation()
 {
-  this->Internals->TimeSteps.clear();
+  this->Pimpl->TimeSteps.clear();
 
   // Update each reader
-  for (ReaderPipeline& pipe : this->Internals->Readers)
+  for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
     pipe.Reader->UpdateInformation();
     vtkInformation* readerInfo = pipe.Reader->GetOutputInformation(0);
 
     int nbTimeSteps = readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     double* readerTimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    this->Internals->TimeSteps.insert(readerTimeSteps, readerTimeSteps + nbTimeSteps);
+    this->Pimpl->TimeSteps.insert(readerTimeSteps, readerTimeSteps + nbTimeSteps);
   }
 }
 
 //----------------------------------------------------------------------------
 vtkIdType vtkF3DGenericImporter::GetNumberOfAnimations()
 {
-  return this->Internals->TimeSteps.size() > 0 ? 1 : 0;
+  return this->Pimpl->TimeSteps.size() > 0 ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -172,7 +172,7 @@ void vtkF3DGenericImporter::EnableAnimation(vtkIdType animationIndex)
 {
   if (animationIndex < this->GetNumberOfAnimations())
   {
-    this->Internals->AnimationEnabled = true;
+    this->Pimpl->AnimationEnabled = true;
   }
 }
 
@@ -181,14 +181,14 @@ void vtkF3DGenericImporter::DisableAnimation(vtkIdType animationIndex)
 {
   if (animationIndex < this->GetNumberOfAnimations())
   {
-    this->Internals->AnimationEnabled = false;
+    this->Pimpl->AnimationEnabled = false;
   }
 }
 
 //----------------------------------------------------------------------------
 bool vtkF3DGenericImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
-  return animationIndex < this->GetNumberOfAnimations() ? this->Internals->AnimationEnabled : false;
+  return animationIndex < this->GetNumberOfAnimations() ? this->Pimpl->AnimationEnabled : false;
 }
 
 //----------------------------------------------------------------------------
@@ -203,11 +203,11 @@ bool vtkF3DGenericImporter::GetTemporalInformation(
 {
   if (animationIndex < this->GetNumberOfAnimations())
   {
-    nbTimeSteps = static_cast<int>(this->Internals->TimeSteps.size());
-    timeRange[0] = *this->Internals->TimeSteps.cbegin();
-    timeRange[1] = *this->Internals->TimeSteps.crbegin();
+    nbTimeSteps = static_cast<int>(this->Pimpl->TimeSteps.size());
+    timeRange[0] = *this->Pimpl->TimeSteps.cbegin();
+    timeRange[1] = *this->Pimpl->TimeSteps.crbegin();
 
-    for (double ts : this->Internals->TimeSteps)
+    for (double ts : this->Pimpl->TimeSteps)
     {
       timeSteps->InsertNextValue(ts);
     }
@@ -219,17 +219,17 @@ bool vtkF3DGenericImporter::GetTemporalInformation(
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
-  this->Internals->GeometryBoundingBox.Reset();
+  this->Pimpl->GeometryBoundingBox.Reset();
 
   // Update each reader
-  for (size_t readerIndex = 0; readerIndex < this->Internals->Readers.size(); readerIndex++)
+  for (size_t readerIndex = 0; readerIndex < this->Pimpl->Readers.size(); readerIndex++)
   {
-    ReaderPipeline& pipe = this->Internals->Readers[readerIndex];
+    ReaderPipeline& pipe = this->Pimpl->Readers[readerIndex];
 
     {
       // Forward progress event
       vtkNew<vtkCallbackCommand> progressCallback;
-      double progressRatio = static_cast<double>(readerIndex + 1) / this->Internals->Readers.size();
+      double progressRatio = static_cast<double>(readerIndex + 1) / this->Pimpl->Readers.size();
       std::pair<vtkF3DGenericImporter*, double> progressPair = { this, progressRatio };
       progressCallback->SetClientData(&progressPair);
       progressCallback->SetCallback(
@@ -271,7 +271,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     // Increase bounding box size if needed
     double bounds[6];
     surface->GetBounds(bounds);
-    this->Internals->GeometryBoundingBox.AddBounds(bounds);
+    this->Pimpl->GeometryBoundingBox.AddBounds(bounds);
 
     // Add filter outputs to mapper inputs
     pipe.PolyDataMapper->SetInputConnection(pipe.PostPro->GetOutputPort(0));
@@ -289,9 +289,9 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     ren->AddVolume(pipe.VolumeProp);
 
     // Set visibilities
-    pipe.GeometryActor->SetVisibility(false);
-    pipe.PointSpritesActor->SetVisibility(false);
-    pipe.VolumeProp->SetVisibility(false);
+    pipe.GeometryActor->VisibilityOff();
+    pipe.PointSpritesActor->VisibilityOff();
+    pipe.VolumeProp->VisibilityOff();
 
     // TODO move to renderer
     pipe.GeometryActor->GetProperty()->SetColor(this->SurfaceColor);
@@ -341,7 +341,7 @@ void vtkF3DGenericImporter::AddInternalReader(
     pipe.Name = name;
     pipe.Reader = reader;
     pipe.PostPro->SetInputConnection(pipe.Reader->GetOutputPort());
-    this->Internals->Readers.push_back(std::move(pipe));
+    this->Pimpl->Readers.push_back(std::move(pipe));
     this->Modified();
   }
 }
@@ -349,23 +349,23 @@ void vtkF3DGenericImporter::AddInternalReader(
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::RemoveInternalReaders()
 {
-  this->Internals->Readers.clear();
+  this->Pimpl->Readers.clear();
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 bool vtkF3DGenericImporter::CanReadFile()
 {
-  return this->Internals->Readers.size() > 0 && this->Internals->Readers[0].Reader != nullptr;
+  return this->Pimpl->Readers.size() > 0 && this->Pimpl->Readers[0].Reader != nullptr;
 }
 
 //----------------------------------------------------------------------------
 std::string vtkF3DGenericImporter::GetOutputsDescription()
 {
   std::string description;
-  for (ReaderPipeline& pipe : this->Internals->Readers)
+  for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
-    if (this->Internals->Readers.size() > 0)
+    if (this->Pimpl->Readers.size() > 0)
     {
       description += "=== " + pipe.Name + " ===\n";
     }
@@ -419,7 +419,7 @@ std::string vtkF3DGenericImporter::GetMetaDataDescription()
 {
   vtkIdType nPoints = 0;
   vtkIdType nCells = 0;
-  for (ReaderPipeline& pipe : this->Internals->Readers)
+  for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
     vtkDataObject* object = pipe.Reader->GetOutputDataObject(0);
     if (object)
@@ -430,10 +430,10 @@ std::string vtkF3DGenericImporter::GetMetaDataDescription()
   }
 
   std::string description;
-  if (this->Internals->Readers.size() > 1)
+  if (this->Pimpl->Readers.size() > 1)
   {
     description += "Number of geometries: ";
-    description += std::to_string(this->Internals->Readers.size());
+    description += std::to_string(this->Pimpl->Readers.size());
     description += "\n";
   }
   description += "Number of points: ";
@@ -448,7 +448,7 @@ std::string vtkF3DGenericImporter::GetMetaDataDescription()
 void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
 {
   // Update each reader
-  for (ReaderPipeline& pipe : this->Internals->Readers)
+  for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
     pipe.PostPro->UpdateTimeStep(timestep);
   }
@@ -461,7 +461,7 @@ std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> >
 vtkF3DGenericImporter::GetGeometryActorsAndMappers()
 {
   std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > actorsAndMappers;
-  for (ReaderPipeline& pipe : this->Internals->Readers)
+  for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
     actorsAndMappers.emplace_back(
       std::make_pair(pipe.GeometryActor.Get(), pipe.PolyDataMapper.Get()));
@@ -474,7 +474,7 @@ std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> >
 vtkF3DGenericImporter::GetPointSpritesActorsAndMappers()
 {
   std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > actorsAndMappers;
-  for (ReaderPipeline& pipe : this->Internals->Readers)
+  for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
     actorsAndMappers.emplace_back(
       std::make_pair(pipe.PointSpritesActor.Get(), pipe.PointGaussianMapper.Get()));
@@ -487,7 +487,7 @@ std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> >
 vtkF3DGenericImporter::GetVolumePropsAndMappers()
 {
   std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > propsAndMappers;
-  for (ReaderPipeline& pipe : this->Internals->Readers)
+  for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
     propsAndMappers.emplace_back(std::make_pair(pipe.VolumeProp.Get(), pipe.VolumeMapper.Get()));
   }
@@ -499,7 +499,7 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
 {
   // Recover all possible names
   std::set<std::string> arrayNames;
-  for (ReaderPipeline& pipe : this->Internals->Readers)
+  for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
     vtkDataSetAttributes* attr = useCellData
       ? static_cast<vtkDataSetAttributes*>(pipe.Output->GetCellData())
@@ -515,8 +515,8 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
     }
   }
 
-  auto& data = useCellData ? this->Internals->CellDataArrayVectorForColoring
-                           : this->Internals->PointDataArrayVectorForColoring;
+  auto& data = useCellData ? this->Pimpl->CellDataArrayVectorForColoring
+                           : this->Pimpl->PointDataArrayVectorForColoring;
   data.clear();
 
   // Create a vector of arrays by name
@@ -524,7 +524,7 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
   {
     vtkF3DGenericImporter::ColoringInfo info;
     info.Name = arrayName;
-    for (ReaderPipeline& pipe : this->Internals->Readers)
+    for (ReaderPipeline& pipe : this->Pimpl->Readers)
     {
       vtkDataArray* array = useCellData ? pipe.Output->GetCellData()->GetArray(arrayName.c_str())
                                         : pipe.Output->GetPointData()->GetArray(arrayName.c_str());
@@ -587,8 +587,8 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
 bool vtkF3DGenericImporter::GetInfoForColoring(
   bool useCellData, int index, vtkF3DGenericImporter::ColoringInfo& info)
 {
-  auto& data = useCellData ? this->Internals->CellDataArrayVectorForColoring
-                           : this->Internals->PointDataArrayVectorForColoring;
+  auto& data = useCellData ? this->Pimpl->CellDataArrayVectorForColoring
+                           : this->Pimpl->PointDataArrayVectorForColoring;
 
   if (index < 0 || index >= static_cast<int>(data.size()))
   {
@@ -601,16 +601,16 @@ bool vtkF3DGenericImporter::GetInfoForColoring(
 //----------------------------------------------------------------------------
 int vtkF3DGenericImporter::GetNumberOfIndexesForColoring(bool useCellData)
 {
-  auto& data = useCellData ? this->Internals->CellDataArrayVectorForColoring
-                           : this->Internals->PointDataArrayVectorForColoring;
+  auto& data = useCellData ? this->Pimpl->CellDataArrayVectorForColoring
+                           : this->Pimpl->PointDataArrayVectorForColoring;
   return static_cast<int>(data.size());
 }
 
 //----------------------------------------------------------------------------
 int vtkF3DGenericImporter::FindIndexForColoring(bool useCellData, std::string arrayName)
 {
-  auto& data = useCellData ? this->Internals->CellDataArrayVectorForColoring
-                           : this->Internals->PointDataArrayVectorForColoring;
+  auto& data = useCellData ? this->Pimpl->CellDataArrayVectorForColoring
+                           : this->Pimpl->PointDataArrayVectorForColoring;
   for (size_t i = 0; i < data.size(); i++)
   {
     if (data[i].Name == arrayName)
@@ -624,5 +624,5 @@ int vtkF3DGenericImporter::FindIndexForColoring(bool useCellData, std::string ar
 //----------------------------------------------------------------------------
 const vtkBoundingBox& vtkF3DGenericImporter::GetGeometryBoundingBox()
 {
-  return this->Internals->GeometryBoundingBox;
+  return this->Pimpl->GeometryBoundingBox;
 }

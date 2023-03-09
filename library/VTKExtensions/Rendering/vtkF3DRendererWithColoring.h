@@ -75,10 +75,10 @@ public:
 
   enum class CycleType
   {
-    F3D_CYCLE_NONE,
-    F3D_CYCLE_FIELD,
-    F3D_CYCLE_ARRAY_INDEX,
-    F3D_CYCLE_COMPONENT
+    NONE,
+    FIELD,
+    ARRAY_INDEX,
+    COMPONENT
   };
 
   /**
@@ -139,7 +139,7 @@ protected:
    * Convenience method for configuring a scalar bar actor for coloring
    */
   void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar,
-    const std::string& arrayName, int component, vtkColorTransferFunction* ctf);
+    std::string arrayName, int component, vtkColorTransferFunction* ctf);
 
   /**
    * Configure internal range and color transfer function according to provided

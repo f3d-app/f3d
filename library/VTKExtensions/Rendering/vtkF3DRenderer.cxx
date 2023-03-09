@@ -142,10 +142,10 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
 
-  this->FilenameActor->SetVisibility(false);
-  this->MetaDataActor->SetVisibility(false);
-  this->TimerActor->SetVisibility(false);
-  this->CheatSheetActor->SetVisibility(false);
+  this->FilenameActor->VisibilityOff();
+  this->MetaDataActor->VisibilityOff();
+  this->TimerActor->VisibilityOff();
+  this->CheatSheetActor->VisibilityOff();
 }
 
 //----------------------------------------------------------------------------

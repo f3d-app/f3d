@@ -32,7 +32,7 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& up)
   this->ComponentForColoring = -1;
 
   this->AddActor2D(this->ScalarBarActor);
-  this->ScalarBarActor->SetVisibility(false);
+  this->ScalarBarActor->VisibilityOff();
 
   this->ColorTransferFunctionConfigured = false;
   this->PolyDataMapperConfigured = false;
@@ -62,8 +62,8 @@ void vtkF3DRendererWithColoring::SetPointSize(double pointSize)
     gaussianPointSize = pointSize * bbox.GetDiagonalLength() * 0.001;
   }
 
-  auto psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
-  for (auto psActorAndMapper : psActorsAndMappers)
+  const auto& psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
+  for (auto& psActorAndMapper : psActorsAndMappers)
   {
     psActorAndMapper.second->SetScaleFactor(gaussianPointSize);
   }
@@ -109,8 +109,8 @@ void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
   {
     this->UseInverseOpacityFunction = use;
 
-    auto volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
-    for (auto volPropAndMapper : volPropsAndMappers)
+    const auto& volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
+    for (auto& volPropAndMapper : volPropsAndMappers)
     {
       if (volPropAndMapper.first)
       {
@@ -168,16 +168,16 @@ void vtkF3DRendererWithColoring::CycleScalars(CycleType type)
 {
   switch (type)
   {
-    case (CycleType::F3D_CYCLE_NONE):
+    case (CycleType::NONE):
       return;
       break;
-    case (CycleType::F3D_CYCLE_FIELD):
+    case (CycleType::FIELD):
       this->CycleFieldForColoring();
       break;
-    case (CycleType::F3D_CYCLE_ARRAY_INDEX):
+    case (CycleType::ARRAY_INDEX):
       this->CycleArrayIndexForColoring();
       break;
-    case (CycleType::F3D_CYCLE_COMPONENT):
+    case (CycleType::COMPONENT):
       this->CycleComponentForColoring();
       break;
     default:
@@ -203,29 +203,29 @@ vtkF3DRendererWithColoring::CycleType vtkF3DRendererWithColoring::CheckColoring(
   // Never force change of anything if we are currently not coloring
   if (this->ArrayIndexForColoring == -1)
   {
-    return CycleType::F3D_CYCLE_NONE;
+    return CycleType::NONE;
   }
 
   // Never force change of CellData/PointData coloring on the user
   if (this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring) == 0)
   {
-    return CycleType::F3D_CYCLE_NONE;
+    return CycleType::NONE;
   }
 
   // Suggest to change the array index only if current index is not valid
   vtkF3DGenericImporter::ColoringInfo info;
   if (!this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
   {
-    return CycleType::F3D_CYCLE_ARRAY_INDEX;
+    return CycleType::ARRAY_INDEX;
   }
 
   // Suggest to change the component if current component is invalid
   if (this->ComponentForColoring >= info.MaximumNumberOfComponents)
   {
-    return CycleType::F3D_CYCLE_COMPONENT;
+    return CycleType::COMPONENT;
   }
 
-  return CycleType::F3D_CYCLE_NONE;
+  return CycleType::NONE;
 }
 
 //----------------------------------------------------------------------------
@@ -348,7 +348,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   if (!hasColoring && volumeVisible)
   {
     // When showing volume, always try to find an array to color with
-    this->CycleScalars(vtkF3DRendererWithColoring::CycleType::F3D_CYCLE_ARRAY_INDEX);
+    this->CycleScalars(vtkF3DRendererWithColoring::CycleType::ARRAY_INDEX);
     hasColoring =
       this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
   }
@@ -361,10 +361,10 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
 
   // Handle surface geometry
   bool geometriesVisible = this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
-  auto actorsAndMappers = this->Importer->GetGeometryActorsAndMappers();
+  const auto& actorsAndMappers = this->Importer->GetGeometryActorsAndMappers();
   for (size_t i = 0; i < actorsAndMappers.size(); i++)
   {
-    auto actorAndMapper = actorsAndMappers[i];
+    auto& actorAndMapper = actorsAndMappers[i];
     vtkDataArray* coloringArray = nullptr;
     if (hasColoring && info.Arrays.size() > i)
     {
@@ -390,10 +390,10 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
 
   // Handle point sprites
   bool pointSpritesVisible = !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
-  auto psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
+  const auto& psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
   for (size_t i = 0; i < psActorsAndMappers.size(); i++)
   {
-    auto actorAndMapper = psActorsAndMappers[i];
+    auto& actorAndMapper = psActorsAndMappers[i];
     vtkDataArray* coloringArray = nullptr;
     if (hasColoring && info.Arrays.size() > i)
     {
@@ -418,10 +418,10 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   }
 
   // Handle Volume prop
-  auto volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
+  const auto& volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
   for (size_t i = 0; i < volPropsAndMappers.size(); i++)
   {
-    auto propAndMapper = volPropsAndMappers[i];
+    auto& propAndMapper = volPropsAndMappers[i];
     vtkDataArray* coloringArray = nullptr;
     if (hasColoring && info.Arrays.size() > i)
     {
@@ -429,13 +429,13 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
     }
     if (!volumeVisible)
     {
-      propAndMapper.first->SetVisibility(false);
+      propAndMapper.first->VisibilityOff();
     }
     else if (volumeVisible && !coloringArray)
     {
       F3DLog::Print(
         F3DLog::Severity::Error, "Cannot use volume with this dataset or with the requested array");
-      propAndMapper.first->SetVisibility(false);
+      propAndMapper.first->VisibilityOff();
     }
     else
     {
@@ -447,7 +447,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
           this->UseInverseOpacityFunction);
         this->VolumeConfigured = true;
       }
-      propAndMapper.first->SetVisibility(true);
+      propAndMapper.first->VisibilityOn();
     }
   }
 
@@ -575,15 +575,14 @@ void vtkF3DRendererWithColoring::ConfigureVolumeForColoring(vtkSmartVolumeMapper
 
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar,
-  const std::string& arrayName, int component, vtkColorTransferFunction* ctf)
+  std::string arrayName, int component, vtkColorTransferFunction* ctf)
 {
-  std::string title = arrayName;
-  title += " (";
-  title += this->ComponentToString(component);
-  title += ")";
+  arrayName += " (";
+  arrayName += this->ComponentToString(component);
+  arrayName += ")";
 
   scalarBar->SetLookupTable(ctf);
-  scalarBar->SetTitle(title.c_str());
+  scalarBar->SetTitle(arrayName.c_str());
   scalarBar->SetNumberOfLabels(4);
   scalarBar->SetOrientationToHorizontal();
   scalarBar->SetWidth(0.8);

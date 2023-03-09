@@ -100,7 +100,7 @@ public:
       case 'C':
         if (renWithColor)
         {
-          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::F3D_CYCLE_FIELD);
+          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::FIELD);
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
@@ -109,7 +109,7 @@ public:
       case 'S':
         if (renWithColor)
         {
-          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::F3D_CYCLE_ARRAY_INDEX);
+          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::ARRAY_INDEX);
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
@@ -118,7 +118,7 @@ public:
       case 'Y':
         if (renWithColor)
         {
-          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::F3D_CYCLE_COMPONENT);
+          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::COMPONENT);
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
