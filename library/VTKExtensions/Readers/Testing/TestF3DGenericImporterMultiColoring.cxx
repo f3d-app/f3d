@@ -1,8 +1,8 @@
+#include <vtkMathUtilities.h>
 #include <vtkNew.h>
 #include <vtkTestUtilities.h>
-#include <vtkXMLUnstructuredGridReader.h>
 #include <vtkXMLStructuredGridReader.h>
-#include <vtkMathUtilities.h>
+#include <vtkXMLUnstructuredGridReader.h>
 
 #include "vtkF3DGenericImporter.h"
 
@@ -77,14 +77,14 @@ int TestF3DGenericImporterMultiColoring(int argc, char* argv[])
     std::cerr << "Unexepected coloring component name 2" << std::endl;
     return EXIT_FAILURE;
   }
-  if (!vtkMathUtilities::FuzzyCompare(info.ComponentRanges[0][0], -5.49586, 1e-5) || 
-      !vtkMathUtilities::FuzzyCompare(info.ComponentRanges[0][1], 5.0455, 1e-5))
+  if (!vtkMathUtilities::FuzzyCompare(info.ComponentRanges[0][0], -5.49586, 1e-5) ||
+    !vtkMathUtilities::FuzzyCompare(info.ComponentRanges[0][1], 5.0455, 1e-5))
   {
     std::cerr << "Unexepected coloring component range" << std::endl;
     return EXIT_FAILURE;
   }
-  if (!vtkMathUtilities::FuzzyCompare(info.MagnitudeRange[0], 0., 1e-5) || 
-      !vtkMathUtilities::FuzzyCompare(info.MagnitudeRange[1], 5.71596, 1e-5))
+  if (!vtkMathUtilities::FuzzyCompare(info.MagnitudeRange[0], 0., 1e-5) ||
+    !vtkMathUtilities::FuzzyCompare(info.MagnitudeRange[1], 5.71596, 1e-5))
   {
     std::cerr << "Unexepected coloring magnitude range" << std::endl;
     return EXIT_FAILURE;

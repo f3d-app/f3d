@@ -574,8 +574,8 @@ void vtkF3DRendererWithColoring::ConfigureVolumeForColoring(vtkSmartVolumeMapper
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar,
-  std::string arrayName, int component, vtkColorTransferFunction* ctf)
+void vtkF3DRendererWithColoring::ConfigureScalarBarActorForColoring(
+  vtkScalarBarActor* scalarBar, std::string arrayName, int component, vtkColorTransferFunction* ctf)
 {
   arrayName += " (";
   arrayName += this->ComponentToString(component);

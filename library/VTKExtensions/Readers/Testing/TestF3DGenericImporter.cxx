@@ -32,8 +32,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
 
   // Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
-  bool ret = importer->GetTemporalInformation(
-    0, 60, nbTimeSteps, timeRange, timeSteps);
+  bool ret = importer->GetTemporalInformation(0, 60, nbTimeSteps, timeRange, timeSteps);
 #else
   bool ret = importer->GetTemporalInformation(0, nbTimeSteps, timeRange, timeSteps);
 #endif
