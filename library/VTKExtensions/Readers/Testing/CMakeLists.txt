@@ -1,5 +1,6 @@
 list(APPEND VTKExtensionsReaderTests_list
      TestF3DGenericImporter.cxx
+     TestF3DGenericImporterMultiColoring.cxx
     )
 
 if(VTK_VERSION VERSION_LESS_EQUAL 9.1.0)
