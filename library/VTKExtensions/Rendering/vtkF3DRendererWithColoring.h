@@ -14,6 +14,8 @@
 
 #include "vtkF3DGenericImporter.h"
 
+#include <vtkWeakPointer.h>
+
 class vtkColorTransferFunction;
 class vtkDataArray;
 class vtkDataSetAttributes;
@@ -193,7 +195,7 @@ protected:
    */
   static std::string ShortName(const std::string& name, int component);
 
-  vtkF3DGenericImporter* Importer = nullptr;
+  vtkWeakPointer<vtkF3DGenericImporter> Importer = nullptr;
 
   vtkNew<vtkScalarBarActor> ScalarBarActor;
   bool ScalarBarActorConfigured = false;

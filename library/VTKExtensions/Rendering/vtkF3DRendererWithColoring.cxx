@@ -21,7 +21,13 @@
 #include <sstream>
 
 vtkStandardNewMacro(vtkF3DRendererWithColoring);
-vtkCxxSetObjectMacro(vtkF3DRendererWithColoring, Importer, vtkF3DGenericImporter);
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetImporter(vtkF3DGenericImporter* importer)
+{
+  this->Importer = importer;
+  this->Modified();
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::Initialize(const std::string& up)
@@ -48,12 +54,9 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& up)
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetPointSize(double pointSize)
 {
-  this->Superclass::SetPointSize(pointSize);
+  assert(this->Importer != nullptr);
 
-  if (!this->Importer)
-  {
-    return;
-  }
+  this->Superclass::SetPointSize(pointSize);
 
   const vtkBoundingBox& bbox = this->Importer->GetGeometryBoundingBox();
   double gaussianPointSize = 1.0;
@@ -105,6 +108,8 @@ void vtkF3DRendererWithColoring::SetUseVolume(bool use)
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
 {
+  assert(this->Importer != nullptr);
+
   if (this->UseInverseOpacityFunction != use)
   {
     this->UseInverseOpacityFunction = use;
@@ -200,6 +205,8 @@ void vtkF3DRendererWithColoring::CycleScalars(CycleType type)
 //----------------------------------------------------------------------------
 vtkF3DRendererWithColoring::CycleType vtkF3DRendererWithColoring::CheckColoring()
 {
+  assert(this->Importer != nullptr);
+
   // Never force change of anything if we are currently not coloring
   if (this->ArrayIndexForColoring == -1)
   {
@@ -232,10 +239,7 @@ vtkF3DRendererWithColoring::CycleType vtkF3DRendererWithColoring::CheckColoring(
 void vtkF3DRendererWithColoring::SetColoring(
   bool useCellData, const std::string& arrayName, int component)
 {
-  if (!this->Importer)
-  {
-    return;
-  }
+  assert(this->Importer != nullptr);
 
   if (this->GetColoringUseCell() != useCellData || this->GetColoringArrayName() != arrayName ||
     this->GetColoringComponent() != component)
@@ -270,6 +274,7 @@ void vtkF3DRendererWithColoring::SetColoring(
       }
     }
 
+    // TODO rework this
     this->ComponentForColoring = component;
 
     this->ColorTransferFunctionConfigured = false;
@@ -290,10 +295,7 @@ bool vtkF3DRendererWithColoring::GetColoringUseCell()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::GetColoringArrayName()
 {
-  if (!this->Importer)
-  {
-    return F3D_RESERVED_STRING;
-  }
+  assert(this->Importer != nullptr);
 
   vtkF3DGenericImporter::ColoringInfo info;
   if (this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
@@ -315,10 +317,7 @@ int vtkF3DRendererWithColoring::GetColoringComponent()
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::UpdateColoringActors()
 {
-  if (!this->Importer)
-  {
-    return;
-  }
+  assert(this->Importer != nullptr);
 
   bool importerChanged = this->Importer->GetMTime() >= this->ColoringUpdateTime;
 
@@ -467,10 +466,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::GetColoringDescription()
 {
-  if (!this->Importer)
-  {
-    return "";
-  }
+  assert(this->Importer != nullptr);
 
   std::stringstream stream;
   vtkF3DGenericImporter::ColoringInfo info;
@@ -602,7 +598,7 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(
   if (this->ComponentForColoring >= info.MaximumNumberOfComponents)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
-      std::string("Invalid component index: ") + std::to_string(this->ComponentForColoring));
+      std::string("Invalid component index: ") + std::to_string(this->ComponentForColoring) + "\n");
     return;
   }
 
@@ -660,10 +656,7 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 {
-  if (!this->Importer)
-  {
-    return;
-  }
+  assert(this->Importer != nullptr);
 
   vtkF3DGenericImporter::ColoringInfo info;
   bool hasColoring =
@@ -696,10 +689,7 @@ void vtkF3DRendererWithColoring::CycleFieldForColoring()
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::CycleArrayIndexForColoring()
 {
-  if (!this->Importer)
-  {
-    return;
-  }
+  assert(this->Importer != nullptr);
 
   int nIndex = this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring);
   if (nIndex <= 0)
@@ -722,6 +712,8 @@ void vtkF3DRendererWithColoring::CycleArrayIndexForColoring()
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::CycleComponentForColoring()
 {
+  assert(this->Importer != nullptr);
+
   vtkF3DGenericImporter::ColoringInfo info;
   if (!this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
   {
@@ -737,10 +729,7 @@ void vtkF3DRendererWithColoring::CycleComponentForColoring()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
 {
-  if (!this->Importer)
-  {
-    return "";
-  }
+  assert(this->Importer != nullptr);
 
   // XXX Padding should not be handled by manipulating string
   // but on the actor directly, but it is not supported by VTK yet.
@@ -767,6 +756,8 @@ std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::ComponentToString(int component)
 {
+  assert(this->Importer != nullptr);
+
   // TODO switch to options
   if (component == -2)
   {
