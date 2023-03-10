@@ -289,8 +289,14 @@ macro(f3d_plugin_build)
     configure_file(
       "${_f3dPlugin_dir}/plugin.desktop.in"
       "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.desktop")
+    configure_file(
+      "${_f3dPlugin_dir}/plugin.thumbnailer.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer")
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.desktop"
       DESTINATION "share/applications"
+      COMPONENT plugin)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer"
+      DESTINATION "share/thumbnailers"
       COMPONENT plugin)
   endif()
 

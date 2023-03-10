@@ -213,7 +213,7 @@ if(F3D_INSTALL_SDK)
       "${CMAKE_SOURCE_DIR}/cmake/f3dPlugin.cmake"
       "${CMAKE_SOURCE_DIR}/cmake/plugin.cxx.in"
       "${CMAKE_SOURCE_DIR}/cmake/plugin.desktop.in"
-      #"${CMAKE_SOURCE_DIR}/cmake/plugin.thumbnailer.in"
+      "${CMAKE_SOURCE_DIR}/cmake/plugin.thumbnailer.in"
       "${CMAKE_SOURCE_DIR}/cmake/readerBoilerPlate.h.in")
   endif ()
 

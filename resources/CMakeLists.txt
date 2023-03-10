@@ -47,13 +47,6 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
     install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
       DESTINATION "share/man/man1/" COMPONENT documentation)
   endif()
-  if (F3D_LINUX_INSTALL_THUMBNAILER_FILES)
-    configure_file(
-      "${CMAKE_CURRENT_SOURCE_DIR}/f3d.thumbnailer.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/f3d.thumbnailer")
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d.thumbnailer"
-      DESTINATION "share/thumbnailers/" COMPONENT shellext)
-  endif()
 elseif(WIN32)
   if (F3D_WINDOWS_INSTALL_LOGOS_FOR_NSIS_PACKAGING)
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/logo.ico"

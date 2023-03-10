@@ -170,11 +170,6 @@ if(WIN32)
   mark_as_advanced(F3D_WINDOWS_RESOURCES_INSTALL_DIR)
 endif()
 
-if(UNIX AND NOT APPLE)
-  option(F3D_LINUX_INSTALL_THUMBNAILER_FILES "Install thumbnailer files" OFF)
-  mark_as_advanced(F3D_LINUX_INSTALL_THUMBNAILER_FILES)
-endif()
-
 # Installing licenses
 set(F3D_LIC_DIR ".")
 
