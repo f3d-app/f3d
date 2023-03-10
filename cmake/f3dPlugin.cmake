@@ -20,6 +20,7 @@ This initializes the variable used internally to accumulate the reader declarati
 macro(f3d_plugin_init)
   set(F3D_PLUGIN_INCLUDES_CODE "")
   set(F3D_PLUGIN_REGISTER_CODE "")
+  set(F3D_PLUGIN_MIMETYPES "")
   set(F3D_PLUGIN_CURRENT_READER_INDEX 0)
   set(F3D_PLUGIN_JSON "{ \"readers\": [] }")
 endmacro()
@@ -76,7 +77,7 @@ macro(f3d_plugin_declare_reader)
 
   # TODO: remove this and read JSON in shellext
   set_property(GLOBAL APPEND PROPERTY F3D_SUPPORTED_EXTENSIONS ${F3D_READER_EXTENSIONS})
-  set_property(GLOBAL APPEND PROPERTY F3D_SUPPORTED_MIME_TYPES ${F3D_READER_MIMETYPES})
+  list(APPEND F3D_PLUGIN_MIMETYPES ${F3D_READER_MIMETYPES})
 
   set(F3D_READER_JSON "{}")
 
@@ -282,6 +283,16 @@ macro(f3d_plugin_build)
       COMPONENT mimetypes
       EXCLUDE_FROM_ALL)
   endforeach()
+
+  # .desktop and .thumbnailer are automatically generated on Linux
+  if(UNIX AND NOT APPLE AND NOT ANDROID)
+    configure_file(
+      "${_f3dPlugin_dir}/plugin.desktop.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.desktop")
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.desktop"
+      DESTINATION "share/applications"
+      COMPONENT plugin)
+  endif()
 
   # JSON
   string(JSON F3D_PLUGIN_JSON
