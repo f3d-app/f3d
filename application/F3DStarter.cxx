@@ -368,11 +368,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
   this->Internals->UpdateWithCommandLineParsing = false; // this is done only once
   this->Internals->Engine->setOptions(this->Internals->FileOptions);
 
-  if (this->Internals->CurrentFileIndex == -1)
-  {
-    loader.resetToDefaultScene();
-  }
-  else
+  if (this->Internals->CurrentFileIndex >= 0)
   {
     // Check the size of the file before loading it
     static constexpr int BYTES_IN_MIB = 1048576;

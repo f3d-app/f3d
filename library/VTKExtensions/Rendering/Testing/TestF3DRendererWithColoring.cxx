@@ -2,8 +2,8 @@
 #include <vtkTestUtilities.h>
 #include <vtkXMLUnstructuredGridReader.h>
 
-#include "vtkF3DRendererWithColoring.h"
 #include "vtkF3DGenericImporter.h"
+#include "vtkF3DRendererWithColoring.h"
 
 int TestF3DRendererWithColoring(int argc, char* argv[])
 {
@@ -27,8 +27,11 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   renderer->SetUseVolume(true);
   renderer->UpdateColoringActors();
 
-  std::cout<<renderer->GetColoringArrayName()<<std::endl;
-  std::cout<<renderer->GetColoringComponent()<<std::endl;
+  if (renderer->GetColoringArrayName() != "Density" || renderer->GetColoringComponent() != 0)
+  {
+    std::cerr << "Unexpected coloring information with invalid array" << std::endl;
+    return EXIT_FAILURE;
+  }
 
   // Check invalid component code path
   renderer->SetColoring(false, "Momentum", 5);
@@ -36,15 +39,18 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   renderer->SetUseVolume(true);
   renderer->UpdateColoringActors();
 
-  std::cout<<renderer->GetColoringArrayName()<<std::endl;
-  std::cout<<renderer->GetColoringComponent()<<std::endl;
+  if (renderer->GetColoringArrayName() != "Momentum" || renderer->GetColoringComponent() != 5)
+  {
+    std::cerr << "Unexpected coloring information with invalid component" << std::endl;
+    return EXIT_FAILURE;
+  }
 
   renderer->CycleScalars(vtkF3DRendererWithColoring::CycleType::COMPONENT);
+  if (renderer->GetColoringArrayName() != "Momentum" || renderer->GetColoringComponent() != 1)
+  {
+    std::cerr << "Unexpected coloring information after cycling component" << std::endl;
+    return EXIT_FAILURE;
+  }
 
-  std::cout<<renderer->GetColoringArrayName()<<std::endl;
-  std::cout<<renderer->GetColoringComponent()<<std::endl;
-
-
-  // Check some invalid code path
   return EXIT_SUCCESS;
 }

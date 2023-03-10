@@ -54,21 +54,22 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& up)
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetPointSize(double pointSize)
 {
-  assert(this->Importer != nullptr);
-
   this->Superclass::SetPointSize(pointSize);
 
-  const vtkBoundingBox& bbox = this->Importer->GetGeometryBoundingBox();
-  double gaussianPointSize = 1.0;
-  if (bbox.IsValid())
+  if (this->Importer)
   {
-    gaussianPointSize = pointSize * bbox.GetDiagonalLength() * 0.001;
-  }
+    const vtkBoundingBox& bbox = this->Importer->GetGeometryBoundingBox();
+    double gaussianPointSize = 1.0;
+    if (bbox.IsValid())
+    {
+      gaussianPointSize = pointSize * bbox.GetDiagonalLength() * 0.001;
+    }
 
-  const auto& psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
-  for (auto& psActorAndMapper : psActorsAndMappers)
-  {
-    psActorAndMapper.second->SetScaleFactor(gaussianPointSize);
+    const auto& psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
+    for (auto& psActorAndMapper : psActorsAndMappers)
+    {
+      psActorAndMapper.second->SetScaleFactor(gaussianPointSize);
+    }
   }
 }
 
