@@ -159,7 +159,6 @@ public:
   /**
    * Setter for all actor loading options TODO move to renderer
    */
-  vtkSetMacro(PointSize, double);
   vtkSetVector3Macro(SurfaceColor, double);
   vtkSetVector3Macro(EmissiveFactor, double);
   vtkSetMacro(Opacity, double);
@@ -199,7 +198,6 @@ private:
   vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;
   void operator=(const vtkF3DGenericImporter&) = delete;
 
-  double PointSize = 10.;
   double Opacity = 1.;
   double Roughness = 0.3;
   double Metallic = 0.;

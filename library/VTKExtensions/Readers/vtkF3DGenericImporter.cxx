@@ -299,7 +299,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     pipe.GeometryActor->GetProperty()->SetRoughness(this->Roughness);
     pipe.GeometryActor->GetProperty()->SetMetallic(this->Metallic);
     pipe.GeometryActor->GetProperty()->SetLineWidth(this->LineWidth);
-    pipe.GeometryActor->GetProperty()->SetPointSize(this->PointSize);
 
     pipe.PointSpritesActor->GetProperty()->SetColor(this->SurfaceColor);
     pipe.PointSpritesActor->GetProperty()->SetOpacity(this->Opacity);
