@@ -1,5 +1,4 @@
 #include "F3DThumbnailProvider.h"
-#include "F3DThumbnailConfig.h"
 
 #include <clocale>
 #include <codecvt>

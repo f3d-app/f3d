@@ -75,8 +75,6 @@ macro(f3d_plugin_declare_reader)
   set(F3D_PLUGIN_REGISTER_CODE
     "${F3D_PLUGIN_REGISTER_CODE}std::make_shared<reader_${F3D_READER_NAME}>(),")
 
-  # TODO: remove this and read JSON in shellext
-  set_property(GLOBAL APPEND PROPERTY F3D_SUPPORTED_EXTENSIONS ${F3D_READER_EXTENSIONS})
   list(APPEND F3D_PLUGIN_MIMETYPES ${F3D_READER_MIMETYPES})
 
   set(F3D_READER_JSON "{}")

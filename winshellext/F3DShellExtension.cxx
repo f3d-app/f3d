@@ -20,6 +20,14 @@ HINSTANCE g_hInst = NULL;
 long g_cDllRef = 0;
 
 //------------------------------------------------------------------------------
+std::vector<std::string> GetExtensionsFromJSON()
+{
+  // TODO: read json files and parse extensions
+
+  return {};
+}
+
+//------------------------------------------------------------------------------
 // Standard DLL functions
 STDAPI_(BOOL) DllMain(HINSTANCE hInstance, DWORD dwReason, void*)
 {
@@ -76,7 +84,7 @@ STDAPI DllRegisterServer()
   }
   // Register the thumbnail handler. The thumbnail handler is associated
   // with the f3d file class.
-  for (auto ext : { @F3D_SUPPORTED_EXTENSIONS_INITIALIZER_LIST@ })
+  for (auto ext : GetExtensionsFromJSON())
   {
     hr |= RegisterShellExtThumbnailHandler(ext, CLSID_F3DThumbnailProvider);
   }
@@ -104,7 +112,7 @@ STDAPI DllUnregisterServer()
   if (SUCCEEDED(hr))
   {
     // Unregister the thumbnail handler.
-    for (auto ext : { @F3D_SUPPORTED_EXTENSIONS_INITIALIZER_LIST@ })
+    for (auto ext : GetExtensionsFromJSON())
     {
       hr |= UnregisterShellExtThumbnailHandler(ext);
     }
