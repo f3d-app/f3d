@@ -121,7 +121,7 @@ public:
     log::debug(importer->GetOutputsDescription(), "\n");
   }
 
-  bool DefaultScene = true;
+  bool DefaultScene = false;
 
   const options& Options;
   window_impl& Window;
@@ -176,20 +176,27 @@ bool loader_impl::addGeometry(const std::string& filePath)
     return false;
   }
 
+  // Check file validity
   if (filePath.empty())
   {
     log::debug("No file to add a geometry from provided\n");
     return false;
   }
-
-  // Read the file
-  log::debug("Loading: ", filePath, "\n");
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
   if (!reader)
   {
     log::warn(filePath, " is not a file of a supported file format\n");
     return false;
   }
+  auto vtkReader = reader->createGeometryReader(filePath);
+  if (!vtkReader)
+  {
+    log::warn(filePath, " is not a file of a supported file format for default scene\n");
+    return false;
+  }
+
+  // Read the file
+  log::debug("Loading: ", filePath, "\n");
 
   // Manage progress bar
   vtkNew<vtkProgressBarWidget> progressWidget;
@@ -205,7 +212,7 @@ bool loader_impl::addGeometry(const std::string& filePath)
 
   // Add a single internal reader
   this->Internals->GenericImporter->AddInternalReader(
-    vtksys::SystemTools::GetFilenameName(filePath), reader->createGeometryReader(filePath));
+    vtksys::SystemTools::GetFilenameName(filePath), vtkReader);
 
   // Update the importer
   this->Internals->GenericImporter->Update();
@@ -244,7 +251,6 @@ bool loader_impl::loadFullScene(const std::string& filePath)
     return false;
   }
 
-  log::debug("Loading full scene: ", filePath, "\n");
 
   // Recover the importer for the provided file path
   this->Internals->CurrentFullSceneImporter = nullptr;
@@ -261,6 +267,7 @@ bool loader_impl::loadFullScene(const std::string& filePath)
     return false;
   }
 
+  log::debug("Loading full scene: ", filePath, "\n");
   this->Internals->Window.Initialize(false);
 
   // Initialize importer for rendering
