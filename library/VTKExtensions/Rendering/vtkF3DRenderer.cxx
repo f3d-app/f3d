@@ -18,6 +18,7 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkLight.h>
 #include <vtkLightCollection.h>
+#include <vtkLightKit.h>
 #include <vtkMath.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
@@ -118,6 +119,7 @@ vtkSmartPointer<vtkImageData> SaveTextureToImage(
 vtkF3DRenderer::vtkF3DRenderer()
 {
   this->Cullers->RemoveAllItems();
+  this->AutomaticLightCreationOff();
 
   // Init actors
   this->MetaDataActor->GetTextProperty()->SetFontSize(15);
@@ -545,7 +547,6 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
       this->Skybox->SetFloorRight(front[0], front[1], front[2]);
 
       this->AddActor(this->Skybox);
-      this->AutomaticLightCreationOff();
 
       // build HDRI textures and spherical harmonics
       this->Render();
@@ -611,7 +612,6 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
       this->UseImageBasedLightingOff();
       this->SetEnvironmentTexture(nullptr);
       this->RemoveActor(this->Skybox);
-      this->AutomaticLightCreationOn();
     }
     this->UpdateTextColor();
   }
@@ -1011,6 +1011,19 @@ void vtkF3DRenderer::Render()
   std::string str = std::to_string(fps);
   str += " fps";
   this->TimerActor->SetInput(str.c_str());
+}
+
+//----------------------------------------------------------------------------
+int vtkF3DRenderer::UpdateLights()
+{
+  int lightCount = this->Superclass::UpdateLights();
+  if (lightCount == 0 && !this->UseImageBasedLighting)
+  {
+    vtkNew<vtkLightKit> lightKit;
+    lightKit->AddLightsToRenderer(this);
+    return this->GetLights()->GetNumberOfItems();
+  }
+  return lightCount;
 }
 
 //----------------------------------------------------------------------------
