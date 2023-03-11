@@ -251,7 +251,6 @@ bool loader_impl::loadFullScene(const std::string& filePath)
     return false;
   }
 
-
   // Recover the importer for the provided file path
   this->Internals->CurrentFullSceneImporter = nullptr;
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);

@@ -35,5 +35,4 @@ int TestSDKMultiColoring(int argc, char* argv[])
            std::string(argv[2]), "TestSDKMultiColoring", 50)
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
-
 }

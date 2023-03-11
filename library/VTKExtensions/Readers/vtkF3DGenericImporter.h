@@ -176,8 +176,6 @@ protected:
   vtkF3DGenericImporter();
   ~vtkF3DGenericImporter() override = default;
 
-//  int ImportBegin() override;
-
   /* Standard ImportActors
    * None of the actors are shown by default
    */
