@@ -1,3 +1,3 @@
 [codespell]
-skip = ./testing/**/*,./.git/**/*,./application/cxxopts.hpp,./cmake/NSIS.template.in
+skip = ./testing/**/*,./.git/**/*,./external/cxxopts.hpp,./cmake/NSIS.template.in
 ignore-words-list=nnumber,unknwn,dota

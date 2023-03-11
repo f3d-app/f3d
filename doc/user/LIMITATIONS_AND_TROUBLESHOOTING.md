@@ -50,7 +50,7 @@ With some C++ STD library version, explicit linking to `stdc++fs` is not support
 ### Sandboxing
 Some file managers (eg: Nautilus) are using sandboxing for thumbnails, which the F3D binary release does not support as it needs
 access to the Xorg server for rendering anything.
-A work around to this issue is to use a virtual Xorg server like Xephyr or Xvfb in the `f3d-plugin-xxx.thumbnailer` files.
+A work around to this issue is to use a virtual Xorg server like Xephyr or Xvfb in all the `f3d-plugin-xxx.thumbnailer` files.
 Here is how your `Exec` line should look to use `xvfb-run`. Keep in mind running xvfb can be very slow.
 
 `Exec=xvfb-run f3d --dry-run -sta --no-background --output=%o --resolution=%s,%s %i`

@@ -298,7 +298,26 @@ macro(f3d_plugin_build)
       COMPONENT plugin)
   endif()
 
-  # JSON
+  #[==[
+  JSON generation
+  Example:
+  {
+    "description" : "Plugin description",
+    "name" : "myPlugin",
+    "readers" : 
+    [
+      {
+        "description" : "Reader description",
+        "extensions" : [ "myext" ],
+        "mimetypes" : [ "application/vnd.myext" ],
+        "name" : "myReader"
+      }
+    ],
+    "type" : "MODULE",
+    "version" : "1.0"
+  }
+  #]==]
+
   string(JSON F3D_PLUGIN_JSON
     SET "${F3D_PLUGIN_JSON}" "name" "\"${F3D_PLUGIN_NAME}\"")
 

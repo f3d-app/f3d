@@ -56,6 +56,7 @@ endif ()
 target_include_directories(f3d
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external>
   )
 
 set(f3d_compile_options_private "")
