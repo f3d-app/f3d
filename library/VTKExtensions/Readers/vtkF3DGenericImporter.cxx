@@ -251,22 +251,6 @@ vtkSmartPointer<vtkTexture> vtkF3DGenericImporter::GetTexture(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::ImportLights(vtkRenderer* ren)
-{
-  ren->RemoveAllLights();
-  ren->AutomaticLightCreationOff();
-
-  if (!ren->GetUseImageBasedLighting())
-  {
-    vtkNew<vtkLightKit> lightKit;
-    lightKit->AddLightsToRenderer(ren);
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DGenericImporter::ImportProperties(vtkRenderer* vtkNotUsed(ren)) {}
-
-//----------------------------------------------------------------------------
 void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   vtkImporter::PrintSelf(os, indent);
