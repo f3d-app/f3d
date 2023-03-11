@@ -108,6 +108,7 @@ vtkSmartPointer<vtkImageData> SaveTextureToImage(
     vtkPixelBufferObject* pbo = tex->Download(target + i, level);
 
     pbo->Download2D(type, img->GetScalarPointer(0, 0, i), dims, tex->GetComponents(), incr);
+    pbo->Delete();
   }
 
   return img;

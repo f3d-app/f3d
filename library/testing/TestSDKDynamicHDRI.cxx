@@ -6,10 +6,18 @@
 
 #include "TestSDKHelpers.h"
 
+#include <random>
+
 int TestSDKDynamicHDRI(int argc, char* argv[])
 {
+  // Generate a random number to avoid reusing any existing cache
+  std::random_device r;
+  std::default_random_engine e1(r());
+  std::uniform_int_distribution<int> dist(1, 100000);
+  std::string cachePath = std::string(argv[2]) + "/cache_" + std::to_string(dist(e1));
+
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
-  eng.setCachePath(std::string(argv[2]) + "/cache");
+  eng.setCachePath(cachePath);
 
   f3d::loader& load = eng.getLoader();
   f3d::window& win = eng.getWindow();
@@ -40,7 +48,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   }
 
   // Check caching is working
-  std::ifstream lutFile(std::string(argv[2]) + "/cache/lut.vti");
+  std::ifstream lutFile(cachePath + "/lut.vti");
 
   if (!lutFile.is_open())
   {

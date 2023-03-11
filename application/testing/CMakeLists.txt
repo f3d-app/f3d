@@ -237,6 +237,7 @@ endif()
 # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestHDRI HDRI DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRICache HDRI DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEPENDS TestHDRI DEFAULT_LIGHTS)
   f3d_test(NAME TestHDRIBlur HDRI DATA suzanne.ply ARGS -u --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
   f3d_test(NAME TestHDRIBlurCoC HDRI DATA suzanne.ply ARGS -u --blur-coc=50 --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
   f3d_test(NAME TestHDRIBlurRatio HDRI DATA suzanne.ply RESOLUTION 600,100 ARGS -u --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
