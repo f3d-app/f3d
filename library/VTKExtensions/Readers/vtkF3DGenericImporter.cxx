@@ -101,6 +101,7 @@ struct ReaderPipeline
   }
 
   std::string Name;
+  bool Imported = false;
   vtkSmartPointer<vtkAlgorithm> Reader;
   vtkNew<vtkF3DPostProcessFilter> PostPro;
   std::string OutputDescription;
@@ -225,6 +226,10 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   for (size_t readerIndex = 0; readerIndex < this->Pimpl->Readers.size(); readerIndex++)
   {
     ReaderPipeline& pipe = this->Pimpl->Readers[readerIndex];
+    if (pipe.Imported)
+    {
+      continue;
+    }
 
     {
       // Forward progress event
@@ -318,6 +323,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     {
       pipe.GeometryActor->ForceTranslucentOn();
     }
+    pipe.Imported = true;
   }
   this->UpdateTemporalInformation();
   this->UpdateColoringVectors(false);
