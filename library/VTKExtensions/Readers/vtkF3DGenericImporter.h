@@ -8,7 +8,6 @@
 
 #include "vtkF3DPostProcessFilter.h"
 
-#include <vtkAlgorithm.h>
 #include <vtkImporter.h>
 #include <vtkSmartPointer.h>
 #include <vtkVersion.h>
@@ -22,12 +21,10 @@
 
 class vtkActor;
 class vtkVolume;
-class vtkPolyDataMapper;
 class vtkMultiBlockDataSet;
 class vtkPointGaussianMapper;
 class vtkPolyDataMapper;
 class vtkSmartVolumeMapper;
-//class vtkScalarBarActor;
 class vtkTexture;
 
 class vtkF3DGenericImporter : public vtkImporter
@@ -39,10 +36,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Specify the VTK reader.
+   * Add an internal reader to generate actors from
    */
-//  void SetInternalReader(vtkAlgorithm* reader);
   void AddInternalReader(const std::string& name, vtkSmartPointer<vtkAlgorithm> reader);
+
+  /**
+   * Remove all internal readers
+   */
   void RemoveInternalReaders();
 
   /**
@@ -54,7 +54,7 @@ public:
    * Get a string describing the outputs
    */
   std::string GetOutputsDescription() override;
-  std::string GetMetaDataDescription(); // TODO add to vtkImporter ?
+  std::string GetMetaDataDescription(); // TODO add to vtkImporter in VTK ?
 
   ///@{
   /**
@@ -65,6 +65,19 @@ public:
   static std::string GetMetaDataDescription(vtkDataObject* object);
   ///@}
 
+  ///@{
+  /**
+   * Access to actors vectors. They all have the same size, which correspond to the number
+   * of added internal readers.
+   */
+  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > GetGeometryActorsAndMappers();
+  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > GetPointSpritesActorsAndMappers();
+  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > GetVolumePropsAndMappers();
+  ///@}
+
+  /**
+   * A struct containing information about possible coloring
+   */
   struct ColoringInfo
   {
     std::string Name;
@@ -75,40 +88,33 @@ public:
     std::vector<vtkDataArray*> Arrays;
   };
 
-  ///@{
   /**
-   * Access to specific actors TODO
+   * Recover information about coloring by index
+   * Should be called after actors have been imported
    */
-/*  vtkGetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
-  vtkGetSmartPointerMacro(GeometryActor, vtkActor);
-  vtkGetSmartPointerMacro(PointSpritesActor, vtkActor);
-  vtkGetSmartPointerMacro(VolumeProp, vtkVolume);*/
-  ///@}
-  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > GetGeometryActorsAndMappers();
-  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > GetPointSpritesActorsAndMappers();
-  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > GetVolumePropsAndMappers();
   bool GetInfoForColoring(bool useCellData, int index, ColoringInfo& info);
+
+  /**
+   * Get the maximum index possible for coloring
+   * Should be called after actors have been imported
+   */
   int GetNumberOfIndexesForColoring(bool useCellData);
+
+  /**
+   * Find an index for coloring corresponding to provided arrayName if available
+   * Should be called after actors have been imported
+   */
   int FindIndexForColoring(bool useCellData, std::string arrayName);
+
+  /**
+   * Get the bounding box of all geometry actors
+   * Should be called after actors have been imported
+   */
   const vtkBoundingBox& GetGeometryBoundingBox();
 
-  ///@{
   /**
-   * Access to specific mappers TODO
+   * Update readers and all pipelines on the specified timestep
    */
-/*  vtkGetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
-  vtkGetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
-  vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);*/
-  ///@}
-
-  ///@{
-  /**
-   * Access to specific attributes TODO
-   */
-//  vtkGetObjectMacro(PointDataForColoring, vtkDataSetAttributes);
-//  vtkGetObjectMacro(CellDataForColoring, vtkDataSetAttributes);
-  ///@}
-
   void UpdateTimeStep(double timestep) override;
 
   /**
@@ -149,7 +155,7 @@ public:
 
   ///@{
   /**
-   * Setter for all actor loading options TODO move
+   * Setter for all actor loading options TODO move to renderer
    */
   vtkSetMacro(PointSize, double);
   vtkSetVector3Macro(SurfaceColor, double);
@@ -189,7 +195,6 @@ protected:
     vtkNew<vtkF3DPostProcessFilter> PostPro;
     std::string OutputDescription;
 
-//    vtkNew<vtkScalarBarActor> ScalarBarActor;
     vtkNew<vtkActor> GeometryActor;
     vtkNew<vtkActor> PointSpritesActor;
     vtkNew<vtkVolume> VolumeProp;
@@ -208,7 +213,6 @@ protected:
   std::vector<ColoringInfo> CellDataArrayVectorForColoring;
   vtkBoundingBox GeometryBoundingBox;
   std::string MetaDataDescription;
-
 
   bool AnimationEnabled = false;
   std::set<double> TimeSteps;

@@ -26,7 +26,6 @@
 #include <vtkRectilinearGrid.h>
 #include <vtkRectilinearGridToPointSet.h>
 #include <vtkRenderer.h>
-//#include <vtkScalarBarActor.h>
 #include <vtkScalarsToColors.h>
 #include <vtkSmartPointer.h>
 #include <vtkSmartVolumeMapper.h>
@@ -191,12 +190,10 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     pipe.PointSpritesActor->SetMapper(pipe.PointGaussianMapper);
 
     // add props
-//    ren->AddActor2D(pipe.ScalarBarActor); TODO handle in renderer ?
     ren->AddActor(pipe.GeometryActor);
     ren->AddActor(pipe.PointSpritesActor);
     ren->AddVolume(pipe.VolumeProp);
 
-//    pipe.ScalarBarActor->SetVisibility(false);
     pipe.GeometryActor->SetVisibility(false);
     pipe.PointSpritesActor->SetVisibility(false);
     pipe.VolumeProp->SetVisibility(false);
@@ -281,13 +278,6 @@ void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-/*void vtkF3DGenericImporter::SetInternalReader(vtkAlgorithm* reader)
-{
-  this->Reader = reader;
-  this->Modified();
-}*/
-
-//----------------------------------------------------------------------------
 void vtkF3DGenericImporter::AddInternalReader(const std::string& name, vtkSmartPointer<vtkAlgorithm> reader)
 {
   if (reader)
@@ -307,13 +297,6 @@ void vtkF3DGenericImporter::RemoveInternalReaders()
   this->Readers.clear();
   this->Modified();
 }
-
-//----------------------------------------------------------------------------
-/*void vtkF3DGenericImporter::SetInternalReader(vtkAlgorithm* reader)
-{
-  this->Reader = reader;
-  this->Modified();
-}*/
 
 //----------------------------------------------------------------------------
 bool vtkF3DGenericImporter::CanReadFile()
@@ -417,18 +400,6 @@ void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
   this->UpdateColoringVectors(false);
   this->UpdateColoringVectors(true);
 }
-
-//----------------------------------------------------------------------------
-/*int vtkF3DGenericImporter::ImportBegin()
-{
-  if (this->Reader)
-  {
-    this->Reader->Update();
-    return 1;
-  }
-
-  return 0;
-}*/
 
 //----------------------------------------------------------------------------
 std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > vtkF3DGenericImporter::GetGeometryActorsAndMappers()
