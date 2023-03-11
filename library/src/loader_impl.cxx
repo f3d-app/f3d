@@ -175,6 +175,11 @@ bool loader_impl::addGeometry(const std::string& filePath)
     log::warn("Cannot add a geometry as default scene is not currently in use\n");
     return false;
   }
+  if (!vtksys::SystemTools::FileExists(filePath, true))
+  {
+    log::warn(filePath, " does not exists\n");
+    return false;
+  }
 
   // Check file validity
   if (filePath.empty())
@@ -250,15 +255,21 @@ bool loader_impl::loadFullScene(const std::string& filePath)
     log::debug("No file to load a full scene provided\n");
     return false;
   }
+  if (!vtksys::SystemTools::FileExists(filePath, true))
+  {
+    log::warn(filePath, " does not exists\n");
+    return false;
+  }
 
   // Recover the importer for the provided file path
   this->Internals->CurrentFullSceneImporter = nullptr;
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
-  if (reader)
+  if (!reader)
   {
-    this->Internals->CurrentFullSceneImporter = reader->createSceneReader(filePath);
+    log::warn(filePath, " is not a file of a supported file format\n");
+    return false;
   }
-
+  this->Internals->CurrentFullSceneImporter = reader->createSceneReader(filePath);
   if (!this->Internals->CurrentFullSceneImporter)
   {
     log::warn(filePath, " is not a file of a supported file format for full scene\n");

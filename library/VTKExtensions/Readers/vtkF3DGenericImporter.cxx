@@ -255,6 +255,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     if (!readerOutput)
     {
       F3DLog::Print(F3DLog::Severity::Warning, "A reader did not produce any output");
+      pipe.Output = nullptr;
       continue;
     }
 
@@ -506,6 +507,11 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
   std::set<std::string> arrayNames;
   for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
+    if (!pipe.Output)
+    {
+      continue;
+    }
+
     vtkDataSetAttributes* attr = useCellData
       ? static_cast<vtkDataSetAttributes*>(pipe.Output->GetCellData())
       : static_cast<vtkDataSetAttributes*>(pipe.Output->GetPointData());
@@ -531,6 +537,11 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
     info.Name = arrayName;
     for (ReaderPipeline& pipe : this->Pimpl->Readers)
     {
+      if (!pipe.Output)
+      {
+        continue;
+      }
+
       vtkDataArray* array = useCellData ? pipe.Output->GetCellData()->GetArray(arrayName.c_str())
                                         : pipe.Output->GetPointData()->GetArray(arrayName.c_str());
       if (array)

@@ -12,16 +12,22 @@ int TestSDKLoader(int argc, char* argv[])
   f3d::engine eng(f3d::window::Type::NONE);
   f3d::loader& load = eng.getLoader();
 
-  std::string filePath, fileName, fileInfo;
-
   // Test file logic
   std::string dummyFilename = "dummy.foo";
+  std::string nonExistentGeometryFilename = "nonExistent.vtp";
+  std::string nonExistentFullSceneFilename = "nonExistent.obj";
+  std::string invalidGeometryFilename = "invalid.vtp";
+  std::string invalidFullSceneFilename = "invalid.gltf";
   std::string cowFilename = "cow.vtp";
   std::string dragonFilename = "dragon.vtu";
   std::string suzanneFilename = "suzanne.stl";
   std::string worldFilename = "world.obj";
   std::string botFilename = "bot2.wrl";
   std::string dummy = std::string(argv[1]) + "data/" + dummyFilename;
+  std::string nonExistentGeometry = std::string(argv[1]) + "data/" + nonExistentGeometryFilename;
+  std::string nonExistentFullScene = std::string(argv[1]) + "data/" + nonExistentFullSceneFilename;
+  std::string invalidGeometry = std::string(argv[1]) + "data/" + invalidGeometryFilename;
+  std::string invalidFullScene = std::string(argv[1]) + "data/" + invalidFullSceneFilename;
   std::string cow = std::string(argv[1]) + "data/" + cowFilename;
   std::string dragon = std::string(argv[1]) + "data/" + dragonFilename;
   std::string suzanne = std::string(argv[1]) + "data/" + suzanneFilename;
@@ -32,6 +38,11 @@ int TestSDKLoader(int argc, char* argv[])
   if (load.canReadGeometry(dummy) || load.canReadScene(dummy))
   {
     std::cerr << "Unexpected canRead output with dummy filenames" << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (!load.canReadGeometry(nonExistentGeometry) || !load.canReadScene(nonExistentFullScene))
+  {
+    std::cerr << "Unexpected canRead output with non existent filenames" << std::endl;
     return EXIT_FAILURE;
   }
   if (load.canReadGeometry(bot) || load.canReadScene(dragon))
@@ -57,7 +68,7 @@ int TestSDKLoader(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // Non existent filename
+  // Dummy filename
   if (load.resetToDefaultScene().addGeometry(dummy))
   {
     std::cerr << "Unexpected addGeometry success with a dummy file" << std::endl;
@@ -80,6 +91,32 @@ int TestSDKLoader(int argc, char* argv[])
   if (load.loadFullScene(cow))
   {
     std::cerr << "Unexpected loadFullScene success with an incorrect file" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Non existent files
+  if (load.resetToDefaultScene().addGeometry(nonExistentGeometry))
+  {
+    std::cerr << "Unexpected addGeometry success with a non existent file" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (load.loadFullScene(nonExistentFullScene))
+  {
+    std::cerr << "Unexpected loadFullScene success with a non existent file" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Invalid files XXX should NOT return true but not supported by vtkImporter yet
+  if (!load.resetToDefaultScene().addGeometry(invalidGeometry))
+  {
+    std::cerr << "Unexpected addGeometry failure with an invalid file" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (!load.loadFullScene(invalidFullScene))
+  {
+    std::cerr << "Unexpected loadFullScene failure with an invalid file" << std::endl;
     return EXIT_FAILURE;
   }
 

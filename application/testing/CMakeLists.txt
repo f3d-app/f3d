@@ -439,6 +439,12 @@ f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename
 # Test non existent texture, do not add a dummy.png
 f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${CMAKE_SOURCE_DIR}/testing/data/dummy.png REGEXP "Texture file does not exist" NO_BASELINE)
 
+# Test invalid geometry XXX should be improved
+f3d_test(NAME TestInvalidGeometry DATA invalid.vtp REGEXP "A reader did not produce any output" NO_BASELINE)
+
+# Test invalid full scene file XXX should be improved
+f3d_test(NAME TestInvalidFullScene DATA invalid.gltf ARGS --verbose REGEXP "Loading full scene" NO_BASELINE)
+
 # Test invalid texture
 f3d_test(NAME TestInvalidTexture DATA cow.vtp ARGS --texture-material=${CMAKE_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open texture file" NO_BASELINE)
 
