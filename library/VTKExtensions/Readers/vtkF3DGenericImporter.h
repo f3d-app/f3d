@@ -143,14 +143,10 @@ protected:
 
   int ImportBegin() override;
 
-  ///@{
-  /* Standard importer API
+  /* Standard ImportActors
    * None of the actors are shown by default
    */
   void ImportActors(vtkRenderer*) override;
-  void ImportLights(vtkRenderer*) override;
-  void ImportProperties(vtkRenderer*) override;
-  ///@}
 
   vtkSmartPointer<vtkTexture> GetTexture(const std::string& fileName, bool isSRGB = false);
 

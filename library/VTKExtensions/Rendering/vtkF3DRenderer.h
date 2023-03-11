@@ -82,6 +82,12 @@ public:
   void Render() override;
 
   /**
+   * Reimplemented to handle light creation when no lights are added
+   * return the number of lights in the renderer.
+   */
+  int UpdateLights() override;
+
+  /**
    * Initialize the renderer actors and flags.
    * Should be called after being added to a vtkRenderWindow.
    */
