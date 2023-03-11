@@ -23,7 +23,7 @@ Options|Default|Description
 Options|Default|Description
 ------|------|------
 \-\-verbose||Enable *verbose* mode, providing more information about the loaded data in the console output.
-\-\-quiet||Enable quiet mode, which superseed any verbose options. No console output will be generated at all.
+\-\-quiet||Enable quiet mode, which supersede any verbose options. No console output will be generated at all.
 \-\-progress||Show a *progress bar* when loading the file.
 \-\-geometry-only||For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-up=\<[+\|-][X\|Y\|Z]\>|+Y|Define the Up direction.
