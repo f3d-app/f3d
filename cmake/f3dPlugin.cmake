@@ -18,10 +18,11 @@ This initializes the variable used internally to accumulate the reader declarati
 #]==]
 
 macro(f3d_plugin_init)
-  set(F3D_READER_INCLUDES_CODE "")
-  set(F3D_READER_INSTANCES_CODE "")
-  set(F3D_READER_REGISTER_CODE "")
-  set(F3D_READER_UNREGISTER_CODE "")
+  set(F3D_PLUGIN_INCLUDES_CODE "")
+  set(F3D_PLUGIN_REGISTER_CODE "")
+  set(F3D_PLUGIN_MIMETYPES "")
+  set(F3D_PLUGIN_CURRENT_READER_INDEX 0)
+  set(F3D_PLUGIN_JSON "{ \"readers\": [] }")
 endmacro()
 
 #[==[
@@ -69,21 +70,39 @@ macro(f3d_plugin_declare_reader)
     set(F3D_READER_HAS_SCORE 0)
   endif()
 
-  set(F3D_READER_INCLUDES_CODE
-    "${F3D_READER_INCLUDES_CODE}#include \"reader_${F3D_READER_NAME}.h\"\n")
-  set(F3D_READER_REGISTER_CODE
-    "${F3D_READER_REGISTER_CODE}std::make_shared<reader_${F3D_READER_NAME}>(),")
+  set(F3D_PLUGIN_INCLUDES_CODE
+    "${F3D_PLUGIN_INCLUDES_CODE}#include \"reader_${F3D_READER_NAME}.h\"\n")
+  set(F3D_PLUGIN_REGISTER_CODE
+    "${F3D_PLUGIN_REGISTER_CODE}std::make_shared<reader_${F3D_READER_NAME}>(),")
 
-  set_property(GLOBAL APPEND PROPERTY F3D_SUPPORTED_EXTENSIONS ${F3D_READER_EXTENSIONS})
-  set_property(GLOBAL APPEND PROPERTY F3D_SUPPORTED_MIME_TYPES ${F3D_READER_MIMETYPES})
+  list(APPEND F3D_PLUGIN_MIMETYPES ${F3D_READER_MIMETYPES})
+
+  set(F3D_READER_JSON "{}")
+
+  string(JSON F3D_READER_JSON
+    SET "${F3D_READER_JSON}" "name" "\"${F3D_READER_NAME}\"")
+
+  string(JSON F3D_READER_JSON
+    SET "${F3D_READER_JSON}" "description" "\"${F3D_READER_FORMAT_DESCRIPTION}\"")
 
   list(TRANSFORM F3D_READER_EXTENSIONS PREPEND "\"")
   list(TRANSFORM F3D_READER_EXTENSIONS APPEND "\"")
   list(JOIN F3D_READER_EXTENSIONS ", " F3D_READER_EXTENSIONS)
 
+  string(JSON F3D_READER_JSON
+    SET "${F3D_READER_JSON}" "extensions" "[${F3D_READER_EXTENSIONS}]")
+
   list(TRANSFORM F3D_READER_MIMETYPES PREPEND "\"")
   list(TRANSFORM F3D_READER_MIMETYPES APPEND "\"")
   list(JOIN F3D_READER_MIMETYPES ", " F3D_READER_MIMETYPES)
+
+  string(JSON F3D_READER_JSON
+    SET "${F3D_READER_JSON}" "mimetypes" "[${F3D_READER_MIMETYPES}]")
+
+  string(JSON F3D_PLUGIN_JSON
+    SET "${F3D_PLUGIN_JSON}" "readers" ${F3D_PLUGIN_CURRENT_READER_INDEX} "${F3D_READER_JSON}")
+
+  math(EXPR "F3D_PLUGIN_CURRENT_READER_INDEX" "${F3D_PLUGIN_CURRENT_READER_INDEX} +1")
 
   if(F3D_READER_VTK_IMPORTER)
     set(F3D_READER_HAS_SCENE_READER 1)
@@ -125,6 +144,7 @@ The `NAME` argument is required. The arguments are as follows:
   * `VTK_MODULES`: The list of VTK modules used by the plugin to link with.
   * `ADDITIONAL_RPATHS`: The list of additional RPATH for the installed binaries on Unix. VTK path is added automatically.
   * `MIMETYPE_XML_FILES`: The list of mimetype files to install. It's useful for file association on OS using Freedesktop specifications.
+  * `FREEDESKTOP`: If specified, generates .desktop and .thumbnailer used for desktop integration on Linux.
   * `FORCE_STATIC`: If specified, the plugin is built as a static library and embedded into libf3d.
 #]==]
 
@@ -263,4 +283,58 @@ macro(f3d_plugin_build)
       EXCLUDE_FROM_ALL)
   endforeach()
 
+  if(F3D_PLUGIN_FREEDESKTOP AND UNIX AND NOT APPLE AND NOT ANDROID)
+    configure_file(
+      "${_f3dPlugin_dir}/plugin.desktop.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.desktop")
+    configure_file(
+      "${_f3dPlugin_dir}/plugin.thumbnailer.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer")
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.desktop"
+      DESTINATION "share/applications"
+      COMPONENT plugin)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer"
+      DESTINATION "share/thumbnailers"
+      COMPONENT plugin)
+  endif()
+
+  #[==[
+  JSON generation
+  Example:
+  {
+    "description" : "Plugin description",
+    "name" : "myPlugin",
+    "readers" : 
+    [
+      {
+        "description" : "Reader description",
+        "extensions" : [ "myext" ],
+        "mimetypes" : [ "application/vnd.myext" ],
+        "name" : "myReader"
+      }
+    ],
+    "type" : "MODULE",
+    "version" : "1.0"
+  }
+  #]==]
+
+  string(JSON F3D_PLUGIN_JSON
+    SET "${F3D_PLUGIN_JSON}" "name" "\"${F3D_PLUGIN_NAME}\"")
+
+  string(JSON F3D_PLUGIN_JSON
+    SET "${F3D_PLUGIN_JSON}" "description" "\"${F3D_PLUGIN_DESCRIPTION}\"")
+
+  string(JSON F3D_PLUGIN_JSON
+    SET "${F3D_PLUGIN_JSON}" "version" "\"${F3D_PLUGIN_VERSION}\"")
+
+  string(JSON F3D_PLUGIN_JSON
+    SET "${F3D_PLUGIN_JSON}" "type" "\"${F3D_PLUGIN_TYPE}\"")
+
+  set(F3D_PLUGIN_JSON_FILE "${CMAKE_CURRENT_BINARY_DIR}/${F3D_PLUGIN_NAME}.json")
+
+  file(WRITE "${F3D_PLUGIN_JSON_FILE}" "${F3D_PLUGIN_JSON}")
+
+  install(FILES "${F3D_PLUGIN_JSON_FILE}"
+      DESTINATION "share/f3d/plugins"
+      COMPONENT plugin)
 endmacro()

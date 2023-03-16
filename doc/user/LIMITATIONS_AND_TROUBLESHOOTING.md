@@ -44,13 +44,13 @@ With some C++ STD library version, explicit linking to `stdc++fs` is not support
  * If all fails, remove your `.cache` user dir and check that `pcmanfm` thumbnails are working.
   * If they are working, then it is an issue specific to your file manager (see below for a potential work around).
   * If only a few format have working thumbnails, then it is an issue with the mime types database.
-  * If no formats have working thumbnails, then it is an issue with the `f3d.thumbnailer` file.
+  * If no formats have working thumbnails, then it is an issue with the `f3d-plugin-xxx.thumbnailer` files.
   * If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.json` configuration file using the `max-size` option.
 
 ### Sandboxing
 Some file managers (eg: Nautilus) are using sandboxing for thumbnails, which the F3D binary release does not support as it needs
 access to the Xorg server for rendering anything.
-A work around to this issue is to use a virtual Xorg server like Xephyr or Xvfb in the `f3d.thumbnailer` file.
+A work around to this issue is to use a virtual Xorg server like Xephyr or Xvfb in all the `f3d-plugin-xxx.thumbnailer` files.
 Here is how your `Exec` line should look to use `xvfb-run`. Keep in mind running xvfb can be very slow.
 
 `Exec=xvfb-run f3d --dry-run -sta --no-background --output=%o --resolution=%s,%s %i`

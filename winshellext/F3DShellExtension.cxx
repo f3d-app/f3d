@@ -1,12 +1,10 @@
-#include <guiddef.h>
-#include <objbase.h>
 #include <shlobj.h>
-#include <shlwapi.h>
-#include <thumbcache.h>
 
-#include <new>
-#include <string>
-#include <vector>
+#include <codecvt>
+#include <filesystem>
+#include <fstream>
+
+#include <json.hpp>
 
 #include "F3DShellExtensionClassFactory.h"
 #include "RegistryHelpers.h"
@@ -18,6 +16,54 @@ static const GUID CLSID_F3DThumbnailProvider = { 0x0f3d0f3d0, 0x7d37, 0x4ccc,
 // Handle the the DLL's module
 HINSTANCE g_hInst = NULL;
 long g_cDllRef = 0;
+
+namespace fs = std::filesystem;
+
+//------------------------------------------------------------------------------
+template<typename F>
+void RunOnJSONExtensions(fs::path modulePath, F callback)
+{
+  // JSON plugin files are located in ${install_path}/share/f3d/plugins
+  for (const auto& entry :
+    fs::directory_iterator(modulePath.parent_path().parent_path() / "share/f3d/plugins"))
+  {
+    if (entry.is_regular_file())
+    {
+      auto f = entry.path();
+
+      if (f.extension() == ".json")
+      {
+        auto root = nlohmann::json::parse(std::ifstream(f));
+
+        auto readers = root.find("readers");
+
+        if (readers != root.end() && readers.value().is_array())
+        {
+          for (auto& r : readers.value())
+          {
+            auto exts = r.find("extensions");
+
+            if (exts != r.end() && exts.value().is_array())
+            {
+              for (auto& e : exts.value())
+              {
+                if (e.is_string())
+                {
+                  std::wstring ret = L".";
+
+                  std::wstring_convert<std::codecvt_utf8<wchar_t> > toUnicode;
+                  ret += toUnicode.from_bytes(e.get<std::string>());
+
+                  callback(ret);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
 //------------------------------------------------------------------------------
 // Standard DLL functions
@@ -76,10 +122,10 @@ STDAPI DllRegisterServer()
   }
   // Register the thumbnail handler. The thumbnail handler is associated
   // with the f3d file class.
-  for (auto ext : { @F3D_SUPPORTED_EXTENSIONS_INITIALIZER_LIST@ })
-  {
-    hr |= RegisterShellExtThumbnailHandler(ext, CLSID_F3DThumbnailProvider);
-  }
+  RunOnJSONExtensions(szModuleName,
+    [&](const std::wstring& ext)
+    { hr |= RegisterShellExtThumbnailHandler(ext.c_str(), CLSID_F3DThumbnailProvider); });
+
   if (SUCCEEDED(hr))
   {
     // Invalidate the thumbnail cache.
@@ -104,10 +150,8 @@ STDAPI DllUnregisterServer()
   if (SUCCEEDED(hr))
   {
     // Unregister the thumbnail handler.
-    for (auto ext : { @F3D_SUPPORTED_EXTENSIONS_INITIALIZER_LIST@ })
-    {
-      hr |= UnregisterShellExtThumbnailHandler(ext);
-    }
+    RunOnJSONExtensions(szModuleName,
+      [&](const std::wstring& ext) { hr |= UnregisterShellExtThumbnailHandler(ext.c_str()); });
   }
 
   return hr;
@@ -122,4 +166,3 @@ STDAPI DllNotifyShell()
 
   return S_OK;
 }
-

@@ -17,9 +17,9 @@ f3d_plugin_init()
 
 f3d_plugin_declare_reader(
   NAME "ReaderName"
-  EXTENSIONS ${reader_ext}     # set the extensions the reader can support
-  MIMETYPES ${reader_mime}     # set the mimetypes the reader can support
-  VTK_READER ${vtk_classname}  # set the name of the VTK class you have created
+  EXTENSIONS "myext"                # set the extensions the reader can support
+  MIMETYPES "application/vnd.myext" # set the mimetypes the reader can support
+  VTK_READER ${vtk_classname}       # set the name of the VTK class you have created
   DESCRIPTION "Reader description"
 )
 
@@ -33,7 +33,28 @@ f3d_plugin_build(
 )
 ```
 
-If the build succeeds, a library called `libf3d-plugin-<name>.so` will be created (`f3d-plugin-<name>.dll` on Windows)
+If the build succeeds, a library called `libf3d-plugin-<name>.so` will be created (`f3d-plugin-<name>.dll` on Windows)  
+A JSON file of the following form will also be generated. It's used by F3D internally to get information about supported file formats.
+
+```json
+{
+  "description" : "Plugin description",
+  "name" : "PluginName",
+  "readers" : 
+  [
+    {
+      "description" : "Reader description",
+      "extensions" : [ "myext" ],
+      "mimetypes" : [ "application/vnd.myext" ],
+      "name" : "ReaderName"
+    }
+  ],
+  "type" : "MODULE",
+  "version" : "1.0"
+}
+```
+
+The list of existing mimetypes can be find [here](https://www.iana.org/assignments/media-types/media-types.xhtml). If your file format is not listed, the mimetype should be `application/vnd.${extension}`
 
 ## Loading your plugin
 
