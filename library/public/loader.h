@@ -25,16 +25,16 @@ public:
    */
   struct load_failure_exception : public exception
   {
-    load_failure_exception(const std::string& what = "") : exception(what) {};
+    load_failure_exception(const std::string& what = "")
+      : exception(what){};
   };
 
   /**
    * Load a geometry from a provided file to the scene.
-   * Reset the scene before loading if a full scene was loaded previously or if reset is set to false,
-   * do not reset if only loaded geometries previously.
-   * Geometries loader using this method will be available in a default scene and use all default
-   * scene related options.
-   * Throw a load_failure_exception on failure.
+   * Reset the scene before loading if a full scene was loaded previously or if reset is set to
+   * false, do not reset if only loaded geometries previously. Geometries loader using this method
+   * will be available in a default scene and use all default scene related options. Throw a
+   * load_failure_exception on failure.
    */
   virtual loader& loadGeometry(const std::string& filePath, bool reset = false) = 0;
 

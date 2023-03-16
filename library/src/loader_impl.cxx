@@ -170,7 +170,8 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
   auto vtkReader = reader->createGeometryReader(filePath);
   if (!vtkReader)
   {
-    throw loader::load_failure_exception(filePath + " is not a file of a supported file format for default scene");
+    throw loader::load_failure_exception(
+      filePath + " is not a file of a supported file format for default scene");
     return *this;
   }
 
@@ -262,7 +263,8 @@ loader& loader_impl::loadFullScene(const std::string& filePath)
   this->Internals->CurrentFullSceneImporter = reader->createSceneReader(filePath);
   if (!this->Internals->CurrentFullSceneImporter)
   {
-    throw loader::load_failure_exception(filePath + " is not a file of a supported file format for full scene");
+    throw loader::load_failure_exception(
+      filePath + " is not a file of a supported file format for full scene");
     return *this;
   }
 

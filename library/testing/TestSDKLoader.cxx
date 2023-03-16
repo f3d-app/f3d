@@ -68,7 +68,9 @@ int TestSDKLoader(int argc, char* argv[])
     std::cerr << "Unexpected loadGeometry success with a dummy file" << std::endl;
     return EXIT_FAILURE;
   }
-  catch (const f3d::loader::load_failure_exception& ex){}
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
 
   // Non supported files
   try
@@ -77,7 +79,9 @@ int TestSDKLoader(int argc, char* argv[])
     std::cerr << "Unexpected loadGeometry success with an incorrect file" << std::endl;
     return EXIT_FAILURE;
   }
-  catch (const f3d::loader::load_failure_exception& ex){}
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
 
   try
   {
@@ -85,7 +89,9 @@ int TestSDKLoader(int argc, char* argv[])
     std::cerr << "Unexpected loadFullScene success with an incorrect file" << std::endl;
     return EXIT_FAILURE;
   }
-  catch (const f3d::loader::load_failure_exception& ex){}
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
 
   // Non existent files
   try
@@ -94,7 +100,9 @@ int TestSDKLoader(int argc, char* argv[])
     std::cerr << "Unexpected loadGeometry success with a non existent file" << std::endl;
     return EXIT_FAILURE;
   }
-  catch (const f3d::loader::load_failure_exception& ex){}
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
 
   try
   {
@@ -102,7 +110,9 @@ int TestSDKLoader(int argc, char* argv[])
     std::cerr << "Unexpected loadFullScene success with a non existent file" << std::endl;
     return EXIT_FAILURE;
   }
-  catch (const f3d::loader::load_failure_exception& ex){}
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
 
   // Invalid files XXX should NOT succeed but not supported by vtkImporter yet
   try
