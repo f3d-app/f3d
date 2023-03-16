@@ -176,6 +176,8 @@ f3d_test(NAME TestVerboseLoadPlugin ARGS --verbose REGEXP "Loading plugin \"nati
 f3d_test(NAME TestNonExistentPlugin ARGS --load-plugins=dummy REGEXP "Plugin failed to load" NO_BASELINE)
 f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalars --bar --comp=2 DEFAULT_LIGHTS)
 f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
+f3d_test(NAME TestGroupGeometries DATA mb/recursive ARGS --group-geometries DEFAULT_LIGHTS)
+f3d_test(NAME TestGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries --scalars=Polynomial -b DEFAULT_LIGHTS)
 
 if(UNIX AND NOT APPLE)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
@@ -358,6 +360,7 @@ f3d_test(NAME TestInteractionFocalPointPickingDefault DATA dragon.vtu INTERACTIO
 f3d_test(NAME TestInteractionFocalPointPickingShift DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionFocalPointPickingPoints DATA pointsCloud.vtp INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)
+f3d_test(NAME TestInteractionGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries INTERACTION DEFAULT_LIGHTS) #SSB
 
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2
@@ -366,6 +369,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream 
     "${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")
 
   f3d_test(NAME TestInteractionDropFiles ARGS -x "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")#DropEvent cow.vtp;#DropEvent dragon.vtu suzanne.stl;
+
+  configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestInteractionGroupGeometriesDrop.log.in"
+    "${CMAKE_BINARY_DIR}/TestInteractionGroupGeometriesDrop.log")
+
+  f3d_test(NAME TestInteractionGroupGeometriesDrop DATA mb/mb_1_0.vtp ARGS --group-geometries "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionGroupGeometriesDrop.log" DEFAULT_LIGHTS) #DropEvent mb_2_0.vtp
 endif()
 
 ## Tests to increase coverage
