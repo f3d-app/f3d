@@ -109,9 +109,7 @@ PYBIND11_MODULE(f3d, module)
   loader
     .def("loadFullScene", &f3d::loader::loadFullScene, "Load a specific full scene file",
       py::arg("path"))
-    .def("resetToDefaultScene", &f3d::loader::resetToDefaultScene,
-      "Reset scene to an empty default scene")
-    .def("addGeometry", &f3d::loader::addGeometry, "Add geometry to a default scene");
+    .def("loadGeometry", &f3d::loader::loadGeometry, "load geometry to a default scene");
 
   // f3d::camera
   py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "camera");

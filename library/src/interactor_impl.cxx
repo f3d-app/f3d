@@ -280,13 +280,13 @@ public:
     if (filesVec.size() > 0)
     {
       self->AnimationManager.StopAnimation();
-      if (self->Loader.canReadScene(filesVec[0]))
+      if (self->Loader.hasSceneReader(filesVec[0]))
       {
         self->Loader.loadFullScene(filesVec[0]);
       }
-      else if (self->Loader.canReadGeometry(filesVec[0]))
+      else if (self->Loader.hasGeometryReader(filesVec[0]))
       {
-        self->Loader.resetToDefaultScene().addGeometry(filesVec[0]);
+        self->Loader.loadGeometry(filesVec[0], true);
       }
       self->Window.render();
     }

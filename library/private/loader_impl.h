@@ -30,11 +30,10 @@ public:
    */
   loader_impl(const options& options, window_impl& window);
   ~loader_impl();
-  bool addGeometry(const std::string& filePath) override;
-  loader& resetToDefaultScene() override;
-  bool loadFullScene(const std::string& filePath) override;
-  bool canReadScene(const std::string& filePath) override;
-  bool canReadGeometry(const std::string& filePath) override;
+  loader& loadGeometry(const std::string& filePath, bool reset) override;
+  loader& loadFullScene(const std::string& filePath) override;
+  bool hasGeometryReader(const std::string& filePath) override;
+  bool hasSceneReader(const std::string& filePath) override;
   ///@}
 
   /**

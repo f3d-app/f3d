@@ -368,6 +368,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
   this->Internals->UpdateWithCommandLineParsing = false; // this is done only once
   this->Internals->Engine->setOptions(this->Internals->FileOptions);
 
+  this->Internals->LoadedFile = false;
   if (this->Internals->CurrentFileIndex >= 0)
   {
     // Check the size of the file before loading it
@@ -380,18 +381,29 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
     }
     else
     {
-      if (loader.canReadScene(filePath.string()) && !fileAppOptions.GeometryOnly)
+
+      try
       {
-        this->Internals->LoadedFile = loader.loadFullScene(filePath.string());
+        if (loader.hasSceneReader(filePath.string()) && !fileAppOptions.GeometryOnly)
+        {
+          loader.loadFullScene(filePath.string());
+          this->Internals->LoadedFile = true;
+        }
+        else if (loader.hasGeometryReader(filePath.string()))
+        {
+          loader.loadGeometry(filePath.string(), true);
+          this->Internals->LoadedFile = true;
+        }
+        else
+        {
+          f3d::log::warn(filePath, " is not a file of a supported file format\n");
+          filenameInfo += " [UNSUPPORTED]";
+        }
       }
-      else if (loader.canReadGeometry(filePath.string()))
+      catch (const f3d::loader::load_failure_exception& ex)
       {
-        this->Internals->LoadedFile = loader.resetToDefaultScene().addGeometry(filePath.string());
-      }
-      else
-      {
-        f3d::log::warn(filePath, " is not a file of a supported file format\n");
-        filenameInfo += " [UNSUPPORTED]";
+        f3d::log::warn("Could not load file:");
+        f3d::log::error(ex.what());
       }
 
       if (!this->Internals->AppOptions.NoRender)

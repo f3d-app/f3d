@@ -19,7 +19,7 @@ public:
     , mOutputPath(outputPath)
   {
     f3d::loader& load = mEngine.getLoader();
-    load.resetToDefaultScene().addGeometry(filePath);
+    load.loadGeometry(filePath);
   }
 
 protected:

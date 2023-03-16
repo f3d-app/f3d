@@ -56,7 +56,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     {
       std::string path = filesVec[0];
       size_t found = path.find_last_of("/\\");
-      load.resetToDefaultScene().addGeometry(path.substr(0, found + 1) + "suzanne.ply");
+      load.loadGeometry(path.substr(0, found + 1) + "suzanne.ply", true);
       win.render();
       return true;
     });

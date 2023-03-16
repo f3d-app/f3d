@@ -26,7 +26,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   opt.set("ui.filename", true);
   opt.set("ui.filename-info", "(1/1) cow.vtp");
 
-  load.resetToDefaultScene().addGeometry(std::string(argv[1]) + "/data/cow.vtp");
+  load.loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
 
   bool ret = win.render();
 

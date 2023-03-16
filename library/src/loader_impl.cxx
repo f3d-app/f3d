@@ -122,7 +122,6 @@ public:
   }
 
   bool DefaultScene = false;
-
   const options& Options;
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
@@ -149,55 +148,46 @@ void loader_impl::setInteractor(interactor_impl* interactor)
 }
 
 //----------------------------------------------------------------------------
-loader& loader_impl::resetToDefaultScene()
+loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
 {
-  // Reset the generic importer
-  this->Internals->GenericImporter->RemoveInternalReaders();
-
-  // Initialize the window
-  this->Internals->Window.Initialize(true);
-
-  // Initialize genericImporter with options
-  loader_impl::internals::InitializeImporterWithOptions(
-    this->Internals->Options, this->Internals->GenericImporter);
-
-  this->Internals->DefaultScene = true;
-
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-bool loader_impl::addGeometry(const std::string& filePath)
-{
-  if (!this->Internals->DefaultScene)
-  {
-    // TODO should we reset to default scene ?
-    log::warn("Cannot add a geometry as default scene is not currently in use\n");
-    return false;
-  }
   if (!vtksys::SystemTools::FileExists(filePath, true))
   {
-    log::warn(filePath, " does not exists\n");
-    return false;
+    throw loader::load_failure_exception(filePath + " does not exists");
   }
 
   // Check file validity
   if (filePath.empty())
   {
     log::debug("No file to add a geometry from provided\n");
-    return false;
+    return *this;
   }
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
   if (!reader)
   {
-    log::warn(filePath, " is not a file of a supported file format\n");
-    return false;
+    throw loader::load_failure_exception(filePath + " is not a file of a supported file format");
+    return *this;
   }
   auto vtkReader = reader->createGeometryReader(filePath);
   if (!vtkReader)
   {
-    log::warn(filePath, " is not a file of a supported file format for default scene\n");
-    return false;
+    throw loader::load_failure_exception(filePath + " is not a file of a supported file format for default scene");
+    return *this;
+  }
+
+  if (!this->Internals->DefaultScene || reset)
+  {
+    // Reset the generic importer
+    this->Internals->GenericImporter->RemoveInternalReaders();
+
+    // Initialize the window with coloring if ever needed
+    this->Internals->Window.Initialize(true);
+
+    // Initialize genericImporter with options
+    loader_impl::internals::InitializeImporterWithOptions(
+      this->Internals->Options, this->Internals->GenericImporter);
+
+    // We are in default scene mode now
+    this->Internals->DefaultScene = true;
   }
 
   // Read the file
@@ -244,21 +234,21 @@ bool loader_impl::addGeometry(const std::string& filePath)
   this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
   this->Internals->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
 
-  return true;
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-bool loader_impl::loadFullScene(const std::string& filePath)
+loader& loader_impl::loadFullScene(const std::string& filePath)
 {
   if (filePath.empty())
   {
     log::debug("No file to load a full scene provided\n");
-    return false;
+    return *this;
   }
   if (!vtksys::SystemTools::FileExists(filePath, true))
   {
-    log::warn(filePath, " does not exists\n");
-    return false;
+    throw loader::load_failure_exception(filePath + " does not exists");
+    return *this;
   }
 
   // Recover the importer for the provided file path
@@ -266,19 +256,18 @@ bool loader_impl::loadFullScene(const std::string& filePath)
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
   if (!reader)
   {
-    log::warn(filePath, " is not a file of a supported file format\n");
-    return false;
+    throw loader::load_failure_exception(filePath + " is not a file of a supported file format");
+    return *this;
   }
   this->Internals->CurrentFullSceneImporter = reader->createSceneReader(filePath);
   if (!this->Internals->CurrentFullSceneImporter)
   {
-    log::warn(filePath, " is not a file of a supported file format for full scene\n");
-    this->Internals->Window.Initialize(false);
-    return false;
+    throw loader::load_failure_exception(filePath + " is not a file of a supported file format for full scene");
+    return *this;
   }
 
-  log::debug("Loading full scene: ", filePath, "\n");
   this->Internals->Window.Initialize(false);
+  this->Internals->DefaultScene = false;
 
   // Initialize importer for rendering
   this->Internals->CurrentFullSceneImporter->SetRenderWindow(
@@ -295,6 +284,8 @@ bool loader_impl::loadFullScene(const std::string& filePath)
     log::warn("This VTK version does not support specifying the camera index, ignored.");
   }
 #endif
+
+  log::debug("Loading full scene: ", filePath, "\n");
 
   // Manage progress bar
   vtkNew<vtkProgressBarWidget> progressWidget;
@@ -333,12 +324,11 @@ bool loader_impl::loadFullScene(const std::string& filePath)
   this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
   this->Internals->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
 
-  this->Internals->DefaultScene = false;
-  return true;
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-bool loader_impl::canReadScene(const std::string& filePath)
+bool loader_impl::hasSceneReader(const std::string& filePath)
 {
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
   if (!reader)
@@ -349,7 +339,7 @@ bool loader_impl::canReadScene(const std::string& filePath)
 }
 
 //----------------------------------------------------------------------------
-bool loader_impl::canReadGeometry(const std::string& filePath)
+bool loader_impl::hasGeometryReader(const std::string& filePath)
 {
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
   if (!reader)
