@@ -54,6 +54,8 @@ A JSON file of the following form will also be generated. It's used by F3D inter
 }
 ```
 
+The list of existing mimetypes can be find [here](https://www.iana.org/assignments/media-types/media-types.xhtml). If your file format is not listed, the mimetype should be `application/vnd.${extension}`
+
 ## Loading your plugin
 
 The plugin can be loaded using `f3d::engine::loadPlugin("path or name")` api if you are using libf3d, or `--load-plugins="path or name"` option if you are using F3D application.

@@ -144,6 +144,7 @@ The `NAME` argument is required. The arguments are as follows:
   * `VTK_MODULES`: The list of VTK modules used by the plugin to link with.
   * `ADDITIONAL_RPATHS`: The list of additional RPATH for the installed binaries on Unix. VTK path is added automatically.
   * `MIMETYPE_XML_FILES`: The list of mimetype files to install. It's useful for file association on OS using Freedesktop specifications.
+  * `FREEDESKTOP`: If specified, generates .desktop and .thumbnailer used for desktop integration on Linux.
   * `FORCE_STATIC`: If specified, the plugin is built as a static library and embedded into libf3d.
 #]==]
 
@@ -282,8 +283,7 @@ macro(f3d_plugin_build)
       EXCLUDE_FROM_ALL)
   endforeach()
 
-  # .desktop and .thumbnailer are automatically generated on Linux
-  if(UNIX AND NOT APPLE AND NOT ANDROID)
+  if(F3D_PLUGIN_FREEDESKTOP AND UNIX AND NOT APPLE AND NOT ANDROID)
     configure_file(
       "${_f3dPlugin_dir}/plugin.desktop.in"
       "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.desktop")
