@@ -409,7 +409,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
               auto geomPath = this->Internals->FilesList[i];
               if (loader.hasGeometryReader(geomPath.string()))
               {
-                // Reset for the first file, then add geometries without reseting
+                // Reset for the first file, then add geometries without resetting
                 loader.loadGeometry(this->Internals->FilesList[i].string(), i == 0 ? true : false);
                 nGeom++;
               }
