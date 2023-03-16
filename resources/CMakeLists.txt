@@ -16,16 +16,9 @@ if (UNIX AND NOT APPLE)
   endif()
 endif()
 
-# Get supported mime types
-get_property(F3D_SUPPORTED_MIME_TYPES GLOBAL PROPERTY F3D_SUPPORTED_MIME_TYPES)
-
 # Other ressoure files
 if(UNIX AND NOT APPLE AND NOT ANDROID)
-  configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/f3d.desktop.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/f3d.desktop")
-
-  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d.desktop"
+  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d.desktop"
     DESTINATION "share/applications" COMPONENT assets)
   install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/logo32.png"
     DESTINATION "share/icons/hicolor/32x32/apps" COMPONENT assets
@@ -53,13 +46,6 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
   if(TARGET man)
     install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
       DESTINATION "share/man/man1/" COMPONENT documentation)
-  endif()
-  if (F3D_LINUX_INSTALL_THUMBNAILER_FILES)
-    configure_file(
-      "${CMAKE_CURRENT_SOURCE_DIR}/f3d.thumbnailer.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/f3d.thumbnailer")
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d.thumbnailer"
-      DESTINATION "share/thumbnailers/" COMPONENT shellext)
   endif()
 elseif(WIN32)
   if (F3D_WINDOWS_INSTALL_LOGOS_FOR_NSIS_PACKAGING)

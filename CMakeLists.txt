@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.19)
 include(CMakeDependentOption)
 
 project(F3D
@@ -168,11 +168,6 @@ if(WIN32)
   mark_as_advanced(F3D_WINDOWS_INSTALL_LOGOS_FOR_NSIS_PACKAGING)
   set(F3D_WINDOWS_RESOURCES_INSTALL_DIR "" CACHE STRING "Specify a directory to install resources to instead of root")
   mark_as_advanced(F3D_WINDOWS_RESOURCES_INSTALL_DIR)
-endif()
-
-if(UNIX AND NOT APPLE)
-  option(F3D_LINUX_INSTALL_THUMBNAILER_FILES "Install thumbnailer files" OFF)
-  mark_as_advanced(F3D_LINUX_INSTALL_THUMBNAILER_FILES)
 endif()
 
 # Installing licenses
