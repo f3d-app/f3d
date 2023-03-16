@@ -367,7 +367,6 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
       // Group geometries mode, consider the first file configuration file only
       this->Internals->CurrentFileIndex = 0;
       filePath = this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)];
-
     }
 
     // Update options for the file to load, using dynamic options as default
@@ -393,7 +392,8 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
     {
       try
       {
-        if (loader.hasSceneReader(filePath.string()) && !fileAppOptions.GeometryOnly && !fileAppOptions.GroupGeometries)
+        if (loader.hasSceneReader(filePath.string()) && !fileAppOptions.GeometryOnly &&
+          !fileAppOptions.GroupGeometries)
         {
           loader.loadFullScene(filePath.string());
           this->Internals->LoadedFile = true;
@@ -404,7 +404,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
           if (fileAppOptions.GroupGeometries)
           {
             int nGeom = 0;
-            for(size_t i = 0; i < size; i++)
+            for (size_t i = 0; i < size; i++)
             {
               auto geomPath = this->Internals->FilesList[i];
               if (loader.hasGeometryReader(geomPath.string()))
