@@ -336,7 +336,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
   f3d::loader& loader = this->Internals->Engine->getLoader();
   fs::path filePath;
   std::string filenameInfo;
-  int size = static_cast<int>(this->Internals->FilesList.size());
+  size_t size = this->Internals->FilesList.size();
   if (size != 0)
   {
     if (relativeIndex)
@@ -360,18 +360,28 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
     this->Internals->CurrentFileIndex = -1;
   }
 
-  // Update options for the file to load, using dynamic options as default
-  this->Internals->FileOptions = this->Internals->DynamicOptions;
-  F3DAppOptions fileAppOptions = this->Internals->AppOptions;
-  this->Internals->Parser.UpdateOptions(filePath.string(), fileAppOptions,
-    this->Internals->FileOptions, this->Internals->UpdateWithCommandLineParsing);
-  this->Internals->UpdateWithCommandLineParsing = false; // this is done only once
-  this->Internals->Engine->setOptions(this->Internals->FileOptions);
-
-  this->Internals->LoadedFile = false;
   if (this->Internals->CurrentFileIndex >= 0)
   {
+    if (this->Internals->AppOptions.GroupGeometries)
+    {
+      // Group geometries mode, consider the first file configuration file only
+      this->Internals->CurrentFileIndex = 0;
+      filePath = this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)];
+
+    }
+
+    // Update options for the file to load, using dynamic options as default
+    this->Internals->FileOptions = this->Internals->DynamicOptions;
+    F3DAppOptions fileAppOptions = this->Internals->AppOptions;
+    this->Internals->Parser.UpdateOptions(filePath.string(), fileAppOptions,
+      this->Internals->FileOptions, this->Internals->UpdateWithCommandLineParsing);
+    this->Internals->UpdateWithCommandLineParsing = false; // this is done only once
+    this->Internals->Engine->setOptions(this->Internals->FileOptions);
+
+    this->Internals->LoadedFile = false;
+
     // Check the size of the file before loading it
+    // Not considered in the context of GroupGeometries
     static constexpr int BYTES_IN_MIB = 1048576;
     if (fileAppOptions.MaxSize >= 0.0 &&
       fs::file_size(filePath) > static_cast<std::uintmax_t>(fileAppOptions.MaxSize * BYTES_IN_MIB))
@@ -381,17 +391,48 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
     }
     else
     {
-
       try
       {
-        if (loader.hasSceneReader(filePath.string()) && !fileAppOptions.GeometryOnly)
+        if (loader.hasSceneReader(filePath.string()) && !fileAppOptions.GeometryOnly && !fileAppOptions.GroupGeometries)
         {
           loader.loadFullScene(filePath.string());
           this->Internals->LoadedFile = true;
         }
         else if (loader.hasGeometryReader(filePath.string()))
         {
-          loader.loadGeometry(filePath.string(), true);
+          // In GroupGeometries, just load all the files from the list
+          if (fileAppOptions.GroupGeometries)
+          {
+            int nGeom = 0;
+            for(size_t i = 0; i < size; i++)
+            {
+              auto geomPath = this->Internals->FilesList[i];
+              if (loader.hasGeometryReader(geomPath.string()))
+              {
+                // Reset for the first file, then add geometries without reseting
+                loader.loadGeometry(this->Internals->FilesList[i].string(), i == 0 ? true : false);
+                nGeom++;
+              }
+              else
+              {
+                f3d::log::warn(geomPath, " is not a geometry of a supported file format\n");
+              }
+            }
+            if (nGeom > 0)
+            {
+              filenameInfo = std::to_string(nGeom) + " Geometries loaded";
+            }
+            else
+            {
+              f3d::log::info("No geometry loaded");
+              filenameInfo = "No geometry loaded";
+            }
+          }
+          else
+          {
+            // Standard loadGeometry code
+            loader.loadGeometry(filePath.string(), true);
+          }
           this->Internals->LoadedFile = true;
         }
         else
@@ -402,7 +443,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
       }
       catch (const f3d::loader::load_failure_exception& ex)
       {
-        f3d::log::warn("Could not load file:");
+        f3d::log::error("Could not load file:");
         f3d::log::error(ex.what());
       }
 

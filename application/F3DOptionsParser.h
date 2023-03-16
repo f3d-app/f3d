@@ -22,6 +22,7 @@ struct F3DAppOptions
   std::string UserConfigFile = "";
   bool DryRun = false;
   bool GeometryOnly = false;
+  bool GroupGeometries = false;
   std::string Output = "";
   std::string Reference = "";
   std::string InteractionTestRecordFile = "";
