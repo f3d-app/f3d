@@ -349,10 +349,12 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
       this->Internals->CurrentFileIndex = index;
     }
     // XXX Do not work if CurrentFileIndex + size < 0
-    this->Internals->CurrentFileIndex = (this->Internals->CurrentFileIndex + size) % size;
-    filePath = this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)];
-    filenameInfo = "(" + std::to_string(this->Internals->CurrentFileIndex + 1) + "/" +
+    size_t fileIndex = (this->Internals->CurrentFileIndex + size) % size;
+    filePath = this->Internals->FilesList[fileIndex];
+    filenameInfo = "(" + std::to_string(fileIndex + 1) + "/" +
       std::to_string(this->Internals->FilesList.size()) + ") " + filePath.filename().string();
+
+    this->Internals->CurrentFileIndex = static_cast<int>(fileIndex);
   }
   else
   {
@@ -420,7 +422,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
             }
             if (nGeom > 0)
             {
-              filenameInfo = std::to_string(nGeom) + " Geometries loaded";
+              filenameInfo = std::to_string(nGeom) + " geometries loaded";
             }
             else
             {
@@ -443,8 +445,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
       }
       catch (const f3d::loader::load_failure_exception& ex)
       {
-        f3d::log::error("Could not load file:");
-        f3d::log::error(ex.what());
+        f3d::log::error("Could not load file: ", ex.what());
       }
 
       if (!this->Internals->AppOptions.NoRender)

@@ -135,7 +135,7 @@ vtkStandardNewMacro(vtkF3DGenericImporter);
 
 //----------------------------------------------------------------------------
 vtkF3DGenericImporter::vtkF3DGenericImporter()
-  : Pimpl(new vtkF3DGenericImporter::Internals())
+  : Pimpl(new Internals())
 {
 }
 
