@@ -1,6 +1,6 @@
-project(render-image)
-
 cmake_minimum_required(VERSION 3.1)
+
+project(render-image)
 
 find_package(f3d REQUIRED)
 
