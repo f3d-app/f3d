@@ -276,30 +276,33 @@ macro(f3d_plugin_build)
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT plugin)
   endif()
 
-  foreach(mimetype_xml ${F3D_PLUGIN_MIMETYPE_XML_FILES})
-    install(FILES "${mimetype_xml}"
-      DESTINATION "share/mime/packages"
-      COMPONENT mimetypes
-      EXCLUDE_FROM_ALL)
-  endforeach()
+  # Generate mime, desktop and thumbnailer files
+  if (UNIX AND NOT APPLE AND NOT ANDROID)
+    foreach(mimetype_xml ${F3D_PLUGIN_MIMETYPE_XML_FILES})
+      install(FILES "${mimetype_xml}"
+        DESTINATION "share/mime/packages"
+        COMPONENT mimetypes
+        EXCLUDE_FROM_ALL)
+    endforeach()
 
-  if(F3D_PLUGIN_FREEDESKTOP AND UNIX AND NOT APPLE AND NOT ANDROID)
-    configure_file(
-      "${_f3dPlugin_dir}/plugin.desktop.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.desktop")
-    configure_file(
-      "${_f3dPlugin_dir}/plugin.thumbnailer.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer")
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.desktop"
-      DESTINATION "share/applications"
-      COMPONENT plugin)
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer"
-      DESTINATION "share/thumbnailers"
-      COMPONENT plugin)
+    if(F3D_PLUGIN_FREEDESKTOP)
+      configure_file(
+        "${_f3dPlugin_dir}/plugin.desktop.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.desktop")
+      configure_file(
+        "${_f3dPlugin_dir}/plugin.thumbnailer.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer")
+      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.desktop"
+        DESTINATION "share/applications"
+        COMPONENT plugin)
+      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer"
+        DESTINATION "share/thumbnailers"
+        COMPONENT plugin)
+    endif()
   endif()
 
   #[==[
-  JSON generation
+  Generate a JSON file describing the plugin
   Example:
   {
     "description" : "Plugin description",
