@@ -1,6 +1,6 @@
-project(render-interact)
-
 cmake_minimum_required(VERSION 3.1)
+
+project(render-interact)
 
 find_package(f3d REQUIRED)
 
