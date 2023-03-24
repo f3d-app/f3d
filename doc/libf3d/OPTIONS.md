@@ -79,7 +79,8 @@ Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
 ui.bar|bool<br>false<br>render|Show *scalar bar* of the coloring by data array.|\-\-bar
 ui.cheatsheet|bool<br>false<br>render|Show a interactor cheatsheet
-ui.filename|bool<br>false<br>render|Display the *name of the file*.|\-\-filename
+ui.filename|bool<br>false<br>render|Display the *filename info content* on top of the window.|\-\-filename
+ui.filename-info|string<br>-<br>render|Content of *filename info* to display.
 ui.font-file|string<br>-<br>render|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.|\-\-font-file
 ui.fps|bool<br>false<br>render|Display a *frame per second counter*.|\-\-fps
 ui.loader-progress|bool<br>false<br>load|Show a *progress bar* when loading the file.|\-\-progress
