@@ -420,14 +420,9 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
                 f3d::log::warn(geomPath, " is not a geometry of a supported file format\n");
               }
             }
-            if (nGeom > 0)
+            if (nGeom > 1)
             {
               filenameInfo = std::to_string(nGeom) + " geometries loaded";
-            }
-            else
-            {
-              f3d::log::info("No geometry loaded");
-              filenameInfo = "No geometry loaded";
             }
           }
           else
@@ -445,6 +440,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
       }
       catch (const f3d::loader::load_failure_exception& ex)
       {
+        // XXX Not reachable until vtkImporter is improved to support returning a failure
         f3d::log::error("Could not load file: ", ex.what());
       }
 

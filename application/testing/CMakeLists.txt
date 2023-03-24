@@ -387,6 +387,9 @@ f3d_test(NAME TestOutputNoBackground DATA cow.vtp ARGS --no-background NO_BASELI
 f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log NO_BASELINE)
 f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log DEPENDS TestInteractionRecord NO_BASELINE)
 
+# Progress test
+f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
+
 # Window position test
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
 

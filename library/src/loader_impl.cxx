@@ -150,17 +150,17 @@ void loader_impl::setInteractor(interactor_impl* interactor)
 //----------------------------------------------------------------------------
 loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
 {
-  if (!vtksys::SystemTools::FileExists(filePath, true))
-  {
-    throw loader::load_failure_exception(filePath + " does not exists");
-  }
-
   // Check file validity
   if (filePath.empty())
   {
     log::debug("No file to add a geometry from provided\n");
     return *this;
   }
+  if (!vtksys::SystemTools::FileExists(filePath, true))
+  {
+    throw loader::load_failure_exception(filePath + " does not exists");
+  }
+
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
   if (!reader)
   {
