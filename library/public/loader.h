@@ -13,8 +13,9 @@ namespace f3d
  * @class   loader
  * @brief   Class to load files in F3D
  *
- * A class to load files in F3D. The loader can load a full scene or multiple geometries into a default scene.
- * It also support checking if a scene or geometry reader is available for a given file.
+ * A class to load files in F3D. The loader can load a full scene or multiple geometries into a
+ * default scene. It also support checking if a scene or geometry reader is available for a given
+ * file.
  *
  * Example usage:
  *

@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 
   // Load all files from provided directory as geometries
   f3d::loader& load = eng.getLoader();
-  for (auto& entry : std::filesystem::directory_iterator(argv[1]) )
+  for (auto& entry : std::filesystem::directory_iterator(argv[1]))
   {
     load.loadGeometry(entry.path().string());
   }
