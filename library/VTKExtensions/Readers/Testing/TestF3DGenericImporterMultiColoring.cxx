@@ -49,44 +49,44 @@ int TestF3DGenericImporterMultiColoring(int argc, char* argv[])
   importer->GetInfoForColoring(false, idx, info);
   if (info.Name != "Momentum")
   {
-    std::cerr << "Unexepected coloring name" << std::endl;
+    std::cerr << "Unexpected coloring name" << std::endl;
     return EXIT_FAILURE;
   }
   if (info.Arrays.size() != 2)
   {
-    std::cerr << "Unexepected number of arrays" << std::endl;
+    std::cerr << "Unexpected number of arrays" << std::endl;
     return EXIT_FAILURE;
   }
   if (info.MaximumNumberOfComponents != 3)
   {
-    std::cerr << "Unexepected coloring nComp" << std::endl;
+    std::cerr << "Unexpected coloring nComp" << std::endl;
     return EXIT_FAILURE;
   }
   if (info.ComponentNames[0] != "LX Momentum")
   {
-    std::cerr << "Unexepected coloring component name 0" << std::endl;
+    std::cerr << "Unexpected coloring component name 0" << std::endl;
     return EXIT_FAILURE;
   }
   if (info.ComponentNames[1] != "LY Momentum_t")
   {
-    std::cerr << "Unexepected coloring component name 1" << std::endl;
+    std::cerr << "Unexpected coloring component name 1" << std::endl;
     return EXIT_FAILURE;
   }
   if (info.ComponentNames[2] != "")
   {
-    std::cerr << "Unexepected coloring component name 2" << std::endl;
+    std::cerr << "Unexpected coloring component name 2" << std::endl;
     return EXIT_FAILURE;
   }
   if (!vtkMathUtilities::FuzzyCompare(info.ComponentRanges[0][0], -5.49586, 1e-5) ||
     !vtkMathUtilities::FuzzyCompare(info.ComponentRanges[0][1], 5.0455, 1e-5))
   {
-    std::cerr << "Unexepected coloring component range" << std::endl;
+    std::cerr << "Unexpected coloring component range" << std::endl;
     return EXIT_FAILURE;
   }
   if (!vtkMathUtilities::FuzzyCompare(info.MagnitudeRange[0], 0., 1e-5) ||
     !vtkMathUtilities::FuzzyCompare(info.MagnitudeRange[1], 5.71596, 1e-5))
   {
-    std::cerr << "Unexepected coloring magnitude range" << std::endl;
+    std::cerr << "Unexpected coloring magnitude range" << std::endl;
     return EXIT_FAILURE;
   }
 
