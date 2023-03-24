@@ -5,8 +5,12 @@ project(multi-geom)
 find_package(f3d REQUIRED)
 
 add_executable(multi-geom main.cxx)
-target_link_libraries(multi-geom f3d::libf3d stdc++fs)
+target_link_libraries(multi-geom f3d::libf3d)
 set_target_properties(multi-geom PROPERTIES CXX_STANDARD 17)
+
+if(UNIX AND NOT APPLE)
+  target_link_libraries(multi-geom stdc++fs)
+endif()
 
 # Simple testing
 if(BUILD_TESTING)
