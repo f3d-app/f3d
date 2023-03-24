@@ -26,6 +26,7 @@ Options|Default|Description
 \-\-quiet||Enable quiet mode, which supersede any verbose options. No console output will be generated at all.
 \-\-progress||Show a *progress bar* when loading the file.
 \-\-geometry-only||For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
+\-\-group-geometries||When opening multiple files, show them all in the same scene.<br>Force geometry-only. The configuration file for the first file will be loaded.
 \-\-up=\<[+\|-][X\|Y\|Z]\>|+Y|Define the Up direction.
 -x, \-\-axis||Show *axes* as a trihedron in the scene.
 -g, \-\-grid||Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.

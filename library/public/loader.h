@@ -13,8 +13,24 @@ namespace f3d
  * @class   loader
  * @brief   Class to load files in F3D
  *
- * A class to load files in F3D.
- * TODO
+ * A class to load files in F3D. The loader can load a full scene or multiple geometries into a default scene.
+ * It also support checking if a scene or geometry reader is available for a given file.
+ *
+ * Example usage:
+ *
+ *  std::string path = ...
+ *  f3d::engine eng(f3d::window::Type::NATIVE);
+ *  f3d::loader& load = eng.getLoader();
+ *
+ *  if (load.hasSceneReader(path)
+ *  {
+ *    load.loadFullScene(path);
+ *  }
+ *  else if (load.hasFullSceneReader(path)
+ *  {
+ *    load.loadGeometry(path);
+ *  }
+ *
  */
 class F3D_EXPORT loader
 {
