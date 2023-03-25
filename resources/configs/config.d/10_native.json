@@ -1,0 +1,19 @@
+{
+  ".*(dcm|nrrd|mhd|mha|vt.)":
+  {
+    "bar": true
+  },
+  ".*(dcm|nrrd|mhd|mha|vti)":
+  {
+    "volume": true
+  },
+  ".*(3ds|stl)":
+  {
+    "up": "+Z"
+  },
+  ".*(tif|tiff)":
+  {
+    "up": "-Y",
+    "comp": "-2"
+  }
+}

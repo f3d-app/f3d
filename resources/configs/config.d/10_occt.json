@@ -1,0 +1,9 @@
+{
+  ".*(step|stp|iges|igs)":
+  {
+    "up": "+Z",
+    "ssao": true,
+    "comp": "-2",
+    "cells": true
+  }
+}
