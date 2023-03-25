@@ -18,46 +18,47 @@
 #include <mach-o/dyld.h>
 #endif
 
+namespace fs = std::filesystem;
+
 //----------------------------------------------------------------------------
-std::string F3DConfigFileTools::GetUserConfigFileDirectory()
+fs::path F3DConfigFileTools::GetUserConfigFileDirectory()
 {
   std::string applicationName = "f3d";
-  std::filesystem::path dirPath;
+  fs::path dirPath;
 #if defined(_WIN32)
   const char* appData = std::getenv("APPDATA");
   if (!appData)
   {
-    return std::string();
+    return fs::path();
   }
-  dirPath = std::filesystem::path(appData);
+  dirPath = fs::path(appData);
 #else
   // Implementing XDG specifications
   const char* xdgConfigHome = std::getenv("XDG_CONFIG_HOME");
   if (xdgConfigHome && strlen(xdgConfigHome) > 0)
   {
-    dirPath = std::filesystem::path(xdgConfigHome);
+    dirPath = fs::path(xdgConfigHome);
   }
   else
   {
     const char* home = std::getenv("HOME");
     if (!home || strlen(home) == 0)
     {
-      return std::string();
+      return fs::path();
     }
-    dirPath = std::filesystem::path(home);
+    dirPath = fs::path(home);
     dirPath /= ".config";
   }
 #endif
   dirPath /= applicationName;
-  return dirPath.string();
+  return dirPath;
 }
 
 //----------------------------------------------------------------------------
-std::string F3DConfigFileTools::GetBinaryConfigFileDirectory()
+fs::path F3DConfigFileTools::GetBinaryConfigFileDirectory()
 {
   std::string execPath;
-  std::filesystem::path dirPath;
-  std::string errorMsg, programFilePath;
+  fs::path dirPath;
   try
   {
 #if defined(_WIN32)
@@ -73,18 +74,17 @@ std::string F3DConfigFileTools::GetBinaryConfigFileDirectory()
     if (_NSGetExecutablePath(buffer, &size) != 0)
     {
       f3d::log::error("Executable is too long to recover path to configuration file");
-      return std::string();
+      return fs::path();
     }
     execPath = buffer;
 #else
-    execPath = std::filesystem::canonical("/proc/self/exe").string();
+    execPath = fs::canonical("/proc/self/exe").string();
 #endif
 #endif
 
     // transform path to exe to path to install
     // /install/bin/f3d -> /install
-    dirPath =
-      std::filesystem::canonical(std::filesystem::path(execPath)).parent_path().parent_path();
+    dirPath = fs::canonical(fs::path(execPath)).parent_path().parent_path();
 
     // Add binary specific paths
 #if F3D_MACOS_BUNDLE
@@ -93,20 +93,20 @@ std::string F3DConfigFileTools::GetBinaryConfigFileDirectory()
     dirPath /= "share/f3d/configs";
 #endif
   }
-  catch (const std::filesystem::filesystem_error&)
+  catch (const fs::filesystem_error&)
   {
     f3d::log::debug("Cannot recover binary configuration file directory: ", dirPath.string());
-    return std::string();
+    return fs::path();
   }
 
-  return dirPath.string();
+  return dirPath;
 }
 
 //----------------------------------------------------------------------------
-std::string F3DConfigFileTools::GetConfigFilePath(const std::string& filename)
+fs::path F3DConfigFileTools::GetConfigFilePath(const std::string& configSearch)
 {
-  std::filesystem::path filePath;
-  std::vector<std::string> dirsToCheck;
+  fs::path configPath;
+  std::vector<fs::path> dirsToCheck;
   try
   {
     dirsToCheck.emplace_back(F3DConfigFileTools::GetUserConfigFileDirectory());
@@ -119,23 +119,23 @@ std::string F3DConfigFileTools::GetConfigFilePath(const std::string& filename)
 #endif
     dirsToCheck.emplace_back(F3DConfigFileTools::GetBinaryConfigFileDirectory());
 
-    for (std::string dir : dirsToCheck)
+    for (const fs::path& dir : dirsToCheck)
     {
       if (!dir.empty())
       {
-        filePath = std::filesystem::path(dir) / filename;
-        if (std::filesystem::exists(filePath))
+        configPath = dir / configSearch;
+        if (fs::exists(configPath))
         {
-          return filePath.string();
+          return configPath;
         }
       }
     }
-    f3d::log::debug("No configuration file (\"", filename, "\") found");
-    return std::string();
+    f3d::log::debug("No configuration file for \"", configSearch, "\" found");
+    return fs::path();
   }
-  catch (const std::filesystem::filesystem_error&)
+  catch (const fs::filesystem_error&)
   {
-    f3d::log::error("Error recovering configuration file path: ", filePath.string());
-    return std::string();
+    f3d::log::error("Error recovering configuration file path: ", configPath.string());
+    return fs::path();
   }
 }
