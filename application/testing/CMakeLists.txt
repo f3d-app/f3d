@@ -389,6 +389,7 @@ f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CM
 
 # Progress test
 f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
+f3d_test(NAME TestProgressScene DATA world.obj ARGS --progress NO_BASELINE)
 
 # Window position test
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
