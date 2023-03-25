@@ -86,11 +86,10 @@ std::string F3DConfigFileTools::GetBinaryConfigFileDirectory()
     dirPath =
       std::filesystem::canonical(std::filesystem::path(execPath)).parent_path().parent_path();
 
-    // Add platform specific paths
+    // Add binary specific paths
 #if F3D_MACOS_BUNDLE
     dirPath /= "Resources";
-#endif
-#ifdef __linux__
+#else
     dirPath /= "share/f3d";
 #endif
   }

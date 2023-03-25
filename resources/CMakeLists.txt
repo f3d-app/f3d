@@ -1,18 +1,20 @@
-list(APPEND config_files
-     "${CMAKE_CURRENT_SOURCE_DIR}/config.json"
-     "${CMAKE_CURRENT_SOURCE_DIR}/thumbnail.json"
-    )
-
-# Default config file
+# Shared resources dir
+set(f3d_resources_dir "share/f3d")
 if (UNIX AND NOT APPLE)
-  if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
-    if (F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
-      install(FILES ${config_files}
-        DESTINATION "share/f3d" COMPONENT configuration)
-    else()
-      install(FILES ${config_files}
-        DESTINATION "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d" COMPONENT configuration)
-    endif()
+  if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE AND NOT F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
+    set(f3d_resources_dir "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d")
+  endif()
+endif()
+
+# Default config files
+if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
+  if(NOT APPLE OR NOT F3D_MACOS_BUNDLE) # MacOS Bundle config file is handled in the bundle directly
+    list(APPEND config_files
+         "${CMAKE_CURRENT_SOURCE_DIR}/config.json"
+         "${CMAKE_CURRENT_SOURCE_DIR}/thumbnail.json"
+        )
+    install(FILES ${config_files}
+      DESTINATION ${f3d_resources_dir} COMPONENT configuration)
   endif()
 endif()
 
@@ -50,17 +52,8 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
 elseif(WIN32)
   if (F3D_WINDOWS_INSTALL_LOGOS_FOR_NSIS_PACKAGING)
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/logo.ico"
-      DESTINATION "./${F3D_WINDOWS_RESOURCES_INSTALL_DIR}" COMPONENT assets)
+      DESTINATION "${f3d_resources_dir}" COMPONENT assets)
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/logotype64.bmp"
-      DESTINATION "./${F3D_WINDOWS_RESOURCES_INSTALL_DIR}" COMPONENT assets)
-  endif()
-  if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
-    install(FILES ${config_files}
-      DESTINATION "./${F3D_WINDOWS_RESOURCES_INSTALL_DIR}" COMPONENT configuration)
-  endif()
-elseif(APPLE AND NOT F3D_MACOS_BUNDLE)
-  if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
-    install(FILES ${config_files}
-      DESTINATION "." COMPONENT configuration)
+      DESTINATION "${f3d_resources_dir}" COMPONENT assets)
   endif()
 endif()

@@ -64,11 +64,11 @@ The configuration file possible locations depends on your operating system.
 They are considered in the below order and only the first found will be used.
 
  * Linux: `${XDG_CONFIG_HOME}/.config/f3d/config.json`, `~/.config/f3d/config.json`, `/etc/f3d/config.json`, `/usr/share/f3d/config.json`, `[install_dir]/share/f3d/config.json`
- * Windows: `%APPDATA%\f3d\config.json`, `[install_dir]\config.json`
+ * Windows: `%APPDATA%\f3d\config.json`, `[install_dir]\share\f3d\config.json`
  * macOS: `${XDG_CONFIG_HOME}/.config/f3d/config.json`, `~/.config/f3d/config.json`, `/usr/local/etc/f3d/config.json`, `f3d.app/Contents/Resources/config.json`
 
 The binary release will install the config files.
-On Linux, they will be installed in `[install_dir]/share/f3d/`, on Windows, it will be installed in the install directory, on macOS, it will be installed in the bundle.
+On Linux, they will be installed in `[install_dir]/share/f3d/`, on Windows, they will be installed in `[install_dir]\share\f3d\`, on macOS, it will be installed in the bundle.
 
 Please note there is a command line option to control the configuration file to read. Using it, one can specify an absolute/relative path for the configuration path, but also
 only the filename or filestem (`.json` will be added) to look for in the locations listed above, instead of looking for `config.json`, eg: `f3d --config=custom_config` will look
