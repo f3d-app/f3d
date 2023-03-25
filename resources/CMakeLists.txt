@@ -1,8 +1,9 @@
 # Shared resources dir
 set(f3d_resources_dir "share/f3d")
+set(f3d_configs_dir "${f3d_resources_dir}/configs")
 if (UNIX AND NOT APPLE)
   if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE AND NOT F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
-    set(f3d_resources_dir "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d")
+    set(f3d_configs_dir "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d")
   endif()
 endif()
 
@@ -14,7 +15,7 @@ if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
          "${CMAKE_CURRENT_SOURCE_DIR}/thumbnail.json"
         )
     install(FILES ${config_files}
-      DESTINATION ${f3d_resources_dir} COMPONENT configuration)
+      DESTINATION "${f3d_configs_dir}" COMPONENT configuration)
   endif()
 endif()
 
