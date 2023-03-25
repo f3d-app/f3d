@@ -176,6 +176,13 @@ f3d_test(NAME TestVerboseLoadPlugin ARGS --verbose REGEXP "Loading plugin \"nati
 f3d_test(NAME TestNonExistentPlugin ARGS --load-plugins=dummy REGEXP "Plugin failed to load" NO_BASELINE)
 f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalars --bar --comp=2 DEFAULT_LIGHTS)
 
+if(UNIX AND NOT APPLE)
+  # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
+  configure_file("${CMAKE_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
+  f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json DEFAULT_LIGHTS)
+  f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build DEFAULT_LIGHTS)
+endif()
+
 # color texture with opacity needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9467
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220811)
   f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --geometry-only --texture-base-color=${CMAKE_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.4 --depth-peeling DEFAULT_LIGHTS)
