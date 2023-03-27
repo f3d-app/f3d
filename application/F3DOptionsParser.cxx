@@ -20,6 +20,8 @@
 #include <utility>
 #include <vector>
 
+namespace fs = std::filesystem;
+
 //----------------------------------------------------------------------------
 class ConfigurationOptions
 {
@@ -496,33 +498,31 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
 {
   this->ConfigDic.clear();
 
-  std::string configFilename = "config.json";
-  bool search = true;
-
+  std::string configSearch = "config.json";
   if (!config.empty())
   {
-    auto path = std::filesystem::path(config);
+    auto path = fs::path(config);
     if (path.stem() == config)
     {
-      // Only a stem, add .json to it
-      configFilename = config + ".json";
+      // Only a stem, use as search string
+      configSearch = config + ".json";
     }
     else if (path.filename() == config)
     {
       // config filename provided
-      configFilename = config;
+      configSearch = config;
     }
     else
     {
-      // Assume its a full path and not search for a config file
-      search = false;
+      // Assume its a full path and do not search for a config path
+      configSearch = "";
     }
   }
 
-  std::string configFilePath;
-  if (search)
+  fs::path configFilePath;
+  if (!configSearch.empty())
   {
-    configFilePath = F3DConfigFileTools::GetConfigFilePath(configFilename);
+    configFilePath = F3DConfigFileTools::GetConfigFilePath(configSearch);
   }
   else
   {
@@ -541,40 +541,38 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
   // Recover an absolute canonical path to config file
   try
   {
-    configFilePath = std::filesystem::canonical(std::filesystem::path(configFilePath)).string();
+    configFilePath = fs::canonical(fs::path(configFilePath)).string();
   }
-  catch (const std::filesystem::filesystem_error&)
+  catch (const fs::filesystem_error&)
   {
-    f3d::log::error("Configuration file does not exist: ", configFilePath);
+    f3d::log::error("Configuration file does not exist: ", configFilePath.string());
     return false;
   }
+  f3d::log::debug("Using config file ", configFilePath.string());
 
   // Read config file
   std::ifstream file;
-  file.open(configFilePath.c_str());
+  file.open(configFilePath.string().c_str());
 
   if (!file.is_open())
   {
-    f3d::log::error("Unable to open the configuration file: ", configFilePath);
+    f3d::log::error("Unable to open the configuration file: ", configFilePath.string());
     return false;
   }
 
-  nlohmann::json j;
-
+  nlohmann::json json;
   try
   {
-    file >> j;
+    file >> json;
   }
   catch (const std::exception& ex)
   {
-    f3d::log::error("Unable to parse the configuration file ", configFilePath);
+    f3d::log::error("Unable to parse the configuration file ", configFilePath.string());
     f3d::log::error(ex.what());
     return false;
   }
 
-  f3d::log::debug("Using config file ", configFilePath);
-
-  for (const auto& regexpConfig : j.items())
+  for (const auto& regexpConfig : json.items())
   {
     std::map<std::string, std::string> localDic;
     for (const auto& prop : regexpConfig.value().items())
