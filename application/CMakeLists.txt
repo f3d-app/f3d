@@ -87,7 +87,7 @@ if(F3D_MACOS_BUNDLE)
 
   # Add default configuration
   if(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
-    set(f3d_CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json)
+    set(f3d_CONFIG ${CMAKE_SOURCE_DIR}/resources/configs)
     set_source_files_properties(${f3d_CONFIG} PROPERTIES
       MACOSX_PACKAGE_LOCATION "Resources")
     target_sources(f3d PRIVATE ${f3d_CONFIG})

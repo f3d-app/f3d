@@ -10,11 +10,7 @@ endif()
 # Default config files
 if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
   if(NOT APPLE OR NOT F3D_MACOS_BUNDLE) # MacOS Bundle config file is handled in the bundle directly
-    list(APPEND config_files
-         "${CMAKE_CURRENT_SOURCE_DIR}/config.json"
-         "${CMAKE_CURRENT_SOURCE_DIR}/thumbnail.json"
-        )
-    install(FILES ${config_files}
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/configs/"
       DESTINATION "${f3d_configs_dir}" COMPONENT configuration)
   endif()
 endif()

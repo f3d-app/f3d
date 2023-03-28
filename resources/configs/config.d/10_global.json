@@ -1,0 +1,12 @@
+{
+  "global":
+  {
+    "axis": true,
+    "tone-mapping": true,
+    "grid": true,
+    "progress": true,
+    "fxaa": true,
+    "filename": true,
+    "scalars": ""
+  }
+}
