@@ -1,0 +1,10 @@
+{
+  "global":
+  {
+    "scalars": "",
+    "fxaa": true,
+    "tone-mapping": true,
+    "no-background": true,
+    "max-size":100
+  }
+}

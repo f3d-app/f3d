@@ -15,7 +15,7 @@ namespace F3DConfigFileTools
 std::filesystem::path GetUserConfigFileDirectory();
 std::filesystem::path GetBinaryConfigFileDirectory();
 std::filesystem::path GetSystemConfigFileDirectory();
-std::filesystem::path GetConfigFilePath(const std::string& configSearch);
+std::filesystem::path GetConfigPath(const std::string& configSearch);
 }
 
 #endif

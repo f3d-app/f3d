@@ -103,7 +103,7 @@ fs::path F3DConfigFileTools::GetBinaryConfigFileDirectory()
 }
 
 //----------------------------------------------------------------------------
-fs::path F3DConfigFileTools::GetConfigFilePath(const std::string& configSearch)
+fs::path F3DConfigFileTools::GetConfigPath(const std::string& configSearch)
 {
   fs::path configPath;
   std::vector<fs::path> dirsToCheck;
@@ -121,9 +121,27 @@ fs::path F3DConfigFileTools::GetConfigFilePath(const std::string& configSearch)
 
     for (const fs::path& dir : dirsToCheck)
     {
-      if (!dir.empty())
+      if (dir.empty())
       {
-        configPath = dir / configSearch;
+        continue;
+      }
+
+      // If the config search is a stem, add extensions
+      if (fs::path(configSearch).stem() == configSearch)
+      {
+        for (const std::string& ext : { ".json", ".d" })
+        {
+          configPath = dir / (configSearch + ext);
+          if (fs::exists(configPath))
+          {
+            return configPath;
+          }
+        }
+      }
+      else
+      {
+        // If not, use directly
+        configPath = dir / (configSearch);
         if (fs::exists(configPath))
         {
           return configPath;

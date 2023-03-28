@@ -16,6 +16,7 @@
 #include <fstream>
 #include <iomanip>
 #include <regex>
+#include <set>
 #include <sstream>
 #include <utility>
 #include <vector>
@@ -498,18 +499,13 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
 {
   this->ConfigDic.clear();
 
-  std::string configSearch = "config.json";
+  std::string configSearch = "config";
   if (!config.empty())
   {
     auto path = fs::path(config);
-    if (path.stem() == config)
+    if (path.stem() == config || path.filename() == config)
     {
-      // Only a stem, use as search string
-      configSearch = config + ".json";
-    }
-    else if (path.filename() == config)
-    {
-      // config filename provided
+      // Only a stem or a filename, use as search string
       configSearch = config;
     }
     else
@@ -519,17 +515,17 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
     }
   }
 
-  fs::path configFilePath;
+  fs::path configPath;
   if (!configSearch.empty())
   {
-    configFilePath = F3DConfigFileTools::GetConfigFilePath(configSearch);
+    configPath = F3DConfigFileTools::GetConfigPath(configSearch);
   }
   else
   {
-    configFilePath = config;
+    configPath = config;
   }
 
-  if (configFilePath.empty())
+  if (configPath.empty())
   {
     if (!config.empty())
     {
@@ -541,63 +537,80 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
   // Recover an absolute canonical path to config file
   try
   {
-    configFilePath = fs::canonical(fs::path(configFilePath)).string();
+    configPath = fs::canonical(fs::path(configPath)).string();
   }
   catch (const fs::filesystem_error&)
   {
-    f3d::log::error("Configuration file does not exist: ", configFilePath.string());
+    f3d::log::error("Configuration file does not exist: ", configPath.string());
     return false;
   }
-  f3d::log::debug("Using config file ", configFilePath.string());
+  f3d::log::debug("Using config file ", configPath.string());
 
-  // Read config file
-  std::ifstream file;
-  file.open(configFilePath.string().c_str());
-
-  if (!file.is_open())
+  // Recover all config files if needed
+  std::set<fs::path> actualConfigFilePaths;
+  if (fs::is_directory(configPath))
   {
-    f3d::log::error("Unable to open the configuration file: ", configFilePath.string());
-    return false;
-  }
-
-  nlohmann::json json;
-  try
-  {
-    file >> json;
-  }
-  catch (const std::exception& ex)
-  {
-    f3d::log::error("Unable to parse the configuration file ", configFilePath.string());
-    f3d::log::error(ex.what());
-    return false;
-  }
-
-  for (const auto& regexpConfig : json.items())
-  {
-    std::map<std::string, std::string> localDic;
-    for (const auto& prop : regexpConfig.value().items())
+    for (auto& entry : std::filesystem::directory_iterator(configPath))
     {
-      if (prop.value().is_number() || prop.value().is_boolean())
+      actualConfigFilePaths.emplace(entry);
+    }
+  }
+  else
+  {
+    actualConfigFilePaths.emplace(configPath);
+  }
+
+  // Read config files
+  for (auto& configFilePath : actualConfigFilePaths)
+  {
+    std::ifstream file;
+    file.open(configFilePath.string().c_str());
+
+    if (!file.is_open())
+    {
+      f3d::log::error("Unable to open the configuration file: ", configFilePath.string());
+      return false;
+    }
+
+    nlohmann::json json;
+    try
+    {
+      file >> json;
+    }
+    catch (const std::exception& ex)
+    {
+      f3d::log::error("Unable to parse the configuration file ", configFilePath.string());
+      f3d::log::error(ex.what());
+      return false;
+    }
+
+    for (const auto& regexpConfig : json.items())
+    {
+      std::map<std::string, std::string> localDic;
+      for (const auto& prop : regexpConfig.value().items())
       {
-        localDic[prop.key()] = ToString(prop.value());
+        if (prop.value().is_number() || prop.value().is_boolean())
+        {
+          localDic[prop.key()] = ToString(prop.value());
+        }
+        else if (prop.value().is_string())
+        {
+          localDic[prop.key()] = prop.value().get<std::string>();
+        }
+        else
+        {
+          f3d::log::error(prop.key(), " must be a string, a boolean or a number");
+          return false;
+        }
       }
-      else if (prop.value().is_string())
+      if (regexpConfig.key() == "global")
       {
-        localDic[prop.key()] = prop.value().get<std::string>();
+        this->GlobalConfigDicEntry = localDic;
       }
       else
       {
-        f3d::log::error(prop.key(), " must be a string, a boolean or a number");
-        return false;
+        this->ConfigDic[regexpConfig.key()] = localDic;
       }
-    }
-    if (regexpConfig.key() == "global")
-    {
-      this->GlobalConfigDicEntry = localDic;
-    }
-    else
-    {
-      this->ConfigDic[regexpConfig.key()] = localDic;
     }
   }
 
