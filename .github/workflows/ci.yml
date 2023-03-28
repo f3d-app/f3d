@@ -313,6 +313,7 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         files: ${{github.workspace}}/source/coverage.info
+        version: "v0.1.15" # works better according to https://github.com/codecov/codecov-action/issues/598
 
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
