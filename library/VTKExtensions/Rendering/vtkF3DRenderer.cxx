@@ -986,7 +986,7 @@ void vtkF3DRenderer::Render()
     glGenQueries(1, &this->Timer);
   }
 
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
   glBeginQuery(GL_TIME_ELAPSED, this->Timer);
 #endif
 
@@ -1000,7 +1000,7 @@ void vtkF3DRenderer::Render()
   int fps = static_cast<int>(std::round(
     1.0 / (std::chrono::duration_cast<std::chrono::microseconds>(cpuElapsed).count() * 1e-6)));
 
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
   glEndQuery(GL_TIME_ELAPSED);
   GLint elapsed;
   glGetQueryObjectiv(this->Timer, GL_QUERY_RESULT, &elapsed);
