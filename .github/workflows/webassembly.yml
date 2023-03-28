@@ -1,0 +1,51 @@
+name: webassembly
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches:
+      - master
+
+jobs:
+  ci:
+    if: github.event.pull_request.draft == false
+
+    runs-on: ubuntu-latest
+    container: dockcross/web-wasm:20230116-670f7f7
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: 'false'
+
+    - name: Dependencies Dir
+      working-directory: ${{github.workspace}}
+      run: mkdir dependencies
+
+    - name: Install VTK dependency
+      uses: ./source/.github/actions/vtk-webassembly-install-dep
+
+    - name: Setup Directories
+      working-directory: ${{github.workspace}}
+      run: |
+         mkdir build
+         mkdir install
+
+    - name: Configure
+      working-directory: ${{github.workspace}}/build
+      run: >
+        cmake ../source
+        -DBUILD_SHARED_LIBS=OFF
+        -DCMAKE_INSTALL_PREFIX:PATH=../install
+        -DF3D_STRICT_BUILD=ON
+        -DF3D_PLUGIN_BUILD_EXODUS=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
+
+    - name: Build
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --parallel 2 --target install

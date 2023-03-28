@@ -33,6 +33,12 @@ init::init()
   vtkNew<vtkF3DObjectFactory> factory;
   vtkObjectFactory::RegisterFactory(factory);
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
+
+#ifdef __EMSCRIPTEN__
+  vtkObjectFactory::SetAllEnableFlags(0, "vtkRenderWindow", "vtkOpenGLRenderWindow");
+  vtkObjectFactory::SetAllEnableFlags(
+    0, "vtkRenderWindowInteractor", "vtkGenericRenderWindowInteractor");
+#endif
 }
 
 //----------------------------------------------------------------------------
