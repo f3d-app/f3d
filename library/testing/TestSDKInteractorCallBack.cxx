@@ -31,11 +31,8 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
 
   // Test callbacks
   std::string filename = "TestSDKInteractorCallBack";
-#if defined(_WIN32)
-  std::string interactionFilePath = std::string(argv[2]) + "..\\..\\" + filename + ".log";
-#else
+
   std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
-#endif
 
   inter.playInteraction(interactionFilePath); // Dragon.vtu; S
 
