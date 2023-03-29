@@ -22,7 +22,7 @@ f3d::engine::autoloadPlugins();
 f3d::engine eng();
 
 // Load a scene
-eng.getLoader().loadFullScene("path/to/file.ext");
+eng.getLoader().loadScene("path/to/file.ext");
 
 // Start rendering and interacting
 eng.getInteractor().start();

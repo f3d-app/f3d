@@ -82,7 +82,7 @@ int TestSDKLoader(int argc, char* argv[])
 
   try
   {
-    load.loadFullScene(empty);
+    load.loadScene(empty);
   }
   catch (const f3d::loader::load_failure_exception& ex)
   {
@@ -103,7 +103,7 @@ int TestSDKLoader(int argc, char* argv[])
 
   try
   {
-    load.loadFullScene(dummy);
+    load.loadScene(dummy);
     std::cerr << "Unexpected loadGeometry success with a dummy file" << std::endl;
     return EXIT_FAILURE;
   }
@@ -124,8 +124,8 @@ int TestSDKLoader(int argc, char* argv[])
 
   try
   {
-    load.loadFullScene(unsupported);
-    std::cerr << "Unexpected loadFullScene success with an unsupported file" << std::endl;
+    load.loadScene(unsupported);
+    std::cerr << "Unexpected loadScene success with an unsupported file" << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::loader::load_failure_exception& ex)
@@ -145,8 +145,8 @@ int TestSDKLoader(int argc, char* argv[])
 
   try
   {
-    load.loadFullScene(cow);
-    std::cerr << "Unexpected loadFullScene success with an incorrect file" << std::endl;
+    load.loadScene(cow);
+    std::cerr << "Unexpected loadScene success with an incorrect file" << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::loader::load_failure_exception& ex)
@@ -166,8 +166,8 @@ int TestSDKLoader(int argc, char* argv[])
 
   try
   {
-    load.loadFullScene(nonExistentFullScene);
-    std::cerr << "Unexpected loadFullScene success with a non existent file" << std::endl;
+    load.loadScene(nonExistentFullScene);
+    std::cerr << "Unexpected loadScene success with a non existent file" << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::loader::load_failure_exception& ex)
@@ -187,11 +187,11 @@ int TestSDKLoader(int argc, char* argv[])
 
   try
   {
-    load.loadFullScene(invalidFullScene);
+    load.loadScene(invalidFullScene);
   }
   catch (const f3d::loader::load_failure_exception& ex)
   {
-    std::cerr << "Unexpected loadFullScene failure with an invalid file" << std::endl;
+    std::cerr << "Unexpected loadScene failure with an invalid file" << std::endl;
     return EXIT_FAILURE;
   }
 

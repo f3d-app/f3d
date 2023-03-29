@@ -282,7 +282,7 @@ public:
       self->AnimationManager.StopAnimation();
       if (self->Loader.hasSceneReader(filesVec[0]))
       {
-        self->Loader.loadFullScene(filesVec[0]);
+        self->Loader.loadScene(filesVec[0]);
       }
       else if (self->Loader.hasGeometryReader(filesVec[0]))
       {

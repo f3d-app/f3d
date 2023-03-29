@@ -397,7 +397,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
         if (loader.hasSceneReader(filePath.string()) && !fileAppOptions.GeometryOnly &&
           !fileAppOptions.GroupGeometries)
         {
-          loader.loadFullScene(filePath.string());
+          loader.loadScene(filePath.string());
           this->Internals->LoadedFile = true;
         }
         else if (loader.hasGeometryReader(filePath.string()))
@@ -494,6 +494,10 @@ void F3DStarter::AddFile(const fs::path& path)
     if (it == this->Internals->FilesList.end())
     {
       this->Internals->FilesList.push_back(tmpPath);
+    }
+    else
+    {
+      f3d::log::warn("File ", tmpPath, " has already been added");
     }
   }
 }

@@ -107,7 +107,7 @@ PYBIND11_MODULE(f3d, module)
   // f3d::loader
   py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete> > loader(module, "loader");
   loader
-    .def("loadFullScene", &f3d::loader::loadFullScene, "Load a specific full scene file",
+    .def("loadScene", &f3d::loader::loadScene, "Load a specific full scene file",
       py::arg("path"))
     .def("loadGeometry", &f3d::loader::loadGeometry, "load geometry to a default scene");
 

@@ -37,7 +37,7 @@ namespace f3d
  * \code{.cpp}
  *  f3d::engine eng(f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR);
  *  f3d::loader& load = eng.getLoader();
- *  load.loadFullScene("path/to/file");
+ *  load.loadScene("path/to/file");
  *  f3d::interactor& inter = eng.getInteractor();
  *  inter.start();
  * \endcode

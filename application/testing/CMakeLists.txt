@@ -374,6 +374,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream 
     "${CMAKE_BINARY_DIR}/TestInteractionGroupGeometriesDrop.log")
 
   f3d_test(NAME TestInteractionGroupGeometriesDrop DATA mb/mb_1_0.vtp ARGS --group-geometries "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionGroupGeometriesDrop.log" DEFAULT_LIGHTS) #DropEvent mb_2_0.vtp
+
+  configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestInteractionDropSameFiles.log.in"
+    "${CMAKE_BINARY_DIR}/TestInteractionDropSameFiles.log")
+
+  f3d_test(NAME TestInteractionDropSameFiles ARGS -x "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropSameFiles.log")#DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
+
 endif()
 
 ## Tests to increase coverage

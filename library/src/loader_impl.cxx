@@ -239,7 +239,7 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
 }
 
 //----------------------------------------------------------------------------
-loader& loader_impl::loadFullScene(const std::string& filePath)
+loader& loader_impl::loadScene(const std::string& filePath)
 {
   if (filePath.empty())
   {
