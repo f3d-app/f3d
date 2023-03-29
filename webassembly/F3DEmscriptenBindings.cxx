@@ -28,8 +28,8 @@ f3d::options* getOptionsPtr(f3d::engine& e) { return &e.getOptions(); }
 f3d::options* toggle(f3d::options& o, const std::string& name) { return &o.toggle(name); }
 
 f3d::loader* getLoaderPtr(f3d::engine& e) { return &e.getLoader(); }
-f3d::loader* addFile(f3d::loader& l, const std::string& p) { return &l.addFile(p); }
-void loadFile(f3d::loader& l) { l.loadFile(); }
+f3d::loader* loadGeometry(f3d::loader& l, const std::string& p) { return &l.loadGeometry(p); }
+f3d::loader* loadScene(f3d::loader& l, const std::string& p) { return &l.loadScene(p); }
 
 f3d::window* getWindowPtr(f3d::engine& e) { return &e.getWindow(); }
 f3d::window* setSize(f3d::window& win, int w, int h) { return &win.setSize(w, h); }
@@ -51,8 +51,8 @@ EMSCRIPTEN_BINDINGS(f3d)
 
   // f3d::loader
   emscripten::class_<f3d::loader>("Loader")
-    .function("addFile", &addFile, emscripten::allow_raw_pointers())
-    .function("loadFile", &loadFile);
+    .function("loadGeometry", &loadGeometry, emscripten::allow_raw_pointers())
+    .function("loadScene", &loadScene, emscripten::allow_raw_pointers());
 
   // f3d::window
   emscripten::class_<f3d::window>("Window")
