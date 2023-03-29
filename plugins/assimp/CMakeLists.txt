@@ -1,4 +1,15 @@
-include(${CMAKE_SOURCE_DIR}/cmake/f3dPlugin.cmake)
+cmake_minimum_required(VERSION 3.19)
+
+project(f3d-plugin-assimp)
+
+include(GNUInstallDirs)
+
+# Check if the plugin is built externally
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  find_package(f3d REQUIRED)
+else()
+  include(${CMAKE_SOURCE_DIR}/cmake/f3dPlugin.cmake)
+endif()
 
 find_package(assimp 5.0 REQUIRED)
 
