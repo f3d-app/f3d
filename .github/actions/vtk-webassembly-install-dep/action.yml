@@ -14,8 +14,8 @@ runs:
       id: cache-vtk
       uses: actions/cache@v3
       with:
-        path: dependencies/vtk_build
-        key: vtk-webassembly-${{env.VTK_SHA}}-1
+        path: dependencies/vtk_install
+        key: vtk-webassembly-${{env.VTK_SHA}}-2
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
