@@ -11,7 +11,7 @@ int TestSDKCompareWithFile(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   win.setSize(300, 300);
 
-  load.addFile(std::string(argv[1]) + "/data/cow.vtp").loadFile();
+  load.loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
            std::string(argv[2]), "TestSDKCompareWithFile", 50)

@@ -26,6 +26,7 @@ Options|Default|Description
 \-\-quiet||Enable quiet mode, which supersede any verbose options. No console output will be generated at all.
 \-\-progress||Show a *progress bar* when loading the file.
 \-\-geometry-only||For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
+\-\-group-geometries||When opening multiple files, show them all in the same scene.<br>Force geometry-only. The configuration file for the first file will be loaded.
 \-\-up=\<[+\|-][X\|Y\|Z]\>|+Y|Define the Up direction.
 -x, \-\-axis||Show *axes* as a trihedron in the scene.
 -g, \-\-grid||Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.
@@ -71,7 +72,7 @@ Options|Default|Description
 
 Options|Default|Description
 ------|------|------
--s, \-\-scalars=\<array_name\>||Specify an array to *Color* with if present in the file. If no array_name is provided, one will be picked if any are available. <br>Requires a default scene.<br>Use \-\-verbose to recover the usable array names.
+-s, \-\-scalars=\<array_name\>||Specify an array to *Color* with if present in the file. If no array_name is provided, the first in alphabetical order will be picked if any are available. <br>Requires a default scene.<br>Use \-\-verbose to recover the usable array names.
 -y, \-\-comp=\<comp_index\>|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. -1 means *magnitude*. -2 or the short option, -y, means *direct values*.<br>When using *direct values*, components are used as L, LA, RGB, RGBA values depending on the number of components.
 -c, \-\-cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
 \-\-range=\<min,max\>||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.

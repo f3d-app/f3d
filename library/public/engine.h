@@ -22,16 +22,26 @@ namespace f3d
  * Configured on creation using an enum, then all objects
  * can be accessed through their getter.
  *
- * Example usage:
+ * Example usage for a default scene file:
  *
  * \code{.cpp}
  *  f3d::engine eng(f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR);
  *  f3d::loader& load = eng.getLoader();
- *  load.addFile("path/to/file");
- *  load.loadFile(f3d::loader::LoadFileEnum::LOAD_CURRENT);
+ *  load.loadGeometry("path/to/file").loadGeometry("path/to/another/file");
  *  f3d::interactor& inter = eng.getInteractor();
  *  inter.start();
  * \endcode
+ *
+ * Example usage for a full scene file:
+ *
+ * \code{.cpp}
+ *  f3d::engine eng(f3d::engine::CREATE_WINDOW | f3d::engine::CREATE_INTERACTOR);
+ *  f3d::loader& load = eng.getLoader();
+ *  load.loadScene("path/to/file");
+ *  f3d::interactor& inter = eng.getInteractor();
+ *  inter.start();
+ * \endcode
+
  */
 class F3D_EXPORT engine
 {
@@ -153,6 +163,8 @@ public:
     std::vector<std::string> Extensions;
     std::vector<std::string> MimeTypes;
     std::string PluginName;
+    bool HasSceneReader;
+    bool HasGeometryReader;
   };
 
   /**

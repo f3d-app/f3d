@@ -51,6 +51,7 @@ public:
   void SetHDRIFile(const std::string& hdriFile);
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);
+  void SetFilenameInfo(const std::string& info);
   ///@}
 
   ///@{
@@ -91,7 +92,7 @@ public:
    * Initialize the renderer actors and flags.
    * Should be called after being added to a vtkRenderWindow.
    */
-  virtual void Initialize(const std::string& fileInfo, const std::string& up);
+  virtual void Initialize(const std::string& up);
 
   /**
    * Get the OpenGL skybox

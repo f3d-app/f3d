@@ -19,7 +19,7 @@ engine.getWindow().setSize(300, 300)
 assert engine.getWindow().getWidth() == 300
 assert engine.getWindow().getHeight() == 300
 
-engine.getLoader().addFile(dataset).loadFile()
+engine.getLoader().loadGeometry(dataset, True)
 
 img = engine.getWindow().renderToImage()
 img.save(output)

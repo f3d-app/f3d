@@ -12,15 +12,14 @@
 
 #include "vtkF3DRenderer.h"
 
-// Include needed because of the smart pointers macro
-#include <vtkPointGaussianMapper.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkScalarBarActor.h>
-#include <vtkSmartVolumeMapper.h>
+#include "vtkF3DGenericImporter.h"
 
-class vtkDataArray;
+#include <vtkWeakPointer.h>
+
 class vtkColorTransferFunction;
+class vtkDataArray;
 class vtkDataSetAttributes;
+class vtkScalarBarActor;
 
 class vtkF3DRendererWithColoring : public vtkF3DRenderer
 {
@@ -31,46 +30,38 @@ public:
   /**
    * Initialize all actors and flags
    */
-  void Initialize(const std::string& fileInfo, const std::string& up) override;
+  void Initialize(const std::string& up) override;
 
   /**
    * Set the pointSize on the pointGaussianMapper as well as calls superclass implementation.
    */
   void SetPointSize(double pointSize) override;
 
-  ///@{
   /**
    * Set the visibility of the scalar bar.
    * It will only be shown when coloring and not
    * using direct scalars rendering.
    */
   void ShowScalarBar(bool show);
-  ///@}
 
-  ///@{
   /**
    * Set the visibility of the point sprites actor.
    * It will only be shown if raytracing and volume are not enabled
    */
   void SetUsePointSprites(bool use);
-  ///@}
 
-  ///@{
   /**
    * Set the visibility of the volume actor.
    * It will only be shown if the data is compatible with volume rendering
    * and raytracing is not enabled
    */
   void SetUseVolume(bool use);
-  ///@}
 
-  ///@{
   /**
    * Set the use of an inverted opacity function
    * for volume rendering..
    */
   void SetUseInverseOpacityFunction(bool use);
-  ///@}
 
   /**
    * Set the range of the scalar bar
@@ -84,78 +75,23 @@ public:
    */
   void SetColormap(const std::vector<double>& colormap);
 
-  enum CycleTypeEnum
+  enum class CycleType
   {
-    F3D_FIELD_CYCLE = 0,
-    F3D_ARRAY_CYCLE,
-    F3D_COMPONENT_CYCLE
+    NONE,
+    FIELD,
+    ARRAY_INDEX,
+    COMPONENT
   };
 
   /**
    * Cycle the shown scalars according to the cycle type
    */
-  void CycleScalars(int cycleType);
-
-  ///@{
-  /**
-   * Set/Get the scalar bar actor, used for hotkey purposes
-   */
-  vtkGetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
-  vtkSetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
-  ///@}
-
-  ///@{
-  /**
-   * Set/Get the geometry actor
-   */
-  vtkGetSmartPointerMacro(GeometryActor, vtkActor);
-  vtkSetSmartPointerMacro(GeometryActor, vtkActor);
-  ///@}
-
-  ///@{
-  /**
-   * Set/Get the point sprites actor
-   */
-  vtkGetSmartPointerMacro(PointSpritesActor, vtkActor);
-  vtkSetSmartPointerMacro(PointSpritesActor, vtkActor);
-  ///@}
-
-  ///@{
-  /**
-   * Set/Get the volume prop
-   */
-  vtkGetSmartPointerMacro(VolumeProp, vtkVolume);
-  vtkSetSmartPointerMacro(VolumeProp, vtkVolume);
-  ///@}
-
-  ///@{
-  /**
-   * Set/Get the polydata mapper
-   */
-  vtkGetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
-  vtkSetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
-  ///@}
-
-  ///@{
-  /**
-   * Set/Get the point gaussian mapper, used for hotkey purposes
-   */
-  vtkGetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
-  vtkSetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
-  ///@}
-
-  ///@{
-  /**
-   * Set/Get the volume mapper, used for hotkey purposes
-   */
-  vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
-  vtkSetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
-  ///@}
+  void CycleScalars(CycleType type);
 
   /**
-   * Set the coloring attributes, call before SetColoring.
+   * Set the generic importer to handle coloring and other actors related actions with.
    */
-  void SetColoringAttributes(vtkDataSetAttributes* pointData, vtkDataSetAttributes* cellData);
+  void SetImporter(vtkF3DGenericImporter* importer);
 
   /**
    * Set the coloring, call after SetColoringAttributes.
@@ -166,7 +102,7 @@ public:
 
   ///@{
   /**
-   * Get current coloring infomatiuons,
+   * Get current coloring information,
    * Useful after using Cycle methods
    */
   bool GetColoringUseCell();
@@ -188,42 +124,40 @@ protected:
   vtkF3DRendererWithColoring() = default;
   ~vtkF3DRendererWithColoring() override = default;
 
+  /**
+   * Convenience method for configuring a poly data mapper for coloring
+   */
   static void ConfigureMapperForColoring(vtkPolyDataMapper* mapper, vtkDataArray* array,
     int component, vtkColorTransferFunction* ctf, double range[2], bool cellFlag = false);
 
+  /**
+   * Convenience method for configuring a volume mapper and volume for coloring
+   */
   static void ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
     vtkDataArray* array, int component, vtkColorTransferFunction* ctf, double range[2],
     bool cellFlag = false, bool inverseOpacityFlag = false);
 
-  void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, vtkDataArray* array,
+  /**
+   * Convenience method for configuring a scalar bar actor for coloring
+   */
+  void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, std::string arrayName,
     int component, vtkColorTransferFunction* ctf);
 
-  void ConfigureRangeAndCTFForColoring(vtkDataArray* array, int component);
-
-  void UpdateScalarBarVisibility();
-
-  void FillCheatSheetHotkeys(std::stringstream& sheet) override;
+  /**
+   * Configure internal range and color transfer function according to provided
+   * coloring info
+   */
+  void ConfigureRangeAndCTFForColoring(const vtkF3DGenericImporter::ColoringInfo& info);
 
   /**
-   * Look for an arrayIndex in a vtkDataSetAttributes based on an arrayName
-   * Returns the arrayIndex or -1 if not found
+   * Fill cheatsheet hotkeys string stream
    */
-  static int FindArrayIndexForColoring(
-    vtkDataSetAttributes* dataForColoring, const std::string& arrayName);
+  void FillCheatSheetHotkeys(std::stringstream& sheet) override;
 
   /**
    * Switch between point data and cell data coloring
    */
   void CycleFieldForColoring();
-
-  /**
-   * Cycle the array used for coloring
-   * This will iterate over the current DataForColoring
-   * until it find a valid array or cycle back to non coloring
-   * Set checkCurrent to true to check the current array index
-   * before incrementing
-   */
-  void CycleArrayForColoring(bool checkCurrent = false);
 
   /**
    * Increment the array index or loop it back
@@ -234,21 +168,24 @@ protected:
 
   /**
    * Cycle the component in used for rendering
-   * looping back to direct scalars if supported or magnitude.
+   * looping back to direct scalars
    */
   void CycleComponentForColoring();
 
   /**
-   * A method that checks if the current component is valid
-   * if not, it will reset it to 0
+   * Check coloring is currently valid and return a cycle type to perform if not
    */
-  void CheckCurrentComponentForColoring();
+  CycleType CheckColoring();
 
+  /**
+   * Generate a padded metadata description
+   * using the internal importer
+   */
   std::string GenerateMetaDataDescription() override;
 
   /**
    * Convert a component index into a string
-   * If there is a component name defined in the data array, display it.
+   * If there is a component name defined in the current coloring information, display it.
    * Otherwise, use component #index as the default value.
    */
   std::string ComponentToString(int component);
@@ -258,33 +195,22 @@ protected:
    */
   static std::string ShortName(const std::string& name, int component);
 
-  vtkSmartPointer<vtkActor> GeometryActor;
-  vtkSmartPointer<vtkActor> PointSpritesActor;
-  vtkSmartPointer<vtkVolume> VolumeProp;
+  vtkWeakPointer<vtkF3DGenericImporter> Importer = nullptr;
 
-  vtkSmartPointer<vtkScalarBarActor> ScalarBarActor;
+  vtkNew<vtkScalarBarActor> ScalarBarActor;
   bool ScalarBarActorConfigured = false;
 
-  vtkSmartPointer<vtkPolyDataMapper> PolyDataMapper;
   bool PolyDataMapperConfigured = false;
-
-  vtkSmartPointer<vtkPointGaussianMapper> PointGaussianMapper;
   bool PointGaussianMapperConfigured = false;
-
-  vtkSmartPointer<vtkSmartVolumeMapper> VolumeMapper;
   bool VolumeConfigured = false;
 
   vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
   double ColorRange[2];
   bool ColorTransferFunctionConfigured = false;
 
-  vtkDataSetAttributes* PointDataForColoring = nullptr;
-  vtkDataSetAttributes* CellDataForColoring = nullptr;
+  bool UseCellColoring = false;
   int ArrayIndexForColoring = -1;
   int ComponentForColoring = -1;
-
-  vtkDataSetAttributes* DataForColoring = nullptr;
-  vtkDataArray* ArrayForColoring = nullptr;
 
   bool ScalarBarVisible = false;
   bool UsePointSprites = false;

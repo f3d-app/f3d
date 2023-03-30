@@ -8,19 +8,24 @@
 
 #include "vtkF3DPostProcessFilter.h"
 
-#include <vtkAlgorithm.h>
+#include <vtkBoundingBox.h>
 #include <vtkImporter.h>
+#include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkVersion.h>
 
+#include <array>
+#include <limits>
+#include <memory>
+#include <set>
+#include <vector>
+
 class vtkActor;
 class vtkVolume;
-class vtkPolyDataMapper;
 class vtkMultiBlockDataSet;
 class vtkPointGaussianMapper;
 class vtkPolyDataMapper;
 class vtkSmartVolumeMapper;
-class vtkScalarBarActor;
 class vtkTexture;
 
 class vtkF3DGenericImporter : public vtkImporter
@@ -32,9 +37,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Specify the VTK reader.
+   * Add an internal reader to generate actors from
    */
-  void SetInternalReader(vtkAlgorithm* reader);
+  void AddInternalReader(const std::string& name, vtkSmartPointer<vtkAlgorithm> reader);
+
+  /**
+   * Remove all internal readers
+   */
+  void RemoveInternalReaders();
 
   /**
    * Check if the file can be read.
@@ -45,6 +55,7 @@ public:
    * Get a string describing the outputs
    */
   std::string GetOutputsDescription() override;
+  std::string GetMetaDataDescription(); // TODO add to vtkImporter in VTK ?
 
   ///@{
   /**
@@ -52,35 +63,60 @@ public:
    */
   static std::string GetMultiBlockDescription(vtkMultiBlockDataSet* mb, vtkIndent indent);
   static std::string GetDataObjectDescription(vtkDataObject* object);
+  static std::string GetMetaDataDescription(vtkDataObject* object);
   ///@}
 
   ///@{
   /**
-   * Access to specific actors
+   * Access to actors vectors. They all have the same size, which correspond to the number
+   * of added internal readers.
    */
-  vtkGetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
-  vtkGetSmartPointerMacro(GeometryActor, vtkActor);
-  vtkGetSmartPointerMacro(PointSpritesActor, vtkActor);
-  vtkGetSmartPointerMacro(VolumeProp, vtkVolume);
+  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > GetGeometryActorsAndMappers();
+  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > GetPointSpritesActorsAndMappers();
+  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > GetVolumePropsAndMappers();
   ///@}
 
-  ///@{
   /**
-   * Access to specific mappers
+   * A struct containing information about possible coloring
    */
-  vtkGetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
-  vtkGetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
-  vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
-  ///@}
+  struct ColoringInfo
+  {
+    std::string Name;
+    int MaximumNumberOfComponents = 0;
+    std::vector<std::string> ComponentNames;
+    std::vector<std::array<double, 2> > ComponentRanges;
+    std::array<double, 2> MagnitudeRange = { std::numeric_limits<float>::max(),
+      std::numeric_limits<float>::min() };
+    std::vector<vtkDataArray*> Arrays;
+  };
 
-  ///@{
   /**
-   * Access to specific attributes
+   * Recover information about coloring by index
+   * Should be called after actors have been imported
    */
-  vtkGetObjectMacro(PointDataForColoring, vtkDataSetAttributes);
-  vtkGetObjectMacro(CellDataForColoring, vtkDataSetAttributes);
-  ///@}
+  bool GetInfoForColoring(bool useCellData, int index, ColoringInfo& info);
 
+  /**
+   * Get the maximum index possible for coloring
+   * Should be called after actors have been imported
+   */
+  int GetNumberOfIndexesForColoring(bool useCellData);
+
+  /**
+   * Find an index for coloring corresponding to provided arrayName if available
+   * Should be called after actors have been imported
+   */
+  int FindIndexForColoring(bool useCellData, std::string arrayName);
+
+  /**
+   * Get the bounding box of all geometry actors
+   * Should be called after actors have been imported
+   */
+  const vtkBoundingBox& GetGeometryBoundingBox();
+
+  /**
+   * Update readers and all pipelines on the specified timestep
+   */
   void UpdateTimeStep(double timestep) override;
 
   /**
@@ -121,9 +157,8 @@ public:
 
   ///@{
   /**
-   * Setter for all actor loading options
+   * Setter for all actor loading options TODO move to renderer
    */
-  vtkSetMacro(PointSize, double);
   vtkSetVector3Macro(SurfaceColor, double);
   vtkSetVector3Macro(EmissiveFactor, double);
   vtkSetMacro(Opacity, double);
@@ -138,41 +173,29 @@ public:
   ///@}
 
 protected:
-  vtkF3DGenericImporter() = default;
+  vtkF3DGenericImporter();
   ~vtkF3DGenericImporter() override = default;
-
-  int ImportBegin() override;
 
   /* Standard ImportActors
    * None of the actors are shown by default
    */
   void ImportActors(vtkRenderer*) override;
 
-  vtkSmartPointer<vtkTexture> GetTexture(const std::string& fileName, bool isSRGB = false);
-
+  /**
+   * Update temporal information according to currently added readers
+   */
   void UpdateTemporalInformation();
 
-  vtkSmartPointer<vtkAlgorithm> Reader;
+  /**
+   * Update coloring information vectors according to
+   * currently added vectors
+   */
+  void UpdateColoringVectors(bool useCellData);
 
-  vtkNew<vtkScalarBarActor> ScalarBarActor;
-  vtkNew<vtkActor> GeometryActor;
-  vtkNew<vtkActor> PointSpritesActor;
-  vtkNew<vtkVolume> VolumeProp;
-  vtkNew<vtkPolyDataMapper> PolyDataMapper;
-  vtkNew<vtkPointGaussianMapper> PointGaussianMapper;
-  vtkNew<vtkSmartVolumeMapper> VolumeMapper;
-  std::string OutputDescription;
+private:
+  vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;
+  void operator=(const vtkF3DGenericImporter&) = delete;
 
-  vtkDataSetAttributes* PointDataForColoring = nullptr;
-  vtkDataSetAttributes* CellDataForColoring = nullptr;
-
-  bool AnimationEnabled = false;
-  int NbTimeSteps = -1;
-  double* TimeSteps = nullptr;
-  double* TimeRange = nullptr;
-  vtkNew<vtkF3DPostProcessFilter> PostPro;
-
-  double PointSize = 10.;
   double Opacity = 1.;
   double Roughness = 0.3;
   double Metallic = 0.;
@@ -185,9 +208,8 @@ protected:
   std::string TextureEmissive;
   std::string TextureNormal;
 
-private:
-  vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;
-  void operator=(const vtkF3DGenericImporter&) = delete;
+  struct Internals;
+  std::unique_ptr<Internals> Pimpl;
 };
 
 #endif

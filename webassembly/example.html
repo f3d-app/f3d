@@ -33,7 +33,7 @@
       Module.Engine.autoloadPlugins();
       var eng = new Module.Engine();
 
-      eng.getLoader().addFile('/dragon.vtu').loadFile();
+      eng.getLoader().loadGeometry('/dragon.vtu');
 
       eng.getOptions().toggle('render.grid.enable');
       eng.getOptions().toggle('render.effect.fxaa');

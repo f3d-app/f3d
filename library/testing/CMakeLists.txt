@@ -13,7 +13,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   list(APPEND libf3dSDKTests_list
     TestSDKCompareWithFile.cxx
     TestSDKImage.cxx
-    TestSDKInteractionDirectory.cxx
+    TestSDKMultiColoring.cxx
     TestSDKWindowNative.cxx
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx
@@ -39,12 +39,15 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519)
   list(APPEND libf3dSDKTests_list
     TestSDKInteractorCallBack.cxx
+    TestSDKInteractorDropFullScene.cxx
     )
 endif()
 
 # Configure the log file for dropfile test
 configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack.log.in"
                "${CMAKE_BINARY_DIR}/TestSDKInteractorCallBack.log") # Dragon.vtu; S
+configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullScene.log.in"
+               "${CMAKE_BINARY_DIR}/TestSDKInteractorDropFullScene.log") # world.obj; S
 
 # External window tests
 if(F3D_MODULE_EXTERNAL_RENDERING AND VTK_VERSION VERSION_GREATER 9.0.1)

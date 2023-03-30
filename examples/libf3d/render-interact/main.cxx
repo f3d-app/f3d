@@ -22,8 +22,7 @@ int main(int argc, char** argv)
   f3d::engine eng(f3d::window::Type::NATIVE);
 
   // Load a model
-  f3d::loader& load = eng.getLoader();
-  load.addFile(std::string(argv[1])).loadFile();
+  f3d::loader& load = eng.getLoader().loadGeometry(std::string(argv[1]));
 
   // Render
   f3d::window& win = eng.getWindow();

@@ -243,6 +243,8 @@ std::vector<engine::readerInformation> engine::getReadersInfo()
       info.Description = reader->getLongDescription();
       info.Extensions = reader->getExtensions();
       info.MimeTypes = reader->getMimeTypes();
+      info.HasSceneReader = reader->hasSceneReader();
+      info.HasGeometryReader = reader->hasGeometryReader();
       readersInfo.push_back(info);
     }
   }

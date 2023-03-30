@@ -65,13 +65,23 @@ public:
 #endif
 
 #if @F3D_READER_HAS_GEOMETRY_READER@
+  /**
+   * Return true if this reader can create a geometry reader
+   * false otherwise
+   */
+  bool hasGeometryReader() override
+  {
+    return true;
+  }
+
   /*
    * Create the geometry reader (VTK reader) for the given filename
+   * The filename is collapsed as some VTK reader needs it to read reliably TODO add issue
    */
   vtkSmartPointer<vtkAlgorithm> createGeometryReader(const std::string& fileName) const override
   {
     vtkNew<@F3D_READER_VTK_READER@> geomReader;
-    geomReader->SetFileName(fileName.c_str());
+    geomReader->SetFileName(vtksys::SystemTools::CollapseFullPath(fileName).c_str());
 
     this->applyCustomReader(geomReader, fileName);
 
@@ -80,13 +90,23 @@ public:
 #endif
 
 #if @F3D_READER_HAS_SCENE_READER@
+  /**
+   * Return true if this reader can create a scene reader
+   * false otherwise
+   */
+  bool hasSceneReader() override
+  {
+    return true;
+  }
+
   /*
    * Create the scene reader (VTK importer) for the given filename
+   * The filename is collapsed as some VTK reader needs it to read reliably TODO add issue
    */
   vtkSmartPointer<vtkImporter> createSceneReader(const std::string& fileName) const override
   {
     vtkNew<@F3D_READER_VTK_IMPORTER@> importer;
-    importer->SetFileName(fileName.c_str());
+    importer->SetFileName(vtksys::SystemTools::CollapseFullPath(fileName).c_str());
 
     this->applyCustomImporter(importer, fileName);
 

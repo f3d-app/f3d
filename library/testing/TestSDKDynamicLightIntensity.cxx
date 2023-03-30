@@ -13,7 +13,7 @@ int TestSDKDynamicLightIntensity(int argc, char* argv[])
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
 
-  load.addFile(std::string(argv[1]) + "/data/cow.vtp").loadFile();
+  load.loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
 
   win.render();
 
