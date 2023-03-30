@@ -8,6 +8,7 @@ DEPENDS
   VTK::RenderingOpenGL2
   VTK::RenderingVolumeOpenGL2
   VTK::opengl
+  f3d::VTKExtensionsReaders
 PRIVATE_DEPENDS
   VTK::IOImage
   VTK::IOXML

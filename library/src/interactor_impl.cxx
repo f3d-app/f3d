@@ -100,7 +100,7 @@ public:
       case 'C':
         if (renWithColor)
         {
-          renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
+          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::FIELD);
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
@@ -109,7 +109,7 @@ public:
       case 'S':
         if (renWithColor)
         {
-          renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
+          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::ARRAY_INDEX);
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
@@ -118,7 +118,7 @@ public:
       case 'Y':
         if (renWithColor)
         {
-          renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
+          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::COMPONENT);
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
@@ -232,28 +232,7 @@ public:
         self->Window.PrintSceneDescription(log::VerboseLevel::INFO);
         break;
       default:
-        if (keySym == "Left")
-        {
-          self->AnimationManager.StopAnimation();
-          loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_PREVIOUS;
-          self->Loader.loadFile(load);
-          render = true;
-        }
-        else if (keySym == "Right")
-        {
-          self->AnimationManager.StopAnimation();
-          loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_NEXT;
-          self->Loader.loadFile(load);
-          render = true;
-        }
-        else if (keySym == "Up")
-        {
-          self->AnimationManager.StopAnimation();
-          loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_CURRENT;
-          self->Loader.loadFile(load);
-          render = true;
-        }
-        else if (keySym == F3D_EXIT_HOTKEY_SYM)
+        if (keySym == F3D_EXIT_HOTKEY_SYM)
         {
           self->StopInteractor();
         }
@@ -297,14 +276,20 @@ public:
       return;
     }
 
-    // No user defined behavior, use standard behavior
-    self->AnimationManager.StopAnimation();
-    for (std::string file : filesVec)
+    // No user defined behavior, load the first file
+    if (filesVec.size() > 0)
     {
-      self->Loader.addFile(file);
+      self->AnimationManager.StopAnimation();
+      if (self->Loader.hasSceneReader(filesVec[0]))
+      {
+        self->Loader.loadScene(filesVec[0]);
+      }
+      else if (self->Loader.hasGeometryReader(filesVec[0]))
+      {
+        self->Loader.loadGeometry(filesVec[0], true);
+      }
+      self->Window.render();
     }
-    self->Loader.loadFile(loader::LoadFileEnum::LOAD_LAST);
-    self->Window.render();
   }
 
   static void OnMiddleButtonPress(vtkObject*, unsigned long, void* clientData, void*)

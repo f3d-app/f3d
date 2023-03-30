@@ -85,6 +85,12 @@ public:
   virtual int getScore() const { return 50; }
 
   /**
+   * Return true if this reader can create a geometry reader
+   * false otherwise
+   */
+  virtual bool hasGeometryReader() { return false; }
+
+  /**
    * Create the geometry reader (VTK reader) for the given filename
    */
   virtual vtkSmartPointer<vtkAlgorithm> createGeometryReader(const std::string&) const
@@ -96,6 +102,12 @@ public:
    * Apply custom code for the reader
    */
   virtual void applyCustomReader(vtkAlgorithm*, const std::string&) const {}
+
+  /**
+   * Return true if this reader can create a scene reader
+   * false otherwise
+   */
+  virtual bool hasSceneReader() { return false; }
 
   /**
    * Create the scene reader (VTK importer) for the given filename

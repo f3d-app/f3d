@@ -109,7 +109,6 @@ options::options()
   // Scene
   this->Internals->init("scene.animation.index", 0);
   this->Internals->init("scene.camera.index", -1);
-  this->Internals->init("scene.geometry-only", false);
   this->Internals->init("scene.up-direction", std::string("+Y"));
 
   // Render
@@ -139,6 +138,7 @@ options::options()
   // UI
   this->Internals->init("ui.bar", false);
   this->Internals->init("ui.filename", false);
+  this->Internals->init("ui.filename-info", std::string());
   this->Internals->init("ui.fps", false);
   this->Internals->init("ui.cheatsheet", false);
   this->Internals->init("ui.metadata", false);

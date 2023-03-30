@@ -1,6 +1,7 @@
 #ifndef f3d_loader_h
 #define f3d_loader_h
 
+#include "exception.h"
 #include "export.h"
 
 #include <string>
@@ -12,76 +13,64 @@ namespace f3d
  * @class   loader
  * @brief   Class to load files in F3D
  *
- * A class to load files in F3D.
- * Multiple files and folders can be added using addFiles/addFile and stored
- * in an internal list, with a index pointing to a "current" file.
- * Then files from the list can be loaded one by one using loadFile method.
- * Information about the files in the list can be recovered using getFileInfo.
- * The current file can be changed either on loadFile with a dedicated enum or
- * by using setCurrentFileIndex.
+ * A class to load files in F3D. The loader can load a full scene or multiple geometries into a
+ * default scene. It also support checking if a scene or geometry reader is available for a given
+ * file.
+ *
+ * Example usage:
+ *
+ *  std::string path = ...
+ *  f3d::engine eng(f3d::window::Type::NATIVE);
+ *  f3d::loader& load = eng.getLoader();
+ *
+ *  if (load.hasSceneReader(path)
+ *  {
+ *    load.loadScene(path);
+ *  }
+ *  else if (load.hasGeometryReader(path)
+ *  {
+ *    load.loadGeometry(path);
+ *  }
+ *
  */
 class F3D_EXPORT loader
 {
 public:
   /**
-   * An enum used in loadFile to select which file to load.
+   * An exception that can be thrown by the loader
+   * when it failed to load a file for some reason.
    */
-  enum class LoadFileEnum
+  struct load_failure_exception : public exception
   {
-    LOAD_FIRST,
-    LOAD_PREVIOUS,
-    LOAD_CURRENT,
-    LOAD_NEXT,
-    LOAD_LAST
+    load_failure_exception(const std::string& what = "")
+      : exception(what){};
   };
 
   /**
-   * Add a list of files or directories to be loaded.
-   * Set recursive to true to load folder recursively instead of only files.
-   * Duplicate will not be added.
+   * Return true if the loader has a geometry reader for the providen file, false otherwise.
    */
-  virtual loader& addFiles(const std::vector<std::string>& files, bool recursive = false) = 0;
+  virtual bool hasGeometryReader(const std::string& filePath) = 0;
 
   /**
-   * Add a file or directory (all files in) to be loaded.
-   * Set recursive to true to load folder recursively instead of only files.
+   * Load a geometry from a provided file to the scene.
+   * Reset the scene before loading if a full scene was loaded previously or if reset is set to
+   * false, do not reset if only loaded geometries previously. Geometries loader using this method
+   * will be available in a default scene and use all default scene related options. Throw a
+   * load_failure_exception on failure.
    */
-  virtual loader& addFile(const std::string& path, bool recursive = false) = 0;
+  virtual loader& loadGeometry(const std::string& filePath, bool reset = false) = 0;
 
   /**
-   * Get the vector of files to be loaded.
+   * Return true if the loader has a scene reader for the providen file, false otherwise.
    */
-  virtual const std::vector<std::string>& getFiles() const = 0;
+  virtual bool hasSceneReader(const std::string& filePath) = 0;
 
   /**
-   * Set the current file index, corresponding to the file that will be loaded
-   * when calling loadFile(LOAD_CURRENT).
+   * Reset scene and load a (full) scene from provided file.
+   * Please note default scene related options are not taken into account when loading a full scene.
+   * Throw a load_failure_exception on failure.
    */
-  virtual loader& setCurrentFileIndex(int index) = 0;
-
-  /**
-   * Get the current file index.
-   */
-  virtual int getCurrentFileIndex() const = 0;
-
-  /**
-   * Load a file if any have been added.
-   * Set the load argument to LOAD_FIRST, LOAD_PREVIOUS, LOAD_NEXT or LOAD_LAST to change file
-   * index. This will change the current file index accordingly.
-   * Default is LOAD_CURRENT.
-   * Returns true if a file is loaded successfully, false otherwise.
-   */
-  virtual bool loadFile(LoadFileEnum load = LoadFileEnum::LOAD_CURRENT) = 0;
-
-  /**
-   * Get information about the next file to load according to the load param.
-   * Set the load argument to LOAD_FIRST, LOAD_PREVIOUS, LOAD_NEXT or LOAD_LAST as needed.
-   * nextFileIndex will provide the index of the file or -1 if not available.
-   * filePath the path to the file and fileInfo a more complete information about the file,
-   * including index in list.
-   */
-  virtual void getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
-    std::string& fileName, std::string& fileInfo) const = 0;
+  virtual loader& loadScene(const std::string& filePath) = 0;
 
 protected:
   //! @cond

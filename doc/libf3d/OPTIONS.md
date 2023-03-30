@@ -19,7 +19,6 @@ Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
 scene.animation.index|int<br>0<br>load|Select the animation to load.<br>Any negative value means all animations.<br>The default scene always has at most one animation.|\-\-animation-index
 scene.camera.index|int<br>-1<br>load|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.|\-\-camera-index
-scene.geometry-only|bool<br>false<br>load|For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.|\-\-geometry-only
 scene.up-direction|string<br>+Y<br>load|Define the Up direction|\-\-up
 scene.grid.enable|bool<br>false<br>render|Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.|\-\-grid
 scene.grid.unit|double<br>0<br>load|Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.|\-\-grid\-unit
@@ -80,7 +79,8 @@ Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
 ui.bar|bool<br>false<br>render|Show *scalar bar* of the coloring by data array.|\-\-bar
 ui.cheatsheet|bool<br>false<br>render|Show a interactor cheatsheet
-ui.filename|bool<br>false<br>render|Display the *name of the file*.|\-\-filename
+ui.filename|bool<br>false<br>render|Display the *filename info content* on top of the window.|\-\-filename
+ui.filename-info|string<br>-<br>render|Content of *filename info* to display.
 ui.font-file|string<br>-<br>render|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.|\-\-font-file
 ui.fps|bool<br>false<br>render|Display a *frame per second counter*.|\-\-fps
 ui.loader-progress|bool<br>false<br>load|Show a *progress bar* when loading the file.|\-\-progress

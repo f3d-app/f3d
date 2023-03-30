@@ -8,7 +8,7 @@ libf3d API is still in alpha version and may change drastically in the future.
 
 ## Getting Started
 
-Rendering a file and starting the interaction is very easy:
+Rendering a full scene file and starting the interaction is very easy:
 
 ```cpp
 #include <f3d/engine.h>
@@ -21,8 +21,28 @@ f3d::engine::autoloadPlugins();
 // Create a f3d::engine
 f3d::engine eng();
 
-// Add a file to the loader and load it
-eng.getLoader().addFile("path/to/file.ext").loadFile();
+// Load a scene
+eng.getLoader().loadScene("path/to/file.ext");
+
+// Start rendering and interacting
+eng.getInteractor().start();
+```
+
+As well as loading multiple geometries into a default scene:
+
+```cpp
+#include <f3d/engine.h>
+#include <f3d/interactor.h>
+#include <f3d/loader.h>
+
+// Load VTK native readers
+f3d::engine::autoloadPlugins();
+
+// Create a f3d::engine
+f3d::engine eng();
+
+// Load multiples geometries
+eng.getLoader().loadGeometry("path/to/file.ext").loadGeometry("path/to/file2.ext");
 
 // Start rendering and interacting
 eng.getInteractor().start();
@@ -42,8 +62,8 @@ f3d::engine::autoloadPlugins();
 // Create a f3d::engine
 f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
 
-// Add a file to the loader and load it
-eng.getLoader().addFile("path/to/file.ext").loadFile();
+// Load a geometry
+eng.getLoader().loadGeometry("path/to/file.ext");
 
 // Set the window size and render to an image
 f3d::image img = eng.getWindow().setSize(300, 300).renderToImage();
@@ -72,7 +92,7 @@ eng.getOptions()
   .set("render.effect.fxaa", true);
 
 // Standard libf3d usage
-eng.getLoader().addFile("path/to/file.ext").loadFile();
+eng.getLoader().loadGeometry("path/to/file.ext");
 eng.getInteractor().start();
 ```
 Most options are dynamic, some are only taken into account when loading a file. See the [options](OPTIONS.md) documentation.

@@ -15,7 +15,7 @@ All static plugins can be loaded using `f3d::engine::autoloadPlugins()`.
 
 ## Loader class
 
-The loader class is responsible to read and load the file from the disk. It supports reading multiple files and even folders.
+The loader class is responsible to read and load the file from the disk. It supports reading full scene files as well as multiple geometries into a default scene.
 
 ## Window class
 

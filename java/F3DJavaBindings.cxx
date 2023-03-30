@@ -59,20 +59,16 @@ extern "C"
   }
 
   // Loader
-  JNIEXPORT void JAVA_BIND(Loader, loadFile)(JNIEnv* env, jobject self, jobject cursor)
-  {
-    // read cursor
-    jmethodID method = env->GetMethodID(
-      env->FindClass("app/f3d/F3D/Loader$LoadFileEnum"), "ordinal", "()I");
-    jint icursor = env->CallIntMethod(cursor, method);
-
-    GetEngine(env, self)->getLoader().loadFile(static_cast<f3d::loader::LoadFileEnum>(icursor));
-  }
-
-  JNIEXPORT void JAVA_BIND(Loader, addFile)(JNIEnv* env, jobject self, jstring path)
+  JNIEXPORT void JAVA_BIND(Loader, loadScene)(JNIEnv* env, jobject self, jstring path)
   {
     const char* str = env->GetStringUTFChars(path, nullptr);
-    GetEngine(env, self)->getLoader().addFile(str);
+    GetEngine(env, self)->getLoader().loadScene(str);
+    env->ReleaseStringUTFChars(path, str);
+  }
+  JNIEXPORT void JAVA_BIND(Loader, loadGeometry)(JNIEnv* env, jobject self, jstring path)
+  {
+    const char* str = env->GetStringUTFChars(path, nullptr);
+    GetEngine(env, self)->getLoader().loadGeometry(str);
     env->ReleaseStringUTFChars(path, str);
   }
 

@@ -106,27 +106,9 @@ PYBIND11_MODULE(f3d, module)
 
   // f3d::loader
   py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete> > loader(module, "loader");
-
-  py::enum_<f3d::loader::LoadFileEnum>(loader, "LoadFileEnum")
-    .value("LOAD_FIRST", f3d::loader::LoadFileEnum::LOAD_FIRST)
-    .value("LOAD_PREVIOUS", f3d::loader::LoadFileEnum::LOAD_PREVIOUS)
-    .value("LOAD_CURRENT", f3d::loader::LoadFileEnum::LOAD_CURRENT)
-    .value("LOAD_NEXT", f3d::loader::LoadFileEnum::LOAD_NEXT)
-    .value("LOAD_LAST", f3d::loader::LoadFileEnum::LOAD_LAST)
-    .export_values();
-
   loader
-    .def("addFiles", &f3d::loader::addFiles, "Add files to the loader", py::arg("list of files"),
-      py::arg("recursive") = false)
-    .def("addFile", &f3d::loader::addFile, "Add a file or directory to the loader", py::arg("path"),
-      py::arg("recursive") = false)
-    .def("loadFile", &f3d::loader::loadFile, "Load a specific file",
-      py::arg("cursor") = f3d::loader::LoadFileEnum::LOAD_CURRENT)
-    .def("getFiles", &f3d::loader::getFiles, "Get the list of files")
-    .def("setCurrentFileIndex", &f3d::loader::setCurrentFileIndex, "Set the current file index")
-    .def("getCurrentFileIndex", &f3d::loader::getCurrentFileIndex, "Get the current file index")
-    .def(
-      "getFileInfo", &f3d::loader::getFileInfo, "Get the file index, path, and information string");
+    .def("loadScene", &f3d::loader::loadScene, "Load a specific full scene file", py::arg("path"))
+    .def("loadGeometry", &f3d::loader::loadGeometry, "load geometry to a default scene");
 
   // f3d::camera
   py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "camera");
