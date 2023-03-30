@@ -22,7 +22,6 @@ option(F3D_MODULE_EXTERNAL_RENDERING "External rendering module" OFF)
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 
 option(F3D_INSTALL_SDK "Install F3D library SDK" OFF)
-cmake_dependent_option(F3D_INSTALL_SDK_PLUGIN "Install F3D plugin SDK" OFF "F3D_INSTALL_SDK" ON)
 
 # VTK dependency
 find_package(VTK 9.0 REQUIRED

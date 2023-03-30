@@ -72,6 +72,8 @@ set(F3D_SOURCE_FILES
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/plugin/reader.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/camera.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/engine.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/exception.h
@@ -84,12 +86,6 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
   )
-
-if (F3D_INSTALL_SDK_PLUGIN)
-  list(APPEND F3D_PUBLIC_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/plugin/reader.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.h)
-endif ()
 
 add_library(libf3d
   ${F3D_SOURCE_FILES}
@@ -203,22 +199,16 @@ if(F3D_INSTALL_SDK)
     VERSION "${PROJECT_VERSION}"
     COMPATIBILITY SameMinorVersion)
 
-  set(sdk_cmake_files
-    "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
-    "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
-    "${CMAKE_SOURCE_DIR}/cmake/f3dEmbed.cmake")
-
-  if (F3D_INSTALL_SDK_PLUGIN)
-    list(APPEND sdk_cmake_files
+  install(
+    FILES
+      "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
+      "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
+      "${CMAKE_SOURCE_DIR}/cmake/f3dEmbed.cmake"
       "${CMAKE_SOURCE_DIR}/cmake/f3dPlugin.cmake"
       "${CMAKE_SOURCE_DIR}/cmake/plugin.cxx.in"
       "${CMAKE_SOURCE_DIR}/cmake/plugin.desktop.in"
       "${CMAKE_SOURCE_DIR}/cmake/plugin.thumbnailer.in"
-      "${CMAKE_SOURCE_DIR}/cmake/readerBoilerPlate.h.in")
-  endif ()
-
-  install(
-    FILES ${sdk_cmake_files}
+      "${CMAKE_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
     DESTINATION
       "lib/cmake/f3d"
     COMPONENT cmake)
