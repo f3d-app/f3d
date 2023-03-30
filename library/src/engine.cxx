@@ -125,10 +125,10 @@ void engine::loadPlugin(const std::string& pathOrName)
   factory* factory = factory::instance();
   factory::plugin_initializer_t init_plugin = factory->getStaticInitializer(pathOrName);
 
-  vtksys::DynamicLoader::LibraryHandle handle = nullptr;
-
   if (init_plugin == nullptr)
   {
+    vtksys::DynamicLoader::LibraryHandle handle = nullptr;
+
     std::string fullPath = vtksys::SystemTools::CollapseFullPath(pathOrName);
     if (vtksys::SystemTools::FileExists(fullPath))
     {
@@ -143,10 +143,21 @@ void engine::loadPlugin(const std::string& pathOrName)
     }
     else
     {
-      std::string libName;
+      std::vector<std::string> searchPaths;
 
-      // Right now, plugins should be located in the same folder than f3d.exe on Windows
-      // On Linux/macOS, when we are not using a full path, we rely on LD_LIBRARY_PATH
+      std::string envValue;
+      if (vtksys::SystemTools::GetEnv("F3D_PLUGINS_PATH", envValue))
+      {
+        // split path with OS separator (':' on Linux/macOS and ';' on Windows)
+#ifdef _WIN32
+        char sep = ';';
+#else
+        char sep = ':';
+#endif
+        vtksys::SystemTools::Split(envValue, searchPaths, sep);
+      }
+
+      // On Windows, search plugins in the same folder than f3d.exe too by default
 #ifdef _WIN32
       std::vector<wchar_t> pathBuf(40000);
       if (GetModuleFileNameW(
@@ -154,21 +165,40 @@ void engine::loadPlugin(const std::string& pathOrName)
       {
         std::string progPath =
           vtksys::SystemTools::GetProgramPath(vtksys::Encoding::ToNarrow(pathBuf.data()));
-        libName = vtksys::SystemTools::ConvertToWindowsOutputPath(progPath) + "\\";
+        searchPaths.push_back(progPath);
       }
 #endif
 
       // construct the library file name from the plugin name
-      libName += vtksys::DynamicLoader::LibPrefix();
+      std::string libName = vtksys::DynamicLoader::LibPrefix();
       libName += "f3d-plugin-";
       libName += pathOrName;
       libName += vtksys::DynamicLoader::LibExtension();
 
-      handle = vtksys::DynamicLoader::OpenLibrary(libName);
+      // try search paths
+      for (const std::string& path : searchPaths)
+      {
+        std::string tryPath = path + '/' + libName;
+        tryPath = vtksys::SystemTools::ConvertToOutputPath(tryPath);
+
+        handle = vtksys::DynamicLoader::OpenLibrary(tryPath);
+
+        if (handle)
+        {
+          // plugin is found and loaded
+          break;
+        }
+      }
+
       if (!handle)
       {
-        throw engine::plugin_exception(
-          "Cannot open the library \"" + pathOrName + "\": " + vtksys::DynamicLoader::LastError());
+        // Rely on internal system (e.g. LD_LIBRARY_PATH on Linux) by giving only the file name
+        handle = vtksys::DynamicLoader::OpenLibrary(libName);
+        if (!handle)
+        {
+          throw engine::plugin_exception("Cannot open the library \"" + pathOrName +
+            "\": " + vtksys::DynamicLoader::LastError());
+        }
       }
     }
 
