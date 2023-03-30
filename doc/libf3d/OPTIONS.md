@@ -20,13 +20,6 @@ Option|Type<br>Default<br>Trigger|Description|F3D option
 scene.animation.index|int<br>0<br>load|Select the animation to load.<br>Any negative value means all animations.<br>The default scene always has at most one animation.|\-\-animation-index
 scene.camera.index|int<br>-1<br>load|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.|\-\-camera-index
 scene.up-direction|string<br>+Y<br>load|Define the Up direction|\-\-up
-scene.grid.enable|bool<br>false<br>render|Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.|\-\-grid
-scene.grid.unit|double<br>0<br>load|Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.|\-\-grid\-unit
-scene.grid.subdivisions|int<br>10<br>load|Set the number of subdivisions for the grid.|\-\-grid\-subdivisions
-scene.background.blur|bool<br>false<br>render|Blur background when using a HDRI.|\-\-blur-background
-render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-background-coc
-scene.background.color|vector\<double\><br>0.2,0.2,0.2<br>render|Set the window *background color*.<br>Ignored if *hdri* is set.|\-\-bg-color
-scene.background.hdri|string<br>-<br>render|Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, png, jpg, pnm, tiff, bmp. Override the color.|\-\-hdri
 
 ## Interactor Options
 
@@ -54,6 +47,9 @@ model.scivis.colormap|vector\<double\><br>\<inferno\><br>render|Set a *custom co
 model.scivis.component|int<br>-1<br>render|Specify the component to color with. -1 means *magnitude*. -2 means *direct values*.|\-\-comp
 model.scivis.array-name|string<br>\<reserved\><br>render|*Color by a specific data array* present in on the data. Set to <empty> to let libf3d find the first available array.|\-\-scalars
 model.scivis.range|vector\<double\><br>-<br>render|Set a *custom range for the coloring*.|\-\-range
+model.point-sprites.enable|bool<br>false<br>render|Show sphere *points sprites* instead of the geometry.|\-\-point-sprites
+model.volume.enable|bool<br>false<br>render|Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.|\-\-volume
+model.volume.inverse|bool<br>false<br>render|Inverse the linear opacity function.|\-\-inverse
 
 ## Render Options
 
@@ -66,12 +62,16 @@ render.effect.tone-mapping|bool<br>false<br>render|Enable generic filmic *Tone M
 render.line-width|double<br>1.0<br>render|Set the *width* of lines when showing edges.|\-\-line-width
 render.show-edges|bool<br>false<br>render|Show the *cell edges*|\-\-edges
 render.point-size|double<br>10.0<br>render|Set the *size* of points when showing vertices and point sprites.|\-\-point-size
-render.point-sprites.enabled|bool<br>false<br>render|Show sphere *points sprites* instead of the geometry.|\-\-point-sprites
-render.volume.enabled|bool<br>false<br>render|Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.|\-\-volume
-render.volume.inverse|bool<br>false<br>render|Inverse the linear opacity function.|\-\-inverse
-render.raytracing.denoise|bool<br>false<br>render|*Denoise* the raytracing rendering.|\-\-denoise
+render.grid.enable|bool<br>false<br>render|Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.|\-\-grid
+render.grid.unit|double<br>0<br>load|Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.|\-\-grid\-unit
+render.grid.subdivisions|int<br>10<br>load|Set the number of subdivisions for the grid.|\-\-grid\-subdivisions
 render.raytracing.enable|bool<br>false<br>render|Enable *raytracing*. Requires the raytracing module to be enabled.|\-\-raytracing
 render.raytracing.samples|int<br>5<br>render|The number of *samples per pixel*.|\-\-samples
+render.raytracing.denoise|bool<br>false<br>render|*Denoise* the raytracing rendering.|\-\-denoise
+render.background.color|vector\<double\><br>0.2,0.2,0.2<br>render|Set the window *background color*.<br>Ignored if *hdri* is set.|\-\-bg-color
+render.background.hdri|string<br>-<br>render|Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, png, jpg, pnm, tiff, bmp. Override the color.|\-\-hdri
+render.background.blur|bool<br>false<br>render|Blur background when using a HDRI.|\-\-blur-background
+render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-background-coc
 
 ## UI Options
 
