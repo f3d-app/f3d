@@ -88,7 +88,7 @@ fs::path F3DConfigFileTools::GetBinaryConfigFileDirectory()
 
     // Add binary specific paths
 #if F3D_MACOS_BUNDLE
-    dirPath /= "Resources";
+    dirPath /= "Resources/configs";
 #else
     dirPath /= "share/f3d/configs";
 #endif

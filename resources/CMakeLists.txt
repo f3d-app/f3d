@@ -1,5 +1,8 @@
 # Shared resources dir
 set(f3d_resources_dir "share/f3d")
+if (F3D_MACOS_BUNDLE)
+  set(f3d_resources_dir "f3d.app/Contents/Resources")
+endif()
 set(f3d_configs_dir "${f3d_resources_dir}/configs")
 if (UNIX AND NOT APPLE)
   if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE AND NOT F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
@@ -9,10 +12,8 @@ endif()
 
 # Default config files
 if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
-  if(NOT APPLE OR NOT F3D_MACOS_BUNDLE) # MacOS Bundle config file is handled in the bundle directly
-    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/configs/"
-      DESTINATION "${f3d_configs_dir}" COMPONENT configuration)
-  endif()
+  install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/configs/"
+    DESTINATION "${f3d_configs_dir}" COMPONENT configuration)
 endif()
 
 # Other ressoure files
