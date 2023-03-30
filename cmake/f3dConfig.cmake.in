@@ -12,7 +12,7 @@
 #   f3d_MODULE_EXTERNAL_RENDERING  Will be enabled if F3D was built with external rendering support
 #   f3d_MODULE_RAYTRACING          Will be enabled if F3D was built with raytracing support
 #   f3d_BINDINGS_PYTHON            Will be enabled if F3D was built with python bindings
-#   f3d_SDK_PLUGIN                 Will be enabled if F3D plugin SDK is available
+#   f3d_BINDINGS_JAVA              Will be enabled if F3D was built with java bindings
 
 @PACKAGE_INIT@
 
@@ -24,11 +24,8 @@ set(f3d_BINDINGS_JAVA "@F3D_BINDINGS_JAVA@")
 # Provide a f3d_embed_file method for embedding image into source code
 include("${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake")
 
-set(f3d_SDK_PLUGIN "@F3D_INSTALL_SDK_PLUGIN@")
-if (@F3D_INSTALL_SDK_PLUGIN@)
-  # Provide macros used to create a plugin
-  include("${CMAKE_CURRENT_LIST_DIR}/f3dPlugin.cmake")
-endif ()
+# Provide macros used to create a plugin
+include("${CMAKE_CURRENT_LIST_DIR}/f3dPlugin.cmake")
 
 include("${CMAKE_CURRENT_LIST_DIR}/f3dTargets.cmake")
 set_and_check(f3d_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/include")
