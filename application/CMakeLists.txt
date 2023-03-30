@@ -85,14 +85,6 @@ list(APPEND f3d_link_options_public ${f3d_sanitizer_link_options})
 if(F3D_MACOS_BUNDLE)
   set_target_properties(f3d PROPERTIES MACOSX_BUNDLE TRUE)
 
-  # Add default configuration
-  if(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
-    set(f3d_CONFIG ${CMAKE_SOURCE_DIR}/resources/configs)
-    set_source_files_properties(${f3d_CONFIG} PROPERTIES
-      MACOSX_PACKAGE_LOCATION "Resources")
-    target_sources(f3d PRIVATE ${f3d_CONFIG})
-  endif()
-
   # Add logo icon
   set(MACOSX_BUNDLE_ICON_FILE logo.icns)
   set(f3d_ICON ${CMAKE_SOURCE_DIR}/resources/logo.icns)
