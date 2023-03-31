@@ -41,9 +41,9 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& up)
   this->ScalarBarActor->VisibilityOff();
 
   this->ColorTransferFunctionConfigured = false;
-  this->PolyDataMapperConfigured = false;
-  this->PointGaussianMapperConfigured = false;
-  this->VolumeConfigured = false;
+  this->GeometryMappersConfigured = false;
+  this->PointSpritesMappersConfigured = false;
+  this->VolumePropsAndMappersConfigured = false;
   this->ScalarBarActorConfigured = false;
 
   this->CheatSheetNeedUpdate = true;
@@ -131,7 +131,7 @@ void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
         }
       }
     }
-    this->VolumeConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
     this->CheatSheetNeedUpdate = true;
     this->ColoringTimeStamp.Modified();
   }
@@ -144,9 +144,9 @@ void vtkF3DRendererWithColoring::SetScalarBarRange(const std::vector<double>& ra
   {
     this->UserScalarBarRange = range;
     this->ColorTransferFunctionConfigured = false;
-    this->PolyDataMapperConfigured = false;
-    this->PointGaussianMapperConfigured = false;
-    this->VolumeConfigured = false;
+    this->GeometryMappersConfigured = false;
+    this->PointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
     this->ColoringTimeStamp.Modified();
   }
@@ -160,9 +160,9 @@ void vtkF3DRendererWithColoring::SetColormap(const std::vector<double>& colormap
     this->Colormap = colormap;
 
     this->ColorTransferFunctionConfigured = false;
-    this->PolyDataMapperConfigured = false;
-    this->PointGaussianMapperConfigured = false;
-    this->VolumeConfigured = false;
+    this->GeometryMappersConfigured = false;
+    this->PointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
     this->ColoringTimeStamp.Modified();
   }
@@ -193,9 +193,9 @@ void vtkF3DRendererWithColoring::CycleScalars(CycleType type)
   this->CycleScalars(this->CheckColoring());
 
   this->ColorTransferFunctionConfigured = false;
-  this->PolyDataMapperConfigured = false;
-  this->PointGaussianMapperConfigured = false;
-  this->VolumeConfigured = false;
+  this->GeometryMappersConfigured = false;
+  this->PointSpritesMappersConfigured = false;
+  this->VolumePropsAndMappersConfigured = false;
   this->ScalarBarActorConfigured = false;
   this->CheatSheetNeedUpdate = true;
 
@@ -278,9 +278,9 @@ void vtkF3DRendererWithColoring::SetColoring(
     this->ComponentForColoring = component;
 
     this->ColorTransferFunctionConfigured = false;
-    this->PolyDataMapperConfigured = false;
-    this->PointGaussianMapperConfigured = false;
-    this->VolumeConfigured = false;
+    this->GeometryMappersConfigured = false;
+    this->PointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
     this->ColoringTimeStamp.Modified();
   }
@@ -330,9 +330,9 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   if (importerChanged)
   {
     this->ColorTransferFunctionConfigured = false;
-    this->PolyDataMapperConfigured = false;
-    this->PointGaussianMapperConfigured = false;
-    this->VolumeConfigured = false;
+    this->GeometryMappersConfigured = false;
+    this->PointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
   }
 
@@ -372,7 +372,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
     actorAndMapper.first->SetVisibility(geometriesVisible);
     if (geometriesVisible && coloringArray)
     {
-      if (!this->PolyDataMapperConfigured)
+      if (!this->GeometryMappersConfigured)
       {
         vtkF3DRendererWithColoring::ConfigureMapperForColoring(actorAndMapper.second, coloringArray,
           this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
@@ -387,7 +387,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   }
   if (geometriesVisible)
   {
-    this->PolyDataMapperConfigured = true;
+    this->GeometryMappersConfigured = true;
   }
 
   // Handle point sprites
@@ -404,7 +404,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
     actorAndMapper.first->SetVisibility(pointSpritesVisible);
     if (pointSpritesVisible && coloringArray)
     {
-      if (!this->PointGaussianMapperConfigured)
+      if (!this->PointSpritesMappersConfigured)
       {
         vtkF3DRendererWithColoring::ConfigureMapperForColoring(actorAndMapper.second, coloringArray,
           this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
@@ -419,7 +419,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   }
   if (pointSpritesVisible)
   {
-    this->PointGaussianMapperConfigured = true;
+    this->PointSpritesMappersConfigured = true;
   }
 
   // Handle Volume prop
@@ -444,7 +444,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
     }
     else
     {
-      if (!this->VolumeConfigured)
+      if (!this->VolumePropsAndMappersConfigured)
       {
         vtkF3DRendererWithColoring::ConfigureVolumeForColoring(propAndMapper.second,
           propAndMapper.first, coloringArray, this->ComponentForColoring,
@@ -456,7 +456,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   }
   if (volumeVisible)
   {
-    this->VolumeConfigured = true;
+    this->VolumePropsAndMappersConfigured = true;
   }
 
   // Handle scalar bar
