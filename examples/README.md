@@ -9,7 +9,7 @@ Examples usages of the libf3d, which requires the `F3D_INSTALL_SDK` cmake option
 
 ## plugins
 
-Examples plugins for the libf3d, which requires the `F3D_INSTALL_PLUGIN_SDK` cmake option when building F3D.
+Examples plugins for the libf3d, which also requires the `F3D_INSTALL_SDK` cmake option when building F3D.
 
 ## Building
 
