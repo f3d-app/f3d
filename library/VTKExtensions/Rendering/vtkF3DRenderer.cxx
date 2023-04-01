@@ -165,6 +165,7 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Initialize(const std::string& up)
 {
+  this->ActorsPropertiesConfigured = false;
   this->RemoveAllViewProps();
   this->RemoveAllLights();
   this->OriginalLightIntensities.clear();
@@ -640,30 +641,20 @@ void vtkF3DRenderer::UpdateTextColor()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetLineWidth(double lineWidth)
 {
-  vtkActor* anActor;
-  vtkActorCollection* ac = this->GetActors();
-  vtkCollectionSimpleIterator ait;
-  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
+  if (this->LineWidth != lineWidth)
   {
-    if (vtkSkybox::SafeDownCast(anActor) == nullptr)
-    {
-      anActor->GetProperty()->SetLineWidth(lineWidth);
-    }
+    this->LineWidth = lineWidth;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetPointSize(double pointSize)
 {
-  vtkActor* anActor;
-  vtkActorCollection* ac = this->GetActors();
-  vtkCollectionSimpleIterator ait;
-  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
+  if (this->PointSize != pointSize)
   {
-    if (vtkSkybox::SafeDownCast(anActor) == nullptr)
-    {
-      anActor->GetProperty()->SetPointSize(pointSize);
-    }
+    this->PointSize = pointSize;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
@@ -939,24 +930,30 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureActorsProperties()
+{
+  vtkActor* anActor;
+  vtkActorCollection* ac = this->GetActors();
+  vtkCollectionSimpleIterator ait;
+  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
+  {
+    if (vtkSkybox::SafeDownCast(anActor) == nullptr)
+    {
+      anActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
+      anActor->GetProperty()->SetLineWidth(this->LineWidth);
+      anActor->GetProperty()->SetPointSize(this->PointSize);
+    }
+  }
+  this->ActorsPropertiesConfigured = true;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowEdge(bool show)
 {
   if (this->EdgeVisible != show)
   {
     this->EdgeVisible = show;
-
-    // Dynamic edges
-    vtkActor* anActor;
-    vtkActorCollection* ac = this->GetActors();
-    vtkCollectionSimpleIterator ait;
-    for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
-    {
-      if (vtkSkybox::SafeDownCast(anActor) == nullptr)
-      {
-        anActor->GetProperty()->SetEdgeVisibility(show);
-      }
-    }
-
+    this->ActorsPropertiesConfigured = false;
     this->CheatSheetNeedUpdate = true;
   }
 }
@@ -974,6 +971,11 @@ void vtkF3DRenderer::SetUseTrackball(bool use)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
+  if (!this->ActorsPropertiesConfigured)
+  {
+    this->ConfigureActorsProperties();
+  }
+
   if (this->CheatSheetNeedUpdate)
   {
     this->UpdateCheatSheet();

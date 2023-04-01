@@ -334,6 +334,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
     this->PointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
+    this->ActorsPropertiesConfigured = false;
   }
 
   this->ColoringUpdateTime = this->ColoringTimeStamp.GetMTime();
