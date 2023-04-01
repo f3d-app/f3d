@@ -200,9 +200,9 @@ protected:
   vtkNew<vtkScalarBarActor> ScalarBarActor;
   bool ScalarBarActorConfigured = false;
 
-  bool PolyDataMapperConfigured = false;
-  bool PointGaussianMapperConfigured = false;
-  bool VolumeConfigured = false;
+  bool GeometryMappersConfigured = false;
+  bool PointSpritesMappersConfigured = false;
+  bool VolumePropsAndMappersConfigured = false;
 
   vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
   double ColorRange[2];
