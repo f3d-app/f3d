@@ -45,8 +45,7 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& up)
   this->PointSpritesMappersConfigured = false;
   this->VolumePropsAndMappersConfigured = false;
   this->ScalarBarActorConfigured = false;
-
-  this->CheatSheetNeedUpdate = true;
+  this->CheatSheetConfigured = false;
 
   this->ColoringTimeStamp.Modified();
 }
@@ -78,7 +77,7 @@ void vtkF3DRendererWithColoring::ShowScalarBar(bool show)
   if (this->ScalarBarVisible != show)
   {
     this->ScalarBarVisible = show;
-    this->CheatSheetNeedUpdate = true;
+    this->CheatSheetConfigured = false;
     this->ColoringTimeStamp.Modified();
   }
 }
@@ -89,7 +88,7 @@ void vtkF3DRendererWithColoring::SetUsePointSprites(bool use)
   if (this->UsePointSprites != use)
   {
     this->UsePointSprites = use;
-    this->CheatSheetNeedUpdate = true;
+    this->CheatSheetConfigured = false;
     this->ColoringTimeStamp.Modified();
   }
 }
@@ -100,7 +99,7 @@ void vtkF3DRendererWithColoring::SetUseVolume(bool use)
   if (this->UseVolume != use)
   {
     this->UseVolume = use;
-    this->CheatSheetNeedUpdate = true;
+    this->CheatSheetConfigured = false;
     this->ColoringTimeStamp.Modified();
   }
 }
@@ -132,7 +131,7 @@ void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
       }
     }
     this->VolumePropsAndMappersConfigured = false;
-    this->CheatSheetNeedUpdate = true;
+    this->CheatSheetConfigured = false;
     this->ColoringTimeStamp.Modified();
   }
 }
@@ -197,7 +196,7 @@ void vtkF3DRendererWithColoring::CycleScalars(CycleType type)
   this->PointSpritesMappersConfigured = false;
   this->VolumePropsAndMappersConfigured = false;
   this->ScalarBarActorConfigured = false;
-  this->CheatSheetNeedUpdate = true;
+  this->CheatSheetConfigured = false;
 
   this->ColoringTimeStamp.Modified();
 }
