@@ -412,6 +412,8 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
               if (loader.hasGeometryReader(geomPath.string()))
               {
                 // Reset for the first file, then add geometries without resetting
+                // XXX this means the scene is reset and loaded from scratch every time a file is
+                // dropped This could be improved
                 loader.loadGeometry(this->Internals->FilesList[i].string(), i == 0 ? true : false);
                 nGeom++;
               }
