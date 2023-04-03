@@ -24,6 +24,7 @@ int TestSDKMultiOptions(int argc, char* argv[])
   // Render one geometry with a render option
   load.loadGeometry(left);
   opt.set("render.show-edges", true);
+  opt.set("render.grid.enable", true);
   win.render();
 
   // Add another geometry
