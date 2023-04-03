@@ -111,9 +111,11 @@ public:
   ///@}
 
   /**
-   * Update the visibility and coloring of internal actors as well as the scalar bar actors
+   * Reimplemented to update the visibility and coloring of internal actors 
+   * as well as the scalar bar actors.
+   * Call Superclass::UpdateActors at the end.
    */
-  void UpdateColoringActors();
+  void UpdateActors() override;
 
   /**
    * Get information about the current coloring

@@ -80,9 +80,19 @@ public:
   ///@}
 
   /**
-   * Reimplemented to handle cheat sheet and timer
+   * Reimplemented to configure:
+   *  - ActorsProperties
+   *  - CheatSheet
+   *  - Timer
+   * before actual rendering, only when needed
    */
   void Render() override;
+
+  /**
+   * Update actors according to the properties of this class:
+   *  - Grid
+   */
+  virtual void UpdateActors();
 
   /**
    * Reimplemented to handle light creation when no lights are added

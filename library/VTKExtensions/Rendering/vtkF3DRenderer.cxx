@@ -121,6 +121,7 @@ vtkF3DRenderer::vtkF3DRenderer()
 {
   this->Cullers->RemoveAllItems();
   this->AutomaticLightCreationOff();
+  this->SetClippingRangeExpansion(0.99);
 
   // Init actors
   this->MetaDataActor->GetTextProperty()->SetFontSize(15);
@@ -220,7 +221,7 @@ std::string vtkF3DRenderer::GenerateMetaDataDescription()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetupRenderPasses()
 {
-  // XXX Do this only once
+  // XXX Handle in UpdateActors
 
   // clean up previous pass
   vtkRenderPass* pass = this->GetPass();
@@ -327,7 +328,7 @@ std::string vtkF3DRenderer::GetSceneDescription()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowAxis(bool show)
 {
-  // Dynamic visible axis
+  // Dynamic visible axis XXX Handle in update actors
   if (this->AxisVisible != show)
   {
     this->AxisWidget = nullptr;
@@ -387,12 +388,9 @@ void vtkF3DRenderer::ShowGrid(bool show)
 {
   if (this->GridVisible != show)
   {
-    this->SetClippingRangeExpansion(show ? 0.99 : 0);
     this->GridVisible = show;
-    this->GridActor->SetVisibility(show);
-    this->ResetCameraClippingRange();
-
     this->SetupRenderPasses();
+    this->GridConfigured = false;
     this->CheatSheetConfigured = false;
   }
 }
@@ -402,7 +400,8 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 {
   // Configure grid using visible prop bounds and actors
   // Also initialize GridInfo
-  if (this->GridVisible)
+  bool show = this->GridVisible;
+  if (show)
   {
     double bounds[6];
     this->ComputeVisiblePropBounds(bounds);
@@ -411,7 +410,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 
     if (!bbox.IsValid())
     {
-      return;
+      show = false;
     }
     else
     {
@@ -446,11 +445,12 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridActor->SetPosition(gridPos);
       this->GridActor->SetMapper(gridMapper);
       this->GridActor->UseBoundsOff();
-      this->GridActor->SetVisibility(true);
-      this->SetClippingRangeExpansion(0);
       this->GridConfigured = true;
     }
   }
+
+  this->GridActor->SetVisibility(show);
+  this->ResetCameraClippingRange();
 }
 
 //----------------------------------------------------------------------------
@@ -463,6 +463,8 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
     collapsedHdriFile = vtksys::SystemTools::CollapseFullPath(hdriFile);
   }
 
+  // XXX this could be handled in UpdateActor
+  // but it is not needed as skybox actor is handled separately
   if (this->HDRIFile != collapsedHdriFile)
   {
     this->HDRIFile = collapsedHdriFile;
@@ -642,7 +644,7 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
       this->SetEnvironmentTexture(nullptr);
       this->RemoveActor(this->Skybox);
     }
-    this->UpdateTextColor();
+    this->UpdateTextColor(); // XXX move to UpdateActors
   }
   this->SetupRenderPasses();
 }
@@ -690,7 +692,7 @@ void vtkF3DRenderer::SetPointSize(double pointSize)
 void vtkF3DRenderer::SetFontFile(const std::string& fontFile)
 {
   // Dynamic font management
-  if (this->FontFile != fontFile)
+  if (this->FontFile != fontFile) // XXX should be done in UpdateActors
   {
     this->FontFile = fontFile;
     this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
@@ -724,13 +726,13 @@ void vtkF3DRenderer::SetFontFile(const std::string& fontFile)
 void vtkF3DRenderer::SetBackground(const double* color)
 {
   this->Superclass::SetBackground(color);
-  this->UpdateTextColor();
+  this->UpdateTextColor(); // XXX move to UpdateActors
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetLightIntensity(const double intensityFactor)
 {
-  /// TODO move to update lights
+  // TODO move to update lights
   vtkLightCollection* lc = this->GetLights();
   vtkLight* light;
   vtkCollectionSimpleIterator it;
@@ -885,7 +887,7 @@ void vtkF3DRenderer::ShowMetaData(bool show)
 {
   if (this->MetaDataVisible != show)
   {
-    this->MetaDataVisible = show;
+    this->MetaDataVisible = show; // XXX should be handled in update actors
     this->MetaDataActor->SetVisibility(show);
     if (show)
     {
@@ -999,13 +1001,17 @@ void vtkF3DRenderer::SetUseTrackball(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::Render()
+void vtkF3DRenderer::UpdateActors()
 {
   if (!this->GridConfigured)
   {
     this->ConfigureGridUsingCurrentActors();
   }
+}
 
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::Render()
+{
   if (!this->ActorsPropertiesConfigured)
   {
     this->ConfigureActorsProperties();

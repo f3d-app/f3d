@@ -22,10 +22,10 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   // Check invalid array code path
   renderer->SetColoring(false, "Invalid", 0);
   renderer->SetUseVolume(false);
-  renderer->UpdateColoringActors();
+  renderer->UpdateActors();
   renderer->CycleScalars(vtkF3DRendererWithColoring::CycleType::COMPONENT);
   renderer->SetUseVolume(true);
-  renderer->UpdateColoringActors();
+  renderer->UpdateActors();
 
   if (renderer->GetColoringArrayName() != "Density" || renderer->GetColoringComponent() != 0)
   {
@@ -35,9 +35,9 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
 
   // Check invalid component code path
   renderer->SetColoring(false, "Momentum", 5);
-  renderer->UpdateColoringActors();
+  renderer->UpdateActors();
   renderer->SetUseVolume(true);
-  renderer->UpdateColoringActors();
+  renderer->UpdateActors();
 
   if (renderer->GetColoringArrayName() != "Momentum" || renderer->GetColoringComponent() != 5)
   {
