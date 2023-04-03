@@ -135,6 +135,14 @@ protected:
   void UpdateTextColor();
 
   /**
+   * Configure all actors properties according to what has been set for:
+   * - point size
+   * - line width
+   * - show edges
+   */
+  void ConfigureActorsProperties();
+
+  /**
    * Update the text of the cheatsheet and mark it for rendering
    */
   void UpdateCheatSheet();
@@ -161,6 +169,7 @@ protected:
   vtkNew<vtkCornerAnnotation> MetaDataActor;
   vtkNew<vtkCornerAnnotation> CheatSheetActor;
   bool CheatSheetNeedUpdate = false;
+  bool ActorsPropertiesConfigured = false;
 
   // vtkCornerAnnotation building is too slow for the timer
   vtkNew<vtkTextActor> TimerActor;
@@ -188,6 +197,9 @@ protected:
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
   double CircleOfConfusionRadius = 20.0;
+
+  double PointSize = 10.0;
+  double LineWidth = 1.0;
 
   bool HasHDRI = false;
   std::string HDRIFile;
