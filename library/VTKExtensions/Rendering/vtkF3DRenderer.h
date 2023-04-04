@@ -143,9 +143,9 @@ protected:
   void ConfigureActorsProperties();
 
   /**
-   * Update the text of the cheatsheet and mark it for rendering
+   * Configure the cheatsheet text and mark it for rendering
    */
-  void UpdateCheatSheet();
+  void ConfigureCheatSheet();
 
   /**
    * Add related hotkeys options to the cheatsheet.
@@ -168,12 +168,14 @@ protected:
   vtkNew<vtkCornerAnnotation> FilenameActor;
   vtkNew<vtkCornerAnnotation> MetaDataActor;
   vtkNew<vtkCornerAnnotation> CheatSheetActor;
-  bool CheatSheetNeedUpdate = false;
-  bool ActorsPropertiesConfigured = false;
 
   // vtkCornerAnnotation building is too slow for the timer
   vtkNew<vtkTextActor> TimerActor;
   unsigned int Timer = 0;
+
+  bool CheatSheetConfigured = false;
+  bool ActorsPropertiesConfigured = false;
+  bool GridConfigured = false;
 
   bool GridVisible = false;
   bool AxisVisible = false;
@@ -191,13 +193,11 @@ protected:
   bool UseBlurBackground = false;
   bool UseTrackball = false;
 
-  bool GridInitialized = false;
   int RaytracingSamples = 0;
   int UpIndex = 1;
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
   double CircleOfConfusionRadius = 20.0;
-
   double PointSize = 10.0;
   double LineWidth = 1.0;
 
