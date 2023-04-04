@@ -3,6 +3,7 @@
 #include "F3DConfig.h"
 #include "F3DConfigFileTools.h"
 #include "F3DException.h"
+#include "F3DSystemTools.h"
 
 #include "cxxopts.hpp"
 #include "json.hpp"
@@ -172,6 +173,7 @@ protected:
   void PrintHelp(cxxopts::Options& cxxOptions);
   void PrintVersion();
   void PrintReadersList();
+  void PrintPluginsScan();
 
 private:
   int Argc;
@@ -205,6 +207,28 @@ void ConfigurationOptions::LoadPlugins(const F3DAppOptions& appOptions) const
 }
 
 //----------------------------------------------------------------------------
+void ConfigurationOptions::PrintPluginsScan()
+{
+#if F3D_MACOS_BUNDLE
+  f3d::log::error("Command not supported");
+#else
+  auto appPath = F3DSystemTools::GetApplicationPath();
+  appPath = appPath.parent_path().parent_path();
+
+  appPath /= "share/f3d/plugins";
+
+  auto plugins = f3d::engine::getPluginsList(appPath.string());
+
+  f3d::log::info("Found ", plugins.size(), " plugins:");
+
+  for (const std::string& p : plugins)
+  {
+    f3d::log::info(" - ", p);
+  }
+#endif
+}
+
+//----------------------------------------------------------------------------
 void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& options,
   std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool parseCommandLine)
 {
@@ -232,6 +256,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp0, "no-render", "", "Verbose mode without any rendering, only for the first file", appOptions.NoRender,  HasDefault::YES, MayHaveConfig::YES );
     this->DeclareOption(grp0, "max-size", "", "Maximum size in Mib of a file to load, negative value means unlimited", appOptions.MaxSize,  HasDefault::YES, MayHaveConfig::YES, "<size in Mib>");
     this->DeclareOption(grp0, "load-plugins", "", "List of plugins to load separated with a comma", appOptions.Plugins, LocalHasDefaultNo, MayHaveConfig::YES, "<paths or names>");
+    this->DeclareOption(grp0, "scan-plugins", "", "Scan some directories for plugins (result can be incomplete)");
 
     auto grp1 = cxxOptions.add_options("General");
     this->DeclareOption(grp1, "verbose", "", "Enable verbose mode, providing more information about the loaded data in the console output", appOptions.Verbose,  HasDefault::YES, MayHaveConfig::YES );
@@ -331,6 +356,12 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
       {
         this->PrintVersion();
         throw F3DExNoProcess("version requested");
+      }
+
+      if (result.count("scan-plugins") > 0)
+      {
+        this->PrintPluginsScan();
+        throw F3DExNoProcess("scan plugins requested");
       }
 
       if (result.count("readers-list") > 0)

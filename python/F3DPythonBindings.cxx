@@ -177,5 +177,6 @@ PYBIND11_MODULE(f3d, module)
     .def_static(
       "autoloadPlugins", &f3d::engine::autoloadPlugins, "Automatically load internal plugins")
     .def_static("getLibInfo", &f3d::engine::getLibInfo)
-    .def_static("getReadersInfo", &f3d::engine::getReadersInfo);
+    .def_static("getReadersInfo", &f3d::engine::getReadersInfo)
+    .def_static("getPluginsList", &f3d::engine::getPluginsList);
 }
