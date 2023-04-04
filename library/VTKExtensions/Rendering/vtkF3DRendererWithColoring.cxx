@@ -471,7 +471,7 @@ void vtkF3DRendererWithColoring::UpdateActors()
     this->ScalarBarActorConfigured = true;
   }
 
-  this->SetupRenderPasses();
+  this->RenderPassesConfigured = false;
 
   // Call superclass update actors after everything,
   // as the grid need all actors visible to be configured correctly
