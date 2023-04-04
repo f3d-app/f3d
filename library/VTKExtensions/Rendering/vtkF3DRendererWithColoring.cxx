@@ -314,7 +314,7 @@ int vtkF3DRendererWithColoring::GetColoringComponent()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::UpdateColoringActors()
+void vtkF3DRendererWithColoring::UpdateActors()
 {
   assert(this->Importer != nullptr);
 
@@ -323,6 +323,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   // Early return if nothing changed
   if (!importerChanged && this->ColoringUpdateTime >= this->ColoringTimeStamp.GetMTime())
   {
+    this->Superclass::UpdateActors();
     return;
   }
 
@@ -334,6 +335,7 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
     this->ActorsPropertiesConfigured = false;
+    this->GridConfigured = false;
   }
 
   this->ColoringUpdateTime = this->ColoringTimeStamp.GetMTime();
@@ -470,6 +472,10 @@ void vtkF3DRendererWithColoring::UpdateColoringActors()
   }
 
   this->SetupRenderPasses();
+
+  // Call superclass update actors after everything,
+  // as the grid need all actors visible to be configured correctly
+  this->Superclass::UpdateActors();
 }
 
 //----------------------------------------------------------------------------
