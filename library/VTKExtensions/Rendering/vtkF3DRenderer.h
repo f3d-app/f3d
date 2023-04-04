@@ -32,7 +32,7 @@ public:
    * Set visibility of different actors
    */
   void ShowAxis(bool show);
-  void ShowGrid(bool show, double unitSquare = 0, int subdivisions = 10);
+  void ShowGrid(bool show);
   void ShowEdge(bool show);
   void ShowTimer(bool show);
   void ShowMetaData(bool show);
@@ -52,6 +52,8 @@ public:
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);
   void SetFilenameInfo(const std::string& info);
+  void SetGridUnitSquare(double unitSquare);
+  void SetGridSubdivisions(int subdivisions);
   ///@}
 
   ///@{
@@ -148,6 +150,11 @@ protected:
   void ConfigureCheatSheet();
 
   /**
+   * Configure the grid
+   */
+  void ConfigureGridUsingCurrentActors();
+
+  /**
    * Add related hotkeys options to the cheatsheet.
    * Override to add other hotkeys
    */
@@ -200,6 +207,8 @@ protected:
   double CircleOfConfusionRadius = 20.0;
   double PointSize = 10.0;
   double LineWidth = 1.0;
+  double GridUnitSquare = 0.0;
+  int GridSubdivisions = 10; 
 
   bool HasHDRI = false;
   std::string HDRIFile;

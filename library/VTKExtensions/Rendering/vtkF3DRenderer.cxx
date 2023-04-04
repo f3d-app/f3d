@@ -363,13 +363,46 @@ void vtkF3DRenderer::ShowAxis(bool show)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ShowGrid(bool show, double unitSquare, int subdivisions)
+void vtkF3DRenderer::SetGridUnitSquare(double unitSquare)
 {
-  // XXX Do this only once
+  if (this->GridUnitSquare != unitSquare)
+  {
+    this->GridUnitSquare = unitSquare;
+    this->GridConfigured = false;
+  }
+}
 
-  // Initialize grid using visible prop bounds
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridSubdivisions(int subdivisions)
+{
+  if (this->GridSubdivisions != subdivisions)
+  {
+    this->GridSubdivisions = subdivisions;
+    this->GridConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowGrid(bool show)
+{
+  if (this->GridVisible != show)
+  {
+    this->SetClippingRangeExpansion(show ? 0.99 : 0);
+    this->GridVisible = show;
+    this->GridActor->SetVisibility(show);
+    this->ResetCameraClippingRange();
+
+    this->SetupRenderPasses();
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
+{
+  // Configure grid using visible prop bounds and actors
   // Also initialize GridInfo
-  if (!this->GridConfigured)
+  if (this->GridVisible)
   {
     double bounds[6];
     this->ComputeVisiblePropBounds(bounds);
@@ -378,14 +411,15 @@ void vtkF3DRenderer::ShowGrid(bool show, double unitSquare, int subdivisions)
 
     if (!bbox.IsValid())
     {
-      show = false;
+      return;
     }
     else
     {
       double diag = bbox.GetDiagonalLength();
-      if (unitSquare <= 0)
+      double tmpUnitSquare = this->GridUnitSquare;
+      if (tmpUnitSquare <= 0)
       {
-        unitSquare = pow(10.0, round(log10(diag * 0.1)));
+        tmpUnitSquare = pow(10.0, round(log10(diag * 0.1)));
       }
 
       double gridPos[3];
@@ -396,15 +430,15 @@ void vtkF3DRenderer::ShowGrid(bool show, double unitSquare, int subdivisions)
       }
 
       std::stringstream stream;
-      stream << "Using grid unit square size = " << unitSquare << "\n"
+      stream << "Using grid unit square size = " << tmpUnitSquare << "\n"
              << "Grid origin set to [" << gridPos[0] << ", " << gridPos[1] << ", " << gridPos[2]
              << "]\n\n";
       this->GridInfo = stream.str();
 
       vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
       gridMapper->SetFadeDistance(diag);
-      gridMapper->SetUnitSquare(unitSquare);
-      gridMapper->SetSubdivisions(subdivisions);
+      gridMapper->SetUnitSquare(tmpUnitSquare);
+      gridMapper->SetSubdivisions(this->GridSubdivisions);
       gridMapper->SetUpIndex(this->UpIndex);
 
       this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
@@ -412,23 +446,10 @@ void vtkF3DRenderer::ShowGrid(bool show, double unitSquare, int subdivisions)
       this->GridActor->SetPosition(gridPos);
       this->GridActor->SetMapper(gridMapper);
       this->GridActor->UseBoundsOff();
-      this->GridActor->SetVisibility(false);
+      this->GridActor->SetVisibility(true);
       this->SetClippingRangeExpansion(0);
       this->GridConfigured = true;
-      this->GridVisible = false;
     }
-  }
-
-  // Actual grid visibility code
-  if (this->GridVisible != show)
-  {
-    this->SetClippingRangeExpansion(show ? 0.99 : 0);
-    this->GridVisible = show;
-    this->GridActor->SetVisibility(show);
-    this->ResetCameraClippingRange();
-
-    this->SetupRenderPasses();
-    this->CheatSheetConfigured = false;
   }
 }
 
@@ -980,6 +1001,11 @@ void vtkF3DRenderer::SetUseTrackball(bool use)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
+  if (!this->GridConfigured)
+  {
+    this->ConfigureGridUsingCurrentActors();
+  }
+
   if (!this->ActorsPropertiesConfigured)
   {
     this->ConfigureActorsProperties();
