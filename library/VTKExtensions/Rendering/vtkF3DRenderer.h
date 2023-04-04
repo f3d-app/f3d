@@ -112,11 +112,6 @@ public:
   vtkGetObjectMacro(Skybox, vtkSkybox);
 
   /**
-   * Setup the different render passes
-   */
-  void SetupRenderPasses();
-
-  /**
    * Return description about the current rendering status
    * Currently contains information about the camera and the grid if any
    */
@@ -165,6 +160,11 @@ protected:
   void ConfigureGridUsingCurrentActors();
 
   /**
+   * Configure the different render passes
+   */
+  void ConfigureRenderPasses();
+
+  /**
    * Add related hotkeys options to the cheatsheet.
    * Override to add other hotkeys
    */
@@ -193,6 +193,7 @@ protected:
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
   bool GridConfigured = false;
+  bool RenderPassesConfigured = false;
 
   bool GridVisible = false;
   bool AxisVisible = false;
