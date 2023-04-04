@@ -365,7 +365,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowGrid(bool show, double unitSquare, int subdivisions)
 {
-  // XXX Do this onle once
+  // XXX Do this only once
 
   // Initialize grid using visible prop bounds
   // Also initialize GridInfo
