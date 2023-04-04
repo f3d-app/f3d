@@ -111,7 +111,7 @@ public:
   ///@}
 
   /**
-   * Reimplemented to update the visibility and coloring of internal actors 
+   * Reimplemented to update the visibility and coloring of internal actors
    * as well as the scalar bar actors.
    * Call Superclass::UpdateActors at the end.
    */

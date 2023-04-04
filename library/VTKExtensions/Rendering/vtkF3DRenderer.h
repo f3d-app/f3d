@@ -218,7 +218,7 @@ protected:
   double PointSize = 10.0;
   double LineWidth = 1.0;
   double GridUnitSquare = 0.0;
-  int GridSubdivisions = 10; 
+  int GridSubdivisions = 10;
 
   bool HasHDRI = false;
   std::string HDRIFile;
