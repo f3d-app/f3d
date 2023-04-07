@@ -51,6 +51,9 @@ if (APPLE)
   endif ()
 elseif (UNIX)
   set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../${CMAKE_INSTALL_LIBDIR})
+elseif (MSVC)
+  set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT f3d) # Set f3d as startup project in visual studio
+  set_target_properties(f3d PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=$<TARGET_FILE_DIR:VTK::CommonCore>") # Add VTK in MSVC PATH environment variable
 endif ()
 
 target_include_directories(f3d
