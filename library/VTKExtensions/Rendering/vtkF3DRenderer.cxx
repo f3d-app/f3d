@@ -166,7 +166,6 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Initialize(const std::string& up)
 {
-  this->ActorsPropertiesConfigured = false;
   this->RemoveAllViewProps();
   this->RemoveAllLights();
   this->OriginalLightIntensities.clear();
@@ -180,6 +179,8 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   this->GridConfigured = false;
   this->CheatSheetConfigured = false;
   this->ActorsPropertiesConfigured = false;
+  this->RenderPassesConfigured = false;
+  this->LightIntensitiesConfigured = false;
 
   this->GridInfo = "";
 
@@ -731,27 +732,12 @@ void vtkF3DRenderer::SetBackground(const double* color)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetLightIntensity(const double intensityFactor)
 {
-  // TODO move to update lights
-  vtkLightCollection* lc = this->GetLights();
-  vtkLight* light;
-  vtkCollectionSimpleIterator it;
-  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
+  if (this->LightIntensity != intensityFactor)
   {
-    double originalIntensity;
-    if (this->OriginalLightIntensities.count(light))
-    {
-      originalIntensity = this->OriginalLightIntensities[light];
-    }
-    else
-    {
-      originalIntensity = light->GetIntensity();
-      this->OriginalLightIntensities[light] = originalIntensity;
-    }
-
-    light->SetIntensity(originalIntensity * intensityFactor);
+    this->LightIntensity = intensityFactor;
+    this->LightIntensitiesConfigured = false;
+    this->CheatSheetConfigured = false;
   }
-  this->LightIntensity = intensityFactor;
-  this->CheatSheetConfigured = false;
 }
 
 //----------------------------------------------------------------------------
@@ -1069,13 +1055,42 @@ void vtkF3DRenderer::Render()
 //----------------------------------------------------------------------------
 int vtkF3DRenderer::UpdateLights()
 {
+  // Recover the number of light that are on
   int lightCount = this->Superclass::UpdateLights();
+
+  // If no lights are turned on, add a light kit
   if (lightCount == 0 && !this->UseImageBasedLighting)
   {
+    int nLights = this->GetLights()->GetNumberOfItems();
     vtkNew<vtkLightKit> lightKit;
     lightKit->AddLightsToRenderer(this);
-    return this->GetLights()->GetNumberOfItems();
+    lightCount += this->GetLights()->GetNumberOfItems() - nLights;
+    this->LightIntensitiesConfigured = false;
   }
+
+  if (!this->LightIntensitiesConfigured)
+  {
+    vtkLightCollection* lc = this->GetLights();
+    vtkLight* light;
+    vtkCollectionSimpleIterator it;
+    for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
+    {
+      double originalIntensity;
+      if (this->OriginalLightIntensities.count(light))
+      {
+        originalIntensity = this->OriginalLightIntensities[light];
+      }
+      else
+      {
+        originalIntensity = light->GetIntensity();
+        this->OriginalLightIntensities[light] = originalIntensity;
+      }
+
+      light->SetIntensity(originalIntensity * this->LightIntensity);
+    }
+    this->LightIntensitiesConfigured = true;
+  }
+
   return lightCount;
 }
 
