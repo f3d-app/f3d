@@ -9,12 +9,12 @@
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
+#include <vtkObjectFactory.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkProperty.h>
 #include <vtkScalarBarActor.h>
 #include <vtkScalarsToColors.h>
-#include <vtkSetGet.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkTexture.h>
 #include <vtkVolumeProperty.h>
