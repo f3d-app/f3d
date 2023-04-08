@@ -308,14 +308,18 @@ void window_impl::UpdateDynamicOptions()
 
   if (renWithColor)
   {
-    renWithColor->SetSurfaceColor(this->Internals->Options.getAsDoubleVector("model.color.rgb").data());
+    renWithColor->SetSurfaceColor(
+      this->Internals->Options.getAsDoubleVector("model.color.rgb").data());
     renWithColor->SetOpacity(this->Internals->Options.getAsDouble("model.color.opacity"));
     renWithColor->SetTextureBaseColor(this->Internals->Options.getAsString("model.color.texture"));
     renWithColor->SetRoughness(this->Internals->Options.getAsDouble("model.material.roughness"));
     renWithColor->SetMetallic(this->Internals->Options.getAsDouble("model.material.metallic"));
-    renWithColor->SetTextureMaterial(this->Internals->Options.getAsString("model.material.texture"));
-    renWithColor->SetTextureEmissive(this->Internals->Options.getAsString("model.emissive.texture"));
-    renWithColor->SetEmissiveFactor(this->Internals->Options.getAsDoubleVector("model.emissive.factor").data());
+    renWithColor->SetTextureMaterial(
+      this->Internals->Options.getAsString("model.material.texture"));
+    renWithColor->SetTextureEmissive(
+      this->Internals->Options.getAsString("model.emissive.texture"));
+    renWithColor->SetEmissiveFactor(
+      this->Internals->Options.getAsDoubleVector("model.emissive.factor").data());
     renWithColor->SetTextureNormal(this->Internals->Options.getAsString("model.normal.texture"));
     renWithColor->SetNormalScale(this->Internals->Options.getAsDouble("model.normal.scale"));
 

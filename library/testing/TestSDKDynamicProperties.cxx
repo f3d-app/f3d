@@ -22,7 +22,7 @@ int TestSDKDynamicProperties(int argc, char* argv[])
   // Change model properties and make sure it is taken into account
   opt.set("model.material.roughness", 0.6);
   opt.set("model.material.metallic", 0.5);
-  opt.set("model.color.rgb", {0.6, 0.1, 0.2});
+  opt.set("model.color.rgb", { 0.6, 0.1, 0.2 });
   opt.set("model.color.opacity", 0.6);
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
