@@ -35,24 +35,6 @@ public:
     vtkProgressBarWidget* widget;
   } ProgressDataStruct;
 
-  static void InitializeImporterWithOptions(const options& options, vtkF3DGenericImporter* importer)
-  {
-    // Move to interactor TODO
-    importer->SetSurfaceColor(options.getAsDoubleVector("model.color.rgb").data());
-    importer->SetOpacity(options.getAsDouble("model.color.opacity"));
-    importer->SetTextureBaseColor(options.getAsString("model.color.texture"));
-
-    importer->SetRoughness(options.getAsDouble("model.material.roughness"));
-    importer->SetMetallic(options.getAsDouble("model.material.metallic"));
-    importer->SetTextureMaterial(options.getAsString("model.material.texture"));
-
-    importer->SetTextureEmissive(options.getAsString("model.emissive.texture"));
-    importer->SetEmissiveFactor(options.getAsDoubleVector("model.emissive.factor").data());
-
-    importer->SetTextureNormal(options.getAsString("model.normal.texture"));
-    importer->SetNormalScale(options.getAsDouble("model.normal.scale"));
-  }
-
   static void CreateProgressRepresentationAndCallback(
     ProgressDataStruct* data, vtkImporter* importer, interactor_impl* interactor)
   {
@@ -182,10 +164,6 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
 
     // Initialize the window with coloring if ever needed
     this->Internals->Window.Initialize(true);
-
-    // Initialize genericImporter with options
-    loader_impl::internals::InitializeImporterWithOptions(
-      this->Internals->Options, this->Internals->GenericImporter);
 
     // We are in default scene mode now
     this->Internals->DefaultScene = true;

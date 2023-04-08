@@ -4,21 +4,64 @@
 #include "vtkF3DConfigure.h"
 #include "vtkF3DGenericImporter.h"
 
-#include <vtkBoundingBox.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkDataArray.h>
-#include <vtkDataSetAttributes.h>
-#include <vtkFieldData.h>
-#include <vtkObjectFactory.h>
+#include <vtkImageData.h>
+#include <vtkImageReader2.h>
+#include <vtkImageReader2Factory.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkPointGaussianMapper.h>
-#include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
 #include <vtkScalarBarActor.h>
+#include <vtkScalarsToColors.h>
 #include <vtkSmartVolumeMapper.h>
+#include <vtkTexture.h>
 #include <vtkVolumeProperty.h>
 
+#include <cassert>
 #include <sstream>
+
+namespace
+{
+//----------------------------------------------------------------------------
+// TODO : add this function in a utils file for rendering in VTK directly
+vtkSmartPointer<vtkTexture> GetTexture(const std::string& filePath, bool isSRGB = false)
+{
+  vtkSmartPointer<vtkTexture> texture;
+  if (!filePath.empty())
+  {
+    std::string fullPath = vtksys::SystemTools::CollapseFullPath(filePath);
+    if (!vtksys::SystemTools::FileExists(fullPath))
+    {
+      F3DLog::Print(F3DLog::Severity::Warning, "Texture file does not exist " + fullPath + "\n");
+    }
+    else
+    {
+      auto reader = vtkSmartPointer<vtkImageReader2>::Take(
+        vtkImageReader2Factory::CreateImageReader2(fullPath.c_str()));
+      if (reader)
+      {
+        reader->SetFileName(fullPath.c_str());
+        reader->Update();
+        texture = vtkSmartPointer<vtkTexture>::New();
+        texture->SetInputConnection(reader->GetOutputPort());
+        if (isSRGB)
+        {
+          texture->UseSRGBColorSpaceOn();
+        }
+        texture->InterpolateOn();
+        return texture;
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning, "Cannot open texture file " + fullPath + "\n");
+      }
+    }
+  }
+
+  return texture;
+}
+}
 
 vtkStandardNewMacro(vtkF3DRendererWithColoring);
 
@@ -46,8 +89,150 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& up)
   this->VolumePropsAndMappersConfigured = false;
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
+  this->ColoringActorsPropertiesConfigured = false;
+  this->ColoringConfigured = false;
+}
 
-  this->ColoringTimeStamp.Modified();
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetRoughness(double roughness)
+{
+  if (this->Roughness != roughness)
+  {
+    this->Roughness = roughness;
+    this->ColoringActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetOpacity(double opacity)
+{
+  if (this->Opacity != opacity)
+  {
+    this->Opacity = opacity;
+    this->ColoringActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetMetallic(double metallic)
+{
+  if (this->Metallic != metallic)
+  {
+    this->Metallic = metallic;
+    this->ColoringActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetNormalScale(double normalScale)
+{
+  if (this->NormalScale != normalScale)
+  {
+    this->NormalScale = normalScale;
+    this->ColoringActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetSurfaceColor(double* color)
+{
+  if (!std::equal(color, color + 3, this->SurfaceColor))
+  {
+    std::copy(color, color + 3, this->SurfaceColor);
+    this->ColoringActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetEmissiveFactor(double* factor)
+{
+  if (!std::equal(factor, factor + 3, this->EmissiveFactor))
+  {
+    std::copy(factor, factor + 3, this->EmissiveFactor);
+    this->ColoringActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetTextureBaseColor(const std::string& tex)
+{
+  if (this->TextureBaseColor != tex)
+  {
+    this->TextureBaseColor = tex;
+    this->ColoringActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetTextureMaterial(const std::string& tex)
+{
+  if (this->TextureMaterial != tex)
+  {
+    this->TextureMaterial = tex;
+    this->ColoringActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetTextureEmissive(const std::string& tex)
+{
+  if (this->TextureEmissive != tex)
+  {
+    this->TextureEmissive = tex;
+    this->ColoringActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetTextureNormal(const std::string& tex)
+{
+  if (this->TextureNormal != tex)
+  {
+    this->TextureNormal = tex;
+    this->ColoringActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
+{
+  assert(this->Importer);
+
+  const auto& actorsAndMappers = this->Importer->GetGeometryActorsAndMappers();
+  for (size_t i = 0; i < actorsAndMappers.size(); i++)
+  {
+    auto& actorAndMapper = actorsAndMappers[i];
+    actorAndMapper.first->GetProperty()->SetColor(this->SurfaceColor);
+    actorAndMapper.first->GetProperty()->SetOpacity(this->Opacity);
+    actorAndMapper.first->GetProperty()->SetRoughness(this->Roughness);
+    actorAndMapper.first->GetProperty()->SetMetallic(this->Metallic);
+    actorAndMapper.first->GetProperty()->SetLineWidth(this->LineWidth);
+
+    // Textures
+    auto colorTex = ::GetTexture(this->TextureBaseColor, true);
+    actorAndMapper.first->GetProperty()->SetBaseColorTexture(colorTex);
+    actorAndMapper.first->GetProperty()->SetORMTexture(::GetTexture(this->TextureMaterial));
+    actorAndMapper.first->GetProperty()->SetEmissiveTexture(
+      ::GetTexture(this->TextureEmissive, true));
+    actorAndMapper.first->GetProperty()->SetEmissiveFactor(this->EmissiveFactor);
+    actorAndMapper.first->GetProperty()->SetNormalTexture(::GetTexture(this->TextureNormal));
+    actorAndMapper.first->GetProperty()->SetNormalScale(this->NormalScale);
+
+    // If the input texture is RGBA, flag the actor as translucent
+    if (colorTex && colorTex->GetImageDataInput(0)->GetNumberOfScalarComponents() == 4)
+    {
+      actorAndMapper.first->ForceTranslucentOn();
+    }
+  }
+
+  const auto& psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
+  for (auto& psActorAndMapper : psActorsAndMappers)
+  {
+    psActorAndMapper.first->GetProperty()->SetColor(this->SurfaceColor);
+    psActorAndMapper.first->GetProperty()->SetOpacity(this->Opacity);
+  }
+
+  this->ColoringActorsPropertiesConfigured = true;
 }
 
 //----------------------------------------------------------------------------
@@ -78,7 +263,7 @@ void vtkF3DRendererWithColoring::ShowScalarBar(bool show)
   {
     this->ScalarBarVisible = show;
     this->CheatSheetConfigured = false;
-    this->ColoringTimeStamp.Modified();
+    this->ColoringConfigured = false;
   }
 }
 
@@ -89,7 +274,7 @@ void vtkF3DRendererWithColoring::SetUsePointSprites(bool use)
   {
     this->UsePointSprites = use;
     this->CheatSheetConfigured = false;
-    this->ColoringTimeStamp.Modified();
+    this->ColoringConfigured = false;
   }
 }
 
@@ -100,7 +285,7 @@ void vtkF3DRendererWithColoring::SetUseVolume(bool use)
   {
     this->UseVolume = use;
     this->CheatSheetConfigured = false;
-    this->ColoringTimeStamp.Modified();
+    this->ColoringConfigured = false;
   }
 }
 
@@ -132,7 +317,7 @@ void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
     }
     this->VolumePropsAndMappersConfigured = false;
     this->CheatSheetConfigured = false;
-    this->ColoringTimeStamp.Modified();
+    this->ColoringConfigured = false;
   }
 }
 
@@ -147,7 +332,7 @@ void vtkF3DRendererWithColoring::SetScalarBarRange(const std::vector<double>& ra
     this->PointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
-    this->ColoringTimeStamp.Modified();
+    this->ColoringConfigured = false;
   }
 }
 
@@ -163,7 +348,7 @@ void vtkF3DRendererWithColoring::SetColormap(const std::vector<double>& colormap
     this->PointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
-    this->ColoringTimeStamp.Modified();
+    this->ColoringConfigured = false;
   }
 }
 
@@ -197,8 +382,7 @@ void vtkF3DRendererWithColoring::CycleScalars(CycleType type)
   this->VolumePropsAndMappersConfigured = false;
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
-
-  this->ColoringTimeStamp.Modified();
+  this->ColoringConfigured = false;
 }
 
 //----------------------------------------------------------------------------
@@ -281,7 +465,7 @@ void vtkF3DRendererWithColoring::SetColoring(
     this->PointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
-    this->ColoringTimeStamp.Modified();
+    this->ColoringConfigured = false;
   }
 }
 
@@ -318,15 +502,9 @@ void vtkF3DRendererWithColoring::UpdateActors()
 {
   assert(this->Importer != nullptr);
 
-  bool importerChanged = this->Importer->GetMTime() >= this->ColoringUpdateTime;
-
-  // Early return if nothing changed
-  if (!importerChanged && this->ColoringUpdateTime >= this->ColoringTimeStamp.GetMTime())
-  {
-    this->Superclass::UpdateActors();
-    return;
-  }
-
+  // Handle importer changes
+  vtkMTimeType importerMTime = this->Importer->GetMTime();
+  bool importerChanged = this->Importer->GetMTime() >= this->ImporterTimeStamp;
   if (importerChanged)
   {
     this->ColorTransferFunctionConfigured = false;
@@ -337,9 +515,30 @@ void vtkF3DRendererWithColoring::UpdateActors()
     this->ActorsPropertiesConfigured = false;
     this->GridConfigured = false;
     this->MetaDataConfigured = false;
+    this->ColoringActorsPropertiesConfigured = false;
+    this->ColoringConfigured = false;
+  }
+  this->ImporterTimeStamp = importerMTime;
+
+  if (!this->ColoringActorsPropertiesConfigured)
+  {
+    this->ConfigureColoringActorsProperties();
   }
 
-  this->ColoringUpdateTime = this->ColoringTimeStamp.GetMTime();
+  if (!this->ColoringConfigured)
+  {
+    this->ConfigureColoring();
+  }
+
+  // Call superclass update actors after everything,
+  // as the grid need all actors visible to be configured correctly
+  this->Superclass::UpdateActors();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::ConfigureColoring()
+{
+  assert(this->Importer);
 
   // Recover coloring information
   vtkF3DGenericImporter::ColoringInfo info;
@@ -473,10 +672,7 @@ void vtkF3DRendererWithColoring::UpdateActors()
   }
 
   this->RenderPassesConfigured = false;
-
-  // Call superclass update actors after everything,
-  // as the grid need all actors visible to be configured correctly
-  this->Superclass::UpdateActors();
+  this->ColoringConfigured = true;
 }
 
 //----------------------------------------------------------------------------

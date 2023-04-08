@@ -3,82 +3,26 @@
 #include "F3DLog.h"
 
 #include <vtkActor.h>
-#include <vtkAppendPolyData.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCellData.h>
-#include <vtkDataObject.h>
-#include <vtkDataObjectTreeIterator.h>
-#include <vtkDataSetSurfaceFilter.h>
+#include <vtkCompositeDataSet.h>
+#include <vtkDataSetAttributes.h>
 #include <vtkDoubleArray.h>
-#include <vtkEventForwarderCommand.h>
 #include <vtkImageData.h>
-#include <vtkImageReader2.h>
-#include <vtkImageReader2Factory.h>
-#include <vtkImageToPoints.h>
 #include <vtkInformation.h>
-#include <vtkLightKit.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
-#include <vtkPiecewiseFunction.h>
 #include <vtkPointData.h>
 #include <vtkPointGaussianMapper.h>
+#include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
-#include <vtkRectilinearGrid.h>
-#include <vtkRectilinearGridToPointSet.h>
 #include <vtkRenderer.h>
-#include <vtkScalarsToColors.h>
-#include <vtkSmartPointer.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
-#include <vtkTexture.h>
-#include <vtkVertexGlyphFilter.h>
-#include <vtkVolumeProperty.h>
-#include <vtksys/SystemTools.hxx>
+#include <vtkVolume.h>
 
 #include <sstream>
-
-namespace
-{
-//----------------------------------------------------------------------------
-// TODO : add this function in a utils file for rendering in VTK directly
-vtkSmartPointer<vtkTexture> GetTexture(const std::string& filePath, bool isSRGB = false)
-{
-  vtkSmartPointer<vtkTexture> texture;
-  if (!filePath.empty())
-  {
-    std::string fullPath = vtksys::SystemTools::CollapseFullPath(filePath);
-    if (!vtksys::SystemTools::FileExists(fullPath))
-    {
-      F3DLog::Print(F3DLog::Severity::Warning, "Texture file does not exist " + fullPath + "\n");
-    }
-    else
-    {
-      auto reader = vtkSmartPointer<vtkImageReader2>::Take(
-        vtkImageReader2Factory::CreateImageReader2(fullPath.c_str()));
-      if (reader)
-      {
-        reader->SetFileName(fullPath.c_str());
-        reader->Update();
-        texture = vtkSmartPointer<vtkTexture>::New();
-        texture->SetInputConnection(reader->GetOutputPort());
-        if (isSRGB)
-        {
-          texture->UseSRGBColorSpaceOn();
-        }
-        texture->InterpolateOn();
-        return texture;
-      }
-      else
-      {
-        F3DLog::Print(F3DLog::Severity::Warning, "Cannot open texture file " + fullPath + "\n");
-      }
-    }
-  }
-
-  return texture;
-}
-}
 
 struct ReaderPipeline
 {
@@ -299,31 +243,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     pipe.PointSpritesActor->VisibilityOff();
     pipe.VolumeProp->VisibilityOff();
 
-    // TODO move to renderer
-    pipe.GeometryActor->GetProperty()->SetColor(this->SurfaceColor);
-    pipe.GeometryActor->GetProperty()->SetOpacity(this->Opacity);
-    pipe.GeometryActor->GetProperty()->SetRoughness(this->Roughness);
-    pipe.GeometryActor->GetProperty()->SetMetallic(this->Metallic);
-    pipe.GeometryActor->GetProperty()->SetLineWidth(this->LineWidth);
-
-    pipe.PointSpritesActor->GetProperty()->SetColor(this->SurfaceColor);
-    pipe.PointSpritesActor->GetProperty()->SetOpacity(this->Opacity);
-
-    // Textures
-    auto colorTex = ::GetTexture(this->TextureBaseColor, true);
-    pipe.GeometryActor->GetProperty()->SetBaseColorTexture(colorTex);
-    pipe.GeometryActor->GetProperty()->SetORMTexture(::GetTexture(this->TextureMaterial));
-    pipe.GeometryActor->GetProperty()->SetEmissiveTexture(
-      ::GetTexture(this->TextureEmissive, true));
-    pipe.GeometryActor->GetProperty()->SetEmissiveFactor(this->EmissiveFactor);
-    pipe.GeometryActor->GetProperty()->SetNormalTexture(::GetTexture(this->TextureNormal));
-    pipe.GeometryActor->GetProperty()->SetNormalScale(this->NormalScale);
-
-    // If the input texture is RGBA, flag the actor as translucent
-    if (colorTex && colorTex->GetImageDataInput(0)->GetNumberOfScalarComponents() == 4)
-    {
-      pipe.GeometryActor->ForceTranslucentOn();
-    }
     pipe.Imported = true;
   }
   this->UpdateTemporalInformation();
