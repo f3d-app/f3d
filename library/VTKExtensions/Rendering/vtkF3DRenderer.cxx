@@ -182,6 +182,7 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   this->RenderPassesConfigured = false;
   this->LightIntensitiesConfigured = false;
   this->TextActorsConfigured = false;
+  this->MetaDataConfigured = false;
 
   this->GridInfo = "";
 
@@ -329,7 +330,11 @@ std::string vtkF3DRenderer::GetSceneDescription()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowAxis(bool show)
 {
-  // Dynamic visible axis XXX Handle in update actors
+  // Dynamic visible axis
+  // XXX this could be handled in UpdateActors
+  // but it is not needed as axis actor is not impacted by
+  // by any other parameters and require special
+  // care when destructing this renderer
   if (this->AxisVisible != show)
   {
     this->AxisWidget = nullptr;
@@ -464,8 +469,9 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
     collapsedHdriFile = vtksys::SystemTools::CollapseFullPath(hdriFile);
   }
 
-  // XXX this could be handled in UpdateActor
-  // but it is not needed as skybox actor is handled separately
+  // XXX this could be handled in UpdateActors
+  // but it is not needed as skybox actor is not impacted by
+  // by any other parameters
   if (this->HDRIFile != collapsedHdriFile)
   {
     this->HDRIFile = collapsedHdriFile;
@@ -877,18 +883,24 @@ void vtkF3DRenderer::ShowMetaData(bool show)
 {
   if (this->MetaDataVisible != show)
   {
-    this->MetaDataVisible = show; // XXX should be handled in update actors
-    this->MetaDataActor->SetVisibility(show);
-    if (show)
-    {
-      // Update metadata info
-      std::string MetaDataDesc = this->GenerateMetaDataDescription();
-      this->MetaDataActor->SetText(vtkCornerAnnotation::RightEdge, MetaDataDesc.c_str());
-    }
-
+    this->MetaDataVisible = show;
+    this->MetaDataConfigured = false;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureMetaData()
+{
+  this->MetaDataActor->SetVisibility(this->MetaDataVisible);
+  if (this->MetaDataVisible)
+  {
+    // Update metadata info
+    std::string MetaDataDesc = this->GenerateMetaDataDescription();
+    this->MetaDataActor->SetText(vtkCornerAnnotation::RightEdge, MetaDataDesc.c_str());
+  }
+  this->MetaDataConfigured = true;
 }
 
 //----------------------------------------------------------------------------
@@ -993,6 +1005,11 @@ void vtkF3DRenderer::SetUseTrackball(bool use)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateActors()
 {
+  if (!this->MetaDataConfigured)
+  {
+    this->ConfigureMetaData();
+  }
+
   if (!this->TextActorsConfigured)
   {
     this->ConfigureTextActors();
