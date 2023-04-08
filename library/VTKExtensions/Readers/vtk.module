@@ -8,9 +8,7 @@ PRIVATE_DEPENDS
   VTK::CommonExecutionModel
   VTK::FiltersGeneral
   VTK::FiltersGeometry
-  VTK::IOImage
   VTK::ImagingHybrid
-  VTK::RenderingAnnotation
   VTK::RenderingVolumeOpenGL2
   f3d::VTKExtensionsCore
 TEST_DEPENDS
