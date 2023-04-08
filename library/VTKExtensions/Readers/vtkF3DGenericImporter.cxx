@@ -18,6 +18,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkSetGet.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkVolume.h>

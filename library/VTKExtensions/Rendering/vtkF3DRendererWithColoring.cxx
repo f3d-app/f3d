@@ -14,9 +14,11 @@
 #include <vtkProperty.h>
 #include <vtkScalarBarActor.h>
 #include <vtkScalarsToColors.h>
+#include <vtkSetGet.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkTexture.h>
 #include <vtkVolumeProperty.h>
+#include <vtksys/SystemTools.hxx>
 
 #include <cassert>
 #include <sstream>
