@@ -141,6 +141,11 @@ protected:
   bool IsBackgroundDark();
 
   /**
+   * Configure meta data actor visibility and content
+   */
+  void ConfigureMetaData();
+
+  /**
    * Configure text actors properties font file and color
    */
   void ConfigureTextActors();
@@ -200,6 +205,7 @@ protected:
   bool RenderPassesConfigured = false;
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
+  bool MetaDataConfigured = false;
 
   bool GridVisible = false;
   bool AxisVisible = false;
