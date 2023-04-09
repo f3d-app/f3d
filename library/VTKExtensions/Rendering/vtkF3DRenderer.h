@@ -194,6 +194,7 @@ protected:
   bool ActorsPropertiesConfigured = false;
   bool GridConfigured = false;
   bool RenderPassesConfigured = false;
+  bool LightIntensitiesConfigured = false;
 
   bool GridVisible = false;
   bool AxisVisible = false;
