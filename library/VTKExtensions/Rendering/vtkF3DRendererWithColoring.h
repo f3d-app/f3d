@@ -133,6 +133,20 @@ public:
     COMPONENT
   };
 
+  enum class ColoringStyle_t
+  {
+    NONE,
+    DIRECT,
+    MAGNITUDE,
+    COMPONENT
+  };
+
+  enum class ColoringField_t
+  {
+    POINT,
+    CELL
+  };
+
   /**
    * Cycle the shown scalars according to the cycle type
    */
@@ -149,6 +163,7 @@ public:
    * position ArrayIndexForColoring and DataForColoring accordingly.
    */
   void SetColoring(bool useCellData, const std::string& arrayName, int component);
+  void SetColoring(const ColoringStyle_t& coloringStyle, const ColoringField_t& coloringField, const std::string& coloringArrayName, int coloringComponent);
 
   ///@{
   /**
@@ -286,7 +301,6 @@ protected:
   bool ColorTransferFunctionConfigured = false;
 
   bool UseCellColoring = false;
-  int ArrayIndexForColoring = -1;
   int ComponentForColoring = -1;
 
   bool ScalarBarVisible = false;
@@ -298,6 +312,12 @@ protected:
   std::vector<double> Colormap;
 
   vtkMTimeType ImporterTimeStamp = 0;
+
+  ColoringStyle_t ColoringStyle = ColoringStyle_t::MAGNITUDE;
+  ColoringField_t ColoringField = ColoringField_t::POINT;
+  std::string ColoringArrayName;
+  int ColoringArrayIndex = -1;
+  int ColoringComponent = 0;
 };
 
 #endif
