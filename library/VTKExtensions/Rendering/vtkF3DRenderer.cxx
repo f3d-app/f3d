@@ -181,6 +181,7 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   this->ActorsPropertiesConfigured = false;
   this->RenderPassesConfigured = false;
   this->LightIntensitiesConfigured = false;
+  this->TextActorsConfigured = false;
 
   this->GridInfo = "";
 
@@ -644,13 +645,13 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
       this->SetEnvironmentTexture(nullptr);
       this->RemoveActor(this->Skybox);
     }
-    this->UpdateTextColor(); // XXX move to UpdateActors
+    this->TextActorsConfigured = false;
   }
   this->RenderPassesConfigured = false;
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::UpdateTextColor()
+void vtkF3DRenderer::ConfigureTextActors()
 {
   // Dynamic text color
   double textColor[3];
@@ -666,6 +667,34 @@ void vtkF3DRenderer::UpdateTextColor()
   this->MetaDataActor->GetTextProperty()->SetColor(textColor);
   this->TimerActor->GetTextProperty()->SetColor(textColor);
   this->CheatSheetActor->GetTextProperty()->SetColor(textColor);
+
+  // Font
+  this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
+  if (!this->FontFile.empty())
+  {
+    std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(this->FontFile);
+    if (vtksys::SystemTools::FileExists(tmpFontFile, true))
+    {
+      this->FilenameActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->FilenameActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+      this->MetaDataActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->MetaDataActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+      this->TimerActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->TimerActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+      this->CheatSheetActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->CheatSheetActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+    }
+    else
+    {
+      F3DLog::Print(
+        F3DLog::Severity::Warning, std::string("Cannot find \"") + tmpFontFile + "\" font file.");
+    }
+  }
+
+  this->TextActorsConfigured = true;
 }
 
 //----------------------------------------------------------------------------
@@ -691,34 +720,10 @@ void vtkF3DRenderer::SetPointSize(double pointSize)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetFontFile(const std::string& fontFile)
 {
-  // Dynamic font management
-  if (this->FontFile != fontFile) // XXX should be done in UpdateActors
+  if (this->FontFile != fontFile)
   {
     this->FontFile = fontFile;
-    this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
-    this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
-    this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
-    this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
-    if (!fontFile.empty())
-    {
-      std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(fontFile);
-      if (vtksys::SystemTools::FileExists(tmpFontFile, true))
-      {
-        this->FilenameActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-        this->FilenameActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
-        this->MetaDataActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-        this->MetaDataActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
-        this->TimerActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-        this->TimerActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
-        this->CheatSheetActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-        this->CheatSheetActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
-      }
-      else
-      {
-        F3DLog::Print(
-          F3DLog::Severity::Warning, std::string("Cannot find \"") + tmpFontFile + "\" font file.");
-      }
-    }
+    this->TextActorsConfigured = false;
   }
 }
 
@@ -726,7 +731,7 @@ void vtkF3DRenderer::SetFontFile(const std::string& fontFile)
 void vtkF3DRenderer::SetBackground(const double* color)
 {
   this->Superclass::SetBackground(color);
-  this->UpdateTextColor(); // XXX move to UpdateActors
+  this->TextActorsConfigured = false;
 }
 
 //----------------------------------------------------------------------------
@@ -988,6 +993,11 @@ void vtkF3DRenderer::SetUseTrackball(bool use)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateActors()
 {
+  if (!this->TextActorsConfigured)
+  {
+    this->ConfigureTextActors();
+  }
+
   if (!this->RenderPassesConfigured)
   {
     this->ConfigureRenderPasses();

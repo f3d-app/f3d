@@ -139,7 +139,11 @@ protected:
   void ReleaseGraphicsResources(vtkWindow* w) override;
 
   bool IsBackgroundDark();
-  void UpdateTextColor();
+
+  /**
+   * Configure text actors properties font file and color
+   */
+  void ConfigureTextActors();
 
   /**
    * Configure all actors properties according to what has been set for:
@@ -195,6 +199,7 @@ protected:
   bool GridConfigured = false;
   bool RenderPassesConfigured = false;
   bool LightIntensitiesConfigured = false;
+  bool TextActorsConfigured = false;
 
   bool GridVisible = false;
   bool AxisVisible = false;
