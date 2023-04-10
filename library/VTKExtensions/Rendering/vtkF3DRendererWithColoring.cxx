@@ -419,7 +419,7 @@ vtkF3DRendererWithColoring::CycleType vtkF3DRendererWithColoring::CheckColoring(
 
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetColoring(
-  const ColoringStyle_t& coloringStyle, const ColoringField_t& coloringField, const std::string& coloringArrayName, int coloringComponent);
+  const ColoringStyle_t& coloringStyle, const ColoringField_t& coloringField, const std::string& coloringArrayName, int coloringComponent)
 {
   if (this->ColoringStyle != coloringStyle ||
       this->ColoringField != coloringField ||
@@ -450,7 +450,7 @@ bool vtkF3DRendererWithColoring::GetColoringUseCell()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::GetColoringArrayName()
 {
-  return this->ColoringArrayNamme;
+  return this->ColoringArrayName;
 }
 
 //----------------------------------------------------------------------------
@@ -501,19 +501,21 @@ void vtkF3DRendererWithColoring::UpdateActors()
 void vtkF3DRendererWithColoring::ConfigureColoring()
 {
   assert(this->Importer);
+  bool useCellData = this->ColoringField == vtkF3DRendererWithColoring::ColoringField_t::CELL;
   if (this->ColoringStyle == vtkF3DRendererWithColoring::ColoringStyle_t::NONE)
   {
+    std::cout<<"NONE"<<std::endl;
     // Not coloring
     this->ColoringArrayIndex = -1;
   }
   else
   {
-    bool useCellData = this->ColoringField == vtkF3DRendererWithColoring::ColoringField_t::CELL;
     int nIndexes = this->Importer->GetNumberOfIndexesForColoring(useCellData);
 
     // Find the array index
     if (this->ColoringArrayName == F3D_RESERVED_STRING)
     {
+      std::cout<<"F3D_RESERVED_STRING"<<std::endl;
       // Not coloring
       this->ColoringArrayIndex = -1;
     }
@@ -535,7 +537,7 @@ void vtkF3DRendererWithColoring::ConfigureColoring()
       if (this->ColoringArrayIndex == -1)
       {
         // Could not find named array
-        F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: " + arrayName + "\n");
+        F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: " + this->ColoringArrayName + "\n");
       }
     }
   }
@@ -562,11 +564,11 @@ void vtkF3DRendererWithColoring::ConfigureColoring()
 
   // Compute component
   int component = this->ColoringComponent;
-  if (this->ColoringStyle = vtkF3DRendererWithColoring::ColoringStyle_t::DIRECT)
+  if (this->ColoringStyle == vtkF3DRendererWithColoring::ColoringStyle_t::DIRECT)
   {
     component = -2;
   }
-  else if(this->ColoringStyle = vtkF3DRendererWithColoring::ColoringStyle_t::MAGNITUDE)
+  else if(this->ColoringStyle == vtkF3DRendererWithColoring::ColoringStyle_t::MAGNITUDE)
   {
     component = -1;
   }
@@ -694,7 +696,7 @@ std::string vtkF3DRendererWithColoring::GetColoringDescription()
   bool useCellData = this->ColoringField == vtkF3DRendererWithColoring::ColoringField_t::CELL;
   if (this->Importer->GetInfoForColoring(useCellData, this->ColoringArrayIndex, info))
   {
-    stream << "Coloring using " << (useCelLData ? "cell" : "point") << " array named "
+    stream << "Coloring using " << (useCellData ? "cell" : "point") << " array named "
            << info.Name << ", "
            << this->GetColoringComponentName() << "\n";
   }
@@ -812,8 +814,8 @@ void vtkF3DRendererWithColoring::ConfigureScalarBarActorForColoring(
 void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(
   const vtkF3DGenericImporter::ColoringInfo& info)
 {
-  if (this->ColoringStyle = vtkF3DRendererWithColoring::ColoringStyle_t::DIRECT ||
-      this->ColoringStyle = vtkF3DRendererWithColoring::ColoringStyle_t::NONE
+  if (this->ColoringStyle == vtkF3DRendererWithColoring::ColoringStyle_t::DIRECT ||
+      this->ColoringStyle == vtkF3DRendererWithColoring::ColoringStyle_t::NONE)
   {
     return;
   }
@@ -831,7 +833,7 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(
     this->ColorRange[0] = this->UserScalarBarRange[0];
     this->ColorRange[1] = this->UserScalarBarRange[1];
   }
-  else if (this->ColoringStyle = vtkF3DRendererWithColoring::ColoringStyle_t::COMPONENT)
+  else if (this->ColoringStyle == vtkF3DRendererWithColoring::ColoringStyle_t::COMPONENT)
   {
     this->ColorRange[0] = info.ComponentRanges[this->ColoringComponent][0];
     this->ColorRange[1] = info.ComponentRanges[this->ColoringComponent][1];
@@ -865,7 +867,7 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(
     }
   }
 
-  if (this->ColoringStyle = vtkF3DRendererWithColoring::ColoringStyle_t::COMPONENT)
+  if (this->ColoringStyle == vtkF3DRendererWithColoring::ColoringStyle_t::COMPONENT)
   {
     this->ColorTransferFunction->SetVectorModeToComponent();
     this->ColorTransferFunction->SetVectorComponent(this->ColoringComponent);

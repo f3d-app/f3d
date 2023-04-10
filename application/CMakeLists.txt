@@ -129,25 +129,7 @@ target_compile_options(f3d PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_co
 target_link_options(f3d PUBLIC ${f3d_link_options_public})
 
 # Create man
-if(UNIX AND NOT APPLE)
-  option(F3D_LINUX_GENERATE_MAN "Generate and install a man entry for f3d using help2man" OFF)
-  mark_as_advanced(F3D_LINUX_GENERATE_MAN)
-  if(F3D_LINUX_GENERATE_MAN)
-    find_program(HELP2MAN help2man)
-    find_program(GZIP gzip)
-    if(HELP2MAN AND GZIP)
-      set(MAN_OUTPUT_FILE ${CMAKE_BINARY_DIR}/f3d.1)
-      add_custom_command(
-        OUTPUT ${MAN_OUTPUT_FILE}
-        COMMAND ${HELP2MAN} $<TARGET_FILE:f3d> -N -n "fast and minimalist 3D viewer" > ${MAN_OUTPUT_FILE}
-        COMMAND ${GZIP} -f ${MAN_OUTPUT_FILE}
-        DEPENDS f3d)
-      add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
-    else()
-      message(WARNING "help2man or gzip not found, cannot create man entry")
-    endif()
-  endif()
-endif()
+
 
 # Testing
 if(BUILD_TESTING)

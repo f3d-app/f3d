@@ -28,6 +28,19 @@
 
 namespace f3d::detail
 {
+
+static const std::map<std::string, vtkF3DRendererWithColoring::ColoringStyle_t> ColoringStylesMap = { 
+   {"none", vtkF3DRendererWithColoring::ColoringStyle_t::NONE},
+   {"direct", vtkF3DRendererWithColoring::ColoringStyle_t::DIRECT},
+   {"magnitude", vtkF3DRendererWithColoring::ColoringStyle_t::MAGNITUDE},
+   {"component", vtkF3DRendererWithColoring::ColoringStyle_t::COMPONENT}
+};
+
+static const std::map<std::string, vtkF3DRendererWithColoring::ColoringField_t> ColoringFieldsMap = {
+   {"point", vtkF3DRendererWithColoring::ColoringField_t::POINT},
+   {"cell", vtkF3DRendererWithColoring::ColoringField_t::CELL}
+};
+
 class window_impl::internals
 {
 public:
@@ -323,15 +336,18 @@ void window_impl::UpdateDynamicOptions()
     renWithColor->SetTextureNormal(this->Internals->Options.getAsString("model.normal.texture"));
     renWithColor->SetNormalScale(this->Internals->Options.getAsDouble("model.normal.scale"));
 
-    std::string coloringStyle = this->Internals->Options.getAsString("model.coloring.style");
-    
+    // TODO except safety
+    std::string coloringStyleString = this->Internals->Options.getAsString("model.coloring.style");
+    auto coloringStyle = detail::ColoringStylesMap.at(coloringStyleString);
+    std::string coloringFieldString = this->Internals->Options.getAsString("model.coloring.field");
+    auto coloringField = detail::ColoringFieldsMap.at(coloringFieldString);
+    std::string coloringArrayName = this->Internals->Options.getAsString("model.coloring.array-name");
+    int coloringComponent = this->Internals->Options.getAsInt("model.coloring.component");
+    renWithColor->SetColoring(coloringStyle, coloringField, coloringArrayName, coloringComponent);
 
-    renWithColor->SetColoring(this->Internals->Options.getAsBool("model.scivis.cells"),
-      this->Internals->Options.getAsString("model.scivis.array-name"),
-      this->Internals->Options.getAsInt("model.scivis.component"));
     renWithColor->SetScalarBarRange(
-      this->Internals->Options.getAsDoubleVector("model.scivis.range"));
-    renWithColor->SetColormap(this->Internals->Options.getAsDoubleVector("model.scivis.colormap"));
+      this->Internals->Options.getAsDoubleVector("model.coloring.range"));
+    renWithColor->SetColormap(this->Internals->Options.getAsDoubleVector("model.coloring.colormap"));
     renWithColor->ShowScalarBar(this->Internals->Options.getAsBool("ui.bar"));
 
     renWithColor->SetUsePointSprites(

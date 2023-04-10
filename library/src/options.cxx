@@ -164,7 +164,7 @@ options::options()
 
   this->Internals->init("model.coloring.style", std::string("none"));
   this->Internals->init("model.coloring.field", std::string("point"));
-  this->Internals->init("model.coloring.array-name", F3D_RESERVED_STRING);
+  this->Internals->init("model.coloring.array-name", std::string());
   this->Internals->init("model.coloring.component", 0);
   this->Internals->init("model.coloring.colormap",
     std::vector<double>{

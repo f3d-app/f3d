@@ -277,13 +277,14 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp3, "blur-coc", "", "Blur circle of confusion radius", options.getAsDoubleRef("render.background.blur.coc"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp3, "light-intensity", "", "Light intensity", options.getAsDoubleRef("render.light.intensity"), HasDefault::YES, MayHaveConfig::YES, "<intensity>");
 
-    auto grp4 = cxxOptions.add_options("Scientific visualization");
-    this->DeclareOption(grp4, "scalars", "s", "Color by scalars", options.getAsStringRef("model.scivis.array-name"), HasDefault::YES, MayHaveConfig::YES, "<array_name>", HasImplicitValue::YES, "");
-    this->DeclareOption(grp4, "comp", "y", "Component from the scalar array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", options.getAsIntRef("model.scivis.component"), HasDefault::YES, MayHaveConfig::YES, "<comp_index>", HasImplicitValue::YES, "-2");
-    this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.getAsBoolRef("model.scivis.cells"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.getAsDoubleVectorRef("model.scivis.range"), HasDefault::YES, MayHaveConfig::YES, "<min,max>");
+    auto grp4 = cxxOptions.add_options("Coloring");
+    this->DeclareOption(grp4, "coloring", "s", "Enable coloring", options.getAsStringRef("model.coloring.style"), HasDefault::YES, MayHaveConfig::YES, "{none, direct, magnitude, component}", HasImplicitValue::YES, "magnitude");
+    this->DeclareOption(grp4, "coloring-field", "c", "Field type to color with", options.getAsStringRef("model.coloring.field"), HasDefault::YES, MayHaveConfig::YES, "{point, cell}", HasImplicitValue::YES, "cell");
+    this->DeclareOption(grp4, "coloring-array", "", "Array name to color with", options.getAsStringRef("model.coloring.array-name"), HasDefault::YES, MayHaveConfig::YES, "<array_name>");
+    this->DeclareOption(grp4, "coloring-component", "", "Component from the scalar array to color with.", options.getAsIntRef("model.coloring.component"), HasDefault::YES, MayHaveConfig::YES, "<comp_index>");
+    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.getAsDoubleVectorRef("model.coloring.range"), HasDefault::YES, MayHaveConfig::YES, "<min,max>");
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.getAsBoolRef("ui.bar"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.getAsDoubleVectorRef("model.scivis.colormap"), HasDefault::YES, MayHaveConfig::YES, "<color_list>");
+    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.getAsDoubleVectorRef("model.coloring.colormap"), HasDefault::YES, MayHaveConfig::YES, "<color_list>");
     this->DeclareOption(grp4, "volume", "v", "Show volume if the file is compatible", options.getAsBoolRef("model.volume.enable"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.getAsBoolRef("model.volume.inverse"), HasDefault::YES, MayHaveConfig::YES);
 
