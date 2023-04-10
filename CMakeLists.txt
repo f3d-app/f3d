@@ -21,8 +21,6 @@ endif()
 option(F3D_MODULE_EXTERNAL_RENDERING "External rendering module" OFF)
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 
-option(F3D_INSTALL_SDK "Install F3D library SDK" OFF)
-
 # VTK dependency
 find_package(VTK 9.0 REQUIRED
   COMPONENTS
@@ -159,11 +157,8 @@ if(EMSCRIPTEN)
 endif ()
 
 # Installation
-option(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE "Install a default configuration file" OFF)
-mark_as_advanced(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
 if(UNIX AND NOT APPLE)
-  cmake_dependent_option(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX "Install the default configuration at the prefix root instead of system wide" OFF
-    "F3D_INSTALL_DEFAULT_CONFIGURATION_FILE" OFF)
+  option(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX "Install the default configuration at the prefix root instead of system wide" OFF)
   mark_as_advanced(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
 endif()
 
