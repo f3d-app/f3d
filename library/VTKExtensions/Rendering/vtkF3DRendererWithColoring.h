@@ -162,7 +162,6 @@ public:
    * This method will try to find the corresponding array in the coloring attributes and will
    * position ArrayIndexForColoring and DataForColoring accordingly.
    */
-  void SetColoring(bool useCellData, const std::string& arrayName, int component);
   void SetColoring(const ColoringStyle_t& coloringStyle, const ColoringField_t& coloringField, const std::string& coloringArrayName, int coloringComponent);
 
   ///@{
@@ -267,7 +266,8 @@ protected:
    * If there is a component name defined in the current coloring information, display it.
    * Otherwise, use component #index as the default value.
    */
-  std::string ComponentToString(int component);
+  //std::string ComponentToString(int component);
+  std::string GetColoringComponentName();
 
   /**
    * Shorten a provided name with "..."
@@ -299,9 +299,6 @@ protected:
   vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
   double ColorRange[2];
   bool ColorTransferFunctionConfigured = false;
-
-  bool UseCellColoring = false;
-  int ComponentForColoring = -1;
 
   bool ScalarBarVisible = false;
   bool UsePointSprites = false;

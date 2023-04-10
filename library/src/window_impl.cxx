@@ -323,6 +323,9 @@ void window_impl::UpdateDynamicOptions()
     renWithColor->SetTextureNormal(this->Internals->Options.getAsString("model.normal.texture"));
     renWithColor->SetNormalScale(this->Internals->Options.getAsDouble("model.normal.scale"));
 
+    std::string coloringStyle = this->Internals->Options.getAsString("model.coloring.style");
+    
+
     renWithColor->SetColoring(this->Internals->Options.getAsBool("model.scivis.cells"),
       this->Internals->Options.getAsString("model.scivis.array-name"),
       this->Internals->Options.getAsInt("model.scivis.component"));
