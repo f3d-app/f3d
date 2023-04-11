@@ -124,12 +124,6 @@ target_include_directories(libf3d
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
-if(F3D_INSTALL_SDK)
-  set_target_properties(libf3d PROPERTIES
-    PUBLIC_HEADER "${F3D_PUBLIC_HEADERS}"
-    )
-endif()
-
 vtk_module_autoinit(TARGETS libf3d MODULES ${F3D_VTK_MODULES})
 
 # The initialize function pointer of the static plugins must be added to the map of static plugins
@@ -175,20 +169,23 @@ if(BUILD_TESTING)
 endif()
 
 # Installing
-if(F3D_INSTALL_SDK OR BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS)
   install(TARGETS libf3d
     EXPORT f3dTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT library
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/f3d COMPONENT headers)
-endif()
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library)
 
-if(F3D_INSTALL_SDK)
+  install(FILES ${F3D_PUBLIC_HEADERS}
+    DESTINATION "include/f3d"
+    COMPONENT sdk
+    EXCLUDE_FROM_ALL)
+
   install(EXPORT f3dTargets
     NAMESPACE f3d::
     DESTINATION "lib/cmake/f3d"
-    COMPONENT cmake)
+    COMPONENT sdk
+    EXCLUDE_FROM_ALL)
 
   include(CMakePackageConfigHelpers)
   configure_package_config_file(
@@ -211,6 +208,6 @@ if(F3D_INSTALL_SDK)
       "${CMAKE_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
     DESTINATION
       "lib/cmake/f3d"
-    COMPONENT cmake)
-
+    COMPONENT sdk
+    EXCLUDE_FROM_ALL)
 endif()

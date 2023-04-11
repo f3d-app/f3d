@@ -27,7 +27,6 @@ then build the software using your build system.
 
 Here is some CMake options of interest::
 * `F3D_BUILD_APPLICATION`: Build the F3D executable.
-* `F3D_INSTALL_SDK`: Install the F3D SDK for the [libf3d](../libf3d/README_LIBF3D.md).
 * `BUILD_TESTING`: Enable the [tests](TESTING.md).
 * `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
 * `F3D_WINDOWS_GUI`: On Windows, build a Win32 application (without console).
@@ -62,4 +61,6 @@ cmake --install ${your_build_dir} --component ${component_name}
 
 Here is the list of the optional components you can install:
 
-* `mimetypes`: Install plugins mimetype XML files for integration with Freedesktop (Linux only)
+* `mimetypes`: Install plugins mimetype XML files for integration with Freedesktop (Linux only).
+* `configuration`: Install default configuration files , `config` and `thumbnail`.
+* `sdk`: Install the [libf3d](../libf3d/README_LIBF3D.md) SDK.

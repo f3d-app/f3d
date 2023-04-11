@@ -114,8 +114,6 @@ jobs:
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_BINDINGS_JAVA=ON
         -DF3D_BINDINGS_PYTHON=ON
-        -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
-        -DF3D_INSTALL_SDK=ON
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
         -DF3D_MACOS_BUNDLE=ON
@@ -167,6 +165,12 @@ jobs:
       if: runner.os == 'Linux'
       working-directory: ${{github.workspace}}/build
       run: cmake --install . --component mimetypes
+
+    - name: Install optional component
+      working-directory: ${{github.workspace}}/build
+      run: |
+        cmake --install . --component sdk
+        cmake --install . --component configuration
 
     - name: Check Install ubuntu
       if: runner.os == 'Linux'
