@@ -5,16 +5,17 @@ if (F3D_MACOS_BUNDLE)
 endif()
 set(f3d_configs_dir "${f3d_resources_dir}/configs")
 if (UNIX AND NOT APPLE)
-  if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE AND NOT F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
+  if (NOT F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
     set(f3d_configs_dir "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d")
   endif()
 endif()
 
 # Default config files
-if (F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
-  install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/configs/"
-    DESTINATION "${f3d_configs_dir}" COMPONENT configuration)
-endif()
+install(
+  DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/configs/"
+  DESTINATION "${f3d_configs_dir}"
+  COMPONENT configuration
+  EXCLUDE_FROM_ALL)
 
 # Other ressoure files
 if(UNIX AND NOT APPLE AND NOT ANDROID)

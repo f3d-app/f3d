@@ -5,11 +5,11 @@ The code is documented in a didactic way to help with understanding them.
 
 ## libf3d
 
-Examples usages of the libf3d, which requires the `F3D_INSTALL_SDK` cmake option when building F3D.
+Examples usages of the libf3d, which requires the `sdk` cmake component to be installed.
 
 ## plugins
 
-Examples plugins for the libf3d, which also requires the `F3D_INSTALL_SDK` cmake option when building F3D.
+Examples plugins for the libf3d, which also requires the `sdk` cmake component to be installed.
 
 ## Building
 

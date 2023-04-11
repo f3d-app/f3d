@@ -45,7 +45,7 @@ With some C++ STD library version, explicit linking to `stdc++fs` is not support
   * If they are working, then it is an issue specific to your file manager (see below for a potential work around).
   * If only a few format have working thumbnails, then it is an issue with the mime types database.
   * If no formats have working thumbnails, then it is an issue with the `f3d-plugin-xxx.thumbnailer` files.
-  * If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.json` configuration file using the `max-size` option.
+  * If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/10_global.json` configuration folder using the `max-size` option.
 
 ### Sandboxing
 Some file managers (eg: Nautilus) are using sandboxing for thumbnails, which the F3D binary release does not support as it needs
