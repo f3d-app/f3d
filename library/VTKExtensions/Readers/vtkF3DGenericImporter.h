@@ -155,23 +155,6 @@ public:
     vtkDoubleArray* timeSteps) override;
 #endif
 
-  ///@{
-  /**
-   * Setter for all actor loading options TODO move to renderer
-   */
-  vtkSetVector3Macro(SurfaceColor, double);
-  vtkSetVector3Macro(EmissiveFactor, double);
-  vtkSetMacro(Opacity, double);
-  vtkSetMacro(Roughness, double);
-  vtkSetMacro(Metallic, double);
-  vtkSetMacro(LineWidth, double);
-  vtkSetMacro(NormalScale, double);
-  vtkSetMacro(TextureBaseColor, std::string);
-  vtkSetMacro(TextureMaterial, std::string);
-  vtkSetMacro(TextureEmissive, std::string);
-  vtkSetMacro(TextureNormal, std::string);
-  ///@}
-
 protected:
   vtkF3DGenericImporter();
   ~vtkF3DGenericImporter() override = default;
@@ -195,18 +178,6 @@ protected:
 private:
   vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;
   void operator=(const vtkF3DGenericImporter&) = delete;
-
-  double Opacity = 1.;
-  double Roughness = 0.3;
-  double Metallic = 0.;
-  double LineWidth = 1.;
-  double NormalScale = 1.;
-  double SurfaceColor[3] = { 1., 1., 1. };
-  double EmissiveFactor[3] = { 1., 1., 1. };
-  std::string TextureBaseColor;
-  std::string TextureMaterial;
-  std::string TextureEmissive;
-  std::string TextureNormal;
 
   struct Internals;
   std::unique_ptr<Internals> Pimpl;
