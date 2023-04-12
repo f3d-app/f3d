@@ -19,6 +19,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx
     TestSDKDynamicLightIntensity.cxx
+    TestSDKDynamicProperties.cxx
     )
 endif()
 

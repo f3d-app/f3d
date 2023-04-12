@@ -33,6 +33,56 @@ public:
   void Initialize(const std::string& up) override;
 
   /**
+   * Set the roughness on all coloring actors
+   */
+  void SetRoughness(double roughness);
+
+  /**
+   * Set the surface color on all coloring actors
+   */
+  void SetSurfaceColor(double* color);
+
+  /**
+   * Set the emmissive factors on all coloring actors
+   */
+  void SetEmissiveFactor(double* factors);
+
+  /**
+   * Set the opacity on all coloring actors
+   */
+  void SetOpacity(double opacity);
+
+  /**
+   * Set the metallic on all coloring actors
+   */
+  void SetMetallic(double metallic);
+
+  /**
+   * Set the normal scale on all coloring actors
+   */
+  void SetNormalScale(double normalScale);
+
+  /**
+   * Set the base color texture on all coloring actors
+   */
+  void SetTextureBaseColor(const std::string& tex);
+
+  /**
+   * Set the metarial texture on all coloring actors
+   */
+  void SetTextureMaterial(const std::string& tex);
+
+  /**
+   * Set the emissive texture on all coloring actors
+   */
+  void SetTextureEmissive(const std::string& tex);
+
+  /**
+   * Set the normal texture on all coloring actors
+   */
+  void SetTextureNormal(const std::string& tex);
+
+  /**
    * Set the pointSize on the pointGaussianMapper as well as calls superclass implementation.
    */
   void SetPointSize(double pointSize) override;
@@ -127,6 +177,18 @@ protected:
   ~vtkF3DRendererWithColoring() override = default;
 
   /**
+   * Configure all coloring actors properties:
+   *  - roughness
+   *
+   */
+  void ConfigureColoringActorsProperties();
+
+  /**
+   * Configure coloring for all coloring actors
+   */
+  void ConfigureColoring();
+
+  /**
    * Convenience method for configuring a poly data mapper for coloring
    */
   static void ConfigureMapperForColoring(vtkPolyDataMapper* mapper, vtkDataArray* array,
@@ -205,6 +267,19 @@ protected:
   bool GeometryMappersConfigured = false;
   bool PointSpritesMappersConfigured = false;
   bool VolumePropsAndMappersConfigured = false;
+  bool ColoringActorsPropertiesConfigured = false;
+  bool ColoringConfigured = false;
+
+  double Opacity = 1.;
+  double Roughness = 0.3;
+  double Metallic = 0.;
+  double NormalScale = 1.;
+  double SurfaceColor[3] = { 1., 1., 1. };
+  double EmissiveFactor[3] = { 1., 1., 1. };
+  std::string TextureBaseColor;
+  std::string TextureMaterial;
+  std::string TextureEmissive;
+  std::string TextureNormal;
 
   vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
   double ColorRange[2];
@@ -222,8 +297,7 @@ protected:
   std::vector<double> UserScalarBarRange;
   std::vector<double> Colormap;
 
-  vtkTimeStamp ColoringTimeStamp;
-  vtkMTimeType ColoringUpdateTime = 0;
+  vtkMTimeType ImporterTimeStamp = 0;
 };
 
 #endif

@@ -32,16 +32,16 @@ interactor.trackball|bool<br>false<br>render|Enable trackball interaction.|\-\-t
 
 Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
-model.color.opacity|double<br>1.0<br>load|Set *opacity* on the geometry. Usually used with Depth Peeling option. Multiplied with the `model.color.texture` when present.|\-\-opacity
-model.color.rgb|vector\<double\><br>1.0,1.0,1.0<br>load|Set a *color* on the geometry. Multiplied with the `model.color.texture` when present.|\-\-color
-model.color.texture|string<br>-<br>load|Path to a texture file that sets the color of the object. Will be multiplied with rgb and opacity.|\-\-texture-base-color
-model.emissive.factor|vector\<double\><br>1.0,1.0,1.0<br>load| Multiply the emissive color when an emissive texture is present.|\-\-emissive-factor
-model.emissive.texture|string<br>-<br>load|Path to a texture file that sets the emitted light of the object. Multiplied with the `model.emissive.factor`.|\-\-texture-emissive
-model.material.metallic|double<br>0.0<br>load|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the `model.material.texture` when present.|\-\-metallic
-model.material.roughness|double<br>0.3<br>load|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the `model.material.texture` when present.|\-\-roughness
-model.material.texture|string<br>-<br>load|Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object. Multiplied with the `model.material.roughness` and `model.material.metallic`, set both of them to 1.0 to get a true result.|\-\-texture-material
-model.normal.scale|double<br>1.0<br>load|Normal scale affects the strength of the normal deviation from the normal texture.|\-\-normal-scale
-model.normal.texture|string<br>-<br>load|Path to a texture file that sets the normal map of the object.|\-\-texrture-normal
+model.color.opacity|double<br>1.0<br>render|Set *opacity* on the geometry. Usually used with Depth Peeling option. Multiplied with the `model.color.texture` when present.|\-\-opacity
+model.color.rgb|vector\<double\><br>1.0,1.0,1.0<br>render|Set a *color* on the geometry. Multiplied with the `model.color.texture` when present.|\-\-color
+model.color.texture|string<br>-<br>render|Path to a texture file that sets the color of the object. Will be multiplied with rgb and opacity.|\-\-texture-base-color
+model.emissive.factor|vector\<double\><br>1.0,1.0,1.0<br>render| Multiply the emissive color when an emissive texture is present.|\-\-emissive-factor
+model.emissive.texture|string<br>-<br>render|Path to a texture file that sets the emitted light of the object. Multiplied with the `model.emissive.factor`.|\-\-texture-emissive
+model.material.metallic|double<br>0.0<br>render|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the `model.material.texture` when present.|\-\-metallic
+model.material.roughness|double<br>0.3<br>render|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the `model.material.texture` when present.|\-\-roughness
+model.material.texture|string<br>-<br>render|Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object. Multiplied with the `model.material.roughness` and `model.material.metallic`, set both of them to 1.0 to get a true result.|\-\-texture-material
+model.normal.scale|double<br>1.0<br>render|Normal scale affects the strength of the normal deviation from the normal texture.|\-\-normal-scale
+model.normal.texture|string<br>-<br>render|Path to a texture file that sets the normal map of the object.|\-\-texrture-normal
 model.scivis.cells|bool<br>false<br>render|Color the data with value found *on the cells* instead of points|\-\-cells
 model.scivis.colormap|vector\<double\><br>\<inferno\><br>render|Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).|\-\-colormap
 model.scivis.component|int<br>-1<br>render|Specify the component to color with. -1 means *magnitude*. -2 means *direct values*.|\-\-comp
@@ -63,8 +63,8 @@ render.line-width|double<br>1.0<br>render|Set the *width* of lines when showing 
 render.show-edges|bool<br>false<br>render|Show the *cell edges*|\-\-edges
 render.point-size|double<br>10.0<br>render|Set the *size* of points when showing vertices and point sprites.|\-\-point-size
 render.grid.enable|bool<br>false<br>render|Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.|\-\-grid
-render.grid.unit|double<br>0<br>load|Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.|\-\-grid\-unit
-render.grid.subdivisions|int<br>10<br>load|Set the number of subdivisions for the grid.|\-\-grid\-subdivisions
+render.grid.unit|double<br>0<br>render|Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.|\-\-grid\-unit
+render.grid.subdivisions|int<br>10<br>render|Set the number of subdivisions for the grid.|\-\-grid\-subdivisions
 render.raytracing.enable|bool<br>false<br>render|Enable *raytracing*. Requires the raytracing module to be enabled.|\-\-raytracing
 render.raytracing.samples|int<br>5<br>render|The number of *samples per pixel*.|\-\-samples
 render.raytracing.denoise|bool<br>false<br>render|*Denoise* the raytracing rendering.|\-\-denoise
