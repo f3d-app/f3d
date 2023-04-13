@@ -159,6 +159,17 @@ int F3DStarter::Start(int argc, char** argv)
           this->Render();
           return true;
         }
+        else if (keySym == "Down")
+        {
+          this->Internals->Engine->getInteractor().stopAnimation();
+          this->AddFile(
+            this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)]
+              .parent_path(),
+            true);
+          this->LoadFile(0, true);
+          this->Render();
+          return true;
+        }
         return false;
       });
 
@@ -466,12 +477,15 @@ void F3DStarter::Render()
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::AddFile(const fs::path& path)
+void F3DStarter::AddFile(const fs::path& path, bool quiet)
 {
   auto tmpPath = fs::absolute(path);
   if (!fs::exists(tmpPath))
   {
-    f3d::log::error("File ", tmpPath, " does not exist");
+    if (!quiet)
+    {
+      f3d::log::error("File ", tmpPath, " does not exist");
+    }
     return;
   }
 
@@ -485,7 +499,7 @@ void F3DStarter::AddFile(const fs::path& path)
     for (auto& entryPath : sortedPaths)
     {
       // Recursively add all files
-      this->AddFile(entryPath);
+      this->AddFile(entryPath, quiet);
     }
   }
   else
@@ -497,7 +511,7 @@ void F3DStarter::AddFile(const fs::path& path)
     {
       this->Internals->FilesList.push_back(tmpPath);
     }
-    else
+    else if (!quiet)
     {
       f3d::log::warn("File ", tmpPath, " has already been added");
     }
