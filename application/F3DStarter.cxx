@@ -369,8 +369,13 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
   }
   else
   {
+    f3d::log::info("No file to load provided.");
     filenameInfo = "No file to load provided, please drop one into this window";
     this->Internals->CurrentFileIndex = -1;
+
+    // Copy dynamic options into files options to get the global config
+    this->Internals->FileOptions = this->Internals->DynamicOptions;
+    this->Internals->Engine->setOptions(this->Internals->FileOptions);
   }
 
   if (this->Internals->CurrentFileIndex >= 0)

@@ -496,6 +496,9 @@ f3d_test(NAME TestInvalidConfigFile DATA cow.vtp CONFIG ${CMAKE_SOURCE_DIR}/test
 # Test quiet in config file
 f3d_test(NAME TestConfigFileQuiet DATA nonExistentFile.vtp CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/quiet.json REGEXP_FAIL "File .*/testing/data/nonExistentFile.vtp does not exist" NO_RENDER)
 
+# Test no file with config file
+f3d_test(NAME TestNoFileConfigFile CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/verbose.json REGEXP "No file to load provided." NO_BASELINE)
+
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
 
