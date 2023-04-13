@@ -424,6 +424,8 @@ vtkF3DRendererWithColoring::CycleType vtkF3DRendererWithColoring::CheckColoring(
 void vtkF3DRendererWithColoring::SetColoring(
   bool useCellData, const std::string& arrayName, int component)
 {
+  // XXX This should be reworked to avoid handling multiple information in one parameters
+  // while still being future-proof and flexible enough.
   assert(this->Importer != nullptr);
 
   if (this->GetColoringUseCell() != useCellData || this->GetColoringArrayName() != arrayName ||
@@ -459,7 +461,6 @@ void vtkF3DRendererWithColoring::SetColoring(
       }
     }
 
-    // TODO rework this
     this->ComponentForColoring = component;
 
     this->ColorTransferFunctionConfigured = false;
@@ -804,7 +805,7 @@ void vtkF3DRendererWithColoring::ConfigureScalarBarActorForColoring(
 void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(
   const vtkF3DGenericImporter::ColoringInfo& info)
 {
-  if (this->ComponentForColoring == -2) // TODO use options
+  if (this->ComponentForColoring == -2)
   {
     return;
   }
@@ -936,8 +937,7 @@ void vtkF3DRendererWithColoring::CycleComponentForColoring()
 
   // -2 -1 0 1 2 3 4
   this->ComponentForColoring =
-    (this->ComponentForColoring + 3) % (info.MaximumNumberOfComponents + 2) -
-    2; // TODO separate direct scalars and magnitude from component number
+    (this->ComponentForColoring + 3) % (info.MaximumNumberOfComponents + 2) - 2;
 }
 
 //----------------------------------------------------------------------------
@@ -972,7 +972,6 @@ std::string vtkF3DRendererWithColoring::ComponentToString(int component)
 {
   assert(this->Importer != nullptr);
 
-  // TODO switch to options
   if (component == -2)
   {
     return "Direct Scalars";
