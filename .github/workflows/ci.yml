@@ -229,8 +229,10 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
+    # Add dummy F3D_PLUGINS_PATH for coverage
     env:
       DISPLAY: :0
+      F3D_PLUGINS_PATH: /dummy1:/dummy2
 
     steps:
 

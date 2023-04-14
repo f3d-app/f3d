@@ -44,7 +44,7 @@ to modify this behavior. For file formats that do not support it, **a default sc
 ## Plugins
 
 If you installed F3D using a package manager, it's possible that the packager chose to bundle the plugins in different packages or to list plugin dependencies as optional dependencies to reduce the reduce the number of dependencies of the main package.
-In this case, in order to open a file that requires a plugin, you will have to make sure all needed dependencies are installed and specify which plugin you want to load in order to be able to open this file. You can either use the `--load-plugins` option or add a line in the [configuration file](CONFIGURATION_FILE.md), if not already.
+In this case, in order to open a file that requires a plugin, you will have to make sure all needed dependencies are installed and specify which plugin you want to load in order to be able to open this file. You can either use the `--load-plugins` option or add a line in the [configuration file](CONFIGURATION_FILE.md), if not already. Several plugins can be specified by giving a comma-separated list.  
 Here is the list of plugins provided officially by F3D:
 
 - **alembic**: ABC support
@@ -54,6 +54,13 @@ Here is the list of plugins provided officially by F3D:
 - **occt**: STEP and IGES support
 
 > Note: If you downloaded the binaries from the Release page, it's not necessary to specify manually the plugins above, all of them are loaded automatically.
+
+Here is how the plugins are searched (by precedence order):  
+1. Search the static plugins
+2. Consider the option given is a full path
+3. Search in the paths specified in `F3D_PLUGINS_PATH` environment variable
+4. Search in the same directory than `f3d.exe` (Windows only)
+5. Rely on OS specific paths (e.g. `LD_LIBRARY_PATH` on Linux or `DYLD_LIBRARY_PATH` on macOS)
 
 You can also try plugins maintained by the community. If you have created a plugin and would like it to be listed here, please submit a pull request.
 
