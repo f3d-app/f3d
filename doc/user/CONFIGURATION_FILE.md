@@ -21,7 +21,7 @@ A typical config file may look like this:
    "global": {
        "bg-color": "0.7,0.7,0.7",
        "color": "0.5,0.1,0.1",
-       "fxaa": true,
+       "anti-aliasing": true,
        "timer": true,
        "progress": true,
        "axis": true,

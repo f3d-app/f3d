@@ -5,7 +5,7 @@
     "tone-mapping": true,
     "grid": true,
     "progress": true,
-    "fxaa": true,
+    "anti-aliasing": true,
     "filename": true,
     "scalars": ""
   }

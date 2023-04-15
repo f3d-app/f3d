@@ -123,9 +123,9 @@ options::options()
   this->Internals->init("render.raytracing.denoise", false);
   this->Internals->init("render.raytracing.samples", 5);
 
-  this->Internals->init("render.effect.depth-peeling", false);
-  this->Internals->init("render.effect.fxaa", false);
-  this->Internals->init("render.effect.ssao", false);
+  this->Internals->init("render.effect.translucency-support", false);
+  this->Internals->init("render.effect.anti-aliasing", false);
+  this->Internals->init("render.effect.ambient-occlusion", false);
   this->Internals->init("render.effect.tone-mapping", false);
 
   this->Internals->init("render.background.color", std::vector<double>{ 0.2, 0.2, 0.2 });

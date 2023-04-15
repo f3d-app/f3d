@@ -55,9 +55,9 @@ model.volume.inverse|bool<br>false<br>render|Inverse the linear opacity function
 
 Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
-render.effect.depth-peeling|bool<br>false<br>render|Enable *depth peeling*. This is a technique used to correctly render translucent objects.|\-\-depth-peeling
-render.effect.fxaa|bool<br>false<br>render|Enable *Fast Approximate Anti-Aliasing*. This technique is used to reduce aliasing.|\-\-fxaa
-render.effect.ssao|bool<br>false<br>render|Enable *Screen-Space Ambient Occlusion*. This is a technique used to improve the depth perception of the object.|\-\-ssao
+render.effect.translucency-support|bool<br>false<br>render|Enable *translucency support*. This is a technique used to correctly render translucent objects, implemented using depth peeling|\-\-translucency-support
+render.effect.anti-aliasing|bool<br>false<br>render|Enable *anti-aliasing*. This technique is used to reduce aliasing, implemented using FXAA.|\-\-anti-aliasing
+render.effect.ambient-occlusion|bool<br>false<br>render|Enable *ambient occlusion*. This is a technique providing approximate shadows, used to improve the depth perception of the object. Implemented using SSAO|\-\-ambient-occlusion
 render.effect.tone-mapping|bool<br>false<br>render|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.|\-\-tone-mapping
 render.line-width|double<br>1.0<br>render|Set the *width* of lines when showing edges.|\-\-line-width
 render.show-edges|bool<br>false<br>render|Show the *cell edges*|\-\-edges
