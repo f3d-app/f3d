@@ -179,12 +179,9 @@ f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
 f3d_test(NAME TestGroupGeometries DATA mb/recursive ARGS --group-geometries DEFAULT_LIGHTS)
 f3d_test(NAME TestGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries --scalars=Polynomial -b DEFAULT_LIGHTS)
 
-if(UNIX AND NOT APPLE)
-  # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
-  configure_file("${CMAKE_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
-  f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json DEFAULT_LIGHTS)
-  f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build DEFAULT_LIGHTS)
-endif()
+configure_file("${CMAKE_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
+f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json DEFAULT_LIGHTS)
+f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build DEFAULT_LIGHTS)
 
 # color texture with opacity needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9467
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220811)
