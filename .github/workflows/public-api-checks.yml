@@ -14,7 +14,9 @@ jobs:
       id: should_warn
       working-directory: ${{github.workspace}}
       shell: bash
-      run: test -z "$(git diff --name-only HEAD master | grep library/public/.*.h)" && echo "should_warn=true" >> $GITHUB_OUTPUT || echo "should_warn=false" >> $GITHUB_OUTPUT
+      run: |
+        git diff --name-only HEAD master | grep library/public/.*.h
+        test -z "$(git diff --name-only HEAD master | grep library/public/.*.h)" && echo "should_warn=false" >> $GITHUB_OUTPUT || echo "should_warn=true" >> $GITHUB_OUTPUT
 
     - uses: thollander/actions-comment-pull-request@v2
       if: ${{ steps.should_warn.outputs.should_warn == 'true' }}
