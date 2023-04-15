@@ -37,12 +37,15 @@ When adding code to F3D, always to to cover it by adding/modifying [tests](TESTI
 F3D continuous integration also check formatting using clang-format and will inform you if changes needs to be made.
 However, some [formatting rules](CODING_STYLE.md) are not enforced by clang-format and will be checked during the review process.
 
+When making changes to the libf3d public API, the CI will warn about making related changes to the bindings. This is required in order to merge the PR.
+
 ## F3D architecture
 
-F3D is separated in three main components:
+F3D is separated in different components:
 - The F3D application, in the application folder.
 - The libf3d, in the library folder.
 - The VTKExtensions in the library/VTKExtensions folder.
+- The bindings, python, java and webassembly, in the respective directories.
 
 VTKExtensions are separated in different modules.
 - Core, that do not depend on any other VTKExtensions modules are provide services for all modules
