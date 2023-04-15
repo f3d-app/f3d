@@ -22,3 +22,14 @@ jobs:
       with:
         check_filenames: true
         check_hidden: true
+
+  public-api-check:
+    name: Public API Check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Comment in PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            :warning: Looks like your are modifying libf3d public API. Please make sure to update all bindings as well !
