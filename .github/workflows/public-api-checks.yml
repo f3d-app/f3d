@@ -18,7 +18,7 @@ jobs:
         files: library/public/*.h
 
     - name: output
-      run: echo {{ steps.changed-files.outputs.all_changed_and_modified_files }}
+      run: echo ${{ steps.changed-files.outputs.all_changed_and_modified_files }}
 
     - name: Warn on PR
       uses: thollander/actions-comment-pull-request@v2
