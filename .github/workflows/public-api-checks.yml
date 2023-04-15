@@ -1,4 +1,4 @@
-name: Style Checks
+name: Public API check
 on: pull_request
 jobs:
 
