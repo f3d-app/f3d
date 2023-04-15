@@ -130,15 +130,15 @@ public:
         break;
       case 'p':
       case 'P':
-        self->Options.toggle("render.effect.depth-peeling");
+        self->Options.toggle("render.effect.translucency-support");
         render = true;
         break;
       case 'Q':
-        self->Options.toggle("render.effect.ssao");
+        self->Options.toggle("render.effect.ambient-occlusion");
         render = true;
         break;
       case 'A':
-        self->Options.toggle("render.effect.fxaa");
+        self->Options.toggle("render.effect.anti-aliasing");
         render = true;
         break;
       case 'T':
