@@ -26,6 +26,8 @@ jobs:
   public-api-check:
     name: Public API Check
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
     - uses: actions/checkout@v3
     - uses: thollander/actions-comment-pull-request@v2
