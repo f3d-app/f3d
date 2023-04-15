@@ -9,6 +9,11 @@ jobs:
       pull-requests: write
     steps:
     - uses: actions/checkout@v3
+    - uses: tj-actions/verify-changed-files@v14
+      id: verify-changed-files
+      with:
+        files: library/public/*.h
     - uses: thollander/actions-comment-pull-request@v2
+      if: steps.verify-changed-files.outputs.files_changed == 'true'
       with:
         message: You are modifying libf3d public API :warning:! Please update bindings accordingly !
