@@ -30,4 +30,4 @@ jobs:
     - uses: actions/checkout@v3
     - uses: thollander/actions-comment-pull-request@v2
       with:
-        message: test
+        message: You are modifying libf3d public API :warning:! Please update bindings accordingly !
