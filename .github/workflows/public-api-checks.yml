@@ -1,0 +1,14 @@
+name: Style Checks
+on: pull_request
+jobs:
+
+  public-api-check:
+    name: Public API Check
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+    - uses: actions/checkout@v3
+    - uses: thollander/actions-comment-pull-request@v2
+      with:
+        message: You are modifying libf3d public API :warning:! Please update bindings accordingly !
