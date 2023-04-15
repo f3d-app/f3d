@@ -68,22 +68,19 @@ PYBIND11_MODULE(f3d, module)
     .def("set",
       py::overload_cast<const std::string&, const std::vector<double>&>(&f3d::options::set),
       "Set an array of floating points option")
-    .def("set", py::overload_cast<const std::string&, const std::vector<int>&>(&f3d::options::set),
-      "Set an array of integers option")
     .def("getAsBool", &f3d::options::getAsBool)
     .def("getAsInt", &f3d::options::getAsInt)
     .def("getAsDouble", &f3d::options::getAsDouble)
     .def("getAsString", &f3d::options::getAsString)
     .def("getAsIntVector", &f3d::options::getAsIntVector)
     .def("getAsDoubleVector", &f3d::options::getAsDoubleVector)
-    .def("getNames", &f3d::options::getNames)
+    .def("toggle", &f3d::options::toggle)
     .def("isSame", &f3d::options::isSame)
-    .def("copy", &f3d::options::copy);
+    .def("copy", &f3d::options::copy)
+    .def("getNames", &f3d::options::getNames);
 
   // f3d::interactor
   py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete> >(module, "interactor")
-    .def("start", &f3d::interactor::start, "Start the interactor")
-    .def("stop", &f3d::interactor::start, "Stop the interactor")
     .def("setKeyPressCallBack", &f3d::interactor::setKeyPressCallBack,
       "Define a callback triggered when a key is pressed")
     .def("setDropFilesCallBack", &f3d::interactor::setDropFilesCallBack,
@@ -102,13 +99,17 @@ PYBIND11_MODULE(f3d, module)
     .def("disableCameraMovement", &f3d::interactor::disableCameraMovement,
       "Disable the camera interaction")
     .def("playInteraction", &f3d::interactor::playInteraction, "Play an interaction file")
-    .def("recordInteraction", &f3d::interactor::recordInteraction, "Record an interaction file");
+    .def("recordInteraction", &f3d::interactor::recordInteraction, "Record an interaction file")
+    .def("start", &f3d::interactor::start, "Start the interactor")
+    .def("stop", &f3d::interactor::start, "Stop the interactor")
+    .def_static("getDefaultInteractionsInfo", &f3d::interactor::getDefaultInteractionsInfo);
 
   // f3d::loader
   py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete> > loader(module, "loader");
-  loader
-    .def("loadScene", &f3d::loader::loadScene, "Load a specific full scene file", py::arg("path"))
-    .def("loadGeometry", &f3d::loader::loadGeometry, "load geometry to a default scene");
+  loader.def("hasGeometryReader", &f3d::loader::hasGeometryReader)
+    .def("loadGeometry", &f3d::loader::loadGeometry, "load geometry to a default scene")
+    .def("hasSceneReader", &f3d::loader::hasSceneReader)
+    .def("loadScene", &f3d::loader::loadScene, "Load a specific full scene file");
 
   // f3d::camera
   py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "camera");
@@ -145,16 +146,18 @@ PYBIND11_MODULE(f3d, module)
     .value("EXTERNAL", f3d::window::Type::EXTERNAL)
     .export_values();
 
-  window.def("render", &f3d::window::render, "Render the window")
+  window.def("getType", &f3d::window::getType)
+    .def("getCamera", &f3d::window::getCamera, py::return_value_policy::reference)
+    .def("render", &f3d::window::render, "Render the window")
     .def("renderToImage", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("noBackground") = false)
     .def("setSize", &f3d::window::setSize, "Set the window size")
     .def("getWidth", &f3d::window::getWidth, "Get the window width")
     .def("getHeight", &f3d::window::getHeight, "Get the window height")
+    .def("setPosition", &f3d::window::setPosition)
     .def("setIcon", &f3d::window::setIcon,
       "Set the icon of the window using a memory buffer representing a PNG file")
     .def("setWindowName", &f3d::window::setWindowName, "Set the window name")
-    .def("getCamera", &f3d::window::getCamera, py::return_value_policy::reference)
     .def("getWorldFromDisplay", &f3d::window::getWorldFromDisplay,
       "Get world coordinate point from display coordinate")
     .def("getDisplayFromWorld", &f3d::window::getDisplayFromWorld,
@@ -164,13 +167,15 @@ PYBIND11_MODULE(f3d, module)
   py::class_<f3d::engine> engine(module, "engine");
 
   engine.def(py::init<f3d::window::Type>(), py::arg("windowType") = f3d::window::Type::NATIVE)
-    .def("getInteractor", &f3d::engine::getInteractor, py::return_value_policy::reference)
-    .def("getLoader", &f3d::engine::getLoader, py::return_value_policy::reference)
-    .def("getOptions", &f3d::engine::getOptions, py::return_value_policy::reference)
-    .def("setOptions", py::overload_cast<const f3d::options&>(&f3d::engine::setOptions))
-    .def("getWindow", &f3d::engine::getWindow, py::return_value_policy::reference)
     .def("setCachePath", &f3d::engine::setCachePath, "Set the cache path directory")
+    .def("setOptions", py::overload_cast<const f3d::options&>(&f3d::engine::setOptions))
+    .def("getOptions", &f3d::engine::getOptions, py::return_value_policy::reference)
+    .def("getWindow", &f3d::engine::getWindow, py::return_value_policy::reference)
+    .def("getLoader", &f3d::engine::getLoader, py::return_value_policy::reference)
+    .def("getInteractor", &f3d::engine::getInteractor, py::return_value_policy::reference)
     .def_static("loadPlugin", &f3d::engine::loadPlugin, "Load a plugin")
     .def_static(
-      "autoloadPlugins", &f3d::engine::autoloadPlugins, "Automatically load internal plugins");
+      "autoloadPlugins", &f3d::engine::autoloadPlugins, "Automatically load internal plugins")
+    .def_static("getLibInfo", &f3d::engine::getLibInfo)
+    .def_static("getReadersInfo", &f3d::engine::getReadersInfo);
 }
