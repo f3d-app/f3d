@@ -88,8 +88,8 @@ f3d::engine eng();
 
 // Recover the options and set the wanted value
 eng.getOptions()
-  .set("render.effect.ssao", true)
-  .set("render.effect.fxaa", true);
+  .set("render.effect.ambient-occlusion", true)
+  .set("render.effect.anti-aliasing", true);
 
 // Standard libf3d usage
 eng.getLoader().loadGeometry("path/to/file.ext");

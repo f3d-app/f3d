@@ -8,7 +8,7 @@
   ".*(vt.)":
   {
     "bar": true,
-    "ssao": true,
+    "ambient-occlusion": true,
     "filename": true
   },
   ".*(vti)":
@@ -20,7 +20,7 @@
   {
     "grid": true,
     "up": "+Z",
-    "ssao": true,
+    "ambient-occlusion": true,
     "filename": false
   }
 }

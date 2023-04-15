@@ -303,10 +303,10 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 #endif
 
     auto grp6 = cxxOptions.add_options("PostFX (OpenGL)");
-    this->DeclareOption(grp6, "depth-peeling", "p", "Enable depth peeling", options.getAsBoolRef("render.effect.depth-peeling"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp6, "ssao", "q", "Enable Screen-Space Ambient Occlusion", options.getAsBoolRef("render.effect.ssao"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp6, "fxaa", "a", "Enable Fast Approximate Anti-Aliasing", options.getAsBoolRef("render.effect.fxaa"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping", options.getAsBoolRef("render.effect.tone-mapping"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp6, "translucency-support", "p", "Enable translucency support, implemented using depth peeling", options.getAsBoolRef("render.effect.translucency-support"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp6, "ambient-occlusion", "q", "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO", options.getAsBoolRef("render.effect.ambient-occlusion"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp6, "anti-aliasing", "a", "Enable anti-aliasing, implemented using FXAA", options.getAsBoolRef("render.effect.anti-aliasing"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping, providing balanced coloring", options.getAsBoolRef("render.effect.tone-mapping"), HasDefault::YES, MayHaveConfig::YES);
 
     auto grp7 = cxxOptions.add_options("Testing");
     this->DeclareOption(grp7, "ref", "", "Reference", appOptions.Reference, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
