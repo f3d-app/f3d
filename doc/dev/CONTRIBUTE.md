@@ -13,6 +13,8 @@ You can also open your own issue or feature request and F3D maintainers will try
 You can then fix the issue in your side and contribute it to the F3D repository,
 by following the workflow described below.
 
+Also do not hesitate to join our [discord](https://discord.f3d.app) !
+
 ## F3D Development workflow
 
 F3D uses the [gitlab flow](https://docs.gitlab.com/ee/topics/gitlab_flow.html). In a few words, here is how to contribute:
