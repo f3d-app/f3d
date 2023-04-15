@@ -19,4 +19,4 @@ jobs:
     - uses: thollander/actions-comment-pull-request@v2
       if: ${{ steps.should_warn.outputs.should_warn == 'true' }}
       with:
-        message: You are modifying libf3d public API :warning:! Please update bindings accordingly !
+        message: You are modifying libf3d public API! :warning:Please update bindings accordingly:warning:!
