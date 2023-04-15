@@ -22,6 +22,6 @@ jobs:
 
     - name: Warn on PR
       uses: thollander/actions-comment-pull-request@v2
-      if: steps.changed-files.outputs.all_changed_and_modified_files == 'true'
+      if: steps.changed-files.outputs.all_changed_and_modified_files != ''
       with:
         message: You are modifying libf3d public API! :warning:Please update bindings accordingly:warning:!
