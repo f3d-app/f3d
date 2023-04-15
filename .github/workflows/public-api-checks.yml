@@ -8,7 +8,11 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        lfs: false
 
     - name: Check Public API Changed
       id: should_warn
@@ -18,7 +22,8 @@ jobs:
         git diff --name-only HEAD master | grep library/public/.*.h
         test -z "$(git diff --name-only HEAD master | grep library/public/.*.h)" && echo "should_warn=false" >> $GITHUB_OUTPUT || echo "should_warn=true" >> $GITHUB_OUTPUT
 
-    - uses: thollander/actions-comment-pull-request@v2
+    - name: Warn on PR
+      uses: thollander/actions-comment-pull-request@v2
       if: ${{ steps.should_warn.outputs.should_warn == 'true' }}
       with:
         message: You are modifying libf3d public API! :warning:Please update bindings accordingly:warning:!
