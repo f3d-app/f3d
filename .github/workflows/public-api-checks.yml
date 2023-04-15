@@ -10,20 +10,15 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        lfs: false
 
-    - name: Check Public API Changed
-      id: should_warn
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: |
-        git diff --name-only HEAD master | grep library/public/.*.h
-        test -z "$(git diff --name-only HEAD master | grep library/public/.*.h)" && echo "should_warn=false" >> $GITHUB_OUTPUT || echo "should_warn=true" >> $GITHUB_OUTPUT
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v35
+      with:
+        files: library/public/*.h
 
     - name: Warn on PR
       uses: thollander/actions-comment-pull-request@v2
-      if: ${{ steps.should_warn.outputs.should_warn == 'true' }}
+      if: steps.changed-files.outputs.all_changed_and_modified_files == 'true'
       with:
         message: You are modifying libf3d public API! :warning:Please update bindings accordingly:warning:!
