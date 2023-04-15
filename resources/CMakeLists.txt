@@ -48,11 +48,4 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
     install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
       DESTINATION "share/man/man1/" COMPONENT documentation)
   endif()
-elseif(WIN32)
-  if (F3D_WINDOWS_INSTALL_LOGOS_FOR_NSIS_PACKAGING)
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/logo.ico"
-      DESTINATION "${f3d_resources_dir}" COMPONENT assets)
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/logotype64.bmp"
-      DESTINATION "${f3d_resources_dir}" COMPONENT assets)
-  endif()
 endif()
