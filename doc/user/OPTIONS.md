@@ -105,7 +105,7 @@ Options|Default|Description
 Options|Description
 ------|------
 -p, \-\-translucency-support|Enable *translucency support*. This is a technique used to correctly render translucent objects.
--q, \-\-ambien-occlusion|Enable *ambient occlusion*. This is a technique used to improve the depth perception of the object.
+-q, \-\-ambient-occlusion|Enable *ambient occlusion*. This is a technique used to improve the depth perception of the object.
 -a, \-\-anti-aliasing|Enable *anti-aliasing*. This technique is used to reduce aliasing.
 -t, \-\-tone-mapping|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
 
