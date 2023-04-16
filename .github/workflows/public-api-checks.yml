@@ -1,6 +1,6 @@
 name: Public API check
+on: [ pull_request ]
 permissions: read-all|write-all
-on: pull_request
 jobs:
 
   public-api-check:
