@@ -5,6 +5,12 @@ on:
       - 'library/public/*.h'
 
 jobs:
+  public-api-check:
+    name: Public API Check
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
     - name: Write warning on PR
       uses: marocchino/sticky-pull-request-comment@v2
       with:
