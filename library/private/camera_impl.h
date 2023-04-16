@@ -58,6 +58,9 @@ public:
   camera& setCurrentAsDefault() override;
   camera& resetToDefault() override;
   camera& resetToBounds() override;
+
+  CameraStateKey saveState() override;
+  bool restoreState(const CameraStateKey&, bool remove) override;
   ///@}
 
   /**

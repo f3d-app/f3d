@@ -9,6 +9,8 @@
 
 namespace f3d
 {
+typedef uint CameraStateKey;
+
 /**
  * @class   camera
  * @brief   Abstract class to control a camera in a window
@@ -67,6 +69,9 @@ public:
    * Reset the camera using the bounds of actors in the scene.
    */
   virtual camera& resetToBounds() = 0;
+
+  virtual CameraStateKey saveState() = 0;
+  virtual bool restoreState(const CameraStateKey&, bool remove=false) = 0;
 
 protected:
   //! @cond
