@@ -316,6 +316,8 @@ endif()
 if(F3D_PLUGIN_BUILD_EXODUS)
   f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS --load-plugins=exodus -s --camera-position=-11,-2,-49 DEFAULT_LIGHTS)
 
+  f3d_test(NAME TestExodusConfig DATA disk_out_ref.ex2 CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/exodus.json ARGS -s --camera-position=-11,-2,-49 DEFAULT_LIGHTS)
+
   # Test Generic Importer Verbose animation
   f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "0: default")
 

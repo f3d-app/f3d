@@ -397,6 +397,9 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
 
     this->Internals->LoadedFile = false;
 
+    // Load any new plugins the updated app options
+    this->Internals->Parser.LoadPlugins(fileAppOptions);
+
     // Check the size of the file before loading it
     // Not considered in the context of GroupGeometries
     static constexpr int BYTES_IN_MIB = 1048576;
