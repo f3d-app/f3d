@@ -132,10 +132,20 @@ void loader_impl::setInteractor(interactor_impl* interactor)
 //----------------------------------------------------------------------------
 loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
 {
+  bool windowInit = false;
+  if (!this->Internals->DefaultScene || reset)
+  {
+    // Reset the generic importer
+    this->Internals->GenericImporter->RemoveInternalReaders();
+
+    // Window initialization is needed
+    windowInit = true;
+  }
+
   // Check file validity
   if (filePath.empty())
   {
-    log::debug("No file to add a geometry from provided\n");
+    log::debug("Provided file path is empty\n");
     return *this;
   }
   if (!vtksys::SystemTools::FileExists(filePath, true))
@@ -157,16 +167,10 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
     return *this;
   }
 
-  if (!this->Internals->DefaultScene || reset)
+  if (windowInit)
   {
-    // Reset the generic importer
-    this->Internals->GenericImporter->RemoveInternalReaders();
-
-    // Initialize the window with coloring if ever needed
+    // Initialize the window with coloring
     this->Internals->Window.Initialize(true);
-
-    // We are in default scene mode now
-    this->Internals->DefaultScene = true;
   }
 
   // Read the file
@@ -212,6 +216,8 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
   // Print info about scene and coloring
   this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
   this->Internals->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
+
+  this->Internals->DefaultScene = true;
 
   return *this;
 }
