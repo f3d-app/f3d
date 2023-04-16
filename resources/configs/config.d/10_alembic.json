@@ -1,0 +1,6 @@
+{
+  ".*(abc)":
+  {
+    "load-plugins": "alembic"
+  }
+}

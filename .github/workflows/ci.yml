@@ -83,10 +83,15 @@ jobs:
          mkdir build
          mkdir install
 
+    - name: Set LD_LIBRARY_PATH ubuntu plugins
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: echo "LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
     # There is a RPATH issue with VTK < 9.2.0
     # This is a simple workaround for it
     # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8210
-    - name: Set LD_LIBRARY_PATH ubuntu
+    - name: Set LD_LIBRARY_PATH ubuntu VTK
       if: |
         runner.os == 'Linux' &&
         ( matrix.vtk_version == 'v9.0.0' ||
@@ -121,6 +126,7 @@ jobs:
         -DF3D_MACOS_BUNDLE=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_MODULE_RAYTRACING=${{ matrix.enable_raytracing == true && 'ON' || 'OFF' }}
+        -DF3D_PLUGINS_STATIC_BUILD=OFF
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON

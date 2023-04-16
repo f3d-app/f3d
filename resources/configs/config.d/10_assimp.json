@@ -1,4 +1,8 @@
 {
+  ".*(fbx|dae|off|dxf)":
+  {
+    "load-plugins": "assimp"
+  },
   ".*(off)":
   {
     "up": "+Z"
