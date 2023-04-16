@@ -138,13 +138,9 @@ f3d_test(NAME TestCityGML DATA Part-4-Buildings-V4-one.gml DEFAULT_LIGHTS)
 f3d_test(NAME TestPTS DATA samplePTS.pts)
 f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalars --roughness=1 --colormap=0,1,0,0,1,0,1,0 DEFAULT_LIGHTS)
 f3d_test(NAME TestCameraConfiguration DATA suzanne.obj ARGS --camera-position=0,0,-10 -x --camera-view-up=1,0,0 --camera-focal-point=1,0,0 --camera-view-angle=20 --camera-azimuth-angle=40 --camera-elevation-angle=-80)
-f3d_test(NAME TestCameraClipping DATA checkerboard_colorful.obj CONFIG ${CMAKE_SOURCE_DIR}/testing/data/checkerboard_colorful.json RESOLUTION 800,600)
+f3d_test(NAME TestCameraClipping DATA checkerboard_colorful.obj CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/checkerboard_colorful.json RESOLUTION 800,600)
 f3d_test(NAME TestToneMapping DATA suzanne.ply ARGS -t DEFAULT_LIGHTS)
 f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt DEFAULT_LIGHTS)
-f3d_test(NAME TestDefaultConfigFile DATA dragon.vtu CONFIG ${CMAKE_SOURCE_DIR}/resources/configs/config.d DEFAULT_LIGHTS)
-f3d_test(NAME TestDefaultConfigFileAnotherBlock DATA vase_4comp.vti CONFIG ${CMAKE_SOURCE_DIR}/resources/configs/config.d DEFAULT_LIGHTS)
-f3d_test(NAME TestDefaultConfigFileUp DATA suzanne.stl CONFIG ${CMAKE_SOURCE_DIR}/resources/configs/config.d DEFAULT_LIGHTS)
-f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y CONFIG ${CMAKE_SOURCE_DIR}/resources/configs/config.d DEFAULT_LIGHTS)
 f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT THRESHOLD 300) # High threshold for volume as it is dependent on the OpenGL implementation
 f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT)
 f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb LONG_TIMEOUT)
@@ -184,6 +180,20 @@ if(UNIX AND NOT APPLE)
   configure_file("${CMAKE_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
   f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json DEFAULT_LIGHTS)
   f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build DEFAULT_LIGHTS)
+
+  file(COPY "${CMAKE_SOURCE_DIR}/resources/configs/config.d/" "${CMAKE_SOURCE_DIR}/plugins/native/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
+  f3d_test(NAME TestDefaultConfigFile DATA dragon.vtu CONFIG config_build DEFAULT_LIGHTS)
+  f3d_test(NAME TestDefaultConfigFileAnotherBlock DATA vase_4comp.vti CONFIG config_build DEFAULT_LIGHTS)
+  f3d_test(NAME TestDefaultConfigFileUp DATA suzanne.stl CONFIG config_build DEFAULT_LIGHTS)
+  f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y CONFIG config_build DEFAULT_LIGHTS)
+
+  # no-background test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8501
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
+    file(COPY "${CMAKE_SOURCE_DIR}/resources/configs/thumbnail.d/" "${CMAKE_SOURCE_DIR}/plugins/native/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
+    f3d_test(NAME TestThumbnailConfigFile DATA dragon.vtu CONFIG thumbnail_build DEFAULT_LIGHTS)
+    f3d_test(NAME TestThumbnailConfigFileAnotherBlock DATA vase_4comp.vti CONFIG thumbnail_build DEFAULT_LIGHTS)
+    f3d_test(NAME TestThumbnailConfigFileUp DATA suzanne.stl CONFIG thumbnail_build DEFAULT_LIGHTS)
+  endif()
 endif()
 
 # color texture with opacity needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9467
@@ -239,9 +249,6 @@ endif()
 # no-background test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8501
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
   f3d_test(NAME TestNoBackground DATA cow.vtp ARGS --no-background)
-  f3d_test(NAME TestThumbnailConfigFile DATA dragon.vtu CONFIG ${CMAKE_SOURCE_DIR}/resources/configs/thumbnail.d DEFAULT_LIGHTS)
-  f3d_test(NAME TestThumbnailConfigFileAnotherBlock DATA vase_4comp.vti CONFIG ${CMAKE_SOURCE_DIR}/resources/configs/thumbnail.d DEFAULT_LIGHTS)
-  f3d_test(NAME TestThumbnailConfigFileUp DATA suzanne.stl CONFIG ${CMAKE_SOURCE_DIR}/resources/configs/thumbnail.d DEFAULT_LIGHTS)
 endif()
 
 # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
