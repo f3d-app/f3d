@@ -11,8 +11,9 @@ f3d_plugin_init()
 f3d_plugin_declare_reader(
   NAME ExampleReader
   EXTENSIONS expl
+  MIMETYPES application/vnd.expl
   VTK_READER vtkF3DExampleReader
-  DESCRIPTION "Example reader"
+  FORMAT_DESCRIPTION "Example reader"
 )
 
 f3d_plugin_build(
@@ -20,6 +21,9 @@ f3d_plugin_build(
   VERSION 1.0
   DESCRIPTION "Example plugin"
   VTK_MODULES CommonCore CommonExecutionModel
+  MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-example-formats.xml"
+  CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
+  FREEDESKTOP
 )
 
 if(BUILD_TESTING)
