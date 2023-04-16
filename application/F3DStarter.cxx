@@ -472,6 +472,13 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
       }
     }
   }
+
+  if (!this->Internals->LoadedFile)
+  {
+    // No file loaded, remove any previously loaded file
+    loader.loadGeometry("", true);
+  }
+
   this->Internals->Engine->getOptions().set("ui.filename-info", filenameInfo);
 }
 
