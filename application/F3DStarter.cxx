@@ -147,7 +147,8 @@ int F3DStarter::Start(int argc, char** argv)
         f3d::camera& cam = this->Internals->Engine->getWindow().getCamera();
         const auto camState = cam.saveState();
         this->LoadFile(index, true);
-        cam.restoreState(camState, true);
+        cam.restoreState(camState);
+        cam.deleteState(camState);
       }
       else
       {

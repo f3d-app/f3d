@@ -235,20 +235,22 @@ CameraStateKey camera_impl::saveState()
 }
 
 //----------------------------------------------------------------------------
-bool camera_impl::restoreState(const CameraStateKey& key, bool remove)
+bool camera_impl::restoreState(const CameraStateKey& key)
 {
   if (this->Internals->SavedStates.count(key))
   {
     this->GetVTKCamera()->DeepCopy(this->Internals->SavedStates[key]);
-    if (remove)
-    {
-      this->Internals->SavedStates.erase(key);
-    }
     return true;
   }
   else
   {
     return false;
   }
+}
+
+//----------------------------------------------------------------------------
+bool camera_impl::deleteState(const CameraStateKey& key)
+{
+  return this->Internals->SavedStates.erase(key) > 0;
 }
 };

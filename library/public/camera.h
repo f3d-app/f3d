@@ -71,7 +71,8 @@ public:
   virtual camera& resetToBounds() = 0;
 
   virtual CameraStateKey saveState() = 0;
-  virtual bool restoreState(const CameraStateKey&, bool remove = false) = 0;
+  virtual bool restoreState(const CameraStateKey&) = 0;
+  virtual bool deleteState(const CameraStateKey&) = 0;
 
 protected:
   //! @cond
