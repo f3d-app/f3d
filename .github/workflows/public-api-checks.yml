@@ -1,6 +1,5 @@
 name: Public API check
 on: [ pull_request ]
-permissions: write-all
 jobs:
 
   public-api-check:
@@ -18,9 +17,8 @@ jobs:
       with:
         files: library/public/*.h
 
-    - name: Warn on PR
-      uses: thollander/actions-comment-pull-request@v2
-      if: steps.changed-files.outputs.all_changed_and_modified_files != ''
+    - name: Write comment
+      uses: marocchino/sticky-pull-request-comment@v2
       with:
         message: |
           You are modifying libf3d public API! :warning:Please update bindings accordingly:warning:!
