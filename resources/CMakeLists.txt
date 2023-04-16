@@ -1,19 +1,7 @@
-# Shared resources dir
-set(f3d_resources_dir "share/f3d")
-if (F3D_MACOS_BUNDLE)
-  set(f3d_resources_dir "f3d.app/Contents/Resources")
-endif()
-set(f3d_configs_dir "${f3d_resources_dir}/configs")
-if (UNIX AND NOT APPLE)
-  if (NOT F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
-    set(f3d_configs_dir "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d")
-  endif()
-endif()
-
 # Default config files
 install(
   DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/configs/"
-  DESTINATION "${f3d_configs_dir}"
+  DESTINATION "${f3d_config_dir}"
   COMPONENT configuration
   EXCLUDE_FROM_ALL)
 
