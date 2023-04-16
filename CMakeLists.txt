@@ -163,6 +163,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 
+
 if(WIN32)
   option(F3D_WINDOWS_INSTALL_LOGOS_FOR_NSIS_PACKAGING "Install logos for nsis packaging" OFF)
   mark_as_advanced(F3D_WINDOWS_INSTALL_LOGOS_FOR_NSIS_PACKAGING)
