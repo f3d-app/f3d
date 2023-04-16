@@ -60,7 +60,8 @@ public:
   camera& resetToBounds() override;
 
   CameraStateKey saveState() override;
-  bool restoreState(const CameraStateKey&, bool remove) override;
+  bool restoreState(const CameraStateKey&) override;
+  bool deleteState(const CameraStateKey&) override;
   ///@}
 
   /**
