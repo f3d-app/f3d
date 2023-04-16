@@ -20,6 +20,7 @@ jobs:
     - name: Write comment
       uses: marocchino/sticky-pull-request-comment@v2
       with:
+        GITHUB_TOKEN: ${{ secrets.WRITE_ON_PR }}.
         message: |
           You are modifying libf3d public API! :warning:Please update bindings accordingly:warning:!
           You can find them in their respective directories: `python`, `java`, `webassembly`.
