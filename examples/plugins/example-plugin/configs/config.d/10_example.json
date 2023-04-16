@@ -1,0 +1,6 @@
+{
+  ".*(expl)":
+  {
+    "load-plugins": "example"
+  }
+}
