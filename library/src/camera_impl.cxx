@@ -4,6 +4,8 @@
 #include <vtkMatrix4x4.h>
 #include <vtkRenderer.h>
 
+#include <map>
+
 namespace f3d::detail
 {
 class camera_impl::internals
@@ -11,6 +13,8 @@ class camera_impl::internals
 public:
   vtkRenderer* VTKRenderer = nullptr;
   vtkNew<vtkCamera> DefaultVTKCamera;
+  std::map<CameraStateKey, vtkSmartPointer<vtkCamera> > SavedStates;
+  CameraStateKey NextCameraStateKey = 0;
 };
 
 //----------------------------------------------------------------------------
@@ -217,5 +221,34 @@ void camera_impl::SetVTKRenderer(vtkRenderer* renderer)
 vtkCamera* camera_impl::GetVTKCamera()
 {
   return this->Internals->VTKRenderer->GetActiveCamera();
+}
+
+//----------------------------------------------------------------------------
+CameraStateKey camera_impl::saveState()
+{
+  vtkNew<vtkCamera> cam;
+  cam->DeepCopy(this->GetVTKCamera());
+
+  const CameraStateKey key = this->Internals->NextCameraStateKey++;
+  this->Internals->SavedStates[key] = cam;
+  return key;
+}
+
+//----------------------------------------------------------------------------
+bool camera_impl::restoreState(const CameraStateKey& key, bool remove)
+{
+  if (this->Internals->SavedStates.count(key))
+  {
+    this->GetVTKCamera()->DeepCopy(this->Internals->SavedStates[key]);
+    if (remove)
+    {
+      this->Internals->SavedStates.erase(key);
+    }
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 };
