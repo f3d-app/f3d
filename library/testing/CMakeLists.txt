@@ -78,7 +78,6 @@ create_test_sourcelist(_libf3dSDKTests libf3dSDKTests.cxx ${libf3dSDKTests_list}
 # add the executable
 add_executable(libf3dSDKTests ${_libf3dSDKTests})
 set_target_properties(libf3dSDKTests PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
   CXX_VISIBILITY_PRESET hidden
   )
 

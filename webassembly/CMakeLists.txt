@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.12)
 add_executable(f3djs F3DEmscriptenBindings.cxx)
 
 set_target_properties(f3djs PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
   OUTPUT_NAME f3d
 )
 
