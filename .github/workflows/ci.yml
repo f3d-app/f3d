@@ -264,10 +264,8 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
-    # Add dummy F3D_PLUGINS_PATH for coverage
     env:
       DISPLAY: :0
-      F3D_PLUGINS_PATH: /dummy1:/dummy2
 
     steps:
 
@@ -322,6 +320,7 @@ jobs:
         -DF3D_COVERAGE=ON
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_MODULE_RAYTRACING=ON
+        -DF3D_PLUGINS_STATIC_BUILD=OFF
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
@@ -335,6 +334,20 @@ jobs:
 
     - name: Run Xvfb
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
+
+    - name: Set LD_LIBRARY_PATH for plugin code coverage
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: echo "LD_LIBRARY_PATH=$(pwd)/build/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
+    - name: Test plugin code coverage
+      working-directory: ${{github.workspace}}/source
+      run: ctest -C Release -R TestExodus$ -VV
+
+    - name: Set F3D_PLUGINS_PATH to build
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: echo "F3D_PLUGINS_PATH=/dummy1:/dummy2:$(pwd)/build/lib" >> $GITHUB_ENV
 
     - name: Test
       working-directory: ${{github.workspace}}/source
