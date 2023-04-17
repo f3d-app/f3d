@@ -34,7 +34,7 @@ Make sure that VTK has been built with *OpenImageDenoise* support (`VTKOSPRAY_EN
 
 > I have a link error related to `stdc++fs` not found.
 
-With some C++ STD library version, explicit linking to `stdc++fs` is not supported. We provide a CMake option `F3D_LINUX_APPLICATION_LINK_FILESYSTEM` that you can set to `OFF` to workaround this issue.
+With some C++ STD library version, explicit linking to `stdc++fs` is not supported. We provide a CMake option `F3D_LINUX_LINK_FILESYSTEM` that you can set to `OFF` to workaround this issue.
 
 ### Thumbnails
 > Thumbnails are not working in my file manager.

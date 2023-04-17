@@ -31,9 +31,13 @@ if(F3D_MODULE_EXTERNAL_RENDERING)
   endif()
 endif()
 
+set(libf3d_link_libraries_private "")
 set(libf3d_compile_options_private "")
 set(libf3d_compile_options_public "")
 set(libf3d_link_options_public "")
+
+# Link
+list(APPEND libf3d_link_libraries_private ${f3d_link_libraries_private})
 
 # F3D_STRICT_BUILD
 list(APPEND libf3d_compile_options_private ${f3d_strict_build_compile_options})
@@ -45,6 +49,7 @@ list(APPEND libf3d_link_options_public ${f3d_coverage_link_options})
 # Sanitizer
 list(APPEND libf3d_compile_options_public ${f3d_sanitizer_compile_options})
 list(APPEND libf3d_link_options_public ${f3d_sanitizer_link_options})
+
 
 add_subdirectory(VTKExtensions)
 
@@ -148,7 +153,7 @@ configure_file(
 # libf3d links with the static plugins.
 list(TRANSFORM F3D_STATIC_PLUGIN_TARGETS PREPEND "f3d-plugin-")
 
-target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES} ${F3D_STATIC_PLUGIN_TARGETS})
+target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES} ${F3D_STATIC_PLUGIN_TARGETS} ${libf3d_link_libraries_private})
 target_compile_options(libf3d PUBLIC ${libf3d_compile_options_public} PRIVATE ${libf3d_compile_options_private})
 target_link_options(libf3d PUBLIC ${libf3d_link_options_public})
 

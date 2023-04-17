@@ -27,15 +27,7 @@ endif()
 
 # Define f3d target
 add_executable(f3d ${F3D_SOURCE_FILES})
-target_link_libraries(f3d PUBLIC libf3d)
-
-if(UNIX AND NOT APPLE)
-  option(F3D_LINUX_APPLICATION_LINK_FILESYSTEM "Link with libstdc++fs" ON)
-  mark_as_advanced(F3D_LINUX_APPLICATION_LINK_FILESYSTEM)
-  if(F3D_LINUX_APPLICATION_LINK_FILESYSTEM)
-    target_link_libraries(f3d PRIVATE stdc++fs)
-  endif()
-endif()
+target_link_libraries(f3d PUBLIC libf3d PRIVATE ${f3d_link_libraries_private})
 
 set_target_properties(f3d PROPERTIES
   CXX_VISIBILITY_PRESET hidden

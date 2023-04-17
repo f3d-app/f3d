@@ -122,6 +122,15 @@ if(NOT F3D_SANITIZER STREQUAL "none")
   set(f3d_sanitizer_link_options -fsanitize=${F3D_SANITIZER})
 endif()
 
+set(f3d_link_libraries_private "")
+if(UNIX AND NOT APPLE)
+  option(F3D_LINUX_LINK_FILESYSTEM "Link with libstdc++fs" ON)
+  mark_as_advanced(F3D_LINUX_LINK_FILESYSTEM)
+  if(F3D_LINUX_LINK_FILESYSTEM)
+    set(f3d_link_libraries_private stdc++fs)
+  endif()
+endif()
+
 # Testing
 option(BUILD_TESTING "Build the tests" OFF)
 cmake_dependent_option(F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON "Disable image comparison on tests using the default lights" OFF "BUILD_TESTING" ON)
