@@ -335,15 +335,6 @@ jobs:
     - name: Run Xvfb
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
-    - name: Set LD_LIBRARY_PATH for plugin code coverage
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: echo "LD_LIBRARY_PATH=$(pwd)/build/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-
-    - name: Test plugin code coverage
-      working-directory: ${{github.workspace}}/source
-      run: ctest -C Release -R TestExodus$ -VV
-
     - name: Set F3D_PLUGINS_PATH to build
       working-directory: ${{github.workspace}}
       shell: bash
