@@ -175,6 +175,15 @@ f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
 f3d_test(NAME TestGroupGeometries DATA mb/recursive ARGS --group-geometries DEFAULT_LIGHTS)
 f3d_test(NAME TestGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries --scalars=Polynomial -b DEFAULT_LIGHTS)
 
+# Test missing symbol plugin using the libf3d
+if(WIN32)
+      f3d_test(NAME TestPluginInvalid ARGS --verbose --load-plugins "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/f3d.dll" NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
+elseif(APPLE)
+      f3d_test(NAME TestPluginInvalid ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libf3d.dylib" NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
+else() # Linux
+      f3d_test(NAME TestPluginInvalid ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libf3d.so" NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
+endif()
+
 if(NOT F3D_MACOS_BUNDLE)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
   configure_file("${CMAKE_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
