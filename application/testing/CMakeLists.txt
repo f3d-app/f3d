@@ -385,9 +385,7 @@ if(F3D_PLUGIN_BUILD_EXODUS)
     # Test --load-plugins with a full path plugin
     if(WIN32)
       f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --load-plugins "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/f3d-plugin-exodus.dll" DEFAULT_LIGHTS)
-    elseif(APPLE)
-      f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libf3d-plugin-exodus.dylib" DEFAULT_LIGHTS)
-    else() # Linux
+    else()
       f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libf3d-plugin-exodus.so" DEFAULT_LIGHTS)
     endif()
   endif()
