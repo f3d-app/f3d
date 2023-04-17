@@ -11,7 +11,6 @@
 #if defined(_WIN32)
 // clang-format off
 #include <windows.h>
-#include <libloaderapi.h>
 // clang-format on
 #endif
 #ifdef __APPLE__

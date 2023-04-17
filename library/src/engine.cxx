@@ -20,6 +20,15 @@
 
 #include <filesystem>
 
+#if defined(_WIN32)
+// clang-format off
+#include <windows.h>
+// clang-format on
+#endif
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
+
 namespace fs = std::filesystem;
 
 namespace f3d
@@ -198,7 +207,7 @@ void engine::loadPlugin(const std::string& pathOrName)
         if (GetModuleFileNameW(
           GetModuleHandle(nullptr), pathBuf.data(), static_cast<DWORD>(pathBuf.size())))
         {
-          std::string execPath = vtksys::Encoding::ToNarrow(pathBuf.data());
+          execPath = vtksys::Encoding::ToNarrow(pathBuf.data());
         }
 #else
 #ifdef __APPLE__
@@ -208,7 +217,7 @@ void engine::loadPlugin(const std::string& pathOrName)
           f3d::log::error("Executable is too long to recover path to configuration file");
           return;
         }
-        execPath = buffer.data();
+        execPath = pathBuf.data();
 #else
         execPath = fs::canonical("/proc/self/exe").string();
 #endif
@@ -219,7 +228,7 @@ void engine::loadPlugin(const std::string& pathOrName)
         pluginDirPath = fs::canonical(fs::path(execPath)).parent_path();
 
         // Add platform specific paths
-#if defined(__linux__) || defined(__APPLE__)
+#elif defined(__unix__)
         // path/to/install/bin/ -> /path/to/install/
         pluginDirPath = pluginDirPath.parent_path();
 #if F3D_MACOS_BUNDLE
