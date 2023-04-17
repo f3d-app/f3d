@@ -221,6 +221,7 @@ vtkCamera* camera_impl::GetVTKCamera()
   return this->Internals->VTKRenderer->GetActiveCamera();
 }
 
+//----------------------------------------------------------------------------
 cameraState* camera_impl::saveState()
 {
   return new cameraState_impl(this->GetVTKCamera());
