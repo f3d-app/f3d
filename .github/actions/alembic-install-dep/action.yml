@@ -20,14 +20,6 @@ runs:
         path: './dependencies/alembic'
         ref: 1.8.5
 
-    - name: Patch Alembic
-      if: steps.cache-alembic.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/alembic
-      shell: bash
-      run: |
-        patch -p1 < $GITHUB_ACTION_PATH/0001-use-install-rpath-for-Imath.patch
-        patch -p1 < $GITHUB_ACTION_PATH/0002-Fix-an-issue-with-ALEMBIC_LIB_INSTALL_DIR.patch
-
     - name: Setup Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
