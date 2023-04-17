@@ -228,7 +228,7 @@ void engine::loadPlugin(const std::string& pathOrName)
         pluginDirPath = fs::canonical(fs::path(execPath)).parent_path();
 
         // Add platform specific paths
-#elif defined(__unix__)
+#if defined(__unix__)
         // path/to/install/bin/ -> /path/to/install/
         pluginDirPath = pluginDirPath.parent_path();
 #if F3D_MACOS_BUNDLE
