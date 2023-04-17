@@ -397,10 +397,11 @@ if(F3D_PLUGIN_BUILD_EXODUS)
 
     # Test --load-plugins with a full path plugin
     if(WIN32)
-      f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --verbose --load-plugins "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/f3d-plugin-exodus.dll" NO_BASELINE REGEXP "Loaded plugin exodus from")
+      set(_libname "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/f3d-plugin-exodus.dll")
     else()
-      f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libf3d-plugin-exodus.so" NO_BASELINE REGEXP "Loaded plugin exodus from")
+      set(_libname "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libf3d-plugin-exodus.so")
     endif()
+    f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --verbose --load-plugins "${_libname}" NO_BASELINE REGEXP "Loaded plugin exodus from")
   endif()
 
 endif()
