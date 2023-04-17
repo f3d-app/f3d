@@ -132,6 +132,25 @@ if(BUILD_TESTING)
   enable_testing()
 endif()
 
+# Figure out F3D configuration directory
+if(UNIX AND NOT APPLE)
+  option(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX "Install the default configuration at the prefix root instead of system wide" OFF)
+  mark_as_advanced(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
+endif()
+
+set(f3d_resources_dir "share/f3d")
+if (F3D_MACOS_BUNDLE)
+  set(f3d_resources_dir "f3d.app/Contents/Resources")
+endif()
+
+## Will be stored in f3dConfig.cmake
+set(f3d_config_dir "${f3d_resources_dir}/configs")
+if (UNIX AND NOT APPLE)
+  if (NOT F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
+    set(f3d_config_dir "${CMAKE_INSTALL_FULL_SYSCONFDIR}/f3d")
+  endif()
+endif()
+
 # plugins
 option(F3D_PLUGINS_STATIC_BUILD "Make all plugins static (embedded into libf3d) and automatically loaded by F3D" ON)
 mark_as_advanced(F3D_PLUGINS_STATIC_BUILD)
@@ -168,12 +187,6 @@ endif()
 if(EMSCRIPTEN)
   add_subdirectory(webassembly)
 endif ()
-
-# Installation
-if(UNIX AND NOT APPLE)
-  option(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX "Install the default configuration at the prefix root instead of system wide" OFF)
-  mark_as_advanced(F3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX)
-endif()
 
 # Installing licenses
 set(F3D_LIC_DIR ".")

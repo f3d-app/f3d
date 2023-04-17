@@ -3,3 +3,4 @@ testing/baselines/**/* filter=lfs diff=lfs merge=lfs -text
 testing/data/DATA_LICENSES.md !filter !diff !merge text
 examples/**/*/data/**/* filter=lfs diff=lfs merge=lfs -text
 examples/**/*/baselines/**/* filter=lfs diff=lfs merge=lfs -text
+.github/baselines/**/* filter=lfs diff=lfs merge=lfs -text
