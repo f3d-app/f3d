@@ -125,7 +125,7 @@ void engine::loadPlugin(const std::string& pathOrName)
   factory* factory = factory::instance();
 
   // check if the plugin is already loaded
-  for(auto* plug : factory->getPlugins())
+  for (auto* plug : factory->getPlugins())
   {
     if (plug->getName() == pathOrName || plug->getOrigin() == pathOrName)
     {
@@ -238,7 +238,7 @@ void engine::loadPlugin(const std::string& pathOrName)
   plugin* plug = init_plugin();
   plug->setOrigin(pluginOrigin);
   factory->load(plug);
-  log::debug("Loaded plugin ",plug->getName()," from: \"", plug->getOrigin(),"\"");
+  log::debug("Loaded plugin ", plug->getName(), " from: \"", plug->getOrigin(), "\"");
 }
 
 //----------------------------------------------------------------------------
