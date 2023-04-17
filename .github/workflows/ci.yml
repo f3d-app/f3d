@@ -335,10 +335,10 @@ jobs:
     - name: Run Xvfb
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
-    - name: Set F3D_PLUGINS_PATH to build
+    - name: Set F3D_PLUGINS_PATH to source
       working-directory: ${{github.workspace}}
       shell: bash
-      run: echo "F3D_PLUGINS_PATH=/dummy1:/dummy2:$(pwd)/build/lib" >> $GITHUB_ENV
+      run: echo "F3D_PLUGINS_PATH=/dummy1:/dummy2:$(pwd)/source/lib" >> $GITHUB_ENV
 
     - name: Test
       working-directory: ${{github.workspace}}/source
