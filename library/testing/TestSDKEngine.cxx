@@ -8,12 +8,14 @@
 
 int TestSDKEngine(int argc, char* argv[])
 {
+  // clang-format off
   // Load all plugins, built or not
   try { f3d::engine::loadPlugin("alembic"); } catch (const std::exception& ex) {};
   try { f3d::engine::loadPlugin("assimp"); } catch (const std::exception& ex) {};
   try { f3d::engine::loadPlugin("draco"); } catch (const std::exception& ex) {};
   try { f3d::engine::loadPlugin("exodus"); } catch (const std::exception& ex) {};
   try { f3d::engine::loadPlugin("occt"); } catch (const std::exception& ex) {};
+  // clang-format on
 
   // Test different flags combinations that makes sense
   f3d::engine eng0(f3d::window::Type::NONE);
