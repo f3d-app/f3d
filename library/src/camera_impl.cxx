@@ -13,8 +13,6 @@ class camera_impl::internals
 public:
   vtkRenderer* VTKRenderer = nullptr;
   vtkNew<vtkCamera> DefaultVTKCamera;
-  std::map<CameraStateKey, vtkSmartPointer<vtkCamera> > SavedStates;
-  CameraStateKey NextCameraStateKey = 0;
 };
 
 //----------------------------------------------------------------------------
@@ -223,34 +221,15 @@ vtkCamera* camera_impl::GetVTKCamera()
   return this->Internals->VTKRenderer->GetActiveCamera();
 }
 
-//----------------------------------------------------------------------------
-CameraStateKey camera_impl::saveState()
+cameraState* camera_impl::saveState()
 {
-  vtkNew<vtkCamera> cam;
-  cam->DeepCopy(this->GetVTKCamera());
-
-  const CameraStateKey key = this->Internals->NextCameraStateKey++;
-  this->Internals->SavedStates[key] = cam;
-  return key;
+  return new cameraState_impl(this->GetVTKCamera());
 }
 
 //----------------------------------------------------------------------------
-bool camera_impl::restoreState(const CameraStateKey& key)
+void camera_impl::restoreState(const cameraState* cameraState)
 {
-  if (this->Internals->SavedStates.count(key))
-  {
-    this->GetVTKCamera()->DeepCopy(this->Internals->SavedStates[key]);
-    return true;
-  }
-  else
-  {
-    return false;
-  }
-}
-
-//----------------------------------------------------------------------------
-bool camera_impl::deleteState(const CameraStateKey& key)
-{
-  return this->Internals->SavedStates.erase(key) > 0;
+  const cameraState_impl* state_impl = dynamic_cast<const cameraState_impl*>(cameraState);
+  this->GetVTKCamera()->DeepCopy(state_impl->Camera);
 }
 };

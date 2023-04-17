@@ -12,12 +12,21 @@
 
 #include "camera.h"
 
+#include <vtkCamera.h>
+
 #include <memory>
 
 class vtkRenderer;
 class vtkCamera;
 namespace f3d::detail
 {
+class cameraState_impl : public cameraState
+{
+public:
+  vtkNew<vtkCamera> Camera;
+  cameraState_impl(vtkCamera* vtkCamera) { this->Camera->DeepCopy(vtkCamera); }
+};
+
 class camera_impl : public camera
 {
 public:
@@ -59,9 +68,8 @@ public:
   camera& resetToDefault() override;
   camera& resetToBounds() override;
 
-  CameraStateKey saveState() override;
-  bool restoreState(const CameraStateKey&) override;
-  bool deleteState(const CameraStateKey&) override;
+  cameraState* saveState() override;
+  void restoreState(const cameraState*) override;
   ///@}
 
   /**

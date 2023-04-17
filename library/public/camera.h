@@ -9,7 +9,11 @@
 
 namespace f3d
 {
-typedef uint CameraStateKey;
+class F3D_EXPORT cameraState
+{
+public:
+  virtual ~cameraState() = default;
+};
 
 /**
  * @class   camera
@@ -70,9 +74,8 @@ public:
    */
   virtual camera& resetToBounds() = 0;
 
-  virtual CameraStateKey saveState() = 0;
-  virtual bool restoreState(const CameraStateKey&) = 0;
-  virtual bool deleteState(const CameraStateKey&) = 0;
+  virtual cameraState* saveState() = 0;
+  virtual void restoreState(const cameraState*) = 0;
 
 protected:
   //! @cond
