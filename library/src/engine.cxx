@@ -122,9 +122,19 @@ interactor& engine::getInteractor()
 void engine::loadPlugin(const std::string& pathOrName)
 {
   std::string pluginOrigin = "static";
+  factory* factory = factory::instance();
+
+  // check if the plugin is already loaded
+  for(auto* plug : factory->getPlugins())
+  {
+    if (plug->getName() == pathOrName || plug->getOrigin() == pathOrName)
+    {
+      log::debug("Plugin \"", pathOrName, "\" already loaded");
+      return;
+    }
+  }
 
   // check if the plugin is a known static plugin
-  factory* factory = factory::instance();
   factory::plugin_initializer_t init_plugin = factory->getStaticInitializer(pathOrName);
 
   if (init_plugin == nullptr)
