@@ -131,6 +131,8 @@ f3d_plugin_build(
   [VTK_MODULES           <string>...]
   [ADDITIONAL_RPATHS     <path>...]
   [MIMETYPE_XML_FILES    <path>...]
+  [CONFIGURATION_DIRS    <path>...]
+  [FREEDESKTOP]
   [FORCE_STATIC])
 ~~~
 
@@ -144,12 +146,13 @@ The `NAME` argument is required. The arguments are as follows:
   * `VTK_MODULES`: The list of VTK modules used by the plugin to link with.
   * `ADDITIONAL_RPATHS`: The list of additional RPATH for the installed binaries on Unix. VTK path is added automatically.
   * `MIMETYPE_XML_FILES`: The list of mimetype files to install. It's useful for file association on OS using Freedesktop specifications.
+  * `CONFIGURATION_DIRS`: The list of configuration directories to install. Generally contain a load-plugins option and format specific options.
   * `FREEDESKTOP`: If specified, generates .desktop and .thumbnailer used for desktop integration on Linux.
   * `FORCE_STATIC`: If specified, the plugin is built as a static library and embedded into libf3d.
 #]==]
 
 macro(f3d_plugin_build)
-  cmake_parse_arguments(F3D_PLUGIN "FREEDESKTOP;FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS;MIMETYPE_XML_FILES" ${ARGN})
+  cmake_parse_arguments(F3D_PLUGIN "FREEDESKTOP;FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS;MIMETYPE_XML_FILES;CONFIGURATION_DIRS" ${ARGN})
 
   find_package(VTK 9.0 REQUIRED COMPONENTS ${F3D_PLUGIN_VTK_MODULES})
 
@@ -248,9 +251,11 @@ macro(f3d_plugin_build)
   if(DEFINED f3d_INCLUDE_DIR)
     # External plugin path
     set(_f3d_include_path "${f3d_INCLUDE_DIR}/f3d")
+    set(_f3d_config_dir ${f3d_CONFIG_DIR})
   else()
     # In-source plugin path
     set(_f3d_include_path "${CMAKE_SOURCE_DIR}/library/plugin")
+    set(_f3d_config_dir ${f3d_config_dir})
   endif()
 
   target_include_directories(f3d-plugin-${F3D_PLUGIN_NAME}
@@ -274,6 +279,16 @@ macro(f3d_plugin_build)
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT plugin
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT plugin)
   endif()
+
+
+  # Install configurations folders
+  foreach(config_dir ${F3D_PLUGIN_CONFIGURATION_DIRS})
+    install(
+      DIRECTORY "${config_dir}"
+      DESTINATION "${_f3d_config_dir}"
+      COMPONENT configuration
+      EXCLUDE_FROM_ALL)
+  endforeach()
 
   # Generate mime, desktop and thumbnailer files
   if (UNIX AND NOT APPLE AND NOT ANDROID)

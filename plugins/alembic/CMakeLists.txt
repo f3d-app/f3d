@@ -42,5 +42,6 @@ f3d_plugin_build(
   VTK_MODULES CommonCore CommonExecutionModel IOImport
   ADDITIONAL_RPATHS ${rpaths}
   MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-alembic-formats.xml"
+  CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
   FREEDESKTOP
 )

@@ -27,4 +27,5 @@ f3d_plugin_build(
   VERSION 1.0
   DESCRIPTION "VTK Exodus support"
   VTK_MODULES CommonCore CommonExecutionModel IOImport IOExodus
+  CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
 )
