@@ -121,8 +121,20 @@ interactor& engine::getInteractor()
 //----------------------------------------------------------------------------
 void engine::loadPlugin(const std::string& pathOrName)
 {
-  // check if the plugin is a known static plugin
+  std::string pluginOrigin = "static";
   factory* factory = factory::instance();
+
+  // check if the plugin is already loaded
+  for (auto* plug : factory->getPlugins())
+  {
+    if (plug->getName() == pathOrName || plug->getOrigin() == pathOrName)
+    {
+      log::debug("Plugin \"", pathOrName, "\" already loaded");
+      return;
+    }
+  }
+
+  // check if the plugin is a known static plugin
   factory::plugin_initializer_t init_plugin = factory->getStaticInitializer(pathOrName);
 
   if (init_plugin == nullptr)
@@ -133,12 +145,17 @@ void engine::loadPlugin(const std::string& pathOrName)
     if (vtksys::SystemTools::FileExists(fullPath))
     {
       // plugin provided as full path
+      log::debug("Trying to load plugin from: \"", fullPath, "\"");
       handle = vtksys::DynamicLoader::OpenLibrary(fullPath);
 
       if (!handle)
       {
         throw engine::plugin_exception(
           "Cannot open the library \"" + fullPath + "\": " + vtksys::DynamicLoader::LastError());
+      }
+      else
+      {
+        pluginOrigin = fullPath;
       }
     }
     else
@@ -181,11 +198,13 @@ void engine::loadPlugin(const std::string& pathOrName)
         std::string tryPath = path + '/' + libName;
         tryPath = vtksys::SystemTools::ConvertToOutputPath(tryPath);
 
+        log::debug("Trying to load plugin from: \"", tryPath, "\"");
         handle = vtksys::DynamicLoader::OpenLibrary(tryPath);
 
         if (handle)
         {
           // plugin is found and loaded
+          pluginOrigin = tryPath;
           break;
         }
       }
@@ -193,11 +212,16 @@ void engine::loadPlugin(const std::string& pathOrName)
       if (!handle)
       {
         // Rely on internal system (e.g. LD_LIBRARY_PATH on Linux) by giving only the file name
+        log::debug("Trying to load plugin relying on internal system: ", libName);
         handle = vtksys::DynamicLoader::OpenLibrary(libName);
         if (!handle)
         {
           throw engine::plugin_exception("Cannot open the library \"" + pathOrName +
             "\": " + vtksys::DynamicLoader::LastError());
+        }
+        else
+        {
+          pluginOrigin = "system";
         }
       }
     }
@@ -211,9 +235,10 @@ void engine::loadPlugin(const std::string& pathOrName)
     }
   }
 
-  plugin* p = init_plugin();
-
-  factory->load(p);
+  plugin* plug = init_plugin();
+  plug->setOrigin(pluginOrigin);
+  factory->load(plug);
+  log::debug("Loaded plugin ", plug->getName(), " from: \"", plug->getOrigin(), "\"");
 }
 
 //----------------------------------------------------------------------------

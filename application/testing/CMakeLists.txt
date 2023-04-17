@@ -175,6 +175,15 @@ f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
 f3d_test(NAME TestGroupGeometries DATA mb/recursive ARGS --group-geometries DEFAULT_LIGHTS)
 f3d_test(NAME TestGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries --scalars=Polynomial -b DEFAULT_LIGHTS)
 
+# Test missing symbol plugin using the libf3d
+if(WIN32)
+      f3d_test(NAME TestPluginInvalid ARGS --verbose --load-plugins "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/f3d.dll" NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
+elseif(APPLE)
+      f3d_test(NAME TestPluginInvalid ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libf3d.dylib" NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
+else() # Linux
+      f3d_test(NAME TestPluginInvalid ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libf3d.so" NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
+endif()
+
 if(NOT F3D_MACOS_BUNDLE)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
   configure_file("${CMAKE_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
@@ -379,6 +388,20 @@ if(F3D_PLUGIN_BUILD_EXODUS)
       file(COPY "${CMAKE_SOURCE_DIR}/plugins/exodus/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
       f3d_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build DEFAULT_LIGHTS)
     endif()
+  endif()
+
+  if (NOT F3D_PLUGINS_STATIC_BUILD)
+
+    # Test --load-plugins with the name of a dynamic plugin
+    f3d_test(NAME TestPluginName DATA disk_out_ref.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "Loaded plugin exodus from")
+
+    # Test --load-plugins with a full path plugin
+    if(WIN32)
+      set(_libname "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/f3d-plugin-exodus.dll")
+    else()
+      set(_libname "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libf3d-plugin-exodus.so")
+    endif()
+    f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --verbose --load-plugins "${_libname}" NO_BASELINE REGEXP "Loaded plugin exodus from")
   endif()
 
 endif()
