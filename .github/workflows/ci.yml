@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        vtk_version: [commit, v9.2.2, v9.1.0, v9.0.0]
+        vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
         include:
           - enable_raytracing: true
           - vtk_version: v9.0.0
