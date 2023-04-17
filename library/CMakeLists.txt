@@ -140,6 +140,11 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/src/factory.cxx"
   @ONLY)
 
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/private/config.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/private/config.h"
+  @ONLY)
+
 # libf3d links with the static plugins.
 list(TRANSFORM F3D_STATIC_PLUGIN_TARGETS PREPEND "f3d-plugin-")
 

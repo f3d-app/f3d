@@ -10,4 +10,7 @@ extern const std::string LibBuildSystem;
 extern const std::string LibBuildDate;
 extern const std::string LibCompiler;
 }
+
+#cmakedefine01 F3D_MACOS_BUNDLE
+
 #endif
