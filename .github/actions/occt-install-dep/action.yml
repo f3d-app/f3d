@@ -9,7 +9,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/occt_install
-        key: occt-V7_6_0-${{runner.os}}-0
+        key: occt-V7_6_3-${{runner.os}}-0
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -18,7 +18,7 @@ runs:
         repository: Open-Cascade-SAS/OCCT
         submodules: true
         path: './dependencies/occt'
-        ref: V7_6_0
+        ref: V7_6_3
 
     - name: Patch OCCT INSTALL_RPATH
       if: steps.cache-occt.outputs.cache-hit != 'true'

@@ -10,7 +10,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/alembic_install
-        key: alembic-v1.8.3-${{runner.os}}-0
+        key: alembic-v1.8.5-${{runner.os}}-0
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -18,7 +18,7 @@ runs:
       with:
         repository: alembic/alembic
         path: './dependencies/alembic'
-        ref: 1.8.3
+        ref: 1.8.5
 
     - name: Patch Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'

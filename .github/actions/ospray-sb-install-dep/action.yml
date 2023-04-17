@@ -9,7 +9,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-v2.7.1-${{runner.os}}-0
+        key: ospray-sb-v2.11.0-${{runner.os}}-0
 
     - name: Checkout ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
@@ -17,7 +17,7 @@ runs:
       with:
         repository: ospray/ospray
         path: './dependencies/ospray'
-        ref: v2.7.1
+        ref: v2.11.0
 
       # https://github.com/ospray/ospray/pull/550
     - name: Patch ospray rkcommon superbuild
