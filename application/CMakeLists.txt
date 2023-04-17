@@ -38,7 +38,6 @@ if(UNIX AND NOT APPLE)
 endif()
 
 set_target_properties(f3d PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
   CXX_VISIBILITY_PRESET hidden
   CXX_STANDARD 17
   )

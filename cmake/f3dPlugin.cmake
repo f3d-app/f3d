@@ -225,7 +225,13 @@ macro(f3d_plugin_build)
     EXPORT_FILE_NAME plugin_export.h
     EXPORT_MACRO_NAME F3D_PLUGIN_EXPORT)
 
-  if(NOT WIN32)
+  if(WIN32)
+    # On Windows, move plugins to "bin"
+    set_target_properties(f3d-plugin-${F3D_PLUGIN_NAME} PROPERTIES
+      LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+      )
+  else()
+    # On Unix, add the RPATH to VTK install folder
     get_target_property(target_type VTK::CommonCore TYPE)
     if (target_type STREQUAL SHARED_LIBRARY)
       list(APPEND F3D_PLUGIN_ADDITIONAL_RPATHS "$<TARGET_FILE_DIR:VTK::CommonCore>")
@@ -234,14 +240,7 @@ macro(f3d_plugin_build)
       INSTALL_RPATH "${F3D_PLUGIN_ADDITIONAL_RPATHS}")
   endif()
 
-  if(WIN32)
-    set(F3D_PLUGIN_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-  else()
-    set(F3D_PLUGIN_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-  endif()
-
   set_target_properties(f3d-plugin-${F3D_PLUGIN_NAME} PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY "${F3D_PLUGIN_OUTPUT_DIRECTORY}"
     POSITION_INDEPENDENT_CODE ON
     CXX_VISIBILITY_PRESET hidden
     )
