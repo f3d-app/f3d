@@ -49,7 +49,7 @@ jobs:
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/)" >> $GITHUB_ENV
+      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/ .github/baselines/)" >> $GITHUB_ENV
 
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
@@ -83,10 +83,10 @@ jobs:
          mkdir build
          mkdir install
 
-    - name: Set LD_LIBRARY_PATH ubuntu plugins
-      working-directory: ${{github.workspace}}/build
+    - name: Set F3D_PLUGINS_PATH to build
+      working-directory: ${{github.workspace}}
       shell: bash
-      run: echo "LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+      run: echo "F3D_PLUGINS_PATH=$(pwd)/build/lib" >> $GITHUB_ENV
 
     # There is a RPATH issue with VTK < 9.2.0
     # This is a simple workaround for it
@@ -108,6 +108,7 @@ jobs:
 
     - name: Configure
       working-directory: ${{github.workspace}}/build
+      shell: bash
       run: >
         cmake ../source
         -Werror=dev
@@ -155,6 +156,7 @@ jobs:
 
     - name: Test
       working-directory: ${{github.workspace}}/build
+      shell: bash
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
@@ -179,29 +181,9 @@ jobs:
         cmake --install . --component sdk
         cmake --install . --component configuration
 
-    - name: Check Install ubuntu
-      if: runner.os == 'Linux'
-      working-directory: ${{github.workspace}}/install
-      run: ./bin/f3d ../source/testing/data/suzanne.obj --output=../output.png
-
-    - name: Install Mesa Windows in install
-      if: runner.os == 'Windows'
-      uses: ./source/.github/actions/mesa-install-bin
-      with:
-        path: ${{github.workspace}}\install\bin
-
-    - name: Check Install windows
-      if: runner.os == 'Windows'
-      working-directory: ${{github.workspace}}/install
-      run: .\bin\f3d.exe ..\source\testing\data\suzanne.obj --output=..\output.png
-
-    - name: Check Install macos
-      if: runner.os == 'macOS'
-      working-directory: ${{github.workspace}}/install
-      run: ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
-
     - name: Build and configure libf3d examples
       working-directory: ${{github.workspace}}
+      shell: bash
       run: |
         cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -B build_examples source/examples/libf3d
         cmake --build build_examples --config Release
@@ -218,14 +200,60 @@ jobs:
     - name: Test libf3d examples
       if: matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0'
       working-directory: ${{github.workspace}}
+      shell: bash
       run: ctest --test-dir build_examples -C Release -VV
 
-    - name: Validate plugin examples
+    - name: Build, test and install plugin examples
       working-directory: ${{github.workspace}}
+      shell: bash
       run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
         cmake --build build_plugins --config Release
         ctest --test-dir build_plugins -C Release -VV
+        cmake --install build_plugins --config Release
+        cmake --install build_plugins --config Release --component configuration
+
+    - name: Set F3D_PLUGINS_PATH to install
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: echo "F3D_PLUGINS_PATH=$(pwd)/install/lib" >> $GITHUB_ENV
+
+    - name: Set F3D binary path Linux
+      if: runner.os == 'Linux'
+      shell: bash
+      run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
+
+    - name: Set F3D binary path Windows
+      if: runner.os == 'Windows'
+      shell: bash
+      run: echo "F3D_BIN_PATH=./bin/f3d.exe" >> $GITHUB_ENV
+
+    - name: Set F3D binary path MacOS
+      if: runner.os == 'macOS'
+      shell: bash
+      run: echo "F3D_BIN_PATH=./f3d.app/Contents/MacOS/f3d" >> $GITHUB_ENV
+
+    - name: Install Mesa Windows in install
+      if: runner.os == 'Windows'
+      uses: ./source/.github/actions/mesa-install-bin
+      with:
+        path: ${{github.workspace}}\install\bin
+
+    - name: Check Install
+      if: matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0'
+      working-directory: ${{github.workspace}}/install
+      shell: bash
+      run: |
+        mkdir output
+        ${{ env.F3D_BIN_PATH }} ../source/testing/data/suzanne.obj --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --verbose
+        ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose
+
+    - name: Upload Tests Install Artifact
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./install/output
+        name: f3d-tests-install-artifact-${{runner.os}}-${{matrix.vtk_version}}
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
