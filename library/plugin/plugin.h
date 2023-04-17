@@ -60,7 +60,7 @@ public:
    * Set by the engine.
    */
   const std::string& getOrigin() { return this->Origin; }
-  const void setOrigin(std::string origin) { this->Origin = origin; }
+  void setOrigin(const std::string& origin) { this->Origin = origin; }
   ///@}
 
 private:
