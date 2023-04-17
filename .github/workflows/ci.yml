@@ -151,7 +151,7 @@ jobs:
       if: runner.os == 'Windows'
       uses: ./source/.github/actions/mesa-install-bin
       with:
-        path: ${{github.workspace}}\build\bin\Release
+        path: ${{github.workspace}}\build\bin_Release
 
     - name: Test
       working-directory: ${{github.workspace}}/build

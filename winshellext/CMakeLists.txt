@@ -13,7 +13,6 @@ target_include_directories(F3DShellExtension PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} 
 target_link_libraries(F3DShellExtension PUBLIC libf3d PRIVATE pathcch shlwapi windowscodecs)
 
 set_target_properties(F3DShellExtension PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
   CXX_STANDARD 17
 )
 
