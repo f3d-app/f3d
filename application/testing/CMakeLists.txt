@@ -175,7 +175,7 @@ f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
 f3d_test(NAME TestGroupGeometries DATA mb/recursive ARGS --group-geometries DEFAULT_LIGHTS)
 f3d_test(NAME TestGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries --scalars=Polynomial -b DEFAULT_LIGHTS)
 
-if(UNIX AND NOT APPLE)
+if(NOT F3D_MACOS_BUNDLE)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
   configure_file("${CMAKE_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
   f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json DEFAULT_LIGHTS)
@@ -286,7 +286,7 @@ endif()
 if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestABC DATA suzanne.abc ARGS --load-plugins=alembic)
 
-  if(UNIX AND NOT APPLE)
+  if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileAlembic DATA suzanne.abc CONFIG config_build DEFAULT_LIGHTS)
 
@@ -326,7 +326,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     endif()
   endif()
 
-  if(UNIX AND NOT APPLE)
+  if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/assimp/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileAssimpFBX DATA phong_cube.fbx CONFIG config_build DEFAULT_LIGHTS)
     f3d_test(NAME TestDefaultConfigFileAssimpDXF DATA PinkEggFromLW.dxf ARGS -p CONFIG config_build DEFAULT_LIGHTS)
@@ -348,7 +348,7 @@ if(F3D_PLUGIN_BUILD_DRACO)
   f3d_test(NAME TestDRACO DATA suzanne.drc DEFAULT_LIGHTS ARGS --load-plugins=draco)
   f3d_test(NAME TestDRACOColoring DATA suzanne.drc DEFAULT_LIGHTS ARGS --scalars --comp=0 --load-plugins=draco)
 
-  if(UNIX AND NOT APPLE)
+  if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/draco/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileDraco DATA suzanne.drc CONFIG config_build DEFAULT_LIGHTS)
 
@@ -371,7 +371,7 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   # Test animation with generic importer and coloring
   f3d_test(NAME TestInteractionAnimationGenericImporter DATA small.ex2 INTERACTION ARGS -sb --load-plugins=exodus DEFAULT_LIGHTS)#Space;Space;
 
-  if(UNIX AND NOT APPLE)
+  if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/exodus/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build DEFAULT_LIGHTS)
 
@@ -387,7 +387,7 @@ if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestSTEP DATA f3d.stp DEFAULT_LIGHTS ARGS --load-plugins=occt)
   f3d_test(NAME TestIGES DATA f3d.igs DEFAULT_LIGHTS ARGS --load-plugins=occt)
 
-  if(UNIX AND NOT APPLE)
+  if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build DEFAULT_LIGHTS)
 
