@@ -141,6 +141,29 @@ jobs:
         ${{ matrix.vtk_version == 'commit' && '-DF3D_TESTING_ENABLE_HDRI_TESTS=ON' || '-DF3D_TESTING_ENABLE_HDRI_TESTS=OFF' }}
         ${{ matrix.vtk_version == 'v9.0.0' && '-DF3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || '-DF3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=OFF' }}
 
+    - name: Install Sonar
+      if: runner.os == 'Linux'
+      uses: SonarSource/sonarcloud-github-c-cpp@v1
+      
+    - name: Run build-wrapper
+      if: runner.os == 'Linux'
+      working-directory: ${{github.workspace}}/build
+      run: build-wrapper-linux-x86-64 --out-dir bw-output cmake --build .
+
+    - name: Run sonar-scanner
+      if: runner.os == 'Linux'
+      working-directory: ${{github.workspace}}/build
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: >
+        sonar-scanner
+        -X
+        -Dsonar.organization=f3d-app
+        -Dsonar.projectKey=f3d-app_f3d
+        -Dsonar.sources=.
+        -Dsonar.cfamily.build-wrapper-output=bw-output
+        -Dsonar.host.url=https://sonarcloud.io
+
     - name: Build
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --config Release
@@ -172,7 +195,7 @@ jobs:
       run: cmake --install .
 
     - name: Install (mimetypes on Linux)
-      if: runner.os == 'Linux'
+      if: runner.os == 'Windows'
       working-directory: ${{github.workspace}}/build
       run: cmake --install . --component mimetypes
 
