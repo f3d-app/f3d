@@ -222,7 +222,10 @@ void ConfigurationOptions::LoadPlugins(const F3DAppOptions& appOptions) const
 
     for (const std::string& plugin : appOptions.Plugins)
     {
-      f3d::engine::loadPlugin(plugin, this->GetPluginSearchPaths());
+      if (!plugin.empty())
+      {
+        f3d::engine::loadPlugin(plugin, this->GetPluginSearchPaths());
+      }
     }
   }
   catch (const f3d::engine::plugin_exception& e)
