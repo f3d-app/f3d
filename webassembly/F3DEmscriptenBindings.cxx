@@ -11,33 +11,66 @@ namespace emscripten
 namespace internal
 {
 template<>
-void raw_destructor<f3d::loader>(f3d::loader* ptr) {}
-
-template<>
-void raw_destructor<f3d::window>(f3d::window* ptr) {}
-
-template<>
-void raw_destructor<f3d::interactor>(f3d::interactor* ptr) {}
-
-template<>
-void raw_destructor<f3d::options>(f3d::options* ptr) {}
-}
+void raw_destructor<f3d::loader>(f3d::loader* ptr)
+{
 }
 
-f3d::options* getOptionsPtr(f3d::engine& e) { return &e.getOptions(); }
-f3d::options* toggle(f3d::options& o, const std::string& name) { return &o.toggle(name); }
+template<>
+void raw_destructor<f3d::window>(f3d::window* ptr)
+{
+}
 
-f3d::loader* getLoaderPtr(f3d::engine& e) { return &e.getLoader(); }
-f3d::loader* loadGeometry(f3d::loader& l, const std::string& p) { return &l.loadGeometry(p); }
-f3d::loader* loadScene(f3d::loader& l, const std::string& p) { return &l.loadScene(p); }
+template<>
+void raw_destructor<f3d::interactor>(f3d::interactor* ptr)
+{
+}
 
-f3d::window* getWindowPtr(f3d::engine& e) { return &e.getWindow(); }
-f3d::window* setSize(f3d::window& win, int w, int h) { return &win.setSize(w, h); }
+template<>
+void raw_destructor<f3d::options>(f3d::options* ptr)
+{
+}
+}
+}
 
-f3d::interactor* getInteractorPtr(f3d::engine& e) { return &e.getInteractor(); }
+f3d::options* getOptionsPtr(f3d::engine& e)
+{
+  return &e.getOptions();
+}
+f3d::options* toggle(f3d::options& o, const std::string& name)
+{
+  return &o.toggle(name);
+}
 
-std::string getExceptionMessage(intptr_t exceptionPtr) {
-  return std::string(reinterpret_cast<std::exception *>(exceptionPtr)->what());
+f3d::loader* getLoaderPtr(f3d::engine& e)
+{
+  return &e.getLoader();
+}
+f3d::loader* loadGeometry(f3d::loader& l, const std::string& p)
+{
+  return &l.loadGeometry(p);
+}
+f3d::loader* loadScene(f3d::loader& l, const std::string& p)
+{
+  return &l.loadScene(p);
+}
+
+f3d::window* getWindowPtr(f3d::engine& e)
+{
+  return &e.getWindow();
+}
+f3d::window* setSize(f3d::window& win, int w, int h)
+{
+  return &win.setSize(w, h);
+}
+
+f3d::interactor* getInteractorPtr(f3d::engine& e)
+{
+  return &e.getInteractor();
+}
+
+std::string getExceptionMessage(intptr_t exceptionPtr)
+{
+  return std::string(reinterpret_cast<std::exception*>(exceptionPtr)->what());
 }
 
 EMSCRIPTEN_BINDINGS(f3d)
@@ -46,8 +79,8 @@ EMSCRIPTEN_BINDINGS(f3d)
   emscripten::function("getExceptionMessage", &getExceptionMessage);
 
   // f3d::options
-  emscripten::class_<f3d::options>("Options")
-    .function("toggle", &toggle, emscripten::allow_raw_pointers());
+  emscripten::class_<f3d::options>("Options").function(
+    "toggle", &toggle, emscripten::allow_raw_pointers());
 
   // f3d::loader
   emscripten::class_<f3d::loader>("Loader")
@@ -60,8 +93,7 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("render", &f3d::window::render);
 
   // f3d::interactor
-  emscripten::class_<f3d::interactor>("Interactor")
-    .function("start", &f3d::interactor::start);
+  emscripten::class_<f3d::interactor>("Interactor").function("start", &f3d::interactor::start);
 
   // f3d::engine
   emscripten::class_<f3d::engine> engine("Engine");
