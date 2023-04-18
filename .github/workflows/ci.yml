@@ -87,8 +87,7 @@ jobs:
       run: |
          mkdir build
          mkdir install
-         cd install
-         mkdir output
+         mkdir install/output
 
     # There is a RPATH issue with VTK < 9.2.0
     # This is a simple workaround for it
@@ -280,8 +279,10 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
+    # Add dummy F3D_PLUGINS_PATH for coverage
     env:
       DISPLAY: :0
+      F3D_PLUGINS_PATH: /dummy1:/dummy2
 
     steps:
 

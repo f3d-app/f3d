@@ -88,17 +88,10 @@ list(APPEND libf3dSDKTestsNoRender_list
      TestSDKLog
      TestSDKLoader)
 
-set(plugin_dir "")
-if(WIN32)
-  set(plugin_dir ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-else()
-  set(plugin_dir ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-endif()
-
 # Add all the ADD_TEST for each test
 foreach (test ${libf3dSDKTests_list})
   get_filename_component (TName ${test} NAME_WE)
-  add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName}  "${CMAKE_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${plugin_dir}")
+  add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName}  "${CMAKE_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
   set_tests_properties(libf3d::${TName} PROPERTIES TIMEOUT 30)
   if (NOT F3D_TESTING_ENABLE_RENDERING_TESTS AND NOT ${TName} IN_LIST libf3dSDKTestsNoRender_list)
     set_tests_properties(libf3d::${TName} PROPERTIES DISABLED ON)
