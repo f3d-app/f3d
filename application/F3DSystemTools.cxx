@@ -21,10 +21,10 @@ namespace F3DSystemTools
 fs::path GetApplicationPath()
 {
 #if defined(_WIN32)
-  std::array<wchar_t, 1024> wc{};
-  if (GetModuleFileNameW(nullptr, wc.data(), 1024))
+  std::array<wchar_t, 1024> buffer{};
+  if (GetModuleFileNameW(nullptr, buffer.data(), 1024))
   {
-    return fs::path(wc.data());
+    return fs::path(buffer.data());
   }
   f3d::log::error("Cannot retrieve application path");
   return fs::path();
@@ -34,10 +34,10 @@ fs::path GetApplicationPath()
   std::array<char, 1024> buffer;
   if (_NSGetExecutablePath(buffer.data(), &size) != 0)
   {
-    f3d::log::error("Executable is too long to recover path to configuration file");
+    f3d::log::error("Cannot retrieve application path");
     return fs::path();
   }
-  return fs::path(buffer);
+  return fs::path(buffer.data());
 #else
   try
   {
