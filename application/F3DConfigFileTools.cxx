@@ -1,22 +1,13 @@
 #include "F3DConfigFileTools.h"
 
 #include "F3DConfig.h"
+#include "F3DSystemTools.h"
 
 #include "log.h"
 
 #include <cstring>
 #include <filesystem>
 #include <vector>
-
-#if defined(_WIN32)
-// clang-format off
-#include <windows.h>
-#include <libloaderapi.h>
-// clang-format on
-#endif
-#ifdef __APPLE__
-#include <mach-o/dyld.h>
-#endif
 
 namespace fs = std::filesystem;
 
@@ -57,34 +48,14 @@ fs::path F3DConfigFileTools::GetUserConfigFileDirectory()
 //----------------------------------------------------------------------------
 fs::path F3DConfigFileTools::GetBinaryConfigFileDirectory()
 {
-  std::string execPath;
   fs::path dirPath;
   try
   {
-#if defined(_WIN32)
-    wchar_t wc[1024] = { 0 };
-    GetModuleFileNameW(NULL, wc, 1024);
-    std::wstring ws(wc);
-    std::transform(
-      ws.begin(), ws.end(), std::back_inserter(execPath), [](wchar_t c) { return (char)c; });
-#else
-#ifdef __APPLE__
-    uint32_t size = 1024;
-    char buffer[size];
-    if (_NSGetExecutablePath(buffer, &size) != 0)
-    {
-      f3d::log::error("Executable is too long to recover path to configuration file");
-      return fs::path();
-    }
-    execPath = buffer;
-#else
-    execPath = fs::canonical("/proc/self/exe").string();
-#endif
-#endif
+    dirPath = F3DSystemTools::GetApplicationPath();
 
     // transform path to exe to path to install
     // /install/bin/f3d -> /install
-    dirPath = fs::canonical(fs::path(execPath)).parent_path().parent_path();
+    dirPath = fs::canonical(dirPath).parent_path().parent_path();
 
     // Add binary specific paths
 #if F3D_MACOS_BUNDLE

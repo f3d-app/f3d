@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef F3DTools_h
-#define F3DTools_h
+#ifndef F3DConfigFileTools_h
+#define F3DConfigFileTools_h
 
 #include <filesystem>
 #include <string>

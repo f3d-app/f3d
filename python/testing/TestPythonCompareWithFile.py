@@ -5,10 +5,10 @@ if sys.platform.startswith('win32'):
 
 import f3d
 
-dataset = sys.argv[2] + "data/cow.vtp"
-reference = sys.argv[2] + "baselines/TestPythonCompareWithFile.png"
-output = sys.argv[3] + "TestPythonCompareWithFile.png"
-outputDiff = sys.argv[3] + "TestPythonCompareWithFile.diff.png"
+dataset = sys.argv[2] + "/testing/data/cow.vtp"
+reference = sys.argv[2] + "/testing/baselines/TestPythonCompareWithFile.png"
+output = sys.argv[3] + "/Testing/Temporary/TestPythonCompareWithFile.png"
+outputDiff = sys.argv[3] + "/Testing/Temporary/TestPythonCompareWithFile.diff.png"
 
 f3d.engine.autoloadPlugins()
 

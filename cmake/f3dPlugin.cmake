@@ -347,7 +347,7 @@ macro(f3d_plugin_build)
   string(JSON F3D_PLUGIN_JSON
     SET "${F3D_PLUGIN_JSON}" "type" "\"${F3D_PLUGIN_TYPE}\"")
 
-  set(F3D_PLUGIN_JSON_FILE "${CMAKE_CURRENT_BINARY_DIR}/${F3D_PLUGIN_NAME}.json")
+  set(F3D_PLUGIN_JSON_FILE "${CMAKE_BINARY_DIR}/share/f3d/plugins/${F3D_PLUGIN_NAME}.json")
 
   file(WRITE "${F3D_PLUGIN_JSON_FILE}" "${F3D_PLUGIN_JSON}")
 
