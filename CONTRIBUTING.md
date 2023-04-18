@@ -52,7 +52,7 @@ F3D is separated in different components:
 - The libf3d, in the library folder.
 - The VTKExtensions in the library/VTKExtensions folder.
 - The bindings, python, java and webassembly, in the respective directories.
-- The plugins providing all the different readers in the plugins directory.
+- The plugins, providing all the different readers in the plugins directory.
 
 VTKExtensions are separated in different modules.
 - Core, that do not depend on any other VTKExtensions modules are provide services for all modules
