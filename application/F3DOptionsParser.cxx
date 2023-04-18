@@ -210,7 +210,7 @@ void ConfigurationOptions::LoadPlugins(const F3DAppOptions& appOptions) const
 void ConfigurationOptions::PrintPluginsScan()
 {
 #if F3D_MACOS_BUNDLE
-  f3d::log::error("Command not supported");
+  f3d::log::error("option not supported with the macOS bundle");
 #else
   auto appPath = F3DSystemTools::GetApplicationPath();
   appPath = appPath.parent_path().parent_path();
