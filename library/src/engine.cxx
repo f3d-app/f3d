@@ -124,6 +124,11 @@ interactor& engine::getInteractor()
 //----------------------------------------------------------------------------
 void engine::loadPlugin(const std::string& pathOrName, const std::vector<std::string>& searchPaths)
 {
+  if (pathOrName.empty())
+  {
+    return;
+  }
+
   std::string pluginOrigin = "static";
   factory* factory = factory::instance();
 
