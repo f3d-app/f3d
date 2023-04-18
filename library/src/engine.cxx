@@ -174,15 +174,17 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<std::st
       {
         std::string tryPath = path + '/' + libName;
         tryPath = vtksys::SystemTools::ConvertToOutputPath(tryPath);
-
-        log::debug("Trying to load plugin from: \"", tryPath, "\"");
-        handle = vtksys::DynamicLoader::OpenLibrary(tryPath);
-
-        if (handle)
+        if (vtksys::SystemTools::FileExists(tryPath))
         {
-          // plugin is found and loaded
-          pluginOrigin = tryPath;
-          break;
+          log::debug("Trying to load \"", pathOrName, "\" plugin from: \"", tryPath, "\"");
+          handle = vtksys::DynamicLoader::OpenLibrary(tryPath);
+
+          if (handle)
+          {
+            // plugin is found and loaded
+            pluginOrigin = tryPath;
+            break;
+          }
         }
       }
 
