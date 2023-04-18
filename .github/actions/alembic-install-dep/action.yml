@@ -10,7 +10,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/alembic_install
-        key: alembic-v1.8.3-${{runner.os}}-1
+        key: alembic-v1.8.5-${{runner.os}}-0
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -18,15 +18,7 @@ runs:
       with:
         repository: alembic/alembic
         path: './dependencies/alembic'
-        ref: 1.8.3
-
-    - name: Patch Alembic
-      if: steps.cache-alembic.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/alembic
-      shell: bash
-      run: |
-        patch -p1 < $GITHUB_ACTION_PATH/0001-use-install-rpath-for-Imath.patch
-        patch -p1 < $GITHUB_ACTION_PATH/0002-Fix-an-issue-with-ALEMBIC_LIB_INSTALL_DIR.patch
+        ref: 1.8.5
 
     - name: Setup Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
