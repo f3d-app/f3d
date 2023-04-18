@@ -10,7 +10,7 @@ reporting a bug you encountered, or suggesting a new feature you feel would impr
 We use [Github](https://github.com/f3d-app/f3d) to manage the project and you can report new issues or weigh 
 in on existing ones [over there](https://github.com/f3d-app/f3d/issues).
 
-Also, do not hesitate to join our [discord](https://discord.f3d.app) !
+Also, do not hesitate to join our [discord](https://discord.f3d.app)!
 
 ## How to get started with development
 
