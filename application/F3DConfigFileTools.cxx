@@ -129,7 +129,7 @@ fs::path F3DConfigFileTools::GetConfigPath(const std::string& configSearch)
       // If the config search is a stem, add extensions
       if (fs::path(configSearch).stem() == configSearch)
       {
-        for (const std::string& ext : { ".json", ".d" })
+        for (const std::string& ext : { std::string(".json"), std::string(".d") })
         {
           configPath = dir / (configSearch + ext);
           if (fs::exists(configPath))
