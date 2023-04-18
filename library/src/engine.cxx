@@ -14,9 +14,12 @@
 
 #include <vtkVersion.h>
 
+#include <vtksys/Directory.hxx>
 #include <vtksys/DynamicLoader.hxx>
 #include <vtksys/Encoding.hxx>
 #include <vtksys/SystemTools.hxx>
+
+#include <json.hpp>
 
 namespace f3d
 {
@@ -245,6 +248,46 @@ void engine::loadPlugin(const std::string& pathOrName)
 void engine::autoloadPlugins()
 {
   factory::instance()->autoload();
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> engine::getPluginsList(const std::string& pluginPath)
+{
+  vtksys::Directory dir;
+  constexpr std::string_view ext = ".json";
+  std::vector<std::string> pluginNames;
+
+  if (dir.Load(pluginPath))
+  {
+    for (unsigned long i = 0; i < dir.GetNumberOfFiles(); i++)
+    {
+      std::string currentFile = dir.GetFile(i);
+      if (std::equal(ext.rbegin(), ext.rend(), currentFile.rbegin()))
+      {
+        std::string fullPath = dir.GetPath();
+        fullPath += "/";
+        fullPath += currentFile;
+
+        try
+        {
+          auto root = nlohmann::json::parse(std::ifstream(fullPath));
+
+          auto name = root.find("name");
+
+          if (name != root.end() && name.value().is_string())
+          {
+            pluginNames.push_back(name.value().get<std::string>());
+          }
+        }
+        catch (const nlohmann::json::parse_error& ex)
+        {
+          f3d::log::warn(fullPath, " is not a valid JSON file: ", ex.what());
+        }
+      }
+    }
+  }
+
+  return pluginNames;
 }
 
 //----------------------------------------------------------------------------

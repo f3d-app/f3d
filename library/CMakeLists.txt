@@ -5,7 +5,6 @@ set(F3D_VTK_MODULES
   VTK::CommonSystem
   VTK::IOImage
   VTK::InteractionWidgets
-  VTK::jsoncpp
   f3d::VTKExtensionsApplicative
   f3d::VTKExtensionsCore
   f3d::VTKExtensionsReaders
@@ -100,6 +99,7 @@ target_include_directories(libf3d
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/private>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/plugin>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/plugin>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external>
   )
 
 set_target_properties(libf3d PROPERTIES

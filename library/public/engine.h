@@ -129,6 +129,13 @@ public:
   static void autoloadPlugins();
 
   /**
+   * List plugins based on associated json files located in the given directory.
+   * Listed plugins can be loaded using engine::loadPlugin function.
+   * Note that the listed plugins may fail to load if the library is not found or incompatible.
+   */
+  static std::vector<std::string> getPluginsList(const std::string& pluginPath);
+
+  /**
    * A structure providing information about the libf3d.
    * Returned by getLibInfo().
    */
