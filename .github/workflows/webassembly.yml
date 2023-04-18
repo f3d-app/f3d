@@ -40,10 +40,11 @@ jobs:
       run: >
         cmake ../source
         -DBUILD_SHARED_LIBS=OFF
-        -DCMAKE_INSTALL_PREFIX:PATH=../install
-        -DF3D_STRICT_BUILD=ON
-        -DF3D_PLUGIN_BUILD_EXODUS=OFF
         -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../install
+        -DF3D_LINUX_LINK_FILESYSTEM=OFF
+        -DF3D_PLUGIN_BUILD_EXODUS=OFF
+        -DF3D_STRICT_BUILD=ON
         -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
 
     - name: Build
