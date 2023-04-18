@@ -2,6 +2,7 @@
 
 #include "log.h"
 
+#include <array>
 #include <cstring>
 #include <filesystem>
 
