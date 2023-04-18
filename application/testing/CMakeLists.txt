@@ -168,21 +168,21 @@ f3d_test(NAME TestMaxSizeBelow DATA suzanne.stl ARGS --max-size=1 DEFAULT_LIGHTS
 f3d_test(NAME TestMaxSizeAbove DATA WaterBottle.glb ARGS --max-size=0.2 REGEXP "No file loaded, file is bigger than max size" NO_BASELINE)
 f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_FAIL)
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
-f3d_test(NAME TestVerboseLoadPlugin ARGS --verbose REGEXP "Loading plugin \"native\"" NO_BASELINE)
-f3d_test(NAME TestNonExistentPlugin ARGS --load-plugins=dummy REGEXP "Plugin failed to load" NO_BASELINE)
 f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalars --bar --comp=2 DEFAULT_LIGHTS)
 f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
 f3d_test(NAME TestGroupGeometries DATA mb/recursive ARGS --group-geometries DEFAULT_LIGHTS)
 f3d_test(NAME TestGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries --scalars=Polynomial -b DEFAULT_LIGHTS)
 
-# Test missing symbol plugin using the libf3d
+# Test plugin fail code path
+f3d_test(NAME TestPluginVerbose ARGS --verbose REGEXP "Loading plugin \"native\"" NO_BASELINE)
+f3d_test(NAME TestPluginNonExistent ARGS --load-plugins=dummy REGEXP "Plugin failed to load" NO_BASELINE)
+f3d_test(NAME TestPluginInvalid ARGS --load-plugins=${CMAKE_SOURCE_DIR}/testing/data/invalid.so REGEXP "Cannot open the library" NO_BASELINE)
 if(WIN32)
-      f3d_test(NAME TestPluginInvalid ARGS --verbose --load-plugins "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/f3d.dll" NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
-elseif(APPLE)
-      f3d_test(NAME TestPluginInvalid ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libf3d.dylib" NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
-else() # Linux
-      f3d_test(NAME TestPluginInvalid ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libf3d.so" NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
+  set(_dirname "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+else()
+  set(_dirname "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 endif()
+f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins "${_dirname}/${CMAKE_SHARED_LIBRARY_PREFIX}f3d${CMAKE_SHARED_LIBRARY_SUFFIX}" NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
 
 if(NOT F3D_MACOS_BUNDLE)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
@@ -396,12 +396,7 @@ if(F3D_PLUGIN_BUILD_EXODUS)
     f3d_test(NAME TestPluginName DATA disk_out_ref.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "Loaded plugin exodus from")
 
     # Test --load-plugins with a full path plugin
-    if(WIN32)
-      set(_libname "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/f3d-plugin-exodus.dll")
-    else()
-      set(_libname "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libf3d-plugin-exodus.so")
-    endif()
-    f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --verbose --load-plugins "${_libname}" NO_BASELINE REGEXP "Loaded plugin exodus from")
+    f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_SHARED_MODULE_PREFIX}f3d-plugin-exodus${CMAKE_SHARED_MODULE_SUFFIX}" NO_BASELINE REGEXP "Loaded plugin exodus from")
   endif()
 
 endif()
