@@ -2,18 +2,24 @@
 
 F3D welcomes all contributors, regardless of skill level or experience!
 
-## How to get started
+## Contributing as a user
 
-To contribute to F3D, you may want to take a look at the opened [issues](https://github.com/f3d-app/f3d/issues),
+To contribute to F3D as a user, you can just use F3D and report any issues or feature ideas.
+Please open your own issue to share any issues or ideas you may have, and comment on any related issues.
+
+Also, do not hesitate to join our [discord](https://discord.f3d.app) !
+
+## How to get started with development
+
+To contribute to F3D as a developer, you may want to take a look at the opened [issues](https://github.com/f3d-app/f3d/issues),
 especially, the ones with the ["good first issue"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) label.
 If one sounds interesting to you, then you should just go ahead and comment on the issue and ask for any help or clarification needed.
 F3D maintainers will see your comment and provide guidance as needed.
-You can also open your own issue or feature request and F3D maintainers will try to help you with it!
 
 You can then fix the issue in your side and contribute it to the F3D repository,
 by following the workflow described below.
 
-Also do not hesitate to join our [discord](https://discord.f3d.app) !
+Another way to get started is to improve the documentation.
 
 ## F3D Development workflow
 
@@ -46,6 +52,7 @@ F3D is separated in different components:
 - The libf3d, in the library folder.
 - The VTKExtensions in the library/VTKExtensions folder.
 - The bindings, python, java and webassembly, in the respective directories.
+- The plugins, providing all the different readers in the plugins directory.
 
 VTKExtensions are separated in different modules.
 - Core, that do not depend on any other VTKExtensions modules are provide services for all modules
