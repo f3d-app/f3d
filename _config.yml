@@ -194,7 +194,7 @@ defaults:
 
   -
     scope:
-      path: "doc/dev/CONTRIBUTE.md"
+      path: "CONTRIBUTING.md"
     values:
       title: Contribute
       parent: Developer Documentation
