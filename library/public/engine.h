@@ -112,15 +112,18 @@ public:
   /**
    * Load a plugin.
    * Supports full path, relative path, and plugin name.
-   * On Linux and macOS, uses LD_LIBRARY_PATH to find the plugin.
-   * On Windows, the plugin should be located in the same folder as the executable.
+   * First try to load the plugin by name from the static plugins.
+   * Then try to load the path provided as if it is a full path to a plugin.
+   * Then try to load a plugin by its name looking into the provided plugin search paths.
+   * Then try to load a plugin by its name relying on internal system (eg: LD_LIBRARY_PATH).
    * The plugin "native" is always available and includes native VTK readers.
    * If built and available in your build, F3D is providing 5 additional plugins:
    * "alembic", "assimp", "draco", "exodus", "occt".
    * Custom plugins can also be available that F3D is not supporting officially.
    * Throw a plugin_exception if the plugin can't be loaded for some reason.
    */
-  static void loadPlugin(const std::string& path);
+  static void loadPlugin(
+    const std::string& nameOrPath, const std::vector<std::string>& pluginSearchPaths = {});
 
   /**
    * Automatically load all the static plugins.
