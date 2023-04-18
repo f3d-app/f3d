@@ -192,22 +192,15 @@ private:
 //----------------------------------------------------------------------------
 std::vector<std::string> ConfigurationOptions::GetPluginSearchPaths() const
 {
-#if F3D_MACOS_BUNDLE
-  return {};
-#endif
-#if !F3D_MACOS_BUNDLE
-
   // Recover F3D_PLUGINS_PATH first
   auto searchPaths = F3DSystemTools::GetVectorEnvironnementVariable("F3D_PLUGINS_PATH");
-
+#if F3D_MACOS_BUNDLE
+  return searchPaths;
+#else
   // Add a executable related path
   auto tmpPath = F3DSystemTools::GetApplicationPath();
-#if defined(_WIN32)
-  tmpPath = tmpPath.parent_path();
-#else
   tmpPath = tmpPath.parent_path().parent_path();
   tmpPath /= "lib";
-#endif
   searchPaths.push_back(tmpPath.string());
   return searchPaths;
 #endif
