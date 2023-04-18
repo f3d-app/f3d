@@ -87,11 +87,8 @@ jobs:
       run: |
          mkdir build
          mkdir install
-
-    - name: Set F3D_PLUGINS_PATH to build
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: echo "F3D_PLUGINS_PATH=$(pwd)/build/lib" >> $GITHUB_ENV
+         cd install
+         mkdir output
 
     # There is a RPATH issue with VTK < 9.2.0
     # This is a simple workaround for it
@@ -208,20 +205,13 @@ jobs:
       shell: bash
       run: ctest --test-dir build_examples -C Release -VV
 
-    - name: Build, test and install plugin examples
+    - name: Build and test plugin examples
       working-directory: ${{github.workspace}}
       shell: bash
       run: |
         cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
         cmake --build build_plugins --config Release
         ctest --test-dir build_plugins -C Release -VV
-        cmake --install build_plugins --config Release
-        cmake --install build_plugins --config Release --component configuration
-
-    - name: Set F3D_PLUGINS_PATH to install
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: echo "F3D_PLUGINS_PATH=$(pwd)/install/lib" >> $GITHUB_ENV
 
     - name: Set F3D binary path Linux
       if: runner.os == 'Linux'
@@ -253,12 +243,24 @@ jobs:
       with:
         path: ${{github.workspace}}\install\bin
 
+    - name: Check F3D_PLUGINS_PATH using plugin example
+      if: matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0'
+      working-directory: ${{github.workspace}}/install
+      shell: bash
+      run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose
+
+    - name: Install plugin examples
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: |
+        cmake --install build_plugins --config Release
+        cmake --install build_plugins --config Release --component configuration
+
     - name: Check Install
       if: matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0'
       working-directory: ${{github.workspace}}/install
       shell: bash
       run: |
-        mkdir output
         ${{ env.F3D_BIN_PATH }} ../source/testing/data/suzanne.obj --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --verbose
         ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose
 
@@ -348,11 +350,6 @@ jobs:
 
     - name: Run Xvfb
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
-
-    - name: Set F3D_PLUGINS_PATH to source
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: echo "F3D_PLUGINS_PATH=/dummy1:/dummy2:$(pwd)/source/lib" >> $GITHUB_ENV
 
     - name: Test
       working-directory: ${{github.workspace}}/source
