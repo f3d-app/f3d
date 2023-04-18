@@ -212,7 +212,7 @@ void engine::loadPlugin(const std::string& pathOrName)
 #else
 #ifdef __APPLE__
         std::vector<char> pathBuf(1024);
-        if (_NSGetExecutablePath(pathBuf.data(), pathBuf.size()) != 0)
+        if (_NSGetExecutablePath(pathBuf.data(), static_cast<uint32_t>(pathBuf.size())) != 0)
         {
           f3d::log::error("Executable is too long to recover path to configuration file");
           return;
