@@ -24,12 +24,17 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
+        macos_bundle: [true]
         include:
           - enable_raytracing: true
           - vtk_version: v9.0.0
             enable_raytracing: false
           - os: macos-latest
             enable_raytracing: false #598
+          - macos_bundle: false
+            os: macos-latest
+            vtk_version: commit
+            enable_raytracing: false
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -124,10 +129,10 @@ jobs:
         -DF3D_BINDINGS_PYTHON=ON
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
-        -DF3D_MACOS_BUNDLE=ON
+        -DF3D_MACOS_BUNDLE=${{ matrix.macos_bundle == true && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_MODULE_RAYTRACING=${{ matrix.enable_raytracing == true && 'ON' || 'OFF' }}
-        -DF3D_PLUGINS_STATIC_BUILD=OFF
+        -DF3D_PLUGINS_STATIC_BUILD=${{ matrix.macos_bundle == true && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
@@ -228,10 +233,19 @@ jobs:
       shell: bash
       run: echo "F3D_BIN_PATH=./bin/f3d.exe" >> $GITHUB_ENV
 
-    - name: Set F3D binary path MacOS
-      if: runner.os == 'macOS'
+    - name: Set F3D binary path MacOS bundle
+      if: |
+        runner.os == 'macOS' &&
+        matrix.macos_bundle == true
       shell: bash
       run: echo "F3D_BIN_PATH=./f3d.app/Contents/MacOS/f3d" >> $GITHUB_ENV
+
+    - name: Set F3D binary path MacOS bundle
+      if: |
+        runner.os == 'macOS' &&
+        matrix.macos_bundle == false
+      shell: bash
+      run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
 
     - name: Install Mesa Windows in install
       if: runner.os == 'Windows'

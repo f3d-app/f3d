@@ -154,6 +154,9 @@ endif()
 # plugins
 option(F3D_PLUGINS_STATIC_BUILD "Make all plugins static (embedded into libf3d) and automatically loaded by F3D" ON)
 mark_as_advanced(F3D_PLUGINS_STATIC_BUILD)
+if (F3D_MACOS_BUNDLE AND NOT F3D_PLUGINS_STATIC_BUILD)
+  message(FATAL_ERROR "Building a macOS Bundle do not support loading plugins dynamically")
+endif()
 add_subdirectory(plugins)
 
 # libf3d target
