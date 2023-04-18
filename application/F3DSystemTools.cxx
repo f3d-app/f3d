@@ -5,6 +5,7 @@
 #include <array>
 #include <cstring>
 #include <filesystem>
+#include <vector>
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -50,5 +51,32 @@ fs::path GetApplicationPath()
   }
 #endif
 #endif
+}
+
+std::vector<std::string> GetVectorEnvironnementVariable(const std::string& envVar)
+{
+  const char* envPtr = std::getenv(envVar.c_str());
+  if (!envPtr)
+  {
+    return {};
+  }
+
+  std::vector<std::string> tokens;
+  std::string token;
+  std::istringstream tokenStream(envPtr);
+
+  // split path with OS separator (':' on Linux/macOS and ';' on Windows)
+#ifdef _WIN32
+  char delimiter = ';';
+#else
+  char delimiter = ':';
+#endif
+
+  while (std::getline(tokenStream, token, delimiter))
+  {
+    tokens.push_back(token);
+  }
+
+  return tokens;
 }
 }

@@ -8,10 +8,13 @@
 #define F3DSystemTools_h
 
 #include <filesystem>
+#include <string>
+#include <vector>
 
 namespace F3DSystemTools
 {
 std::filesystem::path GetApplicationPath();
+std::vector<std::string> GetVectorEnvironnementVariable(const std::string& envVar);
 }
 
 #endif
