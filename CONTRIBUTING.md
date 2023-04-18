@@ -9,7 +9,7 @@ Please open your own issue to share any issues or ideas you may have, comment an
 
 Also do not hesitate to join our [discord](https://discord.f3d.app) !
 
-## How to get started with developement
+## How to get started with development
 
 To contribute to F3D as a developer, you may want to take a look at the opened [issues](https://github.com/f3d-app/f3d/issues),
 especially, the ones with the ["good first issue"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) label.
