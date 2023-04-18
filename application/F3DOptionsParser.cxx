@@ -40,6 +40,7 @@ public:
     bool parseCommandLine = true);
   bool InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
   void LoadPlugins(const F3DAppOptions& appOptions) const;
+  std::vector<std::string> GetPluginSearchPaths() const;
 
   enum class HasDefault : bool
   {
@@ -189,6 +190,30 @@ private:
 };
 
 //----------------------------------------------------------------------------
+std::vector<std::string> ConfigurationOptions::GetPluginSearchPaths() const
+{
+#if F3D_MACOS_BUNDLE
+  return {};
+#endif
+#if !F3D_MACOS_BUNDLE
+
+  // Recover F3D_PLUGINS_PATH first
+  auto searchPaths = F3DSystemTools::GetVectorEnvironnementVariable("F3D_PLUGINS_PATH");
+
+  // Add a executable related path
+  auto tmpPath = F3DSystemTools::GetApplicationPath();
+#if defined(_WIN32)
+  tmpPath = tmpPath.parent_path();
+#else
+  tmpPath = tmpPath.parent_path().parent_path();
+  tmpPath /= "lib";
+#endif
+  searchPaths.push_back(tmpPath.string());
+  return searchPaths;
+#endif
+}
+
+//----------------------------------------------------------------------------
 void ConfigurationOptions::LoadPlugins(const F3DAppOptions& appOptions) const
 {
   try
@@ -197,7 +222,7 @@ void ConfigurationOptions::LoadPlugins(const F3DAppOptions& appOptions) const
 
     for (const std::string& plugin : appOptions.Plugins)
     {
-      f3d::engine::loadPlugin(plugin);
+      f3d::engine::loadPlugin(plugin, this->GetPluginSearchPaths());
     }
   }
   catch (const f3d::engine::plugin_exception& e)
