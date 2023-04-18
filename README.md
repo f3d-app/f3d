@@ -63,7 +63,7 @@ F3D is developed by a team of passionate devs. Please use F3D, star it on github
 
 We envision F3D as a community-driven project, we love to see how the project is growing thanks to the contributions from the community. We would love to see your face in the list below! If you want to contribute to F3D, you are very welcome to! Take a look at our [contribution documentation](CONTRIBUTING.md).
 
-<a href="https://github.com/PRBonn/kiss-icp/graphs/contributors">
+<a href="https://github.com/f3d-app/f3d/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=f3d-app/f3d" />
 </a>
 
