@@ -22,7 +22,7 @@ fs::path GetApplicationPath()
 {
 #if defined(_WIN32)
   std::array<wchar_t, 1024> wc{};
-  if (GetModuleFileNameW(nullptr, wc.data(), wc.size()))
+  if (GetModuleFileNameW(nullptr, wc.data(), 1024))
   {
     return fs::path(wc.data());
   }
@@ -43,7 +43,7 @@ fs::path GetApplicationPath()
   {
     return fs::canonical("/proc/self/exe");
   }
-  catch(const std::exception& ex)
+  catch (const std::exception& ex)
   {
     f3d::log::error("Cannot retrieve application path: ", ex.what());
     return fs::path();
