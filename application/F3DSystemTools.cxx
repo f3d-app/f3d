@@ -37,7 +37,7 @@ fs::path GetApplicationPath()
     f3d::log::error("Executable is too long to recover path to configuration file");
     return fs::path();
   }
-  return fs::path(buffer);
+  return fs::path(buffer.data());
 #else
   try
   {
