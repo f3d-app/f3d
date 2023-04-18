@@ -34,7 +34,7 @@ fs::path GetApplicationPath()
   std::array<char, 1024> buffer;
   if (_NSGetExecutablePath(buffer.data(), &size) != 0)
   {
-    f3d::log::error("Executable is too long to recover path to configuration file");
+    f3d::log::error("Executable is too long to recover application path");
     return fs::path();
   }
   return fs::path(buffer.data());
