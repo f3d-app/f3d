@@ -5,7 +5,7 @@ F3D welcomes all contributors, regardless of skill level or experience!
 ## Contributing as a user
 
 To contribute to F3D as a user, you can just use F3D and report any issues or feature ideas.
-Please open your own issue to share any issues or ideas you may have, comment an any related issues.
+Please open your own issue to share any issues or ideas you may have, and comment on any related issues.
 
 Also do not hesitate to join our [discord](https://discord.f3d.app) !
 
