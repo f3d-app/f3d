@@ -122,7 +122,7 @@ interactor& engine::getInteractor()
 }
 
 //----------------------------------------------------------------------------
-void engine::loadPlugin(const std::string& pathOrName)
+void engine::loadPlugin(const std::string& pathOrName, const std::vector<std::string>& searchPaths)
 {
   std::string pluginOrigin = "static";
   factory* factory = factory::instance();
@@ -163,32 +163,6 @@ void engine::loadPlugin(const std::string& pathOrName)
     }
     else
     {
-      std::vector<std::string> searchPaths;
-
-      std::string envValue;
-      if (vtksys::SystemTools::GetEnv("F3D_PLUGINS_PATH", envValue))
-      {
-        // split path with OS separator (':' on Linux/macOS and ';' on Windows)
-#ifdef _WIN32
-        char sep = ';';
-#else
-        char sep = ':';
-#endif
-        vtksys::SystemTools::Split(envValue, searchPaths, sep);
-      }
-
-      // On Windows, search plugins in the same folder than f3d.exe too by default
-#ifdef _WIN32
-      std::vector<wchar_t> pathBuf(40000);
-      if (GetModuleFileNameW(
-            GetModuleHandle(nullptr), pathBuf.data(), static_cast<DWORD>(pathBuf.size())))
-      {
-        std::string progPath =
-          vtksys::SystemTools::GetProgramPath(vtksys::Encoding::ToNarrow(pathBuf.data()));
-        searchPaths.push_back(progPath);
-      }
-#endif
-
       // construct the library file name from the plugin name
       std::string libName = vtksys::DynamicLoader::LibPrefix();
       libName += "f3d-plugin-";
