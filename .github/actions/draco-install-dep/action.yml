@@ -9,7 +9,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/draco_install
-        key: draco-1.5.5-${{runner.os}}-0
+        key: draco-1.5.6-${{runner.os}}-0
 
     - name: Checkout Draco
       if: steps.cache-draco.outputs.cache-hit != 'true'
@@ -17,7 +17,7 @@ runs:
       with:
         repository: google/draco
         path: './dependencies/draco'
-        ref: 1.5.5
+        ref: 1.5.6
 
     - name: Setup Draco
       if: steps.cache-draco.outputs.cache-hit != 'true'
