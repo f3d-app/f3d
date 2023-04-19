@@ -36,7 +36,8 @@ const std::vector<std::pair<std::string, std::string> >& interactor::getDefaultI
     { "Space", "Play animation if any" },
     { "Left", "Previous file" },
     { "Right", "Next file" },
-    { "Up", "Reload current file" }
+    { "Up", "Reload current file" },
+    { "Down", "Add current file parent directory to the list of files and reload the current file" }
   };
   // clang-format on
 
