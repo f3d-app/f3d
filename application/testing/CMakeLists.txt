@@ -433,7 +433,7 @@ f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-p
 f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-size=20 INTERACTION) #O
 f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalars DEFAULT_LIGHTS) #Right;Right;Right;Left;Up;
 f3d_test(NAME TestInteractionDirectoryLoop DATA mb INTERACTION ARGS --scalars DEFAULT_LIGHTS) #Left;Left;Left;
-f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "Provided file path is empty") #Right;Right;Right;
+f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "Provided geometry file path is empty") #Right;Right;Right;
 f3d_test(NAME TestInteractionGLTFReaderWithAnimation DATA BoxAnimated.gltf INTERACTION ARGS --geometry-only DEFAULT_LIGHTS) #Space;Space;
 f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_BASELINE INTERACTION)#Space;Space;
 f3d_test(NAME TestInteractionResetCamera DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)#MouseMovements;Return;
@@ -586,7 +586,7 @@ f3d_test(NAME TestInvalidConfigFile DATA cow.vtp CONFIG ${CMAKE_SOURCE_DIR}/test
 f3d_test(NAME TestConfigFileQuiet DATA nonExistentFile.vtp CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/quiet.json REGEXP_FAIL "File .*/testing/data/nonExistentFile.vtp does not exist" NO_RENDER)
 
 # Test no file with config file
-f3d_test(NAME TestNoFileConfigFile CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/verbose.json REGEXP "No file to load provided." NO_BASELINE)
+f3d_test(NAME TestNoFileConfigFile CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/verbose.json ARGS --verbose REGEXP "No file to load provided." NO_BASELINE)
 
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
