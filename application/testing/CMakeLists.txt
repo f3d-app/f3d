@@ -452,6 +452,7 @@ f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION DEFAULT_
 f3d_test(NAME TestInteractionGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries INTERACTION DEFAULT_LIGHTS) #SSB
 f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION DEFAULT_LIGHTS) #Up;
 f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION DEFAULT_LIGHTS) #Down;
+f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No file loaded, no rendering performed") #Down;
 f3d_test(NAME TestInteractionGroupGeometriesLoadParentDirectory DATA mb/mb_0_0.vtu ARGS --group-geometries --filename INTERACTION DEFAULT_LIGHTS) #Down;
 
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
