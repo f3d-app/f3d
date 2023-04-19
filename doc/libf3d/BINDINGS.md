@@ -1,6 +1,6 @@
 # Bindings
 
-## Python Bindings
+## Python
 
 If the python bindings have been generated using the `F3D_BINDINGS_PYTHON` CMake option, the libf3d can be used directly from python.
 Make sure to set `PYTHONPATH` to path where the python module is built.
@@ -22,7 +22,7 @@ eng.getLoader().loadGeometry("f3d/testing/data/dragon.vtu")
 eng.getInteractor().start()
 ```
 
-## Java Bindings (experimental)
+## Java (experimental)
 
 If the Java bindings have been generated using the `F3D_BINDINGS_JAVA` CMake option, the libf3d can be used directly from Java.
 You can import the `f3d.jar` package and use the provided Java classes directly.
