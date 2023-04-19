@@ -161,13 +161,16 @@ int F3DStarter::Start(int argc, char** argv)
         }
         else if (keySym == "Down")
         {
-          this->Internals->Engine->getInteractor().stopAnimation();
-          this->AddFile(
-            this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)]
-              .parent_path(),
-            true);
-          this->LoadFile(0, true);
-          this->Render();
+          if (this->Internals->LoadedFile)
+          {
+            this->Internals->Engine->getInteractor().stopAnimation();
+            this->AddFile(
+              this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)]
+                .parent_path(),
+              true);
+            this->LoadFile(0, true);
+            this->Render();
+          }
           return true;
         }
         return false;
