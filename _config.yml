@@ -12,6 +12,7 @@ include:
   - README.md
   - LICENSE.md
   - _licenses.md
+  - CONTRIBUTING.md
 exclude:
   - CMakeLists.txt
   - codecov.yml
