@@ -7,7 +7,7 @@ For the complete documentation, please consult the [libf3d doxygen documentation
 
 The engine class is the main class that needs to be instantiated. All other classes instance are provided by the engine using getters, `getLoader`, `getWindow`, `getInteractor`, `getOptions`.
 
-The engine constructor lets you choose the type of window in its constructor, `NONE`, `NATIVE`, `NATIVE_OFFSCREEN`, `EXTERNAL`. Default is `NATIVE`. See [Window class](window-class) documentation for more info. Please note that the engine will not provide a interactor with `NONE` and `EXTERNAL`.
+The engine constructor lets you choose the type of window in its constructor, `NONE`, `NATIVE`, `NATIVE_OFFSCREEN`, `EXTERNAL`. Default is `NATIVE`. See [Window class](#window-class) documentation for more info. Please note that the engine will not provide a interactor with `NONE` and `EXTERNAL`.
 
 A static function `loadPlugin` can also be called to load reader plugins. It must be called before loading any file. An internal plugin containing VTK native readers can be loaded by calling `f3d::engine::loadPlugin("native");`. Other plugins maintained by F3D team are available if their build is enabled: `alembic`, `assimp`, `draco`, `exodus` and `occt`.
 If CMake option `F3D_PLUGINS_STATIC_BUILD` is enabled, the plugins listed above are also static just like `native` plugin.

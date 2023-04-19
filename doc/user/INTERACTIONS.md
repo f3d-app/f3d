@@ -30,9 +30,9 @@ Other options can be toggled directly by pressing the following hotkeys:
 * `V`: volume rendering.
 * `I`: opacity function inversion during volume rendering.
 * `O`: point sprites rendering.
-* `P`: depth peeling.
-* `Q`: Screen-Space Ambient Occlusion.
-* `A`: Fast Approximate Anti-Aliasing.
+* `P`: translucency support.
+* `Q`: ambient occlusion.
+* `A`: anti-aliasing.
 * `T`: tone mapping.
 * `E`: the display of cell edges.
 * `X`: the trihedral axes display.
@@ -44,6 +44,7 @@ Other options can be toggled directly by pressing the following hotkeys:
 * `D`: the denoiser when raytracing.
 * `U`: background blur when using a HDRi.
 * `K`: trackball interaction mode.
+* `L`: increase (+Shift: decrease) lights intensity.
 
 Note that some hotkeys can be available or not depending on the file being loaded and the F3D configuration.
 

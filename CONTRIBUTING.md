@@ -41,10 +41,10 @@ It also means that adding a new feature or behavior means adding a associated te
 Make sure to check the results for yourself, and ask for help if needed.
 
 F3D continuous integration will also check the coverage as it is a good way to evaluate if new features are being tested or not.
-When adding code to F3D, always to to cover it by adding/modifying [tests](TESTING.md).
+When adding code to F3D, always to to cover it by adding/modifying [tests](doc/dev/TESTING.md).
 
 F3D continuous integration also check formatting using clang-format and will inform you if changes needs to be made.
-However, some [formatting rules](CODING_STYLE.md) are not enforced by clang-format and will be checked during the review process.
+However, some [formatting rules](doc/dev/CODING_STYLE.md) are not enforced by clang-format and will be checked during the review process.
 
 When making changes to the libf3d public API, the CI will warn about making related changes to the bindings. This is required in order to merge the PR.
 
@@ -63,7 +63,7 @@ VTKExtensions are separated in different modules.
 - Rendering, that depends on Core and implements the rendering specificities of F3D
 - Applicative, the depends on all other VTKExtension modules and provide services for the libf3d library
 
-The libf3d implements the whole logic of instancing and manipulating the different VTK classes, it is fully documented [here](../libf3d/README.md).
+The libf3d implements the whole logic of instancing and manipulating the different VTK classes, it is fully documented [here](doc/libf3d/README.md).
 
-The F3D application itself uses the libf3d but adds an applicative layer on top of it, especially the handling of [command line options](../OPTIONS.md)
-and [configuration file](../CONFIGURATION_FILE.md).
+The F3D application itself uses the libf3d but adds an applicative layer on top of it, especially the handling of [command line options](doc/user/OPTIONS.md)
+and [configuration file](doc/user/CONFIGURATION_FILE.md).
