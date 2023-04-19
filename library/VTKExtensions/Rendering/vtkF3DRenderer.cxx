@@ -941,7 +941,8 @@ void vtkF3DRenderer::ConfigureCheatSheet()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 {
-  cheatSheetText << " P: Translucency support " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " P: Translucency support " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]")
+                 << "\n";
   cheatSheetText << " Q: Ambient occlusion " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText << " A: Anti-aliasing " << (this->UseFXAAPass ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText << " T: Tone mapping " << (this->UseToneMappingPass ? "[ON]" : "[OFF]") << "\n";
