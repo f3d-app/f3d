@@ -21,9 +21,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib${output_postfix}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib${output_postfix}")
 
 project(F3D
-  VERSION "1.3.1"
   DESCRIPTION "F3D - A fast and minimalist 3D viewer"
   LANGUAGES C CXX)
+set(PROJECT_VERSION 2.0.0-RC1)
 
 string(TIMESTAMP F3D_BUILD_DATE "%Y-%m-%d %H:%M:%S" UTC)
 
