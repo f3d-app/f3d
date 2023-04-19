@@ -145,7 +145,7 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
   // Check file validity
   if (filePath.empty())
   {
-    log::debug("Provided file path is empty\n");
+    log::debug("Provided geometry file path is empty\n");
     return *this;
   }
   if (!vtksys::SystemTools::FileExists(filePath, true))
