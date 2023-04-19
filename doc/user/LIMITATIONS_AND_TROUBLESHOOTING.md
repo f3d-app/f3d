@@ -36,6 +36,19 @@ Make sure that VTK has been built with *OpenImageDenoise* support (`VTKOSPRAY_EN
 
 With some C++ STD library version, explicit linking to `stdc++fs` is not supported. We provide a CMake option `F3D_LINUX_APPLICATION_LINK_FILESYSTEM` that you can set to `OFF` to workaround this issue.
 
+## Windows
+
+> Using the portable binary release, I'm unable to run F3D because Windows warns about a security risk
+
+F3D is not signed by Microsoft yet so Windows shows this warning. Just click on the "more" button to be able to run F3D.
+
+## macOS
+
+> Using the binary release, I'm unable to run F3D because macOS warns about F3D not being signed.
+
+F3D is not signed by Apple yes so macOS shows this warning. To run F3D, right click on the app and click "open", then click "open" again to be able to run F3D.
+
+
 ### Thumbnails
 > Thumbnails are not working in my file manager.
 
