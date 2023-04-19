@@ -188,6 +188,9 @@ if(BUILD_SHARED_LIBS)
   configure_package_config_file(
     "${CMAKE_SOURCE_DIR}/cmake/f3dConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
     INSTALL_DESTINATION "lib/cmake/f3d")
+
+  # Write PROJECT_VERSION instead of F3D_VERSION to avoid any potential issues with version comparison
+  # because of the potential suffix
   write_basic_package_version_file(
     "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
     VERSION "${PROJECT_VERSION}"
