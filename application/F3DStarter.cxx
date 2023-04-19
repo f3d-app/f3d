@@ -369,7 +369,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
   }
   else
   {
-    f3d::log::info("No file to load provided.");
+    f3d::log::debug("No file to load provided.");
     filenameInfo = "No file to load provided, please drop one into this window";
     this->Internals->CurrentFileIndex = -1;
 
