@@ -46,7 +46,7 @@ F3D is not signed by Microsoft yet so Windows shows this warning. Just click on 
 
 > Using the binary release, I'm unable to run F3D because macOS warns about F3D not being signed.
 
-F3D is not signed by Apple yes so macOS shows this warning. To run F3D, right click on the app and click "open", then click "open" again to be able to run F3D.
+F3D is not signed by Apple yet so macOS shows this warning. To run F3D, right click on the app and click "open", then click "open" again to be able to run F3D.
 
 
 ### Thumbnails
