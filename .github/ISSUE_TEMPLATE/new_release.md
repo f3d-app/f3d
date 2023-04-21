@@ -21,9 +21,9 @@ Release Candidates :
 - [ ] Tag `vX.Y.Z-RCN` and push it to https://github.com/f3d-app/f3d
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z-RCN` F3D version, superbuild `main` branch and prerelease publish `true`
 - [ ] Download the `vX.Y.Z-RCN` prerelease from https://github.com/f3d-app/f3d/releases
-- [ ] Locally test the `vX.Y.Z-RCN` prerelease on Linux
-- [ ] Locally test the `vX.Y.Z-RCN` prerelease on macOS
-- [ ] Locally test the `vX.Y.Z-RCN` prerelease on Windows
+- [ ] Locally test the `vX.Y.Z-RCN` prerelease on Linux: run, render, config file, drag&drop, thumbnails, exec from file manager, sdk
+- [ ] Locally test the `vX.Y.Z-RCN` prerelease on macOS: run, render, config file, drag&drop, exec from file manager
+- [ ] Locally test the `vX.Y.Z-RCN` prerelease on Windows: run, render, config file, drag&drop, thumbnails, exec from file manager, sdk
 - [ ] If it fails, fix the issue, copy this paragraph and increment `N`
 - [ ] Else proceed to the next part
 
@@ -38,6 +38,7 @@ Release :
 - [ ] Write release notes using PR since last release and add it to the release
 - [ ] Add contributors and packagers to the release notes
 - [ ] Release
+- [ ] Update download links and changelog https://github.com/f3d-app/f3d `doc`
 - [ ] Communicate on discord
 - [ ] Communicate on reddit
 - [ ] Communicate on hackernews
