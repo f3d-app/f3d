@@ -4,11 +4,11 @@
 
 | Platform | Files |
 | -------- | ----- |
-| Windows Installer | [F3D-2.0.0-Windows-raytracing.exe]() |
-| Windows (Portable) | [F3D-2.0.0-Windows-raytracing.zip]() |
-| MacOS | [F3D-2.0.0-macOS-raytracing.dmg]() |
-| Debian-based Package | [F3D-2.0.0-Linux-raytracing.deb]() |
-| Linux (Portable) | [F3D-2.0.0-Linux-raytracing.tar.xz]() |
+| Windows Installer | [F3D-2.0.0-Windows-raytracing.exe](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-Windows-x86_64-raytracing.exe) |
+| Windows (Portable) | [F3D-2.0.0-Windows-raytracing.zip](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-Windows-x86_64-raytracing.zip) |
+| MacOS | [F3D-2.0.0-macOS-raytracing.dmg](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-macOS-x86_64-raytracing.dmg) |
+| Debian-based Package | [F3D-2.0.0-Linux-raytracing.deb](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-Linux-x86_64-raytracing.deb) |
+| Linux (Portable) | [F3D-2.0.0-Linux-raytracing.tar.xz](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-Linux-x86_64-raytracing.tar.xz) |
 
 ## Alternatives
 
