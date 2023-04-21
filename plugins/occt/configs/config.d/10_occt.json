@@ -1,0 +1,10 @@
+{
+  ".*(step|stp|iges|igs)":
+  {
+    "load-plugins": "occt",
+    "up": "+Z",
+    "ambient-occlusion": true,
+    "comp": "-2",
+    "cells": true
+  }
+}

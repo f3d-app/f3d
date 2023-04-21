@@ -2,7 +2,6 @@
 
 #include "log.h"
 
-#include "F3DReaderInstantiator.h"
 #include "vtkF3DObjectFactory.h"
 
 #include <vtkLogger.h>
@@ -13,8 +12,6 @@ namespace f3d::detail
 {
 class init::internals
 {
-public:
-  F3DReaderInstantiator ReaderInstantiator;
 };
 
 //----------------------------------------------------------------------------
@@ -32,10 +29,16 @@ init::init()
   vtkLogger::SetInternalVerbosityLevel(vtkLogger::VERBOSITY_OFF);
 #endif
 
-  // instanciate our own polydata mapper and output windows
+  // instantiate our own polydata mapper and output windows
   vtkNew<vtkF3DObjectFactory> factory;
   vtkObjectFactory::RegisterFactory(factory);
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
+
+#ifdef __EMSCRIPTEN__
+  vtkObjectFactory::SetAllEnableFlags(0, "vtkRenderWindow", "vtkOpenGLRenderWindow");
+  vtkObjectFactory::SetAllEnableFlags(
+    0, "vtkRenderWindowInteractor", "vtkGenericRenderWindowInteractor");
+#endif
 }
 
 //----------------------------------------------------------------------------

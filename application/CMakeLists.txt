@@ -14,6 +14,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptionsParser.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DStarter.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DSystemTools.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cxx
 )
 
@@ -29,22 +30,36 @@ endif()
 add_executable(f3d ${F3D_SOURCE_FILES})
 target_link_libraries(f3d PUBLIC libf3d)
 
-if (UNIX AND NOT APPLE)
-  target_link_libraries(f3d PRIVATE stdc++fs)
-endif ()
+if(UNIX AND NOT APPLE)
+  option(F3D_LINUX_APPLICATION_LINK_FILESYSTEM "Link with libstdc++fs" ON)
+  mark_as_advanced(F3D_LINUX_APPLICATION_LINK_FILESYSTEM)
+  if(F3D_LINUX_APPLICATION_LINK_FILESYSTEM)
+    target_link_libraries(f3d PRIVATE stdc++fs)
+  endif()
+endif()
 
-set_target_properties(f3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set_target_properties(f3d PROPERTIES
+  CXX_VISIBILITY_PRESET hidden
+  CXX_STANDARD 17
+  )
+
 if (APPLE)
-  set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../lib)
+  if (F3D_MACOS_BUNDLE)
+    set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../../../lib)
+  else ()
+    set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../lib)
+  endif ()
 elseif (UNIX)
-  set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../lib)
+  set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../${CMAKE_INSTALL_LIBDIR})
+elseif (MSVC)
+  set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT f3d) # Set f3d as startup project in visual studio
+  set_target_properties(f3d PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=$<TARGET_FILE_DIR:VTK::CommonCore>") # Add VTK in MSVC PATH environment variable
 endif ()
-
-target_compile_features(f3d PRIVATE cxx_std_17)
 
 target_include_directories(f3d
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external>
   )
 
 set(f3d_compile_options_private "")
@@ -53,8 +68,12 @@ set(f3d_link_options_public "")
 
 # F3D_STRICT_BUILD
 list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})
-if(F3D_STRICT_BUILD AND MSVC)
-  target_compile_definitions(f3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
+if(F3D_STRICT_BUILD)
+  if(MSVC)
+    target_compile_definitions(f3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
+  elseif(APPLE)
+    target_compile_definitions(f3d PRIVATE GL_SILENCE_DEPRECATION)
+  endif()
 endif()
 
 # Coverage
@@ -69,14 +88,6 @@ list(APPEND f3d_link_options_public ${f3d_sanitizer_link_options})
 if(F3D_MACOS_BUNDLE)
   set_target_properties(f3d PROPERTIES MACOSX_BUNDLE TRUE)
 
-  # Add default configuration
-  if(F3D_INSTALL_DEFAULT_CONFIGURATION_FILE)
-    set(f3d_CONFIG ${CMAKE_SOURCE_DIR}/resources/config.json)
-    set_source_files_properties(${f3d_CONFIG} PROPERTIES
-      MACOSX_PACKAGE_LOCATION "Resources")
-    target_sources(f3d PRIVATE ${f3d_CONFIG})
-  endif()
-
   # Add logo icon
   set(MACOSX_BUNDLE_ICON_FILE logo.icns)
   set(f3d_ICON ${CMAKE_SOURCE_DIR}/resources/logo.icns)
@@ -87,11 +98,11 @@ if(F3D_MACOS_BUNDLE)
   # Set other MacOS vars
   set(MACOSX_BUNDLE_EXECUTABLE_NAME ${PROJECT_NAME})
   set(MACOSX_BUNDLE_INFO_STRING ${PROJECT_DESCRIPTION})
-  set(MACOSX_BUNDLE_GUI_IDENTIFIER "io.github.f3d_app.f3d")
-  set(MACOSX_BUNDLE_LONG_VERSION_STRING ${PROJECT_VERSION})
+  set(MACOSX_BUNDLE_GUI_IDENTIFIER "app.f3d.F3D")
+  set(MACOSX_BUNDLE_LONG_VERSION_STRING ${F3D_VERSION})
   set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
-  set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
-  set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+  set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${F3D_VERSION})
+  set(MACOSX_BUNDLE_BUNDLE_VERSION ${F3D_VERSION})
   set(MACOSX_BUNDLE_COPYRIGHT "Michael Migliore, Mathieu Westphal")
 
   # Generate MacOS bundle
@@ -118,20 +129,33 @@ target_compile_options(f3d PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_co
 target_link_options(f3d PUBLIC ${f3d_link_options_public})
 
 # Create man
-option(F3D_GENERATE_MAN "Generate and install a man entry for f3d using help2man" OFF)
-mark_as_advanced(F3D_GENERATE_MAN)
-if(F3D_GENERATE_MAN)
-  find_program(HELP2MAN help2man)
-  find_program(GZIP gzip)
-  if(HELP2MAN AND GZIP)
-    set(MAN_OUTPUT_FILE ${CMAKE_BINARY_DIR}/f3d.1)
-    add_custom_command(
-      OUTPUT ${MAN_OUTPUT_FILE}
-      COMMAND ${HELP2MAN} $<TARGET_FILE:f3d> -N -n "F3D - Fast and minimalist 3D viewer" > ${MAN_OUTPUT_FILE}
-      COMMAND ${GZIP} -f ${MAN_OUTPUT_FILE}
-      DEPENDS f3d)
-    add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
-  else()
-    message(WARNING "help2man or gzip not found, cannot create man entry")
+if(UNIX AND NOT APPLE)
+  option(F3D_LINUX_GENERATE_MAN "Generate and install a man entry for f3d using help2man" OFF)
+  mark_as_advanced(F3D_LINUX_GENERATE_MAN)
+  if(F3D_LINUX_GENERATE_MAN)
+    find_program(HELP2MAN help2man)
+    find_program(GZIP gzip)
+    if(HELP2MAN AND GZIP)
+      set(MAN_OUTPUT_FILE ${CMAKE_BINARY_DIR}/f3d.1)
+      add_custom_command(
+        OUTPUT ${MAN_OUTPUT_FILE}
+        COMMAND ${HELP2MAN} $<TARGET_FILE:f3d> -N -n "fast and minimalist 3D viewer" > ${MAN_OUTPUT_FILE}
+        COMMAND ${GZIP} -f ${MAN_OUTPUT_FILE}
+        DEPENDS f3d)
+      add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
+    else()
+      message(WARNING "help2man or gzip not found, cannot create man entry")
+    endif()
   endif()
 endif()
+
+# Testing
+if(BUILD_TESTING)
+  add_subdirectory(testing)
+endif()
+
+# Installing
+install(TARGETS f3d
+  EXPORT f3dTargets
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT application
+  BUNDLE DESTINATION "." COMPONENT application)

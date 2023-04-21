@@ -37,7 +37,7 @@ public:
    */
   ~window_impl() override;
 
-  //@{
+  ///@{
   /**
    * Documented public API
    */
@@ -48,25 +48,26 @@ public:
   int getWidth() const override;
   int getHeight() const override;
   window& setSize(int width, int height) override;
+  window& setPosition(int x, int y) override;
   window& setIcon(const unsigned char* icon, size_t iconSize) override;
   window& setWindowName(const std::string& windowName) override;
   point3_t getWorldFromDisplay(const point3_t& displayPoint) const override;
   point3_t getDisplayFromWorld(const point3_t& worldPoint) const override;
-  //@}
+  ///@}
 
   /**
    * Implementation only API.
    * Create and initialize the internal vtkF3DRenderer with the provided parameters
    * Called by the loader right before reading a file
    */
-  virtual void Initialize(bool withColoring, std::string fileInfo);
+  virtual void Initialize(bool withColoring);
 
   /**
    * Implementation only API.
-   * Initialize an already created vtkF3DRendererWithColoring with the provided importer
+   * Set the importer on an already created vtkF3DRendererWithColoring
    * Called by the loader right after reading a file
    */
-  virtual void InitializeRendererWithColoring(vtkF3DGenericImporter* importer);
+  virtual void SetImporterForColoring(vtkF3DGenericImporter* importer);
 
   /**
    * Implementation only API.
@@ -95,6 +96,12 @@ public:
    * Get a pointer to the internal vtkRenderWindow
    */
   virtual vtkRenderWindow* GetRenderWindow();
+
+  /**
+   * Implementation only API.
+   * Set the cache path.
+   */
+  void SetCachePath(const std::string& cachePath);
 
 private:
   class internals;

@@ -1,15 +1,10 @@
 # Define VTK modules to link libf3d with
 # Note that readers/importers specific modules
-# should be listed here as reader instanciation is header only
+# should be listed here as reader instantiation is header only
 set(F3D_VTK_MODULES
   VTK::CommonSystem
-  VTK::IOCityGML
-  VTK::IOGeometry
-  VTK::IOPLY
-  VTK::IOXML
-  VTK::IOParallel
+  VTK::IOImage
   VTK::InteractionWidgets
-  VTK::jsoncpp
   f3d::VTKExtensionsApplicative
   f3d::VTKExtensionsCore
   f3d::VTKExtensionsReaders
@@ -17,15 +12,6 @@ set(F3D_VTK_MODULES
 )
 
 # Check modules
-if(F3D_MODULE_EXODUS)
-  if(TARGET VTK::IOExodus)
-    message(STATUS "Module: VTK ExodusII found")
-    set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::IOExodus)
-  else()
-    message(FATAL_ERROR "F3D_MODULE_EXODUS option is enabled but VTK::IOExodus is not found")
-  endif()
-endif()
-
 if(F3D_MODULE_RAYTRACING)
   if(TARGET VTK::RenderingRayTracing)
     message(STATUS "VTK::RenderingRayTracing module found")
@@ -72,6 +58,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/camera_impl.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/engine.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/src/factory.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/init.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/interactor.cxx
@@ -84,6 +71,8 @@ set(F3D_SOURCE_FILES
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/plugin/reader.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/camera.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/engine.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/exception.h
@@ -108,15 +97,17 @@ target_include_directories(libf3d
   PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/private>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/private>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/plugin>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/plugin>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external>
   )
 
 set_target_properties(libf3d PROPERTIES
-  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+  CXX_STANDARD 17
   CXX_VISIBILITY_PRESET hidden
   POSITION_INDEPENDENT_CODE ON
   OUTPUT_NAME "f3d"
+  PDB_NAME "libf3d"
   )
 
 # Generate export macros for exported public APIs
@@ -125,20 +116,34 @@ generate_export_header(libf3d
   EXPORT_FILE_NAME public/export.h
   EXPORT_MACRO_NAME F3D_EXPORT)
 
-target_compile_features(libf3d PRIVATE cxx_std_17)
-
 target_include_directories(libf3d
   INTERFACE
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
-set_target_properties(libf3d PROPERTIES
-  PUBLIC_HEADER "${F3D_PUBLIC_HEADERS}"
-  )
-
 vtk_module_autoinit(TARGETS libf3d MODULES ${F3D_VTK_MODULES})
 
-target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES})
+# The initialize function pointer of the static plugins must be added to the map of static plugins
+# in the factory constructor. When loading a plugin, there's a lookup into this map.
+get_property(F3D_STATIC_PLUGIN_TARGETS GLOBAL PROPERTY F3D_STATIC_PLUGINS)
+set(F3D_STATIC_PLUGIN_MAP "${F3D_STATIC_PLUGIN_TARGETS}")
+set(F3D_STATIC_PLUGIN_EXTERN "${F3D_STATIC_PLUGIN_TARGETS}")
+
+list(TRANSFORM F3D_STATIC_PLUGIN_EXTERN REPLACE "^(.+)$" "extern f3d::plugin* init_plugin_static_\\1()\\\;")
+list(JOIN F3D_STATIC_PLUGIN_EXTERN "\n" F3D_STATIC_PLUGIN_EXTERN)
+
+list(TRANSFORM F3D_STATIC_PLUGIN_MAP REPLACE "^(.+)$" "this->StaticPluginInitializers[\"\\1\"] = init_plugin_static_\\1\\\;")
+list(JOIN F3D_STATIC_PLUGIN_MAP "\n  " F3D_STATIC_PLUGIN_MAP)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/factory.cxx.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/src/factory.cxx"
+  @ONLY)
+
+# libf3d links with the static plugins.
+list(TRANSFORM F3D_STATIC_PLUGIN_TARGETS PREPEND "f3d-plugin-")
+
+target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES} ${F3D_STATIC_PLUGIN_TARGETS})
 target_compile_options(libf3d PUBLIC ${libf3d_compile_options_public} PRIVATE ${libf3d_compile_options_private})
 target_link_options(libf3d PUBLIC ${libf3d_link_options_public})
 
@@ -148,47 +153,61 @@ if(F3D_STRICT_BUILD AND MSVC)
 endif()
 
 if (APPLE OR UNIX)
-  # Make sure rpath is correctly set for libf3d dependencies
-
-  # VTK
-  set(absolute_rpaths "")
+  # Make sure rpath is correctly set for libf3d
   get_target_property(target_type VTK::CommonCore TYPE)
   if (target_type STREQUAL SHARED_LIBRARY)
-    set(absolute_rpaths "$<TARGET_FILE_DIR:VTK::CommonCore>")
+    set_target_properties(libf3d PROPERTIES INSTALL_RPATH "$<TARGET_FILE_DIR:VTK::CommonCore>")
   endif ()
-
-  # assimp
-  if(F3D_MODULE_ASSIMP)
-    get_target_property(target_type assimp::assimp TYPE)
-    if (target_type STREQUAL SHARED_LIBRARY)
-      list(APPEND absolute_rpaths "$<TARGET_FILE_DIR:assimp::assimp>")
-    endif ()
-  endif ()
-
-  # OCCT
-  if(F3D_MODULE_OCCT)
-    get_target_property(target_type TKernel TYPE)
-    if (target_type STREQUAL SHARED_LIBRARY)
-      list(APPEND absolute_rpaths "${OpenCASCADE_LIBRARY_DIR}")
-    endif ()
-  endif ()
-
-  # Alembic/Imath
-  if(F3D_MODULE_ALEMBIC)
-    get_target_property(target_type Alembic::Alembic TYPE)
-    if (target_type STREQUAL SHARED_LIBRARY)
-      list(APPEND absolute_rpaths "$<TARGET_FILE_DIR:Alembic::Alembic>")
-    endif ()
-    get_target_property(target_type Imath::Imath TYPE)
-    if (target_type STREQUAL SHARED_LIBRARY)
-      list(APPEND absolute_rpaths "$<TARGET_FILE_DIR:Imath::Imath>")
-    endif ()
-  endif ()
-
-  set_target_properties(libf3d PROPERTIES INSTALL_RPATH "${absolute_rpaths}")
 endif ()
 
-# testing
+# Testing
 if(BUILD_TESTING)
   add_subdirectory(testing)
+endif()
+
+# Installing
+if(BUILD_SHARED_LIBS)
+  install(TARGETS libf3d
+    EXPORT f3dTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT library
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library)
+
+  install(FILES ${F3D_PUBLIC_HEADERS}
+    DESTINATION "include/f3d"
+    COMPONENT sdk
+    EXCLUDE_FROM_ALL)
+
+  install(EXPORT f3dTargets
+    NAMESPACE f3d::
+    DESTINATION "lib/cmake/f3d"
+    COMPONENT sdk
+    EXCLUDE_FROM_ALL)
+
+  include(CMakePackageConfigHelpers)
+  configure_package_config_file(
+    "${CMAKE_SOURCE_DIR}/cmake/f3dConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
+    INSTALL_DESTINATION "lib/cmake/f3d")
+
+  # Write PROJECT_VERSION instead of F3D_VERSION to avoid any potential issues with version comparison
+  # because of the potential suffix
+  write_basic_package_version_file(
+    "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
+    VERSION "${PROJECT_VERSION}"
+    COMPATIBILITY SameMinorVersion)
+
+  install(
+    FILES
+      "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
+      "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
+      "${CMAKE_SOURCE_DIR}/cmake/f3dEmbed.cmake"
+      "${CMAKE_SOURCE_DIR}/cmake/f3dPlugin.cmake"
+      "${CMAKE_SOURCE_DIR}/cmake/plugin.cxx.in"
+      "${CMAKE_SOURCE_DIR}/cmake/plugin.desktop.in"
+      "${CMAKE_SOURCE_DIR}/cmake/plugin.thumbnailer.in"
+      "${CMAKE_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
+    DESTINATION
+      "lib/cmake/f3d"
+    COMPONENT sdk
+    EXCLUDE_FROM_ALL)
 endif()

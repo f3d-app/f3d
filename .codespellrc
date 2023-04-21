@@ -1,0 +1,3 @@
+[codespell]
+skip = ./testing/**/*,./.git/**/*,./external/cxxopts.hpp
+ignore-words-list=nnumber,unknwn,dota

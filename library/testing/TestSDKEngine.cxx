@@ -1,6 +1,7 @@
 #include <engine.h>
 #include <interactor.h>
 #include <loader.h>
+#include <log.h>
 #include <options.h>
 #include <window.h>
 
@@ -8,6 +9,17 @@
 
 int TestSDKEngine(int argc, char* argv[])
 {
+  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+
+  // clang-format off
+  // Load all plugins, built or not
+  try { f3d::engine::loadPlugin("alembic", {argv[3]}); } catch (...) {}
+  try { f3d::engine::loadPlugin("assimp", {argv[3]}); } catch (...) {}
+  try { f3d::engine::loadPlugin("draco", {argv[3]}); } catch (...) {}
+  try { f3d::engine::loadPlugin("exodus", {argv[3]}); } catch (...) {}
+  try { f3d::engine::loadPlugin("occt", {argv[3]}); } catch (...) {}
+  // clang-format on
+
   // Test different flags combinations that makes sense
   f3d::engine eng0(f3d::window::Type::NONE);
   f3d::loader& load = eng0.getLoader();

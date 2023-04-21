@@ -27,7 +27,7 @@ class window_impl;
 class interactor_impl : public interactor
 {
 public:
-  //@{
+  ///@{
   /**
    * Documented public API
    */
@@ -53,7 +53,7 @@ public:
 
   void start() override;
   void stop() override;
-  //@}
+  ///@}
 
   /**
    * Implementation only API.
@@ -67,6 +67,14 @@ public:
    * This is called by the loader after loading a file.
    */
   void InitializeAnimation(vtkImporter* importer);
+
+  /**
+   * Implementation only API
+   * Forward to vtkF3DInteractorStyle so that
+   * it update the renderer as needed, especially
+   * the camera clipping range.
+   */
+  void UpdateRendererAfterInteraction();
 
 private:
   class internals;

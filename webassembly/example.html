@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    #main {
+      min-height: 60%;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>F3D Web demo</h1>
+  <div id="main">
+    <canvas id="canvas"></canvas>
+  </div>
+  <script type="text/javascript" src="f3d.js"></script>
+  <script type="text/javascript">
+    var Module = {
+      canvas: (() => {
+        return document.getElementById("canvas");
+      })(),
+      onRuntimeInitialized: () => { },
+    };
+
+    f3d(Module).then((runtime) => {
+      Module.Engine.autoloadPlugins();
+      var eng = new Module.Engine();
+
+      eng.getLoader().loadGeometry('/dragon.vtu');
+
+      eng.getOptions().toggle('render.grid.enable');
+      eng.getOptions().toggle('render.effect.anti-aliasing');
+      eng.getOptions().toggle('render.effect.tone-mapping');
+
+      var main = document.getElementById('main');
+
+      eng.getWindow().setSize(main.clientWidth, main.clientHeight);
+      eng.getWindow().render();
+
+      eng.getInteractor().start();
+    }).catch(error => console.error("F3D internal exception: " + Module.getExceptionMessage(error)));
+  </script>
+</body>
+
+</html>

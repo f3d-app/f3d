@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <!-- These mime types are defined in IANA but absent from freedesktop shared-mime-info -->
+  <!-- https://gitlab.freedesktop.org/xdg/shared-mime-info/-/issues/162 -->
+  <!-- Note: there is a bug that requires to declare that we support applicationg/x-tgif -->
+  <mime-type type="model/obj">
+    <comment>Wavefront OBJ File Format</comment>
+    <glob pattern="*.obj"/>
+  </mime-type>
+  <!-- https://gitlab.freedesktop.org/xdg/shared-mime-info/-/issues/161 -->
+  <mime-type type="model/gltf+json">
+    <comment>GL Transmission file JSON</comment>
+    <glob pattern="*.gltf"/>
+  </mime-type>
+  <mime-type type="model/gltf-binary">
+    <comment>GL Transmission file Binary</comment>
+    <glob pattern="*.glb"/>
+  </mime-type>
+  <!-- Relying to x-3ds does not seems to work reliably, forcing use of unregistered mime type using magic number -->
+  <!-- https://gitlab.freedesktop.org/xdg/shared-mime-info/-/issues/163 -->
+  <mime-type type="application/vnd.3ds">
+    <comment>Autodesk 3D Studio file</comment>
+    <magic priority="50">
+      <match offset="0" type="big16" value="0x4d4d"/>
+    </magic>
+    <glob pattern="*.3ds"/>
+  </mime-type>
+  <mime-type type="application/vnd.pts">
+    <comment>Point Cloud file</comment>
+    <glob pattern="*.pts"/>
+  </mime-type>
+</mime-info>

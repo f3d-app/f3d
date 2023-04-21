@@ -1,0 +1,15 @@
+{
+  ".*(dcm|nrrd|mhd|mha|vti)":
+  {
+    "volume": true
+  },
+  ".*(3ds|stl)":
+  {
+    "up": "+Z"
+  },
+  ".*(tif|tiff)":
+  {
+    "up": "-Y",
+    "comp": "-2"
+  }
+}

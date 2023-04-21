@@ -11,7 +11,10 @@
 #ifndef vtkF3DRenderer_h
 #define vtkF3DRenderer_h
 
+#include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
+
+#include <map>
 
 class vtkCornerAnnotation;
 class vtkOrientationMarkerWidget;
@@ -24,7 +27,7 @@ public:
   static vtkF3DRenderer* New();
   vtkTypeMacro(vtkF3DRenderer, vtkOpenGLRenderer);
 
-  //@{
+  ///@{
   /**
    * Set visibility of different actors
    */
@@ -35,10 +38,10 @@ public:
   void ShowMetaData(bool show);
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
-  //@}
+  ///@}
 
   using vtkOpenGLRenderer::SetBackground;
-  //@{
+  ///@{
   /**
    * Set different actors parameters
    */
@@ -47,9 +50,13 @@ public:
   void SetFontFile(const std::string& fontFile);
   void SetHDRIFile(const std::string& hdriFile);
   void SetBackground(const double* backgroundColor) override;
-  //@}
+  void SetLightIntensity(const double intensity);
+  void SetFilenameInfo(const std::string& info);
+  void SetGridUnitSquare(double unitSquare);
+  void SetGridSubdivisions(int subdivisions);
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set usages and configurations of different render passes
    */
@@ -60,37 +67,49 @@ public:
   void SetUseFXAAPass(bool use);
   void SetUseToneMappingPass(bool use);
   void SetUseBlurBackground(bool use);
+  void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /**
    * Set/Get UseTrackball
    */
   void SetUseTrackball(bool use);
   vtkGetMacro(UseTrackball, bool);
-  //@}
+  ///@}
 
   /**
-   * Reimplemented to handle cheat sheet and timer
+   * Reimplemented to configure:
+   *  - ActorsProperties
+   *  - CheatSheet
+   *  - Timer
+   * before actual rendering, only when needed
    */
   void Render() override;
+
+  /**
+   * Update actors according to the properties of this class:
+   *  - Grid
+   */
+  virtual void UpdateActors();
+
+  /**
+   * Reimplemented to handle light creation when no lights are added
+   * return the number of lights in the renderer.
+   */
+  int UpdateLights() override;
 
   /**
    * Initialize the renderer actors and flags.
    * Should be called after being added to a vtkRenderWindow.
    */
-  virtual void Initialize(const std::string& fileInfo, const std::string& up);
+  virtual void Initialize(const std::string& up);
 
   /**
    * Get the OpenGL skybox
    */
   vtkGetObjectMacro(Skybox, vtkSkybox);
-
-  /**
-   * Setup the different render passes
-   */
-  void SetupRenderPasses();
 
   /**
    * Return description about the current rendering status
@@ -108,6 +127,11 @@ public:
    */
   vtkGetVector3Macro(RightVector, double);
 
+  /**
+   * Set cache path
+   */
+  vtkSetMacro(CachePath, std::string);
+
 protected:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -115,12 +139,39 @@ protected:
   void ReleaseGraphicsResources(vtkWindow* w) override;
 
   bool IsBackgroundDark();
-  void UpdateTextColor();
 
   /**
-   * Update the text of the cheatsheet and mark it for rendering
+   * Configure meta data actor visibility and content
    */
-  void UpdateCheatSheet();
+  void ConfigureMetaData();
+
+  /**
+   * Configure text actors properties font file and color
+   */
+  void ConfigureTextActors();
+
+  /**
+   * Configure all actors properties according to what has been set for:
+   * - point size
+   * - line width
+   * - show edges
+   */
+  void ConfigureActorsProperties();
+
+  /**
+   * Configure the cheatsheet text and mark it for rendering
+   */
+  void ConfigureCheatSheet();
+
+  /**
+   * Configure the grid
+   */
+  void ConfigureGridUsingCurrentActors();
+
+  /**
+   * Configure the different render passes
+   */
+  void ConfigureRenderPasses();
 
   /**
    * Add related hotkeys options to the cheatsheet.
@@ -143,11 +194,18 @@ protected:
   vtkNew<vtkCornerAnnotation> FilenameActor;
   vtkNew<vtkCornerAnnotation> MetaDataActor;
   vtkNew<vtkCornerAnnotation> CheatSheetActor;
-  bool CheatSheetNeedUpdate = false;
 
   // vtkCornerAnnotation building is too slow for the timer
   vtkNew<vtkTextActor> TimerActor;
   unsigned int Timer = 0;
+
+  bool CheatSheetConfigured = false;
+  bool ActorsPropertiesConfigured = false;
+  bool GridConfigured = false;
+  bool RenderPassesConfigured = false;
+  bool LightIntensitiesConfigured = false;
+  bool TextActorsConfigured = false;
+  bool MetaDataConfigured = false;
 
   bool GridVisible = false;
   bool AxisVisible = false;
@@ -165,18 +223,27 @@ protected:
   bool UseBlurBackground = false;
   bool UseTrackball = false;
 
-  bool GridInitialized = false;
   int RaytracingSamples = 0;
   int UpIndex = 1;
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
+  double CircleOfConfusionRadius = 20.0;
+  double PointSize = 10.0;
+  double LineWidth = 1.0;
+  double GridUnitSquare = 0.0;
+  int GridSubdivisions = 10;
 
   bool HasHDRI = false;
   std::string HDRIFile;
   std::string FontFile;
 
+  double LightIntensity = 1.0;
+  std::map<vtkLight*, double> OriginalLightIntensities;
+
   std::string CurrentGridInfo;
   std::string GridInfo;
+
+  std::string CachePath;
 };
 
 #endif

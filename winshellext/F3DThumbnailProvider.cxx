@@ -1,5 +1,4 @@
 #include "F3DThumbnailProvider.h"
-#include "F3DThumbnailConfig.h"
 
 #include <clocale>
 #include <codecvt>
@@ -166,7 +165,7 @@ IFACEMETHODIMP F3DThumbnailProvider::GetThumbnail(UINT cx, HBITMAP* phbmp, WTS_A
   // Create command to run
   wchar_t command[MAX_PATH * 3 + 20];
   swprintf_s(command, MAX_PATH * 3 + 20,
-    L"\"%s\" --input \"%s\" --output \"%s\" --dry-run -sta --no-background --quiet --resolution "
+    L"\"%s\" --input \"%s\" --output \"%s\" --config=thumbnail --quiet --resolution "
     L"%d,%d\"",
     m_f3dPath, m_filePath, image_filename, cx, cx);
 

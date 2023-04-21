@@ -13,9 +13,9 @@ const std::vector<std::pair<std::string, std::string> >& interactor::getDefaultI
     { "V", "Toggle volume rendering" },
     { "I", "Toggle inverse volume opacity" },
     { "O", "Toggle point sprites rendering" },
-    { "P", "Toggle depth peeling" },
-    { "Q", "Toggle SSAO" },
-    { "A", "Toggle FXAA" },
+    { "P", "Toggle translucency support" },
+    { "Q", "Toggle ambient occlusion" },
+    { "A", "Toggle anti-aliasing" },
     { "T", "Toggle tone mapping" },
     { "E", "Toggle the edges display" },
     { "X", "Toggle the axes display" },
@@ -28,6 +28,7 @@ const std::vector<std::pair<std::string, std::string> >& interactor::getDefaultI
     { "F", "Toggle full screen" },
     { "U", "Toggle blur background" },
     { "K", "Toggle trackball interaction" },
+    { "L", "Increase (+Shift: decrease) lights intensity" },
     { "H", "Toggle cheat sheet display" },
     { "?", "Dump camera state to the terminal" },
     { "Escape", "Quit" },
@@ -35,7 +36,8 @@ const std::vector<std::pair<std::string, std::string> >& interactor::getDefaultI
     { "Space", "Play animation if any" },
     { "Left", "Previous file" },
     { "Right", "Next file" },
-    { "Up", "Reload current file" }
+    { "Up", "Reload current file" },
+    { "Down", "Add current file parent directory to the list of files and reload the current file" }
   };
   // clang-format on
 

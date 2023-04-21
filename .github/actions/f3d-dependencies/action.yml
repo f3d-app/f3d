@@ -1,0 +1,29 @@
+name: 'Install F3D Dependencies'
+description: 'Install multiple F3D Dependencies'
+runs:
+  using: "composite"
+  steps:
+
+    - name: Setup JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install OCCT dependency
+      uses: ./source/.github/actions/occt-install-dep
+
+    - name: Install Assimp dependency
+      uses: ./source/.github/actions/assimp-install-dep
+
+    - name: Install Draco dependency
+      uses: ./source/.github/actions/draco-install-dep
+
+    - name: Install Imath dependency
+      uses: ./source/.github/actions/imath-install-dep
+
+    - name: Install Alembic dependency
+      uses: ./source/.github/actions/alembic-install-dep
+
+    - name: Install pybind11 dependency
+      uses: ./source/.github/actions/pybind11-install-dep

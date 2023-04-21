@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=F3D
+GenericName=3D Viewer
+Comment=A fast and minimalist 3D viewer
+TryExec=f3d
+Exec=f3d --load-plugins=${F3D_PLUGIN_NAME} %F
+Icon=f3d
+NoDisplay=true
+MimeType=${F3D_PLUGIN_MIMETYPES}

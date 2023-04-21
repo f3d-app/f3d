@@ -16,7 +16,7 @@ public:
   static vtkF3DWin32OutputWindow* New();
 
   /**
-   * Overriden to simplify and support Unicode
+   * Overridden to simplify and support Unicode
    */
   void DisplayText(const char*) override;
 

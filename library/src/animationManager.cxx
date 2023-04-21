@@ -168,14 +168,15 @@ void animationManager::ToggleAnimation()
     {
       this->CallBackId =
         this->Interactor->createTimerCallBack(1000.0 / this->FrameRate, [this]() { this->Tick(); });
-      if (this->Options->getAsInt("scene.camera.index") >= 0)
-      {
-        this->Interactor->disableCameraMovement();
-      }
-      else
-      {
-        this->Interactor->enableCameraMovement();
-      }
+    }
+
+    if (this->Playing && this->Options->getAsInt("scene.camera.index") >= 0)
+    {
+      this->Interactor->disableCameraMovement();
+    }
+    else
+    {
+      this->Interactor->enableCameraMovement();
     }
   }
 }
@@ -191,6 +192,7 @@ void animationManager::Tick()
       static_cast<double>(this->TimeSteps.size() - 1));
 
     this->Importer->UpdateTimeStep(*this->CurrentTimeStep);
+    this->Interactor->UpdateRendererAfterInteraction();
     this->Window->render();
 
     ++this->CurrentTimeStep;

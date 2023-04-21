@@ -1,0 +1,14 @@
+{
+  ".*(fbx|dae|off|dxf)":
+  {
+    "load-plugins": "assimp"
+  },
+  ".*(off)":
+  {
+    "up": "+Z"
+  },
+  ".*(dxf)":
+  {
+    "up": "-Z"
+  }
+}

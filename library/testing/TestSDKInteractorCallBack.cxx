@@ -31,11 +31,8 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
 
   // Test callbacks
   std::string filename = "TestSDKInteractorCallBack";
-#if defined(_WIN32)
-  std::string interactionFilePath = std::string(argv[2]) + "..\\..\\" + filename + ".log";
-#else
+
   std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
-#endif
 
   inter.playInteraction(interactionFilePath); // Dragon.vtu; S
 
@@ -56,8 +53,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     {
       std::string path = filesVec[0];
       size_t found = path.find_last_of("/\\");
-      load.addFile(path.substr(0, found + 1) + "suzanne.ply")
-        .loadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
+      load.loadGeometry(path.substr(0, found + 1) + "suzanne.ply", true);
       win.render();
       return true;
     });

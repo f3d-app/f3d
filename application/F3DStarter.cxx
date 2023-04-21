@@ -11,7 +11,11 @@
 #include "options.h"
 #include "window.h"
 
+#include <cassert>
 #include <filesystem>
+#include <set>
+
+namespace fs = std::filesystem;
 
 class F3DStarter::F3DInternals
 {
@@ -50,8 +54,13 @@ public:
 
   F3DOptionsParser Parser;
   F3DAppOptions AppOptions;
+  f3d::options DynamicOptions;
+  f3d::options FileOptions;
   std::unique_ptr<f3d::engine> Engine;
+  std::vector<fs::path> FilesList;
+  int CurrentFileIndex = -1;
   bool LoadedFile = false;
+  bool UpdateWithCommandLineParsing = true;
 };
 
 //----------------------------------------------------------------------------
@@ -64,22 +73,15 @@ F3DStarter::F3DStarter()
 F3DStarter::~F3DStarter() = default;
 
 //----------------------------------------------------------------------------
-void F3DStarter::AddFile(const std::string& path)
-{
-  this->Internals->Engine->getLoader().addFile(path);
-}
-
-//----------------------------------------------------------------------------
 int F3DStarter::Start(int argc, char** argv)
 {
   // Parse command line options
   std::vector<std::string> files;
   this->Internals->Parser.Initialize(argc, argv);
-  f3d::options commandLineOptions;
-  this->Internals->Parser.GetOptionsFromCommandLine(
-    this->Internals->AppOptions, commandLineOptions, files);
+  this->Internals->Parser.GetOptions(
+    this->Internals->AppOptions, this->Internals->DynamicOptions, files);
 
-  // Set verbosity level
+  // Set verbosity level early from command line
   if (this->Internals->AppOptions.Quiet)
   {
     f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
@@ -89,11 +91,29 @@ int F3DStarter::Start(int argc, char** argv)
     f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
   }
 
+  // Load plugins from the app options
+  this->Internals->Parser.LoadPlugins(this->Internals->AppOptions);
+
+  // Read config file if needed
   if (!this->Internals->AppOptions.DryRun)
   {
     // Initialize the config file dictionary
     this->Internals->Parser.InitializeDictionaryFromConfigFile(
       this->Internals->AppOptions.UserConfigFile);
+
+    // Parse command line options with config file, global section only
+    this->Internals->Parser.GetOptions(
+      this->Internals->AppOptions, this->Internals->DynamicOptions, files);
+
+    // Set verbosity level again if it was defined in the configuration file global block
+    if (this->Internals->AppOptions.Quiet)
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
+    }
+    else if (this->Internals->AppOptions.Verbose || this->Internals->AppOptions.NoRender)
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+    }
   }
 
 #if __APPLE__
@@ -111,6 +131,7 @@ int F3DStarter::Start(int argc, char** argv)
       !this->Internals->AppOptions.Reference.empty() || !this->Internals->AppOptions.Output.empty();
     this->Internals->Engine = std::make_unique<f3d::engine>(
       offscreen ? f3d::window::Type::NATIVE_OFFSCREEN : f3d::window::Type::NATIVE);
+
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
@@ -120,25 +141,36 @@ int F3DStarter::Start(int argc, char** argv)
         if (keySym == "Left")
         {
           this->Internals->Engine->getInteractor().stopAnimation();
-          f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_PREVIOUS;
-          this->LoadFile(load);
+          this->LoadFile(-1, true);
           this->Render();
           return true;
         }
         else if (keySym == "Right")
         {
           this->Internals->Engine->getInteractor().stopAnimation();
-          f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_NEXT;
-          this->LoadFile(load);
+          this->LoadFile(1, true);
           this->Render();
           return true;
         }
         else if (keySym == "Up")
         {
           this->Internals->Engine->getInteractor().stopAnimation();
-          f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_CURRENT;
-          this->LoadFile(load);
+          this->LoadFile(0, true);
           this->Render();
+          return true;
+        }
+        else if (keySym == "Down")
+        {
+          if (this->Internals->LoadedFile)
+          {
+            this->Internals->Engine->getInteractor().stopAnimation();
+            this->AddFile(
+              this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)]
+                .parent_path(),
+              true);
+            this->LoadFile(0, true);
+            this->Render();
+          }
           return true;
         }
         return false;
@@ -150,9 +182,9 @@ int F3DStarter::Start(int argc, char** argv)
         this->Internals->Engine->getInteractor().stopAnimation();
         for (std::string file : filesVec)
         {
-          this->AddFile(file);
+          this->AddFile(fs::path(file));
         }
-        this->LoadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
+        this->LoadFile(static_cast<int>(this->Internals->FilesList.size()) - 1);
         this->Render();
         return true;
       });
@@ -160,13 +192,30 @@ int F3DStarter::Start(int argc, char** argv)
       .setSize(this->Internals->AppOptions.Resolution[0], this->Internals->AppOptions.Resolution[1])
       .setWindowName(F3D::AppTitle)
       .setIcon(F3DIcon, sizeof(F3DIcon));
+
+    if (this->Internals->AppOptions.Position.size() == 2)
+    {
+      window.setPosition(
+        this->Internals->AppOptions.Position[0], this->Internals->AppOptions.Position[1]);
+    }
+#ifdef __APPLE__
+    else
+    {
+      // The default position (50, 50) in VTK on MacOS is not a great fit for F3D as it can be
+      // partially hidden because the position correspond to the upper left corner and the Y
+      // position is defined from the bottom of the screen. Position it somewhere it makes sense.
+      window.setPosition(100, 800);
+    }
+#endif
   }
 
-  // Move command line options into the actual engine options
-  this->Internals->Engine->setOptions(commandLineOptions);
+  // Add all files
+  for (auto& file : files)
+  {
+    this->AddFile(fs::path(file));
+  }
 
-  // Add and load file
-  this->Internals->Engine->getLoader().addFiles(files);
+  // Load a file
   this->LoadFile();
 
   if (!this->Internals->AppOptions.NoRender)
@@ -203,12 +252,12 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      if (!std::filesystem::exists(this->Internals->AppOptions.Reference))
+      if (!fs::exists(this->Internals->AppOptions.Reference))
       {
         if (this->Internals->AppOptions.Output.empty())
         {
           f3d::log::error("Reference image ", this->Internals->AppOptions.Reference,
-            " does not exists, use the output option to output current rendering into an image "
+            " does not exist, use the output option to output current rendering into an image "
             "file.\n");
         }
         else
@@ -217,7 +266,7 @@ int F3DStarter::Start(int argc, char** argv)
             .save(this->Internals->AppOptions.Output);
 
           f3d::log::error("Reference image " + this->Internals->AppOptions.Reference +
-            " does not exists, current rendering has been outputted to " +
+            " does not exist, current rendering has been outputted to " +
             this->Internals->AppOptions.Output + ".\n");
         }
         return EXIT_FAILURE;
@@ -240,11 +289,14 @@ int F3DStarter::Start(int argc, char** argv)
             " is higher than the threshold of ", this->Internals->AppOptions.RefThreshold, ".\n");
 
           img.save(this->Internals->AppOptions.Output);
-          diff.save(std::filesystem::path(this->Internals->AppOptions.Output)
-                      .replace_extension(".diff.png")
-                      .string());
+          diff.save(
+            fs::path(this->Internals->AppOptions.Output).replace_extension(".diff.png").string());
         }
         return EXIT_FAILURE;
+      }
+      else
+      {
+        f3d::log::info("Image comparison success with an error difference of: ", error);
       }
     }
     // Render to file if needed
@@ -271,36 +323,215 @@ int F3DStarter::Start(int argc, char** argv)
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::LoadFile(f3d::loader::LoadFileEnum load)
+void F3DStarter::LoadFile(int index, bool relativeIndex)
 {
-  // Recover info about the file to be loaded
-  int index;
-  std::string filePath, fileInfo;
-  this->Internals->Engine->getLoader().getFileInfo(load, index, filePath, fileInfo);
-
-  F3DAppOptions configFileAppOptions;
-  if (!this->Internals->AppOptions.DryRun)
+  if (this->Internals->LoadedFile)
   {
-    // Recover options for the file to load
-    f3d::options configFileOptions;
-    this->Internals->Parser.GetOptionsFromConfigFile(
-      filePath, configFileAppOptions, configFileOptions);
-    this->Internals->Engine->setOptions(std::move(configFileOptions));
+    // When loading a file after another, store the changed options
+    // into the dynamic options and use these dynamic option as the default
+    // for loading the next file while still applying file specific options on top of it
+
+    // Recover previous options from the engine
+    const f3d::options& previousOptions = this->Internals->Engine->getOptions();
+
+    // Detect changed options and apply the change to the dynamic options
+    // options names are shared between options instance
+    std::vector<std::string> optionNames = this->Internals->DynamicOptions.getNames();
+    for (auto name : optionNames)
+    {
+      if (!previousOptions.isSame(this->Internals->FileOptions, name))
+      {
+        this->Internals->DynamicOptions.copy(previousOptions, name);
+      }
+    }
   }
 
-  // Load the file
-  this->Internals->LoadedFile = this->Internals->Engine->getLoader().loadFile(load);
-
-  if (!this->Internals->AppOptions.NoRender)
+  // Recover file information
+  f3d::loader& loader = this->Internals->Engine->getLoader();
+  fs::path filePath;
+  std::string filenameInfo;
+  size_t size = this->Internals->FilesList.size();
+  if (size != 0)
   {
-    // Setup the camera according to options
-    this->Internals->SetupCamera(
-      this->Internals->AppOptions.DryRun ? this->Internals->AppOptions : configFileAppOptions);
+    if (relativeIndex)
+    {
+      assert(this->Internals->CurrentFileIndex >= 0);
+      this->Internals->CurrentFileIndex += index;
+    }
+    else
+    {
+      this->Internals->CurrentFileIndex = index;
+    }
+    // XXX Do not work if CurrentFileIndex + size < 0
+    size_t fileIndex = (this->Internals->CurrentFileIndex + size) % size;
+    filePath = this->Internals->FilesList[fileIndex];
+    filenameInfo = "(" + std::to_string(fileIndex + 1) + "/" +
+      std::to_string(this->Internals->FilesList.size()) + ") " + filePath.filename().string();
+
+    this->Internals->CurrentFileIndex = static_cast<int>(fileIndex);
   }
+  else
+  {
+    f3d::log::debug("No file to load provided.");
+    filenameInfo = "No file to load provided, please drop one into this window";
+    this->Internals->CurrentFileIndex = -1;
+
+    // Copy dynamic options into files options to get the global config
+    this->Internals->FileOptions = this->Internals->DynamicOptions;
+    this->Internals->Engine->setOptions(this->Internals->FileOptions);
+  }
+
+  if (this->Internals->CurrentFileIndex >= 0)
+  {
+    if (this->Internals->AppOptions.GroupGeometries)
+    {
+      // Group geometries mode, consider the first file configuration file only
+      this->Internals->CurrentFileIndex = 0;
+      filePath = this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)];
+    }
+
+    // Update options for the file to load, using dynamic options as default
+    this->Internals->FileOptions = this->Internals->DynamicOptions;
+    F3DAppOptions fileAppOptions = this->Internals->AppOptions;
+    this->Internals->Parser.UpdateOptions(filePath.string(), fileAppOptions,
+      this->Internals->FileOptions, this->Internals->UpdateWithCommandLineParsing);
+    this->Internals->UpdateWithCommandLineParsing = false; // this is done only once
+    this->Internals->Engine->setOptions(this->Internals->FileOptions);
+
+    this->Internals->LoadedFile = false;
+
+    // Load any new plugins the updated app options
+    this->Internals->Parser.LoadPlugins(fileAppOptions);
+
+    // Check the size of the file before loading it
+    // Not considered in the context of GroupGeometries
+    static constexpr int BYTES_IN_MIB = 1048576;
+    if (fileAppOptions.MaxSize >= 0.0 &&
+      fs::file_size(filePath) > static_cast<std::uintmax_t>(fileAppOptions.MaxSize * BYTES_IN_MIB))
+    {
+      f3d::log::info("No file loaded, file is bigger than max size");
+      filenameInfo = "No file loaded, file is bigger than max size";
+    }
+    else
+    {
+      try
+      {
+        if (loader.hasSceneReader(filePath.string()) && !fileAppOptions.GeometryOnly &&
+          !fileAppOptions.GroupGeometries)
+        {
+          loader.loadScene(filePath.string());
+          this->Internals->LoadedFile = true;
+        }
+        else if (loader.hasGeometryReader(filePath.string()))
+        {
+          // In GroupGeometries, just load all the files from the list
+          if (fileAppOptions.GroupGeometries)
+          {
+            int nGeom = 0;
+            for (size_t i = 0; i < size; i++)
+            {
+              auto geomPath = this->Internals->FilesList[i];
+              if (loader.hasGeometryReader(geomPath.string()))
+              {
+                // Reset for the first file, then add geometries without resetting
+                // XXX this means the scene is reset and loaded from scratch every time a file is
+                // dropped This could be improved
+                loader.loadGeometry(this->Internals->FilesList[i].string(), i == 0 ? true : false);
+                nGeom++;
+              }
+              else
+              {
+                f3d::log::warn(geomPath, " is not a geometry of a supported file format\n");
+              }
+            }
+            if (nGeom > 1)
+            {
+              filenameInfo = std::to_string(nGeom) + " geometries loaded";
+            }
+          }
+          else
+          {
+            // Standard loadGeometry code
+            loader.loadGeometry(filePath.string(), true);
+          }
+          this->Internals->LoadedFile = true;
+        }
+        else
+        {
+          f3d::log::warn(filePath, " is not a file of a supported file format\n");
+          filenameInfo += " [UNSUPPORTED]";
+        }
+      }
+      catch (const f3d::loader::load_failure_exception& ex)
+      {
+        // XXX Not reachable until vtkImporter is improved to support returning a failure
+        f3d::log::error("Could not load file: ", ex.what());
+      }
+
+      if (!this->Internals->AppOptions.NoRender)
+      {
+        // Setup the camera according to options
+        this->Internals->SetupCamera(fileAppOptions);
+
+        this->Internals->Engine->getWindow().setWindowName(
+          filePath.filename().string() + " - " + F3D::AppName);
+      }
+    }
+  }
+
+  if (!this->Internals->LoadedFile)
+  {
+    // No file loaded, remove any previously loaded file
+    loader.loadGeometry("", true);
+  }
+
+  this->Internals->Engine->getOptions().set("ui.filename-info", filenameInfo);
 }
 
 //----------------------------------------------------------------------------
 void F3DStarter::Render()
 {
   this->Internals->Engine->getWindow().render();
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::AddFile(const fs::path& path, bool quiet)
+{
+  auto tmpPath = fs::absolute(path);
+  if (!fs::exists(tmpPath))
+  {
+    if (!quiet)
+    {
+      f3d::log::error("File ", tmpPath, " does not exist");
+    }
+    return;
+  }
+
+  if (fs::is_directory(tmpPath))
+  {
+    std::set<fs::path> sortedPaths;
+    for (const auto& entry : fs::directory_iterator(tmpPath))
+    {
+      sortedPaths.insert(entry.path());
+    }
+    for (auto& entryPath : sortedPaths)
+    {
+      // Recursively add all files
+      this->AddFile(entryPath, quiet);
+    }
+  }
+  else
+  {
+    auto it =
+      std::find(this->Internals->FilesList.begin(), this->Internals->FilesList.end(), tmpPath);
+
+    if (it == this->Internals->FilesList.end())
+    {
+      this->Internals->FilesList.push_back(tmpPath);
+    }
+    else if (!quiet)
+    {
+      f3d::log::warn("File ", tmpPath, " has already been added");
+    }
+  }
 }

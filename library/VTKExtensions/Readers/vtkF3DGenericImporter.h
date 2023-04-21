@@ -6,20 +6,26 @@
 #ifndef vtkF3DGenericImporter_h
 #define vtkF3DGenericImporter_h
 
-#include "vtkF3DMetaReader.h"
 #include "vtkF3DPostProcessFilter.h"
 
+#include <vtkBoundingBox.h>
 #include <vtkImporter.h>
+#include <vtkNew.h>
+#include <vtkSmartPointer.h>
 #include <vtkVersion.h>
+
+#include <array>
+#include <limits>
+#include <memory>
+#include <set>
+#include <vector>
 
 class vtkActor;
 class vtkVolume;
-class vtkPolyDataMapper;
 class vtkMultiBlockDataSet;
 class vtkPointGaussianMapper;
 class vtkPolyDataMapper;
 class vtkSmartVolumeMapper;
-class vtkScalarBarActor;
 class vtkTexture;
 
 class vtkF3DGenericImporter : public vtkImporter
@@ -31,9 +37,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Specify the name of the file to read.
+   * Add an internal reader to generate actors from
    */
-  void SetFileName(std::string name);
+  void AddInternalReader(const std::string& name, vtkSmartPointer<vtkAlgorithm> reader);
+
+  /**
+   * Remove all internal readers
+   */
+  void RemoveInternalReaders();
 
   /**
    * Check if the file can be read.
@@ -44,42 +55,68 @@ public:
    * Get a string describing the outputs
    */
   std::string GetOutputsDescription() override;
+  std::string GetMetaDataDescription(); // TODO add to vtkImporter in VTK ?
 
-  //@{
+  ///@{
   /**
    * Static methods to recover information about data
    */
   static std::string GetMultiBlockDescription(vtkMultiBlockDataSet* mb, vtkIndent indent);
   static std::string GetDataObjectDescription(vtkDataObject* object);
-  //@}
+  static std::string GetMetaDataDescription(vtkDataObject* object);
+  ///@}
 
-  //@{
+  ///@{
   /**
-   * Access to specific actors
+   * Access to actors vectors. They all have the same size, which correspond to the number
+   * of added internal readers.
    */
-  vtkGetSmartPointerMacro(ScalarBarActor, vtkScalarBarActor);
-  vtkGetSmartPointerMacro(GeometryActor, vtkActor);
-  vtkGetSmartPointerMacro(PointSpritesActor, vtkActor);
-  vtkGetSmartPointerMacro(VolumeProp, vtkVolume);
-  //@}
+  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > GetGeometryActorsAndMappers();
+  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > GetPointSpritesActorsAndMappers();
+  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > GetVolumePropsAndMappers();
+  ///@}
 
-  //@{
   /**
-   * Access to specific mappers
+   * A struct containing information about possible coloring
    */
-  vtkGetSmartPointerMacro(PolyDataMapper, vtkPolyDataMapper);
-  vtkGetSmartPointerMacro(PointGaussianMapper, vtkPointGaussianMapper);
-  vtkGetSmartPointerMacro(VolumeMapper, vtkSmartVolumeMapper);
-  //@}
+  struct ColoringInfo
+  {
+    std::string Name;
+    int MaximumNumberOfComponents = 0;
+    std::vector<std::string> ComponentNames;
+    std::vector<std::array<double, 2> > ComponentRanges;
+    std::array<double, 2> MagnitudeRange = { std::numeric_limits<float>::max(),
+      std::numeric_limits<float>::min() };
+    std::vector<vtkDataArray*> Arrays;
+  };
 
-  //@{
   /**
-   * Access to specific attributes
+   * Recover information about coloring by index
+   * Should be called after actors have been imported
    */
-  vtkGetObjectMacro(PointDataForColoring, vtkDataSetAttributes);
-  vtkGetObjectMacro(CellDataForColoring, vtkDataSetAttributes);
-  //@}
+  bool GetInfoForColoring(bool useCellData, int index, ColoringInfo& info);
 
+  /**
+   * Get the maximum index possible for coloring
+   * Should be called after actors have been imported
+   */
+  int GetNumberOfIndexesForColoring(bool useCellData);
+
+  /**
+   * Find an index for coloring corresponding to provided arrayName if available
+   * Should be called after actors have been imported
+   */
+  int FindIndexForColoring(bool useCellData, std::string arrayName);
+
+  /**
+   * Get the bounding box of all geometry actors
+   * Should be called after actors have been imported
+   */
+  const vtkBoundingBox& GetGeometryBoundingBox();
+
+  /**
+   * Update readers and all pipelines on the specified timestep
+   */
   void UpdateTimeStep(double timestep) override;
 
   /**
@@ -94,7 +131,7 @@ public:
    */
   std::string GetAnimationName(vtkIdType animationIndex) override;
 
-  //@{
+  ///@{
   /**
    * Enable/Disable/Get the status of specific animations
    * Only the first animation can be enabled
@@ -102,10 +139,10 @@ public:
   void EnableAnimation(vtkIdType animationIndex) override;
   void DisableAnimation(vtkIdType animationIndex) override;
   bool IsAnimationEnabled(vtkIdType animationIndex) override;
-  //@}
+  ///@}
 
   /**
-   * Get temporal informations for the currently enabled animations.
+   * Get temporal information for the currently enabled animations.
    * Framerate is ignored in this implementation.
    * the three return arguments are defined in this implementation.
    */
@@ -118,78 +155,32 @@ public:
     vtkDoubleArray* timeSteps) override;
 #endif
 
-  //@{
-  /**
-   * Setter for all actor loading options
-   */
-  vtkSetMacro(PointSize, double);
-  vtkSetVector3Macro(SurfaceColor, double);
-  vtkSetVector3Macro(EmissiveFactor, double);
-  vtkSetMacro(Opacity, double);
-  vtkSetMacro(Roughness, double);
-  vtkSetMacro(Metallic, double);
-  vtkSetMacro(LineWidth, double);
-  vtkSetMacro(NormalScale, double);
-  vtkSetMacro(TextureBaseColor, std::string);
-  vtkSetMacro(TextureMaterial, std::string);
-  vtkSetMacro(TextureEmissive, std::string);
-  vtkSetMacro(TextureNormal, std::string);
-  //@}
-
 protected:
-  vtkF3DGenericImporter() = default;
+  vtkF3DGenericImporter();
   ~vtkF3DGenericImporter() override = default;
 
-  //@{
-  /* Standard importer API
+  /* Standard ImportActors
    * None of the actors are shown by default
    */
   void ImportActors(vtkRenderer*) override;
-  void ImportLights(vtkRenderer*) override;
-  void ImportProperties(vtkRenderer*) override;
-  //@}
 
-  vtkSmartPointer<vtkTexture> GetTexture(const std::string& fileName, bool isSRGB = false);
-
+  /**
+   * Update temporal information according to currently added readers
+   */
   void UpdateTemporalInformation();
 
-  vtkNew<vtkF3DMetaReader> Reader;
-
-  vtkNew<vtkScalarBarActor> ScalarBarActor;
-  vtkNew<vtkActor> GeometryActor;
-  vtkNew<vtkActor> PointSpritesActor;
-  vtkNew<vtkVolume> VolumeProp;
-  vtkNew<vtkPolyDataMapper> PolyDataMapper;
-  vtkNew<vtkPointGaussianMapper> PointGaussianMapper;
-  vtkNew<vtkSmartVolumeMapper> VolumeMapper;
-  std::string OutputDescription;
-
-  vtkDataSetAttributes* PointDataForColoring = nullptr;
-  vtkDataSetAttributes* CellDataForColoring = nullptr;
-
-  bool AnimationEnabled = false;
-  bool TemporalInformationUpdated = false;
-  int NbTimeSteps = -1;
-  double* TimeSteps = nullptr;
-  double* TimeRange = nullptr;
-  vtkNew<vtkF3DPostProcessFilter> PostPro;
-
-  double PointSize = 10.;
-  double Opacity = 1.;
-  double Roughness = 0.3;
-  double Metallic = 0.;
-  double LineWidth = 1.;
-  double NormalScale = 1.;
-  double SurfaceColor[3] = { 1., 1., 1. };
-  double EmissiveFactor[3] = { 1., 1., 1. };
-  std::string TextureBaseColor;
-  std::string TextureMaterial;
-  std::string TextureEmissive;
-  std::string TextureNormal;
+  /**
+   * Update coloring information vectors according to
+   * currently added vectors
+   */
+  void UpdateColoringVectors(bool useCellData);
 
 private:
   vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;
   void operator=(const vtkF3DGenericImporter&) = delete;
+
+  struct Internals;
+  std::unique_ptr<Internals> Pimpl;
 };
 
 #endif

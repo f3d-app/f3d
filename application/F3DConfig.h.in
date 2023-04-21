@@ -5,7 +5,7 @@ namespace F3D
 {
   const std::string AppName = "@PROJECT_NAME@";
   const std::string AppTitle = "@PROJECT_DESCRIPTION@";
-  const std::string AppVersion = "@PROJECT_VERSION@";
+  const std::string AppVersion = "@F3D_VERSION@";
 }
 
 #cmakedefine01 F3D_MACOS_BUNDLE

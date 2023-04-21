@@ -1,0 +1,8 @@
+NAME
+  example::VTKExtensionsExampleReader
+DESCRIPTION
+  A VTK module containing an example plugin
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  VTK::IOImport

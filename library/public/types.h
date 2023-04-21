@@ -1,8 +1,3 @@
-/**
- * @namespace   types
- * @brief   Namespace containing types used in the libf3d API
- */
-
 #ifndef f3d_types_h
 #define f3d_types_h
 
@@ -11,7 +6,7 @@
 namespace f3d
 {
 /**
- * Describe a 3D point
+ * Describe a 3D point.
  */
 struct point3_t : std::array<double, 3>
 {
@@ -23,7 +18,7 @@ struct point3_t : std::array<double, 3>
 };
 
 /**
- * Describe a 3D vector
+ * Describe a 3D vector.
  */
 struct vector3_t : std::array<double, 3>
 {
@@ -35,7 +30,7 @@ struct vector3_t : std::array<double, 3>
 };
 
 /**
- * Describe an angle in degrees
+ * Describe an angle in degrees.
  */
 using angle_deg_t = double;
 }

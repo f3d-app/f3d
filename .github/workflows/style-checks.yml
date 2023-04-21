@@ -1,0 +1,24 @@
+name: Style Checks
+on: [push, pull_request]
+jobs:
+
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: DoozyX/clang-format-lint-action@v0.13
+      with:
+        source: 'library application python'
+        extensions: 'h,cxx'
+        clangFormatVersion: 13
+
+  codespell-check:
+    name: Codespell Check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: codespell-project/actions-codespell@v1.0
+      with:
+        check_filenames: true
+        check_hidden: true

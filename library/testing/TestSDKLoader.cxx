@@ -12,121 +12,197 @@ int TestSDKLoader(int argc, char* argv[])
   f3d::engine eng(f3d::window::Type::NONE);
   f3d::loader& load = eng.getLoader();
 
-  std::string filePath, fileInfo;
-  int idx;
-
-  // Test empty file list
-  std::string empty = "";
-  load.addFile(empty);
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
-  if (idx != -1)
-  {
-    std::cerr << "Unexpected idx with empty filelist: " << idx << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (load.loadFile())
-  {
-    std::cerr << "Unexpected loaded file with empty filelist" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  // Test file list logic
+  // Test file logic
+  std::string empty;
   std::string dummyFilename = "dummy.foo";
+  std::string nonExistentGeometryFilename = "nonExistent.vtp";
+  std::string nonExistentFullSceneFilename = "nonExistent.obj";
+  std::string invalidGeometryFilename = "invalid.vtp";
+  std::string invalidFullSceneFilename = "invalid.gltf";
+  std::string unsupportedFilename = "unsupportedFile.dummy";
   std::string cowFilename = "cow.vtp";
   std::string dragonFilename = "dragon.vtu";
   std::string suzanneFilename = "suzanne.stl";
+  std::string worldFilename = "world.obj";
+  std::string botFilename = "bot2.wrl";
   std::string dummy = std::string(argv[1]) + "data/" + dummyFilename;
+  std::string nonExistentGeometry = std::string(argv[1]) + "data/" + nonExistentGeometryFilename;
+  std::string nonExistentFullScene = std::string(argv[1]) + "data/" + nonExistentFullSceneFilename;
+  std::string invalidGeometry = std::string(argv[1]) + "data/" + invalidGeometryFilename;
+  std::string invalidFullScene = std::string(argv[1]) + "data/" + invalidFullSceneFilename;
+  std::string unsupported = std::string(argv[1]) + "data/" + unsupportedFilename;
   std::string cow = std::string(argv[1]) + "data/" + cowFilename;
   std::string dragon = std::string(argv[1]) + "data/" + dragonFilename;
   std::string suzanne = std::string(argv[1]) + "data/" + suzanneFilename;
-  std::vector<std::string> filesVec{ dragon, suzanne };
-  std::vector<std::string> filesVecCheck{ cow, dragon, suzanne };
+  std::string world = std::string(argv[1]) + "data/" + worldFilename;
+  std::string bot = std::string(argv[1]) + "data/" + botFilename;
 
-  load.addFile(dummy).addFile(cow).addFiles(filesVec);
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
-  if (filePath != cow)
+  // has*Reader methods
+  if (load.hasGeometryReader(empty) || load.hasSceneReader(empty))
   {
-    std::cerr << "Unexpected file loaded on LOAD_CURRENT: " << filePath << std::endl;
+    std::cerr << "Unexpected has*Reader output with empty filenames" << std::endl;
     return EXIT_FAILURE;
   }
-  if (!load.loadFile())
+  if (load.hasGeometryReader(dummy) || load.hasSceneReader(dummy))
   {
-    std::cerr << "Failed to load a file on LOAD_CURRENT: " << filePath << std::endl;
+    std::cerr << "Unexpected has*Reader output with dummy filenames" << std::endl;
     return EXIT_FAILURE;
   }
-
-  load.loadFile(f3d::loader::LoadFileEnum::LOAD_LAST);
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
-  if (filePath != suzanne)
+  if (!load.hasGeometryReader(nonExistentGeometry) || !load.hasSceneReader(nonExistentFullScene))
   {
-    std::cerr << "Unexpected file loaded on LOAD_LAST: " << filePath << std::endl;
+    std::cerr << "Unexpected has*Reader output with non existent filenames" << std::endl;
     return EXIT_FAILURE;
   }
-
-  load.loadFile(f3d::loader::LoadFileEnum::LOAD_FIRST);
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
-  if (filePath != cow)
+  if (load.hasGeometryReader(bot) || load.hasSceneReader(dragon))
   {
-    std::cerr << "Unexpected file loaded on LOAD_FIRST: " << filePath << std::endl;
+    std::cerr << "Unexpected has*Reader output with incorrect formats" << std::endl;
     return EXIT_FAILURE;
   }
-
-  load.loadFile(f3d::loader::LoadFileEnum::LOAD_NEXT);
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
-  if (filePath != dragon)
+  if (!load.hasGeometryReader(dragon) || !load.hasSceneReader(bot))
   {
-    std::cerr << "Unexpected file loaded on LOAD_NEXT: " << filePath << std::endl;
+    std::cerr << "Unexpected has*Reader output with correct formats" << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (!load.hasGeometryReader(world) || !load.hasSceneReader(world))
+  {
+    std::cerr << "Unexpected has*Reader output with geometry and full scene format" << std::endl;
     return EXIT_FAILURE;
   }
 
-  load.loadFile(f3d::loader::LoadFileEnum::LOAD_NEXT);
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
-  if (filePath != suzanne)
+  // Empty filename, success expected but nothing is loaded
+  try
   {
-    std::cerr << "Unexpected file loaded on second LOAD_NEXT: " << filePath << std::endl;
+    load.loadGeometry(empty);
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+    std::cerr << "Unexpected loadGeometry failure with an empty file" << std::endl;
     return EXIT_FAILURE;
   }
 
-  if (load.getCurrentFileIndex() != 2)
+  try
   {
-    std::cerr << "Unexpected file index after LOAD_NEXT: " << load.getCurrentFileIndex()
-              << std::endl;
+    load.loadScene(empty);
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+    std::cerr << "Unexpected loadGeometry failure with an empty file" << std::endl;
     return EXIT_FAILURE;
   }
 
-  // Check current index
-  load.setCurrentFileIndex(1).loadFile();
-  load.getFileInfo(f3d::loader::LoadFileEnum::LOAD_CURRENT, idx, filePath, fileInfo);
-  if (filePath != dragon)
+  // Dummy filename
+  try
   {
-    std::cerr << "Unexpected file loaded on LOAD_CURRENT after setCurrentFileIndex: " << filePath
-              << std::endl;
+    load.loadGeometry(dummy);
+    std::cerr << "Unexpected loadGeometry success with a dummy file" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
+
+  try
+  {
+    load.loadScene(dummy);
+    std::cerr << "Unexpected loadGeometry success with a dummy file" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
+
+  // Non supported files
+  try
+  {
+    load.loadGeometry(unsupported);
+    std::cerr << "Unexpected loadGeometry success with an unsupported file" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
+
+  try
+  {
+    load.loadScene(unsupported);
+    std::cerr << "Unexpected loadScene success with an unsupported file" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
+
+  // Incorrect files
+  try
+  {
+    load.loadGeometry(bot);
+    std::cerr << "Unexpected loadGeometry success with an incorrect file" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
+
+  try
+  {
+    load.loadScene(cow);
+    std::cerr << "Unexpected loadScene success with an incorrect file" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
+
+  // Non existent files
+  try
+  {
+    load.loadGeometry(nonExistentGeometry);
+    std::cerr << "Unexpected loadGeometry success with a non existent file" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
+
+  try
+  {
+    load.loadScene(nonExistentFullScene);
+    std::cerr << "Unexpected loadScene success with a non existent file" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
+
+  // Invalid files XXX should NOT succeed but not supported by vtkImporter yet
+  try
+  {
+    load.loadGeometry(invalidGeometry);
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+    std::cerr << "Unexpected loadGeometry failure with an invalid file" << std::endl;
     return EXIT_FAILURE;
   }
 
-  // Check files vec
-  if (load.getFiles() != filesVecCheck)
+  try
   {
-    std::cerr << "Unexpected getFiles result" << std::endl;
+    load.loadScene(invalidFullScene);
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+    std::cerr << "Unexpected loadScene failure with an invalid file" << std::endl;
     return EXIT_FAILURE;
   }
 
-  // Check folder non-recursive
-  std::string folder = std::string(argv[1]) + "data/mb";
-  load.addFile(folder, false);
-  if (load.getFiles().size() != 7)
+  // Multiple geometries
+  try
   {
-    std::cerr << "Unexpected getFiles result after non-recursive add: " << load.getFiles().size()
-              << std::endl;
-    return EXIT_FAILURE;
+    load.loadGeometry(cow).loadGeometry(suzanne).loadGeometry(dragon);
   }
-
-  // Check folder recursive
-  load.addFile(folder, true);
-  if (load.getFiles().size() != 11)
+  catch (const f3d::loader::load_failure_exception& ex)
   {
-    std::cerr << "Unexpected getFiles result after recursive add: " << load.getFiles().size()
-              << std::endl;
+    std::cerr << "Unexpected loadGeometry failure with multiple files" << std::endl;
     return EXIT_FAILURE;
   }
 
