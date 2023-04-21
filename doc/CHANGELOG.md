@@ -1,5 +1,45 @@
 # Changelog
 
+## v2.0.0
+
+For F3D users:
+- Removed `--fullscreen` options completely
+- Added a `--position` option to set the position of the F3D window
+- Added a `--light-intensity` option and associated bindings
+- Improved fish and zsh completion
+- Added a new interaction to center the camera on the point under the cursor using *middle* mouse button
+- Added HDRi caching for improved performance
+- Added scene bounding box to the dump interaction
+- Reworked lighting for fullscene format files
+- Improved grid rendering and customization greatly with new options
+- Improved HDRi blur performance and customization
+- Added support for reading config file directory instead of a single file
+- Changed config file location on Windows
+- PostFX option names have been changed
+- Added an interaction (down arrow) to load all files from the directory containing the current file
+- Added a `--group-geometries` option to load multiple default scene file into a single render window
+
+For libf3d users:
+- Reworked loader API from scratch
+- Fixed an issue with engine creation in the Python bindings
+- Fixed an issue with image Python bindings
+- Improved libf3d examples
+- Added experimental javascript bindings based on webassembly/emscriptem
+- Added dynamic support for  all `model` options
+- Added plugin SDK to create your own plugins for any file format
+
+For F3D packagers:
+- Added plugins support for true optional dependencies
+- Added a `F3D_APPLICATION_LINK_FILESYSTEM` CMake option to control if F3D should link explicitly against libstdc++fs
+- Removed most of `F3D_INSTALL_` options with the switch to a component-based approach
+- Removed installation of useless static libs from VTKExtensions (needs VTK master)
+- Fixed RPATH of F3D for system using lib64 instead of lib
+- Many CMake option name changed
+- Fixed data license to use only permissive license for F3D testing data
+- Removed packaging support from F3D
+
+Contributors: @snoyer @mzf-guest @CharlesGueunet @myd7349 @allemangD @Meakk @mwestphal
+
 ## v1.3.1
 
 - Fix raytracing support
