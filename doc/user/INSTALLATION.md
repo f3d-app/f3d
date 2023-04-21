@@ -1,18 +1,19 @@
 # Installation
 
-## Current release packages (1.3.1)
+## Current release packages (2.0.0)
 
 | Platform | Files |
 | -------- | ----- |
-| Windows Installer | [f3d-1.3.1-win64.exe](https://github.com/f3d-app/f3d/releases/download/v1.3.1/f3d-1.3.1-win64.exe) |
-| Windows (Portable) | [f3d-1.3.1-win64.zip](https://github.com/f3d-app/f3d/releases/download/v1.3.1/f3d-1.3.1-win64.zip) |
-| MacOS | [f3d-1.3.1-Darwin.dmg](https://github.com/f3d-app/f3d/releases/download/v1.3.1/f3d-1.3.1-Darwin.dmg) |
-| Debian-based Package | [f3d-1.3.1-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v1.3.1/f3d-1.3.1-Linux.deb) |
-| Linux (Portable) | [f3d-1.3.1-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v1.3.1/f3d-1.3.1-Linux.tar.xz) |
+| Windows Installer | [F3D-2.0.0-Windows.exe](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-Windows-x86_64-raytracing.exe) |
+| Windows (Portable) | [F3D-2.0.0-Windows.zip](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-Windows-x86_64-raytracing.zip) |
+| MacOS | [F3D-2.0.0-macOS.dmg](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-macOS-x86_64-raytracing.dmg) |
+| Debian-based Package | [F3D-2.0.0-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-Linux-x86_64-raytracing.deb) |
+| Linux (Portable) | [F3D-2.0.0-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-Linux-x86_64-raytracing.tar.xz) |
 
 ## Alternatives
 
-You can find the older binary release packages for Windows, Linux and macOS on the [releases page](https://github.com/f3d-app/f3d/releases).
+You can find other (older, smaller, checksum, RCs) release related packages and files on the [releases page](https://github.com/f3d-app/f3d/releases).
+You can also find there the [nightly release](https://github.com/f3d-app/f3d/releases/tag/nightly) to test the development version of F3D.
 See the [desktop integration](DESKTOP_INTEGRATION.md) section in order actually integrate the binary release in your desktop.
 Alternatively, you can build F3D yourself by following the [build](../dev/BUILD.md) guide.
 
