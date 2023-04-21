@@ -20,9 +20,14 @@
 #include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
+#include <vtksys/SystemTools.hxx>
 
 #if F3D_MODULE_EXTERNAL_RENDERING
 #include <vtkExternalOpenGLRenderWindow.h>
+#endif
+
+#if defined(_WIN32)
+#include <vtkWindows.h>
 #endif
 
 namespace f3d::detail
@@ -35,12 +40,21 @@ public:
   {
   }
 
+  std::string GetCachePath()
+  {
+    // create directories if they do not exist
+    vtksys::SystemTools::MakeDirectory(this->CachePath);
+
+    return this->CachePath;
+  }
+
   std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkSmartPointer<vtkF3DRenderer> Renderer;
   Type WindowType;
   const options& Options;
   bool Initialized = false;
+  std::string CachePath;
 };
 
 //----------------------------------------------------------------------------
@@ -67,11 +81,10 @@ window_impl::window_impl(const options& options, Type type)
     this->Internals->RenWin->SetOffScreenRendering(type == Type::NATIVE_OFFSCREEN);
     this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
 
-// The default position (50, 50) in VTK makes the window partially hidden because the position
-// correspond to the upper left corner and the Y position is defined from the bottom of the screen
-// The following code is a hack until we find a better solution
-#ifdef __APPLE__
-    this->Internals->RenWin->SetPosition(100, 800);
+#ifdef __ANDROID__
+    // Since F3D_MODULE_EXTERNAL_RENDERING is not supported on Android yet, we need to call
+    // this workaround. It makes vtkEGLRenderWindow external if WindowInfo is not nullptr.
+    this->Internals->RenWin->SetWindowInfo("jni");
 #endif
   }
 
@@ -91,7 +104,7 @@ camera& window_impl::getCamera()
   // is initialized before providing one.
   if (!this->Internals->Initialized)
   {
-    this->Initialize(false, "");
+    this->Initialize(false);
   }
 
   return *this->Internals->Camera;
@@ -113,6 +126,24 @@ int window_impl::getHeight() const
 window& window_impl::setSize(int width, int height)
 {
   this->Internals->RenWin->SetSize(width, height);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+window& window_impl::setPosition(int x, int y)
+{
+  if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
+  {
+    // vtkCocoaRenderWindow has a different behavior than other render windows
+    // https://gitlab.kitware.com/vtk/vtk/-/issues/18681
+    int* screenSize = this->Internals->RenWin->GetScreenSize();
+    int* winSize = this->Internals->RenWin->GetSize();
+    this->Internals->RenWin->SetPosition(x, screenSize[1] - winSize[1] - y);
+  }
+  else
+  {
+    this->Internals->RenWin->SetPosition(x, y);
+  }
   return *this;
 }
 
@@ -183,7 +214,7 @@ window_impl::~window_impl()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::Initialize(bool withColoring, std::string fileInfo)
+void window_impl::Initialize(bool withColoring)
 {
   // Clear renderer if already present
   if (this->Internals->Renderer)
@@ -193,12 +224,9 @@ void window_impl::Initialize(bool withColoring, std::string fileInfo)
     this->Internals->RenWin->RemoveRenderer(this->Internals->Renderer);
   }
 
+  // Create the renderer only when needed
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
-
-  // Create the renderer only when needed
-  // Note: a vtkF3DRendererWithColoring could always be used instead of switching
-  // but it seems more efficient this way
   if (withColoring && !renWithColor)
   {
     this->Internals->Renderer = vtkSmartPointer<vtkF3DRendererWithColoring>::New();
@@ -208,10 +236,19 @@ void window_impl::Initialize(bool withColoring, std::string fileInfo)
     this->Internals->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
   }
 
+  this->Internals->Renderer->SetCachePath(this->Internals->GetCachePath());
+
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
-  this->Internals->Renderer->Initialize(
-    fileInfo, this->Internals->Options.getAsString("scene.up-direction"));
+  this->Internals->Renderer->Initialize(this->Internals->Options.getAsString("scene.up-direction"));
+
+#if defined(_WIN32)
+  // On Windows, the Log window can get in front in some case, make sure the render window is on top
+  // on initialization
+  HWND f3dWindow = static_cast<HWND>(this->Internals->RenWin->GetGenericWindowId());
+  BringWindowToTop(f3dWindow);
+#endif
+
   this->Internals->Initialized = true;
 }
 
@@ -221,10 +258,11 @@ void window_impl::UpdateDynamicOptions()
   if (!this->Internals->Renderer)
   {
     // Renderer is missing, create a default one
-    this->Initialize(false, "");
+    this->Initialize(false);
   }
 
-  this->Internals->RenWin->SetFullScreen(this->Internals->Options.getAsBool("window.fullscreen"));
+  // Make sure lights are created before we take options into account
+  this->Internals->Renderer->UpdateLights();
 
   this->Internals->Renderer->ShowAxis(this->Internals->Options.getAsBool("interactor.axis"));
   this->Internals->Renderer->SetUseTrackball(
@@ -237,6 +275,8 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("render.show-edges"));
   this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("ui.fps"));
   this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("ui.filename"));
+  this->Internals->Renderer->SetFilenameInfo(
+    this->Internals->Options.getAsString("ui.filename-info"));
   this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("ui.metadata"));
   this->Internals->Renderer->ShowCheatSheet(this->Internals->Options.getAsBool("ui.cheatsheet"));
 
@@ -248,28 +288,53 @@ void window_impl::UpdateDynamicOptions()
     this->Internals->Options.getAsBool("render.raytracing.denoise"));
 
   this->Internals->Renderer->SetUseSSAOPass(
-    this->Internals->Options.getAsBool("render.effect.ssao"));
+    this->Internals->Options.getAsBool("render.effect.ambient-occlusion"));
   this->Internals->Renderer->SetUseFXAAPass(
-    this->Internals->Options.getAsBool("render.effect.fxaa"));
+    this->Internals->Options.getAsBool("render.effect.anti-aliasing"));
   this->Internals->Renderer->SetUseToneMappingPass(
     this->Internals->Options.getAsBool("render.effect.tone-mapping"));
   this->Internals->Renderer->SetUseDepthPeelingPass(
-    this->Internals->Options.getAsBool("render.effect.depth-peeling"));
+    this->Internals->Options.getAsBool("render.effect.translucency-support"));
 
   this->Internals->Renderer->SetBackground(
     this->Internals->Options.getAsDoubleVector("render.background.color").data());
   this->Internals->Renderer->SetUseBlurBackground(
     this->Internals->Options.getAsBool("render.background.blur"));
+  this->Internals->Renderer->SetBlurCircleOfConfusionRadius(
+    this->Internals->Options.getAsDouble("render.background.blur.coc"));
   this->Internals->Renderer->SetHDRIFile(
     this->Internals->Options.getAsString("render.background.hdri"));
+  this->Internals->Renderer->SetLightIntensity(
+    this->Internals->Options.getAsDouble("render.light.intensity"));
 
   this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("ui.font-file"));
+
+  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("render.grid.enable"));
+  this->Internals->Renderer->SetGridUnitSquare(
+    this->Internals->Options.getAsDouble("render.grid.unit"));
+  this->Internals->Renderer->SetGridSubdivisions(
+    this->Internals->Options.getAsInt("render.grid.subdivisions"));
 
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
 
   if (renWithColor)
   {
+    renWithColor->SetSurfaceColor(
+      this->Internals->Options.getAsDoubleVector("model.color.rgb").data());
+    renWithColor->SetOpacity(this->Internals->Options.getAsDouble("model.color.opacity"));
+    renWithColor->SetTextureBaseColor(this->Internals->Options.getAsString("model.color.texture"));
+    renWithColor->SetRoughness(this->Internals->Options.getAsDouble("model.material.roughness"));
+    renWithColor->SetMetallic(this->Internals->Options.getAsDouble("model.material.metallic"));
+    renWithColor->SetTextureMaterial(
+      this->Internals->Options.getAsString("model.material.texture"));
+    renWithColor->SetTextureEmissive(
+      this->Internals->Options.getAsString("model.emissive.texture"));
+    renWithColor->SetEmissiveFactor(
+      this->Internals->Options.getAsDoubleVector("model.emissive.factor").data());
+    renWithColor->SetTextureNormal(this->Internals->Options.getAsString("model.normal.texture"));
+    renWithColor->SetNormalScale(this->Internals->Options.getAsDouble("model.normal.scale"));
+
     renWithColor->SetColoring(this->Internals->Options.getAsBool("model.scivis.cells"),
       this->Internals->Options.getAsString("model.scivis.array-name"),
       this->Internals->Options.getAsInt("model.scivis.component"));
@@ -283,12 +348,9 @@ void window_impl::UpdateDynamicOptions()
     renWithColor->SetUseVolume(this->Internals->Options.getAsBool("model.volume.enable"));
     renWithColor->SetUseInverseOpacityFunction(
       this->Internals->Options.getAsBool("model.volume.inverse"));
-
-    renWithColor->UpdateColoringActors();
   }
 
-  // Show grid last as it needs to know the bounding box to be able to compute its size
-  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("render.grid"));
+  this->Internals->Renderer->UpdateActors();
 }
 
 //----------------------------------------------------------------------------
@@ -355,21 +417,19 @@ image window_impl::renderToImage(bool noBackground)
 }
 
 //----------------------------------------------------------------------------
-void window_impl::InitializeRendererWithColoring(vtkF3DGenericImporter* importer)
+void window_impl::SetImporterForColoring(vtkF3DGenericImporter* importer)
 {
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
   if (renWithColor && importer)
   {
-    renWithColor->SetScalarBarActor(importer->GetScalarBarActor());
-    renWithColor->SetGeometryActor(importer->GetGeometryActor());
-    renWithColor->SetPointSpritesActor(importer->GetPointSpritesActor());
-    renWithColor->SetVolumeProp(importer->GetVolumeProp());
-    renWithColor->SetPolyDataMapper(importer->GetPolyDataMapper());
-    renWithColor->SetPointGaussianMapper(importer->GetPointGaussianMapper());
-    renWithColor->SetVolumeMapper(importer->GetVolumeMapper());
-    renWithColor->SetColoringAttributes(
-      importer->GetPointDataForColoring(), importer->GetCellDataForColoring());
+    renWithColor->SetImporter(importer);
   }
+}
+
+//----------------------------------------------------------------------------
+void window_impl::SetCachePath(const std::string& cachePath)
+{
+  this->Internals->CachePath = cachePath;
 }
 };

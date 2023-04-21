@@ -11,7 +11,10 @@
 #include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCallbackCommand.h>
+#include <vtkCellPicker.h>
+#include <vtkMath.h>
 #include <vtkNew.h>
+#include <vtkPointPicker.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
@@ -19,6 +22,8 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <chrono>
+#include <cmath>
 #include <map>
 
 namespace f3d::detail
@@ -48,6 +53,16 @@ public:
     dropFilesCallback->SetClientData(this);
     dropFilesCallback->SetCallback(OnDropFiles);
     this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
+
+    vtkNew<vtkCallbackCommand> middleButtonPressCallback;
+    middleButtonPressCallback->SetClientData(this);
+    middleButtonPressCallback->SetCallback(OnMiddleButtonPress);
+    this->Style->AddObserver(vtkCommand::MiddleButtonPressEvent, middleButtonPressCallback);
+
+    vtkNew<vtkCallbackCommand> middleButtonReleaseCallback;
+    middleButtonReleaseCallback->SetClientData(this);
+    middleButtonReleaseCallback->SetCallback(OnMiddleButtonRelease);
+    this->Style->AddObserver(vtkCommand::MiddleButtonReleaseEvent, middleButtonReleaseCallback);
 
 // Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
@@ -85,7 +100,7 @@ public:
       case 'C':
         if (renWithColor)
         {
-          renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_FIELD_CYCLE);
+          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::FIELD);
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
@@ -94,7 +109,7 @@ public:
       case 'S':
         if (renWithColor)
         {
-          renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_ARRAY_CYCLE);
+          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::ARRAY_INDEX);
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
@@ -103,7 +118,7 @@ public:
       case 'Y':
         if (renWithColor)
         {
-          renWithColor->CycleScalars(vtkF3DRendererWithColoring::F3D_COMPONENT_CYCLE);
+          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::COMPONENT);
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
@@ -115,15 +130,15 @@ public:
         break;
       case 'p':
       case 'P':
-        self->Options.toggle("render.effect.depth-peeling");
+        self->Options.toggle("render.effect.translucency-support");
         render = true;
         break;
       case 'Q':
-        self->Options.toggle("render.effect.ssao");
+        self->Options.toggle("render.effect.ambient-occlusion");
         render = true;
         break;
       case 'A':
-        self->Options.toggle("render.effect.fxaa");
+        self->Options.toggle("render.effect.anti-aliasing");
         render = true;
         break;
       case 'T':
@@ -139,7 +154,7 @@ public:
         render = true;
         break;
       case 'G':
-        self->Options.toggle("render.grid");
+        self->Options.toggle("render.grid.enable");
         render = true;
         break;
       case 'N':
@@ -184,6 +199,30 @@ public:
         self->Options.toggle("interactor.trackball");
         render = true;
         break;
+      case 'L':
+      {
+        const double intensity = self->Options.getAsDouble("render.light.intensity");
+        const bool down = rwi->GetShiftKey();
+
+        /* `ref < x` is equivalent to:
+         * - `intensity <= x` when going down
+         * - `intensity < x` when going up */
+        const double ref = down ? intensity - 1e-6 : intensity;
+        // clang-format off
+        /* offset in percentage points */
+        const int offsetPp = ref < .5 ?  1
+                           : ref <  1 ?  2
+                           : ref <  5 ?  5
+                           : ref < 10 ? 10
+                           :            25;
+        // clang-format on
+        /* new intensity in percents */
+        const int newIntensityPct = std::lround(intensity * 100) + (down ? -offsetPp : +offsetPp);
+
+        self->Options.set("render.light.intensity", std::max(newIntensityPct, 0) / 100.0);
+        render = true;
+        break;
+      }
       case 'H':
         self->Options.toggle("ui.cheatsheet");
         render = true;
@@ -193,28 +232,7 @@ public:
         self->Window.PrintSceneDescription(log::VerboseLevel::INFO);
         break;
       default:
-        if (keySym == "Left")
-        {
-          self->AnimationManager.StopAnimation();
-          loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_PREVIOUS;
-          self->Loader.loadFile(load);
-          render = true;
-        }
-        else if (keySym == "Right")
-        {
-          self->AnimationManager.StopAnimation();
-          loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_NEXT;
-          self->Loader.loadFile(load);
-          render = true;
-        }
-        else if (keySym == "Up")
-        {
-          self->AnimationManager.StopAnimation();
-          loader::LoadFileEnum load = loader::LoadFileEnum::LOAD_CURRENT;
-          self->Loader.loadFile(load);
-          render = true;
-        }
-        else if (keySym == F3D_EXIT_HOTKEY_SYM)
+        if (keySym == F3D_EXIT_HOTKEY_SYM)
         {
           self->StopInteractor();
         }
@@ -258,14 +276,117 @@ public:
       return;
     }
 
-    // No user defined behavior, use standard behavior
-    self->AnimationManager.StopAnimation();
-    for (std::string file : filesVec)
+    // No user defined behavior, load the first file
+    if (filesVec.size() > 0)
     {
-      self->Loader.addFile(file);
+      self->AnimationManager.StopAnimation();
+      if (self->Loader.hasSceneReader(filesVec[0]))
+      {
+        self->Loader.loadScene(filesVec[0]);
+      }
+      else if (self->Loader.hasGeometryReader(filesVec[0]))
+      {
+        self->Loader.loadGeometry(filesVec[0], true);
+      }
+      self->Window.render();
     }
-    self->Loader.loadFile(loader::LoadFileEnum::LOAD_LAST);
-    self->Window.render();
+  }
+
+  static void OnMiddleButtonPress(vtkObject*, unsigned long, void* clientData, void*)
+  {
+    internals* self = static_cast<internals*>(clientData);
+
+    self->VTKInteractor->GetEventPosition(self->MiddleButtonDownPosition);
+
+    self->Style->OnMiddleButtonDown();
+  }
+
+  static void OnMiddleButtonRelease(vtkObject*, unsigned long, void* clientData, void*)
+  {
+    internals* self = static_cast<internals*>(clientData);
+
+    const int* middleButtonUpPosition = self->VTKInteractor->GetEventPosition();
+
+    const int xDelta = middleButtonUpPosition[0] - self->MiddleButtonDownPosition[0];
+    const int yDelta = middleButtonUpPosition[1] - self->MiddleButtonDownPosition[1];
+    const int sqPosDelta = xDelta * xDelta + yDelta * yDelta;
+    if (sqPosDelta < self->DragDistanceTol * self->DragDistanceTol)
+    {
+      const int x = self->MiddleButtonDownPosition[0];
+      const int y = self->MiddleButtonDownPosition[1];
+      vtkRenderer* renderer =
+        self->VTKInteractor->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
+
+      bool pickSuccessful = false;
+      double picked[3];
+      self->CellPicker->Pick(x, y, 0, renderer);
+      if (self->CellPicker->GetActors()->GetNumberOfItems() > 0)
+      {
+        self->CellPicker->GetPickPosition(picked);
+        pickSuccessful = true;
+      }
+      else
+      {
+        self->PointPicker->Pick(x, y, 0, renderer);
+        if (self->PointPicker->GetActors()->GetNumberOfItems() > 0)
+        {
+          self->PointPicker->GetPickPosition(picked);
+          pickSuccessful = true;
+        }
+      }
+
+      if (pickSuccessful)
+      {
+        /*     pos.--------------------.foc
+         *       /|                   /
+         *      / |                  /
+         *     .--.-----------------.picked
+         * pos1    pos2
+         */
+        camera& cam = self->Window.getCamera();
+        const point3_t pos = cam.getPosition();
+        const point3_t foc = cam.getFocalPoint();
+
+        double focV[3];
+        vtkMath::Subtract(picked, foc.data(), focV); /* foc -> picked */
+
+        double posV[3];
+        vtkMath::Subtract(picked, foc.data(), posV); /* pos -> pos1, parallel to focV */
+        if (!self->Style->GetInteractor()->GetShiftKey())
+        {
+          double v[3];
+          vtkMath::Subtract(foc.data(), pos.data(), v); /* pos -> foc */
+          vtkMath::ProjectVector(focV, v, v);           /* pos2 -> pos1 */
+          vtkMath::Subtract(posV, v, posV);             /* pos -> pos2, keeps on camera plane */
+        }
+
+        if (self->TransitionDuration > 0)
+        {
+          const auto start = std::chrono::high_resolution_clock::now();
+          const auto end = start + std::chrono::milliseconds(self->TransitionDuration);
+          auto now = start;
+          while (now < end)
+          {
+            const double t =
+              std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() /
+              static_cast<double>(self->TransitionDuration);
+            const double u = (1 - std::cos(vtkMath::Pi() * t)) / 2;
+
+            cam.setFocalPoint({ foc[0] + focV[0] * u, foc[1] + focV[1] * u, foc[2] + focV[2] * u });
+            cam.setPosition({ pos[0] + posV[0] * u, pos[1] + posV[1] * u, pos[2] + posV[2] * u });
+            self->Window.render();
+
+            now = std::chrono::high_resolution_clock::now();
+          }
+        }
+
+        cam.setFocalPoint({ picked[0], picked[1], picked[2] });
+        cam.setPosition({ pos[0] + posV[0], pos[1] + posV[1], pos[2] + posV[2] });
+        self->Window.render();
+      }
+    }
+
+    self->Style->OnMiddleButtonUp();
   }
 
   std::function<bool(int, std::string)> KeyPressUserCallBack = [](int, std::string)
@@ -292,6 +413,14 @@ public:
   int WindowSize[2] = { -1, -1 };
   int WindowPos[2] = { 0, 0 };
   std::map<unsigned long, std::pair<int, std::function<void()> > > TimerCallBacks;
+
+  vtkNew<vtkCellPicker> CellPicker;
+  vtkNew<vtkPointPicker> PointPicker;
+
+  int MiddleButtonDownPosition[2] = { 0, 0 };
+
+  int DragDistanceTol = 3;      /* px */
+  int TransitionDuration = 100; /* ms */
 };
 
 //----------------------------------------------------------------------------
@@ -475,5 +604,11 @@ void interactor_impl::InitializeAnimation(vtkImporter* importer)
 {
   this->Internals->AnimationManager.Initialize(
     &this->Internals->Options, this, &this->Internals->Window, importer);
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::UpdateRendererAfterInteraction()
+{
+  this->Internals->Style->UpdateRendererAfterInteraction();
 }
 }

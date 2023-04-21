@@ -1,14 +1,3 @@
-/**
- * @class   log
- * @brief   Class used to show logs in F3D
- *
- * A class to output logs to the standard output.
- * It supports different levels, errors, warnings and info, with associated coloring.
- * A few static methods exists to control the coloring and the verbosity level
- * A waitForUser utility static method exist for windows.
- *
- */
-
 #ifndef f3d_log_h
 #define f3d_log_h
 
@@ -19,17 +8,27 @@
 
 namespace f3d
 {
+/**
+ * @class   log
+ * @brief   Class used to show logs in F3D
+ *
+ * A class to output logs to the standard output.
+ * It supports different levels, errors, warnings and info, with associated coloring.
+ * A few static methods exists to control the coloring and the verbosity level
+ * A waitForUser utility static method exist for windows.
+ *
+ */
 class F3D_EXPORT log
 {
 public:
   /**
    * Enumeration of verbose levels
    * =============================
-   * DEBUG: All logs are displayed
-   * INFO: Standard logging level, the default
-   * WARN: Only warnings and errors are displayed
-   * ERROR: Only errors are displayed
-   * QUIET: Logging is fully disabled
+   * DEBUG: All logs are displayed.
+   * INFO: Standard logging level, the default.
+   * WARN: Only warnings and errors are displayed.
+   * ERROR: Only errors are displayed.
+   * QUIET: Logging is fully disabled.
    */
   enum class VerboseLevel : unsigned char
   {
@@ -101,17 +100,18 @@ public:
   static void setUseColoring(bool use);
 
   /**
-   * Set the verbose level
+   * Set the verbose level.
    */
   static void setVerboseLevel(VerboseLevel level);
 
   /**
-   * Wait for user if applicable (eg: win32 output window)
+   * Wait for user if applicable (eg: win32 output window).
    * No effect otherwise.
    */
   static void waitForUser();
 
 protected:
+  //! @cond
   static void appendArg(std::stringstream&) {}
 
   template<typename T, typename... Args>
@@ -126,6 +126,7 @@ protected:
   static void warnInternal(const std::string& msg);
   static void infoInternal(const std::string& msg);
   static void debugInternal(const std::string& msg);
+  //! @endcond
 };
 }
 

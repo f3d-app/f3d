@@ -4,6 +4,7 @@ DESCRIPTION
   A VTK modules using all other VTK modules from F3D
 PRIVATE_DEPENDS
   VTK::CommonCore
+  VTK::RenderingOpenGL2
   f3d::VTKExtensionsCore
   f3d::VTKExtensionsRendering
 TEST_DEPENDS

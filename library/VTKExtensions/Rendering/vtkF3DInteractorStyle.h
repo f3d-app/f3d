@@ -45,35 +45,49 @@ public:
   void OnDropFiles(vtkStringArray* files) override;
 
   /**
-   * Overriden for turntable mode
+   * Overridden for turntable mode
    */
   void Rotate() override;
 
-  //@{
+  ///@{
   /**
-   * Overriden to support being disabled
+   * Overridden to support being disabled
    */
   void Spin() override;
   void Pan() override;
   void Dolly() override;
-  //@}
+  ///@}
 
   /**
-   * Overriden to rotate the skybox as well
+   * Overridden to rotate the skybox as well
    */
   void EnvironmentRotate() override;
 
-  //@{
+  ///@{
   /**
    * Set/Get is camera movement are disabled
    */
   vtkSetMacro(CameraMovementDisabled, bool);
   vtkGetMacro(CameraMovementDisabled, bool);
-  //@}
+  ///@}
+
+  /**
+   * Update the renderer as needed, especially
+   * the camera clipping range
+   */
+  void UpdateRendererAfterInteraction();
+
+  /**
+   * Reimplemented to always return the first
+   * renderer as this is the only one used
+   * for interaction. This is needed for performance
+   * reasons.
+   */
+  void FindPokedRenderer(int vtkNotUsed(x), int vtkNotUsed(y));
 
 protected:
   /**
-   * Overriden to support being disabled
+   * Overridden to support being disabled
    */
   void Dolly(double factor) override;
 

@@ -1,6 +1,12 @@
 #import "F3DNSDelegate.h"
 
-#import "Cocoa/Cocoa.h"
+// For some reason, this warning is emitted in the CI, so it needs to be disabled
+// /Applications/Xcode_13.2.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSURLHandle.h:84:1: error: method has no return type specified; defaults to 'id' [-Werror,-Wmissing-method-return-type]
+// - initWithURL:(NSURL *)anURL cached:(BOOL)willCache API_DEPRECATED("", macos(10.0, 10.4)) API_UNAVAILABLE(ios, watchos, tvos);
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-method-return-type"
+#import "AppKit/NSApplication.h"
+#pragma clang diagnostic pop
 
 #import "F3DStarter.h"
 

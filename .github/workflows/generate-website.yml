@@ -1,0 +1,37 @@
+name: Generate Website
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches:
+      - master
+
+jobs:
+
+  generate-website:
+    name: Generate Website
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Build Jekyll
+      uses: actions/jekyll-build-pages@v1
+
+    - name: Install doxygen and build doxygen doc
+      working-directory: ${{github.workspace}}
+      run: |
+        pip install "sphinx==5.3.0" "pydata-sphinx-theme==0.13.1" sphinx-book-theme exhale
+        sudo apt install doxygen
+        sphinx-build -M html ./library/doxygen ./library/doxygen/build/
+        sudo mv library/doxygen/build/html _site/doc/libf3d/doxygen
+
+    - name: Deploy
+      if: github.ref == 'refs/heads/master'
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: _site
+        token: ${{ secrets.GITHUB_TOKEN }}
+        clean: true

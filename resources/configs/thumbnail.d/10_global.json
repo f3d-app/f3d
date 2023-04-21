@@ -1,0 +1,10 @@
+{
+  "global":
+  {
+    "scalars": "",
+    "anti-aliasing": true,
+    "tone-mapping": true,
+    "no-background": true,
+    "max-size":100
+  }
+}

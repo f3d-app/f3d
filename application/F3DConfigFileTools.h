@@ -4,17 +4,18 @@
  *
  */
 
-#ifndef F3DTools_h
-#define F3DTools_h
+#ifndef F3DConfigFileTools_h
+#define F3DConfigFileTools_h
 
+#include <filesystem>
 #include <string>
 
 namespace F3DConfigFileTools
 {
-std::string GetUserConfigFileDirectory();
-std::string GetBinaryConfigFileDirectory();
-std::string GetSystemConfigFileDirectory();
-std::string GetConfigFilePath();
+std::filesystem::path GetUserConfigFileDirectory();
+std::filesystem::path GetBinaryConfigFileDirectory();
+std::filesystem::path GetSystemConfigFileDirectory();
+std::filesystem::path GetConfigPath(const std::string& configSearch);
 }
 
 #endif

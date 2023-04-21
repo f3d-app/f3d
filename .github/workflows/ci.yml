@@ -7,6 +7,10 @@ on:
     branches:
       - master
 
+concurrency:
+  group: '${{ github.workflow }}-${{ github.ref_name }}'
+  cancel-in-progress: true
+
 jobs:
 
 #----------------------------------------------------------------------------
@@ -19,7 +23,18 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        vtk_version: [commit, v9.1.0, v9.0.0]
+        vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
+        macos_bundle: [true]
+        include:
+          - enable_raytracing: true
+          - vtk_version: v9.0.0
+            enable_raytracing: false
+          - os: macos-latest
+            enable_raytracing: false #598
+          - macos_bundle: false
+            os: macos-latest
+            vtk_version: commit
+            enable_raytracing: false
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -30,16 +45,16 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: 'source'
         fetch-depth: 0
-        lfs: 'false'
+        lfs: false
 
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
       shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
+      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/ .github/baselines/)" >> $GITHUB_ENV
 
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
@@ -48,171 +63,212 @@ jobs:
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
-      run: mkdir dependencies
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
 
-    - name: Install OCCT dependency
-      uses: ./source/.github/actions/occt-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install Assimp dependency
-      uses: ./source/.github/actions/assimp-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install Imath dependency
-      uses: ./source/.github/actions/imath-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install Alembic dependency
-      uses: ./source/.github/actions/alembic-install-dep
-      with:
-        os: ${{matrix.os}}
-
-    - name: Install pybind11 dependency
-      uses: ./source/.github/actions/pybind11-install-dep
-      with:
-        os: ${{matrix.os}}
+    - name: Install Raytracing Dependencies
+      if: matrix.enable_raytracing == true
+      uses: ./source/.github/actions/ospray-sb-install-dep
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_version: ${{matrix.vtk_version}}
-        vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
-        os: ${{matrix.os}}
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+        enable_raytracing: ${{matrix.enable_raytracing}}
+
+    - name: Install F3D dependencies
+      uses: ./source/.github/actions/f3d-dependencies
 
     - name: Setup Directories
       working-directory: ${{github.workspace}}
       run: |
          mkdir build
          mkdir install
+         mkdir install/output
 
-    # pwd seems necessary for OpenCASCADE and Assimp for some reasons
+    # There is a RPATH issue with VTK < 9.2.0
+    # This is a simple workaround for it
+    # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8210
+    - name: Set LD_LIBRARY_PATH ubuntu VTK
+      if: |
+        runner.os == 'Linux' &&
+        ( matrix.vtk_version == 'v9.0.0' ||
+          matrix.vtk_version == 'v9.1.0' )
+      working-directory: ${{github.workspace}}/dependencies/
+      shell: bash
+      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
+    - name: Set PATH windows
+      if: runner.os == 'Windows'
+      working-directory: ${{github.workspace}}
+      shell: powershell
+      run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
     - name: Configure
       working-directory: ${{github.workspace}}/build
+      shell: bash
       run: >
         cmake ../source
         -Werror=dev
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
-        -DCMAKE_INSTALL_PREFIX:PATH=../install
-        -DF3D_STRICT_BUILD=ON
-        -DF3D_MODULE_EXTERNAL_RENDERING=ON
-        -DF3D_MODULE_OCCT=ON
-        -DF3D_MODULE_ASSIMP=ON
-        -DF3D_MODULE_ALEMBIC=ON
-        -DF3D_PYTHON_BINDINGS=ON
         -DCMAKE_BUILD_TYPE=Release
-        -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
-        -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
-        -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
-        -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
-        -Dpybind11_DIR:PATH=$(pwd)/../dependencies/pybind11_install/share/cmake/pybind11
-        -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE=ON
-        ${{ matrix.os == 'windows-latest' && '-Ax64 -DF3D_WINDOWS_GUI=ON -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/cmake/ -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
-        ${{ matrix.os == 'macos-latest' && '-DF3D_MACOS_BUNDLE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade' || null }}
-        ${{ matrix.os == 'ubuntu-latest' && '-DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON -DF3D_GENERATE_MAN=ON -DF3D_INSTALL_MIME_TYPES_FILE=ON -DF3D_INSTALL_THUMBNAILER_FILES=ON -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
-        ${{ matrix.vtk_version == 'commit' && '-DF3D_ENABLE_HDRI_TESTS=ON' || '-DF3D_ENABLE_HDRI_TESTS=OFF' }}
-        ${{ matrix.vtk_version == 'v9.0.0' && '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || '-DF3D_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=OFF' }}
+        -DCMAKE_INSTALL_PREFIX:PATH=../install
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
+        -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_BINDINGS_JAVA=ON
+        -DF3D_BINDINGS_PYTHON=ON
+        -DF3D_LINUX_GENERATE_MAN=ON
+        -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
+        -DF3D_MACOS_BUNDLE=${{ matrix.macos_bundle == true && 'ON' || 'OFF' }}
+        -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_MODULE_RAYTRACING=${{ matrix.enable_raytracing == true && 'ON' || 'OFF' }}
+        -DF3D_PLUGINS_STATIC_BUILD=${{ matrix.macos_bundle == true && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
+        -DF3D_PLUGIN_BUILD_OCCT=ON
+        -DF3D_STRICT_BUILD=ON
+        -DF3D_WINDOWS_GUI=ON
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Linux' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
+        ${{ matrix.vtk_version == 'commit' && '-DF3D_TESTING_ENABLE_HDRI_TESTS=ON' || '-DF3D_TESTING_ENABLE_HDRI_TESTS=OFF' }}
+        ${{ matrix.vtk_version == 'v9.0.0' && '-DF3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || '-DF3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=OFF' }}
 
     - name: Build
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --config Release
 
     - name: Run Xvfb ubuntu
-      if: matrix.os == 'ubuntu-latest'
+      if: runner.os == 'Linux'
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
-    - name: Install Mesa windows
-      shell: cmd
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/dependencies/
-      run: |
-        mkdir mesa
-        cd mesa
-        curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/22.0.1/mesa3d-22.0.1-release-msvc.7z
-        "C:\Program Files\7-Zip\7z.exe" x mesa.7z
-        cp x64\opengl32.dll ..\..\build\bin\Release\
-        cp x64\libglapi.dll ..\..\build\bin\Release\
-        cp x64\libgallium_wgl.dll ..\..\build\bin\Release\
+    - name: Install Mesa Windows
+      if: runner.os == 'Windows'
+      uses: ./source/.github/actions/mesa-install-bin
+      with:
+        path: ${{github.workspace}}\build\bin_Release
 
     - name: Test
       working-directory: ${{github.workspace}}/build
+      shell: bash
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
       if: failure()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: ./build/Testing/Temporary
-        name: f3d-tests-artifact-${{matrix.os}}-${{matrix.vtk_version}}
+        name: f3d-tests-artifact-${{runner.os}}-${{matrix.vtk_version}}
 
-    - name: Install
+    - name: Install (ALL)
       working-directory: ${{github.workspace}}/build
       run: cmake --install .
 
-    - name: Check Install ubuntu
-      if: matrix.os == 'ubuntu-latest'
-      working-directory: ${{github.workspace}}/install
-      run: ./bin/f3d ../source/testing/data/suzanne.obj --output=../output.png
-
-    - name: Check Install windows
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}/install
-      run: |
-        cp ..\dependencies\mesa\x64\opengl32.dll .\bin\
-        cp ..\dependencies\mesa\x64\libglapi.dll .\bin\
-        cp ..\dependencies\mesa\x64\libgallium_wgl.dll .\bin\
-        .\bin\f3d.exe ..\source\testing\data\suzanne.obj --output=..\output.png
-
-    - name: Check Install macos
-      if: matrix.os == 'macos-latest'
-      working-directory: ${{github.workspace}}/install
-      run: ./f3d.app/Contents/MacOS/f3d ../source/testing/data/suzanne.obj --output=../output.png
-
-    - name: Check SDK
-      if: matrix.os != 'macos-latest'
-      working-directory: ${{github.workspace}}
-      run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -B test_sdk source/.github/test_sdk
-        cmake --build test_sdk
-
-    - name: Setup NSIS
-      if: matrix.os == 'windows-latest'
-      working-directory: ${{github.workspace}}
-      run: cp source\.github\nsis\FileAssociation.nsh "C:/Program Files (x86)/NSIS/Include"
-
-    - name: Packaging
+    - name: Install (mimetypes on Linux)
+      if: runner.os == 'Linux'
       working-directory: ${{github.workspace}}/build
-      run: cpack
+      run: cmake --install . --component mimetypes
 
-    - name: Check Packaging Linux
-      if: matrix.os == 'ubuntu-latest'
-      working-directory: ${{github.workspace}}
+    - name: Install optional component
+      working-directory: ${{github.workspace}}/build
       run: |
-        mkdir package
-        tar -xzvf ./build/f3d-*.tar.gz -C ./package/
-        ./package/bin/f3d source/testing/data/suzanne.obj --output=output.png
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/package/lib/cmake/f3d -B test_sdk_package source/.github/test_sdk
-        cmake --build test_sdk
+        cmake --install . --component sdk
+        cmake --install . --component configuration
 
-    - name: Check Packaging Windows
-      if: matrix.os == 'windows-latest'
+    - name: Build and configure libf3d examples
       working-directory: ${{github.workspace}}
+      shell: bash
       run: |
-        mkdir package
-        Expand-Archive .\build\f3d-*.zip -DestinationPath .\package
-        .\package\bin\f3d source\testing\data\suzanne.obj --output=output.png
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/package/lib/cmake/f3d -B test_sdk_package source/.github/test_sdk
-        cmake --build test_sdk
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -B build_examples source/examples/libf3d
+        cmake --build build_examples --config Release
 
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v2
+    - name: Install Mesa Windows examples
+      if: |
+        runner.os == 'Windows' &&
+        matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0'
+      uses: ./source/.github/actions/mesa-install-bin
       with:
-        path: ./build/f3d-*
-        name: f3d-${{matrix.os}}-${{matrix.vtk_version}}
+        path: ${{github.workspace}}\build_examples\*\Release
+
+    # older VTK version create different renderings so they are not tested
+    - name: Test libf3d examples
+      if: matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0'
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: ctest --test-dir build_examples -C Release -VV
+
+    - name: Build and test plugin examples
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: |
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
+        cmake --build build_plugins --config Release
+        ctest --test-dir build_plugins -C Release -VV
+
+    - name: Set F3D binary path Linux
+      if: runner.os == 'Linux'
+      shell: bash
+      run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
+
+    - name: Set F3D binary path Windows
+      if: runner.os == 'Windows'
+      shell: bash
+      run: echo "F3D_BIN_PATH=./bin/f3d.exe" >> $GITHUB_ENV
+
+    - name: Set F3D binary path MacOS bundle
+      if: |
+        runner.os == 'macOS' &&
+        matrix.macos_bundle == true
+      shell: bash
+      run: echo "F3D_BIN_PATH=./f3d.app/Contents/MacOS/f3d" >> $GITHUB_ENV
+
+    - name: Set F3D binary path MacOS bundle
+      if: |
+        runner.os == 'macOS' &&
+        matrix.macos_bundle == false
+      shell: bash
+      run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
+
+    - name: Install Mesa Windows in install
+      if: runner.os == 'Windows'
+      uses: ./source/.github/actions/mesa-install-bin
+      with:
+        path: ${{github.workspace}}\install\bin
+
+    - name: Check F3D_PLUGINS_PATH using plugin example
+      if: matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0'
+      working-directory: ${{github.workspace}}/install
+      shell: bash
+      run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose
+
+    - name: Install plugin examples
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: |
+        cmake --install build_plugins --config Release
+        cmake --install build_plugins --config Release --component configuration
+
+    - name: Check Install
+      if: matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0'
+      working-directory: ${{github.workspace}}/install
+      shell: bash
+      run: |
+        ${{ env.F3D_BIN_PATH }} ../source/testing/data/suzanne.obj --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --verbose
+        ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose
+
+    - name: Upload Tests Install Artifact
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./install/output
+        name: f3d-tests-install-artifact-${{runner.os}}-${{matrix.vtk_version}}
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
@@ -223,17 +279,19 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
+    # Add dummy F3D_PLUGINS_PATH for coverage
     env:
       DISPLAY: :0
+      F3D_PLUGINS_PATH: /dummy1:/dummy2
 
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: 'source'
         fetch-depth: 0
-        lfs: 'false'
+        lfs: false
 
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
@@ -247,26 +305,23 @@ jobs:
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
-      run: mkdir dependencies
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
 
-    - name: Install OCCT dependency
-      uses: ./source/.github/actions/occt-install-dep
-
-    - name: Install Assimp dependency
-      uses: ./source/.github/actions/assimp-install-dep
-
-    - name: Install Imath dependency
-      uses: ./source/.github/actions/imath-install-dep
-
-    - name: Install Alembic dependency
-      uses: ./source/.github/actions/alembic-install-dep
+    - name: Install Raytracing Dependencies
+      uses: ./source/.github/actions/ospray-sb-install-dep
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+        enable_raytracing: true
 
-    # pwd seems necessary for OpenCASCADE and Assimp for some reasons
+    - name: Install F3D dependencies
+      uses: ./source/.github/actions/f3d-dependencies
+
     # coverage build is done in source as it seems to be required for codecov
     - name: Configure
       working-directory: ${{github.workspace}}/source
@@ -276,19 +331,19 @@ jobs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
-        -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON
-        -DF3D_STRICT_BUILD=ON
-        -DF3D_MODULE_EXTERNAL_RENDERING=ON
-        -DF3D_MODULE_OCCT=ON
-        -DF3D_MODULE_ASSIMP=ON
-        -DF3D_MODULE_ALEMBIC=ON
         -DCMAKE_BUILD_TYPE=Release
-        -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
-        -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade
-        -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
-        -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
-        -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_COVERAGE=ON
+        -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_MODULE_RAYTRACING=ON
+        -DF3D_PLUGINS_STATIC_BUILD=OFF
+        -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
+        -DF3D_PLUGIN_BUILD_OCCT=ON
+        -DF3D_STRICT_BUILD=ON
+        -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
 
     - name: Build
       working-directory: ${{github.workspace}}/source
@@ -311,14 +366,15 @@ jobs:
         lcov --remove coverage.info "*Test*" -o coverage.info
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
       with:
         files: ${{github.workspace}}/source/coverage.info
+        version: "v0.1.15" # works better according to https://github.com/codecov/codecov-action/issues/598
 
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
 #----------------------------------------------------------------------------
-# "leak" is run by defaut with "address" so we do not need to run it in CI
+# "leak" is run by default with "address" so we do not need to run it in CI
 # "memory" returns false positives in VTK:
 # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
@@ -340,11 +396,11 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: 'source'
         fetch-depth: 0
-        lfs: 'false'
+        lfs: false
 
     - name: Set LFS env var
       working-directory: ${{github.workspace}}/source
@@ -358,30 +414,23 @@ jobs:
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
-      run: mkdir dependencies
-
-    - name: Install OCCT dependency
-      uses: ./source/.github/actions/occt-install-dep
-
-    - name: Install Assimp dependency
-      uses: ./source/.github/actions/assimp-install-dep
-
-    - name: Install Imath dependency
-      uses: ./source/.github/actions/imath-install-dep
-
-    - name: Install Alembic dependency
-      uses: ./source/.github/actions/alembic-install-dep
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        vtk_sha_file: ./source/.github/actions/vtk-install-dep/vtk_commit_sha
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+
+    - name: Install F3D dependencies
+      uses: ./source/.github/actions/f3d-dependencies
 
     - name: Setup Build Directory
       working-directory: ${{github.workspace}}
       run: mkdir build
 
-    # pwd seems necessary for OpenCASCADE and Assimp for some reasons
     - name: Configure
       working-directory: ${{github.workspace}}/build
       run: >
@@ -390,19 +439,17 @@ jobs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
-        -DF3D_ENABLE_LONG_TIMEOUT_TESTS=ON
-        -DF3D_STRICT_BUILD=ON
-        -DF3D_MODULE_EXTERNAL_RENDERING=ON
-        -DF3D_MODULE_OCCT=ON
-        -DF3D_MODULE_ASSIMP=ON
-        -DF3D_MODULE_ALEMBIC=ON
         -DCMAKE_BUILD_TYPE=Release
-        -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
-        -DOpenCASCADE_DIR:PATH=$(pwd)/../dependencies/occt_install/lib/cmake/opencascade
-        -Dassimp_DIR:PATH=$(pwd)/../dependencies/assimp_install/lib/cmake/assimp-5.1
-        -DAlembic_DIR:PATH=$(pwd)/../dependencies/alembic_install/lib/cmake/Alembic
-        -DImath_DIR:PATH=$(pwd)/../dependencies/imath_install/lib/cmake/Imath
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
+        -DF3D_PLUGIN_BUILD_OCCT=ON
         -DF3D_SANITIZER=${{matrix.santype}}
+        -DF3D_STRICT_BUILD=ON
+        -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
 
     - name: Build
       working-directory: ${{github.workspace}}/build

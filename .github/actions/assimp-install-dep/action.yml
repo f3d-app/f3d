@@ -1,28 +1,23 @@
 name: 'Install Assimpp Dependency'
-description: 'Install Assimp Depency using cache when possible'
-inputs:
-  os:
-    description: 'OS to build on'
-    required: false
-    default: 'ubuntu-latest'
+description: 'Install Assimp Dependency using cache when possible'
 runs:
   using: "composite"
   steps:
 
     - name: Cache ASSIMP
       id: cache-assimp
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: dependencies/assimp_install
-        key: assimp-v5.1.1-3-${{inputs.os}}
+        key: assimp-v5.2.5-${{runner.os}}-0
 
     - name: Checkout ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: assimp/assimp
         path: './dependencies/assimp'
-        ref: v5.1.1
+        ref: v5.2.5
 
     - name: Setup ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
@@ -38,23 +33,29 @@ runs:
       shell: bash
       run: >
         cmake ../assimp
-        -DBUILD_SHARED_LIBS=OFF
-        -DASSIMP_NO_EXPORT=ON
         -DASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT=OFF
-        -DASSIMP_BUILD_FBX_IMPORTER=ON
-        -DASSIMP_BUILD_OFF_IMPORTER=ON
+        -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
         -DASSIMP_BUILD_COLLADA_IMPORTER=ON
         -DASSIMP_BUILD_DXF_IMPORTER=ON
-        -DASSIMP_BUILD_TESTS=OFF
-        -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
+        -DASSIMP_BUILD_FBX_IMPORTER=ON
+        -DASSIMP_BUILD_OFF_IMPORTER=ON
         -DASSIMP_BUILD_SAMPLES=OFF
+        -DASSIMP_BUILD_TESTS=OFF
+        -DASSIMP_NO_EXPORT=ON
+        -DASSIMP_WARNINGS_AS_ERRORS=OFF
+        -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../assimp_install
-        ${{ inputs.os == 'macos-latest' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ inputs.os == 'windows-latest' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/assimp_build
       shell: bash
       run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/assimp_install
+      shell: bash
+      run: cp -r ./* ../install/

@@ -24,26 +24,17 @@ class window_impl;
 class loader_impl : public loader
 {
 public:
-  //@{
+  ///@{
   /**
    * Documented public API
    */
   loader_impl(const options& options, window_impl& window);
   ~loader_impl();
-
-  loader& addFiles(const std::vector<std::string>& files, bool recursive = false) override;
-  loader& addFile(const std::string& path, bool recursive = false) override;
-
-  const std::vector<std::string>& getFiles() const override;
-
-  loader& setCurrentFileIndex(int index) override;
-  int getCurrentFileIndex() const override;
-
-  bool loadFile(LoadFileEnum load) override;
-
-  void getFileInfo(LoadFileEnum load, int& nextFileIndex, std::string& filePath,
-    std::string& fileInfo) const override;
-  //@}
+  loader& loadGeometry(const std::string& filePath, bool reset) override;
+  loader& loadScene(const std::string& filePath) override;
+  bool hasGeometryReader(const std::string& filePath) override;
+  bool hasSceneReader(const std::string& filePath) override;
+  ///@}
 
   /**
    * Implementation only API.

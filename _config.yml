@@ -1,0 +1,259 @@
+remote_theme: just-the-docs/just-the-docs
+plugins:
+  - jekyll-optional-front-matter
+  - jekyll-relative-links
+  - jekyll-remote-theme
+  - jekyll-seo-tag
+  - jekyll-titles-from-headings
+relative_links:
+  enabled: true
+  collections: true
+include:
+  - README.md
+  - LICENSE.md
+  - _licenses.md
+  - CONTRIBUTING.md
+exclude:
+  - CMakeLists.txt
+  - codecov.yml
+  - application
+  - cmake
+  - examples
+  - java
+  - library
+  - plugins
+  - python
+  - testing
+  - winshellext
+title: F3D
+tagline: Fast and minimalist 3D viewer
+description: F3D - Fast and minimalist 3D viewer
+url: https://f3d.app/
+logo: /resources/logotype.svg
+color_scheme: dark
+
+# Set default front matter values
+defaults:
+  -
+    scope:
+      path: ""
+    values:
+      image: # Set a opengraph image from the gallery for all pages
+        path: https://user-images.githubusercontent.com/3129530/201317344-092db03d-8616-45b9-b606-30d22cda2eff.png
+        height: 1200
+        width: 630
+      description: "F3D - Fast and minimalist 3D viewer"
+      has_toc: false
+
+  -
+    scope:
+      path: "README.md"
+    values:
+      title: Home
+      nav_order: 0
+      permalink: /
+      layout: default
+
+  -
+    scope:
+      path: "doc/*"
+    values:
+      layout: default
+
+  -
+    scope:
+      path: "doc/GALLERY.md"
+    values:
+      nav_order: 1
+
+# user doc
+  -
+    scope:
+      path: "doc/user/README_USER.md"
+    values:
+      nav_order: 2
+      has_children: true
+
+  -
+    scope:
+      path: "doc/user/USAGE.md"
+    values:
+      parent: User Documentation
+      nav_order: 0
+
+  -
+    scope:
+      path: "doc/user/INSTALLATION.md"
+    values:
+      parent: User Documentation
+      nav_order: 1
+
+  -
+    scope:
+      path: "doc/user/OPTIONS.md"
+    values:
+      title: Options
+      parent: User Documentation
+      nav_order: 2
+
+  -
+    scope:
+      path: "doc/user/INTERACTIONS.md"
+    values:
+      parent: User Documentation
+      nav_order: 3
+
+  -
+    scope:
+      path: "doc/user/CONFIGURATION_FILE.md"
+    values:
+      parent: User Documentation
+      nav_order: 4
+
+  -
+    scope:
+      path: "doc/user/DESKTOP_INTEGRATION.md"
+    values:
+      parent: User Documentation
+      nav_order: 5
+
+  -
+    scope:
+      path: "doc/user/LIMITATIONS_AND_TROUBLESHOOTING.md"
+    values:
+      title: Limitations and Troubleshooting
+      parent: User Documentation
+      nav_order: 6
+
+# libf3d doc
+  -
+    scope:
+      path: "doc/libf3d/README_LIBF3D.md"
+    values:
+      nav_order: 3
+      has_children: true
+
+  -
+    scope:
+      path: "doc/libf3d/OVERVIEW.md"
+    values:
+      title: Overview
+      parent: libf3d Documentation
+      nav_order: 0
+
+  -
+    scope:
+      path: "doc/libf3d/CLASSES.md"
+    values:
+      parent: libf3d Documentation
+      nav_order: 1
+
+  -
+    scope:
+      path: "doc/libf3d/OPTIONS.md"
+    values:
+      title: Options
+      parent: libf3d Documentation
+      nav_order: 2
+
+  -
+    scope:
+      path: "doc/libf3d/BINDINGS.md"
+    values:
+      parent: libf3d Documentation
+      nav_order: 3
+
+  -
+    scope:
+      path: "doc/libf3d/PLUGINS.md"
+    values:
+      parent: libf3d Documentation
+      nav_order: 4
+
+# dev doc
+  -
+    scope:
+      path: "doc/dev/README_DEV.md"
+    values:
+      nav_order: 4
+      has_children: true
+
+  -
+    scope:
+      path: "doc/dev/BUILD.md"
+    values:
+      title: Build
+      parent: Developer Documentation
+      nav_order: 0
+
+  -
+    scope:
+      path: "doc/dev/TESTING.md"
+    values:
+      parent: Developer Documentation
+      nav_order: 1
+
+  -
+    scope:
+      path: "CONTRIBUTING.md"
+    values:
+      title: Contribute
+      parent: Developer Documentation
+      nav_order: 2
+
+  -
+    scope:
+      path: "doc/dev/GENERATE.md"
+    values:
+      title: Generate
+      parent: Developer Documentation
+      nav_order: 3
+
+  -
+    scope:
+      path: "doc/dev/CODING_STYLE.md"
+    values:
+      parent: Developer Documentation
+      nav_order: 4
+
+# Licenses doc
+# _licenses.md uses front matter      
+  -
+    scope:
+      path: "LICENSE.md"
+    values:
+      title: License
+      parent: Licenses
+      nav_order: 0
+      layout: default
+
+  -
+    scope:
+      path: "doc/THIRD_PARTY_LICENSES.md"
+    values:
+      title: Third Party Licenses
+      parent: Licenses
+      nav_order: 1
+
+  -
+    scope:
+      path: "doc/CHANGELOG.md"
+    values:
+      nav_order: 6
+
+# Aux links for the upper right navigation
+aux_links:
+  "<img src=\"https://user-images.githubusercontent.com/3129530/197903476-11d9c41d-73b0-461f-93e8-c8c00c680e6e.png\" width=\"30px\">":
+    - "//github.com/f3d-app/f3d"
+
+# Makes Aux links open in a new tab.
+aux_links_new_tab: true
+
+# External navigation links
+nav_external_links:
+  - title: Download F3D
+    url: https://github.com/f3d-app/f3d/releases
+
+# Google Analytics Tracking
+ga_tracking: G-ZCWEYB9KVG
+ga_tracking_anonymize_ip: true

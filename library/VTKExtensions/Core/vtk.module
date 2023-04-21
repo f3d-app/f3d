@@ -7,6 +7,5 @@ PRIVATE_DEPENDS
   VTK::CommonDataModel
   VTK::ImagingCore
   VTK::RenderingCore
-  VTK::IOImage
 TEST_DEPENDS
   VTK::TestingCore

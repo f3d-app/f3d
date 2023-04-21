@@ -9,6 +9,7 @@
 
 #include "loader.h"
 
+#include <filesystem>
 #include <memory>
 
 class F3DStarter
@@ -20,15 +21,16 @@ public:
   int Start(int argc, char** argv);
 
   /**
-   * Add a file or directory to be forwarded to the loader
+   * Add a file or directory to the list of paths
    */
-  void AddFile(const std::string& path);
+  void AddFile(const std::filesystem::path& path, bool quiet = false);
 
   /**
    * Load a file if any have been added
-   * Set the load argument to LOAD_FIRST, LOAD_PREVIOUS, LOAD_NEXT or LOAD_LAST to change file index
+   * Set the index to select the index of the file to load
+   * Set relativeIndex to true to use the index as a relative index with the current index
    */
-  void LoadFile(f3d::loader::LoadFileEnum load = f3d::loader::LoadFileEnum::LOAD_CURRENT);
+  void LoadFile(int index = 0, bool relativeIndex = false);
 
   /**
    * Trigger a render

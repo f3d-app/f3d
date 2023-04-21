@@ -9,8 +9,13 @@ vtk_module_scan(
 # if libf3d is built as a static library, VTK extension static libraries
 # must be exported as well for proper linkage
 set(export_name "")
+set(libf3d_vtk_no_install "")
 if(NOT BUILD_SHARED_LIBS)
   set(export_name "f3dTargets")
+else()
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220928)
+    set(libf3d_vtk_no_install "NO_INSTALL")
+  endif()
 endif()
 
 # We need HEADERS_COMPONENT because of a bug in vtk_module_build in VTK <= 9.1
@@ -34,7 +39,7 @@ foreach (module IN LISTS modules)
   if (NOT "${libf3d_link_options_public}" STREQUAL "")
     vtk_module_link_options(${module} PUBLIC ${libf3d_link_options_public})
   endif()
-  vtk_module_compile_features(${module} PRIVATE cxx_std_17)
+  vtk_module_set_property(${module} PROPERTY CXX_STANDARD VALUE 17)
   if(F3D_STRICT_BUILD AND MSVC)
     # There are warnings in VTK related to deprecated features in C++17
     vtk_module_definitions(${module} PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
