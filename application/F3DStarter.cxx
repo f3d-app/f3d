@@ -180,11 +180,15 @@ int F3DStarter::Start(int argc, char** argv)
       [this](std::vector<std::string> filesVec) -> bool
       {
         this->Internals->Engine->getInteractor().stopAnimation();
+        int index = -1;
         for (std::string file : filesVec)
         {
-          this->AddFile(fs::path(file));
+          index = this->AddFile(fs::path(file));
         }
-        this->LoadFile(static_cast<int>(this->Internals->FilesList.size()) - 1);
+        if (index > -1)
+        {
+          this->LoadFile(index);
+        }
         this->Render();
         return true;
       });
@@ -495,7 +499,7 @@ void F3DStarter::Render()
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::AddFile(const fs::path& path, bool quiet)
+int F3DStarter::AddFile(const fs::path& path, bool quiet)
 {
   auto tmpPath = fs::absolute(path);
   if (!fs::exists(tmpPath))
@@ -504,10 +508,9 @@ void F3DStarter::AddFile(const fs::path& path, bool quiet)
     {
       f3d::log::error("File ", tmpPath, " does not exist");
     }
-    return;
+    return -1;
   }
-
-  if (fs::is_directory(tmpPath))
+  else if (fs::is_directory(tmpPath))
   {
     std::set<fs::path> sortedPaths;
     for (const auto& entry : fs::directory_iterator(tmpPath))
@@ -519,6 +522,7 @@ void F3DStarter::AddFile(const fs::path& path, bool quiet)
       // Recursively add all files
       this->AddFile(entryPath, quiet);
     }
+    return static_cast<int>(this->Internals->FilesList.size()) - 1;
   }
   else
   {
@@ -528,10 +532,15 @@ void F3DStarter::AddFile(const fs::path& path, bool quiet)
     if (it == this->Internals->FilesList.end())
     {
       this->Internals->FilesList.push_back(tmpPath);
+      return static_cast<int>(this->Internals->FilesList.size()) - 1;
     }
-    else if (!quiet)
+    else
     {
-      f3d::log::warn("File ", tmpPath, " has already been added");
+      if (!quiet)
+      {
+        f3d::log::warn("File ", tmpPath, " has already been added");
+      }
+      return static_cast<int>(std::distance(this->Internals->FilesList.begin(), it));
     }
   }
 }

@@ -23,7 +23,7 @@ public:
   /**
    * Add a file or directory to the list of paths
    */
-  void AddFile(const std::filesystem::path& path, bool quiet = false);
+  int AddFile(const std::filesystem::path& path, bool quiet = false);
 
   /**
    * Load a file if any have been added
