@@ -522,7 +522,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       // Recursively add all files
       this->AddFile(entryPath, quiet);
     }
-    return this->Internals->FilesList.size() - 1;
+    return static_cast<int>(this->Internals->FilesList.size()) - 1;
   }
   else
   {
@@ -532,11 +532,15 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
     if (it == this->Internals->FilesList.end())
     {
       this->Internals->FilesList.push_back(tmpPath);
+      return static_cast<int>(this->Internals->FilesList.size()) - 1;
     }
-    else if (!quiet)
+    else
     {
-      f3d::log::warn("File ", tmpPath, " has already been added");
+      if (!quiet)
+      {
+        f3d::log::warn("File ", tmpPath, " has already been added");
+      }
+      return static_cast<int>(std::distance(this->Internals->FilesList.begin(), it));
     }
-    return std::distance(this->Internals->FilesList.begin(), it);
   }
 }
