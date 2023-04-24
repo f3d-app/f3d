@@ -189,6 +189,7 @@ if(NOT F3D_MACOS_BUNDLE)
   configure_file("${CMAKE_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
   f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json DEFAULT_LIGHTS)
   f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build DEFAULT_LIGHTS)
+  f3d_test(NAME TestConfigFileUpperCase DATA suzanne_upper.STL CONFIG config_build DEFAULT_LIGHTS)
 
   file(COPY "${CMAKE_SOURCE_DIR}/resources/configs/config.d/" "${CMAKE_SOURCE_DIR}/plugins/native/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build DEFAULT_LIGHTS)
