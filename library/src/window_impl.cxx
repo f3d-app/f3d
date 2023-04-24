@@ -309,11 +309,13 @@ void window_impl::UpdateDynamicOptions()
 
   this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("ui.font-file"));
 
-  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("render.grid.enable"));
   this->Internals->Renderer->SetGridUnitSquare(
     this->Internals->Options.getAsDouble("render.grid.unit"));
   this->Internals->Renderer->SetGridSubdivisions(
     this->Internals->Options.getAsInt("render.grid.subdivisions"));
+  this->Internals->Renderer->SetGridAbsolute(
+    this->Internals->Options.getAsBool("render.grid.absolute"));
+  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("render.grid.enable"));
 
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
