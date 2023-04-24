@@ -288,7 +288,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp1, "up", "", "Up direction", options.getAsStringRef("scene.up-direction"), HasDefault::YES, MayHaveConfig::YES, "{-X, +X, -Y, +Y, -Z, +Z}");
     this->DeclareOption(grp1, "axis", "x", "Show axes", options.getAsBoolRef("interactor.axis"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "grid", "g", "Show grid", options.getAsBoolRef("render.grid.enable"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "grid-absolute", "", "Show grid at (0,0,0)", options.getAsBoolRef("render.grid.absolute"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "grid-absolute", "", "Position grid at the absolute origin instead of below the model", options.getAsBoolRef("render.grid.absolute"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "grid-unit", "", "Size of grid unit square", options.getAsDoubleRef("render.grid.unit"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "grid-subdivisions", "", "Number of grid subdivisions", options.getAsIntRef("render.grid.subdivisions"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.getAsBoolRef("render.show-edges"), HasDefault::YES, MayHaveConfig::YES);
