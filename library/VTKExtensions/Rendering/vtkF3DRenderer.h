@@ -52,6 +52,7 @@ public:
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);
   void SetFilenameInfo(const std::string& info);
+  void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(double unitSquare);
   void SetGridSubdivisions(int subdivisions);
   ///@}
@@ -208,6 +209,7 @@ protected:
   bool MetaDataConfigured = false;
 
   bool GridVisible = false;
+  bool GridAbsolute = false;
   bool AxisVisible = false;
   bool EdgeVisible = false;
   bool TimerVisible = false;

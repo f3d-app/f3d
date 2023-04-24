@@ -370,6 +370,16 @@ void vtkF3DRenderer::ShowAxis(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridAbsolute(bool absolute)
+{
+  if (this->GridAbsolute != absolute)
+  {
+    this->GridAbsolute = absolute;
+    this->GridConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetGridUnitSquare(double unitSquare)
 {
   if (this->GridUnitSquare != unitSquare)
@@ -427,11 +437,14 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
         tmpUnitSquare = pow(10.0, round(log10(diag * 0.1)));
       }
 
-      double gridPos[3];
-      for (int i = 0; i < 3; i++)
+      double gridPos[3] = { 0, 0, 0 };
+      if (!this->GridAbsolute)
       {
-        double size = bounds[2 * i + 1] - bounds[2 * i];
-        gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
+        for (int i = 0; i < 3; i++)
+        {
+          double size = bounds[2 * i + 1] - bounds[2 * i];
+          gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
+        }
       }
 
       std::stringstream stream;
