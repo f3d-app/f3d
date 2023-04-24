@@ -77,7 +77,7 @@ protected:
     {
       for (auto const& it : this->ConfigDic)
       {
-        std::regex re(it.first);
+        std::regex re(it.first, std::regex_constants::icase);
         std::smatch matches;
         if (std::regex_match(this->FilePathForConfigBlock, matches, re))
         {
