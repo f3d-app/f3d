@@ -13,6 +13,7 @@ Using a command-line option will override the corresponding value in the config 
 The `global` block and command-line options are only taken into account on the first load
 and not on subsequent loads, when switching between files.
 The regular expression blocks are always taken into account, even when loading further files.
+Please note the regular expressions are not case-sensitive.
 
 A typical config file may look like this:
 
