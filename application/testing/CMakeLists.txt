@@ -174,7 +174,7 @@ f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
 f3d_test(NAME TestGroupGeometries DATA mb/recursive ARGS --group-geometries DEFAULT_LIGHTS)
 f3d_test(NAME TestGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries --scalars=Polynomial -b DEFAULT_LIGHTS)
 f3d_test(NAME TestInvalidUpDirection DATA suzanne.ply ARGS -g --up=W REGEXP "W is not a valid up direction" NO_BASELINE)
-f3d_test(NAME TestUpDirectionNoSign DATA suzanne.ply ARGS --up=X)
+f3d_test(NAME TestUpDirectionNoSign DATA suzanne.ply ARGS --up=X DEFAULT_LIGHTS)
 
 # Test plugin fail code path
 f3d_test(NAME TestPluginVerbose ARGS --verbose REGEXP "Loading plugin \"native\"" NO_BASELINE)
