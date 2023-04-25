@@ -32,7 +32,7 @@ Make sure that VTK has been built with *OpenImageDenoise* support (`VTKOSPRAY_EN
 
 > My model shows up all wrong, with inverted surfaces everywhere.
 
-Your data probably contains some translucent data for some reasons, turn on translucency support by pressiong `P` or using the `-p` command line option.
+Your data probably contains some translucent data for some reason, turn on translucency support by pressing `P` or using the `-p` command line option.
 
 ## Linux
 
