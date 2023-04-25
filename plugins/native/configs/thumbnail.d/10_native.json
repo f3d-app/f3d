@@ -14,7 +14,7 @@
   },
   ".*(ply)":
   {
-    "comp": "-2"
+    "comp": "-2",
     "translucency-support": true
   }
 }
