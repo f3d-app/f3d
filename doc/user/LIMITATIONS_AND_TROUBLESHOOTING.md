@@ -30,6 +30,10 @@ ABC file formats rely on [Alembic](https://github.com/alembic/alembic) library. 
 
 Make sure that VTK has been built with *OpenImageDenoise* support (`VTKOSPRAY_ENABLE_DENOISER` option).
 
+> My model shows up all wrong, with inverted surfaces everywhere.
+
+Your data probably contains some translucent data for some reason, turn on translucency support by pressing `P` or using the `-p` command line option.
+
 ## Linux
 
 > I have a link error related to `stdc++fs` not found.
