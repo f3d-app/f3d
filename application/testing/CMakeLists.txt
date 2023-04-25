@@ -409,6 +409,7 @@ if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestSTEP DATA f3d.stp DEFAULT_LIGHTS ARGS --load-plugins=occt)
   f3d_test(NAME TestIGES DATA f3d.igs DEFAULT_LIGHTS ARGS --load-plugins=occt)
 
+  # Following tests are failing if OpenCascade was built without coloring support
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build DEFAULT_LIGHTS)

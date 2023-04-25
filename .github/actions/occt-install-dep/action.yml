@@ -40,7 +40,7 @@ runs:
       shell: bash
       run: >
         cmake ../occt
-        -DBUILD_ADDITIONAL_TOOLKITS="TKSTEP;TKIGES;TKMesh"
+        -DBUILD_ADDITIONAL_TOOLKITS="TKSTEP;TKIGES;TKMesh;TKXDESTEP;TKXDEIGES"
         -DBUILD_DOC_Overview=OFF
         -DBUILD_LIBRARY_TYPE=Shared
         -DBUILD_MODULE_ApplicationFramework=OFF
