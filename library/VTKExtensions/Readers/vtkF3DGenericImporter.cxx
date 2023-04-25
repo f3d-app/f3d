@@ -439,7 +439,7 @@ void vtkF3DGenericImporter::UpdateColoringVectors(bool useCellData)
     for (int i = 0; i < attr->GetNumberOfArrays(); i++)
     {
       vtkDataArray* array = attr->GetArray(i);
-      if (array)
+      if (array && array->GetName())
       {
         arrayNames.insert(array->GetName());
       }
