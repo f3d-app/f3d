@@ -15,5 +15,10 @@
   {
     "up": "-Y",
     "comp": "-2"
+  },
+  ".*(ply)":
+  {
+    "comp": "-2",
+    "translucency-support": true
   }
 }
