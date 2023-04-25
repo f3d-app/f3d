@@ -194,28 +194,27 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   {
     const float sign = match[1].str() == "-" ? -1.0 : +1.0;
     const int index = std::toupper(match[2].str()[0]) - 'X';
-    if (index >= 0 && index < 3)
-    {
-      this->UpIndex = index;
+    assert(index >= 0 && index < 3);
 
-      std::fill(this->UpVector, this->UpVector + 3, 0);
-      this->UpVector[this->UpIndex] = sign;
+    this->UpIndex = index;
 
-      std::fill(this->RightVector, this->RightVector + 3, 0);
-      this->RightVector[this->UpIndex == 0 ? 1 : 0] = 1.0;
+    std::fill(this->UpVector, this->UpVector + 3, 0);
+    this->UpVector[this->UpIndex] = sign;
 
-      double pos[3];
-      vtkMath::Cross(this->UpVector, this->RightVector, pos);
-      vtkMath::MultiplyScalar(pos, -1.0);
+    std::fill(this->RightVector, this->RightVector + 3, 0);
+    this->RightVector[this->UpIndex == 0 ? 1 : 0] = 1.0;
 
-      vtkCamera* cam = this->GetActiveCamera();
-      cam->SetFocalPoint(0.0, 0.0, 0.0);
-      cam->SetPosition(pos);
-      cam->SetViewUp(this->UpVector);
+    double pos[3];
+    vtkMath::Cross(this->UpVector, this->RightVector, pos);
+    vtkMath::MultiplyScalar(pos, -1.0);
 
-      this->SetEnvironmentUp(this->UpVector);
-      this->SetEnvironmentRight(this->RightVector);
-    }
+    vtkCamera* cam = this->GetActiveCamera();
+    cam->SetFocalPoint(0.0, 0.0, 0.0);
+    cam->SetPosition(pos);
+    cam->SetViewUp(this->UpVector);
+
+    this->SetEnvironmentUp(this->UpVector);
+    this->SetEnvironmentRight(this->RightVector);
   }
   else
   {
