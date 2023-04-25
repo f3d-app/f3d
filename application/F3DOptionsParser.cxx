@@ -37,7 +37,7 @@ public:
 
   void GetOptions(F3DAppOptions& appOptions, f3d::options& options,
     std::vector<std::string>& inputs, std::string filePathForConfigBlock = "",
-    bool parseCommandLine = true);
+    bool allOptionsInitialized = false, bool parseCommandLine = true);
   bool InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
   void LoadPlugins(const F3DAppOptions& appOptions) const;
   std::vector<std::string> GetPluginSearchPaths() const;
@@ -251,13 +251,15 @@ void ConfigurationOptions::PrintPluginsScan()
 
 //----------------------------------------------------------------------------
 void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& options,
-  std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool parseCommandLine)
+  std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool allOptionsInitialized,
+  bool parseCommandLine)
 {
   this->FilePathForConfigBlock = filePathForConfigBlock;
 
-  // When not parsing the command line, provided options are expected to be already initialized,
-  // which means they have a "default" in the cxxopts sense.
-  HasDefault LocalHasDefaultNo = parseCommandLine ? HasDefault::NO : HasDefault::YES;
+  // When parsing multiple times, hasDefault should be forced to yes after the first pass as all
+  // options are expected to be already initialized, which means they have a "default" in the
+  // cxxopts sense.
+  HasDefault LocalHasDefaultNo = allOptionsInitialized ? HasDefault::YES : HasDefault::NO;
 
   try
   {
@@ -695,7 +697,7 @@ void F3DOptionsParser::UpdateOptions(const std::string& filePath, F3DAppOptions&
 {
   std::vector<std::string> dummyFiles;
   return this->ConfigOptions->GetOptions(
-    appOptions, options, dummyFiles, filePath, parseCommandLine);
+    appOptions, options, dummyFiles, filePath, true, parseCommandLine);
 }
 
 //----------------------------------------------------------------------------
