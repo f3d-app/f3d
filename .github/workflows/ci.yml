@@ -22,22 +22,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu, windows, macos]
         vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
-        macos_bundle: [true]
         include:
-          - enable_raytracing: true
-          - vtk_version: v9.0.0
-            enable_raytracing: false
-          - os: macos-latest
-            enable_raytracing: false #598
-          - macos_bundle: false
-            os: macos-latest
-            vtk_version: commit
-            enable_raytracing: false
+          - enable_raytracing: raytracing
+          - enable_raytracing: no-raytracing
+            vtk_version: v9.0.0
+          - enable_raytracing: no-raytracing
+            vtk_version: macos #598
 
-    runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    runs-on: ${{matrix.os}}-latest
+    container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       DISPLAY: :0
@@ -69,7 +64,7 @@ jobs:
         mkdir install
 
     - name: Install Raytracing Dependencies
-      if: matrix.enable_raytracing == true
+      if: matrix.enable_raytracing == 'raytracing'
       uses: ./source/.github/actions/ospray-sb-install-dep
 
     - name: Install VTK dependency
@@ -77,7 +72,7 @@ jobs:
       with:
         vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-        enable_raytracing: ${{matrix.enable_raytracing}}
+        enable_raytracing: ${{matrix.enable_raytracing == 'raytracing'}}
 
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
@@ -125,10 +120,10 @@ jobs:
         -DF3D_BINDINGS_PYTHON=ON
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
-        -DF3D_MACOS_BUNDLE=${{ matrix.macos_bundle == true && 'ON' || 'OFF' }}
+        -DF3D_MACOS_BUNDLE=${{ matrix.macos_bundle == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
-        -DF3D_MODULE_RAYTRACING=${{ matrix.enable_raytracing == true && 'ON' || 'OFF' }}
-        -DF3D_PLUGINS_STATIC_BUILD=${{ matrix.macos_bundle == true && 'ON' || 'OFF' }}
+        -DF3D_MODULE_RAYTRACING=${{ matrix.enable_raytracing == 'raytracing' && 'ON' || 'OFF' }}
+        -DF3D_PLUGINS_STATIC_BUILD=${{ matrix.macos_bundle == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
@@ -225,14 +220,14 @@ jobs:
     - name: Set F3D binary path MacOS bundle
       if: |
         runner.os == 'macOS' &&
-        matrix.macos_bundle == true
+        matrix.macos_bundle == 'bundle'
       shell: bash
       run: echo "F3D_BIN_PATH=./f3d.app/Contents/MacOS/f3d" >> $GITHUB_ENV
 
     - name: Set F3D binary path MacOS bundle
       if: |
         runner.os == 'macOS' &&
-        matrix.macos_bundle == false
+        matrix.macos_bundle == 'no-bundle'
       shell: bash
       run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
 
