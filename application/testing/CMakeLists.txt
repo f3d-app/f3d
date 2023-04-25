@@ -199,6 +199,7 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build DEFAULT_LIGHTS)
   f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build DEFAULT_LIGHTS)
   f3d_test(NAME TestDefaultConfigFileTIFF DATA logo.tif CONFIG config_build DEFAULT_LIGHTS)
+  f3d_test(NAME TestDefaultConfigFilePLY DATA cube.ply CONFIG config_build DEFAULT_LIGHTS THRESHOLD 100)
   f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y CONFIG config_build DEFAULT_LIGHTS)
 
   # no-background test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8501
@@ -208,6 +209,7 @@ if(NOT F3D_MACOS_BUNDLE)
     f3d_test(NAME TestThumbnailConfigFileVTI DATA vase_4comp.vti CONFIG thumbnail_build DEFAULT_LIGHTS)
     f3d_test(NAME TestThumbnailConfigFileSTL DATA suzanne.stl CONFIG thumbnail_build DEFAULT_LIGHTS)
     f3d_test(NAME TestThumbnailConfigFileTIFF DATA logo.tif CONFIG thumbnail_build DEFAULT_LIGHTS)
+    f3d_test(NAME TestThumbnailConfigFilePLY DATA cube.ply CONFIG thumbnail_build DEFAULT_LIGHTS THRESHOLD 100)
   endif()
 endif()
 
