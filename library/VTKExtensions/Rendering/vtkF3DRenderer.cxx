@@ -58,6 +58,7 @@
 
 #include <cctype>
 #include <chrono>
+#include <regex>
 #include <sstream>
 
 vtkStandardNewMacro(vtkF3DRenderer);
@@ -187,31 +188,37 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   this->GridInfo = "";
 
   // Importer rely on the Environment being set, so this is needed in the initialization
-  if (up.size() == 2)
+  const std::regex re("([-+]?)([XYZ])", std::regex_constants::icase);
+  std::smatch match;
+  if (std::regex_match(up, match, re))
   {
-    char sign = up[0];
-    char axis = std::toupper(up[1]);
-    if ((sign == '-' || sign == '+') && (axis >= 'X' && axis <= 'Z'))
-    {
-      this->UpIndex = axis - 'X';
-      std::fill(this->UpVector, this->UpVector + 3, 0);
-      this->UpVector[this->UpIndex] = (sign == '+') ? 1.0 : -1.0;
+    const float sign = match[1].str() == "-" ? -1.0 : +1.0;
+    const int index = std::toupper(match[2].str()[0]) - 'X';
+    assert(index >= 0 && index < 3);
 
-      std::fill(this->RightVector, this->RightVector + 3, 0);
-      this->RightVector[this->UpIndex == 0 ? 1 : 0] = 1.0;
+    this->UpIndex = index;
 
-      double pos[3];
-      vtkMath::Cross(this->UpVector, this->RightVector, pos);
-      vtkMath::MultiplyScalar(pos, -1.0);
+    std::fill(this->UpVector, this->UpVector + 3, 0);
+    this->UpVector[this->UpIndex] = sign;
 
-      vtkCamera* cam = this->GetActiveCamera();
-      cam->SetFocalPoint(0.0, 0.0, 0.0);
-      cam->SetPosition(pos);
-      cam->SetViewUp(this->UpVector);
+    std::fill(this->RightVector, this->RightVector + 3, 0);
+    this->RightVector[this->UpIndex == 0 ? 1 : 0] = 1.0;
 
-      this->SetEnvironmentUp(this->UpVector);
-      this->SetEnvironmentRight(this->RightVector);
-    }
+    double pos[3];
+    vtkMath::Cross(this->UpVector, this->RightVector, pos);
+    vtkMath::MultiplyScalar(pos, -1.0);
+
+    vtkCamera* cam = this->GetActiveCamera();
+    cam->SetFocalPoint(0.0, 0.0, 0.0);
+    cam->SetPosition(pos);
+    cam->SetViewUp(this->UpVector);
+
+    this->SetEnvironmentUp(this->UpVector);
+    this->SetEnvironmentRight(this->RightVector);
+  }
+  else
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, up + " is not a valid up direction");
   }
 }
 
