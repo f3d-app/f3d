@@ -468,6 +468,11 @@ f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --fi
 f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No file loaded, no rendering performed") #Down;
 f3d_test(NAME TestInteractionGroupGeometriesLoadParentDirectory DATA mb/mb_0_0.vtu ARGS --group-geometries --filename INTERACTION DEFAULT_LIGHTS) #Down;
 
+# Progress test
+f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE FORCE_PROGRESS_BAR)
+f3d_test(NAME TestProgressScene DATA WaterBottle.glb ARGS --progress NO_BASELINE FORCE_PROGRESS_BAR)
+f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --progress NO_BASELINE FORCE_PROGRESS_BAR INTERACTION) #Up;Up;Up;Up
+
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2
 
@@ -498,10 +503,6 @@ f3d_test(NAME TestOutputNoBackground DATA cow.vtp ARGS --no-background NO_BASELI
 # Basic record and play test
 f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log NO_BASELINE)
 f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log DEPENDS TestInteractionRecord NO_BASELINE)
-
-# Progress test
-f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE FORCE_PROGRESS_BAR)
-f3d_test(NAME TestProgressScene DATA world.obj ARGS --progress NO_BASELINE FORCE_PROGRESS_BAR)
 
 # Window position test
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
