@@ -406,8 +406,8 @@ if(F3D_PLUGIN_BUILD_EXODUS)
 endif()
 
 if(F3D_PLUGIN_BUILD_OCCT)
-  f3d_test(NAME TestSTEP DATA f3d.stp DEFAULT_LIGHTS ARGS --load-plugins=occt)
-  f3d_test(NAME TestIGES DATA f3d.igs DEFAULT_LIGHTS ARGS --load-plugins=occt)
+  f3d_test(NAME TestSTEP DATA f3d.stp DEFAULT_LIGHTS ARGS --load-plugins=occt --up=+Z)
+  f3d_test(NAME TestIGES DATA f3d.igs DEFAULT_LIGHTS ARGS --load-plugins=occt --up=+Z)
 
   # Following tests are failing if OpenCascade was built without coloring support
   if(NOT F3D_MACOS_BUNDLE)
