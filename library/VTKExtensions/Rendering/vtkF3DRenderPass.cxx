@@ -68,14 +68,7 @@ void vtkF3DRenderPass::ReleaseGraphicsResources(vtkWindow* w)
 // ----------------------------------------------------------------------------
 void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 {
-  if (this->InitializeTime == this->MTime)
-  {
-    // already initialized
-    return;
-  }
-
-  this->ReleaseGraphicsResources(s->GetRenderer()->GetRenderWindow());
-
+  // Always updates props from the renderstate
   this->BackgroundProps.clear();
   this->MainProps.clear();
 
@@ -93,6 +86,14 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
       this->MainProps.push_back(prop);
     }
   }
+
+  if (this->InitializeTime == this->MTime)
+  {
+    // already initialized
+    return;
+  }
+
+  this->ReleaseGraphicsResources(s->GetRenderer()->GetRenderWindow());
 
   // background pass, setup framebuffer, clear and draw skybox
   vtkNew<vtkOpaquePass> bgP;
