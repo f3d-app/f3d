@@ -80,7 +80,7 @@ jobs:
     - name: Install freetype
       if: runner.os == 'Linux'
       working-directory: ${{github.workspace}}
-      run: apt install freetype
+      run: apt install libfreetype-dev
 
     - name: Install Raytracing Dependencies
       if: matrix.raytracing_label == 'raytracing'
