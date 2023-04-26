@@ -177,6 +177,11 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   this->AddActor(this->MetaDataActor);
   this->AddActor(this->CheatSheetActor);
 
+  if (this->HasHDRI)
+  {
+    this->AddActor(this->Skybox);
+  }
+
   this->GridConfigured = false;
   this->CheatSheetConfigured = false;
   this->ActorsPropertiesConfigured = false;
