@@ -72,16 +72,6 @@ jobs:
         cd dependencies
         mkdir install
 
-    - name: Install freetype
-      if: runner.os == 'macOS'
-      working-directory: ${{github.workspace}}
-      run: brew install freetype
-
-    - name: Install freetype
-      if: runner.os == 'Linux'
-      working-directory: ${{github.workspace}}
-      run: apt install libfreetype-dev
-
     - name: Install Raytracing Dependencies
       if: matrix.raytracing_label == 'raytracing'
       uses: ./source/.github/actions/ospray-sb-install-dep
