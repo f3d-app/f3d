@@ -1,7 +1,7 @@
 # F3D Testing
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;LONG_TIMEOUT;HDRI;INTERACTION;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;DEPENDS" "ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;LONG_TIMEOUT;HDRI;INTERACTION;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;FORCE_PROGRESS_BAR" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;DEPENDS" "ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -92,6 +92,10 @@ function(f3d_test)
   if(F3D_TEST_DEPENDS)
     set_tests_properties(f3d::${F3D_TEST_DEPENDS} PROPERTIES FIXTURES_SETUP f3d::${F3D_TEST_DEPENDS}_FIXTURE)
     set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES FIXTURES_REQUIRED f3d::${F3D_TEST_DEPENDS}_FIXTURE)
+  endif()
+
+  if(F3D_TEST_FORCE_PROGRESS_BAR)
+    set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT "CTEST_PROGRESS_BAR_TESTING=1")
   endif()
 
 endfunction()
@@ -496,8 +500,8 @@ f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=
 f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log DEPENDS TestInteractionRecord NO_BASELINE)
 
 # Progress test
-f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
-f3d_test(NAME TestProgressScene DATA world.obj ARGS --progress NO_BASELINE)
+f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE FORCE_PROGRESS_BAR)
+f3d_test(NAME TestProgressScene DATA world.obj ARGS --progress NO_BASELINE FORCE_PROGRESS_BAR)
 
 # Window position test
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
