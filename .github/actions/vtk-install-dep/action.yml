@@ -12,7 +12,7 @@ inputs:
   raytracing_label:
     description: 'Label to control raytracing'
     required: false
-    default: 'raytracing'
+    default: 'no-raytracing'
 runs:
   using: "composite"
   steps:
