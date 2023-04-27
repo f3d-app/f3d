@@ -143,7 +143,7 @@ The `NAME` argument is required. The arguments are as follows:
   * `NAME`: (Required) The name of the plugin.
   * `DESCRIPTION`: The description of the plugin.
   * `VERSION`: The version of the plugin.
-  * `VTK_MODULES`: The list of VTK modules used by the plugin to link with.
+  * `VTK_MODULES`: The list of VTK modules used by the plugin to link with. A few VTK modules are automatically linked.
   * `ADDITIONAL_RPATHS`: The list of additional RPATH for the installed binaries on Unix. VTK path is added automatically.
   * `MIMETYPE_XML_FILES`: The list of mimetype files to install. It's useful for file association on OS using Freedesktop specifications.
   * `CONFIGURATION_DIRS`: The list of configuration directories to install. Generally contain a load-plugins option and format specific options.
@@ -264,6 +264,7 @@ macro(f3d_plugin_build)
   list(TRANSFORM F3D_PLUGIN_VTK_MODULES PREPEND "VTK::")
 
   target_link_libraries(f3d-plugin-${F3D_PLUGIN_NAME} PRIVATE
+    VTK::CommonCore VTK::CommonExecutionModel VTK::IOImport
     ${F3D_PLUGIN_VTK_MODULES}
     ${modules})
 
@@ -274,7 +275,6 @@ macro(f3d_plugin_build)
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT plugin
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT plugin)
   endif()
-
 
   # Install configurations folders
   foreach(config_dir ${F3D_PLUGIN_CONFIGURATION_DIRS})
@@ -316,7 +316,7 @@ macro(f3d_plugin_build)
   {
     "description" : "Plugin description",
     "name" : "myPlugin",
-    "readers" : 
+    "readers" :
     [
       {
         "description" : "Reader description",
