@@ -20,13 +20,6 @@ class vtkRenderer;
 class vtkCamera;
 namespace f3d::detail
 {
-class cameraState_impl : public cameraState
-{
-public:
-  vtkNew<vtkCamera> Camera;
-  cameraState_impl(vtkCamera* vtkCamera) { this->Camera->DeepCopy(vtkCamera); }
-};
-
 class camera_impl : public camera
 {
 public:
@@ -56,6 +49,9 @@ public:
   camera& setViewAngle(const angle_deg_t& angle) override;
   angle_deg_t getViewAngle() override;
   void getViewAngle(angle_deg_t& angle) override;
+  camera& setState(const camera_state_t& state) override;
+  camera_state_t getState() override;
+  void getState(camera_state_t& state) override;
 
   camera& dolly(double val) override;
   camera& roll(angle_deg_t angle) override;
@@ -68,8 +64,6 @@ public:
   camera& resetToDefault() override;
   camera& resetToBounds() override;
 
-  cameraState* saveState() override;
-  void restoreState(const cameraState*) override;
   ///@}
 
   /**

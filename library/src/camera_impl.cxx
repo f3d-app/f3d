@@ -125,6 +125,36 @@ void camera_impl::getViewAngle(angle_deg_t& angle)
 }
 
 //----------------------------------------------------------------------------
+camera& camera_impl::setState(const camera_state_t& state)
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  cam->SetPosition(state.pos.data());
+  cam->SetFocalPoint(state.foc.data());
+  cam->SetViewUp(state.up.data());
+  cam->SetViewAngle(state.angle);
+  cam->OrthogonalizeViewUp();
+  this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+camera_state_t camera_impl::getState()
+{
+  camera_state_t state;
+  this->getState(state);
+  return state;
+}
+
+//----------------------------------------------------------------------------
+void camera_impl::getState(camera_state_t& state)
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  cam->GetPosition(state.pos.data());
+  cam->GetFocalPoint(state.foc.data());
+  cam->GetViewUp(state.up.data());
+  state.angle = cam->GetViewAngle();
+}
+//----------------------------------------------------------------------------
 camera& camera_impl::dolly(double val)
 {
   vtkCamera* cam = this->GetVTKCamera();
@@ -219,18 +249,5 @@ void camera_impl::SetVTKRenderer(vtkRenderer* renderer)
 vtkCamera* camera_impl::GetVTKCamera()
 {
   return this->Internals->VTKRenderer->GetActiveCamera();
-}
-
-//----------------------------------------------------------------------------
-cameraState* camera_impl::saveState()
-{
-  return new cameraState_impl(this->GetVTKCamera());
-}
-
-//----------------------------------------------------------------------------
-void camera_impl::restoreState(const cameraState* cameraState)
-{
-  const cameraState_impl* state_impl = dynamic_cast<const cameraState_impl*>(cameraState);
-  this->GetVTKCamera()->DeepCopy(state_impl->Camera);
 }
 };

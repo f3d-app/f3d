@@ -9,10 +9,12 @@
 
 namespace f3d
 {
-class F3D_EXPORT cameraState
+struct F3D_EXPORT camera_state_t
 {
-public:
-  virtual ~cameraState() = default;
+  point3_t pos;
+  point3_t foc;
+  vector3_t up;
+  angle_deg_t angle;
 };
 
 /**
@@ -44,6 +46,9 @@ public:
   virtual camera& setViewAngle(const angle_deg_t& angle) = 0;
   virtual angle_deg_t getViewAngle() = 0;
   virtual void getViewAngle(angle_deg_t& angle) = 0;
+  virtual camera& setState(const camera_state_t& state) = 0;
+  virtual camera_state_t getState() = 0;
+  virtual void getState(camera_state_t& state) = 0;
   ///@}
 
   ///@{ @name Manipulation
@@ -73,9 +78,6 @@ public:
    * Reset the camera using the bounds of actors in the scene.
    */
   virtual camera& resetToBounds() = 0;
-
-  virtual cameraState* saveState() = 0;
-  virtual void restoreState(const cameraState*) = 0;
 
 protected:
   //! @cond
