@@ -28,6 +28,7 @@ jobs:
         include:
           - raytracing_label: raytracing
           - bundle_label: no-bundle
+          - egl_label: no-egl
           - vtk_version: v9.0.0
             raytracing_label: no-raytracing
           - os: windows
@@ -39,6 +40,10 @@ jobs:
             vtk_version: commit
             raytracing_label: no-raytracing
             bundle_label: bundle
+          - build_type: headless
+            os: ubuntu
+            vtk_version: commit
+            egl_label: egl
 
     runs-on: ${{matrix.os}}-latest
     container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -82,6 +87,7 @@ jobs:
         vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         raytracing_label: ${{matrix.raytracing_label}}
+        egl_label: ${{matrix.egl_label}}
 
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
