@@ -57,11 +57,12 @@ if (target_type STREQUAL SHARED_LIBRARY)
   list(APPEND rpaths "${OpenCASCADE_LIBRARY_DIR}")
 endif ()
 
+# RenderingOpenGL2 is needed as OpenCascade itself can expose some VTK libs that we need to link against
 f3d_plugin_build(
   NAME occt
   VERSION 1.0
   DESCRIPTION "OpenCASCADE support (version ${OpenCASCADE_VERSION})"
-  VTK_MODULES CommonCore CommonExecutionModel IOImport
+  VTK_MODULES CommonCore CommonExecutionModel FiltersGeneral RenderingOpenGL2
   ADDITIONAL_RPATHS ${rpaths}
   MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-occt-formats.xml"
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"

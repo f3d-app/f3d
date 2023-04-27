@@ -39,7 +39,7 @@ f3d_plugin_build(
   NAME alembic
   VERSION 1.0
   DESCRIPTION "Alembic support (version ${Alembic_VERSION})"
-  VTK_MODULES CommonCore CommonExecutionModel IOImport
+  VTK_MODULES CommonCore IOImport IOImage
   ADDITIONAL_RPATHS ${rpaths}
   MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-alembic-formats.xml"
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
