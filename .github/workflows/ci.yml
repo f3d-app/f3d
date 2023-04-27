@@ -22,24 +22,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu, windows, macos]
         vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
         build_type: [standard]
         include:
           - raytracing_label: raytracing
-          - macos_bundle: false
+          - bundle_label: no-bundle
           - vtk_version: v9.0.0
             raytracing_label: no-raytracing
-          - os: macos-latest
+          - os: macos
             raytracing_label: no-raytracing #598
           - build_type: macos_bundle
-            os: macos-latest
+            os: macos
             vtk_version: commit
             raytracing_label: no-raytracing
-            macos_bundle: true
+            bundle_label: bundle
 
     runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       DISPLAY: :0
@@ -127,10 +127,10 @@ jobs:
         -DF3D_BINDINGS_PYTHON=ON
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
-        -DF3D_MACOS_BUNDLE=${{ matrix.macos_bundle == true && 'ON' || 'OFF' }}
+        -DF3D_MACOS_BUNDLE=${{ matrix.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_MODULE_RAYTRACING=${{ matrix.raytracing_label == 'raytracing' && 'ON' || 'OFF' }}
-        -DF3D_PLUGINS_STATIC_BUILD=${{ matrix.macos_bundle == true && 'ON' || 'OFF' }}
+        -DF3D_PLUGINS_STATIC_BUILD=${{ matrix.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
@@ -227,14 +227,14 @@ jobs:
     - name: Set F3D binary path MacOS bundle
       if: |
         runner.os == 'macOS' &&
-        matrix.macos_bundle == true
+        matrix.bundle_label == 'bundle'
       shell: bash
       run: echo "F3D_BIN_PATH=./f3d.app/Contents/MacOS/f3d" >> $GITHUB_ENV
 
     - name: Set F3D binary path MacOS bundle
       if: |
         runner.os == 'macOS' &&
-        matrix.macos_bundle == false
+        matrix.bundle_label != 'bundle'
       shell: bash
       run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
 
@@ -278,7 +278,7 @@ jobs:
   coverage:
     if: github.event.pull_request.draft == false
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu
     container: ghcr.io/f3d-app/f3d-ci
 
     # Add dummy F3D_PLUGINS_PATH for coverage
@@ -387,7 +387,7 @@ jobs:
       matrix:
         santype: [address, thread, undefined]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu
     container: ghcr.io/f3d-app/f3d-ci
 
     env:

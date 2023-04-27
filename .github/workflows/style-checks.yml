@@ -4,7 +4,7 @@ jobs:
 
   formatting-check:
     name: Formatting Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu
     steps:
     - uses: actions/checkout@v3
     - uses: DoozyX/clang-format-lint-action@v0.13
@@ -15,7 +15,7 @@ jobs:
 
   codespell-check:
     name: Codespell Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu
     steps:
     - uses: actions/checkout@v3
     - uses: codespell-project/actions-codespell@v1.0

@@ -19,7 +19,7 @@ jobs:
       matrix:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu
     container: ghcr.io/f3d-app/f3d-ci
 
     env:

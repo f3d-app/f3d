@@ -11,7 +11,7 @@ jobs:
 
   generate-website:
     name: Generate Website
-    runs-on: ubuntu-latest
+    runs-on: ubuntu
     steps:
 
     - name: Checkout
