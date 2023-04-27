@@ -37,7 +37,7 @@ f3d_plugin_declare_reader(
   NAME STEP
   EXTENSIONS stp step stpnc p21 210
   MIMETYPES application/vnd.step
-  VTK_READER vtkF3DOCCTReader
+  VTK_READER vtkOCCTReader
   FORMAT_DESCRIPTION "STEP ISO 10303"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/step.inl"
 )
@@ -46,7 +46,7 @@ f3d_plugin_declare_reader(
   NAME IGES
   EXTENSIONS igs iges
   MIMETYPES model/iges
-  VTK_READER vtkF3DOCCTReader
+  VTK_READER vtkOCCTReader
   FORMAT_DESCRIPTION "Initial Graphics Exchange Specification"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/iges.inl"
 )
@@ -61,7 +61,7 @@ f3d_plugin_build(
   NAME occt
   VERSION 1.0
   DESCRIPTION "OpenCASCADE support (version ${OpenCASCADE_VERSION})"
-  VTK_MODULES CommonCore CommonExecutionModel IOImport
+  VTK_MODULES CommonCore CommonExecutionModel IOImport IOOCCT
   ADDITIONAL_RPATHS ${rpaths}
   MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-occt-formats.xml"
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
