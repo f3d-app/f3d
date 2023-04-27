@@ -45,9 +45,9 @@ set_target_properties(f3d PROPERTIES
 
 if (APPLE)
   if (F3D_MACOS_BUNDLE)
-    set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../../../lib)
+    set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../../../${CMAKE_INSTALL_LIBDIR})
   else ()
-    set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../lib)
+    set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../${CMAKE_INSTALL_LIBDIR})
   endif ()
 elseif (UNIX)
   set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../${CMAKE_INSTALL_LIBDIR})
