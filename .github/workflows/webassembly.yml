@@ -11,7 +11,7 @@ jobs:
   ci:
     if: github.event.pull_request.draft == false
 
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     container: dockcross/web-wasm:20230116-670f7f7
 
     steps:

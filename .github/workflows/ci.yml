@@ -38,7 +38,7 @@ jobs:
             raytracing_label: no-raytracing
             bundle_label: bundle
 
-    runs-on: ${{matrix.os}}
+    runs-on: ${{matrix.os}}-latest
     container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
@@ -278,7 +278,7 @@ jobs:
   coverage:
     if: github.event.pull_request.draft == false
 
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
     # Add dummy F3D_PLUGINS_PATH for coverage
@@ -387,7 +387,7 @@ jobs:
       matrix:
         santype: [address, thread, undefined]
 
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
