@@ -26,15 +26,15 @@ jobs:
         vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
         macos_bundle: [true]
         include:
-          - enable_raytracing: true
+          - raytracing_label: raytracing
           - vtk_version: v9.0.0
-            enable_raytracing: false
+            raytracing_label: no-raytracing
           - os: macos-latest
-            enable_raytracing: false #598
+            raytracing_label: no-raytracing #598
           - macos_bundle: false
             os: macos-latest
             vtk_version: commit
-            enable_raytracing: false
+            raytracing_label: no-raytracing
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -69,7 +69,7 @@ jobs:
         mkdir install
 
     - name: Install Raytracing Dependencies
-      if: matrix.enable_raytracing == true
+      if: matrix.raytracing_label == 'raytracing'
       uses: ./source/.github/actions/ospray-sb-install-dep
 
     - name: Install VTK dependency
@@ -77,7 +77,7 @@ jobs:
       with:
         vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-        enable_raytracing: ${{matrix.enable_raytracing}}
+        raytracing_label: ${{matrix.raytracing_label}}
 
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
@@ -127,7 +127,7 @@ jobs:
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
         -DF3D_MACOS_BUNDLE=${{ matrix.macos_bundle == true && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
-        -DF3D_MODULE_RAYTRACING=${{ matrix.enable_raytracing == true && 'ON' || 'OFF' }}
+        -DF3D_MODULE_RAYTRACING=${{ matrix.raytracing_label == 'raytracing' && 'ON' || 'OFF' }}
         -DF3D_PLUGINS_STATIC_BUILD=${{ matrix.macos_bundle == true && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
@@ -317,7 +317,7 @@ jobs:
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-        enable_raytracing: true
+        raytracing_label: raytracing
 
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies

@@ -9,10 +9,10 @@ inputs:
     description: 'VTK SHA file'
     required: false
     default: ''
-  enable_raytracing:
-    description: 'Enable Raytracing'
+  raytracing_label:
+    description: 'Label to control raytracing'
     required: false
-    default: 'false'
+    default: 'raytracing'
 runs:
   using: "composite"
   steps:
@@ -38,7 +38,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.enable_raytracing}}-1
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-1
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -109,7 +109,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingExternal=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingLabel=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
-        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.enable_raytracing == 'true' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.raytracing_label == 'raytracing' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_VERSIONED_INSTALL=OFF
