@@ -174,20 +174,20 @@ if(BUILD_SHARED_LIBS)
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library)
 
   install(FILES ${F3D_PUBLIC_HEADERS}
-    DESTINATION "include/f3d"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"
     COMPONENT sdk
     EXCLUDE_FROM_ALL)
 
   install(EXPORT f3dTargets
     NAMESPACE f3d::
-    DESTINATION "lib/cmake/f3d"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
     COMPONENT sdk
     EXCLUDE_FROM_ALL)
 
   include(CMakePackageConfigHelpers)
   configure_package_config_file(
     "${CMAKE_SOURCE_DIR}/cmake/f3dConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
-    INSTALL_DESTINATION "lib/cmake/f3d")
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d")
 
   # Write PROJECT_VERSION instead of F3D_VERSION to avoid any potential issues with version comparison
   # because of the potential suffix
@@ -207,7 +207,7 @@ if(BUILD_SHARED_LIBS)
       "${CMAKE_SOURCE_DIR}/cmake/plugin.thumbnailer.in"
       "${CMAKE_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
     DESTINATION
-      "lib/cmake/f3d"
+      "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
     COMPONENT sdk
     EXCLUDE_FROM_ALL)
 endif()
