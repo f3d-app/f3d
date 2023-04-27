@@ -24,17 +24,19 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
-        macos_bundle: [true]
+        build_type: [standard]
         include:
           - raytracing_label: raytracing
+          - macos_bundle: false
           - vtk_version: v9.0.0
             raytracing_label: no-raytracing
           - os: macos-latest
             raytracing_label: no-raytracing #598
-          - macos_bundle: false
+          - build_type: macos_bundle
             os: macos-latest
             vtk_version: commit
             raytracing_label: no-raytracing
+            macos_bundle: true
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -165,7 +167,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         path: ./build/Testing/Temporary
-        name: f3d-tests-artifact-${{runner.os}}-${{matrix.vtk_version}}
+        name: f3d-tests-artifact-${{runner.os}}-${{matrix.vtk_version}}-${{matrix.build_type}}
 
     - name: Install (ALL)
       working-directory: ${{github.workspace}}/build
@@ -268,7 +270,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         path: ./install/output
-        name: f3d-tests-install-artifact-${{runner.os}}-${{matrix.vtk_version}}
+        name: f3d-tests-install-artifact-${{runner.os}}-${{matrix.vtk_version}}-${{matrix.build_type}}
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
