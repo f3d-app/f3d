@@ -268,7 +268,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
     // clang-format off
     auto grp0 = cxxOptions.add_options("Applicative");
-    this->DeclareOption(grp0, "input", "", "Input file", inputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
+    this->DeclareOption(grp0, "input", "", "Input files", inputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
     this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
     this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "help", "h", "Print help");
@@ -364,7 +364,9 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", appOptions.InteractionTestPlayFile, LocalHasDefaultNo, MayHaveConfig::YES,"<file_path>");
     // clang-format on
 
+    cxxOptions.positional_help("file1 file2 ...");
     cxxOptions.parse_positional({ "input" });
+    cxxOptions.show_positional_help();
 
     if (parseCommandLine)
     {
