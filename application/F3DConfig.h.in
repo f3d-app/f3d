@@ -1,11 +1,15 @@
 #ifndef F3DConfig_h
 #define F3DConfig_h
 
+#include <array>
+#include <string>
+
 namespace F3D
 {
   const std::string AppName = "@PROJECT_NAME@";
   const std::string AppTitle = "@PROJECT_DESCRIPTION@";
   const std::string AppVersion = "@F3D_VERSION@";
+  const std::array<std::string, 4> PluginDirectories = {"@CMAKE_INSTALL_LIBDIR@", "lib", "lib_Release", "lib_Debug" }; // There is no way to generate this with CMake afaics
 }
 
 #cmakedefine01 F3D_MACOS_BUNDLE
