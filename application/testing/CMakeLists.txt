@@ -126,6 +126,7 @@ f3d_test(NAME Test3DSImporter DATA iflamigm.3ds ARGS --up=+Z)
 f3d_test(NAME TestScalars DATA suzanne.ply ARGS --scalars=Normals --comp=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestScalarsRange DATA suzanne.ply ARGS --scalars=Normals --comp=1 --range=0,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestScalarsWithBar DATA suzanne.ply ARGS -b --scalars=Normals --comp=0 DEFAULT_LIGHTS)
+f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --scalars --cells --comp=-2 --up=+Z DEFAULT_LIGHTS)
 f3d_test(NAME TestGLTFImporter DATA WaterBottle.glb)
 f3d_test(NAME TestGLTFImporterWithAnimation DATA BoxAnimated.gltf DEFAULT_LIGHTS) # Technically not a default lights tests, but fails for some reason on vtk 9.0.0
 f3d_test(NAME TestGLTFSkin DATA SimpleSkin.gltf)
