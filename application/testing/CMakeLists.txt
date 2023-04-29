@@ -607,6 +607,7 @@ f3d_test(NAME TestNoFileConfigFile CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/ve
 
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
+f3d_test(NAME TestHelpPositional ARGS --help REGEXP "--input")
 
 # Test version display
 f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")
