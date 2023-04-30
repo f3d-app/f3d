@@ -1,5 +1,8 @@
-# NVIDIA driver
+# Drivers
 leak:nvidia-glcore
+leak:swrast_dri
+leak:X11
+leak:xcb
 
 # Kernel
 leak:ld-linux-x86-64
