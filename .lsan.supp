@@ -7,6 +7,11 @@ leak:ld-linux-x86-64
 # OCCT
 leak:TKernel
 leak:TKXSBase
+leak:TKG2d
+leak:TKG3d
+leak:TKMath
+leak:TKMesh
+leak:TKBO
 
 # Potential mesa/VTK leak with incomplete callstack
 # forces us to hide all leaks from the libf3dSDKTests
