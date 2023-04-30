@@ -46,7 +46,7 @@ jobs:
             egl_label: egl
 
     runs-on: ${{matrix.os}}-latest
-    container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    container: ${{ matrix.os == 'ubuntu' && 'mwestphal/f3d-ci:latest' || null }}
 
     env:
       DISPLAY: :0
