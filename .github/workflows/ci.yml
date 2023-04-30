@@ -156,7 +156,9 @@ jobs:
       run: cmake --build . --parallel 2 --config Release
 
     - name: Run Xvfb ubuntu
-      if: runner.os == 'Linux'
+      if: |
+        runner.os == 'Linux' &&
+        matrix.egl_label != 'egl'
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
     - name: Install Mesa Windows
