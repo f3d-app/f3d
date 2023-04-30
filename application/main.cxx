@@ -21,6 +21,7 @@ int main(int argc, char** argv)
   {
     f3d::log::error("F3D encountered an unexpected exception:");
     f3d::log::error(ex.what());
+    f3d::log::waitForUser();
     exit(EXIT_FAILURE);
   }
 
