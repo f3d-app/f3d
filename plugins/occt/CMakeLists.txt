@@ -25,10 +25,15 @@ endif()
 
 message(STATUS "Plugin: OpenCASCADE ${OpenCASCADE_VERSION} found")
 
-if((TARGET "TKXDESTEP") AND (TARGET "TKXDEIGES"))
-    set(F3D_PLUGIN_OCCT_XCAF 1)
-else()
-    message(WARNING "OpenCASCADE: TKXDESTEP and TKXDEIGES are not found. Parts color and name are not supported.")
+option(F3D_PLUGIN_OCCT_COLORING_SUPPORT "Enable coloring support in occt plugin" ON)
+mark_as_advanced(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
+
+if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
+  if ((TARGET "TKXDESTEP") AND (TARGET "TKXDEIGES"))
+      set(F3D_PLUGIN_OCCT_XCAF 1)
+  else()
+      message(FATAL_ERROR "occt plugin: TKXDESTEP and TKXDEIGES OCCT modules are not found. Turn off F3D_PLUGIN_OCCT_COLORING_SUPPORT or enable them in your OpenCascade build.")
+  endif()
 endif()
 
 f3d_plugin_init()
