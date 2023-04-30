@@ -220,11 +220,8 @@ public:
       }
       else
       {
-        float fn[3] = { 0.0, 0.0 };
-        for (Standard_Integer i = 1; i <= nbV; i++)
-        {
-          uvs->InsertNextTypedTuple(fn);
-        }
+        uvs->SetNumberOfTuples(nbV);
+        uvs->Fill(0.0);
       }
 
       for (int i = 1; i <= nbT; i++)
