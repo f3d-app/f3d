@@ -93,3 +93,7 @@ Set the codepage to UTF-8, run `chcp 65001`.
 > Using the binary release, I'm unable to run F3D because macOS warns about F3D not being signed.
 
 F3D is not signed by Apple yet so macOS shows this warning. To run F3D, right click on the app and click "open", then click "open" again to be able to run F3D.
+
+> I'm unable to get coloring right with step files
+
+F3D on macOS does not support coloring on cells because of a [VTK issue](https://gitlab.kitware.com/vtk/vtk/-/issues/18969)
