@@ -17,7 +17,7 @@ runs:
       with:
         repository: Mesa3D/mesa
         path: './dependencies/mesa'
-        ref: mesa-23.0.2
+        ref: mesa-22.3.7
 
     - name: Setup mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
