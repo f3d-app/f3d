@@ -19,6 +19,12 @@ runs:
         path: './dependencies/assimp'
         ref: v5.2.5
 
+    - name: Patch Assimp librt
+      if: steps.cache-assimp.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/assimp
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/0001-Fix-librt-link.patch
+
     - name: Setup ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
