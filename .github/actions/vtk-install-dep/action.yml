@@ -64,6 +64,14 @@ runs:
         path: './dependencies/vtk'
         ref: ${{env.VTK_SHA_OR_TAG}}
 
+    - name: Patch VTK 9.0 limits include
+      if: |
+        steps.cache-vtk.outputs.cache-hit != 'true' &&
+        inputs.vtk_version == 'v9.0.0'
+      working-directory: ${{github.workspace}}/dependencies/vtk
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/0001-fix-missing-limits-include.patch
+
     - name: Patch VTK 9.0 source macos
       if: |
         steps.cache-vtk.outputs.cache-hit != 'true' &&
