@@ -77,10 +77,6 @@ jobs:
         cd dependencies
         mkdir install
 
-    - name: Install Mesa EGL Dependencies
-      if: matrix.egl_label == 'egl'
-      uses: ./source/.github/actions/mesa-egl-install-dep
-
     - name: Install Raytracing Dependencies
       if: matrix.raytracing_label == 'raytracing'
       uses: ./source/.github/actions/ospray-sb-install-dep
@@ -110,8 +106,7 @@ jobs:
       if: |
         runner.os == 'Linux' &&
         ( matrix.vtk_version == 'v9.0.0' ||
-          matrix.vtk_version == 'v9.1.0' ||
-          matrix.egl_label == 'egl'
+          matrix.vtk_version == 'v9.1.0'
           )
       working-directory: ${{github.workspace}}/dependencies/
       shell: bash
