@@ -26,7 +26,7 @@ runs:
       run: |
         mkdir mesa_build
         mkdir mesa_install
-        apt install -y wayland-protocols libwayland-egl-backend-dev
+        apt install -y wayland-protocols libwayland-egl-backend-dev ninja-build
 
     - name: Configure mesa
       if: steps.cache-mesa.outputs.cache-hit != 'true'
