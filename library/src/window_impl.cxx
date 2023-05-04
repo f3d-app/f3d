@@ -415,7 +415,6 @@ image window_impl::renderToImage(bool noBackground)
 
   exporter->Export(output.getData());
 
-  std::cout<<this->Internals->RenWin->ReportCapabilities()<<std::endl;
   return output;
 }
 
