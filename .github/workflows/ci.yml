@@ -403,8 +403,8 @@ jobs:
 
     env:
       DISPLAY: :0
-      CC: clang-10
-      CXX: clang++-10
+      CC: clang
+      CXX: clang++
 
     steps:
 
