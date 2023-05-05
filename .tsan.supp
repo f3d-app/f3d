@@ -1,2 +1,5 @@
 # False positive with Qt test
 race:libQt5Core
+
+# Issue in mesa sw_rast
+race:swrast_dri
