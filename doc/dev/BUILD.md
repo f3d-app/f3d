@@ -25,7 +25,7 @@ As stated in the dependencies, F3D is compatible with VTK >= 9.0.0, however, man
 Configure and generate the project with CMake,
 then build the software using your build system.
 
-Here is some CMake options of interest::
+Here is some CMake options of interest:
 * `F3D_BUILD_APPLICATION`: Build the F3D executable.
 * `BUILD_TESTING`: Enable the [tests](TESTING.md).
 * `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
@@ -44,6 +44,11 @@ Some modules, plugins and bindings depending on external libraries can be option
 * `F3D_PLUGIN_BUILD_DRACO`: Support for DRC file format. Requires `Draco`. Disabled by default.
 * `F3D_BINDINGS_PYTHON`: Generate python bindings (requires `Python` and `pybind11`). Disabled by default.
 * `F3D_BINDINGS_JAVA`: Generate java bindings (requires `Java` and `JNI`). Disabled by default.
+
+## VCPKG
+
+It's possible to use VCPKG to automatically build dependencies. A manifest file `vcpkg.json` is available at your convenience. Please read [VCPKG documentation](https://vcpkg.io/en/getting-started.html).  
+Basically, just install VCPKG, and configure F3D using `-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake` option.
 
 ## Installing
 
