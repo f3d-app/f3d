@@ -19,6 +19,7 @@ runs:
         path: './dependencies/assimp'
         ref: v5.2.5
 
+    # https://github.com/assimp/assimp/pull/5087
     - name: Patch Assimp librt
       if: steps.cache-assimp.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/assimp
