@@ -46,7 +46,7 @@ jobs:
             egl_label: egl
 
     runs-on: ${{matrix.os}}-latest
-    container: ${{ matrix.os == 'ubuntu' && 'mwestphal/f3d-ci:f3d-ci' || null }}
+    container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       DISPLAY: :0
@@ -290,7 +290,7 @@ jobs:
     if: github.event.pull_request.draft == false
 
     runs-on: ubuntu-latest
-    container: mwestphal/f3d-ci:f3d-ci
+    container: ghcr.io/f3d-app/f3d-ci
 
     # Add dummy F3D_PLUGINS_PATH for coverage
     env:
@@ -399,7 +399,7 @@ jobs:
         santype: [address, thread, undefined]
 
     runs-on: ubuntu-latest
-    container: mwestphal/f3d-ci:f3d-ci
+    container: ghcr.io/f3d-app/f3d-ci
 
     env:
       DISPLAY: :0
