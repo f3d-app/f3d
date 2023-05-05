@@ -477,3 +477,10 @@ jobs:
         export LSAN_OPTIONS=suppressions=$(pwd)/../source/.lsan.supp:use_tls=0
         export TSAN_OPTIONS=suppressions=$(pwd)/../source/.tsan.supp
         ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+
+    - name: Upload Tests Artifact
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./build/Testing/Temporary
+        name: f3d-tests-artifact-sanitizer-${{matrix.santype}}
