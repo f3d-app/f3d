@@ -1,0 +1,25 @@
+From 7339dda7aba5e32be553fe252c9d4f322cd9bdfe Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Thu, 4 May 2023 19:57:47 +0200
+Subject: [PATCH] Fix librt link
+
+---
+ code/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/code/CMakeLists.txt b/code/CMakeLists.txt
+index b87bc665f..9230548ea 100644
+--- a/code/CMakeLists.txt
++++ b/code/CMakeLists.txt
+@@ -1327,7 +1327,7 @@ ENDIF()
+ 
+ # Add RT-extension library for glTF importer with Open3DGC-compression.
+ IF (RT_FOUND AND ASSIMP_IMPORTER_GLTF_USE_OPEN3DGC)
+-  TARGET_LINK_LIBRARIES(assimp ${RT_LIBRARY})
++  TARGET_LINK_LIBRARIES(assimp rt)
+ ENDIF ()
+ 
+ 
+-- 
+2.40.1
+

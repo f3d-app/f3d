@@ -28,6 +28,7 @@ jobs:
         include:
           - raytracing_label: raytracing
           - bundle_label: no-bundle
+          - egl_label: no-egl
           - vtk_version: v9.0.0
             raytracing_label: no-raytracing
           - os: windows
@@ -39,6 +40,10 @@ jobs:
             vtk_version: commit
             raytracing_label: no-raytracing
             bundle_label: bundle
+          - build_type: headless
+            os: ubuntu
+            vtk_version: commit
+            egl_label: egl
 
     runs-on: ${{matrix.os}}-latest
     container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -82,6 +87,7 @@ jobs:
         vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         raytracing_label: ${{matrix.raytracing_label}}
+        egl_label: ${{matrix.egl_label}}
 
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
@@ -100,7 +106,8 @@ jobs:
       if: |
         runner.os == 'Linux' &&
         ( matrix.vtk_version == 'v9.0.0' ||
-          matrix.vtk_version == 'v9.1.0' )
+          matrix.vtk_version == 'v9.1.0'
+          )
       working-directory: ${{github.workspace}}/dependencies/
       shell: bash
       run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
@@ -131,7 +138,7 @@ jobs:
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
         -DF3D_MACOS_BUNDLE=${{ matrix.bundle_label == 'bundle' && 'ON' || 'OFF' }}
-        -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_MODULE_EXTERNAL_RENDERING=${{ matrix.egl_label == 'egl' && 'OFF' || 'ON' }}
         -DF3D_MODULE_RAYTRACING=${{ matrix.raytracing_label == 'raytracing' && 'ON' || 'OFF' }}
         -DF3D_PLUGINS_STATIC_BUILD=${{ matrix.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
@@ -152,7 +159,9 @@ jobs:
       run: cmake --build . --parallel 2 --config Release
 
     - name: Run Xvfb ubuntu
-      if: runner.os == 'Linux'
+      if: |
+        runner.os == 'Linux' &&
+        matrix.egl_label != 'egl'
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
     - name: Install Mesa Windows
@@ -365,7 +374,7 @@ jobs:
     - name: Generate XML Coverage
       working-directory: ${{github.workspace}}/source
       run: |
-        lcov --base-directory . --directory . -c -o coverage.info --gcov-tool /usr/bin/gcov-8
+        lcov --base-directory . --directory . -c -o coverage.info --gcov-tool /usr/bin/gcov
         lcov --remove coverage.info "*/dependencies/*" -o coverage.info
         lcov --remove coverage.info "*/cxxopts.hpp" -o coverage.info
         lcov --remove coverage.info "*/json.hpp" -o coverage.info
@@ -396,8 +405,8 @@ jobs:
 
     env:
       DISPLAY: :0
-      CC: clang-10
-      CXX: clang++-10
+      CC: clang
+      CXX: clang++
 
     steps:
 
@@ -470,3 +479,10 @@ jobs:
         export LSAN_OPTIONS=suppressions=$(pwd)/../source/.lsan.supp:use_tls=0
         export TSAN_OPTIONS=suppressions=$(pwd)/../source/.tsan.supp
         ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+
+    - name: Upload Tests Artifact
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./build/Testing/Temporary
+        name: f3d-tests-artifact-sanitizer-${{matrix.santype}}

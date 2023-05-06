@@ -13,6 +13,11 @@ inputs:
     description: 'Label to control raytracing'
     required: false
     default: 'no-raytracing'
+  egl_label:
+    description: 'Label to control egl'
+    required: false
+    default: 'no-egl'
+
 runs:
   using: "composite"
   steps:
@@ -38,7 +43,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-1
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-1
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -58,6 +63,14 @@ runs:
         fetch-depth: 0
         path: './dependencies/vtk'
         ref: ${{env.VTK_SHA_OR_TAG}}
+
+    - name: Patch VTK 9.0 limits include
+      if: |
+        steps.cache-vtk.outputs.cache-hit != 'true' &&
+        inputs.vtk_version == 'v9.0.0'
+      working-directory: ${{github.workspace}}/dependencies/vtk
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/0001-fix-missing-limits-include.patch
 
     - name: Patch VTK 9.0 source macos
       if: |
@@ -83,12 +96,13 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_BUILD_TESTING=OFF
+        -DVTK_DEBUG_LEAKS=ON
+        -DVTK_DEFAULT_RENDER_WINDOW_HEADLESS=${{ inputs.egl_label == 'egl' && 'ON' || 'OFF' }}
         -DVTK_ENABLE_LOGGING=OFF
         -DVTK_ENABLE_WRAPPING=OFF
         -DVTK_GROUP_ENABLE_Rendering=DEFAULT
         -DVTK_GROUP_ENABLE_StandAlone=DEFAULT
         -DVTK_LEGACY_REMOVE=ON
-        -DVTK_DEBUG_LEAKS=ON
         -DVTK_MODULE_ENABLE_VTK_CommonSystem=YES
         -DVTK_MODULE_ENABLE_VTK_FiltersGeneral=YES
         -DVTK_MODULE_ENABLE_VTK_FiltersGeometry=YES
@@ -112,6 +126,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.raytracing_label == 'raytracing' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
+        -DVTK_OPENGL_HAS_EGL=${{ inputs.egl_label == 'egl' && 'ON' || 'OFF' }}
         -DVTK_VERSIONED_INSTALL=OFF
         ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
