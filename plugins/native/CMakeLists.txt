@@ -99,6 +99,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/x-tgif
   VTK_READER vtkTIFFReader
   FORMAT_DESCRIPTION "TIFF"
+  EXCLUDE_FROM_THUMBNAILER
 )
 
 f3d_plugin_declare_reader(
