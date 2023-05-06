@@ -46,3 +46,7 @@ regsvr32 /u F3DShellExtension.dll
 ## MacOS
 
 There is no support for thumbnails on MacOS, the .dmg binary release provides automatic file openings.
+
+## Limitations
+
+- TIFF files are excluded from the thumbnailer to avoid conflicts with other better 2D thumbnailers.

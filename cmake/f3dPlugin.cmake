@@ -21,6 +21,7 @@ macro(f3d_plugin_init)
   set(F3D_PLUGIN_INCLUDES_CODE "")
   set(F3D_PLUGIN_REGISTER_CODE "")
   set(F3D_PLUGIN_MIMETYPES "")
+  set(F3D_PLUGIN_MIMETYPES_THUMB "")
   set(F3D_PLUGIN_CURRENT_READER_INDEX 0)
   set(F3D_PLUGIN_JSON "{ \"readers\": [] }")
 endmacro()
@@ -35,6 +36,7 @@ f3d_plugin_declare_reader(
   [VTK_READER            <class>]
   [FORMAT_DESCRIPTION    <string>]
   [SCORE                 <integer>]
+  [EXCLUDE_FROM_THUMBNAILER]
   [CUSTOM_CODE           <file>]
   EXTENSIONS             <string>...
   MIMETYPES              <string>...)
@@ -49,6 +51,7 @@ The `NAME` argument is required. The arguments are as follows:
   * `VTK_READER`: The VTK reader class to use.
   * `FORMAT_DESCRIPTION`: The description of the format read by the reader.
   * `SCORE`: The score of the reader (from 0 to 100). Default value is 50.
+  * `EXCLUDE_FROM_THUMBNAILER`: If specified, the reader will not be used for generating thumbnails.
   * `CUSTOM_CODE`: A custom code file containing the implementation of ``applyCustomReader`` function.
   * `EXTENSIONS`: (Required) The list of file extensions supported by the reader.
   * `MIMETYPES`: (Required) The list of mimetypes supported by the reader.
@@ -56,7 +59,7 @@ The `NAME` argument is required. The arguments are as follows:
 #]==]
 
 macro(f3d_plugin_declare_reader)
-  cmake_parse_arguments(F3D_READER "" "NAME;VTK_IMPORTER;VTK_READER;FORMAT_DESCRIPTION;SCORE;CUSTOM_CODE" "EXTENSIONS;MIMETYPES" ${ARGN})
+  cmake_parse_arguments(F3D_READER "EXCLUDE_FROM_THUMBNAILER" "NAME;VTK_IMPORTER;VTK_READER;FORMAT_DESCRIPTION;SCORE;CUSTOM_CODE" "EXTENSIONS;MIMETYPES" ${ARGN})
 
   if(F3D_READER_CUSTOM_CODE)
     set(F3D_READER_HAS_CUSTOM_CODE 1)
@@ -98,6 +101,15 @@ macro(f3d_plugin_declare_reader)
 
   string(JSON F3D_READER_JSON
     SET "${F3D_READER_JSON}" "mimetypes" "[${F3D_READER_MIMETYPES}]")
+
+  if (F3D_READER_EXCLUDE_FROM_THUMBNAILER)
+    string(JSON F3D_READER_JSON
+      SET "${F3D_READER_JSON}" "exclude_thumbnailer" "true")
+  else()
+    list(APPEND F3D_PLUGIN_MIMETYPES_THUMB ${F3D_READER_MIMETYPES})
+    string(JSON F3D_READER_JSON
+      SET "${F3D_READER_JSON}" "exclude_thumbnailer" "false")
+  endif()
 
   string(JSON F3D_PLUGIN_JSON
     SET "${F3D_PLUGIN_JSON}" "readers" ${F3D_PLUGIN_CURRENT_READER_INDEX} "${F3D_READER_JSON}")
@@ -297,14 +309,14 @@ macro(f3d_plugin_build)
     if(F3D_PLUGIN_FREEDESKTOP)
       configure_file(
         "${_f3dPlugin_dir}/plugin.desktop.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.desktop")
+        "${CMAKE_BINARY_DIR}/share/applications/f3d-plugin-${F3D_PLUGIN_NAME}.desktop")
       configure_file(
         "${_f3dPlugin_dir}/plugin.thumbnailer.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer")
-      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.desktop"
+        "${CMAKE_BINARY_DIR}/share/thumbnailers/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer")
+      install(FILES "${CMAKE_BINARY_DIR}/share/applications/f3d-plugin-${F3D_PLUGIN_NAME}.desktop"
         DESTINATION "share/applications"
         COMPONENT plugin)
-      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer"
+      install(FILES "${CMAKE_BINARY_DIR}/share/thumbnailers/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer"
         DESTINATION "share/thumbnailers"
         COMPONENT plugin)
     endif()
