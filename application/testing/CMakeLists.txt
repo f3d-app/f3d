@@ -1,7 +1,7 @@
 # F3D Testing
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;LONG_TIMEOUT;HDRI;INTERACTION;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;FORCE_PROGRESS_BAR" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;DEPENDS" "ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;LONG_TIMEOUT;HDRI;INTERACTION;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;DEPENDS" "ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -94,9 +94,8 @@ function(f3d_test)
     set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES FIXTURES_REQUIRED f3d::${F3D_TEST_DEPENDS}_FIXTURE)
   endif()
 
-  if(F3D_TEST_FORCE_PROGRESS_BAR)
-    set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT "CTEST_PROGRESS_BAR_TESTING=1")
-  endif()
+  set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT
+    "F3D_PLUGINS_PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY};CTEST_PROGRESS_BAR_TESTING=1")
 
 endfunction()
 
@@ -475,9 +474,9 @@ f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE RE
 f3d_test(NAME TestInteractionGroupGeometriesLoadParentDirectory DATA mb/mb_0_0.vtu ARGS --group-geometries --filename INTERACTION DEFAULT_LIGHTS) #Down;
 
 # Progress test
-f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE FORCE_PROGRESS_BAR)
-f3d_test(NAME TestProgressScene DATA WaterBottle.glb ARGS --progress NO_BASELINE FORCE_PROGRESS_BAR)
-f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --progress NO_BASELINE FORCE_PROGRESS_BAR INTERACTION) #Up;Up;Up;Up
+f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
+f3d_test(NAME TestProgressScene DATA WaterBottle.glb ARGS --progress NO_BASELINE)
+f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --progress NO_BASELINE INTERACTION) #Up;Up;Up;Up
 
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2
