@@ -8,6 +8,7 @@ leak:ld-linux-x86-64
 leak:TKBO
 leak:TKG2d
 leak:TKG3d
+leak:TKIGES
 leak:TKMath
 leak:TKMesh
 leak:TKVCAF
