@@ -31,8 +31,6 @@ jobs:
           - egl_label: no-egl
           - vtk_version: v9.0.0
             raytracing_label: no-raytracing
-          - os: windows
-            bundle_label: bundle #790
           - os: macos
             raytracing_label: no-raytracing #598
           - build_type: macos_bundle
