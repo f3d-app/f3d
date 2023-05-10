@@ -8,15 +8,16 @@
 
 #include "TestSDKHelpers.h"
 
+#include <utility>
+
 class F3DWindow : public QOpenGLWindow
 {
 public:
-  F3DWindow(
-    const std::string& filePath, const std::string& baselinePath, const std::string& outputPath)
+  F3DWindow(const std::string& filePath, std::string baselinePath, std::string outputPath)
     : QOpenGLWindow()
     , mEngine(f3d::window::Type::EXTERNAL)
-    , mBaselinePath(baselinePath)
-    , mOutputPath(outputPath)
+    , mBaselinePath(std::move(baselinePath))
+    , mOutputPath(std::move(outputPath))
   {
     f3d::loader& load = mEngine.getLoader();
     load.loadGeometry(filePath);

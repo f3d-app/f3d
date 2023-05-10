@@ -25,14 +25,14 @@ public:
    */
   vtkSetMacro(UseColoring, bool);
 
+  vtkF3DConsoleOutputWindow(const vtkF3DConsoleOutputWindow&) = delete;
+  void operator=(const vtkF3DConsoleOutputWindow&) = delete;
+
 protected:
   vtkF3DConsoleOutputWindow();
   ~vtkF3DConsoleOutputWindow() override = default;
 
 private:
-  vtkF3DConsoleOutputWindow(const vtkF3DConsoleOutputWindow&) = delete;
-  void operator=(const vtkF3DConsoleOutputWindow&) = delete;
-
   bool UseColoring = true;
 };
 

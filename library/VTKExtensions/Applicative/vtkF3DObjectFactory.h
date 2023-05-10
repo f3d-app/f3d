@@ -18,13 +18,12 @@ public:
 
   const char* GetVTKSourceVersion() override;
 
+  vtkF3DObjectFactory(const vtkF3DObjectFactory&) = delete;
+  void operator=(const vtkF3DObjectFactory&) = delete;
+
 protected:
   vtkF3DObjectFactory();
   ~vtkF3DObjectFactory() override = default;
-
-private:
-  vtkF3DObjectFactory(const vtkF3DObjectFactory&) = delete;
-  void operator=(const vtkF3DObjectFactory&) = delete;
 };
 
 #endif // vtkF3DObjectFactory_h

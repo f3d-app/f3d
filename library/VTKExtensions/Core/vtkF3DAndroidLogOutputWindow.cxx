@@ -6,7 +6,7 @@
 
 vtkStandardNewMacro(vtkF3DAndroidLogOutputWindow);
 
-vtkF3DAndroidLogOutputWindow::vtkF3DAndroidLogOutputWindow() {}
+vtkF3DAndroidLogOutputWindow::vtkF3DAndroidLogOutputWindow() = default;
 
 void vtkF3DAndroidLogOutputWindow::DisplayText(const char* txt)
 {

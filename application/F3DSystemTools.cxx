@@ -28,7 +28,7 @@ fs::path GetApplicationPath()
     return fs::path(wc.data());
   }
   f3d::log::error("Cannot retrieve application path");
-  return fs::path();
+  return {};
 #else
 #ifdef __APPLE__
   uint32_t size = 1024;
@@ -36,7 +36,7 @@ fs::path GetApplicationPath()
   if (_NSGetExecutablePath(buffer.data(), &size) != 0)
   {
     f3d::log::error("Executable is too long to recover application path");
-    return fs::path();
+    return {};
   }
   return fs::path(buffer.data());
 #else
@@ -47,7 +47,7 @@ fs::path GetApplicationPath()
   catch (const std::exception& ex)
   {
     f3d::log::error("Cannot retrieve application path: ", ex.what());
-    return fs::path();
+    return {};
   }
 #endif
 #endif

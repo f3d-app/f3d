@@ -70,7 +70,6 @@ struct vtkF3DGenericImporter::Internals
   std::vector<ColoringInfo> PointDataArrayVectorForColoring;
   std::vector<ColoringInfo> CellDataArrayVectorForColoring;
   vtkBoundingBox GeometryBoundingBox;
-  std::string MetaDataDescription;
 
   bool AnimationEnabled = false;
   std::set<double> TimeSteps;
@@ -258,8 +257,7 @@ void vtkF3DGenericImporter::PrintSelf(std::ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::AddInternalReader(
-  const std::string& name, vtkSmartPointer<vtkAlgorithm> reader)
+void vtkF3DGenericImporter::AddInternalReader(const std::string& name, vtkAlgorithm* reader)
 {
   if (reader)
   {
@@ -289,7 +287,7 @@ bool vtkF3DGenericImporter::CanReadFile()
 std::string vtkF3DGenericImporter::GetOutputsDescription()
 {
   std::string description;
-  for (ReaderPipeline& pipe : this->Pimpl->Readers)
+  for (const ReaderPipeline& pipe : this->Pimpl->Readers)
   {
     if (this->Pimpl->Readers.size() > 0)
     {
@@ -386,12 +384,14 @@ void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
 std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> >
 vtkF3DGenericImporter::GetGeometryActorsAndMappers()
 {
-  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > actorsAndMappers;
-  for (ReaderPipeline& pipe : this->Pimpl->Readers)
-  {
-    actorsAndMappers.emplace_back(
-      std::make_pair(pipe.GeometryActor.Get(), pipe.PolyDataMapper.Get()));
-  }
+  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > actorsAndMappers(
+    this->Pimpl->Readers.size());
+
+  std::transform(this->Pimpl->Readers.cbegin(), this->Pimpl->Readers.cend(),
+    actorsAndMappers.begin(),
+    [](const ReaderPipeline& pipe)
+    { return std::make_pair(pipe.GeometryActor.Get(), pipe.PolyDataMapper.Get()); });
+
   return actorsAndMappers;
 }
 
@@ -399,12 +399,14 @@ vtkF3DGenericImporter::GetGeometryActorsAndMappers()
 std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> >
 vtkF3DGenericImporter::GetPointSpritesActorsAndMappers()
 {
-  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > actorsAndMappers;
-  for (ReaderPipeline& pipe : this->Pimpl->Readers)
-  {
-    actorsAndMappers.emplace_back(
-      std::make_pair(pipe.PointSpritesActor.Get(), pipe.PointGaussianMapper.Get()));
-  }
+  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > actorsAndMappers(
+    this->Pimpl->Readers.size());
+
+  std::transform(this->Pimpl->Readers.cbegin(), this->Pimpl->Readers.cend(),
+    actorsAndMappers.begin(),
+    [](const ReaderPipeline& pipe)
+    { return std::make_pair(pipe.PointSpritesActor.Get(), pipe.PointGaussianMapper.Get()); });
+
   return actorsAndMappers;
 }
 
@@ -412,11 +414,14 @@ vtkF3DGenericImporter::GetPointSpritesActorsAndMappers()
 std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> >
 vtkF3DGenericImporter::GetVolumePropsAndMappers()
 {
-  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > propsAndMappers;
-  for (ReaderPipeline& pipe : this->Pimpl->Readers)
-  {
-    propsAndMappers.emplace_back(std::make_pair(pipe.VolumeProp.Get(), pipe.VolumeMapper.Get()));
-  }
+  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > propsAndMappers(
+    this->Pimpl->Readers.size());
+
+  std::transform(this->Pimpl->Readers.cbegin(), this->Pimpl->Readers.cend(),
+    propsAndMappers.begin(),
+    [](const ReaderPipeline& pipe)
+    { return std::make_pair(pipe.VolumeProp.Get(), pipe.VolumeMapper.Get()); });
+
   return propsAndMappers;
 }
 
@@ -543,7 +548,7 @@ int vtkF3DGenericImporter::GetNumberOfIndexesForColoring(bool useCellData)
 }
 
 //----------------------------------------------------------------------------
-int vtkF3DGenericImporter::FindIndexForColoring(bool useCellData, std::string arrayName)
+int vtkF3DGenericImporter::FindIndexForColoring(bool useCellData, const std::string& arrayName)
 {
   auto& data = useCellData ? this->Pimpl->CellDataArrayVectorForColoring
                            : this->Pimpl->PointDataArrayVectorForColoring;

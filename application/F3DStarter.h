@@ -40,12 +40,12 @@ public:
   F3DStarter();
   ~F3DStarter();
 
+  F3DStarter(F3DStarter const&) = delete;
+  void operator=(F3DStarter const&) = delete;
+
 private:
   class F3DInternals;
   std::unique_ptr<F3DInternals> Internals;
-
-  F3DStarter(F3DStarter const&) = delete;
-  void operator=(F3DStarter const&) = delete;
 };
 
 #endif

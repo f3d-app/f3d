@@ -68,7 +68,7 @@ class vtkF3DOCCTReader::vtkInternals
 {
 public:
   //----------------------------------------------------------------------------
-  vtkInternals(vtkF3DOCCTReader* parent)
+  explicit vtkInternals(vtkF3DOCCTReader* parent)
     : Parent(parent)
   {
   }
@@ -409,7 +409,7 @@ vtkF3DOCCTReader::~vtkF3DOCCTReader() = default;
 class ProgressIndicator : public Message_ProgressIndicator
 {
 public:
-  ProgressIndicator(vtkF3DOCCTReader* reader) { this->Reader = reader; }
+  explicit ProgressIndicator(vtkF3DOCCTReader* reader) { this->Reader = reader; }
 
 protected:
   void Show(const Message_ProgressScope&, const Standard_Boolean) override

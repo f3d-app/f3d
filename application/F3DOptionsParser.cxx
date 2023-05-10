@@ -171,7 +171,7 @@ protected:
 
   void PrintHelpPair(
     const std::string& key, const std::string& help, int keyWidth = 10, int helpWidth = 70);
-  void PrintHelp(cxxopts::Options& cxxOptions);
+  void PrintHelp(const cxxopts::Options& cxxOptions);
   void PrintVersion();
   void PrintReadersList();
   void PrintPluginsScan();
@@ -254,7 +254,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool allOptionsInitialized,
   bool parseCommandLine)
 {
-  this->FilePathForConfigBlock = filePathForConfigBlock;
+  this->FilePathForConfigBlock = std::move(filePathForConfigBlock);
 
   // When parsing multiple times, hasDefault should be forced to yes after the first pass as all
   // options are expected to be already initialized, which means they have a "default" in the
@@ -420,7 +420,7 @@ void ConfigurationOptions::PrintHelpPair(
 }
 
 //----------------------------------------------------------------------------
-void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
+void ConfigurationOptions::PrintHelp(const cxxopts::Options& cxxOptions)
 {
   const std::vector<std::pair<std::string, std::string> > examples = {
     { this->ExecutableName + " file.vtu -xtgans",
@@ -684,7 +684,7 @@ F3DOptionsParser::~F3DOptionsParser() = default;
 //----------------------------------------------------------------------------
 void F3DOptionsParser::Initialize(int argc, char** argv)
 {
-  this->ConfigOptions = std::unique_ptr<ConfigurationOptions>(new ConfigurationOptions(argc, argv));
+  this->ConfigOptions = std::make_unique<ConfigurationOptions>(argc, argv);
 }
 
 //----------------------------------------------------------------------------

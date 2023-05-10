@@ -29,11 +29,11 @@ public:
   {
   }
 
-  typedef struct ProgressDataStruct
+  struct ProgressDataStruct
   {
     vtkTimerLog* timer;
     vtkProgressBarWidget* widget;
-  } ProgressDataStruct;
+  };
 
   static void CreateProgressRepresentationAndCallback(
     ProgressDataStruct* data, vtkImporter* importer, interactor_impl* interactor)
@@ -158,14 +158,12 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
   if (!reader)
   {
     throw loader::load_failure_exception(filePath + " is not a file of a supported file format");
-    return *this;
   }
   auto vtkReader = reader->createGeometryReader(filePath);
   if (!vtkReader)
   {
     throw loader::load_failure_exception(
       filePath + " is not a file of a supported file format for default scene");
-    return *this;
   }
 
   if (windowInit)
@@ -234,7 +232,6 @@ loader& loader_impl::loadScene(const std::string& filePath)
   if (!vtksys::SystemTools::FileExists(filePath, true))
   {
     throw loader::load_failure_exception(filePath + " does not exists");
-    return *this;
   }
 
   // Recover the importer for the provided file path
@@ -243,14 +240,12 @@ loader& loader_impl::loadScene(const std::string& filePath)
   if (!reader)
   {
     throw loader::load_failure_exception(filePath + " is not a file of a supported file format");
-    return *this;
   }
   this->Internals->CurrentFullSceneImporter = reader->createSceneReader(filePath);
   if (!this->Internals->CurrentFullSceneImporter)
   {
     throw loader::load_failure_exception(
       filePath + " is not a file of a supported file format for full scene");
-    return *this;
   }
 
   this->Internals->Window.Initialize(false);

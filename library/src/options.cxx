@@ -433,6 +433,7 @@ options& options::copy(const options& from, const std::string& name)
 std::vector<std::string> options::getNames()
 {
   std::vector<std::string> names;
+  names.reserve(this->Internals->Options.size());
   for (const auto& [name, _] : this->Internals->Options)
   {
     names.emplace_back(name);
