@@ -39,6 +39,7 @@
 - vase_4comp.vti: VTK Data: BSD-3-Clause
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
 - world*: VTK Data: BSD-3-Clause
+- 16bits.*: @bisechen: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
 
 All other datasets are licensed under the BSD-3-Clause F3D license.
