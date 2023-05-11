@@ -35,7 +35,7 @@ namespace f3d::detail
 class window_impl::internals
 {
 public:
-  internals(const options& options)
+  explicit internals(const options& options)
     : Options(options)
   {
   }

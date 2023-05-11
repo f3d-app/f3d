@@ -37,7 +37,7 @@ int TestSDKImage(int argc, char* argv[])
 
   try
   {
-    f3d::image("/dummy/folder/img.png");
+    f3d::image img("/dummy/folder/img.png");
 
     std::cerr << "An exception has not been thrown when reading an incorrect path" << std::endl;
     return EXIT_FAILURE;

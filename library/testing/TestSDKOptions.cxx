@@ -151,7 +151,7 @@ int TestSDKOptions(int argc, char* argv[])
   opt.get("model.scivis.cells", val);
   try
   {
-    double& refVal = opt.getAsDoubleRef("model.scivis.cells");
+    const double& refVal = opt.getAsDoubleRef("model.scivis.cells");
   }
   catch (const f3d::options::incompatible_exception& ex)
   {
@@ -162,7 +162,7 @@ int TestSDKOptions(int argc, char* argv[])
   opt.get("dummy", val);
   try
   {
-    double& refVal = opt.getAsDoubleRef("dummy");
+    const double& refVal = opt.getAsDoubleRef("dummy");
   }
   catch (const f3d::options::inexistent_exception& ex)
   {

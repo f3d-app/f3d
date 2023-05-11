@@ -96,7 +96,7 @@ public:
    */
   struct write_exception : public exception
   {
-    write_exception(const std::string& what = "");
+    explicit write_exception(const std::string& what = "");
   };
 
   /**
@@ -105,7 +105,7 @@ public:
    */
   struct read_exception : public exception
   {
-    read_exception(const std::string& what = "");
+    explicit read_exception(const std::string& what = "");
   };
 
 private:

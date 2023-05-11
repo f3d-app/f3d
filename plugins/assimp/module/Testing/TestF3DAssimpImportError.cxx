@@ -18,7 +18,7 @@ public:
     char* message = static_cast<char*>(data);
     if (importer && message)
     {
-      this->Messages.push_back(message);
+      this->Messages.emplace_back(message);
     }
   }
 

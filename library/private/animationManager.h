@@ -50,6 +50,9 @@ public:
    */
   bool IsPlaying() const { return Playing; }
 
+  animationManager(animationManager const&) = delete;
+  void operator=(animationManager const&) = delete;
+
 protected:
   /**
    * Called by an internal timer to advance one animation tick
@@ -57,9 +60,9 @@ protected:
   void Tick();
 
   vtkImporter* Importer = nullptr;
-  window* Window;
-  interactor_impl* Interactor;
-  const options* Options;
+  window* Window = nullptr;
+  interactor_impl* Interactor = nullptr;
+  const options* Options = nullptr;
 
   std::set<double> TimeSteps;
   std::set<double>::iterator CurrentTimeStep;
@@ -70,10 +73,6 @@ protected:
   unsigned long CallBackId = 0;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
-
-private:
-  animationManager(animationManager const&) = delete;
-  void operator=(animationManager const&) = delete;
 };
 }
 }

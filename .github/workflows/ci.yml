@@ -466,7 +466,7 @@ jobs:
 
     - name: Build
       working-directory: ${{github.workspace}}/build
-      run: cmake --build . --parallel 2 --config Release
+      run: cmake --build . --parallel 2
 
     - name: Run Xvfb
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
@@ -484,3 +484,93 @@ jobs:
       with:
         path: ./build/Testing/Temporary
         name: f3d-tests-artifact-sanitizer-${{matrix.santype}}
+
+#----------------------------------------------------------------------------
+# static-analysis: Run static analysis on linux
+#----------------------------------------------------------------------------
+  static-analysis:
+    if: github.event.pull_request.draft == false
+
+    strategy:
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+    container: ghcr.io/f3d-app/f3d-ci
+
+    env:
+      CC: clang
+      CXX: clang++
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Set LFS env var
+      working-directory: ${{github.workspace}}/source
+      shell: bash
+      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{env.LFS_SHA}}
+
+    - name: Dependencies Dir
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
+
+    - name: Install VTK dependency
+      uses: ./source/.github/actions/vtk-install-dep
+      with:
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+
+    - name: Install F3D dependencies
+      uses: ./source/.github/actions/f3d-dependencies
+
+    - name: Setup Build Directory
+      working-directory: ${{github.workspace}}
+      run: mkdir build
+
+    - name: Configure
+      working-directory: ${{github.workspace}}/build
+      run: >
+        cmake ../source
+        -Werror=dev
+        -Werror=deprecated
+        --warn-uninitialized
+        -DBUILD_TESTING=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
+        -DF3D_PLUGIN_BUILD_OCCT=ON
+        -DF3D_STRICT_BUILD=ON
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+    # It's necessary to run the build step to generate F3DIcon.h
+    - name: Build
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --parallel 2
+
+    - name: Clang-tidy
+      working-directory: ${{github.workspace}}/source
+      run: run-clang-tidy -quiet -p ../build
+
+    - name: Cppcheck
+      working-directory: ${{github.workspace}}/source
+      run: >
+        cppcheck -q
+        --project=../build/compile_commands.json
+        --enable=all
+        --suppressions-list=.cppcheck.supp
+        --error-exitcode=1

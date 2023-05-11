@@ -26,7 +26,7 @@ void animationManager::Initialize(
   this->Importer = importer;
 
   // This can be -1 if animation support is not implemented in the importer
-  int availAnimations = this->Importer->GetNumberOfAnimations();
+  vtkIdType availAnimations = this->Importer->GetNumberOfAnimations();
 
   if (availAnimations > 0)
   {

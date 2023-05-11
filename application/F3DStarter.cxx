@@ -136,7 +136,7 @@ int F3DStarter::Start(int argc, char** argv)
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
     interactor.setKeyPressCallBack(
-      [this](int, std::string keySym) -> bool
+      [this](int, const std::string& keySym) -> bool
       {
         if (keySym == "Left")
         {
@@ -177,11 +177,11 @@ int F3DStarter::Start(int argc, char** argv)
       });
 
     interactor.setDropFilesCallBack(
-      [this](std::vector<std::string> filesVec) -> bool
+      [this](const std::vector<std::string>& filesVec) -> bool
       {
         this->Internals->Engine->getInteractor().stopAnimation();
         int index = -1;
-        for (std::string file : filesVec)
+        for (const std::string& file : filesVec)
         {
           index = this->AddFile(fs::path(file));
         }
@@ -341,7 +341,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
     // Detect changed options and apply the change to the dynamic options
     // options names are shared between options instance
     std::vector<std::string> optionNames = this->Internals->DynamicOptions.getNames();
-    for (auto name : optionNames)
+    for (const auto& name : optionNames)
     {
       if (!previousOptions.isSame(this->Internals->FileOptions, name))
       {
@@ -517,7 +517,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
     {
       sortedPaths.insert(entry.path());
     }
-    for (auto& entryPath : sortedPaths)
+    for (const auto& entryPath : sortedPaths)
     {
       // Recursively add all files
       this->AddFile(entryPath, quiet);

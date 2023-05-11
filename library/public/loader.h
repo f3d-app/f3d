@@ -42,7 +42,7 @@ public:
    */
   struct load_failure_exception : public exception
   {
-    load_failure_exception(const std::string& what = "")
+    explicit load_failure_exception(const std::string& what = "")
       : exception(what){};
   };
 

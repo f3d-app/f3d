@@ -7,11 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: DoozyX/clang-format-lint-action@v0.13
+    - uses: DoozyX/clang-format-lint-action@v0.16.1
       with:
         source: 'library application python'
         extensions: 'h,cxx'
-        clangFormatVersion: 13
+        clangFormatVersion: 14 # Last Ubuntu LTS version (22.04)
 
   codespell-check:
     name: Codespell Check
