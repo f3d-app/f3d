@@ -49,7 +49,7 @@ Options|Default|Description
 \-\-opacity=\<opacity\>|1.0|Set *opacity* on the geometry. Multiplied with the base color texture when present. <br>Requires a default scene. Usually used with Depth Peeling option.
 \-\-roughness=\<roughness\>|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Requires a default scene.
 \-\-metallic=\<metallic\>|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Requires a default scene.
-\-\-hrdi=\<HDRi file\>||Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, png, jpg, pnm, tiff, bmp.
+\-\-hdri=\<HDRi file\>||Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, png, jpg, pnm, tiff, bmp.
 \-\-texture-base-color=\<texture file\>||Set the texture file to control the color of the object. Please note this will be multiplied with the color and opacity options.
 \-\-texture-material=\<texture file\>||Set the texture file to control the occlusion, roughness and metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use \-\-roughness=1 \-\-metallic=1.
 \-\-texture-emissive=\<texture file\>||Set the texture file to control the emitted light of the object. Please note this will be multiplied with the emissive factor.
