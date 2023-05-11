@@ -220,6 +220,7 @@ public:
 
     vTexture->MipmapOn();
     vTexture->InterpolateOn();
+    vTexture->SetColorModeToDirectScalars();
     vTexture->SetUseSRGBColorSpace(sRGB);
 
     return vTexture;
