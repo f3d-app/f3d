@@ -175,9 +175,10 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<std::st
       libName += vtksys::DynamicLoader::LibExtension();
 
       // try search paths
-      for (const std::string& path : searchPaths)
+      for (std::string tryPath : searchPaths)
       {
-        std::string tryPath = path + '/' + libName;
+        tryPath += '/';
+        tryPath += libName;
         tryPath = vtksys::SystemTools::ConvertToOutputPath(tryPath);
         if (vtksys::SystemTools::FileExists(tryPath))
         {

@@ -282,7 +282,7 @@ protected:
   std::string TextureNormal;
 
   vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
-  double ColorRange[2];
+  double ColorRange[2] = { 0.0, 1.0 };
   bool ColorTransferFunctionConfigured = false;
 
   bool UseCellColoring = false;

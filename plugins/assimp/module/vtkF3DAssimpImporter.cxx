@@ -43,7 +43,7 @@ class vtkF3DAssimpImporter::vtkInternals
 {
 public:
   //----------------------------------------------------------------------------
-  vtkInternals(vtkF3DAssimpImporter* parent)
+  explicit vtkInternals(vtkF3DAssimpImporter* parent)
     : Parent(parent)
   {
   }
@@ -150,7 +150,7 @@ public:
           }
 
           renderer->AddLight(light);
-          this->Lights.push_back({ aLight->mName.data, light });
+          this->Lights.emplace_back(aLight->mName.data, light);
         }
       }
 
@@ -837,7 +837,7 @@ public:
   }
 
   Assimp::Importer Importer;
-  const aiScene* Scene;
+  const aiScene* Scene = nullptr;
   std::string Description;
   std::vector<vtkSmartPointer<vtkPolyData> > Meshes;
   std::vector<vtkSmartPointer<vtkProperty> > Properties;

@@ -20,7 +20,7 @@ fs::path F3DConfigFileTools::GetUserConfigFileDirectory()
   const char* appData = std::getenv("APPDATA");
   if (!appData)
   {
-    return fs::path();
+    return {};
   }
   dirPath = fs::path(appData);
 #else
@@ -35,7 +35,7 @@ fs::path F3DConfigFileTools::GetUserConfigFileDirectory()
     const char* home = std::getenv("HOME");
     if (!home || strlen(home) == 0)
     {
-      return fs::path();
+      return {};
     }
     dirPath = fs::path(home);
     dirPath /= ".config";
@@ -67,7 +67,7 @@ fs::path F3DConfigFileTools::GetBinaryConfigFileDirectory()
   catch (const fs::filesystem_error&)
   {
     f3d::log::debug("Cannot recover binary configuration file directory: ", dirPath.string());
-    return fs::path();
+    return {};
   }
 
   return dirPath;
@@ -77,9 +77,9 @@ fs::path F3DConfigFileTools::GetBinaryConfigFileDirectory()
 fs::path F3DConfigFileTools::GetConfigPath(const std::string& configSearch)
 {
   fs::path configPath;
-  std::vector<fs::path> dirsToCheck;
   try
   {
+    std::vector<fs::path> dirsToCheck;
     dirsToCheck.emplace_back(F3DConfigFileTools::GetUserConfigFileDirectory());
 #ifdef __APPLE__
     dirsToCheck.emplace_back("/usr/local/etc/f3d");
@@ -120,11 +120,11 @@ fs::path F3DConfigFileTools::GetConfigPath(const std::string& configSearch)
       }
     }
     f3d::log::debug("No configuration file for \"", configSearch, "\" found");
-    return fs::path();
+    return {};
   }
   catch (const fs::filesystem_error&)
   {
     f3d::log::error("Error recovering configuration file path: ", configPath.string());
-    return fs::path();
+    return {};
   }
 }

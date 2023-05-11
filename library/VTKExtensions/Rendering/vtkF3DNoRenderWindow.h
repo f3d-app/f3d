@@ -15,13 +15,12 @@ public:
   static vtkF3DNoRenderWindow* New();
   vtkTypeMacro(vtkF3DNoRenderWindow, vtkRenderWindow);
 
+  vtkF3DNoRenderWindow(const vtkF3DNoRenderWindow&) = delete;
+  void operator=(const vtkF3DNoRenderWindow&) = delete;
+
 protected:
   vtkF3DNoRenderWindow() = default;
   ~vtkF3DNoRenderWindow() override = default;
-
-private:
-  vtkF3DNoRenderWindow(const vtkF3DNoRenderWindow&) = delete;
-  void operator=(const vtkF3DNoRenderWindow&) = delete;
 };
 
 #endif /* vtkF3DNoRenderWindow_h */

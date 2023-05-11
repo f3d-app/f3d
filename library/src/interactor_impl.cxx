@@ -266,9 +266,10 @@ public:
     internals* self = static_cast<internals*>(clientData);
     vtkStringArray* filesArr = static_cast<vtkStringArray*>(callData);
     std::vector<std::string> filesVec;
+    filesVec.resize(filesArr->GetNumberOfTuples());
     for (int i = 0; i < filesArr->GetNumberOfTuples(); i++)
     {
-      filesVec.push_back(filesArr->GetValue(i));
+      filesVec[i] = filesArr->GetValue(i);
     }
 
     if (self->DropFilesUserCallBack(filesVec))
@@ -389,12 +390,15 @@ public:
     self->Style->OnMiddleButtonUp();
   }
 
-  std::function<bool(int, std::string)> KeyPressUserCallBack = [](int, std::string)
+  std::function<bool(int, const std::string&)> KeyPressUserCallBack = [](int, const std::string&)
   { return false; };
-  std::function<bool(std::vector<std::string>)> DropFilesUserCallBack = [](std::vector<std::string>)
-  { return false; };
+  std::function<bool(const std::vector<std::string>&)> DropFilesUserCallBack =
+    [](const std::vector<std::string>&) { return false; };
 
-  void StartInteractor() { this->VTKInteractor->Start(); }
+  void StartInteractor()
+  {
+    this->VTKInteractor->Start();
+  }
 
   void StopInteractor()
   {

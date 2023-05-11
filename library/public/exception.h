@@ -15,7 +15,7 @@ namespace f3d
  */
 struct exception : public std::runtime_error
 {
-  exception(const std::string& what = "")
+  explicit exception(const std::string& what = "")
     : std::runtime_error(what)
   {
   }

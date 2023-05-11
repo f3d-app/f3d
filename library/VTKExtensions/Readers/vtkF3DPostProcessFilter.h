@@ -21,6 +21,9 @@ public:
   static vtkF3DPostProcessFilter* New();
   vtkTypeMacro(vtkF3DPostProcessFilter, vtkDataObjectAlgorithm);
 
+  vtkF3DPostProcessFilter(const vtkF3DPostProcessFilter&) = delete;
+  void operator=(const vtkF3DPostProcessFilter&) = delete;
+
 protected:
   vtkF3DPostProcessFilter();
   ~vtkF3DPostProcessFilter() override = default;
@@ -30,10 +33,6 @@ protected:
 
   int FillInputPortInformation(int port, vtkInformation* info) override;
   int FillOutputPortInformation(int port, vtkInformation* info) override;
-
-private:
-  vtkF3DPostProcessFilter(const vtkF3DPostProcessFilter&) = delete;
-  void operator=(const vtkF3DPostProcessFilter&) = delete;
 };
 
 #endif

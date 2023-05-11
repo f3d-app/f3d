@@ -88,10 +88,10 @@ public:
   F3DOptionsParser();
   ~F3DOptionsParser();
 
-private:
   F3DOptionsParser(F3DOptionsParser const&) = delete;
   void operator=(F3DOptionsParser const&) = delete;
 
+private:
   std::unique_ptr<ConfigurationOptions> ConfigOptions;
 };
 

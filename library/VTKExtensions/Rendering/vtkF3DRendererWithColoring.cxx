@@ -200,10 +200,8 @@ void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
 {
   assert(this->Importer);
 
-  const auto& actorsAndMappers = this->Importer->GetGeometryActorsAndMappers();
-  for (size_t i = 0; i < actorsAndMappers.size(); i++)
+  for (auto& actorAndMapper : this->Importer->GetGeometryActorsAndMappers())
   {
-    auto& actorAndMapper = actorsAndMappers[i];
     actorAndMapper.first->GetProperty()->SetColor(this->SurfaceColor);
     actorAndMapper.first->GetProperty()->SetOpacity(this->Opacity);
     actorAndMapper.first->GetProperty()->SetRoughness(this->Roughness);
@@ -227,8 +225,7 @@ void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
     }
   }
 
-  const auto& psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
-  for (auto& psActorAndMapper : psActorsAndMappers)
+  for (auto& psActorAndMapper : this->Importer->GetPointSpritesActorsAndMappers())
   {
     psActorAndMapper.first->GetProperty()->SetColor(this->SurfaceColor);
     psActorAndMapper.first->GetProperty()->SetOpacity(this->Opacity);
@@ -439,7 +436,7 @@ void vtkF3DRendererWithColoring::SetColoring(
       // Not coloring
       this->ArrayIndexForColoring = -1;
     }
-    else if (arrayName != F3D_RESERVED_STRING && nIndexes == 0)
+    else if (nIndexes == 0)
     {
       // Trying to color but no array available
       F3DLog::Print(F3DLog::Severity::Warning, "No array to color with");
@@ -641,7 +638,7 @@ void vtkF3DRendererWithColoring::ConfigureColoring()
     {
       propAndMapper.first->VisibilityOff();
     }
-    else if (volumeVisible && !coloringArray)
+    else if (!coloringArray)
     {
       F3DLog::Print(
         F3DLog::Severity::Error, "Cannot use volume with this dataset or with the requested array");
@@ -953,7 +950,7 @@ std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
   size_t index = 0;
   while (true)
   {
-    index = description.find("\n", index);
+    index = description.find('\n', index);
     if (index == std::string::npos)
     {
       break;

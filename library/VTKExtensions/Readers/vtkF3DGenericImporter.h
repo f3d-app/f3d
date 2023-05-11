@@ -39,7 +39,7 @@ public:
   /**
    * Add an internal reader to generate actors from
    */
-  void AddInternalReader(const std::string& name, vtkSmartPointer<vtkAlgorithm> reader);
+  void AddInternalReader(const std::string& name, vtkAlgorithm* reader);
 
   /**
    * Remove all internal readers
@@ -106,7 +106,7 @@ public:
    * Find an index for coloring corresponding to provided arrayName if available
    * Should be called after actors have been imported
    */
-  int FindIndexForColoring(bool useCellData, std::string arrayName);
+  int FindIndexForColoring(bool useCellData, const std::string& arrayName);
 
   /**
    * Get the bounding box of all geometry actors
