@@ -136,7 +136,7 @@ jobs:
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
         -DF3D_MACOS_BUNDLE=${{ matrix.bundle_label == 'bundle' && 'ON' || 'OFF' }}
-        -DF3D_MODULE_EXTERNAL_RENDERING=${{ matrix.egl_label == 'egl' && 'OFF' || 'ON' }}
+        -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_MODULE_RAYTRACING=${{ matrix.raytracing_label == 'raytracing' && 'ON' || 'OFF' }}
         -DF3D_PLUGINS_STATIC_BUILD=${{ matrix.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
