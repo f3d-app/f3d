@@ -50,15 +50,10 @@ With some C++ STD library version, explicit linking to `stdc++fs` is not support
   * If no formats have working thumbnails, then it is an issue with the `f3d-plugin-xxx.thumbnailer` files.
   * If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/10_global.json` configuration folder using the `max-size` option.
 
-Some file managers (eg: Nautilus) are using sandboxing for thumbnails, which the F3D binary release does not support as it needs
-access to the Xorg server for rendering anything.
-A work around to this issue is to use a virtual Xorg server like Xephyr or Xvfb in all the `f3d-plugin-xxx.thumbnailer` files.
-Here is how your `Exec` line should look to use `xvfb-run`. Keep in mind running xvfb can be very slow.
-
-`Exec=xvfb-run f3d --dry-run -sta --no-background --output=%o --resolution=%s,%s %i`
-
-Another workaround is to build VTK with EGL or osmesa support and then build F3D yourself against
-this custom VTK build.
+Some file managers (eg: Nautilus) are using sandboxing for thumbnails, which the F3D standard binary release does not support as it needs
+access to the Xorg server to render anything.
+In that case, you want to use the headless version of F3D that rely on EGL instead of Xorg, available in the [releases page](https://github.com/f3d-app/f3d/releases).
+If you use the portable archive, make sure to extract it somewhere the sandboxing system has access to, eg: Nautilus uses `bwrap` and gives it access to `/usr` but not to `/opt`.
 
 ## Windows
 
