@@ -53,7 +53,7 @@ With some C++ STD library version, explicit linking to `stdc++fs` is not support
 Some file managers (eg: Nautilus) are using sandboxing for thumbnails, which the F3D standard binary release does not support as it needs
 access to the Xorg server to render anything.
 In that case, you want to use the headless version of F3D that rely on EGL instead of Xorg, available in the [releases page](https://github.com/f3d-app/f3d/releases).
-If you use the portable archive, make sure to extract it somewhere the sandboxing system has access to, eg: `/usr/opt/`.
+If you use the portable archive, make sure to extract it somewhere the sandboxing system has access to, eg: Nautilus uses `bwrap` and gives it access to `/usr` but not to `/opt`.
 
 ## Windows
 
