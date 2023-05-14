@@ -66,6 +66,11 @@ set(f3d_compile_options_private "")
 set(f3d_compile_options_public "")
 set(f3d_link_options_public "")
 
+# Headless EGL build
+if (VTK_OPENGL_HAS_EGL)
+  target_compile_definitions(f3d PRIVATE F3D_HEADLESS_BUILD)
+endif ()
+
 # F3D_STRICT_BUILD
 list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})
 if(F3D_STRICT_BUILD)

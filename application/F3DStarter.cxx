@@ -318,8 +318,12 @@ int F3DStarter::Start(int argc, char** argv)
     // Start interaction
     else
     {
+#ifdef F3D_HEADLESS_BUILD
+      f3d::log::error("This is a headless build of F3D, interactive rendering is not supported");
+#else
       window.render();
       interactor.start();
+#endif
     }
   }
 
