@@ -51,7 +51,7 @@ With some C++ STD library version, explicit linking to `stdc++fs` is not support
   * If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/10_global.json` configuration folder using the `max-size` option.
 
 Some file managers (eg: Nautilus) are using sandboxing for thumbnails, which the F3D standard binary release does not support as it needs
-access to the Xorg server for rendering anything.
+access to the Xorg server to render anything.
 In that case, you want to use the headless version of F3D that rely on EGL instead of Xorg, available in the [releases page](https://github.com/f3d-app/f3d/releases).
 If you use the portable archive, make sure to extract it somewhere the sandboxing system has access to, eg: `/usr/opt/`.
 
