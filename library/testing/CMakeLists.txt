@@ -52,7 +52,7 @@ configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFull
                "${CMAKE_BINARY_DIR}/TestSDKInteractorDropFullScene.log") # world.obj; S
 
 # External window tests
-if(F3D_MODULE_EXTERNAL_RENDERING AND VTK_VERSION VERSION_GREATER 9.0.1)
+if(F3D_MODULE_EXTERNAL_RENDERING AND NOT VTK_OPENGL_HAS_EGL AND VTK_VERSION VERSION_GREATER 9.0.1)
   find_package(glfw3 QUIET)
   if(glfw3_FOUND)
     list(APPEND libf3dSDKTests_list
