@@ -67,7 +67,7 @@ void F3DLog::WaitForUser()
 #if F3D_WINDOWS_GUI
   vtkOutputWindow* win = vtkOutputWindow::GetInstance();
   vtkF3DWin32OutputWindow* win32Win = vtkF3DWin32OutputWindow::SafeDownCast(win);
-  if (win32Win)
+  if (win32Win && win->GetDisplayMode() != vtkOutputWindow::NEVER)
   {
     win32Win->WaitForUser();
   }
