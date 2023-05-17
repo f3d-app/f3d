@@ -381,7 +381,6 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
   else
   {
     f3d::log::debug("No file to load provided.");
-    filenameInfo = "No file to load provided, please drop one into this window";
     this->Internals->CurrentFileIndex = -1;
 
     // Copy dynamic options into files options to get the global config
@@ -418,7 +417,6 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
       fs::file_size(filePath) > static_cast<std::uintmax_t>(fileAppOptions.MaxSize * BYTES_IN_MIB))
     {
       f3d::log::info("No file loaded, file is bigger than max size");
-      filenameInfo = "No file loaded, file is bigger than max size";
     }
     else
     {
@@ -493,6 +491,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
     loader.loadGeometry("", true);
   }
 
+  this->Internals->Engine->getOptions().set("ui.dropzone", !this->Internals->LoadedFile);
   this->Internals->Engine->getOptions().set("ui.filename-info", filenameInfo);
 }
 

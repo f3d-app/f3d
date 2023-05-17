@@ -12,6 +12,7 @@ list(APPEND libf3dSDKTests_list
 if(VTK_VERSION VERSION_GREATER 9.0.1)
   list(APPEND libf3dSDKTests_list
     TestSDKCompareWithFile.cxx
+    TestSDKDropZone.cxx
     TestSDKImage.cxx
     TestSDKMultiColoring.cxx
     TestSDKMultiOptions.cxx
