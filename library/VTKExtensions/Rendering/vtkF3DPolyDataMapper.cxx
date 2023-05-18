@@ -19,7 +19,11 @@ vtkStandardNewMacro(vtkF3DPolyDataMapper);
 //-----------------------------------------------------------------------------
 vtkF3DPolyDataMapper::vtkF3DPolyDataMapper()
 {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20230518)
+  this->SetVBOShiftScaleMethod(vtkPolyDataMapper::ShiftScaleMethodType::DISABLE_SHIFT_SCALE);
+#else
   this->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
+#endif
 
   // map glTF arrays to GPU VBOs
   this->MapDataArrayToVertexAttribute(
