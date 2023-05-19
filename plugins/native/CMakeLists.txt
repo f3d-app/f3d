@@ -3,7 +3,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   message(FATAL_ERROR "native plugin cannot be built externally")
 endif()
 
-include(${CMAKE_SOURCE_DIR}/cmake/f3dPlugin.cmake)
+include(f3dPlugin)
 
 f3d_plugin_init()
 

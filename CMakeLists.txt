@@ -26,7 +26,7 @@ project(F3D
 
 set(f3d_cmake_dir "${F3D_SOURCE_DIR}/cmake")
  list(INSERT CMAKE_MODULE_PATH 0 "${f3d_cmake_dir}")
-include(F3DVersion)
+include(f3dVersion)
 
 # Handle F3D_VERSION
 set(F3D_MAJOR_VERSION 2)

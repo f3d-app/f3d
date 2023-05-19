@@ -8,7 +8,7 @@ include(GNUInstallDirs)
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
   find_package(f3d REQUIRED)
 else()
-  include(${CMAKE_SOURCE_DIR}/cmake/f3dPlugin.cmake)
+  include(f3dPlugin)
 endif()
 
 find_package(Alembic 1.7 REQUIRED)
