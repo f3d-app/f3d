@@ -145,6 +145,7 @@ public:
   struct libInformation
   {
     std::string Version;
+    std::string VersionFull;
     std::string BuildDate;
     std::string BuildSystem;
     std::string Compiler;

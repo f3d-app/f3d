@@ -1,4 +1,6 @@
-# Modified from vtkEncodeString (BSD licensed)
+# Modified from vtkEncodeString from VTK Project
+# Copyright (c) 1993-2015 Ken Martin, Will Schroeder, Bill Lorensen
+# BSD 3 Clause license
 
 set(_embed_script_file "${CMAKE_CURRENT_LIST_FILE}")
 

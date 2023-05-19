@@ -457,7 +457,7 @@ void ConfigurationOptions::PrintVersion()
   f3d::log::info(F3D::AppName + " " + F3D::AppVersion + "\n");
   f3d::log::info(F3D::AppTitle);
   auto libInfo = f3d::engine::getLibInfo();
-  f3d::log::info("Version: " + libInfo.Version + ".");
+  f3d::log::info("Version: " + libInfo.VersionFull + ".");
   f3d::log::info("Build date: " + libInfo.BuildDate + ".");
   f3d::log::info("Build system: " + libInfo.BuildSystem + ".");
   f3d::log::info("Compiler: " + libInfo.Compiler + ".");
