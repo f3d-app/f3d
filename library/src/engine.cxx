@@ -277,6 +277,7 @@ engine::libInformation engine::getLibInfo()
 {
   libInformation libInfo;
   libInfo.Version = detail::LibVersion;
+  libInfo.VersionFull = detail::LibVersionFull;
   libInfo.BuildDate = detail::LibBuildDate;
   libInfo.BuildSystem = detail::LibBuildSystem;
   libInfo.Compiler = detail::LibCompiler;
