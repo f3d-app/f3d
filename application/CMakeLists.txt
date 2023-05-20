@@ -1,5 +1,5 @@
 # Generate F3DIcon buffer
-include("${CMAKE_SOURCE_DIR}/cmake/f3dEmbed.cmake")
+include("f3dEmbed")
 
 f3d_embed_file(
   INPUT "${CMAKE_SOURCE_DIR}/resources/logo32.png"
