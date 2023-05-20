@@ -277,6 +277,7 @@ engine::libInformation engine::getLibInfo()
 {
   libInformation libInfo;
   libInfo.Version = detail::LibVersion;
+  libInfo.VersionFull = detail::LibVersionFull;
   libInfo.BuildDate = detail::LibBuildDate;
   libInfo.BuildSystem = detail::LibBuildSystem;
   libInfo.Compiler = detail::LibCompiler;
@@ -297,8 +298,23 @@ engine::libInformation engine::getLibInfo()
 #endif
   libInfo.ExternalRenderingModule = tmp;
 
-  libInfo.VTKVersion = std::string(VTK_VERSION) + std::string(" (build ") +
-    std::to_string(VTK_BUILD_VERSION) + std::string(")");
+  // First version of VTK including the version check (and the feature used)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
+  std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
+  if (!vtkVersion.empty())
+  {
+    libInfo.VTKVersion = vtkVersion;
+    std::string date = std::to_string(vtkVersion::GetVTKBuildVersion());
+    if (date.size() == 8)
+    {
+      libInfo.VTKVersion += std::string(" (date: ") + date + ")";
+    }
+  }
+  else
+#endif
+  {
+    libInfo.VTKVersion = vtkVersion::GetVTKVersion();
+  }
 
   libInfo.PreviousCopyright = "Copyright (C) 2019-2021 Kitware SAS";
   libInfo.Copyright = "Copyright (C) 2021-2023 Michael Migliore, Mathieu Westphal";
