@@ -46,25 +46,26 @@ function(f3d_determine_version source_dir git_command var_prefix)
   if(DEFINED tmp_VERSION)
     if (NOT tmp_VERSION STREQUAL ${var_prefix}_VERSION)
       message(WARNING
-        "Version from git (${tmp_VERSION}) disagrees with hard coded version (${${var_prefix}_VERSION}). Either update the git tags or main CMakeLists.txt.")
+        "Version from git (${tmp_VERSION}) disagrees with hard coded version (${${var_prefix}_VERSION}). "
+        "Either update the git tags or main CMakeLists.txt. Discarding version from git.")
+    else ()
+      foreach(suffix VERSION MAJOR_VERSION MINOR_VERSION PATCH_VERSION
+                     PATCH_VERSION_EXTRA VERSION_FULL VERSION_IS_RELEASE)
+        set(${var_prefix}_${suffix} ${tmp_${suffix}} PARENT_SCOPE)
+      endforeach()
     endif()
-    foreach(suffix VERSION MAJOR_VERSION MINOR_VERSION PATCH_VERSION
-                   PATCH_VERSION_EXTRA VERSION_FULL VERSION_IS_RELEASE)
-      set(${var_prefix}_${suffix} ${tmp_${suffix}} PARENT_SCOPE)
-    endforeach()
   else()
     message(STATUS
       "Could not use git to determine source version, using version ${${var_prefix}_VERSION}")
   endif()
 endfunction()
 
-# Extracts components from a version string. See determine_version() for usage.
+# Extracts components from a version string. See f3d_determine_version() for usage.
 function(f3d_extract_version_components version_string var_prefix)
   string(REGEX MATCH "^v(([0-9]+)\\.([0-9]+)\\.([0-9]+)-?(.*))$"
     version_matches "${version_string}")
   if(CMAKE_MATCH_0)
-    # note, we don't use CMAKE_MATCH_0 for `full` since it may or may not have
-    # the `v` prefix.
+    # note, we don't use CMAKE_MATCH_0 for `full` since it contains the `v` prefix.
     set(full ${CMAKE_MATCH_1})
     set(major ${CMAKE_MATCH_2})
     set(minor ${CMAKE_MATCH_3})
