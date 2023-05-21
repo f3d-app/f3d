@@ -108,6 +108,8 @@ set_target_properties(libf3d PROPERTIES
   POSITION_INDEPENDENT_CODE ON
   OUTPUT_NAME "f3d"
   PDB_NAME "libf3d"
+  VERSION ${F3D_VERSION}
+  SOVERSION ${F3D_MAJOR_VERSION}
   )
 
 # Generate export macros for exported public APIs
