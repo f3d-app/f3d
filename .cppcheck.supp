@@ -10,7 +10,9 @@ unusedFunction
 *:*opencascade/*.hxx
 
 // specific checks
-preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx
-preprocessorErrorDirective:library/src/engine.cxx
-unknownMacro:library/VTKExtensions/Applicative/vtkF3DObjectFactory.cxx
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
+noExplicitConstructor:library/public/types.h
+preprocessorErrorDirective:library/src/engine.cxx
+preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx
+unknownMacro:library/VTKExtensions/Applicative/vtkF3DObjectFactory.cxx
+unusedVariable:*factory.cxx*
