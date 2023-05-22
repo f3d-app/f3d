@@ -15,3 +15,4 @@ noExplicitConstructor:library/public/types.h
 preprocessorErrorDirective:library/src/engine.cxx
 preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx
 unknownMacro:library/VTKExtensions/Applicative/vtkF3DObjectFactory.cxx
+unusedVariable:library/src/factory.cxx
