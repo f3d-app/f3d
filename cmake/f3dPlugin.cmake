@@ -263,10 +263,12 @@ macro(f3d_plugin_build)
     # External plugin path
     set(_f3d_include_path "${f3d_INCLUDE_DIR}/f3d")
     set(_f3d_config_dir ${f3d_CONFIG_DIR})
+    set(_f3d_plugins_install_dir ${f3d_PLUGINS_INSTALL_DIR})
   else()
     # In-source plugin path
     set(_f3d_include_path "${CMAKE_SOURCE_DIR}/library/plugin")
     set(_f3d_config_dir ${f3d_config_dir})
+    set(_f3d_plugins_install_dir ${F3D_PLUGINS_INSTALL_DIR})
   endif()
 
   target_include_directories(f3d-plugin-${F3D_PLUGIN_NAME}
@@ -287,9 +289,8 @@ macro(f3d_plugin_build)
   if(NOT F3D_PLUGIN_IS_STATIC OR NOT BUILD_SHARED_LIBS)
     install(TARGETS f3d-plugin-${F3D_PLUGIN_NAME}
       EXPORT ${export_name}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT plugin
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT plugin
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT plugin)
+      ARCHIVE DESTINATION ${_f3d_plugins_install_dir} COMPONENT plugin
+      LIBRARY DESTINATION ${_f3d_plugins_install_dir} COMPONENT plugin)
   endif()
 
   # Install configurations folders

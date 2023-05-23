@@ -169,6 +169,8 @@ mark_as_advanced(F3D_PLUGINS_STATIC_BUILD)
 if (F3D_MACOS_BUNDLE AND NOT F3D_PLUGINS_STATIC_BUILD)
   message(FATAL_ERROR "Building a macOS Bundle do not support loading plugins dynamically")
 endif()
+set(F3D_PLUGINS_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE STRING "Plugins install directory relative path")
+mark_as_advanced(F3D_PLUGINS_INSTALL_DIR)
 add_subdirectory(plugins)
 
 # libf3d target
