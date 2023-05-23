@@ -200,7 +200,7 @@ std::vector<std::string> ConfigurationOptions::GetPluginSearchPaths() const
   // Add a executable related path
   auto tmpPath = F3DSystemTools::GetApplicationPath();
   tmpPath = tmpPath.parent_path().parent_path();
-  tmpPath /= "lib";
+  tmpPath /= F3D::PluginsInstallDir;
   searchPaths.push_back(tmpPath.string());
   return searchPaths;
 #endif
