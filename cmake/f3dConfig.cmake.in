@@ -14,6 +14,7 @@
 #   f3d_BINDINGS_PYTHON            Will be enabled if F3D was built with python bindings
 #   f3d_BINDINGS_JAVA              Will be enabled if F3D was built with java bindings
 #   f3d_CONFIG_DIR                 Path to F3D configuration directory, can be absolute or relative
+#   f3d_PLUGINS_INSTALL_DIR        Path to F3D plugins install directory, can be absolute or relative
 
 @PACKAGE_INIT@
 
@@ -22,6 +23,7 @@ set(f3d_MODULE_RAYTRACING "@F3D_MODULE_RAYTRACING@")
 set(f3d_BINDINGS_PYTHON "@F3D_BINDINGS_PYTHON@")
 set(f3d_BINDINGS_JAVA "@F3D_BINDINGS_JAVA@")
 set(f3d_CONFIG_DIR "@f3d_config_dir@")
+set(f3d_PLUGINS_INSTALL_DIR "@F3D_PLUGINS_INSTALL_DIR@")
 
 # Provide a f3d_embed_file method for embedding image into source code
 include("${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake")
