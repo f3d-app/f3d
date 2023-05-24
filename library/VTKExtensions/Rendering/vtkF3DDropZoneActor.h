@@ -1,3 +1,13 @@
+/**
+ * @class   vtkF3DDropZoneActor
+ * @brief   A F3D dedicated drop zone actor
+ *
+ * This actor show a drop zone with a fixed text
+ * in the center of the screen. The main featurere
+ * is the geometry of the dropzone that adapts to the size of
+ * of the viewport.
+ */
+
 #ifndef vtkF3DDropZoneActor_h
 #define vtkF3DDropZoneActor_h
 
@@ -13,14 +23,22 @@ class vtkPolyDataMapper2D;
 class vtkF3DDropZoneActor : public vtkActor2D
 {
 public:
-  vtkTypeMacro(vtkF3DDropZoneActor, vtkActor2D);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
-
   static vtkF3DDropZoneActor* New();
+  vtkTypeMacro(vtkF3DDropZoneActor, vtkActor2D);
 
+  /**
+   * Get the text property used to display text in this actor
+   */
   vtkTextProperty* GetTextProperty();
 
+  /**
+   * Release private actor graphic ressources
+   */
   void ReleaseGraphicsResources(vtkWindow*) override;
+
+  /**
+   * Render private actors overlay
+   */
   int RenderOverlay(vtkViewport* viewport) override;
 
 protected:
@@ -31,12 +49,15 @@ private:
   vtkF3DDropZoneActor(const vtkF3DDropZoneActor&) = delete;
   void operator=(const vtkF3DDropZoneActor&) = delete;
 
-  void BuildBorderGeometry(vtkViewport* viewport);
+  /**
+   * Build the border geometry if the size of the viewport changed
+   * Return true on success, false otherwise
+   */
+  bool BuildBorderGeometry(vtkViewport* viewport);
 
   vtkNew<vtkActor2D> TextActor;
   vtkNew<vtkTextMapper> TextMapper;
-
-  int ComputedBorderViewportSize[2] = {-1, -1};
+  int ComputedBorderViewportSize[2] = { -1, -1 };
   vtkNew<vtkPolyData> BorderPolyData;
   vtkNew<vtkActor2D> BorderActor;
   vtkNew<vtkPolyDataMapper2D> BorderMapper;
