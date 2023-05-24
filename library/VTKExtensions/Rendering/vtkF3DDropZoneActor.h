@@ -32,7 +32,7 @@ public:
   vtkTextProperty* GetTextProperty();
 
   /**
-   * Release private actor graphic ressources
+   * Release private actor graphic resources
    */
   void ReleaseGraphicsResources(vtkWindow*) override;
 
