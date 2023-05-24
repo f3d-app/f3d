@@ -792,6 +792,12 @@ void vtkF3DRenderer::SetFilenameInfo(const std::string& info)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDropZoneInfo(const std::string& info)
+{
+  this->DropZoneActor->SetDropText(info);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseDepthPeelingPass(bool use)
 {
   if (this->UseDepthPeelingPass != use)

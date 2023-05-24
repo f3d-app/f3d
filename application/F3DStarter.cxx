@@ -67,6 +67,8 @@ public:
 F3DStarter::F3DStarter()
   : Internals(std::make_unique<F3DStarter::F3DInternals>())
 {
+  // Set option outside of command line and config file
+  this->Internals->DynamicOptions.set("ui.dropzone-info", "Drop a file to open it\nPress H to show cheatsheet");
 }
 
 //----------------------------------------------------------------------------

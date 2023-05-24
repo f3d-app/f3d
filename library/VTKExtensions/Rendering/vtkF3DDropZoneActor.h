@@ -27,6 +27,11 @@ public:
   vtkTypeMacro(vtkF3DDropZoneActor, vtkActor2D);
 
   /**
+   * Set the drop text to display
+   */
+  vtkSetMacro(DropText, std::string);
+
+  /**
    * Get the text property used to display text in this actor
    */
   vtkTextProperty* GetTextProperty();
@@ -55,6 +60,7 @@ private:
    */
   bool BuildBorderGeometry(vtkViewport* viewport);
 
+  std::string DropText;
   vtkNew<vtkActor2D> TextActor;
   vtkNew<vtkTextMapper> TextMapper;
   int ComputedBorderViewportSize[2] = { -1, -1 };

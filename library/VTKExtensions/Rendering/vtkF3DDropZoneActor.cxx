@@ -7,16 +7,12 @@
 #include <vtkTextProperty.h>
 #include <vtkViewport.h>
 
-constexpr int tickWidth = 3;
-constexpr int tickLength = 10;
-
 vtkStandardNewMacro(vtkF3DDropZoneActor);
 
 //------------------------------------------------------------------------------
 vtkF3DDropZoneActor::vtkF3DDropZoneActor()
 {
   this->TextActor->SetMapper(this->TextMapper);
-  this->TextMapper->SetInput("Drop a file to open it\nPress H to show cheatsheet");
   vtkTextProperty* tProp = this->TextMapper->GetTextProperty();
   tProp->SetFontSize(25);
   tProp->SetJustificationToCentered();
@@ -42,6 +38,7 @@ int vtkF3DDropZoneActor::RenderOverlay(vtkViewport* viewport)
   const int* vSize = viewport->GetSize();
 
   // Simply position text actor in the middle
+  this->TextMapper->SetInput(this->DropText.c_str());
   this->TextActor->SetPosition(vSize[0] / 2, vSize[1] / 2);
   this->TextActor->RenderOverlay(viewport);
 
@@ -55,6 +52,9 @@ int vtkF3DDropZoneActor::RenderOverlay(vtkViewport* viewport)
 //------------------------------------------------------------------------------
 bool vtkF3DDropZoneActor::BuildBorderGeometry(vtkViewport* viewport)
 {
+  constexpr int tickWidth = 3;
+  constexpr int tickLength = 10;
+
   const int* vSize = viewport->GetSize();
   if (vSize[0] == this->ComputedBorderViewportSize[0] &&
     vSize[1] == this->ComputedBorderViewportSize[1])
@@ -62,96 +62,60 @@ bool vtkF3DDropZoneActor::BuildBorderGeometry(vtkViewport* viewport)
     return true;
   }
 
-  // Create a border at 80% of the viewport
+  // padding is 10% of shortest side
+  const int padding = std::min(vSize[0], vSize[1]) * 0.1;
+  const int borderW = vSize[0] - 2 * padding;
+  const int borderH = vSize[1] - 2 * padding;
+
+  // number of ticks assuming spacing == tickLength
+  const int nTicksW = borderW / (tickLength * 2);
+  const int nTicksH = borderH / (tickLength * 2);
+
+  // recompute uniform spacing
+  const double spacingW = static_cast<double>(borderW - nTicksW * tickLength) / (nTicksW - 1);
+  const double spacingH = static_cast<double>(borderH - nTicksH * tickLength) / (nTicksH - 1);
+
   vtkNew<vtkPoints> borderPoints;
   vtkNew<vtkCellArray> borderCells;
-  vtkIdType pointCnt = 0;
+  borderPoints->SetNumberOfPoints(4 * (2 * nTicksW + 2 * nTicksH));
+  vtkIdType index = 0;
 
-  int borderCorner[2];
-  borderCorner[0] = vSize[0] * 0.1;
-  borderCorner[1] = vSize[1] * 0.1;
-  int borderSize[2];
-  borderSize[0] = vSize[0] * 0.8;
-  borderSize[1] = vSize[1] * 0.8;
-
-  // Determine the number of "ticks" by side, excluding corners, one "tick" is tickLength pixels
-  // long, tickWidth pixels wide
-  int nTicksSides[2];
-  nTicksSides[0] = borderSize[0] / (2 * tickLength) - 1;
-  nTicksSides[1] = borderSize[1] / (2 * tickLength) - 1;
-  if (nTicksSides[0] < 0 || nTicksSides[1] < 0)
+  // Draw top/bottom
+  for (int i = 0; i < nTicksW; ++i)
   {
-    return false;
-  }
-
-  // Compute the remaining offsets to equalize it between corners
-  int emptyOffsets[2];
-  emptyOffsets[0] = (borderSize[0] - (nTicksSides[0] + 1) * (2 * tickLength)) / 4;
-  emptyOffsets[1] = (borderSize[1] - (nTicksSides[1] + 1) * (2 * tickLength)) / 4;
-
-  // left/right, up/down and four corners
-  borderPoints->SetNumberOfPoints(4 * (nTicksSides[0] * 2 + nTicksSides[1] * 2) + 6 * 4);
-
-  for (int iSide = 0; iSide < 4; iSide++)
-  {
-    int xTag = iSide % 2;             // 0 1 0 1
-    int yTag = ((iSide + 1) / 2) % 2; // 0 1 1 0
-
-    int xMult = 1 - xTag - yTag; // 1 -1 0 0
-    int yMult = xTag - yTag;     // 0 0 -1 1
-
-    // Compute the corner point
-    int basePoint[2];
-    basePoint[0] = borderCorner[0] + borderSize[0] * xTag;
-    basePoint[1] = borderCorner[1] + borderSize[1] * yTag;
-
-    // Create corner geometries. A corner is a L shaped geometry, tickWidth pixels wides, tickLength
-    // pixels on first side, tickLength pixels on second side
-    vtkIdType ids[6];
-    ids[0] = pointCnt;
-    borderPoints->SetPoint(pointCnt++, basePoint[0], basePoint[1], 0.);
-    ids[1] = pointCnt;
-    borderPoints->SetPoint(
-      pointCnt++, basePoint[0] + tickLength * xMult, basePoint[1] + tickLength * yMult, 0.);
-    ids[2] = pointCnt;
-    borderPoints->SetPoint(pointCnt++, basePoint[0] + tickLength * xMult - tickWidth * yMult,
-      basePoint[1] + tickWidth * xMult + tickLength * yMult, 0.);
-    ids[3] = pointCnt;
-    borderPoints->SetPoint(pointCnt++, basePoint[0] + tickWidth * xMult - tickWidth * yMult,
-      basePoint[1] + tickWidth * xMult + tickWidth * yMult, 0.);
-    ids[4] = pointCnt;
-    borderPoints->SetPoint(pointCnt++, basePoint[0] + tickWidth * xMult - tickLength * yMult,
-      basePoint[1] + tickLength * xMult + tickWidth * yMult, 0.);
-    ids[5] = pointCnt;
-    borderPoints->SetPoint(
-      pointCnt++, basePoint[0] - tickLength * yMult, basePoint[1] + tickLength * xMult, 0.);
-    borderCells->InsertNextCell(6, ids);
-
-    // Move base point to first tick of the side
-    basePoint[0] += (tickLength * 2 + emptyOffsets[0]) * xMult;
-    basePoint[1] += (tickLength * 2 + emptyOffsets[1]) * yMult;
-
-    // Create tick geometries. A tick is a square.
-    for (int iTick = 0; iTick < nTicksSides[iSide / 2]; iTick++)
+    const int x0 = padding + tickLength * i + spacingW * i;
+    const int x1 = x0 + tickLength;
+    const int y[2] = { padding, vSize[1] - padding };
+    const int h[2] = { +tickWidth, -tickWidth };
+    for (int j = 0; j < 2; ++j)
     {
-      int tickBasePoint[2];
-      tickBasePoint[0] = basePoint[0] + (tickLength * 2) * xMult * iTick;
-      tickBasePoint[1] = basePoint[1] + (tickLength * 2) * yMult * iTick;
-
-      ids[0] = pointCnt;
-      borderPoints->SetPoint(pointCnt++, tickBasePoint[0], tickBasePoint[1], 0.);
-      ids[1] = pointCnt;
-      borderPoints->SetPoint(pointCnt++, tickBasePoint[0] + tickLength * xMult,
-        tickBasePoint[1] + tickLength * yMult, 0.);
-      ids[2] = pointCnt;
-      borderPoints->SetPoint(pointCnt++, tickBasePoint[0] + tickLength * xMult - tickWidth * yMult,
-        tickBasePoint[1] + tickWidth * xMult + tickLength * yMult, 0.);
-      ids[3] = pointCnt;
-      borderPoints->SetPoint(
-        pointCnt++, tickBasePoint[0] - tickWidth * yMult, tickBasePoint[1] + tickWidth * xMult, 0.);
+      vtkIdType ids[4] = { index++, index++, index++, index++ };
+      borderPoints->SetPoint(ids[0], x0, y[j] + h[j], 0.);
+      borderPoints->SetPoint(ids[1], x1, y[j] + h[j], 0.);
+      borderPoints->SetPoint(ids[2], x1, y[j], 0.);
+      borderPoints->SetPoint(ids[3], x0, y[j], 0.);
       borderCells->InsertNextCell(4, ids);
     }
   }
+
+  // Draw left/right
+  for (int i = 0; i < nTicksH; ++i)
+  {
+    const int y0 = padding + tickLength * i + spacingH * i;
+    const int y1 = y0 + tickLength;
+    const int x[2] = { padding, vSize[0] - padding };
+    const int w[2] = { +tickWidth, -tickWidth };
+    for (int j = 0; j < 2; ++j)
+    {
+      vtkIdType ids[4] = { index++, index++, index++, index++ };
+      borderPoints->SetPoint(ids[0], x[j], y0, 0.);
+      borderPoints->SetPoint(ids[1], x[j] + w[j], y0, 0.);
+      borderPoints->SetPoint(ids[2], x[j] + w[j], y1, 0.);
+      borderPoints->SetPoint(ids[3], x[j], y1, 0.);
+      borderCells->InsertNextCell(4, ids);
+    }
+  }
+
   this->BorderPolyData->SetPoints(borderPoints);
   this->BorderPolyData->SetPolys(borderCells);
 

@@ -280,6 +280,7 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("ui.metadata"));
   this->Internals->Renderer->ShowCheatSheet(this->Internals->Options.getAsBool("ui.cheatsheet"));
   this->Internals->Renderer->ShowDropZone(this->Internals->Options.getAsBool("ui.dropzone"));
+  this->Internals->Renderer->SetDropZoneInfo(this->Internals->Options.getAsString("ui.dropzone-info"));
 
   this->Internals->Renderer->SetUseRaytracing(
     this->Internals->Options.getAsBool("render.raytracing.enable"));
