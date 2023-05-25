@@ -35,7 +35,7 @@ void vtkF3DDropZoneActor::ReleaseGraphicsResources(vtkWindow* win)
 //------------------------------------------------------------------------------
 int vtkF3DDropZoneActor::RenderOverlay(vtkViewport* viewport)
 {
-  const int* vSize = viewport->GetSize();
+  int* vSize = viewport->GetSize();
 
   // Simply position text actor in the middle
   this->TextMapper->SetInput(this->DropText.c_str());
@@ -55,7 +55,7 @@ bool vtkF3DDropZoneActor::BuildBorderGeometry(vtkViewport* viewport)
   constexpr int tickWidth = 3;
   constexpr int tickLength = 10;
 
-  const int* vSize = viewport->GetSize();
+  int* vSize = viewport->GetSize();
   if (vSize[0] == this->ComputedBorderViewportSize[0] &&
     vSize[1] == this->ComputedBorderViewportSize[1])
   {
@@ -63,17 +63,17 @@ bool vtkF3DDropZoneActor::BuildBorderGeometry(vtkViewport* viewport)
   }
 
   // padding is 10% of shortest side
-  const int padding = std::min(vSize[0], vSize[1]) * 0.1;
-  const int borderW = vSize[0] - 2 * padding;
-  const int borderH = vSize[1] - 2 * padding;
+  int padding = static_cast<int>(std::min(vSize[0], vSize[1]) * 0.1);
+  int borderW = vSize[0] - 2 * padding;
+  int borderH = vSize[1] - 2 * padding;
 
   // number of ticks assuming spacing == tickLength
-  const int nTicksW = borderW / (tickLength * 2);
-  const int nTicksH = borderH / (tickLength * 2);
+  int nTicksW = static_cast<int>(std::ceil(borderW / (tickLength * 2.0)));
+  int nTicksH = static_cast<int>(std::ceil(borderH / (tickLength * 2.0)));
 
   // recompute uniform spacing
-  const double spacingW = static_cast<double>(borderW - nTicksW * tickLength) / (nTicksW - 1);
-  const double spacingH = static_cast<double>(borderH - nTicksH * tickLength) / (nTicksH - 1);
+  double spacingW = static_cast<double>(borderW - nTicksW * tickLength) / (nTicksW - 1);
+  double spacingH = static_cast<double>(borderH - nTicksH * tickLength) / (nTicksH - 1);
 
   vtkNew<vtkPoints> borderPoints;
   vtkNew<vtkCellArray> borderCells;
@@ -83,10 +83,10 @@ bool vtkF3DDropZoneActor::BuildBorderGeometry(vtkViewport* viewport)
   // Draw top/bottom
   for (int i = 0; i < nTicksW; ++i)
   {
-    const int x0 = padding + tickLength * i + spacingW * i;
-    const int x1 = x0 + tickLength;
-    const int y[2] = { padding, vSize[1] - padding };
-    const int h[2] = { +tickWidth, -tickWidth };
+    int x0 = padding + tickLength * i + spacingW * i;
+    int x1 = x0 + tickLength;
+    int y[2] = { padding, vSize[1] - padding };
+    int h[2] = { +tickWidth, -tickWidth };
     for (int j = 0; j < 2; ++j)
     {
       vtkIdType ids[4] = { index++, index++, index++, index++ };
@@ -101,10 +101,10 @@ bool vtkF3DDropZoneActor::BuildBorderGeometry(vtkViewport* viewport)
   // Draw left/right
   for (int i = 0; i < nTicksH; ++i)
   {
-    const int y0 = padding + tickLength * i + spacingH * i;
-    const int y1 = y0 + tickLength;
-    const int x[2] = { padding, vSize[0] - padding };
-    const int w[2] = { +tickWidth, -tickWidth };
+    int y0 = padding + tickLength * i + spacingH * i;
+    int y1 = y0 + tickLength;
+    int x[2] = { padding, vSize[0] - padding };
+    int w[2] = { +tickWidth, -tickWidth };
     for (int j = 0; j < 2; ++j)
     {
       vtkIdType ids[4] = { index++, index++, index++, index++ };
