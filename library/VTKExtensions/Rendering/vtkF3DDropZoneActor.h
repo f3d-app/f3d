@@ -3,7 +3,7 @@
  * @brief   A F3D dedicated drop zone actor
  *
  * This actor show a drop zone with a fixed text
- * in the center of the screen. The main featurere
+ * in the center of the screen. The main feature
  * is the geometry of the dropzone that adapts to the size of
  * of the viewport.
  */
