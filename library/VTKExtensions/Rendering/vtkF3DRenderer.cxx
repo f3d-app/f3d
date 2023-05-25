@@ -4,6 +4,7 @@
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
 #include "vtkF3DConfigure.h"
+#include "vtkF3DDropZoneActor.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
 
@@ -143,11 +144,13 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
 
   this->FilenameActor->VisibilityOff();
   this->MetaDataActor->VisibilityOff();
   this->TimerActor->VisibilityOff();
   this->CheatSheetActor->VisibilityOff();
+  this->DropZoneActor->VisibilityOff();
 }
 
 //----------------------------------------------------------------------------
@@ -176,6 +179,7 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   this->AddActor(this->TimerActor);
   this->AddActor(this->MetaDataActor);
   this->AddActor(this->CheatSheetActor);
+  this->AddActor(this->DropZoneActor);
 
   if (this->HasHDRI)
   {
@@ -698,12 +702,14 @@ void vtkF3DRenderer::ConfigureTextActors()
   this->MetaDataActor->GetTextProperty()->SetColor(textColor);
   this->TimerActor->GetTextProperty()->SetColor(textColor);
   this->CheatSheetActor->GetTextProperty()->SetColor(textColor);
+  this->DropZoneActor->GetTextProperty()->SetColor(textColor);
 
   // Font
   this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
   this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
   if (!this->FontFile.empty())
   {
     std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(this->FontFile);
@@ -717,6 +723,8 @@ void vtkF3DRenderer::ConfigureTextActors()
       this->TimerActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
       this->CheatSheetActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
       this->CheatSheetActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+      this->DropZoneActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->DropZoneActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
     }
     else
     {
@@ -781,6 +789,12 @@ void vtkF3DRenderer::SetFilenameInfo(const std::string& info)
 {
   this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, info.c_str());
   this->RenderPassesConfigured = false;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDropZoneInfo(const std::string& info)
+{
+  this->DropZoneActor->SetDropText(info);
 }
 
 //----------------------------------------------------------------------------
@@ -960,6 +974,16 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, cheatSheetText.str().c_str());
     this->CheatSheetActor->RenderOpaqueGeometry(this);
     this->CheatSheetConfigured = true;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowDropZone(bool show)
+{
+  if (this->DropZoneVisible != show)
+  {
+    this->DropZoneVisible = show;
+    this->DropZoneActor->SetVisibility(show);
   }
 }
 
