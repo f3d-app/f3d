@@ -142,6 +142,8 @@ options::options()
   this->Internals->init("ui.filename-info", std::string());
   this->Internals->init("ui.fps", false);
   this->Internals->init("ui.cheatsheet", false);
+  this->Internals->init("ui.dropzone", false);
+  this->Internals->init("ui.dropzone-info", std::string());
   this->Internals->init("ui.metadata", false);
   this->Internals->init("ui.font-file", std::string());
   this->Internals->init("ui.loader-progress", false);

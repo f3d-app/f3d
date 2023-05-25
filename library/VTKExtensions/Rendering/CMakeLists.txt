@@ -1,6 +1,7 @@
 set(classes
   vtkF3DCachedLUTTexture
   vtkF3DCachedSpecularTexture
+  vtkF3DDropZoneActor
   vtkF3DHexagonalBokehBlurPass
   vtkF3DInteractorEventRecorder
   vtkF3DInteractorStyle
