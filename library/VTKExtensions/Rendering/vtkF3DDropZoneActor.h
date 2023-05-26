@@ -46,6 +46,16 @@ public:
    */
   int RenderOverlay(vtkViewport* viewport) override;
 
+  /**
+   * Reimplemented for noop
+   */
+  int RenderTranslucentPolygonalGeometry(vtkViewport* vtkNotUsed(viewport)) override { return 0; };
+
+  /**
+   * Reimplemented for noop
+   */
+  int RenderOpaqueGeometry(vtkViewport* vtkNotUsed(viewport)) override { return 0; };
+
 protected:
   vtkF3DDropZoneActor();
   ~vtkF3DDropZoneActor() override;
