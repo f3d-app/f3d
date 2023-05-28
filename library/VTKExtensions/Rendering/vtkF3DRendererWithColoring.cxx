@@ -893,7 +893,12 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 {
-  assert(!this->Importer);
+  if (!this->Importer)
+  {
+    this->Superclass::FillCheatSheetHotkeys(cheatSheetText);
+    return;
+  }
+
 
   vtkF3DGenericImporter::ColoringInfo info;
   bool hasColoring =
