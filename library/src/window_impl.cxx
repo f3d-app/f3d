@@ -423,7 +423,7 @@ void window_impl::SetImporterForColoring(vtkF3DGenericImporter* importer)
 {
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
-  if (renWithColor && importer)
+  if (renWithColor)
   {
     renWithColor->SetImporter(importer);
   }

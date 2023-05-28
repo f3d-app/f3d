@@ -138,6 +138,9 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
     // Reset the generic importer
     this->Internals->GenericImporter->RemoveInternalReaders();
 
+    // Remove the importer from the renderer
+    this->Internals->Window.SetImporterForColoring(nullptr);
+
     // Window initialization is needed
     this->Internals->Window.Initialize(true);
   }

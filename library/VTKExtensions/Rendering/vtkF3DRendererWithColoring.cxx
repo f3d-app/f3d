@@ -198,10 +198,7 @@ void vtkF3DRendererWithColoring::SetTextureNormal(const std::string& tex)
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
 {
-  if (!this->Importer)
-  {
-    return;
-  }
+  assert(this->Importer);
 
   for (auto& actorAndMapper : this->Importer->GetGeometryActorsAndMappers())
   {
@@ -363,6 +360,11 @@ void vtkF3DRendererWithColoring::SetColormap(const std::vector<double>& colormap
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::CycleScalars(CycleType type)
 {
+  if (!this->Importer)
+  {
+    return;
+  }
+
   switch (type)
   {
     case (CycleType::NONE):
@@ -396,8 +398,10 @@ void vtkF3DRendererWithColoring::CycleScalars(CycleType type)
 //----------------------------------------------------------------------------
 vtkF3DRendererWithColoring::CycleType vtkF3DRendererWithColoring::CheckColoring()
 {
+  assert(this->Importer);
+
   // Never force change of anything if we are currently not coloring
-  if (!this->Importer || this->ArrayIndexForColoring == -1)
+  if (this->ArrayIndexForColoring == -1)
   {
     return CycleType::NONE;
   }
@@ -490,7 +494,7 @@ std::string vtkF3DRendererWithColoring::GetColoringArrayName()
 {
   if (!this->Importer)
   {
-    return "";
+    return F3D_RESERVED_STRING;
   }
 
   vtkF3DGenericImporter::ColoringInfo info;
@@ -515,6 +519,8 @@ void vtkF3DRendererWithColoring::UpdateActors()
 {
   if (!this->Importer)
   {
+    // Importer is nullptr, still call superclass to render other actors
+    this->Superclass::UpdateActors();
     return;
   }
 
@@ -554,10 +560,7 @@ void vtkF3DRendererWithColoring::UpdateActors()
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::ConfigureColoring()
 {
-  if (!this->Importer)
-  {
-    return;
-  }
+  assert(this->Importer);
 
   // Recover coloring information
   vtkF3DGenericImporter::ColoringInfo info;
@@ -890,11 +893,8 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 {
-  if (!this->Importer)
-  {
-    return;
-  }
-
+  assert(!this->Importer);
+  
   vtkF3DGenericImporter::ColoringInfo info;
   bool hasColoring =
     this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
@@ -926,10 +926,7 @@ void vtkF3DRendererWithColoring::CycleFieldForColoring()
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::CycleArrayIndexForColoring()
 {
-  if (!this->Importer)
-  {
-    return;
-  }
+  assert(this->Importer);
 
   int nIndex = this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring);
   if (nIndex <= 0)
@@ -952,10 +949,7 @@ void vtkF3DRendererWithColoring::CycleArrayIndexForColoring()
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::CycleComponentForColoring()
 {
-  if (!this->Importer)
-  {
-    return;
-  }
+  assert(this->Importer);
 
   vtkF3DGenericImporter::ColoringInfo info;
   if (!this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
@@ -971,6 +965,7 @@ void vtkF3DRendererWithColoring::CycleComponentForColoring()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
 {
+  std::cout<<this->Importer<<std::endl;
   if (!this->Importer)
   {
     return "";
