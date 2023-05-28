@@ -899,7 +899,6 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
     return;
   }
 
-
   vtkF3DGenericImporter::ColoringInfo info;
   bool hasColoring =
     this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
