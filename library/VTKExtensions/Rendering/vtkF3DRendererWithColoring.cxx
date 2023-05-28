@@ -999,10 +999,7 @@ std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::ComponentToString(int component)
 {
-  if (!this->Importer)
-  {
-    return "";
-  }
+  assert(this->Importer);
 
   if (component == -2)
   {
