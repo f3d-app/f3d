@@ -56,11 +56,20 @@ elseif (MSVC)
   set_target_properties(f3d PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=$<TARGET_FILE_DIR:VTK::CommonCore>") # Add VTK in MSVC PATH environment variable
 endif ()
 
-target_include_directories(f3d
-  PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external>
+if (F3D_USE_EXTERNAL_DEPS)
+  find_package(cxxopts REQUIRED)
+  find_package(nlohmann_json REQUIRED)
+  target_include_directories(f3d
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
   )
+else ()
+  target_include_directories(f3d
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external>
+  )
+endif()
 
 set(f3d_compile_options_private "")
 set(f3d_compile_options_public "")

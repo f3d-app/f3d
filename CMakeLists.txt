@@ -205,6 +205,8 @@ if(EMSCRIPTEN)
   add_subdirectory(webassembly)
 endif ()
 
+option(F3D_USE_EXTERNAL_DEPS "Use external dependencies" OFF)
+
 # Installing licenses
 set(F3D_LIC_DIR ".")
 
