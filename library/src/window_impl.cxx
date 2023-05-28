@@ -371,7 +371,11 @@ void window_impl::PrintColoringDescription(log::VerboseLevel level)
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
   if (renWithColor)
   {
-    log::print(level, renWithColor->GetColoringDescription());
+    std::string descr = renWithColor->GetColoringDescription();
+    if (!descr.empty())
+    {
+      log::print(level, descr);
+    }
   }
 }
 
@@ -426,7 +430,7 @@ void window_impl::SetImporterForColoring(vtkF3DGenericImporter* importer)
 {
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
-  if (renWithColor && importer)
+  if (renWithColor)
   {
     renWithColor->SetImporter(importer);
   }
