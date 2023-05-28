@@ -894,7 +894,7 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(
 void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 {
   assert(!this->Importer);
-  
+
   vtkF3DGenericImporter::ColoringInfo info;
   bool hasColoring =
     this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
@@ -965,7 +965,6 @@ void vtkF3DRendererWithColoring::CycleComponentForColoring()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
 {
-  std::cout<<this->Importer<<std::endl;
   if (!this->Importer)
   {
     return "";
