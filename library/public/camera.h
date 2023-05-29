@@ -66,7 +66,7 @@ public:
   /**
    * Reset the camera using the bounds of actors in the scene.
    */
-  virtual camera& resetToBounds() = 0;
+  virtual camera& resetToBounds(double zoomFactor = 0.9) = 0;
 
 protected:
   //! @cond

@@ -202,7 +202,7 @@ camera& camera_impl::resetToDefault()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::resetToBounds()
+camera& camera_impl::resetToBounds(double zoomFactor)
 {
 
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 0, 20210331)
@@ -215,7 +215,7 @@ camera& camera_impl::resetToBounds()
   }
   else
   {
-    this->Internals->VTKRenderer->ResetCameraScreenSpace();
+    this->Internals->VTKRenderer->ResetCameraScreenSpace(zoomFactor);
   }
 #endif
   this->Internals->VTKRenderer->ResetCameraClippingRange();
