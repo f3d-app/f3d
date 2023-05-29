@@ -202,7 +202,7 @@ camera& camera_impl::resetToDefault()
 //----------------------------------------------------------------------------
 camera& camera_impl::resetToBounds()
 {
-  this->Internals->VTKRenderer->ResetCamera();
+  this->Internals->VTKRenderer->ResetCameraScreenSpace();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
   return *this;
 }
