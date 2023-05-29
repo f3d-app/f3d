@@ -65,6 +65,9 @@ public:
 
   /**
    * Reset the camera using the bounds of actors in the scene.
+   * Provided zoomFactor will be used to position the camera.
+   * A value of 1 correspond to the bounds roughly aligned to the edges
+   * of the window.
    */
   virtual camera& resetToBounds(double zoomFactor = 0.9) = 0;
 
