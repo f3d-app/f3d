@@ -214,7 +214,8 @@ camera& camera_impl::resetToBounds()
   this->Internals->VTKRenderer->ResetCamera();
 #else
 #if F3D_MODULE_EXTERNAL_RENDERING
-  if (vtkExternalOpenGLRenderWindow::SafeDownCast(this->Internals->VTKRenderer->GetRenderWindow()) != nullptr)
+  if (vtkExternalOpenGLRenderWindow::SafeDownCast(
+        this->Internals->VTKRenderer->GetRenderWindow()) != nullptr)
   {
     // External render window does not support ResetCameraScreenSpace correctly
     this->Internals->VTKRenderer->ResetCamera();
