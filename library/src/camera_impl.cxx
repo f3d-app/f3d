@@ -202,7 +202,7 @@ camera& camera_impl::resetToDefault()
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::resetToBounds(double zoomFactor)
+camera& camera_impl::resetToBounds([[maybe_unused]] double zoomFactor)
 {
 
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 0, 20210331)
