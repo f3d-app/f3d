@@ -99,8 +99,14 @@ target_include_directories(libf3d
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/private>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/plugin>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/plugin>
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external>
   )
+if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
+  find_package(nlohmann_json REQUIRED)
+  target_link_libraries(libf3d PRIVATE nlohmann_json::nlohmann_json)
+else ()
+  target_include_directories(libf3d PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/nlohmann_json>)
+endif ()
 
 set_target_properties(libf3d PROPERTIES
   CXX_STANDARD 17
