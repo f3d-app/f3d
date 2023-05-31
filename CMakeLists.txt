@@ -208,6 +208,13 @@ endif ()
 option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
 option(F3D_USE_EXTERNAL_NLOHMANN_JSON "Use external nlohmann_json dependency" OFF)
 
+if (F3D_USE_EXTERNAL_CXXOPTS)
+  find_package(cxxopts REQUIRED)
+endif ()
+if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
+  find_package(nlohmann_json REQUIRED)
+endif ()
+
 # Installing licenses
 set(F3D_LIC_DIR ".")
 

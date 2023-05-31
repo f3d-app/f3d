@@ -10,7 +10,6 @@ target_compile_definitions(F3DShellExtension PUBLIC UNICODE F3D_WINDOWS_THUMBNAI
 
 target_include_directories(F3DShellExtension PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
-  find_package(nlohmann_json REQUIRED)
   target_link_libraries(F3DShellExtension PRIVATE nlohmann_json::nlohmann_json)
 else ()
   target_include_directories(F3DShellExtension PRIVATE
