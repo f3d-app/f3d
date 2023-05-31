@@ -38,5 +38,5 @@ camera.elevation(angle)
 camera.pitch(angle)
 
 camera.setCurrentAsDefault()
-camera.resetToBounds(0.9)
+camera.resetToBounds()
 camera.resetToDefault()
