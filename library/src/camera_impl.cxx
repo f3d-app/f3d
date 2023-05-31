@@ -1,15 +1,10 @@
 #include "camera_impl.h"
 
-#include "vtkF3DConfigure.h"
-
 #include <vtkCamera.h>
 #include <vtkMatrix4x4.h>
 #include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
 #include <vtkVersion.h>
-
-#if F3D_MODULE_EXTERNAL_RENDERING
-#include <vtkExternalOpenGLRenderWindow.h>
-#endif
 
 namespace f3d::detail
 {
@@ -213,15 +208,12 @@ camera& camera_impl::resetToBounds()
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 0, 20210331)
   this->Internals->VTKRenderer->ResetCamera();
 #else
-#if F3D_MODULE_EXTERNAL_RENDERING
-  if (vtkExternalOpenGLRenderWindow::SafeDownCast(
-        this->Internals->VTKRenderer->GetRenderWindow()) != nullptr)
+  if (this->Internals->VTKRenderer->GetRenderWindow()->IsA("vtkExternalOpenGLRenderWindow"))
   {
     // External render window does not support ResetCameraScreenSpace correctly
     this->Internals->VTKRenderer->ResetCamera();
   }
   else
-#endif
   {
     this->Internals->VTKRenderer->ResetCameraScreenSpace();
   }
