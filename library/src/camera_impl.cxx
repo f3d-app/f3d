@@ -2,8 +2,8 @@
 
 #include <vtkCamera.h>
 #include <vtkMatrix4x4.h>
-#include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 #include <vtkVersion.h>
 
 namespace f3d::detail
