@@ -115,19 +115,19 @@ f3d_test(NAME TestGridZ DATA suzanne.ply ARGS -g --up=+Z DEFAULT_LIGHTS)
 f3d_test(NAME TestGridOptions DATA suzanne.ply ARGS -g --camera-elevation-angle=45 --grid-unit=2 --grid-subdivisions=3 -t DEFAULT_LIGHTS)
 f3d_test(NAME TestGridAbsolute DATA suzanne.ply ARGS -g --camera-elevation-angle=45 --grid-absolute -t DEFAULT_LIGHTS)
 f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x DEFAULT_LIGHTS)
-f3d_test(NAME TestPointCloud DATA pointsCloud.vtp ARGS -o --point-size=20)
-f3d_test(NAME TestPointCloudBar DATA pointsCloud.vtp ARGS -sob --point-size=20)
-f3d_test(NAME TestPointCloudUG DATA pointsCloud.vtu ARGS -o --point-size=20)
-f3d_test(NAME TestPointCloudVolume DATA bluntfin.vts ARGS -sob)
-f3d_test(NAME TestPointCloudDefaultScene DATA pointsCloud.vtp ARGS --point-size=20)
-f3d_test(NAME TestVRMLImporter DATA bot2.wrl)
-f3d_test(NAME Test3DSImporter DATA iflamigm.3ds ARGS --up=+Z)
+f3d_test(NAME TestPointCloud DATA pointsCloud.vtp ARGS -o --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestPointCloudBar DATA pointsCloud.vtp ARGS -sob --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestPointCloudUG DATA pointsCloud.vtu ARGS -o --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestPointCloudVolume DATA bluntfin.vts ARGS -sob DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestPointCloudDefaultScene DATA pointsCloud.vtp ARGS --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestVRMLImporter DATA bot2.wrl DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME Test3DSImporter DATA iflamigm.3ds ARGS --up=+Z DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestScalars DATA suzanne.ply ARGS --scalars=Normals --comp=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestScalarsRange DATA suzanne.ply ARGS --scalars=Normals --comp=1 --range=0,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestScalarsWithBar DATA suzanne.ply ARGS -b --scalars=Normals --comp=0 DEFAULT_LIGHTS)
-f3d_test(NAME TestGLTFImporter DATA WaterBottle.glb)
+f3d_test(NAME TestGLTFImporter DATA WaterBottle.glb DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestGLTFImporterWithAnimation DATA BoxAnimated.gltf DEFAULT_LIGHTS) # Technically not a default lights tests, but fails for some reason on vtk 9.0.0
-f3d_test(NAME TestGLTFSkin DATA SimpleSkin.gltf)
+f3d_test(NAME TestGLTFSkin DATA SimpleSkin.gltf DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestGLTFReaderWithAnimation DATA BoxAnimated.gltf ARGS --geometry-only DEFAULT_LIGHTS)
 f3d_test(NAME TestDicom DATA IM-0001-1983.dcm ARGS --scalars --roughness=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestMHD DATA HeadMRVolume.mhd ARGS --scalars --roughness=1 DEFAULT_LIGHTS)
@@ -135,23 +135,23 @@ f3d_test(NAME TestVTICell DATA waveletMaterial.vti ARGS --scalars=Material -c --
 f3d_test(NAME TestSSAO LONG_TIMEOUT DATA suzanne.ply ARGS -q DEFAULT_LIGHTS)
 f3d_test(NAME TestDepthPeeling DATA suzanne.ply ARGS -sp --opacity=0.9 DEFAULT_LIGHTS)
 f3d_test(NAME TestBackground DATA suzanne.ply ARGS --bg-color=0.8,0.2,0.9 THRESHOLD 100 DEFAULT_LIGHTS)
-f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity 0.2)
+f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity 0.2 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n DEFAULT_LIGHTS)
 f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --bg-color=1,1,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestCityGML DATA Part-4-Buildings-V4-one.gml DEFAULT_LIGHTS)
-f3d_test(NAME TestPTS DATA samplePTS.pts)
+f3d_test(NAME TestPTS DATA samplePTS.pts DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalars --roughness=1 --colormap=0,1,0,0,1,0,1,0 DEFAULT_LIGHTS)
 f3d_test(NAME TestCameraConfiguration DATA suzanne.obj ARGS --camera-position=0,0,-10 -x --camera-view-up=1,0,0 --camera-focal-point=1,0,0 --camera-view-angle=20 --camera-azimuth-angle=40 --camera-elevation-angle=-80)
 f3d_test(NAME TestCameraClipping DATA checkerboard_colorful.obj CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/checkerboard_colorful.json RESOLUTION 800,600)
 f3d_test(NAME TestToneMapping DATA suzanne.ply ARGS -t DEFAULT_LIGHTS)
 f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt DEFAULT_LIGHTS)
-f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT THRESHOLD 300) # High threshold for volume as it is dependent on the OpenGL implementation
-f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT)
-f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb LONG_TIMEOUT)
-f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --comp=3 LONG_TIMEOUT)
-f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --comp=-2 LONG_TIMEOUT)
-f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --cells LONG_TIMEOUT)
-f3d_test(NAME TestVolumeNonScalars DATA waveletArrays.vti ARGS -vb --scalars=RandomPointScalars LONG_TIMEOUT)
+f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT THRESHOLD 300 DEFAULT_LIGHTS) # Using default lights because of ResetCamera, High threshold for volume as it is dependent on the OpenGL implementation
+f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --comp=3 LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --comp=-2 LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --cells LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestVolumeNonScalars DATA waveletArrays.vti ARGS -vb --scalars=RandomPointScalars LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestTextureNormal DATA WaterBottle.glb ARGS --geometry-only --texture-normal=${CMAKE_SOURCE_DIR}/testing/data/normal.png --normal-scale=0.1 DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMaterial DATA WaterBottle.glb ARGS --geometry-only --texture-material=${CMAKE_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=1 --metallic=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMaterialWithOptions DATA WaterBottle.glb ARGS --geometry-only --texture-material=${CMAKE_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=0.5 --metallic=0.5 DEFAULT_LIGHTS)
@@ -311,7 +311,7 @@ if(F3D_MODULE_EXTERNAL_RENDERING)
 endif()
 
 if(F3D_PLUGIN_BUILD_ALEMBIC)
-  f3d_test(NAME TestABC DATA suzanne.abc ARGS --load-plugins=alembic)
+  f3d_test(NAME TestABC DATA suzanne.abc ARGS --load-plugins=alembic DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
@@ -327,9 +327,9 @@ endif()
 
 if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestOFF DATA teapot.off ARGS --up=+Z --load-plugins=assimp)
-  f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p --load-plugins=assimp)
-  f3d_test(NAME TestFBX DATA phong_cube.fbx ARGS --load-plugins=assimp)
-  f3d_test(NAME TestFBX16bits DATA 16bit.fbx ARGS --load-plugins=assimp)
+  f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p --load-plugins=assimp DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+  f3d_test(NAME TestFBX DATA phong_cube.fbx ARGS --load-plugins=assimp DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+  f3d_test(NAME TestFBX16bits DATA 16bit.fbx ARGS --load-plugins=assimp THRESHOLD 70 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
   f3d_test(NAME TestVerboseCameraAssimp DATA duck.dae ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "camera1")
 
   # TGA Reader needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8224
@@ -445,11 +445,11 @@ f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #PQ
 f3d_test(NAME TestInteractionActors DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #EXGMN
 f3d_test(NAME TestInteractionTimer DATA cow.vtp NO_BASELINE INTERACTION) #Z
 f3d_test(NAME TestInteractionMisc DATA cow.vtp NO_BASELINE INTERACTION) #KK
-f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION) #VCCC
+f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION DEFAULT_LIGHTS) #VCCC
 f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION DEFAULT_LIGHTS) #SYYYY
 f3d_test(NAME TestInteractionCycleScalars DATA dragon.vtu INTERACTION DEFAULT_LIGHTS) #BSSSS
-f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION) #VI
-f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-size=20 INTERACTION) #O
+f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION DEFAULT_LIGHTS) #VI
+f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-size=20 INTERACTION DEFAULT_LIGHTS) #O
 f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalars DEFAULT_LIGHTS) #Right;Right;Right;Left;Up;
 f3d_test(NAME TestInteractionDirectoryLoop DATA mb INTERACTION ARGS --scalars DEFAULT_LIGHTS) #Left;Left;Left;
 f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "is not a file of a supported file format") #Right;Right;Right;HMCSY
