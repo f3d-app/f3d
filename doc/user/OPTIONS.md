@@ -85,12 +85,14 @@ Options|Default|Description
 
 Options|Default|Description
 ------|------|------
-\-\-camera-position=\<X,Y,Z\>||Set the camera position.
+\-\-camera-position=\<X,Y,Z\>||Set the camera position, overrides --camera-direction and camera-zoom-factor.
 \-\-camera-focal-point=\<X,Y,Z\>||Set the camera focal point.
 \-\-camera-view-up=\<X,Y,Z\>||Set the camera view up vector. Will be orthogonalized.
-\-\-camera-view-angle=\<angle\>||Set the camera view angle, a non-zero value in degrees.
-\-\-camera-azimuth-angle=\<angle\>|0.0|Apply an azimuth transformation to the camera, in degrees.
-\-\-camera-elevation-angle=\<angle\>|0.0|Apply an elevation transformation to the camera, in degrees.
+\-\-camera-view-angle=\<angle\>||Set the camera view angle, a strictly positive value in degrees.
+\-\-camera-direction=\<X,Y,Z\>||Set the camera direction, looking at the focal point.
+\-\-camera-zoom-factor=\<X,Y,Z\>||Set the camera zoom factor relative to the autozoom on data, a strictly positive value.
+\-\-camera-azimuth-angle=\<angle\>|0.0|Apply an azimuth transformation to the camera, in degrees, added after other camera options.
+\-\-camera-elevation-angle=\<angle\>|0.0|Apply an elevation transformation to the camera, in degrees, added after other camera options.
 
 ## Raytracing options
 

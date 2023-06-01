@@ -134,7 +134,7 @@ PYBIND11_MODULE(f3d, module)
     .def("pitch", &f3d::camera::pitch)
     .def("setCurrentAsDefault", &f3d::camera::setCurrentAsDefault)
     .def("resetToDefault", &f3d::camera::resetToDefault)
-    .def("resetToBounds", &f3d::camera::resetToBounds);
+    .def("resetToBounds", &f3d::camera::resetToBounds, py::arg("zoomFactor") = 0.9);
 
   // f3d::window
   py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> > window(module, "window");
