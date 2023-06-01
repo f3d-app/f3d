@@ -3,8 +3,8 @@ missingInclude
 unusedFunction
 
 // external libraries
-*:external/json.hpp
-*:external/cxxopts.hpp
+*:external/nlohmann_json/nlohmann/json.hpp
+*:external/cxxopts/cxxopts.hpp
 
 // opencascade
 *:*opencascade/*.hxx

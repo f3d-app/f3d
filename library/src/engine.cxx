@@ -19,7 +19,7 @@
 #include <vtksys/Encoding.hxx>
 #include <vtksys/SystemTools.hxx>
 
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 namespace f3d
 {

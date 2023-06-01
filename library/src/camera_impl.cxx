@@ -2,7 +2,9 @@
 
 #include <vtkCamera.h>
 #include <vtkMatrix4x4.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+#include <vtkVersion.h>
 
 namespace f3d::detail
 {
@@ -229,7 +231,20 @@ camera& camera_impl::resetToDefault()
 //----------------------------------------------------------------------------
 camera& camera_impl::resetToBounds()
 {
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 0, 20210331)
   this->Internals->VTKRenderer->ResetCamera();
+#else
+  if (this->Internals->VTKRenderer->GetRenderWindow()->IsA("vtkExternalOpenGLRenderWindow"))
+  {
+    // External render window does not support ResetCameraScreenSpace correctly
+    this->Internals->VTKRenderer->ResetCamera();
+  }
+  else
+  {
+    this->Internals->VTKRenderer->ResetCameraScreenSpace();
+  }
+#endif
   this->Internals->VTKRenderer->ResetCameraClippingRange();
   return *this;
 }
