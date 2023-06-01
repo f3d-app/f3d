@@ -58,7 +58,7 @@ Other hotkeys are available:
 * `LEFT`: load the previous file if any.
 * `RIGHT`: load the next file if any.
 * `UP`: reload the current file without reseting the camera.
-* `DOWN`: add current file parent directory to the list of files and reload the current file without reseting the camera.
+* `DOWN`: add current file parent directory to the list of files, reload the current file and reset the camera.
 
 When loading another file or reloading, options that have been changed interactively are kept but can be overridden
 if a dedicated regular expression block in the configuration file is present, see the [configuration file](CONFIGURATION_FILE.md)

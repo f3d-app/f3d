@@ -182,7 +182,7 @@ int F3DStarter::Start(int argc, char** argv)
               this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)]
                 .parent_path(),
               true);
-            return loadFile(0, true);
+            return loadFile(0);
           }
           return true;
         }
