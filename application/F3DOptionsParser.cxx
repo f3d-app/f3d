@@ -6,7 +6,7 @@
 #include "F3DSystemTools.h"
 
 #include "cxxopts.hpp"
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 
 #include "engine.h"
 #include "interactor.h"
@@ -403,7 +403,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
       cxxOptions.parse(1, nullptr);
     }
   }
-  catch (const cxxopts::OptionException& ex)
+  catch (const cxxopts::exceptions::exception& ex)
   {
     f3d::log::error("Error parsing options: ", ex.what());
     throw;
