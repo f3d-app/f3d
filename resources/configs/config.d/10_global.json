@@ -7,6 +7,7 @@
     "progress": true,
     "anti-aliasing": true,
     "filename": true,
-    "scalars": ""
+    "scalars": "",
+    "camera-direction": "-1,-1,1"
   }
 }

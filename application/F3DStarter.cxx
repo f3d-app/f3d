@@ -43,10 +43,37 @@ public:
       std::copy_n(appOptions.CameraViewUp.begin(), 3, up.begin());
       cam.setViewUp(up);
     }
-    if (appOptions.CameraViewAngle != 0)
+    if (appOptions.CameraViewAngle > 0)
     {
       cam.setViewAngle(appOptions.CameraViewAngle);
     }
+
+    bool reset = false;
+    double zoomFactor = 0.9;
+    if (appOptions.CameraPosition.size() != 3 && appOptions.CameraDirection.size() == 3)
+    {
+      f3d::vector3_t dir;
+      std::copy_n(appOptions.CameraDirection.begin(), 3, dir.begin());
+      f3d::point3_t foc;
+      f3d::point3_t pos;
+      cam.getFocalPoint(foc);
+      for (int i = 0; i < 3; i++)
+      {
+        pos[i] = foc[i] - dir[i];
+      }
+      cam.setPosition(pos);
+      reset = true;
+    }
+    if (appOptions.CameraPosition.size() != 3 && appOptions.CameraZoomFactor > 0)
+    {
+      zoomFactor = appOptions.CameraZoomFactor;
+      reset = true;
+    }
+    if (reset)
+    {
+      cam.resetToBounds(zoomFactor);
+    }
+
     cam.azimuth(appOptions.CameraAzimuthAngle)
       .elevation(appOptions.CameraElevationAngle)
       .setCurrentAsDefault();

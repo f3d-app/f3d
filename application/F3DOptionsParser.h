@@ -41,6 +41,8 @@ struct F3DAppOptions
   std::vector<double> CameraFocalPoint = { 0 };
   std::vector<double> CameraPosition = { 0 };
   std::vector<double> CameraViewUp = { 0 };
+  std::vector<double> CameraDirection = { 0 };
+  double CameraZoomFactor = 0.0;
   double CameraViewAngle = 0.0;
   std::vector<std::string> Plugins;
 };

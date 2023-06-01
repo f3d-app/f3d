@@ -57,7 +57,7 @@ public:
 
   camera& setCurrentAsDefault() override;
   camera& resetToDefault() override;
-  camera& resetToBounds() override;
+  camera& resetToBounds(double zoomFactor = 0.9) override;
   ///@}
 
   /**

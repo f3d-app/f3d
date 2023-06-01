@@ -5,6 +5,7 @@
     "anti-aliasing": true,
     "tone-mapping": true,
     "no-background": true,
-    "max-size":100
+    "max-size":100,
+    "camera-direction": "-1,-1,1"
   }
 }
