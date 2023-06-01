@@ -91,7 +91,7 @@ Options|Default|Description
 \-\-camera-view-angle=\<angle\>||Set the camera view angle, a strictly positive value in degrees.
 \-\-camera-direction=\<X,Y,Z\>||Set the camera direction, looking at the focal point.
 \-\-camera-zoom-factor=\<X,Y,Z\>||Set the camera zoom factor relative to the autozoom on data, a strictly positive value.
-\-\-camera-azimuth-angle=\<angle\>|0.0|Apply an azimuth transformation to the camera, in degrees, added after other camera option except elevation.
+\-\-camera-azimuth-angle=\<angle\>|0.0|Apply an azimuth transformation to the camera, in degrees, added after other camera options.
 \-\-camera-elevation-angle=\<angle\>|0.0|Apply an elevation transformation to the camera, in degrees, added after other camera options.
 
 ## Raytracing options
