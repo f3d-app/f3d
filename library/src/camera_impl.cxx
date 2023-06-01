@@ -4,15 +4,13 @@
 #include <vtkMatrix4x4.h>
 #include <vtkRenderer.h>
 
-#include <map>
-
 namespace f3d::detail
 {
 class camera_impl::internals
 {
 public:
   vtkRenderer* VTKRenderer = nullptr;
-  vtkNew<vtkCamera> DefaultVTKCamera;
+  camera_state_t DefaultCamera;
 };
 
 //----------------------------------------------------------------------------
@@ -217,17 +215,14 @@ camera& camera_impl::pitch(angle_deg_t angle)
 //----------------------------------------------------------------------------
 camera& camera_impl::setCurrentAsDefault()
 {
-  vtkCamera* cam = this->GetVTKCamera();
-  this->Internals->DefaultVTKCamera->DeepCopy(cam);
+  this->getState(this->Internals->DefaultCamera);
   return *this;
 }
 
 //----------------------------------------------------------------------------
 camera& camera_impl::resetToDefault()
 {
-  vtkCamera* cam = this->GetVTKCamera();
-  cam->DeepCopy(this->Internals->DefaultVTKCamera);
-  this->Internals->VTKRenderer->ResetCameraClippingRange();
+  this->setState(this->Internals->DefaultCamera);
   return *this;
 }
 

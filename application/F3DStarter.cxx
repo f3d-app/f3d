@@ -171,7 +171,7 @@ int F3DStarter::Start(int argc, char** argv)
         }
         else if (keySym == "Up")
         {
-          return loadFile(0, true); // TODO decide how to control whether we restore the camera
+          return loadFile(0, true);
         }
         else if (keySym == "Down")
         {
@@ -182,7 +182,7 @@ int F3DStarter::Start(int argc, char** argv)
               this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)]
                 .parent_path(),
               true);
-            return loadFile(0);
+            return loadFile(0, true);
           }
           return true;
         }

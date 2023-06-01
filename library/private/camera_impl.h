@@ -63,7 +63,6 @@ public:
   camera& setCurrentAsDefault() override;
   camera& resetToDefault() override;
   camera& resetToBounds() override;
-
   ///@}
 
   /**
