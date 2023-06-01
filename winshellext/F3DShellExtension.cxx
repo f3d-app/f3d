@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 #include "F3DShellExtensionClassFactory.h"
 #include "RegistryHelpers.h"
