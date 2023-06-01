@@ -337,7 +337,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.getAsBoolRef("model.volume.inverse"), HasDefault::YES, MayHaveConfig::YES);
 
     auto grpCamera = cxxOptions.add_options("Camera");
-    this->DeclareOption(grpCamera, "camera-position", "", "Camera position (override camera direction and camera zoom factor if any)", appOptions.CameraPosition, HasDefault::YES, MayHaveConfig::YES, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-position", "", "Camera position (overrides camera direction and camera zoom factor if any)", appOptions.CameraPosition, HasDefault::YES, MayHaveConfig::YES, "<X,Y,Z>");
     this->DeclareOption(grpCamera, "camera-focal-point", "", "Camera focal point", appOptions.CameraFocalPoint, HasDefault::YES, MayHaveConfig::YES, "<X,Y,Z>");
     this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", appOptions.CameraViewUp, HasDefault::YES, MayHaveConfig::YES, "<X,Y,Z>");
     this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degrees)", appOptions.CameraViewAngle, LocalHasDefaultNo, MayHaveConfig::YES, "<angle>");

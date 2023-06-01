@@ -43,7 +43,7 @@ public:
       std::copy_n(appOptions.CameraViewUp.begin(), 3, up.begin());
       cam.setViewUp(up);
     }
-    if (appOptions.CameraViewAngle != 0)
+    if (appOptions.CameraViewAngle > 0)
     {
       cam.setViewAngle(appOptions.CameraViewAngle);
     }
@@ -64,7 +64,7 @@ public:
       cam.setPosition(pos);
       reset = true;
     }
-    if (appOptions.CameraPosition.size() != 3 && appOptions.CameraZoomFactor != 0)
+    if (appOptions.CameraPosition.size() != 3 && appOptions.CameraZoomFactor > 0)
     {
       zoomFactor = appOptions.CameraZoomFactor;
       reset = true;
