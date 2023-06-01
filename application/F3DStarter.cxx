@@ -159,7 +159,7 @@ int F3DStarter::Start(int argc, char** argv)
     };
 
     interactor.setKeyPressCallBack(
-      [this, loadFile, &interactor](int, const std::string& keySym) -> bool
+      [this, loadFile](int, const std::string& keySym) -> bool
       {
         if (keySym == "Left")
         {
