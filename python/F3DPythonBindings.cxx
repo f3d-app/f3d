@@ -113,6 +113,7 @@ PYBIND11_MODULE(f3d, module)
 
   // f3d::camera
   py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "camera");
+  py::class_<f3d::camera_state_t>(module, "camera_state_t");
 
   camera.def("setPosition", &f3d::camera::setPosition)
     .def("getPosition", py::overload_cast<>(&f3d::camera::getPosition))
@@ -132,6 +133,9 @@ PYBIND11_MODULE(f3d, module)
     .def("yaw", &f3d::camera::yaw)
     .def("elevation", &f3d::camera::elevation)
     .def("pitch", &f3d::camera::pitch)
+    .def("setState", &f3d::camera::setState)
+    .def("getState", py::overload_cast<>(&f3d::camera::getState))
+    .def("getState", py::overload_cast<f3d::camera_state_t&>(&f3d::camera::getState))
     .def("setCurrentAsDefault", &f3d::camera::setCurrentAsDefault)
     .def("resetToDefault", &f3d::camera::resetToDefault)
     .def("resetToBounds", &f3d::camera::resetToBounds);
