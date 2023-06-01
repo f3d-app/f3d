@@ -35,7 +35,8 @@ Options|Default|Description
 -e, \-\-edges||Show the *cell edges*.
 \-\-camera-index=\<idx\>|-1|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.
 -k, \-\-trackball||Enable trackball interaction.
-\-\-animation-index=\<idx\>|0|Select the animation to show.<br>Any negative value means all animations.<br>The default scene always has at most one animation.
+\-\-animation-index=\<idx\>|0|Select the animation to show.<br>Any negative value means all animations (glTF only).<br>The default scene always has at most one animation.
+\-\-animation-speed-factor=\<factor\>|1|Set the animation speed factor to slow, speed up or even invert animation time.
 \-\-font-file=\<font file\>||Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.
 
 ## Material options

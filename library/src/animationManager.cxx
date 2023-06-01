@@ -98,39 +98,43 @@ void animationManager::Initialize(
     this->Importer->EnableAnimation(animationIndex);
   }
 
-  this->TimeSteps.clear();
-  this->TimeRange[0] = 0.0;
-  this->TimeRange[1] = 0.0;
-
+  // Recover time ranges for all enabled animations
+  this->TimeRange[0] = std::numeric_limits<double>::infinity();
+  this->TimeRange[1] = -std::numeric_limits<double>::infinity();
   vtkIdType nbAnims = this->Importer->GetNumberOfAnimations();
   for (vtkIdType animIndex = 0; animIndex < nbAnims; animIndex++)
   {
     if (this->Importer->IsAnimationEnabled(animIndex))
     {
+      double timeRange[2];
       int nbTimeSteps;
       vtkNew<vtkDoubleArray> timeSteps;
 
 // Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
-      this->Importer->GetTemporalInformation(
-        animIndex, this->FrameRate, nbTimeSteps, this->TimeRange, timeSteps);
+      // Discard timesteps, F3D only cares about real elapsed time using time range
+      // Specifying the frame rate in the next call is not needed after VTK 9.2.20230603 : VTK_VERSION_CHECK(9, 2, 20230603)
+      this->Importer->GetTemporalInformation(animIndex, this->FrameRate, nbTimeSteps, timeRange, timeSteps);
 #else
-      this->Importer->GetTemporalInformation(animIndex, nbTimeSteps, this->TimeRange, timeSteps);
+      this->Importer->GetTemporalInformation(animIndex, nbTimeSteps, timeRange, timeSteps);
 #endif
-
-      for (vtkIdType i = 0; i < timeSteps->GetNumberOfTuples(); i++)
+      // Accumulate time ranges
+      if (timeRange[0] < this->TimeRange[0])
       {
-        this->TimeSteps.insert(timeSteps->GetValue(i));
+        this->TimeRange[0] = timeRange[0];
       }
+      if (timeRange[1] > this->TimeRange[1])
+      {
+        this->TimeRange[1] = timeRange[1];
+      }
+
+      this->HasAnimation = true;
     }
   }
-
-  if (this->TimeSteps.size() > 0)
-  {
-    this->CurrentTimeStep = std::begin(this->TimeSteps);
-    this->HasAnimation = true;
-  }
+  log::debug("Animation(s) time range is: ", this->TimeRange[0], " ", this->TimeRange[1], ".");
   this->Playing = false;
+  this->CurrentTime = 0;
+  this->CurrentTimeSet = false;
 }
 
 //----------------------------------------------------------------------------
@@ -163,9 +167,17 @@ void animationManager::ToggleAnimation()
     {
       this->Interactor->removeTimerCallBack(this->CallBackId);
     }
-
     if (this->Playing)
     {
+      // Initialize time if not already
+      if (!this->CurrentTimeSet)
+      {
+        this->CurrentTime = this->TimeRange[0];
+        this->CurrentTimeSet = true;
+      }
+
+      // Always reset previous tick when starting the animation
+      this->PreviousTick = std::chrono::steady_clock::now();
       this->CallBackId =
         this->Interactor->createTimerCallBack(1000.0 / this->FrameRate, [this]() { this->Tick(); });
     }
@@ -184,24 +196,38 @@ void animationManager::ToggleAnimation()
 //----------------------------------------------------------------------------
 void animationManager::Tick()
 {
-  if (this->HasAnimation)
+  // Compute time since previous tick
+  std::chrono::steady_clock::time_point tick = std::chrono::steady_clock::now();
+  auto timeInMS =
+    std::chrono::duration_cast<std::chrono::milliseconds>(tick - this->PreviousTick).count();
+  this->PreviousTick = tick;
+
+  // Convert to a usable time in seconds
+  double elapsedTime = static_cast<double>(timeInMS) / 1000;
+  double animationSpeedFactor =
+    this->Options->getAsDouble("scene.animation.speed-factor"); // Is this ok to do here ? TODO
+  elapsedTime *= animationSpeedFactor;
+
+  // elapsedTime can be negative
+  this->CurrentTime += elapsedTime;
+  if (this->CurrentTime < this->TimeRange[0])
   {
-    vtkProgressBarRepresentation* progressRep =
-      vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());
-    progressRep->SetProgressRate(std::distance(std::begin(this->TimeSteps), this->CurrentTimeStep) /
-      static_cast<double>(this->TimeSteps.size() - 1));
-
-    this->Importer->UpdateTimeStep(*this->CurrentTimeStep);
-    this->Interactor->UpdateRendererAfterInteraction();
-    this->Window->render();
-
-    ++this->CurrentTimeStep;
-
-    // repeat
-    if (this->CurrentTimeStep == std::end(this->TimeSteps))
-    {
-      this->CurrentTimeStep = std::begin(this->TimeSteps);
-    }
+    this->CurrentTime = this->TimeRange[1];
   }
+  else if (this->CurrentTime > this->TimeRange[1])
+  {
+    this->CurrentTime = this->TimeRange[0];
+  }
+
+  // Set progress bar
+  vtkProgressBarRepresentation* progressRep =
+    vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());
+  progressRep->SetProgressRate(
+    (this->CurrentTime - this->TimeRange[0]) / (this->TimeRange[1] - this->TimeRange[0]));
+
+  // Update and render
+  this->Importer->UpdateTimeStep(this->CurrentTime);
+  this->Interactor->UpdateRendererAfterInteraction();
+  this->Window->render();
 }
 }

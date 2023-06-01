@@ -3,7 +3,7 @@ void applyCustomReader(vtkAlgorithm* algo, const std::string&) const override
   vtkGLTFReader* gltfReader = vtkGLTFReader::SafeDownCast(algo);
 
   // Enable all animations in the GLTFReader
-  gltfReader->SetFrameRate(30);
+  gltfReader->SetFrameRate(0);
   gltfReader->ApplyDeformationsToGeometryOn();
   gltfReader->UpdateInformation(); // Read model metadata to get the number of animations
   for (vtkIdType i = 0; i < gltfReader->GetNumberOfAnimations(); i++)

@@ -10,6 +10,7 @@
 #include <vtkProgressBarWidget.h>
 #include <vtkSmartPointer.h>
 
+#include <chrono>
 #include <set>
 
 class vtkF3DRenderer;
@@ -64,13 +65,14 @@ protected:
   interactor_impl* Interactor = nullptr;
   const options* Options = nullptr;
 
-  std::set<double> TimeSteps;
-  std::set<double>::iterator CurrentTimeStep;
   double FrameRate = 30;
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   bool HasAnimation = false;
   unsigned long CallBackId = 0;
+  double CurrentTime = 0;
+  bool CurrentTimeSet = false;
+  std::chrono::steady_clock::time_point PreviousTick;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
 };

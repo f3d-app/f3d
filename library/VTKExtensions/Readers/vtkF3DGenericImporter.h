@@ -144,7 +144,7 @@ public:
   /**
    * Get temporal information for the currently enabled animations.
    * Framerate is ignored in this implementation.
-   * the three return arguments are defined in this implementation.
+   * Only timerange is defined in this implementation.
    */
 // Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)

@@ -1,7 +1,7 @@
 # F3D Testing
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;LONG_TIMEOUT;HDRI;INTERACTION;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;DEPENDS" "ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;LONG_TIMEOUT;HDRI;INTERACTION;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;SERIAL" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;DEPENDS" "ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -92,6 +92,10 @@ function(f3d_test)
   if(F3D_TEST_DEPENDS)
     set_tests_properties(f3d::${F3D_TEST_DEPENDS} PROPERTIES FIXTURES_SETUP f3d::${F3D_TEST_DEPENDS}_FIXTURE)
     set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES FIXTURES_REQUIRED f3d::${F3D_TEST_DEPENDS}_FIXTURE)
+  endif()
+
+  if(F3D_TEST_SERIAL)
+    set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES RUN_SERIAL TRUE)
   endif()
 
   set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT
@@ -242,8 +246,8 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_BASELINE REGEXP "7: CubicSpline Translation")
   # Test Animation index out of domain error
   f3d_test(NAME TestVerboseAnimationIndexError1 DATA InterpolationTest.glb ARGS --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
-  f3d_test(NAME TestInteractionAnimation DATA InterpolationTest.glb ARGS --animation-index=-1 INTERACTION)#Space;Space;
-  f3d_test(NAME TestInteractionAnimationMovement DATA CameraAnimated.glb ARGS --camera-index=0 INTERACTION)#Space;MouseMovement;Space;
+  f3d_test(NAME TestInteractionAnimation DATA InterpolationTest.glb ARGS --animation-index=-1 SERIAL INTERACTION)#Space;Space;
+  f3d_test(NAME TestInteractionAnimationMovement DATA CameraAnimated.glb ARGS --camera-index=0 SERIAL INTERACTION)#Space;MouseMovement;Space;
   # Test exit hotkey
   f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
 
@@ -336,7 +340,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   # TGA Reader needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8224
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210805) # for TGA support and embedded textures
     f3d_test(NAME TestFBXBone DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08)
-    f3d_test(NAME TestInteractionFBXBoneAnim DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 INTERACTION) #Space;Space;
+    f3d_test(NAME TestInteractionFBXBoneAnim DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 SERIAL INTERACTION) #Space;Space;
     f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "LOD3sp")
     f3d_test(NAME TestTGATextureFBX DATA duck.fbx ARGS --load-plugins=assimp)
     f3d_test(NAME TestDAE DATA duck.dae ARGS --load-plugins=assimp)
@@ -348,10 +352,10 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     # Embedded texture are only working with assimp 5.1.X
     if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.1.0")
       f3d_test(NAME TestEmbeddedTextureFBX DATA texturedCube.fbx ARGS --load-plugins=assimp)
-      f3d_test(NAME TestInteractionFBXAnim DATA animatedWorld.fbx ARGS --load-plugins=assimp INTERACTION) #Space;Space;
-      f3d_test(NAME TestInteractionFBXLights DATA animatedLights.fbx ARGS --load-plugins=assimp INTERACTION) #Space;Space;
-      f3d_test(NAME TestInteractionFBXCamera DATA animatedCamera.fbx ARGS --load-plugins=assimp --camera-index=0 --animation-index=0 INTERACTION) #Space;Space;
-      f3d_test(NAME TestInteractionDAELights DATA animatedLights.dae ARGS --load-plugins=assimp INTERACTION) #Space;Space;
+      f3d_test(NAME TestInteractionFBXAnim DATA animatedWorld.fbx ARGS --load-plugins=assimp SERIAL INTERACTION) #Space;Space;
+      f3d_test(NAME TestInteractionFBXLights DATA animatedLights.fbx ARGS --load-plugins=assimp SERIAL INTERACTION) #Space;Space;
+      f3d_test(NAME TestInteractionFBXCamera DATA animatedCamera.fbx ARGS --load-plugins=assimp --camera-index=0 --animation-index=0 SERIAL INTERACTION) #Space;Space;
+      f3d_test(NAME TestInteractionDAELights DATA animatedLights.dae ARGS --load-plugins=assimp SERIAL INTERACTION) #Space;Space;
     endif()
   endif()
 
@@ -398,7 +402,7 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "0: default")
 
   # Test animation with generic importer and coloring
-  f3d_test(NAME TestInteractionAnimationGenericImporter DATA small.ex2 INTERACTION ARGS -sb --load-plugins=exodus DEFAULT_LIGHTS)#Space;Space;
+  f3d_test(NAME TestInteractionAnimationGenericImporter DATA small.ex2 INTERACTION ARGS -sb --load-plugins=exodus --animation-speed-factor=0.001 SERIAL DEFAULT_LIGHTS)#Space;Space;
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/exodus/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
@@ -454,8 +458,8 @@ f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-size=2
 f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalars DEFAULT_LIGHTS) #Right;Right;Right;Left;Up;
 f3d_test(NAME TestInteractionDirectoryLoop DATA mb INTERACTION ARGS --scalars DEFAULT_LIGHTS) #Left;Left;Left;
 f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "is not a file of a supported file format") #Right;Right;Right;HMCSY
-f3d_test(NAME TestInteractionGLTFReaderWithAnimation DATA BoxAnimated.gltf INTERACTION ARGS --geometry-only DEFAULT_LIGHTS) #Space;Space;
-f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_BASELINE INTERACTION)#Space;Space;
+f3d_test(NAME TestInteractionGLTFReaderWithAnimation DATA BoxAnimated.gltf INTERACTION ARGS --geometry-only SERIAL DEFAULT_LIGHTS) #Space;Space;
+f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_BASELINE SERIAL INTERACTION)#Space;
 f3d_test(NAME TestInteractionResetCamera DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)#MouseMovements;Return;
 f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --scalars --comp=-2  INTERACTION DEFAULT_LIGHTS) #SYYYYYYYYYY
 f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --scalars --comp=2 INTERACTION DEFAULT_LIGHTS) #S
