@@ -160,7 +160,6 @@ int F3DStarter::Start(int argc, char** argv)
           return true;
         };
 
-
         if (keySym == "Left")
         {
           return loadFile(-1);
