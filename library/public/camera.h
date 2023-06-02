@@ -9,6 +9,14 @@
 
 namespace f3d
 {
+struct F3D_EXPORT camera_state_t
+{
+  point3_t pos = { 0., 0., 1. };
+  point3_t foc = { 0., 0., 0. };
+  vector3_t up = { 0., 1., 0. };
+  angle_deg_t angle = 30.;
+};
+
 /**
  * @class   camera
  * @brief   Abstract class to control a camera in a window
@@ -38,6 +46,9 @@ public:
   virtual camera& setViewAngle(const angle_deg_t& angle) = 0;
   virtual angle_deg_t getViewAngle() = 0;
   virtual void getViewAngle(angle_deg_t& angle) = 0;
+  virtual camera& setState(const camera_state_t& state) = 0;
+  virtual camera_state_t getState() = 0;
+  virtual void getState(camera_state_t& state) = 0;
   ///@}
 
   ///@{ @name Manipulation

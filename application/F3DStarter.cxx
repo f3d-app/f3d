@@ -164,30 +164,40 @@ int F3DStarter::Start(int argc, char** argv)
 
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
-
     interactor.setKeyPressCallBack(
       [this](int, const std::string& keySym) -> bool
       {
-        if (keySym == "Left")
+        const auto loadFile = [this](int index, bool restoreCamera = false) -> bool
         {
           this->Internals->Engine->getInteractor().stopAnimation();
-          this->LoadFile(-1, true);
+
+          if (restoreCamera)
+          {
+            f3d::camera& cam = this->Internals->Engine->getWindow().getCamera();
+            const auto camState = cam.getState();
+            this->LoadFile(index, true);
+            cam.setState(camState);
+          }
+          else
+          {
+            this->LoadFile(index, true);
+          }
+
           this->Render();
           return true;
+        };
+
+        if (keySym == "Left")
+        {
+          return loadFile(-1);
         }
         else if (keySym == "Right")
         {
-          this->Internals->Engine->getInteractor().stopAnimation();
-          this->LoadFile(1, true);
-          this->Render();
-          return true;
+          return loadFile(+1);
         }
         else if (keySym == "Up")
         {
-          this->Internals->Engine->getInteractor().stopAnimation();
-          this->LoadFile(0, true);
-          this->Render();
-          return true;
+          return loadFile(0, true);
         }
         else if (keySym == "Down")
         {
@@ -198,8 +208,7 @@ int F3DStarter::Start(int argc, char** argv)
               this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)]
                 .parent_path(),
               true);
-            this->LoadFile(0, true);
-            this->Render();
+            return loadFile(0);
           }
           return true;
         }

@@ -47,6 +47,9 @@ public:
   camera& setViewAngle(const angle_deg_t& angle) override;
   angle_deg_t getViewAngle() override;
   void getViewAngle(angle_deg_t& angle) override;
+  camera& setState(const camera_state_t& state) override;
+  camera_state_t getState() override;
+  void getState(camera_state_t& state) override;
 
   camera& dolly(double val) override;
   camera& roll(angle_deg_t angle) override;
