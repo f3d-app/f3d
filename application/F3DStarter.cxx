@@ -137,30 +137,30 @@ int F3DStarter::Start(int argc, char** argv)
 
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
-
-    const auto loadFile = [this](int index, bool restoreCamera = false) -> bool
-    {
-      this->Internals->Engine->getInteractor().stopAnimation();
-
-      if (restoreCamera)
-      {
-        f3d::camera& cam = this->Internals->Engine->getWindow().getCamera();
-        const auto camState = cam.getState();
-        this->LoadFile(index, true);
-        cam.setState(camState);
-      }
-      else
-      {
-        this->LoadFile(index, true);
-      }
-
-      this->Render();
-      return true;
-    };
-
     interactor.setKeyPressCallBack(
-      [this, loadFile](int, const std::string& keySym) -> bool
+      [this](int, const std::string& keySym) -> bool
       {
+        const auto loadFile = [this](int index, bool restoreCamera = false) -> bool
+        {
+          this->Internals->Engine->getInteractor().stopAnimation();
+
+          if (restoreCamera)
+          {
+            f3d::camera& cam = this->Internals->Engine->getWindow().getCamera();
+            const auto camState = cam.getState();
+            this->LoadFile(index, true);
+            cam.setState(camState);
+          }
+          else
+          {
+            this->LoadFile(index, true);
+          }
+
+          this->Render();
+          return true;
+        };
+
+
         if (keySym == "Left")
         {
           return loadFile(-1);
@@ -186,10 +186,7 @@ int F3DStarter::Start(int argc, char** argv)
           }
           return true;
         }
-        else
-        {
-          return false;
-        }
+        return false;
       });
 
     interactor.setDropFilesCallBack(

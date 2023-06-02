@@ -12,8 +12,6 @@
 
 #include "camera.h"
 
-#include <vtkCamera.h>
-
 #include <memory>
 
 class vtkRenderer;
