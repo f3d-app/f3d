@@ -191,15 +191,15 @@ int F3DStarter::Start(int argc, char** argv)
         {
           return loadFile(-1);
         }
-        else if (keySym == "Right")
+        if (keySym == "Right")
         {
           return loadFile(+1);
         }
-        else if (keySym == "Up")
+        if (keySym == "Up")
         {
           return loadFile(0, true);
         }
-        else if (keySym == "Down")
+        if (keySym == "Down")
         {
           if (this->Internals->LoadedFile)
           {
