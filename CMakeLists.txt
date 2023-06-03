@@ -46,6 +46,17 @@ set(F3D_SYSTEM_PROCESSOR "${F3D_SYSTEM_PROCESSOR}-bits")
 option(F3D_MODULE_EXTERNAL_RENDERING "External rendering module" OFF)
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 
+# Use externals
+option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
+option(F3D_USE_EXTERNAL_NLOHMANN_JSON "Use external nlohmann_json dependency" OFF)
+
+if (F3D_USE_EXTERNAL_CXXOPTS)
+  find_package(cxxopts REQUIRED)
+endif ()
+if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
+  find_package(nlohmann_json REQUIRED)
+endif ()
+
 # VTK dependency
 find_package(VTK 9.0 REQUIRED
   COMPONENTS
@@ -203,16 +214,6 @@ endif()
 # webassembly bindings
 if(EMSCRIPTEN)
   add_subdirectory(webassembly)
-endif ()
-
-option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
-option(F3D_USE_EXTERNAL_NLOHMANN_JSON "Use external nlohmann_json dependency" OFF)
-
-if (F3D_USE_EXTERNAL_CXXOPTS)
-  find_package(cxxopts REQUIRED)
-endif ()
-if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
-  find_package(nlohmann_json REQUIRED)
 endif ()
 
 # Installing licenses
