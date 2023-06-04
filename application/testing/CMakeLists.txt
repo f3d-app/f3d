@@ -259,6 +259,9 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   # Framerate test is a smoke test as event playing seems to break VTK timers
   f3d_test(NAME TestInteractionAnimationFrameRate DATA InterpolationTest.glb ARGS --animation-frame-rate=2 --animation-index=-1 SERIAL INTERACTION NO_BASELINE)#Space;Wait;Space;
 
+  # A verbose test that needs animation index support
+  f3d_test(NAME TestVerboseAnimationWrongAnimationTime DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Provided time value: 10 is outside of animation time range" NO_BASELINE)
+
   # Test exit hotkey
   f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
 
@@ -559,7 +562,6 @@ f3d_test(NAME TestVerboseDirectory DATA mb REGEXP "Loading: .*mb_._0.vt." NO_REN
 # Test Animation invalid code paths
 f3d_test(NAME TestVerboseAnimationIndexError2 DATA cow.vtp ARGS --animation-index=1 --verbose REGEXP "An animation index has been specified but there are no animation available." NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationNoAnimationTime DATA cow.vtp ARGS --animation-time=2 --verbose REGEXP "No animation available, cannot load a specific animation time" NO_BASELINE)
-f3d_test(NAME TestVerboseAnimationWrongAnimationTime DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Provided time value: 10 is outside of animation time range" NO_BASELINE)
 
 # Test Grid verbose output
 f3d_test(NAME TestVerboseGrid DATA suzanne.ply ARGS -g --verbose REGEXP "Grid origin set to" NO_BASELINE)
