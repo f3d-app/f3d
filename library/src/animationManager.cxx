@@ -186,7 +186,7 @@ void animationManager::ToggleAnimation()
       double frameRate =
         this->Options->getAsDouble("scene.animation.frame-rate");
       this->CallBackId =
-        this->Interactor->createTimerCallBack(1000 / frameRate, [this]() { this->Tick(); });
+        this->Interactor->createTimerCallBack(1000.0 / frameRate, [this]() { this->Tick(); });
     }
 
     if (this->Playing && this->Options->getAsInt("scene.camera.index") >= 0)
@@ -212,7 +212,7 @@ void animationManager::Tick()
   this->PreviousTick = tick;
 
   // Convert to a usable time in seconds
-  double elapsedTime = static_cast<double>(timeInMS) / 1000;
+  double elapsedTime = static_cast<double>(timeInMS) / 1000.0;
   double animationSpeedFactor =
     this->Options->getAsDouble("scene.animation.speed-factor");
   elapsedTime *= animationSpeedFactor;
@@ -234,9 +234,14 @@ void animationManager::Tick()
 //----------------------------------------------------------------------------
 bool animationManager::LoadAtTime(double timeValue)
 {
+  if (!this->HasAnimation)
+  {
+    log::warn("No animation available, cannot load a specific animation time");
+    return false;
+  }
   if (timeValue < this->TimeRange[0] || timeValue > this->TimeRange[1])
   {
-    log::error("Provided time value: ", timeValue, " is outside of animation time range: [",
+    log::warn("Provided time value: ", timeValue, " is outside of animation time range: [",
       this->TimeRange[0], ", ", this->TimeRange[1], "] .");
     return false;
   }

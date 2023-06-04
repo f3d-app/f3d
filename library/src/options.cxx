@@ -4,7 +4,6 @@
 
 #include "vtkF3DConfigure.h"
 
-#include <limits>
 #include <map>
 #include <type_traits>
 #include <variant>

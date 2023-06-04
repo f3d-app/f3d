@@ -38,7 +38,7 @@ public:
 
   /**
    * Implementation only API.
-   * Set the interactor to use when interacting.
+   * Set the interactor to use when interacting and set the AnimationManager on the interactor.
    */
   void SetInteractor(interactor_impl* interactor);
 
