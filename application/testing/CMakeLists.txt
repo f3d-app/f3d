@@ -254,7 +254,6 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   # Test interactive animation and speed factor
   f3d_test(NAME TestInteractionAnimationFast DATA InterpolationTest.glb ARGS --animation-speed-factor=1000 --animation-index=-1 SERIAL INTERACTION)#Space;Space;
   f3d_test(NAME TestInteractionAnimationSlow DATA InterpolationTest.glb ARGS --animation-speed-factor=0.01 --animation-index=-1 SERIAL INTERACTION)#Space;Wait;Space;
-  f3d_test(NAME TestInteractionAnimationInvert DATA small.ex2 ARGS --animation-speed-factor=-1 --animation-time=0.00429998 SERIAL INTERACTION)#Space;Space;
   f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-speed-factor=10 SERIAL INTERACTION)#Space;MouseMovement;Space;
 
   # Test exit hotkey
@@ -412,6 +411,9 @@ if(F3D_PLUGIN_BUILD_EXODUS)
 
   # Test animation with generic importer and coloring
   f3d_test(NAME TestAnimationGenericImporter DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-time=0.003)
+
+  # Test animation with inverted speed factor
+  f3d_test(NAME TestInteractionAnimationInvert DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-speed-factor=-1 --animation-time=0.00429998 SERIAL INTERACTION)#Space;Space;
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/exodus/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
