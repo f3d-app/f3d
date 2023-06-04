@@ -229,7 +229,7 @@ bool animationManager::LoadAtTime(double timeValue)
 {
   if (timeValue < this->TimeRange[0] || timeValue > this->TimeRange[1])
   {
-    log::error("Provided time value: ", timeValue, " is outside of animation time range:", this->TimeRange[0], " ", this->TimeRange[1], " .");
+    log::error("Provided time value: ", timeValue, " is outside of animation time range: [", this->TimeRange[0], ", ", this->TimeRange[1], "] .");
     return false;
   }
 
