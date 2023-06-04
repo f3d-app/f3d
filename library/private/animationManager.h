@@ -70,7 +70,6 @@ protected:
   interactor_impl* Interactor = nullptr;
   const options* Options = nullptr;
 
-  double FrameRate = 30;
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   bool HasAnimation = false;

@@ -256,6 +256,9 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestInteractionAnimationSlow DATA InterpolationTest.glb ARGS --animation-speed-factor=0.01 --animation-index=-1 SERIAL INTERACTION)#Space;Wait;Space;
   f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-speed-factor=10 SERIAL INTERACTION)#Space;MouseMovement;Space;
 
+  # Framerate test is a smoke test as event playing seems to break VTK timers
+  f3d_test(NAME TestInteractionAnimationFrameRate DATA InterpolationTest.glb ARGS --animation-frame-rate=2 --animation-index=-1 SERIAL INTERACTION NO_BASELINE)#Space;Wait;Space;
+
   # Test exit hotkey
   f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
 
