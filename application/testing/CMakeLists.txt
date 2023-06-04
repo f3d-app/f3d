@@ -410,10 +410,10 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "0, 0.00429999")
 
   # Test animation with generic importer and coloring
-  f3d_test(NAME TestAnimationGenericImporter DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-time=0.003)
+  f3d_test(NAME TestAnimationGenericImporter DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-time=0.003 DEFAULT_LIGHTS)
 
   # Test animation with inverted speed factor
-  f3d_test(NAME TestInteractionAnimationInvert DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-speed-factor=-1 --animation-time=0.00429998 SERIAL INTERACTION)#Space;Space;
+  f3d_test(NAME TestInteractionAnimationInvert DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-speed-factor=-1 --animation-time=0.00429998 SERIAL INTERACTION DEFAULT_LIGHTS)#Space;Space;
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/exodus/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
