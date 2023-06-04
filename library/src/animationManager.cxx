@@ -115,8 +115,7 @@ void animationManager::Initialize(
       // Discard timesteps, F3D only cares about real elapsed time using time range
       // Specifying the frame rate in the next call is not needed after VTK 9.2.20230603 :
       // VTK_VERSION_CHECK(9, 2, 20230603)
-      double frameRate =
-        this->Options->getAsDouble("scene.animation.frame-rate");
+      double frameRate = this->Options->getAsDouble("scene.animation.frame-rate");
       this->Importer->GetTemporalInformation(
         animIndex, frameRate, nbTimeSteps, timeRange, timeSteps);
 #else
@@ -183,8 +182,7 @@ void animationManager::ToggleAnimation()
       // Always reset previous tick when starting the animation
       this->PreviousTick = std::chrono::steady_clock::now();
 
-      double frameRate =
-        this->Options->getAsDouble("scene.animation.frame-rate");
+      double frameRate = this->Options->getAsDouble("scene.animation.frame-rate");
       this->CallBackId =
         this->Interactor->createTimerCallBack(1000.0 / frameRate, [this]() { this->Tick(); });
     }
@@ -213,8 +211,7 @@ void animationManager::Tick()
 
   // Convert to a usable time in seconds
   double elapsedTime = static_cast<double>(timeInMS) / 1000.0;
-  double animationSpeedFactor =
-    this->Options->getAsDouble("scene.animation.speed-factor");
+  double animationSpeedFactor = this->Options->getAsDouble("scene.animation.speed-factor");
   elapsedTime *= animationSpeedFactor;
 
   // elapsedTime can be negative
