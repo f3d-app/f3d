@@ -4,6 +4,7 @@
 
 #include "vtkF3DConfigure.h"
 
+#include <limits>
 #include <map>
 #include <type_traits>
 #include <variant>
@@ -109,6 +110,7 @@ options::options()
   // Scene
   this->Internals->init("scene.animation.index", 0);
   this->Internals->init("scene.animation.speed-factor", 1.0);
+  this->Internals->init("scene.animation.time", 0.0);
   this->Internals->init("scene.camera.index", -1);
   this->Internals->init("scene.up-direction", std::string("+Y"));
 

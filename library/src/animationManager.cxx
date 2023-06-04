@@ -16,7 +16,7 @@ namespace f3d::detail
 {
 //----------------------------------------------------------------------------
 void animationManager::Initialize(
-  const options* options, interactor_impl* interactor, window* window, vtkImporter* importer)
+  const options* options, window* window, interactor_impl* interactor, vtkImporter* importer)
 {
   this->HasAnimation = false;
 
@@ -28,7 +28,7 @@ void animationManager::Initialize(
   // This can be -1 if animation support is not implemented in the importer
   vtkIdType availAnimations = this->Importer->GetNumberOfAnimations();
 
-  if (availAnimations > 0)
+  if (availAnimations > 0 && interactor)
   {
     this->ProgressWidget = vtkSmartPointer<vtkProgressBarWidget>::New();
     interactor->SetInteractorOn(this->ProgressWidget);
@@ -131,7 +131,7 @@ void animationManager::Initialize(
       this->HasAnimation = true;
     }
   }
-  log::debug("Animation(s) time range is: ", this->TimeRange[0], " ", this->TimeRange[1], ".");
+  log::debug("Animation(s) time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
   this->Playing = false;
   this->CurrentTime = 0;
   this->CurrentTimeSet = false;
@@ -159,7 +159,7 @@ void animationManager::StopAnimation()
 //----------------------------------------------------------------------------
 void animationManager::ToggleAnimation()
 {
-  if (this->HasAnimation)
+  if (this->HasAnimation && this->Interactor)
   {
     this->Playing = !this->Playing;
 
@@ -196,6 +196,8 @@ void animationManager::ToggleAnimation()
 //----------------------------------------------------------------------------
 void animationManager::Tick()
 {
+  assert(this->Interactor);
+
   // Compute time since previous tick
   std::chrono::steady_clock::time_point tick = std::chrono::steady_clock::now();
   auto timeInMS =
@@ -218,16 +220,33 @@ void animationManager::Tick()
   {
     this->CurrentTime = this->TimeRange[0];
   }
-
-  // Set progress bar
-  vtkProgressBarRepresentation* progressRep =
-    vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());
-  progressRep->SetProgressRate(
-    (this->CurrentTime - this->TimeRange[0]) / (this->TimeRange[1] - this->TimeRange[0]));
-
-  // Update and render
-  this->Importer->UpdateTimeStep(this->CurrentTime);
-  this->Interactor->UpdateRendererAfterInteraction();
+  this->LoadAtTime(this->CurrentTime);
   this->Window->render();
+}
+
+//----------------------------------------------------------------------------
+bool animationManager::LoadAtTime(double timeValue)
+{
+  if (timeValue < this->TimeRange[0] || timeValue > this->TimeRange[1])
+  {
+    log::error("Provided time value: ", timeValue, " is outside of animation time range:", this->TimeRange[0], " ", this->TimeRange[1], " .");
+    return false;
+  }
+
+  this->CurrentTime = timeValue;
+  this->CurrentTimeSet = true;
+  this->Importer->UpdateTimeStep(this->CurrentTime);
+
+  if (this->Interactor)
+  {
+    // Set progress bar
+    vtkProgressBarRepresentation* progressRep =
+      vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());
+    progressRep->SetProgressRate(
+      (this->CurrentTime - this->TimeRange[0]) / (this->TimeRange[1] - this->TimeRange[0]));
+
+    this->Interactor->UpdateRendererAfterInteraction();
+  }
+  return true;
 }
 }

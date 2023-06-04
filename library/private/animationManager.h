@@ -34,10 +34,10 @@ public:
 
   /**
    * Initialize the animation manager, required before playing the animation.
-   * Provided pointers are expected to be not null.
+   * Provided pointers are expected to be not null except interactor.
    */
   void Initialize(
-    const options* options, interactor_impl* interactor, window* window, vtkImporter* importer);
+    const options* options, window* window, interactor_impl* interactor, vtkImporter* importer);
 
   /**
    * Start/Stop playing the animation
@@ -50,6 +50,11 @@ public:
    * Return true if the animation manager is playing the animation
    */
   bool IsPlaying() const { return Playing; }
+
+  /**
+   * Load animation at provided time value
+   */
+  bool LoadAtTime(double timeValue);
 
   animationManager(animationManager const&) = delete;
   void operator=(animationManager const&) = delete;

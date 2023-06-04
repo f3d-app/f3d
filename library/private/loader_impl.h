@@ -40,7 +40,7 @@ public:
    * Implementation only API.
    * Set the interactor to use when interacting.
    */
-  void setInteractor(interactor_impl* interactor);
+  void SetInteractor(interactor_impl* interactor);
 
 private:
   class internals;
