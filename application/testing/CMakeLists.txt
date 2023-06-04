@@ -415,7 +415,7 @@ if(F3D_PLUGIN_BUILD_EXODUS)
 
   f3d_test(NAME TestExodusConfig DATA disk_out_ref.ex2 CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/exodus.json ARGS -s --camera-position=-11,-2,-49 DEFAULT_LIGHTS)
 
-  # Test Generic Importer Verbose animation
+  # Test Generic Importer Verbose animation. Regex contains the time range.
   f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "0, 0.00429999")
 
   # Test animation with generic importer and coloring
@@ -423,6 +423,9 @@ if(F3D_PLUGIN_BUILD_EXODUS)
 
   # Test animation with inverted speed factor
   f3d_test(NAME TestInteractionAnimationInvert DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-speed-factor=-1 --animation-time=0.00429998 SERIAL INTERACTION DEFAULT_LIGHTS)#Space;Space;
+
+  # Test no render animation time. Regex contains a part of the range of the ACCL field.
+  f3d_test(NAME TestNoRenderAnimation DATA small.ex2 ARGS  --load-plugins=exodus --animation-time=0.003 REGEXP "-521950, 6.57485" NO_RENDER)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/exodus/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")

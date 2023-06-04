@@ -175,6 +175,11 @@ protected:
    */
   void UpdateColoringVectors(bool useCellData);
 
+  /**
+   * Update output descriptions according to current outputs
+   */
+  void UpdateOutputDescriptions();
+
 private:
   vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;
   void operator=(const vtkF3DGenericImporter&) = delete;

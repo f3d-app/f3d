@@ -189,7 +189,6 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
 
   // Update the importer
   this->Internals->GenericImporter->Update();
-  loader_impl::internals::DisplayImporterDescription(this->Internals->GenericImporter);
 
   // Remove anything progress related if any
   this->Internals->GenericImporter->RemoveObservers(vtkCommand::ProgressEvent);
@@ -204,6 +203,9 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
   {
     this->Internals->AnimationManager.LoadAtTime(animationTime);
   }
+
+  // Display the importer description
+  loader_impl::internals::DisplayImporterDescription(this->Internals->GenericImporter);
 
   // Set the importer to use for coloring and actors
   this->Internals->Window.SetImporterForColoring(this->Internals->GenericImporter);
@@ -283,7 +285,6 @@ loader& loader_impl::loadScene(const std::string& filePath)
 
   // Read the file
   this->Internals->CurrentFullSceneImporter->Update();
-  loader_impl::internals::DisplayImporterDescription(this->Internals->CurrentFullSceneImporter);
 
   // Remove anything progress related if any
   this->Internals->CurrentFullSceneImporter->RemoveObservers(vtkCommand::ProgressEvent);
@@ -298,6 +299,9 @@ loader& loader_impl::loadScene(const std::string& filePath)
   {
     this->Internals->AnimationManager.LoadAtTime(animationTime);
   }
+
+  // Display output description
+  loader_impl::internals::DisplayImporterDescription(this->Internals->CurrentFullSceneImporter);
 
   // Initialize renderer and reset camera to bounds if needed
   this->Internals->Window.UpdateDynamicOptions();

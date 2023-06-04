@@ -387,6 +387,7 @@ void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
   }
   this->UpdateColoringVectors(false);
   this->UpdateColoringVectors(true);
+  this->UpdateOutputDescriptions();
 }
 
 //----------------------------------------------------------------------------
@@ -575,4 +576,22 @@ int vtkF3DGenericImporter::FindIndexForColoring(bool useCellData, const std::str
 const vtkBoundingBox& vtkF3DGenericImporter::GetGeometryBoundingBox()
 {
   return this->Pimpl->GeometryBoundingBox;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::UpdateOutputDescriptions()
+{
+  for (ReaderPipeline& pipe : this->Pimpl->Readers)
+  {
+    vtkDataObject* readerOutput = pipe.Reader->GetOutputDataObject(0);
+    if (!readerOutput)
+    {
+      F3DLog::Print(F3DLog::Severity::Warning, "A reader did not produce any output");
+      pipe.Output = nullptr;
+      continue;
+    }
+
+    // Recover output description
+    pipe.OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(readerOutput);
+  }
 }
