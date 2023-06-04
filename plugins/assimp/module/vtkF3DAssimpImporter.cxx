@@ -1037,8 +1037,9 @@ bool vtkF3DAssimpImporter::IsAnimationEnabled(vtkIdType animationIndex)
 // Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
 //----------------------------------------------------------------------------
-bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex, double vtkNotUsed(frameRate),
-  int& vtkNotUsed(nbTimeSteps), double timeRange[2], vtkDoubleArray* vtkNotUsed(timeSteps))
+bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex,
+  double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
+  vtkDoubleArray* vtkNotUsed(timeSteps))
 {
   double duration = this->Internals->Scene->mAnimations[animationIndex]->mDuration;
   double fps = this->Internals->Scene->mAnimations[animationIndex]->mTicksPerSecond;

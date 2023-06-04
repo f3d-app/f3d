@@ -196,8 +196,8 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
   progressWidget->Off();
 
   // Initialize the animation using temporal information from the importer
-  this->Internals->AnimationManager.Initialize(
-    &this->Internals->Options, &this->Internals->Window, this->Internals->Interactor, this->Internals->GenericImporter);
+  this->Internals->AnimationManager.Initialize(&this->Internals->Options, &this->Internals->Window,
+    this->Internals->Interactor, this->Internals->GenericImporter);
 
   double animationTime = this->Internals->Options.getAsDouble("scene.animation.time");
   if (animationTime != 0)
@@ -290,8 +290,8 @@ loader& loader_impl::loadScene(const std::string& filePath)
   progressWidget->Off();
 
   // Initialize the animation using temporal information from the importer
-  this->Internals->AnimationManager.Initialize(
-    &this->Internals->Options, &this->Internals->Window, this->Internals->Interactor, this->Internals->CurrentFullSceneImporter);
+  this->Internals->AnimationManager.Initialize(&this->Internals->Options, &this->Internals->Window,
+    this->Internals->Interactor, this->Internals->CurrentFullSceneImporter);
 
   double animationTime = this->Internals->Options.getAsDouble("scene.animation.time");
   if (animationTime != 0)

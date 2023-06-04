@@ -113,8 +113,10 @@ void animationManager::Initialize(
 // Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
       // Discard timesteps, F3D only cares about real elapsed time using time range
-      // Specifying the frame rate in the next call is not needed after VTK 9.2.20230603 : VTK_VERSION_CHECK(9, 2, 20230603)
-      this->Importer->GetTemporalInformation(animIndex, this->FrameRate, nbTimeSteps, timeRange, timeSteps);
+      // Specifying the frame rate in the next call is not needed after VTK 9.2.20230603 :
+      // VTK_VERSION_CHECK(9, 2, 20230603)
+      this->Importer->GetTemporalInformation(
+        animIndex, this->FrameRate, nbTimeSteps, timeRange, timeSteps);
 #else
       this->Importer->GetTemporalInformation(animIndex, nbTimeSteps, timeRange, timeSteps);
 #endif
@@ -229,7 +231,8 @@ bool animationManager::LoadAtTime(double timeValue)
 {
   if (timeValue < this->TimeRange[0] || timeValue > this->TimeRange[1])
   {
-    log::error("Provided time value: ", timeValue, " is outside of animation time range: [", this->TimeRange[0], ", ", this->TimeRange[1], "] .");
+    log::error("Provided time value: ", timeValue, " is outside of animation time range: [",
+      this->TimeRange[0], ", ", this->TimeRange[1], "] .");
     return false;
   }
 
