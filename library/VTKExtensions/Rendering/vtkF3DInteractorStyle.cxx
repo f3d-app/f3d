@@ -114,7 +114,19 @@ void vtkF3DInteractorStyle::Dolly()
   {
     return;
   }
-  this->Superclass::Dolly();
+
+  if (this->CurrentRenderer == nullptr)
+  {
+    return;
+  }
+
+  vtkRenderWindowInteractor* rwi = this->Interactor;
+  const double* center = this->CurrentRenderer->GetCenter();
+  const int dy = rwi->GetEventPosition()[1] - rwi->GetLastEventPosition()[1];
+  const int dx = rwi->GetEventPosition()[0] - rwi->GetLastEventPosition()[0];
+  const auto dt = std::abs(dy) > std::abs(dx) ? dy : dx;
+  const double dtf = this->MotionFactor * dt / center[1];
+  this->Dolly(pow(1.1, dtf));
 }
 
 //----------------------------------------------------------------------------
