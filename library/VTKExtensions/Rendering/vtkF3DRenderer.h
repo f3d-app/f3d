@@ -83,6 +83,9 @@ public:
   vtkGetMacro(UseTrackball, bool);
   ///@}
 
+  vtkSetMacro(InvertZoom, bool);
+  vtkGetMacro(InvertZoom, bool);
+
   /**
    * Reimplemented to configure:
    *  - ActorsProperties
@@ -229,6 +232,7 @@ protected:
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;
   bool UseTrackball = false;
+  bool InvertZoom = false;
 
   int RaytracingSamples = 0;
   int UpIndex = 1;

@@ -124,7 +124,11 @@ void vtkF3DInteractorStyle::Dolly()
   const double* center = this->CurrentRenderer->GetCenter();
   const int dy = rwi->GetEventPosition()[1] - rwi->GetLastEventPosition()[1];
   const int dx = rwi->GetEventPosition()[0] - rwi->GetLastEventPosition()[0];
-  const auto dt = std::abs(dy) > std::abs(dx) ? dy : dx;
+  auto dt = std::abs(dy) > std::abs(dx) ? dy : dx;
+
+  if (vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
+      ren && ren->GetInvertZoom())
+    dt *= -1;
   const double dtf = this->MotionFactor * dt / center[1];
   this->Dolly(pow(1.1, dtf));
 }

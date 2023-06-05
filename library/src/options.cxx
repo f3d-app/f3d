@@ -181,6 +181,7 @@ options::options()
   // Interactor
   this->Internals->init("interactor.axis", false);
   this->Internals->init("interactor.trackball", false);
+  this->Internals->init("interactor.invert-zoom", false);
 };
 
 //----------------------------------------------------------------------------
