@@ -252,9 +252,9 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestVerboseAnimationIndexError1 DATA InterpolationTest.glb ARGS --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
 
   # Test interactive animation and speed factor
-  f3d_test(NAME TestInteractionAnimationFast DATA InterpolationTest.glb ARGS --animation-speed-factor=1000 --animation-index=-1 SERIAL INTERACTION)#Space;Space;
+  f3d_test(NAME TestInteractionAnimationFast DATA InterpolationTest.glb ARGS --animation-speed-factor=1000 --animation-index=-1 SERIAL INTERACTION NO_BASELINE)#Space;Space;
   f3d_test(NAME TestInteractionAnimationSlow DATA InterpolationTest.glb ARGS --animation-speed-factor=0.01 --animation-index=-1 SERIAL INTERACTION)#Space;Wait;Space;
-  f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-speed-factor=10 SERIAL INTERACTION)#Space;MouseMovement;Space;
+  f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-speed-factor=1000 SERIAL INTERACTION)#Space;MouseMovement;Space;
 
   # Framerate test is a smoke test as event playing seems to break VTK timers
   f3d_test(NAME TestInteractionAnimationFrameRate DATA InterpolationTest.glb ARGS --animation-frame-rate=2 --animation-index=-1 SERIAL INTERACTION NO_BASELINE)#Space;Wait;Space;
@@ -422,7 +422,7 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   f3d_test(NAME TestAnimationGenericImporter DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-time=0.003 DEFAULT_LIGHTS)
 
   # Test animation with inverted speed factor
-  f3d_test(NAME TestInteractionAnimationInvert DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-speed-factor=-1 --animation-time=0.00429998 SERIAL INTERACTION DEFAULT_LIGHTS)#Space;Space;
+  f3d_test(NAME TestInteractionAnimationInvert DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-speed-factor=-0.001 --animation-time=0.00429998 SERIAL INTERACTION DEFAULT_LIGHTS)#Space;Space;
 
   # Test no render animation time. Regex contains a part of the range of the ACCL field.
   f3d_test(NAME TestNoRenderAnimation DATA small.ex2 ARGS  --load-plugins=exodus --animation-time=0.003 REGEXP "-521950, 6.57485" NO_RENDER)

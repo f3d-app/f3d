@@ -896,9 +896,9 @@ void vtkF3DAssimpImporter::UpdateTimeStep(double timeValue)
   // get the animation tick
   double fps =
     this->Internals->Scene->mAnimations[this->Internals->ActiveAnimation]->mTicksPerSecond;
-  if (fps == 0)
+  if (fps == 0.0)
   {
-    fps = 1;
+    fps = 1.0;
   }
 
   aiAnimation* anim = this->Internals->Scene->mAnimations[this->Internals->ActiveAnimation];
@@ -1043,9 +1043,9 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex,
 {
   double duration = this->Internals->Scene->mAnimations[animationIndex]->mDuration;
   double fps = this->Internals->Scene->mAnimations[animationIndex]->mTicksPerSecond;
-  if (fps == 0)
+  if (fps == 0.0)
   {
-    fps = 1;
+    fps = 1.0;
   }
 
   this->Internals->Description += "Animation \"";

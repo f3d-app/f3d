@@ -122,15 +122,8 @@ void animationManager::Initialize(
       this->Importer->GetTemporalInformation(animIndex, nbTimeSteps, timeRange, timeSteps);
 #endif
       // Accumulate time ranges
-      if (timeRange[0] < this->TimeRange[0])
-      {
-        this->TimeRange[0] = timeRange[0];
-      }
-      if (timeRange[1] > this->TimeRange[1])
-      {
-        this->TimeRange[1] = timeRange[1];
-      }
-
+      this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
+      this->TimeRange[1] = std::max(timeRange[1], this->TimeRange[1]);
       this->HasAnimation = true;
     }
   }
@@ -212,18 +205,14 @@ void animationManager::Tick()
   // Convert to a usable time in seconds
   double elapsedTime = static_cast<double>(timeInMS) / 1000.0;
   double animationSpeedFactor = this->Options->getAsDouble("scene.animation.speed-factor");
-  elapsedTime *= animationSpeedFactor;
 
   // elapsedTime can be negative
-  this->CurrentTime += elapsedTime;
-  if (this->CurrentTime < this->TimeRange[0])
-  {
-    this->CurrentTime = this->TimeRange[1];
-  }
-  else if (this->CurrentTime > this->TimeRange[1])
-  {
-    this->CurrentTime = this->TimeRange[0];
-  }
+  elapsedTime *= animationSpeedFactor;
+
+  // Modulo computation, compute CurrentTime + elapsedTime in the time range.
+  double delta = this->TimeRange[1] - this->TimeRange[0];
+  this->CurrentTime = fmod(this->CurrentTime - this->TimeRange[0] + fmod(elapsedTime, delta) + delta, delta) + this->TimeRange[0];
+
   this->LoadAtTime(this->CurrentTime);
   this->Window->render();
 }
