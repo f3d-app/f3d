@@ -474,6 +474,7 @@ f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION DEFAULT_
 f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION DEFAULT_LIGHTS) #Down;
 f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No file loaded, no rendering performed") #Down;
 f3d_test(NAME TestInteractionGroupGeometriesLoadParentDirectory DATA mb/mb_0_0.vtu ARGS --group-geometries --filename INTERACTION DEFAULT_LIGHTS) #Down;
+f3d_test(NAME TestInteractionInvertZoom DATA suzanne.ply ARGS --invert-zoom=true INTERACTION DEFAULT_LIGHTS)
 
 # Progress test
 f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
