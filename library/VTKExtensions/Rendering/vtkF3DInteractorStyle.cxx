@@ -115,6 +115,8 @@ void vtkF3DInteractorStyle::Dolly()
     return;
   }
 
+  assert(this->CurrentRenderer != nullptr);
+
   vtkRenderWindowInteractor* rwi = this->Interactor;
   const double* center = this->CurrentRenderer->GetCenter();
   const int dy = rwi->GetEventPosition()[1] - rwi->GetLastEventPosition()[1];
