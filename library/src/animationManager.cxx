@@ -211,7 +211,9 @@ void animationManager::Tick()
 
   // Modulo computation, compute CurrentTime + elapsedTime in the time range.
   double delta = this->TimeRange[1] - this->TimeRange[0];
-  this->CurrentTime = fmod(this->CurrentTime - this->TimeRange[0] + fmod(elapsedTime, delta) + delta, delta) + this->TimeRange[0];
+  this->CurrentTime =
+    fmod(this->CurrentTime - this->TimeRange[0] + fmod(elapsedTime, delta) + delta, delta) +
+    this->TimeRange[0];
 
   this->LoadAtTime(this->CurrentTime);
   this->Window->render();
