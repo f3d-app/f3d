@@ -83,8 +83,13 @@ public:
   vtkGetMacro(UseTrackball, bool);
   ///@}
 
+  ///@{
+  /**
+   * Set/Get InvertZoom
+   */
   vtkSetMacro(InvertZoom, bool);
   vtkGetMacro(InvertZoom, bool);
+  ///@}
 
   /**
    * Reimplemented to configure:
