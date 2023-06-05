@@ -22,6 +22,9 @@ runs:
     - name: Install Imath dependency
       uses: ./source/.github/actions/imath-install-dep
 
+    - name: Install OpenEXR dependency
+      uses: ./source/.github/actions/openexr-install-dep
+
     - name: Install Alembic dependency
       uses: ./source/.github/actions/alembic-install-dep
 

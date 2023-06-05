@@ -137,6 +137,7 @@ jobs:
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
         -DF3D_MACOS_BUNDLE=${{ matrix.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_MODULE_EXR=ON
         -DF3D_MODULE_RAYTRACING=${{ matrix.raytracing_label == 'raytracing' && 'ON' || 'OFF' }}
         -DF3D_PLUGINS_STATIC_BUILD=${{ matrix.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
@@ -456,6 +457,7 @@ jobs:
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_MODULE_EXR=ON
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
@@ -550,6 +552,7 @@ jobs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_MODULE_EXR=ON
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON

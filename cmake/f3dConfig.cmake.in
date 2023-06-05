@@ -9,6 +9,7 @@
 #
 #   f3d_MODULE_EXTERNAL_RENDERING  Will be enabled if F3D was built with external rendering support
 #   f3d_MODULE_RAYTRACING          Will be enabled if F3D was built with raytracing support
+#   f3d_MODULE_EXR                 Will be enabled if F3D was built with OpenEXR images support
 #   f3d_BINDINGS_PYTHON            Will be enabled if F3D was built with python bindings
 #   f3d_BINDINGS_JAVA              Will be enabled if F3D was built with java bindings
 #   f3d_INCLUDE_DIR                Absolute path to the include directory of public f3d library classes
@@ -19,6 +20,7 @@
 
 set(f3d_MODULE_EXTERNAL_RENDERING "@F3D_MODULE_EXTERNAL_RENDERING@")
 set(f3d_MODULE_RAYTRACING "@F3D_MODULE_RAYTRACING@")
+set(f3d_MODULE_EXR "@F3D_MODULE_EXR@")
 set(f3d_BINDINGS_PYTHON "@F3D_BINDINGS_PYTHON@")
 set(f3d_BINDINGS_JAVA "@F3D_BINDINGS_JAVA@")
 set(f3d_CONFIG_DIR "@f3d_config_dir@")

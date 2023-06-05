@@ -5,6 +5,7 @@
         "assimp",
         "draco",
         "opencascade",
+        "openexr",
         {
             "name": "vtk",
             "default-features": false,
