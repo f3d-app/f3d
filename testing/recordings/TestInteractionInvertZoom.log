@@ -1,0 +1,15 @@
+# StreamVersion 1.2
+RenderEvent 0 0 0 13 1 Return 0
+EnterEvent 73 324 0 0 0 Return 0
+RightButtonPressEvent 62 155 0 0 0 Return 0
+StartInteractionEvent 62 155 0 0 0 Return 0
+MouseMoveEvent 62 155 0 0 0 Return 0
+RenderEvent 62 155 0 0 0 Return 0
+InteractionEvent 62 155 0 0 0 Return 0
+MouseMoveEvent 60 397 0 0 0 Return 0
+RenderEvent 60 397 0 0 0 Return 0
+InteractionEvent 60 397 0 0 0 Return 0
+RightButtonReleaseEvent 60 397 0 0 0 Return 0
+EndInteractionEvent 60 397 0 0 0 Return 0
+RenderEvent 60 397 0 0 0 Return 0
+ExitEvent 995 434 0 0 0 Return 0
