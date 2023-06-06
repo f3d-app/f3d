@@ -123,13 +123,14 @@ void vtkF3DInteractorStyle::Dolly()
   const int* last_position = rwi->GetLastEventPosition();
   const int dy = current_position[1] - last_position[1];
   const int dx = current_position[0] - last_position[0];
-  auto dt = std::abs(dy) > std::abs(dx) ? dy : dx;
+  const double dxf = this->MotionFactor * dx / center[0];
+  const double dyf = this->MotionFactor * dy / center[1];
+  auto dtf = std::abs(dyf) > std::abs(dxf) ? dyf : dxf;
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
   if (ren && ren->GetInvertZoom())
   {
-    dt *= -1;
+    dtf *= -1;
   }
-  const double dtf = this->MotionFactor * dt / center[1];
   this->Dolly(pow(1.1, dtf));
 }
 
