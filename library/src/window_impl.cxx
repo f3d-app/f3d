@@ -267,6 +267,8 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->ShowAxis(this->Internals->Options.getAsBool("interactor.axis"));
   this->Internals->Renderer->SetUseTrackball(
     this->Internals->Options.getAsBool("interactor.trackball"));
+  this->Internals->Renderer->SetInvertZoom(
+    this->Internals->Options.getAsBool("interactor.invert-zoom"));
 
   this->Internals->Renderer->SetLineWidth(
     this->Internals->Options.getAsDouble("render.line-width"));
