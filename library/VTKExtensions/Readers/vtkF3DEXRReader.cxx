@@ -49,7 +49,7 @@ void vtkF3DEXRReader::ExecuteInformation()
     Imf::RgbaChannels channels = file.channels();
     if (channels != Imf::RgbaChannels::WRITE_RGBA && channels != Imf::RgbaChannels::WRITE_RGB)
     {
-      throw std::runtime_error("type of channels not supported yet");
+      throw std::runtime_error("only RGB and RGBA channels are supported");
     }
   }
   catch (const std::exception& e)
@@ -135,11 +135,13 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
   }
 }
 
+//------------------------------------------------------------------------------
 int vtkF3DEXRReader::GetWidth() const
 {
   return this->DataExtent[1] - this->DataExtent[0] + 1;
 }
 
+//------------------------------------------------------------------------------
 int vtkF3DEXRReader::GetHeight() const
 {
   return this->DataExtent[3] - this->DataExtent[2] + 1;
