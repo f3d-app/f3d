@@ -10,7 +10,17 @@
 #include <vtkProgressBarRepresentation.h>
 #include <vtkVersion.h>
 
+#include <cmath>
 #include <functional>
+
+namespace
+{
+double modulo(double a, double b)
+{
+  const double remainder = fmod(a, b);
+  return remainder < 0 ? remainder + b : remainder;
+}
+}
 
 namespace f3d::detail
 {
@@ -19,6 +29,9 @@ void animationManager::Initialize(
   const options* options, window* window, interactor_impl* interactor, vtkImporter* importer)
 {
   this->HasAnimation = false;
+  this->Playing = false;
+  this->CurrentTime = 0;
+  this->CurrentTimeSet = false;
 
   this->Options = options;
   this->Interactor = interactor;
@@ -127,10 +140,15 @@ void animationManager::Initialize(
       this->HasAnimation = true;
     }
   }
-  log::debug("Animation(s) time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
-  this->Playing = false;
-  this->CurrentTime = 0;
-  this->CurrentTimeSet = false;
+  if (this->TimeRange[0] == this->TimeRange[1])
+  {
+    log::warn("Animation(s) time range delta is zero: [", this->TimeRange[0], ", ", this->TimeRange[1], "]. Disabling animation.");
+    this->HasAnimation = false;
+  }
+  else
+  {
+    log::debug("Animation(s) time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -208,12 +226,13 @@ void animationManager::Tick()
 
   // elapsedTime can be negative
   elapsedTime *= animationSpeedFactor;
+  this->CurrentTime += elapsedTime;
 
-  // Modulo computation, compute CurrentTime + elapsedTime in the time range.
-  double delta = this->TimeRange[1] - this->TimeRange[0];
-  this->CurrentTime =
-    fmod(this->CurrentTime - this->TimeRange[0] + fmod(elapsedTime, delta) + delta, delta) +
-    this->TimeRange[0];
+  // Modulo computation, compute CurrentTime in the time range.
+  if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
+  {
+    this->CurrentTime = this->TimeRange[0] + ::modulo(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] -  this->TimeRange[0]);
+  }
 
   this->LoadAtTime(this->CurrentTime);
   this->Window->render();
