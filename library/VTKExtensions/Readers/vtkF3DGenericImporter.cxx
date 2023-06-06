@@ -100,14 +100,8 @@ void vtkF3DGenericImporter::UpdateTemporalInformation()
     {
       // Accumulate time ranges
       double* readerTimeRange = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
-      if (readerTimeRange[0] < this->Pimpl->TimeRange[0])
-      {
-        this->Pimpl->TimeRange[0] = readerTimeRange[0];
-      }
-      if (readerTimeRange[1] > this->Pimpl->TimeRange[1])
-      {
-        this->Pimpl->TimeRange[1] = readerTimeRange[1];
-      }
+      this->Pimpl->TimeRange[0] = std::min(this->Pimpl->TimeRange[0], readerTimeRange[0]);
+      this->Pimpl->TimeRange[1] = std::max(this->Pimpl->TimeRange[1], readerTimeRange[1]);
       this->Pimpl->HasAnimation = true;
     }
   }
