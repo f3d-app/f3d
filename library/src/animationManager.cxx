@@ -142,7 +142,8 @@ void animationManager::Initialize(
   }
   if (this->TimeRange[0] == this->TimeRange[1])
   {
-    log::warn("Animation(s) time range delta is zero: [", this->TimeRange[0], ", ", this->TimeRange[1], "]. Disabling animation.");
+    log::warn("Animation(s) time range delta is zero: [", this->TimeRange[0], ", ",
+      this->TimeRange[1], "]. Disabling animation.");
     this->HasAnimation = false;
   }
   else
@@ -231,7 +232,8 @@ void animationManager::Tick()
   // Modulo computation, compute CurrentTime in the time range.
   if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
   {
-    this->CurrentTime = this->TimeRange[0] + ::modulo(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] -  this->TimeRange[0]);
+    this->CurrentTime = this->TimeRange[0] +
+      ::modulo(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] - this->TimeRange[0]);
   }
 
   this->LoadAtTime(this->CurrentTime);
