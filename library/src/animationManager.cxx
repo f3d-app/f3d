@@ -13,15 +13,6 @@
 #include <cmath>
 #include <functional>
 
-namespace
-{
-double modulo(double a, double b)
-{
-  const double remainder = fmod(a, b);
-  return remainder < 0 ? remainder + b : remainder;
-}
-}
-
 namespace f3d::detail
 {
 //----------------------------------------------------------------------------
@@ -232,8 +223,12 @@ void animationManager::Tick()
   // Modulo computation, compute CurrentTime in the time range.
   if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
   {
+    auto modulo = [](double val, double mod) {
+      const double remainder = fmod(val, mod);
+      return remainder < 0 ? remainder + mod : remainder;
+    };
     this->CurrentTime = this->TimeRange[0] +
-      ::modulo(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] - this->TimeRange[0]);
+      modulo(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] - this->TimeRange[0]);
   }
 
   this->LoadAtTime(this->CurrentTime);
