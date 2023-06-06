@@ -223,7 +223,8 @@ void animationManager::Tick()
   // Modulo computation, compute CurrentTime in the time range.
   if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
   {
-    auto modulo = [](double val, double mod) {
+    auto modulo = [](double val, double mod)
+    {
       const double remainder = fmod(val, mod);
       return remainder < 0 ? remainder + mod : remainder;
     };
