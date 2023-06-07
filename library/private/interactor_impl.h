@@ -23,6 +23,7 @@ namespace detail
 {
 class loader_impl;
 class window_impl;
+class animationManager;
 
 class interactor_impl : public interactor
 {
@@ -54,6 +55,12 @@ public:
   void start() override;
   void stop() override;
   ///@}
+
+  /**
+   * Implementation only API.
+   * Set the internal AnimationManager to be used by the interactor
+   */
+  void SetAnimationManager(animationManager* manager);
 
   /**
    * Implementation only API.

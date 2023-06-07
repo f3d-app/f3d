@@ -71,8 +71,9 @@ struct vtkF3DGenericImporter::Internals
   std::vector<ColoringInfo> CellDataArrayVectorForColoring;
   vtkBoundingBox GeometryBoundingBox;
 
+  bool HasAnimation = false;
   bool AnimationEnabled = false;
-  std::set<double> TimeSteps;
+  std::array<double, 2> TimeRange;
 };
 
 vtkStandardNewMacro(vtkF3DGenericImporter);
@@ -86,24 +87,30 @@ vtkF3DGenericImporter::vtkF3DGenericImporter()
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::UpdateTemporalInformation()
 {
-  this->Pimpl->TimeSteps.clear();
+  this->Pimpl->HasAnimation = false;
+  this->Pimpl->TimeRange[0] = std::numeric_limits<double>::infinity();
+  this->Pimpl->TimeRange[1] = -std::numeric_limits<double>::infinity();
 
   // Update each reader
   for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
     pipe.Reader->UpdateInformation();
     vtkInformation* readerInfo = pipe.Reader->GetOutputInformation(0);
-
-    int nbTimeSteps = readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    double* readerTimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    this->Pimpl->TimeSteps.insert(readerTimeSteps, readerTimeSteps + nbTimeSteps);
+    if (readerInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
+    {
+      // Accumulate time ranges
+      double* readerTimeRange = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+      this->Pimpl->TimeRange[0] = std::min(this->Pimpl->TimeRange[0], readerTimeRange[0]);
+      this->Pimpl->TimeRange[1] = std::max(this->Pimpl->TimeRange[1], readerTimeRange[1]);
+      this->Pimpl->HasAnimation = true;
+    }
   }
 }
 
 //----------------------------------------------------------------------------
 vtkIdType vtkF3DGenericImporter::GetNumberOfAnimations()
 {
-  return this->Pimpl->TimeSteps.size() > 0 ? 1 : 0;
+  return this->Pimpl->HasAnimation ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -140,22 +147,18 @@ bool vtkF3DGenericImporter::IsAnimationEnabled(vtkIdType animationIndex)
 // Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
 bool vtkF3DGenericImporter::GetTemporalInformation(vtkIdType animationIndex,
-  double vtkNotUsed(frameRate), int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
+  double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
+  vtkDoubleArray* vtkNotUsed(timeSteps))
 #else
-bool vtkF3DGenericImporter::GetTemporalInformation(
-  vtkIdType animationIndex, int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
+bool vtkF3DGenericImporter::GetTemporalInformation(vtkIdType animationIndex,
+  int& vtkNotUsed(nbTimeSteps), double timeRange[2], vtkDoubleArray* vtkNotUsed(timeSteps))
 #endif
 {
+  // F3D do not care about timesteps
   if (animationIndex < this->GetNumberOfAnimations())
   {
-    nbTimeSteps = static_cast<int>(this->Pimpl->TimeSteps.size());
-    timeRange[0] = *this->Pimpl->TimeSteps.cbegin();
-    timeRange[1] = *this->Pimpl->TimeSteps.crbegin();
-
-    for (double ts : this->Pimpl->TimeSteps)
-    {
-      timeSteps->InsertNextValue(ts);
-    }
+    timeRange[0] = this->Pimpl->TimeRange[0];
+    timeRange[1] = this->Pimpl->TimeRange[1];
     return true;
   }
   return false;
@@ -378,6 +381,7 @@ void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
   }
   this->UpdateColoringVectors(false);
   this->UpdateColoringVectors(true);
+  this->UpdateOutputDescriptions();
 }
 
 //----------------------------------------------------------------------------
@@ -566,4 +570,22 @@ int vtkF3DGenericImporter::FindIndexForColoring(bool useCellData, const std::str
 const vtkBoundingBox& vtkF3DGenericImporter::GetGeometryBoundingBox()
 {
   return this->Pimpl->GeometryBoundingBox;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::UpdateOutputDescriptions()
+{
+  for (ReaderPipeline& pipe : this->Pimpl->Readers)
+  {
+    vtkDataObject* readerOutput = pipe.Reader->GetOutputDataObject(0);
+    if (!readerOutput)
+    {
+      F3DLog::Print(F3DLog::Severity::Warning, "A reader did not produce any output");
+      pipe.Output = nullptr;
+      continue;
+    }
+
+    // Recover output description
+    pipe.OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(readerOutput);
+  }
 }
