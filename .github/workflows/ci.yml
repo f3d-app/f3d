@@ -36,13 +36,12 @@ jobs:
       id: lfs_sha_recover
       shell: bash
       run: |
-        echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/ .github/baselines/)" >> $GITHUB_ENV
-        echo "lfs_sha=${{env.LFS_SHA}}" >> $GITHUB_OUTPUT
+        echo "lfs_sha=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/ .github/baselines/)" >> $GITHUB_OUTPUT
 
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
       with:
-        lfs_sha: ${{env.LFS_SHA}}
+        lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
 
 #----------------------------------------------------------------------------
 # MAIN CI: Build and test with a cross-platform, cross-vtk build matrix
