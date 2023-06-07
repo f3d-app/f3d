@@ -1,6 +1,5 @@
-#include <vtkNew.h>
-
 #include <vtkImageData.h>
+#include <vtkNew.h>
 
 #include "vtkF3DEXRReader.h"
 
@@ -23,7 +22,6 @@ int TestF3DEXRReader(int argc, char* argv[])
   if (dims[0] != 1024 && dims[1] != 512)
   {
     std::cerr << "Incorrect EXR image size." << std::endl;
-
     return EXIT_FAILURE;
   }
 
