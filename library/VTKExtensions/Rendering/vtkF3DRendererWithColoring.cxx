@@ -52,6 +52,7 @@ vtkSmartPointer<vtkTexture> GetTexture(const std::string& filePath, bool isSRGB 
           texture->UseSRGBColorSpaceOn();
         }
         texture->InterpolateOn();
+        texture->SetColorModeToDirectScalars();
         return texture;
       }
       else
@@ -156,6 +157,16 @@ void vtkF3DRendererWithColoring::SetEmissiveFactor(double* factor)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetTextureMatCap(const std::string& tex)
+{
+  if (this->TextureMatCap != tex)
+  {
+    this->TextureMatCap = tex;
+    this->ColoringActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetTextureBaseColor(const std::string& tex)
 {
   if (this->TextureBaseColor != tex)
@@ -217,6 +228,7 @@ void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
     actorAndMapper.first->GetProperty()->SetEmissiveFactor(this->EmissiveFactor);
     actorAndMapper.first->GetProperty()->SetNormalTexture(::GetTexture(this->TextureNormal));
     actorAndMapper.first->GetProperty()->SetNormalScale(this->NormalScale);
+    actorAndMapper.first->GetProperty()->SetTexture("matcap", ::GetTexture(this->TextureMatCap));
 
     // If the input texture is RGBA, flag the actor as translucent
     if (colorTex && colorTex->GetImageDataInput(0)->GetNumberOfScalarComponents() == 4)

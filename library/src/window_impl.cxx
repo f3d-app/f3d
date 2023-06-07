@@ -341,6 +341,7 @@ void window_impl::UpdateDynamicOptions()
       this->Internals->Options.getAsDoubleVector("model.emissive.factor").data());
     renWithColor->SetTextureNormal(this->Internals->Options.getAsString("model.normal.texture"));
     renWithColor->SetNormalScale(this->Internals->Options.getAsDouble("model.normal.scale"));
+    renWithColor->SetTextureMatCap(this->Internals->Options.getAsString("model.matcap.texture"));
 
     renWithColor->SetColoring(this->Internals->Options.getAsBool("model.scivis.cells"),
       this->Internals->Options.getAsString("model.scivis.array-name"),

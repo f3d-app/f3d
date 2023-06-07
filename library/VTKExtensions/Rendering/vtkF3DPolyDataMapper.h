@@ -21,11 +21,22 @@ public:
   void ReplaceShaderValues(
     std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
 
+  ///@{
+  /**
+   * Modify the shaders to use MatCap if enabled
+   */
+  void ReplaceShaderColor(
+    std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
+  void ReplaceShaderLight(
+    std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
+  ///@}
+
 protected:
   vtkF3DPolyDataMapper();
   ~vtkF3DPolyDataMapper() override = default;
 
-  bool HaveJoints = false;
+private:
+  bool RenderWithMatCap(vtkActor* actor);
 };
 
 #endif
