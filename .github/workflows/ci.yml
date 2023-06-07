@@ -14,10 +14,41 @@ concurrency:
 jobs:
 
 #----------------------------------------------------------------------------
+# Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
+#----------------------------------------------------------------------------
+
+  cache_lfs:
+    runs-on: ubuntu-latest
+    name: Update LFS data cache
+    outputs:
+      lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Set LFS env var
+      working-directory: ${{github.workspace}}/source
+      id: lfs_sha_recover
+      shell: bash
+      run: echo "lfs_sha=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/ .github/baselines/)" >> $GITHUB_OUTPUT
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
+        workflow_label: 'producer'
+
+#----------------------------------------------------------------------------
 # MAIN CI: Build and test with a cross-platform, cross-vtk build matrix
 #----------------------------------------------------------------------------
   ci:
     if: github.event.pull_request.draft == false
+    needs: cache_lfs
 
     strategy:
       fail-fast: false
@@ -58,15 +89,11 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Set LFS env var
-      working-directory: ${{github.workspace}}/source
-      shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/ .github/baselines/)" >> $GITHUB_ENV
-
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
       with:
-        lfs_sha: ${{env.LFS_SHA}}
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
@@ -288,6 +315,7 @@ jobs:
 # Coverage: Build and test on linux with last VTK with coverage option
 #----------------------------------------------------------------------------
   coverage:
+    needs: cache_lfs
     if: github.event.pull_request.draft == false
 
     runs-on: ubuntu-latest
@@ -307,15 +335,11 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Set LFS env var
-      working-directory: ${{github.workspace}}/source
-      shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
-
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
       with:
-        lfs_sha: ${{env.LFS_SHA}}
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
@@ -392,6 +416,7 @@ jobs:
 # "memory" returns false positives in VTK:
 # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
+    needs: cache_lfs
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -416,15 +441,11 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Set LFS env var
-      working-directory: ${{github.workspace}}/source
-      shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
-
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
       with:
-        lfs_sha: ${{env.LFS_SHA}}
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
@@ -491,6 +512,7 @@ jobs:
 # static-analysis: Run static analysis on linux
 #----------------------------------------------------------------------------
   static-analysis:
+    needs: cache_lfs
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -512,15 +534,11 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Set LFS env var
-      working-directory: ${{github.workspace}}/source
-      shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
-
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
       with:
-        lfs_sha: ${{env.LFS_SHA}}
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
