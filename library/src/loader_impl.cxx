@@ -1,5 +1,6 @@
 #include "loader_impl.h"
 
+#include "animationManager.h"
 #include "interactor_impl.h"
 #include "log.h"
 #include "options.h"
@@ -108,6 +109,7 @@ public:
   const options& Options;
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
+  animationManager AnimationManager;
 
   vtkSmartPointer<vtkImporter> CurrentFullSceneImporter;
   vtkNew<vtkF3DGenericImporter> GenericImporter;
@@ -123,12 +125,6 @@ loader_impl::loader_impl(const options& options, window_impl& window)
 
 //----------------------------------------------------------------------------
 loader_impl::~loader_impl() = default;
-
-//----------------------------------------------------------------------------
-void loader_impl::setInteractor(interactor_impl* interactor)
-{
-  this->Internals->Interactor = interactor;
-}
 
 //----------------------------------------------------------------------------
 loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
@@ -193,17 +189,23 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
 
   // Update the importer
   this->Internals->GenericImporter->Update();
-  loader_impl::internals::DisplayImporterDescription(this->Internals->GenericImporter);
 
   // Remove anything progress related if any
   this->Internals->GenericImporter->RemoveObservers(vtkCommand::ProgressEvent);
   progressWidget->Off();
 
-  if (this->Internals->Interactor)
+  // Initialize the animation using temporal information from the importer
+  this->Internals->AnimationManager.Initialize(&this->Internals->Options, &this->Internals->Window,
+    this->Internals->Interactor, this->Internals->GenericImporter);
+
+  double animationTime = this->Internals->Options.getAsDouble("scene.animation.time");
+  if (animationTime != 0)
   {
-    // Initialize the animation using temporal information from the importer
-    this->Internals->Interactor->InitializeAnimation(this->Internals->GenericImporter);
+    this->Internals->AnimationManager.LoadAtTime(animationTime);
   }
+
+  // Display the importer description
+  loader_impl::internals::DisplayImporterDescription(this->Internals->GenericImporter);
 
   // Set the importer to use for coloring and actors
   this->Internals->Window.SetImporterForColoring(this->Internals->GenericImporter);
@@ -283,17 +285,23 @@ loader& loader_impl::loadScene(const std::string& filePath)
 
   // Read the file
   this->Internals->CurrentFullSceneImporter->Update();
-  loader_impl::internals::DisplayImporterDescription(this->Internals->CurrentFullSceneImporter);
 
   // Remove anything progress related if any
   this->Internals->CurrentFullSceneImporter->RemoveObservers(vtkCommand::ProgressEvent);
   progressWidget->Off();
 
-  if (this->Internals->Interactor)
+  // Initialize the animation using temporal information from the importer
+  this->Internals->AnimationManager.Initialize(&this->Internals->Options, &this->Internals->Window,
+    this->Internals->Interactor, this->Internals->CurrentFullSceneImporter);
+
+  double animationTime = this->Internals->Options.getAsDouble("scene.animation.time");
+  if (animationTime != 0)
   {
-    // Initialize the animation using temporal information from the importer
-    this->Internals->Interactor->InitializeAnimation(this->Internals->CurrentFullSceneImporter);
+    this->Internals->AnimationManager.LoadAtTime(animationTime);
   }
+
+  // Display output description
+  loader_impl::internals::DisplayImporterDescription(this->Internals->CurrentFullSceneImporter);
 
   // Initialize renderer and reset camera to bounds if needed
   this->Internals->Window.UpdateDynamicOptions();
@@ -329,5 +337,12 @@ bool loader_impl::hasGeometryReader(const std::string& filePath)
     return false;
   }
   return reader->hasGeometryReader();
+}
+
+//----------------------------------------------------------------------------
+void loader_impl::SetInteractor(interactor_impl* interactor)
+{
+  this->Internals->Interactor = interactor;
+  this->Internals->Interactor->SetAnimationManager(&this->Internals->AnimationManager);
 }
 }

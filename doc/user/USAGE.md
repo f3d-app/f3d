@@ -41,6 +41,13 @@ but also some scene information like *lights*, *cameras*, *actors* in the scene,
 By default, all this information will be loaded from the file and displayed. Use the `--geometry-only` [options](OPTIONS.md)
 to modify this behavior. For file formats that do not support it, **a default scene** is created.
 
+## Animations
+
+F3D can play animations for a number of file formats (.ex2/.e/.exo/.g, .gltf/.glb, .fbx, .dae) if the file contains an animation.
+It is possible to select the animation to play using `--animation-index`, or to play all animations at once using `--animation-index=-1` (.gltf/.glb only).
+When F3D play an animation, it assumes the time unit is in seconds to show accurate speed of animation. Use `--animation-speed-factor` if
+an adjustment is needed. By default, F3D will try update the scene 60 times per seconds, use `--animation-frame-rate` to change that if needed.
+
 ## Plugins
 
 If you installed F3D using a package manager, it's possible that the packager chose to bundle the plugins in different packages or to list plugin dependencies as optional dependencies to reduce the reduce the number of dependencies of the main package.

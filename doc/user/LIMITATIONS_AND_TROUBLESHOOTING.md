@@ -14,6 +14,7 @@ Here is a non exhaustive list of F3D limitations:
 FBX, DAE, OFF, and DXF file formats rely on [Assimp](https://github.com/assimp/assimp) library. It comes with some known limitations:
 - PBR materials are not supported for FBX file format.
 - Complex animations are not working very well with Assimp 5.1, it's recommended to use Assimp 5.0 for this use case.
+- Only one animation can be shown at a time, showing all animations is not supported yet.
 - Some files can be empty, crash, or show artifacts.
 - DXF support is very limited: only files with polylines and 3D faces are displayed.
 
