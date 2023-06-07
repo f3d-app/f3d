@@ -2,8 +2,14 @@
 
 #include "log.h"
 
+#include "vtkF3DConfigure.h"
 #include "vtkF3DObjectFactory.h"
 
+#if F3D_MODULE_EXR
+#include "vtkF3DEXRReader.h"
+#endif
+
+#include <vtkImageReader2Factory.h>
 #include <vtkLogger.h>
 #include <vtkNew.h>
 #include <vtkVersion.h>
@@ -38,6 +44,11 @@ init::init()
   vtkObjectFactory::SetAllEnableFlags(0, "vtkRenderWindow", "vtkOpenGLRenderWindow");
   vtkObjectFactory::SetAllEnableFlags(
     0, "vtkRenderWindowInteractor", "vtkGenericRenderWindowInteractor");
+#endif
+
+#if F3D_MODULE_EXR
+  vtkNew<vtkF3DEXRReader> reader;
+  vtkImageReader2Factory::RegisterReader(reader);
 #endif
 }
 

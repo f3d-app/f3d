@@ -298,6 +298,13 @@ engine::libInformation engine::getLibInfo()
 #endif
   libInfo.ExternalRenderingModule = tmp;
 
+#if F3D_MODULE_EXR
+  tmp = "ON";
+#else
+  tmp = "OFF";
+#endif
+  libInfo.OpenEXRModule = tmp;
+
   // First version of VTK including the version check (and the feature used)
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
   std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());

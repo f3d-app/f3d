@@ -21,6 +21,7 @@ public:
   /**
    * Create an image from file, the following formats are supported:
    * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA.
+   * EXR files are also supported if the associated module is built.
    * Throw an image::read_exception in case of failure.
    */
   explicit image(const std::string& path);
