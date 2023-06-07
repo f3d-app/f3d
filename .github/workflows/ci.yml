@@ -41,8 +41,7 @@ jobs:
       uses: ./source/.github/actions/lfs-copy
       with:
         lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
-        checkout_label: 'checkout'
-        artifact_label: 'upload'
+        workflow_label: 'producer'
 
 #----------------------------------------------------------------------------
 # MAIN CI: Build and test with a cross-platform, cross-vtk build matrix
@@ -94,8 +93,7 @@ jobs:
       uses: ./source/.github/actions/lfs-copy
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        checkout_label: 'no-checkout'
-        artifact_label: 'download'
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
@@ -341,8 +339,7 @@ jobs:
       uses: ./source/.github/actions/lfs-copy
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        checkout_label: 'no-checkout'
-        artifact_label: 'download'
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
@@ -448,8 +445,7 @@ jobs:
       uses: ./source/.github/actions/lfs-copy
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        checkout_label: 'no-checkout'
-        artifact_label: 'download'
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
@@ -542,8 +538,7 @@ jobs:
       uses: ./source/.github/actions/lfs-copy
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        checkout_label: 'no-checkout'
-        artifact_label: 'download'
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}

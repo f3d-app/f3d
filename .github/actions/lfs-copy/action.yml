@@ -4,12 +4,9 @@ inputs:
   lfs_sha:
     description: 'LFS sha to recover'
     required: true
-  checkout_label:
-    description: 'Whether to checkout the repository or not'
-    default: 'checkout'
-  artifact_label:
-    description: 'Whether to upload or download an artifact'
-    default: 'upload'
+  workflow_label:
+    description: 'Whether this action produce/consume LFS data'
+    default: 'producer'
 
 runs:
   using: "composite"
@@ -25,25 +22,27 @@ runs:
     - name: Checkout LFS data
       if: |
         steps.cache-lfs.outputs.cache-hit != 'true' &&
-        inputs.checkout_label == 'checkout'
+        inputs.workflow_label == 'producer'
       uses: actions/checkout@v3
       with:
         path: 'lfs_data'
         fetch-depth: 0
         lfs: true
 
-    - name: Download LFS artifact
+    - name: Upload LFS artifact
       if: |
         steps.cache-lfs.outputs.cache-hit != 'true' &&
-        inputs.artifact_label == 'download'
-      uses: actions/download-artifact@master
+        inputs.workflow_label == 'producer'
+      uses: actions/upload-artifact@master
       with:
         name: lfs-data
         path: lfs_data
 
-    - name: Upload LFS artifact
-      if: inputs.artifact_label == 'upload'
-      uses: actions/upload-artifact@master
+    - name: Download LFS artifact
+      if: |
+        steps.cache-lfs.outputs.cache-hit != 'true' &&
+        inputs.workflow_label == 'consumer'
+      uses: actions/download-artifact@master
       with:
         name: lfs-data
         path: lfs_data
