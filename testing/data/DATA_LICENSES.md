@@ -20,9 +20,10 @@
 - iflamigm.3ds: VTK Data: BSD-3-Clause
 - IM-0001-1983.dcm: VTK Data: BSD-3-Clause
 - InterpolationTest.glb: glTF-Sample-Models: Public Domain
+- kloofendal_43d_clear_1k.exr: Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - normal.png: glTF-Sample-Models: Public Domain
 - normalMapping.fbx: assimp test models: BSD-3-Clause; rubberduck: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
-- palermo_park_1k.hdr: Polyhaven: Public Domain
+- palermo_park_1k.hdr: Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - Part-4-Buildings-V4-one.gml: VTK Data: BSD-3-Clause
 - phong_cube.fbx: assimp test models: BSD-3-Clause
 - PinkEggFromLW.dxf: assimp test models: BSD-3-Clause

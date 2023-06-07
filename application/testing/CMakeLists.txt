@@ -308,6 +308,10 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
 
   configure_file("${CMAKE_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
   f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" HDRI DEFAULT_LIGHTS)
+
+  if(F3D_MODULE_EXR)
+    f3d_test(NAME TestHDRIEXR HDRI DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/kloofendal_43d_clear_1k.exr DEFAULT_LIGHTS)
+  endif()
 endif()
 
 if(F3D_MODULE_RAYTRACING)

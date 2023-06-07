@@ -3,6 +3,10 @@ list(APPEND VTKExtensionsReaderTests_list
      TestF3DGenericImporterMultiColoring.cxx
     )
 
+if(F3D_MODULE_EXR)
+  list(APPEND VTKExtensionsReaderTests_list TestF3DEXRReader.cxx)
+endif()
+
 if(VTK_VERSION VERSION_LESS_EQUAL 9.1.0)
   cmake_policy(SET CMP0115 OLD)
 endif()
