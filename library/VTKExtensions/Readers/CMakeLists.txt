@@ -4,7 +4,7 @@ set(classes
   )
 
 if(F3D_MODULE_EXR)
-  find_package(OpenEXR REQUIRED)
+  find_package(OpenEXR 3.0 REQUIRED)
   list(APPEND classes vtkF3DEXRReader)
 endif()
 
