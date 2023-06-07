@@ -4,6 +4,13 @@ inputs:
   lfs_sha:
     description: 'LFS sha to recover'
     required: true
+  checkout_label:
+    description: 'Whether to checkout the repository or not'
+    default: 'checkout'
+  artifact_label:
+    description: 'Whether to upload or download an artifact'
+    default: 'upload'
+
 runs:
   using: "composite"
   steps:
@@ -16,12 +23,30 @@ runs:
         key: lfs-data-${{inputs.lfs_sha}}-1
 
     - name: Checkout LFS data
-      if: steps.cache-lfs.outputs.cache-hit != 'true'
+      if: |
+        steps.cache-lfs.outputs.cache-hit != 'true' &&
+        inputs.checkout_label == 'checkout'
       uses: actions/checkout@v3
       with:
         path: 'lfs_data'
         fetch-depth: 0
         lfs: true
+
+    - name: Download LFS artifact
+      if: |
+        steps.cache-lfs.outputs.cache-hit != 'true' &&
+        inputs.artifact_label == 'download'
+      uses: actions/download-artifact@master
+      with:
+        name: lfs-data
+        path: lfs_data
+
+    - name: Upload LFS artifact
+      if: inputs.artifact_label == 'upload'
+      uses: actions/upload-artifact@master
+      with:
+        name: lfs-data
+        path: lfs_data
 
     - name: Setup LFS data
       working-directory: ${{github.workspace}}
