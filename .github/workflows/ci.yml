@@ -35,8 +35,7 @@ jobs:
       working-directory: ${{github.workspace}}/source
       id: lfs_sha_recover
       shell: bash
-      run: |
-        echo "lfs_sha=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/ .github/baselines/)" >> $GITHUB_OUTPUT
+      run: echo "lfs_sha=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/ .github/baselines/)" >> $GITHUB_OUTPUT
 
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
