@@ -109,6 +109,11 @@ public:
   std::vector<std::string> getNames();
 
   /**
+   * Get the closest option name and its Levenstein distance.
+   */
+  std::pair<std::string, int> getClosestOption(const std::string& option) const;
+
+  /**
    * An exception that can be thrown by the options
    * when a provided option type is incompatible with
    * its internal type.

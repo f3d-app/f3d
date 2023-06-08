@@ -1,12 +1,17 @@
 #include "options.h"
 
+#include "levenshteinDistance.h"
 #include "log.h"
 
 #include "vtkF3DConfigure.h"
 
+#include <limits>
 #include <map>
+#include <string_view>
 #include <type_traits>
 #include <variant>
+
+#include <iostream>
 
 namespace f3d
 {
@@ -447,6 +452,28 @@ std::vector<std::string> options::getNames()
     names.emplace_back(name);
   }
   return names;
+}
+
+//----------------------------------------------------------------------------
+std::pair<std::string, int> options::getClosestOption(const std::string& option) const
+{
+  if (this->Internals->Options.find(option) != this->Internals->Options.end())
+  {
+    return { option, 0 };
+  }
+
+  std::pair<std::string, int> ret = { "", std::numeric_limits<int>::max() };
+
+  for (const auto& [name, _] : this->Internals->Options)
+  {
+    int distance = levenshteinDistance(name, option).run();
+    if (distance < ret.second)
+    {
+      ret = { name, distance };
+    }
+  }
+
+  return ret;
 }
 
 //----------------------------------------------------------------------------
