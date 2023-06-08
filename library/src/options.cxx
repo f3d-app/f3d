@@ -152,6 +152,8 @@ options::options()
   this->Internals->init("ui.loader-progress", false);
 
   // Model
+  this->Internals->init("model.matcap.texture", std::string());
+
   this->Internals->init("model.color.opacity", 1.0);
   // XXX: Not compatible with scivis: https://github.com/f3d-app/f3d/issues/347
   this->Internals->init("model.color.rgb", std::vector<double>{ 1., 1., 1. });
