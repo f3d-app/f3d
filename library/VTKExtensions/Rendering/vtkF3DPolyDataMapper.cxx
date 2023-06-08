@@ -212,7 +212,6 @@ void vtkF3DPolyDataMapper::ReplaceShaderLight(
   if (this->RenderWithMatCap(actor))
   {
     auto fragmentShader = shaders[vtkShader::Fragment];
-
     auto FSSource = fragmentShader->GetSource();
 
     std::string customLight = "//VTK::Light::Impl\n"
@@ -220,7 +219,6 @@ void vtkF3DPolyDataMapper::ReplaceShaderLight(
                               "gl_FragData[0] = texture(matcap, uv);\n";
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::Light::Impl", customLight);
-
     fragmentShader->SetSource(FSSource);
   }
   else
