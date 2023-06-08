@@ -191,9 +191,7 @@ bool vtkF3DPolyDataMapper::RenderWithMatCap(vtkActor* actor)
   }
 
   auto textures = actor->GetProperty()->GetAllTextures();
-
   auto fn = [](const std::pair<std::string, vtkTexture*>& tex) { return tex.first == "matcap"; };
-
   return std::find_if(textures.begin(), textures.end(), fn) != textures.end();
 }
 
@@ -217,9 +215,9 @@ void vtkF3DPolyDataMapper::ReplaceShaderLight(
 
     auto FSSource = fragmentShader->GetSource();
 
-    std::string customLight = "//VTK::Light::Impl\n";
-    customLight += "vec2 uv = vec2(normalVCVSOutput.xy) * 0.5 + vec2(0.5,0.5);\n";
-    customLight += "gl_FragData[0] = texture(matcap, uv);\n";
+    std::string customLight = "//VTK::Light::Impl\n"
+                              "vec2 uv = vec2(normalVCVSOutput.xy) * 0.5 + vec2(0.5,0.5);\n"
+                              "gl_FragData[0] = texture(matcap, uv);\n";
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::Light::Impl", customLight);
 

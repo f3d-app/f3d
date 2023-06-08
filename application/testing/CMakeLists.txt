@@ -179,7 +179,7 @@ f3d_test(NAME TestGroupGeometries DATA mb/recursive ARGS --group-geometries DEFA
 f3d_test(NAME TestGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries --scalars=Polynomial -b DEFAULT_LIGHTS)
 f3d_test(NAME TestInvalidUpDirection DATA suzanne.ply ARGS -g --up=W REGEXP "W is not a valid up direction" NO_BASELINE)
 f3d_test(NAME TestUpDirectionNoSign DATA suzanne.ply ARGS --up=X DEFAULT_LIGHTS)
-f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${CMAKE_SOURCE_DIR}/testing/data/skin.png)
+f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${CMAKE_SOURCE_DIR}/testing/data/skin.png DEFAULT_LIGHTS)
 
 if (NOT APPLE)
   # This test is broken on apple because of #792

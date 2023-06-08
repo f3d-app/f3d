@@ -36,6 +36,9 @@ protected:
   ~vtkF3DPolyDataMapper() override = default;
 
 private:
+  /**
+   * Returns true if a MatCap texture is defined by the user and the actor has normals
+   */
   bool RenderWithMatCap(vtkActor* actor);
 };
 

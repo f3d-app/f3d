@@ -34,7 +34,7 @@ interactor.trackball|bool<br>false<br>render|Enable trackball interaction.|\-\-t
 
 Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
-model.matcap.texture|string<br>-<br>render|Path to a texture file containing a material capture. All other model options are ignored if this is set.|\-\-texture-matcap
+model.matcap.texture|string<br>-<br>render|Path to a texture file containing a material capture. All other model options for surfaces are ignored if this is set.|\-\-texture-matcap
 model.color.opacity|double<br>1.0<br>render|Set *opacity* on the geometry. Usually used with Depth Peeling option. Multiplied with the `model.color.texture` when present.|\-\-opacity
 model.color.rgb|vector\<double\><br>1.0,1.0,1.0<br>render|Set a *color* on the geometry. Multiplied with the `model.color.texture` when present.|\-\-color
 model.color.texture|string<br>-<br>render|Path to a texture file that sets the color of the object. Will be multiplied with rgb and opacity.|\-\-texture-base-color

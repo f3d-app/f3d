@@ -63,7 +63,9 @@ public:
   void SetNormalScale(double normalScale);
 
   /**
-   * Set the material capture texture on all coloring actors
+   * Set the material capture texture on all coloring actors.
+   * This texture includes baked lighting effect,
+   * so all other material textures are ignored.
    */
   void SetTextureMatCap(const std::string& tex);
 
