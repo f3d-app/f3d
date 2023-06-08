@@ -180,3 +180,49 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
 
   this->Superclass::ReplaceShaderValues(shaders, ren, actor);
 }
+
+//-----------------------------------------------------------------------------
+bool vtkF3DPolyDataMapper::RenderWithMatCap(vtkActor* actor)
+{
+  // check if we have normals
+  if (this->VBOs->GetNumberOfComponents("normalMC") != 3)
+  {
+    return false;
+  }
+
+  auto textures = actor->GetProperty()->GetAllTextures();
+  auto fn = [](const std::pair<std::string, vtkTexture*>& tex) { return tex.first == "matcap"; };
+  return std::find_if(textures.begin(), textures.end(), fn) != textures.end();
+}
+
+//-----------------------------------------------------------------------------
+void vtkF3DPolyDataMapper::ReplaceShaderColor(
+  std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
+{
+  if (!this->RenderWithMatCap(actor))
+  {
+    this->Superclass::ReplaceShaderColor(shaders, ren, actor);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void vtkF3DPolyDataMapper::ReplaceShaderLight(
+  std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
+{
+  if (this->RenderWithMatCap(actor))
+  {
+    auto fragmentShader = shaders[vtkShader::Fragment];
+    auto FSSource = fragmentShader->GetSource();
+
+    std::string customLight = "//VTK::Light::Impl\n"
+                              "vec2 uv = vec2(normalVCVSOutput.xy) * 0.5 + vec2(0.5,0.5);\n"
+                              "gl_FragData[0] = texture(matcap, uv);\n";
+
+    vtkShaderProgram::Substitute(FSSource, "//VTK::Light::Impl", customLight);
+    fragmentShader->SetSource(FSSource);
+  }
+  else
+  {
+    this->Superclass::ReplaceShaderLight(shaders, ren, actor);
+  }
+}
