@@ -7,11 +7,8 @@
 
 #include <limits>
 #include <map>
-#include <string_view>
 #include <type_traits>
 #include <variant>
-
-#include <iostream>
 
 namespace f3d
 {
@@ -455,13 +452,13 @@ std::vector<std::string> options::getNames()
 }
 
 //----------------------------------------------------------------------------
-int options::textDistance(const std::string& strA, const std::string& strB)
+unsigned int options::textDistance(const std::string& strA, const std::string& strB)
 {
-  return levenshtein(strA, strB).run();
+  return static_cast<unsigned int>(levenshtein(strA, strB).run());
 }
 
 //----------------------------------------------------------------------------
-std::pair<std::string, int> options::getClosestOption(const std::string& option) const
+std::pair<std::string, unsigned int> options::getClosestOption(const std::string& option) const
 {
   if (this->Internals->Options.find(option) != this->Internals->Options.end())
   {

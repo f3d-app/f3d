@@ -16,7 +16,6 @@
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
-#include <iostream>
 #include <regex>
 #include <set>
 #include <sstream>
@@ -407,16 +406,18 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
         for (std::string unknownOption : unmatched)
         {
+          // check if it's a long option
           if (unknownOption[0] == '-' && unknownOption[1] == '-')
           {
+            // remove trailing '--'
             unknownOption = unknownOption.substr(2);
 
             auto it = std::find_if(unknownOption.rbegin(), unknownOption.rend(),
               [](unsigned char ch) { return ch == '='; });
 
+            // remove everything after the character =
             if (it != unknownOption.rend())
             {
-
               unknownOption.erase(it.base() - 1, unknownOption.end());
             }
 
