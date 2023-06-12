@@ -86,7 +86,6 @@ runs:
 
     - name: Install TBB MacOS
       if: |
-        steps.cache-vtk.outputs.cache-hit != 'true' &&
         runner.os == 'macOS' &&
         inputs.vtk_version != 'v9.0.0'
       shell: bash

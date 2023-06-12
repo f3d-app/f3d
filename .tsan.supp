@@ -7,3 +7,6 @@ race:swrast_dri
 
 # VTK + TBB
 race:libvtkCommonDataModel
+
+# OpenEXR
+race:libOpenEXR
