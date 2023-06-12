@@ -8,7 +8,7 @@ namespace f3d
 class levenshtein::internals
 {
 public:
-  internals(std::string_view a, std::string_view b)
+  internals(const std::string_view& a, const std::string_view& b)
     : StringA(a)
     , StringB(b)
   {
