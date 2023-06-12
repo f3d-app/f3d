@@ -64,7 +64,7 @@ private:
 };
 
 //----------------------------------------------------------------------------
-levenshtein::levenshtein(std::string_view a, std::string_view b)
+levenshtein::levenshtein(const std::string_view& a, const std::string_view& b)
   : Internals(std::make_unique<levenshtein::internals>(a, b))
 {
 }

@@ -19,7 +19,7 @@ namespace f3d
 class levenshtein
 {
 public:
-  levenshtein(std::string_view a, std::string_view b);
+  levenshtein(const std::string_view& a, const std::string_view& b);
   ~levenshtein();
 
   /**
