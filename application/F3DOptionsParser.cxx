@@ -10,7 +10,6 @@
 
 #include "engine.h"
 #include "interactor.h"
-#include "levenshteinDistance.h"
 #include "log.h"
 #include "options.h"
 
@@ -185,7 +184,7 @@ protected:
 
     for (const std::string& name : this->AllLongOptions)
     {
-      int distance = f3d::levenshteinDistance(name, option).run();
+      int distance = f3d::options::textDistance(name, option);
       if (distance < ret.second)
       {
         ret = { name, distance };

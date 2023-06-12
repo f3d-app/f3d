@@ -63,7 +63,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/init.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/interactor.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/interactor_impl.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/levenshteinDistance.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/levenshtein.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/loader_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/log.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/options.cxx
