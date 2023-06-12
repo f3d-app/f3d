@@ -15,9 +15,6 @@ leak:TKVCAF
 leak:TKXSBase
 leak:TKernel
 
-# VTK + TBB
-leak:libvtkCommonDataModel
-
 # Potential mesa/VTK leak with incomplete callstack
 # forces us to hide all leaks from the libf3dSDKTests
 # https://gitlab.kitware.com/vtk/vtk/-/issues/18504

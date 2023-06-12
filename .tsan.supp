@@ -4,3 +4,6 @@ race:libQt5XcbQpa
 
 # Issue in mesa sw_rast
 race:swrast_dri
+
+# VTK + TBB
+race:libvtkCommonDataModel
