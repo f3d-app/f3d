@@ -9,8 +9,8 @@ class levenshtein::internals
 {
 public:
   internals(std::string_view a, std::string_view b)
-    : StringA(std::move(a))
-    , StringB(std::move(b))
+    : StringA(a)
+    , StringB(b)
   {
     this->Distances.resize((a.size() + 1) * (b.size() + 1), std::numeric_limits<size_t>::max());
   }
