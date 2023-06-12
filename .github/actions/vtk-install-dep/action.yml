@@ -84,6 +84,14 @@ runs:
         sed -i '' '46i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Oint.c
         sed -i '' '36i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Rint.c
 
+    - name: Install TBB MacOS
+      if: |
+        steps.cache-vtk.outputs.cache-hit != 'true' &&
+        runner.os == 'macOS' &&
+        inputs.vtk_version != 'v9.0.0'
+      shell: bash
+      run: brew install tbb
+
     - name: Configure VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/vtk_build
