@@ -14,15 +14,23 @@
 #include <vtkNew.h>
 #include <vtkVersion.h>
 
+#include <memory>
+
 namespace f3d::detail
 {
-class init::internals
+
+//----------------------------------------------------------------------------
+void init::initialize()
 {
-};
+  static std::unique_ptr<init> instance;
+  if (!instance)
+  {
+    instance = std::make_unique<init>();
+  }
+}
 
 //----------------------------------------------------------------------------
 init::init()
-  : Internals(std::make_unique<init::internals>())
 {
 #if NDEBUG
   vtkObject::GlobalWarningDisplayOff();
@@ -51,8 +59,4 @@ init::init()
   vtkImageReader2Factory::RegisterReader(reader);
 #endif
 }
-
-//----------------------------------------------------------------------------
-init::~init() = default;
-
 }
