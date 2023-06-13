@@ -444,7 +444,7 @@ std::vector<std::string> options::getNames()
 {
   std::vector<std::string> names;
   names.reserve(this->Internals->Options.size());
-  for (const auto& [name, _] : this->Internals->Options)
+  for (const auto& [name, value] : this->Internals->Options)
   {
     names.emplace_back(name);
   }
@@ -467,7 +467,7 @@ std::pair<std::string, unsigned int> options::getClosestOption(const std::string
 
   std::pair<std::string, int> ret = { "", std::numeric_limits<int>::max() };
 
-  for (const auto& [name, _] : this->Internals->Options)
+  for (const auto& [name, value] : this->Internals->Options)
   {
     int distance = options::textDistance(name, option);
     if (distance < ret.second)
