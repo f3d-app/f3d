@@ -1,7 +1,7 @@
 #include "options.h"
 
-#include "levenshtein.h"
 #include "log.h"
+#include "utils.h"
 
 #include "vtkF3DConfigure.h"
 
@@ -452,12 +452,6 @@ std::vector<std::string> options::getNames()
 }
 
 //----------------------------------------------------------------------------
-unsigned int options::textDistance(const std::string& strA, const std::string& strB)
-{
-  return static_cast<unsigned int>(levenshtein::distance(strA, strB));
-}
-
-//----------------------------------------------------------------------------
 std::pair<std::string, unsigned int> options::getClosestOption(const std::string& option) const
 {
   if (this->Internals->Options.find(option) != this->Internals->Options.end())
@@ -469,7 +463,7 @@ std::pair<std::string, unsigned int> options::getClosestOption(const std::string
 
   for (const auto& [name, value] : this->Internals->Options)
   {
-    int distance = options::textDistance(name, option);
+    int distance = utils::textDistance(name, option);
     if (distance < ret.second)
     {
       ret = { name, distance };

@@ -12,6 +12,7 @@
 #include "interactor.h"
 #include "log.h"
 #include "options.h"
+#include "utils.h"
 
 #include <filesystem>
 #include <fstream>
@@ -183,7 +184,7 @@ protected:
 
     for (const std::string& name : this->AllLongOptions)
     {
-      int distance = f3d::options::textDistance(name, option);
+      int distance = f3d::utils::textDistance(name, option);
       if (distance < ret.second)
       {
         ret = { name, distance };
@@ -415,7 +416,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
             auto it = std::find_if(unknownOption.rbegin(), unknownOption.rend(),
               [](unsigned char ch) { return ch == '='; });
 
-            // remove everything after the character =
+            // remove everything after the character '='
             if (it != unknownOption.rend())
             {
               unknownOption.erase(it.base() - 1, unknownOption.end());

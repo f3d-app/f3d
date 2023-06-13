@@ -109,11 +109,6 @@ public:
   std::vector<std::string> getNames();
 
   /**
-   * Utility static function used to compute the Levenshtein distance between two strings.
-   */
-  static unsigned int textDistance(const std::string& strA, const std::string& strB);
-
-  /**
    * Get the closest option name and its Levenshtein distance.
    */
   std::pair<std::string, unsigned int> getClosestOption(const std::string& option) const;
