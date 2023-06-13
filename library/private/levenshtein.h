@@ -16,9 +16,9 @@
 
 namespace f3d::levenshtein
 {
-  /**
-   * Run the Levenshtein distance computation and return the result
-   */
-  size_t distance(const std::string_view& a, const std::string_view& b);
+/**
+ * Run the Levenshtein distance computation and return the result
+ */
+size_t distance(const std::string_view& a, const std::string_view& b);
 }
 #endif
