@@ -120,7 +120,6 @@ f3d_test(NAME TestPointCloudBar DATA pointsCloud.vtp ARGS -sob --point-size=20 D
 f3d_test(NAME TestPointCloudUG DATA pointsCloud.vtu ARGS -o --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestPointCloudVolume DATA bluntfin.vts ARGS -sob DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestPointCloudDefaultScene DATA pointsCloud.vtp ARGS --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
-f3d_test(NAME TestVRMLImporter DATA bot2.wrl DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME Test3DSImporter DATA iflamigm.3ds ARGS --up=+Z DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestScalars DATA suzanne.ply ARGS --scalars=Normals --comp=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestScalarsRange DATA suzanne.ply ARGS --scalars=Normals --comp=1 --range=0,1 DEFAULT_LIGHTS)
@@ -313,6 +312,16 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   if(F3D_MODULE_EXR)
     f3d_test(NAME TestHDRIEXR HDRI DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/kloofendal_43d_clear_1k.exr DEFAULT_LIGHTS)
   endif()
+endif()
+
+# Zoom factor was introduced in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9958
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230221)
+  f3d_test(NAME TestCameraZoomFactor DATA suzanne.obj ARGS --camera-direction=-1,-1,1 --camera-zoom-factor=1.5)
+endif()
+
+# VRML was fixed in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10235
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230603)
+  f3d_test(NAME TestVRMLImporter DATA bot2.wrl DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 endif()
 
 if(F3D_MODULE_RAYTRACING)
@@ -529,10 +538,6 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream 
 
   f3d_test(NAME TestInteractionDropSameFiles ARGS -x "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropSameFiles.log")#DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
 
-endif()
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230221)
-  f3d_test(NAME TestCameraZoomFactor DATA suzanne.obj ARGS --camera-direction=-1,-1,1 --camera-zoom-factor=1.5)
 endif()
 
 ## Tests to increase coverage
