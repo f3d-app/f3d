@@ -145,6 +145,13 @@ int TestSDKOptions(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  closest = opt.getClosestOption("model.scivis.cells");
+  if (closest.first != "model.scivis.cells" || closest.second != 0)
+  {
+    std::cerr << "Failed to get the exact option." << std::endl;
+    return EXIT_FAILURE;
+  }
+
   // Test chaining options
   opt.set("model.scivis.cells", true).set("model.scivis.cells", false);
   if (opt.getAsBool("model.scivis.cells") != false)
