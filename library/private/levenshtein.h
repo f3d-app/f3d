@@ -14,25 +14,11 @@
 #include <memory>
 #include <string_view>
 
-namespace f3d
+namespace f3d::levenshtein
 {
-class levenshtein
-{
-public:
-  levenshtein(const std::string_view& a, const std::string_view& b);
-  ~levenshtein();
-
   /**
    * Run the Levenshtein distance computation and return the result
    */
-  size_t run();
-
-  levenshtein(levenshtein const&) = delete;
-  void operator=(levenshtein const&) = delete;
-
-private:
-  class internals;
-  std::unique_ptr<internals> Internals;
-};
+  size_t distance(const std::string_view& a, const std::string_view& b);
 }
 #endif

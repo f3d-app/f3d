@@ -454,7 +454,7 @@ std::vector<std::string> options::getNames()
 //----------------------------------------------------------------------------
 unsigned int options::textDistance(const std::string& strA, const std::string& strB)
 {
-  return static_cast<unsigned int>(levenshtein(strA, strB).run());
+  return static_cast<unsigned int>(levenshtein::distance(strA, strB));
 }
 
 //----------------------------------------------------------------------------

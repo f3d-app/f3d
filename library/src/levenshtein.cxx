@@ -3,12 +3,12 @@
 #include <limits>
 #include <vector>
 
-namespace f3d
+namespace f3d::levenshtein
 {
-class levenshtein::internals
+class levenshtein_impl
 {
 public:
-  internals(const std::string_view& a, const std::string_view& b)
+  levenshtein_impl(const std::string_view& a, const std::string_view& b)
     : StringA(a)
     , StringB(b)
   {
@@ -64,17 +64,8 @@ private:
 };
 
 //----------------------------------------------------------------------------
-levenshtein::levenshtein(const std::string_view& a, const std::string_view& b)
-  : Internals(std::make_unique<levenshtein::internals>(a, b))
+size_t distance(const std::string_view& a, const std::string_view& b)
 {
-}
-
-//----------------------------------------------------------------------------
-levenshtein::~levenshtein() = default;
-
-//----------------------------------------------------------------------------
-size_t levenshtein::run()
-{
-  return this->Internals->run(0, 0);
+  return levenshtein_impl(a, b).run(0, 0);
 }
 }
