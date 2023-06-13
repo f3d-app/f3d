@@ -82,8 +82,7 @@ PYBIND11_MODULE(f3d, module)
     .def("getClosestOption", &f3d::options::getClosestOption);
 
   // f3d::utils
-  py::class_<f3d::utils>(module, "utils")
-    .def_static("textDistance", &f3d::utils::textDistance);
+  py::class_<f3d::utils>(module, "utils").def_static("textDistance", &f3d::utils::textDistance);
 
   // f3d::interactor
   py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete> >(module, "interactor")
