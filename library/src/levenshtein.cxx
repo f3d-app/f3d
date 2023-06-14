@@ -12,7 +12,8 @@ public:
     : StringA(strA)
     , StringB(strB)
   {
-    this->Distances.resize((strA.size() + 1) * (strB.size() + 1), std::numeric_limits<size_t>::max());
+    this->Distances.resize(
+      (strA.size() + 1) * (strB.size() + 1), std::numeric_limits<size_t>::max());
   }
 
   size_t run(size_t indexA, size_t indexB)
@@ -43,7 +44,8 @@ public:
     {
       // different character, increase the distance and check with advancing only A, only B, or both
       dist = 1 +
-        std::min(std::min(this->run(indexA, indexB + 1), this->run(indexA + 1, indexB)), this->run(indexA + 1, indexB + 1));
+        std::min(std::min(this->run(indexA, indexB + 1), this->run(indexA + 1, indexB)),
+          this->run(indexA + 1, indexB + 1));
     }
 
     // cache the value for later
