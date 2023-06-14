@@ -403,12 +403,10 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
       if (unmatched.size() > 0)
       {
-        constexpr int distanceThreshold = 5;
-
         for (std::string unknownOption : unmatched)
         {
           // check if it's a long option
-          if (unknownOption[0] == '-' && unknownOption[1] == '-')
+          if (unknownOption.substr(0, 2) == "--")
           {
             // remove trailing '--'
             unknownOption = unknownOption.substr(2);
@@ -422,14 +420,11 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
               unknownOption.erase(it.base() - 1, unknownOption.end());
             }
 
-            f3d::log::error("Unknown option --", unknownOption);
+            f3d::log::error("Unknown option '", unknownOption, "'");
 
             auto [name, dist] = this->GetClosestOption(unknownOption);
 
-            if (dist < distanceThreshold)
-            {
-              f3d::log::error("Did you mean --", name, "?");
-            }
+            f3d::log::error("Did you mean '", name, "'?");
           }
         }
         throw F3DExNoProcess("unknown options");

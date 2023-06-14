@@ -8,54 +8,54 @@ namespace f3d::levenshtein
 class levenshtein_impl
 {
 public:
-  levenshtein_impl(const std::string_view& a, const std::string_view& b)
-    : StringA(a)
-    , StringB(b)
+  levenshtein_impl(const std::string_view& strA, const std::string_view& strB)
+    : StringA(strA)
+    , StringB(strB)
   {
-    this->Distances.resize((a.size() + 1) * (b.size() + 1), std::numeric_limits<size_t>::max());
+    this->Distances.resize((strA.size() + 1) * (strB.size() + 1), std::numeric_limits<size_t>::max());
   }
 
-  size_t run(size_t ia, size_t ib)
+  size_t run(size_t indexA, size_t indexB)
   {
     // check if this pair has already been checked in the cache and early exit
-    if (this->getValue(ia, ib) != std::numeric_limits<size_t>::max())
+    if (this->getValue(indexA, indexB) != std::numeric_limits<size_t>::max())
     {
-      return this->getValue(ia, ib);
+      return this->getValue(indexA, indexB);
     }
 
     size_t dist = 0;
-    if (ib >= this->StringB.size())
+    if (indexB >= this->StringB.size())
     {
       // no more characters in string B, return the characters count in string A
-      dist = this->StringA.size() - ia;
+      dist = this->StringA.size() - indexA;
     }
-    else if (ia >= this->StringA.size())
+    else if (indexA >= this->StringA.size())
     {
       // no more characters in string A, return the characters count in string B
-      dist = this->StringB.size() - ib;
+      dist = this->StringB.size() - indexB;
     }
-    else if (this->StringA[ia] == this->StringB[ib])
+    else if (this->StringA[indexA] == this->StringB[indexB])
     {
       // same character, continue with the remaining characters
-      dist = this->run(ia + 1, ib + 1);
+      dist = this->run(indexA + 1, indexB + 1);
     }
     else
     {
       // different character, increase the distance and check with advancing only A, only B, or both
       dist = 1 +
-        std::min(std::min(this->run(ia, ib + 1), this->run(ia + 1, ib)), this->run(ia + 1, ib + 1));
+        std::min(std::min(this->run(indexA, indexB + 1), this->run(indexA + 1, indexB)), this->run(indexA + 1, indexB + 1));
     }
 
     // cache the value for later
-    this->getValue(ia, ib) = dist;
+    this->getValue(indexA, indexB) = dist;
 
     return dist;
   }
 
 private:
-  size_t& getValue(size_t ia, size_t ib)
+  size_t& getValue(size_t indexA, size_t indexB)
   {
-    return this->Distances[ia * (this->StringB.size() + 1) + ib];
+    return this->Distances[indexA * (this->StringB.size() + 1) + indexB];
   };
 
   std::vector<size_t> Distances;
