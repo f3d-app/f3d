@@ -68,8 +68,16 @@ PYBIND11_MODULE(f3d, module)
   module.doc() = "f3d library bindings";
 
   // f3d::image
-  py::class_<f3d::image>(module, "image")
-    .def(py::init<>())
+  py::class_<f3d::image> image(module, "image");
+
+  py::enum_<f3d::image::Format>(image, "Format")
+    .value("PNG", f3d::image::Format::PNG)
+    .value("JPG", f3d::image::Format::JPG)
+    .value("TIF", f3d::image::Format::TIF)
+    .value("BMP", f3d::image::Format::BMP)
+    .export_values();
+
+  image.def(py::init<>())
     .def(py::init<const std::string&>())
     .def(py::self == py::self)
     .def(py::self != py::self)
@@ -96,7 +104,7 @@ PYBIND11_MODULE(f3d, module)
           (char*)img.getData(), img.getChannelCount() * img.getWidth() * img.getHeight());
       })
     .def("compare", &f3d::image::compare)
-    .def("save", &f3d::image::save);
+    .def("save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::Format::PNG);
 
   // f3d::options
   py::class_<f3d::options>(module, "options")

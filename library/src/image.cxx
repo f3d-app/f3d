@@ -2,13 +2,17 @@
 
 #include "init.h"
 
+#include <vtkBMPWriter.h>
+#include <vtkImageData.h>
 #include <vtkImageDifference.h>
 #include <vtkImageExport.h>
 #include <vtkImageImport.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
+#include <vtkJPEGWriter.h>
 #include <vtkPNGWriter.h>
 #include <vtkSmartPointer.h>
+#include <vtkTIFFWriter.h>
 #include <vtksys/SystemTools.hxx>
 
 #include <cassert>
@@ -23,18 +27,35 @@ public:
   unsigned int Width = 0;
   unsigned int Height = 0;
   unsigned int Channels = 0;
+  unsigned int ChannelSize = 1;
 
-  void UpdateBufferSize() { this->Buffer.resize(this->Width * this->Height * this->Channels); }
+  void UpdateBufferSize()
+  {
+    this->Buffer.resize(this->Width * this->Height * this->Channels * this->ChannelSize);
+  }
 
   vtkSmartPointer<vtkImageImport> GetVTKImporter() const
   {
-    assert(this->Buffer.size() == this->Width * this->Height * this->Channels);
+    assert(this->Buffer.size() == this->Width * this->Height * this->Channels * this->ChannelSize);
 
     vtkNew<vtkImageImport> importer;
     importer->CopyImportVoidPointer(
       const_cast<unsigned char*>(this->Buffer.data()), static_cast<vtkIdType>(this->Buffer.size()));
     importer->SetNumberOfScalarComponents(this->Channels);
-    importer->SetDataScalarTypeToUnsignedChar();
+    switch (this->ChannelSize)
+    {
+      case 1:
+        importer->SetDataScalarType(VTK_UNSIGNED_CHAR);
+        break;
+      case 2:
+        importer->SetDataScalarType(VTK_UNSIGNED_SHORT);
+        break;
+      case 4:
+        importer->SetDataScalarType(VTK_FLOAT);
+        break;
+      default:
+        break;
+    }
     importer->SetWholeExtent(0, this->Width - 1, 0, this->Height - 1, 0, 0);
     importer->SetDataExtentToWholeExtent();
     return importer;
@@ -42,6 +63,8 @@ public:
 
   void SetFromVTK(vtkAlgorithm* alg)
   {
+    alg->Update();
+
     vtkNew<vtkImageExport> exporter;
     exporter->SetInputConnection(alg->GetOutputPort());
     exporter->ImageLowerLeftOn();
@@ -50,6 +73,7 @@ public:
     this->Width = dims[0];
     this->Height = dims[1];
     this->Channels = exporter->GetDataNumberOfScalarComponents();
+    this->ChannelSize = exporter->GetInput()->GetScalarSize();
     this->UpdateBufferSize();
 
     exporter->Export(this->Buffer.data());
@@ -154,6 +178,20 @@ image& image::setChannelCount(unsigned int dim)
 }
 
 //----------------------------------------------------------------------------
+unsigned int image::getChannelSize() const
+{
+  return this->Internals->ChannelSize;
+}
+
+//----------------------------------------------------------------------------
+image& image::setChannelSize(unsigned int size)
+{
+  this->Internals->ChannelSize = size;
+  this->Internals->UpdateBufferSize();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 image& image::setData(unsigned char* buffer)
 {
   std::copy(buffer, buffer + this->Internals->Buffer.size(), this->Internals->Buffer.begin());
@@ -213,11 +251,30 @@ bool image::operator!=(const image& reference) const
 }
 
 //----------------------------------------------------------------------------
-void image::save(const std::string& path) const
+void image::save(const std::string& path, Format format) const
 {
   auto importer = this->Internals->GetVTKImporter();
 
-  vtkNew<vtkPNGWriter> writer;
+  vtkSmartPointer<vtkImageWriter> writer;
+
+  switch (format)
+  {
+    case Format::PNG:
+      writer = vtkSmartPointer<vtkPNGWriter>::New();
+      break;
+    case Format::JPG:
+      writer = vtkSmartPointer<vtkJPEGWriter>::New();
+      break;
+    case Format::TIF:
+      writer = vtkSmartPointer<vtkTIFFWriter>::New();
+      break;
+    case Format::BMP:
+      writer = vtkSmartPointer<vtkBMPWriter>::New();
+      break;
+    default:
+      throw write_exception("Unknown format");
+  }
+
   writer->SetFileName(path.c_str());
   writer->SetInputConnection(importer->GetOutputPort());
   writer->Write();

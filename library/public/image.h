@@ -19,6 +19,22 @@ class F3D_EXPORT image
 {
 public:
   /**
+   * Enumeration of supported export formats
+   * =======================================
+   * PNG: Supports channel size up to 2 bytes
+   * JPG: Supports channel size of 1 byte
+   * TIF: Supports channel size up to 4 bytes
+   * BMP: Supports channel size of 1 byte
+   */
+  enum class Format : unsigned char
+  {
+    PNG,
+    JPG,
+    TIF,
+    BMP
+  };
+
+  /**
    * Create an image from file, the following formats are supported:
    * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA.
    * EXR files are also supported if the associated module is built.
@@ -63,6 +79,15 @@ public:
   image& setChannelCount(unsigned int dim);
   ///@}
 
+  ///@{ @name Channel Size
+  /**
+   * Set/Get image channel size in byte.
+   * Default is 1.
+   */
+  unsigned int getChannelSize() const;
+  image& setChannelSize(unsigned int size);
+  ///@}
+
   ///@{ @name Buffer Data
   /**
    * Set/Get image buffer data.
@@ -86,10 +111,11 @@ public:
   bool compare(const image& reference, double threshold, image& diff, double& error) const;
 
   /**
-   * Save an image to a file in .png format.
+   * Save an image to a file in the specified format.
+   * Default format is PNG if not specified.
    * Throw an image::write_exception if image cannot be written.
    */
-  void save(const std::string& path) const;
+  void save(const std::string& path, Format format = Format::PNG) const;
 
   /**
    * An exception that can be thrown by the image when there.

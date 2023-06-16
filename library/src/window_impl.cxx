@@ -418,10 +418,12 @@ image window_impl::renderToImage(bool noBackground)
 
   int* dims = exporter->GetDataDimensions();
   int cmp = exporter->GetDataNumberOfScalarComponents();
+  vtkIdType size = exporter->GetInput()->GetScalarSize();
 
   image output;
   output.setResolution(dims[0], dims[1]);
   output.setChannelCount(cmp);
+  output.setChannelSize(size);
 
   exporter->Export(output.getData());
 

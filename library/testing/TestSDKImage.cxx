@@ -10,8 +10,9 @@ int TestSDKImage(int argc, char* argv[])
   constexpr unsigned int width = 64;
   constexpr unsigned int height = 64;
   constexpr unsigned int channels = 3;
+  constexpr unsigned int channelSize = 1;
 
-  std::vector<unsigned char> pixels(width * height * channels);
+  std::vector<unsigned char> pixels(width * height * channels * channelSize);
 
   // fill with deterministic random values
   // do not use std::uniform_int_distribution, it's not giving the same result on different
@@ -20,8 +21,15 @@ int TestSDKImage(int argc, char* argv[])
   std::generate(std::begin(pixels), std::end(pixels), [&]() { return rand_generator() % 256; });
 
   f3d::image generated;
-  generated.setResolution(width, height).setChannelCount(channels).setData(pixels.data());
+  generated.setResolution(width, height)
+    .setChannelCount(channels)
+    .setChannelSize(channelSize)
+    .setData(pixels.data());
+
   generated.save(std::string(argv[2]) + "TestSDKImage.png");
+  generated.save(std::string(argv[2]) + "TestSDKImage.jpg", f3d::image::Format::JPG);
+  generated.save(std::string(argv[2]) + "TestSDKImage.tif", f3d::image::Format::TIF);
+  generated.save(std::string(argv[2]) + "TestSDKImage.bmp", f3d::image::Format::BMP);
 
   // test exceptions
   try
@@ -46,6 +54,16 @@ int TestSDKImage(int argc, char* argv[])
   {
   }
 
+  // check reading a 32-bits image
+  f3d::image hdrImg(std::string(argv[1]) + "/data/palermo_park_1k.hdr");
+
+  if (hdrImg.getChannelSize() != 4)
+  {
+    std::cerr << "Cannot read a 32-bits image" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // check generated image with baseline
   f3d::image baseline(std::string(argv[1]) + "/baselines/TestSDKImage.png");
 
   if (generated.getWidth() != width || generated.getHeight() != height)
@@ -57,6 +75,12 @@ int TestSDKImage(int argc, char* argv[])
   if (generated.getChannelCount() != channels)
   {
     std::cerr << "Image has wrong number of channels" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated.getChannelSize() != channelSize)
+  {
+    std::cerr << "Image has wrong channel size" << std::endl;
     return EXIT_FAILURE;
   }
 
