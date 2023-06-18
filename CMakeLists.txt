@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 include(CMakeDependentOption)
 
+
 # Generic CMake variables, should be done before project()
 set(output_postfix "")
 get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
