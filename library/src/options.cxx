@@ -1,5 +1,6 @@
 #include "options.h"
 
+#include "init.h"
 #include "log.h"
 
 #include "vtkF3DConfigure.h"
@@ -106,6 +107,8 @@ public:
 options::options()
   : Internals(new options::internals)
 {
+  detail::init::initialize();
+
   // Scene
   this->Internals->init("scene.animation.index", 0);
   this->Internals->init("scene.animation.speed-factor", 1.0);
