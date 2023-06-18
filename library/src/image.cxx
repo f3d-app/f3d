@@ -1,5 +1,7 @@
 #include "image.h"
 
+#include "init.h"
+
 #include <vtkImageDifference.h>
 #include <vtkImageExport.h>
 #include <vtkImageImport.h>
@@ -58,12 +60,15 @@ public:
 image::image()
   : Internals(new image::internals())
 {
+  detail::init::initialize();
 }
 
 //----------------------------------------------------------------------------
 image::image(const std::string& path)
   : Internals(new image::internals())
 {
+  detail::init::initialize();
+
   std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
   if (!vtksys::SystemTools::FileExists(fullPath))
   {
@@ -196,7 +201,7 @@ bool image::compare(const image& reference, double threshold, image& diff, doubl
 //----------------------------------------------------------------------------
 bool image::operator==(const image& reference) const
 {
-  f3d::image diff;
+  image diff;
   double error;
   return this->compare(reference, 0, diff, error);
 }

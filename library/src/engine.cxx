@@ -1,7 +1,7 @@
 #include "engine.h"
 
 #include "config.h"
-#include "init.h" // This includes is needed on mac so that the global variable is created
+#include "init.h"
 #include "interactor_impl.h"
 #include "loader_impl.h"
 #include "log.h"
@@ -36,6 +36,9 @@ public:
 engine::engine(window::Type windowType)
   : Internals(new engine::internals)
 {
+  // Ensure all lib initialization is done (once)
+  detail::init::initialize();
+
   // build default cache path
 #if defined(_WIN32)
   std::string cachePath = vtksys::SystemTools::GetEnv("LOCALAPPDATA");
@@ -263,7 +266,7 @@ std::vector<std::string> engine::getPluginsList(const std::string& pluginPath)
         }
         catch (const nlohmann::json::parse_error& ex)
         {
-          f3d::log::warn(fullPath, " is not a valid JSON file: ", ex.what());
+          log::warn(fullPath, " is not a valid JSON file: ", ex.what());
         }
       }
     }
