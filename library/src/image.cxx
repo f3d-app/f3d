@@ -29,7 +29,6 @@ public:
 image::image()
   : Internals(new image::internals())
 {
-  detail::init::initialize();
 }
 
 //----------------------------------------------------------------------------
