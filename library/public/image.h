@@ -26,12 +26,26 @@ public:
    * TIF: Supports channel size up to 4 bytes
    * BMP: Supports channel size of 1 byte
    */
-  enum class Format : unsigned char
+  enum class SaveFormat : unsigned char
   {
     PNG,
     JPG,
     TIF,
     BMP
+  };
+
+  /**
+   * Enumeration of supported channel types
+   * ======================================
+   * BYTE: 8-bit integer in range [0,255]
+   * SHORT: 16-bit integer in range [0,65535]
+   * FLOAT: 32-bit floating point in range [-inf,+inf]
+   */
+  enum class ChannelType : unsigned char
+  {
+    BYTE,
+    SHORT,
+    FLOAT
   };
 
   /**
@@ -41,6 +55,12 @@ public:
    * Throw an image::read_exception in case of failure.
    */
   explicit image(const std::string& path);
+
+  /**
+   * Create an image from a given width, height, and channel count.
+   * A channel type can also be given. Default is BYTE.
+   */
+  image(unsigned int width, unsigned int height, unsigned int channelCount, ChannelType type = ChannelType::BYTE);
 
   ///@{ @name Constructors
   /**
@@ -64,34 +84,27 @@ public:
 
   ///@{ @name Resolution
   /**
-   * Set/Get image resolution.
+   * Get image resolution.
    */
   unsigned int getWidth() const;
   unsigned int getHeight() const;
-  image& setResolution(unsigned int width, unsigned int height);
   ///@}
 
-  ///@{ @name Channel Count
   /**
-   * Set/Get image channel count.
+   * Get image channel count.
    */
   unsigned int getChannelCount() const;
-  image& setChannelCount(unsigned int dim);
-  ///@}
 
-  ///@{ @name Channel Size
   /**
-   * Set/Get image channel size in byte.
-   * Default is 1.
+   * Get image channel type.
+   * throw an image::read_exception if the type is unknown.
    */
-  unsigned int getChannelSize() const;
-  image& setChannelSize(unsigned int size);
-  ///@}
+  ChannelType getChannelType() const;
 
   ///@{ @name Buffer Data
   /**
    * Set/Get image buffer data.
-   * Its size is expected to be `width * height * channelCount`.
+   * Its size is expected to be `width * height * channelCount * typeSize`.
    */
   image& setData(unsigned char* buffer);
   unsigned char* getData() const;
@@ -115,7 +128,7 @@ public:
    * Default format is PNG if not specified.
    * Throw an image::write_exception if image cannot be written.
    */
-  void save(const std::string& path, Format format = Format::PNG) const;
+  void save(const std::string& path, SaveFormat format = SaveFormat::PNG) const;
 
   /**
    * An exception that can be thrown by the image when there.

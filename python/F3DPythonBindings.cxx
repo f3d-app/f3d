@@ -70,22 +70,27 @@ PYBIND11_MODULE(f3d, module)
   // f3d::image
   py::class_<f3d::image> image(module, "image");
 
-  py::enum_<f3d::image::Format>(image, "Format")
-    .value("PNG", f3d::image::Format::PNG)
-    .value("JPG", f3d::image::Format::JPG)
-    .value("TIF", f3d::image::Format::TIF)
-    .value("BMP", f3d::image::Format::BMP)
+  py::enum_<f3d::image::SaveFormat>(image, "SaveFormat")
+    .value("PNG", f3d::image::SaveFormat::PNG)
+    .value("JPG", f3d::image::SaveFormat::JPG)
+    .value("TIF", f3d::image::SaveFormat::TIF)
+    .value("BMP", f3d::image::SaveFormat::BMP)
     .export_values();
 
-  image.def(py::init<>())
-    .def(py::init<const std::string&>())
+  py::enum_<f3d::image::ChannelType>(image, "ChannelType")
+    .value("BYTE", f3d::image::ChannelType::BYTE)
+    .value("SHORT", f3d::image::ChannelType::SHORT)
+    .value("FLOAT", f3d::image::ChannelType::FLOAT)
+    .export_values();
+
+  image.def(py::init<const std::string&>())
+    .def(py::init<unsigned int, unsigned int, unsigned int, f3d::image::ChannelType>())
     .def(py::self == py::self)
     .def(py::self != py::self)
     .def("getWidth", &f3d::image::getWidth)
     .def("getHeight", &f3d::image::getHeight)
-    .def("setResolution", &f3d::image::setResolution)
     .def("getChannelCount", &f3d::image::getChannelCount)
-    .def("setChannelCount", &f3d::image::setChannelCount)
+    .def("getChannelType", &f3d::image::getChannelType)
     .def("setData",
       [](f3d::image& img, const py::bytes& data)
       {
@@ -104,7 +109,7 @@ PYBIND11_MODULE(f3d, module)
           (char*)img.getData(), img.getChannelCount() * img.getWidth() * img.getHeight());
       })
     .def("compare", &f3d::image::compare)
-    .def("save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::Format::PNG);
+    .def("save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG);
 
   // f3d::options
   py::class_<f3d::options>(module, "options")

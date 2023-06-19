@@ -5,12 +5,11 @@
 #include <vtkBMPWriter.h>
 #include <vtkImageData.h>
 #include <vtkImageDifference.h>
-#include <vtkImageExport.h>
-#include <vtkImageImport.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkJPEGWriter.h>
 #include <vtkPNGWriter.h>
+#include <vtkPointData.h>
 #include <vtkSmartPointer.h>
 #include <vtkTIFFWriter.h>
 #include <vtksys/SystemTools.hxx>
@@ -23,61 +22,7 @@ namespace f3d
 class image::internals
 {
 public:
-  std::vector<unsigned char> Buffer;
-  unsigned int Width = 0;
-  unsigned int Height = 0;
-  unsigned int Channels = 0;
-  unsigned int ChannelSize = 1;
-
-  void UpdateBufferSize()
-  {
-    this->Buffer.resize(this->Width * this->Height * this->Channels * this->ChannelSize);
-  }
-
-  vtkSmartPointer<vtkImageImport> GetVTKImporter() const
-  {
-    assert(this->Buffer.size() == this->Width * this->Height * this->Channels * this->ChannelSize);
-
-    vtkNew<vtkImageImport> importer;
-    importer->CopyImportVoidPointer(
-      const_cast<unsigned char*>(this->Buffer.data()), static_cast<vtkIdType>(this->Buffer.size()));
-    importer->SetNumberOfScalarComponents(this->Channels);
-    switch (this->ChannelSize)
-    {
-      case 1:
-        importer->SetDataScalarType(VTK_UNSIGNED_CHAR);
-        break;
-      case 2:
-        importer->SetDataScalarType(VTK_UNSIGNED_SHORT);
-        break;
-      case 4:
-        importer->SetDataScalarType(VTK_FLOAT);
-        break;
-      default:
-        break;
-    }
-    importer->SetWholeExtent(0, this->Width - 1, 0, this->Height - 1, 0, 0);
-    importer->SetDataExtentToWholeExtent();
-    return importer;
-  }
-
-  void SetFromVTK(vtkAlgorithm* alg)
-  {
-    alg->Update();
-
-    vtkNew<vtkImageExport> exporter;
-    exporter->SetInputConnection(alg->GetOutputPort());
-    exporter->ImageLowerLeftOn();
-
-    int* dims = exporter->GetDataDimensions();
-    this->Width = dims[0];
-    this->Height = dims[1];
-    this->Channels = exporter->GetDataNumberOfScalarComponents();
-    this->ChannelSize = exporter->GetInput()->GetScalarSize();
-    this->UpdateBufferSize();
-
-    exporter->Export(this->Buffer.data());
-  }
+  vtkSmartPointer<vtkImageData> Image;
 };
 
 //----------------------------------------------------------------------------
@@ -85,6 +30,27 @@ image::image()
   : Internals(new image::internals())
 {
   detail::init::initialize();
+}
+
+//----------------------------------------------------------------------------
+image::image(unsigned int width, unsigned int height, unsigned int channelCount, ChannelType type)
+  : Internals(new image::internals())
+{
+  this->Internals->Image = vtkSmartPointer<vtkImageData>::New();
+  this->Internals->Image->SetDimensions(width, height, 1);
+
+  switch (type)
+  {
+    case ChannelType::BYTE:
+      this->Internals->Image->AllocateScalars(VTK_UNSIGNED_CHAR, channelCount);
+      break;
+    case ChannelType::SHORT:
+      this->Internals->Image->AllocateScalars(VTK_UNSIGNED_SHORT, channelCount);
+      break;
+    case ChannelType::FLOAT:
+      this->Internals->Image->AllocateScalars(VTK_FLOAT, channelCount);
+      break;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -96,7 +62,7 @@ image::image(const std::string& path)
   std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
   if (!vtksys::SystemTools::FileExists(fullPath))
   {
-    throw read_exception("Cannot open image " + path);
+    throw read_exception("Cannot open file " + path);
   }
 
   auto reader = vtkSmartPointer<vtkImageReader2>::Take(
@@ -105,7 +71,13 @@ image::image(const std::string& path)
   if (reader)
   {
     reader->SetFileName(fullPath.c_str());
-    this->Internals->SetFromVTK(reader);
+    reader->Update();
+    this->Internals->Image = reader->GetOutput();
+  }
+
+  if (!this->Internals->Image)
+  {
+    throw read_exception("Cannot read image " + path);
   }
 }
 
@@ -119,13 +91,15 @@ image::~image()
 image::image(const image& img)
   : Internals(new image::internals())
 {
-  *this->Internals = *img.Internals;
+  this->Internals->Image = vtkSmartPointer<vtkImageData>::New();
+  this->Internals->Image->DeepCopy(img.Internals->Image);
 }
 
 //----------------------------------------------------------------------------
 image& image::operator=(const image& img) noexcept
 {
-  *this->Internals = *img.Internals;
+  this->Internals->Image = vtkSmartPointer<vtkImageData>::New();
+  this->Internals->Image->DeepCopy(img.Internals->Image);
   return *this;
 }
 
@@ -145,77 +119,66 @@ image& image::operator=(image&& img) noexcept
 //----------------------------------------------------------------------------
 unsigned int image::getWidth() const
 {
-  return this->Internals->Width;
+  int dims[3];
+  this->Internals->Image->GetDimensions(dims);
+  return dims[0];
 }
 
 //----------------------------------------------------------------------------
 unsigned int image::getHeight() const
 {
-  return this->Internals->Height;
-}
-
-//----------------------------------------------------------------------------
-image& image::setResolution(unsigned int width, unsigned int height)
-{
-  this->Internals->Width = width;
-  this->Internals->Height = height;
-  this->Internals->UpdateBufferSize();
-  return *this;
+  int dims[3];
+  this->Internals->Image->GetDimensions(dims);
+  return dims[1];
 }
 
 //----------------------------------------------------------------------------
 unsigned int image::getChannelCount() const
 {
-  return this->Internals->Channels;
+  return this->Internals->Image->GetNumberOfScalarComponents();
 }
 
 //----------------------------------------------------------------------------
-image& image::setChannelCount(unsigned int dim)
+image::ChannelType image::getChannelType() const
 {
-  this->Internals->Channels = dim;
-  this->Internals->UpdateBufferSize();
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-unsigned int image::getChannelSize() const
-{
-  return this->Internals->ChannelSize;
-}
-
-//----------------------------------------------------------------------------
-image& image::setChannelSize(unsigned int size)
-{
-  this->Internals->ChannelSize = size;
-  this->Internals->UpdateBufferSize();
-  return *this;
+  switch (this->Internals->Image->GetScalarType())
+  {
+    case VTK_UNSIGNED_CHAR:
+      return ChannelType::BYTE;
+    case VTK_UNSIGNED_SHORT:
+      return ChannelType::SHORT;
+    case VTK_FLOAT:
+      return ChannelType::FLOAT;
+  }
+  throw read_exception("Unknown channel type");
 }
 
 //----------------------------------------------------------------------------
 image& image::setData(unsigned char* buffer)
 {
-  std::copy(buffer, buffer + this->Internals->Buffer.size(), this->Internals->Buffer.begin());
+  int scalarSize = this->Internals->Image->GetScalarSize();
+  int totalSize = this->getWidth() * this->getHeight() * this->getChannelCount() * scalarSize;
+  unsigned char* internalBuffer =
+    reinterpret_cast<unsigned char*>(this->Internals->Image->GetScalarPointer());
+  std::copy(buffer, buffer + totalSize, internalBuffer);
   return *this;
 }
 
 //----------------------------------------------------------------------------
 unsigned char* image::getData() const
 {
-  return this->Internals->Buffer.data();
+  return reinterpret_cast<unsigned char*>(this->Internals->Image->GetScalarPointer());
 }
 
 //----------------------------------------------------------------------------
 bool image::compare(const image& reference, double threshold, image& diff, double& error) const
 {
-  auto importerThis = this->Internals->GetVTKImporter();
-  auto importerRef = reference.Internals->GetVTKImporter();
-
   vtkNew<vtkImageDifference> imDiff;
   // handle threshold outside of vtkImageDifference:
   // https://gitlab.kitware.com/vtk/vtk/-/issues/18152
   imDiff->SetThreshold(0);
-  imDiff->SetInputConnection(importerThis->GetOutputPort());
-  imDiff->SetImageConnection(importerRef->GetOutputPort());
+  imDiff->SetInputData(this->Internals->Image);
+  imDiff->SetImageData(reference.Internals->Image);
   imDiff->UpdateInformation();
   error = imDiff->GetThresholdedError();
 
@@ -231,7 +194,8 @@ bool image::compare(const image& reference, double threshold, image& diff, doubl
   }
   else
   {
-    diff.Internals->SetFromVTK(imDiff);
+    imDiff->Update();
+    diff.Internals->Image = imDiff->GetOutput();
     return false;
   }
 }
@@ -251,24 +215,22 @@ bool image::operator!=(const image& reference) const
 }
 
 //----------------------------------------------------------------------------
-void image::save(const std::string& path, Format format) const
+void image::save(const std::string& path, SaveFormat format) const
 {
-  auto importer = this->Internals->GetVTKImporter();
-
   vtkSmartPointer<vtkImageWriter> writer;
 
   switch (format)
   {
-    case Format::PNG:
+    case SaveFormat::PNG:
       writer = vtkSmartPointer<vtkPNGWriter>::New();
       break;
-    case Format::JPG:
+    case SaveFormat::JPG:
       writer = vtkSmartPointer<vtkJPEGWriter>::New();
       break;
-    case Format::TIF:
+    case SaveFormat::TIF:
       writer = vtkSmartPointer<vtkTIFFWriter>::New();
       break;
-    case Format::BMP:
+    case SaveFormat::BMP:
       writer = vtkSmartPointer<vtkBMPWriter>::New();
       break;
     default:
@@ -276,7 +238,7 @@ void image::save(const std::string& path, Format format) const
   }
 
   writer->SetFileName(path.c_str());
-  writer->SetInputConnection(importer->GetOutputPort());
+  writer->SetInputData(this->Internals->Image);
   writer->Write();
 
   if (writer->GetErrorCode() != 0)
