@@ -2,6 +2,7 @@ list(APPEND pyf3dTests_list
      TestPythonCamera.py
      TestPythonImageData.py
      TestPythonOptions.py
+     TestPythonUtils.py
     )
 
 if(NOT F3D_MACOS_BUNDLE)
@@ -20,6 +21,7 @@ endif()
 list(APPEND pyf3dTestsNoRender_list
      TestPythonOptions
      TestPythonPlugins
+     TestPythonUtils
     )
 
 # Add all the ADD_TEST for each test

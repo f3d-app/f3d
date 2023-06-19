@@ -630,8 +630,8 @@ f3d_test(NAME TestNonExistentInteraction DATA cow.vtp INTERACTION REGEXP "Intera
 # Test invalid provided HDRI
 f3d_test(NAME TestInvalidHDRI DATA cow.vtp ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
-# Test invalid options, do not add a --dummy option
-f3d_test(NAME TestInvalidOption ARGS --dummy REGEXP "Error parsing options:")
+# Test invalid options, do not add a --colour option
+f3d_test(NAME TestInvalidOption ARGS --colour=1,0,0 REGEXP "Did you mean '--color'?")
 
 # Test non-existent config filepath, do not add a dummy.json
 f3d_test(NAME TestNonExistentConfigFilePath DATA cow.vtp CONFIG "${CMAKE_SOURCE_DIR}/testing/configs/dummy.json" REGEXP "Configuration file does not exist" NO_BASELINE)
