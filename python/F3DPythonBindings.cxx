@@ -9,6 +9,7 @@
 #include "loader.h"
 #include "options.h"
 #include "types.h"
+#include "utils.h"
 #include "window.h"
 
 namespace py = pybind11;
@@ -77,7 +78,11 @@ PYBIND11_MODULE(f3d, module)
     .def("toggle", &f3d::options::toggle)
     .def("isSame", &f3d::options::isSame)
     .def("copy", &f3d::options::copy)
-    .def("getNames", &f3d::options::getNames);
+    .def("getNames", &f3d::options::getNames)
+    .def("getClosestOption", &f3d::options::getClosestOption);
+
+  // f3d::utils
+  py::class_<f3d::utils>(module, "utils").def_static("textDistance", &f3d::utils::textDistance);
 
   // f3d::interactor
   py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete> >(module, "interactor")

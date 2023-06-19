@@ -2,9 +2,11 @@
 
 #include "init.h"
 #include "log.h"
+#include "utils.h"
 
 #include "vtkF3DConfigure.h"
 
+#include <limits>
 #include <map>
 #include <type_traits>
 #include <variant>
@@ -445,11 +447,33 @@ std::vector<std::string> options::getNames()
 {
   std::vector<std::string> names;
   names.reserve(this->Internals->Options.size());
-  for (const auto& [name, _] : this->Internals->Options)
+  for (const auto& [name, value] : this->Internals->Options)
   {
     names.emplace_back(name);
   }
   return names;
+}
+
+//----------------------------------------------------------------------------
+std::pair<std::string, unsigned int> options::getClosestOption(const std::string& option) const
+{
+  if (this->Internals->Options.find(option) != this->Internals->Options.end())
+  {
+    return { option, 0 };
+  }
+
+  std::pair<std::string, int> ret = { "", std::numeric_limits<int>::max() };
+
+  for (const auto& [name, value] : this->Internals->Options)
+  {
+    int distance = utils::textDistance(name, option);
+    if (distance < ret.second)
+    {
+      ret = { name, distance };
+    }
+  }
+
+  return ret;
 }
 
 //----------------------------------------------------------------------------

@@ -12,6 +12,7 @@
 #include "interactor.h"
 #include "log.h"
 #include "options.h"
+#include "utils.h"
 
 #include <filesystem>
 #include <fstream>
@@ -130,8 +131,9 @@ protected:
   }
 
   void DeclareOption(cxxopts::OptionAdder& group, const std::string& longName,
-    const std::string& shortName, const std::string& doc) const
+    const std::string& shortName, const std::string& doc)
   {
+    this->AllLongOptions.push_back(longName);
     group(this->CollapseName(longName, shortName), doc);
   }
 
@@ -139,8 +141,7 @@ protected:
   void DeclareOption(cxxopts::OptionAdder& group, const std::string& longName,
     const std::string& shortName, const std::string& doc, T& var, HasDefault hasDefault,
     MayHaveConfig mayHaveConfig, const std::string& argHelp = "",
-    HasImplicitValue hasImplicitValue = HasImplicitValue::NO,
-    const std::string& implicitValue = "") const
+    HasImplicitValue hasImplicitValue = HasImplicitValue::NO, const std::string& implicitValue = "")
   {
     bool hasDefaultBool = hasDefault == HasDefault::YES;
     auto val = cxxopts::value<T>(var);
@@ -166,6 +167,7 @@ protected:
       val = val->default_value(defaultVal);
     }
     var = {};
+    this->AllLongOptions.push_back(longName);
     group(this->CollapseName(longName, shortName), doc, val, argHelp);
   }
 
@@ -175,6 +177,22 @@ protected:
   void PrintVersion();
   void PrintReadersList();
   void PrintPluginsScan();
+
+  std::pair<std::string, int> GetClosestOption(const std::string& option)
+  {
+    std::pair<std::string, int> ret = { "", std::numeric_limits<int>::max() };
+
+    for (const std::string& name : this->AllLongOptions)
+    {
+      int distance = f3d::utils::textDistance(name, option);
+      if (distance < ret.second)
+      {
+        ret = { name, distance };
+      }
+    }
+
+    return ret;
+  }
 
 private:
   int Argc;
@@ -187,6 +205,7 @@ private:
   DictionaryEntry GlobalConfigDicEntry;
   Dictionary ConfigDic;
   std::string ExecutableName;
+  std::vector<std::string> AllLongOptions;
 };
 
 //----------------------------------------------------------------------------
@@ -374,10 +393,42 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     cxxOptions.positional_help("file1 file2 ...");
     cxxOptions.parse_positional({ "input" });
     cxxOptions.show_positional_help();
+    cxxOptions.allow_unrecognised_options();
 
     if (parseCommandLine)
     {
       auto result = cxxOptions.parse(this->Argc, this->Argv);
+
+      auto unmatched = result.unmatched();
+
+      if (unmatched.size() > 0)
+      {
+        for (std::string unknownOption : unmatched)
+        {
+          f3d::log::error("Unknown option '", unknownOption, "'");
+
+          // check if it's a long option
+          if (unknownOption.substr(0, 2) == "--")
+          {
+            // remove trailing '--'
+            unknownOption = unknownOption.substr(2);
+
+            auto it = std::find_if(unknownOption.rbegin(), unknownOption.rend(),
+              [](unsigned char ch) { return ch == '='; });
+
+            // remove everything after the character '='
+            if (it != unknownOption.rend())
+            {
+              unknownOption.erase(it.base() - 1, unknownOption.end());
+            }
+
+            auto [name, dist] = this->GetClosestOption(unknownOption);
+
+            f3d::log::error("Did you mean '--", name, "'?");
+          }
+        }
+        throw F3DExNoProcess("unknown options");
+      }
 
       if (result.count("help") > 0)
       {
