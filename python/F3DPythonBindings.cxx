@@ -14,6 +14,8 @@
 
 namespace py = pybind11;
 
+namespace
+{
 template<typename T, size_t S>
 bool load_array(const py::handle& src, bool convert, std::array<T, S>& value)
 {
@@ -35,11 +37,27 @@ bool load_array(const py::handle& src, bool convert, std::array<T, S>& value)
   return true;
 }
 
+size_t get_channel_size(f3d::image::ChannelType type)
+{
+  switch (type)
+  {
+    case f3d::image::ChannelType::BYTE:
+      return 1;
+    case f3d::image::ChannelType::SHORT:
+      return 2;
+    case f3d::image::ChannelType::FLOAT:
+      return 4;
+  }
+
+  return 0;
+}
+}
+
 template<>
 class py::detail::type_caster<f3d::point3_t>
 {
 public:
-  bool load(handle src, bool convert) { return load_array(src, convert, value); }
+  bool load(handle src, bool convert) { return ::load_array(src, convert, value); }
 
   static handle cast(const f3d::point3_t& src, return_value_policy, handle /* parent */)
   {
@@ -53,7 +71,7 @@ template<>
 class py::detail::type_caster<f3d::vector3_t>
 {
 public:
-  bool load(handle src, bool convert) { return load_array(src, convert, value); }
+  bool load(handle src, bool convert) { return ::load_array(src, convert, value); }
 
   static handle cast(const f3d::vector3_t& src, return_value_policy, handle /* parent */)
   {
@@ -92,24 +110,25 @@ PYBIND11_MODULE(f3d, module)
     .def("getChannelCount", &f3d::image::getChannelCount)
     .def("getChannelType", &f3d::image::getChannelType)
     .def("setData",
-      [](f3d::image& img, const py::bytes& data)
-      {
+      [](f3d::image& img, const py::bytes& data) {
         const py::buffer_info info(py::buffer(data).request());
-        if (info.itemsize != 1 ||
-          info.size != img.getChannelCount() * img.getWidth() * img.getHeight())
+        size_t expectedSize = img.getChannelCount() * img.getWidth() * img.getHeight() *
+          ::get_channel_size(img.getChannelType());
+        if (info.itemsize != 1 || info.size != expectedSize)
         {
           throw py::value_error();
         }
         img.setData((unsigned char*)info.ptr);
       })
     .def("getData",
-      [](const f3d::image& img)
-      {
-        return py::bytes(
-          (char*)img.getData(), img.getChannelCount() * img.getWidth() * img.getHeight());
+      [](const f3d::image& img) {
+        size_t expectedSize = img.getChannelCount() * img.getWidth() * img.getHeight() *
+          ::get_channel_size(img.getChannelType());
+        return py::bytes((char*)img.getData(), expectedSize);
       })
     .def("compare", &f3d::image::compare)
-    .def("save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG);
+    .def(
+      "save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG);
 
   // f3d::options
   py::class_<f3d::options>(module, "options")
