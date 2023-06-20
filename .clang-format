@@ -9,7 +9,6 @@ BreakBeforeBraces: Allman
 BinPackArguments: true
 BinPackParameters: true
 ColumnLimit: 100
-AllowShortFunctionsOnASingleLine: false
 # Note that on versions after 4.0 you need to specify
 # SpaceAfterTemplateKeyword: true
 # which is not an option prior to 4.0. Later versions
