@@ -84,6 +84,8 @@ public:
   void UpdateRendererAfterInteraction();
 
 private:
+  void AnimateCameraTransition(std::function<void(camera& cam, double t)> update_camera);
+
   class internals;
   std::unique_ptr<internals> Internals;
 };

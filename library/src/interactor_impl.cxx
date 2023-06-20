@@ -363,29 +363,13 @@ public:
           vtkMath::Subtract(posV, v, posV);             /* pos -> pos2, keeps on camera plane */
         }
 
-        if (self->TransitionDuration > 0)
+        const auto update_camera = [&foc, &focV, &pos, &posV](camera& cam, double t)
         {
-          const auto start = std::chrono::high_resolution_clock::now();
-          const auto end = start + std::chrono::milliseconds(self->TransitionDuration);
-          auto now = start;
-          while (now < end)
-          {
-            const double t =
-              std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() /
-              static_cast<double>(self->TransitionDuration);
-            const double u = (1 - std::cos(vtkMath::Pi() * t)) / 2;
+          cam.setPosition({ pos[0] + posV[0] * t, pos[1] + posV[1] * t, pos[2] + posV[2] * t });
+          cam.setFocalPoint({ foc[0] + focV[0] * t, foc[1] + focV[1] * t, foc[2] + focV[2] * t });
+        };
 
-            cam.setFocalPoint({ foc[0] + focV[0] * u, foc[1] + focV[1] * u, foc[2] + focV[2] * u });
-            cam.setPosition({ pos[0] + posV[0] * u, pos[1] + posV[1] * u, pos[2] + posV[2] * u });
-            self->Window.render();
-
-            now = std::chrono::high_resolution_clock::now();
-          }
-        }
-
-        cam.setFocalPoint({ picked[0], picked[1], picked[2] });
-        cam.setPosition({ pos[0] + posV[0], pos[1] + posV[1], pos[2] + posV[2] });
-        self->Window.render();
+        self->AnimateCameraTransition(update_camera);
       }
     }
 
@@ -397,15 +381,39 @@ public:
   std::function<bool(const std::vector<std::string>&)> DropFilesUserCallBack =
     [](const std::vector<std::string>&) { return false; };
 
-  void StartInteractor()
-  {
-    this->VTKInteractor->Start();
-  }
+  void StartInteractor() { this->VTKInteractor->Start(); }
 
   void StopInteractor()
   {
     this->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
     this->VTKInteractor->ExitCallback();
+  }
+
+  void AnimateCameraTransition(std::function<void(camera& cam, double t)> update_camera)
+  {
+    window& win = this->Window;
+    camera& cam = win.getCamera();
+    const int duration = this->TransitionDuration;
+
+    if (duration > 0)
+    {
+      // TODO can we disable inputs so we don't queue key presses while the animation is running?
+
+      const auto start = std::chrono::high_resolution_clock::now();
+      const auto end = start + std::chrono::milliseconds(duration);
+      auto now = start;
+      while (now < end)
+      {
+        const double t = std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count();
+        const double u = (1 - std::cos(vtkMath::Pi() * (t / duration))) / 2;
+        update_camera(cam, u);
+        this->Window.render();
+        now = std::chrono::high_resolution_clock::now();
+      }
+    }
+
+    update_camera(cam, 1.); // ensure last update
+    this->Window.render();
   }
 
   options& Options;
