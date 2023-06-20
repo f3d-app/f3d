@@ -526,7 +526,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream 
   configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestInteractionDropFiles.log.in"
     "${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")
 
-  f3d_test(NAME TestInteractionDropFiles ARGS -x "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")#DropEvent cow.vtp;#DropEvent dragon.vtu suzanne.stl;
+  f3d_test(NAME TestInteractionDropFiles ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
 
   configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestInteractionGroupGeometriesDrop.log.in"
     "${CMAKE_BINARY_DIR}/TestInteractionGroupGeometriesDrop.log")
