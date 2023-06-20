@@ -392,7 +392,7 @@ public:
     this->VTKInteractor->ExitCallback();
   }
 
-  void AnimateCameraTransition(std::function<void(camera&, double)> update_camera)
+  void AnimateCameraTransition(const std::function<void(camera&, double)>& update_camera)
   {
     window& win = this->Window;
     camera& cam = win.getCamera();
