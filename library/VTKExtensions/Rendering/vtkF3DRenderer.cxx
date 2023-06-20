@@ -961,15 +961,17 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     std::stringstream cheatSheetText;
     cheatSheetText << "\n";
     this->FillCheatSheetHotkeys(cheatSheetText);
-    cheatSheetText << "\n   H  : Cheat sheet \n";
-    cheatSheetText << "   ?  : Print scene descr to terminal\n";
-    cheatSheetText << "  ESC : Quit \n";
-    cheatSheetText << " ENTER: Reset camera to initial parameters\n";
-    cheatSheetText << " SPACE: Play animation if any\n";
-    cheatSheetText << " LEFT : Previous file \n";
-    cheatSheetText << " RIGHT: Next file \n";
-    cheatSheetText << "  UP  : Reload current file \n";
-    cheatSheetText << " DOWN : Add files from dir of current file\n";
+    cheatSheetText << "\n     H     : Cheat sheet \n";
+    cheatSheetText << "     ?     : Print scene descr to terminal \n";
+    cheatSheetText << "    ESC    : Quit \n";
+    cheatSheetText << "   ENTER   : Reset camera to initial parameters \n";
+    cheatSheetText << "   SPACE   : Play animation if any \n";
+    cheatSheetText << "   LEFT    : Previous file \n";
+    cheatSheetText << "   RIGHT   : Next file \n";
+    cheatSheetText << "    UP     : Reload current file \n";
+    cheatSheetText << "   DOWN    : Add files from dir of current file \n";
+    cheatSheetText << "   Drop    : Load dropped file or folder \n";
+    cheatSheetText << " Ctrl+Drop : Load dropped file as a HDRI \n";
 
     this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, cheatSheetText.str().c_str());
     this->CheatSheetActor->RenderOpaqueGeometry(this);
