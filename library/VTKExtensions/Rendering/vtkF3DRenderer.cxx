@@ -961,15 +961,19 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     std::stringstream cheatSheetText;
     cheatSheetText << "\n";
     this->FillCheatSheetHotkeys(cheatSheetText);
-    cheatSheetText << "\n   H   : Cheat sheet \n";
-    cheatSheetText << "   ?   : Print scene descr to terminal \n";
-    cheatSheetText << "  ESC  : Quit \n";
-    cheatSheetText << " ENTER : Reset camera to initial parameters \n";
-    cheatSheetText << " SPACE : Play animation if any \n";
-    cheatSheetText << " LEFT  : Previous file \n";
-    cheatSheetText << " RIGHT : Next file \n";
-    cheatSheetText << "  UP   : Reload current file \n";
-    cheatSheetText << " DOWN  : Add files from dir of current file \n";
+    cheatSheetText << "\n   H  : Cheat sheet \n";
+    cheatSheetText << "   ?  : Print scene descr to terminal\n";
+    cheatSheetText << "  ESC : Quit \n";
+    cheatSheetText << " SPACE: Play animation if any\n";
+    cheatSheetText << " LEFT : Previous file \n";
+    cheatSheetText << " RIGHT: Next file \n";
+    cheatSheetText << "  UP  : Reload current file \n";
+    cheatSheetText << " DOWN : Add files from dir of current file\n";
+    cheatSheetText << "\n 1: Front View camera\n";
+    cheatSheetText << " 3: Right View camera\n";
+    cheatSheetText << " 7: Top View camera\n";
+    cheatSheetText << " 9: Isometric View camera\n";
+    cheatSheetText << " ENTER: Reset camera to initial parameters\n";
     cheatSheetText << " Drop  : Load dropped file, folder or HDRI\n";
 
     this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, cheatSheetText.str().c_str());

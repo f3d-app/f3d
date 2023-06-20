@@ -48,12 +48,18 @@ Other options can be toggled directly by pressing the following hotkeys:
 
 Note that some hotkeys can be available or not depending on the file being loaded and the F3D configuration.
 
+Camera Hotkeys:
+* `1`: front view camera.
+* `3`: right view camera.
+* `7`: top view camera.
+* `9`: isometric view camera.
+* `ENTER`: reset the camera to its initial parameters.
+
 Other hotkeys are available:
 
 * `H`: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
 * `?`: key to print scene description to the terminal.
 * `ESC`: close the window and quit F3D.
-* `ENTER`: reset the camera to its initial parameters.
 * `SPACE`: play the animation if any.
 * `LEFT`: load the previous file if any.
 * `RIGHT`: load the next file if any.
