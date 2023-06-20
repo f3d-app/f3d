@@ -363,10 +363,10 @@ public:
           vtkMath::Subtract(posV, v, posV);             /* pos -> pos2, keeps on camera plane */
         }
 
-        const auto update_camera = [&foc, &focV, &pos, &posV](camera& cam, double t)
+        const auto update_camera = [&foc, &focV, &pos, &posV](camera& c, double t)
         {
-          cam.setPosition({ pos[0] + posV[0] * t, pos[1] + posV[1] * t, pos[2] + posV[2] * t });
-          cam.setFocalPoint({ foc[0] + focV[0] * t, foc[1] + focV[1] * t, foc[2] + focV[2] * t });
+          c.setPosition({ pos[0] + posV[0] * t, pos[1] + posV[1] * t, pos[2] + posV[2] * t });
+          c.setFocalPoint({ foc[0] + focV[0] * t, foc[1] + focV[1] * t, foc[2] + focV[2] * t });
         };
 
         self->AnimateCameraTransition(update_camera);
@@ -381,7 +381,8 @@ public:
   std::function<bool(const std::vector<std::string>&)> DropFilesUserCallBack =
     [](const std::vector<std::string>&) { return false; };
 
-  void StartInteractor() {
+  void StartInteractor()
+  {
     this->VTKInteractor->Start();
   }
 
