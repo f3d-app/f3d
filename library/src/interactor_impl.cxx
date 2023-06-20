@@ -273,6 +273,19 @@ public:
       filesVec[i] = filesArr->GetValue(i);
     }
 
+    vtkRenderWindowInteractor* rwi = self->Style->GetInteractor();
+    if (rwi->GetControlKey() == 1)
+    {
+      // When Ctrl Key is pressed, load the first file as an HDRI instead
+      // of loading a file.
+      // This bypass the DropFilesUserCallBack logic and will be reworked
+      // once https://github.com/f3d-app/f3d/issues/443 is addressed.
+
+      self->Options.set("render.background.hdri", filesVec[0]);
+      self->Window.render();
+      return;
+    }
+
     if (self->DropFilesUserCallBack(filesVec))
     {
       return;
