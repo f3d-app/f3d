@@ -381,7 +381,9 @@ public:
   std::function<bool(const std::vector<std::string>&)> DropFilesUserCallBack =
     [](const std::vector<std::string>&) { return false; };
 
-  void StartInteractor() { this->VTKInteractor->Start(); }
+  void StartInteractor() {
+    this->VTKInteractor->Start();
+  }
 
   void StopInteractor()
   {
@@ -389,7 +391,7 @@ public:
     this->VTKInteractor->ExitCallback();
   }
 
-  void AnimateCameraTransition(std::function<void(camera& cam, double t)> update_camera)
+  void AnimateCameraTransition(std::function<void(camera&, double)> update_camera)
   {
     window& win = this->Window;
     camera& cam = win.getCamera();
