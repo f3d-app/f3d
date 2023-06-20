@@ -280,7 +280,6 @@ public:
       // of loading a file.
       // This bypass the DropFilesUserCallBack logic and will be reworked
       // once https://github.com/f3d-app/f3d/issues/443 is addressed.
-
       self->Options.set("render.background.hdri", filesVec[0]);
       self->Window.render();
       return;
