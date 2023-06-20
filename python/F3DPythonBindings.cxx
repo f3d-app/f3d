@@ -110,7 +110,8 @@ PYBIND11_MODULE(f3d, module)
     .def("getChannelCount", &f3d::image::getChannelCount)
     .def("getChannelType", &f3d::image::getChannelType)
     .def("setData",
-      [](f3d::image& img, const py::bytes& data) {
+      [](f3d::image& img, const py::bytes& data)
+      {
         const py::buffer_info info(py::buffer(data).request());
         size_t expectedSize = img.getChannelCount() * img.getWidth() * img.getHeight() *
           ::get_channel_size(img.getChannelType());
@@ -121,7 +122,8 @@ PYBIND11_MODULE(f3d, module)
         img.setData((unsigned char*)info.ptr);
       })
     .def("getData",
-      [](const f3d::image& img) {
+      [](const f3d::image& img)
+      {
         size_t expectedSize = img.getChannelCount() * img.getWidth() * img.getHeight() *
           ::get_channel_size(img.getChannelType());
         return py::bytes((char*)img.getData(), expectedSize);

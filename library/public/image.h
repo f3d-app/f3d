@@ -60,7 +60,8 @@ public:
    * Create an image from a given width, height, and channel count.
    * A channel type can also be given. Default is BYTE.
    */
-  image(unsigned int width, unsigned int height, unsigned int channelCount, ChannelType type = ChannelType::BYTE);
+  image(unsigned int width, unsigned int height, unsigned int channelCount,
+    ChannelType type = ChannelType::BYTE);
 
   ///@{ @name Constructors
   /**
