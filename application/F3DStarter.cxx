@@ -95,8 +95,8 @@ F3DStarter::F3DStarter()
   : Internals(std::make_unique<F3DStarter::F3DInternals>())
 {
   // Set option outside of command line and config file
-  this->Internals->DynamicOptions.set(
-    "ui.dropzone-info", "Drop a file to open it\nPress H to show cheatsheet");
+  this->Internals->DynamicOptions.set("ui.dropzone-info",
+    "Drop a file to open it\nCtrl+Drop to load a HDRI\nPress H to show cheatsheet");
 }
 
 //----------------------------------------------------------------------------
@@ -372,24 +372,21 @@ int F3DStarter::Start(int argc, char** argv)
 //----------------------------------------------------------------------------
 void F3DStarter::LoadFile(int index, bool relativeIndex)
 {
-  if (this->Internals->LoadedFile)
+  // When loading a file, store any changed options
+  // into the dynamic options and use these dynamic option as the default
+  // for loading the file while still applying file specific options on top of it
+
+  // Recover previous options from the engine
+  const f3d::options& previousOptions = this->Internals->Engine->getOptions();
+
+  // Detect changed options and apply the change to the dynamic options
+  // options names are shared between options instance
+  std::vector<std::string> optionNames = this->Internals->DynamicOptions.getNames();
+  for (const auto& name : optionNames)
   {
-    // When loading a file after another, store the changed options
-    // into the dynamic options and use these dynamic option as the default
-    // for loading the next file while still applying file specific options on top of it
-
-    // Recover previous options from the engine
-    const f3d::options& previousOptions = this->Internals->Engine->getOptions();
-
-    // Detect changed options and apply the change to the dynamic options
-    // options names are shared between options instance
-    std::vector<std::string> optionNames = this->Internals->DynamicOptions.getNames();
-    for (const auto& name : optionNames)
+    if (!previousOptions.isSame(this->Internals->FileOptions, name))
     {
-      if (!previousOptions.isSame(this->Internals->FileOptions, name))
-      {
-        this->Internals->DynamicOptions.copy(previousOptions, name);
-      }
+      this->Internals->DynamicOptions.copy(previousOptions, name);
     }
   }
 
