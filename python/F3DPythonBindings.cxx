@@ -4,6 +4,7 @@
 
 #include "camera.h"
 #include "engine.h"
+#include "export.h"
 #include "image.h"
 #include "interactor.h"
 #include "loader.h"
@@ -101,7 +102,8 @@ PYBIND11_MODULE(f3d, module)
     .value("FLOAT", f3d::image::ChannelType::FLOAT)
     .export_values();
 
-  image.def(py::init<const std::string&>())
+  image.def(py::init<>())
+    .def(py::init<const std::string&>())
     .def(py::init<unsigned int, unsigned int, unsigned int, f3d::image::ChannelType>())
     .def(py::self == py::self)
     .def(py::self != py::self)
@@ -271,4 +273,19 @@ PYBIND11_MODULE(f3d, module)
     .def_static("getLibInfo", &f3d::engine::getLibInfo)
     .def_static("getReadersInfo", &f3d::engine::getReadersInfo)
     .def_static("getPluginsList", &f3d::engine::getPluginsList);
+
+// deprecated functions, will be removed in the next major release
+#ifndef F3D_NO_DEPRECATED
+  image.def("setResolution", [](f3d::image& img, unsigned int width, unsigned height) {
+    PyErr_WarnEx(PyExc_DeprecationWarning,
+      "setResolution is deprecated, use the appropriate constructor instead.", 1);
+    return img.setResolution(width, height);
+  });
+
+  image.def("setChannelCount", [](f3d::image& img, unsigned int channels) {
+    PyErr_WarnEx(PyExc_DeprecationWarning,
+      "setChannelCount is deprecated, use the appropriate constructor instead.", 1);
+    return img.setChannelCount(channels);
+  });
+#endif
 }

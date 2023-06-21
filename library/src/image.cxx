@@ -29,6 +29,7 @@ public:
 image::image()
   : Internals(new image::internals())
 {
+  this->Internals->Image = vtkSmartPointer<vtkImageData>::New();
 }
 
 //----------------------------------------------------------------------------
@@ -131,11 +132,30 @@ unsigned int image::getHeight() const
   return dims[1];
 }
 
+#ifndef F3D_NO_DEPRECATED
+//----------------------------------------------------------------------------
+image& image::setResolution(unsigned int width, unsigned int height)
+{
+  this->Internals->Image->SetDimensions(width, height, 1);
+  this->Internals->Image->AllocateScalars(VTK_UNSIGNED_CHAR, this->getChannelCount());
+  return *this;
+}
+#endif
+
 //----------------------------------------------------------------------------
 unsigned int image::getChannelCount() const
 {
   return this->Internals->Image->GetNumberOfScalarComponents();
 }
+
+#ifndef F3D_NO_DEPRECATED
+//----------------------------------------------------------------------------
+image& image::setChannelCount(unsigned int dim)
+{
+  this->Internals->Image->AllocateScalars(VTK_UNSIGNED_CHAR, dim);
+  return *this;
+}
+#endif
 
 //----------------------------------------------------------------------------
 image::ChannelType image::getChannelType() const
