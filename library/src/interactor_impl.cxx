@@ -346,9 +346,9 @@ public:
          *     .--.-----------------.picked
          * pos1    pos2
          */
-        camera& cam = self->Window.getCamera();
-        const point3_t pos = cam.getPosition();
-        const point3_t foc = cam.getFocalPoint();
+        camera& currentCam = self->Window.getCamera();
+        const point3_t pos = currentCam.getPosition();
+        const point3_t foc = currentCam.getFocalPoint();
 
         double focV[3];
         vtkMath::Subtract(picked, foc.data(), focV); /* foc -> picked */
@@ -363,10 +363,10 @@ public:
           vtkMath::Subtract(posV, v, posV);             /* pos -> pos2, keeps on camera plane */
         }
 
-        const auto update_camera = [&foc, &focV, &pos, &posV](camera& c, double t)
+        const auto update_camera = [&foc, &focV, &pos, &posV](camera& cam, double t)
         {
-          c.setPosition({ pos[0] + posV[0] * t, pos[1] + posV[1] * t, pos[2] + posV[2] * t });
-          c.setFocalPoint({ foc[0] + focV[0] * t, foc[1] + focV[1] * t, foc[2] + focV[2] * t });
+          cam.setPosition({ pos[0] + posV[0] * t, pos[1] + posV[1] * t, pos[2] + posV[2] * t });
+          cam.setFocalPoint({ foc[0] + focV[0] * t, foc[1] + focV[1] * t, foc[2] + focV[2] * t });
         };
 
         self->AnimateCameraTransition(update_camera);
