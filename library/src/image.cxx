@@ -207,16 +207,14 @@ bool image::compare(const image& reference, double threshold, image& diff, doubl
     error = imDiff->GetThresholdedError();
   }
 
-  if (error <= threshold)
-  {
-    return true;
-  }
-  else
+  if (error > threshold)
   {
     imDiff->Update();
     diff.Internals->Image = imDiff->GetOutput();
     return false;
   }
+
+  return true;
 }
 
 //----------------------------------------------------------------------------
