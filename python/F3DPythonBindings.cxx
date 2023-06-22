@@ -19,9 +19,13 @@ void pyseq_to_array(const py::sequence& seq, std::array<T, S>& arr)
 {
   const size_t len = py::len(seq);
   if (len != arr.size())
+  {
     throw py::value_error("wrong length");
+  }
   for (size_t i = 0; i < len; ++i)
+  {
     arr[i] = py::cast<T>(seq[i]);
+  }
 }
 
 size_t py_index(int i, size_t len)
