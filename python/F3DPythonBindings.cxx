@@ -24,6 +24,19 @@ void pyseq_to_array(const py::sequence& seq, std::array<T, S>& arr)
     arr[i] = py::cast<T>(seq[i]);
 }
 
+size_t py_index(int i, size_t len)
+{
+  if (i < 0)
+  {
+    i += len;
+  }
+  if (i < 0 || i >= len)
+  {
+    throw py::index_error();
+  }
+  return i;
+}
+
 PYBIND11_MODULE(f3d, module)
 {
   module.doc() = "f3d library bindings";
@@ -35,8 +48,9 @@ PYBIND11_MODULE(f3d, module)
     .def(
       "__iter__", [](const f3d::point3_t& p) { return py::make_iterator(p); },
       py::keep_alive<0, 1>()) /* keep alive while iterator is used */
-    .def("__getitem__", [](const f3d::point3_t& p, int i) { return p[i]; })
-    .def("__setitem__", [](f3d::point3_t& p, int i, double value) { p[i] = value; });
+    .def("__getitem__", [](const f3d::point3_t& p, int i) { return p[py_index(i, p.size())]; })
+    .def("__setitem__",
+      [](f3d::point3_t& p, int i, double value) { p[py_index(i, p.size())] = value; });
 
   py::class_<f3d::vector3_t>(module, "vector3_t")
     .def(py::init<double, double, double>())
@@ -44,8 +58,9 @@ PYBIND11_MODULE(f3d, module)
     .def(
       "__iter__", [](const f3d::vector3_t& v) { return py::make_iterator(v); },
       py::keep_alive<0, 1>()) /* keep alive while iterator is used */
-    .def("__getitem__", [](const f3d::vector3_t& v, int i) { return v[i]; })
-    .def("__setitem__", [](f3d::vector3_t& v, int i, double value) { v[i] = value; });
+    .def("__getitem__", [](const f3d::vector3_t& v, int i) { return v[py_index(i, v.size())]; })
+    .def("__setitem__",
+      [](f3d::vector3_t& v, int i, double value) { v[py_index(i, v.size())] = value; });
 
   // f3d::image
   py::class_<f3d::image>(module, "image")

@@ -24,6 +24,17 @@ assert tuple(point) == xyz
 assert (point[0], point[1], point[2]) == xyz
 point[1] += 1
 assert tuple(point) == (xyz[0], xyz[1] + 1, xyz[2])
+point[-1] -= 1
+assert tuple(point) == (xyz[0], xyz[1] + 1, xyz[2] - 1)
+
+try:
+    point[3] = 2
+except IndexError:
+    assert True
+try:
+    point[-4] = 2
+except IndexError:
+    assert True
 
 # vector3_t
 vector = f3d.vector3_t(*xyz)
@@ -31,6 +42,17 @@ assert tuple(vector) == xyz
 assert (vector[0], vector[1], vector[2]) == xyz
 vector[1] += 1
 assert tuple(vector) == (xyz[0], xyz[1] + 1, xyz[2])
+vector[-1] -= 1
+assert tuple(vector) == (xyz[0], xyz[1] + 1, xyz[2] - 1)
+
+try:
+    vector[3] = 2
+except IndexError:
+    assert True
+try:
+    vector[-4] = 2
+except IndexError:
+    assert True
 
 
 # position as point3_t
