@@ -18,7 +18,7 @@ namespace f3d
  * file.
  *
  * Example usage:
- *
+ * \code{.cpp}
  *  std::string path = ...
  *  f3d::engine eng(f3d::window::Type::NATIVE);
  *  f3d::loader& load = eng.getLoader();
@@ -31,6 +31,7 @@ namespace f3d
  *  {
  *    load.loadGeometry(path);
  *  }
+ * \endcode
  *
  */
 class F3D_EXPORT loader
