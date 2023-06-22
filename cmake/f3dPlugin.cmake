@@ -95,6 +95,7 @@ macro(f3d_plugin_declare_reader)
   string(JSON F3D_READER_JSON
     SET "${F3D_READER_JSON}" "extensions" "[${F3D_READER_EXTENSIONS}]")
 
+  set(F3D_READER_MIMETYPES_THUMB ${F3D_READER_MIMETYPES})
   list(TRANSFORM F3D_READER_MIMETYPES PREPEND "\"")
   list(TRANSFORM F3D_READER_MIMETYPES APPEND "\"")
   list(JOIN F3D_READER_MIMETYPES ", " F3D_READER_MIMETYPES)
@@ -106,7 +107,7 @@ macro(f3d_plugin_declare_reader)
     string(JSON F3D_READER_JSON
       SET "${F3D_READER_JSON}" "exclude_thumbnailer" "true")
   else()
-    list(APPEND F3D_PLUGIN_MIMETYPES_THUMB ${F3D_READER_MIMETYPES})
+    list(APPEND F3D_PLUGIN_MIMETYPES_THUMB ${F3D_READER_MIMETYPES_THUMB})
     string(JSON F3D_READER_JSON
       SET "${F3D_READER_JSON}" "exclude_thumbnailer" "false")
   endif()
