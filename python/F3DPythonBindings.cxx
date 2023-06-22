@@ -14,13 +14,38 @@
 
 namespace py = pybind11;
 
+template<typename T, size_t S>
+void pyseq_to_array(const py::sequence& seq, std::array<T, S>& arr)
+{
+  const size_t len = py::len(seq);
+  if (len != arr.size())
+    throw py::value_error("wrong length");
+  for (size_t i = 0; i < len; ++i)
+    arr[i] = py::cast<T>(seq[i]);
+}
+
 PYBIND11_MODULE(f3d, module)
 {
   module.doc() = "f3d library bindings";
 
   // types
-  py::class_<f3d::point3_t>(module, "point3_t").def(py::init<double, double, double>());
-  py::class_<f3d::vector3_t>(module, "vector3_t").def(py::init<double, double, double>());
+  py::class_<f3d::point3_t>(module, "point3_t")
+    .def(py::init<double, double, double>())
+    .def("__len__", [](const f3d::point3_t& p) { return p.size(); })
+    .def(
+      "__iter__", [](const f3d::point3_t& p) { return py::make_iterator(p); },
+      py::keep_alive<0, 1>()) /* keep alive while iterator is used */
+    .def("__getitem__", [](const f3d::point3_t& p, int i) { return p[i]; })
+    .def("__setitem__", [](f3d::point3_t& p, int i, double value) { p[i] = value; });
+
+  py::class_<f3d::vector3_t>(module, "vector3_t")
+    .def(py::init<double, double, double>())
+    .def("__len__", [](const f3d::vector3_t& v) { return v.size(); })
+    .def(
+      "__iter__", [](const f3d::vector3_t& v) { return py::make_iterator(v); },
+      py::keep_alive<0, 1>()) /* keep alive while iterator is used */
+    .def("__getitem__", [](const f3d::vector3_t& v, int i) { return v[i]; })
+    .def("__setitem__", [](f3d::vector3_t& v, int i, double value) { v[i] = value; });
 
   // f3d::image
   py::class_<f3d::image>(module, "image")
@@ -117,16 +142,35 @@ PYBIND11_MODULE(f3d, module)
     .def("loadScene", &f3d::loader::loadScene, "Load a specific full scene file");
 
   // f3d::camera
-  py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "camera");
-  py::class_<f3d::camera_state_t>(module, "camera_state_t");
-
-  camera.def("setPosition", &f3d::camera::setPosition)
+  py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> >(module, "camera")
+    .def("setPosition", &f3d::camera::setPosition)
+    .def("setPosition",
+      [](f3d::camera& cam, py::sequence point)
+      {
+        f3d::point3_t p;
+        pyseq_to_array(point, p);
+        cam.setPosition(p);
+      })
     .def("getPosition", py::overload_cast<>(&f3d::camera::getPosition))
     .def("getPosition", py::overload_cast<f3d::point3_t&>(&f3d::camera::getPosition))
     .def("setFocalPoint", &f3d::camera::setFocalPoint)
+    .def("setFocalPoint",
+      [](f3d::camera& cam, py::sequence point)
+      {
+        f3d::point3_t p;
+        pyseq_to_array(point, p);
+        cam.setFocalPoint(p);
+      })
     .def("getFocalPoint", py::overload_cast<>(&f3d::camera::getFocalPoint))
     .def("getFocalPoint", py::overload_cast<f3d::point3_t&>(&f3d::camera::getFocalPoint))
     .def("setViewUp", &f3d::camera::setViewUp)
+    .def("setViewUp",
+      [](f3d::camera& cam, py::sequence vector)
+      {
+        f3d::vector3_t v;
+        pyseq_to_array(vector, v);
+        cam.setViewUp(v);
+      })
     .def("getViewUp", py::overload_cast<>(&f3d::camera::getViewUp))
     .def("getViewUp", py::overload_cast<f3d::vector3_t&>(&f3d::camera::getViewUp))
     .def("setViewAngle", &f3d::camera::setViewAngle)
@@ -144,6 +188,8 @@ PYBIND11_MODULE(f3d, module)
     .def("setCurrentAsDefault", &f3d::camera::setCurrentAsDefault)
     .def("resetToDefault", &f3d::camera::resetToDefault)
     .def("resetToBounds", &f3d::camera::resetToBounds, py::arg("zoomFactor") = 0.9);
+
+  py::class_<f3d::camera_state_t>(module, "camera_state_t");
 
   // f3d::window
   py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> > window(module, "window");
