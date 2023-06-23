@@ -14,25 +14,27 @@
 
 namespace py = pybind11;
 
-namespace PYBIND11_NAMESPACE
-{
-namespace detail
-{
 template<>
-class type_caster<f3d::point3_t>
+class py::detail::type_caster<f3d::point3_t>
 {
 public:
   bool load(handle src, bool convert)
   {
     if (!isinstance<sequence>(src))
+    {
       return false;
+    }
     py::sequence l = reinterpret_borrow<sequence>(src);
     if (l.size() != 3)
+    {
       return false;
+    }
 
     size_t i = 0;
     for (auto it : l)
+    {
       value[i++] = py::cast<double>(it);
+    }
     return true;
   }
 
@@ -45,20 +47,26 @@ public:
 };
 
 template<>
-class type_caster<f3d::vector3_t>
+class py::detail::type_caster<f3d::vector3_t>
 {
 public:
   bool load(handle src, bool convert)
   {
     if (!isinstance<sequence>(src))
+    {
       return false;
+    }
     py::sequence l = reinterpret_borrow<sequence>(src);
     if (l.size() != 3)
+    {
       return false;
+    }
 
     size_t i = 0;
     for (auto it : l)
+    {
       value[i++] = py::cast<double>(it);
+    }
     return true;
   }
 
@@ -69,9 +77,6 @@ public:
 
   PYBIND11_TYPE_CASTER(f3d::vector3_t, const_name("f3d.vector3_t"));
 };
-
-}
-}
 
 PYBIND11_MODULE(f3d, module)
 {
