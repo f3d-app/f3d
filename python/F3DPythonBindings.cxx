@@ -12,6 +12,10 @@
 #include "utils.h"
 #include "window.h"
 
+#ifndef F3D_PYTHONLIB_NAME
+#define F3D_PYTHONLIB_NAME f3d
+#endif
+
 namespace py = pybind11;
 
 template<typename T, size_t S>
@@ -63,7 +67,7 @@ public:
   PYBIND11_TYPE_CASTER(f3d::vector3_t, const_name("f3d.vector3_t"));
 };
 
-PYBIND11_MODULE(f3d, module)
+PYBIND11_MODULE(F3D_PYTHONLIB_NAME, module)
 {
   module.doc() = "f3d library bindings";
 

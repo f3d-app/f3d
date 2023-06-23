@@ -22,16 +22,21 @@ set_target_properties(pyf3d PROPERTIES
   LIBRARY_OUTPUT_NAME "f3d"
   )
 
-if(WIN32)
+if(SKBUILD)
+  # If we are building a python wheel, we import _f3d.* in __init__.py
+  target_compile_definitions(pyf3d PRIVATE F3D_PYTHONLIB_NAME=_f3d)
+  set_target_properties(pyf3d PROPERTIES PREFIX "_")
+  set(PYTHON_INSTALL_PATH ".")
+elseif(WIN32)
   # On Windows, the python module needs to be in the same folder than f3d.dll
   # Usage of PATH to find the DLL is not possible, see https://stackoverflow.com/a/64303856/2609654
   set_target_properties(pyf3d PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
     )
-endif()
-
-if (APPLE OR UNIX)
+  set(PYTHON_INSTALL_PATH ${CMAKE_INSTALL_BINDIR})
+else()
   set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+  set(PYTHON_INSTALL_PATH "${CMAKE_INSTALL_LIBDIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages")
 endif ()
 
 # testing
@@ -40,10 +45,5 @@ if(BUILD_TESTING)
 endif()
 
 # installing
-if(WIN32)
-  set(PYTHON_INSTALL_PATH ${CMAKE_INSTALL_BINDIR})
-else()
-  set(PYTHON_INSTALL_PATH "${CMAKE_INSTALL_LIBDIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages")
-endif()
 install(TARGETS pyf3d
   LIBRARY DESTINATION ${PYTHON_INSTALL_PATH} COMPONENT pythonmodule)

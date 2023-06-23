@@ -5,6 +5,10 @@ if sys.platform.startswith('win32'):
 
 import f3d
 
-plugins = f3d.engine.getPluginsList(sys.argv[3] + '/share/f3d/plugins')
-assert len(plugins) > 0
-assert plugins.index('native') >= 0
+def test_plugins():
+  plugins = f3d.engine.getPluginsList(sys.argv[3] + '/share/f3d/plugins')
+  assert len(plugins) > 0
+  assert plugins.index('native') >= 0
+
+if __name__ == '__main__':
+  test_plugins()
