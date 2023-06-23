@@ -3,7 +3,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   message(FATAL_ERROR "native plugin cannot be built externally")
 endif()
 
-include(${CMAKE_SOURCE_DIR}/cmake/f3dPlugin.cmake)
+include(f3dPlugin)
 
 f3d_plugin_init()
 
@@ -99,6 +99,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/x-tgif
   VTK_READER vtkTIFFReader
   FORMAT_DESCRIPTION "TIFF"
+  EXCLUDE_FROM_THUMBNAILER
 )
 
 f3d_plugin_declare_reader(
@@ -176,7 +177,7 @@ f3d_plugin_build(
   NAME native
   VERSION 1.0
   DESCRIPTION "Native VTK I/O support"
-  VTK_MODULES CommonCore CommonExecutionModel IOImport IOXML IOParallel IOCityGML IOImage IOGeometry IOPLY
+  VTK_MODULES IOXML IOParallel IOCityGML IOImage IOGeometry IOPLY
   MIMETYPE_XML_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/f3d-3d-formats.xml"
     "${CMAKE_CURRENT_SOURCE_DIR}/f3d-3d-image-formats.xml"

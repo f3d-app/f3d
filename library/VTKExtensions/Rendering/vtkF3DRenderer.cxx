@@ -4,6 +4,7 @@
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
 #include "vtkF3DConfigure.h"
+#include "vtkF3DDropZoneActor.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
 
@@ -58,6 +59,7 @@
 
 #include <cctype>
 #include <chrono>
+#include <regex>
 #include <sstream>
 
 vtkStandardNewMacro(vtkF3DRenderer);
@@ -142,11 +144,13 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
 
   this->FilenameActor->VisibilityOff();
   this->MetaDataActor->VisibilityOff();
   this->TimerActor->VisibilityOff();
   this->CheatSheetActor->VisibilityOff();
+  this->DropZoneActor->VisibilityOff();
 }
 
 //----------------------------------------------------------------------------
@@ -175,6 +179,12 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   this->AddActor(this->TimerActor);
   this->AddActor(this->MetaDataActor);
   this->AddActor(this->CheatSheetActor);
+  this->AddActor(this->DropZoneActor);
+
+  if (this->HasHDRI)
+  {
+    this->AddActor(this->Skybox);
+  }
 
   this->GridConfigured = false;
   this->CheatSheetConfigured = false;
@@ -187,31 +197,37 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   this->GridInfo = "";
 
   // Importer rely on the Environment being set, so this is needed in the initialization
-  if (up.size() == 2)
+  const std::regex re("([-+]?)([XYZ])", std::regex_constants::icase);
+  std::smatch match;
+  if (std::regex_match(up, match, re))
   {
-    char sign = up[0];
-    char axis = std::toupper(up[1]);
-    if ((sign == '-' || sign == '+') && (axis >= 'X' && axis <= 'Z'))
-    {
-      this->UpIndex = axis - 'X';
-      std::fill(this->UpVector, this->UpVector + 3, 0);
-      this->UpVector[this->UpIndex] = (sign == '+') ? 1.0 : -1.0;
+    const float sign = match[1].str() == "-" ? -1.0 : +1.0;
+    const int index = std::toupper(match[2].str()[0]) - 'X';
+    assert(index >= 0 && index < 3);
 
-      std::fill(this->RightVector, this->RightVector + 3, 0);
-      this->RightVector[this->UpIndex == 0 ? 1 : 0] = 1.0;
+    this->UpIndex = index;
 
-      double pos[3];
-      vtkMath::Cross(this->UpVector, this->RightVector, pos);
-      vtkMath::MultiplyScalar(pos, -1.0);
+    std::fill(this->UpVector, this->UpVector + 3, 0);
+    this->UpVector[this->UpIndex] = sign;
 
-      vtkCamera* cam = this->GetActiveCamera();
-      cam->SetFocalPoint(0.0, 0.0, 0.0);
-      cam->SetPosition(pos);
-      cam->SetViewUp(this->UpVector);
+    std::fill(this->RightVector, this->RightVector + 3, 0);
+    this->RightVector[this->UpIndex == 0 ? 1 : 0] = 1.0;
 
-      this->SetEnvironmentUp(this->UpVector);
-      this->SetEnvironmentRight(this->RightVector);
-    }
+    double pos[3];
+    vtkMath::Cross(this->UpVector, this->RightVector, pos);
+    vtkMath::MultiplyScalar(pos, -1.0);
+
+    vtkCamera* cam = this->GetActiveCamera();
+    cam->SetFocalPoint(0.0, 0.0, 0.0);
+    cam->SetPosition(pos);
+    cam->SetViewUp(this->UpVector);
+
+    this->SetEnvironmentUp(this->UpVector);
+    this->SetEnvironmentRight(this->RightVector);
+  }
+  else
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, up + " is not a valid up direction");
   }
 }
 
@@ -370,6 +386,16 @@ void vtkF3DRenderer::ShowAxis(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridAbsolute(bool absolute)
+{
+  if (this->GridAbsolute != absolute)
+  {
+    this->GridAbsolute = absolute;
+    this->GridConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetGridUnitSquare(double unitSquare)
 {
   if (this->GridUnitSquare != unitSquare)
@@ -427,11 +453,14 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
         tmpUnitSquare = pow(10.0, round(log10(diag * 0.1)));
       }
 
-      double gridPos[3];
-      for (int i = 0; i < 3; i++)
+      double gridPos[3] = { 0, 0, 0 };
+      if (!this->GridAbsolute)
       {
-        double size = bounds[2 * i + 1] - bounds[2 * i];
-        gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
+        for (int i = 0; i < 3; i++)
+        {
+          double size = bounds[2 * i + 1] - bounds[2 * i];
+          gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
+        }
       }
 
       std::stringstream stream;
@@ -673,12 +702,14 @@ void vtkF3DRenderer::ConfigureTextActors()
   this->MetaDataActor->GetTextProperty()->SetColor(textColor);
   this->TimerActor->GetTextProperty()->SetColor(textColor);
   this->CheatSheetActor->GetTextProperty()->SetColor(textColor);
+  this->DropZoneActor->GetTextProperty()->SetColor(textColor);
 
   // Font
   this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
   this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
+  this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
   if (!this->FontFile.empty())
   {
     std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(this->FontFile);
@@ -692,6 +723,8 @@ void vtkF3DRenderer::ConfigureTextActors()
       this->TimerActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
       this->CheatSheetActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
       this->CheatSheetActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+      this->DropZoneActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->DropZoneActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
     }
     else
     {
@@ -756,6 +789,12 @@ void vtkF3DRenderer::SetFilenameInfo(const std::string& info)
 {
   this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, info.c_str());
   this->RenderPassesConfigured = false;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDropZoneInfo(const std::string& info)
+{
+  this->DropZoneActor->SetDropText(info);
 }
 
 //----------------------------------------------------------------------------
@@ -922,19 +961,31 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     std::stringstream cheatSheetText;
     cheatSheetText << "\n";
     this->FillCheatSheetHotkeys(cheatSheetText);
-    cheatSheetText << "\n   H  : Cheat sheet \n";
-    cheatSheetText << "   ?  : Print scene descr to terminal\n";
-    cheatSheetText << "  ESC : Quit \n";
-    cheatSheetText << " ENTER: Reset camera to initial parameters\n";
-    cheatSheetText << " SPACE: Play animation if any\n";
-    cheatSheetText << " LEFT : Previous file \n";
-    cheatSheetText << " RIGHT: Next file \n";
-    cheatSheetText << "  UP  : Reload current file \n";
-    cheatSheetText << " DOWN : Add files from dir of current file\n";
+    cheatSheetText << "\n     H     : Cheat sheet \n";
+    cheatSheetText << "     ?     : Print scene descr to terminal \n";
+    cheatSheetText << "    ESC    : Quit \n";
+    cheatSheetText << "   ENTER   : Reset camera to initial parameters \n";
+    cheatSheetText << "   SPACE   : Play animation if any \n";
+    cheatSheetText << "   LEFT    : Previous file \n";
+    cheatSheetText << "   RIGHT   : Next file \n";
+    cheatSheetText << "    UP     : Reload current file \n";
+    cheatSheetText << "   DOWN    : Add files from dir of current file \n";
+    cheatSheetText << "   Drop    : Load dropped file or folder \n";
+    cheatSheetText << " Ctrl+Drop : Load dropped file as a HDRI \n";
 
     this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, cheatSheetText.str().c_str());
     this->CheatSheetActor->RenderOpaqueGeometry(this);
     this->CheatSheetConfigured = true;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowDropZone(bool show)
+{
+  if (this->DropZoneVisible != show)
+  {
+    this->DropZoneVisible = show;
+    this->DropZoneActor->SetVisibility(show);
   }
 }
 

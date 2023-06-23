@@ -1,2 +1,5 @@
 .vscode
 _site
+.vs
+CMakeUserPresets.json
+build/

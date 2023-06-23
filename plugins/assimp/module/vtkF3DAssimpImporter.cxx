@@ -43,7 +43,7 @@ class vtkF3DAssimpImporter::vtkInternals
 {
 public:
   //----------------------------------------------------------------------------
-  vtkInternals(vtkF3DAssimpImporter* parent)
+  explicit vtkInternals(vtkF3DAssimpImporter* parent)
     : Parent(parent)
   {
   }
@@ -150,7 +150,7 @@ public:
           }
 
           renderer->AddLight(light);
-          this->Lights.push_back({ aLight->mName.data, light });
+          this->Lights.emplace_back(aLight->mName.data, light);
         }
       }
 
@@ -220,6 +220,7 @@ public:
 
     vTexture->MipmapOn();
     vTexture->InterpolateOn();
+    vTexture->SetColorModeToDirectScalars();
     vTexture->SetUseSRGBColorSpace(sRGB);
 
     return vTexture;
@@ -836,7 +837,7 @@ public:
   }
 
   Assimp::Importer Importer;
-  const aiScene* Scene;
+  const aiScene* Scene = nullptr;
   std::string Description;
   std::vector<vtkSmartPointer<vtkPolyData> > Meshes;
   std::vector<vtkSmartPointer<vtkProperty> > Properties;
@@ -884,7 +885,7 @@ std::string vtkF3DAssimpImporter::GetOutputsDescription()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DAssimpImporter::UpdateTimeStep(double timestep)
+void vtkF3DAssimpImporter::UpdateTimeStep(double timeValue)
 {
   if (this->Internals->ActiveAnimation < 0 ||
     this->Internals->ActiveAnimation >= this->GetNumberOfAnimations())
@@ -893,9 +894,15 @@ void vtkF3DAssimpImporter::UpdateTimeStep(double timestep)
   }
 
   // get the animation tick
-  timestep *= this->Internals->Scene->mAnimations[0]->mTicksPerSecond;
+  double fps =
+    this->Internals->Scene->mAnimations[this->Internals->ActiveAnimation]->mTicksPerSecond;
+  if (fps == 0.0)
+  {
+    fps = 1.0;
+  }
 
   aiAnimation* anim = this->Internals->Scene->mAnimations[this->Internals->ActiveAnimation];
+  double tick = timeValue * fps;
 
   Assimp::Interpolator<aiVectorKey> vectorInterpolator;
   Assimp::Interpolator<aiQuatKey> quaternionInterpolator;
@@ -909,7 +916,7 @@ void vtkF3DAssimpImporter::UpdateTimeStep(double timestep)
     aiQuaternion quaternion;
 
     aiVectorKey* positionKey = std::lower_bound(nodeAnim->mPositionKeys,
-      nodeAnim->mPositionKeys + nodeAnim->mNumPositionKeys, timestep,
+      nodeAnim->mPositionKeys + nodeAnim->mNumPositionKeys, tick,
       [](const aiVectorKey& key, const double& time) { return key.mTime < time; });
 
     if (positionKey == nodeAnim->mPositionKeys)
@@ -923,12 +930,12 @@ void vtkF3DAssimpImporter::UpdateTimeStep(double timestep)
     else
     {
       aiVectorKey* prev = positionKey - 1;
-      ai_real d = (timestep - prev->mTime) / (positionKey->mTime - prev->mTime);
+      ai_real d = (tick - prev->mTime) / (positionKey->mTime - prev->mTime);
       vectorInterpolator(translation, *prev, *positionKey, d);
     }
 
     aiQuatKey* rotationKey = std::lower_bound(nodeAnim->mRotationKeys,
-      nodeAnim->mRotationKeys + nodeAnim->mNumRotationKeys, timestep,
+      nodeAnim->mRotationKeys + nodeAnim->mNumRotationKeys, tick,
       [](const aiQuatKey& key, const double& time) { return key.mTime < time; });
 
     if (rotationKey == nodeAnim->mRotationKeys)
@@ -942,13 +949,13 @@ void vtkF3DAssimpImporter::UpdateTimeStep(double timestep)
     else
     {
       aiQuatKey* prev = rotationKey - 1;
-      ai_real d = (timestep - prev->mTime) / (rotationKey->mTime - prev->mTime);
+      ai_real d = (tick - prev->mTime) / (rotationKey->mTime - prev->mTime);
       quaternionInterpolator(quaternion, *prev, *rotationKey, d);
     }
 
     aiVectorKey* scalingKey =
       std::lower_bound(nodeAnim->mScalingKeys, nodeAnim->mScalingKeys + nodeAnim->mNumScalingKeys,
-        timestep, [](const aiVectorKey& key, const double& time) { return key.mTime < time; });
+        tick, [](const aiVectorKey& key, const double& time) { return key.mTime < time; });
 
     if (scalingKey == nodeAnim->mScalingKeys)
     {
@@ -961,7 +968,7 @@ void vtkF3DAssimpImporter::UpdateTimeStep(double timestep)
     else
     {
       aiVectorKey* prev = scalingKey - 1;
-      ai_real d = (timestep - prev->mTime) / (scalingKey->mTime - prev->mTime);
+      ai_real d = (tick - prev->mTime) / (scalingKey->mTime - prev->mTime);
       vectorInterpolator(scaling, *prev, *scalingKey, d);
     }
 
@@ -1030,11 +1037,16 @@ bool vtkF3DAssimpImporter::IsAnimationEnabled(vtkIdType animationIndex)
 // Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
 //----------------------------------------------------------------------------
-bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex, double frameRate,
-  int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
+bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex,
+  double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
+  vtkDoubleArray* vtkNotUsed(timeSteps))
 {
   double duration = this->Internals->Scene->mAnimations[animationIndex]->mDuration;
   double fps = this->Internals->Scene->mAnimations[animationIndex]->mTicksPerSecond;
+  if (fps == 0.0)
+  {
+    fps = 1.0;
+  }
 
   this->Internals->Description += "Animation \"";
   this->Internals->Description += this->GetAnimationName(animationIndex);
@@ -1044,25 +1056,9 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex, doub
   this->Internals->Description += std::to_string(fps);
   this->Internals->Description += " fps.\n";
 
-  if (fps == 0.0)
-  {
-    fps = frameRate;
-  }
-
+  // F3D do not care about timesteps, only set time range
   timeRange[0] = 0.0;
   timeRange[1] = duration / fps;
-
-  timeSteps->SetNumberOfComponents(1);
-  timeSteps->SetNumberOfTuples(0);
-
-  nbTimeSteps = 0;
-
-  for (double time = 0.0; time < timeRange[1]; time += (1.0 / frameRate))
-  {
-    timeSteps->InsertNextTuple(&time);
-    nbTimeSteps++;
-  }
-
   return true;
 }
 #endif

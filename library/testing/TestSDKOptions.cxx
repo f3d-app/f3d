@@ -137,6 +137,21 @@ int TestSDKOptions(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Test closest option
+  auto closest = opt.getClosestOption("modle.sciivs.cell");
+  if (closest.first != "model.scivis.cells" || closest.second != 5)
+  {
+    std::cerr << "Failed to get the closest option." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  closest = opt.getClosestOption("model.scivis.cells");
+  if (closest.first != "model.scivis.cells" || closest.second != 0)
+  {
+    std::cerr << "Failed to get the exact option." << std::endl;
+    return EXIT_FAILURE;
+  }
+
   // Test chaining options
   opt.set("model.scivis.cells", true).set("model.scivis.cells", false);
   if (opt.getAsBool("model.scivis.cells") != false)
@@ -151,7 +166,7 @@ int TestSDKOptions(int argc, char* argv[])
   opt.get("model.scivis.cells", val);
   try
   {
-    double& refVal = opt.getAsDoubleRef("model.scivis.cells");
+    const double& refVal = opt.getAsDoubleRef("model.scivis.cells");
   }
   catch (const f3d::options::incompatible_exception& ex)
   {
@@ -162,7 +177,7 @@ int TestSDKOptions(int argc, char* argv[])
   opt.get("dummy", val);
   try
   {
-    double& refVal = opt.getAsDoubleRef("dummy");
+    const double& refVal = opt.getAsDoubleRef("dummy");
   }
   catch (const f3d::options::inexistent_exception& ex)
   {

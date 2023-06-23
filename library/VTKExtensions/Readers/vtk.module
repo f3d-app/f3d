@@ -3,6 +3,7 @@ NAME
 DESCRIPTION
   A VTK module containing all F3D provided readers and reader factory logic
 DEPENDS
+  VTK::IOImage
   VTK::IOImport
 PRIVATE_DEPENDS
   VTK::CommonExecutionModel

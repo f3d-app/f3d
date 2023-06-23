@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 #include "F3DShellExtensionClassFactory.h"
 #include "RegistryHelpers.h"
@@ -41,20 +41,25 @@ void RunOnJSONExtensions(fs::path modulePath, F callback)
         {
           for (auto& r : readers.value())
           {
-            auto exts = r.find("extensions");
+            auto excludeThumb = r.find("exclude_thumbnailer").value();
 
-            if (exts != r.end() && exts.value().is_array())
+            if (excludeThumb.is_boolean() && excludeThumb.get<bool>() == false)
             {
-              for (auto& e : exts.value())
+              auto exts = r.find("extensions");
+
+              if (exts != r.end() && exts.value().is_array())
               {
-                if (e.is_string())
+                for (auto& e : exts.value())
                 {
-                  std::wstring ret = L".";
+                  if (e.is_string())
+                  {
+                    std::wstring ret = L".";
 
-                  std::wstring_convert<std::codecvt_utf8<wchar_t> > toUnicode;
-                  ret += toUnicode.from_bytes(e.get<std::string>());
+                    std::wstring_convert<std::codecvt_utf8<wchar_t> > toUnicode;
+                    ret += toUnicode.from_bytes(e.get<std::string>());
 
-                  callback(ret);
+                    callback(ret);
+                  }
                 }
               }
             }

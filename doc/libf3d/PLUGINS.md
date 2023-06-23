@@ -20,7 +20,8 @@ f3d_plugin_declare_reader(
   EXTENSIONS "myext"                # set the extensions the reader can support
   MIMETYPES "application/vnd.myext" # set the mimetypes the reader can support
   VTK_READER ${vtk_classname}       # set the name of the VTK class you have created
-  DESCRIPTION "Reader description"
+  DESCRIPTION "Reader description"  # set the description of the reader
+  EXCLUDE_FROM_THUMBNAILER          # add this flag if you don't want thumbnail generation for this reader
 )
 
 # More f3d_plugin_declare_reader calls are possible

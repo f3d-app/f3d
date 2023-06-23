@@ -37,6 +37,10 @@ camera.yaw(angle)
 camera.elevation(angle)
 camera.pitch(angle)
 
+state = camera.getState()
+camera.getState(state)
+camera.setState(state)
+
 camera.setCurrentAsDefault()
 camera.resetToBounds()
 camera.resetToDefault()

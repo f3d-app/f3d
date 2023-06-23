@@ -5,7 +5,6 @@ DESCRIPTION
 DEPENDS
   VTK::CommonCore
   VTK::CommonExecutionModel
-  VTK::IOImport
   draco::draco
 TEST_DEPENDS
   VTK::TestingCore

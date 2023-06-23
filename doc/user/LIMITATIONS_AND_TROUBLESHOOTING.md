@@ -2,17 +2,19 @@
 
 Here is a non exhaustive list of F3D limitations:
 
-* No support for specifying manual lighting in the default scene.
+* No support for specifying manual lighting in the default scene apart from using `--light-intensity` option.
 * Multiblock (.vtm, .gml) support is partial, non-surfacic data will be converted into surfaces.
 * Animation support with full scene data format require VTK >= 9.0.20201016.
 * Full drag and drop support require VTK >= 9.0.20210620
 * Drag and drop interaction cannot be recorded nor played back.
 * Volume rendering and HDRI support requires a decent GPU.
+* The `--camera-zoom-factor` option require VTK >= 9.3.0
 
 ## Assimp
 FBX, DAE, OFF, and DXF file formats rely on [Assimp](https://github.com/assimp/assimp) library. It comes with some known limitations:
 - PBR materials are not supported for FBX file format.
 - Complex animations are not working very well with Assimp 5.1, it's recommended to use Assimp 5.0 for this use case.
+- Only one animation can be shown at a time, showing all animations is not supported yet.
 - Some files can be empty, crash, or show artifacts.
 - DXF support is very limited: only files with polylines and 3D faces are displayed.
 
@@ -30,6 +32,10 @@ ABC file formats rely on [Alembic](https://github.com/alembic/alembic) library. 
 
 Make sure that VTK has been built with *OpenImageDenoise* support (`VTKOSPRAY_ENABLE_DENOISER` option).
 
+> My model shows up all wrong, with inverted surfaces everywhere.
+
+Your data probably contains some translucent data for some reason, turn on translucency support by pressing `P` or using the `-p` command line option.
+
 ## Linux
 
 > I have a link error related to `stdc++fs` not found.
@@ -46,15 +52,10 @@ With some C++ STD library version, explicit linking to `stdc++fs` is not support
   * If no formats have working thumbnails, then it is an issue with the `f3d-plugin-xxx.thumbnailer` files.
   * If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/10_global.json` configuration folder using the `max-size` option.
 
-Some file managers (eg: Nautilus) are using sandboxing for thumbnails, which the F3D binary release does not support as it needs
-access to the Xorg server for rendering anything.
-A work around to this issue is to use a virtual Xorg server like Xephyr or Xvfb in all the `f3d-plugin-xxx.thumbnailer` files.
-Here is how your `Exec` line should look to use `xvfb-run`. Keep in mind running xvfb can be very slow.
-
-`Exec=xvfb-run f3d --dry-run -sta --no-background --output=%o --resolution=%s,%s %i`
-
-Another workaround is to build VTK with EGL or osmesa support and then build F3D yourself against
-this custom VTK build.
+Some file managers (eg: Nautilus) are using sandboxing for thumbnails, which the F3D standard binary release does not support as it needs
+access to the Xorg server to render anything.
+In that case, you want to use the headless version of F3D that rely on EGL instead of Xorg, available in the [releases page](https://github.com/f3d-app/f3d/releases).
+If you use the portable archive, make sure to extract it somewhere the sandboxing system has access to, eg: Nautilus uses `bwrap` and gives it access to `/usr` but not to `/opt`.
 
 ## Windows
 
@@ -89,3 +90,7 @@ Set the codepage to UTF-8, run `chcp 65001`.
 > Using the binary release, I'm unable to run F3D because macOS warns about F3D not being signed.
 
 F3D is not signed by Apple yet so macOS shows this warning. To run F3D, right click on the app and click "open", then click "open" again to be able to run F3D.
+
+> I'm unable to get coloring right with step files
+
+F3D on macOS does not support coloring on cells because of a [VTK issue](https://gitlab.kitware.com/vtk/vtk/-/issues/18969)

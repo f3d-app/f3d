@@ -5,6 +5,7 @@
     "up": "+Z",
     "ambient-occlusion": true,
     "comp": "-2",
-    "cells": true
+    "cells": true,
+    "camera-direction": "-1,1,-1"
   }
 }

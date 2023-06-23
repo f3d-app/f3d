@@ -1,0 +1,16 @@
+{
+    "name": "f3d",
+    "dependencies": [
+        "alembic",
+        "assimp",
+        "draco",
+        "opencascade",
+        "openexr",
+        {
+            "name": "vtk",
+            "default-features": false,
+            "features": [ "opengl" ]
+        }
+    ],
+    "builtin-baseline": "60e2c07d20aeb4bf534a8deabf92a70cbcb07617"
+}

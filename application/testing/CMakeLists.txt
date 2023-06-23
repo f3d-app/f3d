@@ -94,6 +94,9 @@ function(f3d_test)
     set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES FIXTURES_REQUIRED f3d::${F3D_TEST_DEPENDS}_FIXTURE)
   endif()
 
+  set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT
+    "F3D_PLUGINS_PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY};CTEST_PROGRESS_BAR_TESTING=1")
+
 endfunction()
 
 f3d_test(NAME TestPLY DATA suzanne.ply DEFAULT_LIGHTS)
@@ -110,44 +113,45 @@ f3d_test(NAME TestGridX DATA suzanne.ply ARGS -g --up=+X DEFAULT_LIGHTS)
 f3d_test(NAME TestGridY DATA suzanne.ply ARGS -g --up=+Y DEFAULT_LIGHTS)
 f3d_test(NAME TestGridZ DATA suzanne.ply ARGS -g --up=+Z DEFAULT_LIGHTS)
 f3d_test(NAME TestGridOptions DATA suzanne.ply ARGS -g --camera-elevation-angle=45 --grid-unit=2 --grid-subdivisions=3 -t DEFAULT_LIGHTS)
+f3d_test(NAME TestGridAbsolute DATA suzanne.ply ARGS -g --camera-elevation-angle=45 --grid-absolute -t DEFAULT_LIGHTS)
 f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x DEFAULT_LIGHTS)
-f3d_test(NAME TestPointCloud DATA pointsCloud.vtp ARGS -o --point-size=20)
-f3d_test(NAME TestPointCloudBar DATA pointsCloud.vtp ARGS -sob --point-size=20)
-f3d_test(NAME TestPointCloudUG DATA pointsCloud.vtu ARGS -o --point-size=20)
-f3d_test(NAME TestPointCloudVolume DATA bluntfin.vts ARGS -sob)
-f3d_test(NAME TestPointCloudDefaultScene DATA pointsCloud.vtp ARGS --point-size=20)
-f3d_test(NAME TestVRMLImporter DATA bot2.wrl)
-f3d_test(NAME Test3DSImporter DATA iflamigm.3ds ARGS --up=+Z)
+f3d_test(NAME TestPointCloud DATA pointsCloud.vtp ARGS -o --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestPointCloudBar DATA pointsCloud.vtp ARGS -sob --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestPointCloudUG DATA pointsCloud.vtu ARGS -o --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestPointCloudVolume DATA bluntfin.vts ARGS -sob DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestPointCloudDefaultScene DATA pointsCloud.vtp ARGS --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME Test3DSImporter DATA iflamigm.3ds ARGS --up=+Z DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestScalars DATA suzanne.ply ARGS --scalars=Normals --comp=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestScalarsRange DATA suzanne.ply ARGS --scalars=Normals --comp=1 --range=0,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestScalarsWithBar DATA suzanne.ply ARGS -b --scalars=Normals --comp=0 DEFAULT_LIGHTS)
-f3d_test(NAME TestGLTFImporter DATA WaterBottle.glb)
-f3d_test(NAME TestGLTFImporterWithAnimation DATA BoxAnimated.gltf DEFAULT_LIGHTS) # Technically not a default lights tests, but fails for some reason on vtk 9.0.0
-f3d_test(NAME TestGLTFSkin DATA SimpleSkin.gltf)
-f3d_test(NAME TestGLTFReaderWithAnimation DATA BoxAnimated.gltf ARGS --geometry-only DEFAULT_LIGHTS)
+f3d_test(NAME TestGLTFImporter DATA WaterBottle.glb DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestGLTFImporterWithAnimation DATA BoxAnimated.gltf ARGS --animation-time=2 DEFAULT_LIGHTS) # Technically not a default lights tests, but fails for some reason on vtk 9.0.0
+f3d_test(NAME TestGLTFSkin DATA SimpleSkin.gltf DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestGLTFReaderWithAnimation DATA BoxAnimated.gltf ARGS --geometry-only --animation-time=2 DEFAULT_LIGHTS)
 f3d_test(NAME TestDicom DATA IM-0001-1983.dcm ARGS --scalars --roughness=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestMHD DATA HeadMRVolume.mhd ARGS --scalars --roughness=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestVTICell DATA waveletMaterial.vti ARGS --scalars=Material -c --roughness=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestSSAO LONG_TIMEOUT DATA suzanne.ply ARGS -q DEFAULT_LIGHTS)
 f3d_test(NAME TestDepthPeeling DATA suzanne.ply ARGS -sp --opacity=0.9 DEFAULT_LIGHTS)
 f3d_test(NAME TestBackground DATA suzanne.ply ARGS --bg-color=0.8,0.2,0.9 THRESHOLD 100 DEFAULT_LIGHTS)
-f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity 0.2)
+f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity 0.2 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n DEFAULT_LIGHTS)
 f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --bg-color=1,1,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestCityGML DATA Part-4-Buildings-V4-one.gml DEFAULT_LIGHTS)
-f3d_test(NAME TestPTS DATA samplePTS.pts)
+f3d_test(NAME TestPTS DATA samplePTS.pts DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalars --roughness=1 --colormap=0,1,0,0,1,0,1,0 DEFAULT_LIGHTS)
-f3d_test(NAME TestCameraConfiguration DATA suzanne.obj ARGS --camera-position=0,0,-10 -x --camera-view-up=1,0,0 --camera-focal-point=1,0,0 --camera-view-angle=20 --camera-azimuth-angle=40 --camera-elevation-angle=-80)
+f3d_test(NAME TestCameraConfiguration DATA suzanne.obj ARGS --camera-position=0,0,-10 -x --camera-view-up=1,0,0 --camera-focal-point=1,0,0 --camera-view-angle=20 --camera-azimuth-angle=40 --camera-elevation-angle=-80 --camera-direction=12,34,56 --camera-zoom-factor=78)
+f3d_test(NAME TestCameraDirection DATA suzanne.obj ARGS --camera-direction=-1,-1,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestCameraClipping DATA checkerboard_colorful.obj CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/checkerboard_colorful.json RESOLUTION 800,600)
 f3d_test(NAME TestToneMapping DATA suzanne.ply ARGS -t DEFAULT_LIGHTS)
 f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt DEFAULT_LIGHTS)
-f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT THRESHOLD 300) # High threshold for volume as it is dependent on the OpenGL implementation
-f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT)
-f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb LONG_TIMEOUT)
-f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --comp=3 LONG_TIMEOUT)
-f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --comp=-2 LONG_TIMEOUT)
-f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --cells LONG_TIMEOUT)
-f3d_test(NAME TestVolumeNonScalars DATA waveletArrays.vti ARGS -vb --scalars=RandomPointScalars LONG_TIMEOUT)
+f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT THRESHOLD 300 DEFAULT_LIGHTS) # Using default lights because of ResetCamera, High threshold for volume as it is dependent on the OpenGL implementation
+f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --comp=3 LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --comp=-2 LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --cells LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestVolumeNonScalars DATA waveletArrays.vti ARGS -vb --scalars=RandomPointScalars LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestTextureNormal DATA WaterBottle.glb ARGS --geometry-only --texture-normal=${CMAKE_SOURCE_DIR}/testing/data/normal.png --normal-scale=0.1 DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMaterial DATA WaterBottle.glb ARGS --geometry-only --texture-material=${CMAKE_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=1 --metallic=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMaterialWithOptions DATA WaterBottle.glb ARGS --geometry-only --texture-material=${CMAKE_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=0.5 --metallic=0.5 DEFAULT_LIGHTS)
@@ -163,7 +167,7 @@ f3d_test(NAME TestLightIntensityBrighterFullScene DATA WaterBottle.glb ARGS --li
 f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --light-intensity=0.2 DEFAULT_LIGHTS)
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp" DEFAULT_LIGHTS)
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${CMAKE_SOURCE_DIR}/testing/data/Crosterian.ttf DEFAULT_LIGHTS)
-f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-index=7 DEFAULT_LIGHTS)
+f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 DEFAULT_LIGHTS)
 f3d_test(NAME TestMaxSizeBelow DATA suzanne.stl ARGS --max-size=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestMaxSizeAbove DATA WaterBottle.glb ARGS --max-size=0.2 REGEXP "No file loaded, file is bigger than max size" NO_BASELINE)
 f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_FAIL)
@@ -172,6 +176,14 @@ f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalars --bar --comp=2 
 f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
 f3d_test(NAME TestGroupGeometries DATA mb/recursive ARGS --group-geometries DEFAULT_LIGHTS)
 f3d_test(NAME TestGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries --scalars=Polynomial -b DEFAULT_LIGHTS)
+f3d_test(NAME TestInvalidUpDirection DATA suzanne.ply ARGS -g --up=W REGEXP "W is not a valid up direction" NO_BASELINE)
+f3d_test(NAME TestUpDirectionNoSign DATA suzanne.ply ARGS --up=X DEFAULT_LIGHTS)
+f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${CMAKE_SOURCE_DIR}/testing/data/skin.png DEFAULT_LIGHTS)
+
+if (NOT APPLE)
+  # This test is broken on apple because of #792
+  f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --scalars --cells --comp=-2 --up=+Z DEFAULT_LIGHTS)
+endif ()
 
 # Test plugin fail code path
 f3d_test(NAME TestPluginVerbose ARGS --verbose REGEXP "Loading plugin \"native\"" NO_BASELINE)
@@ -189,12 +201,14 @@ if(NOT F3D_MACOS_BUNDLE)
   configure_file("${CMAKE_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
   f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json DEFAULT_LIGHTS)
   f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build DEFAULT_LIGHTS)
+  f3d_test(NAME TestConfigFileUpperCase DATA suzanne_upper.STL CONFIG config_build DEFAULT_LIGHTS)
 
   file(COPY "${CMAKE_SOURCE_DIR}/resources/configs/config.d/" "${CMAKE_SOURCE_DIR}/plugins/native/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build DEFAULT_LIGHTS)
   f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build DEFAULT_LIGHTS)
   f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build DEFAULT_LIGHTS)
   f3d_test(NAME TestDefaultConfigFileTIFF DATA logo.tif CONFIG config_build DEFAULT_LIGHTS)
+  f3d_test(NAME TestDefaultConfigFilePLY DATA cube.ply CONFIG config_build DEFAULT_LIGHTS THRESHOLD 100)
   f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y CONFIG config_build DEFAULT_LIGHTS)
 
   # no-background test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8501
@@ -203,7 +217,7 @@ if(NOT F3D_MACOS_BUNDLE)
     f3d_test(NAME TestThumbnailConfigFileVTU DATA dragon.vtu CONFIG thumbnail_build DEFAULT_LIGHTS)
     f3d_test(NAME TestThumbnailConfigFileVTI DATA vase_4comp.vti CONFIG thumbnail_build DEFAULT_LIGHTS)
     f3d_test(NAME TestThumbnailConfigFileSTL DATA suzanne.stl CONFIG thumbnail_build DEFAULT_LIGHTS)
-    f3d_test(NAME TestThumbnailConfigFileTIFF DATA logo.tif CONFIG thumbnail_build DEFAULT_LIGHTS)
+    f3d_test(NAME TestThumbnailConfigFilePLY DATA cube.ply CONFIG thumbnail_build DEFAULT_LIGHTS THRESHOLD 100)
   endif()
 endif()
 
@@ -224,12 +238,26 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestLineWidthFullScene DATA suzanne.obj ARGS -e --line-width=3 --up=-Y)
   f3d_test(NAME TestPointCloudFullScene DATA pointsCloud.gltf ARGS --point-size=20)
 
+  # Test enabling all animations
+  f3d_test(NAME TestAnimationAllAnimations DATA InterpolationTest.glb ARGS --animation-index=-1 --animation-time=1)
+
   # Test Verbose animation, no baseline needed
   f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_BASELINE REGEXP "7: CubicSpline Translation")
+
   # Test Animation index out of domain error
   f3d_test(NAME TestVerboseAnimationIndexError1 DATA InterpolationTest.glb ARGS --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
-  f3d_test(NAME TestInteractionAnimation DATA InterpolationTest.glb ARGS --animation-index=-1 INTERACTION)#Space;Space;
-  f3d_test(NAME TestInteractionAnimationMovement DATA CameraAnimated.glb ARGS --camera-index=0 INTERACTION)#Space;MouseMovement;Space;
+
+  # Test interactive animation and speed factor
+  f3d_test(NAME TestInteractionAnimationFast DATA InterpolationTest.glb ARGS --animation-speed-factor=1000 --animation-index=-1 INTERACTION NO_BASELINE)#Space;Space;
+  f3d_test(NAME TestInteractionAnimationSlow DATA InterpolationTest.glb ARGS --animation-speed-factor=0.01 --animation-index=-1 INTERACTION)#Space;Wait;Space;
+  f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-speed-factor=1000 INTERACTION)#Space;MouseMovement;Space;
+
+  # Framerate test is a smoke test as event playing seems to break VTK timers
+  f3d_test(NAME TestInteractionAnimationFrameRate DATA InterpolationTest.glb ARGS --animation-frame-rate=2 --animation-index=-1 INTERACTION NO_BASELINE)#Space;Wait;Space;
+
+  # A verbose test that needs animation index support
+  f3d_test(NAME TestVerboseAnimationWrongAnimationTime DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Provided time value: 10 is outside of animation time range" NO_BASELINE)
+
   # Test exit hotkey
   f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
 
@@ -273,8 +301,27 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestHDRI8Bit DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/logo.tif HDRI)
   f3d_test(NAME TestHDRIOrient DATA suzanne.stl ARGS --up=+Z --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI)
   f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply ARGS -t --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI)
-  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI INTERACTION) #Shift+MouseRight;
+  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI INTERACTION THRESHOLD 60) #Shift+MouseRight;
   f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #U
+  f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #Up
+  f3d_test(NAME TestInteractionHDRIChange DATA multi ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #Right
+
+  configure_file("${CMAKE_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
+  f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" HDRI DEFAULT_LIGHTS)
+
+  if(F3D_MODULE_EXR)
+    f3d_test(NAME TestHDRIEXR HDRI DATA suzanne.ply ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/kloofendal_43d_clear_1k.exr DEFAULT_LIGHTS)
+  endif()
+endif()
+
+# Zoom factor was introduced in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9958
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230221)
+  f3d_test(NAME TestCameraZoomFactor DATA suzanne.obj ARGS --camera-direction=-1,-1,1 --camera-zoom-factor=1.5)
+endif()
+
+# VRML was fixed in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10235
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230603)
+  f3d_test(NAME TestVRMLImporter DATA bot2.wrl DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 endif()
 
 if(F3D_MODULE_RAYTRACING)
@@ -293,7 +340,7 @@ if(F3D_MODULE_EXTERNAL_RENDERING)
 endif()
 
 if(F3D_PLUGIN_BUILD_ALEMBIC)
-  f3d_test(NAME TestABC DATA suzanne.abc ARGS --load-plugins=alembic)
+  f3d_test(NAME TestABC DATA suzanne.abc ARGS --load-plugins=alembic DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
@@ -309,17 +356,21 @@ endif()
 
 if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestOFF DATA teapot.off ARGS --up=+Z --load-plugins=assimp)
-  f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p --load-plugins=assimp)
-  f3d_test(NAME TestFBX DATA phong_cube.fbx ARGS --load-plugins=assimp)
+  f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p --load-plugins=assimp DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+  f3d_test(NAME TestFBX DATA phong_cube.fbx ARGS --load-plugins=assimp DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+  f3d_test(NAME TestFBX16bits DATA 16bit.fbx ARGS --load-plugins=assimp THRESHOLD 70 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
   f3d_test(NAME TestVerboseCameraAssimp DATA duck.dae ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "camera1")
 
   # TGA Reader needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8224
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210805) # for TGA support and embedded textures
     f3d_test(NAME TestFBXBone DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08)
-    f3d_test(NAME TestInteractionFBXBoneAnim DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 INTERACTION) #Space;Space;
+    f3d_test(NAME TestFBXBoneAnimation DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 --animation-time=0.5)
     f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "LOD3sp")
     f3d_test(NAME TestTGATextureFBX DATA duck.fbx ARGS --load-plugins=assimp)
     f3d_test(NAME TestDAE DATA duck.dae ARGS --load-plugins=assimp)
+
+    # To increase coverage of some specific animation code path when looping
+    f3d_test(NAME TestInteractionFBXBoneAnimation DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 --animation-speed-factor=100 INTERACTION NO_BASELINE)#Space;Wait;Space;
 
     # This test baseline is incorrect because of https://github.com/f3d-app/f3d/issues/603
     # It will need to be changed when fixed
@@ -328,10 +379,10 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     # Embedded texture are only working with assimp 5.1.X
     if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "5.1.0")
       f3d_test(NAME TestEmbeddedTextureFBX DATA texturedCube.fbx ARGS --load-plugins=assimp)
-      f3d_test(NAME TestInteractionFBXAnim DATA animatedWorld.fbx ARGS --load-plugins=assimp INTERACTION) #Space;Space;
-      f3d_test(NAME TestInteractionFBXLights DATA animatedLights.fbx ARGS --load-plugins=assimp INTERACTION) #Space;Space;
-      f3d_test(NAME TestInteractionFBXCamera DATA animatedCamera.fbx ARGS --load-plugins=assimp --camera-index=0 --animation-index=0 INTERACTION) #Space;Space;
-      f3d_test(NAME TestInteractionDAELights DATA animatedLights.dae ARGS --load-plugins=assimp INTERACTION) #Space;Space;
+      f3d_test(NAME TestFBXAnimation DATA animatedWorld.fbx ARGS --load-plugins=assimp --animation-time=2)
+      f3d_test(NAME TestFBXAnimationLights DATA animatedLights.fbx ARGS --load-plugins=assimp --animation-time=1.8)
+      f3d_test(NAME TestFBXAnimationCamera DATA animatedCamera.fbx ARGS --load-plugins=assimp --camera-index=0 --animation-index=0 --animation-time=3)
+      f3d_test(NAME TestDAEAnimationLights DATA animatedLights.dae ARGS --load-plugins=assimp --animation-time=1.8)
     endif()
   endif()
 
@@ -374,11 +425,20 @@ if(F3D_PLUGIN_BUILD_EXODUS)
 
   f3d_test(NAME TestExodusConfig DATA disk_out_ref.ex2 CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/exodus.json ARGS -s --camera-position=-11,-2,-49 DEFAULT_LIGHTS)
 
-  # Test Generic Importer Verbose animation
-  f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "0: default")
+  # Test Generic Importer Verbose animation. Regex contains the time range.
+  f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "0, 0.00429999")
 
   # Test animation with generic importer and coloring
-  f3d_test(NAME TestInteractionAnimationGenericImporter DATA small.ex2 INTERACTION ARGS -sb --load-plugins=exodus DEFAULT_LIGHTS)#Space;Space;
+  f3d_test(NAME TestAnimationGenericImporter DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-time=0.003 DEFAULT_LIGHTS)
+
+  # Test animation with inverted speed factor
+  f3d_test(NAME TestInteractionAnimationInvert DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-speed-factor=-0.0000001 --animation-time=0.00429998 INTERACTION DEFAULT_LIGHTS)#Space;Space;
+
+  # Test Generic Importer Verbose animation. Regex contains the time range.
+  f3d_test(NAME TestVerboseAnimationSingleTimestep DATA single_timestep.e ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "time range delta is zero")
+
+  # Test no render animation time. Regex contains a part of the range of the ACCL field.
+  f3d_test(NAME TestNoRenderAnimation DATA small.ex2 ARGS  --load-plugins=exodus --animation-time=0.003 REGEXP "-521950, 6.57485" NO_RENDER)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/exodus/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
@@ -402,10 +462,10 @@ if(F3D_PLUGIN_BUILD_EXODUS)
 endif()
 
 if(F3D_PLUGIN_BUILD_OCCT)
-  f3d_test(NAME TestSTEP DATA f3d.stp DEFAULT_LIGHTS ARGS --load-plugins=occt)
-  f3d_test(NAME TestIGES DATA f3d.igs DEFAULT_LIGHTS ARGS --load-plugins=occt)
+  f3d_test(NAME TestSTEP DATA f3d.stp DEFAULT_LIGHTS ARGS --load-plugins=occt --up=+Z)
+  f3d_test(NAME TestIGES DATA f3d.igs DEFAULT_LIGHTS ARGS --load-plugins=occt --up=+Z)
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(F3D_PLUGIN_OCCT_COLORING_SUPPORT AND NOT F3D_MACOS_BUNDLE)
     file(COPY "${CMAKE_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build DEFAULT_LIGHTS)
 
@@ -426,16 +486,15 @@ f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #PQ
 f3d_test(NAME TestInteractionActors DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #EXGMN
 f3d_test(NAME TestInteractionTimer DATA cow.vtp NO_BASELINE INTERACTION) #Z
 f3d_test(NAME TestInteractionMisc DATA cow.vtp NO_BASELINE INTERACTION) #KK
-f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION) #VCCC
+f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION DEFAULT_LIGHTS) #VCCC
 f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION DEFAULT_LIGHTS) #SYYYY
 f3d_test(NAME TestInteractionCycleScalars DATA dragon.vtu INTERACTION DEFAULT_LIGHTS) #BSSSS
-f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION) #VI
-f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-size=20 INTERACTION) #O
+f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION DEFAULT_LIGHTS) #VI
+f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-size=20 INTERACTION DEFAULT_LIGHTS) #O
 f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalars DEFAULT_LIGHTS) #Right;Right;Right;Left;Up;
 f3d_test(NAME TestInteractionDirectoryLoop DATA mb INTERACTION ARGS --scalars DEFAULT_LIGHTS) #Left;Left;Left;
-f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "Provided geometry file path is empty") #Right;Right;Right;
-f3d_test(NAME TestInteractionGLTFReaderWithAnimation DATA BoxAnimated.gltf INTERACTION ARGS --geometry-only DEFAULT_LIGHTS) #Space;Space;
-f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_BASELINE INTERACTION)#Space;Space;
+f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "is not a file of a supported file format") #Right;Right;Right;HMCSY
+f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_BASELINE INTERACTION)#Space;
 f3d_test(NAME TestInteractionResetCamera DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)#MouseMovements;Return;
 f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --scalars --comp=-2  INTERACTION DEFAULT_LIGHTS) #SYYYYYYYYYY
 f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --scalars --comp=2 INTERACTION DEFAULT_LIGHTS) #S
@@ -454,6 +513,12 @@ f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION DEFAULT_
 f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION DEFAULT_LIGHTS) #Down;
 f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No file loaded, no rendering performed") #Down;
 f3d_test(NAME TestInteractionGroupGeometriesLoadParentDirectory DATA mb/mb_0_0.vtu ARGS --group-geometries --filename INTERACTION DEFAULT_LIGHTS) #Down;
+f3d_test(NAME TestInteractionInvertZoom DATA suzanne.ply ARGS --invert-zoom INTERACTION DEFAULT_LIGHTS)
+
+# Progress test
+f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
+f3d_test(NAME TestProgressScene DATA WaterBottle.glb ARGS --progress NO_BASELINE)
+f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --progress NO_BASELINE INTERACTION) #Up;Up;Up;Up
 
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2
@@ -461,7 +526,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream 
   configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestInteractionDropFiles.log.in"
     "${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")
 
-  f3d_test(NAME TestInteractionDropFiles ARGS -x "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")#DropEvent cow.vtp;#DropEvent dragon.vtu suzanne.stl;
+  f3d_test(NAME TestInteractionDropFiles ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
 
   configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestInteractionGroupGeometriesDrop.log.in"
     "${CMAKE_BINARY_DIR}/TestInteractionGroupGeometriesDrop.log")
@@ -486,10 +551,6 @@ f3d_test(NAME TestOutputNoBackground DATA cow.vtp ARGS --no-background NO_BASELI
 f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log NO_BASELINE)
 f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log DEPENDS TestInteractionRecord NO_BASELINE)
 
-# Progress test
-f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
-f3d_test(NAME TestProgressScene DATA world.obj ARGS --progress NO_BASELINE)
-
 # Window position test
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
 
@@ -511,8 +572,9 @@ f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --scalars --rough
 # Test opening a directory
 f3d_test(NAME TestVerboseDirectory DATA mb REGEXP "Loading: .*mb_._0.vt." NO_RENDER)
 
-# Test Animation invalid index
+# Test Animation invalid code paths
 f3d_test(NAME TestVerboseAnimationIndexError2 DATA cow.vtp ARGS --animation-index=1 --verbose REGEXP "An animation index has been specified but there are no animation available." NO_BASELINE)
+f3d_test(NAME TestVerboseAnimationNoAnimationTime DATA cow.vtp ARGS --animation-time=2 --verbose REGEXP "No animation available, cannot load a specific animation time" NO_BASELINE)
 
 # Test Grid verbose output
 f3d_test(NAME TestVerboseGrid DATA suzanne.ply ARGS -g --verbose REGEXP "Grid origin set to" NO_BASELINE)
@@ -568,8 +630,8 @@ f3d_test(NAME TestNonExistentInteraction DATA cow.vtp INTERACTION REGEXP "Intera
 # Test invalid provided HDRI
 f3d_test(NAME TestInvalidHDRI DATA cow.vtp ARGS --hdri=${CMAKE_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
-# Test invalid options, do not add a --dummy option
-f3d_test(NAME TestInvalidOption ARGS --dummy REGEXP "Error parsing options:")
+# Test invalid options, do not add a --colour option
+f3d_test(NAME TestInvalidOption ARGS --colour=1,0,0 REGEXP "Did you mean '--color'?")
 
 # Test non-existent config filepath, do not add a dummy.json
 f3d_test(NAME TestNonExistentConfigFilePath DATA cow.vtp CONFIG "${CMAKE_SOURCE_DIR}/testing/configs/dummy.json" REGEXP "Configuration file does not exist" NO_BASELINE)
@@ -591,6 +653,7 @@ f3d_test(NAME TestNoFileConfigFile CONFIG ${CMAKE_SOURCE_DIR}/testing/configs/ve
 
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
+f3d_test(NAME TestHelpPositional ARGS --help REGEXP "--input")
 
 # Test version display
 f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")

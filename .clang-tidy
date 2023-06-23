@@ -1,0 +1,4 @@
+Checks: '-*,performance-*,modernize-*,-modernize-use-trailing-return-type,-modernize-use-nodiscard,-modernize-avoid-c-arrays,-modernize-use-auto'
+WarningsAsErrors: '*'
+UseColor: true
+FormatStyle: none

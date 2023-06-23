@@ -52,7 +52,7 @@ void vtkF3DCachedSpecularTexture::Load(vtkRenderer* ren)
 
     unsigned int nbLevels = mb->GetNumberOfBlocks();
 
-    this->TextureObject->SetMaxLevel(nbLevels - 1);
+    this->TextureObject->SetMaxLevel(static_cast<int>(nbLevels) - 1);
 
     vtkImageData* firstImg = vtkImageData::SafeDownCast(mb->GetBlock(0));
 
@@ -73,9 +73,9 @@ void vtkF3DCachedSpecularTexture::Load(vtkRenderer* ren)
 
       for (int j = 0; j < 6; j++)
       {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i,
-          this->TextureObject->GetInternalFormat(VTK_FLOAT, 3, false), dims[0], dims[1], 0,
-          this->TextureObject->GetFormat(VTK_FLOAT, 3, false),
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, static_cast<GLint>(i),
+          this->TextureObject->GetInternalFormat(VTK_FLOAT, 3, false), static_cast<GLint>(dims[0]),
+          static_cast<GLint>(dims[1]), 0, this->TextureObject->GetFormat(VTK_FLOAT, 3, false),
           this->TextureObject->GetDataType(VTK_FLOAT), img->GetScalarPointer(0, 0, j));
       }
     }

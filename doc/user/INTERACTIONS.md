@@ -10,7 +10,8 @@ Simple interaction with the displayed data is possible directly within the windo
 * *Move the mouse wheel* to zoom in/out.
 * *Click and drag* with the *middle* mouse button to translate the camera.
 * *Click* with the *middle* mouse button to center the camera on the point under the cursor (hold *Shift* to allow forward or backward movement).
-* Drag and drop a file or directory into the F3D window to load it
+* Drag and drop a file or directory into the F3D window to load it.
+* Press Control and Drag and drop a HDRI file to load a HDRI as with the `--hdri` option.
 
 > Note: When playing an animation with a scene camera, camera interactions are locked.
 
@@ -57,8 +58,8 @@ Other hotkeys are available:
 * `SPACE`: play the animation if any.
 * `LEFT`: load the previous file if any.
 * `RIGHT`: load the next file if any.
-* `UP`: reload the current file.
-* `DOWN`: add current file parent directory to the list of files and reload the current file.
+* `UP`: reload the current file without resetting the camera.
+* `DOWN`: add current file parent directory to the list of files, reload the current file and reset the camera.
 
 When loading another file or reloading, options that have been changed interactively are kept but can be overridden
 if a dedicated regular expression block in the configuration file is present, see the [configuration file](CONFIGURATION_FILE.md)

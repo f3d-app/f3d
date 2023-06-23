@@ -37,7 +37,9 @@ const std::vector<std::pair<std::string, std::string> >& interactor::getDefaultI
     { "Left", "Previous file" },
     { "Right", "Next file" },
     { "Up", "Reload current file" },
-    { "Down", "Add current file parent directory to the list of files and reload the current file" }
+    { "Down", "Add current file parent directory to the list of files and reload the current file" },
+    { "Drop", "Load dropped file or folder" },
+    { "Ctrl+Drop", "Load dropped file as HDRI" }
   };
   // clang-format on
 

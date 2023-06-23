@@ -37,7 +37,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.playInteraction(interactionFilePath); // Dragon.vtu; S
 
   inter.setKeyPressCallBack(
-    [&](int, std::string keySym) -> bool
+    [&](int, const std::string& keySym) -> bool
     {
       if (keySym == "S")
       {

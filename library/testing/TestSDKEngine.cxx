@@ -22,17 +22,17 @@ int TestSDKEngine(int argc, char* argv[])
 
   // Test different flags combinations that makes sense
   f3d::engine eng0(f3d::window::Type::NONE);
-  f3d::loader& load = eng0.getLoader();
+  const f3d::loader& load = eng0.getLoader();
 
   f3d::engine eng1(f3d::window::Type::NATIVE);
-  f3d::loader& load1 = eng1.getLoader();
-  f3d::window& window1 = eng1.getWindow();
-  f3d::interactor& inter1 = eng1.getInteractor();
+  const f3d::loader& load1 = eng1.getLoader();
+  const f3d::window& window1 = eng1.getWindow();
+  const f3d::interactor& inter1 = eng1.getInteractor();
 
   f3d::engine eng2(f3d::window::Type::NATIVE_OFFSCREEN);
-  f3d::loader& load2 = eng2.getLoader();
-  f3d::window& window2 = eng2.getWindow();
-  f3d::interactor& inter2 = eng2.getInteractor();
+  const f3d::loader& load2 = eng2.getLoader();
+  const f3d::window& window2 = eng2.getWindow();
+  const f3d::interactor& inter2 = eng2.getInteractor();
 
   // Test option setters
   f3d::options opt;

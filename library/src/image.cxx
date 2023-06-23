@@ -1,5 +1,7 @@
 #include "image.h"
 
+#include "init.h"
+
 #include <vtkImageDifference.h>
 #include <vtkImageExport.h>
 #include <vtkImageImport.h>
@@ -30,7 +32,7 @@ public:
 
     vtkNew<vtkImageImport> importer;
     importer->CopyImportVoidPointer(
-      const_cast<unsigned char*>(this->Buffer.data()), this->Buffer.size());
+      const_cast<unsigned char*>(this->Buffer.data()), static_cast<vtkIdType>(this->Buffer.size()));
     importer->SetNumberOfScalarComponents(this->Channels);
     importer->SetDataScalarTypeToUnsignedChar();
     importer->SetWholeExtent(0, this->Width - 1, 0, this->Height - 1, 0, 0);
@@ -58,24 +60,27 @@ public:
 image::image()
   : Internals(new image::internals())
 {
+  detail::init::initialize();
 }
 
 //----------------------------------------------------------------------------
 image::image(const std::string& path)
   : Internals(new image::internals())
 {
+  detail::init::initialize();
+
   std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
-  if (!vtksys::SystemTools::FileExists(path))
+  if (!vtksys::SystemTools::FileExists(fullPath))
   {
     throw read_exception("Cannot open image " + path);
   }
 
   auto reader = vtkSmartPointer<vtkImageReader2>::Take(
-    vtkImageReader2Factory::CreateImageReader2(path.c_str()));
+    vtkImageReader2Factory::CreateImageReader2(fullPath.c_str()));
 
   if (reader)
   {
-    reader->SetFileName(path.c_str());
+    reader->SetFileName(fullPath.c_str());
     this->Internals->SetFromVTK(reader);
   }
 }
@@ -196,7 +201,7 @@ bool image::compare(const image& reference, double threshold, image& diff, doubl
 //----------------------------------------------------------------------------
 bool image::operator==(const image& reference) const
 {
-  f3d::image diff;
+  image diff;
   double error;
   return this->compare(reference, 0, diff, error);
 }

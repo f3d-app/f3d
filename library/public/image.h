@@ -21,6 +21,7 @@ public:
   /**
    * Create an image from file, the following formats are supported:
    * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA.
+   * EXR files are also supported if the associated module is built.
    * Throw an image::read_exception in case of failure.
    */
   explicit image(const std::string& path);
@@ -96,7 +97,7 @@ public:
    */
   struct write_exception : public exception
   {
-    write_exception(const std::string& what = "");
+    explicit write_exception(const std::string& what = "");
   };
 
   /**
@@ -105,7 +106,7 @@ public:
    */
   struct read_exception : public exception
   {
-    read_exception(const std::string& what = "");
+    explicit read_exception(const std::string& what = "");
   };
 
 private:

@@ -20,9 +20,10 @@
 - iflamigm.3ds: VTK Data: BSD-3-Clause
 - IM-0001-1983.dcm: VTK Data: BSD-3-Clause
 - InterpolationTest.glb: glTF-Sample-Models: Public Domain
+- kloofendal_43d_clear_1k.exr: Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - normal.png: glTF-Sample-Models: Public Domain
 - normalMapping.fbx: assimp test models: BSD-3-Clause; rubberduck: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
-- palermo_park_1k.hdr: Polyhaven: Public Domain
+- palermo_park_1k.hdr: Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - Part-4-Buildings-V4-one.gml: VTK Data: BSD-3-Clause
 - phong_cube.fbx: assimp test models: BSD-3-Clause
 - PinkEggFromLW.dxf: assimp test models: BSD-3-Clause
@@ -32,6 +33,7 @@
 - SimpleMorph.gltf: glTF-Sample-Models: Public Domain
 - SimpleSkin.gltf: glTF-Sample-Models: Public Domain
 - samplePTS.pts: VTK Data: BSD-3-Clause
+- skin.png: Blender: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - small.ex2: VTK Data: BSD-3-Clause
 - teapot.off: Utah Teapot: Public Domain
 - tensors.vti: VTK Data: BSD-3-Clause
@@ -39,6 +41,7 @@
 - vase_4comp.vti: VTK Data: BSD-3-Clause
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
 - world*: VTK Data: BSD-3-Clause
+- 16bits.*: @bisechen: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
 
 All other datasets are licensed under the BSD-3-Clause F3D license.

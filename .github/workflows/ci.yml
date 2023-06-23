@@ -14,30 +14,68 @@ concurrency:
 jobs:
 
 #----------------------------------------------------------------------------
+# Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
+#----------------------------------------------------------------------------
+
+  cache_lfs:
+    runs-on: ubuntu-latest
+    name: Update LFS data cache
+    outputs:
+      lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Set LFS env var
+      working-directory: ${{github.workspace}}/source
+      id: lfs_sha_recover
+      shell: bash
+      run: echo "lfs_sha=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/ .github/baselines/)" >> $GITHUB_OUTPUT
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
+        workflow_label: 'producer'
+
+#----------------------------------------------------------------------------
 # MAIN CI: Build and test with a cross-platform, cross-vtk build matrix
 #----------------------------------------------------------------------------
   ci:
     if: github.event.pull_request.draft == false
+    needs: cache_lfs
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu, windows, macos]
         vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
-        macos_bundle: [true]
+        build_type: [standard]
         include:
-          - enable_raytracing: true
+          - raytracing_label: raytracing
+          - bundle_label: no-bundle
+          - egl_label: no-egl
           - vtk_version: v9.0.0
-            enable_raytracing: false
-          - os: macos-latest
-            enable_raytracing: false #598
-          - macos_bundle: false
-            os: macos-latest
+            raytracing_label: no-raytracing
+          - os: macos
+            raytracing_label: no-raytracing #598
+          - build_type: macos_bundle
+            os: macos
             vtk_version: commit
-            enable_raytracing: false
+            raytracing_label: no-raytracing
+            bundle_label: bundle
+          - build_type: headless
+            os: ubuntu
+            vtk_version: commit
+            egl_label: egl
 
-    runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    runs-on: ${{matrix.os}}-latest
+    container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       DISPLAY: :0
@@ -51,15 +89,11 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Set LFS env var
-      working-directory: ${{github.workspace}}/source
-      shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/ .github/baselines/)" >> $GITHUB_ENV
-
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
       with:
-        lfs_sha: ${{env.LFS_SHA}}
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
@@ -69,7 +103,7 @@ jobs:
         mkdir install
 
     - name: Install Raytracing Dependencies
-      if: matrix.enable_raytracing == true
+      if: matrix.raytracing_label == 'raytracing'
       uses: ./source/.github/actions/ospray-sb-install-dep
 
     - name: Install VTK dependency
@@ -77,7 +111,8 @@ jobs:
       with:
         vtk_version: ${{matrix.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-        enable_raytracing: ${{matrix.enable_raytracing}}
+        raytracing_label: ${{matrix.raytracing_label}}
+        egl_label: ${{matrix.egl_label}}
 
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
@@ -96,7 +131,8 @@ jobs:
       if: |
         runner.os == 'Linux' &&
         ( matrix.vtk_version == 'v9.0.0' ||
-          matrix.vtk_version == 'v9.1.0' )
+          matrix.vtk_version == 'v9.1.0'
+          )
       working-directory: ${{github.workspace}}/dependencies/
       shell: bash
       run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
@@ -107,6 +143,7 @@ jobs:
       shell: powershell
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+      # occt coloring not supported on macOS because of #792
     - name: Configure
       working-directory: ${{github.workspace}}/build
       shell: bash
@@ -125,14 +162,16 @@ jobs:
         -DF3D_BINDINGS_PYTHON=ON
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
-        -DF3D_MACOS_BUNDLE=${{ matrix.macos_bundle == true && 'ON' || 'OFF' }}
+        -DF3D_MACOS_BUNDLE=${{ matrix.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
-        -DF3D_MODULE_RAYTRACING=${{ matrix.enable_raytracing == true && 'ON' || 'OFF' }}
-        -DF3D_PLUGINS_STATIC_BUILD=${{ matrix.macos_bundle == true && 'ON' || 'OFF' }}
+        -DF3D_MODULE_EXR=ON
+        -DF3D_MODULE_RAYTRACING=${{ matrix.raytracing_label == 'raytracing' && 'ON' || 'OFF' }}
+        -DF3D_PLUGINS_STATIC_BUILD=${{ matrix.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
         -DF3D_PLUGIN_BUILD_OCCT=ON
+        -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ runner.os == 'macOS' && 'OFF' || 'ON' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
@@ -146,7 +185,9 @@ jobs:
       run: cmake --build . --parallel 2 --config Release
 
     - name: Run Xvfb ubuntu
-      if: runner.os == 'Linux'
+      if: |
+        runner.os == 'Linux' &&
+        matrix.egl_label != 'egl'
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
     - name: Install Mesa Windows
@@ -165,7 +206,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         path: ./build/Testing/Temporary
-        name: f3d-tests-artifact-${{runner.os}}-${{matrix.vtk_version}}
+        name: f3d-tests-artifact-${{runner.os}}-${{matrix.vtk_version}}-${{matrix.build_type}}
 
     - name: Install (ALL)
       working-directory: ${{github.workspace}}/build
@@ -225,14 +266,14 @@ jobs:
     - name: Set F3D binary path MacOS bundle
       if: |
         runner.os == 'macOS' &&
-        matrix.macos_bundle == true
+        matrix.bundle_label == 'bundle'
       shell: bash
       run: echo "F3D_BIN_PATH=./f3d.app/Contents/MacOS/f3d" >> $GITHUB_ENV
 
     - name: Set F3D binary path MacOS bundle
       if: |
         runner.os == 'macOS' &&
-        matrix.macos_bundle == false
+        matrix.bundle_label != 'bundle'
       shell: bash
       run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
 
@@ -268,12 +309,13 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         path: ./install/output
-        name: f3d-tests-install-artifact-${{runner.os}}-${{matrix.vtk_version}}
+        name: f3d-tests-install-artifact-${{runner.os}}-${{matrix.vtk_version}}-${{matrix.build_type}}
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
 #----------------------------------------------------------------------------
   coverage:
+    needs: cache_lfs
     if: github.event.pull_request.draft == false
 
     runs-on: ubuntu-latest
@@ -293,15 +335,11 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Set LFS env var
-      working-directory: ${{github.workspace}}/source
-      shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
-
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
       with:
-        lfs_sha: ${{env.LFS_SHA}}
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
@@ -317,7 +355,7 @@ jobs:
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-        enable_raytracing: true
+        raytracing_label: raytracing
 
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
@@ -359,7 +397,7 @@ jobs:
     - name: Generate XML Coverage
       working-directory: ${{github.workspace}}/source
       run: |
-        lcov --base-directory . --directory . -c -o coverage.info --gcov-tool /usr/bin/gcov-8
+        lcov --base-directory . --directory . -c -o coverage.info --gcov-tool /usr/bin/gcov
         lcov --remove coverage.info "*/dependencies/*" -o coverage.info
         lcov --remove coverage.info "*/cxxopts.hpp" -o coverage.info
         lcov --remove coverage.info "*/json.hpp" -o coverage.info
@@ -378,6 +416,7 @@ jobs:
 # "memory" returns false positives in VTK:
 # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
+    needs: cache_lfs
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -390,8 +429,8 @@ jobs:
 
     env:
       DISPLAY: :0
-      CC: clang-10
-      CXX: clang++-10
+      CC: clang
+      CXX: clang++
 
     steps:
 
@@ -402,15 +441,11 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Set LFS env var
-      working-directory: ${{github.workspace}}/source
-      shell: bash
-      run: echo "LFS_SHA=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/)" >> $GITHUB_ENV
-
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
       with:
-        lfs_sha: ${{env.LFS_SHA}}
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       working-directory: ${{github.workspace}}
@@ -443,6 +478,7 @@ jobs:
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_MODULE_EXR=ON
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
@@ -453,7 +489,7 @@ jobs:
 
     - name: Build
       working-directory: ${{github.workspace}}/build
-      run: cmake --build . --parallel 2 --config Release
+      run: cmake --build . --parallel 2
 
     - name: Run Xvfb
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
@@ -464,3 +500,98 @@ jobs:
         export LSAN_OPTIONS=suppressions=$(pwd)/../source/.lsan.supp:use_tls=0
         export TSAN_OPTIONS=suppressions=$(pwd)/../source/.tsan.supp
         ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+
+    - name: Upload Tests Artifact
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./build/Testing/Temporary
+        name: f3d-tests-artifact-sanitizer-${{matrix.santype}}
+
+#----------------------------------------------------------------------------
+# static-analysis: Run static analysis on linux
+#----------------------------------------------------------------------------
+  static-analysis:
+    needs: cache_lfs
+    if: github.event.pull_request.draft == false
+
+    strategy:
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+    container: ghcr.io/f3d-app/f3d-ci
+
+    env:
+      CC: clang
+      CXX: clang++
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
+
+    - name: Dependencies Dir
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
+
+    - name: Install VTK dependency
+      uses: ./source/.github/actions/vtk-install-dep
+      with:
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+
+    - name: Install F3D dependencies
+      uses: ./source/.github/actions/f3d-dependencies
+
+    - name: Setup Build Directory
+      working-directory: ${{github.workspace}}
+      run: mkdir build
+
+    - name: Configure
+      working-directory: ${{github.workspace}}/build
+      run: >
+        cmake ../source
+        -Werror=dev
+        -Werror=deprecated
+        --warn-uninitialized
+        -DBUILD_TESTING=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_MODULE_EXR=ON
+        -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
+        -DF3D_PLUGIN_BUILD_OCCT=ON
+        -DF3D_STRICT_BUILD=ON
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+    # It's necessary to run the build step to generate F3DIcon.h
+    - name: Build
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --parallel 2
+
+    - name: Clang-tidy
+      working-directory: ${{github.workspace}}/source
+      run: run-clang-tidy -quiet -p ../build
+
+    - name: Cppcheck
+      working-directory: ${{github.workspace}}/source
+      run: >
+        cppcheck -q
+        --project=../build/compile_commands.json
+        --enable=all
+        --suppressions-list=.cppcheck.supp
+        --error-exitcode=1

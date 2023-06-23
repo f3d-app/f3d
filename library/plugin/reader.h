@@ -65,15 +65,10 @@ public:
     std::string ext = fileName.substr(fileName.find_last_of(".") + 1);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
-    const std::vector<std::string> extensions = this->getExtensions();
-    for (auto e : extensions)
-    {
-      if (e == ext)
-      {
-        return true;
-      }
-    }
-    return false;
+    const std::vector<std::string>& extensions = this->getExtensions();
+
+    return std::any_of(
+      extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; });
   }
 
   /**

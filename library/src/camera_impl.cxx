@@ -2,7 +2,9 @@
 
 #include <vtkCamera.h>
 #include <vtkMatrix4x4.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+#include <vtkVersion.h>
 
 namespace f3d::detail
 {
@@ -10,7 +12,7 @@ class camera_impl::internals
 {
 public:
   vtkRenderer* VTKRenderer = nullptr;
-  vtkNew<vtkCamera> DefaultVTKCamera;
+  camera_state_t DefaultCamera;
 };
 
 //----------------------------------------------------------------------------
@@ -123,6 +125,36 @@ void camera_impl::getViewAngle(angle_deg_t& angle)
 }
 
 //----------------------------------------------------------------------------
+camera& camera_impl::setState(const camera_state_t& state)
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  cam->SetPosition(state.pos.data());
+  cam->SetFocalPoint(state.foc.data());
+  cam->SetViewUp(state.up.data());
+  cam->SetViewAngle(state.angle);
+  cam->OrthogonalizeViewUp();
+  this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+camera_state_t camera_impl::getState()
+{
+  camera_state_t state;
+  this->getState(state);
+  return state;
+}
+
+//----------------------------------------------------------------------------
+void camera_impl::getState(camera_state_t& state)
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  cam->GetPosition(state.pos.data());
+  cam->GetFocalPoint(state.foc.data());
+  cam->GetViewUp(state.up.data());
+  state.angle = cam->GetViewAngle();
+}
+//----------------------------------------------------------------------------
 camera& camera_impl::dolly(double val)
 {
   vtkCamera* cam = this->GetVTKCamera();
@@ -185,24 +217,38 @@ camera& camera_impl::pitch(angle_deg_t angle)
 //----------------------------------------------------------------------------
 camera& camera_impl::setCurrentAsDefault()
 {
-  vtkCamera* cam = this->GetVTKCamera();
-  this->Internals->DefaultVTKCamera->DeepCopy(cam);
+  this->getState(this->Internals->DefaultCamera);
   return *this;
 }
 
 //----------------------------------------------------------------------------
 camera& camera_impl::resetToDefault()
 {
-  vtkCamera* cam = this->GetVTKCamera();
-  cam->DeepCopy(this->Internals->DefaultVTKCamera);
-  this->Internals->VTKRenderer->ResetCameraClippingRange();
+  this->setState(this->Internals->DefaultCamera);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::resetToBounds()
+camera& camera_impl::resetToBounds([[maybe_unused]] double zoomFactor)
 {
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 0, 20210331)
   this->Internals->VTKRenderer->ResetCamera();
+#else
+  if (this->Internals->VTKRenderer->GetRenderWindow()->IsA("vtkExternalOpenGLRenderWindow"))
+  {
+    // External render window does not support ResetCameraScreenSpace correctly
+    this->Internals->VTKRenderer->ResetCamera();
+  }
+  else
+  {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20230221)
+    this->Internals->VTKRenderer->ResetCameraScreenSpace(zoomFactor);
+#else
+    this->Internals->VTKRenderer->ResetCameraScreenSpace();
+#endif
+  }
+#endif
   this->Internals->VTKRenderer->ResetCameraClippingRange();
   return *this;
 }

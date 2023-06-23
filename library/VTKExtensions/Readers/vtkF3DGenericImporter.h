@@ -39,7 +39,7 @@ public:
   /**
    * Add an internal reader to generate actors from
    */
-  void AddInternalReader(const std::string& name, vtkSmartPointer<vtkAlgorithm> reader);
+  void AddInternalReader(const std::string& name, vtkAlgorithm* reader);
 
   /**
    * Remove all internal readers
@@ -106,7 +106,7 @@ public:
    * Find an index for coloring corresponding to provided arrayName if available
    * Should be called after actors have been imported
    */
-  int FindIndexForColoring(bool useCellData, std::string arrayName);
+  int FindIndexForColoring(bool useCellData, const std::string& arrayName);
 
   /**
    * Get the bounding box of all geometry actors
@@ -144,7 +144,7 @@ public:
   /**
    * Get temporal information for the currently enabled animations.
    * Framerate is ignored in this implementation.
-   * the three return arguments are defined in this implementation.
+   * Only timerange is defined in this implementation.
    */
 // Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
@@ -174,6 +174,11 @@ protected:
    * currently added vectors
    */
   void UpdateColoringVectors(bool useCellData);
+
+  /**
+   * Update output descriptions according to current outputs
+   */
+  void UpdateOutputDescriptions();
 
 private:
   vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;

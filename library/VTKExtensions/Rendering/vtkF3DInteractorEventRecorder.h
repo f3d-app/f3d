@@ -20,16 +20,15 @@ public:
    */
   void SetInteractor(vtkRenderWindowInteractor* iren) override;
 
+  vtkF3DInteractorEventRecorder(const vtkF3DInteractorEventRecorder&) = delete;
+  void operator=(const vtkF3DInteractorEventRecorder&) = delete;
+
 protected:
   vtkF3DInteractorEventRecorder();
   ~vtkF3DInteractorEventRecorder() override = default;
 
   static void ProcessEvents(
     vtkObject* object, unsigned long event, void* clientdata, void* calldata);
-
-private:
-  vtkF3DInteractorEventRecorder(const vtkF3DInteractorEventRecorder&) = delete;
-  void operator=(const vtkF3DInteractorEventRecorder&) = delete;
 };
 
 #endif /* vtkF3DInteractorEventRecorder_h */

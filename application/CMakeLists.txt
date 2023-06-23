@@ -1,5 +1,5 @@
 # Generate F3DIcon buffer
-include("${CMAKE_SOURCE_DIR}/cmake/f3dEmbed.cmake")
+include("f3dEmbed")
 
 f3d_embed_file(
   INPUT "${CMAKE_SOURCE_DIR}/resources/logo32.png"
@@ -45,9 +45,9 @@ set_target_properties(f3d PROPERTIES
 
 if (APPLE)
   if (F3D_MACOS_BUNDLE)
-    set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../../../lib)
+    set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../../../${CMAKE_INSTALL_LIBDIR})
   else ()
-    set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../lib)
+    set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../${CMAKE_INSTALL_LIBDIR})
   endif ()
 elseif (UNIX)
   set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../${CMAKE_INSTALL_LIBDIR})
@@ -56,15 +56,27 @@ elseif (MSVC)
   set_target_properties(f3d PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=$<TARGET_FILE_DIR:VTK::CommonCore>") # Add VTK in MSVC PATH environment variable
 endif ()
 
-target_include_directories(f3d
-  PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external>
-  )
+target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+if (F3D_USE_EXTERNAL_CXXOPTS)
+  target_link_libraries(f3d PRIVATE cxxopts::cxxopts)
+else ()
+  target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/cxxopts>)
+endif ()
+
+if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
+  target_link_libraries(f3d PRIVATE nlohmann_json::nlohmann_json)
+else ()
+  target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/nlohmann_json>)
+endif ()
 
 set(f3d_compile_options_private "")
 set(f3d_compile_options_public "")
 set(f3d_link_options_public "")
+
+# Headless EGL build
+if (VTK_OPENGL_HAS_EGL)
+  target_compile_definitions(f3d PRIVATE F3D_HEADLESS_BUILD)
+endif ()
 
 # F3D_STRICT_BUILD
 list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})

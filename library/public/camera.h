@@ -9,6 +9,14 @@
 
 namespace f3d
 {
+struct F3D_EXPORT camera_state_t
+{
+  point3_t pos = { 0., 0., 1. };
+  point3_t foc = { 0., 0., 0. };
+  vector3_t up = { 0., 1., 0. };
+  angle_deg_t angle = 30.;
+};
+
 /**
  * @class   camera
  * @brief   Abstract class to control a camera in a window
@@ -38,6 +46,9 @@ public:
   virtual camera& setViewAngle(const angle_deg_t& angle) = 0;
   virtual angle_deg_t getViewAngle() = 0;
   virtual void getViewAngle(angle_deg_t& angle) = 0;
+  virtual camera& setState(const camera_state_t& state) = 0;
+  virtual camera_state_t getState() = 0;
+  virtual void getState(camera_state_t& state) = 0;
   ///@}
 
   ///@{ @name Manipulation
@@ -65,8 +76,11 @@ public:
 
   /**
    * Reset the camera using the bounds of actors in the scene.
+   * Provided zoomFactor will be used to position the camera.
+   * A value of 1 correspond to the bounds roughly aligned to the edges
+   * of the window.
    */
-  virtual camera& resetToBounds() = 0;
+  virtual camera& resetToBounds(double zoomFactor = 0.9) = 0;
 
 protected:
   //! @cond

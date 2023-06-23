@@ -2,12 +2,26 @@
 #include <vtkTestUtilities.h>
 #include <vtkXMLUnstructuredGridReader.h>
 
+#include "vtkF3DConfigure.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DRendererWithColoring.h"
 
 int TestF3DRendererWithColoring(int argc, char* argv[])
 {
   vtkNew<vtkF3DRendererWithColoring> renderer;
+
+  // Check error paths
+  if (renderer->GetColoringArrayName() != F3D_RESERVED_STRING)
+  {
+    std::cerr << "Unexpected coloring information without an importer" << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (!renderer->GetColoringDescription().empty())
+  {
+    std::cerr << "Unexpected coloring description without an importer" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   vtkNew<vtkF3DGenericImporter> importer;
   renderer->SetImporter(importer);
 

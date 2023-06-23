@@ -109,13 +109,18 @@ public:
   std::vector<std::string> getNames();
 
   /**
+   * Get the closest option name and its Levenshtein distance.
+   */
+  std::pair<std::string, unsigned int> getClosestOption(const std::string& option) const;
+
+  /**
    * An exception that can be thrown by the options
    * when a provided option type is incompatible with
    * its internal type.
    */
   struct incompatible_exception : public exception
   {
-    incompatible_exception(const std::string& what = "");
+    explicit incompatible_exception(const std::string& what = "");
   };
 
   /**
@@ -124,7 +129,7 @@ public:
    */
   struct inexistent_exception : public exception
   {
-    inexistent_exception(const std::string& what = "");
+    explicit inexistent_exception(const std::string& what = "");
   };
 
 private:

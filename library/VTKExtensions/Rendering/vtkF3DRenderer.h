@@ -17,6 +17,7 @@
 #include <map>
 
 class vtkCornerAnnotation;
+class vtkF3DDropZoneActor;
 class vtkOrientationMarkerWidget;
 class vtkSkybox;
 class vtkTextActor;
@@ -38,6 +39,7 @@ public:
   void ShowMetaData(bool show);
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
+  void ShowDropZone(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -52,6 +54,8 @@ public:
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);
   void SetFilenameInfo(const std::string& info);
+  void SetDropZoneInfo(const std::string& info);
+  void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(double unitSquare);
   void SetGridSubdivisions(int subdivisions);
   ///@}
@@ -77,6 +81,14 @@ public:
    */
   void SetUseTrackball(bool use);
   vtkGetMacro(UseTrackball, bool);
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get InvertZoom
+   */
+  vtkSetMacro(InvertZoom, bool);
+  vtkGetMacro(InvertZoom, bool);
   ///@}
 
   /**
@@ -194,6 +206,7 @@ protected:
   vtkNew<vtkCornerAnnotation> FilenameActor;
   vtkNew<vtkCornerAnnotation> MetaDataActor;
   vtkNew<vtkCornerAnnotation> CheatSheetActor;
+  vtkNew<vtkF3DDropZoneActor> DropZoneActor;
 
   // vtkCornerAnnotation building is too slow for the timer
   vtkNew<vtkTextActor> TimerActor;
@@ -208,12 +221,14 @@ protected:
   bool MetaDataConfigured = false;
 
   bool GridVisible = false;
+  bool GridAbsolute = false;
   bool AxisVisible = false;
   bool EdgeVisible = false;
   bool TimerVisible = false;
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
   bool CheatSheetVisible = false;
+  bool DropZoneVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
@@ -222,6 +237,7 @@ protected:
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;
   bool UseTrackball = false;
+  bool InvertZoom = false;
 
   int RaytracingSamples = 0;
   int UpIndex = 1;

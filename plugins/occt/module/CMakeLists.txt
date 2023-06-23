@@ -14,7 +14,7 @@ vtk_module_link(f3d::VTKExtensionsOCCTReader
   PRIVATE
     ${OpenCASCADE_LIBRARIES})
 
-if(F3D_PLUGIN_OCCT_XCAF)
+if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
   vtk_module_definitions(f3d::VTKExtensionsOCCTReader
     PRIVATE F3D_PLUGIN_OCCT_XCAF)
 endif()

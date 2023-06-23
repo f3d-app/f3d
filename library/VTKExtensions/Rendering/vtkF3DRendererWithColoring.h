@@ -63,6 +63,13 @@ public:
   void SetNormalScale(double normalScale);
 
   /**
+   * Set the material capture texture on all coloring actors.
+   * This texture includes baked lighting effect,
+   * so all other material textures are ignored.
+   */
+  void SetTextureMatCap(const std::string& tex);
+
+  /**
    * Set the base color texture on all coloring actors
    */
   void SetTextureBaseColor(const std::string& tex);
@@ -276,13 +283,14 @@ protected:
   double NormalScale = 1.;
   double SurfaceColor[3] = { 1., 1., 1. };
   double EmissiveFactor[3] = { 1., 1., 1. };
+  std::string TextureMatCap;
   std::string TextureBaseColor;
   std::string TextureMaterial;
   std::string TextureEmissive;
   std::string TextureNormal;
 
   vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
-  double ColorRange[2];
+  double ColorRange[2] = { 0.0, 1.0 };
   bool ColorTransferFunctionConfigured = false;
 
   bool UseCellColoring = false;

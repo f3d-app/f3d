@@ -7,7 +7,7 @@
 class F3DExNoProcess : public std::runtime_error
 {
 public:
-  F3DExNoProcess(const std::string& what = "")
+  explicit F3DExNoProcess(const std::string& what = "")
     : std::runtime_error(what)
   {
   }

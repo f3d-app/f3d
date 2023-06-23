@@ -1,0 +1,55 @@
+name: 'Install OpenEXR Dependency'
+description: 'Install OpenEXR Dependency using cache when possible'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache OpenEXR
+      id: cache-openexr
+      uses: actions/cache@v3
+      with:
+        path: dependencies/openexr_install
+        key: openexr-v3.1.8-${{runner.os}}-0
+
+    - name: Checkout OpenEXR
+      if: steps.cache-openexr.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        repository: AcademySoftwareFoundation/openexr
+        path: './dependencies/openexr'
+        ref: v3.1.8
+
+    - name: Setup OpenEXR
+      if: steps.cache-openexr.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir openexr_build
+        mkdir openexr_install
+
+    - name: Configure OpenEXR
+      if: steps.cache-openexr.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/openexr_build
+      shell: bash
+      run: >
+        cmake ../openexr
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../openexr_install
+        -DCMAKE_PREFIX_PATH:PATH=../install/
+        -DOPENEXR_INSTALL_TOOLS=OFF
+        -DOPENEXR_INSTALL_EXAMPLES=OFF
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_MACOSX_RPATH=ON' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build OpenEXR
+      if: steps.cache-openexr.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/openexr_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/openexr_install
+      shell: bash
+      run: cp -r ./* ../install/
