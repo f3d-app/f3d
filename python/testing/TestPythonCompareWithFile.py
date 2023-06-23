@@ -8,7 +8,7 @@ import f3d
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-TESTS_DATA_DIR = Path(__file__).parent.parent.parent / "testing"
+TESTS_DATA_DIR = Path(__file__).parent.parent.parent
 
 def test_compare(in_dir = TESTS_DATA_DIR, out_dir = None):
   if out_dir is None:
