@@ -9,7 +9,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-v2.7.1-${{runner.os}}-0
+        key: ospray-sb-v2.7.1-${{runner.os}}-1
 
     - name: Checkout ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
@@ -48,7 +48,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../ospray_install
         -DDOWNLOAD_ISPC=ON
-        -DDOWNLOAD_TBB=ON
+        -DDOWNLOAD_TBB=OFF
         -DINSTALL_DEPENDENCIES=ON
         -DINSTALL_IN_SEPARATE_DIRECTORIES=OFF
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}

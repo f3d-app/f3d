@@ -1,0 +1,55 @@
+name: 'Install TBB Dependency'
+description: 'Install TBB Dependency using cache when possible'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache TBB
+      id: cache-tbb
+      uses: actions/cache@v3
+      with:
+        path: dependencies/tbb_install
+        key: tbb-v2021.9.0-${{runner.os}}-2
+
+    - name: Checkout TBB
+      if: steps.cache-tbb.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        repository: oneapi-src/oneTBB
+        path: './dependencies/tbb'
+        ref: v2021.9.0
+
+    - name: Setup TBB
+      if: steps.cache-tbb.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir tbb_build
+        mkdir tbb_install
+
+    - name: Configure TBB
+      if: steps.cache-tbb.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/tbb_build
+      shell: bash
+      run: >
+        cmake ../tbb
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../tbb_install
+        -DTBB_STRICT=OFF
+        -DTBB_TEST=OFF
+        -DTBB4PY_BUILD=OFF
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_MACOSX_RPATH=ON' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build TBB
+      if: steps.cache-tbb.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/tbb_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/tbb_install
+      shell: bash
+      run: cp -r ./* ../install/

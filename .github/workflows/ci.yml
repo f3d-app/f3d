@@ -102,6 +102,9 @@ jobs:
         cd dependencies
         mkdir install
 
+    - name: Install TBB
+      uses: ./source/.github/actions/tbb-install-dep
+
     - name: Install Raytracing Dependencies
       if: matrix.raytracing_label == 'raytracing'
       uses: ./source/.github/actions/ospray-sb-install-dep
@@ -348,6 +351,9 @@ jobs:
         cd dependencies
         mkdir install
 
+    - name: Install TBB
+      uses: ./source/.github/actions/tbb-install-dep
+
     - name: Install Raytracing Dependencies
       uses: ./source/.github/actions/ospray-sb-install-dep
 
@@ -453,6 +459,9 @@ jobs:
         mkdir dependencies
         cd dependencies
         mkdir install
+
+    - name: Install TBB
+      uses: ./source/.github/actions/tbb-install-dep
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
