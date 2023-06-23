@@ -34,12 +34,15 @@ runs:
         mkdir ospray_build
         mkdir ospray_install
 
+    - name: Set TBB_ROOT
+      working-directory: ${{github.workspace}}/dependencies/
+      shell: bash
+      run: echo "TBB_ROOT=$(pwd)/install" >> $GITHUB_ENV
+
     - name: Configure ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/ospray_build
       shell: bash
-      env:
-        TBB_ROOT: ${{github.workspace}}/dependencies/install
       run: >
         cmake ../ospray/scripts/superbuild/
         -DBUILD_EMBREE_FROM_SOURCE=OFF
