@@ -86,7 +86,7 @@ public:
   ///@{ @name Resolution
   /**
    * Set/Get image resolution.
-   * 
+   *
    * \deprecated { setResolution is deprecated, use the appropriate constructor }
    */
   unsigned int getWidth() const;
@@ -99,7 +99,7 @@ public:
   ///@{ @name Channel Count
   /**
    * Set/Get image channel count.
-   * 
+   *
    * \deprecated { setChannelCount is deprecated, use the appropriate constructor }
    */
   unsigned int getChannelCount() const;
@@ -139,7 +139,6 @@ public:
   /**
    * Save an image to a file in the specified format.
    * Default format is PNG if not specified.
-   * Throw an image::write_exception if image cannot be written.
    */
   void save(const std::string& path, SaveFormat format = SaveFormat::PNG) const;
 

@@ -190,6 +190,7 @@ unsigned char* image::getData() const
 }
 
 //----------------------------------------------------------------------------
+// cppcheck-suppress constParameter
 bool image::compare(const image& reference, double threshold, image& diff, double& error) const
 {
   vtkNew<vtkImageDifference> imDiff;
@@ -250,8 +251,6 @@ void image::save(const std::string& path, SaveFormat format) const
     case SaveFormat::BMP:
       writer = vtkSmartPointer<vtkBMPWriter>::New();
       break;
-    default:
-      throw write_exception("Unknown format");
   }
 
   writer->SetFileName(path.c_str());

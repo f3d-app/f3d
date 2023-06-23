@@ -22,10 +22,15 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image generated(width, height, channels);
   generated.setData(pixels.data());
 
+  // test save in different formats
   generated.save(std::string(argv[2]) + "TestSDKImage.png");
   generated.save(std::string(argv[2]) + "TestSDKImage.jpg", f3d::image::SaveFormat::JPG);
   generated.save(std::string(argv[2]) + "TestSDKImage.tif", f3d::image::SaveFormat::TIF);
   generated.save(std::string(argv[2]) + "TestSDKImage.bmp", f3d::image::SaveFormat::BMP);
+
+  // test constructor with different channel sizes
+  f3d::image img16(width, height, channels, f3d::image::ChannelType::SHORT);
+  f3d::image img32(width, height, channels, f3d::image::ChannelType::FLOAT);
 
   // test exceptions
   try
@@ -48,6 +53,15 @@ int TestSDKImage(int argc, char* argv[])
   }
   catch (const f3d::image::read_exception&)
   {
+  }
+
+  // check reading a 16-bits image
+  f3d::image shortImg(std::string(argv[1]) + "/data/16bit.png");
+
+  if (shortImg.getChannelType() != f3d::image::ChannelType::SHORT)
+  {
+    std::cerr << "Cannot read a 16-bits image" << std::endl;
+    return EXIT_FAILURE;
   }
 
   // check reading a 32-bits image
