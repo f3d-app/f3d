@@ -339,6 +339,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, windows, macos]
+        include:
+          - raytracing_label: no-raytracing
 
     runs-on: ${{matrix.os}}-latest
     container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -368,15 +370,11 @@ jobs:
         cd dependencies
         mkdir install
 
-    - name: Install Raytracing Dependencies
-      if: matrix.raytracing_label == 'raytracing'
-      uses: ./source/.github/actions/ospray-sb-install-dep
-
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-        raytracing_label: raytracing
+        raytracing_label: no-raytracing
 
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
