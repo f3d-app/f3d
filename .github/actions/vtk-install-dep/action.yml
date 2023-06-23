@@ -43,7 +43,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-2
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-3
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -83,13 +83,6 @@ runs:
         sed -i '' '57i\'$'\n''herr_t H5O__fsinfo_set_version(H5F_t *f, H5O_fsinfo_t *fsinfo);' ThirdParty/hdf5/vtkhdf5/src/H5Fsuper.c
         sed -i '' '46i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Oint.c
         sed -i '' '36i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Rint.c
-
-    - name: Install TBB MacOS
-      if: |
-        runner.os == 'macOS' &&
-        inputs.vtk_version != 'v9.0.0'
-      shell: bash
-      run: brew install tbb
 
     - name: Configure VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
