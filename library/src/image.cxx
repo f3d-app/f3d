@@ -190,7 +190,6 @@ unsigned char* image::getData() const
 }
 
 //----------------------------------------------------------------------------
-// cppcheck-suppress constParameter
 bool image::compare(const image& reference, double threshold, image& diff, double& error) const
 {
   vtkNew<vtkImageDifference> imDiff;
