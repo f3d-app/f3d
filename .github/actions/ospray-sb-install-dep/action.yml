@@ -47,6 +47,7 @@ runs:
         -DBUILD_OSPRAY_APPS=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../ospray_install
+        -DCMAKE_PREFIX_PATH:PATH=../install/
         -DDOWNLOAD_ISPC=ON
         -DDOWNLOAD_TBB=OFF
         -DINSTALL_DEPENDENCIES=ON
