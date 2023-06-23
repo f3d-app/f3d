@@ -44,7 +44,7 @@ All application test are just a command line run by ctest using the `f3d` execut
 ctest then check the output for any failure. Most of these tests are just using the `--output`
 and `--ref` F3D option in order to check if a rendering behave correctly with specific options.
 
-Everything is handled in `cmake/testing.cmake`.
+Everything is handled in `application/testing/CMakeLists.txt`.
 
 Usually, adding a test is a simple as adding a line like this one:
 
@@ -73,9 +73,9 @@ When for some reason adding a test in the application layer is not possible, it 
 to add a C++ test in the library layer. These tests are simple C++ methods that should return
 `EXIT_SUCCESS` or `EXIT_FAILURE`. 
 
-Everything is handled in `src/library/testing`.
+Everything is handled in `library/testing`.
 
-To add a test, create a new `TestName.cxx` file containing a `int TestName(int argc, char* argv[])` method,
+To add a test, create a new `TestSDKName.cxx` file containing a `int TestSDKName(int argc, char* argv[])` method,
 then implement your test in C++ using the [libf3d](../libf3d/README.md) API.
 Then add you new file to `src/library/testing/CMakeLists.txt`.
 
@@ -83,10 +83,10 @@ It is supported to read file as input and perform image comparison against basel
 
 ### Bindings layer
 
-The libf3d supports multiple bindings, including Java and Python.
+The libf3d supports multiple bindings, including Python, Java and Javascript.
 
 When improving/modifying these bindings, it is necessary to also improve/modify the bindings tests accordingly.
-Please take a look into `src/<bindings>/testing` for examples to follow.
+Please take a look into `<bindings>/testing` for examples to follow.
 
 ### VTKExtensions layer
 
@@ -94,11 +94,11 @@ When for some reason adding a test in the application or library layer is not po
 to add a C++ test in the VTKExtensions layer. These tests are simple C++ methods that should return
 `EXIT_SUCESS` or `EXIT_FAILURE`. 
 
-Everything is handled in `src/library/VTKExtensions/ModuleName/Testing`.
+Everything is handled in `library/VTKExtensions/ModuleName/Testing`.
 
 To add a test, first identify which VTKExtensions module you need to add a test into, 
 then create a new `TestName.cxx` file containing a `int TestName(int argc, char* argv[])` method,
 then implement your test in C++ using VTK and F3D VTKExtensions modules.
-Then add you new file to `src/library/VTKExtensions/ModuleName/Testing/CMakeLists.txt`.
+Then add you new file to `library/VTKExtensions/ModuleName/Testing/CMakeLists.txt`.
 
 It is supported to read file as input if needed, see other tests as examples.

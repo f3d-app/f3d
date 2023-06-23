@@ -43,10 +43,37 @@ public:
       std::copy_n(appOptions.CameraViewUp.begin(), 3, up.begin());
       cam.setViewUp(up);
     }
-    if (appOptions.CameraViewAngle != 0)
+    if (appOptions.CameraViewAngle > 0)
     {
       cam.setViewAngle(appOptions.CameraViewAngle);
     }
+
+    bool reset = false;
+    double zoomFactor = 0.9;
+    if (appOptions.CameraPosition.size() != 3 && appOptions.CameraDirection.size() == 3)
+    {
+      f3d::vector3_t dir;
+      std::copy_n(appOptions.CameraDirection.begin(), 3, dir.begin());
+      f3d::point3_t foc;
+      f3d::point3_t pos;
+      cam.getFocalPoint(foc);
+      for (int i = 0; i < 3; i++)
+      {
+        pos[i] = foc[i] - dir[i];
+      }
+      cam.setPosition(pos);
+      reset = true;
+    }
+    if (appOptions.CameraPosition.size() != 3 && appOptions.CameraZoomFactor > 0)
+    {
+      zoomFactor = appOptions.CameraZoomFactor;
+      reset = true;
+    }
+    if (reset)
+    {
+      cam.resetToBounds(zoomFactor);
+    }
+
     cam.azimuth(appOptions.CameraAzimuthAngle)
       .elevation(appOptions.CameraElevationAngle)
       .setCurrentAsDefault();
@@ -67,6 +94,9 @@ public:
 F3DStarter::F3DStarter()
   : Internals(std::make_unique<F3DStarter::F3DInternals>())
 {
+  // Set option outside of command line and config file
+  this->Internals->DynamicOptions.set("ui.dropzone-info",
+    "Drop a file to open it\nCtrl+Drop to load a HDRI\nPress H to show cheatsheet");
 }
 
 //----------------------------------------------------------------------------
@@ -134,32 +164,42 @@ int F3DStarter::Start(int argc, char** argv)
 
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
-
     interactor.setKeyPressCallBack(
-      [this](int, std::string keySym) -> bool
+      [this](int, const std::string& keySym) -> bool
       {
+        const auto loadFile = [this](int index, bool restoreCamera = false) -> bool
+        {
+          this->Internals->Engine->getInteractor().stopAnimation();
+
+          if (restoreCamera)
+          {
+            f3d::camera& cam = this->Internals->Engine->getWindow().getCamera();
+            const auto camState = cam.getState();
+            this->LoadFile(index, true);
+            cam.setState(camState);
+          }
+          else
+          {
+            this->LoadFile(index, true);
+          }
+
+          this->Render();
+          return true;
+        };
+
         if (keySym == "Left")
         {
-          this->Internals->Engine->getInteractor().stopAnimation();
-          this->LoadFile(-1, true);
-          this->Render();
-          return true;
+          return loadFile(-1);
         }
-        else if (keySym == "Right")
+        if (keySym == "Right")
         {
-          this->Internals->Engine->getInteractor().stopAnimation();
-          this->LoadFile(1, true);
-          this->Render();
-          return true;
+          return loadFile(+1);
         }
-        else if (keySym == "Up")
+        if (keySym == "Up")
         {
-          this->Internals->Engine->getInteractor().stopAnimation();
-          this->LoadFile(0, true);
-          this->Render();
-          return true;
+          return loadFile(0, true);
         }
-        else if (keySym == "Down")
+        if (keySym == "Down")
         {
           if (this->Internals->LoadedFile)
           {
@@ -168,8 +208,7 @@ int F3DStarter::Start(int argc, char** argv)
               this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)]
                 .parent_path(),
               true);
-            this->LoadFile(0, true);
-            this->Render();
+            return loadFile(0);
           }
           return true;
         }
@@ -177,14 +216,18 @@ int F3DStarter::Start(int argc, char** argv)
       });
 
     interactor.setDropFilesCallBack(
-      [this](std::vector<std::string> filesVec) -> bool
+      [this](const std::vector<std::string>& filesVec) -> bool
       {
         this->Internals->Engine->getInteractor().stopAnimation();
-        for (std::string file : filesVec)
+        int index = -1;
+        for (const std::string& file : filesVec)
         {
-          this->AddFile(fs::path(file));
+          index = this->AddFile(fs::path(file));
         }
-        this->LoadFile(static_cast<int>(this->Internals->FilesList.size()) - 1);
+        if (index > -1)
+        {
+          this->LoadFile(index);
+        }
         this->Render();
         return true;
       });
@@ -314,8 +357,12 @@ int F3DStarter::Start(int argc, char** argv)
     // Start interaction
     else
     {
+#ifdef F3D_HEADLESS_BUILD
+      f3d::log::error("This is a headless build of F3D, interactive rendering is not supported");
+#else
       window.render();
       interactor.start();
+#endif
     }
   }
 
@@ -325,24 +372,21 @@ int F3DStarter::Start(int argc, char** argv)
 //----------------------------------------------------------------------------
 void F3DStarter::LoadFile(int index, bool relativeIndex)
 {
-  if (this->Internals->LoadedFile)
+  // When loading a file, store any changed options
+  // into the dynamic options and use these dynamic option as the default
+  // for loading the file while still applying file specific options on top of it
+
+  // Recover previous options from the engine
+  const f3d::options& previousOptions = this->Internals->Engine->getOptions();
+
+  // Detect changed options and apply the change to the dynamic options
+  // options names are shared between options instance
+  std::vector<std::string> optionNames = this->Internals->DynamicOptions.getNames();
+  for (const auto& name : optionNames)
   {
-    // When loading a file after another, store the changed options
-    // into the dynamic options and use these dynamic option as the default
-    // for loading the next file while still applying file specific options on top of it
-
-    // Recover previous options from the engine
-    const f3d::options& previousOptions = this->Internals->Engine->getOptions();
-
-    // Detect changed options and apply the change to the dynamic options
-    // options names are shared between options instance
-    std::vector<std::string> optionNames = this->Internals->DynamicOptions.getNames();
-    for (auto name : optionNames)
+    if (!previousOptions.isSame(this->Internals->FileOptions, name))
     {
-      if (!previousOptions.isSame(this->Internals->FileOptions, name))
-      {
-        this->Internals->DynamicOptions.copy(previousOptions, name);
-      }
+      this->Internals->DynamicOptions.copy(previousOptions, name);
     }
   }
 
@@ -373,7 +417,6 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
   else
   {
     f3d::log::debug("No file to load provided.");
-    filenameInfo = "No file to load provided, please drop one into this window";
     this->Internals->CurrentFileIndex = -1;
 
     // Copy dynamic options into files options to get the global config
@@ -410,7 +453,6 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
       fs::file_size(filePath) > static_cast<std::uintmax_t>(fileAppOptions.MaxSize * BYTES_IN_MIB))
     {
       f3d::log::info("No file loaded, file is bigger than max size");
-      filenameInfo = "No file loaded, file is bigger than max size";
     }
     else
     {
@@ -485,6 +527,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
     loader.loadGeometry("", true);
   }
 
+  this->Internals->Engine->getOptions().set("ui.dropzone", !this->Internals->LoadedFile);
   this->Internals->Engine->getOptions().set("ui.filename-info", filenameInfo);
 }
 
@@ -495,7 +538,7 @@ void F3DStarter::Render()
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::AddFile(const fs::path& path, bool quiet)
+int F3DStarter::AddFile(const fs::path& path, bool quiet)
 {
   auto tmpPath = fs::absolute(path);
   if (!fs::exists(tmpPath))
@@ -504,21 +547,21 @@ void F3DStarter::AddFile(const fs::path& path, bool quiet)
     {
       f3d::log::error("File ", tmpPath, " does not exist");
     }
-    return;
+    return -1;
   }
-
-  if (fs::is_directory(tmpPath))
+  else if (fs::is_directory(tmpPath))
   {
     std::set<fs::path> sortedPaths;
     for (const auto& entry : fs::directory_iterator(tmpPath))
     {
       sortedPaths.insert(entry.path());
     }
-    for (auto& entryPath : sortedPaths)
+    for (const auto& entryPath : sortedPaths)
     {
       // Recursively add all files
       this->AddFile(entryPath, quiet);
     }
+    return static_cast<int>(this->Internals->FilesList.size()) - 1;
   }
   else
   {
@@ -528,10 +571,15 @@ void F3DStarter::AddFile(const fs::path& path, bool quiet)
     if (it == this->Internals->FilesList.end())
     {
       this->Internals->FilesList.push_back(tmpPath);
+      return static_cast<int>(this->Internals->FilesList.size()) - 1;
     }
-    else if (!quiet)
+    else
     {
-      f3d::log::warn("File ", tmpPath, " has already been added");
+      if (!quiet)
+      {
+        f3d::log::warn("File ", tmpPath, " has already been added");
+      }
+      return static_cast<int>(std::distance(this->Internals->FilesList.begin(), it));
     }
   }
 }

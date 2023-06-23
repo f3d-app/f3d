@@ -52,6 +52,7 @@ vtkSmartPointer<vtkTexture> GetTexture(const std::string& filePath, bool isSRGB 
           texture->UseSRGBColorSpaceOn();
         }
         texture->InterpolateOn();
+        texture->SetColorModeToDirectScalars();
         return texture;
       }
       else
@@ -156,6 +157,16 @@ void vtkF3DRendererWithColoring::SetEmissiveFactor(double* factor)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRendererWithColoring::SetTextureMatCap(const std::string& tex)
+{
+  if (this->TextureMatCap != tex)
+  {
+    this->TextureMatCap = tex;
+    this->ColoringActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetTextureBaseColor(const std::string& tex)
 {
   if (this->TextureBaseColor != tex)
@@ -200,10 +211,8 @@ void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
 {
   assert(this->Importer);
 
-  const auto& actorsAndMappers = this->Importer->GetGeometryActorsAndMappers();
-  for (size_t i = 0; i < actorsAndMappers.size(); i++)
+  for (auto& actorAndMapper : this->Importer->GetGeometryActorsAndMappers())
   {
-    auto& actorAndMapper = actorsAndMappers[i];
     actorAndMapper.first->GetProperty()->SetColor(this->SurfaceColor);
     actorAndMapper.first->GetProperty()->SetOpacity(this->Opacity);
     actorAndMapper.first->GetProperty()->SetRoughness(this->Roughness);
@@ -219,6 +228,7 @@ void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
     actorAndMapper.first->GetProperty()->SetEmissiveFactor(this->EmissiveFactor);
     actorAndMapper.first->GetProperty()->SetNormalTexture(::GetTexture(this->TextureNormal));
     actorAndMapper.first->GetProperty()->SetNormalScale(this->NormalScale);
+    actorAndMapper.first->GetProperty()->SetTexture("matcap", ::GetTexture(this->TextureMatCap));
 
     // If the input texture is RGBA, flag the actor as translucent
     if (colorTex && colorTex->GetImageDataInput(0)->GetNumberOfScalarComponents() == 4)
@@ -227,8 +237,7 @@ void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
     }
   }
 
-  const auto& psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
-  for (auto& psActorAndMapper : psActorsAndMappers)
+  for (auto& psActorAndMapper : this->Importer->GetPointSpritesActorsAndMappers())
   {
     psActorAndMapper.first->GetProperty()->SetColor(this->SurfaceColor);
     psActorAndMapper.first->GetProperty()->SetOpacity(this->Opacity);
@@ -242,7 +251,10 @@ void vtkF3DRendererWithColoring::SetPointSize(double pointSize)
 {
   this->Superclass::SetPointSize(pointSize);
 
-  assert(this->Importer != nullptr);
+  if (!this->Importer)
+  {
+    return;
+  }
 
   const vtkBoundingBox& bbox = this->Importer->GetGeometryBoundingBox();
   double gaussianPointSize = 1.0;
@@ -294,7 +306,10 @@ void vtkF3DRendererWithColoring::SetUseVolume(bool use)
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
 {
-  assert(this->Importer != nullptr);
+  if (!this->Importer)
+  {
+    return;
+  }
 
   if (this->UseInverseOpacityFunction != use)
   {
@@ -357,6 +372,11 @@ void vtkF3DRendererWithColoring::SetColormap(const std::vector<double>& colormap
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::CycleScalars(CycleType type)
 {
+  if (!this->Importer)
+  {
+    return;
+  }
+
   switch (type)
   {
     case (CycleType::NONE):
@@ -390,7 +410,7 @@ void vtkF3DRendererWithColoring::CycleScalars(CycleType type)
 //----------------------------------------------------------------------------
 vtkF3DRendererWithColoring::CycleType vtkF3DRendererWithColoring::CheckColoring()
 {
-  assert(this->Importer != nullptr);
+  assert(this->Importer);
 
   // Never force change of anything if we are currently not coloring
   if (this->ArrayIndexForColoring == -1)
@@ -424,10 +444,13 @@ vtkF3DRendererWithColoring::CycleType vtkF3DRendererWithColoring::CheckColoring(
 void vtkF3DRendererWithColoring::SetColoring(
   bool useCellData, const std::string& arrayName, int component)
 {
+  if (!this->Importer)
+  {
+    return;
+  }
+
   // XXX This should be reworked to avoid handling multiple information in one parameters
   // while still being future-proof and flexible enough.
-  assert(this->Importer != nullptr);
-
   if (this->GetColoringUseCell() != useCellData || this->GetColoringArrayName() != arrayName ||
     this->GetColoringComponent() != component)
   {
@@ -439,7 +462,7 @@ void vtkF3DRendererWithColoring::SetColoring(
       // Not coloring
       this->ArrayIndexForColoring = -1;
     }
-    else if (arrayName != F3D_RESERVED_STRING && nIndexes == 0)
+    else if (nIndexes == 0)
     {
       // Trying to color but no array available
       F3DLog::Print(F3DLog::Severity::Warning, "No array to color with");
@@ -481,7 +504,10 @@ bool vtkF3DRendererWithColoring::GetColoringUseCell()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::GetColoringArrayName()
 {
-  assert(this->Importer != nullptr);
+  if (!this->Importer)
+  {
+    return F3D_RESERVED_STRING;
+  }
 
   vtkF3DGenericImporter::ColoringInfo info;
   if (this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
@@ -503,7 +529,12 @@ int vtkF3DRendererWithColoring::GetColoringComponent()
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::UpdateActors()
 {
-  assert(this->Importer != nullptr);
+  if (!this->Importer)
+  {
+    // Importer is nullptr, still call superclass to render other actors
+    this->Superclass::UpdateActors();
+    return;
+  }
 
   // Handle importer changes
   vtkMTimeType importerMTime = this->Importer->GetMTime();
@@ -641,7 +672,7 @@ void vtkF3DRendererWithColoring::ConfigureColoring()
     {
       propAndMapper.first->VisibilityOff();
     }
-    else if (volumeVisible && !coloringArray)
+    else if (!coloringArray)
     {
       F3DLog::Print(
         F3DLog::Severity::Error, "Cannot use volume with this dataset or with the requested array");
@@ -681,7 +712,10 @@ void vtkF3DRendererWithColoring::ConfigureColoring()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::GetColoringDescription()
 {
-  assert(this->Importer != nullptr);
+  if (!this->Importer)
+  {
+    return "";
+  }
 
   std::stringstream stream;
   vtkF3DGenericImporter::ColoringInfo info;
@@ -871,7 +905,11 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 {
-  assert(this->Importer != nullptr);
+  if (!this->Importer)
+  {
+    this->Superclass::FillCheatSheetHotkeys(cheatSheetText);
+    return;
+  }
 
   vtkF3DGenericImporter::ColoringInfo info;
   bool hasColoring =
@@ -904,7 +942,7 @@ void vtkF3DRendererWithColoring::CycleFieldForColoring()
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::CycleArrayIndexForColoring()
 {
-  assert(this->Importer != nullptr);
+  assert(this->Importer);
 
   int nIndex = this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring);
   if (nIndex <= 0)
@@ -927,7 +965,7 @@ void vtkF3DRendererWithColoring::CycleArrayIndexForColoring()
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::CycleComponentForColoring()
 {
-  assert(this->Importer != nullptr);
+  assert(this->Importer);
 
   vtkF3DGenericImporter::ColoringInfo info;
   if (!this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
@@ -943,7 +981,10 @@ void vtkF3DRendererWithColoring::CycleComponentForColoring()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
 {
-  assert(this->Importer != nullptr);
+  if (!this->Importer)
+  {
+    return "";
+  }
 
   // XXX Padding should not be handled by manipulating string
   // but on the actor directly, but it is not supported by VTK yet.
@@ -953,7 +994,7 @@ std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
   size_t index = 0;
   while (true)
   {
-    index = description.find("\n", index);
+    index = description.find('\n', index);
     if (index == std::string::npos)
     {
       break;
@@ -970,7 +1011,7 @@ std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
 //----------------------------------------------------------------------------
 std::string vtkF3DRendererWithColoring::ComponentToString(int component)
 {
-  assert(this->Importer != nullptr);
+  assert(this->Importer);
 
   if (component == -2)
   {

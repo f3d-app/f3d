@@ -1,9 +1,12 @@
 #include "options.h"
 
+#include "init.h"
 #include "log.h"
+#include "utils.h"
 
 #include "vtkF3DConfigure.h"
 
+#include <limits>
 #include <map>
 #include <type_traits>
 #include <variant>
@@ -106,8 +109,13 @@ public:
 options::options()
   : Internals(new options::internals)
 {
+  detail::init::initialize();
+
   // Scene
   this->Internals->init("scene.animation.index", 0);
+  this->Internals->init("scene.animation.speed-factor", 1.0);
+  this->Internals->init("scene.animation.time", 0.0);
+  this->Internals->init("scene.animation.frame-rate", 60.0);
   this->Internals->init("scene.camera.index", -1);
   this->Internals->init("scene.up-direction", std::string("+Y"));
 
@@ -116,6 +124,7 @@ options::options()
   this->Internals->init("render.line-width", 1.0);
   this->Internals->init("render.point-size", 10.0);
   this->Internals->init("render.grid.enable", false);
+  this->Internals->init("render.grid.absolute", false);
   this->Internals->init("render.grid.unit", 0.0);
   this->Internals->init("render.grid.subdivisions", 10);
 
@@ -141,11 +150,15 @@ options::options()
   this->Internals->init("ui.filename-info", std::string());
   this->Internals->init("ui.fps", false);
   this->Internals->init("ui.cheatsheet", false);
+  this->Internals->init("ui.dropzone", false);
+  this->Internals->init("ui.dropzone-info", std::string());
   this->Internals->init("ui.metadata", false);
   this->Internals->init("ui.font-file", std::string());
   this->Internals->init("ui.loader-progress", false);
 
   // Model
+  this->Internals->init("model.matcap.texture", std::string());
+
   this->Internals->init("model.color.opacity", 1.0);
   // XXX: Not compatible with scivis: https://github.com/f3d-app/f3d/issues/347
   this->Internals->init("model.color.rgb", std::vector<double>{ 1., 1., 1. });
@@ -178,6 +191,7 @@ options::options()
   // Interactor
   this->Internals->init("interactor.axis", false);
   this->Internals->init("interactor.trackball", false);
+  this->Internals->init("interactor.invert-zoom", false);
 };
 
 //----------------------------------------------------------------------------
@@ -432,11 +446,34 @@ options& options::copy(const options& from, const std::string& name)
 std::vector<std::string> options::getNames()
 {
   std::vector<std::string> names;
-  for (const auto& [name, _] : this->Internals->Options)
+  names.reserve(this->Internals->Options.size());
+  for (const auto& [name, value] : this->Internals->Options)
   {
     names.emplace_back(name);
   }
   return names;
+}
+
+//----------------------------------------------------------------------------
+std::pair<std::string, unsigned int> options::getClosestOption(const std::string& option) const
+{
+  if (this->Internals->Options.find(option) != this->Internals->Options.end())
+  {
+    return { option, 0 };
+  }
+
+  std::pair<std::string, int> ret = { "", std::numeric_limits<int>::max() };
+
+  for (const auto& [name, value] : this->Internals->Options)
+  {
+    int distance = utils::textDistance(name, option);
+    if (distance < ret.second)
+    {
+      ret = { name, distance };
+    }
+  }
+
+  return ret;
 }
 
 //----------------------------------------------------------------------------

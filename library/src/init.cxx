@@ -2,21 +2,35 @@
 
 #include "log.h"
 
+#include "vtkF3DConfigure.h"
 #include "vtkF3DObjectFactory.h"
 
+#if F3D_MODULE_EXR
+#include "vtkF3DEXRReader.h"
+#endif
+
+#include <vtkImageReader2Factory.h>
 #include <vtkLogger.h>
 #include <vtkNew.h>
 #include <vtkVersion.h>
 
+#include <memory>
+
 namespace f3d::detail
 {
-class init::internals
+
+//----------------------------------------------------------------------------
+void init::initialize()
 {
-};
+  static std::unique_ptr<init> instance;
+  if (!instance)
+  {
+    instance = std::make_unique<init>();
+  }
+}
 
 //----------------------------------------------------------------------------
 init::init()
-  : Internals(std::make_unique<init::internals>())
 {
 #if NDEBUG
   vtkObject::GlobalWarningDisplayOff();
@@ -39,9 +53,10 @@ init::init()
   vtkObjectFactory::SetAllEnableFlags(
     0, "vtkRenderWindowInteractor", "vtkGenericRenderWindowInteractor");
 #endif
+
+#if F3D_MODULE_EXR
+  vtkNew<vtkF3DEXRReader> reader;
+  vtkImageReader2Factory::RegisterReader(reader);
+#endif
 }
-
-//----------------------------------------------------------------------------
-init::~init() = default;
-
 }

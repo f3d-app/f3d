@@ -40,9 +40,12 @@ public:
   using vtkOpenGLPolyDataMapper::GetBounds;
   double* GetBounds() override;
 
+  vtkF3DOpenGLGridMapper(const vtkF3DOpenGLGridMapper&) = delete;
+  void operator=(const vtkF3DOpenGLGridMapper&) = delete;
+
 protected:
   vtkF3DOpenGLGridMapper();
-  ~vtkF3DOpenGLGridMapper() = default;
+  ~vtkF3DOpenGLGridMapper() override = default;
 
   void ReplaceShaderValues(
     std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
@@ -60,10 +63,6 @@ protected:
   double UnitSquare = 1.0;
   int Subdivisions = 10;
   int UpIndex = 1;
-
-private:
-  vtkF3DOpenGLGridMapper(const vtkF3DOpenGLGridMapper&) = delete;
-  void operator=(const vtkF3DOpenGLGridMapper&) = delete;
 };
 
 #endif

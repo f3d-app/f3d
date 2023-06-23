@@ -5,11 +5,12 @@
   },
   ".*(3ds|stl)":
   {
-    "up": "+Z"
+    "up": "+Z",
+    "camera-direction": "-1,1,-1"
   },
-  ".*(tif|tiff)":
+  ".*(ply)":
   {
-    "up": "-Y",
-    "comp": "-2"
+    "comp": "-2",
+    "translucency-support": true
   }
 }

@@ -243,7 +243,8 @@ public:
         }
         else if (keySym == "Space")
         {
-          self->AnimationManager.ToggleAnimation();
+          assert(self->AnimationManager);
+          self->AnimationManager->ToggleAnimation();
         }
         break;
     }
@@ -266,9 +267,22 @@ public:
     internals* self = static_cast<internals*>(clientData);
     vtkStringArray* filesArr = static_cast<vtkStringArray*>(callData);
     std::vector<std::string> filesVec;
+    filesVec.resize(filesArr->GetNumberOfTuples());
     for (int i = 0; i < filesArr->GetNumberOfTuples(); i++)
     {
-      filesVec.push_back(filesArr->GetValue(i));
+      filesVec[i] = filesArr->GetValue(i);
+    }
+
+    vtkRenderWindowInteractor* rwi = self->Style->GetInteractor();
+    if (rwi->GetControlKey() == 1)
+    {
+      // When Ctrl Key is pressed, load the first file as an HDRI instead
+      // of loading a file.
+      // This bypass the DropFilesUserCallBack logic and will be reworked
+      // once https://github.com/f3d-app/f3d/issues/443 is addressed.
+      self->Options.set("render.background.hdri", filesVec[0]);
+      self->Window.render();
+      return;
     }
 
     if (self->DropFilesUserCallBack(filesVec))
@@ -279,7 +293,8 @@ public:
     // No user defined behavior, load the first file
     if (filesVec.size() > 0)
     {
-      self->AnimationManager.StopAnimation();
+      assert(self->AnimationManager);
+      self->AnimationManager->StopAnimation();
       if (self->Loader.hasSceneReader(filesVec[0]))
       {
         self->Loader.loadScene(filesVec[0]);
@@ -389,12 +404,15 @@ public:
     self->Style->OnMiddleButtonUp();
   }
 
-  std::function<bool(int, std::string)> KeyPressUserCallBack = [](int, std::string)
+  std::function<bool(int, const std::string&)> KeyPressUserCallBack = [](int, const std::string&)
   { return false; };
-  std::function<bool(std::vector<std::string>)> DropFilesUserCallBack = [](std::vector<std::string>)
-  { return false; };
+  std::function<bool(const std::vector<std::string>&)> DropFilesUserCallBack =
+    [](const std::vector<std::string>&) { return false; };
 
-  void StartInteractor() { this->VTKInteractor->Start(); }
+  void StartInteractor()
+  {
+    this->VTKInteractor->Start();
+  }
 
   void StopInteractor()
   {
@@ -405,7 +423,7 @@ public:
   options& Options;
   window_impl& Window;
   loader_impl& Loader;
-  animationManager AnimationManager;
+  animationManager* AnimationManager;
 
   vtkNew<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
@@ -427,8 +445,8 @@ public:
 interactor_impl::interactor_impl(options& options, window_impl& window, loader_impl& loader)
   : Internals(std::make_unique<interactor_impl::internals>(options, window, loader))
 {
-  // Loader need the interactor
-  this->Internals->Loader.setInteractor(this);
+  // Loader need the interactor, loader will set the AnimationManager on the interactor
+  this->Internals->Loader.SetInteractor(this);
 }
 
 //----------------------------------------------------------------------------
@@ -482,25 +500,29 @@ unsigned long interactor_impl::createTimerCallBack(double time, std::function<vo
 //----------------------------------------------------------------------------
 void interactor_impl::toggleAnimation()
 {
-  this->Internals->AnimationManager.ToggleAnimation();
+  assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->ToggleAnimation();
 }
 
 //----------------------------------------------------------------------------
 void interactor_impl::startAnimation()
 {
-  this->Internals->AnimationManager.StartAnimation();
+  assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->StartAnimation();
 }
 
 //----------------------------------------------------------------------------
 void interactor_impl::stopAnimation()
 {
-  this->Internals->AnimationManager.StopAnimation();
+  assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->StopAnimation();
 }
 
 //----------------------------------------------------------------------------
 bool interactor_impl::isPlayingAnimation()
 {
-  return this->Internals->AnimationManager.IsPlaying();
+  assert(this->Internals->AnimationManager);
+  return this->Internals->AnimationManager->IsPlaying();
 }
 
 //----------------------------------------------------------------------------
@@ -594,16 +616,14 @@ void interactor_impl::stop()
 }
 
 //----------------------------------------------------------------------------
+void interactor_impl::SetAnimationManager(animationManager* manager)
+{
+  this->Internals->AnimationManager = manager;
+}
+//----------------------------------------------------------------------------
 void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 {
   observer->SetInteractor(this->Internals->VTKInteractor);
-}
-
-//----------------------------------------------------------------------------
-void interactor_impl::InitializeAnimation(vtkImporter* importer)
-{
-  this->Internals->AnimationManager.Initialize(
-    &this->Internals->Options, this, &this->Internals->Window, importer);
 }
 
 //----------------------------------------------------------------------------

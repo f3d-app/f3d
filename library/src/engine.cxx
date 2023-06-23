@@ -1,7 +1,7 @@
 #include "engine.h"
 
 #include "config.h"
-#include "init.h" // This includes is needed on mac so that the global variable is created
+#include "init.h"
 #include "interactor_impl.h"
 #include "loader_impl.h"
 #include "log.h"
@@ -19,7 +19,7 @@
 #include <vtksys/Encoding.hxx>
 #include <vtksys/SystemTools.hxx>
 
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 namespace f3d
 {
@@ -36,6 +36,9 @@ public:
 engine::engine(window::Type windowType)
   : Internals(new engine::internals)
 {
+  // Ensure all lib initialization is done (once)
+  detail::init::initialize();
+
   // build default cache path
 #if defined(_WIN32)
   std::string cachePath = vtksys::SystemTools::GetEnv("LOCALAPPDATA");
@@ -175,9 +178,10 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<std::st
       libName += vtksys::DynamicLoader::LibExtension();
 
       // try search paths
-      for (const std::string& path : searchPaths)
+      for (std::string tryPath : searchPaths)
       {
-        std::string tryPath = path + '/' + libName;
+        tryPath += '/';
+        tryPath += libName;
         tryPath = vtksys::SystemTools::ConvertToOutputPath(tryPath);
         if (vtksys::SystemTools::FileExists(tryPath))
         {
@@ -262,7 +266,7 @@ std::vector<std::string> engine::getPluginsList(const std::string& pluginPath)
         }
         catch (const nlohmann::json::parse_error& ex)
         {
-          f3d::log::warn(fullPath, " is not a valid JSON file: ", ex.what());
+          log::warn(fullPath, " is not a valid JSON file: ", ex.what());
         }
       }
     }
@@ -276,6 +280,7 @@ engine::libInformation engine::getLibInfo()
 {
   libInformation libInfo;
   libInfo.Version = detail::LibVersion;
+  libInfo.VersionFull = detail::LibVersionFull;
   libInfo.BuildDate = detail::LibBuildDate;
   libInfo.BuildSystem = detail::LibBuildSystem;
   libInfo.Compiler = detail::LibCompiler;
@@ -296,8 +301,30 @@ engine::libInformation engine::getLibInfo()
 #endif
   libInfo.ExternalRenderingModule = tmp;
 
-  libInfo.VTKVersion = std::string(VTK_VERSION) + std::string(" (build ") +
-    std::to_string(VTK_BUILD_VERSION) + std::string(")");
+#if F3D_MODULE_EXR
+  tmp = "ON";
+#else
+  tmp = "OFF";
+#endif
+  libInfo.OpenEXRModule = tmp;
+
+  // First version of VTK including the version check (and the feature used)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
+  std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
+  if (!vtkVersion.empty())
+  {
+    libInfo.VTKVersion = vtkVersion;
+    std::string date = std::to_string(vtkVersion::GetVTKBuildVersion());
+    if (date.size() == 8)
+    {
+      libInfo.VTKVersion += std::string(" (date: ") + date + ")";
+    }
+  }
+  else
+#endif
+  {
+    libInfo.VTKVersion = vtkVersion::GetVTKVersion();
+  }
 
   libInfo.PreviousCopyright = "Copyright (C) 2019-2021 Kitware SAS";
   libInfo.Copyright = "Copyright (C) 2021-2023 Michael Migliore, Mathieu Westphal";

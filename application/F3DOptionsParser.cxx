@@ -6,12 +6,13 @@
 #include "F3DSystemTools.h"
 
 #include "cxxopts.hpp"
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 
 #include "engine.h"
 #include "interactor.h"
 #include "log.h"
 #include "options.h"
+#include "utils.h"
 
 #include <filesystem>
 #include <fstream>
@@ -37,7 +38,7 @@ public:
 
   void GetOptions(F3DAppOptions& appOptions, f3d::options& options,
     std::vector<std::string>& inputs, std::string filePathForConfigBlock = "",
-    bool parseCommandLine = true);
+    bool allOptionsInitialized = false, bool parseCommandLine = true);
   bool InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
   void LoadPlugins(const F3DAppOptions& appOptions) const;
   std::vector<std::string> GetPluginSearchPaths() const;
@@ -77,7 +78,7 @@ protected:
     {
       for (auto const& it : this->ConfigDic)
       {
-        std::regex re(it.first);
+        std::regex re(it.first, std::regex_constants::icase);
         std::smatch matches;
         if (std::regex_match(this->FilePathForConfigBlock, matches, re))
         {
@@ -130,8 +131,9 @@ protected:
   }
 
   void DeclareOption(cxxopts::OptionAdder& group, const std::string& longName,
-    const std::string& shortName, const std::string& doc) const
+    const std::string& shortName, const std::string& doc)
   {
+    this->AllLongOptions.push_back(longName);
     group(this->CollapseName(longName, shortName), doc);
   }
 
@@ -139,8 +141,7 @@ protected:
   void DeclareOption(cxxopts::OptionAdder& group, const std::string& longName,
     const std::string& shortName, const std::string& doc, T& var, HasDefault hasDefault,
     MayHaveConfig mayHaveConfig, const std::string& argHelp = "",
-    HasImplicitValue hasImplicitValue = HasImplicitValue::NO,
-    const std::string& implicitValue = "") const
+    HasImplicitValue hasImplicitValue = HasImplicitValue::NO, const std::string& implicitValue = "")
   {
     bool hasDefaultBool = hasDefault == HasDefault::YES;
     auto val = cxxopts::value<T>(var);
@@ -166,15 +167,32 @@ protected:
       val = val->default_value(defaultVal);
     }
     var = {};
+    this->AllLongOptions.push_back(longName);
     group(this->CollapseName(longName, shortName), doc, val, argHelp);
   }
 
   void PrintHelpPair(
     const std::string& key, const std::string& help, int keyWidth = 10, int helpWidth = 70);
-  void PrintHelp(cxxopts::Options& cxxOptions);
+  void PrintHelp(const cxxopts::Options& cxxOptions);
   void PrintVersion();
   void PrintReadersList();
   void PrintPluginsScan();
+
+  std::pair<std::string, int> GetClosestOption(const std::string& option)
+  {
+    std::pair<std::string, int> ret = { "", std::numeric_limits<int>::max() };
+
+    for (const std::string& name : this->AllLongOptions)
+    {
+      int distance = f3d::utils::textDistance(name, option);
+      if (distance < ret.second)
+      {
+        ret = { name, distance };
+      }
+    }
+
+    return ret;
+  }
 
 private:
   int Argc;
@@ -187,6 +205,7 @@ private:
   DictionaryEntry GlobalConfigDicEntry;
   Dictionary ConfigDic;
   std::string ExecutableName;
+  std::vector<std::string> AllLongOptions;
 };
 
 //----------------------------------------------------------------------------
@@ -200,7 +219,7 @@ std::vector<std::string> ConfigurationOptions::GetPluginSearchPaths() const
   // Add a executable related path
   auto tmpPath = F3DSystemTools::GetApplicationPath();
   tmpPath = tmpPath.parent_path().parent_path();
-  tmpPath /= "lib";
+  tmpPath /= F3D::PluginsInstallDir;
   searchPaths.push_back(tmpPath.string());
   return searchPaths;
 #endif
@@ -251,13 +270,15 @@ void ConfigurationOptions::PrintPluginsScan()
 
 //----------------------------------------------------------------------------
 void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& options,
-  std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool parseCommandLine)
+  std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool allOptionsInitialized,
+  bool parseCommandLine)
 {
-  this->FilePathForConfigBlock = filePathForConfigBlock;
+  this->FilePathForConfigBlock = std::move(filePathForConfigBlock);
 
-  // When not parsing the command line, provided options are expected to be already initialized,
-  // which means they have a "default" in the cxxopts sense.
-  HasDefault LocalHasDefaultNo = parseCommandLine ? HasDefault::NO : HasDefault::YES;
+  // When parsing multiple times, hasDefault should be forced to yes after the first pass as all
+  // options are expected to be already initialized, which means they have a "default" in the
+  // cxxopts sense.
+  HasDefault LocalHasDefaultNo = allOptionsInitialized ? HasDefault::YES : HasDefault::NO;
 
   try
   {
@@ -266,7 +287,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
     // clang-format off
     auto grp0 = cxxOptions.add_options("Applicative");
-    this->DeclareOption(grp0, "input", "", "Input file", inputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
+    this->DeclareOption(grp0, "input", "", "Input files", inputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
     this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
     this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "help", "h", "Print help");
@@ -288,12 +309,17 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp1, "up", "", "Up direction", options.getAsStringRef("scene.up-direction"), HasDefault::YES, MayHaveConfig::YES, "{-X, +X, -Y, +Y, -Z, +Z}");
     this->DeclareOption(grp1, "axis", "x", "Show axes", options.getAsBoolRef("interactor.axis"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "grid", "g", "Show grid", options.getAsBoolRef("render.grid.enable"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "grid-absolute", "", "Position grid at the absolute origin instead of below the model", options.getAsBoolRef("render.grid.absolute"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "grid-unit", "", "Size of grid unit square", options.getAsDoubleRef("render.grid.unit"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "grid-subdivisions", "", "Number of grid subdivisions", options.getAsIntRef("render.grid.subdivisions"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.getAsBoolRef("render.show-edges"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", options.getAsIntRef("scene.camera.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
     this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", options.getAsBoolRef("interactor.trackball"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "invert-zoom", "", "Invert zoom direction with right mouse click", options.getAsBoolRef("interactor.invert-zoom"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.getAsIntRef("scene.animation.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
+    this->DeclareOption(grp1, "animation-speed-factor", "", "Set animation speed factor", options.getAsDoubleRef("scene.animation.speed-factor"), HasDefault::YES, MayHaveConfig::YES, "<factor>");
+    this->DeclareOption(grp1, "animation-time", "", "Set animation time to load", options.getAsDoubleRef("scene.animation.time"), HasDefault::YES, MayHaveConfig::YES, "<time>");
+    this->DeclareOption(grp1, "animation-frame-rate", "", "Set animation frame rate when playing animation interactively", options.getAsDoubleRef("scene.animation.frame-rate"), HasDefault::YES, MayHaveConfig::YES, "<frame rate>");
     this->DeclareOption(grp1, "font-file", "", "Path to a FreeType compatible font file", options.getAsStringRef("ui.font-file"), LocalHasDefaultNo, MayHaveConfig::NO, "<file_path>");
 
     auto grp2 = cxxOptions.add_options("Material");
@@ -305,6 +331,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.roughness"), HasDefault::YES, MayHaveConfig::YES, "<roughness>");
     this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.metallic"), HasDefault::YES, MayHaveConfig::YES, "<metallic>");
     this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.getAsStringRef("render.background.hdri"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "texture-matcap", "", "Path to a texture file containing a material capture", options.getAsStringRef("model.matcap.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.getAsStringRef("model.color.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.getAsStringRef("model.material.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emitted light of the object", options.getAsStringRef("model.emissive.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
@@ -334,12 +361,14 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.getAsBoolRef("model.volume.inverse"), HasDefault::YES, MayHaveConfig::YES);
 
     auto grpCamera = cxxOptions.add_options("Camera");
-    this->DeclareOption(grpCamera, "camera-position", "", "Camera position", appOptions.CameraPosition, HasDefault::YES, MayHaveConfig::YES, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-position", "", "Camera position (overrides camera direction and camera zoom factor if any)", appOptions.CameraPosition, HasDefault::YES, MayHaveConfig::YES, "<X,Y,Z>");
     this->DeclareOption(grpCamera, "camera-focal-point", "", "Camera focal point", appOptions.CameraFocalPoint, HasDefault::YES, MayHaveConfig::YES, "<X,Y,Z>");
     this->DeclareOption(grpCamera, "camera-view-up", "", "Camera view up", appOptions.CameraViewUp, HasDefault::YES, MayHaveConfig::YES, "<X,Y,Z>");
     this->DeclareOption(grpCamera, "camera-view-angle", "", "Camera view angle (non-zero, in degrees)", appOptions.CameraViewAngle, LocalHasDefaultNo, MayHaveConfig::YES, "<angle>");
-    this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees)", appOptions.CameraAzimuthAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
-    this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees)", appOptions.CameraElevationAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
+    this->DeclareOption(grpCamera, "camera-direction", "", "Camera direction", appOptions.CameraDirection, HasDefault::YES, MayHaveConfig::YES, "<X,Y,Z>");
+    this->DeclareOption(grpCamera, "camera-zoom-factor", "", "Camera zoom factor (non-zero)", appOptions.CameraZoomFactor, HasDefault::YES, MayHaveConfig::YES, "<factor>");
+    this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees), performed after other camera options", appOptions.CameraAzimuthAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
+    this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees), performed after other camera options", appOptions.CameraElevationAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
 
 #if F3D_MODULE_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
@@ -361,11 +390,45 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", appOptions.InteractionTestPlayFile, LocalHasDefaultNo, MayHaveConfig::YES,"<file_path>");
     // clang-format on
 
+    cxxOptions.positional_help("file1 file2 ...");
     cxxOptions.parse_positional({ "input" });
+    cxxOptions.show_positional_help();
+    cxxOptions.allow_unrecognised_options();
 
     if (parseCommandLine)
     {
       auto result = cxxOptions.parse(this->Argc, this->Argv);
+
+      auto unmatched = result.unmatched();
+
+      if (unmatched.size() > 0)
+      {
+        for (std::string unknownOption : unmatched)
+        {
+          f3d::log::error("Unknown option '", unknownOption, "'");
+
+          // check if it's a long option
+          if (unknownOption.substr(0, 2) == "--")
+          {
+            // remove trailing '--'
+            unknownOption = unknownOption.substr(2);
+
+            auto it = std::find_if(unknownOption.rbegin(), unknownOption.rend(),
+              [](unsigned char ch) { return ch == '='; });
+
+            // remove everything after the character '='
+            if (it != unknownOption.rend())
+            {
+              unknownOption.erase(it.base() - 1, unknownOption.end());
+            }
+
+            auto [name, dist] = this->GetClosestOption(unknownOption);
+
+            f3d::log::error("Did you mean '--", name, "'?");
+          }
+        }
+        throw F3DExNoProcess("unknown options");
+      }
 
       if (result.count("help") > 0)
       {
@@ -398,7 +461,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
       cxxOptions.parse(1, nullptr);
     }
   }
-  catch (const cxxopts::OptionException& ex)
+  catch (const cxxopts::exceptions::exception& ex)
   {
     f3d::log::error("Error parsing options: ", ex.what());
     throw;
@@ -415,7 +478,7 @@ void ConfigurationOptions::PrintHelpPair(
 }
 
 //----------------------------------------------------------------------------
-void ConfigurationOptions::PrintHelp(cxxopts::Options& cxxOptions)
+void ConfigurationOptions::PrintHelp(const cxxopts::Options& cxxOptions)
 {
   const std::vector<std::pair<std::string, std::string> > examples = {
     { this->ExecutableName + " file.vtu -xtgans",
@@ -452,7 +515,7 @@ void ConfigurationOptions::PrintVersion()
   f3d::log::info(F3D::AppName + " " + F3D::AppVersion + "\n");
   f3d::log::info(F3D::AppTitle);
   auto libInfo = f3d::engine::getLibInfo();
-  f3d::log::info("Version: " + libInfo.Version + ".");
+  f3d::log::info("Version: " + libInfo.VersionFull + ".");
   f3d::log::info("Build date: " + libInfo.BuildDate + ".");
   f3d::log::info("Build system: " + libInfo.BuildSystem + ".");
   f3d::log::info("Compiler: " + libInfo.Compiler + ".");
@@ -679,7 +742,7 @@ F3DOptionsParser::~F3DOptionsParser() = default;
 //----------------------------------------------------------------------------
 void F3DOptionsParser::Initialize(int argc, char** argv)
 {
-  this->ConfigOptions = std::unique_ptr<ConfigurationOptions>(new ConfigurationOptions(argc, argv));
+  this->ConfigOptions = std::make_unique<ConfigurationOptions>(argc, argv);
 }
 
 //----------------------------------------------------------------------------
@@ -694,7 +757,7 @@ void F3DOptionsParser::UpdateOptions(const std::string& filePath, F3DAppOptions&
 {
   std::vector<std::string> dummyFiles;
   return this->ConfigOptions->GetOptions(
-    appOptions, options, dummyFiles, filePath, parseCommandLine);
+    appOptions, options, dummyFiles, filePath, true, parseCommandLine);
 }
 
 //----------------------------------------------------------------------------

@@ -9,6 +9,7 @@
 #include "loader.h"
 #include "options.h"
 #include "types.h"
+#include "utils.h"
 #include "window.h"
 
 namespace py = pybind11;
@@ -77,7 +78,11 @@ PYBIND11_MODULE(f3d, module)
     .def("toggle", &f3d::options::toggle)
     .def("isSame", &f3d::options::isSame)
     .def("copy", &f3d::options::copy)
-    .def("getNames", &f3d::options::getNames);
+    .def("getNames", &f3d::options::getNames)
+    .def("getClosestOption", &f3d::options::getClosestOption);
+
+  // f3d::utils
+  py::class_<f3d::utils>(module, "utils").def_static("textDistance", &f3d::utils::textDistance);
 
   // f3d::interactor
   py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete> >(module, "interactor")
@@ -113,6 +118,7 @@ PYBIND11_MODULE(f3d, module)
 
   // f3d::camera
   py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "camera");
+  py::class_<f3d::camera_state_t>(module, "camera_state_t");
 
   camera.def("setPosition", &f3d::camera::setPosition)
     .def("getPosition", py::overload_cast<>(&f3d::camera::getPosition))
@@ -132,9 +138,12 @@ PYBIND11_MODULE(f3d, module)
     .def("yaw", &f3d::camera::yaw)
     .def("elevation", &f3d::camera::elevation)
     .def("pitch", &f3d::camera::pitch)
+    .def("setState", &f3d::camera::setState)
+    .def("getState", py::overload_cast<>(&f3d::camera::getState))
+    .def("getState", py::overload_cast<f3d::camera_state_t&>(&f3d::camera::getState))
     .def("setCurrentAsDefault", &f3d::camera::setCurrentAsDefault)
     .def("resetToDefault", &f3d::camera::resetToDefault)
-    .def("resetToBounds", &f3d::camera::resetToBounds);
+    .def("resetToBounds", &f3d::camera::resetToBounds, py::arg("zoomFactor") = 0.9);
 
   // f3d::window
   py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> > window(module, "window");

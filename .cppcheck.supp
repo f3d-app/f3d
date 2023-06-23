@@ -1,0 +1,18 @@
+// remove some checks
+missingInclude
+unusedFunction
+
+// external libraries
+*:external/nlohmann_json/nlohmann/json.hpp
+*:external/cxxopts/cxxopts.hpp
+
+// opencascade
+*:*opencascade/*.hxx
+
+// specific checks
+knownConditionTrueFalse:library/testing/TestSDKImage.cxx
+noExplicitConstructor:library/public/types.h
+preprocessorErrorDirective:library/src/engine.cxx
+preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx
+unknownMacro:library/VTKExtensions/Applicative/vtkF3DObjectFactory.cxx
+unusedVariable:*factory.cxx*

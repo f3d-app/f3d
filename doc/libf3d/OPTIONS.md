@@ -17,7 +17,9 @@ See the exhaustive list below, but note that this may change in the future.
 
 Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
-scene.animation.index|int<br>0<br>load|Select the animation to load.<br>Any negative value means all animations.<br>The default scene always has at most one animation.|\-\-animation-index
+scene.animation.index|int<br>0<br>load|Select the animation to load.<br>Any negative value means all animations (glTF only).<br>The default scene always has at most one animation.|\-\-animation-index
+scene.animation.speed-factor|double<br>1<br>render|Set the animation speed factor to slow, speed up or even invert animation.|\-\-animation-speed-factor
+scene.animation.frame-rate|double<br>60<br>render|Set the animation frame rate used to play the animation interactively.|\-\-animation-frame-rate
 scene.camera.index|int<br>-1<br>load|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.|\-\-camera-index
 scene.up-direction|string<br>+Y<br>load|Define the Up direction|\-\-up
 
@@ -32,6 +34,7 @@ interactor.trackball|bool<br>false<br>render|Enable trackball interaction.|\-\-t
 
 Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
+model.matcap.texture|string<br>-<br>render|Path to a texture file containing a material capture. All other model options for surfaces are ignored if this is set.|\-\-texture-matcap
 model.color.opacity|double<br>1.0<br>render|Set *opacity* on the geometry. Usually used with Depth Peeling option. Multiplied with the `model.color.texture` when present.|\-\-opacity
 model.color.rgb|vector\<double\><br>1.0,1.0,1.0<br>render|Set a *color* on the geometry. Multiplied with the `model.color.texture` when present.|\-\-color
 model.color.texture|string<br>-<br>render|Path to a texture file that sets the color of the object. Will be multiplied with rgb and opacity.|\-\-texture-base-color
@@ -41,7 +44,7 @@ model.material.metallic|double<br>0.0<br>render|Set the *metallic coefficient* o
 model.material.roughness|double<br>0.3<br>render|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the `model.material.texture` when present.|\-\-roughness
 model.material.texture|string<br>-<br>render|Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object. Multiplied with the `model.material.roughness` and `model.material.metallic`, set both of them to 1.0 to get a true result.|\-\-texture-material
 model.normal.scale|double<br>1.0<br>render|Normal scale affects the strength of the normal deviation from the normal texture.|\-\-normal-scale
-model.normal.texture|string<br>-<br>render|Path to a texture file that sets the normal map of the object.|\-\-texrture-normal
+model.normal.texture|string<br>-<br>render|Path to a texture file that sets the normal map of the object.|\-\-texture-normal
 model.scivis.cells|bool<br>false<br>render|Color the data with value found *on the cells* instead of points|\-\-cells
 model.scivis.colormap|vector\<double\><br>\<inferno\><br>render|Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).|\-\-colormap
 model.scivis.component|int<br>-1<br>render|Specify the component to color with. -1 means *magnitude*. -2 means *direct values*.|\-\-comp
@@ -63,13 +66,14 @@ render.line-width|double<br>1.0<br>render|Set the *width* of lines when showing 
 render.show-edges|bool<br>false<br>render|Show the *cell edges*|\-\-edges
 render.point-size|double<br>10.0<br>render|Set the *size* of points when showing vertices and point sprites.|\-\-point-size
 render.grid.enable|bool<br>false<br>render|Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.|\-\-grid
+render.grid.absolute|bool<br>false<br>render|Position the grid at the *absolute origin* of the model's coordinate system instead of below the model.|\-\-grid
 render.grid.unit|double<br>0<br>render|Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.|\-\-grid\-unit
 render.grid.subdivisions|int<br>10<br>render|Set the number of subdivisions for the grid.|\-\-grid\-subdivisions
 render.raytracing.enable|bool<br>false<br>render|Enable *raytracing*. Requires the raytracing module to be enabled.|\-\-raytracing
 render.raytracing.samples|int<br>5<br>render|The number of *samples per pixel*.|\-\-samples
 render.raytracing.denoise|bool<br>false<br>render|*Denoise* the raytracing rendering.|\-\-denoise
 render.background.color|vector\<double\><br>0.2,0.2,0.2<br>render|Set the window *background color*.<br>Ignored if *hdri* is set.|\-\-bg-color
-render.background.hdri|string<br>-<br>render|Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, png, jpg, pnm, tiff, bmp. Override the color.|\-\-hdri
+render.background.hdri|string<br>-<br>render|Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp. Override the color.|\-\-hdri
 render.background.blur|bool<br>false<br>render|Blur background when using a HDRI.|\-\-blur-background
 render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-background-coc
 
@@ -85,3 +89,5 @@ ui.font-file|string<br>-<br>render|Use the provided FreeType compatible font fil
 ui.fps|bool<br>false<br>render|Display a *frame per second counter*.|\-\-fps
 ui.loader-progress|bool<br>false<br>load|Show a *progress bar* when loading the file.|\-\-progress
 ui.metadata|bool<br>false<br>render|Display the *metadata*.|\-\-metadata
+ui.dropzone|bool<br>false<br>render|Show a drop zone.
+ui.dropzone-info|string<br>-<br>render|Content of the drop zone text to display.

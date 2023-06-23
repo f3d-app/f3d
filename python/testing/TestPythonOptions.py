@@ -13,6 +13,10 @@ assert engine.getOptions().getAsInt("render.raytracing.samples") == 5
 assert engine.getOptions().getAsDoubleVector("model.color.rgb") == [ 1., 1., 1.]
 assert engine.getOptions().getAsString("scene.up-direction") == "+Y"
 
+closest = engine.getOptions().getClosestOption("scene-direction")
+assert closest[0] == "scene.up-direction"
+assert closest[1] == 3
+
 options = f3d.options()
 options.set("interactor.axis", True)
 options.set("model.material.roughness", 0.7)

@@ -9,7 +9,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/occt_install
-        key: occt-V7_6_3-${{runner.os}}-0
+        key: occt-V7_6_3-${{runner.os}}-3
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -40,7 +40,7 @@ runs:
       shell: bash
       run: >
         cmake ../occt
-        -DBUILD_ADDITIONAL_TOOLKITS="TKSTEP;TKIGES;TKMesh"
+        -DBUILD_ADDITIONAL_TOOLKITS="TKSTEP;TKIGES;TKMesh;TKXDESTEP;TKXDEIGES"
         -DBUILD_DOC_Overview=OFF
         -DBUILD_LIBRARY_TYPE=Shared
         -DBUILD_MODULE_ApplicationFramework=OFF
@@ -53,6 +53,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../occt_install
         -DINSTALL_DIR_BIN:PATH=bin
+        -DUSE_FREETYPE=OFF
         ${{ runner.os == 'macOS' && '-DINSTALL_NAME_DIR:STRING=@rpath -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
@@ -61,22 +62,6 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/occt_build
       shell: bash
       run: cmake --build . --parallel 2 --target install --config Release
-
-    - name: Patch OCCT install macos
-      if: |
-        steps.cache-occt.outputs.cache-hit != 'true' &&
-        runner.os == 'macOS'
-      working-directory: ${{github.workspace}}/dependencies
-      shell: bash
-      run: sed -i '' 's/OpenCASCADE_LIBRARIES [A-Za-z0-9;]\+/OpenCASCADE_LIBRARIES TKSTEP;TKSTEPAttr;TKSTEP209;TKSTEPBase;TKIGES;TKBool;TKMesh;TKXSBase;TKBO;TKPrim;TKShHealing;TKTopAlgo;TKBRep;TKGeomAlgo;TKGeomBase;TKG3d;TKG2d;TKMath;TKernel/' occt_install/lib/cmake/opencascade/OpenCASCADEConfig.cmake
-
-    - name: Patch OCCT install ubuntu
-      if: |
-        steps.cache-occt.outputs.cache-hit != 'true' &&
-        runner.os == 'Linux'
-      working-directory: ${{github.workspace}}/dependencies
-      shell: bash
-      run: sed -i 's/OpenCASCADE_LIBRARIES [A-Za-z0-9;]\+/OpenCASCADE_LIBRARIES TKSTEP;TKSTEPAttr;TKSTEP209;TKSTEPBase;TKIGES;TKBool;TKMesh;TKXSBase;TKBO;TKPrim;TKShHealing;TKTopAlgo;TKBRep;TKGeomAlgo;TKGeomBase;TKG3d;TKG2d;TKMath;TKernel/' occt_install/lib/cmake/opencascade/OpenCASCADEConfig.cmake
 
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/occt_install

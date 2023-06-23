@@ -1,0 +1,50 @@
+From c30cbb45765c6f5369040a6fa2f80d8aed5687b4 Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Thu, 4 May 2023 08:26:04 +0200
+Subject: [PATCH] fix missing limits include
+
+---
+ Common/Core/vtkGenericDataArrayLookupHelper.h | 1 +
+ Common/DataModel/vtkPiecewiseFunction.cxx     | 1 +
+ Rendering/Core/vtkColorTransferFunction.cxx   | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/Common/Core/vtkGenericDataArrayLookupHelper.h b/Common/Core/vtkGenericDataArrayLookupHelper.h
+index f278e27c0f..06995f4780 100644
+--- a/Common/Core/vtkGenericDataArrayLookupHelper.h
++++ b/Common/Core/vtkGenericDataArrayLookupHelper.h
+@@ -27,6 +27,7 @@
+ #include <cmath>
+ #include <unordered_map>
+ #include <vector>
++#include <limits>
+ 
+ namespace detail
+ {
+diff --git a/Common/DataModel/vtkPiecewiseFunction.cxx b/Common/DataModel/vtkPiecewiseFunction.cxx
+index c75935fd19..dfc6b04f76 100644
+--- a/Common/DataModel/vtkPiecewiseFunction.cxx
++++ b/Common/DataModel/vtkPiecewiseFunction.cxx
+@@ -24,6 +24,7 @@
+ #include <iterator>
+ #include <set>
+ #include <vector>
++#include <limits>
+ 
+ vtkStandardNewMacro(vtkPiecewiseFunction);
+ 
+diff --git a/Rendering/Core/vtkColorTransferFunction.cxx b/Rendering/Core/vtkColorTransferFunction.cxx
+index 40504e5398..e1e0f25187 100644
+--- a/Rendering/Core/vtkColorTransferFunction.cxx
++++ b/Rendering/Core/vtkColorTransferFunction.cxx
+@@ -23,6 +23,7 @@
+ #include <iterator>
+ #include <set>
+ #include <vector>
++#include <limits>
+ 
+ vtkStandardNewMacro(vtkColorTransferFunction);
+ 
+-- 
+2.40.1
+

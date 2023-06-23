@@ -327,20 +327,9 @@ void vtkF3DHexagonalBokehBlurPass::ReleaseGraphicsResources(vtkWindow* win)
     delete this->RhomboidQuadHelper;
     this->RhomboidQuadHelper = nullptr;
   }
-  if (this->FrameBufferObject != nullptr)
-  {
-    this->FrameBufferObject = nullptr;
-  }
-  if (this->DiagonalBlurTexture != nullptr)
-  {
-    this->DiagonalBlurTexture = nullptr;
-  }
-  if (this->VerticalBlurTexture != nullptr)
-  {
-    this->VerticalBlurTexture = nullptr;
-  }
-  if (this->BackgroundTexture != nullptr)
-  {
-    this->BackgroundTexture = nullptr;
-  }
+
+  this->FrameBufferObject = nullptr;
+  this->DiagonalBlurTexture = nullptr;
+  this->VerticalBlurTexture = nullptr;
+  this->BackgroundTexture = nullptr;
 }

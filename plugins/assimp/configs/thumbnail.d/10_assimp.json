@@ -5,10 +5,12 @@
   },
   ".*(off)":
   {
-    "up": "+Z"
+    "up": "+Z",
+    "camera-direction": "-1,1,-1"
   },
   ".*(dxf)":
   {
-    "up": "-Z"
+    "up": "-Z",
+    "camera-direction": "1,-1,1"
   }
 }

@@ -35,7 +35,7 @@ namespace f3d::detail
 class window_impl::internals
 {
 public:
-  internals(const options& options)
+  explicit internals(const options& options)
     : Options(options)
   {
   }
@@ -267,6 +267,8 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->ShowAxis(this->Internals->Options.getAsBool("interactor.axis"));
   this->Internals->Renderer->SetUseTrackball(
     this->Internals->Options.getAsBool("interactor.trackball"));
+  this->Internals->Renderer->SetInvertZoom(
+    this->Internals->Options.getAsBool("interactor.invert-zoom"));
 
   this->Internals->Renderer->SetLineWidth(
     this->Internals->Options.getAsDouble("render.line-width"));
@@ -279,6 +281,9 @@ void window_impl::UpdateDynamicOptions()
     this->Internals->Options.getAsString("ui.filename-info"));
   this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("ui.metadata"));
   this->Internals->Renderer->ShowCheatSheet(this->Internals->Options.getAsBool("ui.cheatsheet"));
+  this->Internals->Renderer->ShowDropZone(this->Internals->Options.getAsBool("ui.dropzone"));
+  this->Internals->Renderer->SetDropZoneInfo(
+    this->Internals->Options.getAsString("ui.dropzone-info"));
 
   this->Internals->Renderer->SetUseRaytracing(
     this->Internals->Options.getAsBool("render.raytracing.enable"));
@@ -309,11 +314,13 @@ void window_impl::UpdateDynamicOptions()
 
   this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("ui.font-file"));
 
-  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("render.grid.enable"));
   this->Internals->Renderer->SetGridUnitSquare(
     this->Internals->Options.getAsDouble("render.grid.unit"));
   this->Internals->Renderer->SetGridSubdivisions(
     this->Internals->Options.getAsInt("render.grid.subdivisions"));
+  this->Internals->Renderer->SetGridAbsolute(
+    this->Internals->Options.getAsBool("render.grid.absolute"));
+  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("render.grid.enable"));
 
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
@@ -334,6 +341,7 @@ void window_impl::UpdateDynamicOptions()
       this->Internals->Options.getAsDoubleVector("model.emissive.factor").data());
     renWithColor->SetTextureNormal(this->Internals->Options.getAsString("model.normal.texture"));
     renWithColor->SetNormalScale(this->Internals->Options.getAsDouble("model.normal.scale"));
+    renWithColor->SetTextureMatCap(this->Internals->Options.getAsString("model.matcap.texture"));
 
     renWithColor->SetColoring(this->Internals->Options.getAsBool("model.scivis.cells"),
       this->Internals->Options.getAsString("model.scivis.array-name"),
@@ -366,7 +374,11 @@ void window_impl::PrintColoringDescription(log::VerboseLevel level)
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
   if (renWithColor)
   {
-    log::print(level, renWithColor->GetColoringDescription());
+    std::string descr = renWithColor->GetColoringDescription();
+    if (!descr.empty())
+    {
+      log::print(level, descr);
+    }
   }
 }
 
@@ -421,7 +433,7 @@ void window_impl::SetImporterForColoring(vtkF3DGenericImporter* importer)
 {
   vtkF3DRendererWithColoring* renWithColor =
     vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
-  if (renWithColor && importer)
+  if (renWithColor)
   {
     renWithColor->SetImporter(importer);
   }

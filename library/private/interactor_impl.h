@@ -23,6 +23,7 @@ namespace detail
 {
 class loader_impl;
 class window_impl;
+class animationManager;
 
 class interactor_impl : public interactor
 {
@@ -32,7 +33,7 @@ public:
    * Documented public API
    */
   interactor_impl(options& options, window_impl& window, loader_impl& loader);
-  ~interactor_impl();
+  ~interactor_impl() override;
 
   interactor& setKeyPressCallBack(std::function<bool(int, std::string)> callBack) override;
   interactor& setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack) override;
@@ -54,6 +55,12 @@ public:
   void start() override;
   void stop() override;
   ///@}
+
+  /**
+   * Implementation only API.
+   * Set the internal AnimationManager to be used by the interactor
+   */
+  void SetAnimationManager(animationManager* manager);
 
   /**
    * Implementation only API.
