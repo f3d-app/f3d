@@ -388,14 +388,14 @@ jobs:
       shell: powershell
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-    # - name: Build wheel
-    #   working-directory: ${{github.workspace}}/source
-    #   shell: bash
-    #   run: pip install .
+    - name: Build wheel
+      working-directory: ${{github.workspace}}/source
+      shell: bash
+      run: pip install .
 
-    # - name: Test wheel
-    #   working-directory: ${{github.workspace}}
-    #   run: pytest
+    - name: Test wheel
+      working-directory: ${{github.workspace}}/source
+      run: pytest
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
