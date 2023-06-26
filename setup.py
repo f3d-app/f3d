@@ -41,16 +41,11 @@ setup(
     entry_points={"console_scripts": ["f3d=f3d.__main__:main"]},
     cmake_source_dir=".",
     cmake_install_dir="python/packaging",
-    cmake_args=[  # TODO: enable/disable modules with env variables?
+    cmake_args=[
         "-DF3D_BINDINGS_PYTHON:BOOL=ON",
         "-DBUILD_SHARED_LIBS:BOOL=OFF",
-        "-DF3D_PLUGINS_STATIC_BUILD:BOOL=ON"
-        "-DF3D_PLUGIN_BUILD_ALEMBIC:BOOL=ON",
-        "-DF3D_PLUGIN_BUILD_ASSIMP:BOOL=ON",
-        "-DF3D_PLUGIN_BUILD_DRACO:BOOL=ON",
-        "-DF3D_PLUGIN_BUILD_EXODUS:BOOL=ON",
-        "-DF3D_PLUGIN_BUILD_OCCT:BOOL=ON",
-        "-DF3D_MODULE_EXR:BOOL=ON",
+        "-DF3D_PLUGINS_STATIC_BUILD:BOOL=ON",
+        *(f"-D{key}={val}" for key, val in os.environ.items() if key.startswith("F3D")),
     ],
     cmake_process_manifest_hook=exclude_static_libraries,
     zip_safe=False,
