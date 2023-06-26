@@ -14,28 +14,34 @@
 
 namespace py = pybind11;
 
+template<typename T, size_t S>
+bool load_array(const py::handle& src, bool convert, std::array<T, S>& value)
+{
+  if (!py::isinstance<py::sequence>(src))
+  {
+    return false;
+  }
+  const py::sequence l = py::reinterpret_borrow<py::sequence>(src);
+  if (l.size() != S)
+  {
+    return false;
+  }
+
+  size_t i = 0;
+  for (auto it : l)
+  {
+    value[i++] = py::cast<T>(it);
+  }
+  return true;
+}
+
 template<>
 class py::detail::type_caster<f3d::point3_t>
 {
 public:
   bool load(handle src, bool convert)
   {
-    if (!isinstance<sequence>(src))
-    {
-      return false;
-    }
-    py::sequence l = reinterpret_borrow<sequence>(src);
-    if (l.size() != 3)
-    {
-      return false;
-    }
-
-    size_t i = 0;
-    for (auto it : l)
-    {
-      value[i++] = py::cast<double>(it);
-    }
-    return true;
+    return load_array(src, convert, value);
   }
 
   static handle cast(const f3d::point3_t& src, return_value_policy, handle /* parent */)
@@ -52,22 +58,7 @@ class py::detail::type_caster<f3d::vector3_t>
 public:
   bool load(handle src, bool convert)
   {
-    if (!isinstance<sequence>(src))
-    {
-      return false;
-    }
-    py::sequence l = reinterpret_borrow<sequence>(src);
-    if (l.size() != 3)
-    {
-      return false;
-    }
-
-    size_t i = 0;
-    for (auto it : l)
-    {
-      value[i++] = py::cast<double>(it);
-    }
-    return true;
+    return load_array(src, convert, value);
   }
 
   static handle cast(const f3d::vector3_t& src, return_value_policy, handle /* parent */)
