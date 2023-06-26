@@ -39,10 +39,7 @@ template<>
 class py::detail::type_caster<f3d::point3_t>
 {
 public:
-  bool load(handle src, bool convert)
-  {
-    return load_array(src, convert, value);
-  }
+  bool load(handle src, bool convert) { return load_array(src, convert, value); }
 
   static handle cast(const f3d::point3_t& src, return_value_policy, handle /* parent */)
   {
@@ -56,10 +53,7 @@ template<>
 class py::detail::type_caster<f3d::vector3_t>
 {
 public:
-  bool load(handle src, bool convert)
-  {
-    return load_array(src, convert, value);
-  }
+  bool load(handle src, bool convert) { return load_array(src, convert, value); }
 
   static handle cast(const f3d::vector3_t& src, return_value_policy, handle /* parent */)
   {
