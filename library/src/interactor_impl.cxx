@@ -346,38 +346,39 @@ public:
          *     .--.-----------------.picked
          * pos1    pos2
          */
-        camera& currentCam = self->Window.getCamera();
-        const point3_t pos = currentCam.getPosition();
-        const point3_t foc = currentCam.getFocalPoint();
+        const camera_state_t state0 = self->Window.getCamera().getState();
 
         double focV[3];
-        vtkMath::Subtract(picked, foc.data(), focV); /* foc -> picked */
+        vtkMath::Subtract(picked, state0.foc.data(), focV); /* foc -> picked */
 
         double posV[3];
-        vtkMath::Subtract(picked, foc.data(), posV); /* pos -> pos1, parallel to focV */
+        vtkMath::Subtract(picked, state0.foc.data(), posV); /* pos -> pos1, parallel to focV */
         if (!self->Style->GetInteractor()->GetShiftKey())
         {
           double v[3];
-          vtkMath::Subtract(foc.data(), pos.data(), v); /* pos -> foc */
-          vtkMath::ProjectVector(focV, v, v);           /* pos2 -> pos1 */
-          vtkMath::Subtract(posV, v, posV);             /* pos -> pos2, keeps on camera plane */
+          vtkMath::Subtract(state0.foc.data(), state0.pos.data(), v); /* pos -> foc */
+          vtkMath::ProjectVector(focV, v, v);                         /* pos2 -> pos1 */
+          vtkMath::Subtract(posV, v, posV); /* pos -> pos2, keeps on camera plane */
         }
 
-        const auto update_camera = [&foc, &focV, &pos, &posV](camera& cam, double ratio)
+        const auto iterpolateCameraState = [&state0, &focV, &posV](double ratio) -> camera_state_t
         {
-          cam.setPosition({
-            pos[0] + posV[0] * ratio,
-            pos[1] + posV[1] * ratio,
-            pos[2] + posV[2] * ratio,
-          });
-          cam.setFocalPoint({
-            foc[0] + focV[0] * ratio,
-            foc[1] + focV[1] * ratio,
-            foc[2] + focV[2] * ratio,
-          });
+          return { //
+            {
+              state0.pos[0] + posV[0] * ratio,
+              state0.pos[1] + posV[1] * ratio,
+              state0.pos[2] + posV[2] * ratio,
+            },
+            {
+              state0.foc[0] + focV[0] * ratio,
+              state0.foc[1] + focV[1] * ratio,
+              state0.foc[2] + focV[2] * ratio,
+            },
+            state0.up, state0.angle
+          };
         };
 
-        self->AnimateCameraTransition(update_camera);
+        self->AnimateCameraTransition(iterpolateCameraState);
       }
     }
 
@@ -400,7 +401,7 @@ public:
     this->VTKInteractor->ExitCallback();
   }
 
-  void AnimateCameraTransition(const std::function<void(camera&, double)>& update_camera)
+  void AnimateCameraTransition(const std::function<camera_state_t(double)>& iterpolateCameraState)
   {
     window& win = this->Window;
     camera& cam = win.getCamera();
@@ -418,13 +419,13 @@ public:
         const double timeDelta =
           std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count();
         const double ratio = (1 - std::cos(vtkMath::Pi() * (timeDelta / duration))) / 2;
-        update_camera(cam, ratio);
+        cam.setState(iterpolateCameraState(ratio));
         this->Window.render();
         now = std::chrono::high_resolution_clock::now();
       }
     }
 
-    update_camera(cam, 1.); // ensure last update
+    cam.setState(iterpolateCameraState(1.)); // ensure final update
     this->Window.render();
   }
 
