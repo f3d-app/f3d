@@ -401,6 +401,12 @@ public:
     this->VTKInteractor->ExitCallback();
   }
 
+  /**
+   * Run a camera transition animation based on a camera state interpolation function.
+   * The provided function will be called with an interpolation parameter
+   * varying from `0.` for the initial to `1.` for the final state;
+   * it shall return an appropriate linearly interpolated `camera_state_t` for any value in between.
+   */
   void AnimateCameraTransition(const std::function<camera_state_t(double)>& iterpolateCameraState)
   {
     window& win = this->Window;
