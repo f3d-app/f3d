@@ -346,35 +346,35 @@ public:
          *     .--.-----------------.picked
          * pos1    pos2
          */
-        const camera_state_t state0 = self->Window.getCamera().getState();
+        const camera_state_t state = self->Window.getCamera().getState();
 
         double focV[3];
-        vtkMath::Subtract(picked, state0.foc.data(), focV); /* foc -> picked */
+        vtkMath::Subtract(picked, state.foc.data(), focV); /* foc -> picked */
 
         double posV[3];
-        vtkMath::Subtract(picked, state0.foc.data(), posV); /* pos -> pos1, parallel to focV */
+        vtkMath::Subtract(picked, state.foc.data(), posV); /* pos -> pos1, parallel to focV */
         if (!self->Style->GetInteractor()->GetShiftKey())
         {
           double v[3];
-          vtkMath::Subtract(state0.foc.data(), state0.pos.data(), v); /* pos -> foc */
-          vtkMath::ProjectVector(focV, v, v);                         /* pos2 -> pos1 */
+          vtkMath::Subtract(state.foc.data(), state.pos.data(), v); /* pos -> foc */
+          vtkMath::ProjectVector(focV, v, v);                       /* pos2 -> pos1 */
           vtkMath::Subtract(posV, v, posV); /* pos -> pos2, keeps on camera plane */
         }
 
-        const auto iterpolateCameraState = [&state0, &focV, &posV](double ratio) -> camera_state_t
+        const auto iterpolateCameraState = [&state, &focV, &posV](double ratio) -> camera_state_t
         {
           return { //
             {
-              state0.pos[0] + posV[0] * ratio,
-              state0.pos[1] + posV[1] * ratio,
-              state0.pos[2] + posV[2] * ratio,
+              state.pos[0] + posV[0] * ratio,
+              state.pos[1] + posV[1] * ratio,
+              state.pos[2] + posV[2] * ratio,
             },
             {
-              state0.foc[0] + focV[0] * ratio,
-              state0.foc[1] + focV[1] * ratio,
-              state0.foc[2] + focV[2] * ratio,
+              state.foc[0] + focV[0] * ratio,
+              state.foc[1] + focV[1] * ratio,
+              state.foc[2] + focV[2] * ratio,
             },
-            state0.up, state0.angle
+            state.up, state.angle
           };
         };
 
