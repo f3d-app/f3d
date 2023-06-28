@@ -12,5 +12,6 @@ namespace F3D
 
 #cmakedefine01 F3D_MACOS_BUNDLE
 #cmakedefine01 F3D_MODULE_RAYTRACING
+#cmakedefine01 F3D_MODULE_EXR
 
 #endif
