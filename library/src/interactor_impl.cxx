@@ -363,10 +363,18 @@ public:
           vtkMath::Subtract(posV, v, posV);             /* pos -> pos2, keeps on camera plane */
         }
 
-        const auto update_camera = [&foc, &focV, &pos, &posV](camera& cam, double t)
+        const auto update_camera = [&foc, &focV, &pos, &posV](camera& cam, double ratio)
         {
-          cam.setPosition({ pos[0] + posV[0] * t, pos[1] + posV[1] * t, pos[2] + posV[2] * t });
-          cam.setFocalPoint({ foc[0] + focV[0] * t, foc[1] + focV[1] * t, foc[2] + focV[2] * t });
+          cam.setPosition({
+            pos[0] + posV[0] * ratio,
+            pos[1] + posV[1] * ratio,
+            pos[2] + posV[2] * ratio,
+          });
+          cam.setFocalPoint({
+            foc[0] + focV[0] * ratio,
+            foc[1] + focV[1] * ratio,
+            foc[2] + focV[2] * ratio,
+          });
         };
 
         self->AnimateCameraTransition(update_camera);
@@ -400,16 +408,17 @@ public:
 
     if (duration > 0)
     {
-      // TODO can we disable inputs so we don't queue key presses while the animation is running?
+      // TODO implement a way to not queue key presses while the animation is running
 
       const auto start = std::chrono::high_resolution_clock::now();
       const auto end = start + std::chrono::milliseconds(duration);
       auto now = start;
       while (now < end)
       {
-        const double t = std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count();
-        const double u = (1 - std::cos(vtkMath::Pi() * (t / duration))) / 2;
-        update_camera(cam, u);
+        const double timeDelta =
+          std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count();
+        const double ratio = (1 - std::cos(vtkMath::Pi() * (timeDelta / duration))) / 2;
+        update_camera(cam, ratio);
         this->Window.render();
         now = std::chrono::high_resolution_clock::now();
       }
