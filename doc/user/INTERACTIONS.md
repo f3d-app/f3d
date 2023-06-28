@@ -10,8 +10,7 @@ Simple interaction with the displayed data is possible directly within the windo
 * *Move the mouse wheel* to zoom in/out.
 * *Click and drag* with the *middle* mouse button to translate the camera.
 * *Click* with the *middle* mouse button to center the camera on the point under the cursor (hold *Shift* to allow forward or backward movement).
-* Drag and drop a file or directory into the F3D window to load it.
-* Press Control and Drag and drop a HDRI file to load a HDRI as with the `--hdri` option.
+* Drag and drop a file, directory or HDRI into the F3D window to load it. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.
 
 > Note: When playing an animation with a scene camera, camera interactions are locked.
 
