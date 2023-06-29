@@ -1,0 +1,12 @@
+# StreamVersion 1.2
+ExposeEvent 0 599 0 0 0 0 0
+RenderEvent 0 599 0 0 0 0 0
+KeyPressEvent 474 416 0 115 1 x 0
+CharEvent 474 416 0 115 1 x 0
+KeyReleaseEvent 474 416 0 115 1 x 0
+KeyPressEvent 677 699 0 0 1 Super_L 0
+CharEvent 677 699 0 0 1 Super_L 0
+UpdateDropLocationEvent 677 699 0 0 1 Super_L 0
+EnterEvent 781 494 0 0 0 Super_L 0
+DropFilesEvent 781 494 0 0 0 Super_L 1 2 ${CMAKE_SOURCE_DIR}/testing/data/dragon.vtu ${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr
+RenderEvent 781 494 0 0 0 Super_L 0
