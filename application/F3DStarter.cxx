@@ -79,6 +79,27 @@ public:
       .setCurrentAsDefault();
   }
 
+  static bool HasHDRIExtension(const std::string& file)
+  {
+    std::string ext = fs::path(file).extension().string();
+    for (char& c : ext)
+    {
+      // casting is required on Windows
+      c = static_cast<char>(toupper(c));
+    }
+#if F3D_MODULE_EXR
+    if (ext == ".EXR")
+    {
+      return true;
+    }
+#endif
+    if (ext == ".HDR")
+    {
+      return true;
+    }
+    return false;
+  }
+
   F3DOptionsParser Parser;
   F3DAppOptions AppOptions;
   f3d::options DynamicOptions;
@@ -95,8 +116,8 @@ F3DStarter::F3DStarter()
   : Internals(std::make_unique<F3DStarter::F3DInternals>())
 {
   // Set option outside of command line and config file
-  this->Internals->DynamicOptions.set("ui.dropzone-info",
-    "Drop a file to open it\nCtrl+Drop to load a HDRI\nPress H to show cheatsheet");
+  this->Internals->DynamicOptions.set(
+    "ui.dropzone-info", "Drop a file or HDRI to load it\nPress H to show cheatsheet");
 }
 
 //----------------------------------------------------------------------------
@@ -222,7 +243,20 @@ int F3DStarter::Start(int argc, char** argv)
         int index = -1;
         for (const std::string& file : filesVec)
         {
-          index = this->AddFile(fs::path(file));
+          if (F3DInternals::HasHDRIExtension(file))
+          {
+            // TODO: add a image::canRead
+
+            // Load the file as an HDRI instead of adding it.
+            this->Internals->Engine->getOptions().set("render.background.hdri", file);
+
+            // Rendering now is needed for correct lighting
+            this->Render();
+          }
+          else
+          {
+            index = this->AddFile(fs::path(file));
+          }
         }
         if (index > -1)
         {
