@@ -538,6 +538,21 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream 
 
   f3d_test(NAME TestInteractionDropSameFiles ARGS -x "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropSameFiles.log")#DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
 
+  # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+
+    configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRI.log.in"
+      "${CMAKE_BINARY_DIR}/TestInteractionDropHDRI.log")
+
+    f3d_test(NAME TestInteractionDropHDRI ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRI.log" HDRI)#X;DropEvent dragon.vtu palermo.hdr;
+
+    if(F3D_MODULE_EXR)
+      configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRIExr.log.in"
+        "${CMAKE_BINARY_DIR}/TestInteractionDropHDRIExr.log")
+
+      f3d_test(NAME TestInteractionDropHDRIExr ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIExr.log" HDRI)#X;DropEvent kloofendal.exr;DropEvent dragon.vtu;
+    endif()
+  endif()
 endif()
 
 ## Tests to increase coverage
