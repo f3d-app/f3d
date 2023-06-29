@@ -43,7 +43,7 @@ public:
 
   static handle cast(const f3d::point3_t& src, return_value_policy, handle /* parent */)
   {
-    return Py_BuildValue("fff", src[0], src[1], src[2]);
+    return Py_BuildValue("ddd", src[0], src[1], src[2]);
   }
 
   PYBIND11_TYPE_CASTER(f3d::point3_t, const_name("f3d.point3_t"));
@@ -57,7 +57,7 @@ public:
 
   static handle cast(const f3d::vector3_t& src, return_value_policy, handle /* parent */)
   {
-    return Py_BuildValue("fff", src[0], src[1], src[2]);
+    return Py_BuildValue("ddd", src[0], src[1], src[2]);
   }
 
   PYBIND11_TYPE_CASTER(f3d::vector3_t, const_name("f3d.vector3_t"));
