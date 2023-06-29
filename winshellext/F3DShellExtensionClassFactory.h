@@ -31,7 +31,10 @@ public:
     return QISearch(this, qit, riid, ppv);
   }
 
-  IFACEMETHODIMP_(ULONG) AddRef() { return ::InterlockedIncrement(&m_cRef); }
+  IFACEMETHODIMP_(ULONG) AddRef()
+  {
+    return ::InterlockedIncrement(&m_cRef);
+  }
 
   IFACEMETHODIMP_(ULONG) Release()
   {
@@ -77,7 +80,10 @@ public:
   }
 
 protected:
-  ~F3DShellExtensionClassFactory() { ::InterlockedDecrement(&g_cDllRef); }
+  ~F3DShellExtensionClassFactory()
+  {
+    ::InterlockedDecrement(&g_cDllRef);
+  }
 
   long m_cRef;
 };

@@ -32,12 +32,16 @@ public:
   /**
    * Disable base class features
    */
-  void OnChar() override {}
+  void OnChar() override
+  {
+  }
 
   /**
    * Disable base class features
    */
-  void OnTimer() override {}
+  void OnTimer() override
+  {
+  }
 
   /**
    * Handle drop files

@@ -102,7 +102,10 @@ protected:
     return ss.str();
   }
 
-  static std::string ToString(bool currValue) { return currValue ? "true" : "false"; }
+  static std::string ToString(bool currValue)
+  {
+    return currValue ? "true" : "false";
+  }
 
   template<class T>
   static std::string ToString(const std::vector<T>& currValue)

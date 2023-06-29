@@ -156,9 +156,13 @@ public:
     }
   }
 
-  void ImportCameras(vtkRenderer* vtkNotUsed(renderer)) {}
+  void ImportCameras(vtkRenderer* vtkNotUsed(renderer))
+  {
+  }
 
-  void ImportLights(vtkRenderer* vtkNotUsed(renderer)) {}
+  void ImportLights(vtkRenderer* vtkNotUsed(renderer))
+  {
+  }
 
   void ReadScene(const std::string& filePath)
   {

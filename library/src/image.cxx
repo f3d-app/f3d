@@ -24,7 +24,10 @@ public:
   unsigned int Height = 0;
   unsigned int Channels = 0;
 
-  void UpdateBufferSize() { this->Buffer.resize(this->Width * this->Height * this->Channels); }
+  void UpdateBufferSize()
+  {
+    this->Buffer.resize(this->Width * this->Height * this->Channels);
+  }
 
   vtkSmartPointer<vtkImageImport> GetVTKImporter() const
   {

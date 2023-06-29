@@ -45,7 +45,10 @@ public:
   /**
    * Get the long description of this reader
    */
-  virtual const std::string getLongDescription() const { return this->getShortDescription(); }
+  virtual const std::string getLongDescription() const
+  {
+    return this->getShortDescription();
+  }
 
   /**
    * Get the extensions supported by this reader
@@ -77,13 +80,19 @@ public:
    * The reader having the highest score (from 0 to 100) is used to read the file.
    * Default is 50.
    */
-  virtual int getScore() const { return 50; }
+  virtual int getScore() const
+  {
+    return 50;
+  }
 
   /**
    * Return true if this reader can create a geometry reader
    * false otherwise
    */
-  virtual bool hasGeometryReader() { return false; }
+  virtual bool hasGeometryReader()
+  {
+    return false;
+  }
 
   /**
    * Create the geometry reader (VTK reader) for the given filename
@@ -96,13 +105,18 @@ public:
   /**
    * Apply custom code for the reader
    */
-  virtual void applyCustomReader(vtkAlgorithm*, const std::string&) const {}
+  virtual void applyCustomReader(vtkAlgorithm*, const std::string&) const
+  {
+  }
 
   /**
    * Return true if this reader can create a scene reader
    * false otherwise
    */
-  virtual bool hasSceneReader() { return false; }
+  virtual bool hasSceneReader()
+  {
+    return false;
+  }
 
   /**
    * Create the scene reader (VTK importer) for the given filename
@@ -115,7 +129,9 @@ public:
   /**
    * Apply custom code for the importer
    */
-  virtual void applyCustomImporter(vtkImporter*, const std::string&) const {}
+  virtual void applyCustomImporter(vtkImporter*, const std::string&) const
+  {
+  }
 };
 }
 

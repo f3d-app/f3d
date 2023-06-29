@@ -51,7 +51,10 @@ protected:
     this->close();
   }
 
-  void paintGL() override { mEngine.getWindow().render(); }
+  void paintGL() override
+  {
+    mEngine.getWindow().render();
+  }
 
 private:
   f3d::engine mEngine;
