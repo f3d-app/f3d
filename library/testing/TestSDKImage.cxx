@@ -84,6 +84,24 @@ int TestSDKImage(int argc, char* argv[])
   }
 #endif
 
+  // check reading invalid image
+  try
+  {
+    f3d::image invalidImg(std::string(argv[1]) + "/data/invalid.png");
+
+    std::cerr << "An exception has not been thrown when reading an invalid file" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::read_exception&)
+  {
+  }
+
+  if (hdrImg.getChannelType() != f3d::image::ChannelType::FLOAT)
+  {
+    std::cerr << "Cannot read a HDR 32-bits image" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   // check generated image with baseline
   f3d::image baseline(std::string(argv[1]) + "/baselines/TestSDKImage.png");
 

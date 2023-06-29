@@ -4,7 +4,6 @@
 
 #include "camera.h"
 #include "engine.h"
-#include "export.h"
 #include "image.h"
 #include "interactor.h"
 #include "loader.h"
@@ -121,14 +120,14 @@ PYBIND11_MODULE(f3d, module)
         {
           throw py::value_error();
         }
-        img.setData((unsigned char*)info.ptr);
+        img.setData(info.ptr);
       })
     .def("getData",
       [](const f3d::image& img)
       {
         size_t expectedSize = img.getChannelCount() * img.getWidth() * img.getHeight() *
           ::get_channel_size(img.getChannelType());
-        return py::bytes((char*)img.getData(), expectedSize);
+        return py::bytes(static_cast<char*>(img.getData()), expectedSize);
       })
     .def("compare", &f3d::image::compare)
     .def(

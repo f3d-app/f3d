@@ -119,8 +119,8 @@ public:
    * Set/Get image buffer data.
    * Its size is expected to be `width * height * channelCount * typeSize`.
    */
-  image& setData(unsigned char* buffer);
-  unsigned char* getData() const;
+  image& setData(void* buffer);
+  void* getData() const;
   ///@}
 
   /**

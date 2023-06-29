@@ -37,18 +37,18 @@ image::image(unsigned int width, unsigned int height, unsigned int channelCount,
   : Internals(new image::internals())
 {
   this->Internals->Image = vtkSmartPointer<vtkImageData>::New();
-  this->Internals->Image->SetDimensions(width, height, 1);
+  this->Internals->Image->SetDimensions(static_cast<int>(width), static_cast<int>(height), 1);
 
   switch (type)
   {
     case ChannelType::BYTE:
-      this->Internals->Image->AllocateScalars(VTK_UNSIGNED_CHAR, channelCount);
+      this->Internals->Image->AllocateScalars(VTK_UNSIGNED_CHAR, static_cast<int>(channelCount));
       break;
     case ChannelType::SHORT:
-      this->Internals->Image->AllocateScalars(VTK_UNSIGNED_SHORT, channelCount);
+      this->Internals->Image->AllocateScalars(VTK_UNSIGNED_SHORT, static_cast<int>(channelCount));
       break;
     case ChannelType::FLOAT:
-      this->Internals->Image->AllocateScalars(VTK_FLOAT, channelCount);
+      this->Internals->Image->AllocateScalars(VTK_FLOAT, static_cast<int>(channelCount));
       break;
   }
 }
@@ -98,8 +98,11 @@ image::image(const image& img)
 //----------------------------------------------------------------------------
 image& image::operator=(const image& img) noexcept
 {
-  this->Internals->Image = vtkSmartPointer<vtkImageData>::New();
-  this->Internals->Image->DeepCopy(img.Internals->Image);
+  if (this != &img)
+  {
+    this->Internals->Image = vtkSmartPointer<vtkImageData>::New();
+    this->Internals->Image->DeepCopy(img.Internals->Image);
+  }
   return *this;
 }
 
@@ -136,8 +139,9 @@ unsigned int image::getHeight() const
 //----------------------------------------------------------------------------
 image& image::setResolution(unsigned int width, unsigned int height)
 {
-  this->Internals->Image->SetDimensions(width, height, 1);
-  this->Internals->Image->AllocateScalars(VTK_UNSIGNED_CHAR, this->getChannelCount());
+  this->Internals->Image->SetDimensions(static_cast<int>(width), static_cast<int>(height), 1);
+  this->Internals->Image->AllocateScalars(
+    VTK_UNSIGNED_CHAR, static_cast<int>(this->getChannelCount()));
   return *this;
 }
 #endif
@@ -152,7 +156,7 @@ unsigned int image::getChannelCount() const
 //----------------------------------------------------------------------------
 image& image::setChannelCount(unsigned int dim)
 {
-  this->Internals->Image->AllocateScalars(VTK_UNSIGNED_CHAR, dim);
+  this->Internals->Image->AllocateScalars(VTK_UNSIGNED_CHAR, static_cast<int>(dim));
   return *this;
 }
 #endif
@@ -168,25 +172,28 @@ image::ChannelType image::getChannelType() const
       return ChannelType::SHORT;
     case VTK_FLOAT:
       return ChannelType::FLOAT;
+    default:
+      break;
   }
   throw read_exception("Unknown channel type");
 }
 
 //----------------------------------------------------------------------------
-image& image::setData(unsigned char* buffer)
+image& image::setData(void* buffer)
 {
-  int scalarSize = this->Internals->Image->GetScalarSize();
-  int totalSize = this->getWidth() * this->getHeight() * this->getChannelCount() * scalarSize;
+  unsigned int scalarSize = this->Internals->Image->GetScalarSize();
+  unsigned int totalSize =
+    this->getWidth() * this->getHeight() * this->getChannelCount() * scalarSize;
   unsigned char* internalBuffer =
-    reinterpret_cast<unsigned char*>(this->Internals->Image->GetScalarPointer());
-  std::copy(buffer, buffer + totalSize, internalBuffer);
+    static_cast<unsigned char*>(this->Internals->Image->GetScalarPointer());
+  std::copy_n(static_cast<unsigned char*>(buffer), totalSize, internalBuffer);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-unsigned char* image::getData() const
+void* image::getData() const
 {
-  return reinterpret_cast<unsigned char*>(this->Internals->Image->GetScalarPointer());
+  return this->Internals->Image->GetScalarPointer();
 }
 
 //----------------------------------------------------------------------------
