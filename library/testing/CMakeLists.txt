@@ -82,7 +82,7 @@ set_target_properties(libf3dSDKTests PROPERTIES
   CXX_VISIBILITY_PRESET hidden
   )
 
-target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR=$<BOOL:F3D_MODULE_EXR>)
+target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR=$<BOOL:${F3D_MODULE_EXR}>)
 
 # List tests that do not require rendering
 list(APPEND libf3dSDKTestsNoRender_list
