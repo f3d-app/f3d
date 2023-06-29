@@ -69,9 +69,20 @@ int TestSDKImage(int argc, char* argv[])
 
   if (hdrImg.getChannelType() != f3d::image::ChannelType::FLOAT)
   {
-    std::cerr << "Cannot read a 32-bits image" << std::endl;
+    std::cerr << "Cannot read a HDR 32-bits image" << std::endl;
     return EXIT_FAILURE;
   }
+
+#if F3D_MODULE_EXR
+  // check reading EXR
+  f3d::image exrImg(std::string(argv[1]) + "/data/kloofendal_43d_clear_1k.exr");
+
+  if (exrImg.getChannelType() != f3d::image::ChannelType::FLOAT)
+  {
+    std::cerr << "Cannot read a EXR 32-bits image" << std::endl;
+    return EXIT_FAILURE;
+  }
+#endif
 
   // check generated image with baseline
   f3d::image baseline(std::string(argv[1]) + "/baselines/TestSDKImage.png");
