@@ -209,7 +209,7 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build DEFAULT_LIGHTS)
   f3d_test(NAME TestDefaultConfigFileTIFF DATA logo.tif CONFIG config_build DEFAULT_LIGHTS)
   f3d_test(NAME TestDefaultConfigFilePLY DATA cube.ply CONFIG config_build DEFAULT_LIGHTS THRESHOLD 100)
-  f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y CONFIG config_build DEFAULT_LIGHTS)
+  f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build DEFAULT_LIGHTS)
 
   # no-background test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8501
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
