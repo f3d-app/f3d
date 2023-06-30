@@ -6,7 +6,7 @@
   ".*(3ds|stl)":
   {
     "up": "+Z",
-    "camera-direction": "-1,1,-1"
+    "camera-direction": "-1,1,-0.5"
   },
   ".*(ply)":
   {
