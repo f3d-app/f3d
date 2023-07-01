@@ -668,6 +668,9 @@ void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
         }
 
         vtkNew<vtkXMLMultiBlockDataWriter> writer;
+        writer->SetCompressorTypeToNone();
+        writer->SetDataModeToAppended();
+        writer->EncodeAppendedDataOff();
         writer->SetFileName(specCachePath.c_str());
         writer->SetInputData(mb);
         writer->Write();
