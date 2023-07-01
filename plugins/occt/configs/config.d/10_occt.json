@@ -6,6 +6,6 @@
     "ambient-occlusion": true,
     "comp": "-2",
     "cells": true,
-    "camera-direction": "-1,1,-1"
+    "camera-direction": "-1,1,-0.5"
   }
 }
