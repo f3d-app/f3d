@@ -6,11 +6,11 @@
   ".*(off)":
   {
     "up": "+Z",
-    "camera-direction": "-1,1,-1"
+    "camera-direction": "-1,1,-0.5"
   },
   ".*(dxf)":
   {
     "up": "-Z",
-    "camera-direction": "1,-1,1"
+    "camera-direction": "1,-1,0.5"
   }
 }
