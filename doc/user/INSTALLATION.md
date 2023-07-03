@@ -1,14 +1,14 @@
 # Installation
 
-## Current release packages (2.0.0)
+## Current release packages (2.1.0)
 
 | Platform | Files |
 | -------- | ----- |
-| Windows Installer | [F3D-2.0.0-Windows.exe](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-Windows-x86_64-raytracing.exe) |
-| Windows (Portable) | [F3D-2.0.0-Windows.zip](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-Windows-x86_64-raytracing.zip) |
-| MacOS | [F3D-2.0.0-macOS.dmg](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-macOS-x86_64-raytracing.dmg) |
-| Debian-based Package | [F3D-2.0.0-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-Linux-x86_64-raytracing.deb) |
-| Linux (Portable) | [F3D-2.0.0-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v2.0.0/F3D-2.0.0-Linux-x86_64-raytracing.tar.xz) |
+| Windows Installer | [F3D-2.1.0-Windows.exe](https://github.com/f3d-app/f3d/releases/download/v2.1.0/F3D-2.1.0-Windows-x86_64-raytracing.exe) |
+| Windows (Portable) | [F3D-2.1.0-Windows.zip](https://github.com/f3d-app/f3d/releases/download/v2.1.0/F3D-2.1.0-Windows-x86_64-raytracing.zip) |
+| MacOS | [F3D-2.1.0-macOS.dmg](https://github.com/f3d-app/f3d/releases/download/v2.1.0/F3D-2.1.0-macOS-x86_64-raytracing.dmg) |
+| Debian-based Package | [F3D-2.1.0-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v2.1.0/F3D-2.1.0-Linux-x86_64-raytracing.deb) |
+| Linux (Portable) | [F3D-2.1.0-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v2.1.0/F3D-2.1.0-Linux-x86_64-raytracing.tar.xz) |
 
 ## Alternatives
 
