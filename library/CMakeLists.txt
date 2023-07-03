@@ -182,46 +182,44 @@ if(BUILD_TESTING)
 endif()
 
 # Installing
-if(BUILD_SHARED_LIBS)
-  install(TARGETS libf3d
-    EXPORT f3dTargets
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT library
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library)
+install(TARGETS libf3d
+  EXPORT f3dTargets
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT library
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library)
 
-  install(FILES ${F3D_PUBLIC_HEADERS}
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"
-    COMPONENT sdk
-    EXCLUDE_FROM_ALL)
+install(FILES ${F3D_PUBLIC_HEADERS}
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"
+  COMPONENT sdk
+  EXCLUDE_FROM_ALL)
 
-  install(EXPORT f3dTargets
-    NAMESPACE f3d::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT sdk
-    EXCLUDE_FROM_ALL)
+install(EXPORT f3dTargets
+  NAMESPACE f3d::
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
+  COMPONENT sdk
+  EXCLUDE_FROM_ALL)
 
-  include(CMakePackageConfigHelpers)
-  configure_package_config_file(
-    "${F3D_SOURCE_DIR}/cmake/f3dConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d")
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+  "${F3D_SOURCE_DIR}/cmake/f3dConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d")
 
-  write_basic_package_version_file(
+write_basic_package_version_file(
+  "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
+  VERSION "${F3D_VERSION}"
+  COMPATIBILITY SameMinorVersion)
+
+install(
+  FILES
+    "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
     "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
-    VERSION "${F3D_VERSION}"
-    COMPATIBILITY SameMinorVersion)
-
-  install(
-    FILES
-      "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
-      "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
-      "${F3D_SOURCE_DIR}/cmake/f3dEmbed.cmake"
-      "${F3D_SOURCE_DIR}/cmake/f3dPlugin.cmake"
-      "${F3D_SOURCE_DIR}/cmake/plugin.cxx.in"
-      "${F3D_SOURCE_DIR}/cmake/plugin.desktop.in"
-      "${F3D_SOURCE_DIR}/cmake/plugin.thumbnailer.in"
-      "${F3D_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
-    DESTINATION
-      "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT sdk
-    EXCLUDE_FROM_ALL)
-endif()
+    "${F3D_SOURCE_DIR}/cmake/f3dEmbed.cmake"
+    "${F3D_SOURCE_DIR}/cmake/f3dPlugin.cmake"
+    "${F3D_SOURCE_DIR}/cmake/plugin.cxx.in"
+    "${F3D_SOURCE_DIR}/cmake/plugin.desktop.in"
+    "${F3D_SOURCE_DIR}/cmake/plugin.thumbnailer.in"
+    "${F3D_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
+  DESTINATION
+    "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
+  COMPONENT sdk
+  EXCLUDE_FROM_ALL)
