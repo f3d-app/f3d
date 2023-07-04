@@ -361,7 +361,7 @@ public:
           vtkMath::Subtract(posV, v, posV); /* pos -> pos2, keeps on camera plane */
         }
 
-        const auto iterpolateCameraState = [&state, &focV, &posV](double ratio) -> camera_state_t
+        const auto interpolateCameraState = [&state, &focV, &posV](double ratio) -> camera_state_t
         {
           return { //
             {
@@ -378,7 +378,7 @@ public:
           };
         };
 
-        self->AnimateCameraTransition(iterpolateCameraState);
+        self->AnimateCameraTransition(interpolateCameraState);
       }
     }
 
@@ -407,7 +407,7 @@ public:
    * varying from `0.` for the initial to `1.` for the final state;
    * it shall return an appropriate linearly interpolated `camera_state_t` for any value in between.
    */
-  void AnimateCameraTransition(const std::function<camera_state_t(double)>& iterpolateCameraState)
+  void AnimateCameraTransition(const std::function<camera_state_t(double)>& interpolateCameraState)
   {
     window& win = this->Window;
     camera& cam = win.getCamera();
@@ -425,13 +425,13 @@ public:
         const double timeDelta =
           std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count();
         const double ratio = (1 - std::cos(vtkMath::Pi() * (timeDelta / duration))) / 2;
-        cam.setState(iterpolateCameraState(ratio));
+        cam.setState(interpolateCameraState(ratio));
         this->Window.render();
         now = std::chrono::high_resolution_clock::now();
       }
     }
 
-    cam.setState(iterpolateCameraState(1.)); // ensure final update
+    cam.setState(interpolateCameraState(1.)); // ensure final update
     this->Window.render();
   }
 
