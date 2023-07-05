@@ -199,7 +199,20 @@ bool vtkF3DPolyDataMapper::RenderWithMatCap(vtkActor* actor)
 void vtkF3DPolyDataMapper::ReplaceShaderColor(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
-  if (!this->RenderWithMatCap(actor))
+  if (this->RenderWithMatCap(actor))
+  {
+    auto fragmentShader = shaders[vtkShader::Fragment];
+    auto FSSource = fragmentShader->GetSource();
+
+    std::string customLight = "//VTK::Color::Impl\n"
+                              "vec2 uv = vec2(normalVCVSOutput.xy) * 0.5 + vec2(0.5,0.5);\n"
+                              "vec3 diffuseColor = vec3(0.0);\n"
+                              "vec3 ambientColor = texture(matcap, uv).rgb;\n";
+
+    vtkShaderProgram::Substitute(FSSource, "//VTK::Color::Impl", customLight);
+    fragmentShader->SetSource(FSSource);
+  }
+  else
   {
     this->Superclass::ReplaceShaderColor(shaders, ren, actor);
   }
@@ -214,9 +227,9 @@ void vtkF3DPolyDataMapper::ReplaceShaderLight(
     auto fragmentShader = shaders[vtkShader::Fragment];
     auto FSSource = fragmentShader->GetSource();
 
+    // set final color to gamma-corrected ambient color
     std::string customLight = "//VTK::Light::Impl\n"
-                              "vec2 uv = vec2(normalVCVSOutput.xy) * 0.5 + vec2(0.5,0.5);\n"
-                              "gl_FragData[0] = texture(matcap, uv);\n";
+                              "gl_FragData[0] = vec4(pow(ambientColor, vec3(1.0/2.2)), 1.0);\n";
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::Light::Impl", customLight);
     fragmentShader->SetSource(FSSource);
@@ -225,4 +238,22 @@ void vtkF3DPolyDataMapper::ReplaceShaderLight(
   {
     this->Superclass::ReplaceShaderLight(shaders, ren, actor);
   }
+}
+
+//-----------------------------------------------------------------------------
+void vtkF3DPolyDataMapper::ReplaceShaderTCoord(
+  std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
+{
+  if (this->RenderWithMatCap(actor))
+  {
+    // disable default behavior of VTK with textures to avoid blending with itself
+    auto fragmentShader = shaders[vtkShader::Fragment];
+    std::string FSSource = fragmentShader->GetSource();
+
+    vtkShaderProgram::Substitute(FSSource, "//VTK::TCoord::Impl", "");
+
+    fragmentShader->SetSource(FSSource);
+  }
+
+  this->Superclass::ReplaceShaderTCoord(shaders, ren, actor);
 }

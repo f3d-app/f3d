@@ -29,6 +29,8 @@ public:
     std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
   void ReplaceShaderLight(
     std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
+  void ReplaceShaderTCoord(
+    std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
   ///@}
 
 protected:
