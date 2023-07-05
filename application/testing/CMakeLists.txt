@@ -179,6 +179,7 @@ f3d_test(NAME TestGroupGeometriesColoring DATA mb/recursive ARGS --group-geometr
 f3d_test(NAME TestInvalidUpDirection DATA suzanne.ply ARGS -g --up=W REGEXP "W is not a valid up direction" NO_BASELINE)
 f3d_test(NAME TestUpDirectionNoSign DATA suzanne.ply ARGS --up=X DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${CMAKE_SOURCE_DIR}/testing/data/skin.png DEFAULT_LIGHTS)
+f3d_test(NAME TestTextureMatCapWithTCoords DATA WaterBottle.glb ARGS --geometry-only --texture-matcap=${CMAKE_SOURCE_DIR}/testing/data/skin.png DEFAULT_LIGHTS)
 
 if (NOT APPLE)
   # This test is broken on apple because of #792
@@ -237,6 +238,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestLineWidth DATA cow.vtk ARGS -e --line-width=5)
   f3d_test(NAME TestLineWidthFullScene DATA suzanne.obj ARGS -e --line-width=3 --up=-Y)
   f3d_test(NAME TestPointCloudFullScene DATA pointsCloud.gltf ARGS --point-size=20)
+  f3d_test(NAME TestTextureMatCapWithEdges DATA suzanne.ply ARGS -e --texture-matcap=${CMAKE_SOURCE_DIR}/testing/data/skin.png DEFAULT_LIGHTS)
 
   # Test enabling all animations
   f3d_test(NAME TestAnimationAllAnimations DATA InterpolationTest.glb ARGS --animation-index=-1 --animation-time=1)
