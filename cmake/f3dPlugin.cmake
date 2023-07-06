@@ -267,7 +267,7 @@ macro(f3d_plugin_build)
     set(_f3d_plugins_install_dir ${f3d_PLUGINS_INSTALL_DIR})
   else()
     # In-source plugin path
-    set(_f3d_include_path "${CMAKE_SOURCE_DIR}/library/plugin")
+    set(_f3d_include_path "${F3D_SOURCE_DIR}/library/plugin")
     set(_f3d_config_dir ${f3d_config_dir})
     set(_f3d_plugins_install_dir ${F3D_PLUGINS_INSTALL_DIR})
   endif()

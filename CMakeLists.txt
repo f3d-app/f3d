@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.21)
 include(CMakeDependentOption)
 
 # Generic CMake variables, should be done before project()

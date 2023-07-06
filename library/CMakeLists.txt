@@ -107,7 +107,7 @@ if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
   target_link_libraries(libf3d PRIVATE nlohmann_json::nlohmann_json)
 else ()
   target_include_directories(libf3d PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/nlohmann_json>)
+    $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)
 endif ()
 
 set_target_properties(libf3d PROPERTIES
@@ -196,7 +196,7 @@ if(BUILD_SHARED_LIBS)
 
   include(CMakePackageConfigHelpers)
   configure_package_config_file(
-    "${CMAKE_SOURCE_DIR}/cmake/f3dConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
+    "${F3D_SOURCE_DIR}/cmake/f3dConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
     INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d")
 
   write_basic_package_version_file(
@@ -208,12 +208,12 @@ if(BUILD_SHARED_LIBS)
     FILES
       "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
       "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
-      "${CMAKE_SOURCE_DIR}/cmake/f3dEmbed.cmake"
-      "${CMAKE_SOURCE_DIR}/cmake/f3dPlugin.cmake"
-      "${CMAKE_SOURCE_DIR}/cmake/plugin.cxx.in"
-      "${CMAKE_SOURCE_DIR}/cmake/plugin.desktop.in"
-      "${CMAKE_SOURCE_DIR}/cmake/plugin.thumbnailer.in"
-      "${CMAKE_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
+      "${F3D_SOURCE_DIR}/cmake/f3dEmbed.cmake"
+      "${F3D_SOURCE_DIR}/cmake/f3dPlugin.cmake"
+      "${F3D_SOURCE_DIR}/cmake/plugin.cxx.in"
+      "${F3D_SOURCE_DIR}/cmake/plugin.desktop.in"
+      "${F3D_SOURCE_DIR}/cmake/plugin.thumbnailer.in"
+      "${F3D_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
     DESTINATION
       "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
     COMPONENT sdk

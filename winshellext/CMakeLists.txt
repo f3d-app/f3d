@@ -13,7 +13,7 @@ if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
   target_link_libraries(F3DShellExtension PRIVATE nlohmann_json::nlohmann_json)
 else ()
   target_include_directories(F3DShellExtension PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/nlohmann_json>)
+    $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)
 endif ()
 
 target_link_libraries(F3DShellExtension PUBLIC libf3d PRIVATE pathcch shlwapi windowscodecs)
