@@ -641,9 +641,9 @@ jobs:
         mkdir install
 
     - name: Install VTK dependency
-      uses: ./source/.github/actions/vtk-install-dep
+      uses: ./source/f3d/.github/actions/vtk-install-dep
       with:
-        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+        vtk_sha_file: ./source/f3d/.github/actions/vtk_commit_sha
 
     - name: Setup Build Directory
       working-directory: ${{github.workspace}}
