@@ -13,7 +13,9 @@
 #include <vtkCallbackCommand.h>
 #include <vtkCellPicker.h>
 #include <vtkMath.h>
+#include <vtkMatrix3x3.h>
 #include <vtkNew.h>
+#include <vtkPicker.h>
 #include <vtkPointPicker.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
@@ -25,6 +27,8 @@
 #include <chrono>
 #include <cmath>
 #include <map>
+
+#include "camera.h"
 
 namespace f3d::detail
 {
@@ -71,8 +75,76 @@ public:
 #endif
   }
 
+  //----------------------------------------------------------------------------
+  // Method defined to normalize the Z axis so all models are treated temporarily
+  // as Z-up axis models.
+  void ToEnvironmentSpace(vtkMatrix3x3* transform)
+  {
+    vtkRenderer* renderer =
+      this->VTKInteractor->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
+    const double* up = renderer->GetEnvironmentUp();
+    const double* right = renderer->GetEnvironmentRight();
+    double fwd[3];
+    vtkMath::Cross(right, up, fwd);
+    const double m[9] = {
+      right[0], right[1], right[2], //
+      fwd[0], fwd[1], fwd[2],       //
+      up[0], up[1], up[2],          //
+    };
+    transform->DeepCopy(m);
+  }
+
+  //----------------------------------------------------------------------------
+  // Set the view orbit position on the viewport.
+  enum class ViewType
+  {
+    VT_FRONT,
+    VT_RIGHT,
+    VT_TOP,
+    VT_ISOMETRIC
+  };
+  static void SetViewOrbit(ViewType view, internals* self)
+  {
+    vtkNew<vtkMatrix3x3> transform;
+    self->ToEnvironmentSpace(transform);
+    camera& cam = self->Window.getCamera();
+    vector3_t up = { 0, 0, 1 };
+    point3_t foc = cam.getFocalPoint();
+    point3_t axis, newPos;
+
+    switch (view)
+    {
+      case ViewType::VT_FRONT:
+        axis = { 0, +1, 0 };
+        break;
+      case ViewType::VT_RIGHT:
+        axis = { +1, 0, 0 };
+        break;
+      case ViewType::VT_TOP:
+        axis = { 0, 0, +1 };
+        up = { 0, -1, 0 };
+        break;
+      case ViewType::VT_ISOMETRIC:
+        axis = { -1, +1, +1 };
+        break;
+    }
+
+    transform->MultiplyPoint(up.data(), up.data());
+    transform->MultiplyPoint(axis.data(), axis.data());
+
+    newPos[0] = foc[0] + axis[0];
+    newPos[1] = foc[1] + axis[1];
+    newPos[2] = foc[2] + axis[2];
+
+    /* set camera coordinates back */
+    cam.setPosition(newPos);
+    cam.setViewUp(up);
+    cam.resetToBounds(0.9);
+  }
+
   static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
   {
+
     internals* self = static_cast<internals*>(clientData);
     vtkRenderWindowInteractor* rwi = self->Style->GetInteractor();
     int keyCode = std::toupper(rwi->GetKeyCode());
@@ -230,6 +302,22 @@ public:
       case '?':
         self->Window.PrintColoringDescription(log::VerboseLevel::INFO);
         self->Window.PrintSceneDescription(log::VerboseLevel::INFO);
+        break;
+      case '1':
+        self->SetViewOrbit(ViewType::VT_FRONT, self);
+        render = true;
+        break;
+      case '3':
+        self->SetViewOrbit(ViewType::VT_RIGHT, self);
+        render = true;
+        break;
+      case '7':
+        self->SetViewOrbit(ViewType::VT_TOP, self);
+        render = true;
+        break;
+      case '9':
+        self->SetViewOrbit(ViewType::VT_ISOMETRIC, self);
+        render = true;
         break;
       default:
         if (keySym == F3D_EXIT_HOTKEY_SYM)
@@ -608,6 +696,7 @@ void interactor_impl::SetAnimationManager(animationManager* manager)
 {
   this->Internals->AnimationManager = manager;
 }
+
 //----------------------------------------------------------------------------
 void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 {
