@@ -4,10 +4,9 @@ requires = [
     "wheel",
     "setuptools_scm>=6.2",
     "scikit-build",
-    "cmake>=3.18",
-    "ninja; platform_system!='Windows'"
+    "cmake>=3.21",
 ]
-build-backend="setuptools.build_meta"
+build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
 write_to = "python/packaging/_version.py"

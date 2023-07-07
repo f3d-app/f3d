@@ -1,11 +1,11 @@
-import pathlib
-
+from pathlib import Path
 from skbuild import setup
+import os
 
 def exclude_static_libraries(cmake_manifest):
     return list(filter(lambda name: not (name.endswith(".a") and not name.endswith(".lib")), cmake_manifest))
 
-here = pathlib.Path(__file__).parent.resolve()
+here = Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
@@ -23,7 +23,7 @@ setup(
     author_email="mcmigliore+pip@gmail.com",
     license="BSD 3-Clause",
     license_files=["LICENSE.md"],
-    classifiers=[  # TODO
+    classifiers=[  # TODO?
         "License :: OSI Approved :: BSD License",
         "Operating System :: Microsoft :: Windows",
         "Operating System :: POSIX",
@@ -42,11 +42,15 @@ setup(
     cmake_source_dir=".",
     cmake_install_dir="python/packaging",
     cmake_args=[
-        "-DF3D_BINDINGS_PYTHON:BOOL=ON",
-        "-DBUILD_SHARED_LIBS:BOOL=OFF",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DF3D_BINDINGS_PYTHON=ON",
         "-DF3D_PLUGINS_STATIC_BUILD:BOOL=ON",
+        "-DF3D_BUILD_APPLICATION=OFF",
+        "-DF3D_EXCLUDE_DEPRECATED=OFF",
         *(f"-D{key}={val}" for key, val in os.environ.items() if key.startswith("F3D")),
     ],
-    cmake_process_manifest_hook=exclude_static_libraries,
+    #cmake_process_manifest_hook=exclude_static_libraries,
     zip_safe=False,
 )
