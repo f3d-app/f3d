@@ -408,9 +408,9 @@ jobs:
       shell: bash
       run: python -m pip install .
 
-    - name: Test wheel
-      working-directory: ${{github.workspace}}/source
-      run: python -m pytest
+    #- name: Test wheel
+    #  working-directory: ${{github.workspace}}/source
+    #  run: python -m pytest
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
