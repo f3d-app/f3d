@@ -388,6 +388,11 @@ jobs:
       shell: powershell
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+    - name: Set CMAKE_PREFIX_PATH
+      working-directory: ${{github.workspace}}/dependencies/install
+      shell: bash
+      run: echo "CMAKE_PREFIX_PATH=$(pwd)" >> $GITHUB_ENV
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -396,16 +401,16 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest
+        python -m pip install pytest
 
     - name: Build wheel
       working-directory: ${{github.workspace}}/source
       shell: bash
-      run: pip install .
+      run: python -m pip install .
 
     - name: Test wheel
       working-directory: ${{github.workspace}}/source
-      run: pytest
+      run: python -m pytest
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
