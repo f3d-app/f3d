@@ -624,7 +624,7 @@ jobs:
       working-directory: ${{github.workspace}}
       run: |
         mkdir source
-        echo "project(toplevel)\nadd_subdirectory(f3d)" > source/CMakeLists.txt
+        echo "cmake_minimum_required(VERSION 3.21)\nproject(toplevel)\nadd_subdirectory(f3d)" > source/CMakeLists.txt
 
     - name: Checkout
       uses: actions/checkout@v3
