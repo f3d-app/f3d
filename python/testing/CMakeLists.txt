@@ -27,7 +27,7 @@ list(APPEND pyf3dTestsNoRender_list
 # Add all the ADD_TEST for each test
 foreach(test ${pyf3dTests_list})
   get_filename_component (TName ${test} NAME_WE)
-  add_test(NAME pyf3d::${TName} COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/${test} $<TARGET_FILE_DIR:VTK::CommonCore> ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
+  add_test(NAME pyf3d::${TName} COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/${test} $<TARGET_FILE_DIR:VTK::CommonCore> ${F3D_SOURCE_DIR} ${CMAKE_BINARY_DIR})
   set_tests_properties(pyf3d::${TName} PROPERTIES
     ENVIRONMENT "PYTHONPATH=$<TARGET_FILE_DIR:pyf3d>"
     FAIL_REGULAR_EXPRESSION "AssertionError")

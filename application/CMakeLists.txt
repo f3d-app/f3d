@@ -2,7 +2,7 @@
 include("f3dEmbed")
 
 f3d_embed_file(
-  INPUT "${CMAKE_SOURCE_DIR}/resources/logo32.png"
+  INPUT "${F3D_SOURCE_DIR}/resources/logo32.png"
   NAME F3DIcon
   BINARY)
 
@@ -19,7 +19,7 @@ set(F3D_SOURCE_FILES
 )
 
 if(WIN32)
-  list(APPEND F3D_SOURCE_FILES "${CMAKE_SOURCE_DIR}/resources/f3d.rc")
+  list(APPEND F3D_SOURCE_FILES "${F3D_SOURCE_DIR}/resources/f3d.rc")
 endif()
 
 if(APPLE)
@@ -52,7 +52,7 @@ if (APPLE)
 elseif (UNIX)
   set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../${CMAKE_INSTALL_LIBDIR})
 elseif (MSVC)
-  set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT f3d) # Set f3d as startup project in visual studio
+  set_property(DIRECTORY ${F3D_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT f3d) # Set f3d as startup project in visual studio
   set_target_properties(f3d PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=$<TARGET_FILE_DIR:VTK::CommonCore>") # Add VTK in MSVC PATH environment variable
 endif ()
 
@@ -60,13 +60,13 @@ target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_D
 if (F3D_USE_EXTERNAL_CXXOPTS)
   target_link_libraries(f3d PRIVATE cxxopts::cxxopts)
 else ()
-  target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/cxxopts>)
+  target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/cxxopts>)
 endif ()
 
 if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
   target_link_libraries(f3d PRIVATE nlohmann_json::nlohmann_json)
 else ()
-  target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/external/nlohmann_json>)
+  target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)
 endif ()
 
 set(f3d_compile_options_private "")
@@ -102,7 +102,7 @@ if(F3D_MACOS_BUNDLE)
 
   # Add logo icon
   set(MACOSX_BUNDLE_ICON_FILE logo.icns)
-  set(f3d_ICON ${CMAKE_SOURCE_DIR}/resources/logo.icns)
+  set(f3d_ICON ${F3D_SOURCE_DIR}/resources/logo.icns)
   set_source_files_properties(${f3d_ICON} PROPERTIES
     MACOSX_PACKAGE_LOCATION "Resources")
   target_sources(f3d PRIVATE ${f3d_ICON})
@@ -118,7 +118,7 @@ if(F3D_MACOS_BUNDLE)
   set(MACOSX_BUNDLE_COPYRIGHT "Michael Migliore, Mathieu Westphal")
 
   # Generate MacOS bundle
-  configure_file("${CMAKE_SOURCE_DIR}/resources/BundleInfo.plist.in"
+  configure_file("${F3D_SOURCE_DIR}/resources/BundleInfo.plist.in"
     "${CMAKE_CURRENT_BINARY_DIR}/BundleInfo.plist")
   set_target_properties(f3d PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/BundleInfo.plist")
 endif()
