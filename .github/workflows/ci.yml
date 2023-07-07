@@ -604,3 +604,62 @@ jobs:
         --enable=all
         --suppressions-list=.cppcheck.supp
         --error-exitcode=1
+
+#----------------------------------------------------------------------------
+# external-build: Check build of F3D as sub-project
+#----------------------------------------------------------------------------
+  external-build:
+    needs: cache_lfs
+    if: github.event.pull_request.draft == false
+
+    strategy:
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+    container: ghcr.io/f3d-app/f3d-ci
+
+    steps:
+
+    - name: Create top level
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir source
+        echo "project(toplevel)\nadd_subdirectory(f3d)" > source/CMakeLists.txt
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source/f3d'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Dependencies Dir
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
+
+    - name: Install VTK dependency
+      uses: ./source/.github/actions/vtk-install-dep
+      with:
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+
+    - name: Setup Build Directory
+      working-directory: ${{github.workspace}}
+      run: mkdir build
+
+    - name: Configure
+      working-directory: ${{github.workspace}}/build
+      run: >
+        cmake ../source
+        -Werror=dev
+        -Werror=deprecated
+        --warn-uninitialized
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_STRICT_BUILD=ON
+
+    - name: Build
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --parallel 2
