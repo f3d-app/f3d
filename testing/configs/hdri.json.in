@@ -1,6 +1,6 @@
 {
   "global":
   {
-    "hdri": "${CMAKE_SOURCE_DIR}/testing/data/palermo_park_1k.hdr"
+    "hdri": "${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr"
   }
 }
