@@ -404,10 +404,11 @@ public:
   /**
    * Run a camera transition animation based on a camera state interpolation function.
    * The provided function will be called with an interpolation parameter
-   * varying from `0.` for the initial to `1.` for the final state;
+   * varying from `0.` for the initial state to `1.` for the final state;
    * it shall return an appropriate linearly interpolated `camera_state_t` for any value in between.
    */
-  void AnimateCameraTransition(const std::function<camera_state_t(double)>& interpolateCameraState)
+  template<class CameraStateInterpolator>
+  void AnimateCameraTransition(CameraStateInterpolator interpolateCameraState)
   {
     window& win = this->Window;
     camera& cam = win.getCamera();
