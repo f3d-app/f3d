@@ -1,5 +1,16 @@
 # Changelog
 
+## Ongoing development
+
+For F3D users:
+ - Added bindings to move the camera to standard locations: `1`: Front, `3`: Right, `7: Top, `9`: Isometric
+ - Fixed an issue with matcap textures
+
+For developers:
+
+For F3D packagers:
+ - Fixed compatibility with FreeBSD
+
 ## v2.1.0
 
 For F3D users:

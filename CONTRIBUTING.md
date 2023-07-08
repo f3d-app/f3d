@@ -48,6 +48,12 @@ However, some [formatting rules](doc/dev/CODING_STYLE.md) are not enforced by cl
 
 When making changes to the libf3d public API, the CI will warn about making related changes to the bindings. This is required in order to merge the PR.
 
+## Changelog
+
+Whenever you make significant changes, either bugfixes or features, please update the [changelog](doc/CHANGELOG.md) "Ongoing development" section.
+There are three subsections. "For F3D Users" are changes that impact actual F3D users and related to F3D behaviors changing. "For developers" are change
+that impact developers that build F3D. "For F3D packagers" are for changes that impact anyone packaging F3D, eg: new CMake options.
+
 ## F3D architecture
 
 F3D is separated in different components:
