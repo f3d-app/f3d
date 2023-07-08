@@ -47,6 +47,7 @@ setup(
         "-DBUILD_SHARED_LIBS=OFF",
         "-DF3D_BINDINGS_PYTHON=ON",
         "-DF3D_PLUGINS_STATIC_BUILD:BOOL=ON",
+        "-DF3D_PLUGIN_BUILD_EXODUS:BOOL=OFF",
         "-DF3D_BUILD_APPLICATION=OFF",
         "-DF3D_EXCLUDE_DEPRECATED=OFF",
         *(f"-D{key}={val}" for key, val in os.environ.items() if key.startswith("F3D")),
