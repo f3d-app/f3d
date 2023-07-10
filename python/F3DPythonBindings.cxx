@@ -276,7 +276,19 @@ PYBIND11_MODULE(f3d, module)
       return img.setChannelCount(channels);
     });
 
-  image.def("setData", setImageBytes);
-  image.def("getData", getImageBytes);
+  image.def("setData",
+    [=](f3d::image& img, const py::bytes& data)
+    {
+      PyErr_WarnEx(PyExc_DeprecationWarning,
+        "setData is deprecated, use setContent instead.", 1);
+      setImageBytes(img, data);
+    });
+  image.def("getData",
+    [=](const f3d::image& img)
+    {
+      PyErr_WarnEx(PyExc_DeprecationWarning,
+        "getData is deprecated, use getContent instead.", 1);
+      getImageBytes(img);
+    });
 #endif
 }
