@@ -179,14 +179,19 @@ image::ChannelType image::getChannelType() const
 }
 
 //----------------------------------------------------------------------------
+unsigned int image::getTypeSize() const
+{
+  return this->Internals->Image->GetScalarSize();
+}
+
+//----------------------------------------------------------------------------
 image& image::setData(void* buffer)
 {
   unsigned int scalarSize = this->Internals->Image->GetScalarSize();
   unsigned int totalSize =
     this->getWidth() * this->getHeight() * this->getChannelCount() * scalarSize;
-  unsigned char* internalBuffer =
-    static_cast<unsigned char*>(this->Internals->Image->GetScalarPointer());
-  std::copy_n(static_cast<unsigned char*>(buffer), totalSize, internalBuffer);
+  uint8_t* internalBuffer = static_cast<uint8_t*>(this->Internals->Image->GetScalarPointer());
+  std::copy_n(static_cast<uint8_t*>(buffer), totalSize, internalBuffer);
   return *this;
 }
 
@@ -195,6 +200,14 @@ void* image::getData() const
 {
   return this->Internals->Image->GetScalarPointer();
 }
+
+#ifndef F3D_NO_DEPRECATED
+//----------------------------------------------------------------------------
+unsigned char* image::getData() const
+{
+  return static_cast<unsigned char*>(this->Internals->Image->GetScalarPointer());
+}
+#endif
 
 //----------------------------------------------------------------------------
 bool image::compare(const image& reference, double threshold, image& diff, double& error) const

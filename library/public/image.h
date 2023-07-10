@@ -114,6 +114,11 @@ public:
    */
   ChannelType getChannelType() const;
 
+  /**
+   * Get image channel type size in bytes.
+   */
+  unsigned int getTypeSize() const;
+
   ///@{ @name Buffer Data
   /**
    * Set/Get image buffer data.
@@ -121,6 +126,9 @@ public:
    */
   image& setData(void* buffer);
   void* getData() const;
+#ifndef F3D_NO_DEPRECATED
+  F3D_DEPRECATED unsigned char* getData() const;
+#endif
   ///@}
 
   /**

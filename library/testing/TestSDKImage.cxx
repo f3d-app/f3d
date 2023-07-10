@@ -60,7 +60,13 @@ int TestSDKImage(int argc, char* argv[])
 
   if (shortImg.getChannelType() != f3d::image::ChannelType::SHORT)
   {
-    std::cerr << "Cannot read a 16-bits image" << std::endl;
+    std::cerr << "Cannot read a 16-bits image type" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (shortImg.getTypeSize() != 2)
+  {
+    std::cerr << "Cannot read a 16-bits image type size" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -70,6 +76,12 @@ int TestSDKImage(int argc, char* argv[])
   if (hdrImg.getChannelType() != f3d::image::ChannelType::FLOAT)
   {
     std::cerr << "Cannot read a HDR 32-bits image" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (shortImg.getTypeSize() != 4)
+  {
+    std::cerr << "Cannot read a HDR 32-bits image type size" << std::endl;
     return EXIT_FAILURE;
   }
 
