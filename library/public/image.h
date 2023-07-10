@@ -123,7 +123,7 @@ public:
   /**
    * Set/Get image buffer data.
    * Its size is expected to be `width * height * channelCount * typeSize`.
-   * 
+   *
    * \deprecated { setData and getData are deprecated, use setContent and getContent instead }
    */
   image& setContent(void* buffer);
