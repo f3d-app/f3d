@@ -69,15 +69,23 @@ jobs:
             os: macos
             vtk_version: commit
             raytracing_label: no-raytracing
+            exclude_deprecated_label: no-exclude-deprecated
             bundle_label: bundle
+            egl_label: no-egl
           - build_type: headless
             os: ubuntu
             vtk_version: commit
+            raytracing_label: raytracing
+            exclude_deprecated_label: no-exclude-deprecated
+            bundle_label: no-bundle
             egl_label: egl
           - build_type: exclude_deprecated
             os: ubuntu
             vtk_version: commit
+            raytracing_label: raytracing
             exclude_deprecated_label: exclude-deprecated
+            bundle_label: no-bundle
+            egl_label: no-egl
 
     runs-on: ${{matrix.os}}-latest
     container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
