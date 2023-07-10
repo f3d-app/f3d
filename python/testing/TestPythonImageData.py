@@ -1,6 +1,6 @@
+import os
 import sys
 if sys.platform.startswith('win32'):
-  import os
   os.add_dll_directory(sys.argv[1])
 
 import f3d
@@ -16,7 +16,7 @@ img = window.renderToImage()
 width = img.getWidth()
 height = img.getHeight()
 depth = img.getChannelCount()
-data = img.getData()
+data = img.getContent()
 
 assert width == window.getWidth()
 assert height == window.getHeight()
@@ -31,7 +31,7 @@ img = window.renderToImage(True)
 width = img.getWidth()
 height = img.getHeight()
 depth = img.getChannelCount()
-data = img.getData()
+data = img.getContent()
 
 assert width == window.getWidth()
 assert height == window.getHeight()
@@ -43,7 +43,15 @@ assert len(data) == depth * width * height
 '''set data back'''
 
 img.setData(data)
-assert img.getData() == data
+assert img.getContent() == data
+
+'''check channel type and save image'''
+
+assert img.getChannelType() == f3d.image.ChannelType.BYTE
+assert img.getChannelTypeSize() == 1
+
+img.save(sys.argv[3] + "/Testing/Temporary/TestPythonSaveFile.bmp", f3d.image.SaveFormat.BMP)
+assert os.path.isfile(sys.argv[3] + "/Testing/Temporary/TestPythonSaveFile.bmp")
 
 
 '''attempt to set partial data back'''

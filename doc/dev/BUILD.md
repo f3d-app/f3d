@@ -15,6 +15,7 @@ needed dependencies, configuring and building.
 * Optionally, [Draco](https://google.github.io/draco/) >= 1.5.
 * Optionally, [Python](https://www.python.org/) >= 3.6 and [pybind11](https://github.com/pybind/pybind11) >= 2.2.
 * Optionally, [Java](https://www.java.com) >= 18.
+* Optionally, [OpenEXR](https://openexr.com/en/latest/) >= 3.0.
 
 ## VTK compatibility
 

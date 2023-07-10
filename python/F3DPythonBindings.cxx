@@ -68,35 +68,55 @@ PYBIND11_MODULE(f3d, module)
   module.doc() = "f3d library bindings";
 
   // f3d::image
-  py::class_<f3d::image>(module, "image")
-    .def(py::init<>())
+  py::class_<f3d::image> image(module, "image");
+
+  py::enum_<f3d::image::SaveFormat>(image, "SaveFormat")
+    .value("PNG", f3d::image::SaveFormat::PNG)
+    .value("JPG", f3d::image::SaveFormat::JPG)
+    .value("TIF", f3d::image::SaveFormat::TIF)
+    .value("BMP", f3d::image::SaveFormat::BMP)
+    .export_values();
+
+  py::enum_<f3d::image::ChannelType>(image, "ChannelType")
+    .value("BYTE", f3d::image::ChannelType::BYTE)
+    .value("SHORT", f3d::image::ChannelType::SHORT)
+    .value("FLOAT", f3d::image::ChannelType::FLOAT)
+    .export_values();
+
+  auto setImageBytes = [](f3d::image& img, const py::bytes& data)
+  {
+    const py::buffer_info info(py::buffer(data).request());
+    size_t expectedSize =
+      img.getChannelCount() * img.getWidth() * img.getHeight() * img.getChannelTypeSize();
+    if (info.itemsize != 1 || info.size != expectedSize)
+    {
+      throw py::value_error();
+    }
+    img.setContent(info.ptr);
+  };
+
+  auto getImageBytes = [](const f3d::image& img)
+  {
+    size_t expectedSize =
+      img.getChannelCount() * img.getWidth() * img.getHeight() * img.getChannelTypeSize();
+    return py::bytes(static_cast<char*>(img.getContent()), expectedSize);
+  };
+
+  image.def(py::init<>())
     .def(py::init<const std::string&>())
+    .def(py::init<unsigned int, unsigned int, unsigned int, f3d::image::ChannelType>())
     .def(py::self == py::self)
     .def(py::self != py::self)
     .def("getWidth", &f3d::image::getWidth)
     .def("getHeight", &f3d::image::getHeight)
-    .def("setResolution", &f3d::image::setResolution)
     .def("getChannelCount", &f3d::image::getChannelCount)
-    .def("setChannelCount", &f3d::image::setChannelCount)
-    .def("setData",
-      [](f3d::image& img, const py::bytes& data)
-      {
-        const py::buffer_info info(py::buffer(data).request());
-        if (info.itemsize != 1 ||
-          info.size != img.getChannelCount() * img.getWidth() * img.getHeight())
-        {
-          throw py::value_error();
-        }
-        img.setData((unsigned char*)info.ptr);
-      })
-    .def("getData",
-      [](const f3d::image& img)
-      {
-        return py::bytes(
-          (char*)img.getData(), img.getChannelCount() * img.getWidth() * img.getHeight());
-      })
+    .def("getChannelType", &f3d::image::getChannelType)
+    .def("getChannelTypeSize", &f3d::image::getChannelTypeSize)
+    .def("setContent", setImageBytes)
+    .def("getContent", getImageBytes)
     .def("compare", &f3d::image::compare)
-    .def("save", &f3d::image::save);
+    .def(
+      "save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG);
 
   // f3d::options
   py::class_<f3d::options>(module, "options")
@@ -237,4 +257,39 @@ PYBIND11_MODULE(f3d, module)
     .def_static("getLibInfo", &f3d::engine::getLibInfo)
     .def_static("getReadersInfo", &f3d::engine::getReadersInfo)
     .def_static("getPluginsList", &f3d::engine::getPluginsList);
+
+// deprecated functions, will be removed in the next major release, F3D v3.0.0
+#ifndef F3D_NO_DEPRECATED
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  image.def("setResolution",
+    [](f3d::image& img, unsigned int width, unsigned height)
+    {
+      PyErr_WarnEx(PyExc_DeprecationWarning,
+        "setResolution is deprecated, use the appropriate constructor instead.", 1);
+      return img.setResolution(width, height);
+    });
+
+  image.def("setChannelCount",
+    [](f3d::image& img, unsigned int channels)
+    {
+      PyErr_WarnEx(PyExc_DeprecationWarning,
+        "setChannelCount is deprecated, use the appropriate constructor instead.", 1);
+      return img.setChannelCount(channels);
+    });
+
+  image.def("setData",
+    [=](f3d::image& img, const py::bytes& data)
+    {
+      PyErr_WarnEx(PyExc_DeprecationWarning, "setData is deprecated, use setContent instead.", 1);
+      setImageBytes(img, data);
+    });
+  image.def("getData",
+    [=](const f3d::image& img)
+    {
+      PyErr_WarnEx(PyExc_DeprecationWarning, "getData is deprecated, use getContent instead.", 1);
+      getImageBytes(img);
+    });
+#pragma GCC diagnostic pop
+#endif
 }

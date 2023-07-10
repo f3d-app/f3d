@@ -10,6 +10,7 @@ namespace F3D
   const std::string PluginsInstallDir = "@F3D_PLUGINS_INSTALL_DIR@";
 }
 
+// TODO: Use CMake definitions and get rid of these
 #cmakedefine01 F3D_MACOS_BUNDLE
 #cmakedefine01 F3D_MODULE_RAYTRACING
 #cmakedefine01 F3D_MODULE_EXR
