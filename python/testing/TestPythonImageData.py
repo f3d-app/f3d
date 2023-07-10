@@ -42,7 +42,7 @@ assert len(data) == depth * width * height
 
 '''set data back'''
 
-img.setData(data)
+img.setContent(data)
 assert img.getContent() == data
 
 '''check channel type and save image'''
@@ -57,7 +57,7 @@ assert os.path.isfile(sys.argv[3] + "/Testing/Temporary/TestPythonSaveFile.bmp")
 '''attempt to set partial data back'''
 
 try:
-    img.setData(data[:-1])
+    img.setContent(data[:-1])
     assert False, 'expected exception'
 except ValueError:
     assert True
