@@ -38,7 +38,7 @@ protected:
     QImage frameBuffer = grabFramebuffer().mirrored().convertToFormat(QImage::Format_RGB888);
 
     f3d::image img(frameBuffer.width(), frameBuffer.height(), 3);
-    img.setData(frameBuffer.bits());
+    img.setContent(frameBuffer.bits());
 
     if (!TestSDKHelpers::RenderTest(
           img, this->mBaselinePath, this->mOutputPath, "TestSDKExternalWindowQT"))

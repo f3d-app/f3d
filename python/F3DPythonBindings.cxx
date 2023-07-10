@@ -258,8 +258,10 @@ PYBIND11_MODULE(f3d, module)
     .def_static("getReadersInfo", &f3d::engine::getReadersInfo)
     .def_static("getPluginsList", &f3d::engine::getPluginsList);
 
-// deprecated functions, will be removed in the next major release
+// deprecated functions, will be removed in the next major release, F3D v3.0.0
 #ifndef F3D_NO_DEPRECATED
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   image.def("setResolution",
     [](f3d::image& img, unsigned int width, unsigned height)
     {
@@ -288,5 +290,6 @@ PYBIND11_MODULE(f3d, module)
       PyErr_WarnEx(PyExc_DeprecationWarning, "getData is deprecated, use getContent instead.", 1);
       getImageBytes(img);
     });
+#pragma GCC diagnostic pop
 #endif
 }
