@@ -7,7 +7,12 @@ For F3D users:
  - Fixed an issue with the binary release when opening draco files
  - Fixed an issue with matcap textures
 
+For libf3d users:
+ - Reworked image API to support many file formats to read (EXR, HDR) and write (PNG, JPG, TIF, BMP)
+ - Deprecated previous image API
+
 For developers:
+ - Added a deprecation framework
 
 For F3D packagers:
  - Fixed compatibility with FreeBSD
