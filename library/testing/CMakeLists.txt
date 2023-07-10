@@ -22,6 +22,10 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
     TestSDKDynamicLightIntensity.cxx
     TestSDKDynamicProperties.cxx
     )
+  if(NOT F3D_EXCLUDE_DEPRECATED)
+    list(APPEND libf3dSDKTests_list
+         TestSDKImageDeprecated.cxx)
+  endif()
 endif()
 
 # Animation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
