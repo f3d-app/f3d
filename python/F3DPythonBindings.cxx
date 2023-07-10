@@ -14,8 +14,6 @@
 
 namespace py = pybind11;
 
-namespace
-{
 template<typename T, size_t S>
 bool load_array(const py::handle& src, bool convert, std::array<T, S>& value)
 {
@@ -37,27 +35,11 @@ bool load_array(const py::handle& src, bool convert, std::array<T, S>& value)
   return true;
 }
 
-size_t get_channel_size(f3d::image::ChannelType type)
-{
-  switch (type)
-  {
-    case f3d::image::ChannelType::BYTE:
-      return 1;
-    case f3d::image::ChannelType::SHORT:
-      return 2;
-    case f3d::image::ChannelType::FLOAT:
-      return 4;
-  }
-
-  return 0;
-}
-}
-
 template<>
 class py::detail::type_caster<f3d::point3_t>
 {
 public:
-  bool load(handle src, bool convert) { return ::load_array(src, convert, value); }
+  bool load(handle src, bool convert) { return load_array(src, convert, value); }
 
   static handle cast(const f3d::point3_t& src, return_value_policy, handle /* parent */)
   {
@@ -71,7 +53,7 @@ template<>
 class py::detail::type_caster<f3d::vector3_t>
 {
 public:
-  bool load(handle src, bool convert) { return ::load_array(src, convert, value); }
+  bool load(handle src, bool convert) { return load_array(src, convert, value); }
 
   static handle cast(const f3d::vector3_t& src, return_value_policy, handle /* parent */)
   {
@@ -101,6 +83,23 @@ PYBIND11_MODULE(f3d, module)
     .value("FLOAT", f3d::image::ChannelType::FLOAT)
     .export_values();
 
+  auto setImageBytes = [](f3d::image& img, const py::bytes& data) {
+    const py::buffer_info info(py::buffer(data).request());
+    size_t expectedSize =
+      img.getChannelCount() * img.getWidth() * img.getHeight() * img.getChannelTypeSize();
+    if (info.itemsize != 1 || info.size != expectedSize)
+    {
+      throw py::value_error();
+    }
+    img.setContent(info.ptr);
+  };
+
+  auto getImageBytes = [](const f3d::image& img) {
+    size_t expectedSize =
+      img.getChannelCount() * img.getWidth() * img.getHeight() * img.getChannelTypeSize();
+    return py::bytes(static_cast<char*>(img.getContent()), expectedSize);
+  };
+
   image.def(py::init<>())
     .def(py::init<const std::string&>())
     .def(py::init<unsigned int, unsigned int, unsigned int, f3d::image::ChannelType>())
@@ -111,25 +110,8 @@ PYBIND11_MODULE(f3d, module)
     .def("getChannelCount", &f3d::image::getChannelCount)
     .def("getChannelType", &f3d::image::getChannelType)
     .def("getChannelTypeSize", &f3d::image::getChannelTypeSize)
-    .def("setData",
-      [](f3d::image& img, const py::bytes& data)
-      {
-        const py::buffer_info info(py::buffer(data).request());
-        size_t expectedSize = img.getChannelCount() * img.getWidth() * img.getHeight() *
-          ::get_channel_size(img.getChannelType());
-        if (info.itemsize != 1 || info.size != expectedSize)
-        {
-          throw py::value_error();
-        }
-        img.setData(info.ptr);
-      })
-    .def("getData",
-      [](const f3d::image& img)
-      {
-        size_t expectedSize = img.getChannelCount() * img.getWidth() * img.getHeight() *
-          ::get_channel_size(img.getChannelType());
-        return py::bytes(static_cast<char*>(img.getData()), expectedSize);
-      })
+    .def("setContent", setImageBytes)
+    .def("getContent", getImageBytes)
     .def("compare", &f3d::image::compare)
     .def(
       "save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG);
@@ -276,20 +258,19 @@ PYBIND11_MODULE(f3d, module)
 
 // deprecated functions, will be removed in the next major release
 #ifndef F3D_NO_DEPRECATED
-  image.def("setResolution",
-    [](f3d::image& img, unsigned int width, unsigned height)
-    {
-      PyErr_WarnEx(PyExc_DeprecationWarning,
-        "setResolution is deprecated, use the appropriate constructor instead.", 1);
-      return img.setResolution(width, height);
-    });
+  image.def("setResolution", [](f3d::image& img, unsigned int width, unsigned height) {
+    PyErr_WarnEx(PyExc_DeprecationWarning,
+      "setResolution is deprecated, use the appropriate constructor instead.", 1);
+    return img.setResolution(width, height);
+  });
 
-  image.def("setChannelCount",
-    [](f3d::image& img, unsigned int channels)
-    {
-      PyErr_WarnEx(PyExc_DeprecationWarning,
-        "setChannelCount is deprecated, use the appropriate constructor instead.", 1);
-      return img.setChannelCount(channels);
-    });
+  image.def("setChannelCount", [](f3d::image& img, unsigned int channels) {
+    PyErr_WarnEx(PyExc_DeprecationWarning,
+      "setChannelCount is deprecated, use the appropriate constructor instead.", 1);
+    return img.setChannelCount(channels);
+  });
+
+  image.def("setData", setImageBytes);
+  image.def("getData", getImageBytes);
 #endif
 }

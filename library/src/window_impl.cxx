@@ -420,7 +420,7 @@ image window_impl::renderToImage(bool noBackground)
   int cmp = exporter->GetDataNumberOfScalarComponents();
 
   image output(dims[0], dims[1], cmp);
-  exporter->Export(output.getData());
+  exporter->Export(output.getContent());
 
   return output;
 }

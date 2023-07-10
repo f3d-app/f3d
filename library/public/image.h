@@ -124,9 +124,10 @@ public:
    * Set/Get image buffer data.
    * Its size is expected to be `width * height * channelCount * typeSize`.
    */
-  image& setData(void* buffer);
-  void* getData() const;
+  image& setContent(void* buffer);
+  void* getContent() const;
 #ifndef F3D_NO_DEPRECATED
+  F3D_DEPRECATED image& setData(unsigned char* buffer);
   F3D_DEPRECATED unsigned char* getData() const;
 #endif
   ///@}

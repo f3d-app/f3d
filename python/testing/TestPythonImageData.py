@@ -16,7 +16,7 @@ img = window.renderToImage()
 width = img.getWidth()
 height = img.getHeight()
 depth = img.getChannelCount()
-data = img.getData()
+data = img.getContent()
 
 assert width == window.getWidth()
 assert height == window.getHeight()
@@ -31,7 +31,7 @@ img = window.renderToImage(True)
 width = img.getWidth()
 height = img.getHeight()
 depth = img.getChannelCount()
-data = img.getData()
+data = img.getContent()
 
 assert width == window.getWidth()
 assert height == window.getHeight()
@@ -43,7 +43,7 @@ assert len(data) == depth * width * height
 '''set data back'''
 
 img.setData(data)
-assert img.getData() == data
+assert img.getContent() == data
 
 '''check channel type and save image'''
 

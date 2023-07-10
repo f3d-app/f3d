@@ -20,7 +20,7 @@ int TestSDKImage(int argc, char* argv[])
   std::generate(std::begin(pixels), std::end(pixels), [&]() { return rand_generator() % 256; });
 
   f3d::image generated(width, height, channels);
-  generated.setData(pixels.data());
+  generated.setContent(pixels.data());
 
   // test save in different formats
   generated.save(std::string(argv[2]) + "TestSDKImage.png");
@@ -79,7 +79,7 @@ int TestSDKImage(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (shortImg.getChannelTypeSize() != 4)
+  if (hdrImg.getChannelTypeSize() != 4)
   {
     std::cerr << "Cannot read a HDR 32-bits image type size" << std::endl;
     return EXIT_FAILURE;
@@ -135,7 +135,7 @@ int TestSDKImage(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (generated.getData() == nullptr)
+  if (generated.getContent() == nullptr)
   {
     std::cerr << "Image has no data" << std::endl;
     return EXIT_FAILURE;

@@ -185,7 +185,7 @@ unsigned int image::getChannelTypeSize() const
 }
 
 //----------------------------------------------------------------------------
-image& image::setData(void* buffer)
+image& image::setContent(void* buffer)
 {
   unsigned int scalarSize = this->Internals->Image->GetScalarSize();
   unsigned int totalSize =
@@ -196,16 +196,23 @@ image& image::setData(void* buffer)
 }
 
 //----------------------------------------------------------------------------
-void* image::getData() const
+void* image::getContent() const
 {
   return this->Internals->Image->GetScalarPointer();
 }
 
 #ifndef F3D_NO_DEPRECATED
 //----------------------------------------------------------------------------
+image& image::setData(unsigned char* buffer)
+{
+  this->setContent(buffer);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 unsigned char* image::getData() const
 {
-  return static_cast<unsigned char*>(this->Internals->Image->GetScalarPointer());
+  return static_cast<unsigned char*>(this->getContent());
 }
 #endif
 
