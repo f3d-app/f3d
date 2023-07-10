@@ -122,9 +122,15 @@ set_target_properties(libf3d PROPERTIES
 
 # Generate export macros for exported public APIs
 include(GenerateExportHeader)
+option(F3D_EXCLUDE_DEPRECATED "Exclude deprecated functions of the library" OFF)
+set(libf3d_no_deprecated)
+if(F3D_EXCLUDE_DEPRECATED)
+  set(libf3d_no_deprecated "DEFINE_NO_DEPRECATED")
+endif()
 generate_export_header(libf3d
   EXPORT_FILE_NAME public/export.h
-  EXPORT_MACRO_NAME F3D_EXPORT)
+  BASE_NAME F3D
+  ${libf3d_no_deprecated})
 
 target_include_directories(libf3d
   INTERFACE

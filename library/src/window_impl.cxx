@@ -419,11 +419,8 @@ image window_impl::renderToImage(bool noBackground)
   int* dims = exporter->GetDataDimensions();
   int cmp = exporter->GetDataNumberOfScalarComponents();
 
-  image output;
-  output.setResolution(dims[0], dims[1]);
-  output.setChannelCount(cmp);
-
-  exporter->Export(output.getData());
+  image output(dims[0], dims[1], cmp);
+  exporter->Export(output.getContent());
 
   return output;
 }
