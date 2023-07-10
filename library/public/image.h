@@ -117,7 +117,7 @@ public:
   /**
    * Get image channel type size in bytes.
    */
-  unsigned int getTypeSize() const;
+  unsigned int getChannelTypeSize() const;
 
   ///@{ @name Buffer Data
   /**

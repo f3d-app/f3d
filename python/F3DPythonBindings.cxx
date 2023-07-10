@@ -110,6 +110,7 @@ PYBIND11_MODULE(f3d, module)
     .def("getHeight", &f3d::image::getHeight)
     .def("getChannelCount", &f3d::image::getChannelCount)
     .def("getChannelType", &f3d::image::getChannelType)
+    .def("getChannelTypeSize", &f3d::image::getChannelTypeSize)
     .def("setData",
       [](f3d::image& img, const py::bytes& data)
       {

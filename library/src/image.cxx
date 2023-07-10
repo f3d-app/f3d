@@ -179,7 +179,7 @@ image::ChannelType image::getChannelType() const
 }
 
 //----------------------------------------------------------------------------
-unsigned int image::getTypeSize() const
+unsigned int image::getChannelTypeSize() const
 {
   return this->Internals->Image->GetScalarSize();
 }

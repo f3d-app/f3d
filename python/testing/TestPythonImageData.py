@@ -48,6 +48,7 @@ assert img.getData() == data
 '''check channel type and save image'''
 
 assert img.getChannelType() == f3d.image.ChannelType.BYTE
+assert img.getChannelTypeSize() == 1
 
 img.save(sys.argv[3] + "/Testing/Temporary/TestPythonSaveFile.bmp", f3d.image.SaveFormat.BMP)
 assert os.path.isfile(sys.argv[3] + "/Testing/Temporary/TestPythonSaveFile.bmp")

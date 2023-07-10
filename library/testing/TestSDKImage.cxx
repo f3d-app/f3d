@@ -64,7 +64,7 @@ int TestSDKImage(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (shortImg.getTypeSize() != 2)
+  if (shortImg.getChannelTypeSize() != 2)
   {
     std::cerr << "Cannot read a 16-bits image type size" << std::endl;
     return EXIT_FAILURE;
@@ -79,7 +79,7 @@ int TestSDKImage(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (shortImg.getTypeSize() != 4)
+  if (shortImg.getChannelTypeSize() != 4)
   {
     std::cerr << "Cannot read a HDR 32-bits image type size" << std::endl;
     return EXIT_FAILURE;
