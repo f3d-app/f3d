@@ -260,19 +260,21 @@ PYBIND11_MODULE(f3d, module)
 
 // deprecated functions, will be removed in the next major release
 #ifndef F3D_NO_DEPRECATED
-  image.def("setResolution", [](f3d::image& img, unsigned int width, unsigned height)
-  {
-    PyErr_WarnEx(PyExc_DeprecationWarning,
-      "setResolution is deprecated, use the appropriate constructor instead.", 1);
-    return img.setResolution(width, height);
-  });
+  image.def("setResolution",
+    [](f3d::image& img, unsigned int width, unsigned height)
+    {
+      PyErr_WarnEx(PyExc_DeprecationWarning,
+        "setResolution is deprecated, use the appropriate constructor instead.", 1);
+      return img.setResolution(width, height);
+    });
 
-  image.def("setChannelCount", [](f3d::image& img, unsigned int channels)
-  {
-    PyErr_WarnEx(PyExc_DeprecationWarning,
-      "setChannelCount is deprecated, use the appropriate constructor instead.", 1);
-    return img.setChannelCount(channels);
-  });
+  image.def("setChannelCount",
+    [](f3d::image& img, unsigned int channels)
+    {
+      PyErr_WarnEx(PyExc_DeprecationWarning,
+        "setChannelCount is deprecated, use the appropriate constructor instead.", 1);
+      return img.setChannelCount(channels);
+    });
 
   image.def("setData", setImageBytes);
   image.def("getData", getImageBytes);
