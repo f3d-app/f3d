@@ -116,9 +116,15 @@ set_target_properties(libf3d PROPERTIES
   POSITION_INDEPENDENT_CODE ON
   OUTPUT_NAME "f3d"
   PDB_NAME "libf3d"
-  VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}
-  SOVERSION ${F3D_MAJOR_VERSION}
   )
+
+# Do not create SOVERSION with Python wheels, otherwise, libs are duplicated
+if (NOT SKBUILD)
+  set_target_properties(libf3d PROPERTIES
+    VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}
+    SOVERSION ${F3D_MAJOR_VERSION}
+  )
+endif()
 
 # Generate export macros for exported public APIs
 include(GenerateExportHeader)
