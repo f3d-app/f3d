@@ -135,10 +135,10 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->TimerActor->SetPosition(10, 10);
   this->TimerActor->SetInput("0 fps");
 
-  this->CheatSheetActor->GetTextProperty()->SetFontSize(15);
-  this->CheatSheetActor->GetTextProperty()->SetOpacity(0.5);
+  this->CheatSheetActor->GetTextProperty()->SetFontSize(14);
+  this->CheatSheetActor->GetTextProperty()->SetOpacity(1.0);
   this->CheatSheetActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
-  this->CheatSheetActor->GetTextProperty()->SetBackgroundOpacity(0.5);
+  this->CheatSheetActor->GetTextProperty()->SetBackgroundOpacity(0.8);
 
   this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
   this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
@@ -178,8 +178,8 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   this->AddActor(this->GridActor);
   this->AddActor(this->TimerActor);
   this->AddActor(this->MetaDataActor);
-  this->AddActor(this->CheatSheetActor);
   this->AddActor(this->DropZoneActor);
+  this->AddActor(this->CheatSheetActor);
 
   this->GridConfigured = false;
   this->CheatSheetConfigured = false;
@@ -726,16 +726,16 @@ void vtkF3DRenderer::ConfigureTextActors()
   double textColor[3];
   if (this->IsBackgroundDark())
   {
-    textColor[0] = textColor[1] = textColor[2] = 1.0;
+    textColor[0] = textColor[1] = textColor[2] = 0.9;
   }
   else
   {
-    textColor[0] = textColor[1] = textColor[2] = 0.0;
+    textColor[0] = textColor[1] = textColor[2] = 0.2;
   }
   this->FilenameActor->GetTextProperty()->SetColor(textColor);
   this->MetaDataActor->GetTextProperty()->SetColor(textColor);
   this->TimerActor->GetTextProperty()->SetColor(textColor);
-  this->CheatSheetActor->GetTextProperty()->SetColor(textColor);
+  this->CheatSheetActor->GetTextProperty()->SetColor(0.8, 0.8, 0.8);
   this->DropZoneActor->GetTextProperty()->SetColor(textColor);
 
   // Font
