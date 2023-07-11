@@ -104,7 +104,8 @@ public:
     }
     catch (const std::bad_variant_access&)
     {
-      throw options::incompatible_exception("Trying to get option reference " + name + " with incompatible type");
+      throw options::incompatible_exception(
+        "Trying to get option reference " + name + " with incompatible type");
     }
     catch (const std::out_of_range&)
     {
