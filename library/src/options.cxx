@@ -104,15 +104,11 @@ public:
     }
     catch (const std::bad_variant_access&)
     {
-      std::string error = "Trying to get option reference " + name + " with incompatible type";
-      log::error(error);
-      throw options::incompatible_exception(error + "\n");
+      throw options::incompatible_exception("Trying to get option reference " + name + " with incompatible type");
     }
     catch (const std::out_of_range&)
     {
-      std::string error = "Option " + name + " does not exist";
-      log::error(error);
-      throw options::inexistent_exception(error + "\n");
+      throw options::inexistent_exception("Option " + name + " does not exist");
     }
   }
 
