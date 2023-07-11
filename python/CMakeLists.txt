@@ -26,6 +26,7 @@ if(SKBUILD)
   # If we are building a python wheel, we import _f3d.* in __init__.py
   target_compile_definitions(pyf3d PRIVATE F3D_PYTHONLIB_NAME=_f3d)
   set_target_properties(pyf3d PROPERTIES PREFIX "_")
+  set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
   set(PYTHON_INSTALL_PATH ".")
 elseif(WIN32)
   # On Windows, the python module needs to be in the same folder than f3d.dll
