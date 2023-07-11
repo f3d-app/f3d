@@ -146,6 +146,16 @@ jobs:
       shell: powershell
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pytest
+
       # occt coloring not supported on macOS because of #792
     - name: Configure
       working-directory: ${{github.workspace}}/build
@@ -198,16 +208,6 @@ jobs:
       uses: ./source/.github/actions/mesa-install-bin
       with:
         path: ${{github.workspace}}\build\bin_Release
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install pytest
 
     - name: Test
       working-directory: ${{github.workspace}}/build
