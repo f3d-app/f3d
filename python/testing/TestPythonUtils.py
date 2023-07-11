@@ -5,9 +5,6 @@ if sys.platform.startswith('win32'):
 
 import f3d
 
-def test_utils():
-  distance = f3d.utils.textDistance('modle', 'model')
-  assert distance == 2
+distance = f3d.utils.textDistance('modle', 'model')
 
-if __name__ == '__main__':
-  test_utils()
+assert distance == 2
