@@ -287,44 +287,47 @@ macro(f3d_plugin_build)
     ${F3D_PLUGIN_VTK_MODULES}
     ${modules})
 
-  if(NOT F3D_PLUGIN_IS_STATIC OR NOT BUILD_SHARED_LIBS)
-    install(TARGETS f3d-plugin-${F3D_PLUGIN_NAME}
-      EXPORT ${export_name}
-      ARCHIVE DESTINATION ${_f3d_plugins_install_dir} COMPONENT plugin
-      LIBRARY DESTINATION ${_f3d_plugins_install_dir} COMPONENT plugin)
-  endif()
+  # When building Python wheels, these are excluded
+  if (NOT SKBUILD)
+    if(NOT F3D_PLUGIN_IS_STATIC OR NOT BUILD_SHARED_LIBS)
+      install(TARGETS f3d-plugin-${F3D_PLUGIN_NAME}
+        EXPORT ${export_name}
+        ARCHIVE DESTINATION ${_f3d_plugins_install_dir} COMPONENT plugin
+        LIBRARY DESTINATION ${_f3d_plugins_install_dir} COMPONENT plugin)
+    endif()
 
-  # Install configurations folders
-  foreach(config_dir ${F3D_PLUGIN_CONFIGURATION_DIRS})
-    install(
-      DIRECTORY "${config_dir}"
-      DESTINATION "${_f3d_config_dir}"
-      COMPONENT configuration
-      EXCLUDE_FROM_ALL)
-  endforeach()
-
-  # Generate mime, desktop and thumbnailer files
-  if (UNIX AND NOT APPLE AND NOT ANDROID)
-    foreach(mimetype_xml ${F3D_PLUGIN_MIMETYPE_XML_FILES})
-      install(FILES "${mimetype_xml}"
-        DESTINATION "share/mime/packages"
-        COMPONENT mimetypes
+    # Install configurations folders
+    foreach(config_dir ${F3D_PLUGIN_CONFIGURATION_DIRS})
+      install(
+        DIRECTORY "${config_dir}"
+        DESTINATION "${_f3d_config_dir}"
+        COMPONENT configuration
         EXCLUDE_FROM_ALL)
     endforeach()
 
-    if(F3D_PLUGIN_FREEDESKTOP)
-      configure_file(
-        "${_f3dPlugin_dir}/plugin.desktop.in"
-        "${CMAKE_BINARY_DIR}/share/applications/f3d-plugin-${F3D_PLUGIN_NAME}.desktop")
-      configure_file(
-        "${_f3dPlugin_dir}/plugin.thumbnailer.in"
-        "${CMAKE_BINARY_DIR}/share/thumbnailers/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer")
-      install(FILES "${CMAKE_BINARY_DIR}/share/applications/f3d-plugin-${F3D_PLUGIN_NAME}.desktop"
-        DESTINATION "share/applications"
-        COMPONENT plugin)
-      install(FILES "${CMAKE_BINARY_DIR}/share/thumbnailers/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer"
-        DESTINATION "share/thumbnailers"
-        COMPONENT plugin)
+    # Generate mime, desktop and thumbnailer files
+    if (UNIX AND NOT APPLE AND NOT ANDROID AND NOT SKBUILD)
+      foreach(mimetype_xml ${F3D_PLUGIN_MIMETYPE_XML_FILES})
+        install(FILES "${mimetype_xml}"
+          DESTINATION "share/mime/packages"
+          COMPONENT mimetypes
+          EXCLUDE_FROM_ALL)
+      endforeach()
+
+      if(F3D_PLUGIN_FREEDESKTOP)
+        configure_file(
+          "${_f3dPlugin_dir}/plugin.desktop.in"
+          "${CMAKE_BINARY_DIR}/share/applications/f3d-plugin-${F3D_PLUGIN_NAME}.desktop")
+        configure_file(
+          "${_f3dPlugin_dir}/plugin.thumbnailer.in"
+          "${CMAKE_BINARY_DIR}/share/thumbnailers/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer")
+        install(FILES "${CMAKE_BINARY_DIR}/share/applications/f3d-plugin-${F3D_PLUGIN_NAME}.desktop"
+          DESTINATION "share/applications"
+          COMPONENT plugin)
+        install(FILES "${CMAKE_BINARY_DIR}/share/thumbnailers/f3d-plugin-${F3D_PLUGIN_NAME}.thumbnailer"
+          DESTINATION "share/thumbnailers"
+          COMPONENT plugin)
+      endif()
     endif()
   endif()
 

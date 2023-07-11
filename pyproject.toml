@@ -1,15 +1,37 @@
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel",
-    "setuptools_scm>=6.2",
-    "scikit-build",
-    "cmake>=3.21",
-]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "f3d"
+dynamic = ["version"]
+
+[tool.scikit-build]
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+cmake.verbose = true
+logging.level = "INFO"
+minimum-version = "0.4"
+cmake.minimum-version = "3.21"
+ninja.minimum-version = "1.10"
+ninja.make-fallback = false
+wheel.packages = ["python/f3d"]
+wheel.install-dir = "f3d"
+wheel.license-files = ["LICENSE.md", "doc/THIRD_PARTY_LICENSES.md"]
+cmake.build-type = "Release"
+sdist.include = ["python/f3d/_version.py"]
+
+[tool.scikit-build.cmake.define]
+CMAKE_OSX_DEPLOYMENT_TARGET = "10.15"
+BUILD_SHARED_LIBS = "OFF"
+F3D_BINDINGS_PYTHON = "ON"
+F3D_PLUGINS_STATIC_BUILD = "ON"
+F3D_BUILD_APPLICATION = "OFF"
+F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION = "OFF"
+F3D_EXCLUDE_DEPRECATED = "OFF"
+Python_FIND_VIRTUALENV = "First"
 
 [tool.setuptools_scm]
-write_to = "python/packaging/_version.py"
+write_to = "python/f3d/_version.py"
 
 [tool.pytest.ini_options]
 python_files = "python/testing/*.py"
