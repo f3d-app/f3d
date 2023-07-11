@@ -10,7 +10,7 @@ vtk_module_scan(
 # must be exported as well for proper linkage
 set(export_name "")
 set(libf3d_vtk_no_install "")
-if(NOT BUILD_SHARED_LIBS)
+if(NOT BUILD_SHARED_LIBS AND NOT SKBUILD)
   set(export_name "f3dTargets")
 else()
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220928)

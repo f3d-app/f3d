@@ -7,17 +7,15 @@ name = "f3d"
 dynamic = ["version"]
 
 [tool.scikit-build]
-metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
-cmake.verbose = true
-logging.level = "INFO"
 minimum-version = "0.4"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
 cmake.minimum-version = "3.21"
+cmake.build-type = "Release"
 ninja.minimum-version = "1.10"
 ninja.make-fallback = false
 wheel.packages = ["python/f3d"]
 wheel.install-dir = "f3d"
 wheel.license-files = ["LICENSE.md", "doc/THIRD_PARTY_LICENSES.md"]
-cmake.build-type = "Release"
 sdist.include = ["python/f3d/_version.py"]
 
 [tool.scikit-build.cmake.define]
@@ -27,7 +25,6 @@ F3D_BINDINGS_PYTHON = "ON"
 F3D_PLUGINS_STATIC_BUILD = "ON"
 F3D_BUILD_APPLICATION = "OFF"
 F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION = "OFF"
-F3D_EXCLUDE_DEPRECATED = "OFF"
 Python_FIND_VIRTUALENV = "First"
 
 [tool.setuptools_scm]
