@@ -3,3 +3,5 @@ _site
 .vs
 CMakeUserPresets.json
 build/
+__pycache__
+*.pyc

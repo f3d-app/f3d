@@ -27,10 +27,14 @@ list(APPEND pyf3dTestsNoRender_list
 # Add all the ADD_TEST for each test
 foreach(test ${pyf3dTests_list})
   get_filename_component (TName ${test} NAME_WE)
-  add_test(NAME pyf3d::${TName} COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/${test} $<TARGET_FILE_DIR:VTK::CommonCore> ${F3D_SOURCE_DIR} ${CMAKE_BINARY_DIR})
+  add_test(NAME pyf3d::${TName} COMMAND ${Python_EXECUTABLE} -m pytest ${CMAKE_CURRENT_LIST_DIR}/${test} -rA
+    --vtk-common $<TARGET_FILE_DIR:VTK::CommonCore>
+    --f3d-source-dir ${F3D_SOURCE_DIR}
+    --cmake-binary-dir ${CMAKE_BINARY_DIR}
+  )
   set_tests_properties(pyf3d::${TName} PROPERTIES
     ENVIRONMENT "PYTHONPATH=$<TARGET_FILE_DIR:pyf3d>"
-    FAIL_REGULAR_EXPRESSION "AssertionError")
+    FAIL_REGULAR_EXPRESSION "FAILURES")
   if (NOT F3D_TESTING_ENABLE_RENDERING_TESTS AND NOT ${TName} IN_LIST pyf3dTestsNoRender_list)
     set_tests_properties(pyf3d::${TName} PROPERTIES DISABLED ON)
   endif ()
