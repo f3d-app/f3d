@@ -5,6 +5,11 @@ list(APPEND pyf3dTests_list
      TestPythonUtils.py
     )
 
+if(NOT F3D_EXCLUDE_DEPRECATED)
+  list(APPEND pyf3dTests_list
+       TestPythonImageDataDeprecated.py)
+endif()
+
 if(NOT F3D_MACOS_BUNDLE)
   list(APPEND pyf3dTests_list
        TestPythonPlugins.py

@@ -288,7 +288,7 @@ PYBIND11_MODULE(f3d, module)
     [=](const f3d::image& img)
     {
       PyErr_WarnEx(PyExc_DeprecationWarning, "getData is deprecated, use getContent instead.", 1);
-      getImageBytes(img);
+      return getImageBytes(img);
     });
 #pragma GCC diagnostic pop
 #endif

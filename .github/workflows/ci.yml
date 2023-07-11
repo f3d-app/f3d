@@ -58,6 +58,7 @@ jobs:
         build_type: [standard]
         include:
           - raytracing_label: raytracing
+          - exclude_deprecated_label: no-exclude-deprecated
           - bundle_label: no-bundle
           - egl_label: no-egl
           - vtk_version: v9.0.0
@@ -68,11 +69,23 @@ jobs:
             os: macos
             vtk_version: commit
             raytracing_label: no-raytracing
+            exclude_deprecated_label: no-exclude-deprecated
             bundle_label: bundle
+            egl_label: no-egl
           - build_type: headless
             os: ubuntu
             vtk_version: commit
+            raytracing_label: raytracing
+            exclude_deprecated_label: no-exclude-deprecated
+            bundle_label: no-bundle
             egl_label: egl
+          - build_type: exclude_deprecated
+            os: ubuntu
+            vtk_version: commit
+            raytracing_label: raytracing
+            exclude_deprecated_label: exclude-deprecated
+            bundle_label: no-bundle
+            egl_label: no-egl
 
     runs-on: ${{matrix.os}}-latest
     container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -163,6 +176,7 @@ jobs:
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_BINDINGS_JAVA=ON
         -DF3D_BINDINGS_PYTHON=ON
+        -DF3D_EXCLUDE_DEPRECATED=${{ matrix.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
         -DF3D_MACOS_BUNDLE=${{ matrix.bundle_label == 'bundle' && 'ON' || 'OFF' }}
@@ -388,7 +402,6 @@ jobs:
         -DF3D_PLUGIN_BUILD_DRACO=ON
         -DF3D_PLUGIN_BUILD_OCCT=ON
         -DF3D_STRICT_BUILD=ON
-        -DF3D_EXCLUDE_DEPRECATED=ON
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
 
     - name: Build
