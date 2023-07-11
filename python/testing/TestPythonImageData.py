@@ -5,7 +5,14 @@ if sys.platform.startswith('win32'):
 
 import f3d
 
-def test_image():
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+def test_image(out_dir = None):
+  if out_dir is None:
+    tmp_dir = TemporaryDirectory()
+    out_dir = Path(tmp_dir.name)
+
   engine = f3d.engine(f3d.window.NATIVE_OFFSCREEN)
   window = engine.getWindow()
   window.setSize(300, 200)
@@ -52,8 +59,8 @@ def test_image():
   assert img.getChannelType() == f3d.image.ChannelType.BYTE
   assert img.getChannelTypeSize() == 1
 
-  img.save(sys.argv[3] + "/Testing/Temporary/TestPythonSaveFile.bmp", f3d.image.SaveFormat.BMP)
-  assert os.path.isfile(sys.argv[3] + "/Testing/Temporary/TestPythonSaveFile.bmp")
+  img.save(str(out_dir / "TestPythonSaveFile.bmp"), f3d.image.SaveFormat.BMP)
+  assert os.path.isfile(str(out_dir / "TestPythonSaveFile.bmp"))
 
 
   '''attempt to set partial data back'''
@@ -65,4 +72,4 @@ def test_image():
       assert True
 
 if __name__ == '__main__':
-  test_image()
+  test_image(Path(sys.argv[3]) / "Testing/Temporary")
