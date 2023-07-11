@@ -398,19 +398,16 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install pytest
-
     - name: Build wheel
       working-directory: ${{github.workspace}}/source
       shell: bash
-      run: python -m pip install .
+      run: python -m pip wheel .
 
-    - name: Test wheel
-      working-directory: ${{github.workspace}}/source
-      run: python -m pytest
+    - name: Upload Tests Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./source/*.whl
+        name: ${{matrix.os}}-wheel
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
