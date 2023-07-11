@@ -28,7 +28,7 @@ list(APPEND pyf3dTestsNoRender_list
 foreach(test ${pyf3dTests_list})
   get_filename_component (TName ${test} NAME_WE)
   add_test(NAME pyf3d::${TName} COMMAND ${Python_EXECUTABLE} -m pytest ${CMAKE_CURRENT_LIST_DIR}/${test} -rA
-    --vtk-common $<TARGET_FILE_DIR:VTK::CommonCore>
+    --windows-runtime-paths $<TARGET_FILE_DIR:VTK::CommonCore>
     --f3d-source-dir ${F3D_SOURCE_DIR}
     --cmake-binary-dir ${CMAKE_BINARY_DIR}
   )
