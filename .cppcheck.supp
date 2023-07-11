@@ -11,6 +11,7 @@ unusedFunction
 
 // specific checks
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
+knownConditionTrueFalse:library/testing/TestSDKImageDeprecated.cxx
 noExplicitConstructor:library/public/types.h
 preprocessorErrorDirective:library/src/engine.cxx
 preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx
