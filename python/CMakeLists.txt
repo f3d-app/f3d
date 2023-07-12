@@ -27,7 +27,12 @@ set_target_properties(pyf3d PROPERTIES
   )
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
-  "${f3d_python_lib_output}/__init__.py" @ONLY)
+  "${CMAKE_CURRENT_BINARY_DIR}/__init__.py" @ONLY)
+
+file(GENERATE
+  OUTPUT "${f3d_python_lib_output}/__init__.py"
+  INPUT "${CMAKE_CURRENT_BINARY_DIR}/__init__.py"
+)
 
 if(SKBUILD)
   if (APPLE)
