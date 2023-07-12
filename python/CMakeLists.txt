@@ -16,28 +16,33 @@ else()
   target_link_libraries(pyf3d PRIVATE libf3d)
 endif()
 
+set(f3d_python_package_name "f3d")
+set(f3d_python_package_suffix "python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages")
+set(f3d_python_lib_output "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${f3d_python_package_suffix}/${f3d_python_package_name}")
+
 set_target_properties(pyf3d PROPERTIES
   CXX_STANDARD 14
   CXX_VISIBILITY_PRESET hidden
-  LIBRARY_OUTPUT_NAME "f3d"
+  LIBRARY_OUTPUT_DIRECTORY "${f3d_python_lib_output}"
   )
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/__init__.py" @ONLY)
+  "${f3d_python_lib_output}/__init__.py" @ONLY)
 
-cmake_dependent_option(F3D_PYTHON_INSTALL_SITEARCH "Install Python module in standard Python module path" ON "NOT SKBUILD" OFF)
-
-if(F3D_PYTHON_INSTALL_SITEARCH)
-  set(f3d_python_install_path "${CMAKE_INSTALL_LIBDIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages/f3d")
-else()
+if(SKBUILD)
   if (APPLE)
     set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
   elseif (UNIX)
     set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
   endif()
   set(f3d_python_install_path ".")
-  target_compile_definitions(pyf3d PRIVATE F3D_PYTHONLIB_NAME=_f3d)
-  set_target_properties(pyf3d PROPERTIES PREFIX "_")
+else()
+  if (APPLE)
+    set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/../../../${CMAKE_INSTALL_LIBDIR}")
+  elseif (UNIX)
+    set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/../../../${CMAKE_INSTALL_LIBDIR}")
+  endif()
+  set(f3d_python_install_path "${CMAKE_INSTALL_LIBDIR}/${f3d_python_package_suffix}/${f3d_python_package_name}")
 endif()
 
 # testing
@@ -48,5 +53,5 @@ endif()
 # installing
 install(TARGETS pyf3d
   LIBRARY DESTINATION ${f3d_python_install_path} COMPONENT pythonmodule)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py"
+install(FILES "${f3d_python_lib_output}/__init__.py"
   DESTINATION ${f3d_python_install_path} COMPONENT pythonmodule)
