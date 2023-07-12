@@ -6,8 +6,8 @@ list(APPEND pyf3dTests_list
     )
 
 if(NOT F3D_EXCLUDE_DEPRECATED)
-  list(APPEND pyf3dTests_list
-       TestPythonImageDataDeprecated.py)
+    list(APPEND pyf3dTests_list
+         TestPythonDeprecated.py)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)
