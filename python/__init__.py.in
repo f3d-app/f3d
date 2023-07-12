@@ -1,3 +1,19 @@
 from .pyf3d import *
 
-__version__ = "@F3D_MAJOR_VERSION@.@F3D_MINOR_VERSION@.@F3D_PATCH_VERSION@"
+import sys
+
+__version__ = '@F3D_MAJOR_VERSION@.@F3D_MINOR_VERSION@.@F3D_PATCH_VERSION@'
+
+def _windows_dll_path():
+    from pathlib import Path
+
+    _root_path = Path(__file__).parents[4]
+
+    try:
+        for p in sorted(_root_path.glob('bin*')):
+            _ = os.add_dll_directory(p)
+    except ImportError:
+        pass
+
+if sys.version_info >= (3, 8) and sys.platform == 'win32':
+    _windows_dll_path()
