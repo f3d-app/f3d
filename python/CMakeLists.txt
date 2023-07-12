@@ -22,27 +22,22 @@ set_target_properties(pyf3d PROPERTIES
   LIBRARY_OUTPUT_NAME "f3d"
   )
 
-if(SKBUILD)
-  # If we are building a python wheel, we import _f3d.* in __init__.py
-  target_compile_definitions(pyf3d PRIVATE F3D_PYTHONLIB_NAME=_f3d)
-  set_target_properties(pyf3d PROPERTIES PREFIX "_")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/__init__.py" @ONLY)
+
+cmake_dependent_option(F3D_PYTHON_INSTALL_SITEARCH "Install Python module in standard Python module path" ON "NOT SKBUILD" OFF)
+
+if(F3D_PYTHON_INSTALL_SITEARCH)
+  set(f3d_python_install_path "${CMAKE_INSTALL_LIBDIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages/f3d")
+else()
   if (APPLE)
     set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
   elseif (UNIX)
     set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
   endif()
-  set(PYTHON_INSTALL_PATH ".")
-else()
-  if(WIN32)
-    # On Windows, the python module needs to be in the same folder than f3d.dll
-    # Usage of PATH to find the DLL is not possible, see https://stackoverflow.com/a/64303856/2609654
-    set_target_properties(pyf3d PROPERTIES
-      LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-      )
-    set(PYTHON_INSTALL_PATH "${CMAKE_INSTALL_BINDIR}")
-  else()
-    set(PYTHON_INSTALL_PATH "${Python_SITEARCH}")
-  endif()
+  set(f3d_python_install_path ".")
+  target_compile_definitions(pyf3d PRIVATE F3D_PYTHONLIB_NAME=_f3d)
+  set_target_properties(pyf3d PROPERTIES PREFIX "_")
 endif()
 
 # testing
@@ -52,4 +47,6 @@ endif()
 
 # installing
 install(TARGETS pyf3d
-  LIBRARY DESTINATION ${PYTHON_INSTALL_PATH} COMPONENT pythonmodule)
+  LIBRARY DESTINATION ${f3d_python_install_path} COMPONENT pythonmodule)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py"
+  DESTINATION ${f3d_python_install_path} COMPONENT pythonmodule)
