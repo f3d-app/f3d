@@ -37,7 +37,7 @@ cmake.minimum-version = "3.21"
 cmake.build-type = "Release"
 ninja.minimum-version = "1.10"
 ninja.make-fallback = false
-wheel.packages = ["python/f3d"]
+wheel.packages = []
 wheel.install-dir = "f3d"
 wheel.license-files = ["LICENSE.md", "doc/THIRD_PARTY_LICENSES.md"]
 
