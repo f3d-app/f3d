@@ -155,6 +155,9 @@ if(UNIX AND NOT APPLE)
         COMMAND ${GZIP} -f ${MAN_OUTPUT_FILE}
         DEPENDS f3d)
       add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
+
+      install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
+        DESTINATION "share/man/man1/" COMPONENT documentation)
     else()
       message(WARNING "help2man or gzip not found, cannot create man entry")
     endif()
@@ -171,3 +174,39 @@ install(TARGETS f3d
   EXPORT f3dTargets
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT application
   BUNDLE DESTINATION "." COMPONENT application)
+
+# Default config files
+install(
+  DIRECTORY "${F3D_SOURCE_DIR}/resources/configs/"
+  DESTINATION "${f3d_config_dir}"
+  COMPONENT configuration
+  EXCLUDE_FROM_ALL)
+
+# Other ressoure files
+if(UNIX AND NOT APPLE AND NOT ANDROID)
+  install(FILES "${F3D_SOURCE_DIR}/resources/f3d.desktop"
+    DESTINATION "share/applications" COMPONENT assets)
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo32.png"
+    DESTINATION "share/icons/hicolor/32x32/apps" COMPONENT assets
+    RENAME "f3d.png")
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo48.png"
+    DESTINATION "share/icons/hicolor/48x48/apps" COMPONENT assets
+    RENAME "f3d.png")
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo64.png"
+    DESTINATION "share/icons/hicolor/64x64/apps" COMPONENT assets
+    RENAME "f3d.png")
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo.svg"
+    DESTINATION "share/icons/hicolor/scalable/apps" COMPONENT assets
+    RENAME "f3d.svg")
+  install(FILES "${F3D_SOURCE_DIR}/resources/completion.bash"
+    DESTINATION "share/bash-completion/completions" COMPONENT shellext
+    RENAME "f3d")
+  install(FILES "${F3D_SOURCE_DIR}/resources/completion.zsh"
+    DESTINATION "share/zsh/site-functions" COMPONENT shellext
+    RENAME "_f3d")
+  install(FILES "${F3D_SOURCE_DIR}/resources/completion.fish"
+    DESTINATION "share/fish/vendor_completions.d" COMPONENT shellext
+    RENAME "f3d.fish")
+  install(FILES "${F3D_SOURCE_DIR}/resources/app.f3d.F3D.metainfo.xml"
+    DESTINATION "share/metainfo" COMPONENT assets)
+endif()
