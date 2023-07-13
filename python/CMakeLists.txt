@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.21)
 
 project(pyf3d)
 
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}/cmake")
+include(f3dPython)
+
 find_package(Python 3.6 COMPONENTS Interpreter Development)
 find_package(pybind11 2.2 REQUIRED)
 
@@ -26,14 +29,6 @@ set_target_properties(pyf3d PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY "${f3d_python_lib_output}"
   )
 
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/__init__.py" @ONLY)
-
-file(GENERATE
-  OUTPUT "${f3d_python_lib_output}/__init__.py"
-  INPUT "${CMAKE_CURRENT_BINARY_DIR}/__init__.py"
-)
-
 if(SKBUILD)
   if (APPLE)
     set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
@@ -41,6 +36,7 @@ if(SKBUILD)
     set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
   endif()
   set(f3d_python_install_path ".")
+  set(f3d_python_dll_install_bin_path "${CMAKE_INSTALL_BINDIR}")
 else()
   if (APPLE)
     set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/../../../${CMAKE_INSTALL_LIBDIR}")
@@ -48,7 +44,25 @@ else()
     set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/../../../${CMAKE_INSTALL_LIBDIR}")
   endif()
   set(f3d_python_install_path "${CMAKE_INSTALL_LIBDIR}/${f3d_python_package_suffix}/${f3d_python_package_name}")
+  set(f3d_python_dll_install_bin_path "../../../${CMAKE_INSTALL_BINDIR}")
 endif()
+
+# generate fixup for build
+f3d_python_windows_dll_fixup(ABSOLUTE_PATHS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "$<TARGET_FILE_DIR:VTK::CommonCore>" OUTPUT F3D_PYTHON_FIXUP)
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build" @ONLY)
+
+file(GENERATE
+  OUTPUT "${f3d_python_lib_output}/__init__.py"
+  INPUT "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build"
+)
+
+# generate fixup for install
+f3d_python_windows_dll_fixup(RELATIVE_PATHS "${f3d_python_dll_install_bin_path}" OUTPUT F3D_PYTHON_FIXUP)
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-install" @ONLY)
 
 # testing
 if(BUILD_TESTING)
@@ -58,5 +72,5 @@ endif()
 # installing
 install(TARGETS pyf3d
   LIBRARY DESTINATION ${f3d_python_install_path} COMPONENT pythonmodule)
-install(FILES "${f3d_python_lib_output}/__init__.py"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-install" RENAME "__init__.py"
   DESTINATION ${f3d_python_install_path} COMPONENT pythonmodule)
