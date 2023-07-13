@@ -25,7 +25,7 @@ project(F3D
   LANGUAGES C CXX)
 
 set(f3d_cmake_dir "${F3D_SOURCE_DIR}/cmake")
- list(INSERT CMAKE_MODULE_PATH 0 "${f3d_cmake_dir}")
+list(INSERT CMAKE_MODULE_PATH 0 "${f3d_cmake_dir}")
 include(f3dVersion)
 
 # Handle F3D_VERSION
@@ -231,6 +231,3 @@ if (F3D_BUILD_APPLICATION)
   install(FILES doc/THIRD_PARTY_LICENSES.md
     DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
 endif ()
-
-# Installling resources
-add_subdirectory(resources)

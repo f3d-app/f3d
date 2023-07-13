@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.21)
 
 project(pyf3d)
 
@@ -8,12 +8,12 @@ find_package(pybind11 2.2 REQUIRED)
 pybind11_add_module(pyf3d MODULE F3DPythonBindings.cxx)
 
 # In case pyf3d is built separately, we need to retrieve the existing libf3d
-if(TARGET libf3d)
-  target_link_libraries(pyf3d PRIVATE libf3d)
-else()
+if(PROJECT_IS_TOP_LEVEL)
   find_package(f3d REQUIRED)
   target_link_libraries(pyf3d PRIVATE f3d::libf3d)
   target_include_directories(pyf3d PRIVATE "${f3d_INCLUDE_DIR}/f3d")
+else()
+  target_link_libraries(pyf3d PRIVATE libf3d)
 endif()
 
 set_target_properties(pyf3d PROPERTIES
