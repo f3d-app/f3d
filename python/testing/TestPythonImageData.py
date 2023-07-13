@@ -1,3 +1,4 @@
+import sys
 import os
 import f3d
 
