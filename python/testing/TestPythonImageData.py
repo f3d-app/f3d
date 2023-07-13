@@ -1,8 +1,4 @@
 import os
-import sys
-if sys.platform.startswith('win32'):
-  os.add_dll_directory(sys.argv[1])
-
 import f3d
 
 engine = f3d.engine(f3d.window.NATIVE_OFFSCREEN)
@@ -50,8 +46,8 @@ assert img.getContent() == data
 assert img.getChannelType() == f3d.image.ChannelType.BYTE
 assert img.getChannelTypeSize() == 1
 
-img.save(sys.argv[3] + "/Testing/Temporary/TestPythonSaveFile.bmp", f3d.image.SaveFormat.BMP)
-assert os.path.isfile(sys.argv[3] + "/Testing/Temporary/TestPythonSaveFile.bmp")
+img.save(sys.argv[2] + "/Testing/Temporary/TestPythonSaveFile.bmp", f3d.image.SaveFormat.BMP)
+assert os.path.isfile(sys.argv[2] + "/Testing/Temporary/TestPythonSaveFile.bmp")
 
 
 '''attempt to set partial data back'''

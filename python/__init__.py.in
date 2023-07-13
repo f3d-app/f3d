@@ -1,0 +1,6 @@
+import sys
+
+@F3D_PYTHON_FIXUP@
+
+from .pyf3d import *
+__version__ = '@F3D_MAJOR_VERSION@.@F3D_MINOR_VERSION@.@F3D_PATCH_VERSION@'
