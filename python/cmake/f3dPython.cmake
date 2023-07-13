@@ -1,7 +1,7 @@
 function(f3d_python_windows_dll_fixup)
-	if(WIN32)
-		cmake_parse_arguments(F3D_DLL_FIXUP "" "OUTPUT" "RELATIVE_PATHS;ABSOLUTE_PATHS" ${ARGN})
+	cmake_parse_arguments(F3D_DLL_FIXUP "" "OUTPUT" "RELATIVE_PATHS;ABSOLUTE_PATHS" ${ARGN})
 
+	if(WIN32)
 		set(_fixup [=[
 if sys.version_info >= (3, 8) and sys.platform == 'win32':
     from pathlib import Path
