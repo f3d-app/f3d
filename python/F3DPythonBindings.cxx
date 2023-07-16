@@ -63,7 +63,7 @@ public:
   PYBIND11_TYPE_CASTER(f3d::vector3_t, const_name("f3d.vector3_t"));
 };
 
-PYBIND11_MODULE(f3d, module)
+PYBIND11_MODULE(pyf3d, module)
 {
   module.doc() = "f3d library bindings";
 
