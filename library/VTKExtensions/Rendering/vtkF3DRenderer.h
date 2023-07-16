@@ -40,6 +40,7 @@ public:
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
   void ShowDropZone(bool show);
+  void ShowHDRISkybox(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -235,6 +236,7 @@ protected:
   bool MetaDataVisible = false;
   bool CheatSheetVisible = false;
   bool DropZoneVisible = false;
+  bool HDRISkyboxVisible = true;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;

@@ -309,6 +309,8 @@ void window_impl::UpdateDynamicOptions()
     this->Internals->Options.getAsDouble("render.background.blur.coc"));
   this->Internals->Renderer->SetHDRIFile(
     this->Internals->Options.getAsString("render.background.hdri"));
+  this->Internals->Renderer->ShowHDRISkybox(
+    !this->Internals->Options.getAsBool("render.background.hdri.hide"));
   this->Internals->Renderer->SetLightIntensity(
     this->Internals->Options.getAsDouble("render.light.intensity"));
 

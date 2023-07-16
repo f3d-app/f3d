@@ -493,6 +493,21 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowHDRISkybox(bool show)
+{
+  if (this->HDRISkyboxVisible != show)
+  {
+    this->HDRISkyboxVisible = show;
+
+    // TODO merely changing the Skybox visibility could be optimized
+    // instead of configuring the HDRI lighting again
+    this->HDRIConfigured = false;
+    this->TextActorsConfigured = false;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
 {
   // Check HDRI is different than current one
@@ -699,16 +714,23 @@ void vtkF3DRenderer::ConfigureHDRI()
     }
 #endif
 
-    // Setup the OpenGL Skybox
-    // TODO: Add support for visibility in vtkOpenGLSkybox
-    this->AddActor(this->Skybox);
-    this->Skybox->SetProjection(vtkSkybox::Sphere);
-    this->Skybox->SetTexture(hdriTexture);
+    if (this->HDRISkyboxVisible)
+    {
+      // Setup the OpenGL Skybox
+      // TODO: Add support for visibility in vtkOpenGLSkybox
+      this->AddActor(this->Skybox);
+      this->Skybox->SetProjection(vtkSkybox::Sphere);
+      this->Skybox->SetTexture(hdriTexture);
 
-    // First version of VTK including the version check (and the feature used)
+      // First version of VTK including the version check (and the feature used)
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
-    this->Skybox->GammaCorrectOn();
+      this->Skybox->GammaCorrectOn();
 #endif
+    }
+    else
+    {
+      this->RemoveActor(this->Skybox);
+    }
   }
   else
   {
