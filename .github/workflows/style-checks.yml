@@ -16,7 +16,7 @@ jobs:
     - name: Python Formatting
       uses: psf/black@stable
       with:
-        options: "--check --verbose --include '(\.py|\.py\.in)'"
+        options: "--check --verbose --include '(\\.py|\\.py\\.in)'"
         src: "./python"
 
   codespell-check:
