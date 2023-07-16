@@ -7,11 +7,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: DoozyX/clang-format-lint-action@v0.16.1
+    - name: C++ Formatting
+      uses: DoozyX/clang-format-lint-action@v0.16.1
       with:
         source: 'library application python'
         extensions: 'h,cxx'
         clangFormatVersion: 14 # Last Ubuntu LTS version (22.04)
+    - name: Python Formatting
+      uses: psf/black@stable
+      with:
+        options: "--check --verbose --include '(\.py|\.py\.in)'"
+        src: "./python"
 
   codespell-check:
     name: Codespell Check

@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 F3D_ABSOLUTE_DLLS = [
-    # @F3D_ABSOLUTE_DLLS_FIXUP@                                              
+    # @F3D_ABSOLUTE_DLLS_FIXUP@
 ]
 F3D_RELATIVE_DLLS = [
     # @F3D_RELATIVE_DLLS_FIXUP@
@@ -19,4 +19,5 @@ if sys.version_info >= (3, 8) and sys.platform == "win32":
         os.add_dll_directory((root / rel_path).resolve())
 
 from .pyf3d import *
-__version__ = '@F3D_VERSION@'
+
+__version__ = "@F3D_VERSION@"
