@@ -35,10 +35,13 @@ elseif (UNIX)
   set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/../../../${CMAKE_INSTALL_LIBDIR}")
 endif()
 set(f3d_python_install_path "${CMAKE_INSTALL_LIBDIR}/${f3d_python_package_suffix}/${f3d_python_package_name}")
-set(f3d_python_dll_install_bin_path "../../../${CMAKE_INSTALL_BINDIR}")
 
-# generate fixup for build
-f3d_python_windows_dll_fixup(ABSOLUTE_PATHS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "$<TARGET_FILE_DIR:VTK::CommonCore>" OUTPUT F3D_PYTHON_FIXUP)
+# generate Windows fixup for build
+set(F3D_ABSOLUTE_DLLS_FIXUP "")
+set(F3D_RELATIVE_DLLS_FIXUP "")
+if(WIN32)
+  f3d_python_windows_dll_fixup(PATHS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "$<TARGET_FILE_DIR:VTK::CommonCore>" OUTPUT F3D_ABSOLUTE_DLLS_FIXUP)
+endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
   "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build" @ONLY)
@@ -48,8 +51,13 @@ file(GENERATE
   INPUT "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build"
 )
 
-# generate fixup for install
-f3d_python_windows_dll_fixup(RELATIVE_PATHS "${f3d_python_dll_install_bin_path}" OUTPUT F3D_PYTHON_FIXUP)
+# generate Windows fixup for install
+set(F3D_ABSOLUTE_DLLS_FIXUP "")
+set(F3D_RELATIVE_DLLS_FIXUP "")
+if(WIN32)
+  set(f3d_python_dll_install_bin_path "../../../${CMAKE_INSTALL_BINDIR}")
+  f3d_python_windows_dll_fixup(PATHS "${f3d_python_dll_install_bin_path}" OUTPUT F3D_RELATIVE_DLLS_FIXUP)
+endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
   "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-install" @ONLY)
