@@ -314,7 +314,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI INTERACTION THRESHOLD 60) #Shift+MouseRight;
   f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #U
   f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #Up
-  f3d_test(NAME TestInteractionHDRIChange DATA multi ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #Right
+  f3d_test(NAME TestInteractionHDRIChange DATA multi ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION DEFAULT_LIGHTS) #Left
 
   configure_file("${F3D_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
   f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" HDRI DEFAULT_LIGHTS)
