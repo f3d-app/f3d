@@ -3,3 +3,8 @@ _site
 .vs
 CMakeUserPresets.json
 build/
+_skbuild
+_version.py
+dist
+*.egg-info
+__pycache__

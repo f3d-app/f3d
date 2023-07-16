@@ -116,9 +116,18 @@ set_target_properties(libf3d PROPERTIES
   POSITION_INDEPENDENT_CODE ON
   OUTPUT_NAME "f3d"
   PDB_NAME "libf3d"
-  VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}
-  SOVERSION ${F3D_MAJOR_VERSION}
   )
+
+# It can be useful to disable soversion in case the links are duplicated
+# It happens with Python wheels for example
+option(F3D_ENABLE_SOVERSION "Enable libf3d SOVERSION" ON)
+mark_as_advanced(F3D_ENABLE_SOVERSION)
+if(F3D_ENABLE_SOVERSION)
+  set_target_properties(libf3d PROPERTIES
+    VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}
+    SOVERSION ${F3D_MAJOR_VERSION}
+  )
+endif()
 
 # Generate export macros for exported public APIs
 include(GenerateExportHeader)
