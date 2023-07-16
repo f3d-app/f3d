@@ -140,9 +140,9 @@ public:
   vtkGetVector3Macro(RightVector, double);
 
   /**
-   * Set cache path
+   * Set cache path, only used by the HDRI logic
    */
-  vtkSetMacro(CachePath, std::string);
+  void SetCachePath(const std::string& cachePath);
 
 protected:
   vtkF3DRenderer();
@@ -161,6 +161,11 @@ protected:
    * Configure text actors properties font file and color
    */
   void ConfigureTextActors();
+
+  /**
+   * Configure HDRI actor and related lighting
+   */
+  void ConfigureHDRI();
 
   /**
    * Configure all actors properties according to what has been set for:
@@ -219,6 +224,7 @@ protected:
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
   bool MetaDataConfigured = false;
+  bool HDRIConfigured = false;
 
   bool GridVisible = false;
   bool GridAbsolute = false;
@@ -249,7 +255,7 @@ protected:
   double GridUnitSquare = 0.0;
   int GridSubdivisions = 10;
 
-  bool HasHDRI = false;
+  bool HasHDRILighting = false;
   std::string HDRIFile;
   std::string FontFile;
 
