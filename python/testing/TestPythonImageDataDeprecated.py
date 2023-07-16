@@ -6,7 +6,7 @@ window = engine.getWindow()
 window.setSize(300, 200)
 
 
-'''with background -> RGB image'''
+"""with background -> RGB image"""
 
 img = window.renderToImage()
 width = img.getWidth()
@@ -21,7 +21,7 @@ assert isinstance(data, (bytes, bytearray))
 assert len(data) == depth * width * height
 
 
-'''without background -> RGBA image'''
+"""without background -> RGBA image"""
 
 img = window.renderToImage(True)
 width = img.getWidth()
@@ -36,16 +36,16 @@ assert isinstance(data, (bytes, bytearray))
 assert len(data) == depth * width * height
 
 
-'''set data back'''
+"""set data back"""
 
 img.setData(data)
 assert img.getData() == data
 
 
-'''attempt to set partial data back'''
+"""attempt to set partial data back"""
 
 try:
     img.setData(data[:-1])
-    assert False, 'expected exception'
+    assert False, "expected exception"
 except ValueError:
     assert True

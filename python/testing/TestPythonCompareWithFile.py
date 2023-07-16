@@ -26,6 +26,6 @@ error = 0.0
 ret = img.compare(f3d.image(reference), 50, diff, error)
 
 if not ret:
-  diff.save(outputDiff)
-  
+    diff.save(outputDiff)
+
 assert ret is True
