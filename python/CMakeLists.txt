@@ -30,9 +30,9 @@ set_target_properties(pyf3d PROPERTIES
   )
 
 if (APPLE)
-  set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/../../../${CMAKE_INSTALL_LIBDIR}")
+  set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/../..")
 elseif (UNIX)
-  set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/../../../${CMAKE_INSTALL_LIBDIR}")
+  set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/../..")
 endif()
 set(f3d_python_install_path "${CMAKE_INSTALL_LIBDIR}/${f3d_python_package_suffix}/${f3d_python_package_name}")
 
