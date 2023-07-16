@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.21)
 
 project(pyf3d)
 
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}/cmake")
+include(f3dPython)
+
 find_package(Python 3.6 COMPONENTS Interpreter Development)
 find_package(pybind11 2.2 REQUIRED)
 
@@ -16,23 +19,48 @@ else()
   target_link_libraries(pyf3d PRIVATE libf3d)
 endif()
 
+set(f3d_python_package_name "f3d")
+set(f3d_python_package_suffix "python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages")
+set(f3d_python_lib_output "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${f3d_python_package_suffix}/${f3d_python_package_name}")
+
 set_target_properties(pyf3d PROPERTIES
   CXX_STANDARD 14
   CXX_VISIBILITY_PRESET hidden
-  LIBRARY_OUTPUT_NAME "f3d"
+  LIBRARY_OUTPUT_DIRECTORY "${f3d_python_lib_output}"
   )
 
+if (APPLE)
+  set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/../..")
+elseif (UNIX)
+  set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/../..")
+endif()
+set(f3d_python_install_path "${CMAKE_INSTALL_LIBDIR}/${f3d_python_package_suffix}/${f3d_python_package_name}")
+
+# generate Windows fixup for build
+set(F3D_ABSOLUTE_DLLS_FIXUP "")
+set(F3D_RELATIVE_DLLS_FIXUP "")
 if(WIN32)
-  # On Windows, the python module needs to be in the same folder than f3d.dll
-  # Usage of PATH to find the DLL is not possible, see https://stackoverflow.com/a/64303856/2609654
-  set_target_properties(pyf3d PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-    )
+  f3d_python_windows_dll_fixup(PATHS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "$<TARGET_FILE_DIR:VTK::CommonCore>" OUTPUT F3D_ABSOLUTE_DLLS_FIXUP)
 endif()
 
-if (APPLE OR UNIX)
-  set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-endif ()
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build" @ONLY)
+
+file(GENERATE
+  OUTPUT "${f3d_python_lib_output}/__init__.py"
+  INPUT "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build"
+)
+
+# generate Windows fixup for install
+set(F3D_ABSOLUTE_DLLS_FIXUP "")
+set(F3D_RELATIVE_DLLS_FIXUP "")
+if(WIN32)
+  set(f3d_python_dll_install_bin_path "../../../${CMAKE_INSTALL_BINDIR}")
+  f3d_python_windows_dll_fixup(PATHS "${f3d_python_dll_install_bin_path}" OUTPUT F3D_RELATIVE_DLLS_FIXUP)
+endif()
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-install" @ONLY)
 
 # testing
 if(BUILD_TESTING)
@@ -40,10 +68,7 @@ if(BUILD_TESTING)
 endif()
 
 # installing
-if(WIN32)
-  set(PYTHON_INSTALL_PATH ${CMAKE_INSTALL_BINDIR})
-else()
-  set(PYTHON_INSTALL_PATH "${CMAKE_INSTALL_LIBDIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages")
-endif()
 install(TARGETS pyf3d
-  LIBRARY DESTINATION ${PYTHON_INSTALL_PATH} COMPONENT pythonmodule)
+  LIBRARY DESTINATION ${f3d_python_install_path} COMPONENT pythonmodule)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-install" RENAME "__init__.py"
+  DESTINATION ${f3d_python_install_path} COMPONENT pythonmodule)
