@@ -4,7 +4,6 @@ _site
 CMakeUserPresets.json
 build/
 _skbuild
-_version.py
 dist
 *.egg-info
 __pycache__

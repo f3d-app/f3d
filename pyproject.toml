@@ -18,12 +18,16 @@ maintainers = [
 ]
 keywords = ["vtk", "animations", "fbx", "step", "stl", "gltf", "pbr", "raytracing", "rendering"]
 classifiers = [
+  "Development Status :: 5 - Production/Stable"
   "License :: OSI Approved :: BSD License",
   "Operating System :: Microsoft :: Windows",
   "Operating System :: POSIX",
   "Operating System :: MacOS",
   "Programming Language :: C++",
   "Programming Language :: Python :: 3",
+  "Topic :: Multimedia :: Graphics :: 3D Rendering",
+  "Topic :: Multimedia :: Graphics :: Viewers",
+  "Topic :: Scientific/Engineering :: Visualization",
 ]
 
 [project.urls]
