@@ -18,7 +18,7 @@ maintainers = [
 ]
 keywords = ["vtk", "animations", "fbx", "step", "stl", "gltf", "pbr", "raytracing", "rendering"]
 classifiers = [
-  "Development Status :: 5 - Production/Stable"
+  "Development Status :: 5 - Production/Stable",
   "License :: OSI Approved :: BSD License",
   "Operating System :: Microsoft :: Windows",
   "Operating System :: POSIX",
