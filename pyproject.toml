@@ -1,0 +1,58 @@
+[build-system]
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "f3d"
+requires-python = ">=3.7"
+version = "2.1.0"
+description = "F3D, a fast and minimalist 3D viewer"
+readme = "README.md"
+license = {file = "LICENSE.md"}
+authors = [
+  {name = "Michael Migliore"},
+  {name = "Mathieu Westphal"},
+]
+maintainers = [
+  {name = "Michael Migliore", email = "mcmigliore+pip@gmail.com"}
+]
+keywords = ["vtk", "animations", "fbx", "step", "stl", "gltf", "pbr", "raytracing", "rendering"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX",
+  "Operating System :: MacOS",
+  "Programming Language :: C++",
+  "Programming Language :: Python :: 3",
+  "Topic :: Multimedia :: Graphics :: 3D Rendering",
+  "Topic :: Multimedia :: Graphics :: Viewers",
+  "Topic :: Scientific/Engineering :: Visualization",
+]
+
+[project.urls]
+Homepage = "https://f3d.app"
+Repository = "https://github.com/f3d-app/f3d.git"
+Changelog = "https://github.com/f3d-app/f3d/blob/master/doc/CHANGELOG.md"
+
+[tool.scikit-build]
+minimum-version = "0.4"
+cmake.minimum-version = "3.21"
+cmake.build-type = "Release"
+ninja.minimum-version = "1.10"
+ninja.make-fallback = false
+wheel.packages = []
+wheel.install-dir = "f3d"
+wheel.license-files = ["LICENSE.md", "doc/THIRD_PARTY_LICENSES.md"]
+
+[tool.scikit-build.cmake.define]
+CMAKE_OSX_DEPLOYMENT_TARGET = "10.15"
+BUILD_SHARED_LIBS = "ON"
+F3D_BINDINGS_PYTHON = "ON"
+F3D_PLUGINS_STATIC_BUILD = "ON"
+F3D_BUILD_APPLICATION = "OFF"
+F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION = "OFF"
+F3D_ENABLE_SOVERSION = "OFF"
+
+[tool.pytest.ini_options]
+python_files = "python/testing/*.py"
