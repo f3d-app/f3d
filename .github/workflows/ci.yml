@@ -329,6 +329,84 @@ jobs:
         name: f3d-tests-install-artifact-${{runner.os}}-${{matrix.vtk_version}}-${{matrix.build_type}}
 
 #----------------------------------------------------------------------------
+# Python packaging: Build and test the Python wheel
+#----------------------------------------------------------------------------
+  python-packaging:
+    if: github.event.pull_request.draft == false
+    needs: cache_lfs
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu, windows, macos]
+
+    runs-on: ${{matrix.os}}-latest
+    container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+
+    env:
+      DISPLAY: :0
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
+
+    - name: Dependencies Dir
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
+
+    - name: Install TBB
+      uses: ./source/.github/actions/tbb-install-dep
+
+    - name: Install VTK dependency
+      uses: ./source/.github/actions/vtk-install-dep
+      with:
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+
+    - name: Install F3D dependencies
+      uses: ./source/.github/actions/f3d-dependencies
+
+    - name: Set PATH windows
+      if: runner.os == 'Windows'
+      working-directory: ${{github.workspace}}
+      shell: powershell
+      run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+    - name: Set CMAKE_PREFIX_PATH
+      working-directory: ${{github.workspace}}/dependencies/install
+      shell: bash
+      run: echo "CMAKE_PREFIX_PATH=$(pwd)" >> $GITHUB_ENV
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Build wheel
+      working-directory: ${{github.workspace}}/source
+      shell: bash
+      run: python -m pip wheel .
+
+    - name: Upload Tests Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./source/*.whl
+        name: ${{matrix.os}}-wheel
+
+#----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
 #----------------------------------------------------------------------------
   coverage:
