@@ -175,6 +175,9 @@ if (UNIX AND NOT APPLE)
   endif()
 endif()
 
+# F3D Application
+cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
+
 # plugins
 option(F3D_PLUGINS_STATIC_BUILD "Make all plugins static (embedded into libf3d) and automatically loaded by F3D" ON)
 mark_as_advanced(F3D_PLUGINS_STATIC_BUILD)
@@ -188,8 +191,6 @@ add_subdirectory(plugins)
 # libf3d target
 add_subdirectory(library)
 
-# F3D Application
-cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
 if (F3D_BUILD_APPLICATION)
   add_subdirectory(application)
 endif()
