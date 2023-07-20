@@ -3,9 +3,12 @@
 ## Ongoing development
 
 For F3D users:
- - Added bindings to move the camera to standard locations: `1`: Front, `3`: Right, `7: Top, `9`: Isometric
+ - Added bindings to move the camera to standard locations: `1`: Front, `3`: Right, `7`: Top, `9`: Isometric
  - Fixed an issue with the binary release when opening draco files
  - Fixed an issue with matcap textures
+ - Fixed cheatsheet menu rendering under 'Drop File Instructor'
+ - Improved cheatsheet menu contrast for any background color
+ - Improved overall text contrast for any background color
 
 For libf3d users:
  - Reworked image API to support many file formats to read (EXR, HDR) and write (PNG, JPG, TIF, BMP)
