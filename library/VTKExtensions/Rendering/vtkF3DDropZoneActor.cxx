@@ -3,6 +3,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper2D.h>
+#include <vtkProperty2D.h>
 #include <vtkTextMapper.h>
 #include <vtkTextProperty.h>
 #include <vtkViewport.h>
@@ -79,6 +80,7 @@ bool vtkF3DDropZoneActor::BuildBorderGeometry(vtkViewport* viewport)
   vtkNew<vtkCellArray> borderCells;
   borderPoints->SetNumberOfPoints(4 * (2 * nTicksW + 2 * nTicksH));
   vtkIdType index = 0;
+  this->BorderActor->GetProperty()->SetColor(this->GetTextProperty()->GetColor());
 
   // Draw top/bottom
   for (int i = 0; i < nTicksW; ++i)
