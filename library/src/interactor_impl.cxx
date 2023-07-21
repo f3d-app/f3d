@@ -311,6 +311,10 @@ public:
         self->SetViewOrbit(ViewType::VT_RIGHT, self);
         render = true;
         break;
+      case '5':
+        self->Window.getCamera().toggleOrthographic();
+        render = true;
+        break;
       case '7':
         self->SetViewOrbit(ViewType::VT_TOP, self);
         render = true;

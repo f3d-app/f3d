@@ -215,6 +215,14 @@ camera& camera_impl::pitch(angle_deg_t angle)
 }
 
 //----------------------------------------------------------------------------
+camera& camera_impl::toggleOrthographic()
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  cam->SetParallelProjection(!cam->GetParallelProjection());
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 camera& camera_impl::setCurrentAsDefault()
 {
   this->getState(this->Internals->DefaultCamera);
