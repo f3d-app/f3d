@@ -62,6 +62,7 @@ public:
   virtual camera& yaw(angle_deg_t angle) = 0;
   virtual camera& elevation(angle_deg_t angle) = 0;
   virtual camera& pitch(angle_deg_t angle) = 0;
+  virtual camera& ortoview() = 0;
   ///@}
 
   /**

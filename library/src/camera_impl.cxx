@@ -215,6 +215,17 @@ camera& camera_impl::pitch(angle_deg_t angle)
 }
 
 //----------------------------------------------------------------------------
+camera& camera_impl::ortoview()
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  if (cam->GetParallelProjection() == 0)
+    cam->ParallelProjectionOn();
+  else
+    cam->ParallelProjectionOff();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 camera& camera_impl::setCurrentAsDefault()
 {
   this->getState(this->Internals->DefaultCamera);
