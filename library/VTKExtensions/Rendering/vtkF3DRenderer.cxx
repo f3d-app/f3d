@@ -546,6 +546,7 @@ void vtkF3DRenderer::ConfigureHDRI()
 {
   // Read HDRI when needed
   vtkNew<vtkTexture> hdriTexture;
+  vtkSmartPointer<vtkImageReader2> reader;
   this->HasHDRILighting = false;
   if (!this->HDRIFile.empty())
   {
@@ -556,24 +557,10 @@ void vtkF3DRenderer::ConfigureHDRI()
     }
     else
     {
-      auto reader = vtkSmartPointer<vtkImageReader2>::Take(
+      reader = vtkSmartPointer<vtkImageReader2>::Take(
         vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
       if (reader)
       {
-        reader->SetFileName(this->HDRIFile.c_str());
-        reader->Update();
-
-        hdriTexture->SetColorModeToDirectScalars();
-        hdriTexture->MipmapOn();
-        hdriTexture->InterpolateOn();
-        hdriTexture->SetInputConnection(reader->GetOutputPort());
-
-        // 8-bit textures are usually gamma-corrected
-        if (reader->GetOutput() && reader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
-        {
-          hdriTexture->UseSRGBColorSpaceOn();
-        }
-
         this->HasHDRILighting = true;
       }
       else
@@ -644,78 +631,100 @@ void vtkF3DRenderer::ConfigureHDRI()
     this->GetEnvMapPrefiltered()->HalfPrecisionOff();
 #endif
 
-    // HDRI OpenGL
     this->UseImageBasedLightingOn();
+
+    bool needHDRIComputation = !lutCacheExists || !shCacheExists || !specCacheExists;
+
+    if (needHDRIComputation || this->HDRISkyboxVisible)
+    {
+      reader->SetFileName(this->HDRIFile.c_str());
+      reader->Update();
+
+      hdriTexture->SetColorModeToDirectScalars();
+      hdriTexture->MipmapOn();
+      hdriTexture->InterpolateOn();
+      hdriTexture->SetInputConnection(reader->GetOutputPort());
+
+      // 8-bit textures are usually gamma-corrected
+      if (reader->GetOutput() && reader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
+      {
+        hdriTexture->UseSRGBColorSpaceOn();
+      }
+    }
+    else
+    {
+      // TODO Improve vtkOpenGLRenderer to support not having a texture
+      vtkNew<vtkImageData> img;
+      img->SetDimensions(1, 1, 1);
+      img->AllocateScalars(VTK_FLOAT, 1);
+      img->SetScalarComponentFromDouble(0, 0, 0, 0, 0.0);
+      hdriTexture->SetInputData(img);
+    }
+
     this->SetEnvironmentTexture(hdriTexture);
+    if (needHDRIComputation)
+    {
+      this->Render();
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
-    // Create LUT cache file
-    if (!lutCacheExists)
-    {
-      vtkPBRLUTTexture* lut = this->GetEnvMapLookupTable();
-      if (!lut->GetTextureObject())
+      // Create LUT cache file
+      if (!lutCacheExists)
       {
-        this->Render();
         lut = this->GetEnvMapLookupTable();
-      }
-      assert(lut->GetTextureObject());
+        assert(lut->GetTextureObject());
 
-      vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-        lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize(), VTK_UNSIGNED_SHORT);
-      assert(img);
-
-      vtkNew<vtkXMLImageDataWriter> writer;
-      writer->SetFileName(lutCachePath.c_str());
-      writer->SetInputData(img);
-      writer->Write();
-    }
-
-    // Create spherical harmonics cache file
-    if (!shCacheExists)
-    {
-      vtkNew<vtkTable> table;
-      table->AddColumn(this->SphericalHarmonics);
-
-      vtkNew<vtkXMLTableWriter> writer;
-      writer->SetInputData(table);
-      writer->SetFileName(shCachePath.c_str());
-      writer->Write();
-    }
-
-    // Create specular cache file
-    if (!specCacheExists)
-    {
-      vtkPBRPrefilterTexture* spec = this->GetEnvMapPrefiltered();
-      if (!spec->GetTextureObject())
-      {
-        this->Render();
-        spec = this->GetEnvMapPrefiltered();
-      }
-      assert(spec->GetTextureObject());
-
-      unsigned int nbLevels = spec->GetPrefilterLevels();
-      unsigned int size = spec->GetPrefilterSize();
-
-      vtkNew<vtkMultiBlockDataSet> mb;
-      mb->SetNumberOfBlocks(6 * nbLevels);
-
-      for (unsigned int i = 0; i < nbLevels; i++)
-      {
         vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-          spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i, VTK_FLOAT);
+          lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize(), VTK_UNSIGNED_SHORT);
         assert(img);
-        mb->SetBlock(i, img);
+
+        vtkNew<vtkXMLImageDataWriter> writer;
+        writer->SetFileName(lutCachePath.c_str());
+        writer->SetInputData(img);
+        writer->Write();
       }
 
-      vtkNew<vtkXMLMultiBlockDataWriter> writer;
-      writer->SetCompressorTypeToNone();
-      writer->SetDataModeToAppended();
-      writer->EncodeAppendedDataOff();
-      writer->SetFileName(specCachePath.c_str());
-      writer->SetInputData(mb);
-      writer->Write();
-    }
+      // Create spherical harmonics cache file
+      if (!shCacheExists)
+      {
+        vtkNew<vtkTable> table;
+        table->AddColumn(this->SphericalHarmonics);
+
+        vtkNew<vtkXMLTableWriter> writer;
+        writer->SetInputData(table);
+        writer->SetFileName(shCachePath.c_str());
+        writer->Write();
+      }
+
+      // Create specular cache file
+      if (!specCacheExists)
+      {
+        vtkPBRPrefilterTexture* spec = this->GetEnvMapPrefiltered();
+        assert(spec->GetTextureObject());
+
+        unsigned int nbLevels = spec->GetPrefilterLevels();
+        unsigned int size = spec->GetPrefilterSize();
+
+        vtkNew<vtkMultiBlockDataSet> mb;
+        mb->SetNumberOfBlocks(6 * nbLevels);
+
+        for (unsigned int i = 0; i < nbLevels; i++)
+        {
+          vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
+            spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i, VTK_FLOAT);
+          assert(img);
+          mb->SetBlock(i, img);
+        }
+
+        vtkNew<vtkXMLMultiBlockDataWriter> writer;
+        writer->SetCompressorTypeToNone();
+        writer->SetDataModeToAppended();
+        writer->EncodeAppendedDataOff();
+        writer->SetFileName(specCachePath.c_str());
+        writer->SetInputData(mb);
+        writer->Write();
+      }
 #endif
+    }
 
     if (this->HDRISkyboxVisible)
     {
