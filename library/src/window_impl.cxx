@@ -233,7 +233,7 @@ void window_impl::Initialize(bool withColoring)
   }
   else if (!withColoring && (renWithColor || !this->Internals->Renderer))
   {
-    this->Internals->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
+    this->Internals->Renderer = vtkSmartPointer<vtkF3DRendererWithColoring>::New();
   }
 
   this->Internals->Renderer->SetCachePath(this->Internals->GetCachePath());
