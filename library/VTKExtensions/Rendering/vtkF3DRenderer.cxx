@@ -76,7 +76,6 @@ std::string ComputeFileHash(const std::string& filepath)
   char md5Hash[33];
   md5Hash[32] = '\0';
 
-
   std::size_t length = vtksys::SystemTools::FileLength(filepath);
   std::vector<char> buffer(length);
 
@@ -546,7 +545,7 @@ void vtkF3DRenderer::ConfigureHDRI()
 {
   // Read HDRI when needed
   vtkNew<vtkTexture> hdriTexture;
-  vtkSmartPointer<vtkImageReader2> reader;
+  vtkSmartPointer<vtkImageReader2> textureReader;
   this->HasHDRILighting = false;
   if (!this->HDRIFile.empty())
   {
@@ -557,9 +556,9 @@ void vtkF3DRenderer::ConfigureHDRI()
     }
     else
     {
-      reader = vtkSmartPointer<vtkImageReader2>::Take(
+      textureReader = vtkSmartPointer<vtkImageReader2>::Take(
         vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
-      if (reader)
+      if (textureReader)
       {
         this->HasHDRILighting = true;
       }
@@ -640,16 +639,16 @@ void vtkF3DRenderer::ConfigureHDRI()
     if (needHDRIComputation || this->HDRISkyboxVisible)
     {
       // The actual env texture is needed, read it
-      reader->SetFileName(this->HDRIFile.c_str());
-      reader->Update();
+      textureReader->SetFileName(this->HDRIFile.c_str());
+      textureReader->Update();
 
       hdriTexture->SetColorModeToDirectScalars();
       hdriTexture->MipmapOn();
       hdriTexture->InterpolateOn();
-      hdriTexture->SetInputConnection(reader->GetOutputPort());
+      hdriTexture->SetInputConnection(textureReader->GetOutputPort());
 
       // 8-bit textures are usually gamma-corrected
-      if (reader->GetOutput() && reader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
+      if (textureReader->GetOutput() && textureReader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
       {
         hdriTexture->UseSRGBColorSpaceOn();
       }
