@@ -80,12 +80,12 @@ std::string ComputeFileHash(const std::string& filepath)
   std::vector<char> buffer(length);
 
   vtksys::ifstream file;
-  file.open(filepath, std::ios_base::binary);
+  file.open(filepath.c_str(), std::ios_base::binary);
   file.read(buffer.data(), length);
 
   vtksysMD5* md5 = vtksysMD5_New();
   vtksysMD5_Initialize(md5);
-  vtksysMD5_Append(md5, reinterpret_cast<const unsigned char*>(buffer.data()), length);
+  vtksysMD5_Append(md5, reinterpret_cast<const unsigned char*>(buffer.data()), static_cast<int>(length));
   vtksysMD5_Finalize(md5, digest);
   vtksysMD5_DigestToHex(digest, md5Hash);
   vtksysMD5_Delete(md5);
@@ -660,9 +660,11 @@ void vtkF3DRenderer::ConfigureHDRI()
       vtkNew<vtkImageData> img;
       hdriTexture->SetInputData(img);
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
       // The MTime must be more recent than the image one
       // Otherwise VTK triggers a new SH computation
       this->SphericalHarmonics->Modified();
+#endif
     }
     this->SetEnvironmentTexture(hdriTexture);
 
