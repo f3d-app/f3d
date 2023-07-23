@@ -648,7 +648,8 @@ void vtkF3DRenderer::ConfigureHDRI()
       hdriTexture->SetInputConnection(textureReader->GetOutputPort());
 
       // 8-bit textures are usually gamma-corrected
-      if (textureReader->GetOutput() && textureReader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
+      if (textureReader->GetOutput() &&
+        textureReader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
       {
         hdriTexture->UseSRGBColorSpaceOn();
       }
