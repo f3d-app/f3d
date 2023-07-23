@@ -85,7 +85,8 @@ std::string ComputeFileHash(const std::string& filepath)
 
   vtksysMD5* md5 = vtksysMD5_New();
   vtksysMD5_Initialize(md5);
-  vtksysMD5_Append(md5, reinterpret_cast<const unsigned char*>(buffer.data()), static_cast<int>(length));
+  vtksysMD5_Append(
+    md5, reinterpret_cast<const unsigned char*>(buffer.data()), static_cast<int>(length));
   vtksysMD5_Finalize(md5, digest);
   vtksysMD5_DigestToHex(digest, md5Hash);
   vtksysMD5_Delete(md5);
