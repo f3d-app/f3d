@@ -1180,8 +1180,8 @@ int vtkF3DRenderer::UpdateLights()
   vtkLightCollection* lc = this->GetLights();
   vtkLight* light;
   int lightCount = 0;
-  vtkCollectionSimpleIterator sit;
-  for (lc->InitTraversal(sit); (light = lc->GetNextLight(sit));)
+  vtkCollectionSimpleIterator it;
+  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
   {
     if (light->GetSwitch())
     {
@@ -1202,9 +1202,7 @@ int vtkF3DRenderer::UpdateLights()
 
   if (!this->LightIntensitiesConfigured)
   {
-    vtkLightCollection* lc = this->GetLights();
-    vtkLight* light;
-    vtkCollectionSimpleIterator it;
+    lc = this->GetLights();
     for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
     {
       double originalIntensity;
