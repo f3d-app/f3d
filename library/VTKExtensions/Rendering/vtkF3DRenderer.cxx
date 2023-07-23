@@ -1176,18 +1176,29 @@ void vtkF3DRenderer::Render()
 //----------------------------------------------------------------------------
 int vtkF3DRenderer::UpdateLights()
 {
-  // Recover the number of light that are on
-  int lightCount = this->Superclass::UpdateLights();
-
-  // If no lights are turned on, add a light kit
-  if (lightCount == 0 && !this->UseImageBasedLighting)
+  // Recover the number of lights that are on
+  vtkLightCollection* lc = this->GetLights();
+  vtkLight* light;
+  int lightCount = 0;
+  vtkCollectionSimpleIterator sit;
+  for (lc->InitTraversal(sit); (light = lc->GetNextLight(sit));)
   {
-    int nLights = this->GetLights()->GetNumberOfItems();
+    if (light->GetSwitch())
+    {
+      lightCount++;
+    }
+  }
+
+  // If no lights are turned on, add a light kit, even when using a HDRI
+  if (lightCount == 0)
+  {
     vtkNew<vtkLightKit> lightKit;
     lightKit->AddLightsToRenderer(this);
-    lightCount += this->GetLights()->GetNumberOfItems() - nLights;
     this->LightIntensitiesConfigured = false;
   }
+
+  // Update light shaders
+  lightCount = this->Superclass::UpdateLights();
 
   if (!this->LightIntensitiesConfigured)
   {
