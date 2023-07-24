@@ -317,10 +317,8 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply ARGS -t --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI)
   f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI INTERACTION THRESHOLD 60) #Shift+MouseRight;
   f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #U
+  f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #Up
   f3d_test(NAME TestInteractionHDRIChange DATA multi ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION DEFAULT_LIGHTS) #Left
-
-  f3d_test(NAME TestHDRIReloadOutput DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI NO_BASELINE DEFAULT_LIGHTS)
-  f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --ref=${CMAKE_BINARY_DIR}/Testing/Temporary/TestHDRIReloadOutput.png DEPENDS TestHDRIReloadOutput INTERACTION HDRI NO_BASELINE DEFAULT_LIGHTS) #Up
 
   configure_file("${F3D_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
   f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" HDRI DEFAULT_LIGHTS)
@@ -525,14 +523,12 @@ f3d_test(NAME TestInteractionFocalPointPickingShift DATA dragon.vtu INTERACTION 
 f3d_test(NAME TestInteractionFocalPointPickingPoints DATA pointsCloud.vtp INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries INTERACTION DEFAULT_LIGHTS) #SSB
+f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION DEFAULT_LIGHTS) #Up;
 f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION DEFAULT_LIGHTS) #Down;
 f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No file loaded, no rendering performed") #Down;
 f3d_test(NAME TestInteractionGroupGeometriesLoadParentDirectory DATA mb/mb_0_0.vtu ARGS --group-geometries --filename INTERACTION DEFAULT_LIGHTS) #Down;
 f3d_test(NAME TestInteractionInvertZoom DATA suzanne.ply ARGS --invert-zoom INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionCameraHotkeys DATA cow.vtp INTERACTION DEFAULT_LIGHTS)
-
-f3d_test(NAME TestReloadOutput DATA dragon.vtu ARGS -e NO_BASELINE DEFAULT_LIGHTS)
-f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e --ref=${CMAKE_BINARY_DIR}/Testing/Temporary/TestReloadOutput.png DEPENDS TestReloadOutput NO_BASELINE) #Up;
 
 # Progress test
 f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
