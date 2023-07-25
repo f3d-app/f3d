@@ -983,7 +983,7 @@ std::string vtkF3DRendererWithColoring::GenerateMetaDataDescription()
 {
   if (!this->Importer)
   {
-    return "";
+    return this->Superclass::GenerateMetaDataDescription();
   }
 
   // XXX Padding should not be handled by manipulating string
