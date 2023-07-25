@@ -42,6 +42,7 @@
 #include <vtkXMLMultiBlockDataWriter.h>
 #include <vtkXMLTableReader.h>
 #include <vtkXMLTableWriter.h>
+#include <vtksys/FStream.hxx>
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -70,22 +71,24 @@ namespace
 {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
 //----------------------------------------------------------------------------
-// Compute the MD5 hash of the scalar field of an image data
-std::string ComputeImageHash(vtkImageData* image)
+// Compute the MD5 hash of an existing file on disk
+std::string ComputeFileHash(const std::string& filepath)
 {
   unsigned char digest[16];
   char md5Hash[33];
   md5Hash[32] = '\0';
 
-  unsigned char* content = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
-  int* dims = image->GetDimensions();
-  int nbComp = image->GetNumberOfScalarComponents();
-  int scalarSize = image->GetScalarSize();
-  int size = nbComp * scalarSize * dims[0] * dims[1] * dims[2];
+  std::size_t length = vtksys::SystemTools::FileLength(filepath);
+  std::vector<char> buffer(length);
+
+  vtksys::ifstream file;
+  file.open(filepath.c_str(), std::ios_base::binary);
+  file.read(buffer.data(), length);
 
   vtksysMD5* md5 = vtksysMD5_New();
   vtksysMD5_Initialize(md5);
-  vtksysMD5_Append(md5, content, size);
+  vtksysMD5_Append(
+    md5, reinterpret_cast<const unsigned char*>(buffer.data()), static_cast<int>(length));
   vtksysMD5_Finalize(md5, digest);
   vtksysMD5_DigestToHex(digest, md5Hash);
   vtksysMD5_Delete(md5);
@@ -595,7 +598,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
         // Compute HDRI MD5
-        this->HDRIHash = ::ComputeImageHash(this->HDRITexture->GetInput());
+        this->HDRIHash = ::ComputeFileHash(this->HDRIFile);
 
         // Cache folder for this HDRI
         std::string currentCachePath = this->CachePath + "/" + this->HDRIHash;
