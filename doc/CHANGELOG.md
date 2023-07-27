@@ -7,6 +7,7 @@ For F3D users:
  - Fixed an issue with the binary release when opening draco files
  - Fixed an issue with matcap textures
  - Fixed an issue with HDRI lighting
+ - Fixed an issue with HDRI lighting when dropping HDRI after a model
  - Fixed cheatsheet menu rendering under 'Drop File Instructor'
  - Improved cheatsheet menu contrast for any background color
  - Improved overall text contrast for any background color

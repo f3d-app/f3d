@@ -559,7 +559,17 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream 
     configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRI.log.in"
       "${CMAKE_BINARY_DIR}/TestInteractionDropHDRI.log")
 
-    f3d_test(NAME TestInteractionDropHDRI ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRI.log" HDRI)#X;DropEvent dragon.vtu palermo.hdr;
+    f3d_test(NAME TestInteractionDropHDRI ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRI.log" HDRI)#X;DropEvent dragon.vtu;DropEven palermo.hdr;
+
+    configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRIInvert.log.in"
+      "${CMAKE_BINARY_DIR}/TestInteractionDropHDRIInvert.log")
+
+    f3d_test(NAME TestInteractionDropHDRIInvert ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIInvert.log" HDRI)#X;DropEvent palermo.hdr;DropEvent dragon.vtu;
+
+    configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRIMulti.log.in"
+      "${CMAKE_BINARY_DIR}/TestInteractionDropHDRIMulti.log")
+
+    f3d_test(NAME TestInteractionDropHDRIMulti ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIMulti.log" HDRI)#X;DropEvent dragon.vtu palermo.hdr;
 
     if(F3D_MODULE_EXR)
       configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRIExr.log.in"
