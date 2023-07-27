@@ -57,5 +57,19 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+#if F3D_MODULE_EXR
+  // Change the hdri and make sure it is taken into account
+  opt.set("render.background.hdri", std::string(argv[1]) + "/data/kloofendal_43d_clear_1k.exr");
+
+  ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+    std::string(argv[2]), "TestSDKDynamicHDRIExr", 50);
+
+  if (!ret)
+  {
+    std::cerr << "Third render with HDRI failed" << std::endl;
+    return EXIT_FAILURE;
+  }
+#endif
+
   return EXIT_SUCCESS;
 }

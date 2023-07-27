@@ -8,9 +8,5 @@ KeyPressEvent 677 699 0 0 1 Super_L 0
 CharEvent 677 699 0 0 1 Super_L 0
 UpdateDropLocationEvent 677 699 0 0 1 Super_L 0
 EnterEvent 781 494 0 0 0 Super_L 0
-DropFilesEvent 781 494 0 0 0 Super_L 1 1 ${F3D_SOURCE_DIR}/testing/data/dragon.vtu
-RenderEvent 781 494 0 0 0 Super_L 0
-UpdateDropLocationEvent 677 699 0 0 1 Super_L 0
-EnterEvent 781 494 0 0 0 Super_L 0
-DropFilesEvent 781 494 0 0 0 Super_L 1 1 ${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr
+DropFilesEvent 781 494 0 0 0 Super_L 1 2 ${F3D_SOURCE_DIR}/testing/data/dragon.vtu ${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr
 RenderEvent 781 494 0 0 0 Super_L 0

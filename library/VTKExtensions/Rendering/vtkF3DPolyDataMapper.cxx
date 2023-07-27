@@ -4,6 +4,7 @@
 #include <vtkDoubleArray.h>
 #include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
+#include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLVertexBufferObject.h>
 #include <vtkOpenGLVertexBufferObjectGroup.h>
 #include <vtkPointData.h>
@@ -11,6 +12,7 @@
 #include <vtkProperty.h>
 #include <vtkShaderProgram.h>
 #include <vtkShaderProperty.h>
+#include <vtkTexture.h>
 #include <vtkUniforms.h>
 #include <vtkVersion.h>
 
@@ -256,4 +258,25 @@ void vtkF3DPolyDataMapper::ReplaceShaderTCoord(
   }
 
   this->Superclass::ReplaceShaderTCoord(shaders, ren, actor);
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DPolyDataMapper::GetNeedToRebuildShaders(
+  vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* actor)
+{
+  bool ret = this->Superclass::GetNeedToRebuildShaders(cellBO, ren, actor);
+  if (!ret)
+  {
+    // TODO: Put this logic in VTK
+    vtkOpenGLRenderer* oren = static_cast<vtkOpenGLRenderer*>(ren);
+    vtkTexture* envTexture = oren->GetEnvironmentTexture();
+    if (this->EnvTexture != envTexture ||
+      (envTexture && envTexture->GetMTime() > this->EnvTextureTime))
+    {
+      ret = true;
+      this->EnvTexture = envTexture;
+      this->EnvTextureTime = envTexture->GetMTime();
+    }
+  }
+  return ret;
 }
