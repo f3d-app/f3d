@@ -310,31 +310,40 @@ void window_impl::UpdateDynamicOptions()
   {
     this->Internals->Renderer->SetSurfaceColor(
       this->Internals->Options.getAsDoubleVector("model.color.rgb").data());
-    this->Internals->Renderer->SetOpacity(this->Internals->Options.getAsDouble("model.color.opacity"));
-    this->Internals->Renderer->SetTextureBaseColor(this->Internals->Options.getAsString("model.color.texture"));
-    this->Internals->Renderer->SetRoughness(this->Internals->Options.getAsDouble("model.material.roughness"));
-    this->Internals->Renderer->SetMetallic(this->Internals->Options.getAsDouble("model.material.metallic"));
+    this->Internals->Renderer->SetOpacity(
+      this->Internals->Options.getAsDouble("model.color.opacity"));
+    this->Internals->Renderer->SetTextureBaseColor(
+      this->Internals->Options.getAsString("model.color.texture"));
+    this->Internals->Renderer->SetRoughness(
+      this->Internals->Options.getAsDouble("model.material.roughness"));
+    this->Internals->Renderer->SetMetallic(
+      this->Internals->Options.getAsDouble("model.material.metallic"));
     this->Internals->Renderer->SetTextureMaterial(
       this->Internals->Options.getAsString("model.material.texture"));
     this->Internals->Renderer->SetTextureEmissive(
       this->Internals->Options.getAsString("model.emissive.texture"));
     this->Internals->Renderer->SetEmissiveFactor(
       this->Internals->Options.getAsDoubleVector("model.emissive.factor").data());
-    this->Internals->Renderer->SetTextureNormal(this->Internals->Options.getAsString("model.normal.texture"));
-    this->Internals->Renderer->SetNormalScale(this->Internals->Options.getAsDouble("model.normal.scale"));
-    this->Internals->Renderer->SetTextureMatCap(this->Internals->Options.getAsString("model.matcap.texture"));
+    this->Internals->Renderer->SetTextureNormal(
+      this->Internals->Options.getAsString("model.normal.texture"));
+    this->Internals->Renderer->SetNormalScale(
+      this->Internals->Options.getAsDouble("model.normal.scale"));
+    this->Internals->Renderer->SetTextureMatCap(
+      this->Internals->Options.getAsString("model.matcap.texture"));
 
     this->Internals->Renderer->SetColoring(this->Internals->Options.getAsBool("model.scivis.cells"),
       this->Internals->Options.getAsString("model.scivis.array-name"),
       this->Internals->Options.getAsInt("model.scivis.component"));
     this->Internals->Renderer->SetScalarBarRange(
       this->Internals->Options.getAsDoubleVector("model.scivis.range"));
-    this->Internals->Renderer->SetColormap(this->Internals->Options.getAsDoubleVector("model.scivis.colormap"));
+    this->Internals->Renderer->SetColormap(
+      this->Internals->Options.getAsDoubleVector("model.scivis.colormap"));
     this->Internals->Renderer->ShowScalarBar(this->Internals->Options.getAsBool("ui.bar"));
 
     this->Internals->Renderer->SetUsePointSprites(
       this->Internals->Options.getAsBool("model.point-sprites.enable"));
-    this->Internals->Renderer->SetUseVolume(this->Internals->Options.getAsBool("model.volume.enable"));
+    this->Internals->Renderer->SetUseVolume(
+      this->Internals->Options.getAsBool("model.volume.enable"));
     this->Internals->Renderer->SetUseInverseOpacityFunction(
       this->Internals->Options.getAsBool("model.volume.inverse"));
   }
