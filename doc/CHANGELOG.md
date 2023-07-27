@@ -11,6 +11,7 @@ For F3D users:
  - Fixed cheatsheet menu rendering under 'Drop File Instructor'
  - Improved cheatsheet menu contrast for any background color
  - Improved overall text contrast for any background color
+ - Improved performance when changing model and using a HDRI
 
 For libf3d users:
  - Reworked image API to support many file formats to read (EXR, HDR) and write (PNG, JPG, TIF, BMP)
