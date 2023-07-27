@@ -10,6 +10,9 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
 {
   vtkNew<vtkF3DRendererWithColoring> renderer;
 
+  // Check some invalid code path
+  renderer->ShowGrid(true);
+
   // Check error paths
   if (renderer->GetColoringArrayName() != F3D_RESERVED_STRING)
   {
