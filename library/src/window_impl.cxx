@@ -89,7 +89,9 @@ window_impl::window_impl(const options& options, Type type)
 #endif
   }
 
+  this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
+  this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
 }
 
 //----------------------------------------------------------------------------
@@ -215,15 +217,7 @@ window_impl::~window_impl()
 void window_impl::Initialize(bool withColoring)
 {
   this->Internals->WithColoring = withColoring;
-
-  // Hide axis to make sure the renderer can be deleted if needed
-  this->Internals->Renderer->ShowAxis(false);
-  this->Internals->RenWin->RemoveRenderer(this->Internals->Renderer);
-
   this->Internals->Renderer->SetCachePath(this->Internals->GetCachePath());
-
-  this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
-  this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Renderer->Initialize(this->Internals->Options.getAsString("scene.up-direction"));
 
 #if defined(_WIN32)
