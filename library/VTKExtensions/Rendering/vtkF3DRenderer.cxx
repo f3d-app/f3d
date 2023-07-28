@@ -62,8 +62,6 @@
 #include <regex>
 #include <sstream>
 
-vtkStandardNewMacro(vtkF3DRenderer);
-
 namespace
 {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
@@ -232,12 +230,6 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   {
     F3DLog::Print(F3DLog::Severity::Warning, up + " is not a valid up direction");
   }
-}
-
-//----------------------------------------------------------------------------
-std::string vtkF3DRenderer::GenerateMetaDataDescription()
-{
-  return " Unavailable\n";
 }
 
 //----------------------------------------------------------------------------

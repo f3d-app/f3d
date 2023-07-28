@@ -50,10 +50,11 @@ public:
 
   std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
-  vtkSmartPointer<vtkF3DRenderer> Renderer;
+  vtkNew<vtkF3DRendererWithColoring> Renderer;
   Type WindowType;
   const options& Options;
   bool Initialized = false;
+  bool WithColoring = false;
   std::string CachePath;
 };
 
@@ -88,7 +89,9 @@ window_impl::window_impl(const options& options, Type type)
 #endif
   }
 
+  this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
+  this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
 }
 
 //----------------------------------------------------------------------------
@@ -205,41 +208,16 @@ point3_t window_impl::getDisplayFromWorld(const point3_t& worldPoint) const
 //----------------------------------------------------------------------------
 window_impl::~window_impl()
 {
-  if (this->Internals->Renderer)
-  {
-    // The axis widget should be disabled before calling the renderer destructor
-    // As there is a register loop if not
-    this->Internals->Renderer->ShowAxis(false);
-  }
+  // The axis widget should be disabled before calling the renderer destructor
+  // As there is a register loop if not
+  this->Internals->Renderer->ShowAxis(false);
 }
 
 //----------------------------------------------------------------------------
 void window_impl::Initialize(bool withColoring)
 {
-  // Clear renderer if already present
-  if (this->Internals->Renderer)
-  {
-    // Hide axis to make sure the renderer can be deleted if needed
-    this->Internals->Renderer->ShowAxis(false);
-    this->Internals->RenWin->RemoveRenderer(this->Internals->Renderer);
-  }
-
-  // Create the renderer only when needed
-  vtkF3DRendererWithColoring* renWithColor =
-    vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
-  if (withColoring && !renWithColor)
-  {
-    this->Internals->Renderer = vtkSmartPointer<vtkF3DRendererWithColoring>::New();
-  }
-  else if (!withColoring && (renWithColor || !this->Internals->Renderer))
-  {
-    this->Internals->Renderer = vtkSmartPointer<vtkF3DRenderer>::New();
-  }
-
+  this->Internals->WithColoring = withColoring;
   this->Internals->Renderer->SetCachePath(this->Internals->GetCachePath());
-
-  this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
-  this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Renderer->Initialize(this->Internals->Options.getAsString("scene.up-direction"));
 
 #if defined(_WIN32)
@@ -255,7 +233,7 @@ void window_impl::Initialize(bool withColoring)
 //----------------------------------------------------------------------------
 void window_impl::UpdateDynamicOptions()
 {
-  if (!this->Internals->Renderer)
+  if (!this->Internals->Initialized)
   {
     // Renderer is missing, create a default one
     this->Initialize(false);
@@ -322,39 +300,45 @@ void window_impl::UpdateDynamicOptions()
     this->Internals->Options.getAsBool("render.grid.absolute"));
   this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("render.grid.enable"));
 
-  vtkF3DRendererWithColoring* renWithColor =
-    vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
-
-  if (renWithColor)
+  if (this->Internals->WithColoring)
   {
-    renWithColor->SetSurfaceColor(
+    this->Internals->Renderer->SetSurfaceColor(
       this->Internals->Options.getAsDoubleVector("model.color.rgb").data());
-    renWithColor->SetOpacity(this->Internals->Options.getAsDouble("model.color.opacity"));
-    renWithColor->SetTextureBaseColor(this->Internals->Options.getAsString("model.color.texture"));
-    renWithColor->SetRoughness(this->Internals->Options.getAsDouble("model.material.roughness"));
-    renWithColor->SetMetallic(this->Internals->Options.getAsDouble("model.material.metallic"));
-    renWithColor->SetTextureMaterial(
+    this->Internals->Renderer->SetOpacity(
+      this->Internals->Options.getAsDouble("model.color.opacity"));
+    this->Internals->Renderer->SetTextureBaseColor(
+      this->Internals->Options.getAsString("model.color.texture"));
+    this->Internals->Renderer->SetRoughness(
+      this->Internals->Options.getAsDouble("model.material.roughness"));
+    this->Internals->Renderer->SetMetallic(
+      this->Internals->Options.getAsDouble("model.material.metallic"));
+    this->Internals->Renderer->SetTextureMaterial(
       this->Internals->Options.getAsString("model.material.texture"));
-    renWithColor->SetTextureEmissive(
+    this->Internals->Renderer->SetTextureEmissive(
       this->Internals->Options.getAsString("model.emissive.texture"));
-    renWithColor->SetEmissiveFactor(
+    this->Internals->Renderer->SetEmissiveFactor(
       this->Internals->Options.getAsDoubleVector("model.emissive.factor").data());
-    renWithColor->SetTextureNormal(this->Internals->Options.getAsString("model.normal.texture"));
-    renWithColor->SetNormalScale(this->Internals->Options.getAsDouble("model.normal.scale"));
-    renWithColor->SetTextureMatCap(this->Internals->Options.getAsString("model.matcap.texture"));
+    this->Internals->Renderer->SetTextureNormal(
+      this->Internals->Options.getAsString("model.normal.texture"));
+    this->Internals->Renderer->SetNormalScale(
+      this->Internals->Options.getAsDouble("model.normal.scale"));
+    this->Internals->Renderer->SetTextureMatCap(
+      this->Internals->Options.getAsString("model.matcap.texture"));
 
-    renWithColor->SetColoring(this->Internals->Options.getAsBool("model.scivis.cells"),
+    this->Internals->Renderer->SetColoring(this->Internals->Options.getAsBool("model.scivis.cells"),
       this->Internals->Options.getAsString("model.scivis.array-name"),
       this->Internals->Options.getAsInt("model.scivis.component"));
-    renWithColor->SetScalarBarRange(
+    this->Internals->Renderer->SetScalarBarRange(
       this->Internals->Options.getAsDoubleVector("model.scivis.range"));
-    renWithColor->SetColormap(this->Internals->Options.getAsDoubleVector("model.scivis.colormap"));
-    renWithColor->ShowScalarBar(this->Internals->Options.getAsBool("ui.bar"));
+    this->Internals->Renderer->SetColormap(
+      this->Internals->Options.getAsDoubleVector("model.scivis.colormap"));
+    this->Internals->Renderer->ShowScalarBar(this->Internals->Options.getAsBool("ui.bar"));
 
-    renWithColor->SetUsePointSprites(
+    this->Internals->Renderer->SetUsePointSprites(
       this->Internals->Options.getAsBool("model.point-sprites.enable"));
-    renWithColor->SetUseVolume(this->Internals->Options.getAsBool("model.volume.enable"));
-    renWithColor->SetUseInverseOpacityFunction(
+    this->Internals->Renderer->SetUseVolume(
+      this->Internals->Options.getAsBool("model.volume.enable"));
+    this->Internals->Renderer->SetUseInverseOpacityFunction(
       this->Internals->Options.getAsBool("model.volume.inverse"));
   }
 
@@ -370,11 +354,9 @@ void window_impl::PrintSceneDescription(log::VerboseLevel level)
 //----------------------------------------------------------------------------
 void window_impl::PrintColoringDescription(log::VerboseLevel level)
 {
-  vtkF3DRendererWithColoring* renWithColor =
-    vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
-  if (renWithColor)
+  if (this->Internals->WithColoring)
   {
-    std::string descr = renWithColor->GetColoringDescription();
+    std::string descr = this->Internals->Renderer->GetColoringDescription();
     if (!descr.empty())
     {
       log::print(level, descr);
@@ -428,11 +410,9 @@ image window_impl::renderToImage(bool noBackground)
 //----------------------------------------------------------------------------
 void window_impl::SetImporterForColoring(vtkF3DGenericImporter* importer)
 {
-  vtkF3DRendererWithColoring* renWithColor =
-    vtkF3DRendererWithColoring::SafeDownCast(this->Internals->Renderer);
-  if (renWithColor)
+  if (this->Internals->WithColoring)
   {
-    renWithColor->SetImporter(importer);
+    this->Internals->Renderer->SetImporter(importer);
   }
 }
 
