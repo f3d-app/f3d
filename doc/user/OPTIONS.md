@@ -68,7 +68,8 @@ Options|Default|Description
 -z, \-\-fps||Display a *frame per second counter*.
 -n, \-\-filename||Display the *name of the file* on top of the window.
 -m, \-\-metadata||Display the *metadata*.<br>Empty without a default scene.
--u, \-\-blur-background||Blur background.<br>Requires an HDRi.
+-u, \-\-blur-background||Blur background.<br>Useful with a HDRI.
+\-\-blur-coc|20|Blur circle of confusion radius.
 \-\-light-intensity|1.0|*Adjust the intensity* of every light in the scene.
 
 ## Scientific visualization options
