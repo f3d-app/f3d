@@ -7,7 +7,6 @@ vtk_add_test_cxx(VTKExtensionsRenderingTests tests
   TestF3DInteractorEventRecorder.cxx
   TestF3DOpenGLGridMapper.cxx 
   TestF3DRenderPass.cxx
-  TestF3DRenderer.cxx
   TestF3DRendererWithColoring.cxx
   TestF3DCachedTexturesPrint.cxx
   ${F3D_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)

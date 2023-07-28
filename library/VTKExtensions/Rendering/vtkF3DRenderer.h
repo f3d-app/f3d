@@ -25,7 +25,6 @@ class vtkTextActor;
 class vtkF3DRenderer : public vtkOpenGLRenderer
 {
 public:
-  static vtkF3DRenderer* New();
   vtkTypeMacro(vtkF3DRenderer, vtkOpenGLRenderer);
 
   ///@{
@@ -199,7 +198,7 @@ protected:
   /**
    * Override to generate a data description
    */
-  virtual std::string GenerateMetaDataDescription();
+  virtual std::string GenerateMetaDataDescription() = 0;
 
   vtkNew<vtkActor> GridActor;
 
