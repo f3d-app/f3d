@@ -161,10 +161,17 @@ protected:
    */
   void ConfigureTextActors();
 
+  ///@{
   /**
-   * Configure HDRI actor and related lighting
+   * Configure HDRI actor and related lighting textures
    */
   void ConfigureHDRI();
+  void ConfigureHDRITexture();
+  void ConfigureHDRILUT();
+  void ConfigureHDRISphericalHarmonics();
+  void ConfigureHDRISpecular();
+  void ConfigureHDRISkybox();
+  ///@}
 
   /**
    * Configure all actors properties according to what has been set for:
@@ -223,7 +230,11 @@ protected:
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
   bool MetaDataConfigured = false;
-  bool HDRIConfigured = false;
+  bool HDRITextureConfigured = false;
+  bool HDRILUTConfigured = false;
+  bool HDRISphericalHarmonicsConfigured = false;
+  bool HDRISpecularConfigured = false;
+  bool HDRISkyboxConfigured = false;
 
   bool GridVisible = false;
   bool GridAbsolute = false;
@@ -254,8 +265,11 @@ protected:
   double GridUnitSquare = 0.0;
   int GridSubdivisions = 10;
 
-  bool HasHDRILighting = false;
+  bool HasValidHDRIFile = false;
   std::string HDRIFile;
+  std::string HDRIHash;
+  vtkNew<vtkTexture> HDRITexture;
+
   std::string FontFile;
 
   double LightIntensity = 1.0;
