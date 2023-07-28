@@ -74,7 +74,7 @@ render.raytracing.samples|int<br>5<br>render|The number of *samples per pixel*.|
 render.raytracing.denoise|bool<br>false<br>render|*Denoise* the raytracing rendering.|\-\-denoise
 render.background.color|vector\<double\><br>0.2,0.2,0.2<br>render|Set the window *background color*.<br>Ignored if *hdri* is set.|\-\-bg-color
 render.background.hdri|string<br>-<br>render|Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp. Override the color.|\-\-hdri
-render.background.blur|bool<br>false<br>render|Blur background when using a HDRI.|\-\-blur-background
+render.background.blur|bool<br>false<br>render|Blur background, useful with a HDRI.|\-\-blur-background
 render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-background-coc
 
 ## UI Options
