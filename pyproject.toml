@@ -39,6 +39,7 @@ Changelog = "https://github.com/f3d-app/f3d/blob/master/doc/CHANGELOG.md"
 minimum-version = "0.4"
 cmake.minimum-version = "3.21"
 cmake.build-type = "Release"
+install.components = ["library", "pythonmodule", "dependencies"]
 ninja.minimum-version = "1.10"
 ninja.make-fallback = false
 wheel.packages = []

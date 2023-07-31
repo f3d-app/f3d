@@ -193,9 +193,18 @@ endif()
 if(BUILD_SHARED_LIBS)
   install(TARGETS libf3d
     EXPORT f3dTargets
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library
+    RUNTIME_DEPENDENCY_SET libf3dDeps
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk EXCLUDE_FROM_ALL
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT library
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library)
+
+  # Install dependencies, but exclude system libraries
+  set(F3D_DEPENDENCIES_DIR "" CACHE STRING "Semicolon separated directories for dependencies look up")
+  install(RUNTIME_DEPENDENCY_SET libf3dDeps
+    COMPONENT dependencies EXCLUDE_FROM_ALL
+    PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
+    POST_EXCLUDE_REGEXES ".*system32/.*" "^/usr/lib.*" "^/lib.*" "^/var/lib.*"
+    DIRECTORIES "${F3D_DEPENDENCIES_DIR}")
 
   install(FILES ${F3D_PUBLIC_HEADERS}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"
