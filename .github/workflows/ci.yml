@@ -396,13 +396,14 @@ jobs:
 
     - name: Set SKBUILD_CMAKE_ARGS
       shell: bash
-      run: echo "SKBUILD_CMAKE_ARGS=-DF3D_DEPENDENCIES_DIR=${{ env.ESCAPED_WS }}/dependencies/install/bin;\
-        -DF3D_PLUGIN_BUILD_ALEMBIC=ON;\
-        -DF3D_PLUGIN_BUILD_ASSIMP=ON;\
-        -DF3D_PLUGIN_BUILD_DRACO=ON;\
-        -DF3D_PLUGIN_BUILD_OCCT=ON;\
-        -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=ON;\
-        -DF3D_MODULE_EXR=ON;\
+      run: >
+        echo "SKBUILD_CMAKE_ARGS=-DF3D_DEPENDENCIES_DIR=${{ env.ESCAPED_WS }}/dependencies/install/bin;
+        -DF3D_PLUGIN_BUILD_ALEMBIC=ON;
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON;
+        -DF3D_PLUGIN_BUILD_DRACO=ON;
+        -DF3D_PLUGIN_BUILD_OCCT=ON;
+        -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=ON;
+        -DF3D_MODULE_EXR=ON;
         -DF3D_MODULE_EXTERNAL_RENDERING=ON" >> $GITHUB_ENV
 
     - name: Set up Python
