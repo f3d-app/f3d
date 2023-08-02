@@ -87,6 +87,11 @@ public:
    */
   void LoadPlugins(const F3DAppOptions& appOptions) const;
 
+  /**
+   * Print warnings if deprecated options have been set
+   */
+  static void WarnForDeprecatedOptions(const f3d::options& options);
+
   F3DOptionsParser();
   ~F3DOptionsParser();
 
