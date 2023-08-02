@@ -1,11 +1,13 @@
 #include "options.h"
 
+#include "export.h"
 #include "init.h"
 #include "log.h"
 #include "utils.h"
 
 #include "vtkF3DConfigure.h"
 
+#include <algorithm>
 #include <limits>
 #include <map>
 #include <type_traits>
@@ -41,6 +43,12 @@ public:
     static_assert(!std::is_array_v<T> && !std::is_pointer_v<T>);
     try
     {
+#ifndef F3D_NO_DEPRECATED
+      if (this->IsDeprecated(name))
+      {
+        log::warn("Option ", name, " is deprecated");
+      }
+#endif
       T& opt = std::get<T>(this->Options.at(name));
       opt = value;
     }
@@ -50,7 +58,7 @@ public:
     }
     catch (const std::out_of_range&)
     {
-      log::error("Options ", name, " does not exist");
+      log::error("Option ", name, " does not exist");
     }
   }
 
@@ -68,7 +76,7 @@ public:
     }
     catch (const std::out_of_range&)
     {
-      log::error("Options ", name, " does not exist");
+      log::error("Option ", name, " does not exist");
       return;
     }
   }
@@ -86,6 +94,12 @@ public:
   {
     try
     {
+#ifndef F3D_NO_DEPRECATED
+      if (this->IsDeprecated(name))
+      {
+        log::warn("Option ", name, " is deprecated");
+      }
+#endif
       return std::get<T>(this->Options.at(name));
     }
     catch (const std::bad_variant_access&)
@@ -96,11 +110,22 @@ public:
     }
     catch (const std::out_of_range&)
     {
-      std::string error = "Options " + name + " does not exist";
+      std::string error = "Option " + name + " does not exist";
       log::error(error);
       throw options::inexistent_exception(error + "\n");
     }
   }
+
+#ifndef F3D_NO_DEPRECATED
+  bool IsDeprecated(const std::string& name)
+  {
+    // compile time list of deprecated options
+    constexpr std::string_view deprecated[] = { "render.background.hdri" };
+
+    auto it = std::find(std::begin(deprecated), std::end(deprecated), name);
+    return it != std::end(deprecated);
+  }
+#endif
 
   std::map<std::string, OptionVariant> Options;
 };
@@ -137,9 +162,13 @@ options::options()
   this->Internals->init("render.effect.ambient-occlusion", false);
   this->Internals->init("render.effect.tone-mapping", false);
 
+  this->Internals->init("render.hdri.file", std::string());
+  this->Internals->init("render.hdri.ambient", false);
   this->Internals->init("render.background.color", std::vector<double>{ 0.2, 0.2, 0.2 });
-  this->Internals->init(
-    "render.background.hdri", std::string()); // XXX This overrides background.color
+#ifndef F3D_NO_DEPRECATED
+  this->Internals->init("render.background.hdri", std::string());
+#endif
+  this->Internals->init("render.background.skybox", false);
   this->Internals->init("render.background.blur", false);
   this->Internals->init("render.background.blur.coc", 20.0);
   this->Internals->init("render.light.intensity", 1.);

@@ -1,5 +1,6 @@
 #include "image.h"
 
+#include "export.h"
 #include "init.h"
 
 #include <vtkBMPWriter.h>

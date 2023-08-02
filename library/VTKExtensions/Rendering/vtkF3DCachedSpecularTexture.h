@@ -25,11 +25,20 @@ public:
    */
   void Load(vtkRenderer*) override;
 
+  ///@{
+  /**
+   * Turn on or off cache mechanism
+   */
+  vtkSetMacro(UseCache, bool);
+  vtkBooleanMacro(UseCache, bool);
+  ///@}
+
 protected:
   vtkF3DCachedSpecularTexture() = default;
   ~vtkF3DCachedSpecularTexture() override = default;
 
   std::string FileName;
+  bool UseCache = true;
 
 private:
   vtkF3DCachedSpecularTexture(const vtkF3DCachedSpecularTexture&) = delete;

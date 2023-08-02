@@ -9,6 +9,7 @@
 #include "nlohmann/json.hpp"
 
 #include "engine.h"
+#include "export.h"
 #include "interactor.h"
 #include "log.h"
 #include "options.h"
@@ -330,7 +331,12 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp2, "opacity", "", "Opacity", options.getAsDoubleRef("model.color.opacity"), HasDefault::YES, MayHaveConfig::YES, "<opacity>");
     this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.roughness"), HasDefault::YES, MayHaveConfig::YES, "<roughness>");
     this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.metallic"), HasDefault::YES, MayHaveConfig::YES, "<metallic>");
-    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.getAsStringRef("render.background.hdri"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+#ifndef F3D_NO_DEPRECATED
+    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source and skybox (deprecated)", options.getAsStringRef("render.background.hdri"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+#endif
+    this->DeclareOption(grp2, "hdri-file", "", "Path to an image file that can be used as a light source and skybox", options.getAsStringRef("render.hdri.file"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "hdri-ambient", "f", "Enable HDRI ambient lighting", options.getAsBoolRef("render.hdri.ambient"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp2, "hdri-skybox", "j", "Enable HDRI skybox background", options.getAsBoolRef("render.background.skybox"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp2, "texture-matcap", "", "Path to a texture file containing a material capture", options.getAsStringRef("model.matcap.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.getAsStringRef("model.color.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.getAsStringRef("model.material.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
@@ -771,4 +777,16 @@ void F3DOptionsParser::GetOptions(
 void F3DOptionsParser::LoadPlugins(const F3DAppOptions& appOptions) const
 {
   return this->ConfigOptions->LoadPlugins(appOptions);
+}
+
+//----------------------------------------------------------------------------
+void F3DOptionsParser::WarnForDeprecatedOptions(const f3d::options& options)
+{
+#ifndef F3D_NO_DEPRECATED
+  if (!options.getAsString("render.background.hdri").empty())
+  {
+    f3d::log::warn("--hdri option is deprecated, please use --hdri-file, --hdri-ambient and "
+                   "--hdri-skybox instead.");
+  }
+#endif
 }
