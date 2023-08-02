@@ -28,6 +28,8 @@ const std::vector<std::pair<std::string, std::string> >& interactor::getDefaultI
     { "F", "Toggle full screen" },
     { "U", "Toggle blur background" },
     { "K", "Toggle trackball interaction" },
+    { "F", "Toggle HDRI ambient lighting" },
+    { "J", "Toggle HDRI skybox" },
     { "L", "Increase (+Shift: decrease) lights intensity" },
     { "H", "Toggle cheat sheet display" },
     { "?", "Dump camera state to the terminal" },

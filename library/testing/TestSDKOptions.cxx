@@ -1,3 +1,4 @@
+#include <export.h>
 #include <options.h>
 
 #include <iostream>
@@ -286,6 +287,11 @@ int TestSDKOptions(int argc, char* argv[])
   {
     std::cout << "Expected exception:" << ex.what() << std::endl;
   }
+
+#ifndef F3D_NO_DEPRECATED
+  // Check deprecated options for coverage
+  opt.set("render.background.hdri", "dummy");
+#endif
 
   return EXIT_SUCCESS;
 }

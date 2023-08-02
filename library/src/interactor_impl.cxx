@@ -167,6 +167,7 @@ public:
     bool checkColoring = false;
     bool render = false;
 
+    // Available keycodes: W
     switch (keyCode)
     {
       case 'C':
@@ -200,7 +201,6 @@ public:
         self->Options.toggle("ui.bar");
         render = true;
         break;
-      case 'p':
       case 'P':
         self->Options.toggle("render.effect.translucency-support");
         render = true;
@@ -269,6 +269,14 @@ public:
         break;
       case 'K':
         self->Options.toggle("interactor.trackball");
+        render = true;
+        break;
+      case 'F':
+        self->Options.toggle("render.hdri.ambient");
+        render = true;
+        break;
+      case 'J':
+        self->Options.toggle("render.background.skybox");
         render = true;
         break;
       case 'L':

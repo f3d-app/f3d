@@ -265,18 +265,21 @@ bool vtkF3DPolyDataMapper::GetNeedToRebuildShaders(
   vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* actor)
 {
   bool ret = this->Superclass::GetNeedToRebuildShaders(cellBO, ren, actor);
-  if (!ret)
+
+  // TODO: Put this logic in VTK
+  // https://github.com/f3d-app/f3d/issues/935
+  vtkOpenGLRenderer* oren = static_cast<vtkOpenGLRenderer*>(ren);
+  vtkTexture* envTexture = oren->GetEnvironmentTexture();
+  if (this->EnvTexture != envTexture ||
+    (envTexture && envTexture->GetMTime() > this->EnvTextureTime))
   {
-    // TODO: Put this logic in VTK
-    vtkOpenGLRenderer* oren = static_cast<vtkOpenGLRenderer*>(ren);
-    vtkTexture* envTexture = oren->GetEnvironmentTexture();
-    if (this->EnvTexture != envTexture ||
-      (envTexture && envTexture->GetMTime() > this->EnvTextureTime))
+    ret = true;
+    this->EnvTexture = envTexture;
+    if (envTexture)
     {
-      ret = true;
-      this->EnvTexture = envTexture;
       this->EnvTextureTime = envTexture->GetMTime();
     }
   }
+
   return ret;
 }
