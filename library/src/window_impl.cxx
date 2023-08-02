@@ -293,15 +293,6 @@ void window_impl::UpdateDynamicOptions()
   std::string hdriFile = this->Internals->Options.getAsString("render.hdri.file");
   bool hdriAmbient = this->Internals->Options.getAsBool("render.hdri.ambient");
   bool hdriSkybox = this->Internals->Options.getAsBool("render.background.skybox");
-#ifndef F3D_NO_DEPRECATED
-  std::string legacyHDRI = this->Internals->Options.getAsString("render.background.hdri");
-  if (!legacyHDRI.empty())
-  {
-    hdriFile = legacyHDRI;
-    hdriAmbient = true;
-    hdriSkybox = true;
-  }
-#endif
   this->Internals->Renderer->SetHDRIFile(hdriFile);
   this->Internals->Renderer->SetUseImageBasedLighting(hdriAmbient);
   this->Internals->Renderer->ShowHDRISkybox(hdriSkybox);
