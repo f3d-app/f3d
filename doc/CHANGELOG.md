@@ -3,6 +3,8 @@
 ## Ongoing development
 
 For F3D users:
+ - Added new options `hdri-file`, `hdri-ambient`, `hdri-skybox` to have more control on the HDRI behavior
+ - Added bindings to toggle HDRI ambient lighting (`F`) and HDRI skybox (`J`)
  - Added bindings to move the camera to standard locations: `1`: Front, `3`: Right, `7`: Top, `9`: Isometric
  - Fixed an issue with the binary release when opening draco files
  - Fixed an issue with matcap textures
@@ -13,13 +15,17 @@ For F3D users:
  - Improved overall text contrast for any background color
  - Improved performance when changing model and using a HDRI
  - Improved HDRI cache performance
+ - Deprecated `hdri` option
 
 For libf3d users:
  - Reworked image API to support many file formats to read (EXR, HDR) and write (PNG, JPG, TIF, BMP)
+ - Added `render.hdri.file`, `render.hdri.ambient`, `render.background.skybox` options.
+ - Deprecated `render.background.hdri` in favor of new options above
  - Deprecated previous image API
 
 For developers:
  - Added a deprecation framework
+ - Removed `F3D_TESTING_ENABLE_HDRI_TESTS` cmake option and merged it with `F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS`
 
 For F3D packagers:
  - Fixed compatibility with FreeBSD

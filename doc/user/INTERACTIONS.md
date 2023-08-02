@@ -42,8 +42,10 @@ Other options can be toggled directly by pressing the following hotkeys:
 * `Z`: the display of the FPS counter.
 * `R`: raytracing.
 * `D`: the denoiser when raytracing.
-* `U`: background blur when using a HDRi.
+* `U`: background blur, useful with an HDRI.
 * `K`: trackball interaction mode.
+* `F`: HDRI ambient lighting.
+* `J`: the display of the HDRI skybox.
 * `L`: increase (+Shift: decrease) lights intensity.
 
 Note that some hotkeys can be available or not depending on the file being loaded and the F3D configuration.
