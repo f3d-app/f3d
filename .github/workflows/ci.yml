@@ -413,7 +413,7 @@ jobs:
     - name: Build wheel
       working-directory: ${{github.workspace}}/source
       shell: bash
-      run: python -m pip wheel .
+      run: python -m pip -v wheel .
 
     - name: Upload Tests Artifact
       uses: actions/upload-artifact@v3
