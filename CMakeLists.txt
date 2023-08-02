@@ -42,6 +42,8 @@ string(TIMESTAMP F3D_BUILD_DATE "%Y-%m-%d %H:%M:%S" UTC)
 math(EXPR F3D_SYSTEM_PROCESSOR "8 * ${CMAKE_SIZEOF_VOID_P}")
 set(F3D_SYSTEM_PROCESSOR "${F3D_SYSTEM_PROCESSOR}-bits")
 
+option(F3D_EXCLUDE_DEPRECATED "Exclude deprecated functions and options" OFF)
+
 # Modules
 option(F3D_MODULE_EXTERNAL_RENDERING "External rendering module" OFF)
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
@@ -148,10 +150,9 @@ endif()
 
 # Testing
 option(BUILD_TESTING "Build the tests" OFF)
-cmake_dependent_option(F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON "Disable image comparison on tests using the default lights" OFF "BUILD_TESTING" ON)
-cmake_dependent_option(F3D_TESTING_ENABLE_RENDERING_TESTS "Enable rendering tests" ON "BUILD_TESTING" ON)
-cmake_dependent_option(F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" ON)
-cmake_dependent_option(F3D_TESTING_ENABLE_HDRI_TESTS "Enable HDRi related tests" ON "F3D_TESTING_RENDRERING_TESTS" ON "F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS" ON "BUILD_TESTING" ON)
+cmake_dependent_option(F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON "Disable image comparison on tests using the default lights" OFF "BUILD_TESTING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_RENDERING_TESTS "Enable rendering tests" ON "BUILD_TESTING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" OFF)
 if(BUILD_TESTING)
   enable_testing()
 endif()

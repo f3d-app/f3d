@@ -1,7 +1,7 @@
 # F3D Testing
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;LONG_TIMEOUT;HDRI;INTERACTION;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;DEPENDS" "ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;LONG_TIMEOUT;INTERACTION;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;DEPENDS;HDRI" "ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -15,6 +15,11 @@ function(f3d_test)
 
   if(F3D_TEST_INTERACTION)
     list(APPEND F3D_TEST_ARGS "--interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/${F3D_TEST_NAME}.log")
+  endif()
+
+  if (F3D_TEST_HDRI)
+    list(APPEND F3D_TEST_ARGS "--hdri-file=${F3D_SOURCE_DIR}/testing/data/${F3D_TEST_HDRI}" "--hdri-ambient" "--hdri-skybox")
+    set(F3D_TEST_LONG_TIMEOUT ON)
   endif()
 
   if(F3D_TEST_NO_RENDER)
@@ -44,7 +49,7 @@ function(f3d_test)
   add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
 
   set(_timeout "30")
-  if(F3D_TEST_LONG_TIMEOUT OR F3D_TEST_INTERACTION OR F3D_TEST_HDRI)
+  if(F3D_TEST_LONG_TIMEOUT OR F3D_TEST_INTERACTION)
     set(_timeout "120")
   endif()
 
@@ -66,12 +71,7 @@ function(f3d_test)
     endif()
   endif()
   if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
-    if(F3D_TEST_LONG_TIMEOUT OR F3D_TEST_INTERACTION OR F3D_TEST_HDRI)
-      set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
-    endif()
-  endif()
-  if(NOT F3D_TESTING_ENABLE_HDRI_TESTS)
-    if(F3D_TEST_HDRI)
+    if(F3D_TEST_LONG_TIMEOUT OR F3D_TEST_INTERACTION)
       set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
     endif()
   endif()
@@ -275,13 +275,13 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
     f3d_test(NAME TestInteractionCheatsheetWhiteBGRaytracing DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION) #H
     f3d_test(NAME TestInteractionCheatsheetBlackBGRaytracing DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION) #H
     f3d_test(NAME TestInteractionCheatsheetScalarsRaytracing DATA dragon.vtu ARGS --scalars --comp=-2 INTERACTION) #HSSS
-    f3d_test(NAME TestInteractionNoFileCheatsheetRaytracing INTERACTION NO_DATA_FORCE_RENDER) #HXZM 
+    f3d_test(NAME TestInteractionNoFileCheatsheetRaytracing INTERACTION NO_DATA_FORCE_RENDER) #HXZM
   else()
     f3d_test(NAME TestInteractionCheatsheet DATA cow.vtp INTERACTION) #H
     f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION) #H
     f3d_test(NAME TestInteractionCheatsheetBlackBG DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION) #H
     f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalars --comp=-2 INTERACTION) #HSSS
-    f3d_test(NAME TestInteractionNoFileCheatsheet INTERACTION NO_DATA_FORCE_RENDER) #HXZM 
+    f3d_test(NAME TestInteractionNoFileCheatsheet INTERACTION NO_DATA_FORCE_RENDER) #HXZM
   endif()
 endif()
 
@@ -306,26 +306,57 @@ endif()
 
 # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
-  f3d_test(NAME TestHDRI HDRI DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
-  f3d_test(NAME TestHDRICache HDRI DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEPENDS TestHDRI DEFAULT_LIGHTS)
-  f3d_test(NAME TestHDRIBlur HDRI DATA suzanne.ply ARGS -u --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
-  f3d_test(NAME TestHDRIBlurCoC HDRI DATA suzanne.ply ARGS -u --blur-coc=50 --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
-  f3d_test(NAME TestHDRIBlurRatio HDRI DATA suzanne.ply RESOLUTION 600,100 ARGS -u --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
-  f3d_test(NAME TestHDRIEdges HDRI DATA suzanne.ply ARGS -e --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr DEFAULT_LIGHTS)
-  f3d_test(NAME TestHDRI8Bit DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/logo.tif HDRI)
-  f3d_test(NAME TestHDRIOrient DATA suzanne.stl ARGS --up=+Z --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI)
-  f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply ARGS -t --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI)
-  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr HDRI INTERACTION THRESHOLD 60) #Shift+MouseRight;
-  f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #U
-  f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr INTERACTION HDRI DEFAULT_LIGHTS) #Up
-  f3d_test(NAME TestInteractionHDRIChange DATA multi ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION DEFAULT_LIGHTS) #Left
+  f3d_test(NAME TestHDRI DATA suzanne.ply HDRI palermo_park_1k.hdr DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRICache DATA suzanne.ply HDRI palermo_park_1k.hdr DEPENDS TestHDRI DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -u DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIBlurCoC DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -u --blur-coc=50 DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI palermo_park_1k.hdr RESOLUTION 600,100 ARGS -u DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -e DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRI8Bit DATA suzanne.ply HDRI logo.tif)
+  f3d_test(NAME TestHDRIOrient DATA suzanne.stl HDRI palermo_park_1k.hdr ARGS --up=+Z)
+  f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -t)
+  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION THRESHOLD 60) #Shift+MouseRight;
+  f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS) #U
+  f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS) #Up
+  f3d_test(NAME TestInteractionHDRIChange DATA multi HDRI palermo_park_1k.hdr CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION DEFAULT_LIGHTS) #Left
 
   configure_file("${F3D_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
-  f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" HDRI DEFAULT_LIGHTS)
+  f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" LONG_TIMEOUT DEFAULT_LIGHTS)
 
   if(F3D_MODULE_EXR)
-    f3d_test(NAME TestHDRIEXR HDRI DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/kloofendal_43d_clear_1k.exr DEFAULT_LIGHTS)
+    f3d_test(NAME TestHDRIEXR DATA suzanne.ply HDRI kloofendal_43d_clear_1k.exr DEFAULT_LIGHTS)
   endif()
+
+  f3d_test(NAME TestHDRISkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox LONG_TIMEOUT DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient LONG_TIMEOUT DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient --no-background LONG_TIMEOUT DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRINone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT DEFAULT_LIGHTS)
+
+  f3d_test(NAME TestInteractionHDRIRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS)
+  f3d_test(NAME TestInteractionHDRIRemoveAmbient DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS)
+  f3d_test(NAME TestInteractionHDRIRemoveBoth DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS)
+  f3d_test(NAME TestInteractionHDRILoop DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS)
+  f3d_test(NAME TestInteractionHDRIFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT INTERACTION DEFAULT_LIGHTS)
+
+  if(F3D_MODULE_RAYTRACING)
+    # XXX: These tests are impacted by https://github.com/f3d-app/f3d/issues/933
+    f3d_test(NAME TestHDRIOSPRay DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1)
+    f3d_test(NAME TestHDRIOSPRaySkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox -r --samples=1 LONG_TIMEOUT)
+    f3d_test(NAME TestHDRIOSPRayAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 LONG_TIMEOUT)
+    f3d_test(NAME TestHDRIOSPRayAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 --no-background LONG_TIMEOUT)
+    f3d_test(NAME TestHDRIOSPRayNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT)
+
+    f3d_test(NAME TestInteractionHDRIOSPRayRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIOSPRayRemoveAmbient DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIOSPRayRemoveBoth DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIOSPRayLoop DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIOSPRayFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT INTERACTION DEFAULT_LIGHTS)
+
+  endif()
+
+  if (NOT F3D_EXCLUDE_DEPRECATED)
+    f3d_test(NAME TestHDRIDeprecated DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT DEFAULT_LIGHTS)
+  endif ()
 endif()
 
 # Zoom factor was introduced in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9958
@@ -345,6 +376,11 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestOSPRayDenoise DATA suzanne.ply ARGS -rd --samples=1)
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Raytracing module: ON")
   f3d_test(NAME TestInteractionOSPRayDenoise DATA suzanne.ply ARGS --samples=1 INTERACTION) #RD
+
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
+    f3d_test(NAME TestOSPRayNoBackground DATA suzanne.ply ARGS -r --samples=1 --no-background)
+  endif()
+
 else(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionOSPRayDenoiseNoRaytracing DATA suzanne.ply ARGS INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
 endif()
@@ -559,23 +595,23 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream 
     configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRI.log.in"
       "${CMAKE_BINARY_DIR}/TestInteractionDropHDRI.log")
 
-    f3d_test(NAME TestInteractionDropHDRI ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRI.log" HDRI)#X;DropEvent dragon.vtu;DropEven palermo.hdr;
+    f3d_test(NAME TestInteractionDropHDRI ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRI.log" LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEven palermo.hdr;
 
     configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRIInvert.log.in"
       "${CMAKE_BINARY_DIR}/TestInteractionDropHDRIInvert.log")
 
-    f3d_test(NAME TestInteractionDropHDRIInvert ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIInvert.log" HDRI)#X;DropEvent palermo.hdr;DropEvent dragon.vtu;
+    f3d_test(NAME TestInteractionDropHDRIInvert ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIInvert.log" LONG_TIMEOUT)#X;DropEvent palermo.hdr;DropEvent dragon.vtu;
 
     configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRIMulti.log.in"
       "${CMAKE_BINARY_DIR}/TestInteractionDropHDRIMulti.log")
 
-    f3d_test(NAME TestInteractionDropHDRIMulti ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIMulti.log" HDRI)#X;DropEvent dragon.vtu palermo.hdr;
+    f3d_test(NAME TestInteractionDropHDRIMulti ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIMulti.log" LONG_TIMEOUT)#X;DropEvent dragon.vtu palermo.hdr;
 
     if(F3D_MODULE_EXR)
       configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRIExr.log.in"
         "${CMAKE_BINARY_DIR}/TestInteractionDropHDRIExr.log")
 
-      f3d_test(NAME TestInteractionDropHDRIExr ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIExr.log" HDRI)#X;DropEvent kloofendal.exr;DropEvent dragon.vtu;
+      f3d_test(NAME TestInteractionDropHDRIExr ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIExr.log" LONG_TIMEOUT)#X;DropEvent kloofendal.exr;DropEvent dragon.vtu;
     endif()
   endif()
 endif()
@@ -662,13 +698,13 @@ f3d_test(NAME TestInvalidFullScene DATA invalid.gltf ARGS --verbose REGEXP "Load
 f3d_test(NAME TestInvalidTexture DATA cow.vtp ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open texture file" NO_BASELINE)
 
 # Test non existent HDRI, do not add a dummy.png
-f3d_test(NAME TestNonExistentHDRI DATA cow.vtp ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/dummy.png REGEXP "HDRI file does not exist" NO_BASELINE)
+f3d_test(NAME TestNonExistentHDRI DATA cow.vtp ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/dummy.png REGEXP "HDRI file does not exist" NO_BASELINE)
 
 # Test non existent interaction file, do not add a TestNonExistentInteraction
 f3d_test(NAME TestNonExistentInteraction DATA cow.vtp INTERACTION REGEXP "Interaction record file to play does not exist" NO_BASELINE)
 
 # Test invalid provided HDRI
-f3d_test(NAME TestInvalidHDRI DATA cow.vtp ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
+f3d_test(NAME TestInvalidHDRI DATA cow.vtp ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
 # Test invalid options, do not add a --colour option
 f3d_test(NAME TestInvalidOption ARGS --colour=1,0,0 REGEXP "Did you mean '--color'?")
