@@ -217,7 +217,6 @@ window_impl::~window_impl()
 void window_impl::Initialize(bool withColoring)
 {
   this->Internals->WithColoring = withColoring;
-  this->Internals->Renderer->SetCachePath(this->Internals->GetCachePath());
   this->Internals->Renderer->Initialize(this->Internals->Options.getAsString("scene.up-direction"));
 
 #if defined(_WIN32)
@@ -238,6 +237,9 @@ void window_impl::UpdateDynamicOptions()
     // Renderer is missing, create a default one
     this->Initialize(false);
   }
+
+  // Set the cache path if not already
+  this->Internals->Renderer->SetCachePath(this->Internals->GetCachePath());
 
   // Make sure lights are created before we take options into account
   this->Internals->Renderer->UpdateLights();
@@ -285,10 +287,24 @@ void window_impl::UpdateDynamicOptions()
     this->Internals->Options.getAsBool("render.background.blur"));
   this->Internals->Renderer->SetBlurCircleOfConfusionRadius(
     this->Internals->Options.getAsDouble("render.background.blur.coc"));
-  this->Internals->Renderer->SetHDRIFile(
-    this->Internals->Options.getAsString("render.background.hdri"));
   this->Internals->Renderer->SetLightIntensity(
     this->Internals->Options.getAsDouble("render.light.intensity"));
+
+  std::string hdriFile = this->Internals->Options.getAsString("render.hdri.file");
+  bool hdriAmbient = this->Internals->Options.getAsBool("render.hdri.ambient");
+  bool hdriSkybox = this->Internals->Options.getAsBool("render.background.skybox");
+#ifndef F3D_NO_DEPRECATED
+  std::string legacyHDRI = this->Internals->Options.getAsString("render.background.hdri");
+  if (!legacyHDRI.empty())
+  {
+    hdriFile = legacyHDRI;
+    hdriAmbient = true;
+    hdriSkybox = true;
+  }
+#endif
+  this->Internals->Renderer->SetHDRIFile(hdriFile);
+  this->Internals->Renderer->SetUseImageBasedLighting(hdriAmbient);
+  this->Internals->Renderer->ShowHDRISkybox(hdriSkybox);
 
   this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("ui.font-file"));
 
