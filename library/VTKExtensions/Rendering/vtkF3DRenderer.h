@@ -39,6 +39,7 @@ public:
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
   void ShowDropZone(bool show);
+  void ShowHDRISkybox(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -50,6 +51,7 @@ public:
   virtual void SetPointSize(double pointSize);
   void SetFontFile(const std::string& fontFile);
   void SetHDRIFile(const std::string& hdriFile);
+  void SetUseImageBasedLighting(bool use) override;
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);
   void SetFilenameInfo(const std::string& info);
@@ -173,6 +175,14 @@ protected:
   void ConfigureHDRISkybox();
   ///@}
 
+  ///@{
+  /**
+   * Methods to check if certain HDRI caches are available
+   */
+  bool CheckForSpecCache(std::string& path);
+  bool CheckForSHCache(std::string& path);
+  ///@}
+
   /**
    * Configure all actors properties according to what has been set for:
    * - point size
@@ -206,6 +216,11 @@ protected:
    * Override to generate a data description
    */
   virtual std::string GenerateMetaDataDescription() = 0;
+
+  /**
+   * Create a cache directory if a HDRIHash is set
+   */
+  void CreateCacheDirectory();
 
   vtkNew<vtkActor> GridActor;
 
@@ -245,6 +260,7 @@ protected:
   bool MetaDataVisible = false;
   bool CheatSheetVisible = false;
   bool DropZoneVisible = false;
+  bool HDRISkyboxVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
@@ -267,8 +283,13 @@ protected:
 
   bool HasValidHDRIFile = false;
   std::string HDRIFile;
+  bool HasValidHDRIHash = false;
   std::string HDRIHash;
+  bool HasValidHDRITexture = false;
   vtkNew<vtkTexture> HDRITexture;
+  bool HasValidHDRILUT = false;
+  bool HasValidHDRISH = false;
+  bool HasValidHDRISpec = false;
 
   std::string FontFile;
 
