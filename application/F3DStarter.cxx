@@ -249,7 +249,9 @@ int F3DStarter::Start(int argc, char** argv)
             // TODO: add a image::canRead
 
             // Load the file as an HDRI instead of adding it.
-            this->Internals->Engine->getOptions().set("render.background.hdri", file);
+            this->Internals->Engine->getOptions().set("render.hdri.file", file);
+            this->Internals->Engine->getOptions().set("render.hdri.ambient", true);
+            this->Internals->Engine->getOptions().set("render.background.skybox", true);
 
             // Rendering now is needed for correct lighting
             this->Render();
@@ -475,6 +477,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
     F3DAppOptions fileAppOptions = this->Internals->AppOptions;
     this->Internals->Parser.UpdateOptions(filePath.string(), fileAppOptions,
       this->Internals->FileOptions, this->Internals->UpdateWithCommandLineParsing);
+    F3DOptionsParser::WarnForDeprecatedOptions(this->Internals->FileOptions);
     this->Internals->UpdateWithCommandLineParsing = false; // this is done only once
     this->Internals->Engine->setOptions(this->Internals->FileOptions);
 
