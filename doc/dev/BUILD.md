@@ -74,12 +74,12 @@ Name|Installed by default|Operating system|Description
 `configuration`|NO|ALL|Default configuration files, `config` and `thumbnail`.
 `library`|YES|ALL|libf3d library binaries
 `plugin`|YES|ALL|libf3d plugins
-`dependencies`|NO|ALL|libf3d runtime dependencies (system libraries excluded)
+`dependencies`|NO|ALL|libf3d runtime dependencies. Can be used to create a self-contained and relocatable package. System libraries are excluded.
 `sdk`|NO|ALL|libf3d SDK (headers and CMake config files)
 `licenses`|YES|ALL|F3D and third party licenses
 `documentation`|YES|Linux|`man` documentation
 `shellext`|YES|Windows/Linux|Desktop integration
-`pythonmodule`|YES|ALL|Python bindings
+`python`|YES|ALL|Python bindings
 `java`|YES|ALL|Java bindings
 `mimetypes`|NO|Linux|Plugins mimetype XML files for integration with Freedesktop
 `assets`|YES|Linux|Assets for integration with Freedesktop

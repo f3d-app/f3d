@@ -82,6 +82,6 @@ endif()
 
 # installing
 install(TARGETS pyf3d
-  LIBRARY DESTINATION ${f3d_python_install_path} COMPONENT pythonmodule)
+  LIBRARY DESTINATION ${f3d_python_install_path} COMPONENT python)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-install" RENAME "__init__.py"
-  DESTINATION ${f3d_python_install_path} COMPONENT pythonmodule)
+  DESTINATION ${f3d_python_install_path} COMPONENT python)
