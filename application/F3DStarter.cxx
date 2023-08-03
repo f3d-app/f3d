@@ -477,7 +477,6 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
     F3DAppOptions fileAppOptions = this->Internals->AppOptions;
     this->Internals->Parser.UpdateOptions(filePath.string(), fileAppOptions,
       this->Internals->FileOptions, this->Internals->UpdateWithCommandLineParsing);
-    F3DOptionsParser::WarnForDeprecatedOptions(this->Internals->FileOptions);
     this->Internals->UpdateWithCommandLineParsing = false; // this is done only once
     this->Internals->Engine->setOptions(this->Internals->FileOptions);
 

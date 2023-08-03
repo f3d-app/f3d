@@ -281,6 +281,11 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   // cxxopts sense.
   HasDefault LocalHasDefaultNo = allOptionsInitialized ? HasDefault::YES : HasDefault::NO;
 
+#ifndef F3D_NO_DEPRECATED
+  // Deprecated options that needs further processing
+  std::string deprecatedHDRI;
+#endif
+
   try
   {
     cxxopts::Options cxxOptions(this->ExecutableName, F3D::AppTitle);
@@ -332,7 +337,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.roughness"), HasDefault::YES, MayHaveConfig::YES, "<roughness>");
     this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.metallic"), HasDefault::YES, MayHaveConfig::YES, "<metallic>");
 #ifndef F3D_NO_DEPRECATED
-    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source and skybox (deprecated)", options.getAsStringRef("render.background.hdri"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source and skybox (deprecated)", deprecatedHDRI, LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
 #endif
     this->DeclareOption(grp2, "hdri-file", "", "Path to an image file that can be used as a light source and skybox", options.getAsStringRef("render.hdri.file"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "hdri-ambient", "f", "Enable HDRI ambient lighting", options.getAsBoolRef("render.hdri.ambient"), HasDefault::YES, MayHaveConfig::YES);
@@ -435,6 +440,18 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
         }
         throw F3DExNoProcess("unknown options");
       }
+
+#ifndef F3D_NO_DEPRECATED
+      if (!deprecatedHDRI.empty())
+      {
+        options.set("render.hdri.file", deprecatedHDRI);
+        options.set("render.hdri.ambient", true);
+        options.set("render.background.skybox", true);
+
+        f3d::log::warn("--hdri option is deprecated, please use --hdri-file, --hdri-ambient and "
+                       "--hdri-skybox instead.");
+      }
+#endif
 
       if (result.count("help") > 0)
       {
@@ -777,16 +794,4 @@ void F3DOptionsParser::GetOptions(
 void F3DOptionsParser::LoadPlugins(const F3DAppOptions& appOptions) const
 {
   return this->ConfigOptions->LoadPlugins(appOptions);
-}
-
-//----------------------------------------------------------------------------
-void F3DOptionsParser::WarnForDeprecatedOptions(const f3d::options& options)
-{
-#ifndef F3D_NO_DEPRECATED
-  if (!options.getAsString("render.background.hdri").empty())
-  {
-    f3d::log::warn("--hdri option is deprecated, please use --hdri-file, --hdri-ambient and "
-                   "--hdri-skybox instead.");
-  }
-#endif
 }
