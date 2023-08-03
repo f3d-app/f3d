@@ -289,8 +289,8 @@ int TestSDKOptions(int argc, char* argv[])
   }
 
 #ifndef F3D_NO_DEPRECATED
-  // Check deprecated options for coverage
-  opt.set("render.background.hdri", "dummy");
+  // Check getRef with deprecated options to increase coverage
+  opt.getAsStringRef("render.background.hdri");
 #endif
 
   return EXIT_SUCCESS;
