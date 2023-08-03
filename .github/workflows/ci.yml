@@ -389,6 +389,23 @@ jobs:
       shell: bash
       run: echo "CMAKE_PREFIX_PATH=$(pwd)" >> $GITHUB_ENV
 
+    - name: Escaping backslashes Windows
+      if: runner.os == 'Windows'
+      shell: bash
+      run: echo "ESCAPED_WS=${{github.workspace}}" | tr '\\' '/' >> $GITHUB_ENV
+
+    - name: Set SKBUILD_CMAKE_ARGS
+      shell: bash
+      run: >
+        echo "SKBUILD_CMAKE_ARGS=-DF3D_DEPENDENCIES_DIR=${{ env.ESCAPED_WS }}/dependencies/install/bin;
+        -DF3D_PLUGIN_BUILD_ALEMBIC=ON;
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON;
+        -DF3D_PLUGIN_BUILD_DRACO=ON;
+        -DF3D_PLUGIN_BUILD_OCCT=ON;
+        -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=ON;
+        -DF3D_MODULE_EXR=ON;
+        -DF3D_MODULE_EXTERNAL_RENDERING=ON" >> $GITHUB_ENV
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -397,7 +414,7 @@ jobs:
     - name: Build wheel
       working-directory: ${{github.workspace}}/source
       shell: bash
-      run: python -m pip wheel .
+      run: python -m pip -v wheel .
 
     - name: Upload Tests Artifact
       uses: actions/upload-artifact@v3
