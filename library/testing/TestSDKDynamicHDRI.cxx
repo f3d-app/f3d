@@ -1,4 +1,5 @@
 #include <engine.h>
+#include <export.h>
 #include <loader.h>
 #include <log.h>
 #include <options.h>
@@ -87,6 +88,21 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   if (!ret)
   {
     std::cerr << "Render with EXR HDRI failed" << std::endl;
+    return EXIT_FAILURE;
+  }
+#endif
+
+#ifndef F3D_NO_DEPRECATED
+  // Check deprecated HDRI options
+  opt.set("render.hdri.ambient", false);
+  opt.set("render.background.skybox", false);
+  opt.set("render.background.hdri", std::string(argv[1]) + "data/palermo_park_1k.hdr");
+
+  ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+    std::string(argv[2]), "TestSDKDynamicHDRI", 50);
+  if (!ret)
+  {
+    std::cerr << "Render with deprecated HDRI option failed" << std::endl;
     return EXIT_FAILURE;
   }
 #endif
