@@ -1,7 +1,7 @@
 # F3D Testing
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;LONG_TIMEOUT;INTERACTION;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;DEPENDS;HDRI" "ARGS" ${ARGN})
+	cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;DEPENDS;HDRI" "ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -15,6 +15,11 @@ function(f3d_test)
 
   if(F3D_TEST_INTERACTION)
     list(APPEND F3D_TEST_ARGS "--interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/${F3D_TEST_NAME}.log")
+  else ()
+    if(F3D_TEST_INTERACTION_CONFIGURE)
+      configure_file("${F3D_SOURCE_DIR}/testing/recordings/${F3D_TEST_NAME}.log.in" "${CMAKE_BINARY_DIR}/testing/recordings/${F3D_TEST_NAME}.log")
+      list(APPEND F3D_TEST_ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/testing/recordings/${F3D_TEST_NAME}.log")
+    endif()
   endif()
 
   if (F3D_TEST_HDRI)
@@ -573,45 +578,18 @@ f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --progress NO_BASE
 
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2
-
-  configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropFiles.log.in"
-    "${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")
-
-  f3d_test(NAME TestInteractionDropFiles ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
-
-  configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionGroupGeometriesDrop.log.in"
-    "${CMAKE_BINARY_DIR}/TestInteractionGroupGeometriesDrop.log")
-
-  f3d_test(NAME TestInteractionGroupGeometriesDrop DATA mb/mb_1_0.vtp ARGS --group-geometries -e "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionGroupGeometriesDrop.log" DEFAULT_LIGHTS) #DropEvent mb_2_0.vtp
-
-  configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropSameFiles.log.in"
-    "${CMAKE_BINARY_DIR}/TestInteractionDropSameFiles.log")
-
-  f3d_test(NAME TestInteractionDropSameFiles ARGS -x "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropSameFiles.log")#DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
+  f3d_test(NAME TestInteractionDropFiles INTERACTION_CONFIGURE)#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
+  f3d_test(NAME TestInteractionGroupGeometriesDrop DATA mb/mb_1_0.vtp ARGS --group-geometries -e INTERACTION_CONFIGURE DEFAULT_LIGHTS) #DropEvent mb_2_0.vtp
+  f3d_test(NAME TestInteractionDropSameFiles ARGS -x INTERACTION_CONFIGURE)#DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
 
   # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
-
-    configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRI.log.in"
-      "${CMAKE_BINARY_DIR}/TestInteractionDropHDRI.log")
-
-    f3d_test(NAME TestInteractionDropHDRI ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRI.log" LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEven palermo.hdr;
-
-    configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRIInvert.log.in"
-      "${CMAKE_BINARY_DIR}/TestInteractionDropHDRIInvert.log")
-
-    f3d_test(NAME TestInteractionDropHDRIInvert ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIInvert.log" LONG_TIMEOUT)#X;DropEvent palermo.hdr;DropEvent dragon.vtu;
-
-    configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRIMulti.log.in"
-      "${CMAKE_BINARY_DIR}/TestInteractionDropHDRIMulti.log")
-
-    f3d_test(NAME TestInteractionDropHDRIMulti ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIMulti.log" LONG_TIMEOUT)#X;DropEvent dragon.vtu palermo.hdr;
+    f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEven palermo.hdr;
+    f3d_test(NAME TestInteractionDropHDRIInvert INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent palermo.hdr;DropEvent dragon.vtu;
+    f3d_test(NAME TestInteractionDropHDRIMulti INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu palermo.hdr;
 
     if(F3D_MODULE_EXR)
-      configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRIExr.log.in"
-        "${CMAKE_BINARY_DIR}/TestInteractionDropHDRIExr.log")
-
-      f3d_test(NAME TestInteractionDropHDRIExr ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIExr.log" LONG_TIMEOUT)#X;DropEvent kloofendal.exr;DropEvent dragon.vtu;
+      f3d_test(NAME TestInteractionDropHDRIExr INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent kloofendal.exr;DropEvent dragon.vtu;
     endif()
   endif()
 endif()
