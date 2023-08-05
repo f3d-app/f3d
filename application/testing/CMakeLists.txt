@@ -340,17 +340,17 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
 
   if(F3D_MODULE_RAYTRACING)
     # XXX: These tests are impacted by https://github.com/f3d-app/f3d/issues/933
-    f3d_test(NAME TestHDRIOSPRay DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1)
-    f3d_test(NAME TestHDRIOSPRaySkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox -r --samples=1 LONG_TIMEOUT)
-    f3d_test(NAME TestHDRIOSPRayAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 LONG_TIMEOUT)
-    f3d_test(NAME TestHDRIOSPRayAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 --no-background LONG_TIMEOUT)
-    f3d_test(NAME TestHDRIOSPRayNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT)
+    f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1)
+    f3d_test(NAME TestHDRIRaytracingSkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox -r --samples=1 LONG_TIMEOUT)
+    f3d_test(NAME TestHDRIRaytracingAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 LONG_TIMEOUT)
+    f3d_test(NAME TestHDRIRaytracingAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 --no-background LONG_TIMEOUT)
+    f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT)
 
-    f3d_test(NAME TestInteractionHDRIOSPRayRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
-    f3d_test(NAME TestInteractionHDRIOSPRayRemoveAmbient DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
-    f3d_test(NAME TestInteractionHDRIOSPRayRemoveBoth DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
-    f3d_test(NAME TestInteractionHDRIOSPRayLoop DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
-    f3d_test(NAME TestInteractionHDRIOSPRayFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIRaytracingRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIRaytracingRemoveAmbient DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIRaytracingRemoveBoth DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIRaytracingLoop DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT INTERACTION DEFAULT_LIGHTS)
 
   endif()
 
@@ -370,19 +370,19 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230603)
 endif()
 
 if(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestOSPRayGLTF DATA WaterBottle.glb ARGS -r --samples=1)
-  f3d_test(NAME TestOSPRayBackground DATA suzanne.ply ARGS -r --samples=1 --bg-color=1,0,0)
-  f3d_test(NAME TestOSPRayPointCloud DATA pointsCloud.vtp ARGS -r --point-size=20)
-  f3d_test(NAME TestOSPRayDenoise DATA suzanne.ply ARGS -rd --samples=1)
+  f3d_test(NAME TestRaytracingGLTF DATA WaterBottle.glb ARGS -r --samples=1)
+  f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS -r --samples=1 --bg-color=1,0,0)
+  f3d_test(NAME TestRaytracingPointCloud DATA pointsCloud.vtp ARGS -r --point-size=20)
+  f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS -rd --samples=1)
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Raytracing module: ON")
-  f3d_test(NAME TestInteractionOSPRayDenoise DATA suzanne.ply ARGS --samples=1 INTERACTION) #RD
+  f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --samples=1 INTERACTION) #RD
 
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
-    f3d_test(NAME TestOSPRayNoBackground DATA suzanne.ply ARGS -r --samples=1 --no-background)
+    f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -r --samples=1 --no-background)
   endif()
 
 else(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestInteractionOSPRayDenoiseNoRaytracing DATA suzanne.ply ARGS INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
+  f3d_test(NAME TestInteractionRaytracingDenoiseNoRaytracing DATA suzanne.ply ARGS INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
 endif()
 
 if(F3D_MODULE_EXTERNAL_RENDERING)
