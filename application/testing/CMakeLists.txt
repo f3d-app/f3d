@@ -1,7 +1,7 @@
 # F3D Testing
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;LONG_TIMEOUT;INTERACTION;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;DEPENDS;HDRI" "ARGS" ${ARGN})
+	cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;DEPENDS;HDRI" "ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -15,6 +15,11 @@ function(f3d_test)
 
   if(F3D_TEST_INTERACTION)
     list(APPEND F3D_TEST_ARGS "--interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/${F3D_TEST_NAME}.log")
+  else ()
+    if(F3D_TEST_INTERACTION_CONFIGURE)
+      configure_file("${F3D_SOURCE_DIR}/testing/recordings/${F3D_TEST_NAME}.log.in" "${CMAKE_BINARY_DIR}/testing/recordings/${F3D_TEST_NAME}.log")
+      list(APPEND F3D_TEST_ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/testing/recordings/${F3D_TEST_NAME}.log")
+    endif()
   endif()
 
   if (F3D_TEST_HDRI)
@@ -340,17 +345,17 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
 
   if(F3D_MODULE_RAYTRACING)
     # XXX: These tests are impacted by https://github.com/f3d-app/f3d/issues/933
-    f3d_test(NAME TestHDRIOSPRay DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1)
-    f3d_test(NAME TestHDRIOSPRaySkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox -r --samples=1 LONG_TIMEOUT)
-    f3d_test(NAME TestHDRIOSPRayAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 LONG_TIMEOUT)
-    f3d_test(NAME TestHDRIOSPRayAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 --no-background LONG_TIMEOUT)
-    f3d_test(NAME TestHDRIOSPRayNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT)
+    f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1)
+    f3d_test(NAME TestHDRIRaytracingSkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox -r --samples=1 LONG_TIMEOUT)
+    f3d_test(NAME TestHDRIRaytracingAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 LONG_TIMEOUT)
+    f3d_test(NAME TestHDRIRaytracingAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 --no-background LONG_TIMEOUT)
+    f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT)
 
-    f3d_test(NAME TestInteractionHDRIOSPRayRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
-    f3d_test(NAME TestInteractionHDRIOSPRayRemoveAmbient DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
-    f3d_test(NAME TestInteractionHDRIOSPRayRemoveBoth DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
-    f3d_test(NAME TestInteractionHDRIOSPRayLoop DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
-    f3d_test(NAME TestInteractionHDRIOSPRayFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIRaytracingRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIRaytracingRemoveAmbient DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIRaytracingRemoveBoth DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIRaytracingLoop DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT INTERACTION DEFAULT_LIGHTS)
 
   endif()
 
@@ -370,19 +375,19 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230603)
 endif()
 
 if(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestOSPRayGLTF DATA WaterBottle.glb ARGS -r --samples=1)
-  f3d_test(NAME TestOSPRayBackground DATA suzanne.ply ARGS -r --samples=1 --bg-color=1,0,0)
-  f3d_test(NAME TestOSPRayPointCloud DATA pointsCloud.vtp ARGS -r --point-size=20)
-  f3d_test(NAME TestOSPRayDenoise DATA suzanne.ply ARGS -rd --samples=1)
+  f3d_test(NAME TestRaytracingGLTF DATA WaterBottle.glb ARGS -r --samples=1)
+  f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS -r --samples=1 --bg-color=1,0,0)
+  f3d_test(NAME TestRaytracingPointCloud DATA pointsCloud.vtp ARGS -r --point-size=20)
+  f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS -rd --samples=1)
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Raytracing module: ON")
-  f3d_test(NAME TestInteractionOSPRayDenoise DATA suzanne.ply ARGS --samples=1 INTERACTION) #RD
+  f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --samples=1 INTERACTION) #RD
 
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
-    f3d_test(NAME TestOSPRayNoBackground DATA suzanne.ply ARGS -r --samples=1 --no-background)
+    f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -r --samples=1 --no-background)
   endif()
 
 else(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestInteractionOSPRayDenoiseNoRaytracing DATA suzanne.ply ARGS INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
+  f3d_test(NAME TestInteractionRaytracingDenoiseNoRaytracing DATA suzanne.ply ARGS INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
 endif()
 
 if(F3D_MODULE_EXTERNAL_RENDERING)
@@ -573,45 +578,18 @@ f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --progress NO_BASE
 
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2
-
-  configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropFiles.log.in"
-    "${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")
-
-  f3d_test(NAME TestInteractionDropFiles ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropFiles.log")#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
-
-  configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionGroupGeometriesDrop.log.in"
-    "${CMAKE_BINARY_DIR}/TestInteractionGroupGeometriesDrop.log")
-
-  f3d_test(NAME TestInteractionGroupGeometriesDrop DATA mb/mb_1_0.vtp ARGS --group-geometries -e "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionGroupGeometriesDrop.log" DEFAULT_LIGHTS) #DropEvent mb_2_0.vtp
-
-  configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropSameFiles.log.in"
-    "${CMAKE_BINARY_DIR}/TestInteractionDropSameFiles.log")
-
-  f3d_test(NAME TestInteractionDropSameFiles ARGS -x "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropSameFiles.log")#DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
+  f3d_test(NAME TestInteractionDropFiles INTERACTION_CONFIGURE)#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
+  f3d_test(NAME TestInteractionGroupGeometriesDrop DATA mb/mb_1_0.vtp ARGS --group-geometries -e INTERACTION_CONFIGURE DEFAULT_LIGHTS) #DropEvent mb_2_0.vtp
+  f3d_test(NAME TestInteractionDropSameFiles ARGS -x INTERACTION_CONFIGURE)#DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
 
   # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
-
-    configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRI.log.in"
-      "${CMAKE_BINARY_DIR}/TestInteractionDropHDRI.log")
-
-    f3d_test(NAME TestInteractionDropHDRI ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRI.log" LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEven palermo.hdr;
-
-    configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRIInvert.log.in"
-      "${CMAKE_BINARY_DIR}/TestInteractionDropHDRIInvert.log")
-
-    f3d_test(NAME TestInteractionDropHDRIInvert ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIInvert.log" LONG_TIMEOUT)#X;DropEvent palermo.hdr;DropEvent dragon.vtu;
-
-    configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRIMulti.log.in"
-      "${CMAKE_BINARY_DIR}/TestInteractionDropHDRIMulti.log")
-
-    f3d_test(NAME TestInteractionDropHDRIMulti ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIMulti.log" LONG_TIMEOUT)#X;DropEvent dragon.vtu palermo.hdr;
+    f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEven palermo.hdr;
+    f3d_test(NAME TestInteractionDropHDRIInvert INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent palermo.hdr;DropEvent dragon.vtu;
+    f3d_test(NAME TestInteractionDropHDRIMulti INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu palermo.hdr;
 
     if(F3D_MODULE_EXR)
-      configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestInteractionDropHDRIExr.log.in"
-        "${CMAKE_BINARY_DIR}/TestInteractionDropHDRIExr.log")
-
-      f3d_test(NAME TestInteractionDropHDRIExr ARGS "--interaction-test-play=${CMAKE_BINARY_DIR}/TestInteractionDropHDRIExr.log" LONG_TIMEOUT)#X;DropEvent kloofendal.exr;DropEvent dragon.vtu;
+      f3d_test(NAME TestInteractionDropHDRIExr INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent kloofendal.exr;DropEvent dragon.vtu;
     endif()
   endif()
 endif()
