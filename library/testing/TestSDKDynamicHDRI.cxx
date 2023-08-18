@@ -38,11 +38,19 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   std::string cachePath = std::string(argv[2]) + "/cache_" + std::to_string(dist(e1));
   eng.setCachePath(cachePath);
 
-  // Change the hdri and make sure it is taken into account
-  opt.set("render.hdri.file", std::string(argv[1]) + "data/palermo_park_1k.hdr");
+  // Enable HDRI ambient and skybox and check the default HDRI
   opt.set("render.hdri.ambient", true);
   opt.set("render.background.skybox", true);
+  ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+    std::string(argv[2]), "TestSDKDynamicHDRIDefault", 50);
+  if (!ret)
+  {
+    std::cerr << "Render with Default HDRI failed" << std::endl;
+    return EXIT_FAILURE;
+  }
 
+  // Change the hdri and make sure it is taken into account
+  opt.set("render.hdri.file", std::string(argv[1]) + "data/palermo_park_1k.hdr");
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
     std::string(argv[2]), "TestSDKDynamicHDRI", 50);
   if (!ret)

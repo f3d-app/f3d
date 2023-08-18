@@ -1,5 +1,6 @@
 #include "vtkF3DRenderer.h"
 
+#include "F3DDefaultHDRI.h"
 #include "F3DLog.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
@@ -27,6 +28,7 @@
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkPBRLUTTexture.h>
+#include <vtkPNGReader.h>
 #include <vtkPixelBufferObject.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
@@ -263,7 +265,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetUseDepthPeelingPass(this->UseDepthPeelingPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
   newPass->SetCircleOfConfusionRadius(this->CircleOfConfusionRadius);
-  newPass->SetForceOpaqueBackground(this->HasValidHDRIFile && this->HDRISkyboxVisible);
+  newPass->SetForceOpaqueBackground(this->HDRISkyboxVisible);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -304,7 +306,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 #else
   int mode = 1;
 #endif
-  if (this->HasValidHDRIFile && this->GetUseImageBasedLighting())
+  if (this->GetUseImageBasedLighting())
   {
     if (this->HDRISkyboxVisible)
     {
@@ -628,95 +630,102 @@ void vtkF3DRenderer::ConfigureHDRI()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureHDRITexture()
 {
-  // Read HDRI when needed
-  this->HasValidHDRIFile = false;
-
-  if (!this->HDRIFile.empty())
+  if (this->HDRISkyboxVisible || this->GetUseImageBasedLighting())
+    ;
   {
-    if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
+    vtkSmartPointer<vtkImageReader2> hdriReader;
+
+    if (!this->HDRIFile.empty())
     {
-      F3DLog::Print(
-        F3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
-    }
-    else
-    {
-      auto reader = vtkSmartPointer<vtkImageReader2>::Take(
-        vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
-      if (reader)
+      if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
       {
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
-        if (this->GetUseImageBasedLighting() && !this->HasValidHDRIHash)
-        {
-          // Compute HDRI MD5
-          this->HDRIHash = ::ComputeFileHash(this->HDRIFile);
-          this->HasValidHDRIHash = true;
-          this->CreateCacheDirectory();
-        }
-
-        std::string dummy;
-        bool needHDRITexture = this->HDRISkyboxVisible ||
-          (this->GetUseImageBasedLighting() &&
-            (!this->CheckForSHCache(dummy) || !this->CheckForSpecCache(dummy) ||
-              this->UseRaytracing));
-
-#else
-        bool needHDRITexture = this->HDRISkyboxVisible || this->GetUseImageBasedLighting();
-#endif
-        if (needHDRITexture)
-        {
-          if (!this->HasValidHDRITexture)
-          {
-            reader->SetFileName(this->HDRIFile.c_str());
-            reader->Update();
-
-            this->HDRITexture->SetColorModeToDirectScalars();
-            this->HDRITexture->MipmapOn();
-            this->HDRITexture->InterpolateOn();
-            this->HDRITexture->SetInputConnection(reader->GetOutputPort());
-
-            // 8-bit textures are usually gamma-corrected
-            if (reader->GetOutput() && reader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
-            {
-              this->HDRITexture->UseSRGBColorSpaceOn();
-            }
-            this->HasValidHDRITexture = true;
-          }
-        }
-        else
-        {
-          // Reading the HDRI texture is actually not needed
-          // create a dummy one instead
-          // TODO add support for not providing a texture and still using IBL in VTK
-          // https://github.com/f3d-app/f3d/issues/935
-          vtkNew<vtkImageData> img;
-          this->HDRITexture->SetInputData(img);
-          this->HasValidHDRITexture = false;
-        }
-
-        if (this->GetUseImageBasedLighting())
-        {
-          this->SetEnvironmentTexture(this->HDRITexture);
-        }
-        else
-        {
-          this->SetEnvironmentTexture(nullptr);
-        }
-        this->HasValidHDRIFile = true;
+        F3DLog::Print(
+          F3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
       }
       else
       {
-        F3DLog::Print(
-          F3DLog::Severity::Warning, std::string("Cannot open HDRI file ") + this->HDRIFile);
+        hdriReader = vtkSmartPointer<vtkImageReader2>::Take(
+          vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
+        if (hdriReader)
+        {
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
+          if (this->GetUseImageBasedLighting() && !this->HasValidHDRIHash)
+          {
+            // Compute HDRI MD5
+            this->HDRIHash = ::ComputeFileHash(this->HDRIFile);
+            this->HasValidHDRIHash = true;
+            this->CreateCacheDirectory();
+          }
+          hdriReader->SetFileName(this->HDRIFile.c_str());
+        }
+        else
+        {
+          F3DLog::Print(F3DLog::Severity::Warning,
+            std::string("Cannot open HDRI file ") + this->HDRIFile +
+              std::string(". Using default HDRI"));
+        }
       }
+    }
+
+    if (!hdriReader)
+    {
+      // No HDRI file provided, read the default HDRI
+      // TODO add support for memory buffer in the vtkHDRReader in VTK
+      // https://github.com/f3d-app/f3d/issues/935
+      hdriReader = vtkSmartPointer<vtkPNGReader>::New();
+      hdriReader->SetMemoryBuffer(F3DDefaultHDRI);
+      hdriReader->SetMemoryBufferLength(sizeof(F3DDefaultHDRI));
+    }
+
+    std::string dummy;
+    bool needHDRITexture = this->HDRISkyboxVisible ||
+      (this->GetUseImageBasedLighting() &&
+        (!this->CheckForSHCache(dummy) || !this->CheckForSpecCache(dummy) || this->UseRaytracing));
+
+#else
+          bool needHDRITexture = this->HDRISkyboxVisible || this->GetUseImageBasedLighting();
+#endif
+    if (needHDRITexture)
+    {
+      if (!this->HasValidHDRITexture)
+      {
+        hdriReader->Update();
+
+        this->HDRITexture->SetColorModeToDirectScalars();
+        this->HDRITexture->MipmapOn();
+        this->HDRITexture->InterpolateOn();
+        this->HDRITexture->SetInputConnection(hdriReader->GetOutputPort());
+
+        // 8-bit textures are usually gamma-corrected
+        if (hdriReader->GetOutput() &&
+          hdriReader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
+        {
+          this->HDRITexture->UseSRGBColorSpaceOn();
+        }
+        this->HasValidHDRITexture = true;
+      }
+    }
+    else
+    {
+      // Reading the HDRI texture is actually not needed
+      // create a dummy one instead
+      // TODO add support for not providing a texture and still using IBL in VTK
+      // https://github.com/f3d-app/f3d/issues/935
+      vtkNew<vtkImageData> img;
+      this->HDRITexture->SetInputData(img);
+      this->HasValidHDRITexture = false;
     }
   }
 
-  if (!this->HasValidHDRIFile)
+  if (this->GetUseImageBasedLighting())
+  {
+    this->SetEnvironmentTexture(this->HDRITexture);
+  }
+  else
   {
     this->SetEnvironmentTexture(nullptr);
   }
-
   this->HDRITextureConfigured = true;
 }
 
@@ -724,9 +733,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
 void vtkF3DRenderer::ConfigureHDRILUT()
 {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
-  // HasValidHDRIFile is technically not needed but there is no point
-  // computing LUT without it.
-  if (this->HasValidHDRIFile && this->GetUseImageBasedLighting() && !this->HasValidHDRILUT)
+  if (this->GetUseImageBasedLighting() && !this->HasValidHDRILUT)
   {
     // Check LUT cache
     std::string lutCachePath = this->CachePath + "/lut.vti";
@@ -769,7 +776,7 @@ void vtkF3DRenderer::ConfigureHDRILUT()
 void vtkF3DRenderer::ConfigureHDRISphericalHarmonics()
 {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
-  if (this->HasValidHDRIFile && this->GetUseImageBasedLighting() && !this->HasValidHDRISH)
+  if (this->GetUseImageBasedLighting() && !this->HasValidHDRISH)
   {
     // Check spherical harmonics cache
     std::string shCachePath;
@@ -813,7 +820,7 @@ void vtkF3DRenderer::ConfigureHDRISphericalHarmonics()
 void vtkF3DRenderer::ConfigureHDRISpecular()
 {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
-  if (this->HasValidHDRIFile && this->GetUseImageBasedLighting() && !this->HasValidHDRISpec)
+  if (this->GetUseImageBasedLighting() && !this->HasValidHDRISpec)
   {
     // Check specular cache
     std::string specCachePath;
@@ -872,7 +879,7 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureHDRISkybox()
 {
-  if (this->HasValidHDRIFile)
+  if (this->HDRISkyboxVisible)
   {
     // Setup the OpenGL Skybox
     this->Skybox->SetProjection(vtkSkybox::Sphere);
@@ -883,19 +890,15 @@ void vtkF3DRenderer::ConfigureHDRISkybox()
     this->Skybox->GammaCorrectOn();
 #endif
 
-    if (this->HDRISkyboxVisible)
-    {
-      // TODO: Add support for visibility and
-      // avoid segfaulting in case missing texture in vtkOpenGLSkybox
-      // https://github.com/f3d-app/f3d/issues/935
-      this->AddActor(this->Skybox);
-    }
-    else
-    {
-      this->RemoveActor(this->Skybox);
-    }
+    // TODO: Add support for visibility and
+    // avoid segfaulting in case missing texture in vtkOpenGLSkybox
+    // https://github.com/f3d-app/f3d/issues/935
+    this->AddActor(this->Skybox);
   }
-
+  else
+  {
+    this->RemoveActor(this->Skybox);
+  }
   this->HDRISkyboxConfigured = true;
 }
 
@@ -1423,7 +1426,7 @@ bool vtkF3DRenderer::IsBackgroundDark()
 {
   double luminance =
     0.299 * this->Background[0] + 0.587 * this->Background[1] + 0.114 * this->Background[2];
-  return this->HasValidHDRIFile && this->HDRISkyboxVisible ? true : luminance < 0.5;
+  return this->HDRISkyboxVisible ? true : luminance < 0.5;
 }
 
 //----------------------------------------------------------------------------

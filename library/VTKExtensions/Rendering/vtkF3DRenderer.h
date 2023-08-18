@@ -281,7 +281,6 @@ protected:
   double GridUnitSquare = 0.0;
   int GridSubdivisions = 10;
 
-  bool HasValidHDRIFile = false;
   std::string HDRIFile;
   bool HasValidHDRIHash = false;
   std::string HDRIHash;
