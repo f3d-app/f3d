@@ -1240,8 +1240,9 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 #endif
   cheatSheetText << " U: Blur background " << (this->UseBlurBackground ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText << " K: Trackball interaction " << (this->UseTrackball ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " F: HDRI ambient lighting " << (this->UseTrackball ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " J: HDRI skybox " << (this->UseTrackball ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " F: HDRI ambient lighting "
+                 << (this->GetUseImageBasedLighting() ? "[ON]" : "[OFF]") << "\n";
+  cheatSheetText << " J: HDRI skybox " << (this->HDRISkyboxVisible ? "[ON]" : "[OFF]") << "\n";
   cheatSheetText.precision(2);
   cheatSheetText << std::fixed;
   cheatSheetText << " L: Light (increase, shift+L: decrease) [" << this->LightIntensity << "]"
