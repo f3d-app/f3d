@@ -7,6 +7,8 @@
 
 #include <BRepAdaptor_Surface.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
+#include <BRepTools.hxx>
+#include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <IGESControl_Reader.hxx>
 #include <Message.hxx>
@@ -136,7 +138,7 @@ public:
 #if F3D_PLUGIN_OCCT_XCAF
         std::array<unsigned char, 3> rgb = { 0, 0, 0 };
         Quantity_Color aColor;
-        if (this->ColorTool->GetColor(edge, XCAFDoc_ColorCurv, aColor))
+        if (this->ColorTool && this->ColorTool->GetColor(edge, XCAFDoc_ColorCurv, aColor))
         {
           rgb[0] = static_cast<unsigned char>(255.0 * aColor.Red());
           rgb[1] = static_cast<unsigned char>(255.0 * aColor.Green());
@@ -239,7 +241,7 @@ public:
 #if F3D_PLUGIN_OCCT_XCAF
         std::array<unsigned char, 3> rgb = { 255, 255, 255 };
         Quantity_Color aColor;
-        if (this->ColorTool->GetColor(face, XCAFDoc_ColorSurf, aColor))
+        if (this->ColorTool && this->ColorTool->GetColor(face, XCAFDoc_ColorSurf, aColor))
         {
           rgb[0] = static_cast<unsigned char>(255.0 * aColor.Red());
           rgb[1] = static_cast<unsigned char>(255.0 * aColor.Green());
@@ -458,6 +460,29 @@ int vtkF3DOCCTReader::RequestData(
 
   Message::DefaultMessenger()->RemovePrinters(STANDARD_TYPE(Message_PrinterOStream));
 
+  if (this->FileFormat == FILE_FORMAT::BREP)
+  {
+    TopoDS_Shape shape;
+    const BRep_Builder builder;
+    ProgressIndicator pIndicator(this);
+    const Message_ProgressRange pRange = pIndicator.Start();
+    if (BRepTools::Read(shape, this->GetFileName().c_str(), builder, pRange))
+    {
+      output->SetNumberOfBlocks(1);
+      const vtkSmartPointer<vtkPolyData> polydata = this->Internals->CreateShape(shape);
+      if (polydata && polydata->GetNumberOfCells() > 0)
+      {
+        output->SetBlock(1, polydata);
+      }
+      return 1;
+    }
+    else
+    {
+      vtkErrorWithObjectMacro(this, "Failed opening file " << this->GetFileName());
+      return 0;
+    }
+  }
+
 #if F3D_PLUGIN_OCCT_XCAF
   Handle(TDocStd_Document) doc;
   XCAFApp_Application::GetApplication()->NewDocument("MDTV-XCAF", doc);
@@ -549,6 +574,9 @@ void vtkF3DOCCTReader::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AngularDeflection: " << this->AngularDeflection << "\n";
   os << indent << "RelativeDeflection: " << (this->RelativeDeflection ? "true" : "false") << "\n";
   os << indent << "ReadWire: " << (this->ReadWire ? "true" : "false") << "\n";
-  os << indent << "FileFormat: " << (this->FileFormat == FILE_FORMAT::STEP ? "STEP" : "IGES")
+  os << indent << "FileFormat: "
+     << (this->FileFormat == FILE_FORMAT::BREP      ? "BREP"
+            : this->FileFormat == FILE_FORMAT::STEP ? "STEP"
+                                                    : "IGES")
      << "\n";
 }
