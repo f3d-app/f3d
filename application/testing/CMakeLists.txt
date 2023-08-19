@@ -325,6 +325,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS) #Up
   f3d_test(NAME TestInteractionHDRIChange DATA multi HDRI palermo_park_1k.hdr CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION DEFAULT_LIGHTS) #Left
 
+  # Test non existent HDRI, do not add a dummy.png
+  f3d_test(NAME TestNonExistentHDRI DATA cow.vtp HDRI dummy.png REGEXP "HDRI file does not exist" NO_BASELINE)
+
+  # Test invalid provided HDRI
+  f3d_test(NAME TestInvalidHDRI DATA cow.vtp HDRI invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
+
   # Use a dummy HDRI for simplicity to test default HDRI
   f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png DEFAULT_LIGHTS)
 
@@ -340,6 +346,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestHDRIAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient --no-background LONG_TIMEOUT DEFAULT_LIGHTS)
   f3d_test(NAME TestHDRINone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT DEFAULT_LIGHTS)
 
+  f3d_test(NAME TestInteractionHDRICache DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEPENDS TestHDRI DEFAULT_LIGHTS)
   f3d_test(NAME TestInteractionHDRIRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS)
   f3d_test(NAME TestInteractionHDRIRemoveAmbient DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS)
   f3d_test(NAME TestInteractionHDRIRemoveBoth DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS)
@@ -678,14 +685,8 @@ f3d_test(NAME TestInvalidFullScene DATA invalid.gltf ARGS --verbose REGEXP "Load
 # Test invalid texture
 f3d_test(NAME TestInvalidTexture DATA cow.vtp ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open texture file" NO_BASELINE)
 
-# Test non existent HDRI, do not add a dummy.png
-f3d_test(NAME TestNonExistentHDRI DATA cow.vtp ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/dummy.png REGEXP "HDRI file does not exist" NO_BASELINE)
-
 # Test non existent interaction file, do not add a TestNonExistentInteraction
 f3d_test(NAME TestNonExistentInteraction DATA cow.vtp INTERACTION REGEXP "Interaction record file to play does not exist" NO_BASELINE)
-
-# Test invalid provided HDRI
-f3d_test(NAME TestInvalidHDRI DATA cow.vtp ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
 # Test invalid options, do not add a --colour option
 f3d_test(NAME TestInvalidOption ARGS --colour=1,0,0 REGEXP "Did you mean '--color'?")
