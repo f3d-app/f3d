@@ -769,6 +769,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
   {
     this->SetEnvironmentTexture(this->HDRITexture);
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
     // Force modified on the spherical harmonics
     // to avoid them updating themselves
     // TODO add support for not providing a texture and still using IBL in VTK
@@ -777,6 +778,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
     {
       this->SphericalHarmonics->Modified();
     }
+#endif    
   }
   else
   {

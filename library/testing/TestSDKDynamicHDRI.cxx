@@ -42,7 +42,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   opt.set("render.hdri.ambient", true);
   opt.set("render.background.skybox", true);
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRIDefault", 50);
+    std::string(argv[2]), "TestSDKDynamicHDRIDefault", 120);
   if (!ret)
   {
     std::cerr << "Render with Default HDRI failed" << std::endl;

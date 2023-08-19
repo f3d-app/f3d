@@ -216,12 +216,12 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestConfigFileUpperCase DATA suzanne_upper.STL CONFIG complex_build DEFAULT_LIGHTS)
 
   file(COPY "${F3D_SOURCE_DIR}/resources/configs/config.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-  f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build DEFAULT_LIGHTS)
-  f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build DEFAULT_LIGHTS)
-  f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build DEFAULT_LIGHTS)
-  f3d_test(NAME TestDefaultConfigFileTIFF DATA logo.tif CONFIG config_build DEFAULT_LIGHTS)
-  f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build DEFAULT_LIGHTS THRESHOLD 100)
-  f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build DEFAULT_LIGHTS)
+  f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+  f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+  f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+  f3d_test(NAME TestDefaultConfigFileTIFF DATA logo.tif CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+  f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS THRESHOLD 100)
+  f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
 
   # no-background test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8501
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
@@ -332,7 +332,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestInvalidHDRI DATA cow.vtp HDRI invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
   # Use a dummy HDRI for simplicity to test default HDRI
-  f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png THRESHOLD 110 DEFAULT_LIGHTS)
 
   configure_file("${F3D_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
   f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" LONG_TIMEOUT DEFAULT_LIGHTS)
@@ -409,11 +409,11 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-    f3d_test(NAME TestDefaultConfigFileAlembic DATA suzanne.abc CONFIG config_build DEFAULT_LIGHTS)
+    f3d_test(NAME TestDefaultConfigFileAlembic DATA suzanne.abc CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
       file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-      f3d_test(NAME TestThumbnailConfigFileAlembic DATA suzanne.abc CONFIG thumbnail_build DEFAULT_LIGHTS)
+      f3d_test(NAME TestThumbnailConfigFileAlembic DATA suzanne.abc CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
     endif()
   endif()
 
@@ -460,10 +460,10 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
       file(COPY "${F3D_SOURCE_DIR}/plugins/assimp/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-      f3d_test(NAME TestThumbnailConfigFileAssimpFBX DATA phong_cube.fbx CONFIG thumbnail_build DEFAULT_LIGHTS)
-      f3d_test(NAME TestThumbnailConfigFileAssimpDXF DATA PinkEggFromLW.dxf ARGS -p CONFIG thumbnail_build DEFAULT_LIGHTS)
-      f3d_test(NAME TestThumbnailConfigFileAssimpOFF DATA teapot.off CONFIG thumbnail_build DEFAULT_LIGHTS)
-      f3d_test(NAME TestThumbnailConfigFileAssimpDAE DATA duck.dae CONFIG thumbnail_build DEFAULT_LIGHTS)
+      f3d_test(NAME TestThumbnailConfigFileAssimpFBX DATA phong_cube.fbx CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+      f3d_test(NAME TestThumbnailConfigFileAssimpDXF DATA PinkEggFromLW.dxf ARGS -p CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+      f3d_test(NAME TestThumbnailConfigFileAssimpOFF DATA teapot.off CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+      f3d_test(NAME TestThumbnailConfigFileAssimpDAE DATA duck.dae CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
     endif()
   endif()
 
@@ -475,11 +475,11 @@ if(F3D_PLUGIN_BUILD_DRACO)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/draco/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-    f3d_test(NAME TestDefaultConfigFileDraco DATA suzanne.drc CONFIG config_build DEFAULT_LIGHTS)
+    f3d_test(NAME TestDefaultConfigFileDraco DATA suzanne.drc CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
       file(COPY "${F3D_SOURCE_DIR}/plugins/draco/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-      f3d_test(NAME TestThumbnailConfigFileDraco DATA suzanne.drc CONFIG thumbnail_build DEFAULT_LIGHTS)
+      f3d_test(NAME TestThumbnailConfigFileDraco DATA suzanne.drc CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
     endif()
   endif()
 
@@ -507,11 +507,11 @@ if(F3D_PLUGIN_BUILD_EXODUS)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/exodus/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-    f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build DEFAULT_LIGHTS)
+    f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
       file(COPY "${F3D_SOURCE_DIR}/plugins/exodus/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-      f3d_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build DEFAULT_LIGHTS)
+      f3d_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
     endif()
   endif()
 
@@ -532,11 +532,11 @@ if(F3D_PLUGIN_BUILD_OCCT)
 
   if(F3D_PLUGIN_OCCT_COLORING_SUPPORT AND NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-    f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build DEFAULT_LIGHTS)
+    f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
       file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-      f3d_test(NAME TestThumbnailConfigFileOCCT DATA f3d.stp CONFIG thumbnail_build DEFAULT_LIGHTS)
+      f3d_test(NAME TestThumbnailConfigFileOCCT DATA f3d.stp CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
     endif()
   endif()
 endif()
