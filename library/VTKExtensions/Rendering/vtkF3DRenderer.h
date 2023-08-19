@@ -18,6 +18,7 @@
 
 class vtkCornerAnnotation;
 class vtkF3DDropZoneActor;
+class vtkImageReader2;
 class vtkOrientationMarkerWidget;
 class vtkSkybox;
 class vtkTextActor;
@@ -168,6 +169,8 @@ protected:
    * Configure HDRI actor and related lighting textures
    */
   void ConfigureHDRI();
+  void ConfigureHDRIReader();
+  void ConfigureHDRIHash();
   void ConfigureHDRITexture();
   void ConfigureHDRILUT();
   void ConfigureHDRISphericalHarmonics();
@@ -245,6 +248,8 @@ protected:
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
   bool MetaDataConfigured = false;
+  bool HDRIReaderConfigured = false;
+  bool HDRIHashConfigured = false;
   bool HDRITextureConfigured = false;
   bool HDRILUTConfigured = false;
   bool HDRISphericalHarmonicsConfigured = false;
@@ -282,10 +287,13 @@ protected:
   int GridSubdivisions = 10;
 
   std::string HDRIFile;
-  bool HasValidHDRIHash = false;
+  vtkSmartPointer<vtkImageReader2> HDRIReader;
+  bool HasValidHDRIReader = false;
+  bool UseDefaultHDRI = false;
   std::string HDRIHash;
-  bool HasValidHDRITexture = false;
+  bool HasValidHDRIHash = false;
   vtkNew<vtkTexture> HDRITexture;
+  bool HasValidHDRITexture = false;
   bool HasValidHDRILUT = false;
   bool HasValidHDRISH = false;
   bool HasValidHDRISpec = false;
