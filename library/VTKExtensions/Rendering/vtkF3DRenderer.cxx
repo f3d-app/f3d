@@ -725,12 +725,13 @@ void vtkF3DRenderer::ConfigureHDRITexture()
     bool needHDRITexture = this->HDRISkyboxVisible || this->GetUseImageBasedLighting();
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
-    if(this->HasValidHDRIHash)
+    if (this->HasValidHDRIHash)
     {
-    std::string dummy;
-    needHDRITexture = this->HDRISkyboxVisible ||
-      (this->GetUseImageBasedLighting() &&
-        (!this->CheckForSHCache(dummy) || !this->CheckForSpecCache(dummy) || this->UseRaytracing));
+      std::string dummy;
+      needHDRITexture = this->HDRISkyboxVisible ||
+        (this->GetUseImageBasedLighting() &&
+          (!this->CheckForSHCache(dummy) || !this->CheckForSpecCache(dummy) ||
+            this->UseRaytracing));
     }
 #endif
 
@@ -738,7 +739,6 @@ void vtkF3DRenderer::ConfigureHDRITexture()
     {
       assert(this->HasValidHDRIReader);
       this->HDRIReader->Update();
-      std::cout<<"Update"<<std::endl;
 
       this->HDRITexture->SetColorModeToDirectScalars();
       this->HDRITexture->MipmapOn();
@@ -747,7 +747,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
 
       // 8-bit textures are usually gamma-corrected
       if (this->HDRIReader->GetOutput() &&
-          this->HDRIReader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
+        this->HDRIReader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
       {
         this->HDRITexture->UseSRGBColorSpaceOn();
       }
@@ -765,7 +765,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
     }
   }
 
-  if(this->GetUseImageBasedLighting())
+  if (this->GetUseImageBasedLighting())
   {
     this->SetEnvironmentTexture(this->HDRITexture);
 
