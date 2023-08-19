@@ -136,15 +136,18 @@ public:
         linesCells->InsertNextCell(polyline.size(), polyline.data());
 
 #if F3D_PLUGIN_OCCT_XCAF
-        std::array<unsigned char, 3> rgb = { 0, 0, 0 };
-        Quantity_Color aColor;
-        if (this->ColorTool && this->ColorTool->GetColor(edge, XCAFDoc_ColorCurv, aColor))
+        if (this->ColorTool)
         {
-          rgb[0] = static_cast<unsigned char>(255.0 * aColor.Red());
-          rgb[1] = static_cast<unsigned char>(255.0 * aColor.Green());
-          rgb[2] = static_cast<unsigned char>(255.0 * aColor.Blue());
+          std::array<unsigned char, 3> rgb = { 0, 0, 0 };
+          Quantity_Color aColor;
+          if (this->ColorTool->GetColor(edge, XCAFDoc_ColorCurv, aColor))
+          {
+            rgb[0] = static_cast<unsigned char>(255.0 * aColor.Red());
+            rgb[1] = static_cast<unsigned char>(255.0 * aColor.Green());
+            rgb[2] = static_cast<unsigned char>(255.0 * aColor.Blue());
+          }
+          colors->InsertNextTypedTuple(rgb.data());
         }
-        colors->InsertNextTypedTuple(rgb.data());
 #endif
 
         shift += nbV;
@@ -239,15 +242,18 @@ public:
         trianglesCells->InsertNextCell(3, cell);
 
 #if F3D_PLUGIN_OCCT_XCAF
-        std::array<unsigned char, 3> rgb = { 255, 255, 255 };
-        Quantity_Color aColor;
-        if (this->ColorTool && this->ColorTool->GetColor(face, XCAFDoc_ColorSurf, aColor))
+        if (this->ColorTool)
         {
-          rgb[0] = static_cast<unsigned char>(255.0 * aColor.Red());
-          rgb[1] = static_cast<unsigned char>(255.0 * aColor.Green());
-          rgb[2] = static_cast<unsigned char>(255.0 * aColor.Blue());
+          std::array<unsigned char, 3> rgb = { 255, 255, 255 };
+          Quantity_Color aColor;
+          if (this->ColorTool->GetColor(face, XCAFDoc_ColorSurf, aColor))
+          {
+            rgb[0] = static_cast<unsigned char>(255.0 * aColor.Red());
+            rgb[1] = static_cast<unsigned char>(255.0 * aColor.Green());
+            rgb[2] = static_cast<unsigned char>(255.0 * aColor.Blue());
+          }
+          colors->InsertNextTypedTuple(rgb.data());
         }
-        colors->InsertNextTypedTuple(rgb.data());
 #endif
       }
 
@@ -262,7 +268,10 @@ public:
     polydata->SetLines(linesCells);
 
 #if F3D_PLUGIN_OCCT_XCAF
-    polydata->GetCellData()->SetScalars(colors);
+    if (colors->GetSize() > 0)
+    {
+      polydata->GetCellData()->SetScalars(colors);
+    }
 #endif
 
     polydata->Squeeze();
