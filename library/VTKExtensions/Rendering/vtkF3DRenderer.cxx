@@ -1,6 +1,6 @@
 #include "vtkF3DRenderer.h"
 
-#include "F3DDefaultHDRI.h"
+//#include "F3DDefaultHDRI.h"
 #include "F3DLog.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
@@ -685,8 +685,8 @@ void vtkF3DRenderer::ConfigureHDRIReader()
       // TODO add support for memory buffer in the vtkHDRReader in VTK
       // https://github.com/f3d-app/f3d/issues/935
       this->HDRIReader = vtkSmartPointer<vtkPNGReader>::New();
-      this->HDRIReader->SetMemoryBuffer(F3DDefaultHDRI);
-      this->HDRIReader->SetMemoryBufferLength(sizeof(F3DDefaultHDRI));
+//      this->HDRIReader->SetMemoryBuffer(F3DDefaultHDRI);
+//      this->HDRIReader->SetMemoryBufferLength(sizeof(F3DDefaultHDRI));
       this->UseDefaultHDRI = true;
     }
     this->HasValidHDRIReader = true;
