@@ -778,7 +778,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
     {
       this->SphericalHarmonics->Modified();
     }
-#endif    
+#endif
   }
   else
   {
