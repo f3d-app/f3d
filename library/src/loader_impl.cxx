@@ -49,7 +49,7 @@ public:
         vtkProgressBarWidget* widget = progressData->widget;
         // Only show and render the progress bar if loading takes more than 0.15 seconds
         if (progressData->timer->GetElapsedTime() > 0.15 ||
-          vtksys::SystemTools::HasEnv("CTEST_F3D_PROGRESS_BAR_TESTING"))
+          vtksys::SystemTools::HasEnv("CTEST_F3D_PROGRESS_BAR"))
         {
           widget->On();
           vtkProgressBarRepresentation* rep =
