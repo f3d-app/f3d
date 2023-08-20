@@ -54,8 +54,8 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME BREP
-  EXTENSIONS brep occ
-  MIMETYPES model/brep model/occ
+  EXTENSIONS brep
+  MIMETYPES application/vnd.brep
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "Open CASCADE BRep"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/brep.inl"
