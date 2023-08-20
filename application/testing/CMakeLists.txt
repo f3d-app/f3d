@@ -520,6 +520,7 @@ if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestSTEP DATA f3d.stp DEFAULT_LIGHTS ARGS --load-plugins=occt --up=+Z)
   f3d_test(NAME TestIGES DATA f3d.igs DEFAULT_LIGHTS ARGS --load-plugins=occt --up=+Z)
   f3d_test(NAME TestBREP DATA f3d.brep DEFAULT_LIGHTS ARGS --load-plugins=occt --up=+Z)
+  f3d_test(NAME TestBinaryBREP DATA f3d.bin.brep DEFAULT_LIGHTS ARGS --load-plugins=occt --up=+Z)
 
   if(F3D_PLUGIN_OCCT_COLORING_SUPPORT AND NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")

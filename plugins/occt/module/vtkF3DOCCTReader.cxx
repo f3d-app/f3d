@@ -10,6 +10,7 @@
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
+#include <BinTools.hxx>
 #include <IGESControl_Reader.hxx>
 #include <Message.hxx>
 #include <Message_PrinterOStream.hxx>
@@ -19,6 +20,7 @@
 #include <Quantity_Color.hxx>
 #include <STEPControl_Reader.hxx>
 #include <Standard_PrimitiveTypes.hxx>
+#include <Storage_StreamTypeMismatchError.hxx>
 #include <TColgp_Array1OfVec.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
@@ -472,10 +474,21 @@ int vtkF3DOCCTReader::RequestData(
   if (this->FileFormat == FILE_FORMAT::BREP)
   {
     TopoDS_Shape shape;
-    const BRep_Builder builder;
     ProgressIndicator pIndicator(this);
     const Message_ProgressRange pRange = pIndicator.Start();
-    if (BRepTools::Read(shape, this->GetFileName().c_str(), builder, pRange))
+
+    bool success = false;
+    try
+    {
+      success = BinTools::Read(shape, this->GetFileName().c_str(), pRange);
+    }
+    catch (Storage_StreamTypeMismatchError&)
+    {
+      const BRep_Builder builder;
+      success = BRepTools::Read(shape, this->GetFileName().c_str(), builder, pRange);
+    }
+
+    if (success)
     {
       output->SetNumberOfBlocks(1);
       const vtkSmartPointer<vtkPolyData> polydata = this->Internals->CreateShape(shape);
