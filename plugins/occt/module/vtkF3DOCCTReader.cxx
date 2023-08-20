@@ -596,9 +596,12 @@ void vtkF3DOCCTReader::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AngularDeflection: " << this->AngularDeflection << "\n";
   os << indent << "RelativeDeflection: " << (this->RelativeDeflection ? "true" : "false") << "\n";
   os << indent << "ReadWire: " << (this->ReadWire ? "true" : "false") << "\n";
-  os << indent << "FileFormat: "
-     << (this->FileFormat == FILE_FORMAT::BREP      ? "BREP"
-            : this->FileFormat == FILE_FORMAT::STEP ? "STEP"
-                                                    : "IGES")
-     << "\n";
+  // clang-format off
+  switch (this->FileFormat)
+  {
+    case FILE_FORMAT::BREP: os << "FileFormat: BREP" << "\n"; break;
+    case FILE_FORMAT::STEP: os << "FileFormat: STEP" << "\n"; break;
+    case FILE_FORMAT::IGES: os << "FileFormat: IGES" << "\n"; break;
+  }
+  // clang-format
 }
