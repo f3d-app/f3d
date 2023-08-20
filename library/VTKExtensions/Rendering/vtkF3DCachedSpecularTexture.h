@@ -28,7 +28,6 @@ public:
   ///@{
   /**
    * Turn on or off cache mechanism
-   * Default is off
    */
   vtkSetMacro(UseCache, bool);
   vtkBooleanMacro(UseCache, bool);
@@ -39,7 +38,7 @@ protected:
   ~vtkF3DCachedSpecularTexture() override = default;
 
   std::string FileName;
-  bool UseCache = false;
+  bool UseCache = true;
 
 private:
   vtkF3DCachedSpecularTexture(const vtkF3DCachedSpecularTexture&) = delete;
