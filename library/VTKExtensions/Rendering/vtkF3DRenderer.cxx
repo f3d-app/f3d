@@ -28,7 +28,7 @@
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkPBRLUTTexture.h>
-#include <vtkPNGReader.h>
+//#include <vtkPNGReader.h>
 #include <vtkPixelBufferObject.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
@@ -654,7 +654,7 @@ void vtkF3DRenderer::ConfigureHDRIReader()
   if (!this->HasValidHDRIReader && (this->HDRISkyboxVisible || this->GetUseImageBasedLighting()))
   {
     this->UseDefaultHDRI = false;
-    this->HDRIReader = nullptr;
+//    this->HDRIReader = nullptr;
     if (!this->HDRIFile.empty())
     {
       if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
@@ -664,7 +664,7 @@ void vtkF3DRenderer::ConfigureHDRIReader()
       }
       else
       {
-        this->HDRIReader = vtkSmartPointer<vtkImageReader2>::Take(
+/*        this->HDRIReader = vtkSmartPointer<vtkImageReader2>::Take(
           vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
         if (this->HDRIReader)
         {
@@ -675,11 +675,11 @@ void vtkF3DRenderer::ConfigureHDRIReader()
           F3DLog::Print(F3DLog::Severity::Warning,
             std::string("Cannot open HDRI file ") + this->HDRIFile +
               std::string(". Using default HDRI"));
-        }
+        }*/
       }
     }
 
-    if (!this->HDRIReader)
+/*    if (!this->HDRIReader)
     {
       // No valid HDRI file have been provided, read the default HDRI
       // TODO add support for memory buffer in the vtkHDRReader in VTK
@@ -688,7 +688,7 @@ void vtkF3DRenderer::ConfigureHDRIReader()
 //      this->HDRIReader->SetMemoryBuffer(F3DDefaultHDRI);
 //      this->HDRIReader->SetMemoryBufferLength(sizeof(F3DDefaultHDRI));
       this->UseDefaultHDRI = true;
-    }
+    }*/
     this->HasValidHDRIReader = true;
   }
   this->HDRIReaderConfigured = true;
@@ -738,7 +738,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
     if (needHDRITexture)
     {
       assert(this->HasValidHDRIReader);
-      this->HDRIReader->Update();
+/*      this->HDRIReader->Update();
 
       this->HDRITexture->SetColorModeToDirectScalars();
       this->HDRITexture->MipmapOn();
@@ -750,7 +750,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
         this->HDRIReader->GetOutput()->GetScalarType() == VTK_UNSIGNED_CHAR)
       {
         this->HDRITexture->UseSRGBColorSpaceOn();
-      }
+      }*/
       this->HasValidHDRITexture = true;
     }
     else

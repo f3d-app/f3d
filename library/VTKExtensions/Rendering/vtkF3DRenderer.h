@@ -18,7 +18,7 @@
 
 class vtkCornerAnnotation;
 class vtkF3DDropZoneActor;
-class vtkImageReader2;
+//class vtkImageReader2;
 class vtkOrientationMarkerWidget;
 class vtkSkybox;
 class vtkTextActor;
@@ -287,7 +287,7 @@ protected:
   int GridSubdivisions = 10;
 
   std::string HDRIFile;
-  vtkSmartPointer<vtkImageReader2> HDRIReader;
+//  vtkSmartPointer<vtkImageReader2> HDRIReader;
   bool HasValidHDRIReader = false;
   bool UseDefaultHDRI = false;
   std::string HDRIHash;
