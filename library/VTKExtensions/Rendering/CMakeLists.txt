@@ -1,3 +1,13 @@
+include("f3dEmbed")
+f3d_embed_file(
+  INPUT "${F3D_SOURCE_DIR}/resources/defaultHDRI.png"
+  NAME F3DDefaultHDRI
+  BINARY)
+set(sources
+  ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.cxx)
+set(private_headers
+  ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
+
 set(classes
   vtkF3DCachedLUTTexture
   vtkF3DCachedSpecularTexture
@@ -20,4 +30,7 @@ endif()
 vtk_module_add_module(f3d::VTKExtensionsRendering
   ${libf3d_vtk_no_install}
   FORCE_STATIC
-  CLASSES ${classes})
+  CLASSES ${classes}
+  SOURCES ${sources}
+  PRIVATE_HEADERS ${private_headers}
+  )
