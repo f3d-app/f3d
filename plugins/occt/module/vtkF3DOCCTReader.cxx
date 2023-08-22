@@ -270,6 +270,7 @@ public:
     polydata->SetLines(linesCells);
 
 #if F3D_PLUGIN_OCCT_XCAF
+    /* colors may be left empty if this->ColorTool has not been initialized */
     if (colors->GetSize() > 0)
     {
       polydata->GetCellData()->SetScalars(colors);
