@@ -63,16 +63,16 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: >
         cmake ../source
-        -DCMAKE_SYSTEM_NAME=Android
-        -DCMAKE_ANDROID_NDK=$(pwd)/../android-ndk
         -DCMAKE_ANDROID_ARCH_ABI=${{matrix.arch}}
-        -DCMAKE_SYSTEM_VERSION=${{env.API_LEVEL}}
-        -DCMAKE_INSTALL_PREFIX:PATH=../install
-        -DF3D_STRICT_BUILD=ON
-        -DF3D_PLUGIN_BUILD_EXODUS=OFF
-        -DF3D_BINDINGS_JAVA=ON
+        -DCMAKE_ANDROID_NDK=$(pwd)/../android-ndk
         -DCMAKE_BUILD_TYPE=Release
-        -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_build/CMakeExternals/Install/vtk-android/lib/cmake/vtk-9.2
+        -DCMAKE_INSTALL_PREFIX:PATH=../install
+        -DCMAKE_PREFIX_PATH=$(pwd)/../dependencies/vtk_build/CMakeExternals/Install/vtk-android/
+        -DCMAKE_SYSTEM_NAME=Android
+        -DCMAKE_SYSTEM_VERSION=${{env.API_LEVEL}}
+        -DF3D_BINDINGS_JAVA=ON
+        -DF3D_PLUGIN_BUILD_EXODUS=OFF
+        -DF3D_STRICT_BUILD=ON
 
     - name: Build
       working-directory: ${{github.workspace}}/build
