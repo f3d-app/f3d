@@ -52,6 +52,15 @@ f3d_plugin_declare_reader(
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/iges.inl"
 )
 
+f3d_plugin_declare_reader(
+  NAME BREP
+  EXTENSIONS brep
+  MIMETYPES application/vnd.brep
+  VTK_READER vtkF3DOCCTReader
+  FORMAT_DESCRIPTION "Open CASCADE BRep"
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/brep.inl"
+)
+
 set(rpaths "")
 get_target_property(target_type TKernel TYPE)
 if (target_type STREQUAL SHARED_LIBRARY)
