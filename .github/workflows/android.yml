@@ -72,7 +72,7 @@ jobs:
         -DF3D_PLUGIN_BUILD_EXODUS=OFF
         -DF3D_BINDINGS_JAVA=ON
         -DCMAKE_BUILD_TYPE=Release
-        -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_build/CMakeExternals/Install/vtk-android/lib/cmake/vtk-9.3
+        -DCMAKE_PREFIX_PATH=$(pwd)/../dependencies/vtk_build/CMakeExternals/Install/vtk-android/
 
     - name: Build
       working-directory: ${{github.workspace}}/build
