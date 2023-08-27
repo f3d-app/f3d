@@ -1,28 +1,12 @@
-name: webassembly
+name: 'Webassembly CI'
+description: 'Webassembly CI'
 
-on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-  push:
-    branches:
-      - master
-
-jobs:
-  ci:
-    if: github.event.pull_request.draft == false
-
-    runs-on: ubuntu-latest
-    container: dockcross/web-wasm:20230116-670f7f7
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: 'false'
+runs:
+  using: "composite"
+  steps:
 
     - name: Dependencies Dir
+      shell: bash
       working-directory: ${{github.workspace}}
       run: mkdir dependencies
 
@@ -30,12 +14,14 @@ jobs:
       uses: ./source/.github/actions/vtk-webassembly-install-dep
 
     - name: Setup Directories
+      shell: bash
       working-directory: ${{github.workspace}}
       run: |
          mkdir build
          mkdir install
 
     - name: Configure
+      shell: bash
       working-directory: ${{github.workspace}}/build
       run: >
         cmake ../source
@@ -47,5 +33,6 @@ jobs:
         -DVTK_DIR:PATH=$(pwd)/../dependencies/vtk_install/lib/cmake/vtk
 
     - name: Build
+      shell: bash
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --target install
