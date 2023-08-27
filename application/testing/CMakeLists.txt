@@ -276,11 +276,14 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
 
   # No alternative baseline supports in F3D
   if(F3D_MODULE_RAYTRACING)
-    f3d_test(NAME TestInteractionCheatsheetRaytracing DATA cow.vtp INTERACTION) #H
-    f3d_test(NAME TestInteractionCheatsheetWhiteBGRaytracing DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION) #H
-    f3d_test(NAME TestInteractionCheatsheetBlackBGRaytracing DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION) #H
-    f3d_test(NAME TestInteractionCheatsheetScalarsRaytracing DATA dragon.vtu ARGS --scalars --comp=-2 INTERACTION) #HSSS
-    f3d_test(NAME TestInteractionNoFileCheatsheetRaytracing INTERACTION NO_DATA_FORCE_RENDER) #HXZM
+    # Raytracing result have changed because of https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8577
+    if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.20230825)
+      f3d_test(NAME TestInteractionCheatsheetRaytracing DATA cow.vtp INTERACTION) #H
+      f3d_test(NAME TestInteractionCheatsheetWhiteBGRaytracing DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION) #H
+      f3d_test(NAME TestInteractionCheatsheetBlackBGRaytracing DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION) #H
+      f3d_test(NAME TestInteractionCheatsheetScalarsRaytracing DATA dragon.vtu ARGS --scalars --comp=-2 INTERACTION) #HSSS
+      f3d_test(NAME TestInteractionNoFileCheatsheetRaytracing INTERACTION NO_DATA_FORCE_RENDER) #HXZM
+    endif()
   else()
     f3d_test(NAME TestInteractionCheatsheet DATA cow.vtp INTERACTION) #H
     f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION) #H
@@ -343,7 +346,8 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestInteractionHDRILoop DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS)
   f3d_test(NAME TestInteractionHDRIFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT INTERACTION DEFAULT_LIGHTS)
 
-  if(F3D_MODULE_RAYTRACING)
+  # Raytracing result have changed because of https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8577
+  if(F3D_MODULE_RAYTRACING AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20230825)
     # XXX: These tests are impacted by https://github.com/f3d-app/f3d/issues/933
     f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1)
     f3d_test(NAME TestHDRIRaytracingSkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox -r --samples=1 LONG_TIMEOUT)
@@ -374,18 +378,17 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230603)
   f3d_test(NAME TestVRMLImporter DATA bot2.wrl DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 endif()
 
+# Raytracing result have changed because of https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8577
 if(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestRaytracingGLTF DATA WaterBottle.glb ARGS -r --samples=1)
-  f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS -r --samples=1 --bg-color=1,0,0)
-  f3d_test(NAME TestRaytracingPointCloud DATA pointsCloud.vtp ARGS -r --point-size=20)
-  f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS -rd --samples=1)
-  f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Raytracing module: ON")
-  f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --samples=1 INTERACTION) #RD
-
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20230825)
+    f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --samples=1 INTERACTION) #RD
+    f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS -r --samples=1 --bg-color=1,0,0)
+    f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS -rd --samples=1)
+    f3d_test(NAME TestRaytracingGLTF DATA WaterBottle.glb ARGS -r --samples=1)
     f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -r --samples=1 --no-background)
+    f3d_test(NAME TestRaytracingPointCloud DATA pointsCloud.vtp ARGS -r --point-size=20)
+    f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Raytracing module: ON")
   endif()
-
 else(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionRaytracingDenoiseNoRaytracing DATA suzanne.ply ARGS INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
 endif()
