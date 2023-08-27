@@ -133,8 +133,13 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->SetClippingRangeExpansion(0.99);
 
   // Create cached texture
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20230902)
+  this->EnvMapLookupTable = vtkSmartPointer<vtkF3DCachedLUTTexture>::New();
+  this->EnvMapPrefiltered = vtkSmartPointer<vtkF3DCachedSpecularTexture>::New();
+#else
   this->EnvMapLookupTable = vtkF3DCachedLUTTexture::New();
   this->EnvMapPrefiltered = vtkF3DCachedSpecularTexture::New();
+#endif
 
   // Init actors
   vtkNew<vtkTextProperty> textProp;
@@ -734,6 +739,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
       assert(this->HasValidHDRIReader);
       this->HDRIReader->Update();
 
+      this->HDRITexture = vtkSmartPointer<vtkTexture>::New();
       this->HDRITexture->SetColorModeToDirectScalars();
       this->HDRITexture->MipmapOn();
       this->HDRITexture->InterpolateOn();
@@ -749,12 +755,15 @@ void vtkF3DRenderer::ConfigureHDRITexture()
     }
     else
     {
-      // Reading the HDRI texture is actually not needed
-      // create a dummy one instead
-      // TODO add support for not providing a texture and still using IBL in VTK
-      // https://github.com/f3d-app/f3d/issues/935
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20230902)
+      // IBL without textures has been added in VTK in
+      // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10454
+      this->HDRITexture = nullptr;
+#else
       vtkNew<vtkImageData> img;
+      this->HDRITexture = vtkSmartPointer<vtkTexture>::New();
       this->HDRITexture->SetInputData(img);
+#endif
       this->HasValidHDRITexture = false;
     }
   }
@@ -763,11 +772,11 @@ void vtkF3DRenderer::ConfigureHDRITexture()
   {
     this->SetEnvironmentTexture(this->HDRITexture);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
-    // Force modified on the spherical harmonics
-    // to avoid them updating themselves
-    // TODO add support for not providing a texture and still using IBL in VTK
-    // https://github.com/f3d-app/f3d/issues/935
+    // No cache support before 20221220
+    // IBL without textures has been added in VTK in
+    // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10454
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220) &&                                     \
+  VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20230902)
     if (this->SphericalHarmonics)
     {
       this->SphericalHarmonics->Modified();
