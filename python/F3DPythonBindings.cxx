@@ -441,7 +441,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("getLibInfo", &f3d::engine::getLibInfo, "DEPRECATED")
     .def_static("getReadersInfo", &f3d::engine::getReadersInfo, "DEPRECATED")
     .def_static("getPluginsList", &f3d::engine::getPluginsList, "DEPRECATED");
->>>>>>> 815d02f5 (revert, deprecate, pythonify, pytest)
 #pragma GCC diagnostic pop
 #endif
 }

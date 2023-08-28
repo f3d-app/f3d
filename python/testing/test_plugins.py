@@ -3,7 +3,6 @@ import os
 import pytest
 
 import f3d
-import f3d_init
 
 
 @pytest.fixture

@@ -1,7 +1,6 @@
 import pytest
 
 import f3d
-import f3d_init
 
 
 def test_closest_option():

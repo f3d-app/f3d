@@ -1,15 +1,7 @@
 import pytest
 
 import f3d
-import f3d_init
 
-<<<<<<< HEAD
-dataset = sys.argv[1] + "/testing/data/cow.vtp"
-reference = sys.argv[1] + "/testing/baselines/TestPythonCompareWithFile.png"
-output = sys.argv[2] + "/Testing/Temporary/TestPythonCompareWithFile.png"
-outputDiff = sys.argv[2] + "/Testing/Temporary/TestPythonCompareWithFile.diff.png"
-=======
->>>>>>> 815d02f5 (revert, deprecate, pythonify, pytest)
 
 @pytest.fixture
 def f3d_source_dir(pytestconfig):

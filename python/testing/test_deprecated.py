@@ -3,7 +3,6 @@ import os
 import pytest
 
 import f3d
-import f3d_init
 
 
 @pytest.fixture
@@ -83,7 +82,7 @@ def test_legacy_Camera():
     camera.resetToDefault()
 
 
-def test_legacy_ComapareWithFile(f3d_source_dir, cmake_binary_dir):
+def test_legacy_CompareWithFile(f3d_source_dir, cmake_binary_dir):
     dataset = f3d_source_dir + "/testing/data/cow.vtp"
     reference = f3d_source_dir + "/testing/baselines/TestPythonCompareWithFile.png"
     output = cmake_binary_dir + "/Testing/Temporary/TestPythonCompareWithFile.png"
