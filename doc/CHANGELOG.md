@@ -4,6 +4,7 @@
 
 For F3D users:
  - Added new options `hdri-file`, `hdri-ambient`, `hdri-skybox` to have more control on the HDRI behavior
+ - Added a default HDRI used when providing no `hdri-file`
  - Added bindings to toggle HDRI ambient lighting (`F`) and HDRI skybox (`J`)
  - Added bindings to move the camera to standard locations: `1`: Front, `3`: Right, `7`: Top, `9`: Isometric
  - Added [Open CASCADE BRep format](https://dev.opencascade.org/doc/overview/html/specification__brep_format.html) to the OCCT plugin.

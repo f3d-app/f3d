@@ -42,7 +42,7 @@ Other options can be toggled directly by pressing the following hotkeys:
 * `Z`: the display of the FPS counter.
 * `R`: raytracing.
 * `D`: the denoiser when raytracing.
-* `U`: background blur, useful with an HDRI.
+* `U`: background blur, useful with an HDRI skybox.
 * `K`: trackball interaction mode.
 * `F`: HDRI ambient lighting.
 * `J`: the display of the HDRI skybox.

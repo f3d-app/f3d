@@ -72,11 +72,11 @@ render.grid.subdivisions|int<br>10<br>render|Set the number of subdivisions for 
 render.raytracing.enable|bool<br>false<br>render|Enable *raytracing*. Requires the raytracing module to be enabled.|\-\-raytracing
 render.raytracing.samples|int<br>5<br>render|The number of *samples per pixel*.|\-\-samples
 render.raytracing.denoise|bool<br>false<br>render|*Denoise* the raytracing rendering.|\-\-denoise
-render.hdri.file|string<br>-<br>render|Set the *HDRI* image that can be used for ambient lighting and skybox.<br>Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp.|\-\-hdri-file
+render.hdri.file|string<br>-<br>render|Set the *HDRI* image that can be used for ambient lighting and skybox.<br>Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp.<br>If not set, a default is provided.|\-\-hdri-file
 render.hdri.ambient|bool<br>false<br>render|Light the scene using the *HDRI* image as ambient lighting<br>The environment act as a light source and is reflected on the material.|\-\-hdri-ambient
 render.background.color|vector\<double\><br>0.2,0.2,0.2<br>render|Set the window *background color*.<br>Ignored if a *hdri* skybox is used.|\-\-bg-color
 render.background.skybox|bool<br>false<br>render|Show the *HDRI* image as a skybox<br>Overrides the the background color if any|\-\-hdri-skybox
-render.background.blur|bool<br>false<br>render|Blur background, useful with a *HDRI*.|\-\-blur-background
+render.background.blur|bool<br>false<br>render|Blur background, useful with a skybox.|\-\-blur-background
 render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-background-coc
 
 ## UI Options
