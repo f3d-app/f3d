@@ -702,8 +702,7 @@ void vtkF3DRenderer::ConfigureHDRIHash()
   {
     if (this->UseDefaultHDRI)
     {
-      // Use a random HDRIHash, no need to generate one
-      this->HDRIHash = "fa96df14ed5268a6dbe81478abf8aac2";
+      this->HDRIHash = "default";
     }
     else
     {

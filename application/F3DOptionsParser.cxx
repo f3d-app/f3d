@@ -506,7 +506,7 @@ void ConfigurationOptions::PrintHelp(const cxxopts::Options& cxxOptions)
   const std::vector<std::pair<std::string, std::string> > examples = {
     { this->ExecutableName + " file.vtu -xtgans",
       "View a unstructured mesh in a typical nice looking sciviz style" },
-    { this->ExecutableName + " file.glb -tuqap --hdri=file.hdr",
+    { this->ExecutableName + " file.glb -tuqap --hdri-file=file.hdr --hdri-ambient --hdri-skybox",
       "View a gltf file in a realistic environment" },
     { this->ExecutableName + " file.ply -so --point-size=0 --comp=-2",
       "View a point cloud file with direct scalars rendering" },

@@ -1,6 +1,6 @@
 include("f3dEmbed")
 f3d_embed_file(
-  INPUT "${F3D_SOURCE_DIR}/resources/defaultHDRI.png"
+  INPUT "${F3D_DEFAULT_HDRI}"
   NAME F3DDefaultHDRI
   BINARY)
 set(sources
