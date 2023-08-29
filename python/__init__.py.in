@@ -20,7 +20,7 @@ if sys.version_info >= (3, 8) and sys.platform == "win32":
     for rel_path in F3D_RELATIVE_DLLS:
         os.add_dll_directory((root / rel_path).resolve())
 
-from .pyf3d import *
+from pyf3d import *
 
 __version__ = "@F3D_VERSION@"
 
