@@ -1,0 +1,258 @@
+name: 'Generic F3D CI'
+description: 'Generic F3D CI'
+inputs:
+  build_type:
+    description: 'Name of the build'
+    required: false
+    default: 'standard'
+  vtk_version:
+    description: 'VTK version'
+    required: false
+    default: 'commit'
+  raytracing_label:
+    description: 'Label to control raytracing'
+    required: false
+    default: 'no-raytracing'
+  exclude_deprecated_label:
+    description: 'Label to control deprecated exclusion'
+    required: false
+    default: 'no-exclude-deprecated'
+  bundle_label:
+    description: 'Label to control bundle'
+    required: false
+    default: 'no-bundle'
+  egl_label:
+    description: 'Label to control egl'
+    required: false
+    default: 'no-egl'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Dependencies Dir
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
+
+    - name: Install TBB
+      uses: ./source/.github/actions/tbb-install-dep
+
+    - name: Install Raytracing Dependencies
+      if: inputs.raytracing_label == 'raytracing'
+      uses: ./source/.github/actions/ospray-sb-install-dep
+
+    - name: Install VTK dependency
+      uses: ./source/.github/actions/vtk-install-dep
+      with:
+        vtk_version: ${{inputs.vtk_version}}
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+        raytracing_label: ${{inputs.raytracing_label}}
+        egl_label: ${{inputs.egl_label}}
+
+    - name: Install F3D dependencies
+      uses: ./source/.github/actions/f3d-dependencies
+
+    - name: Setup Directories
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+         mkdir build
+         mkdir install
+         mkdir install/output
+
+    # There is a RPATH issue with VTK < 9.2.0
+    # This is a simple workaround for it
+    # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8210
+    - name: Set LD_LIBRARY_PATH ubuntu VTK
+      if: |
+        runner.os == 'Linux' &&
+        ( inputs.vtk_version == 'v9.0.0' ||
+          inputs.vtk_version == 'v9.1.0'
+          )
+      shell: bash
+      working-directory: ${{github.workspace}}/dependencies/
+      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
+    - name: Set PATH windows
+      if: runner.os == 'Windows'
+      shell: powershell
+      working-directory: ${{github.workspace}}
+      run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      # occt coloring not supported on macOS because of #792
+    - name: Configure
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: >
+        cmake ../source
+        -Werror=dev
+        -Werror=deprecated
+        --warn-uninitialized
+        -DBUILD_TESTING=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../install
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
+        -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_BINDINGS_JAVA=ON
+        -DF3D_BINDINGS_PYTHON=ON
+        -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
+        -DF3D_LINUX_GENERATE_MAN=ON
+        -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
+        -DF3D_MACOS_BUNDLE=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_MODULE_EXR=ON
+        -DF3D_MODULE_RAYTRACING=${{ inputs.raytracing_label == 'raytracing' && 'ON' || 'OFF' }}
+        -DF3D_PLUGINS_STATIC_BUILD=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
+        -DF3D_PLUGIN_BUILD_OCCT=ON
+        -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ runner.os == 'macOS' && 'OFF' || 'ON' }}
+        -DF3D_STRICT_BUILD=ON
+        -DF3D_WINDOWS_GUI=ON
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Linux' && matrix.vtk_version != 'v9.0.0' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
+        ${{ matrix.vtk_version == 'v9.0.0' && '-DF3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || null }}
+
+    - name: Build
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --parallel 2 --config Release
+
+    - name: Run Xvfb ubuntu
+      if: |
+        runner.os == 'Linux' &&
+        inputs.egl_label != 'egl'
+      shell: bash
+      run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
+
+    - name: Install Mesa Windows
+      if: runner.os == 'Windows'
+      uses: ./source/.github/actions/mesa-install-bin
+      with:
+        path: ${{github.workspace}}\build\bin_Release
+
+    - name: Test
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+
+    - name: Upload Tests Artifact
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./build/Testing/Temporary
+        name: f3d-tests-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}
+
+    - name: Install (ALL)
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --install .
+
+    - name: Install (mimetypes on Linux)
+      if: runner.os == 'Linux'
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --install . --component mimetypes
+
+    - name: Install optional component
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: |
+        cmake --install . --component sdk
+        cmake --install . --component configuration
+
+    - name: Build and configure libf3d examples
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -B build_examples source/examples/libf3d
+        cmake --build build_examples --config Release
+
+    - name: Install Mesa Windows examples
+      if: |
+        runner.os == 'Windows' &&
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0'
+      uses: ./source/.github/actions/mesa-install-bin
+      with:
+        path: ${{github.workspace}}\build_examples\*\Release
+
+    # older VTK version create different renderings so they are not tested
+    - name: Test libf3d examples
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: ctest --test-dir build_examples -C Release -VV
+
+    - name: Build and test plugin examples
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
+        cmake --build build_plugins --config Release
+        ctest --test-dir build_plugins -C Release -VV
+
+    - name: Set F3D binary path Linux
+      if: runner.os == 'Linux'
+      shell: bash
+      run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
+
+    - name: Set F3D binary path Windows
+      if: runner.os == 'Windows'
+      shell: bash
+      run: echo "F3D_BIN_PATH=./bin/f3d.exe" >> $GITHUB_ENV
+
+    - name: Set F3D binary path MacOS bundle
+      if: |
+        runner.os == 'macOS' &&
+        inputs.bundle_label == 'bundle'
+      shell: bash
+      run: echo "F3D_BIN_PATH=./f3d.app/Contents/MacOS/f3d" >> $GITHUB_ENV
+
+    - name: Set F3D binary path MacOS bundle
+      if: |
+        runner.os == 'macOS' &&
+        inputs.bundle_label != 'bundle'
+      shell: bash
+      run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
+
+    - name: Install Mesa Windows in install
+      if: runner.os == 'Windows'
+      uses: ./source/.github/actions/mesa-install-bin
+      with:
+        path: ${{github.workspace}}\install\bin
+
+    - name: Check F3D_PLUGINS_PATH using plugin example
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0'
+      shell: bash
+      working-directory: ${{github.workspace}}/install
+      run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose
+
+    - name: Install plugin examples
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        cmake --install build_plugins --config Release
+        cmake --install build_plugins --config Release --component configuration
+
+    - name: Check Install
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0'
+      shell: bash
+      working-directory: ${{github.workspace}}/install
+      run: |
+        ${{ env.F3D_BIN_PATH }} ../source/testing/data/suzanne.obj --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --verbose
+        ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose
+
+    - name: Upload Tests Install Artifact
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./install/output
+        name: f3d-tests-install-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}
+
