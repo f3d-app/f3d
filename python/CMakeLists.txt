@@ -26,22 +26,18 @@ set(f3d_python_lib_output "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${f3d_python_packag
 set_target_properties(pyf3d PROPERTIES
   CXX_STANDARD 14
   CXX_VISIBILITY_PRESET hidden
-  LIBRARY_OUTPUT_DIRECTORY "${f3d_python_lib_output}"
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>"
   )
 
+if(APPLE)
+  set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
+elseif(UNIX)
+  set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
+endif()
+
 if(SKBUILD)
-  if(APPLE)
-    set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
-  elseif(UNIX)
-    set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
-  endif()
   set(f3d_python_install_path ".")
 else()
-  if(APPLE)
-    set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/../..")
-  elseif(UNIX)
-    set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/../..")
-  endif()
   set(f3d_python_install_path "${CMAKE_INSTALL_LIBDIR}/${f3d_python_package_suffix}/${f3d_python_package_name}")
 endif()
 
@@ -56,7 +52,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
   "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build" @ONLY)
 
 file(GENERATE
-  OUTPUT "${f3d_python_lib_output}/__init__.py"
+  OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/f3d.py"
   INPUT "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build"
 )
 

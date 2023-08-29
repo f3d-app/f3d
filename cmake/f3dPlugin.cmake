@@ -362,9 +362,9 @@ macro(f3d_plugin_build)
   string(JSON F3D_PLUGIN_JSON
     SET "${F3D_PLUGIN_JSON}" "type" "\"${F3D_PLUGIN_TYPE}\"")
 
-  set(F3D_PLUGIN_JSON_FILE "${CMAKE_BINARY_DIR}/share/f3d/plugins/${F3D_PLUGIN_NAME}.json")
+  set(F3D_PLUGIN_JSON_FILE "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/plugins/${F3D_PLUGIN_NAME}.json")
 
-  file(WRITE "${F3D_PLUGIN_JSON_FILE}" "${F3D_PLUGIN_JSON}")
+  file(GENERATE OUTPUT "${F3D_PLUGIN_JSON_FILE}" CONTENT "${F3D_PLUGIN_JSON}")
 
   install(FILES "${F3D_PLUGIN_JSON_FILE}"
       DESTINATION "share/f3d/plugins"

@@ -34,7 +34,7 @@ foreach(test ${pyf3dTests_list})
   get_filename_component (TName ${test} NAME_WE)
   add_test(NAME pyf3d::${TName} COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/${test} ${F3D_SOURCE_DIR} ${CMAKE_BINARY_DIR})
   set_tests_properties(pyf3d::${TName} PROPERTIES
-    ENVIRONMENT "PYTHONPATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${f3d_python_package_suffix}"
+    ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/$<CONFIG>"
     FAIL_REGULAR_EXPRESSION "AssertionError")
   if (NOT F3D_TESTING_ENABLE_RENDERING_TESTS AND NOT ${TName} IN_LIST pyf3dTestsNoRender_list)
     set_tests_properties(pyf3d::${TName} PROPERTIES DISABLED ON)
