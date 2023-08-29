@@ -4,12 +4,6 @@ import pytest
 
 import f3d
 
-
-@pytest.fixture
-def f3d_source_dir(pytestconfig):
-    return pytestconfig.getoption("f3d_source_dir")
-
-
 @pytest.fixture
 def cmake_binary_dir(pytestconfig):
     return pytestconfig.getoption("cmake_binary_dir")
@@ -82,9 +76,9 @@ def test_legacy_Camera():
     camera.resetToDefault()
 
 
-def test_legacy_CompareWithFile(f3d_source_dir, cmake_binary_dir):
-    dataset = f3d_source_dir + "/testing/data/cow.vtp"
-    reference = f3d_source_dir + "/testing/baselines/TestPythonCompareWithFile.png"
+def test_legacy_CompareWithFile(cmake_binary_dir):
+    dataset = "./testing/data/cow.vtp"
+    reference = "./testing/baselines/TestPythonCompareWithFile.png"
     output = cmake_binary_dir + "/Testing/Temporary/TestPythonCompareWithFile.png"
     outputDiff = (
         cmake_binary_dir + "/Testing/Temporary/TestPythonCompareWithFile.diff.png"
