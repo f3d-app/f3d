@@ -308,22 +308,11 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 #endif
   if (this->GetUseImageBasedLighting())
   {
-    if (this->HDRISkyboxVisible)
-    {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210123)
-      mode = vtkOSPRayRendererNode::Environment;
+    mode = vtkOSPRayRendererNode::Both;
 #else
-      mode = 2;
+    mode = 3;
 #endif
-    }
-    else
-    {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210123)
-      mode = vtkOSPRayRendererNode::Both;
-#else
-      mode = 3
-#endif
-    }
   }
   vtkOSPRayRendererNode::SetBackgroundMode(mode, this);
 #else
