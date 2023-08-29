@@ -129,9 +129,6 @@ if(F3D_ENABLE_SOVERSION)
   )
 endif()
 
-set(F3D_DEFAULT_HDRI "${F3D_SOURCE_DIR}/resources/defaultHDRI.png" CACHE STRING "Default HDRI when no HDRI file is provided")
-mark_as_advanced(F3D_DEFAULT_HDRI)
-
 # Generate export macros for exported public APIs
 include(GenerateExportHeader)
 set(libf3d_no_deprecated)

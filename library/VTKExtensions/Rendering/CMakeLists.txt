@@ -1,3 +1,5 @@
+set(F3D_DEFAULT_HDRI "${F3D_SOURCE_DIR}/resources/defaultHDRI.png" CACHE STRING "Default HDRI when no HDRI file is provided")
+mark_as_advanced(F3D_DEFAULT_HDRI)
 include("f3dEmbed")
 f3d_embed_file(
   INPUT "${F3D_DEFAULT_HDRI}"
