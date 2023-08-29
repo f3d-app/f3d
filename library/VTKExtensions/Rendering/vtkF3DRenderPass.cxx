@@ -27,6 +27,7 @@
 #include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
 #include <vtkTranslucentPass.h>
+#include <vtkVersion.h>
 #include <vtkVolumetricPass.h>
 
 #if F3D_MODULE_RAYTRACING
@@ -248,7 +249,20 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl", ssDecl.str());
 
     std::stringstream ssImpl;
+
     ssImpl << "  vec4 mainSample = texture(texMain, texCoord);\n";
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20230824)
+    // vtkOSPRayPass output convention changed
+    // It was sRGB before and it's now is linear color space
+    // We need to make the conversion to sRGB ourselves
+    // See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8577
+    if (F3D_MODULE_RAYTRACING && this->UseRaytracing)
+    {
+      ssImpl << "  mainSample = vec4(pow(vec3(mainSample), vec3(1.0 / 2.2)), mainSample.a);\n";
+    }
+#endif
+
     ssImpl << "  vec3 bgCol = texture(texBackground, texCoord).rgb;\n";
     ssImpl << "  vec3 result = mix(bgCol, mainSample.rgb, mainSample.a);\n";
 
