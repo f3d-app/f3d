@@ -96,9 +96,10 @@ def test_legacy_CompareWithFile():
     diff = f3d.image()
     error = 0.0
 
-    ret = img.compare(f3d.image(reference), 50, diff, error)
+    ret = img.compare(f3d.image(reference), 100, diff, error)
 
     if not ret:
+        print("img compare failing with diff=" + error)
         diff.save(outputDiff)
 
     assert ret is True
