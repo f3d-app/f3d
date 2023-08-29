@@ -9,7 +9,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/imath_install
-        key: imath-v3.1.7-${{runner.os}}-1
+        key: imath-v3.1.7-${{runner.os}}-2
 
     - name: Checkout Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'
@@ -35,7 +35,7 @@ runs:
         cmake ../imath
         -DBUILD_SHARED_LIBS=ON
         -DBUILD_TESTING=OFF
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=Debug
         -DCMAKE_INSTALL_PREFIX:PATH=../imath_install
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}

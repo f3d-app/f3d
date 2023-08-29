@@ -10,7 +10,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/alembic_install
-        key: alembic-v1.8.5-${{runner.os}}-2
+        key: alembic-v1.8.5-${{runner.os}}-3
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -36,7 +36,7 @@ runs:
         cmake ../alembic
         -DALEMBIC_LIB_INSTALL_DIR=${{ runner.os == 'Windows' && 'bin' || 'lib' }}
         -DALEMBIC_SHARED_LIBS=ON
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=Debug
         -DCMAKE_INSTALL_PREFIX:PATH=../alembic_install
         -DCMAKE_PREFIX_PATH:PATH=../install/
         -DUSE_BINARIES=OFF
