@@ -51,7 +51,7 @@ Options|Default|Description
 \-\-opacity=\<opacity\>|1.0|Set *opacity* on the geometry. Multiplied with the base color texture when present. <br>Requires a default scene. Usually used with Depth Peeling option.
 \-\-roughness=\<roughness\>|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Requires a default scene.
 \-\-metallic=\<metallic\>|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Requires a default scene.
-\-\-hdri-file=\<HDRI file\>||Set the *HDRI* image that can be used as ambient lighting and skybox.<br>Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp.
+\-\-hdri-file=\<HDRI file\>||Set the *HDRI* image that can be used as ambient lighting and skybox.<br>Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp. <br> If not set, a default is provided.
 \-\-hdri-ambient||Light the scene using the *HDRI* image as ambient lighting.<br>The environment act as a light source and is reflected on the material.
 \-\-texture-matcap=\<texture file\>||Set the texture file to control the material capture of the object. All other model options for surfaces are ignored if this is set. Must be in linear color space.
 \-\-texture-base-color=\<texture file\>||Set the texture file to control the color of the object. Please note this will be multiplied with the color and opacity options. Must be in sRGB color space.
@@ -70,7 +70,7 @@ Options|Default|Description
 -n, \-\-filename||Display the *name of the file* on top of the window.
 -m, \-\-metadata||Display the *metadata*.<br>Empty without a default scene.
 \-\-hdri-skybox||Show the HDRI as a skybox. Overrides \-\-bg-color and \-\-no-background.
--u, \-\-blur-background||Blur background.<br>Useful with a HDRI.
+-u, \-\-blur-background||Blur background.<br>Useful with a HDRI skybox.
 \-\-blur-coc|20|Blur circle of confusion radius.
 \-\-light-intensity|1.0|*Adjust the intensity* of every light in the scene.
 

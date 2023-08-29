@@ -193,8 +193,8 @@ jobs:
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'Linux' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
-        ${{ matrix.vtk_version == 'v9.0.0' && '-DF3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || '-DF3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=OFF' }}
+        ${{ runner.os == 'Linux' && matrix.vtk_version != 'v9.0.0' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
+        ${{ matrix.vtk_version == 'v9.0.0' && '-DF3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || null }}
 
     - name: Build
       working-directory: ${{github.workspace}}/build
