@@ -1,18 +1,14 @@
 import pytest
-
+import tempfile
 import f3d
 
-@pytest.fixture
-def cmake_binary_dir(pytestconfig):
-    return pytestconfig.getoption("cmake_binary_dir")
 
-
-def test_compare_with_file(cmake_binary_dir):
+def test_compare_with_file():
     dataset = "./testing/data/cow.vtp"
     reference = "./testing/baselines/TestPythonCompareWithFile.png"
-    output = cmake_binary_dir + "/Testing/Temporary/TestPythonCompareWithFile.png"
+    output = tempfile.gettempdir() + "/TestPythonCompareWithFile.png"
     outputDiff = (
-        cmake_binary_dir + "/Testing/Temporary/TestPythonCompareWithFile.diff.png"
+        tempfile.gettempdir() + "/TestPythonCompareWithFile.diff.png"
     )
 
     f3d.engine.autoload_plugins()

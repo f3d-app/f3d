@@ -1,13 +1,8 @@
 import os
-
+import tempfile
 import pytest
 
 import f3d 
-
-
-@pytest.fixture
-def cmake_binary_dir(pytestconfig):
-    return pytestconfig.getoption("cmake_binary_dir")
 
 
 @pytest.fixture
@@ -55,9 +50,9 @@ def test_set_wrong_data(f3d_engine):
         img.content = img.content[:-1]
 
 
-def test_save(cmake_binary_dir, f3d_engine):
+def test_save(f3d_engine):
     img = f3d_engine.window.render_to_image()
-    fn = cmake_binary_dir + "/Testing/Temporary/TestPythonSaveFile.bmp"
+    fn = tempfile.gettempdir() + "/TestPythonSaveFile.bmp"
 
     img.save(fn, f3d.image.SaveFormat.BMP)
     assert os.path.isfile(fn)

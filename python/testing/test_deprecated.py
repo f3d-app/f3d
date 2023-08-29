@@ -1,12 +1,9 @@
 import os
+import tempfile
 
 import pytest
 
 import f3d
-
-@pytest.fixture
-def cmake_binary_dir(pytestconfig):
-    return pytestconfig.getoption("cmake_binary_dir")
 
 
 def test_legacy_Camera():
@@ -76,12 +73,12 @@ def test_legacy_Camera():
     camera.resetToDefault()
 
 
-def test_legacy_CompareWithFile(cmake_binary_dir):
+def test_legacy_CompareWithFile():
     dataset = "./testing/data/cow.vtp"
     reference = "./testing/baselines/TestPythonCompareWithFile.png"
-    output = cmake_binary_dir + "/Testing/Temporary/TestPythonCompareWithFile.png"
+    output = tempfile.gettempdir() + "/TestPythonCompareWithFile.png"
     outputDiff = (
-        cmake_binary_dir + "/Testing/Temporary/TestPythonCompareWithFile.diff.png"
+        tempfile.gettempdir() + "/TestPythonCompareWithFile.diff.png"
     )
 
     f3d.engine.autoloadPlugins()
@@ -109,7 +106,7 @@ def test_legacy_CompareWithFile(cmake_binary_dir):
     assert ret is True
 
 
-def test_legacy_ImageData(cmake_binary_dir):
+def test_legacy_ImageData():
     engine = f3d.engine(f3d.window.NATIVE_OFFSCREEN)
     window = engine.getWindow()
     window.setSize(300, 200)
@@ -152,7 +149,7 @@ def test_legacy_ImageData(cmake_binary_dir):
     assert img.getChannelType() == f3d.image.ChannelType.BYTE
     assert img.getChannelTypeSize() == 1
 
-    fn = cmake_binary_dir + "/Testing/Temporary/TestPythonSaveFile.bmp"
+    fn = tempfile.gettempdir() + "/TestPythonSaveFile.bmp"
     img.save(fn, f3d.image.SaveFormat.BMP)
     assert os.path.isfile(fn)
 
@@ -202,8 +199,8 @@ def test_legacy_Options():
     assert options2.isSame(options, "interactor.axis")
 
 
-def test_legacy_Plugins(cmake_binary_dir):
-    plugins = f3d.engine.getPluginsList(cmake_binary_dir + "/share/f3d/plugins")
+def test_legacy_Plugins():
+    plugins = f3d.engine.getPluginsList(os.path.dirname(f3d.__file__) + "/share/f3d/plugins")
     assert len(plugins) > 0
     assert plugins.index("native") >= 0
 
