@@ -77,9 +77,7 @@ def test_legacy_CompareWithFile():
     dataset = "./testing/data/cow.vtp"
     reference = "./testing/baselines/TestPythonCompareWithFile.png"
     output = tempfile.gettempdir() + "/TestPythonCompareWithFile.png"
-    outputDiff = (
-        tempfile.gettempdir() + "/TestPythonCompareWithFile.diff.png"
-    )
+    outputDiff = tempfile.gettempdir() + "/TestPythonCompareWithFile.diff.png"
 
     f3d.engine.autoloadPlugins()
 
@@ -200,7 +198,9 @@ def test_legacy_Options():
 
 
 def test_legacy_Plugins():
-    plugins = f3d.engine.getPluginsList(os.path.dirname(f3d.__file__) + "/share/f3d/plugins")
+    plugins = f3d.engine.getPluginsList(
+        os.path.dirname(f3d.__file__) + "/share/f3d/plugins"
+    )
     assert len(plugins) > 0
     assert plugins.index("native") >= 0
 

@@ -7,9 +7,7 @@ def test_compare_with_file():
     dataset = "./testing/data/cow.vtp"
     reference = "./testing/baselines/TestPythonCompareWithFile.png"
     output = tempfile.gettempdir() + "/TestPythonCompareWithFile.png"
-    outputDiff = (
-        tempfile.gettempdir() + "/TestPythonCompareWithFile.diff.png"
-    )
+    outputDiff = tempfile.gettempdir() + "/TestPythonCompareWithFile.diff.png"
 
     f3d.engine.autoload_plugins()
 

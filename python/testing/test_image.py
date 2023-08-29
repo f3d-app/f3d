@@ -2,7 +2,7 @@ import os
 import tempfile
 import pytest
 
-import f3d 
+import f3d
 
 
 @pytest.fixture
