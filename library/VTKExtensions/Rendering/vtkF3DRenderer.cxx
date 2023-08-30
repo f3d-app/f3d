@@ -157,11 +157,18 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
   this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
 
+  this->SkyboxActor->SetProjection(vtkSkybox::Sphere);
+  // First version of VTK including the version check (and the feature used)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
+  this->SkyboxActor->GammaCorrectOn();
+#endif
+
   this->FilenameActor->VisibilityOff();
   this->MetaDataActor->VisibilityOff();
   this->TimerActor->VisibilityOff();
   this->CheatSheetActor->VisibilityOff();
   this->DropZoneActor->VisibilityOff();
+  this->SkyboxActor->VisibilityOff();
 }
 
 //----------------------------------------------------------------------------
@@ -191,6 +198,7 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   this->AddActor(this->MetaDataActor);
   this->AddActor(this->DropZoneActor);
   this->AddActor(this->CheatSheetActor);
+  this->AddActor(this->SkyboxActor);
 
   this->GridConfigured = false;
   this->CheatSheetConfigured = false;
@@ -236,8 +244,8 @@ void vtkF3DRenderer::Initialize(const std::string& up)
     // skybox orientation
     double front[3];
     vtkMath::Cross(this->RightVector, this->UpVector, front);
-    this->Skybox->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
-    this->Skybox->SetFloorRight(front[0], front[1], front[2]);
+    this->SkyboxActor->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
+    this->SkyboxActor->SetFloorRight(front[0], front[1], front[2]);
 
     // environment orientation
     this->SetEnvironmentUp(this->UpVector);
@@ -926,26 +934,8 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureHDRISkybox()
 {
-  if (this->HDRISkyboxVisible)
-  {
-    // Setup the OpenGL Skybox
-    this->Skybox->SetProjection(vtkSkybox::Sphere);
-    this->Skybox->SetTexture(this->HDRITexture);
-
-    // First version of VTK including the version check (and the feature used)
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
-    this->Skybox->GammaCorrectOn();
-#endif
-
-    // TODO: Add support for visibility and
-    // avoid segfaulting in case missing texture in vtkOpenGLSkybox
-    // https://github.com/f3d-app/f3d/issues/935
-    this->AddActor(this->Skybox);
-  }
-  else
-  {
-    this->RemoveActor(this->Skybox);
-  }
+  this->SkyboxActor->SetTexture(this->HDRITexture);
+  this->SkyboxActor->SetVisibility(this->HDRISkyboxVisible);
   this->HDRISkyboxConfigured = true;
 }
 

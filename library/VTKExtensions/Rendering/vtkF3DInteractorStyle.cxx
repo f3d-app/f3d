@@ -159,8 +159,8 @@ void vtkF3DInteractorStyle::EnvironmentRotate()
     double front[3];
     vtkMath::Cross(right, up, front);
 
-    ren->GetSkybox()->SetFloorPlane(up[0], up[1], up[2], 0.0);
-    ren->GetSkybox()->SetFloorRight(front[0], front[1], front[2]);
+    ren->GetSkyboxActor()->SetFloorPlane(up[0], up[1], up[2], 0.0);
+    ren->GetSkyboxActor()->SetFloorRight(front[0], front[1], front[2]);
 
     this->Interactor->Render();
   }

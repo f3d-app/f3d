@@ -123,7 +123,7 @@ public:
   /**
    * Get the OpenGL skybox
    */
-  vtkGetObjectMacro(Skybox, vtkSkybox);
+  vtkGetObjectMacro(SkyboxActor, vtkSkybox);
 
   /**
    * Return description about the current rendering status
@@ -225,9 +225,6 @@ protected:
    */
   void CreateCacheDirectory();
 
-  vtkNew<vtkActor> GridActor;
-
-  vtkNew<vtkSkybox> Skybox;
   vtkNew<vtkCamera> InitialCamera;
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
@@ -236,6 +233,8 @@ protected:
   vtkNew<vtkCornerAnnotation> MetaDataActor;
   vtkNew<vtkCornerAnnotation> CheatSheetActor;
   vtkNew<vtkF3DDropZoneActor> DropZoneActor;
+  vtkNew<vtkActor> GridActor;
+  vtkNew<vtkSkybox> SkyboxActor;
 
   // vtkCornerAnnotation building is too slow for the timer
   vtkNew<vtkTextActor> TimerActor;
