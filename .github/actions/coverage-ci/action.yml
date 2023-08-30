@@ -1,0 +1,84 @@
+name: 'Coverage CI'
+description: 'Coverage CI'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Dependencies Dir
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
+
+    - name: Install TBB
+      uses: ./source/.github/actions/tbb-install-dep
+
+    - name: Install Raytracing Dependencies
+      uses: ./source/.github/actions/ospray-sb-install-dep
+
+    - name: Install VTK dependency
+      uses: ./source/.github/actions/vtk-install-dep
+      with:
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+        raytracing_label: raytracing
+
+    - name: Install F3D dependencies
+      uses: ./source/.github/actions/f3d-dependencies
+
+    # coverage build is done in source as it seems to be required for codecov
+    - name: Configure
+      shell: bash
+      working-directory: ${{github.workspace}}/source
+      run: >
+        cmake ./
+        -Werror=dev
+        -Werror=deprecated
+        --warn-uninitialized
+        -DBUILD_TESTING=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_COVERAGE=ON
+        -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_MODULE_EXR=ON
+        -DF3D_MODULE_RAYTRACING=ON
+        -DF3D_PLUGINS_STATIC_BUILD=OFF
+        -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
+        -DF3D_PLUGIN_BUILD_OCCT=ON
+        -DF3D_STRICT_BUILD=ON
+        -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
+
+    - name: Build
+      shell: bash
+      working-directory: ${{github.workspace}}/source
+      run: cmake --build . --parallel 2 --config Release
+
+    - name: Run Xvfb
+      shell: bash
+      run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
+
+    - name: Test
+      shell: bash
+      working-directory: ${{github.workspace}}/source
+      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+
+    - name: Generate XML Coverage
+      shell: bash
+      working-directory: ${{github.workspace}}/source
+      run: |
+        lcov --base-directory . --directory . -c -o coverage.info --gcov-tool /usr/bin/gcov
+        lcov --remove coverage.info "*/dependencies/*" -o coverage.info
+        lcov --remove coverage.info "*/cxxopts.hpp" -o coverage.info
+        lcov --remove coverage.info "*/json.hpp" -o coverage.info
+        lcov --remove coverage.info "*Test*" -o coverage.info
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ${{github.workspace}}/source/coverage.info
+        version: "v0.1.15" # works better according to https://github.com/codecov/codecov-action/issues/598

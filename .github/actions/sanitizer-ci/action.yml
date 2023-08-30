@@ -1,0 +1,80 @@
+name: 'Sanitzier CI'
+description: 'Sanitizer CI'
+inputs:
+  sanitizer_type:
+    description: 'Type of sanitizer'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Dependencies Dir
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
+
+    - name: Install TBB
+      uses: ./source/.github/actions/tbb-install-dep
+
+    - name: Install VTK dependency
+      uses: ./source/.github/actions/vtk-install-dep
+      with:
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+
+    - name: Install F3D dependencies
+      uses: ./source/.github/actions/f3d-dependencies
+
+    - name: Setup Build Directory
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: mkdir build
+
+    - name: Configure
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: >
+        cmake ../source
+        -Werror=dev
+        -Werror=deprecated
+        --warn-uninitialized
+        -DBUILD_TESTING=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_MODULE_EXTERNAL_RENDERING=ON
+        -DF3D_MODULE_EXR=ON
+        -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
+        -DF3D_PLUGIN_BUILD_OCCT=ON
+        -DF3D_SANITIZER=${{inputs.sanitizer_type}}
+        -DF3D_STRICT_BUILD=ON
+        -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
+
+    - name: Build
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --parallel 2
+
+    - name: Run Xvfb
+      shell: bash
+      run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
+
+    - name: Test
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: |
+        export LSAN_OPTIONS=suppressions=$(pwd)/../source/.lsan.supp:use_tls=0
+        export TSAN_OPTIONS=suppressions=$(pwd)/../source/.tsan.supp
+        ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+
+    - name: Upload Tests Artifact
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./build/Testing/Temporary
+        name: f3d-tests-artifact-sanitizer-${{matrix.sanitizer_type}}

@@ -1,46 +1,22 @@
-name: android
+name: 'Android CI'
+description: 'Android CI'
+inputs:
+  arch:
+    description: 'Android arch to build'
+    required: true
 
-on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-  push:
-    branches:
-      - master
-
-concurrency:
-  group: '${{ github.workflow }}-${{ github.ref_name }}'
-  cancel-in-progress: true
-
-jobs:
-  ci:
-    if: github.event.pull_request.draft == false
-
-    strategy:
-      matrix:
-        arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
-
-    runs-on: ubuntu-latest
-    container: ghcr.io/f3d-app/f3d-ci
-
-    env:
-      NDK_VERSION: r21e
-      API_LEVEL: 27
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+runs:
+  using: "composite"
+  steps:
 
     - name: Dependencies Dir
+      shell: bash
       working-directory: ${{github.workspace}}
       run: mkdir dependencies
 
     - name: Install NDK
-      working-directory: ${{github.workspace}}
       shell: bash
+      working-directory: ${{github.workspace}}
       run: |
         apt-get install unzip
         wget https://dl.google.com/android/repository/android-ndk-${{env.NDK_VERSION}}-linux-x86_64.zip
@@ -50,20 +26,22 @@ jobs:
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-android-install-dep
       with:
-        arch: ${{matrix.arch}}
+        arch: ${{inputs.arch}}
         api_level: ${{env.API_LEVEL}}
 
     - name: Setup Directories
+      shell: bash
       working-directory: ${{github.workspace}}
       run: |
          mkdir build
          mkdir install
 
     - name: Configure
+      shell: bash
       working-directory: ${{github.workspace}}/build
       run: >
         cmake ../source
-        -DCMAKE_ANDROID_ARCH_ABI=${{matrix.arch}}
+        -DCMAKE_ANDROID_ARCH_ABI=${{inputs.arch}}
         -DCMAKE_ANDROID_NDK=$(pwd)/../android-ndk
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_FIND_ROOT_PATH=$(pwd)/../dependencies/vtk_build/CMakeExternals/Install/vtk-android/
@@ -75,5 +53,6 @@ jobs:
         -DF3D_STRICT_BUILD=ON
 
     - name: Build
+      shell: bash
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --target install
