@@ -209,6 +209,7 @@ jobs:
       DISPLAY: :0
       CC: clang
       CXX: clang++
+      VTK_SMP_BACKEND_IN_USE: Sequential
 
     steps:
 
