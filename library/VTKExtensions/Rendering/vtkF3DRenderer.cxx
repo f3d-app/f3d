@@ -137,19 +137,19 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->EnvMapPrefiltered = vtkF3DCachedSpecularTexture::New();
 
   // Init actors
-  this->MetaDataActor->GetTextProperty()->SetFontSize(15);
-  this->MetaDataActor->GetTextProperty()->SetOpacity(0.5);
-  this->MetaDataActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
-  this->MetaDataActor->GetTextProperty()->SetBackgroundOpacity(0.5);
+  vtkNew<vtkTextProperty> textProp;
+  textProp->SetFontSize(14);
+  textProp->SetOpacity(1.0);
+  textProp->SetBackgroundColor(0, 0, 0);
+  textProp->SetBackgroundOpacity(0.8);
+
+  this->MetaDataActor->SetTextProperty(textProp);
 
   this->TimerActor->GetTextProperty()->SetFontSize(15);
   this->TimerActor->SetPosition(10, 10);
   this->TimerActor->SetInput("0 fps");
 
-  this->CheatSheetActor->GetTextProperty()->SetFontSize(14);
-  this->CheatSheetActor->GetTextProperty()->SetOpacity(1.0);
-  this->CheatSheetActor->GetTextProperty()->SetBackgroundColor(0, 0, 0);
-  this->CheatSheetActor->GetTextProperty()->SetBackgroundOpacity(0.8);
+  this->CheatSheetActor->SetTextProperty(textProp);
 
   this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
   this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
