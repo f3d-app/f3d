@@ -293,6 +293,7 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
     // The colors should be premultiplied by the alpha value and all colors
     // must be blended in linear color space
     // see https://en.wikipedia.org/wiki/Alpha_compositing
+    // https://github.com/f3d-app/f3d/issues/968
 
     // alpha blending (main)
     ssImpl << "  vec3 resultColor = mix(bgSample.rgb, mainSample.rgb, mainSample.a);\n";
