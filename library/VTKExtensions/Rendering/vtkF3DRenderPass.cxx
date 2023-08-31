@@ -289,16 +289,17 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
     ssImpl << "  vec4 bgSample = texture(texBackground, texCoord);\n";
     ssImpl << "  vec4 ovlSample = texture(texOverlay, texCoord);\n";
 
-    // premultiply sample colors
-    ssImpl << "  vec3 ovlColor = ovlSample.rgb * ovlSample.a;\n";
-    ssImpl << "  vec3 mainColor = mainSample.rgb * mainSample.a;\n";
+    // TODO: the apha blending done here is incorrect.
+    // The colors should be premultiplied by the alpha value and all colors
+    // must be blended in linear color space
+    // see https://en.wikipedia.org/wiki/Alpha_compositing
 
     // alpha blending (main)
-    ssImpl << "  vec3 resultColor = mix(bgSample.rgb, mainColor, mainSample.a);\n";
-    ssImpl << "  float resultAlpha = mix(bgSample.a, mainSample.a, mainSample.a);\n";
+    ssImpl << "  vec3 resultColor = mix(bgSample.rgb, mainSample.rgb, mainSample.a);\n";
+    ssImpl << "  float resultAlpha = mainSample.a;\n";
 
     // alpha blending (overlay)
-    ssImpl << "  resultColor = mix(resultColor, ovlColor, ovlSample.a);\n";
+    ssImpl << "  resultColor = mix(resultColor, ovlSample.rgb, ovlSample.a);\n";
     ssImpl << "  resultAlpha = mix(resultAlpha, ovlSample.a, ovlSample.a);\n";
 
     if (this->ForceOpaqueBackground)
