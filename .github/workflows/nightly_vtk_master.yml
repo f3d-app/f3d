@@ -1,0 +1,224 @@
+name: Nightly VTK master
+
+on:
+  schedule:
+    - cron:  '0 0 * * *'
+
+jobs:
+
+#----------------------------------------------------------------------------
+# Check nightly: Checkout VTK and check if the last merged commit is less than 24 hours old
+#----------------------------------------------------------------------------
+  check_nightly:
+    runs-on: ubuntu-latest
+    name: Check nightly
+    outputs:
+      should_run: ${{ steps.should_run.outputs.should_run }}
+    steps:
+
+    - name: Checkout VTK
+      uses: actions/checkout@v3
+      with:
+        repository: Kitware/VTK
+        submodules: false
+        fetch-depth: 0
+        ref: master
+
+    - name: Check latest commit age is less than 24 hours
+      id: should_run
+      run: test -n "$(git rev-list --no-merges HEAD --not $(git rev-list -n1 --before=24hours --first-parent HEAD))" && echo "should_run=true" >> $GITHUB_OUTPUT || echo "should_run=false" >> $GITHUB_OUTPUT
+
+#----------------------------------------------------------------------------
+# Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
+#----------------------------------------------------------------------------
+
+  cache_lfs:
+    needs: check_nightly
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+    runs-on: ubuntu-latest
+    name: Update LFS data cache
+    outputs:
+      lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Set LFS env var
+      working-directory: ${{github.workspace}}/source
+      id: lfs_sha_recover
+      shell: bash
+      run: echo "lfs_sha=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/ .github/baselines/)" >> $GITHUB_OUTPUT
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
+        workflow_label: 'producer'
+
+#----------------------------------------------------------------------------
+# MAIN CI: Build and test with a cross-platform build matrix
+#----------------------------------------------------------------------------
+  ci:
+    needs: [cache_lfs, check_nightly]
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu, windows, macos]
+        vtk_version: [master]
+        build_type: [standard]
+        include:
+          - raytracing_label: raytracing
+          - egl_label: no-egl
+          - os: macos
+            raytracing_label: no-raytracing #598
+          - build_type: headless
+            os: ubuntu
+            vtk_version: master
+            raytracing_label: raytracing
+            exclude_deprecated_label: no-exclude-deprecated
+            bundle_label: no-bundle
+            egl_label: egl
+
+    runs-on: ${{matrix.os}}-latest
+    container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+
+    env:
+      DISPLAY: :0
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
+
+    - name: Generic CI
+      uses: ./source/.github/actions/generic-ci
+      with:
+        build_type: ${{matrix.build_type}}
+        vtk_version: ${{matrix.vtk_version}}
+        raytracing_label: ${{matrix.raytracing_label}}
+        exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
+        bundle_label: ${{matrix.bundle_label}}
+        egl_label: ${{matrix.egl_label}}
+
+#----------------------------------------------------------------------------
+# Sanitizer: Build and test on linux with last VTK with sanitizer options
+#----------------------------------------------------------------------------
+# "leak" is run by default with "address" so we do not need to run it in CI
+# "memory" returns false positives in VTK:
+# https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
+  sanitizer:
+    needs: [cache_lfs, check_nightly]
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer_type: [address, thread, undefined]
+
+    runs-on: ubuntu-latest
+    container: ghcr.io/f3d-app/f3d-ci
+
+    env:
+      DISPLAY: :0
+      CC: clang
+      CXX: clang++
+      VTK_SMP_BACKEND_IN_USE: Sequential
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
+
+    - name: Sanitizer CI
+      uses: ./source/.github/actions/sanitizer-ci
+      with:
+        vtk_version: master
+        sanitizer_type: ${{matrix.sanitizer_type}}
+
+#----------------------------------------------------------------------------
+# android: Check build of F3D for android
+#----------------------------------------------------------------------------
+  android:
+    needs: check_nightly
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
+
+    runs-on: ubuntu-latest
+    container: ghcr.io/f3d-app/f3d-ci
+
+    env:
+      NDK_VERSION: r21e
+      API_LEVEL: 27
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Android CI
+      uses: ./source/.github/actions/android-ci
+      with:
+        vtk_version: master
+
+#----------------------------------------------------------------------------
+# webassembly: Check build of F3D for webassembly
+#----------------------------------------------------------------------------
+  webassembly:
+    needs: check_nightly
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
+
+    runs-on: ubuntu-latest
+    container: dockcross/web-wasm:20230116-670f7f7
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: 'false'
+
+    - name: Web Assembly CI
+      uses: ./source/.github/actions/webassembly-ci
+      with:
+        vtk_version: master

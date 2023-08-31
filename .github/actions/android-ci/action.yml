@@ -4,6 +4,10 @@ inputs:
   arch:
     description: 'Android arch to build'
     required: true
+  vtk_version:
+    description: 'VTK version'
+    required: false
+    default: 'commit'
 
 runs:
   using: "composite"
@@ -28,6 +32,8 @@ runs:
       with:
         arch: ${{inputs.arch}}
         api_level: ${{env.API_LEVEL}}
+        vtk_version: ${{inputs.vtk_version}}
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
 
     - name: Setup Directories
       shell: bash

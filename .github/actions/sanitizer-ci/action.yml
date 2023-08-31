@@ -4,6 +4,10 @@ inputs:
   sanitizer_type:
     description: 'Type of sanitizer'
     required: true
+  vtk_version:
+    description: 'VTK version'
+    required: false
+    default: 'commit'
 
 runs:
   using: "composite"
@@ -23,6 +27,7 @@ runs:
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
+        vtk_version: ${{inputs.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
 
     - name: Install F3D dependencies
