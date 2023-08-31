@@ -109,22 +109,6 @@ function(f3d_test)
 
 endfunction()
 
-add_custom_target(f3d_config_target
-  COMMENT "Copying config files to binary directory"
-  VERBATIM
-  )
-
-add_dependencies(f3d f3d_config_target)
-
-function(f3d_copy_config)
-  cmake_parse_arguments(F3D_COPY_CONFIG "" "INPUT;DESTINATION" "" ${ARGN})
-
-  add_custom_command(TARGET f3d_config_target POST_BUILD
-                     COMMAND ${CMAKE_COMMAND} -E copy
-                     "${F3D_COPY_CONFIG_INPUT}"
-                     "${F3D_COPY_CONFIG_DESTINATION}")
-endfunction()
-
 f3d_test(NAME TestPLY DATA suzanne.ply DEFAULT_LIGHTS)
 f3d_test(NAME TestOBJ DATA suzanne.obj ARGS --geometry-only DEFAULT_LIGHTS)
 f3d_test(NAME TestSTL DATA suzanne.stl DEFAULT_LIGHTS)
@@ -226,13 +210,13 @@ f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins "${_dirname}/${CMAK
 
 if(NOT F3D_MACOS_BUNDLE)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
-  f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/testing/configs/complex.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/complex_build.json")
+  file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/complex_build.json" INPUT "${F3D_SOURCE_DIR}/testing/configs/complex.json")
   f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json DEFAULT_LIGHTS)
   f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build DEFAULT_LIGHTS)
   f3d_test(NAME TestConfigFileUpperCase DATA suzanne_upper.STL CONFIG complex_build DEFAULT_LIGHTS)
 
-  f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/resources/configs/config.d/10_global.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_global.json")
-  f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/plugins/native/configs/config.d/10_native.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_native.json")
+  file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_global.json" INPUT "${F3D_SOURCE_DIR}/resources/configs/config.d/10_global.json")
+  file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_native.json" INPUT "${F3D_SOURCE_DIR}/plugins/native/configs/config.d/10_native.json")
 
   f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
   f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
@@ -243,8 +227,8 @@ if(NOT F3D_MACOS_BUNDLE)
 
   # no-background test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8501
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
-    f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/resources/configs/thumbnail.d/10_global.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_global.json")
-    f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/plugins/native/configs/thumbnail.d/10_native.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_native.json")
+    file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_global.json" INPUT "${F3D_SOURCE_DIR}/resources/configs/thumbnail.d/10_global.json")
+    file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_native.json" INPUT "${F3D_SOURCE_DIR}/plugins/native/configs/thumbnail.d/10_native.json")
     f3d_test(NAME TestThumbnailConfigFileVTU DATA dragon.vtu CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
     f3d_test(NAME TestThumbnailConfigFileVTI DATA vase_4comp.vti CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
     f3d_test(NAME TestThumbnailConfigFileSTL DATA suzanne.stl CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
@@ -427,11 +411,11 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestABC DATA suzanne.abc ARGS --load-plugins=alembic DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 
   if(NOT F3D_MACOS_BUNDLE)
-    f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/10_alembic.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_alembic.json")
+    file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_alembic.json" INPUT "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/10_alembic.json")
     f3d_test(NAME TestDefaultConfigFileAlembic DATA suzanne.abc CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
-      f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/plugins/alembic/configs/thumbnail.d/10_alembic.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_alembic.json")
+      file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_alembic.json" INPUT "${F3D_SOURCE_DIR}/plugins/alembic/configs/thumbnail.d/10_alembic.json")
       f3d_test(NAME TestThumbnailConfigFileAlembic DATA suzanne.abc CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
     endif()
   endif()
@@ -471,14 +455,14 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   endif()
 
   if(NOT F3D_MACOS_BUNDLE)
-    f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/plugins/assimp/configs/config.d/10_assimp.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_assimp.json")
+    file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_assimp.json" INPUT "${F3D_SOURCE_DIR}/plugins/assimp/configs/config.d/10_assimp.json")
     f3d_test(NAME TestDefaultConfigFileAssimpFBX DATA phong_cube.fbx CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
     f3d_test(NAME TestDefaultConfigFileAssimpDXF DATA PinkEggFromLW.dxf ARGS -p CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
     f3d_test(NAME TestDefaultConfigFileAssimpOFF DATA teapot.off CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
     f3d_test(NAME TestDefaultConfigFileAssimpDAE DATA duck.dae CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
-      f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/plugins/assimp/configs/thumbnail.d/10_assimp.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_assimp.json")
+      file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_assimp.json" INPUT "${F3D_SOURCE_DIR}/plugins/assimp/configs/thumbnail.d/10_assimp.json")
       f3d_test(NAME TestThumbnailConfigFileAssimpFBX DATA phong_cube.fbx CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
       f3d_test(NAME TestThumbnailConfigFileAssimpDXF DATA PinkEggFromLW.dxf ARGS -p CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
       f3d_test(NAME TestThumbnailConfigFileAssimpOFF DATA teapot.off CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
@@ -493,11 +477,11 @@ if(F3D_PLUGIN_BUILD_DRACO)
   f3d_test(NAME TestDRACOColoring DATA suzanne.drc DEFAULT_LIGHTS ARGS --scalars --comp=0 --load-plugins=draco)
 
   if(NOT F3D_MACOS_BUNDLE)
-    f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/plugins/draco/configs/config.d/10_draco.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_draco.json")
+    file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_draco.json" INPUT "${F3D_SOURCE_DIR}/plugins/draco/configs/config.d/10_draco.json")
     f3d_test(NAME TestDefaultConfigFileDraco DATA suzanne.drc CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
-      f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/plugins/draco/configs/thumbnail.d/10_draco.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_draco.json")
+      file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_draco.json" INPUT "${F3D_SOURCE_DIR}/plugins/draco/configs/thumbnail.d/10_draco.json")
       f3d_test(NAME TestThumbnailConfigFileDraco DATA suzanne.drc CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
     endif()
   endif()
@@ -525,11 +509,11 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   f3d_test(NAME TestNoRenderAnimation DATA small.ex2 ARGS  --load-plugins=exodus --animation-time=0.003 REGEXP "-521950, 6.57485" NO_RENDER)
 
   if(NOT F3D_MACOS_BUNDLE)
-    f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/plugins/exodus/configs/config.d/10_exodus.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_exodus.json")
+    file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_exodus.json" INPUT "${F3D_SOURCE_DIR}/plugins/exodus/configs/config.d/10_exodus.json")
     f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
-      f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/plugins/exodus/configs/thumbnail.d/10_exodus.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_exodus.json")
+      file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_exodus.json" INPUT "${F3D_SOURCE_DIR}/plugins/exodus/configs/thumbnail.d/10_exodus.json")
       f3d_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
     endif()
   endif()
@@ -554,11 +538,11 @@ if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestInvalidBREP DATA invalid.brep ARGS --verbose --load-plugins=occt NO_BASELINE)
 
   if(F3D_PLUGIN_OCCT_COLORING_SUPPORT AND NOT F3D_MACOS_BUNDLE)
-    f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/10_occt.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_occt.json")
+    file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/config_build.d/10_occt.json" INPUT "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/10_occt.json")
     f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
-      f3d_copy_config(INPUT "${F3D_SOURCE_DIR}/plugins/occt/configs/thumbnail.d/10_occt.json" DESTINATION "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_occt.json")
+      file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/$<CONFIG>/share/f3d/configs/thumbnail_build.d/10_occt.json" INPUT "${F3D_SOURCE_DIR}/plugins/occt/configs/thumbnail.d/10_occt.json")
       f3d_test(NAME TestThumbnailConfigFileOCCT DATA f3d.stp CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
     endif()
   endif()
