@@ -19,16 +19,37 @@ else()
   target_link_libraries(pyf3d PRIVATE libf3d)
 endif()
 
+set(f3d_python_package_name "f3d")
+set(f3d_python_package_suffix "python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages")
+set(f3d_python_lib_output "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${f3d_python_package_suffix}/${f3d_python_package_name}")
+set(f3d_module_dir "${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>/f3d")
+
 set_target_properties(pyf3d PROPERTIES
   CXX_STANDARD 14
   CXX_VISIBILITY_PRESET hidden
-  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>/f3d"
+  LIBRARY_OUTPUT_DIRECTORY "${f3d_module_dir}"
   )
 
 if(APPLE)
   set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
 elseif(UNIX)
   set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
+endif()
+
+if(SKBUILD)
+  if(APPLE)
+    set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
+  elseif(UNIX)
+    set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
+  endif()
+  set(f3d_python_install_path ".")
+else()
+  if(APPLE)
+    set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/../..")
+  elseif(UNIX)
+    set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/../..")
+  endif()
+  set(f3d_python_install_path "${CMAKE_INSTALL_LIBDIR}/${f3d_python_package_suffix}/${f3d_python_package_name}")
 endif()
 
 # generate Windows fixup for build
@@ -42,7 +63,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
   "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build" @ONLY)
 
 file(GENERATE
-  OUTPUT "${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>/f3d/__init__.py"
+  OUTPUT "${f3d_module_dir}/__init__.py"
   INPUT "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build"
 )
 
@@ -68,6 +89,6 @@ endif()
 
 # installing
 install(TARGETS pyf3d
-  LIBRARY DESTINATION "." COMPONENT python)
+  LIBRARY DESTINATION ${f3d_python_install_path} COMPONENT python)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-install" RENAME "__init__.py"
-  DESTINATION "." COMPONENT python)
+  DESTINATION ${f3d_python_install_path} COMPONENT python)
