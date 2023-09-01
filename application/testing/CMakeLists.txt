@@ -391,6 +391,14 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply THRESHOLD 120 ARGS -rd --samples=1)
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Raytracing module: ON")
   f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply THRESHOLD 120 ARGS --samples=1 INTERACTION) #RD
+  f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsb --samples=1)
+
+  if(NOT F3D_MACOS_BUNDLE)
+  f3d_test(NAME TestRaytracingDefaultConfigFile DATA dragon.vtu THRESHOLD 150 CONFIG config_build ARGS -r --samples=1)
+    if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
+      f3d_test(NAME TestRaytracingThumbnailConfigFile DATA dragon.vtu THRESHOLD 100 CONFIG thumbnail_build ARGS -r --samples=1)
+    endif()
+  endif()
 
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
     f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -r --samples=1 --no-background)

@@ -78,7 +78,8 @@ void vtkF3DRendererWithColoring::SetImporter(vtkF3DGenericImporter* importer)
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::Initialize(const std::string& up)
 {
-  this->Superclass::Initialize(up);
+  this->RemoveAllViewProps();
+  this->RemoveAllLights();
 
   this->ArrayIndexForColoring = -1;
   this->ComponentForColoring = -1;
@@ -94,6 +95,8 @@ void vtkF3DRendererWithColoring::Initialize(const std::string& up)
   this->CheatSheetConfigured = false;
   this->ColoringActorsPropertiesConfigured = false;
   this->ColoringConfigured = false;
+
+  this->Superclass::Initialize(up);
 }
 
 //----------------------------------------------------------------------------
