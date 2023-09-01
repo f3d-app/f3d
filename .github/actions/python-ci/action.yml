@@ -62,6 +62,11 @@ runs:
       working-directory: ${{github.workspace}}/source
       run: python -m pip -v wheel .
 
+    - name: Install wheel
+      shell: bash
+      working-directory: ${{github.workspace}}/source
+      run: python -m pip -v install *.whl
+
     - name: Test wheel
       shell: bash
       working-directory: ${{github.workspace}}/source
