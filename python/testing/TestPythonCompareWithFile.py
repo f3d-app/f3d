@@ -3,8 +3,8 @@ import f3d
 
 dataset = sys.argv[1] + "/testing/data/cow.vtp"
 reference = sys.argv[1] + "/testing/baselines/TestPythonCompareWithFile.png"
-output = sys.argv[2] + "/Testing/Temporary/TestPythonCompareWithFile.png"
-outputDiff = sys.argv[2] + "/Testing/Temporary/TestPythonCompareWithFile.diff.png"
+output = sys.argv[2] + "/../Testing/Temporary/TestPythonCompareWithFile.png"
+outputDiff = sys.argv[2] + "/../Testing/Temporary/TestPythonCompareWithFile.diff.png"
 
 f3d.engine.autoloadPlugins()
 
