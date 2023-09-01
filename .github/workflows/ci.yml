@@ -108,6 +108,21 @@ jobs:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
         workflow_label: 'consumer'
 
+    # todo: needed?
+    - name: Remove system's Python
+      if: runner.os == 'Linux'
+      run: apt remove -y python3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pytest
+
     - name: Generic CI
       uses: ./source/.github/actions/generic-ci
       with:
