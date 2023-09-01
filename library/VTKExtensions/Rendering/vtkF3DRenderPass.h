@@ -64,6 +64,7 @@ protected:
   double CircleOfConfusionRadius = 20.0;
 
   vtkSmartPointer<vtkFramebufferPass> BackgroundPass;
+  vtkSmartPointer<vtkFramebufferPass> OverlayPass;
   vtkSmartPointer<vtkFramebufferPass> MainPass;
 
   double Bounds[6] = {};
@@ -71,6 +72,7 @@ protected:
   vtkMTimeType InitializeTime = 0;
 
   std::vector<vtkProp*> BackgroundProps;
+  std::vector<vtkProp*> OverlayProps;
   std::vector<vtkProp*> MainProps;
 
   std::shared_ptr<vtkOpenGLQuadHelper> BlendQuadHelper;
