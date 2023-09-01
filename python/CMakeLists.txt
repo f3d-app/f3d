@@ -42,7 +42,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
   "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build" @ONLY)
 
 file(GENERATE
-  OUTPUT "${CMAKE_BINARY_DIR}/f3d.py"
+  OUTPUT "${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>/f3d.py"
   INPUT "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build"
 )
 

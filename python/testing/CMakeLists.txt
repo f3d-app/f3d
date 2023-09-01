@@ -37,7 +37,7 @@ foreach(test ${pyf3dTests_list})
   string(REPLACE "test_" "" TName ${TName})
   add_test(NAME pyf3d::${TName} COMMAND ${Python_EXECUTABLE} -m pytest ${CMAKE_CURRENT_LIST_DIR}/${test} -rA)
   set_tests_properties(pyf3d::${TName} PROPERTIES
-    ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}"
+    ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>"
     WORKING_DIRECTORY "${F3D_SOURCE_DIR}"
     FAIL_REGULAR_EXPRESSION "FAILURES")
   if (NOT F3D_TESTING_ENABLE_RENDERING_TESTS AND NOT ${test} IN_LIST pyf3dTestsNoRender_list)
