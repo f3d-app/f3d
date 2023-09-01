@@ -5,11 +5,6 @@ list(APPEND pyf3dTests_list
      test_utils.py
     )
 
-if(NOT F3D_EXCLUDE_DEPRECATED)
-    list(APPEND pyf3dTests_list
-         test_deprecated.py)
-endif()
-
 if(NOT F3D_MACOS_BUNDLE)
   list(APPEND pyf3dTests_list
        test_plugins.py
@@ -18,6 +13,13 @@ endif()
 
 # Test image comparison only with VTK > 9.0.1
 if(VTK_VERSION VERSION_GREATER 9.0.1)
+
+  # A deprecated test use image comparison
+  if(NOT F3D_EXCLUDE_DEPRECATED)
+      list(APPEND pyf3dTests_list
+          test_deprecated.py)
+  endif()
+
   list(APPEND pyf3dTests_list
        test_image_compare.py
       )
