@@ -35,7 +35,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-webassembly-${{env.VTK_SHA}}-2
+        key: vtk-webassembly-${{env.VTK_SHA_OR_TAG}}-2
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -50,7 +50,7 @@ runs:
         repository: Kitware/VTK
         submodules: 'true'
         path: './dependencies/vtk'
-        ref: ${{env.VTK_SHA}}
+        ref: ${{env.VTK_SHA_OR_TAG}}
 
     - name: Configure VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
