@@ -291,7 +291,7 @@ protected:
   bool UseDefaultHDRI = false;
   std::string HDRIHash;
   bool HasValidHDRIHash = false;
-  vtkNew<vtkTexture> HDRITexture;
+  vtkSmartPointer<vtkTexture> HDRITexture;
   bool HasValidHDRITexture = false;
   bool HasValidHDRILUT = false;
   bool HasValidHDRISH = false;
