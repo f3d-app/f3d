@@ -260,14 +260,14 @@ void vtkF3DPolyDataMapper::ReplaceShaderTCoord(
   this->Superclass::ReplaceShaderTCoord(shaders, ren, actor);
 }
 
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20230902)
+// Integrated in VTK in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10456
 //------------------------------------------------------------------------------
 bool vtkF3DPolyDataMapper::GetNeedToRebuildShaders(
   vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* actor)
 {
   bool ret = this->Superclass::GetNeedToRebuildShaders(cellBO, ren, actor);
 
-  // TODO: Put this logic in VTK
-  // https://github.com/f3d-app/f3d/issues/935
   vtkOpenGLRenderer* oren = static_cast<vtkOpenGLRenderer*>(ren);
   vtkTexture* envTexture = oren->GetEnvironmentTexture();
   if (this->EnvTexture != envTexture ||
@@ -283,3 +283,4 @@ bool vtkF3DPolyDataMapper::GetNeedToRebuildShaders(
 
   return ret;
 }
+#endif
