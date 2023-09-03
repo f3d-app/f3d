@@ -176,11 +176,17 @@ if(F3D_STRICT_BUILD AND MSVC)
   target_compile_definitions(libf3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
 endif()
 
+if(APPLE)
+  set_target_properties(libf3d PROPERTIES INSTALL_RPATH "@loader_path")
+elseif(UNIX)
+  set_target_properties(libf3d PROPERTIES INSTALL_RPATH "$ORIGIN")
+endif()
+
 if (APPLE OR UNIX)
   # Make sure rpath is correctly set for libf3d
   get_target_property(target_type VTK::CommonCore TYPE)
   if (target_type STREQUAL SHARED_LIBRARY)
-    set_target_properties(libf3d PROPERTIES INSTALL_RPATH "$<TARGET_FILE_DIR:VTK::CommonCore>")
+    set_target_properties(libf3d PROPERTIES BUILD_RPATH "$<TARGET_FILE_DIR:VTK::CommonCore>")
   endif ()
 endif ()
 

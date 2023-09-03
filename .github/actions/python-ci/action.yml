@@ -67,10 +67,10 @@ runs:
       working-directory: ${{github.workspace}}/source
       run: python -m pip -v install *.whl
 
-    # - name: Test wheel
-    #   shell: bash
-    #   working-directory: ${{github.workspace}}/source
-    #   run: python -m pytest
+    - name: Test wheel
+      shell: bash
+      working-directory: ${{github.workspace}}/source
+      run: python -m pytest
 
     - name: Upload Tests Artifact
       uses: actions/upload-artifact@v3
