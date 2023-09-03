@@ -42,7 +42,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_build
-        key: vtk-android-${{env.VTK_SHA}}-${{inputs.api_level}}-${{inputs.arch}}-0
+        key: vtk-android-${{env.VTK_SHA_OR_TAG}}-${{inputs.api_level}}-${{inputs.arch}}-0
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -57,7 +57,7 @@ runs:
         repository: Kitware/VTK
         submodules: true
         path: './dependencies/vtk'
-        ref: ${{env.VTK_SHA}}
+        ref: ${{env.VTK_SHA_OR_TAG}}
 
     - name: Configure VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
