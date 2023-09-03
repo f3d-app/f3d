@@ -62,6 +62,12 @@ runs:
       working-directory: ${{github.workspace}}/source
       run: python -m pip -v wheel .
 
+    - name: Upload wheel
+      uses: actions/upload-artifact@v3
+      with:
+        path: ./source/*.whl
+        name: ${{runner.os}}-wheel
+
     - name: Install wheel
       shell: bash
       working-directory: ${{github.workspace}}/source
@@ -72,8 +78,3 @@ runs:
       working-directory: ${{github.workspace}}/source
       run: python -m pytest
 
-    - name: Upload Tests Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        path: ./source/*.whl
-        name: ${{runner.os}}-wheel
