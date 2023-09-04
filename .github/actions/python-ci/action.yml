@@ -84,6 +84,11 @@ runs:
       with:
         path: ${{github.workspace}}\source
 
+    - name: Install Mesa Windows
+      if: runner.os == 'Windows'
+      shell: bash
+      run: ls ${{github.workspace}}\source
+
     - name: Test wheel
       shell: bash
       working-directory: ${{github.workspace}}/source

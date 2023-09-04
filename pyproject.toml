@@ -58,3 +58,4 @@ F3D_ENABLE_SOVERSION = "OFF"
 [tool.pytest.ini_options]
 pythonpath = ["python/testing"]
 python_files = "python/testing/*.py"
+filterwarnings = "ignore::DeprecationWarning"
