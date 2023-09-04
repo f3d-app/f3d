@@ -108,7 +108,6 @@ jobs:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
         workflow_label: 'consumer'
 
-    # todo: needed?
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -161,11 +160,6 @@ jobs:
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
         workflow_label: 'consumer'
-
-    # todo: needed?
-    - name: Remove system's Python
-      if: runner.os == 'Linux'
-      run: apt remove -y python3
 
     - name: Set up Python
       uses: actions/setup-python@v4

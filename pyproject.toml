@@ -56,7 +56,5 @@ F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION = "OFF"
 F3D_ENABLE_SOVERSION = "OFF"
 
 [tool.pytest.ini_options]
-pythonpath = ["python/testing"]
-python_files = "python/testing/*.py"
 addopts = "-rA"
 filterwarnings = "ignore::DeprecationWarning"
