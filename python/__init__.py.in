@@ -72,8 +72,9 @@ def add_deprecation_warnings():
         window,
     ):
         for name, member in f3d_class.__dict__.items():
-            if callable(member):
-                if m := re.search(r"DEPRECATED(:\s*.+)?", member.__doc__ or ""):
+            if callable(member) and member.__doc__:
+                m = re.search(r"DEPRECATED(:\s*.+)?", member.__doc__)
+                if m:
                     reason = m.group(1) or ""
                     msg = f"{f3d_class.__qualname__}.{name} is deprecated{reason}"
                     setattr(f3d_class, name, deprecated_decorator(member, msg))

@@ -35,7 +35,7 @@ list(APPEND pyf3dTestsNoRender_list
 foreach(test ${pyf3dTests_list})
   get_filename_component (TName TestPython_${test} NAME_WE)
   string(REPLACE "test_" "" TName ${TName})
-  add_test(NAME pyf3d::${TName} COMMAND ${Python_EXECUTABLE} -m pytest ${CMAKE_CURRENT_LIST_DIR}/${test} -rA)
+  add_test(NAME pyf3d::${TName} COMMAND ${Python_EXECUTABLE} -m pytest ${CMAKE_CURRENT_LIST_DIR}/${test})
   set_tests_properties(pyf3d::${TName} PROPERTIES
     ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>"
     WORKING_DIRECTORY "${F3D_SOURCE_DIR}"
