@@ -80,7 +80,6 @@ runs:
 
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
-      shell: powershell
       uses: ./source/.github/actions/mesa-install-bin
       with:
         path: ${{ env.Python_ROOT_DIR }}
