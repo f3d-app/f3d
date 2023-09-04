@@ -80,14 +80,10 @@ runs:
 
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
+      shell: powershell
       uses: ./source/.github/actions/mesa-install-bin
       with:
-        path: ${{github.workspace}}\source
-
-    - name: Install Mesa Windows
-      if: runner.os == 'Windows'
-      shell: bash
-      run: ls ${{github.workspace}}\source
+        path: ${{ env.Python_ROOT_DIR }}
 
     - name: Test wheel
       shell: bash
