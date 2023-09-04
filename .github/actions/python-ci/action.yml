@@ -73,8 +73,18 @@ runs:
       working-directory: ${{github.workspace}}/source
       run: python -m pip -v install *.whl
 
+    - name: Run Xvfb ubuntu
+      if: runner.os == 'Linux'
+      shell: bash
+      run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
+
+    - name: Install Mesa Windows
+      if: runner.os == 'Windows'
+      uses: ./source/.github/actions/mesa-install-bin
+      with:
+        path: ${{github.workspace}}\source
+
     - name: Test wheel
       shell: bash
       working-directory: ${{github.workspace}}/source
       run: python -m pytest
-
