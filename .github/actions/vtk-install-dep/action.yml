@@ -111,7 +111,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_FiltersGeneral=YES
         -DVTK_MODULE_ENABLE_VTK_FiltersGeometry=YES
         -DVTK_MODULE_ENABLE_VTK_IOCityGML=YES
-        -DVTK_MODULE_ENABLE_VTK_IOExodus=YES
+        -DVTK_MODULE_ENABLE_VTK_IOExodus=${{ inputs.cpu == 'x86_64' && 'YES' || 'NO' }}
         -DVTK_MODULE_ENABLE_VTK_IOGeometry=YES
         -DVTK_MODULE_ENABLE_VTK_IOImage=YES
         -DVTK_MODULE_ENABLE_VTK_IOImport=YES
