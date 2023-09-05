@@ -22,6 +22,7 @@ if sys.version_info >= (3, 8) and sys.platform == "win32":
 
 from .pyf3d import *
 
+# Automatically load plugins for the user
 engine.autoload_plugins()
 
 __version__ = "@F3D_VERSION@"
