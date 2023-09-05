@@ -16,10 +16,10 @@ eng.options.update({
   "model.scivis.array-name": "Normals",
   "model.scivis.component": 0,
   "ui.bar": True,
-  "scene.grid": True,
+  "render.grid.enable": True,
   })
 
-eng.loader.loadGeometry("f3d/testing/data/dragon.vtu")
+eng.loader.load_geometry("f3d/testing/data/dragon.vtu")
 eng.interactor.start()
 ```
 
