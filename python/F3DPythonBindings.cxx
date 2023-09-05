@@ -119,7 +119,6 @@ PYBIND11_MODULE(pyf3d, module)
       "save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG);
 
   // f3d::options
-
   py::class_<f3d::options> options(module, "options");
 
   options //
@@ -210,7 +209,7 @@ PYBIND11_MODULE(pyf3d, module)
   py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete> > loader(module, "loader");
   loader //
     .def("has_geometry_reader", &f3d::loader::hasGeometryReader)
-    .def("load_geometry", &f3d::loader::loadGeometry, "load geometry to a default scene")
+    .def("load_geometry", &f3d::loader::loadGeometry, "load geometry to a default scene", py::arg("file_path"), py::arg("reset") = false)
     .def("has_scene_reader", &f3d::loader::hasSceneReader)
     .def("load_scene", &f3d::loader::loadScene, "Load a specific full scene file");
 

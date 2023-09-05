@@ -9,17 +9,18 @@ Here is an example showing how to use libf3d python bindings:
 ```python
 import f3d
 
-f3d.engine.autoloadPlugins()
+f3d.engine.autoload_plugins()
 
 eng = f3d.engine(f3d.window.NATIVE)
-eng.getOptions()
-  .set("model.scivis.array-name", "Normals")
-  .set("model.scivis.component", 0)
-  .set("ui.bar", True)
-  .set("scene.grid", True)
+eng.options.update({
+  "model.scivis.array-name": "Normals",
+  "model.scivis.component": 0,
+  "ui.bar": True,
+  "scene.grid": True,
+  })
 
-eng.getLoader().loadGeometry("f3d/testing/data/dragon.vtu")
-eng.getInteractor().start()
+eng.loader.loadGeometry("f3d/testing/data/dragon.vtu")
+eng.interactor.start()
 ```
 
 ## Java (experimental)
