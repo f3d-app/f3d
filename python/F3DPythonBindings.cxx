@@ -404,7 +404,6 @@ PYBIND11_MODULE(pyf3d, module)
   window //
     .def("getType", &f3d::window::getType, "DEPRECATED")
     .def("getCamera", &f3d::window::getCamera, py::return_value_policy::reference, "DEPRECATED")
-    .def("render", &f3d::window::render, "Render the window", "DEPRECATED")
     .def("renderToImage", &f3d::window::renderToImage, "Render the window to an image",
       py::arg("noBackground") = false, "DEPRECATED")
     .def("setSize", &f3d::window::setSize, "Set the window size", "DEPRECATED")
