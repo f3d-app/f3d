@@ -3,6 +3,8 @@
 
 import os
 import sys
+import re
+import warnings
 from pathlib import Path
 
 F3D_ABSOLUTE_DLLS = [
@@ -20,4 +22,76 @@ if sys.version_info >= (3, 8) and sys.platform == "win32":
 
 from .pyf3d import *
 
+# Automatically load plugins for the user
+Engine.autoload_plugins()
+
+# TODO: Delete this in 3.0, it's there for retrocompatibility with old class naming
+engine = Engine
+options = Options
+loader = Loader
+image = Image
+interactor = Interactor
+window = Window
+camera = Camera
+camera_state_t = CameraState
+utils = Utils
+
 __version__ = "@F3D_VERSION@"
+
+
+################################################################################
+# monkey patch `options.update`
+
+
+def f3d_options_update(self, arg):
+    try:
+        for k, v in arg.items():
+            self[k] = v
+        return
+    except AttributeError:
+        pass
+
+    try:
+        for k, v in arg:
+            self[k] = v
+        return
+    except AttributeError:
+        pass
+
+    raise ValueError(f"cannot update {self} from {args}")
+
+
+Options.update = f3d_options_update
+
+
+################################################################################
+# add deprecated warnings
+
+
+def deprecated_decorator(f, reason):
+    def g(*args, **kwargs):
+        warnings.warn(reason, DeprecationWarning, 2)
+        return f(*args, **kwargs)
+
+    return g
+
+
+def add_deprecation_warnings():
+    for f3d_class in (
+        Camera,
+        Loader,
+        Options,
+        Interactor,
+        Engine,
+        Window,
+    ):
+        for name, member in f3d_class.__dict__.items():
+            if callable(member) and member.__doc__:
+                m = re.search(r"DEPRECATED(:\s*.+)?", member.__doc__)
+                if m:
+                    reason = m.group(1) or ""
+                    msg = f"{f3d_class.__qualname__}.{name} is deprecated{reason}"
+                    setattr(f3d_class, name, deprecated_decorator(member, msg))
+
+
+add_deprecation_warnings()

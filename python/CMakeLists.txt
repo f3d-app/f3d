@@ -21,12 +21,12 @@ endif()
 
 set(f3d_python_package_name "f3d")
 set(f3d_python_package_suffix "python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages")
-set(f3d_python_lib_output "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${f3d_python_package_suffix}/${f3d_python_package_name}")
+set(f3d_module_dir "${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>/${f3d_python_package_name}")
 
 set_target_properties(pyf3d PROPERTIES
   CXX_STANDARD 14
   CXX_VISIBILITY_PRESET hidden
-  LIBRARY_OUTPUT_DIRECTORY "${f3d_python_lib_output}"
+  LIBRARY_OUTPUT_DIRECTORY "${f3d_module_dir}"
   )
 
 if(SKBUILD)
@@ -56,7 +56,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
   "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build" @ONLY)
 
 file(GENERATE
-  OUTPUT "${f3d_python_lib_output}/__init__.py"
+  OUTPUT "${f3d_module_dir}/__init__.py"
   INPUT "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-build"
 )
 
