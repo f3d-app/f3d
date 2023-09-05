@@ -44,57 +44,79 @@ jobs:
         workflow_label: 'producer'
 
 #----------------------------------------------------------------------------
-# MAIN CI: Build and test with a cross-platform, cross-vtk build matrix
+# Windows CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
-  ci:
+  windows-ci:
     if: github.event.pull_request.draft == false
     needs: cache_lfs
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu, windows, macos]
+        vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
+        include:
+          - raytracing_label: raytracing
+          - vtk_version: v9.0.0
+            raytracing_label: no-raytracing
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
+
+    - name: Generic CI
+      uses: ./source/.github/actions/generic-ci
+      with:
+        vtk_version: ${{matrix.vtk_version}}
+        raytracing_label: ${{matrix.raytracing_label}}
+
+#----------------------------------------------------------------------------
+# Linux CI: Build and test, cross-vtk build matrix
+#----------------------------------------------------------------------------
+  linux-ci:
+    if: github.event.pull_request.draft == false
+    needs: cache_lfs
+
+    strategy:
+      fail-fast: false
+      matrix:
         vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
         build_type: [standard]
         include:
           - raytracing_label: raytracing
           - exclude_deprecated_label: no-exclude-deprecated
-          - bundle_label: no-bundle
           - egl_label: no-egl
           - vtk_version: v9.0.0
             raytracing_label: no-raytracing
-          - os: macos
-            raytracing_label: no-raytracing #598
-          - build_type: macos_bundle
-            os: macos
-            vtk_version: commit
-            raytracing_label: no-raytracing
-            exclude_deprecated_label: no-exclude-deprecated
-            bundle_label: bundle
-            egl_label: no-egl
           - build_type: headless
-            os: ubuntu
             vtk_version: commit
             raytracing_label: raytracing
             exclude_deprecated_label: no-exclude-deprecated
-            bundle_label: no-bundle
             egl_label: egl
           - build_type: exclude_deprecated
-            os: ubuntu
             vtk_version: commit
             raytracing_label: raytracing
             exclude_deprecated_label: exclude-deprecated
-            bundle_label: no-bundle
             egl_label: no-egl
 
-    runs-on: ${{matrix.os}}-latest
-    container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    runs-on: ubuntu-latest
+    container: ghcr.io/f3d-app/f3d-ci
 
     env:
       DISPLAY: :0
 
     steps:
-
     - name: Checkout
       uses: actions/checkout@v3
       with:
@@ -115,8 +137,43 @@ jobs:
         vtk_version: ${{matrix.vtk_version}}
         raytracing_label: ${{matrix.raytracing_label}}
         exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
-        bundle_label: ${{matrix.bundle_label}}
         egl_label: ${{matrix.egl_label}}
+
+#----------------------------------------------------------------------------
+# MacOS CI: Build and test, cross-vtk build matrix
+#----------------------------------------------------------------------------
+  macos-ci:
+    if: github.event.pull_request.draft == false
+    needs: cache_lfs
+
+    strategy:
+      fail-fast: false
+      matrix:
+        vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
+        cpu: [x86_64, arm64]
+
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
+
+    - name: Generic CI
+      uses: ./source/.github/actions/generic-ci
+      with:
+        vtk_version: ${{matrix.vtk_version}}
+        bundle_label: bundle
+        cpu: ${{matrix.cpu}}
 
 #----------------------------------------------------------------------------
 # Python packaging: Build and test the Python wheel

@@ -17,6 +17,10 @@ inputs:
     description: 'Label to control egl'
     required: false
     default: 'no-egl'
+  cpu:
+    description: 'Label to control cpu architecture'
+    required: false
+    default: 'x86_64'
 
 runs:
   using: "composite"
@@ -43,7 +47,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-3
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-${{inputs.cpu}}-1
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -128,6 +132,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_OPENGL_HAS_EGL=${{ inputs.egl_label == 'egl' && 'ON' || 'OFF' }}
         -DVTK_VERSIONED_INSTALL=OFF
+        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         ${{ inputs.vtk_version != 'v9.0.0' && '-DVTK_ENABLE_REMOTE_MODULES=OFF -DVTK_SMP_IMPLEMENTATION_TYPE=TBB' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
