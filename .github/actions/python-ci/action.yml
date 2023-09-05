@@ -24,6 +24,17 @@ runs:
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
 
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install Python dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pytest
+
     - name: Set PATH windows
       if: runner.os == 'Windows'
       shell: powershell
@@ -62,8 +73,29 @@ runs:
       working-directory: ${{github.workspace}}/source
       run: python -m pip -v wheel .
 
-    - name: Upload Tests Artifact
+    - name: Upload wheel
       uses: actions/upload-artifact@v3
       with:
         path: ./source/*.whl
         name: ${{runner.os}}-wheel
+
+    - name: Install wheel
+      shell: bash
+      working-directory: ${{github.workspace}}/source
+      run: python -m pip -v install *.whl
+
+    - name: Run Xvfb ubuntu
+      if: runner.os == 'Linux'
+      shell: bash
+      run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
+
+    - name: Install Mesa Windows
+      if: runner.os == 'Windows'
+      uses: ./source/.github/actions/mesa-install-bin
+      with:
+        path: ${{ env.Python_ROOT_DIR }}
+
+    - name: Test wheel
+      shell: bash
+      working-directory: ${{github.workspace}}/source
+      run: python -m pytest
