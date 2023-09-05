@@ -34,6 +34,8 @@ public:
   loader& loadScene(const std::string& filePath) override;
   bool hasGeometryReader(const std::string& filePath) override;
   bool hasSceneReader(const std::string& filePath) override;
+  loader& loadGeometry(const std::vector<float>& positions,
+    const std::vector<unsigned int>& triangles, bool reset = false) override;
   ///@}
 
   /**

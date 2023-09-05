@@ -206,5 +206,16 @@ int TestSDKLoader(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Load from memory
+  try
+  {
+    load.loadGeometry({ 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, { 0, 1, 2 });
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+    std::cerr << "Unexpected loadMemory failure" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   return EXIT_SUCCESS;
 }

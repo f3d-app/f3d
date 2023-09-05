@@ -62,6 +62,16 @@ public:
   virtual loader& loadGeometry(const std::string& filePath, bool reset = false) = 0;
 
   /**
+   * Load a geometry from memory buffers.
+   * Reset the scene before loading if a full scene was loaded previously or if reset is set to
+   * false, do not reset if only loaded geometries previously. Geometries loader using this method
+   * will be available in a default scene and use all default scene related options. Throw a
+   * load_failure_exception on failure.
+   */
+  virtual loader& loadGeometry(const std::vector<float>& positions,
+    const std::vector<unsigned int>& triangles, bool reset = false) = 0;
+
+  /**
    * Return true if the loader has a scene reader for the providen file, false otherwise.
    */
   virtual bool hasSceneReader(const std::string& filePath) = 0;
