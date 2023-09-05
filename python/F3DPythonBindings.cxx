@@ -168,13 +168,6 @@ PYBIND11_MODULE(pyf3d, module)
       },
       py::keep_alive<0, 1>())
     .def("keys", &f3d::options::getNames) // to do `dict(options)`
-    // TODO: keep the get_as_?
-    //  .def("get_as_bool", &f3d::options::getAsBool)
-    //  .def("get_as_int", &f3d::options::getAsInt)
-    //  .def("get_as_double", &f3d::options::getAsDouble)
-    //  .def("get_as_string", &f3d::options::getAsString)
-    //  .def("get_as_int_vector", &f3d::options::getAsIntVector)
-    //  .def("get_as_double_vector", &f3d::options::getAsDoubleVector)
     .def("toggle", &f3d::options::toggle)
     .def("is_same", &f3d::options::isSame)
     .def("get_closest_option", &f3d::options::getClosestOption)

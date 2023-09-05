@@ -108,16 +108,6 @@ jobs:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
         workflow_label: 'consumer'
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install pytest
-
     - name: Generic CI
       uses: ./source/.github/actions/generic-ci
       with:
@@ -160,16 +150,6 @@ jobs:
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
         workflow_label: 'consumer'
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install pytest
 
     - name: Python CI
       uses: ./source/.github/actions/python-ci

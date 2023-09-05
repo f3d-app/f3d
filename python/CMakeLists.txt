@@ -30,12 +30,6 @@ set_target_properties(pyf3d PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY "${f3d_module_dir}"
   )
 
-if(APPLE)
-  set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
-elseif(UNIX)
-  set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
-endif()
-
 if(SKBUILD)
   if(APPLE)
     set_target_properties(pyf3d PROPERTIES INSTALL_RPATH "@loader_path/${CMAKE_INSTALL_LIBDIR}")
