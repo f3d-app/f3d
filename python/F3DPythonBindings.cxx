@@ -68,7 +68,7 @@ PYBIND11_MODULE(pyf3d, module)
   module.doc() = "f3d library bindings";
 
   // f3d::image
-  py::class_<f3d::image> image(module, "image");
+  py::class_<f3d::image> image(module, "Image");
 
   py::enum_<f3d::image::SaveFormat>(image, "SaveFormat")
     .value("PNG", f3d::image::SaveFormat::PNG)
@@ -119,7 +119,7 @@ PYBIND11_MODULE(pyf3d, module)
       "save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG);
 
   // f3d::options
-  py::class_<f3d::options> options(module, "options");
+  py::class_<f3d::options> options(module, "Options");
 
   options //
     .def(py::init<>())
@@ -173,14 +173,14 @@ PYBIND11_MODULE(pyf3d, module)
     .def("copy", &f3d::options::copy);
 
   // f3d::utils
-  py::class_<f3d::utils> utils(module, "utils");
+  py::class_<f3d::utils> utils(module, "Utils");
 
   utils //
     .def_static("text_distance", &f3d::utils::textDistance);
 
   // f3d::interactor
   py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete> > interactor(
-    module, "interactor");
+    module, "Interactor");
   interactor //
     .def("set_key_press_callback", &f3d::interactor::setKeyPressCallBack,
       "Define a callback triggered when a key is pressed")
@@ -206,7 +206,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("get_default_interactions_info", &f3d::interactor::getDefaultInteractionsInfo);
 
   // f3d::loader
-  py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete> > loader(module, "loader");
+  py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete> > loader(module, "Loader");
   loader //
     .def("has_geometry_reader", &f3d::loader::hasGeometryReader)
     .def("load_geometry", &f3d::loader::loadGeometry, "load geometry to a default scene",
@@ -215,7 +215,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("load_scene", &f3d::loader::loadScene, "Load a specific full scene file");
 
   // f3d::camera
-  py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "camera");
+  py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "Camera");
   camera //
     .def_property(
       "position", [](f3d::camera& cam) { return cam.getPosition(); }, &f3d::camera::setPosition)
@@ -238,7 +238,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("reset_to_default", &f3d::camera::resetToDefault)
     .def("reset_to_bounds", &f3d::camera::resetToBounds, py::arg("zoom_factor") = 0.9);
 
-  py::class_<f3d::camera_state_t>(module, "camera_state_t")
+  py::class_<f3d::camera_state_t>(module, "CameraState")
     .def(py::init<>())
     .def(py::init<const f3d::point3_t&, const f3d::point3_t&, const f3d::vector3_t&,
       const f3d::angle_deg_t&>())
@@ -248,7 +248,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("angle", &f3d::camera_state_t::angle);
 
   // f3d::window
-  py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> > window(module, "window");
+  py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> > window(module, "Window");
 
   py::enum_<f3d::window::Type>(window, "Type")
     .value("NONE", f3d::window::Type::NONE)
@@ -281,7 +281,7 @@ PYBIND11_MODULE(pyf3d, module)
       "Get display coordinate point from world coordinate");
 
   // f3d::engine
-  py::class_<f3d::engine> engine(module, "engine");
+  py::class_<f3d::engine> engine(module, "Engine");
 
   engine //
     .def(py::init<f3d::window::Type>(), py::arg("window_type") = f3d::window::Type::NATIVE)

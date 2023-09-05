@@ -7,7 +7,7 @@ import f3d
 
 @pytest.fixture
 def f3d_engine():
-    engine = f3d.engine(f3d.window.NATIVE_OFFSCREEN)
+    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
     engine.window.size = 300, 200
     return engine
 
@@ -54,5 +54,5 @@ def test_save(f3d_engine):
     img = f3d_engine.window.render_to_image()
     fn = tempfile.gettempdir() + "/TestPythonSaveFile.bmp"
 
-    img.save(fn, f3d.image.SaveFormat.BMP)
+    img.save(fn, f3d.Image.SaveFormat.BMP)
     assert os.path.isfile(fn)
