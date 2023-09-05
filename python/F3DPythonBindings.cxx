@@ -83,7 +83,8 @@ PYBIND11_MODULE(pyf3d, module)
     .value("FLOAT", f3d::image::ChannelType::FLOAT)
     .export_values();
 
-  auto setImageBytes = [](f3d::image& img, const py::bytes& data) {
+  auto setImageBytes = [](f3d::image& img, const py::bytes& data)
+  {
     const py::buffer_info info(py::buffer(data).request());
     size_t expectedSize =
       img.getChannelCount() * img.getWidth() * img.getHeight() * img.getChannelTypeSize();
@@ -94,7 +95,8 @@ PYBIND11_MODULE(pyf3d, module)
     img.setContent(info.ptr);
   };
 
-  auto getImageBytes = [](const f3d::image& img) {
+  auto getImageBytes = [](const f3d::image& img)
+  {
     size_t expectedSize =
       img.getChannelCount() * img.getWidth() * img.getHeight() * img.getChannelTypeSize();
     return py::bytes(static_cast<char*>(img.getContent()), expectedSize);
@@ -131,7 +133,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("__setitem__",
       py::overload_cast<const std::string&, const std::vector<double>&>(&f3d::options::set))
     .def("__getitem__",
-      [](f3d::options& opts, const std::string key) {
+      [](f3d::options& opts, const std::string key)
+      {
 #define TRY(getter)                                                                                \
   try                                                                                              \
   {                                                                                                \
@@ -157,7 +160,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("__len__", [](f3d::options& opts) { return opts.getNames().size(); })
     .def(
       "__iter__",
-      [](f3d::options& opts) {
+      [](f3d::options& opts)
+      {
         const auto names = py::cast(opts.getNames()); // won't work without cast
         return make_iterator(names);
       },
