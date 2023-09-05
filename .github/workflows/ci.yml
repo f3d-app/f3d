@@ -323,8 +323,6 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
     runs-on: ubuntu-latest
     container: dockcross/web-wasm:20230116-670f7f7
