@@ -151,10 +151,11 @@ jobs:
       matrix:
         vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
         cpu: [x86_64, arm64]
+        bundle_label: [no-bundle]
         include:
-          - bundle_label: no-bundle
           - vtk_version: commit
             bundle_label: bundle
+            cpu: x86_64
 
     runs-on: macos-latest
 
