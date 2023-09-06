@@ -46,8 +46,8 @@ jobs:
 #----------------------------------------------------------------------------
 # Windows CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
-  windows-ci:
-    if: false && github.event.pull_request.draft == false
+  windows:
+    if: github.event.pull_request.draft == false
     needs: cache_lfs
 
     strategy:
@@ -84,8 +84,8 @@ jobs:
 #----------------------------------------------------------------------------
 # Linux CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
-  linux-ci:
-    if: false && github.event.pull_request.draft == false
+  linux:
+    if: github.event.pull_request.draft == false
     needs: cache_lfs
 
     strategy:
@@ -142,7 +142,7 @@ jobs:
 #----------------------------------------------------------------------------
 # MacOS CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
-  macos-ci:
+  macos:
     if: github.event.pull_request.draft == false
     needs: cache_lfs
 
@@ -179,7 +179,7 @@ jobs:
 # Python packaging: Build and test the Python wheel
 #----------------------------------------------------------------------------
   python-packaging:
-    if: false && github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false
     needs: cache_lfs
 
     strategy:
@@ -216,7 +216,7 @@ jobs:
 #----------------------------------------------------------------------------
   coverage:
     needs: cache_lfs
-    if: false && github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false
 
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
@@ -252,7 +252,7 @@ jobs:
 # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
     needs: cache_lfs
-    if: false && github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false
 
     strategy:
       fail-fast: false
@@ -292,7 +292,7 @@ jobs:
 # static-analysis: Run static analysis on linux
 #----------------------------------------------------------------------------
   static-analysis:
-    if: false && github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false
 
     strategy:
       fail-fast: false
@@ -320,7 +320,7 @@ jobs:
 # external-build: Check build of F3D as sub-project
 #----------------------------------------------------------------------------
   external-build:
-    if: false && github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false
 
     strategy:
       fail-fast: false
@@ -344,7 +344,7 @@ jobs:
 # android: Check build of F3D for android
 #----------------------------------------------------------------------------
   android:
-    if: false && github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false
 
     strategy:
       fail-fast: false
@@ -376,7 +376,7 @@ jobs:
 # webassembly: Check build of F3D for webassembly
 #----------------------------------------------------------------------------
   webassembly:
-    if: false && github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false
 
     strategy:
       fail-fast: false
