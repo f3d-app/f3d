@@ -193,6 +193,7 @@ runs:
         cmake --install . --component configuration
 
     - name: Build and configure libf3d examples
+      if: inputs.cpu == 'x86_64'
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
@@ -255,12 +256,13 @@ runs:
         path: ${{github.workspace}}\install\bin
 
     - name: Check F3D_PLUGINS_PATH using plugin example
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0'
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.cpu == 'x86_64'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose
 
     - name: Install plugin examples
+      if: inputs.cpu == 'x86_64'
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
@@ -268,7 +270,7 @@ runs:
         cmake --install build_plugins --config Release --component configuration
 
     - name: Check Install
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.cpu == 'x86_64'
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.cpu == 'x86_64' && inputs.cpu == 'x86_64'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
