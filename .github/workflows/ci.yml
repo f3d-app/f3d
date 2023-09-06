@@ -151,6 +151,10 @@ jobs:
       matrix:
         vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
         cpu: [x86_64, arm64]
+        include:
+          - bundle_label: no-bundle
+          - vtk_version: commit
+            bundle_label: bundle
 
     runs-on: macos-latest
 
@@ -172,7 +176,7 @@ jobs:
       uses: ./source/.github/actions/generic-ci
       with:
         vtk_version: ${{matrix.vtk_version}}
-        bundle_label: bundle
+        bundle_label: ${{matrix.bundle_label}}
         cpu: ${{matrix.cpu}}
 
 #----------------------------------------------------------------------------
