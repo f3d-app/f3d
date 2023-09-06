@@ -61,8 +61,9 @@ runs:
         cpu: ${{inputs.cpu}}
 
     - name: Install F3D dependencies
-      if: inputs.cpu == 'x86_64'
       uses: ./source/.github/actions/f3d-dependencies
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Set up Python
       if: inputs.cpu == 'x86_64'
@@ -126,14 +127,14 @@ runs:
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
         -DF3D_MACOS_BUNDLE=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
-        -DF3D_MODULE_EXR=${{ inputs.cpu == 'x86_64' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_EXR=ON
         -DF3D_MODULE_RAYTRACING=${{ inputs.raytracing_label == 'raytracing' && 'ON' || 'OFF' }}
         -DF3D_PLUGINS_STATIC_BUILD=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_ALEMBIC=${{ inputs.cpu == 'x86_64' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_ASSIMP=${{ inputs.cpu == 'x86_64' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_DRACO=${{ inputs.cpu == 'x86_64' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
         -DF3D_PLUGIN_BUILD_EXODUS=${{ inputs.cpu == 'x86_64' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.cpu == 'x86_64' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_OCCT=ON
         -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ runner.os == 'macOS' && 'OFF' || 'ON' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_WINDOWS_GUI=ON
