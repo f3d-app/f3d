@@ -225,14 +225,18 @@ runs:
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_examples -C Release -VV
 
-    - name: Build and test plugin examples
-      if: inputs.cpu == 'x86_64'
+    - name: Build plugin examples
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
         cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
         cmake --build build_plugins --config Release
-        ctest --test-dir build_plugins -C Release -VV
+
+    - name: Test plugin examples
+      if: inputs.cpu == 'x86_64'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: ctest --test-dir build_plugins -C Release -VV
 
     - name: Set F3D binary path Linux
       if: runner.os == 'Linux'
