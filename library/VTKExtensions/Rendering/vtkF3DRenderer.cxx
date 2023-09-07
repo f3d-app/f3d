@@ -140,6 +140,9 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->EnvMapLookupTable = vtkF3DCachedLUTTexture::New();
   this->EnvMapPrefiltered = vtkF3DCachedSpecularTexture::New();
 #endif
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
+  this->EnvMapPrefiltered->HalfPrecisionOff();
+#endif
 
   // Init actors
   vtkNew<vtkTextProperty> textProp;
@@ -797,20 +800,19 @@ void vtkF3DRenderer::ConfigureHDRILUT()
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
   if (this->GetUseImageBasedLighting() && !this->HasValidHDRILUT)
   {
+    vtkF3DCachedLUTTexture* lut = vtkF3DCachedLUTTexture::SafeDownCast(this->EnvMapLookupTable);
+    assert(lut);
+
     // Check LUT cache
     std::string lutCachePath = this->CachePath + "/lut.vti";
     bool lutCacheExists = vtksys::SystemTools::FileExists(lutCachePath, true);
     if (lutCacheExists)
     {
-      vtkF3DCachedLUTTexture* lut = vtkF3DCachedLUTTexture::SafeDownCast(this->EnvMapLookupTable);
       lut->SetFileName(lutCachePath.c_str());
       lut->UseCacheOn();
     }
     else
     {
-      // Create LUT cache file
-      vtkF3DCachedLUTTexture* lut = vtkF3DCachedLUTTexture::SafeDownCast(this->EnvMapLookupTable);
-      assert(lut);
       if (!lut->GetTextureObject() || !this->HasValidHDRILUT)
       {
         lut->UseCacheOff();
@@ -884,21 +886,19 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
   if (this->GetUseImageBasedLighting() && !this->HasValidHDRISpec)
   {
+    vtkF3DCachedSpecularTexture* spec =
+      vtkF3DCachedSpecularTexture::SafeDownCast(this->EnvMapPrefiltered);
+    assert(spec);
+
     // Check specular cache
     std::string specCachePath;
     if (this->CheckForSpecCache(specCachePath))
     {
-      vtkF3DCachedSpecularTexture* spec =
-        vtkF3DCachedSpecularTexture::SafeDownCast(this->EnvMapPrefiltered);
       spec->SetFileName(specCachePath.c_str());
       spec->UseCacheOn();
     }
     else
     {
-      // Create specular cache file
-      vtkF3DCachedSpecularTexture* spec =
-        vtkF3DCachedSpecularTexture::SafeDownCast(this->EnvMapPrefiltered);
-      assert(spec);
       if (!spec->GetTextureObject() || !this->HasValidHDRISpec)
       {
         spec->UseCacheOff();
@@ -925,12 +925,11 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
       writer->SetCompressorTypeToNone();
       writer->SetDataModeToAppended();
       writer->EncodeAppendedDataOff();
+      writer->SetHeaderTypeToUInt64();
       writer->SetFileName(specCachePath.c_str());
       writer->SetInputData(mb);
       writer->Write();
     }
-
-    this->GetEnvMapPrefiltered()->HalfPrecisionOff();
     this->HasValidHDRISpec = true;
   }
 #endif
