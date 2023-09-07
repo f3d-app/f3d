@@ -1,9 +1,18 @@
 name: 'Python specific CI'
 description: 'Python specific CI'
+inputs:
+  lfs_sha:
+    description: 'Cache LFS sha'
+    required: true
 
 runs:
   using: "composite"
   steps:
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{ inputs.lfs_sha}}
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       shell: bash

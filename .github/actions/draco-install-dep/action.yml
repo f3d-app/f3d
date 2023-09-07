@@ -1,5 +1,11 @@
 name: 'Install Draco Dependency'
 description: 'Install Draco Dependency using cache when possible'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+
 runs:
   using: "composite"
   steps:
@@ -9,7 +15,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/draco_install
-        key: draco-1.5.6-${{runner.os}}-0
+        key: draco-1.5.6-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout Draco
       if: steps.cache-draco.outputs.cache-hit != 'true'
@@ -39,6 +45,7 @@ runs:
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         -DDRACO_BACKWARDS_COMPATIBILITY=OFF
         -DDRACO_JS_GLUE=OFF
+        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 

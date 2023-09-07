@@ -25,10 +25,23 @@ inputs:
     description: 'Label to control egl'
     required: false
     default: 'no-egl'
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+  lfs_sha:
+    description: 'Cache LFS sha'
+    required: true
 
 runs:
   using: "composite"
   steps:
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{ inputs.lfs_sha}}
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       shell: bash
@@ -40,6 +53,8 @@ runs:
 
     - name: Install TBB
       uses: ./source/.github/actions/tbb-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Install Raytracing Dependencies
       if: inputs.raytracing_label == 'raytracing'
@@ -52,9 +67,12 @@ runs:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         raytracing_label: ${{inputs.raytracing_label}}
         egl_label: ${{inputs.egl_label}}
+        cpu: ${{inputs.cpu}}
 
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -94,7 +112,13 @@ runs:
       working-directory: ${{github.workspace}}
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+    - name: Determine if testing should be enabled
+      id: vars
+      shell: bash
+      run: echo "run_tests=${{ inputs.cpu == 'x86_64' && 'true' || 'false' }}" >> $GITHUB_OUTPUT
+
       # occt coloring not supported on macOS because of #792
+      # Exodus not supported on Apple Silicon because of #976
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}/build
@@ -122,10 +146,12 @@ runs:
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
+        -DF3D_PLUGIN_BUILD_EXODUS=${{ inputs.cpu == 'x86_64' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_OCCT=ON
         -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ runner.os == 'macOS' && 'OFF' || 'ON' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_WINDOWS_GUI=ON
+        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ runner.os == 'Linux' && matrix.vtk_version != 'v9.0.0' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
@@ -150,6 +176,7 @@ runs:
         path: ${{github.workspace}}\build\bin_Release
 
     - name: Test
+      if: steps.vars.outputs.run_tests == true
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
@@ -183,7 +210,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -B build_examples source/examples/libf3d
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }} -B build_examples source/examples/libf3d
         cmake --build build_examples --config Release
 
     - name: Install Mesa Windows examples
@@ -196,18 +223,23 @@ runs:
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0'
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && steps.vars.outputs.run_tests == true
       shell: bash
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_examples -C Release -VV
 
-    - name: Build and test plugin examples
+    - name: Build plugin examples
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }} -B build_plugins source/examples/plugins
         cmake --build build_plugins --config Release
-        ctest --test-dir build_plugins -C Release -VV
+
+    - name: Test plugin examples
+      if: steps.vars.outputs.run_tests == true
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: ctest --test-dir build_plugins -C Release -VV
 
     - name: Set F3D binary path Linux
       if: runner.os == 'Linux'
@@ -226,7 +258,7 @@ runs:
       shell: bash
       run: echo "F3D_BIN_PATH=./f3d.app/Contents/MacOS/f3d" >> $GITHUB_ENV
 
-    - name: Set F3D binary path MacOS bundle
+    - name: Set F3D binary path MacOS no-bundle
       if: |
         runner.os == 'macOS' &&
         inputs.bundle_label != 'bundle'
@@ -240,7 +272,7 @@ runs:
         path: ${{github.workspace}}\install\bin
 
     - name: Check F3D_PLUGINS_PATH using plugin example
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0'
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && steps.vars.outputs.run_tests == true
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose
@@ -253,7 +285,7 @@ runs:
         cmake --install build_plugins --config Release --component configuration
 
     - name: Check Install
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0'
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && steps.vars.outputs.run_tests == true
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
