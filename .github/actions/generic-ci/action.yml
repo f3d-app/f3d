@@ -223,7 +223,7 @@ runs:
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && ${{ steps.vars.outputs.run_tests == true }}
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && steps.vars.outputs.run_tests == true
       shell: bash
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_examples -C Release -VV
