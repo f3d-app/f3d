@@ -26,13 +26,19 @@ inputs:
     required: false
     default: 'no-egl'
   cpu:
-    description: 'Label to control cpu architecture'
+    description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
 
 runs:
   using: "composite"
   steps:
+
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       shell: bash
@@ -120,8 +126,8 @@ runs:
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
-        -DF3D_BINDINGS_JAVA=${{ inputs.cpu == 'x86_64' && 'ON' || 'OFF' }}
-        -DF3D_BINDINGS_PYTHON=${{ inputs.cpu == 'x86_64' && 'ON' || 'OFF' }}
+        -DF3D_BINDINGS_JAVA=ON
+        -DF3D_BINDINGS_PYTHON=ON
         -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
@@ -242,11 +248,10 @@ runs:
       shell: bash
       run: echo "F3D_BIN_PATH=./f3d.app/Contents/MacOS/f3d" >> $GITHUB_ENV
 
-    - name: Set F3D binary path MacOS bundle
+    - name: Set F3D binary path MacOS no-bundle
       if: |
         runner.os == 'macOS' &&
-        inputs.bundle_label != 'bundle' &&
-        inputs.cpu == 'x86_64'
+        inputs.bundle_label != 'bundle'
       shell: bash
       run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
 
@@ -263,7 +268,6 @@ runs:
       run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose
 
     - name: Install plugin examples
-      if: inputs.cpu == 'x86_64'
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
@@ -271,7 +275,7 @@ runs:
         cmake --install build_plugins --config Release --component configuration
 
     - name: Check Install
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.cpu == 'x86_64' && inputs.cpu == 'x86_64'
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.cpu == 'x86_64'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |

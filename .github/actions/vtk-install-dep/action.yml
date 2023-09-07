@@ -18,7 +18,7 @@ inputs:
     required: false
     default: 'no-egl'
   cpu:
-    description: 'Label to control cpu architecture'
+    description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
 

@@ -16,7 +16,6 @@ jobs:
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
 #----------------------------------------------------------------------------
-
   cache_lfs:
     runs-on: ubuntu-latest
     name: Update LFS data cache
@@ -69,12 +68,6 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        workflow_label: 'consumer'
-
     - name: Generic CI
       uses: ./source/.github/actions/generic-ci
       with:
@@ -124,12 +117,6 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        workflow_label: 'consumer'
-
     - name: Generic CI
       uses: ./source/.github/actions/generic-ci
       with:
@@ -167,12 +154,6 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        workflow_label: 'consumer'
-
     - name: Generic CI
       uses: ./source/.github/actions/generic-ci
       with:
@@ -207,12 +188,6 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        workflow_label: 'consumer'
-
     - name: Python CI
       uses: ./source/.github/actions/python-ci
 
@@ -239,12 +214,6 @@ jobs:
         path: 'source'
         fetch-depth: 0
         lfs: false
-
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        workflow_label: 'consumer'
 
     - name: Coverage CI
       uses: ./source/.github/actions/coverage-ci
@@ -281,12 +250,6 @@ jobs:
         path: 'source'
         fetch-depth: 0
         lfs: false
-
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        workflow_label: 'consumer'
 
     - name: Sanitizer CI
       uses: ./source/.github/actions/sanitizer-ci

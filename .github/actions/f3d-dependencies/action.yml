@@ -2,7 +2,7 @@ name: 'Install F3D Dependencies'
 description: 'Install multiple F3D Dependencies'
 inputs:
   cpu:
-    description: 'Label to control cpu architecture'
+    description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
 

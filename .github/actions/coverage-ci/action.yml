@@ -4,6 +4,11 @@ description: 'Coverage CI'
 runs:
   using: "composite"
   steps:
+    - name: Copy LFS Data
+      uses: ./source/.github/actions/lfs-copy
+      with:
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        workflow_label: 'consumer'
 
     - name: Dependencies Dir
       shell: bash

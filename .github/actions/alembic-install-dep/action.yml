@@ -2,7 +2,7 @@ name: 'Install Alembic Dependency'
 description: 'Install Alembic Dependency using cache when possible'
 inputs:
   cpu:
-    description: 'Label to control cpu architecture'
+    description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
     
