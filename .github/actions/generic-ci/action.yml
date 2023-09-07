@@ -115,6 +115,7 @@ runs:
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       # occt coloring not supported on macOS because of #792
+      # Exodus not supported on Apple Silicon because of #976
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}/build
@@ -203,11 +204,10 @@ runs:
         cmake --install . --component configuration
 
     - name: Build and configure libf3d examples
-      if: inputs.cpu == 'x86_64'
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -B build_examples source/examples/libf3d
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }} -B build_examples source/examples/libf3d
         cmake --build build_examples --config Release
 
     - name: Install Mesa Windows examples
@@ -229,7 +229,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }} -B build_plugins source/examples/plugins
         cmake --build build_plugins --config Release
 
     - name: Test plugin examples
