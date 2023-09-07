@@ -16,7 +16,6 @@ jobs:
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
 #----------------------------------------------------------------------------
-
   cache_lfs:
     runs-on: ubuntu-latest
     name: Update LFS data cache
@@ -44,57 +43,24 @@ jobs:
         workflow_label: 'producer'
 
 #----------------------------------------------------------------------------
-# MAIN CI: Build and test with a cross-platform, cross-vtk build matrix
+# Windows CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
-  ci:
+  windows:
     if: github.event.pull_request.draft == false
     needs: cache_lfs
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu, windows, macos]
         vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
-        build_type: [standard]
         include:
           - raytracing_label: raytracing
-          - exclude_deprecated_label: no-exclude-deprecated
-          - bundle_label: no-bundle
-          - egl_label: no-egl
           - vtk_version: v9.0.0
             raytracing_label: no-raytracing
-          - os: macos
-            raytracing_label: no-raytracing #598
-          - build_type: macos_bundle
-            os: macos
-            vtk_version: commit
-            raytracing_label: no-raytracing
-            exclude_deprecated_label: no-exclude-deprecated
-            bundle_label: bundle
-            egl_label: no-egl
-          - build_type: headless
-            os: ubuntu
-            vtk_version: commit
-            raytracing_label: raytracing
-            exclude_deprecated_label: no-exclude-deprecated
-            bundle_label: no-bundle
-            egl_label: egl
-          - build_type: exclude_deprecated
-            os: ubuntu
-            vtk_version: commit
-            raytracing_label: raytracing
-            exclude_deprecated_label: exclude-deprecated
-            bundle_label: no-bundle
-            egl_label: no-egl
 
-    runs-on: ${{matrix.os}}-latest
-    container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
-
-    env:
-      DISPLAY: :0
+    runs-on: windows-latest
 
     steps:
-
     - name: Checkout
       uses: actions/checkout@v3
       with:
@@ -102,11 +68,55 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
+    - name: Generic CI
+      uses: ./source/.github/actions/generic-ci
       with:
+        vtk_version: ${{matrix.vtk_version}}
+        raytracing_label: ${{matrix.raytracing_label}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        workflow_label: 'consumer'
+
+#----------------------------------------------------------------------------
+# Linux CI: Build and test, cross-vtk build matrix
+#----------------------------------------------------------------------------
+  linux:
+    if: github.event.pull_request.draft == false
+    needs: cache_lfs
+
+    strategy:
+      fail-fast: false
+      matrix:
+        vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
+        build_type: [standard]
+        include:
+          - raytracing_label: raytracing
+          - exclude_deprecated_label: no-exclude-deprecated
+          - egl_label: no-egl
+          - vtk_version: v9.0.0
+            raytracing_label: no-raytracing
+          - build_type: headless
+            vtk_version: commit
+            raytracing_label: raytracing
+            exclude_deprecated_label: no-exclude-deprecated
+            egl_label: egl
+          - build_type: exclude_deprecated
+            vtk_version: commit
+            raytracing_label: raytracing
+            exclude_deprecated_label: exclude-deprecated
+            egl_label: no-egl
+
+    runs-on: ubuntu-latest
+    container: ghcr.io/f3d-app/f3d-ci
+
+    env:
+      DISPLAY: :0
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
 
     - name: Generic CI
       uses: ./source/.github/actions/generic-ci
@@ -115,8 +125,44 @@ jobs:
         vtk_version: ${{matrix.vtk_version}}
         raytracing_label: ${{matrix.raytracing_label}}
         exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
-        bundle_label: ${{matrix.bundle_label}}
         egl_label: ${{matrix.egl_label}}
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+
+#----------------------------------------------------------------------------
+# MacOS CI: Build and test, cross-vtk build matrix
+#----------------------------------------------------------------------------
+  macos:
+    if: github.event.pull_request.draft == false
+    needs: cache_lfs
+
+    strategy:
+      fail-fast: false
+      matrix:
+        vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
+        cpu: [x86_64, arm64]
+        bundle_label: [no-bundle]
+        include:
+          - vtk_version: commit
+            bundle_label: bundle
+            cpu: x86_64
+
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Generic CI
+      uses: ./source/.github/actions/generic-ci
+      with:
+        vtk_version: ${{matrix.vtk_version}}
+        bundle_label: ${{matrix.bundle_label}}
+        cpu: ${{matrix.cpu}}
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
 # Python packaging: Build and test the Python wheel
@@ -145,14 +191,10 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        workflow_label: 'consumer'
-
     - name: Python CI
       uses: ./source/.github/actions/python-ci
+      with:
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
@@ -178,14 +220,10 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        workflow_label: 'consumer'
-
     - name: Coverage CI
       uses: ./source/.github/actions/coverage-ci
+      with:
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -220,16 +258,11 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        workflow_label: 'consumer'
-
     - name: Sanitizer CI
       uses: ./source/.github/actions/sanitizer-ci
       with:
         sanitizer_type: ${{matrix.sanitizer_type}}
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
 # static-analysis: Run static analysis on linux

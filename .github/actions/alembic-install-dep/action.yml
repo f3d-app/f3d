@@ -1,6 +1,11 @@
 name: 'Install Alembic Dependency'
 description: 'Install Alembic Dependency using cache when possible'
-
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+    
 runs:
   using: "composite"
   steps:
@@ -10,7 +15,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/alembic_install
-        key: alembic-v1.8.5-${{runner.os}}-2
+        key: alembic-v1.8.5-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -41,6 +46,7 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=../install/
         -DUSE_BINARIES=OFF
         -DUSE_TESTS=OFF
+        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_MACOSX_RPATH=ON' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
