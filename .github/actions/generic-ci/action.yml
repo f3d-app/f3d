@@ -75,13 +75,11 @@ runs:
         cpu: ${{inputs.cpu}}
 
     - name: Set up Python
-      if: inputs.cpu == 'x86_64'
       uses: actions/setup-python@v4
       with:
         python-version: '3.x'
 
     - name: Install Python dependencies
-      if: inputs.cpu == 'x86_64'
       shell: bash
       run: |
         python -m pip install --upgrade pip
@@ -114,6 +112,11 @@ runs:
       working-directory: ${{github.workspace}}
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+    - name: Determine if testing should be enabled
+      id: vars
+      shell: bash
+      run: echo "run_tests=${{ inputs.cpu == 'x86_64' && 'true' || 'false' }}" >> $GITHUB_OUTPUT
+
       # occt coloring not supported on macOS because of #792
       # Exodus not supported on Apple Silicon because of #976
     - name: Configure
@@ -124,7 +127,7 @@ runs:
         -Werror=dev
         -Werror=deprecated
         --warn-uninitialized
-        -DBUILD_TESTING=${{ inputs.cpu == 'x86_64' && 'ON' || 'OFF' }}
+        -DBUILD_TESTING=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
@@ -173,7 +176,7 @@ runs:
         path: ${{github.workspace}}\build\bin_Release
 
     - name: Test
-      if: inputs.cpu == 'x86_64'
+      if: ${{ steps.vars.outputs.run_tests == 'true' }}
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
@@ -220,7 +223,7 @@ runs:
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.cpu == 'x86_64'
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && ${{ steps.vars.outputs.run_tests == 'true' }}
       shell: bash
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_examples -C Release -VV
@@ -233,7 +236,7 @@ runs:
         cmake --build build_plugins --config Release
 
     - name: Test plugin examples
-      if: inputs.cpu == 'x86_64'
+      if: ${{ steps.vars.outputs.run_tests == 'true' }}
       shell: bash
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_plugins -C Release -VV
@@ -269,7 +272,7 @@ runs:
         path: ${{github.workspace}}\install\bin
 
     - name: Check F3D_PLUGINS_PATH using plugin example
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.cpu == 'x86_64'
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && ${{ steps.vars.outputs.run_tests == 'true' }}
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose
@@ -282,7 +285,7 @@ runs:
         cmake --install build_plugins --config Release --component configuration
 
     - name: Check Install
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.cpu == 'x86_64'
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && ${{ steps.vars.outputs.run_tests == 'true' }}
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
