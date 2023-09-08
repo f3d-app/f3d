@@ -67,33 +67,14 @@ jobs:
         workflow_label: 'producer'
 
 #----------------------------------------------------------------------------
-# MAIN CI: Build and test with a cross-platform build matrix
+# Windows CI: Build and test
 #----------------------------------------------------------------------------
-  ci:
+  windows:
     needs: [cache_lfs, check_nightly]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu, windows, macos]
-        build_type: [standard]
-        include:
-          - raytracing_label: raytracing
-          - egl_label: no-egl
-          - os: macos
-            raytracing_label: no-raytracing #598
-          - build_type: headless
-            os: ubuntu
-            raytracing_label: raytracing
-            exclude_deprecated_label: no-exclude-deprecated
-            bundle_label: no-bundle
-            egl_label: egl
-
-    runs-on: ${{matrix.os}}-latest
-    container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
-
-    env:
-      DISPLAY: :0
+    runs-on: windows-latest
 
     steps:
 
@@ -107,12 +88,76 @@ jobs:
     - name: Generic CI
       uses: ./source/.github/actions/generic-ci
       with:
+        vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+        raytracing_label: 'raytracing'
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+
+#----------------------------------------------------------------------------
+# Linux CI: Build and test
+#----------------------------------------------------------------------------
+  linux:
+    needs: [cache_lfs, check_nightly]
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [standard]
+        include:
+          - egl_label: no-egl
+          - build_type: headless
+            egl_label: egl
+
+    runs-on: ubuntu-latest
+    container: ghcr.io/f3d-app/f3d-ci
+
+    env:
+      DISPLAY: :0
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Generic CI
+      uses: ./source/.github/actions/generic-ci
+      with:
         build_type: ${{matrix.build_type}}
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-        raytracing_label: ${{matrix.raytracing_label}}
+        raytracing_label: 'raytracing'
         exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
-        bundle_label: ${{matrix.bundle_label}}
         egl_label: ${{matrix.egl_label}}
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+
+#----------------------------------------------------------------------------
+# MacOS CI: Build and test, cross-cpu build matrix
+#----------------------------------------------------------------------------
+  macos:
+    needs: [cache_lfs, check_nightly]
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        cpu: [x86_64, arm64]
+
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Generic CI
+      uses: ./source/.github/actions/generic-ci
+      with:
+        build_type: ${{matrix.build_type}}
+        vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+        cpu: ${{matrix.cpu}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
