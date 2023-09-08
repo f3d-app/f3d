@@ -104,12 +104,6 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        workflow_label: 'consumer'
-
     - name: Generic CI
       uses: ./source/.github/actions/generic-ci
       with:
@@ -119,6 +113,7 @@ jobs:
         exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
         bundle_label: ${{matrix.bundle_label}}
         egl_label: ${{matrix.egl_label}}
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -153,17 +148,12 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        workflow_label: 'consumer'
-
     - name: Sanitizer CI
       uses: ./source/.github/actions/sanitizer-ci
       with:
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
         sanitizer_type: ${{matrix.sanitizer_type}}
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
 # android: Check build of F3D for android
