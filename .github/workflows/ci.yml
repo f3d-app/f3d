@@ -145,6 +145,9 @@ jobs:
           - vtk_version: commit
             bundle_label: bundle
             cpu: x86_64
+          - vtk_version: commit
+            bundle_label: bundle
+            cpu: arm64
 
     runs-on: macos-latest
 

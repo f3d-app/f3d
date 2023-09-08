@@ -21,6 +21,11 @@ runs:
   using: "composite"
   steps:
 
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.arch }}" ]] || { echo "arch input is empty" ; exit 1; }
+
     - name: Recover VTK Short SHA from file
       if: |
         steps.cache-vtk.outputs.cache-hit != 'true' &&

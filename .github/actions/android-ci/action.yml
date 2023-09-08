@@ -13,6 +13,11 @@ runs:
   using: "composite"
   steps:
 
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.arch }}" ]] || { echo "arch input is empty" ; exit 1; }
+
     - name: Dependencies Dir
       shell: bash
       working-directory: ${{github.workspace}}
