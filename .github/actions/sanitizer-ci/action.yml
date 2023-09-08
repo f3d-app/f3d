@@ -15,6 +15,13 @@ inputs:
 runs:
   using: "composite"
   steps:
+
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.sanitizer_type }}" ]] || { echo "sanitizer_type input is empty" ; exit 1; }
+        [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
+
     - name: Copy LFS Data
       uses: ./source/.github/actions/lfs-copy
       with:
