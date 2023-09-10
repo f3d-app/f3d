@@ -1,9 +1,13 @@
 #include "vtkF3DMemoryMesh.h"
 
+#include "vtkDataArrayRange.h"
 #include "vtkFloatArray.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkSMPTools.h"
+
+#include <numeric>
 
 vtkStandardNewMacro(vtkF3DMemoryMesh);
 
@@ -17,37 +21,43 @@ vtkF3DMemoryMesh::vtkF3DMemoryMesh()
 vtkF3DMemoryMesh::~vtkF3DMemoryMesh() = default;
 
 //------------------------------------------------------------------------------
-void vtkF3DMemoryMesh::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-}
-
-//------------------------------------------------------------------------------
 void vtkF3DMemoryMesh::SetPoints(const std::vector<float>& positions)
 {
-  vtkNew<vtkPoints> points;
-  points->SetNumberOfPoints(positions.size() / 3);
+  vtkNew<vtkFloatArray> arr;
+  arr->SetNumberOfComponents(3);
+  arr->SetNumberOfTuples(positions.size() / 3);
 
-  for (size_t i = 0; i < positions.size() / 3; i++)
-  {
-    points->SetPoint(i, &positions[3 * i]);
-  }
+  std::copy(positions.cbegin(), positions.cend(), arr->GetPointer(0));
+
+  vtkNew<vtkPoints> points;
+  points->SetDataTypeToFloat();
+  points->SetData(arr);
 
   this->Mesh->SetPoints(points);
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DMemoryMesh::SetTriangles(const std::vector<unsigned int>& triangles)
+void vtkF3DMemoryMesh::SetCells(
+  const std::vector<unsigned int>& cellSize, const std::vector<unsigned int>& cellIndices)
 {
-  vtkNew<vtkCellArray> cells;
-  cells->AllocateExact(triangles.size() / 3, triangles.size());
+  vtkNew<vtkIdTypeArray> offsets;
+  vtkNew<vtkIdTypeArray> connectivity;
+  offsets->SetNumberOfTuples(cellSize.size() + 1);
+  connectivity->SetNumberOfTuples(cellIndices.size());
 
-  for (size_t i = 0; i < triangles.size(); i += 3)
-  {
-    vtkIdType t[] = { static_cast<vtkIdType>(triangles[i]),
-      static_cast<vtkIdType>(triangles[i + 1]), static_cast<vtkIdType>(triangles[i + 2]) };
-    cells->InsertNextCell(3, t);
-  }
+  // fill offsets
+  offsets->SetTypedComponent(0, 0, 0);
+  std::inclusive_scan(cellSize.cbegin(), cellSize.cend(),
+    vtk::DataArrayValueRange(offsets).begin() + 1,
+    [](unsigned int a, unsigned int b) { return static_cast<vtkIdType>(a + b); });
+
+  // fill connectivity
+  vtkSMPTools::Transform(cellIndices.cbegin(), cellIndices.cend(),
+    vtk::DataArrayValueRange(connectivity).begin(),
+    [](unsigned int i) { return static_cast<vtkIdType>(i); });
+
+  vtkNew<vtkCellArray> cells;
+  cells->SetData(offsets, connectivity);
 
   this->Mesh->SetPolys(cells);
 }

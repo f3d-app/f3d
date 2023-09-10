@@ -18,6 +18,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <algorithm>
+#include <numeric>
 #include <vector>
 
 namespace f3d::detail
@@ -323,12 +324,38 @@ loader& loader_impl::loadScene(const std::string& filePath)
 }
 
 //----------------------------------------------------------------------------
-loader& loader_impl::loadGeometry(
-  const std::vector<float>& positions, const std::vector<unsigned int>& triangles, bool reset)
+loader& loader_impl::loadGeometry(const std::vector<float>& positions,
+  const std::vector<unsigned int>& cellSize, const std::vector<unsigned int>& cellIds, bool reset)
 {
+  if (positions.size() % 3 != 0)
+  {
+    throw loader::load_failure_exception(
+      "The positions buffer is not a multiple of 3. It's length is " +
+      std::to_string(positions.size()));
+  }
+
+  unsigned int expectedSize = std::reduce(cellSize.cbegin(), cellSize.cend());
+
+  if (cellIds.size() != expectedSize)
+  {
+    throw loader::load_failure_exception(
+      "The cellIds buffer size is invalid, it should be " + std::to_string(expectedSize));
+  }
+
+  size_t nbPoints = positions.size() / 3;
+
+  auto it = std::find_if(
+    cellIds.cbegin(), cellIds.cend(), [=](unsigned int idx) { return idx >= nbPoints; });
+  if (it != cellIds.cend())
+  {
+    throw loader::load_failure_exception("Cell vertex at index " +
+      std::to_string(std::distance(cellIds.cbegin(), it)) +
+      " is greater than the maximum vertex index (" + std::to_string(nbPoints) + ")");
+  }
+
   vtkNew<vtkF3DMemoryMesh> vtkSource;
   vtkSource->SetPoints(positions);
-  vtkSource->SetTriangles(triangles);
+  vtkSource->SetCells(cellSize, cellIds);
   vtkSource->Update();
 
   this->Internals->LoadGeometry("<memory>", vtkSource, reset);
