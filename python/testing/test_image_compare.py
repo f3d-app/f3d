@@ -1,11 +1,14 @@
+from pathlib import Path
 import pytest
 import tempfile
+
 import f3d
 
 
 def test_compare_with_file():
-    dataset = "./testing/data/cow.vtp"
-    reference = "./testing/baselines/TestPythonCompareWithFile.png"
+    testingDir = str(Path(__file__).parent.parent.parent / "testing")
+    dataset = testingDir + "/data/cow.vtp"
+    reference = testingDir + "/baselines/TestPythonCompareWithFile.png"
     output = tempfile.gettempdir() + "/TestPythonCompareWithFile.png"
     outputDiff = tempfile.gettempdir() + "/TestPythonCompareWithFile.diff.png"
 

@@ -1,7 +1,7 @@
+from pathlib import Path
 import os
-import tempfile
-
 import pytest
+import tempfile
 
 import f3d
 
@@ -74,8 +74,9 @@ def test_legacy_Camera():
 
 
 def test_legacy_CompareWithFile():
-    dataset = "./testing/data/cow.vtp"
-    reference = "./testing/baselines/TestPythonCompareWithFile.png"
+    testingDir = str(Path(__file__).parent.parent.parent / "testing")
+    dataset = testingDir + "/data/cow.vtp"
+    reference = testingDir + "/baselines/TestPythonCompareWithFile.png"
     output = tempfile.gettempdir() + "/TestPythonCompareWithFile.png"
     outputDiff = tempfile.gettempdir() + "/TestPythonCompareWithFile.diff.png"
 
