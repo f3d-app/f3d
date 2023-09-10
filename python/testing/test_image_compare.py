@@ -6,9 +6,9 @@ import f3d
 
 
 def test_compare_with_file():
-    testingDir = str(Path(__file__).parent.parent.parent / "testing")
-    dataset = testingDir + "/data/cow.vtp"
-    reference = testingDir + "/baselines/TestPythonCompareWithFile.png"
+    testing_dir = Path(__file__).parent.parent.parent / "testing"
+    dataset = f"{testing_dir}/data/cow.vtp"
+    reference = f"{testing_dir}/baselines/TestPythonCompareWithFile.png"
     output = tempfile.gettempdir() + "/TestPythonCompareWithFile.png"
     outputDiff = tempfile.gettempdir() + "/TestPythonCompareWithFile.diff.png"
 
