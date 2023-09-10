@@ -74,9 +74,9 @@ def test_legacy_Camera():
 
 
 def test_legacy_CompareWithFile():
-    testingDir = str(Path(__file__).parent.parent.parent / "testing")
-    dataset = testingDir + "/data/cow.vtp"
-    reference = testingDir + "/baselines/TestPythonCompareWithFile.png"
+    testing_dir = Path(__file__).parent.parent.parent / "testing"
+    dataset = f"{testing_dir}/data/cow.vtp"
+    reference = f"{testing_dir}/baselines/TestPythonCompareWithFile.png"
     output = tempfile.gettempdir() + "/TestPythonCompareWithFile.png"
     outputDiff = tempfile.gettempdir() + "/TestPythonCompareWithFile.diff.png"
 
