@@ -31,7 +31,8 @@ public:
    * The length of cellIndices should be the sum of all values in cellSize
    * The lists are copied internally.
    */
-  void SetCells(const std::vector<unsigned int>& cellSize, const std::vector<unsigned int>& cellIndices);
+  void SetCells(
+    const std::vector<unsigned int>& cellSize, const std::vector<unsigned int>& cellIndices);
 
 protected:
   vtkF3DMemoryMesh();

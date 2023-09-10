@@ -13,17 +13,6 @@ int TestSDKLoadFromMemory(int argc, char* argv[])
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
   f3d::window& win = eng.getWindow().setSize(300, 300);
 
-  // Load from memory
-  try
-  {
-    eng.getLoader().loadGeometry({ 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, { 3 }, { 0, 1, 2 });
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-    std::cerr << "Unexpected loadMemory failure" << std::endl;
-    return EXIT_FAILURE;
-  }
-
   // Load invalid number of points
   try
   {
@@ -38,7 +27,8 @@ int TestSDKLoadFromMemory(int argc, char* argv[])
   // Load invalid number of points
   try
   {
-    eng.getLoader().loadGeometry({ 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, { 3 }, { 0, 1, 2, 3 });
+    eng.getLoader().loadGeometry(
+      { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, { 3 }, { 0, 1, 2, 3 });
     std::cerr << "Should throw: invalid number of cell indices" << std::endl;
     return EXIT_FAILURE;
   }
@@ -46,7 +36,20 @@ int TestSDKLoadFromMemory(int argc, char* argv[])
   {
   }
 
-  if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKLoadMemory"))
+  // Load from memory (valid)
+  try
+  {
+    eng.getLoader().loadGeometry(
+      { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, { 3 }, { 0, 1, 2 });
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+    std::cerr << "Unexpected loadMemory failure" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (!TestSDKHelpers::RenderTest(
+        win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKLoadMemory"))
   {
     return EXIT_FAILURE;
   }

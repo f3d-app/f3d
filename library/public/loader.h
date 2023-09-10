@@ -67,13 +67,14 @@ public:
    * or if the reset argument is set to true, It will not reset if only geometries were loaded
    * previously. Geometries loaded using this method will be available in a default scene and use
    * all default scene related options.
-   * @param[out] positions All point positions. Must be a multiple of 3.
-   * @param[in]  cellSize  All cell size (e.g. 3 for triangles, 4 for quads).
-   * @param[in]  cellIds   All cell vertex indices. The length should be the sum of all values in cellSize.
-   * Throw a load_failure_exception on failure.
+   * @param[in] positions All point positions. Must be a multiple of 3.
+   * @param[in] cellSize  All cell size (e.g. 3 for triangles, 4 for quads).
+   * @param[in] cellIds   All cell vertex indices. The length should be the sum of all values in
+   * cellSize. Throw a load_failure_exception on failure.
    */
   virtual loader& loadGeometry(const std::vector<float>& positions,
-    const std::vector<unsigned int>& cellSize, const std::vector<unsigned int>& cellIds, bool reset = false) = 0;
+    const std::vector<unsigned int>& cellSize, const std::vector<unsigned int>& cellIds,
+    bool reset = false) = 0;
 
   /**
    * Return true if the loader has a scene reader for the providen file, false otherwise.

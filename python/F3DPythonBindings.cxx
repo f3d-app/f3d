@@ -214,10 +214,10 @@ PYBIND11_MODULE(pyf3d, module)
     .def("has_scene_reader", &f3d::loader::hasSceneReader)
     .def("load_scene", &f3d::loader::loadScene, "Load a specific full scene file")
     .def("load_geometry",
-      py::overload_cast<const std::vector<float>&, const std::vector<unsigned int>&, const std::vector<unsigned int>&, bool>(
-        &f3d::loader::loadGeometry),
-      "Load a triangular mesh from memory", py::arg("positions"), py::arg("cellSize"), py::arg("cellIds"),
-      py::arg("reset") = false);
+      py::overload_cast<const std::vector<float>&, const std::vector<unsigned int>&,
+        const std::vector<unsigned int>&, bool>(&f3d::loader::loadGeometry),
+      "Load a triangular mesh from memory", py::arg("positions"), py::arg("cellSize"),
+      py::arg("cellIds"), py::arg("reset") = false);
 
   // f3d::camera
   py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "Camera");
