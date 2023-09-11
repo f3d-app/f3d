@@ -6,8 +6,8 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkSMPTools.h"
 
-#include <execution>
 #include <numeric>
 
 vtkStandardNewMacro(vtkF3DMemoryMesh);
@@ -24,11 +24,16 @@ vtkF3DMemoryMesh::~vtkF3DMemoryMesh() = default;
 //------------------------------------------------------------------------------
 void vtkF3DMemoryMesh::SetPoints(const std::vector<float>& positions)
 {
+  vtkIdType nbVertices = static_cast<vtkIdType>(positions.size() / 3);
+
   vtkNew<vtkFloatArray> arr;
   arr->SetNumberOfComponents(3);
-  arr->SetNumberOfTuples(positions.size() / 3);
+  arr->SetNumberOfTuples(nbVertices);
 
-  std::copy(std::execution::par, positions.cbegin(), positions.cend(), arr->GetPointer(0));
+  vtkSMPTools::For(0, 3 * nbVertices, [&](vtkIdType begin, vtkIdType end) {
+    auto it = positions.cbegin();
+    std::copy(it + begin, it + end, arr->GetPointer(0) + begin);
+  });
 
   vtkNew<vtkPoints> points;
   points->SetDataTypeToFloat();
@@ -48,12 +53,12 @@ void vtkF3DMemoryMesh::SetFaces(
 
   // fill offsets
   offsets->SetTypedComponent(0, 0, 0);
-  std::inclusive_scan(std::execution::par, faceSizes.cbegin(), faceSizes.cend(),
+  std::inclusive_scan(faceSizes.cbegin(), faceSizes.cend(),
     vtk::DataArrayValueRange(offsets).begin() + 1,
     [](unsigned int a, unsigned int b) { return static_cast<vtkIdType>(a + b); });
 
   // fill connectivity
-  std::transform(std::execution::par, faceIndices.cbegin(), faceIndices.cend(),
+  vtkSMPTools::Transform(faceIndices.cbegin(), faceIndices.cend(),
     vtk::DataArrayValueRange(connectivity).begin(),
     [](unsigned int i) { return static_cast<vtkIdType>(i); });
 
