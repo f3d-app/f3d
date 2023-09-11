@@ -1,6 +1,7 @@
 list(APPEND pyf3dTests_list
      test_camera.py
      test_image.py
+     test_loader.py
      test_options.py
      test_utils.py
     )
