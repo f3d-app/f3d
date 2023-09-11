@@ -48,6 +48,27 @@ eng.getLoader().loadGeometry("path/to/file.ext").loadGeometry("path/to/file2.ext
 eng.getInteractor().start();
 ```
 
+It's also possible to load a geometry from memory buffers:
+
+```cpp
+#include <f3d/engine.h>
+#include <f3d/interactor.h>
+#include <f3d/loader.h>
+
+// Create a f3d::engine
+f3d::engine eng();
+
+// Create a single triangle
+eng.getLoader().loadGeometry(
+  { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, // positions
+  { 3 }, // single triangle
+  { 0, 1, 2 } // triangle indices
+);
+
+// Start rendering and interacting
+eng.getInteractor().start();
+```
+
 Manipulating the window directly can be done this way:
 
 ```cpp
