@@ -325,7 +325,8 @@ loader& loader_impl::loadScene(const std::string& filePath)
 
 //----------------------------------------------------------------------------
 loader& loader_impl::loadGeometry(const std::vector<float>& positions,
-  const std::vector<unsigned int>& faceSizes, const std::vector<unsigned int>& faceIndices, bool reset)
+  const std::vector<unsigned int>& faceSizes, const std::vector<unsigned int>& faceIndices,
+  bool reset)
 {
   if (positions.size() % 3 != 0)
   {
