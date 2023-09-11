@@ -5,8 +5,8 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkSMPTools.h"
 
+#include <execution>
 #include <numeric>
 
 vtkStandardNewMacro(vtkF3DMemoryMesh);
@@ -27,7 +27,7 @@ void vtkF3DMemoryMesh::SetPoints(const std::vector<float>& positions)
   arr->SetNumberOfComponents(3);
   arr->SetNumberOfTuples(positions.size() / 3);
 
-  std::copy(positions.cbegin(), positions.cend(), arr->GetPointer(0));
+  std::copy(std::execution::par, positions.cbegin(), positions.cend(), arr->GetPointer(0));
 
   vtkNew<vtkPoints> points;
   points->SetDataTypeToFloat();
@@ -47,12 +47,12 @@ void vtkF3DMemoryMesh::SetCells(
 
   // fill offsets
   offsets->SetTypedComponent(0, 0, 0);
-  std::inclusive_scan(cellSize.cbegin(), cellSize.cend(),
+  std::inclusive_scan(std::execution::par, cellSize.cbegin(), cellSize.cend(),
     vtk::DataArrayValueRange(offsets).begin() + 1,
     [](unsigned int a, unsigned int b) { return static_cast<vtkIdType>(a + b); });
 
   // fill connectivity
-  vtkSMPTools::Transform(cellIndices.cbegin(), cellIndices.cend(),
+  std::transform(std::execution::par, cellIndices.cbegin(), cellIndices.cend(),
     vtk::DataArrayValueRange(connectivity).begin(),
     [](unsigned int i) { return static_cast<vtkIdType>(i); });
 

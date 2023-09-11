@@ -4,9 +4,9 @@ import f3d
 
 
 def test_load_memory():
-    reference = "./testing/baselines/TestSDKLoadMemory.png"
-    output = tempfile.gettempdir() + "/TestSDKLoadMemory.png"
-    outputDiff = tempfile.gettempdir() + "/TestSDKLoadMemory.diff.png"
+    reference = "./testing/baselines/TestPythonLoadMemory.png"
+    output = tempfile.gettempdir() + "/TestPythonLoadMemory.png"
+    outputDiff = tempfile.gettempdir() + "/TestPythonLoadMemory.diff.png"
 
     engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
     engine.window.size = 300, 300
