@@ -24,6 +24,7 @@ For libf3d users:
  - Added `render.hdri.file`, `render.hdri.ambient`, `render.background.skybox` options.
  - Deprecated `render.background.hdri` in favor of new options above
  - Deprecated previous image API
+ - Add `loader::loadGeometry` allowing loading geometry from memory buffers
 
 For developers:
  - Added a deprecation framework

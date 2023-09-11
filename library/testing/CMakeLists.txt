@@ -14,6 +14,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
     TestSDKCompareWithFile.cxx
     TestSDKDropZone.cxx
     TestSDKImage.cxx
+    TestSDKLoadFromMemory.cxx
     TestSDKMultiColoring.cxx
     TestSDKMultiOptions.cxx
     TestSDKWindowNative.cxx
