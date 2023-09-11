@@ -67,13 +67,13 @@ public:
    * or if the reset argument is set to true, It will not reset if only geometries were loaded
    * previously. Geometries loaded using this method will be available in a default scene and use
    * all default scene related options.
-   * @param[in] positions All point positions. Must be a multiple of 3.
-   * @param[in] cellSize  All cell size (e.g. 3 for triangles, 4 for quads).
-   * @param[in] cellIds   All cell vertex indices. The length should be the sum of all values in
+   * @param[in] positions   All point positions. Must be a multiple of 3.
+   * @param[in] faceSize    All face sizes (e.g. 3 for triangles, 4 for quads).
+   * @param[in] faceIndices All cell vertex indices. The length should be the sum of all values in
    * cellSize. Throw a load_failure_exception on failure.
    */
   virtual loader& loadGeometry(const std::vector<float>& positions,
-    const std::vector<unsigned int>& cellSize, const std::vector<unsigned int>& cellIds,
+    const std::vector<unsigned int>& faceSizes, const std::vector<unsigned int>& faceIndices,
     bool reset = false) = 0;
 
   /**

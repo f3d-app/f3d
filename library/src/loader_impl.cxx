@@ -325,7 +325,7 @@ loader& loader_impl::loadScene(const std::string& filePath)
 
 //----------------------------------------------------------------------------
 loader& loader_impl::loadGeometry(const std::vector<float>& positions,
-  const std::vector<unsigned int>& cellSize, const std::vector<unsigned int>& cellIds, bool reset)
+  const std::vector<unsigned int>& faceSizes, const std::vector<unsigned int>& faceIndices, bool reset)
 {
   if (positions.size() % 3 != 0)
   {
@@ -334,28 +334,28 @@ loader& loader_impl::loadGeometry(const std::vector<float>& positions,
       std::to_string(positions.size()));
   }
 
-  unsigned int expectedSize = std::reduce(cellSize.cbegin(), cellSize.cend());
+  unsigned int expectedSize = std::reduce(faceSizes.cbegin(), faceSizes.cend());
 
-  if (cellIds.size() != expectedSize)
+  if (faceIndices.size() != expectedSize)
   {
     throw loader::load_failure_exception(
-      "The cellIds buffer size is invalid, it should be " + std::to_string(expectedSize));
+      "The faceIndices buffer size is invalid, it should be " + std::to_string(expectedSize));
   }
 
   size_t nbPoints = positions.size() / 3;
 
   auto it = std::find_if(
-    cellIds.cbegin(), cellIds.cend(), [=](unsigned int idx) { return idx >= nbPoints; });
-  if (it != cellIds.cend())
+    faceIndices.cbegin(), faceIndices.cend(), [=](unsigned int idx) { return idx >= nbPoints; });
+  if (it != faceIndices.cend())
   {
-    throw loader::load_failure_exception("Cell vertex at index " +
-      std::to_string(std::distance(cellIds.cbegin(), it)) +
+    throw loader::load_failure_exception("Face vertex at index " +
+      std::to_string(std::distance(faceIndices.cbegin(), it)) +
       " is greater than the maximum vertex index (" + std::to_string(nbPoints) + ")");
   }
 
   vtkNew<vtkF3DMemoryMesh> vtkSource;
   vtkSource->SetPoints(positions);
-  vtkSource->SetCells(cellSize, cellIds);
+  vtkSource->SetFaces(faceSizes, faceIndices);
   vtkSource->Update();
 
   this->Internals->LoadGeometry("<memory>", vtkSource, reset);

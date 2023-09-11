@@ -25,14 +25,14 @@ public:
   void SetPoints(const std::vector<float>& positions);
 
   /**
-   * Set cells by vertex indices.
-   * cellSize contains the size of each cell (3 is triangle, 4 is quad, etc...)
-   * cellIndices is a contiguous array of all cells indices
-   * The length of cellIndices should be the sum of all values in cellSize
+   * Set faces by vertex indices.
+   * faceSizes contains the size of each face (3 is triangle, 4 is quad, etc...)
+   * cellIndices is a contiguous array of all face indices
+   * The length of faceIndices should be the sum of all values in faceSizes
    * The lists are copied internally.
    */
-  void SetCells(
-    const std::vector<unsigned int>& cellSize, const std::vector<unsigned int>& cellIndices);
+  void SetFaces(
+    const std::vector<unsigned int>& faceSizes, const std::vector<unsigned int>& faceIndices);
 
 protected:
   vtkF3DMemoryMesh();

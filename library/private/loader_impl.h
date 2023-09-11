@@ -32,7 +32,7 @@ public:
   ~loader_impl();
   loader& loadGeometry(const std::string& filePath, bool reset) override;
   loader& loadGeometry(const std::vector<float>& positions,
-    const std::vector<unsigned int>& cellSize, const std::vector<unsigned int>& cellIds,
+    const std::vector<unsigned int>& faceSizes, const std::vector<unsigned int>& faceIndices,
     bool reset = false) override;
   loader& loadScene(const std::string& filePath) override;
   bool hasGeometryReader(const std::string& filePath) override;

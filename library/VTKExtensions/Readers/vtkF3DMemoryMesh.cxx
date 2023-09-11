@@ -37,29 +37,29 @@ void vtkF3DMemoryMesh::SetPoints(const std::vector<float>& positions)
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DMemoryMesh::SetCells(
-  const std::vector<unsigned int>& cellSize, const std::vector<unsigned int>& cellIndices)
+void vtkF3DMemoryMesh::SetFaces(
+  const std::vector<unsigned int>& faceSizes, const std::vector<unsigned int>& faceIndices)
 {
   vtkNew<vtkIdTypeArray> offsets;
   vtkNew<vtkIdTypeArray> connectivity;
-  offsets->SetNumberOfTuples(cellSize.size() + 1);
-  connectivity->SetNumberOfTuples(cellIndices.size());
+  offsets->SetNumberOfTuples(faceSizes.size() + 1);
+  connectivity->SetNumberOfTuples(faceIndices.size());
 
   // fill offsets
   offsets->SetTypedComponent(0, 0, 0);
-  std::inclusive_scan(std::execution::par, cellSize.cbegin(), cellSize.cend(),
+  std::inclusive_scan(std::execution::par, faceSizes.cbegin(), faceSizes.cend(),
     vtk::DataArrayValueRange(offsets).begin() + 1,
     [](unsigned int a, unsigned int b) { return static_cast<vtkIdType>(a + b); });
 
   // fill connectivity
-  std::transform(std::execution::par, cellIndices.cbegin(), cellIndices.cend(),
+  std::transform(std::execution::par, faceIndices.cbegin(), faceIndices.cend(),
     vtk::DataArrayValueRange(connectivity).begin(),
     [](unsigned int i) { return static_cast<vtkIdType>(i); });
 
-  vtkNew<vtkCellArray> cells;
-  cells->SetData(offsets, connectivity);
+  vtkNew<vtkCellArray> polys;
+  polys->SetData(offsets, connectivity);
 
-  this->Mesh->SetPolys(cells);
+  this->Mesh->SetPolys(polys);
 }
 
 //------------------------------------------------------------------------------
