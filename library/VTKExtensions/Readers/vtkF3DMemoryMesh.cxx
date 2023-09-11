@@ -30,12 +30,14 @@ void vtkF3DMemoryMesh::SetPoints(const std::vector<float>& positions)
   arr->SetNumberOfComponents(3);
   arr->SetNumberOfTuples(nbVertices);
 
-  vtkSMPTools::For(0, nbVertices, [&](vtkIdType begin, vtkIdType end) {
-    for (vtkIdType i = begin; i < end; i++)
+  vtkSMPTools::For(0, nbVertices,
+    [&](vtkIdType begin, vtkIdType end)
     {
-      arr->SetTypedTuple(i, positions.data() + 3 * i);
-    }
-  });
+      for (vtkIdType i = begin; i < end; i++)
+      {
+        arr->SetTypedTuple(i, positions.data() + 3 * i);
+      }
+    });
 
   vtkNew<vtkPoints> points;
   points->SetDataTypeToFloat();
@@ -60,12 +62,14 @@ void vtkF3DMemoryMesh::SetFaces(
     [](unsigned int a, unsigned int b) { return static_cast<vtkIdType>(a + b); });
 
   // fill connectivity
-  vtkSMPTools::For(0, faceIndices.size(), [&](vtkIdType begin, vtkIdType end) {
-    for (vtkIdType i = begin; i < end; i++)
+  vtkSMPTools::For(0, faceIndices.size(),
+    [&](vtkIdType begin, vtkIdType end)
     {
-      connectivity->SetTypedComponent(i, 0, static_cast<vtkIdType>(faceIndices[i]));
-    }
-  });
+      for (vtkIdType i = begin; i < end; i++)
+      {
+        connectivity->SetTypedComponent(i, 0, static_cast<vtkIdType>(faceIndices[i]));
+      }
+    });
 
   vtkNew<vtkCellArray> polys;
   polys->SetData(offsets, connectivity);
