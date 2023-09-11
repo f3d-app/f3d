@@ -14,6 +14,8 @@ vtk_module_add_module(f3d::VTKExtensionsReaders
   FORCE_STATIC
   CLASSES ${classes})
 
+vtk_module_set_properties(f3d::VTKExtensionsReaders CXX_STANDARD 17)
+
 if(F3D_MODULE_EXR)
   vtk_module_link(f3d::VTKExtensionsReaders PRIVATE OpenEXR::OpenEXR)
 endif()
