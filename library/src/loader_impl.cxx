@@ -335,7 +335,11 @@ loader& loader_impl::loadGeometry(const std::vector<float>& positions,
       std::to_string(positions.size()));
   }
 
-  unsigned int expectedSize = std::reduce(faceSizes.cbegin(), faceSizes.cend());
+  unsigned int expectedSize = 0;
+  for (unsigned int currentSize : faceSizes)
+  {
+    expectedSize += currentSize;
+  }
 
   if (faceIndices.size() != expectedSize)
   {
