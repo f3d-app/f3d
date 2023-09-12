@@ -104,12 +104,6 @@ runs:
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
-    - name: Install Mesa Windows
-      if: runner.os == 'Windows'
-      uses: ./source/.github/actions/mesa-install-bin
-      with:
-        path: ${{ env.Python_ROOT_DIR }}
-
     - name: Test wheel
       shell: bash
       working-directory: ${{github.workspace}}/source
