@@ -59,11 +59,11 @@ It's also possible to load a geometry from memory buffers:
 f3d::engine eng();
 
 // Create a single triangle
-eng.getLoader().loadGeometry(
-  { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, // positions
-  { 3 }, // single triangle
-  { 0, 1, 2 } // triangle indices
-);
+f3d::mesh_t mesh = {};
+mesh.points = { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f };
+mesh.face_sizes = { 3 };
+mesh.face_indices = { 0, 1, 2 };
+eng.getLoader().loadGeometry(mesh);
 
 // Start rendering and interacting
 eng.getInteractor().start();

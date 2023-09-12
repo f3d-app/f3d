@@ -15,7 +15,11 @@ def test_load_memory():
     engine.window.size = 300, 300
 
     engine.loader.load_geometry(
-        [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0], [3], [0, 1, 2]
+        f3d.Mesh(
+            points=[0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0],
+            face_sizes=[3],
+            face_indices=[0, 1, 2],
+        )
     )
 
     img = engine.window.render_to_image()
