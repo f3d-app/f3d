@@ -57,9 +57,11 @@ void vtkF3DMemoryMesh::SetFaces(
 
   // fill offsets
   offsets->SetTypedComponent(0, 0, 0);
-  std::inclusive_scan(faceSizes.cbegin(), faceSizes.cend(),
-    vtk::DataArrayValueRange(offsets).begin() + 1,
-    [](unsigned int a, unsigned int b) { return static_cast<vtkIdType>(a + b); });
+  for (size_t i = 0; i < faceSizes.size(); i++)
+  {
+    offsets->SetTypedComponent(
+      i + 1, 0, offsets->GetTypedComponent(i, 0) + static_cast<vtkIdType>(faceSizes[i]));
+  }
 
   // fill connectivity
   vtkSMPTools::For(0, faceIndices.size(),
