@@ -89,6 +89,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
+        -DVTK_USE_SDL2=ON
         -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread
         -DVTK_VERSIONED_INSTALL=OFF
 
