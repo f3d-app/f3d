@@ -64,6 +64,7 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DVTK_BUILD_TESTING=OFF
         -DVTK_ENABLE_LOGGING=OFF
+        -DVTK_ENABLE_REMOTE_MODULES=OFF
         -DVTK_ENABLE_WEBGPU=ON
         -DVTK_ENABLE_WRAPPING=OFF
         -DVTK_GROUP_ENABLE_Rendering=DEFAULT
@@ -89,9 +90,9 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
-        -DVTK_VERSIONED_INSTALL=OFF
-        -DVTK_ENABLE_REMOTE_MODULES=OFF
         -DVTK_SMP_IMPLEMENTATION_TYPE=STDThread
+        -DVTK_USE_X=ON
+        -DVTK_VERSIONED_INSTALL=OFF
 
     - name: Build VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
