@@ -17,7 +17,7 @@ def test_load_memory():
     engine.loader.load_geometry(
         f3d.Mesh(
             points=[0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0],
-            face_sizes=[3],
+            face_sides=[3],
             face_indices=[0, 1, 2],
         )
     )

@@ -354,7 +354,7 @@ loader& loader_impl::loadGeometry(const mesh_t& mesh, bool reset)
   }
 
   unsigned int expectedSize = 0;
-  for (unsigned int currentSize : mesh.face_sizes)
+  for (unsigned int currentSize : mesh.face_sides)
   {
     expectedSize += currentSize;
   }
@@ -365,8 +365,8 @@ loader& loader_impl::loadGeometry(const mesh_t& mesh, bool reset)
       "The face_indices buffer size is invalid, it should be " + std::to_string(expectedSize));
   }
 
-  auto it = std::find_if(
-    mesh.face_indices.cbegin(), mesh.face_indices.cend(), [=](unsigned int idx) { return idx >= nbPoints; });
+  auto it = std::find_if(mesh.face_indices.cbegin(), mesh.face_indices.cend(),
+    [=](unsigned int idx) { return idx >= nbPoints; });
   if (it != mesh.face_indices.cend())
   {
     throw loader::load_failure_exception("Face vertex at index " +
@@ -378,7 +378,7 @@ loader& loader_impl::loadGeometry(const mesh_t& mesh, bool reset)
   vtkSource->SetPoints(mesh.points);
   vtkSource->SetNormals(mesh.normals);
   vtkSource->SetTCoords(mesh.texture_coordinates);
-  vtkSource->SetFaces(mesh.face_sizes, mesh.face_indices);
+  vtkSource->SetFaces(mesh.face_sides, mesh.face_indices);
   vtkSource->Update();
 
   this->Internals->LoadGeometry("<memory>", vtkSource, reset);

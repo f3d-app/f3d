@@ -43,15 +43,15 @@ using angle_deg_t = double;
  * - points must not be empty and its length must be a multiple of 3 (3 times the number of points)
  * - normals can be empty or its length must be 3 times the number of points
  * - texture_coordinates can be empty or its length must be 2 times the number of points
- * - face_sizes can be any size including empty resulting in a point cloud
- * - face_indices length must be the sum of all values in face_sizes
+ * - face_sides can be any size including empty resulting in a point cloud
+ * - face_indices length must be the sum of all values in face_sides
  */
-struct F3D_EXPORT mesh_t
+struct mesh_t
 {
   std::vector<float> points;
   std::vector<float> normals;
   std::vector<float> texture_coordinates;
-  std::vector<unsigned int> face_sizes;
+  std::vector<unsigned int> face_sides;
   std::vector<unsigned int> face_indices;
 };
 }

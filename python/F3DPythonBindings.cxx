@@ -209,12 +209,15 @@ PYBIND11_MODULE(pyf3d, module)
   py::class_<f3d::mesh_t>(module, "Mesh")
     .def(py::init<>())
     .def(py::init<const std::vector<float>&, const std::vector<float>&, const std::vector<float>&,
-      const std::vector<unsigned int>&, const std::vector<unsigned int>&>(),
-      py::arg("points"), py::arg("normals") = std::vector<float>(), py::arg("texture_coordinates") = std::vector<float>(), py::arg("face_sizes") = std::vector<unsigned int>(), py::arg("face_indices") = std::vector<unsigned int>())
+           const std::vector<unsigned int>&, const std::vector<unsigned int>&>(),
+      py::arg("points"), py::arg("normals") = std::vector<float>(),
+      py::arg("texture_coordinates") = std::vector<float>(),
+      py::arg("face_sides") = std::vector<unsigned int>(),
+      py::arg("face_indices") = std::vector<unsigned int>())
     .def_readwrite("points", &f3d::mesh_t::points)
     .def_readwrite("normals", &f3d::mesh_t::normals)
     .def_readwrite("texture_coordinates", &f3d::mesh_t::texture_coordinates)
-    .def_readwrite("face_sizes", &f3d::mesh_t::face_sizes)
+    .def_readwrite("face_sides", &f3d::mesh_t::face_sides)
     .def_readwrite("face_indices", &f3d::mesh_t::face_indices);
 
   // f3d::loader
@@ -225,8 +228,7 @@ PYBIND11_MODULE(pyf3d, module)
       "load geometry to a default scene", py::arg("file_path"), py::arg("reset") = false)
     .def("has_scene_reader", &f3d::loader::hasSceneReader)
     .def("load_scene", &f3d::loader::loadScene, "Load a specific full scene file")
-    .def("load_geometry",
-      py::overload_cast<const f3d::mesh_t&, bool>(&f3d::loader::loadGeometry),
+    .def("load_geometry", py::overload_cast<const f3d::mesh_t&, bool>(&f3d::loader::loadGeometry),
       "Load a surfacic mesh from memory", py::arg("mesh"), py::arg("reset") = false);
 
   // f3d::camera

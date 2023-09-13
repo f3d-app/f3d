@@ -61,7 +61,7 @@ f3d::engine eng();
 // Create a single triangle
 f3d::mesh_t mesh = {};
 mesh.points = { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f };
-mesh.face_sizes = { 3 };
+mesh.face_sides = { 3 };
 mesh.face_indices = { 0, 1, 2 };
 eng.getLoader().loadGeometry(mesh);
 
