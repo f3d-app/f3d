@@ -77,7 +77,7 @@ int vtkF3DEXRReader::CanReadFile(const char* fname)
   }
 
   // The file must begin with magic number 76 2F 31 01
-  if ((ifs.get() != 0x76) && (ifs.get() != 0x2F) && (ifs.get() != 0x31) && (ifs.get() != 0x01))
+  if ((ifs.get() != 0x76) || (ifs.get() != 0x2F) || (ifs.get() != 0x31) || (ifs.get() != 0x01))
   {
     ifs.close();
     return 0;
@@ -104,6 +104,12 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
   }
 
   vtkFloatArray* scalars = vtkFloatArray::SafeDownCast(data->GetPointData()->GetScalars());
+  if (!scalars)
+  {
+    vtkErrorMacro(<< "Could not find expected scalar array");
+    return;
+  }
+
   scalars->SetName("Pixels");
   float* dataPtr = scalars->GetPointer(0);
 
