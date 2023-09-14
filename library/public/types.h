@@ -4,6 +4,7 @@
 #include "export.h"
 
 #include <array>
+#include <string>
 #include <vector>
 
 namespace f3d
@@ -53,6 +54,13 @@ struct mesh_t
   std::vector<float> texture_coordinates;
   std::vector<unsigned int> face_sides;
   std::vector<unsigned int> face_indices;
+
+  /**
+   * Check validity of the mesh.
+   * Returns a pair with the first element to true if the mesh is valid.
+   * If invalid, an error message is returned in the second element.
+   */
+  F3D_EXPORT std::pair<bool, std::string> isValid() const;
 };
 }
 

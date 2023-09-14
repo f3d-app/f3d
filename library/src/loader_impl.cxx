@@ -327,51 +327,10 @@ loader& loader_impl::loadScene(const std::string& filePath)
 loader& loader_impl::loadGeometry(const mesh_t& mesh, bool reset)
 {
   // sanity checks
-  if (mesh.points.size() == 0)
+  auto [valid, err] = mesh.isValid();
+  if (!valid)
   {
-    throw loader::load_failure_exception("The points buffer must not be empty.");
-  }
-
-  if (mesh.points.size() % 3 != 0)
-  {
-    throw loader::load_failure_exception(
-      "The points buffer is not a multiple of 3. It's length is " +
-      std::to_string(mesh.points.size()));
-  }
-
-  size_t nbPoints = mesh.points.size() / 3;
-
-  if (mesh.normals.size() > 0 && mesh.normals.size() != nbPoints * 3)
-  {
-    throw loader::load_failure_exception(
-      "The normals buffer must be empty or equal to 3 times the number of points.");
-  }
-
-  if (mesh.texture_coordinates.size() > 0 && mesh.texture_coordinates.size() != nbPoints * 2)
-  {
-    throw loader::load_failure_exception(
-      "The texture_coordinates buffer must be empty or equal to 2 times the number of points.");
-  }
-
-  unsigned int expectedSize = 0;
-  for (unsigned int currentSize : mesh.face_sides)
-  {
-    expectedSize += currentSize;
-  }
-
-  if (mesh.face_indices.size() != expectedSize)
-  {
-    throw loader::load_failure_exception(
-      "The face_indices buffer size is invalid, it should be " + std::to_string(expectedSize));
-  }
-
-  auto it = std::find_if(mesh.face_indices.cbegin(), mesh.face_indices.cend(),
-    [=](unsigned int idx) { return idx >= nbPoints; });
-  if (it != mesh.face_indices.cend())
-  {
-    throw loader::load_failure_exception("Face vertex at index " +
-      std::to_string(std::distance(mesh.face_indices.cbegin(), it)) +
-      " is greater than the maximum vertex index (" + std::to_string(nbPoints) + ")");
+    throw loader::load_failure_exception(err);
   }
 
   vtkNew<vtkF3DMemoryMesh> vtkSource;
