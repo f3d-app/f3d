@@ -35,11 +35,6 @@ std::pair<bool, std::string> mesh_t::isValid() const
 
   unsigned int expectedSize = std::accumulate(this->face_sides.begin(), this->face_sides.end(), 0);
 
-  for (unsigned int currentSize : this->face_sides)
-  {
-    expectedSize += currentSize;
-  }
-
   if (this->face_indices.size() != expectedSize)
   {
     std::string err = "The face_indices buffer size is invalid, it should be ";
