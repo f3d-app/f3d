@@ -205,6 +205,21 @@ PYBIND11_MODULE(pyf3d, module)
     .def("stop", &f3d::interactor::start, "Stop the interactor")
     .def_static("get_default_interactions_info", &f3d::interactor::getDefaultInteractionsInfo);
 
+  // f3d::mesh_t
+  py::class_<f3d::mesh_t>(module, "Mesh")
+    .def(py::init<>())
+    .def(py::init<const std::vector<float>&, const std::vector<float>&, const std::vector<float>&,
+           const std::vector<unsigned int>&, const std::vector<unsigned int>&>(),
+      py::arg("points"), py::arg("normals") = std::vector<float>(),
+      py::arg("texture_coordinates") = std::vector<float>(),
+      py::arg("face_sides") = std::vector<unsigned int>(),
+      py::arg("face_indices") = std::vector<unsigned int>())
+    .def_readwrite("points", &f3d::mesh_t::points)
+    .def_readwrite("normals", &f3d::mesh_t::normals)
+    .def_readwrite("texture_coordinates", &f3d::mesh_t::texture_coordinates)
+    .def_readwrite("face_sides", &f3d::mesh_t::face_sides)
+    .def_readwrite("face_indices", &f3d::mesh_t::face_indices);
+
   // f3d::loader
   py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete> > loader(module, "Loader");
   loader //
@@ -213,11 +228,8 @@ PYBIND11_MODULE(pyf3d, module)
       "load geometry to a default scene", py::arg("file_path"), py::arg("reset") = false)
     .def("has_scene_reader", &f3d::loader::hasSceneReader)
     .def("load_scene", &f3d::loader::loadScene, "Load a specific full scene file")
-    .def("load_geometry",
-      py::overload_cast<const std::vector<float>&, const std::vector<unsigned int>&,
-        const std::vector<unsigned int>&, bool>(&f3d::loader::loadGeometry),
-      "Load a triangular mesh from memory", py::arg("positions"), py::arg("cellSize"),
-      py::arg("cellIds"), py::arg("reset") = false);
+    .def("load_geometry", py::overload_cast<const f3d::mesh_t&, bool>(&f3d::loader::loadGeometry),
+      "Load a surfacic mesh from memory", py::arg("mesh"), py::arg("reset") = false);
 
   // f3d::camera
   py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "Camera");

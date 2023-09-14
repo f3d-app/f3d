@@ -31,9 +31,7 @@ public:
   loader_impl(const options& options, window_impl& window);
   ~loader_impl();
   loader& loadGeometry(const std::string& filePath, bool reset) override;
-  loader& loadGeometry(const std::vector<float>& positions,
-    const std::vector<unsigned int>& faceSizes, const std::vector<unsigned int>& faceIndices,
-    bool reset = false) override;
+  loader& loadGeometry(const mesh_t& mesh, bool reset = false) override;
   loader& loadScene(const std::string& filePath) override;
   bool hasGeometryReader(const std::string& filePath) override;
   bool hasSceneReader(const std::string& filePath) override;
