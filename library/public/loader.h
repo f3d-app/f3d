@@ -3,6 +3,7 @@
 
 #include "exception.h"
 #include "export.h"
+#include "types.h"
 
 #include <string>
 #include <vector>
@@ -67,14 +68,9 @@ public:
    * or if the reset argument is set to true, It will not reset if only geometries were loaded
    * previously. Geometries loaded using this method will be available in a default scene and use
    * all default scene related options.
-   * @param[in] positions   All point positions. Must be a multiple of 3.
-   * @param[in] faceSize    All face sizes (e.g. 3 for triangles, 4 for quads).
-   * @param[in] faceIndices All cell vertex indices. The length should be the sum of all values in
-   * cellSize. Throw a load_failure_exception on failure.
+   * Throw a load_failure_exception if the mesh is invalid.
    */
-  virtual loader& loadGeometry(const std::vector<float>& positions,
-    const std::vector<unsigned int>& faceSizes, const std::vector<unsigned int>& faceIndices,
-    bool reset = false) = 0;
+  virtual loader& loadGeometry(const mesh_t& mesh, bool reset = false) = 0;
 
   /**
    * Return true if the loader has a scene reader for the providen file, false otherwise.

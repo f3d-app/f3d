@@ -324,43 +324,20 @@ loader& loader_impl::loadScene(const std::string& filePath)
 }
 
 //----------------------------------------------------------------------------
-loader& loader_impl::loadGeometry(const std::vector<float>& positions,
-  const std::vector<unsigned int>& faceSizes, const std::vector<unsigned int>& faceIndices,
-  bool reset)
+loader& loader_impl::loadGeometry(const mesh_t& mesh, bool reset)
 {
-  if (positions.size() % 3 != 0)
+  // sanity checks
+  auto [valid, err] = mesh.isValid();
+  if (!valid)
   {
-    throw loader::load_failure_exception(
-      "The positions buffer is not a multiple of 3. It's length is " +
-      std::to_string(positions.size()));
-  }
-
-  unsigned int expectedSize = 0;
-  for (unsigned int currentSize : faceSizes)
-  {
-    expectedSize += currentSize;
-  }
-
-  if (faceIndices.size() != expectedSize)
-  {
-    throw loader::load_failure_exception(
-      "The faceIndices buffer size is invalid, it should be " + std::to_string(expectedSize));
-  }
-
-  size_t nbPoints = positions.size() / 3;
-
-  auto it = std::find_if(
-    faceIndices.cbegin(), faceIndices.cend(), [=](unsigned int idx) { return idx >= nbPoints; });
-  if (it != faceIndices.cend())
-  {
-    throw loader::load_failure_exception("Face vertex at index " +
-      std::to_string(std::distance(faceIndices.cbegin(), it)) +
-      " is greater than the maximum vertex index (" + std::to_string(nbPoints) + ")");
+    throw loader::load_failure_exception(err);
   }
 
   vtkNew<vtkF3DMemoryMesh> vtkSource;
-  vtkSource->SetPoints(positions);
-  vtkSource->SetFaces(faceSizes, faceIndices);
+  vtkSource->SetPoints(mesh.points);
+  vtkSource->SetNormals(mesh.normals);
+  vtkSource->SetTCoords(mesh.texture_coordinates);
+  vtkSource->SetFaces(mesh.face_sides, mesh.face_indices);
   vtkSource->Update();
 
   this->Internals->LoadGeometry("<memory>", vtkSource, reset);

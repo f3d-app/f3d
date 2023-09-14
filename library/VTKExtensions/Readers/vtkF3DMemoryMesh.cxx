@@ -12,6 +12,30 @@
 
 vtkStandardNewMacro(vtkF3DMemoryMesh);
 
+namespace
+{
+template<vtkIdType NbComponents>
+vtkSmartPointer<vtkFloatArray> ConvertToFloatArray(const std::vector<float>& positions)
+{
+  vtkIdType nbVertices = static_cast<vtkIdType>(positions.size() / NbComponents);
+
+  vtkNew<vtkFloatArray> arr;
+  arr->SetNumberOfComponents(NbComponents);
+  arr->SetNumberOfTuples(nbVertices);
+
+  vtkSMPTools::For(0, nbVertices,
+    [&](vtkIdType begin, vtkIdType end)
+    {
+      for (vtkIdType i = begin; i < end; i++)
+      {
+        arr->SetTypedTuple(i, positions.data() + NbComponents * i);
+      }
+    });
+
+  return arr;
+}
+}
+
 //------------------------------------------------------------------------------
 vtkF3DMemoryMesh::vtkF3DMemoryMesh()
 {
@@ -24,26 +48,23 @@ vtkF3DMemoryMesh::~vtkF3DMemoryMesh() = default;
 //------------------------------------------------------------------------------
 void vtkF3DMemoryMesh::SetPoints(const std::vector<float>& positions)
 {
-  vtkIdType nbVertices = static_cast<vtkIdType>(positions.size() / 3);
-
-  vtkNew<vtkFloatArray> arr;
-  arr->SetNumberOfComponents(3);
-  arr->SetNumberOfTuples(nbVertices);
-
-  vtkSMPTools::For(0, nbVertices,
-    [&](vtkIdType begin, vtkIdType end)
-    {
-      for (vtkIdType i = begin; i < end; i++)
-      {
-        arr->SetTypedTuple(i, positions.data() + 3 * i);
-      }
-    });
-
   vtkNew<vtkPoints> points;
   points->SetDataTypeToFloat();
-  points->SetData(arr);
+  points->SetData(ConvertToFloatArray<3>(positions));
 
   this->Mesh->SetPoints(points);
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DMemoryMesh::SetNormals(const std::vector<float>& normals)
+{
+  this->Mesh->GetPointData()->SetNormals(ConvertToFloatArray<3>(normals));
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DMemoryMesh::SetTCoords(const std::vector<float>& tcoords)
+{
+  this->Mesh->GetPointData()->SetTCoords(ConvertToFloatArray<2>(tcoords));
 }
 
 //------------------------------------------------------------------------------
