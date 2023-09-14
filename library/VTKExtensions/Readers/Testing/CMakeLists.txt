@@ -4,7 +4,9 @@ list(APPEND VTKExtensionsReaderTests_list
     )
 
 if(F3D_MODULE_EXR)
-  list(APPEND VTKExtensionsReaderTests_list TestF3DEXRReader.cxx)
+  list(APPEND VTKExtensionsReaderTests_list 
+       TestF3DEXRReader.cxx
+       TestF3DEXRReaderInvalid.cxx)
 endif()
 
 if(VTK_VERSION VERSION_LESS_EQUAL 9.1.0)
@@ -17,3 +19,7 @@ vtk_add_test_cxx(VTKExtensionsReaderTests tests
   ${F3D_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(VTKExtensionsReaderTests tests)
 
+set_tests_properties(f3d::VTKExtensionsReadersCxx-TestF3DEXRReaderInvalid
+  PROPERTIES 
+    FAIL_REGULAR_EXPRESSION ""
+    PASS_REGULAR_EXPRESSION "Could not find expected scalar array")
