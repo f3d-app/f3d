@@ -1,6 +1,7 @@
 #include "types.h"
 
 #include <algorithm>
+#include <numeric>
 
 namespace f3d
 {
@@ -32,7 +33,8 @@ std::pair<bool, std::string> mesh_t::isValid() const
       "The texture_coordinates buffer must be empty or equal to 2 times the number of points." };
   }
 
-  unsigned int expectedSize = 0;
+  unsigned int expectedSize = std::accumulate(this->face_sides.begin(), this->face_sides.end(), 0);
+
   for (unsigned int currentSize : this->face_sides)
   {
     expectedSize += currentSize;
