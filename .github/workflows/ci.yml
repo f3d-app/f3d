@@ -90,18 +90,27 @@ jobs:
         include:
           - raytracing_label: raytracing
           - exclude_deprecated_label: no-exclude-deprecated
+          - optional_deps_label: optional-deps
           - egl_label: no-egl
           - vtk_version: v9.0.0
             raytracing_label: no-raytracing
           - build_type: headless
             vtk_version: commit
             raytracing_label: raytracing
+            optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
             egl_label: egl
           - build_type: exclude_deprecated
             vtk_version: commit
             raytracing_label: raytracing
+            optional_deps_label: optional-deps
             exclude_deprecated_label: exclude-deprecated
+            egl_label: no-egl
+          - build_type: no_optional_deps
+            vtk_version: commit
+            raytracing_label: no-raytracing
+            optional_deps_label: no-optional-deps
+            exclude_deprecated_label: no-exclude-deprecated
             egl_label: no-egl
 
     runs-on: ubuntu-latest
@@ -124,6 +133,7 @@ jobs:
         build_type: ${{matrix.build_type}}
         vtk_version: ${{matrix.vtk_version}}
         raytracing_label: ${{matrix.raytracing_label}}
+        optional_deps_label: ${{matrix.optional_deps_label}}
         exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
         egl_label: ${{matrix.egl_label}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}

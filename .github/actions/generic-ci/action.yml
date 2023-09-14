@@ -13,6 +13,10 @@ inputs:
     description: 'Label to control raytracing'
     required: false
     default: 'no-raytracing'
+  optional_deps_label:
+    description: 'Label to optional dependencies'
+    required: false
+    default: 'optional-deps'
   exclude_deprecated_label:
     description: 'Label to control deprecated exclusion'
     required: false
@@ -75,16 +79,19 @@ runs:
         cpu: ${{inputs.cpu}}
 
     - name: Install F3D dependencies
+      if: inputs.optional_deps_label == 'optional-deps'
       uses: ./source/.github/actions/f3d-dependencies
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Set up Python
+      if: inputs.optional_deps_label == 'optional-deps'
       uses: actions/setup-python@v4
       with:
         python-version: '3.x'
 
     - name: Install Python dependencies
+      if: inputs.optional_deps_label == 'optional-deps'
       shell: bash
       run: |
         python -m pip install --upgrade pip
@@ -138,21 +145,21 @@ runs:
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
-        -DF3D_BINDINGS_JAVA=ON
-        -DF3D_BINDINGS_PYTHON=ON
+        -DF3D_BINDINGS_JAVA=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
         -DF3D_MACOS_BUNDLE=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
-        -DF3D_MODULE_EXR=ON
+        -DF3D_MODULE_EXR=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_RAYTRACING=${{ inputs.raytracing_label == 'raytracing' && 'ON' || 'OFF' }}
         -DF3D_PLUGINS_STATIC_BUILD=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_ALEMBIC=ON
-        -DF3D_PLUGIN_BUILD_ASSIMP=ON
-        -DF3D_PLUGIN_BUILD_DRACO=ON
-        -DF3D_PLUGIN_BUILD_EXODUS=${{ inputs.cpu == 'x86_64' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_OCCT=ON
+        -DF3D_PLUGIN_BUILD_ALEMBIC=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_ASSIMP=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_DRACO=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_EXODUS=${{ inputs.cpu == 'x86_64' && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ runner.os == 'macOS' && 'OFF' || 'ON' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_WINDOWS_GUI=ON
