@@ -19,7 +19,9 @@ vtk_add_test_cxx(VTKExtensionsReaderTests tests
   ${F3D_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(VTKExtensionsReaderTests tests)
 
+if(F3D_MODULE_EXR)
 set_tests_properties(f3d::VTKExtensionsReadersCxx-TestF3DEXRReaderInvalid
   PROPERTIES 
     FAIL_REGULAR_EXPRESSION ""
     PASS_REGULAR_EXPRESSION "Could not find expected scalar array")
+endif()
