@@ -55,7 +55,7 @@ int TestSDKLoadFromMemory(int argc, char* argv[])
   try
   {
     eng.getLoader().loadGeometry(
-      { { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, {}, {}, { 3 }, { 0, 1, 2, 4 } });
+      { { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, {}, {}, { 3 }, { 0, 1, 4 } });
     std::cerr << "Should throw: invalid vertex index" << std::endl;
     return EXIT_FAILURE;
   }
