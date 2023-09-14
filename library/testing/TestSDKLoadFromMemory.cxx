@@ -28,6 +28,17 @@ int TestSDKLoadFromMemory(int argc, char* argv[])
   {
   }
 
+  // Load empty point
+  try
+  {
+    eng.getLoader().loadGeometry(f3d::mesh_t{});
+    std::cerr << "Should throw: no point" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::loader::load_failure_exception& ex)
+  {
+  }
+
   // Load invalid number of points
   try
   {
