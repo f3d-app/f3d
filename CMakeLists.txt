@@ -233,3 +233,14 @@ if (F3D_BUILD_APPLICATION)
   install(FILES doc/THIRD_PARTY_LICENSES.md
     DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
 endif ()
+
+# Check that a LFS data file is big enough to be an actual file
+file(SIZE "${F3D_SOURCE_DIR}/testing/data/dragon.vtu" f3d_lfs_file_size)
+if (f3d_lfs_file_size LESS_EQUAL 500)
+  if(BUILD_TESTING)
+    message(FATAL_ERROR "Building tests without LFS data will result in non fonctionning tests, please fetch LFS data or disable BUILD_TESTING. Aborting.")
+  endif()
+  if (F3D_BINDINGS_PYTHON)
+    message(WARNING "Building python binding without LFS data is supported but testing using pytest will not be, please fetch LFS data to avoid this.")
+  endif()
+endif()
