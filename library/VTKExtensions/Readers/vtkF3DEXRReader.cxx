@@ -29,6 +29,10 @@ void vtkF3DEXRReader::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 void vtkF3DEXRReader::ExecuteInformation()
 {
+  // XXX: Needed because of VTK initialize file pattern in the constructor for some reasons
+  delete[] this->FilePattern;
+  this->FilePattern = nullptr;
+
   // Setup filename to read the header
   this->ComputeInternalFileName(this->DataExtent[4]);
   if (this->InternalFileName == nullptr || this->InternalFileName[0] == '\0')
@@ -97,12 +101,6 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
     return;
   }
 
-  if (this->InternalFileName == nullptr)
-  {
-    vtkErrorMacro(<< "Either a FileName or FilePrefix must be specified.");
-    return;
-  }
-
   vtkFloatArray* scalars = vtkFloatArray::SafeDownCast(data->GetPointData()->GetScalars());
   if (!scalars)
   {
@@ -115,6 +113,7 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
 
   try
   {
+    assert(this->InternalFileName);
     Imf::RgbaInputFile file(this->InternalFileName);
 
     Imf::Array2D<Imf::Rgba> pixels(this->GetHeight(), this->GetWidth());
