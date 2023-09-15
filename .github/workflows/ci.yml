@@ -281,6 +281,7 @@ jobs:
 # static-analysis: Run static analysis on linux
 #----------------------------------------------------------------------------
   static-analysis:
+    needs: cache_lfs
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -304,6 +305,8 @@ jobs:
 
     - name: Static analysis CI
       uses: ./source/.github/actions/static-analysis-ci
+      with:
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
 # external-build: Check build of F3D as sub-project
