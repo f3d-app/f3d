@@ -81,7 +81,7 @@ runs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: 'pypy3.x'
+        python-version: 'pypy3.9'
 
     - name: Build wheel
       shell: bash
