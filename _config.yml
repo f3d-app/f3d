@@ -180,18 +180,26 @@ defaults:
 
   -
     scope:
+      path: "doc/dev/GETTING_STARTED.md"
+    values:
+      title: Getting Started
+      parent: Developer Documentation
+      nav_order: 0
+
+  -
+    scope:
       path: "doc/dev/BUILD.md"
     values:
       title: Build
       parent: Developer Documentation
-      nav_order: 0
+      nav_order: 1
 
   -
     scope:
       path: "doc/dev/TESTING.md"
     values:
       parent: Developer Documentation
-      nav_order: 1
+      nav_order: 2
 
   -
     scope:
@@ -199,7 +207,7 @@ defaults:
     values:
       title: Contribute
       parent: Developer Documentation
-      nav_order: 2
+      nav_order: 3
 
   -
     scope:
@@ -207,14 +215,14 @@ defaults:
     values:
       title: Generate
       parent: Developer Documentation
-      nav_order: 3
+      nav_order: 4
 
   -
     scope:
       path: "doc/dev/CODING_STYLE.md"
     values:
       parent: Developer Documentation
-      nav_order: 4
+      nav_order: 5
 
 # Licenses doc
 # _licenses.md uses front matter      
