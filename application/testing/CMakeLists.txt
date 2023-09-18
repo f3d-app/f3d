@@ -555,6 +555,28 @@ if(F3D_PLUGIN_BUILD_OCCT)
   endif()
 endif()
 
+if(F3D_PLUGIN_BUILD_USD)
+  f3d_test(NAME TestUSD DATA suzanne.usd ARGS --load-plugins=usd --up=+Z DEFAULT_LIGHTS)
+  f3d_test(NAME TestUSDAPrimitives DATA primitives.usda ARGS --load-plugins=usd DEFAULT_LIGHTS)
+  f3d_test(NAME TestUSDAPrimitivesZAxis DATA primitivesZ.usda ARGS --load-plugins=usd DEFAULT_LIGHTS)
+  f3d_test(NAME TestUSDAInstancing DATA instancing.usda ARGS --load-plugins=usd DEFAULT_LIGHTS)
+  f3d_test(NAME TestUSDAGlyphs DATA glyphs.usda ARGS --load-plugins=usd DEFAULT_LIGHTS)
+  f3d_test(NAME TestUSDInvalid DATA invalid.usd REGEXP "Failed to open layer" ARGS --load-plugins=usd NO_BASELINE)
+
+  # This test is there to test occlusion texture and face-varying point data
+  # TODO: Note that the result looks incorrect because of face-varying attributes and must be fixed later
+  f3d_test(NAME TestUSDTeapot DATA Teapot.usd ARGS --load-plugins=usd DEFAULT_LIGHTS)
+
+  # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8224
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210805) # for embedded material support
+    f3d_test(NAME TestUSDZAnimated DATA AnimatedCube.usdz ARGS --load-plugins=usd --animation-time=0.3)
+
+    # The threshold is quite high because of macos
+    # However, the PNSR is >30db which is acceptable
+    f3d_test(NAME TestUSDZMaterials DATA McUsd.usdz ARGS --load-plugins=usd --camera-position=1055,912,-247 --camera-focal-point=69,173,63 THRESHOLD 280)
+  endif()
+endif()
+
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestMultiplePluginsLoad DATA cow.vtp ARGS --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()
