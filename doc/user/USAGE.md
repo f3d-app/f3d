@@ -24,6 +24,7 @@ Here is the list of supported file formats:
 * **.pts** : Point Cloud file format
 * **.step/.stp** : CAD STEP exchange ISO format
 * **.iges/.igs** : CAD Initial Graphics Exchange Specification format
+* **.brep** : Open CASCADE BRep format
 * **.abc** : Alembic format
 * **.obj** : Wavefront OBJ file format (full scene and default scene)
 * **.gltf/.glb** : GL Transmission Format (full scene and default scene)

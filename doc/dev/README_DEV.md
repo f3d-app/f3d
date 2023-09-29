@@ -1,4 +1,5 @@
 # Developer Documentation
+- [How to get started with building F3D.](GETTING_STARTED.md)
 - [How to build F3D.](BUILD.md)
 - [How to test F3D.](TESTING.md)
 - [How to contribute to F3D.](../../CONTRIBUTING.md)

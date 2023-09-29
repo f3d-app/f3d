@@ -1,0 +1,69 @@
+name: 'Android CI'
+description: 'Android CI'
+inputs:
+  arch:
+    description: 'Android arch to build'
+    required: true
+  vtk_version:
+    description: 'VTK version'
+    required: false
+    default: 'commit'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.arch }}" ]] || { echo "arch input is empty" ; exit 1; }
+
+    - name: Dependencies Dir
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: mkdir dependencies
+
+    - name: Install NDK
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        apt-get install unzip
+        wget https://dl.google.com/android/repository/android-ndk-${{env.NDK_VERSION}}-linux-x86_64.zip
+        unzip -qq android-ndk-${{env.NDK_VERSION}}-linux-x86_64.zip
+        mv android-ndk-${{env.NDK_VERSION}} android-ndk
+
+    - name: Install VTK dependency
+      uses: ./source/.github/actions/vtk-android-install-dep
+      with:
+        arch: ${{inputs.arch}}
+        api_level: ${{env.API_LEVEL}}
+        vtk_version: ${{inputs.vtk_version}}
+        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+
+    - name: Setup Directories
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+         mkdir build
+         mkdir install
+
+    - name: Configure
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: >
+        cmake ../source
+        -DCMAKE_ANDROID_ARCH_ABI=${{inputs.arch}}
+        -DCMAKE_ANDROID_NDK=$(pwd)/../android-ndk
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_FIND_ROOT_PATH=$(pwd)/../dependencies/vtk_build/CMakeExternals/Install/vtk-android/
+        -DCMAKE_INSTALL_PREFIX:PATH=../install
+        -DCMAKE_SYSTEM_NAME=Android
+        -DCMAKE_SYSTEM_VERSION=${{env.API_LEVEL}}
+        -DF3D_BINDINGS_JAVA=ON
+        -DF3D_PLUGIN_BUILD_EXODUS=OFF
+        -DF3D_STRICT_BUILD=ON
+
+    - name: Build
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --parallel 2 --target install

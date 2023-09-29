@@ -51,10 +51,12 @@ Options|Default|Description
 \-\-opacity=\<opacity\>|1.0|Set *opacity* on the geometry. Multiplied with the base color texture when present. <br>Requires a default scene. Usually used with Depth Peeling option.
 \-\-roughness=\<roughness\>|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Requires a default scene.
 \-\-metallic=\<metallic\>|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Requires a default scene.
-\-\-hdri=\<HDRi file\>||Set the *HDRI* image used to create the environment.<br>The environment act as a light source and is reflected on the material.<br>Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp.
-\-\-texture-base-color=\<texture file\>||Set the texture file to control the color of the object. Please note this will be multiplied with the color and opacity options.
-\-\-texture-material=\<texture file\>||Set the texture file to control the occlusion, roughness and metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use \-\-roughness=1 \-\-metallic=1.
-\-\-texture-emissive=\<texture file\>||Set the texture file to control the emitted light of the object. Please note this will be multiplied with the emissive factor.
+\-\-hdri-file=\<HDRI file\>||Set the *HDRI* image that can be used as ambient lighting and skybox.<br>Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp. <br> If not set, a default is provided.
+\-\-hdri-ambient||Light the scene using the *HDRI* image as ambient lighting.<br>The environment act as a light source and is reflected on the material.
+\-\-texture-matcap=\<texture file\>||Set the texture file to control the material capture of the object. All other model options for surfaces are ignored if this is set. Must be in linear color space.
+\-\-texture-base-color=\<texture file\>||Set the texture file to control the color of the object. Please note this will be multiplied with the color and opacity options. Must be in sRGB color space.
+\-\-texture-material=\<texture file\>||Set the texture file to control the occlusion, roughness and metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use \-\-roughness=1 \-\-metallic=1. Must be in linear color space.
+\-\-texture-emissive=\<texture file\>||Set the texture file to control the emitted light of the object. Please note this will be multiplied with the emissive factor.  Must be in sRGB color space.
 \-\-emissive-factor=\<R,G,B\>|1.0, 1.0, 1.0|Set the emissive factor. This value is multiplied with the emissive color when an emissive texture is present.
 
 ## Window options
@@ -67,7 +69,9 @@ Options|Default|Description
 -z, \-\-fps||Display a *frame per second counter*.
 -n, \-\-filename||Display the *name of the file* on top of the window.
 -m, \-\-metadata||Display the *metadata*.<br>Empty without a default scene.
--u, \-\-blur-background||Blur background.<br>Requires an HDRi.
+\-\-hdri-skybox||Show the HDRI as a skybox. Overrides \-\-bg-color and \-\-no-background.
+-u, \-\-blur-background||Blur background.<br>Useful with a HDRI skybox.
+\-\-blur-coc|20|Blur circle of confusion radius.
 \-\-light-intensity|1.0|*Adjust the intensity* of every light in the scene.
 
 ## Scientific visualization options

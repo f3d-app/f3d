@@ -37,10 +37,8 @@ protected:
     // before closing, compare the content of the framebuffer with the baseline
     QImage frameBuffer = grabFramebuffer().mirrored().convertToFormat(QImage::Format_RGB888);
 
-    f3d::image img;
-    img.setResolution(frameBuffer.width(), frameBuffer.height())
-      .setChannelCount(3)
-      .setData(frameBuffer.bits());
+    f3d::image img(frameBuffer.width(), frameBuffer.height(), 3);
+    img.setContent(frameBuffer.bits());
 
     if (!TestSDKHelpers::RenderTest(
           img, this->mBaselinePath, this->mOutputPath, "TestSDKExternalWindowQT"))

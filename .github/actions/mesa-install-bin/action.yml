@@ -8,6 +8,11 @@ runs:
   using: "composite"
   steps:
 
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.path }}" ]] || { echo "path input is empty" ; exit 1; }
+
     - name: Download and install Mesa windows
       shell: powershell
       run: |

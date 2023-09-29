@@ -1,5 +1,11 @@
 name: 'Install F3D Dependencies'
 description: 'Install multiple F3D Dependencies'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+
 runs:
   using: "composite"
   steps:
@@ -12,21 +18,33 @@ runs:
 
     - name: Install OCCT dependency
       uses: ./source/.github/actions/occt-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Install Assimp dependency
       uses: ./source/.github/actions/assimp-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Install Draco dependency
       uses: ./source/.github/actions/draco-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Install Imath dependency
       uses: ./source/.github/actions/imath-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Install OpenEXR dependency
       uses: ./source/.github/actions/openexr-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Install Alembic dependency
       uses: ./source/.github/actions/alembic-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Install pybind11 dependency
       uses: ./source/.github/actions/pybind11-install-dep

@@ -42,18 +42,26 @@ Other options can be toggled directly by pressing the following hotkeys:
 * `Z`: the display of the FPS counter.
 * `R`: raytracing.
 * `D`: the denoiser when raytracing.
-* `U`: background blur when using a HDRi.
+* `U`: background blur, useful with an HDRI skybox.
 * `K`: trackball interaction mode.
+* `F`: HDRI ambient lighting.
+* `J`: the display of the HDRI skybox.
 * `L`: increase (+Shift: decrease) lights intensity.
 
 Note that some hotkeys can be available or not depending on the file being loaded and the F3D configuration.
+
+Camera Hotkeys:
+* `1`: front view camera.
+* `3`: right view camera.
+* `7`: top view camera.
+* `9`: isometric view camera.
+* `ENTER`: reset the camera to its initial parameters.
 
 Other hotkeys are available:
 
 * `H`: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
 * `?`: key to print scene description to the terminal.
 * `ESC`: close the window and quit F3D.
-* `ENTER`: reset the camera to its initial parameters.
 * `SPACE`: play the animation if any.
 * `LEFT`: load the previous file if any.
 * `RIGHT`: load the next file if any.

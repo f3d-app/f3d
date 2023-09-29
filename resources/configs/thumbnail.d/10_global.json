@@ -6,6 +6,7 @@
     "tone-mapping": true,
     "no-background": true,
     "max-size":100,
-    "camera-direction": "-1,-0.5,-1"
+    "camera-direction": "-1,-0.5,-1",
+    "hdri-ambient": true
   }
 }

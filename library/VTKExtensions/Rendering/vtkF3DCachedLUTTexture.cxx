@@ -21,6 +21,11 @@ void vtkF3DCachedLUTTexture::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 void vtkF3DCachedLUTTexture::Load(vtkRenderer* ren)
 {
+  if (!this->UseCache)
+  {
+    return this->Superclass::Load(ren);
+  }
+
   if (this->GetMTime() > this->LoadTime.GetMTime())
   {
     vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow());
@@ -51,13 +56,18 @@ void vtkF3DCachedLUTTexture::Load(vtkRenderer* ren)
     vtkImageData* img = reader->GetOutput();
     int dims[3];
     img->GetDimensions(dims);
+    if (dims[0] != dims[1])
+    {
+      vtkWarningMacro("LUT cache has unexpected dimensions");
+    }
+    this->LUTSize = dims[0];
 
 #ifdef GL_ES_VERSION_3_0
     this->TextureObject->Create2DFromRaw(
-      dims[0], dims[1], 2, VTK_UNSIGNED_CHAR, img->GetScalarPointer());
+      this->LUTSize, this->LUTSize, 2, VTK_UNSIGNED_CHAR, img->GetScalarPointer());
 #else
     this->TextureObject->Create2DFromRaw(
-      dims[0], dims[1], 2, VTK_UNSIGNED_SHORT, img->GetScalarPointer());
+      this->LUTSize, this->LUTSize, 2, VTK_UNSIGNED_SHORT, img->GetScalarPointer());
 #endif
 
     this->RenderWindow = renWin;

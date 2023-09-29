@@ -5,11 +5,11 @@ Images and videos displayed below use public datasets, you can download them [he
 
 <video src='https://user-images.githubusercontent.com/3129530/194735274-395839e9-e2cb-4a47-83b9-5c6987640032.webm' autoplay="autoplay" loop="loop" width="700"></video>
 
-*Animated realistic rendering*: `f3d gearbox/scene.gltf --hdri=future_parking_2k.hdr -uqxtgas`
+*Animated realistic rendering*: `f3d gearbox/scene.gltf --hdri-file=future_parking_2k.hdr --hdri-skybox --hdri-ambient -uqxtgas`
 
 <video src='https://user-images.githubusercontent.com/3129530/194734947-f34bc377-8ee4-472a-b130-30ce9e86facf.webm' autoplay="autoplay" loop="loop" width="700"></video>
 
-*Animated, skinned and morphed rendering*: `f3d dota/scene.gltf --hdri=future_parking_2k.hdr -uqxtgas`
+*Animated, skinned and morphed rendering*: `f3d dota/scene.gltf --hdri-skybox --hdri-ambient --hdri-file=future_parking_2k.hdr -uqxtgas`
 
 <video src='https://user-images.githubusercontent.com/3129530/194735269-b62216e6-33da-484c-9f0d-39befc8253bf.webm' autoplay="autoplay" loop="loop" width="700"></video>
 
@@ -17,7 +17,7 @@ Images and videos displayed below use public datasets, you can download them [he
 
 <img src="https://user-images.githubusercontent.com/3129530/194735272-5bcd3e7c-a333-41f5-8066-9b0bec9885e8.png" width="700">
 
-*Direct scalars rendering of a point cloud*: `f3d Carola_PointCloud.ply --point-size=0 --comp=-2 -so --up=+Z --hdri=venice_sunset_8k.hdr`
+*Direct scalars rendering of a point cloud*: `f3d Carola_PointCloud.ply --point-size=0 --comp=-2 -so --up=+Z --hdri-skybox --hdri-ambient --hdri-file=venice_sunset_8k.hdr`
 
 <img src="https://user-images.githubusercontent.com/3129530/194735378-b8be4df2-e030-4d13-b12f-24806cbb385b.png" width="700">
 
@@ -29,7 +29,7 @@ Images and videos displayed below use public datasets, you can download them [he
 
 <img src="https://user-images.githubusercontent.com/3129530/194735376-3a476643-00d6-4cfc-9a88-e0dd33658564.png" width="700">
 
-*Realistic rendering #1*: `f3d DamagedHelmet.glb --hdri=lebombo_4k.hdr -tuqap`
+*Realistic rendering #1*: `f3d DamagedHelmet.glb --hdri-skybox --hdri-ambient --hdri-file=lebombo_4k.hdr -tuqap`
 
 <img src="https://user-images.githubusercontent.com/3129530/194735416-3f386437-456c-4145-9b5e-6bb6451d7e9a.png" width="700">
 
@@ -45,7 +45,7 @@ Images and videos displayed below use public datasets, you can download them [he
 
 <img src="https://user-images.githubusercontent.com/3129530/194735363-d2be23bb-90b6-4e90-941d-14b6dc24b476.png" width="700">
 
-*Realistic rendering #2*: `f3d FlightHelmet.glb --hdri=lebombo_4k.hdr -tuqap`
+*Realistic rendering #2*: `f3d FlightHelmet.glb --hdri-skybox --hdri-ambient --hdri-file=lebombo_4k.hdr -tuqap`
 
 <img src="https://user-images.githubusercontent.com/3129530/194735361-7e827d8e-531a-4938-b608-18825a9574f8.png" width="700">
 

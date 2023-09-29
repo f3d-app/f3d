@@ -4,6 +4,7 @@
 #include "F3DIcon.h"
 #include "F3DNSDelegate.h"
 #include "F3DOptionsParser.h"
+#include "F3DSystemTools.h"
 
 #include "engine.h"
 #include "interactor.h"
@@ -248,7 +249,9 @@ int F3DStarter::Start(int argc, char** argv)
             // TODO: add a image::canRead
 
             // Load the file as an HDRI instead of adding it.
-            this->Internals->Engine->getOptions().set("render.background.hdri", file);
+            this->Internals->Engine->getOptions().set("render.hdri.file", file);
+            this->Internals->Engine->getOptions().set("render.hdri.ambient", true);
+            this->Internals->Engine->getOptions().set("render.background.skybox", true);
 
             // Rendering now is needed for correct lighting
             this->Render();
@@ -320,10 +323,12 @@ int F3DStarter::Start(int argc, char** argv)
       }
     }
 
+    char* noDataForceRender = std::getenv("CTEST_F3D_NO_DATA_FORCE_RENDER");
+
     // Render and compare with file if needed
     if (!this->Internals->AppOptions.Reference.empty())
     {
-      if (!this->Internals->LoadedFile)
+      if (!this->Internals->LoadedFile && !noDataForceRender)
       {
         f3d::log::error("No file loaded, no rendering performed");
         return EXIT_FAILURE;
@@ -379,7 +384,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Render to file if needed
     else if (!this->Internals->AppOptions.Output.empty())
     {
-      if (!this->Internals->LoadedFile)
+      if (!this->Internals->LoadedFile && !noDataForceRender)
       {
         f3d::log::error("No file loaded, no rendering performed");
         return EXIT_FAILURE;

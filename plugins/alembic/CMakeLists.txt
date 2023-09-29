@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.21)
 
 project(f3d-plugin-alembic)
 
 include(GNUInstallDirs)
 
 # Check if the plugin is built externally
-if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+if(PROJECT_IS_TOP_LEVEL)
   find_package(f3d REQUIRED)
 else()
   include(f3dPlugin)

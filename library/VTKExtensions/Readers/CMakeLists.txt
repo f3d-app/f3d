@@ -1,5 +1,6 @@
 set(classes
   vtkF3DGenericImporter
+  vtkF3DMemoryMesh
   vtkF3DPostProcessFilter
   )
 

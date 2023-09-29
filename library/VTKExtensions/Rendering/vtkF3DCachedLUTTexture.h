@@ -25,11 +25,21 @@ public:
    */
   void Load(vtkRenderer*) override;
 
+  ///@{
+  /**
+   * Turn on or off cache mechanism
+   * Default is off
+   */
+  vtkSetMacro(UseCache, bool);
+  vtkBooleanMacro(UseCache, bool);
+  ///@}
+
 protected:
   vtkF3DCachedLUTTexture() = default;
   ~vtkF3DCachedLUTTexture() override = default;
 
   std::string FileName;
+  bool UseCache = false;
 
 private:
   vtkF3DCachedLUTTexture(const vtkF3DCachedLUTTexture&) = delete;
