@@ -182,14 +182,6 @@ PYBIND11_MODULE(pyf3d, module)
   py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete> > interactor(
     module, "Interactor");
   interactor //
-    .def("set_key_press_callback", &f3d::interactor::setKeyPressCallBack,
-      "Define a callback triggered when a key is pressed")
-    .def("set_drop_files_callback", &f3d::interactor::setDropFilesCallBack,
-      "Define a callback triggered when files are dropped")
-    .def("create_timer_callback", &f3d::interactor::createTimerCallBack,
-      "Define a callback triggered at a fixed timestep")
-    .def("remove_timer_callback", &f3d::interactor::removeTimerCallBack,
-      "Delete a previously created timer callback")
     .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation")
     .def("start_animation", &f3d::interactor::startAnimation, "Start the animation")
     .def("stop_animation", &f3d::interactor::stopAnimation, "Stop the animation")
@@ -313,8 +305,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("load_plugin", &f3d::engine::loadPlugin, "Load a plugin")
     .def_static(
       "autoload_plugins", &f3d::engine::autoloadPlugins, "Automatically load internal plugins")
-    .def_static("get_lib_info", &f3d::engine::getLibInfo)
-    .def_static("get_readers_info", &f3d::engine::getReadersInfo)
     .def_static("get_plugins_list", &f3d::engine::getPluginsList);
 
 // deprecated functions, will be removed in the next major release, F3D v3.0.0
@@ -368,14 +358,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("textDistance", &f3d::utils::textDistance, "DEPRECATED");
 
   interactor //
-    .def("setKeyPressCallBack", &f3d::interactor::setKeyPressCallBack,
-      "Define a callback triggered when a key is pressed", "DEPRECATED")
-    .def("setDropFilesCallBack", &f3d::interactor::setDropFilesCallBack,
-      "Define a callback triggered when files are dropped", "DEPRECATED")
-    .def("createTimerCallBack", &f3d::interactor::createTimerCallBack,
-      "Define a callback triggered at a fixed timestep", "DEPRECATED")
-    .def("removeTimerCallBack", &f3d::interactor::removeTimerCallBack,
-      "Delete a previously created timer callback", "DEPRECATED")
     .def("toggleAnimation", &f3d::interactor::toggleAnimation, "Toggle the animation", "DEPRECATED")
     .def("startAnimation", &f3d::interactor::startAnimation, "Start the animation", "DEPRECATED")
     .def("stopAnimation", &f3d::interactor::stopAnimation, "Stop the animation", "DEPRECATED")
@@ -447,8 +429,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("loadPlugin", &f3d::engine::loadPlugin, "Load a plugin", "DEPRECATED")
     .def_static("autoloadPlugins", &f3d::engine::autoloadPlugins,
       "Automatically load internal plugins", "DEPRECATED")
-    .def_static("getLibInfo", &f3d::engine::getLibInfo, "DEPRECATED")
-    .def_static("getReadersInfo", &f3d::engine::getReadersInfo, "DEPRECATED")
     .def_static("getPluginsList", &f3d::engine::getPluginsList, "DEPRECATED");
 #pragma GCC diagnostic pop
 #endif
