@@ -14,13 +14,20 @@ Also, do not hesitate to join our [discord](https://discord.f3d.app)!
 
 ## How to get started with development
 
-To contribute to F3D as a developer, you may want to take a look at the opened [issues](https://github.com/f3d-app/f3d/issues),
+To contribute to F3D as a developer, first you may want to try and build F3D for yourself.
+If you are already familiar with software compilation, you can take a look at our [build](doc/dev/BUILD.md) guide.
+If not, you may want to look at our [getting started](doc/dev/GETTING_STARTED.md) guide, that provide steps to compile F3D.
+
+Once you are able to build F3D, you may want to take a look at the opened [issues](https://github.com/f3d-app/f3d/issues),
 especially, the ones with the ["good first issue"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) label.
 If one sounds interesting to you, then you should just go ahead and comment on the issue and ask for any help or clarification needed.
-F3D maintainers will see your comment and provide guidance as needed.
+F3D maintainers will see your comment and provide guidance as needed. You can also reach out on discord.
 
 You can then fix the issue in your side and contribute it to the F3D repository,
 by following the workflow described below.
+
+Of course, if you are already using F3D and want to improve it for your specific needs, because you want a feature or found a bug,
+that is definitely possible. Feel free to reach out for guidance by opening an issue or asking on discord.
 
 Another way to get started is to improve the documentation.
 
@@ -41,7 +48,7 @@ It also means that adding a new feature or behavior means adding a associated te
 Make sure to check the results for yourself, and ask for help if needed.
 
 F3D continuous integration will also check the coverage as it is a good way to evaluate if new features are being tested or not.
-When adding code to F3D, always to to cover it by adding/modifying [tests](doc/dev/TESTING.md).
+When adding code to F3D, always try to cover it by adding/modifying [tests](doc/dev/TESTING.md).
 
 F3D continuous integration also check formatting using clang-format and will inform you if changes needs to be made.
 However, some [formatting rules](doc/dev/CODING_STYLE.md) are not enforced by clang-format and will be checked during the review process.
