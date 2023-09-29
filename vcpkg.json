@@ -6,6 +6,7 @@
         "draco",
         "opencascade",
         "openexr",
+        "pybind11",
         {
             "name": "vtk",
             "default-features": false,

@@ -47,6 +47,9 @@ public:
       diffRes.save(diff);
       return false;
     }
+
+    std::cout << "Successful render test against " << baseline + " with an error of " << error
+              << std::endl;
     return true;
   }
 

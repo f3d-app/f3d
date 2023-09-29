@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.21)
 include(CMakeDependentOption)
 
 # Generic CMake variables, should be done before project()
 set(output_postfix "")
-get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-if(${is_multi_config})
+get_property(F3D_MULTI_CONFIG_GENERATOR GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(${F3D_MULTI_CONFIG_GENERATOR})
   set(output_postfix "_$<CONFIG>")
   if(NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Multi-config types" FORCE)
@@ -25,7 +25,7 @@ project(F3D
   LANGUAGES C CXX)
 
 set(f3d_cmake_dir "${F3D_SOURCE_DIR}/cmake")
- list(INSERT CMAKE_MODULE_PATH 0 "${f3d_cmake_dir}")
+list(INSERT CMAKE_MODULE_PATH 0 "${f3d_cmake_dir}")
 include(f3dVersion)
 
 # Handle F3D_VERSION
@@ -41,6 +41,8 @@ string(TIMESTAMP F3D_BUILD_DATE "%Y-%m-%d %H:%M:%S" UTC)
 
 math(EXPR F3D_SYSTEM_PROCESSOR "8 * ${CMAKE_SIZEOF_VOID_P}")
 set(F3D_SYSTEM_PROCESSOR "${F3D_SYSTEM_PROCESSOR}-bits")
+
+option(F3D_EXCLUDE_DEPRECATED "Exclude deprecated functions and options" OFF)
 
 # Modules
 option(F3D_MODULE_EXTERNAL_RENDERING "External rendering module" OFF)
@@ -148,10 +150,9 @@ endif()
 
 # Testing
 option(BUILD_TESTING "Build the tests" OFF)
-cmake_dependent_option(F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON "Disable image comparison on tests using the default lights" OFF "BUILD_TESTING" ON)
-cmake_dependent_option(F3D_TESTING_ENABLE_RENDERING_TESTS "Enable rendering tests" ON "BUILD_TESTING" ON)
-cmake_dependent_option(F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" ON)
-cmake_dependent_option(F3D_TESTING_ENABLE_HDRI_TESTS "Enable HDRi related tests" ON "F3D_TESTING_RENDRERING_TESTS" ON "F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS" ON "BUILD_TESTING" ON)
+cmake_dependent_option(F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON "Disable image comparison on tests using the default lights" OFF "BUILD_TESTING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_RENDERING_TESTS "Enable rendering tests" ON "BUILD_TESTING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" OFF)
 if(BUILD_TESTING)
   enable_testing()
 endif()
@@ -175,6 +176,9 @@ if (UNIX AND NOT APPLE)
   endif()
 endif()
 
+# F3D Application
+cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
+
 # plugins
 option(F3D_PLUGINS_STATIC_BUILD "Make all plugins static (embedded into libf3d) and automatically loaded by F3D" ON)
 mark_as_advanced(F3D_PLUGINS_STATIC_BUILD)
@@ -188,8 +192,6 @@ add_subdirectory(plugins)
 # libf3d target
 add_subdirectory(library)
 
-# F3D Application
-cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
 if (F3D_BUILD_APPLICATION)
   add_subdirectory(application)
 endif()
@@ -232,5 +234,13 @@ if (F3D_BUILD_APPLICATION)
     DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
 endif ()
 
-# Installling resources
-add_subdirectory(resources)
+# Check that a LFS data file is big enough to be an actual file
+file(SIZE "${F3D_SOURCE_DIR}/testing/data/dragon.vtu" f3d_lfs_file_size)
+if (f3d_lfs_file_size LESS_EQUAL 500)
+  if(BUILD_TESTING)
+    message(FATAL_ERROR "Building tests without LFS data will result in non fonctionning tests, please fetch LFS data or disable BUILD_TESTING. Aborting.")
+  endif()
+  if (F3D_BINDINGS_PYTHON)
+    message(WARNING "Building python binding without LFS data is supported but testing using pytest will not be, please fetch LFS data to avoid this.")
+  endif()
+endif()

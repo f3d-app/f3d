@@ -1,7 +1,8 @@
 # Build guide
 
 F3D uses a CMake based build system, so building F3D just requires installing
-needed dependencies, configuring and building.
+needed dependencies, configuring and building. If you are not used to such processes
+please take a look at our [getting started guide](GETTING_STARTED.md).
 
 ## Dependencies
 
@@ -15,6 +16,7 @@ needed dependencies, configuring and building.
 * Optionally, [Draco](https://google.github.io/draco/) >= 1.5.
 * Optionally, [Python](https://www.python.org/) >= 3.6 and [pybind11](https://github.com/pybind/pybind11) >= 2.2.
 * Optionally, [Java](https://www.java.com) >= 18.
+* Optionally, [OpenEXR](https://openexr.com/en/latest/) >= 3.0.
 
 ## VTK compatibility
 
@@ -59,14 +61,26 @@ Installation can be done through CMake, by running the following command:
 cmake --install ${your_build_dir}
 ```
 
-Optional components can be installed by specifying the component name:
+Individual components can also be installed by specifying the component name:
 
 ```
 cmake --install ${your_build_dir} --component ${component_name}
 ```
 
-Here is the list of the optional components you can install:
+Here is the list of all the components:
 
-* `mimetypes`: Install plugins mimetype XML files for integration with Freedesktop (Linux only).
-* `configuration`: Install default configuration files , `config` and `thumbnail`.
-* `sdk`: Install the [libf3d](../libf3d/README_LIBF3D.md) SDK.
+Name|Installed by default|Operating system|Description
+------|------|------|------
+`application`|YES|ALL|F3D application
+`configuration`|NO|ALL|Default configuration files, `config` and `thumbnail`.
+`library`|YES|ALL|libf3d library binaries
+`plugin`|YES|ALL|libf3d plugins
+`dependencies`|NO|ALL|libf3d runtime dependencies. Can be used to create a self-contained and relocatable package. System libraries are excluded.
+`sdk`|NO|ALL|libf3d SDK (headers and CMake config files)
+`licenses`|YES|ALL|F3D and third party licenses
+`documentation`|YES|Linux|`man` documentation
+`shellext`|YES|Windows/Linux|Desktop integration
+`python`|YES|ALL|Python bindings
+`java`|YES|ALL|Java bindings
+`mimetypes`|NO|Linux|Plugins mimetype XML files for integration with Freedesktop
+`assets`|YES|Linux|Assets for integration with Freedesktop

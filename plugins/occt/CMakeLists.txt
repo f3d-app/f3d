@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.21)
 
 project(f3d-plugin-occt)
 
 include(GNUInstallDirs)
 
 # Check if the plugin is built externally
-if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+if(PROJECT_IS_TOP_LEVEL)
   find_package(f3d REQUIRED)
 else()
   include(f3dPlugin)
@@ -50,6 +50,15 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "Initial Graphics Exchange Specification"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/iges.inl"
+)
+
+f3d_plugin_declare_reader(
+  NAME BREP
+  EXTENSIONS brep
+  MIMETYPES application/vnd.brep
+  VTK_READER vtkF3DOCCTReader
+  FORMAT_DESCRIPTION "Open CASCADE BRep"
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/brep.inl"
 )
 
 set(rpaths "")

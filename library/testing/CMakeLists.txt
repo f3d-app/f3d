@@ -14,6 +14,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
     TestSDKCompareWithFile.cxx
     TestSDKDropZone.cxx
     TestSDKImage.cxx
+    TestSDKLoadFromMemory.cxx
     TestSDKMultiColoring.cxx
     TestSDKMultiOptions.cxx
     TestSDKWindowNative.cxx
@@ -22,6 +23,10 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
     TestSDKDynamicLightIntensity.cxx
     TestSDKDynamicProperties.cxx
     )
+  if(NOT F3D_EXCLUDE_DEPRECATED)
+    list(APPEND libf3dSDKTests_list
+         TestSDKImageDeprecated.cxx)
+  endif()
 endif()
 
 # Animation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
@@ -47,9 +52,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519)
 endif()
 
 # Configure the log file for dropfile test
-configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack.log.in"
+configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack.log.in"
                "${CMAKE_BINARY_DIR}/TestSDKInteractorCallBack.log") # Dragon.vtu; S
-configure_file("${CMAKE_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullScene.log.in"
+configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullScene.log.in"
                "${CMAKE_BINARY_DIR}/TestSDKInteractorDropFullScene.log") # world.obj; S
 
 # External window tests
@@ -82,6 +87,8 @@ set_target_properties(libf3dSDKTests PROPERTIES
   CXX_VISIBILITY_PRESET hidden
   )
 
+target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR=$<BOOL:${F3D_MODULE_EXR}>)
+
 # List tests that do not require rendering
 list(APPEND libf3dSDKTestsNoRender_list
      TestSDKEngineExceptions
@@ -92,7 +99,7 @@ list(APPEND libf3dSDKTestsNoRender_list
 # Add all the ADD_TEST for each test
 foreach (test ${libf3dSDKTests_list})
   get_filename_component (TName ${test} NAME_WE)
-  add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName}  "${CMAKE_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+  add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName}  "${F3D_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
   set_tests_properties(libf3d::${TName} PROPERTIES TIMEOUT 30)
   if (NOT F3D_TESTING_ENABLE_RENDERING_TESTS AND NOT ${TName} IN_LIST libf3dSDKTestsNoRender_list)
     set_tests_properties(libf3d::${TName} PROPERTIES DISABLED ON)
@@ -112,7 +119,7 @@ Test Debug Coloring")
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES TIMEOUT 90)
-  if(NOT F3D_TESTING_ENABLE_HDRI_TESTS OR NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
+  if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
     set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)
   endif()
 endif()

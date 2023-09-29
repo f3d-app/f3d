@@ -8,6 +8,7 @@
 
 #include "factory.h"
 #include "vtkF3DGenericImporter.h"
+#include "vtkF3DMemoryMesh.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkProgressBarRepresentation.h>
@@ -17,6 +18,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <algorithm>
+#include <numeric>
 #include <vector>
 
 namespace f3d::detail
@@ -49,7 +51,7 @@ public:
         vtkProgressBarWidget* widget = progressData->widget;
         // Only show and render the progress bar if loading takes more than 0.15 seconds
         if (progressData->timer->GetElapsedTime() > 0.15 ||
-          vtksys::SystemTools::HasEnv("CTEST_PROGRESS_BAR_TESTING"))
+          vtksys::SystemTools::HasEnv("CTEST_F3D_PROGRESS_BAR"))
         {
           widget->On();
           vtkProgressBarRepresentation* rep =
@@ -105,6 +107,69 @@ public:
     log::debug(importer->GetOutputsDescription(), "\n");
   }
 
+  void LoadGeometry(const std::string& name, vtkAlgorithm* source, bool reset)
+  {
+    if (!this->DefaultScene || reset)
+    {
+      // Reset the generic importer
+      this->GenericImporter->RemoveInternalReaders();
+
+      // Remove the importer from the renderer
+      this->Window.SetImporterForColoring(nullptr);
+
+      // Window initialization is needed
+      this->Window.Initialize(true);
+    }
+
+    // Manage progress bar
+    vtkNew<vtkProgressBarWidget> progressWidget;
+    vtkNew<vtkTimerLog> timer;
+    loader_impl::internals::ProgressDataStruct callbackData;
+    callbackData.timer = timer;
+    callbackData.widget = progressWidget;
+    if (this->Options.getAsBool("ui.loader-progress") && this->Interactor)
+    {
+      loader_impl::internals::CreateProgressRepresentationAndCallback(
+        &callbackData, this->GenericImporter, this->Interactor);
+    }
+
+    // Add a single internal reader
+    this->GenericImporter->AddInternalReader(name, source);
+
+    // Update the importer
+    this->GenericImporter->Update();
+
+    // Remove anything progress related if any
+    this->GenericImporter->RemoveObservers(vtkCommand::ProgressEvent);
+    progressWidget->Off();
+
+    // Initialize the animation using temporal information from the importer
+    this->AnimationManager.Initialize(
+      &this->Options, &this->Window, this->Interactor, this->GenericImporter);
+
+    double animationTime = this->Options.getAsDouble("scene.animation.time");
+    if (animationTime != 0)
+    {
+      this->AnimationManager.LoadAtTime(animationTime);
+    }
+
+    // Display the importer description
+    loader_impl::internals::DisplayImporterDescription(this->GenericImporter);
+
+    // Set the importer to use for coloring and actors
+    this->Window.SetImporterForColoring(this->GenericImporter);
+
+    // Initialize renderer and reset camera to bounds
+    this->Window.UpdateDynamicOptions();
+    this->Window.getCamera().resetToBounds();
+
+    // Print info about scene and coloring
+    this->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+    this->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
+
+    this->DefaultScene = true;
+  }
+
   bool DefaultScene = false;
   const options& Options;
   window_impl& Window;
@@ -129,18 +194,6 @@ loader_impl::~loader_impl() = default;
 //----------------------------------------------------------------------------
 loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
 {
-  if (!this->Internals->DefaultScene || reset)
-  {
-    // Reset the generic importer
-    this->Internals->GenericImporter->RemoveInternalReaders();
-
-    // Remove the importer from the renderer
-    this->Internals->Window.SetImporterForColoring(nullptr);
-
-    // Window initialization is needed
-    this->Internals->Window.Initialize(true);
-  }
-
   // Check file validity
   if (filePath.empty())
   {
@@ -171,54 +224,7 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
   // Read the file
   log::debug("Loading: ", filePath, "\n");
 
-  // Manage progress bar
-  vtkNew<vtkProgressBarWidget> progressWidget;
-  vtkNew<vtkTimerLog> timer;
-  loader_impl::internals::ProgressDataStruct callbackData;
-  callbackData.timer = timer;
-  callbackData.widget = progressWidget;
-  if (this->Internals->Options.getAsBool("ui.loader-progress") && this->Internals->Interactor)
-  {
-    loader_impl::internals::CreateProgressRepresentationAndCallback(
-      &callbackData, this->Internals->GenericImporter, this->Internals->Interactor);
-  }
-
-  // Add a single internal reader
-  this->Internals->GenericImporter->AddInternalReader(
-    vtksys::SystemTools::GetFilenameName(filePath), vtkReader);
-
-  // Update the importer
-  this->Internals->GenericImporter->Update();
-
-  // Remove anything progress related if any
-  this->Internals->GenericImporter->RemoveObservers(vtkCommand::ProgressEvent);
-  progressWidget->Off();
-
-  // Initialize the animation using temporal information from the importer
-  this->Internals->AnimationManager.Initialize(&this->Internals->Options, &this->Internals->Window,
-    this->Internals->Interactor, this->Internals->GenericImporter);
-
-  double animationTime = this->Internals->Options.getAsDouble("scene.animation.time");
-  if (animationTime != 0)
-  {
-    this->Internals->AnimationManager.LoadAtTime(animationTime);
-  }
-
-  // Display the importer description
-  loader_impl::internals::DisplayImporterDescription(this->Internals->GenericImporter);
-
-  // Set the importer to use for coloring and actors
-  this->Internals->Window.SetImporterForColoring(this->Internals->GenericImporter);
-
-  // Initialize renderer and reset camera to bounds
-  this->Internals->Window.UpdateDynamicOptions();
-  this->Internals->Window.getCamera().resetToBounds();
-
-  // Print info about scene and coloring
-  this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-  this->Internals->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
-
-  this->Internals->DefaultScene = true;
+  this->Internals->LoadGeometry(vtksys::SystemTools::GetFilenameName(filePath), vtkReader, reset);
 
   return *this;
 }
@@ -313,6 +319,28 @@ loader& loader_impl::loadScene(const std::string& filePath)
   // Print info about scene and coloring
   this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
   this->Internals->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+loader& loader_impl::loadGeometry(const mesh_t& mesh, bool reset)
+{
+  // sanity checks
+  auto [valid, err] = mesh.isValid();
+  if (!valid)
+  {
+    throw loader::load_failure_exception(err);
+  }
+
+  vtkNew<vtkF3DMemoryMesh> vtkSource;
+  vtkSource->SetPoints(mesh.points);
+  vtkSource->SetNormals(mesh.normals);
+  vtkSource->SetTCoords(mesh.texture_coordinates);
+  vtkSource->SetFaces(mesh.face_sides, mesh.face_indices);
+  vtkSource->Update();
+
+  this->Internals->LoadGeometry("<memory>", vtkSource, reset);
 
   return *this;
 }

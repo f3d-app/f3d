@@ -85,6 +85,14 @@ You can try to use a software implementation of OpenGL, called [Mesa](https://gi
 
 Set the codepage to UTF-8, run `chcp 65001`.
 
+> When I install F3D, I can't add F3D to the path and the installer complains that: `PATH too long installer unable to modify PATH!`.
+
+There are too many entry in your PATH environment variable, remove the ones you do not use.
+
+> When I try to update F3D, the installer fails with: `Error opening file for writing: F3DShellExtension.dll`
+
+Your previous F3D installation is current being used to generate thumbnails, wait for a bit or reboot your computer before updating again.
+
 ## macOS
 
 > Using the binary release, I'm unable to run F3D because macOS warns about F3D not being signed.

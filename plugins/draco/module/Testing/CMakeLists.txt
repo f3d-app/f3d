@@ -9,5 +9,5 @@ endif()
 vtk_add_test_cxx(VTKExtensionsPluginDraco tests
   NO_DATA NO_VALID NO_OUTPUT
   ${VTKExtensionsPluginDraco_list}
-  ${CMAKE_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
+  ${F3D_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(VTKExtensionsPluginDraco tests)

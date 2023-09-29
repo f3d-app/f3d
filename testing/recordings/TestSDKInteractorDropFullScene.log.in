@@ -5,7 +5,7 @@ KeyPressEvent 677 699 0 0 1 Super_L 0
 CharEvent 677 699 0 0 1 Super_L 0
 UpdateDropLocationEvent 677 699 0 0 1 Super_L 0
 EnterEvent 781 494 0 0 0 Super_L 0
-DropFilesEvent 781 494 0 0 0 Super_L 1 1 ${CMAKE_SOURCE_DIR}/testing/data/world.obj
+DropFilesEvent 781 494 0 0 0 Super_L 1 1 ${F3D_SOURCE_DIR}/testing/data/world.obj
 RenderEvent 781 494 0 0 0 Super_L 0
 MouseMoveEvent 781 498 0 0 0 Super_L 0
 LeaveEvent 751 614 0 0 0 Super_L 0

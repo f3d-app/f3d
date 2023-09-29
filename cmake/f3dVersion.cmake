@@ -62,6 +62,7 @@ endfunction()
 
 # Extracts components from a version string. See f3d_determine_version() for usage.
 function(f3d_extract_version_components version_string var_prefix)
+  set(CMAKE_MATCH_5 "") # Init the patch extra as it can be undefined
   string(REGEX MATCH "^v(([0-9]+)\\.([0-9]+)\\.([0-9]+)-?(.*))$"
     version_matches "${version_string}")
   if(CMAKE_MATCH_0)

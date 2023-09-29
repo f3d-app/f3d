@@ -22,6 +22,11 @@ void vtkF3DCachedSpecularTexture::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 void vtkF3DCachedSpecularTexture::Load(vtkRenderer* ren)
 {
+  if (!this->UseCache)
+  {
+    return this->Superclass::Load(ren);
+  }
+
   if (this->GetMTime() > this->LoadTime.GetMTime())
   {
     vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow());
@@ -63,7 +68,13 @@ void vtkF3DCachedSpecularTexture::Load(vtkRenderer* ren)
     }
 
     int* firstDims = firstImg->GetDimensions();
-    this->TextureObject->CreateCubeFromRaw(firstDims[0], firstDims[1], 3, VTK_FLOAT, data);
+    if (firstDims[0] != firstDims[1])
+    {
+      vtkWarningMacro("Specular cache has unexpected dimensions");
+    }
+    this->PrefilterSize = firstDims[0];
+    this->TextureObject->CreateCubeFromRaw(
+      this->PrefilterSize, this->PrefilterSize, 3, VTK_FLOAT, data);
 
     // the mip levels are manually uploaded because there is no abstraction in VTK
     for (unsigned int i = 1; i < nbLevels; i++)

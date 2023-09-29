@@ -42,7 +42,11 @@ fs::path GetApplicationPath()
 #else
   try
   {
+#if defined(__FreeBSD__)
+    return fs::canonical("/proc/curproc/file");
+#else
     return fs::canonical("/proc/self/exe");
+#endif
   }
   catch (const std::exception& ex)
   {

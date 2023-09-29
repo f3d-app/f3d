@@ -3,6 +3,7 @@
 
 #include "exception.h"
 #include "export.h"
+#include "types.h"
 
 #include <string>
 #include <vector>
@@ -54,12 +55,22 @@ public:
 
   /**
    * Load a geometry from a provided file to the scene.
-   * Reset the scene before loading if a full scene was loaded previously or if reset is set to
-   * false, do not reset if only loaded geometries previously. Geometries loader using this method
-   * will be available in a default scene and use all default scene related options. Throw a
-   * load_failure_exception on failure.
+   * Calling this method will reset the scene before loading if a full scene was loaded previously
+   * or if the reset argument is set to true, It will not reset if only geometries were loaded
+   * previously. Geometries loaded using this method will be available in a default scene and use
+   * all default scene related options. Throw a load_failure_exception on failure.
    */
   virtual loader& loadGeometry(const std::string& filePath, bool reset = false) = 0;
+
+  /**
+   * Load a geometry from memory buffers.
+   * Calling this method will reset the scene before loading if a full scene was loaded previously
+   * or if the reset argument is set to true, It will not reset if only geometries were loaded
+   * previously. Geometries loaded using this method will be available in a default scene and use
+   * all default scene related options.
+   * Throw a load_failure_exception if the mesh is invalid.
+   */
+  virtual loader& loadGeometry(const mesh_t& mesh, bool reset = false) = 0;
 
   /**
    * Return true if the loader has a scene reader for the providen file, false otherwise.

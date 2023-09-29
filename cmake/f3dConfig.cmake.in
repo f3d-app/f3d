@@ -7,6 +7,7 @@
 #
 # The following local variables will also be defined:
 #
+#   f3d_BUILD_APPLICATION          Will be enabled if F3D application was built
 #   f3d_MODULE_EXTERNAL_RENDERING  Will be enabled if F3D was built with external rendering support
 #   f3d_MODULE_RAYTRACING          Will be enabled if F3D was built with raytracing support
 #   f3d_MODULE_EXR                 Will be enabled if F3D was built with OpenEXR images support
@@ -18,6 +19,7 @@
 
 @PACKAGE_INIT@
 
+set(f3d_BUILD_APPLICATION "@F3D_BUILD_APPLICATION@")
 set(f3d_MODULE_EXTERNAL_RENDERING "@F3D_MODULE_EXTERNAL_RENDERING@")
 set(f3d_MODULE_RAYTRACING "@F3D_MODULE_RAYTRACING@")
 set(f3d_MODULE_EXR "@F3D_MODULE_EXR@")

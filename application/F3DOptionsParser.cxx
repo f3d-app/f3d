@@ -9,6 +9,7 @@
 #include "nlohmann/json.hpp"
 
 #include "engine.h"
+#include "export.h"
 #include "interactor.h"
 #include "log.h"
 #include "options.h"
@@ -280,6 +281,11 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   // cxxopts sense.
   HasDefault LocalHasDefaultNo = allOptionsInitialized ? HasDefault::YES : HasDefault::NO;
 
+#ifndef F3D_NO_DEPRECATED
+  // Deprecated options that needs further processing
+  std::string deprecatedHDRI;
+#endif
+
   try
   {
     cxxopts::Options cxxOptions(this->ExecutableName, F3D::AppTitle);
@@ -330,7 +336,12 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp2, "opacity", "", "Opacity", options.getAsDoubleRef("model.color.opacity"), HasDefault::YES, MayHaveConfig::YES, "<opacity>");
     this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.roughness"), HasDefault::YES, MayHaveConfig::YES, "<roughness>");
     this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.metallic"), HasDefault::YES, MayHaveConfig::YES, "<metallic>");
-    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source", options.getAsStringRef("render.background.hdri"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+#ifndef F3D_NO_DEPRECATED
+    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source and skybox (deprecated)", deprecatedHDRI, LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+#endif
+    this->DeclareOption(grp2, "hdri-file", "", "Path to an image file that can be used as a light source and skybox", options.getAsStringRef("render.hdri.file"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "hdri-ambient", "f", "Enable HDRI ambient lighting", options.getAsBoolRef("render.hdri.ambient"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp2, "hdri-skybox", "j", "Enable HDRI skybox background", options.getAsBoolRef("render.background.skybox"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp2, "texture-matcap", "", "Path to a texture file containing a material capture", options.getAsStringRef("model.matcap.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.getAsStringRef("model.color.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.getAsStringRef("model.material.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
@@ -430,6 +441,18 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
         throw F3DExNoProcess("unknown options");
       }
 
+#ifndef F3D_NO_DEPRECATED
+      if (!deprecatedHDRI.empty())
+      {
+        options.set("render.hdri.file", deprecatedHDRI);
+        options.set("render.hdri.ambient", true);
+        options.set("render.background.skybox", true);
+
+        f3d::log::warn("--hdri option is deprecated, please use --hdri-file, --hdri-ambient and "
+                       "--hdri-skybox instead.");
+      }
+#endif
+
       if (result.count("help") > 0)
       {
         this->PrintHelp(cxxOptions);
@@ -483,7 +506,7 @@ void ConfigurationOptions::PrintHelp(const cxxopts::Options& cxxOptions)
   const std::vector<std::pair<std::string, std::string> > examples = {
     { this->ExecutableName + " file.vtu -xtgans",
       "View a unstructured mesh in a typical nice looking sciviz style" },
-    { this->ExecutableName + " file.glb -tuqap --hdri=file.hdr",
+    { this->ExecutableName + " file.glb -tuqap --hdri-file=file.hdr --hdri-ambient --hdri-skybox",
       "View a gltf file in a realistic environment" },
     { this->ExecutableName + " file.ply -so --point-size=0 --comp=-2",
       "View a point cloud file with direct scalars rendering" },

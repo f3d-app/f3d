@@ -18,6 +18,7 @@
 
 class vtkCornerAnnotation;
 class vtkF3DDropZoneActor;
+class vtkImageReader2;
 class vtkOrientationMarkerWidget;
 class vtkSkybox;
 class vtkTextActor;
@@ -25,7 +26,6 @@ class vtkTextActor;
 class vtkF3DRenderer : public vtkOpenGLRenderer
 {
 public:
-  static vtkF3DRenderer* New();
   vtkTypeMacro(vtkF3DRenderer, vtkOpenGLRenderer);
 
   ///@{
@@ -40,6 +40,7 @@ public:
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
   void ShowDropZone(bool show);
+  void ShowHDRISkybox(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -51,6 +52,7 @@ public:
   virtual void SetPointSize(double pointSize);
   void SetFontFile(const std::string& fontFile);
   void SetHDRIFile(const std::string& hdriFile);
+  void SetUseImageBasedLighting(bool use) override;
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);
   void SetFilenameInfo(const std::string& info);
@@ -121,7 +123,7 @@ public:
   /**
    * Get the OpenGL skybox
    */
-  vtkGetObjectMacro(Skybox, vtkSkybox);
+  vtkGetObjectMacro(SkyboxActor, vtkSkybox);
 
   /**
    * Return description about the current rendering status
@@ -140,9 +142,9 @@ public:
   vtkGetVector3Macro(RightVector, double);
 
   /**
-   * Set cache path
+   * Set cache path, only used by the HDRI logic
    */
-  vtkSetMacro(CachePath, std::string);
+  void SetCachePath(const std::string& cachePath);
 
 protected:
   vtkF3DRenderer();
@@ -161,6 +163,28 @@ protected:
    * Configure text actors properties font file and color
    */
   void ConfigureTextActors();
+
+  ///@{
+  /**
+   * Configure HDRI actor and related lighting textures
+   */
+  void ConfigureHDRI();
+  void ConfigureHDRIReader();
+  void ConfigureHDRIHash();
+  void ConfigureHDRITexture();
+  void ConfigureHDRILUT();
+  void ConfigureHDRISphericalHarmonics();
+  void ConfigureHDRISpecular();
+  void ConfigureHDRISkybox();
+  ///@}
+
+  ///@{
+  /**
+   * Methods to check if certain HDRI caches are available
+   */
+  bool CheckForSpecCache(std::string& path);
+  bool CheckForSHCache(std::string& path);
+  ///@}
 
   /**
    * Configure all actors properties according to what has been set for:
@@ -194,11 +218,13 @@ protected:
   /**
    * Override to generate a data description
    */
-  virtual std::string GenerateMetaDataDescription();
+  virtual std::string GenerateMetaDataDescription() = 0;
 
-  vtkNew<vtkActor> GridActor;
+  /**
+   * Create a cache directory if a HDRIHash is set
+   */
+  void CreateCacheDirectory();
 
-  vtkNew<vtkSkybox> Skybox;
   vtkNew<vtkCamera> InitialCamera;
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
@@ -207,6 +233,8 @@ protected:
   vtkNew<vtkCornerAnnotation> MetaDataActor;
   vtkNew<vtkCornerAnnotation> CheatSheetActor;
   vtkNew<vtkF3DDropZoneActor> DropZoneActor;
+  vtkNew<vtkActor> GridActor;
+  vtkNew<vtkSkybox> SkyboxActor;
 
   // vtkCornerAnnotation building is too slow for the timer
   vtkNew<vtkTextActor> TimerActor;
@@ -219,6 +247,13 @@ protected:
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
   bool MetaDataConfigured = false;
+  bool HDRIReaderConfigured = false;
+  bool HDRIHashConfigured = false;
+  bool HDRITextureConfigured = false;
+  bool HDRILUTConfigured = false;
+  bool HDRISphericalHarmonicsConfigured = false;
+  bool HDRISpecularConfigured = false;
+  bool HDRISkyboxConfigured = false;
 
   bool GridVisible = false;
   bool GridAbsolute = false;
@@ -229,6 +264,7 @@ protected:
   bool MetaDataVisible = false;
   bool CheatSheetVisible = false;
   bool DropZoneVisible = false;
+  bool HDRISkyboxVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
@@ -249,8 +285,18 @@ protected:
   double GridUnitSquare = 0.0;
   int GridSubdivisions = 10;
 
-  bool HasHDRI = false;
   std::string HDRIFile;
+  vtkSmartPointer<vtkImageReader2> HDRIReader;
+  bool HasValidHDRIReader = false;
+  bool UseDefaultHDRI = false;
+  std::string HDRIHash;
+  bool HasValidHDRIHash = false;
+  vtkSmartPointer<vtkTexture> HDRITexture;
+  bool HasValidHDRITexture = false;
+  bool HasValidHDRILUT = false;
+  bool HasValidHDRISH = false;
+  bool HasValidHDRISpec = false;
+
   std::string FontFile;
 
   double LightIntensity = 1.0;

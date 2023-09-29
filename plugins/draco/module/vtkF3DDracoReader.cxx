@@ -195,6 +195,11 @@ int vtkF3DDracoReader::RequestData(
   if (geom_type.value() == draco::TRIANGULAR_MESH)
   {
     auto mesh = decoder.DecodeMeshFromBuffer(&buffer);
+    if (!mesh.value())
+    {
+      vtkErrorMacro("Cannot decode triangular mesh file");
+      return 0;
+    }
 
     vtkInternals::FillPoints(mesh.value(), output);
     vtkInternals::FillFaces(mesh.value(), output);
@@ -202,6 +207,11 @@ int vtkF3DDracoReader::RequestData(
   else if (geom_type.value() == draco::POINT_CLOUD)
   {
     auto pc = decoder.DecodePointCloudFromBuffer(&buffer);
+    if (!pc.value())
+    {
+      vtkErrorMacro("Cannot decode point cloud file");
+      return 0;
+    }
 
     vtkInternals::FillPoints(pc.value(), output);
   }
