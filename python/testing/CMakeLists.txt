@@ -1,7 +1,6 @@
 list(APPEND pyf3dTests_list
      test_camera.py
      test_image.py
-     test_loader.py
      test_options.py
      test_utils.py
     )
@@ -23,6 +22,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
 
   list(APPEND pyf3dTests_list
        test_image_compare.py
+       test_loader.py
       )
 endif()
 
