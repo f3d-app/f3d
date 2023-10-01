@@ -107,18 +107,23 @@ public:
     log::debug(importer->GetOutputsDescription(), "\n");
   }
 
+  void Reset()
+  {
+    // Reset the generic importer
+    this->GenericImporter->RemoveInternalReaders();
+
+    // Remove the importer from the renderer
+    this->Window.SetImporterForColoring(nullptr);
+
+    // Window initialization is needed
+    this->Window.Initialize(true);
+  }
+
   void LoadGeometry(const std::string& name, vtkAlgorithm* source, bool reset)
   {
     if (!this->DefaultScene || reset)
     {
-      // Reset the generic importer
-      this->GenericImporter->RemoveInternalReaders();
-
-      // Remove the importer from the renderer
-      this->Window.SetImporterForColoring(nullptr);
-
-      // Window initialization is needed
-      this->Window.Initialize(true);
+      this->Reset();
     }
 
     // Manage progress bar
@@ -202,6 +207,7 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
     {
       log::debug("Provided geometry file path is empty\n");
     }
+    this->Internals->Reset();
     return *this;
   }
   if (!vtksys::SystemTools::FileExists(filePath, true))
