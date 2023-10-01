@@ -438,6 +438,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
             f3d::log::error("Did you mean '--", name, "'?");
           }
         }
+        f3d::log::waitForUser();
         throw F3DExNoProcess("unknown options");
       }
 
