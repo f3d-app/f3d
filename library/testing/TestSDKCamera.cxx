@@ -8,7 +8,7 @@
 #include <iostream>
 #include <limits>
 
-// TODO these methodes should be put in types.h at some point.
+// TODO these methods should be put in types.h at some point.
 // https://github.com/f3d-app/f3d/issues/361
 bool compareDouble(double a, double b)
 {
