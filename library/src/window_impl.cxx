@@ -26,10 +26,6 @@
 #include <vtkExternalOpenGLRenderWindow.h>
 #endif
 
-#if defined(_WIN32)
-#include <vtkWindows.h>
-#endif
-
 namespace f3d::detail
 {
 class window_impl::internals
@@ -218,14 +214,6 @@ void window_impl::Initialize(bool withColoring)
 {
   this->Internals->WithColoring = withColoring;
   this->Internals->Renderer->Initialize(this->Internals->Options.getAsString("scene.up-direction"));
-
-#if defined(_WIN32)
-  // On Windows, the Log window can get in front in some case, make sure the render window is on top
-  // on initialization
-  HWND f3dWindow = static_cast<HWND>(this->Internals->RenWin->GetGenericWindowId());
-  BringWindowToTop(f3dWindow);
-#endif
-
   this->Internals->Initialized = true;
 }
 
