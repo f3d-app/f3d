@@ -5,7 +5,7 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "f3d"
 requires-python = ">=3.7"
-version = "2.2.0"
+version = "2.2.1"
 description = "F3D, a fast and minimalist 3D viewer"
 readme = "README.md"
 license = {file = "LICENSE.md"}
