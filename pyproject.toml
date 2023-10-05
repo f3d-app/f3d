@@ -4,11 +4,11 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "f3d"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 version = "2.2.1"
 description = "F3D, a fast and minimalist 3D viewer"
 readme = "README.md"
-license = {file = "LICENSE.md"}
+license = {text = "BSD 3-Clause License"}
 authors = [
   {name = "Michael Migliore"},
   {name = "Mathieu Westphal"},
