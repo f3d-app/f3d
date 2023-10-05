@@ -99,6 +99,10 @@ Your previous F3D installation is current being used to generate thumbnails, wai
 
 F3D is not signed by Apple yet so macOS shows this warning. To run F3D, right click on the app and click "open", then click "open" again to be able to run F3D.
 
+> Using the silicon binary release, I cannot find the raytracing feature or open exodus files
+
+F3D raytracing and exodus plugin are not working on macOS silicon yet, see this [issue](https://github.com/f3d-app/f3d/issues/976).
+
 > I'm unable to get coloring right with step files
 
-F3D on macOS does not support coloring on cells because of a [VTK issue](https://gitlab.kitware.com/vtk/vtk/-/issues/18969)
+F3D on macOS does not support coloring on cells because of a [VTK issue](https://gitlab.kitware.com/vtk/vtk/-/issues/18969).
