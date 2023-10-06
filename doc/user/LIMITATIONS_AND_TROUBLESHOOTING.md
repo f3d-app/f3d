@@ -95,9 +95,15 @@ Your previous F3D installation is current being used to generate thumbnails, wai
 
 ## macOS
 
-> Using the binary release, I'm unable to run F3D because macOS warns about F3D not being signed.
+> I'm unable to use the binary release, macOS complains the file is invalid or corrupted
 
-F3D is not signed by Apple yet so macOS shows this warning. To run F3D, right click on the app and click "open", then click "open" again to be able to run F3D.
+Our macOS binary package are not signed, to work around this, you can simply run the following command:
+
+```
+xattr -cr /Applications/F3D.app
+```
+
+Then F3D should work as expected.
 
 > Using the silicon binary release, I cannot find the raytracing feature or open exodus files
 
