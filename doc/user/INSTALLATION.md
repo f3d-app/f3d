@@ -11,6 +11,8 @@
 | Debian-based Package | [F3D-2.2.1-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v2.2.1/F3D-2.2.1-Linux-x86_64-raytracing.deb) |
 | Linux (Portable) | [F3D-2.2.1-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v2.2.1/F3D-2.2.1-Linux-x86_64-raytracing.tar.xz) |
 
+Note: MacOS package is not signed, see the [troubleshooting](LIMITATIONS_AND_TROUBLESHOOTING.md) section for a workaround if needed.
+
 ## Alternatives
 
 You can find other (headless, older, smaller, checksum, RCs) release related packages and files on the [releases page](https://github.com/f3d-app/f3d/releases).
@@ -43,4 +45,4 @@ You can also find packages for the following repositories:
 
 - [FreeBSD](https://cgit.freebsd.org/ports/tree/graphics/f3d)
 - [Spack](https://packages.spack.io/package.html?name=f3d)
-- [pypi](https://pypi.org/project/f3d/)
+- [pypi](https://pypi.org/project/f3d/) (library only)
