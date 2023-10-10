@@ -1,5 +1,5 @@
 set(classes
-  vtkF3DAlembicImporter
+  vtkF3DAlembicReader
   )
 
 set(_no_install "")
