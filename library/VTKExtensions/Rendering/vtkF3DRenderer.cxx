@@ -487,7 +487,14 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       }
 
       double gridPos[3] = { 0, 0, 0 };
-      if (!this->GridAbsolute)
+      if (this->GridAbsolute)
+      {
+        for (int i = 0; i < 3; i++)
+        {
+          gridPos[i] = this->UpVector[i] ? 0 : 0.5 * (bounds[2 * i] + bounds[2 * i + 1]);
+        }
+      }
+      else
       {
         for (int i = 0; i < 3; i++)
         {
@@ -507,6 +514,8 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       gridMapper->SetUnitSquare(tmpUnitSquare);
       gridMapper->SetSubdivisions(this->GridSubdivisions);
       gridMapper->SetUpIndex(this->UpIndex);
+      if (this->GridAbsolute)
+        gridMapper->SetOriginOffset(-gridPos[0], -gridPos[1], -gridPos[2]);
 
       this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
       this->GridActor->ForceTranslucentOn();

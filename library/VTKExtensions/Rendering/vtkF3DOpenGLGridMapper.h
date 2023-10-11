@@ -18,6 +18,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
+   * Set the origin of the axes relative to the actor position
+   */
+  vtkSetVector3Macro(OriginOffset, double);
+
+  /**
    * Set the distance where the grid disappear.
    */
   vtkSetMacro(FadeDistance, double);
@@ -59,6 +64,7 @@ protected:
 
   bool GetNeedToRebuildShaders(vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* act) override;
 
+  double OriginOffset[3] = { 0.0, 0.0, 0.0 };
   double FadeDistance = 10.0;
   double UnitSquare = 1.0;
   int Subdivisions = 10;
