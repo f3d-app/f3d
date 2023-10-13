@@ -13,7 +13,5 @@ int main(int argc, char** argv)
   f3d::image img1(argv[2]);
 
   // Compare them
-  f3d::image diff;
-  double error;
-  return img0.compare(img1, 50, diff, error) ? EXIT_SUCCESS : EXIT_FAILURE;
+  return img0.psnr(img1) >= 30.0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }

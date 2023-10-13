@@ -30,7 +30,7 @@ int TestSDKWindowNative(int argc, char* argv[])
 
   // Use a higher threshold as background difference can be strong with mesa
   return TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-           "TestSDKWindowStandard", 150)
+           "TestSDKWindowStandard")
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }

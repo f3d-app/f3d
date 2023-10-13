@@ -144,8 +144,31 @@ public:
    * 50: Visually indistinguishable.
    * 100: Small visible difference.
    * 300: Comparable images.
+   *
+   * \deprecated { compare is deprecated, use diff and psnr functions instead }
    */
-  bool compare(const image& reference, double threshold, image& diff, double& error) const;
+#ifndef F3D_NO_DEPRECATED
+  F3D_DEPRECATED bool compare(
+    const image& reference, double threshold, image& diff, double& error) const;
+#endif
+
+  /**
+   * Compute the peak signal-to-noise ratio
+   * It's used to quantify the reconstruction quality of an image with the ground truth.
+   * The returned value is the PSNR in decibels.
+   * 20 to 30 dB: The image is comparable but there are clear differences
+   * 30 and 50 dB: The image is a bit different but hard to distinguish
+   * >50 dB: Indistinguishable
+   *
+   * Throws psnr_exception if the two images have different size, different number of channels
+   * or if the channel types is not BYTE.
+   */
+  double psnr(const image& reference) const;
+
+  /**
+   * Compute a difference image used to locate pixels with different values.
+   */
+  image diff(const image& other) const;
 
   /**
    * Save an image to a file in the specified format.
@@ -169,6 +192,15 @@ public:
   struct read_exception : public exception
   {
     explicit read_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by the image.
+   * when there is an error on psnr.
+   */
+  struct psnr_exception : public exception
+  {
+    explicit psnr_exception(const std::string& what = "");
   };
 
 private:

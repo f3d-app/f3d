@@ -8,7 +8,7 @@ class TestSDKHelpers
 {
 public:
   static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
-    const std::string& outputPath, const std::string& name, double threshold = 50)
+    const std::string& outputPath, const std::string& name, double threshold = 30.0)
   {
     if (baselinePath.empty() || outputPath.empty() || name.empty())
     {
@@ -32,29 +32,28 @@ public:
       }
     }
 
-    f3d::image diffRes;
     f3d::image reference(baseline);
-    double error;
+    double psnr = img.psnr(reference);
 
-    if (!img.compare(reference, threshold, diffRes, error))
+    if (psnr < threshold)
     {
-      std::cerr << "Current rendering difference with reference image: " << error
-                << " is higher than the threshold of " << threshold << std::endl;
+      std::cerr << "Current rendering PSNR with reference image: " << psnr
+                << " is lower than the threshold of " << threshold << std::endl;
       std::cerr << "Result resolution: " << img.getWidth() << "x" << img.getHeight() << std::endl;
       std::cerr << "Reference resolution: " << reference.getWidth() << "x" << reference.getHeight()
                 << std::endl;
       img.save(output);
-      diffRes.save(diff);
+      img.diff(reference).save(diff);
       return false;
     }
 
-    std::cout << "Successful render test against " << baseline + " with an error of " << error
+    std::cout << "Successful render test against " << baseline + " with an PSNR of " << psnr
               << std::endl;
     return true;
   }
 
   static bool RenderTest(f3d::window& win, const std::string& baselinePath,
-    const std::string& outputPath, const std::string& name, double threshold = 50,
+    const std::string& outputPath, const std::string& name, double threshold = 30.0,
     bool noBackground = false)
   {
     return TestSDKHelpers::RenderTest(

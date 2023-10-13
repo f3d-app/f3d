@@ -356,9 +356,9 @@ int F3DStarter::Start(int argc, char** argv)
 
       f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
       f3d::image ref(this->Internals->AppOptions.Reference);
-      f3d::image diff;
-      double error;
-      if (!img.compare(ref, this->Internals->AppOptions.RefThreshold, diff, error))
+
+      double psnr = img.psnr(ref);
+      if (psnr < this->Internals->AppOptions.RefThreshold)
       {
         if (this->Internals->AppOptions.Output.empty())
         {
@@ -367,18 +367,18 @@ int F3DStarter::Start(int argc, char** argv)
         }
         else
         {
-          f3d::log::error("Current rendering difference with reference image: ", error,
-            " is higher than the threshold of ", this->Internals->AppOptions.RefThreshold, ".\n");
+          f3d::log::error("Current rendering PSNR with reference image: ", psnr,
+            " is lower than the threshold of ", this->Internals->AppOptions.RefThreshold, ".\n");
 
           img.save(this->Internals->AppOptions.Output);
-          diff.save(
+          img.diff(ref).save(
             fs::path(this->Internals->AppOptions.Output).replace_extension(".diff.png").string());
         }
         return EXIT_FAILURE;
       }
       else
       {
-        f3d::log::info("Image comparison success with an error difference of: ", error);
+        f3d::log::info("Image comparison success with a PSNR of: ", psnr);
       }
     }
     // Render to file if needed

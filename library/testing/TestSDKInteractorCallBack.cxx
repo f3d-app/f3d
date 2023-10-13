@@ -62,7 +62,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.playInteraction(interactionFilePath);
 
   return TestSDKHelpers::RenderTest(
-           win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename, 50)
+           win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename)
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }
