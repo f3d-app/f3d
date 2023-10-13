@@ -266,7 +266,8 @@ double image::psnr(const image& reference) const
     throw psnr_exception("Images have different channel count");
   }
 
-  if (this->getChannelType() != ChannelType::BYTE || reference.getChannelType() != ChannelType::BYTE)
+  if (this->getChannelType() != ChannelType::BYTE ||
+    reference.getChannelType() != ChannelType::BYTE)
   {
     throw psnr_exception("One image has a channel type different then BYTE");
   }
@@ -280,10 +281,10 @@ double image::psnr(const image& reference) const
   // todo: multi-thread using SMP
   for (unsigned int i = 0; i < totalSize; i++)
   {
-      unsigned char valRef = (*contentRef++);
-      unsigned char valThis = (*contentThis++);
-      double diff = static_cast<double>(valRef) - static_cast<double>(valThis);
-      mse += diff * diff;
+    unsigned char valRef = (*contentRef++);
+    unsigned char valThis = (*contentThis++);
+    double diff = static_cast<double>(valRef) - static_cast<double>(valThis);
+    mse += diff * diff;
   }
 
   mse /= static_cast<double>(totalSize);

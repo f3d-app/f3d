@@ -143,7 +143,7 @@ f3d_test(NAME TestMHD DATA HeadMRVolume.mhd ARGS --scalars --roughness=1 DEFAULT
 f3d_test(NAME TestVTICell DATA waveletMaterial.vti ARGS --scalars=Material -c --roughness=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestSSAO LONG_TIMEOUT DATA suzanne.ply ARGS -q DEFAULT_LIGHTS)
 f3d_test(NAME TestDepthPeeling DATA suzanne.ply ARGS -sp --opacity=0.9 DEFAULT_LIGHTS)
-f3d_test(NAME TestBackground DATA suzanne.ply ARGS --bg-color=0.8,0.2,0.9 THRESHOLD 100 DEFAULT_LIGHTS)
+f3d_test(NAME TestBackground DATA suzanne.ply ARGS --bg-color=0.8,0.2,0.9 DEFAULT_LIGHTS)
 f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity 0.2 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n DEFAULT_LIGHTS)
 f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --bg-color=1,1,1 DEFAULT_LIGHTS)
@@ -155,7 +155,7 @@ f3d_test(NAME TestCameraDirection DATA suzanne.obj ARGS --camera-direction=-1,-1
 f3d_test(NAME TestCameraClipping DATA checkerboard_colorful.obj CONFIG ${F3D_SOURCE_DIR}/testing/configs/checkerboard_colorful.json RESOLUTION 800,600)
 f3d_test(NAME TestToneMapping DATA suzanne.ply ARGS -t DEFAULT_LIGHTS)
 f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt DEFAULT_LIGHTS)
-f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT THRESHOLD 300 DEFAULT_LIGHTS) # Using default lights because of ResetCamera, High threshold for volume as it is dependent on the OpenGL implementation
+f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --comp=3 LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
@@ -173,7 +173,7 @@ f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m DEFAULT_LIGHTS)
 f3d_test(NAME TestTIFF DATA logo.tif ARGS -sy --up=-Y DEFAULT_LIGHTS)
 f3d_test(NAME TestLightIntensityBrighter DATA cow.vtp ARGS --light-intensity=5.0 DEFAULT_LIGHTS)
 f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2 DEFAULT_LIGHTS)
-f3d_test(NAME TestLightIntensityBrighterFullScene DATA WaterBottle.glb ARGS --light-intensity=5.0 THRESHOLD 60 DEFAULT_LIGHTS)
+f3d_test(NAME TestLightIntensityBrighterFullScene DATA WaterBottle.glb ARGS --light-intensity=5.0 DEFAULT_LIGHTS)
 f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --light-intensity=0.2 DEFAULT_LIGHTS)
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp" DEFAULT_LIGHTS)
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf DEFAULT_LIGHTS)
@@ -316,11 +316,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -u DEFAULT_LIGHTS)
   f3d_test(NAME TestHDRIBlurCoC DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -u --blur-coc=50 DEFAULT_LIGHTS)
   f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI palermo_park_1k.hdr RESOLUTION 600,100 ARGS -u DEFAULT_LIGHTS)
-  f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -e DEFAULT_LIGHTS THRESHOLD 60)
+  f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -e DEFAULT_LIGHTS)
   f3d_test(NAME TestHDRI8Bit DATA suzanne.ply HDRI logo.tif)
   f3d_test(NAME TestHDRIOrient DATA suzanne.stl HDRI palermo_park_1k.hdr ARGS --up=+Z)
   f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -t)
-  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION THRESHOLD 60) #Shift+MouseRight;
+  f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION) #Shift+MouseRight;
   f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS) #U
   f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS) #Up
   f3d_test(NAME TestInteractionHDRIChange DATA multi HDRI palermo_park_1k.hdr CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION DEFAULT_LIGHTS) #Left
@@ -332,7 +332,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestInvalidHDRI DATA cow.vtp HDRI invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
   # Use a dummy HDRI for simplicity to test default HDRI
-  f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png THRESHOLD 110 DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png DEFAULT_LIGHTS)
 
   configure_file("${F3D_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
   f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" LONG_TIMEOUT DEFAULT_LIGHTS)
@@ -355,17 +355,17 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
 
   if(F3D_MODULE_RAYTRACING)
     # XXX: These tests are impacted by https://github.com/f3d-app/f3d/issues/933
-    f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI palermo_park_1k.hdr THRESHOLD 120 ARGS -r --samples=1)
+    f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1)
     f3d_test(NAME TestHDRIRaytracingSkyboxOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-skybox -r --samples=1 LONG_TIMEOUT)
-    f3d_test(NAME TestHDRIRaytracingAmbientOnly DATA suzanne.ply THRESHOLD 120 ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 LONG_TIMEOUT)
-    f3d_test(NAME TestHDRIRaytracingAmbientOnlyNoBackground DATA suzanne.ply THRESHOLD 120 ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 --no-background LONG_TIMEOUT)
+    f3d_test(NAME TestHDRIRaytracingAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 LONG_TIMEOUT)
+    f3d_test(NAME TestHDRIRaytracingAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient -r --samples=1 --no-background LONG_TIMEOUT)
     f3d_test(NAME TestHDRIRaytracingNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT)
 
-    f3d_test(NAME TestInteractionHDRIRaytracingRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr THRESHOLD 120 ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIRaytracingRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
     f3d_test(NAME TestInteractionHDRIRaytracingRemoveAmbient DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
     f3d_test(NAME TestInteractionHDRIRaytracingRemoveBoth DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
-    f3d_test(NAME TestInteractionHDRIRaytracingLoop DATA suzanne.ply HDRI palermo_park_1k.hdr THRESHOLD 120 ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
-    f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply THRESHOLD 120 ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIRaytracingLoop DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -r --samples=1 INTERACTION DEFAULT_LIGHTS)
+    f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT INTERACTION DEFAULT_LIGHTS)
 
   endif()
 
@@ -386,22 +386,22 @@ endif()
 
 if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingGLTF DATA WaterBottle.glb ARGS -r --samples=1)
-  f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS -r --samples=1 --bg-color=1,0,0)
-  f3d_test(NAME TestRaytracingPointCloud DATA pointsCloud.vtp THRESHOLD 120 ARGS -r --point-size=20)
-  f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply THRESHOLD 120 ARGS -rd --samples=1)
+  f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS -r --samples=1 --bg-color=1,0,0 THRESHOLD 25)
+  f3d_test(NAME TestRaytracingPointCloud DATA pointsCloud.vtp ARGS -r --point-size=20 THRESHOLD 15)
+  f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS -rd --samples=1)
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Raytracing module: ON")
-  f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply THRESHOLD 120 ARGS --samples=1 INTERACTION) #RD
+  f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --samples=1 INTERACTION) #RD
   f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsb --samples=1)
 
   if(NOT F3D_MACOS_BUNDLE)
-  f3d_test(NAME TestRaytracingDefaultConfigFile DATA dragon.vtu THRESHOLD 150 CONFIG config_build ARGS -r --samples=1)
+  f3d_test(NAME TestRaytracingDefaultConfigFile DATA dragon.vtu CONFIG config_build ARGS -r --samples=1)
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
-      f3d_test(NAME TestRaytracingThumbnailConfigFile DATA dragon.vtu THRESHOLD 100 CONFIG thumbnail_build ARGS -r --samples=1)
+      f3d_test(NAME TestRaytracingThumbnailConfigFile DATA dragon.vtu CONFIG thumbnail_build ARGS -r --samples=1)
     endif()
   endif()
 
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
-    f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -r --samples=1 --no-background)
+    f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -r --samples=1 --no-background THRESHOLD 25)
   endif()
 
 else(F3D_MODULE_RAYTRACING)
@@ -431,7 +431,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestOFF DATA teapot.off ARGS --up=+Z --load-plugins=assimp)
   f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p --load-plugins=assimp DEFAULT_LIGHTS) # Using default lights because of ResetCamera
   f3d_test(NAME TestFBX DATA phong_cube.fbx ARGS --load-plugins=assimp DEFAULT_LIGHTS) # Using default lights because of ResetCamera
-  f3d_test(NAME TestFBX16bits DATA 16bit.fbx ARGS --load-plugins=assimp THRESHOLD 70 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+  f3d_test(NAME TestFBX16bits DATA 16bit.fbx ARGS --load-plugins=assimp DEFAULT_LIGHTS) # Using default lights because of ResetCamera
   f3d_test(NAME TestVerboseCameraAssimp DATA duck.dae ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "camera1")
 
   # TGA Reader needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8224
