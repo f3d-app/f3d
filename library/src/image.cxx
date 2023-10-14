@@ -11,6 +11,7 @@
 #include <vtkJPEGWriter.h>
 #include <vtkPNGWriter.h>
 #include <vtkPointData.h>
+#include <vtkSMPTools.h>
 #include <vtkSmartPointer.h>
 #include <vtkTIFFWriter.h>
 #include <vtksys/SystemTools.hxx>
@@ -272,22 +273,47 @@ double image::psnr(const image& reference) const
     throw psnr_exception("One image has a channel type different then BYTE");
   }
 
-  unsigned char* contentRef = static_cast<unsigned char*>(reference.getContent());
-  unsigned char* contentThis = static_cast<unsigned char*>(this->getContent());
+  struct MSEWorker
+  {
+    vtkSMPThreadLocal<double> LocalMSE;
+    double ReducedMSE = 0.0;
+    unsigned char* Buffer1;
+    unsigned char* Buffer2;
 
-  double mse = 0.0;
+    MSEWorker(unsigned char* buffer1, unsigned char* buffer2)
+      : Buffer1(buffer1)
+      , Buffer2(buffer2)
+    {
+    }
+
+    void Initialize() { this->LocalMSE.Local() = 0.0; }
+
+    void operator()(vtkIdType begin, vtkIdType end)
+    {
+      for (vtkIdType idx = begin; idx < end; ++idx)
+      {
+        double diff =
+          static_cast<double>(this->Buffer1[idx]) - static_cast<double>(this->Buffer2[idx]);
+        this->LocalMSE.Local() += diff * diff;
+      }
+    }
+
+    void Reduce()
+    {
+      for (double localMSE : this->LocalMSE)
+      {
+        this->ReducedMSE += localMSE;
+      }
+    }
+  };
+
   unsigned int totalSize = this->getHeight() * this->getWidth() * this->getChannelCount();
 
-  // todo: multi-thread using SMP
-  for (unsigned int i = 0; i < totalSize; i++)
-  {
-    unsigned char valRef = (*contentRef++);
-    unsigned char valThis = (*contentThis++);
-    double diff = static_cast<double>(valRef) - static_cast<double>(valThis);
-    mse += diff * diff;
-  }
+  MSEWorker worker(static_cast<unsigned char*>(reference.getContent()),
+    static_cast<unsigned char*>(this->getContent()));
+  vtkSMPTools::For(0, totalSize, worker);
 
-  mse /= static_cast<double>(totalSize);
+  double mse = worker.ReducedMSE / static_cast<double>(totalSize);
 
   if (mse < 1e-9)
   {
