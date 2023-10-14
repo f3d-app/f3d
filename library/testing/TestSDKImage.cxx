@@ -180,5 +180,59 @@ int TestSDKImage(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // check invalid PSNR
+  try
+  {
+    f3d::image singleComp(width, height, 1, f3d::image::ChannelType::BYTE);
+    double metric = singleComp.psnr(baseline);
+
+    std::cerr
+      << "An exception has not been thrown when comparing images with different channel count"
+      << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::psnr_exception&)
+  {
+  }
+
+  try
+  {
+    f3d::image widthComp(width + 1, height, channels, f3d::image::ChannelType::BYTE);
+    double metric = widthComp.psnr(baseline);
+
+    std::cerr << "An exception has not been thrown when comparing images with different width"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::psnr_exception&)
+  {
+  }
+
+  try
+  {
+    f3d::image heightComp(width, height + 1, channels, f3d::image::ChannelType::BYTE);
+    double metric = heightComp.psnr(baseline);
+
+    std::cerr << "An exception has not been thrown when comparing images with different height"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::psnr_exception&)
+  {
+  }
+
+  try
+  {
+    f3d::image typeComp(width, height, channels, f3d::image::ChannelType::SHORT);
+    double metric = typeComp.psnr(baseline);
+
+    std::cerr << "An exception has not been thrown when comparing images with different types"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::psnr_exception&)
+  {
+  }
+
   return EXIT_SUCCESS;
 }
