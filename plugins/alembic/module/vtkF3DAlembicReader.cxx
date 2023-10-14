@@ -37,25 +37,30 @@ public:
       Alembic::AbcGeom::Int32ArraySamplePtr indices = samp.getFaceIndices();
       Alembic::AbcGeom::Int32ArraySamplePtr counts = samp.getFaceCounts();
 
-      size_t P_size = positions->size();
-      size_t counts_size = counts->size();
+      points->SetNumberOfPoints(positions->size());
 
-      for (size_t i = 0; i < P_size; i++)
+      for (size_t i = 0; i < positions->size(); i++)
       {
-        points->InsertNextPoint(
-          positions->get()[i].x, positions->get()[i].y, positions->get()[i].z);
+        points->SetPoint(i, positions->get()[i].x, positions->get()[i].y, positions->get()[i].z);
       }
 
-      size_t face_index = 0;
-      for (size_t i = 0; i < counts_size; i++)
+      vtkNew<vtkIdTypeArray> offsets;
+      vtkNew<vtkIdTypeArray> connectivity;
+      offsets->SetNumberOfTuples(counts->size() + 1);
+      connectivity->SetNumberOfTuples(indices->size());
+
+      offsets->SetTypedComponent(0, 0, 0);
+      for (size_t i = 0; i < counts->size(); i++)
       {
-        auto polyface_vertex_count = counts->get()[i];
-        polys->InsertNextCell(polyface_vertex_count);
-        for (auto j = 0; j < polyface_vertex_count; j++)
-        {
-          polys->InsertCellPoint(indices->get()[face_index++]);
-        }
+        offsets->SetTypedComponent(i + 1, 0, offsets->GetTypedComponent(i, 0) + counts->get()[i]);
       }
+
+      for (size_t i = 0; i < indices->size(); i++)
+      {
+        connectivity->SetTypedComponent(i, 0, indices->get()[i]);
+      }
+
+      polys->SetData(offsets, connectivity);
     }
     polydata->SetPoints(points);
     polydata->SetPolys(polys);
@@ -86,7 +91,7 @@ public:
     {
       for (size_t i = 0; i < nextParentObject.getNumChildren(); ++i)
       {
-        IterateIObject(append, nextParentObject, nextParentObject.getChildHeader(i));
+        this->IterateIObject(append, nextParentObject, nextParentObject.getChildHeader(i));
       }
     }
   }
@@ -97,16 +102,16 @@ public:
 
     for (size_t i = 0; i < top.getNumChildren(); ++i)
     {
-      IterateIObject(append, top, top.getChildHeader(i));
+      this->IterateIObject(append, top, top.getChildHeader(i));
     }
   }
 
-  void ReadScene(const std::string& filePath)
+  void ReadArchive(const std::string& filePath)
   {
     Alembic::AbcCoreFactory::IFactory factory;
-    Alembic::AbcCoreFactory::IFactory::CoreType core_type;
+    Alembic::AbcCoreFactory::IFactory::CoreType coreType;
 
-    this->Archive = factory.getArchive(filePath, core_type);
+    this->Archive = factory.getArchive(filePath, coreType);
   }
   Alembic::Abc::IArchive Archive;
 };
@@ -129,7 +134,7 @@ int vtkF3DAlembicReader::RequestData(
 {
   vtkPolyData* output = vtkPolyData::GetData(outputVector);
 
-  this->Internals->ReadScene(this->FileName);
+  this->Internals->ReadArchive(this->FileName);
 
   vtkNew<vtkAppendPolyData> append;
   this->Internals->ImportRoot(append);
