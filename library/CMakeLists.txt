@@ -191,6 +191,14 @@ if (APPLE OR UNIX)
   endif ()
 endif ()
 
+if(UNIX AND NOT APPLE)
+  option(F3D_LINUX_LIBRARY_LINK_ATOMIC "Link with libatomic" OFF)
+  mark_as_advanced(F3D_LINUX_LIBRARY_LINK_ATOMIC)
+  if(F3D_LINUX_LIBRARY_LINK_ATOMIC)
+    target_link_libraries(libf3d PRIVATE atomic)
+  endif()
+endif()
+
 # Testing
 if(BUILD_TESTING)
   add_subdirectory(testing)
