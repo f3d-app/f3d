@@ -1,6 +1,7 @@
 #include "vtkF3DAlembicReader.h"
 
 #include <vtkAppendPolyData.h>
+#include <vtkIdTypeArray.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
