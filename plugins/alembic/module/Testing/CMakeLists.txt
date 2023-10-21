@@ -1,5 +1,5 @@
 list(APPEND VTKExtensionsPluginAlembic_list
-     TestF3DAlembicImporter.cxx
+     TestF3DAlembicReader.cxx
     )
 
 if(VTK_VERSION VERSION_LESS_EQUAL 9.1.0)
