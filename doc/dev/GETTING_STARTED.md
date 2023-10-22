@@ -7,9 +7,9 @@ to such processes, you may be looking for our [build guide](BUILD.md).
 This guide will help you to compile your own version of F3D with required dependencies.
 Optional dependencies or covered in the build guide.
 
- - If you are using [Linux](#Linux)
- - If you are using [Windows](#Windows)
- - If you are using [macOS](#macOS)
+ - If you are using [Linux](#linux)
+ - If you are using [Windows](#windows)
+ - If you are using [macOS](#macos)
 
 ## Linux
 
