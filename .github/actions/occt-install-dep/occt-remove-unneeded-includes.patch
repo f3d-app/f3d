@@ -1,0 +1,37 @@
+From 169c8e90b3075a5775d5fbda38a7f74b824dea34 Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Mon, 23 Oct 2023 03:55:23 +0800
+Subject: [PATCH] Remove unneeded includes
+
+---
+ src/IGESCAFControl/IGESCAFControl_Provider.cxx | 1 -
+ src/STEPCAFControl/STEPCAFControl_Provider.cxx | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/src/IGESCAFControl/IGESCAFControl_Provider.cxx b/src/IGESCAFControl/IGESCAFControl_Provider.cxx
+index f5c82fd3..ea908522 100644
+--- a/src/IGESCAFControl/IGESCAFControl_Provider.cxx
++++ b/src/IGESCAFControl/IGESCAFControl_Provider.cxx
+@@ -13,7 +13,6 @@
+ 
+ #include <IGESCAFControl_Provider.hxx>
+ 
+-#include <BinXCAFDrivers.hxx>
+ #include <IGESCAFControl_ConfigurationNode.hxx>
+ #include <IGESCAFControl_Reader.hxx>
+ #include <IGESCAFControl_Writer.hxx>
+diff --git a/src/STEPCAFControl/STEPCAFControl_Provider.cxx b/src/STEPCAFControl/STEPCAFControl_Provider.cxx
+index 6eb2db9f..e73f14fe 100644
+--- a/src/STEPCAFControl/STEPCAFControl_Provider.cxx
++++ b/src/STEPCAFControl/STEPCAFControl_Provider.cxx
+@@ -13,7 +13,6 @@
+ 
+ #include <STEPCAFControl_Provider.hxx>
+ 
+-#include <BinXCAFDrivers.hxx>
+ #include <Interface_Static.hxx>
+ #include <Message.hxx>
+ #include <StepData_StepModel.hxx>
+-- 
+2.42.0
+
