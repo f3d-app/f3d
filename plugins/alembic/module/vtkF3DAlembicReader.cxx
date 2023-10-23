@@ -105,7 +105,6 @@ class vtkF3DAlembicReader::vtkInternals
 
     if (need_to_duplicate)
     {
-      // printf("ZZZZZZZZZZZZZZZZZZZZZZZZ NEED TO DUPLICATE\n");
       auto face_count = original_data._indices.size();
       duplicated_data._indices.resize(face_count);
       for (auto i = 0; i < face_count; i++)
@@ -126,14 +125,11 @@ class vtkF3DAlembicReader::vtkInternals
           {
             Alembic::Abc::V3f original_position =
               original_data._attributes.at("P")[original_data._indices[i][j].x];
-            // \todo Consider storing a temp P_v3f to reverse on a per face basis to reverse the
-            // implicit normals
             P_v3f.emplace_back(original_position);
             duplicated_data._indices[i][j].x = P_running_index;
             P_running_index++;
           }
         }
-        /// std::reverse(P_v3f.begin(), P_v3f.end());
 
         duplicated_data._attributes.insert(AttributesContainer::value_type("P", P_v3f));
       }
@@ -156,8 +152,6 @@ class vtkF3DAlembicReader::vtkInternals
             uv_running_index++;
           }
         }
-        // Confirmed with Houdini : do not perform reverse
-        // std::reverse(uv_v3f.begin(), uv_v3f.end());
 
         duplicated_data._attributes.insert(AttributesContainer::value_type("uv", uv_v3f));
       }
@@ -175,23 +169,17 @@ class vtkF3DAlembicReader::vtkInternals
           {
             Alembic::Abc::V3f original_N =
               original_data._attributes.at("N")[original_data._indices[i][j].z];
-            // std::cout << boost::format("Duplicating original_data._indices[%1%][%2%][%3%] =
-            // %4%\n") % i % j % original_data._indices[i][j].z % original_N;
-            Alembic::Abc::V3f inverted_N(-original_N.x, -original_N.y, -original_N.z);
-            // N_v3f.emplace_back(inverted_N);
             N_v3f.emplace_back(original_N);
             duplicated_data._indices[i][j].z = N_running_index;
             N_running_index++;
           }
         }
-        // std::reverse(N_v3f.begin(), N_v3f.end());
 
         duplicated_data._attributes.insert(AttributesContainer::value_type("N", N_v3f));
       }
     }
     else
     {
-      // printf("ZZZZZZZZZZZZ PURE COPYING ONLY\n");
       duplicated_data = original_data;
     }
   }
@@ -268,7 +256,7 @@ class vtkF3DAlembicReader::vtkInternals
   }
 
 public:
-  vtkSmartPointer<vtkPolyData> ProcessIPolyMeshScopeMigration(
+  vtkSmartPointer<vtkPolyData> ProcessIPolyMesh(
     const Alembic::AbcGeom::IPolyMesh& pmesh)
   {
     vtkNew<vtkPolyData> polydata;
@@ -371,52 +359,6 @@ public:
     return polydata;
   }
 
-  vtkSmartPointer<vtkPolyData> ProcessIPolyMesh(const Alembic::AbcGeom::IPolyMesh& pmesh)
-  {
-    vtkNew<vtkPoints> points;
-    vtkNew<vtkCellArray> polys;
-    vtkNew<vtkPolyData> polydata;
-
-    Alembic::AbcGeom::IPolyMeshSchema::Sample samp;
-    if (pmesh.getSchema().getNumSamples() > 0)
-    {
-      pmesh.getSchema().get(samp);
-
-      Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
-      Alembic::AbcGeom::Int32ArraySamplePtr indices = samp.getFaceIndices();
-      Alembic::AbcGeom::Int32ArraySamplePtr counts = samp.getFaceCounts();
-
-      points->SetNumberOfPoints(positions->size());
-
-      for (size_t i = 0; i < positions->size(); i++)
-      {
-        points->SetPoint(i, positions->get()[i].x, positions->get()[i].y, positions->get()[i].z);
-      }
-
-      vtkNew<vtkIdTypeArray> offsets;
-      vtkNew<vtkIdTypeArray> connectivity;
-      offsets->SetNumberOfTuples(counts->size() + 1);
-      connectivity->SetNumberOfTuples(indices->size());
-
-      offsets->SetTypedComponent(0, 0, 0);
-      for (size_t i = 0; i < counts->size(); i++)
-      {
-        offsets->SetTypedComponent(i + 1, 0, offsets->GetTypedComponent(i, 0) + counts->get()[i]);
-      }
-
-      for (size_t i = 0; i < indices->size(); i++)
-      {
-        connectivity->SetTypedComponent(i, 0, indices->get()[i]);
-      }
-
-      polys->SetData(offsets, connectivity);
-    }
-    polydata->SetPoints(points);
-    polydata->SetPolys(polys);
-
-    return polydata;
-  }
-
   void IterateIObject(vtkAppendPolyData* append, const Alembic::Abc::IObject& parent,
     const Alembic::Abc::ObjectHeader& ohead)
   {
@@ -431,8 +373,7 @@ public:
     else if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
     {
       Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
-      // append->AddInputData(ProcessIPolyMesh(polymesh));
-      append->AddInputData(ProcessIPolyMeshScopeMigration(polymesh));
+      append->AddInputData(ProcessIPolyMesh(polymesh));
       nextParentObject = polymesh;
     }
 
