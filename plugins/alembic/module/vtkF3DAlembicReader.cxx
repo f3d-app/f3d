@@ -52,7 +52,7 @@ class vtkF3DAlembicReader::vtkInternals
     PerMeshWavefrontIndicesTripletsContainer& extracted_indices)
   {
 
-    for (auto i = 0; i < face_vertex_counts->size(); i++)
+    for (size_t i = 0; i < face_vertex_counts->size(); i++)
     {
       auto this_face_vertex_count = face_vertex_counts->get()[i];
       PerFaceWavefrontIndicesTripletsContainer per_face_indices(this_face_vertex_count);
@@ -65,12 +65,12 @@ class vtkF3DAlembicReader::vtkInternals
     PerMeshWavefrontIndicesTripletsContainer& mesh_indices)
   {
     auto face_indices_counter = 0;
-    for (auto i = 0; i < mesh_indices.size(); i++)
+    for (size_t i = 0; i < mesh_indices.size(); i++)
     {
       auto this_face_vertex_count = mesh_indices[i].size();
       IndicesContainer this_face_indices;
       // Perform the collection first
-      for (auto j = 0; j < this_face_vertex_count; j++)
+      for (size_t j = 0; j < this_face_vertex_count; j++)
       {
         auto vertex = attribute_indices->get()[face_indices_counter];
         // mesh_indices[i][j][indices_offset] = vertex;
@@ -85,7 +85,7 @@ class vtkF3DAlembicReader::vtkInternals
           this_face_indices.begin() + this_face_indices.size() - 1, this_face_indices.end());
       }
       // Now update the mesh's indices
-      for (auto j = 0; j < this_face_vertex_count; j++)
+      for (size_t j = 0; j < this_face_vertex_count; j++)
       {
         mesh_indices[i][j][indices_offset] = this_face_indices[j];
         // printf("reversed rotated vertex %d\n",this_face_indices[j]+1);
@@ -107,7 +107,7 @@ class vtkF3DAlembicReader::vtkInternals
     {
       auto face_count = original_data._indices.size();
       duplicated_data._indices.resize(face_count);
-      for (auto i = 0; i < face_count; i++)
+      for (size_t i = 0; i < face_count; i++)
       {
         auto this_face_vertex_count = original_data._indices[i].size();
         duplicated_data._indices[i].resize(
@@ -118,10 +118,10 @@ class vtkF3DAlembicReader::vtkInternals
       {
         V3fContainer P_v3f;
         int P_running_index = 0;
-        for (auto i = 0; i < face_count; i++)
+        for (size_t i = 0; i < face_count; i++)
         {
           auto this_face_vertex_count = original_data._indices[i].size();
-          for (auto j = 0; j < this_face_vertex_count; j++)
+          for (size_t j = 0; j < this_face_vertex_count; j++)
           {
             Alembic::Abc::V3f original_position =
               original_data._attributes.at("P")[original_data._indices[i][j].x];
@@ -140,10 +140,10 @@ class vtkF3DAlembicReader::vtkInternals
         V3fContainer uv_v3f;
         int uv_running_index = 0;
 
-        for (auto i = 0; i < face_count; i++)
+        for (size_t i = 0; i < face_count; i++)
         {
           auto this_face_vertex_count = original_data._indices[i].size();
-          for (auto j = 0; j < this_face_vertex_count; j++)
+          for (size_t j = 0; j < this_face_vertex_count; j++)
           {
             Alembic::Abc::V3f original_uv =
               original_data._attributes.at("uv")[original_data._indices[i][j].y];
@@ -162,10 +162,10 @@ class vtkF3DAlembicReader::vtkInternals
         V3fContainer N_v3f;
         int N_running_index = 0;
 
-        for (auto i = 0; i < face_count; i++)
+        for (size_t i = 0; i < face_count; i++)
         {
           auto this_face_vertex_count = original_data._indices[i].size();
-          for (auto j = 0; j < this_face_vertex_count; j++)
+          for (size_t j = 0; j < this_face_vertex_count; j++)
           {
             Alembic::Abc::V3f original_N =
               original_data._attributes.at("N")[original_data._indices[i][j].z];
@@ -278,7 +278,7 @@ public:
       // Position
       {
         V3fContainer P_v3f;
-        for (auto P_index = 0; P_index < P->size(); P_index++)
+        for (size_t P_index = 0; P_index < P->size(); P_index++)
         {
           P_v3f.emplace_back(P->get()[P_index].x, P->get()[P_index].y, P->get()[P_index].z);
         }
@@ -297,7 +297,7 @@ public:
         {
           V3fContainer uv_v3f;
           Alembic::AbcGeom::UInt32ArraySamplePtr uv_indices = uvValue.getIndices();
-          for (auto index = 0; index < uvValue.getVals()->size(); ++index)
+          for (size_t index = 0; index < uvValue.getVals()->size(); ++index)
           {
             Alembic::AbcGeom::V2f uv = (*(uvValue.getVals()))[index];
             uv_v3f.emplace_back(uv[0], uv[1], 0);
@@ -327,7 +327,7 @@ public:
         {
           V3fContainer normal_v3f;
           Alembic::AbcGeom::UInt32ArraySamplePtr normal_indices = normalValue.getIndices();
-          for (auto index = 0; index < normalValue.getVals()->size(); ++index)
+          for (size_t index = 0; index < normalValue.getVals()->size(); ++index)
           {
             Alembic::AbcGeom::V3f normal = (*(normalValue.getVals()))[index];
             normal_v3f.emplace_back(normal[0], normal[1], normal[2]);
