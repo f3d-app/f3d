@@ -268,7 +268,8 @@ class vtkF3DAlembicReader::vtkInternals
   }
 
 public:
-  vtkSmartPointer<vtkPolyData> ProcessIPolyMeshScopeMigration(const Alembic::AbcGeom::IPolyMesh& pmesh)
+  vtkSmartPointer<vtkPolyData> ProcessIPolyMeshScopeMigration(
+    const Alembic::AbcGeom::IPolyMesh& pmesh)
   {
     vtkNew<vtkPolyData> polydata;
     IntermediateGeometry original_data;
@@ -369,7 +370,7 @@ public:
 
     return polydata;
   }
-	
+
   vtkSmartPointer<vtkPolyData> ProcessIPolyMesh(const Alembic::AbcGeom::IPolyMesh& pmesh)
   {
     vtkNew<vtkPoints> points;
@@ -431,7 +432,7 @@ public:
     {
       Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
       // append->AddInputData(ProcessIPolyMesh(polymesh));
-	  append->AddInputData(ProcessIPolyMeshScopeMigration(polymesh));
+      append->AddInputData(ProcessIPolyMeshScopeMigration(polymesh));
       nextParentObject = polymesh;
     }
 
