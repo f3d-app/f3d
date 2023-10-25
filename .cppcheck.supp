@@ -1,6 +1,7 @@
 // remove some checks
 missingInclude
 unusedFunction
+unknownMacro
 
 // external libraries
 *:external/nlohmann_json/nlohmann/json.hpp
