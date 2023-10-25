@@ -33,6 +33,7 @@ runs:
       run: |
         patch -p1 < $GITHUB_ACTION_PATH/0001-Adding-INSTALL_RPATH-Linux.patch
         patch -p1 < $GITHUB_ACTION_PATH/occt-remove-unneeded-includes.patch
+        patch -p1 < $GITHUB_ACTION_PATH/occt-remove-unneeded-quotes-warning-msvc.patch
 
     - name: Setup OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
