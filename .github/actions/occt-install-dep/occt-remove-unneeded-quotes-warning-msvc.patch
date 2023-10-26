@@ -1,7 +1,7 @@
 From 2cae159acd7e4f2ba52422d0a750183fddf05b85 Mon Sep 17 00:00:00 2001
 From: Mathieu Westphal <mathieu.westphal@kitware.com>
 Date: Wed, 25 Oct 2023 08:18:51 +0200
-Subject: [PATCH] remove uneeded quotes warning msvc
+Subject: [PATCH] remove unneeded quotes warning msvc
 
 ---
  adm/cmake/occt_defs_flags.cmake | 2 +-
