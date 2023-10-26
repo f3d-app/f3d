@@ -7,9 +7,6 @@ unknownMacro
 *:external/nlohmann_json/nlohmann/json.hpp
 *:external/cxxopts/cxxopts.hpp
 
-// opencascade
-*:*opencascade/*.hxx
-
 // specific checks
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
 knownConditionTrueFalse:library/testing/TestSDKImageDeprecated.cxx
