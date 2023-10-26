@@ -9,7 +9,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-v2.12.0-${{runner.os}}-0
+        key: ospray-sb-v2.7.1-${{runner.os}}-1
 
     - name: Checkout ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
@@ -17,7 +17,7 @@ runs:
       with:
         repository: ospray/ospray
         path: './dependencies/ospray'
-        ref: v2.12.0
+        ref: v2.7.1
 
       # https://github.com/ospray/ospray/pull/550
     - name: Patch ospray rkcommon superbuild
@@ -48,7 +48,7 @@ runs:
         -DBUILD_EMBREE_FROM_SOURCE=OFF
         -DBUILD_GLFW=OFF
         -DBUILD_OIDN=ON
-        -DBUILD_OIDN_FROM_SOURCE=ON
+        -DBUILD_OIDN_FROM_SOURCE=OFF
         -DBUILD_OSPRAY_APPS=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../ospray_install
