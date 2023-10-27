@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/occt_install
-        key: occt-V7_6_3-${{runner.os}}-${{inputs.cpu}}-0
+        key: occt-V7_7_2-${{runner.os}}-${{inputs.cpu}}-1
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -24,13 +24,16 @@ runs:
         repository: Open-Cascade-SAS/OCCT
         submodules: true
         path: './dependencies/occt'
-        ref: V7_6_3
+        ref: V7_7_2
 
-    - name: Patch OCCT INSTALL_RPATH
+    - name: Patch OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/occt
       shell: bash
-      run: patch -p1 < $GITHUB_ACTION_PATH/0001-Adding-INSTALL_RPATH-Linux.patch
+      run: |
+        patch -p1 < $GITHUB_ACTION_PATH/0001-Adding-INSTALL_RPATH-Linux.patch
+        patch -p1 < $GITHUB_ACTION_PATH/occt-remove-unneeded-includes.patch
+        patch -p1 < $GITHUB_ACTION_PATH/occt-remove-unneeded-quotes-warning-msvc.patch
 
     - name: Setup OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -50,6 +53,7 @@ runs:
         -DBUILD_DOC_Overview=OFF
         -DBUILD_LIBRARY_TYPE=Shared
         -DBUILD_MODULE_ApplicationFramework=OFF
+        -DBUILD_MODULE_DETools=OFF
         -DBUILD_MODULE_DataExchange=OFF
         -DBUILD_MODULE_Draw=OFF
         -DBUILD_MODULE_FoundationClasses=OFF

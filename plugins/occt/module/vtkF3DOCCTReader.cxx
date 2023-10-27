@@ -19,6 +19,7 @@
 #include <Poly_Triangulation.hxx>
 #include <Quantity_Color.hxx>
 #include <STEPControl_Reader.hxx>
+#include <Standard_Handle.hxx>
 #include <Standard_PrimitiveTypes.hxx>
 #include <Storage_StreamTypeMismatchError.hxx>
 #include <TColgp_Array1OfVec.hxx>
