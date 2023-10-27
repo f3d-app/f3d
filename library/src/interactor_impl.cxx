@@ -540,8 +540,6 @@ public:
   vtkNew<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
-  int WindowSize[2] = { -1, -1 };
-  int WindowPos[2] = { 0, 0 };
   std::map<unsigned long, std::pair<int, std::function<void()> > > TimerCallBacks;
 
   vtkNew<vtkCellPicker> CellPicker;
