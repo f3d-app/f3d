@@ -285,7 +285,7 @@ public:
         original_data._attributes.insert(AttributesContainer::value_type("P", P_v3f));
 
         UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-          face_position_indices, P_indices_offset, false, original_data._indices);
+          face_position_indices, P_indices_offset, true, original_data._indices);
       }
 
       // Texture coordinate
@@ -308,7 +308,7 @@ public:
           {
             original_data._uv_is_facevarying = true;
             UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              uv_indices, uv_indices_offset, false, original_data._indices);
+              uv_indices, uv_indices_offset, true, original_data._indices);
           }
           else
           {
@@ -339,7 +339,7 @@ public:
             original_data._N_is_facevarying = true;
 
             UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              normal_indices, N_indices_offset, false, original_data._indices);
+              normal_indices, N_indices_offset, true, original_data._indices);
           }
           else
           {
