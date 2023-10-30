@@ -35,15 +35,10 @@ const size_t N_indices_offset = 2;
 
 struct IntermediateGeometry
 {
-  IntermediateGeometry()
-    : _uv_is_facevarying(false)
-    , _N_is_facevarying(false)
-  {
-  }
   AttributesContainer _attributes;
   PerMeshWavefrontIndicesTripletsContainer _indices;
-  bool _uv_is_facevarying;
-  bool _N_is_facevarying;
+  bool _uv_is_facevarying{false};
+  bool _N_is_facevarying{false};
 };
 
 class vtkF3DAlembicReader::vtkInternals
@@ -65,9 +60,9 @@ class vtkF3DAlembicReader::vtkInternals
     PerMeshWavefrontIndicesTripletsContainer& mesh_indices)
   {
     auto face_indices_counter = 0;
-    for (size_t i = 0; i < mesh_indices.size(); i++)
+    for (auto & per_face_indices : mesh_indices)
     {
-      auto this_face_vertex_count = mesh_indices[i].size();
+      auto this_face_vertex_count = per_face_indices.size();
       IndicesContainer this_face_indices;
       // Perform the collection first
       for (size_t j = 0; j < this_face_vertex_count; j++)
@@ -87,7 +82,7 @@ class vtkF3DAlembicReader::vtkInternals
       // Now update the mesh's indices
       for (size_t j = 0; j < this_face_vertex_count; j++)
       {
-        mesh_indices[i][j][indices_offset] = this_face_indices[j];
+        per_face_indices[j][indices_offset] = this_face_indices[j];
         // printf("reversed rotated vertex %d\n",this_face_indices[j]+1);
       }
     }
