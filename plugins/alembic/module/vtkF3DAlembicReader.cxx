@@ -56,8 +56,8 @@ class vtkF3DAlembicReader::vtkInternals
   }
 
   template<typename I>
-  void UpdateIndices(const I& attribute_indices, size_t indices_offset, bool do_reverse_rotate,
-    PerMeshWavefrontIndicesTripletsContainer& mesh_indices)
+  void UpdateIndices(const I& attribute_indices, size_t indices_offset, PerMeshWavefrontIndicesTripletsContainer& mesh_indices,
+    bool do_reverse_rotate = true)
   {
     size_t face_indices_counter = 0;
     for (auto & per_face_indices : mesh_indices)
@@ -279,7 +279,7 @@ public:
         original_data._attributes.insert(AttributesContainer::value_type("P", P_v3f));
 
         UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-          face_position_indices, pIndicesOffset, true, original_data._indices);
+          face_position_indices, pIndicesOffset, original_data._indices);
       }
 
       // Texture coordinate
@@ -302,12 +302,12 @@ public:
           {
             original_data._uv_is_facevarying = true;
             UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              uv_indices, uvIndicesOffset, true, original_data._indices);
+              uv_indices, uvIndicesOffset, original_data._indices);
           }
           else
           {
             UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-              face_position_indices, uvIndicesOffset, true, original_data._indices);
+              face_position_indices, uvIndicesOffset, original_data._indices);
           }
         }
       }
@@ -333,12 +333,12 @@ public:
             original_data._N_is_facevarying = true;
 
             UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              normal_indices, nIndicesOffset, true, original_data._indices);
+              normal_indices, nIndicesOffset, original_data._indices);
           }
           else
           {
             UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-              face_position_indices, nIndicesOffset, true, original_data._indices);
+              face_position_indices, nIndicesOffset, original_data._indices);
           }
         }
       }
