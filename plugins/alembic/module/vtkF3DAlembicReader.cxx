@@ -29,16 +29,16 @@ using PerFaceWavefrontIndicesTripletsContainer = std::vector<Alembic::Abc::V3i>;
 using PerMeshWavefrontIndicesTripletsContainer =
   std::vector<PerFaceWavefrontIndicesTripletsContainer>;
 
-const size_t P_indices_offset = 0;
-const size_t uv_indices_offset = 1;
-const size_t N_indices_offset = 2;
+const size_t pIndicesOffset = 0;
+const size_t uvIndicesOffset = 1;
+const size_t nIndicesOffset = 2;
 
 struct IntermediateGeometry
 {
   AttributesContainer _attributes;
   PerMeshWavefrontIndicesTripletsContainer _indices;
-  bool _uv_is_facevarying{false};
-  bool _N_is_facevarying{false};
+  bool _uv_is_facevarying = false;
+  bool _N_is_facevarying = false;
 };
 
 class vtkF3DAlembicReader::vtkInternals
@@ -59,16 +59,15 @@ class vtkF3DAlembicReader::vtkInternals
   void UpdateIndices(const I& attribute_indices, size_t indices_offset, bool do_reverse_rotate,
     PerMeshWavefrontIndicesTripletsContainer& mesh_indices)
   {
-    auto face_indices_counter = 0;
+    size_t face_indices_counter = 0;
     for (auto & per_face_indices : mesh_indices)
     {
-      auto this_face_vertex_count = per_face_indices.size();
+      size_t this_face_vertex_count = per_face_indices.size();
       IndicesContainer this_face_indices;
       // Perform the collection first
       for (size_t j = 0; j < this_face_vertex_count; j++)
       {
         auto vertex = attribute_indices->get()[face_indices_counter];
-        // mesh_indices[i][j][indices_offset] = vertex;
         this_face_indices.emplace_back(vertex);
         // printf("vertex[%ld] %d\n", indices_offset, vertex + 1);
         face_indices_counter++;
@@ -179,7 +178,7 @@ class vtkF3DAlembicReader::vtkInternals
     }
   }
 
-  void WriteVTP(const IntermediateGeometry& data, vtkPolyData* polydata)
+  void FillPolyData(const IntermediateGeometry& data, vtkPolyData* polydata)
   {
     // Create 10 points.
     vtkNew<vtkPoints> points;
@@ -268,7 +267,7 @@ public:
       Alembic::AbcGeom::Int32ArraySamplePtr face_position_indices = samp.getFaceIndices();
       Alembic::AbcGeom::Int32ArraySamplePtr face_vertex_counts = samp.getFaceCounts();
 
-      SetupIndicesStorage(face_vertex_counts, original_data._indices);
+      this->SetupIndicesStorage(face_vertex_counts, original_data._indices);
 
       // Position
       {
@@ -280,7 +279,7 @@ public:
         original_data._attributes.insert(AttributesContainer::value_type("P", P_v3f));
 
         UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-          face_position_indices, P_indices_offset, true, original_data._indices);
+          face_position_indices, pIndicesOffset, true, original_data._indices);
       }
 
       // Texture coordinate
@@ -303,12 +302,12 @@ public:
           {
             original_data._uv_is_facevarying = true;
             UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              uv_indices, uv_indices_offset, true, original_data._indices);
+              uv_indices, uvIndicesOffset, true, original_data._indices);
           }
           else
           {
             UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-              face_position_indices, uv_indices_offset, true, original_data._indices);
+              face_position_indices, uvIndicesOffset, true, original_data._indices);
           }
         }
       }
@@ -334,12 +333,12 @@ public:
             original_data._N_is_facevarying = true;
 
             UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              normal_indices, N_indices_offset, true, original_data._indices);
+              normal_indices, nIndicesOffset, true, original_data._indices);
           }
           else
           {
             UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-              face_position_indices, N_indices_offset, true, original_data._indices);
+              face_position_indices, nIndicesOffset, true, original_data._indices);
           }
         }
       }
@@ -349,7 +348,7 @@ public:
 
     PointDuplicateAccumulator(original_data, duplicated_data);
 
-    WriteVTP(duplicated_data, polydata);
+    FillPolyData(duplicated_data, polydata);
 
     return polydata;
   }
