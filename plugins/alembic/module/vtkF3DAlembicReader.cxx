@@ -278,7 +278,7 @@ public:
         }
         original_data._attributes.insert(AttributesContainer::value_type("P", P_v3f));
 
-        UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
+        this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
           face_position_indices, pIndicesOffset, original_data._indices);
       }
 
@@ -301,12 +301,12 @@ public:
           if (uvsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
           {
             original_data._uv_is_facevarying = true;
-            UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
+            this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
               uv_indices, uvIndicesOffset, original_data._indices);
           }
           else
           {
-            UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
+            this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
               face_position_indices, uvIndicesOffset, original_data._indices);
           }
         }
@@ -332,12 +332,12 @@ public:
           {
             original_data._N_is_facevarying = true;
 
-            UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
+            this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
               normal_indices, nIndicesOffset, original_data._indices);
           }
           else
           {
-            UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
+            this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
               face_position_indices, nIndicesOffset, original_data._indices);
           }
         }
@@ -346,9 +346,9 @@ public:
 
     IntermediateGeometry duplicated_data;
 
-    PointDuplicateAccumulator(original_data, duplicated_data);
+    this->PointDuplicateAccumulator(original_data, duplicated_data);
 
-    FillPolyData(duplicated_data, polydata);
+    this->FillPolyData(duplicated_data, polydata);
 
     return polydata;
   }
