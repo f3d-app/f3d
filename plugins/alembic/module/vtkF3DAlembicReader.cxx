@@ -49,9 +49,7 @@ class vtkF3DAlembicReader::vtkInternals
 
     for (size_t i = 0; i < face_vertex_counts->size(); i++)
     {
-      auto this_face_vertex_count = face_vertex_counts->get()[i];
-      PerFaceWavefrontIndicesTripletsContainer per_face_indices(this_face_vertex_count);
-      extracted_indices.push_back(per_face_indices);
+      extracted_indices.emplace_back( face_vertex_counts->get()[i]);
     }
   }
 
