@@ -22,12 +22,11 @@
 #pragma warning(pop)
 #endif
 
-using IndicesContainer = std::vector<int32_t>;
-using V3fContainer = std::vector<Alembic::Abc::V3f>;
-using AttributesContainer = std::map<std::string, V3fContainer>;
-using PerFaceWavefrontIndicesTripletsContainer = std::vector<Alembic::Abc::V3i>;
-using PerMeshWavefrontIndicesTripletsContainer =
-  std::vector<PerFaceWavefrontIndicesTripletsContainer>;
+typedef std::vector<int> IndicesContainer;
+typedef std::vector<Alembic::Abc::V3f> V3fContainer;
+typedef std::map<std::string, V3fContainer> AttributesContainer;
+typedef std::vector<Alembic::Abc::V3i> PerFaceWavefrontIndicesTripletsContainer;
+typedef std::vector<PerFaceWavefrontIndicesTripletsContainer> PerMeshWavefrontIndicesTripletsContainer;
 
 const size_t pIndicesOffset = 0;
 const size_t uvIndicesOffset = 1;
