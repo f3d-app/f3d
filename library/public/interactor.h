@@ -23,6 +23,41 @@ namespace f3d
 class F3D_EXPORT interactor
 {
 public:
+
+  /**
+   * Enumeration of supported modifier combination, in binary.
+   */
+  enum class ModifierKeys : unsigned char
+  {
+    ANY = 0x80,      // 10000000
+    NONE = 0x0,      // 00000000
+    CTRL = 0x1,      // 00000001
+    SHIFT = 0x2,     // 00000010
+    CTRL_SHIFT = 0x3 // 00000011
+  };
+
+  /**
+   * Use this method to specify your own keypress callback for a specified keysym and modifiers flag.
+   * keysym being the pressed key symbol, TODO list ?
+   * modifiers is a binary flag from the dedicated enum.
+   * Adding a callback for same keySym and modifiers as any existing key press interaction will remove the previous one.
+   * Expected API:
+   * \code
+   * void callBack()
+   * \endcode
+   */
+  virtual interactor& addKeyPressCallBack(const std::string& keySym, ModifierKeys modifiers, std::function<void()> callBack) = 0;
+
+  /**
+   * Use this method to specify your to toggle a boolean option for a specified keysym and modifiers flag.
+   * keysym being the pressed key symbol, TODO list ?
+   * modifiers is a binary flag from the dedicated enum.
+   * Adding a toggle for same keySym and modifiers as any existing key press interaction will remove the previous one.
+   */
+  virtual interactor& addKeyPressToggle(const std::string& keySym, ModifierKeys modifiers, const std::string& option) = 0;
+
+  virtual interactor& addDefaultKeyPressInteractions();
+
   /**
    * Use this method to specify your own keypress callback, with the expected API:
    * \code

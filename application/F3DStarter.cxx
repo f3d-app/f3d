@@ -186,6 +186,7 @@ int F3DStarter::Start(int argc, char** argv)
 
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
+    interactor.addDefaultKeyPressInteractions(); // TODO where should we put this ?
     interactor.setKeyPressCallBack(
       [this](int, const std::string& keySym) -> bool
       {

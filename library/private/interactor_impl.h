@@ -35,6 +35,9 @@ public:
   interactor_impl(options& options, window_impl& window, loader_impl& loader);
   ~interactor_impl() override;
 
+  interactor& addKeyPressCallBack(const std::string& keySym, ModifierKeys modifiers, std::function<void()> callBack) override;
+  interactor& addKeyPressToggle(const std::string& keySym, ModifierKeys modifiers, const std::string& option) override;
+
   interactor& setKeyPressCallBack(std::function<bool(int, std::string)> callBack) override;
   interactor& setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack) override;
 

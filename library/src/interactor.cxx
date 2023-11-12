@@ -2,6 +2,34 @@
 
 namespace f3d
 {
+
+//----------------------------------------------------------------------------
+interactor& interactor::addDefaultKeyPressInteractions()
+{
+  this->addKeyPressToggle("b", ModifierKeys::ANY, "ui.bar");
+  this->addKeyPressToggle("p", ModifierKeys::ANY, "render.effect.translucency-support");
+  this->addKeyPressToggle("q", ModifierKeys::ANY, "render.effect.ambient-occlusion");
+  this->addKeyPressToggle("a", ModifierKeys::ANY, "render.effect.anti-aliasing");
+  this->addKeyPressToggle("t", ModifierKeys::ANY, "render.effect.tone-mapping");
+  this->addKeyPressToggle("e", ModifierKeys::ANY, "render.show-edges");
+  this->addKeyPressToggle("x", ModifierKeys::ANY, "interactor.axis");
+  this->addKeyPressToggle("g", ModifierKeys::ANY, "render.grid.enable");
+  this->addKeyPressToggle("n", ModifierKeys::ANY, "ui.filename");
+  this->addKeyPressToggle("m", ModifierKeys::ANY, "ui.metadata");
+  this->addKeyPressToggle("r", ModifierKeys::ANY, "render.raytracing.enable");
+  this->addKeyPressToggle("d", ModifierKeys::ANY, "render.raytracing.denoise");
+  this->addKeyPressToggle("v", ModifierKeys::ANY, "model.volume.enable");
+  this->addKeyPressToggle("i", ModifierKeys::ANY, "model.volume.inverse");
+  this->addKeyPressToggle("o", ModifierKeys::ANY, "model.point-sprites.enable");
+  this->addKeyPressToggle("u", ModifierKeys::ANY, "render.background.blur");
+  this->addKeyPressToggle("k", ModifierKeys::ANY, "interactor.trackball");
+  this->addKeyPressToggle("f", ModifierKeys::ANY, "render.hdri.ambient");
+  this->addKeyPressToggle("f", ModifierKeys::ANY, "render.background.skybox");
+  this->addKeyPressToggle("h", ModifierKeys::ANY, "ui.cheatsheet");
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 const std::vector<std::pair<std::string, std::string> >& interactor::getDefaultInteractionsInfo()
 {
   // clang-format off
