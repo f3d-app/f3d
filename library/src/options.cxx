@@ -134,6 +134,7 @@ options::options()
   detail::init::initialize();
 
   // Scene
+  this->Internals->init("scene.animation.autoplay", false);
   this->Internals->init("scene.animation.index", 0);
   this->Internals->init("scene.animation.speed-factor", 1.0);
   this->Internals->init("scene.animation.time", 0.0);
