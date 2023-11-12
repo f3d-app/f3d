@@ -141,6 +141,12 @@ void animationManager::Initialize(
   {
     log::debug("Animation(s) time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
   }
+
+  bool autoplay = options->getAsBool("scene.animation.autoplay");
+  if (autoplay)
+  {
+    this->StartAnimation();
+  }
 }
 
 //----------------------------------------------------------------------------
