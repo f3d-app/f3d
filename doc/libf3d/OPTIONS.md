@@ -17,6 +17,7 @@ See the exhaustive list below, but note that this may change in the future.
 
 Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
+scene.animation.autoplay|bool<br>false<br>load|Automatically start animation.|\-\-animation-autoplay
 scene.animation.index|int<br>0<br>load|Select the animation to load.<br>Any negative value means all animations (glTF only).<br>The default scene always has at most one animation.|\-\-animation-index
 scene.animation.speed-factor|double<br>1<br>render|Set the animation speed factor to slow, speed up or even invert animation.|\-\-animation-speed-factor
 scene.animation.frame-rate|double<br>60<br>render|Set the animation frame rate used to play the animation interactively.|\-\-animation-frame-rate
