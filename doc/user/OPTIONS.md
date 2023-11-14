@@ -35,6 +35,7 @@ Options|Default|Description
 -e, \-\-edges||Show the *cell edges*.
 \-\-camera-index=\<idx\>|-1|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.
 -k, \-\-trackball||Enable trackball interaction.
+\-\-animation-autoplay||Automatically start animation.
 \-\-animation-index=\<idx\>|0|Select the animation to show.<br>Any negative value means all animations (glTF only).<br>The default scene always has at most one animation.
 \-\-animation-speed-factor=\<factor\>|1|Set the animation speed factor to slow, speed up or even invert animation time.
 \-\-animation-frame-rate=\<factor\>|60|Set the animation frame rate used when playing animation interactively.
