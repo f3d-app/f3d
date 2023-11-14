@@ -34,17 +34,6 @@ struct ReaderPipeline
     this->GeometryActor->GetProperty()->SetInterpolationToPBR();
     this->VolumeMapper->SetRequestedRenderModeToGPU();
     this->PolyDataMapper->InterpolateScalarsBeforeMappingOn();
-    this->PointGaussianMapper->EmissiveOff();
-    this->PointGaussianMapper->SetSplatShaderCode(
-      "//VTK::Color::Impl\n"
-      "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
-      "if (dist > 1.0) {\n"
-      "  discard;\n"
-      "} else {\n"
-      "  float scale = (1.0 - dist);\n"
-      "  ambientColor *= scale;\n"
-      "  diffuseColor *= scale;\n"
-      "}\n");
   }
 
   std::string Name;

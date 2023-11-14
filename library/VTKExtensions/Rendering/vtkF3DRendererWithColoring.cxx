@@ -250,9 +250,9 @@ void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetPointSize(double pointSize)
+void vtkF3DRendererWithColoring::SetPointProperties(SplatType type, double pointSize)
 {
-  this->Superclass::SetPointSize(pointSize);
+  this->SetPointSize(pointSize);
 
   if (!this->Importer)
   {
@@ -260,16 +260,59 @@ void vtkF3DRendererWithColoring::SetPointSize(double pointSize)
   }
 
   const vtkBoundingBox& bbox = this->Importer->GetGeometryBoundingBox();
-  double gaussianPointSize = 1.0;
+
+  double scaleFactor = 1.0;
   if (bbox.IsValid())
   {
-    gaussianPointSize = pointSize * bbox.GetDiagonalLength() * 0.001;
+    scaleFactor = pointSize * bbox.GetDiagonalLength() * 0.001;
   }
 
   const auto& psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
-  for (auto& psActorAndMapper : psActorsAndMappers)
+  for (auto& [actor, mapper] : psActorsAndMappers)
   {
-    psActorAndMapper.second->SetScaleFactor(gaussianPointSize);
+    mapper->EmissiveOff();
+
+    if (type == SplatType::GAUSSIAN)
+    {
+      mapper->SetScaleFactor(1.0);
+      mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      mapper->AnisotropicOn();
+      mapper->SetBoundScale(3.0);
+      mapper->SetScaleArray("scale");
+      mapper->SetRotationArray("rotation");
+
+      int* viewport = this->GetSize();
+
+      float lowPass[3] = { 0.3f / (viewport[0] * viewport[0]), 0.f,
+        0.3f / (viewport[1] * viewport[1]) };
+      mapper->SetLowpassMatrix(lowPass);
+#endif
+
+      actor->ForceTranslucentOn();
+    }
+    else
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      mapper->AnisotropicOff();
+      mapper->SetLowpassMatrix(0., 0., 0.);
+#endif
+
+      mapper->SetScaleFactor(scaleFactor);
+
+      mapper->SetSplatShaderCode("//VTK::Color::Impl\n"
+                                 "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
+                                 "if (dist > 1.0) {\n"
+                                 "  discard;\n"
+                                 "} else {\n"
+                                 "  float scale = (1.0 - dist);\n"
+                                 "  ambientColor *= scale;\n"
+                                 "  diffuseColor *= scale;\n"
+                                 "}\n");
+
+      actor->ForceTranslucentOff();
+    }
   }
 }
 

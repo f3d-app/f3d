@@ -146,6 +146,7 @@ options::options()
   this->Internals->init("render.show-edges", false);
   this->Internals->init("render.line-width", 1.0);
   this->Internals->init("render.point-size", 10.0);
+  this->Internals->init("render.splat-type", std::string("sphere"));
   this->Internals->init("render.grid.enable", false);
   this->Internals->init("render.grid.absolute", false);
   this->Internals->init("render.grid.unit", 0.0);
