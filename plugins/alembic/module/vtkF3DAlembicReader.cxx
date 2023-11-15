@@ -22,261 +22,249 @@
 #pragma warning(pop)
 #endif
 
-typedef std::vector<int> IndicesContainer;
-typedef std::vector<Alembic::Abc::V3f> V3fContainer;
-typedef std::map<std::string, V3fContainer> AttributesContainer;
-typedef std::vector<Alembic::Abc::V3i> PerFaceWavefrontIndicesTripletsContainer;
-typedef std::vector<PerFaceWavefrontIndicesTripletsContainer> PerMeshWavefrontIndicesTripletsContainer;
+using IndicesContainer = std::vector<int>;
+using V3fContainer = std::vector<Alembic::Abc::V3f>;
+using AttributesContainer = std::map<std::string, V3fContainer>;
+using PerFaceWavefrontIndicesTripletsContainer = std::vector<Alembic::Abc::V3i>;
+using PerMeshWavefrontIndicesTripletsContainer =
+  std::vector<PerFaceWavefrontIndicesTripletsContainer>;
 
-const size_t pIndicesOffset = 0;
-const size_t uvIndicesOffset = 1;
-const size_t nIndicesOffset = 2;
+constexpr int pIndicesOffset = 0;
+constexpr int uvIndicesOffset = 1;
+constexpr int nIndicesOffset = 2;
 
 struct IntermediateGeometry
 {
-  AttributesContainer _attributes;
-  PerMeshWavefrontIndicesTripletsContainer _indices;
-  bool _uv_is_facevarying = false;
-  bool _N_is_facevarying = false;
+  AttributesContainer Attributes;
+  PerMeshWavefrontIndicesTripletsContainer Indices;
+  bool uvFaceVarying = false;
+  bool nFaceVarying = false;
 };
 
 class vtkF3DAlembicReader::vtkInternals
 {
-  void SetupIndicesStorage(const Alembic::AbcGeom::Int32ArraySamplePtr& face_vertex_counts,
-    PerMeshWavefrontIndicesTripletsContainer& extracted_indices)
+  void SetupIndicesStorage(const Alembic::AbcGeom::Int32ArraySamplePtr& faceVertexCounts,
+    PerMeshWavefrontIndicesTripletsContainer& extractedIndices)
   {
-
-    for (size_t i = 0; i < face_vertex_counts->size(); i++)
+    for (size_t i = 0; i < faceVertexCounts->size(); i++)
     {
-      extracted_indices.emplace_back( face_vertex_counts->get()[i]);
+      extractedIndices.emplace_back(faceVertexCounts->get()[i]);
     }
   }
 
   template<typename I>
-  void UpdateIndices(const I& attribute_indices, size_t indices_offset, PerMeshWavefrontIndicesTripletsContainer& mesh_indices,
-    bool do_reverse_rotate = true)
+  void UpdateIndices(const I& attributeIndices, int indicesOffset,
+    PerMeshWavefrontIndicesTripletsContainer& meshIndices, bool doReverseRotate = true)
   {
-    size_t face_indices_counter = 0;
-    for (auto & per_face_indices : mesh_indices)
+    size_t faceIndicesCounter = 0;
+    for (auto& perFaceIndices : meshIndices)
     {
-      size_t this_face_vertex_count = per_face_indices.size();
-      IndicesContainer this_face_indices;
       // Perform the collection first
-      for (size_t j = 0; j < this_face_vertex_count; j++)
+      size_t thisFaceVertexCount = perFaceIndices.size();
+      IndicesContainer thisFaceIndices;
+      for (size_t j = 0; j < thisFaceVertexCount; j++)
       {
-        auto vertex = attribute_indices->get()[face_indices_counter];
-        this_face_indices.emplace_back(vertex);
-        // printf("vertex[%ld] %d\n", indices_offset, vertex + 1);
-        face_indices_counter++;
+        auto vertex = attributeIndices->get()[faceIndicesCounter];
+        thisFaceIndices.emplace_back(vertex);
+        faceIndicesCounter++;
       }
-      if (do_reverse_rotate)
+      if (doReverseRotate)
       {
-        std::reverse(this_face_indices.begin(), this_face_indices.end());
-        std::rotate(this_face_indices.begin(),
-          this_face_indices.begin() + this_face_indices.size() - 1, this_face_indices.end());
+        std::reverse(thisFaceIndices.begin(), thisFaceIndices.end());
+        std::rotate(thisFaceIndices.begin(), thisFaceIndices.begin() + thisFaceIndices.size() - 1,
+          thisFaceIndices.end());
       }
+
       // Now update the mesh's indices
-      for (size_t j = 0; j < this_face_vertex_count; j++)
+      for (size_t j = 0; j < thisFaceVertexCount; j++)
       {
-        per_face_indices[j][indices_offset] = this_face_indices[j];
-        // printf("reversed rotated vertex %d\n",this_face_indices[j]+1);
+        perFaceIndices[j][indicesOffset] = thisFaceIndices[j];
       }
     }
   }
 
   void PointDuplicateAccumulator(
-    const IntermediateGeometry& original_data, IntermediateGeometry& duplicated_data)
+    const IntermediateGeometry& originalData, IntermediateGeometry& duplicatedData)
   {
-    bool need_to_duplicate = original_data._uv_is_facevarying || original_data._N_is_facevarying;
+    duplicatedData.uvFaceVarying = originalData.uvFaceVarying;
+    duplicatedData.nFaceVarying = originalData.nFaceVarying;
+    bool needToDuplicate = originalData.uvFaceVarying || originalData.nFaceVarying;
 
-    auto uv_map_iter = original_data._attributes.find("uv");
-    auto N_map_iter = original_data._attributes.find("N");
-    bool have_uv = uv_map_iter != original_data._attributes.end();
-    bool have_N = N_map_iter != original_data._attributes.end();
+    auto uvMapIter = originalData.Attributes.find("uv");
+    auto nMapIter = originalData.Attributes.find("N");
+    bool haveUV = uvMapIter != originalData.Attributes.end();
+    bool haveN = nMapIter != originalData.Attributes.end();
 
-    if (need_to_duplicate)
+    if (needToDuplicate)
     {
-      auto face_count = original_data._indices.size();
-      duplicated_data._indices.resize(face_count);
-      for (size_t i = 0; i < face_count; i++)
+      auto faceCount = originalData.Indices.size();
+      duplicatedData.Indices.resize(faceCount);
+      for (size_t i = 0; i < faceCount; i++)
       {
-        auto this_face_vertex_count = original_data._indices[i].size();
-        duplicated_data._indices[i].resize(
-          this_face_vertex_count, Alembic::Abc::V3i(-9999, -9999, -9999));
+        auto thisFaceVertexCount = originalData.Indices[i].size();
+        duplicatedData.Indices[i].resize(thisFaceVertexCount, Alembic::Abc::V3i());
       }
 
       // Points
       {
-        V3fContainer P_v3f;
-        int P_running_index = 0;
-        for (size_t i = 0; i < face_count; i++)
+        V3fContainer pV3F;
+        int pRunningIndex = 0;
+        for (size_t i = 0; i < faceCount; i++)
         {
-          auto this_face_vertex_count = original_data._indices[i].size();
-          for (size_t j = 0; j < this_face_vertex_count; j++)
+          auto thisFaceVertexCount = originalData.Indices[i].size();
+          for (size_t j = 0; j < thisFaceVertexCount; j++)
           {
-            Alembic::Abc::V3f original_position =
-              original_data._attributes.at("P")[original_data._indices[i][j].x];
-            P_v3f.emplace_back(original_position);
-            duplicated_data._indices[i][j].x = P_running_index;
-            P_running_index++;
+            Alembic::Abc::V3f originalPosition =
+              originalData.Attributes.at("P")[originalData.Indices[i][j].x];
+            pV3F.emplace_back(originalPosition);
+            duplicatedData.Indices[i][j].x = pRunningIndex;
+            pRunningIndex++;
           }
         }
 
-        duplicated_data._attributes.insert(AttributesContainer::value_type("P", P_v3f));
+        duplicatedData.Attributes.insert(AttributesContainer::value_type("P", pV3F));
       }
 
       // UV
-      if (have_uv)
+      if (haveUV)
       {
-        V3fContainer uv_v3f;
-        int uv_running_index = 0;
+        V3fContainer uvV3F;
+        int uvRunningIndex = 0;
 
-        for (size_t i = 0; i < face_count; i++)
+        for (size_t i = 0; i < faceCount; i++)
         {
-          auto this_face_vertex_count = original_data._indices[i].size();
-          for (size_t j = 0; j < this_face_vertex_count; j++)
+          auto thisFaceVertexCount = originalData.Indices[i].size();
+          for (size_t j = 0; j < thisFaceVertexCount; j++)
           {
-            Alembic::Abc::V3f original_uv =
-              original_data._attributes.at("uv")[original_data._indices[i][j].y];
-            uv_v3f.emplace_back(original_uv);
-            duplicated_data._indices[i][j].y = uv_running_index;
-            uv_running_index++;
+            Alembic::Abc::V3f originalUV =
+              originalData.Attributes.at("uv")[originalData.Indices[i][j].y];
+            uvV3F.emplace_back(originalUV);
+            duplicatedData.Indices[i][j].y = uvRunningIndex;
+            uvRunningIndex++;
           }
         }
 
-        duplicated_data._attributes.insert(AttributesContainer::value_type("uv", uv_v3f));
+        duplicatedData.Attributes.insert(AttributesContainer::value_type("uv", uvV3F));
       }
 
       // Normal
-      if (have_N)
+      if (haveN)
       {
-        V3fContainer N_v3f;
-        int N_running_index = 0;
+        V3fContainer nV3F;
+        int nRunningIndex = 0;
 
-        for (size_t i = 0; i < face_count; i++)
+        for (size_t i = 0; i < faceCount; i++)
         {
-          auto this_face_vertex_count = original_data._indices[i].size();
-          for (size_t j = 0; j < this_face_vertex_count; j++)
+          auto thisFaceVertexCount = originalData.Indices[i].size();
+          for (size_t j = 0; j < thisFaceVertexCount; j++)
           {
-            Alembic::Abc::V3f original_N =
-              original_data._attributes.at("N")[original_data._indices[i][j].z];
-            N_v3f.emplace_back(original_N);
-            duplicated_data._indices[i][j].z = N_running_index;
-            N_running_index++;
+            Alembic::Abc::V3f originalN =
+              originalData.Attributes.at("N")[originalData.Indices[i][j].z];
+            nV3F.emplace_back(originalN);
+            duplicatedData.Indices[i][j].z = nRunningIndex;
+            nRunningIndex++;
           }
         }
 
-        duplicated_data._attributes.insert(AttributesContainer::value_type("N", N_v3f));
+        duplicatedData.Attributes.insert(AttributesContainer::value_type("N", nV3F));
       }
     }
     else
     {
-      duplicated_data = original_data;
+      duplicatedData = originalData;
     }
   }
 
   void FillPolyData(const IntermediateGeometry& data, vtkPolyData* polydata)
   {
-    // Create 10 points.
     vtkNew<vtkPoints> points;
     vtkNew<vtkCellArray> cells;
 
-    auto P_map_iter = data._attributes.find("P");
-    assert(P_map_iter != data._attributes.end());
-    // Note : uv and N are optional
-    auto uv_map_iter = data._attributes.find("uv");
-    auto N_map_iter = data._attributes.find("N");
-    bool have_uv = uv_map_iter != data._attributes.end();
-    bool have_N = N_map_iter != data._attributes.end();
-    for (auto& P_iter : P_map_iter->second)
+    auto pMapIter = data.Attributes.find("P");
+    if (pMapIter == data.Attributes.end())
     {
-      points->InsertNextPoint(P_iter.x, P_iter.y, P_iter.z);
+      // Not a geometry, silent return
+      return;
+    }
+
+    // Note : uv and N are optional
+    auto uvMapIter = data.Attributes.find("uv");
+    auto nMapIter = data.Attributes.find("N");
+    bool haveUV = uvMapIter != data.Attributes.end();
+    bool haveN = nMapIter != data.Attributes.end();
+    for (auto& pIter : pMapIter->second)
+    {
+      points->InsertNextPoint(pIter.x, pIter.y, pIter.z);
     }
     polydata->SetPoints(points);
 
-    for (auto& face_indices_iter : data._indices)
+    for (auto& faceIndicesIter : data.Indices)
     {
       vtkNew<vtkPolygon> polygon;
-      for (auto& vertex_indices_iter : face_indices_iter)
+      for (auto& vertexIndicesIter : faceIndicesIter)
       {
-        polygon->GetPointIds()->InsertNextId(vertex_indices_iter.x);
+        polygon->GetPointIds()->InsertNextId(vertexIndicesIter.x);
       }
       cells->InsertNextCell(polygon);
     }
     polydata->SetPolys(cells);
-    vtkDataSetAttributes* point_attributes = polydata->GetAttributes(vtkDataSet::POINT);
-    vtkDataSetAttributes* cell_attributes = polydata->GetAttributes(vtkDataSet::CELL);
+    vtkDataSetAttributes* pointAttributes = polydata->GetAttributes(vtkDataSet::POINT);
 
-    assert(point_attributes != nullptr);
-    assert(cell_attributes != nullptr);
-    if (have_N)
+    if (haveN)
     {
       vtkNew<vtkFloatArray> normals;
+      normals->SetName("Normals");
       normals->SetNumberOfComponents(3);
-      for (auto& N : N_map_iter->second)
+      for (auto& N : nMapIter->second)
       {
         normals->InsertNextTuple3(N.x, N.y, N.z);
       }
-      if (data._N_is_facevarying)
-      {
-        cell_attributes->SetNormals(normals);
-      }
-      else
-      {
-        point_attributes->SetNormals(normals);
-      }
+      pointAttributes->SetNormals(normals);
     }
 
-    if (have_uv)
+    if (haveUV)
     {
       vtkNew<vtkFloatArray> uvs;
+      uvs->SetName("UVs");
       uvs->SetNumberOfComponents(2);
-      for (auto& uv : uv_map_iter->second)
+      for (auto& uv : uvMapIter->second)
       {
         uvs->InsertNextTuple2(uv.x, uv.y);
       }
-      if (data._uv_is_facevarying)
-      {
-        cell_attributes->SetTCoords(uvs);
-      }
-      else
-      {
-        point_attributes->SetTCoords(uvs);
-      }
+      pointAttributes->SetTCoords(uvs);
     }
   }
 
 public:
-  vtkSmartPointer<vtkPolyData> ProcessIPolyMesh(
-    const Alembic::AbcGeom::IPolyMesh& pmesh)
+  vtkSmartPointer<vtkPolyData> ProcessIPolyMesh(const Alembic::AbcGeom::IPolyMesh& pmesh)
   {
     vtkNew<vtkPolyData> polydata;
-    IntermediateGeometry original_data;
+    IntermediateGeometry originalData;
 
     Alembic::AbcGeom::IPolyMeshSchema::Sample samp;
     const Alembic::AbcGeom::IPolyMeshSchema& schema = pmesh.getSchema();
     if (schema.getNumSamples() > 0)
     {
-
       schema.get(samp);
 
-      Alembic::AbcGeom::P3fArraySamplePtr P = samp.getPositions();
-      Alembic::AbcGeom::Int32ArraySamplePtr face_position_indices = samp.getFaceIndices();
-      Alembic::AbcGeom::Int32ArraySamplePtr face_vertex_counts = samp.getFaceCounts();
+      Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
+      Alembic::AbcGeom::Int32ArraySamplePtr facePositionIndices = samp.getFaceIndices();
+      Alembic::AbcGeom::Int32ArraySamplePtr faceVertexCounts = samp.getFaceCounts();
 
-      this->SetupIndicesStorage(face_vertex_counts, original_data._indices);
+      this->SetupIndicesStorage(faceVertexCounts, originalData.Indices);
 
-      // Position
+      // Positions
       {
-        V3fContainer P_v3f;
-        for (size_t P_index = 0; P_index < P->size(); P_index++)
+        V3fContainer pV3F;
+        for (size_t pIndex = 0; pIndex < positions->size(); pIndex++)
         {
-          P_v3f.emplace_back(P->get()[P_index].x, P->get()[P_index].y, P->get()[P_index].z);
+          pV3F.emplace_back(
+            positions->get()[pIndex].x, positions->get()[pIndex].y, positions->get()[pIndex].z);
         }
-        original_data._attributes.insert(AttributesContainer::value_type("P", P_v3f));
+        originalData.Attributes.insert(AttributesContainer::value_type("P", pV3F));
 
         this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-          face_position_indices, pIndicesOffset, original_data._indices);
+          facePositionIndices, pIndicesOffset, originalData.Indices);
       }
 
       // Texture coordinate
@@ -286,25 +274,25 @@ public:
         Alembic::AbcGeom::IV2fGeomParam::Sample uvValue = uvsParam.getIndexedValue();
         if (uvValue.valid())
         {
-          V3fContainer uv_v3f;
-          Alembic::AbcGeom::UInt32ArraySamplePtr uv_indices = uvValue.getIndices();
+          V3fContainer uvV3F;
+          Alembic::AbcGeom::UInt32ArraySamplePtr uvIndices = uvValue.getIndices();
           for (size_t index = 0; index < uvValue.getVals()->size(); ++index)
           {
             Alembic::AbcGeom::V2f uv = (*(uvValue.getVals()))[index];
-            uv_v3f.emplace_back(uv[0], uv[1], 0);
+            uvV3F.emplace_back(uv[0], uv[1], 0);
           }
-          original_data._attributes.insert(AttributesContainer::value_type("uv", uv_v3f));
+          originalData.Attributes.insert(AttributesContainer::value_type("uv", uvV3F));
 
           if (uvsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
           {
-            original_data._uv_is_facevarying = true;
+            originalData.uvFaceVarying = true;
             this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              uv_indices, uvIndicesOffset, original_data._indices);
+              uvIndices, uvIndicesOffset, originalData.Indices);
           }
           else
           {
             this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-              face_position_indices, uvIndicesOffset, original_data._indices);
+              facePositionIndices, uvIndicesOffset, originalData.Indices);
           }
         }
       }
@@ -317,35 +305,35 @@ public:
         if (normalValue.valid())
         {
           V3fContainer normal_v3f;
-          Alembic::AbcGeom::UInt32ArraySamplePtr normal_indices = normalValue.getIndices();
+          Alembic::AbcGeom::UInt32ArraySamplePtr normalIndices = normalValue.getIndices();
           for (size_t index = 0; index < normalValue.getVals()->size(); ++index)
           {
             Alembic::AbcGeom::V3f normal = (*(normalValue.getVals()))[index];
             normal_v3f.emplace_back(normal[0], normal[1], normal[2]);
           }
-          original_data._attributes.insert(AttributesContainer::value_type("N", normal_v3f));
+          originalData.Attributes.insert(AttributesContainer::value_type("N", normal_v3f));
 
           if (normalsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
           {
-            original_data._N_is_facevarying = true;
+            originalData.nFaceVarying = true;
 
             this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              normal_indices, nIndicesOffset, original_data._indices);
+              normalIndices, nIndicesOffset, originalData.Indices);
           }
           else
           {
             this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-              face_position_indices, nIndicesOffset, original_data._indices);
+              facePositionIndices, nIndicesOffset, originalData.Indices);
           }
         }
       }
     }
 
-    IntermediateGeometry duplicated_data;
+    IntermediateGeometry duplicatedData;
 
-    this->PointDuplicateAccumulator(original_data, duplicated_data);
+    this->PointDuplicateAccumulator(originalData, duplicatedData);
 
-    this->FillPolyData(duplicated_data, polydata);
+    this->FillPolyData(duplicatedData, polydata);
 
     return polydata;
   }
@@ -358,8 +346,8 @@ public:
 
     if (Alembic::AbcGeom::IXform::matches(ohead))
     {
-      Alembic::AbcGeom::IXform xform(parent, ohead.getName());
-      nextParentObject = xform;
+      Alembic::AbcGeom::IXform xForm(parent, ohead.getName());
+      nextParentObject = xForm;
     }
     else if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
     {
