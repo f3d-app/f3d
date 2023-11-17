@@ -206,10 +206,11 @@ if(BUILD_SHARED_LIBS)
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT library)
 
   # Install dependencies, but exclude system libraries
-  set(F3D_DEPENDENCIES_DIR "" CACHE STRING "Semicolon separated directories for dependencies look up")
+  set(F3D_DEPENDENCIES_DIRS "" CACHE STRING "Semicolon separated directories for dependencies look up")
+  set(F3D_DEPENDENCIES_EXCLUDE_REGEXES "" CACHE STRING "Semicolon separated regex to exclude from dependencies install")
   install(RUNTIME_DEPENDENCY_SET libf3dDeps
     COMPONENT dependencies EXCLUDE_FROM_ALL
-    PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
+    PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-" ${F3D_DEPENDENCIES_EXCLUDE_REGEXES}
     POST_EXCLUDE_REGEXES ".*system32/.*" "^/usr/lib.*" "^/lib.*" "^/var/lib.*"
     DIRECTORIES "${F3D_DEPENDENCIES_DIR}")
 
