@@ -304,6 +304,12 @@ runs:
         ${{ env.F3D_BIN_PATH }} ../source/testing/data/suzanne.obj --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --verbose
         ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose
 
+    - name: Check not needed for CI optional component
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: |
+        cmake --install . --component dependencies
+
     - name: Upload Tests Install Artifact
       if: failure()
       uses: actions/upload-artifact@v3
