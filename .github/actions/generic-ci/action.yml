@@ -148,7 +148,7 @@ runs:
         -DF3D_BINDINGS_JAVA=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_DEPENDENCIES_DIRS=${{ runner.os == 'Windows' && '$(pwd)/../dependencies/install/bin' || null }}
-        -DF3D_DEPENDENCIES_EXCLUDE_REGEXES=${{ runner.os == 'Windows' && 'opengl32;libglapi;libglapi;vulkan' || null }}
+        -DF3D_DEPENDENCIES_EXCLUDE_REGEXES=${{ runner.os == 'Windows' && 'opengl32 libglapi libglapi vulkan' || null }}
         -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON

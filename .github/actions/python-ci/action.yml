@@ -69,7 +69,7 @@ runs:
     - name: Set SKBUILD_CMAKE_ARGS
       shell: bash
       run: >
-        echo "SKBUILD_CMAKE_ARGS=-DF3D_DEPENDENCIES_DIR=${{ env.ESCAPED_WS }}/dependencies/install/bin;
+        echo "SKBUILD_CMAKE_ARGS=-DF3D_DEPENDENCIES_DIRS=${{ env.ESCAPED_WS }}/dependencies/install/bin;
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON;
         -DF3D_PLUGIN_BUILD_ASSIMP=ON;
         -DF3D_PLUGIN_BUILD_DRACO=ON;
