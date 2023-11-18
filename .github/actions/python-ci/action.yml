@@ -35,6 +35,7 @@ runs:
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+        build_shared_libs: 'OFF'
 
     - name: Install F3D dependencies
       uses: ./source/.github/actions/f3d-dependencies

@@ -21,6 +21,10 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
+  build_shared_libs:
+    description: 'BUILD_SHARED_LIBS cmake option'
+    required: false
+    default: 'ON'
 
 runs:
   using: "composite"
@@ -47,7 +51,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-${{inputs.cpu}}-4
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-${{inputs.cpu}}-${{inputs.build_shared_libs}}-0
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -94,7 +98,7 @@ runs:
       shell: bash
       run: >
         cmake ../vtk
-        -DBUILD_SHARED_LIBS=ON
+        -DBUILD_SHARED_LIBS=${{ inputs.build_shared_libs }}
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
