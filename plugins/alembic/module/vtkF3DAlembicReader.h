@@ -14,8 +14,8 @@
 #ifndef vtkF3DAlembicReader_h
 #define vtkF3DAlembicReader_h
 
-#include <vtkPolyDataAlgorithm.h>
 #include <vtkNew.h>
+#include <vtkPolyDataAlgorithm.h>
 #include <vtkVersion.h>
 
 #include <memory>
