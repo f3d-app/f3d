@@ -13,6 +13,7 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 * Optionally, [Assimp](https://www.assimp.org/) >= 5.0.
 * Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.5.2.
 * Optionally, [Alembic](http://www.alembic.io/) >= 1.7.
+* Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 23.05.
 * Optionally, [Draco](https://google.github.io/draco/) >= 1.5.
 * Optionally, [Python](https://www.python.org/) >= 3.6 and [pybind11](https://github.com/pybind/pybind11) >= 2.2.
 * Optionally, [Java](https://www.java.com) >= 18.

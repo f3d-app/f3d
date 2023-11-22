@@ -4,7 +4,7 @@
 By Michael Migliore and Mathieu Westphal.
 
 <img src="https://raw.githubusercontent.com/f3d-app/f3d/master/resources/logo.svg" align="left" width="20px"/>
-F3D (pronounced `/fɛd/`) is a fast and minimalist 3D viewer. It supports many file formats, from digital content to scientific datasets (including glTF, STL, STEP, PLY, OBJ, FBX, Alembic), can show animations and support thumbnails and many rendering and texturing options including real time physically based rendering and raytracing.
+F3D (pronounced `/fɛd/`) is a fast and minimalist 3D viewer. It supports many file formats, from digital content to scientific datasets (including glTF, USD, STL, STEP, PLY, OBJ, FBX, Alembic), can show animations and support thumbnails and many rendering and texturing options including real time physically based rendering and raytracing.
 <br clear="left"/>
 
 It is fully controllable from the command line and support configuration files. It can provide thumbnails, support interactive hotkeys, drag&drop and integration into file managers.
@@ -69,7 +69,7 @@ We envision F3D as a community-driven project, we love to see how the project is
 
 # Acknowledgments
 
-F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/), [Assimp](https://www.assimp.org/), [Alembic](http://www.alembic.io/), [Draco](https://google.github.io/draco/) and [OSPRay](https://www.ospray.org/).
+F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/), [Assimp](https://www.assimp.org/), [Alembic](http://www.alembic.io/), [Draco](https://google.github.io/draco/), [OpenUSD](https://openusd.org/release/index.html) and [OSPRay](https://www.ospray.org/).
 
 # License
 

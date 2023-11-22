@@ -122,7 +122,7 @@ runs:
       if: runner.os == 'Windows'
       shell: powershell
       working-directory: ${{github.workspace}}
-      run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Determine if testing should be enabled
       id: vars
@@ -160,6 +160,7 @@ runs:
         -DF3D_PLUGIN_BUILD_DRACO=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_EXODUS=${{ inputs.cpu == 'x86_64' && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ runner.os == 'macOS' && 'OFF' || 'ON' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_WINDOWS_GUI=ON

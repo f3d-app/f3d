@@ -25,6 +25,11 @@ ABC file formats rely on [Alembic](https://github.com/alembic/alembic) library. 
 - Does not support Subdivision Meshes.
 - Does not support Materials.
 
+## USD
+USD file formats rely on [OpenUSD](https://github.com/PixarAnimationStudios/OpenUSD) library. It comes with some known limitations:
+- Skinning is slow and baked on the CPU.
+- Does not support Face-varying attributes.
+
 # Troubleshooting
 
 ## General
