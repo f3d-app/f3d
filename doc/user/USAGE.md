@@ -60,6 +60,7 @@ Here is the list of plugins provided officially by F3D:
 - **draco**: DRC support
 - **exodus**: EX2 support
 - **occt**: STEP and IGES support
+- **usd**: USD, USDA, UDSC and USDZ support
 
 > Note: If you downloaded the binaries from the Release page, it's not necessary to specify manually the plugins above, all of them are loaded automatically.
 

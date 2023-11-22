@@ -1,0 +1,74 @@
+name: 'Install USD Dependency'
+description: 'Install USD Dependency using cache when possible'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache USD
+      id: cache-usd
+      uses: actions/cache@v3
+      with:
+        path: dependencies/usd_install
+        key: usd-v23.05-${{runner.os}}-${{inputs.cpu}}-0
+
+    - name: Checkout USD
+      if: steps.cache-usd.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        repository: PixarAnimationStudios/USD
+        path: './dependencies/usd'
+        ref: v23.05
+
+    # This patch is coming from https://gist.github.com/Meakk/c1d5e25c0e4d3dfffb5f776b2f93663b
+    # Related issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/1471#issuecomment-1587463831
+    - name: Patch USD oneTBB
+      if: steps.cache-usd.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/usd
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/0001-usd-onetbb.patch
+
+    - name: Setup USD
+      if: steps.cache-usd.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir usd_build
+        mkdir usd_install
+
+    - name: Configure USD
+      if: steps.cache-usd.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/usd_build
+      shell: bash
+      run: >
+        cmake ../usd
+        -DPXR_BUILD_ALEMBIC_PLUGIN:BOOL=OFF
+        -DPXR_BUILD_EMBREE_PLUGIN:BOOL=OFF
+        -DPXR_BUILD_IMAGING:BOOL=OFF
+        -DPXR_BUILD_MONOLITHIC:BOOL=OFF
+        -DPXR_BUILD_TESTS:BOOL=OFF
+        -DPXR_BUILD_USD_IMAGING:BOOL=OFF
+        -DPXR_ENABLE_PYTHON_SUPPORT:BOOL=OFF
+        -DPXR_BUILD_EXAMPLES:BOOL=OFF
+        -DPXR_BUILD_TUTORIALS:BOOL=OFF
+        -DPXR_BUILD_USD_TOOLS:BOOL=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=$(pwd)/../usd_install
+        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
+        -DCMAKE_PREFIX_PATH:PATH=../install/
+
+    - name: Build USD
+      if: steps.cache-usd.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/usd_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/usd_install
+      shell: bash
+      run: cp -r ./* ../install/

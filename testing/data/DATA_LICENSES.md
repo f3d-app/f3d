@@ -3,6 +3,9 @@
 # Copyrights and Licenses
 
 - albedo.png: glTF-Sample-Models: Public Domain
+- AnimatedCube.usdz: [USD Working Group](https://github.com/usd-wg/assets): Apache 2.0
+- McUSD.usdz: [USD Working Group](https://github.com/usd-wg/assets): CC-NC-BY-SA, textures by [jasonjgardner](https://github.com/jasonjgardner)
+- Teapot.usd: [USD Working Group](https://github.com/usd-wg/assets): Public Domain - CC0
 - animatedWorld.fbx: VTK Data: BSD-3-Clause
 - animation_with_skeleton.fbx: assimp test models: BSD-3-Clause
 - beach.nrrd: VTK Data: BSD-3-Clause
