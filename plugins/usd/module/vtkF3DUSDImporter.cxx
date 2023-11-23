@@ -295,7 +295,8 @@ public:
         {
           pxr::UsdGeomCapsule capsulePrim = pxr::UsdGeomCapsule(prim);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20230921)
+          // See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10531
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 0)
           vtkNew<vtkCylinderSource> capsule;
           capsule->CapsuleCapOn();
 
