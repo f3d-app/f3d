@@ -11,8 +11,11 @@ f3d_embed_file(
   NAME F3DDefaultHDRI
   BINARY)
 set(sources
+  ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_opengl3.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.cxx)
 set(private_headers
+  ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_opengl3.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_opengl3_loader.h
   ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
 
 set(shader_files
@@ -48,6 +51,7 @@ set(classes
   vtkF3DRenderPass
   vtkF3DRenderer
   vtkF3DRendererWithColoring
+  vtkF3DUIRenderWindow
   )
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
@@ -92,3 +96,6 @@ endif()
 if(F3D_MODULE_EXR)
   vtk_module_link(f3d::vtkextPrivate PRIVATE OpenEXR::OpenEXR)
 endif()
+
+find_package(imgui REQUIRED)
+vtk_module_link(f3d::vtkextPrivate PRIVATE imgui::imgui)
