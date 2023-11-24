@@ -48,6 +48,17 @@ public:
     // in order to be able to interact while animating
     this->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
 
+    vtkNew<vtkCallbackCommand> renderCallback;
+    renderCallback->SetClientData(this->Window.GetRenderWindow());
+    renderCallback->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void* callData)
+      {
+        vtkRenderWindow* renWin = static_cast<vtkRenderWindow*>(clientData);
+        // calling Frame() here instead of Render() refresh only the UI
+        renWin->Frame();
+      });
+    this->VTKInteractor->AddObserver(vtkCommand::MouseMoveEvent, renderCallback);
+
     vtkNew<vtkCallbackCommand> keyPressCallback;
     keyPressCallback->SetClientData(this);
     keyPressCallback->SetCallback(OnKeyPress);

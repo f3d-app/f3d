@@ -10,13 +10,13 @@
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DNoRenderWindow.h"
 #include "vtkF3DRendererWithColoring.h"
+#include "vtkF3DUIRenderWindow.h"
 
 #include <vtkCamera.h>
 #include <vtkImageData.h>
 #include <vtkImageExport.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
-#include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
@@ -74,7 +74,7 @@ window_impl::window_impl(const options& options, Type type)
   }
   else
   {
-    this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DUIRenderWindow>::New();
     this->Internals->RenWin->SetOffScreenRendering(type == Type::NATIVE_OFFSCREEN);
     this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
 
