@@ -413,7 +413,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
       auto result = cxxOptions.parse(this->Argc, this->Argv);
 
 #ifndef F3D_NO_DEPRECATED
-      for (auto input : deprecatedInputs)
+      for (const std::string& input : deprecatedInputs)
       {
         /* `deprecatedInputs` may contain an empty string instead of being empty itself */
         if (!input.empty())
