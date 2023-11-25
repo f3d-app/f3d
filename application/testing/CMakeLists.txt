@@ -753,6 +753,7 @@ f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
 f3d_test(NAME TestHelpPositional ARGS --help REGEXP "file1 file2 \.\.\.")
 if (NOT F3D_EXCLUDE_DEPRECATED)
   f3d_test(NAME TestHelpInput ARGS --help REGEXP "--input")
+  f3d_test(NAME TestDeprecatedInput ARGS --input a.b REGEXP "--input option is deprecated")
 endif()
 
 # Test version display
