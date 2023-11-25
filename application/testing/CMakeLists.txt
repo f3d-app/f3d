@@ -751,7 +751,9 @@ f3d_test(NAME TestNoFileConfigFile CONFIG ${F3D_SOURCE_DIR}/testing/configs/verb
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
 f3d_test(NAME TestHelpPositional ARGS --help REGEXP "file1 file2 \.\.\.")
-f3d_test(NAME TestHelpInput ARGS --help REGEXP "--input")
+if (NOT F3D_EXCLUDE_DEPRECATED)
+  f3d_test(NAME TestHelpInput ARGS --help REGEXP "--input")
+endif()
 
 # Test version display
 f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")

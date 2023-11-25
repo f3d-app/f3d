@@ -274,6 +274,8 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool allOptionsInitialized,
   bool parseCommandLine)
 {
+  inputs.clear(); /* that would not be necessary if this function wasn't called multiple times */
+
   this->FilePathForConfigBlock = std::move(filePathForConfigBlock);
 
   // When parsing multiple times, hasDefault should be forced to yes after the first pass as all
@@ -284,16 +286,18 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 #ifndef F3D_NO_DEPRECATED
   // Deprecated options that needs further processing
   std::string deprecatedHDRI;
+  std::vector<std::string> deprecatedInputs;
 #endif
 
   try
   {
     cxxopts::Options cxxOptions(this->ExecutableName, F3D::AppTitle);
     cxxOptions.custom_help("[OPTIONS...] file1 file2 ...");
-
     // clang-format off
     auto grp0 = cxxOptions.add_options("Applicative");
-    this->DeclareOption(grp0, "input", "", "Input files", inputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
+#ifndef F3D_NO_DEPRECATED
+    this->DeclareOption(grp0, "input", "", "Input files", deprecatedInputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
+#endif
     this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
     this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "help", "h", "Print help");
@@ -407,6 +411,19 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     if (parseCommandLine)
     {
       auto result = cxxOptions.parse(this->Argc, this->Argv);
+
+#ifndef F3D_NO_DEPRECATED
+      for (auto input : deprecatedInputs)
+      {
+        /* `deprecatedInputs` may contain an empty string instead of being empty itself */
+        if (!input.empty())
+        {
+          f3d::log::warn("--input option is deprecated, please use positional arguments instead.");
+          break;
+        }
+      }
+      inputs = deprecatedInputs;
+#endif
 
       auto unmatched = result.unmatched();
       bool found_unknown_option = false;
