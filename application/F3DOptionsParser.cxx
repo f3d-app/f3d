@@ -293,6 +293,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
     // clang-format off
     auto grp0 = cxxOptions.add_options("Applicative");
+    this->DeclareOption(grp0, "input", "", "Input files", inputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
     this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
     this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "help", "h", "Print help");
@@ -408,8 +409,6 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
       auto result = cxxOptions.parse(this->Argc, this->Argv);
 
       auto unmatched = result.unmatched();
-
-      inputs.clear();
       bool found_unknown_option = false;
       for (std::string unknownOption : unmatched)
       {

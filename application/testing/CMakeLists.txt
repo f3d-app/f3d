@@ -176,8 +176,8 @@ f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2 D
 f3d_test(NAME TestLightIntensityBrighterFullScene DATA WaterBottle.glb ARGS --light-intensity=5.0 THRESHOLD 60 DEFAULT_LIGHTS)
 f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --light-intensity=0.2 DEFAULT_LIGHTS)
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp" DEFAULT_LIGHTS)
-f3d_test(NAME TestFilenameCommas DATA a,b,c.d REGEXP "a,b,c.d\" does not exist")
-f3d_test(NAME TestFilenameSpaces DATA "a b c.d" REGEXP "a b c.d\" does not exist")
+f3d_test(NAME TestFilenameCommas DATA a,b,c.d REGEXP "a,b,c\.d\" does not exist")
+f3d_test(NAME TestFilenameSpaces DATA "a b c.d" REGEXP "a b c\.d\" does not exist")
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf DEFAULT_LIGHTS)
 f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 DEFAULT_LIGHTS)
 f3d_test(NAME TestAnimationAutoplay DATA InterpolationTest.glb ARGS --animation-autoplay DEFAULT_LIGHTS)
@@ -750,7 +750,8 @@ f3d_test(NAME TestNoFileConfigFile CONFIG ${F3D_SOURCE_DIR}/testing/configs/verb
 
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
-f3d_test(NAME TestHelpPositional ARGS --help REGEXP "--input")
+f3d_test(NAME TestHelpPositional ARGS --help REGEXP "file1 file2 \.\.\.")
+f3d_test(NAME TestHelpInput ARGS --help REGEXP "--input")
 
 # Test version display
 f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")
