@@ -176,7 +176,7 @@ f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2 D
 f3d_test(NAME TestLightIntensityBrighterFullScene DATA WaterBottle.glb ARGS --light-intensity=5.0 THRESHOLD 60 DEFAULT_LIGHTS)
 f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --light-intensity=0.2 DEFAULT_LIGHTS)
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp" DEFAULT_LIGHTS)
-f3d_test(NAME TestFilenameCommasSpaces DATA "tetrahedron, with commas & spaces.off" DEFAULT_LIGHTS)
+f3d_test(NAME TestFilenameCommasSpaces DATA "tetrahedron, with commas & spaces.stl" DEFAULT_LIGHTS)
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf DEFAULT_LIGHTS)
 f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 DEFAULT_LIGHTS)
 f3d_test(NAME TestAnimationAutoplay DATA InterpolationTest.glb ARGS --animation-autoplay DEFAULT_LIGHTS)
