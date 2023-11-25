@@ -289,11 +289,10 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   try
   {
     cxxopts::Options cxxOptions(this->ExecutableName, F3D::AppTitle);
-    cxxOptions.positional_help("file1 file2 ...");
+    cxxOptions.custom_help("[OPTIONS...] file1 file2 ...");
 
     // clang-format off
     auto grp0 = cxxOptions.add_options("Applicative");
-    this->DeclareOption(grp0, "input", "", "Input files", inputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
     this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
     this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "help", "h", "Print help");
@@ -402,9 +401,6 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", appOptions.InteractionTestPlayFile, LocalHasDefaultNo, MayHaveConfig::YES,"<file_path>");
     // clang-format on
 
-    cxxOptions.positional_help("file1 file2 ...");
-    cxxOptions.parse_positional({ "input" });
-    cxxOptions.show_positional_help();
     cxxOptions.allow_unrecognised_options();
 
     if (parseCommandLine)
@@ -413,11 +409,18 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
       auto unmatched = result.unmatched();
 
-      if (unmatched.size() > 0)
+      inputs.clear();
+      bool found_unknown_option = false;
+      for (std::string unknownOption : unmatched)
       {
-        for (std::string unknownOption : unmatched)
+        if (!unknownOption.empty() && unknownOption[0] != '-')
+        {
+          inputs.push_back(unknownOption);
+        }
+        else
         {
           f3d::log::error("Unknown option '", unknownOption, "'");
+          found_unknown_option = true;
 
           // check if it's a long option
           if (unknownOption.substr(0, 2) == "--")
@@ -439,6 +442,9 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
             f3d::log::error("Did you mean '--", name, "'?");
           }
         }
+      }
+      if (found_unknown_option)
+      {
         f3d::log::waitForUser();
         throw F3DExNoProcess("unknown options");
       }
