@@ -56,6 +56,7 @@ public:
    */
   virtual interactor& addKeyPressToggle(const std::string& keySym, ModifierKeys modifiers, const std::string& option) = 0;
 
+  virtual interactor& command(const std::string& command) = 0;
   virtual interactor& addDefaultKeyPressInteractions();
 
   /**

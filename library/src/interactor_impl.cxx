@@ -24,9 +24,11 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <map>
+#include <vector>
 
 #include "camera.h"
 
@@ -804,5 +806,65 @@ void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 void interactor_impl::UpdateRendererAfterInteraction()
 {
   this->Internals->Style->UpdateRendererAfterInteraction();
+}
+
+//----------------------------------------------------------------------------
+interactor& command(const std::string& commandString)
+{
+  // Split command with space
+  std::string temp;
+	std::stringstream stringstream { commandString };
+	std::vector<std::string> result;
+	while (std::getline(stringstream, temp, ' ')) 
+  {
+		result.push_back(temp);
+	}
+
+  size_t nTokens = result.size();
+  if (nTokens > 3 || nTokens == 0)
+  {
+    log::error("Command: \"", commandString, "\" contains incorrect number of tokens, ignoring");
+    return this;
+  }
+
+  std::string command = results[0];
+  std::string option = nTokens >= 1 ? results[1] : "";
+  std::string value = nTokens >= 2 ? results[2] : "";
+
+  // Identify command
+  if (command == "set")
+  {
+    // TODO add alias support
+
+    // TODO do we want a map ?
+    std::vector<std::string> optionNames = this->Internals->Options->getNames();
+    if(std::find(optionNames.begin(), optionNames.end(), option) == vec.end())
+    {
+      log::error("Option: \"", option, "\" is not valid, ignoring");
+      return this;
+    }
+
+  }
+  else if (command == "inc")
+  {
+  }
+  else if (command == "dec")
+  {
+  }
+  else if (command == "toggle")
+  {
+  }
+  else if (command == "print")
+  {
+  }
+  else if (command == "alias")
+  {
+  }
+  else
+  {
+    log::error("Command: \"", command, "\" is not recognized, ignoring");
+    return this;
+  }
+
 }
 }
