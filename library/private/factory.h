@@ -5,7 +5,7 @@
  * This class describes the singleton object that manages the declared readers
  * in F3D.
  * To make it simple and automatic, you just have to declare each reader class
- * with the CMake macro f3d_declare_reader(). Then, at configure time, CMake
+ * with the CMake macro f3d_plugin_declare_reader(). Then, at configure time, CMake
  * generates a cxx file that instantiates all the reader classes and registers
  * them to the factory.
  */
