@@ -274,7 +274,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool allOptionsInitialized,
   bool parseCommandLine)
 {
-  inputs.clear(); /* that would not be necessary if this function wasn't called multiple times */
+  inputs.clear(); /* needed because this function is called multiple times */
 
   this->FilePathForConfigBlock = std::move(filePathForConfigBlock);
 
