@@ -21,7 +21,7 @@ namespace f3d
  * file formats, and must be able to produce either a VTK reader or a VTK importer.
  * Every reader must be registered to the `factory` singleton. This is
  * automatically done when the plugin is loaded by CMake when declaring every reader
- * with the f3d_declare_reader() macro.
+ * with the f3d_plugin_declare_reader() macro.
  *
  * @warning This file is used internally by the plugin SDK, it is not intended to be included
  * directly by libf3d users.
