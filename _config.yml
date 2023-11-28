@@ -262,6 +262,8 @@ aux_links_new_tab: true
 nav_external_links:
   - title: Download F3D
     url: https://f3d.app/doc/user/INSTALLATION.html
+  - title: GitHub repository
+    url: https://github.com/f3d-app/f3d
 
 # Google Analytics Tracking
 ga_tracking: G-ZCWEYB9KVG
