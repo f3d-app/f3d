@@ -59,7 +59,7 @@ runs:
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       uses: actions/checkout@v3
       with:
-        repository: Kitware/VTK
+        repository: mwestphal/VTK
         submodules: true
         path: './dependencies/vtk'
         ref: ${{env.VTK_SHA_OR_TAG}}
