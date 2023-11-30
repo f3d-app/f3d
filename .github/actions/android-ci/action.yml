@@ -28,8 +28,8 @@ runs:
       working-directory: ${{github.workspace}}
       run: |
         apt-get install unzip
-        wget https://dl.google.com/android/repository/android-ndk-${{env.NDK_VERSION}}-linux-x86_64.zip
-        unzip -qq android-ndk-${{env.NDK_VERSION}}-linux-x86_64.zip
+        wget https://dl.google.com/android/repository/android-ndk-${{env.NDK_VERSION}}-linux.zip
+        unzip -qq android-ndk-${{env.NDK_VERSION}}-linux.zip
         mv android-ndk-${{env.NDK_VERSION}} android-ndk
 
     - name: Install VTK dependency
