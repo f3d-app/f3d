@@ -346,10 +346,6 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
-    env:
-      NDK_VERSION: r26b
-      API_LEVEL: 27
-
     steps:
 
     - name: Checkout
