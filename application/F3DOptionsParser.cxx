@@ -274,6 +274,8 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool allOptionsInitialized,
   bool parseCommandLine)
 {
+  inputs.clear(); /* needed because this function is called multiple times */
+
   this->FilePathForConfigBlock = std::move(filePathForConfigBlock);
 
   // When parsing multiple times, hasDefault should be forced to yes after the first pass as all
@@ -284,16 +286,18 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 #ifndef F3D_NO_DEPRECATED
   // Deprecated options that needs further processing
   std::string deprecatedHDRI;
+  std::vector<std::string> deprecatedInputs;
 #endif
 
   try
   {
     cxxopts::Options cxxOptions(this->ExecutableName, F3D::AppTitle);
-    cxxOptions.positional_help("file1 file2 ...");
-
+    cxxOptions.custom_help("[OPTIONS...] file1 file2 ...");
     // clang-format off
     auto grp0 = cxxOptions.add_options("Applicative");
-    this->DeclareOption(grp0, "input", "", "Input files", inputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
+#ifndef F3D_NO_DEPRECATED
+    this->DeclareOption(grp0, "input", "", "Input files", deprecatedInputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
+#endif
     this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
     this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "help", "h", "Print help");
@@ -402,22 +406,37 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", appOptions.InteractionTestPlayFile, LocalHasDefaultNo, MayHaveConfig::YES,"<file_path>");
     // clang-format on
 
-    cxxOptions.positional_help("file1 file2 ...");
-    cxxOptions.parse_positional({ "input" });
-    cxxOptions.show_positional_help();
     cxxOptions.allow_unrecognised_options();
 
     if (parseCommandLine)
     {
       auto result = cxxOptions.parse(this->Argc, this->Argv);
 
-      auto unmatched = result.unmatched();
-
-      if (unmatched.size() > 0)
+#ifndef F3D_NO_DEPRECATED
+      for (const std::string& input : deprecatedInputs)
       {
-        for (std::string unknownOption : unmatched)
+        /* `deprecatedInputs` may contain an empty string instead of being empty itself */
+        if (!input.empty())
+        {
+          f3d::log::warn("--input option is deprecated, please use positional arguments instead.");
+          break;
+        }
+      }
+      inputs = deprecatedInputs;
+#endif
+
+      auto unmatched = result.unmatched();
+      bool found_unknown_option = false;
+      for (std::string unknownOption : unmatched)
+      {
+        if (!unknownOption.empty() && unknownOption[0] != '-')
+        {
+          inputs.push_back(unknownOption);
+        }
+        else
         {
           f3d::log::error("Unknown option '", unknownOption, "'");
+          found_unknown_option = true;
 
           // check if it's a long option
           if (unknownOption.substr(0, 2) == "--")
@@ -439,6 +458,9 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
             f3d::log::error("Did you mean '--", name, "'?");
           }
         }
+      }
+      if (found_unknown_option)
+      {
         f3d::log::waitForUser();
         throw F3DExNoProcess("unknown options");
       }
