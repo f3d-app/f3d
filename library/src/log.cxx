@@ -4,9 +4,10 @@
 
 #include "F3DLog.h"
 
+#include <vtkObject.h>
+
 namespace f3d
 {
-
 //----------------------------------------------------------------------------
 void log::printInternal(log::VerboseLevel level, const std::string& str)
 {
@@ -90,6 +91,9 @@ void log::setVerboseLevel(log::VerboseLevel level)
     default:
       break;
   }
+
+  // Display third parties log on Debug level
+  vtkObject::SetGlobalWarningDisplay(level == log::VerboseLevel::DEBUG);
 }
 
 //----------------------------------------------------------------------------
