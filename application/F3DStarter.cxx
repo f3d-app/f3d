@@ -101,6 +101,36 @@ public:
     return false;
   }
 
+  static void SetVerboseLevel(const std::string& level)
+  {
+    // A switch/case over verbose level
+    if (level == "quiet")
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
+    }
+    else if (level == "error")
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::ERROR);
+    }
+    else if (level == "warning")
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::WARN);
+    }
+    else if (level == "info")
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO);
+    }
+    else if (level == "debug")
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+    }
+    else
+    {
+      f3d::log::warn("Unrecognized verbose level: ", level,
+        ", Ignoring. Possible values are quiet, error, warning, info, debug");
+    }
+  }
+
   F3DOptionsParser Parser;
   F3DAppOptions AppOptions;
   f3d::options DynamicOptions;
@@ -134,14 +164,7 @@ int F3DStarter::Start(int argc, char** argv)
     this->Internals->AppOptions, this->Internals->DynamicOptions, files);
 
   // Set verbosity level early from command line
-  if (this->Internals->AppOptions.Quiet)
-  {
-    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
-  }
-  else if (this->Internals->AppOptions.Verbose || this->Internals->AppOptions.NoRender)
-  {
-    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  }
+  F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel);
 
   // Load plugins from the app options
   this->Internals->Parser.LoadPlugins(this->Internals->AppOptions);
@@ -158,14 +181,7 @@ int F3DStarter::Start(int argc, char** argv)
       this->Internals->AppOptions, this->Internals->DynamicOptions, files);
 
     // Set verbosity level again if it was defined in the configuration file global block
-    if (this->Internals->AppOptions.Quiet)
-    {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
-    }
-    else if (this->Internals->AppOptions.Verbose || this->Internals->AppOptions.NoRender)
-    {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-    }
+    F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel);
   }
 
 #if __APPLE__
