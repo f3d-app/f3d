@@ -920,7 +920,7 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
       unsigned int size = spec->GetPrefilterSize();
 
       vtkNew<vtkMultiBlockDataSet> mb;
-      mb->SetNumberOfBlocks(6 * nbLevels);
+      mb->SetNumberOfBlocks(nbLevels);
 
       for (unsigned int i = 0; i < nbLevels; i++)
       {
