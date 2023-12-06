@@ -29,7 +29,7 @@ int vtkF3DWin32OutputWindow::Initialize()
 {
   int rc = this->Superclass::Initialize();
 
-  // retrieve window handle
+  // retrieve output window handle
   HWND hCurWnd = nullptr;
   do
   {
@@ -51,6 +51,25 @@ int vtkF3DWin32OutputWindow::Initialize()
 
   // find Edit control
   this->EditControlHandle = FindWindowExA(hCurWnd, nullptr, "Edit", nullptr);
+
+  // retrieve f3d window handle
+  HWND f3dCurWnd = nullptr;
+  do
+  {
+    f3dCurWnd = FindWindowExA(nullptr, f3dCurWnd, "vtkOpenGL", nullptr);
+    DWORD processID = 0;
+    GetWindowThreadProcessId(f3dCurWnd, &processID);
+    if (processID == GetCurrentProcessId())
+    {
+      break;
+    }
+  } while (f3dCurWnd != nullptr);
+
+  // Put f3d window on top of output window
+  if (f3dCurWnd)
+  {
+    BringWindowToTop(f3dCurWnd);
+  }
 
   return rc;
 }
