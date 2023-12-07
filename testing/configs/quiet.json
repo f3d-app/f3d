@@ -1,6 +1,7 @@
 {
   "global":
   {
-    "quiet": true
+    "verbose": "quiet",
+    "no-render": true
   }
 }

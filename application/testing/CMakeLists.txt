@@ -28,7 +28,7 @@ function(f3d_test)
   endif()
 
   if(F3D_TEST_NO_RENDER)
-    list(APPEND F3D_TEST_ARGS "--no-render")
+    list(APPEND F3D_TEST_ARGS "--no-render" "--verbose=debug")
   else()
     if(F3D_TEST_RESOLUTION)
       list(APPEND F3D_TEST_ARGS "--resolution=${F3D_TEST_RESOLUTION}")
@@ -657,7 +657,19 @@ f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CM
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
 
 # Simple verbosity test
-f3d_test(NAME TestVerbose DATA dragon.vtu ARGS --verbose REGEXP "Number of points: 13268\nNumber of cells: 26532" NO_RENDER)
+f3d_test(NAME TestVerbose DATA dragon.vtu ARGS --verbose REGEXP "Number of points: 13268\nNumber of cells: 26532" NO_BASELINE)
+
+# Test verbose quiet
+f3d_test(NAME TestVerboseQuiet DATA mb.vtm ARGS --verbose=quiet REGEXP_FAIL "A non data set block was ignored while reading a multiblock." NO_BASELINE)
+
+# Test verbose error
+f3d_test(NAME TestVerboseError DATA mb.vtm ARGS --verbose=error REGEXP_FAIL "A non data set block was ignored while reading a multiblock." NO_BASELINE)
+
+# Test verbose warning, rely on the log::info about image comparison
+f3d_test(NAME TestVerboseWarning DATA cow.vtp ARGS --verbose=warning REGEXP_FAIL "Image comparison success with an error difference of" DEFAULT_LIGHTS)
+
+# Test verbose debug
+f3d_test(NAME TestVerboseDebug DATA dragon.vtu ARGS --verbose REGEXP "Number of points: 13268\nNumber of cells: 26532" NO_BASELINE)
 
 # Test verbose invalid verbose value
 f3d_test(NAME TestVerboseInvalid DATA dragon.vtu ARGS --verbose=invalid REGEXP "Unrecognized verbose level" NO_BASELINE)
@@ -703,13 +715,13 @@ f3d_test(NAME TestVerboseVolumeNoArray DATA cow.vtp ARGS -v REGEXP "Cannot use v
 f3d_test(NAME TestVerboseNoArray DATA cow.vtp ARGS -s REGEXP "No array to color with" NO_BASELINE)
 
 # Test non existent file, do not create nonExistentFile.vtp
-f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose REGEXP "File \".*nonExistentFile.vtp\" does not exist" NO_RENDER)
+f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp REGEXP "File \".*nonExistentFile.vtp\" does not exist" NO_RENDER)
 
 # Test non existent font file, do not create nonExistentFile.ttf
 f3d_test(NAME TestVerboseNonExistentFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/nonExistentFile.ttf REGEXP "Cannot find \".*nonExistentFile.ttf\" font file" NO_BASELINE)
 
-# Test non existent file, do not create nonExistentFile.vtp
-f3d_test(NAME TestQuietNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose --quiet REGEXP_FAIL "File \".*nonExistentFile.vtp\" does not exist" NO_RENDER)
+# Test quiet with a non existent file
+f3d_test(NAME TestQuietNonExistentFile DATA nonExistentFile.vtp ARGS --verbose=quiet --no-render REGEXP_FAIL "File \".*nonExistentFile.vtp\" does not exist")
 
 # Test non supported file, do not add support for .dummy file.
 f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename REGEXP ".*unsupportedFile.dummy\" is not a file of a supported file format" NO_RENDER)
@@ -745,7 +757,7 @@ f3d_test(NAME TestNonExistentConfigFileStem DATA cow.vtp CONFIG "dummy" REGEXP "
 f3d_test(NAME TestInvalidConfigFile DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid.json REGEXP "Unable to parse the configuration file" NO_BASELINE)
 
 # Test quiet in config file
-f3d_test(NAME TestConfigFileQuiet DATA nonExistentFile.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/quiet.json REGEXP_FAIL "File .*/testing/data/nonExistentFile.vtp does not exist" NO_RENDER)
+f3d_test(NAME TestConfigFileQuiet DATA nonExistentFile.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/quiet.json REGEXP_FAIL "File .*/testing/data/nonExistentFile.vtp does not exist" NO_BASELINE)
 
 # Test no file with config file
 f3d_test(NAME TestNoFileConfigFile CONFIG ${F3D_SOURCE_DIR}/testing/configs/verbose.json ARGS --verbose REGEXP "No file to load provided." NO_BASELINE)
@@ -754,8 +766,9 @@ f3d_test(NAME TestNoFileConfigFile CONFIG ${F3D_SOURCE_DIR}/testing/configs/verb
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
 f3d_test(NAME TestHelpPositional ARGS --help REGEXP "file1 file2 \.\.\.")
 if (NOT F3D_EXCLUDE_DEPRECATED)
-  f3d_test(NAME TestHelpInput ARGS --help REGEXP "--input")
+  f3d_test(NAME TestDeprecatedHelpInput ARGS --help REGEXP "--input")
   f3d_test(NAME TestDeprecatedInput ARGS --input a.b REGEXP "--input option is deprecated")
+  f3d_test(NAME TestDeprecatedQuietNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose --quiet --no-render REGEXP_FAIL "File \".*nonExistentFile.vtp\" does not exist" NO_BASELINE)
 endif()
 
 # Test version display
