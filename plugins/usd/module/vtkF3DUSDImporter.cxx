@@ -563,7 +563,8 @@ public:
       maxHeight = std::max(maxHeight, size[1]);
     }
 
-    auto ResizeAndExtractChannel = [&](vtkImageData* img) -> vtkSmartPointer<vtkImageData> {
+    auto ResizeAndExtractChannel = [&](vtkImageData* img) -> vtkSmartPointer<vtkImageData>
+    {
       if (!img)
       {
         vtkNew<vtkImageData> emptyImage;
@@ -882,9 +883,15 @@ public:
     return { prop, isTranslucent };
   }
 
-  bool HasTimeCode() { return this->Stage ? this->Stage->HasAuthoredTimeCodeRange() : false; }
+  bool HasTimeCode()
+  {
+    return this->Stage ? this->Stage->HasAuthoredTimeCodeRange() : false;
+  }
 
-  void SetCurrentTime(double currentTime) { this->CurrentTime = currentTime; }
+  void SetCurrentTime(double currentTime)
+  {
+    this->CurrentTime = currentTime;
+  }
 
   void GetTimeRange(double timeRange[2])
   {
