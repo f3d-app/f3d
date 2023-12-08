@@ -12,6 +12,7 @@ else()
 endif()
 
 find_package(pxr REQUIRED)
+find_package(Boost REQUIRED)
 
 message(STATUS "Plugin: USD found")
 
