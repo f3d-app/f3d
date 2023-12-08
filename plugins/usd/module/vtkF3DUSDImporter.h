@@ -42,7 +42,7 @@ public:
    */
   void EnableAnimation(vtkIdType vtkNotUsed(animationIndex)) override
   {
-      this->AnimationEnabled = true;
+    this->AnimationEnabled = true;
   }
 
   /**
