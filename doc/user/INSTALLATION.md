@@ -37,6 +37,8 @@ You can also find packages for the following repositories:
 - [Arch](https://archlinux.org/packages/extra/x86_64/f3d/)
 - [NixOS](https://search.nixos.org/packages?query=f3d)
 - [openSUSE](https://software.opensuse.org/package/f3d)
+- [OpenMandriva](https://github.com/OpenMandrivaAssociation/f3d)
+- [Mageia](https://madb.mageia.org/package/show/source/1/application/0/release/cauldron/name/f3d)
 - Fedora and others through [openSUSE OBS](https://build.opensuse.org/package/show/home:AndnoVember:F3D/f3d)
 - [Guix](https://packages.guix.gnu.org/packages/f3d/)
 - [Flathub](https://flathub.org/apps/details/io.github.f3d_app.f3d)
