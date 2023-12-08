@@ -3,6 +3,9 @@
 ## Ongoing development
 For F3D users:
  - Added `--animation-autoplay` option (libf3d: `scene.animation.autoplay`) to automatically start animation on file load.
+ - Changed `--verbose` into a string based option, eg: `--verbose=quiet` or `--verbose=debug`. `--verbose` is still supported.
+ - Changed `--no-render` behavior so that it doesn't impact verbosity anymore
+ - Deprecated `--quiet`, use `--verbose=quiet` instead.
 
 For libf3d users:
  - Added `scene.animation.autoplay` option.
