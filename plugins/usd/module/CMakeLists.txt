@@ -7,5 +7,6 @@ vtk_module_add_module(f3d::VTKExtensionsUSDReader
   CLASSES ${classes})
 
 vtk_module_link(f3d::VTKExtensionsUSDReader PRIVATE ${PXR_LIBRARIES})
+vtk_module_include(f3d::VTKExtensionsUSDReader PRIVATE ${PXR_INCLUDE_DIRS})
 
 vtk_module_set_properties(f3d::VTKExtensionsUSDReader CXX_STANDARD 17)
