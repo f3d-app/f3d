@@ -4,6 +4,7 @@ option(F3D_PLUGIN_BUILD_DRACO "Draco plugin (DRC files)" OFF)
 option(F3D_PLUGIN_BUILD_EXODUS "ExodusII plugin (EX2 files)" ON)
 option(F3D_PLUGIN_BUILD_OCCT "OpenCASCADE plugin (STEP and IGES files)" OFF)
 option(F3D_PLUGIN_BUILD_USD "Universal Scene Description plugin (USD files)" OFF)
+option(F3D_PLUGIN_BUILD_VDB "OpenVDB plugin (VDB files)" OFF)
 
 add_subdirectory(native)
 
@@ -29,4 +30,8 @@ endif()
 
 if (F3D_PLUGIN_BUILD_USD)
   add_subdirectory(usd)
+endif()
+
+if (F3D_PLUGIN_BUILD_VDB)
+  add_subdirectory(vdb)
 endif()
