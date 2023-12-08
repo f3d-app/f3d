@@ -2,5 +2,5 @@
 Type=X-Thumbnailer
 Name=f3d Thumbnailer (${F3D_PLUGIN_NAME} plugin)
 TryExec=f3d
-Exec=f3d --config=thumbnail --load-plugins=${F3D_PLUGIN_NAME} --quiet --output=%o --resolution=%s,%s %i
+Exec=f3d --config=thumbnail --load-plugins=${F3D_PLUGIN_NAME} --verbose=quiet --output=%o --resolution=%s,%s %i
 MimeType=${F3D_PLUGIN_MIMETYPES_THUMB}
