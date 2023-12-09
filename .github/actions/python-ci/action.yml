@@ -28,9 +28,9 @@ runs:
         cd dependencies
         mkdir install
 
-    - name: Install TBB
-      uses: ./source/.github/actions/tbb-install-dep
-
+    - name: Install VTK dependencies
+      uses: ./source/.github/actions/vtk-dependencies
+ 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:

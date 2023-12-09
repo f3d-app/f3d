@@ -60,8 +60,8 @@ runs:
         cd dependencies
         mkdir install
 
-    - name: Install TBB
-      uses: ./source/.github/actions/tbb-install-dep
+    - name: Install VTK dependencies
+      uses: ./source/.github/actions/vtk-dependencies
       with:
         cpu: ${{inputs.cpu}}
 
@@ -161,6 +161,7 @@ runs:
         -DF3D_PLUGIN_BUILD_EXODUS=${{ inputs.cpu == 'x86_64' && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_VDB=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ runner.os == 'macOS' && 'OFF' || 'ON' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_WINDOWS_GUI=ON

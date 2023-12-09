@@ -47,7 +47,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-${{inputs.cpu}}-4
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-${{inputs.cpu}}-5
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -98,6 +98,8 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -DOpenVDB_openvdb_INCLUDE_DIR=$(pwd)/../install/include/
+        -DOpenVDB_openvdb_LIBRARY=$(pwd)/../install/lib/libopenvdb.so.11.0.0
         -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_BUILD_TESTING=OFF
         -DVTK_DEBUG_LEAKS=ON
@@ -115,6 +117,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_IOGeometry=YES
         -DVTK_MODULE_ENABLE_VTK_IOImage=YES
         -DVTK_MODULE_ENABLE_VTK_IOImport=YES
+        -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=YES
         -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
         -DVTK_MODULE_ENABLE_VTK_IOParallel=YES
         -DVTK_MODULE_ENABLE_VTK_IOXML=YES

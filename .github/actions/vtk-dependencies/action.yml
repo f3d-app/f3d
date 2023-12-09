@@ -1,0 +1,34 @@
+name: 'Install VTK Dependencies'
+description: 'Install multiple VTK Dependencies'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Install TBB
+      uses: ./source/.github/actions/tbb-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+
+    - name: Install Boost dependency
+      uses: ./source/.github/actions/boost-install-dep
+
+    - name: Install zlib
+      uses: ./source/.github/actions/zlib-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+
+    - name: Install blosc
+      uses: ./source/.github/actions/blosc-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+
+    - name: Install OpenVDB
+      uses: ./source/.github/actions/openvdb-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
