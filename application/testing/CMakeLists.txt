@@ -588,6 +588,21 @@ if(F3D_PLUGIN_BUILD_USD)
   endif()
 endif()
 
+if(F3D_PLUGIN_BUILD_VDB)
+  f3d_test(NAME TestVDBVolume DATA icosahedron.vdb ARGS --load-plugins=exodus --volume --inverse DEFAULT_LIGHTS)
+  f3d_test(NAME TestVDBPoints DATA sphere_points.vdb ARGS --load-plugins=exodus -o DEFAULT_LIGHTS)
+
+  if(NOT F3D_MACOS_BUNDLE)
+    file(COPY "${F3D_SOURCE_DIR}/plugins/vdb/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
+    f3d_test(NAME TestDefaultConfigFileVDB DATA icosahedron.vdb CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+
+    if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
+      file(COPY "${F3D_SOURCE_DIR}/plugins/vdb/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
+      f3d_test(NAME TestThumbnailConfigFileVDB DATA icosahedron.vdb CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+    endif()
+  endif()
+endif ()
+
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestMultiplePluginsLoad DATA cow.vtp ARGS --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()
