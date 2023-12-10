@@ -26,9 +26,14 @@ f3d_plugin_declare_reader(
 )
 
 set(rpaths "")
-get_target_property(target_type usdGeom TYPE)
-if (target_type STREQUAL SHARED_LIBRARY)
-  list(APPEND rpaths "$<TARGET_FILE_DIR:usdGeom>")
+list(GET PXR_LIBRARIES 0 first_lib)
+get_target_property(target_type ${first_lib} TYPE)
+if(target_type STREQUAL SHARED_LIBRARY)
+  list(APPEND rpaths "$<TARGET_FILE_DIR:${first_lib}>")
+else()
+  # When built as a static library, OpenUSD has to be linked with the WHOLE_ARCHIVE link option.
+  # It's not done currently, so just exit with a fatal error.
+  message(FATAL_ERROR "OpenUSD seems to have been built as static libraries. This is currently not supported.")
 endif ()
 
 f3d_plugin_build(

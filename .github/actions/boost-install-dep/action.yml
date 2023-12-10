@@ -10,7 +10,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/boost_install
-        key: boost-1.82.0-${{runner.os}}-0
+        key: boost-1.83.0-${{runner.os}}-0
 
     - name: Checkout Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
@@ -20,7 +20,7 @@ runs:
         submodules: true
         fetch-depth: 0
         path: './dependencies/boost'
-        ref: boost-1.82.0
+        ref: boost-1.83.0
 
     - name: Setup Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
