@@ -30,7 +30,16 @@
 #include <vtkTransformFilter.h>
 #include <vtkTriangleFilter.h>
 
-#if defined(_MSC_VER)
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsuggest-override"
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#elif defined(_MSC_VER)
 #pragma warning(push, 0)
 #endif
 #include <pxr/usd/ar/asset.h>
@@ -53,8 +62,12 @@
 #include <pxr/usd/usdShade/material.h>
 #include <pxr/usd/usdShade/materialBindingAPI.h>
 #include <pxr/usd/usdSkel/bakeSkinning.h>
-#if defined(_MSC_VER)
-#pragma warning(pop)
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop, 0)
 #endif
 
 class vtkF3DUSDImporter::vtkInternals
