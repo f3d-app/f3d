@@ -6,15 +6,14 @@ F3D behavior can be fully controlled from the command line using the following o
 
 Options|Default|Description
 ------|------|------
-\-\-input=\<file\>||The *input* file or files to read, can also be provided as a positional argument.
 \-\-output=\<png file\>||Instead of showing a render view and render into it, *render directly into a png file*. When used with \-\-ref option, only outputs on failure.
 \-\-no-background||Use with \-\-output to output a png file with a transparent background.
--h, \-\-help||Print *help* and exit.
-\-\-version||Show *version* information and exit.
-\-\-readers-list||List available *readers* and exit.
+-h, \-\-help||Print *help* and exit. Ignore `--verbose`.
+\-\-version||Show *version* information and exit. Ignore `--verbose`.
+\-\-readers-list||List available *readers* and exit. Ignore `--verbose`.
 \-\-config=\<config file path/name/stem\>|config|Specify the [configuration file](CONFIGURATION_FILE.md) to use. Supports absolute/relative path but also filename/filestem to search for in standard configuration file locations.
 \-\-dry-run||Do not read any configuration file and consider only the command line options.
-\-\-no-render||Print information about the first provided file (as with \-\-verbose) and exit, without rendering anything, useful to recover information about a file.
+\-\-no-render||Do not render anything and quit just after loading the first file, use with \-\-verbose to recover information about a file.
 \-\-max-size=\<size in MiB\>|-1|Prevent F3D to load a file bigger than the provided size in Mib, negative value means unlimited, useful for thumbnails.
 \-\-load-plugins=\<paths or names\>||List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `exodus`, `occt`, `usd`. See [usage](USAGE.md) for more info.
 
@@ -22,8 +21,7 @@ Options|Default|Description
 
 Options|Default|Description
 ------|------|------
-\-\-verbose||Enable *verbose* mode, providing more information about the loaded data in the console output.
-\-\-quiet||Enable quiet mode, which supersede any verbose options. No console output will be generated at all.
+\-\-verbose=\<[debug\|info\|warning\|error\|quiet]\>|info| Set *verbose* level, in order to provide more information about the loaded data in the console output. If no level is providen, assume `debug`.
 \-\-progress||Show a *progress bar* when loading the file.
 \-\-geometry-only||For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-group-geometries||When opening multiple files, show them all in the same scene.<br>Force geometry-only. The configuration file for the first file will be loaded.
