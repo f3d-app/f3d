@@ -63,6 +63,8 @@ public:
   camera& resetToBounds(double zoomFactor = 0.9) override;
   ///@}
 
+  void toggleOrthogonalProjection() override;
+
   /**
    * Implementation only api.
    * Set the pointer to the renderer to control the camera of.

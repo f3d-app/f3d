@@ -37,6 +37,7 @@ const std::vector<std::pair<std::string, std::string> >& interactor::getDefaultI
     { "3", "Left View camera" },
     { "7", "Top View camera" },
     { "9", "Isometric View camera" },
+    { "0", "Toggle Orthogonal projection" },
     { "Escape", "Quit" },
     { "Enter", "Reset camera to initial parameters" },
     { "Space", "Play animation if any" },

@@ -253,6 +253,23 @@ camera& camera_impl::resetToBounds([[maybe_unused]] double zoomFactor)
   return *this;
 }
 
+void camera_impl::toggleOrthogonalProjection()
+{
+  bool isParallel = this->GetVTKCamera()->GetParallelProjection();
+  if(isParallel)
+  {
+    this->GetVTKCamera()->ParallelProjectionOff();
+  }
+  else
+  {
+    this->GetVTKCamera()->ParallelProjectionOn();
+    const camera_state_t& state = this->getState();
+    double distance = std::sqrt(vtkMath::Distance2BetweenPoints(state.pos, state.foc));
+    double parallel_scale = distance * tan(0.5 * vtkMath::RadiansFromDegrees(state.angle));
+    this->GetVTKCamera()->SetParallelScale(parallel_scale);
+  }
+}
+
 //----------------------------------------------------------------------------
 void camera_impl::SetVTKRenderer(vtkRenderer* renderer)
 {
@@ -264,4 +281,5 @@ vtkCamera* camera_impl::GetVTKCamera()
 {
   return this->Internals->VTKRenderer->GetActiveCamera();
 }
-};
+
+}

@@ -101,7 +101,7 @@ public:
     VT_FRONT,
     VT_RIGHT,
     VT_TOP,
-    VT_ISOMETRIC
+    VT_ISOMETRIC,
   };
   static void SetViewOrbit(ViewType view, internals* self)
   {
@@ -140,6 +140,12 @@ public:
     cam.setPosition(newPos);
     cam.setViewUp(up);
     cam.resetToBounds(0.9);
+  }
+
+  static void ToggleOrthogonalProjection(internals* self)
+  {
+    camera& cam = self->Window.getCamera();
+    cam.toggleOrthogonalProjection();
   }
 
   static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
@@ -325,6 +331,11 @@ public:
         break;
       case '9':
         self->SetViewOrbit(ViewType::VT_ISOMETRIC, self);
+        render = true;
+        break;
+      case '0':
+        self->ToggleOrthogonalProjection(self);
+        self->Options.toggle("camera.orthogonal");
         render = true;
         break;
       default:
