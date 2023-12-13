@@ -82,8 +82,6 @@ public:
    */
   virtual camera& resetToBounds(double zoomFactor = 0.9) = 0;
 
-  virtual void toggleOrthogonalProjection() = 0;
-
 protected:
   //! @cond
   camera() = default;

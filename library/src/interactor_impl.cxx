@@ -11,6 +11,7 @@
 #include "vtkF3DRendererWithColoring.h"
 
 #include <vtkCallbackCommand.h>
+#include <vtkCamera.h>
 #include <vtkCellPicker.h>
 #include <vtkMath.h>
 #include <vtkMatrix3x3.h>
@@ -142,10 +143,21 @@ public:
     cam.resetToBounds(0.9);
   }
 
-  static void ToggleOrthogonalProjection(internals* self)
+  static void SetOrthogonalProjection(internals* self)
   {
-    camera& cam = self->Window.getCamera();
-    cam.toggleOrthogonalProjection();
+    vtkRenderWindow* renWin = self->Window.GetRenderWindow();
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    vtkCamera* camera = ren->GetActiveCamera();
+
+    bool use = self->Options.getAsBool("camera.orthogonal");
+    if (use)
+    {
+      const camera_state_t& state = self->Window.getCamera().getState();
+      double distance = std::sqrt(vtkMath::Distance2BetweenPoints(state.pos, state.foc));
+      double parallel_scale = distance * tan(0.5 * vtkMath::RadiansFromDegrees(state.angle));
+      camera->SetParallelScale(parallel_scale);
+    }
+    camera->SetParallelProjection(use);
   }
 
   static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
@@ -325,17 +337,17 @@ public:
         self->SetViewOrbit(ViewType::VT_RIGHT, self);
         render = true;
         break;
+      case '5':
+        self->Options.toggle("camera.orthogonal");
+        self->SetOrthogonalProjection(self);
+        render = true;
+        break;
       case '7':
         self->SetViewOrbit(ViewType::VT_TOP, self);
         render = true;
         break;
       case '9':
         self->SetViewOrbit(ViewType::VT_ISOMETRIC, self);
-        render = true;
-        break;
-      case '0':
-        self->ToggleOrthogonalProjection(self);
-        self->Options.toggle("camera.orthogonal");
         render = true;
         break;
       default:
@@ -497,10 +509,7 @@ public:
   std::function<bool(const std::vector<std::string>&)> DropFilesUserCallBack =
     [](const std::vector<std::string>&) { return false; };
 
-  void StartInteractor()
-  {
-    this->VTKInteractor->Start();
-  }
+  void StartInteractor() { this->VTKInteractor->Start(); }
 
   void StopInteractor()
   {

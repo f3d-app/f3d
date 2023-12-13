@@ -278,8 +278,6 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetLightIntensity(
     this->Internals->Options.getAsDouble("render.light.intensity"));
 
-  this->Internals->Renderer->ShowOrthogonal(this->Internals->Options.getAsBool("camera.orthogonal"));
-
   std::string hdriFile = this->Internals->Options.getAsString("render.hdri.file");
   bool hdriAmbient = this->Internals->Options.getAsBool("render.hdri.ambient");
   bool hdriSkybox = this->Internals->Options.getAsBool("render.background.skybox");

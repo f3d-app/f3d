@@ -43,8 +43,6 @@ public:
   void ShowHDRISkybox(bool show);
   ///@}
 
-  void ShowOrthogonal(bool show);
-
   using vtkOpenGLRenderer::SetBackground;
   ///@{
   /**
@@ -235,7 +233,6 @@ protected:
   vtkNew<vtkCornerAnnotation> MetaDataActor;
   vtkNew<vtkCornerAnnotation> CheatSheetActor;
   vtkNew<vtkF3DDropZoneActor> DropZoneActor;
-  vtkNew<vtkCornerAnnotation> OrthogonalActor;
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkSkybox> SkyboxActor;
 
@@ -268,7 +265,6 @@ protected:
   bool CheatSheetVisible = false;
   bool DropZoneVisible = false;
   bool HDRISkyboxVisible = false;
-  bool OrthogonalVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
@@ -276,6 +272,7 @@ protected:
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;
+  bool UseOrthogonalProjection = false;
   bool UseTrackball = false;
   bool InvertZoom = false;
 

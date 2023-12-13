@@ -171,15 +171,12 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->SkyboxActor->GammaCorrectOn();
 #endif
 
-  this->OrthogonalActor->SetTextProperty(textProp);
-
   this->FilenameActor->VisibilityOff();
   this->MetaDataActor->VisibilityOff();
   this->TimerActor->VisibilityOff();
   this->CheatSheetActor->VisibilityOff();
   this->DropZoneActor->VisibilityOff();
   this->SkyboxActor->VisibilityOff();
-  this->OrthogonalActor->VisibilityOff();
 }
 
 //----------------------------------------------------------------------------
@@ -208,7 +205,6 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   this->AddActor(this->DropZoneActor);
   this->AddActor(this->CheatSheetActor);
   this->AddActor(this->SkyboxActor);
-  this->AddActor(this->OrthogonalActor);
 
   this->GridConfigured = false;
   this->CheatSheetConfigured = false;
@@ -1244,6 +1240,7 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     cheatSheetText << " DOWN : Add files from dir of current file\n";
     cheatSheetText << "\n 1: Front View camera\n";
     cheatSheetText << " 3: Right View camera\n";
+    cheatSheetText << " 5: Orthogonal Projection\n";
     cheatSheetText << " 7: Top View camera\n";
     cheatSheetText << " 9: Isometric View camera\n";
     cheatSheetText << " 0: Toggle Orthogonal projection\n";
@@ -1278,17 +1275,6 @@ void vtkF3DRenderer::ShowHDRISkybox(bool show)
     this->HDRISkyboxConfigured = false;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
-  }
-}
-
-void vtkF3DRenderer::ShowOrthogonal(bool show)
-{
-  if(this->OrthogonalVisible != show)
-  {
-    std::string orthogonalText = "Projection: Orthogonal";
-    this->OrthogonalVisible = show;
-    this->OrthogonalActor->SetText(vtkCornerAnnotation::UpperLeft, orthogonalText.c_str());
-    this->OrthogonalActor->SetVisibility(show);
   }
 }
 
