@@ -143,23 +143,6 @@ public:
     cam.resetToBounds(0.9);
   }
 
-  static void SetOrthogonalProjection(internals* self)
-  {
-    vtkRenderWindow* renWin = self->Window.GetRenderWindow();
-    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    vtkCamera* camera = ren->GetActiveCamera();
-
-    bool use = self->Options.getAsBool("camera.orthogonal");
-    if (use)
-    {
-      const camera_state_t& state = self->Window.getCamera().getState();
-      double distance = std::sqrt(vtkMath::Distance2BetweenPoints(state.pos, state.foc));
-      double parallel_scale = distance * tan(0.5 * vtkMath::RadiansFromDegrees(state.angle));
-      camera->SetParallelScale(parallel_scale);
-    }
-    camera->SetParallelProjection(use);
-  }
-
   static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
   {
 
@@ -338,8 +321,8 @@ public:
         render = true;
         break;
       case '5':
-        self->Options.toggle("camera.orthogonal");
-        self->SetOrthogonalProjection(self);
+        self->Options.toggle("camera.orthographic");
+        ren->SetUseOrthographicProjection(self->Options.getAsBool("camera.orthographic"));
         render = true;
         break;
       case '7':

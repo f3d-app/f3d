@@ -1,4 +1,5 @@
 .vscode
+.idea
 _site
 .vs
 CMakeUserPresets.json

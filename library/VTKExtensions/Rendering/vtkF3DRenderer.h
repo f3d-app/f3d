@@ -79,6 +79,13 @@ public:
 
   ///@{
   /**
+   * Set orthographic projection for the camera
+   */
+  void SetUseOrthographicProjection(bool use);
+  ///@}
+
+  ///@{
+  /**
    * Set/Get UseTrackball
    */
   void SetUseTrackball(bool use);
@@ -272,7 +279,6 @@ protected:
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;
-  bool UseOrthogonalProjection = false;
   bool UseTrackball = false;
   bool InvertZoom = false;
 

@@ -1240,10 +1240,9 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     cheatSheetText << " DOWN : Add files from dir of current file\n";
     cheatSheetText << "\n 1: Front View camera\n";
     cheatSheetText << " 3: Right View camera\n";
-    cheatSheetText << " 5: Orthogonal Projection\n";
+    cheatSheetText << " 5: Orthographic Projection\n";
     cheatSheetText << " 7: Top View camera\n";
     cheatSheetText << " 9: Isometric View camera\n";
-    cheatSheetText << " 0: Toggle Orthogonal projection\n";
     cheatSheetText << " ENTER: Reset camera to initial parameters\n";
     cheatSheetText << " Drop  : Load dropped file, folder or HDRI\n";
 
@@ -1334,6 +1333,22 @@ void vtkF3DRenderer::ShowEdge(bool show)
     this->ActorsPropertiesConfigured = false;
     this->CheatSheetConfigured = false;
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseOrthographicProjection(bool use)
+{
+  vtkCamera* camera = GetActiveCamera();
+  if (use)
+  {
+    const double* position = camera->GetPosition();
+    const double* focal = camera->GetFocalPoint();
+    const double angle = camera->GetViewAngle();
+    double distance = std::sqrt(vtkMath::Distance2BetweenPoints(position, focal));
+    double parallel_scale = distance * tan(0.5 * vtkMath::RadiansFromDegrees(angle));
+    camera->SetParallelScale(parallel_scale);
+  }
+  camera->SetParallelProjection(use);
 }
 
 //----------------------------------------------------------------------------
