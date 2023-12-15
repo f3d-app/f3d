@@ -34,7 +34,7 @@ int TestSDKMultiOptions(int argc, char* argv[])
 
   // Check rendering is correct
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-           std::string(argv[2]), "TestSDKMultiOptions", 50)
+           std::string(argv[2]), "TestSDKMultiOptions")
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }

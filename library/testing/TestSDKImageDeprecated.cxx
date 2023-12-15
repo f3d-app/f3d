@@ -105,5 +105,13 @@ int TestSDKImageDeprecated(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  f3d::image diff;
+  double error;
+  if (!imgCopy.compare(baseline, 0, diff, error))
+  {
+    std::cerr << "Compare failed" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   return EXIT_SUCCESS;
 }

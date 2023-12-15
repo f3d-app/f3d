@@ -24,7 +24,8 @@ def test_compare_with_file():
     img = engine.window.render_to_image()
     img.save(output)
 
-    diff = f3d.Image()
-    error = 0.0
+    ref = f3d.Image(reference)
 
-    assert img.compare(f3d.Image(reference), 50, diff, error)
+    img.diff(ref).save(outputDiff)
+
+    assert img.psnr(ref) > 30

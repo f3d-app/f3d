@@ -29,7 +29,7 @@ struct F3DAppOptions
   std::string InteractionTestPlayFile = "";
   bool NoBackground = false;
   bool NoRender = false;
-  double RefThreshold = 50;
+  double RefThreshold = 30.0;
   double MaxSize = -1.0;
 
   std::vector<int> Resolution{ 1000, 600 };

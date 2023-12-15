@@ -26,6 +26,10 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   if(NOT F3D_EXCLUDE_DEPRECATED)
     list(APPEND libf3dSDKTests_list
          TestSDKImageDeprecated.cxx)
+
+    if(NOT MSVC)
+      set_source_files_properties(TestSDKImageDeprecated.cxx PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
+    endif()
   endif()
 endif()
 

@@ -11,11 +11,13 @@
 #include <vtkJPEGWriter.h>
 #include <vtkPNGWriter.h>
 #include <vtkPointData.h>
+#include <vtkSMPTools.h>
 #include <vtkSmartPointer.h>
 #include <vtkTIFFWriter.h>
 #include <vtksys/SystemTools.hxx>
 
 #include <cassert>
+#include <cmath>
 #include <vector>
 
 namespace f3d
@@ -217,6 +219,7 @@ unsigned char* image::getData() const
 }
 #endif
 
+#ifndef F3D_NO_DEPRECATED
 //----------------------------------------------------------------------------
 bool image::compare(const image& reference, double threshold, image& diff, double& error) const
 {
@@ -244,13 +247,102 @@ bool image::compare(const image& reference, double threshold, image& diff, doubl
 
   return true;
 }
+#endif
+
+//----------------------------------------------------------------------------
+double image::psnr(const image& reference) const
+{
+  if (this->getWidth() != reference.getWidth())
+  {
+    throw psnr_exception("Images have different widths");
+  }
+
+  if (this->getHeight() != reference.getHeight())
+  {
+    throw psnr_exception("Images have different heights");
+  }
+
+  if (this->getChannelCount() != reference.getChannelCount())
+  {
+    throw psnr_exception("Images have different channel count");
+  }
+
+  if (this->getChannelType() != ChannelType::BYTE ||
+    reference.getChannelType() != ChannelType::BYTE)
+  {
+    throw psnr_exception("One image has a channel type different then BYTE");
+  }
+
+  struct MSEWorker
+  {
+    vtkSMPThreadLocal<double> LocalMSE;
+    double ReducedMSE = 0.0;
+    unsigned char* Buffer1;
+    unsigned char* Buffer2;
+
+    MSEWorker(unsigned char* buffer1, unsigned char* buffer2)
+      : Buffer1(buffer1)
+      , Buffer2(buffer2)
+    {
+    }
+
+    void Initialize() { this->LocalMSE.Local() = 0.0; }
+
+    void operator()(vtkIdType begin, vtkIdType end)
+    {
+      for (vtkIdType idx = begin; idx < end; ++idx)
+      {
+        double diff =
+          static_cast<double>(this->Buffer1[idx]) - static_cast<double>(this->Buffer2[idx]);
+        this->LocalMSE.Local() += diff * diff;
+      }
+    }
+
+    void Reduce()
+    {
+      for (double localMSE : this->LocalMSE)
+      {
+        this->ReducedMSE += localMSE;
+      }
+    }
+  };
+
+  unsigned int totalSize = this->getHeight() * this->getWidth() * this->getChannelCount();
+
+  MSEWorker worker(static_cast<unsigned char*>(reference.getContent()),
+    static_cast<unsigned char*>(this->getContent()));
+  vtkSMPTools::For(0, totalSize, worker);
+
+  double mse = worker.ReducedMSE / static_cast<double>(totalSize);
+
+  if (mse < 1e-9)
+  {
+    // pixel perfect
+    return std::numeric_limits<double>::infinity();
+  }
+
+  return 10.0 * std::log10(255.0 * 255.0 / mse);
+}
+
+//----------------------------------------------------------------------------
+image image::diff(const image& other) const
+{
+  vtkNew<vtkImageDifference> imDiff;
+  imDiff->SetThreshold(0);
+  imDiff->SetInputData(this->Internals->Image);
+  imDiff->SetImageData(other.Internals->Image);
+  imDiff->Update();
+
+  image diff;
+  diff.Internals->Image = imDiff->GetOutput();
+
+  return diff;
+}
 
 //----------------------------------------------------------------------------
 bool image::operator==(const image& reference) const
 {
-  image diff;
-  double error;
-  return this->compare(reference, 0, diff, error);
+  return this->psnr(reference) == std::numeric_limits<double>::infinity();
 }
 
 //----------------------------------------------------------------------------
@@ -298,6 +390,12 @@ image::write_exception::write_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 image::read_exception::read_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+image::psnr_exception::psnr_exception(const std::string& what)
   : exception(what)
 {
 }

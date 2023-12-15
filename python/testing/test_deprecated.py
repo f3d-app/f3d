@@ -94,16 +94,12 @@ def test_legacy_CompareWithFile():
     img = engine.getWindow().renderToImage()
     img.save(output)
 
-    diff = f3d.image()
-    error = 0.0
+    ref = f3d.image(reference)
 
-    ret = img.compare(f3d.image(reference), 100, diff, error)
+    psnr = img.psnr(ref)
+    img.diff(ref).save(outputDiff)
 
-    if not ret:
-        print("img compare failing with diff=" + error)
-        diff.save(outputDiff)
-
-    assert ret is True
+    assert psnr > 30.0, "img compare failing with psnr=" + str(psnr)
 
 
 def test_legacy_ImageData():

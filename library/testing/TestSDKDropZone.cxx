@@ -16,7 +16,7 @@ int TestSDKDropZone(int argc, char* argv[])
   win.render();
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-           std::string(argv[2]), "TestSDKDropZone", 50)
+           std::string(argv[2]), "TestSDKDropZone")
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }

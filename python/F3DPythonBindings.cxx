@@ -114,7 +114,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property_readonly("channel_type", &f3d::image::getChannelType)
     .def_property_readonly("channel_type_size", &f3d::image::getChannelTypeSize)
     .def_property("content", getImageBytes, setImageBytes)
-    .def("compare", &f3d::image::compare)
+    .def("psnr", &f3d::image::psnr)
+    .def("diff", &f3d::image::diff)
     .def(
       "save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG);
 
@@ -328,7 +329,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("getChannelType", &f3d::image::getChannelType, "DEPRECATED")
     .def("getChannelTypeSize", &f3d::image::getChannelTypeSize, "DEPRECATED")
     .def("setContent", setImageBytes, "DEPRECATED")
-    .def("getContent", getImageBytes, "DEPRECATED");
+    .def("getContent", getImageBytes, "DEPRECATED")
+    .def("compare", &f3d::image::compare, "DEPRECATED");
 
   options //
     .def("set", py::overload_cast<const std::string&, bool>(&f3d::options::set),

@@ -29,7 +29,7 @@ int TestSDKMultiColoring(int argc, char* argv[])
   opt.set("model.scivis.array-name", "Normals");
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-           std::string(argv[2]), "TestSDKMultiColoring", 50)
+           std::string(argv[2]), "TestSDKMultiColoring")
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }
