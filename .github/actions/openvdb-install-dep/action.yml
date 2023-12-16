@@ -49,6 +49,7 @@ runs:
         -DOPENVDB_BUILD_VDB_PRINT=OFF
         -DOPENVDB_CORE_STATIC=OFF
         -DOPENVDB_ENABLE_UNINSTALL=OFF
+        -DTBB_ROOT:PATH=../install/
         -DUSE_PKGCONFIG=OFF
         -DUSE_TBB=ON
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
