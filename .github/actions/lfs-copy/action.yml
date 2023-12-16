@@ -22,7 +22,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: lfs_data
-        key: lfs-data-${{inputs.lfs_sha}}-1
+        key: lfs-data-${{inputs.lfs_sha}}-2
 
     - name: Checkout LFS data
       if: |
