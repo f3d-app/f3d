@@ -39,6 +39,7 @@ runs:
       shell: bash
       run: >
         cmake ../openvdb
+        -DBOOST_ROOT:PATH=../install/
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../openvdb_install
