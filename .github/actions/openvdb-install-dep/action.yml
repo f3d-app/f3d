@@ -50,7 +50,7 @@ runs:
         -DOPENVDB_CORE_STATIC=OFF
         -DOPENVDB_ENABLE_UNINSTALL=OFF
         -DUSE_PKGCONFIG=OFF
-        -DUSE_TBB=OFF
+        -DUSE_TBB=ON
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
