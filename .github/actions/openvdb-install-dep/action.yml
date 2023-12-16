@@ -39,18 +39,15 @@ runs:
       shell: bash
       run: >
         cmake ../openvdb
-        -DBLOSC_ROOT:PATH=../install/
-        -DBOOST_ROOT:PATH=../install/
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../openvdb_install
         -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
-        -DCMAKE_PREFIX_PATH:PATH=../install/
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DOPENVDB_BUILD_BINARIES=OFF
         -DOPENVDB_BUILD_VDB_PRINT=OFF
         -DOPENVDB_CORE_STATIC=OFF
         -DOPENVDB_ENABLE_UNINSTALL=OFF
-        -DTBB_ROOT:PATH=../install/
         -DUSE_PKGCONFIG=OFF
         -DUSE_TBB=ON
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
