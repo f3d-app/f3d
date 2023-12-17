@@ -44,7 +44,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../openvdb_install
         -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
-        -DCMAKE_POSITION_INDEPENDENT_CODE=ON # Needed for clang
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DTBB_ROOT=$(pwd)/../install/
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
