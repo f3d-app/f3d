@@ -10,7 +10,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/boost_install
-        key: boost-1.83.0-${{runner.os}}-1
+        key: boost-1.83.0-${{runner.os}}-2
 
     - name: Checkout Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
@@ -47,6 +47,7 @@ runs:
         variant='release'
         link=static
         runtime-link=shared
+        ${{ runner.os == 'Windows' && 'toolset=msvc' || null }}
         --with-date_time
         --with-filesystem
         --with-program_options
