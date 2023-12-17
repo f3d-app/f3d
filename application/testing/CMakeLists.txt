@@ -589,8 +589,8 @@ if(F3D_PLUGIN_BUILD_USD)
 endif()
 
 if(F3D_PLUGIN_BUILD_VDB)
-  f3d_test(NAME TestVDBVolume DATA icosahedron.vdb ARGS --load-plugins=exodus --volume --inverse DEFAULT_LIGHTS)
-  f3d_test(NAME TestVDBPoints DATA sphere_points.vdb ARGS --load-plugins=exodus -o DEFAULT_LIGHTS)
+  f3d_test(NAME TestVDBVolume DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --inverse DEFAULT_LIGHTS)
+  f3d_test(NAME TestVDBPoints DATA sphere_points.vdb ARGS --load-plugins=vdb -o DEFAULT_LIGHTS)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/vdb/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
