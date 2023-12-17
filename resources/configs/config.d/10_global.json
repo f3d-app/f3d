@@ -9,6 +9,7 @@
     "filename": true,
     "scalars": "",
     "camera-direction": "-1,-0.5,-1",
-    "hdri-ambient": true
+    "hdri-ambient": true,
+    "translucency-support": true
   }
 }
