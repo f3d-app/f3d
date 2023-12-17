@@ -27,6 +27,11 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
 
+    - name: Install zstd
+      uses: ${{inputs.source_dir}}/.github/actions/zstd-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+
     - name: Install blosc
       uses: ${{inputs.source_dir}}/.github/actions/blosc-install-dep
       with:

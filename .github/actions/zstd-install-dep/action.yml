@@ -1,0 +1,64 @@
+name: 'Install zstd Dependency'
+description: 'Install zstd Dependency using cache when possible'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache zstd
+      id: cache-zstd
+      uses: actions/cache@v3
+      with:
+        path: dependencies/zstd_install
+        key: zstd-1.5.5-${{runner.os}}-${{inputs.cpu}}-0
+
+    - name: Checkout zstd
+      if: steps.cache-zstd.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        repository: facebook/zstd
+        path: './dependencies/zstd'
+        ref: v1.5.5
+
+    - name: Setup zstd
+      if: steps.cache-zstd.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir zstd_build
+        mkdir zstd_install
+
+    - name: Configure zstd
+      if: steps.cache-zstd.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/zstd_build
+      shell: bash
+      run: >
+        cmake ../zstd
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../zstd_install
+        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
+        -DZSTD_BUILD_CONTRIB:BOOL=OFF
+        -DZSTD_BUILD_PROGRAMS:BOOL=OFF
+        -DZSTD_BUILD_SHARED:BOOL=ON
+        -DZSTD_BUILD_STATIC:BOOL=OFF
+        -DZSTD_LEGACY_SUPPORT:BOOL=OFF
+        -DZSTD_MULTITHREAD_SUPPORT:BOOL=ON
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build zstd
+      if: steps.cache-zstd.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/zstd_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/zstd_install
+      shell: bash
+      run: cp -r ./* ../install/
