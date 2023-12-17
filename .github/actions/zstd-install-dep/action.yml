@@ -38,7 +38,7 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/zstd_build
       shell: bash
       run: >
-        cmake ../zstd
+        cmake ../zstd/build/cmake
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../zstd_install
