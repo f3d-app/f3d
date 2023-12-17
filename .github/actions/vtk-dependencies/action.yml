@@ -14,35 +14,37 @@ runs:
   using: "composite"
   steps:
 
-    - name: Navigate to source dir
+    - name: Copy actions to a common directory TODO move to another step ?
       shell: bash
       working-directory: ${{github.workspace}}
-      run: cd ${{inputs.source_dir}}
+      run: |
+        mkdir .actions
+        cp -r ${{inputs.source_dir}}/.github/actions/* .actions/
 
     - name: Install TBB
-      uses: ./.github/actions/tbb-install-dep
+      uses: .actions/tbb-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install Boost dependency
-      uses: ./.github/actions/boost-install-dep
+      uses: .actions/boost-install-dep
 
     - name: Install zlib
-      uses: ./.github/actions/zlib-install-dep
+      uses: .actions/zlib-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install zstd
-      uses: ./.github/actions/zstd-install-dep
+      uses: .actions/zstd-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install blosc
-      uses: ./.github/actions/blosc-install-dep
+      uses: .actions/blosc-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install OpenVDB
-      uses: ./.github/actions/openvdb-install-dep
+      uses: .actions/openvdb-install-dep
       with:
         cpu: ${{inputs.cpu}}
