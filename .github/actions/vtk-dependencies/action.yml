@@ -22,29 +22,29 @@ runs:
         cp -r ${{inputs.source_dir}}/.github/actions/* .actions/
 
     - name: Install TBB
-      uses: .actions/tbb-install-dep
+      uses: ./.actions/tbb-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install Boost dependency
-      uses: .actions/boost-install-dep
+      uses: ./.actions/boost-install-dep
 
     - name: Install zlib
-      uses: .actions/zlib-install-dep
+      uses: ./.actions/zlib-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install zstd
-      uses: .actions/zstd-install-dep
+      uses: ./.actions/zstd-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install blosc
-      uses: .actions/blosc-install-dep
+      uses: ./.actions/blosc-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install OpenVDB
-      uses: .actions/openvdb-install-dep
+      uses: ./.actions/openvdb-install-dep
       with:
         cpu: ${{inputs.cpu}}
