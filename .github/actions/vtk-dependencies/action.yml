@@ -20,29 +20,29 @@ runs:
       run: cd ${{inputs.source_dir}}
 
     - name: Install TBB
-      uses: .github/actions/tbb-install-dep
+      uses: ./.github/actions/tbb-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install Boost dependency
-      uses: .github/actions/boost-install-dep
+      uses: ./.github/actions/boost-install-dep
 
     - name: Install zlib
-      uses: .github/actions/zlib-install-dep
+      uses: ./.github/actions/zlib-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install zstd
-      uses: .github/actions/zstd-install-dep
+      uses: ./.github/actions/zstd-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install blosc
-      uses: .github/actions/blosc-install-dep
+      uses: ./.github/actions/blosc-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install OpenVDB
-      uses: .github/actions/openvdb-install-dep
+      uses: ./.github/actions/openvdb-install-dep
       with:
         cpu: ${{inputs.cpu}}
