@@ -5,7 +5,7 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
-  working_directory:
+  source_dir:
     description: 'Source directory for actions'
     required: false
     default: './source'
@@ -14,36 +14,35 @@ runs:
   using: "composite"
   steps:
 
+    - name: Navigate to source dir
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: cd ${{inputs.source_dir}}
+
     - name: Install TBB
-      working-directory: ${{inputs.working_directory}}
       uses: .github/actions/tbb-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install Boost dependency
-      working-directory: ${{inputs.working_directory}}
       uses: .github/actions/boost-install-dep
 
     - name: Install zlib
-      working-directory: ${{inputs.working_directory}}
       uses: .github/actions/zlib-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install zstd
-      working-directory: ${{inputs.working_directory}}
       uses: .github/actions/zstd-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install blosc
-      working-directory: ${{inputs.working_directory}}
       uses: .github/actions/blosc-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install OpenVDB
-      working-directory: ${{inputs.working_directory}}
       uses: .github/actions/openvdb-install-dep
       with:
         cpu: ${{inputs.cpu}}
