@@ -21,7 +21,7 @@ runs:
     - name: Install VTK dependencies
       uses: ./source/f3d/.github/actions/vtk-dependencies
       with:
-        source_dir: ./source/f3d
+        working_directory: ./source/f3d
  
     - name: Install VTK dependency
       uses: ./source/f3d/.github/actions/vtk-install-dep

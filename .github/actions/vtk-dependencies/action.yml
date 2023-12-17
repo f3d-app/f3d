@@ -5,7 +5,7 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
-  source_dir:
+  working_directory:
     description: 'Source directory for actions'
     required: false
     default: './source'
@@ -15,29 +15,35 @@ runs:
   steps:
 
     - name: Install TBB
-      uses: ${{inputs.source_dir}}/.github/actions/tbb-install-dep
+      working-directory: ${{inputs.working_directory}}
+      uses: .github/actions/tbb-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install Boost dependency
-      uses: ${{inputs.source_dir}}/.github/actions/boost-install-dep
+      working-directory: ${{inputs.working_directory}}
+      uses: .github/actions/boost-install-dep
 
     - name: Install zlib
-      uses: ${{inputs.source_dir}}/.github/actions/zlib-install-dep
+      working-directory: ${{inputs.working_directory}}
+      uses: .github/actions/zlib-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install zstd
-      uses: ${{inputs.source_dir}}/.github/actions/zstd-install-dep
+      working-directory: ${{inputs.working_directory}}
+      uses: .github/actions/zstd-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install blosc
-      uses: ${{inputs.source_dir}}/.github/actions/blosc-install-dep
+      working-directory: ${{inputs.working_directory}}
+      uses: .github/actions/blosc-install-dep
       with:
         cpu: ${{inputs.cpu}}
 
     - name: Install OpenVDB
-      uses: ${{inputs.source_dir}}/.github/actions/openvdb-install-dep
+      working-directory: ${{inputs.working_directory}}
+      uses: .github/actions/openvdb-install-dep
       with:
         cpu: ${{inputs.cpu}}
