@@ -39,6 +39,7 @@ runs:
       shell: bash
       run: >
         cmake ../openvdb
+        -DBoost_DIR=$(pwd)/../install/lib/cmake/Boost-1.83.0/
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../openvdb_install
