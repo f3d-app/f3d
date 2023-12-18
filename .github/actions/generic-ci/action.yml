@@ -137,7 +137,7 @@ runs:
       run: >
         cmake ../source
         -Werror=dev
-        ${{ matrix.vtk_version != 'v9.0.0' && '-Werror=deprecated' || null }}
+        -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
         -DCMAKE_BUILD_TYPE=Release
