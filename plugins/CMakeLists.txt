@@ -33,5 +33,10 @@ if (F3D_PLUGIN_BUILD_USD)
 endif()
 
 if (F3D_PLUGIN_BUILD_VDB)
-  add_subdirectory(vdb)
+  # VDB plugin needs vtkOpenVDBReader: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9363
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220714)
+    add_subdirectory(vdb)
+  else ()
+    message(FATAL_ERROR "VDB plugin requires VTK >= 9.2.20220714")
+  endif()
 endif()
