@@ -88,6 +88,11 @@ runs:
         sed -i '' '46i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Oint.c
         sed -i '' '36i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Rint.c
 
+    - name: check openvdb
+      working-directory: ${{github.workspace}}/dependencies/vtk_build
+      shell: bash
+      run: ls $(pwd)/../install/lib/cmake/OpenVDB/
+
       # CMAKE_MODULE_PATH is required for VTK 9.3.0 because of a combination of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
       # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10393
