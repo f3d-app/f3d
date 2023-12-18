@@ -56,6 +56,10 @@ runs:
       run: |
         mkdir vtk_build
         mkdir vtk_install
+        ls ./install/lib/cmake/OpenVDB/
+        cd vtk_build
+        ls ../install/lib/cmake/OpenVDB/
+        ls $(pwd)/../install/lib/cmake/OpenVDB/
 
     # MacOS needs fetch-depth: 0 to avoid an issue with version in linker
     - name: Checkout VTK
@@ -87,11 +91,6 @@ runs:
         sed -i '' '57i\'$'\n''herr_t H5O__fsinfo_set_version(H5F_t *f, H5O_fsinfo_t *fsinfo);' ThirdParty/hdf5/vtkhdf5/src/H5Fsuper.c
         sed -i '' '46i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Oint.c
         sed -i '' '36i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Rint.c
-
-    - name: check openvdb
-      working-directory: ${{github.workspace}}/dependencies/vtk_build
-      shell: bash
-      run: ls $(pwd)/../install/lib/cmake/OpenVDB/
 
       # CMAKE_MODULE_PATH is required for VTK 9.3.0 because of a combination of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
