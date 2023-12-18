@@ -47,7 +47,7 @@ runs:
     # OpenVDB does not supports arm64 yet
     # TODO issue ?
     - name: Install OpenVDB
-      if: inputs.cpu.os == 'x86_64'
+      if: inputs.cpu == 'x86_64'
       uses: ./.actions/openvdb-install-dep
       with:
         cpu: ${{inputs.cpu}}
