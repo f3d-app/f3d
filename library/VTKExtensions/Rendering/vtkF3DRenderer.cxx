@@ -1345,10 +1345,10 @@ void vtkF3DRenderer::SetUseOrthographicProjection(bool use)
     const double* focal = camera->GetFocalPoint();
     const double angle = camera->GetViewAngle();
     double distance = std::sqrt(vtkMath::Distance2BetweenPoints(position, focal));
-    double parallel_scale = distance * tan(0.5 * vtkMath::RadiansFromDegrees(angle));
-    camera->SetParallelScale(parallel_scale);
+    double parallelScale = distance * tan(0.5 * vtkMath::RadiansFromDegrees(angle));
+    camera->SetParallelScale(parallelScale);
+    camera->SetParallelProjection(use);
   }
-  camera->SetParallelProjection(use);
 }
 
 //----------------------------------------------------------------------------

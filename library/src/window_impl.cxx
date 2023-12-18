@@ -304,8 +304,11 @@ void window_impl::UpdateDynamicOptions()
     this->Internals->Options.getAsBool("render.grid.absolute"));
   this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("render.grid.enable"));
 
-  this->Internals->Renderer->SetUseOrthographicProjection(
-    this->Internals->Options.getAsBool("camera.orthographic"));
+  if (this->Internals->Options.getAsInt("scene.camera.index") < 0)
+  {
+    this->Internals->Renderer->SetUseOrthographicProjection(
+      this->Internals->Options.getAsBool("camera.orthographic"));
+  }
 
   if (this->Internals->WithColoring)
   {

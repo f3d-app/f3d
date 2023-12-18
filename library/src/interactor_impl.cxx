@@ -102,7 +102,7 @@ public:
     VT_FRONT,
     VT_RIGHT,
     VT_TOP,
-    VT_ISOMETRIC,
+    VT_ISOMETRIC
   };
   static void SetViewOrbit(ViewType view, internals* self)
   {
@@ -322,7 +322,6 @@ public:
         break;
       case '5':
         self->Options.toggle("camera.orthographic");
-        ren->SetUseOrthographicProjection(self->Options.getAsBool("camera.orthographic"));
         render = true;
         break;
       case '7':
@@ -492,7 +491,10 @@ public:
   std::function<bool(const std::vector<std::string>&)> DropFilesUserCallBack =
     [](const std::vector<std::string>&) { return false; };
 
-  void StartInteractor() { this->VTKInteractor->Start(); }
+  void StartInteractor()
+  {
+    this->VTKInteractor->Start();
+  }
 
   void StopInteractor()
   {

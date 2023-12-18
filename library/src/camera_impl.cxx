@@ -264,5 +264,4 @@ vtkCamera* camera_impl::GetVTKCamera()
 {
   return this->Internals->VTKRenderer->GetActiveCamera();
 }
-
 }
