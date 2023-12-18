@@ -88,6 +88,9 @@ runs:
         sed -i '' '46i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Oint.c
         sed -i '' '36i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Rint.c
 
+      # CMAKE_MODULE_PATH is required for VTK 9.3.0 because of a combination of
+      # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
+      # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10393
     - name: Configure VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/vtk_build
@@ -97,8 +100,8 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
+        -DCMAKE_MODULE_PATH=$(pwd)/../install/lib/cmake/OpenVDB/
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
-        -DOpenVDB_CMAKE_PATH=$(pwd)/../install/lib/cmake/OpenVDB/
         -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_BUILD_TESTING=OFF
         -DVTK_DEBUG_LEAKS=ON
