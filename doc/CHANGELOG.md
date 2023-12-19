@@ -7,6 +7,8 @@ For F3D users:
  - Changed `--no-render` behavior so that it doesn't impact verbosity anymore
  - Deprecated `--quiet`, use `--verbose=quiet` instead.
  - Reading EXR files is now multi-threaded and much faster.
+ - Translucency support is now enabled by default.
+ - A small margin is added between the model and the grid to avoid potential z-fighting.
 
 For libf3d users:
  - Added `scene.animation.autoplay` option.
