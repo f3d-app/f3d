@@ -6,6 +6,7 @@ For F3D users:
  - Changed `--verbose` into a string based option, eg: `--verbose=quiet` or `--verbose=debug`. `--verbose` is still supported.
  - Changed `--no-render` behavior so that it doesn't impact verbosity anymore
  - Deprecated `--quiet`, use `--verbose=quiet` instead.
+ - Reading EXR files is now multi-threaded and much faster.
 
 For libf3d users:
  - Added `scene.animation.autoplay` option.
