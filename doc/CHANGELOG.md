@@ -7,6 +7,7 @@ For F3D users:
  - Changed `--no-render` behavior so that it doesn't impact verbosity anymore
  - Deprecated `--quiet`, use `--verbose=quiet` instead.
  - Added --camera-orthographic for orthographic projection
+ - Reading EXR files is now multi-threaded and much faster.
 
 For libf3d users:
  - Added `scene.animation.autoplay` option.
