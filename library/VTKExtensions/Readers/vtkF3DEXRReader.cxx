@@ -11,6 +11,7 @@
 #include <ImfRgbaFile.h>
 
 #include <sstream>
+#include <thread>
 
 vtkStandardNewMacro(vtkF3DEXRReader);
 
@@ -114,6 +115,7 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
   try
   {
     assert(this->InternalFileName);
+    Imf::setGlobalThreadCount(std::thread::hardware_concurrency());
     Imf::RgbaInputFile file(this->InternalFileName);
 
     Imf::Array2D<Imf::Rgba> pixels(this->GetHeight(), this->GetWidth());
