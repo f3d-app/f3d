@@ -40,7 +40,7 @@ runs:
       uses: ./source/.github/actions/f3d-dependencies
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
@@ -80,7 +80,7 @@ runs:
         -DF3D_MODULE_EXTERNAL_RENDERING=ON" >> $GITHUB_ENV
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
@@ -90,7 +90,7 @@ runs:
       run: python -m pip -v wheel .
 
     - name: Upload wheel
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         path: ./source/*.whl
         name: ${{runner.os}}-wheel

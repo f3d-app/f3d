@@ -97,7 +97,7 @@ runs:
 
     - name: Upload Tests Artifact
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         path: ./build/Testing/Temporary
         name: f3d-tests-artifact-sanitizer-${{matrix.sanitizer_type}}

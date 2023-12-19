@@ -85,7 +85,7 @@ runs:
 
     - name: Upload Tests Artifact
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         path: ./source/Testing/Temporary
         name: f3d-tests-artifact-coverage

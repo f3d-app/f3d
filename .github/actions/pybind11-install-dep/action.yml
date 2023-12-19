@@ -13,7 +13,7 @@ runs:
 
     - name: Checkout pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: pybind/pybind11
         submodules: true
