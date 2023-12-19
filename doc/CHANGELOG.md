@@ -10,6 +10,7 @@ For F3D users:
 
 For libf3d users:
  - Added `scene.animation.autoplay` option.
+ - Added a `f3d::image::saveBuffer` API to save an image as a file format in memory.
 
 ## v2.2.1
 

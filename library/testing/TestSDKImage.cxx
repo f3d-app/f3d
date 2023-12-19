@@ -28,6 +28,38 @@ int TestSDKImage(int argc, char* argv[])
   generated.save(std::string(argv[2]) + "TestSDKImage.tif", f3d::image::SaveFormat::TIF);
   generated.save(std::string(argv[2]) + "TestSDKImage.bmp", f3d::image::SaveFormat::BMP);
 
+  // test saveBuffer in different formats
+  std::vector<unsigned char> bufferPNG = generated.saveBuffer();
+  if (bufferPNG.size() == 0)
+  {
+    std::cerr << "PNG buffer empty" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  std::vector<unsigned char> bufferJPG = generated.saveBuffer(f3d::image::SaveFormat::JPG);
+  if (bufferJPG.size() == 0)
+  {
+    std::cerr << "JPG buffer empty" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  try
+  {
+    generated.saveBuffer(f3d::image::SaveFormat::TIF);
+    std::cerr << "An exception has not been thrown when saving buffer to TIF format" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::write_exception&)
+  {
+  }
+
+  std::vector<unsigned char> bufferBMP = generated.saveBuffer(f3d::image::SaveFormat::BMP);
+  if (bufferBMP.size() == 0)
+  {
+    std::cerr << "BMP buffer empty" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   // test constructor with different channel sizes
   f3d::image img16(width, height, channels, f3d::image::ChannelType::SHORT);
   f3d::image img32(width, height, channels, f3d::image::ChannelType::FLOAT);
