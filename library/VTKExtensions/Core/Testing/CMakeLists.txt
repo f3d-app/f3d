@@ -1,4 +1,5 @@
 if(VTK_VERSION VERSION_LESS_EQUAL 9.1.0)
+  set(CMAKE_WARN_DEPRECATED OFF)
   cmake_policy(SET CMP0115 OLD)
 endif()
 
