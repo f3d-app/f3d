@@ -147,7 +147,6 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
-        -DCMAKE_MODULE_PATH=$(pwd)/../dependencies/install/lib/cmake/OpenVDB/
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_BINDINGS_JAVA=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
