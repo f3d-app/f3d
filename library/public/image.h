@@ -5,6 +5,7 @@
 #include "export.h"
 
 #include <string>
+#include <vector>
 
 namespace f3d
 {
@@ -152,6 +153,14 @@ public:
    * Default format is PNG if not specified.
    */
   void save(const std::string& path, SaveFormat format = SaveFormat::PNG) const;
+
+  /**
+   * Save an image to a memory buffer in the specified format.
+   * Default format is PNG if not specified.
+   * TIF format is not supported yet.
+   * Throw an image::write_exception if the type is TIF.
+   */
+  std::vector<unsigned char> saveBuffer(SaveFormat format = SaveFormat::PNG) const;
 
   /**
    * An exception that can be thrown by the image when there.
