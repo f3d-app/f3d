@@ -8,6 +8,8 @@ For F3D users:
  - Deprecated `--quiet`, use `--verbose=quiet` instead.
  - Added --camera-orthographic for orthographic projection
  - Reading EXR files is now multi-threaded and much faster.
+ - Translucency support is now enabled by default.
+ - A small margin is added between the model and the grid to avoid potential z-fighting.
 
 For libf3d users:
  - Added `scene.animation.autoplay` option.
