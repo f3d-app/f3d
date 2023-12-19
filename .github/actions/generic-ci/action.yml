@@ -131,10 +131,6 @@ runs:
 
       # occt coloring not supported on macOS because of #792
       # Exodus not supported on Apple Silicon because of #976
-      #
-      # CMAKE_MODULE_PATH is required for VTK 9.3.0 because of a combination of
-      # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
-      # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10393
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}/build
@@ -166,7 +162,7 @@ runs:
         -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ runner.os == 'macOS' && 'OFF' || 'ON' }}
-        -DF3D_PLUGIN_BUILD_VDB=${{ inputs.cpu == 'x86_64' && (matrix.vtk_version == 'v9.3.0' || matrix.vtk_version == 'commit' ) && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_VDB=${{ inputs.cpu == 'x86_64' && matrix.vtk_version == 'commit' && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_WINDOWS_GUI=ON
         -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
