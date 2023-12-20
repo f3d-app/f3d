@@ -19,7 +19,7 @@ runs:
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: alembic/alembic
         path: './dependencies/alembic'

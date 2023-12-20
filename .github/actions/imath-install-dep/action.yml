@@ -19,7 +19,7 @@ runs:
 
     - name: Checkout Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: AcademySoftwareFoundation/Imath
         path: './dependencies/imath'

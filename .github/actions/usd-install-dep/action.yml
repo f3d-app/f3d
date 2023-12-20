@@ -19,7 +19,7 @@ runs:
 
     - name: Checkout USD
       if: steps.cache-usd.outputs.cache-hit != 'true'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: PixarAnimationStudios/USD
         path: './dependencies/usd'
