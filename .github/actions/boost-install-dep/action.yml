@@ -14,7 +14,7 @@ runs:
 
     - name: Checkout Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: boostorg/boost
         submodules: true
