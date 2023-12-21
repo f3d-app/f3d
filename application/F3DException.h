@@ -13,4 +13,13 @@ public:
   }
 };
 
+class F3DExFailure : public std::runtime_error
+{
+public:
+  explicit F3DExFailure(const std::string& what = "")
+    : std::runtime_error(what)
+  {
+  }
+};
+
 #endif
