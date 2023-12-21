@@ -218,17 +218,18 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
   if (!reader)
   {
-    throw loader::load_failure_exception(filePath + " is not a file of a supported file format");
+    throw loader::load_failure_exception(
+      filePath + " is not a file of a supported 3D geometry file format");
   }
   auto vtkReader = reader->createGeometryReader(filePath);
   if (!vtkReader)
   {
     throw loader::load_failure_exception(
-      filePath + " is not a file of a supported file format for default scene");
+      filePath + " is not a file of a supported 3D geometry file format for default scene");
   }
 
   // Read the file
-  log::debug("Loading: ", filePath, "\n");
+  log::debug("Loading 3D geometry: ", filePath, "\n");
 
   this->Internals->LoadGeometry(vtksys::SystemTools::GetFilenameName(filePath), vtkReader, reset);
 
@@ -253,13 +254,14 @@ loader& loader_impl::loadScene(const std::string& filePath)
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
   if (!reader)
   {
-    throw loader::load_failure_exception(filePath + " is not a file of a supported file format");
+    throw loader::load_failure_exception(
+      filePath + " is not a file of a supported 3D scene file format");
   }
   this->Internals->CurrentFullSceneImporter = reader->createSceneReader(filePath);
   if (!this->Internals->CurrentFullSceneImporter)
   {
     throw loader::load_failure_exception(
-      filePath + " is not a file of a supported file format for full scene");
+      filePath + " is not a file of a supported 3D scene file format for full scene");
   }
 
   this->Internals->Window.Initialize(false);
@@ -281,7 +283,7 @@ loader& loader_impl::loadScene(const std::string& filePath)
   }
 #endif
 
-  log::debug("Loading full scene: ", filePath, "\n");
+  log::debug("Loading 3D scene: ", filePath, "\n");
 
   // Manage progress bar
   vtkNew<vtkProgressBarWidget> progressWidget;
