@@ -34,11 +34,6 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
 
-    - name: Install zstd
-      uses: ./.actions/zstd-install-dep
-      with:
-        cpu: ${{inputs.cpu}}
-
     - name: Install blosc
       uses: ./.actions/blosc-install-dep
       with:
