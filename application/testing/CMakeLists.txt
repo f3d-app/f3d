@@ -698,7 +698,7 @@ f3d_test(NAME TestIncorrectComponent DATA dragon.vtu ARGS -s --comp=4 REGEXP "In
 f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --scalars --roughness=1 --colormap=0,1,0,0,1,0,1 REGEXP "Specified color map list count is not a multiple of 4, ignoring it." NO_BASELINE)
 
 # Test opening a directory
-f3d_test(NAME TestVerboseDirectory DATA mb REGEXP "Loading: .*mb_._0.vt." NO_RENDER)
+f3d_test(NAME TestVerboseDirectory DATA mb REGEXP "Loading 3D geometry: .*mb_._0.vt." NO_RENDER)
 
 # Test Animation invalid code paths
 f3d_test(NAME TestVerboseAnimationIndexError2 DATA cow.vtp ARGS --animation-index=1 --verbose REGEXP "An animation index has been specified but there are no animation available." NO_BASELINE)
@@ -744,7 +744,7 @@ f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${F3D_
 f3d_test(NAME TestInvalidGeometry DATA invalid.vtp REGEXP "A reader did not produce any output" NO_BASELINE)
 
 # Test invalid full scene file XXX should be improved
-f3d_test(NAME TestInvalidFullScene DATA invalid.gltf ARGS --verbose REGEXP "Loading full scene" NO_BASELINE)
+f3d_test(NAME TestInvalidFullScene DATA invalid.gltf ARGS --verbose REGEXP "Loading 3D scene" NO_BASELINE)
 
 # Test invalid texture
 f3d_test(NAME TestInvalidTexture DATA cow.vtp ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open texture file" NO_BASELINE)
