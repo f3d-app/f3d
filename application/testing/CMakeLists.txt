@@ -194,6 +194,15 @@ f3d_test(NAME TestUpDirectionNoSign DATA suzanne.ply ARGS --up=X DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMatCapWithTCoords DATA WaterBottle.glb ARGS --geometry-only --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png DEFAULT_LIGHTS)
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231108)
+  f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb DEFAULT_LIGHTS)
+else()
+  # No animation before https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20201015)
+    f3d_test(NAME TestSkinningManyBonesWarning DATA tube_254bones.glb ARGS -v REGEXP "with 254 bones" NO_BASELINE)
+  endif()
+endif()
+
 if (NOT APPLE)
   # This test is broken on apple because of #792
   f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --scalars --cells --comp=-2 --up=+Z DEFAULT_LIGHTS)
