@@ -144,7 +144,7 @@ f3d_test(NAME TestVTICell DATA waveletMaterial.vti ARGS --scalars=Material -c --
 f3d_test(NAME TestSSAO LONG_TIMEOUT DATA suzanne.ply ARGS -q DEFAULT_LIGHTS)
 f3d_test(NAME TestDepthPeeling DATA suzanne.ply ARGS -sp --opacity=0.9 DEFAULT_LIGHTS)
 f3d_test(NAME TestBackground DATA suzanne.ply ARGS --bg-color=0.8,0.2,0.9 THRESHOLD 100 DEFAULT_LIGHTS)
-f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity 0.2 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity=0.2 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n DEFAULT_LIGHTS)
 f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --bg-color=1,1,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestCityGML DATA Part-4-Buildings-V4-one.gml DEFAULT_LIGHTS)
@@ -208,7 +208,7 @@ if(WIN32)
 else()
   set(_dirname "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 endif()
-f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins "${_dirname}/${CMAKE_SHARED_LIBRARY_PREFIX}f3d${CMAKE_SHARED_LIBRARY_SUFFIX}" NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
+f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins=${_dirname}/${CMAKE_SHARED_LIBRARY_PREFIX}f3d${CMAKE_SHARED_LIBRARY_SUFFIX} NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
 
 if(NOT F3D_MACOS_BUNDLE)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
@@ -796,13 +796,13 @@ set_tests_properties(f3d::TestNoDryRun PROPERTIES TIMEOUT 2)
 f3d_test(NAME TestNoRef DATA cow.vtp WILL_FAIL)
 
 # Test failure without a reference and without an output, please do not create a TestNoRef.png file
-f3d_test(NAME TestNoRefNoOutput DATA cow.vtp ARGS --ref ${F3D_SOURCE_DIR}/testing/baselines/TestNoRef.png REGEXP "use the output option to output current rendering into an image file." NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestNoRefNoOutput DATA cow.vtp ARGS --ref=${F3D_SOURCE_DIR}/testing/baselines/TestNoRef.png REGEXP "use the output option to output current rendering into an image file." NO_BASELINE NO_OUTPUT)
 
 # Test failure with a bad reference, please do not create a good TestBadRef.png file
 f3d_test(NAME TestBadRef DATA cow.vtp WILL_FAIL)
 
 # Test failure with a bad reference without an output, please do not create a good TestBadRef.png file
-f3d_test(NAME TestBadRefNoOutput DATA cow.vtp ARGS --ref ${F3D_SOURCE_DIR}/testing/baselines/TestBadRef.png REGEXP "Use the --output option to be able to output current rendering and diff images into files." NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestBadRefNoOutput DATA cow.vtp ARGS --ref=${F3D_SOURCE_DIR}/testing/baselines/TestBadRef.png REGEXP "Use the --output option to be able to output current rendering and diff images into files." NO_BASELINE NO_OUTPUT)
 
 # Test failure with a bad interaction play file, please do not create a dummy.log
 f3d_test(NAME TestPlayNoFile DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/dummy.log WILL_FAIL)
