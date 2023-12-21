@@ -558,7 +558,7 @@ if(F3D_PLUGIN_BUILD_OCCT)
 endif()
 
 if(F3D_PLUGIN_BUILD_USD)
-  f3d_test(NAME TestUSD DATA suzanne.usd ARGS --load-plugins=usd --up=+Z DEFAULT_LIGHTS)
+  f3d_test(NAME TestUSD DATA suzanne.usd ARGS --load-plugins=usd DEFAULT_LIGHTS)
   f3d_test(NAME TestUSDAPrimitives DATA primitives.usda ARGS --load-plugins=usd DEFAULT_LIGHTS)
   f3d_test(NAME TestUSDAPrimitivesZAxis DATA primitivesZ.usda ARGS --load-plugins=usd DEFAULT_LIGHTS)
   f3d_test(NAME TestUSDAInstancing DATA instancing.usda ARGS --load-plugins=usd DEFAULT_LIGHTS)

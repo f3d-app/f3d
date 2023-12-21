@@ -129,6 +129,7 @@ public:
         pxr::UsdGeomXform xform = pxr::UsdGeomXform(prim);
 
         auto mat = this->GetLocalTransform(xform, timeCode);
+        vtkMatrix4x4::Multiply4x4(currentMatrix, mat, mat);
 
         this->ImportNode(renderer, prim.GetPrototype(), path.AppendChild(prim.GetName()), mat);
       }
@@ -539,8 +540,22 @@ public:
     pxr::UsdSkelBakeSkinning(this->Stage->Traverse());
     this->Stage->Save();
 
-    vtkNew<vtkMatrix4x4> identity;
-    this->ImportNode(renderer, this->Stage->GetPseudoRoot(), pxr::SdfPath("/"), identity);
+    vtkNew<vtkMatrix4x4> rootTransform;
+
+    pxr::TfToken up = pxr::UsdGeomGetStageUpAxis(this->Stage);
+
+    if (up == pxr::UsdGeomTokens->z)
+    {
+      vtkWarningWithObjectMacro(
+        renderer, << "This USD file up axis is +Z, internally rotate it to align with +Y axis");
+      rootTransform->Zero();
+      rootTransform->SetElement(0, 0, 1.0);
+      rootTransform->SetElement(1, 2, 1.0);
+      rootTransform->SetElement(2, 1, -1.0);
+      rootTransform->SetElement(3, 3, 1.0);
+    }
+
+    this->ImportNode(renderer, this->Stage->GetPseudoRoot(), pxr::SdfPath("/"), rootTransform);
   }
 
   vtkSmartPointer<vtkImageData> CombineORMImage(
