@@ -30,7 +30,7 @@ runs:
 
     - name: Install VTK dependencies
       uses: ./source/.github/actions/vtk-dependencies
- 
+
     - name: Install Raytracing Dependencies
       uses: ./source/.github/actions/ospray-sb-install-dep
 
