@@ -1,5 +1,10 @@
 name: 'Install Boost Dependency'
 description: 'Install Boost Dependency using cache when possible'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
 
 runs:
   using: "composite"
@@ -10,7 +15,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/boost_install
-        key: boost-1.83.0-${{runner.os}}-2
+        key: boost-1.83.0-${{runner.os}}-${{inputs.cpu}}-2
 
     - name: Checkout Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
@@ -48,6 +53,7 @@ runs:
         link=static
         runtime-link=shared
         ${{ runner.os == 'Windows' && 'toolset=msvc' || null }}
+        ${{ inputs.cpu == 'arm64' && 'architecture=arm' || null }}
         --with-date_time
         --with-filesystem
         --with-program_options

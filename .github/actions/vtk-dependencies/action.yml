@@ -28,6 +28,8 @@ runs:
 
     - name: Install Boost dependency
       uses: ./.actions/boost-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Install zlib
       uses: ./.actions/zlib-install-dep
@@ -39,10 +41,7 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
 
-    # OpenVDB does not supports arm64 yet
-    # TODO issue ?
     - name: Install OpenVDB
-      if: inputs.cpu == 'x86_64'
       uses: ./.actions/openvdb-install-dep
       with:
         cpu: ${{inputs.cpu}}
