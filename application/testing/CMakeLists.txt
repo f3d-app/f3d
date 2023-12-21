@@ -700,6 +700,12 @@ f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --scalars --rough
 # Test opening a directory
 f3d_test(NAME TestVerboseDirectory DATA mb REGEXP "Loading 3D geometry: .*mb_._0.vt." NO_RENDER)
 
+# Test opening multiple file and rendering only one
+f3d_test(NAME TestVerboseMultiFileRender DATA mb REGEXP "An output image was saved using a single 3D file, other provided 3D files were ignored." NO_BASELINE)
+if (NOT F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON) # DEFAULT_LIGHTS cannot be used here because the regexp text would not be reached
+  f3d_test(NAME TestVerboseMultiFileCompare DATA mb REGEXP "Image comparison was performed using a single 3D file, other provided 3D files were ignored.")
+endif ()
+
 # Test Animation invalid code paths
 f3d_test(NAME TestVerboseAnimationIndexError2 DATA cow.vtp ARGS --animation-index=1 --verbose REGEXP "An animation index has been specified but there are no animation available." NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationNoAnimationTime DATA cow.vtp ARGS --animation-time=2 --verbose REGEXP "No animation available, cannot load a specific animation time" NO_BASELINE)
