@@ -438,6 +438,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
       inputs = deprecatedInputs;
 #endif
 
+      // Check that all options are matched
       auto unmatched = result.unmatched();
       bool found_unknown_option = false;
       for (std::string unknownOption : unmatched)
@@ -475,7 +476,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
       if (found_unknown_option)
       {
         f3d::log::waitForUser();
-        throw F3DExNoProcess("unknown options");
+        throw F3DExFailure("unknown options");
       }
 
       // Check that no invalid implicit value have been used
@@ -484,7 +485,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
         if (pair.value() == ::F3D_APPLICATION_RESERVED_STRING)
         {
           f3d::log::error("Using --", pair.key(), " without a value is not supported, aborting");
-          throw F3DExNoProcess("incorrect option usage");
+          throw F3DExFailure("incorrect option usage");
         }
       }
 
