@@ -465,7 +465,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
       if (found_unknown_option)
       {
         f3d::log::waitForUser();
-        throw F3DExNoProcess("unknown options");
+        throw F3DExFailure("unknown options");
       }
 
 #ifndef F3D_NO_DEPRECATED
