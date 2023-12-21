@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/blosc_install
-        key: blosc-1.21.5-${{runner.os}}-${{inputs.cpu}}-0
+        key: blosc-1.21.5-${{runner.os}}-${{inputs.cpu}}-1
 
     - name: Checkout blosc
       if: steps.cache-blosc.outputs.cache-hit != 'true'
@@ -50,7 +50,7 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DPREFER_EXTERNAL_ZLIB=ON
         -DPREFER_EXTERNAL_ZSTD=ON
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_MACOSX_RPATH=ON' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build blosc
