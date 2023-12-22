@@ -47,7 +47,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-${{inputs.cpu}}-8
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-${{inputs.cpu}}-9
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -88,7 +88,7 @@ runs:
         sed -i '' '46i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Oint.c
         sed -i '' '36i\'$'\n''#include "H5CXprivate.h"' ThirdParty/hdf5/vtkhdf5/src/H5Rint.c
 
-      # OpenVDB_CMAKE_PATH is required for VTK 9.3.0 because of a combination of
+      # CMAKE_MODULE_PATH is required for VTK 9.3.0 because of a combination of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
       # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10393
     - name: Configure VTK
@@ -100,7 +100,7 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
-        -DOpenVDB_CMAKE_PATH=$(pwd)/../install/lib/cmake/OpenVDB/
+        -DCMAKE_MODULE_PATH=$(pwd)/../install/lib/cmake/OpenVDB/
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_BUILD_TESTING=OFF
