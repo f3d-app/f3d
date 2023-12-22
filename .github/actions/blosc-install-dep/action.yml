@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/blosc_install
-        key: blosc-1.21.5-${{runner.os}}-${{inputs.cpu}}-2
+        key: blosc-1.21.5-${{runner.os}}-${{inputs.cpu}}-3
 
     - name: Checkout blosc
       if: steps.cache-blosc.outputs.cache-hit != 'true'

@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/zstd_install
-        key: zstd-1.5.5-${{runner.os}}-${{inputs.cpu}}-0
+        key: zstd-1.5.5-${{runner.os}}-${{inputs.cpu}}-1
 
     - name: Checkout zstd
       if: steps.cache-zstd.outputs.cache-hit != 'true'
