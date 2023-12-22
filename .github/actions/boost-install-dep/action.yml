@@ -52,6 +52,7 @@ runs:
         variant='release'
         link=static
         runtime-link=shared
+        cxxflags=-fPIC
         ${{ runner.os == 'Windows' && 'toolset=msvc' || null }}
         ${{ inputs.cpu == 'arm64' && 'architecture=arm' || null }}
         --with-date_time
