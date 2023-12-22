@@ -297,7 +297,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     // clang-format off
     auto grp0 = cxxOptions.add_options("Applicative");
 #ifndef F3D_NO_DEPRECATED
-    this->DeclareOption(grp0, "input", "", "Input files", deprecatedInputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
+    this->DeclareOption(grp0, "input", "", "Input files (deprecated)", deprecatedInputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
 #endif
     this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
     this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES);

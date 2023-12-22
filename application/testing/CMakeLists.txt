@@ -182,6 +182,7 @@ f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-ind
 f3d_test(NAME TestAnimationAutoplay DATA InterpolationTest.glb ARGS --animation-autoplay DEFAULT_LIGHTS)
 f3d_test(NAME TestMaxSizeBelow DATA suzanne.stl ARGS --max-size=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestMaxSizeAbove DATA WaterBottle.glb ARGS --max-size=0.2 REGEXP "No file loaded, file is bigger than max size" NO_BASELINE)
+f3d_test(NAME TestAlternativeOptionSyntax DATA WaterBottle.glb ARGS --max-size 0.2 REGEXP "No file loaded, file is bigger than max size" NO_BASELINE)
 f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_FAIL)
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
 f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalars --bar --comp=2 DEFAULT_LIGHTS)
