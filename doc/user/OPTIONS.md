@@ -132,3 +132,8 @@ Some rendering options are not compatible between them, here is the precedence o
 * Raytracing (`-r`)
 * Volume (`-v`)
 * Point Sprites (`-o`)
+
+## Options syntax
+
+The `--options=value` syntax is used everywhere in this documentation, however, the syntax `--options value` can also be used, with the exception of options that have implicit values,
+`--verbose`, `--comp` and `--scalars`.
