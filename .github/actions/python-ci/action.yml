@@ -66,6 +66,7 @@ runs:
       shell: bash
       run: echo "ESCAPED_WS=${{github.workspace}}" | tr '\\' '/' >> $GITHUB_ENV
 
+    # VDB has some rpath issue on macOS, disabling for now
     - name: Set SKBUILD_CMAKE_ARGS
       shell: bash
       run: >
@@ -75,7 +76,7 @@ runs:
         -DF3D_PLUGIN_BUILD_DRACO=ON;
         -DF3D_PLUGIN_BUILD_OCCT=ON;
         -DF3D_PLUGIN_BUILD_USD=ON;
-        -DF3D_PLUGIN_BUILD_VDB=ON;
+        -DF3D_PLUGIN_BUILD_VDB=${{ runner.os == 'macOS' && 'OFF' || 'ON' }};
         -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=ON;
         -DF3D_MODULE_EXR=ON;
         -DF3D_MODULE_EXTERNAL_RENDERING=ON" >> $GITHUB_ENV
