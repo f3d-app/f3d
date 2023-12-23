@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/openvdb_install
-        key: openvdb-11.0.0-${{runner.os}}-${{inputs.cpu}}-4
+        key: openvdb-11.0.0-${{runner.os}}-${{inputs.cpu}}-5
 
     - name: Checkout OpenVDB
       if: steps.cache-openvdb.outputs.cache-hit != 'true'
