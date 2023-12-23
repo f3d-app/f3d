@@ -67,6 +67,11 @@ if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
   find_package(nlohmann_json REQUIRED)
 endif ()
 
+if (F3D_PLUGIN_BUILD_VDB)
+  # OpenVDB is VTK dependency, needs to be found before VTK
+  find_package(OpenVDB REQUIRED)
+endif ()
+
 # VTK dependency
 find_package(VTK 9.0 REQUIRED
   COMPONENTS
