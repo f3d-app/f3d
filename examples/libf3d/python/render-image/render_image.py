@@ -12,7 +12,7 @@ if __name__ == "__main__":
         eng.loader.load_geometry(sys.argv[1])
 
         eng.window.size = 300, 300
-        img = eng.render_to_image()
+        img = eng.window.render_to_image()
 
         img.save(sys.argv[2])
     except Exception as e:
