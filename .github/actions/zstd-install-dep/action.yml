@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/zstd_install
-        key: zstd-1.5.5-${{runner.os}}-${{inputs.cpu}}-1
+        key: zstd-1.5.5-${{runner.os}}-${{inputs.cpu}}-2
 
     - name: Checkout zstd
       if: steps.cache-zstd.outputs.cache-hit != 'true'
@@ -42,7 +42,6 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../zstd_install
-        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         -DZSTD_BUILD_CONTRIB:BOOL=OFF
         -DZSTD_BUILD_PROGRAMS:BOOL=OFF
         -DZSTD_BUILD_SHARED:BOOL=ON

@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/blosc_install
-        key: blosc-1.21.5-${{runner.os}}-${{inputs.cpu}}-4
+        key: blosc-1.21.5-${{runner.os}}-${{inputs.cpu}}-5
 
     - name: Checkout blosc
       if: steps.cache-blosc.outputs.cache-hit != 'true'
@@ -46,7 +46,6 @@ runs:
         -DBUILD_TESTS=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../blosc_install
-        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DPREFER_EXTERNAL_ZLIB=ON
         -DPREFER_EXTERNAL_ZSTD=ON

@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/boost_install
-        key: boost-1.83.0-${{runner.os}}-${{inputs.cpu}}-3
+        key: boost-1.83.0-${{runner.os}}-${{inputs.cpu}}-4
 
     - name: Checkout Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
@@ -54,7 +54,6 @@ runs:
         runtime-link=shared
         cxxflags="-fPIC"
         ${{ runner.os == 'Windows' && 'toolset=msvc' || null }}
-        ${{ inputs.cpu == 'arm64' && 'architecture=arm' || null }}
         --with-date_time
         --with-filesystem
         --with-program_options
