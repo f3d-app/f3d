@@ -155,6 +155,6 @@ runs:
 
     - name: Remove problematic .cmake files
       if: steps.cache-openvdb.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/openvdb_install/lib/cmake/OpenVDB
+      working-directory: ${{github.workspace}}
       shell: bash
-      run: rm -rf ./dependencies/openvdb_install/lib/cmake/OpenVDB/FindTBB.cmake /dependencies/openvdb_install/lib/cmake/OpenVDB/FindOpenEXR.cmake
+      run: rm -rf ./dependencies/openvdb_install/lib/cmake/OpenVDB/FindTBB.cmake ./dependencies/openvdb_install/lib/cmake/OpenVDB/FindOpenEXR.cmake
