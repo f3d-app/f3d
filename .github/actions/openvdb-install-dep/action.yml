@@ -59,7 +59,7 @@ runs:
       if: steps.cache-openvdb.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/openvdb_install/lib/cmake/OpenVDB
       shell: bash
-      run: rm FindTBB.cmake
+      run: rm FindTBB.cmake FindOpenEXR.cmake
 
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/openvdb_install

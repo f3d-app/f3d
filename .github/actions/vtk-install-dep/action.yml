@@ -100,7 +100,7 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
-        -DCMAKE_MODULE_PATH=$(pwd)/../install/lib/cmake/OpenVDB/
+        -DOpenVDB_CMAKE_PATH=$(pwd)/../install/lib/cmake/OpenVDB/
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_BUILD_TESTING=OFF
