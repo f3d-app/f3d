@@ -8,5 +8,5 @@ if(BUILD_TESTING)
   enable_testing()
 endif()
 
-add_subdirectory(libf3d)
-add_subdirectory(plugins)
+add_subdirectory(cpp)
+add_subdirectory(python)
