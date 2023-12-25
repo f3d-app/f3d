@@ -152,3 +152,9 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/vtk_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Remove problematic .cmake files
+      if: steps.cache-openvdb.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/openvdb_install/lib/cmake/OpenVDB
+      shell: bash
+      run: rm FindTBB.cmake FindOpenEXR.cmake
