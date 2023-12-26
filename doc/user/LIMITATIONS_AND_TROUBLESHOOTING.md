@@ -24,11 +24,17 @@ ABC file formats rely on [Alembic](https://github.com/alembic/alembic) library. 
 - Does not support ArbGeomParam feature in Alembic.
 - Does not support Subdivision Meshes.
 - Does not support Materials.
+- Does not support Animations.
 
 ## USD
 USD file formats rely on [OpenUSD](https://github.com/PixarAnimationStudios/OpenUSD) library. It comes with some known limitations:
 - Skinning is slow and baked on the CPU.
 - Does not support Face-varying attributes.
+
+## VDB
+VDB file formats rely on [OpenVDB](https://github.com/AcademySoftwareFoundation/openvdb) and VTK libraries. It currently comes with some known limitations:
+- Not tested in continuous integration on macOS and not shipped in the binary release for macOS arm.
+- VDB Grid files are opened with a hard-coded 0.1 sampling rate.
 
 # Troubleshooting
 
