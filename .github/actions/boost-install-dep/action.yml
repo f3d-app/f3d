@@ -10,7 +10,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/boost_install
-        key: boost-1.83.0-${{runner.os}}-0
+        key: boost-1.83.0-${{runner.os}}-2
 
     - name: Checkout Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
@@ -36,6 +36,8 @@ runs:
       shell: bash
       run: ./bootstrap.sh
 
+    # Windows require msvc toolset to avoid mingw being picked up instead
+    # fPIC is needed for clang
     - name: Build Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/boost
@@ -47,11 +49,14 @@ runs:
         variant='release'
         link=static
         runtime-link=shared
+        cxxflags="-fPIC"
+        ${{ runner.os == 'Windows' && 'toolset=msvc' || null }}
         --with-date_time
         --with-filesystem
         --with-program_options
         --with-regex
         --with-system
+        --with-iostreams
         install
 
     - name: Copy to install

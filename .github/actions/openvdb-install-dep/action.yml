@@ -1,0 +1,65 @@
+name: 'Install OpenVDB Dependency'
+description: 'Install OpenVDB Dependency using cache when possible'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache OpenVDB
+      id: cache-openvdb
+      uses: actions/cache@v3
+      with:
+        path: dependencies/openvdb_install
+        key: openvdb-11.0.0-${{runner.os}}-1
+
+    - name: Checkout OpenVDB
+      if: steps.cache-openvdb.outputs.cache-hit != 'true'
+      uses: actions/checkout@v3
+      with:
+        repository: AcademySoftwareFoundation/openvdb
+        path: './dependencies/openvdb'
+        ref: v11.0.0
+
+    - name: Setup OpenVDB
+      if: steps.cache-openvdb.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir openvdb_build
+        mkdir openvdb_install
+
+    - name: Configure OpenVDB
+      if: steps.cache-openvdb.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/openvdb_build
+      shell: bash
+      run: >
+        cmake ../openvdb
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../openvdb_install
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -DOPENVDB_CORE_STATIC=OFF
+        -DOPENVDB_BUILD_BINARIES=OFF
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build OpenVDB
+      if: steps.cache-openvdb.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/openvdb_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    # OpenVDB is installing .cmake files that causes issues in F3D
+    # https://github.com/AcademySoftwareFoundation/openvdb/issues/1741
+    # https://github.com/AcademySoftwareFoundation/openvdb/issues/1740
+    - name: Remove not needed .cmake file
+      if: steps.cache-openvdb.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/openvdb_install/lib/cmake/OpenVDB
+      shell: bash
+      run: rm FindTBB.cmake FindOpenEXR.cmake
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/openvdb_install
+      shell: bash
+      run: cp -r ./* ../install/

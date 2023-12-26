@@ -18,9 +18,11 @@ runs:
         cd dependencies
         mkdir install
 
-    - name: Install TBB
-      uses: ./source/f3d/.github/actions/tbb-install-dep
-
+    - name: Install VTK dependencies
+      uses: ./source/f3d/.github/actions/vtk-dependencies
+      with:
+        source_dir: ./source/f3d
+ 
     - name: Install VTK dependency
       uses: ./source/f3d/.github/actions/vtk-install-dep
       with:
