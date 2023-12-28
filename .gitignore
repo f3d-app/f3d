@@ -8,3 +8,4 @@ dist
 *.egg-info
 __pycache__
 *.pyc
+_version.py
