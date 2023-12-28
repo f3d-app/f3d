@@ -5,7 +5,7 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "f3d"
 requires-python = ">=3.8"
-version = "2.2.1"
+dynamic = ["version"]
 description = "F3D, a fast and minimalist 3D viewer"
 readme = "README.md"
 license = {text = "BSD 3-Clause License"}
@@ -37,14 +37,20 @@ Changelog = "https://github.com/f3d-app/f3d/blob/master/doc/CHANGELOG.md"
 
 [tool.scikit-build]
 minimum-version = "0.4"
-cmake.minimum-version = "3.21"
-cmake.build-type = "Release"
 install.components = ["library", "plugin", "python", "dependencies"]
-ninja.minimum-version = "1.10"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+sdist.include = ["_version.py"]
+cmake.build-type = "Release"
+cmake.minimum-version = "3.21"
 ninja.make-fallback = false
-wheel.packages = []
+ninja.minimum-version = "1.10"
 wheel.install-dir = "f3d"
 wheel.license-files = ["LICENSE.md", "doc/THIRD_PARTY_LICENSES.md"]
+wheel.packages = []
+
+[tool.setuptools_scm]
+write_to = "_version.py"
+fallback_version = "2.2.1"
 
 [tool.scikit-build.cmake.define]
 CMAKE_OSX_DEPLOYMENT_TARGET = "10.15"
