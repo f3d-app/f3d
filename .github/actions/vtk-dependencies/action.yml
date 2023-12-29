@@ -32,17 +32,13 @@ runs:
 
     # macOS CI does not yet support OpenVDB, disabling all related dependencies
     - name: Install zlib
-      if: runner.os != 'macOS'
       uses: ./.actions/zlib-install-dep
 
     - name: Install zstd
-      if: runner.os != 'macOS'
       uses: ./.actions/zstd-install-dep
 
     - name: Install blosc
-      if: runner.os != 'macOS'
       uses: ./.actions/blosc-install-dep
 
     - name: Install OpenVDB
-      if: runner.os != 'macOS'
       uses: ./.actions/openvdb-install-dep
