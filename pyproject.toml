@@ -1,5 +1,5 @@
 [build-system]
-requires = ["scikit-build-core"]
+requires = ["scikit-build-core", "setuptools-scm>=8.0"]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -49,7 +49,9 @@ wheel.license-files = ["LICENSE.md", "doc/THIRD_PARTY_LICENSES.md"]
 wheel.packages = []
 
 [tool.setuptools_scm]
-write_to = "_version.py"
+version_file = "_version.py"
+version_scheme = "no-guess-dev"
+local_scheme = "no-local-version"
 fallback_version = "2.2.1"
 
 [tool.scikit-build.cmake.define]
