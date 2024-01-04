@@ -26,6 +26,7 @@ Here is the list of supported file formats:
 * **.iges/.igs** : CAD Initial Graphics Exchange Specification format
 * **.brep** : Open CASCADE BRep format
 * **.abc** : Alembic format
+* **.vdb** : VDB format (experimental)
 * **.obj** : Wavefront OBJ file format (full scene and default scene)
 * **.gltf/.glb** : GL Transmission Format (full scene and default scene)
 * **.3ds** : Autodesk 3D Studio file format (full scene)
@@ -61,6 +62,7 @@ Here is the list of plugins provided officially by F3D:
 - **exodus**: EX2 support
 - **occt**: STEP and IGES support
 - **usd**: USD, USDA, UDSC and USDZ support
+- **vdb**: VDB support (experimental)
 
 > Note: If you downloaded the binaries from the Release page, it's not necessary to specify manually the plugins above, all of them are loaded automatically.
 

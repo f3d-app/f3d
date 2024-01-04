@@ -49,9 +49,6 @@ runs:
     - name: Install pybind11 dependency
       uses: ./source/.github/actions/pybind11-install-dep
 
-    - name: Install Boost dependency
-      uses: ./source/.github/actions/boost-install-dep
-
     - name: Install USD dependency
       uses: ./source/.github/actions/usd-install-dep
       with:

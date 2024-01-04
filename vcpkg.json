@@ -6,6 +6,7 @@
         "draco",
         "opencascade",
         "openexr",
+        "openvdb",
         "pybind11",
         "tbb",
         "usd",

@@ -1,0 +1,48 @@
+name: 'Install VTK Dependencies'
+description: 'Install multiple VTK Dependencies'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+  source_dir:
+    description: 'Source directory for actions'
+    required: false
+    default: './source'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Copy actions to a common directory TODO move to another step ?
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir .actions
+        cp -r ${{inputs.source_dir}}/.github/actions/* .actions/
+
+    - name: Install TBB
+      uses: ./.actions/tbb-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+
+    # inputs.cpu is not needed yet because macOS CI use boost header only for now
+    - name: Install Boost dependency
+      uses: ./.actions/boost-install-dep
+
+    # macOS CI does not yet support OpenVDB, disabling all related dependencies
+    - name: Install zlib
+      if: runner.os != 'macOS'
+      uses: ./.actions/zlib-install-dep
+
+    - name: Install zstd
+      if: runner.os != 'macOS'
+      uses: ./.actions/zstd-install-dep
+
+    - name: Install blosc
+      if: runner.os != 'macOS'
+      uses: ./.actions/blosc-install-dep
+
+    - name: Install OpenVDB
+      if: runner.os != 'macOS'
+      uses: ./.actions/openvdb-install-dep
