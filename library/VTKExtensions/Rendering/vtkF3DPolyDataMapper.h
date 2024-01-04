@@ -57,6 +57,11 @@ private:
   vtkMTimeType EnvTextureTime = 0;
   vtkTexture* EnvTexture = nullptr;
 #endif
+
+// SSBO support: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231108)
+  vtkNew<vtkOpenGLBufferObject> JointMatrices;
+#endif
 };
 
 #endif
