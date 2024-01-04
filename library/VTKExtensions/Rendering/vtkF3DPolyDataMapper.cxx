@@ -160,8 +160,8 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
       // 4.3 is required for SSBO
       vtkShaderProgram::Substitute(VSSource, "//VTK::System::Dec", "#version 430");
 #else
-      std::string msg = "A mesh is associated with " + std::to_string(nbJoints) +
-        " bones, which is not supported by VTK <= 9.3";
+      std::string msg = "A mesh is associated with more than 250 bones (" +
+        std::to_string(nbJoints) + "), which is not supported by VTK <= 9.3";
       F3DLog::Print(F3DLog::Severity::Warning, msg);
 
       skinningSupported = false;
