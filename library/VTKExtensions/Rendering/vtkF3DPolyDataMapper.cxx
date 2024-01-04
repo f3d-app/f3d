@@ -161,7 +161,7 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
       vtkShaderProgram::Substitute(VSSource, "//VTK::System::Dec", "#version 430");
 #else
       std::string msg = "A mesh is associated with more than 250 bones (" +
-        std::to_string(nbJoints) + "), which is not supported by VTK <= 9.3";
+        std::to_string(nbJoints) + "), which is not supported by VTK < 9.3.20231108";
       F3DLog::Print(F3DLog::Severity::Warning, msg);
 
       skinningSupported = false;
