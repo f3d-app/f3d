@@ -12,6 +12,8 @@
 #include <vtkInformation.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
+#include <vtkPartitionedDataSet.h>
+#include <vtkPartitionedDataSetCollection.h>
 #include <vtkPointData.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkPolyData.h>
@@ -326,13 +328,44 @@ std::string vtkF3DGenericImporter::GetMultiBlockDescription(
 }
 
 //----------------------------------------------------------------------------
+std::string vtkF3DGenericImporter::GetPartitionedDataSetCollectionDescription(
+  vtkPartitionedDataSetCollection* pdc, vtkIndent indent)
+{
+  std::stringstream ss;
+  for (unsigned int i = 0; i < pdc->GetNumberOfPartitionedDataSets(); i++)
+  {
+    const char* pdsName = pdc->GetMetaData(i)->Get(vtkCompositeDataSet::NAME());
+    ss << indent << "PartitionedDataSet: " << (pdsName ? std::string(pdsName) : std::to_string(i))
+       << "\n";
+    vtkPartitionedDataSet* pds = pdc->GetPartitionedDataSet(i);
+    for (unsigned int j = 0; j < pds->GetNumberOfPartitions(); j++)
+    {
+      vtkIndent nextIndent = indent.GetNextIndent();
+      const char* pName = pds->GetMetaData(j)->Get(vtkCompositeDataSet::NAME());
+      ss << nextIndent << "Partition: " << (pName ? std::string(pName) : std::to_string(j)) << "\n";
+      vtkDataSet* ds = pds->GetPartition(j);
+      if (ds)
+      {
+        ss << vtkImporter::GetDataSetDescription(ds, nextIndent.GetNextIndent());
+      }
+    }
+  }
+  return ss.str();
+}
+
+//----------------------------------------------------------------------------
 std::string vtkF3DGenericImporter::GetDataObjectDescription(vtkDataObject* object)
 {
   vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(object);
+  vtkPartitionedDataSetCollection* pdc = vtkPartitionedDataSetCollection::SafeDownCast(object);
   vtkDataSet* ds = vtkDataSet::SafeDownCast(object);
   if (mb)
   {
     return vtkF3DGenericImporter::GetMultiBlockDescription(mb, vtkIndent(0));
+  }
+  if (pdc)
+  {
+    return vtkF3DGenericImporter::GetPartitionedDataSetCollectionDescription(pdc, vtkIndent(0));
   }
   else if (ds)
   {

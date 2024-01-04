@@ -4,12 +4,12 @@
 
 #include <vtkAppendPolyData.h>
 #include <vtkDataObject.h>
+#include <vtkDataObjectTree.h>
 #include <vtkDataObjectTreeIterator.h>
 #include <vtkDataSetSurfaceFilter.h>
 #include <vtkImageData.h>
 #include <vtkImageToPoints.h>
 #include <vtkInformation.h>
-#include <vtkMultiBlockDataSet.h>
 #include <vtkNew.h>
 #include <vtkObjectFactory.h>
 #include <vtkPolyData.h>
@@ -38,43 +38,54 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkPolyData* outputPoints = vtkPolyData::GetData(outputVector, 1);
   vtkImageData* outputImage = vtkImageData::GetData(outputVector, 2);
 
-  vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(dataObject);
+  vtkDataObjectTree* composite = vtkDataObjectTree::SafeDownCast(dataObject);
   vtkSmartPointer<vtkDataSet> dataset = vtkDataSet::SafeDownCast(dataObject);
 
-  // Convert multiblock input to a surfacic dataset
-  if (mb)
+  // Extract data from a composite dataset
+  if (composite)
   {
-    vtkNew<vtkAppendPolyData> append;
-
-    auto iter = vtkSmartPointer<vtkDataObjectTreeIterator>::Take(mb->NewTreeIterator());
+    auto iter = vtkSmartPointer<vtkDataObjectTreeIterator>::Take(composite->NewTreeIterator());
     iter->VisitOnlyLeavesOn();
     iter->SkipEmptyNodesOn();
     iter->TraverseSubTreeOn();
 
+    // If it contains a single leaf, extract it as is
+    int nLeaf = 0;
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-      vtkDataSet* leafDS = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-      vtkSmartPointer<vtkPolyData> leafPD = vtkPolyData::SafeDownCast(leafDS);
-      if (!leafDS)
-      {
-        F3DLog::Print(F3DLog::Severity::Warning,
-          "A non data set block was ignored while reading a multiblock.");
-      }
-      else
-      {
-        if (!leafPD)
-        {
-          vtkNew<vtkDataSetSurfaceFilter> geom;
-          geom->SetInputData(iter->GetCurrentDataObject());
-          geom->Update();
-          leafPD = vtkPolyData::SafeDownCast(geom->GetOutput());
-        }
-        append->AddInputData(leafPD);
-      }
+      dataset = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      nLeaf++;
     }
 
-    append->Update();
-    dataset = append->GetOutput();
+    // If multiple leafs, extract all surfaces and append them together
+    if (nLeaf > 1)
+    {
+      vtkNew<vtkAppendPolyData> append;
+      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      {
+        vtkDataSet* leafDS = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+        vtkSmartPointer<vtkPolyData> leafPD = vtkPolyData::SafeDownCast(leafDS);
+        if (!leafDS)
+        {
+          F3DLog::Print(F3DLog::Severity::Warning,
+            "A non data set block was ignored while reading a composite.");
+        }
+        else
+        {
+          if (!leafPD)
+          {
+            vtkNew<vtkDataSetSurfaceFilter> geom;
+            geom->SetInputData(iter->GetCurrentDataObject());
+            geom->Update();
+            leafPD = vtkPolyData::SafeDownCast(geom->GetOutput());
+          }
+          append->AddInputData(leafPD);
+        }
+      }
+
+      append->Update();
+      dataset = append->GetOutput();
+    }
   }
 
   // If the input is a polydata or an unstructured grid without cells, add a polyvertex cell

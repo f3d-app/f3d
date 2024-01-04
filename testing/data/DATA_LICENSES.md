@@ -20,6 +20,7 @@
 - duck.dae: assimp test models: BSD-3-Clause
 - duck.fbx: assimp test models: BSD-3-Clause
 - HeadMRVolume*: VTK Data: BSD-3-Clause
+- icosahedron.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - iflamigm.3ds: VTK Data: BSD-3-Clause
 - IM-0001-1983.dcm: VTK Data: BSD-3-Clause
 - InterpolationTest.glb: glTF-Sample-Models: Public Domain
@@ -38,6 +39,7 @@
 - samplePTS.pts: VTK Data: BSD-3-Clause
 - skin.png: Blender: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - small.ex2: VTK Data: BSD-3-Clause
+- sphere_points.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - teapot.off: Utah Teapot: Public Domain
 - tensors.vti: VTK Data: BSD-3-Clause
 - UnlitTest.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
