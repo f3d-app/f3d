@@ -43,7 +43,7 @@ Some modules, plugins and bindings depending on external libraries can be option
 * `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
 * `F3D_PLUGIN_BUILD_EXODUS`: Support for ExodusII (.ex2) file format. Requires that VTK has been built with `IOExodus` module (and `hdf5`). Enabled by default.
 * `F3D_PLUGIN_BUILD_OCCT`: Support for STEP and IGES file formats. Requires `OpenCASCADE`. Disabled by default.
-* `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF and DXF file formats. Requires `Assimp`. Disabled by default.
+* `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF and X file formats. Requires `Assimp`. Disabled by default.
 * `F3D_PLUGIN_BUILD_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.
 * `F3D_PLUGIN_BUILD_DRACO`: Support for DRC file format. Requires `Draco`. Disabled by default.
 * `F3D_BINDINGS_PYTHON`: Generate python bindings (requires `Python` and `pybind11`). Disabled by default.
