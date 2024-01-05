@@ -34,9 +34,6 @@ runs:
     - name: Install zlib
       uses: ./.actions/zlib-install-dep
 
-    - name: Install zstd
-      uses: ./.actions/zstd-install-dep
-
     - name: Install blosc
       uses: ./.actions/blosc-install-dep
 

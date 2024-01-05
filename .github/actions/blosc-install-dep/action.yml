@@ -43,7 +43,6 @@ runs:
         -DCMAKE_INSTALL_PREFIX=../blosc_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DPREFER_EXTERNAL_ZLIB=ON
-        -DPREFER_EXTERNAL_ZSTD=ON
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
