@@ -30,12 +30,5 @@ runs:
     - name: Install Boost dependency
       uses: ./.actions/boost-install-dep
 
-    # macOS CI does not yet support OpenVDB, disabling all related dependencies
-    - name: Install zlib
-      uses: ./.actions/zlib-install-dep
-
-    - name: Install blosc
-      uses: ./.actions/blosc-install-dep
-
     - name: Install OpenVDB
       uses: ./.actions/openvdb-install-dep
