@@ -1,6 +1,7 @@
 # Changelog
 
 ## Ongoing development
+
 For F3D users:
  - Added `--animation-autoplay` option (libf3d: `scene.animation.autoplay`) to automatically start animation on file load.
  - Added an experimental VDB reader for .vdb files using OpenVDB
@@ -16,6 +17,9 @@ For F3D users:
 For libf3d users:
  - Added `scene.animation.autoplay` option.
  - Added a `f3d::image::saveBuffer` API to save an image as a file format in memory.
+
+For F3D packagers:
+ - Added a new optional dependency through VTK, OpenVDB
 
 ## v2.2.1
 
