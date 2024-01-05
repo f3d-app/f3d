@@ -35,6 +35,7 @@ Here is the list of supported file formats:
 * **.dae** : COLLADA (full scene)
 * **.off** : Object File Format (full scene)
 * **.dxf** : Drawing Exchange Format (full scene)
+* **.x** : DirectX Format (full scene)
 
 ## Scene construction
 
@@ -45,7 +46,7 @@ to modify this behavior. For file formats that do not support it, **a default sc
 
 ## Animations
 
-F3D can play animations for a number of file formats (.ex2/.e/.exo/.g, .gltf/.glb, .fbx, .dae) if the file contains an animation.
+F3D can play animations for a number of file formats (.ex2/.e/.exo/.g, .gltf/.glb, .fbx, .dae, .x) if the file contains an animation.
 It is possible to select the animation to play using `--animation-index`, or to play all animations at once using `--animation-index=-1` (.gltf/.glb only).
 When F3D play an animation, it assumes the time unit is in seconds to show accurate speed of animation. Use `--animation-speed-factor` if
 an adjustment is needed. By default, F3D will try update the scene 60 times per seconds, use `--animation-frame-rate` to change that if needed.
@@ -57,7 +58,7 @@ In this case, in order to open a file that requires a plugin, you will have to m
 Here is the list of plugins provided officially by F3D:
 
 - **alembic**: ABC support
-- **assimp**: FBX, DAE, OFF and DXF support
+- **assimp**: FBX, DAE, OFF, DXF and X support
 - **draco**: DRC support
 - **exodus**: EX2 support
 - **occt**: STEP and IGES support

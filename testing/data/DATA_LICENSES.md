@@ -8,6 +8,7 @@
 - Teapot.usd: [USD Working Group](https://github.com/usd-wg/assets): Public Domain - CC0
 - animatedWorld.fbx: VTK Data: BSD-3-Clause
 - animation_with_skeleton.fbx: assimp test models: BSD-3-Clause
+- anim_test.x: assimp test models: BSD-3-Clause
 - beach.nrrd: VTK Data: BSD-3-Clause
 - bluntfin.vts: VTK Data: BSD-3-Clause
 - bot2.wrl: VTK Data: BSD-3-Clause

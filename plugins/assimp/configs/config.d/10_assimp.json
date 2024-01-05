@@ -1,5 +1,5 @@
 {
-  ".*(fbx|dae|off|dxf)":
+  ".*(fbx|dae|off|dxf|x)":
   {
     "load-plugins": "assimp"
   },
