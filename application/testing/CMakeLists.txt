@@ -456,6 +456,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "LOD3sp")
     f3d_test(NAME TestTGATextureFBX DATA duck.fbx ARGS --load-plugins=assimp)
     f3d_test(NAME TestDAE DATA duck.dae ARGS --load-plugins=assimp)
+    f3d_test(NAME TestX DATA anim_test.x ARGS --load-plugins=assimp)
 
     # To increase coverage of some specific animation code path when looping
     f3d_test(NAME TestInteractionFBXBoneAnimation DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 --animation-speed-factor=100 INTERACTION NO_BASELINE)#Space;Wait;Space;

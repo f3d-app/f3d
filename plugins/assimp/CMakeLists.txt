@@ -58,6 +58,14 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Object File Format"
 )
 
+f3d_plugin_declare_reader(
+  NAME DirectX
+  EXTENSIONS x
+  MIMETYPES application/vnd.x
+  VTK_IMPORTER vtkF3DAssimpImporter
+  FORMAT_DESCRIPTION "DirectX File Format"
+)
+
 set(rpaths "")
 get_target_property(target_type assimp::assimp TYPE)
 if (target_type STREQUAL SHARED_LIBRARY)

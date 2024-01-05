@@ -605,7 +605,7 @@ public:
       }
 
       // convert materials to properties
-      this->Properties.resize(this->Scene->mNumMeshes);
+      this->Properties.resize(this->Scene->mNumMaterials);
       for (unsigned int i = 0; i < this->Scene->mNumMaterials; i++)
       {
         this->Properties[i] = this->CreateMaterial(this->Scene->mMaterials[i]);
@@ -811,7 +811,18 @@ public:
                   vtkNew<vtkMatrix4x4> boneMat;
                   bonesTransform->GetTypedTuple(i, boneMat->GetData());
 
-                  vtkMatrix4x4::Multiply4x4(this->NodeGlobalMatrix[boneName], boneMat, boneMat);
+                  auto globalMatrix = this->NodeGlobalMatrix[boneName];
+
+                  if (globalMatrix)
+                  {
+                    vtkMatrix4x4::Multiply4x4(globalMatrix, boneMat, boneMat);
+                  }
+                  else
+                  {
+                    vtkWarningWithObjectMacro(
+                      this->Parent, "Cannot find global matrix of bone " << boneName);
+                  }
+
                   vtkMatrix4x4::Multiply4x4(inverseRoot, boneMat, boneMat);
 
                   for (int j = 0; j < 4; j++)

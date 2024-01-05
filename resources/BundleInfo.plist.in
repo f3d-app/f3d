@@ -326,6 +326,19 @@
 					<string>dxf</string>
 				</array>
 			</dict>
+			<!-- X -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>DirectX</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>x</string>
+				</array>
+			</dict>
 			<!-- OFF -->
 			<dict>
 				<key>CFBundleTypeName</key>
