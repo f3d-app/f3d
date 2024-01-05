@@ -197,7 +197,13 @@ f3d_test(NAME TestTextureMatCapWithTCoords DATA WaterBottle.glb ARGS --geometry-
 
 # Needs SSBO: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231108)
-  f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb DEFAULT_LIGHTS)
+  if(APPLE) # MacOS does not support OpenGL 4.3
+    f3d_test(NAME TestSkinningManyBonesFailure DATA tube_254bones.glb ARGS -v REGEXP "which requires OpenGL" NO_BASELINE)
+  else()
+    # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
+    # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
+    f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb DEFAULT_LIGHTS)
+  endif()
 else()
   # No animation before https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20201015)

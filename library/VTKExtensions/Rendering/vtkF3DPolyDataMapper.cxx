@@ -6,6 +6,7 @@
 #include <vtkDoubleArray.h>
 #include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
+#include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLVertexBufferObject.h>
 #include <vtkOpenGLVertexBufferObjectGroup.h>
@@ -144,21 +145,38 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
     if (nbJoints > 250)
     {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231108)
-      std::vector<float> buffer(16 * sizeof(float) * nbJoints);
-      uniforms->GetUniformMatrix4x4v("jointMatrices", buffer);
+      vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow());
+      assert(renWin);
 
-      this->JointMatrices->Upload(buffer, vtkOpenGLBufferObject::ArrayBuffer);
-      this->JointMatrices->BindShaderStorage(0);
-
-      uniforms->RemoveUniform("jointMatrices");
-
-      customDecl += "layout(std430, binding = 0) readonly buffer JointsData\n"
-                    "{\n"
-                    "  mat4 jointMatrices[];\n"
-                    "};\n";
+      int major, minor;
+      renWin->GetOpenGLVersion(major, minor);
 
       // 4.3 is required for SSBO
-      vtkShaderProgram::Substitute(VSSource, "//VTK::System::Dec", "#version 430");
+      if (major == 4 && minor >= 3)
+      {
+        std::vector<float> buffer(16 * sizeof(float) * nbJoints);
+        uniforms->GetUniformMatrix4x4v("jointMatrices", buffer);
+
+        this->JointMatrices->Upload(buffer, vtkOpenGLBufferObject::ArrayBuffer);
+        this->JointMatrices->BindShaderStorage(0);
+
+        uniforms->RemoveUniform("jointMatrices");
+
+        customDecl += "layout(std430, binding = 0) readonly buffer JointsData\n"
+                      "{\n"
+                      "  mat4 jointMatrices[];\n"
+                      "};\n";
+
+        vtkShaderProgram::Substitute(VSSource, "//VTK::System::Dec", "#version 430");
+      }
+      else
+      {
+        std::string msg = "A mesh is associated with more than 250 bones (" +
+          std::to_string(nbJoints) + "), which requires OpenGL >= 4.3";
+        F3DLog::Print(F3DLog::Severity::Warning, msg);
+
+        skinningSupported = false;
+      }
 #else
       std::string msg = "A mesh is associated with more than 250 bones (" +
         std::to_string(nbJoints) + "), which is not supported by VTK < 9.3.20231108";
