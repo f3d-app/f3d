@@ -1,0 +1,25 @@
+From 35ce43860794c6a5a5dbe023bff84278afa5d41b Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Fri, 5 Jan 2024 17:04:16 +0100
+Subject: [PATCH] fixup zstd
+
+---
+ cmake/FindBlosc.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/FindBlosc.cmake b/cmake/FindBlosc.cmake
+index a9c77ae..ad67747 100644
+--- a/cmake/FindBlosc.cmake
++++ b/cmake/FindBlosc.cmake
+@@ -381,7 +381,7 @@ if(NOT TARGET Blosc::blosc)
+       INTERFACE_LINK_DIRECTORIES
+          "\$<\$<CONFIG:Release>:${Blosc_RELEASE_LIBRARY_DIRS}>;\$<\$<CONFIG:Debug>:${Blosc_DEBUG_LIBRARY_DIRS}>")
+ 
+-    set(BLOSC_EXTERNAL_LIBRARIES lz4 snappy zlib zstd)
++    set(BLOSC_EXTERNAL_LIBRARIES lz4 snappy zlib)
+ 
+     foreach(BLOSC_EXTERNAL_LIB ${BLOSC_EXTERNAL_LIBRARIES})
+ 
+-- 
+2.35.1.windows.2
+
