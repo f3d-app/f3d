@@ -10,7 +10,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/openvdb_install
-        key: openvdb-11.0.0-${{runner.os}}-1
+        key: openvdb-11.0.0-${{runner.os}}-2
 
     - name: Checkout OpenVDB
       if: steps.cache-openvdb.outputs.cache-hit != 'true'
@@ -36,11 +36,17 @@ runs:
         cmake ../openvdb
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_LIBDIR:PATH=lib
         -DCMAKE_INSTALL_PREFIX=../openvdb_install
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
-        -DOPENVDB_CORE_STATIC=OFF
         -DOPENVDB_BUILD_BINARIES=OFF
+        -DOPENVDB_BUILD_VDB_PRINT:BOOL=OFF
+        -DOPENVDB_CORE_STATIC=OFF
+        -DUSE_BLOSC:BOOL=ON
+        -DUSE_CCACHE:BOOL=OFF
+        -DUSE_EXPLICIT_INSTANTIATION:BOOL=OFF
+        -DUSE_ZLIB:BOOL=ON
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
