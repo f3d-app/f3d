@@ -10,7 +10,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/boost_install
-        key: boost-1.83.0-${{runner.os}}-2
+        key: boost-1.83.0-${{runner.os}}-3
 
     - name: Checkout Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
@@ -57,6 +57,7 @@ runs:
         --with-regex
         --with-system
         --with-iostreams
+        -sNO_ZSTD=1
         install
 
     - name: Copy to install
