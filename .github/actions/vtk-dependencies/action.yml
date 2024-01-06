@@ -26,23 +26,22 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
 
-    # inputs.cpu is not needed yet because macOS CI use boost header only for now
     - name: Install Boost dependency
       uses: ./.actions/boost-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
 
-    # macOS CI does not yet support OpenVDB, disabling all related dependencies
     - name: Install zlib
-      if: runner.os != 'macOS'
       uses: ./.actions/zlib-install-dep
-
-    - name: Install zstd
-      if: runner.os != 'macOS'
-      uses: ./.actions/zstd-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Install blosc
-      if: runner.os != 'macOS'
       uses: ./.actions/blosc-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Install OpenVDB
-      if: runner.os != 'macOS'
       uses: ./.actions/openvdb-install-dep
+      with:
+        cpu: ${{inputs.cpu}}

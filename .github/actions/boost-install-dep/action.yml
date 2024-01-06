@@ -1,5 +1,10 @@
 name: 'Install Boost Dependency'
 description: 'Install Boost Dependency using cache when possible'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
 
 runs:
   using: "composite"
@@ -38,6 +43,7 @@ runs:
 
     # Windows require msvc toolset to avoid mingw being picked up instead
     # fPIC is needed for clang
+    # NO_ZSTD is needed on macOS for some reason
     - name: Build Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/boost
@@ -51,12 +57,14 @@ runs:
         runtime-link=shared
         cxxflags="-fPIC"
         ${{ runner.os == 'Windows' && 'toolset=msvc' || null }}
+        ${{ inputs.cpu == 'arm64' && 'architecture=arm' || null }}
         --with-date_time
         --with-filesystem
         --with-program_options
         --with-regex
         --with-system
         --with-iostreams
+        -sNO_ZSTD=1
         install
 
     - name: Copy to install
