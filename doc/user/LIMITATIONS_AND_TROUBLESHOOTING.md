@@ -30,11 +30,12 @@ ABC file formats rely on [Alembic](https://github.com/alembic/alembic) library. 
 USD file formats rely on [OpenUSD](https://github.com/PixarAnimationStudios/OpenUSD) library. It comes with some known limitations:
 - Skinning is slow and baked on the CPU.
 - Does not support Face-varying attributes.
+- The `usd` plugin is not shipped in the python wheels yet.
 
 ## VDB
 VDB file formats rely on [OpenVDB](https://github.com/AcademySoftwareFoundation/openvdb) and VTK libraries. It currently comes with some known limitations:
-- Not tested in continuous integration on macOS and not shipped in the binary release for macOS arm nor in the Python wheels.
 - VDB Grid files are opened with a hard-coded 0.1 sampling rate.
+- The `vdb` plugin is not shipped in the python wheels yet.
 
 # Troubleshooting
 
@@ -123,3 +124,13 @@ F3D raytracing and exodus plugin are not working on macOS silicon yet, see this 
 > I'm unable to get coloring right with step files
 
 F3D on macOS does not support coloring on cells because of a [VTK issue](https://gitlab.kitware.com/vtk/vtk/-/issues/18969).
+
+## Python
+
+> I can't find `usd` and `vdb` plugins after installing f3d with pip
+
+The `usd` and `vdb` plugins are not shipped in the python wheels for now, you can compile F3D yourself with them though.
+
+> Raytracing does not work after installing f3d with pip
+
+F3D raytracing feature is not shipped in the python wheels for now, you can compile F3D yourself with it though.
