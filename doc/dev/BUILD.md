@@ -14,6 +14,7 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 * Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.5.2.
 * Optionally, [Alembic](http://www.alembic.io/) >= 1.7.
 * Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 23.05.
+* Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 10.0.0, enable `IOOpenVDB` VTK module.
 * Optionally, [Draco](https://google.github.io/draco/) >= 1.5.
 * Optionally, [Python](https://www.python.org/) >= 3.6 and [pybind11](https://github.com/pybind/pybind11) >= 2.2.
 * Optionally, [Java](https://www.java.com) >= 18.
@@ -21,7 +22,7 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.0.0, however, many features are only available in certain conditions. We suggest using VTK 9.2.6 with RenderingRayTracing, RenderingExternal and IOExodus modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.0.0, however, many features are only available in certain conditions. We suggest using VTK 9.2.6 with RenderingRayTracing, RenderingExternal, IOExodus and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 ## Configuration and building
 
@@ -42,10 +43,12 @@ Some modules, plugins and bindings depending on external libraries can be option
 * `F3D_MODULE_EXTERNAL_RENDERING`: Support for external render window. Requires that VTK has been built with `VTK_MODULE_ENABLE_VTK_RenderingExternal` turned on. Disabled by default.
 * `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
 * `F3D_PLUGIN_BUILD_EXODUS`: Support for ExodusII (.ex2) file format. Requires that VTK has been built with `IOExodus` module (and `hdf5`). Enabled by default.
-* `F3D_PLUGIN_BUILD_OCCT`: Support for STEP and IGES file formats. Requires `OpenCASCADE`. Disabled by default.
+* `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES and BREP file formats. Requires `OpenCASCADE`. Disabled by default.
 * `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF and X file formats. Requires `Assimp`. Disabled by default.
 * `F3D_PLUGIN_BUILD_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.
 * `F3D_PLUGIN_BUILD_DRACO`: Support for DRC file format. Requires `Draco`. Disabled by default.
+* `F3D_PLUGIN_BUILD_USD`: Support for USD file format. Requires `OpenUSD`. Disabled by default.
+* `F3D_PLUGIN_BUILD_VDB`: Support for VDB file format. Requires that VTK has been built with `IOOpenVDB` module (and `OpenVDB`). Disabled by default.
 * `F3D_BINDINGS_PYTHON`: Generate python bindings (requires `Python` and `pybind11`). Disabled by default.
 * `F3D_BINDINGS_JAVA`: Generate java bindings (requires `Java` and `JNI`). Disabled by default.
 
