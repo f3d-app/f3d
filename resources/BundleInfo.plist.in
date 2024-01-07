@@ -380,6 +380,19 @@
 					<string>stp</string>
 				</array>
 			</dict>
+			<!-- BREP -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>Boundary Representation file format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>brep</string>
+				</array>
+			</dict>
 			<!-- ABC -->
 			<dict>
 				<key>CFBundleTypeName</key>
@@ -391,6 +404,19 @@
 				<key>CFBundleTypeExtensions</key>
 				<array>
 					<string>abc</string>
+				</array>
+			</dict>
+			<!-- VDB -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>VDB file format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>vdb</string>
 				</array>
 			</dict>
 			<!-- File type associations -->
