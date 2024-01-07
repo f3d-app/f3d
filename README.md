@@ -4,7 +4,7 @@
 By Michael Migliore and Mathieu Westphal.
 
 <img src="https://raw.githubusercontent.com/f3d-app/f3d/master/resources/logo.svg" align="left" width="20px"/>
-F3D (pronounced `/fɛd/`) is a fast and minimalist 3D viewer. It supports many file formats, from digital content to scientific datasets (including glTF, USD, STL, STEP, PLY, OBJ, FBX, Alembic), can show animations and support thumbnails and many rendering and texturing options including real time physically based rendering and raytracing.
+F3D (pronounced `/fɛd/`) is a fast and minimalist 3D viewer desktop application. It supports many file formats, from digital content to scientific datasets (including glTF, USD, STL, STEP, PLY, OBJ, FBX, Alembic), can show animations and support thumbnails and many rendering and texturing options including real time physically based rendering and raytracing.
 <br clear="left"/>
 
 It is fully controllable from the command line and support configuration files. It can provide thumbnails, support interactive hotkeys, drag&drop and integration into file managers.
@@ -23,7 +23,7 @@ F3D also contains the libf3d, a simple library to render meshes, with C++ and Py
 
 *A direct scalars render by F3D*
 
-See the [gallery](doc/GALLERY.md) for more images, take a look at the [changelog](doc/CHANGELOG.md) or go to the [releases page](https://github.com/f3d-app/f3d/releases) to download F3D!
+See the [gallery](doc/GALLERY.md) for more images, take a look at the [changelog](doc/CHANGELOG.md) or go to the [install guide](doc/user/INSTALLATION.md) to download and install F3D!
 
 If you need any help or want to discuss with other F3D users and developers, head over to our [discord](https://discord.f3d.app).
 
