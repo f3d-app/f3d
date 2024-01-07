@@ -54,6 +54,10 @@ Your data probably contains some translucent data for some reason, turn on trans
 
 With some C++ STD library version, explicit linking to `stdc++fs` is not supported. We provide a CMake option `F3D_LINUX_APPLICATION_LINK_FILESYSTEM` that you can set to `OFF` to workaround this issue.
 
+> I have a link error related to undefined reference to symbol of `libatomic`.
+
+The GCC flag `-latomic` is not being added automatically with specific architectures, like `armel` and `RISCV64`. We provide a CMake option `F3D_LINUX_LIBRARY_LINK_ATOMIC` that you can set to `ON` to workaround this issue.
+
 > Thumbnails are not working in my file manager.
 
  * Check that your file manager supports the thumbnailer mechanism.
