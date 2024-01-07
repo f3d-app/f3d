@@ -15,7 +15,7 @@ Options|Default|Description
 \-\-dry-run||Do not read any configuration file and consider only the command line options.
 \-\-no-render||Do not render anything and quit just after loading the first file, use with \-\-verbose to recover information about a file.
 \-\-max-size=\<size in MiB\>|-1|Prevent F3D to load a file bigger than the provided size in Mib, negative value means unlimited, useful for thumbnails.
-\-\-load-plugins=\<paths or names\>||List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `exodus`, `occt`, `usd`. See [usage](USAGE.md) for more info.
+\-\-load-plugins=\<paths or names\>||List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `exodus`, `occt`, `usd`, `vdb`. See [usage](USAGE.md) for more info.
 
 ## General Options
 
