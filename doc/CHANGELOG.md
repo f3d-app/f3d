@@ -11,7 +11,7 @@ For F3D users:
  - Reading EXR files is now multi-threaded and much faster.
  - Translucency support is now enabled by default.
  - A small margin is added between the model and the grid to avoid potential z-fighting.
- - Add X files support (part of `assimp` plugin)
+ - Add 3MF and X files support (part of `assimp` plugin)
  - Fix potential crashes when reading `assimp` plugin file format
 
 For libf3d users:
