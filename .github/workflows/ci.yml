@@ -359,6 +359,7 @@ jobs:
       uses: ./source/.github/actions/android-ci
       with:
         arch: ${{matrix.arch}}
+        vtk_version: v9.3.0
 
 #----------------------------------------------------------------------------
 # webassembly: Check build of F3D for webassembly
