@@ -231,8 +231,7 @@ camera& camera_impl::resetToDefault()
 //----------------------------------------------------------------------------
 camera& camera_impl::resetToBounds([[maybe_unused]] double zoomFactor)
 {
-
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 0, 20210331)
+#if __ANDROID__ || VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 0, 20210331)
   this->Internals->VTKRenderer->ResetCamera();
 #else
   if (this->Internals->VTKRenderer->GetRenderWindow()->IsA("vtkExternalOpenGLRenderWindow"))

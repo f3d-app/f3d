@@ -6,8 +6,8 @@ public class Engine implements AutoCloseable {
         System.loadLibrary("f3d-java");
     }
 
-    public Engine(Window.Type type) {
-        mNativeAddress = construct(type); // instantiate the native engine
+    public Engine() {
+        mNativeAddress = construct(); // instantiate the native engine
         mLoader = new Loader(mNativeAddress);
         mOptions = new Options(mNativeAddress);
         mWindow = new Window(mNativeAddress);
@@ -30,7 +30,7 @@ public class Engine implements AutoCloseable {
     public Options getOptions() { return mOptions; }
     public Window getWindow() { return mWindow; }
 
-    private native long construct(Window.Type type);
+    private native long construct();
     private native void destroy(long nativeAddress);
 
     private Loader mLoader;

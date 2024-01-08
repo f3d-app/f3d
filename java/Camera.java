@@ -18,5 +18,7 @@ public class Camera {
     public native double[] getPosition();
     public native void setPosition(double[] pt);
 
+    public native void resetToBounds();
+
     private long mNativeAddress;
 }

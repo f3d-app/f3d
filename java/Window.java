@@ -2,8 +2,6 @@ package app.f3d.F3D;
 
 public class Window {
 
-    public enum Type { NONE, NATIVE, NATIVE_OFFSCREEN, EXTERNAL }
-
     public Window(long nativeAddress) {
         mNativeAddress = nativeAddress;
         mCamera = new Camera(nativeAddress);
