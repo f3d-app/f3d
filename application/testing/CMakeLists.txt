@@ -450,6 +450,7 @@ endif()
 
 if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestOFF DATA teapot.off ARGS --up=+Z --load-plugins=assimp)
+  f3d_test(NAME Test3MF DATA cube_gears.3mf ARGS --load-plugins=assimp DEFAULT_LIGHTS) # Using default lights because of ResetCamera
   f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p --load-plugins=assimp DEFAULT_LIGHTS) # Using default lights because of ResetCamera
   f3d_test(NAME TestFBX DATA phong_cube.fbx ARGS --load-plugins=assimp DEFAULT_LIGHTS) # Using default lights because of ResetCamera
   f3d_test(NAME TestFBX16bits DATA 16bit.fbx ARGS --load-plugins=assimp THRESHOLD 70 DEFAULT_LIGHTS) # Using default lights because of ResetCamera

@@ -339,6 +339,19 @@
 					<string>x</string>
 				</array>
 			</dict>
+			<!-- 3MF -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>3D Manufacturing Format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>3mf</string>
+				</array>
+			</dict>
 			<!-- OFF -->
 			<dict>
 				<key>CFBundleTypeName</key>

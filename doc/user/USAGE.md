@@ -36,10 +36,11 @@ Here is the list of supported file formats:
 * **.off** : Object File Format (full scene)
 * **.dxf** : Drawing Exchange Format (full scene)
 * **.x** : DirectX Format (full scene)
+* **.3mf** : 3D Manufacturing Format (full scene)
 
 ## Scene construction
 
-The **full scene** formats (.gltf/.glb, .3ds, .wrl, .obj, .fbx, .dae, .off) contain not only *geometry*, 
+The **full scene** formats (.gltf/.glb, .3ds, .wrl, .obj, .fbx, .dae, .off, .x, .3mf) contain not only *geometry*, 
 but also some scene information like *lights*, *cameras*, *actors* in the scene, as well as *texture* properties.
 By default, all this information will be loaded from the file and displayed. Use the `--geometry-only` [options](OPTIONS.md)
 to modify this behavior. For file formats that do not support it, **a default scene** is created.
@@ -58,7 +59,7 @@ In this case, in order to open a file that requires a plugin, you will have to m
 Here is the list of plugins provided officially by F3D:
 
 - **alembic**: ABC support
-- **assimp**: FBX, DAE, OFF, DXF and X support
+- **assimp**: FBX, DAE, OFF, DXF, X and 3MF support
 - **draco**: DRC support
 - **exodus**: EX2 support
 - **occt**: STEP and IGES support
