@@ -43,14 +43,10 @@ extern "C"
     env->ReleaseStringUTFChars(path, str);
   }
 
-  JNIEXPORT jlong JAVA_BIND(Engine, construct)(JNIEnv* env, jobject self, jobject windowType)
+  JNIEXPORT jlong JAVA_BIND(Engine, construct)(JNIEnv*, jobject)
   {
-    // read cursor
-    jmethodID method =
-      env->GetMethodID(env->FindClass("app/f3d/F3D/Window$Type"), "ordinal", "()I");
-    jint itype = env->CallIntMethod(windowType, method);
-
-    return reinterpret_cast<jlong>(new f3d::engine(static_cast<f3d::window::Type>(itype)));
+    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+    return reinterpret_cast<jlong>(new f3d::engine());
   }
 
   JNIEXPORT void JAVA_BIND(Engine, destroy)(JNIEnv*, jobject, jlong ptr)
@@ -196,5 +192,10 @@ extern "C"
     double* arr = env->GetDoubleArrayElements(pt, nullptr);
     GetEngine(env, self)->getWindow().getCamera().setPosition({ arr[0], arr[1], arr[2] });
     env->ReleaseDoubleArrayElements(pt, arr, 0);
+  }
+
+  JNIEXPORT void JAVA_BIND(Camera, resetToBounds)(JNIEnv* env, jobject self)
+  {
+    GetEngine(env, self)->getWindow().getCamera().resetToBounds();
   }
 }
