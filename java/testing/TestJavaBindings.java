@@ -17,7 +17,7 @@ public class TestJavaBindings {
     Engine.autoloadPlugins();
 
     // Always use try-with-resources idiom to ensure the native engine is released
-    try (Engine engine = new Engine(Window.Type.NATIVE_OFFSCREEN)) {
+    try (Engine engine = new Engine()) {
 
       Camera camera = engine.getWindow().getCamera();
 
