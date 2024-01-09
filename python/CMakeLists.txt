@@ -21,6 +21,8 @@ endif()
 
 set(f3d_python_package_name "f3d")
 set(f3d_python_package_suffix "python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages")
+
+get_property(F3D_MULTI_CONFIG_GENERATOR GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 set(f3d_module_dir "${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>/${f3d_python_package_name}")
 
 set_target_properties(pyf3d PROPERTIES
