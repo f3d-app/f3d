@@ -4,6 +4,7 @@ project(pyf3d)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(f3dPython)
+include(GNUInstallDirs)
 
 find_package(Python 3.6 COMPONENTS Interpreter Development)
 find_package(pybind11 2.2 REQUIRED)
@@ -13,6 +14,7 @@ pybind11_add_module(pyf3d MODULE F3DPythonBindings.cxx)
 # In case pyf3d is built separately, we need to retrieve the existing libf3d
 if(PROJECT_IS_TOP_LEVEL)
   find_package(f3d REQUIRED)
+  set(F3D_VERSION "${f3d_VERSION}")
   target_link_libraries(pyf3d PRIVATE f3d::libf3d)
   target_include_directories(pyf3d PRIVATE "${f3d_INCLUDE_DIR}/f3d")
 else()
