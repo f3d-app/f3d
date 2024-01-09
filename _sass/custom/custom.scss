@@ -1,0 +1,35 @@
+kbd {
+    // TODO: use just the docs variables?
+    --kbd-color-background: #e6e1e8;
+    --kbd-color-border: #959396;
+    --kbd-color-text: #27262b;
+
+    // Match the page defaults in light mode but
+    // switch to a light-ish grey in dark mode
+    background-color: var(--kbd-color-background);
+    color: var(--kbd-color-text);
+
+    // Round off the corners like physical keys have
+    border-radius: 0.25rem;
+    background-clip: padding-box;
+    border: 1px solid var(--kbd-color-border);
+    box-shadow: 0 2px 0 1px var(--kbd-color-border);
+
+    // Remove the text cursor
+    cursor: default;
+
+    font-size: 0.75em;
+    line-height: 1;
+    min-width: 0.75rem;
+    text-align: center;
+    padding: 2px 5px;
+    margin-right: 3px;
+    position: relative;
+    top: -1px;
+
+    // Push effect on hover
+    &:hover {
+        box-shadow: 0 1px 0 0.5px var(--kbd-color-border);
+        top: 1px;
+    }
+}
