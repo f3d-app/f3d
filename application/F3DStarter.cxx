@@ -101,6 +101,36 @@ public:
     return false;
   }
 
+  static void SetVerboseLevel(const std::string& level)
+  {
+    // A switch/case over verbose level
+    if (level == "quiet")
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
+    }
+    else if (level == "error")
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::ERROR);
+    }
+    else if (level == "warning")
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::WARN);
+    }
+    else if (level == "info")
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO);
+    }
+    else if (level == "debug")
+    {
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+    }
+    else
+    {
+      f3d::log::warn("Unrecognized verbose level: ", level,
+        ", Ignoring. Possible values are quiet, error, warning, info, debug");
+    }
+  }
+
   F3DOptionsParser Parser;
   F3DAppOptions AppOptions;
   f3d::options DynamicOptions;
@@ -134,14 +164,9 @@ int F3DStarter::Start(int argc, char** argv)
     this->Internals->AppOptions, this->Internals->DynamicOptions, files);
 
   // Set verbosity level early from command line
-  if (this->Internals->AppOptions.Quiet)
-  {
-    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
-  }
-  else if (this->Internals->AppOptions.Verbose || this->Internals->AppOptions.NoRender)
-  {
-    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  }
+  F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel);
+
+  f3d::log::debug("========== Initializing ==========");
 
   // Load plugins from the app options
   this->Internals->Parser.LoadPlugins(this->Internals->AppOptions);
@@ -158,20 +183,15 @@ int F3DStarter::Start(int argc, char** argv)
       this->Internals->AppOptions, this->Internals->DynamicOptions, files);
 
     // Set verbosity level again if it was defined in the configuration file global block
-    if (this->Internals->AppOptions.Quiet)
-    {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
-    }
-    else if (this->Internals->AppOptions.Verbose || this->Internals->AppOptions.NoRender)
-    {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-    }
+    F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel);
   }
 
 #if __APPLE__
   // Initialize MacOS delegate
   F3DNSDelegate::InitializeDelegate(this);
 #endif
+
+  f3d::log::debug("========== Configuring engine ==========");
 
   if (this->Internals->AppOptions.NoRender)
   {
@@ -193,6 +213,8 @@ int F3DStarter::Start(int argc, char** argv)
         {
           this->Internals->Engine->getInteractor().stopAnimation();
 
+          f3d::log::debug("========== Loading 3D file ==========");
+
           if (restoreCamera)
           {
             f3d::camera& cam = this->Internals->Engine->getWindow().getCamera();
@@ -204,6 +226,8 @@ int F3DStarter::Start(int argc, char** argv)
           {
             this->LoadFile(index, true);
           }
+
+          f3d::log::debug("========== Rendering ==========");
 
           this->Render();
           return true;
@@ -288,6 +312,9 @@ int F3DStarter::Start(int argc, char** argv)
     }
 #endif
   }
+  f3d::log::debug("Engine configured");
+
+  f3d::log::debug("========== Loading 3D file ==========");
 
   // Add all files
   for (auto& file : files)
@@ -297,6 +324,8 @@ int F3DStarter::Start(int argc, char** argv)
 
   // Load a file
   this->LoadFile();
+
+  f3d::log::debug("========== Rendering ==========");
 
   if (!this->Internals->AppOptions.NoRender)
   {
@@ -380,6 +409,12 @@ int F3DStarter::Start(int argc, char** argv)
       {
         f3d::log::info("Image comparison success with an error difference of: ", error);
       }
+
+      if (this->Internals->FilesList.size() > 1)
+      {
+        f3d::log::warn("Image comparison was performed using a single 3D file, other provided "
+                       "3D files were ignored.");
+      }
     }
     // Render to file if needed
     else if (!this->Internals->AppOptions.Output.empty())
@@ -392,14 +427,22 @@ int F3DStarter::Start(int argc, char** argv)
 
       f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
       img.save(this->Internals->AppOptions.Output);
+      f3d::log::debug("Output image saved to ", this->Internals->AppOptions.Output);
+
+      if (this->Internals->FilesList.size() > 1)
+      {
+        f3d::log::warn("An output image was saved using a single 3D file, other provided 3D "
+                       "files were ignored.");
+      }
     }
     // Start interaction
     else
     {
 #ifdef F3D_HEADLESS_BUILD
       f3d::log::error("This is a headless build of F3D, interactive rendering is not supported");
+      return EXIT_FAILURE;
 #else
-      window.render();
+      this->Render();
       interactor.start();
 #endif
     }
@@ -574,6 +617,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
 void F3DStarter::Render()
 {
   this->Internals->Engine->getWindow().render();
+  f3d::log::debug("Render done");
 }
 
 //----------------------------------------------------------------------------

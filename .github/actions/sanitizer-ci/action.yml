@@ -36,8 +36,8 @@ runs:
         cd dependencies
         mkdir install
 
-    - name: Install TBB
-      uses: ./source/.github/actions/tbb-install-dep
+    - name: Install VTK dependencies
+      uses: ./source/.github/actions/vtk-dependencies
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -53,6 +53,8 @@ runs:
       working-directory: ${{github.workspace}}
       run: mkdir build
 
+    # USD and VDB gives a lot of leaks and race conditions
+    # Not sure if it's false positives but the plugin is disabled for now
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}/build
@@ -71,6 +73,8 @@ runs:
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
         -DF3D_PLUGIN_BUILD_OCCT=ON
+        -DF3D_PLUGIN_BUILD_USD=OFF
+        -DF3D_PLUGIN_BUILD_VDB=OFF
         -DF3D_SANITIZER=${{inputs.sanitizer_type}}
         -DF3D_STRICT_BUILD=ON
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
@@ -94,7 +98,7 @@ runs:
 
     - name: Upload Tests Artifact
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         path: ./build/Testing/Temporary
         name: f3d-tests-artifact-sanitizer-${{matrix.sanitizer_type}}

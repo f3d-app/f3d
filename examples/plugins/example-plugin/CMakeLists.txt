@@ -31,6 +31,7 @@ if(BUILD_TESTING)
           COMMAND "$<TARGET_FILE:f3d::f3d>"
                   "--dry-run"
                   "--no-render"
+                  "--verbose"
                   "--load-plugins=$<TARGET_FILE:f3d-plugin-example>"
                   "${CMAKE_CURRENT_SOURCE_DIR}/data.expl"
   )

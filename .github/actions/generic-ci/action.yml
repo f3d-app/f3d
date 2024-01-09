@@ -60,8 +60,8 @@ runs:
         cd dependencies
         mkdir install
 
-    - name: Install TBB
-      uses: ./source/.github/actions/tbb-install-dep
+    - name: Install VTK dependencies
+      uses: ./source/.github/actions/vtk-dependencies
       with:
         cpu: ${{inputs.cpu}}
 
@@ -86,7 +86,7 @@ runs:
 
     - name: Set up Python
       if: inputs.optional_deps_label == 'optional-deps'
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
@@ -122,7 +122,7 @@ runs:
       if: runner.os == 'Windows'
       shell: powershell
       working-directory: ${{github.workspace}}
-      run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Determine if testing should be enabled
       id: vars
@@ -131,6 +131,8 @@ runs:
 
       # occt coloring not supported on macOS because of #792
       # Exodus not supported on Apple Silicon because of #976
+      # CMAKE_MODULE_PATH is required because of
+      # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}/build
@@ -144,6 +146,7 @@ runs:
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
+        -DCMAKE_MODULE_PATH=$(pwd)/../dependencies/install/lib/cmake/OpenVDB/
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_BINDINGS_JAVA=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
@@ -160,7 +163,9 @@ runs:
         -DF3D_PLUGIN_BUILD_DRACO=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_EXODUS=${{ inputs.cpu == 'x86_64' && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ runner.os == 'macOS' && 'OFF' || 'ON' }}
+        -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0' && matrix.vtk_version != 'v9.2.6' && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_WINDOWS_GUI=ON
         -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
@@ -195,7 +200,7 @@ runs:
 
     - name: Upload Tests Artifact
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         path: ./build/Testing/Temporary
         name: f3d-tests-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}
@@ -284,7 +289,7 @@ runs:
         path: ${{github.workspace}}\install\bin
 
     - name: Check F3D_PLUGINS_PATH using plugin example
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && steps.vars.outputs.run_tests == 'true'
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' && steps.vars.outputs.run_tests == 'true'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose
@@ -297,7 +302,7 @@ runs:
         cmake --install build_plugins --config Release --component configuration
 
     - name: Check Install
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && steps.vars.outputs.run_tests == 'true'
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' && steps.vars.outputs.run_tests == 'true'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
@@ -306,7 +311,7 @@ runs:
 
     - name: Upload Tests Install Artifact
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         path: ./install/output
         name: f3d-tests-install-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}

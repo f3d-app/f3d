@@ -15,15 +15,15 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/imath_install
-        key: imath-v3.1.7-${{runner.os}}-${{inputs.cpu}}-0
+        key: imath-v3.1.9-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: AcademySoftwareFoundation/Imath
         path: './dependencies/imath'
-        ref: v3.1.7
+        ref: v3.1.9
 
     - name: Setup Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'

@@ -21,7 +21,7 @@ f3d_plugin_declare_reader(
   NAME Alembic
   EXTENSIONS abc
   MIMETYPES application/vnd.abc
-  VTK_IMPORTER vtkF3DAlembicImporter
+  VTK_READER vtkF3DAlembicReader
   FORMAT_DESCRIPTION "Alembic"
 )
 

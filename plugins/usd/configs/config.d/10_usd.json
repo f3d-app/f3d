@@ -1,0 +1,6 @@
+{
+  ".*(usd)[acz]?":
+  {
+    "load-plugins": "usd"
+  }
+}

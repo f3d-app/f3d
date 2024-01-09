@@ -102,6 +102,12 @@ PYBIND11_MODULE(pyf3d, module)
     return py::bytes(static_cast<char*>(img.getContent()), expectedSize);
   };
 
+  auto getFileBytes = [](const f3d::image& img, f3d::image::SaveFormat format)
+  {
+    std::vector<unsigned char> result = img.saveBuffer(format);
+    return py::bytes(reinterpret_cast<char*>(result.data()), result.size());
+  };
+
   image //
     .def(py::init<>())
     .def(py::init<const std::string&>())
@@ -116,7 +122,10 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("content", getImageBytes, setImageBytes)
     .def("compare", &f3d::image::compare)
     .def(
-      "save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG);
+      "save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG)
+    .def("save_buffer", getFileBytes, py::arg("format") = f3d::image::SaveFormat::PNG)
+    .def("_repr_png_",
+      [&](const f3d::image& img) { return getFileBytes(img, f3d::image::SaveFormat::PNG); });
 
   // f3d::options
   py::class_<f3d::options> options(module, "Options");

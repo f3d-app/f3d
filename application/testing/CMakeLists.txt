@@ -28,7 +28,7 @@ function(f3d_test)
   endif()
 
   if(F3D_TEST_NO_RENDER)
-    list(APPEND F3D_TEST_ARGS "--no-render")
+    list(APPEND F3D_TEST_ARGS "--no-render" "--verbose=debug")
   else()
     if(F3D_TEST_RESOLUTION)
       list(APPEND F3D_TEST_ARGS "--resolution=${F3D_TEST_RESOLUTION}")
@@ -123,7 +123,7 @@ f3d_test(NAME TestGridX DATA suzanne.ply ARGS -g --up=+X DEFAULT_LIGHTS)
 f3d_test(NAME TestGridY DATA suzanne.ply ARGS -g --up=+Y DEFAULT_LIGHTS)
 f3d_test(NAME TestGridZ DATA suzanne.ply ARGS -g --up=+Z DEFAULT_LIGHTS)
 f3d_test(NAME TestGridOptions DATA suzanne.ply ARGS -g --camera-elevation-angle=45 --grid-unit=2 --grid-subdivisions=3 -t DEFAULT_LIGHTS)
-f3d_test(NAME TestGridAbsolute DATA suzanne.ply ARGS -g --camera-elevation-angle=45 --grid-absolute -t DEFAULT_LIGHTS)
+f3d_test(NAME TestGridAbsolute DATA f3d.vtp ARGS -g --up=-Y --camera-direction=-.5,+1,+1 --grid-absolute -t DEFAULT_LIGHTS)
 f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x DEFAULT_LIGHTS)
 f3d_test(NAME TestPointCloud DATA pointsCloud.vtp ARGS -o --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestPointCloudBar DATA pointsCloud.vtp ARGS -sob --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
@@ -144,7 +144,7 @@ f3d_test(NAME TestVTICell DATA waveletMaterial.vti ARGS --scalars=Material -c --
 f3d_test(NAME TestSSAO LONG_TIMEOUT DATA suzanne.ply ARGS -q DEFAULT_LIGHTS)
 f3d_test(NAME TestDepthPeeling DATA suzanne.ply ARGS -sp --opacity=0.9 DEFAULT_LIGHTS)
 f3d_test(NAME TestBackground DATA suzanne.ply ARGS --bg-color=0.8,0.2,0.9 THRESHOLD 100 DEFAULT_LIGHTS)
-f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity 0.2 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity=0.2 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n DEFAULT_LIGHTS)
 f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --bg-color=1,1,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestCityGML DATA Part-4-Buildings-V4-one.gml DEFAULT_LIGHTS)
@@ -176,10 +176,13 @@ f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2 D
 f3d_test(NAME TestLightIntensityBrighterFullScene DATA WaterBottle.glb ARGS --light-intensity=5.0 THRESHOLD 60 DEFAULT_LIGHTS)
 f3d_test(NAME TestLightIntensityDarkerFullScene DATA WaterBottle.glb ARGS --light-intensity=0.2 DEFAULT_LIGHTS)
 f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp" DEFAULT_LIGHTS)
+f3d_test(NAME TestFilenameCommasSpaces DATA "tetrahedron, with commas & spaces.stl" DEFAULT_LIGHTS)
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf DEFAULT_LIGHTS)
 f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 DEFAULT_LIGHTS)
+f3d_test(NAME TestAnimationAutoplay DATA InterpolationTest.glb ARGS --animation-autoplay DEFAULT_LIGHTS)
 f3d_test(NAME TestMaxSizeBelow DATA suzanne.stl ARGS --max-size=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestMaxSizeAbove DATA WaterBottle.glb ARGS --max-size=0.2 REGEXP "No file loaded, file is bigger than max size" NO_BASELINE)
+f3d_test(NAME TestAlternativeOptionSyntax DATA WaterBottle.glb ARGS --max-size 0.2 REGEXP "No file loaded, file is bigger than max size" NO_BASELINE)
 f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_FAIL)
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
 f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalars --bar --comp=2 DEFAULT_LIGHTS)
@@ -191,6 +194,22 @@ f3d_test(NAME TestInvalidUpDirection DATA suzanne.ply ARGS -g --up=W REGEXP "W i
 f3d_test(NAME TestUpDirectionNoSign DATA suzanne.ply ARGS --up=X DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMatCapWithTCoords DATA WaterBottle.glb ARGS --geometry-only --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png DEFAULT_LIGHTS)
+
+# Needs SSBO: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231108)
+  if(APPLE) # MacOS does not support OpenGL 4.3
+    f3d_test(NAME TestSkinningManyBonesFailure DATA tube_254bones.glb ARGS -v REGEXP "which requires OpenGL" NO_BASELINE)
+  else()
+    # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
+    # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
+    f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb DEFAULT_LIGHTS)
+  endif()
+else()
+  # No animation before https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20201015)
+    f3d_test(NAME TestSkinningManyBonesWarning DATA tube_254bones.glb ARGS -v REGEXP "with more than 250 bones \\\(254\\\)" NO_BASELINE)
+  endif()
+endif()
 
 if (NOT APPLE)
   # This test is broken on apple because of #792
@@ -206,7 +225,7 @@ if(WIN32)
 else()
   set(_dirname "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 endif()
-f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins "${_dirname}/${CMAKE_SHARED_LIBRARY_PREFIX}f3d${CMAKE_SHARED_LIBRARY_SUFFIX}" NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
+f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins=${_dirname}/${CMAKE_SHARED_LIBRARY_PREFIX}f3d${CMAKE_SHARED_LIBRARY_SUFFIX} NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
 
 if(NOT F3D_MACOS_BUNDLE)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
@@ -222,6 +241,7 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestDefaultConfigFileTIFF DATA logo.tif CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
   f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS THRESHOLD 100)
   f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+  f3d_test(NAME TestDefaultConfigTranslucent DATA red_translucent_monkey.gltf CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
 
   # no-background test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8501
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
@@ -413,7 +433,8 @@ if(F3D_MODULE_EXTERNAL_RENDERING)
 endif()
 
 if(F3D_PLUGIN_BUILD_ALEMBIC)
-  f3d_test(NAME TestABC DATA suzanne.abc ARGS --load-plugins=alembic DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+  f3d_test(NAME TestABC DATA suzanne.abc ARGS -s --load-plugins=alembic DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+  f3d_test(NAME TestABCNonFaceVarying DATA tetrahedron_non_facevarying_uv.abc ARGS -s --load-plugins=alembic DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
@@ -429,6 +450,7 @@ endif()
 
 if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestOFF DATA teapot.off ARGS --up=+Z --load-plugins=assimp)
+  f3d_test(NAME Test3MF DATA cube_gears.3mf ARGS --load-plugins=assimp DEFAULT_LIGHTS) # Using default lights because of ResetCamera
   f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p --load-plugins=assimp DEFAULT_LIGHTS) # Using default lights because of ResetCamera
   f3d_test(NAME TestFBX DATA phong_cube.fbx ARGS --load-plugins=assimp DEFAULT_LIGHTS) # Using default lights because of ResetCamera
   f3d_test(NAME TestFBX16bits DATA 16bit.fbx ARGS --load-plugins=assimp THRESHOLD 70 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
@@ -441,6 +463,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "LOD3sp")
     f3d_test(NAME TestTGATextureFBX DATA duck.fbx ARGS --load-plugins=assimp)
     f3d_test(NAME TestDAE DATA duck.dae ARGS --load-plugins=assimp)
+    f3d_test(NAME TestX DATA anim_test.x ARGS --load-plugins=assimp)
 
     # To increase coverage of some specific animation code path when looping
     f3d_test(NAME TestInteractionFBXBoneAnimation DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 --animation-speed-factor=100 INTERACTION NO_BASELINE)#Space;Wait;Space;
@@ -553,6 +576,52 @@ if(F3D_PLUGIN_BUILD_OCCT)
   endif()
 endif()
 
+if(F3D_PLUGIN_BUILD_USD)
+  f3d_test(NAME TestUSD DATA suzanne.usd ARGS --load-plugins=usd DEFAULT_LIGHTS)
+  f3d_test(NAME TestUSDAPrimitives DATA primitives.usda ARGS --load-plugins=usd DEFAULT_LIGHTS)
+  f3d_test(NAME TestUSDAPrimitivesZAxis DATA primitivesZ.usda ARGS --load-plugins=usd DEFAULT_LIGHTS)
+  f3d_test(NAME TestUSDAInstancing DATA instancing.usda ARGS --load-plugins=usd DEFAULT_LIGHTS)
+  f3d_test(NAME TestUSDAGlyphs DATA glyphs.usda ARGS --load-plugins=usd DEFAULT_LIGHTS)
+  f3d_test(NAME TestUSDInvalid DATA invalid.usd REGEXP "Failed to open layer" ARGS --load-plugins=usd NO_BASELINE)
+
+  # This test is there to test occlusion texture and face-varying point data
+  # TODO: Note that the result looks incorrect because of face-varying attributes and must be fixed later
+  f3d_test(NAME TestUSDTeapot DATA Teapot.usd ARGS --load-plugins=usd DEFAULT_LIGHTS)
+
+  # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8224
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210805) # for embedded material support
+    f3d_test(NAME TestUSDZAnimated DATA AnimatedCube.usdz ARGS --load-plugins=usd --animation-time=0.3)
+
+    # The threshold is quite high because of macos
+    # However, the PNSR is >30db which is acceptable
+    f3d_test(NAME TestUSDZMaterials DATA McUsd.usdz ARGS --load-plugins=usd --camera-position=1055,912,-247 --camera-focal-point=69,173,63 THRESHOLD 280)
+  endif()
+
+  if(NOT F3D_MACOS_BUNDLE)
+    file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
+    f3d_test(NAME TestDefaultConfigFileUSD DATA suzanne.usd CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+
+    if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
+      file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
+      f3d_test(NAME TestThumbnailConfigFileUSD DATA suzanne.usd CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+    endif()
+  endif()
+endif()
+
+if(F3D_PLUGIN_BUILD_VDB)
+  f3d_test(NAME TestVDBVolume DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --inverse DEFAULT_LIGHTS)
+  f3d_test(NAME TestVDBPoints DATA sphere_points.vdb ARGS --load-plugins=vdb -o DEFAULT_LIGHTS)
+  f3d_test(NAME TestVDBVerbose DATA icosahedron.vdb ARGS --load-plugins=vdb REGEXP "PartitionedDataSet" NO_RENDER)
+
+  if(NOT F3D_MACOS_BUNDLE)
+    file(COPY "${F3D_SOURCE_DIR}/plugins/vdb/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
+    f3d_test(NAME TestDefaultConfigFileVDB DATA icosahedron.vdb CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+
+    file(COPY "${F3D_SOURCE_DIR}/plugins/vdb/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
+    f3d_test(NAME TestThumbnailConfigFileVDB DATA icosahedron.vdb CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+  endif()
+endif ()
+
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestMultiplePluginsLoad DATA cow.vtp ARGS --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()
@@ -632,7 +701,22 @@ f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CM
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
 
 # Simple verbosity test
-f3d_test(NAME TestVerbose DATA dragon.vtu ARGS --verbose REGEXP "Number of points: 13268\nNumber of cells: 26532" NO_RENDER)
+f3d_test(NAME TestVerbose DATA dragon.vtu ARGS --verbose REGEXP "Number of points: 13268\nNumber of cells: 26532" NO_BASELINE)
+
+# Test verbose quiet
+f3d_test(NAME TestVerboseQuiet DATA mb.vtm ARGS --verbose=quiet REGEXP_FAIL "A non data set block was ignored while reading a multiblock." NO_BASELINE)
+
+# Test verbose error
+f3d_test(NAME TestVerboseError DATA mb.vtm ARGS --verbose=error REGEXP_FAIL "A non data set block was ignored while reading a multiblock." NO_BASELINE)
+
+# Test verbose warning, rely on the log::info about image comparison
+f3d_test(NAME TestVerboseWarning DATA cow.vtp ARGS --verbose=warning REGEXP_FAIL "Image comparison success with an error difference of" DEFAULT_LIGHTS)
+
+# Test verbose debug
+f3d_test(NAME TestVerboseDebug DATA dragon.vtu ARGS --verbose REGEXP "Number of points: 13268\nNumber of cells: 26532" NO_BASELINE)
+
+# Test verbose invalid verbose value
+f3d_test(NAME TestVerboseInvalid DATA dragon.vtu ARGS --verbose=invalid REGEXP "Unrecognized verbose level" NO_BASELINE)
 
 # Unknown scalar array verbosity test
 f3d_test(NAME TestVerboseWrongArray DATA dragon.vtu ARGS --scalars=dummy --verbose REGEXP "Unknown scalar array: dummy" NO_BASELINE)
@@ -647,7 +731,13 @@ f3d_test(NAME TestIncorrectComponent DATA dragon.vtu ARGS -s --comp=4 REGEXP "In
 f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --scalars --roughness=1 --colormap=0,1,0,0,1,0,1 REGEXP "Specified color map list count is not a multiple of 4, ignoring it." NO_BASELINE)
 
 # Test opening a directory
-f3d_test(NAME TestVerboseDirectory DATA mb REGEXP "Loading: .*mb_._0.vt." NO_RENDER)
+f3d_test(NAME TestVerboseDirectory DATA mb REGEXP "Loading 3D geometry: .*mb_._0.vt." NO_RENDER)
+
+# Test opening multiple file and rendering only one
+f3d_test(NAME TestVerboseMultiFileRender DATA mb REGEXP "An output image was saved using a single 3D file, other provided 3D files were ignored." NO_BASELINE)
+if (NOT F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON) # DEFAULT_LIGHTS cannot be used here because the regexp text would not be reached
+  f3d_test(NAME TestVerboseMultiFileCompare DATA mb REGEXP "Image comparison was performed using a single 3D file, other provided 3D files were ignored.")
+endif ()
 
 # Test Animation invalid code paths
 f3d_test(NAME TestVerboseAnimationIndexError2 DATA cow.vtp ARGS --animation-index=1 --verbose REGEXP "An animation index has been specified but there are no animation available." NO_BASELINE)
@@ -675,13 +765,13 @@ f3d_test(NAME TestVerboseVolumeNoArray DATA cow.vtp ARGS -v REGEXP "Cannot use v
 f3d_test(NAME TestVerboseNoArray DATA cow.vtp ARGS -s REGEXP "No array to color with" NO_BASELINE)
 
 # Test non existent file, do not create nonExistentFile.vtp
-f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose REGEXP "File \".*nonExistentFile.vtp\" does not exist" NO_RENDER)
+f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp REGEXP "File \".*nonExistentFile.vtp\" does not exist" NO_RENDER)
 
 # Test non existent font file, do not create nonExistentFile.ttf
 f3d_test(NAME TestVerboseNonExistentFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/nonExistentFile.ttf REGEXP "Cannot find \".*nonExistentFile.ttf\" font file" NO_BASELINE)
 
-# Test non existent file, do not create nonExistentFile.vtp
-f3d_test(NAME TestQuietNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose --quiet REGEXP_FAIL "File \".*nonExistentFile.vtp\" does not exist" NO_RENDER)
+# Test quiet with a non existent file
+f3d_test(NAME TestQuietNonExistentFile DATA nonExistentFile.vtp ARGS --verbose=quiet --no-render REGEXP_FAIL "File \".*nonExistentFile.vtp\" does not exist")
 
 # Test non supported file, do not add support for .dummy file.
 f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename REGEXP ".*unsupportedFile.dummy\" is not a file of a supported file format" NO_RENDER)
@@ -693,7 +783,7 @@ f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${F3D_
 f3d_test(NAME TestInvalidGeometry DATA invalid.vtp REGEXP "A reader did not produce any output" NO_BASELINE)
 
 # Test invalid full scene file XXX should be improved
-f3d_test(NAME TestInvalidFullScene DATA invalid.gltf ARGS --verbose REGEXP "Loading full scene" NO_BASELINE)
+f3d_test(NAME TestInvalidFullScene DATA invalid.gltf ARGS --verbose REGEXP "Loading 3D scene" NO_BASELINE)
 
 # Test invalid texture
 f3d_test(NAME TestInvalidTexture DATA cow.vtp ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open texture file" NO_BASELINE)
@@ -701,8 +791,9 @@ f3d_test(NAME TestInvalidTexture DATA cow.vtp ARGS --texture-material=${F3D_SOUR
 # Test non existent interaction file, do not add a TestNonExistentInteraction
 f3d_test(NAME TestNonExistentInteraction DATA cow.vtp INTERACTION REGEXP "Interaction record file to play does not exist" NO_BASELINE)
 
-# Test invalid options, do not add a --colour option
-f3d_test(NAME TestInvalidOption ARGS --colour=1,0,0 REGEXP "Did you mean '--color'?")
+# Test unknown options, do not add a --colour option
+f3d_test(NAME TestUnknownOptionVerbose ARGS --colour=1,0,0 REGEXP "Did you mean '--color'?")
+f3d_test(NAME TestUnknownOptionExitCode ARGS --colour=1,0,0 WILL_FAIL)
 
 # Test non-existent config filepath, do not add a dummy.json
 f3d_test(NAME TestNonExistentConfigFilePath DATA cow.vtp CONFIG "${F3D_SOURCE_DIR}/testing/configs/dummy.json" REGEXP "Configuration file does not exist" NO_BASELINE)
@@ -717,14 +808,19 @@ f3d_test(NAME TestNonExistentConfigFileStem DATA cow.vtp CONFIG "dummy" REGEXP "
 f3d_test(NAME TestInvalidConfigFile DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid.json REGEXP "Unable to parse the configuration file" NO_BASELINE)
 
 # Test quiet in config file
-f3d_test(NAME TestConfigFileQuiet DATA nonExistentFile.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/quiet.json REGEXP_FAIL "File .*/testing/data/nonExistentFile.vtp does not exist" NO_RENDER)
+f3d_test(NAME TestConfigFileQuiet DATA nonExistentFile.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/quiet.json REGEXP_FAIL "File .*/testing/data/nonExistentFile.vtp does not exist" NO_BASELINE)
 
 # Test no file with config file
 f3d_test(NAME TestNoFileConfigFile CONFIG ${F3D_SOURCE_DIR}/testing/configs/verbose.json ARGS --verbose REGEXP "No file to load provided." NO_BASELINE)
 
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
-f3d_test(NAME TestHelpPositional ARGS --help REGEXP "--input")
+f3d_test(NAME TestHelpPositional ARGS --help REGEXP "file1 file2 \.\.\.")
+if (NOT F3D_EXCLUDE_DEPRECATED)
+  f3d_test(NAME TestDeprecatedHelpInput ARGS --help REGEXP "--input")
+  f3d_test(NAME TestDeprecatedInput ARGS --input a.b REGEXP "--input option is deprecated")
+  f3d_test(NAME TestDeprecatedQuietNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose --quiet --no-render REGEXP_FAIL "File \".*nonExistentFile.vtp\" does not exist" NO_BASELINE)
+endif()
 
 # Test version display
 f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")
@@ -740,13 +836,13 @@ set_tests_properties(f3d::TestNoDryRun PROPERTIES TIMEOUT 2)
 f3d_test(NAME TestNoRef DATA cow.vtp WILL_FAIL)
 
 # Test failure without a reference and without an output, please do not create a TestNoRef.png file
-f3d_test(NAME TestNoRefNoOutput DATA cow.vtp ARGS --ref ${F3D_SOURCE_DIR}/testing/baselines/TestNoRef.png REGEXP "use the output option to output current rendering into an image file." NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestNoRefNoOutput DATA cow.vtp ARGS --ref=${F3D_SOURCE_DIR}/testing/baselines/TestNoRef.png REGEXP "use the output option to output current rendering into an image file." NO_BASELINE NO_OUTPUT)
 
 # Test failure with a bad reference, please do not create a good TestBadRef.png file
 f3d_test(NAME TestBadRef DATA cow.vtp WILL_FAIL)
 
 # Test failure with a bad reference without an output, please do not create a good TestBadRef.png file
-f3d_test(NAME TestBadRefNoOutput DATA cow.vtp ARGS --ref ${F3D_SOURCE_DIR}/testing/baselines/TestBadRef.png REGEXP "Use the --output option to be able to output current rendering and diff images into files." NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestBadRefNoOutput DATA cow.vtp ARGS --ref=${F3D_SOURCE_DIR}/testing/baselines/TestBadRef.png REGEXP "Use the --output option to be able to output current rendering and diff images into files." NO_BASELINE NO_OUTPUT)
 
 # Test failure with a bad interaction play file, please do not create a dummy.log
 f3d_test(NAME TestPlayNoFile DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/dummy.log WILL_FAIL)

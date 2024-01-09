@@ -84,7 +84,7 @@ window_impl::window_impl(const options& options, Type type)
     this->Internals->RenWin->SetWindowInfo("jni");
 #endif
   }
-
+  this->Internals->RenWin->SetWindowName("f3d");
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);

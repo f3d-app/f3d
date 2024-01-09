@@ -1,9 +1,9 @@
 {
-  ".*(fbx|dae|off|dxf)":
+  ".*(fbx|dae|off|dxf|x|3mf)":
   {
     "load-plugins": "assimp"
   },
-  ".*(off)":
+  ".*(off|3mf)":
   {
     "up": "+Z",
     "camera-direction": "-1,1,-0.5"

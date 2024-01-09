@@ -23,6 +23,7 @@
 class vtkActor;
 class vtkVolume;
 class vtkMultiBlockDataSet;
+class vtkPartitionedDataSetCollection;
 class vtkPointGaussianMapper;
 class vtkPolyDataMapper;
 class vtkSmartVolumeMapper;
@@ -62,6 +63,8 @@ public:
    * Static methods to recover information about data
    */
   static std::string GetMultiBlockDescription(vtkMultiBlockDataSet* mb, vtkIndent indent);
+  static std::string GetPartitionedDataSetCollectionDescription(
+    vtkPartitionedDataSetCollection* pdc, vtkIndent indent);
   static std::string GetDataObjectDescription(vtkDataObject* object);
   static std::string GetMetaDataDescription(vtkDataObject* object);
   ///@}

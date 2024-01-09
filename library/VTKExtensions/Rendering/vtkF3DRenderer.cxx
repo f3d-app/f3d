@@ -487,11 +487,21 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       }
 
       double gridPos[3] = { 0, 0, 0 };
-      if (!this->GridAbsolute)
+      if (this->GridAbsolute)
       {
         for (int i = 0; i < 3; i++)
         {
-          double size = bounds[2 * i + 1] - bounds[2 * i];
+          gridPos[i] = this->UpVector[i] ? 0 : 0.5 * (bounds[2 * i] + bounds[2 * i + 1]);
+        }
+      }
+      else
+      {
+        for (int i = 0; i < 3; i++)
+        {
+          // a small margin is added to the size to avoid z-fighting if large translucent
+          // triangles are exactly aligned with the grid bounds
+          constexpr double margin = 1.0001;
+          double size = margin * (bounds[2 * i + 1] - bounds[2 * i]);
           gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
         }
       }
@@ -507,6 +517,8 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       gridMapper->SetUnitSquare(tmpUnitSquare);
       gridMapper->SetSubdivisions(this->GridSubdivisions);
       gridMapper->SetUpIndex(this->UpIndex);
+      if (this->GridAbsolute)
+        gridMapper->SetOriginOffset(-gridPos[0], -gridPos[1], -gridPos[2]);
 
       this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
       this->GridActor->ForceTranslucentOn();
@@ -911,7 +923,7 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
       unsigned int size = spec->GetPrefilterSize();
 
       vtkNew<vtkMultiBlockDataSet> mb;
-      mb->SetNumberOfBlocks(6 * nbLevels);
+      mb->SetNumberOfBlocks(nbLevels);
 
       for (unsigned int i = 0; i < nbLevels; i++)
       {

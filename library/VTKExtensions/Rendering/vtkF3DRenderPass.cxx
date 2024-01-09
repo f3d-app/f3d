@@ -275,7 +275,7 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
 
     ssImpl << "  vec4 mainSample = texture(texMain, texCoord);\n";
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20230824)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20230824)
     // vtkOSPRayPass output convention changed
     // It was sRGB before and it's now is linear color space
     // We need to make the conversion to sRGB ourselves

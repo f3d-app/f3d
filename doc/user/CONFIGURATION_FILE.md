@@ -60,7 +60,7 @@ The following command-line options <b> cannot </b> be set via config file:
 `help`, `version`, `readers-list`, `config`, `dry-run`.
 
 The following command-line options <b>can only</b> be set in the global block of the config file:
-`no-render`, `inputs`, `output`, `quiet`, `verbose`, `resolution`, `position` and all testing options.
+`no-render`, `inputs`, `output`, `verbose`, `resolution`, `position` and all testing options.
 
 Boolean options that have been turned on in the configuration file can be turned
 off on the command line if needed, eg: `--point-sprites=false`.

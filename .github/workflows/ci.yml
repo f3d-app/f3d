@@ -24,7 +24,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -52,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
+        vtk_version: [commit, v9.3.0, v9.2.6, v9.1.0, v9.0.0]
         include:
           - raytracing_label: raytracing
           - vtk_version: v9.0.0
@@ -62,7 +62,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -85,7 +85,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
+        vtk_version: [commit, v9.3.0, v9.2.6, v9.1.0, v9.0.0]
         build_type: [standard]
         include:
           - raytracing_label: raytracing
@@ -121,7 +121,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -148,7 +148,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.2.6, v9.1.0, v9.0.0]
+        vtk_version: [commit, v9.3.0, v9.2.6, v9.1.0, v9.0.0]
         cpu: [x86_64, arm64]
         bundle_label: [no-bundle]
         include:
@@ -163,7 +163,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -198,7 +198,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -227,7 +227,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -265,7 +265,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -297,7 +297,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -323,7 +323,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source/f3d'
         fetch-depth: 0
@@ -346,14 +346,10 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
-    env:
-      NDK_VERSION: r21e
-      API_LEVEL: 27
-
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -379,7 +375,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
