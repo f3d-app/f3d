@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(python-render-interact)
 
+find_package(f3d REQUIRED)
+
 # Simple testing
 if(BUILD_TESTING)
   enable_testing()
