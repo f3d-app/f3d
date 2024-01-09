@@ -6,7 +6,7 @@
  * The list of supported file format is available here:
  * https://github.com/assimp/assimp/blob/master/doc/Fileformats.md
  *
- * The following formats have been tested and are supported by f3d: FBX, DAE, OFF, DXF
+ * The following formats have been tested and are supported by f3d: FBX, DAE, OFF, DXF, X, 3MF
  */
 
 #ifndef vtkF3DAssimpImporter_h

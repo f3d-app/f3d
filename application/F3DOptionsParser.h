@@ -34,8 +34,7 @@ struct F3DAppOptions
 
   std::vector<int> Resolution{ 1000, 600 };
   std::vector<int> Position{ 0 };
-  bool Quiet = false;
-  bool Verbose = false;
+  std::string VerboseLevel = "info";
   double CameraAzimuthAngle = 0.0;
   double CameraElevationAngle = 0.0;
   std::vector<double> CameraFocalPoint = { 0 };

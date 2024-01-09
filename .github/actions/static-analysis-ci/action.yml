@@ -29,8 +29,8 @@ runs:
         cd dependencies
         mkdir install
 
-    - name: Install TBB
-      uses: ./source/.github/actions/tbb-install-dep
+    - name: Install VTK dependencies
+      uses: ./source/.github/actions/vtk-dependencies
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -45,6 +45,8 @@ runs:
       working-directory: ${{github.workspace}}
       run: mkdir build
 
+    # CMAKE_MODULE_PATH is required because of
+    # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}/build
@@ -55,6 +57,7 @@ runs:
         --warn-uninitialized
         -DBUILD_TESTING=ON
         -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_MODULE_PATH=$(pwd)/../dependencies/install/lib/cmake/OpenVDB/
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_MODULE_EXR=ON
@@ -62,6 +65,8 @@ runs:
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
         -DF3D_PLUGIN_BUILD_OCCT=ON
+        -DF3D_PLUGIN_BUILD_USD=ON
+        -DF3D_PLUGIN_BUILD_VDB=ON
         -DF3D_STRICT_BUILD=ON
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 

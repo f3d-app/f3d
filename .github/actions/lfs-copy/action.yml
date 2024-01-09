@@ -28,7 +28,7 @@ runs:
       if: |
         steps.cache-lfs.outputs.cache-hit != 'true' &&
         inputs.workflow_label == 'producer'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'lfs_data'
         fetch-depth: 0
@@ -59,7 +59,7 @@ runs:
         steps.cache-lfs.outputs.cache-hit != 'true' &&
         steps.download-artifact.outcome != 'success' &&
         inputs.workflow_label == 'consumer'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'lfs_data'
         fetch-depth: 0

@@ -15,15 +15,15 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/tbb_install
-        key: tbb-v2021.9.0-${{runner.os}}-${{inputs.cpu}}-0
+        key: tbb-v2021.10.0-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout TBB
       if: steps.cache-tbb.outputs.cache-hit != 'true'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: oneapi-src/oneTBB
         path: './dependencies/tbb'
-        ref: v2021.9.0
+        ref: v2021.10.0
 
     - name: Setup TBB
       if: steps.cache-tbb.outputs.cache-hit != 'true'

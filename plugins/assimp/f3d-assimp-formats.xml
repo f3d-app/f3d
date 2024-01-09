@@ -12,4 +12,8 @@
     <comment>Object File Format</comment>
     <glob pattern="*.off"/>
   </mime-type>
+  <mime-type type="application/vnd.x">
+    <comment>DirectX File Format</comment>
+    <glob pattern="*.x"/>
+  </mime-type>
 </mime-info>

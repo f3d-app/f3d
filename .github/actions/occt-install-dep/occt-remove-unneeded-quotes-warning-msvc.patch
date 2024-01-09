@@ -1,0 +1,25 @@
+From 2cae159acd7e4f2ba52422d0a750183fddf05b85 Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Wed, 25 Oct 2023 08:18:51 +0200
+Subject: [PATCH] remove unneeded quotes warning msvc
+
+---
+ adm/cmake/occt_defs_flags.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/adm/cmake/occt_defs_flags.cmake b/adm/cmake/occt_defs_flags.cmake
+index 33b50e8ce7..d942b40f22 100644
+--- a/adm/cmake/occt_defs_flags.cmake
++++ b/adm/cmake/occt_defs_flags.cmake
+@@ -26,7 +26,7 @@ endif()
+ 
+ if (MSVC)
+   # suppress C26812 on VS2019/C++20 (prefer 'enum class' over 'enum')
+-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:precise /wd\"26812\"")
++  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:precise /wd26812")
+   # suppress warning on using portable non-secure functions in favor of non-portable secure ones
+   add_definitions (-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE)
+ else()
+-- 
+2.42.0
+

@@ -274,6 +274,8 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool allOptionsInitialized,
   bool parseCommandLine)
 {
+  inputs.clear(); /* needed because this function is called multiple times */
+
   this->FilePathForConfigBlock = std::move(filePathForConfigBlock);
 
   // When parsing multiple times, hasDefault should be forced to yes after the first pass as all
@@ -284,16 +286,19 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 #ifndef F3D_NO_DEPRECATED
   // Deprecated options that needs further processing
   std::string deprecatedHDRI;
+  std::vector<std::string> deprecatedInputs;
+  bool deprecatedQuiet = false;
 #endif
 
   try
   {
     cxxopts::Options cxxOptions(this->ExecutableName, F3D::AppTitle);
-    cxxOptions.positional_help("file1 file2 ...");
-
+    cxxOptions.custom_help("[OPTIONS...] file1 file2 ...");
     // clang-format off
     auto grp0 = cxxOptions.add_options("Applicative");
-    this->DeclareOption(grp0, "input", "", "Input files", inputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
+#ifndef F3D_NO_DEPRECATED
+    this->DeclareOption(grp0, "input", "", "Input files (deprecated)", deprecatedInputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
+#endif
     this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
     this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "help", "h", "Print help");
@@ -301,14 +306,16 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp0, "readers-list", "", "Print the list of readers");
     this->DeclareOption(grp0, "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations.", appOptions.UserConfigFile,  LocalHasDefaultNo, MayHaveConfig::NO , "<filePath/filename/fileStem>");
     this->DeclareOption(grp0, "dry-run", "", "Do not read the configuration file", appOptions.DryRun,  HasDefault::YES, MayHaveConfig::NO );
-    this->DeclareOption(grp0, "no-render", "", "Verbose mode without any rendering, only for the first file", appOptions.NoRender,  HasDefault::YES, MayHaveConfig::YES );
+    this->DeclareOption(grp0, "no-render", "", "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.", appOptions.NoRender,  HasDefault::YES, MayHaveConfig::YES );
     this->DeclareOption(grp0, "max-size", "", "Maximum size in Mib of a file to load, negative value means unlimited", appOptions.MaxSize,  HasDefault::YES, MayHaveConfig::YES, "<size in Mib>");
     this->DeclareOption(grp0, "load-plugins", "", "List of plugins to load separated with a comma", appOptions.Plugins, LocalHasDefaultNo, MayHaveConfig::YES, "<paths or names>");
     this->DeclareOption(grp0, "scan-plugins", "", "Scan some directories for plugins (result can be incomplete)");
 
     auto grp1 = cxxOptions.add_options("General");
-    this->DeclareOption(grp1, "verbose", "", "Enable verbose mode, providing more information about the loaded data in the console output", appOptions.Verbose,  HasDefault::YES, MayHaveConfig::YES );
-    this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which supersede any verbose options and prevent any console output to be generated at all", appOptions.Quiet,  HasDefault::YES, MayHaveConfig::YES );
+    this->DeclareOption(grp1, "verbose", "", "Set verbose level, providing more information about the loaded data in the console output", appOptions.VerboseLevel, HasDefault::YES, MayHaveConfig::YES, "{debug, info, warning, error, quiet}", HasImplicitValue::YES, "debug");
+#ifndef F3D_NO_DEPRECATED
+    this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which supersede any verbose options and prevent any console output to be generated at all (deprecated, using `--verbose=quiet` instead)", deprecatedQuiet,  HasDefault::YES, MayHaveConfig::YES );
+#endif
     this->DeclareOption(grp1, "progress", "", "Show progress bar", options.getAsBoolRef("ui.loader-progress"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", appOptions.GeometryOnly, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "group-geometries", "", "When opening multiple files, show them all in the same scene. Force geometry-only. The configuration file for the first file will be loaded.", appOptions.GroupGeometries, HasDefault::YES, MayHaveConfig::NO);
@@ -322,6 +329,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", options.getAsIntRef("scene.camera.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
     this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", options.getAsBoolRef("interactor.trackball"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "invert-zoom", "", "Invert zoom direction with right mouse click", options.getAsBoolRef("interactor.invert-zoom"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "animation-autoplay", "", "Automatically start animation", options.getAsBoolRef("scene.animation.autoplay"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.getAsIntRef("scene.animation.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
     this->DeclareOption(grp1, "animation-speed-factor", "", "Set animation speed factor", options.getAsDoubleRef("scene.animation.speed-factor"), HasDefault::YES, MayHaveConfig::YES, "<factor>");
     this->DeclareOption(grp1, "animation-time", "", "Set animation time to load", options.getAsDoubleRef("scene.animation.time"), HasDefault::YES, MayHaveConfig::YES, "<time>");
@@ -401,22 +409,37 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp7, "interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", appOptions.InteractionTestPlayFile, LocalHasDefaultNo, MayHaveConfig::YES,"<file_path>");
     // clang-format on
 
-    cxxOptions.positional_help("file1 file2 ...");
-    cxxOptions.parse_positional({ "input" });
-    cxxOptions.show_positional_help();
     cxxOptions.allow_unrecognised_options();
 
     if (parseCommandLine)
     {
       auto result = cxxOptions.parse(this->Argc, this->Argv);
 
-      auto unmatched = result.unmatched();
-
-      if (unmatched.size() > 0)
+#ifndef F3D_NO_DEPRECATED
+      for (const std::string& input : deprecatedInputs)
       {
-        for (std::string unknownOption : unmatched)
+        /* `deprecatedInputs` may contain an empty string instead of being empty itself */
+        if (!input.empty())
+        {
+          f3d::log::warn("--input option is deprecated, please use positional arguments instead.");
+          break;
+        }
+      }
+      inputs = deprecatedInputs;
+#endif
+
+      auto unmatched = result.unmatched();
+      bool found_unknown_option = false;
+      for (std::string unknownOption : unmatched)
+      {
+        if (!unknownOption.empty() && unknownOption[0] != '-')
+        {
+          inputs.push_back(unknownOption);
+        }
+        else
         {
           f3d::log::error("Unknown option '", unknownOption, "'");
+          found_unknown_option = true;
 
           // check if it's a long option
           if (unknownOption.substr(0, 2) == "--")
@@ -438,11 +461,19 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
             f3d::log::error("Did you mean '--", name, "'?");
           }
         }
+      }
+      if (found_unknown_option)
+      {
         f3d::log::waitForUser();
-        throw F3DExNoProcess("unknown options");
+        throw F3DExFailure("unknown options");
       }
 
 #ifndef F3D_NO_DEPRECATED
+      if (deprecatedQuiet)
+      {
+        appOptions.VerboseLevel = "quiet";
+      }
+
       if (!deprecatedHDRI.empty())
       {
         options.set("render.hdri.file", deprecatedHDRI);

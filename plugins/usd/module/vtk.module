@@ -1,0 +1,12 @@
+NAME
+  f3d::VTKExtensionsUSDReader
+DESCRIPTION
+  A VTK module for the USD plugin
+DEPENDS
+  VTK::CommonCore
+  VTK::FiltersGeneral
+  VTK::FiltersSources
+  VTK::IOImport
+  VTK::IOImage
+TEST_DEPENDS
+  VTK::TestingCore

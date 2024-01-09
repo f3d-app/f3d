@@ -28,8 +28,8 @@ runs:
         cd dependencies
         mkdir install
 
-    - name: Install TBB
-      uses: ./source/.github/actions/tbb-install-dep
+    - name: Install VTK dependencies
+      uses: ./source/.github/actions/vtk-dependencies
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -40,7 +40,7 @@ runs:
       uses: ./source/.github/actions/f3d-dependencies
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
@@ -61,25 +61,34 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/install
       run: echo "CMAKE_PREFIX_PATH=$(pwd)" >> $GITHUB_ENV
 
-    - name: Escaping backslashes Windows
+    - name: WORKSPACE env var with escaped backslashes Windows
       if: runner.os == 'Windows'
       shell: bash
-      run: echo "ESCAPED_WS=${{github.workspace}}" | tr '\\' '/' >> $GITHUB_ENV
+      run: echo "WORKSPACE=${{github.workspace}}" | tr '\\' '/' >> $GITHUB_ENV
 
+    - name: WORKSPACE env var not windows
+      if: runner.os != 'Windows'
+      shell: bash
+      run: echo "WORKSPACE=$(pwd)" >> $GITHUB_ENV
+
+    # VDB has some linking issue on macOS, disabling for now
     - name: Set SKBUILD_CMAKE_ARGS
       shell: bash
       run: >
-        echo "SKBUILD_CMAKE_ARGS=-DF3D_DEPENDENCIES_DIR=${{ env.ESCAPED_WS }}/dependencies/install/bin;
+        echo "SKBUILD_CMAKE_ARGS=-DF3D_DEPENDENCIES_DIR=${{ env.WORKSPACE }}/dependencies/install/bin;
+        -DCMAKE_MODULE_PATH=${{ env.WORKSPACE }}/dependencies/install/lib/cmake/OpenVDB/;
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON;
         -DF3D_PLUGIN_BUILD_ASSIMP=ON;
         -DF3D_PLUGIN_BUILD_DRACO=ON;
         -DF3D_PLUGIN_BUILD_OCCT=ON;
+        -DF3D_PLUGIN_BUILD_USD=ON;
+        -DF3D_PLUGIN_BUILD_VDB=${{ runner.os == 'macOS' && 'OFF' || 'ON' }};
         -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=ON;
         -DF3D_MODULE_EXR=ON;
         -DF3D_MODULE_EXTERNAL_RENDERING=ON" >> $GITHUB_ENV
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
@@ -89,7 +98,7 @@ runs:
       run: python -m pip -v wheel .
 
     - name: Upload wheel
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         path: ./source/*.whl
         name: ${{runner.os}}-wheel

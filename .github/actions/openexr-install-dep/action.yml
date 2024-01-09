@@ -15,15 +15,15 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/openexr_install
-        key: openexr-v3.1.8-${{runner.os}}-${{inputs.cpu}}-0
+        key: openexr-v3.2.1-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: AcademySoftwareFoundation/openexr
         path: './dependencies/openexr'
-        ref: v3.1.8
+        ref: v3.2.1
 
     - name: Setup OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'

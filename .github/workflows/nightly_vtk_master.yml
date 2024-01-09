@@ -18,7 +18,7 @@ jobs:
     steps:
 
     - name: Checkout VTK
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: Kitware/VTK
         submodules: false
@@ -48,7 +48,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -79,7 +79,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -115,7 +115,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -146,7 +146,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -187,7 +187,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -215,14 +215,10 @@ jobs:
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
-    env:
-      NDK_VERSION: r21e
-      API_LEVEL: 27
-
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0
@@ -250,7 +246,7 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 0

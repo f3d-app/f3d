@@ -3,16 +3,43 @@
 ## Ongoing development
 
 For F3D users:
+ - Added `--animation-autoplay` option (libf3d: `scene.animation.autoplay`) to automatically start animation on file load.
+ - Added an experimental VDB reader for .vdb files using OpenVDB
+ - Changed `--verbose` into a string based option, eg: `--verbose=quiet` or `--verbose=debug`. `--verbose` is still supported.
+ - Changed `--no-render` behavior so that it doesn't impact verbosity anymore
+ - Deprecated `--quiet`, use `--verbose=quiet` instead.
+ - Reading EXR files is now multi-threaded and much faster.
+ - Translucency support is now enabled by default.
+ - A small margin is added between the model and the grid to avoid potential z-fighting.
+ - Add 3MF and X files support (part of `assimp` plugin)
+ - Fix potential crashes when reading `assimp` plugin file format
+
+For libf3d users:
+ - Added `scene.animation.autoplay` option.
+ - Added a `f3d::image::saveBuffer` API to save an image as a file format in memory.
+
+For F3D packagers:
+ - Added a new optional dependency through VTK, OpenVDB
+
+## v2.2.1
+
+For F3D users:
+ - Added a native Apple Silicon release package
  - Added new options `hdri-file`, `hdri-ambient`, `hdri-skybox` to have more control on the HDRI behavior
  - Added a default HDRI used when providing no `hdri-file`
  - Added bindings to toggle HDRI ambient lighting (`F`) and HDRI skybox (`J`)
  - Added bindings to move the camera to standard locations: `1`: Front, `3`: Right, `7`: Top, `9`: Isometric
  - Added [Open CASCADE BRep format](https://dev.opencascade.org/doc/overview/html/specification__brep_format.html) to the OCCT plugin.
+ - Fixed an infamous issue when the Windows thumbnailer always steal the focus
  - Fixed an issue with the binary release when opening draco files
  - Fixed an issue with matcap textures
  - Fixed an issue with HDRI lighting
  - Fixed an issue with HDRI lighting when dropping HDRI after a model
+ - Fixed an issue where invalid option would not show on Windows
+ - Fixed an issue where previously loaded file would stay visible
+ - Fixed an issue when loading invalid EXR file as HDRI
  - Fixed cheatsheet menu rendering under 'Drop File Instructor'
+ - Fixed raytracing rendering issues
  - Improved cheatsheet menu contrast for any background color
  - Improved overall text contrast for any background color
  - Improved performance when changing model and using a HDRI
@@ -29,6 +56,7 @@ For libf3d users:
 For developers:
  - Added a deprecation framework
  - Removed `F3D_TESTING_ENABLE_HDRI_TESTS` cmake option and merged it with `F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS`
+ - Added a Getting Started guide for beginners developers
 
 For F3D packagers:
  - Fixed compatibility with FreeBSD

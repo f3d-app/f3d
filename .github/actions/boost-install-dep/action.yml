@@ -1,0 +1,73 @@
+name: 'Install Boost Dependency'
+description: 'Install Boost Dependency using cache when possible'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache Boost
+      id: cache-boost
+      uses: actions/cache@v3
+      with:
+        path: dependencies/boost_install
+        key: boost-1.83.0-${{runner.os}}-${{inputs.cpu}}-3
+
+    - name: Checkout Boost
+      if: steps.cache-boost.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: boostorg/boost
+        submodules: true
+        fetch-depth: 0
+        path: './dependencies/boost'
+        ref: boost-1.83.0
+
+    - name: Setup Boost
+      if: steps.cache-boost.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir boost_build
+        mkdir boost_install
+
+    - name: Configure Boost
+      if: steps.cache-boost.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/boost
+      shell: bash
+      run: ./bootstrap.sh
+
+    # Windows require msvc toolset to avoid mingw being picked up instead
+    # fPIC is needed for clang
+    # NO_ZSTD is needed on macOS for some reason
+    - name: Build Boost
+      if: steps.cache-boost.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/boost
+      shell: bash
+      run: >
+        ./b2
+        --prefix='../boost_install'
+        --build-dir='../boost_build'
+        variant='release'
+        link=static
+        runtime-link=shared
+        cxxflags="-fPIC"
+        ${{ runner.os == 'Windows' && 'toolset=msvc' || null }}
+        ${{ inputs.cpu == 'arm64' && 'architecture=arm' || null }}
+        --with-date_time
+        --with-filesystem
+        --with-program_options
+        --with-regex
+        --with-system
+        --with-iostreams
+        -sNO_ZSTD=1
+        install
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/boost_install
+      shell: bash
+      run: cp -r ./* ../install/

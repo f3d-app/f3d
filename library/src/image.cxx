@@ -4,6 +4,7 @@
 #include "init.h"
 
 #include <vtkBMPWriter.h>
+#include <vtkDataArrayRange.h>
 #include <vtkImageData.h>
 #include <vtkImageDifference.h>
 #include <vtkImageReader2.h>
@@ -13,10 +14,10 @@
 #include <vtkPointData.h>
 #include <vtkSmartPointer.h>
 #include <vtkTIFFWriter.h>
+#include <vtkUnsignedCharArray.h>
 #include <vtksys/SystemTools.hxx>
 
 #include <cassert>
-#include <vector>
 
 namespace f3d
 {
@@ -24,6 +25,22 @@ class image::internals
 {
 public:
   vtkSmartPointer<vtkImageData> Image;
+
+  template<typename WriterType>
+  std::vector<unsigned char> SaveBuffer()
+  {
+    vtkNew<WriterType> writer;
+    writer->WriteToMemoryOn();
+    writer->SetInputData(this->Image);
+    writer->Write();
+
+    std::vector<unsigned char> result;
+
+    auto valRange = vtk::DataArrayValueRange(writer->GetResult());
+    std::copy(valRange.begin(), valRange.end(), std::back_inserter(result));
+
+    return result;
+  }
 };
 
 //----------------------------------------------------------------------------
@@ -287,6 +304,22 @@ void image::save(const std::string& path, SaveFormat format) const
   if (writer->GetErrorCode() != 0)
   {
     throw write_exception("Cannot write " + path);
+  }
+}
+
+//----------------------------------------------------------------------------
+std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
+{
+  switch (format)
+  {
+    case SaveFormat::PNG:
+      return this->Internals->SaveBuffer<vtkPNGWriter>();
+    case SaveFormat::JPG:
+      return this->Internals->SaveBuffer<vtkJPEGWriter>();
+    case SaveFormat::BMP:
+      return this->Internals->SaveBuffer<vtkBMPWriter>();
+    default:
+      throw write_exception("Cannot save to buffer in the specified format");
   }
 }
 

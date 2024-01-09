@@ -76,7 +76,7 @@ VTKExtensions are separated in different modules.
 - Rendering, that depends on Core and implements the rendering specificities of F3D
 - Applicative, the depends on all other VTKExtension modules and provide services for the libf3d library
 
-The libf3d implements the whole logic of instancing and manipulating the different VTK classes, it is fully documented [here](doc/libf3d/README.md).
+The libf3d implements the whole logic of instancing and manipulating the different VTK classes, it is fully documented [here](doc/libf3d/README_LIBF3D.md).
 
 The F3D application itself uses the libf3d but adds an applicative layer on top of it, especially the handling of [command line options](doc/user/OPTIONS.md)
 and [configuration file](doc/user/CONFIGURATION_FILE.md).

@@ -1,13 +1,11 @@
 // remove some checks
 missingInclude
 unusedFunction
+unknownMacro
 
 // external libraries
 *:external/nlohmann_json/nlohmann/json.hpp
 *:external/cxxopts/cxxopts.hpp
-
-// opencascade
-*:*opencascade/*.hxx
 
 // specific checks
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
