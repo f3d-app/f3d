@@ -46,7 +46,8 @@ Other options can be toggled directly by pressing the following hotkeys:
 * <kbd>K</kbd>: trackball interaction mode.
 * <kbd>F</kbd>: HDRI ambient lighting.
 * <kbd>J</kbd>: the display of the HDRI skybox.
-* <kbd>L</kbd>: increase (+Shift: decrease) lights intensity.
+* <kbd>L</kbd>: increase lights intensity.
+* <kbd>Shift</kbd>+<kbd>L</kbd>: decrease lights intensity.
 
 Note that some hotkeys can be available or not depending on the file being loaded and the F3D configuration.
 

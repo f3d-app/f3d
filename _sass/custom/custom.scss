@@ -4,12 +4,11 @@ kbd {
     --kbd-color-border: #959396;
     --kbd-color-text: #27262b;
 
-    // Match the page defaults in light mode but
-    // switch to a light-ish grey in dark mode
+    // Background/text colors
     background-color: var(--kbd-color-background);
     color: var(--kbd-color-text);
 
-    // Round off the corners like physical keys have
+    // Border/shadow
     border-radius: 0.25rem;
     background-clip: padding-box;
     border: 1px solid var(--kbd-color-border);
@@ -18,6 +17,7 @@ kbd {
     // Remove the text cursor
     cursor: default;
 
+    // text style
     font-size: 0.75em;
     line-height: 1;
     min-width: 0.75rem;
@@ -28,7 +28,7 @@ kbd {
     top: -1px;
 
     // Push effect on hover
-    &:hover {
+    &:hover, li:hover & {
         box-shadow: 0 1px 0 0.5px var(--kbd-color-border);
         top: 1px;
     }
