@@ -637,50 +637,50 @@ void vtkF3DGenericImporter::CycleAnimations(CycleType type)
     default:
       break;
   }
+}
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::CycleAnimationsForGLTF()
+{
 
-  //----------------------------------------------------------------------------
-  void vtkF3DGenericImporter::CycleAnimationsForGLTF()
+  assert(this->Importer);
+
+  int nIndex = this->Importer->GetNumberOfAnimations();
+  if (nIndex <= 0)
   {
-
-    assert(this->Importer);
-
-    int nIndex = this->Importer->GetNumberOfAnimations();
-    if (nIndex <= 0)
-    {
-      return;
-    }
-
-    if (this->HasAnimation)
-    {
-      this->ArrayIndexForAnimation = (this->ArrayIndexForAnimation + 1) % nIndex;
-    }
-    else
-    {
-      // Cycle through arrays looping back to -1
-      // -1 0 1 2 -1 0 1 2 ...
-      this->ArrayIndexForAnimation = (this->ArrayIndexForAnimation + 2) % (nIndex + 1) - 1;
-    }
+    return;
   }
 
-  //----------------------------------------------------------------------------
-  std::string vtkF3DGenericImporter::GetAnimationDescription()
+  if (this->HasAnimation)
   {
-    if (!this->Importer)
-      s
-      {
-        return "";
-      }
-
-    std::stringstream stream;
-    vtkF3DGenericImporter::AnimationInfo info;
-    if (this->Importer->GetInfoForAnimation(this->HasAnimation, this->ArrayIndexForAnimation, info))
-    {
-      stream << "Current Animation " << info.Name << ", "
-             << vtkF3DGenericImporter::ComponentToString(this->ComponentForAnimation) << "\n";
-    }
-    else
-    {
-      stream << "Not animating\n";
-    }
-    return stream.str();
+    this->ArrayIndexForAnimation = (this->ArrayIndexForAnimation + 1) % nIndex;
   }
+  else
+  {
+    // Cycle through arrays looping back to -1
+    // -1 0 1 2 -1 0 1 2 ...
+    this->ArrayIndexForAnimation = (this->ArrayIndexForAnimation + 2) % (nIndex + 1) - 1;
+  }
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DGenericImporter::GetAnimationDescription()
+{
+  if (!this->Importer)
+    s
+    {
+      return "";
+    }
+
+  std::stringstream stream;
+  vtkF3DGenericImporter::AnimationInfo info;
+  if (this->Importer->GetInfoForAnimation(this->HasAnimation, this->ArrayIndexForAnimation, info))
+  {
+    stream << "Current Animation " << info.Name << ", "
+           << vtkF3DGenericImporter::ComponentToString(this->ComponentForAnimation) << "\n";
+  }
+  else
+  {
+    stream << "Not animating\n";
+  }
+  return stream.str();
+}
