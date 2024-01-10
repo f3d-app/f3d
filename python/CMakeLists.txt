@@ -3,9 +3,10 @@ cmake_minimum_required(VERSION 3.21)
 project(pyf3d)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}/cmake")
+include(GNUInstallDirs)
 include(f3dPython)
 
-find_package(Python 3.6 COMPONENTS Interpreter Development)
+find_package(Python 3.8 COMPONENTS Interpreter Development)
 find_package(pybind11 2.2 REQUIRED)
 
 pybind11_add_module(pyf3d MODULE F3DPythonBindings.cxx)
@@ -13,6 +14,7 @@ pybind11_add_module(pyf3d MODULE F3DPythonBindings.cxx)
 # In case pyf3d is built separately, we need to retrieve the existing libf3d
 if(PROJECT_IS_TOP_LEVEL)
   find_package(f3d REQUIRED)
+  set(F3D_VERSION "${f3d_VERSION}")
   target_link_libraries(pyf3d PRIVATE f3d::libf3d)
   target_include_directories(pyf3d PRIVATE "${f3d_INCLUDE_DIR}/f3d")
 else()
@@ -21,6 +23,8 @@ endif()
 
 set(f3d_python_package_name "f3d")
 set(f3d_python_package_suffix "python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages")
+
+get_property(F3D_MULTI_CONFIG_GENERATOR GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 set(f3d_module_dir "${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>/${f3d_python_package_name}")
 
 set_target_properties(pyf3d PROPERTIES
@@ -49,7 +53,11 @@ endif()
 set(F3D_ABSOLUTE_DLLS_FIXUP "")
 set(F3D_RELATIVE_DLLS_FIXUP "")
 if(WIN32)
-  f3d_python_windows_dll_fixup(PATHS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "$<TARGET_FILE_DIR:VTK::CommonCore>" OUTPUT F3D_ABSOLUTE_DLLS_FIXUP)
+  if(PROJECT_IS_TOP_LEVEL)
+    f3d_python_windows_dll_fixup(PATHS "$<TARGET_FILE_DIR:f3d::libf3d>" OUTPUT F3D_ABSOLUTE_DLLS_FIXUP)
+  else()
+    f3d_python_windows_dll_fixup(PATHS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "$<TARGET_FILE_DIR:VTK::CommonCore>" OUTPUT F3D_ABSOLUTE_DLLS_FIXUP)
+  endif()
 endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
