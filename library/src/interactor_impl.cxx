@@ -170,6 +170,14 @@ public:
     // Available keycodes: W
     switch (keyCode)
     {
+      case 'W':
+        if (renWithAnimation)
+        {
+          renWithAnimation->CycleAnimations();
+          self->Window.PrintAnimationDescription(log::VerboseLevel::DEBUG);
+          checkAnimation = true;
+          render = true;
+        }
       case 'C':
         if (renWithColor)
         {
@@ -485,10 +493,7 @@ public:
   std::function<bool(const std::vector<std::string>&)> DropFilesUserCallBack =
     [](const std::vector<std::string>&) { return false; };
 
-  void StartInteractor()
-  {
-    this->VTKInteractor->Start();
-  }
+  void StartInteractor() { this->VTKInteractor->Start(); }
 
   void StopInteractor()
   {
