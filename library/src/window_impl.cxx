@@ -486,6 +486,18 @@ void window_impl::PrintColoringDescription(log::VerboseLevel level)
     }
   }
 }
+//----------------------------------------------------------------------------
+void window_impl::PrintAnimationDescription(log::VerboseLevel level)
+{
+  if (this->Internals->WithAnimation)
+  {
+    std::string descr = this->Internals->Renderer->GetAnimationDescription();
+    if (!descr.empty())
+    {
+      log::print(level, descr);
+    }
+  }
+}
 
 //----------------------------------------------------------------------------
 vtkRenderWindow* window_impl::GetRenderWindow()
