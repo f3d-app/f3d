@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.21)
 project(pyf3d)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}/cmake")
-include(f3dPython)
 include(GNUInstallDirs)
+include(f3dPython)
 
 find_package(Python 3.6 COMPONENTS Interpreter Development)
 find_package(pybind11 2.2 REQUIRED)
