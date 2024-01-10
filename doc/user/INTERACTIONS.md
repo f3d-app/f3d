@@ -18,55 +18,56 @@ Simple interaction with the displayed data is possible directly within the windo
 
 The coloring can be controlled directly by pressing the following hotkeys:
 
-* `C`: cycle between coloring with array from point data and from cell data.
-* `S`: cycle the array to color with.
-* `Y`: cycle the component of the array to color with.
+* <kbd>C</kbd>: cycle between coloring with array from point data and from cell data.
+* <kbd>S</kbd>: cycle the array to color with.
+* <kbd>Y</kbd>: cycle the component of the array to color with.
 
 See the [coloring cycle](#cycling-coloring) section for more info.
 
 Other options can be toggled directly by pressing the following hotkeys:
 
-* `B`: display of the scalar bar, only when coloring and not using direct scalars.
-* `V`: volume rendering.
-* `I`: opacity function inversion during volume rendering.
-* `O`: point sprites rendering.
-* `P`: translucency support.
-* `Q`: ambient occlusion.
-* `A`: anti-aliasing.
-* `T`: tone mapping.
-* `E`: the display of cell edges.
-* `X`: the trihedral axes display.
-* `G`: the horizontal grid display.
-* `N`: the display of the file name.
-* `M`: the display of the metadata if exists.
-* `Z`: the display of the FPS counter.
-* `R`: raytracing.
-* `D`: the denoiser when raytracing.
-* `U`: background blur, useful with an HDRI skybox.
-* `K`: trackball interaction mode.
-* `F`: HDRI ambient lighting.
-* `J`: the display of the HDRI skybox.
-* `L`: increase (+Shift: decrease) lights intensity.
+* <kbd>B</kbd>: display of the scalar bar, only when coloring and not using direct scalars.
+* <kbd>V</kbd>: volume rendering.
+* <kbd>I</kbd>: opacity function inversion during volume rendering.
+* <kbd>O</kbd>: point sprites rendering.
+* <kbd>P</kbd>: translucency support.
+* <kbd>Q</kbd>: ambient occlusion.
+* <kbd>A</kbd>: anti-aliasing.
+* <kbd>T</kbd>: tone mapping.
+* <kbd>E</kbd>: the display of cell edges.
+* <kbd>X</kbd>: the trihedral axes display.
+* <kbd>G</kbd>: the horizontal grid display.
+* <kbd>N</kbd>: the display of the file name.
+* <kbd>M</kbd>: the display of the metadata if exists.
+* <kbd>Z</kbd>: the display of the FPS counter.
+* <kbd>R</kbd>: raytracing.
+* <kbd>D</kbd>: the denoiser when raytracing.
+* <kbd>U</kbd>: background blur, useful with an HDRI skybox.
+* <kbd>K</kbd>: trackball interaction mode.
+* <kbd>F</kbd>: HDRI ambient lighting.
+* <kbd>J</kbd>: the display of the HDRI skybox.
+* <kbd>L</kbd>: increase lights intensity.
+* <kbd>Shift</kbd>+<kbd>L</kbd>: decrease lights intensity.
 
 Note that some hotkeys can be available or not depending on the file being loaded and the F3D configuration.
 
 Camera Hotkeys:
-* `1`: front view camera.
-* `3`: right view camera.
-* `7`: top view camera.
-* `9`: isometric view camera.
-* `ENTER`: reset the camera to its initial parameters.
+* <kbd>1</kbd>: front view camera.
+* <kbd>3</kbd>: right view camera.
+* <kbd>7</kbd>: top view camera.
+* <kbd>9</kbd>: isometric view camera.
+* <kbd>Enter</kbd>: reset the camera to its initial parameters.
 
 Other hotkeys are available:
 
-* `H`: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
-* `?`: key to print scene description to the terminal.
-* `ESC`: close the window and quit F3D.
-* `SPACE`: play the animation if any.
-* `LEFT`: load the previous file if any.
-* `RIGHT`: load the next file if any.
-* `UP`: reload the current file without resetting the camera.
-* `DOWN`: add current file parent directory to the list of files, reload the current file and reset the camera.
+* <kbd>H</kbd>: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
+* <kbd>?</kbd>: key to print scene description to the terminal.
+* <kbd>Esc</kbd>: close the window and quit F3D.
+* <kbd>Space</kbd>: play the animation if any.
+* <kbd>&larr;</kbd>: load the previous file if any.
+* <kbd>&rarr;</kbd>: load the next file if any.
+* <kbd>&uarr;</kbd>: reload the current file without resetting the camera.
+* <kbd>&darr;</kbd>: add current file parent directory to the list of files, reload the current file and reset the camera.
 
 When loading another file or reloading, options that have been changed interactively are kept but can be overridden
 if a dedicated regular expression block in the configuration file is present, see the [configuration file](CONFIGURATION_FILE.md)
@@ -76,10 +77,10 @@ documentation for more info.
 
 When using the default scene, the following hotkeys let you cycle the coloring of the data:
 
-* `C`: cycle between point data and cell data - field data is not supported.
-* `S`: cycle the array available on the currently selected data in alphabetical order,
+* <kbd>C</kbd>: cycle between point data and cell data - field data is not supported.
+* <kbd>S</kbd>: cycle the array available on the currently selected data in alphabetical order,
 skipping array not containing numeric data. It will loop back to not coloring unless using volume rendering.
-* `Y`: cycle the component available on the currently selected array, looping to -2 for direct scalars rendering.
+* <kbd>Y</kbd>: cycle the component available on the currently selected array, looping to -2 for direct scalars rendering.
 
 When changing the array, the component in use will be kept if valid with the new array, if not it will be cycled until a valid
 component is found.
