@@ -53,7 +53,7 @@ endif()
 set(F3D_ABSOLUTE_DLLS_FIXUP "")
 set(F3D_RELATIVE_DLLS_FIXUP "")
 if(WIN32)
-  f3d_python_windows_dll_fixup(PATHS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "$<TARGET_FILE_DIR:VTK::CommonCore>" OUTPUT F3D_ABSOLUTE_DLLS_FIXUP)
+  f3d_python_windows_dll_fixup(PATHS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} "$<TARGET_FILE_DIR:VTK::CommonCore>" OUTPUT F3D_ABSOLUTE_DLLS_FIXUP)
 endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
