@@ -416,6 +416,22 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
       auto result = cxxOptions.parse(this->Argc, this->Argv);
 
 #ifndef F3D_NO_DEPRECATED
+      if (deprecatedQuiet)
+      {
+        f3d::log::warn("--quiet option is deprecated, please use --verbose=quiet instead.");
+        appOptions.VerboseLevel = "quiet";
+      }
+
+      if (!deprecatedHDRI.empty())
+      {
+        options.set("render.hdri.file", deprecatedHDRI);
+        options.set("render.hdri.ambient", true);
+        options.set("render.background.skybox", true);
+
+        f3d::log::warn("--hdri option is deprecated, please use --hdri-file, --hdri-ambient and "
+                       "--hdri-skybox instead.");
+      }
+
       for (const std::string& input : deprecatedInputs)
       {
         /* `deprecatedInputs` may contain an empty string instead of being empty itself */
@@ -467,23 +483,6 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
         f3d::log::waitForUser();
         throw F3DExFailure("unknown options");
       }
-
-#ifndef F3D_NO_DEPRECATED
-      if (deprecatedQuiet)
-      {
-        appOptions.VerboseLevel = "quiet";
-      }
-
-      if (!deprecatedHDRI.empty())
-      {
-        options.set("render.hdri.file", deprecatedHDRI);
-        options.set("render.hdri.ambient", true);
-        options.set("render.background.skybox", true);
-
-        f3d::log::warn("--hdri option is deprecated, please use --hdri-file, --hdri-ambient and "
-                       "--hdri-skybox instead.");
-      }
-#endif
 
       if (result.count("help") > 0)
       {

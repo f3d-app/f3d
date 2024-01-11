@@ -21,7 +21,7 @@ Options|Default|Description
 
 Options|Default|Description
 ------|------|------
-\-\-verbose=\<[debug\|info\|warning\|error\|quiet]\>|info| Set *verbose* level, in order to provide more information about the loaded data in the console output. If no level is providen, assume `debug`.
+\-\-verbose=\<[debug\|info\|warning\|error\|quiet]\>|info| Set *verbose* level, in order to provide more information about the loaded data in the console output. If no level is providen, assume `debug`. Option parsing may ignore this flag.
 \-\-progress||Show a *progress bar* when loading the file.
 \-\-geometry-only||For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-group-geometries||When opening multiple files, show them all in the same scene.<br>Force geometry-only. The configuration file for the first file will be loaded.
