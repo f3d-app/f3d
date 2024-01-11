@@ -19,7 +19,7 @@ should work for other OSes as stated, as long as listed packages are available.
 ### Install dependencies
 
 First make sure your system is up-to-date,
-then install the required dependencies using the terminal.
+then install the required dependencies (nlohmann-json, hdf5, netcdf, ospray, fmt and verdict) using the terminal.
 
 #### Debian/Ubuntu/Mint
 
