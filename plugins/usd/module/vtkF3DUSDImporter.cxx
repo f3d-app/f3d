@@ -1,5 +1,7 @@
 #include "vtkF3DUSDImporter.h"
 
+#include "vtkF3DFaceVaryingPolyData.h"
+
 #include <vtkActor.h>
 #include <vtkCapsuleSource.h>
 #include <vtkConeSource.h>
@@ -192,45 +194,41 @@ public:
           polydata = this->MeshMap[meshPrim.GetPath().GetAsString()];
           bool meshAlreadyExists = (polydata != nullptr);
 
-          if (!meshAlreadyExists)
-          {
-            polydata = vtkSmartPointer<vtkPolyData>::New();
-          }
-
-          // read normals
+          // attributes
           pxr::UsdAttribute normalsAttr = meshPrim.GetNormalsAttr();
-
-          if (meshPrim.GetNormalsInterpolation() == pxr::UsdGeomTokens->vertex)
-          {
-            // only vertex interpolation is supported for now
-            // there are many datasets using faceVarying to represent sharp edges
-            // but it is not supported by VTK so points have to be duplicated manually
-            // See https://github.com/f3d-app/f3d/issues/1074
-            if (!meshAlreadyExists || normalsAttr.ValueMightBeTimeVarying())
-            {
-              pxr::VtArray<pxr::GfVec3f> normals;
-              normalsAttr.Get(&normals, timeCode);
-
-              vtkNew<vtkFloatArray> vNormals;
-              vNormals->SetName("Normals");
-              vNormals->SetNumberOfComponents(3);
-              vNormals->Allocate(normals.size());
-
-              for (const pxr::GfVec3f& n : normals)
-              {
-                vNormals->InsertNextTuple3(n[0], n[1], n[2]);
-              }
-
-              polydata->GetPointData()->SetNormals(vNormals);
-            }
-          }
-
-          // read uvs
           pxr::UsdGeomPrimvar uvAttr =
             pxr::UsdGeomPrimvarsAPI(meshPrim).GetPrimvar(pxr::TfToken("st"));
+          pxr::UsdAttribute pointsAttr = meshPrim.GetPointsAttr();
+          pxr::UsdAttribute facesCountAttr = meshPrim.GetFaceVertexCountsAttr();
+          pxr::UsdAttribute facesIndicesAttr = meshPrim.GetFaceVertexIndicesAttr();
 
-          if (!meshAlreadyExists || uvAttr.ValueMightBeTimeVarying())
+          // Check if the mesh has to be rebuilt
+          if (!meshAlreadyExists || normalsAttr.ValueMightBeTimeVarying() || uvAttr.ValueMightBeTimeVarying()
+          || pointsAttr.ValueMightBeTimeVarying() || facesCountAttr.ValueMightBeTimeVarying()
+          || facesIndicesAttr.ValueMightBeTimeVarying())
           {
+            vtkNew<vtkPolyData> newPolyData;
+
+            bool normalsFV = meshPrim.GetNormalsInterpolation() == pxr::UsdGeomTokens->faceVarying;
+            bool uvsFV = uvAttr.GetInterpolation() == pxr::UsdGeomTokens->faceVarying;
+
+            // normals
+            pxr::VtArray<pxr::GfVec3f> normals;
+            normalsAttr.Get(&normals, timeCode);
+
+            vtkNew<vtkFloatArray> vNormals;
+            vNormals->SetName("Normals");
+            vNormals->SetNumberOfComponents(3);
+            vNormals->Allocate(normals.size());
+
+            for (const pxr::GfVec3f& n : normals)
+            {
+              vNormals->InsertNextTuple3(n[0], n[1], n[2]);
+            }
+
+            newPolyData->GetPointData()->SetNormals(vNormals);
+
+            // uvs
             pxr::VtArray<pxr::GfVec2f> uvs;
             uvAttr.Get(&uvs, timeCode);
 
@@ -246,15 +244,10 @@ public:
                 texCoords->InsertNextTuple2(uv[0], uv[1]);
               }
 
-              polydata->GetPointData()->SetTCoords(texCoords);
+              newPolyData->GetPointData()->SetTCoords(texCoords);
             }
-          }
 
-          // read points
-          pxr::UsdAttribute pointsAttr = meshPrim.GetPointsAttr();
-
-          if (!meshAlreadyExists || pointsAttr.ValueMightBeTimeVarying())
-          {
+            // points
             pxr::VtArray<pxr::GfVec3f> positions;
             pointsAttr.Get(&positions, timeCode);
 
@@ -265,16 +258,9 @@ public:
               points->InsertNextPoint(p[0], p[1], p[2]);
             }
 
-            polydata->SetPoints(points);
-          }
+            newPolyData->SetPoints(points);
 
-          // read polys
-          pxr::UsdAttribute facesCountAttr = meshPrim.GetFaceVertexCountsAttr();
-          pxr::UsdAttribute facesIndicesAttr = meshPrim.GetFaceVertexIndicesAttr();
-
-          if (!meshAlreadyExists || facesCountAttr.ValueMightBeTimeVarying() ||
-            facesIndicesAttr.ValueMightBeTimeVarying())
-          {
+            // faces
             pxr::VtArray<int> counts;
             facesCountAttr.Get(&counts, timeCode);
 
@@ -293,7 +279,15 @@ public:
               std::advance(currentCellIt, c);
             }
 
-            polydata->SetPolys(cells);
+            newPolyData->SetPolys(cells);
+
+            vtkNew<vtkF3DFaceVaryingPolyData> faceVaryingFilter;
+            faceVaryingFilter->SetInputData(newPolyData);
+            faceVaryingFilter->SetNormalsFaceVarying(normalsFV);
+            faceVaryingFilter->SetTCoordsFaceVarying(uvsFV);
+            faceVaryingFilter->Update();
+
+            polydata = faceVaryingFilter->GetOutput();
           }
         }
         else if (prim.IsA<pxr::UsdGeomSphere>())
@@ -478,7 +472,7 @@ public:
 
           // get associated material/shader
           pxr::UsdShadeMaterial material =
-            pxr::UsdShadeMaterialBindingAPI(geomPrim).ComputeBoundMaterial();
+            pxr::UsdShadeMaterialBindingAPI(geomPrim).ComputeBoundMaterial(pxr::UsdShadeTokens->preview);
 
           if (material)
           {

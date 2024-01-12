@@ -15,6 +15,9 @@ public:
   static vtkF3DFaceVaryingPolyData* New();
   vtkTypeMacro(vtkF3DFaceVaryingPolyData, vtkPolyDataAlgorithm);
 
+  vtkSetMacro(NormalsFaceVarying, bool);
+  vtkSetMacro(TCoordsFaceVarying, bool);
+
 protected:
   vtkF3DFaceVaryingPolyData();
   ~vtkF3DFaceVaryingPolyData() override;
@@ -24,6 +27,9 @@ protected:
 private:
   vtkF3DFaceVaryingPolyData(const vtkF3DFaceVaryingPolyData&) = delete;
   void operator=(const vtkF3DFaceVaryingPolyData&) = delete;
+
+  bool NormalsFaceVarying = false;
+  bool TCoordsFaceVarying = false;
 };
 
 #endif
