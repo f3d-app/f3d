@@ -124,6 +124,29 @@ public:
     // simple range-for iteration
     for (pxr::UsdPrim prim : pxr::UsdPrimSiblingRange(node.GetAllChildren()))
     {
+      if (prim.IsA<pxr::UsdGeomImageable>())
+      {
+        pxr::UsdGeomImageable imageable = pxr::UsdGeomImageable(prim);
+
+        pxr::TfToken visibility;
+        pxr::UsdAttribute visAttr = imageable.GetVisibilityAttr();
+        if (visAttr && visAttr.HasAuthoredValue() && visAttr.Get(&visibility, timeCode) &&
+          visibility == pxr::UsdGeomTokens->invisible)
+        {
+          // not visible, skip
+          continue;
+        }
+
+        pxr::TfToken purpose;
+        pxr::UsdAttribute purpAttr = imageable.GetPurposeAttr();
+        if (purpAttr && purpAttr.HasAuthoredValue() && purpAttr.Get(&purpose, timeCode) &&
+          (purpose == pxr::UsdGeomTokens->proxy || purpose == pxr::UsdGeomTokens->guide))
+        {
+          // proxy, skip
+          continue;
+        }
+      }
+
       if (prim.IsInstance())
       {
         pxr::UsdGeomXform xform = pxr::UsdGeomXform(prim);
