@@ -1,4 +1,5 @@
 set(classes
+  vtkF3DFaceVaryingPolyData
   vtkF3DUSDImporter
   )
 
