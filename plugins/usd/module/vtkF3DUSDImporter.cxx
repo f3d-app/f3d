@@ -196,8 +196,11 @@ public:
 
           // attributes
           pxr::UsdAttribute normalsAttr = meshPrim.GetNormalsAttr();
+
+          // TODO: on the TV model, the UV to use are called "perfuv" instead of "st"
+          // "st" is used for the "full" material
           pxr::UsdGeomPrimvar uvAttr =
-            pxr::UsdGeomPrimvarsAPI(meshPrim).GetPrimvar(pxr::TfToken("perfuv"));
+            pxr::UsdGeomPrimvarsAPI(meshPrim).GetPrimvar(pxr::TfToken("st"));
           pxr::UsdAttribute pointsAttr = meshPrim.GetPointsAttr();
           pxr::UsdAttribute facesCountAttr = meshPrim.GetFaceVertexCountsAttr();
           pxr::UsdAttribute facesIndicesAttr = meshPrim.GetFaceVertexIndicesAttr();
@@ -491,6 +494,7 @@ public:
           actor = vtkSmartPointer<vtkActor>::New();
 
           // get associated material/shader
+          // TODO: which material (preview vs full vs default) and how to get associated primvar
           pxr::UsdShadeMaterial material =
             pxr::UsdShadeMaterialBindingAPI(geomPrim).ComputeBoundMaterial(pxr::UsdShadeTokens->preview);
 
