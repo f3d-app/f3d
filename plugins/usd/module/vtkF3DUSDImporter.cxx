@@ -197,7 +197,7 @@ public:
           // attributes
           pxr::UsdAttribute normalsAttr = meshPrim.GetNormalsAttr();
           pxr::UsdGeomPrimvar uvAttr =
-            pxr::UsdGeomPrimvarsAPI(meshPrim).GetPrimvar(pxr::TfToken("st"));
+            pxr::UsdGeomPrimvarsAPI(meshPrim).GetPrimvar(pxr::TfToken("perfuv"));
           pxr::UsdAttribute pointsAttr = meshPrim.GetPointsAttr();
           pxr::UsdAttribute facesCountAttr = meshPrim.GetFaceVertexCountsAttr();
           pxr::UsdAttribute facesIndicesAttr = meshPrim.GetFaceVertexIndicesAttr();
@@ -237,11 +237,31 @@ public:
               vtkNew<vtkFloatArray> texCoords;
               texCoords->SetName("TCoords");
               texCoords->SetNumberOfComponents(2);
-              texCoords->Allocate(uvs.size());
 
-              for (const pxr::GfVec2f& uv : uvs)
+              if (uvAttr.IsIndexed())
               {
-                texCoords->InsertNextTuple2(uv[0], uv[1]);
+                pxr::UsdAttribute indicesAttr = uvAttr.GetIndicesAttr();
+
+                pxr::VtArray<int> indices;
+                if (indicesAttr.Get(&indices) && indices.size() > 0)
+                {
+                  texCoords->Allocate(indices.size());
+
+                  for (int index : indices)
+                  {
+                    const pxr::GfVec2f& uv = uvs[index];
+                    texCoords->InsertNextTuple2(uv[0], uv[1]);
+                  }
+                }
+              }
+              else
+              {
+                texCoords->Allocate(uvs.size());
+
+                for (const pxr::GfVec2f& uv : uvs)
+                {
+                  texCoords->InsertNextTuple2(uv[0], uv[1]);
+                }
               }
 
               newPolyData->GetPointData()->SetTCoords(texCoords);
