@@ -359,7 +359,6 @@ jobs:
       uses: ./source/.github/actions/android-ci
       with:
         arch: ${{matrix.arch}}
-        vtk_version: v9.3.0 # TODO: change to master, see https://gitlab.kitware.com/vtk/vtk/-/issues/19126
 
 #----------------------------------------------------------------------------
 # webassembly: Check build of F3D for webassembly
