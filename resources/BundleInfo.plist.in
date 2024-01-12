@@ -432,6 +432,22 @@
 					<string>vdb</string>
 				</array>
 			</dict>
+			<!-- USD -->
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>Universal Scene Description format</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>usd</string>
+					<string>usda</string>
+					<string>usdc</string>
+					<string>usdz</string>
+				</array>
+			</dict>
 			<!-- File type associations -->
 		</array>
 	</dict>
