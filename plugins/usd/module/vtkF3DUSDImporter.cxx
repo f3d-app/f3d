@@ -140,7 +140,7 @@ public:
         pxr::TfToken purpose;
         pxr::UsdAttribute purpAttr = imageable.GetPurposeAttr();
         if (purpAttr && purpAttr.HasAuthoredValue() && purpAttr.Get(&purpose, timeCode) &&
-          purpose == pxr::UsdGeomTokens->proxy)
+          (purpose == pxr::UsdGeomTokens->proxy || purpose == pxr::UsdGeomTokens->guide))
         {
           // proxy, skip
           continue;
