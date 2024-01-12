@@ -583,6 +583,7 @@ if(F3D_PLUGIN_BUILD_USD)
   f3d_test(NAME TestUSDAInstancing DATA instancing.usda ARGS --load-plugins=usd DEFAULT_LIGHTS)
   f3d_test(NAME TestUSDAGlyphs DATA glyphs.usda ARGS --load-plugins=usd DEFAULT_LIGHTS)
   f3d_test(NAME TestUSDInvalid DATA invalid.usd REGEXP "Failed to open layer" ARGS --load-plugins=usd NO_BASELINE)
+  f3d_test(NAME TestUSDPurpose DATA purpose.usdc ARGS --load-plugins=usd DEFAULT_LIGHTS)
 
   # This test is there to test occlusion texture and face-varying point data
   # TODO: Note that the result looks incorrect because of face-varying attributes and must be fixed later
