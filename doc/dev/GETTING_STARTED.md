@@ -86,9 +86,14 @@ mkdir build
 
  * Open git bash
 
+Check the VCPKG baseline in `vcpkg.json` at the root of f3d source directory.  
+It should be `c9140a3b500812ad3206317885860d9553b93f13` (please let us know if it's not)
+
 ```sh
 cd C:/dev
 git clone https://github.com/Microsoft/vcpkg.git
+cd vcpkg
+git fetch origin c9140a3b500812ad3206317885860d9553b93f13
 ```
 
  * Open cmd
