@@ -418,20 +418,15 @@ public:
 
       bool pickSuccessful = false;
       double picked[3];
-      self->CellPicker->Pick(x, y, 0, renderer);
-      if (self->CellPicker->GetActors()->GetNumberOfItems() > 0)
+      if (self->CellPicker->Pick(x, y, 0, renderer))
       {
         self->CellPicker->GetPickPosition(picked);
         pickSuccessful = true;
       }
-      else
+      else if (self->PointPicker->Pick(x, y, 0, renderer))
       {
-        self->PointPicker->Pick(x, y, 0, renderer);
-        if (self->PointPicker->GetActors()->GetNumberOfItems() > 0)
-        {
-          self->PointPicker->GetPickPosition(picked);
-          pickSuccessful = true;
-        }
+        self->PointPicker->GetPickPosition(picked);
+        pickSuccessful = true;
       }
 
       if (pickSuccessful)
