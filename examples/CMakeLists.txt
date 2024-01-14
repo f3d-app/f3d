@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(libf3d-examples)
+project(examples)
 
 find_package(f3d REQUIRED)
 
