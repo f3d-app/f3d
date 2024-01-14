@@ -1,7 +1,3 @@
-cmake_minimum_required(VERSION 3.5)
-
-project(libf3d-examples)
-
 find_package(f3d REQUIRED)
 
 if(BUILD_TESTING)
