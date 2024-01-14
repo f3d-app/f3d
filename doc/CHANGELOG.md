@@ -26,6 +26,7 @@ For F3D users:
  - Fixed dependency issue with the headless .deb binary release
  - Fixed a crash when using a file with more than 254 bones (Requires OpenGL 4.3)
  - Fixed an issue with Unicode filenames on the title bar on Windows
+ - Fixed an issue where focal point picking would generate error messages
  - Changed `--verbose` into a string based option, eg: `--verbose=quiet` or `--verbose=debug`. `--verbose` is still supported.
  - Changed `--no-render` behavior so that it doesn't impact verbosity anymore
  - Changed the default configuration file so that translucency support is enabled by default
