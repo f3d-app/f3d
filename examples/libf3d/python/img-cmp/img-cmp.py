@@ -13,4 +13,9 @@ if __name__ == "__main__":
 
     result = img_0.compare(img_1, 50, diff, error)
 
-    sys.exit(0 if result else 1)
+    if result:
+        print("Images are identical")
+    else:
+        print("Images are different")
+
+    sys.exit(0)
