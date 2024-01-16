@@ -239,7 +239,7 @@ public:
             // texture coordinates
             for (const pxr::UsdGeomPrimvar& primVar : primVars)
             {
-              if (primVar.GetTypeName() == "texCoord2f[]")
+              if (primVar.GetTypeName() == "texCoord2f[]" || primVar.GetTypeName() == "float2[]")
               {
                 pxr::VtArray<pxr::GfVec2f> uvs;
                 primVar.Get(&uvs, timeCode);
