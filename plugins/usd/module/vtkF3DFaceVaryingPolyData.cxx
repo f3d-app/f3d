@@ -122,9 +122,9 @@ int vtkF3DFaceVaryingPolyData::RequestData(vtkInformation* vtkNotUsed(request),
       cell[j] = currentVertexIndex + j;
       newPoints->SetPoint(currentVertexIndex + j, originalPoints->GetPoint(cellPoints[j]));
 
-      for (vtkIdType i = 0; i < nbArrays; i++)
+      for (vtkIdType k = 0; k < nbArrays; k++)
       {
-        vtkDataArray* originalArray = originalPointData->GetArray(i);
+        vtkDataArray* originalArray = originalPointData->GetArray(k);
 
         vtkInformation* info = originalArray->GetInformation();
         int interpType = info->Get(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE());
