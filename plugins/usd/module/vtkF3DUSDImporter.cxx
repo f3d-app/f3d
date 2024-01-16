@@ -873,8 +873,11 @@ public:
         if (diffuseColorSampler)
         {
           auto image = this->GetVTKTexture(diffuseColorSampler, colorToken);
-          diffuseColorImage = image;
-          info->Copy(image->GetInformation());
+          if (image)
+          {
+            diffuseColorImage = image;
+            info->Copy(image->GetInformation());
+          }
         }
 
         // opacity
@@ -890,8 +893,11 @@ public:
         if (opacitySampler)
         {
           auto image = this->GetVTKTexture(opacitySampler, opacityToken);
-          opacityImage = image;
-          info->Copy(image->GetInformation());
+          if (image)
+          {
+            opacityImage = image;
+            info->Copy(image->GetInformation());
+          }
         }
 
         auto baseColor = this->CombineColorOpacityImage(diffuseColorImage, opacityImage);
@@ -946,8 +952,11 @@ public:
         {
           prop->SetRoughness(1.0);
           auto image = this->GetVTKTexture(roughnessSampler, roughnessToken);
-          roughnessImage = image;
-          info->Copy(image->GetInformation());
+          if (image)
+          {
+            roughnessImage = image;
+            info->Copy(image->GetInformation());
+          }
         }
 
         float metallicValue;
@@ -963,8 +972,11 @@ public:
         {
           prop->SetMetallic(1.0);
           auto image = this->GetVTKTexture(metallicSampler, metallicToken);
-          metallicImage = image;
-          info->Copy(image->GetInformation());
+          if (image)
+          {
+            metallicImage = image;
+            info->Copy(image->GetInformation());
+          }
         }
 
         pxr::UsdShadeInput occlusion = shaderPrim.GetInput(pxr::TfToken("occlusion"));
@@ -973,8 +985,11 @@ public:
         if (occlusionSampler)
         {
           auto image = this->GetVTKTexture(occlusionSampler, occlusionToken);
-          occlusionImage = image;
-          info->Copy(image->GetInformation());
+          if (image)
+          {
+            occlusionImage = image;
+            info->Copy(image->GetInformation());
+          }
         }
 
         auto orm = this->CombineORMImage(occlusionImage, roughnessImage, metallicImage);
