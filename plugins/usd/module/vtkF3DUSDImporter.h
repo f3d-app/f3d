@@ -25,6 +25,8 @@
 
 #include <memory>
 
+class vtkInformationStringKey;
+
 class vtkF3DUSDImporter : public vtkImporter
 {
 public:
@@ -52,6 +54,8 @@ public:
   {
     this->AnimationEnabled = false;
   }
+
+  static vtkInformationStringKey* TCOORDS_NAME();
 
 protected:
   vtkF3DUSDImporter();

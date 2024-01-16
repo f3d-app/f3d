@@ -31,6 +31,7 @@
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
 #include <vtkTriangleFilter.h>
+#include <vtkInformationStringKey.h>
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -279,7 +280,7 @@ public:
                   vtkInformation* info = texCoords->GetInformation();
                   info->Set(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE(), primVar.GetInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
 
-                  newPolyData->GetPointData()->SetTCoords(texCoords);
+                  newPolyData->GetPointData()->AddArray(texCoords);
                 }
               }
             }
@@ -506,7 +507,7 @@ public:
           actor = vtkSmartPointer<vtkActor>::New();
 
           // get associated material/shader
-          // TODO: which material (preview vs full vs default) and how to get associated primvar
+          // TODO: which material should we select? (preview vs full vs default)
           pxr::UsdShadeMaterial material =
             pxr::UsdShadeMaterialBindingAPI(geomPrim).ComputeBoundMaterial(
               pxr::UsdShadeTokens->preview);
@@ -515,12 +516,19 @@ public:
           {
             auto [shaderPrim, token] = this->GetConnectedShaderPrim(material.GetSurfaceOutput());
 
-            auto [prop, isTranslucent] = this->GetVTKProperty(shaderPrim);
+            auto prop = this->GetVTKProperty(shaderPrim);
             actor->SetProperty(prop);
-            if (isTranslucent)
+
+            // enable translucent flag if required
+            vtkTexture* baseColor = prop->GetTexture("albedoTex");
+            if (prop->GetOpacity() < 0.99 || (baseColor && baseColor->GetInput()->GetNumberOfScalarComponents() == 4))
             {
               actor->ForceTranslucentOn();
             }
+
+            // activate correct UV set
+            vtkInformation* info = prop->GetInformation();
+            polydata->GetPointData()->SetActiveAttribute(info->Get(vtkF3DUSDImporter::TCOORDS_NAME()), vtkDataSetAttributes::TCOORDS);
           }
           else
           {
@@ -759,6 +767,28 @@ public:
       }
     }
 
+    // get array name
+    auto [uvset, uvtoken] = this->GetConnectedShaderPrim(samplerPrim.GetInput(pxr::TfToken("st")));
+    std::string name = "st"; // default
+
+    if (uvset)
+    {
+      pxr::UsdShadeInput arrayName = uvset.GetInput(pxr::TfToken("varname"));
+
+      if (arrayName.GetTypeName() == "token")
+      {
+        pxr::TfToken tokenName;
+        if (arrayName.Get(&tokenName))
+        {
+          name = tokenName;
+        }
+      }
+      else if (arrayName.GetTypeName() == "string")
+      {
+        arrayName.Get(&name);
+      }
+    }
+
     // extract component based on token
     vtkNew<vtkImageExtractComponents> extract;
     extract->SetInputData(tex);
@@ -788,34 +818,18 @@ public:
     else
     {
       // just return the image as is
-      return { tex, "" };
+      return { tex, name };
     }
 
     extract->Update();
 
-    // get array name
-    auto [uvset, uvtoken] = this->GetConnectedShaderPrim(samplerPrim.GetInput(pxr::TfToken("st")));
-    std::string name = "st"; // default
-    if (uvset)
-    {
-      pxr::UsdShadeInput arrayName = uvset.GetInput(pxr::TfToken("varname"));
-
-      pxr::TfToken tokenName;
-      if (arrayName.Get(&tokenName))
-      {
-        name = tokenName;
-      }
-    }
-
     return { extract->GetOutput(), name };
   }
 
-  std::pair<vtkSmartPointer<vtkProperty>, bool> GetVTKProperty(
+  vtkSmartPointer<vtkProperty> GetVTKProperty(
     const pxr::UsdShadeShader& shaderPrim)
   {
     auto& prop = this->ShaderMap[shaderPrim.GetPath().GetAsString()];
-
-    bool isTranslucent = false;
 
     if (prop == nullptr)
     {
@@ -830,11 +844,13 @@ public:
         if (!defined || materialToken != pxr::TfToken("UsdPreviewSurface"))
         {
           // only UsdPreviewSurface supported for now
-          return { nullptr, isTranslucent };
+          return nullptr;
         }
 
         prop = vtkSmartPointer<vtkProperty>::New();
         prop->SetInterpolationToPBR();
+
+        vtkInformation* info = prop->GetInformation();
 
         // diffuseColor
         pxr::GfVec3f diffuseColorValue;
@@ -850,6 +866,7 @@ public:
         {
           auto [image, uv] = this->GetVTKTexture(diffuseColorSampler, colorToken);
           diffuseColorImage = image;
+          info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
         }
 
         // opacity
@@ -866,7 +883,7 @@ public:
         {
           auto [image, uv] = this->GetVTKTexture(opacitySampler, opacityToken);
           opacityImage = image;
-          isTranslucent = true;
+          info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
         }
 
         auto baseColor = this->CombineColorOpacityImage(diffuseColorImage, opacityImage);
@@ -902,6 +919,8 @@ public:
             texture->UseSRGBColorSpaceOn();
 
             prop->SetEmissiveTexture(texture);
+
+            info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
           }
         }
 
@@ -920,6 +939,7 @@ public:
           prop->SetRoughness(1.0);
           auto [image, uv] = this->GetVTKTexture(roughnessSampler, roughnessToken);
           roughnessImage = image;
+          info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
         }
 
         float metallicValue;
@@ -936,6 +956,7 @@ public:
           prop->SetMetallic(1.0);
           auto [image, uv] = this->GetVTKTexture(metallicSampler, metallicToken);
           metallicImage = image;
+          info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
         }
 
         pxr::UsdShadeInput occlusion = shaderPrim.GetInput(pxr::TfToken("occlusion"));
@@ -945,6 +966,7 @@ public:
         {
           auto [image, uv] = this->GetVTKTexture(occlusionSampler, occlusionToken);
           occlusionImage = image;
+          info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
         }
 
         auto orm = this->CombineORMImage(occlusionImage, roughnessImage, metallicImage);
@@ -978,12 +1000,14 @@ public:
             texture->SetColorModeToDirectScalars();
 
             prop->SetNormalTexture(texture);
+
+            info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
           }
         }
       }
     }
 
-    return { prop, isTranslucent };
+    return prop;
   }
 
   bool HasTimeCode() { return this->Stage ? this->Stage->HasAuthoredTimeCodeRange() : false; }
@@ -1007,6 +1031,8 @@ private:
 };
 
 vtkStandardNewMacro(vtkF3DUSDImporter);
+
+vtkInformationKeyMacro(vtkF3DUSDImporter, TCOORDS_NAME, String);
 
 //----------------------------------------------------------------------------
 vtkF3DUSDImporter::vtkF3DUSDImporter()
