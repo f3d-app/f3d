@@ -77,17 +77,11 @@ int vtkF3DFaceVaryingPolyData::RequestData(vtkInformation* vtkNotUsed(request),
     if (interpType == 0) // vertex
     {
       vtkDataArray* newArray = vtkDataArray::CreateDataArray(originalArray->GetDataType());
+      newArray->SetNumberOfComponents(originalArray->GetNumberOfComponents());
+      newArray->SetNumberOfTuples(nbConnectivity);
+      newArray->SetName(originalArray->GetName());
 
-      // TODO: Assumes float array, to generalize
-      vtkFloatArray* newTypedArray = vtkFloatArray::SafeDownCast(newArray);
-      if (newTypedArray)
-      {
-        newTypedArray->SetNumberOfComponents(originalArray->GetNumberOfComponents());
-        newTypedArray->SetNumberOfTuples(nbConnectivity);
-        newTypedArray->SetName(originalArray->GetName());
-
-        newPointData->AddArray(newTypedArray);
-      }
+      newPointData->AddArray(newArray);
     }
     else
     {
