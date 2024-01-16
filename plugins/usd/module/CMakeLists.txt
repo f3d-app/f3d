@@ -1,5 +1,5 @@
 set(classes
-  vtkF3DFaceVaryingPolyData
+  vtkF3DFaceVaryingPointDispatcher
   vtkF3DUSDImporter
   )
 

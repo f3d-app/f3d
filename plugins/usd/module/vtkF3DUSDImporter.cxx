@@ -1,6 +1,6 @@
 #include "vtkF3DUSDImporter.h"
 
-#include "vtkF3DFaceVaryingPolyData.h"
+#include "vtkF3DFaceVaryingPointDispatcher.h"
 
 #include <vtkActor.h>
 #include <vtkCapsuleSource.h>
@@ -230,7 +230,7 @@ public:
               }
 
               vtkInformation* info = vNormals->GetInformation();
-              info->Set(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE(),
+              info->Set(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE(),
                 meshPrim.GetNormalsInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
 
               newPolyData->GetPointData()->SetNormals(vNormals);
@@ -279,7 +279,7 @@ public:
                   }
 
                   vtkInformation* info = texCoords->GetInformation();
-                  info->Set(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE(),
+                  info->Set(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE(),
                     primVar.GetInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
 
                   newPolyData->GetPointData()->AddArray(texCoords);
@@ -321,7 +321,7 @@ public:
 
             newPolyData->SetPolys(cells);
 
-            vtkNew<vtkF3DFaceVaryingPolyData> faceVaryingFilter;
+            vtkNew<vtkF3DFaceVaryingPointDispatcher> faceVaryingFilter;
             faceVaryingFilter->SetInputData(newPolyData);
             faceVaryingFilter->Update();
 
@@ -509,30 +509,32 @@ public:
           actor = vtkSmartPointer<vtkActor>::New();
 
           // get associated material/shader
-          // TODO: which material should we select? (preview vs full vs default)
           pxr::UsdShadeMaterial material =
-            pxr::UsdShadeMaterialBindingAPI(geomPrim).ComputeBoundMaterial(
-              pxr::UsdShadeTokens->preview);
+            pxr::UsdShadeMaterialBindingAPI(geomPrim).ComputeBoundMaterial();
 
           if (material)
           {
             auto [shaderPrim, token] = this->GetConnectedShaderPrim(material.GetSurfaceOutput());
 
             auto prop = this->GetVTKProperty(shaderPrim);
-            actor->SetProperty(prop);
 
-            // enable translucent flag if required
-            vtkTexture* baseColor = prop->GetTexture("albedoTex");
-            if (prop->GetOpacity() < 0.99 ||
-              (baseColor && baseColor->GetInput()->GetNumberOfScalarComponents() == 4))
+            if (prop)
             {
-              actor->ForceTranslucentOn();
-            }
+              actor->SetProperty(prop);
 
-            // activate correct UV set
-            vtkInformation* info = prop->GetInformation();
-            polydata->GetPointData()->SetActiveAttribute(
-              info->Get(vtkF3DUSDImporter::TCOORDS_NAME()), vtkDataSetAttributes::TCOORDS);
+              // enable translucent flag if required
+              vtkTexture* baseColor = prop->GetTexture("albedoTex");
+              if (prop->GetOpacity() < 0.99 ||
+                (baseColor && baseColor->GetInput()->GetNumberOfScalarComponents() == 4))
+              {
+                actor->ForceTranslucentOn();
+              }
+
+              // activate correct UV set
+              vtkInformation* info = prop->GetInformation();
+              polydata->GetPointData()->SetActiveAttribute(
+                info->Get(vtkF3DUSDImporter::TCOORDS_NAME()), vtkDataSetAttributes::TCOORDS);
+            }
           }
           else
           {
@@ -780,17 +782,20 @@ public:
     {
       pxr::UsdShadeInput arrayName = uvset.GetInput(pxr::TfToken("varname"));
 
-      if (arrayName.GetTypeName() == "token")
+      if (arrayName)
       {
-        pxr::TfToken tokenName;
-        if (arrayName.Get(&tokenName))
+        if (arrayName.GetTypeName() == "token")
         {
-          name = tokenName;
+          pxr::TfToken tokenName;
+          if (arrayName.Get(&tokenName))
+          {
+            name = tokenName;
+          }
         }
-      }
-      else if (arrayName.GetTypeName() == "string")
-      {
-        arrayName.Get(&name);
+        else if (arrayName.GetTypeName() == "string")
+        {
+          arrayName.Get(&name);
+        }
       }
     }
 

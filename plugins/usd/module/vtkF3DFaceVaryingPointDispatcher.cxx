@@ -1,4 +1,4 @@
-#include "vtkF3DFaceVaryingPolyData.h"
+#include "vtkF3DFaceVaryingPointDispatcher.h"
 
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
@@ -6,18 +6,18 @@
 #include "vtkInformationVector.h"
 #include "vtkPointData.h"
 
-vtkStandardNewMacro(vtkF3DFaceVaryingPolyData);
+vtkStandardNewMacro(vtkF3DFaceVaryingPointDispatcher);
 
-vtkInformationKeyMacro(vtkF3DFaceVaryingPolyData, INTERPOLATION_TYPE, Integer);
-
-//------------------------------------------------------------------------------
-vtkF3DFaceVaryingPolyData::vtkF3DFaceVaryingPolyData() = default;
+vtkInformationKeyMacro(vtkF3DFaceVaryingPointDispatcher, INTERPOLATION_TYPE, Integer);
 
 //------------------------------------------------------------------------------
-vtkF3DFaceVaryingPolyData::~vtkF3DFaceVaryingPolyData() = default;
+vtkF3DFaceVaryingPointDispatcher::vtkF3DFaceVaryingPointDispatcher() = default;
 
 //------------------------------------------------------------------------------
-int vtkF3DFaceVaryingPolyData::RequestData(vtkInformation* vtkNotUsed(request),
+vtkF3DFaceVaryingPointDispatcher::~vtkF3DFaceVaryingPointDispatcher() = default;
+
+//------------------------------------------------------------------------------
+int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkPolyData* input = vtkPolyData::GetData(inputVector[0]->GetInformationObject(0));
@@ -35,7 +35,7 @@ int vtkF3DFaceVaryingPolyData::RequestData(vtkInformation* vtkNotUsed(request),
     vtkDataArray* originalArray = originalPointData->GetArray(i);
 
     vtkInformation* info = originalArray->GetInformation();
-    int interpType = info->Get(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE());
+    int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
 
     if (interpType != 0) // vertex
     {
@@ -72,7 +72,7 @@ int vtkF3DFaceVaryingPolyData::RequestData(vtkInformation* vtkNotUsed(request),
     vtkDataArray* originalArray = originalPointData->GetArray(i);
 
     vtkInformation* info = originalArray->GetInformation();
-    int interpType = info->Get(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE());
+    int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
 
     if (interpType == 0) // vertex
     {
@@ -122,7 +122,7 @@ int vtkF3DFaceVaryingPolyData::RequestData(vtkInformation* vtkNotUsed(request),
         vtkDataArray* originalArray = originalPointData->GetArray(k);
 
         vtkInformation* info = originalArray->GetInformation();
-        int interpType = info->Get(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE());
+        int interpType = info->Get(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE());
 
         if (interpType == 0) // vertex
         {
