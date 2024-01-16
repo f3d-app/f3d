@@ -212,27 +212,27 @@ public:
           {
             vtkNew<vtkPolyData> newPolyData;
 
-            bool normalsFV = meshPrim.GetNormalsInterpolation() == pxr::UsdGeomTokens->faceVarying;
-            bool uvsFV = std::any_of(
-              primVars.cbegin(), primVars.cend(), [](const pxr::UsdGeomPrimvar& uvAttr) {
-                return uvAttr.GetInterpolation() == pxr::UsdGeomTokens->faceVarying;
-              });
-
             // normals
             pxr::VtArray<pxr::GfVec3f> normals;
             normalsAttr.Get(&normals, timeCode);
 
-            vtkNew<vtkFloatArray> vNormals;
-            vNormals->SetName("Normals");
-            vNormals->SetNumberOfComponents(3);
-            vNormals->Allocate(normals.size());
-
-            for (const pxr::GfVec3f& n : normals)
+            if (normals.size() > 0)
             {
-              vNormals->InsertNextTuple3(n[0], n[1], n[2]);
-            }
+              vtkNew<vtkFloatArray> vNormals;
+              vNormals->SetName("Normals");
+              vNormals->SetNumberOfComponents(3);
+              vNormals->Allocate(normals.size());
 
-            newPolyData->GetPointData()->SetNormals(vNormals);
+              for (const pxr::GfVec3f& n : normals)
+              {
+                vNormals->InsertNextTuple3(n[0], n[1], n[2]);
+              }
+
+              vtkInformation* info = vNormals->GetInformation();
+              info->Set(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE(), meshPrim.GetNormalsInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
+
+              newPolyData->GetPointData()->SetNormals(vNormals);
+            }
 
             // texture coordinates
             for (const pxr::UsdGeomPrimvar& primVar : primVars)
@@ -276,6 +276,9 @@ public:
                     }
                   }
 
+                  vtkInformation* info = texCoords->GetInformation();
+                  info->Set(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE(), primVar.GetInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
+
                   newPolyData->GetPointData()->SetTCoords(texCoords);
                 }
               }
@@ -317,8 +320,6 @@ public:
 
             vtkNew<vtkF3DFaceVaryingPolyData> faceVaryingFilter;
             faceVaryingFilter->SetInputData(newPolyData);
-            faceVaryingFilter->SetNormalsFaceVarying(normalsFV);
-            faceVaryingFilter->SetTCoordsFaceVarying(uvsFV);
             faceVaryingFilter->Update();
 
             polydata = faceVaryingFilter->GetOutput();

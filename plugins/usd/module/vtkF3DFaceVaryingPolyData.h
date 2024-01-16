@@ -15,8 +15,8 @@ public:
   static vtkF3DFaceVaryingPolyData* New();
   vtkTypeMacro(vtkF3DFaceVaryingPolyData, vtkPolyDataAlgorithm);
 
-  vtkSetMacro(NormalsFaceVarying, bool);
-  vtkSetMacro(TCoordsFaceVarying, bool);
+  // TODO: flag used to indicate which interpolation is used on arrays
+  static vtkInformationIntegerKey* INTERPOLATION_TYPE();
 
 protected:
   vtkF3DFaceVaryingPolyData();
@@ -27,9 +27,6 @@ protected:
 private:
   vtkF3DFaceVaryingPolyData(const vtkF3DFaceVaryingPolyData&) = delete;
   void operator=(const vtkF3DFaceVaryingPolyData&) = delete;
-
-  bool NormalsFaceVarying = false;
-  bool TCoordsFaceVarying = false;
 };
 
 #endif

@@ -1,10 +1,14 @@
 #include "vtkF3DFaceVaryingPolyData.h"
 
+#include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkInformationIntegerKey.h"
 #include "vtkPointData.h"
 #include "vtkFloatArray.h"
 
 vtkStandardNewMacro(vtkF3DFaceVaryingPolyData);
+
+vtkInformationKeyMacro(vtkF3DFaceVaryingPolyData, INTERPOLATION_TYPE, Integer);
 
 //------------------------------------------------------------------------------
 vtkF3DFaceVaryingPolyData::vtkF3DFaceVaryingPolyData() = default;
@@ -19,59 +23,60 @@ int vtkF3DFaceVaryingPolyData::RequestData(vtkInformation* vtkNotUsed(request),
   vtkPolyData* input = vtkPolyData::GetData(inputVector[0]->GetInformationObject(0));
   vtkPolyData* output = vtkPolyData::GetData(outputVector->GetInformationObject(0));
 
-  vtkDataArray* originalNormals = input->GetPointData()->GetNormals();
-  vtkDataArray* originalTCoords = input->GetPointData()->GetTCoords();
-
-  bool hasNormals = originalNormals && originalNormals->GetNumberOfTuples() > 0;
-  bool hasTCoords = originalTCoords && originalTCoords->GetNumberOfTuples() > 0;
-
-  if (!(hasNormals && this->NormalsFaceVarying) && !(hasTCoords && this->TCoordsFaceVarying))
-  {
-    output->ShallowCopy(input);
-    return 1;
-  }
-
   vtkPoints* originalPoints = input->GetPoints();
   vtkCellArray* originalFaces = input->GetPolys();
 
+  // todo: early exit if all vertex
+
   vtkNew<vtkPoints> newPoints;
   vtkNew<vtkCellArray> newFaces;
-  vtkNew<vtkPointData> newPointData;
-  vtkNew<vtkFloatArray> newNormals;
-  vtkNew<vtkFloatArray> newTCoords;
 
   vtkIdType nbCells = originalFaces->GetNumberOfCells();
   vtkIdType nbConnectivity = originalFaces->GetNumberOfConnectivityIds();
 
   newPoints->SetNumberOfPoints(nbConnectivity);
 
-  if (hasNormals)
+  vtkPointData* originalPointData = input->GetPointData();
+  vtkPointData* newPointData = output->GetPointData();
+
+  vtkIdType nbArrays = originalPointData->GetNumberOfArrays();
+
+  for (vtkIdType i = 0; i < nbArrays; i++)
   {
-    if (this->NormalsFaceVarying)
+    vtkDataArray* originalArray = originalPointData->GetArray(i);
+
+    vtkInformation* info = originalArray->GetInformation();
+    int interpType = info->Get(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE());
+
+    if (interpType == 0) // vertex
     {
-      output->GetPointData()->SetNormals(originalNormals);
+      vtkDataArray* newArray = vtkDataArray::CreateDataArray(originalArray->GetDataType());
+
+      // TODO: Assumes float array, to generalize
+      vtkFloatArray* newTypedArray = vtkFloatArray::SafeDownCast(newArray);
+      if (newTypedArray)
+      {
+        newTypedArray->SetNumberOfComponents(originalArray->GetNumberOfComponents());
+        newTypedArray->SetNumberOfTuples(nbConnectivity);
+        newTypedArray->SetName(originalArray->GetName());
+
+        newPointData->AddArray(newTypedArray);
+      }
     }
     else
     {
-      newNormals->SetNumberOfComponents(3);
-      newNormals->SetNumberOfTuples(nbConnectivity);
-
-      output->GetPointData()->SetNormals(newNormals);
+      // if faceVarying, just copy
+      newPointData->AddArray(originalArray);
     }
   }
 
-  if (hasTCoords)
+  // set attributes
+  for (int attribute : { vtkDataSetAttributes::NORMALS, vtkDataSetAttributes::TCOORDS })
   {
-    if (this->TCoordsFaceVarying)
+    vtkDataArray* array = originalPointData->GetAttribute(attribute);
+    if (array)
     {
-      output->GetPointData()->SetTCoords(originalTCoords);
-    }
-    else
-    {
-      newTCoords->SetNumberOfComponents(2);
-      newTCoords->SetNumberOfTuples(nbConnectivity);
-
-      output->GetPointData()->SetTCoords(newTCoords);
+      newPointData->SetActiveAttribute(array->GetName(), attribute);
     }
   }
 
@@ -91,14 +96,22 @@ int vtkF3DFaceVaryingPolyData::RequestData(vtkInformation* vtkNotUsed(request),
       cell[j] = currentVertexIndex + j;
       newPoints->SetPoint(currentVertexIndex + j, originalPoints->GetPoint(cellPoints[j]));
 
-      if (hasNormals && !this->NormalsFaceVarying)
+      for (vtkIdType i = 0; i < nbArrays; i++)
       {
-        newNormals->SetTuple(currentVertexIndex + j, originalNormals->GetTuple(cellPoints[j]));
-      }
+        vtkDataArray* originalArray = originalPointData->GetArray(i);
 
-      if (hasTCoords && !this->TCoordsFaceVarying)
-      {
-        newTCoords->SetTuple(currentVertexIndex + j, originalTCoords->GetTuple(cellPoints[j]));
+        vtkInformation* info = originalArray->GetInformation();
+        int interpType = info->Get(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE());
+
+        if (interpType == 0) // vertex
+        {
+          vtkDataArray* newArray = newPointData->GetArray(originalArray->GetName());
+
+          if (newArray)
+          {
+            newArray->SetTuple(currentVertexIndex + j, originalArray->GetTuple(cellPoints[j]));
+          }
+        }
       }
     }
 
