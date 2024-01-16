@@ -86,9 +86,6 @@ mkdir build
 
  * Open git bash
 
-Check the value of `builtin-baseline` in the `vcpkg.json` file at the root of f3d source directory.  
-Make sure it's `c9140a3b500812ad3206317885860d9553b93f13` (please let us know if it's not)
-
 ```sh
 cd C:/dev
 git clone https://github.com/Microsoft/vcpkg.git
