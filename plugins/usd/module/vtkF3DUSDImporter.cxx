@@ -206,10 +206,14 @@ public:
 
           auto TimeVarying = [](const auto& a) { return a.ValueMightBeTimeVarying(); };
 
+          bool animatedAttribute = std::any_of(primVars.cbegin(), primVars.cend(), TimeVarying);
+          animatedAttribute = animatedAttribute || TimeVarying(pointsAttr);
+          animatedAttribute = animatedAttribute || TimeVarying(normalsAttr);
+          animatedAttribute = animatedAttribute || TimeVarying(facesCountAttr);
+          animatedAttribute = animatedAttribute || TimeVarying(facesIndicesAttr);
+
           // Check if the mesh has to be rebuilt
-          if (!meshAlreadyExists || TimeVarying(normalsAttr) ||
-            std::any_of(primVars.cbegin(), primVars.cend(), TimeVarying) ||
-            TimeVarying(pointsAttr) || TimeVarying(facesCountAttr) || TimeVarying(facesIndicesAttr))
+          if (!meshAlreadyExists || animatedAttribute)
           {
             vtkNew<vtkPolyData> newPolyData;
 
