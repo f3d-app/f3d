@@ -16,6 +16,7 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkImageResize.h>
 #include <vtkInformation.h>
+#include <vtkInformationStringKey.h>
 #include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
@@ -31,7 +32,6 @@
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
 #include <vtkTriangleFilter.h>
-#include <vtkInformationStringKey.h>
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -230,7 +230,8 @@ public:
               }
 
               vtkInformation* info = vNormals->GetInformation();
-              info->Set(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE(), meshPrim.GetNormalsInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
+              info->Set(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE(),
+                meshPrim.GetNormalsInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
 
               newPolyData->GetPointData()->SetNormals(vNormals);
             }
@@ -278,7 +279,8 @@ public:
                   }
 
                   vtkInformation* info = texCoords->GetInformation();
-                  info->Set(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE(), primVar.GetInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
+                  info->Set(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE(),
+                    primVar.GetInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
 
                   newPolyData->GetPointData()->AddArray(texCoords);
                 }
@@ -521,14 +523,16 @@ public:
 
             // enable translucent flag if required
             vtkTexture* baseColor = prop->GetTexture("albedoTex");
-            if (prop->GetOpacity() < 0.99 || (baseColor && baseColor->GetInput()->GetNumberOfScalarComponents() == 4))
+            if (prop->GetOpacity() < 0.99 ||
+              (baseColor && baseColor->GetInput()->GetNumberOfScalarComponents() == 4))
             {
               actor->ForceTranslucentOn();
             }
 
             // activate correct UV set
             vtkInformation* info = prop->GetInformation();
-            polydata->GetPointData()->SetActiveAttribute(info->Get(vtkF3DUSDImporter::TCOORDS_NAME()), vtkDataSetAttributes::TCOORDS);
+            polydata->GetPointData()->SetActiveAttribute(
+              info->Get(vtkF3DUSDImporter::TCOORDS_NAME()), vtkDataSetAttributes::TCOORDS);
           }
           else
           {
@@ -704,12 +708,12 @@ public:
   }
 
   // returns the image and the texture coordinate name
-  std::pair<vtkSmartPointer<vtkImageData>, std::string> GetVTKTexture(
+  vtkSmartPointer<vtkImageData> GetVTKTexture(
     const pxr::UsdShadeShader& samplerPrim, const pxr::TfToken& token)
   {
     if (!samplerPrim)
     {
-      return { nullptr, "" };
+      return nullptr;
     }
 
     pxr::TfToken idToken;
@@ -717,7 +721,7 @@ public:
     if (!defined || idToken != pxr::TfToken("UsdUVTexture"))
     {
       // only UsdUVTexture supported for now
-      return { nullptr, "" };
+      return nullptr;
     }
 
     auto& tex = this->TextureMap[samplerPrim.GetPath().GetAsString()];
@@ -739,7 +743,7 @@ public:
         if (!reader)
         {
           // cannot read the image file
-          return { nullptr, "" };
+          return nullptr;
         }
 
         const std::string& resolvedPath = path.GetResolvedPath();
@@ -748,7 +752,7 @@ public:
         if (!asset)
         {
           // cannot get USD asset
-          return { nullptr, "" };
+          return nullptr;
         }
 
         auto buffer = asset->GetBuffer();
@@ -756,7 +760,7 @@ public:
         if (!buffer)
         {
           // buffer invalid
-          return { nullptr, "" };
+          return nullptr;
         }
 
         reader->SetMemoryBuffer(buffer.get());
@@ -789,6 +793,8 @@ public:
       }
     }
 
+    tex->GetInformation()->Set(vtkF3DUSDImporter::TCOORDS_NAME(), name);
+
     // extract component based on token
     vtkNew<vtkImageExtractComponents> extract;
     extract->SetInputData(tex);
@@ -818,16 +824,17 @@ public:
     else
     {
       // just return the image as is
-      return { tex, name };
+      return tex;
     }
 
     extract->Update();
 
-    return { extract->GetOutput(), name };
+    extract->GetOutput()->GetInformation()->Copy(tex->GetInformation());
+
+    return extract->GetOutput();
   }
 
-  vtkSmartPointer<vtkProperty> GetVTKProperty(
-    const pxr::UsdShadeShader& shaderPrim)
+  vtkSmartPointer<vtkProperty> GetVTKProperty(const pxr::UsdShadeShader& shaderPrim)
   {
     auto& prop = this->ShaderMap[shaderPrim.GetPath().GetAsString()];
 
@@ -864,9 +871,9 @@ public:
         vtkSmartPointer<vtkImageData> diffuseColorImage;
         if (diffuseColorSampler)
         {
-          auto [image, uv] = this->GetVTKTexture(diffuseColorSampler, colorToken);
+          auto image = this->GetVTKTexture(diffuseColorSampler, colorToken);
           diffuseColorImage = image;
-          info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
+          info->Copy(image->GetInformation());
         }
 
         // opacity
@@ -881,9 +888,9 @@ public:
         vtkSmartPointer<vtkImageData> opacityImage;
         if (opacitySampler)
         {
-          auto [image, uv] = this->GetVTKTexture(opacitySampler, opacityToken);
+          auto image = this->GetVTKTexture(opacitySampler, opacityToken);
           opacityImage = image;
-          info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
+          info->Copy(image->GetInformation());
         }
 
         auto baseColor = this->CombineColorOpacityImage(diffuseColorImage, opacityImage);
@@ -906,7 +913,7 @@ public:
         auto [emissiveSampler, emissiveToken] = this->GetConnectedShaderPrim(emissive);
         if (emissiveSampler)
         {
-          auto [image, uv] = this->GetVTKTexture(emissiveSampler, emissiveToken);
+          auto image = this->GetVTKTexture(emissiveSampler, emissiveToken);
           if (image)
           {
             vtkNew<vtkTexture> texture;
@@ -920,7 +927,7 @@ public:
 
             prop->SetEmissiveTexture(texture);
 
-            info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
+            info->Copy(image->GetInformation());
           }
         }
 
@@ -937,9 +944,9 @@ public:
         if (roughnessSampler)
         {
           prop->SetRoughness(1.0);
-          auto [image, uv] = this->GetVTKTexture(roughnessSampler, roughnessToken);
+          auto image = this->GetVTKTexture(roughnessSampler, roughnessToken);
           roughnessImage = image;
-          info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
+          info->Copy(image->GetInformation());
         }
 
         float metallicValue;
@@ -954,9 +961,9 @@ public:
         if (metallicSampler)
         {
           prop->SetMetallic(1.0);
-          auto [image, uv] = this->GetVTKTexture(metallicSampler, metallicToken);
+          auto image = this->GetVTKTexture(metallicSampler, metallicToken);
           metallicImage = image;
-          info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
+          info->Copy(image->GetInformation());
         }
 
         pxr::UsdShadeInput occlusion = shaderPrim.GetInput(pxr::TfToken("occlusion"));
@@ -964,9 +971,9 @@ public:
         vtkSmartPointer<vtkImageData> occlusionImage;
         if (occlusionSampler)
         {
-          auto [image, uv] = this->GetVTKTexture(occlusionSampler, occlusionToken);
+          auto image = this->GetVTKTexture(occlusionSampler, occlusionToken);
           occlusionImage = image;
-          info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
+          info->Copy(image->GetInformation());
         }
 
         auto orm = this->CombineORMImage(occlusionImage, roughnessImage, metallicImage);
@@ -988,7 +995,7 @@ public:
         auto [normalSampler, normalToken] = this->GetConnectedShaderPrim(normal);
         if (normalSampler)
         {
-          auto [image, uv] = this->GetVTKTexture(normalSampler, normalToken);
+          auto image = this->GetVTKTexture(normalSampler, normalToken);
 
           if (image)
           {
@@ -1001,7 +1008,7 @@ public:
 
             prop->SetNormalTexture(texture);
 
-            info->Set(vtkF3DUSDImporter::TCOORDS_NAME(), uv);
+            info->Copy(image->GetInformation());
           }
         }
       }
