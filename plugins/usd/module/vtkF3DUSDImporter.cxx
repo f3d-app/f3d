@@ -196,24 +196,27 @@ public:
 
           // attributes
           pxr::UsdAttribute normalsAttr = meshPrim.GetNormalsAttr();
-
-          // TODO: on the TV model, the UV to use are called "perfuv" instead of "st"
-          // "st" is used for the "full" material
-          pxr::UsdGeomPrimvar uvAttr =
-            pxr::UsdGeomPrimvarsAPI(meshPrim).GetPrimvar(pxr::TfToken("st"));
           pxr::UsdAttribute pointsAttr = meshPrim.GetPointsAttr();
           pxr::UsdAttribute facesCountAttr = meshPrim.GetFaceVertexCountsAttr();
           pxr::UsdAttribute facesIndicesAttr = meshPrim.GetFaceVertexIndicesAttr();
 
+          std::vector<pxr::UsdGeomPrimvar> primVars =
+            pxr::UsdGeomPrimvarsAPI(meshPrim).GetPrimvars();
+
+          auto TimeVarying = [](const auto& a) { return a.ValueMightBeTimeVarying(); };
+
           // Check if the mesh has to be rebuilt
-          if (!meshAlreadyExists || normalsAttr.ValueMightBeTimeVarying() || uvAttr.ValueMightBeTimeVarying()
-          || pointsAttr.ValueMightBeTimeVarying() || facesCountAttr.ValueMightBeTimeVarying()
-          || facesIndicesAttr.ValueMightBeTimeVarying())
+          if (!meshAlreadyExists || TimeVarying(normalsAttr) ||
+            std::any_of(primVars.cbegin(), primVars.cend(), TimeVarying) ||
+            TimeVarying(pointsAttr) || TimeVarying(facesCountAttr) || TimeVarying(facesIndicesAttr))
           {
             vtkNew<vtkPolyData> newPolyData;
 
             bool normalsFV = meshPrim.GetNormalsInterpolation() == pxr::UsdGeomTokens->faceVarying;
-            bool uvsFV = uvAttr.GetInterpolation() == pxr::UsdGeomTokens->faceVarying;
+            bool uvsFV = std::any_of(
+              primVars.cbegin(), primVars.cend(), [](const pxr::UsdGeomPrimvar& uvAttr) {
+                return uvAttr.GetInterpolation() == pxr::UsdGeomTokens->faceVarying;
+              });
 
             // normals
             pxr::VtArray<pxr::GfVec3f> normals;
@@ -231,43 +234,51 @@ public:
 
             newPolyData->GetPointData()->SetNormals(vNormals);
 
-            // uvs
-            pxr::VtArray<pxr::GfVec2f> uvs;
-            uvAttr.Get(&uvs, timeCode);
-
-            if (uvs.size() > 0)
+            // texture coordinates
+            for (const pxr::UsdGeomPrimvar& primVar : primVars)
             {
-              vtkNew<vtkFloatArray> texCoords;
-              texCoords->SetName("TCoords");
-              texCoords->SetNumberOfComponents(2);
-
-              if (uvAttr.IsIndexed())
+              if (primVar.GetTypeName() == "texCoord2f[]")
               {
-                pxr::UsdAttribute indicesAttr = uvAttr.GetIndicesAttr();
+                pxr::VtArray<pxr::GfVec2f> uvs;
+                primVar.Get(&uvs, timeCode);
 
-                pxr::VtArray<int> indices;
-                if (indicesAttr.Get(&indices) && indices.size() > 0)
+                if (uvs.size() > 0)
                 {
-                  texCoords->Allocate(indices.size());
+                  std::string name = primVar.GetPrimvarName();
 
-                  for (int index : indices)
+                  vtkNew<vtkFloatArray> texCoords;
+                  texCoords->SetName(name.c_str());
+                  texCoords->SetNumberOfComponents(2);
+
+                  if (primVar.IsIndexed())
                   {
-                    const pxr::GfVec2f& uv = uvs[index];
-                    texCoords->InsertNextTuple2(uv[0], uv[1]);
+                    pxr::UsdAttribute indicesAttr = primVar.GetIndicesAttr();
+
+                    pxr::VtArray<int> indices;
+                    if (indicesAttr.Get(&indices) && indices.size() > 0)
+                    {
+                      texCoords->Allocate(indices.size());
+
+                      for (int index : indices)
+                      {
+                        const pxr::GfVec2f& uv = uvs[index];
+                        texCoords->InsertNextTuple2(uv[0], uv[1]);
+                      }
+                    }
                   }
+                  else
+                  {
+                    texCoords->Allocate(uvs.size());
+
+                    for (const pxr::GfVec2f& uv : uvs)
+                    {
+                      texCoords->InsertNextTuple2(uv[0], uv[1]);
+                    }
+                  }
+
+                  newPolyData->GetPointData()->SetTCoords(texCoords);
                 }
               }
-              else
-              {
-                texCoords->Allocate(uvs.size());
-
-                for (const pxr::GfVec2f& uv : uvs)
-                {
-                  texCoords->InsertNextTuple2(uv[0], uv[1]);
-                }
-              }
-
-              newPolyData->GetPointData()->SetTCoords(texCoords);
             }
 
             // points
@@ -496,7 +507,8 @@ public:
           // get associated material/shader
           // TODO: which material (preview vs full vs default) and how to get associated primvar
           pxr::UsdShadeMaterial material =
-            pxr::UsdShadeMaterialBindingAPI(geomPrim).ComputeBoundMaterial(pxr::UsdShadeTokens->preview);
+            pxr::UsdShadeMaterialBindingAPI(geomPrim).ComputeBoundMaterial(
+              pxr::UsdShadeTokens->preview);
 
           if (material)
           {
@@ -634,8 +646,7 @@ public:
       maxHeight = std::max(maxHeight, size[1]);
     }
 
-    auto ResizeAndExtractChannel = [&](vtkImageData* img) -> vtkSmartPointer<vtkImageData>
-    {
+    auto ResizeAndExtractChannel = [&](vtkImageData* img) -> vtkSmartPointer<vtkImageData> {
       if (!img)
       {
         vtkNew<vtkImageData> emptyImage;
@@ -783,7 +794,7 @@ public:
 
     // get array name
     auto [uvset, uvtoken] = this->GetConnectedShaderPrim(samplerPrim.GetInput(pxr::TfToken("st")));
-    std::string name = "xx"; // default
+    std::string name = "st"; // default
     if (uvset)
     {
       pxr::UsdShadeInput arrayName = uvset.GetInput(pxr::TfToken("varname"));
@@ -974,15 +985,9 @@ public:
     return { prop, isTranslucent };
   }
 
-  bool HasTimeCode()
-  {
-    return this->Stage ? this->Stage->HasAuthoredTimeCodeRange() : false;
-  }
+  bool HasTimeCode() { return this->Stage ? this->Stage->HasAuthoredTimeCodeRange() : false; }
 
-  void SetCurrentTime(double currentTime)
-  {
-    this->CurrentTime = currentTime;
-  }
+  void SetCurrentTime(double currentTime) { this->CurrentTime = currentTime; }
 
   void GetTimeRange(double timeRange[2])
   {
