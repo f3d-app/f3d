@@ -82,6 +82,7 @@ int vtkF3DFaceVaryingPolyData::RequestData(vtkInformation* vtkNotUsed(request),
       newArray->SetName(originalArray->GetName());
 
       newPointData->AddArray(newArray);
+      newArray->Delete();
     }
     else
     {
