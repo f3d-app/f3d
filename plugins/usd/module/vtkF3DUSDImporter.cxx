@@ -233,6 +233,8 @@ public:
               info->Set(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE(),
                 meshPrim.GetNormalsInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
 
+              std::cout << "Normals = " << meshPrim.GetNormalsInterpolation() << std::endl;
+
               newPolyData->GetPointData()->SetNormals(vNormals);
             }
 
@@ -281,6 +283,8 @@ public:
                   vtkInformation* info = texCoords->GetInformation();
                   info->Set(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE(),
                     primVar.GetInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
+
+                  std::cout << "UV = " << primVar.GetInterpolation() << std::endl;
 
                   newPolyData->GetPointData()->AddArray(texCoords);
                 }
