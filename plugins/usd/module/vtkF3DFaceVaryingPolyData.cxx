@@ -23,10 +23,36 @@ int vtkF3DFaceVaryingPolyData::RequestData(vtkInformation* vtkNotUsed(request),
   vtkPolyData* input = vtkPolyData::GetData(inputVector[0]->GetInformationObject(0));
   vtkPolyData* output = vtkPolyData::GetData(outputVector->GetInformationObject(0));
 
+  // early exit if all interpolations are "vertex"
+  vtkPointData* originalPointData = input->GetPointData();
+
+  vtkIdType nbArrays = originalPointData->GetNumberOfArrays();
+
+  bool earlyExit = true;
+
+  for (vtkIdType i = 0; i < nbArrays; i++)
+  {
+    vtkDataArray* originalArray = originalPointData->GetArray(i);
+
+    vtkInformation* info = originalArray->GetInformation();
+    int interpType = info->Get(vtkF3DFaceVaryingPolyData::INTERPOLATION_TYPE());
+
+    if (interpType != 0) // vertex
+    {
+      earlyExit = false;
+      break;
+    }
+  }
+
+  if (earlyExit)
+  {
+    // nothing to do, just return the input
+    output->ShallowCopy(input);
+    return 1;
+  }
+
   vtkPoints* originalPoints = input->GetPoints();
   vtkCellArray* originalFaces = input->GetPolys();
-
-  // todo: early exit if all vertex
 
   vtkNew<vtkPoints> newPoints;
   vtkNew<vtkCellArray> newFaces;
@@ -34,13 +60,13 @@ int vtkF3DFaceVaryingPolyData::RequestData(vtkInformation* vtkNotUsed(request),
   vtkIdType nbCells = originalFaces->GetNumberOfCells();
   vtkIdType nbConnectivity = originalFaces->GetNumberOfConnectivityIds();
 
+  // the number of output points is the number of total cells connectivity
   newPoints->SetNumberOfPoints(nbConnectivity);
 
-  vtkPointData* originalPointData = input->GetPointData();
   vtkPointData* newPointData = output->GetPointData();
 
-  vtkIdType nbArrays = originalPointData->GetNumberOfArrays();
-
+  // Use the interpolation type metadata to know if the array can be shallow copied
+  // And initialize the arrays
   for (vtkIdType i = 0; i < nbArrays; i++)
   {
     vtkDataArray* originalArray = originalPointData->GetArray(i);
@@ -70,7 +96,7 @@ int vtkF3DFaceVaryingPolyData::RequestData(vtkInformation* vtkNotUsed(request),
     }
   }
 
-  // set attributes
+  // copy attribute flags from input
   for (int attribute : { vtkDataSetAttributes::NORMALS, vtkDataSetAttributes::TCOORDS })
   {
     vtkDataArray* array = originalPointData->GetAttribute(attribute);

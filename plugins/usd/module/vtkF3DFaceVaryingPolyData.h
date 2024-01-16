@@ -2,7 +2,9 @@
  * @class vtkF3DFaceVaryingPolyData
  * @brief dispatch face-varying attributes by duplicating points.
  *
- * TODO
+ * This filter processes arrays on point data in case some of them are flagged
+ * as face-varying in which case points must be duplicated before rendering
+ *
  */
 #ifndef vtkF3DFaceVaryingPolyData_h
 #define vtkF3DFaceVaryingPolyData_h
@@ -15,7 +17,9 @@ public:
   static vtkF3DFaceVaryingPolyData* New();
   vtkTypeMacro(vtkF3DFaceVaryingPolyData, vtkPolyDataAlgorithm);
 
-  // TODO: flag used to indicate which interpolation is used on arrays
+  /**
+   * Metadata used to indicate which interpolation is used on arrays
+   */
   static vtkInformationIntegerKey* INTERPOLATION_TYPE();
 
 protected:
