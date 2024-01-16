@@ -683,26 +683,27 @@ public:
     return appendChannels->GetOutput();
   }
 
-  vtkSmartPointer<vtkImageData> GetVTKTexture(
+  // returns the image and the texture coordinate name
+  std::pair<vtkSmartPointer<vtkImageData>, std::string> GetVTKTexture(
     const pxr::UsdShadeShader& samplerPrim, const pxr::TfToken& token)
   {
     if (!samplerPrim)
     {
-      return nullptr;
+      return { nullptr, "" };
+    }
+
+    pxr::TfToken idToken;
+    bool defined = samplerPrim.GetIdAttr().Get(&idToken);
+    if (!defined || idToken != pxr::TfToken("UsdUVTexture"))
+    {
+      // only UsdUVTexture supported for now
+      return { nullptr, "" };
     }
 
     auto& tex = this->TextureMap[samplerPrim.GetPath().GetAsString()];
 
     if (tex == nullptr)
     {
-      pxr::TfToken idToken;
-      bool defined = samplerPrim.GetIdAttr().Get(&idToken);
-      if (!defined || idToken != pxr::TfToken("UsdUVTexture"))
-      {
-        // only UsdUVTexture supported for now
-        return nullptr;
-      }
-
       pxr::SdfAssetPath path;
       if (samplerPrim.GetInput(pxr::TfToken("file")).Get(&path))
       {
@@ -718,7 +719,7 @@ public:
         if (!reader)
         {
           // cannot read the image file
-          return nullptr;
+          return { nullptr, "" };
         }
 
         const std::string& resolvedPath = path.GetResolvedPath();
@@ -727,7 +728,7 @@ public:
         if (!asset)
         {
           // cannot get USD asset
-          return nullptr;
+          return { nullptr, "" };
         }
 
         auto buffer = asset->GetBuffer();
@@ -735,7 +736,7 @@ public:
         if (!buffer)
         {
           // buffer invalid
-          return nullptr;
+          return { nullptr, "" };
         }
 
         reader->SetMemoryBuffer(buffer.get());
@@ -775,11 +776,26 @@ public:
     else
     {
       // just return the image as is
-      return tex;
+      return { tex, "" };
     }
 
     extract->Update();
-    return extract->GetOutput();
+
+    // get array name
+    auto [uvset, uvtoken] = this->GetConnectedShaderPrim(samplerPrim.GetInput(pxr::TfToken("st")));
+    std::string name = "xx"; // default
+    if (uvset)
+    {
+      pxr::UsdShadeInput arrayName = uvset.GetInput(pxr::TfToken("varname"));
+
+      pxr::TfToken tokenName;
+      if (arrayName.Get(&tokenName))
+      {
+        name = tokenName;
+      }
+    }
+
+    return { extract->GetOutput(), name };
   }
 
   std::pair<vtkSmartPointer<vtkProperty>, bool> GetVTKProperty(
@@ -820,7 +836,8 @@ public:
         vtkSmartPointer<vtkImageData> diffuseColorImage;
         if (diffuseColorSampler)
         {
-          diffuseColorImage = this->GetVTKTexture(diffuseColorSampler, colorToken);
+          auto [image, uv] = this->GetVTKTexture(diffuseColorSampler, colorToken);
+          diffuseColorImage = image;
         }
 
         // opacity
@@ -835,7 +852,8 @@ public:
         vtkSmartPointer<vtkImageData> opacityImage;
         if (opacitySampler)
         {
-          opacityImage = this->GetVTKTexture(opacitySampler, opacityToken);
+          auto [image, uv] = this->GetVTKTexture(opacitySampler, opacityToken);
+          opacityImage = image;
           isTranslucent = true;
         }
 
@@ -857,14 +875,13 @@ public:
         // emissive
         pxr::UsdShadeInput emissive = shaderPrim.GetInput(pxr::TfToken("emissiveColor"));
         auto [emissiveSampler, emissiveToken] = this->GetConnectedShaderPrim(emissive);
-        vtkSmartPointer<vtkImageData> emissiveImage;
         if (emissiveSampler)
         {
-          emissiveImage = this->GetVTKTexture(emissiveSampler, emissiveToken);
-          if (emissiveImage)
+          auto [image, uv] = this->GetVTKTexture(emissiveSampler, emissiveToken);
+          if (image)
           {
             vtkNew<vtkTexture> texture;
-            texture->SetInputData(emissiveImage);
+            texture->SetInputData(image);
 
             texture->MipmapOn();
             texture->InterpolateOn();
@@ -889,7 +906,8 @@ public:
         if (roughnessSampler)
         {
           prop->SetRoughness(1.0);
-          roughnessImage = this->GetVTKTexture(roughnessSampler, roughnessToken);
+          auto [image, uv] = this->GetVTKTexture(roughnessSampler, roughnessToken);
+          roughnessImage = image;
         }
 
         float metallicValue;
@@ -904,7 +922,8 @@ public:
         if (metallicSampler)
         {
           prop->SetMetallic(1.0);
-          metallicImage = this->GetVTKTexture(metallicSampler, metallicToken);
+          auto [image, uv] = this->GetVTKTexture(metallicSampler, metallicToken);
+          metallicImage = image;
         }
 
         pxr::UsdShadeInput occlusion = shaderPrim.GetInput(pxr::TfToken("occlusion"));
@@ -912,7 +931,8 @@ public:
         vtkSmartPointer<vtkImageData> occlusionImage;
         if (occlusionSampler)
         {
-          occlusionImage = this->GetVTKTexture(occlusionSampler, occlusionToken);
+          auto [image, uv] = this->GetVTKTexture(occlusionSampler, occlusionToken);
+          occlusionImage = image;
         }
 
         auto orm = this->CombineORMImage(occlusionImage, roughnessImage, metallicImage);
@@ -934,12 +954,12 @@ public:
         auto [normalSampler, normalToken] = this->GetConnectedShaderPrim(normal);
         if (normalSampler)
         {
-          auto img = this->GetVTKTexture(normalSampler, normalToken);
+          auto [image, uv] = this->GetVTKTexture(normalSampler, normalToken);
 
-          if (img)
+          if (image)
           {
             vtkNew<vtkTexture> texture;
-            texture->SetInputData(img);
+            texture->SetInputData(image);
 
             texture->MipmapOn();
             texture->InterpolateOn();
