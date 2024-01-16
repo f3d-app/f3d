@@ -1,10 +1,10 @@
 #include "vtkF3DFaceVaryingPolyData.h"
 
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
-#include "vtkInformationIntegerKey.h"
-#include "vtkPointData.h"
 #include "vtkFloatArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationIntegerKey.h"
+#include "vtkInformationVector.h"
+#include "vtkPointData.h"
 
 vtkStandardNewMacro(vtkF3DFaceVaryingPolyData);
 
