@@ -4,7 +4,7 @@
  *
  * This filter processes arrays on point data in case some of them are flagged
  * as face-varying in which case points must be duplicated before rendering
- * 
+ *
  * Face-varying attributes are a special case between point and cell data where the number of tuples
  * in the attributes is equal to the cell connectivity array size.
  * For example, if we have two adjacent quads, we will have 6 points and 8 cell indices (4 per quad)
