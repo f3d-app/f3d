@@ -67,8 +67,7 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
 
   newPointData->ShallowCopy(originalPointData);
 
-  // Use the interpolation type metadata to know if the array can be shallow copied
-  // And initialize the arrays
+  // Use the interpolation type metadata to know if the array must be replaced
   for (vtkIdType i = 0; i < nbArrays; i++)
   {
     vtkDataArray* originalArray = originalPointData->GetArray(i);
