@@ -65,6 +65,8 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
 
   vtkPointData* newPointData = output->GetPointData();
 
+  newPointData->ShallowCopy(originalPointData);
+
   // Use the interpolation type metadata to know if the array can be shallow copied
   // And initialize the arrays
   for (vtkIdType i = 0; i < nbArrays; i++)
@@ -76,28 +78,12 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
 
     if (interpType == 0) // vertex
     {
-      vtkDataArray* newArray = vtkDataArray::CreateDataArray(originalArray->GetDataType());
+      auto newArray = vtkSmartPointer<vtkDataArray>::Take(vtkDataArray::CreateDataArray(originalArray->GetDataType()));
       newArray->SetNumberOfComponents(originalArray->GetNumberOfComponents());
       newArray->SetNumberOfTuples(nbConnectivity);
       newArray->SetName(originalArray->GetName());
 
       newPointData->AddArray(newArray);
-      newArray->Delete();
-    }
-    else
-    {
-      // if faceVarying, just copy
-      newPointData->AddArray(originalArray);
-    }
-  }
-
-  // copy attribute flags from input
-  for (int attribute : { vtkDataSetAttributes::NORMALS, vtkDataSetAttributes::TCOORDS })
-  {
-    vtkDataArray* array = originalPointData->GetAttribute(attribute);
-    if (array)
-    {
-      newPointData->SetActiveAttribute(array->GetName(), attribute);
     }
   }
 
