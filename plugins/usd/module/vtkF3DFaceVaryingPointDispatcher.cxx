@@ -78,7 +78,8 @@ int vtkF3DFaceVaryingPointDispatcher::RequestData(vtkInformation* vtkNotUsed(req
 
     if (interpType == 0) // vertex
     {
-      auto newArray = vtkSmartPointer<vtkDataArray>::Take(vtkDataArray::CreateDataArray(originalArray->GetDataType()));
+      auto newArray = vtkSmartPointer<vtkDataArray>::Take(
+        vtkDataArray::CreateDataArray(originalArray->GetDataType()));
       newArray->SetNumberOfComponents(originalArray->GetNumberOfComponents());
       newArray->SetNumberOfTuples(nbConnectivity);
       newArray->SetName(originalArray->GetName());
