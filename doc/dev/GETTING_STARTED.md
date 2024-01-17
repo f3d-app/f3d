@@ -89,6 +89,8 @@ mkdir build
 ```sh
 cd C:/dev
 git clone https://github.com/Microsoft/vcpkg.git
+cd vcpkg
+git fetch origin c9140a3b500812ad3206317885860d9553b93f13
 ```
 
  * Open cmd
