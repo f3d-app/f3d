@@ -25,6 +25,8 @@
 
 #include <memory>
 
+class vtkInformationStringKey;
+
 class vtkF3DUSDImporter : public vtkImporter
 {
 public:
@@ -52,6 +54,11 @@ public:
   {
     this->AnimationEnabled = false;
   }
+
+  /**
+   * Information key used to propagate the array name used as texture coordinates
+   */
+  static vtkInformationStringKey* TCOORDS_NAME();
 
 protected:
   vtkF3DUSDImporter();
