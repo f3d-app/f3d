@@ -53,6 +53,7 @@ public:
    * Create an image from file, the following formats are supported:
    * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA.
    * EXR files are also supported if the associated module is built.
+   * The complete list can be retrieve at runtime by calling getSupportedFormats.
    * Throw an image::read_exception in case of failure.
    */
   explicit image(const std::string& path);
@@ -83,6 +84,11 @@ public:
   bool operator==(const image& reference) const;
   bool operator!=(const image& reference) const;
   ///@}
+
+  /**
+   * Get the list of supported image format when opening a file.
+   */
+  static std::vector<std::string> getSupportedFormats();
 
   ///@{ @name Resolution
   /**

@@ -7,6 +7,23 @@
 
 int TestSDKImage(int argc, char* argv[])
 {
+  // check supported formats
+  std::vector<std::string> formats = f3d::image::getSupportedFormats();
+  
+  if (std::find(formats.begin(), formats.end(), ".png") == formats.end())
+  {
+    std::cerr << "PNG is not in the list of supported files" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+#if F3D_MODULE_EXR
+  if (std::find(formats.begin(), formats.end(), ".exr") == formats.end())
+  {
+    std::cerr << "EXR is not in the list of supported files" << std::endl;
+    return EXIT_FAILURE;
+  }
+#endif
+
   constexpr unsigned int width = 64;
   constexpr unsigned int height = 64;
   constexpr unsigned int channels = 3;

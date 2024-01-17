@@ -8,6 +8,7 @@
 #include <vtkImageData.h>
 #include <vtkImageDifference.h>
 #include <vtkImageReader2.h>
+#include <vtkImageReader2Collection.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkJPEGWriter.h>
 #include <vtkPNGWriter.h>
@@ -18,6 +19,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <cassert>
+#include <regex>
 
 namespace f3d
 {
@@ -135,6 +137,30 @@ image& image::operator=(image&& img) noexcept
 {
   std::swap(this->Internals, img.Internals);
   return *this;
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> image::getSupportedFormats()
+{
+  std::vector<std::string> formats;
+
+  vtkNew<vtkImageReader2Collection> collection;
+  vtkImageReader2Factory::GetRegisteredReaders(collection);
+
+  collection->InitTraversal();
+  vtkImageReader2* reader = nullptr;
+
+  while (reader = collection->GetNextItem())
+  {
+    std::string extensions = reader->GetFileExtensions();
+
+    std::regex re("\\s+");
+    std::sregex_token_iterator first{ extensions.begin(), extensions.end(), re, -1 }, last;
+
+    std::copy(first, last, std::back_inserter(formats));
+  }
+
+  return formats;
 }
 
 //----------------------------------------------------------------------------
