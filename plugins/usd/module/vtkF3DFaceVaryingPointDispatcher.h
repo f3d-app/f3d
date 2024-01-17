@@ -4,6 +4,12 @@
  *
  * This filter processes arrays on point data in case some of them are flagged
  * as face-varying in which case points must be duplicated before rendering
+ * 
+ * Face-varying attributes are a special case between point and cell data where the number of tuples
+ * in the attributes is equal to the cell connectivity array size.
+ * For example, if we have two adjacent quads, we will have 6 points and 8 cell indices (4 per quad)
+ * Face-varying attributes, even if located on point data will have 8 tuples, and not 6
+ * It can be seen as attributes, but this filter will normalize it by outputting 8 points.
  *
  */
 #ifndef vtkF3DFaceVaryingPointDispatcher_h

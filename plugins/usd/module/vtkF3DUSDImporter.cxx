@@ -286,6 +286,8 @@ public:
                   info->Set(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE(),
                     primVar.GetInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
 
+                  // the size of the array can be larger than the number of points if the attribute interpolation
+                  // is face-varying. It will be normalized by the vtkF3DFaceVaryingPointDispatcher later
                   newPolyData->GetPointData()->AddArray(texCoords);
                 }
               }
