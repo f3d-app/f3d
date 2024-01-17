@@ -49,7 +49,10 @@ public:
   /**
    * Return true if the animation manager is playing the animation
    */
-  bool IsPlaying() const { return Playing; }
+  bool IsPlaying() const
+  {
+    return Playing;
+  }
 
   /**
    * Load animation at provided time value
