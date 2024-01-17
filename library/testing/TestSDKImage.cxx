@@ -9,7 +9,7 @@ int TestSDKImage(int argc, char* argv[])
 {
   // check supported formats
   std::vector<std::string> formats = f3d::image::getSupportedFormats();
-  
+
   if (std::find(formats.begin(), formats.end(), ".png") == formats.end())
   {
     std::cerr << "PNG is not in the list of supported files" << std::endl;

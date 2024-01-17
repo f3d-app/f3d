@@ -148,9 +148,9 @@ std::vector<std::string> image::getSupportedFormats()
   vtkImageReader2Factory::GetRegisteredReaders(collection);
 
   collection->InitTraversal();
-  vtkImageReader2* reader = nullptr;
+  vtkImageReader2* reader = collection->GetNextItem();
 
-  while (reader = collection->GetNextItem())
+  while (reader != nullptr)
   {
     std::string extensions = reader->GetFileExtensions();
 
@@ -158,6 +158,8 @@ std::vector<std::string> image::getSupportedFormats()
     std::sregex_token_iterator first{ extensions.begin(), extensions.end(), re, -1 }, last;
 
     std::copy(first, last, std::back_inserter(formats));
+
+    reader = collection->GetNextItem();
   }
 
   return formats;
