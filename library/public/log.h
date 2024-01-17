@@ -112,7 +112,9 @@ public:
 
 protected:
   //! @cond
-  static void appendArg(std::stringstream&) {}
+  static void appendArg(std::stringstream&)
+  {
+  }
 
   template<typename T, typename... Args>
   static void appendArg(std::stringstream& ss, T value, Args... args)
