@@ -37,30 +37,48 @@ public:
   /**
    * Get the name of this plugin
    */
-  const std::string& getName() { return this->Name; }
+  const std::string& getName()
+  {
+    return this->Name;
+  }
 
   /**
    * Get the description of this plugin
    */
-  const std::string& getDescription() { return this->Description; }
+  const std::string& getDescription()
+  {
+    return this->Description;
+  }
 
   /**
    * Get the version of this plugin
    */
-  const std::string& getVersion() { return this->Version; }
+  const std::string& getVersion()
+  {
+    return this->Version;
+  }
 
   /**
    * Get the list of readers created by this plugin
    */
-  const std::vector<std::shared_ptr<reader> >& getReaders() { return this->Readers; }
+  const std::vector<std::shared_ptr<reader> >& getReaders()
+  {
+    return this->Readers;
+  }
 
   ///@{
   /**
    * Set/Get the origin of this plugin, usually static, system or an actual path
    * Set by the engine.
    */
-  const std::string& getOrigin() { return this->Origin; }
-  void setOrigin(const std::string& origin) { this->Origin = origin; }
+  const std::string& getOrigin()
+  {
+    return this->Origin;
+  }
+  void setOrigin(const std::string& origin)
+  {
+    this->Origin = origin;
+  }
   ///@}
 
 private:
