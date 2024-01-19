@@ -648,7 +648,7 @@ public:
         else
         {
           // split subsets
-          for (pxr::UsdGeomSubset subset : subsets)
+          for (const pxr::UsdGeomSubset& subset : subsets)
           {
             pxr::UsdAttribute indicesAttr = subset.GetIndicesAttr();
 
