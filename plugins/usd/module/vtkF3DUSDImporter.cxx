@@ -120,7 +120,8 @@ public:
     return this->ConvertMatrix(node.ComputeLocalToWorldTransform(timeCode));
   }
 
-  void AddActor(vtkRenderer* renderer, const pxr::SdfPath& path, const pxr::UsdGeomGprim& geomPrim, const pxr::UsdPrim& prim, vtkMatrix4x4* mat, vtkPolyData* polydata)
+  void AddActor(vtkRenderer* renderer, const pxr::SdfPath& path, const pxr::UsdGeomGprim& geomPrim,
+    const pxr::UsdPrim& prim, vtkMatrix4x4* mat, vtkPolyData* polydata)
   {
     pxr::SdfPath actorPath = path.AppendChild(pxr::TfToken(prim.GetName()));
 
@@ -672,7 +673,8 @@ public:
 
             polydataSubset->SetPolys(cells);
 
-            this->AddActor(renderer, path.AppendChild(pxr::TfToken(prim.GetName())), geomPrim, subset.GetPrim(), mat, polydataSubset);
+            this->AddActor(renderer, path.AppendChild(pxr::TfToken(prim.GetName())), geomPrim,
+              subset.GetPrim(), mat, polydataSubset);
           }
         }
       }
