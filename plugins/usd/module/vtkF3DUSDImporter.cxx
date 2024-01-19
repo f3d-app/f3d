@@ -23,6 +23,7 @@
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkPolyDataNormals.h>
 #include <vtkPolyDataTangents.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
@@ -119,7 +120,7 @@ public:
     return this->ConvertMatrix(node.ComputeLocalToWorldTransform(timeCode));
   }
 
-  void AddActor(vtkRenderer* renderer, const pxr::SdfPath& path, const pxr::UsdPrim& prim, vtkMatrix4x4* mat, vtkPolyData* polydata)
+  void AddActor(vtkRenderer* renderer, const pxr::SdfPath& path, const pxr::UsdGeomGprim& geomPrim, const pxr::UsdPrim& prim, vtkMatrix4x4* mat, vtkPolyData* polydata)
   {
     pxr::SdfPath actorPath = path.AppendChild(pxr::TfToken(prim.GetName()));
 
@@ -133,8 +134,6 @@ public:
       // get associated material/shader
       pxr::UsdShadeMaterial material =
         pxr::UsdShadeMaterialBindingAPI(prim).ComputeBoundMaterial(pxr::UsdShadeTokens->preview);
-
-      pxr::UsdGeomGprim geomPrim = pxr::UsdGeomGprim(prim);
 
       if (material)
       {
@@ -164,7 +163,7 @@ public:
           }
         }
       }
-      else if (geomPrim)
+      else
       {
         // if there is no material, fallback on display color
         pxr::UsdAttribute displayColorAttr = geomPrim.GetDisplayColorAttr();
@@ -182,26 +181,23 @@ public:
       }
 
       // backface culling
-      if (geomPrim)
+      pxr::UsdAttribute doubleSidedAttr = geomPrim.GetDoubleSidedAttr();
+
+      bool doubleSided;
+      if (doubleSidedAttr.Get(&doubleSided) && !doubleSided)
       {
-        pxr::UsdAttribute doubleSidedAttr = geomPrim.GetDoubleSidedAttr();
+        pxr::UsdAttribute orientationAttr = geomPrim.GetOrientationAttr();
 
-        bool doubleSided;
-        if (doubleSidedAttr.Get(&doubleSided) && !doubleSided)
+        pxr::TfToken orientation;
+        if (orientationAttr && orientationAttr.Get(&orientation))
         {
-          pxr::UsdAttribute orientationAttr = geomPrim.GetOrientationAttr();
-
-          pxr::TfToken orientation;
-          if (orientationAttr && orientationAttr.Get(&orientation))
+          if (orientation == pxr::UsdGeomTokens->rightHanded)
           {
-            if (orientation == pxr::UsdGeomTokens->rightHanded)
-            {
-              actor->GetProperty()->BackfaceCullingOn();
-            }
-            else
-            {
-              actor->GetProperty()->FrontfaceCullingOn();
-            }
+            actor->GetProperty()->BackfaceCullingOn();
+          }
+          else
+          {
+            actor->GetProperty()->FrontfaceCullingOn();
           }
         }
       }
@@ -214,8 +210,11 @@ public:
         vtkNew<vtkTriangleFilter> triangulate;
         triangulate->SetInputData(polydata);
 
+        vtkNew<vtkPolyDataNormals> normals;
+        normals->SetInputConnection(triangulate->GetOutputPort());
+
         vtkNew<vtkPolyDataTangents> tangents;
-        tangents->SetInputConnection(triangulate->GetOutputPort());
+        tangents->SetInputConnection(normals->GetOutputPort());
         tangents->Update();
         mapper->SetInputData(tangents->GetOutput());
       }
@@ -407,7 +406,7 @@ public:
                   // the size of the array can be larger than the number of points if the attribute
                   // interpolation is face-varying.
                   // It will be normalized by the vtkF3DFaceVaryingPointDispatcher later
-                  newPolyData->GetPointData()->SetTCoords(texCoords);
+                  newPolyData->GetPointData()->AddArray(texCoords);
                 }
               }
             }
@@ -633,7 +632,7 @@ public:
 
         if (subsets.empty())
         {
-          this->AddActor(renderer, path, prim, mat, polydata);
+          this->AddActor(renderer, path, geomPrim, prim, mat, polydata);
         }
         else
         {
@@ -663,7 +662,7 @@ public:
 
             polydataSubset->SetPolys(cells);
 
-            this->AddActor(renderer, path, subset.GetPrim(), mat, polydataSubset);
+            this->AddActor(renderer, path.AppendChild(pxr::TfToken(prim.GetName())), geomPrim, subset.GetPrim(), mat, polydataSubset);
           }
         }
       }
