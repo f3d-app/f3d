@@ -82,7 +82,15 @@ public:
   void ReadScene(const std::string& filePath)
   {
     // in case of failure, you may want to set PXR_PLUGINPATH_NAME to the lib/usd path
-    this->Stage = pxr::UsdStage::Open(filePath);
+    if (!this->Stage)
+    {
+      this->Stage = pxr::UsdStage::Open(filePath);
+
+      // TODO: USD bake skinning is not performant
+      // We need to read joints and do the skinning in the shader
+      // See https://github.com/f3d-app/f3d/issues/1076
+      pxr::UsdSkelBakeSkinning(this->Stage->Traverse());
+    }
   }
 
   template<typename T>
@@ -203,37 +211,36 @@ public:
         }
       }
 
-      // set mapper
-      vtkNew<vtkPolyDataMapper> mapper;
-
-      if (actor->GetProperty()->GetTexture("normalTex"))
-      {
-        vtkNew<vtkTriangleFilter> triangulate;
-        triangulate->SetInputData(polydata);
-
-        vtkNew<vtkPolyDataNormals> normals;
-        normals->SetInputConnection(triangulate->GetOutputPort());
-
-        vtkNew<vtkPolyDataTangents> tangents;
-        tangents->SetInputConnection(normals->GetOutputPort());
-        tangents->Update();
-        mapper->SetInputData(tangents->GetOutput());
-      }
-      else
-      {
-        mapper->SetInputData(polydata);
-      }
-
-      if (!this->HasTimeCode())
-      {
-        mapper->StaticOn();
-      }
-
-      actor->SetMapper(mapper);
-
       renderer->AddActor(actor);
     }
 
+    // set mapper
+    vtkNew<vtkPolyDataMapper> mapper;
+
+    if (actor->GetProperty()->GetTexture("normalTex"))
+    {
+      vtkNew<vtkTriangleFilter> triangulate;
+      triangulate->SetInputData(polydata);
+
+      vtkNew<vtkPolyDataNormals> normals;
+      normals->SetInputConnection(triangulate->GetOutputPort());
+
+      vtkNew<vtkPolyDataTangents> tangents;
+      tangents->SetInputConnection(normals->GetOutputPort());
+      tangents->Update();
+      mapper->SetInputData(tangents->GetOutput());
+    }
+    else
+    {
+      mapper->SetInputData(polydata);
+    }
+
+    if (!this->HasTimeCode())
+    {
+      mapper->StaticOn();
+    }
+
+    actor->SetMapper(mapper);
     actor->SetUserMatrix(mat);
   }
 
@@ -310,8 +317,8 @@ public:
         {
           pxr::UsdGeomMesh meshPrim = pxr::UsdGeomMesh(prim);
 
-          polydata = this->MeshMap[meshPrim.GetPath().GetAsString()];
-          bool meshAlreadyExists = (polydata != nullptr);
+          vtkSmartPointer<vtkPolyData>& mappedPolydata = this->MeshMap[meshPrim.GetPath().GetAsString()];
+          bool meshAlreadyExists = (mappedPolydata != nullptr);
 
           // attributes
           pxr::UsdAttribute normalsAttr = meshPrim.GetNormalsAttr();
@@ -460,8 +467,10 @@ public:
             faceVaryingFilter->SetInputData(newPolyData);
             faceVaryingFilter->Update();
 
-            polydata = faceVaryingFilter->GetOutput();
+            mappedPolydata = faceVaryingFilter->GetOutput();
           }
+
+          polydata = mappedPolydata;
         }
         else if (prim.IsA<pxr::UsdGeomSphere>())
         {
@@ -693,12 +702,6 @@ public:
       vtkErrorWithObjectMacro(renderer, << "Stage failed to open");
       return;
     }
-
-    // TODO: USD bake skinning is not performant
-    // We need to read joints and do the skinning in the shader
-    // See https://github.com/f3d-app/f3d/issues/1076
-    pxr::UsdSkelBakeSkinning(this->Stage->Traverse());
-    this->Stage->Save();
 
     vtkNew<vtkMatrix4x4> rootTransform;
 
