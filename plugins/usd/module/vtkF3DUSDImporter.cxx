@@ -358,6 +358,7 @@ public:
             }
 
             // texture coordinates
+            bool firstArray = true;
             for (const pxr::UsdGeomPrimvar& primVar : primVars)
             {
               if (primVar.GetTypeName() == "texCoord2f[]" || primVar.GetTypeName() == "float2[]")
@@ -407,6 +408,15 @@ public:
                   // interpolation is face-varying.
                   // It will be normalized by the vtkF3DFaceVaryingPointDispatcher later
                   newPolyData->GetPointData()->AddArray(texCoords);
+
+                  if (firstArray)
+                  {
+                    // sometimes we are enable to fetch the array name to use for texture mapping
+                    // so we fallback to the first UV set added
+                    // see https://github.com/f3d-app/f3d/issues/1184
+                    firstArray = false;
+                    newPolyData->GetPointData()->SetTCoords(texCoords);
+                  }
                 }
               }
             }
@@ -807,6 +817,31 @@ public:
       return nullptr;
     }
 
+    // get array name
+    auto [uvset, uvtoken] = this->GetConnectedShaderPrim(samplerPrim.GetInput(pxr::TfToken("st")));
+    std::string name;
+
+    if (uvset)
+    {
+      pxr::UsdShadeInput arrayName = uvset.GetInput(pxr::TfToken("varname"));
+
+      if (arrayName)
+      {
+        if (arrayName.GetTypeName() == "token")
+        {
+          pxr::TfToken tokenName;
+          if (arrayName.Get(&tokenName))
+          {
+            name = tokenName;
+          }
+        }
+        else if (arrayName.GetTypeName() == "string")
+        {
+          arrayName.Get(&name);
+        }
+      }
+    }
+
     auto& tex = this->TextureMap[samplerPrim.GetPath().GetAsString()];
 
     if (tex == nullptr)
@@ -856,31 +891,6 @@ public:
       else
       {
         return nullptr;
-      }
-    }
-
-    // get array name
-    auto [uvset, uvtoken] = this->GetConnectedShaderPrim(samplerPrim.GetInput(pxr::TfToken("st")));
-    std::string name;
-
-    if (uvset)
-    {
-      pxr::UsdShadeInput arrayName = uvset.GetInput(pxr::TfToken("varname"));
-
-      if (arrayName)
-      {
-        if (arrayName.GetTypeName() == "token")
-        {
-          pxr::TfToken tokenName;
-          if (arrayName.Get(&tokenName))
-          {
-            name = tokenName;
-          }
-        }
-        else if (arrayName.GetTypeName() == "string")
-        {
-          arrayName.Get(&name);
-        }
       }
     }
 
