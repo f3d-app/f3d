@@ -126,13 +126,15 @@ public:
     auto& actor = this->ActorMap[actorPath.GetAsString()];
     bool actorAlreadyExists = (actor != nullptr);
 
-    //if (!actorAlreadyExists)
+    if (!actorAlreadyExists)
     {
       actor = vtkSmartPointer<vtkActor>::New();
 
       // get associated material/shader
       pxr::UsdShadeMaterial material =
         pxr::UsdShadeMaterialBindingAPI(prim).ComputeBoundMaterial(pxr::UsdShadeTokens->preview);
+
+      pxr::UsdGeomGprim geomPrim = pxr::UsdGeomGprim(prim);
 
       if (material)
       {
@@ -154,33 +156,53 @@ public:
 
           // activate correct UV set if relevant
           vtkInformation* info = prop->GetInformation();
-          std::string uvName = info->Get(vtkF3DUSDImporter::TCOORDS_NAME());
+          const char* uvName = info->Get(vtkF3DUSDImporter::TCOORDS_NAME());
 
-          if (!uvName.empty())
+          if (uvName && uvName[0] != 0)
           {
-            polydata->GetPointData()->SetActiveAttribute(uvName.c_str(), vtkDataSetAttributes::TCOORDS);
+            polydata->GetPointData()->SetActiveAttribute(uvName, vtkDataSetAttributes::TCOORDS);
           }
         }
       }
-      else
+      else if (geomPrim)
       {
-        pxr::UsdGeomGprim geomPrim = pxr::UsdGeomGprim(prim);
+        // if there is no material, fallback on display color
+        pxr::UsdAttribute displayColorAttr = geomPrim.GetDisplayColorAttr();
 
-        if (geomPrim)
+        vtkNew<vtkProperty> prop;
+        prop->SetInterpolationToPBR();
+
+        pxr::VtArray<pxr::GfVec3f> color;
+        if (displayColorAttr.Get(&color) && color.size() == 1)
         {
-          // if there is no material, fallback on display color
-          pxr::UsdAttribute displayColorAttr = geomPrim.GetDisplayColorAttr();
+          prop->SetColor(color[0][0], color[0][1], color[0][2]);
+        }
 
-          vtkNew<vtkProperty> prop;
-          prop->SetInterpolationToPBR();
+        actor->SetProperty(prop);
+      }
 
-          pxr::VtArray<pxr::GfVec3f> color;
-          if (displayColorAttr.Get(&color) && color.size() == 1)
+      // backface culling
+      if (geomPrim)
+      {
+        pxr::UsdAttribute doubleSidedAttr = geomPrim.GetDoubleSidedAttr();
+
+        bool doubleSided;
+        if (doubleSidedAttr.Get(&doubleSided) && !doubleSided)
+        {
+          pxr::UsdAttribute orientationAttr = geomPrim.GetOrientationAttr();
+
+          pxr::TfToken orientation;
+          if (orientationAttr && orientationAttr.Get(&orientation))
           {
-            prop->SetColor(color[0][0], color[0][1], color[0][2]);
+            if (orientation == pxr::UsdGeomTokens->rightHanded)
+            {
+              actor->GetProperty()->BackfaceCullingOn();
+            }
+            else
+            {
+              actor->GetProperty()->FrontfaceCullingOn();
+            }
           }
-
-          actor->SetProperty(prop);
         }
       }
 
@@ -791,7 +813,8 @@ public:
     if (tex == nullptr)
     {
       pxr::SdfAssetPath path;
-      if (samplerPrim.GetInput(pxr::TfToken("file")).Get(&path))
+      pxr::UsdShadeInput fileInput = samplerPrim.GetInput(pxr::TfToken("file"));
+      if (fileInput && fileInput.Get(&path))
       {
         vtkSmartPointer<vtkImageReader2> reader;
 
@@ -830,6 +853,10 @@ public:
         reader->Update();
 
         tex = reader->GetOutput();
+      }
+      else
+      {
+        return nullptr;
       }
     }
 
