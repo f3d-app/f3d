@@ -327,7 +327,7 @@ engine::libInformation engine::getLibInfo()
   }
 
   libInfo.PreviousCopyright = "Copyright (C) 2019-2021 Kitware SAS";
-  libInfo.Copyright = "Copyright (C) 2021-2023 Michael Migliore, Mathieu Westphal";
+  libInfo.Copyright = "Copyright (C) 2021-2024 Michael Migliore, Mathieu Westphal";
   libInfo.License = "BSD-3-Clause";
   libInfo.Authors = "Michael Migliore, Mathieu Westphal and Joachim Pouderoux";
 
