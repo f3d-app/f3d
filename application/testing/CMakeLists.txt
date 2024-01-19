@@ -593,6 +593,7 @@ if(F3D_PLUGIN_BUILD_USD)
   # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8224
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210805) # for embedded material support
     f3d_test(NAME TestUSDZAnimated DATA AnimatedCube.usdz ARGS --load-plugins=usd --animation-time=0.3)
+    f3d_test(NAME TestUSDZRigged DATA RiggedSimple.usdz ARGS --load-plugins=usd --animation-time=0.3)
 
     # The threshold is quite high because of macos
     # However, the PNSR is >30db which is acceptable
