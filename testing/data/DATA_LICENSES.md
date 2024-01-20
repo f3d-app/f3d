@@ -6,6 +6,7 @@
 - AnimatedCube.usdz: [USD Working Group](https://github.com/usd-wg/assets): Apache 2.0
 - McUSD.usdz: [USD Working Group](https://github.com/usd-wg/assets): CC-NC-BY-SA, textures by [jasonjgardner](https://github.com/jasonjgardner)
 - Teapot.usd: [USD Working Group](https://github.com/usd-wg/assets): Public Domain - CC0
+- RiggedSimple.usdz: [USD Working Group](https://github.com/usd-wg/assets): [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - animatedWorld.fbx: VTK Data: BSD-3-Clause
 - animation_with_skeleton.fbx: assimp test models: BSD-3-Clause
 - anim_test.x: assimp test models: BSD-3-Clause
