@@ -317,7 +317,8 @@ public:
         {
           pxr::UsdGeomMesh meshPrim = pxr::UsdGeomMesh(prim);
 
-          vtkSmartPointer<vtkPolyData>& mappedPolydata = this->MeshMap[meshPrim.GetPath().GetAsString()];
+          vtkSmartPointer<vtkPolyData>& mappedPolydata =
+            this->MeshMap[meshPrim.GetPath().GetAsString()];
           bool meshAlreadyExists = (mappedPolydata != nullptr);
 
           // attributes
