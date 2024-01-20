@@ -86,10 +86,13 @@ public:
     {
       this->Stage = pxr::UsdStage::Open(filePath);
 
-      // TODO: USD bake skinning is not performant
-      // We need to read joints and do the skinning in the shader
-      // See https://github.com/f3d-app/f3d/issues/1076
-      pxr::UsdSkelBakeSkinning(this->Stage->Traverse());
+      if (this->Stage)
+      {
+        // TODO: USD bake skinning is not performant
+        // We need to read joints and do the skinning in the shader
+        // See https://github.com/f3d-app/f3d/issues/1076
+        pxr::UsdSkelBakeSkinning(this->Stage->Traverse());
+      }
     }
   }
 
@@ -1155,7 +1158,7 @@ public:
     timeRange[1] = this->Stage->GetEndTimeCode() / this->Stage->GetTimeCodesPerSecond();
   }
 
-  pxr::UsdStageRefPtr Stage;
+  pxr::UsdStageRefPtr Stage = nullptr;
 
 private:
   std::unordered_map<std::string, vtkSmartPointer<vtkActor> > ActorMap;
