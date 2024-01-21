@@ -8,4 +8,8 @@
     <glob pattern="*.p21"/>
     <glob pattern="*.210"/>
   </mime-type>
+  <mime-type type="application/vnd.brep">
+    <comment>Open CASCADE BRep</comment>
+    <glob pattern="*.brep"/>
+  </mime-type>
 </mime-info>
