@@ -27,5 +27,7 @@ f3d_plugin_build(
   VERSION 1.0
   DESCRIPTION "VTK OpenVDB support"
   VTK_MODULES IOOpenVDB
+  MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-vdb-formats.xml"
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
+  FREEDESKTOP
 )

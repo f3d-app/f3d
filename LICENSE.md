@@ -1,7 +1,7 @@
 BSD 3-Clause License
 
 * Copyright 2019-2021 Kitware SAS
-* Copyright 2021-2023 Michael Migliore, Mathieu Westphal
+* Copyright 2021-2024 Michael Migliore, Mathieu Westphal
 
 All rights reserved.
 

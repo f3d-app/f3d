@@ -525,6 +525,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridActor->SetPosition(gridPos);
       this->GridActor->SetMapper(gridMapper);
       this->GridActor->UseBoundsOff();
+      this->GridActor->PickableOff();
       this->GridConfigured = true;
     }
   }
