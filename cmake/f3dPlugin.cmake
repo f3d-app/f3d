@@ -112,15 +112,14 @@ macro(f3d_plugin_declare_reader)
       SET "${F3D_READER_JSON}" "exclude_thumbnailer" "false")
   endif()
 
-  string(JSON F3D_PLUGIN_JSON
-    SET "${F3D_PLUGIN_JSON}" "readers" ${F3D_PLUGIN_CURRENT_READER_INDEX} "${F3D_READER_JSON}")
-
-  math(EXPR "F3D_PLUGIN_CURRENT_READER_INDEX" "${F3D_PLUGIN_CURRENT_READER_INDEX} +1")
-
   if(F3D_READER_VTK_IMPORTER)
     set(F3D_READER_HAS_SCENE_READER 1)
+    string(JSON F3D_READER_JSON
+      SET "${F3D_READER_JSON}" "full_scene" "true")
   else()
     set(F3D_READER_HAS_SCENE_READER 0)
+    string(JSON F3D_READER_JSON
+      SET "${F3D_READER_JSON}" "full_scene" "false")
   endif()
 
   if(F3D_READER_VTK_READER)
@@ -128,6 +127,11 @@ macro(f3d_plugin_declare_reader)
   else()
     set(F3D_READER_HAS_GEOMETRY_READER 0)
   endif()
+
+  string(JSON F3D_PLUGIN_JSON
+    SET "${F3D_PLUGIN_JSON}" "readers" ${F3D_PLUGIN_CURRENT_READER_INDEX} "${F3D_READER_JSON}")
+
+  math(EXPR "F3D_PLUGIN_CURRENT_READER_INDEX" "${F3D_PLUGIN_CURRENT_READER_INDEX} +1")
 
   configure_file("${_f3dPlugin_dir}/readerBoilerPlate.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/reader_${F3D_READER_NAME}.h")
