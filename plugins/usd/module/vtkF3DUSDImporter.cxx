@@ -1,5 +1,7 @@
 #include "vtkF3DUSDImporter.h"
 
+#include "vtkF3DFaceVaryingPointDispatcher.h"
+
 #include <vtkActor.h>
 #include <vtkCapsuleSource.h>
 #include <vtkConeSource.h>
@@ -14,12 +16,14 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkImageResize.h>
 #include <vtkInformation.h>
+#include <vtkInformationStringKey.h>
 #include <vtkMatrix4x4.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkPolyDataNormals.h>
 #include <vtkPolyDataTangents.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
@@ -78,7 +82,18 @@ public:
   void ReadScene(const std::string& filePath)
   {
     // in case of failure, you may want to set PXR_PLUGINPATH_NAME to the lib/usd path
-    this->Stage = pxr::UsdStage::Open(filePath);
+    if (!this->Stage)
+    {
+      this->Stage = pxr::UsdStage::Open(filePath);
+
+      if (this->Stage)
+      {
+        // TODO: USD bake skinning is not performant
+        // We need to read joints and do the skinning in the shader
+        // See https://github.com/f3d-app/f3d/issues/1076
+        pxr::UsdSkelBakeSkinning(this->Stage->Traverse());
+      }
+    }
   }
 
   template<typename T>
@@ -116,6 +131,122 @@ public:
     return this->ConvertMatrix(node.ComputeLocalToWorldTransform(timeCode));
   }
 
+  void AddActor(vtkRenderer* renderer, const pxr::SdfPath& path, const pxr::UsdGeomGprim& geomPrim,
+    const pxr::UsdPrim& prim, vtkMatrix4x4* mat, vtkPolyData* polydata)
+  {
+    pxr::SdfPath actorPath = path.AppendChild(pxr::TfToken(prim.GetName()));
+
+    auto& actor = this->ActorMap[actorPath.GetAsString()];
+    bool actorAlreadyExists = (actor != nullptr);
+
+    if (!actorAlreadyExists)
+    {
+      actor = vtkSmartPointer<vtkActor>::New();
+
+      // get associated material/shader
+      pxr::UsdShadeMaterial material =
+        pxr::UsdShadeMaterialBindingAPI(prim).ComputeBoundMaterial(pxr::UsdShadeTokens->preview);
+
+      if (material)
+      {
+        auto [shaderPrim, token] = this->GetConnectedShaderPrim(material.GetSurfaceOutput());
+
+        auto prop = this->GetVTKProperty(shaderPrim);
+
+        if (prop)
+        {
+          actor->SetProperty(prop);
+
+          // enable translucent flag if required
+          vtkTexture* baseColor = prop->GetTexture("albedoTex");
+          if (prop->GetOpacity() < 0.99 ||
+            (baseColor && baseColor->GetInput()->GetNumberOfScalarComponents() == 4))
+          {
+            actor->ForceTranslucentOn();
+          }
+
+          // activate correct UV set if relevant
+          vtkInformation* info = prop->GetInformation();
+          const char* uvName = info->Get(vtkF3DUSDImporter::TCOORDS_NAME());
+
+          if (uvName && uvName[0] != 0)
+          {
+            polydata->GetPointData()->SetActiveAttribute(uvName, vtkDataSetAttributes::TCOORDS);
+          }
+        }
+      }
+      else
+      {
+        // if there is no material, fallback on display color
+        pxr::UsdAttribute displayColorAttr = geomPrim.GetDisplayColorAttr();
+
+        vtkNew<vtkProperty> prop;
+        prop->SetInterpolationToPBR();
+
+        pxr::VtArray<pxr::GfVec3f> color;
+        if (displayColorAttr.Get(&color) && color.size() == 1)
+        {
+          prop->SetColor(color[0][0], color[0][1], color[0][2]);
+        }
+
+        actor->SetProperty(prop);
+      }
+
+      // backface culling
+      pxr::UsdAttribute doubleSidedAttr = geomPrim.GetDoubleSidedAttr();
+
+      bool doubleSided;
+      if (doubleSidedAttr.Get(&doubleSided) && !doubleSided)
+      {
+        pxr::UsdAttribute orientationAttr = geomPrim.GetOrientationAttr();
+
+        pxr::TfToken orientation;
+        if (orientationAttr && orientationAttr.Get(&orientation))
+        {
+          if (orientation == pxr::UsdGeomTokens->rightHanded)
+          {
+            actor->GetProperty()->BackfaceCullingOn();
+          }
+          else
+          {
+            actor->GetProperty()->FrontfaceCullingOn();
+          }
+        }
+      }
+
+      renderer->AddActor(actor);
+    }
+
+    // set mapper
+    vtkNew<vtkPolyDataMapper> mapper;
+
+    if (actor->GetProperty()->GetTexture("normalTex"))
+    {
+      vtkNew<vtkTriangleFilter> triangulate;
+      triangulate->SetInputData(polydata);
+
+      vtkNew<vtkPolyDataNormals> normals;
+      normals->SetInputConnection(triangulate->GetOutputPort());
+
+      vtkNew<vtkPolyDataTangents> tangents;
+      tangents->SetInputConnection(normals->GetOutputPort());
+      tangents->Update();
+      mapper->SetInputData(tangents->GetOutput());
+    }
+    else
+    {
+      mapper->SetInputData(polydata);
+    }
+
+    if (!this->HasTimeCode())
+    {
+      mapper->StaticOn();
+    }
+
+    actor->SetMapper(mapper);
+    actor->SetUserMatrix(mat);
+  }
+
   void ImportNode(vtkRenderer* renderer, const pxr::UsdPrim& node, const pxr::SdfPath& path,
     vtkMatrix4x4* currentMatrix)
   {
@@ -124,6 +255,29 @@ public:
     // simple range-for iteration
     for (pxr::UsdPrim prim : pxr::UsdPrimSiblingRange(node.GetAllChildren()))
     {
+      if (prim.IsA<pxr::UsdGeomImageable>())
+      {
+        pxr::UsdGeomImageable imageable = pxr::UsdGeomImageable(prim);
+
+        pxr::TfToken visibility;
+        pxr::UsdAttribute visAttr = imageable.GetVisibilityAttr();
+        if (visAttr && visAttr.HasAuthoredValue() && visAttr.Get(&visibility, timeCode) &&
+          visibility == pxr::UsdGeomTokens->invisible)
+        {
+          // not visible, skip
+          continue;
+        }
+
+        pxr::TfToken purpose;
+        pxr::UsdAttribute purpAttr = imageable.GetPurposeAttr();
+        if (purpAttr && purpAttr.HasAuthoredValue() && purpAttr.Get(&purpose, timeCode) &&
+          (purpose == pxr::UsdGeomTokens->proxy || purpose == pxr::UsdGeomTokens->guide))
+        {
+          // proxy, skip
+          continue;
+        }
+      }
+
       if (prim.IsInstance())
       {
         pxr::UsdGeomXform xform = pxr::UsdGeomXform(prim);
@@ -166,28 +320,38 @@ public:
         {
           pxr::UsdGeomMesh meshPrim = pxr::UsdGeomMesh(prim);
 
-          polydata = this->MeshMap[meshPrim.GetPath().GetAsString()];
-          bool meshAlreadyExists = (polydata != nullptr);
+          vtkSmartPointer<vtkPolyData>& mappedPolydata =
+            this->MeshMap[meshPrim.GetPath().GetAsString()];
+          bool meshAlreadyExists = (mappedPolydata != nullptr);
 
-          if (!meshAlreadyExists)
-          {
-            polydata = vtkSmartPointer<vtkPolyData>::New();
-          }
-
-          // read normals
+          // attributes
           pxr::UsdAttribute normalsAttr = meshPrim.GetNormalsAttr();
+          pxr::UsdAttribute pointsAttr = meshPrim.GetPointsAttr();
+          pxr::UsdAttribute facesCountAttr = meshPrim.GetFaceVertexCountsAttr();
+          pxr::UsdAttribute facesIndicesAttr = meshPrim.GetFaceVertexIndicesAttr();
 
-          if (meshPrim.GetNormalsInterpolation() == pxr::UsdGeomTokens->vertex)
+          std::vector<pxr::UsdGeomPrimvar> primVars =
+            pxr::UsdGeomPrimvarsAPI(meshPrim).GetPrimvars();
+
+          auto TimeVarying = [](const auto& a) { return a.ValueMightBeTimeVarying(); };
+
+          bool animatedAttribute = std::any_of(primVars.cbegin(), primVars.cend(), TimeVarying);
+          animatedAttribute = animatedAttribute || TimeVarying(pointsAttr);
+          animatedAttribute = animatedAttribute || TimeVarying(normalsAttr);
+          animatedAttribute = animatedAttribute || TimeVarying(facesCountAttr);
+          animatedAttribute = animatedAttribute || TimeVarying(facesIndicesAttr);
+
+          // Check if the mesh has to be rebuilt
+          if (!meshAlreadyExists || animatedAttribute)
           {
-            // only vertex interpolation is supported for now
-            // there are many datasets using faceVarying to represent sharp edges
-            // but it is not supported by VTK so points have to be duplicated manually
-            // See https://github.com/f3d-app/f3d/issues/1074
-            if (!meshAlreadyExists || normalsAttr.ValueMightBeTimeVarying())
-            {
-              pxr::VtArray<pxr::GfVec3f> normals;
-              normalsAttr.Get(&normals, timeCode);
+            vtkNew<vtkPolyData> newPolyData;
 
+            // normals
+            pxr::VtArray<pxr::GfVec3f> normals;
+            normalsAttr.Get(&normals, timeCode);
+
+            if (normals.size() > 0)
+            {
               vtkNew<vtkFloatArray> vNormals;
               vNormals->SetName("Normals");
               vNormals->SetNumberOfComponents(3);
@@ -198,40 +362,78 @@ public:
                 vNormals->InsertNextTuple3(n[0], n[1], n[2]);
               }
 
-              polydata->GetPointData()->SetNormals(vNormals);
+              vtkInformation* info = vNormals->GetInformation();
+              info->Set(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE(),
+                meshPrim.GetNormalsInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
+
+              newPolyData->GetPointData()->SetNormals(vNormals);
             }
-          }
 
-          // read uvs
-          pxr::UsdGeomPrimvar uvAttr =
-            pxr::UsdGeomPrimvarsAPI(meshPrim).GetPrimvar(pxr::TfToken("st"));
-
-          if (!meshAlreadyExists || uvAttr.ValueMightBeTimeVarying())
-          {
-            pxr::VtArray<pxr::GfVec2f> uvs;
-            uvAttr.Get(&uvs, timeCode);
-
-            if (uvs.size() > 0)
+            // texture coordinates
+            bool firstArray = true;
+            for (const pxr::UsdGeomPrimvar& primVar : primVars)
             {
-              vtkNew<vtkFloatArray> texCoords;
-              texCoords->SetName("TCoords");
-              texCoords->SetNumberOfComponents(2);
-              texCoords->Allocate(uvs.size());
-
-              for (const pxr::GfVec2f& uv : uvs)
+              if (primVar.GetTypeName() == "texCoord2f[]" || primVar.GetTypeName() == "float2[]")
               {
-                texCoords->InsertNextTuple2(uv[0], uv[1]);
+                pxr::VtArray<pxr::GfVec2f> uvs;
+                primVar.Get(&uvs, timeCode);
+
+                if (uvs.size() > 0)
+                {
+                  std::string name = primVar.GetPrimvarName();
+
+                  vtkNew<vtkFloatArray> texCoords;
+                  texCoords->SetName(name.c_str());
+                  texCoords->SetNumberOfComponents(2);
+
+                  if (primVar.IsIndexed())
+                  {
+                    pxr::UsdAttribute indicesAttr = primVar.GetIndicesAttr();
+
+                    pxr::VtArray<int> indices;
+                    if (indicesAttr.Get(&indices) && indices.size() > 0)
+                    {
+                      texCoords->Allocate(indices.size());
+
+                      for (int index : indices)
+                      {
+                        const pxr::GfVec2f& uv = uvs[index];
+                        texCoords->InsertNextTuple2(uv[0], uv[1]);
+                      }
+                    }
+                  }
+                  else
+                  {
+                    texCoords->Allocate(uvs.size());
+
+                    for (const pxr::GfVec2f& uv : uvs)
+                    {
+                      texCoords->InsertNextTuple2(uv[0], uv[1]);
+                    }
+                  }
+
+                  vtkInformation* info = texCoords->GetInformation();
+                  info->Set(vtkF3DFaceVaryingPointDispatcher::INTERPOLATION_TYPE(),
+                    primVar.GetInterpolation() == pxr::UsdGeomTokens->faceVarying ? 1 : 0);
+
+                  // the size of the array can be larger than the number of points if the attribute
+                  // interpolation is face-varying.
+                  // It will be normalized by the vtkF3DFaceVaryingPointDispatcher later
+                  newPolyData->GetPointData()->AddArray(texCoords);
+
+                  if (firstArray)
+                  {
+                    // sometimes we are enable to fetch the array name to use for texture mapping
+                    // so we fallback to the first UV set added
+                    // see https://github.com/f3d-app/f3d/issues/1184
+                    firstArray = false;
+                    newPolyData->GetPointData()->SetTCoords(texCoords);
+                  }
+                }
               }
-
-              polydata->GetPointData()->SetTCoords(texCoords);
             }
-          }
 
-          // read points
-          pxr::UsdAttribute pointsAttr = meshPrim.GetPointsAttr();
-
-          if (!meshAlreadyExists || pointsAttr.ValueMightBeTimeVarying())
-          {
+            // points
             pxr::VtArray<pxr::GfVec3f> positions;
             pointsAttr.Get(&positions, timeCode);
 
@@ -242,16 +444,9 @@ public:
               points->InsertNextPoint(p[0], p[1], p[2]);
             }
 
-            polydata->SetPoints(points);
-          }
+            newPolyData->SetPoints(points);
 
-          // read polys
-          pxr::UsdAttribute facesCountAttr = meshPrim.GetFaceVertexCountsAttr();
-          pxr::UsdAttribute facesIndicesAttr = meshPrim.GetFaceVertexIndicesAttr();
-
-          if (!meshAlreadyExists || facesCountAttr.ValueMightBeTimeVarying() ||
-            facesIndicesAttr.ValueMightBeTimeVarying())
-          {
+            // faces
             pxr::VtArray<int> counts;
             facesCountAttr.Get(&counts, timeCode);
 
@@ -270,8 +465,16 @@ public:
               std::advance(currentCellIt, c);
             }
 
-            polydata->SetPolys(cells);
+            newPolyData->SetPolys(cells);
+
+            vtkNew<vtkF3DFaceVaryingPointDispatcher> faceVaryingFilter;
+            faceVaryingFilter->SetInputData(newPolyData);
+            faceVaryingFilter->Update();
+
+            mappedPolydata = faceVaryingFilter->GetOutput();
           }
+
+          polydata = mappedPolydata;
         }
         else if (prim.IsA<pxr::UsdGeomSphere>())
         {
@@ -443,80 +646,50 @@ public:
           polydata = vtkPolyData::SafeDownCast(transform->GetOutput());
         }
 
-        // create actor
-        pxr::SdfPath actorPath = path.AppendChild(prim.GetName());
-
-        auto& actor = this->ActorMap[actorPath.GetAsString()];
-        bool actorAlreadyExists = (actor != nullptr);
-
-        if (!actorAlreadyExists)
-        {
-          actor = vtkSmartPointer<vtkActor>::New();
-
-          // get associated material/shader
-          pxr::UsdShadeMaterial material =
-            pxr::UsdShadeMaterialBindingAPI(geomPrim).ComputeBoundMaterial();
-
-          if (material)
-          {
-            auto [shaderPrim, token] = this->GetConnectedShaderPrim(material.GetSurfaceOutput());
-
-            auto [prop, isTranslucent] = this->GetVTKProperty(shaderPrim);
-            actor->SetProperty(prop);
-            if (isTranslucent)
-            {
-              actor->ForceTranslucentOn();
-            }
-          }
-          else
-          {
-            // if there is no material, fallback on display color
-            pxr::UsdAttribute displayColorAttr = geomPrim.GetDisplayColorAttr();
-
-            vtkNew<vtkProperty> prop;
-            prop->SetInterpolationToPBR();
-
-            pxr::VtArray<pxr::GfVec3f> color;
-            if (displayColorAttr.Get(&color) && color.size() == 1)
-            {
-              prop->SetColor(color[0][0], color[0][1], color[0][2]);
-            }
-
-            actor->SetProperty(prop);
-          }
-
-          // set mapper
-          vtkNew<vtkPolyDataMapper> mapper;
-
-          if (actor->GetProperty()->GetTexture("normalTex"))
-          {
-            vtkNew<vtkTriangleFilter> triangulate;
-            triangulate->SetInputData(polydata);
-
-            vtkNew<vtkPolyDataTangents> tangents;
-            tangents->SetInputConnection(triangulate->GetOutputPort());
-            tangents->Update();
-            mapper->SetInputData(tangents->GetOutput());
-          }
-          else
-          {
-            mapper->SetInputData(polydata);
-          }
-
-          if (!this->HasTimeCode())
-          {
-            mapper->StaticOn();
-          }
-
-          actor->SetMapper(mapper);
-
-          renderer->AddActor(actor);
-        }
+        // create actors
 
         // get xform
         auto mat = this->GetLocalTransform(geomPrim, timeCode);
         vtkMatrix4x4::Multiply4x4(currentMatrix, mat, mat);
-        actor->SetUserMatrix(mat);
+
+        std::vector<pxr::UsdGeomSubset> subsets = pxr::UsdGeomSubset::GetGeomSubsets(geomPrim);
+
+        if (subsets.empty())
+        {
+          this->AddActor(renderer, path, geomPrim, prim, mat, polydata);
+        }
+        else
+        {
+          // split subsets
+          for (const pxr::UsdGeomSubset& subset : subsets)
+          {
+            pxr::UsdAttribute indicesAttr = subset.GetIndicesAttr();
+
+            pxr::VtArray<int> indices;
+            indicesAttr.Get(&indices, timeCode);
+
+            vtkNew<vtkPolyData> polydataSubset;
+            polydataSubset->SetPoints(polydata->GetPoints());
+            polydataSubset->GetPointData()->ShallowCopy(polydata->GetPointData());
+
+            vtkCellArray* mainPolys = polydata->GetPolys();
+
+            // add polygons
+            vtkNew<vtkCellArray> cells;
+            for (int cellId : indices)
+            {
+              vtkIdType cellSize;
+              const vtkIdType* cellPoints;
+              mainPolys->GetCellAtId(cellId, cellSize, cellPoints);
+              cells->InsertNextCell(cellSize, cellPoints);
+            }
+
+            polydataSubset->SetPolys(cells);
+
+            this->AddActor(renderer, path.AppendChild(pxr::TfToken(prim.GetName())), geomPrim,
+              subset.GetPrim(), mat, polydataSubset);
+          }
+        }
       }
       else
       {
@@ -533,12 +706,6 @@ public:
       vtkErrorWithObjectMacro(renderer, << "Stage failed to open");
       return;
     }
-
-    // TODO: USD bake skinning is not performant
-    // We need to read joints and do the skinning in the shader
-    // See https://github.com/f3d-app/f3d/issues/1076
-    pxr::UsdSkelBakeSkinning(this->Stage->Traverse());
-    this->Stage->Save();
 
     vtkNew<vtkMatrix4x4> rootTransform;
 
@@ -642,6 +809,7 @@ public:
     return appendChannels->GetOutput();
   }
 
+  // returns the image and the texture coordinate name
   vtkSmartPointer<vtkImageData> GetVTKTexture(
     const pxr::UsdShadeShader& samplerPrim, const pxr::TfToken& token)
   {
@@ -650,20 +818,46 @@ public:
       return nullptr;
     }
 
+    pxr::TfToken idToken;
+    bool defined = samplerPrim.GetIdAttr().Get(&idToken);
+    if (!defined || idToken != pxr::TfToken("UsdUVTexture"))
+    {
+      // only UsdUVTexture supported for now
+      return nullptr;
+    }
+
+    // get array name
+    auto [uvset, uvtoken] = this->GetConnectedShaderPrim(samplerPrim.GetInput(pxr::TfToken("st")));
+    std::string name;
+
+    if (uvset)
+    {
+      pxr::UsdShadeInput arrayName = uvset.GetInput(pxr::TfToken("varname"));
+
+      if (arrayName)
+      {
+        if (arrayName.GetTypeName() == "token")
+        {
+          pxr::TfToken tokenName;
+          if (arrayName.Get(&tokenName))
+          {
+            name = tokenName;
+          }
+        }
+        else if (arrayName.GetTypeName() == "string")
+        {
+          arrayName.Get(&name);
+        }
+      }
+    }
+
     auto& tex = this->TextureMap[samplerPrim.GetPath().GetAsString()];
 
     if (tex == nullptr)
     {
-      pxr::TfToken idToken;
-      bool defined = samplerPrim.GetIdAttr().Get(&idToken);
-      if (!defined || idToken != pxr::TfToken("UsdUVTexture"))
-      {
-        // only UsdUVTexture supported for now
-        return nullptr;
-      }
-
       pxr::SdfAssetPath path;
-      if (samplerPrim.GetInput(pxr::TfToken("file")).Get(&path))
+      pxr::UsdShadeInput fileInput = samplerPrim.GetInput(pxr::TfToken("file"));
+      if (fileInput && fileInput.Get(&path))
       {
         vtkSmartPointer<vtkImageReader2> reader;
 
@@ -703,7 +897,13 @@ public:
 
         tex = reader->GetOutput();
       }
+      else
+      {
+        return nullptr;
+      }
     }
+
+    tex->GetInformation()->Set(vtkF3DUSDImporter::TCOORDS_NAME(), name);
 
     // extract component based on token
     vtkNew<vtkImageExtractComponents> extract;
@@ -738,15 +938,15 @@ public:
     }
 
     extract->Update();
+
+    extract->GetOutput()->GetInformation()->Copy(tex->GetInformation());
+
     return extract->GetOutput();
   }
 
-  std::pair<vtkSmartPointer<vtkProperty>, bool> GetVTKProperty(
-    const pxr::UsdShadeShader& shaderPrim)
+  vtkSmartPointer<vtkProperty> GetVTKProperty(const pxr::UsdShadeShader& shaderPrim)
   {
     auto& prop = this->ShaderMap[shaderPrim.GetPath().GetAsString()];
-
-    bool isTranslucent = false;
 
     if (prop == nullptr)
     {
@@ -761,11 +961,13 @@ public:
         if (!defined || materialToken != pxr::TfToken("UsdPreviewSurface"))
         {
           // only UsdPreviewSurface supported for now
-          return { nullptr, isTranslucent };
+          return nullptr;
         }
 
         prop = vtkSmartPointer<vtkProperty>::New();
         prop->SetInterpolationToPBR();
+
+        vtkInformation* info = prop->GetInformation();
 
         // diffuseColor
         pxr::GfVec3f diffuseColorValue;
@@ -779,7 +981,12 @@ public:
         vtkSmartPointer<vtkImageData> diffuseColorImage;
         if (diffuseColorSampler)
         {
-          diffuseColorImage = this->GetVTKTexture(diffuseColorSampler, colorToken);
+          auto image = this->GetVTKTexture(diffuseColorSampler, colorToken);
+          if (image)
+          {
+            diffuseColorImage = image;
+            info->Copy(image->GetInformation());
+          }
         }
 
         // opacity
@@ -794,8 +1001,12 @@ public:
         vtkSmartPointer<vtkImageData> opacityImage;
         if (opacitySampler)
         {
-          opacityImage = this->GetVTKTexture(opacitySampler, opacityToken);
-          isTranslucent = true;
+          auto image = this->GetVTKTexture(opacitySampler, opacityToken);
+          if (image)
+          {
+            opacityImage = image;
+            info->Copy(image->GetInformation());
+          }
         }
 
         auto baseColor = this->CombineColorOpacityImage(diffuseColorImage, opacityImage);
@@ -816,14 +1027,13 @@ public:
         // emissive
         pxr::UsdShadeInput emissive = shaderPrim.GetInput(pxr::TfToken("emissiveColor"));
         auto [emissiveSampler, emissiveToken] = this->GetConnectedShaderPrim(emissive);
-        vtkSmartPointer<vtkImageData> emissiveImage;
         if (emissiveSampler)
         {
-          emissiveImage = this->GetVTKTexture(emissiveSampler, emissiveToken);
-          if (emissiveImage)
+          auto image = this->GetVTKTexture(emissiveSampler, emissiveToken);
+          if (image)
           {
             vtkNew<vtkTexture> texture;
-            texture->SetInputData(emissiveImage);
+            texture->SetInputData(image);
 
             texture->MipmapOn();
             texture->InterpolateOn();
@@ -832,6 +1042,8 @@ public:
             texture->UseSRGBColorSpaceOn();
 
             prop->SetEmissiveTexture(texture);
+
+            info->Copy(image->GetInformation());
           }
         }
 
@@ -848,7 +1060,12 @@ public:
         if (roughnessSampler)
         {
           prop->SetRoughness(1.0);
-          roughnessImage = this->GetVTKTexture(roughnessSampler, roughnessToken);
+          auto image = this->GetVTKTexture(roughnessSampler, roughnessToken);
+          if (image)
+          {
+            roughnessImage = image;
+            info->Copy(image->GetInformation());
+          }
         }
 
         float metallicValue;
@@ -863,7 +1080,12 @@ public:
         if (metallicSampler)
         {
           prop->SetMetallic(1.0);
-          metallicImage = this->GetVTKTexture(metallicSampler, metallicToken);
+          auto image = this->GetVTKTexture(metallicSampler, metallicToken);
+          if (image)
+          {
+            metallicImage = image;
+            info->Copy(image->GetInformation());
+          }
         }
 
         pxr::UsdShadeInput occlusion = shaderPrim.GetInput(pxr::TfToken("occlusion"));
@@ -871,7 +1093,12 @@ public:
         vtkSmartPointer<vtkImageData> occlusionImage;
         if (occlusionSampler)
         {
-          occlusionImage = this->GetVTKTexture(occlusionSampler, occlusionToken);
+          auto image = this->GetVTKTexture(occlusionSampler, occlusionToken);
+          if (image)
+          {
+            occlusionImage = image;
+            info->Copy(image->GetInformation());
+          }
         }
 
         auto orm = this->CombineORMImage(occlusionImage, roughnessImage, metallicImage);
@@ -893,24 +1120,26 @@ public:
         auto [normalSampler, normalToken] = this->GetConnectedShaderPrim(normal);
         if (normalSampler)
         {
-          auto img = this->GetVTKTexture(normalSampler, normalToken);
+          auto image = this->GetVTKTexture(normalSampler, normalToken);
 
-          if (img)
+          if (image)
           {
             vtkNew<vtkTexture> texture;
-            texture->SetInputData(img);
+            texture->SetInputData(image);
 
             texture->MipmapOn();
             texture->InterpolateOn();
             texture->SetColorModeToDirectScalars();
 
             prop->SetNormalTexture(texture);
+
+            info->Copy(image->GetInformation());
           }
         }
       }
     }
 
-    return { prop, isTranslucent };
+    return prop;
   }
 
   bool HasTimeCode()
@@ -929,7 +1158,7 @@ public:
     timeRange[1] = this->Stage->GetEndTimeCode() / this->Stage->GetTimeCodesPerSecond();
   }
 
-  pxr::UsdStageRefPtr Stage;
+  pxr::UsdStageRefPtr Stage = nullptr;
 
 private:
   std::unordered_map<std::string, vtkSmartPointer<vtkActor> > ActorMap;
@@ -940,6 +1169,8 @@ private:
 };
 
 vtkStandardNewMacro(vtkF3DUSDImporter);
+
+vtkInformationKeyMacro(vtkF3DUSDImporter, TCOORDS_NAME, String);
 
 //----------------------------------------------------------------------------
 vtkF3DUSDImporter::vtkF3DUSDImporter()

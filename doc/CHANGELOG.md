@@ -2,24 +2,47 @@
 
 ## Ongoing development
 
+## v2.3.0
+
 For F3D users:
- - Added `--animation-autoplay` option (libf3d: `scene.animation.autoplay`) to automatically start animation on file load.
- - Added an experimental VDB reader for .vdb files using OpenVDB
+ - Added `--animation-autoplay` option (libf3d: `scene.animation.autoplay`) to automatically start animation on file load
+ - Added an experimental `vdb` plugin in order to read .vdb files using OpenVDB
+ - Added an `usd` plugin in order to read .usd files using OpenUSD
+ - Added .3mf and .x files support in the `assimp` plugin
+ - Added a small margin between the model and the grid to avoid potential z-fighting
+ - Added VTK output to the log when using `--verbose=debug` for easier debug
+ - Reworked the `alembic` plugin to read Texture Coordinates and Normals for .abc files
+ - Improved the reading of EXR files using multi-threading for better performance when loading HDRIs
+ - Improved the documentation on https://f3d.app
+ - Improved general logging in order to make it easier to understand issues with file and options
+ - Fixed potential crashes when reading `assimp` plugin file formats
+ - Fixed `--grid-absolute` for off-center models
+ - Fixed an issue with thumbnail generation showing the log window
+ - Fixed many interaction issues on non-Qwerty keyboard layout
+ - Fixed handling of filenames containing commas
+ - Fixed an issue on Windows where the log window would appear on top of F3D window
+ - Fixed crashes with specific .obj file
+ - Fixed an issue with incorrect return code when using headless mode or incorrect options
+ - Fixed dependency issue with the headless .deb binary release
+ - Fixed a crash when using a file with more than 254 bones (Requires OpenGL 4.3)
+ - Fixed an issue with Unicode filenames on the title bar on Windows
+ - Fixed an issue where focal point picking would generate error messages
  - Changed `--verbose` into a string based option, eg: `--verbose=quiet` or `--verbose=debug`. `--verbose` is still supported.
  - Changed `--no-render` behavior so that it doesn't impact verbosity anymore
- - Deprecated `--quiet`, use `--verbose=quiet` instead.
- - Reading EXR files is now multi-threaded and much faster.
- - Translucency support is now enabled by default.
- - A small margin is added between the model and the grid to avoid potential z-fighting.
- - Add 3MF and X files support (part of `assimp` plugin)
- - Fix potential crashes when reading `assimp` plugin file format
+ - Changed the default configuration file so that translucency support is enabled by default
+ - Deprecated `--quiet`, use `--verbose=quiet` instead
+ - Deprecated `--input`, use positional argument instead
 
 For libf3d users:
- - Added `scene.animation.autoplay` option.
- - Added a `f3d::image::saveBuffer` API to save an image as a file format in memory.
+ - Added `scene.animation.autoplay` option
+ - Added a `f3d::image::saveBuffer` API to save an image as a file format in memory
+ - Fixed the default name of the window
 
 For F3D packagers:
- - Added a new optional dependency through VTK, OpenVDB
+ - Added a new optional dependency, OpenUSD. Enable with `F3D_PLUGIN_BUILD_USD` CMake option
+ - Added a new optional dependency through VTK, OpenVDB. Enable with `F3D_PLUGIN_BUILD_VDB` CMake option
+ - Added a new CMake option to control the link against libatomic. Control with `F3D_LINUX_LIBRARY_LINK_ATOMIC`
+ - Added two new packages to the list, OpenMandriva and Mageia
 
 ## v2.2.1
 
