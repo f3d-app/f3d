@@ -34,15 +34,13 @@ sudo apt install build-essential git git-lfs cmake libvtk9-dev
 ```
 sudo yum update
 sudo yum install make automake gcc gcc-c++ kernel-devel git git-lfs cmake vtk
-
 ```
 
 #### Arch Linux
 
 ```
 sudo pacman -Syu
-sudo pacman -S base-devel git git-lfs cmake vtk nlohmann-json hdf5 netcdf fmt verdict
-
+sudo pacman -S base-devel git git-lfs cmake vtk nlohmann-json hdf5 netcdf fmt verdict openmpi glew ospray boost libxcursor
 ```
 
 ### Compile F3D
