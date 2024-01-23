@@ -23,7 +23,7 @@ bool animationManager::Initialize(
   this->Playing = false;
   this->CurrentTime = 0;
   this->CurrentTimeSet = false;
-
+  this->AnimationIndex = -1;
   this->Options = options;
   this->Interactor = interactor;
   this->Window = window;
@@ -31,7 +31,6 @@ bool animationManager::Initialize(
 
   // This can be -1 if animation support is not implemented in the importer
   vtkIdType availAnimations = this->Importer->GetNumberOfAnimations();
-  int arrayIndexForAnimation = -1;
 
   if (availAnimations > 0 && interactor)
   {
@@ -92,6 +91,13 @@ bool animationManager::Initialize(
   }
   log::debug("");
 
+  this->SelectAnimationIndex(options->getAsInt("scene.animation.index"));
+
+  if (this->AnimationIndex != 0 && availAnimations <= 0)
+  {
+    log::warn("An animation index has been specified but there are no animation available.");
+  }
+  else if (this->AnimationIndex > 0 && this->AnimationIndex >= availAnimations)
   if (animationIndex > 0 && animationIndex >= availAnimations)
   {
     log::warn(
@@ -100,7 +106,7 @@ bool animationManager::Initialize(
 
     this->Importer->EnableAnimation(0);
   }
-  else if (animationIndex <= -1)
+  else if (this->AnimationIndex <= -1)
   {
     for (int i = 0; i < availAnimations; i++)
     {
@@ -109,7 +115,7 @@ bool animationManager::Initialize(
   }
   else
   {
-    this->Importer->EnableAnimation(animationIndex);
+    this->Importer->EnableAnimation(this->AnimationIndex);
   }
 
   // Recover time ranges for all enabled animations
@@ -266,7 +272,6 @@ bool animationManager::LoadAtTime(double timeValue)
       this->TimeRange[0], ", ", this->TimeRange[1], "] .");
     return false;
   }
-
   this->CurrentTime = timeValue;
   this->CurrentTimeSet = true;
   this->Importer->UpdateTimeStep(this->CurrentTime);
@@ -319,47 +324,28 @@ void animationManager::CycleAnimationsForGLTF()
 {
 
   assert(this->Importer);
-
   int nIndex = this->Importer->GetNumberOfAnimations();
   if (nIndex <= 0)
   {
     return;
   }
-
   if (this->HasAnimation)
   {
-    this->ArrayIndexForAnimation = (this->ArrayIndexForAnimation + 1) % nIndex;
+    this->AnimationIndex = (this->AnimationIndex + 1) % nIndex;
   }
   else
   {
-    // Cycle through arrays looping back to -1
-    // -1 0 1 2 -1 0 1 2 ...
-    this->ArrayIndexForAnimation = (this->ArrayIndexForAnimation + 2) % (nIndex + 1) - 1;
+    this->AnimationIndex = (this->AnimationIndex + 2) % (nIndex + 1) - 1;
   }
 }
-//----------------------------------------------------------------------------
-void animationManager::CycleAnimations(CycleType type)
+// ---------------------------------------------------------------------------------
+void f3d::detail::animationManager::SelectAnimationIndex(int animationIndex)
 {
-  if (!this->Importer)
-  {
-    return;
-  }
-
-  switch (type)
-  {
-    case (CycleType::NONE):
-      return;
-      break;
-    case (CycleType::GLTF):
-      this->CycleAnimationsForGLTF();
-      break;
-    case (CycleType::GLB):
-      this->CycleAnimationsForGLB();
-      break;
-    case (CycleType::FBX):
-      this->CycleAnimationsForFBX();
-      break;
-    default:
-      break;
-  }
+  this->AnimationIndex = animationIndex;
+  this->Importer->EnableAnimation(animationIndex);
+}
+// ---------------------------------------------------------------------------------
+int f3d::detail::animationManager::GetAnimationIndex()
+{
+  return this->AnimationIndex;
 }
