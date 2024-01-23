@@ -1240,6 +1240,7 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     cheatSheetText << "   ?  : Print scene descr to terminal\n";
     cheatSheetText << "  ESC : Quit \n";
     cheatSheetText << " SPACE: Play animation if any\n";
+    cheatSheetText << "   W  : Play next animation \n";
     cheatSheetText << " LEFT : Previous file \n";
     cheatSheetText << " RIGHT: Next file \n";
     cheatSheetText << "  UP  : Reload current file \n";
