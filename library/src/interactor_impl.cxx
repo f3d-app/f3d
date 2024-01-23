@@ -176,6 +176,7 @@ public:
         animationIndex = self->AnimationManager->GetAnimationIndex();
         self->Options.set("scene.animation.index", animationIndex);
         self->AnimationManager->SelectAnimationIndex(animationIndex);
+        self->Options.set("ui.animationname-info", self->AnimationManager->GetAnimationName());
         self->AnimationManager->LoadAtTime(0);
         render = true;
         break;
@@ -495,7 +496,10 @@ public:
   std::function<bool(const std::vector<std::string>&)> DropFilesUserCallBack =
     [](const std::vector<std::string>&) { return false; };
 
-  void StartInteractor() { this->VTKInteractor->Start(); }
+  void StartInteractor()
+  {
+    this->VTKInteractor->Start();
+  }
 
   void StopInteractor()
   {

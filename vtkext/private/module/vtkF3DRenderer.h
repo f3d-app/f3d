@@ -56,6 +56,7 @@ public:
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);
   void SetFilenameInfo(const std::string& info);
+  void SetAnimationnameInfo(const std::string& info);
   void SetDropZoneInfo(const std::string& info);
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(double unitSquare);

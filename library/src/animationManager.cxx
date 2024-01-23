@@ -349,3 +349,8 @@ int f3d::detail::animationManager::GetAnimationIndex()
 {
   return this->AnimationIndex;
 }
+// ---------------------------------------------------------------------------------
+std::string f3d::detail::animationManager::GetAnimationName()
+{
+  return this->Importer->GetAnimationName(this->AnimationIndex);
+}

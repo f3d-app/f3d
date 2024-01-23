@@ -1065,6 +1065,12 @@ void vtkF3DRenderer::SetFilenameInfo(const std::string& info)
   this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, info.c_str());
   this->RenderPassesConfigured = false;
 }
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAnimationnameInfo(const std::string& info)
+{
+  this->FilenameActor->SetText(vtkCornerAnnotation::LowerEdge, info.c_str());
+  this->RenderPassesConfigured = false;
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetDropZoneInfo(const std::string& info)
