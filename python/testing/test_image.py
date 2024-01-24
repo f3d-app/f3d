@@ -82,4 +82,7 @@ def test_to_terminal_text(img_filename):
     testing_data_dir = Path(__file__).parent.parent.parent / "testing/data"
     image_path = testing_data_dir / img_filename
     text_path = image_path.with_suffix(".txt")
-    assert f3d.Image(str(image_path)).to_terminal_text() == open(text_path).read()
+    assert (
+        f3d.Image(str(image_path)).to_terminal_text()
+        == open(text_path, encoding="utf8").read()
+    )
