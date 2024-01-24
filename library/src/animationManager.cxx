@@ -91,7 +91,7 @@ bool animationManager::Initialize(
   }
   log::debug("");
 
-  this->SelectAnimationIndex(options->getAsInt("scene.animation.index"));
+  this->AnimationIndex = options->getAsInt("scene.animation.index");
 
   if (this->AnimationIndex != 0 && availAnimations <= 0)
   {
@@ -223,7 +223,6 @@ void animationManager::ToggleAnimation()
     }
   }
 }
-
 //----------------------------------------------------------------------------
 void animationManager::Tick()
 {
@@ -288,69 +287,27 @@ bool animationManager::LoadAtTime(double timeValue)
   }
   return true;
 }
-
-//----------------------------------------------------------------------------
-void animationManager::GetTimeRange(double timeRange[2])
+void animationManager::CycleAnimation()
 {
-  timeRange[0] = this->TimeRange[0];
-  timeRange[1] = this->TimeRange[1];
-}
-}
-
-//----------------------------------------------------------------------------
-std::string animationManager::GetAnimationDescription()
-{
-  if (!this->Importer)
-    s
-    {
-      return "";
-    }
-
-  std::stringstream stream;
-  animationManager::AnimationInfo info;
-  if (this->Importer->GetInfoForAnimation(this->HasAnimation, this->ArrayIndexForAnimation, info))
-  {
-    stream << "Current Animation " << info.Name << ", "
-           << animationManager::ComponentToString(this->ComponentForAnimation) << "\n";
-  }
-  else
-  {
-    stream << "Not animating\n";
-  }
-  return stream.str();
-}
-//----------------------------------------------------------------------------
-void animationManager::CycleAnimationsForGLTF()
-{
-
   assert(this->Importer);
-  int nIndex = this->Importer->GetNumberOfAnimations();
-  if (nIndex <= 0)
+  int numberOfAnimations = this->Importer->GetNumberOfAnimations();
+  if (numberOfAnimations <= 0)
   {
     return;
   }
-  if (this->HasAnimation)
-  {
-    this->AnimationIndex = (this->AnimationIndex + 1) % nIndex;
-  }
-  else
-  {
-    this->AnimationIndex = (this->AnimationIndex + 2) % (nIndex + 1) - 1;
-  }
+  this->Importer->DisableAnimation(this->AnimationIndex);
+  this->AnimationIndex = (this->AnimationIndex + 1) % numberOfAnimations;
+  this->Importer->EnableAnimation(this->AnimationIndex);
+  this->LoadAtTime(0);
 }
 // ---------------------------------------------------------------------------------
-void f3d::detail::animationManager::SelectAnimationIndex(int animationIndex)
-{
-  this->AnimationIndex = animationIndex;
-  this->Importer->EnableAnimation(animationIndex);
-}
-// ---------------------------------------------------------------------------------
-int f3d::detail::animationManager::GetAnimationIndex()
+int animationManager::GetAnimationIndex()
 {
   return this->AnimationIndex;
 }
 // ---------------------------------------------------------------------------------
-std::string f3d::detail::animationManager::GetAnimationName()
+std::string animationManager::GetAnimationName()
 {
   return this->Importer->GetAnimationName(this->AnimationIndex);
+}
 }
