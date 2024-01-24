@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <regex>
+#include <string>
 
 namespace f3d
 {
