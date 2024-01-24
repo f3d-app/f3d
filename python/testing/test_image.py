@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import tempfile
 import pytest
 
@@ -68,3 +69,17 @@ def test_save_buffer(f3d_engine):
 def test_formats(f3d_engine):
     formats = f3d.Image.supported_formats()
     assert ".png" in formats
+
+
+@pytest.mark.parametrize(
+    "img_filename",
+    [
+        "toTerminalText-rgb.png",
+        "toTerminalText-rgba.png",
+    ],
+)
+def test_to_terminal_text(img_filename):
+    testing_data_dir = Path(__file__).parent.parent.parent / "testing/data"
+    image_path = testing_data_dir / img_filename
+    text_path = image_path.with_suffix(".txt")
+    assert f3d.Image(str(image_path)).to_terminal_text() == open(text_path).read()

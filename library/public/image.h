@@ -169,6 +169,16 @@ public:
   std::vector<unsigned char> saveBuffer(SaveFormat format = SaveFormat::PNG) const;
 
   /**
+   * Convert to colored text using ANSI escape sequences for printing in a terminal.
+   * Assumes terminal support for:
+   * - block character (`▄`, `▀`, `█`)
+   * - SGR escape codes (`ESC[0m`, `ESC[39m`, `ESC[49m`)
+   * - 24-bit escape codes (`ESC[38;2;{r};{g};{b}m`, `ESC[48;2;{r};{g};{b}m`)
+   * Throw an exception if the type is not byte RGB or RGBA.
+   */
+  std::string toTerminalText() const;
+
+  /**
    * An exception that can be thrown by the image when there.
    * is an error on write.
    */

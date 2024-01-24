@@ -1,9 +1,11 @@
 #include <image.h>
 
 #include <algorithm>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <random>
+#include <sstream>
 
 int TestSDKImage(int argc, char* argv[])
 {
@@ -227,6 +229,29 @@ int TestSDKImage(int argc, char* argv[])
   {
     std::cerr << "Move assignment failed" << std::endl;
     return EXIT_FAILURE;
+  }
+  {
+    const auto fileToString = [](const std::string& path)
+    {
+      std::ifstream file(path);
+      std::stringstream ss;
+      ss << file.rdbuf();
+      return ss.str();
+    };
+
+    if (f3d::image(std::string(argv[1]) + "/data/toTerminalText-rgb.png").toTerminalText() !=
+      fileToString(std::string(argv[1]) + "/data/toTerminalText-rgb.txt"))
+    {
+      std::cerr << "toTerminalText() (RGB image) failed" << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    if (f3d::image(std::string(argv[1]) + "/data/toTerminalText-rgba.png").toTerminalText() !=
+      fileToString(std::string(argv[1]) + "/data/toTerminalText-rgba.txt"))
+    {
+      std::cerr << "toTerminalText() (RGBA image) failed" << std::endl;
+      return EXIT_FAILURE;
+    }
   }
 
   return EXIT_SUCCESS;
