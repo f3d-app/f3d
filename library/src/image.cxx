@@ -354,7 +354,7 @@ std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
 }
 
 //----------------------------------------------------------------------------
-std::string image::toTerminalText() const
+const f3d::image& image::toTerminalText(std::ostream& stream) const
 {
   const int depth = this->getChannelCount();
   if (this->getChannelType() != ChannelType::BYTE || depth < 3 || depth > 4)
@@ -368,28 +368,29 @@ std::string image::toTerminalText() const
   const int height = dims[1];
   const unsigned char* content = static_cast<unsigned char*>(this->getContent());
 
+  constexpr unsigned char alphaCutoff = 127;
+
   /* Function to retrieve pixels so we can return:
     - transparent black values for out-of-bounds coords,
     - opaque alpha value when the image has no alpha channel.
     Rendering with half blocks means 1 line of text represents 2 rows of pixels
     so we _will_ attempt to access a line past the bottom if the height is not even.
   */
-  const auto getPixel = [&content, width, height, depth](int x, int y, unsigned char* alpha)
+  const auto getPixel = [=](int x, int y)
   {
     if (x >= 0 && x < width && y >= 0 && y < height)
     {
       const size_t i = depth * ((height - 1 - y) * width + x);
-      *alpha = depth > 3 ? content[i + 3] : 255u;
-      return content[i + 0] << 16 | content[i + 1] << 8 | content[i + 2];
+      const int rgb = content[i + 0] << 16 | content[i + 1] << 8 | content[i + 2];
+      const bool transparent = depth > 3 ? content[i + 3] <= alphaCutoff : false;
+      return std::make_pair(rgb, transparent);
     }
-    *alpha = 0u;
-    return 0;
+    return std::make_pair(0x000000, true);
   };
 
   /* Functions to manipulate the terminal colors using escape sequences.
     Keep track of the foreground and background states to avoid redundant sequences.
   */
-  std::stringstream stream;
   int currentFg = -1;
   int currentBg = -1;
   const auto setFg = [&stream, &currentFg](int rgb)
@@ -435,9 +436,7 @@ std::string image::toTerminalText() const
   constexpr std::string_view FULL_BLOCK = u8"\u2588";
   // clang-format on
   constexpr std::string_view EOL = "\n";
-  constexpr unsigned char alphaCutoff = 127;
 
-  unsigned char a1, a2;
   for (int y = 0; y < height; y += 2)
   {
     if (y > 0)
@@ -446,11 +445,8 @@ std::string image::toTerminalText() const
     }
     for (int x = 0; x < width; ++x)
     {
-      const int rgb1 = getPixel(x, y + 0, &a1);
-      const int rgb2 = getPixel(x, y + 1, &a2);
-      const bool blank1 = a1 <= alphaCutoff;
-      const bool blank2 = a2 <= alphaCutoff;
-
+      const auto [rgb1, blank1] = getPixel(x, y + 0);
+      const auto [rgb2, blank2] = getPixel(x, y + 1);
       if (blank1 && blank2)
       {
         reset();
@@ -489,7 +485,15 @@ std::string image::toTerminalText() const
     reset(); // reset after every line to keep the right edge of the image
   }
 
-  return stream.str();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+std::string image::toTerminalText() const
+{
+  std::stringstream ss;
+  toTerminalText(ss);
+  return ss.str();
 }
 
 //----------------------------------------------------------------------------
