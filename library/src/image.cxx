@@ -393,7 +393,7 @@ const f3d::image& image::toTerminalText(std::ostream& stream) const
   */
   int currentFg = -1;
   int currentBg = -1;
-  const auto setFg = [&stream, &currentFg](int rgb)
+  const auto setFg = [&](int rgb)
   {
     if (currentFg != rgb)
     {
@@ -402,7 +402,7 @@ const f3d::image& image::toTerminalText(std::ostream& stream) const
       currentFg = rgb;
     }
   };
-  const auto setBg = [&stream, &currentBg](int rgb)
+  const auto setBg = [&](int rgb)
   {
     if (currentBg != rgb)
     {
@@ -411,7 +411,7 @@ const f3d::image& image::toTerminalText(std::ostream& stream) const
       currentBg = rgb;
     }
   };
-  const auto reset = [&stream, &currentBg, &currentFg]()
+  const auto reset = [&]()
   {
     if (currentBg > -1 || currentFg > -1)
     {
@@ -420,7 +420,7 @@ const f3d::image& image::toTerminalText(std::ostream& stream) const
       currentFg = -1;
     }
   };
-  const auto resetBg = [&stream, &currentBg]()
+  const auto resetBg = [&]()
   {
     if (currentBg > -1)
     {
