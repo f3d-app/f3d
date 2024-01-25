@@ -230,7 +230,26 @@ int TestSDKImage(int argc, char* argv[])
     std::cerr << "Move assignment failed" << std::endl;
     return EXIT_FAILURE;
   }
+
   {
+    try
+    {
+      f3d::image(3, 3, 1, f3d::image::ChannelType::BYTE).toTerminalText();
+      return EXIT_FAILURE; // expected to throw (wrong channel count)
+    }
+    catch (const std::invalid_argument& e)
+    {
+    }
+
+    try
+    {
+      f3d::image(3, 3, 4, f3d::image::ChannelType::SHORT).toTerminalText();
+      return EXIT_FAILURE; // expected to throw (wrong channel type)
+    }
+    catch (const std::invalid_argument& e)
+    {
+    }
+
     const auto fileToString = [](const std::string& path)
     {
       std::ifstream file(path);
