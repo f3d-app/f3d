@@ -359,7 +359,7 @@ std::string image::toTerminalText() const
   const int depth = this->getChannelCount();
   if (this->getChannelType() != ChannelType::BYTE || depth < 3 || depth > 4)
   {
-    throw exception("image must be byte RGB or RGBA");
+    throw std::invalid_argument("image must be byte RGB or RGBA");
   }
 
   int dims[3];
@@ -410,20 +410,18 @@ std::string image::toTerminalText() const
       currentBg = rgb;
     }
   };
-  const auto reset = [&stream, &currentBg, &currentFg](bool bg = true, bool fg = true)
+  const auto reset = [&stream, &currentBg, &currentFg]()
   {
-    if (fg && bg && (currentBg > -1 || currentFg > -1))
+    if (currentBg > -1 || currentFg > -1)
     {
       stream << "\033[0m"; // reset all
       currentBg = -1;
       currentFg = -1;
     }
-    else if (fg && currentFg > -1)
-    {
-      stream << "\033[39m"; // reset foreground
-      currentFg = -1;
-    }
-    else if (bg && currentBg > -1)
+  };
+  const auto resetBg = [&stream, &currentBg]()
+  {
+    if (currentBg > -1)
     {
       stream << "\033[49m"; // reset background
       currentBg = -1;
@@ -431,11 +429,11 @@ std::string image::toTerminalText() const
   };
 
   const std::string EMPTY_BLOCK = " ";
-  const std::string BOTTOM_BLOCK = "▄"; // U+2584
-  const std::string TOP_BLOCK = "▀";    // U+2580
-  const std::string FULL_BLOCK = "█";   // U+2588
+  const std::string TOP_BLOCK = "\u2580";    // U+2580
+  const std::string BOTTOM_BLOCK = "\u2584"; // U+2584
+  const std::string FULL_BLOCK = "\u2588";   // U+2588
   const std::string EOL = "\n";
-  const unsigned char alphaCutoff = 127; // TODO param?
+  const unsigned char alphaCutoff = 127;
 
   unsigned char a1, a2;
   for (int y = 0; y < height; y += 2)
@@ -458,13 +456,13 @@ std::string image::toTerminalText() const
       }
       else if (blank1)
       {
-        reset(true, false);
+        resetBg();
         setFg(rgb2);
         stream << BOTTOM_BLOCK;
       }
       else if (blank2)
       {
-        reset(true, false);
+        resetBg();
         setFg(rgb1);
         stream << TOP_BLOCK;
       }

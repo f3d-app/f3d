@@ -171,7 +171,7 @@ public:
   /**
    * Convert to colored text using ANSI escape sequences for printing in a terminal.
    * Assumes terminal support for:
-   * - block character (`▄`, `▀`, `█`)
+   * - unicode block characters (U+2580, U+2584, U+2588)
    * - SGR escape codes (`ESC[0m`, `ESC[39m`, `ESC[49m`)
    * - 24-bit escape codes (`ESC[38;2;{r};{g};{b}m`, `ESC[48;2;{r};{g};{b}m`)
    * Throw an exception if the type is not byte RGB or RGBA.
