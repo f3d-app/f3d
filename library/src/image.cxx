@@ -379,10 +379,10 @@ std::string image::toTerminalText() const
     if (x >= 0 && x < width && y >= 0 && y < height)
     {
       const size_t i = depth * ((height - 1 - y) * width + x);
-      *alpha = depth > 3 ? content[i + 3] : (unsigned char)255;
+      *alpha = depth > 3 ? content[i + 3] : 255u;
       return content[i + 0] << 16 | content[i + 1] << 8 | content[i + 2];
     }
-    *alpha = (unsigned char)0;
+    *alpha = 0u;
     return 0;
   };
 
@@ -430,12 +430,12 @@ std::string image::toTerminalText() const
 
   constexpr std::string_view EMPTY_BLOCK = " ";
   // clang-format off
-  constexpr std::string_view TOP_BLOCK = u8"\u2580";    // U+2580
-  constexpr std::string_view BOTTOM_BLOCK = u8"\u2584"; // U+2584
-  constexpr std::string_view FULL_BLOCK = u8"\u2588";   // U+2588
+  constexpr std::string_view TOP_BLOCK = u8"\u2580";
+  constexpr std::string_view BOTTOM_BLOCK = u8"\u2584";
+  constexpr std::string_view FULL_BLOCK = u8"\u2588";
   // clang-format on
   constexpr std::string_view EOL = "\n";
-  const unsigned char alphaCutoff = 127;
+  constexpr unsigned char alphaCutoff = 127;
 
   unsigned char a1, a2;
   for (int y = 0; y < height; y += 2)
