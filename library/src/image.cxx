@@ -428,11 +428,13 @@ std::string image::toTerminalText() const
     }
   };
 
-  const std::string EMPTY_BLOCK = " ";
-  const std::string TOP_BLOCK = "\u2580";    // U+2580
-  const std::string BOTTOM_BLOCK = "\u2584"; // U+2584
-  const std::string FULL_BLOCK = "\u2588";   // U+2588
-  const std::string EOL = "\n";
+  constexpr std::string_view EMPTY_BLOCK = " ";
+  // clang-format off
+  constexpr std::string_view TOP_BLOCK = u8"\u2580";    // U+2580
+  constexpr std::string_view BOTTOM_BLOCK = u8"\u2584"; // U+2584
+  constexpr std::string_view FULL_BLOCK = u8"\u2588";   // U+2588
+  // clang-format on
+  constexpr std::string_view EOL = "\n";
   const unsigned char alphaCutoff = 127;
 
   unsigned char a1, a2;
