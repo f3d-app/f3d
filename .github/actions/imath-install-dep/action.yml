@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: dependencies/imath_install
-        key: imath-v3.1.9-${{runner.os}}-${{inputs.cpu}}-0
+        key: imath-v3.1.10-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'
@@ -23,7 +23,7 @@ runs:
       with:
         repository: AcademySoftwareFoundation/Imath
         path: './dependencies/imath'
-        ref: v3.1.9
+        ref: v3.1.10
 
     - name: Setup Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'
