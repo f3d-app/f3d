@@ -12,6 +12,7 @@
 #include "options.h"
 #include "window.h"
 
+#include <algorithm>
 #include <cassert>
 #include <filesystem>
 #include <set>
