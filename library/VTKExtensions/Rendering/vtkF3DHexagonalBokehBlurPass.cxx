@@ -31,8 +31,6 @@ vec3 BlurTexture(sampler2D tex, vec2 uv, vec2 direction)
   // fix for the Y shape artifacts
   uv += 0.5 * invViewDims * direction;
 
-  const float step = 0.1;
-
   for (float i = 0.0; i < 1.0; i += step)
   {
     vec2 offset = i * coc * direction * invViewDims;
@@ -149,6 +147,7 @@ void vtkF3DHexagonalBokehBlurPass::RenderDirectionalBlur(
     ssDecl << "uniform sampler2D backgroundTexture;\n";
     ssDecl << "uniform vec2 invViewDims;\n";
     ssDecl << "uniform float coc;\n";
+    ssDecl << "const float step = " << (2.0 / CircleOfConfusionRadius) << ";\n";
     ssDecl << BlurFunc();
     ssDecl << "//VTK::FSQ::Decl";
 
@@ -216,6 +215,7 @@ void vtkF3DHexagonalBokehBlurPass::RenderRhomboidBlur(
     ssDecl << "uniform sampler2D diagonalBlurTexture;\n";
     ssDecl << "uniform vec2 invViewDims;\n";
     ssDecl << "uniform float coc;\n";
+    ssDecl << "const float step = " << (2.0 / CircleOfConfusionRadius) << ";\n";
     ssDecl << BlurFunc();
     ssDecl << "//VTK::FSQ::Decl";
 
