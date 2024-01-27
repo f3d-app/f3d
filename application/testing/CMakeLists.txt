@@ -628,6 +628,7 @@ f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE RE
 f3d_test(NAME TestInteractionGroupGeometriesLoadParentDirectory DATA mb/mb_0_0.vtu ARGS --group-geometries --filename INTERACTION DEFAULT_LIGHTS) #Down;
 f3d_test(NAME TestInteractionInvertZoom DATA suzanne.ply ARGS --invert-zoom INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionCameraHotkeys DATA cow.vtp INTERACTION DEFAULT_LIGHTS)
+f3d_test(NAME TestInteractionZoomToMouse DATA cow.vtp INTERACTION DEFAULT_LIGHTS)
 
 # Progress test
 f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
