@@ -8,6 +8,8 @@ Simple interaction with the displayed data is possible directly within the windo
 * Hold *Shift* then *Click and drag* horizontally with the *right* mouse button to rotate the HDRI.
 * *Click and drag* vertically with the *right* mouse button to zoom in/out.
 * *Move the mouse wheel* to zoom in/out.
+* While holding *<kbd>Ctrl</kbd>*, *Click and drag* vertically with the *right* mouse button to zoom in/out to mouse position.
+* While holding *<kbd>Ctrl</kbd>*, *Move the mouse wheel* to zoom in/out to mouse position. 
 * *Click and drag* with the *middle* mouse button to translate the camera.
 * *Click* with the *middle* mouse button to center the camera on the point under the cursor (hold *Shift* to allow forward or backward movement).
 * Drag and drop a file, directory or HDRI into the F3D window to load it. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.
