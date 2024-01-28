@@ -10,7 +10,10 @@
 class WarningEventCallback : public vtkCommand
 {
 public:
-  static WarningEventCallback* New() { return new WarningEventCallback; }
+  static WarningEventCallback* New()
+  {
+    return new WarningEventCallback;
+  }
 
   void Execute(vtkObject* caller, unsigned long vtkNotUsed(evId), void* data) override
   {
@@ -22,7 +25,10 @@ public:
     }
   }
 
-  const std::vector<std::string>& GetRecordedWarningMessages() const { return this->Messages; }
+  const std::vector<std::string>& GetRecordedWarningMessages() const
+  {
+    return this->Messages;
+  }
 
 private:
   std::vector<std::string> Messages;

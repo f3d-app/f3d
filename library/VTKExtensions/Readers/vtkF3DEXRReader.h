@@ -18,12 +18,18 @@ public:
   /**
    * List of extensions supported by this reader
    */
-  const char* GetFileExtensions() override { return ".exr"; }
+  const char* GetFileExtensions() override
+  {
+    return ".exr";
+  }
 
   /**
    * Descriptive name of the reader
    */
-  const char* GetDescriptiveName() override { return "OpenEXR"; }
+  const char* GetDescriptiveName() override
+  {
+    return "OpenEXR";
+  }
 
 protected:
   vtkF3DEXRReader();

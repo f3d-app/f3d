@@ -17,6 +17,11 @@ int main(int argc, char** argv)
     // exit gracefully after cleanup when no process is required
     exit(EXIT_SUCCESS);
   }
+  catch (const F3DExFailure&)
+  {
+    // exit with error when needed
+    exit(EXIT_FAILURE);
+  }
   catch (const std::exception& ex)
   {
     f3d::log::error("F3D encountered an unexpected exception:");

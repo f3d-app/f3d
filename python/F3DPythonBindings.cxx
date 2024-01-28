@@ -39,7 +39,10 @@ template<>
 class py::detail::type_caster<f3d::point3_t>
 {
 public:
-  bool load(handle src, bool convert) { return load_array(src, convert, value); }
+  bool load(handle src, bool convert)
+  {
+    return load_array(src, convert, value);
+  }
 
   static handle cast(const f3d::point3_t& src, return_value_policy, handle /* parent */)
   {
@@ -53,7 +56,10 @@ template<>
 class py::detail::type_caster<f3d::vector3_t>
 {
 public:
-  bool load(handle src, bool convert) { return load_array(src, convert, value); }
+  bool load(handle src, bool convert)
+  {
+    return load_array(src, convert, value);
+  }
 
   static handle cast(const f3d::vector3_t& src, return_value_policy, handle /* parent */)
   {
@@ -102,12 +108,19 @@ PYBIND11_MODULE(pyf3d, module)
     return py::bytes(static_cast<char*>(img.getContent()), expectedSize);
   };
 
+  auto getFileBytes = [](const f3d::image& img, f3d::image::SaveFormat format)
+  {
+    std::vector<unsigned char> result = img.saveBuffer(format);
+    return py::bytes(reinterpret_cast<char*>(result.data()), result.size());
+  };
+
   image //
     .def(py::init<>())
     .def(py::init<const std::string&>())
     .def(py::init<unsigned int, unsigned int, unsigned int, f3d::image::ChannelType>())
     .def(py::self == py::self)
     .def(py::self != py::self)
+    .def_static("supported_formats", &f3d::image::getSupportedFormats)
     .def_property_readonly("width", &f3d::image::getWidth)
     .def_property_readonly("height", &f3d::image::getHeight)
     .def_property_readonly("channel_count", &f3d::image::getChannelCount)
@@ -116,7 +129,10 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property("content", getImageBytes, setImageBytes)
     .def("compare", &f3d::image::compare)
     .def(
-      "save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG);
+      "save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG)
+    .def("save_buffer", getFileBytes, py::arg("format") = f3d::image::SaveFormat::PNG)
+    .def("_repr_png_",
+      [&](const f3d::image& img) { return getFileBytes(img, f3d::image::SaveFormat::PNG); });
 
   // f3d::options
   py::class_<f3d::options> options(module, "Options");

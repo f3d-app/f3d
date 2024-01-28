@@ -12,6 +12,7 @@
 #include "options.h"
 #include "window.h"
 
+#include <algorithm>
 #include <cassert>
 #include <filesystem>
 #include <set>
@@ -166,6 +167,8 @@ int F3DStarter::Start(int argc, char** argv)
   // Set verbosity level early from command line
   F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel);
 
+  f3d::log::debug("========== Initializing ==========");
+
   // Load plugins from the app options
   this->Internals->Parser.LoadPlugins(this->Internals->AppOptions);
 
@@ -189,6 +192,8 @@ int F3DStarter::Start(int argc, char** argv)
   F3DNSDelegate::InitializeDelegate(this);
 #endif
 
+  f3d::log::debug("========== Configuring engine ==========");
+
   if (this->Internals->AppOptions.NoRender)
   {
     this->Internals->Engine = std::make_unique<f3d::engine>(f3d::window::Type::NONE);
@@ -209,6 +214,8 @@ int F3DStarter::Start(int argc, char** argv)
         {
           this->Internals->Engine->getInteractor().stopAnimation();
 
+          f3d::log::debug("========== Loading 3D file ==========");
+
           if (restoreCamera)
           {
             f3d::camera& cam = this->Internals->Engine->getWindow().getCamera();
@@ -220,6 +227,8 @@ int F3DStarter::Start(int argc, char** argv)
           {
             this->LoadFile(index, true);
           }
+
+          f3d::log::debug("========== Rendering ==========");
 
           this->Render();
           return true;
@@ -304,6 +313,9 @@ int F3DStarter::Start(int argc, char** argv)
     }
 #endif
   }
+  f3d::log::debug("Engine configured");
+
+  f3d::log::debug("========== Loading 3D file ==========");
 
   // Add all files
   for (auto& file : files)
@@ -313,6 +325,8 @@ int F3DStarter::Start(int argc, char** argv)
 
   // Load a file
   this->LoadFile();
+
+  f3d::log::debug("========== Rendering ==========");
 
   if (!this->Internals->AppOptions.NoRender)
   {
@@ -396,6 +410,12 @@ int F3DStarter::Start(int argc, char** argv)
       {
         f3d::log::info("Image comparison success with an error difference of: ", error);
       }
+
+      if (this->Internals->FilesList.size() > 1)
+      {
+        f3d::log::warn("Image comparison was performed using a single 3D file, other provided "
+                       "3D files were ignored.");
+      }
     }
     // Render to file if needed
     else if (!this->Internals->AppOptions.Output.empty())
@@ -408,14 +428,22 @@ int F3DStarter::Start(int argc, char** argv)
 
       f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
       img.save(this->Internals->AppOptions.Output);
+      f3d::log::debug("Output image saved to ", this->Internals->AppOptions.Output);
+
+      if (this->Internals->FilesList.size() > 1)
+      {
+        f3d::log::warn("An output image was saved using a single 3D file, other provided 3D "
+                       "files were ignored.");
+      }
     }
     // Start interaction
     else
     {
 #ifdef F3D_HEADLESS_BUILD
       f3d::log::error("This is a headless build of F3D, interactive rendering is not supported");
+      return EXIT_FAILURE;
 #else
-      window.render();
+      this->Render();
       interactor.start();
 #endif
     }
@@ -590,6 +618,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
 void F3DStarter::Render()
 {
   this->Internals->Engine->getWindow().render();
+  f3d::log::debug("Render done");
 }
 
 //----------------------------------------------------------------------------

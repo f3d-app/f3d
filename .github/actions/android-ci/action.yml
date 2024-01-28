@@ -75,3 +75,16 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --target install
+
+    - name: Upload native library
+      uses: actions/upload-artifact@v4
+      with:
+        path: ./build/lib/libf3d-java.so
+        name: f3d-android-native-${{inputs.arch}}
+
+    - name: Upload Java package
+      if: inputs.arch == 'arm64-v8a' # avoid duplication
+      uses: actions/upload-artifact@v4
+      with:
+        path: ./build/java/f3d.jar
+        name: f3d-android-jar

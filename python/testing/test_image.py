@@ -56,3 +56,15 @@ def test_save(f3d_engine):
 
     img.save(fn, f3d.Image.SaveFormat.BMP)
     assert os.path.isfile(fn)
+
+
+def test_save_buffer(f3d_engine):
+    img = f3d_engine.window.render_to_image(True)
+    buffer = img.save_buffer(f3d.Image.SaveFormat.PNG)
+    assert buffer.startswith(b"\x89PNG")
+    assert img._repr_png_() == buffer
+
+
+def test_formats(f3d_engine):
+    formats = f3d.Image.supported_formats()
+    assert ".png" in formats

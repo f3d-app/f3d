@@ -22,6 +22,7 @@ public:
 
   /**
    * Add a file or directory to the list of paths
+   * Returns the index of the added file
    */
   int AddFile(const std::filesystem::path& path, bool quiet = false);
 

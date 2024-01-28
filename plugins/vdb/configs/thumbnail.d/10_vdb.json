@@ -1,0 +1,8 @@
+{
+  ".*(vdb)":
+  {
+    "load-plugins": "vdb",
+    "volume": true,
+    "inverse": true
+  }
+}

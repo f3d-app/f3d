@@ -21,6 +21,8 @@ eng.loader.load_geometry("f3d/testing/data/dragon.vtu")
 eng.interactor.start()
 ```
 
+You can see more examples using python bindings in the dedicated example folder [here](https://github.com/f3d-app/f3d/tree/master/examples/libf3d/python).
+
 ## Java (experimental)
 
 If the Java bindings have been generated using the `F3D_BINDINGS_JAVA` CMake option, the libf3d can be used directly from Java.

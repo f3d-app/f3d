@@ -30,8 +30,8 @@ include(f3dVersion)
 
 # Handle F3D_VERSION
 set(F3D_MAJOR_VERSION 2)
-set(F3D_MINOR_VERSION 2)
-set(F3D_PATCH_VERSION 1)
+set(F3D_MINOR_VERSION 3)
+set(F3D_PATCH_VERSION 0)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
 set(F3D_PATCH_VERSION_EXTRA "")
@@ -68,6 +68,8 @@ if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
 endif ()
 
 # VTK dependency
+# Optional components should list VTK modules
+# needed by plugins and optional modules
 find_package(VTK 9.0 REQUIRED
   COMPONENTS
     CommonCore
@@ -96,6 +98,7 @@ find_package(VTK 9.0 REQUIRED
     opengl
   OPTIONAL_COMPONENTS
     IOExodus
+    IOOpenVDB
     RenderingExternal
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")

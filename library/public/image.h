@@ -5,6 +5,7 @@
 #include "export.h"
 
 #include <string>
+#include <vector>
 
 namespace f3d
 {
@@ -52,6 +53,7 @@ public:
    * Create an image from file, the following formats are supported:
    * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA.
    * EXR files are also supported if the associated module is built.
+   * The complete list can be retrieve at runtime by calling getSupportedFormats.
    * Throw an image::read_exception in case of failure.
    */
   explicit image(const std::string& path);
@@ -82,6 +84,11 @@ public:
   bool operator==(const image& reference) const;
   bool operator!=(const image& reference) const;
   ///@}
+
+  /**
+   * Get the list of supported image format when opening a file.
+   */
+  static std::vector<std::string> getSupportedFormats();
 
   ///@{ @name Resolution
   /**
@@ -152,6 +159,14 @@ public:
    * Default format is PNG if not specified.
    */
   void save(const std::string& path, SaveFormat format = SaveFormat::PNG) const;
+
+  /**
+   * Save an image to a memory buffer in the specified format.
+   * Default format is PNG if not specified.
+   * TIF format is not supported yet.
+   * Throw an image::write_exception if the type is TIF.
+   */
+  std::vector<unsigned char> saveBuffer(SaveFormat format = SaveFormat::PNG) const;
 
   /**
    * An exception that can be thrown by the image when there.

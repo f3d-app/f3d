@@ -7,6 +7,23 @@
 
 int TestSDKImage(int argc, char* argv[])
 {
+  // check supported formats
+  std::vector<std::string> formats = f3d::image::getSupportedFormats();
+
+  if (std::find(formats.begin(), formats.end(), ".png") == formats.end())
+  {
+    std::cerr << "PNG is not in the list of supported files" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+#if F3D_MODULE_EXR
+  if (std::find(formats.begin(), formats.end(), ".exr") == formats.end())
+  {
+    std::cerr << "EXR is not in the list of supported files" << std::endl;
+    return EXIT_FAILURE;
+  }
+#endif
+
   constexpr unsigned int width = 64;
   constexpr unsigned int height = 64;
   constexpr unsigned int channels = 3;
@@ -27,6 +44,38 @@ int TestSDKImage(int argc, char* argv[])
   generated.save(std::string(argv[2]) + "TestSDKImage.jpg", f3d::image::SaveFormat::JPG);
   generated.save(std::string(argv[2]) + "TestSDKImage.tif", f3d::image::SaveFormat::TIF);
   generated.save(std::string(argv[2]) + "TestSDKImage.bmp", f3d::image::SaveFormat::BMP);
+
+  // test saveBuffer in different formats
+  std::vector<unsigned char> bufferPNG = generated.saveBuffer();
+  if (bufferPNG.size() == 0)
+  {
+    std::cerr << "PNG buffer empty" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  std::vector<unsigned char> bufferJPG = generated.saveBuffer(f3d::image::SaveFormat::JPG);
+  if (bufferJPG.size() == 0)
+  {
+    std::cerr << "JPG buffer empty" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  try
+  {
+    generated.saveBuffer(f3d::image::SaveFormat::TIF);
+    std::cerr << "An exception has not been thrown when saving buffer to TIF format" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::write_exception&)
+  {
+  }
+
+  std::vector<unsigned char> bufferBMP = generated.saveBuffer(f3d::image::SaveFormat::BMP);
+  if (bufferBMP.size() == 0)
+  {
+    std::cerr << "BMP buffer empty" << std::endl;
+    return EXIT_FAILURE;
+  }
 
   // test constructor with different channel sizes
   f3d::image img16(width, height, channels, f3d::image::ChannelType::SHORT);

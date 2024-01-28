@@ -36,6 +36,7 @@
 #include <assimp/scene.h>
 
 #include <memory>
+#include <regex>
 
 vtkStandardNewMacro(vtkF3DAssimpImporter);
 
@@ -170,9 +171,14 @@ public:
     if (path[0] == '*')
     {
       int texIndex = std::atoi(path + 1);
-      vTexture = this->EmbeddedTextures[texIndex];
+
+      if (texIndex >= 0 && texIndex < static_cast<int>(this->EmbeddedTextures.size()))
+      {
+        vTexture = this->EmbeddedTextures[texIndex];
+      }
     }
-    else
+
+    if (!vTexture)
     {
       // sometimes, embedded textures are indexed by filename
       const aiTexture* aTexture = this->Scene->GetEmbeddedTexture(path);
@@ -257,15 +263,24 @@ public:
     }
     else
     {
-      vtkNew<vtkImageData> img;
-      img->SetDimensions(aTexture->mWidth, aTexture->mHeight, 1);
-      img->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
+      // Sometimes Assimp returns corrupted textures (encountered with 3MF)
+      // Let's validate it before trying to read it
+      // See https://github.com/assimp/assimp/issues/5328
+      std::regex validRegexp("[rgba]{4}[0-9]{4}");
 
-      unsigned char* imageBuffer = reinterpret_cast<unsigned char*>(img->GetScalarPointer());
-      std::copy(imageBuffer, imageBuffer + 4 * aTexture->mWidth * aTexture->mHeight,
-        reinterpret_cast<unsigned char*>(aTexture->pcData));
+      if (std::regex_match(aTexture->achFormatHint, validRegexp))
+      {
+        // only "rgba8888" is supported for now
+        vtkNew<vtkImageData> img;
+        img->SetDimensions(aTexture->mWidth, aTexture->mHeight, 1);
+        img->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
 
-      vTexture->SetInputData(img);
+        unsigned char* imageBuffer = reinterpret_cast<unsigned char*>(img->GetScalarPointer());
+        std::copy(imageBuffer, imageBuffer + 4 * aTexture->mWidth * aTexture->mHeight,
+          reinterpret_cast<unsigned char*>(aTexture->pcData));
+
+        vTexture->SetInputData(img);
+      }
     }
 
     return vTexture;
@@ -331,7 +346,7 @@ public:
     aiString texDiffuse;
     if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texDiffuse) == aiReturn_SUCCESS)
     {
-      vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texDiffuse.data);
+      vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texDiffuse.C_Str());
       if (tex)
       {
         property->SetTexture("diffuseTex", tex);
@@ -341,7 +356,7 @@ public:
     aiString texNormal;
     if (material->GetTexture(aiTextureType_NORMALS, 0, &texNormal) == aiReturn_SUCCESS)
     {
-      vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texNormal.data);
+      vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texNormal.C_Str());
       if (tex)
       {
         property->SetTexture("normalTex", tex);
@@ -351,7 +366,7 @@ public:
     aiString texAlbedo;
     if (material->GetTexture(aiTextureType_BASE_COLOR, 0, &texAlbedo) == aiReturn_SUCCESS)
     {
-      vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texAlbedo.data, true);
+      vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texAlbedo.C_Str(), true);
       if (tex)
       {
         property->SetTexture("albedoTex", tex);
@@ -361,7 +376,7 @@ public:
     aiString texEmissive;
     if (material->GetTexture(aiTextureType_EMISSIVE, 0, &texEmissive) == aiReturn_SUCCESS)
     {
-      vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texEmissive.data, true);
+      vtkSmartPointer<vtkTexture> tex = this->CreateTexture(texEmissive.C_Str(), true);
       if (tex)
       {
         property->SetTexture("emissiveTex", tex);
@@ -605,7 +620,7 @@ public:
       }
 
       // convert materials to properties
-      this->Properties.resize(this->Scene->mNumMeshes);
+      this->Properties.resize(this->Scene->mNumMaterials);
       for (unsigned int i = 0; i < this->Scene->mNumMaterials; i++)
       {
         this->Properties[i] = this->CreateMaterial(this->Scene->mMaterials[i]);
@@ -811,7 +826,18 @@ public:
                   vtkNew<vtkMatrix4x4> boneMat;
                   bonesTransform->GetTypedTuple(i, boneMat->GetData());
 
-                  vtkMatrix4x4::Multiply4x4(this->NodeGlobalMatrix[boneName], boneMat, boneMat);
+                  auto globalMatrix = this->NodeGlobalMatrix[boneName];
+
+                  if (globalMatrix)
+                  {
+                    vtkMatrix4x4::Multiply4x4(globalMatrix, boneMat, boneMat);
+                  }
+                  else
+                  {
+                    vtkWarningWithObjectMacro(
+                      this->Parent, "Cannot find global matrix of bone " << boneName);
+                  }
+
                   vtkMatrix4x4::Multiply4x4(inverseRoot, boneMat, boneMat);
 
                   for (int j = 0; j < 4; j++)

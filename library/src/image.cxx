@@ -4,19 +4,22 @@
 #include "init.h"
 
 #include <vtkBMPWriter.h>
+#include <vtkDataArrayRange.h>
 #include <vtkImageData.h>
 #include <vtkImageDifference.h>
 #include <vtkImageReader2.h>
+#include <vtkImageReader2Collection.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkJPEGWriter.h>
 #include <vtkPNGWriter.h>
 #include <vtkPointData.h>
 #include <vtkSmartPointer.h>
 #include <vtkTIFFWriter.h>
+#include <vtkUnsignedCharArray.h>
 #include <vtksys/SystemTools.hxx>
 
 #include <cassert>
-#include <vector>
+#include <regex>
 
 namespace f3d
 {
@@ -24,6 +27,22 @@ class image::internals
 {
 public:
   vtkSmartPointer<vtkImageData> Image;
+
+  template<typename WriterType>
+  std::vector<unsigned char> SaveBuffer()
+  {
+    vtkNew<WriterType> writer;
+    writer->WriteToMemoryOn();
+    writer->SetInputData(this->Image);
+    writer->Write();
+
+    std::vector<unsigned char> result;
+
+    auto valRange = vtk::DataArrayValueRange(writer->GetResult());
+    std::copy(valRange.begin(), valRange.end(), std::back_inserter(result));
+
+    return result;
+  }
 };
 
 //----------------------------------------------------------------------------
@@ -118,6 +137,32 @@ image& image::operator=(image&& img) noexcept
 {
   std::swap(this->Internals, img.Internals);
   return *this;
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> image::getSupportedFormats()
+{
+  std::vector<std::string> formats;
+
+  vtkNew<vtkImageReader2Collection> collection;
+  vtkImageReader2Factory::GetRegisteredReaders(collection);
+
+  collection->InitTraversal();
+  vtkImageReader2* reader = collection->GetNextItem();
+
+  while (reader != nullptr)
+  {
+    std::string extensions = reader->GetFileExtensions();
+
+    std::regex re("\\s+");
+    std::sregex_token_iterator first{ extensions.begin(), extensions.end(), re, -1 }, last;
+
+    std::copy(first, last, std::back_inserter(formats));
+
+    reader = collection->GetNextItem();
+  }
+
+  return formats;
 }
 
 //----------------------------------------------------------------------------
@@ -287,6 +332,22 @@ void image::save(const std::string& path, SaveFormat format) const
   if (writer->GetErrorCode() != 0)
   {
     throw write_exception("Cannot write " + path);
+  }
+}
+
+//----------------------------------------------------------------------------
+std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
+{
+  switch (format)
+  {
+    case SaveFormat::PNG:
+      return this->Internals->SaveBuffer<vtkPNGWriter>();
+    case SaveFormat::JPG:
+      return this->Internals->SaveBuffer<vtkJPEGWriter>();
+    case SaveFormat::BMP:
+      return this->Internals->SaveBuffer<vtkBMPWriter>();
+    default:
+      throw write_exception("Cannot save to buffer in the specified format");
   }
 }
 

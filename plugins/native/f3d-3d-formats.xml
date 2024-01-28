@@ -29,4 +29,8 @@
     <comment>Point Cloud file</comment>
     <glob pattern="*.pts"/>
   </mime-type>
+  <mime-type type="application/vnd.ply">
+    <comment>Polygon File Format</comment>
+    <glob pattern="*.ply"/>
+  </mime-type>
 </mime-info>

@@ -498,7 +498,10 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       {
         for (int i = 0; i < 3; i++)
         {
-          double size = bounds[2 * i + 1] - bounds[2 * i];
+          // a small margin is added to the size to avoid z-fighting if large translucent
+          // triangles are exactly aligned with the grid bounds
+          constexpr double margin = 1.0001;
+          double size = margin * (bounds[2 * i + 1] - bounds[2 * i]);
           gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
         }
       }
@@ -522,6 +525,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridActor->SetPosition(gridPos);
       this->GridActor->SetMapper(gridMapper);
       this->GridActor->UseBoundsOff();
+      this->GridActor->PickableOff();
       this->GridConfigured = true;
     }
   }
