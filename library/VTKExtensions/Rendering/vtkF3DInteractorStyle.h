@@ -63,6 +63,11 @@ public:
   ///@}
 
   /**
+   * Dolly the renderer's camera to a specific point
+   */
+  static void DollyToPosition(double fact, int* position, vtkRenderer* renderer);
+
+  /**
    * Overridden to rotate the skybox as well
    */
   void EnvironmentRotate() override;

@@ -141,7 +141,50 @@ void vtkF3DInteractorStyle::Dolly(double factor)
   {
     return;
   }
-  this->Superclass::Dolly(factor);
+  if (this->Interactor->GetControlKey())
+  {
+    vtkF3DInteractorStyle::DollyToPosition(
+      factor, this->Interactor->GetEventPosition(), this->CurrentRenderer);
+  }
+  else
+  {
+    this->Superclass::Dolly(factor);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DInteractorStyle::DollyToPosition(double factor, int* position, vtkRenderer* renderer)
+{
+  vtkCamera* cam = renderer->GetActiveCamera();
+  double viewFocus[4], originalViewFocus[3], cameraPos[3], newCameraPos[3];
+  double newFocalPoint[4], norm[3];
+
+  // Move focal point to cursor position
+  cam->GetPosition(cameraPos);
+  cam->GetFocalPoint(viewFocus);
+  cam->GetFocalPoint(originalViewFocus);
+  cam->GetViewPlaneNormal(norm);
+
+  vtkF3DInteractorStyle::ComputeWorldToDisplay(
+    renderer, viewFocus[0], viewFocus[1], viewFocus[2], viewFocus);
+
+  vtkF3DInteractorStyle::ComputeDisplayToWorld(
+    renderer, double(position[0]), double(position[1]), viewFocus[2], newFocalPoint);
+
+  cam->SetFocalPoint(newFocalPoint);
+
+  // Move camera in/out along projection direction
+  cam->Dolly(factor);
+
+  // Find new focal point
+  cam->GetPosition(newCameraPos);
+
+  double newPoint[3];
+  newPoint[0] = originalViewFocus[0] + newCameraPos[0] - cameraPos[0];
+  newPoint[1] = originalViewFocus[1] + newCameraPos[1] - cameraPos[1];
+  newPoint[2] = originalViewFocus[2] + newCameraPos[2] - cameraPos[2];
+
+  cam->SetFocalPoint(newPoint);
 }
 
 //----------------------------------------------------------------------------
