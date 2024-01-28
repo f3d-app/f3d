@@ -155,10 +155,6 @@ void vtkF3DInteractorStyle::Dolly(double factor)
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::DollyToPosition(double factor, int* position, vtkRenderer* renderer)
 {
-  if (this->CameraMovementDisabled)
-  {
-    return;
-  }
   vtkCamera* cam = renderer->GetActiveCamera();
   double viewFocus[4], originalViewFocus[3], cameraPos[3], newCameraPos[3];
   double newFocalPoint[4], norm[3];
