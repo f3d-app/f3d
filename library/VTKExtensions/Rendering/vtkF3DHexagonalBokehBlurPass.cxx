@@ -17,6 +17,14 @@
 
 vtkStandardNewMacro(vtkF3DHexagonalBokehBlurPass);
 
+double BlurFuncStep(double CoC)
+{
+  /* extrapolate from `step = 0.1` for `CoC = 20`
+   * but ensure at least 4 iterations from small `CoC` values. 
+   */
+  return 2.0 / std::max(CoC, 8.0);
+}
+
 constexpr std::string_view BlurFunc()
 {
   // clang-format off
@@ -147,7 +155,7 @@ void vtkF3DHexagonalBokehBlurPass::RenderDirectionalBlur(
     ssDecl << "uniform sampler2D backgroundTexture;\n";
     ssDecl << "uniform vec2 invViewDims;\n";
     ssDecl << "uniform float coc;\n";
-    ssDecl << "const float step = " << (2.0 / CircleOfConfusionRadius) << ";\n";
+    ssDecl << "const float step = " << BlurFuncStep(CircleOfConfusionRadius) << ";\n";
     ssDecl << BlurFunc();
     ssDecl << "//VTK::FSQ::Decl";
 
@@ -215,7 +223,7 @@ void vtkF3DHexagonalBokehBlurPass::RenderRhomboidBlur(
     ssDecl << "uniform sampler2D diagonalBlurTexture;\n";
     ssDecl << "uniform vec2 invViewDims;\n";
     ssDecl << "uniform float coc;\n";
-    ssDecl << "const float step = " << (2.0 / CircleOfConfusionRadius) << ";\n";
+    ssDecl << "const float step = " << BlurFuncStep(CircleOfConfusionRadius) << ";\n";
     ssDecl << BlurFunc();
     ssDecl << "//VTK::FSQ::Decl";
 
