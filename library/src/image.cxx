@@ -20,6 +20,8 @@
 
 #include <cassert>
 #include <regex>
+#include <sstream>
+#include <string>
 
 namespace f3d
 {
@@ -349,6 +351,149 @@ std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
     default:
       throw write_exception("Cannot save to buffer in the specified format");
   }
+}
+
+//----------------------------------------------------------------------------
+const f3d::image& image::toTerminalText(std::ostream& stream) const
+{
+  const int depth = this->getChannelCount();
+  if (this->getChannelType() != ChannelType::BYTE || depth < 3 || depth > 4)
+  {
+    throw std::invalid_argument("image must be byte RGB or RGBA");
+  }
+
+  int dims[3];
+  this->Internals->Image->GetDimensions(dims);
+  const int width = dims[0];
+  const int height = dims[1];
+  const unsigned char* content = static_cast<unsigned char*>(this->getContent());
+
+  constexpr unsigned char alphaCutoff = 127;
+
+  /* Function to retrieve pixels so we can return:
+    - transparent black values for out-of-bounds coords,
+    - opaque alpha value when the image has no alpha channel.
+    Rendering with half blocks means 1 line of text represents 2 rows of pixels
+    so we _will_ attempt to access a line past the bottom if the height is not even.
+  */
+  const auto getPixel = [=](int x, int y)
+  {
+    if (x >= 0 && x < width && y >= 0 && y < height)
+    {
+      const size_t i = depth * ((height - 1 - y) * width + x);
+      const int rgb = content[i + 0] << 16 | content[i + 1] << 8 | content[i + 2];
+      const bool transparent = depth > 3 ? content[i + 3] <= alphaCutoff : false;
+      return std::make_pair(rgb, transparent);
+    }
+    return std::make_pair(0x000000, true);
+  };
+
+  /* Functions to manipulate the terminal colors using escape sequences.
+    Keep track of the foreground and background states to avoid redundant sequences.
+  */
+  int currentFg = -1;
+  int currentBg = -1;
+  const auto setFg = [&](int rgb)
+  {
+    if (currentFg != rgb)
+    {
+      stream << "\033[38;2;" // set 24-bit foreground
+             << ((rgb >> 16) & 0xff) << ";" << ((rgb >> 8) & 0xff) << ";" << (rgb & 0xff) << "m";
+      currentFg = rgb;
+    }
+  };
+  const auto setBg = [&](int rgb)
+  {
+    if (currentBg != rgb)
+    {
+      stream << "\033[48;2;" // set 24-bit background
+             << ((rgb >> 16) & 0xff) << ";" << ((rgb >> 8) & 0xff) << ";" << (rgb & 0xff) << "m";
+      currentBg = rgb;
+    }
+  };
+  const auto reset = [&]()
+  {
+    if (currentBg > -1 || currentFg > -1)
+    {
+      stream << "\033[0m"; // reset all
+      currentBg = -1;
+      currentFg = -1;
+    }
+  };
+  const auto resetBg = [&]()
+  {
+    if (currentBg > -1)
+    {
+      stream << "\033[49m"; // reset background
+      currentBg = -1;
+    }
+  };
+
+  constexpr std::string_view EMPTY_BLOCK = " ";
+  // clang-format off
+  constexpr std::string_view TOP_BLOCK = u8"\u2580";
+  constexpr std::string_view BOTTOM_BLOCK = u8"\u2584";
+  constexpr std::string_view FULL_BLOCK = u8"\u2588";
+  // clang-format on
+  constexpr std::string_view EOL = "\n";
+
+  for (int y = 0; y < height; y += 2)
+  {
+    if (y > 0)
+    {
+      stream << EOL;
+    }
+    for (int x = 0; x < width; ++x)
+    {
+      const auto [rgb1, blank1] = getPixel(x, y + 0);
+      const auto [rgb2, blank2] = getPixel(x, y + 1);
+      if (blank1 && blank2)
+      {
+        reset();
+        stream << EMPTY_BLOCK;
+      }
+      else if (blank1)
+      {
+        resetBg();
+        setFg(rgb2);
+        stream << BOTTOM_BLOCK;
+      }
+      else if (blank2)
+      {
+        resetBg();
+        setFg(rgb1);
+        stream << TOP_BLOCK;
+      }
+      else if (rgb1 == rgb2)
+      {
+        setFg(rgb1);
+        stream << FULL_BLOCK;
+      }
+      else if (rgb1 == currentFg || rgb2 == currentBg)
+      {
+        setBg(rgb2);
+        setFg(rgb1);
+        stream << TOP_BLOCK;
+      }
+      else
+      {
+        setBg(rgb1);
+        setFg(rgb2);
+        stream << BOTTOM_BLOCK;
+      }
+    }
+    reset(); // reset after every line to keep the right edge of the image
+  }
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+std::string image::toTerminalText() const
+{
+  std::stringstream ss;
+  toTerminalText(ss);
+  return ss.str();
 }
 
 //----------------------------------------------------------------------------

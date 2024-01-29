@@ -169,6 +169,26 @@ public:
   std::vector<unsigned char> saveBuffer(SaveFormat format = SaveFormat::PNG) const;
 
   /**
+   * Convert to colored text using ANSI escape sequences for printing in a terminal.
+   * Block and half-block characters are used to represent two pixels per character (vertically)
+   * meaning that each text line represent two rows of pixels.
+   * Byte encoded RGB and RGBA images are supported (alpha channel values are binarized).
+   * Assumes terminal support for:
+   * - unicode block characters (`U+2580`, `U+2584`, `U+2588`)
+   * - SGR escape codes (`ESC[0m`, `ESC[49m`)
+   * - 24-bit escape codes (`ESC[38;2;{r};{g};{b}m`, `ESC[48;2;{r};{g};{b}m`)
+   * Throw an exception if the type is not byte RGB or RGBA.
+   */
+  const f3d::image& toTerminalText(std::ostream& stream) const;
+
+  /**
+   * Convert to colored text using ANSI escape sequences for printing in a terminal.
+   * See `toTerminalText(std::ostream& stream)`.
+   * Throw an exception if the type is not byte RGB or RGBA.
+   */
+  std::string toTerminalText() const;
+
+  /**
    * An exception that can be thrown by the image when there.
    * is an error on write.
    */
