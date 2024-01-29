@@ -20,7 +20,7 @@ vtkStandardNewMacro(vtkF3DHexagonalBokehBlurPass);
 double BlurFuncStep(double CoC)
 {
   /* extrapolate from `step = 0.1` for `CoC = 20`
-   * but ensure at least 4 iterations from small `CoC` values. 
+   * but ensure at least 4 iterations from small `CoC` values.
    */
   return 2.0 / std::max(CoC, 8.0);
 }
