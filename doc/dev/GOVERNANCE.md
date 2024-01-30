@@ -18,7 +18,7 @@ Contributors are those who have made contributions to the Project.
 
 ### 2.1 Consensus-Based Decision Making
 
-The Project make decisions through the consensus of the Maintainers. While explicit agreement of all Maintainers is preferred, it is not required for consensus. Rather, the Maintainers will determine consensus based on their good faith consideration of a several factors, including the dominant view of the Contributors and the nature of support and objections. The Maintainers will document evidence of consensus in accordance with these requirements using issues comments.
+The Project makes decisions through the consensus of the Maintainers. While explicit agreement of all Maintainers is preferred, it is not required for consensus. Rather, the Maintainers will determine consensus based on their good faith consideration of several factors, including the dominant view of the Contributors and the nature of support and objections. The Maintainers will document evidence of consensus in accordance with these requirements using issues comments.
 
 ### 2.2. Appeal Process
 
