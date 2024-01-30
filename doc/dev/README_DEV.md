@@ -5,3 +5,6 @@
 - [How to contribute to F3D.](../../CONTRIBUTING.md)
 - [How to Generate coverage and sanitizer report.](GENERATE.md)  
 - [Coding Style.](CODING_STYLE.md)  
+- [Governance.](GOVERNANCE.md)  
+- [Maintainers.](MAINTAINERS.md)  
+- [Code of conduct.](../../CODE_OF_CONDUCT.md)  
