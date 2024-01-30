@@ -20,9 +20,9 @@ vtkStandardNewMacro(vtkF3DHexagonalBokehBlurPass);
 double BlurFuncStep(double CoC)
 {
   /* extrapolate from `step = 0.1` for `CoC = 20`
-   * but ensure at least 4 iterations from small `CoC` values.
+   * but ensure at least 4 iterations for small `CoC` values.
    */
-  return 2.0 / std::max(CoC, 8.0);
+  return 2.0 / std::max(std::abs(CoC), 8.0);
 }
 
 constexpr std::string_view BlurFunc()
@@ -191,7 +191,7 @@ void vtkF3DHexagonalBokehBlurPass::RenderDirectionalBlur(
   float invViewDims[2] = { 1.f / static_cast<float>(width), 1.f / static_cast<float>(height) };
   this->BlurQuadHelper->Program->SetUniform2f("invViewDims", invViewDims);
 
-  this->BlurQuadHelper->Program->SetUniformf("coc", this->CircleOfConfusionRadius);
+  this->BlurQuadHelper->Program->SetUniformf("coc", std::abs(this->CircleOfConfusionRadius));
 
   this->FrameBufferObject->GetContext()->GetState()->PushFramebufferBindings();
   this->FrameBufferObject->Bind();
@@ -261,7 +261,7 @@ void vtkF3DHexagonalBokehBlurPass::RenderRhomboidBlur(
   float invViewDims[2] = { 1.f / static_cast<float>(width), 1.f / static_cast<float>(height) };
   this->RhomboidQuadHelper->Program->SetUniform2f("invViewDims", invViewDims);
 
-  this->RhomboidQuadHelper->Program->SetUniformf("coc", this->CircleOfConfusionRadius);
+  this->RhomboidQuadHelper->Program->SetUniformf("coc", std::abs(this->CircleOfConfusionRadius));
 
   this->RhomboidQuadHelper->Render();
 
