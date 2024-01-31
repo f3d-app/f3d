@@ -221,6 +221,7 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   this->HDRISpecularConfigured = false;
   this->HDRISkyboxConfigured = false;
 
+  this->AnimationNameInfo = "";
   this->GridInfo = "";
 
   // Importer rely on the Environment being set, so this is needed in the initialization
@@ -1065,12 +1066,6 @@ void vtkF3DRenderer::SetFilenameInfo(const std::string& info)
   this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, info.c_str());
   this->RenderPassesConfigured = false;
 }
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::SetAnimationnameInfo(const std::string& info)
-{
-  this->FilenameActor->SetText(vtkCornerAnnotation::LowerEdge, info.c_str());
-  this->RenderPassesConfigured = false;
-}
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetDropZoneInfo(const std::string& info)
@@ -1246,7 +1241,6 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     cheatSheetText << "   ?  : Print scene descr to terminal\n";
     cheatSheetText << "  ESC : Quit \n";
     cheatSheetText << " SPACE: Play animation if any\n";
-    cheatSheetText << "   W  : Play next animation \n";
     cheatSheetText << " LEFT : Previous file \n";
     cheatSheetText << " RIGHT: Next file \n";
     cheatSheetText << "  UP  : Reload current file \n";
@@ -1294,6 +1288,10 @@ void vtkF3DRenderer::ShowHDRISkybox(bool show)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 {
+
+  cheatSheetText << " W: Cycle animation ["
+                 << vtkF3DRenderer::ShortName(this->AnimationNameInfo, 19)
+                 << "]\n";
   cheatSheetText << " P: Translucency support " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]")
                  << "\n";
   cheatSheetText << " Q: Ambient occlusion " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
@@ -1318,8 +1316,7 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
   cheatSheetText << std::fixed;
   cheatSheetText << " L: Light (increase, shift+L: decrease) [" << this->LightIntensity << "]"
                  << " \n";
-}
-
+ }
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureActorsProperties()
 {
@@ -1552,4 +1549,24 @@ void vtkF3DRenderer::CreateCacheDirectory()
 
   // Create the folder if it does not exists
   vtksys::SystemTools::MakeDirectory(currentCachePath);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAnimationnameInfo(const std::string& info)
+{
+    this->AnimationNameInfo = info;
+    this->CheatSheetConfigured = false;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DRenderer::ShortName(const std::string& name, int maxChar)
+{
+  if (name.size() <= static_cast<size_t>(maxChar) || maxChar <= 3)
+  {
+    return name;
+  }
+  else
+  {
+    return name.substr(0, maxChar - 3) + "...";
+  }
 }

@@ -173,7 +173,7 @@ public:
       case 'W':
         self->AnimationManager->CycleAnimation();
         self->Options.set("scene.animation.index", self->AnimationManager->GetAnimationIndex());
-        self->Options.set("ui.animationname-info", self->AnimationManager->GetAnimationName());
+        ren->SetAnimationnameInfo(self->AnimationManager->GetAnimationName());
         render = true;
         break;
       case 'C':
