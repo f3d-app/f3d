@@ -47,7 +47,10 @@ public:
   void StartAnimation();
   void StopAnimation();
   void CycleAnimation();
+  void EnableAllAnimation();
+  void DisableAllAnimation();
   int GetAnimationIndex();
+
   std::string GetAnimationName();
 
   /**
@@ -88,7 +91,8 @@ protected:
   unsigned long CallBackId = 0;
   double CurrentTime = 0;
   bool CurrentTimeSet = false;
-  int AnimationIndex = -1;
+  int AnimationIndex = 0;
+  int AvailAnimations = 0;
   std::chrono::steady_clock::time_point PreviousTick;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
