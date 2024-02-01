@@ -4,30 +4,36 @@
 #include "vtkF3DOpenGLGridMapper.h"
 
 #include <iostream>
-#include <sstream>
 
-std::string boundsToStr(const double* bounds)
+template<class T, std::size_t N>
+ostream& operator<<(std::ostream& o, const std::array<T, N>& arr)
 {
-  std::stringstream ss;
-  ss << "(" << bounds[0] << "," << bounds[1] << "," << bounds[2] << "," << bounds[3] << ","
-     << bounds[4] << "," << bounds[5] << ")";
-  return ss.str();
+  size_t i = 0;
+  o << "(";
+  for (const auto v : arr)
+  {
+    if (i++)
+    {
+      o << ", ";
+    }
+    o << v;
+  }
+  o << ")";
+  return o;
 }
 
-bool checkBounds(const std::string& name, vtkF3DOpenGLGridMapper* mapper, //
+bool CheckBounds(const std::string& name, vtkF3DOpenGLGridMapper* mapper, //
   double x0, double x1, double y0, double y1, double z0, double z1)
 {
-  const double* actual = mapper->GetBounds();
-  const double expected[6] = { x0, x1, y0, y1, z0, z1 };
-  for (size_t i = 0; i < 6; ++i)
+  std::array<double, 6> actual;
+  mapper->GetBounds(actual.data());
+  const std::array<double, 6> expected = { x0, x1, y0, y1, z0, z1 };
+  if (actual != expected)
   {
-    if (actual[i] != expected[i])
-    {
-      std::cerr << "wrong bounds for " << name << " failed:" << std::endl;
-      std::cerr << "  got " << boundsToStr(actual) << std::endl;
-      std::cerr << "  expected " << boundsToStr(expected) << std::endl;
-      return false;
-    }
+    std::cerr << "wrong bounds for " << name << " failed:" << std::endl;
+    std::cerr << "  got " << actual << std::endl;
+    std::cerr << "  expected " << expected << std::endl;
+    return false;
   }
   return true;
 }
@@ -40,7 +46,7 @@ int TestF3DOpenGLGridMapper(int argc, char* argv[])
     mapper->SetFadeDistance(5.0);
     mapper->Print(std::cout);
 
-    if (!checkBounds("default", mapper, -5, +5, 0, 0, -5, +5))
+    if (!CheckBounds("default", mapper, -5, +5, 0, 0, -5, +5))
       return EXIT_FAILURE;
   }
 
@@ -54,15 +60,15 @@ int TestF3DOpenGLGridMapper(int argc, char* argv[])
      * it should not affect the actual bounding box */
 
     mapper->SetUpIndex(0);
-    if (!checkBounds("YZ with offset", mapper, 0, 0, -r, +r, -r, +r))
+    if (!CheckBounds("YZ with offset", mapper, 0, 0, -r, +r, -r, +r))
       return EXIT_FAILURE;
 
     mapper->SetUpIndex(1);
-    if (!checkBounds("XZ with offset", mapper, -r, +r, 0, 0, -r, +r))
+    if (!CheckBounds("XZ with offset", mapper, -r, +r, 0, 0, -r, +r))
       return EXIT_FAILURE;
 
     mapper->SetUpIndex(2);
-    if (!checkBounds("XY with offset", mapper, -r, +r, -r, +r, 0, 0))
+    if (!CheckBounds("XY with offset", mapper, -r, +r, -r, +r, 0, 0))
       return EXIT_FAILURE;
   }
 
