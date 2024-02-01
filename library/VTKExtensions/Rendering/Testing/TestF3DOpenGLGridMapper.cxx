@@ -3,6 +3,7 @@
 
 #include "vtkF3DOpenGLGridMapper.h"
 
+#include <array>
 #include <iostream>
 
 template<class T, std::size_t N>
