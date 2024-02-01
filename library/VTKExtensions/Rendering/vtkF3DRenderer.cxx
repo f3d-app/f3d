@@ -1428,6 +1428,15 @@ void vtkF3DRenderer::Render()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ResetCameraClippingRange()
+{
+  const bool gridUseBounds = this->GridActor->GetUseBounds();
+  this->GridActor->UseBoundsOn();
+  this->Superclass::ResetCameraClippingRange();
+  this->GridActor->SetUseBounds(gridUseBounds);
+}
+
+//----------------------------------------------------------------------------
 int vtkF3DRenderer::UpdateLights()
 {
   // Recover the number of lights that are on
