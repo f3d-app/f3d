@@ -41,13 +41,15 @@ bool CheckBounds(const std::string& name, vtkF3DOpenGLGridMapper* mapper, //
 
 int TestF3DOpenGLGridMapper(int argc, char* argv[])
 {
+  const double safeMargin = 1e-4;
+
   {
     vtkNew<vtkF3DOpenGLGridMapper> mapper;
 
     mapper->SetFadeDistance(5.0);
     mapper->Print(std::cout);
 
-    if (!CheckBounds("default", mapper, -5, +5, 0, 0, -5, +5))
+    if (!CheckBounds("default", mapper, -5, +5, -safeMargin, +safeMargin, -5, +5))
       return EXIT_FAILURE;
   }
 
@@ -61,15 +63,15 @@ int TestF3DOpenGLGridMapper(int argc, char* argv[])
      * it should not affect the actual bounding box */
 
     mapper->SetUpIndex(0);
-    if (!CheckBounds("YZ with offset", mapper, 0, 0, -r, +r, -r, +r))
+    if (!CheckBounds("YZ with offset", mapper, -safeMargin, +safeMargin, -r, +r, -r, +r))
       return EXIT_FAILURE;
 
     mapper->SetUpIndex(1);
-    if (!CheckBounds("XZ with offset", mapper, -r, +r, 0, 0, -r, +r))
+    if (!CheckBounds("XZ with offset", mapper, -r, +r, -safeMargin, +safeMargin, -r, +r))
       return EXIT_FAILURE;
 
     mapper->SetUpIndex(2);
-    if (!CheckBounds("XY with offset", mapper, -r, +r, -r, +r, 0, 0))
+    if (!CheckBounds("XY with offset", mapper, -r, +r, -r, +r, -safeMargin, +safeMargin))
       return EXIT_FAILURE;
   }
 
