@@ -210,8 +210,14 @@ void vtkF3DOpenGLGridMapper::BuildBufferObjects(vtkRenderer* ren, vtkActor* vtkN
 //-----------------------------------------------------------------------------
 double* vtkF3DOpenGLGridMapper::GetBounds()
 {
-  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = -this->FadeDistance;
-  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = +this->FadeDistance;
+  double r[3] = { this->FadeDistance, this->FadeDistance, this->FadeDistance };
+  r[this->UpIndex] = 1e-4;
+  this->Bounds[0] = -r[0];
+  this->Bounds[1] = +r[0];
+  this->Bounds[2] = -r[1];
+  this->Bounds[3] = +r[1];
+  this->Bounds[4] = -r[2];
+  this->Bounds[5] = +r[2];
   return this->Bounds;
 }
 
