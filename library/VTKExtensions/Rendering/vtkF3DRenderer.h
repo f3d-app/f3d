@@ -105,7 +105,7 @@ public:
   /**
    * Reimplemented to account for grid actor
    */
-  void ResetCameraClippingRange();
+  void ResetCameraClippingRange() override;
 
   /**
    * Update actors according to the properties of this class:

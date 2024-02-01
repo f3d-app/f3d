@@ -4,6 +4,7 @@
 #include "vtkF3DOpenGLGridMapper.h"
 
 #include <iostream>
+#include <sstream>
 
 std::string boundsToStr(const double* bounds)
 {
