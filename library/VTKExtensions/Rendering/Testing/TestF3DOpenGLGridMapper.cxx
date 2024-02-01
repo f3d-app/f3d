@@ -41,7 +41,7 @@ bool CheckBounds(const std::string& name, vtkF3DOpenGLGridMapper* mapper, //
 
 int TestF3DOpenGLGridMapper(int argc, char* argv[])
 {
-  const double safeMargin = 1e-4;
+  constexpr double safeMargin = 1e-4;
 
   {
     vtkNew<vtkF3DOpenGLGridMapper> mapper;
