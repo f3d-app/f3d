@@ -134,7 +134,7 @@ public:
           uvs->InsertNextTypedTuple(fn);
         }
 
-        std::vector<vtkIdType> polyline(nbV - 1);
+        std::vector<vtkIdType> polyline(nbV);
         std::iota(polyline.begin(), polyline.end(), shift);
         linesCells->InsertNextCell(polyline.size(), polyline.data());
 
