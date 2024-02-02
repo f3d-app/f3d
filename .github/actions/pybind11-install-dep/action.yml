@@ -6,7 +6,7 @@ runs:
 
     - name: Cache pybind11
       id: cache-pybind11
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/pybind11_install
         key: pybind11-v2.11.1-${{runner.os}}-0

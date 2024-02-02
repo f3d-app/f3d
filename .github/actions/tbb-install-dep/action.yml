@@ -12,7 +12,7 @@ runs:
 
     - name: Cache TBB
       id: cache-tbb
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/tbb_install
         key: tbb-v2021.10.0-${{runner.os}}-${{inputs.cpu}}-0

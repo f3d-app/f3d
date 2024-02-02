@@ -12,7 +12,7 @@ runs:
 
     - name: Cache blosc
       id: cache-blosc
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/blosc_install
         key: blosc-1.21.5-${{runner.os}}-${{inputs.cpu}}-1

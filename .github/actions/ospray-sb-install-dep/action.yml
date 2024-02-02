@@ -6,7 +6,7 @@ runs:
 
     - name: Cache ospray
       id: cache-ospray
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/ospray_install
         key: ospray-sb-v2.7.1-${{runner.os}}-1

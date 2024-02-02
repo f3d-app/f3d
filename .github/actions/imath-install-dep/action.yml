@@ -12,7 +12,7 @@ runs:
 
     - name: Cache Imath
       id: cache-imath
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/imath_install
         key: imath-v3.1.9-${{runner.os}}-${{inputs.cpu}}-0

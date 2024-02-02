@@ -19,7 +19,7 @@ runs:
  
     - name: Cache LFS data
       id: cache-lfs
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: lfs_data
         key: lfs-data-${{inputs.lfs_sha}}-1
