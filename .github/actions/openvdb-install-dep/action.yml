@@ -17,6 +17,7 @@ runs:
         path: dependencies/openvdb_install
         key: openvdb-11.0.0-${{runner.os}}-${{inputs.cpu}}-4
 
+    # Dependents: vtk
     - name: Checkout OpenVDB
       if: steps.cache-openvdb.outputs.cache-hit != 'true'
       uses: actions/checkout@v3
