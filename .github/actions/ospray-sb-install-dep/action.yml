@@ -11,6 +11,7 @@ runs:
         path: dependencies/ospray_install
         key: ospray-sb-v2.7.1-${{runner.os}}-1
 
+    # Dependents: vtk
     - name: Checkout ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
