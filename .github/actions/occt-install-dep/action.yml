@@ -12,7 +12,7 @@ runs:
 
     - name: Cache OCCT
       id: cache-occt
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/occt_install
         key: occt-V7_7_2-${{runner.os}}-${{inputs.cpu}}-1

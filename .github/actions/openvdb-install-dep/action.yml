@@ -12,7 +12,7 @@ runs:
 
     - name: Cache OpenVDB
       id: cache-openvdb
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/openvdb_install
         key: openvdb-11.0.0-${{runner.os}}-${{inputs.cpu}}-4

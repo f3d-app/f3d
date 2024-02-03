@@ -12,7 +12,7 @@ runs:
 
     - name: Cache USD
       id: cache-usd
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/usd_install
         key: usd-v23.05-${{runner.os}}-${{inputs.cpu}}-7

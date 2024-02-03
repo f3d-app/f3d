@@ -12,7 +12,7 @@ runs:
 
     - name: Cache ASSIMP
       id: cache-assimp
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/assimp_install
         key: assimp-v5.3.1-${{runner.os}}-${{inputs.cpu}}-2
