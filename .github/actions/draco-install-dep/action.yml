@@ -12,7 +12,7 @@ runs:
 
     - name: Cache Draco
       id: cache-draco
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/draco_install
         key: draco-1.5.7-${{runner.os}}-${{inputs.cpu}}-0
