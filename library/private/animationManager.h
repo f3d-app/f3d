@@ -67,7 +67,6 @@ public:
    */
   void GetTimeRange(double timeRange[2]);
 
-
 protected:
   /**
    * Called by an internal timer to advance one animation tick
