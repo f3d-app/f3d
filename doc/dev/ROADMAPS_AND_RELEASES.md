@@ -7,7 +7,7 @@ as planned and releases can be delayed.
 Roadmaps are available on their dedicated issue with their associated project board and milestone.
 They are bound to evolve over time.
 
-If you want to get involved, please feel free to commment on the issues and contribute to the issues that matters to you!
+If you want to get involved, please feel free to comment on the issues and contribute to the issues that matters to you!
 
 ## 2.4.0
 
