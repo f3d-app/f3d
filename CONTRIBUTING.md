@@ -21,10 +21,10 @@ If not, you may want to look at our [getting started](doc/dev/GETTING_STARTED.md
 Once you are able to build F3D, you may want to take a look at the opened [issues](https://github.com/f3d-app/f3d/issues)!
 If you are a beginner, you may want to look at ["good first issues"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
 If you already have some experience with programming and contribution, definitely look at ["help wanted"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) issues.
-If you like to debug or prototype things out, you may want to look at ["investigation"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3Aworkflow%3Ainvestigation) issues.
-If you want to get involved in the technical discussions, definitely look at ["discussion"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3Aworkflow%3Adiscussion) issues.
 If an issue is interesting to you and is not yet assigned, then you should just go ahead, *comment on the issue* and ask for any help or clarification needed.
 F3D maintainers will see your comment, assign the issue to you and provide guidance as needed.
+
+To get involved more deeply, please take a look at the [roadmaps](doc/dev/ROADMAPS_AND_RELEASES.md) for the upcoming releases.
 
 It is also recommended to reach out on [discord](https://discord.f3d.app) to simplify communication, but it is not required.
 
