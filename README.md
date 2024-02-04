@@ -57,7 +57,12 @@ man f3d # Linux only
 
 # Support
 
-F3D is developed by a team of passionate devs. Please use F3D, star it on github or even become a [sponsor](https://github.com/sponsors/f3d-app) to support us!
+F3D needs you help!
+
+If you can, please consider sponsoring F3D, even a small amount, it would help us offseting the maintenance cost
+as well as considering adding support for devices we do not own yet. Read more about it on our [sponsor page](https://github.com/sponsors/f3d-app).
+
+If not, please use F3D, star it on github and share the word about it!
 
 # Vision
 
