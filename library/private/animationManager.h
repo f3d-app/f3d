@@ -62,6 +62,12 @@ public:
   animationManager(animationManager const&) = delete;
   void operator=(animationManager const&) = delete;
 
+  /**
+   * Set a time range pointer to the current time range values
+   */
+  void GetTimeRange(double timeRange[2]);
+ 
+
 protected:
   /**
    * Called by an internal timer to advance one animation tick
