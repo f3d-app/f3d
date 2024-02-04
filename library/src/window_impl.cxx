@@ -238,18 +238,15 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetInvertZoom(
     this->Internals->Options.getAsBool("interactor.invert-zoom"));
 
-  std::string splatType = this->Internals->Options.getAsString("render.splat-type");
+  std::string splatTypeStr = this->Internals->Options.getAsString("render.splat-type");
   int pointSize = this->Internals->Options.getAsDouble("render.point-size");
-  if (splatType == "gaussian")
+  vtkF3DRendererWithColoring::SplatType splatType = vtkF3DRendererWithColoring::SplatType::SPHERE;
+  if (splatTypeStr == "gaussian")
   {
-    this->Internals->Renderer->SetPointProperties(
-      vtkF3DRendererWithColoring::SplatType::GAUSSIAN, pointSize);
+    splatType = vtkF3DRendererWithColoring::SplatType::GAUSSIAN;
   }
-  else if (splatType == "sphere")
-  {
-    this->Internals->Renderer->SetPointProperties(
-      vtkF3DRendererWithColoring::SplatType::SPHERE, pointSize);
-  }
+
+  this->Internals->Renderer->SetPointProperties(splatType, pointSize);
 
   this->Internals->Renderer->SetLineWidth(
     this->Internals->Options.getAsDouble("render.line-width"));

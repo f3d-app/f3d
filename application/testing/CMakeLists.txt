@@ -213,7 +213,7 @@ else()
 endif()
 
 # Needs splat sorting with compute shaders
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240202)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
   if(NOT APPLE) # MacOS does not support compute shaders
     f3d_test(NAME Test3DGaussiansSplatting DATA small.splat ARGS -osy --up=-Y --point-size=1 --point-type=gaussian --camera-position=-3.6,0.5,-4.2)
   endif()

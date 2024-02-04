@@ -1,5 +1,6 @@
-ivec2 disperse(uint t, uint h)
+ivec2 disperse(uint h)
 {
+  uint t = gl_GlobalInvocationID.x;
   uint q = (t / h) * 2 * h;
 
   uint x = q + t % h;
@@ -8,8 +9,9 @@ ivec2 disperse(uint t, uint h)
   return ivec2(x, y);
 }
 
-ivec2 flip(uint t, uint h)
+ivec2 flip(uint h)
 {
+  uint t = gl_GlobalInvocationID.x;
   uint q = (t / h) * 2 * h;
 
   uint x = q + t % h;

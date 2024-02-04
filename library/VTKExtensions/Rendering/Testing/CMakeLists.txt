@@ -11,9 +11,8 @@ list(APPEND VTKExtensionsRenderingTests_list
      TestF3DCachedTexturesPrint.cxx
   )
 
-# Compute shaders are not supported on mac
 # Also needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
-if(NOT ANDROID AND NOT EMSCRIPTEN AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240202)
+if(NOT ANDROID AND NOT EMSCRIPTEN AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
   list(APPEND VTKExtensionsRenderingTests_list 
        TestF3DBitonicSort.cxx)
 endif()

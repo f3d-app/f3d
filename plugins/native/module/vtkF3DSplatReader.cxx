@@ -24,9 +24,6 @@ vtkF3DSplatReader::vtkF3DSplatReader()
 }
 
 //----------------------------------------------------------------------------
-vtkF3DSplatReader::~vtkF3DSplatReader() = default;
-
-//----------------------------------------------------------------------------
 int vtkF3DSplatReader::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {

@@ -22,5 +22,5 @@ layout(location = 1) uniform int height;
 
 void main()
 {
-  compare_and_swap(disperse(gl_GlobalInvocationID.x, height));
+  compare_and_swap(disperse(height));
 }

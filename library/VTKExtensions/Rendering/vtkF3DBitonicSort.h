@@ -24,8 +24,21 @@ public:
   static vtkF3DBitonicSort* New();
   vtkTypeMacro(vtkF3DBitonicSort, vtkObject);
 
+  /**
+   * Initialize the compute shaders.
+   * workgroupSize is the number of threads running in a single GPU workgroup
+   * keyType and valueType are the VTK types of the key and value to sort respectively
+   * Only VTK_DOUBLE, VTK_FLOAT, VTK_INT and VTK_UNSIGNED_INT are supported
+   */
   void Initialize(int workgroupSize, int keyType, int valueType);
 
+  /**
+   * Run the compute shader and sort the buffers.
+   * An OpenGL context must exists and given as input in the first argument
+   * nbPairs is the number of element in the buffer keys and values
+   * OpenGL buffers keys and values must be valid and containing data types specified when
+   * this class has been initialized
+   */
   void Run(vtkOpenGLRenderWindow* context, int nbPairs, vtkOpenGLBufferObject* keys,
     vtkOpenGLBufferObject* values);
 

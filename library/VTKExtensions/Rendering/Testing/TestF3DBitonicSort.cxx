@@ -3,7 +3,6 @@
 #include <vtkShader.h>
 
 #include "vtkF3DBitonicSort.h"
-
 #include "vtkF3DBitonicSortFunctions.h"
 #include "vtkF3DBitonicSortGlobalDisperseCS.h"
 #include "vtkF3DBitonicSortGlobalFlipCS.h"
@@ -12,7 +11,6 @@
 
 #include <algorithm>
 #include <random>
-#include <sstream>
 
 int TestF3DBitonicSort(int argc, char* argv[])
 {
@@ -30,12 +28,12 @@ int TestF3DBitonicSort(int argc, char* argv[])
   constexpr int nbElements = 10000;
 
   // fill CPU keys and values buffers
-  std::vector<float> keys(nbElements);
+  std::vector<double> keys(nbElements);
   std::vector<int> values(nbElements);
 
   std::random_device dev;
   std::mt19937 rng(dev());
-  std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+  std::uniform_real_distribution<double> dist(0.0, 1.0);
 
   std::generate(std::begin(keys), std::end(keys), [&]() { return dist(rng); });
   std::fill(std::begin(values), std::end(values), 0); // we do not care about the values
@@ -49,7 +47,7 @@ int TestF3DBitonicSort(int argc, char* argv[])
 
   // sort
   vtkNew<vtkF3DBitonicSort> sorter;
-  sorter->Initialize(128, VTK_FLOAT, VTK_INT);
+  sorter->Initialize(128, VTK_DOUBLE, VTK_INT);
   sorter->Run(vtkOpenGLRenderWindow::SafeDownCast(renWin), nbElements, bufferKeys, bufferValues);
 
   // download sorted key buffer to CPU

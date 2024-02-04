@@ -24,6 +24,6 @@ void main()
   for (uint h = WorkgroupSize; h >= 1; h /= 2)
   {
     barrier();
-    compare_and_swap(disperse(gl_GlobalInvocationID.x, h));
+    compare_and_swap(disperse(h));
   }
 }

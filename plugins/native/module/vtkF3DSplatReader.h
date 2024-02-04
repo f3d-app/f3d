@@ -1,8 +1,11 @@
 /**
  * @class   vtkF3DSplatReader
- * @brief   VTK Reader for DRC files using Draco
+ * @brief   VTK Reader for 3D Gaussians in binary .splat file format
  *
- * Reader for .splat 3D Gaussians files
+ * Reader for binary .splat files as defined in https://github.com/antimatter15/splat
+ * This reader will probably evolve until there is no standard defined yet
+ * An interesting discussion can be followed here:
+ * https://github.com/mkkellogg/GaussianSplats3D/issues/47
  */
 
 #ifndef vtkF3DSplatReader_h
@@ -24,7 +27,7 @@ public:
 
 protected:
   vtkF3DSplatReader();
-  ~vtkF3DSplatReader() override;
+  ~vtkF3DSplatReader() override = default;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 

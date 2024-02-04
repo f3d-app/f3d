@@ -182,6 +182,7 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME Splat
+  SCORE 90
   EXTENSIONS splat
   MIMETYPES application/vnd.splat
   VTK_READER vtkF3DSplatReader

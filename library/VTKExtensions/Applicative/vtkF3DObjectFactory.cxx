@@ -6,7 +6,7 @@
 #include "vtkF3DPolyDataMapper.h"
 
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__) &&                                           \
-  VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240202)
+  VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
 #include "vtkF3DPointSplatMapper.h"
 #endif
 
@@ -29,7 +29,7 @@ vtkStandardNewMacro(vtkF3DObjectFactory);
 VTK_CREATE_CREATE_FUNCTION(vtkF3DPolyDataMapper)
 
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__) &&                                           \
-  VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240202)
+  VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
 VTK_CREATE_CREATE_FUNCTION(vtkF3DPointSplatMapper)
 #endif
 
@@ -53,7 +53,7 @@ vtkF3DObjectFactory::vtkF3DObjectFactory()
     "vtkPolyDataMapper override for F3D", 1, vtkObjectFactoryCreatevtkF3DPolyDataMapper);
 
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__) &&                                           \
-  VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240202)
+  VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
   this->RegisterOverride("vtkPointGaussianMapper", "vtkF3DPointSplatMapper",
     "vtkPointGaussianMapper override for F3D", 1, vtkObjectFactoryCreatevtkF3DPointSplatMapper);
 #endif

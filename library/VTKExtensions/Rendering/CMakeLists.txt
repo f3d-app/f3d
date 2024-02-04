@@ -45,7 +45,7 @@ set(classes
   )
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
-if(NOT ANDROID AND NOT EMSCRIPTEN AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240202)
+if(NOT ANDROID AND NOT EMSCRIPTEN AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
   set(classes ${classes} vtkF3DBitonicSort vtkF3DPointSplatMapper)
 endif()
 

@@ -13,7 +13,7 @@
 #include <vtkTestUtilities.h>
 #include <vtkVersion.h>
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240202)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
 #include "vtkF3DPointSplatMapper.h"
 #endif
 
@@ -23,7 +23,7 @@ int TestF3DObjectFactory(int argc, char* argv[])
   vtkObjectFactory::RegisterFactory(factory);
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240202)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPointGaussianMapper", "vtkOpenGLPointGaussianMapper");
 #endif
 
@@ -48,7 +48,7 @@ int TestF3DObjectFactory(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240202)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
   vtkNew<vtkPointGaussianMapper> pointMapper;
   pointMapper->Print(cout);
   vtkF3DPointSplatMapper* pointMapperPtr = vtkF3DPointSplatMapper::SafeDownCast(pointMapper);

@@ -24,12 +24,12 @@ void main()
   for (uint h = 1; h <= WorkgroupSize; h *= 2)
   {
     barrier();
-    compare_and_swap(flip(gl_GlobalInvocationID.x, h));
+    compare_and_swap(flip(h));
 
     for (uint hh = h; hh >= 1; hh /= 2)
     {
       barrier();
-      compare_and_swap(disperse(gl_GlobalInvocationID.x, hh));
+      compare_and_swap(disperse(hh));
     }
   }
 }
