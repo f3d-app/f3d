@@ -541,11 +541,11 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   # Test no render animation time. Regex contains a part of the range of the ACCL field.
   f3d_test(NAME TestNoRenderAnimation DATA small.ex2 ARGS  --load-plugins=exodus --animation-time=0.003 REGEXP "-521950, 6.57485" NO_RENDER)
 
-  # Test if the animation-time argument works when set to zero and time range[0] is less than zero
+  # Test if the animation-time works when set to zero and time range[0] is less than zero
   f3d_test(NAME TestTimeRangeLessThanZero DATA negative_range_animated.e ARGS -sgxn --dry-run --animation-time=0 DEFAULT_LIGHTS)
 
-  # Test if a native animation-time works when time range[0] is less than zero
-  f3d_test(NAME TestTimeRangeLessThanZeroNativeAnimationTime DATA negative_range_animated.e ARGS -sgxn --dry-run DEFAULT_LIGHTS)
+  # Test if a negative animation-time works when time range[0] is less than zero
+  f3d_test(NAME TestTimeRangeLessThanZeroNativeAnimationTime DATA negative_range_animated.e ARGS -sgxn --dry-run --animation-time=-3 DEFAULT_LIGHTS)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/exodus/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
