@@ -545,7 +545,7 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   f3d_test(NAME TestTimeRangeLessThanZero DATA negative_range_animated.e ARGS -sgxn --dry-run --animation-time=0 DEFAULT_LIGHTS)
 
   # Test if a negative animation-time works when time range[0] is less than zero
-  f3d_test(NAME TestTimeRangeLessThanZeroNativeAnimationTime DATA negative_range_animated.e ARGS -sgxn --dry-run --animation-time=-3 DEFAULT_LIGHTS)
+  f3d_test(NAME TestTimeRangeLessThanZeroNegativeAnimationTime DATA negative_range_animated.e ARGS -sgxn --dry-run --animation-time=-3 DEFAULT_LIGHTS)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/exodus/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
