@@ -72,7 +72,7 @@ As a minimalist 3D viewer F3D aims to:
 - Be usable non-interactively
 - Be as modular as possible to be built with a small number of dependencies
 
-but there are no plans to:
+but there is no plan to:
 
 - Provide a classic mouse-based UI, with menus and buttons
 - Provide data processing tools
