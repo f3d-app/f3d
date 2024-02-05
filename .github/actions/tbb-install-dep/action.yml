@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/tbb_install
-        key: tbb-v2021.11.0-${{runner.os}}-${{inputs.cpu}}-0
+        key: tbb-v2021.11.0-${{runner.os}}-${{inputs.cpu}}-1
 
     # Dependents: usd openvdb vtk
     - name: Checkout TBB
