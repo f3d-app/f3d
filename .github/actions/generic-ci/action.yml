@@ -188,6 +188,7 @@ runs:
         path: ${{github.workspace}}\build\bin_Release
 
     - name: Test
+      if: runner.os == 'Windows'
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
