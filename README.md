@@ -59,7 +59,7 @@ man f3d # Linux only
 
 F3D needs you help!
 
-If you can, please consider sponsoring F3D. Even a small donation would help us offsetting the recurring maintenance costs.
+If you can, please consider sponsoring F3D. Even a small donation would help us offset the recurring maintenance costs.
 With enough sponsors we would even be able to add support for new devices (as we would need do acquire or rent them first). Read more about it on our [sponsor page](https://github.com/sponsors/f3d-app).
 
 If not, please use F3D, star it on github and share the word about it!
