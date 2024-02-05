@@ -153,7 +153,9 @@ public:
       &this->Options, &this->Window, this->Interactor, this->GenericImporter);
 
     double animationTime = this->Options.getAsDouble("scene.animation.time");
-    if (animationTime != 0)
+    double timeRange[2];
+    this->AnimationManager.GetTimeRange(timeRange);
+    if (animationTime != timeRange[0])
     {
       this->AnimationManager.LoadAtTime(animationTime);
     }
@@ -309,7 +311,9 @@ loader& loader_impl::loadScene(const std::string& filePath)
     this->Internals->Interactor, this->Internals->CurrentFullSceneImporter);
 
   double animationTime = this->Internals->Options.getAsDouble("scene.animation.time");
-  if (animationTime != 0)
+  double timeRange[2];
+  this->Internals->AnimationManager.GetTimeRange(timeRange);
+  if (animationTime != timeRange[0])
   {
     this->Internals->AnimationManager.LoadAtTime(animationTime);
   }

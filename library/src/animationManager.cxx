@@ -273,4 +273,11 @@ bool animationManager::LoadAtTime(double timeValue)
   }
   return true;
 }
+
+//----------------------------------------------------------------------------
+void animationManager::GetTimeRange(double timeRange[2])
+{
+  timeRange[0] = this->TimeRange[0];
+  timeRange[1] = this->TimeRange[1];
+}
 }
