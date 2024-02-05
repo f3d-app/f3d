@@ -18,7 +18,7 @@ Our next minor release is planned for April 2024
 
 ## 3.0.0
 
-Out next major release is planned for october 2024
+Out next major release is planned for October 2024
  - [Issue](https://github.com/f3d-app/f3d/issues/1243)
  - [Milestone](https://github.com/f3d-app/f3d/milestone/8)
  - [Board](https://github.com/orgs/f3d-app/projects/2/views/11?sliceBy%5Bvalue%5D=3.0.0)
