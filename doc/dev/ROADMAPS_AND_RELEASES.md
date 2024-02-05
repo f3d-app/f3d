@@ -25,5 +25,5 @@ Out next major release is planned for october 2024
 
 ## Release cycle
 
-F3D release cycle is one minor release every three months, in january, april, july and october.
+F3D release cycle is one minor release every three months, in January, April, July and October.
 A minor release may be skipped before a major release.
