@@ -57,7 +57,12 @@ man f3d # Linux only
 
 # Support
 
-F3D is developed by a team of passionate devs. Please use F3D, star it on github or even become a [sponsor](https://github.com/sponsors/f3d-app) to support us!
+F3D needs you help!
+
+If you can, please consider sponsoring F3D. Even a small donation would help us offset the recurring maintenance costs.
+With enough sponsors we would even be able to add support for new devices (as we would need do acquire or rent them first). Read more about it on our [sponsor page](https://github.com/sponsors/f3d-app).
+
+If not, please use F3D, star it on github and share the word about it!
 
 # Vision
 
@@ -80,7 +85,7 @@ but there is no plan to:
 
 # Contributing
 
-We envision F3D as a community-driven project, we love to see how the project is growing thanks to the contributions from the community. We would love to see your face in the list below! If you want to contribute to F3D, you are very welcome to! Take a look at our [contribution documentation](CONTRIBUTING.md).
+F3D as a community-driven, inclusive and beginner-friendly project. We love to see how the project is growing thanks to the contributions from the community. We would love to see your face in the list below! If you want to contribute to F3D, you are very welcome to! Take a look at our [contribution documentation](CONTRIBUTING.md), [governance documentation](doc/dev/GOVERNANCE.md) and [code of conduct](CODE_OF_CONDUCT.md).
 
 <a href="https://github.com/f3d-app/f3d/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=f3d-app/f3d" />
