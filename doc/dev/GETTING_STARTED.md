@@ -101,8 +101,8 @@ git fetch origin c9140a3b500812ad3206317885860d9553b93f13
 
 ```sh
 cd C:\dev
-.\vcpkg\bootstrap-vcpkg.sh
-cmake -B .\f3d\build -S .\f3d\src -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
+.\vcpkg\bootstrap-vcpkg.bat
+cmake -B .\f3d\build -S .\f3d\src -DCMAKE_TOOLCHAIN_FILE=C:\dev\vcpkg\scripts\buildsystems\vcpkg.cmake
 ```
 
 Note: Last command will take a while. It download, compile and install all dependencies, including
