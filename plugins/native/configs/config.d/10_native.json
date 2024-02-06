@@ -34,7 +34,6 @@
     "up": "-Y",
     "trackball": true,
     "camera-position": "0,1,-5.2",
-    "camera-focal-point": "0,1,0",
-    "camera-view-up": "0,-1,0"
+    "camera-focal-point": "0,1,0"
   }
 }
