@@ -48,7 +48,7 @@ private:
   vtkNew<vtkF3DBitonicSort> Sorter;
 
   double DirectionThreshold = 0.999;
-  double LastDirection[3];
+  double LastDirection[3] = { 0.0, 0.0, 0.0 };
 };
 
 //----------------------------------------------------------------------------
@@ -57,10 +57,6 @@ vtkStandardNewMacro(vtkF3DSplatMapperHelper);
 //----------------------------------------------------------------------------
 vtkF3DSplatMapperHelper::vtkF3DSplatMapperHelper()
 {
-  this->LastDirection[0] = 0.0;
-  this->LastDirection[1] = 0.0;
-  this->LastDirection[2] = 0.0;
-
   this->DepthComputeShader->SetType(vtkShader::Compute);
   this->DepthComputeShader->SetSource(vtkF3DComputeDepthCS);
   this->DepthProgram->SetComputeShader(this->DepthComputeShader);

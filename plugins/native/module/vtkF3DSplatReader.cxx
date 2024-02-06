@@ -93,10 +93,3 @@ int vtkF3DSplatReader::RequestData(
 
   return 1;
 }
-
-//----------------------------------------------------------------------------
-void vtkF3DSplatReader::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << this->FileName << "\n";
-}

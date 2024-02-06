@@ -133,19 +133,20 @@ bool vtkF3DBitonicSort::Run(vtkOpenGLRenderWindow* context, int nbPairs,
   glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
   // we must now double h, as this happens before every flip
-  for (unsigned int h = this->WorkgroupSize * 2; h < nbPairsExt; h *= 2)
+  for (unsigned int outerHeight = this->WorkgroupSize * 2; outerHeight < nbPairsExt;
+       outerHeight *= 2)
   {
     shaderCache->ReadyShaderProgram(this->BitonicSortGlobalFlipProgram);
     this->BitonicSortGlobalFlipProgram->SetUniformi("count", nbPairs);
-    this->BitonicSortGlobalFlipProgram->SetUniformi("height", h);
+    this->BitonicSortGlobalFlipProgram->SetUniformi("height", outerHeight);
     glDispatchCompute(workgroupCount, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-    for (int hh = h / 2; hh > this->WorkgroupSize; hh /= 2)
+    for (int innerHeight = outerHeight / 2; innerHeight > this->WorkgroupSize; innerHeight /= 2)
     {
       shaderCache->ReadyShaderProgram(this->BitonicSortGlobalDisperseProgram);
       this->BitonicSortGlobalDisperseProgram->SetUniformi("count", nbPairs);
-      this->BitonicSortGlobalDisperseProgram->SetUniformi("height", hh);
+      this->BitonicSortGlobalDisperseProgram->SetUniformi("height", innerHeight);
       glDispatchCompute(workgroupCount, 1, 1);
       glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
     }

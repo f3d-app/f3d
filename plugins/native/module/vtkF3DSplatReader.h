@@ -18,7 +18,6 @@ class vtkF3DSplatReader : public vtkPolyDataAlgorithm
 public:
   static vtkF3DSplatReader* New();
   vtkTypeMacro(vtkF3DSplatReader, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Set the file name.

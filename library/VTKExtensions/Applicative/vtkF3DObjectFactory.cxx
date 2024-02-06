@@ -7,20 +7,20 @@
 
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__) &&                                           \
   VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
-#include "vtkF3DPointSplatMapper.h"
+#include <vtkF3DPointSplatMapper.h>
 #endif
 
 #ifdef __ANDROID__
-#include "vtkF3DAndroidLogOutputWindow.h"
+#include <vtkF3DAndroidLogOutputWindow.h>
 #elif F3D_WINDOWS_GUI
-#include "vtkF3DWin32OutputWindow.h"
+#include <vtkF3DWin32OutputWindow.h>
 #else
-#include "vtkF3DConsoleOutputWindow.h"
+#include <vtkF3DConsoleOutputWindow.h>
 #endif
 
 #ifdef __EMSCRIPTEN__
-#include "vtkSDL2OpenGLRenderWindow.h"
-#include "vtkSDL2RenderWindowInteractor.h"
+#include <vtkSDL2OpenGLRenderWindow.h>
+#include <vtkSDL2RenderWindowInteractor.h>
 #endif
 
 vtkStandardNewMacro(vtkF3DObjectFactory);
