@@ -29,8 +29,9 @@ public:
    * workgroupSize is the number of threads running in a single GPU workgroup
    * keyType and valueType are the VTK types of the key and value to sort respectively
    * Only VTK_DOUBLE, VTK_FLOAT, VTK_INT and VTK_UNSIGNED_INT are supported
+   * Returns true if succeeded
    */
-  void Initialize(int workgroupSize, int keyType, int valueType);
+  bool Initialize(int workgroupSize, int keyType, int valueType);
 
   /**
    * Run the compute shader and sort the buffers.
@@ -38,8 +39,9 @@ public:
    * nbPairs is the number of element in the buffer keys and values
    * OpenGL buffers keys and values must be valid and containing data types specified when
    * this class has been initialized
+   * Returns true if succeeded
    */
-  void Run(vtkOpenGLRenderWindow* context, int nbPairs, vtkOpenGLBufferObject* keys,
+  bool Run(vtkOpenGLRenderWindow* context, int nbPairs, vtkOpenGLBufferObject* keys,
     vtkOpenGLBufferObject* values);
 
 private:

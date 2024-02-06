@@ -20,12 +20,12 @@
 vtkStandardNewMacro(vtkF3DBitonicSort);
 
 //----------------------------------------------------------------------------
-void vtkF3DBitonicSort::Initialize(int workgroupSize, int keyType, int valueType)
+bool vtkF3DBitonicSort::Initialize(int workgroupSize, int keyType, int valueType)
 {
   if (workgroupSize < 0)
   {
     vtkErrorMacro("Invalid workgroupSize");
-    return;
+    return false;
   }
 
   auto GetStringShaderType = [](int vtkType) -> std::string
@@ -48,14 +48,14 @@ void vtkF3DBitonicSort::Initialize(int workgroupSize, int keyType, int valueType
   if (keyTypeShader.empty())
   {
     vtkErrorMacro("Invalid keyType");
-    return;
+    return false;
   }
 
   std::string valueTypeShader = GetStringShaderType(valueType);
   if (valueTypeShader.empty())
   {
     vtkErrorMacro("Invalid valueType");
-    return;
+    return false;
   }
 
   std::stringstream defines;
@@ -102,16 +102,18 @@ void vtkF3DBitonicSort::Initialize(int workgroupSize, int keyType, int valueType
   this->BitonicSortGlobalFlipProgram->SetComputeShader(this->BitonicSortGlobalFlipComputeShader);
 
   this->WorkgroupSize = workgroupSize;
+
+  return true;
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DBitonicSort::Run(vtkOpenGLRenderWindow* context, int nbPairs,
+bool vtkF3DBitonicSort::Run(vtkOpenGLRenderWindow* context, int nbPairs,
   vtkOpenGLBufferObject* keys, vtkOpenGLBufferObject* values)
 {
   if (this->WorkgroupSize < 0)
   {
     vtkErrorMacro("Shaders are not initialized");
-    return;
+    return false;
   }
 
   vtkOpenGLShaderCache* shaderCache = context->GetShaderCache();
@@ -154,4 +156,6 @@ void vtkF3DBitonicSort::Run(vtkOpenGLRenderWindow* context, int nbPairs,
     glDispatchCompute(workgroupCount, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
   }
+
+  return true;
 }
