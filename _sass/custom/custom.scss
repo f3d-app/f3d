@@ -36,3 +36,13 @@ kbd {
     // Transition is fun
     transition: all 0.1s;
 }
+
+div.install-buttons {
+    text-align: center;
+    display: block;
+    line-height: 1;
+
+    .btn {
+        margin: .5em;
+    }
+}
