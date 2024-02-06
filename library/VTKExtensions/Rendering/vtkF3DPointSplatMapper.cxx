@@ -140,7 +140,7 @@ void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
 //----------------------------------------------------------------------------
 void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 {
-  if (actor->GetForceTranslucent())
+  if (vtkShader::IsComputeShaderSupported() && actor->GetForceTranslucent())
   {
     this->SortSplats(ren);
   }
