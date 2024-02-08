@@ -179,6 +179,16 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "VTK XML MultiBlock"
 )
 
+
+f3d_plugin_declare_reader(
+  NAME Splat
+  SCORE 90
+  EXTENSIONS splat
+  MIMETYPES application/vnd.splat
+  VTK_READER vtkF3DSplatReader
+  FORMAT_DESCRIPTION "3D Gaussian splats"
+)
+
 f3d_plugin_build(
   NAME native
   VERSION 1.0

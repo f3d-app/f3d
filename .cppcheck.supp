@@ -16,3 +16,4 @@ preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx
 unknownMacro:library/VTKExtensions/Applicative/vtkF3DObjectFactory.cxx
 unusedVariable:*factory.cxx*
 constParameter:library/src/image.cxx
+invalidPointerCast:plugins/native/module/vtkF3DSplatReader.cxx
