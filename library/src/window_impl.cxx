@@ -238,10 +238,18 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetInvertZoom(
     this->Internals->Options.getAsBool("interactor.invert-zoom"));
 
+  std::string splatTypeStr = this->Internals->Options.getAsString("render.splat-type");
+  int pointSize = this->Internals->Options.getAsDouble("render.point-size");
+  vtkF3DRendererWithColoring::SplatType splatType = vtkF3DRendererWithColoring::SplatType::SPHERE;
+  if (splatTypeStr == "gaussian")
+  {
+    splatType = vtkF3DRendererWithColoring::SplatType::GAUSSIAN;
+  }
+
+  this->Internals->Renderer->SetPointProperties(splatType, pointSize);
+
   this->Internals->Renderer->SetLineWidth(
     this->Internals->Options.getAsDouble("render.line-width"));
-  this->Internals->Renderer->SetPointSize(
-    this->Internals->Options.getAsDouble("render.point-size"));
   this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("render.show-edges"));
   this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("ui.fps"));
   this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("ui.filename"));

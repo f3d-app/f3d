@@ -22,5 +22,22 @@
   {
     "comp": "-2",
     "translucency-support": true
+  },
+  ".*(splat)":
+  {
+    "point-sprites": true,
+    "point-size": 1,
+    "point-type": "gaussian",
+    "scalars": "color",
+    "comp": "-2",
+    "bg-color": "0, 0, 0",
+    "up": "-Y",
+    "trackball": true,
+    "camera-position": "0,1,-5.2",
+    "camera-focal-point": "0,1,0",
+    "tone-mapping": false,
+    "grid": false,
+    "anti-aliasing": false,
+    "translucency-support": false
   }
 }

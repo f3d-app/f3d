@@ -45,6 +45,7 @@ Options|Default|Description
 ------|------|------
 -o, \-\-point-sprites||Show sphere *points sprites* instead of the geometry.
 \-\-point-size=\<size\>|10.0|Set the *size* of points when showing vertices and point sprites.
+\-\-point-type=\<sphere|gaussian\>|sphere|Set the splat type when showing point sprites.
 \-\-line-width=\<size\>|1.0|Set the *width* of lines when showing edges.
 \-\-color=\<R,G,B\>|1.0, 1.0, 1.0| Set a *color* on the geometry. Multiplied with the base color texture when present. <br>Requires a default scene.
 \-\-opacity=\<opacity\>|1.0|Set *opacity* on the geometry. Multiplied with the base color texture when present. <br>Requires a default scene. Usually used with Depth Peeling option.

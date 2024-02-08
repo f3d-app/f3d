@@ -2,6 +2,13 @@
 
 ## Ongoing development
 
+For F3D users:
+- Added a new option `--point-type` used to specify how to display points
+- Add support for 3D Gaussians Splatting in binary .splat format
+
+For libf3d users:
+- Added a new option `render.splat-type` used to specify how to display points (only if `model.point-sprites.enable` is true)
+
 ## v2.3.0
 
 For F3D users:

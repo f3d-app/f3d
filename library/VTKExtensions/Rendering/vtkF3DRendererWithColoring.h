@@ -89,10 +89,16 @@ public:
    */
   void SetTextureNormal(const std::string& tex);
 
+  enum class SplatType
+  {
+    SPHERE,
+    GAUSSIAN
+  };
+
   /**
-   * Set the pointSize on the pointGaussianMapper as well as calls superclass implementation.
+   * Set the pointSize and the splat type on the pointGaussianMapper
    */
-  void SetPointSize(double pointSize) override;
+  void SetPointProperties(SplatType splatType, double pointSize);
 
   /**
    * Set the visibility of the scalar bar.

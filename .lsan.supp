@@ -19,6 +19,7 @@ leak:TKernel
 leak:libtbb
 
 # Potential mesa/VTK leak with incomplete callstack
-# forces us to hide all leaks from the libf3dSDKTests
+# forces us to hide all leaks from the tests using a render window
 # https://gitlab.kitware.com/vtk/vtk/-/issues/18504
 leak:libf3dSDKTests
+leak:VTKExtensionsRenderingTests
