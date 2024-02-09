@@ -16,7 +16,7 @@
 namespace f3d::detail
 {
 //----------------------------------------------------------------------------
-void animationManager::Initialize(
+bool animationManager::Initialize(
   const options* options, window* window, interactor_impl* interactor, vtkImporter* importer)
 {
   this->HasAnimation = false;
@@ -63,9 +63,23 @@ void animationManager::Initialize(
     this->ProgressWidget = nullptr;
   }
 
+  int animationIndex = options->getAsInt("scene.animation.index");
+  double animationTime = options->getAsDouble("scene.animation.time");
+
   if (availAnimations <= 0)
   {
-    log::debug("No animations available in this file");
+    log::debug("No animation available in this file");
+    if (animationIndex > 0)
+    {
+      log::warn("An animation index has been specified but there are no animation available.");
+    }
+    if (animationTime != 0)
+    {
+      log::warn("No animation available, cannot load a specific animation time");
+    }
+
+    this->HasAnimation = false;
+    return false;
   }
   else
   {
@@ -77,12 +91,7 @@ void animationManager::Initialize(
   }
   log::debug("");
 
-  int animationIndex = options->getAsInt("scene.animation.index");
-  if (animationIndex != 0 && availAnimations <= 0)
-  {
-    log::warn("An animation index has been specified but there are no animation available.");
-  }
-  else if (animationIndex > 0 && animationIndex >= availAnimations)
+  if (animationIndex > 0 && animationIndex >= availAnimations)
   {
     log::warn(
       "Specified animation index is greater than the highest possible animation index, enabling "
@@ -105,8 +114,7 @@ void animationManager::Initialize(
   // Recover time ranges for all enabled animations
   this->TimeRange[0] = std::numeric_limits<double>::infinity();
   this->TimeRange[1] = -std::numeric_limits<double>::infinity();
-  vtkIdType nbAnims = this->Importer->GetNumberOfAnimations();
-  for (vtkIdType animIndex = 0; animIndex < nbAnims; animIndex++)
+  for (vtkIdType animIndex = 0; animIndex < availAnimations; animIndex++)
   {
     if (this->Importer->IsAnimationEnabled(animIndex))
     {
@@ -131,11 +139,12 @@ void animationManager::Initialize(
       this->HasAnimation = true;
     }
   }
-  if (this->TimeRange[0] == this->TimeRange[1])
+  if (this->TimeRange[0] >= this->TimeRange[1])
   {
-    log::warn("Animation(s) time range delta is zero: [", this->TimeRange[0], ", ",
+    log::warn("Animation(s) time range delta is invalid: [", this->TimeRange[0], ", ",
       this->TimeRange[1], "]. Disabling animation.");
     this->HasAnimation = false;
+    return false;
   }
   else
   {
@@ -147,6 +156,7 @@ void animationManager::Initialize(
   {
     this->StartAnimation();
   }
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -247,7 +257,6 @@ bool animationManager::LoadAtTime(double timeValue)
 {
   if (!this->HasAnimation)
   {
-    log::warn("No animation available, cannot load a specific animation time");
     return false;
   }
   if (timeValue < this->TimeRange[0] || timeValue > this->TimeRange[1])
