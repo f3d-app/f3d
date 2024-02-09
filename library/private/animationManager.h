@@ -35,8 +35,9 @@ public:
   /**
    * Initialize the animation manager, required before playing the animation.
    * Provided pointers are expected to be not null except interactor.
+   * Return true if at least one animation is available, false otherwise.
    */
-  void Initialize(
+  bool Initialize(
     const options* options, window* window, interactor_impl* interactor, vtkImporter* importer);
 
   /**

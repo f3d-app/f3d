@@ -149,15 +149,18 @@ public:
     progressWidget->Off();
 
     // Initialize the animation using temporal information from the importer
-    this->AnimationManager.Initialize(
-      &this->Options, &this->Window, this->Interactor, this->GenericImporter);
-
-    double animationTime = this->Options.getAsDouble("scene.animation.time");
-    double timeRange[2];
-    this->AnimationManager.GetTimeRange(timeRange);
-    if (animationTime != timeRange[0])
+    if (this->AnimationManager.Initialize(
+          &this->Options, &this->Window, this->Interactor, this->GenericImporter))
     {
-      this->AnimationManager.LoadAtTime(animationTime);
+      double animationTime = this->Options.getAsDouble("scene.animation.time");
+      double timeRange[2];
+      this->AnimationManager.GetTimeRange(timeRange);
+
+      // We assume importers import data at timeRange[0] when not specified
+      if (animationTime != timeRange[0])
+      {
+        this->AnimationManager.LoadAtTime(animationTime);
+      }
     }
 
     // Display the importer description
@@ -307,15 +310,19 @@ loader& loader_impl::loadScene(const std::string& filePath)
   progressWidget->Off();
 
   // Initialize the animation using temporal information from the importer
-  this->Internals->AnimationManager.Initialize(&this->Internals->Options, &this->Internals->Window,
-    this->Internals->Interactor, this->Internals->CurrentFullSceneImporter);
-
-  double animationTime = this->Internals->Options.getAsDouble("scene.animation.time");
-  double timeRange[2];
-  this->Internals->AnimationManager.GetTimeRange(timeRange);
-  if (animationTime != timeRange[0])
+  if (this->Internals->AnimationManager.Initialize(&this->Internals->Options,
+        &this->Internals->Window, this->Internals->Interactor,
+        this->Internals->CurrentFullSceneImporter))
   {
-    this->Internals->AnimationManager.LoadAtTime(animationTime);
+    double animationTime = this->Internals->Options.getAsDouble("scene.animation.time");
+    double timeRange[2];
+    this->Internals->AnimationManager.GetTimeRange(timeRange);
+
+    // We assume importers import data at timeRange[0] when not specified
+    if (animationTime != timeRange[0])
+    {
+      this->Internals->AnimationManager.LoadAtTime(animationTime);
+    }
   }
 
   // Display output description
