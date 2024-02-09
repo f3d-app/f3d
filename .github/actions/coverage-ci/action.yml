@@ -108,4 +108,4 @@ runs:
       uses: codecov/codecov-action@v4
       with:
         files: ${{github.workspace}}/source/coverage.info
-        version: "v0.1.15" # works better according to https://github.com/codecov/codecov-action/issues/598
+        token: ${{ secrets.CODECOV_TOKEN }}
