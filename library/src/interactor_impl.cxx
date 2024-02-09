@@ -24,9 +24,11 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <map>
+#include <vector>
 
 #include "camera.h"
 
@@ -147,19 +149,58 @@ public:
 
     internals* self = static_cast<internals*>(clientData);
     vtkRenderWindowInteractor* rwi = self->Style->GetInteractor();
-    int keyCode = std::toupper(rwi->GetKeyCode());
     std::string keySym = rwi->GetKeySym();
-    if (keySym.length() > 0)
+    int shift = rwi->GetShiftKey();
+    int ctrl = rwi->GetControlKey();
+
+    // Retrocompatible support of the KeyPressUserCallBack
+    int keyCode = std::toupper(rwi->GetKeyCode());
+    std::string upKeySym = keySym;
+    if (upKeySym.length() > 0)
     {
       // Make sure key symbols starts with an upper char (e.g. "space")
-      keySym[0] = std::toupper(keySym[0]);
+      upKeySym[0] = std::toupper(upKeySym[0]);
     }
 
-    if (self->KeyPressUserCallBack(keyCode, keySym))
+    if (self->KeyPressUserCallBack(keyCode, upKeySym))
     {
       return;
     }
 
+    // Actual key press implementation
+    // Check of an *any modifier* interaction first
+    auto mapKey = std::make_pair(keySym, ModifierKeys::ANY);
+    auto callBack = self->KeyCallBacks.find(mapKey);
+    if (callBack !=  self->KeyCallBacks.end())
+    {
+      callBack->second();
+    }
+    else
+    {
+      // Check for an interaction callBack with modifiers
+      ModifierKeys modifiers = ModifierKeys::NONE;
+      if (shift == 1 && ctrl == 1)
+      {
+        modifiers = ModifierKeys::CTRL_SHIFT;
+      }
+      else if (ctrl == 1)
+      {
+        modifiers = ModifierKeys::CTRL;
+      }
+      else if (shift == 1)
+      {
+        modifiers = ModifierKeys::SHIFT;
+      }
+      mapKey.second = modifiers;
+
+      callBack = self->KeyCallBacks.find(mapKey);
+      if (callBack !=  self->KeyCallBacks.end())
+      {
+        callBack->second();
+      }
+    }
+
+    // TODO remove old code below
     // No user defined behavior, use standard behavior
     vtkRenderWindow* renWin = self->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
@@ -197,6 +238,7 @@ public:
           render = true;
         }
         break;
+/*        
       case 'B':
         self->Options.toggle("ui.bar");
         render = true;
@@ -237,13 +279,15 @@ public:
         self->Options.toggle("ui.metadata");
         render = true;
         break;
+*/        
       case 'Z':
         self->Options.toggle("ui.fps");
         self->Window.render();
         self->Window.render();
         // XXX: Double render is needed here
         break;
-      case 'R':
+/*
+     case 'R':
         self->Options.toggle("render.raytracing.enable");
         render = true;
         break;
@@ -279,6 +323,7 @@ public:
         self->Options.toggle("render.background.skybox");
         render = true;
         break;
+        */
       case 'L':
       {
         const double intensity = self->Options.getAsDouble("render.light.intensity");
@@ -303,10 +348,10 @@ public:
         render = true;
         break;
       }
-      case 'H':
+/*      case 'H':
         self->Options.toggle("ui.cheatsheet");
         render = true;
-        break;
+        break;*/
       case '?':
         self->Window.PrintColoringDescription(log::VerboseLevel::INFO);
         self->Window.PrintSceneDescription(log::VerboseLevel::INFO);
@@ -328,16 +373,16 @@ public:
         render = true;
         break;
       default:
-        if (keySym == F3D_EXIT_HOTKEY_SYM)
+        if (upKeySym == F3D_EXIT_HOTKEY_SYM)
         {
           self->StopInteractor();
         }
-        else if (keySym == "Return")
+        else if (upKeySym == "Return")
         {
           self->Window.getCamera().resetToDefault();
           render = true;
         }
-        else if (keySym == "Space")
+        else if (upKeySym == "Space")
         {
           assert(self->AnimationManager);
           self->AnimationManager->ToggleAnimation();
@@ -536,6 +581,7 @@ public:
   vtkNew<vtkF3DInteractorStyle> Style;
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
   std::map<unsigned long, std::pair<int, std::function<void()> > > TimerCallBacks;
+  std::map<std::pair<std::string, ModifierKeys>, std::function<void()> > KeyCallBacks;
 
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;
@@ -556,6 +602,25 @@ interactor_impl::interactor_impl(options& options, window_impl& window, loader_i
 
 //----------------------------------------------------------------------------
 interactor_impl::~interactor_impl() = default;
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::addKeyPressCallBack(const std::string& keySym, ModifierKeys modifiers, std::function<void()> callBack)
+{
+  this->Internals->KeyCallBacks[std::make_pair(keySym, modifiers)] = callBack;
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::addKeyPressToggle(const std::string& keySym, ModifierKeys modifiers, const std::string& option)
+{
+  this->addKeyPressCallBack(keySym, modifiers,
+    [this, option]() -> void
+      {
+        this->Internals->Options.toggle(option);
+        this->Internals->Window.render();
+      });
+  return *this;
+}
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::setKeyPressCallBack(std::function<bool(int, std::string)> callBack)
@@ -736,5 +801,65 @@ void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 void interactor_impl::UpdateRendererAfterInteraction()
 {
   this->Internals->Style->UpdateRendererAfterInteraction();
+}
+
+//----------------------------------------------------------------------------
+interactor& command(const std::string& commandString)
+{
+  // Split command with space
+  std::string temp;
+	std::stringstream stringstream { commandString };
+	std::vector<std::string> result;
+	while (std::getline(stringstream, temp, ' ')) 
+  {
+		result.push_back(temp);
+	}
+
+  size_t nTokens = result.size();
+  if (nTokens > 3 || nTokens == 0)
+  {
+    log::error("Command: \"", commandString, "\" contains incorrect number of tokens, ignoring");
+    return this;
+  }
+
+  std::string command = results[0];
+  std::string option = nTokens >= 1 ? results[1] : "";
+  std::string value = nTokens >= 2 ? results[2] : "";
+
+  // Identify command
+  if (command == "set")
+  {
+    // TODO add alias support
+
+    // TODO do we want a map ?
+    std::vector<std::string> optionNames = this->Internals->Options->getNames();
+    if(std::find(optionNames.begin(), optionNames.end(), option) == vec.end())
+    {
+      log::error("Option: \"", option, "\" is not valid, ignoring");
+      return this;
+    }
+
+  }
+  else if (command == "inc")
+  {
+  }
+  else if (command == "dec")
+  {
+  }
+  else if (command == "toggle")
+  {
+  }
+  else if (command == "print")
+  {
+  }
+  else if (command == "alias")
+  {
+  }
+  else
+  {
+    log::error("Command: \"", command, "\" is not recognized, ignoring");
+    return this;
+  }
+
 }
 }
