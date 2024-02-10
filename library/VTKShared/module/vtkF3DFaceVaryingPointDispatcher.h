@@ -16,6 +16,7 @@
 #define vtkF3DFaceVaryingPointDispatcher_h
 
 #include "vtkPolyDataAlgorithm.h"
+#include "VTKSharedModule.h"
 
 class VTKSHARED_EXPORT vtkF3DFaceVaryingPointDispatcher : public vtkPolyDataAlgorithm
 {
