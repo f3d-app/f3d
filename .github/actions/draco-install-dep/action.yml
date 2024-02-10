@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/draco_install
-        key: draco-1.5.7-${{runner.os}}-${{inputs.cpu}}-0
+        key: draco-1.5.7-${{runner.os}}-${{inputs.cpu}}-1
 
     - name: Checkout Draco
       if: steps.cache-draco.outputs.cache-hit != 'true'

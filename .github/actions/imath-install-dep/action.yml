@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/imath_install
-        key: imath-v3.1.10-${{runner.os}}-${{inputs.cpu}}-0
+        key: imath-v3.1.10-${{runner.os}}-${{inputs.cpu}}-1
 
     # Dependents: alembic
     - name: Checkout Imath

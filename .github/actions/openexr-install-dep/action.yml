@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/openexr_install
-        key: openexr-v3.2.1-${{runner.os}}-${{inputs.cpu}}-0
+        key: openexr-v3.2.1-${{runner.os}}-${{inputs.cpu}}-1
 
     # Dependents: usd
     - name: Checkout OpenEXR
