@@ -193,7 +193,8 @@ runs:
       working-directory: ${{github.workspace}}/build
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
-    # Certain tests are failing on arm64 for unknown reasons
+    # Certain tests are failing on macOS arm64 for unknown reasons
+    # https://github.com/f3d-app/f3d/issues/1276
     - name: Test
       if: inputs.cpu == 'arm64'
       shell: bash
@@ -297,7 +298,8 @@ runs:
       with:
         path: ${{github.workspace}}\install\bin
 
-    # Grid rendering has artifacts in arm64 CI
+    # Grid rendering has artifacts in macOS arm64 CI
+    # https://github.com/f3d-app/f3d/issues/1276
     - name: Check F3D_PLUGINS_PATH using plugin example
       if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' && inputs.cpu != 'arm64'
       shell: bash
@@ -311,7 +313,8 @@ runs:
         cmake --install build_plugins --config Release
         cmake --install build_plugins --config Release --component configuration
 
-    # Grid rendering has artifacts in arm64 CI
+    # Grid rendering has artifacts in macOS arm64 CI
+    # https://github.com/f3d-app/f3d/issues/1276
     - name: Check Install
       if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' && inputs.cpu != 'arm64'
       shell: bash
