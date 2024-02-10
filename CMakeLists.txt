@@ -189,6 +189,9 @@ endif()
 # F3D Application
 cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
 
+# libf3d target
+add_subdirectory(library)
+
 # plugins
 option(F3D_PLUGINS_STATIC_BUILD "Make all plugins static (embedded into libf3d) and automatically loaded by F3D" ON)
 mark_as_advanced(F3D_PLUGINS_STATIC_BUILD)
@@ -198,9 +201,6 @@ endif()
 set(F3D_PLUGINS_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE STRING "Plugins install directory relative path")
 mark_as_advanced(F3D_PLUGINS_INSTALL_DIR)
 add_subdirectory(plugins)
-
-# libf3d target
-add_subdirectory(library)
 
 if (F3D_BUILD_APPLICATION)
   add_subdirectory(application)

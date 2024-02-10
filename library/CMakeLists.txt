@@ -9,6 +9,7 @@ set(F3D_VTK_MODULES
   f3d::VTKExtensionsCore
   f3d::VTKExtensionsReaders
   f3d::VTKExtensionsRendering
+  f3d::VTKShared
 )
 
 # Check modules
@@ -46,6 +47,7 @@ list(APPEND libf3d_compile_options_public ${f3d_sanitizer_compile_options})
 list(APPEND libf3d_link_options_public ${f3d_sanitizer_link_options})
 
 add_subdirectory(VTKExtensions)
+add_subdirectory(VTKShared)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/config.cxx.in"

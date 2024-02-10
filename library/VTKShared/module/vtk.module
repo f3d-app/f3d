@@ -1,0 +1,10 @@
+NAME
+  f3d::VTKShared
+DESCRIPTION
+  A VTK module that is shared and usable by plugins
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  VTK::CommonCore
+TEST_DEPENDS
+  VTK::TestingCore
