@@ -688,6 +688,24 @@ bool interactor_impl::recordInteraction(const std::string& file)
     return false;
   }
 
+  std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
+
+  std::string parentDirectory = vtksys::SystemTools::GetParentDirectory(cleanFile);
+
+  // Check if the parent directory exists
+  if (!vtksys::SystemTools::FileExists(parentDirectory))
+  {
+    log::error("Interaction log file directory does not exist ", parentDirectory);
+    return false;
+  }
+
+  // Check if we can write to the directory
+  if (!vtksys::SystemTools::TestFileAccess(parentDirectory, vtksys::TEST_FILE_WRITE))
+  {
+    log::error("Don't have permission to write to ", parentDirectory);
+    return false;
+  }
+
 // Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
   // Make sure the recorder is off and streams are cleared
