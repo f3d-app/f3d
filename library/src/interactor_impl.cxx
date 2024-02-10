@@ -717,7 +717,6 @@ bool interactor_impl::recordInteraction(const std::string& file)
   this->Internals->Recorder->SetInteractor(this->Internals->VTKInteractor);
 #endif
 
-  std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
   this->Internals->Recorder->SetFileName(cleanFile.c_str());
   this->Internals->Recorder->On();
   this->Internals->Recorder->Record();
