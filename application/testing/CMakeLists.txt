@@ -723,13 +723,7 @@ f3d_test(NAME TestInteractionNonExistentRecordDirectory ARGS --interaction-test-
 # Create a directory with no write permissions
 set(NON_WRITABLE_DIRECTORY ${CMAKE_BINARY_DIR}/Testing/Temporary/NonWritableDirectory)
 file(MAKE_DIRECTORY ${NON_WRITABLE_DIRECTORY})
-
-# Set directory permissions to make it non-writable
-if (UNIX)
-    execute_process(COMMAND chmod -w "${NON_WRITABLE_DIRECTORY}")
-elseif (WIN32)
-    execute_process(COMMAND icacls "${NON_WRITABLE_DIRECTORY}" /deny Everyone:(W))
-endif()
+file(CHMOD ${NON_WRITABLE_DIRECTORY} PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
 
 f3d_test(NAME TestInteractionNonWritableRecordDirectory ARGS --interaction-test-record=${NON_WRITABLE_DIRECTORY}/interaction.log NO_BASELINE REGEXP "Don't have write permissions for")
 
