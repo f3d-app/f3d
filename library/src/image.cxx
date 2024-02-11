@@ -37,7 +37,7 @@ public:
   std::unordered_map<std::string, std::string> Metadata;
 
   template<typename WriterType>
-  std::vector<unsigned char> SaveBuffer(WriterType* writer)
+  std::vector<unsigned char> SaveBuffer(vtkSmartPointer<WriterType> writer)
   {
     writer->WriteToMemoryOn();
     writer->SetInputData(this->Image);
@@ -396,12 +396,12 @@ std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
     {
       vtkSmartPointer<vtkPNGWriter> writer = vtkSmartPointer<vtkPNGWriter>::New();
       this->Internals->writePngMetadata(writer);
-      return this->Internals->SaveBuffer<vtkPNGWriter>(writer);
+      return this->Internals->SaveBuffer(writer);
     }
     case SaveFormat::JPG:
-      return this->Internals->SaveBuffer<vtkJPEGWriter>(vtkSmartPointer<vtkJPEGWriter>::New());
+      return this->Internals->SaveBuffer(vtkSmartPointer<vtkJPEGWriter>::New());
     case SaveFormat::BMP:
-      return this->Internals->SaveBuffer<vtkBMPWriter>(vtkSmartPointer<vtkBMPWriter>::New());
+      return this->Internals->SaveBuffer(vtkSmartPointer<vtkBMPWriter>::New());
     default:
       throw write_exception("Cannot save to buffer in the specified format");
   }
