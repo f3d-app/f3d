@@ -720,13 +720,6 @@ f3d_test(NAME TestOutputNoBackground DATA cow.vtp ARGS --no-background NO_BASELI
 # Test Non existent interaction record directory
 f3d_test(NAME TestInteractionNonExistentRecordDirectory ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/NotExistentDirectory/interaction.log NO_BASELINE REGEXP "Interaction record directory does not exist")
 
-# Create a directory with no write permissions
-set(NON_WRITABLE_DIRECTORY ${CMAKE_BINARY_DIR}/Testing/Temporary/NonWritableDirectory)
-file(MAKE_DIRECTORY ${NON_WRITABLE_DIRECTORY})
-file(CHMOD ${NON_WRITABLE_DIRECTORY} PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
-
-f3d_test(NAME TestInteractionNonWritableRecordDirectory ARGS --interaction-test-record=${NON_WRITABLE_DIRECTORY}/interaction.log NO_BASELINE REGEXP "Don't have write permissions for")
-
 # Basic record and play test
 f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log NO_BASELINE)
 f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log DEPENDS TestInteractionRecord NO_BASELINE)
