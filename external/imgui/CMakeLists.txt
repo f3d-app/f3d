@@ -10,8 +10,12 @@ set(IMGUI_SOURCES
     imgui_widgets.cpp
     imgui.cpp
 
+    imconfig.h
     imgui_internal.h
     imgui.h
+    imstb_rectpack.h
+    imstb_textedit.h
+    imstb_truetype.h
 
     # integration with opengl
     backends/imgui_impl_opengl3.cpp
