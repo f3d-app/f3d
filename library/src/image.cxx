@@ -53,6 +53,8 @@ public:
 
   void writePngMetadata(vtkPNGWriter* pngWriter)
   {
+    // cppcheck-suppress unusedVariable
+    // (false positive, fixed in cppcheck 2.8)
     for (const auto& [key, value] : this->Metadata)
     {
       if (!value.empty())
