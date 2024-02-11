@@ -6,11 +6,8 @@ f3d_embed_file(
   NAME F3DDefaultHDRI
   BINARY)
 set(sources
-  ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_opengl3.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.cxx)
 set(private_headers
-  ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_opengl3.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_opengl3_loader.h
   ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
 
 set(shader_files
@@ -56,8 +53,6 @@ endif()
 if(NOT VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220907)
   set(classes ${classes} vtkF3DOrientationMarkerWidget)
 endif()
-
-find_package(imgui REQUIRED)
 
 vtk_module_add_module(f3d::VTKExtensionsRendering
   ${libf3d_vtk_no_install}
