@@ -695,14 +695,14 @@ bool interactor_impl::recordInteraction(const std::string& file)
   // Check if the parent directory exists
   if (!vtksys::SystemTools::FileExists(parentDirectory))
   {
-    log::error("Interaction log file directory does not exist ", parentDirectory);
+    log::error("Interaction record directory does not exist ", parentDirectory);
     return false;
   }
 
   // Check if we can write to the directory
   if (!vtksys::SystemTools::TestFileAccess(parentDirectory, vtksys::TEST_FILE_WRITE))
   {
-    log::error("Don't have permission to write to ", parentDirectory);
+    log::error("Don't have write permissions for ", parentDirectory);
     return false;
   }
 
