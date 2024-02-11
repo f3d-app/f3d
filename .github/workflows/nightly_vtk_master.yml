@@ -10,6 +10,7 @@ jobs:
 # Check nightly: Checkout VTK and check if the last merged commit is less than 24 hours old
 #----------------------------------------------------------------------------
   check_nightly:
+    if: github.repository == 'f3d-app/f3d'
     runs-on: ubuntu-latest
     name: Check nightly
     outputs:
