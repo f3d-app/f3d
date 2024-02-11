@@ -5,6 +5,7 @@ DESCRIPTION
 DEPENDS
   VTK::CommonCore
   VTK::CommonExecutionModel
+  f3d::VTKShared
 TEST_DEPENDS
   VTK::TestingCore
   VTK::CommonDataModel

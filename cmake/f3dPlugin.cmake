@@ -289,7 +289,7 @@ macro(f3d_plugin_build)
   list(TRANSFORM F3D_PLUGIN_VTK_MODULES PREPEND "VTK::")
 
   target_link_libraries(f3d-plugin-${F3D_PLUGIN_NAME} PRIVATE
-    VTK::CommonCore VTK::CommonExecutionModel VTK::IOImport
+    VTK::CommonCore VTK::CommonExecutionModel VTK::IOImport f3d::VTKShared
     ${F3D_PLUGIN_VTK_MODULES}
     ${modules})
 
