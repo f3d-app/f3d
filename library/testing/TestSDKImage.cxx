@@ -5,10 +5,14 @@
 #include <functional>
 #include <iostream>
 #include <random>
+#include <set>
 #include <sstream>
 
 int TestSDKImage(int argc, char* argv[])
 {
+  const std::string TESTING(argv[1]);
+  const std::string TMP(argv[2]);
+
   // check supported formats
   std::vector<std::string> formats = f3d::image::getSupportedFormats();
 
@@ -42,10 +46,10 @@ int TestSDKImage(int argc, char* argv[])
   generated.setContent(pixels.data());
 
   // test save in different formats
-  generated.save(std::string(argv[2]) + "TestSDKImage.png");
-  generated.save(std::string(argv[2]) + "TestSDKImage.jpg", f3d::image::SaveFormat::JPG);
-  generated.save(std::string(argv[2]) + "TestSDKImage.tif", f3d::image::SaveFormat::TIF);
-  generated.save(std::string(argv[2]) + "TestSDKImage.bmp", f3d::image::SaveFormat::BMP);
+  generated.save(TMP + "/TestSDKImage.png");
+  generated.save(TMP + "/TestSDKImage.jpg", f3d::image::SaveFormat::JPG);
+  generated.save(TMP + "/TestSDKImage.tif", f3d::image::SaveFormat::TIF);
+  generated.save(TMP + "/TestSDKImage.bmp", f3d::image::SaveFormat::BMP);
 
   // test saveBuffer in different formats
   std::vector<unsigned char> bufferPNG = generated.saveBuffer();
@@ -107,7 +111,7 @@ int TestSDKImage(int argc, char* argv[])
   }
 
   // check reading a 16-bits image
-  f3d::image shortImg(std::string(argv[1]) + "/data/16bit.png");
+  f3d::image shortImg(TESTING + "/data/16bit.png");
 
   if (shortImg.getChannelType() != f3d::image::ChannelType::SHORT)
   {
@@ -122,7 +126,7 @@ int TestSDKImage(int argc, char* argv[])
   }
 
   // check reading a 32-bits image
-  f3d::image hdrImg(std::string(argv[1]) + "/data/palermo_park_1k.hdr");
+  f3d::image hdrImg(TESTING + "/data/palermo_park_1k.hdr");
 
   if (hdrImg.getChannelType() != f3d::image::ChannelType::FLOAT)
   {
@@ -138,7 +142,7 @@ int TestSDKImage(int argc, char* argv[])
 
 #if F3D_MODULE_EXR
   // check reading EXR
-  f3d::image exrImg(std::string(argv[1]) + "/data/kloofendal_43d_clear_1k.exr");
+  f3d::image exrImg(TESTING + "/data/kloofendal_43d_clear_1k.exr");
 
   if (exrImg.getChannelType() != f3d::image::ChannelType::FLOAT)
   {
@@ -150,7 +154,7 @@ int TestSDKImage(int argc, char* argv[])
   // check reading invalid image
   try
   {
-    f3d::image invalidImg(std::string(argv[1]) + "/data/invalid.png");
+    f3d::image invalidImg(TESTING + "/data/invalid.png");
 
     std::cerr << "An exception has not been thrown when reading an invalid file" << std::endl;
     return EXIT_FAILURE;
@@ -166,7 +170,7 @@ int TestSDKImage(int argc, char* argv[])
   }
 
   // check generated image with baseline
-  f3d::image baseline(std::string(argv[1]) + "/baselines/TestSDKImage.png");
+  f3d::image baseline(TESTING + "/baselines/TestSDKImage.png");
 
   if (generated.getWidth() != width || generated.getHeight() != height)
   {
@@ -258,17 +262,97 @@ int TestSDKImage(int argc, char* argv[])
       return ss.str();
     };
 
-    if (f3d::image(std::string(argv[1]) + "/data/toTerminalText-rgb.png").toTerminalText() !=
-      fileToString(std::string(argv[1]) + "/data/toTerminalText-rgb.txt"))
+    if (f3d::image(TESTING + "/data/toTerminalText-rgb.png").toTerminalText() !=
+      fileToString(TESTING + "/data/toTerminalText-rgb.txt"))
     {
       std::cerr << "toTerminalText() (RGB image) failed" << std::endl;
       return EXIT_FAILURE;
     }
 
-    if (f3d::image(std::string(argv[1]) + "/data/toTerminalText-rgba.png").toTerminalText() !=
-      fileToString(std::string(argv[1]) + "/data/toTerminalText-rgba.txt"))
+    if (f3d::image(TESTING + "/data/toTerminalText-rgba.png").toTerminalText() !=
+      fileToString(TESTING + "/data/toTerminalText-rgba.txt"))
     {
       std::cerr << "toTerminalText() (RGBA image) failed" << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+
+  {
+    f3d::image img(4, 2, 3);
+    img.setMetadata("foo", "bar");
+    img.setMetadata("hello", "world");
+    if (img.getMetadata("foo") != "bar" || img.getMetadata("hello") != "world")
+    {
+      std::cerr << "setMetadata() or getMetadata() failed" << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    if (img.allMetadata() != std::set<std::string>({ "foo", "hello" }))
+    {
+      std::cerr << "allMetadata() failed" << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    try
+    {
+      img.getMetadata("baz"); // expected to throw
+      std::cerr << "getMetadata() failed to throw" << std::endl;
+      return EXIT_FAILURE;
+    }
+    catch (std::out_of_range& e)
+    {
+      /* expected, key doesn't exist */
+    }
+
+    try
+    {
+      img.setMetadata("foo", ""); // empty value, should remove key
+      img.getMetadata("foo");     // expected to throw
+      std::cerr << "setMetadata() with empty value failed" << std::endl;
+      return EXIT_FAILURE;
+    }
+    catch (std::out_of_range& e)
+    {
+      /* expected, key has been removed */
+    }
+
+    if (img.allMetadata() != std::set<std::string>({ "hello" }))
+    {
+      std::cerr << "allMetadata() failed" << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    img.setMetadata("foo", ""); // make sure removing twice is ok
+  }
+
+  {
+    f3d::image img1(4, 2, 3);
+    img1.setMetadata("foo", "bar");
+    img1.setMetadata("hello", "world");
+    img1.save(TMP + "/metadata.png");
+
+    f3d::image img2(TMP + "/metadata.png");
+    if (img2.getMetadata("foo") != "bar" || img2.getMetadata("hello") != "world")
+    {
+      std::cerr << "saving or loading file metadata failed" << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+
+  {
+    f3d::image img1(4, 2, 3);
+    img1.setMetadata("foo", "bar");
+    img1.setMetadata("hello", "world");
+    {
+      std::vector<unsigned char> buffer = img1.saveBuffer();
+      std::ofstream outfile(TMP + "/metadata-buffer.png", std::ios::out | std::ios::binary);
+      outfile.write((const char*)&buffer[0], buffer.size());
+    }
+
+    f3d::image img2(TMP + "/metadata-buffer.png");
+    if (img2.getMetadata("foo") != "bar" || img2.getMetadata("hello") != "world")
+    {
+      std::cerr << "saving or loading buffer metadata failed" << std::endl;
       return EXIT_FAILURE;
     }
   }

@@ -86,3 +86,15 @@ def test_to_terminal_text(img_filename):
         f3d.Image(str(image_path)).to_terminal_text()
         == open(text_path, encoding="utf8").read()
     )
+
+
+def test_metadata():
+    image = f3d.Image(4, 2, 3, f3d.Image.ChannelType.BYTE)
+    image.set_metadata("foo", "bar")
+    image.set_metadata("hello", "world")
+    assert image.get_metadata("foo") == "bar" and image.get_metadata("hello") == "world"
+
+    with pytest.raises(KeyError):
+        image.get_metadata("baz")
+
+    assert image.all_metadata() == set(["foo", "hello"])
