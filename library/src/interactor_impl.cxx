@@ -683,7 +683,6 @@ bool interactor_impl::recordInteraction(const std::string& file)
 {
   if (file.empty())
   {
-    // TODO improve VTK to check file opening
     log::error("No interaction record file provided");
     return false;
   }
