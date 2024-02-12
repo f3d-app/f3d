@@ -10,6 +10,7 @@ jobs:
 # Check nightly: Checkout VTK and check if the last merged commit is less than 24 hours old
 #----------------------------------------------------------------------------
   check_nightly:
+    if: github.repository == 'f3d-app/f3d'
     runs-on: ubuntu-latest
     name: Check nightly
     outputs:
@@ -132,15 +133,13 @@ jobs:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
-# MacOS CI: Build and test, cross-cpu build matrix
+# MacOS CI: Build and test
 #----------------------------------------------------------------------------
   macos:
     needs: [cache_lfs, check_nightly]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
     strategy:
       fail-fast: false
-      matrix:
-        cpu: [x86_64, arm64]
 
     runs-on: macos-latest
 
@@ -155,9 +154,34 @@ jobs:
     - name: Generic CI
       uses: ./source/.github/actions/generic-ci
       with:
-        build_type: ${{matrix.build_type}}
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-        cpu: ${{matrix.cpu}}
+        cpu: x86_64
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+
+#----------------------------------------------------------------------------
+# MacOS arm64 CI: Build and test
+#----------------------------------------------------------------------------
+  macos_arm:
+    needs: [cache_lfs, check_nightly]
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+    strategy:
+      fail-fast: false
+
+    runs-on: macos-14
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Generic CI
+      uses: ./source/.github/actions/generic-ci
+      with:
+        vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+        cpu: arm64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
