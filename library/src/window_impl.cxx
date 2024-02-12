@@ -10,6 +10,7 @@
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DNoRenderWindow.h"
 #include "vtkF3DRendererWithColoring.h"
+#include "vtkF3DUIRenderWindow.h"
 
 #include <vtkCamera.h>
 #include <vtkImageData.h>
@@ -71,6 +72,10 @@ window_impl::window_impl(const options& options, Type type)
     throw engine::no_window_exception(
       "Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
 #endif
+  }
+  else if (type == Type::IMGUI)
+  {
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DUIRenderWindow>::New();
   }
   else
   {

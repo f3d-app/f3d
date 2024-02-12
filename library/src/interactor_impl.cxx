@@ -9,6 +9,7 @@
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRendererWithColoring.h"
+#include "vtkF3DUIWindowInteractor.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCellPicker.h>
@@ -40,6 +41,12 @@ public:
     , Window(window)
     , Loader(loader)
   {
+    if (window.getType() == window::Type::IMGUI) {
+      this->VTKInteractor = vtkSmartPointer<vtkF3DUIWindowInteractor>::New();
+    } else {
+      this->VTKInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    }
+
     this->VTKInteractor->SetRenderWindow(this->Window.GetRenderWindow());
     this->VTKInteractor->SetInteractorStyle(this->Style);
     this->VTKInteractor->Initialize();
@@ -532,7 +539,7 @@ public:
   loader_impl& Loader;
   animationManager* AnimationManager;
 
-  vtkNew<vtkRenderWindowInteractor> VTKInteractor;
+  vtkSmartPointer<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
   std::map<unsigned long, std::pair<int, std::function<void()> > > TimerCallBacks;

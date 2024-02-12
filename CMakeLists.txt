@@ -59,12 +59,18 @@ option(F3D_MODULE_EXR "OpenEXR images module" OFF)
 # Use externals
 option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
 option(F3D_USE_EXTERNAL_NLOHMANN_JSON "Use external nlohmann_json dependency" OFF)
+option(F3D_USE_EXTERNAL_IMGUI "Use external imgui dependency" OFF)
 
 if (F3D_USE_EXTERNAL_CXXOPTS)
   find_package(cxxopts REQUIRED)
 endif ()
 if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
   find_package(nlohmann_json REQUIRED)
+endif ()
+if (F3D_USE_EXTERNAL_IMGUI)
+  find_package(imgui REQUIRED)
+else()
+  add_subdirectory(external/imgui)
 endif ()
 
 # VTK dependency

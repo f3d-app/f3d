@@ -33,6 +33,7 @@ public:
     NONE,
     NATIVE,
     NATIVE_OFFSCREEN,
+    IMGUI,
     EXTERNAL
   };
 

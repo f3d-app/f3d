@@ -198,6 +198,13 @@ int F3DStarter::Start(int argc, char** argv)
   {
     this->Internals->Engine = std::make_unique<f3d::engine>(f3d::window::Type::NONE);
   }
+  else if (this->Internals->AppOptions.ImGui)
+  {
+    f3d::log::warn("ImGui support is experimental.");
+    this->Internals->Engine = std::make_unique<f3d::engine>(f3d::window::Type::IMGUI);
+    f3d::interactor& interactor = this->Internals->Engine->getInteractor();
+    interactor.start();
+  }
   else
   {
     bool offscreen =
@@ -327,6 +334,18 @@ int F3DStarter::Start(int argc, char** argv)
   this->LoadFile();
 
   f3d::log::debug("========== Rendering ==========");
+
+  // TODO
+  if (this->Internals->AppOptions.ImGui) {
+    f3d::interactor& interactor = this->Internals->Engine->getInteractor();
+
+    this->Render();
+    
+    // We implement a custom interactor which only has a basic event loop
+    interactor.start();
+
+    return EXIT_SUCCESS;
+  }
 
   if (!this->Internals->AppOptions.NoRender)
   {
