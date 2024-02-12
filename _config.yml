@@ -221,7 +221,7 @@ defaults:
     scope:
       path: "doc/dev/CODING_STYLE.md"
     values:
-      title: Generate
+      title: Coding style
       parent: Developer Documentation
       nav_order: 5
 
