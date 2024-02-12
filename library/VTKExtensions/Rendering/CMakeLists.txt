@@ -43,6 +43,7 @@ set(classes
   vtkF3DRenderer
   vtkF3DRendererWithColoring
   vtkF3DUIRenderWindow
+  vtkF3DUIWindowInteractor
   )
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
@@ -62,4 +63,6 @@ vtk_module_add_module(f3d::VTKExtensionsRendering
   PRIVATE_HEADERS ${private_headers}
   )
 
-vtk_module_link(f3d::VTKExtensionsRendering PRIVATE imgui::imgui)
+find_package(glfw3 REQUIRED)
+
+vtk_module_link(f3d::VTKExtensionsRendering PRIVATE imgui::imgui glfw)

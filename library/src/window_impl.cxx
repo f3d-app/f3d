@@ -17,6 +17,7 @@
 #include <vtkImageExport.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
+#include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
@@ -72,9 +73,13 @@ window_impl::window_impl(const options& options, Type type)
       "Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
 #endif
   }
-  else
+  else if (type == Type::IMGUI)
   {
     this->Internals->RenWin = vtkSmartPointer<vtkF3DUIRenderWindow>::New();
+  }
+  else
+  {
+    this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
     this->Internals->RenWin->SetOffScreenRendering(type == Type::NATIVE_OFFSCREEN);
     this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
 

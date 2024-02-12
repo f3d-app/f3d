@@ -10,6 +10,7 @@
         "pybind11",
         "tbb",
         "usd",
+        "glfw3",
         {
             "name": "vtk",
             "default-features": false,
