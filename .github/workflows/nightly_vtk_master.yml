@@ -140,8 +140,8 @@ jobs:
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
     strategy:
       fail-fast: false
-      matrix:
-        cpu: [x86_64]
+    with:
+      cpu: x86_64
 
     runs-on: macos-latest
 
@@ -156,9 +156,8 @@ jobs:
     - name: Generic CI
       uses: ./source/.github/actions/generic-ci
       with:
-        build_type: ${{matrix.build_type}}
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-        cpu: ${{matrix.cpu}}
+        cpu: ${{inputs.cpu}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
@@ -167,12 +166,12 @@ jobs:
   macos_arm:
     needs: [cache_lfs, check_nightly]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+    with:
+      cpu: arm64
     strategy:
       fail-fast: false
-      matrix:
-        cpu: [arm64]
 
-    runs-on: macos-latest
+    runs-on: macos-14
 
     steps:
     - name: Checkout
@@ -185,9 +184,8 @@ jobs:
     - name: Generic CI
       uses: ./source/.github/actions/generic-ci
       with:
-        build_type: ${{matrix.build_type}}
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-        cpu: ${{matrix.cpu}}
+        cpu: ${{inputs.cpu}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
