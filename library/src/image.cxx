@@ -11,29 +11,35 @@
 #include <vtkImageReader2Collection.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkJPEGWriter.h>
+#include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
 #include <vtkPointData.h>
 #include <vtkSmartPointer.h>
+#include <vtkStringArray.h>
 #include <vtkTIFFWriter.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <algorithm>
 #include <cassert>
 #include <regex>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 namespace f3d
 {
 class image::internals
 {
+  inline static const std::string metadataKeyPrefix = "f3d:";
+
 public:
   vtkSmartPointer<vtkImageData> Image;
+  std::unordered_map<std::string, std::string> Metadata;
 
   template<typename WriterType>
-  std::vector<unsigned char> SaveBuffer()
+  std::vector<unsigned char> SaveBuffer(vtkSmartPointer<WriterType> writer)
   {
-    vtkNew<WriterType> writer;
     writer->WriteToMemoryOn();
     writer->SetInputData(this->Image);
     writer->Write();
@@ -44,6 +50,41 @@ public:
     std::copy(valRange.begin(), valRange.end(), std::back_inserter(result));
 
     return result;
+  }
+
+  void WritePngMetadata(vtkPNGWriter* pngWriter)
+  {
+    // cppcheck-suppress unassignedVariable
+    // (false positive, fixed in cppcheck 2.8)
+    for (const auto& [key, value] : this->Metadata)
+    {
+      if (!value.empty())
+      {
+        pngWriter->AddText((metadataKeyPrefix + key).c_str(), value.c_str());
+      }
+    }
+  }
+
+  void ReadPngMetadata(vtkPNGReader* pngReader)
+  {
+    int beginEndIndex[2];
+    for (size_t i = 0; i < pngReader->GetNumberOfTextChunks(); ++i)
+    {
+      const vtkStdString key = pngReader->GetTextKey(static_cast<int>(i));
+      if (key.rfind(metadataKeyPrefix, 0) == 0)
+      {
+        pngReader->GetTextChunks(key.c_str(), beginEndIndex);
+        const int index = beginEndIndex[1] - 1; // only read the last key
+        if (index > -1)
+        {
+          const std::string value(pngReader->GetTextValue(index));
+          if (!value.empty())
+          {
+            this->Metadata[key.substr(metadataKeyPrefix.length())] = value;
+          }
+        }
+      }
+    }
   }
 };
 
@@ -95,6 +136,12 @@ image::image(const std::string& path)
     reader->SetFileName(fullPath.c_str());
     reader->Update();
     this->Internals->Image = reader->GetOutput();
+
+    vtkPNGReader* pngReader = vtkPNGReader::SafeDownCast(reader);
+    if (pngReader != nullptr)
+    {
+      this->Internals->ReadPngMetadata(pngReader);
+    }
   }
 
   if (!this->Internals->Image)
@@ -314,8 +361,12 @@ void image::save(const std::string& path, SaveFormat format) const
   switch (format)
   {
     case SaveFormat::PNG:
-      writer = vtkSmartPointer<vtkPNGWriter>::New();
-      break;
+    {
+      vtkNew<vtkPNGWriter> pngWriter;
+      this->Internals->WritePngMetadata(pngWriter);
+      writer = pngWriter;
+    }
+    break;
     case SaveFormat::JPG:
       writer = vtkSmartPointer<vtkJPEGWriter>::New();
       break;
@@ -343,11 +394,15 @@ std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
   switch (format)
   {
     case SaveFormat::PNG:
-      return this->Internals->SaveBuffer<vtkPNGWriter>();
+    {
+      vtkSmartPointer<vtkPNGWriter> writer = vtkSmartPointer<vtkPNGWriter>::New();
+      this->Internals->WritePngMetadata(writer);
+      return this->Internals->SaveBuffer(writer);
+    }
     case SaveFormat::JPG:
-      return this->Internals->SaveBuffer<vtkJPEGWriter>();
+      return this->Internals->SaveBuffer(vtkSmartPointer<vtkJPEGWriter>::New());
     case SaveFormat::BMP:
-      return this->Internals->SaveBuffer<vtkBMPWriter>();
+      return this->Internals->SaveBuffer(vtkSmartPointer<vtkBMPWriter>::New());
     default:
       throw write_exception("Cannot save to buffer in the specified format");
   }
@@ -494,6 +549,39 @@ std::string image::toTerminalText() const
   std::stringstream ss;
   toTerminalText(ss);
   return ss.str();
+}
+
+//----------------------------------------------------------------------------
+f3d::image& image::setMetadata(const std::string& key, const std::string& value)
+{
+  if (value.empty())
+  {
+    this->Internals->Metadata.erase(key);
+  }
+  else
+  {
+    this->Internals->Metadata[key] = value;
+  }
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+std::string image::getMetadata(const std::string& key) const
+{
+  if (this->Internals->Metadata.count(key))
+  {
+    return this->Internals->Metadata[key];
+  }
+  throw std::out_of_range(key);
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> image::allMetadata() const
+{
+  std::vector<std::string> keys;
+  std::transform(this->Internals->Metadata.begin(), this->Internals->Metadata.end(),
+    std::back_inserter(keys), [](const auto& kv) { return kv.first; });
+  return keys;
 }
 
 //----------------------------------------------------------------------------

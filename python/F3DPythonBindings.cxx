@@ -133,7 +133,21 @@ PYBIND11_MODULE(pyf3d, module)
     .def("save_buffer", getFileBytes, py::arg("format") = f3d::image::SaveFormat::PNG)
     .def("_repr_png_",
       [&](const f3d::image& img) { return getFileBytes(img, f3d::image::SaveFormat::PNG); })
-    .def("to_terminal_text", [](const f3d::image& img) { return img.toTerminalText(); });
+    .def("to_terminal_text", [](const f3d::image& img) { return img.toTerminalText(); })
+    .def("set_metadata", &f3d::image::setMetadata)
+    .def("get_metadata",
+      [](const f3d::image& img, const std::string& key)
+      {
+        try
+        {
+          return img.getMetadata(key);
+        }
+        catch (std::out_of_range e)
+        {
+          throw py::key_error(key);
+        }
+      })
+    .def("all_metadata", &f3d::image::allMetadata);
 
   // f3d::options
   py::class_<f3d::options> options(module, "Options");

@@ -189,6 +189,22 @@ public:
   std::string toTerminalText() const;
 
   /**
+   * Set the value for a metadata key. Setting an empty value (`""`) removes the key.
+   */
+  f3d::image& setMetadata(const std::string& key, const std::string& value);
+
+  /**
+   * Get the value for a metadata key.
+   * Throw `std::invalid_argument` exception if key does not exist.
+   */
+  std::string getMetadata(const std::string& key) const;
+
+  /**
+   * List all the metadata keys which have a value set.
+   */
+  std::vector<std::string> allMetadata() const;
+
+  /**
    * An exception that can be thrown by the image when there.
    * is an error on write.
    */
