@@ -140,11 +140,10 @@ jobs:
   macos:
     if: github.event.pull_request.draft == false
     needs: cache_lfs
-
+    with:
+      cpu: x86_64
     strategy:
       fail-fast: false
-      with:
-        cpu: x86_64
       matrix:
         vtk_version: [commit, v9.3.0, v9.2.6]
         bundle_label: [no-bundle]
@@ -177,8 +176,6 @@ jobs:
     if: github.event.pull_request.draft == false
     needs: cache_lfs
 
-    with:
-      cpu: arm64
     strategy:
       fail-fast: false
       matrix:
@@ -189,6 +186,9 @@ jobs:
             bundle_label: bundle
 
     runs-on: macos-14
+
+    with:
+      cpu: arm64
 
     steps:
     - name: Checkout
