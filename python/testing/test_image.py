@@ -97,4 +97,4 @@ def test_metadata():
     with pytest.raises(KeyError):
         image.get_metadata("baz")
 
-    assert image.all_metadata() == set(["foo", "hello"])
+    assert set(image.all_metadata()) == set(["foo", "hello"])

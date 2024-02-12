@@ -287,7 +287,9 @@ int TestSDKImage(int argc, char* argv[])
       return EXIT_FAILURE;
     }
 
-    if (img.allMetadata() != std::set<std::string>({ "foo", "hello" }))
+    const std::vector<std::string> keys = img.allMetadata();
+    if (std::set<std::string>(keys.begin(), keys.end()) !=
+      std::set<std::string>({ "foo", "hello" }))
     {
       std::cerr << "allMetadata() failed" << std::endl;
       return EXIT_FAILURE;
@@ -316,7 +318,7 @@ int TestSDKImage(int argc, char* argv[])
       /* expected, key has been removed */
     }
 
-    if (img.allMetadata() != std::set<std::string>({ "hello" }))
+    if (img.allMetadata() != std::vector<std::string>({ "hello" }))
     {
       std::cerr << "allMetadata() failed" << std::endl;
       return EXIT_FAILURE;

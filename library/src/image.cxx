@@ -578,11 +578,11 @@ std::string image::getMetadata(const std::string& key) const
 }
 
 //----------------------------------------------------------------------------
-std::set<std::string> image::allMetadata() const
+std::vector<std::string> image::allMetadata() const
 {
-  std::set<std::string> keys;
+  std::vector<std::string> keys;
   for (const auto& kv : this->Internals->Metadata)
-    keys.insert(kv.first);
+    keys.push_back(kv.first);
   return keys;
 }
 

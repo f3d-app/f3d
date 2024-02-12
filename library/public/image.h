@@ -4,7 +4,6 @@
 #include "exception.h"
 #include "export.h"
 
-#include <set>
 #include <string>
 #include <vector>
 
@@ -203,7 +202,7 @@ public:
   /**
    * List all the metadata keys which have a value set.
    */
-  std::set<std::string> allMetadata() const;
+  std::vector<std::string> allMetadata() const;
 
   /**
    * An exception that can be thrown by the image when there.
