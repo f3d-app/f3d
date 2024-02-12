@@ -10,8 +10,8 @@
 
 int TestSDKImage(int argc, char* argv[])
 {
-  const std::string TESTING(argv[1]);
-  const std::string TMP(argv[2]);
+  const std::string testingDir(argv[1]);
+  const std::string tmpDir(argv[2]);
 
   // check supported formats
   std::vector<std::string> formats = f3d::image::getSupportedFormats();
@@ -46,10 +46,10 @@ int TestSDKImage(int argc, char* argv[])
   generated.setContent(pixels.data());
 
   // test save in different formats
-  generated.save(TMP + "/TestSDKImage.png");
-  generated.save(TMP + "/TestSDKImage.jpg", f3d::image::SaveFormat::JPG);
-  generated.save(TMP + "/TestSDKImage.tif", f3d::image::SaveFormat::TIF);
-  generated.save(TMP + "/TestSDKImage.bmp", f3d::image::SaveFormat::BMP);
+  generated.save(tmpDir + "/TestSDKImage.png");
+  generated.save(tmpDir + "/TestSDKImage.jpg", f3d::image::SaveFormat::JPG);
+  generated.save(tmpDir + "/TestSDKImage.tif", f3d::image::SaveFormat::TIF);
+  generated.save(tmpDir + "/TestSDKImage.bmp", f3d::image::SaveFormat::BMP);
 
   // test saveBuffer in different formats
   std::vector<unsigned char> bufferPNG = generated.saveBuffer();
@@ -111,7 +111,7 @@ int TestSDKImage(int argc, char* argv[])
   }
 
   // check reading a 16-bits image
-  f3d::image shortImg(TESTING + "/data/16bit.png");
+  f3d::image shortImg(testingDir + "/data/16bit.png");
 
   if (shortImg.getChannelType() != f3d::image::ChannelType::SHORT)
   {
@@ -126,7 +126,7 @@ int TestSDKImage(int argc, char* argv[])
   }
 
   // check reading a 32-bits image
-  f3d::image hdrImg(TESTING + "/data/palermo_park_1k.hdr");
+  f3d::image hdrImg(testingDir + "/data/palermo_park_1k.hdr");
 
   if (hdrImg.getChannelType() != f3d::image::ChannelType::FLOAT)
   {
@@ -142,7 +142,7 @@ int TestSDKImage(int argc, char* argv[])
 
 #if F3D_MODULE_EXR
   // check reading EXR
-  f3d::image exrImg(TESTING + "/data/kloofendal_43d_clear_1k.exr");
+  f3d::image exrImg(testingDir + "/data/kloofendal_43d_clear_1k.exr");
 
   if (exrImg.getChannelType() != f3d::image::ChannelType::FLOAT)
   {
@@ -154,7 +154,7 @@ int TestSDKImage(int argc, char* argv[])
   // check reading invalid image
   try
   {
-    f3d::image invalidImg(TESTING + "/data/invalid.png");
+    f3d::image invalidImg(testingDir + "/data/invalid.png");
 
     std::cerr << "An exception has not been thrown when reading an invalid file" << std::endl;
     return EXIT_FAILURE;
@@ -170,7 +170,7 @@ int TestSDKImage(int argc, char* argv[])
   }
 
   // check generated image with baseline
-  f3d::image baseline(TESTING + "/baselines/TestSDKImage.png");
+  f3d::image baseline(testingDir + "/baselines/TestSDKImage.png");
 
   if (generated.getWidth() != width || generated.getHeight() != height)
   {
@@ -262,15 +262,15 @@ int TestSDKImage(int argc, char* argv[])
       return ss.str();
     };
 
-    if (f3d::image(TESTING + "/data/toTerminalText-rgb.png").toTerminalText() !=
-      fileToString(TESTING + "/data/toTerminalText-rgb.txt"))
+    if (f3d::image(testingDir + "/data/toTerminalText-rgb.png").toTerminalText() !=
+      fileToString(testingDir + "/data/toTerminalText-rgb.txt"))
     {
       std::cerr << "toTerminalText() (RGB image) failed" << std::endl;
       return EXIT_FAILURE;
     }
 
-    if (f3d::image(TESTING + "/data/toTerminalText-rgba.png").toTerminalText() !=
-      fileToString(TESTING + "/data/toTerminalText-rgba.txt"))
+    if (f3d::image(testingDir + "/data/toTerminalText-rgba.png").toTerminalText() !=
+      fileToString(testingDir + "/data/toTerminalText-rgba.txt"))
     {
       std::cerr << "toTerminalText() (RGBA image) failed" << std::endl;
       return EXIT_FAILURE;
@@ -331,9 +331,9 @@ int TestSDKImage(int argc, char* argv[])
     f3d::image img1(4, 2, 3);
     img1.setMetadata("foo", "bar");
     img1.setMetadata("hello", "world");
-    img1.save(TMP + "/metadata.png");
+    img1.save(tmpDir + "/metadata.png");
 
-    f3d::image img2(TMP + "/metadata.png");
+    f3d::image img2(tmpDir + "/metadata.png");
     if (img2.getMetadata("foo") != "bar" || img2.getMetadata("hello") != "world")
     {
       std::cerr << "saving or loading file metadata failed" << std::endl;
@@ -347,11 +347,11 @@ int TestSDKImage(int argc, char* argv[])
     img1.setMetadata("hello", "world");
     {
       std::vector<unsigned char> buffer = img1.saveBuffer();
-      std::ofstream outfile(TMP + "/metadata-buffer.png", std::ios::out | std::ios::binary);
+      std::ofstream outfile(tmpDir + "/metadata-buffer.png", std::ios::out | std::ios::binary);
       outfile.write((const char*)&buffer[0], buffer.size());
     }
 
-    f3d::image img2(TMP + "/metadata-buffer.png");
+    f3d::image img2(tmpDir + "/metadata-buffer.png");
     if (img2.getMetadata("foo") != "bar" || img2.getMetadata("hello") != "world")
     {
       std::cerr << "saving or loading buffer metadata failed" << std::endl;

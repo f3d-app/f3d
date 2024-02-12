@@ -20,6 +20,7 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <algorithm>
 #include <cassert>
 #include <regex>
 #include <sstream>
@@ -51,7 +52,7 @@ public:
     return result;
   }
 
-  void writePngMetadata(vtkPNGWriter* pngWriter)
+  void WritePngMetadata(vtkPNGWriter* pngWriter)
   {
     // cppcheck-suppress unassignedVariable
     // (false positive, fixed in cppcheck 2.8)
@@ -64,12 +65,12 @@ public:
     }
   }
 
-  void readPngMetadata(vtkPNGReader* pngReader)
+  void ReadPngMetadata(vtkPNGReader* pngReader)
   {
     int beginEndIndex[2];
     for (size_t i = 0; i < pngReader->GetNumberOfTextChunks(); ++i)
     {
-      const vtkStdString key = pngReader->GetTextKey((int)i);
+      const vtkStdString key = pngReader->GetTextKey(static_cast<int>(i));
       if (key.rfind(metadataKeyPrefix, 0) == 0)
       {
         pngReader->GetTextChunks(key.c_str(), beginEndIndex);
@@ -139,7 +140,7 @@ image::image(const std::string& path)
     vtkPNGReader* pngReader = vtkPNGReader::SafeDownCast(reader);
     if (pngReader != nullptr)
     {
-      this->Internals->readPngMetadata(pngReader);
+      this->Internals->ReadPngMetadata(pngReader);
     }
   }
 
@@ -361,8 +362,8 @@ void image::save(const std::string& path, SaveFormat format) const
   {
     case SaveFormat::PNG:
     {
-      vtkSmartPointer<vtkPNGWriter> pngWriter = vtkSmartPointer<vtkPNGWriter>::New();
-      this->Internals->writePngMetadata(pngWriter);
+      vtkNew<vtkPNGWriter> pngWriter;
+      this->Internals->WritePngMetadata(pngWriter);
       writer = pngWriter;
     }
     break;
@@ -395,7 +396,7 @@ std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
     case SaveFormat::PNG:
     {
       vtkSmartPointer<vtkPNGWriter> writer = vtkSmartPointer<vtkPNGWriter>::New();
-      this->Internals->writePngMetadata(writer);
+      this->Internals->WritePngMetadata(writer);
       return this->Internals->SaveBuffer(writer);
     }
     case SaveFormat::JPG:
@@ -571,18 +572,15 @@ std::string image::getMetadata(const std::string& key) const
   {
     return this->Internals->Metadata[key];
   }
-  else
-  {
-    throw std::out_of_range(key);
-  }
+  throw std::out_of_range(key);
 }
 
 //----------------------------------------------------------------------------
 std::vector<std::string> image::allMetadata() const
 {
   std::vector<std::string> keys;
-  for (const auto& kv : this->Internals->Metadata)
-    keys.push_back(kv.first);
+  std::transform(this->Internals->Metadata.begin(), this->Internals->Metadata.end(),
+    std::back_inserter(keys), [](const auto& kv) { return kv.first; });
   return keys;
 }
 
