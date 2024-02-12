@@ -140,8 +140,6 @@ jobs:
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
     strategy:
       fail-fast: false
-    with:
-      cpu: x86_64
 
     runs-on: macos-latest
 
@@ -157,7 +155,7 @@ jobs:
       uses: ./source/.github/actions/generic-ci
       with:
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-        cpu: ${{inputs.cpu}}
+        cpu: x86_64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
@@ -166,8 +164,6 @@ jobs:
   macos_arm:
     needs: [cache_lfs, check_nightly]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
-    with:
-      cpu: arm64
     strategy:
       fail-fast: false
 
@@ -185,7 +181,7 @@ jobs:
       uses: ./source/.github/actions/generic-ci
       with:
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-        cpu: ${{inputs.cpu}}
+        cpu: arm64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------

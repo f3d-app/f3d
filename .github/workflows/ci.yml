@@ -140,8 +140,6 @@ jobs:
   macos:
     if: github.event.pull_request.draft == false
     needs: cache_lfs
-    with:
-      cpu: x86_64
     strategy:
       fail-fast: false
       matrix:
@@ -166,7 +164,7 @@ jobs:
       with:
         vtk_version: ${{matrix.vtk_version}}
         bundle_label: ${{matrix.bundle_label}}
-        cpu: ${{inputs.cpu}}
+        cpu: x86_64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
@@ -187,9 +185,6 @@ jobs:
 
     runs-on: macos-14
 
-    with:
-      cpu: arm64
-
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -203,7 +198,7 @@ jobs:
       with:
         vtk_version: ${{matrix.vtk_version}}
         bundle_label: ${{matrix.bundle_label}}
-        cpu: ${{inputs.cpu}}
+        cpu: arm64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
