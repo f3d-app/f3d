@@ -46,7 +46,6 @@ list(APPEND libf3d_link_options_public ${f3d_coverage_link_options})
 list(APPEND libf3d_compile_options_public ${f3d_sanitizer_compile_options})
 list(APPEND libf3d_link_options_public ${f3d_sanitizer_link_options})
 
-add_subdirectory(VTKShared)
 add_subdirectory(VTKExtensions)
 
 configure_file(
