@@ -516,6 +516,12 @@ if(F3D_PLUGIN_BUILD_DRACO)
   f3d_test(NAME TestDRACO DATA suzanne.drc DEFAULT_LIGHTS ARGS --load-plugins=draco)
   f3d_test(NAME TestDRACOColoring DATA suzanne.drc DEFAULT_LIGHTS ARGS --scalars --comp=0 --load-plugins=draco)
 
+  # TODO: correct version
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240212)
+    f3d_test(NAME TestGLTFDracoImporter DATA Box_draco.gltf ARGS --camera-position=-1.6,1.3,2.7)
+    f3d_test(NAME TestGLTFDracoReader DATA Box_draco.gltf ARGS --geometry-only --camera-position=-1.6,1.3,2.7)
+  endif()
+
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/draco/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileDraco DATA suzanne.drc CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)

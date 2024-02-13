@@ -25,6 +25,19 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Draco"
 )
 
+# TODO: correct version
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240212)
+  f3d_plugin_declare_reader(
+    NAME GLTFDraco
+    SCORE 90
+    EXTENSIONS gltf glb
+    MIMETYPES model/gltf-binary model/gltf+json
+    VTK_READER vtkF3DGLTFReader
+    VTK_IMPORTER vtkF3DGLTFImporter
+    FORMAT_DESCRIPTION "GL Transmission Format"
+  )
+endif()
+
 set(rpaths "")
 get_target_property(target_type draco::draco TYPE)
 if (target_type STREQUAL SHARED_LIBRARY)
