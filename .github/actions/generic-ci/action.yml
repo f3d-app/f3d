@@ -219,7 +219,7 @@ runs:
       working-directory: ${{github.workspace}}/build
       run: cmake --install . --component mimetypes
 
-    - name: Install optional component
+    - name: Install optional component for libf3d
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: |
@@ -255,6 +255,11 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_examples -C Release -VV
+
+    - name: Install optional component f3d plugins
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --install . --component plugin_sdk
 
     - name: Build plugin examples
       shell: bash
