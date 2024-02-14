@@ -48,6 +48,8 @@ std::vector<char> DecodeIndexBuffer(
       return DecodeIndexBuffer<uint16_t>(mesh);
     case vtkGLTFDocumentLoader::ComponentType::UNSIGNED_INT:
       return DecodeIndexBuffer<uint32_t>(mesh);
+    default:
+      break;
   }
 
   return {};
@@ -155,12 +157,12 @@ void vtkF3DGLTFDocumentLoader::PrepareData()
           }
 
           // handle vertex attributes
-          for (const auto& [attName, attIndex] : dracoMetaData.AttributeIndices)
+          for (const auto& attrib : dracoMetaData.AttributeIndices)
           {
-            auto& attrAccessor = model->Accessors[primitive.AttributeIndices[attName]];
+            auto& attrAccessor = model->Accessors[primitive.AttributeIndices[attrib.first]];
 
             model->Buffers.emplace_back(
-              ::DecodeVertexBuffer(attrAccessor.ComponentTypeValue, mesh, attIndex));
+              ::DecodeVertexBuffer(attrAccessor.ComponentTypeValue, mesh, attrib.second));
 
             vtkGLTFDocumentLoader::BufferView decodedBufferView;
             decodedBufferView.Buffer = static_cast<int>(model->Buffers.size() - 1);
