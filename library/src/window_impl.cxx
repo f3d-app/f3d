@@ -85,49 +85,45 @@ public:
   }
 
   /**
+   * Helper function to fetch a DWORD from windows registry.
+   * 
+   * @param hKey A handle to an open registry key
+   * @param subKey The path of registry key relative to 'hKey'
+   * @param value The name of the registry value
+   * @param dWord Variable to store the result in
+   */
+  bool ReadRegistryDWord(HKEY hKey, const std::wstring& subKey, const std::wstring& value, DWORD& dWord)
+  {
+    DWORD dataSize = sizeof(DWORD);
+    LONG result = RegGetValueW(hKey, subKey.c_str(), value.c_str(), RRF_RT_REG_DWORD, nullptr, &dWord, &dataSize);
+
+    return result == ERROR_SUCCESS;
+  }
+
+  /**
    * Helper function to detect user theme
    */
   bool IsWindowsInDarkMode()
   {
-    HKEY hKey;
-    LONG result = RegOpenKeyExA(HKEY_CURRENT_USER,
-      "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", 0, KEY_READ, &hKey);
+    std::wstring subKey(L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize");
 
-    if (result != ERROR_SUCCESS)
+    DWORD value{};
+    bool result = false;
+
+    result = ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"AppsUseLightTheme", value);
+
+    if (result && value == 0)
     {
-      RegCloseKey(hKey);
-      return false;
+      return true;
     }
 
+    result = ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"SystemUsesLightTheme", value);
+    
+    if (result && value == 0)
     {
-      DWORD type;
-      DWORD value = 0;
-      DWORD dataSize = sizeof(DWORD);
-
-      RegQueryValueExA(hKey, "AppsUseLightTheme", NULL, &type, (LPBYTE)&value, &dataSize);
-
-      if (result == ERROR_SUCCESS)
-      {
-        RegCloseKey(hKey);
-        return value == 0;
-      }
+      return true;
     }
 
-    {
-      DWORD type;
-      DWORD value = 0;
-      DWORD dataSize = sizeof(DWORD);
-
-      RegQueryValueExA(hKey, "SystemUsesLightTheme", NULL, &type, (LPBYTE)&value, &dataSize);
-
-      if (result == ERROR_SUCCESS)
-      {
-        RegCloseKey(hKey);
-        return value == 0;
-      }
-    }
-
-    RegCloseKey(hKey);
     return false;
   }
 #endif
