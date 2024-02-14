@@ -334,7 +334,9 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetInvertZoom(
     this->Internals->Options.getAsBool("interactor.invert-zoom"));
 
-  std::string splatTypeStr = this->Internals->Options.getAsString("render.splat-type");
+  // XXX: model.point-sprites.type only has an effect on geometry scene
+  // but we set it here for practical reasons
+  std::string splatTypeStr = this->Internals->Options.getAsString("model.point-sprites.type");
   int pointSize = this->Internals->Options.getAsDouble("render.point-size");
   vtkF3DRendererWithColoring::SplatType splatType = vtkF3DRendererWithColoring::SplatType::SPHERE;
   if (splatTypeStr == "gaussian")

@@ -341,7 +341,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
     auto grp2 = cxxOptions.add_options("Material");
     this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.getAsBoolRef("model.point-sprites.enable"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp2, "point-type", "", "Point splat type when showing point sprites", options.getAsStringRef("render.splat-type"), HasDefault::YES, MayHaveConfig::YES, "<sphere|gaussian>");
+    this->DeclareOption(grp2, "point-type", "", "Point sprites type when showing point sprites", options.getAsStringRef("model.point-sprites.type"), HasDefault::YES, MayHaveConfig::YES, "<sphere|gaussian>");
     this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.getAsDoubleRef("render.point-size"), HasDefault::YES, MayHaveConfig::YES, "<size>");
     this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", options.getAsDoubleRef("render.line-width"), HasDefault::YES, MayHaveConfig::YES, "<width>");
     this->DeclareOption(grp2, "color", "", "Solid color", options.getAsDoubleVectorRef("model.color.rgb"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
