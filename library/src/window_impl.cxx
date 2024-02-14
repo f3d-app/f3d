@@ -62,7 +62,7 @@ public:
    * Helper function to detect if the
    * Windows Build Number is equal or greater to a number
    */
-  BOOL IsWindowsBuildNumberOrGreater(int buildNumber)
+  bool IsWindowsBuildNumberOrGreater(int buildNumber)
   {
     std::string value{};
     bool result = vtksys::SystemTools::ReadRegistryValue("HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion;CurrentBuildNumber", value);
@@ -89,7 +89,7 @@ public:
   /**
    * Helper function to detect user theme
    */
-  BOOL IsWindowsInDarkMode()
+  bool IsWindowsInDarkMode()
   {
     HKEY hKey;
     LONG result = RegOpenKeyExA(HKEY_CURRENT_USER,
@@ -308,7 +308,6 @@ void window_impl::Initialize(bool withColoring)
 
 #ifdef _WIN32
   HWND hwnd = static_cast<HWND>(this->Internals->RenWin->GetGenericWindowId());
-
   BOOL useDarkMode = this->Internals->IsWindowsInDarkMode();
 
   if (this->Internals->IsWindowsBuildNumberOrGreater(IMMERSIVE_DARK_MODE_SUPPORTED_SINCE))
