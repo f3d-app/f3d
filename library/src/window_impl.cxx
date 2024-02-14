@@ -22,8 +22,19 @@
 #include <vtkWindowToImageFilter.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <charconv>
+
 #if F3D_MODULE_EXTERNAL_RENDERING
 #include <vtkExternalOpenGLRenderWindow.h>
+#endif
+
+#ifdef _WIN32
+#include <Windows.h>
+#include <dwmapi.h>
+
+#define DWMWA_USE_IMMERSIVE_DARK_MODE 20
+
+constexpr auto MAX_VALUE_NAME = 16383;
 #endif
 
 namespace f3d::detail
@@ -43,6 +54,97 @@ public:
 
     return this->CachePath;
   }
+
+#if _WIN32
+  /**
+   * Helper function to detect if the
+   * Windows Build Number is equal or greater to a number
+   */
+  BOOL IsWindowsBuildNumberOrGreater(int buildNumber)
+  {
+    int windowsBuildNumber = 0;
+
+    // Receives the handle to Reg key
+    HKEY versionHKey;
+    LONG result = RegOpenKeyExA(HKEY_LOCAL_MACHINE,
+      "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0, KEY_READ, &versionHKey);
+
+    // Query value from the reg key
+    if (result == ERROR_SUCCESS)
+    {
+      // Receives code indicating the type of data stored in the reg value.
+      // CurrentBuildNumber is of type REG_SZ
+      DWORD type;
+      DWORD dataSize = MAX_VALUE_NAME;
+      CHAR data[MAX_VALUE_NAME]{};
+
+      RegGetValueA(versionHKey, "", "CurrentBuildNumber", RRF_RT_REG_SZ, &type, data, &dataSize);
+
+      if (result == ERROR_SUCCESS && type == REG_SZ)
+      {
+        std::from_chars(data, data + dataSize, windowsBuildNumber);
+      }
+      else
+      {
+        f3d::log::debug("Error reading registry value.");
+      }
+    }
+    else
+    {
+      f3d::log::debug("Error opening registry key.");
+    }
+
+    RegCloseKey(versionHKey);
+    return windowsBuildNumber >= buildNumber;
+  }
+
+  /**
+   * Helper function to detect user theme
+   */
+  BOOL IsWindowsInDarkMode()
+  {
+    HKEY hKey;
+    LONG result = RegOpenKeyExA(HKEY_CURRENT_USER,
+      "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", 0, KEY_READ, &hKey);
+
+    if (result != ERROR_SUCCESS)
+    {
+      RegCloseKey(hKey);
+      return false;
+    }
+
+    {
+      DWORD type;
+      DWORD value = 0;
+      DWORD dataSize = sizeof(DWORD);
+
+      RegQueryValueExA(hKey, "AppsUseLightTheme", NULL, &type, (LPBYTE)&value, &dataSize);
+
+      if (result == ERROR_SUCCESS)
+      {
+        RegCloseKey(hKey);
+        return value == 0;
+      }
+    }
+
+    {
+      DWORD type;
+      DWORD value = 0;
+      DWORD dataSize = sizeof(DWORD);
+
+      RegQueryValueExA(hKey, "SystemUsesLightTheme", NULL, &type, (LPBYTE)&value, &dataSize);
+
+      if (result == ERROR_SUCCESS)
+      {
+        RegCloseKey(hKey);
+        return value == 0;
+      }
+    }
+
+    RegCloseKey(hKey);
+    return false;
+  }
+#endif
 
   std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
@@ -215,6 +317,17 @@ void window_impl::Initialize(bool withColoring)
   this->Internals->WithColoring = withColoring;
   this->Internals->Renderer->Initialize(this->Internals->Options.getAsString("scene.up-direction"));
   this->Internals->Initialized = true;
+
+#ifdef _WIN32
+  HWND hwnd = static_cast<HWND>(this->Internals->RenWin->GetGenericWindowId());
+
+  BOOL useDarkMode = this->Internals->IsWindowsInDarkMode();
+
+  if (this->Internals->IsWindowsBuildNumberOrGreater(22000))
+  {
+    DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
+  }
+#endif
 }
 
 //----------------------------------------------------------------------------

@@ -111,6 +111,10 @@ else ()
     $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)
 endif ()
 
+if (WIN32)
+  target_link_libraries(libf3d PRIVATE Dwmapi)
+endif()
+
 set_target_properties(libf3d PROPERTIES
   CXX_STANDARD 17
   CXX_VISIBILITY_PRESET hidden
