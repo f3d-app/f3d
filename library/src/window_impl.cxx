@@ -34,7 +34,7 @@
 #define DWMWA_USE_IMMERSIVE_DARK_MODE 20
 #endif
 
-constexpr auto IMMERSIVE_DARK_MODE_SUPPORTED_SINCE = 22000;
+constexpr auto IMMERSIVE_DARK_MODE_SUPPORTED_SINCE = 19041;
 #endif
 
 namespace f3d::detail
