@@ -32,9 +32,11 @@
 #include <Windows.h>
 #include <dwmapi.h>
 
+#ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
 #define DWMWA_USE_IMMERSIVE_DARK_MODE 20
+#endif
 
-constexpr auto MAX_VALUE_NAME = 16383;
+constexpr auto IMMERSIVE_DARK_MODE_SUPPORTED_SINCE = 22000;
 #endif
 
 namespace f3d::detail
@@ -62,31 +64,18 @@ public:
    */
   BOOL IsWindowsBuildNumberOrGreater(int buildNumber)
   {
-    int windowsBuildNumber = 0;
+    std::string value{};
+    bool result = vtksys::SystemTools::ReadRegistryValue("HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion;CurrentBuildNumber", value);
 
-    // Receives the handle to Reg key
-    HKEY versionHKey;
-    LONG result = RegOpenKeyExA(HKEY_LOCAL_MACHINE,
-      "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0, KEY_READ, &versionHKey);
-
-    // Query value from the reg key
-    if (result == ERROR_SUCCESS)
+    if (result == true)
     {
-      // Receives code indicating the type of data stored in the reg value.
-      // CurrentBuildNumber is of type REG_SZ
-      DWORD type;
-      DWORD dataSize = MAX_VALUE_NAME;
-      CHAR data[MAX_VALUE_NAME]{};
-
-      RegGetValueA(versionHKey, "", "CurrentBuildNumber", RRF_RT_REG_SZ, &type, data, &dataSize);
-
-      if (result == ERROR_SUCCESS && type == REG_SZ)
+      try
       {
-        std::from_chars(data, data + dataSize, windowsBuildNumber);
+        return std::stoi(value) >= buildNumber;
       }
-      else
+      catch (const std::invalid_argument& e)
       {
-        f3d::log::debug("Error reading registry value.");
+        f3d::log::debug("Error parsing CurrentBuildNumber");
       }
     }
     else
@@ -94,8 +83,7 @@ public:
       f3d::log::debug("Error opening registry key.");
     }
 
-    RegCloseKey(versionHKey);
-    return windowsBuildNumber >= buildNumber;
+    return false;
   }
 
   /**
@@ -323,7 +311,7 @@ void window_impl::Initialize(bool withColoring)
 
   BOOL useDarkMode = this->Internals->IsWindowsInDarkMode();
 
-  if (this->Internals->IsWindowsBuildNumberOrGreater(22000))
+  if (this->Internals->IsWindowsBuildNumberOrGreater(IMMERSIVE_DARK_MODE_SUPPORTED_SINCE))
   {
     DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
   }
