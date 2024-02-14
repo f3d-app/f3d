@@ -249,11 +249,14 @@ macro(f3d_plugin_build)
     EXPORT_FILE_NAME plugin_export.h
     EXPORT_MACRO_NAME F3D_PLUGIN_EXPORT)
 
-  if(UNIX)
+  # Add rpath origin so the VTKExtensionsShared can be found
+  if (APPLE)
+    set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path)
+  elseif (UNIX)
     # On Unix, add the RPATH to VTK install folder
     get_target_property(target_type VTK::CommonCore TYPE)
     if (target_type STREQUAL SHARED_LIBRARY)
-      list(APPEND F3D_PLUGIN_ADDITIONAL_RPATHS "$<TARGET_FILE_DIR:VTK::CommonCore>")
+      list(APPEND F3D_PLUGIN_ADDITIONAL_RPATHS "$ORIGIN:$<TARGET_FILE_DIR:VTK::CommonCore>")
     endif ()
     set_target_properties(f3d-plugin-${F3D_PLUGIN_NAME} PROPERTIES
       INSTALL_RPATH "${F3D_PLUGIN_ADDITIONAL_RPATHS}")
@@ -289,7 +292,7 @@ macro(f3d_plugin_build)
   list(TRANSFORM F3D_PLUGIN_VTK_MODULES PREPEND "VTK::")
 
   target_link_libraries(f3d-plugin-${F3D_PLUGIN_NAME} PRIVATE
-    VTK::CommonCore VTK::CommonExecutionModel VTK::IOImport f3d::VTKShared
+    VTK::CommonCore VTK::CommonExecutionModel VTK::IOImport f3d::VTKExtensionsPublic
     ${F3D_PLUGIN_VTK_MODULES}
     ${modules})
 

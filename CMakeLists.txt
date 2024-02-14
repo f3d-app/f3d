@@ -158,6 +158,22 @@ if(NOT F3D_SANITIZER STREQUAL "none")
   set(f3d_sanitizer_link_options -fsanitize=${F3D_SANITIZER})
 endif()
 
+# Construct generic build and link options
+set(f3d_compile_options_private "")
+set(f3d_compile_options_public "")
+set(f3d_link_options_public "")
+
+## F3D_STRICT_BUILD
+list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})
+
+## Coverage
+list(APPEND f3d_compile_options_public ${f3d_coverage_compile_options})
+list(APPEND f3d_link_options_public ${f3d_coverage_link_options})
+
+## Sanitizer
+list(APPEND f3d_compile_options_public ${f3d_sanitizer_compile_options})
+list(APPEND f3d_link_options_public ${f3d_sanitizer_link_options})
+
 # Testing
 option(BUILD_TESTING "Build the tests" OFF)
 cmake_dependent_option(F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON "Disable image comparison on tests using the default lights" OFF "BUILD_TESTING" OFF)
@@ -189,8 +205,8 @@ endif()
 # F3D Application
 cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
 
-# VTKShared module
-add_subdirectory(VTKShared)
+# Build VTK extension moddules
+add_subdirectory(VTKExtensions)
 
 # plugins
 option(F3D_PLUGINS_STATIC_BUILD "Make all plugins static (embedded into libf3d) and automatically loaded by F3D" ON)

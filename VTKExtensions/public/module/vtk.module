@@ -1,7 +1,7 @@
 NAME
-  f3d::VTKShared
+  f3d::VTKExtensionsPublic
 DESCRIPTION
-  A VTK module that is shared and usable by plugins
+  A VTK module that is shared and usable by both libf3d and plugins
 DEPENDS
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS

@@ -9,7 +9,7 @@ set(F3D_VTK_MODULES
   f3d::VTKExtensionsCore
   f3d::VTKExtensionsReaders
   f3d::VTKExtensionsRendering
-  f3d::VTKShared
+  f3d::VTKExtensionsPublic
 )
 
 # Check modules
@@ -30,23 +30,6 @@ if(F3D_MODULE_EXTERNAL_RENDERING)
     message(FATAL_ERROR "F3D_MODULE_EXTERNAL_RENDERING option is enabled but VTK::RenderingExternal is not found")
   endif()
 endif()
-
-set(libf3d_compile_options_private "")
-set(libf3d_compile_options_public "")
-set(libf3d_link_options_public "")
-
-# F3D_STRICT_BUILD
-list(APPEND libf3d_compile_options_private ${f3d_strict_build_compile_options})
-
-# Coverage
-list(APPEND libf3d_compile_options_public ${f3d_coverage_compile_options})
-list(APPEND libf3d_link_options_public ${f3d_coverage_link_options})
-
-# Sanitizer
-list(APPEND libf3d_compile_options_public ${f3d_sanitizer_compile_options})
-list(APPEND libf3d_link_options_public ${f3d_sanitizer_link_options})
-
-add_subdirectory(VTKExtensions)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/config.cxx.in"
@@ -174,8 +157,8 @@ configure_file(
 list(TRANSFORM F3D_STATIC_PLUGIN_TARGETS PREPEND "f3d-plugin-")
 
 target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES} ${F3D_STATIC_PLUGIN_TARGETS})
-target_compile_options(libf3d PUBLIC ${libf3d_compile_options_public} PRIVATE ${libf3d_compile_options_private})
-target_link_options(libf3d PUBLIC ${libf3d_link_options_public})
+target_compile_options(libf3d PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
+target_link_options(libf3d PUBLIC ${f3d_link_options_public})
 
 if(F3D_STRICT_BUILD AND MSVC)
   # There are warnings in VTK related to deprecated features in C++17
@@ -252,6 +235,13 @@ if(BUILD_SHARED_LIBS)
       "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
       "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
       "${F3D_SOURCE_DIR}/cmake/f3dEmbed.cmake"
+    DESTINATION
+      "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
+    COMPONENT sdk
+    EXCLUDE_FROM_ALL)
+
+  install(
+    FILES
       "${F3D_SOURCE_DIR}/cmake/f3dPlugin.cmake"
       "${F3D_SOURCE_DIR}/cmake/plugin.cxx.in"
       "${F3D_SOURCE_DIR}/cmake/plugin.desktop.in"
@@ -259,6 +249,7 @@ if(BUILD_SHARED_LIBS)
       "${F3D_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
     DESTINATION
       "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-    COMPONENT sdk
+    COMPONENT plugin_sdk
     EXCLUDE_FROM_ALL)
+
 endif()
