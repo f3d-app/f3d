@@ -146,7 +146,6 @@ options::options()
   this->Internals->init("render.show-edges", false);
   this->Internals->init("render.line-width", 1.0);
   this->Internals->init("render.point-size", 10.0);
-  this->Internals->init("render.splat-type", std::string("sphere"));
   this->Internals->init("render.grid.enable", false);
   this->Internals->init("render.grid.absolute", false);
   this->Internals->init("render.grid.unit", 0.0);
@@ -213,6 +212,7 @@ options::options()
 
   // XXX: Rename into a "rendering-mode" option: https://github.com/f3d-app/f3d/issues/345
   this->Internals->init("model.point-sprites.enable", false);
+  this->Internals->init("model.point-sprites.type", std::string("sphere"));
   this->Internals->init("model.volume.enable", false);
   this->Internals->init("model.volume.inverse", false);
 
