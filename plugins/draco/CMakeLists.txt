@@ -26,7 +26,7 @@ f3d_plugin_declare_reader(
 )
 
 # TODO: correct version
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240212)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
   f3d_plugin_declare_reader(
     NAME GLTFDraco
     SCORE 90

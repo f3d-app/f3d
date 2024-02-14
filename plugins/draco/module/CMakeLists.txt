@@ -3,7 +3,7 @@ set(classes
   )
 
 # TODO: correct version
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240212)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
   set(classes ${classes}
     vtkF3DGLTFDocumentLoader
     vtkF3DGLTFImporter

@@ -517,7 +517,7 @@ if(F3D_PLUGIN_BUILD_DRACO)
   f3d_test(NAME TestDRACOColoring DATA suzanne.drc DEFAULT_LIGHTS ARGS --scalars --comp=0 --load-plugins=draco)
 
   # TODO: correct version
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240212)
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     f3d_test(NAME TestGLTFDracoImporter DATA Box_draco.gltf ARGS --camera-position=-1.6,1.3,2.7)
     f3d_test(NAME TestGLTFDracoReader DATA Box_draco.gltf ARGS --geometry-only --camera-position=-1.6,1.3,2.7)
   endif()
