@@ -63,7 +63,9 @@ public:
   bool IsWindowsBuildNumberOrGreater(int buildNumber)
   {
     std::string value{};
-    bool result = vtksys::SystemTools::ReadRegistryValue("HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion;CurrentBuildNumber", value);
+    bool result = vtksys::SystemTools::ReadRegistryValue(
+      "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion;CurrentBuildNumber",
+      value);
 
     if (result == true)
     {
@@ -86,16 +88,18 @@ public:
 
   /**
    * Helper function to fetch a DWORD from windows registry.
-   * 
+   *
    * @param hKey A handle to an open registry key
    * @param subKey The path of registry key relative to 'hKey'
    * @param value The name of the registry value
    * @param dWord Variable to store the result in
    */
-  bool ReadRegistryDWord(HKEY hKey, const std::wstring& subKey, const std::wstring& value, DWORD& dWord)
+  bool ReadRegistryDWord(
+    HKEY hKey, const std::wstring& subKey, const std::wstring& value, DWORD& dWord)
   {
     DWORD dataSize = sizeof(DWORD);
-    LONG result = RegGetValueW(hKey, subKey.c_str(), value.c_str(), RRF_RT_REG_DWORD, nullptr, &dWord, &dataSize);
+    LONG result = RegGetValueW(
+      hKey, subKey.c_str(), value.c_str(), RRF_RT_REG_DWORD, nullptr, &dWord, &dataSize);
 
     return result == ERROR_SUCCESS;
   }
@@ -118,7 +122,7 @@ public:
     }
 
     result = ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"SystemUsesLightTheme", value);
-    
+
     if (result && value == 0)
     {
       return true;
@@ -301,11 +305,10 @@ void window_impl::Initialize(bool withColoring)
   this->Internals->Initialized = true;
 
 #ifdef _WIN32
-  HWND hwnd = static_cast<HWND>(this->Internals->RenWin->GetGenericWindowId());
-  BOOL useDarkMode = this->Internals->IsWindowsInDarkMode();
-
   if (this->Internals->IsWindowsBuildNumberOrGreater(IMMERSIVE_DARK_MODE_SUPPORTED_SINCE))
   {
+    HWND hwnd = static_cast<HWND>(this->Internals->RenWin->GetGenericWindowId());
+    BOOL useDarkMode = this->Internals->IsWindowsInDarkMode();
     DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
   }
 #endif
