@@ -25,7 +25,7 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Draco"
 )
 
-# TODO: correct version
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10884
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
   f3d_plugin_declare_reader(
     NAME GLTFDraco

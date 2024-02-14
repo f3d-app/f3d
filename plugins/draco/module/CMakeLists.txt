@@ -2,7 +2,7 @@ set(classes
   vtkF3DDracoReader
   )
 
-# TODO: correct version
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10884
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
   set(classes ${classes}
     vtkF3DGLTFDocumentLoader
