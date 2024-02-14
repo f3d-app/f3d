@@ -197,6 +197,8 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 void vtkF3DRenderer::Initialize(const std::string& up)
 {
   this->OriginalLightIntensities.clear();
+  this->RemoveAllViewProps();
+  this->RemoveAllLights();
 
   this->AddActor(this->FilenameActor);
   this->AddActor(this->GridActor);
