@@ -75,7 +75,7 @@ public:
       }
       catch (const std::invalid_argument& e)
       {
-        f3d::log::debug("Error parsing CurrentBuildNumber");
+        f3d::log::debug("Error parsing CurrentBuildNumber", e.what());
       }
     }
     else
@@ -112,20 +112,15 @@ public:
     std::wstring subKey(L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize");
 
     DWORD value{};
-    bool result = false;
 
-    result = ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"AppsUseLightTheme", value);
-
-    if (result && value == 0)
+    if (ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"AppsUseLightTheme", value))
     {
-      return true;
+      return value == 0;
     }
 
-    result = ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"SystemUsesLightTheme", value);
-
-    if (result && value == 0)
+    if (ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"SystemUsesLightTheme", value))
     {
-      return true;
+      return value == 0;
     }
 
     return false;
