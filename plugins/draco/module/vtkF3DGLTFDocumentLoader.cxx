@@ -139,7 +139,7 @@ void vtkF3DGLTFDocumentLoader::PrepareData()
           auto& accessor = model->Accessors[primitive.IndicesId];
 
           // handle index buffer
-          if (primitive.Indices >= 0)
+          if (primitive.IndicesId >= 0)
           {
             model->Buffers.emplace_back(::DecodeIndexBuffer(mesh, accessor.ComponentTypeValue));
 
