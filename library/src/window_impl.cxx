@@ -60,7 +60,7 @@ public:
    * Helper function to detect if the
    * Windows Build Number is equal or greater to a number
    */
-  bool IsWindowsBuildNumberOrGreater(int buildNumber)
+  static bool IsWindowsBuildNumberOrGreater(int buildNumber)
   {
     std::string value{};
     bool result = vtksys::SystemTools::ReadRegistryValue(
@@ -94,7 +94,7 @@ public:
    * @param value The name of the registry value
    * @param dWord Variable to store the result in
    */
-  bool ReadRegistryDWord(
+  static bool ReadRegistryDWord(
     HKEY hKey, const std::wstring& subKey, const std::wstring& value, DWORD& dWord)
   {
     DWORD dataSize = sizeof(DWORD);
@@ -107,7 +107,7 @@ public:
   /**
    * Helper function to detect user theme
    */
-  bool IsWindowsInDarkMode()
+  static bool IsWindowsInDarkMode()
   {
     std::wstring subKey(L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize");
 
@@ -126,6 +126,18 @@ public:
     return false;
   }
 #endif
+
+  void UpdateTheme() const
+  {
+#ifdef _WIN32
+    if (this->IsWindowsBuildNumberOrGreater(IMMERSIVE_DARK_MODE_SUPPORTED_SINCE))
+    {
+      HWND hwnd = static_cast<HWND>(this->RenWin->GetGenericWindowId());
+      BOOL useDarkMode = this->IsWindowsInDarkMode();
+      DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
+    }
+#endif
+  }
 
   std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
@@ -297,16 +309,8 @@ void window_impl::Initialize(bool withColoring)
 {
   this->Internals->WithColoring = withColoring;
   this->Internals->Renderer->Initialize(this->Internals->Options.getAsString("scene.up-direction"));
+  this->Internals->UpdateTheme();
   this->Internals->Initialized = true;
-
-#ifdef _WIN32
-  if (this->Internals->IsWindowsBuildNumberOrGreater(IMMERSIVE_DARK_MODE_SUPPORTED_SINCE))
-  {
-    HWND hwnd = static_cast<HWND>(this->Internals->RenWin->GetGenericWindowId());
-    BOOL useDarkMode = this->Internals->IsWindowsInDarkMode();
-    DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
-  }
-#endif
 }
 
 //----------------------------------------------------------------------------
