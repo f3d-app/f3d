@@ -22,8 +22,6 @@
 #include <vtkWindowToImageFilter.h>
 #include <vtksys/SystemTools.hxx>
 
-#include <charconv>
-
 #if F3D_MODULE_EXTERNAL_RENDERING
 #include <vtkExternalOpenGLRenderWindow.h>
 #endif
