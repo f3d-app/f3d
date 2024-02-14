@@ -196,7 +196,8 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<std::st
           }
           else
           {
-            log::debug("Could not load \"", tryPath, "\" because: ", vtksys::DynamicLoader::LastError());
+            log::debug(
+              "Could not load \"", tryPath, "\" because: ", vtksys::DynamicLoader::LastError());
           }
         }
       }
