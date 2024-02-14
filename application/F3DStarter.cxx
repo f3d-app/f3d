@@ -326,10 +326,9 @@ int F3DStarter::Start(int argc, char** argv)
   // Load a file
   this->LoadFile();
 
-  f3d::log::debug("========== Rendering ==========");
-
   if (!this->Internals->AppOptions.NoRender)
   {
+    f3d::log::debug("========== Rendering ==========");
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
