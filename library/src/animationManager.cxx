@@ -120,7 +120,7 @@ bool animationManager::Initialize(
   // Recover time ranges for all enabled animations
   this->TimeRange[0] = std::numeric_limits<double>::infinity();
   this->TimeRange[1] = -std::numeric_limits<double>::infinity();
-  for (vtkIdType animIndex = 0; animIndex < availAnimations; animIndex++)
+  for (vtkIdType animIndex = 0; animIndex < this->AvailAnimations; animIndex++)
   {
     if (this->Importer->IsAnimationEnabled(animIndex))
     {
@@ -351,5 +351,12 @@ void animationManager::DisableAllAnimation()
   {
     this->Importer->DisableAnimation(this->AnimationIndex);
   }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::GetTimeRange(double timeRange[2])
+{
+  timeRange[0] = this->TimeRange[0];
+  timeRange[1] = this->TimeRange[1];
 }
 }
