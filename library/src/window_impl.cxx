@@ -322,6 +322,13 @@ void window_impl::UpdateDynamicOptions()
     this->Initialize(false);
   }
 
+  if (this->Internals->WindowType == Type::NONE)
+  {
+    // With a NONE window type, only update the actors to get accurate bounding box information
+    this->Internals->Renderer->UpdateActors();
+    return;
+  }
+
   // Set the cache path if not already
   this->Internals->Renderer->SetCachePath(this->Internals->GetCachePath());
 
