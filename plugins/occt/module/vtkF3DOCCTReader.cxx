@@ -102,21 +102,28 @@ public:
 
     if (this->Parent->GetReadWire())
     {
-      // Add all edges to polydata
-      for (TopExp_Explorer exEdge(shape, TopAbs_EDGE); exEdge.More(); exEdge.Next())
+      std::vector<TopoDS_Edge> edges;
       {
-        TopoDS_Edge edge = TopoDS::Edge(exEdge.Current());
+        /* add all edges to a compound to remesh them all at once */
+        TopoDS_Builder builder;
+        TopoDS_Compound compound;
+        builder.MakeCompound(compound);
+        for (TopExp_Explorer exEdge(shape, TopAbs_EDGE); exEdge.More(); exEdge.Next())
+        {
+          const TopoDS_Edge edge = TopoDS::Edge(exEdge.Current());
+          builder.Add(compound, edge);
+          edges.push_back(edge);
+        }
+        BRepMesh_IncrementalMesh(compound, this->Parent->GetLinearDeflection(),
+          this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(),
+          Standard_True);
+      }
 
+      // Add all edges to polydata
+      for (const TopoDS_Edge edge : edges)
+      {
         TopLoc_Location location;
         const auto& poly = BRep_Tool::Polygon3D(edge, location);
-
-        if (poly.IsNull() || poly->Nodes().Length() <= 0)
-        {
-          // meshing
-          BRepMesh_IncrementalMesh(edge, this->Parent->GetLinearDeflection(),
-            this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(),
-            Standard_True);
-        }
 
         if (poly.IsNull())
         {
