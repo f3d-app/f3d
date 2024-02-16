@@ -550,7 +550,7 @@ int vtkF3DOCCTReader::RequestData(
     this->Internals->ShapeMap[this->Internals->GetHash(label)] =
       this->Internals->CreateShape(shape);
 
-    double progress = 0.5 + static_cast<double>(iLabel) / topLevelShapes.Length();
+    double progress = 0.5 + (static_cast<double>(iLabel) / topLevelShapes.Length()) / 2;
     this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
   }
 
