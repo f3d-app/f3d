@@ -244,23 +244,26 @@ public:
           std::swap(cell[0], cell[2]);
         }
         trianglesCells->InsertNextCell(3, cell);
+      }
 
 #if F3D_PLUGIN_OCCT_XCAF
-        if (this->ColorTool)
+      if (this->ColorTool)
+      {
+        std::array<unsigned char, 3> rgb = { 255, 255, 255 };
+        Quantity_Color aColor;
+        if (this->ColorTool->GetColor(face, XCAFDoc_ColorSurf, aColor) ||
+          this->ColorTool->GetColor(shape, XCAFDoc_ColorSurf, aColor))
         {
-          std::array<unsigned char, 3> rgb = { 255, 255, 255 };
-          Quantity_Color aColor;
-          if (this->ColorTool->GetColor(face, XCAFDoc_ColorSurf, aColor) ||
-            this->ColorTool->GetColor(shape, XCAFDoc_ColorSurf, aColor))
-          {
-            rgb[0] = static_cast<unsigned char>(255.0 * aColor.Red());
-            rgb[1] = static_cast<unsigned char>(255.0 * aColor.Green());
-            rgb[2] = static_cast<unsigned char>(255.0 * aColor.Blue());
-          }
+          rgb[0] = static_cast<unsigned char>(255.0 * aColor.Red());
+          rgb[1] = static_cast<unsigned char>(255.0 * aColor.Green());
+          rgb[2] = static_cast<unsigned char>(255.0 * aColor.Blue());
+        }
+        for (int i = 1; i <= nbT; i++)
+        {
           colors->InsertNextTypedTuple(rgb.data());
         }
-#endif
       }
+#endif
 
       shift += nbV;
     }
