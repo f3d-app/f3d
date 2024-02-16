@@ -96,6 +96,10 @@ public:
 
     Standard_Integer shift = 0;
 
+    /* Mesh the whole shape. This only affect faces, edges have to be handled separately. */
+    BRepMesh_IncrementalMesh(shape, this->Parent->GetLinearDeflection(),
+      this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(), Standard_True);
+
     if (this->Parent->GetReadWire())
     {
       // Add all edges to polydata
@@ -165,14 +169,6 @@ public:
 
       TopLoc_Location location;
       const auto& poly = BRep_Tool::Triangulation(face, location);
-
-      if (poly.IsNull() || poly->NbTriangles() <= 0)
-      {
-        // meshing
-        BRepMesh_IncrementalMesh(face, this->Parent->GetLinearDeflection(),
-          this->Parent->GetRelativeDeflection(), this->Parent->GetAngularDeflection(),
-          Standard_True);
-      }
 
       if (poly.IsNull())
       {
