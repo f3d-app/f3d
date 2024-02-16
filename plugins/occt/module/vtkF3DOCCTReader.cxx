@@ -120,7 +120,7 @@ public:
       }
 
       // Add all edges to polydata
-      for (const TopoDS_Edge edge : edges)
+      for (const TopoDS_Edge& edge : edges)
       {
         TopLoc_Location location;
         const auto& poly = BRep_Tool::Polygon3D(edge, location);
