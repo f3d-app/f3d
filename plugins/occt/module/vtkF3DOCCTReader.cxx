@@ -167,7 +167,7 @@ public:
         std::array<unsigned char, 3> rgb = { 0, 0, 0 };
         try
         {
-          const auto style = inheritedStyles.FindFromKey(edge);
+          const auto& style = inheritedStyles.FindFromKey(edge);
           if (style.IsSetColorCurv())
           {
             Quantity_Color color = style.GetColorCurv();
@@ -272,7 +272,7 @@ public:
       std::array<unsigned char, 3> rgb = { 255, 255, 255 };
       try
       {
-        const auto style = inheritedStyles.FindFromKey(face);
+        const auto& style = inheritedStyles.FindFromKey(face);
         if (style.IsSetColorSurf())
         {
           Quantity_Color color = style.GetColorSurf();
@@ -333,14 +333,14 @@ public:
     std::vector<std::pair<TopoDS_Shape, XCAFPrs_Style> > parents;
     for (StyleMap::Iterator iter(collectedStyles); iter.More(); iter.Next())
     {
-      const TopoDS_Shape shape = iter.Key();
+      const TopoDS_Shape& shape = iter.Key();
       if (shape.ShapeType() == leafType)
       {
         inheritedStyles.Add(shape, iter.Value());
       }
       else if (shape.ShapeType() < leafType)
       {
-        parents.push_back(std::make_pair(shape, iter.Value()));
+        parents.emplace_back(std::make_pair(shape, iter.Value()));
       }
     }
 
