@@ -313,18 +313,18 @@ public:
   }
 
 #if F3D_PLUGIN_OCCT_XCAF
-  StyleMap CollectInheritedStyles(const TDF_Label& label, const TopoDS_Shape& shape)
+  StyleMap CollectInheritedStyles(const TDF_Label& rootLabel, const TopoDS_Shape& rootShape)
   {
     StyleMap inheritedStyles;
 
-    if (label.IsNull())
+    if (rootLabel.IsNull())
     {
       return inheritedStyles;
     }
 
     /* collect styled shapes from the document */
     StyleMap collectedStyles;
-    XCAFPrs::CollectStyleSettings(label, TopLoc_Location(), collectedStyles);
+    XCAFPrs::CollectStyleSettings(rootLabel, TopLoc_Location(), collectedStyles);
 
     /* iterate styled shapes and assign style if leaf, otherwise collect if parent node */
     const TopAbs_ShapeEnum leafType = this->Parent->GetReadWire() ? TopAbs_EDGE : TopAbs_FACE;
@@ -377,7 +377,7 @@ public:
     /* pass down default style (if any) to all leaves */
     try
     {
-      const XCAFPrs_Style defaultStyle = collectedStyles.FindFromKey(shape);
+      const XCAFPrs_Style defaultStyle = collectedStyles.FindFromKey(rootShape);
       for (StyleMap::Iterator iter(inheritedStyles); iter.More(); iter.Next())
       {
         XCAFPrs_Style style = iter.Value();
