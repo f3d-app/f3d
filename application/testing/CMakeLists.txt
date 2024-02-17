@@ -585,7 +585,7 @@ if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestInvalidBREP DATA invalid.brep ARGS --verbose --load-plugins=occt NO_BASELINE)
 
   if(F3D_PLUGIN_OCCT_COLORING_SUPPORT AND NOT F3D_MACOS_BUNDLE)
-    f3d_test(NAME TestXCAFColors DATA xcaf-colors.stp DEFAULT_LIGHTS ARGS --load-plugins=occt -csy --up=+Z --camera-direction=-1,-1,-1)
+    f3d_test(NAME TestXCAFColors DATA xcaf-colors.stp DEFAULT_LIGHTS ARGS --load-plugins=occt -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
 
     file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
