@@ -35,10 +35,12 @@
 #include <TDataStd_Name.hxx>
 #include <TDocStd_Document.hxx>
 #include <XCAFApp_Application.hxx>
-#include <XCAFDoc_ColorTool.hxx>
 #include <XCAFDoc_DocumentTool.hxx>
 #include <XCAFDoc_Location.hxx>
 #include <XCAFDoc_ShapeTool.hxx>
+#include <XCAFPrs.hxx>
+#include <XCAFPrs_IndexedDataMapOfShapeStyle.hxx>
+#include <XCAFPrs_Style.hxx>
 #endif
 
 #if defined(__GNUC__)
@@ -71,6 +73,8 @@
 
 class vtkF3DOCCTReader::vtkInternals
 {
+  typedef XCAFPrs_IndexedDataMapOfShapeStyle StyleMap;
+
 public:
   //----------------------------------------------------------------------------
   explicit vtkInternals(vtkF3DOCCTReader* parent)
@@ -79,7 +83,11 @@ public:
   }
 
   //----------------------------------------------------------------------------
+#if F3D_PLUGIN_OCCT_XCAF
+  vtkSmartPointer<vtkPolyData> CreateShape(const TopoDS_Shape& shape, const TDF_Label& label)
+#else
   vtkSmartPointer<vtkPolyData> CreateShape(const TopoDS_Shape& shape)
+#endif
   {
     vtkNew<vtkPoints> points;
     vtkNew<vtkFloatArray> normals;
@@ -95,6 +103,10 @@ public:
     vtkNew<vtkCellArray> linesCells;
 
     Standard_Integer shift = 0;
+
+#if F3D_PLUGIN_OCCT_XCAF
+    const StyleMap inheritedStyles = this->CollectInheritedStyles(label, shape);
+#endif
 
     /* Mesh the whole shape. This only affect faces, edges have to be handled separately. */
     BRepMesh_IncrementalMesh(shape, this->Parent->GetLinearDeflection(),
@@ -150,19 +162,24 @@ public:
         linesCells->InsertNextCell(polyline.size(), polyline.data());
 
 #if F3D_PLUGIN_OCCT_XCAF
-        if (this->ColorTool)
+        std::array<unsigned char, 3> rgb = { 0, 0, 0 };
+        try
         {
-          std::array<unsigned char, 3> rgb = { 0, 0, 0 };
-          Quantity_Color aColor;
-          if (this->ColorTool->GetColor(edge, XCAFDoc_ColorCurv, aColor) ||
-            this->ColorTool->GetColor(shape, XCAFDoc_ColorCurv, aColor))
+          const auto style = inheritedStyles.FindFromKey(edge);
+          if (style.IsSetColorCurv())
           {
-            rgb[0] = static_cast<unsigned char>(255.0 * aColor.Red());
-            rgb[1] = static_cast<unsigned char>(255.0 * aColor.Green());
-            rgb[2] = static_cast<unsigned char>(255.0 * aColor.Blue());
+            Quantity_Color color = style.GetColorCurv();
+            rgb[0] = static_cast<unsigned char>(255.0 * color.Red());
+            rgb[1] = static_cast<unsigned char>(255.0 * color.Green());
+            rgb[2] = static_cast<unsigned char>(255.0 * color.Blue());
           }
-          colors->InsertNextTypedTuple(rgb.data());
         }
+        catch (Standard_NoSuchObject&)
+        {
+          /* ignore */
+        }
+
+        colors->InsertNextTypedTuple(rgb.data());
 #endif
 
         shift += nbV;
@@ -250,21 +267,26 @@ public:
       }
 
 #if F3D_PLUGIN_OCCT_XCAF
-      if (this->ColorTool)
+      std::array<unsigned char, 3> rgb = { 255, 255, 255 };
+      try
       {
-        std::array<unsigned char, 3> rgb = { 255, 255, 255 };
-        Quantity_Color aColor;
-        if (this->ColorTool->GetColor(face, XCAFDoc_ColorSurf, aColor) ||
-          this->ColorTool->GetColor(shape, XCAFDoc_ColorSurf, aColor))
+        const auto style = inheritedStyles.FindFromKey(face);
+        if (style.IsSetColorSurf())
         {
-          rgb[0] = static_cast<unsigned char>(255.0 * aColor.Red());
-          rgb[1] = static_cast<unsigned char>(255.0 * aColor.Green());
-          rgb[2] = static_cast<unsigned char>(255.0 * aColor.Blue());
+          Quantity_Color color = style.GetColorSurf();
+          rgb[0] = static_cast<unsigned char>(255.0 * color.Red());
+          rgb[1] = static_cast<unsigned char>(255.0 * color.Green());
+          rgb[2] = static_cast<unsigned char>(255.0 * color.Blue());
         }
-        for (int i = 1; i <= nbT; i++)
-        {
-          colors->InsertNextTypedTuple(rgb.data());
-        }
+      }
+      catch (Standard_NoSuchObject&)
+      {
+        /* ignore */
+      }
+
+      for (int i = 1; i <= nbT; i++)
+      {
+        colors->InsertNextTypedTuple(rgb.data());
       }
 #endif
 
@@ -279,7 +301,7 @@ public:
     polydata->SetLines(linesCells);
 
 #if F3D_PLUGIN_OCCT_XCAF
-    /* colors may be left empty if this->ColorTool has not been initialized */
+    /* colors may be left empty ? */
     if (colors->GetSize() > 0)
     {
       polydata->GetCellData()->SetScalars(colors);
@@ -291,6 +313,104 @@ public:
   }
 
 #if F3D_PLUGIN_OCCT_XCAF
+  StyleMap CollectInheritedStyles(const TDF_Label& label, const TopoDS_Shape& shape)
+  {
+    StyleMap inheritedStyles;
+
+    if (label.IsNull())
+    {
+      return inheritedStyles;
+    }
+
+    /* collect styled shapes from the document */
+    StyleMap collectedStyles;
+    XCAFPrs::CollectStyleSettings(label, TopLoc_Location(), collectedStyles);
+
+    /* iterate styled shapes and assign style if leaf, otherwise collect if parent node */
+    const TopAbs_ShapeEnum leafType = this->Parent->GetReadWire() ? TopAbs_EDGE : TopAbs_FACE;
+    std::vector<std::pair<TopoDS_Shape, XCAFPrs_Style> > parents;
+    for (StyleMap::Iterator iter(collectedStyles); iter.More(); iter.Next())
+    {
+      const TopoDS_Shape shape = iter.Key();
+      if (shape.ShapeType() == leafType)
+      {
+        inheritedStyles.Add(shape, iter.Value());
+      }
+      else if (shape.ShapeType() < leafType)
+      {
+        parents.push_back(std::make_pair(shape, iter.Value()));
+      }
+    }
+
+    /* sort parents from deepest upwards */
+    std::sort(parents.begin(), parents.end(),
+      [](const std::pair<TopoDS_Shape, XCAFPrs_Style>& a,
+        const std::pair<TopoDS_Shape, XCAFPrs_Style>& b)
+      { return a.first.ShapeType() > b.first.ShapeType(); });
+
+    /* pass down each parent style props to descendent edge/face leaves */
+    const auto passDownToLeaves = [&](TopAbs_ShapeEnum type)
+    {
+      for (const auto& parent : parents)
+      {
+        for (TopExp_Explorer iter(parent.first, type); iter.More(); iter.Next())
+        {
+          try
+          {
+            this->PassDownStyleProps(parent.second, inheritedStyles.ChangeFromKey(iter.Current()));
+          }
+          catch (Standard_NoSuchObject&)
+          {
+            inheritedStyles.Add(iter.Current(), parent.second);
+          }
+        }
+      }
+    };
+
+    passDownToLeaves(TopAbs_FACE);
+
+    if (this->Parent->GetReadWire())
+    {
+      passDownToLeaves(TopAbs_EDGE);
+    }
+
+    /* pass down default style (if any) to all leaves */
+    try
+    {
+      const XCAFPrs_Style defaultStyle = collectedStyles.FindFromKey(shape);
+      for (StyleMap::Iterator iter(inheritedStyles); iter.More(); iter.Next())
+      {
+        XCAFPrs_Style style = iter.Value();
+        this->PassDownStyleProps(defaultStyle, style);
+      }
+    }
+    catch (Standard_NoSuchObject&)
+    {
+      /* ignore */
+    }
+
+    return inheritedStyles;
+  }
+
+  //----------------------------------------------------------------------------
+  void PassDownStyleProps(const XCAFPrs_Style& parent, XCAFPrs_Style& child)
+  {
+    if (!child.IsSetColorCurv() && parent.IsSetColorCurv())
+    {
+      child.SetColorCurv(parent.GetColorCurv());
+    }
+
+    if (!child.IsSetColorSurf() && parent.IsSetColorSurf())
+    {
+      child.SetColorSurf(parent.GetColorSurfRGBA());
+    }
+
+    if (child.Material().IsNull() && !parent.Material().IsNull())
+    {
+      child.SetMaterial(parent.Material());
+    }
+  };
+
   //----------------------------------------------------------------------------
   void AddLabel(const TDF_Label& label, vtkMatrix4x4* position, vtkMultiBlockDataSet* mb)
   {
@@ -409,7 +529,6 @@ public:
 
   std::unordered_map<int, vtkSmartPointer<vtkPolyData> > ShapeMap;
   Handle(XCAFDoc_ShapeTool) ShapeTool;
-  Handle(XCAFDoc_ColorTool) ColorTool;
 #endif
 
   vtkF3DOCCTReader* Parent;
@@ -504,7 +623,12 @@ int vtkF3DOCCTReader::RequestData(
     if (success)
     {
       output->SetNumberOfBlocks(1);
+#if F3D_PLUGIN_OCCT_XCAF
+      const vtkSmartPointer<vtkPolyData> polydata =
+        this->Internals->CreateShape(shape, TDF_Label());
+#else
       const vtkSmartPointer<vtkPolyData> polydata = this->Internals->CreateShape(shape);
+#endif
       if (polydata && polydata->GetNumberOfCells() > 0)
       {
         output->SetBlock(1, polydata);
@@ -533,7 +657,6 @@ int vtkF3DOCCTReader::RequestData(
   }
 
   this->Internals->ShapeTool = XCAFDoc_DocumentTool::ShapeTool(doc->Main());
-  this->Internals->ColorTool = XCAFDoc_DocumentTool::ColorTool(doc->Main());
 
   TDF_LabelSequence topLevelShapes;
 
@@ -548,7 +671,7 @@ int vtkF3DOCCTReader::RequestData(
     this->Internals->ShapeTool->GetShape(label, shape);
 
     this->Internals->ShapeMap[this->Internals->GetHash(label)] =
-      this->Internals->CreateShape(shape);
+      this->Internals->CreateShape(shape, label);
 
     double progress = 0.5 + (static_cast<double>(iLabel) / topLevelShapes.Length()) / 2;
     this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
