@@ -74,7 +74,7 @@
 class vtkF3DOCCTReader::vtkInternals
 {
 #if F3D_PLUGIN_OCCT_XCAF
-  typedef XCAFPrs_IndexedDataMapOfShapeStyle StyleMap;
+  using StyleMap = XCAFPrs_IndexedDataMapOfShapeStyle;
 #endif
 
 public:
@@ -379,7 +379,7 @@ public:
     /* pass down default style (if any) to all leaves */
     try
     {
-      const XCAFPrs_Style defaultStyle = collectedStyles.FindFromKey(rootShape);
+      const XCAFPrs_Style& defaultStyle = collectedStyles.FindFromKey(rootShape);
       for (StyleMap::Iterator iter(inheritedStyles); iter.More(); iter.Next())
       {
         XCAFPrs_Style style = iter.Value();
