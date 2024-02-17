@@ -73,7 +73,9 @@
 
 class vtkF3DOCCTReader::vtkInternals
 {
+#if F3D_PLUGIN_OCCT_XCAF
   typedef XCAFPrs_IndexedDataMapOfShapeStyle StyleMap;
+#endif
 
 public:
   //----------------------------------------------------------------------------
