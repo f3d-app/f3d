@@ -328,38 +328,36 @@ public:
     StyleMap collectedStyles;
     XCAFPrs::CollectStyleSettings(rootLabel, TopLoc_Location(), collectedStyles);
 
-    /* iterate styled shapes and assign style if leaf, otherwise collect if parent node */
+    /* iterate styled shapes and collect sorted by ascending shape type depth */
+    const auto cmp = [](const TopoDS_Shape& a, const TopoDS_Shape& b)
+    { return a.ShapeType() > b.ShapeType(); };
+    std::multimap<TopoDS_Shape, XCAFPrs_Style, decltype(cmp)> styledShapes(cmp);
+
     const TopAbs_ShapeEnum leafType = this->Parent->GetReadWire() ? TopAbs_EDGE : TopAbs_FACE;
-    std::vector<std::pair<TopoDS_Shape, XCAFPrs_Style> > parents;
     for (StyleMap::Iterator iter(collectedStyles); iter.More(); iter.Next())
     {
       const TopoDS_Shape& shape = iter.Key();
       if (shape.ShapeType() <= leafType)
       {
-        parents.emplace_back(std::make_pair(shape, iter.Value()));
+        styledShapes.insert({ shape, iter.Value() });
       }
     }
-
-    /* sort parents from deepest upwards */
-    std::sort(parents.begin(), parents.end(),
-      [](const std::pair<TopoDS_Shape, XCAFPrs_Style>& a,
-        const std::pair<TopoDS_Shape, XCAFPrs_Style>& b)
-      { return a.first.ShapeType() > b.first.ShapeType(); });
 
     /* pass down each parent style props to descendent edge/face leaves */
     const auto passDownToLeaves = [&](TopAbs_ShapeEnum type)
     {
-      for (const auto& parent : parents)
+      for (const auto& styledShape : styledShapes)
       {
-        for (TopExp_Explorer iter(parent.first, type); iter.More(); iter.Next())
+        for (TopExp_Explorer iter(styledShape.first, type); iter.More(); iter.Next())
         {
           try
           {
-            this->PassDownStyleProps(parent.second, inheritedStyles.ChangeFromKey(iter.Current()));
+            this->PassDownStyleProps(
+              styledShape.second, inheritedStyles.ChangeFromKey(iter.Current()));
           }
           catch (Standard_NoSuchObject&)
           {
-            inheritedStyles.Add(iter.Current(), parent.second);
+            inheritedStyles.Add(iter.Current(), styledShape.second);
           }
         }
       }
