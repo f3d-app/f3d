@@ -178,7 +178,7 @@ public:
         }
         catch (Standard_NoSuchObject&)
         {
-          /* ignore */
+          /* edge has no style, safe to ignore */
         }
 
         colors->InsertNextTypedTuple(rgb.data());
@@ -283,7 +283,7 @@ public:
       }
       catch (Standard_NoSuchObject&)
       {
-        /* ignore */
+        /* face has no style, safe to ignore */
       }
 
       for (int i = 1; i <= nbT; i++)
@@ -388,7 +388,7 @@ public:
     }
     catch (Standard_NoSuchObject&)
     {
-      /* ignore */
+      /* root shape has no style, safe to ignore */
     }
 
     return inheritedStyles;
