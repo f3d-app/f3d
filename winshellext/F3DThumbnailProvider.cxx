@@ -188,6 +188,13 @@ IFACEMETHODIMP F3DThumbnailProvider::GetThumbnail(UINT cx, HBITMAP* phbmp, WTS_A
   // Clean up
   DWORD exitCode = EXIT_SUCCESS;
   GetExitCodeProcess(pi.hProcess, &exitCode);
+  
+  // Terminate the process if it is still active
+  if (exitCode == STILL_ACTIVE)
+  {
+    TerminateProcess(pi.hProcess, EXIT_FAILURE);
+    GetExitCodeProcess(pi.hProcess, &exitCode);
+  }
 
   CloseHandle(pi.hThread);
   CloseHandle(pi.hProcess);
