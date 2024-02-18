@@ -334,11 +334,7 @@ public:
     for (StyleMap::Iterator iter(collectedStyles); iter.More(); iter.Next())
     {
       const TopoDS_Shape& shape = iter.Key();
-      if (shape.ShapeType() == leafType)
-      {
-        inheritedStyles.Add(shape, iter.Value());
-      }
-      else if (shape.ShapeType() < leafType)
+      if (shape.ShapeType() <= leafType)
       {
         parents.emplace_back(std::make_pair(shape, iter.Value()));
       }
