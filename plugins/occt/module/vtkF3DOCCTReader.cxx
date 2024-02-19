@@ -98,9 +98,11 @@ public:
     vtkNew<vtkFloatArray> uvs;
     uvs->SetNumberOfComponents(2);
     uvs->SetName("UV");
+#if F3D_PLUGIN_OCCT_XCAF
     vtkNew<vtkUnsignedCharArray> colors;
     colors->SetNumberOfComponents(3);
     colors->SetName("Colors");
+#endif
     vtkNew<vtkCellArray> trianglesCells;
     vtkNew<vtkCellArray> linesCells;
 
@@ -303,11 +305,7 @@ public:
     polydata->SetLines(linesCells);
 
 #if F3D_PLUGIN_OCCT_XCAF
-    /* colors may be left empty ? */
-    if (colors->GetSize() > 0)
-    {
-      polydata->GetCellData()->SetScalars(colors);
-    }
+    polydata->GetCellData()->SetScalars(colors);
 #endif
 
     polydata->Squeeze();
