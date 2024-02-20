@@ -266,12 +266,7 @@ protected:
    * Otherwise, use component #index as the default value.
    */
   std::string ComponentToString(int component);
-
-  /**
-   * Shorten a provided name with "..."
-   */
-  static std::string ShortName(const std::string& name, int component);
-
+  
   vtkWeakPointer<vtkF3DGenericImporter> Importer = nullptr;
 
   vtkNew<vtkScalarBarActor> ScalarBarActor;

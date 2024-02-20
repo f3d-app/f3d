@@ -962,7 +962,7 @@ void vtkF3DRendererWithColoring::FillCheatSheetHotkeys(std::stringstream& cheatS
   cheatSheetText << " C: Cell scalars coloring [" << (this->UseCellColoring ? "ON" : "OFF")
                  << "]\n";
   cheatSheetText << " S: Scalars coloring ["
-                 << (hasColoring ? vtkF3DRendererWithColoring::ShortName(info.Name, 19) : "OFF")
+                 << (hasColoring ? vtkF3DRenderer::ShortName(info.Name, 19) : "OFF")
                  << "]\n";
   cheatSheetText << " Y: Coloring component ["
                  << vtkF3DRendererWithColoring::ComponentToString(this->ComponentForColoring)
@@ -1089,18 +1089,5 @@ std::string vtkF3DRendererWithColoring::ComponentToString(int component)
       componentName += std::to_string(component);
     }
     return componentName;
-  }
-}
-
-//----------------------------------------------------------------------------
-std::string vtkF3DRendererWithColoring::ShortName(const std::string& name, int maxChar)
-{
-  if (name.size() <= static_cast<size_t>(maxChar) || maxChar <= 3)
-  {
-    return name;
-  }
-  else
-  {
-    return name.substr(0, maxChar - 3) + "...";
   }
 }
