@@ -671,7 +671,7 @@ f3d_test(NAME TestInteractionMisc DATA cow.vtp NO_BASELINE INTERACTION) #KK
 f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION DEFAULT_LIGHTS) #VCCC
 f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION DEFAULT_LIGHTS) #SYYYY
 f3d_test(NAME TestInteractionCycleScalars DATA dragon.vtu INTERACTION DEFAULT_LIGHTS) #BSSSS
-f3d_test(NAME TestInteractionCycleAnimation DATA InterpolationTest.glb INTERACTION DEFAULT_LIGHTS) #WWWWWWWWW;Space;Space;
+f3d_test(NAME TestInteractionCycleAnimation DATA InterpolationTest.glb INTERACTION DEFAULT_LIGHTS) #WWWWWWWWWWW;Space;Space;
 f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION DEFAULT_LIGHTS) #VI
 f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-size=20 INTERACTION DEFAULT_LIGHTS) #O
 f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalars DEFAULT_LIGHTS) #Right;Right;Right;Left;Up;
