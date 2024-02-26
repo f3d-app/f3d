@@ -12,9 +12,9 @@ vtk_module_scan(
 # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9192
 vtk_module_build(
   MODULES ${modules}
-  INSTALL_EXPORT "f3dPluginTargets"
+  INSTALL_EXPORT "f3dVTKExtensionsTargets"
   INSTALL_HEADERS ON
   HEADERS_COMPONENT plugin_sdk
 #  HEADERS_EXCLUDE_FROM_ALL ON https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10889
   TARGETS_COMPONENT vtkext
-  PACKAGE "f3d-VTKExtensions-public")
+  PACKAGE "f3dVTKExtensions")
