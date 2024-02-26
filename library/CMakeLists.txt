@@ -9,7 +9,7 @@ set(F3D_VTK_MODULES
   f3d::VTKExtensionsCore
   f3d::VTKExtensionsReaders
   f3d::VTKExtensionsRendering
-  f3d::VTKExtensionsPublic
+#  f3d::VTKExtensionsPublic
 )
 
 # Check modules
@@ -240,11 +240,11 @@ if(BUILD_SHARED_LIBS)
     COMPONENT sdk
     EXCLUDE_FROM_ALL)
 
-#  install(EXPORT f3dPluginTargets
-#    NAMESPACE f3d::
-#   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
-#    COMPONENT plugin_sdk
-#    EXCLUDE_FROM_ALL)
+  install(EXPORT f3dPluginTargets
+    NAMESPACE f3d::
+   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
+    COMPONENT plugin_sdk
+    EXCLUDE_FROM_ALL)
 
   configure_package_config_file(
     "${F3D_SOURCE_DIR}/cmake/f3dPluginConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dPluginConfig.cmake"
