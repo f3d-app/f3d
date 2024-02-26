@@ -518,8 +518,8 @@ if(F3D_PLUGIN_BUILD_DRACO)
 
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10884
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
-    f3d_test(NAME TestGLTFDracoImporter DATA Box_draco.gltf ARGS --camera-position=-1.6,1.3,2.7)
-    f3d_test(NAME TestGLTFDracoReader DATA Box_draco.gltf ARGS --geometry-only --camera-position=-1.6,1.3,2.7)
+    f3d_test(NAME TestGLTFDracoImporter DATA Box_draco.gltf ARGS --load-plugins=draco --camera-position=-1.6,1.3,2.7)
+    f3d_test(NAME TestGLTFDracoReader DATA Box_draco.gltf ARGS --load-plugins=draco --geometry-only --camera-position=-1.6,1.3,2.7)
   endif()
 
   if(NOT F3D_MACOS_BUNDLE)
