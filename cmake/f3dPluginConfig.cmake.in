@@ -1,0 +1,13 @@
+# When this file is run by CMake through the find_package command, the
+# following targets will exist:
+#
+#   f3d::f3dPlugin        Target that ?
+#
+#   f3d_PLUGINS_INSTALL_DIR        Relative path to F3D plugins install directory
+
+@PACKAGE_INIT@
+
+set(f3d_PLUGINS_INSTALL_DIR "@F3D_PLUGINS_INSTALL_DIR@")
+
+include("${CMAKE_CURRENT_LIST_DIR}/f3dPlugin.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/f3dPluginTargets.cmake")
