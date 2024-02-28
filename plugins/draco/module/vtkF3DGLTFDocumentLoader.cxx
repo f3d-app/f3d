@@ -81,6 +81,8 @@ std::vector<char> DecodeVertexBuffer(
 std::vector<char> DecodeVertexBuffer(vtkGLTFDocumentLoader::ComponentType compType,
   const std::unique_ptr<draco::Mesh>& mesh, int attIndex)
 {
+  (void)compType;
+
   const draco::PointAttribute* attribute = mesh->GetAttributeByUniqueId(attIndex);
 
   assert(compType == vtkGLTFDocumentLoader::ComponentType::FLOAT);
