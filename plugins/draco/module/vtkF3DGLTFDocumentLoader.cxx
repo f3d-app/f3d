@@ -82,23 +82,10 @@ std::vector<char> DecodeVertexBuffer(vtkGLTFDocumentLoader::ComponentType compTy
   const std::unique_ptr<draco::Mesh>& mesh, int attIndex)
 {
   const draco::PointAttribute* attribute = mesh->GetAttributeByUniqueId(attIndex);
-  switch (compType)
-  {
-    case vtkGLTFDocumentLoader::ComponentType::UNSIGNED_BYTE:
-      return DecodeVertexBuffer<uint8_t>(mesh, attribute);
-    case vtkGLTFDocumentLoader::ComponentType::BYTE:
-      return DecodeVertexBuffer<int8_t>(mesh, attribute);
-    case vtkGLTFDocumentLoader::ComponentType::UNSIGNED_SHORT:
-      return DecodeVertexBuffer<uint16_t>(mesh, attribute);
-    case vtkGLTFDocumentLoader::ComponentType::SHORT:
-      return DecodeVertexBuffer<int16_t>(mesh, attribute);
-    case vtkGLTFDocumentLoader::ComponentType::UNSIGNED_INT:
-      return DecodeVertexBuffer<uint32_t>(mesh, attribute);
-    case vtkGLTFDocumentLoader::ComponentType::FLOAT:
-      return DecodeVertexBuffer<float>(mesh, attribute);
-  }
 
-  return {};
+  assert(compType == vtkGLTFDocumentLoader::ComponentType::FLOAT);
+
+  return DecodeVertexBuffer<float>(mesh, attribute);
 }
 }
 
@@ -136,11 +123,11 @@ void vtkF3DGLTFDocumentLoader::PrepareData()
         {
           const std::unique_ptr<draco::Mesh>& mesh = decodeResult.value();
 
-          auto& accessor = model->Accessors[primitive.IndicesId];
-
           // handle index buffer
           if (primitive.IndicesId >= 0)
           {
+            auto& accessor = model->Accessors[primitive.IndicesId];
+
             model->Buffers.emplace_back(::DecodeIndexBuffer(mesh, accessor.ComponentTypeValue));
 
             vtkGLTFDocumentLoader::BufferView decodedIndexBufferView;
