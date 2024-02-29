@@ -1176,7 +1176,7 @@ private:
   class DiagDelegate : public pxr::TfDiagnosticMgr::Delegate
   {
   public:
-    DiagDelegate(vtkF3DUSDImporter* parent)
+    explicit DiagDelegate(vtkF3DUSDImporter* parent)
       : Parent(parent)
     {
     }
