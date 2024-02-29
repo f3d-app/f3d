@@ -242,7 +242,7 @@ if(BUILD_SHARED_LIBS)
 
   configure_package_config_file(
     "${F3D_SOURCE_DIR}/cmake/f3dPluginConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dPluginConfig.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d")
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3dPlugin")
 
   install(
     FILES
@@ -253,7 +253,7 @@ if(BUILD_SHARED_LIBS)
       "${F3D_SOURCE_DIR}/cmake/plugin.thumbnailer.in"
       "${F3D_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
     DESTINATION
-      "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
+      "${CMAKE_INSTALL_LIBDIR}/cmake/f3dPlugin"
     COMPONENT plugin_sdk
     EXCLUDE_FROM_ALL)
 
