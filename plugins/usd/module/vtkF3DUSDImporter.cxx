@@ -79,6 +79,12 @@
 class vtkF3DUSDImporter::vtkInternals
 {
 public:
+  explicit vtkInternals(vtkF3DUSDImporter* parent)
+    : Delegate(parent)
+  {
+    pxr::TfDiagnosticMgr::GetInstance().AddDelegate(&this->Delegate);
+  }
+
   void ReadScene(const std::string& filePath)
   {
     // in case of failure, you may want to set PXR_PLUGINPATH_NAME to the lib/usd path
@@ -1166,6 +1172,44 @@ private:
   std::unordered_map<std::string, vtkSmartPointer<vtkProperty> > ShaderMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkImageData> > TextureMap;
   double CurrentTime = 0.0;
+
+  class DiagDelegate : public pxr::TfDiagnosticMgr::Delegate
+  {
+  public:
+    explicit DiagDelegate(vtkF3DUSDImporter* parent)
+      : Parent(parent)
+    {
+    }
+
+    void IssueError(const pxr::TfError& err) override
+    {
+      vtkErrorWithObjectMacro(this->Parent, << err.GetCommentary());
+    }
+
+    void IssueFatalError(const pxr::TfCallContext&, const std::string& msg) override
+    {
+      vtkErrorWithObjectMacro(this->Parent, << msg);
+    }
+
+    void IssueStatus(const pxr::TfStatus& status) override
+    {
+#ifdef NDEBUG
+      (void)status;
+#else
+      vtkDebugWithObjectMacro(this->Parent, << status.GetCommentary());
+#endif
+    }
+
+    void IssueWarning(const pxr::TfWarning& warn) override
+    {
+      vtkWarningWithObjectMacro(this->Parent, << warn.GetCommentary());
+    }
+
+  private:
+    vtkF3DUSDImporter* Parent = nullptr;
+  };
+
+  DiagDelegate Delegate;
 };
 
 vtkStandardNewMacro(vtkF3DUSDImporter);
@@ -1174,7 +1218,7 @@ vtkInformationKeyMacro(vtkF3DUSDImporter, TCOORDS_NAME, String);
 
 //----------------------------------------------------------------------------
 vtkF3DUSDImporter::vtkF3DUSDImporter()
-  : Internals(new vtkF3DUSDImporter::vtkInternals())
+  : Internals(new vtkF3DUSDImporter::vtkInternals(this))
 {
 }
 
