@@ -1194,9 +1194,9 @@ private:
     void IssueStatus(const pxr::TfStatus& status) override
     {
 #ifdef NDEBUG
-      vtkDebugWithObjectMacro(this->Parent, << status.GetCommentary());
-#else
       (void)status;
+#else
+      vtkDebugWithObjectMacro(this->Parent, << status.GetCommentary());
 #endif
     }
 
