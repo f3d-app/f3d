@@ -1181,10 +1181,6 @@ private:
     {
     }
 
-    ~DiagDelegate() override
-    {
-    }
-
     void IssueError(const pxr::TfError& err) override
     {
       vtkErrorWithObjectMacro(this->Parent, << err.GetCommentary());
@@ -1197,7 +1193,11 @@ private:
 
     void IssueStatus(const pxr::TfStatus& status) override
     {
+#ifdef NDEBUG
       vtkDebugWithObjectMacro(this->Parent, << status.GetCommentary());
+#else
+      (void)status;
+#endif
     }
 
     void IssueWarning(const pxr::TfWarning& warn) override
