@@ -79,7 +79,7 @@
 class vtkF3DUSDImporter::vtkInternals
 {
 public:
-  vtkInternals(vtkF3DUSDImporter* parent)
+  explicit vtkInternals(vtkF3DUSDImporter* parent)
     : Delegate(parent)
   {
     pxr::TfDiagnosticMgr::GetInstance().AddDelegate(&this->Delegate);
