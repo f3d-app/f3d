@@ -205,9 +205,8 @@ options::options()
   this->Internals->init("model.scivis.cells", false);
   this->Internals->init("model.scivis.array-name", F3D_RESERVED_STRING);
   this->Internals->init("model.scivis.component", -1);
-  this->Internals->init("model.scivis.colormap",
-    std::vector<double>{
-      0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 });
+  this->Internals->init("model.scivis.colormap.preset", std::string("inferno"));
+  this->Internals->init("model.scivis.colormap", std::vector<double>{ 0 });
   this->Internals->init("model.scivis.range", std::vector<double>{ 0 });
 
   // XXX: Rename into a "rendering-mode" option: https://github.com/f3d-app/f3d/issues/345

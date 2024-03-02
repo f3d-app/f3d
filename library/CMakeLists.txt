@@ -56,6 +56,7 @@ configure_file(
 set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/animationManager.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/camera_impl.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/colormap_presets.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/engine.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/src/factory.cxx

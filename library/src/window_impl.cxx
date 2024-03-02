@@ -1,6 +1,7 @@
 #include "window_impl.h"
 
 #include "camera_impl.h"
+#include "colormap_presets.h"
 #include "engine.h"
 #include "log.h"
 #include "options.h"
@@ -447,8 +448,18 @@ void window_impl::UpdateDynamicOptions()
       this->Internals->Options.getAsInt("model.scivis.component"));
     this->Internals->Renderer->SetScalarBarRange(
       this->Internals->Options.getAsDoubleVector("model.scivis.range"));
-    this->Internals->Renderer->SetColormap(
-      this->Internals->Options.getAsDoubleVector("model.scivis.colormap"));
+
+    if (this->Internals->Options.getAsDoubleVector("model.scivis.colormap").size() > 1)
+    {
+      this->Internals->Renderer->SetColormap(
+        this->Internals->Options.getAsDoubleVector("model.scivis.colormap"));
+    }
+    else
+    {
+      this->Internals->Renderer->SetColormap(
+        ColorMapPresets.at(this->Internals->Options.getAsString("model.scivis.colormap.preset")));
+    }
+
     this->Internals->Renderer->ShowScalarBar(this->Internals->Options.getAsBool("ui.bar"));
 
     this->Internals->Renderer->SetUsePointSprites(

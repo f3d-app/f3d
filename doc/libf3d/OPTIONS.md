@@ -47,6 +47,7 @@ model.material.texture|string<br>-<br>render|Path to a texture file that sets th
 model.normal.scale|double<br>1.0<br>render|Normal scale affects the strength of the normal deviation from the normal texture.|\-\-normal-scale
 model.normal.texture|string<br>-<br>render|Path to a texture file that sets the normal map of the object.|\-\-texture-normal
 model.scivis.cells|bool<br>false<br>render|Color the data with value found *on the cells* instead of points|\-\-cells
+model.scivis.colormap-preset|string<br>\<inferno\><br>render|Set a *colormap preset for the coloring*.<br>Valid values are: inferno, todo, todo|\-\-colormap-preset
 model.scivis.colormap|vector\<double\><br>\<inferno\><br>render|Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).|\-\-colormap
 model.scivis.component|int<br>-1<br>render|Specify the component to color with. -1 means *magnitude*. -2 means *direct values*.|\-\-comp
 model.scivis.array-name|string<br>\<reserved\><br>render|*Color by a specific data array* present in on the data. Set to <empty> to let libf3d find the first available array.|\-\-scalars
