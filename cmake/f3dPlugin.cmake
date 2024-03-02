@@ -270,7 +270,7 @@ macro(f3d_plugin_build)
   if(DEFINED f3d_INCLUDE_DIR)
     # External plugin path
     set(_f3d_has_application "${f3d_BUILD_APPLICATION}")
-    set(_f3d_include_path "${f3d_INCLUDE_DIR}/f3d")
+    set(_f3d_include_path "${f3d_INCLUDE_DIR}/f3dPlugin")
     set(_f3d_config_dir ${f3d_CONFIG_DIR})
     set(_f3d_plugins_install_dir ${f3d_PLUGINS_INSTALL_DIR})
   else()

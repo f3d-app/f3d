@@ -4,10 +4,10 @@ project(example-plugin)
 
 include(GNUInstallDirs)
 
-find_package(f3d REQUIRED)
-if(NOT f3d_PLUGIN_SDK)
-  message(FATAL_ERROR "F3D found but plugin SDK is not installed")
-endif()
+find_package(f3dPlugin REQUIRED)
+#if(NOT f3d_PLUGIN_SDK)
+#  message(FATAL_ERROR "F3D found but plugin SDK is not installed")
+#endif()
 
 f3d_plugin_init()
 

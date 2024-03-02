@@ -15,6 +15,6 @@ vtk_module_build(
   INSTALL_EXPORT "f3dVTKExtensionsTargets"
   INSTALL_HEADERS ON
   HEADERS_COMPONENT plugin_sdk
-#  HEADERS_EXCLUDE_FROM_ALL ON https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10889
+  HEADERS_EXCLUDE_FROM_ALL ON
   TARGETS_COMPONENT vtkext
   PACKAGE "f3dPlugin")

@@ -74,6 +74,11 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
   )
 
+set(F3D_PLUGIN_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/plugin/reader.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.h
+  )
+
 add_library(libf3d
   ${F3D_SOURCE_FILES}
   )
@@ -243,6 +248,11 @@ if(BUILD_SHARED_LIBS)
   configure_package_config_file(
     "${F3D_SOURCE_DIR}/cmake/f3dPluginConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dPluginConfig.cmake"
     INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3dPlugin")
+
+  install(FILES ${F3D_PLUGIN_HEADERS}
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3dPlugin"
+    COMPONENT plugin_sdk
+    EXCLUDE_FROM_ALL)
 
   install(
     FILES
