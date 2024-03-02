@@ -5,7 +5,6 @@ project(example-plugin)
 include(GNUInstallDirs)
 
 find_package(f3dPlugin REQUIRED)
-find_package(f3d REQUIRED)
 #if(NOT f3d_PLUGIN_SDK)
 #  message(FATAL_ERROR "F3D found but plugin SDK is not installed")
 #endif()
@@ -31,6 +30,7 @@ f3d_plugin_build(
 
 if(BUILD_TESTING)
   enable_testing()
+  find_package(f3d REQUIRED)
   add_test(NAME TestPluginExample
           COMMAND "$<TARGET_FILE:f3d::f3d>"
                   "--dry-run"
