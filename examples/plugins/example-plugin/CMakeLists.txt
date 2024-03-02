@@ -5,6 +5,7 @@ project(example-plugin)
 include(GNUInstallDirs)
 
 find_package(f3dPlugin REQUIRED)
+find_package(f3d REQUIRED)
 #if(NOT f3d_PLUGIN_SDK)
 #  message(FATAL_ERROR "F3D found but plugin SDK is not installed")
 #endif()
