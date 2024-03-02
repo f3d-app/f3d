@@ -51,6 +51,10 @@ public:
   void DisableAllAnimation();
   int GetAnimationIndex();
 
+  /**
+   * Return the current animation name if any
+   * Can be called before initialization safely
+   */
   std::string GetAnimationName();
 
   /**

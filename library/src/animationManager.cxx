@@ -19,6 +19,7 @@ namespace f3d::detail
 bool animationManager::Initialize(
   const options* options, window* window, interactor_impl* interactor, vtkImporter* importer)
 {
+  assert(importer);
   this->HasAnimation = false;
   this->Playing = false;
   this->CurrentTime = 0;
@@ -260,6 +261,7 @@ void animationManager::Tick()
 //----------------------------------------------------------------------------
 bool animationManager::LoadAtTime(double timeValue)
 {
+  assert(this->Importer);
   if (!this->HasAnimation)
   {
     return false;
@@ -316,6 +318,11 @@ int animationManager::GetAnimationIndex()
 // ---------------------------------------------------------------------------------
 std::string animationManager::GetAnimationName()
 {
+  if (!this->Importer)
+  {
+    return "";
+  }
+
   if (this->AnimationIndex == -1)
   {
     return "All Animations";
@@ -325,6 +332,7 @@ std::string animationManager::GetAnimationName()
 //----------------------------------------------------------------------------
 void animationManager::EnableAllAnimation()
 {
+  assert(this->Importer);
   if (this->AnimationIndex == this->AvailAnimations - 1)
   {
     for (int i = 0; i < this->AvailAnimations; i++)
@@ -340,6 +348,7 @@ void animationManager::EnableAllAnimation()
 //----------------------------------------------------------------------------
 void animationManager::DisableAllAnimation()
 {
+  assert(this->Importer);
   if (this->AnimationIndex == this->AvailAnimations - 1)
   {
     for (int i = 0; i < this->AvailAnimations; i++)
