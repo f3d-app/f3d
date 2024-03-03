@@ -261,11 +261,13 @@ runs:
       working-directory: ${{github.workspace}}/build
       run: cmake --install . --component plugin_sdk
 
+      # CMAKE_MODULE_PATH is required because of
+      # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
     - name: Build plugin examples
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -DVTK_DIR=$(pwd)/dependencies/install/lib/cmake/vtk -Df3d_DIR=$(pwd)/install/lib/cmake/f3d -Df3dPlugin_DIR:PATH=$(pwd)/install/lib/cmake/f3dPlugin -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }} -B build_plugins source/examples/plugins
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -DCMAKE_MODULE_PATH=$(pwd)/dependencies/install/lib/cmake/OpenVDB/ -Df3d_DIR=$(pwd)/install/lib/cmake/f3d -Df3dPlugin_DIR:PATH=$(pwd)/install/lib/cmake/f3dPlugin -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }} -B build_plugins source/examples/plugins
         cmake --build build_plugins --config Release
 
     - name: Test plugin examples
