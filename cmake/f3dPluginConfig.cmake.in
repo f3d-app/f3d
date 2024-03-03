@@ -12,10 +12,7 @@ set(f3d_PLUGINS_INSTALL_DIR "@F3D_PLUGINS_INSTALL_DIR@")
 set(f3d_CONFIG_DIR "@f3d_config_dir@")
 set_and_check(f3d_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/include")
 
-find_package(VTK 9.0 REQUIRED COMPONENTS
-  CommonCore
-  CommonExecutionModel
-  IOImport)
-
+# Find VTK at top level as f3dPlugin-targets need it
+find_package(VTK 9.0 REQUIRED COMPONENTS CommonCore CommonExecutionModel IOImport)
 include("${CMAKE_CURRENT_LIST_DIR}/f3dPlugin.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/f3dPlugin-targets.cmake")
