@@ -10,7 +10,8 @@ vtk_module_scan(
 
 # We need HEADERS_COMPONENT because of a bug in vtk_module_build in VTK <= 9.1
 # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9192
-# Installed as part of the plugin SDK
+# The headers and all "dev" part are installed as part of the plugin SDK
+# The library itself is installed as part of the library
 vtk_module_build(
   MODULES ${modules}
   INSTALL_EXPORT "f3dVTKExtensionsTargets"
@@ -18,5 +19,5 @@ vtk_module_build(
   HEADERS_COMPONENT plugin_sdk
 #HEADERS_EXCLUDE_FROM_ALL ON
   HEADERS_DESTINATION "include/f3dPlugin"
-  TARGETS_COMPONENT vtkext
+  TARGETS_COMPONENT library
   PACKAGE "f3dPlugin")
