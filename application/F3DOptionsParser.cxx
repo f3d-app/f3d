@@ -205,7 +205,7 @@ private:
   std::string FilePathForConfigBlock;
 
   using DictionaryEntry = std::map<std::string, std::string>;
-  using Dictionary = std::map<std::string, DictionaryEntry>;
+  using Dictionary = std::vector<std::pair<std::string, DictionaryEntry> >;
   DictionaryEntry GlobalConfigDicEntry;
   Dictionary ConfigDic;
   std::string ExecutableName;
@@ -746,7 +746,7 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
       return false;
     }
 
-    nlohmann::json json;
+    nlohmann::ordered_json json;
     try
     {
       file >> json;
@@ -783,7 +783,7 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
       }
       else
       {
-        this->ConfigDic[regexpConfig.key()] = localDic;
+        this->ConfigDic.emplace_back(regexpConfig.key(), localDic);
       }
     }
   }
