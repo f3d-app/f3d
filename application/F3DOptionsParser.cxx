@@ -68,8 +68,8 @@ protected:
     bool ret = false;
     if (this->FilePathForConfigBlock.empty())
     {
-      auto localIt = this->GlobalConfigDicEntry.find(option);
-      if (localIt != this->GlobalConfigDicEntry.end())
+      auto localIt = this->GlobalConfigEntry.find(option);
+      if (localIt != this->GlobalConfigEntry.end())
       {
         configValue = localIt->second;
         ret = true;
@@ -77,7 +77,7 @@ protected:
     }
     else
     {
-      for (auto const& it : this->ConfigDic)
+      for (auto const& it : this->RegexConfigEntries)
       {
         std::regex re(it.first, std::regex_constants::icase);
         std::smatch matches;
@@ -204,10 +204,10 @@ private:
 
   std::string FilePathForConfigBlock;
 
-  using DictionaryEntry = std::map<std::string, std::string>;
-  using Dictionary = std::map<std::string, DictionaryEntry>;
-  DictionaryEntry GlobalConfigDicEntry;
-  Dictionary ConfigDic;
+  using ConfigEntry = std::map<std::string, std::string>;
+  using ConfigEntries = std::vector<std::pair<std::string, ConfigEntry> >;
+  ConfigEntry GlobalConfigEntry;
+  ConfigEntries RegexConfigEntries;
   std::string ExecutableName;
   std::vector<std::string> AllLongOptions;
 };
@@ -671,7 +671,7 @@ void ConfigurationOptions::PrintReadersList()
 //----------------------------------------------------------------------------
 bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string& config)
 {
-  this->ConfigDic.clear();
+  this->RegexConfigEntries.clear();
 
   std::string configSearch = "config";
   if (!config.empty())
@@ -746,7 +746,7 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
       return false;
     }
 
-    nlohmann::json json;
+    nlohmann::ordered_json json;
     try
     {
       file >> json;
@@ -779,11 +779,11 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
       }
       if (regexpConfig.key() == "global")
       {
-        this->GlobalConfigDicEntry = localDic;
+        this->GlobalConfigEntry = localDic;
       }
       else
       {
-        this->ConfigDic[regexpConfig.key()] = localDic;
+        this->RegexConfigEntries.emplace_back(regexpConfig.key(), localDic);
       }
     }
   }
