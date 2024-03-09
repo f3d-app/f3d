@@ -29,7 +29,6 @@
 #include <TopoDS_Solid.hxx>
 
 #if F3D_PLUGIN_OCCT_XCAF
-#include <Standard_Version.hxx>
 #include <IGESCAFControl_Reader.hxx>
 #include <Standard_Version.hxx>
 #include <STEPCAFControl_Reader.hxx>
