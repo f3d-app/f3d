@@ -8,6 +8,6 @@ DEPENDS
   VTK::FiltersSources
   VTK::IOImport
   VTK::IOImage
-  f3d::VTKExtensionsPublic
+  f3d::vtkext
 TEST_DEPENDS
   VTK::TestingCore
