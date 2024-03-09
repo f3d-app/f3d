@@ -29,6 +29,7 @@
 #include <TopoDS_Solid.hxx>
 
 #if F3D_PLUGIN_OCCT_XCAF
+#include <Standard_Version.hxx>
 #include <IGESCAFControl_Reader.hxx>
 #include <STEPCAFControl_Reader.hxx>
 #include <TDF_ChildIterator.hxx>
@@ -487,7 +488,11 @@ public:
   int GetHash(const TDF_Label& label)
   {
     TopoDS_Shape aShape;
+#if OCC_VERSION_HEX < 0x070800
     return this->ShapeTool->GetShape(label, aShape) ? aShape.HashCode(INT_MAX) : 0;
+#else
+    return this->ShapeTool->GetShape(label, aShape) ? std::hash<TopoDS_Shape>{}(aShape) : 0;
+#endif
   }
 
   //----------------------------------------------------------------------------
