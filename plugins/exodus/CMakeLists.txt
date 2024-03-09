@@ -6,7 +6,7 @@ include(GNUInstallDirs)
 
 # Check if the plugin is built externally
 if(PROJECT_IS_TOP_LEVEL)
-  find_package(f3dPlugin REQUIRED)
+  find_package(f3d REQUIRED plugin)
 else()
   include(f3dPlugin)
 endif()

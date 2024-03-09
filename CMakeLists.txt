@@ -206,7 +206,7 @@ endif()
 cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
 
 # Build VTK extension moddules
-add_subdirectory(VTKExtensions)
+add_subdirectory(vtkext)
 
 # plugins
 option(F3D_PLUGINS_STATIC_BUILD "Make all plugins static (embedded into libf3d) and automatically loaded by F3D" ON)

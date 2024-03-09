@@ -175,6 +175,21 @@ install(TARGETS f3d
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT application
   BUNDLE DESTINATION "." COMPONENT application)
 
+# The targets and config file are only installed with the sdk
+install(EXPORT f3dTargets
+  NAMESPACE f3d::
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
+  COMPONENT sdk
+  EXCLUDE_FROM_ALL)
+
+install(
+  FILES
+    "${F3D_SOURCE_DIR}/cmake/application-config.cmake"
+  DESTINATION
+    "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
+  COMPONENT sdk
+  EXCLUDE_FROM_ALL)
+
 # Default config files
 install(
   DIRECTORY "${F3D_SOURCE_DIR}/resources/configs/"

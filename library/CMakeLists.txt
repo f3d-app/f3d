@@ -9,7 +9,7 @@ set(F3D_VTK_MODULES
   f3d::VTKExtensionsCore
   f3d::VTKExtensionsReaders
   f3d::VTKExtensionsRendering
-  f3d::VTKExtensionsPublic
+  f3d::vtkext
 )
 
 # Check modules
@@ -200,7 +200,7 @@ endif()
 # Installing
 if(BUILD_SHARED_LIBS)
   install(TARGETS libf3d
-    EXPORT f3dTargets
+    EXPORT f3dLibraryTargets
     RUNTIME_DEPENDENCY_SET libf3dDeps
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT sdk EXCLUDE_FROM_ALL
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT library
@@ -219,7 +219,7 @@ if(BUILD_SHARED_LIBS)
     COMPONENT sdk
     EXCLUDE_FROM_ALL)
 
-  install(EXPORT f3dTargets
+  install(EXPORT f3dLibraryTargets
     NAMESPACE f3d::
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
     COMPONENT sdk
@@ -239,31 +239,28 @@ if(BUILD_SHARED_LIBS)
     FILES
       "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
       "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
+      "${F3D_SOURCE_DIR}/cmake/library-config.cmake"
       "${F3D_SOURCE_DIR}/cmake/f3dEmbed.cmake"
     DESTINATION
       "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
     COMPONENT sdk
     EXCLUDE_FROM_ALL)
 
-  configure_package_config_file(
-    "${F3D_SOURCE_DIR}/cmake/f3dPluginConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dPluginConfig.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3dPlugin")
-
   install(FILES ${F3D_PLUGIN_HEADERS}
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3dPlugin"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"
     COMPONENT plugin_sdk
     EXCLUDE_FROM_ALL)
 
   install(
     FILES
-      "${CMAKE_BINARY_DIR}/cmake/f3dPluginConfig.cmake"
+      "${F3D_SOURCE_DIR}/cmake/plugin-config.cmake"
       "${F3D_SOURCE_DIR}/cmake/f3dPlugin.cmake"
       "${F3D_SOURCE_DIR}/cmake/plugin.cxx.in"
       "${F3D_SOURCE_DIR}/cmake/plugin.desktop.in"
       "${F3D_SOURCE_DIR}/cmake/plugin.thumbnailer.in"
       "${F3D_SOURCE_DIR}/cmake/readerBoilerPlate.h.in"
     DESTINATION
-      "${CMAKE_INSTALL_LIBDIR}/cmake/f3dPlugin"
+      "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
     COMPONENT plugin_sdk
     EXCLUDE_FROM_ALL)
 

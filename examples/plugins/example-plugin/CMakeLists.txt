@@ -4,7 +4,7 @@ project(example-plugin)
 
 include(GNUInstallDirs)
 
-find_package(f3dPlugin REQUIRED)
+find_package(f3d REQUIRED plugin)
 
 f3d_plugin_init()
 
@@ -29,7 +29,7 @@ if(BUILD_TESTING)
   enable_testing()
 
   # Finding f3d is needed to test the plugin
-  find_package(f3d REQUIRED)
+  find_package(f3d REQUIRED application)
   add_test(NAME TestPluginExample
           COMMAND "$<TARGET_FILE:f3d::f3d>"
                   "--dry-run"
