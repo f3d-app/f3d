@@ -112,10 +112,17 @@ defaults:
 
   -
     scope:
-      path: "doc/user/DESKTOP_INTEGRATION.md"
+      path: "doc/user/COLOR_MAPS.md"
     values:
       parent: User Documentation
       nav_order: 5
+
+  -
+    scope:
+      path: "doc/user/DESKTOP_INTEGRATION.md"
+    values:
+      parent: User Documentation
+      nav_order: 6
 
   -
     scope:
@@ -123,7 +130,7 @@ defaults:
     values:
       title: Limitations and Troubleshooting
       parent: User Documentation
-      nav_order: 6
+      nav_order: 7
 
 # libf3d doc
   -

@@ -10,6 +10,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.h")
 
 set(F3D_SOURCE_FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DColorMapTools.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DConfigFileTools.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptionsParser.cxx
@@ -207,6 +208,13 @@ install(
   DIRECTORY "${F3D_SOURCE_DIR}/resources/configs/"
   DESTINATION "${f3d_config_dir}"
   COMPONENT configuration
+  EXCLUDE_FROM_ALL)
+
+# Default color maps
+install(
+  DIRECTORY "${F3D_SOURCE_DIR}/resources/colormaps/"
+  DESTINATION "${f3d_config_dir}/colormaps"
+  COMPONENT colormaps
   EXCLUDE_FROM_ALL)
 
 # Other ressoure files

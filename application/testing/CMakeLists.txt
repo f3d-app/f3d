@@ -201,6 +201,20 @@ f3d_test(NAME TestConfigOrder DATA suzanne.ply ARGS CONFIG ${F3D_SOURCE_DIR}/tes
 f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP "^.PNG" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
 
+# Color map files testing
+f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --scalars --comp=1 DEFAULT_LIGHTS)
+f3d_test(NAME TestColorMapInvalid DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/invalid.png --scalars REGEXP "Cannot read colormap at" NO_BASELINE)
+f3d_test(NAME TestColorMapNonExistent DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/non_existent.png --scalars REGEXP "Cannot find the colormap" NO_BASELINE)
+f3d_test(NAME TestColorMapGrayscale DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/white_grayscale.png --scalars REGEXP "The specified color map must have at least 3 channels" NO_BASELINE)
+f3d_test(NAME TestColorMapMore1pxWarning DATA dragon.vtu ARGS --verbose=warning --colormap-file=${F3D_SOURCE_DIR}/testing/data/16bit.png --scalars REGEXP "The specified color map height is not equal to 1" NO_BASELINE)
+f3d_test(NAME TestColorMap16bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis16.png --scalars --comp=1 DEFAULT_LIGHTS)
+f3d_test(NAME TestColorMap32bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --scalars --comp=1 DEFAULT_LIGHTS)
+if(NOT F3D_MACOS_BUNDLE)
+  file(COPY "${F3D_SOURCE_DIR}/resources/colormaps/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/colormaps")
+  f3d_test(NAME TestColorMapStem DATA dragon.vtu ARGS --colormap-file=magma --scalars --comp=1 DEFAULT_LIGHTS)
+  f3d_test(NAME TestColorMapFile DATA dragon.vtu ARGS --colormap-file=magma.png --scalars --comp=1 DEFAULT_LIGHTS)
+endif()
+
 # Needs SSBO: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231108)
   if(APPLE) # MacOS does not support OpenGL 4.3
