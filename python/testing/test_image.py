@@ -71,6 +71,11 @@ def test_formats(f3d_engine):
     assert ".png" in formats
 
 
+def test_normalized_pixel(f3d_engine):
+    img = f3d_engine.window.render_to_image()
+    assert img.normalized_pixel((0, 0)) == [0.2, 0.2, 0.2]
+
+
 @pytest.mark.parametrize(
     "img_filename",
     [

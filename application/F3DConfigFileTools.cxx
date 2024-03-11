@@ -59,9 +59,9 @@ fs::path F3DConfigFileTools::GetBinaryConfigFileDirectory()
 
     // Add binary specific paths
 #if F3D_MACOS_BUNDLE
-    dirPath /= "Resources/configs";
+    dirPath /= "Resources";
 #else
-    dirPath /= "share/f3d/configs";
+    dirPath /= "share/f3d";
 #endif
   }
   catch (const fs::filesystem_error&)
@@ -88,7 +88,7 @@ fs::path F3DConfigFileTools::GetConfigPath(const std::string& configSearch)
     dirsToCheck.emplace_back("/etc/f3d");
     dirsToCheck.emplace_back("/usr/share/f3d/configs");
 #endif
-    dirsToCheck.emplace_back(F3DConfigFileTools::GetBinaryConfigFileDirectory());
+    dirsToCheck.emplace_back(F3DConfigFileTools::GetBinaryConfigFileDirectory() / "configs");
 
     for (const fs::path& dir : dirsToCheck)
     {

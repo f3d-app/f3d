@@ -20,6 +20,7 @@ class options;
 struct F3DAppOptions
 {
   std::string UserConfigFile = "";
+  std::string ColorMapFile = "";
   bool DryRun = false;
   bool GeometryOnly = false;
   bool GroupGeometries = false;
