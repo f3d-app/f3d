@@ -171,11 +171,6 @@ The `NAME` argument is required. The arguments are as follows:
 macro(f3d_plugin_build)
   cmake_parse_arguments(F3D_PLUGIN "FREEDESKTOP;FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS;MIMETYPE_XML_FILES;CONFIGURATION_DIRS" ${ARGN})
 
-  if(POLICY CMP0144)
-    # Older VTK may require this policy to be set to avoid warnings
-    cmake_policy(SET CMP0144 NEW)
-  endif ()
-
   find_package(VTK 9.0 REQUIRED COMPONENTS
                CommonCore CommonExecutionModel IOImport
                ${F3D_PLUGIN_VTK_MODULES})
