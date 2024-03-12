@@ -233,7 +233,7 @@ if(BUILD_SHARED_LIBS)
   write_basic_package_version_file(
     "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
     VERSION "${F3D_VERSION}"
-    COMPATIBILITY SameMinorVersion)
+    COMPATIBILITY SameMajorVersion)
 
   install(
     FILES
