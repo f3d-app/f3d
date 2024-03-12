@@ -5,4 +5,5 @@ include("${CMAKE_CURRENT_LIST_DIR}/f3dLibraryTargets.cmake")
 set_and_check(f3d_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/include")
 
 # Set the required variable
+message(STATUS "Found f3d library component")
 set(f3d_library_FOUND TRUE) 

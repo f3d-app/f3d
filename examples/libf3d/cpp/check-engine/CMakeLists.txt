@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(check-engine)
 
-find_package(f3d REQUIRED)
+find_package(f3d REQUIRED COMPONENTS library)
 
 # Check correctness of variables returned by f3dConfig.cmake
 function(check_variable_defined f3d_var)

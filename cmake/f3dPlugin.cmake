@@ -247,7 +247,7 @@ macro(f3d_plugin_build)
     EXPORT_FILE_NAME plugin_export.h
     EXPORT_MACRO_NAME F3D_PLUGIN_EXPORT)
 
-  # Add rpath origin so the VTKExtensionsPublic can be found
+  # Add rpath origin so the vtkext lib can be found
   if (APPLE)
     set_target_properties(f3d-plugin-${F3D_PLUGIN_NAME} PROPERTIES INSTALL_RPATH @loader_path)
   elseif (UNIX)

@@ -5,4 +5,5 @@ include("${CMAKE_CURRENT_LIST_DIR}/f3dTargets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/f3dEmbed.cmake")
 
 # Set the required variable
+message(STATUS "Found f3d application component")
 set(f3d_application_FOUND TRUE) 

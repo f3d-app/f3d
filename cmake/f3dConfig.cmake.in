@@ -1,16 +1,17 @@
-# When this file is run by CMake through the find_package command, the
-# following targets will exist:
+# When this file is run by CMake through the find_package command
 #
-# The following variables will also be defined:
+# The following variables will be defined:
 #
+#   f3d_BINDINGS_JAVA              Will be enabled if F3D was built with java bindings
+#   f3d_BINDINGS_PYTHON            Will be enabled if F3D was built with python bindings
 #   f3d_BUILD_APPLICATION          Will be enabled if F3D application was built
+#   f3d_CONFIG_DIR                 Path to F3D configuration directory, can be absolute or relative
+#   f3d_MODULE_EXR                 Will be enabled if F3D was built with OpenEXR images support
 #   f3d_MODULE_EXTERNAL_RENDERING  Will be enabled if F3D was built with external rendering support
 #   f3d_MODULE_RAYTRACING          Will be enabled if F3D was built with raytracing support
-#   f3d_MODULE_EXR                 Will be enabled if F3D was built with OpenEXR images support
-#   f3d_BINDINGS_PYTHON            Will be enabled if F3D was built with python bindings
-#   f3d_BINDINGS_JAVA              Will be enabled if F3D was built with java bindings
-#   f3d_CONFIG_DIR                 Path to F3D configuration directory, can be absolute or relative
 #   f3d_PLUGINS_INSTALL_DIR        Path to the location to install plugins so that F3D can find them
+#
+# It is also possible to look for optional components.
 #
 # Optional components are:
 #
@@ -26,11 +27,20 @@
 #
 #   f3d_INCLUDE_DIR                Absolute path to the include directory of public f3d library classes
 #
-# `plugin`: If found TODO
+# `plugin`: If found many plugin related cmake macros will be available as well as the following target:
+#
+#   f3d::vtkext
+#
+# And the following local variable will also be defined
+#
+#   f3d_INCLUDE_DIR                Absolute path to the include directory of classes needed to build a plugin
 #
 # Please note, if no components are set, `library` will be added by default
 
 @PACKAGE_INIT@
+
+include(${CMAKE_CURRENT_LIST_DIR}/f3dConfigVersion.cmake)
+message(STATUS "Found f3d ${PACKAGE_VERSION}")
 
 set(f3d_BUILD_APPLICATION "@F3D_BUILD_APPLICATION@")
 set(f3d_MODULE_EXTERNAL_RENDERING "@F3D_MODULE_EXTERNAL_RENDERING@")
@@ -44,12 +54,20 @@ set(f3d_PLUGINS_INSTALL_DIR "@F3D_PLUGINS_INSTALL_DIR@")
 # If no components specified, look for `library` component
 if(NOT f3d_FIND_COMPONENTS)
   set(f3d_FIND_COMPONENTS library)
+  set(f3d_FIND_REQUIRED_library TRUE)
 endif()
-message(WARNING ${f3d_FIND_COMPONENTS})
 
 foreach(component ${f3d_FIND_COMPONENTS})
   # For requested component, execute its "config" script
-  include(${CMAKE_CURRENT_LIST_DIR}/${component}-config.cmake)
+  if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${component}-config.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/${component}-config.cmake)
+  else()
+    if (${f3d_FIND_REQUIRED_${component}})
+      message(FATAL_ERROR "${component} was requested but could not be found, "
+        "${CMAKE_CURRENT_LIST_DIR}/${component}-config.cmake is missing, "
+        "please check component was installed")
+    endif ()
+  endif()
 endforeach()
 
 check_required_components(f3d)
