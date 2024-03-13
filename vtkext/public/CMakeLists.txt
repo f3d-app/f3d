@@ -9,7 +9,7 @@ vtk_module_scan(
   ENABLE_TESTS      ${BUILD_TESTING})
 
 set(f3d_vtkext_headers_exclude "")
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20240312)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240312)
   set(f3d_vtkext_headers_exclude "HEADERS_EXCLUDE_FROM_ALL;ON")
 endif()
   
