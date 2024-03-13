@@ -6,5 +6,7 @@ DEPENDS
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS
   VTK::CommonCore
+  VTK::RenderingOpenGL2
 TEST_DEPENDS
   VTK::TestingCore
+  VTK::RenderingOpenGL2

@@ -15,6 +15,7 @@ PRIVATE_DEPENDS
   VTK::InteractionWidgets
   VTK::RenderingCore
   f3d::VTKExtensionsCore
+  f3d::vtkext
 OPTIONAL_DEPENDS
   VTK::RenderingExternal
   VTK::RenderingRayTracing

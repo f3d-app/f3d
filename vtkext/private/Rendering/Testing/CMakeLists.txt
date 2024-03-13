@@ -11,12 +11,6 @@ list(APPEND VTKExtensionsRenderingTests_list
      TestF3DCachedTexturesPrint.cxx
   )
 
-# Also needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
-if(NOT ANDROID AND NOT EMSCRIPTEN AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
-  list(APPEND VTKExtensionsRenderingTests_list 
-       TestF3DBitonicSort.cxx)
-endif()
-
 vtk_add_test_cxx(VTKExtensionsRenderingTests tests
   NO_DATA NO_VALID NO_OUTPUT
   ${VTKExtensionsRenderingTests_list}
