@@ -8,6 +8,11 @@ vtk_module_scan(
   WANT_BY_DEFAULT   ON
   ENABLE_TESTS      ${BUILD_TESTING})
 
+set(f3d_vtkext_headers_exclude "")
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20240312)
+  set(f3d_vtkext_headers_exclude "HEADERS_EXCLUDE_FROM_ALL;ON")
+endif()
+  
 # The headers and all "dev" part are installed as part of the plugin SDK
 # The library itself is installed as part of the library
 vtk_module_build(
@@ -15,7 +20,7 @@ vtk_module_build(
   INSTALL_EXPORT "f3d_vtkext"
   INSTALL_HEADERS ON
   HEADERS_COMPONENT plugin_sdk
-#  HEADERS_EXCLUDE_FROM_ALL ON TODO
+  ${f3d_vtkext_headers_exclude}
   HEADERS_DESTINATION "include/f3d"
   TARGETS_COMPONENT library
   PACKAGE "f3d_vtkext")
