@@ -1,4 +1,4 @@
-# Provide f3d::f3d target
+# Provide f3d::libf3d target
 include("${CMAKE_CURRENT_LIST_DIR}/f3dLibraryTargets.cmake")
 
 # Provide f3d_INCLUDE_DIR
