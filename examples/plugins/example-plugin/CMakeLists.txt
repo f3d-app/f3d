@@ -4,7 +4,6 @@ project(example-plugin)
 
 include(GNUInstallDirs)
 
-find_package(opengl)
 find_package(f3d REQUIRED plugin)
 
 f3d_plugin_init()

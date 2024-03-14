@@ -81,7 +81,7 @@ Name|Installed by default|Operating system|Description
 `plugin`|YES|ALL|libf3d plugins
 `dependencies`|NO|ALL|libf3d runtime dependencies. Can be used to create a self-contained and relocatable package. System libraries are excluded.
 `sdk`|NO|ALL|libf3d SDK (headers and CMake config files)
-`plugin_sdk`|NO|ALL|libf3d plugin SDK (headers and CMake config files)
+`plugin_sdk`|NO|ALL|libf3d plugin SDK (headers and CMake config files including macros)
 `licenses`|YES|ALL|F3D and third party licenses
 `documentation`|YES|Linux|`man` documentation
 `shellext`|YES|Windows/Linux|Desktop integration
