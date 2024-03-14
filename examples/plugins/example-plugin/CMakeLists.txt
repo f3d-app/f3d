@@ -4,7 +4,7 @@ project(example-plugin)
 
 include(GNUInstallDirs)
 
-find_package(f3d REQUIRED COMPONENTS plugin)
+find_package(f3d REQUIRED COMPONENTS pluginsdk)
 
 f3d_plugin_init()
 
