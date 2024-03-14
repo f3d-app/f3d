@@ -253,7 +253,7 @@ if(BUILD_SHARED_LIBS)
 
   install(
     FILES
-      "${F3D_SOURCE_DIR}/cmake/plugin-config.cmake"
+      "${F3D_SOURCE_DIR}/cmake/pluginsdk-config.cmake"
       "${F3D_SOURCE_DIR}/cmake/f3dPlugin.cmake"
       "${F3D_SOURCE_DIR}/cmake/plugin.cxx.in"
       "${F3D_SOURCE_DIR}/cmake/plugin.desktop.in"
