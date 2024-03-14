@@ -1,6 +1,6 @@
 # Plugin SDK
 
-When calling `find_package(f3d)` in CMake, a few macros are made available to you to generate a plugin which allow you to extend libf3d to support your own file format.
+When calling `find_package(f3d REQUIRED COMPONENTS pluginsdk)` in CMake, a few macros are made available to you to generate a plugin which allow you to extend libf3d to support your own file format. Access to a f3d::vtkext VTK module is also provided if needed.
 > Please consider [contributing](../../CONTRIBUTING.md) your plugin in [F3D directly](https://github.com/f3d-app/f3d/tree/master/plugins) if you think it can be useful to the community.
 > You can also consider contributing directly [in VTK](https://gitlab.kitware.com/vtk/vtk/blob/master/Documentation/dev/git/develop.md).
 
@@ -61,3 +61,11 @@ The list of existing mimetypes can be find [here](https://www.iana.org/assignmen
 
 The plugin can be loaded using `f3d::engine::loadPlugin("path or name")` api if you are using libf3d, or `--load-plugins="path or name"` option if you are using F3D application.
 The option can also be set in a configuration file that you could distribute with your plugin.
+
+## f3d::vtkext
+
+F3D provides access to a VTK modules containing utilities that may be useful for plugin developers:
+ - `vtkF3DFaceVaryingPointDispatcher`: A VTK filter that manipulates point data so that F3D can display them as face-varying data (used by `usd` plugin)
+ - `vtkF3DBitonicSort`: A VTK class that perform Bitonic Sort algorithm on the GPU (used by the `splat` point sprites rendering algorithm
+
+See respective header of these class for a more complete documentation.
