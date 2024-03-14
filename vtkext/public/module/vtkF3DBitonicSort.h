@@ -13,12 +13,14 @@
 #include <vtkNew.h>
 #include <vtkObject.h>
 
+#include "vtkextModule.h"
+
 class vtkShader;
 class vtkShaderProgram;
 class vtkOpenGLBufferObject;
 class vtkOpenGLRenderWindow;
 
-class vtkF3DBitonicSort : public vtkObject
+class VTKEXT_EXPORT vtkF3DBitonicSort : public vtkObject
 {
 public:
   static vtkF3DBitonicSort* New();

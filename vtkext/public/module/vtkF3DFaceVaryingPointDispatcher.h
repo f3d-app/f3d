@@ -15,9 +15,9 @@
 #ifndef vtkF3DFaceVaryingPointDispatcher_h
 #define vtkF3DFaceVaryingPointDispatcher_h
 
-#include "vtkextModule.h"
-
 #include <vtkPolyDataAlgorithm.h>
+
+#include "vtkextModule.h"
 
 class VTKEXT_EXPORT vtkF3DFaceVaryingPointDispatcher : public vtkPolyDataAlgorithm
 {
