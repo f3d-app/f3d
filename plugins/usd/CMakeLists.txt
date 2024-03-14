@@ -6,7 +6,7 @@ include(GNUInstallDirs)
 
 # Check if the plugin is built externally
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-  find_package(f3d REQUIRED plugin)
+  find_package(f3d REQUIRED COMPONENTS pluginsdk)
 else()
   include(${CMAKE_SOURCE_DIR}/cmake/f3dPlugin.cmake)
 endif()

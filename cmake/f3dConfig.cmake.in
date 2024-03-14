@@ -27,7 +27,7 @@
 #
 #   f3d_INCLUDE_DIR                Absolute path to the include directory of public f3d library classes
 #
-# `plugin`: If found many plugin related cmake macros will be available as well as the following target:
+# `pluginsdk`: If found many plugin related cmake macros will be available as well as the following target:
 #
 #   f3d::vtkext
 #
