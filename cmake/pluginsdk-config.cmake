@@ -12,4 +12,4 @@ set_and_check(f3d_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/include")
 
 # Set the required variable
 message(STATUS "Found f3d plugin component")
-set(f3d_plugin_FOUND TRUE) 
+set(f3d_pluginsdk_FOUND TRUE) 
