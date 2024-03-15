@@ -1246,6 +1246,8 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     cheatSheetText << " DOWN : Add files from dir of current file\n";
     cheatSheetText << "\n 1: Front View camera\n";
     cheatSheetText << " 3: Right View camera\n";
+    cheatSheetText << " 5: Toggle Orthographic Projection "
+                   << (this->UseOrthographicProjection ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " 7: Top View camera\n";
     cheatSheetText << " 9: Isometric View camera\n";
     cheatSheetText << " ENTER: Reset camera to initial parameters\n";
@@ -1338,6 +1340,42 @@ void vtkF3DRenderer::ShowEdge(bool show)
     this->ActorsPropertiesConfigured = false;
     this->CheatSheetConfigured = false;
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseOrthographicProjection(bool use)
+{
+  // if the internal state is already the same as the target state there's nothing to do
+  if (this->UseOrthographicProjection == use)
+  {
+    return;
+  }
+
+  vtkCamera* camera = GetActiveCamera();
+  const double angle = vtkMath::RadiansFromDegrees(camera->GetViewAngle());
+  const double* position = camera->GetPosition();
+  const double* focal = camera->GetFocalPoint();
+
+  if (use)
+  {
+    const double distance = std::sqrt(vtkMath::Distance2BetweenPoints(position, focal));
+    const double parallelScale = distance * tan(angle / 2);
+    camera->SetParallelScale(parallelScale);
+  }
+  else
+  {
+    const double distance = camera->GetParallelScale() / tan(angle / 2);
+    double direction[3];
+    vtkMath::Subtract(position, focal, direction);
+    vtkMath::Normalize(direction);
+    vtkMath::MultiplyScalar(direction, distance);
+    double newPosition[3];
+    vtkMath::Add(focal, direction, newPosition);
+    camera->SetPosition(newPosition);
+  }
+  this->UseOrthographicProjection = use;
+  camera->SetParallelProjection(use);
+  this->ResetCameraClippingRange();
 }
 
 //----------------------------------------------------------------------------

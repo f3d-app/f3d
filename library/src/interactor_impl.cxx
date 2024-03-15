@@ -319,6 +319,10 @@ public:
         self->SetViewOrbit(ViewType::VT_RIGHT, self);
         render = true;
         break;
+      case '5':
+        self->Options.toggle("camera.orthographic");
+        render = true;
+        break;
       case '7':
         self->SetViewOrbit(ViewType::VT_TOP, self);
         render = true;

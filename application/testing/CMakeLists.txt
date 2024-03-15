@@ -695,6 +695,8 @@ f3d_test(NAME TestInteractionGroupGeometriesLoadParentDirectory DATA mb/mb_0_0.v
 f3d_test(NAME TestInteractionInvertZoom DATA suzanne.ply ARGS --invert-zoom INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionCameraHotkeys DATA cow.vtp INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionZoomToMouse DATA cow.vtp INTERACTION DEFAULT_LIGHTS)
+f3d_test(NAME TestInteractionOrthographicProjection DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #5;5
+f3d_test(NAME TestInteractionZoomToggleOrthographicProjection DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #MouseWheel;5;Mousewheelx6;5
 
 # Progress test
 f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
