@@ -110,7 +110,7 @@ jobs:
             egl_label: no-egl
 
     runs-on: ubuntu-latest
-    container: ghcr.io/f3d-app/f3d-ci
+    container: mwestphal/f3d-ci:latest
 
     env:
       DISPLAY: :0
@@ -214,7 +214,7 @@ jobs:
         os: [ubuntu, windows, macos]
 
     runs-on: ${{matrix.os}}-latest
-    container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    container: ${{ matrix.os == 'ubuntu' && 'mwestphal/f3d-ci:latest' || null }}
 
     env:
       DISPLAY: :0
@@ -241,7 +241,7 @@ jobs:
     if: github.event.pull_request.draft == false
 
     runs-on: ubuntu-latest
-    container: ghcr.io/f3d-app/f3d-ci
+    container: mwestphal/f3d-ci:latest
 
     # Add dummy F3D_PLUGINS_PATH for coverage
     env:
@@ -278,7 +278,7 @@ jobs:
         sanitizer_type: [address, thread, undefined]
 
     runs-on: ubuntu-latest
-    container: ghcr.io/f3d-app/f3d-ci
+    container: mwestphal/f3d-ci:latest
 
     env:
       DISPLAY: :0
@@ -312,7 +312,7 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-latest
-    container: ghcr.io/f3d-app/f3d-ci
+    container: mwestphal/f3d-ci:latest
 
     env:
       CC: clang
@@ -342,7 +342,7 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-latest
-    container: ghcr.io/f3d-app/f3d-ci
+    container: mwestphal/f3d-ci:latest
 
     steps:
 
@@ -368,7 +368,7 @@ jobs:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
     runs-on: ubuntu-latest
-    container: ghcr.io/f3d-app/f3d-ci
+    container: mwestphal/f3d-ci:latest
 
     steps:
 
