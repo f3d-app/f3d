@@ -97,7 +97,8 @@ runs:
         # versions of LLVM (17 and newer) should fix this again.
         # https://github.com/google/sanitizers/issues/1716
         # https://github.com/actions/runner-images/issues/9491
-        sysctl -w vm.mmap_rnd_bits=28
+        apt install -y sudo
+        sudo sysctl -w vm.mmap_rnd_bits=28
 
         export LSAN_OPTIONS=suppressions=$(pwd)/../source/.lsan.supp:use_tls=0
         export TSAN_OPTIONS=suppressions=$(pwd)/../source/.tsan.supp
