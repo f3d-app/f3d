@@ -35,6 +35,7 @@ const std::vector<std::pair<std::string, std::string> >& interactor::getDefaultI
     { "?", "Dump camera state to the terminal" },
     { "1", "Front View camera" },
     { "3", "Left View camera" },
+    { "5", "Toggle Orthographic Projection" },
     { "7", "Top View camera" },
     { "9", "Isometric View camera" },
     { "Escape", "Quit" },

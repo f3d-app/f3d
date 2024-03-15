@@ -56,6 +56,7 @@ Note that some hotkeys can be available or not depending on the file being loade
 Camera Hotkeys:
 * <kbd>1</kbd>: front view camera.
 * <kbd>3</kbd>: right view camera.
+* <kbd>5</kbd>: toggle orthographic projection.
 * <kbd>7</kbd>: top view camera.
 * <kbd>9</kbd>: isometric view camera.
 * <kbd>Enter</kbd>: reset the camera to its initial parameters.

@@ -79,6 +79,10 @@ public:
 
   ///@{
   /**
+   * Set SetUseOrthographicProjection
+   */
+  void SetUseOrthographicProjection(bool use);
+  /**
    * Set/Get UseTrackball
    */
   void SetUseTrackball(bool use);
@@ -277,6 +281,7 @@ protected:
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;
+  bool UseOrthographicProjection = false;
   bool UseTrackball = false;
   bool InvertZoom = false;
 
