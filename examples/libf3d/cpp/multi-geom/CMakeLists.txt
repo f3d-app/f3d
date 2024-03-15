@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(multi-geom)
 
-find_package(f3d REQUIRED)
+find_package(f3d REQUIRED COMPONENTS library)
 
 add_executable(multi-geom main.cxx)
 target_link_libraries(multi-geom f3d::libf3d)

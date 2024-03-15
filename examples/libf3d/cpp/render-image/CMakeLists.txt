@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(render-image)
 
-find_package(f3d REQUIRED)
+find_package(f3d REQUIRED COMPONENTS library)
 
 add_executable(render-image main.cxx)
 target_link_libraries(render-image f3d::libf3d)

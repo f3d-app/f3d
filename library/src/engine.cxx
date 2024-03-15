@@ -194,6 +194,11 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<std::st
             pluginOrigin = tryPath;
             break;
           }
+          else
+          {
+            log::debug(
+              "Could not load \"", tryPath, "\" because: ", vtksys::DynamicLoader::LastError());
+          }
         }
       }
 

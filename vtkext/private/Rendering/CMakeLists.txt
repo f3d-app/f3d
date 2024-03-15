@@ -11,11 +11,6 @@ set(private_headers
   ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
 
 set(shader_files
-  glsl/vtkF3DBitonicSortGlobalDisperseCS.glsl
-  glsl/vtkF3DBitonicSortGlobalFlipCS.glsl
-  glsl/vtkF3DBitonicSortLocalDisperseCS.glsl
-  glsl/vtkF3DBitonicSortLocalSortCS.glsl
-  glsl/vtkF3DBitonicSortFunctions.glsl
   glsl/vtkF3DComputeDepthCS.glsl)
 
 foreach(file IN LISTS shader_files)
@@ -46,7 +41,7 @@ set(classes
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
 if(NOT ANDROID AND NOT EMSCRIPTEN AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
-  set(classes ${classes} vtkF3DBitonicSort vtkF3DPointSplatMapper)
+  set(classes ${classes} vtkF3DPointSplatMapper)
 endif()
 
 if(NOT VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220907)
@@ -54,7 +49,7 @@ if(NOT VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220907)
 endif()
 
 vtk_module_add_module(f3d::VTKExtensionsRendering
-  ${libf3d_vtk_no_install}
+  ${f3d_vtk_no_install}
   FORCE_STATIC
   CLASSES ${classes}
   SOURCES ${sources}

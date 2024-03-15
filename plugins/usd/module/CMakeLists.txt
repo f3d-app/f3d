@@ -1,5 +1,4 @@
 set(classes
-  vtkF3DFaceVaryingPointDispatcher
   vtkF3DUSDImporter
   )
 

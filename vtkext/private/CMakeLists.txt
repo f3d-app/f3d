@@ -9,12 +9,12 @@ vtk_module_scan(
 # if libf3d is built as a static library, VTK extension static libraries
 # must be exported as well for proper linkage
 set(export_name "")
-set(libf3d_vtk_no_install "")
+set(f3d_vtk_no_install "")
 if(NOT BUILD_SHARED_LIBS)
   set(export_name "f3dTargets")
 else()
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220928)
-    set(libf3d_vtk_no_install "NO_INSTALL")
+    set(f3d_vtk_no_install "NO_INSTALL")
   endif()
 endif()
 
@@ -25,19 +25,20 @@ vtk_module_build(
   INSTALL_EXPORT ${export_name}
   INSTALL_HEADERS OFF
   HEADERS_COMPONENT vtkext
-  TARGETS_COMPONENT vtkext)
+  TARGETS_COMPONENT vtkext
+  PACKAGE "f3d-VTKExtensionsPrivate")
 
 # We need non empty cmake vars for these calls for VTK <= 9.1
 # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9084
 foreach (module IN LISTS modules)
-  if(NOT "${libf3d_compile_options_public}" STREQUAL "")
-    vtk_module_compile_options(${module} PUBLIC ${libf3d_compile_options_public})
+  if(NOT "${f3d_compile_options_public}" STREQUAL "")
+    vtk_module_compile_options(${module} PUBLIC ${f3d_compile_options_public})
   endif()
-  if(NOT "${libf3d_compile_options_private}" STREQUAL "")
-    vtk_module_compile_options(${module} PRIVATE ${libf3d_compile_options_private})
+  if(NOT "${f3d_compile_options_private}" STREQUAL "")
+    vtk_module_compile_options(${module} PRIVATE ${f3d_compile_options_private})
   endif()
-  if (NOT "${libf3d_link_options_public}" STREQUAL "")
-    vtk_module_link_options(${module} PUBLIC ${libf3d_link_options_public})
+  if (NOT "${f3d_link_options_public}" STREQUAL "")
+    vtk_module_link_options(${module} PUBLIC ${f3d_link_options_public})
   endif()
   vtk_module_set_property(${module} PROPERTY CXX_STANDARD VALUE 17)
   if(F3D_STRICT_BUILD AND MSVC)

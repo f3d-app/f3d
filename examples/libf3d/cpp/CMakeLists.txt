@@ -1,4 +1,4 @@
-find_package(f3d REQUIRED)
+find_package(f3d REQUIRED COMPONENTS library)
 
 if(BUILD_TESTING)
   enable_testing()
