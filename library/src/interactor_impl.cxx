@@ -320,7 +320,7 @@ public:
         render = true;
         break;
       case '5':
-        self->Options.toggle("camera.orthographic");
+        self->Options.toggle("scene.camera.orthographic");
         render = true;
         break;
       case '7':
