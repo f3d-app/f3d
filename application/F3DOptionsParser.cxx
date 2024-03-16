@@ -338,7 +338,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp1, "animation-time", "", "Set animation time to load", options.getAsDoubleRef("scene.animation.time"), HasDefault::YES, MayHaveConfig::YES, "<time>");
     this->DeclareOption(grp1, "animation-frame-rate", "", "Set animation frame rate when playing animation interactively", options.getAsDoubleRef("scene.animation.frame-rate"), HasDefault::YES, MayHaveConfig::YES, "<frame rate>");
     this->DeclareOption(grp1, "font-file", "", "Path to a FreeType compatible font file", options.getAsStringRef("ui.font-file"), LocalHasDefaultNo, MayHaveConfig::NO, "<file_path>");
-    this->DeclareOption(grp1, "camera-orthographic", "", "Render in Orthographic Project mode", options.getAsBoolRef("scene.camera.orthographic"), LocalHasDefaultNo, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "camera-orthographic", "", "Render in Orthographic Projection mode", options.getAsBoolRef("scene.camera.orthographic"), LocalHasDefaultNo, MayHaveConfig::YES);
 
     auto grp2 = cxxOptions.add_options("Material");
     this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.getAsBoolRef("model.point-sprites.enable"), HasDefault::YES, MayHaveConfig::YES);
