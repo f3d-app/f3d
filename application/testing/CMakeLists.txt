@@ -696,7 +696,6 @@ f3d_test(NAME TestInteractionInvertZoom DATA suzanne.ply ARGS --invert-zoom INTE
 f3d_test(NAME TestInteractionCameraHotkeys DATA cow.vtp INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionZoomToMouse DATA cow.vtp INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionOrthographicProjection DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #5;5
-f3d_test(NAME TestInteractionOrthographicProjectionCommand ARGS --camera-orthographic DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #Command line option;
 f3d_test(NAME TestInteractionZoomToggleOrthographicProjection DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #MouseWheel;5;Mousewheelx6;5
 
 # Progress test
@@ -885,6 +884,9 @@ f3d_test(NAME TestBadRefNoOutput DATA cow.vtp ARGS --ref=${F3D_SOURCE_DIR}/testi
 
 # Test failure with a bad interaction play file, please do not create a dummy.log
 f3d_test(NAME TestPlayNoFile DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/dummy.log WILL_FAIL)
+
+# Test Orthographic Projection command line option
+f3d_test(NAME TestOrthographicProjectionCommand ARGS --camera-orthographic DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #Command line option;
 
 # Test scan plugins
 if(NOT F3D_MACOS_BUNDLE)
