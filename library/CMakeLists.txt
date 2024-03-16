@@ -5,11 +5,8 @@ set(F3D_VTK_MODULES
   VTK::CommonSystem
   VTK::IOImage
   VTK::InteractionWidgets
-  f3d::VTKExtensionsApplicative
-  f3d::VTKExtensionsCore
-  f3d::VTKExtensionsReaders
-  f3d::VTKExtensionsRendering
   f3d::vtkext
+  f3d::vtkextPrivate
 )
 
 # Check modules
