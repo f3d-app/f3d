@@ -279,12 +279,7 @@ endif()
 
 # Report options
 function(f3d_report_variable f3d_var)
-  string(ASCII 27 Esc)
-  if ("${${f3d_var}}")
-    message(STATUS "${Esc}[1m${f3d_var}: ${Esc}[1;32mON${Esc}[m")
-  else()
-    message(STATUS "${Esc}[1m${f3d_var}: ${Esc}[1;31mOFF${Esc}[m")
-  endif()
+  message(STATUS "${f3d_var}: ${${f3d_var}}")
 endfunction()
 
 f3d_report_variable(F3D_BINDINGS_JAVA)
