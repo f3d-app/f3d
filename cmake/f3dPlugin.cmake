@@ -175,7 +175,12 @@ macro(f3d_plugin_build)
                CommonCore CommonExecutionModel IOImport
                ${F3D_PLUGIN_VTK_MODULES})
 
-  if(F3D_PLUGIN_FORCE_STATIC OR F3D_PLUGINS_STATIC_BUILD OR NOT BUILD_SHARED_LIBS)
+  set(_force_static FALSE)
+  if(DEFINED BUILD_SHARED_LIBS AND NOT BUILD_SHARED_LIBS)
+    set(_force_static TRUE)
+  endif()
+
+  if(F3D_PLUGIN_FORCE_STATIC OR F3D_PLUGINS_STATIC_BUILD OR _force_static)
     set(F3D_PLUGIN_TYPE "STATIC")
     set(F3D_PLUGIN_IS_STATIC ON)
     set_property(GLOBAL APPEND PROPERTY F3D_STATIC_PLUGINS ${F3D_PLUGIN_NAME})
