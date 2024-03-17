@@ -322,7 +322,7 @@ runs:
     # https://github.com/f3d-app/f3d/issues/1276
     - name: Check F3D_PLUGINS_PATH using plugin example
       if: |
-        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' && 
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' &&
         inputs.cpu != 'arm64' &&
         inputs.static_label == 'no-static'
       shell: bash
@@ -345,6 +345,15 @@ runs:
       working-directory: ${{github.workspace}}/install
       run: |
         ${{ env.F3D_BIN_PATH }} ../source/testing/data/suzanne.obj --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --verbose
+
+    - name: Check Install plugins
+      if: |
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6'
+        && inputs.cpu != 'arm64'
+        && inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}/install
+      run: |
         ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose
 
     - name: Upload Tests Install Artifact
