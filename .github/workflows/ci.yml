@@ -186,10 +186,10 @@ jobs:
       matrix:
         vtk_version: [commit, v9.3.0, v9.2.6]
         bundle_label: [no-bundle]
+        static_label: [no-static]
         include:
           - vtk_version: commit
             bundle_label: bundle
-        include:
           - vtk_version: commit
             static_label: static
 
