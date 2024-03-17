@@ -208,6 +208,7 @@ if(BUILD_SHARED_LIBS)
 
   # Install dependencies, but exclude system libraries
   set(F3D_DEPENDENCIES_DIR "" CACHE STRING "Semicolon separated directories for dependencies look up")
+  mark_as_advanced(F3D_DEPENDENCIES_DIR)
   install(RUNTIME_DEPENDENCY_SET libf3dDeps
     COMPONENT dependencies EXCLUDE_FROM_ALL
     PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
