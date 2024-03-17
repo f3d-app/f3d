@@ -154,7 +154,7 @@ f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalars --roughness=1 --
 f3d_test(NAME TestCameraConfiguration DATA suzanne.obj ARGS --camera-position=0,0,-10 -x --camera-view-up=1,0,0 --camera-focal-point=1,0,0 --camera-view-angle=20 --camera-azimuth-angle=40 --camera-elevation-angle=-80 --camera-direction=12,34,56 --camera-zoom-factor=78)
 f3d_test(NAME TestCameraDirection DATA suzanne.obj ARGS --camera-direction=-1,-1,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestCameraClipping DATA checkerboard_colorful.obj CONFIG ${F3D_SOURCE_DIR}/testing/configs/checkerboard_colorful.json RESOLUTION 800,600)
-f3d_test(NAME TestOrthographicProjectionCommand ARGS --camera-orthographic DATA cow.vtp DEFAULT_LIGHTS)
+f3d_test(NAME TestCameraOrthographic ARGS --camera-orthographic DATA cow.vtp DEFAULT_LIGHTS)
 f3d_test(NAME TestToneMapping DATA suzanne.ply ARGS -t DEFAULT_LIGHTS)
 f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt DEFAULT_LIGHTS)
 f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT THRESHOLD 300 DEFAULT_LIGHTS) # Using default lights because of ResetCamera, High threshold for volume as it is dependent on the OpenGL implementation
