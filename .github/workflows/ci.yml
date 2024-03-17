@@ -53,10 +53,6 @@ jobs:
       fail-fast: false
       matrix:
         vtk_version: [commit, v9.3.0, v9.2.6]
-        static_label: [no-static]
-        include:
-          - vtk_version: commit
-            static_label: static
 
     runs-on: windows-latest
 
@@ -73,7 +69,6 @@ jobs:
       with:
         vtk_version: ${{matrix.vtk_version}}
         raytracing_label: raytracing
-        static_label: ${{matrix.static_label}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
