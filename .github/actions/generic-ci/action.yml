@@ -29,6 +29,10 @@ inputs:
     description: 'Label to control egl'
     required: false
     default: 'no-egl'
+  static_label:
+    description: 'Label to control static build'
+    required: false
+    default: 'no-static'
   cpu:
     description: 'CPU architecture to build for'
     required: false
@@ -136,6 +140,7 @@ runs:
         -Werror=dev
         -Werror=deprecated
         --warn-uninitialized
+        -DBUILD_SHARED_LIBS=${{ inputs.static_label == 'static' && 'OFF' || 'ON' }}
         -DBUILD_TESTING=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../install
@@ -227,7 +232,9 @@ runs:
         cmake --install . --component configuration
 
     - name: Build and configure python externally
-      if: inputs.optional_deps_label == 'optional-deps'
+      if: |
+        inputs.optional_deps_label == 'optional-deps' &&
+        inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
@@ -235,6 +242,7 @@ runs:
         cmake --build build_python --config Release
 
     - name: Build and configure libf3d examples
+      if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
@@ -244,14 +252,17 @@ runs:
     - name: Install Mesa Windows examples
       if: |
         runner.os == 'Windows' &&
-        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0'
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' &&
+        inputs.static_label == 'no-static'
       uses: ./source/.github/actions/mesa-install-bin
       with:
         path: ${{github.workspace}}\build_examples\*\Release
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0'
+      if: |
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' &&
+        inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_examples -C Release -VV
@@ -264,6 +275,7 @@ runs:
       # CMAKE_MODULE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
     - name: Build plugin examples
+      if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
@@ -271,6 +283,7 @@ runs:
         cmake --build build_plugins --config Release
 
     - name: Test plugin examples
+      if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_plugins -C Release -VV
@@ -308,7 +321,10 @@ runs:
     # Grid rendering has artifacts in macOS arm64 CI
     # https://github.com/f3d-app/f3d/issues/1276
     - name: Check F3D_PLUGINS_PATH using plugin example
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' && inputs.cpu != 'arm64'
+      if: |
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' && 
+        inputs.cpu != 'arm64' &&
+        inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose

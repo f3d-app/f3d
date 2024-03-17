@@ -53,6 +53,10 @@ jobs:
       fail-fast: false
       matrix:
         vtk_version: [commit, v9.3.0, v9.2.6]
+        static_label: [no-static]
+        include:
+          - vtk_version: commit
+            static_label: static
 
     runs-on: windows-latest
 
@@ -69,6 +73,7 @@ jobs:
       with:
         vtk_version: ${{matrix.vtk_version}}
         raytracing_label: raytracing
+        static_label: ${{matrix.static_label}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
@@ -88,6 +93,7 @@ jobs:
           - exclude_deprecated_label: no-exclude-deprecated
           - optional_deps_label: optional-deps
           - egl_label: no-egl
+          - static_label: no-static
           - vtk_version: v9.0.0
             raytracing_label: no-raytracing
           - build_type: headless
@@ -96,18 +102,28 @@ jobs:
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
             egl_label: egl
+            static_label: no-static
           - build_type: exclude_deprecated
             vtk_version: commit
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: exclude-deprecated
             egl_label: no-egl
+            static_label: no-static
           - build_type: no_optional_deps
             vtk_version: commit
             raytracing_label: no-raytracing
             optional_deps_label: no-optional-deps
             exclude_deprecated_label: no-exclude-deprecated
             egl_label: no-egl
+            static_label: no-static
+          - build_type: static_libs
+            vtk_version: commit
+            raytracing_label: no-raytracing
+            optional_deps_label: optional-deps
+            exclude_deprecated_label: no-exclude-deprecated
+            egl_label: no-egl
+            static_label: static
 
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
@@ -132,6 +148,7 @@ jobs:
         optional_deps_label: ${{matrix.optional_deps_label}}
         exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
         egl_label: ${{matrix.egl_label}}
+        static_label: ${{matrix.static_label}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
@@ -144,10 +161,6 @@ jobs:
       fail-fast: false
       matrix:
         vtk_version: [commit, v9.3.0, v9.2.6]
-        bundle_label: [no-bundle]
-        include:
-          - vtk_version: commit
-            bundle_label: bundle
 
     runs-on: macos-latest
 
@@ -163,12 +176,11 @@ jobs:
       uses: ./source/.github/actions/generic-ci
       with:
         vtk_version: ${{matrix.vtk_version}}
-        bundle_label: ${{matrix.bundle_label}}
         cpu: x86_64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------
-# MacOS ARM CI: Build and test, cross-vtk build matrix
+# MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
 #----------------------------------------------------------------------------
   macos_arm:
     if: github.event.pull_request.draft == false
@@ -182,6 +194,9 @@ jobs:
         include:
           - vtk_version: commit
             bundle_label: bundle
+        include:
+          - vtk_version: commit
+            static_label: static
 
     runs-on: macos-14
 
@@ -198,6 +213,7 @@ jobs:
       with:
         vtk_version: ${{matrix.vtk_version}}
         bundle_label: ${{matrix.bundle_label}}
+        static_label: ${{matrix.static_label}}
         cpu: arm64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
