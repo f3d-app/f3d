@@ -392,6 +392,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grpCamera, "camera-zoom-factor", "", "Camera zoom factor (non-zero)", appOptions.CameraZoomFactor, HasDefault::YES, MayHaveConfig::YES, "<factor>");
     this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees), performed after other camera options", appOptions.CameraAzimuthAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
     this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees), performed after other camera options", appOptions.CameraElevationAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
+    this->DeclareOption(grpCamera, "camera-orthographic", "", "Use an orthographic camera", options.getAsBoolRef("scene.camera.orthographic"), HasDefault::YES, MayHaveConfig::YES);
 
 #if F3D_MODULE_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");

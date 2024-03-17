@@ -420,7 +420,7 @@ void window_impl::UpdateDynamicOptions()
   if (this->Internals->Options.getAsInt("scene.camera.index") == -1)
   {
     this->Internals->Renderer->SetUseOrthographicProjection(
-      this->Internals->Options.getAsBool("camera.orthographic"));
+      this->Internals->Options.getAsBool("scene.camera.orthographic"));
   }
 
   if (this->Internals->WithColoring)

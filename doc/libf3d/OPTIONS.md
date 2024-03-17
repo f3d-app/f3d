@@ -23,7 +23,7 @@ scene.animation.speed-factor|double<br>1<br>render|Set the animation speed facto
 scene.animation.frame-rate|double<br>60<br>render|Set the animation frame rate used to play the animation interactively.|\-\-animation-frame-rate
 scene.camera.index|int<br>-1<br>load|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.|\-\-camera-index
 scene.up-direction|string<br>+Y<br>load|Define the Up direction|\-\-up
-camera.orthographic|bool<br>false<br>load|Toggles between orthographic projection and parallel mode.|\-\-orthographic
+scene.camera.orthographic|bool<br>false<br>load|Toggles between orthographic projection and parallel mode.|\-\-camera\-orthographic
 
 ## Interactor Options
 

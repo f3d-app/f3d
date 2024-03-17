@@ -217,7 +217,7 @@ options::options()
   this->Internals->init("model.volume.inverse", false);
 
   // Camera projection
-  this->Internals->init("camera.orthographic", false);
+  this->Internals->init("scene.camera.orthographic", false);
 
   // Interactor
   this->Internals->init("interactor.axis", false);

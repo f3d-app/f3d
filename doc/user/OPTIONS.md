@@ -99,6 +99,7 @@ Options|Default|Description
 \-\-camera-zoom-factor=\<factor\>||Set the camera zoom factor relative to the autozoom on data, a strictly positive value.
 \-\-camera-azimuth-angle=\<angle\>|0.0|Apply an azimuth transformation to the camera, in degrees, added after other camera options.
 \-\-camera-elevation-angle=\<angle\>|0.0|Apply an elevation transformation to the camera, in degrees, added after other camera options.
+\-\-camera-orthographic||Set the camera to use the orthographic projection.
 
 ## Raytracing options
 
