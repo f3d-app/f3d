@@ -338,7 +338,6 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp1, "animation-time", "", "Set animation time to load", options.getAsDoubleRef("scene.animation.time"), HasDefault::YES, MayHaveConfig::YES, "<time>");
     this->DeclareOption(grp1, "animation-frame-rate", "", "Set animation frame rate when playing animation interactively", options.getAsDoubleRef("scene.animation.frame-rate"), HasDefault::YES, MayHaveConfig::YES, "<frame rate>");
     this->DeclareOption(grp1, "font-file", "", "Path to a FreeType compatible font file", options.getAsStringRef("ui.font-file"), LocalHasDefaultNo, MayHaveConfig::NO, "<file_path>");
-    this->DeclareOption(grp1, "camera-orthographic", "", "Render in Orthographic Projection mode", options.getAsBoolRef("scene.camera.orthographic"), LocalHasDefaultNo, MayHaveConfig::YES);
 
     auto grp2 = cxxOptions.add_options("Material");
     this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.getAsBoolRef("model.point-sprites.enable"), HasDefault::YES, MayHaveConfig::YES);
@@ -393,6 +392,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grpCamera, "camera-zoom-factor", "", "Camera zoom factor (non-zero)", appOptions.CameraZoomFactor, HasDefault::YES, MayHaveConfig::YES, "<factor>");
     this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees), performed after other camera options", appOptions.CameraAzimuthAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
     this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees), performed after other camera options", appOptions.CameraElevationAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
+    this->DeclareOption(grpCamera, "camera-orthographic", "", "Use and orthographic camera", options.getAsBoolRef("scene.camera.orthographic"), LocalHasDefaultNo, MayHaveConfig::YES);
 
 #if F3D_MODULE_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
