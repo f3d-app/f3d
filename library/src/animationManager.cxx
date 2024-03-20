@@ -49,7 +49,6 @@ bool animationManager::Initialize(
     progressRep->DrawBackgroundOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
-
 // Complete vtkProgressBarRepresentation needs
 // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7359
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201027)
@@ -106,16 +105,9 @@ bool animationManager::Initialize(
 
     this->Importer->EnableAnimation(0);
   }
-  else if (this->AnimationIndex <= -1)
-  {
-    for (int i = 0; i < this->AvailAnimations; i++)
-    {
-      this->Importer->EnableAnimation(i);
-    }
-  }
   else
   {
-    this->Importer->EnableAnimation(this->AnimationIndex);
+    this->EnableAllAnimation();
   }
 
   // Recover time ranges for all enabled animations
@@ -297,17 +289,14 @@ void animationManager::CycleAnimation()
   }
 
   this->DisableAllAnimation();
+  this->AnimationIndex += 1;
 
-  if (this->AnimationIndex == this->AvailAnimations - 1)
+  if (this->AnimationIndex == this->AvailAnimations)
   {
     this->AnimationIndex = -1;
   }
-  else
-  {
-    this->AnimationIndex += 1;
-  }
+
   this->EnableAllAnimation();
-  
   this->LoadAtTime(this->TimeRange[0]);
 }
 // ---------------------------------------------------------------------------------
@@ -333,7 +322,7 @@ std::string animationManager::GetAnimationName()
 void animationManager::EnableAllAnimation()
 {
   assert(this->Importer);
-  if (this->AnimationIndex == this->AvailAnimations - 1)
+  if (this->AnimationIndex == -1)
   {
     for (int i = 0; i < this->AvailAnimations; i++)
     {
@@ -349,7 +338,7 @@ void animationManager::EnableAllAnimation()
 void animationManager::DisableAllAnimation()
 {
   assert(this->Importer);
-  if (this->AnimationIndex == this->AvailAnimations - 1)
+  if (this->AnimationIndex == -1)
   {
     for (int i = 0; i < this->AvailAnimations; i++)
     {
