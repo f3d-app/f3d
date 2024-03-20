@@ -1,5 +1,5 @@
 NAME
-  f3d::vtkextOCCCT
+  f3d::vtkextOCCT
 DESCRIPTION
   A VTK module for the OCCT plugin
 DEPENDS
