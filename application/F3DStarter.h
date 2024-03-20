@@ -34,9 +34,14 @@ public:
   void LoadFile(int index = 0, bool relativeIndex = false);
 
   /**
-   * Trigger a render on the next event loop, use force to trigger it on call
+   * Trigger a render on the next event loop
    */
-  void Render(bool force = false);
+  void Render();
+
+  /**
+   * Trigger a render now
+   */
+  void ForceRender();
 
   F3DStarter();
   ~F3DStarter();

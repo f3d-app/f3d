@@ -142,9 +142,8 @@ public:
     const char* filename, const char*, void* userData)
   {
     F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
-    self->Internals->FilesListMutex.lock();
+    const std::lock_guard<std::mutex> lock(self->Internals->FilesListMutex);
     fs::path filePath = self->Internals->FilesList[self->Internals->CurrentFileIndex];
-    self->Internals->FilesListMutex.unlock();
     if (filePath.filename().string() == std::string(filename))
     {
       self->Internals->ReloadFile = true;
@@ -297,7 +296,7 @@ int F3DStarter::Start(int argc, char** argv)
             this->Internals->Engine->getOptions().set("render.background.skybox", true);
 
             // Rendering now is needed for correct lighting
-            this->Render(true);
+            this->ForceRender();
           }
           else
           {
@@ -635,8 +634,9 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
 
   if (this->Internals->LoadedFile)
   {
-    if (true) // TODO should be controlled with an option
+    if (this->Internals->AppOptions.AutoReload)
     {
+      // Always unwatch and watch current folder, even on reload
       if (this->Internals->FolderWatchId.id > 0)
       {
         dmon_unwatch(this->Internals->FolderWatchId);
@@ -656,19 +656,18 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::Render(bool force)
+void F3DStarter::Render()
 {
-  if (force)
-  {
-    f3d::log::debug("========== Rendering ==========");
-    this->Internals->Engine->getWindow().render();
-    f3d::log::debug("Render done");
-  }
-  else
-  {
-    // Render(true) will be called by the next event loop
-    this->Internals->SoftRender = true;
-  }
+  // ForceRender will be called by the next event loop
+  this->Internals->SoftRender = true;
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::ForceRender()
+{
+  f3d::log::debug("========== Rendering ==========");
+  this->Internals->Engine->getWindow().render();
+  f3d::log::debug("Render done");
 }
 
 //----------------------------------------------------------------------------
@@ -704,9 +703,9 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
 
     if (it == this->Internals->FilesList.end())
     {
-      this->Internals->FilesListMutex.lock();
+      // In the main thread, we only need to guard writing
+      const std::lock_guard<std::mutex> lock(self->Internals->FilesListMutex);
       this->Internals->FilesList.push_back(tmpPath);
-      this->Internals->FilesListMutex.unlock();
       return static_cast<int>(this->Internals->FilesList.size()) - 1;
     }
     else
@@ -752,7 +751,7 @@ void F3DStarter::EventLoop()
   }
   if (this->Internals->SoftRender)
   {
-    this->Render(true);
+    this->ForceRender();
     this->Internals->SoftRender = false;
   }
 }
