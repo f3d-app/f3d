@@ -125,7 +125,7 @@ For the complete documentation, please consult the [libf3d doxygen documentation
 
 ## Building against the libf3d
 
-Please follow instructions in the [F3D build guide](../dev/BUILD.md), and make sure to install the `sdk` component then use CMake to find the libf3d
+Please follow instructions in the [F3D build guide](../dev/BUILD.md), make sure to build with `BUILD_SHARED_LIBS=ON` and to install the `sdk` component then use CMake to find the libf3d
 and link against it like this in your CMakeLists.txt:
 
 ```cmake

@@ -175,7 +175,7 @@ macro(f3d_plugin_build)
                CommonCore CommonExecutionModel IOImport
                ${F3D_PLUGIN_VTK_MODULES})
 
-  if(F3D_PLUGIN_FORCE_STATIC OR F3D_PLUGINS_STATIC_BUILD)
+  if(F3D_PLUGIN_FORCE_STATIC OR F3D_PLUGINS_STATIC_BUILD OR NOT BUILD_SHARED_LIBS)
     set(F3D_PLUGIN_TYPE "STATIC")
     set(F3D_PLUGIN_IS_STATIC ON)
     set_property(GLOBAL APPEND PROPERTY F3D_STATIC_PLUGINS ${F3D_PLUGIN_NAME})
@@ -201,12 +201,6 @@ macro(f3d_plugin_build)
   list(APPEND f3d_plugin_link_options "${f3d_coverage_link_options}")
   list(APPEND f3d_plugin_link_options "${f3d_sanitizer_link_options}")
 
-  # if libf3d is built as a static library, VTK extension static libraries
-  # must be exported as well for proper linkage
-  set(export_name "")
-  if(NOT BUILD_SHARED_LIBS AND F3D_PLUGIN_IS_STATIC)
-    set(export_name "f3dTargets")
-  endif()
 
   vtk_module_find_modules(vtk_module_files "${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -220,11 +214,8 @@ macro(f3d_plugin_build)
 
     vtk_module_build(
       MODULES ${modules}
-      INSTALL_EXPORT ${export_name}
       INSTALL_HEADERS OFF
-      HEADERS_COMPONENT vtkext
-      TARGETS_COMPONENT vtkext
-      PACKAGE "f3d-plugin-${F3D_PLUGIN_NAME}")
+      PACKAGE "f3d_${F3D_PLUGIN_NAME}_vtkext_private")
 
     foreach (module IN LISTS modules)
       if(NOT "${f3d_plugin_compile_options}" STREQUAL "")
@@ -294,7 +285,7 @@ macro(f3d_plugin_build)
     ${F3D_PLUGIN_VTK_MODULES}
     ${modules})
 
-  if(NOT F3D_PLUGIN_IS_STATIC OR NOT BUILD_SHARED_LIBS)
+  if(NOT F3D_PLUGIN_IS_STATIC)
     install(TARGETS f3d-plugin-${F3D_PLUGIN_NAME}
       EXPORT ${export_name}
       ARCHIVE DESTINATION ${_f3d_plugins_install_dir} COMPONENT plugin

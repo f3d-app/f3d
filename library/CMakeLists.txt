@@ -195,7 +195,30 @@ if(BUILD_TESTING)
 endif()
 
 # Installing
+
+## Install f3dConfig.cmake and f3dVersion.cmake so the f3d::f3d target can be found
+## Even without BUILD_SHARED_LIBS
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+  "${F3D_SOURCE_DIR}/cmake/f3dConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d")
+write_basic_package_version_file(
+  "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
+  VERSION "${F3D_VERSION}"
+  COMPATIBILITY SameMajorVersion)
+install(
+  FILES
+    "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
+    "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
+  DESTINATION
+    "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
+  COMPONENT sdk
+  EXCLUDE_FROM_ALL)
+
+## Install the rest of the libraries and SDK parts
 if(BUILD_SHARED_LIBS)
+
+  # Install the libf3d
   install(TARGETS libf3d
     EXPORT f3dLibraryTargets
     RUNTIME_DEPENDENCY_SET libf3dDeps
@@ -212,31 +235,22 @@ if(BUILD_SHARED_LIBS)
     POST_EXCLUDE_REGEXES ".*system32/.*" "^/usr/lib.*" "^/lib.*" "^/var/lib.*"
     DIRECTORIES "${F3D_DEPENDENCIES_DIR}")
 
+  # Install the public headers
   install(FILES ${F3D_PUBLIC_HEADERS}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"
     COMPONENT sdk
     EXCLUDE_FROM_ALL)
 
+  # Install the library exported targets
   install(EXPORT f3dLibraryTargets
     NAMESPACE f3d::
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
     COMPONENT sdk
     EXCLUDE_FROM_ALL)
 
-  include(CMakePackageConfigHelpers)
-  configure_package_config_file(
-    "${F3D_SOURCE_DIR}/cmake/f3dConfig.cmake.in" "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/f3d")
-
-  write_basic_package_version_file(
-    "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
-    VERSION "${F3D_VERSION}"
-    COMPATIBILITY SameMajorVersion)
-
+  # Install library cmake files
   install(
     FILES
-      "${CMAKE_BINARY_DIR}/cmake/f3dConfig.cmake"
-      "${CMAKE_BINARY_DIR}/cmake/f3dConfigVersion.cmake"
       "${F3D_SOURCE_DIR}/cmake/library-config.cmake"
       "${F3D_SOURCE_DIR}/cmake/f3dEmbed.cmake"
     DESTINATION
@@ -244,11 +258,13 @@ if(BUILD_SHARED_LIBS)
     COMPONENT sdk
     EXCLUDE_FROM_ALL)
 
+  # Install plugin headers
   install(FILES ${F3D_PLUGIN_HEADERS}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"
     COMPONENT plugin_sdk
     EXCLUDE_FROM_ALL)
 
+  # Install pluginsdk cmake and source files
   install(
     FILES
       "${F3D_SOURCE_DIR}/cmake/pluginsdk-config.cmake"
