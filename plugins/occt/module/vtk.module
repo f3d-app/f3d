@@ -1,5 +1,5 @@
 NAME
-  f3d::VTKExtensionsOCCTReader
+  f3d::vtkextOCCCT
 DESCRIPTION
   A VTK module for the OCCT plugin
 DEPENDS

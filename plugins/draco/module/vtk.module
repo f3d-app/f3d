@@ -1,5 +1,5 @@
 NAME
-  f3d::VTKExtensionsDracoReader
+  f3d::vtkextDraco
 DESCRIPTION
   A VTK module for the Draco plugin
 DEPENDS

@@ -1,5 +1,5 @@
 NAME
-  f3d::VTKExtensionsAlembicReader
+  f3d::vtkextAlembic
 DESCRIPTION
   A VTK module for the Alembic plugin
 DEPENDS
