@@ -345,7 +345,6 @@ int F3DStarter::Start(int argc, char** argv)
 
   if (!this->Internals->AppOptions.NoRender)
   {
-    f3d::log::debug("========== Rendering ==========");
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
@@ -704,7 +703,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
     if (it == this->Internals->FilesList.end())
     {
       // In the main thread, we only need to guard writing
-      const std::lock_guard<std::mutex> lock(self->Internals->FilesListMutex);
+      const std::lock_guard<std::mutex> lock(this->Internals->FilesListMutex);
       this->Internals->FilesList.push_back(tmpPath);
       return static_cast<int>(this->Internals->FilesList.size()) - 1;
     }
