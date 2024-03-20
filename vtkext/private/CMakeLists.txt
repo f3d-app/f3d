@@ -26,7 +26,7 @@ vtk_module_build(
   INSTALL_HEADERS OFF
   HEADERS_COMPONENT vtkext
   TARGETS_COMPONENT vtkext
-  PACKAGE "f3d-VTKExtensionsPrivate")
+  PACKAGE "f3d_vtkext_private")
 
 # We need non empty cmake vars for these calls for VTK <= 9.1
 # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9084
