@@ -365,7 +365,6 @@ public:
 
     if (render)
     {
-      self->Options.set("ui.animationname-info", self->AnimationManager->GetAnimationName());
       self->Window.render();
     }
   }

@@ -360,8 +360,6 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("ui.filename"));
   this->Internals->Renderer->SetFilenameInfo(
     this->Internals->Options.getAsString("ui.filename-info"));
-  this->Internals->Renderer->SetAnimationnameInfo(
-    this->Internals->Options.getAsString("ui.animationname-info"));
   this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("ui.metadata"));
   this->Internals->Renderer->ShowCheatSheet(this->Internals->Options.getAsBool("ui.cheatsheet"));
   this->Internals->Renderer->ShowDropZone(this->Internals->Options.getAsBool("ui.dropzone"));

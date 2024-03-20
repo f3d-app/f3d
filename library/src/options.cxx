@@ -175,7 +175,6 @@ options::options()
   this->Internals->init("ui.bar", false);
   this->Internals->init("ui.filename", false);
   this->Internals->init("ui.filename-info", std::string());
-  this->Internals->init("ui.animationname-info", std::string());
   this->Internals->init("ui.fps", false);
   this->Internals->init("ui.cheatsheet", false);
   this->Internals->init("ui.dropzone", false);
