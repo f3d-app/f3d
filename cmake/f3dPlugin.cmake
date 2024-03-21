@@ -292,7 +292,7 @@ macro(f3d_plugin_build)
 
   if(NOT F3D_PLUGIN_IS_STATIC)
     install(TARGETS f3d-plugin-${F3D_PLUGIN_NAME}
-       EXPORT f3dTargets
+      EXPORT f3dTargets
       ARCHIVE DESTINATION ${_f3d_plugins_install_dir} COMPONENT plugin
       LIBRARY DESTINATION ${_f3d_plugins_install_dir} COMPONENT plugin)
   endif()

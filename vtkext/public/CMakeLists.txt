@@ -22,8 +22,10 @@ if(BUILD_SHARED_LIBS)
   set(export_name "f3d_vtkext")
   set(headers_component "plugin_sdk")
 else()
-  # When building as a static lib, the module is not installed at all
-  set(f3d_vtk_no_install "NO_INSTALL")
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220928)
+    # When building as a static lib, the module is not installed at all
+    set(f3d_vtk_no_install "NO_INSTALL")
+  endif()
 endif()
 
 vtk_module_build(
