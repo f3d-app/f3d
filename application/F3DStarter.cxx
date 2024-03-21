@@ -633,7 +633,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
 
   if (this->Internals->LoadedFile)
   {
-    if (this->Internals->AppOptions.AutoReload)
+    if (this->Internals->AppOptions.Watch)
     {
       // Always unwatch and watch current folder, even on reload
       if (this->Internals->FolderWatchId.id > 0)

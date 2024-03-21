@@ -901,6 +901,6 @@ if(NOT F3D_MACOS_BUNDLE)
 endif()
 
 if(UNIX AND NOT VTK_OPENGL_HAS_EGL)
-  # Custom bash test for testing auto-reload
-  add_test (NAME f3d::TestAutoReload COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/auto_reload.sh $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
+  # Custom bash test for testing watch option
+  add_test (NAME f3d::TestWatch COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.sh $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
 endif()

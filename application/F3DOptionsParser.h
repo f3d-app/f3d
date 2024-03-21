@@ -29,7 +29,7 @@ struct F3DAppOptions
   std::string InteractionTestPlayFile = "";
   bool NoBackground = false;
   bool NoRender = false;
-  bool AutoReload = false;
+  bool Watch = false;
   double RefThreshold = 50;
   double MaxSize = -1.0;
 

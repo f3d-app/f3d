@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Test the auto-reload feature by opening a file
+# Test the watch feature by opening a file
 # rewriting it and checking the the file has been
 # automatically reloaded
 
@@ -16,7 +16,7 @@ reloaded_data=$tmp_dir/cow.vtp
 cp $hires_data $reloaded_data
 
 log=$tmp_dir/output.log
-$f3d_cmd --auto-reload --verbose $reloaded_data > $log &
+$f3d_cmd --watch --verbose $reloaded_data > $log &
 pid=$!
 
 sleep 1
