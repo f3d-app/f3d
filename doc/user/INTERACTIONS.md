@@ -67,8 +67,8 @@ Other hotkeys are available:
 * <kbd>?</kbd>: key to print scene description to the terminal.
 * <kbd>Esc</kbd>: close the window and quit F3D.
 * <kbd>Space</kbd>: play the animation if any.
-* <kbd>&larr;</kbd>: load the previous file if any and reset camera.
-* <kbd>&rarr;</kbd>: load the next file if any and reset camera.
+* <kbd>&larr;</kbd>: load the previous file if any and reset the camera.
+* <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
 * <kbd>&uarr;</kbd>: reload the current file.
 * <kbd>&darr;</kbd>: add current file parent directory to the list of files, reload the current file and reset the camera.
 
