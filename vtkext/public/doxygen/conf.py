@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'libf3d'
+project = 'vtkext'
 copyright = '2024, Michael Migliore and Mathieu Westphal'
 author = 'Michael Migliore and Mathieu Westphal'
 
