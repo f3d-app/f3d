@@ -28,7 +28,7 @@ jobs:
         sphinx-build -M html ./library/doxygen ./library/doxygen/build/
         sudo mv library/doxygen/build/html _site/doc/libf3d/doxygen
         sphinx-build -M html ./vtkext/public/doxygen ./vtkext/public/doxygen/build/
-        sudo mv vtkext/public/doxygen/build/html _site/doc/vtkext/doxygen
+        sudo mv vtkext/public/doxygen/build/html _site/doc/libf3d/vtkext_doxygen
 
     - name: Deploy
       if: github.ref == 'refs/heads/master'
