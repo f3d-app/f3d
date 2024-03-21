@@ -8,6 +8,10 @@
 
 #define DMON_IMPL
 #include "dmon.h"
+#ifdef WIN32
+  // dmon includes Windows.h which defines 'ERROR' and conflicts with log.h
+  #undef ERROR
+#endif
 
 #include "engine.h"
 #include "interactor.h"
