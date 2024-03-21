@@ -138,7 +138,7 @@ public:
     }
   }
 
-  static void dmonFolderChanged(dmon_watch_id watch_id, dmon_action action, const char* rootdir,
+  static void dmonFolderChanged(dmon_watch_id watchId, dmon_action action, const char* rootDir,
     const char* filename, const char*, void* userData)
   {
     F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
