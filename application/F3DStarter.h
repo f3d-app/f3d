@@ -60,7 +60,7 @@ private:
   bool LoadRelativeFile(int relativeIndex = 0, bool restoreCamera = false);
 
   /**
-   * Internal event loop that is triggered repeatdly to handle specific events:
+   * Internal event loop that is triggered repeatedly to handle specific events:
    * - Render
    * - ReloadFile
    */
