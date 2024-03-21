@@ -39,7 +39,7 @@ public:
   void Render();
 
   /**
-   * Trigger a render now
+   * Trigger a render immediately (must be called by the main thread)
    */
   void ForceRender();
 
