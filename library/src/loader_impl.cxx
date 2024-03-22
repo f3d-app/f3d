@@ -163,6 +163,9 @@ public:
       }
     }
 
+    // Set the name for animation
+    this->Window.setAnimationNameInfo(this->AnimationManager.GetAnimationName());
+
     // Display the importer description
     loader_impl::internals::DisplayImporterDescription(this->GenericImporter);
 
@@ -232,7 +235,6 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
     throw loader::load_failure_exception(
       filePath + " is not a file of a supported 3D geometry file format for default scene");
   }
-
   // Read the file
   log::debug("Loading 3D geometry: ", filePath, "\n");
 
@@ -324,6 +326,9 @@ loader& loader_impl::loadScene(const std::string& filePath)
       this->Internals->AnimationManager.LoadAtTime(animationTime);
     }
   }
+  
+  // Set the name for animation
+  this->Internals->Window.setAnimationNameInfo(this->Internals->AnimationManager.GetAnimationName());
 
   // Display output description
   loader_impl::internals::DisplayImporterDescription(this->Internals->CurrentFullSceneImporter);
