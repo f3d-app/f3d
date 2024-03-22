@@ -13,13 +13,26 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240312)
   set(f3d_vtkext_headers_exclude "HEADERS_EXCLUDE_FROM_ALL;ON")
 endif()
   
-# The headers and all "dev" part are installed as part of the plugin SDK
-# The library itself is installed as part of the library
+set(export_name "")
+set(headers_component "")
+set(f3d_vtk_no_install "")
+if(BUILD_SHARED_LIBS)
+  # The headers and all "dev" part are installed as part of the plugin SDK
+  # The library itself is installed as part of the library
+  set(export_name "f3d_vtkext")
+  set(headers_component "plugin_sdk")
+else()
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220928)
+    # When building as a static lib, the module is not installed at all
+    set(f3d_vtk_no_install "NO_INSTALL")
+  endif()
+endif()
+
 vtk_module_build(
   MODULES ${modules}
-  INSTALL_EXPORT "f3d_vtkext"
+  INSTALL_EXPORT ${export_name}
   INSTALL_HEADERS ON
-  HEADERS_COMPONENT plugin_sdk
+  HEADERS_COMPONENT ${headers_component}
   ${f3d_vtkext_headers_exclude}
   HEADERS_DESTINATION "include/f3d"
   TARGETS_COMPONENT library

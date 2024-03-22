@@ -236,7 +236,10 @@ if(WIN32)
 else()
   set(_dirname "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 endif()
-f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins=${_dirname}/${CMAKE_SHARED_LIBRARY_PREFIX}f3d${CMAKE_SHARED_LIBRARY_SUFFIX} NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
+
+if(BUILD_SHARED_LIBS)
+  f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins=${_dirname}/${CMAKE_SHARED_LIBRARY_PREFIX}f3d${CMAKE_SHARED_LIBRARY_SUFFIX} NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
+endif()
 
 if(NOT F3D_MACOS_BUNDLE)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
@@ -574,7 +577,7 @@ if(F3D_PLUGIN_BUILD_EXODUS)
     endif()
   endif()
 
-  if (NOT F3D_PLUGINS_STATIC_BUILD)
+  if (NOT F3D_PLUGINS_STATIC_BUILD AND BUILD_SHARED_LIBS)
 
     # Test --load-plugins with the name of a dynamic plugin
     f3d_test(NAME TestPluginName DATA disk_out_ref.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "Loaded plugin exodus from")

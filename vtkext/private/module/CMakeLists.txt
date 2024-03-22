@@ -72,8 +72,13 @@ if(F3D_MODULE_EXR)
   list(APPEND classes vtkF3DEXRReader)
 endif()
 
+set(_no_install "")
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220928)
+  set(_no_install "NO_INSTALL")
+endif()
+
 vtk_module_add_module(f3d::vtkextPrivate
-  ${f3d_vtk_no_install}
+  ${_no_install}
   FORCE_STATIC
   CLASSES ${classes}
   SOURCES ${sources}
