@@ -1,5 +1,5 @@
 NAME
-  f3d::VTKExtensionsAssimpReader
+  f3d::vtkextAssimp
 DESCRIPTION
   A VTK module for the Assimp plugin
 DEPENDS

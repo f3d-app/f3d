@@ -1,5 +1,5 @@
 NAME
-  f3d::VTKExtensionsUSDReader
+  f3d::vtkextUSD
 DESCRIPTION
   A VTK module for the USD plugin
 DEPENDS

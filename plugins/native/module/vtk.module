@@ -1,5 +1,5 @@
 NAME
-  f3d::VTKExtensionsSplatReader
+  f3d::vtkextNative
 DESCRIPTION
   A VTK module for the native plugin
 DEPENDS
