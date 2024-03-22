@@ -232,6 +232,7 @@ runs:
       run: |
         cmake --install . --component sdk
         cmake --install . --component configuration
+        cmake --install . --component colormaps
 
     - name: Build and configure python externally
       if: |
