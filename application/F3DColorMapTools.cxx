@@ -23,52 +23,40 @@ std::string Find(const std::string& str)
     }
   }
 
-  fs::path cmPath;
-  try
-  {
-    std::vector<fs::path> dirsToCheck;
-    dirsToCheck.emplace_back(F3DConfigFileTools::GetUserConfigFileDirectory() / "colormaps");
+  std::vector<fs::path> dirsToCheck;
+  dirsToCheck.emplace_back(F3DConfigFileTools::GetUserConfigFileDirectory() / "colormaps");
 #ifdef __APPLE__
-    dirsToCheck.emplace_back("/usr/local/etc/f3d/colormaps");
+  dirsToCheck.emplace_back("/usr/local/etc/f3d/colormaps");
 #endif
 #ifdef __linux__
-    dirsToCheck.emplace_back("/etc/f3d/colormaps");
-    dirsToCheck.emplace_back("/usr/share/f3d/colormaps");
+  dirsToCheck.emplace_back("/etc/f3d/colormaps");
+  dirsToCheck.emplace_back("/usr/share/f3d/colormaps");
 #endif
-    dirsToCheck.emplace_back(F3DConfigFileTools::GetBinaryConfigFileDirectory() / "colormaps");
+  dirsToCheck.emplace_back(F3DConfigFileTools::GetBinaryConfigFileDirectory() / "colormaps");
 
-    for (const fs::path& dir : dirsToCheck)
+  for (const fs::path& dir : dirsToCheck)
+  {
+    // If the string is a stem, try adding supported extensions
+    if (fs::path(str).stem() == str)
     {
-      // If the string is a stem, try adding supported extensions
-      if (fs::path(str).stem() == str)
+      for (const std::string& ext : f3d::image::getSupportedFormats())
       {
-        for (const std::string& ext : f3d::image::getSupportedFormats())
+        fs::path cmPath = dir / (str + ext);
+        if (fs::exists(cmPath))
         {
-          cmPath = dir / (str + ext);
-          if (fs::exists(cmPath))
-          {
-            return cmPath.string();
-          }
+          return cmPath.string();
         }
       }
-      else
-      {
-        // If not, use directly
-        cmPath = dir / str;
-      }
-
+    }
+    else
+    {
+      // If not, use directly
+      fs::path cmPath = dir / str;
       if (fs::exists(cmPath))
       {
         return cmPath.string();
       }
     }
-
-    return {};
-  }
-  catch (const fs::filesystem_error&)
-  {
-    f3d::log::error("Error recovering color map file path: ", str);
-    return {};
   }
 
   return {};
