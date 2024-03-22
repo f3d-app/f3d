@@ -133,6 +133,7 @@ runs:
       # CMAKE_MODULE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
       # OCCT plugin causes issues with static build because it exports symbols with the executable for some reasons
+      # https://github.com/f3d-app/f3d/issues/1322
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}/build
