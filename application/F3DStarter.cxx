@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cassert>
 #include <filesystem>
+#include <iostream>
 #include <set>
 
 namespace fs = std::filesystem;
@@ -164,8 +165,16 @@ int F3DStarter::Start(int argc, char** argv)
   this->Internals->Parser.GetOptions(
     this->Internals->AppOptions, this->Internals->DynamicOptions, files);
 
-  // Set verbosity level early from command line
-  F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel);
+  const bool renderToStdout = this->Internals->AppOptions.Output == "-";
+  if (renderToStdout)
+  {
+    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::ERROR);
+  }
+  else
+  {
+    // Set verbosity level early from command line
+    F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel);
+  }
 
   f3d::log::debug("========== Initializing ==========");
 
@@ -184,7 +193,10 @@ int F3DStarter::Start(int argc, char** argv)
       this->Internals->AppOptions, this->Internals->DynamicOptions, files);
 
     // Set verbosity level again if it was defined in the configuration file global block
-    F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel);
+    if (!renderToStdout)
+    {
+      F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel);
+    }
   }
 
 #if __APPLE__
@@ -426,7 +438,15 @@ int F3DStarter::Start(int argc, char** argv)
       }
 
       f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
-      img.save(this->Internals->AppOptions.Output);
+      if (renderToStdout)
+      {
+        const auto buffer = img.saveBuffer();
+        std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator(std::cout));
+      }
+      else
+      {
+        img.save(this->Internals->AppOptions.Output);
+      }
       f3d::log::debug("Output image saved to ", this->Internals->AppOptions.Output);
 
       if (this->Internals->FilesList.size() > 1)
