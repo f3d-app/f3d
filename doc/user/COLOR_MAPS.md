@@ -3,11 +3,13 @@
 ## Image files
 
 It is possible to specify a color map using the `--colormap-file` option.
-The value of the option can be a full path to an image file, a filename only is which case, these directories are used to find the file (in this order):
+The value of the option can be a path to an image file, a filename or a filestem.
+If it is not a path, these directories are used to find the file (in this order):
  * Linux: `${XDG_CONFIG_HOME}/f3d/colormaps`, `~/.config/f3d/colormaps`, `/etc/f3d/colormaps`, `/usr/share/f3d/colormaps`, `[install_dir]/share/f3d/colormaps`
  * Windows: `%APPDATA%\f3d\colormaps`, `[install_dir]\share\f3d\configs\colormaps`
  * macOS: `${XDG_CONFIG_HOME}/f3d/colormaps`, `~/.config/f3d/colormaps`, `/usr/local/etc/f3d/colormaps`, `f3d.app/Contents/Resources/configs/colormaps`
-In case the filename omits the extension, PNG files only are searched.
+The first existing file found is used.
+If it is a filestem, all [supported image](#supported-formats) extensions are tried.
 
 We provide some ready to use color maps files, listed in the table below:
 
@@ -23,9 +25,27 @@ plasma|<img src="https://github.com/Meakk/f3d/blob/colormap-file/resources/color
 seismic|<img src="https://github.com/Meakk/f3d/blob/colormap-file/resources/colormaps/seismic.png?raw=true" class="cm" width="256" height="10" />
 viridis|<img src="https://github.com/Meakk/f3d/blob/colormap-file/resources/colormaps/viridis.png?raw=true" class="cm" width="256" height="10" />
 
-It is possible to create a custom color map by creating a simple RGB image in any supported format (PNG recommended), and any resolution (if the height is more than 1 row, only the first one is taken into account). The image must be copied in the user config directory:
+It is possible to create a custom color map by creating a simple RGB image in any [supported formats](#supported-formats), and any resolution (if the height is more than 1 row, only the first one is taken into account). The image must be copied in the user config directory:
 * Linux/macOS: `~/.config/f3d/colormaps`
 * Windows: `%APPDATA%\f3d\colormaps`
+
+### Supported formats
+
+Here's the list of all supported image formats that can be used as color maps:
+
+- `.png`
+- `.pnm`, `.pgm`, `.ppm`
+- `.tif`, `.tiff`
+- `.bmp`
+- `.slc`
+- `.hdr`
+- `.pic`
+- `.jpeg`, `.jpg`
+- `.MR`
+- `.CT`
+- `.mhd`, `.mha`
+- `.tga`
+- `.exr` (if `F3D_MODULE_EXR` is [enabled](../dev/BUILD.md))
 
 ## Custom values
 

@@ -39,10 +39,17 @@ std::string Find(const std::string& str)
 
     for (const fs::path& dir : dirsToCheck)
     {
-      // If the string is a stem, add extension
+      // If the string is a stem, try adding supported extensions
       if (fs::path(str).stem() == str)
       {
-        cmPath = dir / (str + ".png");
+        for (const std::string& ext : f3d::image::getSupportedFormats())
+        {
+          cmPath = dir / (str + ext);
+          if (fs::exists(cmPath))
+          {
+            return cmPath.string();
+          }
+        }
       }
       else
       {
