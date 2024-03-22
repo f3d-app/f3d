@@ -215,6 +215,7 @@ void animationManager::ToggleAnimation()
     }
   }
 }
+
 //----------------------------------------------------------------------------
 void animationManager::Tick()
 {
@@ -280,6 +281,8 @@ bool animationManager::LoadAtTime(double timeValue)
   }
   return true;
 }
+
+// ---------------------------------------------------------------------------------
 void animationManager::CycleAnimation()
 {
   assert(this->Importer);
@@ -299,11 +302,13 @@ void animationManager::CycleAnimation()
   this->EnableAllAnimation();
   this->LoadAtTime(this->TimeRange[0]);
 }
+
 // ---------------------------------------------------------------------------------
 int animationManager::GetAnimationIndex()
 {
   return this->AnimationIndex;
 }
+
 // ---------------------------------------------------------------------------------
 std::string animationManager::GetAnimationName()
 {
@@ -318,6 +323,7 @@ std::string animationManager::GetAnimationName()
   }
   return this->Importer->GetAnimationName(this->AnimationIndex);
 }
+
 //----------------------------------------------------------------------------
 void animationManager::EnableAllAnimation()
 {
@@ -334,6 +340,7 @@ void animationManager::EnableAllAnimation()
     this->Importer->EnableAnimation(this->AnimationIndex);
   }
 }
+
 //----------------------------------------------------------------------------
 void animationManager::DisableAllAnimation()
 {
@@ -357,4 +364,5 @@ void animationManager::GetTimeRange(double timeRange[2])
   timeRange[0] = this->TimeRange[0];
   timeRange[1] = this->TimeRange[1];
 }
+
 }

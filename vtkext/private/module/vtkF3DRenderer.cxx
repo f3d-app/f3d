@@ -1570,3 +1570,5 @@ std::string vtkF3DRenderer::ShortName(const std::string& name, int maxChar)
     return name.substr(0, maxChar - 3) + "...";
   }
 }
+
+//----------------------------------------------------------------------------

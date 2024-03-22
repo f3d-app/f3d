@@ -1091,3 +1091,5 @@ std::string vtkF3DRendererWithColoring::ComponentToString(int component)
     return componentName;
   }
 }
+
+//----------------------------------------------------------------------------
