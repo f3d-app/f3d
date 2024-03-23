@@ -404,7 +404,7 @@ typedef struct dmon__state {
     CRITICAL_SECTION mutex;
     volatile LONG modify_watches;
     dmon__win32_event* events;
-    bool quit;
+    std::atomic<bool> quit;
 } dmon__state;
 
 static bool _dmon_init;
