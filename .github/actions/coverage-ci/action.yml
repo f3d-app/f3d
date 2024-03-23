@@ -102,6 +102,7 @@ runs:
         lcov --remove coverage.info "*/dependencies/*" -o coverage.info
         lcov --remove coverage.info "*/cxxopts.hpp" -o coverage.info
         lcov --remove coverage.info "*/json.hpp" -o coverage.info
+        lcov --remove coverage.info "*/dmon.h" -o coverage.info
         lcov --remove coverage.info "*Test*" -o coverage.info
 
     - name: Upload coverage to Codecov
