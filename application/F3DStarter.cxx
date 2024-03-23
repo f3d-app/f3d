@@ -11,8 +11,8 @@
 #define DMON_IMPL
 #include "dmon.h"
 #ifdef WIN32
-  // dmon includes Windows.h which defines 'ERROR' and conflicts with log.h
-  #undef ERROR
+// dmon includes Windows.h which defines 'ERROR' and conflicts with log.h
+#undef ERROR
 #endif
 #pragma warning(pop)
 
