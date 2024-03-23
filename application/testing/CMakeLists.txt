@@ -199,6 +199,7 @@ f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${F3D_SOU
 f3d_test(NAME TestTextureMatCapWithTCoords DATA WaterBottle.glb ARGS --geometry-only --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png DEFAULT_LIGHTS)
 f3d_test(NAME TestConfigOrder DATA suzanne.ply ARGS CONFIG ${F3D_SOURCE_DIR}/testing/data/config-order.json DEFAULT_LIGHTS)
 f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP "^.PNG" NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
 
 # Needs SSBO: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231108)
