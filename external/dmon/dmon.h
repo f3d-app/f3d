@@ -83,7 +83,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <atomic>
 
 #ifndef DMON_API_DECL
 #   define DMON_API_DECL
@@ -405,7 +404,7 @@ typedef struct dmon__state {
     CRITICAL_SECTION mutex;
     volatile LONG modify_watches;
     dmon__win32_event* events;
-    std::atomic<bool> quit;
+    bool quit;
 } dmon__state;
 
 static bool _dmon_init;
@@ -767,7 +766,7 @@ typedef struct dmon__state {
     int num_watches;
     pthread_t thread_handle;
     pthread_mutex_t mutex;
-    std::atomic<bool> quit;
+    bool quit;
 } dmon__state;
 
 static bool _dmon_init;
@@ -1330,7 +1329,7 @@ typedef struct dmon__state {
     pthread_mutex_t mutex;
     CFRunLoopRef cf_loop_ref;
     CFAllocatorRef cf_alloc_ref;
-    std::atomic<bool> quit;
+    bool quit;
 } dmon__state;
 
 union dmon__cast_userdata {
