@@ -6,12 +6,15 @@
 #include "F3DOptionsParser.h"
 #include "F3DSystemTools.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4505)
 #define DMON_IMPL
 #include "dmon.h"
 #ifdef WIN32
   // dmon includes Windows.h which defines 'ERROR' and conflicts with log.h
   #undef ERROR
 #endif
+#pragma warning(pop)
 
 #include "engine.h"
 #include "interactor.h"
@@ -142,7 +145,7 @@ public:
     }
   }
 
-  static void dmonFolderChanged(dmon_watch_id watchId, dmon_action action, const char* rootDir,
+  static void dmonFolderChanged(dmon_watch_id, dmon_action, const char*,
     const char* filename, const char*, void* userData)
   {
     F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
