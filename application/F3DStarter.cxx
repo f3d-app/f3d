@@ -6,14 +6,16 @@
 #include "F3DOptionsParser.h"
 #include "F3DSystemTools.h"
 
+#define DMON_IMPL
 #ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable: 4505)
-#define DMON_IMPL
 #include "dmon.h"
 // dmon includes Windows.h which defines 'ERROR' and conflicts with log.h
 #undef ERROR
 #pragma warning(pop)
+#else
+#include "dmon.h"
 #endif
 
 #include "engine.h"
