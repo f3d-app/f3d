@@ -9,7 +9,7 @@
 #define DMON_IMPL
 #ifdef WIN32
 #pragma warning(push)
-#pragma warning(disable: 4505)
+#pragma warning(disable : 4505)
 #include "dmon.h"
 // dmon includes Windows.h which defines 'ERROR' and conflicts with log.h
 #undef ERROR
@@ -147,8 +147,8 @@ public:
     }
   }
 
-  static void dmonFolderChanged(dmon_watch_id, dmon_action, const char*,
-    const char* filename, const char*, void* userData)
+  static void dmonFolderChanged(
+    dmon_watch_id, dmon_action, const char*, const char* filename, const char*, void* userData)
   {
     F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
     const std::lock_guard<std::mutex> lock(self->Internals->FilesListMutex);

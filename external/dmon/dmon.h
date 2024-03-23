@@ -766,7 +766,7 @@ typedef struct dmon__state {
     int num_watches;
     pthread_t thread_handle;
     pthread_mutex_t mutex;
-    bool quit;
+    std::atomic<bool> quit;
 } dmon__state;
 
 static bool _dmon_init;
@@ -1329,7 +1329,7 @@ typedef struct dmon__state {
     pthread_mutex_t mutex;
     CFRunLoopRef cf_loop_ref;
     CFAllocatorRef cf_alloc_ref;
-    bool quit;
+    std::atomic<bool> quit;
 } dmon__state;
 
 union dmon__cast_userdata {
