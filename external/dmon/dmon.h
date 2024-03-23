@@ -83,6 +83,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <atomic>
 
 #ifndef DMON_API_DECL
 #   define DMON_API_DECL
