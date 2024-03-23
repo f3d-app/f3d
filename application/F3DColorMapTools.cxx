@@ -32,7 +32,7 @@ std::string Find(const std::string& str)
   dirsToCheck.emplace_back("/etc/f3d/colormaps");
   dirsToCheck.emplace_back("/usr/share/f3d/colormaps");
 #endif
-  dirsToCheck.emplace_back(F3DConfigFileTools::GetBinaryConfigFileDirectory() / "colormaps");
+  dirsToCheck.emplace_back(F3DConfigFileTools::GetBinaryResourceDirectory() / "colormaps");
 
   for (const fs::path& dir : dirsToCheck)
   {
