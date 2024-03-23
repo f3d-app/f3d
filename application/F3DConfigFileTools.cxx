@@ -46,7 +46,7 @@ fs::path F3DConfigFileTools::GetUserConfigFileDirectory()
 }
 
 //----------------------------------------------------------------------------
-fs::path F3DConfigFileTools::GetBinaryConfigFileDirectory()
+fs::path F3DConfigFileTools::GetBinaryResourceDirectory()
 {
   fs::path dirPath;
   try
@@ -88,7 +88,7 @@ fs::path F3DConfigFileTools::GetConfigPath(const std::string& configSearch)
     dirsToCheck.emplace_back("/etc/f3d");
     dirsToCheck.emplace_back("/usr/share/f3d/configs");
 #endif
-    dirsToCheck.emplace_back(F3DConfigFileTools::GetBinaryConfigFileDirectory() / "configs");
+    dirsToCheck.emplace_back(F3DConfigFileTools::GetBinaryResourceDirectory() / "configs");
 
     for (const fs::path& dir : dirsToCheck)
     {
