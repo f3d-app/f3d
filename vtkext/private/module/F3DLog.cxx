@@ -55,10 +55,23 @@ void F3DLog::SetUseColoring(bool use)
 }
 
 //----------------------------------------------------------------------------
-void F3DLog::SetQuiet(bool quiet)
+void F3DLog::SetStandardStream(StandardStream mode)
 {
   vtkOutputWindow* win = vtkOutputWindow::GetInstance();
-  win->SetDisplayMode(quiet ? vtkOutputWindow::NEVER : vtkOutputWindow::ALWAYS);
+
+  switch (mode)
+  {
+    case StandardStream::None:
+      win->SetDisplayMode(vtkOutputWindow::NEVER);
+      break;
+    case StandardStream::AlwaysStdErr:
+      win->SetDisplayMode(vtkOutputWindow::ALWAYS_STDERR);
+      break;
+    case StandardStream::Default:
+    default:
+      win->SetDisplayMode(vtkOutputWindow::ALWAYS);
+      break;
+  }
 }
 
 //----------------------------------------------------------------------------

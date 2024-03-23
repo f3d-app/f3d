@@ -69,10 +69,20 @@ void log::setUseColoring(bool use)
 }
 
 //----------------------------------------------------------------------------
-void log::setVerboseLevel(log::VerboseLevel level)
+void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)
 {
   detail::init::initialize();
-  F3DLog::SetQuiet(level == log::VerboseLevel::QUIET);
+
+  if (level == log::VerboseLevel::QUIET)
+  {
+    F3DLog::SetStandardStream(F3DLog::StandardStream::None);
+  }
+  else
+  {
+    F3DLog::SetStandardStream(
+      forceStdErr ? F3DLog::StandardStream::AlwaysStdErr : F3DLog::StandardStream::Default);
+  }
+
   switch (level)
   {
     case (log::VerboseLevel::DEBUG):

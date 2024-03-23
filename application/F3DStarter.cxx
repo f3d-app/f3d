@@ -103,28 +103,28 @@ public:
     return false;
   }
 
-  static void SetVerboseLevel(const std::string& level)
+  static void SetVerboseLevel(const std::string& level, bool forceStdErr)
   {
     // A switch/case over verbose level
     if (level == "quiet")
     {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET, forceStdErr);
     }
     else if (level == "error")
     {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::ERROR);
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::ERROR, forceStdErr);
     }
     else if (level == "warning")
     {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::WARN);
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::WARN, forceStdErr);
     }
     else if (level == "info")
     {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO);
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO, forceStdErr);
     }
     else if (level == "debug")
     {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG, forceStdErr);
     }
     else
     {
@@ -166,14 +166,14 @@ int F3DStarter::Start(int argc, char** argv)
     this->Internals->AppOptions, this->Internals->DynamicOptions, files);
 
   const bool renderToStdout = this->Internals->AppOptions.Output == "-";
+
+  // Set verbosity level early from command line
+  F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel, renderToStdout);
+
   if (renderToStdout)
   {
-    f3d::log::setVerboseLevel(f3d::log::VerboseLevel::ERROR);
-  }
-  else
-  {
-    // Set verbosity level early from command line
-    F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel);
+    f3d::log::info("Output image will be saved to stdout, all log types including debug and info "
+                   "levels are redirected to stderr");
   }
 
   f3d::log::debug("========== Initializing ==========");
@@ -193,10 +193,7 @@ int F3DStarter::Start(int argc, char** argv)
       this->Internals->AppOptions, this->Internals->DynamicOptions, files);
 
     // Set verbosity level again if it was defined in the configuration file global block
-    if (!renderToStdout)
-    {
-      F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel);
-    }
+    F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel, renderToStdout);
   }
 
 #if __APPLE__
@@ -442,12 +439,13 @@ int F3DStarter::Start(int argc, char** argv)
       {
         const auto buffer = img.saveBuffer();
         std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator(std::cout));
+        f3d::log::debug("Output image saved to stdout");
       }
       else
       {
         img.save(this->Internals->AppOptions.Output);
+        f3d::log::debug("Output image saved to ", this->Internals->AppOptions.Output);
       }
-      f3d::log::debug("Output image saved to ", this->Internals->AppOptions.Output);
 
       if (this->Internals->FilesList.size() > 1)
       {

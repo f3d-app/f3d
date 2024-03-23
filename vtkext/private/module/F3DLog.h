@@ -23,6 +23,13 @@ enum class Severity : unsigned char
   Error
 };
 
+enum class StandardStream : unsigned char
+{
+  Default = 0,
+  None,
+  AlwaysStdErr
+};
+
 /**
  * Set this global variable to control the verbose level
  * that actually display something in Print
@@ -41,10 +48,13 @@ void Print(Severity sev, const std::string& msg);
 void SetUseColoring(bool use);
 
 /**
- * Set if any log should be shown or not.
- * Override the verbosity level completely.
+ * Determine how standard stream should be used.
+ * If mode is None, then no message is written at all (including errors).
+ * If mode is AlwaysStdErr, then all messages are written to stderr.
+ * If mode is Default, then only warnings and errors are written to stderr. Debug and info messages
+ * are written to stdout.
  */
-void SetQuiet(bool quiet);
+void SetStandardStream(StandardStream mode);
 
 /**
  * If output window is a vtkF3DWin32OutputWindow,

@@ -27,12 +27,12 @@ int TestF3DLog(int argc, char* argv[])
   F3DLog::Print(F3DLog::Severity::Error, "Test Error\n");
 
   F3DLog::VerboseLevel = F3DLog::Severity::Info;
-  F3DLog::SetQuiet(true); // Next print calls should print nothing
+  F3DLog::SetStandardStream(F3DLog::StandardStream::None); // Next print calls should print nothing
   F3DLog::Print(F3DLog::Severity::Debug, "Test Debug Quiet ");
   F3DLog::Print(F3DLog::Severity::Info, "Test Info Quiet ");
   F3DLog::Print(F3DLog::Severity::Warning, "Test Warning Quiet ");
   F3DLog::Print(F3DLog::Severity::Error, "Test Error Quiet\n");
-  F3DLog::SetQuiet(false);
+  F3DLog::SetStandardStream(F3DLog::StandardStream::Default);
 
   // Without the object factory created, this is expected to have no effect
   F3DLog::SetUseColoring(true);
