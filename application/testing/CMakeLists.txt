@@ -900,7 +900,13 @@ if(NOT F3D_MACOS_BUNDLE)
   endif()
 endif()
 
-if(UNIX AND NOT VTK_OPENGL_HAS_EGL)
-  # Custom bash test for testing watch option
-  add_test (NAME f3d::TestWatch COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.sh $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
+if(NOT VTK_OPENGL_HAS_EGL)
+  if(UNIX)
+    # Custom bash test for testing watch option
+    add_test (NAME f3d::TestWatch COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.sh $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
+  elseif(WIN32)
+    find_program(PWSH NAMES pwsh powershell)
+    add_test (NAME f3d::TestWatch COMMAND ${PWSH} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.ps1 $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
+elseif(UNIX)
+  endif()
 endif()
