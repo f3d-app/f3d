@@ -903,13 +903,16 @@ if(NOT F3D_MACOS_BUNDLE)
   endif()
 endif()
 
+# Watch testing require onscreen renderong
 if(NOT VTK_OPENGL_HAS_EGL)
+  set(_f3d_os_run_exec "")
+  set(_f3d_os_script_ext "")
   if(UNIX)
-    # Custom bash test for testing watch option
-    add_test (NAME f3d::TestWatch COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.sh $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
+    set(_f3d_os_script_ext "sh")
   elseif(WIN32)
-    find_program(PWSH NAMES pwsh powershell)
-    add_test (NAME f3d::TestWatch COMMAND ${PWSH} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.ps1 $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
-elseif(UNIX)
+    set(_f3d_os_script_ext "ps1")
+    find_program(_f3d_os_run_exec NAMES pwsh powershell)
   endif()
+  # Custom bash test for testing watch option
+  add_test (NAME f3d::TestWatch COMMAND ${_f3d_os_run_exec} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.${_f3d_os_script_ext} $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
 endif()
