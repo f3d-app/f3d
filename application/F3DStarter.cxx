@@ -10,9 +10,10 @@
 #ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable : 4505)
+#define WIN32_LEAN_AND_MEAN
 #include "dmon.h"
 // dmon includes Windows.h which defines 'ERROR' and conflicts with log.h
-#undef ERROR
+//#undef ERROR
 #pragma warning(pop)
 #else
 #include "dmon.h"
