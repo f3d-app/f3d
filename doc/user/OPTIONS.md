@@ -6,7 +6,7 @@ F3D behavior can be fully controlled from the command line using the following o
 
 Options|Default|Description
 ------|------|------
-\-\-output=\<png file\>||Instead of showing a render view and render into it, *render directly into a png file*. When used with \-\-ref option, only outputs on failure.
+\-\-output=\<png file\>||Instead of showing a render view and render into it, *render directly into a png file*. When used with \-\-ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout.
 \-\-no-background||Use with \-\-output to output a png file with a transparent background.
 -h, \-\-help||Print *help* and exit. Ignore `--verbose`.
 \-\-version||Show *version* information and exit. Ignore `--verbose`.
