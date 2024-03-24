@@ -6,6 +6,9 @@
 #include "F3DOptionsParser.h"
 #include "F3DSystemTools.h"
 
+#define DMON_IMPL
+#include "dmon.h"
+
 #include "engine.h"
 #include "interactor.h"
 #include "log.h"
@@ -13,9 +16,11 @@
 #include "window.h"
 
 #include <algorithm>
+#include <atomic>
 #include <cassert>
 #include <filesystem>
 #include <iostream>
+#include <mutex>
 #include <set>
 
 namespace fs = std::filesystem;
@@ -133,15 +138,36 @@ public:
     }
   }
 
+  static void dmonFolderChanged(dmon_watch_id watch_id, dmon_action action, const char* rootdir,
+    const char* filename, const char*, void* userData)
+  {
+    F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
+    self->Internals->FilesListMutex.lock();
+    fs::path filePath = self->Internals->FilesList[self->Internals->CurrentFileIndex];
+    self->Internals->FilesListMutex.unlock();
+    if (filePath.filename().string() == std::string(filename))
+    {
+      self->Internals->ReloadFile = true;
+    }
+  }
+
   F3DOptionsParser Parser;
   F3DAppOptions AppOptions;
   f3d::options DynamicOptions;
   f3d::options FileOptions;
   std::unique_ptr<f3d::engine> Engine;
   std::vector<fs::path> FilesList;
-  int CurrentFileIndex = -1;
+  dmon_watch_id FolderWatchId;
   bool LoadedFile = false;
   bool UpdateWithCommandLineParsing = true;
+
+  // dmon used atomic and mutex
+  std::atomic<int> CurrentFileIndex = -1;
+  std::mutex FilesListMutex;
+
+  // Event loop atomics
+  std::atomic<bool> SoftRender = false;
+  std::atomic<bool> ReloadFile = false;
 };
 
 //----------------------------------------------------------------------------
@@ -151,10 +177,17 @@ F3DStarter::F3DStarter()
   // Set option outside of command line and config file
   this->Internals->DynamicOptions.set(
     "ui.dropzone-info", "Drop a file or HDRI to load it\nPress H to show cheatsheet");
+
+  // Initialize dmon
+  dmon_init();
 }
 
 //----------------------------------------------------------------------------
-F3DStarter::~F3DStarter() = default;
+F3DStarter::~F3DStarter()
+{
+  // deinit dmon
+  dmon_deinit();
+}
 
 //----------------------------------------------------------------------------
 int F3DStarter::Start(int argc, char** argv)
@@ -219,41 +252,17 @@ int F3DStarter::Start(int argc, char** argv)
     interactor.setKeyPressCallBack(
       [this](int, const std::string& keySym) -> bool
       {
-        const auto loadFile = [this](int index, bool restoreCamera = false) -> bool
-        {
-          this->Internals->Engine->getInteractor().stopAnimation();
-
-          f3d::log::debug("========== Loading 3D file ==========");
-
-          if (restoreCamera)
-          {
-            f3d::camera& cam = this->Internals->Engine->getWindow().getCamera();
-            const auto camState = cam.getState();
-            this->LoadFile(index, true);
-            cam.setState(camState);
-          }
-          else
-          {
-            this->LoadFile(index, true);
-          }
-
-          f3d::log::debug("========== Rendering ==========");
-
-          this->Render();
-          return true;
-        };
-
         if (keySym == "Left")
         {
-          return loadFile(-1);
+          return this->LoadRelativeFile(-1);
         }
         if (keySym == "Right")
         {
-          return loadFile(+1);
+          return this->LoadRelativeFile(+1);
         }
         if (keySym == "Up")
         {
-          return loadFile(0, true);
+          return this->LoadRelativeFile(0, true);
         }
         if (keySym == "Down")
         {
@@ -264,7 +273,7 @@ int F3DStarter::Start(int argc, char** argv)
               this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)]
                 .parent_path(),
               true);
-            return loadFile(0);
+            return this->LoadRelativeFile(0);
           }
           return true;
         }
@@ -288,7 +297,7 @@ int F3DStarter::Start(int argc, char** argv)
             this->Internals->Engine->getOptions().set("render.background.skybox", true);
 
             // Rendering now is needed for correct lighting
-            this->Render();
+            this->Render(true);
           }
           else
           {
@@ -460,6 +469,8 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::log::error("This is a headless build of F3D, interactive rendering is not supported");
       return EXIT_FAILURE;
 #else
+      // Create the event loop repeating timer
+      interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
       this->Render();
       interactor.start();
 #endif
@@ -472,6 +483,7 @@ int F3DStarter::Start(int argc, char** argv)
 //----------------------------------------------------------------------------
 void F3DStarter::LoadFile(int index, bool relativeIndex)
 {
+  f3d::log::debug("========== Loading 3D file ==========");
   // When loading a file, store any changed options
   // into the dynamic options and use these dynamic option as the default
   // for loading the file while still applying file specific options on top of it
@@ -621,7 +633,19 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
     }
   }
 
-  if (!this->Internals->LoadedFile)
+  if (this->Internals->LoadedFile)
+  {
+    if (true) // TODO should be controlled with an option
+    {
+      if (this->Internals->FolderWatchId.id > 0)
+      {
+        dmon_unwatch(this->Internals->FolderWatchId);
+      }
+      this->Internals->FolderWatchId = dmon_watch(
+        filePath.parent_path().string().c_str(), &F3DInternals::dmonFolderChanged, 0, this);
+    }
+  }
+  else
   {
     // No file loaded, remove any previously loaded file
     loader.loadGeometry("", true);
@@ -632,10 +656,19 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::Render()
+void F3DStarter::Render(bool force)
 {
-  this->Internals->Engine->getWindow().render();
-  f3d::log::debug("Render done");
+  if (force)
+  {
+    f3d::log::debug("========== Rendering ==========");
+    this->Internals->Engine->getWindow().render();
+    f3d::log::debug("Render done");
+  }
+  else
+  {
+    // Render(true) will be called by the next event loop
+    this->Internals->SoftRender = true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -671,7 +704,9 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
 
     if (it == this->Internals->FilesList.end())
     {
+      this->Internals->FilesListMutex.lock();
       this->Internals->FilesList.push_back(tmpPath);
+      this->Internals->FilesListMutex.unlock();
       return static_cast<int>(this->Internals->FilesList.size()) - 1;
     }
     else
@@ -682,5 +717,42 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       }
       return static_cast<int>(std::distance(this->Internals->FilesList.begin(), it));
     }
+  }
+}
+
+//----------------------------------------------------------------------------
+bool F3DStarter::LoadRelativeFile(int index, bool restoreCamera)
+{
+  this->Internals->Engine->getInteractor().stopAnimation();
+
+  if (restoreCamera)
+  {
+    f3d::camera& cam = this->Internals->Engine->getWindow().getCamera();
+    const auto camState = cam.getState();
+    this->LoadFile(index, true);
+    cam.setState(camState);
+  }
+  else
+  {
+    this->LoadFile(index, true);
+  }
+
+  this->Render();
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::EventLoop()
+{
+  if (this->Internals->ReloadFile)
+  {
+    this->LoadRelativeFile(0, true);
+    this->Internals->ReloadFile = false;
+  }
+  if (this->Internals->SoftRender)
+  {
+    this->Render(true);
+    this->Internals->SoftRender = false;
   }
 }

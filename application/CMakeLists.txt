@@ -57,6 +57,7 @@ elseif (MSVC)
 endif ()
 
 target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+
 if (F3D_USE_EXTERNAL_CXXOPTS)
   target_link_libraries(f3d PRIVATE cxxopts::cxxopts)
 else ()
@@ -67,6 +68,12 @@ if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
   target_link_libraries(f3d PRIVATE nlohmann_json::nlohmann_json)
 else ()
   target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)
+endif ()
+
+if (F3D_USE_EXTERNAL_DMON)
+  target_link_libraries(f3d PRIVATE dmon::dmon)
+else ()
+  target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/dmon>)
 endif ()
 
 set(f3d_compile_options_private "")
