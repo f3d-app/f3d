@@ -911,6 +911,7 @@ if(NOT VTK_OPENGL_HAS_EGL)
   endif()
   # Custom bash/pwsh test for testing watch option
   add_test (NAME f3d::TestWatch COMMAND ${_f3d_os_script_exec} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.${_f3d_os_script_ext} $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
+  set_tests_properties(f3d::TestWatch PROPERTIES RUN_SERIAL TRUE)
   if(F3D_COVERAGE) # When running test for coverage, adapt the script to use xdotool
     set_tests_properties(f3d::TestWatch PROPERTIES ENVIRONMENT "CTEST_F3D_COVERAGE=1")
   endif()
