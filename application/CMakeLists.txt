@@ -213,7 +213,7 @@ install(
 # Default color maps
 install(
   DIRECTORY "${F3D_SOURCE_DIR}/resources/colormaps/"
-  DESTINATION "${f3d_config_dir}/colormaps"
+  DESTINATION "${f3d_resources_dir}/colormaps"
   COMPONENT colormaps
   EXCLUDE_FROM_ALL)
 
