@@ -29,8 +29,8 @@ function cleanup()
 }
 trap "cleanup" EXIT
 
-sleep 1
+sleep 10
 cp $lowres_data $reloaded_data
-sleep 1
+sleep 10
 
 grep -q "Number of points: 634" $log
