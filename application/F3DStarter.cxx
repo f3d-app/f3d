@@ -155,7 +155,7 @@ public:
     fs::path filePath = self->Internals->FilesList[self->Internals->CurrentFileIndex];
     if (filePath.filename().string() == std::string(filename))
     {
-      self->Internals->ReloadFile = true;
+      self->Internals->ReloadFileRequested = true;
     }
   }
 
@@ -174,8 +174,8 @@ public:
   std::mutex FilesListMutex;
 
   // Event loop atomics
-  std::atomic<bool> SoftRender = false;
-  std::atomic<bool> ReloadFile = false;
+  std::atomic<bool> RenderRequested = false;
+  std::atomic<bool> ReloadFileRequested = false;
 };
 
 //----------------------------------------------------------------------------
@@ -305,7 +305,7 @@ int F3DStarter::Start(int argc, char** argv)
             this->Internals->Engine->getOptions().set("render.background.skybox", true);
 
             // Rendering now is needed for correct lighting
-            this->ForceRender();
+            this->Render();
           }
           else
           {
@@ -316,7 +316,7 @@ int F3DStarter::Start(int argc, char** argv)
         {
           this->LoadFile(index);
         }
-        this->Render();
+        this->RequestRender();
         return true;
       });
     window
@@ -478,7 +478,7 @@ int F3DStarter::Start(int argc, char** argv)
 #else
       // Create the event loop repeating timer
       interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
-      this->Render();
+      this->RequestRender();
       interactor.start();
 #endif
     }
@@ -664,14 +664,14 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::Render()
+void F3DStarter::RequestRender()
 {
-  // ForceRender will be called by the next event loop
-  this->Internals->SoftRender = true;
+  // Render will be called by the next event loop
+  this->Internals->RenderRequested = true;
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::ForceRender()
+void F3DStarter::Render()
 {
   f3d::log::debug("========== Rendering ==========");
   this->Internals->Engine->getWindow().render();
@@ -744,7 +744,7 @@ bool F3DStarter::LoadRelativeFile(int index, bool restoreCamera)
     this->LoadFile(index, true);
   }
 
-  this->Render();
+  this->RequestRender();
 
   return true;
 }
@@ -752,14 +752,14 @@ bool F3DStarter::LoadRelativeFile(int index, bool restoreCamera)
 //----------------------------------------------------------------------------
 void F3DStarter::EventLoop()
 {
-  if (this->Internals->ReloadFile)
+  if (this->Internals->ReloadFileRequested)
   {
     this->LoadRelativeFile(0, true);
-    this->Internals->ReloadFile = false;
+    this->Internals->ReloadFileRequested = false;
   }
-  if (this->Internals->SoftRender)
+  if (this->Internals->RenderRequested)
   {
-    this->ForceRender();
-    this->Internals->SoftRender = false;
+    this->Render();
+    this->Internals->RenderRequested = false;
   }
 }

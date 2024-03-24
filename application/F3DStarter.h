@@ -36,12 +36,12 @@ public:
   /**
    * Trigger a render on the next event loop
    */
-  void Render();
+  void RequestRender();
 
   /**
    * Trigger a render immediately (must be called by the main thread)
    */
-  void ForceRender();
+  void Render();
 
   F3DStarter();
   ~F3DStarter();
