@@ -4,7 +4,7 @@
 # rewriting it and checking the the file has been
 # automatically reloaded
 
-set -uo pipefail
+set -euo pipefail
 f3d_cmd=$1
 data_dir=$2
 tmp_dir=$3
@@ -19,12 +19,18 @@ log=$tmp_dir/output.log
 $f3d_cmd --watch --verbose $reloaded_data > $log &
 pid=$!
 
+function cleanup()
+{
+  if [[ -z "${CTEST_F3D_COVERAGE}" ]]; then
+    kill $pid
+  else
+    xdotool key Escape
+  fi
+}
+trap "cleanup" EXIT
+
 sleep 1
 cp $lowres_data $reloaded_data
 sleep 1
 
 grep -q "Number of points: 634" $log
-ret=$?
-
-kill $pid
-exit $ret

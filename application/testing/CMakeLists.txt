@@ -891,9 +891,6 @@ f3d_test(NAME TestBadRefNoOutput DATA cow.vtp ARGS --ref=${F3D_SOURCE_DIR}/testi
 # Test failure with a bad interaction play file, please do not create a dummy.log
 f3d_test(NAME TestPlayNoFile DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/dummy.log WILL_FAIL)
 
-# Test watch coverage, actual test is a custom test that is not taken into account by classic coverage computation
-f3d_test(NAME TestWatchCoverage DATA cow.vtp ARGS --watch NO_BASELINE)
-
 # Test scan plugins
 if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestScanPluginsCheckNative ARGS --scan-plugins NO_RENDER NO_BASELINE REGEXP " - native")
@@ -915,4 +912,7 @@ if(NOT VTK_OPENGL_HAS_EGL)
   endif()
   # Custom bash test for testing watch option
   add_test (NAME f3d::TestWatch COMMAND ${_f3d_os_run_exec} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.${_f3d_os_script_ext} $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
+  if(F3D_COVERAGE) # When running test for coverage, adapt the script to use xdotool
+    set_tests_properties(f3d::TestWatch PROPERTIES ENVIRONMENT "CTEST_F3D_COVERAGE=1")
+  endif()
 endif()
