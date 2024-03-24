@@ -902,16 +902,15 @@ endif()
 
 # Watch testing require onscreen renderong
 if(NOT VTK_OPENGL_HAS_EGL)
-  set(_f3d_os_run_exec "")
   set(_f3d_os_script_ext "")
   if(UNIX)
     set(_f3d_os_script_ext "sh")
   elseif(WIN32)
     set(_f3d_os_script_ext "ps1")
-    find_program(_f3d_os_run_exec NAMES pwsh powershell)
+    find_program(PWSH NAMES pwsh powershell)
   endif()
-  # Custom bash test for testing watch option
-  add_test (NAME f3d::TestWatch COMMAND ${_f3d_os_run_exec} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.${_f3d_os_script_ext} $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
+  # Custom bash/pwsh test for testing watch option
+  add_test (NAME f3d::TestWatch COMMAND ${PWSH} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.${_f3d_os_script_ext} $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
   if(F3D_COVERAGE) # When running test for coverage, adapt the script to use xdotool
     set_tests_properties(f3d::TestWatch PROPERTIES ENVIRONMENT "CTEST_F3D_COVERAGE=1")
   endif()
