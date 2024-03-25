@@ -147,7 +147,8 @@ PYBIND11_MODULE(pyf3d, module)
           throw py::key_error(key);
         }
       })
-    .def("all_metadata", &f3d::image::allMetadata);
+    .def("all_metadata", &f3d::image::allMetadata)
+    .def("normalized_pixel", &f3d::image::getNormalizedPixel);
 
   // f3d::options
   py::class_<f3d::options> options(module, "Options");

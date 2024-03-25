@@ -354,6 +354,33 @@ bool image::operator!=(const image& reference) const
 }
 
 //----------------------------------------------------------------------------
+std::vector<double> image::getNormalizedPixel(const std::pair<int, int>& xy) const
+{
+  std::vector<double> pixel(this->getChannelCount());
+
+  for (size_t i = 0; i < pixel.size(); i++)
+  {
+    double v = this->Internals->Image->GetScalarComponentAsDouble(
+      xy.first, xy.second, 0, static_cast<int>(i));
+
+    switch (this->getChannelType())
+    {
+      case ChannelType::BYTE:
+        pixel[i] = v / 255.0;
+        break;
+      case ChannelType::SHORT:
+        pixel[i] = v / 65535.0;
+        break;
+      default:
+        pixel[i] = v;
+        break;
+    }
+  }
+
+  return pixel;
+}
+
+//----------------------------------------------------------------------------
 void image::save(const std::string& path, SaveFormat format) const
 {
   vtkSmartPointer<vtkImageWriter> writer;

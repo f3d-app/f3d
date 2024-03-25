@@ -86,6 +86,14 @@ public:
   ///@}
 
   /**
+   * Read one specific pixel and return all channel normalized values.
+   * If the channel type is BYTE or SHORT, the values are normalized to [0, 1] range.
+   * \warning Because of the normalization, this function can be slow, prefer getContent when
+   * reading several pixels and normalization is not needed.
+   */
+  std::vector<double> getNormalizedPixel(const std::pair<int, int>& xy) const;
+
+  /**
    * Get the list of supported image format when opening a file.
    */
   static std::vector<std::string> getSupportedFormats();
