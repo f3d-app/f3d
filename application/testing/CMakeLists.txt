@@ -900,7 +900,7 @@ if(NOT F3D_MACOS_BUNDLE)
   endif()
 endif()
 
-# Watch testing require onscreen renderong
+# Watch testing require onscreen rendering
 if(NOT VTK_OPENGL_HAS_EGL)
   if(UNIX)
     set(_f3d_os_script_ext "sh")
