@@ -60,12 +60,16 @@ option(F3D_MODULE_EXR "OpenEXR images module" OFF)
 # Use externals
 option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
 option(F3D_USE_EXTERNAL_NLOHMANN_JSON "Use external nlohmann_json dependency" OFF)
+option(F3D_USE_EXTERNAL_DMON "Use external dmon dependency" OFF)
 
 if (F3D_USE_EXTERNAL_CXXOPTS)
   find_package(cxxopts REQUIRED)
 endif ()
 if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
   find_package(nlohmann_json REQUIRED)
+endif ()
+if (F3D_USE_EXTERNAL_DMON)
+  find_package(dmon REQUIRED)
 endif ()
 
 # VTK dependency

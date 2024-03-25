@@ -19,6 +19,7 @@
 - Cameras.gltf: glTF-Sample-Models: Public Domain
 - cow.vtk: VTK Data: BSD-3-Clause
 - cow.vtp: VTK Data: BSD-3-Clause
+- cowlow.vtp: VTK Data: BSD-3-Clause
 - disk_out_ref.ex2: VTK Data: BSD-3-Clause
 - dragon.vtu: Stanford: Public Domain
 - duck.dae: assimp test models: BSD-3-Clause

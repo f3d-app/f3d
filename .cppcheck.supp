@@ -6,6 +6,7 @@ unknownMacro
 // external libraries
 *:external/nlohmann_json/nlohmann/json.hpp
 *:external/cxxopts/cxxopts.hpp
+*:external/dmon/dmon.h
 
 // specific checks
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
