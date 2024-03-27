@@ -31,7 +31,8 @@ add_executable(f3d ${F3D_SOURCE_FILES})
 target_link_libraries(f3d PUBLIC libf3d)
 
 if(UNIX)
-  target_link_libraries(f3d PRIVATE pthread)
+  find_package(Threads REQUIRED)
+  target_link_libraries(f3d PRIVATE Threads::Threads)
 endif()
 
 if(UNIX AND NOT APPLE)
