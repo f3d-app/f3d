@@ -95,7 +95,7 @@ runs:
       shell: bash
       run: |
         python -m pip install --upgrade pip
-        python -m pip install pytest
+        python -m pip install pytest==8.0.0
 
     - name: Setup Directories
       shell: bash
