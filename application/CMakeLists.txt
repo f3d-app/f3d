@@ -30,6 +30,10 @@ endif()
 add_executable(f3d ${F3D_SOURCE_FILES})
 target_link_libraries(f3d PUBLIC libf3d)
 
+if(UNIX)
+  target_link_libraries(f3d PRIVATE pthread)
+endif()
+
 if(UNIX AND NOT APPLE)
   option(F3D_LINUX_APPLICATION_LINK_FILESYSTEM "Link with libstdc++fs" ON)
   mark_as_advanced(F3D_LINUX_APPLICATION_LINK_FILESYSTEM)
