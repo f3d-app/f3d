@@ -327,13 +327,26 @@ std::string animationManager::GetAnimationName()
 void animationManager::EnableOnlyCurrentAnimation()
 {
   assert(this->Importer);
-  this->AnimationIndex = this->AnimationIndex - 1;
+  if (this->AnimationIndex == -1)
+  {
+    this->AnimationIndex = this->AvailAnimations - 1;
+  }
+  else
+  {
+    this->AnimationIndex = this->AnimationIndex - 1;
+  }
   for (int i = 0; i < this->AvailAnimations; i++)
   {
     this->Importer->DisableAnimation(i);
   }
-  this->AnimationIndex = this->AnimationIndex + 1;
-
+  if (this->AnimationIndex == this->AvailAnimations - 1)
+  {
+    this->AnimationIndex = -1;
+  }
+  else
+  {
+    this->AnimationIndex = this->AnimationIndex + 1;
+  }
   if (this->AnimationIndex == -1)
   {
     for (int i = 0; i < this->AvailAnimations; i++)
