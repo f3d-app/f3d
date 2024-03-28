@@ -290,7 +290,6 @@ void animationManager::CycleAnimation()
   {
     return;
   }
-
   this->AnimationIndex += 1;
 
   if (this->AnimationIndex == this->AvailAnimations)
@@ -311,7 +310,7 @@ int animationManager::GetAnimationIndex()
 // ---------------------------------------------------------------------------------
 std::string animationManager::GetAnimationName()
 {
-  if (!this->Importer)
+  if (!this->Importer || this->AvailAnimations <= 0)
   {
     return "";
   }
@@ -327,36 +326,16 @@ std::string animationManager::GetAnimationName()
 void animationManager::EnableOnlyCurrentAnimation()
 {
   assert(this->Importer);
-  if (this->AnimationIndex == -1)
-  {
-    this->AnimationIndex = this->AvailAnimations - 1;
-  }
-  else
-  {
-    this->AnimationIndex = this->AnimationIndex - 1;
-  }
   for (int i = 0; i < this->AvailAnimations; i++)
   {
     this->Importer->DisableAnimation(i);
   }
-  if (this->AnimationIndex == this->AvailAnimations - 1)
+  for (int i = 0; i < this->AvailAnimations; i++)
   {
-    this->AnimationIndex = -1;
-  }
-  else
-  {
-    this->AnimationIndex = this->AnimationIndex + 1;
-  }
-  if (this->AnimationIndex == -1)
-  {
-    for (int i = 0; i < this->AvailAnimations; i++)
+    if (this->AnimationIndex == -1 || i == this->AnimationIndex)
     {
       this->Importer->EnableAnimation(i);
     }
-  }
-  else
-  {
-    this->Importer->EnableAnimation(this->AnimationIndex);
   }
 }
 
