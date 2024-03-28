@@ -328,7 +328,8 @@ loader& loader_impl::loadScene(const std::string& filePath)
   }
   
   // Set the name for animation
-  this->Internals->Window.setAnimationNameInfo(this->Internals->AnimationManager.GetAnimationName());
+  this->Internals->Window.setAnimationNameInfo(
+    this->Internals->AnimationManager.GetAnimationName());
 
   // Display output description
   loader_impl::internals::DisplayImporterDescription(this->Internals->CurrentFullSceneImporter);
