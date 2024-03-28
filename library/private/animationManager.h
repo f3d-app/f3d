@@ -46,8 +46,20 @@ public:
   void ToggleAnimation();
   void StartAnimation();
   void StopAnimation();
+
+  /**
+   * Cycle onto and play the next available animation
+  */
   void CycleAnimation();
+
+  /**
+   * Enable only the current animation
+  */
   void EnableOnlyCurrentAnimation();
+
+  /**
+   * Get the current animation index
+  */
   int GetAnimationIndex();
 
   /**

@@ -11,6 +11,9 @@ For F3D users:
 For libf3d users:
 - Added a new option `model.point-sprites.type` used to specify how to display points (only if `model.point-sprites.enable` is true)
 
+For developers:
+- Added more support for animationManager (CycleAnimation, EnableOnlyCurrentAnimation, GetAnimationIndex)
+
 ## v2.3.0
 
 For F3D users:
