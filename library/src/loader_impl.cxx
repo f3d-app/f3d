@@ -162,7 +162,7 @@ public:
         this->AnimationManager.LoadAtTime(animationTime);
       }
     }
-
+    
     // Set the name for animation
     this->Window.setAnimationNameInfo(this->AnimationManager.GetAnimationName());
 
@@ -326,7 +326,7 @@ loader& loader_impl::loadScene(const std::string& filePath)
       this->Internals->AnimationManager.LoadAtTime(animationTime);
     }
   }
-  
+
   // Set the name for animation
   this->Internals->Window.setAnimationNameInfo(
     this->Internals->AnimationManager.GetAnimationName());
