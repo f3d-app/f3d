@@ -232,6 +232,7 @@ runs:
       run: |
         cmake --install . --component sdk
         cmake --install . --component configuration
+        cmake --install . --component colormaps
 
     - name: Build and configure python externally
       if: |
@@ -346,7 +347,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
-        ${{ env.F3D_BIN_PATH }} ../source/testing/data/suzanne.obj --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --verbose
+        ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --comp=0 --verbose
 
     - name: Check Install plugins
       if: |

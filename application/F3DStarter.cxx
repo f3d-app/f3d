@@ -1,5 +1,6 @@
 #include "F3DStarter.h"
 
+#include "F3DColorMapTools.h"
 #include "F3DConfig.h"
 #include "F3DIcon.h"
 #include "F3DNSDelegate.h"
@@ -339,6 +340,24 @@ int F3DStarter::Start(int argc, char** argv)
     }
 #endif
   }
+
+  // Parse colormap
+  if (!this->Internals->AppOptions.ColorMapFile.empty())
+  {
+    std::string fullPath = F3DColorMapTools::Find(this->Internals->AppOptions.ColorMapFile);
+
+    if (!fullPath.empty())
+    {
+      this->Internals->Engine->getOptions().set(
+        "model.scivis.colormap", F3DColorMapTools::Read(fullPath));
+    }
+    else
+    {
+      f3d::log::error("Cannot find the colormap ", this->Internals->AppOptions.ColorMapFile);
+      this->Internals->Engine->getOptions().set("model.scivis.colormap", std::vector<double>{});
+    }
+  }
+
   f3d::log::debug("Engine configured");
 
   f3d::log::debug("========== Loading 3D file ==========");

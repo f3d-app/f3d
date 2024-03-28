@@ -307,9 +307,9 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp0, "help", "h", "Print help");
     this->DeclareOption(grp0, "version", "", "Print version details");
     this->DeclareOption(grp0, "readers-list", "", "Print the list of readers");
-    this->DeclareOption(grp0, "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations.", appOptions.UserConfigFile,  LocalHasDefaultNo, MayHaveConfig::NO , "<filePath/filename/fileStem>");
+    this->DeclareOption(grp0, "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations.", appOptions.UserConfigFile, LocalHasDefaultNo, MayHaveConfig::NO, "<filePath/filename/fileStem>");
     this->DeclareOption(grp0, "dry-run", "", "Do not read the configuration file", appOptions.DryRun,  HasDefault::YES, MayHaveConfig::NO );
-    this->DeclareOption(grp0, "no-render", "", "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.", appOptions.NoRender,  HasDefault::YES, MayHaveConfig::YES );
+    this->DeclareOption(grp0, "no-render", "", "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.", appOptions.NoRender, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "max-size", "", "Maximum size in Mib of a file to load, negative value means unlimited", appOptions.MaxSize,  HasDefault::YES, MayHaveConfig::YES, "<size in Mib>");
     this->DeclareOption(grp0, "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", appOptions.Watch,  HasDefault::YES, MayHaveConfig::YES );
     this->DeclareOption(grp0, "load-plugins", "", "List of plugins to load separated with a comma", appOptions.Plugins, LocalHasDefaultNo, MayHaveConfig::YES, "<paths or names>");
@@ -380,7 +380,8 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.getAsBoolRef("model.scivis.cells"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.getAsDoubleVectorRef("model.scivis.range"), HasDefault::YES, MayHaveConfig::YES, "<min,max>");
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.getAsBoolRef("ui.bar"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.getAsDoubleVectorRef("model.scivis.colormap"), HasDefault::YES, MayHaveConfig::YES, "<color_list>");
+    this->DeclareOption(grp4, "colormap-file", "", "Specify a colormap image", appOptions.ColorMapFile, LocalHasDefaultNo, MayHaveConfig::YES, "<filePath/filename/fileStem>");
+    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap (ignored if \"colormap-file\" is specified)", options.getAsDoubleVectorRef("model.scivis.colormap"), HasDefault::YES, MayHaveConfig::YES, "<color_list>");
     this->DeclareOption(grp4, "volume", "v", "Show volume if the file is compatible", options.getAsBoolRef("model.volume.enable"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.getAsBoolRef("model.volume.inverse"), HasDefault::YES, MayHaveConfig::YES);
 
