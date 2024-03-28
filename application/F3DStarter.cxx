@@ -348,16 +348,13 @@ int F3DStarter::Start(int argc, char** argv)
 
     if (!fullPath.empty())
     {
-      auto cm = F3DColorMapTools::Read(fullPath);
-
-      if (!cm.empty())
-      {
-        this->Internals->Engine->getOptions().set("model.scivis.colormap", cm);
-      }
+      this->Internals->Engine->getOptions().set(
+        "model.scivis.colormap", F3DColorMapTools::Read(fullPath));
     }
     else
     {
       f3d::log::error("Cannot find the colormap ", this->Internals->AppOptions.ColorMapFile);
+      this->Internals->Engine->getOptions().set("model.scivis.colormap", std::vector<double>{});
     }
   }
 

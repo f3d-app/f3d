@@ -380,8 +380,8 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.getAsBoolRef("model.scivis.cells"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.getAsDoubleVectorRef("model.scivis.range"), HasDefault::YES, MayHaveConfig::YES, "<min,max>");
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.getAsBoolRef("ui.bar"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp4, "colormap-file", "", "Specify a colormap image (ignored if \"colormap\" is specified)", appOptions.ColorMapFile, LocalHasDefaultNo, MayHaveConfig::YES, "<filePath/filename/fileStem>");
-    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.getAsDoubleVectorRef("model.scivis.colormap"), HasDefault::YES, MayHaveConfig::YES, "<color_list>");
+    this->DeclareOption(grp4, "colormap-file", "", "Specify a colormap image", appOptions.ColorMapFile, LocalHasDefaultNo, MayHaveConfig::YES, "<filePath/filename/fileStem>");
+    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap (ignored if \"colormap-file\" is specified)", options.getAsDoubleVectorRef("model.scivis.colormap"), HasDefault::YES, MayHaveConfig::YES, "<color_list>");
     this->DeclareOption(grp4, "volume", "v", "Show volume if the file is compatible", options.getAsBoolRef("model.volume.enable"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.getAsBoolRef("model.volume.inverse"), HasDefault::YES, MayHaveConfig::YES);
 
