@@ -150,6 +150,8 @@ runs:
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
         -DCMAKE_MODULE_PATH=$(pwd)/../dependencies/install/lib/cmake/OpenVDB/
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_BINDINGS_JAVA=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
