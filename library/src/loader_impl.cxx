@@ -162,7 +162,7 @@ public:
         this->AnimationManager.LoadAtTime(animationTime);
       }
     }
-    
+
     // Set the name for animation
     this->Window.setAnimationNameInfo(this->AnimationManager.GetAnimationName());
 
