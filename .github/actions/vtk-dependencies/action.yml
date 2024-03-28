@@ -40,8 +40,3 @@ runs:
       uses: ./.actions/blosc-install-dep
       with:
         cpu: ${{inputs.cpu}}
-
-    - name: Install OpenVDB
-      uses: ./.actions/openvdb-install-dep
-      with:
-        cpu: ${{inputs.cpu}}
