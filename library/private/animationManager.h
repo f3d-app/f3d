@@ -47,8 +47,7 @@ public:
   void StartAnimation();
   void StopAnimation();
   void CycleAnimation();
-  void EnableAllAnimation();
-  void DisableAllAnimation();
+  void EnableOnlyCurrentAnimation();
   int GetAnimationIndex();
 
   /**

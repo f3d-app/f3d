@@ -107,7 +107,7 @@ bool animationManager::Initialize(
   }
   else
   {
-    this->EnableAllAnimation();
+    this->EnableOnlyCurrentAnimation();
   }
 
   // Recover time ranges for all enabled animations
@@ -291,7 +291,6 @@ void animationManager::CycleAnimation()
     return;
   }
 
-  this->DisableAllAnimation();
   this->AnimationIndex += 1;
 
   if (this->AnimationIndex == this->AvailAnimations)
@@ -299,7 +298,7 @@ void animationManager::CycleAnimation()
     this->AnimationIndex = -1;
   }
 
-  this->EnableAllAnimation();
+  this->EnableOnlyCurrentAnimation();
   this->LoadAtTime(this->TimeRange[0]);
 }
 
@@ -325,36 +324,33 @@ std::string animationManager::GetAnimationName()
 }
 
 //----------------------------------------------------------------------------
-void animationManager::EnableAllAnimation()
+void animationManager::EnableOnlyCurrentAnimation()
 {
   assert(this->Importer);
+  if (this->AnimationIndex - 1 == -1)
+  {
+    this->AnimationIndex = this->AnimationIndex - 1;
+    for (int i = 0; i < this->AvailAnimations; i++)
+    {
+      this->Importer->DisableAnimation(i);
+    }
+    this->AnimationIndex = this->AnimationIndex + 1;
+  }
+  else
+  {
+    this->Importer->DisableAnimation(this->AnimationIndex - 1);
+  }
+
   if (this->AnimationIndex == -1)
   {
     for (int i = 0; i < this->AvailAnimations; i++)
     {
-        this->Importer->EnableAnimation(i);
+      this->Importer->EnableAnimation(i);
     }
   }
   else
   {
     this->Importer->EnableAnimation(this->AnimationIndex);
-  }
-}
-
-//----------------------------------------------------------------------------
-void animationManager::DisableAllAnimation()
-{
-  assert(this->Importer);
-  if (this->AnimationIndex == -1)
-  {
-    for (int i = 0; i < this->AvailAnimations; i++)
-    {
-        this->Importer->DisableAnimation(i);
-    }
-  }
-  else
-  {
-    this->Importer->DisableAnimation(this->AnimationIndex);
   }
 }
 
