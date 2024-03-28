@@ -47,6 +47,7 @@ public:
   image renderToImage(bool noBackground = false) override;
   int getWidth() const override;
   int getHeight() const override;
+  window& setAnimationNameInfo(const std::string& name);
   window& setSize(int width, int height) override;
   window& setPosition(int x, int y) override;
   window& setIcon(const unsigned char* icon, size_t iconSize) override;

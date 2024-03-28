@@ -167,9 +167,15 @@ public:
     bool checkColoring = false;
     bool render = false;
 
-    // Available keycodes: W
+    // Available keycodes: None
     switch (keyCode)
     {
+      case 'W':
+        self->AnimationManager->CycleAnimation();
+        self->Options.set("scene.animation.index", self->AnimationManager->GetAnimationIndex());
+        ren->SetAnimationnameInfo(self->AnimationManager->GetAnimationName());
+        render = true;
+        break;
       case 'C':
         if (renWithColor)
         {
@@ -356,6 +362,7 @@ public:
       self->Options.set("model.scivis.array-name", renWithColor->GetColoringArrayName());
       self->Options.set("model.scivis.component", renWithColor->GetColoringComponent());
     }
+
     if (render)
     {
       self->Window.render();

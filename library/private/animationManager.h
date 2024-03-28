@@ -46,6 +46,15 @@ public:
   void ToggleAnimation();
   void StartAnimation();
   void StopAnimation();
+  void CycleAnimation();
+  void EnableOnlyCurrentAnimation();
+  int GetAnimationIndex();
+
+  /**
+   * Return the current animation name if any
+   * Can be called before initialization safely
+   */
+  std::string GetAnimationName();
 
   /**
    * Return true if the animation manager is playing the animation
@@ -85,6 +94,8 @@ protected:
   unsigned long CallBackId = 0;
   double CurrentTime = 0;
   bool CurrentTimeSet = false;
+  int AnimationIndex = 0;
+  int AvailAnimations = 0;
   std::chrono::steady_clock::time_point PreviousTick;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;

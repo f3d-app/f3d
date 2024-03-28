@@ -51,7 +51,7 @@ to modify this behavior. For file formats that do not support it, **a default sc
 F3D can play animations for a number of file formats (.ex2/.e/.exo/.g, .gltf/.glb, .fbx, .dae, .x, .usd) if the file contains an animation.
 It is possible to select the animation to play using `--animation-index`, or to play all animations at once using `--animation-index=-1` (.gltf/.glb only).
 When F3D plays an animation, it assumes the time unit is in seconds to show accurate speed of animation. Use `--animation-speed-factor` if
-an adjustment is needed. By default, F3D will try update the scene 60 times per seconds, use `--animation-frame-rate` to change that if needed.
+an adjustment is needed. By default, F3D will try update the scene 60 times per seconds, use `--animation-frame-rate` to change that if needed. Press "W" hotkey to cycle through available animations.
 
 ## Plugins
 
