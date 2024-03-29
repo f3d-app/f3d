@@ -71,15 +71,13 @@ that impact developers that build F3D. "For F3D packagers" are changes that impa
 F3D is divided into different components:
 - The f3d executable, in the application folder.
 - The libf3d library, in the library folder.
-- The VTKExtensions, in the vtkext folder.
+- The extensions to VTK, in the vtkext folder.
 - The bindings for python, java, and webassembly, in their respective directories.
 - The plugins, providing all the different readers in the plugins directory.
 
-VTKExtensions are divided into different modules:
-- Core, that do not depend on any other VTKExtensions modules, provide services for all modules.
-- Readers, that depend on Core and implement many new VTK readers and importers.
-- Rendering, that depend on Core and implement the rendering specificities of F3D.
-- Applicative, that depend on all other VTKExtension modules and provide services for the libf3d library.
+The extensions to VTK are divided into two modules:
+- The [private module](vtkext/private) is used exclusively by libf3d.
+- The [public module](vtkext/public) is used by libf3d and also by plugins. Additional documention can be found in [PLUGINS.md](doc/libf3d/PLUGINS.md).
 
 The libf3d library implements the whole logic of instancing and manipulating the different VTK classes, it is fully documented in the [libf3d README](doc/libf3d/README_LIBF3D.md).
 
