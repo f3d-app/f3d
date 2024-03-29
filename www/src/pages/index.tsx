@@ -4,32 +4,16 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures';
 
 import styles from './index.module.css'
 import Link from '@docusaurus/Link';
-import { GalleryCarousel } from '../components/GalleryCarousel';
+import { GalleryCarousel } from '@site/src/components/GalleryCarousel';
+import { useEffect, useState } from 'react';
+import { guess_client_OS } from '@site/src/lib/utils';
 
 function HomepageHeader() {
-  function guess_client_OS() {
-    /* https://stackoverflow.com/a/38241481 */
-    const userAgent = window.navigator.userAgent;
-    const platform =
-      window.navigator?.userAgentData?.platform || window.navigator.platform;
-    const macosPlatforms = ["macOS", "Macintosh", "MacIntel", "MacPPC", "Mac68K"];
-    const windowsPlatforms = ["Win32", "Win64", "Windows", "WinCE"];
-    const iosPlatforms = ["iPhone", "iPad", "iPod"];
+  const [OS, setOS] = useState<null|string>(null)
 
-    if (macosPlatforms.indexOf(platform) !== -1) {
-      return "MacOS";
-    } else if (iosPlatforms.indexOf(platform) !== -1) {
-      return "iOS";
-    } else if (windowsPlatforms.indexOf(platform) !== -1) {
-      return "Windows";
-    } else if (/Android/.test(userAgent)) {
-      return "Android";
-    } else if (/Linux/.test(platform)) {
-      return "Linux";
-    } else {
-      return null;
-    }
-  }
+  useEffect(() => {
+    setOS(guess_client_OS())
+  }, [])
 
   const {siteConfig} = useDocusaurusContext();
   return (
@@ -47,7 +31,7 @@ function HomepageHeader() {
           <Link className={styles.button} data-variant="outline" to={'docs/HOME'}>Docs</Link>
         </div>
         <div>
-          <a className={styles.button} data-variant="primary">{`Download for ${guess_client_OS()} (64bit)`}</a>
+          <a className={styles.button} data-variant="primary">{`Download for ${OS} (64bit)`}</a>
         </div>
       </div>
     </header>

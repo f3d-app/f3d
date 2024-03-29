@@ -11,12 +11,12 @@ const config: Config = {
   url: 'https://f3d.app/',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/f3dDocs/',
+  baseUrl: '/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'chirag-droid', // Usually your GitHub org/user name.
-  projectName: 'f3dDocs', // Usually your repo name.
+  organizationName: 'f3d-app', // Usually your GitHub org/user name.
+  projectName: 'f3d', // Usually your repo name.
 
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
