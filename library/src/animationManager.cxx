@@ -24,7 +24,6 @@ bool animationManager::Initialize(
   this->Playing = false;
   this->CurrentTime = 0;
   this->CurrentTimeSet = false;
-  this->AnimationIndex = 0;
   this->Options = options;
   this->Interactor = interactor;
   this->Window = window;

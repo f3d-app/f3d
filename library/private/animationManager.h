@@ -107,7 +107,7 @@ protected:
   double CurrentTime = 0;
   bool CurrentTimeSet = false;
   int AnimationIndex = 0;
-  int AvailAnimations = 0;
+  int AvailAnimations = -1;
   std::chrono::steady_clock::time_point PreviousTick;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
