@@ -1,10 +1,3 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
-
 export function guess_client_OS() {
   /* https://stackoverflow.com/a/38241481 */
   const userAgent = window.navigator.userAgent;

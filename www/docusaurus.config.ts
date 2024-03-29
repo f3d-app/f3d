@@ -29,19 +29,6 @@ const config: Config = {
     locales: ['en'],
   },
 
-  plugins: [
-    async function autoprefixer(context, options) {
-      return {
-        name: "docusaurus-autoprefixer",
-        configurePostCss(postcssOptions) {
-          postcssOptions.plugins.push(require('tailwindcss'))
-          postcssOptions.plugins.push(require('autoprefixer'))
-          return postcssOptions;
-        }
-      }
-    }
-  ],
-
   presets: [
     [
       'classic',
