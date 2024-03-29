@@ -1,0 +1,116 @@
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.header {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem; 
+  margin-left: auto;
+  margin-right: auto; 
+  max-width: 72rem; 
+}
+
+.subSection {
+  margin: 4rem auto;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 2rem;
+  background-color: #eee;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
+}
+
+.container {
+  text-align: center;
+  padding-bottom: 1.25rem; 
+  padding-top: 8rem; 
+}
+
+.heading {
+  font-size: inherit;
+  font-weight: 500;
+  font-size: 2.25rem;
+  line-height: 2.5rem; 
+}
+
+.subHeading {
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 2rem; 
+}
+
+.description {
+  font-size: 1.25rem;
+  color: #9BA9B4;
+}
+
+.flexContainer {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 20rem;
+}
+
+.button {
+  width: 100%;
+  padding: 0.5rem 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--ifm-color-primary);
+  cursor: pointer;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.button[data-variant='primary'] {
+  background-color: var(--ifm-color-primary);
+  color: white;
+}
+
+.button[data-variant='outline'] {
+  background-color: white;
+  color: black;
+}
+
+.button:hover {
+  text-decoration: none;
+}
+
+.contributions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+@media (min-width: 640px) {
+  .flexContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    max-width: none;
+  }
+
+  .button {
+    margin-bottom: 0;
+  }
+}
+
+@media (min-width: 768px) { 
+  .heading {
+    font-size: 3.75rem;
+    line-height: 1; 
+  }
+
+  .spacing {
+    padding-bottom: 4rem; 
+    padding-top: 10rem; 
+  }
+}
