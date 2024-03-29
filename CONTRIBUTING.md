@@ -76,10 +76,10 @@ F3D is divided into different components:
 - The plugins, providing all the different readers in the plugins directory.
 
 The extensions to VTK are divided into two modules:
-- The [private module](vtkext/private) is used exclusively by libf3d.
-- The [public module](vtkext/public) is used by libf3d and also by plugins. Additional documentation can be found in [PLUGINS.md](doc/libf3d/PLUGINS.md).
+- The [private module](vtkext/private) is used exclusively by `libf3d`.
+- The [public module](vtkext/public) is used by `libf3d` and also by plugins. Additional documentation can be found in [PLUGINS.md](doc/libf3d/PLUGINS.md).
 
-The libf3d library implements the whole logic of instancing and manipulating the different VTK classes, it is fully documented in the [libf3d README](doc/libf3d/README_LIBF3D.md).
+The `libf3d` library implements the whole logic of instancing and manipulating the different VTK classes, it is fully documented in the [`libf3d` README](doc/libf3d/README_LIBF3D.md).
 
-The f3d executable itself uses libf3d and adds an applicative layer on top of it, especially the handling of [command line options](doc/user/OPTIONS.md)
+The `f3d` executable itself uses `libf3d` and adds an applicative layer on top of it, especially the handling of [command line options](doc/user/OPTIONS.md)
 and a [configuration file](doc/user/CONFIGURATION_FILE.md).
