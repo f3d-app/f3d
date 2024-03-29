@@ -69,10 +69,10 @@ that impact developers that build F3D. "For F3D packagers" are changes that impa
 ## F3D Architecture
 
 F3D is divided into different components:
-- The f3d executable, in the application folder.
-- The libf3d library, in the library folder.
-- The extensions to VTK, in the vtkext folder.
-- The bindings for python, java, and webassembly, in their respective directories.
+- The `f3d` executable, in the `application` folder.
+- The `libf3d` library, in the `library` folder.
+- The extensions to VTK, in the `vtkext` folder.
+- The bindings for Python, Java, and WebAssembly, in their respective folders.
 - The plugins, providing all the different readers in the plugins directory.
 
 The extensions to VTK are divided into two modules:
