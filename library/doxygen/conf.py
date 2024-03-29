@@ -22,7 +22,7 @@ copyright = '2022, Michael Migliore and Mathieu Westphal'
 author = 'Michael Migliore and Mathieu Westphal'
 
 # The full version, including alpha/beta/rc tags
-release = '1.3.1'
+release = '2.3.1'
 
 
 # -- General configuration ---------------------------------------------------
