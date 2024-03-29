@@ -7,10 +7,10 @@ F3D welcomes all contributors, regardless of skill level or experience!
 Contributing to F3D can be as simple as pointing out a spelling mistake on the website,
 reporting a bug you encountered, or suggesting a new feature you feel would improve the application.
 
-We use [Github](https://github.com/f3d-app/f3d) to manage the project and you can report new issues or weigh
+We use [GitHub](https://github.com/f3d-app/f3d) to manage the project and you can report new issues or weigh
 in on existing ones via our [issue tracker](https://github.com/f3d-app/f3d/issues).
 
-Also, do not hesitate to join our [discord](https://discord.f3d.app)!
+Also, do not hesitate to join our [Discord](https://discord.f3d.app)!
 
 ## How to Get Started With Development
 
@@ -26,19 +26,19 @@ F3D maintainers will see your comment, assign the issue to you and provide guida
 
 To get involved more deeply, please take a look at the [roadmaps](doc/dev/ROADMAPS_AND_RELEASES.md) for the upcoming releases.
 
-It is also recommended to reach out on [discord](https://discord.f3d.app) to simplify communication, but it is not required.
+It is also recommended to reach out on [Discord](https://discord.f3d.app) to simplify communication, but it is not required.
 
 You can then fix the issue or implement the feature on your side and contribute it to the F3D repository by following the workflow described below.
 
 Of course, if you are already using F3D and want to improve it for your specific needs, because you want a feature or found a bug,
-that is definitely possible. Feel free to reach out for guidance by opening an issue or asking on [discord](https://discord.f3d.app).
+that is definitely possible. Feel free to reach out for guidance by opening an issue or asking on [Discord](https://discord.f3d.app).
 
-Another way to get started is to improve the documentation, look for typos, improve the examples and the gallery. Please share any ideas you may have!
+Another way to get started is to improve the documentation, look for typos, or improve the examples and the gallery. Please share any ideas you may have!
 
 ## F3D Development Workflow
 
 F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-gitlab-flow/). In a few words, here is how to contribute:
-- [Fork](https://github.com/f3d-app/f3d/fork) the F3D repository on github.
+- [Fork](https://github.com/f3d-app/f3d/fork) the F3D repository on GitHub.
 - Create and push a feature branch on your fork containing new commits.
 - When it is ready for review or when you want to run the CI, create a pull request against `f3d-app/f3d/master`.
 - Once the PR is approved and CI comes back clean, a F3D maintainer will merge your pull request in the master branch.
@@ -57,7 +57,7 @@ When adding code to F3D, always try to cover it by adding/modifying [tests](doc/
 F3D continuous integration also checks formatting using clang-format and will inform you if changes needs to be made.
 Some [formatting rules](doc/dev/CODING_STYLE.md) are not enforced by clang-format and will be checked during the review process.
 
-When making changes to the libf3d public API, continuous integration will warn about making related changes to the bindings.
+When making changes to the `libf3d` public API, continuous integration will warn about making related changes to the bindings.
 This is required in order to merge the pull request.
 
 ## Changelog
@@ -79,7 +79,7 @@ The extensions to VTK are divided into two modules:
 - The [private module](vtkext/private) is used exclusively by `libf3d`.
 - The [public module](vtkext/public) is used by `libf3d` and also by plugins. Additional documentation can be found in [PLUGINS.md](doc/libf3d/PLUGINS.md).
 
-The `libf3d` library implements the whole logic of instancing and manipulating the different VTK classes, it is fully documented in the [`libf3d` README](doc/libf3d/README_LIBF3D.md).
+The `libf3d` library implements the whole logic of instancing and manipulating the different VTK classes, it is fully documented in the [libf3d README](doc/libf3d/README_LIBF3D.md).
 
 The `f3d` executable itself uses `libf3d` and adds an applicative layer on top of it, especially the handling of [command line options](doc/user/OPTIONS.md)
 and a [configuration file](doc/user/CONFIGURATION_FILE.md).
