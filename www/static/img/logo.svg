@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg viewBox="10.895 5.00 106.42 106.42" width="256" height="256" xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <g id="Sketch">
+    <path id="red" d="M 36.12 63.30 L 64.30 5.00 L 87.65 5.00 Z" fill="#c0202a" />
+    <path id="green" d="M 60.30 65.00 L 36.42 65.00 L 88.45 6.70 Z" fill="#209949" />
+    <path id="blue" d="M 39.59 111.42 L 68.71 51.10 L 92.08 51.10 Z" fill="#074e8e" />
+  </g>
+</svg>

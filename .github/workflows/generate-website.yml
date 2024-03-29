@@ -17,8 +17,18 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Build Jekyll
-      uses: actions/jekyll-build-pages@v1
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: npm
+
+    - name: Install dependencies
+      run: npm ci
+      working-directory: www
+
+    - name: Build website
+      run: npm run build -- --out-dir ../_site
+      working-directory: www
 
     - name: Install doxygen and build doxygen doc
       working-directory: ${{github.workspace}}
