@@ -91,12 +91,7 @@ bool animationManager::Initialize(
   log::debug("");
 
   this->AnimationIndex = options->getAsInt("scene.animation.index");
-
-  if (this->AnimationIndex != 0 && this->AvailAnimations <= 0)
-  {
-    log::warn("An animation index has been specified but there are no animation available.");
-  }
-  else if (this->AnimationIndex > 0 && this->AnimationIndex >= this->AvailAnimations)
+  if (this->AnimationIndex > 0 && this->AnimationIndex >= this->AvailAnimations)
   {
     log::warn(
       "Specified animation index is greater than the highest possible animation index, enabling "
