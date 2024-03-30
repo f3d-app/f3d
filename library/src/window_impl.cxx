@@ -217,6 +217,13 @@ int window_impl::getHeight() const
 }
 
 //----------------------------------------------------------------------------
+window& window_impl::setAnimationNameInfo(const std::string& name)
+{
+  this->Internals->Renderer->SetAnimationnameInfo(name);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 window& window_impl::setSize(int width, int height)
 {
   this->Internals->RenWin->SetSize(width, height);

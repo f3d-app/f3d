@@ -723,6 +723,11 @@ f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
 f3d_test(NAME TestProgressScene DATA WaterBottle.glb ARGS --progress NO_BASELINE)
 f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --progress NO_BASELINE INTERACTION) #Up;Up;Up;Up
 
+# For some reasons this animation test goes "too far" when run with sanitizer
+if(F3D_SANITIZER STREQUAL "none")
+  f3d_test(NAME TestInteractionCycleAnimation DATA InterpolationTest.glb INTERACTION DEFAULT_LIGHTS) #WWWWWWWWWWW;Space;Space;
+endif()
+
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2
   f3d_test(NAME TestInteractionDropFiles INTERACTION_CONFIGURE)#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
