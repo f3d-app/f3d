@@ -308,7 +308,8 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_BASELINE REGEXP "7: CubicSpline Translation")
 
   # Test Animation index out of domain error
-  f3d_test(NAME TestVerboseAnimationIndexError1 DATA InterpolationTest.glb ARGS --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
+  f3d_test(NAME TestVerboseAnimationIndexErrorFirst DATA InterpolationTest.glb ARGS --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
+  f3d_test(NAME TestVerboseAnimationIndexErrorSecond DATA cow.vtp ARGS --animation-index=1 NO_BASELINE REGEXP "An animation index has been specified but there are no animation available.")
 
   # Test interactive animation and speed factor
   f3d_test(NAME TestInteractionAnimationFast DATA InterpolationTest.glb ARGS --animation-speed-factor=1000 --animation-index=-1 INTERACTION NO_BASELINE)#Space;Space;
@@ -727,6 +728,7 @@ f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --progress NO_BASE
 if(F3D_SANITIZER STREQUAL "none")
   f3d_test(NAME TestInteractionCycleAnimation DATA InterpolationTest.glb INTERACTION DEFAULT_LIGHTS) #WWWWWWWWWWW;Space;Space;
 endif()
+f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
 
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2

@@ -362,7 +362,6 @@ public:
       self->Options.set("model.scivis.array-name", renWithColor->GetColoringArrayName());
       self->Options.set("model.scivis.component", renWithColor->GetColoringComponent());
     }
-
     if (render)
     {
       self->Window.render();

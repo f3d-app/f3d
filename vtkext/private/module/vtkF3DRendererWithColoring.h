@@ -266,7 +266,7 @@ protected:
    * Otherwise, use component #index as the default value.
    */
   std::string ComponentToString(int component);
-  
+
   vtkWeakPointer<vtkF3DGenericImporter> Importer = nullptr;
 
   vtkNew<vtkScalarBarActor> ScalarBarActor;
