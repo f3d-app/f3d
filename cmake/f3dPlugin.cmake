@@ -136,6 +136,10 @@ macro(f3d_plugin_declare_reader)
     list(JOIN F3D_MACOS_BUNDLE_EXTENSIONS "</string>
 					<string>" F3D_MACOS_BUNDLE_EXTENSIONS)
 
+    if(NOT DEFINED F3D_MACOS_BUNDLE_XML_PLUGIN)
+      set(F3D_MACOS_BUNDLE_XML_PLUGIN "")
+    endif()
+
     set(F3D_MACOS_BUNDLE_XML_PLUGIN
 "${F3D_MACOS_BUNDLE_XML_PLUGIN}
 			<dict>
@@ -149,8 +153,7 @@ macro(f3d_plugin_declare_reader)
 				<array>
 					<string>${F3D_MACOS_BUNDLE_EXTENSIONS}</string>
 				</array>
-			</dict>
-")
+			</dict>")
   endif()
 
   math(EXPR "F3D_PLUGIN_CURRENT_READER_INDEX" "${F3D_PLUGIN_CURRENT_READER_INDEX} +1")
@@ -393,7 +396,7 @@ macro(f3d_plugin_build)
       COMPONENT plugin)
 
   if(F3D_MACOS_BUNDLE)
-    set(F3D_MACOS_BUNDLE_XML "${F3D_MACOS_BUNDLE_XML}${F3D_MACOS_BUNDLE_XML_PLUGIN}" PARENT_SCOPE)
+    set_property(GLOBAL APPEND_STRING PROPERTY  F3D_MACOS_BUNDLE_XML ${F3D_MACOS_BUNDLE_XML_PLUGIN})
   endif()
 
 endmacro()
