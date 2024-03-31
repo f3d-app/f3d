@@ -88,6 +88,7 @@ macro(f3d_plugin_declare_reader)
   string(JSON F3D_READER_JSON
     SET "${F3D_READER_JSON}" "description" "\"${F3D_READER_FORMAT_DESCRIPTION}\"")
 
+  set(F3D_MACOS_BUNDLE_EXTENSIONS ${F3D_READER_EXTENSIONS})
   list(TRANSFORM F3D_READER_EXTENSIONS PREPEND "\"")
   list(TRANSFORM F3D_READER_EXTENSIONS APPEND "\"")
   list(JOIN F3D_READER_EXTENSIONS ", " F3D_READER_EXTENSIONS)
@@ -130,6 +131,30 @@ macro(f3d_plugin_declare_reader)
 
   string(JSON F3D_PLUGIN_JSON
     SET "${F3D_PLUGIN_JSON}" "readers" ${F3D_PLUGIN_CURRENT_READER_INDEX} "${F3D_READER_JSON}")
+
+  if(F3D_MACOS_BUNDLE)
+    list(JOIN F3D_MACOS_BUNDLE_EXTENSIONS "</string>
+					<string>" F3D_MACOS_BUNDLE_EXTENSIONS)
+
+    if(NOT DEFINED F3D_MACOS_BUNDLE_XML_PLUGIN)
+      set(F3D_MACOS_BUNDLE_XML_PLUGIN "")
+    endif()
+
+    set(F3D_MACOS_BUNDLE_XML_PLUGIN
+"${F3D_MACOS_BUNDLE_XML_PLUGIN}
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>${F3D_READER_FORMAT_DESCRIPTION}</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>${F3D_MACOS_BUNDLE_EXTENSIONS}</string>
+				</array>
+			</dict>")
+  endif()
 
   math(EXPR "F3D_PLUGIN_CURRENT_READER_INDEX" "${F3D_PLUGIN_CURRENT_READER_INDEX} +1")
 
@@ -205,7 +230,6 @@ macro(f3d_plugin_build)
   set(f3d_plugin_link_options "")
   list(APPEND f3d_plugin_link_options "${f3d_coverage_link_options}")
   list(APPEND f3d_plugin_link_options "${f3d_sanitizer_link_options}")
-
 
   vtk_module_find_modules(vtk_module_files "${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -370,4 +394,9 @@ macro(f3d_plugin_build)
   install(FILES "${F3D_PLUGIN_JSON_FILE}"
       DESTINATION "share/f3d/plugins"
       COMPONENT plugin)
+
+  if(F3D_MACOS_BUNDLE)
+    set_property(GLOBAL APPEND_STRING PROPERTY  F3D_MACOS_BUNDLE_XML ${F3D_MACOS_BUNDLE_XML_PLUGIN})
+  endif()
+
 endmacro()
