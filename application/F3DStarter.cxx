@@ -360,8 +360,6 @@ int F3DStarter::Start(int argc, char** argv)
 
   f3d::log::debug("Engine configured");
 
-  f3d::log::debug("========== Loading 3D file ==========");
-
   // Add all files
   for (auto& file : files)
   {

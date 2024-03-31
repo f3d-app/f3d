@@ -234,6 +234,7 @@ protected:
    * Create a cache directory if a HDRIHash is set
    */
   void CreateCacheDirectory();
+
   /**
    * Shorten a provided name with "..."
    */

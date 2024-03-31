@@ -1290,8 +1290,7 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 {
   
 
-  cheatSheetText << (!this->AnimationNameInfo.empty() ? " W: Cycle animation [" +
-                    vtkF3DRenderer::ShortName(this->AnimationNameInfo, 19) +  "]\n" : "");
+  cheatSheetText << " W: Cycle animation [" << vtkF3DRenderer::ShortName(this->AnimationNameInfo, 22) << "]\n";
   cheatSheetText << " P: Translucency support " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]")
                  << "\n";
   cheatSheetText << " Q: Ambient occlusion " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
@@ -1316,7 +1315,8 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
   cheatSheetText << std::fixed;
   cheatSheetText << " L: Light (increase, shift+L: decrease) [" << this->LightIntensity << "]"
                  << " \n";
- }
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureActorsProperties()
 {
