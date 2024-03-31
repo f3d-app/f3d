@@ -17,6 +17,7 @@ Options|Default|Description
 \-\-max-size=\<size in MiB\>|-1|Prevent F3D to load a file bigger than the provided size in Mib, negative value means unlimited, useful for thumbnails.
 \-\-watch||Watch current file and automatically reload it whenever it is modified on disk.
 \-\-load-plugins=\<paths or names\>||List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `exodus`, `occt`, `usd`, `vdb`. See [usage](USAGE.md) for more info.
+\-\-scan-plugins||Scan standard directories for plugins and display their names, results may be incomplete. See [usage](USAGE.md) for more info.
 
 ## General Options
 
