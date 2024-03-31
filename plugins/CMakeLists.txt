@@ -40,3 +40,7 @@ if (F3D_PLUGIN_BUILD_VDB)
     message(FATAL_ERROR "VDB plugin requires VTK >= 9.2.20220714")
   endif()
 endif()
+
+if(F3D_MACOS_BUNDLE)
+  set(F3D_MACOS_BUNDLE_XML ${F3D_MACOS_BUNDLE_XML} PARENT_SCOPE)
+endif()
