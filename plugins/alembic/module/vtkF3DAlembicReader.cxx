@@ -3,11 +3,14 @@
 #include <vtkAppendPolyData.h>
 #include <vtkFloatArray.h>
 #include <vtkIdTypeArray.h>
+#include <vtkInformation.h>
+#include <vtkInformationVector.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolygon.h>
 #include <vtkSmartPointer.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
 
 #if defined(_MSC_VER)
 #pragma warning(push, 0)
@@ -236,7 +239,8 @@ class vtkF3DAlembicReader::vtkInternals
   }
 
 public:
-  vtkSmartPointer<vtkPolyData> ProcessIPolyMesh(const Alembic::AbcGeom::IPolyMesh& pmesh)
+  vtkSmartPointer<vtkPolyData> ProcessIPolyMesh(
+    const Alembic::AbcGeom::IPolyMesh& pmesh, double time)
   {
     vtkNew<vtkPolyData> polydata;
     IntermediateGeometry originalData;
@@ -245,7 +249,8 @@ public:
     const Alembic::AbcGeom::IPolyMeshSchema& schema = pmesh.getSchema();
     if (schema.getNumSamples() > 0)
     {
-      schema.get(samp);
+      Alembic::AbcGeom::ISampleSelector selector(time);
+      schema.get(samp, selector);
 
       Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
       Alembic::AbcGeom::Int32ArraySamplePtr facePositionIndices = samp.getFaceIndices();
@@ -271,7 +276,7 @@ public:
       Alembic::AbcGeom::IV2fGeomParam uvsParam = schema.getUVsParam();
       if (uvsParam.valid())
       {
-        Alembic::AbcGeom::IV2fGeomParam::Sample uvValue = uvsParam.getIndexedValue();
+        Alembic::AbcGeom::IV2fGeomParam::Sample uvValue = uvsParam.getIndexedValue(selector);
         if (uvValue.valid())
         {
           V3fContainer uvV3F;
@@ -301,7 +306,8 @@ public:
       Alembic::AbcGeom::IN3fGeomParam normalsParam = schema.getNormalsParam();
       if (normalsParam.valid())
       {
-        Alembic::AbcGeom::IN3fGeomParam::Sample normalValue = normalsParam.getIndexedValue();
+        Alembic::AbcGeom::IN3fGeomParam::Sample normalValue =
+          normalsParam.getIndexedValue(selector);
         if (normalValue.valid())
         {
           V3fContainer normal_v3f;
@@ -338,8 +344,9 @@ public:
     return polydata;
   }
 
-  void IterateIObject(vtkAppendPolyData* append, const Alembic::Abc::IObject& parent,
-    const Alembic::Abc::ObjectHeader& ohead)
+  template<typename F>
+  void IterateIObject(
+    F func, const Alembic::Abc::IObject& parent, const Alembic::Abc::ObjectHeader& ohead)
   {
     // Set this if we should continue traversing
     Alembic::Abc::IObject nextParentObject;
@@ -352,7 +359,7 @@ public:
     else if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
     {
       Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
-      append->AddInputData(ProcessIPolyMesh(polymesh));
+      func(polymesh);
       nextParentObject = polymesh;
     }
 
@@ -361,18 +368,51 @@ public:
     {
       for (size_t i = 0; i < nextParentObject.getNumChildren(); ++i)
       {
-        this->IterateIObject(append, nextParentObject, nextParentObject.getChildHeader(i));
+        this->IterateIObject(func, nextParentObject, nextParentObject.getChildHeader(i));
       }
     }
   }
 
-  void ImportRoot(vtkAppendPolyData* append)
+  void ImportRoot(vtkAppendPolyData* append, double time)
   {
     Alembic::Abc::IObject top = this->Archive.getTop();
 
+    auto appendMesh = [&](const Alembic::AbcGeom::IPolyMesh& polymesh)
+    { append->AddInputData(ProcessIPolyMesh(polymesh, time)); };
+
     for (size_t i = 0; i < top.getNumChildren(); ++i)
     {
-      this->IterateIObject(append, top, top.getChildHeader(i));
+      this->IterateIObject(appendMesh, top, top.getChildHeader(i));
+    }
+  }
+
+  void ExtendTimeRange(double& start, double& end)
+  {
+    Alembic::Abc::IObject top = this->Archive.getTop();
+
+    auto computeRange = [&](const Alembic::AbcGeom::IPolyMesh& polymesh)
+    {
+      Alembic::Abc::TimeSamplingPtr ts = polymesh.getSchema().getTimeSampling();
+
+      if (ts->getTimeSamplingType().isUniform())
+      {
+        double min = ts->getSampleTime(0);
+        double max = min +
+          (polymesh.getSchema().getNumSamples() - 1) * ts->getTimeSamplingType().getTimePerCycle();
+        start = std::min(start, min);
+        end = std::max(end, max);
+      }
+      else if (ts->getTimeSamplingType().isCyclic())
+      {
+        const auto& times = ts->getStoredTimes();
+        start = std::min(start, times.front());
+        end = std::max(end, times.back());
+      }
+    };
+
+    for (size_t i = 0; i < top.getNumChildren(); ++i)
+    {
+      this->IterateIObject(computeRange, top, top.getChildHeader(i));
     }
   }
 
@@ -398,16 +438,42 @@ vtkF3DAlembicReader::vtkF3DAlembicReader()
 //----------------------------------------------------------------------------
 vtkF3DAlembicReader::~vtkF3DAlembicReader() = default;
 
+//------------------------------------------------------------------------------
+int vtkF3DAlembicReader::RequestInformation(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
+{
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+
+  this->Internals->ReadArchive(this->FileName);
+
+  double timeRange[2] = { std::numeric_limits<double>::infinity(),
+    -std::numeric_limits<double>::infinity() };
+  this->Internals->ExtendTimeRange(timeRange[0], timeRange[1]);
+
+  if (timeRange[0] < timeRange[1])
+  {
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
+  }
+
+  return 1;
+}
+
 //----------------------------------------------------------------------------
 int vtkF3DAlembicReader::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
   vtkPolyData* output = vtkPolyData::GetData(outputVector);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  this->Internals->ReadArchive(this->FileName);
+  double requestedTimeValue = 0.0;
+
+  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
+  {
+    requestedTimeValue = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+  }
 
   vtkNew<vtkAppendPolyData> append;
-  this->Internals->ImportRoot(append);
+  this->Internals->ImportRoot(append, requestedTimeValue);
   append->Update();
 
   output->ShallowCopy(append->GetOutput());
