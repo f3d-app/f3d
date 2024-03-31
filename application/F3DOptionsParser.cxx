@@ -313,7 +313,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp0, "max-size", "", "Maximum size in Mib of a file to load, negative value means unlimited", appOptions.MaxSize,  HasDefault::YES, MayHaveConfig::YES, "<size in Mib>");
     this->DeclareOption(grp0, "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", appOptions.Watch,  HasDefault::YES, MayHaveConfig::YES );
     this->DeclareOption(grp0, "load-plugins", "", "List of plugins to load separated with a comma", appOptions.Plugins, LocalHasDefaultNo, MayHaveConfig::YES, "<paths or names>");
-    this->DeclareOption(grp0, "scan-plugins", "", "Scan some directories for plugins (result can be incomplete)");
+    this->DeclareOption(grp0, "scan-plugins", "", "Scan standard directories for plugins and display available plugins (result can be incomplete)");
 
     auto grp1 = cxxOptions.add_options("General");
     this->DeclareOption(grp1, "verbose", "", "Set verbose level, providing more information about the loaded data in the console output", appOptions.VerboseLevel, HasDefault::YES, MayHaveConfig::YES, "{debug, info, warning, error, quiet}", HasImplicitValue::YES, "debug");
