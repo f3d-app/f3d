@@ -15,9 +15,11 @@
 - bluntfin.vts: VTK Data: BSD-3-Clause
 - bot2.wrl: VTK Data: BSD-3-Clause
 - BoxAnimated*: glTF-Sample-Models/Cesium: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- Box_draco*: glTF-Sample-Models/Cesium: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - Cameras.gltf: glTF-Sample-Models: Public Domain
 - cow.vtk: VTK Data: BSD-3-Clause
 - cow.vtp: VTK Data: BSD-3-Clause
+- cowlow.vtp: VTK Data: BSD-3-Clause
 - disk_out_ref.ex2: VTK Data: BSD-3-Clause
 - dragon.vtu: Stanford: Public Domain
 - duck.dae: assimp test models: BSD-3-Clause

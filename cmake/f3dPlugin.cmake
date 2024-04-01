@@ -88,6 +88,7 @@ macro(f3d_plugin_declare_reader)
   string(JSON F3D_READER_JSON
     SET "${F3D_READER_JSON}" "description" "\"${F3D_READER_FORMAT_DESCRIPTION}\"")
 
+  set(F3D_MACOS_BUNDLE_EXTENSIONS ${F3D_READER_EXTENSIONS})
   list(TRANSFORM F3D_READER_EXTENSIONS PREPEND "\"")
   list(TRANSFORM F3D_READER_EXTENSIONS APPEND "\"")
   list(JOIN F3D_READER_EXTENSIONS ", " F3D_READER_EXTENSIONS)
@@ -112,15 +113,14 @@ macro(f3d_plugin_declare_reader)
       SET "${F3D_READER_JSON}" "exclude_thumbnailer" "false")
   endif()
 
-  string(JSON F3D_PLUGIN_JSON
-    SET "${F3D_PLUGIN_JSON}" "readers" ${F3D_PLUGIN_CURRENT_READER_INDEX} "${F3D_READER_JSON}")
-
-  math(EXPR "F3D_PLUGIN_CURRENT_READER_INDEX" "${F3D_PLUGIN_CURRENT_READER_INDEX} +1")
-
   if(F3D_READER_VTK_IMPORTER)
     set(F3D_READER_HAS_SCENE_READER 1)
+    string(JSON F3D_READER_JSON
+      SET "${F3D_READER_JSON}" "full_scene" "true")
   else()
     set(F3D_READER_HAS_SCENE_READER 0)
+    string(JSON F3D_READER_JSON
+      SET "${F3D_READER_JSON}" "full_scene" "false")
   endif()
 
   if(F3D_READER_VTK_READER)
@@ -128,6 +128,35 @@ macro(f3d_plugin_declare_reader)
   else()
     set(F3D_READER_HAS_GEOMETRY_READER 0)
   endif()
+
+  string(JSON F3D_PLUGIN_JSON
+    SET "${F3D_PLUGIN_JSON}" "readers" ${F3D_PLUGIN_CURRENT_READER_INDEX} "${F3D_READER_JSON}")
+
+  if(F3D_MACOS_BUNDLE)
+    list(JOIN F3D_MACOS_BUNDLE_EXTENSIONS "</string>
+					<string>" F3D_MACOS_BUNDLE_EXTENSIONS)
+
+    if(NOT DEFINED F3D_MACOS_BUNDLE_XML_PLUGIN)
+      set(F3D_MACOS_BUNDLE_XML_PLUGIN "")
+    endif()
+
+    set(F3D_MACOS_BUNDLE_XML_PLUGIN
+"${F3D_MACOS_BUNDLE_XML_PLUGIN}
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>${F3D_READER_FORMAT_DESCRIPTION}</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>
+				<true/>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>${F3D_MACOS_BUNDLE_EXTENSIONS}</string>
+				</array>
+			</dict>")
+  endif()
+
+  math(EXPR "F3D_PLUGIN_CURRENT_READER_INDEX" "${F3D_PLUGIN_CURRENT_READER_INDEX} +1")
 
   configure_file("${_f3dPlugin_dir}/readerBoilerPlate.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/reader_${F3D_READER_NAME}.h")
@@ -168,12 +197,15 @@ macro(f3d_plugin_build)
   cmake_parse_arguments(F3D_PLUGIN "FREEDESKTOP;FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS;MIMETYPE_XML_FILES;CONFIGURATION_DIRS" ${ARGN})
 
   find_package(VTK 9.0 REQUIRED COMPONENTS
-    CommonCore
-    CommonExecutionModel
-    IOImport
-    ${F3D_PLUGIN_VTK_MODULES})
+               CommonCore CommonExecutionModel IOImport
+               ${F3D_PLUGIN_VTK_MODULES})
 
-  if(F3D_PLUGIN_FORCE_STATIC OR F3D_PLUGINS_STATIC_BUILD)
+  set(_force_static FALSE)
+  if(DEFINED BUILD_SHARED_LIBS AND NOT BUILD_SHARED_LIBS)
+    set(_force_static TRUE)
+  endif()
+
+  if(F3D_PLUGIN_FORCE_STATIC OR F3D_PLUGINS_STATIC_BUILD OR _force_static)
     set(F3D_PLUGIN_TYPE "STATIC")
     set(F3D_PLUGIN_IS_STATIC ON)
     set_property(GLOBAL APPEND PROPERTY F3D_STATIC_PLUGINS ${F3D_PLUGIN_NAME})
@@ -199,13 +231,6 @@ macro(f3d_plugin_build)
   list(APPEND f3d_plugin_link_options "${f3d_coverage_link_options}")
   list(APPEND f3d_plugin_link_options "${f3d_sanitizer_link_options}")
 
-  # if libf3d is built as a static library, VTK extension static libraries
-  # must be exported as well for proper linkage
-  set(export_name "")
-  if(NOT BUILD_SHARED_LIBS AND F3D_PLUGIN_IS_STATIC)
-    set(export_name "f3dTargets")
-  endif()
-
   vtk_module_find_modules(vtk_module_files "${CMAKE_CURRENT_SOURCE_DIR}")
 
   if(NOT ${vtk_module_files} STREQUAL "")
@@ -218,11 +243,8 @@ macro(f3d_plugin_build)
 
     vtk_module_build(
       MODULES ${modules}
-      INSTALL_EXPORT ${export_name}
       INSTALL_HEADERS OFF
-      HEADERS_COMPONENT vtkext
-      TARGETS_COMPONENT vtkext
-      PACKAGE "f3d-plugin-${F3D_PLUGIN_NAME}")
+      PACKAGE "f3d_${F3D_PLUGIN_NAME}_vtkext_private")
 
     foreach (module IN LISTS modules)
       if(NOT "${f3d_plugin_compile_options}" STREQUAL "")
@@ -245,11 +267,14 @@ macro(f3d_plugin_build)
     EXPORT_FILE_NAME plugin_export.h
     EXPORT_MACRO_NAME F3D_PLUGIN_EXPORT)
 
-  if(UNIX)
+  # Add rpath origin so the vtkext lib can be found
+  if (APPLE)
+    set_target_properties(f3d-plugin-${F3D_PLUGIN_NAME} PROPERTIES INSTALL_RPATH @loader_path)
+  elseif (UNIX)
     # On Unix, add the RPATH to VTK install folder
     get_target_property(target_type VTK::CommonCore TYPE)
     if (target_type STREQUAL SHARED_LIBRARY)
-      list(APPEND F3D_PLUGIN_ADDITIONAL_RPATHS "$<TARGET_FILE_DIR:VTK::CommonCore>")
+      list(APPEND F3D_PLUGIN_ADDITIONAL_RPATHS "$ORIGIN:$<TARGET_FILE_DIR:VTK::CommonCore>")
     endif ()
     set_target_properties(f3d-plugin-${F3D_PLUGIN_NAME} PROPERTIES
       INSTALL_RPATH "${F3D_PLUGIN_ADDITIONAL_RPATHS}")
@@ -285,13 +310,13 @@ macro(f3d_plugin_build)
   list(TRANSFORM F3D_PLUGIN_VTK_MODULES PREPEND "VTK::")
 
   target_link_libraries(f3d-plugin-${F3D_PLUGIN_NAME} PRIVATE
-    VTK::CommonCore VTK::CommonExecutionModel VTK::IOImport
+    VTK::CommonCore VTK::CommonExecutionModel VTK::IOImport f3d::vtkext
     ${F3D_PLUGIN_VTK_MODULES}
     ${modules})
 
-  if(NOT F3D_PLUGIN_IS_STATIC OR NOT BUILD_SHARED_LIBS)
+  if(NOT F3D_PLUGIN_IS_STATIC)
     install(TARGETS f3d-plugin-${F3D_PLUGIN_NAME}
-      EXPORT ${export_name}
+      EXPORT f3dTargets
       ARCHIVE DESTINATION ${_f3d_plugins_install_dir} COMPONENT plugin
       LIBRARY DESTINATION ${_f3d_plugins_install_dir} COMPONENT plugin)
   endif()
@@ -369,4 +394,9 @@ macro(f3d_plugin_build)
   install(FILES "${F3D_PLUGIN_JSON_FILE}"
       DESTINATION "share/f3d/plugins"
       COMPONENT plugin)
+
+  if(F3D_MACOS_BUNDLE)
+    set_property(GLOBAL APPEND_STRING PROPERTY  F3D_MACOS_BUNDLE_XML ${F3D_MACOS_BUNDLE_XML_PLUGIN})
+  endif()
+
 endmacro()

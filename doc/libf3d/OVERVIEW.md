@@ -125,15 +125,25 @@ For the complete documentation, please consult the [libf3d doxygen documentation
 
 ## Building against the libf3d
 
-Please follow instructions in the [F3D build guide](../dev/BUILD.md), then use CMake to find the libf3d
+Please follow instructions in the [F3D build guide](../dev/BUILD.md), make sure to build with `BUILD_SHARED_LIBS=ON` and to install the `sdk` component then use CMake to find the libf3d
 and link against it like this in your CMakeLists.txt:
 
 ```cmake
-find_package(f3d REQUIRED)
+find_package(f3d REQUIRED COMPONENTS library)
 [...]
 target_link_libraries(target f3d::libf3d)
 ```
 
+## find_package COMPONENTS
+
+When using `find_package(f3d)` and `sdk` CMake component have been installed, you can require specific components:
+ - `application`: access to f3d::f3d target
+ - `library`: access to f3d::libf3d target and include dir
+ - `plugin_sdk`: access to CMake macros to create plugins, the f3d::vtkext target and include dir
+
+see the installed `f3dConfig.cmake` file for more info.
+
 ## Extending libf3d with plugins
 
 In order to add new supported file format to libf3d, you can create a plugin using CMake macros. Please follow instructions in the [F3D plugin SDK guide](PLUGINS.md).
+Also make sure the `plugin_sdk` component have been installed as well as the `sdk` component.

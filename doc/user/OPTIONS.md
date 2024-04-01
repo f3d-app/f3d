@@ -6,7 +6,7 @@ F3D behavior can be fully controlled from the command line using the following o
 
 Options|Default|Description
 ------|------|------
-\-\-output=\<png file\>||Instead of showing a render view and render into it, *render directly into a png file*. When used with \-\-ref option, only outputs on failure.
+\-\-output=\<png file\>||Instead of showing a render view and render into it, *render directly into a png file*. When used with \-\-ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout.
 \-\-no-background||Use with \-\-output to output a png file with a transparent background.
 -h, \-\-help||Print *help* and exit. Ignore `--verbose`.
 \-\-version||Show *version* information and exit. Ignore `--verbose`.
@@ -15,7 +15,9 @@ Options|Default|Description
 \-\-dry-run||Do not read any configuration file and consider only the command line options.
 \-\-no-render||Do not render anything and quit just after loading the first file, use with \-\-verbose to recover information about a file.
 \-\-max-size=\<size in MiB\>|-1|Prevent F3D to load a file bigger than the provided size in Mib, negative value means unlimited, useful for thumbnails.
+\-\-watch||Watch current file and automatically reload it whenever it is modified on disk.
 \-\-load-plugins=\<paths or names\>||List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `exodus`, `occt`, `usd`, `vdb`. See [usage](USAGE.md) for more info.
+\-\-scan-plugins||Scan standard directories for plugins and display their names, results may be incomplete. See [usage](USAGE.md) for more info.
 
 ## General Options
 
@@ -45,6 +47,7 @@ Options|Default|Description
 ------|------|------
 -o, \-\-point-sprites||Show sphere *points sprites* instead of the geometry.
 \-\-point-size=\<size\>|10.0|Set the *size* of points when showing vertices and point sprites.
+\-\-point-type=\<sphere|gaussian\>|sphere|Set the splat type when showing point sprites.
 \-\-line-width=\<size\>|1.0|Set the *width* of lines when showing edges.
 \-\-color=\<R,G,B\>|1.0, 1.0, 1.0| Set a *color* on the geometry. Multiplied with the base color texture when present. <br>Requires a default scene.
 \-\-opacity=\<opacity\>|1.0|Set *opacity* on the geometry. Multiplied with the base color texture when present. <br>Requires a default scene. Usually used with Depth Peeling option.
@@ -82,7 +85,8 @@ Options|Default|Description
 -c, \-\-cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
 \-\-range=\<min,max\>||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
 -b, \-\-bar||Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
-\-\-colormap=\<color_list\>||Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).<br>Use with the scalar option.
+\-\-colormap\-file=\<name\>||Set a *colormap file for the coloring*.<br>See [color maps](COLOR_MAPS.md).<br>Use with the scalar option.
+\-\-colormap=\<color_list\>||Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).<br>Ignored if `--colormap-file` option is specified.<br>Use with the scalar option.
 -v, \-\-volume||Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other formats.
 -i, \-\-inverse||Inverse the linear opacity function used for volume rendering.
 
@@ -98,6 +102,7 @@ Options|Default|Description
 \-\-camera-zoom-factor=\<factor\>||Set the camera zoom factor relative to the autozoom on data, a strictly positive value.
 \-\-camera-azimuth-angle=\<angle\>|0.0|Apply an azimuth transformation to the camera, in degrees, added after other camera options.
 \-\-camera-elevation-angle=\<angle\>|0.0|Apply an elevation transformation to the camera, in degrees, added after other camera options.
+\-\-camera-orthographic||Set the camera to use the orthographic projection.
 
 ## Raytracing options
 

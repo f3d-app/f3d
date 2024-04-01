@@ -13,7 +13,7 @@ pybind11_add_module(pyf3d MODULE F3DPythonBindings.cxx)
 
 # In case pyf3d is built separately, we need to retrieve the existing libf3d
 if(PROJECT_IS_TOP_LEVEL)
-  find_package(f3d REQUIRED)
+  find_package(f3d REQUIRED COMPONENTS library)
   set(F3D_VERSION "${f3d_VERSION}")
   target_link_libraries(pyf3d PRIVATE f3d::libf3d)
   target_include_directories(pyf3d PRIVATE "${f3d_INCLUDE_DIR}/f3d")

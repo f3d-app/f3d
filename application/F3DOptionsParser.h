@@ -20,6 +20,7 @@ class options;
 struct F3DAppOptions
 {
   std::string UserConfigFile = "";
+  std::string ColorMapFile = "";
   bool DryRun = false;
   bool GeometryOnly = false;
   bool GroupGeometries = false;
@@ -29,6 +30,7 @@ struct F3DAppOptions
   std::string InteractionTestPlayFile = "";
   bool NoBackground = false;
   bool NoRender = false;
+  bool Watch = false;
   double RefThreshold = 50;
   double MaxSize = -1.0;
 

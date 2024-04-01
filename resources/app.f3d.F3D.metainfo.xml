@@ -16,6 +16,7 @@
     <url type="homepage">https://f3d.app/</url>
     <url type="help">https://f3d.app/doc/user/README_USER.html</url>
     <url type="bugtracker">https://github.com/f3d-app/f3d/issues</url>
+    <developer_name>Michael Migliore and Mathieu Westphal</developer_name>
     <screenshots>
         <screenshot type="default">
             <image>https://user-images.githubusercontent.com/3129530/194735416-3f386437-456c-4145-9b5e-6bb6451d7e9a.png</image>

@@ -54,6 +54,15 @@ reader* factory::getReader(const std::string& fileName)
     }
   }
 
+  if (bestReader)
+  {
+    log::debug("The best reader for \"" + fileName + "\" is \"" + bestReader->getName() + "\"");
+  }
+  else
+  {
+    log::debug("No reader found for \"" + fileName + "\"");
+  }
+
   return bestReader;
 }
 

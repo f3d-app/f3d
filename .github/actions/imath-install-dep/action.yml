@@ -12,18 +12,19 @@ runs:
 
     - name: Cache Imath
       id: cache-imath
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/imath_install
-        key: imath-v3.1.9-${{runner.os}}-${{inputs.cpu}}-0
+        key: imath-v3.1.10-${{runner.os}}-${{inputs.cpu}}-1
 
+    # Dependents: alembic
     - name: Checkout Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
       with:
         repository: AcademySoftwareFoundation/Imath
         path: './dependencies/imath'
-        ref: v3.1.9
+        ref: v3.1.10
 
     - name: Setup Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'

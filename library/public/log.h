@@ -101,8 +101,10 @@ public:
 
   /**
    * Set the verbose level.
+   * By default, only warnings and errors are written to stderr, debug and info are written to
+   * stdout. If forceStdErr is true, all messages including debug and info are written to stderr.
    */
-  static void setVerboseLevel(VerboseLevel level);
+  static void setVerboseLevel(VerboseLevel level, bool forceStdErr = false);
 
   /**
    * Wait for user if applicable (eg: win32 output window).
@@ -112,7 +114,9 @@ public:
 
 protected:
   //! @cond
-  static void appendArg(std::stringstream&) {}
+  static void appendArg(std::stringstream&)
+  {
+  }
 
   template<typename T, typename... Args>
   static void appendArg(std::stringstream& ss, T value, Args... args)

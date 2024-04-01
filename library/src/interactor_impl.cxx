@@ -167,9 +167,15 @@ public:
     bool checkColoring = false;
     bool render = false;
 
-    // Available keycodes: W
+    // Available keycodes: None
     switch (keyCode)
     {
+      case 'W':
+        self->AnimationManager->CycleAnimation();
+        self->Options.set("scene.animation.index", self->AnimationManager->GetAnimationIndex());
+        ren->SetAnimationnameInfo(self->AnimationManager->GetAnimationName());
+        render = true;
+        break;
       case 'C':
         if (renWithColor)
         {
@@ -317,6 +323,10 @@ public:
         break;
       case '3':
         self->SetViewOrbit(ViewType::VT_RIGHT, self);
+        render = true;
+        break;
+      case '5':
+        self->Options.toggle("scene.camera.orthographic");
         render = true;
         break;
       case '7':
@@ -683,8 +693,25 @@ bool interactor_impl::recordInteraction(const std::string& file)
 {
   if (file.empty())
   {
-    // TODO improve VTK to check file opening
     log::error("No interaction record file provided");
+    return false;
+  }
+
+  std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
+
+  std::string parentDirectory = vtksys::SystemTools::GetParentDirectory(cleanFile);
+
+  // Check if the parent directory exists
+  if (!vtksys::SystemTools::FileExists(parentDirectory))
+  {
+    log::error("Interaction record directory does not exist ", parentDirectory);
+    return false;
+  }
+
+  // Check if we can write to the directory
+  if (!vtksys::SystemTools::TestFileAccess(parentDirectory, vtksys::TEST_FILE_WRITE))
+  {
+    log::error("Don't have write permissions for ", parentDirectory);
     return false;
   }
 
@@ -699,7 +726,6 @@ bool interactor_impl::recordInteraction(const std::string& file)
   this->Internals->Recorder->SetInteractor(this->Internals->VTKInteractor);
 #endif
 
-  std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
   this->Internals->Recorder->SetFileName(cleanFile.c_str());
   this->Internals->Recorder->On();
   this->Internals->Recorder->Record();

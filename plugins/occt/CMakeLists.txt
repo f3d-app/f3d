@@ -6,7 +6,7 @@ include(GNUInstallDirs)
 
 # Check if the plugin is built externally
 if(PROJECT_IS_TOP_LEVEL)
-  find_package(f3d REQUIRED)
+  find_package(f3d REQUIRED COMPONENTS pluginsdk)
 else()
   include(f3dPlugin)
 endif()
@@ -17,7 +17,13 @@ if("${OpenCASCADE_VERSION}" VERSION_LESS "7.5.0")
   message(FATAL_ERROR "Plugin: OpenCASCADE: ${OpenCASCADE_VERSION} is not supported by F3D, please update your OpenCASCADE installation.")
 endif()
 
-if((NOT TARGET "TKSTEP") AND (NOT TARGET "TKIGES") AND (NOT TARGET "TKMesh"))
+if("${OpenCASCADE_VERSION}" VERSION_LESS "7.8.0")
+  if((NOT TARGET "TKSTEP") AND (NOT TARGET "TKIGES") AND (NOT TARGET "TKMesh"))
+    message(FATAL_ERROR "Plugin: OpenCASCADE does not contain required modules")
+  endif()
+endif()
+
+if((NOT TARGET "TKDESTEP") AND (NOT TARGET "TKDEIGES") AND (NOT TARGET "TKMesh"))
     message(FATAL_ERROR "Plugin: OpenCASCADE does not contain required modules")
 endif()
 
@@ -27,8 +33,14 @@ option(F3D_PLUGIN_OCCT_COLORING_SUPPORT "Enable coloring support in occt plugin"
 mark_as_advanced(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
 
 if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
-  if (NOT (TARGET "TKXDESTEP") OR NOT (TARGET "TKXDEIGES"))
+  if("${OpenCASCADE_VERSION}" VERSION_LESS "7.8.0")
+    if (NOT (TARGET "TKXDESTEP") OR NOT (TARGET "TKXDEIGES"))
       message(FATAL_ERROR "occt plugin: TKXDESTEP and TKXDEIGES OCCT modules are not found. Turn off F3D_PLUGIN_OCCT_COLORING_SUPPORT or enable them in your OpenCascade build.")
+    endif()
+  else()
+    if (NOT (TARGET "TKXSDRAWSTEP") OR NOT (TARGET "TKXSDRAWIGES"))
+        message(FATAL_ERROR "occt plugin: TKXSDRAWSTEP and TKXSDRAWIGES OCCT modules are not found. Turn off F3D_PLUGIN_OCCT_COLORING_SUPPORT or enable them in your OpenCascade build.")
+    endif()
   endif()
 endif()
 

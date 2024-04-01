@@ -1,10 +1,23 @@
 #include "F3DStarter.h"
 
+#include "F3DColorMapTools.h"
 #include "F3DConfig.h"
 #include "F3DIcon.h"
 #include "F3DNSDelegate.h"
 #include "F3DOptionsParser.h"
 #include "F3DSystemTools.h"
+
+#define DMON_IMPL
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable : 4505)
+#include "dmon.h"
+// dmon includes Windows.h which defines 'ERROR' and conflicts with log.h
+#undef ERROR
+#pragma warning(pop)
+#else
+#include "dmon.h"
+#endif
 
 #include "engine.h"
 #include "interactor.h"
@@ -12,8 +25,12 @@
 #include "options.h"
 #include "window.h"
 
+#include <algorithm>
+#include <atomic>
 #include <cassert>
 #include <filesystem>
+#include <iostream>
+#include <mutex>
 #include <set>
 
 namespace fs = std::filesystem;
@@ -101,33 +118,45 @@ public:
     return false;
   }
 
-  static void SetVerboseLevel(const std::string& level)
+  static void SetVerboseLevel(const std::string& level, bool forceStdErr)
   {
     // A switch/case over verbose level
     if (level == "quiet")
     {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET, forceStdErr);
     }
     else if (level == "error")
     {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::ERROR);
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::ERROR, forceStdErr);
     }
     else if (level == "warning")
     {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::WARN);
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::WARN, forceStdErr);
     }
     else if (level == "info")
     {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO);
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO, forceStdErr);
     }
     else if (level == "debug")
     {
-      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+      f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG, forceStdErr);
     }
     else
     {
       f3d::log::warn("Unrecognized verbose level: ", level,
         ", Ignoring. Possible values are quiet, error, warning, info, debug");
+    }
+  }
+
+  static void dmonFolderChanged(
+    dmon_watch_id, dmon_action, const char*, const char* filename, const char*, void* userData)
+  {
+    F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
+    const std::lock_guard<std::mutex> lock(self->Internals->FilesListMutex);
+    fs::path filePath = self->Internals->FilesList[self->Internals->CurrentFileIndex];
+    if (filePath.filename().string() == std::string(filename))
+    {
+      self->Internals->ReloadFileRequested = true;
     }
   }
 
@@ -137,9 +166,17 @@ public:
   f3d::options FileOptions;
   std::unique_ptr<f3d::engine> Engine;
   std::vector<fs::path> FilesList;
-  int CurrentFileIndex = -1;
+  dmon_watch_id FolderWatchId;
   bool LoadedFile = false;
   bool UpdateWithCommandLineParsing = true;
+
+  // dmon used atomic and mutex
+  std::atomic<int> CurrentFileIndex = -1;
+  std::mutex FilesListMutex;
+
+  // Event loop atomics
+  std::atomic<bool> RenderRequested = false;
+  std::atomic<bool> ReloadFileRequested = false;
 };
 
 //----------------------------------------------------------------------------
@@ -149,10 +186,17 @@ F3DStarter::F3DStarter()
   // Set option outside of command line and config file
   this->Internals->DynamicOptions.set(
     "ui.dropzone-info", "Drop a file or HDRI to load it\nPress H to show cheatsheet");
+
+  // Initialize dmon
+  dmon_init();
 }
 
 //----------------------------------------------------------------------------
-F3DStarter::~F3DStarter() = default;
+F3DStarter::~F3DStarter()
+{
+  // deinit dmon
+  dmon_deinit();
+}
 
 //----------------------------------------------------------------------------
 int F3DStarter::Start(int argc, char** argv)
@@ -163,8 +207,16 @@ int F3DStarter::Start(int argc, char** argv)
   this->Internals->Parser.GetOptions(
     this->Internals->AppOptions, this->Internals->DynamicOptions, files);
 
+  const bool renderToStdout = this->Internals->AppOptions.Output == "-";
+
   // Set verbosity level early from command line
-  F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel);
+  F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel, renderToStdout);
+
+  if (renderToStdout)
+  {
+    f3d::log::info("Output image will be saved to stdout, all log types including debug and info "
+                   "levels are redirected to stderr");
+  }
 
   f3d::log::debug("========== Initializing ==========");
 
@@ -183,7 +235,7 @@ int F3DStarter::Start(int argc, char** argv)
       this->Internals->AppOptions, this->Internals->DynamicOptions, files);
 
     // Set verbosity level again if it was defined in the configuration file global block
-    F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel);
+    F3DInternals::SetVerboseLevel(this->Internals->AppOptions.VerboseLevel, renderToStdout);
   }
 
 #if __APPLE__
@@ -209,41 +261,17 @@ int F3DStarter::Start(int argc, char** argv)
     interactor.setKeyPressCallBack(
       [this](int, const std::string& keySym) -> bool
       {
-        const auto loadFile = [this](int index, bool restoreCamera = false) -> bool
-        {
-          this->Internals->Engine->getInteractor().stopAnimation();
-
-          f3d::log::debug("========== Loading 3D file ==========");
-
-          if (restoreCamera)
-          {
-            f3d::camera& cam = this->Internals->Engine->getWindow().getCamera();
-            const auto camState = cam.getState();
-            this->LoadFile(index, true);
-            cam.setState(camState);
-          }
-          else
-          {
-            this->LoadFile(index, true);
-          }
-
-          f3d::log::debug("========== Rendering ==========");
-
-          this->Render();
-          return true;
-        };
-
         if (keySym == "Left")
         {
-          return loadFile(-1);
+          return this->LoadRelativeFile(-1);
         }
         if (keySym == "Right")
         {
-          return loadFile(+1);
+          return this->LoadRelativeFile(+1);
         }
         if (keySym == "Up")
         {
-          return loadFile(0, true);
+          return this->LoadRelativeFile(0, true);
         }
         if (keySym == "Down")
         {
@@ -254,7 +282,7 @@ int F3DStarter::Start(int argc, char** argv)
               this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)]
                 .parent_path(),
               true);
-            return loadFile(0);
+            return this->LoadRelativeFile(0);
           }
           return true;
         }
@@ -289,7 +317,7 @@ int F3DStarter::Start(int argc, char** argv)
         {
           this->LoadFile(index);
         }
-        this->Render();
+        this->RequestRender();
         return true;
       });
     window
@@ -312,9 +340,25 @@ int F3DStarter::Start(int argc, char** argv)
     }
 #endif
   }
-  f3d::log::debug("Engine configured");
 
-  f3d::log::debug("========== Loading 3D file ==========");
+  // Parse colormap
+  if (!this->Internals->AppOptions.ColorMapFile.empty())
+  {
+    std::string fullPath = F3DColorMapTools::Find(this->Internals->AppOptions.ColorMapFile);
+
+    if (!fullPath.empty())
+    {
+      this->Internals->Engine->getOptions().set(
+        "model.scivis.colormap", F3DColorMapTools::Read(fullPath));
+    }
+    else
+    {
+      f3d::log::error("Cannot find the colormap ", this->Internals->AppOptions.ColorMapFile);
+      this->Internals->Engine->getOptions().set("model.scivis.colormap", std::vector<double>{});
+    }
+  }
+
+  f3d::log::debug("Engine configured");
 
   // Add all files
   for (auto& file : files)
@@ -324,8 +368,6 @@ int F3DStarter::Start(int argc, char** argv)
 
   // Load a file
   this->LoadFile();
-
-  f3d::log::debug("========== Rendering ==========");
 
   if (!this->Internals->AppOptions.NoRender)
   {
@@ -426,8 +468,17 @@ int F3DStarter::Start(int argc, char** argv)
       }
 
       f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
-      img.save(this->Internals->AppOptions.Output);
-      f3d::log::debug("Output image saved to ", this->Internals->AppOptions.Output);
+      if (renderToStdout)
+      {
+        const auto buffer = img.saveBuffer();
+        std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator(std::cout));
+        f3d::log::debug("Output image saved to stdout");
+      }
+      else
+      {
+        img.save(this->Internals->AppOptions.Output);
+        f3d::log::debug("Output image saved to ", this->Internals->AppOptions.Output);
+      }
 
       if (this->Internals->FilesList.size() > 1)
       {
@@ -442,7 +493,9 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::log::error("This is a headless build of F3D, interactive rendering is not supported");
       return EXIT_FAILURE;
 #else
-      this->Render();
+      // Create the event loop repeating timer
+      interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
+      this->RequestRender();
       interactor.start();
 #endif
     }
@@ -454,6 +507,7 @@ int F3DStarter::Start(int argc, char** argv)
 //----------------------------------------------------------------------------
 void F3DStarter::LoadFile(int index, bool relativeIndex)
 {
+  f3d::log::debug("========== Loading 3D file ==========");
   // When loading a file, store any changed options
   // into the dynamic options and use these dynamic option as the default
   // for loading the file while still applying file specific options on top of it
@@ -603,7 +657,20 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
     }
   }
 
-  if (!this->Internals->LoadedFile)
+  if (this->Internals->LoadedFile)
+  {
+    if (this->Internals->AppOptions.Watch)
+    {
+      // Always unwatch and watch current folder, even on reload
+      if (this->Internals->FolderWatchId.id > 0)
+      {
+        dmon_unwatch(this->Internals->FolderWatchId);
+      }
+      this->Internals->FolderWatchId = dmon_watch(
+        filePath.parent_path().string().c_str(), &F3DInternals::dmonFolderChanged, 0, this);
+    }
+  }
+  else
   {
     // No file loaded, remove any previously loaded file
     loader.loadGeometry("", true);
@@ -614,8 +681,16 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
 }
 
 //----------------------------------------------------------------------------
+void F3DStarter::RequestRender()
+{
+  // Render will be called by the next event loop
+  this->Internals->RenderRequested = true;
+}
+
+//----------------------------------------------------------------------------
 void F3DStarter::Render()
 {
+  f3d::log::debug("========== Rendering ==========");
   this->Internals->Engine->getWindow().render();
   f3d::log::debug("Render done");
 }
@@ -653,6 +728,8 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
 
     if (it == this->Internals->FilesList.end())
     {
+      // In the main thread, we only need to guard writing
+      const std::lock_guard<std::mutex> lock(this->Internals->FilesListMutex);
       this->Internals->FilesList.push_back(tmpPath);
       return static_cast<int>(this->Internals->FilesList.size()) - 1;
     }
@@ -664,5 +741,42 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       }
       return static_cast<int>(std::distance(this->Internals->FilesList.begin(), it));
     }
+  }
+}
+
+//----------------------------------------------------------------------------
+bool F3DStarter::LoadRelativeFile(int index, bool restoreCamera)
+{
+  this->Internals->Engine->getInteractor().stopAnimation();
+
+  if (restoreCamera)
+  {
+    f3d::camera& cam = this->Internals->Engine->getWindow().getCamera();
+    const auto camState = cam.getState();
+    this->LoadFile(index, true);
+    cam.setState(camState);
+  }
+  else
+  {
+    this->LoadFile(index, true);
+  }
+
+  this->RequestRender();
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::EventLoop()
+{
+  if (this->Internals->ReloadFileRequested)
+  {
+    this->LoadRelativeFile(0, true);
+    this->Internals->ReloadFileRequested = false;
+  }
+  if (this->Internals->RenderRequested)
+  {
+    this->Render();
+    this->Internals->RenderRequested = false;
   }
 }

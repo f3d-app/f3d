@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import tempfile
 import pytest
 
@@ -63,3 +64,42 @@ def test_save_buffer(f3d_engine):
     buffer = img.save_buffer(f3d.Image.SaveFormat.PNG)
     assert buffer.startswith(b"\x89PNG")
     assert img._repr_png_() == buffer
+
+
+def test_formats(f3d_engine):
+    formats = f3d.Image.supported_formats()
+    assert ".png" in formats
+
+
+def test_normalized_pixel(f3d_engine):
+    img = f3d_engine.window.render_to_image()
+    assert img.normalized_pixel((0, 0)) == [0.2, 0.2, 0.2]
+
+
+@pytest.mark.parametrize(
+    "img_filename",
+    [
+        "toTerminalText-rgb.png",
+        "toTerminalText-rgba.png",
+    ],
+)
+def test_to_terminal_text(img_filename):
+    testing_data_dir = Path(__file__).parent.parent.parent / "testing/data"
+    image_path = testing_data_dir / img_filename
+    text_path = image_path.with_suffix(".txt")
+    assert (
+        f3d.Image(str(image_path)).to_terminal_text()
+        == open(text_path, encoding="utf8").read()
+    )
+
+
+def test_metadata():
+    image = f3d.Image(4, 2, 3, f3d.Image.ChannelType.BYTE)
+    image.set_metadata("foo", "bar")
+    image.set_metadata("hello", "world")
+    assert image.get_metadata("foo") == "bar" and image.get_metadata("hello") == "world"
+
+    with pytest.raises(KeyError):
+        image.get_metadata("baz")
+
+    assert set(image.all_metadata()) == set(["foo", "hello"])

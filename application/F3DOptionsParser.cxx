@@ -68,8 +68,8 @@ protected:
     bool ret = false;
     if (this->FilePathForConfigBlock.empty())
     {
-      auto localIt = this->GlobalConfigDicEntry.find(option);
-      if (localIt != this->GlobalConfigDicEntry.end())
+      auto localIt = this->GlobalConfigEntry.find(option);
+      if (localIt != this->GlobalConfigEntry.end())
       {
         configValue = localIt->second;
         ret = true;
@@ -77,7 +77,7 @@ protected:
     }
     else
     {
-      for (auto const& it : this->ConfigDic)
+      for (auto const& it : this->RegexConfigEntries)
       {
         std::regex re(it.first, std::regex_constants::icase);
         std::smatch matches;
@@ -103,7 +103,10 @@ protected:
     return ss.str();
   }
 
-  static std::string ToString(bool currValue) { return currValue ? "true" : "false"; }
+  static std::string ToString(bool currValue)
+  {
+    return currValue ? "true" : "false";
+  }
 
   template<class T>
   static std::string ToString(const std::vector<T>& currValue)
@@ -201,10 +204,10 @@ private:
 
   std::string FilePathForConfigBlock;
 
-  using DictionaryEntry = std::map<std::string, std::string>;
-  using Dictionary = std::map<std::string, DictionaryEntry>;
-  DictionaryEntry GlobalConfigDicEntry;
-  Dictionary ConfigDic;
+  using ConfigEntry = std::map<std::string, std::string>;
+  using ConfigEntries = std::vector<std::pair<std::string, ConfigEntry> >;
+  ConfigEntry GlobalConfigEntry;
+  ConfigEntries RegexConfigEntries;
   std::string ExecutableName;
   std::vector<std::string> AllLongOptions;
 };
@@ -304,12 +307,13 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp0, "help", "h", "Print help");
     this->DeclareOption(grp0, "version", "", "Print version details");
     this->DeclareOption(grp0, "readers-list", "", "Print the list of readers");
-    this->DeclareOption(grp0, "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations.", appOptions.UserConfigFile,  LocalHasDefaultNo, MayHaveConfig::NO , "<filePath/filename/fileStem>");
+    this->DeclareOption(grp0, "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations.", appOptions.UserConfigFile, LocalHasDefaultNo, MayHaveConfig::NO, "<filePath/filename/fileStem>");
     this->DeclareOption(grp0, "dry-run", "", "Do not read the configuration file", appOptions.DryRun,  HasDefault::YES, MayHaveConfig::NO );
-    this->DeclareOption(grp0, "no-render", "", "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.", appOptions.NoRender,  HasDefault::YES, MayHaveConfig::YES );
+    this->DeclareOption(grp0, "no-render", "", "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.", appOptions.NoRender, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "max-size", "", "Maximum size in Mib of a file to load, negative value means unlimited", appOptions.MaxSize,  HasDefault::YES, MayHaveConfig::YES, "<size in Mib>");
+    this->DeclareOption(grp0, "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", appOptions.Watch,  HasDefault::YES, MayHaveConfig::YES );
     this->DeclareOption(grp0, "load-plugins", "", "List of plugins to load separated with a comma", appOptions.Plugins, LocalHasDefaultNo, MayHaveConfig::YES, "<paths or names>");
-    this->DeclareOption(grp0, "scan-plugins", "", "Scan some directories for plugins (result can be incomplete)");
+    this->DeclareOption(grp0, "scan-plugins", "", "Scan standard directories for plugins and display available plugins (result can be incomplete)");
 
     auto grp1 = cxxOptions.add_options("General");
     this->DeclareOption(grp1, "verbose", "", "Set verbose level, providing more information about the loaded data in the console output", appOptions.VerboseLevel, HasDefault::YES, MayHaveConfig::YES, "{debug, info, warning, error, quiet}", HasImplicitValue::YES, "debug");
@@ -338,6 +342,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
     auto grp2 = cxxOptions.add_options("Material");
     this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.getAsBoolRef("model.point-sprites.enable"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp2, "point-type", "", "Point sprites type when showing point sprites", options.getAsStringRef("model.point-sprites.type"), HasDefault::YES, MayHaveConfig::YES, "<sphere|gaussian>");
     this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.getAsDoubleRef("render.point-size"), HasDefault::YES, MayHaveConfig::YES, "<size>");
     this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", options.getAsDoubleRef("render.line-width"), HasDefault::YES, MayHaveConfig::YES, "<width>");
     this->DeclareOption(grp2, "color", "", "Solid color", options.getAsDoubleVectorRef("model.color.rgb"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
@@ -375,7 +380,8 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.getAsBoolRef("model.scivis.cells"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.getAsDoubleVectorRef("model.scivis.range"), HasDefault::YES, MayHaveConfig::YES, "<min,max>");
     this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.getAsBoolRef("ui.bar"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap", options.getAsDoubleVectorRef("model.scivis.colormap"), HasDefault::YES, MayHaveConfig::YES, "<color_list>");
+    this->DeclareOption(grp4, "colormap-file", "", "Specify a colormap image", appOptions.ColorMapFile, LocalHasDefaultNo, MayHaveConfig::YES, "<filePath/filename/fileStem>");
+    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap (ignored if \"colormap-file\" is specified)", options.getAsDoubleVectorRef("model.scivis.colormap"), HasDefault::YES, MayHaveConfig::YES, "<color_list>");
     this->DeclareOption(grp4, "volume", "v", "Show volume if the file is compatible", options.getAsBoolRef("model.volume.enable"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.getAsBoolRef("model.volume.inverse"), HasDefault::YES, MayHaveConfig::YES);
 
@@ -388,6 +394,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grpCamera, "camera-zoom-factor", "", "Camera zoom factor (non-zero)", appOptions.CameraZoomFactor, HasDefault::YES, MayHaveConfig::YES, "<factor>");
     this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees), performed after other camera options", appOptions.CameraAzimuthAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
     this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees), performed after other camera options", appOptions.CameraElevationAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
+    this->DeclareOption(grpCamera, "camera-orthographic", "", "Use an orthographic camera", options.getAsBoolRef("scene.camera.orthographic"), HasDefault::YES, MayHaveConfig::YES);
 
 #if F3D_MODULE_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
@@ -667,7 +674,7 @@ void ConfigurationOptions::PrintReadersList()
 //----------------------------------------------------------------------------
 bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string& config)
 {
-  this->ConfigDic.clear();
+  this->RegexConfigEntries.clear();
 
   std::string configSearch = "config";
   if (!config.empty())
@@ -742,7 +749,7 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
       return false;
     }
 
-    nlohmann::json json;
+    nlohmann::ordered_json json;
     try
     {
       file >> json;
@@ -775,11 +782,11 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
       }
       if (regexpConfig.key() == "global")
       {
-        this->GlobalConfigDicEntry = localDic;
+        this->GlobalConfigEntry = localDic;
       }
       else
       {
-        this->ConfigDic[regexpConfig.key()] = localDic;
+        this->RegexConfigEntries.emplace_back(regexpConfig.key(), localDic);
       }
     }
   }

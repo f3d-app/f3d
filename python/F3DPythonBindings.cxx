@@ -39,7 +39,10 @@ template<>
 class py::detail::type_caster<f3d::point3_t>
 {
 public:
-  bool load(handle src, bool convert) { return load_array(src, convert, value); }
+  bool load(handle src, bool convert)
+  {
+    return load_array(src, convert, value);
+  }
 
   static handle cast(const f3d::point3_t& src, return_value_policy, handle /* parent */)
   {
@@ -53,7 +56,10 @@ template<>
 class py::detail::type_caster<f3d::vector3_t>
 {
 public:
-  bool load(handle src, bool convert) { return load_array(src, convert, value); }
+  bool load(handle src, bool convert)
+  {
+    return load_array(src, convert, value);
+  }
 
   static handle cast(const f3d::vector3_t& src, return_value_policy, handle /* parent */)
   {
@@ -114,6 +120,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def(py::init<unsigned int, unsigned int, unsigned int, f3d::image::ChannelType>())
     .def(py::self == py::self)
     .def(py::self != py::self)
+    .def_static("supported_formats", &f3d::image::getSupportedFormats)
     .def_property_readonly("width", &f3d::image::getWidth)
     .def_property_readonly("height", &f3d::image::getHeight)
     .def_property_readonly("channel_count", &f3d::image::getChannelCount)
@@ -125,7 +132,23 @@ PYBIND11_MODULE(pyf3d, module)
       "save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG)
     .def("save_buffer", getFileBytes, py::arg("format") = f3d::image::SaveFormat::PNG)
     .def("_repr_png_",
-      [&](const f3d::image& img) { return getFileBytes(img, f3d::image::SaveFormat::PNG); });
+      [&](const f3d::image& img) { return getFileBytes(img, f3d::image::SaveFormat::PNG); })
+    .def("to_terminal_text", [](const f3d::image& img) { return img.toTerminalText(); })
+    .def("set_metadata", &f3d::image::setMetadata)
+    .def("get_metadata",
+      [](const f3d::image& img, const std::string& key)
+      {
+        try
+        {
+          return img.getMetadata(key);
+        }
+        catch (std::out_of_range e)
+        {
+          throw py::key_error(key);
+        }
+      })
+    .def("all_metadata", &f3d::image::allMetadata)
+    .def("normalized_pixel", &f3d::image::getNormalizedPixel);
 
   // f3d::options
   py::class_<f3d::options> options(module, "Options");

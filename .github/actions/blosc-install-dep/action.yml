@@ -12,11 +12,12 @@ runs:
 
     - name: Cache blosc
       id: cache-blosc
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/blosc_install
-        key: blosc-1.21.5-${{runner.os}}-${{inputs.cpu}}-1
+        key: blosc-1.21.5-${{runner.os}}-${{inputs.cpu}}-3
 
+    # Dependents: openvdb vtk
     - name: Checkout blosc
       if: steps.cache-blosc.outputs.cache-hit != 'true'
       uses: actions/checkout@v3

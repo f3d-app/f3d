@@ -34,7 +34,12 @@ public:
   void LoadFile(int index = 0, bool relativeIndex = false);
 
   /**
-   * Trigger a render
+   * Trigger a render on the next event loop
+   */
+  void RequestRender();
+
+  /**
+   * Trigger a render immediately (must be called by the main thread)
    */
   void Render();
 
@@ -47,6 +52,19 @@ public:
 private:
   class F3DInternals;
   std::unique_ptr<F3DInternals> Internals;
+
+  /**
+   * Internal method triggered when interacting with the application
+   * that load a file using relative index and handle camera restore
+   */
+  bool LoadRelativeFile(int relativeIndex = 0, bool restoreCamera = false);
+
+  /**
+   * Internal event loop that is triggered repeatedly to handle specific events:
+   * - Render
+   * - ReloadFile
+   */
+  void EventLoop();
 };
 
 #endif

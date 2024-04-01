@@ -16,23 +16,23 @@
 namespace f3d::detail
 {
 //----------------------------------------------------------------------------
-void animationManager::Initialize(
+bool animationManager::Initialize(
   const options* options, window* window, interactor_impl* interactor, vtkImporter* importer)
 {
+  assert(importer);
   this->HasAnimation = false;
   this->Playing = false;
   this->CurrentTime = 0;
   this->CurrentTimeSet = false;
-
   this->Options = options;
   this->Interactor = interactor;
   this->Window = window;
   this->Importer = importer;
 
   // This can be -1 if animation support is not implemented in the importer
-  vtkIdType availAnimations = this->Importer->GetNumberOfAnimations();
+  this->AvailAnimations = this->Importer->GetNumberOfAnimations();
 
-  if (availAnimations > 0 && interactor)
+  if (this->AvailAnimations > 0 && interactor)
   {
     this->ProgressWidget = vtkSmartPointer<vtkProgressBarWidget>::New();
     interactor->SetInteractorOn(this->ProgressWidget);
@@ -48,7 +48,6 @@ void animationManager::Initialize(
     progressRep->DrawBackgroundOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
-
 // Complete vtkProgressBarRepresentation needs
 // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7359
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201027)
@@ -63,50 +62,51 @@ void animationManager::Initialize(
     this->ProgressWidget = nullptr;
   }
 
-  if (availAnimations <= 0)
+  int animationIndex = options->getAsInt("scene.animation.index");
+  double animationTime = options->getAsDouble("scene.animation.time");
+
+  if (this->AvailAnimations <= 0)
   {
-    log::debug("No animations available in this file");
+    log::debug("No animation available in this file");
+    if (animationIndex > 0)
+    {
+      log::warn("An animation index has been specified but there are no animation available.");
+    }
+    if (animationTime != 0)
+    {
+      log::warn("No animation available, cannot load a specific animation time");
+    }
+
+    this->HasAnimation = false;
+    return false;
   }
   else
   {
     log::debug("Animation(s) available in this file are:");
   }
-  for (int i = 0; i < availAnimations; i++)
+  for (int i = 0; i < this->AvailAnimations; i++)
   {
     log::debug(i, ": ", this->Importer->GetAnimationName(i));
   }
   log::debug("");
 
-  int animationIndex = options->getAsInt("scene.animation.index");
-  if (animationIndex != 0 && availAnimations <= 0)
-  {
-    log::warn("An animation index has been specified but there are no animation available.");
-  }
-  else if (animationIndex > 0 && animationIndex >= availAnimations)
+  this->AnimationIndex = options->getAsInt("scene.animation.index");
+  if (this->AnimationIndex > 0 && this->AnimationIndex >= this->AvailAnimations)
   {
     log::warn(
       "Specified animation index is greater than the highest possible animation index, enabling "
       "the first animation.");
-
     this->Importer->EnableAnimation(0);
-  }
-  else if (animationIndex <= -1)
-  {
-    for (int i = 0; i < availAnimations; i++)
-    {
-      this->Importer->EnableAnimation(i);
-    }
   }
   else
   {
-    this->Importer->EnableAnimation(animationIndex);
+    this->EnableOnlyCurrentAnimation();
   }
 
   // Recover time ranges for all enabled animations
   this->TimeRange[0] = std::numeric_limits<double>::infinity();
   this->TimeRange[1] = -std::numeric_limits<double>::infinity();
-  vtkIdType nbAnims = this->Importer->GetNumberOfAnimations();
-  for (vtkIdType animIndex = 0; animIndex < nbAnims; animIndex++)
+  for (vtkIdType animIndex = 0; animIndex < this->AvailAnimations; animIndex++)
   {
     if (this->Importer->IsAnimationEnabled(animIndex))
     {
@@ -131,11 +131,12 @@ void animationManager::Initialize(
       this->HasAnimation = true;
     }
   }
-  if (this->TimeRange[0] == this->TimeRange[1])
+  if (this->TimeRange[0] >= this->TimeRange[1])
   {
-    log::warn("Animation(s) time range delta is zero: [", this->TimeRange[0], ", ",
+    log::warn("Animation(s) time range delta is invalid: [", this->TimeRange[0], ", ",
       this->TimeRange[1], "]. Disabling animation.");
     this->HasAnimation = false;
+    return false;
   }
   else
   {
@@ -147,6 +148,7 @@ void animationManager::Initialize(
   {
     this->StartAnimation();
   }
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -245,9 +247,9 @@ void animationManager::Tick()
 //----------------------------------------------------------------------------
 bool animationManager::LoadAtTime(double timeValue)
 {
+  assert(this->Importer);
   if (!this->HasAnimation)
   {
-    log::warn("No animation available, cannot load a specific animation time");
     return false;
   }
   if (timeValue < this->TimeRange[0] || timeValue > this->TimeRange[1])
@@ -256,7 +258,6 @@ bool animationManager::LoadAtTime(double timeValue)
       this->TimeRange[0], ", ", this->TimeRange[1], "] .");
     return false;
   }
-
   this->CurrentTime = timeValue;
   this->CurrentTimeSet = true;
   this->Importer->UpdateTimeStep(this->CurrentTime);
@@ -272,5 +273,69 @@ bool animationManager::LoadAtTime(double timeValue)
     this->Interactor->UpdateRendererAfterInteraction();
   }
   return true;
+}
+
+// ---------------------------------------------------------------------------------
+void animationManager::CycleAnimation()
+{
+  assert(this->Importer);
+  if (this->AvailAnimations <= 0)
+  {
+    return;
+  }
+  this->AnimationIndex += 1;
+
+  if (this->AnimationIndex == this->AvailAnimations)
+  {
+    this->AnimationIndex = -1;
+  }
+
+  this->EnableOnlyCurrentAnimation();
+  this->LoadAtTime(this->TimeRange[0]);
+}
+
+// ---------------------------------------------------------------------------------
+int animationManager::GetAnimationIndex()
+{
+  return this->AnimationIndex;
+}
+
+// ---------------------------------------------------------------------------------
+std::string animationManager::GetAnimationName()
+{
+  if (!this->Importer || this->AvailAnimations <= 0)
+  {
+    return "No animation";
+  }
+
+  if (this->AnimationIndex == -1)
+  {
+    return "All Animations";
+  }
+  return this->Importer->GetAnimationName(this->AnimationIndex);
+}
+
+//----------------------------------------------------------------------------
+void animationManager::EnableOnlyCurrentAnimation()
+{
+  assert(this->Importer);
+  for (int i = 0; i < this->AvailAnimations; i++)
+  {
+    this->Importer->DisableAnimation(i);
+  }
+  for (int i = 0; i < this->AvailAnimations; i++)
+  {
+    if (this->AnimationIndex == -1 || i == this->AnimationIndex)
+    {
+      this->Importer->EnableAnimation(i);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::GetTimeRange(double timeRange[2])
+{
+  timeRange[0] = this->TimeRange[0];
+  timeRange[1] = this->TimeRange[1];
 }
 }

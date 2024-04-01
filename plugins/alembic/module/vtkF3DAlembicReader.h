@@ -36,6 +36,7 @@ protected:
   vtkF3DAlembicReader();
   ~vtkF3DAlembicReader() override;
 
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   std::string FileName;

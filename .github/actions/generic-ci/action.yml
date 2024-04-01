@@ -29,6 +29,10 @@ inputs:
     description: 'Label to control egl'
     required: false
     default: 'no-egl'
+  static_label:
+    description: 'Label to control static build'
+    required: false
+    default: 'no-static'
   cpu:
     description: 'CPU architecture to build for'
     required: false
@@ -124,15 +128,12 @@ runs:
       working-directory: ${{github.workspace}}
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-    - name: Determine if testing should be enabled
-      id: vars
-      shell: bash
-      run: echo "run_tests=${{ inputs.cpu == 'x86_64' && 'true' || 'false' }}" >> $GITHUB_OUTPUT
-
       # occt coloring not supported on macOS because of #792
       # Exodus not supported on Apple Silicon because of #976
       # CMAKE_MODULE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
+      # OCCT plugin causes issues with static build because it exports symbols with the executable for some reasons
+      # https://github.com/f3d-app/f3d/issues/1322
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}/build
@@ -141,6 +142,7 @@ runs:
         -Werror=dev
         -Werror=deprecated
         --warn-uninitialized
+        -DBUILD_SHARED_LIBS=${{ inputs.static_label == 'static' && 'OFF' || 'ON' }}
         -DBUILD_TESTING=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../install
@@ -162,7 +164,7 @@ runs:
         -DF3D_PLUGIN_BUILD_ASSIMP=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_DRACO=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_EXODUS=${{ inputs.cpu == 'x86_64' && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && inputs.static_label == 'no-static' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ runner.os == 'macOS' && 'OFF' || 'ON' }}
         -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0' && matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
@@ -193,10 +195,18 @@ runs:
         path: ${{github.workspace}}\build\bin_Release
 
     - name: Test
-      if: steps.vars.outputs.run_tests == 'true'
+      if: inputs.cpu == 'x86_64'
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+
+    # Certain tests are failing on macOS arm64 for unknown reasons
+    # https://github.com/f3d-app/f3d/issues/1276
+    - name: Test
+      if: inputs.cpu == 'arm64'
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: ctest -E "(TestGrid)|(TestConfig)" -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
       if: failure()
@@ -216,15 +226,18 @@ runs:
       working-directory: ${{github.workspace}}/build
       run: cmake --install . --component mimetypes
 
-    - name: Install optional component
+    - name: Install optional component for libf3d
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: |
         cmake --install . --component sdk
         cmake --install . --component configuration
+        cmake --install . --component colormaps
 
     - name: Build and configure python externally
-      if: inputs.optional_deps_label == 'optional-deps'
+      if: |
+        inputs.optional_deps_label == 'optional-deps' &&
+        inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
@@ -232,6 +245,7 @@ runs:
         cmake --build build_python --config Release
 
     - name: Build and configure libf3d examples
+      if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
@@ -241,27 +255,38 @@ runs:
     - name: Install Mesa Windows examples
       if: |
         runner.os == 'Windows' &&
-        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0'
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' &&
+        inputs.static_label == 'no-static'
       uses: ./source/.github/actions/mesa-install-bin
       with:
         path: ${{github.workspace}}\build_examples\*\Release
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && steps.vars.outputs.run_tests == 'true'
+      if: |
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' &&
+        inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_examples -C Release -VV
 
+    - name: Install optional component f3d plugins
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --install . --component plugin_sdk
+
+      # CMAKE_MODULE_PATH is required because of
+      # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
     - name: Build plugin examples
+      if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }} -B build_plugins source/examples/plugins
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -DCMAKE_MODULE_PATH=$(pwd)/dependencies/install/lib/cmake/OpenVDB/ -Df3d_DIR=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }} -B build_plugins source/examples/plugins
         cmake --build build_plugins --config Release
 
     - name: Test plugin examples
-      if: steps.vars.outputs.run_tests == 'true'
+      if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_plugins -C Release -VV
@@ -296,25 +321,42 @@ runs:
       with:
         path: ${{github.workspace}}\install\bin
 
+    # Grid rendering has artifacts in macOS arm64 CI
+    # https://github.com/f3d-app/f3d/issues/1276
     - name: Check F3D_PLUGINS_PATH using plugin example
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' && steps.vars.outputs.run_tests == 'true'
+      if: |
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' &&
+        inputs.cpu != 'arm64' &&
+        inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose
 
     - name: Install plugin examples
+      if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
         cmake --install build_plugins --config Release
         cmake --install build_plugins --config Release --component configuration
 
+    # Grid rendering has artifacts in macOS arm64 CI
+    # https://github.com/f3d-app/f3d/issues/1276
     - name: Check Install
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' && steps.vars.outputs.run_tests == 'true'
+      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' && inputs.cpu != 'arm64'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
-        ${{ env.F3D_BIN_PATH }} ../source/testing/data/suzanne.obj --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --verbose
+        ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --comp=0 --verbose
+
+    - name: Check Install plugins
+      if: |
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6'
+        && inputs.cpu != 'arm64'
+        && inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}/install
+      run: |
         ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose
 
     - name: Upload Tests Install Artifact

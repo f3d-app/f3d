@@ -35,8 +35,9 @@ public:
   /**
    * Initialize the animation manager, required before playing the animation.
    * Provided pointers are expected to be not null except interactor.
+   * Return true if at least one animation is available, false otherwise.
    */
-  void Initialize(
+  bool Initialize(
     const options* options, window* window, interactor_impl* interactor, vtkImporter* importer);
 
   /**
@@ -47,9 +48,33 @@ public:
   void StopAnimation();
 
   /**
+   * Cycle onto and play the next available animation
+   */
+  void CycleAnimation();
+
+  /**
+   * Enable only the current animation
+   */
+  void EnableOnlyCurrentAnimation();
+
+  /**
+   * Get the current animation index
+   */
+  int GetAnimationIndex();
+
+  /**
+   * Return the current animation name if any
+   * Can be called before initialization safely
+   */
+  std::string GetAnimationName();
+
+  /**
    * Return true if the animation manager is playing the animation
    */
-  bool IsPlaying() const { return Playing; }
+  bool IsPlaying() const
+  {
+    return Playing;
+  }
 
   /**
    * Load animation at provided time value
@@ -58,6 +83,11 @@ public:
 
   animationManager(animationManager const&) = delete;
   void operator=(animationManager const&) = delete;
+
+  /**
+   * Set a time range pointer to the current time range values
+   */
+  void GetTimeRange(double timeRange[2]);
 
 protected:
   /**
@@ -76,6 +106,8 @@ protected:
   unsigned long CallBackId = 0;
   double CurrentTime = 0;
   bool CurrentTimeSet = false;
+  int AnimationIndex = 0;
+  int AvailAnimations = -1;
   std::chrono::steady_clock::time_point PreviousTick;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;

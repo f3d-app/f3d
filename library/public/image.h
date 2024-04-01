@@ -53,6 +53,7 @@ public:
    * Create an image from file, the following formats are supported:
    * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA.
    * EXR files are also supported if the associated module is built.
+   * The complete list can be retrieve at runtime by calling getSupportedFormats.
    * Throw an image::read_exception in case of failure.
    */
   explicit image(const std::string& path);
@@ -83,6 +84,19 @@ public:
   bool operator==(const image& reference) const;
   bool operator!=(const image& reference) const;
   ///@}
+
+  /**
+   * Read one specific pixel and return all channel normalized values.
+   * If the channel type is BYTE or SHORT, the values are normalized to [0, 1] range.
+   * \warning Because of the normalization, this function can be slow, prefer getContent when
+   * reading several pixels and normalization is not needed.
+   */
+  std::vector<double> getNormalizedPixel(const std::pair<int, int>& xy) const;
+
+  /**
+   * Get the list of supported image format when opening a file.
+   */
+  static std::vector<std::string> getSupportedFormats();
 
   ///@{ @name Resolution
   /**
@@ -161,6 +175,42 @@ public:
    * Throw an image::write_exception if the type is TIF.
    */
   std::vector<unsigned char> saveBuffer(SaveFormat format = SaveFormat::PNG) const;
+
+  /**
+   * Convert to colored text using ANSI escape sequences for printing in a terminal.
+   * Block and half-block characters are used to represent two pixels per character (vertically)
+   * meaning that each text line represent two rows of pixels.
+   * Byte encoded RGB and RGBA images are supported (alpha channel values are binarized).
+   * Assumes terminal support for:
+   * - unicode block characters (`U+2580`, `U+2584`, `U+2588`)
+   * - SGR escape codes (`ESC[0m`, `ESC[49m`)
+   * - 24-bit escape codes (`ESC[38;2;{r};{g};{b}m`, `ESC[48;2;{r};{g};{b}m`)
+   * Throw an exception if the type is not byte RGB or RGBA.
+   */
+  const f3d::image& toTerminalText(std::ostream& stream) const;
+
+  /**
+   * Convert to colored text using ANSI escape sequences for printing in a terminal.
+   * See `toTerminalText(std::ostream& stream)`.
+   * Throw an exception if the type is not byte RGB or RGBA.
+   */
+  std::string toTerminalText() const;
+
+  /**
+   * Set the value for a metadata key. Setting an empty value (`""`) removes the key.
+   */
+  f3d::image& setMetadata(const std::string& key, const std::string& value);
+
+  /**
+   * Get the value for a metadata key.
+   * Throw `std::invalid_argument` exception if key does not exist.
+   */
+  std::string getMetadata(const std::string& key) const;
+
+  /**
+   * List all the metadata keys which have a value set.
+   */
+  std::vector<std::string> allMetadata() const;
 
   /**
    * An exception that can be thrown by the image when there.

@@ -50,6 +50,7 @@ math(EXPR F3D_SYSTEM_PROCESSOR "8 * ${CMAKE_SIZEOF_VOID_P}")
 set(F3D_SYSTEM_PROCESSOR "${F3D_SYSTEM_PROCESSOR}-bits")
 
 option(F3D_EXCLUDE_DEPRECATED "Exclude deprecated functions and options" OFF)
+mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 
 # Modules
 option(F3D_MODULE_EXTERNAL_RENDERING "External rendering module" OFF)
@@ -59,12 +60,16 @@ option(F3D_MODULE_EXR "OpenEXR images module" OFF)
 # Use externals
 option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
 option(F3D_USE_EXTERNAL_NLOHMANN_JSON "Use external nlohmann_json dependency" OFF)
+option(F3D_USE_EXTERNAL_DMON "Use external dmon dependency" OFF)
 
 if (F3D_USE_EXTERNAL_CXXOPTS)
   find_package(cxxopts REQUIRED)
 endif ()
 if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
   find_package(nlohmann_json REQUIRED)
+endif ()
+if (F3D_USE_EXTERNAL_DMON)
+  find_package(dmon REQUIRED)
 endif ()
 
 # VTK dependency
@@ -128,6 +133,7 @@ endif()
 
 # Coverage
 cmake_dependent_option(F3D_COVERAGE "Emit coverage files" OFF "UNIX" OFF)
+mark_as_advanced(F3D_COVERAGE)
 set(f3d_coverage_compile_options "")
 set(f3d_coverage_link_options "")
 if(F3D_COVERAGE)
@@ -140,6 +146,7 @@ if(NOT F3D_SANITIZER)
   set(F3D_SANITIZER "none" CACHE STRING "Sanitizer type" FORCE)
   set_property(CACHE F3D_SANITIZER PROPERTY STRINGS "none" "address" "thread" "leak" "memory" "undefined")
 endif()
+mark_as_advanced(F3D_SANITIZER)
 
 if(NOT UNIX)
   set_property(CACHE F3D_SANITIZER PROPERTY TYPE INTERNAL)
@@ -157,6 +164,22 @@ if(NOT F3D_SANITIZER STREQUAL "none")
   endif()
   set(f3d_sanitizer_link_options -fsanitize=${F3D_SANITIZER})
 endif()
+
+# Construct generic build and link options
+set(f3d_compile_options_private "")
+set(f3d_compile_options_public "")
+set(f3d_link_options_public "")
+
+## F3D_STRICT_BUILD
+list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})
+
+## Coverage
+list(APPEND f3d_compile_options_public ${f3d_coverage_compile_options})
+list(APPEND f3d_link_options_public ${f3d_coverage_link_options})
+
+## Sanitizer
+list(APPEND f3d_compile_options_public ${f3d_sanitizer_compile_options})
+list(APPEND f3d_link_options_public ${f3d_sanitizer_link_options})
 
 # Testing
 option(BUILD_TESTING "Build the tests" OFF)
@@ -188,6 +211,9 @@ endif()
 
 # F3D Application
 cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
+
+# Build VTK extension moddules
+add_subdirectory(vtkext)
 
 # plugins
 option(F3D_PLUGINS_STATIC_BUILD "Make all plugins static (embedded into libf3d) and automatically loaded by F3D" ON)
@@ -254,3 +280,22 @@ if (f3d_lfs_file_size LESS_EQUAL 500)
     message(WARNING "Building python binding without LFS data is supported but testing using pytest will not be, please fetch LFS data to avoid this.")
   endif()
 endif()
+
+# Report options
+function(f3d_report_variable f3d_var)
+  message(STATUS "${f3d_var}: ${${f3d_var}}")
+endfunction()
+
+f3d_report_variable(F3D_BINDINGS_JAVA)
+f3d_report_variable(F3D_BINDINGS_PYTHON)
+f3d_report_variable(F3D_BUILD_APPLICATION)
+f3d_report_variable(F3D_MODULE_EXR)
+f3d_report_variable(F3D_MODULE_EXTERNAL_RENDERING)
+f3d_report_variable(F3D_MODULE_RAYTRACING)
+f3d_report_variable(F3D_PLUGIN_BUILD_ALEMBIC)
+f3d_report_variable(F3D_PLUGIN_BUILD_ASSIMP)
+f3d_report_variable(F3D_PLUGIN_BUILD_DRACO)
+f3d_report_variable(F3D_PLUGIN_BUILD_EXODUS)
+f3d_report_variable(F3D_PLUGIN_BUILD_OCCT)
+f3d_report_variable(F3D_PLUGIN_BUILD_USD)
+f3d_report_variable(F3D_PLUGIN_BUILD_VDB)

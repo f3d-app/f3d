@@ -6,7 +6,7 @@ include(GNUInstallDirs)
 
 # Check if the plugin is built externally
 if(PROJECT_IS_TOP_LEVEL)
-  find_package(f3d REQUIRED)
+  find_package(f3d REQUIRED COMPONENTS pluginsdk)
 else()
   include(f3dPlugin)
 endif()
@@ -24,6 +24,20 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DDracoReader
   FORMAT_DESCRIPTION "Draco"
 )
+
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10884
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
+  f3d_plugin_declare_reader(
+    NAME GLTFDraco
+    SCORE 90
+    EXTENSIONS gltf glb
+    MIMETYPES model/gltf-binary model/gltf+json
+    VTK_READER vtkF3DGLTFReader
+    VTK_IMPORTER vtkF3DGLTFImporter
+    FORMAT_DESCRIPTION "GL Transmission Format"
+    CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/gltf.inl"
+  )
+endif()
 
 set(rpaths "")
 get_target_property(target_type draco::draco TYPE)

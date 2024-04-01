@@ -3,7 +3,7 @@
 Requires `gcovr` program and `gcc` toolchain.
 
 1. Build with `F3D_COVERAGE` option enabled.
-2. Run all tests.
+2. Run all tests, `xdotool` needs to be installed. This will generate many `.gcda` files.
 3. Generate the report with: `gcovr -r /path/to/sources --html --html-details -o coverage.html`.
 
 # How to build and test with sanitizer

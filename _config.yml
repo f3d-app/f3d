@@ -112,10 +112,17 @@ defaults:
 
   -
     scope:
-      path: "doc/user/DESKTOP_INTEGRATION.md"
+      path: "doc/user/COLOR_MAPS.md"
     values:
       parent: User Documentation
       nav_order: 5
+
+  -
+    scope:
+      path: "doc/user/DESKTOP_INTEGRATION.md"
+    values:
+      parent: User Documentation
+      nav_order: 6
 
   -
     scope:
@@ -123,7 +130,7 @@ defaults:
     values:
       title: Limitations and Troubleshooting
       parent: User Documentation
-      nav_order: 6
+      nav_order: 7
 
 # libf3d doc
   -
@@ -221,8 +228,41 @@ defaults:
     scope:
       path: "doc/dev/CODING_STYLE.md"
     values:
+      title: Coding style
       parent: Developer Documentation
       nav_order: 5
+
+  -
+    scope:
+      path: "doc/dev/ROADMAPS_AND_RELEASES.md"
+    values:
+      title: Roadmaps and release cycle
+      parent: Developer Documentation
+      nav_order: 6
+
+  -
+    scope:
+      path: "doc/dev/GOVERNANCE.md"
+    values:
+      title: Governance
+      parent: Developer Documentation
+      nav_order: 7
+
+  -
+    scope:
+      path: "doc/dev/MAINTAINERS.md"
+    values:
+      title: Maintainers
+      parent: Developer Documentation
+      nav_order: 8
+
+  -
+    scope:
+      path: "CODE_OF_CONDUCT.md"
+    values:
+      title: Code of conduct
+      parent: Developer Documentation
+      nav_order: 9
 
 # Licenses doc
 # _licenses.md uses front matter      

@@ -89,4 +89,5 @@ runs:
         --project=../build/compile_commands.json
         --enable=all
         --suppressions-list=.cppcheck.supp
+        --inline-suppr
         --error-exitcode=1

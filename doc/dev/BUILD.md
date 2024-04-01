@@ -36,6 +36,7 @@ Here is some CMake options of interest:
 * `F3D_WINDOWS_GUI`: On Windows, build a Win32 application (without console).
 * `F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION`: On Windows, build the shell thumbnails extension.
 * `F3D_PLUGINS_STATIC_BUILD`: Build all plugins as static library (embedded into `libf3d`) and automatically loaded by the application. Incompatible with `F3D_MACOS_BUNDLE`.
+* `BUILD_SHARED_LIBS`: Build the libf3d and all plugins as static library (embedded into `f3d` executable). The `library` and `plugin_sdk` component will not be installed.
 
 Some modules, plugins and bindings depending on external libraries can be optionally enabled with the following CMake variables:
 
@@ -75,16 +76,18 @@ Here is the list of all the components:
 
 Name|Installed by default|Operating system|Description
 ------|------|------|------
-`application`|YES|ALL|F3D application
+`application`|YES|ALL|F3D application.
 `configuration`|NO|ALL|Default configuration files, `config` and `thumbnail`.
-`library`|YES|ALL|libf3d library binaries
-`plugin`|YES|ALL|libf3d plugins
+`library`|YES|ALL|libf3d library binaries.
+`plugin`|YES|ALL|libf3d plugins.
 `dependencies`|NO|ALL|libf3d runtime dependencies. Can be used to create a self-contained and relocatable package. System libraries are excluded.
-`sdk`|NO|ALL|libf3d SDK (headers and CMake config files)
-`licenses`|YES|ALL|F3D and third party licenses
-`documentation`|YES|Linux|`man` documentation
-`shellext`|YES|Windows/Linux|Desktop integration
-`python`|YES|ALL|Python bindings
-`java`|YES|ALL|Java bindings
-`mimetypes`|NO|Linux|Plugins mimetype XML files for integration with Freedesktop
-`assets`|YES|Linux|Assets for integration with Freedesktop
+`sdk`|NO|ALL|libf3d SDK (headers and CMake config files) for `library` and `application` find_package components.
+`plugin_sdk`|NO|ALL|libf3d plugin SDK (headers and CMake config files including macros) for `pluginsdk` find_package components.
+`licenses`|YES|ALL|F3D and third party licenses.
+`documentation`|YES|Linux|`man` documentation.
+`shellext`|YES|Windows/Linux|Desktop integration.
+`python`|YES|ALL|Python bindings.
+`java`|YES|ALL|Java bindings.
+`mimetypes`|NO|Linux|Plugins mimetype XML files for integration with Freedesktop.
+`assets`|YES|Linux|Assets for integration with Freedesktop.
+`colormaps`|NO|ALL|Color maps presets, see [documentation](../user/COLOR_MAPS.md)

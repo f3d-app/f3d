@@ -12,11 +12,12 @@ runs:
 
     - name: Cache Boost
       id: cache-boost
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/boost_install
-        key: boost-1.83.0-${{runner.os}}-${{inputs.cpu}}-3
+        key: boost-1.83.0-${{runner.os}}-${{inputs.cpu}}-4
 
+    # Dependents: usd openvdb vtk
     - name: Checkout Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
       uses: actions/checkout@v4

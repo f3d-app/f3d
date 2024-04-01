@@ -12,10 +12,10 @@ runs:
 
     - name: Cache Alembic
       id: cache-alembic
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: dependencies/alembic_install
-        key: alembic-v1.8.5-${{runner.os}}-${{inputs.cpu}}-1
+        key: alembic-v1.8.5-${{runner.os}}-${{inputs.cpu}}-3
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'

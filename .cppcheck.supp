@@ -6,6 +6,7 @@ unknownMacro
 // external libraries
 *:external/nlohmann_json/nlohmann/json.hpp
 *:external/cxxopts/cxxopts.hpp
+*:external/dmon/dmon.h
 
 // specific checks
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
@@ -16,3 +17,5 @@ preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx
 unknownMacro:library/VTKExtensions/Applicative/vtkF3DObjectFactory.cxx
 unusedVariable:*factory.cxx*
 constParameter:library/src/image.cxx
+invalidPointerCast:plugins/native/module/vtkF3DSplatReader.cxx
+invalidPointerCast:plugins/draco/module/vtkF3DGLTFDocumentLoader.cxx

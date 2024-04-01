@@ -26,6 +26,17 @@
 #include <vtkExternalOpenGLRenderWindow.h>
 #endif
 
+#ifdef _WIN32
+#include <Windows.h>
+#include <dwmapi.h>
+
+#ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
+#define DWMWA_USE_IMMERSIVE_DARK_MODE 20
+#endif
+
+constexpr auto IMMERSIVE_DARK_MODE_SUPPORTED_SINCE = 19041;
+#endif
+
 namespace f3d::detail
 {
 class window_impl::internals
@@ -42,6 +53,90 @@ public:
     vtksys::SystemTools::MakeDirectory(this->CachePath);
 
     return this->CachePath;
+  }
+
+#if _WIN32
+  /**
+   * Helper function to detect if the
+   * Windows Build Number is equal or greater to a number
+   */
+  static bool IsWindowsBuildNumberOrGreater(int buildNumber)
+  {
+    std::string value{};
+    bool result = vtksys::SystemTools::ReadRegistryValue(
+      "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion;CurrentBuildNumber",
+      value);
+
+    if (result == true)
+    {
+      try
+      {
+        return std::stoi(value) >= buildNumber;
+      }
+      catch (const std::invalid_argument& e)
+      {
+        f3d::log::debug("Error parsing CurrentBuildNumber", e.what());
+      }
+    }
+    else
+    {
+      f3d::log::debug("Error opening registry key.");
+    }
+
+    return false;
+  }
+
+  /**
+   * Helper function to fetch a DWORD from windows registry.
+   *
+   * @param hKey A handle to an open registry key
+   * @param subKey The path of registry key relative to 'hKey'
+   * @param value The name of the registry value
+   * @param dWord Variable to store the result in
+   */
+  static bool ReadRegistryDWord(
+    HKEY hKey, const std::wstring& subKey, const std::wstring& value, DWORD& dWord)
+  {
+    DWORD dataSize = sizeof(DWORD);
+    LONG result = RegGetValueW(
+      hKey, subKey.c_str(), value.c_str(), RRF_RT_REG_DWORD, nullptr, &dWord, &dataSize);
+
+    return result == ERROR_SUCCESS;
+  }
+
+  /**
+   * Helper function to detect user theme
+   */
+  static bool IsWindowsInDarkMode()
+  {
+    std::wstring subKey(L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize");
+
+    DWORD value{};
+
+    if (ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"AppsUseLightTheme", value))
+    {
+      return value == 0;
+    }
+
+    if (ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"SystemUsesLightTheme", value))
+    {
+      return value == 0;
+    }
+
+    return false;
+  }
+#endif
+
+  void UpdateTheme() const
+  {
+#ifdef _WIN32
+    if (this->IsWindowsBuildNumberOrGreater(IMMERSIVE_DARK_MODE_SUPPORTED_SINCE))
+    {
+      HWND hwnd = static_cast<HWND>(this->RenWin->GetGenericWindowId());
+      BOOL useDarkMode = this->IsWindowsInDarkMode();
+      DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
+    }
+#endif
   }
 
   std::unique_ptr<camera_impl> Camera;
@@ -119,6 +214,13 @@ int window_impl::getWidth() const
 int window_impl::getHeight() const
 {
   return this->Internals->RenWin->GetSize()[1];
+}
+
+//----------------------------------------------------------------------------
+window& window_impl::setAnimationNameInfo(const std::string& name)
+{
+  this->Internals->Renderer->SetAnimationnameInfo(name);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -214,6 +316,7 @@ void window_impl::Initialize(bool withColoring)
 {
   this->Internals->WithColoring = withColoring;
   this->Internals->Renderer->Initialize(this->Internals->Options.getAsString("scene.up-direction"));
+  this->Internals->UpdateTheme();
   this->Internals->Initialized = true;
 }
 
@@ -224,6 +327,13 @@ void window_impl::UpdateDynamicOptions()
   {
     // Renderer is missing, create a default one
     this->Initialize(false);
+  }
+
+  if (this->Internals->WindowType == Type::NONE)
+  {
+    // With a NONE window type, only update the actors to get accurate bounding box information
+    this->Internals->Renderer->UpdateActors();
+    return;
   }
 
   // Set the cache path if not already
@@ -238,10 +348,20 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetInvertZoom(
     this->Internals->Options.getAsBool("interactor.invert-zoom"));
 
+  // XXX: model.point-sprites.type only has an effect on geometry scene
+  // but we set it here for practical reasons
+  std::string splatTypeStr = this->Internals->Options.getAsString("model.point-sprites.type");
+  int pointSize = this->Internals->Options.getAsDouble("render.point-size");
+  vtkF3DRendererWithColoring::SplatType splatType = vtkF3DRendererWithColoring::SplatType::SPHERE;
+  if (splatTypeStr == "gaussian")
+  {
+    splatType = vtkF3DRendererWithColoring::SplatType::GAUSSIAN;
+  }
+
+  this->Internals->Renderer->SetPointProperties(splatType, pointSize);
+
   this->Internals->Renderer->SetLineWidth(
     this->Internals->Options.getAsDouble("render.line-width"));
-  this->Internals->Renderer->SetPointSize(
-    this->Internals->Options.getAsDouble("render.point-size"));
   this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("render.show-edges"));
   this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("ui.fps"));
   this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("ui.filename"));
@@ -303,6 +423,12 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetGridAbsolute(
     this->Internals->Options.getAsBool("render.grid.absolute"));
   this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("render.grid.enable"));
+
+  if (this->Internals->Options.getAsInt("scene.camera.index") == -1)
+  {
+    this->Internals->Renderer->SetUseOrthographicProjection(
+      this->Internals->Options.getAsBool("scene.camera.orthographic"));
+  }
 
   if (this->Internals->WithColoring)
   {

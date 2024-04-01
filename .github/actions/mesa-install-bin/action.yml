@@ -18,9 +18,10 @@ runs:
       run: |
         mkdir mesa
         cd mesa
-        curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/22.0.1/mesa3d-22.0.1-release-msvc.7z
+        curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/23.3.5/mesa3d-23.3.5-release-msvc.7z
         C:\'Program Files'\7-Zip\7z.exe x mesa.7z
         # A * is added next line to force Get-ChildItem to look for directory within the path
         Get-ChildItem -Directory ${{inputs.path}}* | ForEach-Object { Copy-Item -Path .\x64\opengl32.dll, .\x64\libglapi.dll, .\x64\libgallium_wgl.dll -Destination $_ }
+        echo "GALLIUM_DRIVER=llvmpipe"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         cd ..
         rm .\mesa -r -force

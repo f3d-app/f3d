@@ -124,6 +124,7 @@ f3d_test(NAME TestGridY DATA suzanne.ply ARGS -g --up=+Y DEFAULT_LIGHTS)
 f3d_test(NAME TestGridZ DATA suzanne.ply ARGS -g --up=+Z DEFAULT_LIGHTS)
 f3d_test(NAME TestGridOptions DATA suzanne.ply ARGS -g --camera-elevation-angle=45 --grid-unit=2 --grid-subdivisions=3 -t DEFAULT_LIGHTS)
 f3d_test(NAME TestGridAbsolute DATA f3d.vtp ARGS -g --up=-Y --camera-direction=-.5,+1,+1 --grid-absolute -t DEFAULT_LIGHTS)
+f3d_test(NAME TestGridClipping DATA offset-flat-box.glb ARGS -g --grid-absolute --camera-position=70,120,350 -t DEFAULT_LIGHTS)
 f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x DEFAULT_LIGHTS)
 f3d_test(NAME TestPointCloud DATA pointsCloud.vtp ARGS -o --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestPointCloudBar DATA pointsCloud.vtp ARGS -sob --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
@@ -153,6 +154,7 @@ f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalars --roughness=1 --
 f3d_test(NAME TestCameraConfiguration DATA suzanne.obj ARGS --camera-position=0,0,-10 -x --camera-view-up=1,0,0 --camera-focal-point=1,0,0 --camera-view-angle=20 --camera-azimuth-angle=40 --camera-elevation-angle=-80 --camera-direction=12,34,56 --camera-zoom-factor=78)
 f3d_test(NAME TestCameraDirection DATA suzanne.obj ARGS --camera-direction=-1,-1,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestCameraClipping DATA checkerboard_colorful.obj CONFIG ${F3D_SOURCE_DIR}/testing/configs/checkerboard_colorful.json RESOLUTION 800,600)
+f3d_test(NAME TestCameraOrthographic ARGS --camera-orthographic DATA cow.vtp DEFAULT_LIGHTS)
 f3d_test(NAME TestToneMapping DATA suzanne.ply ARGS -t DEFAULT_LIGHTS)
 f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt DEFAULT_LIGHTS)
 f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT THRESHOLD 300 DEFAULT_LIGHTS) # Using default lights because of ResetCamera, High threshold for volume as it is dependent on the OpenGL implementation
@@ -187,6 +189,7 @@ f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
 f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalars --bar --comp=2 DEFAULT_LIGHTS)
 f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
+f3d_test(NAME TestNoRenderWithOptions DATA dragon.vtu ARGS --hdri-ambient --axis NO_RENDER) # These options causes issues if not handled correctly
 f3d_test(NAME TestNoFile NO_DATA_FORCE_RENDER)
 f3d_test(NAME TestGroupGeometries DATA mb/recursive ARGS --group-geometries DEFAULT_LIGHTS)
 f3d_test(NAME TestGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries --scalars=Polynomial -b DEFAULT_LIGHTS)
@@ -194,6 +197,23 @@ f3d_test(NAME TestInvalidUpDirection DATA suzanne.ply ARGS -g --up=W REGEXP "W i
 f3d_test(NAME TestUpDirectionNoSign DATA suzanne.ply ARGS --up=X DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMatCapWithTCoords DATA WaterBottle.glb ARGS --geometry-only --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png DEFAULT_LIGHTS)
+f3d_test(NAME TestConfigOrder DATA suzanne.ply ARGS CONFIG ${F3D_SOURCE_DIR}/testing/data/config-order.json DEFAULT_LIGHTS)
+f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP "^.PNG" NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
+
+# Color map files testing
+f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --scalars --comp=1 DEFAULT_LIGHTS)
+f3d_test(NAME TestColorMapInvalid DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/invalid.png --scalars REGEXP "Cannot read colormap at" NO_BASELINE)
+f3d_test(NAME TestColorMapNonExistent DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/non_existent.png --scalars REGEXP "Cannot find the colormap" NO_BASELINE)
+f3d_test(NAME TestColorMapGrayscale DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/white_grayscale.png --scalars REGEXP "The specified color map must have at least 3 channels" NO_BASELINE)
+f3d_test(NAME TestColorMapMore1pxWarning DATA dragon.vtu ARGS --verbose=warning --colormap-file=${F3D_SOURCE_DIR}/testing/data/16bit.png --scalars REGEXP "The specified color map height is not equal to 1" NO_BASELINE)
+f3d_test(NAME TestColorMap16bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis16.png --scalars --comp=1 DEFAULT_LIGHTS)
+f3d_test(NAME TestColorMap32bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --scalars --comp=1 DEFAULT_LIGHTS)
+if(NOT F3D_MACOS_BUNDLE)
+  file(COPY "${F3D_SOURCE_DIR}/resources/colormaps/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/colormaps")
+  f3d_test(NAME TestColorMapStem DATA dragon.vtu ARGS --colormap-file=magma --scalars --comp=1 DEFAULT_LIGHTS)
+  f3d_test(NAME TestColorMapFile DATA dragon.vtu ARGS --colormap-file=magma.png --scalars --comp=1 DEFAULT_LIGHTS)
+endif()
 
 # Needs SSBO: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231108)
@@ -211,6 +231,13 @@ else()
   endif()
 endif()
 
+# Needs splat sorting with compute shaders
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
+  if(NOT APPLE) # MacOS does not support compute shaders
+    f3d_test(NAME Test3DGaussiansSplatting DATA small.splat ARGS -osy --up=-Y --point-size=1 --point-type=gaussian --camera-position=-3.6,0.5,-4.2)
+  endif()
+endif()
+
 if (NOT APPLE)
   # This test is broken on apple because of #792
   f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --scalars --cells --comp=-2 --up=+Z DEFAULT_LIGHTS)
@@ -225,7 +252,10 @@ if(WIN32)
 else()
   set(_dirname "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 endif()
-f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins=${_dirname}/${CMAKE_SHARED_LIBRARY_PREFIX}f3d${CMAKE_SHARED_LIBRARY_SUFFIX} NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
+
+if(BUILD_SHARED_LIBS)
+  f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins=${_dirname}/${CMAKE_SHARED_LIBRARY_PREFIX}f3d${CMAKE_SHARED_LIBRARY_SUFFIX} NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
+endif()
 
 if(NOT F3D_MACOS_BUNDLE)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
@@ -278,7 +308,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_BASELINE REGEXP "7: CubicSpline Translation")
 
   # Test Animation index out of domain error
-  f3d_test(NAME TestVerboseAnimationIndexError1 DATA InterpolationTest.glb ARGS --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
+  f3d_test(NAME TestVerboseAnimationIndexError DATA InterpolationTest.glb ARGS --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
 
   # Test interactive animation and speed factor
   f3d_test(NAME TestInteractionAnimationFast DATA InterpolationTest.glb ARGS --animation-speed-factor=1000 --animation-index=-1 INTERACTION NO_BASELINE)#Space;Space;
@@ -334,7 +364,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestHDRI DATA suzanne.ply HDRI palermo_park_1k.hdr DEFAULT_LIGHTS)
   f3d_test(NAME TestHDRICache DATA suzanne.ply HDRI palermo_park_1k.hdr DEPENDS TestHDRI DEFAULT_LIGHTS)
   f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -u DEFAULT_LIGHTS)
-  f3d_test(NAME TestHDRIBlurCoC DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -u --blur-coc=50 DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIBlurCoCSmall DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=10 --camera-position=-20,0,20 DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIBlurCoCMedium DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=50 --camera-position=-20,0,20 DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIBlurCoCLarge DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=100 --camera-position=-20,0,20 DEFAULT_LIGHTS)
+  f3d_test(NAME TestHDRIBlurCoCZero DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=0 --camera-position=-20,0,20 DEFAULT_LIGHTS THRESHOLD 75)
+  f3d_test(NAME TestHDRIBlurCoCNegative DATA suzanne.ply HDRI shanghai_bund_1k.hdr ARGS -u --blur-coc=-100 --camera-position=-20,0,20 DEFAULT_LIGHTS)
   f3d_test(NAME TestHDRIBlurRatio DATA suzanne.ply HDRI palermo_park_1k.hdr RESOLUTION 600,100 ARGS -u DEFAULT_LIGHTS)
   f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -e DEFAULT_LIGHTS THRESHOLD 60)
   f3d_test(NAME TestHDRI8Bit DATA suzanne.ply HDRI logo.tif)
@@ -435,6 +469,7 @@ endif()
 if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestABC DATA suzanne.abc ARGS -s --load-plugins=alembic DEFAULT_LIGHTS) # Using default lights because of ResetCamera
   f3d_test(NAME TestABCNonFaceVarying DATA tetrahedron_non_facevarying_uv.abc ARGS -s --load-plugins=alembic DEFAULT_LIGHTS) # Using default lights because of ResetCamera
+  f3d_test(NAME TestABCAnimation DATA drop.abc ARGS --animation-time=2 --load-plugins=alembic DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
@@ -504,6 +539,13 @@ if(F3D_PLUGIN_BUILD_DRACO)
   f3d_test(NAME TestDRACO DATA suzanne.drc DEFAULT_LIGHTS ARGS --load-plugins=draco)
   f3d_test(NAME TestDRACOColoring DATA suzanne.drc DEFAULT_LIGHTS ARGS --scalars --comp=0 --load-plugins=draco)
 
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10884
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
+    f3d_test(NAME TestGLTFDracoImporter DATA Box_draco.gltf ARGS --load-plugins=draco --camera-position=-1.6,1.3,2.7)
+    f3d_test(NAME TestGLTFDracoReader DATA Box_draco.gltf ARGS --load-plugins=draco --geometry-only --camera-position=-1.6,1.3,2.7)
+    f3d_test(NAME TestGLTFDracoReaderWithoutCompression DATA BoxAnimated.gltf ARGS --load-plugins=draco --geometry-only --animation-time=2 DEFAULT_LIGHTS)
+  endif()
+
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/draco/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileDraco DATA suzanne.drc CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
@@ -531,10 +573,16 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   f3d_test(NAME TestInteractionAnimationInvert DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-speed-factor=-0.0000001 --animation-time=0.00429998 INTERACTION DEFAULT_LIGHTS)#Space;Space;
 
   # Test Generic Importer Verbose animation. Regex contains the time range.
-  f3d_test(NAME TestVerboseAnimationSingleTimestep DATA single_timestep.e ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "time range delta is zero")
+  f3d_test(NAME TestVerboseAnimationSingleTimestep DATA single_timestep.e ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "time range delta is invalid")
 
   # Test no render animation time. Regex contains a part of the range of the ACCL field.
   f3d_test(NAME TestNoRenderAnimation DATA small.ex2 ARGS  --load-plugins=exodus --animation-time=0.003 REGEXP "-521950, 6.57485" NO_RENDER)
+
+  # Test if the animation-time works when set to zero and time range[0] is less than zero
+  f3d_test(NAME TestTimeRangeLessThanZero DATA negative_range_animated.e ARGS -s --load-plugins=exodus --animation-time=0 DEFAULT_LIGHTS)
+
+  # Test if a negative animation-time works when time range[0] is less than zero
+  f3d_test(NAME TestTimeRangeLessThanZeroNegativeAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=exodus --animation-time=-3 DEFAULT_LIGHTS)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/exodus/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
@@ -546,7 +594,7 @@ if(F3D_PLUGIN_BUILD_EXODUS)
     endif()
   endif()
 
-  if (NOT F3D_PLUGINS_STATIC_BUILD)
+  if (NOT F3D_PLUGINS_STATIC_BUILD AND BUILD_SHARED_LIBS)
 
     # Test --load-plugins with the name of a dynamic plugin
     f3d_test(NAME TestPluginName DATA disk_out_ref.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "Loaded plugin exodus from")
@@ -566,6 +614,8 @@ if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestInvalidBREP DATA invalid.brep ARGS --verbose --load-plugins=occt NO_BASELINE)
 
   if(F3D_PLUGIN_OCCT_COLORING_SUPPORT AND NOT F3D_MACOS_BUNDLE)
+    f3d_test(NAME TestXCAFColors DATA xcaf-colors.stp DEFAULT_LIGHTS ARGS --load-plugins=occt -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
+
     file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
 
@@ -665,11 +715,20 @@ f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE RE
 f3d_test(NAME TestInteractionGroupGeometriesLoadParentDirectory DATA mb/mb_0_0.vtu ARGS --group-geometries --filename INTERACTION DEFAULT_LIGHTS) #Down;
 f3d_test(NAME TestInteractionInvertZoom DATA suzanne.ply ARGS --invert-zoom INTERACTION DEFAULT_LIGHTS)
 f3d_test(NAME TestInteractionCameraHotkeys DATA cow.vtp INTERACTION DEFAULT_LIGHTS)
+f3d_test(NAME TestInteractionZoomToMouse DATA cow.vtp INTERACTION DEFAULT_LIGHTS)
+f3d_test(NAME TestInteractionOrthographicProjection DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #5;5
+f3d_test(NAME TestInteractionZoomToggleOrthographicProjection DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #MouseWheel;5;Mousewheelx6;5
 
 # Progress test
 f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
 f3d_test(NAME TestProgressScene DATA WaterBottle.glb ARGS --progress NO_BASELINE)
 f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --progress NO_BASELINE INTERACTION) #Up;Up;Up;Up
+
+# For some reasons this animation test goes "too far" when run with sanitizer
+if(F3D_SANITIZER STREQUAL "none")
+  f3d_test(NAME TestInteractionCycleAnimation DATA InterpolationTest.glb INTERACTION DEFAULT_LIGHTS) #WWWWWWWWWWW;Space;Space;
+endif()
+f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
 
 # Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream version 1.2
@@ -695,6 +754,9 @@ f3d_test(NAME TestOutput DATA cow.vtp NO_BASELINE)
 f3d_test(NAME TestOutputOutput DATA cow.vtp ARGS --ref=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutput.png DEPENDS TestOutput NO_BASELINE)
 f3d_test(NAME TestUnsupportedInputOutput DATA unsupportedFile.dummy REGEXP "No file loaded, no rendering performed" NO_BASELINE)
 f3d_test(NAME TestOutputNoBackground DATA cow.vtp ARGS --no-background NO_BASELINE)
+
+# Test Non existent interaction record directory
+f3d_test(NAME TestInteractionNonExistentRecordDirectory ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/NotExistentDirectory/interaction.log NO_BASELINE REGEXP "Interaction record directory does not exist")
 
 # Basic record and play test
 f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log NO_BASELINE)
@@ -833,7 +895,7 @@ f3d_test(NAME TestReadersList ARGS --readers-list REGEXP_FAIL "No registered rea
 
 # Test that f3d can try to read a system config file
 add_test(NAME f3d::TestNoDryRun COMMAND $<TARGET_FILE:f3d> --no-render)
-set_tests_properties(f3d::TestNoDryRun PROPERTIES TIMEOUT 2)
+set_tests_properties(f3d::TestNoDryRun PROPERTIES TIMEOUT 4)
 
 # Test failure without a reference, please do not create a TestNoRef.png file
 f3d_test(NAME TestNoRef DATA cow.vtp WILL_FAIL)
@@ -856,5 +918,22 @@ if(NOT F3D_MACOS_BUNDLE)
 
   if(F3D_PLUGIN_BUILD_EXODUS)
     f3d_test(NAME TestScanPluginsCheckExodus ARGS --scan-plugins NO_RENDER NO_BASELINE REGEXP " - exodus")
+  endif()
+endif()
+
+# Watch testing require onscreen rendering
+if(NOT VTK_OPENGL_HAS_EGL)
+  if(UNIX)
+    set(_f3d_os_script_ext "sh")
+    set(_f3d_os_script_exec "")
+  elseif(WIN32)
+    set(_f3d_os_script_ext "ps1")
+    find_program(_f3d_os_script_exec NAMES pwsh powershell)
+  endif()
+  # Custom bash/pwsh test for testing watch option
+  add_test (NAME f3d::TestWatch COMMAND ${_f3d_os_script_exec} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.${_f3d_os_script_ext} $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
+  set_tests_properties(f3d::TestWatch PROPERTIES RUN_SERIAL TRUE)
+  if(F3D_COVERAGE) # When running test for coverage, adapt the script to use xdotool
+    set_tests_properties(f3d::TestWatch PROPERTIES ENVIRONMENT "CTEST_F3D_COVERAGE=1")
   endif()
 endif()

@@ -212,8 +212,12 @@ options::options()
 
   // XXX: Rename into a "rendering-mode" option: https://github.com/f3d-app/f3d/issues/345
   this->Internals->init("model.point-sprites.enable", false);
+  this->Internals->init("model.point-sprites.type", std::string("sphere"));
   this->Internals->init("model.volume.enable", false);
   this->Internals->init("model.volume.inverse", false);
+
+  // Camera projection
+  this->Internals->init("scene.camera.orthographic", false);
 
   // Interactor
   this->Internals->init("interactor.axis", false);
