@@ -39,6 +39,9 @@ VDB file formats rely on [OpenVDB](https://github.com/AcademySoftwareFoundation/
 - VDB Grid files are opened with a hard-coded 0.1 sampling rate.
 - The `vdb` plugin is not shipped in the python wheels yet.
 
+## Gaussian splatting
+Gaussian splatting (option `--point-type=gaussian`) needs depth sorting which is done internally using a compute shader. This requires support for OpenGL 4.3 which is not supported by macOS and old GPUs/drivers.
+
 # Troubleshooting
 
 ## General
