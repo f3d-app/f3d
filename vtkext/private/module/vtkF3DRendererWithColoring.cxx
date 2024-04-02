@@ -15,6 +15,7 @@
 #include <vtkProperty.h>
 #include <vtkScalarBarActor.h>
 #include <vtkScalarsToColors.h>
+#include <vtkShader.h>
 #include <vtkSmartVolumeMapper.h>
 #include <vtkTexture.h>
 #include <vtkVolumeProperty.h>
@@ -255,6 +256,18 @@ void vtkF3DRendererWithColoring::SetPointProperties(SplatType type, double point
   if (!this->Importer)
   {
     return;
+  }
+
+  if (type == SplatType::GAUSSIAN)
+  {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+    if (!vtkShader::IsComputeShaderSupported())
+    {
+      F3DLog::Print(F3DLog::Severity::Warning,
+        "Compute shaders are not supported, gaussians are not sorted, resulting in blending "
+        "artifacts");
+    }
+#endif
   }
 
   const vtkBoundingBox& bbox = this->Importer->GetGeometryBoundingBox();
