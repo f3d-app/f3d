@@ -8,7 +8,6 @@
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
-#include <vtkPolygon.h>
 #include <vtkSmartPointer.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 
@@ -201,14 +200,15 @@ class vtkF3DAlembicReader::vtkInternals
     }
     polydata->SetPoints(points);
 
+    std::vector<vtkIdType> indexArr;
     for (auto& faceIndicesIter : data.Indices)
     {
-      vtkNew<vtkPolygon> polygon;
-      for (auto& vertexIndicesIter : faceIndicesIter)
-      {
-        polygon->GetPointIds()->InsertNextId(vertexIndicesIter.x);
-      }
-      cells->InsertNextCell(polygon);
+      indexArr.clear();
+
+      std::transform(faceIndicesIter.cbegin(), faceIndicesIter.cend(), std::back_inserter(indexArr),
+        [](const Alembic::Abc::V3i& v) { return v.x; });
+
+      cells->InsertNextCell(indexArr.size(), indexArr.data());
     }
     polydata->SetPolys(cells);
     vtkDataSetAttributes* pointAttributes = polydata->GetAttributes(vtkDataSet::POINT);
