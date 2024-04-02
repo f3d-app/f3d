@@ -27,6 +27,7 @@ endif()
 
 vtk_module_add_module(f3d::vtkext
   ${f3d_vtk_no_install}
+  ${f3d_vtk_force_static}
   CLASSES ${classes}
   SOURCES ${sources}
   PRIVATE_HEADERS ${private_headers}
