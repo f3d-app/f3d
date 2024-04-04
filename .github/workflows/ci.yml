@@ -176,6 +176,7 @@ jobs:
       uses: ./source/.github/actions/generic-ci
       with:
         vtk_version: ${{matrix.vtk_version}}
+        raytracing_label: raytracing
         cpu: x86_64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
@@ -212,6 +213,7 @@ jobs:
       uses: ./source/.github/actions/generic-ci
       with:
         vtk_version: ${{matrix.vtk_version}}
+        raytracing_label: raytracing
         bundle_label: ${{matrix.bundle_label}}
         static_label: ${{matrix.static_label}}
         cpu: arm64
