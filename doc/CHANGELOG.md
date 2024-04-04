@@ -34,9 +34,12 @@ For libf3d users:
 - Added a `image::toTerminalText` method to print image to terminal text
 - Added an `image` metadata API
 - Added a `vtkext` module for plugin developer, see the [documentation](https://f3d.app/doc/libf3d/PLUGINS.html)
+- Added a new f3d component to find_package of, `pluginsdk`, require to build plugins against F3D
 
 For F3D packagers:
 - Added a CMake report at the end of configuration
+- Added a new cmake installation component, `plugin_sdk`, needed to compile external plugin against F3D
+- Added a new cmake installation component, `colormaps`, needed for the colormap feature
 - Fixed multiple issue with static (`BUILD_SHARED_LIBS=OFF`) build
 - Fixed a compilation issue with gcc14
 - Fixed a compilation issue with OCCT 7.8.0
