@@ -48,11 +48,14 @@ Release :
 - [ ] Finalize release note and add them to the release
 - [ ] Release
 - [ ] Update download links and update changelog in https://github.com/f3d-app/f3d `doc`
-- [ ] Update `.github/ISSUE_TEMPLATE/new_release.md` in https://github.com/f3d-app/f3d if needed
 - [ ] Communicate on discord
 - [ ] Communicate on reddit
 - [ ] Communicate on hackernews
 - [ ] Communicate on linkedin
+- [ ] Move all issue from current milestone to next milestone, close current roadmap issue and open a next roadmap issue
+- [ ] Update `doc/dev/ROADMAPS_AND_RELEASES.md` for next release
+- [ ] Create an issue for updating dependencies in CI and superbuild
+- [ ] Update `.github/ISSUE_TEMPLATE/new_release.md` in https://github.com/f3d-app/f3d if needed
 
 Linux testing protocol:
 - Install F3D-X.Y.Z-RCN-Linux-x86_64-raytracing system wide
