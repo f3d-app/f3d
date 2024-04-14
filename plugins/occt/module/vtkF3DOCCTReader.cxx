@@ -492,7 +492,8 @@ public:
     return this->ShapeTool->GetShape(label, aShape) ? aShape.HashCode(INT_MAX) : 0;
 #else
     // OCCT V7_8_0 returns a size_t, casting to avoid warnings
-    return static_cast<int>(this->ShapeTool->GetShape(label, aShape) ? std::hash<TopoDS_Shape>{}(aShape) : 0);
+    return static_cast<int>(
+      this->ShapeTool->GetShape(label, aShape) ? std::hash<TopoDS_Shape>{}(aShape) : 0);
 #endif
   }
 
