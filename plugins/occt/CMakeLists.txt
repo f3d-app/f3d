@@ -29,17 +29,13 @@ endif()
 
 message(STATUS "Plugin: OpenCASCADE ${OpenCASCADE_VERSION} found")
 
-option(F3D_PLUGIN_OCCT_COLORING_SUPPORT "Enable coloring support in occt plugin" ON)
-mark_as_advanced(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
-
-if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
-  if("${OpenCASCADE_VERSION}" VERSION_LESS "7.8.0")
+# For 7_8_0 and above, coloring is always available in TKDE* modules
+if("${OpenCASCADE_VERSION}" VERSION_LESS "7.8.0")
+  option(F3D_PLUGIN_OCCT_COLORING_SUPPORT "Enable coloring support in occt plugin" ON)
+  mark_as_advanced(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
+  if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     if (NOT (TARGET "TKXDESTEP") OR NOT (TARGET "TKXDEIGES"))
       message(FATAL_ERROR "occt plugin: TKXDESTEP and TKXDEIGES OCCT modules are not found. Turn off F3D_PLUGIN_OCCT_COLORING_SUPPORT or enable them in your OpenCascade build.")
-    endif()
-  else()
-    if (NOT (TARGET "TKXSDRAWSTEP") OR NOT (TARGET "TKXSDRAWIGES"))
-        message(FATAL_ERROR "occt plugin: TKXSDRAWSTEP and TKXSDRAWIGES OCCT modules are not found. Turn off F3D_PLUGIN_OCCT_COLORING_SUPPORT or enable them in your OpenCascade build.")
     endif()
   endif()
 endif()
