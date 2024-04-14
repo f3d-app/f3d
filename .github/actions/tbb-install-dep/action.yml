@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/tbb_install
-        key: tbb-v2021.11.0-${{runner.os}}-${{inputs.cpu}}-1
+        key: tbb-v2021.12.0-${{runner.os}}-${{inputs.cpu}}-0
 
     # Dependents: usd openvdb vtk
     - name: Checkout TBB
@@ -24,7 +24,7 @@ runs:
       with:
         repository: oneapi-src/oneTBB
         path: './dependencies/tbb'
-        ref: v2021.11.0
+        ref: v2021.12.0
 
     - name: Setup TBB
       if: steps.cache-tbb.outputs.cache-hit != 'true'
