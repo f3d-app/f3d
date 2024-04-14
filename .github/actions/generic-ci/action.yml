@@ -72,6 +72,8 @@ runs:
     - name: Install Raytracing Dependencies
       if: inputs.raytracing_label == 'raytracing'
       uses: ./source/.github/actions/ospray-sb-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
