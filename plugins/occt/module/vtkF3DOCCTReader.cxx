@@ -491,7 +491,9 @@ public:
 #if OCC_VERSION_HEX < 0x070800
     return this->ShapeTool->GetShape(label, aShape) ? aShape.HashCode(INT_MAX) : 0;
 #else
-    return this->ShapeTool->GetShape(label, aShape) ? std::hash<TopoDS_Shape>{}(aShape) : 0;
+    // OCCT V7_8_0 returns a size_t, casting to avoid warnings
+    return static_cast<int>(
+      this->ShapeTool->GetShape(label, aShape) ? std::hash<TopoDS_Shape>{}(aShape) : 0);
 #endif
   }
 
