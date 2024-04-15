@@ -1288,9 +1288,9 @@ void vtkF3DRenderer::ShowHDRISkybox(bool show)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 {
-  
 
-  cheatSheetText << " W: Cycle animation [" << vtkF3DRenderer::ShortName(this->AnimationNameInfo, 22) << "]\n";
+  cheatSheetText << " W: Cycle animation ["
+                 << vtkF3DRenderer::ShortName(this->AnimationNameInfo, 22) << "]\n";
   cheatSheetText << " P: Translucency support " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]")
                  << "\n";
   cheatSheetText << " Q: Ambient occlusion " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
@@ -1554,8 +1554,8 @@ void vtkF3DRenderer::CreateCacheDirectory()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetAnimationnameInfo(const std::string& info)
 {
-    this->AnimationNameInfo = info;
-    this->CheatSheetConfigured = false;
+  this->AnimationNameInfo = info;
+  this->CheatSheetConfigured = false;
 }
 
 //----------------------------------------------------------------------------
