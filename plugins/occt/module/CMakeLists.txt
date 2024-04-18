@@ -18,6 +18,7 @@ vtk_module_include(f3d::vtkextOCCT
 
 set(_occt_link_libs "${OpenCASCADE_LIBRARIES}")
 if(CMAKE_LINK_GROUP_USING_RESCAN_SUPPORTED)
+  # Static linking of recursively dependant libs is very complex with OCCT, this simplify it
   set(_occt_link_libs "$<LINK_GROUP:RESCAN,${OpenCASCADE_LIBRARIES}>")
 endif()
 
