@@ -16,8 +16,12 @@ vtk_module_include(f3d::vtkextOCCT
   PRIVATE
     $<BUILD_INTERFACE:${OpenCASCADE_INCLUDE_DIR}>)
 
-vtk_module_link(f3d::vtkextOCCT
-  PRIVATE "$<LINK_GROUP:RESCAN,${OpenCASCADE_LIBRARIES}>")
+set(_occt_link_libs "${OpenCASCADE_LIBRARIES}")
+if(CMAKE_LINK_GROUP_USING_RESCAN_SUPPORTED)
+  set(_occt_link_libs "$<LINK_GROUP:RESCAN,${OpenCASCADE_LIBRARIES}>")
+endif()
+
+vtk_module_link(f3d::vtkextOCCT PRIVATE "${_occt_link_libs}")
 
 if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
   vtk_module_definitions(f3d::vtkextOCCT
