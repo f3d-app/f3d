@@ -167,7 +167,6 @@ f3d_test(NAME TestVolumeNonScalars DATA waveletArrays.vti ARGS -vb --scalars=Ran
 f3d_test(NAME TestTextureNormal DATA WaterBottle.glb ARGS --geometry-only --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --normal-scale=0.1 DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMaterial DATA WaterBottle.glb ARGS --geometry-only --texture-material=${F3D_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=1 --metallic=1 DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureMaterialWithOptions DATA WaterBottle.glb ARGS --geometry-only --texture-material=${F3D_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=0.5 --metallic=0.5 DEFAULT_LIGHTS)
-f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --geometry-only --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --translucency-support DEFAULT_LIGHTS)
 f3d_test(NAME TestTextureEmissive DATA WaterBottle.glb ARGS --geometry-only --texture-emissive=${F3D_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1 DEFAULT_LIGHTS)
 f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --geometry-only --texture-material=${F3D_SOURCE_DIR}/testing/data/red.jpg --roughness=1 --metallic=1 --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo.png --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --texture-emissive=${F3D_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1 DEFAULT_LIGHTS)
 f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m DEFAULT_LIGHTS)
@@ -213,6 +212,10 @@ if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/resources/colormaps/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/colormaps")
   f3d_test(NAME TestColorMapStem DATA dragon.vtu ARGS --colormap-file=magma --scalars --comp=1 DEFAULT_LIGHTS)
   f3d_test(NAME TestColorMapFile DATA dragon.vtu ARGS --colormap-file=magma.png --scalars --comp=1 DEFAULT_LIGHTS)
+endif()
+
+if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
+  f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --geometry-only --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --translucency-support DEFAULT_LIGHTS)
 endif()
 
 # Needs SSBO: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
