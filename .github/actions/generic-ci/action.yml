@@ -215,7 +215,7 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         path: ./build/Testing/Temporary
-        name: f3d-tests-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}
+        name: f3d-tests-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}-${{inputs.static_label}}
 
     - name: Install (ALL)
       shell: bash
@@ -366,4 +366,4 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         path: ./install/output
-        name: f3d-tests-install-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}
+        name: f3d-tests-install-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}-${{inputs.static_label}}

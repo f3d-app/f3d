@@ -196,7 +196,9 @@ jobs:
         include:
           - vtk_version: commit
             bundle_label: bundle
+            static_label: no-static
           - vtk_version: commit
+            bundle_label: no-bundle
             static_label: static
 
     runs-on: macos-14
