@@ -83,7 +83,6 @@ runs:
         -DF3D_PLUGIN_BUILD_OCCT=ON;
         -DF3D_PLUGIN_BUILD_USD=ON;
         -DF3D_PLUGIN_BUILD_VDB=${{ runner.os == 'macOS' && 'OFF' || 'ON' }};
-        -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=ON;
         -DF3D_MODULE_EXR=ON;
         -DF3D_MODULE_EXTERNAL_RENDERING=ON" >> $GITHUB_ENV
 

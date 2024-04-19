@@ -619,15 +619,17 @@ if(F3D_PLUGIN_BUILD_OCCT)
 
   f3d_test(NAME TestInvalidBREP DATA invalid.brep ARGS --verbose --load-plugins=occt NO_BASELINE)
 
-  if(F3D_PLUGIN_OCCT_COLORING_SUPPORT AND NOT F3D_MACOS_BUNDLE)
+  if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     f3d_test(NAME TestXCAFColors DATA xcaf-colors.stp DEFAULT_LIGHTS ARGS --load-plugins=occt -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
 
-    file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-    f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+    if (NOT F3D_MACOS_BUNDLE)
+      file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
+      f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
 
-    if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
-      file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-      f3d_test(NAME TestThumbnailConfigFileOCCT DATA f3d.stp CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+      if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
+        file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
+        f3d_test(NAME TestThumbnailConfigFileOCCT DATA f3d.stp CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+      endif()
     endif()
   endif()
 endif()
