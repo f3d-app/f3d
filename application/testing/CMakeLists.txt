@@ -133,6 +133,7 @@ f3d_test(NAME TestPointCloudVolume DATA bluntfin.vts ARGS -sob DEFAULT_LIGHTS) #
 f3d_test(NAME TestPointCloudDefaultScene DATA pointsCloud.vtp ARGS --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME Test3DSImporter DATA iflamigm.3ds ARGS --up=+Z DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestScalars DATA suzanne.ply ARGS --scalars=Normals --comp=1 DEFAULT_LIGHTS)
+f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --scalars --cells --comp=-2 --up=+Z DEFAULT_LIGHTS)
 f3d_test(NAME TestScalarsRange DATA suzanne.ply ARGS --scalars=Normals --comp=1 --range=0,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestScalarsWithBar DATA suzanne.ply ARGS -b --scalars=Normals --comp=0 DEFAULT_LIGHTS)
 f3d_test(NAME TestGLTFImporter DATA WaterBottle.glb DEFAULT_LIGHTS) # Using default lights because of ResetCamera
@@ -240,11 +241,6 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
     f3d_test(NAME Test3DGaussiansSplatting DATA small.splat ARGS -osy --up=-Y --point-size=1 --point-type=gaussian --camera-position=-3.6,0.5,-4.2)
   endif()
 endif()
-
-if (NOT APPLE)
-  # This test is broken on apple because of #792
-  f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --scalars --cells --comp=-2 --up=+Z DEFAULT_LIGHTS)
-endif ()
 
 # Test plugin fail code path
 f3d_test(NAME TestPluginVerbose ARGS --verbose REGEXP "Loading plugin \"native\"" NO_BASELINE)

@@ -39,15 +39,7 @@ if("${OpenCASCADE_VERSION}" VERSION_LESS "7.8.0")
     endif()
   endif()
 else()
-  if(APPLE)
-    # On macOS, cell scalar coloring is not supported and the default configuration for STEP file
-    # makes it very obvious.
-    # The simplest fix for now is to force coloring support to false
-    # https://github.com/f3d-app/f3d/issues/792
-    set(F3D_PLUGIN_OCCT_COLORING_SUPPORT OFF CACHE INTERNAL "")
-  else()
-    set(F3D_PLUGIN_OCCT_COLORING_SUPPORT ON CACHE INTERNAL "")
-  endif()
+  set(F3D_PLUGIN_OCCT_COLORING_SUPPORT ON CACHE INTERNAL "")
 endif()
 
 f3d_plugin_init()

@@ -130,7 +130,6 @@ runs:
       working-directory: ${{github.workspace}}
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      # occt coloring not supported on macOS because of #792
       # Exodus not supported on Apple Silicon because of #976
       # CMAKE_MODULE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
@@ -195,19 +194,28 @@ runs:
       with:
         path: ${{github.workspace}}\build\bin_Release
 
-    - name: Test
-      if: inputs.cpu == 'x86_64'
+    # Certain tests are failing on macOS with GPU pass through
+    # https://github.com/f3d-app/f3d/issues/792
+    - name: Set CI test exception for macOS x86_64
+      if: |
+        runner.os == 'macOS' &&
+        inputs.cpu == 'x86_64'
       shell: bash
-      working-directory: ${{github.workspace}}/build
-      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestScalarsCell)|(TestXCAFColors)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS arm64 for unknown reasons
     # https://github.com/f3d-app/f3d/issues/1276
+    - name: Set CI test exception for macOS arm64
+      if: |
+        runner.os == 'macOS' &&
+        inputs.cpu == 'arm64'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)" >> $GITHUB_ENV
+
     - name: Test
-      if: inputs.cpu == 'arm64'
       shell: bash
       working-directory: ${{github.workspace}}/build
-      run: ctest -E "(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)" -C Release -j 2 --output-on-failure || ctest -E "(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)" -C Release -j 1 --rerun-failed -VV
+      run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure || ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
       if: failure()
