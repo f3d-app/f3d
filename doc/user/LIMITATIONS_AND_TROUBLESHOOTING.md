@@ -130,10 +130,6 @@ Then F3D should work as expected.
 
 F3D raytracing and exodus plugin are not working on macOS silicon yet, see this [issue](https://github.com/f3d-app/f3d/issues/976).
 
-> I'm unable to get coloring right with step files
-
-F3D on macOS does not support coloring on cells because of a [VTK issue](https://gitlab.kitware.com/vtk/vtk/-/issues/18969).
-
 ## Python
 
 > I can't find `usd` and `vdb` plugins after installing f3d with pip
