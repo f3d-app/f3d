@@ -44,7 +44,7 @@ else()
     # makes it very obvious.
     # The simplest fix for now is to force coloring support to false
     # https://github.com/f3d-app/f3d/issues/792
-    set(F3D_PLUGIN_OCCT_COLORING_SUPPORT OFF CACHE INTERNAL "")
+    set(F3D_PLUGIN_OCCT_COLORING_SUPPORT ON CACHE INTERNAL "")
   else()
     set(F3D_PLUGIN_OCCT_COLORING_SUPPORT ON CACHE INTERNAL "")
   endif()

@@ -109,6 +109,7 @@ function(f3d_test)
 
 endfunction()
 
+f3d_test(NAME TestSpereCellScalars DATA sphere.vtp ARGS -sc DEFAULT_LIGHTS)
 f3d_test(NAME TestPLY DATA suzanne.ply DEFAULT_LIGHTS)
 f3d_test(NAME TestOBJ DATA suzanne.obj ARGS --geometry-only DEFAULT_LIGHTS)
 f3d_test(NAME TestSTL DATA suzanne.stl DEFAULT_LIGHTS)
