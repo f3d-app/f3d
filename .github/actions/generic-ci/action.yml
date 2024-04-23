@@ -190,7 +190,7 @@ runs:
 
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
-      uses: ./source/.github/actions/mesa-install-bin
+      uses: f3d-app/install-mesa-windows-action@v1
       with:
         path: ${{github.workspace}}\build\bin_Release
 
@@ -266,7 +266,7 @@ runs:
         runner.os == 'Windows' &&
         inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' &&
         inputs.static_label == 'no-static'
-      uses: ./source/.github/actions/mesa-install-bin
+      uses: f3d-app/install-mesa-windows-action@v1
       with:
         path: ${{github.workspace}}\build_examples\*\Release
 
@@ -326,7 +326,7 @@ runs:
 
     - name: Install Mesa Windows in install
       if: runner.os == 'Windows'
-      uses: ./source/.github/actions/mesa-install-bin
+      uses: f3d-app/install-mesa-windows-action@v1
       with:
         path: ${{github.workspace}}\install\bin
 
