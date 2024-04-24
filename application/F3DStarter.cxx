@@ -36,6 +36,7 @@
 #include <filesystem>
 #include <iostream>
 #include <mutex>
+#include <regex>
 #include <set>
 
 namespace fs = std::filesystem;
@@ -291,6 +292,13 @@ int F3DStarter::Start(int argc, char** argv)
           }
           return true;
         }
+
+        if (keySym == "F12")
+        {
+          this->SaveScreenshot("{app}/{model}.png"); // TODO read from conf/opts
+          return true;
+        }
+
         return false;
       });
 
@@ -698,6 +706,141 @@ void F3DStarter::Render()
   f3d::log::debug("========== Rendering ==========");
   this->Internals->Engine->getWindow().render();
   f3d::log::debug("Render done");
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
+{
+  constexpr auto getPlatform = []()
+  {
+#if defined(_WIN32)
+    return "win32";
+#elif defined(__APPLE__)
+    return "apple";
+#elif defined(__ANDROID__)
+    return "android";
+#elif defined(__unix__)
+    return "unix";
+#else
+    return "?";
+#endif
+  };
+
+  const auto getScreenshotDir = []()
+  {
+    for (const std::string& candidate : { "XDG_PICTURES_DIR", "HOME", "USERPROFILE" })
+    {
+      char* val = std::getenv(candidate.c_str());
+      if (val != nullptr)
+      {
+        const auto path = std::filesystem::path(val);
+        if (std::filesystem::is_directory(path))
+        {
+          return path;
+        }
+      }
+    }
+
+    return std::filesystem::current_path();
+  };
+
+  const auto applyFilenameTemplate = [&](const std::string& fn_template)
+  {
+    std::string filename = fn_template;
+
+    {
+      std::regex re("\\{app\\}");
+      filename = std::regex_replace(filename, re, F3D::AppName);
+    }
+    {
+      std::regex re("\\{version\\}");
+      filename = std::regex_replace(filename, re, F3D::AppVersionFull);
+    }
+    {
+      std::regex re("\\{os\\}");
+      filename = std::regex_replace(filename, re, getPlatform());
+    }
+    {
+      std::regex re("\\{model\\}");
+      if (std::regex_search(filename, re))
+      {
+        const auto file = this->Internals->FilesList[this->Internals->CurrentFileIndex];
+        filename = std::regex_replace(filename, re, file.filename().string());
+      }
+    }
+
+    return std::filesystem::path(filename);
+  };
+
+  const auto findAvailableFilename = [&](const std::string& idealFilename)
+  {
+    const auto appendFilenameNumber = [](const std::filesystem::path& path, size_t n)
+    {
+      std::stringstream ss;
+      const std::string fn = path.string();
+      const std::string::size_type i = fn.find_last_of(".");
+      if (i != std::string::npos)
+      {
+        ss << fn.substr(0, i) << " (" << n << ")" << fn.substr(i);
+      }
+      else
+      {
+        ss << fn << " (" << n << ")";
+      }
+      return ss.str();
+    };
+
+    std::string fn = idealFilename;
+    for (size_t i = 2; std::filesystem::exists(fn) && i < 1e8; ++i)
+    {
+      fn = appendFilenameNumber(idealFilename, i);
+    }
+    if (std::filesystem::exists(fn))
+    {
+      throw std::runtime_error("could not find available filenamne");
+    }
+    return fn;
+  };
+
+  std::filesystem::path path = applyFilenameTemplate(filenameTemplate);
+  if (!path.is_absolute())
+  {
+    path = getScreenshotDir() / path;
+  }
+  path = findAvailableFilename(path);
+  std::filesystem::create_directories(std::filesystem::path(path).parent_path());
+  f3d::log::info("saving screenshot to " + path.string());
+
+  f3d::window& window = this->Internals->Engine->getWindow();
+
+  std::stringstream cameraMetadata;
+  {
+    const auto state = window.getCamera().getState();
+    const auto vec3toJson = [](const std::array<double, 3>& v)
+    {
+      std::stringstream ss;
+      ss << "[" << v[0] << ", " << v[1] << ", " << v[2] << "]";
+      return ss.str();
+    };
+    cameraMetadata << "{\n";
+    cameraMetadata << "  \"pos\": " << vec3toJson(state.pos) << ",\n";
+    cameraMetadata << "  \"foc\": " << vec3toJson(state.foc) << ",\n";
+    cameraMetadata << "  \"up\": " << vec3toJson(state.up) << ",\n";
+    cameraMetadata << "  \"angle\": " << state.angle << "\n";
+    cameraMetadata << "}\n";
+  }
+
+  window.renderToImage()
+    .setMetadata("camera", cameraMetadata.str())
+    .save(path, f3d::image::SaveFormat::PNG);
+
+  f3d::options& options = this->Internals->Engine->getOptions();
+  const std::string light_intensity_key = "render.light.intensity";
+  const double intensity = options.getAsDouble(light_intensity_key);
+  options.set(light_intensity_key, intensity * 5);
+  this->Render();
+  options.set(light_intensity_key, intensity);
+  this->Render();
 }
 
 //----------------------------------------------------------------------------

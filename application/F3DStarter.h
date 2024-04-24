@@ -43,6 +43,11 @@ public:
    */
   void Render();
 
+  /**
+   * Trigger a render and save a screenshot to disk according to a filename template.
+   */
+  void SaveScreenshot(const std::string& filenameTemplate);
+
   F3DStarter();
   ~F3DStarter();
 
