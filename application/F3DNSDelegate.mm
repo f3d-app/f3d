@@ -8,6 +8,7 @@
 #import "AppKit/NSApplication.h"
 #pragma clang diagnostic pop
 
+#import "F3DConfig.h"
 #import "F3DStarter.h"
 
 // This is a subclass of NSApplicationDelegate.
@@ -26,6 +27,84 @@
   Starter->LoadFile();
   Starter->Render();
   return YES;
+}
+
+- (void)applicationWillFinishLaunching:(NSNotification *)notification
+{
+  NSString* appName = [NSString stringWithUTF8String:F3D::AppName.c_str()];
+
+  NSMenu* bar = [[NSMenu alloc] init];
+  [NSApp setMainMenu:bar];
+
+  NSMenuItem* appMenuItem = [bar addItemWithTitle:@"" action:nil keyEquivalent:@""];
+  NSMenu* appMenu = [[NSMenu alloc] init];
+  [appMenuItem setSubmenu:appMenu];
+  [appMenu release];
+
+  // setup "app menu"
+  [appMenu addItemWithTitle:[NSString stringWithFormat:@"About %@", appName]
+                     action:@selector(orderFrontStandardAboutPanel:)
+              keyEquivalent:@""];
+
+  [appMenu addItem:[NSMenuItem separatorItem]];
+
+  NSMenu* servicesMenu = [[NSMenu alloc] init];
+  [NSApp setServicesMenu:servicesMenu];
+  [servicesMenu release];
+
+  [[appMenu addItemWithTitle:@"Services"
+                      action:nil
+              keyEquivalent:@""] setSubmenu:servicesMenu];
+
+  [appMenu addItem:[NSMenuItem separatorItem]];
+
+  [appMenu addItemWithTitle:[NSString stringWithFormat:@"Hide %@", appName]
+                      action:@selector(hide:)
+              keyEquivalent:@"h"];
+
+  [[appMenu addItemWithTitle:@"Hide Others"
+                      action:@selector(hideOtherApplications:)
+              keyEquivalent:@"h"]
+    setKeyEquivalentModifierMask:NSEventModifierFlagOption | NSEventModifierFlagCommand];
+
+  [appMenu addItemWithTitle:@"Show All"
+                      action:@selector(unhideAllApplications:)
+              keyEquivalent:@""];
+
+  [appMenu addItem:[NSMenuItem separatorItem]];
+
+  [appMenu addItemWithTitle:[NSString stringWithFormat:@"Quit %@", appName]
+                      action:@selector(terminate:)
+              keyEquivalent:@"q"];
+
+  // setup "window menu"
+  NSMenuItem* windowMenuItem = [bar addItemWithTitle:@"" action:nil keyEquivalent:@""];
+  NSMenu* windowMenu = [[NSMenu alloc] initWithTitle:@"Window"];
+  [NSApp setWindowsMenu:windowMenu];
+  [windowMenu release];
+
+  [windowMenuItem setSubmenu:windowMenu];
+
+  [windowMenu addItemWithTitle:@"Minimize"
+                        action:@selector(performMiniaturize:)
+                  keyEquivalent:@"m"];
+
+  [windowMenu addItemWithTitle:@"Zoom"
+                        action:@selector(performZoom:)
+                  keyEquivalent:@""];
+
+  [windowMenu addItem:[NSMenuItem separatorItem]];
+
+  [windowMenu addItemWithTitle:@"Bring All to Front"
+                        action:@selector(arrangeInFront:)
+                 keyEquivalent:@""];
+
+  [windowMenu addItem:[NSMenuItem separatorItem]];
+
+  [[windowMenu addItemWithTitle:@"Enter Full Screen"
+                         action:@selector(toggleFullScreen:)
+                  keyEquivalent:@"f"]
+    setKeyEquivalentModifierMask:NSEventModifierFlagControl | NSEventModifierFlagCommand];
 }
 
 @end
