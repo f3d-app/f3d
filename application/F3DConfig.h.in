@@ -1,6 +1,8 @@
 #ifndef F3DConfig_h
 #define F3DConfig_h
 
+#include <string>
+
 namespace F3D
 {
   const std::string AppName = "@PROJECT_NAME@";
