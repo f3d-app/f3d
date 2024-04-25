@@ -295,7 +295,7 @@ int F3DStarter::Start(int argc, char** argv)
 
         if (keySym == "F12")
         {
-          this->SaveScreenshot("{app}/{model}.png"); // TODO read from conf/opts
+          this->SaveScreenshot(this->Internals->AppOptions.ScreenshotFilename);
           return true;
         }
 
@@ -711,20 +711,6 @@ void F3DStarter::Render()
 //----------------------------------------------------------------------------
 void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
 {
-  constexpr auto getPlatform = []()
-  {
-#if defined(_WIN32)
-    return "win32";
-#elif defined(__APPLE__)
-    return "apple";
-#elif defined(__ANDROID__)
-    return "android";
-#elif defined(__unix__)
-    return "unix";
-#else
-    return "?";
-#endif
-  };
 
   const auto getScreenshotDir = []()
   {
@@ -757,10 +743,6 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
       filename = std::regex_replace(filename, re, F3D::AppVersionFull);
     }
     {
-      std::regex re("\\{os\\}");
-      filename = std::regex_replace(filename, re, getPlatform());
-    }
-    {
       std::regex re("\\{model\\}");
       if (std::regex_search(filename, re))
       {
@@ -781,11 +763,11 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
       const std::string::size_type i = fn.find_last_of(".");
       if (i != std::string::npos)
       {
-        ss << fn.substr(0, i) << " (" << n << ")" << fn.substr(i);
+        ss << fn.substr(0, i) << "_" << n << fn.substr(i);
       }
       else
       {
-        ss << fn << " (" << n << ")";
+        ss << fn << "_" << n;
       }
       return ss.str();
     };

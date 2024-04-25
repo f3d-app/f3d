@@ -314,6 +314,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp0, "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", appOptions.Watch,  HasDefault::YES, MayHaveConfig::YES );
     this->DeclareOption(grp0, "load-plugins", "", "List of plugins to load separated with a comma", appOptions.Plugins, LocalHasDefaultNo, MayHaveConfig::YES, "<paths or names>");
     this->DeclareOption(grp0, "scan-plugins", "", "Scan standard directories for plugins and display available plugins (result can be incomplete)");
+    this->DeclareOption(grp0, "screenshot-filename", "", "Screenshot filename", appOptions.ScreenshotFilename, LocalHasDefaultNo, MayHaveConfig::YES, "<filename>");
 
     auto grp1 = cxxOptions.add_options("General");
     this->DeclareOption(grp1, "verbose", "", "Set verbose level, providing more information about the loaded data in the console output", appOptions.VerboseLevel, HasDefault::YES, MayHaveConfig::YES, "{debug, info, warning, error, quiet}", HasImplicitValue::YES, "debug");
@@ -526,6 +527,11 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   {
     f3d::log::error("Error parsing options: ", ex.what());
     throw;
+  }
+
+  if (appOptions.ScreenshotFilename.empty())
+  {
+    appOptions.ScreenshotFilename = "{app}/{model}.png";
   }
 }
 

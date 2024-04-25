@@ -25,6 +25,7 @@ struct F3DAppOptions
   bool GeometryOnly = false;
   bool GroupGeometries = false;
   std::string Output = "";
+  std::string ScreenshotFilename = "";
   std::string Reference = "";
   std::string InteractionTestRecordFile = "";
   std::string InteractionTestPlayFile = "";

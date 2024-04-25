@@ -215,6 +215,13 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestColorMapFile DATA dragon.vtu ARGS --colormap-file=magma.png --scalars --comp=1 DEFAULT_LIGHTS)
 endif()
 
+# Screenshot Interaction
+set(_screenshot_dir ${CMAKE_BINARY_DIR}/Testing/Temporary/ss)
+add_test(NAME f3d::TestClearScreenshots COMMAND ${CMAKE_COMMAND} -E remove_directory ${_screenshot_dir})
+f3d_test(NAME TestScreenshot DATA suzanne.ply ARGS --screenshot-filename=${_screenshot_dir}/{app}-{version}/{model}.png INTERACTION DEFAULT_LIGHTS DEPENDS TestClearScreenshots NO_BASELINE)
+f3d_test(NAME TestScreenshotFile1 DATA suzanne.ply ARGS --ref=${_screenshot_dir}/${PROJECT_NAME}-${F3D_VERSION}/suzanne.ply.png DEPENDS TestScreenshot NO_BASELINE)
+f3d_test(NAME TestScreenshotFile2 DATA suzanne.ply ARGS --ref=${_screenshot_dir}/${PROJECT_NAME}-${F3D_VERSION}/suzanne.ply_2.png DEPENDS TestScreenshot NO_BASELINE)
+
 if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
   f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --geometry-only --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --translucency-support DEFAULT_LIGHTS)
 endif()
