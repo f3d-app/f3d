@@ -714,9 +714,9 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
 
   const auto getScreenshotDir = []()
   {
-    for (const std::string_view& candidate : { "XDG_PICTURES_DIR", "HOME", "USERPROFILE" })
+    for (const char* const& candidate : { "XDG_PICTURES_DIR", "HOME", "USERPROFILE" })
     {
-      char* val = std::getenv(candidate.data());
+      char* val = std::getenv(candidate);
       if (val != nullptr)
       {
         const auto path = std::filesystem::path(val);
