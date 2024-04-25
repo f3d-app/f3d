@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-v2.7.1-${{runner.os}}-${{inputs.cpu}}-0
+        key: ospray-sb-v2.7.1-${{runner.os}}-${{inputs.cpu}}-1
 
     # Dependents: vtk
     - name: Checkout ospray
@@ -59,7 +59,6 @@ runs:
         -DBUILD_OSPRAY_APPS=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../ospray_install
-        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         -DDOWNLOAD_ISPC=ON
         -DDOWNLOAD_TBB=OFF
         -DINSTALL_DEPENDENCIES=ON

@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/openexr_install
-        key: openexr-v3.2.4-${{runner.os}}-${{inputs.cpu}}-0
+        key: openexr-v3.2.4-${{runner.os}}-${{inputs.cpu}}-1
 
     # Dependents: usd
     - name: Checkout OpenEXR
@@ -46,7 +46,6 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=../install/
         -DOPENEXR_INSTALL_TOOLS=OFF
         -DOPENEXR_INSTALL_EXAMPLES=OFF
-        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_MACOSX_RPATH=ON' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
