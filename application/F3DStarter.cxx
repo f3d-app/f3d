@@ -740,7 +740,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
     }
     {
       std::regex re("\\{version\\}");
-      filename = std::regex_replace(filename, re, F3D::AppVersionFull);
+      filename = std::regex_replace(filename, re, F3D::AppVersion);
     }
     {
       std::regex re("\\{model\\}");
@@ -789,7 +789,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
   {
     path = getScreenshotDir() / path;
   }
-  path = findAvailableFilename(path);
+  path = findAvailableFilename(path.string());
   std::filesystem::create_directories(std::filesystem::path(path).parent_path());
   f3d::log::info("saving screenshot to " + path.string());
 
