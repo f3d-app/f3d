@@ -218,7 +218,7 @@ endif()
 # Screenshot Interaction
 set(_screenshot_dir ${CMAKE_BINARY_DIR}/Testing/Temporary/ss)
 add_test(NAME f3d::TestClearScreenshots COMMAND ${CMAKE_COMMAND} -E remove_directory ${_screenshot_dir})
-f3d_test(NAME TestScreenshot DATA suzanne.ply ARGS --screenshot-filename=${_screenshot_dir}/{app}-{version}/{model}.png INTERACTION DEFAULT_LIGHTS DEPENDS TestClearScreenshots NO_BASELINE)
+f3d_test(NAME TestScreenshot DATA suzanne.ply ARGS --screenshot-filename=${_screenshot_dir}/{app}-{version}/{model}.png INTERACTION DEPENDS TestClearScreenshots NO_BASELINE)
 f3d_test(NAME TestScreenshotFile1 DATA suzanne.ply ARGS --ref=${_screenshot_dir}/${PROJECT_NAME}-${F3D_VERSION}/suzanne.ply.png DEPENDS TestScreenshot NO_BASELINE)
 f3d_test(NAME TestScreenshotFile2 DATA suzanne.ply ARGS --ref=${_screenshot_dir}/${PROJECT_NAME}-${F3D_VERSION}/suzanne.ply_2.png DEPENDS TestScreenshot NO_BASELINE)
 
