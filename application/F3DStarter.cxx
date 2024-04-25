@@ -814,7 +814,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
 
   window.renderToImage()
     .setMetadata("camera", cameraMetadata.str())
-    .save(path, f3d::image::SaveFormat::PNG);
+    .save(path.string(), f3d::image::SaveFormat::PNG);
 
   f3d::options& options = this->Internals->Engine->getOptions();
   const std::string light_intensity_key = "render.light.intensity";
