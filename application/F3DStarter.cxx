@@ -719,7 +719,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
       char* val = std::getenv(candidate);
       if (val != nullptr)
       {
-        const auto path = std::filesystem::path(val);
+        std::filesystem::path path(val);
         if (std::filesystem::is_directory(path))
         {
           return path;
@@ -760,7 +760,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
     {
       std::stringstream ss;
       const std::string fn = path.string();
-      const std::string::size_type i = fn.find_last_of(".");
+      const std::string::size_type i = fn.find_last_of('.');
       if (i != std::string::npos)
       {
         ss << fn.substr(0, i) << "_" << n << fn.substr(i);
