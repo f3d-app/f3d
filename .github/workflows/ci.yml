@@ -162,7 +162,7 @@ jobs:
       matrix:
         vtk_version: [commit, v9.3.0, v9.2.6]
 
-    runs-on: macos-latest
+    runs-on: macos-12
 
     steps:
     - name: Checkout
@@ -231,10 +231,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu, windows, macos]
+        os: [ubuntu-latest, windows-latest, macos-12]
 
-    runs-on: ${{matrix.os}}-latest
-    container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    runs-on: ${{matrix.os}}
+    container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       DISPLAY: :0
