@@ -47,7 +47,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-${{inputs.cpu}}-6
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-${{inputs.cpu}}-7
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -101,7 +101,6 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
-        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DOpenVDB_CMAKE_PATH=$(pwd)/../install/lib/cmake/OpenVDB/
         -DVTKOSPRAY_ENABLE_DENOISER=ON
@@ -117,7 +116,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_FiltersGeneral=YES
         -DVTK_MODULE_ENABLE_VTK_FiltersGeometry=YES
         -DVTK_MODULE_ENABLE_VTK_IOCityGML=YES
-        -DVTK_MODULE_ENABLE_VTK_IOExodus=${{ inputs.cpu == 'x86_64' && 'YES' || 'NO' }}
+        -DVTK_MODULE_ENABLE_VTK_IOExodus=YES
         -DVTK_MODULE_ENABLE_VTK_IOGeometry=YES
         -DVTK_MODULE_ENABLE_VTK_IOImage=YES
         -DVTK_MODULE_ENABLE_VTK_IOImport=YES
