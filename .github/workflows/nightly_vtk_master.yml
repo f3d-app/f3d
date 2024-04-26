@@ -141,7 +141,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: macos-latest
+    runs-on: macos-12
 
     steps:
     - name: Checkout
