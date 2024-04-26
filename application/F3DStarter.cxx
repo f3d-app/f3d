@@ -15,6 +15,11 @@
 // dmon includes Windows.h which defines 'ERROR' and conflicts with log.h
 #undef ERROR
 #pragma warning(pop)
+#elif __APPLE__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#include "dmon.h"
+#pragma clang diagnostic pop
 #else
 #include "dmon.h"
 #endif
