@@ -117,3 +117,5 @@ runs:
         files: ${{github.workspace}}/source/coverage.info
         verbose: true
         use_oidc: false
+        codecov_yml_path: ${{github.workspace}}/source/codecov.yml
+        disable_search: true
