@@ -281,7 +281,6 @@ jobs:
       uses: ./source/.github/actions/coverage-ci
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        codecov_token: ${{ secrets.CODECOV_TOKEN }}
 
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
