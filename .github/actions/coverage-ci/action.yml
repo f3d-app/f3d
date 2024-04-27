@@ -116,3 +116,4 @@ runs:
         token: ${{ inputs.codecov_token }}
         files: ${{github.workspace}}/source/coverage.info
         verbose: true
+        use_oidc: false
