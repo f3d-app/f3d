@@ -113,7 +113,6 @@ runs:
       uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: true
-        token: ${{ inputs.codecov_token }}
         files: ${{github.workspace}}/source/coverage.info
         verbose: true
         use_oidc: false
