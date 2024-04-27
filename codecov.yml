@@ -1,4 +1,5 @@
 codecov:
+  token: 7d2ecd8b-ac89-4c2d-ad05-119518130cb2
   notify:
     after_n_builds: 1
     wait_for_ci: yes
