@@ -13,6 +13,12 @@ runs:
   using: "composite"
   steps:
 
+    - name: Setup env
+      shell: bash
+      run: |
+        echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
+        echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+
     - name: Check required inputs
       shell: bash
       run: |
@@ -119,4 +125,4 @@ runs:
         use_oidc: false
         codecov_yml_path: ${{github.workspace}}/source/codecov.yml
         disable_search: true
-        root_dir: $GITHUB_WORKSPACE/source
+        root_dir: ${{env.GITHUB_WORKSPACE}}/source
