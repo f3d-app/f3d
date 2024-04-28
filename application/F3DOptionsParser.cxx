@@ -34,7 +34,7 @@ public:
     : Argc(argc)
     , Argv(argv)
   {
-    this->ExecutableName = argc > 0 && argv[0][0] ? argv[0] : "f3d";
+    this->ExecutableName = argc > 0 && argv[0][0] ? fs::path(argv[0]).filename().string() : "f3d";
   }
 
   void GetOptions(F3DAppOptions& appOptions, f3d::options& options,
