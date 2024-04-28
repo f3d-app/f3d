@@ -4,6 +4,10 @@ inputs:
   lfs_sha:
     description: 'Cache LFS sha'
     required: true
+  codecov_token:
+    description: 'Codecov token, needed for non-forked workflows'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -108,6 +112,7 @@ runs:
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
+        token: ${{inputs.codecov_token}}
         fail_ci_if_error: true
         files: ${{github.workspace}}/source/coverage.info
         verbose: true
