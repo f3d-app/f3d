@@ -119,3 +119,4 @@ runs:
         use_oidc: false
         codecov_yml_path: ${{github.workspace}}/source/codecov.yml
         disable_search: true
+        root_dir:  ${{github.workspace}}/source
