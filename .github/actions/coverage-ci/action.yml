@@ -13,12 +13,6 @@ runs:
   using: "composite"
   steps:
 
-    - name: Setup env
-      shell: bash
-      run: |
-        echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
-        echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" >> $GITHUB_ENV
-
     - name: Check required inputs
       shell: bash
       run: |
@@ -117,12 +111,11 @@ runs:
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
+      working-directory: ${{github.workspace}}/source
       with:
         token: ${{inputs.codecov_token}}
         fail_ci_if_error: true
         files: ${{github.workspace}}/source/coverage.info
         verbose: true
         use_oidc: false
-        codecov_yml_path: ${{github.workspace}}/source/codecov.yml
         disable_search: true
-        root_dir: ${{env.GITHUB_WORKSPACE}}/source
