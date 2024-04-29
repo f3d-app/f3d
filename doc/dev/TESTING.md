@@ -27,7 +27,7 @@ ctest -R PLY
 
 ## Testing architecture
 
-There are multiple layers of tests to ensure that testing covers all of the aspects of the application. There are various layers of the application namely
+There are multiple layers of tests to ensure that testing covers all aspects of the application. There are various layers of the application namely
  - UI (Application) layer
  - Library layer
  - Bindings layer
