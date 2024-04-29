@@ -121,10 +121,10 @@ It is supported to read file as input and perform image comparison against basel
 
 ### Bindings layer
 
-The libf3d supports multiple bindings, including C, Python, Java and Javascript.
+The libf3d supports multiple bindings, including Python, Java and Javascript.
 
 When improving/modifying these bindings, it is necessary to also improve/modify the bindings tests accordingly.
-Please take a look into `<bindings>/testing` for examples to follow.
+Please take a look into `<java/python/webassembly>/testing` for examples to follow.
 
 ### VTKExtensions layer
 
