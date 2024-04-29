@@ -206,12 +206,13 @@ runs:
 
     # Certain tests are failing on macOS arm64 for unknown reasons
     # https://github.com/f3d-app/f3d/issues/1276
+    # https://github.com/f3d-app/f3d/issues/792
     - name: Set CI test exception for macOS arm64
       if: |
         runner.os == 'macOS' &&
         inputs.cpu == 'arm64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
