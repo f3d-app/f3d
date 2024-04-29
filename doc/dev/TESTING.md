@@ -1,7 +1,6 @@
 # Testing
 
-F3D has an expansive suite of tests, that you may want to run locally,
-either to validate your build or because you are contributing to F3D and want to add/modify a test.
+F3D has an expansive suite of tests that can be run locally, either to validate your build or because you are contributing to F3D and want to add/modify a test.
 To enable the tests, run `cmake -DBUILD_TESTING=ON ../` from the `build`  directory.
 
 ## CMake Options
@@ -13,7 +12,7 @@ There are a few CMake options to configure the F3D testing framework:
 
 ## Running the tests
 
-To run all tests, build the `f3d` binary and run `ctest` from the build directory:
+To run all tests, build the `f3d` binary with `make` and then run `ctest` from the build directory:
 
 ```
 make
@@ -28,22 +27,20 @@ ctest -R PLY
 
 ## Testing architecture
 
-There are multiple layers of tests to ensure that test coverage is as high as possible
- - Application layer
+There are multiple layers of tests to ensure that testing covers all of the aspects of the application. There are various layers of the application namely
+ - UI (Application) layer
  - Library layer
  - Bindings layer
  - VTK Extension layer
 
-When contributing to F3D, it is necessary that any new code is covered by a test in at least one layer above. Additional tests can be created in other layers, depending on the added functionality / bugfix.
+When contributing to F3D, it is necessary that new code is covered by a test in at least one layer above. Additional tests can be created in other layers, depending on the new functionality / bugfix.
 
 ### Application layer
 
-All application tests are initiated via the command line run by `ctest` and use the built`f3d` executable.
-`ctest` then compares the rendered output with the expected (baseline) output for differences.
-Most of the tests use the `--output` (which saves the rendered output to a file) and `--ref` 
-(which compares the output to a reference file) F3D options in order to identify differences.
+All application tests are initiated via the `ctest` testing framework.
+`ctest` then runs `f3d` with the `--output` and `--ref` arguments which renders an output image and compares it to a reference image. `f3d` also compares the differences between the 2 images and generates a diff file if there is a difference.
 
-The application test framework is handled in `application/testing/CMakeLists.txt`.
+All aspects of the application test framework are handled in `application/testing/CMakeLists.txt`.
 
 Usually, adding a test is as simple as adding a line like this one:
 
@@ -68,21 +65,19 @@ Visually check that the generated file looks as expected, then add it to the F3D
 Rerun the test, it should now pass.
 
 ### Recovering baselines from CI
-Occassionally you may need to recover a baseline from the CI, becuase you can not generate the baseline image on your local environment. If this is required, create a PR and let the test run (fail) on CI. Check the actions run summary on Github and download the appropriate `baseline` archive based on your OS. Extract it and navigate to the `build/Testing/Temporary/TestName.png`. Extract this file and add it to the `testing/baselines` directory.
+Occasionally you may need to recover a baseline from the CI. If this is required, create a PR and let the test run (fail) on CI. Check the actions run summary on Github and download the appropriate `baseline` archive. Extract it and navigate to the `build/Testing/Temporary/TestName.png`. Extract this file and add it to the `testing/baselines` directory.
 
 ### Creating Interaction tests
-Sometimes you contribute changes that affect how the end user interacts with F3D, example toggling orthographic projection on/off or zooming in or out of the rendered image. These are simulated by interaction tests. F3D has the functionality to record 
-any mouse wheel scrolls, mouse movements as well as keypresses to a file. This is enabled by running 
+Sometimes you may contribute changes that affect how the end user interacts with F3D, example, toggling orthographic projection on/off or zooming in/out of the rendered image. These human interactions are simulated by interaction tests. F3D has the functionality to record human interactions such as mouse wheel scrolls, mouse movements as well as keypresses to a file. This is enabled by running 
 
 ```
 f3d --interaction-test-record ./TestName.log
 ```
 
 where
-- `TestName` should be the name of the test case. `TestName.log` should be added to the `./testing/recordings` directory.
+- `TestName` should be the name of the test case.
 
-Care should be taken to perform the minimum number of events to simulate the interaction. For instance, if you want to simulate 
-the number `5` being pressed, there should be no mouse events or other keypress events. To save the file, exit `f3d`
+While recording the interaction, care should be taken to perform the minimum number of events to simulate the interaction. For example, if you want to simulate the number `5` being pressed, there should be no mouse events or other keypress events during the recording of the interaction. The interaction file is saved when `f3d` is exited.
 
 You can verify that your interaction test file is correct by running
 
@@ -90,11 +85,13 @@ You can verify that your interaction test file is correct by running
 f3d --interaction-test-play ./TestName.log
 ```
 
-After you have verififed that the interaction file works as expected, copy it to `./testing/recordings` and create the interaction test case by adding the below line to `application/testing/CMakeLists.txt`
+After you have verififed that the interaction file works as expected, copy it to `./testing/recordings`. The name of the interaction file should be the same as the test name. The interaction test case can be created by adding 
 
 ```
 f3d_test(NAME TestName DATA datafile.ext INTERACTION DEFAULT_LIGHTS)
 ```
+
+to `application/testing/CMakeLists.txt`
 
  where
  - `NAME` should be the name of the test, which must be unique
