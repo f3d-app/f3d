@@ -77,6 +77,7 @@ runs:
       run: >
         echo "SKBUILD_CMAKE_ARGS=-DF3D_DEPENDENCIES_DIR=${{ env.WORKSPACE }}/dependencies/install/bin;
         -DCMAKE_MODULE_PATH=${{ env.WORKSPACE }}/dependencies/install/lib/cmake/OpenVDB/;
+        -DF3D_WINDOWS_GUI=OFF;
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON;
         -DF3D_PLUGIN_BUILD_ASSIMP=ON;
         -DF3D_PLUGIN_BUILD_DRACO=ON;
