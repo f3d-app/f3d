@@ -66,7 +66,7 @@ You can then simply run F3D from the command line:
 ### Running the test suite
 
 ```
-cmake BUILD_TESTING=ON ../build
+cmake -DBUILD_TESTING=ON ../src
 make
 ctest
 ```
@@ -130,6 +130,17 @@ cmake --build .
 
  * Double click on the `C:\dev\f3d\build\bin_Debug\f3d.exe` executable
 
+### Running the test suite
+
+ * Open cmd
+
+```sh
+cd C:\dev\f3d\build
+cmake -DBUILD_TESTING=ON .
+cmake --build .
+ctest
+```
+
 ## macOS
 
 Note: The following steps were tested with macOS Catalina using Xcode 12.4, but should also work for other versions
@@ -179,6 +190,15 @@ You can then simply run F3D from the command line:
 
 ```
 ./bin/f3d.app/Contents/MacOS/f3d
+```
+
+### Running the test suite
+
+```
+cd build
+cmake -DBUILD_TESTING=ON ../src
+make
+ctest
 ```
 
 [cmake-download]: https://cmake.org/download
