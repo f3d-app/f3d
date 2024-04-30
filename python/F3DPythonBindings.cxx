@@ -7,6 +7,7 @@
 #include "image.h"
 #include "interactor.h"
 #include "loader.h"
+#include "log.h"
 #include "options.h"
 #include "types.h"
 #include "utils.h"
@@ -338,6 +339,24 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static(
       "autoload_plugins", &f3d::engine::autoloadPlugins, "Automatically load internal plugins")
     .def_static("get_plugins_list", &f3d::engine::getPluginsList);
+
+  // f3d::log
+  py::class_<f3d::log> log(module, "Log");
+
+  log //
+    .def_static("set_verbose_level", &f3d::log::setVerboseLevel, py::arg("level"),
+      py::arg("force_std_err") = false)
+    .def_static("set_use_coloring", &f3d::log::setUseColoring)
+    .def_static("print", [](f3d::log::VerboseLevel& level, const std::string& message)
+      { f3d::log::print(level, message); });
+
+  py::enum_<f3d::log::VerboseLevel>(log, "VerboseLevel")
+    .value("DEBUG", f3d::log::VerboseLevel::DEBUG)
+    .value("INFO", f3d::log::VerboseLevel::INFO)
+    .value("WARN", f3d::log::VerboseLevel::WARN)
+    .value("ERROR", f3d::log::VerboseLevel::ERROR)
+    .value("QUIET", f3d::log::VerboseLevel::QUIET)
+    .export_values();
 
 // deprecated functions, will be removed in the next major release, F3D v3.0.0
 #ifndef F3D_NO_DEPRECATED
