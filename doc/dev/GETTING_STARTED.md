@@ -63,6 +63,14 @@ You can then simply run F3D from the command line:
 ./bin/f3d
 ```
 
+### Running the test suite
+
+```
+cmake BUILD_TESTING=ON ../build
+make
+ctest
+```
+
 ## Windows
 
 Note: The following steps were tested with Visual Studio Community 2022 using Windows 10, but should also work for other versions

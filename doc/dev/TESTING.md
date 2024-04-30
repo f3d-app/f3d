@@ -1,18 +1,18 @@
 # Testing
 
 F3D has an expansive suite of tests that can be run locally, either to validate your build or because you are contributing to F3D and want to add/modify a test.
-To enable the tests, run `cmake -DBUILD_TESTING=ON ../` from the `build`  directory.
 
 ## CMake Options
 
 There are a few CMake options to configure the F3D testing framework:
+* `BUILD_TESTING`: Enable the test framework, off by default.
 * `F3D_TESTING_ENABLE_RENDERING_TESTS`: An option to enable/disable test that require rendering capabilities, on by default.
 * `F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS`: Certain tests can take some time to run, off by default, requires rendering tests.
 * `F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON`: With VTK < 9.0.0, rendering can be very different, although not incorrect, so this option is provided, off by default.
 
 ## Running the tests
 
-To run all tests, build the `f3d` binary with `make` and then run `ctest` from the build directory:
+To run all tests, build and then run `ctest` from the build directory:
 
 ```
 make
@@ -28,17 +28,17 @@ ctest -R PLY
 ## Testing architecture
 
 There are multiple layers of tests to ensure that testing covers all aspects of the application. The layers of the application are
- - UI (Application) layer
+ - Application layer
  - Library layer
  - Bindings layer
  - VTK Extension layer
 
-When contributing to F3D, it is necessary that new code is covered by a test in at least one layer above. Additional tests can be created in other layers, depending on the new functionality / bugfix.
+When contributing to F3D, it is necessary that new code is covered by a test in at least one layer above. Additional tests can be created in other layers, depending on the new functionality/bugfix.
 
 ### Application layer
 
-All application tests are initiated via the `ctest` testing framework.
-`ctest` then runs `f3d` with the `--output` and `--ref` arguments which renders an output image and compares it to a reference image. `f3d` also compares the differences between the 2 images and generates a diff file if there is a difference.
+All application tests are initiated via the `CTest` (https://cmake.org/cmake/help/book/mastering-cmake/chapter/Testing%20With%20CMake%20and%20CTest.html) testing framework.
+`CTest` runs `f3d` with the `--output` and `--ref` arguments which renders an output image and compares it to a reference image. `f3d` compares the differences between the 2 images and generates a diff file if there are differences between the images.
 
 All aspects of the application test framework are handled in `application/testing/CMakeLists.txt`.
 
@@ -60,15 +60,15 @@ Once the new test has been added, configure and build F3D, then run the test (-V
 ctest -R TestName -VV
 ```
 
-The test will fail but an image output will be generated in the build directory, namely `build/Testing/Temporary/TestName.png`.
+The test will run and fail but an image output will be generated in the build directory, namely `Testing/Temporary/TestName.png`.
 Visually check that the generated file looks as expected, then add it to the F3D sources in `testing/baselines`.
 Rerun the test, it should now pass.
 
 ### Recovering baselines from CI
-Occasionally you may need to recover a baseline from the CI. If this is required, create a PR and let the test run (fail) on CI. Check the actions run summary on Github and download the appropriate `baseline` archive. Extract it and navigate to the `build/Testing/Temporary/TestName.png`. Extract this file and add it to the `testing/baselines` directory.
+Occasionally you may need to recover a baseline from the CI. If this is required, create a PR and let the test run and fail on CI. Check the actions run summary on Github and download the appropriate `baseline` archive. Extract the archive and navigate to the `build/Testing/Temporary/TestName.png`. Visually check that the generated file looks as expected, then add it to the F3D sources in `testing/baselines`.
 
 ### Creating Interaction tests
-Sometimes you may contribute changes that affect how the end user interacts with F3D, example, toggling orthographic projection on/off or zooming in/out of the rendered image. These human interactions are simulated by interaction tests. F3D has the functionality to record human interactions such as mouse wheel scrolls, mouse movements as well as keypresses to a file. This is enabled by running 
+Sometimes you may contribute changes that affect how the end user interacts with F3D, example, toggling orthographic projection on/off or zooming in/out of the rendered image. These human interactions are simulated by interaction tests. F3D has the functionality to record human interactions such as mouse wheel scrolls, mouse movements as well as keypresses to a file. This functionality is enabled by running 
 
 ```
 f3d --interaction-test-record ./TestName.log
@@ -79,13 +79,13 @@ where
 
 While recording the interaction, care should be taken to perform the minimum number of events to simulate the interaction. For example, if you want to simulate the number `5` being pressed, there should be no mouse events or other keypress events during the recording of the interaction. The interaction file is saved when `f3d` is exited.
 
-You can verify that your interaction test file is correct by running
+You can verify that your interaction file is correct by playing back the interaction
 
 ```
 f3d --interaction-test-play ./TestName.log
 ```
 
-After you have verififed that the interaction file works as expected, copy it to `./testing/recordings`. The name of the interaction file should be the same as the test name. The interaction test case can be created by adding 
+Small additions can be made to the interaction log file manually. After verifying that the interaction file works as expected, copy it to `./testing/recordings`. The name of the interaction file should be the same as the test name. The interaction test case can then be created by adding 
 
 ```
 f3d_test(NAME TestName DATA datafile.ext INTERACTION DEFAULT_LIGHTS)
@@ -94,16 +94,9 @@ f3d_test(NAME TestName DATA datafile.ext INTERACTION DEFAULT_LIGHTS)
 to `application/testing/CMakeLists.txt`
 
  where
- - `NAME` should be the name of the test, which must be unique
- - `DATA` should be a file in `testing/data` directory, though adding a new file is possible
  - `INTERACTION` signifies that this is an interaction test
- - `DEFAULT_LIGHTS` is expected when performing baselines comparison
 
-Once the new test has been added, configure and build F3D, then run the test (-VV for verbose output):
-
-```
-ctest -R TestName -VV
-```
+The steps to running the test are the same as above.
 
 ### Library layer
 
