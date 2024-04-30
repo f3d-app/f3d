@@ -579,7 +579,7 @@ int F3DStarter::Start(int argc, char** argv)
       {
         std::filesystem::path path =
           this->Internals->applyFilenameTemplate(this->Internals->AppOptions.Output);
-        img.save(path);
+        img.save(path.string());
         f3d::log::debug("Output image saved to ", path);
       }
 
