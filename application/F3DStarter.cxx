@@ -223,7 +223,7 @@ public:
       }
     }
     {
-      std::regex re("\\{model\\.ext\\}");
+      std::regex re("\\{model[.]ext\\}");
       if (std::regex_search(filename, re))
       {
         const auto file = FilesList[CurrentFileIndex];
@@ -249,7 +249,7 @@ public:
       }
     }
 
-    return std::filesystem::path(filename);
+    return { filename };
   }
 
   F3DOptionsParser Parser;
