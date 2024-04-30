@@ -531,7 +531,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
   if (appOptions.ScreenshotFilename.empty())
   {
-    appOptions.ScreenshotFilename = "{app}/{model}.png";
+    appOptions.ScreenshotFilename = "{app}/{model}_{n}.png";
   }
 }
 
