@@ -271,7 +271,7 @@ public:
           {
             fragments.emplace_back(variableLookup(std::regex_replace(m, substVarRe, "$2")), true);
           }
-          catch (std::out_of_range& e)
+          catch (std::out_of_range&)
           {
             fragments.emplace_back(m, false);
           }
