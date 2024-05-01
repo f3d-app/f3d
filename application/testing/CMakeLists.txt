@@ -216,17 +216,28 @@ if(NOT F3D_MACOS_BUNDLE)
 endif()
 
 # Screenshot Interaction
+function(f3d_ss_test)
+  cmake_parse_arguments(F3D_SS_TEST "" "NAME;TEMPLATE;EXPECTED;DEPENDS" "ARGS" ${ARGN})
+  f3d_test(NAME TestScreenshot${F3D_SS_TEST_NAME} DATA suzanne.ply ARGS --screenshot-filename=${F3D_SS_TEST_TEMPLATE} --dry-run --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log NO_BASELINE DEPENDS TestClearScreenshots)
+  f3d_test(NAME TestScreenshot${F3D_SS_TEST_NAME}File DATA suzanne.ply ARGS --ref=${F3D_SS_TEST_EXPECTED} DEPENDS TestScreenshot${F3D_SS_TEST_NAME} TestScreenshot${F3D_SS_TEST_DEPENDS} NO_BASELINE LONG_TIMEOUT)
+endfunction()
+
 if(F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
   set(_screenshot_dir ${CMAKE_BINARY_DIR}/Testing/Temporary/ss)
   add_test(NAME f3d::TestClearScreenshots COMMAND ${CMAKE_COMMAND} -E remove_directory ${_screenshot_dir})
-  f3d_test(NAME TestScreenshot DATA suzanne.ply ARGS --screenshot-filename=${_screenshot_dir}/{app}-{version}/{model.ext}_{n}.png INTERACTION DEPENDS TestClearScreenshots NO_BASELINE)
-  f3d_test(NAME TestScreenshotFile1 DATA suzanne.ply ARGS --ref=${_screenshot_dir}/${PROJECT_NAME}-${F3D_VERSION}/suzanne.ply_1.png DEPENDS TestScreenshot NO_BASELINE LONG_TIMEOUT)
-  f3d_test(NAME TestScreenshotFile2 DATA suzanne.ply ARGS --ref=${_screenshot_dir}/${PROJECT_NAME}-${F3D_VERSION}/suzanne.ply_2.png DEPENDS TestScreenshot NO_BASELINE LONG_TIMEOUT)
-  
-  f3d_test(NAME TestScreenshotUser DATA suzanne.ply ARGS --screenshot-filename={app}-{version_full}/{model}.png INTERACTION DEPENDS TestClearScreenshots NO_BASELINE)
-  set_tests_properties(f3d::TestScreenshotUser PROPERTIES ENVIRONMENT "XDG_PICTURES_DIR=${_screenshot_dir}/user;HOME=${_screenshot_dir}/user;USERPROFILE=${_screenshot_dir}/user")
-  f3d_test(NAME TestScreenshotUserFile1 DATA suzanne.ply ARGS --ref=${_screenshot_dir}/user/${PROJECT_NAME}-${F3D_VERSION_FULL}/suzanne.png DEPENDS TestScreenshotUser NO_BASELINE LONG_TIMEOUT)
-  f3d_test(NAME TestScreenshotUserFile2 DATA suzanne.ply ARGS --ref=${_screenshot_dir}/user/${PROJECT_NAME}-${F3D_VERSION_FULL}/suzanne.png DEPENDS TestScreenshotUser NO_BASELINE LONG_TIMEOUT)
+
+  f3d_ss_test(NAME Version TEMPLATE ${_screenshot_dir}/{app}_{version}_{version_full}.png EXPECTED ${_screenshot_dir}/${PROJECT_NAME}_${F3D_VERSION}_${F3D_VERSION_FULL}.png)
+  f3d_ss_test(NAME Model TEMPLATE ${_screenshot_dir}/{model}_{model.ext}_{model_ext}.png EXPECTED ${_screenshot_dir}/suzanne_suzanne.ply_ply.png)
+  f3d_ss_test(NAME ModelN1 TEMPLATE ${_screenshot_dir}/{model}_{n}_{n:2}.png EXPECTED ${_screenshot_dir}/suzanne_1_01.png)
+  f3d_ss_test(NAME ModelN2 TEMPLATE ${_screenshot_dir}/{model}_{n}_{n:2}.png EXPECTED ${_screenshot_dir}/suzanne_2_02.png DEPENDS ModelN1)
+  string(TIMESTAMP DATE_Y "%Y")
+  string(TIMESTAMP DATE_Ymd "%Y%m%d")
+  f3d_ss_test(NAME Date TEMPLATE ${_screenshot_dir}/{model}_{date}_{date:%Y}.png EXPECTED ${_screenshot_dir}/suzanne_${DATE_Ymd}_${DATE_Y}.png)
+  f3d_ss_test(NAME Esc TEMPLATE ${_screenshot_dir}/{model}_{{model}}_{}.png EXPECTED ${_screenshot_dir}/suzanne_{model}_{}.png)
+
+  set(_screenshot_user_dir ${_screenshot_dir}/user)
+  f3d_ss_test(NAME UserModelN TEMPLATE {model}_{n}.png EXPECTED ${_screenshot_user_dir}/suzanne_1.png)
+  set_tests_properties(f3d::TestScreenshotUserModelN PROPERTIES ENVIRONMENT "XDG_PICTURES_DIR=${_screenshot_user_dir};HOME=${_screenshot_user_dir};USERPROFILE=${_screenshot_user_dir}")
 endif()
 
 if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)

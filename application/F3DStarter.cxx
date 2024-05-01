@@ -195,61 +195,164 @@ public:
    * - `{version_full}`: full application version (eg. `2.4.0-abcdefgh`)
    * - `{model}`: current model filename without extension (eg. `foo` for `/home/user/foo.glb`)
    * - `{model.ext}`: current model filename with extension (eg. `foo.glb` for `/home/user/foo.glb`)
+   * - `{model_ext}`: current model filename extension (eg. `glb` for `/home/user/foo.glb`)
+   * - `{date}`: current date in YYYYMMDD format
+   * - `{date:format}`: current date as per C++'s `std::put_time` format)
    * - `{n}`: auto-incremented number to make filename unique
+   * - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique
    */
-  std::filesystem::path applyFilenameTemplate(const std::string& filenameTemplate)
+  std::filesystem::path applyFilenameTemplate(const std::string& templateString)
   {
-    std::string filename = filenameTemplate;
+    const std::regex numberingRe("\\{(n:?([0-9]*))\\}");
+    const std::regex dateRe("date:?([A-Za-z%]*)");
 
+    /* return value for template variable name (eg. `app` -> `F3D`) */
+    const auto variableLookup = [&](const std::string& var)
     {
-      std::regex re("\\{app\\}");
-      filename = std::regex_replace(filename, re, F3D::AppName);
-    }
-    {
-      std::regex re("\\{version\\}");
-      filename = std::regex_replace(filename, re, F3D::AppVersion);
-    }
-    {
-      std::regex re("\\{version_full\\}");
-      filename = std::regex_replace(filename, re, F3D::AppVersionFull);
-    }
-
-    {
-      std::regex re("\\{model\\}");
-      if (std::regex_search(filename, re))
+      if (var == "app")
       {
-        const auto file = FilesList[CurrentFileIndex];
-        filename = std::regex_replace(filename, re, file.stem().string());
+        return F3D::AppName;
       }
-    }
-    {
-      std::regex re("\\{model[.]ext\\}");
-      if (std::regex_search(filename, re))
+      else if (var == "version")
       {
-        const auto file = FilesList[CurrentFileIndex];
-        filename = std::regex_replace(filename, re, file.filename().string());
+        return F3D::AppVersion;
       }
-    }
-
-    {
-      /* try and find non-existing filename; must be done last, assumes full path */
-      std::regex re("\\{n\\}");
-      if (std::regex_search(filename, re))
+      else if (var == "version_full")
       {
-        std::string fn = std::regex_replace(filename, re, "1");
-        for (size_t i = 2; std::filesystem::exists(fn) && i < 1000000; ++i)
+        return F3D::AppVersionFull;
+      }
+      else if (var == "model")
+      {
+        return FilesList[CurrentFileIndex].stem().string();
+      }
+      else if (var == "model.ext")
+      {
+        return FilesList[CurrentFileIndex].filename().string();
+      }
+      else if (var == "model_ext")
+      {
+        return FilesList[CurrentFileIndex].extension().string().substr(1);
+      }
+      else if (std::regex_match(var, dateRe))
+      {
+        auto fmt = std::regex_replace(var, dateRe, "$1");
+        if (fmt.empty())
         {
-          fn = std::regex_replace(filename, re, std::to_string(i));
+          fmt = "%Y%m%d";
         }
-        if (std::filesystem::exists(fn))
-        {
-          throw std::runtime_error("could not find available unique filename");
-        }
-        filename = fn;
+        std::time_t t = std::time(nullptr);
+        std::stringstream joined;
+        joined << std::put_time(std::localtime(&t), fmt.c_str());
+        return joined.str();
       }
+      throw std::out_of_range(var);
+    };
+
+    /* process template as tokens, keeping track of whether they've been
+     * substituted or left untouched */
+    const auto substituteVariables = [&]()
+    {
+      const std::string varName = "[\\w_.%:-]+";
+      const std::string escapedVar = "(\\{(\\{" + varName + "\\})\\})";
+      const std::string substVar = "(\\{(" + varName + ")\\})";
+      const std::regex escapedVarRe(escapedVar);
+      const std::regex substVarRe(substVar);
+
+      std::vector<std::pair<std::string, bool> > fragments;
+      const auto callback = [&](const std::string& m)
+      {
+        if (std::regex_match(m, escapedVarRe))
+        {
+          fragments.emplace_back(std::regex_replace(m, escapedVarRe, "$2"), true);
+        }
+        else if (std::regex_match(m, substVarRe))
+        {
+          try
+          {
+            fragments.emplace_back(variableLookup(std::regex_replace(m, substVarRe, "$2")), true);
+          }
+          catch (std::out_of_range& e)
+          {
+            fragments.emplace_back(m, false);
+          }
+        }
+        else
+        {
+          fragments.emplace_back(m, false);
+        }
+      };
+
+      const std::regex re(escapedVar + "|" + substVar);
+      std::sregex_token_iterator begin(templateString.begin(), templateString.end(), re, { -1, 0 });
+      std::for_each(begin, std::sregex_token_iterator(), callback);
+
+      return fragments;
+    };
+
+    const auto fragments = substituteVariables();
+
+    /* check the non-substituted fragments for numbering variables */
+    const auto hasNumbering = [&]()
+    {
+      for (const auto& [fragment, processed] : fragments)
+      {
+        if (!processed && std::regex_search(fragment, numberingRe))
+        {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    /* just join and return if there's no numbering to be done */
+    if (!hasNumbering())
+    {
+      std::stringstream joined;
+      for (const auto& fragment : fragments)
+      {
+        joined << fragment.first;
+      }
+      return { joined.str() };
     }
 
-    return { filename };
+    /* apply numbering in the non-substituted fragments and join */
+    const auto applyNumbering = [&](const size_t i)
+    {
+      std::stringstream joined;
+      for (const auto& [fragment, processed] : fragments)
+      {
+        if (!processed && std::regex_match(fragment, numberingRe))
+        {
+          std::stringstream formattedNumber;
+          try
+          {
+            const std::string fmt = std::regex_replace(fragment, numberingRe, "$2");
+            formattedNumber << std::setfill('0') << std::setw(std::stoi(fmt)) << i;
+          }
+          catch (std::invalid_argument&)
+          {
+            formattedNumber << std::setw(0) << i;
+          }
+          joined << std::regex_replace(fragment, numberingRe, formattedNumber.str());
+        }
+        else
+        {
+          joined << fragment;
+        }
+      }
+      return joined.str();
+    };
+
+    /* apply incrementing numbering until file doesn't exist already */
+    for (size_t i = 1; i < 1000000; ++i)
+    {
+      const std::string candidate = applyNumbering(i);
+      if (!std::filesystem::exists(candidate))
+      {
+        return { candidate };
+      }
+    }
+    throw std::runtime_error("could not find available unique filename");
   }
 
   F3DOptionsParser Parser;
@@ -828,7 +931,8 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
   std::filesystem::create_directories(std::filesystem::path(path).parent_path());
   f3d::log::info("saving screenshot to " + path.string());
 
-  f3d::image img = this->Internals->Engine->getWindow().renderToImage();
+  f3d::image img =
+    this->Internals->Engine->getWindow().renderToImage(this->Internals->AppOptions.NoBackground);
   this->Internals->addOutputImageMetadata(img);
   img.save(path.string(), f3d::image::SaveFormat::PNG);
 
