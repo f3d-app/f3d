@@ -8,7 +8,7 @@ There are a few CMake options to configure the F3D testing framework:
 * `BUILD_TESTING`: Enable the test framework, off by default.
 * `F3D_TESTING_ENABLE_RENDERING_TESTS`: An option to enable/disable test that require rendering capabilities, on by default.
 * `F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS`: Certain tests can take some time to run, off by default, requires rendering tests.
-* `F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON`: With VTK < 9.0.0, rendering can be very different, although not incorrect, so this option is provided, off by default.
+* `F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON`: With VTK < 9.1.0, rendering can be very different, although not incorrect, so this option is provided, off by default.
 
 ## Running the tests
 
@@ -33,7 +33,7 @@ There are multiple layers of tests to ensure that testing covers all aspects of 
  - Bindings layer
  - VTK Extension layer
 
-When contributing to F3D, it is necessary that new code is covered by a test in at least one layer above. Additional tests can be created in other layers, depending on the new functionality/bugfix.
+When contributing to F3D, it is necessary that new code is covered by a test in at least one layer above. Additional tests can be created in other layers, depending on the change.
 
 ### Application layer
 
@@ -85,7 +85,7 @@ You can verify that your interaction file is correct by playing back the interac
 f3d --interaction-test-play ./TestName.log
 ```
 
-Small additions can be made to the interaction log file manually. After verifying that the interaction file works as expected, copy it to `./testing/recordings`. The name of the interaction file should be the same as the test name. The interaction test case can then be created by adding 
+Interactions that are not needed for the test can be removed manually. After verifying that the interaction file works as expected, copy it to `./testing/recordings`. The name of the interaction file should be the same as the test name. The interaction test case can then be created by adding 
 
 ```
 f3d_test(NAME TestName DATA datafile.ext INTERACTION DEFAULT_LIGHTS)

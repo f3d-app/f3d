@@ -132,10 +132,7 @@ cmake --build .
 
 ### Running the test suite
 
- * Open cmd
-
-```sh
-cd C:\dev\f3d\build
+```
 cmake -DBUILD_TESTING=ON .
 cmake --build .
 ctest
@@ -195,7 +192,6 @@ You can then simply run F3D from the command line:
 ### Running the test suite
 
 ```
-cd build
 cmake -DBUILD_TESTING=ON ../src
 make
 ctest
