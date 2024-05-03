@@ -134,7 +134,7 @@ cmake --build .
 
 ```
 cmake -DBUILD_TESTING=ON .
-cmake --build .
+cmake --build . --config Release
 ctest
 ```
 
