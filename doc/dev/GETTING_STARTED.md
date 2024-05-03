@@ -135,7 +135,7 @@ cmake --build .
 ```
 cmake -DBUILD_TESTING=ON .
 cmake --build . --config Release
-ctest
+ctest -C Release
 ```
 
 ## macOS
