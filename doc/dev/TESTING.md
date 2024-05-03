@@ -1,6 +1,6 @@
 # Testing
 
-F3D has an expansive suite of tests that can be run locally, either to validate your build or because you are contributing to F3D and want to add/modify a test.
+F3D has an extensive suite of tests that can be run locally, either to validate your build or because you are contributing to F3D and want to add/modify a test.
 
 ## CMake Options
 
