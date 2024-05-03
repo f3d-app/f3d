@@ -63,6 +63,14 @@ You can then simply run F3D from the command line:
 ./bin/f3d
 ```
 
+### Running the test suite
+
+```
+cmake -DBUILD_TESTING=ON ../src
+make
+ctest
+```
+
 ## Windows
 
 Note: The following steps were tested with Visual Studio Community 2022 using Windows 10, but should also work for other versions
@@ -122,6 +130,14 @@ cmake --build .
 
  * Double click on the `C:\dev\f3d\build\bin_Debug\f3d.exe` executable
 
+### Running the test suite
+
+```
+cmake -DBUILD_TESTING=ON .
+cmake --build . --config Release
+ctest -C Release
+```
+
 ## macOS
 
 Note: The following steps were tested with macOS Catalina using Xcode 12.4, but should also work for other versions
@@ -171,6 +187,14 @@ You can then simply run F3D from the command line:
 
 ```
 ./bin/f3d.app/Contents/MacOS/f3d
+```
+
+### Running the test suite
+
+```
+cmake -DBUILD_TESTING=ON ../src
+make
+ctest
 ```
 
 [cmake-download]: https://cmake.org/download
