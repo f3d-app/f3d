@@ -15,7 +15,7 @@ There are a few CMake options to configure the F3D testing framework:
 To run all tests, build and then run `ctest` from the build directory:
 
 ```
-make
+cmake --build .
 ctest
 ```
 
@@ -38,7 +38,7 @@ When contributing to F3D, it is necessary that new code is covered by a test in 
 ### Application layer
 
 All application tests are initiated via the `CTest` (https://cmake.org/cmake/help/book/mastering-cmake/chapter/Testing%20With%20CMake%20and%20CTest.html) testing framework.
-`CTest` runs `f3d` with the `--output` and `--ref` arguments which renders an output image and compares it to a reference image. `f3d` compares the differences between the 2 images and generates a diff file if there are differences between the images.
+`CTest` runs `f3d` with the `--output` and `--ref` arguments which renders an output image and compares it to a reference image. F3D compares the differences between the 2 images and generates a diff file if there are differences between the images.
 
 All aspects of the application test framework are handled in `application/testing/CMakeLists.txt`.
 
@@ -54,7 +54,7 @@ f3d_test(NAME TestName DATA datafile.ext ARGS --args-to-test DEFAULT_LIGHTS)
  - `ARGS` should be the F3D options to pass to the f3d executable, if any
  - `DEFAULT_LIGHTS` is expected when performing baselines comparison
 
-Once the new test has been added, configure and build F3D, then run the test (-VV for verbose output):
+Once the new test has been added, configure and build F3D, then run the test (`-VV` for verbose output):
 
 ```
 ctest -R TestName -VV
