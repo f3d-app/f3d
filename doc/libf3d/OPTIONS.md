@@ -81,6 +81,7 @@ render.background.color|vector\<double\><br>0.2,0.2,0.2<br>render|Set the window
 render.background.skybox|bool<br>false<br>render|Show the *HDRI* image as a skybox<br>Overrides the the background color if any|\-\-hdri-skybox
 render.background.blur|bool<br>false<br>render|Blur background, useful with a skybox.|\-\-blur-background
 render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-background-coc
+render.light.intensity|double<br>1.0<br>render|Adjust the intensity of every light in the scene.|\-\-light-intensity
 
 ## UI Options
 
