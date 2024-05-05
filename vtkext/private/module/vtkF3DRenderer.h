@@ -281,6 +281,7 @@ protected:
   bool CheatSheetVisible = false;
   bool DropZoneVisible = false;
   bool HDRISkyboxVisible = false;
+  bool BackfaceCullingVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
@@ -291,6 +292,7 @@ protected:
   bool UseOrthographicProjection = false;
   bool UseTrackball = false;
   bool InvertZoom = false;
+
 
   int RaytracingSamples = 0;
   int UpIndex = 1;
