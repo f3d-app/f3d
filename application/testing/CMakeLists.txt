@@ -235,7 +235,8 @@ f3d_ss_test(NAME Date TEMPLATE ${_screenshot_dir}/{model}_{date}_{date:%Y}.png E
 f3d_ss_test(NAME Esc TEMPLATE ${_screenshot_dir}/{model}_{{model}}_{}.png EXPECTED ${_screenshot_dir}/suzanne_{model}_{}.png)
 
 set(_screenshot_user_dir ${_screenshot_dir}/user)
-f3d_ss_test(NAME UserModelN TEMPLATE {model}_{n}.png EXPECTED ${_screenshot_user_dir}/suzanne_1.png)
+add_test(NAME f3d::TestSetupScreenshotsUser COMMAND ${CMAKE_COMMAND} -E make_directory ${_screenshot_user_dir})
+f3d_ss_test(NAME UserModelN TEMPLATE {model}_{n}.png EXPECTED ${_screenshot_user_dir}/suzanne_1.png DEPENDS TestSetupScreenshotsUser)
 set_tests_properties(f3d::TestScreenshotUserModelN PROPERTIES ENVIRONMENT "XDG_PICTURES_DIR=${_screenshot_user_dir};HOME=${_screenshot_user_dir};USERPROFILE=${_screenshot_user_dir}")
 
 if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
