@@ -1337,6 +1337,7 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
   cheatSheetText << std::fixed;
   cheatSheetText << " L: Light (increase, shift+L: decrease) [" << this->LightIntensity << "]"
                  << " \n";
+  cheatSheetText << " F1: Enable Backface Culling " << (this->BackfaceCullingVisible ? "[ON]" : "[OFF]") << "\n";
 }
 
 //----------------------------------------------------------------------------
@@ -1352,6 +1353,8 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       anActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
       anActor->GetProperty()->SetLineWidth(this->LineWidth);
       anActor->GetProperty()->SetPointSize(this->PointSize);
+
+      anActor->GetProperty()->SetBackfaceCulling(this->BackfaceCullingVisible);
     }
   }
   this->ActorsPropertiesConfigured = true;
