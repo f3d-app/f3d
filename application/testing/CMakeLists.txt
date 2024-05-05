@@ -218,12 +218,13 @@ endif()
 # Screenshot Interaction
 function(f3d_ss_test)
   cmake_parse_arguments(F3D_SS_TEST "" "NAME;TEMPLATE;EXPECTED;DEPENDS" "ARGS" ${ARGN})
-  f3d_test(NAME TestScreenshot${F3D_SS_TEST_NAME} DATA suzanne.ply ARGS --screenshot-filename=${F3D_SS_TEST_TEMPLATE} --dry-run --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log NO_BASELINE DEPENDS TestClearScreenshots)
+  f3d_test(NAME TestScreenshot${F3D_SS_TEST_NAME} DATA suzanne.ply ARGS --screenshot-filename=${F3D_SS_TEST_TEMPLATE} --dry-run --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log NO_BASELINE DEPENDS TestSetupScreenshots)
   f3d_test(NAME TestScreenshot${F3D_SS_TEST_NAME}File DATA suzanne.ply ARGS --ref=${F3D_SS_TEST_EXPECTED} DEPENDS TestScreenshot${F3D_SS_TEST_NAME} TestScreenshot${F3D_SS_TEST_DEPENDS} NO_BASELINE)
 endfunction()
 
 set(_screenshot_dir ${CMAKE_BINARY_DIR}/Testing/Temporary/ss)
-add_test(NAME f3d::TestClearScreenshots COMMAND ${CMAKE_COMMAND} -E remove_directory ${_screenshot_dir})
+set(_screenshot_user_dir ${_screenshot_dir}/user)
+add_test(NAME f3d::TestSetupScreenshots COMMAND ${CMAKE_COMMAND} -E remove_directory ${_screenshot_dir} -E make_directory ${_screenshot_user_dir})
 
 f3d_ss_test(NAME Version TEMPLATE ${_screenshot_dir}/{app}_{version}_{version_full}.png EXPECTED ${_screenshot_dir}/${PROJECT_NAME}_${F3D_VERSION}_${F3D_VERSION_FULL}.png)
 f3d_ss_test(NAME Model TEMPLATE ${_screenshot_dir}/{model}_{model.ext}_{model_ext}.png EXPECTED ${_screenshot_dir}/suzanne_suzanne.ply_ply.png)
@@ -234,9 +235,7 @@ string(TIMESTAMP DATE_Ymd "%Y%m%d")
 f3d_ss_test(NAME Date TEMPLATE ${_screenshot_dir}/{model}_{date}_{date:%Y}.png EXPECTED ${_screenshot_dir}/suzanne_${DATE_Ymd}_${DATE_Y}.png)
 f3d_ss_test(NAME Esc TEMPLATE ${_screenshot_dir}/{model}_{{model}}_{}.png EXPECTED ${_screenshot_dir}/suzanne_{model}_{}.png)
 
-set(_screenshot_user_dir ${_screenshot_dir}/user)
-add_test(NAME f3d::TestSetupScreenshotsUser COMMAND ${CMAKE_COMMAND} -E make_directory ${_screenshot_user_dir})
-f3d_ss_test(NAME UserModelN TEMPLATE {model}_{n}.png EXPECTED ${_screenshot_user_dir}/suzanne_1.png DEPENDS TestSetupScreenshotsUser)
+f3d_ss_test(NAME UserModelN TEMPLATE {model}_{n}.png EXPECTED ${_screenshot_user_dir}/suzanne_1.png)
 set_tests_properties(f3d::TestScreenshotUserModelN PROPERTIES ENVIRONMENT "XDG_PICTURES_DIR=${_screenshot_user_dir};HOME=${_screenshot_user_dir};USERPROFILE=${_screenshot_user_dir}")
 
 if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
