@@ -1315,7 +1315,6 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
   cheatSheetText << std::fixed;
   cheatSheetText << " L: Light (increase, shift+L: decrease) [" << this->LightIntensity << "]"
                  << " \n";
-  cheatSheetText << " F1: Enable Backface Culling " << (this->BackfaceCullingVisible ? "[ON]" : "[OFF]") << "\n";
 }
 
 //----------------------------------------------------------------------------
