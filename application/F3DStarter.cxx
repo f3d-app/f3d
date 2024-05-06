@@ -198,12 +198,13 @@ public:
    * - `{model_ext}`: current model filename extension (eg. `glb` for `/home/user/foo.glb`)
    * - `{date}`: current date in YYYYMMDD format
    * - `{date:format}`: current date as per C++'s `std::put_time` format
-   * - `{n}`: auto-incremented number to make filename unique
+   * - `{n}`: auto-incremented number to make filename unique (up to 1000000)
    * - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique
+   *   (up to 1000000)
    */
-  std::filesystem::path applyFilenameTemplate(
-    const std::string& templateString, size_t maxNumberingAttempts = 1000000)
+  std::filesystem::path applyFilenameTemplate(const std::string& templateString)
   {
+    constexpr size_t maxNumberingAttempts = 1000000;
     const std::regex numberingRe("\\{(n:?([0-9]*))\\}");
     const std::regex dateRe("date:?([A-Za-z%]*)");
 
@@ -353,7 +354,8 @@ public:
         return { candidate };
       }
     }
-    throw std::runtime_error("could not find available unique filename");
+    throw std::runtime_error("could not find available unique filename after " +
+      std::to_string(maxNumberingAttempts) + " attempts");
   }
 
   F3DOptionsParser Parser;

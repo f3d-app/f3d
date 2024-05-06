@@ -18,7 +18,7 @@ Options|Default|Description
 \-\-watch||Watch current file and automatically reload it whenever it is modified on disk.
 \-\-load-plugins=\<paths or names\>||List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `exodus`, `occt`, `usd`, `vdb`. See [usage](USAGE.md) for more info.
 \-\-scan-plugins||Scan standard directories for plugins and display their names, results may be incomplete. See [usage](USAGE.md) for more info.
-\-\-screenshot-filename||[Screenshot](INTERACTIONS.md#taking-screenshots) filename template. Can use [template variables](#filename-templating).
+\-\-screenshot-filename=\<png file\>||Filename to save [screenshots](INTERACTIONS.md#taking-screenshots) to. Can use [template variables](#filename-templating).
 
 ## General Options
 
@@ -156,8 +156,8 @@ The destination filename used by `--output` or to save screenshots can use the f
 - `{model_ext}`: current model filename extension (eg. `glb` for `/home/user/foo.glb`)
 - `{date}`: current date in YYYYMMDD format
 - `{date:format}`: current date as per C++'s `std::put_time` format
-- `{n}`: auto-incremented number to make filename unique
-- `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique
+- `{n}`: auto-incremented number to make filename unique (up to 1000000)
+- `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique (up to 1000000)
 - variable names can be escaped by doubling the braces (eg. use `{{model}}.png` to output `{model}.png` without the model name being substituted)
 
 For example the screenshot filename is configured as `{app}/{model}_{n}.png` by default, meaning that, assuming the model `hello.glb` is being viewed,

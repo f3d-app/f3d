@@ -95,7 +95,7 @@ as specified above.
 
 ## Taking Screenshots
 
-The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd>) is configurable and can use template variables as described [on the options page](OPTIONS.md#filename-templating).
+The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd>) is configurable (using the `screenshot-filename` option) and can use template variables as described [on the options page](OPTIONS.md#filename-templating).
 
 Unless the configured filename template is an absolute path, images will be saved into the user's home directory
-(using the following environment variables: `XDG_PICTURES_DIR`, `HOME`, or `USERPROFILE`).
+(using the following environment variables, if defined and pointing to an existing directory, in that order: `XDG_PICTURES_DIR`, `HOME`, or `USERPROFILE`).
