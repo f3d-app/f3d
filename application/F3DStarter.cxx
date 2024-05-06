@@ -190,18 +190,19 @@ public:
 
   /**
    * Substitute the following variables in a filename template:
-   * - `{app}`: application name (eg. `F3D`)
+   * - `{app}`: application name (ie. `F3D`)
    * - `{version}`: application version (eg. `2.4.0`)
    * - `{version_full}`: full application version (eg. `2.4.0-abcdefgh`)
    * - `{model}`: current model filename without extension (eg. `foo` for `/home/user/foo.glb`)
    * - `{model.ext}`: current model filename with extension (eg. `foo.glb` for `/home/user/foo.glb`)
    * - `{model_ext}`: current model filename extension (eg. `glb` for `/home/user/foo.glb`)
    * - `{date}`: current date in YYYYMMDD format
-   * - `{date:format}`: current date as per C++'s `std::put_time` format)
+   * - `{date:format}`: current date as per C++'s `std::put_time` format
    * - `{n}`: auto-incremented number to make filename unique
    * - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique
    */
-  std::filesystem::path applyFilenameTemplate(const std::string& templateString)
+  std::filesystem::path applyFilenameTemplate(
+    const std::string& templateString, size_t maxNumberingAttempts = 1000000)
   {
     const std::regex numberingRe("\\{(n:?([0-9]*))\\}");
     const std::regex dateRe("date:?([A-Za-z%]*)");
@@ -344,7 +345,7 @@ public:
     };
 
     /* apply incrementing numbering until file doesn't exist already */
-    for (size_t i = 1; i < 1000000; ++i)
+    for (size_t i = 1; i <= maxNumberingAttempts; ++i)
     {
       const std::string candidate = applyNumbering(i);
       if (!std::filesystem::exists(candidate))

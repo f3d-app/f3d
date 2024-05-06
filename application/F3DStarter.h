@@ -45,6 +45,7 @@ public:
 
   /**
    * Trigger a render and save a screenshot to disk according to a filename template.
+   * See `F3DStarter::F3DInternals::applyFilenameTemplate` for template substitution details.
    */
   void SaveScreenshot(const std::string& filenameTemplate);
 
