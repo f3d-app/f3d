@@ -923,7 +923,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
     return std::filesystem::current_path();
   };
 
-  std::filesystem::path pathTemplate = std::filesystem::path(filenameTemplate);
+  std::filesystem::path pathTemplate = std::filesystem::path(filenameTemplate).make_preferred();
   std::filesystem::path fullPathTemplate =
     pathTemplate.is_absolute() ? pathTemplate : getScreenshotDir() / pathTemplate;
   std::filesystem::path path = this->Internals->applyFilenameTemplate(fullPathTemplate.string());

@@ -222,8 +222,10 @@ function(f3d_ss_test)
   f3d_test(NAME TestScreenshot${F3D_SS_TEST_NAME}File DATA suzanne.ply ARGS --ref=${F3D_SS_TEST_EXPECTED} DEPENDS TestScreenshot${F3D_SS_TEST_NAME} TestScreenshot${F3D_SS_TEST_DEPENDS} NO_BASELINE)
 endfunction()
 
-set(_screenshot_dir ${CMAKE_BINARY_DIR}/Testing/Temporary/ss)
-set(_screenshot_user_dir ${_screenshot_dir}/user)
+cmake_path(SET _screenshot_path ${CMAKE_BINARY_DIR}/Testing/Temporary/ss)
+cmake_path(SET _screenshot_user_path ${_screenshot_path}/user)
+cmake_path(NATIVE_PATH _screenshot_path _screenshot_dir)
+cmake_path(NATIVE_PATH _screenshot_user_path _screenshot_user_dir)
 add_test(NAME f3d::TestSetupScreenshots COMMAND ${CMAKE_COMMAND} -E remove_directory ${_screenshot_dir} -E make_directory ${_screenshot_user_dir})
 
 f3d_ss_test(NAME Version TEMPLATE ${_screenshot_dir}/{app}_{version}_{version_full}.png EXPECTED ${_screenshot_dir}/${PROJECT_NAME}_${F3D_VERSION}_${F3D_VERSION_FULL}.png)
