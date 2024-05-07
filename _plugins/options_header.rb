@@ -32,7 +32,7 @@ Jekyll::Hooks.register :pages, :pre_render do |page|
             converter.convert(md).strip.delete_prefix('<p>').delete_suffix('</p>')}
         }.join
         
-        # add anchor links to all known cli flags occurences
+        # add anchor links to all known cli flags occurrences
         page.content = page.content.gsub(/`(--?[^=`]+)(=[^`]*)?`/){|m|
             if cli_flags.include? $1 then "[`#{$1}#{$2}`](##{cli_flags[$1]})" else m end
         }
