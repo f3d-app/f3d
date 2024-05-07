@@ -168,6 +168,7 @@ Some rendering options are not compatible between them, here is the precedence o
 - Volume (`-v`)
 - Point Sprites (`-o`)
 
+
 ## Options syntax
 
 To turn on/off boolean options, it is possible to write `--option=true` and `--option=false`, eg `--points-sprites=false`.
