@@ -67,3 +67,10 @@ div.popup-container {
         margin-left: auto;
     }
 }
+
+/* dim value hints in header on Options page */
+h3.cli > em > code {
+    opacity: .5;
+    font-style: normal;
+    font-weight: normal;
+}
