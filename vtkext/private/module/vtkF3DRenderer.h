@@ -74,6 +74,7 @@ public:
   void SetUseFXAAPass(bool use);
   void SetUseToneMappingPass(bool use);
   void SetUseBlurBackground(bool use);
+  void SetUseBackface(bool use);
   void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);
   ///@}
@@ -280,7 +281,7 @@ protected:
   bool CheatSheetVisible = false;
   bool DropZoneVisible = false;
   bool HDRISkyboxVisible = false;
-  bool BackfaceCullingVisible = false;
+  bool UseBackface = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
