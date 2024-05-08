@@ -831,7 +831,7 @@ f3d_test(NAME TestTensorsVolumeDirect DATA tensors.vti ARGS -v --scalars=tensors
 f3d_test(NAME TestVerboseVolumeNoArray DATA cow.vtp ARGS -v REGEXP "Cannot use volume with this dataset" NO_BASELINE)
 
 # Test scalar rendering without any array
-f3d_test(NAME TestVerboseNoArray DATA cow.vtp ARGS -s REGEXP "No array to color with" NO_BASELINE)
+f3d_test(NAME TestVerboseNoArray DATA cow.vtp ARGS -s --verbose=debug REGEXP "No array to color with" NO_BASELINE)
 
 # Test non existent file, do not create nonExistentFile.vtp
 f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp REGEXP "File \".*nonExistentFile.vtp\" does not exist" NO_RENDER)

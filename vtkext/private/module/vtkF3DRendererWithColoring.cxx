@@ -525,7 +525,7 @@ void vtkF3DRendererWithColoring::SetColoring(
     else if (nIndexes == 0)
     {
       // Trying to color but no array available
-      F3DLog::Print(F3DLog::Severity::Warning, "No array to color with");
+      F3DLog::Print(F3DLog::Severity::Debug, "No array to color with");
       this->ArrayIndexForColoring = -1;
     }
     else if (arrayName.empty())
