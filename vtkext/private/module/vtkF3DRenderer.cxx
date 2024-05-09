@@ -1096,11 +1096,11 @@ void vtkF3DRenderer::SetUseBlurBackground(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseBackface(bool use)
+void vtkF3DRenderer::SetUseBackface(const std::string& backfaceType)
 {
-  if (this->UseBackface != use)
+  if (this->UseBackface != backfaceType)
   {
-    this->UseBackface = use;
+    this->UseBackface = backfaceType;
     this->RenderPassesConfigured = false;
   }
 }
@@ -1341,7 +1341,15 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       anActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
       anActor->GetProperty()->SetLineWidth(this->LineWidth);
       anActor->GetProperty()->SetPointSize(this->PointSize);
-      anActor->GetProperty()->SetBackfaceCulling(this->UseBackface);
+      if (this->UseBackface == "default")
+      {
+        anActor->GetProperty()->SetBackfaceCulling(false);
+      }
+      if (this->UseBackface == "hidden")
+      {
+        anActor->GetProperty()->SetBackfaceCulling(true);
+      }
+
     }
     vtkMapper* mapper = anActor->GetMapper();
     if (vtkF3DOpenGLGridMapper::SafeDownCast(mapper) != nullptr)
