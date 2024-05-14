@@ -72,6 +72,7 @@ Other hotkeys are available:
 * <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
 * <kbd>&uarr;</kbd>: reload the current file.
 * <kbd>&darr;</kbd>: add current file parent directory to the list of files, reload the current file and reset the camera.
+* <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
 
 When loading another file or reloading, options that have been changed interactively are kept but can be overridden
 if a dedicated regular expression block in the configuration file is present, see the [configuration file](CONFIGURATION_FILE.md)
@@ -91,3 +92,10 @@ component is found.
 When changing the type of data to color with, the index of the array within the data will be kept if valid
 with the new data. If not, it will cycle until a valid array is found. After that, the component will be checked
 as specified above.
+
+## Taking Screenshots
+
+The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd>) is configurable (using the `screenshot-filename` option) and can use template variables as described [on the options page](OPTIONS.md#filename-templating).
+
+Unless the configured filename template is an absolute path, images will be saved into the user's home directory
+(using the following environment variables, if defined and pointing to an existing directory, in that order: `XDG_PICTURES_DIR`, `HOME`, or `USERPROFILE`).

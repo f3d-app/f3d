@@ -6,7 +6,7 @@ F3D behavior can be fully controlled from the command line using the following o
 
 Options|Default|Description
 ------|------|------
-\-\-output=\<png file\>||Instead of showing a render view and render into it, *render directly into a png file*. When used with \-\-ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout.
+\-\-output=\<png file\>||Instead of showing a render view and render into it, *render directly into a png file*. When used with \-\-ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating).
 \-\-no-background||Use with \-\-output to output a png file with a transparent background.
 -h, \-\-help||Print *help* and exit. Ignore `--verbose`.
 \-\-version||Show *version* information and exit. Ignore `--verbose`.
@@ -18,6 +18,7 @@ Options|Default|Description
 \-\-watch||Watch current file and automatically reload it whenever it is modified on disk.
 \-\-load-plugins=\<paths or names\>||List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `exodus`, `occt`, `usd`, `vdb`. See [usage](USAGE.md) for more info.
 \-\-scan-plugins||Scan standard directories for plugins and display their names, results may be incomplete. See [usage](USAGE.md) for more info.
+\-\-screenshot-filename=\<png file\>|`{app}/{model}_{n}.png`|Filename to save [screenshots](INTERACTIONS.md#taking-screenshots) to. Can use [template variables](#filename-templating).
 
 ## General Options
 
@@ -142,3 +143,23 @@ Some rendering options are not compatible between them, here is the precedence o
 
 The `--options=value` syntax is used everywhere in this documentation, however, the syntax `--options value` can also be used, with the exception of options that have implicit values,
 `--verbose`, `--comp` and `--scalars`.
+
+## Filename templating
+
+The destination filename used by `--output` or to save screenshots can use the following template variables:
+
+- `{app}`: application name (ie. `F3D`)
+- `{version}`: application version (eg. `2.4.0`)
+- `{version_full}`: full application version (eg. `2.4.0-abcdefgh`)
+- `{model}`: current model filename without extension (eg. `foo` for `/home/user/foo.glb`)
+- `{model.ext}`: current model filename with extension (eg. `foo.glb` for `/home/user/foo.glb`)
+- `{model_ext}`: current model filename extension (eg. `glb` for `/home/user/foo.glb`)
+- `{date}`: current date in YYYYMMDD format
+- `{date:format}`: current date as per C++'s `std::put_time` format
+- `{n}`: auto-incremented number to make filename unique (up to 1000000)
+- `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique (up to 1000000)
+- variable names can be escaped by doubling the braces (eg. use `{{model}}.png` to output `{model}.png` without the model name being substituted)
+
+For example the screenshot filename is configured as `{app}/{model}_{n}.png` by default, meaning that, assuming the model `hello.glb` is being viewed,
+consecutive screenshots are going to be saved as `F3D/hello_1.png`, `F3D/hello_2.png`, `F3D/hello_3.png`, ...
+

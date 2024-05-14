@@ -36,6 +36,7 @@
 #include <filesystem>
 #include <iostream>
 #include <mutex>
+#include <regex>
 #include <set>
 
 namespace fs = std::filesystem;
@@ -165,6 +166,198 @@ public:
     }
   }
 
+  void addOutputImageMetadata(f3d::image& image)
+  {
+    std::stringstream cameraMetadata;
+    {
+      const auto state = Engine->getWindow().getCamera().getState();
+      const auto vec3toJson = [](const std::array<double, 3>& v)
+      {
+        std::stringstream ss;
+        ss << "[" << v[0] << ", " << v[1] << ", " << v[2] << "]";
+        return ss.str();
+      };
+      cameraMetadata << "{\n";
+      cameraMetadata << "  \"pos\": " << vec3toJson(state.pos) << ",\n";
+      cameraMetadata << "  \"foc\": " << vec3toJson(state.foc) << ",\n";
+      cameraMetadata << "  \"up\": " << vec3toJson(state.up) << ",\n";
+      cameraMetadata << "  \"angle\": " << state.angle << "\n";
+      cameraMetadata << "}\n";
+    }
+
+    image.setMetadata("camera", cameraMetadata.str());
+  }
+
+  /**
+   * Substitute the following variables in a filename template:
+   * - `{app}`: application name (ie. `F3D`)
+   * - `{version}`: application version (eg. `2.4.0`)
+   * - `{version_full}`: full application version (eg. `2.4.0-abcdefgh`)
+   * - `{model}`: current model filename without extension (eg. `foo` for `/home/user/foo.glb`)
+   * - `{model.ext}`: current model filename with extension (eg. `foo.glb` for `/home/user/foo.glb`)
+   * - `{model_ext}`: current model filename extension (eg. `glb` for `/home/user/foo.glb`)
+   * - `{date}`: current date in YYYYMMDD format
+   * - `{date:format}`: current date as per C++'s `std::put_time` format
+   * - `{n}`: auto-incremented number to make filename unique (up to 1000000)
+   * - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique
+   *   (up to 1000000)
+   */
+  std::filesystem::path applyFilenameTemplate(const std::string& templateString)
+  {
+    constexpr size_t maxNumberingAttempts = 1000000;
+    const std::regex numberingRe("\\{(n:?([0-9]*))\\}");
+    const std::regex dateRe("date:?([A-Za-z%]*)");
+
+    /* return value for template variable name (eg. `app` -> `F3D`) */
+    const auto variableLookup = [&](const std::string& var)
+    {
+      if (var == "app")
+      {
+        return F3D::AppName;
+      }
+      else if (var == "version")
+      {
+        return F3D::AppVersion;
+      }
+      else if (var == "version_full")
+      {
+        return F3D::AppVersionFull;
+      }
+      else if (var == "model")
+      {
+        return FilesList[CurrentFileIndex].stem().string();
+      }
+      else if (var == "model.ext")
+      {
+        return FilesList[CurrentFileIndex].filename().string();
+      }
+      else if (var == "model_ext")
+      {
+        return FilesList[CurrentFileIndex].extension().string().substr(1);
+      }
+      else if (std::regex_match(var, dateRe))
+      {
+        auto fmt = std::regex_replace(var, dateRe, "$1");
+        if (fmt.empty())
+        {
+          fmt = "%Y%m%d";
+        }
+        std::time_t t = std::time(nullptr);
+        std::stringstream joined;
+        joined << std::put_time(std::localtime(&t), fmt.c_str());
+        return joined.str();
+      }
+      throw std::out_of_range(var);
+    };
+
+    /* process template as tokens, keeping track of whether they've been
+     * substituted or left untouched */
+    const auto substituteVariables = [&]()
+    {
+      const std::string varName = "[\\w_.%:-]+";
+      const std::string escapedVar = "(\\{(\\{" + varName + "\\})\\})";
+      const std::string substVar = "(\\{(" + varName + ")\\})";
+      const std::regex escapedVarRe(escapedVar);
+      const std::regex substVarRe(substVar);
+
+      std::vector<std::pair<std::string, bool> > fragments;
+      const auto callback = [&](const std::string& m)
+      {
+        if (std::regex_match(m, escapedVarRe))
+        {
+          fragments.emplace_back(std::regex_replace(m, escapedVarRe, "$2"), true);
+        }
+        else if (std::regex_match(m, substVarRe))
+        {
+          try
+          {
+            fragments.emplace_back(variableLookup(std::regex_replace(m, substVarRe, "$2")), true);
+          }
+          catch (std::out_of_range&)
+          {
+            fragments.emplace_back(m, false);
+          }
+        }
+        else
+        {
+          fragments.emplace_back(m, false);
+        }
+      };
+
+      const std::regex re(escapedVar + "|" + substVar);
+      std::sregex_token_iterator begin(templateString.begin(), templateString.end(), re, { -1, 0 });
+      std::for_each(begin, std::sregex_token_iterator(), callback);
+
+      return fragments;
+    };
+
+    const auto fragments = substituteVariables();
+
+    /* check the non-substituted fragments for numbering variables */
+    const auto hasNumbering = [&]()
+    {
+      for (const auto& [fragment, processed] : fragments)
+      {
+        if (!processed && std::regex_search(fragment, numberingRe))
+        {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    /* just join and return if there's no numbering to be done */
+    if (!hasNumbering())
+    {
+      std::stringstream joined;
+      for (const auto& fragment : fragments)
+      {
+        joined << fragment.first;
+      }
+      return { joined.str() };
+    }
+
+    /* apply numbering in the non-substituted fragments and join */
+    const auto applyNumbering = [&](const size_t i)
+    {
+      std::stringstream joined;
+      for (const auto& [fragment, processed] : fragments)
+      {
+        if (!processed && std::regex_match(fragment, numberingRe))
+        {
+          std::stringstream formattedNumber;
+          try
+          {
+            const std::string fmt = std::regex_replace(fragment, numberingRe, "$2");
+            formattedNumber << std::setfill('0') << std::setw(std::stoi(fmt)) << i;
+          }
+          catch (std::invalid_argument&)
+          {
+            formattedNumber << std::setw(0) << i;
+          }
+          joined << std::regex_replace(fragment, numberingRe, formattedNumber.str());
+        }
+        else
+        {
+          joined << fragment;
+        }
+      }
+      return joined.str();
+    };
+
+    /* apply incrementing numbering until file doesn't exist already */
+    for (size_t i = 1; i <= maxNumberingAttempts; ++i)
+    {
+      const std::string candidate = applyNumbering(i);
+      if (!std::filesystem::exists(candidate))
+      {
+        return { candidate };
+      }
+    }
+    throw std::runtime_error("could not find available unique filename after " +
+      std::to_string(maxNumberingAttempts) + " attempts");
+  }
+
   F3DOptionsParser Parser;
   F3DAppOptions AppOptions;
   f3d::options DynamicOptions;
@@ -291,6 +484,13 @@ int F3DStarter::Start(int argc, char** argv)
           }
           return true;
         }
+
+        if (keySym == "F12")
+        {
+          this->SaveScreenshot(this->Internals->AppOptions.ScreenshotFilename);
+          return true;
+        }
+
         return false;
       });
 
@@ -473,6 +673,8 @@ int F3DStarter::Start(int argc, char** argv)
       }
 
       f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
+      this->Internals->addOutputImageMetadata(img);
+
       if (renderToStdout)
       {
         const auto buffer = img.saveBuffer();
@@ -481,8 +683,10 @@ int F3DStarter::Start(int argc, char** argv)
       }
       else
       {
-        img.save(this->Internals->AppOptions.Output);
-        f3d::log::debug("Output image saved to ", this->Internals->AppOptions.Output);
+        std::filesystem::path path =
+          this->Internals->applyFilenameTemplate(this->Internals->AppOptions.Output);
+        img.save(path.string());
+        f3d::log::debug("Output image saved to ", path);
       }
 
       if (this->Internals->FilesList.size() > 1)
@@ -698,6 +902,50 @@ void F3DStarter::Render()
   f3d::log::debug("========== Rendering ==========");
   this->Internals->Engine->getWindow().render();
   f3d::log::debug("Render done");
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
+{
+
+  const auto getScreenshotDir = []()
+  {
+    for (const char* const& candidate : { "XDG_PICTURES_DIR", "HOME", "USERPROFILE" })
+    {
+      char* val = std::getenv(candidate);
+      if (val != nullptr)
+      {
+        std::filesystem::path path(val);
+        if (std::filesystem::is_directory(path))
+        {
+          return path;
+        }
+      }
+    }
+
+    return std::filesystem::current_path();
+  };
+
+  std::filesystem::path pathTemplate = std::filesystem::path(filenameTemplate).make_preferred();
+  std::filesystem::path fullPathTemplate =
+    pathTemplate.is_absolute() ? pathTemplate : getScreenshotDir() / pathTemplate;
+  std::filesystem::path path = this->Internals->applyFilenameTemplate(fullPathTemplate.string());
+
+  std::filesystem::create_directories(std::filesystem::path(path).parent_path());
+  f3d::log::info("saving screenshot to " + path.string());
+
+  f3d::image img =
+    this->Internals->Engine->getWindow().renderToImage(this->Internals->AppOptions.NoBackground);
+  this->Internals->addOutputImageMetadata(img);
+  img.save(path.string(), f3d::image::SaveFormat::PNG);
+
+  f3d::options& options = this->Internals->Engine->getOptions();
+  const std::string light_intensity_key = "render.light.intensity";
+  const double intensity = options.getAsDouble(light_intensity_key);
+  options.set(light_intensity_key, intensity * 5);
+  this->Render();
+  options.set(light_intensity_key, intensity);
+  this->Render();
 }
 
 //----------------------------------------------------------------------------
