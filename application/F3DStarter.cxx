@@ -34,6 +34,7 @@
 #include <atomic>
 #include <cassert>
 #include <filesystem>
+#include <iomanip>
 #include <iostream>
 #include <mutex>
 #include <regex>
