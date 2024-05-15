@@ -1,7 +1,9 @@
+F3D can play animations for a number of file formats (.ex2/.e/.exo/.g, .gltf/.glb, .fbx, .dae, .x, .usd) if the file contains an animation.
 ## Demonstration
-This specific example uses an animation file which can be downloaded here: <\insert download link for: `InterpolationTest.glb`>\
+This specific example uses an animation file which can be downloaded [here](https://github.com/f3d-app/f3d/blob/606089959c9520085a9cbf70660fb0ffc68fb934/testing/data/InterpolationTest.glb).
 
 <img width="305" alt="Screenshot 2024-05-07 at 3 25 14 PM" src="https://github.com/f3d-app/f3d/assets/2395780/9b92e833-d497-4fca-a75c-ce651ae973f6">
+
 Load the example animation file shown above by executing within command line: `f3d InterpolationTest.glb`
 
 <img width="1105" alt="Screenshot 2024-05-07 at 1 16 37 PM" src="https://github.com/f3d-app/f3d/assets/2395780/2668544e-7744-4adc-8867-e83579e9c915">
@@ -30,12 +32,5 @@ F3D animation behavior can be fully controlled from the command line using the f
 ## Animation Interactions
 - Press <kbd>W</kbd> to cycle through animations
 - Press <kbd>Space</kbd> to play/pause animation
-## Supported File Types
-- ex2/.e/.exo/.g
-- .gltf/.glb
-- .fbx
-- .dae
-- .x
-- .usd
 ## Time Units
 - When F3D plays an animation, it assumes the time unit is in seconds to show accurate speed of animation.
