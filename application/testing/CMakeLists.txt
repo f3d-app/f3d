@@ -865,16 +865,16 @@ f3d_test(NAME TestVerboseVolumeNoArray DATA cow.vtp ARGS -v REGEXP "Cannot use v
 f3d_test(NAME TestVerboseNoArray DATA cow.vtp ARGS -s --verbose=debug REGEXP "No array to color with" NO_BASELINE)
 
 # Test non existent file, do not create nonExistentFile.vtp
-f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp REGEXP "File \".*nonExistentFile.vtp\" does not exist" NO_RENDER)
+f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp REGEXP "File .*nonExistentFile.vtp does not exist" NO_RENDER)
 
 # Test non existent font file, do not create nonExistentFile.ttf
 f3d_test(NAME TestVerboseNonExistentFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/nonExistentFile.ttf REGEXP "Cannot find \".*nonExistentFile.ttf\" font file" NO_BASELINE)
 
 # Test quiet with a non existent file
-f3d_test(NAME TestQuietNonExistentFile DATA nonExistentFile.vtp ARGS --verbose=quiet --no-render REGEXP_FAIL "File \".*nonExistentFile.vtp\" does not exist")
+f3d_test(NAME TestQuietNonExistentFile DATA nonExistentFile.vtp ARGS --verbose=quiet --no-render REGEXP_FAIL "File .*nonExistentFile.vtp does not exist")
 
 # Test non supported file, do not add support for .dummy file.
-f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename REGEXP ".*unsupportedFile.dummy\" is not a file of a supported file format" NO_RENDER)
+f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename REGEXP ".*unsupportedFile.dummy is not a file of a supported file format" NO_RENDER)
 
 # Test non existent texture, do not add a dummy.png
 f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/dummy.png REGEXP "Texture file does not exist" NO_BASELINE)
@@ -919,7 +919,7 @@ f3d_test(NAME TestHelpPositional ARGS --help REGEXP "file1 file2 \.\.\.")
 if (NOT F3D_EXCLUDE_DEPRECATED)
   f3d_test(NAME TestDeprecatedHelpInput ARGS --help REGEXP "--input")
   f3d_test(NAME TestDeprecatedInput ARGS --input a.b REGEXP "--input option is deprecated")
-  f3d_test(NAME TestDeprecatedQuietNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose --quiet --no-render REGEXP_FAIL "File \".*nonExistentFile.vtp\" does not exist" NO_BASELINE)
+  f3d_test(NAME TestDeprecatedQuietNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose --quiet --no-render REGEXP_FAIL "File .*nonExistentFile.vtp does not exist" NO_BASELINE)
 endif()
 
 # Test version display

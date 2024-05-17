@@ -846,7 +846,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
         }
         else
         {
-          f3d::log::warn(filePath, " is not a file of a supported file format\n");
+          f3d::log::warn(filePath.string(), " is not a file of a supported file format\n");
           filenameInfo += " [UNSUPPORTED]";
         }
       }
@@ -957,7 +957,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
   {
     if (!quiet)
     {
-      f3d::log::error("File ", tmpPath, " does not exist");
+      f3d::log::error("File ", tmpPath.string(), " does not exist");
     }
     return -1;
   }
@@ -991,7 +991,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
     {
       if (!quiet)
       {
-        f3d::log::warn("File ", tmpPath, " has already been added");
+        f3d::log::warn("File ", tmpPath.string(), " has already been added");
       }
       return static_cast<int>(std::distance(this->Internals->FilesList.begin(), it));
     }
