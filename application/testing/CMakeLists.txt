@@ -874,7 +874,7 @@ f3d_test(NAME TestVerboseNonExistentFont DATA suzanne.ply ARGS -n --font-file=${
 f3d_test(NAME TestQuietNonExistentFile DATA nonExistentFile.vtp ARGS --verbose=quiet --no-render REGEXP_FAIL "File \".*nonExistentFile.vtp\" does not exist")
 
 # Test non supported file, do not add support for .dummy file.
-f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename REGEXP ".*unsupportedFile.dummy\" is not a file of a supported file format" NO_RENDER)
+f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename REGEXP ".*unsupportedFile.dummy is not a file of a supported file format" NO_RENDER)
 
 # Test non existent texture, do not add a dummy.png
 f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/dummy.png REGEXP "Texture file does not exist" NO_BASELINE)
