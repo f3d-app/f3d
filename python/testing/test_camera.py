@@ -86,6 +86,21 @@ def test_moves():
     camera.pitch(angle)
 
 
+def test_pan():
+    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+    camera = engine.window.camera
+
+    camera.state = f3d.CameraState((1, 2, 3), (1, 2, 13), (0, 1, 0), 40)
+    camera.pan(1, 2)
+    assert camera.state.pos == (0, 4, 3)
+    assert camera.state.foc == (0, 4, 13)
+
+    camera.state = f3d.CameraState((1, 2, 3), (1, -2, 3), (0, 0, 1), 40)
+    camera.pan(3, 4)
+    assert camera.state.pos == (-2, 2, 7)
+    assert camera.state.foc == (-2, -2, 7)
+
+
 def test_resets():
     engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
     camera = engine.window.camera
