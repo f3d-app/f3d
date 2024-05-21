@@ -239,9 +239,9 @@ int TestSDKCamera(int argc, char* argv[])
     cam.setPosition({ 1, 2, 3 });
     cam.setFocalPoint({ 1, -2, 3 });
     cam.setViewUp({ 0, 0, 1 });
-    cam.pan(3, 4);
-    checkVec3(cam.getPosition(), { -2, 2, 7 }, "pos after pan");
-    checkVec3(cam.getFocalPoint(), { -2, -2, 7 }, "foc after pan");
+    cam.pan(3, 4, 5);
+    checkVec3(cam.getPosition(), { -2, -3, 7 }, "pos after pan");
+    checkVec3(cam.getFocalPoint(), { -2, -7, 7 }, "foc after pan");
     checkVec3(cam.getViewUp(), { 0, 0, 1 }, "up after pan");
   }
   catch (testFailure& e)

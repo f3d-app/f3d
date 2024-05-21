@@ -96,9 +96,9 @@ def test_pan():
     assert camera.state.foc == (0, 4, 13)
 
     camera.state = f3d.CameraState((1, 2, 3), (1, -2, 3), (0, 0, 1), 40)
-    camera.pan(3, 4)
-    assert camera.state.pos == (-2, 2, 7)
-    assert camera.state.foc == (-2, -2, 7)
+    camera.pan(3, 4, 5)
+    assert camera.state.pos == (-2, -3, 7)
+    assert camera.state.foc == (-2, -7, 7)
 
 
 def test_resets():

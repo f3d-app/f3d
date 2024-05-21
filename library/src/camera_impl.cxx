@@ -165,7 +165,7 @@ camera& camera_impl::dolly(double val)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::pan(double right, double up)
+camera& camera_impl::pan(double right, double up, double forward)
 {
   vtkCamera* cam = this->GetVTKCamera();
   double pos[3], foc[3], vUp[3], vForward[3], vRight[3];
@@ -178,13 +178,16 @@ camera& camera_impl::pan(double right, double up)
 
   vtkMath::MultiplyScalar(vRight, right);
   vtkMath::MultiplyScalar(vUp, up);
+  vtkMath::MultiplyScalar(vForward, forward);
 
-  vtkMath::Add(pos, vUp, pos);
   vtkMath::Add(pos, vRight, pos);
+  vtkMath::Add(pos, vUp, pos);
+  vtkMath::Add(pos, vForward, pos);
   cam->SetPosition(pos);
 
-  vtkMath::Add(foc, vUp, foc);
   vtkMath::Add(foc, vRight, foc);
+  vtkMath::Add(foc, vUp, foc);
+  vtkMath::Add(foc, vForward, foc);
   cam->SetFocalPoint(foc);
 
   cam->OrthogonalizeViewUp();
