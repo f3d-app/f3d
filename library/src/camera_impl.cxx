@@ -165,6 +165,37 @@ camera& camera_impl::dolly(double val)
 }
 
 //----------------------------------------------------------------------------
+camera& camera_impl::pan(double right, double up, double forward)
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  double pos[3], foc[3], vUp[3], vForward[3], vRight[3];
+  cam->GetPosition(pos);
+  cam->GetFocalPoint(foc);
+  cam->GetViewUp(vUp);
+  vtkMath::Subtract(foc, pos, vForward);
+  vtkMath::Normalize(vForward);
+  vtkMath::Cross(vForward, vUp, vRight);
+
+  vtkMath::MultiplyScalar(vRight, right);
+  vtkMath::MultiplyScalar(vUp, up);
+  vtkMath::MultiplyScalar(vForward, forward);
+
+  vtkMath::Add(pos, vRight, pos);
+  vtkMath::Add(pos, vUp, pos);
+  vtkMath::Add(pos, vForward, pos);
+  cam->SetPosition(pos);
+
+  vtkMath::Add(foc, vRight, foc);
+  vtkMath::Add(foc, vUp, foc);
+  vtkMath::Add(foc, vForward, foc);
+  cam->SetFocalPoint(foc);
+
+  cam->OrthogonalizeViewUp();
+  this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 camera& camera_impl::roll(angle_deg_t angle)
 {
   vtkCamera* cam = this->GetVTKCamera();

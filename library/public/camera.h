@@ -57,6 +57,7 @@ public:
    * Angles are in degrees.
    */
   virtual camera& dolly(double val) = 0;
+  virtual camera& pan(double right, double up, double forward = 0) = 0;
   virtual camera& roll(angle_deg_t angle) = 0;
   virtual camera& azimuth(angle_deg_t angle) = 0;
   virtual camera& yaw(angle_deg_t angle) = 0;
