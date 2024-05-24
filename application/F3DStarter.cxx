@@ -846,6 +846,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
         }
         else
         {
+          f3d::log::debug("No reader found for \"" + filePath.string() + "\"");
           f3d::log::warn(filePath.string(), " is not a file of a supported file format\n");
           filenameInfo += " [UNSUPPORTED]";
         }
