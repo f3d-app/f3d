@@ -226,7 +226,7 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
   if (reader)
   {
-    log::debug("The best reader for \"" + filePath + "\" is \"" + reader->getName() + "\"");
+    log::debug("Found a reader for \"" + filePath + "\" : \"" + reader->getName() + "\"");
   }
   else
   {
@@ -266,7 +266,7 @@ loader& loader_impl::loadScene(const std::string& filePath)
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
   if (reader)
   {
-    log::debug("The best reader for \"" + filePath + "\" is \"" + reader->getName() + "\"");
+    log::debug("Found a reader for \"" + filePath + "\" : \"" + reader->getName() + "\"");
   }
   else
   {
