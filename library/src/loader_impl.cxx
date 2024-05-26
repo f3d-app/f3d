@@ -224,8 +224,13 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
   }
 
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
-  if (!reader)
+  if (reader)
   {
+    log::debug("Found a reader for \"" + filePath + "\" : \"" + reader->getName() + "\"");
+  }
+  else
+  {
+    log::debug("No reader found for \"" + filePath + "\"");
     throw loader::load_failure_exception(
       filePath + " is not a file of a supported 3D geometry file format");
   }
@@ -259,8 +264,13 @@ loader& loader_impl::loadScene(const std::string& filePath)
   // Recover the importer for the provided file path
   this->Internals->CurrentFullSceneImporter = nullptr;
   f3d::reader* reader = f3d::factory::instance()->getReader(filePath);
-  if (!reader)
+  if (reader)
   {
+    log::debug("Found a reader for \"" + filePath + "\" : \"" + reader->getName() + "\"");
+  }
+  else
+  {
+    log::debug("No reader found for \"" + filePath + "\"");
     throw loader::load_failure_exception(
       filePath + " is not a file of a supported 3D scene file format");
   }
