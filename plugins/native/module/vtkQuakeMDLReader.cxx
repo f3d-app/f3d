@@ -40,7 +40,7 @@ int vtkQuakeMDLReader::RequestData(
   size_t nbSplats = buffer.size() / splatSize;
 
   // identity ("IDPO"): 4 chars (4 bytes)
-  vtkNew<vtkCharArray> IDPOArray;
+  vtkNew<vtkUnsignedCharArray> IDPOArray;
   IDPOArray->SetNumberOfComponents(4);
   IDPOArray->SetNumberOfTuples(nbSplats);
   IDPOArray->SetName("identity");
@@ -112,7 +112,7 @@ int vtkQuakeMDLReader::RequestData(
   trianglesNum->SetName("number of triangles");
 
   // number of frames: 1 int (4 bytes)
-  vtkNew<vtkArray> framesNum;
+  vtkNew<vtkIntArray> framesNum;
   framesNum->SetNumberOfComponents(1);
   framesNum->SetNumberOfTuples(nbSplats);
   framesNum->SetName("number of frames");
@@ -146,13 +146,13 @@ int vtkQuakeMDLReader::RequestData(
   scale->SetName("scale");
 
   // rotation: 4 chars (4 bytes)
-  vtkNew<vtkCharArray> rotation;
+  vtkNew<vtkUnsignedCharArray> rotation;
   rotation->SetNumberOfComponents(4);
   rotation->SetNumberOfTuples(nbSplats);
   rotation->SetName("rotation");
 
   // color+opacity: 4 chars (4 bytes)
-  vtkNew<vtkCharArray> colorAndOpacity;
+  vtkNew<vtkUnsignedCharArray> colorAndOpacity;
   colorAndOpacity->SetNumberOfComponents(4);
   colorAndOpacity->SetNumberOfTuples(nbSplats);
   colorAndOpacity->SetName("color and opacity");
