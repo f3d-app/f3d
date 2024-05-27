@@ -78,19 +78,19 @@ int vtkQuakeMDLReader::RequestData(
   eyePosition->SetName("eye position");
 
   //====================================
-  
+
   // number of textures: 1 int (4 bytes)
   vtkNew<vtkIntArray> texturesNum;
   texturesNum->SetNumberOfComponents(1);
   texturesNum->SetNumberOfTuples(nbSplats);
   texturesNum->SetName("number of textures");
-  
+
   // texture width: 1 int (4 bytes)
   vtkNew<vtkIntArray> textureWidth;
   textureWidth->SetNumberOfComponents(1);
   texturesWidth->SetNumberOfTuples(nbSplats);
   textureWidth->SetName("texture width");
-  
+
   // texture height: 1 int (4 bytes)
   vtkNew<vtkIntArray> textureHeight;
   textureHeight->SetNumberOfComponents(1);
