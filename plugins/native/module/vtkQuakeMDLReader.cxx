@@ -88,7 +88,7 @@ int vtkQuakeMDLReader::RequestData(
   // texture width: 1 int (4 bytes)
   vtkNew<vtkIntArray> textureWidth;
   textureWidth->SetNumberOfComponents(1);
-  texturesWidth->SetNumberOfTuples(nbSplats);
+  textureWidth->SetNumberOfTuples(nbSplats);
   textureWidth->SetName("texture width");
 
   // texture height: 1 int (4 bytes)
