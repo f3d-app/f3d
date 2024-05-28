@@ -813,20 +813,20 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
 
     for (const auto& configBlock : json.items())
     {
-      ConfigDiff config;
+      ConfigDiff entry;
       for (const auto& item : configBlock.value().items())
       {
         if (item.value().is_null())
         {
-          config[item.key()] = std::nullopt;
+          entry[item.key()] = std::nullopt;
         }
         else if (item.value().is_number() || item.value().is_boolean())
         {
-          config[item.key()] = ToString(item.value());
+          entry[item.key()] = ToString(item.value());
         }
         else if (item.value().is_string())
         {
-          config[item.key()] = item.value().get<std::string>();
+          entry[item.key()] = item.value().get<std::string>();
         }
         else
         {
@@ -836,11 +836,11 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
       }
       if (configBlock.key() == "global")
       {
-        this->GlobalConfigEntries.emplace_back(config, configFilePath, configBlock.key());
+        this->GlobalConfigEntries.emplace_back(entry, configFilePath, configBlock.key());
       }
       else
       {
-        this->RegexConfigEntries.emplace_back(config, configFilePath, configBlock.key());
+        this->RegexConfigEntries.emplace_back(entry, configFilePath, configBlock.key());
       }
     }
   }
