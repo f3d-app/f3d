@@ -79,22 +79,22 @@ std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& conf
   std::vector<std::filesystem::path> paths;
 
   fs::path configPath;
-  try
-  {
-    std::vector<fs::path> dirsToCheck = {
+  std::vector<fs::path> dirsToCheck = {
 
 #ifdef __APPLE__
-      "/usr/local/etc/f3d",
+    "/usr/local/etc/f3d",
 #endif
 #ifdef __linux__
-      "/etc/f3d",
-      "/usr/share/f3d/configs",
+    "/etc/f3d",
+    "/usr/share/f3d/configs",
 #endif
-      F3DConfigFileTools::GetBinaryResourceDirectory() / "configs",
-      F3DConfigFileTools::GetUserConfigFileDirectory(),
-    };
+    F3DConfigFileTools::GetBinaryResourceDirectory() / "configs",
+    F3DConfigFileTools::GetUserConfigFileDirectory(),
+  };
 
-    for (const fs::path& dir : dirsToCheck)
+  for (const fs::path& dir : dirsToCheck)
+  {
+    try
     {
       if (dir.empty())
       {
@@ -123,10 +123,10 @@ std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& conf
         }
       }
     }
-  }
-  catch (const fs::filesystem_error&) // TODO this try/catch should be inside the loop?
-  {
-    f3d::log::error("Error recovering configuration file path: ", configPath.string());
+    catch (const fs::filesystem_error&)
+    {
+      f3d::log::error("Error recovering configuration file path: ", configPath.string());
+    }
   }
 
   return paths;

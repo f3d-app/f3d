@@ -716,6 +716,7 @@ void ConfigurationOptions::PrintReadersList()
 //----------------------------------------------------------------------------
 bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string& config)
 {
+  // we expect this function to only get called once but clear anyway just in case
   this->GlobalConfigEntries.clear();
   this->RegexConfigEntries.clear();
 
