@@ -318,9 +318,9 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
         update(conf);
       }
     }
-
-    this->CurrentFileConfig = tmpConfig;
   }
+
+  this->CurrentFileConfig = tmpConfig;
 
   // When parsing multiple times, hasDefault should be forced to yes after the first pass as all
   // options are expected to be already initialized, which means they have a "default" in the
@@ -779,6 +779,12 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
       f3d::log::debug("Using config file ", configPath.string());
       actualConfigFilePaths.emplace_back(configPath);
     }
+  }
+
+  if (actualConfigFilePaths.empty())
+  {
+    f3d::log::error("Configuration file for \"", config, "\" could not been found");
+    return false;
   }
 
   // Read config files
