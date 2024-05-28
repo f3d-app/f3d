@@ -899,10 +899,10 @@ f3d_test(NAME TestUnknownOptionExitCode ARGS --colour=1,0,0 WILL_FAIL)
 f3d_test(NAME TestNonExistentConfigFilePath DATA cow.vtp CONFIG "${F3D_SOURCE_DIR}/testing/configs/dummy.json" REGEXP "Configuration file does not exist" NO_BASELINE)
 
 # Test non-existent config filename, do not add a dummy.json
-f3d_test(NAME TestNonExistentConfigFilename DATA cow.vtp CONFIG "dummy.json" REGEXP "Configuration file for \"dummy.json\" could not been found" NO_BASELINE)
+f3d_test(NAME TestNonExistentConfigFilename DATA cow.vtp CONFIG "dummy.json" REGEXP "Configuration file for \"dummy.json\" could not be found" NO_BASELINE)
 
 # Test non-existent config filename, do not add a dummy.json
-f3d_test(NAME TestNonExistentConfigFileStem DATA cow.vtp CONFIG "dummy" REGEXP "Configuration file for \"dummy\" could not been found" NO_BASELINE)
+f3d_test(NAME TestNonExistentConfigFileStem DATA cow.vtp CONFIG "dummy" REGEXP "Configuration file for \"dummy\" could not be found" NO_BASELINE)
 
 # Test invalid config file
 f3d_test(NAME TestInvalidConfigFile DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid.json REGEXP "Unable to parse the configuration file" NO_BASELINE)
