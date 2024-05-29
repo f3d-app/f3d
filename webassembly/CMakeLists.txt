@@ -47,4 +47,8 @@ if(F3D_WASM_COPY_EXAMPLE)
     "${CMAKE_CURRENT_SOURCE_DIR}/example.html"
     "${CMAKE_BINARY_DIR}/bin/index.html"
     COPYONLY)
+  configure_file(
+    "${F3D_SOURCE_DIR}/resources/logo.ico"
+    "${CMAKE_BINARY_DIR}/bin/favicon.ico"
+    COPYONLY)
 endif()

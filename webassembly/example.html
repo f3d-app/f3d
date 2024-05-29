@@ -47,7 +47,7 @@
       Module.engineInstance.getOptions().set_integer('model.scivis.component', -2);
       Module.engineInstance.getOptions().toggle('model.scivis.cells');
 
-      // making it look nice
+      // make it look nice
       Module.engineInstance.getOptions().toggle('render.effect.anti-aliasing');
       Module.engineInstance.getOptions().toggle('render.effect.tone-mapping');
       Module.engineInstance.getOptions().toggle('interactor.axis');
@@ -55,6 +55,7 @@
       // up is +Z on this file
       Module.engineInstance.getOptions().set_string('scene.up-direction', '+Z')
 
+      // load the file located in the virtual filesystem
       Module.engineInstance.getLoader().loadGeometry('/f3d.vtp');
 
       // setup the window size based on the canvas size
@@ -65,7 +66,7 @@
       // do a first render and start the interactor
       Module.engineInstance.getWindow().render();
       Module.engineInstance.getInteractor().start();
-    }).catch(error => console.error("F3D internal exception: " + Module.getExceptionMessage(error)));
+    }).catch(error => console.error("Internal exception: " + error));
   </script>
 </body>
 

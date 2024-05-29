@@ -50,11 +50,12 @@ docker run -v $VTK_DIR:/vtk -v $F3D_DIR:/f3d --rm dockcross/web-wasm:20230905-7b
 
 # Testing it locally
 
-Four different files should be located in `$F3D_DIR/build-wasm/bin` folder:
+Five different files should be located in `$F3D_DIR/build-wasm/bin` folder:
 - `f3d.js`: javascript library
 - `f3d.wasm`: webassembly binaries
 - `f3d.data`: virtual filesystem containing the file specified in `F3D_WASM_DATA_FILE`
 - `index.html`: example file setting up the web page
+- `favicon.ico`: icon used to display the logo in the browser tab
 
 It's possible to run a local HTML server by running the following command from `$F3D_DIR/build-wasm/bin`:
 
