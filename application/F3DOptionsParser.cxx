@@ -268,7 +268,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     for (const auto& [key, value] : config)
     {
       const std::string del = tmpConfig.count(key) ? key + ": " + tmpConfig[key] : "";
-      const std::string add = key + ": " + value;
+      const std::string add = std::string(key).append(": ").append(value);
       if (add == del)
       {
         f3d::log::debug("= ", add);
