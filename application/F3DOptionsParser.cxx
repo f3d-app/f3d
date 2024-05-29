@@ -38,7 +38,7 @@ public:
   }
 
   void GetOptions(F3DAppOptions& appOptions, f3d::options& options,
-    std::vector<std::string>& inputs, std::string filePathForConfigBlock = "",
+    std::vector<std::string>& inputs, const std::string& filePathForConfigBlock = "",
     bool allOptionsInitialized = false, bool parseCommandLine = true);
   bool InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
   void LoadPlugins(const F3DAppOptions& appOptions) const;
@@ -71,6 +71,7 @@ protected:
       configValue = localIt->second;
       return true;
     }
+    // TODO ensure to return the actual default value if option key is not found
     return false;
   }
 
@@ -182,8 +183,7 @@ private:
   char** Argv;
 
   using ConfigDict = std::map<std::string, std::string>;
-  using ConfigDiff = std::map<std::string, std::optional<std::string> >;
-  using ConfigEntry = std::tuple<ConfigDiff, fs::path, std::string>;
+  using ConfigEntry = std::tuple<ConfigDict, fs::path, std::string>;
   using ConfigEntries = std::vector<ConfigEntry>;
   ConfigEntries GlobalConfigEntries;
   ConfigEntries RegexConfigEntries;
@@ -255,23 +255,21 @@ void ConfigurationOptions::PrintPluginsScan()
 
 //----------------------------------------------------------------------------
 void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& options,
-  std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool allOptionsInitialized,
-  bool parseCommandLine)
+  std::vector<std::string>& inputs, const std::string& filePathForConfigBlock,
+  bool allOptionsInitialized, bool parseCommandLine)
 {
   inputs.clear(); /* needed because this function is called multiple times */
 
   /* start with an empty config ... */
   ConfigDict tmpConfig;
 
-  const auto update = [&](const ConfigDiff& config)
+  const auto update = [&](const ConfigDict& config)
   {
-    for (const auto& [key, maybeValue] : config)
+    for (const auto& [key, value] : config)
     {
-      const std::string del = tmpConfig.count(key) ? key + ": " + tmpConfig[key]
-        : !maybeValue.has_value()                  ? key
-                                                   : "";
-      const std::string add = maybeValue.has_value() ? key + ": " + maybeValue.value() : "";
-      if (add == del && !add.empty())
+      const std::string del = tmpConfig.count(key) ? key + ": " + tmpConfig[key] : "";
+      const std::string add = key + ": " + value;
+      if (add == del)
       {
         f3d::log::debug("= ", add);
       }
@@ -281,20 +279,10 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
         {
           f3d::log::debug("- ", del);
         }
-        if (!add.empty())
-        {
-          f3d::log::debug("+ ", add);
-        }
+        f3d::log::debug("+ ", add);
       }
 
-      if (maybeValue.has_value())
-      {
-        tmpConfig[key] = maybeValue.value();
-      }
-      else
-      {
-        tmpConfig.erase(key);
-      }
+      tmpConfig[key] = value;
     }
   };
 
@@ -813,14 +801,10 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
 
     for (const auto& configBlock : json.items())
     {
-      ConfigDiff entry;
+      ConfigDict entry;
       for (const auto& item : configBlock.value().items())
       {
-        if (item.value().is_null())
-        {
-          entry[item.key()] = std::nullopt;
-        }
-        else if (item.value().is_number() || item.value().is_boolean())
+        if (item.value().is_number() || item.value().is_boolean())
         {
           entry[item.key()] = ToString(item.value());
         }
@@ -830,7 +814,7 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
         }
         else
         {
-          f3d::log::error(item.key(), " must be a string, a boolean, a number, or null");
+          f3d::log::error(item.key(), " must be a string, a boolean or a number");
           return false;
         }
       }
