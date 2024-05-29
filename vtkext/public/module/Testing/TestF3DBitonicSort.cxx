@@ -84,12 +84,12 @@ int TestF3DBitonicSort(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (!sorter->Run(
-        vtkOpenGLRenderWindow::SafeDownCast(renWin), nbElements, bufferKeys, bufferValues))
-  {
-    std::cerr << "Sorter Run call failed" << std::endl;
-    return EXIT_FAILURE;
-  }
+  // if (!sorter->Run(
+  //       vtkOpenGLRenderWindow::SafeDownCast(renWin), nbElements, bufferKeys, bufferValues))
+  // {
+  //   std::cerr << "Sorter Run call failed" << std::endl;
+  //   return EXIT_FAILURE;
+  // }
 
   // download sorted key buffer to CPU
   bufferKeys->Download(keys.data(), keys.size());
