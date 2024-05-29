@@ -13,7 +13,7 @@ While it's possible to setup an emscripten cross-compiling toolchain locally, it
 Install Docker locally and pull the WebAssembly image
 
 ```sh
-docker pull dockcross/web-wasm:20230905-7b2d74f
+docker pull dockcross/web-wasm:20240529-0dade71
 ```
 
 Clone VTK and F3D, it will be assumed that the source code is located in `$VTK_DIR` and `$F3D_DIR` variables in the next steps of this guide.
@@ -24,13 +24,12 @@ Configure VTK by running the following command:
 
 ```sh
 docker run -v $VTK_DIR:/vtk \
- --rm dockcross/web-wasm:20230905-7b2d74f \
+ --rm dockcross/web-wasm:20240529-0dade71 \
  cmake -S /vtk -B /vtk/build-wasm \
  -DBUILD_SHARED_LIBS=OFF \
  -DCMAKE_BUILD_TYPE=Release \
  -DVTK_ENABLE_LOGGING=OFF \
  -DVTK_ENABLE_WRAPPING=OFF \
- -DVTK_SMP_IMPLEMENTATION_TYPE=Sequential \
  -DVTK_GROUP_ENABLE_Imaging=DONT_WANT \
  -DVTK_GROUP_ENABLE_MPI=DONT_WANT \
  -DVTK_GROUP_ENABLE_Qt=DONT_WANT \
@@ -59,13 +58,15 @@ docker run -v $VTK_DIR:/vtk \
  -DVTK_MODULE_ENABLE_VTK_RenderingLabel=YES \
  -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES \
  -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES \
- -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
+ -DVTK_MODULE_ENABLE_VTK_TestingCore=YES \
+ -DVTK_LEGACY_REMOVE=ON \
+ -DVTK_SMP_IMPLEMENTATION_TYPE=Sequential
 ```
 
 Build VTK by running the following command:
 
 ```sh
-docker run -v $VTK_DIR:/vtk --rm dockcross/web-wasm:20230905-7b2d74f cmake --build /vtk/build-wasm --parallel 8
+docker run -v $VTK_DIR:/vtk --rm dockcross/web-wasm:20240529-0dade71 cmake --build /vtk/build-wasm --parallel 8
 ```
 
 ## Building F3D
@@ -73,7 +74,10 @@ docker run -v $VTK_DIR:/vtk --rm dockcross/web-wasm:20230905-7b2d74f cmake --bui
 Configure F3D by running the following command:
 
 ```sh
-docker run -v $VTK_DIR:/vtk -v $F3D_DIR:/f3d --rm dockcross/web-wasm:20230905-7b2d74f cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DVTK_DIR=/vtk/build-wasm  -DF3D_PLUGIN_BUILD_EXODUS=OFF -DF3D_WASM_DATA_FILE=/f3d/testing/data/f3d.vtp -S /f3d -B /f3d/build-wasm
+docker run -v $VTK_DIR:/vtk -v $F3D_DIR:/f3d \
+ --rm dockcross/web-wasm:20240529-0dade71 \
+ cmake -S /f3d -B /f3d/build-wasm \
+ -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DVTK_DIR=/vtk/build-wasm -DF3D_PLUGIN_BUILD_EXODUS=OFF -DF3D_WASM_DATA_FILE=/f3d/testing/data/f3d.vtp 
 ```
 
 > You can change the value of `F3D_WASM_DATA_FILE` to embed another file in the virtual filesystem.
@@ -81,7 +85,7 @@ docker run -v $VTK_DIR:/vtk -v $F3D_DIR:/f3d --rm dockcross/web-wasm:20230905-7b
 Build F3D by running the following command:
 
 ```sh
-docker run -v $VTK_DIR:/vtk -v $F3D_DIR:/f3d --rm dockcross/web-wasm:20230905-7b2d74f cmake --build /f3d/build-wasm --parallel 8
+docker run -v $VTK_DIR:/vtk -v $F3D_DIR:/f3d --rm dockcross/web-wasm:20240529-0dade71 cmake --build /f3d/build-wasm --parallel 8
 ```
 
 # Testing it locally

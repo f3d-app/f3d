@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-latest
-    container: dockcross/web-wasm:20230905-7b2d74f
+    container: dockcross/web-wasm:20240529-0dade71
 
     steps:
 

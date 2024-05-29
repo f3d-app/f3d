@@ -2,11 +2,14 @@
 <html data-theme="dark">
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>F3D Web</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
   <style>
     #main {
       min-height: 70vh;
-      border: 1px solid hsl(348, 86%, 43%);
+      border: 1px solid var(--bulma-primary);
       border-radius: 0.5rem;
       overflow: hidden;
     }
@@ -16,10 +19,26 @@
 <body>
   <section class="section">
     <div class="container">
-      <h1 class="title">F3D Web</h1>
-      <p class="subtitle">
-        A webassembly build demo
-      </p>
+      <div class="columns">
+        <div class="column">
+            <h1 class="title">F3D</h1>
+            <p class="subtitle">
+              WebAssembly demo
+            </p>
+        </div>
+
+        <div class="column">
+          <div class="file has-name is-right">
+            <label class="file-label">
+              <input class="file-input" type="file" id="file-selector" />
+              <span class="file-cta">
+                <span class="file-label">Open a 3D file...</span>
+              </span>
+              <span class="file-name" id="file-name">f3d.vtp</span>
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
   <section class="section">
@@ -29,44 +48,57 @@
   </section>
   <script type="text/javascript" src="f3d.js"></script>
   <script type="text/javascript">
-    let Module = {
-      canvas: (() => {
-        return document.getElementById("canvas");
-      })(),
-      onRuntimeInitialized: () => { },
-    };
+    const settings = { canvas: document.getElementById("canvas") };
 
-    f3d(Module).then((runtime) => {
-      // automatically load all supported file format readers
-      Module.Engine.autoloadPlugins();
+    f3d(settings)
+      .then((Module) => {
+        // automatically load all supported file format readers
+        Module.Engine.autoloadPlugins();
 
-      Module.engineInstance = new Module.Engine();
+        Module.engineInstance = new Module.Engine();
 
-      // setup coloring
-      Module.engineInstance.getOptions().set_string('model.scivis.array-name', 'Colors');
-      Module.engineInstance.getOptions().set_integer('model.scivis.component', -2);
-      Module.engineInstance.getOptions().toggle('model.scivis.cells');
+        // setup file open event
+        document.querySelector("#file-selector")
+          .addEventListener("change", (evt) => {
+            for (const file of evt.target.files)
+            {
+              const reader = new FileReader();
+              reader.addEventListener('loadend', (e)=>{
+                document.getElementById('file-name').innerHTML = file.name;
+                Module.FS.writeFile(file.name, new Uint8Array(reader.result));
+                Module.engineInstance.getLoader().loadGeometry('/' + file.name);
+                Module.engineInstance.getWindow().resetCamera();
+              });
+              reader.readAsArrayBuffer(file);
+            }
+          });
 
-      // make it look nice
-      Module.engineInstance.getOptions().toggle('render.effect.anti-aliasing');
-      Module.engineInstance.getOptions().toggle('render.effect.tone-mapping');
-      Module.engineInstance.getOptions().toggle('interactor.axis');
+        // setup coloring
+        Module.engineInstance.getOptions().set_string('model.scivis.array-name', 'Colors');
+        Module.engineInstance.getOptions().set_integer('model.scivis.component', -2);
+        Module.engineInstance.getOptions().toggle('model.scivis.cells');
 
-      // up is +Z on this file
-      Module.engineInstance.getOptions().set_string('scene.up-direction', '+Z')
+        // make it look nice
+        Module.engineInstance.getOptions().toggle('render.effect.anti-aliasing');
+        Module.engineInstance.getOptions().toggle('render.effect.tone-mapping');
+        Module.engineInstance.getOptions().toggle('interactor.axis');
 
-      // load the file located in the virtual filesystem
-      Module.engineInstance.getLoader().loadGeometry('/f3d.vtp');
+        // up is +Z on this file
+        Module.engineInstance.getOptions().set_string('scene.up-direction', '+Z')
 
-      // setup the window size based on the canvas size
-      const main = document.getElementById('main');
-      const scale = window.devicePixelRatio;
-      Module.engineInstance.getWindow().setSize(scale * main.clientWidth, scale * main.clientHeight);
+        // load the file located in the virtual filesystem
+        Module.engineInstance.getLoader().loadGeometry('/f3d.vtp');
 
-      // do a first render and start the interactor
-      Module.engineInstance.getWindow().render();
-      Module.engineInstance.getInteractor().start();
-    }).catch(error => console.error("Internal exception: " + error));
+        // setup the window size based on the canvas size
+        const main = document.getElementById('main');
+        const scale = window.devicePixelRatio;
+        Module.engineInstance.getWindow().setSize(scale * main.clientWidth, scale * main.clientHeight);
+
+        // do a first render and start the interactor
+        Module.engineInstance.getWindow().render();
+        Module.engineInstance.getInteractor().start();
+      })
+      .catch(error => console.error("Internal exception: " + error));
   </script>
 </body>
 
