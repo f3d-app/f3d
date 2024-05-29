@@ -18,11 +18,6 @@
 #include <vtkF3DConsoleOutputWindow.h>
 #endif
 
-#ifdef __EMSCRIPTEN__
-#include <vtkSDL2OpenGLRenderWindow.h>
-#include <vtkSDL2RenderWindowInteractor.h>
-#endif
-
 vtkStandardNewMacro(vtkF3DObjectFactory);
 
 // Now create the functions to create overrides with.
@@ -39,11 +34,6 @@ VTK_CREATE_CREATE_FUNCTION(vtkF3DAndroidLogOutputWindow)
 VTK_CREATE_CREATE_FUNCTION(vtkF3DWin32OutputWindow)
 #else
 VTK_CREATE_CREATE_FUNCTION(vtkF3DConsoleOutputWindow)
-#endif
-
-#ifdef __EMSCRIPTEN__
-VTK_CREATE_CREATE_FUNCTION(vtkSDL2OpenGLRenderWindow)
-VTK_CREATE_CREATE_FUNCTION(vtkSDL2RenderWindowInteractor)
 #endif
 
 //----------------------------------------------------------------------------
@@ -67,14 +57,6 @@ vtkF3DObjectFactory::vtkF3DObjectFactory()
 #else
   this->RegisterOverride("vtkOutputWindow", "vtkF3DConsoleOutputWindow",
     "vtkOutputWindow override for F3D", 1, vtkObjectFactoryCreatevtkF3DConsoleOutputWindow);
-#endif
-
-#ifdef __EMSCRIPTEN__
-  this->RegisterOverride("vtkRenderWindow", "vtkSDL2OpenGLRenderWindow",
-    "vtkRenderWindow override for F3D", 1, vtkObjectFactoryCreatevtkSDL2OpenGLRenderWindow);
-  this->RegisterOverride("vtkRenderWindowInteractor", "vtkSDL2RenderWindowInteractor",
-    "vtkRenderWindowInteractor override for F3D", 1,
-    vtkObjectFactoryCreatevtkSDL2RenderWindowInteractor);
 #endif
 }
 

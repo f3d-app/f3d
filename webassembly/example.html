@@ -1,28 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="dark">
 
 <head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
   <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-    }
-
     #main {
-      min-height: 60%;
+      min-height: 70vh;
+      border: 1px solid hsl(348, 86%, 43%);
+      border-radius: 0.5rem;
+      overflow: hidden;
     }
   </style>
 </head>
 
 <body>
-  <h1>F3D Web demo</h1>
-  <div id="main">
-    <canvas id="canvas"></canvas>
-  </div>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">F3D Web</h1>
+      <p class="subtitle">
+        A webassembly build demo
+      </p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container" id="main">
+      <canvas id="canvas"></canvas>
+    </div>
+  </section>
   <script type="text/javascript" src="f3d.js"></script>
   <script type="text/javascript">
-    var Module = {
+    let Module = {
       canvas: (() => {
         return document.getElementById("canvas");
       })(),
@@ -30,21 +37,34 @@
     };
 
     f3d(Module).then((runtime) => {
+      // automatically load all supported file format readers
       Module.Engine.autoloadPlugins();
-      var eng = new Module.Engine();
 
-      eng.getLoader().loadGeometry('/dragon.vtu');
+      Module.engineInstance = new Module.Engine();
 
-      eng.getOptions().toggle('render.grid.enable');
-      eng.getOptions().toggle('render.effect.anti-aliasing');
-      eng.getOptions().toggle('render.effect.tone-mapping');
+      // setup coloring
+      Module.engineInstance.getOptions().set_string('model.scivis.array-name', 'Colors');
+      Module.engineInstance.getOptions().set_integer('model.scivis.component', -2);
+      Module.engineInstance.getOptions().toggle('model.scivis.cells');
 
-      var main = document.getElementById('main');
+      // making it look nice
+      Module.engineInstance.getOptions().toggle('render.effect.anti-aliasing');
+      Module.engineInstance.getOptions().toggle('render.effect.tone-mapping');
+      Module.engineInstance.getOptions().toggle('interactor.axis');
 
-      eng.getWindow().setSize(main.clientWidth, main.clientHeight);
-      eng.getWindow().render();
+      // up is +Z on this file
+      Module.engineInstance.getOptions().set_string('scene.up-direction', '+Z')
 
-      eng.getInteractor().start();
+      Module.engineInstance.getLoader().loadGeometry('/f3d.vtp');
+
+      // setup the window size based on the canvas size
+      const main = document.getElementById('main');
+      const scale = window.devicePixelRatio;
+      Module.engineInstance.getWindow().setSize(scale * main.clientWidth, scale * main.clientHeight);
+
+      // do a first render and start the interactor
+      Module.engineInstance.getWindow().render();
+      Module.engineInstance.getInteractor().start();
     }).catch(error => console.error("F3D internal exception: " + Module.getExceptionMessage(error)));
   </script>
 </body>

@@ -1,4 +1,12 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.17) # 3.17 required for CMP0099
+
+# Need https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10551
+if(NOT VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231007)
+  message(FATAL_ERROR "Cannot build emscripten bindings with VTK version below 9.3.20231007")
+endif()
+
+set(F3D_WASM_DATA_FILE "${F3D_SOURCE_DIR}/testing/data/f3d.vtp"
+  CACHE PATH "File to copy in the webassembly root virtual filesystem")
 
 add_executable(f3djs F3DEmscriptenBindings.cxx)
 
@@ -11,19 +19,16 @@ target_link_libraries(f3djs PRIVATE libf3d)
 target_link_options(f3djs PRIVATE
   "--bind"
   "-O1"
-  "SHELL:--preload-file ${F3D_SOURCE_DIR}/testing/data@/"
+  "SHELL:--preload-file ${F3D_WASM_DATA_FILE}@/"
   "SHELL:-sEXPORT_NAME=f3d"
   "SHELL:-sALLOW_MEMORY_GROWTH=1"
   "SHELL:-sDEMANGLE_SUPPORT=1"
   "SHELL:-sEMULATE_FUNCTION_POINTER_CASTS=0"
-  "SHELL:-sERROR_ON_UNDEFINED_SYMBOLS=0"
   "SHELL:-sMODULARIZE=1"
   "SHELL:-sUSE_PTHREADS=0"
   "SHELL:-sWASM=1"
   "SHELL:-sASSERTIONS=1"
   "SHELL:-sFORCE_FILESYSTEM"
-  "SHELL:-sFULL_ES3=1"
-  "SHELL:-sUSE_SDL=2"
   "SHELL:-sERROR_ON_WASM_CHANGES_AFTER_LINK"
   "SHELL:-sWASM_BIGINT"
   "SHELL:-sNO_DISABLE_EXCEPTION_CATCHING"
