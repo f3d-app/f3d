@@ -66,8 +66,7 @@ jobs:
         path: ./wasm
 
     - name: Copy web assembly binaries
-      run: |
-        sudo mv wasm _site/
+      run: sudo mv wasm _site/
 
     - name: Deploy
       if: github.ref == 'refs/heads/master'

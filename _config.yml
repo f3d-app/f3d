@@ -304,6 +304,8 @@ nav_external_links:
     url: https://f3d.app/doc/user/INSTALLATION.html
   - title: GitHub repository
     url: https://github.com/f3d-app/f3d
+  - title: Webassembly demo
+    url: https://f3d.app/wasm
 
 # Google Analytics Tracking
 ga_tracking: G-ZCWEYB9KVG

@@ -55,7 +55,6 @@ docker run -v $VTK_DIR:/vtk \
  -DVTK_MODULE_ENABLE_VTK_InteractionWidgets=YES \
  -DVTK_MODULE_ENABLE_VTK_RenderingAnnotation=YES \
  -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES \
- -DVTK_MODULE_ENABLE_VTK_RenderingLabel=YES \
  -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES \
  -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES \
  -DVTK_MODULE_ENABLE_VTK_TestingCore=YES \
@@ -77,7 +76,11 @@ Configure F3D by running the following command:
 docker run -v $VTK_DIR:/vtk -v $F3D_DIR:/f3d \
  --rm dockcross/web-wasm:20240529-0dade71 \
  cmake -S /f3d -B /f3d/build-wasm \
- -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DVTK_DIR=/vtk/build-wasm -DF3D_PLUGIN_BUILD_EXODUS=OFF -DF3D_WASM_DATA_FILE=/f3d/testing/data/f3d.vtp 
+ -DBUILD_SHARED_LIBS=OFF \
+ -DCMAKE_BUILD_TYPE=Release \
+ -DVTK_DIR=/vtk/build-wasm \
+ -DF3D_PLUGIN_BUILD_EXODUS=OFF \
+ -DF3D_WASM_DATA_FILE=/f3d/testing/data/f3d.vtp 
 ```
 
 > You can change the value of `F3D_WASM_DATA_FILE` to embed another file in the virtual filesystem.

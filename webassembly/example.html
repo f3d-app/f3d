@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>F3D Web</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-switch@2.0.4/dist/css/bulma-switch.min.css">
   <style>
     #main {
       min-height: 70vh;
@@ -19,36 +20,73 @@
 <body>
   <section class="section">
     <div class="container">
-      <div class="columns">
-        <div class="column">
-            <h1 class="title">F3D</h1>
-            <p class="subtitle">
-              WebAssembly demo
-            </p>
+      <h1 class="title">F3D</h1>
+      <p class="subtitle">
+        WebAssembly demo
+      </p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="columns">
+      <aside class="menu">
+        <div class="file has-name">
+          <label class="file-label">
+            <input class="file-input" type="file" id="file-selector" />
+            <span class="file-cta">
+              <span class="file-label">Open a file...</span>
+            </span>
+            <span class="file-name" id="file-name"></span>
+          </label>
         </div>
-
-        <div class="column">
-          <div class="file has-name is-right">
-            <label class="file-label">
-              <input class="file-input" type="file" id="file-selector" />
-              <span class="file-cta">
-                <span class="file-label">Open a 3D file...</span>
-              </span>
-              <span class="file-name" id="file-name">f3d.vtp</span>
-            </label>
-          </div>
+        <p class="menu-label">Widgets</p>
+        <ul class="menu-list">
+          <li class="field">
+            <input id="grid" type="checkbox" name="grid" class="switch is-rounded">
+            <label for="grid">Grid</label>
+          </li>
+          <li class="field">
+            <input id="axis" type="checkbox" name="axis" class="switch is-rounded" checked>
+            <label for="axis">Axis</label>
+          </li>
+        </ul>
+        <p class="menu-label">Rendering</p>
+        <ul class="menu-list">
+          <li class="field">
+            <input id="fxaa" type="checkbox" name="fxaa" class="switch is-rounded" checked>
+            <label for="fxaa">Anti-aliasing</label>
+          </li>
+          <li class="field">
+            <input id="tone" type="checkbox" name="tone" class="switch is-rounded" checked>
+            <label for="tone">Tone mapping</label>
+          </li>
+        </ul>
+      </aside>
+      <div class="column">
+        <div class="container" id="main">
+          <canvas id="canvas"></canvas>
         </div>
       </div>
     </div>
   </section>
-  <section class="section">
-    <div class="container" id="main">
-      <canvas id="canvas"></canvas>
-    </div>
-  </section>
   <script type="text/javascript" src="f3d.js"></script>
   <script type="text/javascript">
-    const settings = { canvas: document.getElementById("canvas") };
+    const settings = {
+      canvas: document.getElementById("canvas"),
+      setupOptions: (options) => {
+        // setup coloring
+        options.set_string('model.scivis.array-name', 'Colors');
+        options.set_integer('model.scivis.component', -2);
+        options.toggle('model.scivis.cells');
+
+        // make it look nice
+        options.toggle('render.effect.anti-aliasing');
+        options.toggle('render.effect.tone-mapping');
+        options.toggle('interactor.axis');
+
+        // up is +Z on this file
+        options.set_string('scene.up-direction', '+Z')
+      }
+    };
 
     f3d(settings)
       .then((Module) => {
@@ -57,37 +95,44 @@
 
         Module.engineInstance = new Module.Engine();
 
+        const openFile = (name) => {
+          document.getElementById('file-name').innerHTML = name;
+          Module.engineInstance.getLoader().loadGeometry('/' + name);
+          Module.engineInstance.getWindow().resetCamera();
+          Module.engineInstance.getWindow().render();
+        };
+
         // setup file open event
-        document.querySelector("#file-selector")
-          .addEventListener("change", (evt) => {
-            for (const file of evt.target.files)
-            {
+        document.querySelector('#file-selector')
+          .addEventListener('change', (evt) => {
+            for (const file of evt.target.files) {
               const reader = new FileReader();
-              reader.addEventListener('loadend', (e)=>{
-                document.getElementById('file-name').innerHTML = file.name;
+              reader.addEventListener('loadend', (e) => {
                 Module.FS.writeFile(file.name, new Uint8Array(reader.result));
-                Module.engineInstance.getLoader().loadGeometry('/' + file.name);
-                Module.engineInstance.getWindow().resetCamera();
+                openFile(file.name);
               });
               reader.readAsArrayBuffer(file);
             }
           });
 
-        // setup coloring
-        Module.engineInstance.getOptions().set_string('model.scivis.array-name', 'Colors');
-        Module.engineInstance.getOptions().set_integer('model.scivis.component', -2);
-        Module.engineInstance.getOptions().toggle('model.scivis.cells');
+        Module.setupOptions(Module.engineInstance.getOptions());
 
-        // make it look nice
-        Module.engineInstance.getOptions().toggle('render.effect.anti-aliasing');
-        Module.engineInstance.getOptions().toggle('render.effect.tone-mapping');
-        Module.engineInstance.getOptions().toggle('interactor.axis');
+        // toggle callback
+        const mapToggleIdToOption = (id, option) => {
+          document.querySelector('#'+id)
+            .addEventListener('change', (evt) => {
+              Module.engineInstance.getOptions().toggle(option);
+              Module.engineInstance.getWindow().render();
+            });
+        };
 
-        // up is +Z on this file
-        Module.engineInstance.getOptions().set_string('scene.up-direction', '+Z')
+        mapToggleIdToOption('grid', 'render.grid.enable');
+        mapToggleIdToOption('axis', 'interactor.axis');
+        mapToggleIdToOption('fxaa', 'render.effect.anti-aliasing');
+        mapToggleIdToOption('tone', 'render.effect.tone-mapping');
 
         // load the file located in the virtual filesystem
-        Module.engineInstance.getLoader().loadGeometry('/f3d.vtp');
+        openFile('f3d.vtp')
 
         // setup the window size based on the canvas size
         const main = document.getElementById('main');
