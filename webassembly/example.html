@@ -39,27 +39,28 @@
           </label>
         </div>
         <p class="menu-label">Widgets</p>
-        <ul class="menu-list">
-          <li class="field">
-            <input id="grid" type="checkbox" name="grid" class="switch is-rounded">
-            <label for="grid">Grid</label>
-          </li>
-          <li class="field">
-            <input id="axis" type="checkbox" name="axis" class="switch is-rounded" checked>
-            <label for="axis">Axis</label>
-          </li>
-        </ul>
+        <div class="is-flex is-flex-direction-row is-align-items-center">
+          <button id="y-up" class="button mx-1 is-small">+Y</button>
+          <button id="z-up" class="button mx-1 is-small is-active">+Z</button>
+          <label class="mx-1">Up</label>
+        </div>
+        <div class="field">
+          <input id="grid" type="checkbox" name="grid" class="switch is-rounded">
+          <label for="grid">Grid</label>
+        </div>
+        <div class="field">
+          <input id="axis" type="checkbox" name="axis" class="switch is-rounded" checked>
+          <label for="axis">Axis</label>
+        </div>
         <p class="menu-label">Rendering</p>
-        <ul class="menu-list">
-          <li class="field">
-            <input id="fxaa" type="checkbox" name="fxaa" class="switch is-rounded" checked>
-            <label for="fxaa">Anti-aliasing</label>
-          </li>
-          <li class="field">
-            <input id="tone" type="checkbox" name="tone" class="switch is-rounded" checked>
-            <label for="tone">Tone mapping</label>
-          </li>
-        </ul>
+        <div class="field">
+          <input id="fxaa" type="checkbox" name="fxaa" class="switch is-rounded" checked>
+          <label for="fxaa">Anti-aliasing</label>
+        </div>
+        <div class="field">
+          <input id="tone" type="checkbox" name="tone" class="switch is-rounded" checked>
+          <label for="tone">Tone mapping</label>
+        </div>
       </aside>
       <div class="column">
         <div class="container" id="main">
@@ -84,7 +85,7 @@
         options.toggle('interactor.axis');
 
         // up is +Z on this file
-        options.set_string('scene.up-direction', '+Z')
+        options.set_string('scene.up-direction', '+Z');
       }
     };
 
@@ -119,7 +120,7 @@
 
         // toggle callback
         const mapToggleIdToOption = (id, option) => {
-          document.querySelector('#'+id)
+          document.querySelector('#' + id)
             .addEventListener('change', (evt) => {
               Module.engineInstance.getOptions().toggle(option);
               Module.engineInstance.getWindow().render();
@@ -130,6 +131,23 @@
         mapToggleIdToOption('axis', 'interactor.axis');
         mapToggleIdToOption('fxaa', 'render.effect.anti-aliasing');
         mapToggleIdToOption('tone', 'render.effect.tone-mapping');
+
+        // up callback
+        document.querySelector('#z-up')
+          .addEventListener('click', (evt) => {
+            Module.engineInstance.getOptions().set_string('scene.up-direction', '+Z');
+            document.getElementById('z-up').classList.add('is-active');
+            document.getElementById('y-up').classList.remove('is-active');
+            openFile(document.getElementById('file-name').innerHTML);
+          });
+
+        document.querySelector('#y-up')
+          .addEventListener('click', (evt) => {
+            Module.engineInstance.getOptions().set_string('scene.up-direction', '+Y');
+            document.getElementById('y-up').classList.add('is-active');
+            document.getElementById('z-up').classList.remove('is-active');
+            openFile(document.getElementById('file-name').innerHTML);
+          });
 
         // load the file located in the virtual filesystem
         openFile('f3d.vtp')

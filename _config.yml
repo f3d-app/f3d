@@ -264,6 +264,14 @@ defaults:
       parent: Developer Documentation
       nav_order: 9
 
+  -
+    scope:
+      path: "doc/dev/BUILD_WASM.md"
+    values:
+      title: Build (WebAssembly)
+      parent: Developer Documentation
+      nav_order: 10
+
 # Licenses doc
 # _licenses.md uses front matter      
   -
@@ -304,8 +312,8 @@ nav_external_links:
     url: https://f3d.app/doc/user/INSTALLATION.html
   - title: GitHub repository
     url: https://github.com/f3d-app/f3d
-  - title: Webassembly demo
-    url: https://f3d.app/wasm
+  - title: Web viewer
+    url: https://f3d.app/web
 
 # Google Analytics Tracking
 ga_tracking: G-ZCWEYB9KVG
