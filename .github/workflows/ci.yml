@@ -303,8 +303,8 @@ jobs:
 
     env:
       DISPLAY: :0
-      CC: clang
-      CXX: clang++
+      CC: gcc
+      CXX: g++
       VTK_SMP_BACKEND_IN_USE: Sequential
 
     steps:
@@ -336,8 +336,8 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
-      CC: clang
-      CXX: clang++
+      CC: gcc
+      CXX: g++
 
     steps:
 
