@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # Create main window and define size, position and title
     root = tk.Tk()
     root.geometry('640x480+100+100')
-    root.title('LanPtr3D')
+    root.title('Minimal tkinter interface')
     # Create OpenGL instance
     F3D = Frame()
     F3D.pack(fill=tk.BOTH, expand=tk.YES)
