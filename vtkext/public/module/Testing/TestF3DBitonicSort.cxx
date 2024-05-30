@@ -103,8 +103,5 @@ int TestF3DBitonicSort(int argc, char* argv[])
     }
   }
 
-  bufferKeys->Release();
-  bufferValues->Release();
-
   return EXIT_SUCCESS;
 }
