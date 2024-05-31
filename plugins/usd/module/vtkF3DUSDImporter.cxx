@@ -872,10 +872,12 @@ public:
         const std::string& assetPath = path.GetAssetPath();
         std::string ext = assetPath.substr(assetPath.find_last_of('.'));
         reader.TakeReference(vtkImageReader2Factory::CreateImageReader2FromExtension(ext.c_str()));
+        std::cout << "HEREHRHEHRE " << ext << std::endl;
 #endif
 
         if (!reader)
         {
+          std::cout << "HEREHRHEHRE is null" << std::endl;
           // cannot read the image file
           return nullptr;
         }
@@ -886,6 +888,7 @@ public:
         if (!asset)
         {
           // cannot get USD asset
+          std::cout << "HEREHRHEHRE no asset" << std::endl;
           return nullptr;
         }
 
@@ -893,6 +896,7 @@ public:
 
         if (!buffer)
         {
+          std::cout << "HEREHRHEHRE no buffer" << std::endl;
           // buffer invalid
           return nullptr;
         }

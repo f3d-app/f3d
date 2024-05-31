@@ -3,6 +3,8 @@
 
 #include "vtkImageReader.h"
 
+#include <OpenEXR/ImfIO.h>
+
 class vtkF3DEXRReader : public vtkImageReader
 {
 public:
@@ -31,6 +33,16 @@ public:
     return "OpenEXR";
   }
 
+  /**
+   * Read from memory instead of file
+   */
+  void SetMemoryBuffer(const void* buff) override;
+
+  /**
+   * Specify the in memory image buffer length.
+   */
+  void SetMemoryBufferLength(vtkIdType buflen) override;
+
 protected:
   vtkF3DEXRReader();
   ~vtkF3DEXRReader() override;
@@ -44,6 +56,52 @@ protected:
 private:
   vtkF3DEXRReader(const vtkF3DEXRReader&) = delete;
   void operator=(const vtkF3DEXRReader&) = delete;
+
+  /**
+   * Class to treat file contents in memory like it were still in a file.
+   */
+  class MemStream : public Imf::IStream
+  {
+  public:
+    MemStream(const char* name, const void* buffer, vtkIdType buflen)
+      : Imf::IStream(name)
+      , buffer(buffer)
+      , buflen(buflen)
+      , pos(0)
+    {
+    }
+
+    bool read(char c[], int n) override;
+
+    /**
+     * returns the current reading position, in bytes, from the beginning of the file.
+     * The next read() call will begin reading at the indicated position
+     */
+    uint64_t tellg() override
+    {
+      return pos;
+    }
+
+    /**
+     * sets the current reading position to pos bytes from the beginning of the "file"
+     */
+    void seekg(uint64_t new_pos) override
+    {
+      pos = new_pos;
+    }
+
+    /**
+     * clears any error flags (we dont have to worry about this)
+     */
+    void clear() override
+    {
+    }
+
+  private:
+    const void* buffer;
+    vtkIdType buflen;
+    uint64_t pos;
+  };
 };
 
 #endif
