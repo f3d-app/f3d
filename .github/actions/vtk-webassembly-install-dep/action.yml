@@ -35,7 +35,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-webassembly-${{env.VTK_SHA_OR_TAG}}-6
+        key: vtk-webassembly-${{env.VTK_SHA_OR_TAG}}-7
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -51,6 +51,14 @@ runs:
         submodules: 'true'
         path: './dependencies/vtk'
         ref: ${{env.VTK_SHA_OR_TAG}}
+
+    # Not that it's a bug in VTK and this step should be removed when fixed
+    # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11178
+    - name: Patch js file install
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/vtk
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/0001-fix-js-install.patch
 
     - name: Configure VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
