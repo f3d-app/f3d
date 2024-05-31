@@ -3,6 +3,7 @@
 
 #include "exception.h"
 #include "export.h"
+#include "image_c_api.h"
 
 #include <string>
 #include <vector>
