@@ -31,7 +31,7 @@ void vtkF3DEXRReader::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 void vtkF3DEXRReader::ExecuteInformation()
 {
-  //  XXX: Needed because of VTK initialize file pattern in the constructor for some reasons
+  // XXX: Needed because of VTK initialize file pattern in the constructor for some reasons
   delete[] this->FilePattern;
   this->FilePattern = nullptr;
 
@@ -81,6 +81,7 @@ void vtkF3DEXRReader::ExecuteInformation()
 
   this->SetNumberOfScalarComponents(3);
   this->SetDataScalarTypeToFloat();
+
   this->vtkImageReader::ExecuteInformation();
 }
 
@@ -123,14 +124,17 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
     vtkErrorMacro(<< "Could not find expected scalar array");
     return;
   }
+
   scalars->SetName("Pixels");
   float* dataPtr = scalars->GetPointer(0);
 
   auto execute = [&](Imf::RgbaInputFile& file)
   {
     Imf::Array2D<Imf::Rgba> pixels(this->GetHeight(), this->GetWidth());
+
     file.setFrameBuffer(&pixels[0][0], 1, this->GetWidth());
     file.readPixels(this->DataExtent[2], this->DataExtent[3]);
+
     for (int y = this->GetHeight() - 1; y >= 0; y--)
     {
       for (int x = 0; x < this->GetWidth(); x++)
