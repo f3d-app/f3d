@@ -81,14 +81,12 @@ void vtkF3DEXRReader::ExecuteInformation()
 
   this->SetNumberOfScalarComponents(3);
   this->SetDataScalarTypeToFloat();
-  std::cout << "made it ExecuteInformation\n";
   this->vtkImageReader::ExecuteInformation();
 }
 
 //------------------------------------------------------------------------------
 int vtkF3DEXRReader::CanReadFile(const char* fname)
 {
-  std::cout << "can read\n";
   // get the magic number by reading in a file
   vtksys::ifstream ifs(fname, vtksys::ifstream::in);
 
@@ -112,12 +110,10 @@ int vtkF3DEXRReader::CanReadFile(const char* fname)
 //------------------------------------------------------------------------------
 void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInformation* outInfo)
 {
-  std::cout << "execute with info exr\n";
   vtkImageData* data = this->AllocateOutputData(output, outInfo);
 
   if (this->UpdateExtentIsEmpty(outInfo, output))
   {
-    std::cout << "ret 1\n";
     return;
   }
 
@@ -125,10 +121,8 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
   if (!scalars)
   {
     vtkErrorMacro(<< "Could not find expected scalar array");
-    std::cout << "ret 2\n";
     return;
   }
-  std::cout << "setting pix\n";
   scalars->SetName("Pixels");
   float* dataPtr = scalars->GetPointer(0);
 
@@ -166,7 +160,6 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
       Imf::RgbaInputFile file(this->InternalFileName);
       execute(file);
     }
-    std::cout << "also made it\n";
   }
   catch (const std::exception& e)
   {
