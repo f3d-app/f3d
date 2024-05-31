@@ -52,7 +52,7 @@ runs:
         path: './dependencies/vtk'
         ref: ${{env.VTK_SHA_OR_TAG}}
 
-    # Not that it's a bug in VTK and this step should be removed when fixed
+    # Note that it's a bug in VTK and this step should be removed when fixed
     # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11178
     - name: Patch js file install
       if: steps.cache-vtk.outputs.cache-hit != 'true'
