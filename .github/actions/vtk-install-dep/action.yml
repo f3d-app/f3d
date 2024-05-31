@@ -131,7 +131,6 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingAnnotation=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingExternal=YES
-        -DVTK_MODULE_ENABLE_VTK_RenderingLabel=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.raytracing_label == 'raytracing' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES

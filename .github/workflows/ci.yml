@@ -404,27 +404,3 @@ jobs:
       uses: ./source/.github/actions/android-ci
       with:
         arch: ${{matrix.arch}}
-
-#----------------------------------------------------------------------------
-# webassembly: Check build of F3D for webassembly
-#----------------------------------------------------------------------------
-  webassembly:
-    if: github.event.pull_request.draft == false
-
-    strategy:
-      fail-fast: false
-
-    runs-on: ubuntu-latest
-    container: dockcross/web-wasm:20230905-7b2d74f
-
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: 'false'
-
-    - name: Web Assembly CI
-      uses: ./source/.github/actions/webassembly-ci
