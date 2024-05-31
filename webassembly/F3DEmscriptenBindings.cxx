@@ -40,6 +40,14 @@ f3d::options* toggle(f3d::options& o, const std::string& name)
 {
   return &o.toggle(name);
 }
+f3d::options* set_string(f3d::options& o, const std::string& name, const std::string& value)
+{
+  return &o.set(name, value);
+}
+f3d::options* set_integer(f3d::options& o, const std::string& name, int value)
+{
+  return &o.set(name, value);
+}
 
 f3d::loader* getLoaderPtr(f3d::engine& e)
 {
@@ -47,7 +55,7 @@ f3d::loader* getLoaderPtr(f3d::engine& e)
 }
 f3d::loader* loadGeometry(f3d::loader& l, const std::string& p)
 {
-  return &l.loadGeometry(p);
+  return &l.loadGeometry(p, true);
 }
 f3d::loader* loadScene(f3d::loader& l, const std::string& p)
 {
@@ -62,25 +70,24 @@ f3d::window* setSize(f3d::window& win, int w, int h)
 {
   return &win.setSize(w, h);
 }
+f3d::window* resetCamera(f3d::window& win)
+{
+  win.getCamera().resetToBounds();
+  return &win;
+}
 
 f3d::interactor* getInteractorPtr(f3d::engine& e)
 {
   return &e.getInteractor();
 }
 
-std::string getExceptionMessage(intptr_t exceptionPtr)
-{
-  return std::string(reinterpret_cast<std::exception*>(exceptionPtr)->what());
-}
-
 EMSCRIPTEN_BINDINGS(f3d)
 {
-  // utilities
-  emscripten::function("getExceptionMessage", &getExceptionMessage);
-
   // f3d::options
-  emscripten::class_<f3d::options>("Options").function(
-    "toggle", &toggle, emscripten::allow_raw_pointers());
+  emscripten::class_<f3d::options>("Options")
+    .function("toggle", &toggle, emscripten::allow_raw_pointers())
+    .function("set_string", &set_string, emscripten::allow_raw_pointers())
+    .function("set_integer", &set_integer, emscripten::allow_raw_pointers());
 
   // f3d::loader
   emscripten::class_<f3d::loader>("Loader")
@@ -90,10 +97,12 @@ EMSCRIPTEN_BINDINGS(f3d)
   // f3d::window
   emscripten::class_<f3d::window>("Window")
     .function("setSize", &setSize, emscripten::allow_raw_pointers())
-    .function("render", &f3d::window::render);
+    .function("render", &f3d::window::render)
+    .function("resetCamera", &resetCamera, emscripten::allow_raw_pointers());
 
   // f3d::interactor
-  emscripten::class_<f3d::interactor>("Interactor").function("start", &f3d::interactor::start);
+  emscripten::class_<f3d::interactor>("Interactor")
+    .function("start", &f3d::interactor::start);
 
   // f3d::engine
   emscripten::class_<f3d::engine> engine("Engine");

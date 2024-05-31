@@ -25,6 +25,8 @@ F3D also contains the libf3d, a simple library to render meshes, with C++ and Py
 
 See the [gallery](doc/GALLERY.md) for more images, take a look at the [changelog](doc/CHANGELOG.md) or go to the [install guide](doc/user/INSTALLATION.md) to download and install F3D!
 
+While F3D is primarily a native application, a web app built using emscripten can be run at https://f3d.app/web
+
 If you need any help or want to discuss with other F3D users and developers, head over to our [discord](https://discord.f3d.app).
 
 # Quickstart

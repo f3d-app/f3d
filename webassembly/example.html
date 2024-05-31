@@ -1,51 +1,168 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="dark">
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>F3D Web</title>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-switch@2.0.4/dist/css/bulma-switch.min.css">
   <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-    }
-
     #main {
-      min-height: 60%;
+      min-height: 70vh;
+      border: 1px solid var(--bulma-primary);
+      border-radius: 0.5rem;
+      overflow: hidden;
     }
   </style>
 </head>
 
 <body>
-  <h1>F3D Web demo</h1>
-  <div id="main">
-    <canvas id="canvas"></canvas>
-  </div>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">F3D Web</h1>
+      <p class="subtitle">
+        A WebAssembly application using libf3d
+      </p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="columns">
+      <aside class="menu">
+        <div class="file has-name">
+          <label class="file-label">
+            <input class="file-input" type="file" id="file-selector" accept=".gml,.gltf,.glb,.obj,.ply,.pts,.stl,.vtk,.vtp,.vtu" />
+            <span class="file-cta">
+              <span class="file-label">Open a file...</span>
+            </span>
+            <span class="file-name" id="file-name"></span>
+          </label>
+        </div>
+        <p class="menu-label">Widgets</p>
+        <div class="is-flex is-flex-direction-row is-align-items-center">
+          <button id="y-up" class="button mx-1 is-small">+Y</button>
+          <button id="z-up" class="button mx-1 is-small is-active">+Z</button>
+          <label class="mx-1">Up</label>
+        </div>
+        <div class="field">
+          <input id="grid" type="checkbox" name="grid" class="switch is-rounded">
+          <label for="grid">Grid</label>
+        </div>
+        <div class="field">
+          <input id="axis" type="checkbox" name="axis" class="switch is-rounded" checked>
+          <label for="axis">Axis</label>
+        </div>
+        <p class="menu-label">Rendering</p>
+        <div class="field">
+          <input id="fxaa" type="checkbox" name="fxaa" class="switch is-rounded" checked>
+          <label for="fxaa">Anti-aliasing</label>
+        </div>
+        <div class="field">
+          <input id="tone" type="checkbox" name="tone" class="switch is-rounded" checked>
+          <label for="tone">Tone mapping</label>
+        </div>
+      </aside>
+      <div class="column">
+        <div class="container" id="main">
+          <canvas id="canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
   <script type="text/javascript" src="f3d.js"></script>
   <script type="text/javascript">
-    var Module = {
-      canvas: (() => {
-        return document.getElementById("canvas");
-      })(),
-      onRuntimeInitialized: () => { },
+    const settings = {
+      canvas: document.getElementById("canvas"),
+      setupOptions: (options) => {
+        // setup coloring
+        options.set_string('model.scivis.array-name', 'Colors');
+        options.set_integer('model.scivis.component', -2);
+        options.toggle('model.scivis.cells');
+
+        // make it look nice
+        options.toggle('render.effect.anti-aliasing');
+        options.toggle('render.effect.tone-mapping');
+        options.toggle('interactor.axis');
+
+        // up is +Z on this file
+        options.set_string('scene.up-direction', '+Z');
+      }
     };
 
-    f3d(Module).then((runtime) => {
-      Module.Engine.autoloadPlugins();
-      var eng = new Module.Engine();
+    f3d(settings)
+      .then((Module) => {
+        // automatically load all supported file format readers
+        Module.Engine.autoloadPlugins();
 
-      eng.getLoader().loadGeometry('/dragon.vtu');
+        Module.engineInstance = new Module.Engine();
 
-      eng.getOptions().toggle('render.grid.enable');
-      eng.getOptions().toggle('render.effect.anti-aliasing');
-      eng.getOptions().toggle('render.effect.tone-mapping');
+        const openFile = (name) => {
+          document.getElementById('file-name').innerHTML = name;
+          Module.engineInstance.getLoader().loadGeometry('/' + name);
+          Module.engineInstance.getWindow().resetCamera();
+          Module.engineInstance.getWindow().render();
+        };
 
-      var main = document.getElementById('main');
+        // setup file open event
+        document.querySelector('#file-selector')
+          .addEventListener('change', (evt) => {
+            for (const file of evt.target.files) {
+              const reader = new FileReader();
+              reader.addEventListener('loadend', (e) => {
+                Module.FS.writeFile(file.name, new Uint8Array(reader.result));
+                openFile(file.name);
+              });
+              reader.readAsArrayBuffer(file);
+            }
+          });
 
-      eng.getWindow().setSize(main.clientWidth, main.clientHeight);
-      eng.getWindow().render();
+        Module.setupOptions(Module.engineInstance.getOptions());
 
-      eng.getInteractor().start();
-    }).catch(error => console.error("F3D internal exception: " + Module.getExceptionMessage(error)));
+        // toggle callback
+        const mapToggleIdToOption = (id, option) => {
+          document.querySelector('#' + id)
+            .addEventListener('change', (evt) => {
+              Module.engineInstance.getOptions().toggle(option);
+              Module.engineInstance.getWindow().render();
+            });
+        };
+
+        mapToggleIdToOption('grid', 'render.grid.enable');
+        mapToggleIdToOption('axis', 'interactor.axis');
+        mapToggleIdToOption('fxaa', 'render.effect.anti-aliasing');
+        mapToggleIdToOption('tone', 'render.effect.tone-mapping');
+
+        // up callback
+        document.querySelector('#z-up')
+          .addEventListener('click', (evt) => {
+            Module.engineInstance.getOptions().set_string('scene.up-direction', '+Z');
+            document.getElementById('z-up').classList.add('is-active');
+            document.getElementById('y-up').classList.remove('is-active');
+            openFile(document.getElementById('file-name').innerHTML);
+          });
+
+        document.querySelector('#y-up')
+          .addEventListener('click', (evt) => {
+            Module.engineInstance.getOptions().set_string('scene.up-direction', '+Y');
+            document.getElementById('y-up').classList.add('is-active');
+            document.getElementById('z-up').classList.remove('is-active');
+            openFile(document.getElementById('file-name').innerHTML);
+          });
+
+        // load the file located in the virtual filesystem
+        openFile('f3d.vtp')
+
+        // setup the window size based on the canvas size
+        const main = document.getElementById('main');
+        const scale = window.devicePixelRatio;
+        Module.engineInstance.getWindow().setSize(scale * main.clientWidth, scale * main.clientHeight);
+
+        // do a first render and start the interactor
+        Module.engineInstance.getWindow().render();
+        Module.engineInstance.getInteractor().start();
+      })
+      .catch(error => console.error("Internal exception: " + error));
   </script>
 </body>
 

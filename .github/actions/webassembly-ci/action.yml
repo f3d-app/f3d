@@ -48,3 +48,9 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --parallel 2 --target install
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        path: ./build/bin/*
+        name: f3d-wasm
