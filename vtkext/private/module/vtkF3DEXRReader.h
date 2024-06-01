@@ -63,10 +63,10 @@ private:
   class MemStream : public Imf::IStream
   {
   public:
-    MemStream(const char* name, const void* buffer, vtkIdType buflen)
+    MemStream(const char* name, const void* buff, vtkIdType bufferLen)
       : Imf::IStream(name)
-      , buffer(buffer)
-      , buflen(buflen)
+      , buffer(static_cast<const char*>(buff))
+      , bufflen(static_cast<size_t>(bufferLen))
       , pos(0)
     {
     }
@@ -98,8 +98,8 @@ private:
     }
 
   private:
-    const void* buffer;
-    vtkIdType buflen;
+    const char* buffer;
+    size_t bufflen;
     uint64_t pos;
   };
 };

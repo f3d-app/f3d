@@ -185,9 +185,9 @@ void vtkF3DEXRReader::SetMemoryBuffer(const void* buff)
 /**
  * Specify the in memory image buffer length.
  */
-void vtkF3DEXRReader::SetMemoryBufferLength(vtkIdType buflen)
+void vtkF3DEXRReader::SetMemoryBufferLength(vtkIdType bufferLen)
 {
-  this->MemoryBufferLength = buflen;
+  this->MemoryBufferLength = bufferLen;
 }
 
 //------------------------------------------------------------------------------
@@ -205,7 +205,7 @@ int vtkF3DEXRReader::GetHeight() const
 //------------------------------------------------------------------------------
 bool vtkF3DEXRReader::MemStream::read(char c[], int n)
 {
-  if (pos + n <= buflen)
+  if (pos + n <= bufflen)
   {
     memcpy(c, buffer + pos, n);
     pos += n;
