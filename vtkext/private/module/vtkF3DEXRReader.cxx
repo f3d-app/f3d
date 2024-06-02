@@ -57,13 +57,6 @@ public:
     pos = new_pos;
   }
 
-  /**
-   * clears any error flags (we dont have to worry about this)
-   */
-  void clear() override
-  {
-  }
-
 private:
   const char* buffer;
   size_t bufflen;
