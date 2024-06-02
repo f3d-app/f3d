@@ -6,7 +6,10 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-
+/**
+ * image file taken from
+ * https://github.com/AcademySoftwareFoundation/openexr/blob/370db2835843ac75f85e1386c05455f26a6ff58c/website/test_images/Chromaticities/Rec709.rst
+ */
 bool readFileToVector(const std::string& filename, std::vector<char>& buffer)
 {
   std::ifstream file(filename, std::ios::binary | std::ios::ate);
