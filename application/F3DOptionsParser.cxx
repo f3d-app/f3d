@@ -71,7 +71,6 @@ protected:
       configValue = localIt->second;
       return true;
     }
-    // TODO ensure to return the actual default value if option key is not found
     return false;
   }
 
@@ -265,6 +264,8 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
   const auto update = [&](const ConfigDict& config)
   {
+    /* insert or update the values from the argument into `tmpConfig`.
+     * also log the insertions/updates details in verbose mode */
     for (const auto& [key, value] : config)
     {
       const std::string del = tmpConfig.count(key) ? key + ": " + tmpConfig[key] : "";
@@ -286,7 +287,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     }
   };
 
-  /* apply global entries */
+  /* apply global entries, `pattern` will always be `"global"` here */
   for (const auto& [conf, source, pattern] : this->GlobalConfigEntries)
   {
     f3d::log::debug("using `", pattern, "` config from ", source.string());
