@@ -1,5 +1,6 @@
 #include "image_c_api.h"
 #include "image.h"
+#include <cstring>
 
 struct f3d_image {
     f3d::image img;
@@ -104,4 +105,62 @@ char** f3d_image_all_metadata(f3d_image_t* img, unsigned int* count) {
         strcpy(keys[i], metadata_keys[i].c_str());
     }
     return keys;
+}
+
+void f3d_image_free_metadata_keys(char** keys, unsigned int count) {
+    for (unsigned int i = 0; i < count; ++i) {
+        delete[] keys[i];
+    }
+    delete[] keys;
+}
+
+// Additional functions to match all functionalities from image.cxx
+f3d_image_t* f3d_image_create_from_file(const char* path) {
+    return new f3d_image_t{ f3d::image(path) };
+}
+
+f3d_image_t* f3d_image_create_with_params(unsigned int width, unsigned int height, unsigned int channelCount, unsigned int type) {
+    f3d::image::ChannelType channel_type;
+    switch (type) {
+        case 0:
+            channel_type = f3d::image::ChannelType::BYTE;
+            break;
+        case 1:
+            channel_type = f3d::image::ChannelType::SHORT;
+            break;
+        case 2:
+            channel_type = f3d::image::ChannelType::FLOAT;
+            break;
+        default:
+            channel_type = f3d::image::ChannelType::BYTE; // Default to BYTE
+            break;
+    }
+    return new f3d_image_t{ f3d::image(width, height, channelCount, channel_type) };
+}
+
+unsigned int f3d_image_get_supported_formats_count() {
+    std::vector<std::string> formats = f3d::image::getSupportedFormats();
+    return formats.size();
+}
+
+const char** f3d_image_get_supported_formats() {
+    static std::vector<std::string> formats = f3d::image::getSupportedFormats();
+    static std::vector<const char*> c_formats;
+    c_formats.clear();
+    for (const auto& format : formats) {
+        c_formats.push_back(format.c_str());
+    }
+    return c_formats.data();
+}
+
+double* f3d_image_get_normalized_pixel(f3d_image_t* img, int x, int y, unsigned int* count) {
+    std::vector<double> pixel = img->img.getNormalizedPixel({x, y});
+    *count = pixel.size();
+    double* c_pixel = new double[pixel.size()];
+    std::copy(pixel.begin(), pixel.end(), c_pixel);
+    return c_pixel;
+}
+
+void f3d_image_free_normalized_pixel(double* pixel) {
+    delete[] pixel;
 }
