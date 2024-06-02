@@ -8,11 +8,67 @@
 #include "vtksys/FStream.hxx"
 
 #include <ImfArray.h>
+#include <ImfIO.h>
 #include <ImfRgbaFile.h>
 
 #include <cstring>
 #include <sstream>
 #include <thread>
+
+/**
+ * Class to treat file contents in memory like it were still in a file.
+ */
+class MemStream : public Imf::IStream
+{
+public:
+  MemStream(const char* name, const void* buff, vtkIdType bufferLen)
+    : Imf::IStream(name)
+    , buffer(static_cast<const char*>(buff))
+    , bufflen(static_cast<size_t>(bufferLen))
+    , pos(0)
+  {
+  }
+
+  bool read(char c[], int n) override
+  {
+    if (pos + n <= bufflen)
+    {
+      memcpy(c, buffer + pos, n);
+      pos += n;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * returns the current reading position, in bytes, from the beginning of the file.
+   * The next read() call will begin reading at the indicated position
+   */
+  uint64_t tellg() override
+  {
+    return pos;
+  }
+
+  /**
+   * sets the current reading position to pos bytes from the beginning of the "file"
+   */
+  void seekg(uint64_t new_pos) override
+  {
+    pos = new_pos;
+  }
+
+  /**
+   * clears any error flags (we dont have to worry about this)
+   */
+  void clear() override
+  {
+  }
+
+private:
+  const char* buffer;
+  size_t bufflen;
+  uint64_t pos;
+};
 
 vtkStandardNewMacro(vtkF3DEXRReader);
 
@@ -178,7 +234,7 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
  */
 void vtkF3DEXRReader::SetMemoryBuffer(const void* buff)
 {
-  this->MemoryBuffer = buff;
+  MemoryBuffer = buff;
 }
 
 //------------------------------------------------------------------------------
@@ -187,7 +243,7 @@ void vtkF3DEXRReader::SetMemoryBuffer(const void* buff)
  */
 void vtkF3DEXRReader::SetMemoryBufferLength(vtkIdType bufferLen)
 {
-  this->MemoryBufferLength = bufferLen;
+  MemoryBufferLength = bufferLen;
 }
 
 //------------------------------------------------------------------------------
@@ -200,16 +256,4 @@ int vtkF3DEXRReader::GetWidth() const
 int vtkF3DEXRReader::GetHeight() const
 {
   return this->DataExtent[3] - this->DataExtent[2] + 1;
-}
-
-//------------------------------------------------------------------------------
-bool vtkF3DEXRReader::MemStream::read(char c[], int n)
-{
-  if (pos + n <= bufflen)
-  {
-    memcpy(c, buffer + pos, n);
-    pos += n;
-    return true;
-  }
-  return false;
 }
