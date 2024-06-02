@@ -91,6 +91,7 @@ target_include_directories(libf3d
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/private>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/plugin>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/plugin>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> # Include the C API header directory
   )
 if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
   target_link_libraries(libf3d PRIVATE nlohmann_json::nlohmann_json)
@@ -190,6 +191,15 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(libf3d PRIVATE atomic)
   endif()
 endif()
+
+# C API integration
+add_library(f3d_c_api SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/image_c_api.c)
+target_link_libraries(f3d_c_api PRIVATE libf3d)
+target_include_directories(f3d_c_api
+  PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/public
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
 # Testing
 if(BUILD_TESTING)
