@@ -17,7 +17,8 @@ endif()
 if(F3D_MODULE_EXR)
   list(APPEND test_sources 
        TestF3DEXRReader.cxx
-       TestF3DEXRReaderInvalid.cxx)
+       TestF3DEXRReaderInvalid.cxx
+       TestF3DEXRMemReader.cxx)
 endif()
 
 if(VTK_VERSION VERSION_LESS_EQUAL 9.1.0)
