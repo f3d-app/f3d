@@ -281,32 +281,3 @@ if(BUILD_SHARED_LIBS)
     EXCLUDE_FROM_ALL)
 
 endif()
-
-# C API integration
-
-# Include the C API files
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-add_library(f3d_c_api SHARED src/image_c_api.c)
-
-target_link_libraries(f3d_c_api PRIVATE f3d::libf3d)
-
-# Ensure public headers are installed
-install(FILES include/image_c_api.h DESTINATION include)
-
-# Add C test
-add_executable(test_image_c_api testing/test_image_c_api.c)
-target_link_libraries(test_image_c_api PRIVATE f3d_c_api)
-add_test(NAME test_image_c_api COMMAND test_image_c_api)
-
-list(APPEND libf3dSDKTestsNoRender_list
-     test_image_c_api)
-
-foreach (test ${libf3dSDKTests_list})
-  get_filename_component (TName ${test} NAME_WE)
-  add_test (NAME libf3d::${TName} COMMAND libf3dSDKTests ${TName}  "${F3D_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-  set_tests_properties(libf3d::${TName} PROPERTIES TIMEOUT 30)
-  if (NOT F3D_TESTING_ENABLE_RENDERING_TESTS AND NOT ${TName} IN_LIST libf3dSDKTestsNoRender_list)
-    set_tests_properties(libf3d::${TName} PROPERTIES DISABLED ON)
-  endif ()
-endforeach ()
