@@ -51,13 +51,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/types.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/utils.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl.cxx
-)
-
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-  list(APPEND F3D_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/image_c_api.c # Include the C API implementation
   )
-endif()
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
@@ -75,22 +69,16 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
-)
-
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-  list(APPEND F3D_PUBLIC_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/image_c_api.h # Include the C API header
   )
-endif()
 
 set(F3D_PLUGIN_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/plugin/reader.h
   ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.h
-)
+  )
 
 add_library(libf3d
   ${F3D_SOURCE_FILES}
-)
+  )
 
 target_include_directories(libf3d
   PUBLIC
@@ -101,9 +89,7 @@ target_include_directories(libf3d
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/private>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/plugin>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/plugin>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> # Include the C API header directory
-)
-
+  )
 if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
   target_link_libraries(libf3d PRIVATE nlohmann_json::nlohmann_json)
 else ()
@@ -121,7 +107,7 @@ set_target_properties(libf3d PROPERTIES
   POSITION_INDEPENDENT_CODE ON
   OUTPUT_NAME "f3d"
   PDB_NAME "libf3d"
-)
+  )
 
 # It can be useful to disable soversion in case the links are duplicated
 # It happens with Python wheels for example
@@ -148,7 +134,7 @@ generate_export_header(libf3d
 target_include_directories(libf3d
   INTERFACE
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-)
+  )
 
 vtk_module_autoinit(TARGETS libf3d MODULES ${F3D_VTK_MODULES})
 
@@ -201,24 +187,6 @@ if(UNIX AND NOT APPLE)
   if(F3D_LINUX_LIBRARY_LINK_ATOMIC)
     target_link_libraries(libf3d PRIVATE atomic)
   endif()
-endif()
-
-# WebAssembly specific settings
-if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-  set_target_properties(libf3d PROPERTIES
-    LINK_FLAGS "--bind"
-  )
-endif()
-
-# C API integration
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-  add_library(f3d_c_api SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/image_c_api.c)
-  target_link_libraries(f3d_c_api PRIVATE libf3d)
-  target_include_directories(f3d_c_api
-    PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/public
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-  )
 endif()
 
 # Testing
