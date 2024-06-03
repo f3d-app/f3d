@@ -35,16 +35,16 @@ target_link_options(f3djs PRIVATE
   "SHELL:-sEXPORT_EXCEPTION_HANDLING_HELPERS"
 )
 
-# Option to copy example.html file to index.html in the binary folder
-# In order to test the example:
+# Option to copy app.html file to index.html in the binary folder
+# In order to test the app:
 # - go to the binary folder where f3d.js, f3d.wasm and f3d.data are located
 # - run `python -m http.server 8000`
 # - open a browser to http://localhost:8000
-option(F3D_WASM_COPY_EXAMPLE "Copy HTML example to binary folder" ON)
+option(F3D_WASM_COPY_APP "Copy HTML app file to binary folder" ON)
 
-if(F3D_WASM_COPY_EXAMPLE)
+if(F3D_WASM_COPY_APP)
   configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/example.html"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app.html"
     "${CMAKE_BINARY_DIR}/bin/index.html"
     COPYONLY)
   configure_file(

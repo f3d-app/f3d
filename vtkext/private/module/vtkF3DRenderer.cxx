@@ -837,6 +837,7 @@ void vtkF3DRenderer::ConfigureHDRILUT()
       }
       assert(lut->GetTextureObject());
 
+#ifndef __EMSCRIPTEN__
       vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
         lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize(), VTK_UNSIGNED_SHORT);
       assert(img);
@@ -845,6 +846,7 @@ void vtkF3DRenderer::ConfigureHDRILUT()
       writer->SetFileName(lutCachePath.c_str());
       writer->SetInputData(img);
       writer->Write();
+#endif
     }
     this->HasValidHDRILUT = true;
   }
@@ -881,6 +883,7 @@ void vtkF3DRenderer::ConfigureHDRISphericalHarmonics()
           vtkTable::SafeDownCast(sh->GetOutputDataObject(0))->GetColumn(0));
       }
 
+#ifndef __EMSCRIPTEN__
       // Create spherical harmonics cache file
       vtkNew<vtkTable> table;
       table->AddColumn(this->SphericalHarmonics);
@@ -889,6 +892,7 @@ void vtkF3DRenderer::ConfigureHDRISphericalHarmonics()
       writer->SetInputData(table);
       writer->SetFileName(shCachePath.c_str());
       writer->Write();
+#endif
     }
     this->HasValidHDRISH = true;
   }
@@ -923,6 +927,7 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
       }
       assert(spec->GetTextureObject());
 
+#ifndef __EMSCRIPTEN__
       unsigned int nbLevels = spec->GetPrefilterLevels();
       unsigned int size = spec->GetPrefilterSize();
 
@@ -945,6 +950,7 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
       writer->SetFileName(specCachePath.c_str());
       writer->SetInputData(mb);
       writer->Write();
+#endif
     }
     this->HasValidHDRISpec = true;
   }
