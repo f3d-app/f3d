@@ -51,7 +51,6 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/types.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/utils.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/image_c_api.c
   )
 
 # List of headers that will be installed
@@ -70,7 +69,6 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/image_c_api.h
   )
 
 set(F3D_PLUGIN_HEADERS
