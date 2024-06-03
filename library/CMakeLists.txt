@@ -51,7 +51,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/types.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/utils.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/image_c_api.c   # Add this line
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/image_c_api.c
   )
 
 # List of headers that will be installed
@@ -70,6 +70,7 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/image_c_api.h
   )
 
 set(F3D_PLUGIN_HEADERS
@@ -90,7 +91,6 @@ target_include_directories(libf3d
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/private>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/plugin>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/plugin>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/path_to_your_c_header>  # Add this line
   )
 if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
   target_link_libraries(libf3d PRIVATE nlohmann_json::nlohmann_json)
