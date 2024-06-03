@@ -677,6 +677,9 @@ if(F3D_PLUGIN_BUILD_USD)
 
   # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8224
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20210805) # for embedded material support
+    if(F3D_MODULE_EXR)
+      f3d_test(NAME TestEXRReadMemory DATA sphere8.usdz --load-plugins=usd DEFAULT_LIGHTS)
+    endif()
     f3d_test(NAME TestUSDZAnimated DATA AnimatedCube.usdz ARGS --load-plugins=usd --animation-time=0.3)
     f3d_test(NAME TestUSDZRigged DATA RiggedSimple.usdz ARGS --load-plugins=usd --animation-time=0.3)
 
