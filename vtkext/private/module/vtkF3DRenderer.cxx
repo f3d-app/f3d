@@ -98,6 +98,7 @@ std::string ComputeFileHash(const std::string& filepath)
   return md5Hash;
 }
 
+#ifndef __EMSCRIPTEN__
 //----------------------------------------------------------------------------
 // Download texture from the GPU to a vtkImageData
 vtkSmartPointer<vtkImageData> SaveTextureToImage(
@@ -122,6 +123,7 @@ vtkSmartPointer<vtkImageData> SaveTextureToImage(
 
   return img;
 }
+#endif
 #endif
 }
 
