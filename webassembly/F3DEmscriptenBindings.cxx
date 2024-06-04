@@ -61,6 +61,14 @@ f3d::loader* loadScene(f3d::loader& l, const std::string& p)
 {
   return &l.loadScene(p);
 }
+bool hasGeometryReader(f3d::loader& l, const std::string& p)
+{
+  return l.hasGeometryReader(p);
+}
+bool hasSceneReader(f3d::loader& l, const std::string& p)
+{
+  return l.hasSceneReader(p);
+}
 
 f3d::window* getWindowPtr(f3d::engine& e)
 {
@@ -92,7 +100,9 @@ EMSCRIPTEN_BINDINGS(f3d)
   // f3d::loader
   emscripten::class_<f3d::loader>("Loader")
     .function("loadGeometry", &loadGeometry, emscripten::allow_raw_pointers())
-    .function("loadScene", &loadScene, emscripten::allow_raw_pointers());
+    .function("loadScene", &loadScene, emscripten::allow_raw_pointers())
+    .function("hasGeometryReader", &hasGeometryReader, emscripten::allow_raw_pointers())
+    .function("hasSceneReader", &hasSceneReader, emscripten::allow_raw_pointers());
 
   // f3d::window
   emscripten::class_<f3d::window>("Window")
