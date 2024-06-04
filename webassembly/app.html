@@ -40,7 +40,7 @@
       <aside class="menu">
         <div class="file has-name">
           <label class="file-label">
-            <input class="file-input" type="file" id="file-selector" accept=".gml,.gltf,.glb,.obj,.ply,.pts,.stl,.vtk,.vtp,.vtu" />
+            <input class="file-input" type="file" id="file-selector" accept=".gml,.gltf,.glb,.obj,.ply,.pts,.stl,.vtk,.vtp,.vtu,.3ds,.wrl,.vrml" />
             <span class="file-cta">
               <span class="file-label">Open a file...</span>
             </span>
@@ -136,7 +136,20 @@
 
         const openFile = (name) => {
           document.getElementById('file-name').innerHTML = name;
-          Module.engineInstance.getLoader().loadGeometry('/' + name);
+          const filePath = '/' + name;
+          const loader = Module.engineInstance.getLoader();
+          if (loader.hasSceneReader(filePath))
+          {
+            loader.loadScene(filePath);
+          }
+          else if (loader.hasGeometryReader(filePath))
+          {
+            loader.loadGeometry(filePath);
+          }
+          else
+          {
+            console.error('File ' + filePath + ' cannot be opened');
+          }
           Module.engineInstance.getWindow().resetCamera();
           Module.engineInstance.getWindow().render();
         };
