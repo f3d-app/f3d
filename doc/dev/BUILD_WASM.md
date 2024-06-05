@@ -19,6 +19,7 @@ docker pull dockcross/web-wasm:20240529-0dade71
 ```
 
 Clone VTK and F3D, it will be assumed that the source code is located in `$VTK_DIR` and `$F3D_DIR` variables in the next steps of this guide.
+It's recommended to use VTK commit `7e954a92fba020b160a07420403248f6be87f2b0` which has been tested to work properly.
 
 ## Building VTK
 
