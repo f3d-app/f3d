@@ -40,6 +40,9 @@ public:
     , Window(window)
     , Loader(loader)
   {
+#ifdef __EMSCRIPTEN__
+    vtkRenderWindowInteractor::InteractorManagesTheEventLoop = false;
+#endif
     this->VTKInteractor->SetRenderWindow(this->Window.GetRenderWindow());
     this->VTKInteractor->SetInteractorStyle(this->Style);
     this->VTKInteractor->Initialize();
