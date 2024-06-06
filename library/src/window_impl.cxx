@@ -179,6 +179,9 @@ window_impl::window_impl(const options& options, Type type)
     this->Internals->RenWin->SetWindowInfo("jni");
 #endif
   }
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240606)
+  this->Internals->RenWin->EnableTranslucentSurfaceOn();
+#endif
   this->Internals->RenWin->SetWindowName("f3d");
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
