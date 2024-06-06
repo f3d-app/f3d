@@ -17,8 +17,9 @@ set_target_properties(f3djs PROPERTIES
 target_link_libraries(f3djs PRIVATE libf3d)
 
 target_link_options(f3djs PRIVATE
+  "$<IF:$<CONFIG:Release>,-Oz,-O0>"
   "--bind"
-  "-O1"
+  "--closure 1"
   "SHELL:--preload-file ${F3D_WASM_DATA_FILE}@/"
   "SHELL:-sEXPORT_NAME=f3d"
   "SHELL:-sALLOW_MEMORY_GROWTH=1"
@@ -26,13 +27,10 @@ target_link_options(f3djs PRIVATE
   "SHELL:-sMODULARIZE=1"
   "SHELL:-sUSE_PTHREADS=0"
   "SHELL:-sWASM=1"
-  "SHELL:-sASSERTIONS=1"
   "SHELL:-sFORCE_FILESYSTEM"
   "SHELL:-sEXPORTED_RUNTIME_METHODS=FS"
-  "SHELL:-sERROR_ON_WASM_CHANGES_AFTER_LINK"
   "SHELL:-sWASM_BIGINT"
   "SHELL:-sNO_DISABLE_EXCEPTION_CATCHING"
-  "SHELL:-sEXPORT_EXCEPTION_HANDLING_HELPERS"
 )
 
 # Option to copy app.html file to index.html in the binary folder
