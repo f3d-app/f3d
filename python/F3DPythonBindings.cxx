@@ -272,6 +272,7 @@ PYBIND11_MODULE(pyf3d, module)
       "state", [](f3d::camera& cam) { return cam.getState(); }, &f3d::camera::setState)
     .def("dolly", &f3d::camera::dolly)
     .def("pan", &f3d::camera::pan, py::arg("right"), py::arg("up"), py::arg("forward") = 0.0)
+    .def("zoom", &f3d::camera::zoom)
     .def("roll", &f3d::camera::roll)
     .def("azimuth", &f3d::camera::azimuth)
     .def("yaw", &f3d::camera::yaw)
@@ -348,8 +349,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("set_verbose_level", &f3d::log::setVerboseLevel, py::arg("level"),
       py::arg("force_std_err") = false)
     .def_static("set_use_coloring", &f3d::log::setUseColoring)
-    .def_static("print",
-      [](f3d::log::VerboseLevel& level, const std::string& message)
+    .def_static("print", [](f3d::log::VerboseLevel& level, const std::string& message)
       { f3d::log::print(level, message); });
 
   py::enum_<f3d::log::VerboseLevel>(log, "VerboseLevel")
