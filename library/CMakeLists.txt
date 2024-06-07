@@ -195,8 +195,6 @@ endif()
 # Testing
 if(BUILD_TESTING)
   add_subdirectory(testing)
-  add_executable(test_image_c_api testing/test_image_c_api.c)   
-  target_link_libraries(test_image_c_api PRIVATE libf3d)
 endif()
 
 # Installing
