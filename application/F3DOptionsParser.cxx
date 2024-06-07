@@ -772,9 +772,9 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
 
   if (actualConfigFilePaths.empty())
   {
-    if (!config.empty())
+    if (!configSearch.empty())
     {
-      f3d::log::error("Configuration file for \"", config, "\" could not be found");
+      f3d::log::warn("Configuration file for \"", configSearch, "\" could not be found");
     }
     return false;
   }
