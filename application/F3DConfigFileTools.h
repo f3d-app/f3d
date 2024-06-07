@@ -9,12 +9,13 @@
 
 #include <filesystem>
 #include <string>
+#include <vector>
 
 namespace F3DConfigFileTools
 {
 std::filesystem::path GetUserConfigFileDirectory();
 std::filesystem::path GetBinaryResourceDirectory();
-std::filesystem::path GetConfigPath(const std::string& configSearch);
+std::vector<std::filesystem::path> GetConfigPaths(const std::string& configSearch);
 }
 
 #endif

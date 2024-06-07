@@ -74,23 +74,27 @@ fs::path F3DConfigFileTools::GetBinaryResourceDirectory()
 }
 
 //----------------------------------------------------------------------------
-fs::path F3DConfigFileTools::GetConfigPath(const std::string& configSearch)
+std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& configSearch)
 {
+  std::vector<std::filesystem::path> paths;
+
   fs::path configPath;
-  try
-  {
-    std::vector<fs::path> dirsToCheck;
-    dirsToCheck.emplace_back(F3DConfigFileTools::GetUserConfigFileDirectory());
+  std::vector<fs::path> dirsToCheck = {
+
 #ifdef __APPLE__
-    dirsToCheck.emplace_back("/usr/local/etc/f3d");
+    "/usr/local/etc/f3d",
 #endif
 #ifdef __linux__
-    dirsToCheck.emplace_back("/etc/f3d");
-    dirsToCheck.emplace_back("/usr/share/f3d/configs");
+    "/etc/f3d",
+    "/usr/share/f3d/configs",
 #endif
-    dirsToCheck.emplace_back(F3DConfigFileTools::GetBinaryResourceDirectory() / "configs");
+    F3DConfigFileTools::GetBinaryResourceDirectory() / "configs",
+    F3DConfigFileTools::GetUserConfigFileDirectory(),
+  };
 
-    for (const fs::path& dir : dirsToCheck)
+  for (const fs::path& dir : dirsToCheck)
+  {
+    try
     {
       if (dir.empty())
       {
@@ -105,7 +109,7 @@ fs::path F3DConfigFileTools::GetConfigPath(const std::string& configSearch)
           configPath = dir / (configSearch + ext);
           if (fs::exists(configPath))
           {
-            return configPath;
+            paths.emplace_back(configPath);
           }
         }
       }
@@ -115,16 +119,15 @@ fs::path F3DConfigFileTools::GetConfigPath(const std::string& configSearch)
         configPath = dir / (configSearch);
         if (fs::exists(configPath))
         {
-          return configPath;
+          paths.emplace_back(configPath);
         }
       }
     }
-    f3d::log::debug("No configuration file for \"", configSearch, "\" found");
-    return {};
+    catch (const fs::filesystem_error&)
+    {
+      f3d::log::error("Error recovering configuration file path: ", configPath.string());
+    }
   }
-  catch (const fs::filesystem_error&)
-  {
-    f3d::log::error("Error recovering configuration file path: ", configPath.string());
-    return {};
-  }
+
+  return paths;
 }
