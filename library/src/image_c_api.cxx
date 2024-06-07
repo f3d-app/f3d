@@ -1,220 +1,166 @@
-#ifndef F3D_C_API_H
-#define F3D_C_API_H
+#include "image_c_api.h"
+#include "image.h"
+#include <cstring>
 
-#include "export.h" // Ensure F3D_EXPORT is defined
+struct f3d_image {
+    f3d::image img;
+};
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/**
- * @struct f3d_point3_t
- * @brief Structure representing a 3D point
- */
-typedef struct {
-    float x;
-    float y;
-    float z;
-} f3d_point3_t;
-
-/**
- * @struct f3d_vector3_t
- * @brief Structure representing a 3D vector
- */
-typedef struct {
-    float x;
-    float y;
-    float z;
-} f3d_vector3_t;
-
-/**
- * @struct f3d_image_t
- * @brief Forward declaration of the f3d_image structure
- */
-typedef struct f3d_image f3d_image_t;
-
-/**
- * @brief Create a new image object
- * @return Pointer to the newly created image object
- */
-F3D_EXPORT f3d_image_t* f3d_image_new(void);
-
-/**
- * @brief Delete an image object
- * @param img Pointer to the image object to be deleted
- */
-F3D_EXPORT void f3d_image_delete(f3d_image_t* img);
-
-/**
- * @brief Set the resolution of an image
- * @param img Pointer to the image object
- * @param width Width of the image
- * @param height Height of the image
- */
-F3D_EXPORT void f3d_image_set_resolution(f3d_image_t* img, unsigned int width, unsigned int height);
-
-/**
- * @brief Get the width of an image
- * @param img Pointer to the image object
- * @return Width of the image
- */
-F3D_EXPORT unsigned int f3d_image_get_width(f3d_image_t* img);
-
-/**
- * @brief Get the height of an image
- * @param img Pointer to the image object
- * @return Height of the image
- */
-F3D_EXPORT unsigned int f3d_image_get_height(f3d_image_t* img);
-
-/**
- * @brief Get the number of channels in an image
- * @param img Pointer to the image object
- * @return Number of channels in the image
- */
-F3D_EXPORT unsigned int f3d_image_get_channel_count(f3d_image_t* img);
-
-/**
- * @brief Get the type of channels in an image
- * @param img Pointer to the image object
- * @return Type of channels in the image
- */
-F3D_EXPORT unsigned int f3d_image_get_channel_type(f3d_image_t* img);
-
-/**
- * @brief Get the size of the channel type in an image
- * @param img Pointer to the image object
- * @return Size of the channel type in the image
- */
-F3D_EXPORT unsigned int f3d_image_get_channel_type_size(f3d_image_t* img);
-
-/**
- * @brief Set the content of an image from a buffer
- * @param img Pointer to the image object
- * @param buffer Pointer to the buffer containing the image content
- */
-F3D_EXPORT void f3d_image_set_content(f3d_image_t* img, void* buffer);
-
-/**
- * @brief Get the content of an image as a buffer
- * @param img Pointer to the image object
- * @return Pointer to the buffer containing the image content
- */
-F3D_EXPORT void* f3d_image_get_content(f3d_image_t* img);
-
-/**
- * @brief Compare two images and return the difference
- * @param img Pointer to the image object
- * @param reference Pointer to the reference image object
- * @param threshold Comparison threshold
- * @param diff Pointer to the image object to store the difference
- * @param error Pointer to store the error value
- * @return 0 if the images are identical, non-zero otherwise
- */
-F3D_EXPORT int f3d_image_compare(f3d_image_t* img, f3d_image_t* reference, double threshold, f3d_image_t* diff, double* error);
-
-/**
- * @brief Save an image to a file
- * @param img Pointer to the image object
- * @param path Path to the file where the image will be saved
- * @param format Format in which the image will be saved
- */
-F3D_EXPORT void f3d_image_save(f3d_image_t* img, const char* path, int format);
-
-/**
- * @brief Save an image to a buffer
- * @param img Pointer to the image object
- * @param format Format in which the image will be saved
- * @param size Pointer to store the size of the saved buffer
- * @return Pointer to the buffer containing the saved image
- */
-F3D_EXPORT unsigned char* f3d_image_save_buffer(f3d_image_t* img, int format, unsigned int* size);
-
-/**
- * @brief Convert an image to a string representation for terminal output
- * @param img Pointer to the image object
- * @return Pointer to the string representation of the image
- */
-F3D_EXPORT const char* f3d_image_to_terminal_text(f3d_image_t* img);
-
-/**
- * @brief Set metadata for an image
- * @param img Pointer to the image object
- * @param key Metadata key
- * @param value Metadata value
- */
-F3D_EXPORT void f3d_image_set_metadata(f3d_image_t* img, const char* key, const char* value);
-
-/**
- * @brief Get metadata from an image
- * @param img Pointer to the image object
- * @param key Metadata key
- * @return Metadata value
- */
-F3D_EXPORT const char* f3d_image_get_metadata(f3d_image_t* img, const char* key);
-
-/**
- * @brief Get all metadata keys from an image
- * @param img Pointer to the image object
- * @param count Pointer to store the count of metadata keys
- * @return Pointer to the array of metadata keys
- */
-F3D_EXPORT char** f3d_image_all_metadata(f3d_image_t* img, unsigned int* count);
-
-/**
- * @brief Free metadata keys obtained from an image
- * @param keys Pointer to the array of metadata keys
- * @param count Count of metadata keys
- */
-F3D_EXPORT void f3d_image_free_metadata_keys(char** keys, unsigned int count);
-
-/**
- * @brief Create an image from a file
- * @param path Path to the image file
- * @return Pointer to the created image object
- */
-F3D_EXPORT f3d_image_t* f3d_image_create_from_file(const char* path);
-
-/**
- * @brief Create an image with specified parameters
- * @param width Width of the image
- * @param height Height of the image
- * @param channelCount Number of channels in the image
- * @param type Type of channels in the image
- * @return Pointer to the created image object
- */
-F3D_EXPORT f3d_image_t* f3d_image_create_with_params(unsigned int width, unsigned int height, unsigned int channelCount, unsigned int type);
-
-/**
- * @brief Get the count of supported image formats
- * @return Count of supported image formats
- */
-F3D_EXPORT unsigned int f3d_image_get_supported_formats_count();
-
-/**
- * @brief Get the list of supported image formats
- * @return Pointer to the array of supported image formats
- */
-F3D_EXPORT const char** f3d_image_get_supported_formats();
-
-/**
- * @brief Get a normalized pixel value from an image
- * @param img Pointer to the image object
- * @param x X-coordinate of the pixel
- * @param y Y-coordinate of the pixel
- * @param count Pointer to store the count of pixel values
- * @return Pointer to the array of normalized pixel values
- */
-F3D_EXPORT double* f3d_image_get_normalized_pixel(f3d_image_t* img, int x, int y, unsigned int* count);
-
-/**
- * @brief Free a normalized pixel value obtained from an image
- * @param pixel Pointer to the array of normalized pixel values
- */
-F3D_EXPORT void f3d_image_free_normalized_pixel(double* pixel);
-
-#ifdef __cplusplus
+f3d_image_t* f3d_image_new(void) {
+    return new f3d_image_t();
 }
-#endif
 
-#endif // F3D_C_API_H
+void f3d_image_delete(f3d_image_t* img) {
+    delete img;
+}
+
+void f3d_image_set_resolution(f3d_image_t* img, unsigned int width, unsigned int height) {
+    img->img.setResolution(width, height);
+}
+
+unsigned int f3d_image_get_width(f3d_image_t* img) {
+    return img->img.getWidth();
+}
+
+unsigned int f3d_image_get_height(f3d_image_t* img) {
+    return img->img.getHeight();
+}
+
+unsigned int f3d_image_get_channel_count(f3d_image_t* img) {
+    return img->img.getChannelCount();
+}
+
+unsigned int f3d_image_get_channel_type(f3d_image_t* img) {
+    return static_cast<unsigned int>(img->img.getChannelType());
+}
+
+unsigned int f3d_image_get_channel_type_size(f3d_image_t* img) {
+    return img->img.getChannelTypeSize();
+}
+
+void f3d_image_set_content(f3d_image_t* img, void* buffer) {
+    img->img.setContent(buffer);
+}
+
+void* f3d_image_get_content(f3d_image_t* img) {
+    return img->img.getContent();
+}
+
+int f3d_image_compare(f3d_image_t* img, f3d_image_t* reference, double threshold, f3d_image_t* diff, double* error) {
+    return img->img.compare(reference->img, threshold, diff->img, *error);
+}
+
+void f3d_image_save(f3d_image_t* img, const char* path, int format) {
+    f3d::image::SaveFormat save_format;
+    switch (format) {
+        case 0:
+            save_format = f3d::image::SaveFormat::PNG;
+            break;
+        case 1:
+            save_format = f3d::image::SaveFormat::JPG;
+            break;
+        case 2:
+            save_format = f3d::image::SaveFormat::TIF;
+            break;
+        case 3:
+            save_format = f3d::image::SaveFormat::BMP;
+            break;
+        default:
+            save_format = f3d::image::SaveFormat::PNG; // Default to PNG
+            break;
+    }
+    img->img.save(path, save_format);
+}
+
+unsigned char* f3d_image_save_buffer(f3d_image_t* img, int format, unsigned int* size) {
+    std::vector<unsigned char> buffer = img->img.saveBuffer(static_cast<f3d::image::SaveFormat>(format));
+    unsigned char* c_buffer = new unsigned char[buffer.size()];
+    std::copy(buffer.begin(), buffer.end(), c_buffer);
+    *size = buffer.size();
+    return c_buffer;
+}
+
+const char* f3d_image_to_terminal_text(f3d_image_t* img) {
+    static std::string result;
+    result = img->img.toTerminalText();
+    return result.c_str();
+}
+
+void f3d_image_set_metadata(f3d_image_t* img, const char* key, const char* value) {
+    img->img.setMetadata(key, value);
+}
+
+const char* f3d_image_get_metadata(f3d_image_t* img, const char* key) {
+    static std::string result;
+    result = img->img.getMetadata(key);
+    return result.c_str();
+}
+
+char** f3d_image_all_metadata(f3d_image_t* img, unsigned int* count) {
+    std::vector<std::string> metadata_keys = img->img.allMetadata();
+    *count = metadata_keys.size();
+    char** keys = new char*[metadata_keys.size()];
+    for (size_t i = 0; i < metadata_keys.size(); ++i) {
+        keys[i] = new char[metadata_keys[i].size() + 1];
+        strcpy(keys[i], metadata_keys[i].c_str());
+    }
+    return keys;
+}
+
+void f3d_image_free_metadata_keys(char** keys, unsigned int count) {
+    for (unsigned int i = 0; i < count; ++i) {
+        delete[] keys[i];
+    }
+    delete[] keys;
+}
+
+// Additional functions to match all functionalities from image.cxx
+f3d_image_t* f3d_image_create_from_file(const char* path) {
+    return new f3d_image_t{ f3d::image(path) };
+}
+
+f3d_image_t* f3d_image_create_with_params(unsigned int width, unsigned int height, unsigned int channelCount, unsigned int type) {
+    f3d::image::ChannelType channel_type;
+    switch (type) {
+        case 0:
+            channel_type = f3d::image::ChannelType::BYTE;
+            break;
+        case 1:
+            channel_type = f3d::image::ChannelType::SHORT;
+            break;
+        case 2:
+            channel_type = f3d::image::ChannelType::FLOAT;
+            break;
+        default:
+            channel_type = f3d::image::ChannelType::BYTE; // Default to BYTE
+            break;
+    }
+    return new f3d_image_t{ f3d::image(width, height, channelCount, channel_type) };
+}
+
+unsigned int f3d_image_get_supported_formats_count() {
+    std::vector<std::string> formats = f3d::image::getSupportedFormats();
+    return formats.size();
+}
+
+const char** f3d_image_get_supported_formats() {
+    static std::vector<std::string> formats = f3d::image::getSupportedFormats();
+    static std::vector<const char*> c_formats;
+    c_formats.clear();
+    for (const auto& format : formats) {
+        c_formats.push_back(format.c_str());
+    }
+    return c_formats.data();
+}
+
+double* f3d_image_get_normalized_pixel(f3d_image_t* img, int x, int y, unsigned int* count) {
+    std::vector<double> pixel = img->img.getNormalizedPixel({x, y});
+    *count = pixel.size();
+    double* c_pixel = new double[pixel.size()];
+    std::copy(pixel.begin(), pixel.end(), c_pixel);
+    return c_pixel;
+}
+
+void f3d_image_free_normalized_pixel(double* pixel) {
+    delete[] pixel;
+}
