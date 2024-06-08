@@ -7,16 +7,30 @@ struct f3d_image {
 };
 
 f3d_image_t* f3d_image_new(void) {
-    return new f3d_image_t();
+    return new f3d_image_t{f3d::image()};
 }
 
 void f3d_image_delete(f3d_image_t* img) {
     delete img;
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4996) // Disable deprecated warnings for MSVC
+#elif defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations" // Disable deprecated warnings for GCC/Clang
+#endif
+
 void f3d_image_set_resolution(f3d_image_t* img, unsigned int width, unsigned int height) {
     img->img.setResolution(width, height);
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#elif defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 unsigned int f3d_image_get_width(f3d_image_t* img) {
     return img->img.getWidth();

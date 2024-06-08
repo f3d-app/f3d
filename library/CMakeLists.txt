@@ -51,7 +51,7 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/types.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/utils.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/image_c_api.cxx   
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/image_c_api.cxx 
   )
 
 # List of headers that will be installed
@@ -70,7 +70,7 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/image_c_api.h  
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/image_c_api.h 
   )
 
 set(F3D_PLUGIN_HEADERS
@@ -91,7 +91,7 @@ target_include_directories(libf3d
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/private>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/plugin>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/plugin>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> 
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   )
 if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
   target_link_libraries(libf3d PRIVATE nlohmann_json::nlohmann_json)
@@ -111,6 +111,10 @@ set_target_properties(libf3d PROPERTIES
   OUTPUT_NAME "f3d"
   PDB_NAME "libf3d"
   )
+
+# Disable warnings as errors for image_c_api.cxx
+target_compile_options(libf3d PRIVATE
+  $<$<COMPILE_LANGUAGE:CXX>:-Wno-error=deprecated-declarations>)
 
 # It can be useful to disable soversion in case the links are duplicated
 # It happens with Python wheels for example
@@ -195,6 +199,8 @@ endif()
 # Testing
 if(BUILD_TESTING)
   add_subdirectory(testing)
+  add_executable(test_image_c_api testing/test_image_c_api.c)
+  target_link_libraries(test_image_c_api PRIVATE libf3d)      
 endif()
 
 # Installing
@@ -259,13 +265,13 @@ if(BUILD_SHARED_LIBS)
     DESTINATION
       "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
     COMPONENT sdk
-    EXCLUDE_FROM_ALL)
+    EXCLUDE_FROM ALL)
 
   # Install plugin headers
   install(FILES ${F3D_PLUGIN_HEADERS}
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/f3d"
     COMPONENT plugin_sdk
-    EXCLUDE_FROM_ALL)
+    EXCLUDE FROM ALL)
 
   # Install pluginsdk cmake and source files
   install(
@@ -279,6 +285,6 @@ if(BUILD_SHARED_LIBS)
     DESTINATION
       "${CMAKE_INSTALL_LIBDIR}/cmake/f3d"
     COMPONENT plugin_sdk
-    EXCLUDE_FROM_ALL)
+    EXCLUDE FROM ALL)
 
 endif()
