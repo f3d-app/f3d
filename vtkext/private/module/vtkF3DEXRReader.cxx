@@ -60,7 +60,7 @@ public:
 private:
   const char* buffer;
   size_t bufflen;
-  uint64_t pos;
+  uint64_t pos{ 0 };
 };
 
 vtkStandardNewMacro(vtkF3DEXRReader);
