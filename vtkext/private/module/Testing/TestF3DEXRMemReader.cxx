@@ -20,12 +20,8 @@ bool readFileToVector(const std::string& filename, std::vector<char>& buffer)
 
   std::streamsize size = file.tellg();
   file.seekg(0, std::ios::beg);
-
   buffer.resize(size);
-
-  if (file.read(buffer.data(), size))
-    return true;
-  return false;
+  return file.read(buffer.data(), size) ? true : false;
 }
 
 int TestF3DEXRMemReader(int argc, char* argv[])
