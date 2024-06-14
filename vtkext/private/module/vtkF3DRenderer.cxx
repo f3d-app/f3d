@@ -296,8 +296,13 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   if (this->UseToneMappingPass)
   {
     vtkNew<vtkToneMappingPass> toneP;
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240609)
+    toneP->SetToneMappingType(vtkToneMappingPass::NeutralPBR);
+#else
     toneP->SetToneMappingType(vtkToneMappingPass::GenericFilmic);
     toneP->SetGenericFilmicDefaultPresets();
+#endif
     toneP->SetDelegatePass(renderingPass);
     renderingPass = toneP;
   }

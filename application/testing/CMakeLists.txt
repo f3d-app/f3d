@@ -1,7 +1,7 @@
 # F3D Testing
 function(f3d_test)
 
-	cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI" "DEPENDS;ARGS" ${ARGN})
+	cmake_parse_arguments(F3D_TEST "DEFAULT_LIGHTS;TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI" "DEPENDS;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -70,6 +70,12 @@ function(f3d_test)
     math(EXPR _timeout "3 * ${_timeout}")
   endif()
 
+  if(F3D_TEST_TONE_MAPPING AND VTK_VERSION VERSION_LESS 9.3.20240609)
+    # After VTK 9.3.20240609, the tone mapping used in F3D is PBR Neutral
+    # Testing tone mapping is now disabled because the reference image is different
+    set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
+  endif()
+
   if(NOT F3D_TESTING_ENABLE_RENDERING_TESTS)
     if(NOT F3D_TEST_NO_RENDER)
       set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES DISABLED ON)
@@ -125,9 +131,9 @@ f3d_test(NAME TestNRRD DATA beach.nrrd ARGS -s DEFAULT_LIGHTS)
 f3d_test(NAME TestGridX DATA suzanne.ply ARGS -g --up=+X DEFAULT_LIGHTS)
 f3d_test(NAME TestGridY DATA suzanne.ply ARGS -g --up=+Y DEFAULT_LIGHTS)
 f3d_test(NAME TestGridZ DATA suzanne.ply ARGS -g --up=+Z DEFAULT_LIGHTS)
-f3d_test(NAME TestGridOptions DATA suzanne.ply ARGS -g --camera-elevation-angle=45 --grid-unit=2 --grid-subdivisions=3 -t DEFAULT_LIGHTS)
-f3d_test(NAME TestGridAbsolute DATA f3d.vtp ARGS -g --up=-Y --camera-direction=-.5,+1,+1 --grid-absolute -t DEFAULT_LIGHTS)
-f3d_test(NAME TestGridClipping DATA offset-flat-box.glb ARGS -g --grid-absolute --camera-position=70,120,350 -t DEFAULT_LIGHTS)
+f3d_test(NAME TestGridOptions DATA suzanne.ply ARGS -g --camera-elevation-angle=45 --grid-unit=2 --grid-subdivisions=3 DEFAULT_LIGHTS)
+f3d_test(NAME TestGridAbsolute DATA f3d.vtp ARGS -g --up=-Y --camera-direction=-.5,+1,+1 --grid-absolute DEFAULT_LIGHTS)
+f3d_test(NAME TestGridClipping DATA offset-flat-box.glb ARGS -g --grid-absolute --camera-position=70,120,350 DEFAULT_LIGHTS)
 f3d_test(NAME TestGridColor DATA suzanne.ply ARGS -g --grid-color=1,1,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x DEFAULT_LIGHTS)
 f3d_test(NAME TestPointCloud DATA pointsCloud.vtp ARGS -o --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
@@ -160,8 +166,8 @@ f3d_test(NAME TestCameraConfiguration DATA suzanne.obj ARGS --camera-position=0,
 f3d_test(NAME TestCameraDirection DATA suzanne.obj ARGS --camera-direction=-1,-1,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestCameraClipping DATA checkerboard_colorful.obj CONFIG ${F3D_SOURCE_DIR}/testing/configs/checkerboard_colorful.json RESOLUTION 800,600)
 f3d_test(NAME TestCameraOrthographic ARGS --camera-orthographic DATA cow.vtp DEFAULT_LIGHTS)
-f3d_test(NAME TestToneMapping DATA suzanne.ply ARGS -t DEFAULT_LIGHTS)
-f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt DEFAULT_LIGHTS)
+f3d_test(NAME TestToneMapping DATA suzanne.ply ARGS -t TONE_MAPPING DEFAULT_LIGHTS)
+f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -pt TONE_MAPPING DEFAULT_LIGHTS)
 f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT THRESHOLD 300 DEFAULT_LIGHTS) # Using default lights because of ResetCamera, High threshold for volume as it is dependent on the OpenGL implementation
 f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb LONG_TIMEOUT DEFAULT_LIGHTS) # Using default lights because of ResetCamera
@@ -296,21 +302,21 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestConfigFileUpperCase DATA suzanne_upper.STL CONFIG complex_build DEFAULT_LIGHTS)
 
   file(COPY "${F3D_SOURCE_DIR}/resources/configs/config.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-  f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
-  f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
-  f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
-  f3d_test(NAME TestDefaultConfigFileTIFF DATA logo.tif CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
-  f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS THRESHOLD 100)
-  f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
-  f3d_test(NAME TestDefaultConfigTranslucent DATA red_translucent_monkey.gltf CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+  f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+  f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+  f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+  f3d_test(NAME TestDefaultConfigFileTIFF DATA logo.tif CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+  f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING THRESHOLD 100)
+  f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+  f3d_test(NAME TestDefaultConfigTranslucent DATA red_translucent_monkey.gltf CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
 
   # no-background test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8501
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
     file(COPY "${F3D_SOURCE_DIR}/resources/configs/thumbnail.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-    f3d_test(NAME TestThumbnailConfigFileVTU DATA dragon.vtu CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
-    f3d_test(NAME TestThumbnailConfigFileVTI DATA vase_4comp.vti CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
-    f3d_test(NAME TestThumbnailConfigFileSTL DATA suzanne.stl CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
-    f3d_test(NAME TestThumbnailConfigFilePLY DATA suzanneRGBA.ply CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS THRESHOLD 100)
+    f3d_test(NAME TestThumbnailConfigFileVTU DATA dragon.vtu CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+    f3d_test(NAME TestThumbnailConfigFileVTI DATA vase_4comp.vti CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+    f3d_test(NAME TestThumbnailConfigFileSTL DATA suzanne.stl CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+    f3d_test(NAME TestThumbnailConfigFilePLY DATA suzanneRGBA.ply CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING THRESHOLD 100)
   endif()
 endif()
 
@@ -404,7 +410,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestHDRIEdges DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -e DEFAULT_LIGHTS THRESHOLD 60)
   f3d_test(NAME TestHDRI8Bit DATA suzanne.ply HDRI logo.tif)
   f3d_test(NAME TestHDRIOrient DATA suzanne.stl HDRI palermo_park_1k.hdr ARGS --up=+Z)
-  f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -t)
+  f3d_test(NAME TestHDRIToneMapping DATA suzanne.ply HDRI palermo_park_1k.hdr TONE_MAPPING ARGS -t)
   f3d_test(NAME TestInteractionHDRIMove DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION THRESHOLD 60) #Shift+MouseRight;
   f3d_test(NAME TestInteractionHDRIBlur DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS) #U
   f3d_test(NAME TestInteractionHDRIReload DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEFAULT_LIGHTS) #Up
@@ -479,9 +485,9 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsb --samples=1)
 
   if(NOT F3D_MACOS_BUNDLE)
-  f3d_test(NAME TestRaytracingDefaultConfigFile DATA dragon.vtu THRESHOLD 150 CONFIG config_build ARGS -r --samples=1 LONG_TIMEOUT)
+  f3d_test(NAME TestRaytracingDefaultConfigFile DATA dragon.vtu THRESHOLD 150 CONFIG config_build ARGS -r --samples=1 LONG_TIMEOUT TONE_MAPPING)
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
-      f3d_test(NAME TestRaytracingThumbnailConfigFile DATA dragon.vtu THRESHOLD 100 CONFIG thumbnail_build ARGS -r --samples=1 LONG_TIMEOUT)
+      f3d_test(NAME TestRaytracingThumbnailConfigFile DATA dragon.vtu THRESHOLD 100 CONFIG thumbnail_build ARGS -r --samples=1 LONG_TIMEOUT TONE_MAPPING)
     endif()
   endif()
 
@@ -504,11 +510,11 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-    f3d_test(NAME TestDefaultConfigFileAlembic DATA suzanne.abc CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+    f3d_test(NAME TestDefaultConfigFileAlembic DATA suzanne.abc CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
       file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-      f3d_test(NAME TestThumbnailConfigFileAlembic DATA suzanne.abc CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+      f3d_test(NAME TestThumbnailConfigFileAlembic DATA suzanne.abc CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
     endif()
   endif()
 
@@ -553,17 +559,17 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/assimp/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-    f3d_test(NAME TestDefaultConfigFileAssimpFBX DATA phong_cube.fbx CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
-    f3d_test(NAME TestDefaultConfigFileAssimpDXF DATA PinkEggFromLW.dxf ARGS -p CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
-    f3d_test(NAME TestDefaultConfigFileAssimpOFF DATA teapot.off CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
-    f3d_test(NAME TestDefaultConfigFileAssimpDAE DATA duck.dae CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+    f3d_test(NAME TestDefaultConfigFileAssimpFBX DATA phong_cube.fbx CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+    f3d_test(NAME TestDefaultConfigFileAssimpDXF DATA PinkEggFromLW.dxf ARGS -p CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+    f3d_test(NAME TestDefaultConfigFileAssimpOFF DATA teapot.off CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+    f3d_test(NAME TestDefaultConfigFileAssimpDAE DATA duck.dae CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
       file(COPY "${F3D_SOURCE_DIR}/plugins/assimp/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-      f3d_test(NAME TestThumbnailConfigFileAssimpFBX DATA phong_cube.fbx CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
-      f3d_test(NAME TestThumbnailConfigFileAssimpDXF DATA PinkEggFromLW.dxf ARGS -p CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
-      f3d_test(NAME TestThumbnailConfigFileAssimpOFF DATA teapot.off CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
-      f3d_test(NAME TestThumbnailConfigFileAssimpDAE DATA duck.dae CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+      f3d_test(NAME TestThumbnailConfigFileAssimpFBX DATA phong_cube.fbx CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+      f3d_test(NAME TestThumbnailConfigFileAssimpDXF DATA PinkEggFromLW.dxf ARGS -p CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+      f3d_test(NAME TestThumbnailConfigFileAssimpOFF DATA teapot.off CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
+      f3d_test(NAME TestThumbnailConfigFileAssimpDAE DATA duck.dae CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
     endif()
   endif()
 
@@ -582,11 +588,11 @@ if(F3D_PLUGIN_BUILD_DRACO)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/draco/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-    f3d_test(NAME TestDefaultConfigFileDraco DATA suzanne.drc CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+    f3d_test(NAME TestDefaultConfigFileDraco DATA suzanne.drc CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
       file(COPY "${F3D_SOURCE_DIR}/plugins/draco/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-      f3d_test(NAME TestThumbnailConfigFileDraco DATA suzanne.drc CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+      f3d_test(NAME TestThumbnailConfigFileDraco DATA suzanne.drc CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
     endif()
   endif()
 
@@ -620,11 +626,11 @@ if(F3D_PLUGIN_BUILD_EXODUS)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/exodus/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-    f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+    f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
       file(COPY "${F3D_SOURCE_DIR}/plugins/exodus/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-      f3d_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+      f3d_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
     endif()
   endif()
 
@@ -652,11 +658,11 @@ if(F3D_PLUGIN_BUILD_OCCT)
 
     if (NOT F3D_MACOS_BUNDLE)
       file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-      f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+      f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
 
       if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
         file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-        f3d_test(NAME TestThumbnailConfigFileOCCT DATA f3d.stp CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+        f3d_test(NAME TestThumbnailConfigFileOCCT DATA f3d.stp CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
       endif()
     endif()
   endif()
@@ -688,11 +694,11 @@ if(F3D_PLUGIN_BUILD_USD)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-    f3d_test(NAME TestDefaultConfigFileUSD DATA suzanne.usd CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+    f3d_test(NAME TestDefaultConfigFileUSD DATA suzanne.usd CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
 
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20211007)
       file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-      f3d_test(NAME TestThumbnailConfigFileUSD DATA suzanne.usd CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+      f3d_test(NAME TestThumbnailConfigFileUSD DATA suzanne.usd CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
     endif()
   endif()
 endif()
@@ -704,10 +710,10 @@ if(F3D_PLUGIN_BUILD_VDB)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/vdb/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-    f3d_test(NAME TestDefaultConfigFileVDB DATA icosahedron.vdb CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS)
+    f3d_test(NAME TestDefaultConfigFileVDB DATA icosahedron.vdb CONFIG config_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
 
     file(COPY "${F3D_SOURCE_DIR}/plugins/vdb/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-    f3d_test(NAME TestThumbnailConfigFileVDB DATA icosahedron.vdb CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS)
+    f3d_test(NAME TestThumbnailConfigFileVDB DATA icosahedron.vdb CONFIG thumbnail_build LONG_TIMEOUT DEFAULT_LIGHTS TONE_MAPPING)
   endif()
 endif ()
 
@@ -717,7 +723,7 @@ endif()
 
 ## Interaction Tests
 # Test hotkeys
-f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #PQAT
+f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION TONE_MAPPING DEFAULT_LIGHTS) #PQAT
 f3d_test(NAME TestInteractionActors DATA cow.vtp INTERACTION DEFAULT_LIGHTS) #EXGMN
 f3d_test(NAME TestInteractionTimer DATA cow.vtp NO_BASELINE INTERACTION) #Z
 f3d_test(NAME TestInteractionMisc DATA cow.vtp NO_BASELINE INTERACTION) #KK
