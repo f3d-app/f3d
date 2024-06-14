@@ -72,7 +72,7 @@ jobs:
       uses: ./source/.github/actions/generic-ci
       with:
         vtk_version: ${{matrix.vtk_version}}
-        raytracing_label: no-raytracing
+        raytracing_label: raytracing
         static_label: ${{matrix.static_label}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
