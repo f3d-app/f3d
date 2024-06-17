@@ -6,9 +6,25 @@
 
 #include <string>
 #include <vector>
+#include <variant>
+#include <array>
 
 namespace f3d
 {
+struct f3d_options {
+  struct scene_t {
+    struct animation_t {
+      int index = 0;
+    };
+  animation_t animation;
+  };
+ scene_t scene;
+ struct render_t {
+   double line_width = 1.0;
+ };
+ render_t render;
+};
+
 /**
  * @class   options
  * @brief   Class used to control the different options
@@ -132,9 +148,13 @@ public:
     explicit inexistent_exception(const std::string& what = "");
   };
 
+  f3d_options& getStruct(){return option_struct;}
+  const f3d_options& getConstStruct() const{return option_struct;}
+
 private:
   class internals;
   internals* Internals;
+  f3d_options option_struct;
 };
 }
 

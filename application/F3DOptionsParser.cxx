@@ -365,7 +365,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", options.getAsBoolRef("interactor.trackball"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "invert-zoom", "", "Invert zoom direction with right mouse click", options.getAsBoolRef("interactor.invert-zoom"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "animation-autoplay", "", "Automatically start animation", options.getAsBoolRef("scene.animation.autoplay"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.getAsIntRef("scene.animation.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
+    this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.getStruct().scene.animation.index, HasDefault::YES, MayHaveConfig::YES, "<index>");
     this->DeclareOption(grp1, "animation-speed-factor", "", "Set animation speed factor", options.getAsDoubleRef("scene.animation.speed-factor"), HasDefault::YES, MayHaveConfig::YES, "<factor>");
     this->DeclareOption(grp1, "animation-time", "", "Set animation time to load", options.getAsDoubleRef("scene.animation.time"), HasDefault::YES, MayHaveConfig::YES, "<time>");
     this->DeclareOption(grp1, "animation-frame-rate", "", "Set animation frame rate when playing animation interactively", options.getAsDoubleRef("scene.animation.frame-rate"), HasDefault::YES, MayHaveConfig::YES, "<frame rate>");
@@ -375,7 +375,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.getAsBoolRef("model.point-sprites.enable"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp2, "point-type", "", "Point sprites type when showing point sprites", options.getAsStringRef("model.point-sprites.type"), HasDefault::YES, MayHaveConfig::YES, "<sphere|gaussian>");
     this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.getAsDoubleRef("render.point-size"), HasDefault::YES, MayHaveConfig::YES, "<size>");
-    this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", options.getAsDoubleRef("render.line-width"), HasDefault::YES, MayHaveConfig::YES, "<width>");
+    this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", options.getStruct().render.line_width, HasDefault::YES, MayHaveConfig::YES, "<width>");
     this->DeclareOption(grp2, "color", "", "Solid color", options.getAsDoubleVectorRef("model.color.rgb"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
     this->DeclareOption(grp2, "opacity", "", "Opacity", options.getAsDoubleRef("model.color.opacity"), HasDefault::YES, MayHaveConfig::YES, "<opacity>");
     this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.roughness"), HasDefault::YES, MayHaveConfig::YES, "<roughness>");
