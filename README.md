@@ -59,7 +59,7 @@ man f3d # Linux only
 
 # Support
 
-F3D needs you help!
+F3D needs your help!
 
 If you can, please consider sponsoring F3D. Even a small donation would help us offset the recurring maintenance costs.
 With enough sponsors we would even be able to add support for new devices (as we would need do acquire or rent them first). Read more about it on our [sponsor page](https://github.com/sponsors/f3d-app).
