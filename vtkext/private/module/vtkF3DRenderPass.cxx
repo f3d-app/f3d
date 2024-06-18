@@ -261,6 +261,11 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
 
   r->Clear();
 
+  // Enable blending with default VTK blending function
+  // It is required since external window do not set it up
+  renWin->GetState()->vtkglEnable(GL_BLEND);
+  renWin->GetState()->vtkglBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
   if (this->BlendQuadHelper && this->BlendQuadHelper->ShaderChangeValue < this->GetMTime())
   {
     this->BlendQuadHelper = nullptr;
