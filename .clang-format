@@ -19,5 +19,5 @@ ColumnLimit: 100
 # For your commits to be compatible with clang 3.8
 # you are best off running clang-format 3.8 on your
 # system
-Standard: Cpp03
+Standard: Cpp11
 ...

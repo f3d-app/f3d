@@ -20,13 +20,13 @@ class options::internals
 {
 public:
   using OptionVariant =
-    std::variant<bool, int, double, std::string, std::vector<int>, std::vector<double> >;
+    std::variant<bool, int, double, std::string, std::vector<int>, std::vector<double>>;
 
   template<typename T, typename U>
   struct IsTypeValid;
 
   template<typename T, typename... Ts>
-  struct IsTypeValid<T, std::variant<Ts...> > : public std::disjunction<std::is_same<T, Ts>...>
+  struct IsTypeValid<T, std::variant<Ts...>> : public std::disjunction<std::is_same<T, Ts>...>
   {
   };
 
@@ -390,13 +390,13 @@ std::string options::getAsString(const std::string& name) const
 //----------------------------------------------------------------------------
 std::vector<int> options::getAsIntVector(const std::string& name) const
 {
-  return this->Internals->get<std::vector<int> >(name);
+  return this->Internals->get<std::vector<int>>(name);
 }
 
 //----------------------------------------------------------------------------
 std::vector<double> options::getAsDoubleVector(const std::string& name) const
 {
-  return this->Internals->get<std::vector<double> >(name);
+  return this->Internals->get<std::vector<double>>(name);
 }
 
 //----------------------------------------------------------------------------
@@ -426,13 +426,13 @@ std::string& options::getAsStringRef(const std::string& name)
 //----------------------------------------------------------------------------
 std::vector<int>& options::getAsIntVectorRef(const std::string& name)
 {
-  return this->Internals->getRef<std::vector<int> >(name);
+  return this->Internals->getRef<std::vector<int>>(name);
 }
 
 //----------------------------------------------------------------------------
 std::vector<double>& options::getAsDoubleVectorRef(const std::string& name)
 {
-  return this->Internals->getRef<std::vector<double> >(name);
+  return this->Internals->getRef<std::vector<double>>(name);
 }
 
 //----------------------------------------------------------------------------

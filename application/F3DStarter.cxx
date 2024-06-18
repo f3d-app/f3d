@@ -261,7 +261,7 @@ public:
       const std::regex escapedVarRe(escapedVar);
       const std::regex substVarRe(substVar);
 
-      std::vector<std::pair<std::string, bool> > fragments;
+      std::vector<std::pair<std::string, bool>> fragments;
       const auto callback = [&](const std::string& m)
       {
         if (std::regex_match(m, escapedVarRe))

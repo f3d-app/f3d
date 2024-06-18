@@ -111,8 +111,7 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("resetCamera", &resetCamera, emscripten::allow_raw_pointers());
 
   // f3d::interactor
-  emscripten::class_<f3d::interactor>("Interactor")
-    .function("start", &f3d::interactor::start);
+  emscripten::class_<f3d::interactor>("Interactor").function("start", &f3d::interactor::start);
 
   // f3d::engine
   emscripten::class_<f3d::engine> engine("Engine");
