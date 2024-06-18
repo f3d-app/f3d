@@ -258,7 +258,6 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
 {
   vtkRenderer* r = s->GetRenderer();
   vtkOpenGLRenderWindow* renWin = static_cast<vtkOpenGLRenderWindow*>(r->GetRenderWindow());
-  vtkOpenGLState* ostate = renWin->GetState();
 
   r->Clear();
 
