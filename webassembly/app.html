@@ -104,6 +104,9 @@
     const settings = {
       canvas: document.getElementById("canvas"),
       setupOptions: (options) => {
+        // background must be set to black for proper blending with transparent canvas
+        options.set_color('render.background.color', 0, 0, 0);
+
         // setup coloring
         options.set_string('model.scivis.array-name', 'Colors');
         options.set_integer('model.scivis.component', -2);

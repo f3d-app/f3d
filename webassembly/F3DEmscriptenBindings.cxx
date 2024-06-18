@@ -48,6 +48,10 @@ f3d::options* set_integer(f3d::options& o, const std::string& name, int value)
 {
   return &o.set(name, value);
 }
+f3d::options* set_color(f3d::options& o, const std::string& name, double r, double g, double b)
+{
+  return &o.set(name, std::vector{ r, g, b });
+}
 
 f3d::loader* getLoaderPtr(f3d::engine& e)
 {
@@ -95,7 +99,8 @@ EMSCRIPTEN_BINDINGS(f3d)
   emscripten::class_<f3d::options>("Options")
     .function("toggle", &toggle, emscripten::allow_raw_pointers())
     .function("set_string", &set_string, emscripten::allow_raw_pointers())
-    .function("set_integer", &set_integer, emscripten::allow_raw_pointers());
+    .function("set_integer", &set_integer, emscripten::allow_raw_pointers())
+    .function("set_color", &set_color, emscripten::allow_raw_pointers());
 
   // f3d::loader
   emscripten::class_<f3d::loader>("Loader")
