@@ -47,6 +47,7 @@ struct F3DAppOptions
   double CameraZoomFactor = 0.0;
   double CameraViewAngle = 0.0;
   std::vector<std::string> Plugins;
+  std::string FinalShader = "";
 };
 
 class F3DOptionsParser

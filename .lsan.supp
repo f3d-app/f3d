@@ -22,4 +22,4 @@ leak:libtbb
 # forces us to hide all leaks from the tests using a render window
 # https://gitlab.kitware.com/vtk/vtk/-/issues/18504
 leak:libf3dSDKTests
-leak:VTKExtensionsRenderingTests
+leak:vtkextPrivateTests

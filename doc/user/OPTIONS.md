@@ -123,6 +123,7 @@ Options|Description
 -q, \-\-ambient-occlusion|Enable *ambient occlusion*. This is a technique used to improve the depth perception of the object.
 -a, \-\-anti-aliasing|Enable *anti-aliasing*. This technique is used to reduce aliasing.
 -t, \-\-tone-mapping|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
+\-\-final-shader|Add a final shader to the output image. See [dedicated documentation](FINAL_SHADER.md) for more details.
 
 ## Testing options
 

@@ -78,6 +78,7 @@ public:
   void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);
   void SetBackfaceType(const std::string& backfaceType);
+  void SetFinalShader(const std::string& finalShader);
   ///@}
 
   ///@{
@@ -328,6 +329,7 @@ protected:
   std::string AnimationNameInfo;
 
   std::string BackfaceType;
+  std::string FinalShader;
 };
 
 #endif
