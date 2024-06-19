@@ -407,10 +407,10 @@ void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> >
+std::vector<std::pair<vtkActor*, vtkPolyDataMapper*>>
 vtkF3DGenericImporter::GetGeometryActorsAndMappers()
 {
-  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > actorsAndMappers(
+  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*>> actorsAndMappers(
     this->Pimpl->Readers.size());
 
   std::transform(this->Pimpl->Readers.cbegin(), this->Pimpl->Readers.cend(),
@@ -422,10 +422,10 @@ vtkF3DGenericImporter::GetGeometryActorsAndMappers()
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> >
+std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*>>
 vtkF3DGenericImporter::GetPointSpritesActorsAndMappers()
 {
-  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > actorsAndMappers(
+  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*>> actorsAndMappers(
     this->Pimpl->Readers.size());
 
   std::transform(this->Pimpl->Readers.cbegin(), this->Pimpl->Readers.cend(),
@@ -437,10 +437,10 @@ vtkF3DGenericImporter::GetPointSpritesActorsAndMappers()
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> >
+std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*>>
 vtkF3DGenericImporter::GetVolumePropsAndMappers()
 {
-  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > propsAndMappers(
+  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*>> propsAndMappers(
     this->Pimpl->Readers.size());
 
   std::transform(this->Pimpl->Readers.cbegin(), this->Pimpl->Readers.cend(),

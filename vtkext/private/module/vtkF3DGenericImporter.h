@@ -74,9 +74,9 @@ public:
    * Access to actors vectors. They all have the same size, which correspond to the number
    * of added internal readers.
    */
-  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > GetGeometryActorsAndMappers();
-  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > GetPointSpritesActorsAndMappers();
-  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > GetVolumePropsAndMappers();
+  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*>> GetGeometryActorsAndMappers();
+  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*>> GetPointSpritesActorsAndMappers();
+  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*>> GetVolumePropsAndMappers();
   ///@}
 
   /**
@@ -87,7 +87,7 @@ public:
     std::string Name;
     int MaximumNumberOfComponents = 0;
     std::vector<std::string> ComponentNames;
-    std::vector<std::array<double, 2> > ComponentRanges;
+    std::vector<std::array<double, 2>> ComponentRanges;
     std::array<double, 2> MagnitudeRange = { std::numeric_limits<float>::max(),
       std::numeric_limits<float>::min() };
     std::vector<vtkDataArray*> Arrays;

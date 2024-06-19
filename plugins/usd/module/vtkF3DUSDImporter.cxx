@@ -1167,10 +1167,10 @@ public:
   pxr::UsdStageRefPtr Stage = nullptr;
 
 private:
-  std::unordered_map<std::string, vtkSmartPointer<vtkActor> > ActorMap;
-  std::unordered_map<std::string, vtkSmartPointer<vtkPolyData> > MeshMap;
-  std::unordered_map<std::string, vtkSmartPointer<vtkProperty> > ShaderMap;
-  std::unordered_map<std::string, vtkSmartPointer<vtkImageData> > TextureMap;
+  std::unordered_map<std::string, vtkSmartPointer<vtkActor>> ActorMap;
+  std::unordered_map<std::string, vtkSmartPointer<vtkPolyData>> MeshMap;
+  std::unordered_map<std::string, vtkSmartPointer<vtkProperty>> ShaderMap;
+  std::unordered_map<std::string, vtkSmartPointer<vtkImageData>> TextureMap;
   double CurrentTime = 0.0;
 
   class DiagDelegate : public pxr::TfDiagnosticMgr::Delegate
