@@ -267,8 +267,11 @@ bool animationManager::LoadAtTime(double timeValue)
     // Set progress bar
     vtkProgressBarRepresentation* progressRep =
       vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());
-    progressRep->SetProgressRate(
-      (this->CurrentTime - this->TimeRange[0]) / (this->TimeRange[1] - this->TimeRange[0]));
+    if (this->Options->getAsBool("ui.animation-progress"))
+      progressRep->SetProgressRate(
+        (this->CurrentTime - this->TimeRange[0]) / (this->TimeRange[1] - this->TimeRange[0]));
+    else
+      progressRep->SetProgressRate(0);
 
     this->Interactor->UpdateRendererAfterInteraction();
   }
