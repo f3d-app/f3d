@@ -148,13 +148,12 @@ public:
     explicit inexistent_exception(const std::string& what = "");
   };
 
-  f3d_options& getStruct(){return option_struct;}
-  const f3d_options& getConstStruct() const{return option_struct;}
+  f3d_options& getStruct();
+  const f3d_options& getConstStruct() const;
 
 private:
   class internals;
   internals* Internals;
-  f3d_options option_struct;
 };
 }
 

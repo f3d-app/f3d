@@ -49,17 +49,24 @@ public:
         log::warn("Option ", name, " is deprecated");
       }
 #endif
-      T& opt = std::get<T>(this->Options.at(name));
-      opt = value;
+      OptionVariant var(value);
+      if (name == "scene.animation.index")
+      {
+        this->option_struct.scene.animation.index = std::get<int>(var);
+      }
+      else if (name == "render.line_width")
+      {
+        this->option_struct.render.line_width = std::get<double>(var);
+      }
     }
     catch (const std::bad_variant_access&)
     {
       log::error("Trying to set option ", name, " with incompatible type");
     }
-    catch (const std::out_of_range&)
+/*    catch (const std::out_of_range&)
     {
       log::error("Option ", name, " does not exist");
-    }
+    }*/
   }
 
   template<typename T>
@@ -84,8 +91,24 @@ public:
   template<typename T>
   T get(const std::string& name) const
   {
+    OptionVariant var;
     T val = {};
-    this->get(name, val);
+    try
+    {
+      if (name == "scene.animation.index")
+      {
+        var = this->option_struct.scene.animation.index;
+      }
+      else if (name == "render.line_width")
+      {
+        var = this->option_struct.render.line_width;
+      }
+      T val = std::get<T>(var);
+    }
+    catch (const std::bad_variant_access&)
+    {
+      log::error("Trying to get option ", name, " with incompatible type");
+    }
     return val;
   }
 
@@ -125,6 +148,7 @@ public:
 #endif
 
   std::map<std::string, OptionVariant> Options;
+  f3d_options option_struct;
 };
 
 //----------------------------------------------------------------------------
@@ -518,5 +542,8 @@ options::inexistent_exception::inexistent_exception(const std::string& what)
   : exception(what)
 {
 }
+
+f3d_options& options::getStruct(){return this->Internals->option_struct;}
+const f3d_options& options::getConstStruct() const{return this->Internals->option_struct;}
 
 }
