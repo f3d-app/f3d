@@ -360,6 +360,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp1, "grid-absolute", "", "Position grid at the absolute origin instead of below the model", options.getAsBoolRef("render.grid.absolute"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "grid-unit", "", "Size of grid unit square", options.getAsDoubleRef("render.grid.unit"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "grid-subdivisions", "", "Number of grid subdivisions", options.getAsIntRef("render.grid.subdivisions"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "grid-color", "", "Color of main grid lines", options.getAsDoubleVectorRef("render.grid.color"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.getAsBoolRef("render.show-edges"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", options.getAsIntRef("scene.camera.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
     this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", options.getAsBoolRef("interactor.trackball"), HasDefault::YES, MayHaveConfig::YES);

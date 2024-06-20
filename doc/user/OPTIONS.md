@@ -33,6 +33,7 @@ Options|Default|Description
 -g, \-\-grid||Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.
 \-\-grid\-unit=\<length\>||Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.
 \-\-grid\-subdivisions=\<count\>||Set the number of subdivisions for the grid.
+\-\-grid\-color=\<color\>|(0,0,0)|Set the color grid lines.
 -e, \-\-edges||Show the *cell edges*.
 \-\-camera-index=\<idx\>|-1|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.
 -k, \-\-trackball||Enable trackball interaction.
