@@ -72,6 +72,7 @@ render.grid.enable|bool<br>false<br>render|Show *a grid* aligned with the horizo
 render.grid.absolute|bool<br>false<br>render|Position the grid at the *absolute origin* of the model's coordinate system instead of below the model.|\-\-grid
 render.grid.unit|double<br>0<br>render|Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.|\-\-grid\-unit
 render.grid.subdivisions|int<br>10<br>render|Set the number of subdivisions for the grid.|\-\-grid\-subdivisions
+render.grid.color|int<br>(0, 0, 0)<br>render|Set the color of grid lines.|\-\-grid\-color
 render.raytracing.enable|bool<br>false<br>render|Enable *raytracing*. Requires the raytracing module to be enabled.|\-\-raytracing
 render.raytracing.samples|int<br>5<br>render|The number of *samples per pixel*.|\-\-samples
 render.raytracing.denoise|bool<br>false<br>render|*Denoise* the raytracing rendering.|\-\-denoise

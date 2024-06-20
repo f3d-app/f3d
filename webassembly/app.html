@@ -87,20 +87,6 @@
   <script type="text/javascript" src="f3d.js"></script>
   <script type="text/javascript">
 
-    // theme switch
-    document.querySelector('#dark').addEventListener('change', (evt) => {
-        if (evt.target.checked)
-        {
-          document.documentElement.classList.add('theme-dark');
-          document.documentElement.classList.remove('theme-light');
-        }
-        else
-        {
-          document.documentElement.classList.add('theme-light');
-          document.documentElement.classList.remove('theme-dark');
-        }
-      });
-
     const settings = {
       canvas: document.getElementById("canvas"),
       setupOptions: (options) => {
@@ -185,6 +171,30 @@
         mapToggleIdToOption('ssao', 'render.effect.ambient-occlusion');
         mapToggleIdToOption('ambient', 'render.hdri.ambient');
 
+        switchDark = () => {
+          document.documentElement.classList.add('theme-dark');
+          document.documentElement.classList.remove('theme-light');
+          Module.engineInstance.getOptions().set_color('render.grid.color', 0.25, 0.27, 0.33);
+          Module.engineInstance.getWindow().render();
+        };
+
+        switchLight = () => {
+          document.documentElement.classList.add('theme-light');
+          document.documentElement.classList.remove('theme-dark');
+          Module.engineInstance.getOptions().set_color('render.grid.color', 0.67, 0.69, 0.75);
+          Module.engineInstance.getWindow().render();
+        };
+
+        // theme switch
+        document.querySelector('#dark').addEventListener('change', (evt) => {
+            if (evt.target.checked)
+              switchDark();
+            else
+              switchLight();
+          });
+
+        switchDark();
+
         // up callback
         document.querySelector('#z-up')
           .addEventListener('click', (evt) => {
@@ -203,7 +213,7 @@
           });
 
         // load the file located in the virtual filesystem
-        openFile('f3d.vtp')
+        openFile('f3d.vtp');
 
         // setup the window size based on the canvas size
         const main = document.getElementById('main');

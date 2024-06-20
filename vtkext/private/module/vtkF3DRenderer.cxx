@@ -454,6 +454,20 @@ void vtkF3DRenderer::SetGridSubdivisions(int subdivisions)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetGridColor(const std::vector<double>& color)
+{
+  assert(color.size() == 3);
+
+  if (this->GridColor[0] != color[0] || this->GridColor[1] != color[1] || this->GridColor[2] != color[2])
+  {
+    this->GridColor[0] = color[0];
+    this->GridColor[1] = color[1];
+    this->GridColor[2] = color[2];
+    this->GridConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowGrid(bool show)
 {
   if (this->GridVisible != show)
@@ -525,7 +539,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       if (this->GridAbsolute)
         gridMapper->SetOriginOffset(-gridPos[0], -gridPos[1], -gridPos[2]);
 
-      this->GridActor->GetProperty()->SetColor(0.0, 0.0, 0.0);
+      this->GridActor->GetProperty()->SetColor(this->GridColor);
       this->GridActor->ForceTranslucentOn();
       this->GridActor->SetPosition(gridPos);
       this->GridActor->SetMapper(gridMapper);
