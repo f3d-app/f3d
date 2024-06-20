@@ -90,7 +90,9 @@ void vtkF3DEXRReader::ExecuteInformation()
   {
     // If we have no file then maybe we have the file in memory
     if (!this->MemoryBuffer)
+    {
       return;
+    }
   }
 
   auto execute = [&](Imf::RgbaInputFile& file)
