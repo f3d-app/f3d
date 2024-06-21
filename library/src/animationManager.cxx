@@ -54,9 +54,9 @@ bool animationManager::Initialize(
     progressRep->DrawFrameOff();
     progressRep->SetPadding(0.0, 0.0);
 #endif
+    progressRep->SetVisibility(options->getAsBool("ui.animation-progress"));
 
-    if (this->Options->getAsBool("ui.animation-progress"))
-      this->ProgressWidget->On();
+    this->ProgressWidget->On();
   }
   else
   {
