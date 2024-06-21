@@ -95,6 +95,7 @@ ui.filename-info|string<br>-<br>render|Content of *filename info* to display.
 ui.font-file|string<br>-<br>render|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.|\-\-font-file
 ui.fps|bool<br>false<br>render|Display a *frame per second counter*.|\-\-fps
 ui.loader-progress|bool<br>false<br>load|Show a *progress bar* when loading the file.|\-\-progress
+ui.animation-progress|bool<br>false<br>load|Show a *progress bar* when playing the animation.|\-\-animation-progress
 ui.metadata|bool<br>false<br>render|Display the *metadata*.|\-\-metadata
 ui.dropzone|bool<br>false<br>render|Show a drop zone.
 ui.dropzone-info|string<br>-<br>render|Content of the drop zone text to display.

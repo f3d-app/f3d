@@ -183,6 +183,7 @@ options::options()
   this->Internals->init("ui.metadata", false);
   this->Internals->init("ui.font-file", std::string());
   this->Internals->init("ui.loader-progress", false);
+  this->Internals->init("ui.animation-progress", false);
 
   // Model
   this->Internals->init("model.matcap.texture", std::string());
