@@ -175,26 +175,30 @@ public:
 
   void setString(const std::string& name, std::string value)
   {
+    variant_t var;
     if (name == "scene.animation.index")
     {
-      this->option_struct.scene.animation.index = std::stoi(value);
+      var = std::stoi(value);
+      this->setVariant(name, var);
     }
     else if (name == "render.line_width")
     {
-      this->option_struct.render.line_width = std::stof(value);
+      var = std::stof(value);
+      this->setVariant(name, var);
     }
   }
 
   std::string getString(const std::string& name)
   {
+    variant_t var = this->getVariant(name);
     std::string str;
     if (name == "scene.animation.index")
     {
-      str = std::to_string(this->option_struct.scene.animation.index);
+      str = std::to_string(std::get<int>(var));
     }
     else if (name == "render.line_width")
     {
-      str = std::to_string(this->option_struct.render.line_width);
+      str = std::to_string(std::get<double>(var));
     }
     return str;
   }
