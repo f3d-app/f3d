@@ -147,6 +147,58 @@ public:
   }
 #endif
 
+  void setVariant(const std::string& name, variant_t value)
+  {
+    if (name == "scene.animation.index")
+    {
+      this->option_struct.scene.animation.index = std::get<int>(value);
+    }
+    else if (name == "render.line_width")
+    {
+      this->option_struct.render.line_width = std::get<double>(value);
+    }
+  }
+
+  variant_t getVariant(const std::string& name)
+  {
+    variant_t var;
+    if (name == "scene.animation.index")
+    {
+      var = this->option_struct.scene.animation.index;
+    }
+    else if (name == "render.line_width")
+    {
+      var = this->option_struct.render.line_width;
+    }
+    return var;
+  }
+
+  void setString(const std::string& name, std::string value)
+  {
+    if (name == "scene.animation.index")
+    {
+      this->option_struct.scene.animation.index = std::stoi(value);
+    }
+    else if (name == "render.line_width")
+    {
+      this->option_struct.render.line_width = std::stof(value);
+    }
+  }
+
+  std::string getString(const std::string& name)
+  {
+    std::string str;
+    if (name == "scene.animation.index")
+    {
+      str = std::to_string(this->option_struct.scene.animation.index);
+    }
+    else if (name == "render.line_width")
+    {
+      str = std::to_string(this->option_struct.render.line_width);
+    }
+    return str;
+  }
+
   std::map<std::string, OptionVariant> Options;
   f3d_options option_struct;
 };
@@ -286,6 +338,30 @@ options& options::operator=(options&& other) noexcept
     other.Internals = nullptr;
   }
   return *this;
+}
+
+//----------------------------------------------------------------------------
+void options::setVariant(const std::string& name, variant_t value)
+{
+  this->Internals->setVariant(name, value);
+}
+
+//----------------------------------------------------------------------------
+variant_t options::getVariant(const std::string& name)
+{
+  return this->Internals->getVariant(name);
+}
+
+//----------------------------------------------------------------------------
+void options::setString(const std::string& name, std::string value)
+{
+  this->Internals->setString(name, value);
+}
+
+//----------------------------------------------------------------------------
+std::string options::getString(const std::string& name)
+{
+  return this->Internals->getString(name);
 }
 
 //----------------------------------------------------------------------------

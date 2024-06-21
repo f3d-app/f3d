@@ -11,6 +11,12 @@
 
 namespace f3d
 {
+
+typedef std::variant<
+  double,
+  int
+> variant_t;
+
 struct f3d_options {
   struct scene_t {
     struct animation_t {
@@ -46,6 +52,12 @@ public:
   options(options&& other) noexcept;
   options& operator=(options&& other) noexcept;
   ///@}
+
+  void setVariant(const std::string& name, variant_t value);
+  variant_t getVariant(const std::string& name);
+  void setString(const std::string& name, std::string value);
+  std::string getString(const std::string& name);
+
 
   ///@{ @name Setters
   /**
