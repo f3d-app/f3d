@@ -1118,11 +1118,11 @@ void vtkF3DRenderer::SetUseBlurBackground(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseBackface(const std::string& backfaceType)
+void vtkF3DRenderer::SetBackfaceType(const std::string& backfaceType)
 {
-  if (this->UseBackface != backfaceType)
+  if (this->BackfaceType != backfaceType)
   {
-    this->UseBackface = backfaceType;
+    this->BackfaceType = backfaceType;
     this->RenderPassesConfigured = false;
   }
 }
@@ -1363,20 +1363,18 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       anActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
       anActor->GetProperty()->SetLineWidth(this->LineWidth);
       anActor->GetProperty()->SetPointSize(this->PointSize);
-      if (this->UseBackface == "default")
+      if (this->BackfaceType == "visible")
       {
         anActor->GetProperty()->SetBackfaceCulling(false);
       }
-      if (this->UseBackface == "hidden")
+      else if (this->BackfaceType == "hidden")
       {
         anActor->GetProperty()->SetBackfaceCulling(true);
       }
-
-    }
-    vtkMapper* mapper = anActor->GetMapper();
-    if (vtkF3DOpenGLGridMapper::SafeDownCast(mapper) != nullptr)
-    {
-      anActor->GetProperty()->SetBackfaceCulling(false);
+      else if (this->BackfaceType != "default")
+      {
+        F3DLog::Print(F3DLog::Severity::Warning, this->BackfaceType + " is not a valid backface type, assuming default");
+      }
     }
   }
   this->ActorsPropertiesConfigured = true;

@@ -77,7 +77,7 @@ public:
   void SetUseBlurBackground(bool use);
   void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);
-  void SetUseBackface(const std::string& backfaceType);
+  void SetBackfaceType(const std::string& backfaceType);
   ///@}
 
   ///@{
@@ -327,7 +327,7 @@ protected:
   std::string CachePath;
   std::string AnimationNameInfo;
 
-  std::string UseBackface;
+  std::string BackfaceType;
 };
 
 #endif
