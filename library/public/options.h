@@ -13,6 +13,7 @@
 namespace f3d
 {
 
+// TODO GENERATE
 struct options_struct {
   struct scene_t {
     struct animation_t {
