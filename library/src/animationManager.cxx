@@ -63,7 +63,8 @@ bool animationManager::Initialize(
     this->ProgressWidget = nullptr;
   }
 
-  int animationIndex = options->getAsInt("scene.animation.index");
+  const options_struct& optionStruct = options->getConstStruct();
+  int animationIndex = optionStruct.scene.animation.index;
   double animationTime = options->getAsDouble("scene.animation.time");
 
   if (this->AvailAnimations <= 0)
@@ -91,7 +92,7 @@ bool animationManager::Initialize(
   }
   log::debug("");
 
-  this->AnimationIndex = options->getAsInt("scene.animation.index");
+  this->AnimationIndex = optionStruct.scene.animation.index;
   if (this->AnimationIndex > 0 && this->AnimationIndex >= this->AvailAnimations)
   {
     log::warn(

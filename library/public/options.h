@@ -3,12 +3,31 @@
 
 #include "exception.h"
 #include "export.h"
+#include "types.h"
 
 #include <string>
 #include <vector>
+#include <variant>
+#include <array>
 
 namespace f3d
 {
+
+// TODO GENERATE
+struct options_struct {
+  struct scene_t {
+    struct animation_t {
+      int index = 0;
+    };
+  animation_t animation;
+  };
+ scene_t scene;
+ struct render_t {
+   double line_width = 1.0;
+ };
+ render_t render;
+};
+
 /**
  * @class   options
  * @brief   Class used to control the different options
@@ -30,6 +49,12 @@ public:
   options(options&& other) noexcept;
   options& operator=(options&& other) noexcept;
   ///@}
+
+  void setVariant(const std::string& name, option_variant_t value);
+  option_variant_t getVariant(const std::string& name);
+  void setString(const std::string& name, std::string value);
+  std::string getString(const std::string& name);
+
 
   ///@{ @name Setters
   /**
@@ -131,6 +156,9 @@ public:
   {
     explicit inexistent_exception(const std::string& what = "");
   };
+
+  options_struct& getStruct();
+  const options_struct& getConstStruct() const;
 
 private:
   class internals;

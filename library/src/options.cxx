@@ -124,7 +124,102 @@ public:
   }
 #endif
 
+  enum class option_types { int_value, double_value };
+
+  void initNew(const std::string& name, option_types type, option_variant_t value)
+  {
+    this->OptionTypes[name] = type;
+    this->setVariant(name, value);
+  }
+
+  void setVariant(const std::string& name, option_variant_t value)
+  {
+    // TODO GENERATE
+    if (name == "scene.animation.index")
+    {
+      this->OptionStruct.scene.animation.index = std::get<int>(value);
+    }
+    else if (name == "render.line_width")
+    {
+      this->OptionStruct.render.line_width = std::get<double>(value);
+    }
+  }
+
+  option_variant_t getVariant(const std::string& name)
+  {
+    // TODO GENERATE
+    option_variant_t var;
+    if (name == "scene.animation.index")
+    {
+      var = this->OptionStruct.scene.animation.index;
+    }
+    else if (name == "render.line_width")
+    {
+      var = this->OptionStruct.render.line_width;
+    }
+    return var;
+  }
+
+  void setString(const std::string& name, std::string value)
+  {
+    option_variant_t var;
+    try
+    {
+      switch (this->OptionTypes.at(name))
+      {
+        case(option_types::int_value):
+          var = std::stoi(value);
+          break;
+        case(option_types::double_value):
+          var = std::stof(value);
+          break;
+        default:
+          // TODO
+          break;
+      }
+    }
+    catch (const std::out_of_range&)
+    {
+      throw options::inexistent_exception("Option " + name + " does not exist");
+    }
+    this->setVariant(name, var);
+  }
+
+  std::string getString(const std::string& name)
+  {
+    option_variant_t var = this->getVariant(name);
+    std::string str;
+    try
+    {
+      switch (this->OptionTypes.at(name))
+      {
+        case(option_types::int_value):
+          str = std::to_string(std::get<int>(var));
+          break;
+        case(option_types::double_value):
+          str = std::to_string(std::get<double>(var));
+          break;
+        default:
+          // TODO
+          break;
+      }
+    }
+    catch (const std::bad_variant_access&)
+    {
+      throw options::incompatible_exception(
+        "Trying to get option reference " + name + " with incompatible type");
+    }
+    catch (const std::out_of_range&)
+    {
+      throw options::inexistent_exception("Option " + name + " does not exist");
+    }
+    return str;
+  }
+
   std::map<std::string, OptionVariant> Options;
+
+  options_struct OptionStruct;
+  std::map<std::string, option_types> OptionTypes;
 };
 
 //----------------------------------------------------------------------------
@@ -135,7 +230,8 @@ options::options()
 
   // Scene
   this->Internals->init("scene.animation.autoplay", false);
-  this->Internals->init("scene.animation.index", 0);
+//  this->Internals->init("scene.animation.index", 0);
+  this->Internals->initNew("scene.animation.index", internals::option_types::int_value,0);
   this->Internals->init("scene.animation.speed-factor", 1.0);
   this->Internals->init("scene.animation.time", 0.0);
   this->Internals->init("scene.animation.frame-rate", 60.0);
@@ -144,7 +240,8 @@ options::options()
 
   // Render
   this->Internals->init("render.show-edges", false);
-  this->Internals->init("render.line-width", 1.0);
+//  this->Internals->init("render.line-width", 1.0);
+  this->Internals->initNew("render.line_width", internals::option_types::double_value, 1.0);
   this->Internals->init("render.point-size", 10.0);
   this->Internals->init("render.grid.enable", false);
   this->Internals->init("render.grid.absolute", false);
@@ -238,12 +335,16 @@ options::options(const options& opt)
   : Internals(new options::internals)
 {
   this->Internals->Options = opt.Internals->Options;
+  this->Internals->OptionStruct = opt.Internals->OptionStruct;
+  this->Internals->OptionTypes = opt.Internals->OptionTypes;
 }
 
 //----------------------------------------------------------------------------
 options& options::operator=(const options& opt) noexcept
 {
   this->Internals->Options = opt.Internals->Options;
+  this->Internals->OptionStruct = opt.Internals->OptionStruct;
+  this->Internals->OptionTypes = opt.Internals->OptionTypes;
   return *this;
 }
 
@@ -264,6 +365,30 @@ options& options::operator=(options&& other) noexcept
     other.Internals = nullptr;
   }
   return *this;
+}
+
+//----------------------------------------------------------------------------
+void options::setVariant(const std::string& name, option_variant_t value)
+{
+  this->Internals->setVariant(name, value);
+}
+
+//----------------------------------------------------------------------------
+option_variant_t options::getVariant(const std::string& name)
+{
+  return this->Internals->getVariant(name);
+}
+
+//----------------------------------------------------------------------------
+void options::setString(const std::string& name, std::string value)
+{
+  this->Internals->setString(name, value);
+}
+
+//----------------------------------------------------------------------------
+std::string options::getString(const std::string& name)
+{
+  return this->Internals->getString(name);
 }
 
 //----------------------------------------------------------------------------
@@ -520,5 +645,8 @@ options::inexistent_exception::inexistent_exception(const std::string& what)
   : exception(what)
 {
 }
+
+options_struct& options::getStruct(){return this->Internals->OptionStruct;}
+const options_struct& options::getConstStruct() const{return this->Internals->OptionStruct;}
 
 }
