@@ -3,6 +3,7 @@
 
 #include "exception.h"
 #include "export.h"
+#include "types.h"
 
 #include <string>
 #include <vector>
@@ -12,12 +13,7 @@
 namespace f3d
 {
 
-typedef std::variant<
-  double,
-  int
-> variant_t;
-
-struct f3d_options {
+struct options_struct {
   struct scene_t {
     struct animation_t {
       int index = 0;
@@ -53,8 +49,8 @@ public:
   options& operator=(options&& other) noexcept;
   ///@}
 
-  void setVariant(const std::string& name, variant_t value);
-  variant_t getVariant(const std::string& name);
+  void setVariant(const std::string& name, option_variant_t value);
+  option_variant_t getVariant(const std::string& name);
   void setString(const std::string& name, std::string value);
   std::string getString(const std::string& name);
 
@@ -160,8 +156,8 @@ public:
     explicit inexistent_exception(const std::string& what = "");
   };
 
-  f3d_options& getStruct();
-  const f3d_options& getConstStruct() const;
+  options_struct& getStruct();
+  const options_struct& getConstStruct() const;
 
 private:
   class internals;

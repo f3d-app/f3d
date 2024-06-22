@@ -62,7 +62,7 @@ bool animationManager::Initialize(
     this->ProgressWidget = nullptr;
   }
 
-  const f3d_options& optionStruct = options->getConstStruct();
+  const options_struct& optionStruct = options->getConstStruct();
   int animationIndex = optionStruct.scene.animation.index;
   double animationTime = options->getAsDouble("scene.animation.time");
 

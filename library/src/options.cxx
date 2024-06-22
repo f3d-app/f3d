@@ -124,7 +124,7 @@ public:
   }
 #endif
 
-  void setVariant(const std::string& name, variant_t value)
+  void setVariant(const std::string& name, option_variant_t value)
   {
     if (name == "scene.animation.index")
     {
@@ -136,9 +136,9 @@ public:
     }
   }
 
-  variant_t getVariant(const std::string& name)
+  option_variant_t getVariant(const std::string& name)
   {
-    variant_t var;
+    option_variant_t var;
     if (name == "scene.animation.index")
     {
       var = this->option_struct.scene.animation.index;
@@ -152,7 +152,7 @@ public:
 
   void setString(const std::string& name, std::string value)
   {
-    variant_t var;
+    option_variant_t var;
     if (name == "scene.animation.index")
     {
       var = std::stoi(value);
@@ -167,7 +167,7 @@ public:
 
   std::string getString(const std::string& name)
   {
-    variant_t var = this->getVariant(name);
+    option_variant_t var = this->getVariant(name);
     std::string str;
     if (name == "scene.animation.index")
     {
@@ -181,7 +181,7 @@ public:
   }
 
   std::map<std::string, OptionVariant> Options;
-  f3d_options option_struct;
+  options_struct option_struct;
 };
 
 //----------------------------------------------------------------------------
@@ -324,13 +324,13 @@ options& options::operator=(options&& other) noexcept
 }
 
 //----------------------------------------------------------------------------
-void options::setVariant(const std::string& name, variant_t value)
+void options::setVariant(const std::string& name, option_variant_t value)
 {
   this->Internals->setVariant(name, value);
 }
 
 //----------------------------------------------------------------------------
-variant_t options::getVariant(const std::string& name)
+option_variant_t options::getVariant(const std::string& name)
 {
   return this->Internals->getVariant(name);
 }
@@ -602,7 +602,7 @@ options::inexistent_exception::inexistent_exception(const std::string& what)
 {
 }
 
-f3d_options& options::getStruct(){return this->Internals->option_struct;}
-const f3d_options& options::getConstStruct() const{return this->Internals->option_struct;}
+options_struct& options::getStruct(){return this->Internals->option_struct;}
+const options_struct& options::getConstStruct() const{return this->Internals->option_struct;}
 
 }
