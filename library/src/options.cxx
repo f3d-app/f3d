@@ -151,6 +151,7 @@ options::options()
   this->Internals->init("render.grid.unit", 0.0);
   this->Internals->init("render.grid.subdivisions", 10);
   this->Internals->init("render.grid.color", std::vector<double>{ 0.0, 0.0, 0.0 });
+  this->Internals->init("render.backface", std::string());
 
   this->Internals->init("render.raytracing.enable", false);
   this->Internals->init("render.raytracing.denoise", false);

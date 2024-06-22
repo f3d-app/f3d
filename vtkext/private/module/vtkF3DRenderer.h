@@ -75,9 +75,9 @@ public:
   void SetUseFXAAPass(bool use);
   void SetUseToneMappingPass(bool use);
   void SetUseBlurBackground(bool use);
-  void SetUseBackface(bool use);
   void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);
+  void SetUseBackface(const std::string& backfaceType);
   ///@}
 
   ///@{
@@ -282,7 +282,6 @@ protected:
   bool CheatSheetVisible = false;
   bool DropZoneVisible = false;
   bool HDRISkyboxVisible = false;
-  bool UseBackface = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
@@ -293,7 +292,6 @@ protected:
   bool UseOrthographicProjection = false;
   bool UseTrackball = false;
   bool InvertZoom = false;
-
 
   int RaytracingSamples = 0;
   int UpIndex = 1;
@@ -328,6 +326,8 @@ protected:
 
   std::string CachePath;
   std::string AnimationNameInfo;
+
+  std::string UseBackface;
 };
 
 #endif

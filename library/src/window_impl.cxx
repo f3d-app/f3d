@@ -391,13 +391,13 @@ void window_impl::UpdateDynamicOptions()
     this->Internals->Options.getAsBool("render.effect.tone-mapping"));
   this->Internals->Renderer->SetUseDepthPeelingPass(
     this->Internals->Options.getAsBool("render.effect.translucency-support"));
+  this->Internals->Renderer->SetUseBackface(
+    this->Internals->Options.getAsString("render.backface"));
 
   this->Internals->Renderer->SetBackground(
     this->Internals->Options.getAsDoubleVector("render.background.color").data());
   this->Internals->Renderer->SetUseBlurBackground(
     this->Internals->Options.getAsBool("render.background.blur"));
-  this->Internals->Renderer->SetUseBackface(
-    this->Internals->Options.getAsBool("render.backface"));
   this->Internals->Renderer->SetBlurCircleOfConfusionRadius(
     this->Internals->Options.getAsDouble("render.background.blur.coc"));
   this->Internals->Renderer->SetLightIntensity(
