@@ -126,10 +126,6 @@ xattr -cr /Applications/F3D.app
 
 Then F3D should work as expected.
 
-> Using the silicon binary release, I cannot find the raytracing feature or open exodus files
-
-F3D raytracing and exodus plugin are not working on macOS silicon yet, see this [issue](https://github.com/f3d-app/f3d/issues/976).
-
 ## Python
 
 > I can't find `usd` and `vdb` plugins after installing f3d with pip
