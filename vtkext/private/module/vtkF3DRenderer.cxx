@@ -1116,6 +1116,17 @@ void vtkF3DRenderer::SetUseBlurBackground(bool use)
     this->CheatSheetConfigured = false;
   }
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseBackface(bool use)
+{
+  if (this->UseBackface != use)
+  {
+    this->UseBackface = use;
+    this->RenderPassesConfigured = false;
+  }
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBlurCircleOfConfusionRadius(double radius)
 {
@@ -1352,8 +1363,12 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       anActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
       anActor->GetProperty()->SetLineWidth(this->LineWidth);
       anActor->GetProperty()->SetPointSize(this->PointSize);
-
-      anActor->GetProperty()->SetBackfaceCulling(this->BackfaceCullingVisible);
+      anActor->GetProperty()->SetBackfaceCulling(this->UseBackface);
+    }
+    vtkMapper* mapper = anActor->GetMapper();
+    if (vtkF3DOpenGLGridMapper::SafeDownCast(mapper) != nullptr)
+    {
+      anActor->GetProperty()->SetBackfaceCulling(false);
     }
   }
   this->ActorsPropertiesConfigured = true;
