@@ -192,7 +192,7 @@ options::options()
 
   // Scene
   this->Internals->init("scene.animation.autoplay", false);
-  this->Internals->init("scene.animation.index", 0);
+//  this->Internals->init("scene.animation.index", 0);
   this->Internals->init("scene.animation.speed-factor", 1.0);
   this->Internals->init("scene.animation.time", 0.0);
   this->Internals->init("scene.animation.frame-rate", 60.0);
@@ -201,7 +201,7 @@ options::options()
 
   // Render
   this->Internals->init("render.show-edges", false);
-  this->Internals->init("render.line-width", 1.0);
+//  this->Internals->init("render.line-width", 1.0);
   this->Internals->init("render.point-size", 10.0);
   this->Internals->init("render.grid.enable", false);
   this->Internals->init("render.grid.absolute", false);
@@ -293,12 +293,14 @@ options::options(const options& opt)
   : Internals(new options::internals)
 {
   this->Internals->Options = opt.Internals->Options;
+  this->Internals->option_struct = opt.Internals->option_struct;
 }
 
 //----------------------------------------------------------------------------
 options& options::operator=(const options& opt) noexcept
 {
   this->Internals->Options = opt.Internals->Options;
+  this->Internals->option_struct = opt.Internals->option_struct;
   return *this;
 }
 

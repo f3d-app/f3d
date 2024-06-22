@@ -363,8 +363,9 @@ void window_impl::UpdateDynamicOptions()
 
   this->Internals->Renderer->SetPointProperties(splatType, pointSize);
 
+  std::cout<<this->Internals->Options.getConstStruct().render.line_width<<std::endl;
   this->Internals->Renderer->SetLineWidth(
-    this->Internals->Options.getAsDouble("render.line-width"));
+    this->Internals->Options.getConstStruct().render.line_width);
   this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("render.show-edges"));
   this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("ui.fps"));
   this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("ui.filename"));
