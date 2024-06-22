@@ -391,6 +391,8 @@ void window_impl::UpdateDynamicOptions()
     this->Internals->Options.getAsBool("render.effect.tone-mapping"));
   this->Internals->Renderer->SetUseDepthPeelingPass(
     this->Internals->Options.getAsBool("render.effect.translucency-support"));
+  this->Internals->Renderer->SetBackfaceType(
+    this->Internals->Options.getAsString("render.backface-type"));
 
   this->Internals->Renderer->SetBackground(
     this->Internals->Options.getAsDoubleVector("render.background.color").data());

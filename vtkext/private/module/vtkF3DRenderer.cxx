@@ -1116,6 +1116,17 @@ void vtkF3DRenderer::SetUseBlurBackground(bool use)
     this->CheatSheetConfigured = false;
   }
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetBackfaceType(const std::string& backfaceType)
+{
+  if (this->BackfaceType != backfaceType)
+  {
+    this->BackfaceType = backfaceType;
+    this->RenderPassesConfigured = false;
+  }
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBlurCircleOfConfusionRadius(double radius)
 {
@@ -1352,6 +1363,18 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       anActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
       anActor->GetProperty()->SetLineWidth(this->LineWidth);
       anActor->GetProperty()->SetPointSize(this->PointSize);
+      if (this->BackfaceType == "visible")
+      {
+        anActor->GetProperty()->SetBackfaceCulling(false);
+      }
+      else if (this->BackfaceType == "hidden")
+      {
+        anActor->GetProperty()->SetBackfaceCulling(true);
+      }
+      else if (this->BackfaceType != "default")
+      {
+        F3DLog::Print(F3DLog::Severity::Warning, this->BackfaceType + " is not a valid backface type, assuming default");
+      }
     }
   }
   this->ActorsPropertiesConfigured = true;

@@ -130,6 +130,8 @@ f3d_test(NAME TestGridAbsolute DATA f3d.vtp ARGS -g --up=-Y --camera-direction=-
 f3d_test(NAME TestGridClipping DATA offset-flat-box.glb ARGS -g --grid-absolute --camera-position=70,120,350 -t DEFAULT_LIGHTS)
 f3d_test(NAME TestGridColor DATA suzanne.ply ARGS -g --grid-color=1,1,1 DEFAULT_LIGHTS)
 f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x DEFAULT_LIGHTS)
+f3d_test(NAME TestBackfaceVisible DATA backface.vtp ARGS --backface-type=visible DEFAULT_LIGHTS)
+f3d_test(NAME TestBackfaceHidden DATA backface.vtp ARGS --backface-type=hidden DEFAULT_LIGHTS)
 f3d_test(NAME TestPointCloud DATA pointsCloud.vtp ARGS -o --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestPointCloudBar DATA pointsCloud.vtp ARGS -sob --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
 f3d_test(NAME TestPointCloudUG DATA pointsCloud.vtu ARGS -o --point-size=20 DEFAULT_LIGHTS) # Using default lights because of ResetCamera
