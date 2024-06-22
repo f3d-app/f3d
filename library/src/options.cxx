@@ -49,24 +49,17 @@ public:
         log::warn("Option ", name, " is deprecated");
       }
 #endif
-      OptionVariant var(value);
-      if (name == "scene.animation.index")
-      {
-        this->option_struct.scene.animation.index = std::get<int>(var);
-      }
-      else if (name == "render.line_width")
-      {
-        this->option_struct.render.line_width = std::get<double>(var);
-      }
+      T& opt = std::get<T>(this->Options.at(name));
+      opt = value;
     }
     catch (const std::bad_variant_access&)
     {
       log::error("Trying to set option ", name, " with incompatible type");
     }
-/*    catch (const std::out_of_range&)
+    catch (const std::out_of_range&)
     {
       log::error("Option ", name, " does not exist");
-    }*/
+    }
   }
 
   template<typename T>
@@ -91,24 +84,8 @@ public:
   template<typename T>
   T get(const std::string& name) const
   {
-    OptionVariant var;
     T val = {};
-    try
-    {
-      if (name == "scene.animation.index")
-      {
-        var = this->option_struct.scene.animation.index;
-      }
-      else if (name == "render.line_width")
-      {
-        var = this->option_struct.render.line_width;
-      }
-      T val = std::get<T>(var);
-    }
-    catch (const std::bad_variant_access&)
-    {
-      log::error("Trying to get option ", name, " with incompatible type");
-    }
+    this->get(name, val);
     return val;
   }
 
