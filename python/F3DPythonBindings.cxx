@@ -212,7 +212,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("text_distance", &f3d::utils::textDistance);
 
   // f3d::interactor
-  py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete> > interactor(
+  py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete>> interactor(
     module, "Interactor");
   interactor //
     .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation")
@@ -246,7 +246,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("face_indices", &f3d::mesh_t::face_indices);
 
   // f3d::loader
-  py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete> > loader(module, "Loader");
+  py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete>> loader(module, "Loader");
   loader //
     .def("has_geometry_reader", &f3d::loader::hasGeometryReader)
     .def("load_geometry", py::overload_cast<const std::string&, bool>(&f3d::loader::loadGeometry),
@@ -257,7 +257,7 @@ PYBIND11_MODULE(pyf3d, module)
       "Load a surfacic mesh from memory", py::arg("mesh"), py::arg("reset") = false);
 
   // f3d::camera
-  py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "Camera");
+  py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete>> camera(module, "Camera");
   camera //
     .def_property(
       "position", [](f3d::camera& cam) { return cam.getPosition(); }, &f3d::camera::setPosition)
@@ -291,7 +291,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("angle", &f3d::camera_state_t::angle);
 
   // f3d::window
-  py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> > window(module, "Window");
+  py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete>> window(module, "Window");
 
   py::enum_<f3d::window::Type>(window, "Type")
     .value("NONE", f3d::window::Type::NONE)

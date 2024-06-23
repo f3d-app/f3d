@@ -17,8 +17,9 @@ set_target_properties(f3djs PROPERTIES
 target_link_libraries(f3djs PRIVATE libf3d)
 
 target_link_options(f3djs PRIVATE
+  "$<IF:$<CONFIG:Release>,-Oz,-O0>"
   "--bind"
-  "-O1"
+  "--closure 1"
   "SHELL:--preload-file ${F3D_WASM_DATA_FILE}@/"
   "SHELL:-sEXPORT_NAME=f3d"
   "SHELL:-sALLOW_MEMORY_GROWTH=1"
@@ -26,25 +27,22 @@ target_link_options(f3djs PRIVATE
   "SHELL:-sMODULARIZE=1"
   "SHELL:-sUSE_PTHREADS=0"
   "SHELL:-sWASM=1"
-  "SHELL:-sASSERTIONS=1"
   "SHELL:-sFORCE_FILESYSTEM"
   "SHELL:-sEXPORTED_RUNTIME_METHODS=FS"
-  "SHELL:-sERROR_ON_WASM_CHANGES_AFTER_LINK"
   "SHELL:-sWASM_BIGINT"
   "SHELL:-sNO_DISABLE_EXCEPTION_CATCHING"
-  "SHELL:-sEXPORT_EXCEPTION_HANDLING_HELPERS"
 )
 
-# Option to copy example.html file to index.html in the binary folder
-# In order to test the example:
+# Option to copy app.html file to index.html in the binary folder
+# In order to test the app:
 # - go to the binary folder where f3d.js, f3d.wasm and f3d.data are located
 # - run `python -m http.server 8000`
 # - open a browser to http://localhost:8000
-option(F3D_WASM_COPY_EXAMPLE "Copy HTML example to binary folder" ON)
+option(F3D_WASM_COPY_APP "Copy HTML app file to binary folder" ON)
 
-if(F3D_WASM_COPY_EXAMPLE)
+if(F3D_WASM_COPY_APP)
   configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/example.html"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app.html"
     "${CMAKE_BINARY_DIR}/bin/index.html"
     COPYONLY)
   configure_file(

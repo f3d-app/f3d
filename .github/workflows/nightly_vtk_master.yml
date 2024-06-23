@@ -90,7 +90,7 @@ jobs:
       uses: ./source/.github/actions/generic-ci
       with:
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-        raytracing_label: 'raytracing'
+        raytracing_label: raytracing
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------

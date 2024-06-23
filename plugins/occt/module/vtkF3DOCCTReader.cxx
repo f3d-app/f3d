@@ -528,7 +528,7 @@ public:
     }
   }
 
-  std::unordered_map<int, vtkSmartPointer<vtkPolyData> > ShapeMap;
+  std::unordered_map<int, vtkSmartPointer<vtkPolyData>> ShapeMap;
   Handle(XCAFDoc_ShapeTool) ShapeTool;
 #endif
 

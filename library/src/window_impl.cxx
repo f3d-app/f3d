@@ -179,6 +179,9 @@ window_impl::window_impl(const options& options, Type type)
     this->Internals->RenWin->SetWindowInfo("jni");
 #endif
   }
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240606)
+  this->Internals->RenWin->EnableTranslucentSurfaceOn();
+#endif
   this->Internals->RenWin->SetWindowName("f3d");
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
@@ -388,6 +391,8 @@ void window_impl::UpdateDynamicOptions()
     this->Internals->Options.getAsBool("render.effect.tone-mapping"));
   this->Internals->Renderer->SetUseDepthPeelingPass(
     this->Internals->Options.getAsBool("render.effect.translucency-support"));
+  this->Internals->Renderer->SetBackfaceType(
+    this->Internals->Options.getAsString("render.backface-type"));
 
   this->Internals->Renderer->SetBackground(
     this->Internals->Options.getAsDoubleVector("render.background.color").data());
@@ -423,6 +428,8 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetGridAbsolute(
     this->Internals->Options.getAsBool("render.grid.absolute"));
   this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("render.grid.enable"));
+  this->Internals->Renderer->SetGridColor(
+    this->Internals->Options.getAsDoubleVector("render.grid.color"));
 
   if (this->Internals->Options.getAsInt("scene.camera.index") == -1)
   {

@@ -55,7 +55,7 @@ void RunOnJSONExtensions(fs::path modulePath, F callback)
                   {
                     std::wstring ret = L".";
 
-                    std::wstring_convert<std::codecvt_utf8<wchar_t> > toUnicode;
+                    std::wstring_convert<std::codecvt_utf8<wchar_t>> toUnicode;
                     ret += toUnicode.from_bytes(e.get<std::string>());
 
                     callback(ret);

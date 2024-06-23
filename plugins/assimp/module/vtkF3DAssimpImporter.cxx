@@ -865,19 +865,19 @@ public:
   Assimp::Importer Importer;
   const aiScene* Scene = nullptr;
   std::string Description;
-  std::vector<vtkSmartPointer<vtkPolyData> > Meshes;
-  std::vector<vtkSmartPointer<vtkProperty> > Properties;
-  std::vector<vtkSmartPointer<vtkTexture> > EmbeddedTextures;
+  std::vector<vtkSmartPointer<vtkPolyData>> Meshes;
+  std::vector<vtkSmartPointer<vtkProperty>> Properties;
+  std::vector<vtkSmartPointer<vtkTexture>> EmbeddedTextures;
   vtkIdType ActiveAnimation = 0;
-  std::vector<std::pair<std::string, vtkSmartPointer<vtkLight> > > Lights;
+  std::vector<std::pair<std::string, vtkSmartPointer<vtkLight>>> Lights;
   std::vector<
-    std::pair<std::string, std::pair<vtkSmartPointer<vtkCamera>, vtkSmartPointer<vtkCamera> > > >
+    std::pair<std::string, std::pair<vtkSmartPointer<vtkCamera>, vtkSmartPointer<vtkCamera>>>>
     Cameras;
   vtkIdType ActiveCameraIndex = -1;
-  std::unordered_map<std::string, vtkSmartPointer<vtkActorCollection> > NodeActors;
-  std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4> > NodeLocalMatrix;
-  std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4> > NodeTRSMatrix;
-  std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4> > NodeGlobalMatrix;
+  std::unordered_map<std::string, vtkSmartPointer<vtkActorCollection>> NodeActors;
+  std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4>> NodeLocalMatrix;
+  std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4>> NodeTRSMatrix;
+  std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4>> NodeGlobalMatrix;
   vtkF3DAssimpImporter* Parent;
 };
 

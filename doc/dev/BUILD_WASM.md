@@ -4,7 +4,7 @@ F3D can be built in WebAssembly using emscripten in order to embed it into a web
 It is still experimental and only a small fraction of the libf3d public API is bound.
 An example can be seen at https://f3d.app/web
 
-This guide is describing how to build VTK and F3D with emscripten using Docker on Linux.
+This guide is describing how to build VTK and F3D with emscripten using Docker on Linux or Windows.
 
 # Building
 
@@ -19,13 +19,14 @@ docker pull dockcross/web-wasm:20240529-0dade71
 ```
 
 Clone VTK and F3D, it will be assumed that the source code is located in `$VTK_DIR` and `$F3D_DIR` variables in the next steps of this guide.
+It's recommended to use VTK commit `7e954a92fba020b160a07420403248f6be87f2b0` which has been tested to work properly.
 
 ## Building VTK
 
 Configure VTK by running the following command:
 
 ```sh
-docker run -v $VTK_DIR:/vtk \
+docker run -v ${VTK_DIR}:/vtk \
  --rm dockcross/web-wasm:20240529-0dade71 \
  cmake -S /vtk -B /vtk/build-wasm \
  -DBUILD_SHARED_LIBS=OFF \
@@ -67,7 +68,7 @@ docker run -v $VTK_DIR:/vtk \
 Build VTK by running the following command:
 
 ```sh
-docker run -v $VTK_DIR:/vtk --rm dockcross/web-wasm:20240529-0dade71 cmake --build /vtk/build-wasm --parallel 8
+docker run -v ${VTK_DIR}:/vtk --rm dockcross/web-wasm:20240529-0dade71 cmake --build /vtk/build-wasm --parallel 8
 ```
 
 ## Building F3D
@@ -75,14 +76,14 @@ docker run -v $VTK_DIR:/vtk --rm dockcross/web-wasm:20240529-0dade71 cmake --bui
 Configure F3D by running the following command:
 
 ```sh
-docker run -v $VTK_DIR:/vtk -v $F3D_DIR:/f3d \
+docker run -v ${VTK_DIR}:/vtk -v ${F3D_DIR}:/f3d \
  --rm dockcross/web-wasm:20240529-0dade71 \
  cmake -S /f3d -B /f3d/build-wasm \
  -DBUILD_SHARED_LIBS=OFF \
  -DCMAKE_BUILD_TYPE=Release \
  -DVTK_DIR=/vtk/build-wasm \
  -DF3D_PLUGIN_BUILD_EXODUS=OFF \
- -DF3D_WASM_DATA_FILE=/f3d/testing/data/f3d.vtp 
+ -DF3D_WASM_DATA_FILE="/f3d/testing/data/f3d.vtp"
 ```
 
 > You can change the value of `F3D_WASM_DATA_FILE` to embed another file in the virtual filesystem.
@@ -90,7 +91,7 @@ docker run -v $VTK_DIR:/vtk -v $F3D_DIR:/f3d \
 Build F3D by running the following command:
 
 ```sh
-docker run -v $VTK_DIR:/vtk -v $F3D_DIR:/f3d --rm dockcross/web-wasm:20240529-0dade71 cmake --build /f3d/build-wasm --parallel 8
+docker run -v ${VTK_DIR}:/vtk -v ${F3D_DIR}:/f3d --rm dockcross/web-wasm:20240529-0dade71 cmake --build /f3d/build-wasm --parallel 8
 ```
 
 # Testing it locally
