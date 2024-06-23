@@ -229,97 +229,97 @@ options::options()
   detail::init::initialize();
 
   // Scene
-  this->Internals->init("scene.animation.autoplay", false);
+  this->Internals->init("scene.animation.autoplay", false); // bool
 //  this->Internals->init("scene.animation.index", 0);
-  this->Internals->initNew("scene.animation.index", internals::option_types::int_value,0);
-  this->Internals->init("scene.animation.speed-factor", 1.0);
-  this->Internals->init("scene.animation.time", 0.0);
-  this->Internals->init("scene.animation.frame-rate", 60.0);
-  this->Internals->init("scene.camera.index", -1);
-  this->Internals->init("scene.up-direction", std::string("+Y"));
+  this->Internals->initNew("scene.animation.index", internals::option_types::int_value,0); // index ? int
+  this->Internals->init("scene.animation.speed-factor", 1.0); // double ? factor ?
+  this->Internals->init("scene.animation.time", 0.0); // double
+  this->Internals->init("scene.animation.frame-rate", 60.0); // double ?
+  this->Internals->init("scene.camera.index", -1); // index ? int
+  this->Internals->init("scene.up-direction", std::string("+Y")); // direction
 
   // Render
-  this->Internals->init("render.show-edges", false);
+  this->Internals->init("render.show-edges", false); // bool
 //  this->Internals->init("render.line-width", 1.0);
-  this->Internals->initNew("render.line_width", internals::option_types::double_value, 1.0);
-  this->Internals->init("render.point-size", 10.0);
-  this->Internals->init("render.grid.enable", false);
-  this->Internals->init("render.grid.absolute", false);
-  this->Internals->init("render.grid.unit", 0.0);
-  this->Internals->init("render.grid.subdivisions", 10);
+  this->Internals->initNew("render.line_width", internals::option_types::double_value, 1.0); // double
+  this->Internals->init("render.point-size", 10.0); // double
+  this->Internals->init("render.grid.enable", false); // bool
+  this->Internals->init("render.grid.absolute", false); // bool
+  this->Internals->init("render.grid.unit", 0.0); // double
+  this->Internals->init("render.grid.subdivisions", 10); // int
 
-  this->Internals->init("render.raytracing.enable", false);
-  this->Internals->init("render.raytracing.denoise", false);
-  this->Internals->init("render.raytracing.samples", 5);
+  this->Internals->init("render.raytracing.enable", false); // bool
+  this->Internals->init("render.raytracing.denoise", false); // bool
+  this->Internals->init("render.raytracing.samples", 5); // int
 
-  this->Internals->init("render.effect.translucency-support", false);
-  this->Internals->init("render.effect.anti-aliasing", false);
-  this->Internals->init("render.effect.ambient-occlusion", false);
-  this->Internals->init("render.effect.tone-mapping", false);
+  this->Internals->init("render.effect.translucency-support", false); // bool
+  this->Internals->init("render.effect.anti-aliasing", false); // bool
+  this->Internals->init("render.effect.ambient-occlusion", false); // bool
+  this->Internals->init("render.effect.tone-mapping", false); // bool
 
-  this->Internals->init("render.hdri.file", std::string());
-  this->Internals->init("render.hdri.ambient", false);
-  this->Internals->init("render.background.color", std::vector<double>{ 0.2, 0.2, 0.2 });
+  this->Internals->init("render.hdri.file", std::string()); // path
+  this->Internals->init("render.hdri.ambient", false); // bool
+  this->Internals->init("render.background.color", std::vector<double>{ 0.2, 0.2, 0.2 }); // color
 #ifndef F3D_NO_DEPRECATED
-  this->Internals->init("render.background.hdri", std::string());
+  this->Internals->init("render.background.hdri", std::string()); // path
 #endif
-  this->Internals->init("render.background.skybox", false);
-  this->Internals->init("render.background.blur", false);
-  this->Internals->init("render.background.blur.coc", 20.0);
-  this->Internals->init("render.light.intensity", 1.);
+  this->Internals->init("render.background.skybox", false); // bool
+  this->Internals->init("render.background.blur", false); // bool
+  this->Internals->init("render.background.blur.coc", 20.0); // double
+  this->Internals->init("render.light.intensity", 1.); // double
 
   // UI
-  this->Internals->init("ui.bar", false);
-  this->Internals->init("ui.filename", false);
-  this->Internals->init("ui.filename-info", std::string());
-  this->Internals->init("ui.fps", false);
-  this->Internals->init("ui.cheatsheet", false);
-  this->Internals->init("ui.dropzone", false);
-  this->Internals->init("ui.dropzone-info", std::string());
-  this->Internals->init("ui.metadata", false);
-  this->Internals->init("ui.font-file", std::string());
-  this->Internals->init("ui.loader-progress", false);
+  this->Internals->init("ui.bar", false); // bool
+  this->Internals->init("ui.filename", false); // bool
+  this->Internals->init("ui.filename-info", std::string()); // string
+  this->Internals->init("ui.fps", false); // bool
+  this->Internals->init("ui.cheatsheet", false); // bool
+  this->Internals->init("ui.dropzone", false); // bool
+  this->Internals->init("ui.dropzone-info", std::string()); // string
+  this->Internals->init("ui.metadata", false); // bool
+  this->Internals->init("ui.font-file", std::string()); // path
+  this->Internals->init("ui.loader-progress", false); // bool
 
   // Model
-  this->Internals->init("model.matcap.texture", std::string());
+  this->Internals->init("model.matcap.texture", std::string()); // path
 
-  this->Internals->init("model.color.opacity", 1.0);
+  this->Internals->init("model.color.opacity", 1.0); // rate ? double
   // XXX: Not compatible with scivis: https://github.com/f3d-app/f3d/issues/347
-  this->Internals->init("model.color.rgb", std::vector<double>{ 1., 1., 1. });
+  this->Internals->init("model.color.rgb", std::vector<double>{ 1., 1., 1. }); // color
   // XXX: Artifacts when using with scivis: https://github.com/f3d-app/f3d/issues/348
-  this->Internals->init("model.color.texture", std::string());
+  this->Internals->init("model.color.texture", std::string()); // path
 
-  this->Internals->init("model.emissive.factor", std::vector<double>{ 1., 1., 1. });
-  this->Internals->init("model.emissive.texture", std::string());
+  this->Internals->init("model.emissive.factor", std::vector<double>{ 1., 1., 1. }); // color
+  this->Internals->init("model.emissive.texture", std::string()); // path
 
-  this->Internals->init("model.normal.texture", std::string());
-  this->Internals->init("model.normal.scale", 1.0);
+  this->Internals->init("model.normal.texture", std::string()); // path
+  this->Internals->init("model.normal.scale", 1.0); // rate ? double
 
-  this->Internals->init("model.material.metallic", 0.0);
-  this->Internals->init("model.material.roughness", 0.3);
-  this->Internals->init("model.material.texture", std::string());
+  this->Internals->init("model.material.metallic", 0.0); // rate ? double
+  this->Internals->init("model.material.roughness", 0.3); // rate ? double
+  this->Internals->init("model.material.texture", std::string()); // path
 
-  this->Internals->init("model.scivis.cells", false);
-  this->Internals->init("model.scivis.array-name", F3D_RESERVED_STRING);
-  this->Internals->init("model.scivis.component", -1);
+  this->Internals->init("model.scivis.cells", false); // bool
+  this->Internals->init("model.scivis.array-name", F3D_RESERVED_STRING); // string
+  this->Internals->init("model.scivis.component", -1); // index ? int
   this->Internals->init("model.scivis.colormap",
     std::vector<double>{
-      0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 });
-  this->Internals->init("model.scivis.range", std::vector<double>{ 0 });
+      0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 }); // rgba_colormap
+  this->Internals->init("model.scivis.range", std::vector<double>{ 0 }); // vector_double
 
   // XXX: Rename into a "rendering-mode" option: https://github.com/f3d-app/f3d/issues/345
-  this->Internals->init("model.point-sprites.enable", false);
-  this->Internals->init("model.point-sprites.type", std::string("sphere"));
-  this->Internals->init("model.volume.enable", false);
-  this->Internals->init("model.volume.inverse", false);
+  this->Internals->init("model.point-sprites.enable", false); // bool
+  this->Internals->init("model.point-sprites.type", std::string("sphere")); // string
+  this->Internals->init("model.volume.enable", false); // bool
+  this->Internals->init("model.volume.inverse", false); // bool
 
   // Camera projection
-  this->Internals->init("scene.camera.orthographic", false);
+  this->Internals->init("scene.camera.orthographic", false); // bool
 
   // Interactor
-  this->Internals->init("interactor.axis", false);
-  this->Internals->init("interactor.trackball", false);
-  this->Internals->init("interactor.invert-zoom", false);
+  this->Internals->init("interactor.axis", false); // bool
+  this->Internals->init("interactor.trackball", false); // bool
+  this->Internals->init("interactor.invert-zoom", false); // bool
 };
 
 //----------------------------------------------------------------------------
