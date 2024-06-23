@@ -265,6 +265,8 @@ bool animationManager::LoadAtTime(double timeValue)
 
   if (this->Interactor)
   {
+    assert(this->ProgressWidget);
+
     // Set progress bar
     vtkProgressBarRepresentation* progressRep =
       vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());
