@@ -11,7 +11,7 @@
 | Linux (Debian package) | [F3D-2.4.0-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v2.4.0/F3D-2.4.0-Linux-x86_64-raytracing.deb) |
 | Linux (portable) | [F3D-2.4.0-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v2.4.0/F3D-2.4.0-Linux-x86_64-raytracing.tar.xz) |
 
-Note: MacOS package is not signed, see the [troubleshooting](LIMITATIONS_AND_TROUBLESHOOTING.md) section for a workaround if needed.
+Note: MacOS package is not signed, see the [troubleshooting](LIMITATIONS_AND_TROUBLESHOOTING.md#macos) section for a workaround if needed.
 
 ## Alternatives
 
