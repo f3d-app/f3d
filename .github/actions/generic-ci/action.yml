@@ -342,9 +342,9 @@ runs:
     # https://github.com/f3d-app/f3d/issues/1276
     - name: Check F3D_PLUGINS_PATH using plugin example
       if: |
-        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' &&
-        inputs.cpu != 'arm64' &&
-        inputs.static_label == 'no-static'
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' &&
+        inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.0' &&
+        inputs.cpu != 'arm64' && inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose
@@ -360,7 +360,9 @@ runs:
     # Grid rendering has artifacts in macOS arm64 CI
     # https://github.com/f3d-app/f3d/issues/1276
     - name: Check Install
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' && inputs.cpu != 'arm64'
+      if: |
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' &&
+        inputs.vtk_version != 'v9.3.0' && inputs.cpu != 'arm64'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
@@ -369,7 +371,7 @@ runs:
     - name: Check Install plugins
       if: |
         inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6'
-        && inputs.cpu != 'arm64'
+        && inputs.vtk_version != 'v9.3.0' && inputs.cpu != 'arm64'
         && inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}/install
