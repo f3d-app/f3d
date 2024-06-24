@@ -40,7 +40,7 @@ function enhance_install_page() {
                 if (target_platform_re.test(platform))
                   downloads.push([platform, link.innerText, link.href]);
 
-                if (/(MacOS)/i.test(platform))
+                if (/MacOS/i.test(platform))
                   link.addEventListener("click", open_mac_warning_popup);
               }
             }
