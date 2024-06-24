@@ -161,6 +161,7 @@ options::options()
   this->Internals->init("render.effect.anti-aliasing", false);
   this->Internals->init("render.effect.ambient-occlusion", false);
   this->Internals->init("render.effect.tone-mapping", false);
+  this->Internals->init("render.effect.final-shader", std::string());
 
   this->Internals->init("render.hdri.file", std::string());
   this->Internals->init("render.hdri.ambient", false);

@@ -8,6 +8,7 @@
 #include "vtkF3DDropZoneActor.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
+#include "vtkF3DUserRenderPass.h"
 
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
@@ -309,6 +310,25 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
     this->SetPass(fxaaP);
     renderingPass = fxaaP;
+  }
+
+  if (!this->FinalShader.empty())
+  {
+    // basic validation
+    if (this->FinalShader.find("pixel") != std::string::npos)
+    {
+      vtkNew<vtkF3DUserRenderPass> userP;
+      userP->SetUserShader(this->FinalShader.c_str());
+      userP->SetDelegatePass(renderingPass);
+
+      this->SetPass(userP);
+      renderingPass = userP;
+    }
+    else
+    {
+      F3DLog::Print(F3DLog::Severity::Warning,
+        "Final shader must define a function named \"pixel\"");
+    }
   }
 
   this->SetPass(renderingPass);
@@ -1145,6 +1165,16 @@ void vtkF3DRenderer::SetUseSSAOPass(bool use)
     this->UseSSAOPass = use;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetFinalShader(const std::string& finalShader)
+{
+  if (this->FinalShader != finalShader)
+  {
+    this->FinalShader = finalShader;
+    this->RenderPassesConfigured = false;
   }
 }
 

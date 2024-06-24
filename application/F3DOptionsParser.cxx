@@ -442,6 +442,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp6, "ambient-occlusion", "q", "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO", options.getAsBoolRef("render.effect.ambient-occlusion"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp6, "anti-aliasing", "a", "Enable anti-aliasing, implemented using FXAA", options.getAsBoolRef("render.effect.anti-aliasing"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping, providing balanced coloring", options.getAsBoolRef("render.effect.tone-mapping"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp6, "final-shader", "", "Execute the final shader at the end of the rendering pipeline", options.getAsStringRef("render.effect.final-shader"), LocalHasDefaultNo, MayHaveConfig::YES, "<GLSL code>");
 
     auto grp7 = cxxOptions.add_options("Testing");
     this->DeclareOption(grp7, "ref", "", "Reference", appOptions.Reference, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");

@@ -65,6 +65,7 @@ render.effect.translucency-support|bool<br>false<br>render|Enable *translucency 
 render.effect.anti-aliasing|bool<br>false<br>render|Enable *anti-aliasing*. This technique is used to reduce aliasing, implemented using FXAA.|\-\-anti-aliasing
 render.effect.ambient-occlusion|bool<br>false<br>render|Enable *ambient occlusion*. This is a technique providing approximate shadows, used to improve the depth perception of the object. Implemented using SSAO|\-\-ambient-occlusion
 render.effect.tone-mapping|bool<br>false<br>render|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.|\-\-tone-mapping
+render.effect.final-shader|string<br>""<br>render|Add a final shader to the output image|\-\-final-shader. See [user documentation](../user/FINAL_SHADER.md).
 render.line-width|double<br>1.0<br>render|Set the *width* of lines when showing edges.|\-\-line-width
 render.show-edges|bool<br>false<br>render|Show the *cell edges*|\-\-edges
 render.point-size|double<br>10.0<br>render|Set the *size* of points when showing vertices and point sprites.|\-\-point-size
