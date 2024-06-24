@@ -18,7 +18,7 @@ Requires `clang` toolchain.
 # How to locally generate the jekyll based website
 
 1. Install `ruby` and make sure ruby binaries directory is added to your `PATH`
-2. Install jekyll and all dependencies: `gem install jekyll jekyll-remote-theme jekyll-relative-links jekyll-seo-tag jekyll-optional-front-matter jekyll-titles-from-headings`
+2. Install jekyll and all dependencies: `gem install jekyll jekyll-remote-theme jekyll-relative-links jekyll-seo-tag jekyll-optional-front-matter jekyll-titles-from-headings jekyll-include-cache`
 3. Run jekyll locally: `jekyll server`
 4. Open http://127.0.0.1:4000/ in a browser
 
