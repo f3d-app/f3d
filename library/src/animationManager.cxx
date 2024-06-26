@@ -78,7 +78,6 @@ bool animationManager::Initialize(
       log::warn("No animation available, cannot load a specific animation time");
     }
 
-    this->HasAnimation = false;
     return false;
   }
   else
@@ -168,7 +167,6 @@ void animationManager::StopAnimation()
   {
     this->ToggleAnimation();
   }
-  this->ProgressWidget = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -263,7 +261,7 @@ bool animationManager::LoadAtTime(double timeValue)
   this->CurrentTimeSet = true;
   this->Importer->UpdateTimeStep(this->CurrentTime);
 
-  if (this->Interactor)
+  if (this->Interactor && this->ProgressWidget)
   {
     // Set progress bar
     vtkProgressBarRepresentation* progressRep =

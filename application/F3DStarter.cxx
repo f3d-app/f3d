@@ -476,7 +476,6 @@ int F3DStarter::Start(int argc, char** argv)
         {
           if (this->Internals->LoadedFile)
           {
-            this->Internals->Engine->getInteractor().stopAnimation();
             this->AddFile(
               this->Internals->FilesList[static_cast<size_t>(this->Internals->CurrentFileIndex)]
                 .parent_path(),
@@ -498,7 +497,6 @@ int F3DStarter::Start(int argc, char** argv)
     interactor.setDropFilesCallBack(
       [this](const std::vector<std::string>& filesVec) -> bool
       {
-        this->Internals->Engine->getInteractor().stopAnimation();
         int index = -1;
         for (const std::string& file : filesVec)
         {
@@ -717,6 +715,12 @@ int F3DStarter::Start(int argc, char** argv)
 //----------------------------------------------------------------------------
 void F3DStarter::LoadFile(int index, bool relativeIndex)
 {
+  // Make sure the animation is stopped before trying to load any file
+  if (!this->Internals->AppOptions.NoRender)
+  {
+    this->Internals->Engine->getInteractor().stopAnimation();
+  }
+
   f3d::log::debug("========== Loading 3D file ==========");
   // When loading a file, store any changed options
   // into the dynamic options and use these dynamic option as the default
@@ -1002,7 +1006,6 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
 //----------------------------------------------------------------------------
 bool F3DStarter::LoadRelativeFile(int index, bool restoreCamera)
 {
-  this->Internals->Engine->getInteractor().stopAnimation();
 
   if (restoreCamera)
   {
