@@ -31,16 +31,6 @@ public:
     return "OpenEXR";
   }
 
-  /**
-   * Read from memory instead of file
-   */
-  void SetMemoryBuffer(const void* buff) override;
-
-  /**
-   * Specify the in memory image buffer length.
-   */
-  void SetMemoryBufferLength(vtkIdType buflen) override;
-
 protected:
   vtkF3DEXRReader();
   ~vtkF3DEXRReader() override;
