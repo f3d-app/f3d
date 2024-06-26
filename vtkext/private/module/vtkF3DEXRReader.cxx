@@ -25,7 +25,6 @@ public:
     : Imf::IStream(name)
     , buffer(static_cast<const char*>(buff))
     , bufflen(static_cast<size_t>(bufferLen))
-    , pos(0)
   {
   }
 
@@ -86,13 +85,10 @@ void vtkF3DEXRReader::ExecuteInformation()
 
   // Setup filename to read the header
   this->ComputeInternalFileName(this->DataExtent[4]);
-  if (this->InternalFileName == nullptr || this->InternalFileName[0] == '\0')
+  if ((this->InternalFileName == nullptr || this->InternalFileName[0] == '\0') &&
+    !this->MemoryBuffer)
   {
-    // If we have no file then maybe we have the file in memory
-    if (!this->MemoryBuffer)
-    {
-      return;
-    }
+    return;
   }
 
   auto execute = [&](Imf::RgbaInputFile& file)
@@ -201,7 +197,6 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
 
   try
   {
-    assert(this->InternalFileName);
     Imf::setGlobalThreadCount(std::thread::hardware_concurrency());
 
     if (this->MemoryBuffer)
@@ -212,6 +207,10 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
     }
     else
     {
+      if (!(this->InternalFileName))
+      {
+        throw std::invalid_argument("Not filename in EXR Reader when no Memory Buffer is set.");
+      }
       Imf::RgbaInputFile file(this->InternalFileName);
       execute(file);
     }
@@ -221,24 +220,6 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
     vtkErrorMacro("Error reading EXR file: " << e.what());
     return;
   }
-}
-
-//------------------------------------------------------------------------------
-/**
- * Read from memory instead of file
- */
-void vtkF3DEXRReader::SetMemoryBuffer(const void* buff)
-{
-  MemoryBuffer = buff;
-}
-
-//------------------------------------------------------------------------------
-/**
- * Specify the in memory image buffer length.
- */
-void vtkF3DEXRReader::SetMemoryBufferLength(vtkIdType bufferLen)
-{
-  MemoryBufferLength = bufferLen;
 }
 
 //------------------------------------------------------------------------------
