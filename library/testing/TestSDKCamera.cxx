@@ -53,6 +53,18 @@ void checkVec3(const std::array<double, 3>& actual, const std::array<double, 3>&
   }
 }
 
+void checkDouble(const double actual, const double expected, const std::string& label)
+{
+  if (!compareDouble(actual, expected))
+  {
+    std::stringstream ss;
+    ss << label << ": ";
+    ss << std::setprecision(12);
+    ss << actual << " != " << expected;
+    throw testFailure(ss.str());
+  }
+}
+
 int TestSDKCamera(int argc, char* argv[])
 {
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
@@ -243,6 +255,16 @@ int TestSDKCamera(int argc, char* argv[])
     checkVec3(cam.getPosition(), { -2, -3, 7 }, "pos after pan");
     checkVec3(cam.getFocalPoint(), { -2, -7, 7 }, "foc after pan");
     checkVec3(cam.getViewUp(), { 0, 0, 1 }, "up after pan");
+
+    cam.setPosition({ 1, 2, 3 });
+    cam.setFocalPoint({ 1, 2, 13 });
+    cam.setViewUp({ 0, 1, 0 });
+    cam.setViewAngle(25);
+    cam.zoom(1.5);
+    checkVec3(cam.getPosition(), { 1, 2, 3 }, "pos after zoom");
+    checkVec3(cam.getFocalPoint(), { 1, 2, 13 }, "foc after zoom");
+    checkVec3(cam.getViewUp(), { 0, 1, 0 }, "up after zoom");
+    checkDouble(cam.getViewAngle(), 25 / 1.5, "angle after zoom");
   }
   catch (testFailure& e)
   {

@@ -196,6 +196,15 @@ camera& camera_impl::pan(double right, double up, double forward)
 }
 
 //----------------------------------------------------------------------------
+camera& camera_impl::zoom(double factor)
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  cam->Zoom(factor);
+  this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 camera& camera_impl::roll(angle_deg_t angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
