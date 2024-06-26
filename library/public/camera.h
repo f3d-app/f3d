@@ -52,18 +52,25 @@ public:
   ///@}
 
   ///@{ @name Manipulation
-  /**
-   * Standard camera manipulation methods.
-   * Angles are in degrees.
-   */
+  /// Standard camera manipulation methods. Angles are in degrees.
+
+  /** Divide the camera's distance from the focal point by the given value. */
   virtual camera& dolly(double val) = 0;
+  /** Move the camera along its horizontal, vertical, and forward axes */
   virtual camera& pan(double right, double up, double forward = 0) = 0;
+  /** Decrease the view angle (or the parallel scale in parallel mode) by the specified factor. */
   virtual camera& zoom(double factor) = 0;
+  /** Rotate the camera about its forward axis. */
   virtual camera& roll(angle_deg_t angle) = 0;
+  /** Rotate the camera about its vertical axis, centered at the focal point. */
   virtual camera& azimuth(angle_deg_t angle) = 0;
+  /** Rotate the camera about its vertical axis, centered the camera's position. */
   virtual camera& yaw(angle_deg_t angle) = 0;
+  /** Rotate the camera about its horizontal axis, centered at the focal point. */
   virtual camera& elevation(angle_deg_t angle) = 0;
+  /** Rotate the camera about its horizontal axis, centered the camera's position. */
   virtual camera& pitch(angle_deg_t angle) = 0;
+
   ///@}
 
   /**
