@@ -328,7 +328,7 @@ protected:
   std::string CachePath;
   std::string AnimationNameInfo;
 
-  std::string BackfaceType;
+  std::string BackfaceType = "default";
   std::string FinalShader;
 };
 
