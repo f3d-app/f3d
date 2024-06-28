@@ -48,3 +48,6 @@ You can also find packages for the following repositories:
 - [FreeBSD](https://cgit.freebsd.org/ports/tree/graphics/f3d)
 - [Spack](https://packages.spack.io/package.html?name=f3d)
 - [pypi](https://pypi.org/project/f3d/) (library only)
+
+### libf3d based softwares
+- [Exhibit](https://packages.fedoraproject.org/pkgs/f3d/)
