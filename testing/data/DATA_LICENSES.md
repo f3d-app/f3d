@@ -11,6 +11,7 @@
 - animation_with_skeleton.fbx: assimp test models: BSD-3-Clause
 - anim_test.x: assimp test models: BSD-3-Clause
 - cube_gears.3mf: 3MF consortium samples: BSD-2-Clause
+- punch.fbx: batrisya1501: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - beach.nrrd: VTK Data: BSD-3-Clause
 - bluntfin.vts: VTK Data: BSD-3-Clause
 - bot2.wrl: VTK Data: BSD-3-Clause

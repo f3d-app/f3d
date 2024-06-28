@@ -596,6 +596,8 @@ public:
   {
     try
     {
+      // Work around for https://github.com/assimp/assimp/issues/4620
+      this->Importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
       this->Scene = this->Importer.ReadFile(filePath, aiProcess_LimitBoneWeights);
     }
     catch (const DeadlyImportError& e)
