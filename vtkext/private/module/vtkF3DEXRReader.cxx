@@ -8,10 +8,59 @@
 #include "vtksys/FStream.hxx"
 
 #include <ImfArray.h>
+#include <ImfIO.h>
 #include <ImfRgbaFile.h>
 
+#include <cstring>
 #include <sstream>
 #include <thread>
+
+/**
+ * Class to treat file contents in memory like it were still in a file.
+ */
+class MemStream : public Imf::IStream
+{
+public:
+  MemStream(const char* name, const void* buff, vtkIdType bufferLen)
+    : Imf::IStream(name)
+    , buffer(static_cast<const char*>(buff))
+    , bufflen(static_cast<size_t>(bufferLen))
+  {
+  }
+
+  bool read(char c[], int n) override
+  {
+    if (pos + n <= bufflen)
+    {
+      memcpy(c, buffer + pos, n);
+      pos += n;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * returns the current reading position, in bytes, from the beginning of the file.
+   * The next read() call will begin reading at the indicated position
+   */
+  uint64_t tellg() override
+  {
+    return pos;
+  }
+
+  /**
+   * sets the current reading position to pos bytes from the beginning of the "file"
+   */
+  void seekg(uint64_t new_pos) override
+  {
+    pos = new_pos;
+  }
+
+private:
+  const char* buffer;
+  size_t bufflen;
+  uint64_t pos{ 0 };
+};
 
 vtkStandardNewMacro(vtkF3DEXRReader);
 
@@ -36,15 +85,14 @@ void vtkF3DEXRReader::ExecuteInformation()
 
   // Setup filename to read the header
   this->ComputeInternalFileName(this->DataExtent[4]);
-  if (this->InternalFileName == nullptr || this->InternalFileName[0] == '\0')
+  if ((this->InternalFileName == nullptr || this->InternalFileName[0] == '\0') &&
+    !this->MemoryBuffer)
   {
     return;
   }
 
-  try
+  auto execute = [&](Imf::RgbaInputFile& file)
   {
-    Imf::RgbaInputFile file(this->InternalFileName);
-
     Imath::Box2i dw = file.dataWindow();
     this->DataExtent[0] = dw.min.x;
     this->DataExtent[1] = dw.max.x;
@@ -55,6 +103,21 @@ void vtkF3DEXRReader::ExecuteInformation()
     if (channels != Imf::RgbaChannels::WRITE_RGBA && channels != Imf::RgbaChannels::WRITE_RGB)
     {
       throw std::runtime_error("only RGB and RGBA channels are supported");
+    }
+  };
+
+  try
+  {
+    if (this->MemoryBuffer)
+    {
+      MemStream memoryStream("EXRmemoryStream", this->MemoryBuffer, this->MemoryBufferLength);
+      Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
+      execute(file);
+    }
+    else
+    {
+      Imf::RgbaInputFile file(this->InternalFileName);
+      execute(file);
     }
   }
   catch (const std::exception& e)
@@ -112,12 +175,8 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
   scalars->SetName("Pixels");
   float* dataPtr = scalars->GetPointer(0);
 
-  try
+  auto execute = [&](Imf::RgbaInputFile& file)
   {
-    assert(this->InternalFileName);
-    Imf::setGlobalThreadCount(std::thread::hardware_concurrency());
-    Imf::RgbaInputFile file(this->InternalFileName);
-
     Imf::Array2D<Imf::Rgba> pixels(this->GetHeight(), this->GetWidth());
 
     file.setFrameBuffer(&pixels[0][0], 1, this->GetWidth());
@@ -133,6 +192,27 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
         dataPtr[2] = std::clamp(static_cast<float>(p.b), 0.f, 10000.f);
         dataPtr += 3;
       }
+    }
+  };
+
+  try
+  {
+    Imf::setGlobalThreadCount(std::thread::hardware_concurrency());
+
+    if (this->MemoryBuffer)
+    {
+      MemStream memoryStream("EXRmemoryStream", this->MemoryBuffer, this->MemoryBufferLength);
+      Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
+      execute(file);
+    }
+    else
+    {
+      if (!(this->InternalFileName))
+      {
+        throw std::invalid_argument("Not filename in EXR Reader when no Memory Buffer is set.");
+      }
+      Imf::RgbaInputFile file(this->InternalFileName);
+      execute(file);
     }
   }
   catch (const std::exception& e)
