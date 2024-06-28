@@ -4,6 +4,10 @@ inputs:
   lfs_sha:
     description: 'Cache LFS sha'
     required: true
+  codecov_token:
+    description: 'Codecov token, needed for non-forked workflows'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -106,7 +110,12 @@ runs:
         lcov --remove coverage.info "*Test*" -o coverage.info
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
+        working-directory: ${{github.workspace}}/source
+        token: ${{inputs.codecov_token}}
+        fail_ci_if_error: true
         files: ${{github.workspace}}/source/coverage.info
-        version: "v0.1.15" # works better according to https://github.com/codecov/codecov-action/issues/598
+        verbose: true
+        use_oidc: false
+        disable_search: true

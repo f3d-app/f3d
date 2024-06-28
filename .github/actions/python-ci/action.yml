@@ -75,17 +75,19 @@ runs:
     - name: Set SKBUILD_CMAKE_ARGS
       shell: bash
       run: >
-        echo "SKBUILD_CMAKE_ARGS=-DF3D_DEPENDENCIES_DIR=${{ env.WORKSPACE }}/dependencies/install/bin;
+        echo "SKBUILD_CMAKE_ARGS=
         -DCMAKE_MODULE_PATH=${{ env.WORKSPACE }}/dependencies/install/lib/cmake/OpenVDB/;
+        -DF3D_DEPENDENCIES_DIR=${{ env.WORKSPACE }}/dependencies/install/bin;
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON;
         -DF3D_PLUGIN_BUILD_ASSIMP=ON;
         -DF3D_PLUGIN_BUILD_DRACO=ON;
         -DF3D_PLUGIN_BUILD_OCCT=ON;
         -DF3D_PLUGIN_BUILD_USD=ON;
         -DF3D_PLUGIN_BUILD_VDB=${{ runner.os == 'macOS' && 'OFF' || 'ON' }};
-        -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=ON;
+        -DF3D_MACOS_BUNDLE=OFF;
         -DF3D_MODULE_EXR=ON;
-        -DF3D_MODULE_EXTERNAL_RENDERING=ON" >> $GITHUB_ENV
+        -DF3D_MODULE_EXTERNAL_RENDERING=ON;
+        -DF3D_WINDOWS_GUI=OFF" >> $GITHUB_ENV
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -115,7 +117,7 @@ runs:
 
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
-      uses: ./source/.github/actions/mesa-install-bin
+      uses: f3d-app/install-mesa-windows-action@v1
       with:
         path: ${{ env.Python_ROOT_DIR }}
 

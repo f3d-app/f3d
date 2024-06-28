@@ -9,7 +9,36 @@ on:
 
 jobs:
 
+#----------------------------------------------------------------------------
+# webassembly: Build webassembly artifacts
+#----------------------------------------------------------------------------
+  webassembly:
+    name: Generate wasm binaries
+    if: github.event.pull_request.draft == false
+
+    strategy:
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+    container: dockcross/web-wasm:20240529-0dade71
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: 'true'
+
+    - name: Web Assembly CI
+      uses: ./source/.github/actions/webassembly-ci
+
+#----------------------------------------------------------------------------
+# generate website
+#----------------------------------------------------------------------------
   generate-website:
+    needs: webassembly
     name: Generate Website
     runs-on: ubuntu-latest
     steps:
@@ -29,6 +58,15 @@ jobs:
         sudo mv library/doxygen/build/html _site/doc/libf3d/doxygen
         sphinx-build -M html ./vtkext/public/doxygen ./vtkext/public/doxygen/build/
         sudo mv vtkext/public/doxygen/build/html _site/doc/libf3d/vtkext_doxygen
+
+    - name: Retrieve web assembly binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: f3d-wasm
+        path: ./web
+
+    - name: Copy web assembly binaries
+      run: sudo mv web _site/
 
     - name: Deploy
       if: github.ref == 'refs/heads/master'

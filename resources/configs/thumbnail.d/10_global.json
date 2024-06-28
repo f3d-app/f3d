@@ -6,7 +6,7 @@
     "hdri-ambient": true,
     "max-size":100,
     "no-background": true,
-    "quiet": true,
+    "verbose": "quiet",
     "scalars": "",
     "tone-mapping": true,
     "translucency-support": true

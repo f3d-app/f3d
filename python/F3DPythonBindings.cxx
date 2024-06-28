@@ -7,6 +7,7 @@
 #include "image.h"
 #include "interactor.h"
 #include "loader.h"
+#include "log.h"
 #include "options.h"
 #include "types.h"
 #include "utils.h"
@@ -211,7 +212,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("text_distance", &f3d::utils::textDistance);
 
   // f3d::interactor
-  py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete> > interactor(
+  py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete>> interactor(
     module, "Interactor");
   interactor //
     .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation")
@@ -245,7 +246,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("face_indices", &f3d::mesh_t::face_indices);
 
   // f3d::loader
-  py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete> > loader(module, "Loader");
+  py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete>> loader(module, "Loader");
   loader //
     .def("has_geometry_reader", &f3d::loader::hasGeometryReader)
     .def("load_geometry", py::overload_cast<const std::string&, bool>(&f3d::loader::loadGeometry),
@@ -256,7 +257,7 @@ PYBIND11_MODULE(pyf3d, module)
       "Load a surfacic mesh from memory", py::arg("mesh"), py::arg("reset") = false);
 
   // f3d::camera
-  py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "Camera");
+  py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete>> camera(module, "Camera");
   camera //
     .def_property(
       "position", [](f3d::camera& cam) { return cam.getPosition(); }, &f3d::camera::setPosition)
@@ -270,6 +271,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property(
       "state", [](f3d::camera& cam) { return cam.getState(); }, &f3d::camera::setState)
     .def("dolly", &f3d::camera::dolly)
+    .def("pan", &f3d::camera::pan, py::arg("right"), py::arg("up"), py::arg("forward") = 0.0)
+    .def("zoom", &f3d::camera::zoom)
     .def("roll", &f3d::camera::roll)
     .def("azimuth", &f3d::camera::azimuth)
     .def("yaw", &f3d::camera::yaw)
@@ -289,7 +292,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("angle", &f3d::camera_state_t::angle);
 
   // f3d::window
-  py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> > window(module, "Window");
+  py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete>> window(module, "Window");
 
   py::enum_<f3d::window::Type>(window, "Type")
     .value("NONE", f3d::window::Type::NONE)
@@ -338,6 +341,25 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static(
       "autoload_plugins", &f3d::engine::autoloadPlugins, "Automatically load internal plugins")
     .def_static("get_plugins_list", &f3d::engine::getPluginsList);
+
+  // f3d::log
+  py::class_<f3d::log> log(module, "Log");
+
+  log //
+    .def_static("set_verbose_level", &f3d::log::setVerboseLevel, py::arg("level"),
+      py::arg("force_std_err") = false)
+    .def_static("set_use_coloring", &f3d::log::setUseColoring)
+    .def_static("print",
+      [](f3d::log::VerboseLevel& level, const std::string& message)
+      { f3d::log::print(level, message); });
+
+  py::enum_<f3d::log::VerboseLevel>(log, "VerboseLevel")
+    .value("DEBUG", f3d::log::VerboseLevel::DEBUG)
+    .value("INFO", f3d::log::VerboseLevel::INFO)
+    .value("WARN", f3d::log::VerboseLevel::WARN)
+    .value("ERROR", f3d::log::VerboseLevel::ERROR)
+    .value("QUIET", f3d::log::VerboseLevel::QUIET)
+    .export_values();
 
 // deprecated functions, will be removed in the next major release, F3D v3.0.0
 #ifndef F3D_NO_DEPRECATED

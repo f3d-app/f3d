@@ -5,6 +5,25 @@ function onload(event) {
 }
 
 function enhance_install_page() {
+  function open_mac_warning_popup() {
+    const popup = document.createElement("div");
+    popup.classList = "popup-container bg-grey-dk-200";
+    popup.innerHTML = `
+        <h2>Warning</h2>
+        <p>MacOS package is not signed, if macOS complains that <b>the file is invalid, damaged or corrupted</b>, see the <a href="/doc/user/LIMITATIONS_AND_TROUBLESHOOTING.html#macos">troubleshooting section</a> for a workaround.</p>
+    `;
+
+    const button = document.createElement("button");
+    button.classList = "btn btn-primary";
+    button.innerHTML = "Ok";
+    button.addEventListener("click", function () {
+        popup.remove();
+    });
+    popup.append(button);
+
+    document.body.append(popup);
+  }
+
   function retrieve_downloads(target_platform_re) {
     var downloads = [];
     for (const table of document.querySelectorAll("table")) {
@@ -17,8 +36,12 @@ function enhance_install_page() {
               const link = table_cols[1].querySelector("a");
               if (link) {
                 const platform = table_cols[0].innerText;
+
                 if (target_platform_re.test(platform))
                   downloads.push([platform, link.innerText, link.href]);
+
+                if (/MacOS/i.test(platform))
+                  link.addEventListener("click", open_mac_warning_popup);
               }
             }
           }
@@ -56,6 +79,7 @@ function enhance_install_page() {
     link.setAttribute("href", url);
     link.setAttribute("class", i++ ? "btn" : "btn btn-primary");
     link.innerHTML = `<div>Get <b>F3D</b> for ${bolded_platform}</div><small>${filename}</small>`;
+    if (current_os === "MacOS") link.addEventListener("click", open_mac_warning_popup);
     div.append(link);
   }
   const note = document.createElement("div");

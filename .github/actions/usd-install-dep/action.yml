@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/usd_install
-        key: usd-v23.05-${{runner.os}}-${{inputs.cpu}}-8
+        key: usd-v23.05-${{runner.os}}-${{inputs.cpu}}-9
 
     - name: Checkout USD
       if: steps.cache-usd.outputs.cache-hit != 'true'
@@ -62,7 +62,6 @@ runs:
         -DPXR_INSTALL_LOCATION:PATH=../lib/usd
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=$(pwd)/../usd_install
-        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         -DCMAKE_PREFIX_PATH:PATH=../install/
 
     - name: Build USD

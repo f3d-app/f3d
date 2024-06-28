@@ -52,6 +52,8 @@ public:
   void getState(camera_state_t& state) override;
 
   camera& dolly(double val) override;
+  camera& pan(double right, double up, double forward) override;
+  camera& zoom(double factor) override;
   camera& roll(angle_deg_t angle) override;
   camera& azimuth(angle_deg_t angle) override;
   camera& yaw(angle_deg_t angle) override;

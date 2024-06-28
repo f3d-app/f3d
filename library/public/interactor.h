@@ -98,7 +98,7 @@ public:
   /**
    * Get a structure of strings describing default interactions.
    */
-  static const std::vector<std::pair<std::string, std::string> >& getDefaultInteractionsInfo();
+  static const std::vector<std::pair<std::string, std::string>>& getDefaultInteractionsInfo();
 
 protected:
   //! @cond

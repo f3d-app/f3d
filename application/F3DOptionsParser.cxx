@@ -34,11 +34,11 @@ public:
     : Argc(argc)
     , Argv(argv)
   {
-    this->ExecutableName = argc > 0 && argv[0][0] ? argv[0] : "f3d";
+    this->ExecutableName = argc > 0 && argv[0][0] ? fs::path(argv[0]).filename().string() : "f3d";
   }
 
   void GetOptions(F3DAppOptions& appOptions, f3d::options& options,
-    std::vector<std::string>& inputs, std::string filePathForConfigBlock = "",
+    std::vector<std::string>& inputs, const std::string& filePathForConfigBlock = "",
     bool allOptionsInitialized = false, bool parseCommandLine = true);
   bool InitializeDictionaryFromConfigFile(const std::string& userConfigFile);
   void LoadPlugins(const F3DAppOptions& appOptions) const;
@@ -65,34 +65,13 @@ public:
 protected:
   bool GetOptionConfig(const std::string& option, std::string& configValue) const
   {
-    bool ret = false;
-    if (this->FilePathForConfigBlock.empty())
+    auto localIt = this->CurrentFileConfig.find(option);
+    if (localIt != this->CurrentFileConfig.end())
     {
-      auto localIt = this->GlobalConfigEntry.find(option);
-      if (localIt != this->GlobalConfigEntry.end())
-      {
-        configValue = localIt->second;
-        ret = true;
-      }
+      configValue = localIt->second;
+      return true;
     }
-    else
-    {
-      for (auto const& it : this->RegexConfigEntries)
-      {
-        std::regex re(it.first, std::regex_constants::icase);
-        std::smatch matches;
-        if (std::regex_match(this->FilePathForConfigBlock, matches, re))
-        {
-          auto localIt = it.second.find(option);
-          if (localIt != it.second.end())
-          {
-            configValue = localIt->second;
-            ret = true;
-          }
-        }
-      }
-    }
-    return ret;
+    return false;
   }
 
   template<class T>
@@ -202,14 +181,15 @@ private:
   int Argc;
   char** Argv;
 
-  std::string FilePathForConfigBlock;
-
-  using ConfigEntry = std::map<std::string, std::string>;
-  using ConfigEntries = std::vector<std::pair<std::string, ConfigEntry> >;
-  ConfigEntry GlobalConfigEntry;
+  using ConfigDict = std::map<std::string, std::string>;
+  using ConfigEntry = std::tuple<ConfigDict, fs::path, std::string>;
+  using ConfigEntries = std::vector<ConfigEntry>;
+  ConfigEntries GlobalConfigEntries;
   ConfigEntries RegexConfigEntries;
   std::string ExecutableName;
   std::vector<std::string> AllLongOptions;
+
+  ConfigDict CurrentFileConfig;
 };
 
 //----------------------------------------------------------------------------
@@ -274,12 +254,62 @@ void ConfigurationOptions::PrintPluginsScan()
 
 //----------------------------------------------------------------------------
 void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& options,
-  std::vector<std::string>& inputs, std::string filePathForConfigBlock, bool allOptionsInitialized,
-  bool parseCommandLine)
+  std::vector<std::string>& inputs, const std::string& filePathForConfigBlock,
+  bool allOptionsInitialized, bool parseCommandLine)
 {
   inputs.clear(); /* needed because this function is called multiple times */
 
-  this->FilePathForConfigBlock = std::move(filePathForConfigBlock);
+  /* start with an empty config ... */
+  ConfigDict tmpConfig;
+
+  const auto update = [&](const ConfigDict& config)
+  {
+    /* insert or update the values from the argument into `tmpConfig`.
+     * also log the insertions/updates details in verbose mode */
+    for (const auto& [key, value] : config)
+    {
+      const std::string del = tmpConfig.count(key) ? key + ": " + tmpConfig[key] : "";
+      const std::string add = std::string(key).append(": ").append(value);
+      if (add == del)
+      {
+        f3d::log::debug("= ", add);
+      }
+      else
+      {
+        if (!del.empty())
+        {
+          f3d::log::debug("- ", del);
+        }
+        f3d::log::debug("+ ", add);
+      }
+
+      tmpConfig[key] = value;
+    }
+  };
+
+  /* apply global entries, `pattern` will always be `"global"` here */
+  for (const auto& [conf, source, pattern] : this->GlobalConfigEntries)
+  {
+    f3d::log::debug("using `", pattern, "` config from ", source.string());
+    update(conf);
+  }
+
+  /* ... then go through matching regex configs and override */
+  if (!filePathForConfigBlock.empty())
+  {
+    for (auto const& [conf, source, pattern] : this->RegexConfigEntries)
+    {
+      std::regex re(pattern, std::regex_constants::icase);
+      std::smatch matches;
+      if (std::regex_match(filePathForConfigBlock, matches, re))
+      {
+        f3d::log::debug("using `", pattern, "` config from ", source.string());
+        update(conf);
+      }
+    }
+  }
+
+  this->CurrentFileConfig = tmpConfig;
 
   // When parsing multiple times, hasDefault should be forced to yes after the first pass as all
   // options are expected to be already initialized, which means they have a "default" in the
@@ -314,21 +344,24 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp0, "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", appOptions.Watch,  HasDefault::YES, MayHaveConfig::YES );
     this->DeclareOption(grp0, "load-plugins", "", "List of plugins to load separated with a comma", appOptions.Plugins, LocalHasDefaultNo, MayHaveConfig::YES, "<paths or names>");
     this->DeclareOption(grp0, "scan-plugins", "", "Scan standard directories for plugins and display available plugins (result can be incomplete)");
+    this->DeclareOption(grp0, "screenshot-filename", "", "Screenshot filename", appOptions.ScreenshotFilename, HasDefault::YES, MayHaveConfig::YES, "<filename>");
 
     auto grp1 = cxxOptions.add_options("General");
     this->DeclareOption(grp1, "verbose", "", "Set verbose level, providing more information about the loaded data in the console output", appOptions.VerboseLevel, HasDefault::YES, MayHaveConfig::YES, "{debug, info, warning, error, quiet}", HasImplicitValue::YES, "debug");
 #ifndef F3D_NO_DEPRECATED
     this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which supersede any verbose options and prevent any console output to be generated at all (deprecated, using `--verbose=quiet` instead)", deprecatedQuiet,  HasDefault::YES, MayHaveConfig::YES );
 #endif
-    this->DeclareOption(grp1, "progress", "", "Show progress bar", options.getAsBoolRef("ui.loader-progress"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "progress", "", "Show loading progress bar", options.getAsBoolRef("ui.loader-progress"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "animation-progress", "", "Show animation progress bar", options.getAsBoolRef("ui.animation-progress"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", appOptions.GeometryOnly, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "group-geometries", "", "When opening multiple files, show them all in the same scene. Force geometry-only. The configuration file for the first file will be loaded.", appOptions.GroupGeometries, HasDefault::YES, MayHaveConfig::NO);
     this->DeclareOption(grp1, "up", "", "Up direction", options.getAsStringRef("scene.up-direction"), HasDefault::YES, MayHaveConfig::YES, "{-X, +X, -Y, +Y, -Z, +Z}");
     this->DeclareOption(grp1, "axis", "x", "Show axes", options.getAsBoolRef("interactor.axis"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "grid", "g", "Show grid", options.getAsBoolRef("render.grid.enable"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "grid-absolute", "", "Position grid at the absolute origin instead of below the model", options.getAsBoolRef("render.grid.absolute"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "grid-unit", "", "Size of grid unit square", options.getAsDoubleRef("render.grid.unit"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "grid-unit", "", "Size of grid unit square, set to a non-positive value for automatic computation", options.getAsDoubleRef("render.grid.unit"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "grid-subdivisions", "", "Number of grid subdivisions", options.getAsIntRef("render.grid.subdivisions"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "grid-color", "", "Color of main grid lines", options.getAsDoubleVectorRef("render.grid.color"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.getAsBoolRef("render.show-edges"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", options.getAsIntRef("scene.camera.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
     this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", options.getAsBoolRef("interactor.trackball"), HasDefault::YES, MayHaveConfig::YES);
@@ -345,6 +378,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp2, "point-type", "", "Point sprites type when showing point sprites", options.getAsStringRef("model.point-sprites.type"), HasDefault::YES, MayHaveConfig::YES, "<sphere|gaussian>");
     this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.getAsDoubleRef("render.point-size"), HasDefault::YES, MayHaveConfig::YES, "<size>");
     this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", options.getAsDoubleRef("render.line-width"), HasDefault::YES, MayHaveConfig::YES, "<width>");
+    this->DeclareOption(grp2, "backface-type", "", "Backface type, can be default (usually visible), visible or hidden", options.getAsStringRef("render.backface-type"), HasDefault::YES, MayHaveConfig::YES, "<default|visible|hidden>");
     this->DeclareOption(grp2, "color", "", "Solid color", options.getAsDoubleVectorRef("model.color.rgb"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
     this->DeclareOption(grp2, "opacity", "", "Opacity", options.getAsDoubleRef("model.color.opacity"), HasDefault::YES, MayHaveConfig::YES, "<opacity>");
     this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.roughness"), HasDefault::YES, MayHaveConfig::YES, "<roughness>");
@@ -408,6 +442,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp6, "ambient-occlusion", "q", "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO", options.getAsBoolRef("render.effect.ambient-occlusion"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp6, "anti-aliasing", "a", "Enable anti-aliasing, implemented using FXAA", options.getAsBoolRef("render.effect.anti-aliasing"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping, providing balanced coloring", options.getAsBoolRef("render.effect.tone-mapping"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp6, "final-shader", "", "Execute the final shader at the end of the rendering pipeline", options.getAsStringRef("render.effect.final-shader"), LocalHasDefaultNo, MayHaveConfig::YES, "<GLSL code>");
 
     auto grp7 = cxxOptions.add_options("Testing");
     this->DeclareOption(grp7, "ref", "", "Reference", appOptions.Reference, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
@@ -541,7 +576,7 @@ void ConfigurationOptions::PrintHelpPair(
 //----------------------------------------------------------------------------
 void ConfigurationOptions::PrintHelp(const cxxopts::Options& cxxOptions)
 {
-  const std::vector<std::pair<std::string, std::string> > examples = {
+  const std::vector<std::pair<std::string, std::string>> examples = {
     { this->ExecutableName + " file.vtu -xtgans",
       "View a unstructured mesh in a typical nice looking sciviz style" },
     { this->ExecutableName + " file.glb -tuqap --hdri-file=file.hdr --hdri-ambient --hdri-skybox",
@@ -674,6 +709,8 @@ void ConfigurationOptions::PrintReadersList()
 //----------------------------------------------------------------------------
 bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string& config)
 {
+  // we expect this function to only get called once but clear anyway just in case
+  this->GlobalConfigEntries.clear();
   this->RegexConfigEntries.clear();
 
   std::string configSearch = "config";
@@ -692,49 +729,58 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
     }
   }
 
-  fs::path configPath;
+  std::vector<fs::path> actualConfigFilePaths;
+
+  std::vector<fs::path> configPaths;
+
   if (!configSearch.empty())
   {
-    configPath = F3DConfigFileTools::GetConfigPath(configSearch);
-  }
-  else
-  {
-    configPath = config;
-  }
-
-  if (configPath.empty())
-  {
-    if (!config.empty())
+    for (const auto& path : F3DConfigFileTools::GetConfigPaths(configSearch))
     {
-      f3d::log::error("Configuration file for \"", config, "\" could not been found");
-    }
-    return false;
-  }
-
-  // Recover an absolute canonical path to config file
-  try
-  {
-    configPath = fs::canonical(fs::path(configPath)).string();
-  }
-  catch (const fs::filesystem_error&)
-  {
-    f3d::log::error("Configuration file does not exist: ", configPath.string());
-    return false;
-  }
-  f3d::log::debug("Using config file ", configPath.string());
-
-  // Recover all config files if needed
-  std::set<fs::path> actualConfigFilePaths;
-  if (fs::is_directory(configPath))
-  {
-    for (auto& entry : std::filesystem::directory_iterator(configPath))
-    {
-      actualConfigFilePaths.emplace(entry);
+      configPaths.emplace_back(path);
     }
   }
   else
   {
-    actualConfigFilePaths.emplace(configPath);
+    configPaths.emplace_back(config);
+  }
+
+  for (auto configPath : configPaths)
+  {
+    // Recover an absolute canonical path to config file
+    try
+    {
+      configPath = fs::canonical(fs::path(configPath)).string();
+    }
+    catch (const fs::filesystem_error&)
+    {
+      f3d::log::error("Configuration file does not exist: ", configPath.string());
+      return false;
+    }
+
+    // Recover all config files if needed
+    if (fs::is_directory(configPath))
+    {
+      f3d::log::debug("Using config directory ", configPath.string());
+      for (auto& entry : std::filesystem::directory_iterator(configPath))
+      {
+        actualConfigFilePaths.emplace_back(entry);
+      }
+    }
+    else
+    {
+      f3d::log::debug("Using config file ", configPath.string());
+      actualConfigFilePaths.emplace_back(configPath);
+    }
+  }
+
+  if (actualConfigFilePaths.empty())
+  {
+    if (!configSearch.empty())
+    {
+      f3d::log::warn("Configuration file for \"", configSearch, "\" could not be found");
+    }
+    return false;
   }
 
   // Read config files
@@ -761,32 +807,32 @@ bool ConfigurationOptions::InitializeDictionaryFromConfigFile(const std::string&
       return false;
     }
 
-    for (const auto& regexpConfig : json.items())
+    for (const auto& configBlock : json.items())
     {
-      std::map<std::string, std::string> localDic;
-      for (const auto& prop : regexpConfig.value().items())
+      ConfigDict entry;
+      for (const auto& item : configBlock.value().items())
       {
-        if (prop.value().is_number() || prop.value().is_boolean())
+        if (item.value().is_number() || item.value().is_boolean())
         {
-          localDic[prop.key()] = ToString(prop.value());
+          entry[item.key()] = ToString(item.value());
         }
-        else if (prop.value().is_string())
+        else if (item.value().is_string())
         {
-          localDic[prop.key()] = prop.value().get<std::string>();
+          entry[item.key()] = item.value().get<std::string>();
         }
         else
         {
-          f3d::log::error(prop.key(), " must be a string, a boolean or a number");
+          f3d::log::error(item.key(), " must be a string, a boolean or a number");
           return false;
         }
       }
-      if (regexpConfig.key() == "global")
+      if (configBlock.key() == "global")
       {
-        this->GlobalConfigEntry = localDic;
+        this->GlobalConfigEntries.emplace_back(entry, configFilePath, configBlock.key());
       }
       else
       {
-        this->RegexConfigEntries.emplace_back(regexpConfig.key(), localDic);
+        this->RegexConfigEntries.emplace_back(entry, configFilePath, configBlock.key());
       }
     }
   }

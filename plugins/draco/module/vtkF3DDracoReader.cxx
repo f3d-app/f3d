@@ -30,10 +30,10 @@ public:
   }
 
   template<typename T>
-  static vtkSmartPointer<vtkAOSDataArrayTemplate<T> > FillArray(
+  static vtkSmartPointer<vtkAOSDataArrayTemplate<T>> FillArray(
     int nbPoints, draco::PointAttribute* attribute)
   {
-    vtkNew<vtkAOSDataArrayTemplate<T> > arr;
+    vtkNew<vtkAOSDataArrayTemplate<T>> arr;
 
     arr->SetNumberOfComponents(attribute->num_components());
     arr->SetNumberOfTuples(nbPoints);

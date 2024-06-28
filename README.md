@@ -25,6 +25,8 @@ F3D also contains the libf3d, a simple library to render meshes, with C++ and Py
 
 See the [gallery](doc/GALLERY.md) for more images, take a look at the [changelog](doc/CHANGELOG.md) or go to the [install guide](doc/user/INSTALLATION.md) to download and install F3D!
 
+You can even use F3D directly in your [browser](https://f3d.app/web)!
+
 If you need any help or want to discuss with other F3D users and developers, head over to our [discord](https://discord.f3d.app).
 
 # Quickstart
@@ -57,7 +59,7 @@ man f3d # Linux only
 
 # Support
 
-F3D needs you help!
+F3D needs your help!
 
 If you can, please consider sponsoring F3D. Even a small donation would help us offset the recurring maintenance costs.
 With enough sponsors we would even be able to add support for new devices (as we would need do acquire or rent them first). Read more about it on our [sponsor page](https://github.com/sponsors/f3d-app).

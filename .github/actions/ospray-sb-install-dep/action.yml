@@ -1,5 +1,11 @@
 name: 'Install ospray sb Dependency'
 description: 'Install ospray sb Dependency using cache when possible'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+
 runs:
   using: "composite"
   steps:
@@ -9,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-v2.7.1-${{runner.os}}-1
+        key: ospray-sb-v2.7.1-${{runner.os}}-${{inputs.cpu}}-2
 
     # Dependents: vtk
     - name: Checkout ospray
@@ -46,10 +52,10 @@ runs:
       shell: bash
       run: >
         cmake ../ospray/scripts/superbuild/
-        -DBUILD_EMBREE_FROM_SOURCE=OFF
+        -DBUILD_EMBREE_FROM_SOURCE=ON
         -DBUILD_GLFW=OFF
         -DBUILD_OIDN=ON
-        -DBUILD_OIDN_FROM_SOURCE=OFF
+        -DBUILD_OIDN_FROM_SOURCE=ON
         -DBUILD_OSPRAY_APPS=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../ospray_install

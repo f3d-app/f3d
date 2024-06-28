@@ -54,6 +54,7 @@ bool animationManager::Initialize(
     progressRep->DrawFrameOff();
     progressRep->SetPadding(0.0, 0.0);
 #endif
+    progressRep->SetVisibility(options->getAsBool("ui.animation-progress"));
 
     this->ProgressWidget->On();
   }
@@ -77,7 +78,6 @@ bool animationManager::Initialize(
       log::warn("No animation available, cannot load a specific animation time");
     }
 
-    this->HasAnimation = false;
     return false;
   }
   else
@@ -167,7 +167,6 @@ void animationManager::StopAnimation()
   {
     this->ToggleAnimation();
   }
-  this->ProgressWidget = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -262,7 +261,7 @@ bool animationManager::LoadAtTime(double timeValue)
   this->CurrentTimeSet = true;
   this->Importer->UpdateTimeStep(this->CurrentTime);
 
-  if (this->Interactor)
+  if (this->Interactor && this->ProgressWidget)
   {
     // Set progress bar
     vtkProgressBarRepresentation* progressRep =

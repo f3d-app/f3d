@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/tbb_install
-        key: tbb-v2021.11.0-${{runner.os}}-${{inputs.cpu}}-1
+        key: tbb-v2021.12.0-${{runner.os}}-${{inputs.cpu}}-1
 
     # Dependents: usd openvdb vtk
     - name: Checkout TBB
@@ -24,7 +24,7 @@ runs:
       with:
         repository: oneapi-src/oneTBB
         path: './dependencies/tbb'
-        ref: v2021.11.0
+        ref: v2021.12.0
 
     - name: Setup TBB
       if: steps.cache-tbb.outputs.cache-hit != 'true'
@@ -46,7 +46,6 @@ runs:
         -DTBB_STRICT=OFF
         -DTBB_TEST=OFF
         -DTBB4PY_BUILD=OFF
-        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_MACOSX_RPATH=ON' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 

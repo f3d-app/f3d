@@ -162,7 +162,7 @@ jobs:
       matrix:
         vtk_version: [commit, v9.3.0, v9.2.6]
 
-    runs-on: macos-latest
+    runs-on: macos-13
 
     steps:
     - name: Checkout
@@ -176,6 +176,7 @@ jobs:
       uses: ./source/.github/actions/generic-ci
       with:
         vtk_version: ${{matrix.vtk_version}}
+        raytracing_label: raytracing
         cpu: x86_64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
@@ -195,7 +196,9 @@ jobs:
         include:
           - vtk_version: commit
             bundle_label: bundle
+            static_label: no-static
           - vtk_version: commit
+            bundle_label: no-bundle
             static_label: static
 
     runs-on: macos-14
@@ -212,6 +215,7 @@ jobs:
       uses: ./source/.github/actions/generic-ci
       with:
         vtk_version: ${{matrix.vtk_version}}
+        raytracing_label: raytracing
         bundle_label: ${{matrix.bundle_label}}
         static_label: ${{matrix.static_label}}
         cpu: arm64
@@ -227,10 +231,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu, windows, macos]
+        os: [ubuntu-latest, windows-latest, macos-13]
 
-    runs-on: ${{matrix.os}}-latest
-    container: ${{ matrix.os == 'ubuntu' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    runs-on: ${{matrix.os}}
+    container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       DISPLAY: :0
@@ -277,6 +281,7 @@ jobs:
       uses: ./source/.github/actions/coverage-ci
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        codecov_token: ${{secrets.CODECOV_TOKEN}}
 
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -399,27 +404,3 @@ jobs:
       uses: ./source/.github/actions/android-ci
       with:
         arch: ${{matrix.arch}}
-
-#----------------------------------------------------------------------------
-# webassembly: Check build of F3D for webassembly
-#----------------------------------------------------------------------------
-  webassembly:
-    if: github.event.pull_request.draft == false
-
-    strategy:
-      fail-fast: false
-
-    runs-on: ubuntu-latest
-    container: dockcross/web-wasm:20230905-7b2d74f
-
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: 'false'
-
-    - name: Web Assembly CI
-      uses: ./source/.github/actions/webassembly-ci

@@ -26,7 +26,7 @@ class plugin
 {
 public:
   plugin(const std::string& name, const std::string& desc, const std::string& vers,
-    const std::vector<std::shared_ptr<reader> >& readers)
+    const std::vector<std::shared_ptr<reader>>& readers)
     : Name(name)
     , Description(desc)
     , Version(vers)
@@ -61,7 +61,7 @@ public:
   /**
    * Get the list of readers created by this plugin
    */
-  const std::vector<std::shared_ptr<reader> >& getReaders()
+  const std::vector<std::shared_ptr<reader>>& getReaders()
   {
     return this->Readers;
   }
@@ -85,7 +85,7 @@ private:
   std::string Name;
   std::string Description;
   std::string Version;
-  std::vector<std::shared_ptr<reader> > Readers;
+  std::vector<std::shared_ptr<reader>> Readers;
   std::string Origin = "undefined";
 };
 

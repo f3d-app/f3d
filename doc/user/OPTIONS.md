@@ -6,7 +6,7 @@ F3D behavior can be fully controlled from the command line using the following o
 
 Options|Default|Description
 ------|------|------
-\-\-output=\<png file\>||Instead of showing a render view and render into it, *render directly into a png file*. When used with \-\-ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout.
+\-\-output=\<png file\>||Instead of showing a render view and render into it, *render directly into a png file*. When used with \-\-ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating).
 \-\-no-background||Use with \-\-output to output a png file with a transparent background.
 -h, \-\-help||Print *help* and exit. Ignore `--verbose`.
 \-\-version||Show *version* information and exit. Ignore `--verbose`.
@@ -18,6 +18,7 @@ Options|Default|Description
 \-\-watch||Watch current file and automatically reload it whenever it is modified on disk.
 \-\-load-plugins=\<paths or names\>||List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `exodus`, `occt`, `usd`, `vdb`. See [usage](USAGE.md) for more info.
 \-\-scan-plugins||Scan standard directories for plugins and display their names, results may be incomplete. See [usage](USAGE.md) for more info.
+\-\-screenshot-filename=\<png file\>|`{app}/{model}_{n}.png`|Filename to save [screenshots](INTERACTIONS.md#taking-screenshots) to. Can use [template variables](#filename-templating).
 
 ## General Options
 
@@ -25,6 +26,7 @@ Options|Default|Description
 ------|------|------
 \-\-verbose=\<[debug\|info\|warning\|error\|quiet]\>|info| Set *verbose* level, in order to provide more information about the loaded data in the console output. If no level is providen, assume `debug`. Option parsing may ignore this flag.
 \-\-progress||Show a *progress bar* when loading the file.
+\-\-animation-progress||Show a *progress bar* when playing the animation.
 \-\-geometry-only||For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-group-geometries||When opening multiple files, show them all in the same scene.<br>Force geometry-only. The configuration file for the first file will be loaded.
 \-\-up=\<[+\|-][X\|Y\|Z]\>|+Y|Define the Up direction.
@@ -32,6 +34,7 @@ Options|Default|Description
 -g, \-\-grid||Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.
 \-\-grid\-unit=\<length\>||Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.
 \-\-grid\-subdivisions=\<count\>||Set the number of subdivisions for the grid.
+\-\-grid\-color=\<color\>|(0,0,0)|Set the color grid lines.
 -e, \-\-edges||Show the *cell edges*.
 \-\-camera-index=\<idx\>|-1|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.
 -k, \-\-trackball||Enable trackball interaction.
@@ -120,6 +123,7 @@ Options|Description
 -q, \-\-ambient-occlusion|Enable *ambient occlusion*. This is a technique used to improve the depth perception of the object.
 -a, \-\-anti-aliasing|Enable *anti-aliasing*. This technique is used to reduce aliasing.
 -t, \-\-tone-mapping|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
+\-\-final-shader|Add a final shader to the output image. See [dedicated documentation](FINAL_SHADER.md) for more details.
 
 ## Testing options
 
@@ -142,3 +146,23 @@ Some rendering options are not compatible between them, here is the precedence o
 
 The `--options=value` syntax is used everywhere in this documentation, however, the syntax `--options value` can also be used, with the exception of options that have implicit values,
 `--verbose`, `--comp` and `--scalars`.
+
+## Filename templating
+
+The destination filename used by `--output` or to save screenshots can use the following template variables:
+
+- `{app}`: application name (ie. `F3D`)
+- `{version}`: application version (eg. `2.4.0`)
+- `{version_full}`: full application version (eg. `2.4.0-abcdefgh`)
+- `{model}`: current model filename without extension (eg. `foo` for `/home/user/foo.glb`)
+- `{model.ext}`: current model filename with extension (eg. `foo.glb` for `/home/user/foo.glb`)
+- `{model_ext}`: current model filename extension (eg. `glb` for `/home/user/foo.glb`)
+- `{date}`: current date in YYYYMMDD format
+- `{date:format}`: current date as per C++'s `std::put_time` format
+- `{n}`: auto-incremented number to make filename unique (up to 1000000)
+- `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique (up to 1000000)
+- variable names can be escaped by doubling the braces (eg. use `{{model}}.png` to output `{model}.png` without the model name being substituted)
+
+For example the screenshot filename is configured as `{app}/{model}_{n}.png` by default, meaning that, assuming the model `hello.glb` is being viewed,
+consecutive screenshots are going to be saved as `F3D/hello_1.png`, `F3D/hello_2.png`, `F3D/hello_3.png`, ...
+

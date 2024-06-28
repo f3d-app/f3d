@@ -40,6 +40,9 @@ public:
     , Window(window)
     , Loader(loader)
   {
+#ifdef __EMSCRIPTEN__
+    vtkRenderWindowInteractor::InteractorManagesTheEventLoop = false;
+#endif
     this->VTKInteractor->SetRenderWindow(this->Window.GetRenderWindow());
     this->VTKInteractor->SetInteractorStyle(this->Style);
     this->VTKInteractor->Initialize();
@@ -545,7 +548,7 @@ public:
   vtkNew<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
-  std::map<unsigned long, std::pair<int, std::function<void()> > > TimerCallBacks;
+  std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
 
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;

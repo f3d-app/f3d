@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/occt_install
-        key: occt-V7_7_2-${{runner.os}}-${{inputs.cpu}}-2
+        key: occt-V7_8_1-${{runner.os}}-${{inputs.cpu}}-1
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -24,7 +24,7 @@ runs:
         repository: Open-Cascade-SAS/OCCT
         submodules: true
         path: './dependencies/occt'
-        ref: V7_7_2
+        ref: V7_8_1
 
     - name: Patch OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -49,7 +49,7 @@ runs:
       shell: bash
       run: >
         cmake ../occt
-        -DBUILD_ADDITIONAL_TOOLKITS="TKSTEP;TKIGES;TKMesh;TKXDESTEP;TKXDEIGES"
+        -DBUILD_ADDITIONAL_TOOLKITS="TKDESTEP;TKDEIGES;TKMesh"
         -DBUILD_DOC_Overview=OFF
         -DBUILD_LIBRARY_TYPE=Shared
         -DBUILD_MODULE_ApplicationFramework=OFF
@@ -65,7 +65,6 @@ runs:
         -DCMAKE_INSTALL_NAME_DIR:PATH=${{github.workspace}}/dependencies/install/lib
         -DINSTALL_DIR_BIN:PATH=bin
         -DUSE_FREETYPE=OFF
-        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         ${{ runner.os == 'macOS' && '-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 

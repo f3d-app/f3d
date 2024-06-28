@@ -65,6 +65,7 @@ render.effect.translucency-support|bool<br>false<br>render|Enable *translucency 
 render.effect.anti-aliasing|bool<br>false<br>render|Enable *anti-aliasing*. This technique is used to reduce aliasing, implemented using FXAA.|\-\-anti-aliasing
 render.effect.ambient-occlusion|bool<br>false<br>render|Enable *ambient occlusion*. This is a technique providing approximate shadows, used to improve the depth perception of the object. Implemented using SSAO|\-\-ambient-occlusion
 render.effect.tone-mapping|bool<br>false<br>render|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.|\-\-tone-mapping
+render.effect.final-shader|string<br>""<br>render|Add a final shader to the output image|\-\-final-shader. See [user documentation](../user/FINAL_SHADER.md).
 render.line-width|double<br>1.0<br>render|Set the *width* of lines when showing edges.|\-\-line-width
 render.show-edges|bool<br>false<br>render|Show the *cell edges*|\-\-edges
 render.point-size|double<br>10.0<br>render|Set the *size* of points when showing vertices and point sprites.|\-\-point-size
@@ -72,6 +73,7 @@ render.grid.enable|bool<br>false<br>render|Show *a grid* aligned with the horizo
 render.grid.absolute|bool<br>false<br>render|Position the grid at the *absolute origin* of the model's coordinate system instead of below the model.|\-\-grid
 render.grid.unit|double<br>0<br>render|Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.|\-\-grid\-unit
 render.grid.subdivisions|int<br>10<br>render|Set the number of subdivisions for the grid.|\-\-grid\-subdivisions
+render.grid.color|int<br>(0, 0, 0)<br>render|Set the color of grid lines.|\-\-grid\-color
 render.raytracing.enable|bool<br>false<br>render|Enable *raytracing*. Requires the raytracing module to be enabled.|\-\-raytracing
 render.raytracing.samples|int<br>5<br>render|The number of *samples per pixel*.|\-\-samples
 render.raytracing.denoise|bool<br>false<br>render|*Denoise* the raytracing rendering.|\-\-denoise
@@ -80,7 +82,8 @@ render.hdri.ambient|bool<br>false<br>render|Light the scene using the *HDRI* ima
 render.background.color|vector\<double\><br>0.2,0.2,0.2<br>render|Set the window *background color*.<br>Ignored if a *hdri* skybox is used.|\-\-bg-color
 render.background.skybox|bool<br>false<br>render|Show the *HDRI* image as a skybox<br>Overrides the the background color if any|\-\-hdri-skybox
 render.background.blur|bool<br>false<br>render|Blur background, useful with a skybox.|\-\-blur-background
-render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-background-coc
+render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-coc
+render.light.intensity|double<br>1.0<br>render|Adjust the intensity of every light in the scene.|\-\-light-intensity
 
 ## UI Options
 
@@ -93,6 +96,7 @@ ui.filename-info|string<br>-<br>render|Content of *filename info* to display.
 ui.font-file|string<br>-<br>render|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.|\-\-font-file
 ui.fps|bool<br>false<br>render|Display a *frame per second counter*.|\-\-fps
 ui.loader-progress|bool<br>false<br>load|Show a *progress bar* when loading the file.|\-\-progress
+ui.animation-progress|bool<br>false<br>load|Show a *progress bar* when playing the animation.|\-\-animation-progress
 ui.metadata|bool<br>false<br>render|Display the *metadata*.|\-\-metadata
 ui.dropzone|bool<br>false<br>render|Show a drop zone.
 ui.dropzone-info|string<br>-<br>render|Content of the drop zone text to display.

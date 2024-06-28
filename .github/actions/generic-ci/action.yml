@@ -72,6 +72,8 @@ runs:
     - name: Install Raytracing Dependencies
       if: inputs.raytracing_label == 'raytracing'
       uses: ./source/.github/actions/ospray-sb-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -128,12 +130,19 @@ runs:
       working-directory: ${{github.workspace}}
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      # occt coloring not supported on macOS because of #792
+    # Works around for https://github.com/actions/runner-images/issues/10055
+    - name: Remove conflicting libraries for Java bindings on Windows
+      if: runner.os == 'Windows'
+      shell: bash
+      run: find "C:/hostedtoolcache/windows/Java_Temurin-Hotspot_jdk" -name "msvcp140.dll" -exec rm {} \;
+
       # Exodus not supported on Apple Silicon because of #976
       # CMAKE_MODULE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
       # OCCT plugin causes issues with static build because it exports symbols with the executable for some reasons
       # https://github.com/f3d-app/f3d/issues/1322
+      # MacOS x86_64 occasionally segfault with Java
+      # https://github.com/f3d-app/f3d/issues/1410
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}/build
@@ -150,7 +159,7 @@ runs:
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
         -DCMAKE_MODULE_PATH=${{ matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0' && matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && '$(pwd)/../dependencies/install/lib/cmake/OpenVDB/' || '' }}
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
-        -DF3D_BINDINGS_JAVA=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_BINDINGS_JAVA=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
         -DF3D_LINUX_GENERATE_MAN=ON
@@ -163,14 +172,12 @@ runs:
         -DF3D_PLUGIN_BUILD_ALEMBIC=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ASSIMP=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_DRACO=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_EXODUS=${{ inputs.cpu == 'x86_64' && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_EXODUS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && inputs.static_label == 'no-static' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ runner.os == 'macOS' && 'OFF' || 'ON' }}
         -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0' && matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_WINDOWS_GUI=ON
-        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ runner.os == 'Linux' && matrix.vtk_version != 'v9.0.0' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
@@ -190,30 +197,40 @@ runs:
 
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
-      uses: ./source/.github/actions/mesa-install-bin
+      uses: f3d-app/install-mesa-windows-action@v1
       with:
         path: ${{github.workspace}}\build\bin_Release
 
-    - name: Test
-      if: inputs.cpu == 'x86_64'
+    # Certain tests are failing on macOS with GPU pass through
+    # https://github.com/f3d-app/f3d/issues/792
+    - name: Set CI test exception for macOS x86_64
+      if: |
+        runner.os == 'macOS' &&
+        inputs.cpu == 'x86_64'
       shell: bash
-      working-directory: ${{github.workspace}}/build
-      run: ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestScalarsCell)|(TestXCAFColors)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS arm64 for unknown reasons
     # https://github.com/f3d-app/f3d/issues/1276
+    # https://github.com/f3d-app/f3d/issues/792
+    - name: Set CI test exception for macOS arm64
+      if: |
+        runner.os == 'macOS' &&
+        inputs.cpu == 'arm64'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)" >> $GITHUB_ENV
+
     - name: Test
-      if: inputs.cpu == 'arm64'
       shell: bash
       working-directory: ${{github.workspace}}/build
-      run: ctest -E "(TestGrid)|(TestConfig)" -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+      run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure || ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
       if: failure()
       uses: actions/upload-artifact@v4
       with:
         path: ./build/Testing/Temporary
-        name: f3d-tests-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}
+        name: f3d-tests-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}-${{inputs.static_label}}
 
     - name: Install (ALL)
       shell: bash
@@ -241,7 +258,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DBUILD_TESTING=ON -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }} -B build_python source/python
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DBUILD_TESTING=ON -B build_python source/python
         cmake --build build_python --config Release
 
     - name: Build and configure libf3d examples
@@ -249,7 +266,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }} -B build_examples source/examples/libf3d
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -B build_examples source/examples/libf3d
         cmake --build build_examples --config Release
 
     - name: Install Mesa Windows examples
@@ -257,7 +274,7 @@ runs:
         runner.os == 'Windows' &&
         inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' &&
         inputs.static_label == 'no-static'
-      uses: ./source/.github/actions/mesa-install-bin
+      uses: f3d-app/install-mesa-windows-action@v1
       with:
         path: ${{github.workspace}}\build_examples\*\Release
 
@@ -282,7 +299,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -DCMAKE_MODULE_PATH=$(pwd)/dependencies/install/lib/cmake/OpenVDB/ -Df3d_DIR=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }} -B build_plugins source/examples/plugins
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -DCMAKE_MODULE_PATH=$(pwd)/dependencies/install/lib/cmake/OpenVDB/ -Df3d_DIR=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
         cmake --build build_plugins --config Release
 
     - name: Test plugin examples
@@ -317,7 +334,7 @@ runs:
 
     - name: Install Mesa Windows in install
       if: runner.os == 'Windows'
-      uses: ./source/.github/actions/mesa-install-bin
+      uses: f3d-app/install-mesa-windows-action@v1
       with:
         path: ${{github.workspace}}\install\bin
 
@@ -325,9 +342,9 @@ runs:
     # https://github.com/f3d-app/f3d/issues/1276
     - name: Check F3D_PLUGINS_PATH using plugin example
       if: |
-        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' &&
-        inputs.cpu != 'arm64' &&
-        inputs.static_label == 'no-static'
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' &&
+        inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.0' &&
+        inputs.cpu != 'arm64' && inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose
@@ -343,7 +360,9 @@ runs:
     # Grid rendering has artifacts in macOS arm64 CI
     # https://github.com/f3d-app/f3d/issues/1276
     - name: Check Install
-      if: inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' && inputs.cpu != 'arm64'
+      if: |
+        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' &&
+        inputs.vtk_version != 'v9.3.0' && inputs.cpu != 'arm64'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
@@ -352,7 +371,7 @@ runs:
     - name: Check Install plugins
       if: |
         inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6'
-        && inputs.cpu != 'arm64'
+        && inputs.vtk_version != 'v9.3.0' && inputs.cpu != 'arm64'
         && inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}/install
@@ -364,4 +383,4 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         path: ./install/output
-        name: f3d-tests-install-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}
+        name: f3d-tests-install-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}-${{inputs.static_label}}

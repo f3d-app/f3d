@@ -48,6 +48,7 @@ set(classes
   vtkF3DRenderPass
   vtkF3DRenderer
   vtkF3DRendererWithColoring
+  vtkF3DUserRenderPass
   )
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675

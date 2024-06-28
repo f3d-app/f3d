@@ -2,14 +2,47 @@
 
 ## Ongoing development
 
+## v2.4.0
+
 For F3D users:
 - Added a new option `--point-type` used to specify how to display points sprites
-- Add support for 3D Gaussians Splatting in binary .splat format
-- Added ability to cycle through available animations by pressing "W" hotkey
+- Added support for 3D Gaussians Splatting in binary `.splat` format
+- Added ability to cycle through available animations by pressing `W` hotkey
 - Added display of current animation name within cheatsheet
+- Added orthographic camera projection option (`--camera-orthographic`) and binding (`5`)
+- Added proper continuous integration for MacOS ARM64
+- Added support for glTF Draco encoded file
+- Added support for dark title bar on Windows
+- Added support for colormap presets, using `--colormap-file` option
+- Added a option to reload file automatically when changed on disk (`--watch`)
+- Added support for streaming output images to stdout, using `-` filename
+- Added animation support to Alembic plugin
+- Improved OCCT plugin (STEP and IGES files) performance drastically
+- Improved config file parsing so that it is parsed in file order
+- Fixed an issue with blur circle of confusion
+- Fixed an issue with the grid being clipped
+- Fixed an issue with STEP file coloring
+- Fixed an issue when time range was not starting at zero
+- Fixed an issue when record file does not exist
+- Fixed an issue when using `--no-render` and `--hdri`
+- Fixed an issue with the Windows thumbnailer with process never properly killed
+- Fixed an issue where OCCT would output to terminal
+- Fixed an issue with FISH completion
 
 For libf3d users:
 - Added a new option `model.point-sprites.type` used to specify how to display points (only if `model.point-sprites.enable` is true)
+- Added a `image::toTerminalText` method to print image to terminal text
+- Added an `image` metadata API
+- Added a `vtkext` module for plugin developer, see the [documentation](https://f3d.app/doc/libf3d/PLUGINS.html)
+- Added a new f3d component to find_package of, `pluginsdk`, require to build plugins against F3D
+
+For F3D packagers:
+- Added a CMake report at the end of configuration
+- Added a new cmake installation component, `plugin_sdk`, needed to compile external plugin against F3D
+- Added a new cmake installation component, `colormaps`, needed for the colormap feature
+- Fixed multiple issue with static (`BUILD_SHARED_LIBS=OFF`) build
+- Fixed a compilation issue with gcc14
+- Fixed a compilation issue with OCCT 7.8.0
 
 ## v2.3.0
 

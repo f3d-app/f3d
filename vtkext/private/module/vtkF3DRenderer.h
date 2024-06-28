@@ -61,6 +61,7 @@ public:
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(double unitSquare);
   void SetGridSubdivisions(int subdivisions);
+  void SetGridColor(const std::vector<double>& color);
   ///@}
 
   ///@{
@@ -76,6 +77,8 @@ public:
   void SetUseBlurBackground(bool use);
   void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);
+  void SetBackfaceType(const std::string& backfaceType);
+  void SetFinalShader(const std::string& finalShader);
   ///@}
 
   ///@{
@@ -300,6 +303,7 @@ protected:
   double LineWidth = 1.0;
   double GridUnitSquare = 0.0;
   int GridSubdivisions = 10;
+  double GridColor[3] = { 0.0, 0.0, 0.0 };
 
   std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
@@ -323,6 +327,9 @@ protected:
 
   std::string CachePath;
   std::string AnimationNameInfo;
+
+  std::string BackfaceType;
+  std::string FinalShader;
 };
 
 #endif

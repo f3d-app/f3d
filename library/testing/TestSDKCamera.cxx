@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <sstream>
 
 // TODO these methods should be put in types.h at some point.
 // https://github.com/f3d-app/f3d/issues/361
@@ -25,6 +26,43 @@ bool comparePoint(const f3d::point3_t& vec1, const f3d::point3_t& vec2)
 {
   return compareDouble(vec1[0], vec2[0]) && compareDouble(vec1[1], vec2[1]) &&
     compareDouble(vec1[2], vec2[2]);
+}
+
+class testFailure : public std::runtime_error
+{
+public:
+  explicit testFailure(const std::string& what = "")
+    : std::runtime_error(what)
+  {
+  }
+};
+
+void checkVec3(const std::array<double, 3>& actual, const std::array<double, 3>& expected,
+  const std::string& label)
+{
+  if (!compareDouble(actual[0], expected[0]) || !compareDouble(actual[1], expected[1]) ||
+    !compareDouble(actual[2], expected[2]))
+  {
+    std::stringstream ss;
+    ss << label << ": ";
+    ss << std::setprecision(12);
+    ss << "(" << actual[0] << "," << actual[1] << "," << actual[2] << ")";
+    ss << " != ";
+    ss << "(" << expected[0] << "," << expected[1] << "," << expected[2] << ")";
+    throw testFailure(ss.str());
+  }
+}
+
+void checkDouble(const double actual, const double expected, const std::string& label)
+{
+  if (!compareDouble(actual, expected))
+  {
+    std::stringstream ss;
+    ss << label << ": ";
+    ss << std::setprecision(12);
+    ss << actual << " != " << expected;
+    throw testFailure(ss.str());
+  }
 }
 
 int TestSDKCamera(int argc, char* argv[])
@@ -197,6 +235,40 @@ int TestSDKCamera(int argc, char* argv[])
               << foc[2] << std::endl;
     std::cerr << std::setprecision(12) << "view up: " << up[0] << "," << up[1] << "," << up[2]
               << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  try
+  {
+    cam.setPosition({ 1, 2, 3 });
+    cam.setFocalPoint({ 1, 2, 13 });
+    cam.setViewUp({ 0, 1, 0 });
+    cam.pan(1, 2);
+    checkVec3(cam.getPosition(), { 0, 4, 3 }, "pos after pan");
+    checkVec3(cam.getFocalPoint(), { 0, 4, 13 }, "foc after pan");
+    checkVec3(cam.getViewUp(), { 0, 1, 0 }, "up after pan");
+
+    cam.setPosition({ 1, 2, 3 });
+    cam.setFocalPoint({ 1, -2, 3 });
+    cam.setViewUp({ 0, 0, 1 });
+    cam.pan(3, 4, 5);
+    checkVec3(cam.getPosition(), { -2, -3, 7 }, "pos after pan");
+    checkVec3(cam.getFocalPoint(), { -2, -7, 7 }, "foc after pan");
+    checkVec3(cam.getViewUp(), { 0, 0, 1 }, "up after pan");
+
+    cam.setPosition({ 1, 2, 3 });
+    cam.setFocalPoint({ 1, 2, 13 });
+    cam.setViewUp({ 0, 1, 0 });
+    cam.setViewAngle(25);
+    cam.zoom(1.5);
+    checkVec3(cam.getPosition(), { 1, 2, 3 }, "pos after zoom");
+    checkVec3(cam.getFocalPoint(), { 1, 2, 13 }, "foc after zoom");
+    checkVec3(cam.getViewUp(), { 0, 1, 0 }, "up after zoom");
+    checkDouble(cam.getViewAngle(), 25 / 1.5, "angle after zoom");
+  }
+  catch (testFailure& e)
+  {
+    std::cerr << e.what() << std::endl;
     return EXIT_FAILURE;
   }
 

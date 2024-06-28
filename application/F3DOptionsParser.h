@@ -25,6 +25,7 @@ struct F3DAppOptions
   bool GeometryOnly = false;
   bool GroupGeometries = false;
   std::string Output = "";
+  std::string ScreenshotFilename = "{app}/{model}_{n}.png";
   std::string Reference = "";
   std::string InteractionTestRecordFile = "";
   std::string InteractionTestPlayFile = "";
@@ -46,6 +47,7 @@ struct F3DAppOptions
   double CameraZoomFactor = 0.0;
   double CameraViewAngle = 0.0;
   std::vector<std::string> Plugins;
+  std::string FinalShader = "";
 };
 
 class F3DOptionsParser

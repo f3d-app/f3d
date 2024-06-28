@@ -10,6 +10,7 @@
 #   f3d_MODULE_EXTERNAL_RENDERING  Will be enabled if F3D was built with external rendering support
 #   f3d_MODULE_RAYTRACING          Will be enabled if F3D was built with raytracing support
 #   f3d_PLUGINS_INSTALL_DIR        Path to the location to install plugins so that F3D can find them
+#   f3d_PREFIX_DIR                 Absolute path to the directory where F3D was installed
 #
 # It is also possible to look for optional components.
 #
@@ -38,6 +39,8 @@
 # Please note, if no components are set, `library` will be added by default
 
 @PACKAGE_INIT@
+
+get_filename_component(f3d_PREFIX_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
 
 include(${CMAKE_CURRENT_LIST_DIR}/f3dConfigVersion.cmake)
 message(STATUS "Found f3d ${PACKAGE_VERSION}")

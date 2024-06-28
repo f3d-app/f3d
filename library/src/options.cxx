@@ -20,13 +20,13 @@ class options::internals
 {
 public:
   using OptionVariant =
-    std::variant<bool, int, double, std::string, std::vector<int>, std::vector<double> >;
+    std::variant<bool, int, double, std::string, std::vector<int>, std::vector<double>>;
 
   template<typename T, typename U>
   struct IsTypeValid;
 
   template<typename T, typename... Ts>
-  struct IsTypeValid<T, std::variant<Ts...> > : public std::disjunction<std::is_same<T, Ts>...>
+  struct IsTypeValid<T, std::variant<Ts...>> : public std::disjunction<std::is_same<T, Ts>...>
   {
   };
 
@@ -150,6 +150,8 @@ options::options()
   this->Internals->init("render.grid.absolute", false);
   this->Internals->init("render.grid.unit", 0.0);
   this->Internals->init("render.grid.subdivisions", 10);
+  this->Internals->init("render.grid.color", std::vector<double>{ 0.0, 0.0, 0.0 });
+  this->Internals->init("render.backface-type", std::string("default"));
 
   this->Internals->init("render.raytracing.enable", false);
   this->Internals->init("render.raytracing.denoise", false);
@@ -159,6 +161,7 @@ options::options()
   this->Internals->init("render.effect.anti-aliasing", false);
   this->Internals->init("render.effect.ambient-occlusion", false);
   this->Internals->init("render.effect.tone-mapping", false);
+  this->Internals->init("render.effect.final-shader", std::string());
 
   this->Internals->init("render.hdri.file", std::string());
   this->Internals->init("render.hdri.ambient", false);
@@ -182,6 +185,7 @@ options::options()
   this->Internals->init("ui.metadata", false);
   this->Internals->init("ui.font-file", std::string());
   this->Internals->init("ui.loader-progress", false);
+  this->Internals->init("ui.animation-progress", false);
 
   // Model
   this->Internals->init("model.matcap.texture", std::string());
@@ -390,13 +394,13 @@ std::string options::getAsString(const std::string& name) const
 //----------------------------------------------------------------------------
 std::vector<int> options::getAsIntVector(const std::string& name) const
 {
-  return this->Internals->get<std::vector<int> >(name);
+  return this->Internals->get<std::vector<int>>(name);
 }
 
 //----------------------------------------------------------------------------
 std::vector<double> options::getAsDoubleVector(const std::string& name) const
 {
-  return this->Internals->get<std::vector<double> >(name);
+  return this->Internals->get<std::vector<double>>(name);
 }
 
 //----------------------------------------------------------------------------
@@ -426,13 +430,13 @@ std::string& options::getAsStringRef(const std::string& name)
 //----------------------------------------------------------------------------
 std::vector<int>& options::getAsIntVectorRef(const std::string& name)
 {
-  return this->Internals->getRef<std::vector<int> >(name);
+  return this->Internals->getRef<std::vector<int>>(name);
 }
 
 //----------------------------------------------------------------------------
 std::vector<double>& options::getAsDoubleVectorRef(const std::string& name)
 {
-  return this->Internals->getRef<std::vector<double> >(name);
+  return this->Internals->getRef<std::vector<double>>(name);
 }
 
 //----------------------------------------------------------------------------

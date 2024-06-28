@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/imath_install
-        key: imath-v3.1.10-${{runner.os}}-${{inputs.cpu}}-1
+        key: imath-v3.1.11-${{runner.os}}-${{inputs.cpu}}-1
 
     # Dependents: alembic
     - name: Checkout Imath
@@ -24,7 +24,7 @@ runs:
       with:
         repository: AcademySoftwareFoundation/Imath
         path: './dependencies/imath'
-        ref: v3.1.10
+        ref: v3.1.11
 
     - name: Setup Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'
@@ -44,7 +44,6 @@ runs:
         -DBUILD_TESTING=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../imath_install
-        -DCMAKE_OSX_ARCHITECTURES=${{ inputs.cpu }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 

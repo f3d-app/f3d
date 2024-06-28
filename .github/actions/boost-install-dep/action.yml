@@ -18,6 +18,7 @@ runs:
         key: boost-1.83.0-${{runner.os}}-${{inputs.cpu}}-4
 
     # Dependents: usd openvdb vtk
+    # Note: usd v23.05 not compatible with boost 1.84.0
     - name: Checkout Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
