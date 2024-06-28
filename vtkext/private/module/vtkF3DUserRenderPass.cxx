@@ -29,7 +29,7 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
   vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
   vtkOpenGLState::ScopedglEnableDisable dsaver(ostate, GL_DEPTH_TEST);
 
-  assert(this->DelegatePass == nullptr);
+  assert(this->DelegatePass != nullptr);
 
   // create FBO and texture
   int pos[2];
