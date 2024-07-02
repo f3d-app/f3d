@@ -120,7 +120,7 @@ public:
   /**
    * Update readers and all pipelines on the specified timestep
    */
-  void UpdateTimeStep(double timestep) override;
+  bool UpdateAtTimeValue(double timeValue) override;
 
   /**
    * Get the number of available animations.
