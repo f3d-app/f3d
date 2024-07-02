@@ -18,7 +18,7 @@ int TestSDKLoader(int argc, char* argv[])
   std::string nonExistentGeometryFilename = "nonExistent.vtp";
   std::string nonExistentFullSceneFilename = "nonExistent.obj";
   std::string invalidGeometryFilename = "invalid.vtp";
-  std::string invalidFullSceneFilename = "invalid.gltf";
+  std::string invalidFullSceneFilename = "duck_invalid.gltf";
   std::string unsupportedFilename = "unsupportedFile.dummy";
   std::string cowFilename = "cow.vtp";
   std::string dragonFilename = "dragon.vtu";
@@ -174,25 +174,24 @@ int TestSDKLoader(int argc, char* argv[])
   {
   }
 
-  // Invalid files XXX should NOT succeed but not supported by vtkImporter yet
   try
   {
     load.loadGeometry(invalidGeometry);
+    std::cerr << "Unexpected loadGeometry success with an invalid file" << std::endl;
+    return EXIT_FAILURE;
   }
   catch (const f3d::loader::load_failure_exception& ex)
   {
-    std::cerr << "Unexpected loadGeometry failure with an invalid file" << std::endl;
-    return EXIT_FAILURE;
   }
 
   try
   {
     load.loadScene(invalidFullScene);
+    std::cerr << "Unexpected loadScene success with an invalid file" << std::endl;
+    return EXIT_FAILURE;
   }
   catch (const f3d::loader::load_failure_exception& ex)
   {
-    std::cerr << "Unexpected loadScene failure with an invalid file" << std::endl;
-    return EXIT_FAILURE;
   }
 
   // Multiple geometries
