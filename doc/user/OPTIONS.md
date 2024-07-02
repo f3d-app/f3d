@@ -1,5 +1,3 @@
-<!-- {% assign model = "{{model}}" %} set variable to prevent Jekyll from swallowing `{{model}}` when expanding template variables -->
-
 # Command line options
 
 F3D behavior can be fully controlled from the command line using the following options.
@@ -163,7 +161,7 @@ The destination filename used by `--output` or to save screenshots can use the f
 - `{date:format}`: current date as per C++'s `std::put_time` format
 - `{n}`: auto-incremented number to make filename unique (up to 1000000)
 - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique (up to 1000000)
-- variable names can be escaped by doubling the braces (eg. use `{{model}}.png` to output `{model}.png` without the model name being substituted)
+- variable names can be escaped by doubling the braces (eg. use _`{`_`{model}`_`}`_`.png` to output `{model}.png` without the model name being substituted)
 
 For example the screenshot filename is configured as `{app}/{model}_{n}.png` by default, meaning that, assuming the model `hello.glb` is being viewed,
 consecutive screenshots are going to be saved as `F3D/hello_1.png`, `F3D/hello_2.png`, `F3D/hello_3.png`, ...
