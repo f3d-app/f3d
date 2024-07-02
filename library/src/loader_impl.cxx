@@ -142,7 +142,11 @@ public:
     this->GenericImporter->AddInternalReader(name, source);
 
     // Update the importer
-    this->GenericImporter->Update();
+    if (!this->GenericImporter->Update())
+    {
+      throw loader::load_failure_exception(
+        "failed to load geometry: " + name);
+    }
 
     // Remove anything progress related if any
     this->GenericImporter->RemoveObservers(vtkCommand::ProgressEvent);
@@ -230,7 +234,6 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
   }
   else
   {
-    log::debug("No reader found for \"" + filePath + "\"");
     throw loader::load_failure_exception(
       filePath + " is not a file of a supported 3D geometry file format");
   }
@@ -270,7 +273,6 @@ loader& loader_impl::loadScene(const std::string& filePath)
   }
   else
   {
-    log::debug("No reader found for \"" + filePath + "\"");
     throw loader::load_failure_exception(
       filePath + " is not a file of a supported 3D scene file format");
   }
@@ -315,7 +317,11 @@ loader& loader_impl::loadScene(const std::string& filePath)
   }
 
   // Read the file
-  this->Internals->CurrentFullSceneImporter->Update();
+  if (!this->Internals->CurrentFullSceneImporter->Update())
+  {
+    throw loader::load_failure_exception(
+      "failed to load scene: " + filePath);
+  }
 
   // Remove anything progress related if any
   this->Internals->CurrentFullSceneImporter->RemoveObservers(vtkCommand::ProgressEvent);

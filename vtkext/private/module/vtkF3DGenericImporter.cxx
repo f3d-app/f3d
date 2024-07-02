@@ -159,6 +159,7 @@ bool vtkF3DGenericImporter::GetTemporalInformation(vtkIdType animationIndex,
 void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
   this->Pimpl->GeometryBoundingBox.Reset();
+  bool hasGeometry = false;
 
   // Update each reader
   for (size_t readerIndex = 0; readerIndex < this->Pimpl->Readers.size(); readerIndex++)
@@ -184,8 +185,15 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
           self->InvokeEvent(vtkCommand::ProgressEvent, &progress);
         });
       pipe.Reader->AddObserver(vtkCommand::ProgressEvent, progressCallback);
-      pipe.PostPro->Update();
+      bool status = pipe.PostPro->GetExecutive()->Update();
       pipe.Reader->RemoveObservers(vtkCommand::ProgressEvent);
+
+      if (!status || !pipe.Reader->GetOutputDataObject(0))
+      {
+        F3DLog::Print(F3DLog::Severity::Warning, "A reader failed to update");
+        pipe.Output = nullptr;
+        continue;
+      }
     }
 
     // Recover output
@@ -238,10 +246,12 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     pipe.VolumeProp->VisibilityOff();
 
     pipe.Imported = true;
+    hasGeometry = true;
   }
   this->UpdateTemporalInformation();
   this->UpdateColoringVectors(false);
   this->UpdateColoringVectors(true);
+  this->SetUpdateStatus(hasGeometry ? vtkImporter::UpdateStatusEnum::SUCCESS : vtkImporter::UpdateStatusEnum::FAILURE);
 }
 
 //----------------------------------------------------------------------------
