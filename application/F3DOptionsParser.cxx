@@ -674,7 +674,7 @@ void ConfigurationOptions::PrintReadersList()
   std::stringstream headerLine;
   headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(plugColSize) << "Plugin"
              << std::setw(descColSize) << "Description" << std::setw(extsColSize) << "Exts"
-             << std::setw(mimeColSize) << "Mime-types";
+             << std::setw(mimeColSize - colGap) << "Mime-types";
   f3d::log::info(headerLine.str());
   f3d::log::info(separator);
 
@@ -683,22 +683,14 @@ void ConfigurationOptions::PrintReadersList()
     for (size_t i = 0; i < reader.Extensions.size(); i++)
     {
       std::stringstream readerLine;
-      if (i == 0)
-      {
-        readerLine << std::left << std::setw(nameColSize) << reader.Name << std::setw(plugColSize)
-                   << reader.PluginName << std::setw(descColSize) << reader.Description;
-      }
-      else
-      {
-        readerLine << std::left << std::setw(nameColSize + descColSize + plugColSize) << " ";
-      }
-
-      readerLine << std::setw(extsColSize) << reader.Extensions[i];
-
-      if (i < reader.MimeTypes.size())
-      {
-        readerLine << std::setw(mimeColSize) << reader.MimeTypes[i];
-      }
+      readerLine << std::left;
+      readerLine << std::setw(nameColSize) << (i == 0 ? reader.Name : "");
+      readerLine << std::setw(plugColSize) << (i == 0 ? reader.PluginName : "");
+      readerLine << std::setw(descColSize) << (i == 0 ? reader.Description : "");
+      readerLine << std::setw(extsColSize)
+                 << (i < reader.Extensions.size() ? reader.Extensions[i] : "");
+      readerLine << std::setw(mimeColSize - colGap)
+                 << (i < reader.MimeTypes.size() ? reader.MimeTypes[i] : "");
 
       f3d::log::info(readerLine.str());
     }
