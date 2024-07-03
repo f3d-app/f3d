@@ -701,7 +701,6 @@ void ConfigurationOptions::PrintReadersList()
 
       f3d::log::info(readerLine.str());
     }
-    f3d::log::info(separator);
   }
   f3d::log::waitForUser();
 }
