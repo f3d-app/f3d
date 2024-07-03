@@ -660,14 +660,15 @@ void ConfigurationOptions::PrintReadersList()
       mimeColSize = std::max(mimeColSize, mime.length());
     }
   }
-  nameColSize++;
-  extsColSize++;
-  mimeColSize++;
-  descColSize++;
-  plugColSize++;
+  const size_t colGap = 4;
+  nameColSize += colGap;
+  extsColSize += colGap;
+  mimeColSize += colGap;
+  descColSize += colGap;
+  plugColSize += colGap;
 
   std::string separator =
-    std::string(nameColSize + extsColSize + descColSize + mimeColSize + plugColSize, '-');
+    std::string(nameColSize + extsColSize + descColSize + mimeColSize + plugColSize - colGap, '-');
 
   // Print the rows split in 3 columns
   std::stringstream headerLine;
