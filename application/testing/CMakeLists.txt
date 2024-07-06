@@ -660,7 +660,7 @@ if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestBREP DATA f3d.brep DEFAULT_LIGHTS ARGS --load-plugins=occt --up=+Z)
   f3d_test(NAME TestBinaryBREP DATA f3d.bin.brep DEFAULT_LIGHTS ARGS --load-plugins=occt --up=+Z)
 
-  f3d_test(NAME TestInvalidBREP DATA invalid.brep ARGS --verbose --load-plugins=occt NO_BASELINE)
+  f3d_test(NAME TestInvalidBREP DATA invalid.brep ARGS --verbose --load-plugins=occt REGEXP "failed to load geometry" NO_BASELINE)
 
   if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     f3d_test(NAME TestXCAFColors DATA xcaf-colors.stp DEFAULT_LIGHTS ARGS --load-plugins=occt -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
