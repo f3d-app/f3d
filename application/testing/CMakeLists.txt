@@ -358,8 +358,8 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestInteractionAnimationFrameRate DATA InterpolationTest.glb ARGS --animation-frame-rate=2 --animation-index=-1 INTERACTION NO_BASELINE)#Space;Wait;Space;
 
   # A verbose test that needs animation index support
-  f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "animation time 10 is outside of range \\[0, 3\\.70833\\], using 3\\.70833" NO_BASELINE)
-  f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf ARGS --animation-time=-5 --verbose REGEXP "animation time -5 is outside of range \\[0, 3\\.70833\\], using 0" NO_BASELINE)
+  f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Animation time 10 is outside of range \\[0, 3\\.70833\\], using 3\\.70833" NO_BASELINE)
+  f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf ARGS --animation-time=-5 --verbose REGEXP "Animation time -5 is outside of range \\[0, 3\\.70833\\], using 0" NO_BASELINE)
 
   # Test exit hotkey
   f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;

@@ -254,13 +254,13 @@ bool animationManager::LoadAtTime(double timeValue)
   /* clamp target time to available range */
   if (timeValue < this->TimeRange[0])
   {
-    log::warn("animation time ", timeValue, " is outside of range [", this->TimeRange[0], ", ",
+    log::warn("Animation time ", timeValue, " is outside of range [", this->TimeRange[0], ", ",
       this->TimeRange[1], "], using ", this->TimeRange[0], ".");
     timeValue = this->TimeRange[0];
   }
   else if (timeValue > this->TimeRange[1])
   {
-    log::warn("animation time ", timeValue, " is outside of range [", this->TimeRange[0], ", ",
+    log::warn("Animation time ", timeValue, " is outside of range [", this->TimeRange[0], ", ",
       this->TimeRange[1], "], using ", this->TimeRange[1], ".");
     timeValue = this->TimeRange[1];
   }
@@ -270,6 +270,7 @@ bool animationManager::LoadAtTime(double timeValue)
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240706)
   if (!this->Importer->UpdateAtTimeValue(this->CurrentTime))
   {
+    log::error("Could not load time value: ", this->CurrentTime);
     return false;
   }
 #else
