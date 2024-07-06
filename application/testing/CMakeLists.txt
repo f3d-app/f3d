@@ -912,6 +912,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240706)
 
   # Test invalid full scene file
   f3d_test(NAME TestInvalidFullScene DATA duck_invalid.gltf REGEXP "failed to load scene" NO_BASELINE)
+
+  # Test invalid geometry with animation
+  f3d_test(NAME TestInteractionAnimationInvalid DATA BoxAnimated_invalid_animation.gltf ARGS --geometry-only REGEXP "A reader failed to update at a timeValue" INTERACTION NO_BASELINE)
 endif ()
 
 # Test invalid texture
