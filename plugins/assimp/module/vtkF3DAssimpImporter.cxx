@@ -1033,7 +1033,7 @@ void vtkF3DAssimpImporter::UpdateTimeStep(double timeValue)
   this->Internals->UpdateCameras();
   this->Internals->UpdateLights();
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240706)
-    return true;
+  return true;
 #endif
 }
 

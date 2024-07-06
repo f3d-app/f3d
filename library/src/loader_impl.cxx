@@ -145,8 +145,7 @@ public:
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240706)
     if (!this->GenericImporter->Update())
     {
-      throw loader::load_failure_exception(
-        "failed to load geometry: " + name);
+      throw loader::load_failure_exception("failed to load geometry: " + name);
     }
 #else
     this->GenericImporter->Update();
@@ -324,8 +323,7 @@ loader& loader_impl::loadScene(const std::string& filePath)
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240706)
   if (!this->Internals->CurrentFullSceneImporter->Update())
   {
-    throw loader::load_failure_exception(
-      "failed to load scene: " + filePath);
+    throw loader::load_failure_exception("failed to load scene: " + filePath);
   }
 #else
   this->Internals->CurrentFullSceneImporter->Update();
