@@ -705,12 +705,12 @@ public:
     }
   }
 
-  void ImportRoot(vtkRenderer* renderer)
+  bool ImportRoot(vtkRenderer* renderer)
   {
     if (!this->Stage)
     {
       vtkErrorWithObjectMacro(renderer, << "Stage failed to open");
-      return;
+      return false;
     }
 
     vtkNew<vtkMatrix4x4> rootTransform;
@@ -729,6 +729,7 @@ public:
     }
 
     this->ImportNode(renderer, this->Stage->GetPseudoRoot(), pxr::SdfPath("/"), rootTransform);
+    return true;
   }
 
   vtkSmartPointer<vtkImageData> CombineORMImage(
@@ -1236,7 +1237,10 @@ int vtkF3DUSDImporter::ImportBegin()
 //----------------------------------------------------------------------------
 void vtkF3DUSDImporter::ImportActors(vtkRenderer* renderer)
 {
-  this->Internals->ImportRoot(renderer);
+  if (!this->Internals->ImportRoot(renderer))
+  {
+    this->SetUpdateStatus(vtkImporter::UpdateStatusEnum::FAILURE);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -1266,10 +1270,11 @@ bool vtkF3DUSDImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationInd
 #endif
 
 //----------------------------------------------------------------------------
-void vtkF3DUSDImporter::UpdateTimeStep(double timeStep)
+bool vtkF3DUSDImporter::UpdateAtTimeValue(double timeValue)
 {
-  this->Internals->SetCurrentTime(timeStep);
+  this->Internals->SetCurrentTime(timeValue);
   this->Update();
+  return this->GetUpdateStatus() == vtkImporter::UpdateStatusEnum::SUCCESS;
 }
 
 //----------------------------------------------------------------------------

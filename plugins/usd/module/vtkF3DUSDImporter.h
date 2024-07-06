@@ -80,7 +80,7 @@ protected:
     double timeRange[2], vtkDoubleArray* timeSteps) override;
 #endif
 
-  void UpdateTimeStep(double timeStep) override;
+  bool UpdateAtTimeValue(double timeValue) override;
 
   std::string FileName;
   bool AnimationEnabled = false;
