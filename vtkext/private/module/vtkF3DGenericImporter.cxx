@@ -240,17 +240,10 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     hasGeometry = true;
   }
 
-  if (hasGeometry)
-  {
-    this->UpdateTemporalInformation();
-    this->UpdateColoringVectors(false);
-    this->UpdateColoringVectors(true);
-    this->SetUpdateStatus(vtkImporter::UpdateStatusEnum::SUCCESS);
-  }
-  else
-  {
-    this->SetUpdateStatus(vtkImporter::UpdateStatusEnum::FAILURE);
-  }
+  this->UpdateTemporalInformation();
+  this->UpdateColoringVectors(false);
+  this->UpdateColoringVectors(true);
+  this->SetUpdateStatus(hasGeometry ? vtkImporter::UpdateStatusEnum::SUCCESS : vtkImporter::UpdateStatusEnum::FAILURE);
 }
 
 //----------------------------------------------------------------------------
@@ -409,7 +402,7 @@ bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
   bool hasGeometry = false;
   for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
-    if(!pipe.PostPro->UpdateTimeStep(timeValue) || pipe.Reader->GetOutputDataObject(0))
+    if(!pipe.PostPro->UpdateTimeStep(timeValue) || !pipe.Reader->GetOutputDataObject(0))
     {
       F3DLog::Print(F3DLog::Severity::Warning, "A reader failed to update at a timeValue");
       pipe.Output = nullptr;

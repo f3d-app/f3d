@@ -236,8 +236,10 @@ void animationManager::Tick()
       modulo(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] - this->TimeRange[0]);
   }
 
-  this->LoadAtTime(this->CurrentTime);
-  this->Window->render();
+  if (this->LoadAtTime(this->CurrentTime))
+  {
+    this->Window->render();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -265,7 +267,10 @@ bool animationManager::LoadAtTime(double timeValue)
 
   this->CurrentTime = timeValue;
   this->CurrentTimeSet = true;
-  this->Importer->UpdateTimeStep(this->CurrentTime);
+  if (!this->Importer->UpdateAtTimeValue(this->CurrentTime))
+  {
+    return false;
+  }
 
   if (this->Interactor && this->ProgressWidget)
   {
