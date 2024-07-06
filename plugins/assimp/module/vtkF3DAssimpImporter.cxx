@@ -915,11 +915,8 @@ std::string vtkF3DAssimpImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 void vtkF3DAssimpImporter::UpdateTimeStep(double timeValue)
 {
-  if (this->Internals->ActiveAnimation < 0 ||
-    this->Internals->ActiveAnimation >= this->GetNumberOfAnimations())
-  {
-    return;
-  }
+  assert(this->Internals->ActiveAnimation >= 0);
+  assert(this->Internals->ActiveAnimation < this->GetNumberOfAnimations());
 
   // get the animation tick
   double fps =
@@ -1041,6 +1038,8 @@ vtkIdType vtkF3DAssimpImporter::GetNumberOfAnimations()
 //----------------------------------------------------------------------------
 std::string vtkF3DAssimpImporter::GetAnimationName(vtkIdType animationIndex)
 {
+  assert(animationIndex >= 0);
+  assert(animationIndex < this->GetNumberOfAnimations());
   return this->Internals->Scene->mAnimations[animationIndex]->mName.C_Str();
 }
 
