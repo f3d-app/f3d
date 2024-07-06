@@ -96,12 +96,9 @@ bool animationManager::Initialize(
     log::warn(
       "Specified animation index is greater than the highest possible animation index, enabling "
       "the first animation.");
-    this->Importer->EnableAnimation(0);
+    this->AnimationIndex = 0;
   }
-  else
-  {
-    this->EnableOnlyCurrentAnimation();
-  }
+  this->EnableOnlyCurrentAnimation();
 
   // Recover time ranges for all enabled animations
   this->TimeRange[0] = std::numeric_limits<double>::infinity();
