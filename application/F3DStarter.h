@@ -46,8 +46,10 @@ public:
   /**
    * Trigger a render and save a screenshot to disk according to a filename template.
    * See `F3DStarter::F3DInternals::applyFilenameTemplate` for template substitution details.
+   * If the `minimal` parameter is `true`, render with transparent background, no grid,
+   * and no overlays.
    */
-  void SaveScreenshot(const std::string& filenameTemplate);
+  void SaveScreenshot(const std::string& filenameTemplate, bool minimal = false);
 
   F3DStarter();
   ~F3DStarter();
