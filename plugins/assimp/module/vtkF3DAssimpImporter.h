@@ -35,7 +35,11 @@ public:
   /**
    * Update actors at the given time value.
    */
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240706)
   bool UpdateAtTimeValue(double timeValue) override;
+#else
+  void UpdateTimeStep(double timeValue) override;
+#endif
 
   /**
    * Get the number of available animations.

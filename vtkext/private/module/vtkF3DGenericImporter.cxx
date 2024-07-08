@@ -243,7 +243,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->UpdateTemporalInformation();
   this->UpdateColoringVectors(false);
   this->UpdateColoringVectors(true);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240706)
   this->SetUpdateStatus(hasGeometry ? vtkImporter::UpdateStatusEnum::SUCCESS : vtkImporter::UpdateStatusEnum::FAILURE);
+#else
+  (void) hasGeometry;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -396,7 +400,11 @@ std::string vtkF3DGenericImporter::GetMetaDataDescription()
 }
 
 //----------------------------------------------------------------------------
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240706)
 bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
+#else
+void vtkF3DGenericImporter::UpdateTimeStep(double timeValue)
+#endif
 {
   // Update each reader
   bool hasGeometry = false;
@@ -418,7 +426,9 @@ bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
     this->UpdateColoringVectors(true);
     this->UpdateOutputDescriptions();
   }
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240706)
   return hasGeometry;
+#endif
 }
 
 //----------------------------------------------------------------------------

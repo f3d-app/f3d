@@ -660,7 +660,9 @@ if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestBREP DATA f3d.brep DEFAULT_LIGHTS ARGS --load-plugins=occt --up=+Z)
   f3d_test(NAME TestBinaryBREP DATA f3d.bin.brep DEFAULT_LIGHTS ARGS --load-plugins=occt --up=+Z)
 
-  f3d_test(NAME TestInvalidBREP DATA invalid.brep ARGS --verbose --load-plugins=occt REGEXP "failed to load geometry" NO_BASELINE)
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240706)
+    f3d_test(NAME TestInvalidBREP DATA invalid.brep ARGS --verbose --load-plugins=occt REGEXP "failed to load geometry" NO_BASELINE)
+  endif()
 
   if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     f3d_test(NAME TestXCAFColors DATA xcaf-colors.stp DEFAULT_LIGHTS ARGS --load-plugins=occt -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
@@ -904,11 +906,13 @@ f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename
 # Test non existent texture, do not add a dummy.png
 f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/dummy.png REGEXP "Texture file does not exist" NO_BASELINE)
 
-# Test invalid geometry
-f3d_test(NAME TestInvalidGeometry DATA duck_invalid.gltf ARGS --geometry-only REGEXP "failed to load geometry" NO_BASELINE)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240706)
+  # Test invalid geometry
+  f3d_test(NAME TestInvalidGeometry DATA duck_invalid.gltf ARGS --geometry-only REGEXP "failed to load geometry" NO_BASELINE)
 
-# Test invalid full scene file
-f3d_test(NAME TestInvalidFullScene DATA duck_invalid.gltf REGEXP "failed to load scene" NO_BASELINE)
+  # Test invalid full scene file
+  f3d_test(NAME TestInvalidFullScene DATA duck_invalid.gltf REGEXP "failed to load scene" NO_BASELINE)
+endif ()
 
 # Test invalid texture
 f3d_test(NAME TestInvalidTexture DATA cow.vtp ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open texture file" NO_BASELINE)

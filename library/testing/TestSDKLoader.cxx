@@ -17,8 +17,6 @@ int TestSDKLoader(int argc, char* argv[])
   std::string dummyFilename = "dummy.foo";
   std::string nonExistentGeometryFilename = "nonExistent.vtp";
   std::string nonExistentFullSceneFilename = "nonExistent.obj";
-  std::string invalidGeometryFilename = "invalid.vtp";
-  std::string invalidFullSceneFilename = "duck_invalid.gltf";
   std::string unsupportedFilename = "unsupportedFile.dummy";
   std::string cowFilename = "cow.vtp";
   std::string dragonFilename = "dragon.vtu";
@@ -28,8 +26,6 @@ int TestSDKLoader(int argc, char* argv[])
   std::string dummy = std::string(argv[1]) + "data/" + dummyFilename;
   std::string nonExistentGeometry = std::string(argv[1]) + "data/" + nonExistentGeometryFilename;
   std::string nonExistentFullScene = std::string(argv[1]) + "data/" + nonExistentFullSceneFilename;
-  std::string invalidGeometry = std::string(argv[1]) + "data/" + invalidGeometryFilename;
-  std::string invalidFullScene = std::string(argv[1]) + "data/" + invalidFullSceneFilename;
   std::string unsupported = std::string(argv[1]) + "data/" + unsupportedFilename;
   std::string cow = std::string(argv[1]) + "data/" + cowFilename;
   std::string dragon = std::string(argv[1]) + "data/" + dragonFilename;
@@ -168,26 +164,6 @@ int TestSDKLoader(int argc, char* argv[])
   {
     load.loadScene(nonExistentFullScene);
     std::cerr << "Unexpected loadScene success with a non existent file" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-  }
-
-  try
-  {
-    load.loadGeometry(invalidGeometry);
-    std::cerr << "Unexpected loadGeometry success with an invalid file" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-  }
-
-  try
-  {
-    load.loadScene(invalidFullScene);
-    std::cerr << "Unexpected loadScene success with an invalid file" << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::loader::load_failure_exception& ex)
