@@ -490,6 +490,11 @@ int F3DStarter::Start(int argc, char** argv)
           this->SaveScreenshot(this->Internals->AppOptions.ScreenshotFilename);
           return true;
         }
+        if (keySym == "F11")
+        {
+          this->SaveScreenshot(this->Internals->AppOptions.ScreenshotFilename, true);
+          return true;
+        }
 
         return false;
       });
@@ -911,7 +916,7 @@ void F3DStarter::Render()
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
+void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minimal)
 {
 
   const auto getScreenshotDir = []()
@@ -940,17 +945,31 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate)
   std::filesystem::create_directories(std::filesystem::path(path).parent_path());
   f3d::log::info("saving screenshot to " + path.string());
 
-  f3d::image img =
-    this->Internals->Engine->getWindow().renderToImage(this->Internals->AppOptions.NoBackground);
+  f3d::options& options = this->Internals->Engine->getOptions();
+  f3d::options optionsCopy = this->Internals->Engine->getOptions();
+
+  bool noBackground = this->Internals->AppOptions.NoBackground;
+  if (minimal)
+  {
+    options.set("ui.bar", false);
+    options.set("ui.cheatsheet", false);
+    options.set("ui.filename", false);
+    options.set("ui.fps", false);
+    options.set("ui.metadata", false);
+    options.set("ui.animation-progress", false);
+    options.set("interactor.axis", false);
+    options.set("render.grid.enable", false);
+    noBackground = true;
+  }
+
+  f3d::image img = this->Internals->Engine->getWindow().renderToImage(noBackground);
   this->Internals->addOutputImageMetadata(img);
   img.save(path.string(), f3d::image::SaveFormat::PNG);
 
-  f3d::options& options = this->Internals->Engine->getOptions();
-  const std::string light_intensity_key = "render.light.intensity";
-  const double intensity = options.getAsDouble(light_intensity_key);
-  options.set(light_intensity_key, intensity * 5);
+  options.getAsDoubleRef("render.light.intensity") *= 5;
   this->Render();
-  options.set(light_intensity_key, intensity);
+
+  this->Internals->Engine->setOptions(optionsCopy);
   this->Render();
 }
 
