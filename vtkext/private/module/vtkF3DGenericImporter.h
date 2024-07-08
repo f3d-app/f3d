@@ -6,6 +6,7 @@
 #ifndef vtkF3DGenericImporter_h
 #define vtkF3DGenericImporter_h
 
+#include "vtkF3DImporter.h"
 #include "vtkF3DPostProcessFilter.h"
 
 #include <vtkBoundingBox.h>
@@ -29,12 +30,12 @@ class vtkPolyDataMapper;
 class vtkSmartVolumeMapper;
 class vtkTexture;
 
-class vtkF3DGenericImporter : public vtkImporter
+class vtkF3DGenericImporter : public vtkF3DImporter
 {
 public:
   static vtkF3DGenericImporter* New();
 
-  vtkTypeMacro(vtkF3DGenericImporter, vtkImporter);
+  vtkTypeMacro(vtkF3DGenericImporter, vtkF3DImporter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -120,11 +121,7 @@ public:
   /**
    * Update readers and all pipelines on the specified timestep
    */
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   bool UpdateAtTimeValue(double timeValue) override;
-#else
-  void UpdateTimeStep(double timeValue) override;
-#endif
 
   /**
    * Get the number of available animations.

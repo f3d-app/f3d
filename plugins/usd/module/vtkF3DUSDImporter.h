@@ -19,7 +19,8 @@
 #ifndef vtkF3DUSDImporter_h
 #define vtkF3DUSDImporter_h
 
-#include <vtkImporter.h>
+#include "vtkF3DImporter.h"
+
 #include <vtkNew.h>
 #include <vtkVersion.h>
 
@@ -27,11 +28,11 @@
 
 class vtkInformationStringKey;
 
-class vtkF3DUSDImporter : public vtkImporter
+class vtkF3DUSDImporter : public vtkF3DImporter
 {
 public:
   static vtkF3DUSDImporter* New();
-  vtkTypeMacro(vtkF3DUSDImporter, vtkImporter);
+  vtkTypeMacro(vtkF3DUSDImporter, vtkF3DImporter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -80,11 +81,7 @@ protected:
     double timeRange[2], vtkDoubleArray* timeSteps) override;
 #endif
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   bool UpdateAtTimeValue(double timeValue) override;
-#else
-  void UpdateTimeStep(double timeValue) override;
-#endif
 
   std::string FileName;
   bool AnimationEnabled = false;

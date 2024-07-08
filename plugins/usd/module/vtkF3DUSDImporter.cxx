@@ -1239,9 +1239,7 @@ void vtkF3DUSDImporter::ImportActors(vtkRenderer* renderer)
 {
   if (!this->Internals->ImportRoot(renderer))
   {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
-    this->SetUpdateStatus(vtkImporter::UpdateStatusEnum::FAILURE);
-#endif
+    this->SetFailureStatus();
   }
 }
 
@@ -1272,17 +1270,11 @@ bool vtkF3DUSDImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationInd
 #endif
 
 //----------------------------------------------------------------------------
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
 bool vtkF3DUSDImporter::UpdateAtTimeValue(double timeValue)
-#else
-void vtkF3DUSDImporter::UpdateTimeStep(double timeValue)
-#endif
 {
   this->Internals->SetCurrentTime(timeValue);
   this->Update();
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
-  return this->GetUpdateStatus() == vtkImporter::UpdateStatusEnum::SUCCESS;
-#endif
+  return this->Superclass::UpdateAtTimeValue(timeValue);
 }
 
 //----------------------------------------------------------------------------

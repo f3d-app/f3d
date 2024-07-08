@@ -18,6 +18,7 @@ endforeach()
 
 set(classes
   vtkF3DFaceVaryingPointDispatcher
+  vtkF3DImporter
   )
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675

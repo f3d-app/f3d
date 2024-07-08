@@ -914,11 +914,7 @@ std::string vtkF3DAssimpImporter::GetOutputsDescription()
 }
 
 //----------------------------------------------------------------------------
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
 bool vtkF3DAssimpImporter::UpdateAtTimeValue(double timeValue)
-#else
-void vtkF3DAssimpImporter::UpdateTimeStep(double timeValue)
-#endif
 {
   assert(this->Internals->ActiveAnimation >= 0);
   assert(this->Internals->ActiveAnimation < this->GetNumberOfAnimations());
@@ -1032,9 +1028,7 @@ void vtkF3DAssimpImporter::UpdateTimeStep(double timeValue)
   this->Internals->UpdateBones();
   this->Internals->UpdateCameras();
   this->Internals->UpdateLights();
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   return true;
-#endif
 }
 
 //----------------------------------------------------------------------------

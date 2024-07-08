@@ -12,16 +12,17 @@
 #ifndef vtkF3DAssimpImporter_h
 #define vtkF3DAssimpImporter_h
 
-#include <vtkImporter.h>
+#include "vtkF3DImporter.h"
+
 #include <vtkVersion.h>
 
 #include <memory>
 
-class vtkF3DAssimpImporter : public vtkImporter
+class vtkF3DAssimpImporter : public vtkF3DImporter
 {
 public:
   static vtkF3DAssimpImporter* New();
-  vtkTypeMacro(vtkF3DAssimpImporter, vtkImporter);
+  vtkTypeMacro(vtkF3DAssimpImporter, vtkF3DImporter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{
@@ -35,11 +36,7 @@ public:
   /**
    * Update actors at the given time value.
    */
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   bool UpdateAtTimeValue(double timeValue) override;
-#else
-  void UpdateTimeStep(double timeValue) override;
-#endif
 
   /**
    * Get the number of available animations.
