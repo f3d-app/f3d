@@ -592,7 +592,7 @@ public:
   /**
    * Read the scene file
    */
-  void ReadScene(const std::string& filePath)
+  bool ReadScene(const std::string& filePath)
   {
     try
     {
@@ -602,7 +602,8 @@ public:
     }
     catch (const DeadlyImportError& e)
     {
-      vtkWarningWithObjectMacro(this->Parent, "Assimp exception: " << e.what());
+      vtkErrorWithObjectMacro(this->Parent, "Assimp exception: " << e.what());
+      return false;
     }
 
     if (this->Scene)
@@ -627,13 +628,15 @@ public:
       {
         this->Properties[i] = this->CreateMaterial(this->Scene->mMaterials[i]);
       }
+      return true;
     }
     else
     {
-      vtkWarningWithObjectMacro(this->Parent, "Assimp failed to load: " << filePath);
+      vtkErrorWithObjectMacro(this->Parent, "Assimp failed to load: " << filePath);
 
       auto errorDescription = this->Importer.GetErrorString();
-      vtkWarningWithObjectMacro(this->Parent, "Assimp error: " << errorDescription);
+      vtkErrorWithObjectMacro(this->Parent, "Assimp error: " << errorDescription);
+      return false;
     }
   }
 
@@ -895,9 +898,7 @@ vtkF3DAssimpImporter::~vtkF3DAssimpImporter() = default;
 //----------------------------------------------------------------------------
 int vtkF3DAssimpImporter::ImportBegin()
 {
-  this->Internals->ReadScene(this->FileName);
-
-  return 1;
+  return this->Internals->ReadScene(this->FileName);
 }
 
 //----------------------------------------------------------------------------
@@ -913,7 +914,7 @@ std::string vtkF3DAssimpImporter::GetOutputsDescription()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DAssimpImporter::UpdateTimeStep(double timeValue)
+bool vtkF3DAssimpImporter::UpdateAtTimeValue(double timeValue)
 {
   assert(this->Internals->ActiveAnimation >= 0);
   assert(this->Internals->ActiveAnimation < this->GetNumberOfAnimations());
@@ -1027,6 +1028,7 @@ void vtkF3DAssimpImporter::UpdateTimeStep(double timeValue)
   this->Internals->UpdateBones();
   this->Internals->UpdateCameras();
   this->Internals->UpdateLights();
+  return true;
 }
 
 //----------------------------------------------------------------------------
