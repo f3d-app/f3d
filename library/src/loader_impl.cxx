@@ -142,7 +142,7 @@ public:
     this->GenericImporter->AddInternalReader(name, source);
 
     // Update the importer
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240706)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     if (!this->GenericImporter->Update())
     {
       throw loader::load_failure_exception("failed to load geometry: " + name);
@@ -320,7 +320,7 @@ loader& loader_impl::loadScene(const std::string& filePath)
   }
 
   // Read the file
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240706)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   if (!this->Internals->CurrentFullSceneImporter->Update())
   {
     throw loader::load_failure_exception("failed to load scene: " + filePath);

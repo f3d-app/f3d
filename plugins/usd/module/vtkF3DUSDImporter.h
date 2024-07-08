@@ -80,7 +80,7 @@ protected:
     double timeRange[2], vtkDoubleArray* timeSteps) override;
 #endif
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240706)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   bool UpdateAtTimeValue(double timeValue) override;
 #else
   void UpdateTimeStep(double timeValue) override;
