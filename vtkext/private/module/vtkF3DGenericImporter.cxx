@@ -425,6 +425,8 @@ void vtkF3DGenericImporter::UpdateTimeStep(double timeValue)
   this->UpdateOutputDescriptions();
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   return hasGeometry;
+#else
+  (void) hasGeometry;
 #endif
 }
 
