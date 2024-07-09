@@ -7,12 +7,12 @@
 #include <iostream>
 #include <vector>
 
-class WarningEventCallback : public vtkCommand
+class ErrorEventCallback : public vtkCommand
 {
 public:
-  static WarningEventCallback* New()
+  static ErrorEventCallback* New()
   {
-    return new WarningEventCallback;
+    return new ErrorEventCallback;
   }
 
   void Execute(vtkObject* caller, unsigned long vtkNotUsed(evId), void* data) override
@@ -25,7 +25,7 @@ public:
     }
   }
 
-  const std::vector<std::string>& GetRecordedWarningMessages() const
+  const std::vector<std::string>& GetRecordedErrorMessages() const
   {
     return this->Messages;
   }
@@ -36,23 +36,22 @@ private:
 
 int TestF3DAssimpImportError(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
 {
-  vtkObject::GlobalWarningDisplayOn();
   vtkNew<vtkF3DAssimpImporter> importer;
 
-  vtkNew<WarningEventCallback> warningEventCallback;
-  importer->AddObserver(vtkCommand::WarningEvent, warningEventCallback);
+  vtkNew<ErrorEventCallback> errorEventCallback;
+  importer->AddObserver(vtkCommand::ErrorEvent, errorEventCallback);
 
   importer->SetFileName("dummy.dae");
   importer->Update();
 
-  auto warningMessages = warningEventCallback->GetRecordedWarningMessages();
-  if (warningMessages.empty())
+  auto errorMessages = errorEventCallback->GetRecordedErrorMessages();
+  if (errorMessages.empty())
   {
-    std::cerr << "No warning triggered." << std::endl;
+    std::cerr << "No error triggered." << std::endl;
     return EXIT_FAILURE;
   }
 
-  auto lastMessage = warningMessages.back();
+  auto lastMessage = errorMessages.back();
   if (lastMessage.find("Assimp error") == std::string::npos)
   {
     std::cerr << "No Assimp error triggered!" << std::endl;

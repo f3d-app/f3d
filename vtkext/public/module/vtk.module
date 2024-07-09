@@ -4,6 +4,7 @@ DESCRIPTION
   A VTK module that is shared and usable by both libf3d and plugins
 DEPENDS
   VTK::CommonExecutionModel
+  VTK::IOImport
 PRIVATE_DEPENDS
   VTK::CommonCore
   VTK::RenderingOpenGL2

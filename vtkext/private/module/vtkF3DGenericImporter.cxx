@@ -159,6 +159,7 @@ bool vtkF3DGenericImporter::GetTemporalInformation(vtkIdType animationIndex,
 void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
   this->Pimpl->GeometryBoundingBox.Reset();
+  bool hasGeometry = false;
 
   // Update each reader
   for (size_t readerIndex = 0; readerIndex < this->Pimpl->Readers.size(); readerIndex++)
@@ -184,17 +185,15 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
           self->InvokeEvent(vtkCommand::ProgressEvent, &progress);
         });
       pipe.Reader->AddObserver(vtkCommand::ProgressEvent, progressCallback);
-      pipe.PostPro->Update();
+      bool status = pipe.PostPro->GetExecutive()->Update();
       pipe.Reader->RemoveObservers(vtkCommand::ProgressEvent);
-    }
 
-    // Recover output
-    vtkDataObject* readerOutput = pipe.Reader->GetOutputDataObject(0);
-    if (!readerOutput)
-    {
-      F3DLog::Print(F3DLog::Severity::Warning, "A reader did not produce any output");
-      pipe.Output = nullptr;
-      continue;
+      if (!status || !pipe.Reader->GetOutputDataObject(0))
+      {
+        F3DLog::Print(F3DLog::Severity::Warning, "A reader failed to update");
+        pipe.Output = nullptr;
+        continue;
+      }
     }
 
     // Cast to dataset types
@@ -205,8 +204,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       : vtkDataSet::SafeDownCast(surface);
     pipe.Output = dataSet;
 
-    // Recover output description
-    pipe.OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(readerOutput);
+    // Recover output description from the reader
+    pipe.OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(pipe.Reader->GetOutputDataObject(0));
 
     // Recover data for coloring
     pipe.PointDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
@@ -238,10 +237,16 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     pipe.VolumeProp->VisibilityOff();
 
     pipe.Imported = true;
+    hasGeometry = true;
   }
+
   this->UpdateTemporalInformation();
   this->UpdateColoringVectors(false);
   this->UpdateColoringVectors(true);
+  if (!hasGeometry)
+  {
+    this->SetFailureStatus();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -394,16 +399,26 @@ std::string vtkF3DGenericImporter::GetMetaDataDescription()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
+bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
 {
   // Update each reader
+  bool hasGeometry = false;
   for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
-    pipe.PostPro->UpdateTimeStep(timestep);
+    if(!pipe.PostPro->UpdateTimeStep(timeValue) || !pipe.Reader->GetOutputDataObject(0))
+    {
+      F3DLog::Print(F3DLog::Severity::Warning, "A reader failed to update at a timeValue");
+      pipe.Output = nullptr;
+      pipe.Imported = false;
+      continue;
+    }
+    hasGeometry = true;
   }
+
   this->UpdateColoringVectors(false);
   this->UpdateColoringVectors(true);
   this->UpdateOutputDescriptions();
+  return hasGeometry;
 }
 
 //----------------------------------------------------------------------------
@@ -599,15 +614,11 @@ void vtkF3DGenericImporter::UpdateOutputDescriptions()
 {
   for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
-    vtkDataObject* readerOutput = pipe.Reader->GetOutputDataObject(0);
-    if (!readerOutput)
+    if (pipe.Imported)
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "A reader did not produce any output");
-      pipe.Output = nullptr;
-      continue;
+      // Recover output description
+      vtkDataObject* readerOutput = pipe.Reader->GetOutputDataObject(0);
+      pipe.OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(readerOutput);
     }
-
-    // Recover output description
-    pipe.OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(readerOutput);
   }
 }

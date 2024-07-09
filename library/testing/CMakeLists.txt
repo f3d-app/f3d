@@ -1,11 +1,11 @@
 list(APPEND libf3dSDKTests_list
-     TestSDKRenderAndInteract.cxx
+     TestSDKCamera.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
-     TestSDKOptions.cxx
-     TestSDKLog.cxx
      TestSDKLoader.cxx
-     TestSDKCamera.cxx
+     TestSDKLog.cxx
+     TestSDKOptions.cxx
+     TestSDKRenderAndInteract.cxx
     )
 
 # Test image comparison only with VTK > 9.0.1
@@ -49,6 +49,14 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519)
   list(APPEND libf3dSDKTests_list
     TestSDKInteractorCallBack.cxx
     TestSDKInteractorDropFullScene.cxx
+    )
+endif()
+
+# Invalid loader codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287
+# Merge with TestSDKLoader.cxx when VTK 9.4.0 is required.
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
+  list(APPEND libf3dSDKTests_list
+    TestSDKLoaderInvalid.cxx
     )
 endif()
 
