@@ -60,7 +60,7 @@ The list of existing mimetypes can be find [here](https://www.iana.org/assignmen
 
 ## Loading your plugin
 
-The plugin can be loaded using `f3d::engine::loadPlugin("path or name")` api if you are using libf3d, or `--load-plugins="path or name"` option if you are using F3D application.
+The plugin can be loaded using `f3d::engine::loadPlugin("path or name")` API if you are using libf3d, or `--load-plugins="path or name"` option if you are using F3D application.
 The option can also be set in a configuration file that you could distribute with your plugin.
 
 ## f3d::vtkext
