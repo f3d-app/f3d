@@ -4,7 +4,7 @@
 
 F3D behavior can be fully controlled from the command line using the following options.
 
-## Applicative Options
+## Application Options
 
 Options|Default|Description
 ------|------|------
@@ -26,7 +26,7 @@ Options|Default|Description
 
 Options|Default|Description
 ------|------|------
-\-\-verbose=\<[debug\|info\|warning\|error\|quiet]\>|info| Set *verbose* level, in order to provide more information about the loaded data in the console output. If no level is providen, assume `debug`. Option parsing may ignore this flag.
+\-\-verbose=\<[debug\|info\|warning\|error\|quiet]\>|info| Set *verbose* level, in order to provide more information about the loaded data in the console output. If no level is provided, assume `debug`. Option parsing may ignore this flag.
 \-\-progress||Show a *progress bar* when loading the file.
 \-\-animation-progress||Show a *progress bar* when playing the animation.
 \-\-geometry-only||For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.

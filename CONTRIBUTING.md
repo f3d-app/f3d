@@ -81,5 +81,5 @@ The extensions to VTK are divided into two modules:
 
 The `libf3d` library implements the whole logic of instancing and manipulating the different VTK classes, it is fully documented in the [libf3d README](doc/libf3d/README_LIBF3D.md).
 
-The `f3d` executable itself uses `libf3d` and adds an applicative layer on top of it, especially the handling of [command line options](doc/user/OPTIONS.md)
+The `f3d` executable itself uses `libf3d` and adds an application layer on top of it, especially the handling of [command line options](doc/user/OPTIONS.md)
 and a [configuration file](doc/user/CONFIGURATION_FILE.md).
