@@ -10,6 +10,7 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 * [VTK](https://vtk.org) >= 9.0.0 (9.2.6 recommended).
 * A C++17 compiler.
 * A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
+* Required for running tests, [git LFS](https://git-lfs.com/)
 * Optionally, [Assimp](https://www.assimp.org/) >= 5.0.
 * Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.5.2.
 * Optionally, [Alembic](http://www.alembic.io/) >= 1.7.

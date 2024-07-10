@@ -12,6 +12,8 @@ There are a few CMake options to configure the F3D testing framework:
 
 ## Running the tests
 
+Before running tests you need to fetch [git LFS](https://git-lfs.com/) data, which contains testing data and baselines. It can be done by running `git lfs pull` from the source directory.
+
 To run all tests, build and then run `ctest` from the build directory:
 
 ```
