@@ -5,14 +5,12 @@ F3D has an extensive suite of tests that can be run locally, either to validate 
 ## CMake Options
 
 There are a few CMake options to configure the F3D testing framework:
-* `BUILD_TESTING`: Enable the test framework, off by default.
+* `BUILD_TESTING`: Enable the test framework, off by default. Requires [git LFS](https://git-lfs.com/) if repository is cloned.
 * `F3D_TESTING_ENABLE_RENDERING_TESTS`: An option to enable/disable test that require rendering capabilities, on by default.
 * `F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS`: Certain tests can take some time to run, off by default, requires rendering tests.
 * `F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON`: With VTK < 9.1.0, rendering can be very different, although not incorrect, so this option is provided, off by default.
 
 ## Running the tests
-
-Before running tests you need to fetch [git LFS](https://git-lfs.com/) data, which contains testing data and baselines. It can be done by running `git lfs pull` from the source directory.
 
 To run all tests, build and then run `ctest` from the build directory:
 
