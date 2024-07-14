@@ -235,12 +235,6 @@ void vtkF3DOpenGLGridMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
 bool vtkF3DOpenGLGridMapper::GetNeedToRebuildShaders(
   vtkOpenGLHelper& cellBO, vtkRenderer* vtkNotUsed(ren), vtkActor* act)
 {
-// Complete GetRenderPassStageMTime needs in
-// https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7933
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210506)
   vtkMTimeType renderPassMTime = this->GetRenderPassStageMTime(act, &cellBO);
-#else
-  vtkMTimeType renderPassMTime = this->GetRenderPassStageMTime(act);
-#endif
   return cellBO.Program == nullptr || cellBO.ShaderSourceTime < renderPassMTime;
 }

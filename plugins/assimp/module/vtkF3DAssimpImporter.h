@@ -75,14 +75,9 @@ public:
    * Get temporal information for the currently enabled animation.
    * Only defines timerange and ignore provided frameRate.
    */
-// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
-#endif
 
-// Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
   /**
    * Get the number of available cameras.
    */
@@ -98,8 +93,6 @@ public:
    * If a negative index is provided, no camera from the importer is used.
    */
   void SetCamera(vtkIdType camIndex) override;
-
-#endif
 
 protected:
   vtkF3DAssimpImporter();

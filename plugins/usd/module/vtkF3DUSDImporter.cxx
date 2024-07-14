@@ -868,13 +868,9 @@ public:
       {
         vtkSmartPointer<vtkImageReader2> reader;
 
-// CreateImageReader2FromExtension needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8211
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210729)
         const std::string& assetPath = path.GetAssetPath();
         std::string ext = assetPath.substr(assetPath.find_last_of('.'));
         reader.TakeReference(vtkImageReader2Factory::CreateImageReader2FromExtension(ext.c_str()));
-#endif
-
         if (!reader)
         {
           // cannot read the image file
@@ -1249,8 +1245,6 @@ vtkIdType vtkF3DUSDImporter::GetNumberOfAnimations()
   return this->Internals->HasTimeCode() ? 1 : 0;
 }
 
-// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
 //----------------------------------------------------------------------------
 bool vtkF3DUSDImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationIndex),
   double frameRate, int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
@@ -1267,7 +1261,6 @@ bool vtkF3DUSDImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationInd
 
   return true;
 }
-#endif
 
 //----------------------------------------------------------------------------
 bool vtkF3DUSDImporter::UpdateAtTimeValue(double timeValue)

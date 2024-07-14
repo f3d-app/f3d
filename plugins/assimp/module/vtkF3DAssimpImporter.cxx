@@ -242,8 +242,6 @@ public:
 
     if (aTexture->mHeight == 0)
     {
-// CreateImageReader2FromExtension needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8211
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210729)
       std::string fileType = aTexture->achFormatHint;
 
       vtkSmartPointer<vtkImageReader2> reader;
@@ -256,10 +254,6 @@ public:
         reader->SetMemoryBufferLength(aTexture->mWidth);
         vTexture->SetInputConnection(reader->GetOutputPort());
       }
-#else
-      vtkWarningWithObjectMacro(
-        this->Parent, "Embedded texture are supported by VTK >= 9.0.20210729");
-#endif
     }
     else
     {
@@ -1063,8 +1057,6 @@ bool vtkF3DAssimpImporter::IsAnimationEnabled(vtkIdType animationIndex)
   return this->Internals->ActiveAnimation == animationIndex;
 }
 
-// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
 //----------------------------------------------------------------------------
 bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex,
   double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
@@ -1090,10 +1082,7 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex,
   timeRange[1] = duration / fps;
   return true;
 }
-#endif
 
-// Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
 //----------------------------------------------------------------------------
 vtkIdType vtkF3DAssimpImporter::GetNumberOfCameras()
 {
@@ -1111,7 +1100,6 @@ void vtkF3DAssimpImporter::SetCamera(vtkIdType camIndex)
 {
   this->Internals->ActiveCameraIndex = camIndex;
 }
-#endif
 
 //----------------------------------------------------------------------------
 void vtkF3DAssimpImporter::ImportCameras(vtkRenderer* renderer)

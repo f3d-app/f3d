@@ -1,40 +1,29 @@
 list(APPEND libf3dSDKTests_list
+     TestSDKAnimation.cxx
      TestSDKCamera.cxx
+     TestSDKCompareWithFile.cxx
+     TestSDKDropZone.cxx
+     TestSDKDynamicBackgroundColor.cxx
+     TestSDKDynamicFontFile.cxx
+     TestSDKDynamicLightIntensity.cxx
+     TestSDKDynamicProperties.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
+     TestSDKImage.cxx
+     TestSDKLoadFromMemory.cxx
      TestSDKLoader.cxx
      TestSDKLog.cxx
+     TestSDKMultiColoring.cxx
+     TestSDKMultiOptions.cxx
      TestSDKOptions.cxx
      TestSDKRenderAndInteract.cxx
-    )
+     TestSDKRenderFinalShader.cxx
+     TestSDKWindowNative.cxx
+)
 
-# Test image comparison only with VTK > 9.0.1
-if(VTK_VERSION VERSION_GREATER 9.0.1)
+if(NOT F3D_EXCLUDE_DEPRECATED)
   list(APPEND libf3dSDKTests_list
-    TestSDKCompareWithFile.cxx
-    TestSDKDropZone.cxx
-    TestSDKRenderFinalShader.cxx
-    TestSDKImage.cxx
-    TestSDKLoadFromMemory.cxx
-    TestSDKMultiColoring.cxx
-    TestSDKMultiOptions.cxx
-    TestSDKWindowNative.cxx
-    TestSDKDynamicBackgroundColor.cxx
-    TestSDKDynamicFontFile.cxx
-    TestSDKDynamicLightIntensity.cxx
-    TestSDKDynamicProperties.cxx
-    )
-  if(NOT F3D_EXCLUDE_DEPRECATED)
-    list(APPEND libf3dSDKTests_list
-         TestSDKImageDeprecated.cxx)
-  endif()
-endif()
-
-# Animation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20201016)
-  list(APPEND libf3dSDKTests_list
-    TestSDKAnimation.cxx
-    )
+       TestSDKImageDeprecated.cxx)
 endif()
 
 # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
@@ -67,7 +56,7 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullSc
                "${CMAKE_BINARY_DIR}/TestSDKInteractorDropFullScene.log") # world.obj; S
 
 # External window tests
-if(F3D_MODULE_EXTERNAL_RENDERING AND NOT VTK_OPENGL_HAS_EGL AND VTK_VERSION VERSION_GREATER 9.0.1)
+if(F3D_MODULE_EXTERNAL_RENDERING AND NOT VTK_OPENGL_HAS_EGL)
   find_package(glfw3 QUIET)
   if(glfw3_FOUND)
     list(APPEND libf3dSDKTests_list
