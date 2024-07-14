@@ -1682,7 +1682,7 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
 
     box.AddBounds(prop3d->GetBounds());
 
-    prop3d->PokeMatrix(NULL);
+    prop3d->PokeMatrix(nullptr);
   };
 
   /* Use custom logic to extend box.
