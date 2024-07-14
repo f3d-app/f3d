@@ -244,24 +244,24 @@ void vtkF3DRenderer::Initialize(const std::string& up)
     const int index = std::toupper(match[2].str()[0]) - 'X';
     assert(index >= 0 && index < 3);
 
-    std::array<double, 3> up = { 0, 0, 0 };
-    up[index] = sign;
+    std::array<double, 3> upDir = { 0, 0, 0 };
+    upDir[index] = sign;
 
-    std::array<double, 3> right = { 0, 0, 0 };
-    right[index == 0 ? 1 : 0] = 1.0;
+    std::array<double, 3> rightDir = { 0, 0, 0 };
+    rightDir[index == 0 ? 1 : 0] = 1.0;
 
-    this->InitializeEnvironment(up, right);
+    this->InitializeEnvironment(upDir, rightDir);
   }
   else if (std::regex_match(up, match, re2))
   {
-    const std::array<double, 3> up = {
+    const std::array<double, 3> upDir = {
       ::atof(match[1].str().c_str()), //
       ::atof(match[4].str().c_str()), //
       ::atof(match[7].str().c_str()), //
     };
-    const std::array<double, 3> right = { 1, 0, 0 };
+    const std::array<double, 3> rightDir = { 1, 0, 0 };
 
-    this->InitializeEnvironment(up, right);
+    this->InitializeEnvironment(upDir, rightDir);
   }
   else
   {
