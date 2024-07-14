@@ -10,6 +10,8 @@ list(APPEND libf3dSDKTests_list
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
      TestSDKImage.cxx
+     TestSDKInteractorCallBack.cxx
+     TestSDKInteractorDropFullScene.cxx
      TestSDKLoadFromMemory.cxx
      TestSDKLoader.cxx
      TestSDKLog.cxx
@@ -30,14 +32,6 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   list(APPEND libf3dSDKTests_list
     TestSDKDynamicHDRI.cxx
-    )
-endif()
-
-# Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519)
-  list(APPEND libf3dSDKTests_list
-    TestSDKInteractorCallBack.cxx
-    TestSDKInteractorDropFullScene.cxx
     )
 endif()
 

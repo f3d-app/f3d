@@ -69,15 +69,8 @@ void vtkF3DInteractorEventRecorder::ProcessEvents(
           {
             mod |= ModifierKey::AltKey;
           }
-// Complete WriteEvent needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220519)
           self->WriteEvent(vtkCommand::GetStringFromEventId(event), rwi->GetEventPosition(), mod,
             rwi->GetKeyCode(), rwi->GetRepeatCount(), rwi->GetKeySym(), callData);
-#else
-          (void)callData;
-          self->WriteEvent(vtkCommand::GetStringFromEventId(event), rwi->GetEventPosition(), mod,
-            rwi->GetKeyCode(), rwi->GetRepeatCount(), rwi->GetKeySym());
-#endif
         }
     }
     self->OutputStream->flush();
