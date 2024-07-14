@@ -15,6 +15,7 @@
 #include <vtkCamera.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
+#include <vtkF3DPolyDataMapper.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
@@ -23,6 +24,7 @@
 #include <vtkLightCollection.h>
 #include <vtkLightKit.h>
 #include <vtkMath.h>
+#include <vtkMatrix4x4.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLFXAAPass.h>
@@ -31,6 +33,8 @@
 #include <vtkPBRLUTTexture.h>
 #include <vtkPNGReader.h>
 #include <vtkPixelBufferObject.h>
+#include <vtkPlane.h>
+#include <vtkPolyData.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
 #include <vtkSkybox.h>
@@ -39,6 +43,7 @@
 #include <vtkTextProperty.h>
 #include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
+#include <vtkTransform.h>
 #include <vtkVersion.h>
 #include <vtkXMLImageDataReader.h>
 #include <vtkXMLImageDataWriter.h>
@@ -229,6 +234,9 @@ void vtkF3DRenderer::Initialize(const std::string& up)
 
   // Importer rely on the Environment being set, so this is needed in the initialization
   const std::regex re("([-+]?)([XYZ])", std::regex_constants::icase);
+  const std::regex re2("([+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)),"
+                       "([+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)),"
+                       "([+-]?([0-9]+([.][0-9]*)?|[.][0-9]+))");
   std::smatch match;
   if (std::regex_match(up, match, re))
   {
@@ -236,13 +244,76 @@ void vtkF3DRenderer::Initialize(const std::string& up)
     const int index = std::toupper(match[2].str()[0]) - 'X';
     assert(index >= 0 && index < 3);
 
-    this->UpIndex = index;
+    std::array<double, 3> up = { 0, 0, 0 };
+    up[index] = sign;
 
-    std::fill(this->UpVector, this->UpVector + 3, 0);
-    this->UpVector[this->UpIndex] = sign;
+    std::array<double, 3> right = { 0, 0, 0 };
+    right[index == 0 ? 1 : 0] = 1.0;
 
-    std::fill(this->RightVector, this->RightVector + 3, 0);
-    this->RightVector[this->UpIndex == 0 ? 1 : 0] = 1.0;
+    this->InitializeEnvironment(up, right);
+  }
+  else if (std::regex_match(up, match, re2))
+  {
+    const std::array<double, 3> up = {
+      ::atof(match[1].str().c_str()), //
+      ::atof(match[4].str().c_str()), //
+      ::atof(match[7].str().c_str()), //
+    };
+    const std::array<double, 3> right = { 1, 0, 0 };
+
+    this->InitializeEnvironment(up, right);
+  }
+  else
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, up + " is not a valid up direction");
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::InitializeEnvironment(
+  const std::array<double, 3>& upDir, const std::array<double, 3>& rightDir)
+{
+  const auto isEqual = [](const std::array<double, 3>& u, const std::array<double, 3>& v)
+  {
+    constexpr double e = 1e-8;
+    return ::abs(u[0] - v[0]) < e && ::abs(u[1] - v[1]) < e && ::abs(u[2] - v[2]) < e;
+  };
+
+  /* if `up` is `(0,0,0)` make it `(0,1,0)` */
+  std::array<double, 3> up = upDir;
+  if (isEqual(up, { 0, 0, 0 }))
+  {
+    up[1] = 1.0;
+  }
+  vtkMath::Normalize(up.data());
+
+  /* make sure `right` is not `(0,0,0)` or the same as `up` */
+  std::array<double, 3> right = rightDir;
+  for (size_t i = 0; (isEqual(right, { 0, 0, 0 }) || isEqual(right, up)) && i < 3; ++i)
+  {
+    right[0] = 0;
+    right[1] = 0;
+    right[2] = 0;
+    right[i] = 1;
+  }
+  vtkMath::Normalize(right.data());
+
+  /* make `front` orthogonal */
+  std::array<double, 3> front;
+  vtkMath::Cross(right.data(), up.data(), front.data());
+  vtkMath::Normalize(front.data());
+
+  /* ensure `right` is orthogonal */
+  vtkMath::Cross(up.data(), front.data(), right.data());
+  vtkMath::Normalize(right.data());
+
+  {
+    this->UpVector[0] = up[0];
+    this->UpVector[1] = up[1];
+    this->UpVector[2] = up[2];
+    this->RightVector[0] = right[0];
+    this->RightVector[1] = right[1];
+    this->RightVector[2] = right[2];
 
     double pos[3];
     vtkMath::Cross(this->UpVector, this->RightVector, pos);
@@ -254,18 +325,12 @@ void vtkF3DRenderer::Initialize(const std::string& up)
     cam->SetViewUp(this->UpVector);
 
     // skybox orientation
-    double front[3];
-    vtkMath::Cross(this->RightVector, this->UpVector, front);
     this->SkyboxActor->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
     this->SkyboxActor->SetFloorRight(front[0], front[1], front[2]);
 
     // environment orientation
     this->SetEnvironmentUp(this->UpVector);
     this->SetEnvironmentRight(this->RightVector);
-  }
-  else
-  {
-    F3DLog::Print(F3DLog::Severity::Warning, up + " is not a valid up direction");
   }
 }
 
@@ -507,15 +572,35 @@ void vtkF3DRenderer::ShowGrid(bool show)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 {
+  double* up = this->GetEnvironmentUp();
+  double* right = this->GetEnvironmentRight();
+  double front[3];
+  vtkMath::Cross(right, up, front);
+
+  vtkNew<vtkMatrix4x4> upMatrix;
+  {
+    const double m[16] = {
+      right[0], right[1], right[2], 0, //
+      up[0], up[1], up[2], 0,          //
+      front[0], front[1], front[2], 0, //
+      0, 0, 0, 1,                      //
+    };
+    upMatrix->DeepCopy(m);
+  }
+  vtkNew<vtkMatrix4x4> upMatrixInv;
+  upMatrixInv->DeepCopy(upMatrix);
+  upMatrixInv->Invert();
+  vtkNew<vtkTransform> upTransformInv;
+  upTransformInv->SetMatrix(upMatrixInv);
+  vtkNew<vtkTransform> upTransform;
+  upTransform->SetMatrix(upMatrix);
+
   // Configure grid using visible prop bounds and actors
   // Also initialize GridInfo
   bool show = this->GridVisible;
   if (show)
   {
-    double bounds[6];
-    this->ComputeVisiblePropBounds(bounds);
-
-    vtkBoundingBox bbox(bounds);
+    const vtkBoundingBox bbox = this->ComputeVisiblePropOrientedBounds(upMatrix);
 
     if (!bbox.IsValid())
     {
@@ -530,25 +615,30 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
         tmpUnitSquare = pow(10.0, round(log10(diag * 0.1)));
       }
 
-      double gridPos[3] = { 0, 0, 0 };
+      double center[3];
+      bbox.GetCenter(center);
+
+      double gridPos[3];
+      upTransformInv->TransformPoint(center, gridPos);
+
+      double downShift = 0;
       if (this->GridAbsolute)
       {
-        for (int i = 0; i < 3; i++)
-        {
-          gridPos[i] = this->UpVector[i] ? 0 : 0.5 * (bounds[2 * i] + bounds[2 * i + 1]);
-        }
+        double origin[3] = { 0, 0, 0 };
+        downShift += vtkPlane::DistanceToPlane(center, up, origin);
       }
       else
       {
-        for (int i = 0; i < 3; i++)
-        {
-          // a small margin is added to the size to avoid z-fighting if large translucent
-          // triangles are exactly aligned with the grid bounds
-          constexpr double margin = 1.0001;
-          double size = margin * (bounds[2 * i + 1] - bounds[2 * i]);
-          gridPos[i] = 0.5 * (bounds[2 * i] + bounds[2 * i + 1] - this->UpVector[i] * size);
-        }
+        // a small margin is added to the size to avoid z-fighting if large translucent
+        // triangles are exactly aligned with the grid bounds
+        constexpr double margin = 0.0001;
+        downShift += bbox.GetLength(1) / 2 + margin;
       }
+
+      double delta[3];
+      this->GetEnvironmentUp(delta);
+      vtkMath::MultiplyScalar(delta, downShift);
+      vtkMath::Subtract(gridPos, delta, gridPos);
 
       std::stringstream stream;
       stream << "Using grid unit square size = " << tmpUnitSquare << "\n"
@@ -560,11 +650,12 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       gridMapper->SetFadeDistance(diag);
       gridMapper->SetUnitSquare(tmpUnitSquare);
       gridMapper->SetSubdivisions(this->GridSubdivisions);
-      gridMapper->SetUpIndex(this->UpIndex);
       if (this->GridAbsolute)
-        gridMapper->SetOriginOffset(-gridPos[0], -gridPos[1], -gridPos[2]);
-
+        gridMapper->SetOriginOffset(-center[0], -center[1], -center[2]);
+      this->GridActor->SetOrientation(upTransformInv->GetOrientation());
       this->GridActor->GetProperty()->SetColor(this->GridColor);
+      gridMapper->SetAxis1Color(::abs(right[0]), ::abs(right[1]), ::abs(right[2]), 1);
+      gridMapper->SetAxis2Color(::abs(front[0]), ::abs(front[1]), ::abs(front[2]), 1);
       this->GridActor->ForceTranslucentOn();
       this->GridActor->SetPosition(gridPos);
       this->GridActor->SetMapper(gridMapper);
@@ -1558,6 +1649,108 @@ void vtkF3DRenderer::ResetCameraClippingRange()
   this->GridActor->UseBoundsOn();
   this->Superclass::ResetCameraClippingRange();
   this->GridActor->SetUseBounds(gridUseBounds);
+}
+
+vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4x4* matrix)
+{
+  const auto isMatrixAxisAligned = [](const vtkMatrix4x4* m, const double tol = 1e-8)
+  {
+    for (size_t i = 0; i < 3; ++i)
+    {
+      size_t nonzerosI = 0;
+      size_t nonzerosJ = 0;
+      for (size_t j = 0; j < 3; ++j)
+      {
+        if (::abs(m->Element[i][j]) > tol)
+          nonzerosI++;
+        if (::abs(m->Element[j][i]) > tol)
+          nonzerosJ++;
+      }
+      if (nonzerosI > 1 || nonzerosJ > 1)
+        return false;
+    }
+    return true;
+  };
+
+  /* Use `PokeMatrix` around the call to `GetBounds()` to extend box.
+   * Only gives the thightest bounds if the transformation is axis-aligned. */
+  const auto extendBoxAxisAligned = [&](vtkProp3D* prop3d, vtkBoundingBox& box)
+  {
+    vtkNew<vtkMatrix4x4> tmpMatrix;
+    vtkMatrix4x4::Multiply4x4(matrix, prop3d->GetMatrix(), tmpMatrix);
+    prop3d->PokeMatrix(tmpMatrix);
+
+    box.AddBounds(prop3d->GetBounds());
+
+    prop3d->PokeMatrix(NULL);
+  };
+
+  /* Use custom logic to extend box.
+   * Should give the tightest bounds even when non-axis-aligned */
+  const auto extendBoxArbitrary = [&](vtkProp3D* prop3d, vtkBoundingBox& box)
+  {
+    vtkActor* actor = dynamic_cast<vtkActor*>(prop3d);
+    if (actor)
+    {
+      vtkPolyDataMapper* polyMapper = dynamic_cast<vtkPolyDataMapper*>(actor->GetMapper());
+      if (polyMapper)
+      {
+        vtkNew<vtkTransform> t;
+        t->Concatenate(*matrix->Element);
+        t->Concatenate(actor->GetMatrix());
+        vtkPolyData* polydata = polyMapper->GetInput();
+        if (polydata)
+        {
+          for (vtkIdType i = 0; i < polydata->GetNumberOfPoints(); ++i)
+          {
+            box.AddPoint(t->TransformPoint(polydata->GetPoint(i)));
+          }
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  const bool isAxisAligned = isMatrixAxisAligned(matrix);
+  vtkBoundingBox box;
+
+  /* use `ComputeVisiblePropBounds()`'s logic to iterate `vtkProp3D`s contributing to the bounds */
+  {
+    vtkProp* prop;
+    vtkCollectionSimpleIterator pit;
+    for (this->Props->InitTraversal(pit); (prop = this->Props->GetNextProp(pit));)
+    {
+      if (prop->GetVisibility() && prop->GetUseBounds())
+      {
+        const double* bounds = prop->GetBounds();
+        if (bounds != nullptr && vtkMath::AreBoundsInitialized(bounds))
+        {
+          vtkProp3D* prop3d = dynamic_cast<vtkProp3D*>(prop);
+          if (prop3d)
+          {
+            if (isAxisAligned)
+            {
+              extendBoxAxisAligned(prop3d, box);
+            }
+            else
+            {
+              if (!extendBoxArbitrary(prop3d, box))
+              {
+                const std::string repr = std::string(prop3d->GetClassName());
+                F3DLog::Print(F3DLog::Severity::Warning,
+                  "Could not properly account for " + repr +
+                    " in non-axis-aligned bounds computation");
+                extendBoxAxisAligned(prop3d, box);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return box;
 }
 
 //----------------------------------------------------------------------------

@@ -11,6 +11,7 @@
 #ifndef vtkF3DRenderer_h
 #define vtkF3DRenderer_h
 
+#include <vtkBoundingBox.h>
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
 
@@ -132,6 +133,19 @@ public:
    * Should be called after being added to a vtkRenderWindow.
    */
   virtual void Initialize(const std::string& up);
+
+  /**
+   * Initialize the environment orientation (camera, skybox, axes).
+   * The `up` direction will be normalized.
+   * The `right` direction will be normalized and may be adjusted to ensure it is orthogonal.
+   */
+  virtual void InitializeEnvironment(
+    const std::array<double, 3>& upDir, const std::array<double, 3>& rightDir);
+
+  /**
+   * Compute bounds of visible props as transformed by given matrix.
+   */
+  vtkBoundingBox ComputeVisiblePropOrientedBounds(const vtkMatrix4x4*);
 
   /**
    * Get the OpenGL skybox
@@ -295,7 +309,6 @@ protected:
   bool InvertZoom = false;
 
   int RaytracingSamples = 0;
-  int UpIndex = 1;
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
   double CircleOfConfusionRadius = 20.0;
