@@ -2,6 +2,37 @@
 
 ## Ongoing development
 
+## v2.5.0
+
+For F3D users:
+- Added a Webassembly version available online: https://f3d.app/web
+- Added a "neutral" tone mapping feature
+- Added an screenshot feature when pressing F12, with its dedicated option, `--screenshot-filename`
+- Added a `--final-shader` option to customize post-processing.
+- Added a `--grid-color` option to set the color of the grid
+- Added a `--animation-progress` option to control if the animation progress bar should be shown
+- Added a `--backface-type` option to control backface visibility
+- Added a concept of filename [template](https://f3d.app/doc/user/OPTIONS.html#filename-templating) for saving screenshots and outputs
+- Added native menus for macOS
+- Improved documentation all around
+- Reworked config file logic to avoid duplicating of the default config
+- Fixed a long standing issue with FBX skinning animation
+- Fixed zsh completion
+- Fixed an opacity blending issue
+- Fixed a crash when dropping a HDRI while playing an animation
+- Fixed a focus issue on macOS
+- Fixed a high DPI issue on Windows
+
+For libf3d users:
+- Added an API to control camera pan and zoom
+- Added a tkinter python example
+- Exposed log level in the python API
+
+For F3D packagers:
+- Fixed compatibility with CMake 3.29.1
+- Fixed compatibility with OCCT 7_8_0
+- Fixed build reproducibility by removing a path from the binary
+
 ## v2.4.0
 
 For F3D users:
