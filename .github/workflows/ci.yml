@@ -52,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.3.0, v9.2.6]
+        vtk_version: [commit, v9.3.1, v9.2.6]
         static_label: [no-static]
         include:
           - vtk_version: commit
@@ -86,7 +86,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.3.0, v9.2.6]
+        vtk_version: [commit, v9.3.1, v9.2.6]
         build_type: [standard]
         include:
           - raytracing_label: raytracing
@@ -158,7 +158,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.3.0, v9.2.6]
+        vtk_version: [commit, v9.3.1, v9.2.6]
 
     runs-on: macos-13
 
@@ -188,7 +188,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.3.0, v9.2.6]
+        vtk_version: [commit, v9.3.1, v9.2.6]
         bundle_label: [no-bundle]
         static_label: [no-static]
         include:

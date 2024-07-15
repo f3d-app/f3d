@@ -153,7 +153,7 @@ runs:
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
-        -DCMAKE_MODULE_PATH=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && '$(pwd)/../dependencies/install/lib/cmake/OpenVDB/' || '' }}
+        -DCMAKE_MODULE_PATH=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.1') && inputs.optional_deps_label == 'optional-deps' && '$(pwd)/../dependencies/install/lib/cmake/OpenVDB/' || '' }}
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_BINDINGS_JAVA=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
@@ -171,7 +171,7 @@ runs:
         -DF3D_PLUGIN_BUILD_EXODUS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && inputs.static_label == 'no-static' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.1') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
@@ -334,7 +334,7 @@ runs:
     # https://github.com/f3d-app/f3d/issues/1276
     - name: Check F3D_PLUGINS_PATH using plugin example
       if: |
-        inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.0' &&
+        inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1' &&
         inputs.cpu != 'arm64' && inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}/install
@@ -353,7 +353,7 @@ runs:
     - name: Check Install
       if: |
         inputs.vtk_version != 'v9.2.6' &&
-        inputs.vtk_version != 'v9.3.0' && inputs.cpu != 'arm64'
+        inputs.vtk_version != 'v9.3.1' && inputs.cpu != 'arm64'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
@@ -362,7 +362,7 @@ runs:
     - name: Check Install plugins
       if: |
         inputs.vtk_version != 'v9.2.6'
-        && inputs.vtk_version != 'v9.3.0' && inputs.cpu != 'arm64'
+        && inputs.vtk_version != 'v9.3.1' && inputs.cpu != 'arm64'
         && inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}/install
