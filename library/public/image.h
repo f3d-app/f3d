@@ -106,9 +106,6 @@ public:
    */
   unsigned int getWidth() const;
   unsigned int getHeight() const;
-#ifndef F3D_NO_DEPRECATED
-  F3D_DEPRECATED image& setResolution(unsigned int width, unsigned int height);
-#endif
   ///@}
 
   ///@{ @name Channel Count
@@ -118,9 +115,6 @@ public:
    * \deprecated { setChannelCount is deprecated, use the appropriate constructor }
    */
   unsigned int getChannelCount() const;
-#ifndef F3D_NO_DEPRECATED
-  F3D_DEPRECATED image& setChannelCount(unsigned int dim);
-#endif
   ///@}
 
   /**
@@ -143,10 +137,6 @@ public:
    */
   image& setContent(void* buffer);
   void* getContent() const;
-#ifndef F3D_NO_DEPRECATED
-  F3D_DEPRECATED image& setData(unsigned char* buffer);
-  F3D_DEPRECATED unsigned char* getData() const;
-#endif
   ///@}
 
   /**

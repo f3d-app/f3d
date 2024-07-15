@@ -231,31 +231,11 @@ unsigned int image::getHeight() const
   return dims[1];
 }
 
-#ifndef F3D_NO_DEPRECATED
-//----------------------------------------------------------------------------
-image& image::setResolution(unsigned int width, unsigned int height)
-{
-  this->Internals->Image->SetDimensions(static_cast<int>(width), static_cast<int>(height), 1);
-  this->Internals->Image->AllocateScalars(
-    VTK_UNSIGNED_CHAR, static_cast<int>(this->getChannelCount()));
-  return *this;
-}
-#endif
-
 //----------------------------------------------------------------------------
 unsigned int image::getChannelCount() const
 {
   return this->Internals->Image->GetNumberOfScalarComponents();
 }
-
-#ifndef F3D_NO_DEPRECATED
-//----------------------------------------------------------------------------
-image& image::setChannelCount(unsigned int dim)
-{
-  this->Internals->Image->AllocateScalars(VTK_UNSIGNED_CHAR, static_cast<int>(dim));
-  return *this;
-}
-#endif
 
 //----------------------------------------------------------------------------
 image::ChannelType image::getChannelType() const
@@ -296,21 +276,6 @@ void* image::getContent() const
 {
   return this->Internals->Image->GetScalarPointer();
 }
-
-#ifndef F3D_NO_DEPRECATED
-//----------------------------------------------------------------------------
-image& image::setData(unsigned char* buffer)
-{
-  this->setContent(buffer);
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-unsigned char* image::getData() const
-{
-  return static_cast<unsigned char*>(this->getContent());
-}
-#endif
 
 //----------------------------------------------------------------------------
 bool image::compare(const image& reference, double threshold, image& diff, double& error) const

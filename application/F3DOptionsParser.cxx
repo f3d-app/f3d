@@ -316,22 +316,12 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   // cxxopts sense.
   HasDefault LocalHasDefaultNo = allOptionsInitialized ? HasDefault::YES : HasDefault::NO;
 
-#ifndef F3D_NO_DEPRECATED
-  // Deprecated options that needs further processing
-  std::string deprecatedHDRI;
-  std::vector<std::string> deprecatedInputs;
-  bool deprecatedQuiet = false;
-#endif
-
   try
   {
     cxxopts::Options cxxOptions(this->ExecutableName, F3D::AppTitle);
     cxxOptions.custom_help("[OPTIONS...] file1 file2 ...");
     // clang-format off
     auto grp0 = cxxOptions.add_options("Applicative");
-#ifndef F3D_NO_DEPRECATED
-    this->DeclareOption(grp0, "input", "", "Input files (deprecated)", deprecatedInputs, LocalHasDefaultNo, MayHaveConfig::YES , "<files>");
-#endif
     this->DeclareOption(grp0, "output", "", "Render to file", appOptions.Output, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
     this->DeclareOption(grp0, "no-background", "", "No background when render to file", appOptions.NoBackground, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp0, "help", "h", "Print help");
@@ -348,9 +338,6 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
     auto grp1 = cxxOptions.add_options("General");
     this->DeclareOption(grp1, "verbose", "", "Set verbose level, providing more information about the loaded data in the console output", appOptions.VerboseLevel, HasDefault::YES, MayHaveConfig::YES, "{debug, info, warning, error, quiet}", HasImplicitValue::YES, "debug");
-#ifndef F3D_NO_DEPRECATED
-    this->DeclareOption(grp1, "quiet", "", "Enable quiet mode, which supersede any verbose options and prevent any console output to be generated at all (deprecated, using `--verbose=quiet` instead)", deprecatedQuiet,  HasDefault::YES, MayHaveConfig::YES );
-#endif
     this->DeclareOption(grp1, "progress", "", "Show loading progress bar", options.getAsBoolRef("ui.loader-progress"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "animation-progress", "", "Show animation progress bar", options.getAsBoolRef("ui.animation-progress"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", appOptions.GeometryOnly, HasDefault::YES, MayHaveConfig::YES);
@@ -383,9 +370,6 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grp2, "opacity", "", "Opacity", options.getAsDoubleRef("model.color.opacity"), HasDefault::YES, MayHaveConfig::YES, "<opacity>");
     this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.roughness"), HasDefault::YES, MayHaveConfig::YES, "<roughness>");
     this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.metallic"), HasDefault::YES, MayHaveConfig::YES, "<metallic>");
-#ifndef F3D_NO_DEPRECATED
-    this->DeclareOption(grp2, "hdri", "", "Path to an image file that will be used as a light source and skybox (deprecated)", deprecatedHDRI, LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
-#endif
     this->DeclareOption(grp2, "hdri-file", "", "Path to an image file that can be used as a light source and skybox", options.getAsStringRef("render.hdri.file"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
     this->DeclareOption(grp2, "hdri-ambient", "f", "Enable HDRI ambient lighting", options.getAsBoolRef("render.hdri.ambient"), HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp2, "hdri-skybox", "j", "Enable HDRI skybox background", options.getAsBoolRef("render.background.skybox"), HasDefault::YES, MayHaveConfig::YES);
@@ -456,35 +440,6 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     if (parseCommandLine)
     {
       auto result = cxxOptions.parse(this->Argc, this->Argv);
-
-#ifndef F3D_NO_DEPRECATED
-      if (deprecatedQuiet)
-      {
-        f3d::log::warn("--quiet option is deprecated, please use --verbose=quiet instead.");
-        appOptions.VerboseLevel = "quiet";
-      }
-
-      if (!deprecatedHDRI.empty())
-      {
-        options.set("render.hdri.file", deprecatedHDRI);
-        options.set("render.hdri.ambient", true);
-        options.set("render.background.skybox", true);
-
-        f3d::log::warn("--hdri option is deprecated, please use --hdri-file, --hdri-ambient and "
-                       "--hdri-skybox instead.");
-      }
-
-      for (const std::string& input : deprecatedInputs)
-      {
-        /* `deprecatedInputs` may contain an empty string instead of being empty itself */
-        if (!input.empty())
-        {
-          f3d::log::warn("--input option is deprecated, please use positional arguments instead.");
-          break;
-        }
-      }
-      inputs = deprecatedInputs;
-#endif
 
       auto unmatched = result.unmatched();
       bool found_unknown_option = false;

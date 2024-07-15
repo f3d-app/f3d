@@ -23,11 +23,6 @@ list(APPEND libf3dSDKTests_list
      TestSDKWindowNative.cxx
 )
 
-if(NOT F3D_EXCLUDE_DEPRECATED)
-  list(APPEND libf3dSDKTests_list
-       TestSDKImageDeprecated.cxx)
-endif()
-
 # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   list(APPEND libf3dSDKTests_list
