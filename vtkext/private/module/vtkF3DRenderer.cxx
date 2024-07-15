@@ -287,16 +287,17 @@ void vtkF3DRenderer::InitializeEnvironment(
   }
   vtkMath::Normalize(up.data());
 
-  /* make sure `right` is not `(0,0,0)` or the same as `up` */
+  /* make sure `right` is not `(0,0,0)` or colinear with `up` */
   std::array<double, 3> right = rightDir;
-  for (size_t i = 0; (isEqual(right, { 0, 0, 0 }) || isEqual(right, up)) && i < 3; ++i)
+  vtkMath::Normalize(right.data());
+  for (size_t i = 0;
+       (isEqual(right, { 0, 0, 0 }) || ::abs(vtkMath::Dot(right, up)) > 0.999) && i < 3; ++i)
   {
     right[0] = 0;
     right[1] = 0;
     right[2] = 0;
     right[i] = 1;
   }
-  vtkMath::Normalize(right.data());
 
   /* make `front` orthogonal */
   std::array<double, 3> front;
