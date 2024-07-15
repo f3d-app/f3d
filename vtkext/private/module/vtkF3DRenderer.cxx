@@ -573,34 +573,30 @@ void vtkF3DRenderer::ShowGrid(bool show)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 {
-  double* up = this->GetEnvironmentUp();
-  double* right = this->GetEnvironmentRight();
-  double front[3];
-  vtkMath::Cross(right, up, front);
-
-  vtkNew<vtkMatrix4x4> upMatrix;
-  {
-    const double m[16] = {
-      right[0], right[1], right[2], 0, //
-      up[0], up[1], up[2], 0,          //
-      front[0], front[1], front[2], 0, //
-      0, 0, 0, 1,                      //
-    };
-    upMatrix->DeepCopy(m);
-  }
-  vtkNew<vtkMatrix4x4> upMatrixInv;
-  upMatrixInv->DeepCopy(upMatrix);
-  upMatrixInv->Invert();
-  vtkNew<vtkTransform> upTransformInv;
-  upTransformInv->SetMatrix(upMatrixInv);
-  vtkNew<vtkTransform> upTransform;
-  upTransform->SetMatrix(upMatrix);
-
   // Configure grid using visible prop bounds and actors
   // Also initialize GridInfo
   bool show = this->GridVisible;
   if (show)
   {
+    double* up = this->GetEnvironmentUp();
+    double* right = this->GetEnvironmentRight();
+    double front[3];
+    vtkMath::Cross(right, up, front);
+
+    vtkNew<vtkMatrix4x4> upMatrix;
+    {
+      const double m[16] = {
+        right[0], right[1], right[2], 0, //
+        up[0], up[1], up[2], 0,          //
+        front[0], front[1], front[2], 0, //
+        0, 0, 0, 1,                      //
+      };
+      upMatrix->DeepCopy(m);
+    }
+    vtkNew<vtkMatrix4x4> upMatrixInv;
+    upMatrixInv->DeepCopy(upMatrix);
+    upMatrixInv->Transpose(); // matrix is orthonormal, no need to use `Invert()`
+
     const vtkBoundingBox bbox = this->ComputeVisiblePropOrientedBounds(upMatrix);
 
     if (!bbox.IsValid())
@@ -619,8 +615,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       double center[3];
       bbox.GetCenter(center);
 
-      double gridPos[3];
-      upTransformInv->TransformPoint(center, gridPos);
+      double* gridPos = upMatrixInv->MultiplyDoublePoint(center);
 
       double downShift = 0;
       if (this->GridAbsolute)
@@ -651,14 +646,20 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       gridMapper->SetFadeDistance(diag);
       gridMapper->SetUnitSquare(tmpUnitSquare);
       gridMapper->SetSubdivisions(this->GridSubdivisions);
+
       if (this->GridAbsolute)
         gridMapper->SetOriginOffset(-center[0], -center[1], -center[2]);
-      this->GridActor->SetOrientation(upTransformInv->GetOrientation());
+
+      double orientation[3];
+      vtkTransform::GetOrientation(orientation, upMatrixInv);
+      this->GridActor->SetOrientation(orientation);
+      this->GridActor->SetPosition(gridPos);
+
       this->GridActor->GetProperty()->SetColor(this->GridColor);
       gridMapper->SetAxis1Color(::abs(right[0]), ::abs(right[1]), ::abs(right[2]), 1);
       gridMapper->SetAxis2Color(::abs(front[0]), ::abs(front[1]), ::abs(front[2]), 1);
+
       this->GridActor->ForceTranslucentOn();
-      this->GridActor->SetPosition(gridPos);
       this->GridActor->SetMapper(gridMapper);
       this->GridActor->UseBoundsOff();
       this->GridActor->PickableOff();
@@ -1696,15 +1697,18 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
       vtkPolyDataMapper* polyMapper = dynamic_cast<vtkPolyDataMapper*>(actor->GetMapper());
       if (polyMapper)
       {
-        vtkNew<vtkTransform> t;
-        t->Concatenate(*matrix->Element);
-        t->Concatenate(actor->GetMatrix());
+        vtkNew<vtkMatrix4x4> tmpMatrix;
+        vtkMatrix4x4::Multiply4x4(matrix, actor->GetMatrix(), tmpMatrix);
         vtkPolyData* polydata = polyMapper->GetInput();
         if (polydata)
         {
+          double p[4] = { 0, 0, 0, 1 };
+          double q[4];
           for (vtkIdType i = 0; i < polydata->GetNumberOfPoints(); ++i)
           {
-            box.AddPoint(t->TransformPoint(polydata->GetPoint(i)));
+            polydata->GetPoint(i, p);
+            tmpMatrix->MultiplyPoint(p, q);
+            box.AddPoint(q);
           }
           return true;
         }
@@ -1717,33 +1721,31 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
   vtkBoundingBox box;
 
   /* use `ComputeVisiblePropBounds()`'s logic to iterate `vtkProp3D`s contributing to the bounds */
+  vtkProp* prop;
+  vtkCollectionSimpleIterator pit;
+  for (this->Props->InitTraversal(pit); (prop = this->Props->GetNextProp(pit));)
   {
-    vtkProp* prop;
-    vtkCollectionSimpleIterator pit;
-    for (this->Props->InitTraversal(pit); (prop = this->Props->GetNextProp(pit));)
+    if (prop->GetVisibility() && prop->GetUseBounds())
     {
-      if (prop->GetVisibility() && prop->GetUseBounds())
+      const double* bounds = prop->GetBounds();
+      if (bounds != nullptr && vtkMath::AreBoundsInitialized(bounds))
       {
-        const double* bounds = prop->GetBounds();
-        if (bounds != nullptr && vtkMath::AreBoundsInitialized(bounds))
+        vtkProp3D* prop3d = dynamic_cast<vtkProp3D*>(prop);
+        if (prop3d)
         {
-          vtkProp3D* prop3d = dynamic_cast<vtkProp3D*>(prop);
-          if (prop3d)
+          if (isAxisAligned)
           {
-            if (isAxisAligned)
+            extendBoxAxisAligned(prop3d, box);
+          }
+          else
+          {
+            if (!extendBoxArbitrary(prop3d, box))
             {
+              const std::string repr = std::string(prop3d->GetClassName());
+              F3DLog::Print(F3DLog::Severity::Warning,
+                "Could not properly account for " + repr +
+                  " in non-axis-aligned bounds computation");
               extendBoxAxisAligned(prop3d, box);
-            }
-            else
-            {
-              if (!extendBoxArbitrary(prop3d, box))
-              {
-                const std::string repr = std::string(prop3d->GetClassName());
-                F3DLog::Print(F3DLog::Severity::Warning,
-                  "Could not properly account for " + repr +
-                    " in non-axis-aligned bounds computation");
-                extendBoxAxisAligned(prop3d, box);
-              }
             }
           }
         }
