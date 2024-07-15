@@ -150,14 +150,8 @@ public:
    * Framerate is ignored in this implementation.
    * Only timerange is defined in this implementation.
    */
-// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
-#else
-  bool GetTemporalInformation(vtkIdType animationIndex, int& nbTimeSteps, double timeRange[2],
-    vtkDoubleArray* timeSteps) override;
-#endif
 
 protected:
   vtkF3DGenericImporter();

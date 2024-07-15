@@ -169,10 +169,7 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
 
   this->SkyboxActor->SetProjection(vtkSkybox::Sphere);
-  // First version of VTK including the version check (and the feature used)
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
   this->SkyboxActor->GammaCorrectOn();
-#endif
 
   this->FilenameActor->VisibilityOff();
   this->MetaDataActor->VisibilityOff();
@@ -344,19 +341,10 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   vtkOSPRayRendererNode::SetEnableDenoiser(this->UseRaytracingDenoiser, this);
   vtkOSPRayRendererNode::SetDenoiserThreshold(0, this);
 
-// complete SetBackgroundMode needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7341
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210123)
   vtkOSPRayRendererNode::BackgroundMode mode = vtkOSPRayRendererNode::Backplate;
-#else
-  int mode = 1;
-#endif
   if (this->GetUseImageBasedLighting())
   {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210123)
     mode = vtkOSPRayRendererNode::Both;
-#else
-    mode = 3;
-#endif
   }
   vtkOSPRayRendererNode::SetBackgroundMode(mode, this);
 #else

@@ -115,11 +115,7 @@ runs:
     # This is a simple workaround for it
     # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8210
     - name: Set LD_LIBRARY_PATH ubuntu VTK
-      if: |
-        runner.os == 'Linux' &&
-        ( inputs.vtk_version == 'v9.0.0' ||
-          inputs.vtk_version == 'v9.1.0'
-          )
+      if: runner.os == 'Linux'
       shell: bash
       working-directory: ${{github.workspace}}/dependencies/
       run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
@@ -157,7 +153,7 @@ runs:
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
-        -DCMAKE_MODULE_PATH=${{ matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0' && matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && '$(pwd)/../dependencies/install/lib/cmake/OpenVDB/' || '' }}
+        -DCMAKE_MODULE_PATH=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && '$(pwd)/../dependencies/install/lib/cmake/OpenVDB/' || '' }}
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_BINDINGS_JAVA=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
@@ -175,13 +171,12 @@ runs:
         -DF3D_PLUGIN_BUILD_EXODUS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && inputs.static_label == 'no-static' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.0.0' && matrix.vtk_version != 'v9.1.0' && matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'Linux' && matrix.vtk_version != 'v9.0.0' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
-        ${{ matrix.vtk_version == 'v9.0.0' && '-DF3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON=ON' || null }}
+        ${{ runner.os == 'Linux' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
 
     - name: Build
       shell: bash
@@ -272,7 +267,6 @@ runs:
     - name: Install Mesa Windows examples
       if: |
         runner.os == 'Windows' &&
-        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' &&
         inputs.static_label == 'no-static'
       uses: f3d-app/install-mesa-windows-action@v1
       with:
@@ -280,9 +274,7 @@ runs:
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
-      if: |
-        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' &&
-        inputs.static_label == 'no-static'
+      if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
       run: ctest --test-dir build_examples -C Release -VV
@@ -342,7 +334,6 @@ runs:
     # https://github.com/f3d-app/f3d/issues/1276
     - name: Check F3D_PLUGINS_PATH using plugin example
       if: |
-        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' &&
         inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.0' &&
         inputs.cpu != 'arm64' && inputs.static_label == 'no-static'
       shell: bash
@@ -361,7 +352,7 @@ runs:
     # https://github.com/f3d-app/f3d/issues/1276
     - name: Check Install
       if: |
-        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6' &&
+        inputs.vtk_version != 'v9.2.6' &&
         inputs.vtk_version != 'v9.3.0' && inputs.cpu != 'arm64'
       shell: bash
       working-directory: ${{github.workspace}}/install
@@ -370,7 +361,7 @@ runs:
 
     - name: Check Install plugins
       if: |
-        inputs.vtk_version != 'v9.0.0' && inputs.vtk_version != 'v9.1.0' && inputs.vtk_version != 'v9.2.6'
+        inputs.vtk_version != 'v9.2.6'
         && inputs.vtk_version != 'v9.3.0' && inputs.cpu != 'arm64'
         && inputs.static_label == 'no-static'
       shell: bash

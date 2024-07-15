@@ -254,19 +254,12 @@ window& window_impl::setPosition(int x, int y)
 //----------------------------------------------------------------------------
 window& window_impl::setIcon(const unsigned char* icon, size_t iconSize)
 {
-  // SetIcon needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7004
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200616)
   // XXX This code requires that the interactor has already been set on the render window
   vtkNew<vtkPNGReader> iconReader;
   iconReader->SetMemoryBuffer(icon);
   iconReader->SetMemoryBufferLength(iconSize);
   iconReader->Update();
   this->Internals->RenWin->SetIcon(iconReader->GetOutput());
-#else
-  // Silent noop
-  (void)icon;
-  (void)iconSize;
-#endif
   return *this;
 }
 

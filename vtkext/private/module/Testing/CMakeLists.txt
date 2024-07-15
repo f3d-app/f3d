@@ -20,11 +20,6 @@ if(F3D_MODULE_EXR)
        TestF3DEXRReaderInvalid.cxx)
 endif()
 
-if(VTK_VERSION VERSION_LESS_EQUAL 9.1.0)
-  set(CMAKE_WARN_DEPRECATED OFF)
-  cmake_policy(SET CMP0115 OLD)
-endif()
-
 vtk_add_test_cxx(vtkextPrivateTests tests
   NO_DATA NO_VALID NO_OUTPUT
   ${test_sources}

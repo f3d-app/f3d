@@ -86,7 +86,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.3.0, v9.2.6, v9.1.0, v9.0.0]
+        vtk_version: [commit, v9.3.0, v9.2.6]
         build_type: [standard]
         include:
           - raytracing_label: raytracing
@@ -94,8 +94,6 @@ jobs:
           - optional_deps_label: optional-deps
           - egl_label: no-egl
           - static_label: no-static
-          - vtk_version: v9.0.0
-            raytracing_label: no-raytracing
           - build_type: headless
             vtk_version: commit
             raytracing_label: raytracing
