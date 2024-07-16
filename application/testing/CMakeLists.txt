@@ -451,10 +451,6 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
     f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply THRESHOLD 120 ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -r --samples=1 LONG_TIMEOUT INTERACTION)
 
   endif()
-
-  if (NOT F3D_EXCLUDE_DEPRECATED)
-    f3d_test(NAME TestHDRIDeprecated DATA suzanne.ply ARGS --hdri=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT)
-  endif ()
 endif()
 
 # Zoom factor was introduced in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9958
@@ -910,11 +906,6 @@ f3d_test(NAME TestNoFileConfigFile CONFIG ${F3D_SOURCE_DIR}/testing/configs/verb
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
 f3d_test(NAME TestHelpPositional ARGS --help REGEXP "file1 file2 \.\.\.")
-if (NOT F3D_EXCLUDE_DEPRECATED)
-  f3d_test(NAME TestDeprecatedHelpInput ARGS --help REGEXP "--input")
-  f3d_test(NAME TestDeprecatedInput ARGS --input a.b REGEXP "--input option is deprecated")
-  f3d_test(NAME TestDeprecatedQuietNonExistentFile DATA nonExistentFile.vtp ARGS --filename --verbose --quiet --no-render REGEXP_FAIL "File .*nonExistentFile.vtp does not exist" NO_BASELINE)
-endif()
 
 # Test version display
 f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")

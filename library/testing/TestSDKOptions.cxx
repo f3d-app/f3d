@@ -288,10 +288,5 @@ int TestSDKOptions(int argc, char* argv[])
     std::cout << "Expected exception:" << ex.what() << std::endl;
   }
 
-#ifndef F3D_NO_DEPRECATED
-  // Check getRef with deprecated options to increase coverage
-  opt.getAsStringRef("render.background.hdri");
-#endif
-
   return EXIT_SUCCESS;
 }

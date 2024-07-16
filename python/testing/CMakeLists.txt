@@ -11,12 +11,6 @@ if(NOT F3D_MACOS_BUNDLE)
       )
 endif()
 
-# A deprecated test use image comparison
-if(NOT F3D_EXCLUDE_DEPRECATED)
-    list(APPEND pyf3dTests_list
-        test_deprecated.py)
-endif()
-
 list(APPEND pyf3dTests_list
      test_image_compare.py
      test_loader.py
