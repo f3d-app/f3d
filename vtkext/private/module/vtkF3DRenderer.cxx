@@ -611,7 +611,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
         tmpUnitSquare = pow(10.0, round(log10(diag * 0.1)));
       }
 
-      double center[3];
+      double center[4] = { 0, 0, 0, 1 };
       bbox.GetCenter(center);
 
       double* gridPos = upMatrixInv->MultiplyDoublePoint(center);
