@@ -68,5 +68,6 @@ The option can also be set in a configuration file that you could distribute wit
 F3D provides access to a VTK modules containing utilities that may be useful for plugin developers:
  - `vtkF3DFaceVaryingPointDispatcher`: A VTK filter that manipulates point data so that F3D can display them as face-varying data (used by `usd` plugin)
  - `vtkF3DBitonicSort`: A VTK class that perform Bitonic Sort algorithm on the GPU (used by the `splat` point sprites rendering algorithm
+ - `vtkF3DImporter`: An Importer class that abstract away support for different version of VTK after some API changes.
 
 For the complete documentation, please consult the [vtkext doxygen documentation.](https://f3d.app/doc/libf3d/vtkext_doxygen/).
