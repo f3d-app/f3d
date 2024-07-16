@@ -48,12 +48,8 @@ bool animationManager::Initialize(
     progressRep->DrawBackgroundOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
-// Complete vtkProgressBarRepresentation needs
-// https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7359
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201027)
     progressRep->DrawFrameOff();
     progressRep->SetPadding(0.0, 0.0);
-#endif
     progressRep->SetVisibility(options->getAsBool("ui.animation-progress"));
 
     this->ProgressWidget->On();
@@ -111,17 +107,13 @@ bool animationManager::Initialize(
       int nbTimeSteps;
       vtkNew<vtkDoubleArray> timeSteps;
 
-// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
       // Discard timesteps, F3D only cares about real elapsed time using time range
       // Specifying the frame rate in the next call is not needed after VTK 9.2.20230603 :
       // VTK_VERSION_CHECK(9, 2, 20230603)
       double frameRate = this->Options->getAsDouble("scene.animation.frame-rate");
       this->Importer->GetTemporalInformation(
         animIndex, frameRate, nbTimeSteps, timeRange, timeSteps);
-#else
-      this->Importer->GetTemporalInformation(animIndex, nbTimeSteps, timeRange, timeSteps);
-#endif
+
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
       this->TimeRange[1] = std::max(timeRange[1], this->TimeRange[1]);

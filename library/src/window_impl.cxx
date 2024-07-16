@@ -254,19 +254,12 @@ window& window_impl::setPosition(int x, int y)
 //----------------------------------------------------------------------------
 window& window_impl::setIcon(const unsigned char* icon, size_t iconSize)
 {
-  // SetIcon needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7004
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200616)
   // XXX This code requires that the interactor has already been set on the render window
   vtkNew<vtkPNGReader> iconReader;
   iconReader->SetMemoryBuffer(icon);
   iconReader->SetMemoryBufferLength(iconSize);
   iconReader->Update();
   this->Internals->RenWin->SetIcon(iconReader->GetOutput());
-#else
-  // Silent noop
-  (void)icon;
-  (void)iconSize;
-#endif
   return *this;
 }
 
@@ -408,15 +401,6 @@ void window_impl::UpdateDynamicOptions()
   std::string hdriFile = this->Internals->Options.getAsString("render.hdri.file");
   bool hdriAmbient = this->Internals->Options.getAsBool("render.hdri.ambient");
   bool hdriSkybox = this->Internals->Options.getAsBool("render.background.skybox");
-#ifndef F3D_NO_DEPRECATED
-  std::string legacyHDRI = this->Internals->Options.getAsString("render.background.hdri");
-  if (!legacyHDRI.empty())
-  {
-    hdriFile = legacyHDRI;
-    hdriAmbient = true;
-    hdriSkybox = true;
-  }
-#endif
   this->Internals->Renderer->SetHDRIFile(hdriFile);
   this->Internals->Renderer->SetUseImageBasedLighting(hdriAmbient);
   this->Internals->Renderer->ShowHDRISkybox(hdriSkybox);

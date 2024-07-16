@@ -182,7 +182,6 @@ list(APPEND f3d_link_options_public ${f3d_sanitizer_link_options})
 
 # Testing
 option(BUILD_TESTING "Build the tests" OFF)
-cmake_dependent_option(F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON "Disable image comparison on tests using the default lights" OFF "BUILD_TESTING" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_RENDERING_TESTS "Enable rendering tests" ON "BUILD_TESTING" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" OFF)
 if(BUILD_TESTING)

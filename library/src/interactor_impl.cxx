@@ -71,11 +71,8 @@ public:
     middleButtonReleaseCallback->SetCallback(OnMiddleButtonRelease);
     this->Style->AddObserver(vtkCommand::MiddleButtonReleaseEvent, middleButtonReleaseCallback);
 
-// Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
     this->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
     this->Recorder->SetInteractor(this->VTKInteractor);
-#endif
   }
 
   //----------------------------------------------------------------------------
@@ -665,16 +662,9 @@ bool interactor_impl::playInteraction(const std::string& file)
   }
   else
   {
-// Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
     // Make sure the recorder is off and streams are cleared
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
-#else
-    // Create a clean recorder as its internal state matters
-    this->Internals->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
-    this->Internals->Recorder->SetInteractor(this->Internals->VTKInteractor);
-#endif
 
     std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
     this->Internals->Recorder->SetFileName(cleanFile.c_str());
@@ -718,16 +708,9 @@ bool interactor_impl::recordInteraction(const std::string& file)
     return false;
   }
 
-// Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
   // Make sure the recorder is off and streams are cleared
   this->Internals->Recorder->Off();
   this->Internals->Recorder->Clear();
-#else
-  // Create a clean recorder as its internal state matters
-  this->Internals->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
-  this->Internals->Recorder->SetInteractor(this->Internals->VTKInteractor);
-#endif
 
   this->Internals->Recorder->SetFileName(cleanFile.c_str());
   this->Internals->Recorder->On();

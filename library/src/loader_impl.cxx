@@ -75,20 +75,13 @@ public:
     progressRep->DrawBackgroundOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
-
-// Complete vtkProgressBarRepresentation needs
-// https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7359
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201027)
     progressRep->DrawFrameOff();
     progressRep->SetPadding(0.0, 0.0);
-#endif
     data->timer->StartTimer();
   }
 
   static void DisplayImporterDescription(vtkImporter* importer)
   {
-// Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210303)
     vtkIdType availCameras = importer->GetNumberOfCameras();
     if (availCameras <= 0)
     {
@@ -103,7 +96,6 @@ public:
       log::debug(i, ": ", importer->GetCameraName(i));
     }
     log::debug("");
-#endif
     log::debug(importer->GetOutputsDescription(), "\n");
   }
 
@@ -294,16 +286,7 @@ loader& loader_impl::loadScene(const std::string& filePath)
     this->Internals->Window.GetRenderWindow());
 
   int cameraIndex = this->Internals->Options.getAsInt("scene.camera.index");
-// Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210303)
   this->Internals->CurrentFullSceneImporter->SetCamera(cameraIndex);
-#else
-  // XXX There is no way to recover the init value yet, assume it is -1
-  if (cameraIndex != -1)
-  {
-    log::warn("This VTK version does not support specifying the camera index, ignored.");
-  }
-#endif
 
   log::debug("Loading 3D scene: ", filePath, "\n");
 
