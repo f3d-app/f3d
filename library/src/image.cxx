@@ -19,6 +19,8 @@
 #include <vtkTIFFWriter.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtksys/SystemTools.hxx>
+#include <vtkImageSSIM.h>
+#include <vtkDoubleArray.h>
 
 #include <algorithm>
 #include <cassert>
@@ -280,13 +282,21 @@ void* image::getContent() const
 //----------------------------------------------------------------------------
 bool image::compare(const image& reference, double threshold, image& diff, double& error) const
 {
-  vtkNew<vtkImageDifference> imDiff;
-  // handle threshold outside of vtkImageDifference:
-  // https://gitlab.kitware.com/vtk/vtk/-/issues/18152
-  imDiff->SetThreshold(0);
-  imDiff->SetInputData(this->Internals->Image);
-  imDiff->SetImageData(reference.Internals->Image);
-  imDiff->UpdateInformation();
+  vtkNew<vtkImageSSIM> ssim;
+  std::vector<int> rgbaRanges {256, 256, 256, 256};
+  ssim->SetInputRange(rgbaRanges);
+  ssim->SetInputData(this->Internals->Image);
+  ssim->SetInputData(1, reference.Internals->Image);
+  ssim->Update();
+  double tight, loose;
+  vtkDoubleArray* scalars = vtkArrayDownCast<vtkDoubleArray>(
+    vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
+  vtkImageSSIM::ComputeErrorMetrics(scalars, tight, loose);
+  std::cout<<tight<<" "<<loose<<std::endl;
+  return false;
+
+
+/*  imDiff->UpdateInformation();
   error = imDiff->GetThresholdedError();
 
   if (error <= threshold)
@@ -302,7 +312,7 @@ bool image::compare(const image& reference, double threshold, image& diff, doubl
     return false;
   }
 
-  return true;
+  return true;*/
 }
 
 //----------------------------------------------------------------------------
