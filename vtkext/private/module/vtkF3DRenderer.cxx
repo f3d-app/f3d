@@ -273,15 +273,15 @@ void vtkF3DRenderer::Initialize(const std::string& up)
 void vtkF3DRenderer::InitializeEnvironment(
   const std::array<double, 3>& upDir, const std::array<double, 3>& rightDir)
 {
-  const auto isEqual = [](const std::array<double, 3>& u, const std::array<double, 3>& v)
+  const auto isNullVector = [](const std::array<double, 3>& v)
   {
     constexpr double e = 1e-8;
-    return ::abs(u[0] - v[0]) < e && ::abs(u[1] - v[1]) < e && ::abs(u[2] - v[2]) < e;
+    return ::abs(v[0]) < e && ::abs(v[1]) < e && ::abs(v[2]) < e;
   };
 
   /* if `up` is `(0,0,0)` make it `(0,1,0)` */
   std::array<double, 3> up = upDir;
-  if (isEqual(up, { 0, 0, 0 }))
+  if (isNullVector(up))
   {
     up[1] = 1.0;
   }
@@ -290,8 +290,7 @@ void vtkF3DRenderer::InitializeEnvironment(
   /* make sure `right` is not `(0,0,0)` or colinear with `up` */
   std::array<double, 3> right = rightDir;
   vtkMath::Normalize(right.data());
-  for (size_t i = 0;
-       (isEqual(right, { 0, 0, 0 }) || ::abs(vtkMath::Dot(right, up)) > 0.999) && i < 3; ++i)
+  for (size_t i = 0; (isNullVector(right) || ::abs(vtkMath::Dot(right, up)) > 0.999) && i < 3; ++i)
   {
     right[0] = 0;
     right[1] = 0;
