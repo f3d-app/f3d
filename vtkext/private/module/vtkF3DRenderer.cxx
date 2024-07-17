@@ -1678,10 +1678,10 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
    * Should give the tightest bounds even when non-axis-aligned */
   const auto extendBoxArbitrary = [&](vtkProp3D* prop3d, vtkBoundingBox& box)
   {
-    vtkActor* actor = dynamic_cast<vtkActor*>(prop3d);
+    vtkActor* actor = vtkActor::SafeDownCast(prop3d);
     if (actor)
     {
-      vtkPolyDataMapper* polyMapper = dynamic_cast<vtkPolyDataMapper*>(actor->GetMapper());
+      vtkPolyDataMapper* polyMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
       if (polyMapper)
       {
         vtkNew<vtkMatrix4x4> tmpMatrix;
@@ -1717,7 +1717,7 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
       const double* bounds = prop->GetBounds();
       if (bounds != nullptr && vtkMath::AreBoundsInitialized(bounds))
       {
-        vtkProp3D* prop3d = dynamic_cast<vtkProp3D*>(prop);
+        vtkProp3D* prop3d = vtkProp3D::SafeDownCast(prop);
         if (prop3d)
         {
           if (isAxisAligned)
