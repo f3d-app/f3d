@@ -21,6 +21,7 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtkImageSSIM.h>
 #include <vtkDoubleArray.h>
+#include <vtkXMLImageDataWriter.h>
 
 #include <algorithm>
 #include <cassert>
@@ -283,17 +284,28 @@ void* image::getContent() const
 bool image::compare(const image& reference, double threshold, image& diff, double& error) const
 {
   vtkNew<vtkImageSSIM> ssim;
+
+  // TODO check comp
   std::vector<int> rgbaRanges {256, 256, 256, 256};
   ssim->SetInputRange(rgbaRanges);
   ssim->SetInputData(this->Internals->Image);
   ssim->SetInputData(1, reference.Internals->Image);
+  // TODO check size
+  // TODO check Update output
   ssim->Update();
   double tight, loose;
   vtkDoubleArray* scalars = vtkArrayDownCast<vtkDoubleArray>(
     vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
+  
+  vtkNew<vtkXMLImageDataWriter> writer;
+  writer->SetFileName("/home/glow/image.vti");
+  writer->SetInputConnection(ssim->GetOutputPort());
+  writer->Write();
+  // TODO check scalars
   vtkImageSSIM::ComputeErrorMetrics(scalars, tight, loose);
   std::cout<<tight<<" "<<loose<<std::endl;
-  return false;
+  double myThresh = 0.001;
+  return tight <= myThresh;
 
 
 /*  imDiff->UpdateInformation();
