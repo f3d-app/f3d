@@ -6,6 +6,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <variant>
 
 namespace f3d
 {
@@ -63,5 +64,13 @@ struct mesh_t
   F3D_EXPORT std::pair<bool, std::string> isValid() const;
 };
 }
+
+using option_variant_t = std::variant<
+  bool,
+  double,
+  int,
+  std::string,
+  std::vector<double>
+>;
 
 #endif

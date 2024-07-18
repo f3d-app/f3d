@@ -33,6 +33,40 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx"
   @ONLY)
 
+function(parse_json_option top_json)
+  string(JSON options_length LENGTH ${top_json})
+  MATH(EXPR options_length "${options_length} - 1")
+  foreach(json_idx RANGE ${options_length})
+    string(JSON member_name MEMBER ${top_json} ${json_idx})
+    string(JSON cur_json GET ${top_json} ${member_name})
+    string(JSON option_type ERROR_VARIABLE type_error GET ${cur_json} "type")
+    if(type_error STREQUAL "NOTFOUND")
+       string(JSON option_default_value GET ${cur_json} "default_value")
+       if(option_type STREQUAL "double_vector")
+         string(APPEND option_struct "std::vector<double> ${member_name} = {${option_default_value}};\n")
+       elseif(option_type STREQUAL "string")
+         string(APPEND option_struct "std::string ${member_name} = \"${option_default_value}\";\n")
+       else()
+         string(APPEND option_struct "${option_type} ${member_name} = ${option_default_value};\n")
+       endif()
+    else()
+      string(APPEND option_struct "struct ${member_name} {\n")
+      parse_json_option(${cur_json})
+      string(APPEND option_struct "\n} ${member_name};\n")
+    endif()
+  endforeach()
+  set(option_struct "${option_struct}" PARENT_SCOPE)
+endfunction()
+
+# Parse options.json and generate headers
+set(option_struct "struct options_struct_gene {\n")
+
+## Read the .json file
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/options.json option_json)
+parse_json_option(${option_json})
+string(APPEND option_struct "\n};")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/public/options_struct.h "${option_struct}")
+
 # Define libf3d target
 set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/animationManager.cxx

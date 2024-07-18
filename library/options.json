@@ -1,0 +1,30 @@
+{
+  "scene": {
+    "up_direction": {
+      "type": "string",
+      "default_value": "+Y"
+    },
+    "animation": {
+      "autoplay": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "index": {
+        "type": "int",
+        "default_value": "0"
+      },
+      "speed_factor": {
+        "type": "double",
+        "default_value": "1.0"
+      }
+    }
+  },
+  "render": {
+    "grid": {
+      "color": {
+        "type": "double_vector",
+        "default_value": "0.0, 0.0, 0.0"
+      }
+    }
+  }
+}
