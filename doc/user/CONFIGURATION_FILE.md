@@ -65,12 +65,14 @@ The following command-line options <b>can only</b> be set in the global block of
 Boolean options that have been turned on in the configuration file can be turned
 off on the command line if needed, eg: `--point-sprites=false`.
 
-The configuration file or directory possible locations depends on your operating system.
-They are considered in the below order and only the first found will be used.
+F3D looks for configuration files in different locations depending on your operating system.
+Existing configuration files are read in order and combined with later entries, potentially overriding previously read entry with the same names.
 
- * Linux: `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`, `~/.config/f3d/config(.json,d)`, `/etc/f3d/config(.json,.d)`, `/usr/share/f3d/configs/config(.json,.d)`, `[install_dir]/share/f3d/configs/config(.json,.d)`
- * Windows: `%APPDATA%\f3d\(config.json,.d)`, `[install_dir]\share\f3d\configs\(config.json,.d)`
- * macOS: `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`, `~/.config/f3d/config(.json,.d)`, `/usr/local/etc/f3d/config(.json,.d)`, `f3d.app/Contents/Resources/configs/config(.json,.d)`
+ * Linux: `/etc/f3d/config(.json,.d)`, `/usr/share/f3d/configs/config(.json,.d)`, `[install_dir]/share/f3d/configs/config(.json,.d)`, `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`
+ * Windows: `[install_dir]\share\f3d\configs\(config.json,.d)`, `%APPDATA%\f3d\(config.json,.d)`
+ * macOS: `/usr/local/etc/f3d/config(.json,.d)`, `f3d.app/Contents/Resources/configs/config(.json,.d)`, `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`
+
+Please note `XDG_CONFIG_HOME` rely on environment variables as specified [here](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html).
 
 The binary release will install the default config directory.
 On Linux, they will be installed in `[install_dir]/share/f3d/configs/`, on Windows, they will be installed in `[install_dir]\share\f3d\configs\`, on macOS, it will be installed in the bundle.
