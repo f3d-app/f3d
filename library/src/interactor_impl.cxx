@@ -164,6 +164,7 @@ public:
     vtkRenderWindow* renWin = self->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
     vtkF3DRendererWithColoring* renWithColor = vtkF3DRendererWithColoring::SafeDownCast(ren);
+    options_struct& optionsStruct = self->Options.getStruct();
     bool checkColoring = false;
     bool render = false;
 
@@ -172,7 +173,7 @@ public:
     {
       case 'W':
         self->AnimationManager->CycleAnimation();
-        self->Options.set("scene.animation.index", self->AnimationManager->GetAnimationIndex());
+        optionsStruct.scene.animation.index = self->AnimationManager->GetAnimationIndex();
         ren->SetAnimationnameInfo(self->AnimationManager->GetAnimationName());
         render = true;
         break;
@@ -204,90 +205,90 @@ public:
         }
         break;
       case 'B':
-        self->Options.toggle("ui.bar");
+        optionsStruct.ui.scalar_bar = !optionsStruct.ui.scalar_bar;
         render = true;
         break;
       case 'P':
-        self->Options.toggle("render.effect.translucency-support");
+        optionsStruct.render.effect.translucency_support = !optionsStruct.render.effect.translucency_support;
         render = true;
         break;
       case 'Q':
-        self->Options.toggle("render.effect.ambient-occlusion");
+        optionsStruct.render.effect.ambient_occlusion = !optionsStruct.render.effect.ambient_occlusion;
         render = true;
         break;
       case 'A':
-        self->Options.toggle("render.effect.anti-aliasing");
+        optionsStruct.render.effect.anti_aliasing = !optionsStruct.render.effect.anti_aliasing;
         render = true;
         break;
       case 'T':
-        self->Options.toggle("render.effect.tone-mapping");
+        optionsStruct.render.effect.tone_mapping = !optionsStruct.render.effect.tone_mapping;
         render = true;
         break;
       case 'E':
-        self->Options.toggle("render.show-edges");
+        optionsStruct.render.show_edges = !optionsStruct.render.show_edges;
         render = true;
         break;
       case 'X':
-        self->Options.toggle("interactor.axis");
+        optionsStruct.interactor.axis = !optionsStruct.interactor.axis;
         render = true;
         break;
       case 'G':
-        self->Options.toggle("render.grid.enable");
+        optionsStruct.render.grid.enable = !optionsStruct.render.grid.enable;
         render = true;
         break;
       case 'N':
-        self->Options.toggle("ui.filename");
+        optionsStruct.ui.filename = !optionsStruct.ui.filename;
         render = true;
         break;
       case 'M':
-        self->Options.toggle("ui.metadata");
+        optionsStruct.ui.metadata = !optionsStruct.ui.metadata;
         render = true;
         break;
       case 'Z':
-        self->Options.toggle("ui.fps");
+        optionsStruct.ui.fps = !optionsStruct.ui.fps;
         self->Window.render();
         self->Window.render();
         // XXX: Double render is needed here
         break;
       case 'R':
-        self->Options.toggle("render.raytracing.enable");
+        optionsStruct.render.raytracing.enable = !optionsStruct.render.raytracing.enable;
         render = true;
         break;
       case 'D':
-        self->Options.toggle("render.raytracing.denoise");
+        optionsStruct.render.raytracing.denoise = !optionsStruct.render.raytracing.denoise;
         render = true;
         break;
       case 'V':
-        self->Options.toggle("model.volume.enable");
+        optionsStruct.model.volume.enable = !optionsStruct.model.volume.enable;
         render = true;
         break;
       case 'I':
-        self->Options.toggle("model.volume.inverse");
+        optionsStruct.model.volume.inverse = !optionsStruct.model.volume.inverse;
         render = true;
         break;
       case 'O':
-        self->Options.toggle("model.point-sprites.enable");
+        optionsStruct.model.point_sprites.enable = !optionsStruct.model.point_sprites.enable;
         render = true;
         break;
       case 'U':
-        self->Options.toggle("render.background.blur");
+        optionsStruct.render.background.blur = !optionsStruct.render.background.blur;
         render = true;
         break;
       case 'K':
-        self->Options.toggle("interactor.trackball");
+        optionsStruct.interactor.trackball = !optionsStruct.interactor.trackball;
         render = true;
         break;
       case 'F':
-        self->Options.toggle("render.hdri.ambient");
+        optionsStruct.render.hdri.ambient = !optionsStruct.render.hdri.ambient;
         render = true;
         break;
       case 'J':
-        self->Options.toggle("render.background.skybox");
+        optionsStruct.render.background.skybox = !optionsStruct.render.background.skybox;
         render = true;
         break;
       case 'L':
       {
-        const double intensity = self->Options.getAsDouble("render.light.intensity");
+        const double intensity = optionsStruct.render.light.intensity;
         const bool down = rwi->GetShiftKey();
 
         /* `ref < x` is equivalent to:
@@ -305,12 +306,12 @@ public:
         /* new intensity in percents */
         const int newIntensityPct = std::lround(intensity * 100) + (down ? -offsetPp : +offsetPp);
 
-        self->Options.set("render.light.intensity", std::max(newIntensityPct, 0) / 100.0);
+        optionsStruct.render.light.intensity = std::max(newIntensityPct, 0) / 100.0;
         render = true;
         break;
       }
       case 'H':
-        self->Options.toggle("ui.cheatsheet");
+        optionsStruct.ui.cheatsheet = !optionsStruct.ui.cheatsheet;
         render = true;
         break;
       case '?':
@@ -326,7 +327,7 @@ public:
         render = true;
         break;
       case '5':
-        self->Options.toggle("scene.camera.orthographic");
+        optionsStruct.scene.camera.orthographic = !optionsStruct.scene.camera.orthographic;
         render = true;
         break;
       case '7':
@@ -358,9 +359,9 @@ public:
     if (checkColoring)
     {
       // Resynchronise renderer coloring status with options
-      self->Options.set("model.scivis.cells", renWithColor->GetColoringUseCell());
-      self->Options.set("model.scivis.array-name", renWithColor->GetColoringArrayName());
-      self->Options.set("model.scivis.component", renWithColor->GetColoringComponent());
+      optionsStruct.model.scivis.cells = renWithColor->GetColoringUseCell();
+      optionsStruct.model.scivis.array_name = renWithColor->GetColoringArrayName();
+      optionsStruct.model.scivis.component = renWithColor->GetColoringComponent();
     }
     if (render)
     {
