@@ -106,6 +106,8 @@ std::vector<std::string> getNames() {
 std::vector<std::string> vec{
 ")
 
+set(option_basename "")
+
 ## TODO add file dependency
 ## Read the .json file and complete the struct
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/options.json options_json)
