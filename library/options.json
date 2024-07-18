@@ -275,7 +275,7 @@
         "type": "bool",
         "default_value": "false"
       },
-      "sprites_type": {
+      "type": {
         "type": "string",
         "default_value": "sphere"
       }
