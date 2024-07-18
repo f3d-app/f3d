@@ -59,12 +59,21 @@ function(parse_json_option top_json)
 endfunction()
 
 # Parse options.json and generate headers
-set(option_struct "struct options_struct_gene {\n")
+set(option_struct "\
+#ifndef f3d_options_struct_h
+#define f3d_options_struct_h
+
+#include <vector>\n\
+#include <string>\n\n\
+
+namespace f3d {
+struct options_struct {\n\
+")
 
 ## Read the .json file
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/options.json option_json)
 parse_json_option(${option_json})
-string(APPEND option_struct "\n};")
+string(APPEND option_struct "\n};\n};\n#endif")
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/public/options_struct.h "${option_struct}")
 
 # Define libf3d target

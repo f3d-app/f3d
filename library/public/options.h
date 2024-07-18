@@ -1,6 +1,7 @@
 #ifndef f3d_options_h
 #define f3d_options_h
 
+#include "options_struct.h"
 #include "exception.h"
 #include "export.h"
 #include "types.h"
@@ -12,7 +13,7 @@
 
 namespace f3d
 {
-
+/*
 // TODO GENERATE
 struct options_struct {
   struct scene_t {
@@ -150,7 +151,7 @@ struct options_struct {
  };
  interactor_t interactor;
 
-};
+};*/
 
 /**
  * @class   options

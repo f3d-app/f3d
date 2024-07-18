@@ -369,7 +369,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
     auto grp2 = cxxOptions.add_options("Material");
     this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", libArgs["model.point_sprites.enable"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
-    this->DeclareOption(grp2, "point-type", "", "Point sprites type when showing point sprites", libArgs["model.point_sprites.type"], HasDefault::YES, MayHaveConfig::YES, "<sphere|gaussian>");
+    this->DeclareOption(grp2, "point-type", "", "Point sprites type when showing point sprites", libArgs["model.point_sprites.sprites_type"], HasDefault::YES, MayHaveConfig::YES, "<sphere|gaussian>");
     this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", libArgs["render.point_size"], HasDefault::YES, MayHaveConfig::YES, "<size>");
     this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", libArgs["render.line_width"], HasDefault::YES, MayHaveConfig::YES, "<width>");
     this->DeclareOption(grp2, "backface-type", "", "Backface type, can be default (usually visible), visible or hidden", libArgs["render.backface_type"], HasDefault::YES, MayHaveConfig::YES, "<default|visible|hidden>");
