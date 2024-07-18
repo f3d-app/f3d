@@ -356,9 +356,9 @@ public:
     {
       this->OptionStruct.model.point_sprites.enable = std::get<bool>(value);
     }
-    else if (name == "model.point_sprites.sprites_type")
+    else if (name == "model.point_sprites.type")
     {
-      this->OptionStruct.model.point_sprites.sprites_type = std::get<std::string>(value);
+      this->OptionStruct.model.point_sprites.type = std::get<std::string>(value);
     }
     else if (name == "model.volume.enable")
     {
@@ -635,9 +635,9 @@ public:
     {
       var = this->OptionStruct.model.point_sprites.enable;
     }
-    else if (name == "model.point_sprites.sprites_type")
+    else if (name == "model.point_sprites.type")
     {
-      var = this->OptionStruct.model.point_sprites.sprites_type;
+      var = this->OptionStruct.model.point_sprites.type;
     }
     else if (name == "model.volume.enable")
     {
@@ -791,7 +791,7 @@ public:
 
      "model.point_sprites.enable",
 
-     "model.point_sprites.sprites_type",
+     "model.point_sprites.type",
 
      "model.volume.enable",
 

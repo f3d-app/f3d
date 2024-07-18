@@ -37,29 +37,39 @@ function(parse_json_option top_json)
   string(JSON options_length LENGTH ${top_json})
   MATH(EXPR options_length "${options_length} - 1")
   foreach(json_idx RANGE ${options_length})
+    # Recover the json element name
     string(JSON member_name MEMBER ${top_json} ${json_idx})
+    # Read the json element
     string(JSON cur_json GET ${top_json} ${member_name})
+    # Recover its type and default if it is a leaf option
     string(JSON option_type ERROR_VARIABLE type_error GET ${cur_json} "type")
-    if(type_error STREQUAL "NOTFOUND")
-       string(JSON option_default_value GET ${cur_json} "default_value")
+    string(JSON option_default_value ERROR_VARIABLE default_value_error GET ${cur_json} "default_value")
+    if(type_error STREQUAL "NOTFOUND" AND default_value_error STREQUAL "NOTFOUND")
+       # Leaf option found!
+       # Add an option in the struct based on its type
        if(option_type STREQUAL "double_vector")
-         string(APPEND option_struct "std::vector<double> ${member_name} = {${option_default_value}};\n")
+         string(APPEND options_struct "std::vector<double> ${member_name} = {${option_default_value}};\n")
        elseif(option_type STREQUAL "string")
-         string(APPEND option_struct "std::string ${member_name} = \"${option_default_value}\";\n")
+         string(APPEND options_struct "std::string ${member_name} = \"${option_default_value}\";\n")
        else()
-         string(APPEND option_struct "${option_type} ${member_name} = ${option_default_value};\n")
+         string(APPEND options_struct "${option_type} ${member_name} = ${option_default_value};\n")
        endif()
     else()
-      string(APPEND option_struct "struct ${member_name} {\n")
+      # Group found, add in the struct and recurse
+      string(APPEND options_struct "struct ${member_name} {\n")
       parse_json_option(${cur_json})
-      string(APPEND option_struct "\n} ${member_name};\n")
+      string(APPEND options_struct "\n} ${member_name};\n")
     endif()
   endforeach()
-  set(option_struct "${option_struct}" PARENT_SCOPE)
+  # Set struct in the parent before leaving the recursion
+  # Always use quotes as it contains semi-colons
+  set(options_struct "${options_struct}" PARENT_SCOPE)
 endfunction()
 
 # Parse options.json and generate headers
-set(option_struct "\
+
+## Option struct skeleton
+set(options_struct "\
 #ifndef f3d_options_struct_h
 #define f3d_options_struct_h
 
@@ -70,11 +80,12 @@ namespace f3d {
 struct options_struct {\n\
 ")
 
-## Read the .json file
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/options.json option_json)
-parse_json_option(${option_json})
-string(APPEND option_struct "\n};\n};\n#endif")
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/public/options_struct.h "${option_struct}")
+## TODO add file dependency
+## Read the .json file and complete the struct
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/options.json options_json)
+parse_json_option(${options_json})
+string(APPEND options_struct "\n};\n};\n#endif")
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/public/options_struct.h "${options_struct}")
 
 # Define libf3d target
 set(F3D_SOURCE_FILES
