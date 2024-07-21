@@ -10,4 +10,4 @@ __pycache__
 *.pyc
 _version.py
 .DS_Store
-
+node_modules

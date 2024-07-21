@@ -94,14 +94,14 @@
         options.set_color('render.background.color', 0, 0, 0);
 
         // setup coloring
-        options.set_string('model.scivis.array-name', 'Colors');
+        options.set_string('model.scivis.array_name', 'Colors');
         options.set_integer('model.scivis.component', -2);
         options.toggle('model.scivis.cells');
 
         // make it look nice
-        options.toggle('render.effect.anti-aliasing');
-        options.toggle('render.effect.tone-mapping');
-        options.toggle('render.effect.ambient-occlusion');
+        options.toggle('render.effect.anti_aliasing');
+        options.toggle('render.effect.tone_mapping');
+        options.toggle('render.effect.ambient_occlusion');
         options.toggle('render.hdri.ambient');
 
         // display widgets
@@ -109,7 +109,7 @@
         options.toggle('render.grid.enable');
 
         // default to +Z
-        options.set_string('scene.up-direction', '+Z');
+        options.set_string('scene.up_direction', '+Z');
       }
     };
 
@@ -166,9 +166,9 @@
 
         mapToggleIdToOption('grid', 'render.grid.enable');
         mapToggleIdToOption('axis', 'interactor.axis');
-        mapToggleIdToOption('fxaa', 'render.effect.anti-aliasing');
-        mapToggleIdToOption('tone', 'render.effect.tone-mapping');
-        mapToggleIdToOption('ssao', 'render.effect.ambient-occlusion');
+        mapToggleIdToOption('fxaa', 'render.effect.anti_aliasing');
+        mapToggleIdToOption('tone', 'render.effect.tone_mapping');
+        mapToggleIdToOption('ssao', 'render.effect.ambient_occlusion');
         mapToggleIdToOption('ambient', 'render.hdri.ambient');
 
         switchDark = () => {
@@ -198,7 +198,7 @@
         // up callback
         document.querySelector('#z-up')
           .addEventListener('click', (evt) => {
-            Module.engineInstance.getOptions().set_string('scene.up-direction', '+Z');
+            Module.engineInstance.getOptions().set_string('scene.up_direction', '+Z');
             document.getElementById('z-up').classList.add('is-active');
             document.getElementById('y-up').classList.remove('is-active');
             openFile(document.getElementById('file-name').innerHTML);
@@ -206,7 +206,7 @@
 
         document.querySelector('#y-up')
           .addEventListener('click', (evt) => {
-            Module.engineInstance.getOptions().set_string('scene.up-direction', '+Y');
+            Module.engineInstance.getOptions().set_string('scene.up_direction', '+Y');
             document.getElementById('y-up').classList.add('is-active');
             document.getElementById('z-up').classList.remove('is-active');
             openFile(document.getElementById('file-name').innerHTML);
