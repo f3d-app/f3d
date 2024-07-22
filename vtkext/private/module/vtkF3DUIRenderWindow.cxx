@@ -3,13 +3,24 @@
 #include <vtkObjectFactory.h>
 
 #include "imgui.h"
+
+//#define ogl_
+
+#ifdef ogl_
 #include "imgui_impl_opengl3.h"
+#else
+#include "imgui_impl_vtk.h"
+#endif
 
 vtkStandardNewMacro(vtkF3DUIRenderWindow);
 
 vtkF3DUIRenderWindow::~vtkF3DUIRenderWindow()
 {
+#ifdef ogl_
   ImGui_ImplOpenGL3_Shutdown();
+#else
+  ImGui_ImplVTK_Shutdown();
+#endif
 
   ImGuiIO& io = ImGui::GetIO();
   io.BackendPlatformName = io.BackendRendererName = nullptr;
@@ -32,7 +43,11 @@ void vtkF3DUIRenderWindow::OpenGLInitContext()
   io.BackendPlatformUserData = nullptr;
   io.BackendPlatformName = io.BackendRendererName = "imgui_impl_vtk";
 
+#ifdef ogl_
   ImGui_ImplOpenGL3_Init();
+#else
+  ImGui_ImplVTK_Init(this);
+#endif
 }
 
 void vtkF3DUIRenderWindow::BlitDisplayFramebuffersToHardware()
@@ -44,7 +59,11 @@ void vtkF3DUIRenderWindow::BlitDisplayFramebuffersToHardware()
   ImGuiIO& io = ImGui::GetIO();
   io.DisplaySize = ImVec2((float)this->Size[0], (float)this->Size[1]);
 
+#ifdef ogl_
   ImGui_ImplOpenGL3_NewFrame();
+#else
+  ImGui_ImplVTK_NewFrame();
+#endif
   ImGui::NewFrame();
 
   ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -67,5 +86,9 @@ void vtkF3DUIRenderWindow::BlitDisplayFramebuffersToHardware()
 
   ImGui::Render();
 
+#ifdef ogl_
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#else
+  ImGui_ImplVTK_RenderDrawData(ImGui::GetDrawData());
+#endif
 }

@@ -12,14 +12,18 @@ f3d_embed_file(
   BINARY)
 set(sources
   ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_opengl3.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_vtk.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.cxx)
 set(private_headers
   ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_opengl3.h
   ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_opengl3_loader.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_vtk.h
   ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
 
 set(shader_files
-  glsl/vtkF3DComputeDepthCS.glsl)
+  glsl/vtkF3DComputeDepthCS.glsl
+  glsl/vtkF3DImguiFS.glsl
+  glsl/vtkF3DImguiVS.glsl)
 
 foreach(file IN LISTS shader_files)
   vtk_encode_string(
