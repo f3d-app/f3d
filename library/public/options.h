@@ -175,70 +175,26 @@ public:
   options& operator=(options&& other) noexcept;
   ///@}
 
-  void setVariant(const std::string& name, option_variant_t value);
-  option_variant_t getVariant(const std::string& name);
-  void setString(const std::string& name, std::string value);
-  std::string getString(const std::string& name);
-
-  ///@{ @name Setters
   /**
-   * Setters for all supported types.
+   * Set/Get an option as a variant based on its name
+   * TODO error mgt
    */
-/*  options& set(const std::string& name, bool value);
-  options& set(const std::string& name, int value);
-  options& set(const std::string& name, double value);
-  options& set(const std::string& name, const std::string& value);
-  options& set(const std::string& name, const char* value);
-  options& set(const std::string& name, const std::vector<int>& values);
-  options& set(const std::string& name, const std::vector<double>& values);
-  options& set(const std::string& name, std::initializer_list<int> values);
-  options& set(const std::string& name, std::initializer_list<double> values);*/
-  ///@}
+  options& set(const std::string& name, option_variant_t value);
+  option_variant_t get(const std::string& name);
 
-  ///@{ @name Reference Getters
   /**
-   * Copy the option value into the provided reference, for all supported types.
+   * Set/Get an option as a string based on its name
+   * The setter use specific parsing, see the related doc TODO
+   * TODO error mgt
    */
-/*  void get(const std::string& name, bool& value) const;
-  void get(const std::string& name, int& value) const;
-  void get(const std::string& name, double& value) const;
-  void get(const std::string& name, std::string& value) const;
-  void get(const std::string& name, std::vector<int>& value) const;
-  void get(const std::string& name, std::vector<double>& value) const;*/
-  ///@}
-
-  ///@{ @name Explicit Copy Getters
-  /**
-   * Explicit getters for all supported types.
-   */
-/*  bool getAsBool(const std::string& name) const;
-  int getAsInt(const std::string& name) const;
-  double getAsDouble(const std::string& name) const;
-  std::string getAsString(const std::string& name) const;
-  std::vector<int> getAsIntVector(const std::string& name) const;
-  std::vector<double> getAsDoubleVector(const std::string& name) const;*/
-  ///@}
-
-  ///@{ @name Explicit Reference Getters
-  /**
-   * Explicit getters to actual reference to the options variable, for all supported types.
-   * Modifying the returned reference will modify the option.
-   * Throw an options::incompatible_exception if the type is not compatible with the option.
-   * Throw an options::inexistent_exception if option does not exist.
-   */
-/*  bool& getAsBoolRef(const std::string& name);
-  int& getAsIntRef(const std::string& name);
-  double& getAsDoubleRef(const std::string& name);
-  std::string& getAsStringRef(const std::string& name);
-  std::vector<int>& getAsIntVectorRef(const std::string& name);
-  std::vector<double>& getAsDoubleVectorRef(const std::string& name);*/
-  ///@}
+  options& setAsString(const std::string& name, std::string value);
+  std::string getAsString(const std::string& name);
 
   /**
    * A boolean option specific method to toggle it.
+   * TODO error mgt
    */
-/*  options& toggle(const std::string& name);
-  options& toggleNew(const std::string& name);*/
+  options& toggle(const std::string& name);
 
   /**
    * Compare an option between this and a provided other.
