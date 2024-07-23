@@ -34,6 +34,7 @@ configure_file(
   @ONLY)
 
 # TODO Move all this section to an installed CMake file
+# TODO Add a deprecation mechanism
 function(parse_json_option top_json)
   string(JSON options_length LENGTH ${top_json})
   MATH(EXPR options_length "${options_length} - 1")
