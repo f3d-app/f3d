@@ -51,13 +51,13 @@ function(parse_json_option top_json)
        set(option_name "${option_basename}${member_name}")
        # Add an option in the struct based on its type
        if(option_type STREQUAL "double_vector")
-         string(APPEND options_struct "std::vector<double> ${member_name} = {${option_default_value}};\n")
+         string(APPEND options_struct "${option_indent}  std::vector<double> ${member_name} = {${option_default_value}};\n")
          list(APPEND options_setter "if (name == \"${option_name}\") ostruct.${option_name} = std::get<std::vector<double>>(value)")
        elseif(option_type STREQUAL "string")
-         string(APPEND options_struct "std::string ${member_name} = \"${option_default_value}\";\n")
+         string(APPEND options_struct "${option_indent}  std::string ${member_name} = \"${option_default_value}\";\n")
          list(APPEND options_setter "if (name == \"${option_name}\") ostruct.${option_name} = std::get<std::string>(value)")
        else()
-         string(APPEND options_struct "${option_type} ${member_name} = ${option_default_value};\n")
+         string(APPEND options_struct "${option_indent}  ${option_type} ${member_name} = ${option_default_value};\n")
          list(APPEND options_setter "if (name == \"${option_name}\") ostruct.${option_name} = std::get<${option_type}>(value)")
        endif()
        list(APPEND options_getter "if (name == \"${option_name}\") var = ostruct.${option_name}")
@@ -65,10 +65,13 @@ function(parse_json_option top_json)
     else()
       # Group found, add in the struct and recurse
       set(option_prevname ${option_basename})
+      set(option_previndent ${option_indent})
+      string(APPEND option_indent "  ")
       string(APPEND option_basename "${member_name}.")
-      string(APPEND options_struct "struct ${member_name} {\n")
+      string(APPEND options_struct "${option_indent}struct ${member_name} {\n")
       parse_json_option(${cur_json})
-      string(APPEND options_struct "} ${member_name};\n\n")
+      string(APPEND options_struct "${option_indent}} ${member_name};\n\n")
+      set(option_indent ${option_previndent})
       set(option_basename ${option_prevname})
     endif()
   endforeach()
@@ -82,6 +85,7 @@ endfunction()
 
 # Parse options.json and generate headers
 set(option_basename "")
+set(option_indent "")
 
 ## TODO add file dependency
 ## Read the .json file and complete the struct
@@ -102,9 +106,9 @@ ${options_struct}};
 #endif
 ")
 
-list(JOIN options_setter ";\nelse " options_setter)
-list(JOIN options_getter ";\nelse " options_getter)
-list(JOIN options_lister ",\n" options_lister)
+list(JOIN options_setter ";\n  else " options_setter)
+list(JOIN options_getter ";\n  else " options_getter)
+list(JOIN options_lister ",\n  " options_lister)
 #TODO add error management
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/private/options_struct_internals.h "\
 #ifndef f3d_options_struct_internals_h
@@ -112,22 +116,20 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/private/options_struct_internals.h "\
 
 #include \"options_struct.h\"
 
-#include <string>
-
 namespace options_struct_internals {
 void set(f3d::options_struct& ostruct, const std::string& name, option_variant_t value){
-${options_setter};
+  ${options_setter};
 }
 
 option_variant_t get(const f3d::options_struct& ostruct, const std::string& name){
   option_variant_t var;
-${options_getter};
+  ${options_getter};
   return var;
 }
 
 std::vector<std::string> getNames() {
   std::vector<std::string> vec{
-${options_lister}
+  ${options_lister}
   };
   return vec;
 }
