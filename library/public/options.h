@@ -13,146 +13,6 @@
 
 namespace f3d
 {
-/*
-// TODO GENERATE
-struct options_struct {
-  struct scene_t {
-  std::string up_direction = "+Y";
-  struct animation_t {
-    bool autoplay = false;
-    int index = 0;
-    double speed_factor = 1.0;
-    double time = 0.0;
-    double frame_rate = 60.0;
-  };
-  animation_t animation;
-  struct camera_t {
-    int index = -1;
-    bool orthographic = false;
-  };
-  camera_t camera;
-  };
- scene_t scene;
-
- struct render_t {
-   bool show_edges = false;
-   double line_width = 1.0;
-   double point_size = 10.0;
-   std::string backface_type = "default";
-   struct grid_t {
-     bool enable = false;
-     bool absolute = false;
-     double unit = 0.0;
-     int subdivisions = 10;
-     std::vector<double> color = {0.0, 0.0, 0.0};
-   };
-   grid_t grid;
-   struct raytracing_t {
-     bool enable = false;
-     bool denoise = false;
-     int samples = 5;
-   };
-   raytracing_t raytracing;
-   struct effect_t {
-     bool translucency_support = false;
-     bool anti_aliasing = false;
-     bool ambient_occlusion = false;
-     bool tone_mapping = false;
-     std::string final_shader;
-   };
-   effect_t effect;
-   struct hdri_t {
-     std::string file;
-     bool ambient = false;
-   };
-   hdri_t hdri;
-   struct background_t {
-     std::vector<double> color{ 0.2, 0.2, 0.2 };
-     bool skybox = false;
-     bool blur = false;
-     double blur_coc = 20.0;
-   };
-   background_t background;
-   struct light_t {
-     double intensity = 1.0;
-   };
-   light_t light;
- };
- render_t render;
-
- struct ui_t {
-   bool scalar_bar = false;
-   bool filename = false;
-   std::string filename_info;
-   bool fps = false;
-   bool cheatsheet = false;
-   bool dropzone = false;
-   std::string dropzone_info;
-   bool metadata = false;
-   std::string font_file;
-   bool loader_progress = false;
-   bool animation_progress = false;
- };
- ui_t ui;
-
- struct model_t {
-   struct matcap_t {
-     std::string texture;
-   };
-   matcap_t matcap;
-   struct color_t {
-     double opacity = 1.0;
-     std::vector<double> rgb = { 1.0, 1.0, 1.0 };
-     std::string texture;
-   };
-   color_t color;
-   struct emissive_t {
-     std::vector<double> factor = { 1.0, 1.0, 1.0 };
-     std::string texture;
-   };
-   emissive_t emissive;
-   struct normal_t {
-     double scale = 1.0;
-     std::string texture;
-   };
-   normal_t normal;
-   struct material_t {
-     double metallic = 0.0;
-     double roughness = 0.3;
-     std::string texture;
-   };
-   material_t material;
-   struct scivis_t {
-     bool cells = false;
-     std::string array_name = "f3d_reserved";
-     int component = -1;
-     std::vector<double> colormap = std::vector<double>{
-      0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 };
-     std::vector<double> range = std::vector<double>{ 0 };
-   };
-   scivis_t scivis;
-   struct point_sprites_t {
-     bool enable = false;
-     std::string type = "sphere";
-   };
-   point_sprites_t point_sprites;
-   struct volume_t {
-     bool enable = false;
-     bool inverse = false;
-   };
-   volume_t volume;
- };
- model_t model;
-
- struct interactor_t {
-   bool axis = false;
-   bool trackball = false;
-   bool invert_zoom = false;
- };
- interactor_t interactor;
-
-};*/
-
 /**
  * @class   options
  * @brief   Class used to control the different options
@@ -177,7 +37,7 @@ public:
 
   /**
    * Set/Get an option as a variant based on its name
-   * TODO error mgt
+   * Throw an options::inexistent_exception if option does not exist.
    */
   options& set(const std::string& name, option_variant_t value);
   option_variant_t get(const std::string& name);
@@ -185,14 +45,15 @@ public:
   /**
    * Set/Get an option as a string based on its name
    * The setter use specific parsing, see the related doc TODO
-   * TODO error mgt
+   * Throw an options::inexistent_exception if option does not exist.
    */
-  options& setAsString(const std::string& name, std::string value);
+  options& setAsString(const std::string& name, std::string str);
   std::string getAsString(const std::string& name);
 
   /**
    * A boolean option specific method to toggle it.
-   * TODO error mgt
+   * Throw an options::inexistent_exception if option does not exist.
+   * Throw an options::incompatible_exception if option is not boolean.
    */
   options& toggle(const std::string& name);
 
@@ -221,7 +82,16 @@ public:
 
   /**
    * An exception that can be thrown by the options
-   * when a provided option type is incompatible with
+   * when parsing of a string into an option value fails
+   */
+  struct parsing_exception : public exception
+  {
+    explicit parsing_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by the options
+   * when an operation on a specific option is incompatible with
    * its internal type.
    */
   struct incompatible_exception : public exception

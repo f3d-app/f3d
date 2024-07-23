@@ -114,21 +114,23 @@ ${options_struct}};
 list(JOIN options_setter ";\n  else " options_setter)
 list(JOIN options_getter ";\n  else " options_getter)
 list(JOIN options_lister ",\n  " options_lister)
-#TODO add error management
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/private/options_struct_internals.h "\
 #ifndef f3d_options_struct_internals_h
 #define f3d_options_struct_internals_h
 
 #include \"options_struct.h\"
+#include \"options.h\"
 
 namespace options_struct_internals {
 void set(f3d::options_struct& ostruct, const std::string& name, option_variant_t value){
   ${options_setter};
+  else throw f3d::options::inexistent_exception(\"Option \" + name + \" does not exist\");
 }
 
 option_variant_t get(const f3d::options_struct& ostruct, const std::string& name){
   option_variant_t var;
   ${options_getter};
+  else throw f3d::options::inexistent_exception(\"Option \" + name + \" does not exist\");
   return var;
 }
 
