@@ -322,7 +322,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     std::vector<std::string> keys = options.getNames();
     for (const std::string& key : keys)
     {
-      libArgs[key] = options.getString(key);
+      libArgs[key] = options.getAsString(key);
     }
     
     cxxopts::Options cxxOptions(this->ExecutableName, F3D::AppTitle);
@@ -449,7 +449,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
       auto result = cxxOptions.parse(this->Argc, this->Argv);
       for(auto [key,val] : libArgs)
       {
-        options.setString(key, val);
+        options.setAsString(key, val);
       }
       auto unmatched = result.unmatched();
       bool found_unknown_option = false;
@@ -522,7 +522,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
       cxxOptions.parse(1, nullptr);
       for(auto [key,val] : libArgs)
       {
-        options.setString(key, val);
+        options.setAsString(key, val);
       }
     }
   }
