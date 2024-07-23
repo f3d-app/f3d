@@ -39,6 +39,15 @@ struct F3D_EXPORT vector3_t : std::array<double, 3>
  */
 using angle_deg_t = double;
 
+class ratio_t
+{
+public:
+  ratio_t(double val){this->Value = val;}
+  operator double() const {return this->Value;}
+private:
+  double Value;
+};
+
 /**
  * Describe a 3D surfacic mesh.
  * A valid mesh fulfills these requirements:
@@ -68,6 +77,7 @@ struct mesh_t
 using option_variant_t = std::variant<
   bool,
   double,
+  f3d::ratio_t,
   int,
   std::string,
   std::vector<double>

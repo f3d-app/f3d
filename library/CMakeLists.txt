@@ -56,6 +56,9 @@ function(parse_json_option top_json)
        elseif(option_type STREQUAL "string")
          string(APPEND options_struct "${option_indent}  std::string ${member_name} = \"${option_default_value}\";\n")
          list(APPEND options_setter "if (name == \"${option_name}\") ostruct.${option_name} = std::get<std::string>(value)")
+       elseif(option_type STREQUAL "ratio")
+	 string(APPEND options_struct "${option_indent}  f3d::ratio_t ${member_name} = f3d::ratio_t(${option_default_value});\n")
+         list(APPEND options_setter "if (name == \"${option_name}\") ostruct.${option_name} = std::get<f3d::ratio_t>(value)")
        else()
          string(APPEND options_struct "${option_indent}  ${option_type} ${member_name} = ${option_default_value};\n")
          list(APPEND options_setter "if (name == \"${option_name}\") ostruct.${option_name} = std::get<${option_type}>(value)")
@@ -95,6 +98,8 @@ parse_json_option(${options_json})
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/public/options_struct.h "\
 #ifndef f3d_options_struct_h
 #define f3d_options_struct_h
+
+#include \"types.h\"
 
 #include <vector>
 #include <string>
