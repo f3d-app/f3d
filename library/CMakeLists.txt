@@ -33,6 +33,7 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx"
   @ONLY)
 
+# TODO Move all this section to an installed CMake file
 function(parse_json_option top_json)
   string(JSON options_length LENGTH ${top_json})
   MATH(EXPR options_length "${options_length} - 1")
@@ -50,15 +51,15 @@ function(parse_json_option top_json)
        # Add an option in the struct based on its type
        if(option_type STREQUAL "double_vector")
          string(APPEND options_struct "std::vector<double> ${member_name} = {${option_default_value}};\n")
-         string(APPEND options_setter "if (name == \"${option_name}\") ostruct.${option_name} = std::get<std::vector<double>>(value);\n")
+         list(APPEND options_setter "if (name == \"${option_name}\") ostruct.${option_name} = std::get<std::vector<double>>(value)")
        elseif(option_type STREQUAL "string")
          string(APPEND options_struct "std::string ${member_name} = \"${option_default_value}\";\n")
-         string(APPEND options_setter "if (name == \"${option_name}\") ostruct.${option_name} = std::get<std::string>(value);\n")
+         list(APPEND options_setter "if (name == \"${option_name}\") ostruct.${option_name} = std::get<std::string>(value)")
        else()
          string(APPEND options_struct "${option_type} ${member_name} = ${option_default_value};\n")
-         string(APPEND options_setter "if (name == \"${option_name}\") ostruct.${option_name} = std::get<${option_type}>(value);\n")
+         list(APPEND options_setter "if (name == \"${option_name}\") ostruct.${option_name} = std::get<${option_type}>(value)")
        endif()
-       string(APPEND options_getter "if (name == \"${option_name}\") var = ostruct.${option_name};\n")
+       list(APPEND options_getter "if (name == \"${option_name}\") var = ostruct.${option_name}")
        list(APPEND options_lister "\"${option_name}\"")
     else()
       # Group found, add in the struct and recurse
@@ -66,22 +67,27 @@ function(parse_json_option top_json)
       string(APPEND option_basename "${member_name}.")
       string(APPEND options_struct "struct ${member_name} {\n")
       parse_json_option(${cur_json})
-      string(APPEND options_struct "\n} ${member_name};\n")
+      string(APPEND options_struct "} ${member_name};\n\n")
       set(option_basename ${option_prevname})
     endif()
   endforeach()
-  # Set appended variables in the parent before leaving the recursion
-  # Always use quotes as it contains semi-colons
+  # Set appended variables and list in the parent before leaving the recursion
+  # Always use quotes for string variable as it contains semi-colons
   set(options_struct "${options_struct}" PARENT_SCOPE)
-  set(options_setter "${options_setter}" PARENT_SCOPE)
-  set(options_getter "${options_getter}" PARENT_SCOPE)
+  set(options_setter ${options_setter} PARENT_SCOPE)
+  set(options_getter ${options_getter} PARENT_SCOPE)
   set(options_lister ${options_lister} PARENT_SCOPE)
 endfunction()
 
 # Parse options.json and generate headers
+set(option_basename "")
 
-## Option struct skeleton
-set(options_struct "\
+## TODO add file dependency
+## Read the .json file and complete the struct
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/options.json options_json)
+parse_json_option(${options_json})
+
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/public/options_struct.h "\
 #ifndef f3d_options_struct_h
 #define f3d_options_struct_h
 
@@ -90,30 +96,15 @@ set(options_struct "\
 
 namespace f3d {
 struct options_struct {
+${options_struct}};
+};
+#endif
 ")
 
-set(options_setter "\
-void set(f3d::options_struct& ostruct, const std::string& name, option_variant_t value){
-")
-
-set(options_getter "\
-option_variant_t get(const f3d::options_struct& ostruct, const std::string& name){
-option_variant_t var;
-")
-
-set(option_basename "")
-
-## TODO add file dependency
-## Read the .json file and complete the struct
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/options.json options_json)
-parse_json_option(${options_json})
-string(APPEND options_struct "\n};\n};\n#endif")
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/public/options_struct.h "${options_struct}")
-
-string(APPEND options_setter "}\n")
-string(APPEND options_getter "return var;\n}\n")
-
+list(JOIN options_setter ";\nelse " options_setter)
+list(JOIN options_getter ";\nelse " options_getter)
 list(JOIN options_lister ",\n" options_lister)
+#TODO add error management
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/private/options_struct_internals.h "\
 #ifndef f3d_options_struct_internals_h
 #define f3d_options_struct_internals_h
@@ -123,8 +114,15 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/private/options_struct_internals.h "\
 #include <string>
 
 namespace options_struct_internals {
-${options_setter}
-${options_getter}
+void set(f3d::options_struct& ostruct, const std::string& name, option_variant_t value){
+${options_setter};
+}
+
+option_variant_t get(const f3d::options_struct& ostruct, const std::string& name){
+  option_variant_t var;
+${options_getter};
+  return var;
+}
 
 std::vector<std::string> getNames() {
   std::vector<std::string> vec{
