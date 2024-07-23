@@ -23,48 +23,131 @@ namespace f3d
 class options::internals
 {
 public:
-  void setAsString(const std::string& name, std::string value)
+  void parse(std::string str, bool& value)
+  {
+    // TODO implement proper parsing
+    bool b1;
+    bool b2;
+    std::istringstream(str) >> b1;
+    std::istringstream(str) >> std::boolalpha >> b2;
+    value = b1 || b2;
+  }
+
+  void parse(std::string str, int& value)
+  {
+    // TODO implement proper parsing
+    try
+    {
+      value = std::stoi(str);
+    }
+    catch (std::invalid_argument const& ex)
+    {
+      throw options::parsing_exception("Cannot parse " + str + " into an int");
+    }
+    catch (std::out_of_range const& ex)
+    {
+      throw options::parsing_exception("Cannot parse " + str + " into an int as it would go out of range");
+    }
+  }
+
+  void parse(std::string str, double& value)
+  {
+    // TODO implement proper parsing
+    try
+    {
+      value = std::stod(str);
+    }
+    catch (std::invalid_argument const& ex)
+    {
+      throw options::parsing_exception("Cannot parse " + str + " into a double");
+    }
+    catch (std::out_of_range const& ex)
+    {
+      throw options::parsing_exception("Cannot parse " + str + " into a double as it would go out of range");
+    }
+  }
+
+  void parse(std::string str, ratio_t& value)
+  {
+    // TODO implement proper parsing
+    try
+    {
+      value = std::stod(str);
+    }
+    catch (std::invalid_argument const& ex)
+    {
+      throw options::parsing_exception("Cannot parse " + str + " into a ratio");
+    }
+    catch (std::out_of_range const& ex)
+    {
+      throw options::parsing_exception("Cannot parse " + str + " into a ratio as it would go out of double range");
+    }
+  }
+
+  void parse(std::string str, std::string& value)
+  {
+    value = str;
+  }
+
+  void parse(std::string str, std::vector<double>& value)
+  {
+    // TODO implement proper parsing
+    try
+    {
+      std::istringstream split(str);
+      value.clear();
+      for (std::string each; std::getline(split, each, ','); value.push_back(std::stod(each)));
+    }
+    catch (std::invalid_argument const& ex)
+    {
+      throw options::parsing_exception("Cannot parse " + str + " into a double vector");
+    }
+    catch (std::out_of_range const& ex)
+    {
+      throw options::parsing_exception("Cannot parse " + str + " into a double vector as it would go out of double range");
+    }
+  }
+
+  void setAsString(const std::string& name, std::string str)
   {
     option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
+
+    // TODO Use std::visit ?
     if (std::holds_alternative<bool>(var))
     {
-      // TODO implement proper parsing
-      bool b1;
-      bool b2;
-      std::istringstream(value) >> b1;
-      std::istringstream(value) >> std::boolalpha >> b2;
-      var = b1 || b2;
+      bool value;
+      this->parse(str, value);
+      var = value;
     }
-    if (std::holds_alternative<int>(var))
+    else if (std::holds_alternative<int>(var))
     {
-      // TODO implement proper parsing
-      var = std::stoi(value);
+      int value;
+      this->parse(str, value);
+      var = value;
     }
     else if (std::holds_alternative<double>(var))
     {
-      // TODO implement proper parsing
-      var = std::stod(value);
+      double value;
+      this->parse(str, value);
+      var = value;
     }
     else if (std::holds_alternative<ratio_t>(var))
     {
-      // TODO implement proper parsing
-      var = ratio_t(std::stod(value));
+      ratio_t value(0);
+      this->parse(str, value);
+      var = value;
     }
     else if (std::holds_alternative<std::string>(var))
     {
+      std::string value;
+      this->parse(str, value);
       var = value;
     }
     else if (std::holds_alternative<std::vector<double>>(var))
     {
-      // TODO implement proper parsing
-      std::istringstream split(value);
-      std::vector<double>& vec = std::get<std::vector<double>>(var);
-      vec.clear();
-      for (std::string each; std::getline(split, each, ','); vec.push_back(std::stod(each)));
-    }
-    else
-    {
-      // TODO implement error mgt
+      std::vector<double> value;
+      this->parse(str, value);
+      var = value;
     }
     options_struct_internals::set(this->OptionsStruct, name, var);
   }
@@ -79,7 +162,7 @@ public:
       {
         str = std::to_string(std::get<bool>(var));
       }
-      if (std::holds_alternative<int>(var))
+      else if (std::holds_alternative<int>(var))
       {
         str = std::to_string(std::get<int>(var));
       }
@@ -107,10 +190,6 @@ public:
         }
         stream << '\n';
         str = stream.str();
-      }
-      else
-      {
-        // TODO implement error mgt
       }
     }
     catch (const std::bad_variant_access&)
@@ -183,9 +262,9 @@ option_variant_t options::get(const std::string& name)
 }
 
 //----------------------------------------------------------------------------
-options& options::setAsString(const std::string& name, std::string value)
+options& options::setAsString(const std::string& name, std::string str)
 {
-  this->Internals->setAsString(name, value);
+  this->Internals->setAsString(name, str);
   return *this;
 }
 
@@ -198,42 +277,30 @@ std::string options::getAsString(const std::string& name)
 //----------------------------------------------------------------------------
 options& options::toggle(const std::string& name)
 {
-  option_variant_t val;
-  val = this->get(name);
-  this->set(name, !std::get<bool>(val));
-  return *this; 
+  try
+  {
+    option_variant_t val;
+    val = this->get(name);
+    this->set(name, !std::get<bool>(val));
+    return *this;
+  }
+  catch (const std::bad_variant_access&)
+  {
+    throw options::incompatible_exception(
+      "Trying to get toggle " + name + " with incompatible type");
+  }
 }
 
 //----------------------------------------------------------------------------
 bool options::isSame(const options& other, const std::string& name) const
 {
-  try
-  {
-    return options_struct_internals::get(this->Internals->OptionsStruct, name) == options_struct_internals::get(other.Internals->OptionsStruct, name);
-  }
-  catch (const std::out_of_range&)
-  {
-    // TODO error mgt
-    std::string error = "Options " + name + " does not exist";
-    log::error(error);
-    throw options::inexistent_exception(error + "\n");
-  }
+  return options_struct_internals::get(this->Internals->OptionsStruct, name) == options_struct_internals::get(other.Internals->OptionsStruct, name);
 }
 
 //----------------------------------------------------------------------------
 options& options::copy(const options& from, const std::string& name)
 {
-  try
-  {
-    options_struct_internals::set(this->Internals->OptionsStruct, name, options_struct_internals::get(from.Internals->OptionsStruct, name));
-  }
-  catch (const std::out_of_range&)
-  {
-    // TODO error mgt
-    std::string error = "Options " + name + " does not exist";
-    log::error(error);
-    throw options::inexistent_exception(error + "\n");
-  }
+  options_struct_internals::set(this->Internals->OptionsStruct, name, options_struct_internals::get(from.Internals->OptionsStruct, name));
   return *this;
 }
 
@@ -264,6 +331,12 @@ std::pair<std::string, unsigned int> options::getClosestOption(const std::string
   }
 
   return ret;
+}
+
+//----------------------------------------------------------------------------
+options::parsing_exception::parsing_exception(const std::string& what)
+  : exception(what)
+{
 }
 
 //----------------------------------------------------------------------------
