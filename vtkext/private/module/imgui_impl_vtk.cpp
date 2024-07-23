@@ -10,6 +10,8 @@
 #include <vtkOpenGLVertexArrayObject.h>
 #include <vtkShader.h>
 #include <vtkShaderProgram.h>
+#include <vtkCallbackCommand.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtk_glew.h>
 
 #include "vtkF3DImguiFS.h"
@@ -214,6 +216,62 @@ void ImGui_ImplVTK_NewFrame()
 
     int* size = bd->RenderWindow->GetSize();
     io.DisplaySize = ImVec2((float)size[0], (float)size[1]);
+}
+
+void ImGui_ImplVTK_AddObservers(vtkRenderWindowInteractor* interactor)
+{
+    vtkNew<vtkCallbackCommand> mouseMoveCB;
+    mouseMoveCB->SetClientData(interactor);
+    mouseMoveCB->PassiveObserverOn();
+    mouseMoveCB->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void* callData)
+      {
+        vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(clientData);
+
+        int sz[2];
+        int p[2];
+        that->GetEventPosition(p);
+        that->GetSize(sz);
+        ImGuiIO& io = ImGui::GetIO();
+        std::cout << p[0] << " " << p[1] << std::endl;
+        io.AddMousePosEvent(static_cast<float>(p[0]), static_cast<float>(sz[1] - p[1] - 1));
+        
+        // calling Frame() here instead of Render() refresh only the UI
+        that->GetRenderWindow()->Frame();
+      });
+    interactor->AddObserver(vtkCommand::MouseMoveEvent, mouseMoveCB);
+
+    vtkNew<vtkCallbackCommand> mouseleftpressCB;
+    mouseleftpressCB->SetClientData(interactor);
+    mouseleftpressCB->PassiveObserverOn();
+    mouseleftpressCB->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void* callData)
+      {
+        vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(clientData);
+
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseButtonEvent(ImGuiMouseButton_Left, true);
+
+        // calling Frame() here instead of Render() refresh only the UI
+        that->GetRenderWindow()->Frame();
+      });
+    interactor->AddObserver(vtkCommand::LeftButtonPressEvent, mouseleftpressCB);
+
+    vtkNew<vtkCallbackCommand> mouseleftreleaseCB;
+    mouseleftreleaseCB->SetClientData(interactor);
+    mouseleftreleaseCB->PassiveObserverOn();
+    mouseleftreleaseCB->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void* callData)
+      {
+        vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(clientData);
+
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseButtonEvent(ImGuiMouseButton_Left, false);
+
+        // calling Frame() here instead of Render() refresh only the UI
+        that->GetRenderWindow()->Frame();
+      });
+    interactor->AddObserver(vtkCommand::LeftButtonReleaseEvent, mouseleftreleaseCB, 1.f);
 }
 
 //-----------------------------------------------------------------------------

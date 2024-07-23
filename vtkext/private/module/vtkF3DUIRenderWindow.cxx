@@ -1,5 +1,8 @@
 #include "vtkF3DUIRenderWindow.h"
 
+#include "vtkF3DRenderer.h"
+#include "vtkRendererCollection.h"
+
 #include <vtkObjectFactory.h>
 
 #include "imgui.h"
@@ -39,6 +42,16 @@ void vtkF3DUIRenderWindow::OpenGLInitContext()
   ImGuiIO& io = ImGui::GetIO();
   IM_ASSERT(io.BackendPlatformUserData == nullptr && "Already initialized a platform backend!");
 
+  io.Fonts->Clear();
+  io.Fonts->AddFontFromFileTTF("/home/michael/dev/f3d/resources/Inter-Regular.ttf", 16);
+  io.Fonts->Build();
+
+  ImGuiStyle* style = &ImGui::GetStyle();
+  style->GrabRounding = 4.0f;
+  style->WindowRounding = 8.f;
+  style->WindowBorderSize = 0.f;
+  style->WindowPadding = ImVec2(10, 10);
+
   // Setup backend capabilities flags
   io.BackendPlatformUserData = nullptr;
   io.BackendPlatformName = io.BackendRendererName = "imgui_impl_vtk";
@@ -52,8 +65,6 @@ void vtkF3DUIRenderWindow::OpenGLInitContext()
 
 void vtkF3DUIRenderWindow::BlitDisplayFramebuffersToHardware()
 {
-  std::cout << "blit!\n";
-
   this->Superclass::BlitDisplayFramebuffersToHardware();
 
   ImGuiIO& io = ImGui::GetIO();
@@ -66,21 +77,55 @@ void vtkF3DUIRenderWindow::BlitDisplayFramebuffersToHardware()
 #endif
   ImGui::NewFrame();
 
-  ImGui::SetNextWindowPos(ImVec2(0, 0));
-  ImGui::SetNextWindowSize(ImVec2(300, 300));
+  int marginLeft = 20;
+  int marginTB = 30;
+  ImGui::SetNextWindowPos(ImVec2(marginLeft, marginTB));
+  ImGui::SetNextWindowSize(ImVec2(300, this->Size[1] - 2 * marginTB - 1));
 
-  bool opened = true;
-  ImGui::Begin("Cheatsheet !", &opened);
+  ImGui::Begin("Cheatsheet", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
-  if (ImGui::Button("Enable Grid", ImVec2(280, 20)))
-  {
-    std::cout << "click!" << std::endl;
-  }
+  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->Renderers->GetFirstRenderer());
 
-  if (ImGui::Button("Enable Depth Peeling", ImVec2(280, 20)))
-  {
-    std::cout << "click!" << std::endl;
-  }
+  auto b = [](bool v) { return v ? "ON" : "OFF"; };
+
+  ImGui::Button("test");
+
+  ImGui::SeparatorText("Options");
+  ImGui::Text("W: Cycle animation [%s]", "N/A");
+  ImGui::Text("P: Translucency support [%s]", b(true));
+  ImGui::Text("Q: Ambient occlusion [%s]", b(true));
+  ImGui::Text("A: Anti-aliasing [%s]", b(true));
+  ImGui::Text("T: Tone mapping [%s]", b(true));
+  ImGui::Text("E: Edge visibility [%s]", b(true));
+  ImGui::Text("X: Axis [%s]", b(true));
+  ImGui::Text("G: Grid [%s]", b(true));
+  ImGui::Text("N: File name [%s]", b(true));
+  ImGui::Text("M: Metadata [%s]", b(true));
+  ImGui::Text("Z: FPS Timer [%s]", b(true));
+  ImGui::Text("U: Blur background [%s]", b(true));
+  ImGui::Text("K: Trackball interaction [%s]", b(true));
+  ImGui::Text("F: HDRI ambient lighting [%s]", b(true));
+  ImGui::Text("J: HDRI skybox [%s]", b(true));
+  ImGui::Text("L: Light (increase, shift+L: decrease) [%.2f]", 1.f);
+
+  ImGui::SeparatorText("Hotkeys");
+  ImGui::Text("H: Cheat sheet");
+  ImGui::Text("?: Print scene descr to terminal");
+  ImGui::Text("ESC : Quit ");
+  ImGui::Text("SPACE: Play animation if any");
+  ImGui::Text("LEFT : Previous file ");
+  ImGui::Text("RIGHT: Next file ");
+  ImGui::Text("UP  : Reload current file ");
+  ImGui::Text("DOWN : Add files from dir of current file");
+  ImGui::Text("ENTER: Reset camera to initial parameters");
+  ImGui::Text("Drop  : Load dropped file, folder or HDRI");
+
+  ImGui::SeparatorText("Camera");
+  ImGui::Text("1: Front View camera");
+  ImGui::Text("3: Right View camera");
+  ImGui::Text("5: Toggle Orthographic Projection [%s]", b(false));
+  ImGui::Text("7: Top View camera");
+  ImGui::Text("9: Isometric View camera");
 
   ImGui::End();
 
