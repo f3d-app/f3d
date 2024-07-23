@@ -59,7 +59,7 @@ function(parse_json_option top_json)
          string(APPEND options_setter "if (name == \"${option_name}\") ostruct.${option_name} = std::get<${option_type}>(value);\n")
        endif()
        string(APPEND options_getter "if (name == \"${option_name}\") var = ostruct.${option_name};\n")
-       string(APPEND options_lister "\"${option_name}\",\n")
+       list(APPEND options_lister "\"${option_name}\"")
     else()
       # Group found, add in the struct and recurse
       set(option_prevname ${option_basename})
@@ -75,7 +75,7 @@ function(parse_json_option top_json)
   set(options_struct "${options_struct}" PARENT_SCOPE)
   set(options_setter "${options_setter}" PARENT_SCOPE)
   set(options_getter "${options_getter}" PARENT_SCOPE)
-  set(options_lister "${options_lister}" PARENT_SCOPE)
+  set(options_lister ${options_lister} PARENT_SCOPE)
 endfunction()
 
 # Parse options.json and generate headers
@@ -101,11 +101,6 @@ option_variant_t get(const f3d::options_struct& ostruct, const std::string& name
 option_variant_t var;
 ")
 
-set(options_lister "\
-std::vector<std::string> getNames() {
-std::vector<std::string> vec{
-")
-
 set(option_basename "")
 
 ## TODO add file dependency
@@ -118,20 +113,25 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/public/options_struct.h "${options_struct
 string(APPEND options_setter "}\n")
 string(APPEND options_getter "return var;\n}\n")
 
-#string(LENGTH "${options_lister}" options_lister_length)
-#MATH(EXPR options_lister_length "${options_lister_length} - 1")
-#string(SUBSTRING "${options_lister}" 0 ${options_lister_length} options_lister)
-string(APPEND options_lister "};\nreturn vec;\n}\n")
+list(JOIN options_lister ",\n" options_lister)
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/private/options_struct_internals.h "\
 #ifndef f3d_options_struct_internals_h
 #define f3d_options_struct_internals_h
 
 #include \"options_struct.h\"
 
+#include <string>
+
 namespace options_struct_internals {
 ${options_setter}
 ${options_getter}
+
+std::vector<std::string> getNames() {
+  std::vector<std::string> vec{
 ${options_lister}
+  };
+  return vec;
+}
 }
 #endif
 ")
