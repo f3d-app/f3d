@@ -45,6 +45,11 @@ public:
       // TODO implement proper parsing
       var = std::stod(value);
     }
+    else if (std::holds_alternative<ratio_t>(var))
+    {
+      // TODO implement proper parsing
+      var = ratio_t(std::stod(value));
+    }
     else if (std::holds_alternative<std::string>(var))
     {
       var = value;
@@ -81,6 +86,10 @@ public:
       else if (std::holds_alternative<double>(var))
       {
         str = std::to_string(std::get<double>(var));
+      }
+      else if (std::holds_alternative<ratio_t>(var))
+      {
+        str = std::to_string(std::get<ratio_t>(var));
       }
       else if (std::holds_alternative<std::string>(var))
       {

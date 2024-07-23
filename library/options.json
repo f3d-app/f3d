@@ -14,7 +14,7 @@
         "default_value": "0"
       },
       "speed_factor": {
-        "type": "double",
+        "type": "ratio",
         "default_value": "1.0"
       },
       "time": {
