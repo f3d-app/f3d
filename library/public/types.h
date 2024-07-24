@@ -42,6 +42,7 @@ using angle_deg_t = double;
 class ratio_t
 {
 public:
+  ratio_t() = default;
   ratio_t(double val){this->Value = val;}
   operator double() const {return this->Value;}
 private:
