@@ -124,7 +124,7 @@ public:
     loader_impl::internals::ProgressDataStruct callbackData;
     callbackData.timer = timer;
     callbackData.widget = progressWidget;
-    const options_struct& optionsStruct = this->Options.getConstStruct();
+    const options_struct& optionsStruct = this->Options.getStruct();
     if (optionsStruct.ui.loader_progress && this->Interactor)
     {
       loader_impl::internals::CreateProgressRepresentationAndCallback(
@@ -286,7 +286,7 @@ loader& loader_impl::loadScene(const std::string& filePath)
   this->Internals->CurrentFullSceneImporter->SetRenderWindow(
     this->Internals->Window.GetRenderWindow());
 
-  const options_struct& optionsStruct = this->Internals->Options.getConstStruct();
+  const options_struct& optionsStruct = this->Internals->Options.getStruct();
   int cameraIndex = optionsStruct.scene.camera.index;
   this->Internals->CurrentFullSceneImporter->SetCamera(cameraIndex);
 

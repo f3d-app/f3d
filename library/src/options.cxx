@@ -309,7 +309,7 @@ options_struct& options::getStruct()
 }
 
 //----------------------------------------------------------------------------
-const options_struct& options::getConstStruct() const
+const options_struct& options::getStruct() const
 {
   return this->Internals->OptionsStruct;
 }

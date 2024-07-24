@@ -311,7 +311,7 @@ window_impl::~window_impl()
 void window_impl::Initialize(bool withColoring)
 {
   this->Internals->WithColoring = withColoring;
-  this->Internals->Renderer->Initialize(this->Internals->Options.getConstStruct().scene.up_direction);
+  this->Internals->Renderer->Initialize(this->Internals->Options.getStruct().scene.up_direction);
   this->Internals->UpdateTheme();
   this->Internals->Initialized = true;
 }
@@ -338,7 +338,7 @@ void window_impl::UpdateDynamicOptions()
   // Make sure lights are created before we take options into account
   this->Internals->Renderer->UpdateLights();
 
-  auto optionsStruct = this->Internals->Options.getConstStruct();
+  auto optionsStruct = this->Internals->Options.getStruct();
   this->Internals->Renderer->ShowAxis(optionsStruct.interactor.axis);
   this->Internals->Renderer->SetUseTrackball(optionsStruct.interactor.trackball);
   this->Internals->Renderer->SetInvertZoom(optionsStruct.interactor.invert_zoom);
