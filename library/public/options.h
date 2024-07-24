@@ -109,7 +109,7 @@ public:
   };
 
   options_struct& getStruct();
-  const options_struct& getConstStruct() const;
+  const options_struct& getStruct() const;
 
 private:
   class internals;

@@ -28,7 +28,7 @@ bool animationManager::Initialize(
   this->Interactor = interactor;
   this->Window = window;
   this->Importer = importer;
-  const options_struct& optionsStruct = options->getConstStruct();
+  const options_struct& optionsStruct = options->getStruct();
 
   // This can be -1 if animation support is not implemented in the importer
   this->AvailAnimations = this->Importer->GetNumberOfAnimations();
@@ -161,7 +161,7 @@ void animationManager::StopAnimation()
 //----------------------------------------------------------------------------
 void animationManager::ToggleAnimation()
 {
-  const options_struct& optionsStruct = this->Options->getConstStruct();
+  const options_struct& optionsStruct = this->Options->getStruct();
   if (this->HasAnimation && this->Interactor)
   {
     this->Playing = !this->Playing;
@@ -211,7 +211,7 @@ void animationManager::Tick()
 
   // Convert to a usable time in seconds
   double elapsedTime = static_cast<double>(timeInMS) / 1000.0;
-  const options_struct& optionsStruct = this->Options->getConstStruct();
+  const options_struct& optionsStruct = this->Options->getStruct();
   double animationSpeedFactor = optionsStruct.scene.animation.speed_factor;
 
   // elapsedTime can be negative
