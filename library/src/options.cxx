@@ -23,7 +23,7 @@ namespace f3d
 class options::internals
 {
 public:
-  void parse(std::string str, bool& value)
+  static void parse(std::string str, bool& value)
   {
     // TODO implement proper parsing
     bool b1;
@@ -33,7 +33,7 @@ public:
     value = b1 || b2;
   }
 
-  void parse(std::string str, int& value)
+  static void parse(std::string str, int& value)
   {
     // TODO implement proper parsing
     try
@@ -50,7 +50,7 @@ public:
     }
   }
 
-  void parse(std::string str, double& value)
+  static void parse(std::string str, double& value)
   {
     // TODO implement proper parsing
     try
@@ -67,7 +67,7 @@ public:
     }
   }
 
-  void parse(std::string str, ratio_t& value)
+  static void parse(std::string str, ratio_t& value)
   {
     // TODO implement proper parsing
     try
@@ -84,12 +84,12 @@ public:
     }
   }
 
-  void parse(std::string str, std::string& value)
+  static void parse(std::string str, std::string& value)
   {
     value = str;
   }
 
-  void parse(std::string str, std::vector<double>& value)
+  static void parse(std::string str, std::vector<double>& value)
   {
     // TODO implement proper parsing
     try
@@ -108,96 +108,47 @@ public:
     }
   }
 
+  static std::string toString(const std::string& var)
+  {
+    return var;
+  }
+
+  static std::string toString(const std::vector<double>& var)
+  {
+    std::ostringstream stream;
+    unsigned int i = 0;
+    for (auto& elem : var)
+    {
+      stream << ((i > 0) ? "," : "") << std::to_string(elem);
+      i++;
+    }
+    stream << '\n';
+    return stream.str();
+  }
+
+  template<typename T>
+  static std::string toString(const T& var)
+  {
+    return std::to_string(var);
+  }
+
   void setAsString(const std::string& name, std::string str)
   {
     option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
-
-    // TODO Use std::visit ?
-    if (std::holds_alternative<bool>(var))
+    std::visit([str](auto& var)
     {
-      bool value;
-      this->parse(str, value);
-      var = value;
-    }
-    else if (std::holds_alternative<int>(var))
-    {
-      int value;
-      this->parse(str, value);
-      var = value;
-    }
-    else if (std::holds_alternative<double>(var))
-    {
-      double value;
-      this->parse(str, value);
-      var = value;
-    }
-    else if (std::holds_alternative<ratio_t>(var))
-    {
-      ratio_t value(0);
-      this->parse(str, value);
-      var = value;
-    }
-    else if (std::holds_alternative<std::string>(var))
-    {
-      std::string value;
-      this->parse(str, value);
-      var = value;
-    }
-    else if (std::holds_alternative<std::vector<double>>(var))
-    {
-      std::vector<double> value;
-      this->parse(str, value);
-      var = value;
-    }
+      internals::parse(str, var);
+    }, var);
     options_struct_internals::set(this->OptionsStruct, name, var);
   }
 
   std::string getAsString(const std::string& name)
   {
     option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
-    std::string str;
-    try
+    return std::visit([](auto& var)
     {
-      if (std::holds_alternative<bool>(var))
-      {
-        str = std::to_string(std::get<bool>(var));
-      }
-      else if (std::holds_alternative<int>(var))
-      {
-        str = std::to_string(std::get<int>(var));
-      }
-      else if (std::holds_alternative<double>(var))
-      {
-        str = std::to_string(std::get<double>(var));
-      }
-      else if (std::holds_alternative<ratio_t>(var))
-      {
-        str = std::to_string(std::get<ratio_t>(var));
-      }
-      else if (std::holds_alternative<std::string>(var))
-      {
-        str = std::get<std::string>(var);
-      }
-      else if (std::holds_alternative<std::vector<double>>(var))
-      {
-        std::vector<double> vec = std::get<std::vector<double>>(var);
-        std::ostringstream stream;
-        unsigned int i = 0;
-        for (auto& elem : vec)
-        {
-          stream << ((i > 0) ? "," : "") << std::to_string(elem);
-          i++;
-        }
-        stream << '\n';
-        str = stream.str();
-      }
-    }
-    catch (const std::bad_variant_access&)
-    {
-      throw options::incompatible_exception(
-        "Trying to get option reference " + name + " with incompatible type");
-    }
-    return str;
+      return internals::toString(var);
+    }, var);
   }
   options_struct OptionsStruct;
 };
