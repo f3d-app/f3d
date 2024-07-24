@@ -11,7 +11,8 @@ and generate the associated CXX code.
 ~~~
 f3d_generate_options(
   INPUT "path/to/options.json"
-  [NAME "optional_prefix")
+  DESTINATION "path/to/destination/folder"
+  [NAME "optional_prefix"]
 	)
 ~~~
 
@@ -20,7 +21,7 @@ f3d_generate_options(
 function (f3d_generate_options)
   cmake_parse_arguments(PARSE_ARGV 0 _f3d_generate_options
     ""
-    "INPUT;NAME"
+    "INPUT;DESTINATION;NAME"
     "")
 
   if (_f3d_generate_options_UNPARSED_ARGUMENTS)
@@ -34,6 +35,11 @@ function (f3d_generate_options)
       "Missing INPUT argument for f3d_generate_options")
   endif ()
 
+  if (NOT DEFINED _f3d_generate_options_DESTINATION)
+    message(FATAL_ERROR
+      "Missing DESTINATION argument for f3d_generate_options")
+  endif ()
+
   set(_f3d_generate_options_prefix "")
   if (DEFINED _f3d_generate_options_NAME)
     set(_f3d_generate_options_prefix ${_f3d_generate_options_NAME}_)
@@ -43,14 +49,16 @@ function (f3d_generate_options)
   set(_option_basename "")
   set(_option_indent "")
 
-  ## TODO add file dependency
+  # Add a configure depends on the input file
+  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${_f3d_generate_options_INPUT})
+
   ## Read the .json file and complete the struct
-  file(READ ${CMAKE_CURRENT_SOURCE_DIR}/options.json _options_json)
+  file(READ ${_f3d_generate_options_INPUT} _options_json)
   _parse_json_option(${_options_json})
 
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/public/options_struct.h "\
-#ifndef f3d_options_struct_h
-#define f3d_options_struct_h
+  file(WRITE ${_f3d_generate_options_DESTINATION}/public/options_struct.h "\
+#ifndef f3d_${_f3d_generate_options_prefix}options_struct_h
+#define f3d_${_f3d_generate_options_prefix}options_struct_h
 
 #include \"types.h\"
 
@@ -58,8 +66,8 @@ function (f3d_generate_options)
 #include <string>
 
 namespace f3d {
-struct options_struct {
-${options_struct}};
+struct ${_f3d_generate_options_prefix}options_struct {
+${_options_struct}};
 };
 #endif
 ")
@@ -67,29 +75,29 @@ ${options_struct}};
   list(JOIN _options_setter ";\n  else " _options_setter)
   list(JOIN _options_getter ";\n  else " _options_getter)
   list(JOIN _options_lister ",\n  " _options_lister)
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/private/options_struct_internals.h "\
-#ifndef f3d_options_struct_internals_h
-#define f3d_options_struct_internals_h
+  file(WRITE ${_f3d_generate_options_DESTINATION}/private/options_struct_internals.h "\
+#ifndef f3d${_f3d_generate_options_prefix}_options_struct_internals_h
+#define f3d${_f3d_generate_options_prefix}_options_struct_internals_h
 
 #include \"options_struct.h\"
 #include \"options.h\"
 
-namespace options_struct_internals {
+namespace ${_f3d_generate_options_prefix}options_struct_internals {
 void set(f3d::options_struct& ostruct, const std::string& name, option_variant_t value){
-  ${options_setter};
+  ${_options_setter};
   else throw f3d::options::inexistent_exception(\"Option \" + name + \" does not exist\");
 }
 
 option_variant_t get(const f3d::options_struct& ostruct, const std::string& name){
   option_variant_t var;
-  ${options_getter};
+  ${_options_getter};
   else throw f3d::options::inexistent_exception(\"Option \" + name + \" does not exist\");
   return var;
 }
 
 std::vector<std::string> getNames() {
   std::vector<std::string> vec{
-  ${options_lister}
+  ${_options_lister}
   };
   return vec;
 }
