@@ -135,9 +135,9 @@ public:
   void setAsString(const std::string& name, std::string str)
   {
     option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
-    std::visit([str](auto& var)
+    std::visit([str](auto& ref)
     {
-      internals::parse(str, var);
+      internals::parse(str, ref);
     }, var);
     options_struct_internals::set(this->OptionsStruct, name, var);
   }
@@ -145,9 +145,9 @@ public:
   std::string getAsString(const std::string& name)
   {
     option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
-    return std::visit([](auto& var)
+    return std::visit([](auto& ref)
     {
-      return internals::toString(var);
+      return internals::toString(ref);
     }, var);
   }
   options_struct OptionsStruct;
