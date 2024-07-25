@@ -23,7 +23,7 @@ int TestSDKMultiOptions(int argc, char* argv[])
 
   // Render one geometry with a render option
   load.loadGeometry(left);
-  opt.set("render.show-edges", true);
+  opt.set("render.show_edges", true);
   opt.set("render.grid.enable", true);
   opt.set("ui.metadata", true);
   opt.set("model.material.roughness", 0.6);
