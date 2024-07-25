@@ -20,7 +20,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
   opt.set("ui.filename", true);
-  opt.set("ui.filename-info", "(1/1) cow.vtp");
+  opt.set("ui.filename_info", "(1/1) cow.vtp");
 
   load.loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
 

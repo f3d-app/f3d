@@ -1,5 +1,3 @@
-
-if (FALSE)
 list(APPEND libf3dSDKTests_list
      TestSDKAnimation.cxx
      TestSDKCamera.cxx
@@ -129,6 +127,5 @@ if(Qt5_FOUND)
   target_link_libraries(libf3dSDKTests Qt5::OpenGL)
 endif()
 
-# make sure the libf3d API is compatible with C++11
-set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 11)
-endif()
+# make sure the libf3d API is compatible with C++17
+set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 17)

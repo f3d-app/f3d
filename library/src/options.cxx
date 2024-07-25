@@ -108,6 +108,28 @@ public:
     }
   }
 
+  // TODO Improve string generation
+  static std::string toString(const bool& var)
+  {
+    std::stringstream stream;
+    stream << std::boolalpha << var;
+    return stream.str();
+  }
+
+  static std::string toString(const double& var)
+  {
+    std::ostringstream stream;
+    stream << std::noshowpoint << var;
+    return stream.str();
+  }
+
+  static std::string toString(const f3d::ratio_t& var)
+  {
+    std::ostringstream stream;
+    stream << std::noshowpoint << var;
+    return stream.str();
+  }
+
   static std::string toString(const std::string& var)
   {
     return var;
@@ -119,10 +141,9 @@ public:
     unsigned int i = 0;
     for (auto& elem : var)
     {
-      stream << ((i > 0) ? "," : "") << std::to_string(elem);
+      stream << ((i > 0) ? ", " : "") << internals::toString(elem);
       i++;
     }
-    stream << '\n';
     return stream.str();
   }
 
