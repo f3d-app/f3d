@@ -509,9 +509,10 @@ int F3DStarter::Start(int argc, char** argv)
             // TODO: add a image::canRead
 
             // Load the file as an HDRI instead of adding it.
-            this->Internals->Engine->getOptions().getStruct().render.hdri.file = file;
-            this->Internals->Engine->getOptions().getStruct().render.hdri.ambient = true;
-            this->Internals->Engine->getOptions().getStruct().render.background.skybox = true;
+            f3d::options_struct& ostruct = this->Internals->Engine->getOptions().getStruct();
+            ostruct.render.hdri.file = file;
+            ostruct.render.hdri.ambient = true;
+            ostruct.render.background.skybox = true;
 
             // Rendering now is needed for correct lighting
             this->Render();
@@ -892,8 +893,9 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
     loader.loadGeometry("", true);
   }
 
-  this->Internals->Engine->getOptions().getStruct().ui.dropzone = !this->Internals->LoadedFile;
-  this->Internals->Engine->getOptions().getStruct().ui.filename_info = filenameInfo;
+  f3d::options_struct& ostruct = this->Internals->Engine->getOptions().getStruct();
+  ostruct.ui.dropzone = !this->Internals->LoadedFile;
+  ostruct.ui.filename_info = filenameInfo;
 }
 
 //----------------------------------------------------------------------------
@@ -945,17 +947,17 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   f3d::options optionsCopy = this->Internals->Engine->getOptions();
 
   bool noBackground = this->Internals->AppOptions.NoBackground;
-  f3d::options_struct& optionStruct = options.getStruct();
+  f3d::options_struct& ostruct = options.getStruct();
   if (minimal)
   {
-    optionStruct.ui.scalar_bar = false;
-    optionStruct.ui.cheatsheet = false;
-    optionStruct.ui.filename = false;
-    optionStruct.ui.fps = false;
-    optionStruct.ui.metadata = false;
-    optionStruct.ui.animation_progress = false;
-    optionStruct.interactor.axis = false;
-    optionStruct.render.grid.enable = false;
+    ostruct.ui.scalar_bar = false;
+    ostruct.ui.cheatsheet = false;
+    ostruct.ui.filename = false;
+    ostruct.ui.fps = false;
+    ostruct.ui.metadata = false;
+    ostruct.ui.animation_progress = false;
+    ostruct.interactor.axis = false;
+    ostruct.render.grid.enable = false;
     noBackground = true;
   }
 
@@ -963,9 +965,9 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   this->Internals->addOutputImageMetadata(img);
   img.save(path.string(), f3d::image::SaveFormat::PNG);
 
-  optionStruct.render.light.intensity = optionStruct.render.light.intensity * 5;
+  ostruct.render.light.intensity = ostruct.render.light.intensity * 5;
   this->Render();
-  
+
   this->Internals->Engine->setOptions(optionsCopy);
   this->Render();
 }
