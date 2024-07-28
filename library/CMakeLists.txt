@@ -75,6 +75,7 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
+  ${CMAKE_CURRENT_BINARY_DIR}/public/options_struct.h
   )
 
 set(F3D_PLUGIN_HEADERS
