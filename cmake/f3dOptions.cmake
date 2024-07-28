@@ -83,7 +83,7 @@ ${_options_struct}};
 #include \"options.h\"
 
 namespace ${_f3d_generate_options_prefix}options_struct_internals {
-void set(f3d::options_struct& ostruct, const std::string& name, option_variant_t value){
+void set(f3d::options_struct& ostruct, const std::string& name, const option_variant_t& value){
   try
   {
     ${_options_setter};

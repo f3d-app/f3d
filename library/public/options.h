@@ -41,16 +41,16 @@ public:
    * Throw an options::incompatible_exception if value is not compatible with option.
    * TODO Improve type compatibility, eg avoid doing f3d_ratio_t(2.5) ?
    */
-  options& set(const std::string& name, option_variant_t value);
-  option_variant_t get(const std::string& name);
+  options& set(const std::string& name, const option_variant_t& value);
+  option_variant_t get(const std::string& name) const;
 
   /**
    * Set/Get an option as a string based on its name
    * The setter use specific parsing, see the related doc TODO
    * Throw an options::inexistent_exception if option does not exist.
    */
-  options& setAsString(const std::string& name, std::string str);
-  std::string getAsString(const std::string& name);
+  options& setAsString(const std::string& name, const std::string& str);
+  std::string getAsString(const std::string& name) const;
 
   /**
    * A boolean option specific method to toggle it.
@@ -76,7 +76,7 @@ public:
    * Get all available option names.
    * TODO: Add a getNamesStruct ?
    */
-  std::vector<std::string> getNames();
+  std::vector<std::string> getNames() const;
 
   /**
    * Get the closest option name and its Levenshtein distance.
