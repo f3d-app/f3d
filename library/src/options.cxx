@@ -71,19 +71,9 @@ public:
 
   static void parse(std::string str, ratio_t& value)
   {
-    // TODO implement proper parsing
-    try
-    {
-      value = std::stod(str);
-    }
-    catch (std::invalid_argument const& ex)
-    {
-      throw options::parsing_exception("Cannot parse " + str + " into a ratio");
-    }
-    catch (std::out_of_range const& ex)
-    {
-      throw options::parsing_exception("Cannot parse " + str + " into a ratio as it would go out of double range");
-    }
+    double dbl;
+    internals::parse(str, dbl);
+    value = dbl;
   }
 
   static void parse(std::string str, std::string& value)
@@ -94,19 +84,13 @@ public:
   static void parse(std::string str, std::vector<double>& value)
   {
     // TODO implement proper parsing
-    try
+    std::istringstream split(str);
+    value.clear();
+    for (std::string each; std::getline(split, each, ',');)
     {
-      std::istringstream split(str);
-      value.clear();
-      for (std::string each; std::getline(split, each, ','); value.push_back(std::stod(each)));
-    }
-    catch (std::invalid_argument const& ex)
-    {
-      throw options::parsing_exception("Cannot parse " + str + " into a double vector");
-    }
-    catch (std::out_of_range const& ex)
-    {
-      throw options::parsing_exception("Cannot parse " + str + " into a double vector as it would go out of double range");
+      double dbl;
+      internals::parse(each, dbl);
+      value.push_back(dbl);
     }
   }
 
