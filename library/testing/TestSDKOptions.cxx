@@ -37,6 +37,12 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options struct with getAsString bool is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
+  opt.toggle("model.scivis.cells");
+  if (opt.getAsString("model.scivis.cells") != "true")
+  {
+    std::cerr << "Options toggle is not behaving as expected." << std::endl;
+    return EXIT_FAILURE;
+  }
 
   // Test int
   opt.set("scene.animation.index", 1);
