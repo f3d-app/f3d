@@ -23,6 +23,8 @@ namespace f3d
 class options::internals
 {
 public:
+
+  // TODO expose parse methods in options API ?
   static void parse(std::string str, bool& value)
   {
     // TODO implement proper parsing

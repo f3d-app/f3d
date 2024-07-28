@@ -74,6 +74,7 @@ public:
 
   /**
    * Get all available option names.
+   * TODO: Add a getNamesStruct ?
    */
   std::vector<std::string> getNames();
 
