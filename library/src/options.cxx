@@ -24,7 +24,7 @@ class options::internals
 {
 public:
   // TODO expose parse methods in options API ?
-  static void parse(std::string str, bool& value)
+  static void parse(const std::string& str, bool& value)
   {
     // TODO implement proper parsing
     bool b1;
@@ -34,7 +34,7 @@ public:
     value = b1 || b2;
   }
 
-  static void parse(std::string str, int& value)
+  static void parse(const std::string& str, int& value)
   {
     // TODO implement proper parsing
     try
@@ -52,7 +52,7 @@ public:
     }
   }
 
-  static void parse(std::string str, double& value)
+  static void parse(const std::string& str, double& value)
   {
     // TODO implement proper parsing
     try
@@ -70,19 +70,19 @@ public:
     }
   }
 
-  static void parse(std::string str, ratio_t& value)
+  static void parse(const std::string& str, ratio_t& value)
   {
     double dbl;
     internals::parse(str, dbl);
     value = dbl;
   }
 
-  static void parse(std::string str, std::string& value)
+  static void parse(const std::string& str, std::string& value)
   {
     value = str;
   }
 
-  static void parse(std::string str, std::vector<double>& value)
+  static void parse(const std::string& str, std::vector<double>& value)
   {
     // TODO implement proper parsing
     std::istringstream split(str);
@@ -140,7 +140,7 @@ public:
     return std::to_string(var);
   }
 
-  void setAsString(const std::string& name, std::string str)
+  void setAsString(const std::string& name, const std::string& str)
   {
     option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
     std::visit([str](auto& ref) { internals::parse(str, ref); }, var);
@@ -202,27 +202,27 @@ options& options::operator=(options&& other) noexcept
 }
 
 //----------------------------------------------------------------------------
-options& options::set(const std::string& name, option_variant_t value)
+options& options::set(const std::string& name, const option_variant_t& value)
 {
   options_struct_internals::set(this->Internals->OptionsStruct, name, value);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-option_variant_t options::get(const std::string& name)
+option_variant_t options::get(const std::string& name) const
 {
   return options_struct_internals::get(this->Internals->OptionsStruct, name);
 }
 
 //----------------------------------------------------------------------------
-options& options::setAsString(const std::string& name, std::string str)
+options& options::setAsString(const std::string& name, const std::string& str)
 {
   this->Internals->setAsString(name, str);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-std::string options::getAsString(const std::string& name)
+std::string options::getAsString(const std::string& name) const
 {
   return this->Internals->getAsString(name);
 }
@@ -260,7 +260,7 @@ options& options::copy(const options& from, const std::string& name)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> options::getNames()
+std::vector<std::string> options::getNames() const
 {
   return options_struct_internals::getNames();
 }
