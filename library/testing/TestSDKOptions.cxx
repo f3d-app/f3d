@@ -191,6 +191,8 @@ int TestSDKOptions(int argc, char* argv[])
   try
   {
     opt.set("model.scivis.cells", 2.13);
+    std::cerr << "Failing to get an expected exception with setting an incompatible value." << std::endl;
+    return EXIT_FAILURE;
   }
   catch (const f3d::options::incompatible_exception& ex)
   {
@@ -200,6 +202,8 @@ int TestSDKOptions(int argc, char* argv[])
   try
   {
     opt.set("dummy", 2.13);
+    std::cerr << "Failing to get an expected exception with setting an inexistent option." << std::endl;
+    return EXIT_FAILURE;
   }
   catch (const f3d::options::inexistent_exception& ex)
   {
@@ -209,6 +213,8 @@ int TestSDKOptions(int argc, char* argv[])
   try
   {
     opt.get("dummy");
+    std::cerr << "Failing to get an expected exception with getting an inexistent option." << std::endl;
+    return EXIT_FAILURE;
   }
   catch (const f3d::options::inexistent_exception& ex)
   {
@@ -218,8 +224,53 @@ int TestSDKOptions(int argc, char* argv[])
   try
   {
     opt.toggle("render.line_width");
+    std::cerr << "Failing to get an expected exception when toggling non-boolean option." << std::endl;
+    return EXIT_FAILURE;
   }
   catch (const f3d::options::incompatible_exception& ex)
+  {
+    std::cout << "Expected exception: " << ex.what() << std::endl;
+  }
+
+  // Test parsing error path
+  try
+  {
+    opt.setAsString("scene.animation.index", "invalid");
+    std::cerr << "Failing to get an expected exception when setting an invalid int." << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::options::parsing_exception& ex)
+  {
+    std::cout << "Expected exception: " << ex.what() << std::endl;
+  }
+  try
+  {
+    opt.setAsString("scene.animation.index", "2147483648");
+    std::cerr << "Failing to get an expected exception when setting an out of range int." << std::endl;
+    std::cerr << "--" << opt.getAsString("scene.animation.index") << "--" <<std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::options::parsing_exception& ex)
+  {
+    std::cout << "Expected exception: " << ex.what() << std::endl;
+  }
+
+  try
+  {
+    opt.setAsString("render.line_width", "invalid");
+    std::cerr << "Failing to get an expected exception when setting an invalid double." << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::options::parsing_exception& ex)
+  {
+    std::cout << "Expected exception: " << ex.what() << std::endl;
+  }
+  try
+  {
+    opt.setAsString("render.line_width", "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::options::parsing_exception& ex)
   {
     std::cout << "Expected exception: " << ex.what() << std::endl;
   }
