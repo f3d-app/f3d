@@ -154,42 +154,11 @@ PYBIND11_MODULE(pyf3d, module)
   // f3d::options
   py::class_<f3d::options> options(module, "Options");
 
+  // TODO Proper options bindings
   options //
     .def(py::init<>())
-    .def("__setitem__", py::overload_cast<const std::string&, bool>(&f3d::options::set))
-    .def("__setitem__", py::overload_cast<const std::string&, int>(&f3d::options::set))
-    .def("__setitem__", py::overload_cast<const std::string&, double>(&f3d::options::set))
-    .def(
-      "__setitem__", py::overload_cast<const std::string&, const std::string&>(&f3d::options::set))
-    .def("__setitem__",
-      py::overload_cast<const std::string&, const std::vector<int>&>(&f3d::options::set))
-    .def("__setitem__",
-      py::overload_cast<const std::string&, const std::vector<double>&>(&f3d::options::set))
-    .def("__getitem__",
-      [](f3d::options& opts, const std::string key)
-      {
-#define TRY(getter)                                                                                \
-  try                                                                                              \
-  {                                                                                                \
-    auto v = getter(key);                                                                          \
-    return py::cast(v);                                                                            \
-  }                                                                                                \
-  catch (const f3d::options::inexistent_exception&)                                                \
-  {                                                                                                \
-    throw pybind11::key_error(key);                                                                \
-  }                                                                                                \
-  catch (const f3d::options::incompatible_exception&)                                              \
-  {                                                                                                \
-  }
-        TRY(opts.getAsBoolRef)
-        TRY(opts.getAsIntRef)
-        TRY(opts.getAsDoubleRef)
-        TRY(opts.getAsStringRef)
-        TRY(opts.getAsDoubleVectorRef)
-        TRY(opts.getAsIntVectorRef)
-        throw pybind11::key_error(key);
-#undef TRY
-      })
+    .def("__setitem__", &f3d::options::setAsString)
+    .def("__getitem__", &f3d::options::getAsString)
     .def("__len__", [](f3d::options& opts) { return opts.getNames().size(); })
     .def(
       "__iter__",
