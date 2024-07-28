@@ -316,15 +316,15 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   // cxxopts sense.
   HasDefault LocalHasDefaultNo = allOptionsInitialized ? HasDefault::YES : HasDefault::NO;
 
+  std::map<std::string, std::string> libf3dOptions;
+  std::vector<std::string> keys = options.getNames();
+  for (const std::string& key : keys)
+  {
+    libf3dOptions[key] = options.getAsString(key);
+  }
+
   try
   {
-    std::map<std::string, std::string> libf3dOptions;
-    std::vector<std::string> keys = options.getNames();
-    for (const std::string& key : keys)
-    {
-      libf3dOptions[key] = options.getAsString(key);
-    }
-
     cxxopts::Options cxxOptions(this->ExecutableName, F3D::AppTitle);
     cxxOptions.custom_help("[OPTIONS...] file1 file2 ...");
     // clang-format off
@@ -528,8 +528,8 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   }
   catch (const cxxopts::exceptions::exception& ex)
   {
-    f3d::log::error("Error parsing options: ", ex.what());
-    throw;
+    f3d::log::error("Error parsing command line arguments: ", ex.what());
+    throw F3DExFailure("Could not parse command line arguments");
   }
 }
 
