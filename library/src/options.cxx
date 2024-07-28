@@ -10,12 +10,12 @@
 #include "vtkF3DConfigure.h"
 
 #include <algorithm>
+#include <iostream>
 #include <limits>
 #include <map>
 #include <string>
 #include <type_traits>
 #include <variant>
-#include <iostream>
 
 namespace f3d
 {
@@ -23,7 +23,6 @@ namespace f3d
 class options::internals
 {
 public:
-
   // TODO expose parse methods in options API ?
   static void parse(std::string str, bool& value)
   {
@@ -48,7 +47,8 @@ public:
     }
     catch (std::out_of_range const& ex)
     {
-      throw options::parsing_exception("Cannot parse " + str + " into an int as it would go out of range");
+      throw options::parsing_exception(
+        "Cannot parse " + str + " into an int as it would go out of range");
     }
   }
 
@@ -65,7 +65,8 @@ public:
     }
     catch (std::out_of_range const& ex)
     {
-      throw options::parsing_exception("Cannot parse " + str + " into a double as it would go out of range");
+      throw options::parsing_exception(
+        "Cannot parse " + str + " into a double as it would go out of range");
     }
   }
 
@@ -142,20 +143,14 @@ public:
   void setAsString(const std::string& name, std::string str)
   {
     option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
-    std::visit([str](auto& ref)
-    {
-      internals::parse(str, ref);
-    }, var);
+    std::visit([str](auto& ref) { internals::parse(str, ref); }, var);
     options_struct_internals::set(this->OptionsStruct, name, var);
   }
 
   std::string getAsString(const std::string& name)
   {
     option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
-    return std::visit([](auto& ref)
-    {
-      return internals::toString(ref);
-    }, var);
+    return std::visit([](auto& ref) { return internals::toString(ref); }, var);
   }
   options_struct OptionsStruct;
 };
@@ -252,13 +247,15 @@ options& options::toggle(const std::string& name)
 //----------------------------------------------------------------------------
 bool options::isSame(const options& other, const std::string& name) const
 {
-  return options_struct_internals::get(this->Internals->OptionsStruct, name) == options_struct_internals::get(other.Internals->OptionsStruct, name);
+  return options_struct_internals::get(this->Internals->OptionsStruct, name) ==
+    options_struct_internals::get(other.Internals->OptionsStruct, name);
 }
 
 //----------------------------------------------------------------------------
 options& options::copy(const options& from, const std::string& name)
 {
-  options_struct_internals::set(this->Internals->OptionsStruct, name, options_struct_internals::get(from.Internals->OptionsStruct, name));
+  options_struct_internals::set(this->Internals->OptionsStruct, name,
+    options_struct_internals::get(from.Internals->OptionsStruct, name));
   return *this;
 }
 

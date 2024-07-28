@@ -383,7 +383,8 @@ F3DStarter::F3DStarter()
   : Internals(std::make_unique<F3DStarter::F3DInternals>())
 {
   // Set option outside of command line and config file
-  this->Internals->DynamicOptions.getStruct().ui.dropzone_info = "Drop a file or HDRI to load it\nPress H to show cheatsheet";
+  this->Internals->DynamicOptions.getStruct().ui.dropzone_info =
+    "Drop a file or HDRI to load it\nPress H to show cheatsheet";
 
   // Initialize dmon
   dmon_init();
@@ -557,12 +558,14 @@ int F3DStarter::Start(int argc, char** argv)
 
     if (!fullPath.empty())
     {
-      this->Internals->Engine->getOptions().getStruct().model.scivis.colormap = F3DColorMapTools::Read(fullPath);
+      this->Internals->Engine->getOptions().getStruct().model.scivis.colormap =
+        F3DColorMapTools::Read(fullPath);
     }
     else
     {
       f3d::log::error("Cannot find the colormap ", this->Internals->AppOptions.ColorMapFile);
-      this->Internals->Engine->getOptions().getStruct().model.scivis.colormap = std::vector<double>{};
+      this->Internals->Engine->getOptions().getStruct().model.scivis.colormap =
+        std::vector<double>{};
     }
   }
 

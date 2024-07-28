@@ -372,15 +372,13 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetUseSSAOPass(ostruct.render.effect.ambient_occlusion);
   this->Internals->Renderer->SetUseFXAAPass(ostruct.render.effect.anti_aliasing);
   this->Internals->Renderer->SetUseToneMappingPass(ostruct.render.effect.tone_mapping);
-  this->Internals->Renderer->SetUseDepthPeelingPass(
-    ostruct.render.effect.translucency_support);
+  this->Internals->Renderer->SetUseDepthPeelingPass(ostruct.render.effect.translucency_support);
   this->Internals->Renderer->SetBackfaceType(ostruct.render.backface_type);
   this->Internals->Renderer->SetFinalShader(ostruct.render.effect.final_shader);
 
   this->Internals->Renderer->SetBackground(ostruct.render.background.color.data());
   this->Internals->Renderer->SetUseBlurBackground(ostruct.render.background.blur);
-  this->Internals->Renderer->SetBlurCircleOfConfusionRadius(
-    ostruct.render.background.blur_coc);
+  this->Internals->Renderer->SetBlurCircleOfConfusionRadius(ostruct.render.background.blur_coc);
   this->Internals->Renderer->SetLightIntensity(ostruct.render.light.intensity);
 
   std::string hdriFile = ostruct.render.hdri.file;
@@ -400,8 +398,7 @@ void window_impl::UpdateDynamicOptions()
 
   if (ostruct.scene.camera.index == -1)
   {
-    this->Internals->Renderer->SetUseOrthographicProjection(
-      ostruct.scene.camera.orthographic);
+    this->Internals->Renderer->SetUseOrthographicProjection(ostruct.scene.camera.orthographic);
   }
 
   if (this->Internals->WithColoring)
@@ -418,8 +415,8 @@ void window_impl::UpdateDynamicOptions()
     this->Internals->Renderer->SetNormalScale(ostruct.model.normal.scale);
     this->Internals->Renderer->SetTextureMatCap(ostruct.model.matcap.texture);
 
-    this->Internals->Renderer->SetColoring(ostruct.model.scivis.cells,
-      ostruct.model.scivis.array_name, ostruct.model.scivis.component);
+    this->Internals->Renderer->SetColoring(
+      ostruct.model.scivis.cells, ostruct.model.scivis.array_name, ostruct.model.scivis.component);
     this->Internals->Renderer->SetScalarBarRange(ostruct.model.scivis.range);
     this->Internals->Renderer->SetColormap(ostruct.model.scivis.colormap);
     this->Internals->Renderer->ShowScalarBar(ostruct.ui.scalar_bar);

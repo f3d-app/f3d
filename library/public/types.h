@@ -5,8 +5,8 @@
 
 #include <array>
 #include <string>
-#include <vector>
 #include <variant>
+#include <vector>
 
 namespace f3d
 {
@@ -43,8 +43,15 @@ class ratio_t
 {
 public:
   ratio_t() = default;
-  ratio_t(double val){this->Value = val;}
-  operator double() const {return this->Value;}
+  ratio_t(double val)
+  {
+    this->Value = val;
+  }
+  operator double() const
+  {
+    return this->Value;
+  }
+
 private:
   double Value;
 };
@@ -75,13 +82,7 @@ struct mesh_t
 };
 }
 
-using option_variant_t = std::variant<
-  bool,
-  double,
-  f3d::ratio_t,
-  int,
-  std::string,
-  std::vector<double>
->;
+using option_variant_t =
+  std::variant<bool, double, f3d::ratio_t, int, std::string, std::vector<double>>;
 
 #endif
