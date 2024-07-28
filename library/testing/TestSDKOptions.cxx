@@ -151,37 +151,42 @@ int TestSDKOptions(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  /*
   // Test error paths
-  double val;
-  opt.set("model.scivis.cells", 2.13);
-  opt.get("model.scivis.cells", val);
   try
   {
-    const double& refVal = opt.getAsDoubleRef("model.scivis.cells");
+    opt.set("model.scivis.cells", 2.13);
   }
   catch (const f3d::options::incompatible_exception& ex)
   {
-    std::cout << "Expected exception:" << ex.what() << std::endl;
+    std::cout << "Expected exception: " << ex.what() << std::endl;
   }
 
-  opt.set("dummy", 2.13);
-  opt.get("dummy", val);
   try
   {
-    const double& refVal = opt.getAsDoubleRef("dummy");
+    opt.set("dummy", 2.13);
   }
   catch (const f3d::options::inexistent_exception& ex)
   {
-    std::cout << "Expected exception:" << ex.what() << std::endl;
+    std::cout << "expected exception: " << ex.what() << std::endl;
   }
 
-  if (opt.getAsBool("model.scivis.cells") != false)
+  try
   {
-    std::cerr << "Options error paths not behaving as expected." << std::endl;
-    return EXIT_FAILURE;
+    opt.get("dummy");
   }
-  */
+  catch (const f3d::options::inexistent_exception& ex)
+  {
+    std::cout << "expected exception: " << ex.what() << std::endl;
+  }
+
+  try
+  {
+    opt.toggle("render.line_width");
+  }
+  catch (const f3d::options::incompatible_exception& ex)
+  {
+    std::cout << "Expected exception: " << ex.what() << std::endl;
+  }
 
   // Test copy operator and constructor
   f3d::options opt2 = opt;
@@ -269,7 +274,7 @@ int TestSDKOptions(int argc, char* argv[])
   }
   catch (const f3d::options::inexistent_exception& ex)
   {
-    std::cout << "Expected exception:" << ex.what() << std::endl;
+    std::cout << "Expected exception: " << ex.what() << std::endl;
   }
   try
   {
@@ -277,7 +282,7 @@ int TestSDKOptions(int argc, char* argv[])
   }
   catch (const f3d::options::inexistent_exception& ex)
   {
-    std::cout << "Expected exception:" << ex.what() << std::endl;
+    std::cout << "Expected exception: " << ex.what() << std::endl;
   }
 
   return EXIT_SUCCESS;

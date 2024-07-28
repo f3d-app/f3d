@@ -72,7 +72,7 @@ ${_options_struct}};
 #endif
 ")
 
-  list(JOIN _options_setter ";\n  else " _options_setter)
+  list(JOIN _options_setter ";\n    else " _options_setter)
   list(JOIN _options_getter ";\n  else " _options_getter)
   list(JOIN _options_lister ",\n  " _options_lister)
   file(WRITE ${_f3d_generate_options_DESTINATION}/private/options_struct_internals.h "\
@@ -84,8 +84,16 @@ ${_options_struct}};
 
 namespace ${_f3d_generate_options_prefix}options_struct_internals {
 void set(f3d::options_struct& ostruct, const std::string& name, option_variant_t value){
-  ${_options_setter};
-  else throw f3d::options::inexistent_exception(\"Option \" + name + \" does not exist\");
+  try
+  {
+    ${_options_setter};
+    else throw f3d::options::inexistent_exception(\"Option \" + name + \" does not exist\");
+  }
+  catch (const std::bad_variant_access&)
+  {
+    throw f3d::options::incompatible_exception(
+      \"Trying to set \" + name + \" with incompatible type\");
+  }
 }
 
 option_variant_t get(const f3d::options_struct& ostruct, const std::string& name){
