@@ -22,13 +22,19 @@ int TestSDKOptions(int argc, char* argv[])
   opt.setAsString("model.scivis.cells", "false");
   if (opt.getAsString("model.scivis.cells") != "false")
   {
-    std::cerr << "Options setAsString bool with boolalpha  is not behaving as expected." << std::endl;
+    std::cerr << "Options setAsString bool with boolalpha is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
   opt.setAsString("model.scivis.cells", "1");
   if (opt.getAsString("model.scivis.cells") != "true")
   {
-    std::cerr << "Options setAsString bool without boolalpha  is not behaving as expected." << std::endl;
+    std::cerr << "Options setAsString bool without boolalpha is not behaving as expected." << std::endl;
+    return EXIT_FAILURE;
+  }
+  opt.getStruct().model.scivis.cells = false;
+  if (opt.getAsString("model.scivis.cells") != "false")
+  {
+    std::cerr << "Options struct with getAsString bool is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -50,6 +56,12 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options setAsString int is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
+  opt.getStruct().scene.animation.index = 3;
+  if (opt.getAsString("scene.animation.index") != "3")
+  {
+    std::cerr << "Options struct with getAsString int is not behaving as expected." << std::endl;
+    return EXIT_FAILURE;
+  }
 
   // Test double
   opt.set("render.line_width", 1.7);
@@ -63,10 +75,16 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options getAsString double is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  opt.setAsString("render.line_width", "2.13");
-  if (opt.getAsString("render.line_width") != "2.13")
+  opt.setAsString("render.line_width", "2.14");
+  if (opt.getAsString("render.line_width") != "2.14")
   {
     std::cerr << "Options setAsString double is not behaving as expected." << std::endl;
+    return EXIT_FAILURE;
+  }
+  opt.getStruct().render.line_width = 2.13;
+  if (opt.getAsString("render.line_width") != "2.13")
+  {
+    std::cerr << "Options struct with getAsString double is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -86,6 +104,12 @@ int TestSDKOptions(int argc, char* argv[])
   if (opt.getAsString("scene.animation.speed_factor") != "3.17")
   {
     std::cerr << "Options setAsString ratio_t is not behaving as expected." << std::endl;
+    return EXIT_FAILURE;
+  }
+  opt.getStruct().scene.animation.speed_factor = 3.18;
+  if (opt.getAsString("scene.animation.speed_factor") != "3.18")
+  {
+    std::cerr << "Options struct with getAsString ratio_t is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -108,6 +132,12 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options setAsString string is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
+  opt.getStruct().model.color.texture = "testInStruct";
+  if (opt.getAsString("model.color.texture") != "testInStruct")
+  {
+    std::cerr << "Options struct with getAsString string is not behaving as expected." << std::endl;
+    return EXIT_FAILURE;
+  }
 
   // Test double vector
   opt.set("render.background.color", std::vector<double>{ 0.1, 0.2, 0.3 });
@@ -125,6 +155,12 @@ int TestSDKOptions(int argc, char* argv[])
   if (opt.getAsString("render.background.color") != "0.1, 0.2, 0.4")
   {
     std::cerr << "Options setAsString vector<double> is not behaving as expected." << std::endl;
+    return EXIT_FAILURE;
+  }
+  opt.getStruct().render.background.color = {0.1, 0.2, 0.5};
+  if (opt.getAsString("render.background.color") != "0.1, 0.2, 0.5")
+  {
+    std::cerr << "Options struct with getAsString vector<double> is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -261,7 +297,7 @@ int TestSDKOptions(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   opt2.copy(opt, "render.background.color");
-  if (std::get<std::vector<double>>(opt2.get("render.background.color")) != std::vector<double>{ 0.1, 0.2, 0.4 })
+  if (std::get<std::vector<double>>(opt2.get("render.background.color")) != std::vector<double>{ 0.1, 0.2, 0.5 })
   {
     std::cerr << "Options copy method not behaving as expected with vectors." << std::endl;
     return EXIT_FAILURE;
