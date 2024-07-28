@@ -324,7 +324,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     {
       libf3dOptions[key] = options.getAsString(key);
     }
-    
+
     cxxopts::Options cxxOptions(this->ExecutableName, F3D::AppTitle);
     cxxOptions.custom_help("[OPTIONS...] file1 file2 ...");
     // clang-format off
@@ -447,7 +447,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     if (parseCommandLine)
     {
       auto result = cxxOptions.parse(this->Argc, this->Argv);
-      for(auto [key,val] : libf3dOptions)
+      for (auto [key, val] : libf3dOptions)
       {
         options.setAsString(key, val);
       }
@@ -520,7 +520,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     {
       // this will update the options using the config file without parsing actual argc/argv
       cxxOptions.parse(1, nullptr);
-      for(auto [key,val] : libf3dOptions)
+      for (auto [key, val] : libf3dOptions)
       {
         options.setAsString(key, val);
       }

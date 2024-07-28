@@ -1,15 +1,15 @@
 #ifndef f3d_options_h
 #define f3d_options_h
 
-#include "options_struct.h"
 #include "exception.h"
 #include "export.h"
+#include "options_struct.h"
 #include "types.h"
 
-#include <string>
-#include <vector>
-#include <variant>
 #include <array>
+#include <string>
+#include <variant>
+#include <vector>
 
 namespace f3d
 {
@@ -39,7 +39,7 @@ public:
    * Set/Get an option as a variant based on its name
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::incompatible_exception if value is not compatible with option.
-   * TODO Improve type compatibilty, eg avoid doing f3d_ratio_t(2.5) ?
+   * TODO Improve type compatibility, eg avoid doing f3d_ratio_t(2.5) ?
    */
   options& set(const std::string& name, option_variant_t value);
   option_variant_t get(const std::string& name);

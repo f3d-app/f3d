@@ -22,13 +22,15 @@ int TestSDKOptions(int argc, char* argv[])
   opt.setAsString("model.scivis.cells", "false");
   if (opt.getAsString("model.scivis.cells") != "false")
   {
-    std::cerr << "Options setAsString bool with boolalpha is not behaving as expected." << std::endl;
+    std::cerr << "Options setAsString bool with boolalpha is not behaving as expected."
+              << std::endl;
     return EXIT_FAILURE;
   }
   opt.setAsString("model.scivis.cells", "1");
   if (opt.getAsString("model.scivis.cells") != "true")
   {
-    std::cerr << "Options setAsString bool without boolalpha is not behaving as expected." << std::endl;
+    std::cerr << "Options setAsString bool without boolalpha is not behaving as expected."
+              << std::endl;
     return EXIT_FAILURE;
   }
   opt.getStruct().model.scivis.cells = false;
@@ -115,7 +117,8 @@ int TestSDKOptions(int argc, char* argv[])
   opt.getStruct().scene.animation.speed_factor = 3.18;
   if (opt.getAsString("scene.animation.speed_factor") != "3.18")
   {
-    std::cerr << "Options struct with getAsString ratio_t is not behaving as expected." << std::endl;
+    std::cerr << "Options struct with getAsString ratio_t is not behaving as expected."
+              << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -147,7 +150,8 @@ int TestSDKOptions(int argc, char* argv[])
 
   // Test double vector
   opt.set("render.background.color", std::vector<double>{ 0.1, 0.2, 0.3 });
-  if (std::get<std::vector<double>>(opt.get("render.background.color")) != std::vector<double>{ 0.1, 0.2, 0.3 })
+  if (std::get<std::vector<double>>(opt.get("render.background.color")) !=
+    std::vector<double>{ 0.1, 0.2, 0.3 })
   {
     std::cerr << "Options set/get vector<double> is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
@@ -163,10 +167,11 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options setAsString vector<double> is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  opt.getStruct().render.background.color = {0.1, 0.2, 0.5};
+  opt.getStruct().render.background.color = { 0.1, 0.2, 0.5 };
   if (opt.getAsString("render.background.color") != "0.1, 0.2, 0.5")
   {
-    std::cerr << "Options struct with getAsString vector<double> is not behaving as expected." << std::endl;
+    std::cerr << "Options struct with getAsString vector<double> is not behaving as expected."
+              << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -197,7 +202,8 @@ int TestSDKOptions(int argc, char* argv[])
   try
   {
     opt.set("model.scivis.cells", 2.13);
-    std::cerr << "Failing to get an expected exception with setting an incompatible value." << std::endl;
+    std::cerr << "Failing to get an expected exception with setting an incompatible value."
+              << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::options::incompatible_exception& ex)
@@ -208,7 +214,8 @@ int TestSDKOptions(int argc, char* argv[])
   try
   {
     opt.set("dummy", 2.13);
-    std::cerr << "Failing to get an expected exception with setting an inexistent option." << std::endl;
+    std::cerr << "Failing to get an expected exception with setting an inexistent option."
+              << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::options::inexistent_exception& ex)
@@ -219,7 +226,8 @@ int TestSDKOptions(int argc, char* argv[])
   try
   {
     opt.get("dummy");
-    std::cerr << "Failing to get an expected exception with getting an inexistent option." << std::endl;
+    std::cerr << "Failing to get an expected exception with getting an inexistent option."
+              << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::options::inexistent_exception& ex)
@@ -230,7 +238,8 @@ int TestSDKOptions(int argc, char* argv[])
   try
   {
     opt.toggle("render.line_width");
-    std::cerr << "Failing to get an expected exception when toggling non-boolean option." << std::endl;
+    std::cerr << "Failing to get an expected exception when toggling non-boolean option."
+              << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::options::incompatible_exception& ex)
@@ -252,8 +261,9 @@ int TestSDKOptions(int argc, char* argv[])
   try
   {
     opt.setAsString("scene.animation.index", "2147483648");
-    std::cerr << "Failing to get an expected exception when setting an out of range int." << std::endl;
-    std::cerr << "--" << opt.getAsString("scene.animation.index") << "--" <<std::endl;
+    std::cerr << "Failing to get an expected exception when setting an out of range int."
+              << std::endl;
+    std::cerr << "--" << opt.getAsString("scene.animation.index") << "--" << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::options::parsing_exception& ex)
@@ -264,7 +274,8 @@ int TestSDKOptions(int argc, char* argv[])
   try
   {
     opt.setAsString("render.line_width", "invalid");
-    std::cerr << "Failing to get an expected exception when setting an invalid double." << std::endl;
+    std::cerr << "Failing to get an expected exception when setting an invalid double."
+              << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::options::parsing_exception& ex)
@@ -273,7 +284,13 @@ int TestSDKOptions(int argc, char* argv[])
   }
   try
   {
-    opt.setAsString("render.line_width", "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
+    opt.setAsString("render.line_width",
+      "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012"
+      "34567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234"
+      "56789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456"
+      "78901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678"
+      "90123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+      "1234567890123456789012345678901234567890");
     return EXIT_FAILURE;
   }
   catch (const f3d::options::parsing_exception& ex)
@@ -354,7 +371,8 @@ int TestSDKOptions(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   opt2.copy(opt, "render.background.color");
-  if (std::get<std::vector<double>>(opt2.get("render.background.color")) != std::vector<double>{ 0.1, 0.2, 0.5 })
+  if (std::get<std::vector<double>>(opt2.get("render.background.color")) !=
+    std::vector<double>{ 0.1, 0.2, 0.5 })
   {
     std::cerr << "Options copy method not behaving as expected with vectors." << std::endl;
     return EXIT_FAILURE;
