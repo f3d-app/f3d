@@ -41,11 +41,11 @@ public:
     {
       value = std::stoi(str);
     }
-    catch (std::invalid_argument const& ex)
+    catch (std::invalid_argument const&)
     {
       throw options::parsing_exception("Cannot parse " + str + " into an int");
     }
-    catch (std::out_of_range const& ex)
+    catch (std::out_of_range const&)
     {
       throw options::parsing_exception(
         "Cannot parse " + str + " into an int as it would go out of range");
@@ -59,11 +59,11 @@ public:
     {
       value = std::stod(str);
     }
-    catch (std::invalid_argument const& ex)
+    catch (std::invalid_argument const&)
     {
       throw options::parsing_exception("Cannot parse " + str + " into a double");
     }
-    catch (std::out_of_range const& ex)
+    catch (std::out_of_range const&)
     {
       throw options::parsing_exception(
         "Cannot parse " + str + " into a double as it would go out of range");
