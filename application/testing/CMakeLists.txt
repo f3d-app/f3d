@@ -182,7 +182,7 @@ f3d_test(NAME TestTextureEmissive DATA WaterBottle.glb ARGS --geometry-only --te
 f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --geometry-only --texture-material=${F3D_SOURCE_DIR}/testing/data/red.jpg --roughness=1 --metallic=1 --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo.png --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --texture-emissive=${F3D_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1)
 f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m)
 f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m)
-f3d_test(NAME TestTIFF DATA logo.tif ARGS -sy --up=-Y)
+f3d_test(NAME TestTIFF DATA f3d.tif ARGS -sy --up=-Y)
 f3d_test(NAME TestLightIntensityBrighter DATA cow.vtp ARGS --light-intensity=5.0)
 f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2)
 f3d_test(NAME TestLightIntensityBrighterFullScene DATA WaterBottle.glb ARGS --light-intensity=5.0 THRESHOLD 60)
