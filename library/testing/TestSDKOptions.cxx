@@ -330,8 +330,8 @@ int TestSDKOptions(int argc, char* argv[])
   }
 
   // Test getNames
-  auto names = opt.getNames();
-  if (names.size() == 0 || opt.getNames() != opt2.getNames())
+  std::vector<std::string> names = opt.getNames();
+  if (names.size() == 0 || names != opt2.getNames())
   {
     std::cerr << "Options getNames not behaving as expected." << std::endl;
     return EXIT_FAILURE;

@@ -150,7 +150,7 @@ public:
   std::string getAsString(const std::string& name)
   {
     option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
-    return std::visit([](auto& ref) { return internals::toString(ref); }, var);
+    return std::visit([](const auto& ref) { return internals::toString(ref); }, var);
   }
   options_struct OptionsStruct;
 };
