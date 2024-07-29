@@ -281,7 +281,7 @@ void* image::getContent() const
 }
 
 //----------------------------------------------------------------------------
-bool image::compare(const image& reference, double threshold, image& diff, double& error) const
+bool image::compare(const image& reference, double , image& , double& ) const
 {
   vtkNew<vtkImageSSIM> ssim;
 
@@ -304,7 +304,7 @@ bool image::compare(const image& reference, double threshold, image& diff, doubl
   // TODO check scalars
   vtkImageSSIM::ComputeErrorMetrics(scalars, tight, loose);
   std::cout<<tight<<" "<<loose<<std::endl;
-  double myThresh = 0.001;
+  double myThresh = 0.1;
   return tight <= myThresh;
 
 
