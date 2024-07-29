@@ -26,7 +26,7 @@ int TestSDKMultiColoring(int argc, char* argv[])
   // Multiple geometries
   load.loadGeometry(cube).loadGeometry(left).loadGeometry(right);
 
-  opt.set("model.scivis.array_name", "Normals");
+  opt.getStruct().model.scivis.array_name = "Normals";
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
            std::string(argv[2]), "TestSDKMultiColoring", 50)
