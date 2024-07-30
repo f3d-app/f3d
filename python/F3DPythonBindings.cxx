@@ -70,6 +70,31 @@ public:
   PYBIND11_TYPE_CASTER(f3d::vector3_t, const_name("f3d.vector3_t"));
 };
 
+template<>
+class py::detail::type_caster<f3d::ratio_t>
+{
+public:
+  bool load(handle src, bool) 
+  {
+    PyObject *source = src.ptr();
+    PyObject *tmp = PyNumber_Float(source);
+    if (!tmp)
+    {
+      return false;
+    }
+    value = PyFloat_AsDouble(tmp);
+    Py_DECREF(tmp);
+    return !(value == -1 && !PyErr_Occurred());
+  }
+
+  static handle cast(f3d::ratio_t src, return_value_policy, handle) 
+  {
+    return PyFloat_FromDouble(src);
+  }
+
+  PYBIND11_TYPE_CASTER(f3d::ratio_t, const_name("f3d.ratio_t"));
+};
+
 PYBIND11_MODULE(pyf3d, module)
 {
   module.doc() = "f3d library bindings";
@@ -157,8 +182,8 @@ PYBIND11_MODULE(pyf3d, module)
   // TODO Proper options bindings
   options //
     .def(py::init<>())
-    .def("__setitem__", &f3d::options::setAsString)
-    .def("__getitem__", &f3d::options::getAsString)
+    .def("__setitem__", &f3d::options::set)
+    .def("__getitem__", &f3d::options::get)
     .def("__len__", [](f3d::options& opts) { return opts.getNames().size(); })
     .def(
       "__iter__",

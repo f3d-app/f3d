@@ -83,6 +83,6 @@ struct mesh_t
 }
 
 using option_variant_t =
-  std::variant<bool, double, f3d::ratio_t, int, std::string, std::vector<double>>;
+  std::variant<bool, int, double, std::string, std::vector<double>, f3d::ratio_t>;
 
 #endif
