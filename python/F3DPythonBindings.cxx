@@ -340,8 +340,30 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("load_plugin", &f3d::engine::loadPlugin, "Load a plugin")
     .def_static(
       "autoload_plugins", &f3d::engine::autoloadPlugins, "Automatically load internal plugins")
-    .def_static("get_plugins_list", &f3d::engine::getPluginsList);
+    .def_static("get_plugins_list", &f3d::engine::getPluginsList)
+    .def_static("get_lib_info", &f3d::engine::getLibInfo, py::return_value_policy::reference);
 
+  py::class_<f3d::engine::libInformation>(module, "LibInformation")
+    .def(py::init<>())
+    .def(py::init<const std::string&, const std::string&, const std::string&, const std::string&,
+                  const std::string&, const std::string&, const std::string&, const std::string&,
+                  const std::string&, const std::string&, const std::string&, const std::string&,
+                  const std::string&>())
+    .def_readonly("version", &f3d::engine::libInformation::Version)
+    .def_readonly("version_full", &f3d::engine::libInformation::VersionFull)
+    .def_readonly("build_date", &f3d::engine::libInformation::BuildDate)
+    .def_readonly("build_system", &f3d::engine::libInformation::BuildSystem)
+    .def_readonly("compiler", &f3d::engine::libInformation::Compiler)
+    .def_readonly("raytracing_module", &f3d::engine::libInformation::RaytracingModule)
+    .def_readonly("external_rendering_module", &f3d::engine::libInformation::ExternalRenderingModule)
+    .def_readonly("openexr_module", &f3d::engine::libInformation::OpenEXRModule)
+    .def_readonly("vtk_version", &f3d::engine::libInformation::VTKVersion)
+    .def_readonly("previous_copyright", &f3d::engine::libInformation::PreviousCopyright)
+    .def_readonly("copyright", &f3d::engine::libInformation::Copyright)
+    .def_readonly("license", &f3d::engine::libInformation::License)
+    .def_readonly("authors", &f3d::engine::libInformation::Authors);
+
+  
   // f3d::log
   py::class_<f3d::log> log(module, "Log");
 
