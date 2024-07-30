@@ -304,7 +304,7 @@ bool image::compare(const image& reference, double , image& , double& ) const
   // TODO check scalars
   vtkImageSSIM::ComputeErrorMetrics(scalars, tight, loose);
   std::cout<<tight<<" "<<loose<<std::endl;
-  double myThresh = 0.1;
+  double myThresh = 0.01;
   return tight <= myThresh;
 
 

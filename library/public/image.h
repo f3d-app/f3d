@@ -144,7 +144,8 @@ public:
    * If the comparison fails, ie. error is higher than the threshold,
    * this outputs the resulting diff and error and return false,
    * return true otherwise.
-   * The error is based on the pixel value and accumulated over neighbors pixels.
+   * The error is minimum between Minkownski and Wasserstein distance
+   * on a SSIM computation, as specified in VTK.
    * 0: Pixel perfect comparison.
    * 50: Visually indistinguishable.
    * 100: Small visible difference.
