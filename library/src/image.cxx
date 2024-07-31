@@ -5,11 +5,13 @@
 
 #include <vtkBMPWriter.h>
 #include <vtkDataArrayRange.h>
+#include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include <vtkImageDifference.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Collection.h>
 #include <vtkImageReader2Factory.h>
+#include <vtkImageSSIM.h>
 #include <vtkJPEGWriter.h>
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
@@ -18,10 +20,9 @@
 #include <vtkStringArray.h>
 #include <vtkTIFFWriter.h>
 #include <vtkUnsignedCharArray.h>
-#include <vtksys/SystemTools.hxx>
-#include <vtkImageSSIM.h>
-#include <vtkDoubleArray.h>
+#include <vtkVersion.h>
 #include <vtkXMLImageDataWriter.h>
+#include <vtksys/SystemTools.hxx>
 
 #include <algorithm>
 #include <cassert>
@@ -298,8 +299,8 @@ bool image::compare(const image& reference, double threshold, double& error) con
     vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
   // TODO check scalars
 
-  double error, unused;
-  vtkImageSSIM::ComputeErrorMetrics(scalars, tight, loose);
+  double unused;
+  vtkImageSSIM::ComputeErrorMetrics(scalars, error, unused);
   return error <= threshold;
 #else
   threshold *= 1000;
@@ -317,25 +318,17 @@ bool image::compare(const image& reference, double threshold, double& error) con
     error = imDiff->GetThresholdedError();
   }
 
-  if (error > threshold)
-  {
-    imDiff->Update();
-    diff.Internals->Image = imDiff->GetOutput();
-    error /= 1000;
-    return false;
-  }
-
+  bool ret = error <= threshold;
   error /= 1000;
-  return true;
+  return ret;
 #endif
 }
 
 //----------------------------------------------------------------------------
 bool image::operator==(const image& reference) const
 {
-  image diff;
   double error;
-  return this->compare(reference, 0, diff, error);
+  return this->compare(reference, 0, error);
 }
 
 //----------------------------------------------------------------------------
