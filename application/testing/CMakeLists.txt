@@ -471,7 +471,7 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingNoDenoise DATA suzanne.ply ARGS -r --samples=20)
   f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Raytracing module: ON")
   f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --samples=4 INTERACTION) #RD
-  f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsbd --samples=4)
+  f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsbd --samples=4 THRESHOLD 0.06) # Threshold needed because of difference in rendering in VTK 9.3 on macOS
 
   if(NOT F3D_MACOS_BUNDLE)
     f3d_test(NAME TestRaytracingDefaultConfigFile DATA dragon.vtu CONFIG config_build ARGS -rd --samples=4 LONG_TIMEOUT TONE_MAPPING)
