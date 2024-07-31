@@ -7,11 +7,9 @@
 #include <vtkDataArrayRange.h>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include <vtkImageDifference.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Collection.h>
 #include <vtkImageReader2Factory.h>
-#include <vtkImageSSIM.h>
 #include <vtkJPEGWriter.h>
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
@@ -23,6 +21,12 @@
 #include <vtkVersion.h>
 #include <vtkXMLImageDataWriter.h>
 #include <vtksys/SystemTools.hxx>
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
+#include <vtkImageSSIM.h>
+#else
+#include <vtkImageDifference.h>
+#endif
 
 #include <algorithm>
 #include <cassert>
