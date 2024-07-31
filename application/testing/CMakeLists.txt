@@ -514,8 +514,8 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --bg-color=1,1,1 -p --load-plugins=assimp)
   endif()
 
-  f3d_test(NAME TestFBXBone DATA animation_with_skeleton.fbx ARGS -a --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08)
-  f3d_test(NAME TestFBXBoneAnimation DATA animation_with_skeleton.fbx ARGS -a --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 --animation-time=0.5 --animation-progress)
+  f3d_test(NAME TestFBXBone DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08)
+  f3d_test(NAME TestFBXBoneAnimation DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 --animation-time=0.5 --animation-progress)
   f3d_test(NAME TestFBXSkinningAnimation DATA punch.fbx ARGS --load-plugins=assimp --animation-time=1 --animation-progress)
   f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "LOD3sp")
   f3d_test(NAME TestVerboseAssimpAnimationIndexError DATA animatedLights.fbx ARGS --load-plugins=assimp --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
@@ -524,7 +524,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestX DATA anim_test.x ARGS --load-plugins=assimp)
 
   # To increase coverage of some specific animation code path when looping
-  f3d_test(NAME TestInteractionFBXBoneAnimation DATA animation_with_skeleton.fbx ARGS -a --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 --animation-speed-factor=100 INTERACTION NO_BASELINE)#Space;Wait;Space;
+  f3d_test(NAME TestInteractionFBXBoneAnimation DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 --animation-speed-factor=100 INTERACTION NO_BASELINE)#Space;Wait;Space;
 
   # This test baseline is incorrect because of https://github.com/f3d-app/f3d/issues/603
   # It will need to be changed when fixed
@@ -628,8 +628,8 @@ endif()
 if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestSTEP DATA f3d.stp ARGS --load-plugins=occt --up=+Z)
   f3d_test(NAME TestIGES DATA f3d.igs ARGS --load-plugins=occt --up=+Z)
-  f3d_test(NAME TestBREP DATA f3d.brep ARGS -a --load-plugins=occt --up=+Z)
-  f3d_test(NAME TestBinaryBREP DATA f3d.bin.brep ARGS -a --load-plugins=occt --up=+Z)
+  f3d_test(NAME TestBREP DATA f3d.brep ARGS --load-plugins=occt --up=+Z)
+  f3d_test(NAME TestBinaryBREP DATA f3d.bin.brep ARGS --load-plugins=occt --up=+Z)
 
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
     f3d_test(NAME TestInvalidBREP DATA invalid.brep ARGS --verbose --load-plugins=occt REGEXP "failed to load geometry" NO_BASELINE)
