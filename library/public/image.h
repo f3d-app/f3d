@@ -147,11 +147,11 @@ public:
    * The error is minimum between Minkownski and Wasserstein distance
    * on a SSIM computation, as specified in VTK.
    * 0: Pixel perfect comparison.
-   * 50: Visually indistinguishable.
-   * 100: Small visible difference.
-   * 300: Comparable images.
+   * 0.05: Visually indistinguishable.
+   * 0.1: Small visible difference.
+   * 0.5: Comparable images.
    */
-  bool compare(const image& reference, double threshold, image& diff, double& error) const;
+  bool compare(const image& reference, double threshold, double& error) const;
 
   /**
    * Save an image to a file in the specified format.

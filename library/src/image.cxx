@@ -281,7 +281,7 @@ void* image::getContent() const
 }
 
 //----------------------------------------------------------------------------
-bool image::compare(const image& reference, double , image& , double& ) const
+bool image::compare(const image& reference, double threshold, double& error) const
 {
   vtkNew<vtkImageSSIM> ssim;
 
@@ -293,38 +293,13 @@ bool image::compare(const image& reference, double , image& , double& ) const
   // TODO check size
   // TODO check Update output
   ssim->Update();
-  double tight, loose;
   vtkDoubleArray* scalars = vtkArrayDownCast<vtkDoubleArray>(
     vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
-  
-  vtkNew<vtkXMLImageDataWriter> writer;
-  writer->SetFileName("/home/glow/image.vti");
-  writer->SetInputConnection(ssim->GetOutputPort());
-  writer->Write();
   // TODO check scalars
+
+  double error, unused;
   vtkImageSSIM::ComputeErrorMetrics(scalars, tight, loose);
-  std::cout<<tight<<" "<<loose<<std::endl;
-  double myThresh = 0.05;
-  return tight <= myThresh;
-
-
-/*  imDiff->UpdateInformation();
-  error = imDiff->GetThresholdedError();
-
-  if (error <= threshold)
-  {
-    imDiff->Update();
-    error = imDiff->GetThresholdedError();
-  }
-
-  if (error > threshold)
-  {
-    imDiff->Update();
-    diff.Internals->Image = imDiff->GetOutput();
-    return false;
-  }
-
-  return true;*/
+  return error <= threshold;
 }
 
 //----------------------------------------------------------------------------
