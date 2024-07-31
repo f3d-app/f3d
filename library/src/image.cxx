@@ -283,6 +283,7 @@ void* image::getContent() const
 //----------------------------------------------------------------------------
 bool image::compare(const image& reference, double threshold, double& error) const
 {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
   vtkNew<vtkImageSSIM> ssim;
 
   // TODO check comp
@@ -300,6 +301,33 @@ bool image::compare(const image& reference, double threshold, double& error) con
   double error, unused;
   vtkImageSSIM::ComputeErrorMetrics(scalars, tight, loose);
   return error <= threshold;
+#else
+  threshold *= 1000;
+
+  vtkNew<vtkImageDifference> imDiff;
+  imDiff->SetThreshold(0);
+  imDiff->SetInputData(this->Internals->Image);
+  imDiff->SetImageData(reference.Internals->Image);
+  imDiff->UpdateInformation();
+  error = imDiff->GetThresholdedError();
+
+  if (error <= threshold)
+  {
+    imDiff->Update();
+    error = imDiff->GetThresholdedError();
+  }
+
+  if (error > threshold)
+  {
+    imDiff->Update();
+    diff.Internals->Image = imDiff->GetOutput();
+    error /= 1000;
+    return false;
+  }
+
+  error /= 1000;
+  return true;
+#endif
 }
 
 //----------------------------------------------------------------------------
