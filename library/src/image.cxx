@@ -292,7 +292,7 @@ bool image::compare(const image& reference, double threshold, double& error) con
   vtkNew<vtkImageSSIM> ssim;
 
   // TODO check comp
-  std::vector<int> rgbaRanges {256, 256, 256, 256};
+  std::vector<int> rgbaRanges{ 256, 256, 256, 256 };
   ssim->SetInputRange(rgbaRanges);
   ssim->SetInputData(this->Internals->Image);
   ssim->SetInputData(1, reference.Internals->Image);
