@@ -222,6 +222,12 @@ install(
 if(UNIX AND NOT APPLE AND NOT ANDROID)
   install(FILES "${F3D_SOURCE_DIR}/resources/f3d.desktop"
     DESTINATION "share/applications" COMPONENT assets)
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo16.png"
+    DESTINATION "share/icons/hicolor/16x16/apps" COMPONENT assets
+    RENAME "f3d.png")
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo24.png"
+    DESTINATION "share/icons/hicolor/24x24/apps" COMPONENT assets
+    RENAME "f3d.png")
   install(FILES "${F3D_SOURCE_DIR}/resources/logo32.png"
     DESTINATION "share/icons/hicolor/32x32/apps" COMPONENT assets
     RENAME "f3d.png")
@@ -231,8 +237,14 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
   install(FILES "${F3D_SOURCE_DIR}/resources/logo64.png"
     DESTINATION "share/icons/hicolor/64x64/apps" COMPONENT assets
     RENAME "f3d.png")
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo256.png"
+    DESTINATION "share/icons/hicolor/256x256/apps" COMPONENT assets
+    RENAME "f3d.png")
   install(FILES "${F3D_SOURCE_DIR}/resources/logo.svg"
     DESTINATION "share/icons/hicolor/scalable/apps" COMPONENT assets
+    RENAME "f3d.svg")
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo-mono.svg"
+    DESTINATION "share/icons/HighContrast/scalable/apps" COMPONENT assets
     RENAME "f3d.svg")
   install(FILES "${F3D_SOURCE_DIR}/resources/completion.bash"
     DESTINATION "share/bash-completion/completions" COMPONENT shellext
