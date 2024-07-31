@@ -9,7 +9,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKDynamicProperties.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
-#     TestSDKImage.cxx
+     TestSDKImage.cxx
      TestSDKInteractorCallBack.cxx
      TestSDKInteractorDropFullScene.cxx
      TestSDKLoadFromMemory.cxx
