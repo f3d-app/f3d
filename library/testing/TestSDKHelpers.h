@@ -18,7 +18,6 @@ public:
 
     std::string baseline = baselinePath + name + ".png";
     std::string output = outputPath + name + ".png";
-    std::string diff = outputPath + name + ".diff.png";
 
     {
       std::ifstream file(baseline.c_str());
