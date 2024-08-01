@@ -201,7 +201,7 @@ int TestSDKImage(int argc, char* argv[])
     double error;
     generated.compare(baseline, 0, error);
 
-    std::cerr << "Generated image is different from the baseline: "<< error << std::endl;
+    std::cerr << "Generated image is different from the baseline: " << error << std::endl;
     return EXIT_FAILURE;
   }
 
