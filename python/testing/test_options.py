@@ -25,7 +25,7 @@ def test_getitem():
 
     assert options["interactor.axis"] is False
     assert options["model.material.roughness"] == 0.3
-    assert options["scene.animation.speed_factor"] == 3.3
+    assert options["scene.animation.speed_factor"] == 1.0
     assert options["render.raytracing.samples"] == 5
     assert options["model.color.rgb"] == [1.0, 1.0, 1.0]
     assert options["scene.up_direction"] == "+Y"

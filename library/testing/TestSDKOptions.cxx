@@ -97,8 +97,8 @@ int TestSDKOptions(int argc, char* argv[])
   }
 
   // Test ratio_t
-  opt.set("scene.animation.speed_factor", f3d::ratio_t(3.17));
-  if (std::get<f3d::ratio_t>(opt.get("scene.animation.speed_factor")) != 3.17)
+  opt.set("scene.animation.speed_factor", 3.17);
+  if (std::get<double>(opt.get("scene.animation.speed_factor")) != 3.17)
   {
     std::cerr << "Options set/get ratio_t is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
