@@ -39,7 +39,6 @@ public:
    * Set/Get an option as a variant based on its name
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::incompatible_exception if value is not compatible with option.
-   * TODO Improve type compatibility, eg avoid doing f3d_ratio_t(2.5) ?
    */
   options& set(const std::string& name, const option_variant_t& value);
   option_variant_t get(const std::string& name) const;
