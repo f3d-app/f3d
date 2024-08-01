@@ -150,6 +150,7 @@ public:
    * 0.05: Visually indistinguishable.
    * 0.1: Small visible difference.
    * 0.5: Comparable images.
+   * 1.0: Different type, size or number of components
    */
   bool compare(const image& reference, double threshold, double& error) const;
 

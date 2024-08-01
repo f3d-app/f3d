@@ -6,6 +6,7 @@
 #include <vtkBMPWriter.h>
 #include <vtkDataArrayRange.h>
 #include <vtkDoubleArray.h>
+#include <vtkExecutive.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Collection.h>
@@ -291,17 +292,58 @@ bool image::compare(const image& reference, double threshold, double& error) con
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
   vtkNew<vtkImageSSIM> ssim;
 
-  // TODO check comp
-  std::vector<int> rgbaRanges{ 256, 256, 256, 256 };
-  ssim->SetInputRange(rgbaRanges);
+  ChannelType type = this->getChannelType();
+  if (type != reference.getChannelType())
+  {
+    error = 1;
+    return false;
+  }
+
+  unsigned int count = this->getChannelCount();
+  if (count != reference.getChannelCount())
+  {
+    error = 1;
+    return false;
+  }
+
+  if (this->getWidth() != reference.getWidth() || this->getHeight() != reference.getHeight())
+  {
+    error = 1;
+    return false;
+  }
+
+  std::vector<int> ranges(count);
+  switch (type)
+  {
+    case ChannelType::BYTE:
+      std::fill(ranges.begin(), ranges.end(), 256);
+      ssim->SetInputRange(ranges);
+      break;
+    case ChannelType::SHORT:
+      std::fill(ranges.begin(), ranges.end(), 65535);
+      ssim->SetInputRange(ranges);
+      break;
+    case ChannelType::FLOAT:
+      ssim->SetInputToAuto();
+      break;
+  }
+
   ssim->SetInputData(this->Internals->Image);
   ssim->SetInputData(1, reference.Internals->Image);
-  // TODO check size
-  // TODO check Update output
-  ssim->Update();
+  if(!ssim->GetExecutive()->Update())
+  {
+    error = 1;
+    return false;
+  }
+
   vtkDoubleArray* scalars = vtkArrayDownCast<vtkDoubleArray>(
     vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
-  // TODO check scalars
+  if (!scalars)
+  {
+    // TODO exception instead ?
+    error = 1;
+    return false;
+  }
 
   double unused;
   vtkImageSSIM::ComputeErrorMetrics(scalars, error, unused);
@@ -332,7 +374,7 @@ bool image::compare(const image& reference, double threshold, double& error) con
 bool image::operator==(const image& reference) const
 {
   double error;
-  // TODO: On macOS arm vtkImageSSIM can provide non-zero error for some reason
+  // TODO: On macOS arm vtkImageSSIM can provide non-zero error for identical images for some reason
   return this->compare(reference, 5e-5 /* should be 0*/, error);
 }
 
