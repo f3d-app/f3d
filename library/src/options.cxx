@@ -17,12 +17,32 @@
 #include <type_traits>
 #include <variant>
 
+#include <cassert>
 namespace f3d
 {
 //----------------------------------------------------------------------------
 class options::internals
 {
 public:
+  template<typename T>
+  static void parse(const std::string& str, T& value, option_types)
+  {
+    internals::parse(str, value);
+  }
+  static void parse(const std::string& str, double& value, option_types type)
+  {
+    if(type == option_types::_ratio)
+    {
+      ratio_t ratio;
+      internals::parse(str, ratio);
+      value = ratio; 
+    }
+    else
+    {
+      internals::parse(str, value);
+    }
+  }
+
   // TODO expose parse methods in options API ?
   static void parse(const std::string& str, bool& value)
   {
@@ -95,6 +115,24 @@ public:
     }
   }
 
+  template<typename T>
+  static std::string toString(const T& value, option_types)
+  {
+    return internals::toString(value);
+  }
+  static std::string toString(const double& value, option_types type)
+  {
+    if(type == option_types::_ratio)
+    {
+      ratio_t ratio = value;
+      return internals::toString(ratio);
+    }
+    else
+    {
+      return internals::toString(value);
+    }
+  }
+
   // TODO Improve string generation
   static std::string toString(const bool& var)
   {
@@ -112,9 +150,8 @@ public:
 
   static std::string toString(const f3d::ratio_t& var)
   {
-    std::ostringstream stream;
-    stream << std::noshowpoint << var;
-    return stream.str();
+    double val = var;
+    return internals::toString(val);
   }
 
   static std::string toString(const std::string& var)
@@ -142,15 +179,17 @@ public:
 
   void setAsString(const std::string& name, const std::string& str)
   {
+    option_types type = options_struct_internals::getType(name);
     option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
-    std::visit([str](auto& ref) { internals::parse(str, ref); }, var);
+    std::visit([str, type](auto& ref) { internals::parse(str, ref, type); }, var);
     options_struct_internals::set(this->OptionsStruct, name, var);
   }
 
   std::string getAsString(const std::string& name)
   {
+    option_types type = options_struct_internals::getType(name);
     option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
-    return std::visit([](const auto& ref) { return internals::toString(ref); }, var);
+    return std::visit([type](const auto& ref) { return internals::toString(ref, type); }, var);
   }
   options_struct OptionsStruct;
 };

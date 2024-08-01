@@ -74,6 +74,7 @@ ${_options_struct}};
 
   list(JOIN _options_setter ";\n    else " _options_setter)
   list(JOIN _options_getter ";\n  else " _options_getter)
+  list(JOIN _options_typer ";\n  else " _options_typer)
   list(JOIN _options_lister ",\n  " _options_lister)
   file(WRITE ${_f3d_generate_options_DESTINATION}/private/options_struct_internals.h "\
 #ifndef f3d${_f3d_generate_options_prefix}_options_struct_internals_h
@@ -101,6 +102,13 @@ option_variant_t get(const f3d::options_struct& ostruct, const std::string& name
   ${_options_getter};
   else throw f3d::options::inexistent_exception(\"Option \" + name + \" does not exist\");
   return var;
+}
+
+option_types getType(const std::string& name){
+  ${_options_typer};
+  else throw f3d::options::inexistent_exception(\"Option \" + name + \" does not exist\");
+  // Cannot be reached
+  return option_types::_bool;
 }
 
 std::vector<std::string> getNames() {
@@ -141,13 +149,14 @@ function(_parse_json_option _top_json)
          string(APPEND _options_struct "${_option_indent}  std::string ${_member_name} = \"${_option_default_value}\";\n")
          list(APPEND _options_setter "if (name == \"${_option_name}\") ostruct.${_option_name} = std::get<std::string>(value)")
        elseif(_option_type STREQUAL "ratio")
-	 string(APPEND _options_struct "${_option_indent}  f3d::ratio_t ${_member_name} = f3d::ratio_t(${_option_default_value});\n")
-         list(APPEND _options_setter "if (name == \"${_option_name}\") ostruct.${_option_name} = std::get<f3d::ratio_t>(value)")
+         string(APPEND _options_struct "${_option_indent} f3d::ratio_t ${_member_name} = f3d::ratio_t(${_option_default_value});\n")
+         list(APPEND _options_setter "if (name == \"${_option_name}\") ostruct.${_option_name} = std::get<double>(value)")
        else()
          string(APPEND _options_struct "${_option_indent}  ${_option_type} ${_member_name} = ${_option_default_value};\n")
          list(APPEND _options_setter "if (name == \"${_option_name}\") ostruct.${_option_name} = std::get<${_option_type}>(value)")
        endif()
        list(APPEND _options_getter "if (name == \"${_option_name}\") var = ostruct.${_option_name}")
+       list(APPEND _options_typer "if (name == \"${_option_name}\") return option_types::_${_option_type}")
        list(APPEND _options_lister "\"${_option_name}\"")
     else()
       # Group found, add in the struct and recurse
@@ -167,5 +176,6 @@ function(_parse_json_option _top_json)
   set(_options_struct "${_options_struct}" PARENT_SCOPE)
   set(_options_setter ${_options_setter} PARENT_SCOPE)
   set(_options_getter ${_options_getter} PARENT_SCOPE)
+  set(_options_typer ${_options_typer} PARENT_SCOPE)
   set(_options_lister ${_options_lister} PARENT_SCOPE)
 endfunction()

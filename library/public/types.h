@@ -82,7 +82,9 @@ struct mesh_t
 };
 }
 
+enum class option_types{ _bool, _int, _double, _ratio, _string, _double_vector};
+
 using option_variant_t =
-  std::variant<bool, int, double, std::string, std::vector<double>, f3d::ratio_t>;
+  std::variant<bool, int, double, std::string, std::vector<double>>;
 
 #endif
