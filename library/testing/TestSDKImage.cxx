@@ -198,7 +198,10 @@ int TestSDKImage(int argc, char* argv[])
 
   if (generated != baseline)
   {
-    std::cerr << "Generated image is different from the baseline" << std::endl;
+    double error;
+    generated->compare(baseline, 0, error);
+
+    std::cerr << "Generated image is different from the baseline: "<< error << std::endl;
     return EXIT_FAILURE;
   }
 
