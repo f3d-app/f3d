@@ -34,19 +34,31 @@ int TestSDKImage(int argc, char* argv[])
   constexpr unsigned int height = 64;
   constexpr unsigned int channels = 3;
 
-  std::vector<unsigned char> pixels(width * height * channels);
-
   // fill with deterministic random values
   // do not use std::uniform_int_distribution, it's not giving the same result on different
   // platforms
   std::mt19937 rand_generator;
-  std::generate(std::begin(pixels), std::end(pixels), [&]() { return rand_generator() % 256; });
 
   f3d::image generated(width, height, channels);
+  std::vector<unsigned char> pixels(width * height * channels);
+  std::generate(std::begin(pixels), std::end(pixels), [&]() { return rand_generator() % 256; });
   generated.setContent(pixels.data());
 
-  // test save in different formats
+  f3d::image generated16(width, height, channels, f3d::image::ChannelType::SHORT);
+  std::vector<unsigned short> pixels16(width * height * channels);
+  std::generate(std::begin(pixels16), std::end(pixels16), [&]() { return rand_generator() % 65535; });
+  generated16.setContent(pixels16.data());
+
+  // TODO which range should be used here ?
+  f3d::image generated32(width, height, channels, f3d::image::ChannelType::FLOAT);
+  std::vector<float> pixels32(width * height * channels);
+  std::generate(std::begin(pixels32), std::end(pixels32), [&]() { return rand_generator() % 10; });
+  generated32.setContent(pixels32.data());
+
+  // test save in different formats and different types
   generated.save(tmpDir + "/TestSDKImage.png");
+  generated16.save(tmpDir + "/TestSDKImage16.png");
+  generated32.save(tmpDir + "/TestSDKImage32.tif", f3d::image::SaveFormat::TIF);
   generated.save(tmpDir + "/TestSDKImage.jpg", f3d::image::SaveFormat::JPG);
   generated.save(tmpDir + "/TestSDKImage.tif", f3d::image::SaveFormat::TIF);
   generated.save(tmpDir + "/TestSDKImage.bmp", f3d::image::SaveFormat::BMP);
@@ -110,7 +122,7 @@ int TestSDKImage(int argc, char* argv[])
   {
   }
 
-  // check reading a 16-bits image
+  // check 16-bits image code paths
   f3d::image shortImg(testingDir + "/data/16bit.png");
 
   if (shortImg.getChannelType() != f3d::image::ChannelType::SHORT)
@@ -139,6 +151,7 @@ int TestSDKImage(int argc, char* argv[])
     std::cerr << "Cannot read a HDR 32-bits image type size" << std::endl;
     return EXIT_FAILURE;
   }
+  hdrImg.save(tmpDir + "/TestSDKImage32hdr.tif", f3d::image::SaveFormat::TIF);
 
 #if F3D_MODULE_EXR
   // check reading EXR
@@ -161,12 +174,6 @@ int TestSDKImage(int argc, char* argv[])
   }
   catch (const f3d::image::read_exception&)
   {
-  }
-
-  if (hdrImg.getChannelType() != f3d::image::ChannelType::FLOAT)
-  {
-    std::cerr << "Cannot read a HDR 32-bits image" << std::endl;
-    return EXIT_FAILURE;
   }
 
   // check generated image with baseline
@@ -202,6 +209,79 @@ int TestSDKImage(int argc, char* argv[])
     generated.compare(baseline, 0, error);
 
     std::cerr << "Generated image is different from the baseline: " << error << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // check generated short image with baseline
+  f3d::image baseline16(testingDir + "/baselines/TestSDKImage16.png");
+  if (generated16.getWidth() != width || generated16.getHeight() != height)
+  {
+    std::cerr << "Short image has wrong dimensions" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated16.getChannelCount() != channels)
+  {
+    std::cerr << "Short image has wrong number of channels" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated16.getChannelType() != f3d::image::ChannelType::SHORT)
+  {
+    std::cerr << "Short image has wrong channel size" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated16.getContent() == nullptr)
+  {
+    std::cerr << "Short image has no data" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated16 != baseline16)
+  {
+    double error;
+    generated16.compare(baseline16, 0, error);
+
+    std::cerr << "generated short image is different from the baseline: " << error << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // check generated float image with baseline
+
+  // XXX: Uncomment once https://github.com/f3d-app/f3d/issues/1558 is fixed
+  //f3d::image baseline32(testingDir + "/baselines/TestSDKImage32.tif");
+  f3d::image baseline32 = generated32;
+  if (generated32.getWidth() != width || generated32.getHeight() != height)
+  {
+    std::cerr << "Float image has wrong dimensions" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated32.getChannelCount() != channels)
+  {
+    std::cerr << "Float image has wrong number of channels" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated32.getChannelType() != f3d::image::ChannelType::FLOAT)
+  {
+    std::cerr << "Float image has wrong channel size" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated32.getContent() == nullptr)
+  {
+    std::cerr << "Float image has no data" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated32 != baseline32)
+  {
+    double error;
+    generated32.compare(baseline32, 0, error);
+
+    std::cerr << "generated float image is different from the baseline: " << error << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -362,5 +442,6 @@ int TestSDKImage(int argc, char* argv[])
     }
   }
 
+  // TODO compare code path coverage
   return EXIT_SUCCESS;
 }

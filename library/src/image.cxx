@@ -312,6 +312,12 @@ bool image::compare(const image& reference, double threshold, double& error) con
     return false;
   }
 
+  if (this->getWidth() == 0 && this->getHeight() == 0)
+  {
+    error = 0;
+    return true;
+  }
+
   std::vector<int> ranges(count);
   switch (type)
   {
@@ -330,20 +336,12 @@ bool image::compare(const image& reference, double threshold, double& error) con
 
   ssim->SetInputData(this->Internals->Image);
   ssim->SetInputData(1, reference.Internals->Image);
-  if(!ssim->GetExecutive()->Update())
-  {
-    error = 1;
-    return false;
-  }
-
+  ssim->Update();
   vtkDoubleArray* scalars = vtkArrayDownCast<vtkDoubleArray>(
     vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
-  if (!scalars)
-  {
-    // TODO exception instead ?
-    error = 1;
-    return false;
-  }
+
+  // Thanks to the checks above, this is not supposed to happen
+  assert(scalars);
 
   double unused;
   vtkImageSSIM::ComputeErrorMetrics(scalars, error, unused);
@@ -416,6 +414,7 @@ void image::save(const std::string& path, SaveFormat format) const
 {
   vtkSmartPointer<vtkImageWriter> writer;
 
+  // TODO Check type is compatible
   switch (format)
   {
     case SaveFormat::PNG:
@@ -449,6 +448,7 @@ void image::save(const std::string& path, SaveFormat format) const
 //----------------------------------------------------------------------------
 std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
 {
+  // TODO Check type is compatible
   switch (format)
   {
     case SaveFormat::PNG:
