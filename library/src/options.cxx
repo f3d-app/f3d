@@ -31,11 +31,11 @@ public:
   }
   static void parse(const std::string& str, double& value, option_types type)
   {
-    if(type == option_types::_ratio)
+    if (type == option_types::_ratio)
     {
       ratio_t ratio;
       internals::parse(str, ratio);
-      value = ratio; 
+      value = ratio;
     }
     else
     {
@@ -122,7 +122,7 @@ public:
   }
   static std::string toString(const double& value, option_types type)
   {
-    if(type == option_types::_ratio)
+    if (type == option_types::_ratio)
     {
       ratio_t ratio = value;
       return internals::toString(ratio);
