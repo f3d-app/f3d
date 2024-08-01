@@ -31,17 +31,16 @@ def test_getitem():
     assert options["scene.up_direction"] == "+Y"
 
 
-#def test_get_non_existent_key():
-#    options = f3d.Options()
-#    with pytest.raises(KeyError):
-#        assert options["hello"] == "world"
+def test_get_non_existent_key():
+    options = f3d.Options()
+    with pytest.raises(Exception):
+        assert options["hello"] == "world"
 
 
-#@pytest.mark.xfail(reason="f3d::options::set does not throw, should it?")
-#def test_set_non_existent_key():
-#    options = f3d.Options()
-#    with pytest.raises(KeyError):
-#        options["hello"] = "world"
+def test_set_non_existent_key():
+    options = f3d.Options()
+    with pytest.raises(Exception):
+        options["hello"] = "world"
 
 
 def test_len():
