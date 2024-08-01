@@ -332,7 +332,8 @@ bool image::compare(const image& reference, double threshold, double& error) con
 bool image::operator==(const image& reference) const
 {
   double error;
-  return this->compare(reference, 0, error);
+  // TODO: On macOS arm vtkImageSSIM can provide non-zero error for some reason
+  return this->compare(reference, 5e-5 /* should be 0*/, error);
 }
 
 //----------------------------------------------------------------------------
