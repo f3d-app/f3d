@@ -5,6 +5,7 @@
 
 #include <array>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace f3d
@@ -38,6 +39,23 @@ struct F3D_EXPORT vector3_t : std::array<double, 3>
  */
 using angle_deg_t = double;
 
+class ratio_t
+{
+public:
+  ratio_t() = default;
+  ratio_t(double val)
+  {
+    this->Value = val;
+  }
+  operator double() const
+  {
+    return this->Value;
+  }
+
+private:
+  double Value;
+};
+
 /**
  * Describe a 3D surfacic mesh.
  * A valid mesh fulfills these requirements:
@@ -63,5 +81,17 @@ struct mesh_t
   F3D_EXPORT std::pair<bool, std::string> isValid() const;
 };
 }
+
+enum class option_types
+{
+  _bool,
+  _int,
+  _double,
+  _ratio,
+  _string,
+  _double_vector
+};
+
+using option_variant_t = std::variant<bool, int, double, std::string, std::vector<double>>;
 
 #endif

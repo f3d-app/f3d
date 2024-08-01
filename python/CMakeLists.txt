@@ -28,7 +28,7 @@ get_property(F3D_MULTI_CONFIG_GENERATOR GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFI
 set(f3d_module_dir "${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>/${f3d_python_package_name}")
 
 set_target_properties(pyf3d PROPERTIES
-  CXX_STANDARD 14
+  CXX_STANDARD 17
   CXX_VISIBILITY_PRESET hidden
   LIBRARY_OUTPUT_DIRECTORY "${f3d_module_dir}"
   )

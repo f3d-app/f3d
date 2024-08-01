@@ -1,4 +1,6 @@
 #include "options.h"
+#include "options_struct.h"
+#include "options_struct_internals.h"
 
 #include "export.h"
 #include "init.h"
@@ -8,100 +10,188 @@
 #include "vtkF3DConfigure.h"
 
 #include <algorithm>
+#include <iostream>
 #include <limits>
 #include <map>
+#include <string>
 #include <type_traits>
 #include <variant>
 
+#include <cassert>
 namespace f3d
 {
 //----------------------------------------------------------------------------
 class options::internals
 {
 public:
-  using OptionVariant =
-    std::variant<bool, int, double, std::string, std::vector<int>, std::vector<double>>;
-
-  template<typename T, typename U>
-  struct IsTypeValid;
-
-  template<typename T, typename... Ts>
-  struct IsTypeValid<T, std::variant<Ts...>> : public std::disjunction<std::is_same<T, Ts>...>
-  {
-  };
-
   template<typename T>
-  void init(const std::string& name, const T& value)
+  static void parse(const std::string& str, T& value, option_types)
   {
-    static_assert(IsTypeValid<T, OptionVariant>::value);
-    this->Options[name] = value;
+    internals::parse(str, value);
+  }
+  static void parse(const std::string& str, double& value, option_types type)
+  {
+    if (type == option_types::_ratio)
+    {
+      ratio_t ratio;
+      internals::parse(str, ratio);
+      value = ratio;
+    }
+    else
+    {
+      internals::parse(str, value);
+    }
   }
 
-  template<typename T>
-  void set(const std::string& name, const T& value)
+  // TODO expose parse methods in options API ?
+  static void parse(const std::string& str, bool& value)
   {
-    static_assert(!std::is_array_v<T> && !std::is_pointer_v<T>);
+    // TODO implement proper parsing
+    bool b1;
+    bool b2;
+    std::istringstream(str) >> b1;
+    std::istringstream(str) >> std::boolalpha >> b2;
+    value = b1 || b2;
+  }
+
+  static void parse(const std::string& str, int& value)
+  {
+    // TODO implement proper parsing
     try
     {
-      T& opt = std::get<T>(this->Options.at(name));
-      opt = value;
+      value = std::stoi(str);
     }
-    catch (const std::bad_variant_access&)
+    catch (std::invalid_argument const&)
     {
-      log::error("Trying to set option ", name, " with incompatible type");
+      throw options::parsing_exception("Cannot parse " + str + " into an int");
     }
-    catch (const std::out_of_range&)
+    catch (std::out_of_range const&)
     {
-      log::error("Option ", name, " does not exist");
+      throw options::parsing_exception(
+        "Cannot parse " + str + " into an int as it would go out of range");
     }
   }
 
-  template<typename T>
-  void get(const std::string& name, T& value) const
+  static void parse(const std::string& str, double& value)
   {
+    // TODO implement proper parsing
     try
     {
-      value = std::get<T>(this->Options.at(name));
+      value = std::stod(str);
     }
-    catch (const std::bad_variant_access&)
+    catch (std::invalid_argument const&)
     {
-      log::error("Trying to get option ", name, " with incompatible type");
-      return;
+      throw options::parsing_exception("Cannot parse " + str + " into a double");
     }
-    catch (const std::out_of_range&)
+    catch (std::out_of_range const&)
     {
-      log::error("Option ", name, " does not exist");
-      return;
+      throw options::parsing_exception(
+        "Cannot parse " + str + " into a double as it would go out of range");
+    }
+  }
+
+  static void parse(const std::string& str, ratio_t& value)
+  {
+    double dbl;
+    internals::parse(str, dbl);
+    value = dbl;
+  }
+
+  static void parse(const std::string& str, std::string& value)
+  {
+    value = str;
+  }
+
+  static void parse(const std::string& str, std::vector<double>& value)
+  {
+    // TODO implement proper parsing
+    std::istringstream split(str);
+    value.clear();
+    for (std::string each; std::getline(split, each, ',');)
+    {
+      double dbl;
+      internals::parse(each, dbl);
+      value.push_back(dbl);
     }
   }
 
   template<typename T>
-  T get(const std::string& name) const
+  static std::string toString(const T& value, option_types)
   {
-    T val = {};
-    this->get(name, val);
-    return val;
+    return internals::toString(value);
+  }
+  static std::string toString(const double& value, option_types type)
+  {
+    if (type == option_types::_ratio)
+    {
+      ratio_t ratio = value;
+      return internals::toString(ratio);
+    }
+    else
+    {
+      return internals::toString(value);
+    }
+  }
+
+  // TODO Improve string generation
+  static std::string toString(const bool& var)
+  {
+    std::stringstream stream;
+    stream << std::boolalpha << var;
+    return stream.str();
+  }
+
+  static std::string toString(const double& var)
+  {
+    std::ostringstream stream;
+    stream << std::noshowpoint << var;
+    return stream.str();
+  }
+
+  static std::string toString(const f3d::ratio_t& var)
+  {
+    double val = var;
+    return internals::toString(val);
+  }
+
+  static std::string toString(const std::string& var)
+  {
+    return var;
+  }
+
+  static std::string toString(const std::vector<double>& var)
+  {
+    std::ostringstream stream;
+    unsigned int i = 0;
+    for (auto& elem : var)
+    {
+      stream << ((i > 0) ? ", " : "") << internals::toString(elem);
+      i++;
+    }
+    return stream.str();
   }
 
   template<typename T>
-  T& getRef(const std::string& name)
+  static std::string toString(const T& var)
   {
-    try
-    {
-      return std::get<T>(this->Options.at(name));
-    }
-    catch (const std::bad_variant_access&)
-    {
-      throw options::incompatible_exception(
-        "Trying to get option reference " + name + " with incompatible type");
-    }
-    catch (const std::out_of_range&)
-    {
-      throw options::inexistent_exception("Option " + name + " does not exist");
-    }
+    return std::to_string(var);
   }
 
-  std::map<std::string, OptionVariant> Options;
+  void setAsString(const std::string& name, const std::string& str)
+  {
+    option_types type = options_struct_internals::getType(name);
+    option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
+    std::visit([str, type](auto& ref) { internals::parse(str, ref, type); }, var);
+    options_struct_internals::set(this->OptionsStruct, name, var);
+  }
+
+  std::string getAsString(const std::string& name)
+  {
+    option_types type = options_struct_internals::getType(name);
+    option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
+    return std::visit([type](const auto& ref) { return internals::toString(ref, type); }, var);
+  }
+  options_struct OptionsStruct;
 };
 
 //----------------------------------------------------------------------------
@@ -109,98 +199,6 @@ options::options()
   : Internals(new options::internals)
 {
   detail::init::initialize();
-
-  // Scene
-  this->Internals->init("scene.animation.autoplay", false);
-  this->Internals->init("scene.animation.index", 0);
-  this->Internals->init("scene.animation.speed-factor", 1.0);
-  this->Internals->init("scene.animation.time", 0.0);
-  this->Internals->init("scene.animation.frame-rate", 60.0);
-  this->Internals->init("scene.camera.index", -1);
-  this->Internals->init("scene.up-direction", std::string("+Y"));
-
-  // Render
-  this->Internals->init("render.show-edges", false);
-  this->Internals->init("render.line-width", 1.0);
-  this->Internals->init("render.point-size", 10.0);
-  this->Internals->init("render.grid.enable", false);
-  this->Internals->init("render.grid.absolute", false);
-  this->Internals->init("render.grid.unit", 0.0);
-  this->Internals->init("render.grid.subdivisions", 10);
-  this->Internals->init("render.grid.color", std::vector<double>{ 0.0, 0.0, 0.0 });
-  this->Internals->init("render.backface-type", std::string("default"));
-
-  this->Internals->init("render.raytracing.enable", false);
-  this->Internals->init("render.raytracing.denoise", false);
-  this->Internals->init("render.raytracing.samples", 5);
-
-  this->Internals->init("render.effect.translucency-support", false);
-  this->Internals->init("render.effect.anti-aliasing", false);
-  this->Internals->init("render.effect.ambient-occlusion", false);
-  this->Internals->init("render.effect.tone-mapping", false);
-  this->Internals->init("render.effect.final-shader", std::string());
-
-  this->Internals->init("render.hdri.file", std::string());
-  this->Internals->init("render.hdri.ambient", false);
-  this->Internals->init("render.background.color", std::vector<double>{ 0.2, 0.2, 0.2 });
-  this->Internals->init("render.background.skybox", false);
-  this->Internals->init("render.background.blur", false);
-  this->Internals->init("render.background.blur.coc", 20.0);
-  this->Internals->init("render.light.intensity", 1.);
-
-  // UI
-  this->Internals->init("ui.bar", false);
-  this->Internals->init("ui.filename", false);
-  this->Internals->init("ui.filename-info", std::string());
-  this->Internals->init("ui.fps", false);
-  this->Internals->init("ui.cheatsheet", false);
-  this->Internals->init("ui.dropzone", false);
-  this->Internals->init("ui.dropzone-info", std::string());
-  this->Internals->init("ui.metadata", false);
-  this->Internals->init("ui.font-file", std::string());
-  this->Internals->init("ui.loader-progress", false);
-  this->Internals->init("ui.animation-progress", false);
-
-  // Model
-  this->Internals->init("model.matcap.texture", std::string());
-
-  this->Internals->init("model.color.opacity", 1.0);
-  // XXX: Not compatible with scivis: https://github.com/f3d-app/f3d/issues/347
-  this->Internals->init("model.color.rgb", std::vector<double>{ 1., 1., 1. });
-  // XXX: Artifacts when using with scivis: https://github.com/f3d-app/f3d/issues/348
-  this->Internals->init("model.color.texture", std::string());
-
-  this->Internals->init("model.emissive.factor", std::vector<double>{ 1., 1., 1. });
-  this->Internals->init("model.emissive.texture", std::string());
-
-  this->Internals->init("model.normal.texture", std::string());
-  this->Internals->init("model.normal.scale", 1.0);
-
-  this->Internals->init("model.material.metallic", 0.0);
-  this->Internals->init("model.material.roughness", 0.3);
-  this->Internals->init("model.material.texture", std::string());
-
-  this->Internals->init("model.scivis.cells", false);
-  this->Internals->init("model.scivis.array-name", F3D_RESERVED_STRING);
-  this->Internals->init("model.scivis.component", -1);
-  this->Internals->init("model.scivis.colormap",
-    std::vector<double>{
-      0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0 });
-  this->Internals->init("model.scivis.range", std::vector<double>{ 0 });
-
-  // XXX: Rename into a "rendering-mode" option: https://github.com/f3d-app/f3d/issues/345
-  this->Internals->init("model.point-sprites.enable", false);
-  this->Internals->init("model.point-sprites.type", std::string("sphere"));
-  this->Internals->init("model.volume.enable", false);
-  this->Internals->init("model.volume.inverse", false);
-
-  // Camera projection
-  this->Internals->init("scene.camera.orthographic", false);
-
-  // Interactor
-  this->Internals->init("interactor.axis", false);
-  this->Internals->init("interactor.trackball", false);
-  this->Internals->init("interactor.invert-zoom", false);
 };
 
 //----------------------------------------------------------------------------
@@ -213,13 +211,13 @@ options::~options()
 options::options(const options& opt)
   : Internals(new options::internals)
 {
-  this->Internals->Options = opt.Internals->Options;
+  this->Internals->OptionsStruct = opt.Internals->OptionsStruct;
 }
 
 //----------------------------------------------------------------------------
 options& options::operator=(const options& opt) noexcept
 {
-  this->Internals->Options = opt.Internals->Options;
+  this->Internals->OptionsStruct = opt.Internals->OptionsStruct;
   return *this;
 }
 
@@ -243,237 +241,81 @@ options& options::operator=(options&& other) noexcept
 }
 
 //----------------------------------------------------------------------------
-options& options::set(const std::string& name, bool value)
+options& options::set(const std::string& name, const option_variant_t& value)
 {
-  this->Internals->set(name, value);
+  options_struct_internals::set(this->Internals->OptionsStruct, name, value);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-options& options::set(const std::string& name, int value)
+option_variant_t options::get(const std::string& name) const
 {
-  this->Internals->set(name, value);
+  return options_struct_internals::get(this->Internals->OptionsStruct, name);
+}
+
+//----------------------------------------------------------------------------
+options& options::setAsString(const std::string& name, const std::string& str)
+{
+  this->Internals->setAsString(name, str);
   return *this;
-}
-
-//----------------------------------------------------------------------------
-options& options::set(const std::string& name, double value)
-{
-  this->Internals->set(name, value);
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-options& options::set(const std::string& name, const std::string& value)
-{
-  this->Internals->set(name, value);
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-options& options::set(const std::string& name, const char* value)
-{
-  this->Internals->set(name, std::string(value));
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-options& options::set(const std::string& name, const std::vector<int>& values)
-{
-  this->Internals->set(name, values);
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-options& options::set(const std::string& name, const std::vector<double>& values)
-{
-  this->Internals->set(name, values);
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-options& options::set(const std::string& name, std::initializer_list<int> values)
-{
-  this->Internals->set(name, std::vector<int>(values));
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-options& options::set(const std::string& name, std::initializer_list<double> values)
-{
-  this->Internals->set(name, std::vector<double>(values));
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-void options::get(const std::string& name, bool& value) const
-{
-  this->Internals->get(name, value);
-}
-
-//----------------------------------------------------------------------------
-void options::get(const std::string& name, int& value) const
-{
-  this->Internals->get(name, value);
-}
-
-//----------------------------------------------------------------------------
-void options::get(const std::string& name, double& value) const
-{
-  this->Internals->get(name, value);
-}
-
-//----------------------------------------------------------------------------
-void options::get(const std::string& name, std::string& value) const
-{
-  this->Internals->get(name, value);
-}
-
-//----------------------------------------------------------------------------
-void options::get(const std::string& name, std::vector<int>& value) const
-{
-  this->Internals->get(name, value);
-}
-
-//----------------------------------------------------------------------------
-void options::get(const std::string& name, std::vector<double>& value) const
-{
-  this->Internals->get(name, value);
-}
-
-//----------------------------------------------------------------------------
-bool options::getAsBool(const std::string& name) const
-{
-  return this->Internals->get<bool>(name);
-}
-
-//----------------------------------------------------------------------------
-int options::getAsInt(const std::string& name) const
-{
-  return this->Internals->get<int>(name);
-}
-
-//----------------------------------------------------------------------------
-double options::getAsDouble(const std::string& name) const
-{
-  return this->Internals->get<double>(name);
 }
 
 //----------------------------------------------------------------------------
 std::string options::getAsString(const std::string& name) const
 {
-  return this->Internals->get<std::string>(name);
-}
-
-//----------------------------------------------------------------------------
-std::vector<int> options::getAsIntVector(const std::string& name) const
-{
-  return this->Internals->get<std::vector<int>>(name);
-}
-
-//----------------------------------------------------------------------------
-std::vector<double> options::getAsDoubleVector(const std::string& name) const
-{
-  return this->Internals->get<std::vector<double>>(name);
-}
-
-//----------------------------------------------------------------------------
-bool& options::getAsBoolRef(const std::string& name)
-{
-  return this->Internals->getRef<bool>(name);
-}
-
-//----------------------------------------------------------------------------
-int& options::getAsIntRef(const std::string& name)
-{
-  return this->Internals->getRef<int>(name);
-}
-
-//----------------------------------------------------------------------------
-double& options::getAsDoubleRef(const std::string& name)
-{
-  return this->Internals->getRef<double>(name);
-}
-
-//----------------------------------------------------------------------------
-std::string& options::getAsStringRef(const std::string& name)
-{
-  return this->Internals->getRef<std::string>(name);
-}
-
-//----------------------------------------------------------------------------
-std::vector<int>& options::getAsIntVectorRef(const std::string& name)
-{
-  return this->Internals->getRef<std::vector<int>>(name);
-}
-
-//----------------------------------------------------------------------------
-std::vector<double>& options::getAsDoubleVectorRef(const std::string& name)
-{
-  return this->Internals->getRef<std::vector<double>>(name);
+  return this->Internals->getAsString(name);
 }
 
 //----------------------------------------------------------------------------
 options& options::toggle(const std::string& name)
 {
-  this->Internals->set<bool>(name, !this->Internals->get<bool>(name));
-  return *this;
+  try
+  {
+    option_variant_t val;
+    val = this->get(name);
+    this->set(name, !std::get<bool>(val));
+    return *this;
+  }
+  catch (const std::bad_variant_access&)
+  {
+    throw options::incompatible_exception(
+      "Trying to get toggle " + name + " with incompatible type");
+  }
 }
 
 //----------------------------------------------------------------------------
 bool options::isSame(const options& other, const std::string& name) const
 {
-  try
-  {
-    return this->Internals->Options.at(name) == other.Internals->Options.at(name);
-  }
-  catch (const std::out_of_range&)
-  {
-    std::string error = "Options " + name + " does not exist";
-    log::error(error);
-    throw options::inexistent_exception(error + "\n");
-  }
+  return options_struct_internals::get(this->Internals->OptionsStruct, name) ==
+    options_struct_internals::get(other.Internals->OptionsStruct, name);
 }
 
 //----------------------------------------------------------------------------
 options& options::copy(const options& from, const std::string& name)
 {
-  try
-  {
-    this->Internals->Options.at(name) = from.Internals->Options.at(name);
-  }
-  catch (const std::out_of_range&)
-  {
-    std::string error = "Options " + name + " does not exist";
-    log::error(error);
-    throw options::inexistent_exception(error + "\n");
-  }
+  options_struct_internals::set(this->Internals->OptionsStruct, name,
+    options_struct_internals::get(from.Internals->OptionsStruct, name));
   return *this;
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> options::getNames()
+std::vector<std::string> options::getNames() const
 {
-  std::vector<std::string> names;
-  names.reserve(this->Internals->Options.size());
-  for (const auto& [name, value] : this->Internals->Options)
-  {
-    names.emplace_back(name);
-  }
-  return names;
+  return options_struct_internals::getNames();
 }
 
 //----------------------------------------------------------------------------
 std::pair<std::string, unsigned int> options::getClosestOption(const std::string& option) const
 {
-  if (this->Internals->Options.find(option) != this->Internals->Options.end())
+  std::vector<std::string> names = options_struct_internals::getNames();
+  if (std::find(names.begin(), names.end(), option) != names.end())
   {
     return { option, 0 };
   }
 
   std::pair<std::string, int> ret = { "", std::numeric_limits<int>::max() };
 
-  for (const auto& [name, value] : this->Internals->Options)
+  for (const auto& name : names)
   {
     int distance = utils::textDistance(name, option);
     if (distance < ret.second)
@@ -483,6 +325,12 @@ std::pair<std::string, unsigned int> options::getClosestOption(const std::string
   }
 
   return ret;
+}
+
+//----------------------------------------------------------------------------
+options::parsing_exception::parsing_exception(const std::string& what)
+  : exception(what)
+{
 }
 
 //----------------------------------------------------------------------------
@@ -497,4 +345,15 @@ options::inexistent_exception::inexistent_exception(const std::string& what)
 {
 }
 
+//----------------------------------------------------------------------------
+options_struct& options::getStruct()
+{
+  return this->Internals->OptionsStruct;
+}
+
+//----------------------------------------------------------------------------
+const options_struct& options::getStruct() const
+{
+  return this->Internals->OptionsStruct;
+}
 }

@@ -13,10 +13,10 @@ def main():
     model_path = TEST_DATA_DIR / "suzanne.obj"
     options = {
         "scene.up-direction": "+Y",
-        "render.effect.tone-mapping": True,
-        "render.effect.ambient-occlusion": True,
-        "render.effect.translucency-support": True,
-        "render.effect.anti-aliasing": True,
+        "render.effect.tone-mapping": "true",
+        "render.effect.ambient-occlusion": "true",
+        "render.effect.translucency-support": "true",
+        "render.effect.anti-aliasing": "true",
     }
     anim_fps = 30
     anim_duration = 4

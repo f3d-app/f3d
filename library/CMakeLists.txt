@@ -33,6 +33,12 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx"
   @ONLY)
 
+include(f3dOptions)
+f3d_generate_options(
+  INPUT "${CMAKE_CURRENT_SOURCE_DIR}/options.json"
+  DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
+	)
+
 # Define libf3d target
 set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/animationManager.cxx
@@ -69,6 +75,7 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
+  ${CMAKE_CURRENT_BINARY_DIR}/public/options_struct.h
   )
 
 set(F3D_PLUGIN_HEADERS

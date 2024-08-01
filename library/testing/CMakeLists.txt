@@ -94,7 +94,6 @@ foreach (test ${libf3dSDKTests_list})
 endforeach ()
 
 # Specific test properties to check
-
 # CTest can't check colored output as it contains special chars
 set_tests_properties(libf3d::TestSDKLog PROPERTIES PASS_REGULAR_EXPRESSION
 "\
@@ -123,5 +122,5 @@ if(Qt5_FOUND)
   target_link_libraries(libf3dSDKTests Qt5::OpenGL)
 endif()
 
-# make sure the libf3d API is compatible with C++11
-set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 11)
+# make sure the libf3d API is compatible with C++17
+set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 17)

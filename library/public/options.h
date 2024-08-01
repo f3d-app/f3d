@@ -3,8 +3,12 @@
 
 #include "exception.h"
 #include "export.h"
+#include "options_struct.h"
+#include "types.h"
 
+#include <array>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace f3d
@@ -31,62 +35,26 @@ public:
   options& operator=(options&& other) noexcept;
   ///@}
 
-  ///@{ @name Setters
   /**
-   * Setters for all supported types.
+   * Set/Get an option as a variant based on its name
+   * Throw an options::inexistent_exception if option does not exist.
+   * Throw an options::incompatible_exception if value is not compatible with option.
    */
-  options& set(const std::string& name, bool value);
-  options& set(const std::string& name, int value);
-  options& set(const std::string& name, double value);
-  options& set(const std::string& name, const std::string& value);
-  options& set(const std::string& name, const char* value);
-  options& set(const std::string& name, const std::vector<int>& values);
-  options& set(const std::string& name, const std::vector<double>& values);
-  options& set(const std::string& name, std::initializer_list<int> values);
-  options& set(const std::string& name, std::initializer_list<double> values);
-  ///@}
+  options& set(const std::string& name, const option_variant_t& value);
+  option_variant_t get(const std::string& name) const;
 
-  ///@{ @name Reference Getters
   /**
-   * Copy the option value into the provided reference, for all supported types.
-   */
-  void get(const std::string& name, bool& value) const;
-  void get(const std::string& name, int& value) const;
-  void get(const std::string& name, double& value) const;
-  void get(const std::string& name, std::string& value) const;
-  void get(const std::string& name, std::vector<int>& value) const;
-  void get(const std::string& name, std::vector<double>& value) const;
-  ///@}
-
-  ///@{ @name Explicit Copy Getters
-  /**
-   * Explicit getters for all supported types.
-   */
-  bool getAsBool(const std::string& name) const;
-  int getAsInt(const std::string& name) const;
-  double getAsDouble(const std::string& name) const;
-  std::string getAsString(const std::string& name) const;
-  std::vector<int> getAsIntVector(const std::string& name) const;
-  std::vector<double> getAsDoubleVector(const std::string& name) const;
-  ///@}
-
-  ///@{ @name Explicit Reference Getters
-  /**
-   * Explicit getters to actual reference to the options variable, for all supported types.
-   * Modifying the returned reference will modify the option.
-   * Throw an options::incompatible_exception if the type is not compatible with the option.
+   * Set/Get an option as a string based on its name
+   * The setter use specific parsing, see the related doc TODO
    * Throw an options::inexistent_exception if option does not exist.
    */
-  bool& getAsBoolRef(const std::string& name);
-  int& getAsIntRef(const std::string& name);
-  double& getAsDoubleRef(const std::string& name);
-  std::string& getAsStringRef(const std::string& name);
-  std::vector<int>& getAsIntVectorRef(const std::string& name);
-  std::vector<double>& getAsDoubleVectorRef(const std::string& name);
-  ///@}
+  options& setAsString(const std::string& name, const std::string& str);
+  std::string getAsString(const std::string& name) const;
 
   /**
    * A boolean option specific method to toggle it.
+   * Throw an options::inexistent_exception if option does not exist.
+   * Throw an options::incompatible_exception if option is not boolean.
    */
   options& toggle(const std::string& name);
 
@@ -105,8 +73,9 @@ public:
 
   /**
    * Get all available option names.
+   * TODO: Add a getNamesStruct ?
    */
-  std::vector<std::string> getNames();
+  std::vector<std::string> getNames() const;
 
   /**
    * Get the closest option name and its Levenshtein distance.
@@ -115,7 +84,16 @@ public:
 
   /**
    * An exception that can be thrown by the options
-   * when a provided option type is incompatible with
+   * when parsing of a string into an option value fails
+   */
+  struct parsing_exception : public exception
+  {
+    explicit parsing_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by the options
+   * when an operation on a specific option is incompatible with
    * its internal type.
    */
   struct incompatible_exception : public exception
@@ -131,6 +109,9 @@ public:
   {
     explicit inexistent_exception(const std::string& what = "");
   };
+
+  options_struct& getStruct();
+  const options_struct& getStruct() const;
 
 private:
   class internals;
