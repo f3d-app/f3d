@@ -76,6 +76,13 @@ set_target_properties(libf3dSDKTests PROPERTIES
 
 target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR=$<BOOL:${F3D_MODULE_EXR}>)
 
+# Remove this once VTK 9.3 support is removed
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
+  target_compile_definitions(libf3dSDKTests PRIVATE F3D_SSIM_COMPARE=ON)
+else()
+  target_compile_definitions(libf3dSDKTests PRIVATE F3D_SSIM_COMPARE=OFF)
+endif()
+
 # List tests that do not require rendering
 list(APPEND libf3dSDKTestsNoRender_list
      TestSDKEngineExceptions

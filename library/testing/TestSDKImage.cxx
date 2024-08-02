@@ -1,4 +1,5 @@
 #include <image.h>
+#include <log.h>
 
 #include <algorithm>
 #include <fstream>
@@ -37,22 +38,22 @@ int TestSDKImage(int argc, char* argv[])
   // fill with deterministic random values
   // do not use std::uniform_int_distribution, it's not giving the same result on different
   // platforms
-  std::mt19937 rand_generator;
+  std::mt19937 randGenerator;
 
   f3d::image generated(width, height, channels);
-  std::vector<unsigned char> pixels(width * height * channels);
-  std::generate(std::begin(pixels), std::end(pixels), [&]() { return rand_generator() % 256; });
+  std::vector<uint8_t> pixels(width * height * channels);
+  std::generate(std::begin(pixels), std::end(pixels), [&]() { return randGenerator() % 256; });
   generated.setContent(pixels.data());
 
   f3d::image generated16(width, height, channels, f3d::image::ChannelType::SHORT);
-  std::vector<unsigned short> pixels16(width * height * channels);
-  std::generate(std::begin(pixels16), std::end(pixels16), [&]() { return rand_generator() % 65535; });
+  std::vector<uint16_t> pixels16(width * height * channels);
+  std::generate(std::begin(pixels16), std::end(pixels16), [&]() { return randGenerator() % 65536; });
   generated16.setContent(pixels16.data());
 
-  // TODO which range should be used here ?
+  std::uniform_real_distribution<> dist(std::numeric_limits<float>::min(), std::numeric_limits<float>::max());
   f3d::image generated32(width, height, channels, f3d::image::ChannelType::FLOAT);
   std::vector<float> pixels32(width * height * channels);
-  std::generate(std::begin(pixels32), std::end(pixels32), [&]() { return rand_generator() % 10; });
+  std::generate(std::begin(pixels32), std::end(pixels32), [&]() { return dist(randGenerator); });
   generated32.setContent(pixels32.data());
 
   // test save in different formats and different types
@@ -177,8 +178,6 @@ int TestSDKImage(int argc, char* argv[])
   }
 
   // check generated image with baseline
-  f3d::image baseline(testingDir + "/baselines/TestSDKImage.png");
-
   if (generated.getWidth() != width || generated.getHeight() != height)
   {
     std::cerr << "Image has wrong dimensions" << std::endl;
@@ -203,15 +202,42 @@ int TestSDKImage(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  f3d::image baseline(testingDir + "/baselines/TestSDKImage.png");
   if (generated != baseline)
   {
     double error;
     generated.compare(baseline, 0, error);
 
-    std::cerr << "Generated image is different from the baseline: " << error << std::endl;
+    std::cerr << "Generated image is different from the png baseline: " << error << std::endl;
     return EXIT_FAILURE;
   }
 
+  // XXX: enable following code once TODO is fixed
+  /*
+  f3d::image baselineJPG(testingDir + "/baselines/TestSDKImage.jpg");
+  if (generated != baselineJPG)
+  {
+    double error;
+    generated.compare(baselineJPG, 0, error);
+
+    std::cerr << "Generated image is different from the jpg baseline: " << error << std::endl;
+    return EXIT_FAILURE;
+  }*/
+
+  // XXX: enable following code once https://github.com/f3d-app/f3d/issues/1558 is fixed
+  /*
+  f3d::image baselineTIF(testingDir + "/baselines/TestSDKImage.tif");
+  if (generated != baselineTIF)
+  {
+    double error;
+    baselineTIF2.compare(baselineTIF, 0, error);
+
+    std::cerr << "Generated image is different from the tif baseline: " << error << std::endl;
+    return EXIT_FAILURE;
+  }*/
+
+// Remove this once VTK 9.3 support is removed
+//#if F3D_SSIM_COMPARE
   // check generated short image with baseline
   f3d::image baseline16(testingDir + "/baselines/TestSDKImage16.png");
   if (generated16.getWidth() != width || generated16.getHeight() != height)
@@ -248,7 +274,6 @@ int TestSDKImage(int argc, char* argv[])
   }
 
   // check generated float image with baseline
-
   // XXX: Uncomment once https://github.com/f3d-app/f3d/issues/1558 is fixed
   //f3d::image baseline32(testingDir + "/baselines/TestSDKImage32.tif");
   f3d::image baseline32 = generated32;
@@ -284,6 +309,7 @@ int TestSDKImage(int argc, char* argv[])
     std::cerr << "generated float image is different from the baseline: " << error << std::endl;
     return EXIT_FAILURE;
   }
+//#endif
 
   // test operators
   f3d::image imgCopy = generated; // copy constructor
