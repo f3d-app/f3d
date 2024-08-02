@@ -4,7 +4,6 @@
 set(F3D_VTK_MODULES
   VTK::CommonSystem
   VTK::IOImage
-  VTK::IOXML
   VTK::InteractionWidgets
   f3d::vtkext
   f3d::vtkextPrivate

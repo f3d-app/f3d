@@ -1,5 +1,4 @@
 #include <image.h>
-#include <log.h>
 
 #include <algorithm>
 #include <fstream>

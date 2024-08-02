@@ -6,7 +6,6 @@
 #include <vtkBMPWriter.h>
 #include <vtkDataArrayRange.h>
 #include <vtkDoubleArray.h>
-#include <vtkExecutive.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Collection.h>
@@ -20,7 +19,6 @@
 #include <vtkTIFFWriter.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
-#include <vtkXMLImageDataWriter.h>
 #include <vtksys/SystemTools.hxx>
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
@@ -339,8 +337,8 @@ bool image::compare(const image& reference, double threshold, double& error) con
   vtkDoubleArray* scalars = vtkArrayDownCast<vtkDoubleArray>(
     vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
 
-  // Thanks to the checks above, this is not supposed to happen
-  assert(scalars);
+  // Thanks to the checks above, this is always true
+  assert(scalars != nullptr);
 
   double unused;
   vtkImageSSIM::ComputeErrorMetrics(scalars, error, unused);
