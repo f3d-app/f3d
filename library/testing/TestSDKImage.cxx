@@ -473,21 +473,21 @@ int TestSDKImage(int argc, char* argv[])
 
   // Test image::compare dedicated code paths
   double error;
-  if(generated.compare(generated16, 0, error) || error != 1.)
+  if (generated.compare(generated16, 0, error) || error != 1.)
   {
     std::cerr << "Unexpected result when comparing image with different channel types" << std::endl;
     return EXIT_FAILURE;
   }
 
   f3d::image generatedCount(width, height, channels + 1);
-  if(generated.compare(generatedCount, 0, error) || error != 1.)
+  if (generated.compare(generatedCount, 0, error) || error != 1.)
   {
     std::cerr << "Unexpected result when comparing image with different channel count" << std::endl;
     return EXIT_FAILURE;
   }
 
   f3d::image generatedSize(width + 1, height, channels + 1);
-  if(generated.compare(generatedSize, 0, error) || error != 1.)
+  if (generated.compare(generatedSize, 0, error) || error != 1.)
   {
     std::cerr << "Unexpected result when comparing image with different sizes" << std::endl;
     return EXIT_FAILURE;
