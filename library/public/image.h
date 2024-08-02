@@ -145,7 +145,8 @@ public:
    * this outputs the resulting diff and error and return false,
    * return true otherwise.
    * The error is minimum between Minkownski and Wasserstein distance
-   * on a SSIM computation, as specified in VTK.
+   * on a SSIM computation, as specified in VTK
+   * Depending on the VTK version, another comparison algorithm may be used.
    * 0: Pixel perfect comparison.
    * 0.05: Visually indistinguishable.
    * 0.1: Small visible difference.
