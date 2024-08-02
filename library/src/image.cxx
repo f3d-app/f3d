@@ -295,7 +295,6 @@ bool image::compare(const image& reference, double threshold, double& error) con
   ChannelType type = this->getChannelType();
   if (type != reference.getChannelType())
   {
-    std::cout<<"getChannelType"<<std::endl;
     error = 1;
     return false;
   }
@@ -303,14 +302,12 @@ bool image::compare(const image& reference, double threshold, double& error) con
   unsigned int count = this->getChannelCount();
   if (count != reference.getChannelCount())
   {
-    std::cout<<"getChannelCount"<<std::endl;
     error = 1;
     return false;
   }
 
   if (this->getWidth() != reference.getWidth() || this->getHeight() != reference.getHeight())
   {
-    std::cout<<"getSize"<<std::endl;
     error = 1;
     return false;
   }

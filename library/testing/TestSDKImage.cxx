@@ -5,6 +5,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <limits>
 #include <random>
 #include <set>
 #include <sstream>
@@ -47,10 +48,12 @@ int TestSDKImage(int argc, char* argv[])
 
   f3d::image generated16(width, height, channels, f3d::image::ChannelType::SHORT);
   std::vector<uint16_t> pixels16(width * height * channels);
-  std::generate(std::begin(pixels16), std::end(pixels16), [&]() { return randGenerator() % 65536; });
+  std::generate(
+    std::begin(pixels16), std::end(pixels16), [&]() { return randGenerator() % 65536; });
   generated16.setContent(pixels16.data());
 
-  std::uniform_real_distribution<> dist(std::numeric_limits<float>::min(), std::numeric_limits<float>::max());
+  std::uniform_real_distribution<> dist(
+    std::numeric_limits<float>::min(), std::numeric_limits<float>::max());
   f3d::image generated32(width, height, channels, f3d::image::ChannelType::FLOAT);
   std::vector<float> pixels32(width * height * channels);
   std::generate(std::begin(pixels32), std::end(pixels32), [&]() { return dist(randGenerator); });
@@ -276,7 +279,7 @@ int TestSDKImage(int argc, char* argv[])
 
   // check generated float image with baseline
   // XXX: Uncomment once https://github.com/f3d-app/f3d/issues/1558 is fixed
-  //f3d::image baseline32(testingDir + "/baselines/TestSDKImage32.tif");
+  // f3d::image baseline32(testingDir + "/baselines/TestSDKImage32.tif");
   f3d::image baseline32 = generated32;
   if (generated32.getWidth() != width || generated32.getHeight() != height)
   {
