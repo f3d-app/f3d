@@ -289,9 +289,6 @@ void* image::getContent() const
 //----------------------------------------------------------------------------
 bool image::compare(const image& reference, double threshold, double& error) const
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
-  vtkNew<vtkImageSSIM> ssim;
-
   ChannelType type = this->getChannelType();
   if (type != reference.getChannelType())
   {
@@ -318,6 +315,8 @@ bool image::compare(const image& reference, double threshold, double& error) con
     return true;
   }
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
+  vtkNew<vtkImageSSIM> ssim;
   std::vector<int> ranges(count);
   switch (type)
   {
