@@ -58,11 +58,12 @@ int TestSDKImage(int argc, char* argv[])
 
   // test save in different formats and different types
   generated.save(tmpDir + "/TestSDKImage.png");
-  generated16.save(tmpDir + "/TestSDKImage16.png");
-  generated32.save(tmpDir + "/TestSDKImage32.tif", f3d::image::SaveFormat::TIF);
   generated.save(tmpDir + "/TestSDKImage.jpg", f3d::image::SaveFormat::JPG);
-  generated.save(tmpDir + "/TestSDKImage.tif", f3d::image::SaveFormat::TIF);
   generated.save(tmpDir + "/TestSDKImage.bmp", f3d::image::SaveFormat::BMP);
+  generated.save(tmpDir + "/TestSDKImage.tif", f3d::image::SaveFormat::TIF);
+  generated16.save(tmpDir + "/TestSDKImage16.png");
+  generated16.save(tmpDir + "/TestSDKImage16.tif", f3d::image::SaveFormat::TIF);
+  generated32.save(tmpDir + "/TestSDKImage32.tif", f3d::image::SaveFormat::TIF);
 
   // test saveBuffer in different formats
   std::vector<unsigned char> bufferPNG = generated.saveBuffer();
@@ -212,34 +213,21 @@ int TestSDKImage(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // XXX: enable following code once TODO is fixed
-  /*
-  f3d::image baselineJPG(testingDir + "/baselines/TestSDKImage.jpg");
-  if (generated != baselineJPG)
-  {
-    double error;
-    generated.compare(baselineJPG, 0, error);
-
-    std::cerr << "Generated image is different from the jpg baseline: " << error << std::endl;
-    return EXIT_FAILURE;
-  }*/
-
   // XXX: enable following code once https://github.com/f3d-app/f3d/issues/1558 is fixed
   /*
   f3d::image baselineTIF(testingDir + "/baselines/TestSDKImage.tif");
   if (generated != baselineTIF)
   {
     double error;
-    baselineTIF2.compare(baselineTIF, 0, error);
+    generated.compare(baselineTIF, 0, error);
 
     std::cerr << "Generated image is different from the tif baseline: " << error << std::endl;
     return EXIT_FAILURE;
   }*/
 
 // Remove this once VTK 9.3 support is removed
-//#if F3D_SSIM_COMPARE
+#if F3D_SSIM_COMPARE
   // check generated short image with baseline
-  f3d::image baseline16(testingDir + "/baselines/TestSDKImage16.png");
   if (generated16.getWidth() != width || generated16.getHeight() != height)
   {
     std::cerr << "Short image has wrong dimensions" << std::endl;
@@ -264,6 +252,7 @@ int TestSDKImage(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  f3d::image baseline16(testingDir + "/baselines/TestSDKImage16.png");
   if (generated16 != baseline16)
   {
     double error;
@@ -272,6 +261,18 @@ int TestSDKImage(int argc, char* argv[])
     std::cerr << "generated short image is different from the baseline: " << error << std::endl;
     return EXIT_FAILURE;
   }
+
+  // XXX: enable following code once https://github.com/f3d-app/f3d/issues/1558 is fixed
+  /*
+  f3d::image baseline16TIF(testingDir + "/baselines/TestSDKImage16.tif");
+  if (generated16 != baseline16TIF)
+  {
+    double error;
+    generated16.compare(baseline16TIF, 0, error);
+
+    std::cerr << "generated short image is different from the TIF baseline: " << error << std::endl;
+    return EXIT_FAILURE;
+  }*/
 
   // check generated float image with baseline
   // XXX: Uncomment once https://github.com/f3d-app/f3d/issues/1558 is fixed
@@ -309,7 +310,7 @@ int TestSDKImage(int argc, char* argv[])
     std::cerr << "generated float image is different from the baseline: " << error << std::endl;
     return EXIT_FAILURE;
   }
-//#endif
+#endif // F3D_SSIM_COMPARE
 
   // test operators
   f3d::image imgCopy = generated; // copy constructor
