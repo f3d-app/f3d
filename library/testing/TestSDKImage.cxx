@@ -486,7 +486,7 @@ int TestSDKImage(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  f3d::image generatedSize(width + 1, height, channels + 1);
+  f3d::image generatedSize(width + 1, height, channels);
   if (generated.compare(generatedSize, 0, error) || error != 1.)
   {
     std::cerr << "Unexpected result when comparing image with different sizes" << std::endl;
