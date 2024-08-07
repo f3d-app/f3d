@@ -144,13 +144,16 @@ public:
    * If the comparison fails, ie. error is higher than the threshold,
    * this outputs the resulting diff and error and return false,
    * return true otherwise.
-   * The error is based on the pixel value and accumulated over neighbors pixels.
+   * The error is minimum between Minkownski and Wasserstein distance
+   * on a SSIM computation, as specified in VTK
+   * Depending on the VTK version, another comparison algorithm may be used.
    * 0: Pixel perfect comparison.
-   * 50: Visually indistinguishable.
-   * 100: Small visible difference.
-   * 300: Comparable images.
+   * 0.05: Visually indistinguishable.
+   * 0.1: Small visible difference.
+   * 0.5: Comparable images.
+   * 1.0: Different type, size or number of components
    */
-  bool compare(const image& reference, double threshold, image& diff, double& error) const;
+  bool compare(const image& reference, double threshold, double& error) const;
 
   /**
    * Save an image to a file in the specified format.
