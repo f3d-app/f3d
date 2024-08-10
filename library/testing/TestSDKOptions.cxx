@@ -211,8 +211,8 @@ int TestSDKOptions(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 #endif
-  opt.setAsString("model.scivis.cells", "False").setAsString("model.scivis.cells", "True");
-  if (opt.getAsString("model.scivis.cells") != "True")
+  opt.setAsString("model.scivis.cells", "false").setAsString("model.scivis.cells", "true");
+  if (opt.getAsString("model.scivis.cells") != "true")
   {
     std::cerr << "Chaining options as string is not working." << std::endl;
     return EXIT_FAILURE;

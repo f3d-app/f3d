@@ -128,4 +128,4 @@ if(Qt5_FOUND)
 endif()
 
 # make sure the libf3d API is compatible with the right C++ standard
-#set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD ${f3d_cxx_standard})
+set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD ${f3d_cxx_standard})
