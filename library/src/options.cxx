@@ -1,6 +1,5 @@
 #include "options.h"
-#include "options_struct.h"
-#include "options_struct_internals.h"
+#include "options_tools.h"
 
 #include "export.h"
 #include "init.h"
@@ -177,21 +176,20 @@ public:
     return std::to_string(var);
   }
 
-  void setAsString(const std::string& name, const std::string& str)
+  void setAsString(options& opt, const std::string& name, const std::string& str)
   {
-    option_types type = options_struct_internals::getType(name);
-    option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
+    option_types type = options_tools::getType(name);
+    option_variant_t var = options_tools::get(opt, name);
     std::visit([str, type](auto& ref) { internals::parse(str, ref, type); }, var);
-    options_struct_internals::set(this->OptionsStruct, name, var);
+    options_tools::set(opt, name, var);
   }
 
-  std::string getAsString(const std::string& name)
+  std::string getAsString(const options& opt, const std::string& name)
   {
-    option_types type = options_struct_internals::getType(name);
-    option_variant_t var = options_struct_internals::get(this->OptionsStruct, name);
+    option_types type = options_tools::getType(name);
+    option_variant_t var = options_tools::get(opt, name);
     return std::visit([type](const auto& ref) { return internals::toString(ref, type); }, var);
   }
-  options_struct OptionsStruct;
 };
 
 //----------------------------------------------------------------------------
@@ -211,13 +209,11 @@ options::~options()
 options::options(const options& opt)
   : Internals(new options::internals)
 {
-  this->Internals->OptionsStruct = opt.Internals->OptionsStruct;
 }
 
 //----------------------------------------------------------------------------
 options& options::operator=(const options& opt) noexcept
 {
-  this->Internals->OptionsStruct = opt.Internals->OptionsStruct;
   return *this;
 }
 
@@ -243,27 +239,27 @@ options& options::operator=(options&& other) noexcept
 //----------------------------------------------------------------------------
 options& options::set(const std::string& name, const option_variant_t& value)
 {
-  options_struct_internals::set(this->Internals->OptionsStruct, name, value);
+  options_tools::set(*this, name, value);
   return *this;
 }
 
 //----------------------------------------------------------------------------
 option_variant_t options::get(const std::string& name) const
 {
-  return options_struct_internals::get(this->Internals->OptionsStruct, name);
+  return options_tools::get(*this, name);
 }
 
 //----------------------------------------------------------------------------
 options& options::setAsString(const std::string& name, const std::string& str)
 {
-  this->Internals->setAsString(name, str);
+  this->Internals->setAsString(*this, name, str);
   return *this;
 }
 
 //----------------------------------------------------------------------------
 std::string options::getAsString(const std::string& name) const
 {
-  return this->Internals->getAsString(name);
+  return this->Internals->getAsString(*this, name);
 }
 
 //----------------------------------------------------------------------------
@@ -286,28 +282,26 @@ options& options::toggle(const std::string& name)
 //----------------------------------------------------------------------------
 bool options::isSame(const options& other, const std::string& name) const
 {
-  return options_struct_internals::get(this->Internals->OptionsStruct, name) ==
-    options_struct_internals::get(other.Internals->OptionsStruct, name);
+  return options_tools::get(*this, name) == options_tools::get(other, name);
 }
 
 //----------------------------------------------------------------------------
 options& options::copy(const options& from, const std::string& name)
 {
-  options_struct_internals::set(this->Internals->OptionsStruct, name,
-    options_struct_internals::get(from.Internals->OptionsStruct, name));
+  options_tools::set(*this, name, options_tools::get(from, name));
   return *this;
 }
 
 //----------------------------------------------------------------------------
 std::vector<std::string> options::getNames() const
 {
-  return options_struct_internals::getNames();
+  return options_tools::getNames();
 }
 
 //----------------------------------------------------------------------------
 std::pair<std::string, unsigned int> options::getClosestOption(const std::string& option) const
 {
-  std::vector<std::string> names = options_struct_internals::getNames();
+  std::vector<std::string> names = options_tools::getNames();
   if (std::find(names.begin(), names.end(), option) != names.end())
   {
     return { option, 0 };
@@ -343,17 +337,5 @@ options::incompatible_exception::incompatible_exception(const std::string& what)
 options::inexistent_exception::inexistent_exception(const std::string& what)
   : exception(what)
 {
-}
-
-//----------------------------------------------------------------------------
-options_struct& options::getStruct()
-{
-  return this->Internals->OptionsStruct;
-}
-
-//----------------------------------------------------------------------------
-const options_struct& options::getStruct() const
-{
-  return this->Internals->OptionsStruct;
 }
 }

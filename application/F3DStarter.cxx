@@ -383,7 +383,7 @@ F3DStarter::F3DStarter()
   : Internals(std::make_unique<F3DStarter::F3DInternals>())
 {
   // Set option outside of command line and config file
-  this->Internals->DynamicOptions.getStruct().ui.dropzone_info =
+  this->Internals->DynamicOptions.ui.dropzone_info =
     "Drop a file or HDRI to load it\nPress H to show cheatsheet";
 
   // Initialize dmon
@@ -510,10 +510,10 @@ int F3DStarter::Start(int argc, char** argv)
             // TODO: add a image::canRead
 
             // Load the file as an HDRI instead of adding it.
-            f3d::options_struct& ostruct = this->Internals->Engine->getOptions().getStruct();
-            ostruct.render.hdri.file = file;
-            ostruct.render.hdri.ambient = true;
-            ostruct.render.background.skybox = true;
+            f3d::options& options = this->Internals->Engine->getOptions();
+            options.render.hdri.file = file;
+            options.render.hdri.ambient = true;
+            options.render.background.skybox = true;
 
             // Rendering now is needed for correct lighting
             this->Render();
@@ -558,13 +558,13 @@ int F3DStarter::Start(int argc, char** argv)
 
     if (!fullPath.empty())
     {
-      this->Internals->Engine->getOptions().getStruct().model.scivis.colormap =
+      this->Internals->Engine->getOptions().model.scivis.colormap =
         F3DColorMapTools::Read(fullPath);
     }
     else
     {
       f3d::log::error("Cannot find the colormap ", this->Internals->AppOptions.ColorMapFile);
-      this->Internals->Engine->getOptions().getStruct().model.scivis.colormap =
+      this->Internals->Engine->getOptions().model.scivis.colormap =
         std::vector<double>{};
     }
   }
@@ -896,9 +896,9 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
     loader.loadGeometry("", true);
   }
 
-  f3d::options_struct& ostruct = this->Internals->Engine->getOptions().getStruct();
-  ostruct.ui.dropzone = !this->Internals->LoadedFile;
-  ostruct.ui.filename_info = filenameInfo;
+  f3d::options& options = this->Internals->Engine->getOptions();
+  options.ui.dropzone = !this->Internals->LoadedFile;
+  options.ui.filename_info = filenameInfo;
 }
 
 //----------------------------------------------------------------------------
@@ -950,17 +950,16 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   f3d::options optionsCopy = this->Internals->Engine->getOptions();
 
   bool noBackground = this->Internals->AppOptions.NoBackground;
-  f3d::options_struct& ostruct = options.getStruct();
   if (minimal)
   {
-    ostruct.ui.scalar_bar = false;
-    ostruct.ui.cheatsheet = false;
-    ostruct.ui.filename = false;
-    ostruct.ui.fps = false;
-    ostruct.ui.metadata = false;
-    ostruct.ui.animation_progress = false;
-    ostruct.interactor.axis = false;
-    ostruct.render.grid.enable = false;
+    options.ui.scalar_bar = false;
+    options.ui.cheatsheet = false;
+    options.ui.filename = false;
+    options.ui.fps = false;
+    options.ui.metadata = false;
+    options.ui.animation_progress = false;
+    options.interactor.axis = false;
+    options.render.grid.enable = false;
     noBackground = true;
   }
 
@@ -968,7 +967,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   this->Internals->addOutputImageMetadata(img);
   img.save(path.string(), f3d::image::SaveFormat::PNG);
 
-  ostruct.render.light.intensity = ostruct.render.light.intensity * 5;
+  options.render.light.intensity = options.render.light.intensity * 5;
   this->Render();
 
   this->Internals->Engine->setOptions(optionsCopy);

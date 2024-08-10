@@ -33,7 +33,7 @@ int TestSDKOptions(int argc, char* argv[])
               << std::endl;
     return EXIT_FAILURE;
   }
-  opt.getStruct().model.scivis.cells = false;
+  opt.model.scivis.cells = false;
   if (opt.getAsString("model.scivis.cells") != "false")
   {
     std::cerr << "Options struct with getAsString bool is not behaving as expected." << std::endl;
@@ -64,7 +64,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options setAsString int is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  opt.getStruct().scene.animation.index = 3;
+  opt.scene.animation.index = 3;
   if (opt.getAsString("scene.animation.index") != "3")
   {
     std::cerr << "Options struct with getAsString int is not behaving as expected." << std::endl;
@@ -89,7 +89,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options setAsString double is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  opt.getStruct().render.line_width = 2.13;
+  opt.render.line_width = 2.13;
   if (opt.getAsString("render.line_width") != "2.13")
   {
     std::cerr << "Options struct with getAsString double is not behaving as expected." << std::endl;
@@ -114,7 +114,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options setAsString ratio_t is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  opt.getStruct().scene.animation.speed_factor = 3.18;
+  opt.scene.animation.speed_factor = 3.18;
   if (opt.getAsString("scene.animation.speed_factor") != "3.18")
   {
     std::cerr << "Options struct with getAsString ratio_t is not behaving as expected."
@@ -141,7 +141,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options setAsString string is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  opt.getStruct().model.color.texture = "testInStruct";
+  opt.model.color.texture = "testInStruct";
   if (opt.getAsString("model.color.texture") != "testInStruct")
   {
     std::cerr << "Options struct with getAsString string is not behaving as expected." << std::endl;
@@ -167,7 +167,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options setAsString vector<double> is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  opt.getStruct().render.background.color = { 0.1, 0.2, 0.5 };
+  opt.render.background.color = { 0.1, 0.2, 0.5 };
   if (opt.getAsString("render.background.color") != "0.1, 0.2, 0.5")
   {
     std::cerr << "Options struct with getAsString vector<double> is not behaving as expected."

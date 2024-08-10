@@ -311,7 +311,7 @@ window_impl::~window_impl()
 void window_impl::Initialize(bool withColoring)
 {
   this->Internals->WithColoring = withColoring;
-  this->Internals->Renderer->Initialize(this->Internals->Options.getStruct().scene.up_direction);
+  this->Internals->Renderer->Initialize(this->Internals->Options.scene.up_direction);
   this->Internals->UpdateTheme();
   this->Internals->Initialized = true;
 }
@@ -338,15 +338,15 @@ void window_impl::UpdateDynamicOptions()
   // Make sure lights are created before we take options into account
   this->Internals->Renderer->UpdateLights();
 
-  auto ostruct = this->Internals->Options.getStruct();
-  this->Internals->Renderer->ShowAxis(ostruct.interactor.axis);
-  this->Internals->Renderer->SetUseTrackball(ostruct.interactor.trackball);
-  this->Internals->Renderer->SetInvertZoom(ostruct.interactor.invert_zoom);
+  const options& opt = this->Internals->Options;
+  this->Internals->Renderer->ShowAxis(opt.interactor.axis);
+  this->Internals->Renderer->SetUseTrackball(opt.interactor.trackball);
+  this->Internals->Renderer->SetInvertZoom(opt.interactor.invert_zoom);
 
   // XXX: model.point-sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
-  std::string splatTypeStr = ostruct.model.point_sprites.type;
-  int pointSize = ostruct.render.point_size;
+  std::string splatTypeStr = opt.model.point_sprites.type;
+  int pointSize = opt.render.point_size;
   vtkF3DRendererWithColoring::SplatType splatType = vtkF3DRendererWithColoring::SplatType::SPHERE;
   if (splatTypeStr == "gaussian")
   {
@@ -355,75 +355,77 @@ void window_impl::UpdateDynamicOptions()
 
   this->Internals->Renderer->SetPointProperties(splatType, pointSize);
 
-  this->Internals->Renderer->SetLineWidth(ostruct.render.line_width);
-  this->Internals->Renderer->ShowEdge(ostruct.render.show_edges);
-  this->Internals->Renderer->ShowTimer(ostruct.ui.fps);
-  this->Internals->Renderer->ShowFilename(ostruct.ui.filename);
-  this->Internals->Renderer->SetFilenameInfo(ostruct.ui.filename_info);
-  this->Internals->Renderer->ShowMetaData(ostruct.ui.metadata);
-  this->Internals->Renderer->ShowCheatSheet(ostruct.ui.cheatsheet);
-  this->Internals->Renderer->ShowDropZone(ostruct.ui.dropzone);
-  this->Internals->Renderer->SetDropZoneInfo(ostruct.ui.dropzone_info);
+  this->Internals->Renderer->SetLineWidth(opt.render.line_width);
+  this->Internals->Renderer->ShowEdge(opt.render.show_edges);
+  this->Internals->Renderer->ShowTimer(opt.ui.fps);
+  this->Internals->Renderer->ShowFilename(opt.ui.filename);
+  this->Internals->Renderer->SetFilenameInfo(opt.ui.filename_info);
+  this->Internals->Renderer->ShowMetaData(opt.ui.metadata);
+  this->Internals->Renderer->ShowCheatSheet(opt.ui.cheatsheet);
+  this->Internals->Renderer->ShowDropZone(opt.ui.dropzone);
+  this->Internals->Renderer->SetDropZoneInfo(opt.ui.dropzone_info);
 
-  this->Internals->Renderer->SetUseRaytracing(ostruct.render.raytracing.enable);
-  this->Internals->Renderer->SetRaytracingSamples(ostruct.render.raytracing.samples);
-  this->Internals->Renderer->SetUseRaytracingDenoiser(ostruct.render.raytracing.denoise);
+  this->Internals->Renderer->SetUseRaytracing(opt.render.raytracing.enable);
+  this->Internals->Renderer->SetRaytracingSamples(opt.render.raytracing.samples);
+  this->Internals->Renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
-  this->Internals->Renderer->SetUseSSAOPass(ostruct.render.effect.ambient_occlusion);
-  this->Internals->Renderer->SetUseFXAAPass(ostruct.render.effect.anti_aliasing);
-  this->Internals->Renderer->SetUseToneMappingPass(ostruct.render.effect.tone_mapping);
-  this->Internals->Renderer->SetUseDepthPeelingPass(ostruct.render.effect.translucency_support);
-  this->Internals->Renderer->SetBackfaceType(ostruct.render.backface_type);
-  this->Internals->Renderer->SetFinalShader(ostruct.render.effect.final_shader);
+  this->Internals->Renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
+  this->Internals->Renderer->SetUseFXAAPass(opt.render.effect.anti_aliasing);
+  this->Internals->Renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
+  this->Internals->Renderer->SetUseDepthPeelingPass(opt.render.effect.translucency_support);
+  this->Internals->Renderer->SetBackfaceType(opt.render.backface_type);
+  this->Internals->Renderer->SetFinalShader(opt.render.effect.final_shader);
 
-  this->Internals->Renderer->SetBackground(ostruct.render.background.color.data());
-  this->Internals->Renderer->SetUseBlurBackground(ostruct.render.background.blur);
-  this->Internals->Renderer->SetBlurCircleOfConfusionRadius(ostruct.render.background.blur_coc);
-  this->Internals->Renderer->SetLightIntensity(ostruct.render.light.intensity);
+  this->Internals->Renderer->SetBackground(opt.render.background.color.data());
+  this->Internals->Renderer->SetUseBlurBackground(opt.render.background.blur);
+  this->Internals->Renderer->SetBlurCircleOfConfusionRadius(opt.render.background.blur_coc);
+  this->Internals->Renderer->SetLightIntensity(opt.render.light.intensity);
 
-  std::string hdriFile = ostruct.render.hdri.file;
-  bool hdriAmbient = ostruct.render.hdri.ambient;
-  bool hdriSkybox = ostruct.render.background.skybox;
+  std::string hdriFile = opt.render.hdri.file;
+  bool hdriAmbient = opt.render.hdri.ambient;
+  bool hdriSkybox = opt.render.background.skybox;
   this->Internals->Renderer->SetHDRIFile(hdriFile);
   this->Internals->Renderer->SetUseImageBasedLighting(hdriAmbient);
   this->Internals->Renderer->ShowHDRISkybox(hdriSkybox);
 
-  this->Internals->Renderer->SetFontFile(ostruct.ui.font_file);
+  this->Internals->Renderer->SetFontFile(opt.ui.font_file);
 
-  this->Internals->Renderer->SetGridUnitSquare(ostruct.render.grid.unit);
-  this->Internals->Renderer->SetGridSubdivisions(ostruct.render.grid.subdivisions);
-  this->Internals->Renderer->SetGridAbsolute(ostruct.render.grid.absolute);
-  this->Internals->Renderer->ShowGrid(ostruct.render.grid.enable);
-  this->Internals->Renderer->SetGridColor(ostruct.render.grid.color);
+  this->Internals->Renderer->SetGridUnitSquare(opt.render.grid.unit);
+  this->Internals->Renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
+  this->Internals->Renderer->SetGridAbsolute(opt.render.grid.absolute);
+  this->Internals->Renderer->ShowGrid(opt.render.grid.enable);
+  this->Internals->Renderer->SetGridColor(opt.render.grid.color);
 
-  if (ostruct.scene.camera.index == -1)
+  if (opt.scene.camera.index == -1)
   {
-    this->Internals->Renderer->SetUseOrthographicProjection(ostruct.scene.camera.orthographic);
+    this->Internals->Renderer->SetUseOrthographicProjection(opt.scene.camera.orthographic);
   }
 
   if (this->Internals->WithColoring)
   {
-    this->Internals->Renderer->SetSurfaceColor(ostruct.model.color.rgb.data());
-    this->Internals->Renderer->SetOpacity(ostruct.model.color.opacity);
-    this->Internals->Renderer->SetTextureBaseColor(ostruct.model.color.texture);
-    this->Internals->Renderer->SetRoughness(ostruct.model.material.roughness);
-    this->Internals->Renderer->SetMetallic(ostruct.model.material.metallic);
-    this->Internals->Renderer->SetTextureMaterial(ostruct.model.material.texture);
-    this->Internals->Renderer->SetTextureEmissive(ostruct.model.emissive.texture);
-    this->Internals->Renderer->SetEmissiveFactor(ostruct.model.emissive.factor.data());
-    this->Internals->Renderer->SetTextureNormal(ostruct.model.normal.texture);
-    this->Internals->Renderer->SetNormalScale(ostruct.model.normal.scale);
-    this->Internals->Renderer->SetTextureMatCap(ostruct.model.matcap.texture);
+    std::vector<double> rgb = opt.model.color.rgb;
+    this->Internals->Renderer->SetSurfaceColor(rgb.data());
+    this->Internals->Renderer->SetOpacity(opt.model.color.opacity);
+    this->Internals->Renderer->SetTextureBaseColor(opt.model.color.texture);
+    this->Internals->Renderer->SetRoughness(opt.model.material.roughness);
+    this->Internals->Renderer->SetMetallic(opt.model.material.metallic);
+    this->Internals->Renderer->SetTextureMaterial(opt.model.material.texture);
+    this->Internals->Renderer->SetTextureEmissive(opt.model.emissive.texture);
+    std::vector<double> factor = opt.model.emissive.factor;
+    this->Internals->Renderer->SetEmissiveFactor(factor.data());
+    this->Internals->Renderer->SetTextureNormal(opt.model.normal.texture);
+    this->Internals->Renderer->SetNormalScale(opt.model.normal.scale);
+    this->Internals->Renderer->SetTextureMatCap(opt.model.matcap.texture);
 
     this->Internals->Renderer->SetColoring(
-      ostruct.model.scivis.cells, ostruct.model.scivis.array_name, ostruct.model.scivis.component);
-    this->Internals->Renderer->SetScalarBarRange(ostruct.model.scivis.range);
-    this->Internals->Renderer->SetColormap(ostruct.model.scivis.colormap);
-    this->Internals->Renderer->ShowScalarBar(ostruct.ui.scalar_bar);
+      opt.model.scivis.cells, opt.model.scivis.array_name, opt.model.scivis.component);
+    this->Internals->Renderer->SetScalarBarRange(opt.model.scivis.range);
+    this->Internals->Renderer->SetColormap(opt.model.scivis.colormap);
+    this->Internals->Renderer->ShowScalarBar(opt.ui.scalar_bar);
 
-    this->Internals->Renderer->SetUsePointSprites(ostruct.model.point_sprites.enable);
-    this->Internals->Renderer->SetUseVolume(ostruct.model.volume.enable);
-    this->Internals->Renderer->SetUseInverseOpacityFunction(ostruct.model.volume.inverse);
+    this->Internals->Renderer->SetUsePointSprites(opt.model.point_sprites.enable);
+    this->Internals->Renderer->SetUseVolume(opt.model.volume.enable);
+    this->Internals->Renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
   }
 
   this->Internals->Renderer->UpdateActors();

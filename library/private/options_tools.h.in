@@ -1,0 +1,41 @@
+#ifndef f3d_options_tools_h
+#define f3d_options_tools_h
+
+#include "options.h"
+
+namespace options_tools {
+void set(f3d::options& opt, const std::string& name, const option_variant_t& value){
+  try
+  {
+    ${_options_setter};
+    else throw f3d::options::inexistent_exception("Option " + name + " does not exist");
+  }
+  catch (const std::bad_variant_access&)
+  {
+    throw f3d::options::incompatible_exception(
+      "Trying to set " + name + " with incompatible type");
+  }
+}
+
+option_variant_t get(const f3d::options& opt, const std::string& name){
+  option_variant_t var;
+  ${_options_getter};
+  else throw f3d::options::inexistent_exception("Option " + name + " does not exist");
+  return var;
+}
+
+option_types getType(const std::string& name){
+  ${_options_typer};
+  else throw f3d::options::inexistent_exception("Option " + name + " does not exist");
+  // Cannot be reached
+  return option_types::_bool;
+}
+
+std::vector<std::string> getNames() {
+  std::vector<std::string> vec{
+  ${_options_lister}
+  };
+  return vec;
+}
+}
+#endif

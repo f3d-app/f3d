@@ -35,8 +35,11 @@ configure_file(
 
 include(f3dOptions)
 f3d_generate_options(
-  INPUT "${CMAKE_CURRENT_SOURCE_DIR}/options.json"
+  INPUT_JSON "${CMAKE_CURRENT_SOURCE_DIR}/options.json"
+  INPUT_PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/public/options.h.in"
+  INPUT_PRIVATE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/private/options_tools.h.in"
   DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
+  OUTPUT_NAME "options"
 	)
 
 # Define libf3d target
@@ -75,7 +78,7 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
-  ${CMAKE_CURRENT_BINARY_DIR}/public/options_struct.h
+  ${CMAKE_CURRENT_BINARY_DIR}/public/options.h
   )
 
 set(F3D_PLUGIN_HEADERS

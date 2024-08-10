@@ -3,7 +3,6 @@
 
 #include "exception.h"
 #include "export.h"
-#include "options_struct.h"
 #include "types.h"
 
 #include <array>
@@ -110,8 +109,10 @@ public:
     explicit inexistent_exception(const std::string& what = "");
   };
 
-  options_struct& getStruct();
-  const options_struct& getStruct() const;
+  /**
+   * The complete auto-generated options struct
+   */
+  ${_options_struct}
 
 private:
   class internals;

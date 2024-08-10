@@ -10,9 +10,11 @@ and generate the associated CXX code.
 
 ~~~
 f3d_generate_options(
-  INPUT "path/to/options.json"
+  INPUT_JSON "path/to/options.json"
+  INPUT_PUBLIC_HEADER "path/to/options.h.in"
+  INPUT_PRIVATE_HEADER "path/to/options_tools.h.in"
   DESTINATION "path/to/destination/folder"
-  [NAME "optional_prefix"]
+  OUTPUT_NAME "options"
 	)
 ~~~
 
@@ -21,7 +23,7 @@ f3d_generate_options(
 function (f3d_generate_options)
   cmake_parse_arguments(PARSE_ARGV 0 _f3d_generate_options
     ""
-    "INPUT;DESTINATION;NAME"
+    "INPUT_JSON;INPUT_PUBLIC_HEADER;INPUT_PRIVATE_HEADER;DESTINATION;OUTPUT_NAME"
     "")
 
   if (_f3d_generate_options_UNPARSED_ARGUMENTS)
@@ -30,9 +32,19 @@ function (f3d_generate_options)
       "${_f3d_generate_options_UNPARSED_ARGUMENTS}")
   endif ()
 
-  if (NOT DEFINED _f3d_generate_options_INPUT)
+  if (NOT DEFINED _f3d_generate_options_INPUT_JSON)
     message(FATAL_ERROR
-      "Missing INPUT argument for f3d_generate_options")
+      "Missing INPUT_JSON argument for f3d_generate_options")
+  endif ()
+
+  if (NOT DEFINED _f3d_generate_options_INPUT_PUBLIC_HEADER)
+    message(FATAL_ERROR
+      "Missing INPUT_PUBLIC_HEADER argument for f3d_generate_options")
+  endif ()
+
+  if (NOT DEFINED _f3d_generate_options_INPUT_PRIVATE_HEADER)
+    message(FATAL_ERROR
+      "Missing INPUT_PRIVATE_HEADER argument for f3d_generate_options")
   endif ()
 
   if (NOT DEFINED _f3d_generate_options_DESTINATION)
@@ -40,86 +52,35 @@ function (f3d_generate_options)
       "Missing DESTINATION argument for f3d_generate_options")
   endif ()
 
-  set(_f3d_generate_options_prefix "")
-  if (DEFINED _f3d_generate_options_NAME)
-    set(_f3d_generate_options_prefix ${_f3d_generate_options_NAME}_)
+  if (NOT DEFINED _f3d_generate_options_OUTPUT_NAME)
+    message(FATAL_ERROR
+      "Missing OUTPUT_NAME argument for f3d_generate_options")
   endif ()
+
 
   # Parse options.json and generate headers
   set(_option_basename "")
   set(_option_indent "")
 
   # Add a configure depends on the input file
-  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${_f3d_generate_options_INPUT})
+  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${_f3d_generate_options_INPUT_JSON})
 
   ## Read the .json file and complete the struct
-  file(READ ${_f3d_generate_options_INPUT} _options_json)
+  file(READ ${_f3d_generate_options_INPUT_JSON} _options_json)
   _parse_json_option(${_options_json})
-
-  file(WRITE ${_f3d_generate_options_DESTINATION}/public/options_struct.h "\
-#ifndef f3d_${_f3d_generate_options_prefix}options_struct_h
-#define f3d_${_f3d_generate_options_prefix}options_struct_h
-
-#include \"types.h\"
-
-#include <vector>
-#include <string>
-
-namespace f3d {
-struct ${_f3d_generate_options_prefix}options_struct {
-${_options_struct}};
-};
-#endif
-")
 
   list(JOIN _options_setter ";\n    else " _options_setter)
   list(JOIN _options_getter ";\n  else " _options_getter)
   list(JOIN _options_typer ";\n  else " _options_typer)
   list(JOIN _options_lister ",\n  " _options_lister)
-  file(WRITE ${_f3d_generate_options_DESTINATION}/private/options_struct_internals.h "\
-#ifndef f3d${_f3d_generate_options_prefix}_options_struct_internals_h
-#define f3d${_f3d_generate_options_prefix}_options_struct_internals_h
 
-#include \"options_struct.h\"
-#include \"options.h\"
+  configure_file(
+    "${_f3d_generate_options_INPUT_PUBLIC_HEADER}"
+    "${_f3d_generate_options_DESTINATION}/public/${_f3d_generate_options_OUTPUT_NAME}.h")
 
-namespace ${_f3d_generate_options_prefix}options_struct_internals {
-void set(f3d::options_struct& ostruct, const std::string& name, const option_variant_t& value){
-  try
-  {
-    ${_options_setter};
-    else throw f3d::options::inexistent_exception(\"Option \" + name + \" does not exist\");
-  }
-  catch (const std::bad_variant_access&)
-  {
-    throw f3d::options::incompatible_exception(
-      \"Trying to set \" + name + \" with incompatible type\");
-  }
-}
-
-option_variant_t get(const f3d::options_struct& ostruct, const std::string& name){
-  option_variant_t var;
-  ${_options_getter};
-  else throw f3d::options::inexistent_exception(\"Option \" + name + \" does not exist\");
-  return var;
-}
-
-option_types getType(const std::string& name){
-  ${_options_typer};
-  else throw f3d::options::inexistent_exception(\"Option \" + name + \" does not exist\");
-  // Cannot be reached
-  return option_types::_bool;
-}
-
-std::vector<std::string> getNames() {
-  std::vector<std::string> vec{
-  ${_options_lister}
-  };
-  return vec;
-}
-}
-#endif
-")
+  configure_file(
+    "${_f3d_generate_options_INPUT_PRIVATE_HEADER}"
+    "${_f3d_generate_options_DESTINATION}/private/${_f3d_generate_options_OUTPUT_NAME}_tools.h")
 
 endfunction()
 
@@ -144,18 +105,18 @@ function(_parse_json_option _top_json)
        # Add an option in the struct based on its type
        if(_option_type STREQUAL "double_vector")
          string(APPEND _options_struct "${_option_indent}  std::vector<double> ${_member_name} = {${_option_default_value}};\n")
-         list(APPEND _options_setter "if (name == \"${_option_name}\") ostruct.${_option_name} = std::get<std::vector<double>>(value)")
+         list(APPEND _options_setter "if (name == \"${_option_name}\") opt.${_option_name} = std::get<std::vector<double>>(value)")
        elseif(_option_type STREQUAL "string")
          string(APPEND _options_struct "${_option_indent}  std::string ${_member_name} = \"${_option_default_value}\";\n")
-         list(APPEND _options_setter "if (name == \"${_option_name}\") ostruct.${_option_name} = std::get<std::string>(value)")
+         list(APPEND _options_setter "if (name == \"${_option_name}\") opt.${_option_name} = std::get<std::string>(value)")
        elseif(_option_type STREQUAL "ratio")
          string(APPEND _options_struct "${_option_indent} f3d::ratio_t ${_member_name} = f3d::ratio_t(${_option_default_value});\n")
-         list(APPEND _options_setter "if (name == \"${_option_name}\") ostruct.${_option_name} = std::get<double>(value)")
+         list(APPEND _options_setter "if (name == \"${_option_name}\") opt.${_option_name} = std::get<double>(value)")
        else()
          string(APPEND _options_struct "${_option_indent}  ${_option_type} ${_member_name} = ${_option_default_value};\n")
-         list(APPEND _options_setter "if (name == \"${_option_name}\") ostruct.${_option_name} = std::get<${_option_type}>(value)")
+         list(APPEND _options_setter "if (name == \"${_option_name}\") opt.${_option_name} = std::get<${_option_type}>(value)")
        endif()
-       list(APPEND _options_getter "if (name == \"${_option_name}\") var = ostruct.${_option_name}")
+       list(APPEND _options_getter "if (name == \"${_option_name}\") var = opt.${_option_name}")
        list(APPEND _options_typer "if (name == \"${_option_name}\") return option_types::_${_option_type}")
        list(APPEND _options_lister "\"${_option_name}\"")
     else()

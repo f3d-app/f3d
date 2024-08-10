@@ -164,7 +164,6 @@ public:
     vtkRenderWindow* renWin = self->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
     vtkF3DRendererWithColoring* renWithColor = vtkF3DRendererWithColoring::SafeDownCast(ren);
-    options_struct& ostruct = self->Options.getStruct();
     bool checkColoring = false;
     bool render = false;
 
@@ -173,7 +172,7 @@ public:
     {
       case 'W':
         self->AnimationManager->CycleAnimation();
-        ostruct.scene.animation.index = self->AnimationManager->GetAnimationIndex();
+        self->Options.scene.animation.index = self->AnimationManager->GetAnimationIndex();
         ren->SetAnimationnameInfo(self->AnimationManager->GetAnimationName());
         render = true;
         break;
@@ -205,90 +204,90 @@ public:
         }
         break;
       case 'B':
-        ostruct.ui.scalar_bar = !ostruct.ui.scalar_bar;
+        self->Options.ui.scalar_bar = !self->Options.ui.scalar_bar;
         render = true;
         break;
       case 'P':
-        ostruct.render.effect.translucency_support = !ostruct.render.effect.translucency_support;
+        self->Options.render.effect.translucency_support = !self->Options.render.effect.translucency_support;
         render = true;
         break;
       case 'Q':
-        ostruct.render.effect.ambient_occlusion = !ostruct.render.effect.ambient_occlusion;
+        self->Options.render.effect.ambient_occlusion = !self->Options.render.effect.ambient_occlusion;
         render = true;
         break;
       case 'A':
-        ostruct.render.effect.anti_aliasing = !ostruct.render.effect.anti_aliasing;
+        self->Options.render.effect.anti_aliasing = !self->Options.render.effect.anti_aliasing;
         render = true;
         break;
       case 'T':
-        ostruct.render.effect.tone_mapping = !ostruct.render.effect.tone_mapping;
+        self->Options.render.effect.tone_mapping = !self->Options.render.effect.tone_mapping;
         render = true;
         break;
       case 'E':
-        ostruct.render.show_edges = !ostruct.render.show_edges;
+        self->Options.render.show_edges = !self->Options.render.show_edges;
         render = true;
         break;
       case 'X':
-        ostruct.interactor.axis = !ostruct.interactor.axis;
+        self->Options.interactor.axis = !self->Options.interactor.axis;
         render = true;
         break;
       case 'G':
-        ostruct.render.grid.enable = !ostruct.render.grid.enable;
+        self->Options.render.grid.enable = !self->Options.render.grid.enable;
         render = true;
         break;
       case 'N':
-        ostruct.ui.filename = !ostruct.ui.filename;
+        self->Options.ui.filename = !self->Options.ui.filename;
         render = true;
         break;
       case 'M':
-        ostruct.ui.metadata = !ostruct.ui.metadata;
+        self->Options.ui.metadata = !self->Options.ui.metadata;
         render = true;
         break;
       case 'Z':
-        ostruct.ui.fps = !ostruct.ui.fps;
+        self->Options.ui.fps = !self->Options.ui.fps;
         self->Window.render();
         self->Window.render();
         // XXX: Double render is needed here
         break;
       case 'R':
-        ostruct.render.raytracing.enable = !ostruct.render.raytracing.enable;
+        self->Options.render.raytracing.enable = !self->Options.render.raytracing.enable;
         render = true;
         break;
       case 'D':
-        ostruct.render.raytracing.denoise = !ostruct.render.raytracing.denoise;
+        self->Options.render.raytracing.denoise = !self->Options.render.raytracing.denoise;
         render = true;
         break;
       case 'V':
-        ostruct.model.volume.enable = !ostruct.model.volume.enable;
+        self->Options.model.volume.enable = !self->Options.model.volume.enable;
         render = true;
         break;
       case 'I':
-        ostruct.model.volume.inverse = !ostruct.model.volume.inverse;
+        self->Options.model.volume.inverse = !self->Options.model.volume.inverse;
         render = true;
         break;
       case 'O':
-        ostruct.model.point_sprites.enable = !ostruct.model.point_sprites.enable;
+        self->Options.model.point_sprites.enable = !self->Options.model.point_sprites.enable;
         render = true;
         break;
       case 'U':
-        ostruct.render.background.blur = !ostruct.render.background.blur;
+        self->Options.render.background.blur = !self->Options.render.background.blur;
         render = true;
         break;
       case 'K':
-        ostruct.interactor.trackball = !ostruct.interactor.trackball;
+        self->Options.interactor.trackball = !self->Options.interactor.trackball;
         render = true;
         break;
       case 'F':
-        ostruct.render.hdri.ambient = !ostruct.render.hdri.ambient;
+        self->Options.render.hdri.ambient = !self->Options.render.hdri.ambient;
         render = true;
         break;
       case 'J':
-        ostruct.render.background.skybox = !ostruct.render.background.skybox;
+        self->Options.render.background.skybox = !self->Options.render.background.skybox;
         render = true;
         break;
       case 'L':
       {
-        const double intensity = ostruct.render.light.intensity;
+        const double intensity = self->Options.render.light.intensity;
         const bool down = rwi->GetShiftKey();
 
         /* `ref < x` is equivalent to:
@@ -306,12 +305,12 @@ public:
         /* new intensity in percents */
         const int newIntensityPct = std::lround(intensity * 100) + (down ? -offsetPp : +offsetPp);
 
-        ostruct.render.light.intensity = std::max(newIntensityPct, 0) / 100.0;
+        self->Options.render.light.intensity = std::max(newIntensityPct, 0) / 100.0;
         render = true;
         break;
       }
       case 'H':
-        ostruct.ui.cheatsheet = !ostruct.ui.cheatsheet;
+        self->Options.ui.cheatsheet = !self->Options.ui.cheatsheet;
         render = true;
         break;
       case '?':
@@ -327,7 +326,7 @@ public:
         render = true;
         break;
       case '5':
-        ostruct.scene.camera.orthographic = !ostruct.scene.camera.orthographic;
+        self->Options.scene.camera.orthographic = !self->Options.scene.camera.orthographic;
         render = true;
         break;
       case '7':
@@ -359,9 +358,9 @@ public:
     if (checkColoring)
     {
       // Resynchronise renderer coloring status with options
-      ostruct.model.scivis.cells = renWithColor->GetColoringUseCell();
-      ostruct.model.scivis.array_name = renWithColor->GetColoringArrayName();
-      ostruct.model.scivis.component = renWithColor->GetColoringComponent();
+      self->Options.model.scivis.cells = renWithColor->GetColoringUseCell();
+      self->Options.model.scivis.array_name = renWithColor->GetColoringArrayName();
+      self->Options.model.scivis.component = renWithColor->GetColoringComponent();
     }
     if (render)
     {

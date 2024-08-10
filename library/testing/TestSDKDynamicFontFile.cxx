@@ -12,11 +12,11 @@ int TestSDKDynamicFontFile(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
-  opt.set("ui.filename", true);
+  opt.ui.filename = true;
 
   // TODO this is causing an exception on Windows for some reason
   //  opt.set("ui.filename_info", "(1/1) cow.vtp");
-  opt.getStruct().ui.filename_info = "(1/1) cow.vtp";
+  opt.ui.filename_info = "(1/1) cow.vtp";
 
   load.loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
 
