@@ -9,14 +9,9 @@
 #include "vtkF3DConfigure.h"
 
 #include <algorithm>
-#include <iostream>
 #include <limits>
-#include <map>
 #include <string>
-#include <type_traits>
-#include <variant>
 
-#include <cassert>
 namespace f3d
 {
 //----------------------------------------------------------------------------
@@ -41,14 +36,14 @@ option_variant_t options::get(const std::string& name) const
 //----------------------------------------------------------------------------
 options& options::setAsString(const std::string& name, const std::string& str)
 {
-  internals::setAsString(*this, name, str);
+  options_tools::setAsString(*this, name, str);
   return *this;
 }
 
 //----------------------------------------------------------------------------
 std::string options::getAsString(const std::string& name) const
 {
-  return internals::getAsString(*this, name);
+  return options_tools::getAsString(*this, name);
 }
 
 //----------------------------------------------------------------------------
