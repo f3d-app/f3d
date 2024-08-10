@@ -26,7 +26,7 @@ int TestSDKDynamicLightIntensity(int argc, char* argv[])
   }
 
   // set light intensity to 5x brighter
-  opt.set("render.light.intensity", 5.);
+  opt.render.light.intensity = 5.;
   if (!TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
         std::string(argv[2]), "TestSDKDynamicLightIntensity-5x-brighter", 50))
   {
@@ -35,7 +35,7 @@ int TestSDKDynamicLightIntensity(int argc, char* argv[])
   }
 
   // set light intensity to 5x darker
-  opt.set("render.light.intensity", .2);
+  opt.render.light.intensity = .2;
   if (!TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
         std::string(argv[2]), "TestSDKDynamicLightIntensity-5x-darker", 50))
   {

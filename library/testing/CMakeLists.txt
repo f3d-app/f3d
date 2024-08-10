@@ -127,5 +127,5 @@ if(Qt5_FOUND)
   target_link_libraries(libf3dSDKTests Qt5::OpenGL)
 endif()
 
-# make sure the libf3d API is compatible with C++17
-set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 17)
+# make sure the libf3d API is compatible with the right C++ standard
+#set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD ${f3d_cxx_standard})

@@ -14,7 +14,7 @@ int TestSDKLoadFromMemory(int argc, char* argv[])
   f3d::window& win = eng.getWindow().setSize(300, 300);
 
   std::string texturePath = std::string(argv[1]) + "data/world.png";
-  eng.getOptions().set("model.color.texture", texturePath);
+  eng.getOptions().model.color.texture = texturePath;
 
   // Load invalid number of points
   try

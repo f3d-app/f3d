@@ -5,7 +5,6 @@
 
 #include <array>
 #include <string>
-#include <variant>
 #include <vector>
 
 namespace f3d
@@ -92,6 +91,10 @@ enum class option_types
   _double_vector
 };
 
+
+#ifdef F3D_ENABLE_CXX17_API
+#include <variant>
 using option_variant_t = std::variant<bool, int, double, std::string, std::vector<double>>;
+#endif
 
 #endif

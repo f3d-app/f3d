@@ -8,6 +8,7 @@ int TestSDKOptions(int argc, char* argv[])
   f3d::options opt;
 
   // Test bool
+#ifdef F3D_ENABLE_CXX17_API
   opt.set("model.scivis.cells", true);
   if (std::get<bool>(opt.get("model.scivis.cells")) != true)
   {
@@ -19,6 +20,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options getAsString bool is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
+#endif
   opt.setAsString("model.scivis.cells", "false");
   if (opt.getAsString("model.scivis.cells") != "false")
   {
@@ -47,6 +49,7 @@ int TestSDKOptions(int argc, char* argv[])
   }
 
   // Test int
+#ifdef F3D_ENABLE_CXX17_API
   opt.set("scene.animation.index", 1);
   if (std::get<int>(opt.get("scene.animation.index")) != 1)
   {
@@ -58,6 +61,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options getAsString int is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
+#endif
   opt.setAsString("scene.animation.index", "2");
   if (opt.getAsString("scene.animation.index") != "2")
   {
@@ -72,6 +76,7 @@ int TestSDKOptions(int argc, char* argv[])
   }
 
   // Test double
+#ifdef F3D_ENABLE_CXX17_API
   opt.set("render.line_width", 1.7);
   if (std::get<double>(opt.get("render.line_width")) != 1.7)
   {
@@ -83,6 +88,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options getAsString double is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
+#endif
   opt.setAsString("render.line_width", "2.14");
   if (opt.getAsString("render.line_width") != "2.14")
   {
@@ -97,6 +103,7 @@ int TestSDKOptions(int argc, char* argv[])
   }
 
   // Test ratio_t
+#ifdef F3D_ENABLE_CXX17_API
   opt.set("scene.animation.speed_factor", 3.17);
   if (std::get<double>(opt.get("scene.animation.speed_factor")) != 3.17)
   {
@@ -108,6 +115,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options getAsString ratio_t is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
+#endif
   opt.setAsString("scene.animation.speed_factor", "3.17");
   if (opt.getAsString("scene.animation.speed_factor") != "3.17")
   {
@@ -123,6 +131,7 @@ int TestSDKOptions(int argc, char* argv[])
   }
 
   // Test string
+#ifdef F3D_ENABLE_CXX17_API
   std::string inputString = "test";
   opt.set("model.color.texture", inputString);
   if (std::get<std::string>(opt.get("model.color.texture")) != "test")
@@ -135,6 +144,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options getAsString string is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
+#endif
   opt.setAsString("model.color.texture", "testAsString");
   if (opt.getAsString("model.color.texture") != "testAsString")
   {
@@ -149,6 +159,7 @@ int TestSDKOptions(int argc, char* argv[])
   }
 
   // Test double vector
+#ifdef F3D_ENABLE_CXX17_API
   opt.set("render.background.color", std::vector<double>{ 0.1, 0.2, 0.3 });
   if (std::get<std::vector<double>>(opt.get("render.background.color")) !=
     std::vector<double>{ 0.1, 0.2, 0.3 })
@@ -161,6 +172,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options getAsString vector<double> is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
+#endif
   opt.setAsString("render.background.color", "0.1, 0.2, 0.4");
   if (opt.getAsString("render.background.color") != "0.1, 0.2, 0.4")
   {
@@ -191,14 +203,23 @@ int TestSDKOptions(int argc, char* argv[])
   }
 
   // Test chaining options
+#ifdef F3D_ENABLE_CXX17_API
   opt.set("model.scivis.cells", true).set("model.scivis.cells", false);
   if (std::get<bool>(opt.get("model.scivis.cells")) != false)
   {
     std::cerr << "Chaining options is not working." << std::endl;
     return EXIT_FAILURE;
   }
+#endif
+  opt.setAsString("model.scivis.cells", "False").setAsString("model.scivis.cells", "True");
+  if (opt.getAsString("model.scivis.cells") != "True")
+  {
+    std::cerr << "Chaining options as string is not working." << std::endl;
+    return EXIT_FAILURE;
+  }
 
   // Test error paths
+#ifdef F3D_ENABLE_CXX17_API
   try
   {
     opt.set("model.scivis.cells", 2.13);
@@ -234,6 +255,7 @@ int TestSDKOptions(int argc, char* argv[])
   {
     std::cout << "expected exception: " << ex.what() << std::endl;
   }
+#endif
 
   try
   {
@@ -300,7 +322,7 @@ int TestSDKOptions(int argc, char* argv[])
 
   // Test copy operator and constructor
   f3d::options opt2 = opt;
-  if (std::get<double>(opt2.get("render.line_width")) != 2.13)
+  if (opt2.render.line_width != 2.13)
   {
     std::cerr << "Options copy constructor not behaving as expected." << std::endl;
     return EXIT_FAILURE;
@@ -308,14 +330,14 @@ int TestSDKOptions(int argc, char* argv[])
 
   f3d::options opt3;
   opt3 = opt2;
-  if (std::get<double>(opt3.get("render.line_width")) != 2.13)
+  if (opt3.render.line_width != 2.13)
   {
     std::cerr << "Options copy operator not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
 
   f3d::options opt4 = std::move(opt3);
-  if (std::get<double>(opt4.get("render.line_width")) != 2.13)
+  if (opt4.render.line_width != 2.13)
   {
     std::cerr << "Options move constructor not behaving as expected." << std::endl;
     return EXIT_FAILURE;
@@ -323,7 +345,7 @@ int TestSDKOptions(int argc, char* argv[])
 
   f3d::options opt5;
   opt5 = std::move(opt4);
-  if (std::get<double>(opt5.get("render.line_width")) != 2.13)
+  if (opt5.render.line_width != 2.13)
   {
     std::cerr << "Options move operator not behaving as expected." << std::endl;
     return EXIT_FAILURE;
@@ -343,7 +365,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options isSame not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  opt2.set("render.line_width", 3.12);
+  opt2.render.line_width = 3.12;
   if (opt.isSame(opt2, "render.line_width"))
   {
     std::cerr << "Options isSame not behaving as expected when it should be different."
@@ -351,7 +373,7 @@ int TestSDKOptions(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   opt2.copy(opt, "render.line_width");
-  if (std::get<double>(opt2.get("render.line_width")) != 2.13)
+  if (opt2.render.line_width != 2.13)
   {
     std::cerr << "Options copy method not behaving as expected." << std::endl;
     return EXIT_FAILURE;
@@ -363,7 +385,7 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options isSame not behaving as expected with vectors." << std::endl;
     return EXIT_FAILURE;
   }
-  opt2.set("render.background.color", std::vector<double>{ 0.1, 0.2, 0.6 });
+  opt2.render.background.color = { 0.1, 0.2, 0.6 };
   if (opt.isSame(opt2, "render.background.color"))
   {
     std::cerr << "Options isSame not behaving as expected with vectors when it should be different."
@@ -371,8 +393,7 @@ int TestSDKOptions(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   opt2.copy(opt, "render.background.color");
-  if (std::get<std::vector<double>>(opt2.get("render.background.color")) !=
-    std::vector<double>{ 0.1, 0.2, 0.5 })
+  if (opt2.render.background.color != std::vector<double>({ 0.1, 0.2, 0.5 }))
   {
     std::cerr << "Options copy method not behaving as expected with vectors." << std::endl;
     return EXIT_FAILURE;

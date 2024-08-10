@@ -176,6 +176,10 @@ if(F3D_STRICT_BUILD AND MSVC)
   target_compile_definitions(libf3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
 endif()
 
+if(F3D_ENABLE_CXX17_API)
+  target_compile_definitions(libf3d PRIVATE F3D_ENABLE_CXX17_API )
+endif()
+
 if(APPLE)
   set_target_properties(libf3d PROPERTIES INSTALL_RPATH "@loader_path")
 elseif(UNIX)

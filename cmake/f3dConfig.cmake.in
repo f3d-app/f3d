@@ -11,6 +11,7 @@
 #   f3d_MODULE_RAYTRACING          Will be enabled if F3D was built with raytracing support
 #   f3d_PLUGINS_INSTALL_DIR        Path to the location to install plugins so that F3D can find them
 #   f3d_PREFIX_DIR                 Absolute path to the directory where F3D was installed
+#   f3d_CXX17_API                  Will be enabled if F3D was built with CXX17 API
 #
 # It is also possible to look for optional components.
 #
@@ -53,6 +54,7 @@ set(f3d_BINDINGS_PYTHON "@F3D_BINDINGS_PYTHON@")
 set(f3d_BINDINGS_JAVA "@F3D_BINDINGS_JAVA@")
 set(f3d_CONFIG_DIR "@f3d_config_dir@")
 set(f3d_PLUGINS_INSTALL_DIR "@F3D_PLUGINS_INSTALL_DIR@")
+set(f3d_CXX17_API "@F3D_ENABLE_CXX17_API@")
 
 # If no components specified, look for `library` component
 if(NOT f3d_FIND_COMPONENTS)

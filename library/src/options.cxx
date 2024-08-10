@@ -20,6 +20,7 @@ options::options()
   detail::init::initialize();
 };
 
+#ifdef F3D_ENABLE_CXX17_API
 //----------------------------------------------------------------------------
 options& options::set(const std::string& name, const option_variant_t& value)
 {
@@ -32,6 +33,7 @@ option_variant_t options::get(const std::string& name) const
 {
   return options_tools::get(*this, name);
 }
+#endif
 
 //----------------------------------------------------------------------------
 options& options::setAsString(const std::string& name, const std::string& str)
@@ -52,8 +54,8 @@ options& options::toggle(const std::string& name)
   try
   {
     option_variant_t val;
-    val = this->get(name);
-    this->set(name, !std::get<bool>(val));
+    val = options_tools::get(*this, name);
+    options_tools::set(*this, name, !std::get<bool>(val));
     return *this;
   }
   catch (const std::bad_variant_access&)
