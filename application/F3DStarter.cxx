@@ -564,8 +564,7 @@ int F3DStarter::Start(int argc, char** argv)
     else
     {
       f3d::log::error("Cannot find the colormap ", this->Internals->AppOptions.ColorMapFile);
-      this->Internals->Engine->getOptions().model.scivis.colormap =
-        std::vector<double>{};
+      this->Internals->Engine->getOptions().model.scivis.colormap = std::vector<double>{};
     }
   }
 
