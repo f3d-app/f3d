@@ -33,6 +33,11 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx"
   @ONLY)
 
+set(f3d_cxx17_api_bool "0")
+if(F3D_ENABLE_CXX17_API)
+  set(f3d_cxx17_api_bool "1")
+endif()
+
 include(f3dOptions)
 f3d_generate_options(
   INPUT_JSON "${CMAKE_CURRENT_SOURCE_DIR}/options.json"

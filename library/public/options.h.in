@@ -9,6 +9,11 @@
 #include <string>
 #include <vector>
 
+#if ${f3d_cxx17_api_bool}
+  #include <variant>
+  using option_variant_t = std::variant<bool, int, double, std::string, std::vector<double>>;
+#endif
+
 namespace f3d
 {
 /**
@@ -33,7 +38,7 @@ public:
   options& operator=(options&& other) noexcept = default;
   ///@}
 
-#ifdef F3D_ENABLE_CXX17_API
+#if ${f3d_cxx17_api_bool}
   /**
    * Set/Get an option as a variant based on its name
    * Throw an options::inexistent_exception if option does not exist.
