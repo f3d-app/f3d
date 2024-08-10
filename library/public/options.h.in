@@ -27,11 +27,11 @@ public:
    * Default/Copy/move constructors/operators.
    */
   options();
-  ~options();
-  options(const options& opt);
-  options& operator=(const options& opt) noexcept;
-  options(options&& other) noexcept;
-  options& operator=(options&& other) noexcept;
+  ~options() = default;
+  options(const options& opt) = default;
+  options& operator=(const options& opt) noexcept = default;
+  options(options&& other) noexcept = default;
+  options& operator=(options&& other) noexcept = default;
   ///@}
 
   /**
@@ -113,10 +113,6 @@ public:
    * The complete auto-generated options struct
    */
   ${_options_struct}
-
-private:
-  class internals;
-  internals* Internals;
 };
 }
 

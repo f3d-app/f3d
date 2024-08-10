@@ -208,11 +208,13 @@ public:
         render = true;
         break;
       case 'P':
-        self->Options.render.effect.translucency_support = !self->Options.render.effect.translucency_support;
+        self->Options.render.effect.translucency_support =
+          !self->Options.render.effect.translucency_support;
         render = true;
         break;
       case 'Q':
-        self->Options.render.effect.ambient_occlusion = !self->Options.render.effect.ambient_occlusion;
+        self->Options.render.effect.ambient_occlusion =
+          !self->Options.render.effect.ambient_occlusion;
         render = true;
         break;
       case 'A':
