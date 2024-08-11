@@ -154,7 +154,6 @@ PYBIND11_MODULE(pyf3d, module)
   // f3d::options
   py::class_<f3d::options> options(module, "Options");
 
-  // TODO Proper options bindings
   options //
     .def(py::init<>())
     .def("__setitem__", &f3d::options::set)

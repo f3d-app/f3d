@@ -33,6 +33,7 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx"
   @ONLY)
 
+# This is used during the configuration of options.h.in and options_tools.h.in
 set(f3d_cxx17_api_bool "0")
 if(F3D_ENABLE_CXX17_API)
   set(f3d_cxx17_api_bool "1")

@@ -966,7 +966,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   this->Internals->addOutputImageMetadata(img);
   img.save(path.string(), f3d::image::SaveFormat::PNG);
 
-  options.render.light.intensity = options.render.light.intensity * 5;
+  options.render.light.intensity *= 5;
   this->Render();
 
   this->Internals->Engine->setOptions(optionsCopy);

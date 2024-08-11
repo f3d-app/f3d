@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+// TODO put in f3d namespace
+// Declared here for simplicity
 #if ${f3d_cxx17_api_bool}
   #include <variant>
   using option_variant_t = std::variant<bool, int, double, std::string, std::vector<double>>;
@@ -21,7 +23,8 @@ namespace f3d
  * @brief   Class used to control the different options
  *
  * A class to control the different options of f3d.
- * See the README_libf3d.md for the full listing of options
+ * See the README_libf3d.md for the full listing of options.
+ * The struct below can also be consulted.
  */
 class F3D_EXPORT options
 {
@@ -52,7 +55,8 @@ public:
 
   /**
    * Set/Get an option as a string based on its name
-   * The setter use specific parsing, see the related doc TODO
+   * The setter use specific parsing, see the related doc
+   * TODO add parsing documentation
    * Throw an options::inexistent_exception if option does not exist.
    */
   options& setAsString(const std::string& name, const std::string& str);
@@ -80,7 +84,7 @@ public:
 
   /**
    * Get all available option names.
-   * TODO: Add a getNamesStruct ?
+   * XXX: Should we add a getNamesStruct witht the same structure as the struct below ?
    */
   std::vector<std::string> getNames() const;
 
@@ -118,7 +122,7 @@ public:
   };
 
   /**
-   * The complete auto-generated options struct
+   * The complete generated options struct
    */
   ${_options_struct}
 };

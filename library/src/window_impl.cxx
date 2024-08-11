@@ -343,7 +343,7 @@ void window_impl::UpdateDynamicOptions()
   this->Internals->Renderer->SetUseTrackball(opt.interactor.trackball);
   this->Internals->Renderer->SetInvertZoom(opt.interactor.invert_zoom);
 
-  // XXX: model.point-sprites.type only has an effect on geometry scene
+  // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
   std::string splatTypeStr = opt.model.point_sprites.type;
   int pointSize = opt.render.point_size;

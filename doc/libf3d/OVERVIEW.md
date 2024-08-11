@@ -108,9 +108,9 @@ f3d::engine::autoloadPlugins();
 f3d::engine eng();
 
 // Recover the options and set the wanted value
-eng.getOptions()
-  .set("render.effect.ambient-occlusion", true)
-  .set("render.effect.anti-aliasing", true);
+options& opt = eng.getOptions();
+opt.render.effect.ambient_occlusion = true;
+opt.render.effect.anti_aliasing = true;
 
 // Standard libf3d usage
 eng.getLoader().loadGeometry("path/to/file.ext");

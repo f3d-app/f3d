@@ -81,6 +81,7 @@ struct mesh_t
 };
 }
 
+// TODO put in f3d namespace
 enum class option_types
 {
   _bool,
