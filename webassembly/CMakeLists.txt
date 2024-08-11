@@ -4,6 +4,9 @@ cmake_minimum_required(VERSION 3.17) # 3.17 required for CMP0099
 if(NOT VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231007)
   message(FATAL_ERROR "Cannot build emscripten bindings with VTK version below 9.3.20231007")
 endif()
+if (NOT ${F3D_ENABLE_CXX17_API})
+  message(FATAL_ERROR "F3D webassembly bindings require F3D CXX17 API")
+endif()
 
 set(F3D_WASM_DATA_FILE "${F3D_SOURCE_DIR}/testing/data/f3d.vtp"
   CACHE PATH "File to copy in the webassembly root virtual filesystem")
