@@ -9,15 +9,17 @@
 #include <string>
 #include <vector>
 
-// TODO put in f3d namespace
-// Declared here for simplicity
 #if ${f3d_cxx17_api_bool}
   #include <variant>
-  using option_variant_t = std::variant<bool, int, double, std::string, std::vector<double>>;
 #endif
 
 namespace f3d
 {
+#if ${f3d_cxx17_api_bool}
+  // Declared here for simplicity
+  using option_variant_t = std::variant<bool, int, double, std::string, std::vector<double>>;
+#endif
+
 /**
  * @class   options
  * @brief   Class used to control the different options

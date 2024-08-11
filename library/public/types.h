@@ -79,9 +79,7 @@ struct mesh_t
    */
   F3D_EXPORT std::pair<bool, std::string> isValid() const;
 };
-}
 
-// TODO put in f3d namespace
 enum class option_types
 {
   _bool,
@@ -91,5 +89,6 @@ enum class option_types
   _string,
   _double_vector
 };
+}
 
 #endif
