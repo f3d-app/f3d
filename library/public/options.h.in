@@ -86,7 +86,7 @@ public:
 
   /**
    * Get all available option names.
-   * XXX: Should we add a getNamesStruct witht the same structure as the struct below ?
+   * XXX: Should we add a getNamesStruct with the same structure as the struct below ?
    */
   std::vector<std::string> getNames() const;
 

@@ -161,7 +161,7 @@ static void parse(const std::string& str, double& value, option_types type)
 //----------------------------------------------------------------------------
 /**
  * Generate a string from provided boolean
- * using boolalpha formating, eg: "true" or "false"
+ * using boolalpha formatting, eg: "true" or "false"
  */
 static std::string toString(const bool& var)
 {
