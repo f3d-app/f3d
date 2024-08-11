@@ -41,6 +41,8 @@ public:
 #if ${f3d_cxx17_api_bool}
   /**
    * Set/Get an option as a variant based on its name
+   * Please note that, on Windows, using an explicit std::string may be required:
+   * https://stackoverflow.com/questions/60681710/prefer-stdstring-in-stdvariantbool-stdstring-for-const-char
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::incompatible_exception if value is not compatible with option.
    */
