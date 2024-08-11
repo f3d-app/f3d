@@ -129,3 +129,6 @@ endif()
 
 # make sure the libf3d API is compatible with the right C++ standard
 set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD ${f3d_cxx_standard})
+if(F3D_ENABLE_CXX17_API)
+  target_compile_definitions(libf3dSDKTests PRIVATE F3D_ENABLE_CXX17_API )
+endif()
