@@ -9,36 +9,39 @@ by either:
 
 ## Supported file formats
 
-Here is the list of supported file formats:
+F3D supports the following file formats:
 
-* **.vtk** : the legacy VTK format
-* **.vt[p\|u\|r\|i\|s\|m]** : XML based VTK formats
-* **.ply** : Polygon File format
-* **.stl** : Standard Triangle Language format
-* **.dcm** : DICOM file format
-* **.nrrd/.nhrd** : "nearly raw raster data" file format
-* **.mhd/.mha** : MetaHeader MetaIO file format
-* **.tif/.tiff** : TIFF 2D/3D file format
-* **.ex2/.e/.exo/.g** : Exodus 2 file format
-* **.gml** : CityGML file format
-* **.pts** : Point Cloud file format
-* **.step/.stp** : CAD STEP exchange ISO format
-* **.iges/.igs** : CAD Initial Graphics Exchange Specification format
-* **.brep** : Open CASCADE BRep format
-* **.xbf** : Open CASCADE XBF format
-* **.abc** : Alembic format
-* **.vdb** : VDB format (experimental)
-* **.obj** : Wavefront OBJ file format (full scene)
-* **.gltf/.glb** : GL Transmission Format (full scene)
-* **.3ds** : Autodesk 3D Studio file format (full scene)
-* **.wrl** : VRML file format (full scene)
-* **.fbx** : Autodesk Filmbox (full scene)
-* **.dae** : COLLADA (full scene)
-* **.off** : Object File Format (full scene)
-* **.dxf** : Drawing Exchange Format (full scene)
-* **.x** : DirectX Format (full scene)
-* **.3mf** : 3D Manufacturing Format (full scene)
-* **.usd** : Universal Scene Description (full scene)
+| Name | File Extension(s) | Type of Scene(s) Supported |
+| -- | -- | -- |
+| Legacy VTK | **.vtk** | Default |
+| VTK XML | **.vt[p\|u\|r\|i\|s\|m]** | Default |
+| Polygon File Format | **.ply** | Default |
+| Standard Triangle Language | **.stl** | Default |  
+| DICOM | **.dcm** | Default |
+| NRRD ("nearly raw raster data") | **.nrrd/.nhrd** | Default |
+| MetaHeader MetaIO | **.mhd/mha** | Default |
+| Tag Image File Format (TIFF) 2D/3D | **.tif/.tiff** | Default |
+| EXODUS II | **.e/.ex2/.exo/.g** | Default |
+| CityGML | **.gml** | Default |
+| Point Cloud | **.pts** | Default |
+| Standard for the Exchange of Product Data (STEP) | **.step/.stp** | Default |
+| Initial Graphics Exchange Specification (IGES) | **.iges/.igs** | Default |
+| Open CASCADE Technology (OCCT) BRep format | **.brep** | Default |
+| Alembic | **.abc** | Default |
+| Wavefront OBJ | **.obj** | Default, Full |
+| GL Transmission Format | **.gltf/.glb** | Default, Full |
+| Autodesk 3D Studio | **.3ds** | Full |
+| Virtual Reality Modeling Language (VRML) | **.wrl** | Full |
+| Autodesk Filmbox (FBX) | **.fbx** | Full |
+| COLLADA | **.dae** | Full |
+| Object File Format | **.off** | Full |
+| Drawing Exchange Format | **.dxf** | Full |
+| DirectX | **.x** | Full |
+| 3D Manufacturing Format | **.3mf** | Full |
+| Universal Scene Description | **.usd** | Full |
+| \***VDB** (Experimental) | **.vdb** | Default |
+
+\***Note:** Support for VDB is experimental.
 
 ## Scene construction
 
