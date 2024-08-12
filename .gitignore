@@ -9,3 +9,5 @@ dist
 __pycache__
 *.pyc
 _version.py
+.DS_Store
+
