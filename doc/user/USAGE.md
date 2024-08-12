@@ -45,10 +45,13 @@ F3D supports the following file formats:
 
 ## Scene construction
 
-The **full scene** formats (.gltf/.glb, .3ds, .wrl, .obj, .fbx, .dae, .off, .x, .3mf, .usd) contain not only *geometry*,
-but also some scene information like *lights*, *cameras*, *actors* in the scene, as well as *texture* properties.
-By default, all this information will be loaded from the file and displayed.
-For file formats that do not support it, **a default scene** is created.
+For most file formats, F3D constructs **a default scene**, loading only the *geometry* from the file.
+
+However, formats supporting **full scenes** will automatically load additional scene properties including *lights*, *cameras*, *actors* and *texture*.
+
+To disable these properties, you can specify the `--geometry-only` [option](OPTIONS.md) from the command line to use a default scene construction instead.
+
+Please refer to the table of supported file formats to see what kind of scenes your file supports.
 
 For **default scene** formats, certain default values are set automatically:
  - texture-*: ""
