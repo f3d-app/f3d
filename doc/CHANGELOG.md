@@ -22,6 +22,7 @@ For F3D users:
 - Fixed a crash when dropping a HDRI while playing an animation
 - Fixed a focus issue on macOS
 - Fixed a high DPI issue on Windows
+- Improved quickstart guide
 
 For libf3d users:
 - Added an API to control camera pan and zoom
