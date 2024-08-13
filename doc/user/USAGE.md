@@ -99,7 +99,7 @@ They will be overridden when using corresponding [options](OPTIONS.md).
 
 ## Animations
 
-F3D can play animations for a number of file formats if the file contains an animation. See the table of [supported file formats](#supported-file-formats) for supported file formats.
+F3D can play [animations](ANIMATIONS.md) for a number of file formats if the file contains an animation. See the table of [supported file formats](#supported-file-formats) for supported file formats.
 
 To select the animation to play, you can use the `--animation-index` option. To play all animations at once, use `--animation-index=-1` (.gltf/.glb only).
 
@@ -130,6 +130,7 @@ F3D officially provides the following plugins and their supported file formats:
 > Note: If you downloaded the binaries from the Release page, it's not necessary to specify manually the plugins above, all of them are loaded automatically.
 
 Here is how the plugins are searched (in preceding order):
+
 1. Search the static plugins.
 2. Consider the option given is a full path.
 3. Search in the paths specified in `F3D_PLUGINS_PATH` environment variable.
@@ -139,3 +140,11 @@ Here is how the plugins are searched (in preceding order):
 You can also try plugins maintained by the community. If you have created a plugin and would like it to be listed here, please submit a pull request.
 
 - **Abaqus**: ODB support by @YangShen398 ([repository](https://github.com/YangShen398/F3D-ODB-Reader-Plugin))
+
+## Further Reading
+
+* [A list of all F3D command-line options.](OPTIONS.md)
+* [How to interact with scenes in F3D.](INTERACTIONS.MD)
+* [How to play animations in F3D.](ANIMATIONS.md)
+* [How to specify colormaps in F3D.](COLOR_MAPS.md)
+* [Limitations and how to troubleshoot F3D.](LIMITATIONS_AND_TROUBLESHOOTING.md)
