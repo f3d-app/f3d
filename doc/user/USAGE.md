@@ -1,11 +1,42 @@
-# Usage
+# Quickstart Guide
 
-Once F3D has been [installed](INSTALLATION.md), you should be able to open any [supported file](#supported-file-formats),
-by either:
-* Using F3D automatically, from your file manager, by directly opening a file.
-* Running F3D and then dragging and dropping files into it to open them.
-* By running F3D from the terminal with a set of command-line [options](OPTIONS.md).
-* As a [thumbnailer](DESKTOP_INTEGRATION.md) for all supported file formats with certain file managers.
+This guide will help you get started using F3D.
+
+As an overview, you'll learn how to run F3D and open supported files. You'll then learn how to configure basic scene constructions, animations and plugins.
+
+## Prerequisites
+
+To use F3D, you'll need to [install](INSTALLATION.md) F3D. See the [Installation](INSTALLATION.md) page for the latest release package supported by your system.
+
+## Run F3D
+
+Once F3D has been [installed](INSTALLATION.md), you should be able to open a [supported file](#supported-file-formats) in any of the following ways:
+
+* Open a file directly from your file manager.
+* Open F3D, then drag and drop a file into the application window.
+* Run F3D from the terminal with a set of command-line [options](OPTIONS.md).
+* Configure F3D as a [thumbnailer](DESKTOP_INTEGRATION.md) for supported file formats with certain file managers.
+
+If you choose to run F3D from the terminal, you have different options.
+
+1\. Open a file and visualize it interactively:
+
+```
+f3d /path/to/file.ext
+```
+
+2\. Open a file and save the rendering into an image file:
+
+```
+f3d /path/to/file.ext --output=/path/to/img.png
+```
+
+If you need help, specify the `--help` [option](OPTIONS.md):
+
+```
+f3d --help
+man f3d # Linux only
+```
 
 ## Supported file formats
 
