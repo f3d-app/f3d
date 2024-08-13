@@ -50,6 +50,8 @@ f3d --help
 man f3d # Linux only
 ```
 
+See the [Quickstart Guide](USAGE.md) for more information on getting started with F3D.
+
 # Documentation
 
 - To get started, please take a look at the [user documentation](doc/user/README_USER.md).
