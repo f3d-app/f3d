@@ -99,16 +99,25 @@ They will be overridden when using corresponding [options](OPTIONS.md).
 
 ## Animations
 
-F3D can play animations for a number of file formats (.ex2/.e/.exo/.g, .gltf/.glb, .fbx, .dae, .x, .usd) if the file contains an animation.
-It is possible to select the animation to play using `--animation-index`, or to play all animations at once using `--animation-index=-1` (.gltf/.glb only).
-When F3D plays an animation, it assumes the time unit is in seconds to show accurate speed of animation. Use `--animation-speed-factor` if
-an adjustment is needed. By default, F3D will try update the scene 60 times per seconds, use `--animation-frame-rate` to change that if needed. Press "W" hotkey to cycle through available animations.
+F3D can play animations for a number of file formats if the file contains an animation. See the table of [supported file formats](#supported-file-formats) for supported file formats.
+
+To select the animation to play, you can use the `--animation-index` option. To play all animations at once, use `--animation-index=-1` (.gltf/.glb only).
+
+F3D uses the second as the default unit of time. To adjust the speed factor of your animations, use the `--animation-speed-factor` option. 
+
+Additionally, F3D uses a default frame rate of 60 frames per second. To change the frame rate of your animations, use `--animation-frame-rate`. 
+
+Press the "W" hotkey to cycle through available animations.
 
 ## Plugins
 
-If you installed F3D using a package manager, it's possible that the packager chose to bundle the plugins in different packages or to list plugin dependencies as optional dependencies to reduce the reduce the number of dependencies of the main package.
-In this case, in order to open a file that requires a plugin, you will have to make sure all needed dependencies are installed and specify which plugin you want to load in order to be able to open this file. You can either use the `--load-plugins` option or add a line in the [configuration file](CONFIGURATION_FILE.md), if not already. Several plugins can be specified by giving a comma-separated list.
-Here is the list of plugins provided officially by F3D:
+If you installed F3D using a package manager, it's possible that the packager chose to bundle the plugins in different packages or to list plugin dependencies as optional in order to reduce the reduce the number of dependencies of the main package.
+
+In order to open a file that requires a plugin, make sure you have installed all necessary dependencies. You then need to specify which plugin you want to load in order to be able to open this file. You can either use the `--load-plugins` option or add it in the [configuration file](CONFIGURATION_FILE.md) if not already specified. You can specify multiple plugins in a single comma-separated list.
+
+### Supported plugins
+
+F3D officially provides the following plugins and their supported file formats:
 
 - **alembic**: ABC support
 - **assimp**: FBX, DAE, OFF, DXF, X and 3MF support
@@ -120,12 +129,12 @@ Here is the list of plugins provided officially by F3D:
 
 > Note: If you downloaded the binaries from the Release page, it's not necessary to specify manually the plugins above, all of them are loaded automatically.
 
-Here is how the plugins are searched (by precedence order):
-1. Search the static plugins
-2. Consider the option given is a full path
-3. Search in the paths specified in `F3D_PLUGINS_PATH` environment variable
-4. Search in a directory relative to the F3D application: `../lib`
-5. Rely on OS specific paths (e.g. `LD_LIBRARY_PATH` on Linux or `DYLD_LIBRARY_PATH` on macOS)
+Here is how the plugins are searched (in preceding order):
+1. Search the static plugins.
+2. Consider the option given is a full path.
+3. Search in the paths specified in `F3D_PLUGINS_PATH` environment variable.
+4. Search in a directory relative to the F3D application: `../lib`.
+5. Rely on OS specific paths (e.g. `LD_LIBRARY_PATH` on Linux or `DYLD_LIBRARY_PATH` on macOS).
 
 You can also try plugins maintained by the community. If you have created a plugin and would like it to be listed here, please submit a pull request.
 
