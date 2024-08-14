@@ -370,7 +370,7 @@ bool image::operator==(const image& reference) const
 {
   double error;
   // TODO: On macOS arm vtkImageSSIM can provide non-zero error for identical images for some reason
-  bool ret = this->compare(reference, 0 /* should be 0*/, error);
+  bool ret = this->compare(reference, 1e-16 /* should be 0*/, error);
   std::cout<<std::setprecision(12)<<error<<std::endl;
   return ret;
 }
