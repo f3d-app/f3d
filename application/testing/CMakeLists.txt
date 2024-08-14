@@ -866,7 +866,7 @@ f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${F3D_
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   # Test invalid geometry
-  f3d_test(NAME TestInvalidGeometry DATA duck_invalid.gltf ARGS --geometry-only REGEXP "failed to load geometry" NO_BASELINE)
+  f3d_test(NAME TestInvalidGeometry DATA world_invalid.obj ARGS --geometry-only REGEXP "failed to load geometry" NO_BASELINE)
 
   # Test invalid full scene file
   f3d_test(NAME TestInvalidFullScene DATA duck_invalid.gltf REGEXP "failed to load scene" NO_BASELINE)
