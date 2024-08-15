@@ -369,8 +369,9 @@ bool image::compare(const image& reference, double threshold, double& error) con
 bool image::operator==(const image& reference) const
 {
   double error;
-  // XXX: We do not use 0 because even with identical images, rounding error, arithmetic imprecision or architecture issue
-  // may cause the value to not be 0. See: https://develop.openfoam.com/Development/openfoam/-/issues/2958
+  // XXX: We do not use 0 because even with identical images, rounding error, arithmetic imprecision
+  // or architecture issue may cause the value to not be 0. See:
+  // https://develop.openfoam.com/Development/openfoam/-/issues/2958
   return this->compare(reference, 1e-14, error);
 }
 
