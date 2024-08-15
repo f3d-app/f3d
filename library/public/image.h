@@ -79,7 +79,7 @@ public:
 
   ///@{ @name Operators
   /**
-   * Comparison operators, uses image::compare with a threshold of 0.
+   * Comparison operators, uses image::compare with a threshold of 1e-14.
    */
   bool operator==(const image& reference) const;
   bool operator!=(const image& reference) const;
@@ -145,9 +145,11 @@ public:
    * this outputs the resulting diff and error and return false,
    * return true otherwise.
    * The error is minimum between Minkownski and Wasserstein distance
-   * on a SSIM computation, as specified in VTK
+   * on a SSIM computation, as specified in VTK.
+   * Please note, due to possible arithemetic imprecision in the SSIM computation
+   * using a threshold of zero may return false with identical images.
    * Depending on the VTK version, another comparison algorithm may be used.
-   * 0: Pixel perfect comparison.
+   * 1e-14: Pixel perfect comparison.
    * 0.05: Visually indistinguishable.
    * 0.1: Small visible difference.
    * 0.5: Comparable images.
