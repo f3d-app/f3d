@@ -143,7 +143,7 @@ PYBIND11_MODULE(pyf3d, module)
         {
           return img.getMetadata(key);
         }
-        catch (std::out_of_range e)
+        catch (const f3d::image::metadata_exception&)
         {
           throw py::key_error(key);
         }

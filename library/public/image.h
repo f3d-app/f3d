@@ -21,11 +21,6 @@ class F3D_EXPORT image
 public:
   /**
    * Enumeration of supported export formats
-   * =======================================
-   * PNG: Supports channel size up to 2 bytes
-   * JPG: Supports channel size of 1 byte
-   * TIF: Supports channel size up to 4 bytes
-   * BMP: Supports channel size of 1 byte
    */
   enum class SaveFormat : unsigned char
   {
@@ -53,8 +48,8 @@ public:
    * Create an image from file, the following formats are supported:
    * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA.
    * EXR files are also supported if the associated module is built.
-   * The complete list can be retrieve at runtime by calling getSupportedFormats.
-   * Throw an image::read_exception in case of failure.
+   * The complete list can be retrieve at runtime by calling `getSupportedFormats()`.
+   * Throw an `image::read_exception` in case of failure.
    */
   explicit image(const std::string& path);
 
@@ -94,7 +89,7 @@ public:
   std::vector<double> getNormalizedPixel(const std::pair<int, int>& xy) const;
 
   /**
-   * Get the list of supported image format when opening a file.
+   * Get the list of supported image format extensions when opening a file.
    */
   static std::vector<std::string> getSupportedFormats();
 
@@ -119,7 +114,7 @@ public:
 
   /**
    * Get image channel type.
-   * throw an image::read_exception if the type is unknown.
+   * throw an `image::read_exception` if the type is unknown.
    */
   ChannelType getChannelType() const;
 
@@ -160,14 +155,24 @@ public:
   /**
    * Save an image to a file in the specified format.
    * Default format is PNG if not specified.
+   * PNG: Supports channel type BYTE and SHORT with channel count of 1 to 4
+   * JPG: Supports channel type BYTE with channel count of 1 or 3
+   * TIF: Supports channel type BYTE, SHORT and FLOAT with channel count of 1 to 4
+   * BMP: Supports channel type BYTE with channel count of 1 to 4
+   * Throw an `image::write_exception` if the format is incompatible with with image channel type or
+   * channel count
    */
   void save(const std::string& path, SaveFormat format = SaveFormat::PNG) const;
 
   /**
    * Save an image to a memory buffer in the specified format.
    * Default format is PNG if not specified.
+   * PNG: Supports channel type BYTE and SHORT with channel count of 1 to 4
+   * JPG: Supports channel type BYTE with channel count of 1 or 3
+   * BMP: Supports channel type BYTE with channel count of 1 to 4
    * TIF format is not supported yet.
-   * Throw an image::write_exception if the type is TIF.
+   * Throw an `image::write_exception` if the type is TIF or
+   * if the format is incompatible with with image channel type or channel count.
    */
   std::vector<unsigned char> saveBuffer(SaveFormat format = SaveFormat::PNG) const;
 
@@ -180,14 +185,14 @@ public:
    * - unicode block characters (`U+2580`, `U+2584`, `U+2588`)
    * - SGR escape codes (`ESC[0m`, `ESC[49m`)
    * - 24-bit escape codes (`ESC[38;2;{r};{g};{b}m`, `ESC[48;2;{r};{g};{b}m`)
-   * Throw an exception if the type is not byte RGB or RGBA.
+   * Throw a `image::write_exception` if the type is not byte RGB or RGBA.
    */
   const f3d::image& toTerminalText(std::ostream& stream) const;
 
   /**
    * Convert to colored text using ANSI escape sequences for printing in a terminal.
    * See `toTerminalText(std::ostream& stream)`.
-   * Throw an exception if the type is not byte RGB or RGBA.
+   * Throw a `image::write_exception` if the type is not byte RGB or RGBA.
    */
   std::string toTerminalText() const;
 
@@ -198,7 +203,7 @@ public:
 
   /**
    * Get the value for a metadata key.
-   * Throw `std::invalid_argument` exception if key does not exist.
+   * Throw a `image::read_exception` if key does not exist.
    */
   std::string getMetadata(const std::string& key) const;
 
@@ -223,6 +228,15 @@ public:
   struct read_exception : public exception
   {
     explicit read_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by the image.
+   * when there is an error related to metadata
+   */
+  struct metadata_exception : public exception
+  {
+    explicit metadata_exception(const std::string& what = "");
   };
 
 private:
