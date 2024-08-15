@@ -55,6 +55,7 @@ public:
 
   /**
    * Perform a render of the window to the screen and save the result in a f3d::image.
+   * of ChannelType BYTE and 3 or 4 components (RGB or RGBA).
    * Set noBackground to true to have a transparent background.
    * Return the resulting f3d::image.
    */

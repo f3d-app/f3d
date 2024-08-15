@@ -38,9 +38,15 @@ namespace f3d
 {
 class image::internals
 {
-  inline static const std::string metadataKeyPrefix = "f3d:";
-
 public:
+  inline static const std::string metadataKeyPrefix = "f3d:";
+  inline static const std::map<SaveFormat, std::string> saveFormatString = {
+    { SaveFormat::PNG, "PNG" },
+    { SaveFormat::BMP, "BMP" },
+    { SaveFormat::JPG, "JPG" },
+    { SaveFormat::TIF, "TIF" },
+  };
+
   vtkSmartPointer<vtkImageData> Image;
   std::unordered_map<std::string, std::string> Metadata;
 
@@ -91,6 +97,51 @@ public:
           }
         }
       }
+    }
+  }
+
+  static void checkSaveFormatCompatibility(const image& self, SaveFormat format)
+  {
+    ChannelType type = self.getChannelType();
+    int count = self.getChannelCount();
+
+    switch (format)
+    {
+      case SaveFormat::PNG:
+        if (type != ChannelType::BYTE && type != ChannelType::SHORT)
+        {
+          throw write_exception("PNG format is only compatible with BYTE or SHORT channel types");
+        }
+        break;
+      case SaveFormat::JPG:
+      case SaveFormat::BMP:
+        if (type != ChannelType::BYTE)
+        {
+          throw write_exception(
+            saveFormatString.at(format) + " format is only compatible with BYTE channel types");
+        }
+        break;
+      default:
+        break;
+    }
+
+    switch (format)
+    {
+      case SaveFormat::JPG:
+        if (count != 1 && count != 3)
+        {
+          throw write_exception("JPG format is only compatible with a channel count of 1 or 3");
+        }
+        break;
+      case SaveFormat::PNG:
+      case SaveFormat::BMP:
+      case SaveFormat::TIF:
+        if (count < 1 || count > 4)
+        {
+          throw write_exception(saveFormatString.at(format) +
+            " format is only compatible with a channel count between 1 to 4");
+        }
+        break;
     }
   }
 };
@@ -411,9 +462,9 @@ std::vector<double> image::getNormalizedPixel(const std::pair<int, int>& xy) con
 //----------------------------------------------------------------------------
 void image::save(const std::string& path, SaveFormat format) const
 {
-  vtkSmartPointer<vtkImageWriter> writer;
+  internals::checkSaveFormatCompatibility(*this, format);
 
-  // TODO Check type is compatible
+  vtkSmartPointer<vtkImageWriter> writer;
   switch (format)
   {
     case SaveFormat::PNG:
@@ -447,7 +498,8 @@ void image::save(const std::string& path, SaveFormat format) const
 //----------------------------------------------------------------------------
 std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
 {
-  // TODO Check type is compatible
+  internals::checkSaveFormatCompatibility(*this, format);
+
   switch (format)
   {
     case SaveFormat::PNG:
@@ -461,7 +513,8 @@ std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
     case SaveFormat::BMP:
       return this->Internals->SaveBuffer(vtkSmartPointer<vtkBMPWriter>::New());
     default:
-      throw write_exception("Cannot save to buffer in the specified format");
+      throw write_exception(
+        "Cannot save to buffer in the specified format: " + internals::saveFormatString.at(format));
   }
 }
 
@@ -471,7 +524,7 @@ const f3d::image& image::toTerminalText(std::ostream& stream) const
   const int depth = this->getChannelCount();
   if (this->getChannelType() != ChannelType::BYTE || depth < 3 || depth > 4)
   {
-    throw std::invalid_argument("image must be byte RGB or RGBA");
+    throw write_exception("image must be byte RGB or RGBA");
   }
 
   int dims[3];
@@ -627,7 +680,7 @@ std::string image::getMetadata(const std::string& key) const
   {
     return this->Internals->Metadata[key];
   }
-  throw std::out_of_range(key);
+  throw metadata_exception("No such key: " + key);
 }
 
 //----------------------------------------------------------------------------
@@ -647,6 +700,12 @@ image::write_exception::write_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 image::read_exception::read_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+image::metadata_exception::metadata_exception(const std::string& what)
   : exception(what)
 {
 }
