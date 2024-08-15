@@ -80,7 +80,7 @@ For most file formats, F3D constructs **a default scene**, loading only the *geo
 
 However, formats supporting **full scenes** will automatically load additional scene properties including *lights*, *cameras*, *actors* and *texture*.
 
-If you'd like to disable these properties, you can specify the `--geometry-only` [option](OPTIONS.md) from the command line to use a default scene construction instead.
+If you'd like to disable these properties, you can specify the `--geometry-only` [option](OPTIONS.md) from the command line to construct a default scene instead.
 
 If you're unsure about what kind of scene your file supports, please see the table of [supported file formats](#supported-file-formats).
 
