@@ -104,15 +104,17 @@ For more information, see the [Interactions](INTERACTIONS.md) page.
 
 ## Playing animations
 
-F3D can play [animations](ANIMATIONS.md) for a number of file formats if the file contains an animation. See the table of [supported file formats](#supported-file-formats) for supported file formats.
+F3D can play [animations](ANIMATIONS.md) for any [supported files](#supported-file-formats) that contain them.
 
-To select the animation to play, you can use the `--animation-index` option. To play all animations at once, use `--animation-index=-1` (.gltf/.glb only).
+With your file loaded into F3D, press the <kbd>W</kbd> hotkey to cycle through available animations. Then, press <kbd>Space</kbd> to play your selected animation. 
 
-F3D uses the second as the default unit of time. To adjust the speed factor of your animations, use the `--animation-speed-factor` option. 
+Alternatively, you can use the command line to play animations. Use the `--animation-index` [option](OPTIONS.md) to specify which animation you want to play. To play all animations at once, use `--animation-index=-1` (.gltf/.glb only). 
 
-Additionally, F3D uses a default frame rate of 60 frames per second. To change the frame rate of your animations, use `--animation-frame-rate`. 
+A few things to note about F3D's default animation settings:
+* F3D plays animations at a default speed factor of 1. Change the `--animation-speed-factor` [option](OPTIONS.md) to adjust how fast or slow your animation plays.
+* Additionally, F3D animates at a default frame rate of 60 frames per second. Change the `--animation-frame-rate` [option](OPTIONS.md) to adjust your desired frame rate.
 
-Press the "W" hotkey to cycle through available animations.
+For more information, see the [Animations](ANIMATIONS.md) page.
 
 ## Navigating plugins
 
