@@ -369,10 +369,9 @@ bool image::compare(const image& reference, double threshold, double& error) con
 bool image::operator==(const image& reference) const
 {
   double error;
-  // TODO: On macOS arm vtkImageSSIM can provide non-zero error for identical images for some reason
-  bool ret = this->compare(reference, 5e-16 /* should be 0*/, error);
-  std::cout  <<  std::setprecision(12)  <<  error  <<  std::endl;
-  return ret;
+  // XXX: We do not use 0 because even with identical images, rounding error, arithmetic imprecision or architecture issue
+  // may cause the value to not be 0. See: https://develop.openfoam.com/Development/openfoam/-/issues/2958
+  return this->compare(reference, 1e-14, error);
 }
 
 //----------------------------------------------------------------------------
