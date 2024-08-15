@@ -8,7 +8,7 @@ As an overview, you'll learn how to run F3D and open supported files. You'll the
 
 To use F3D, you'll need to [install](INSTALLATION.md) F3D. See the [Installation](INSTALLATION.md) page for the latest release package supported by your system.
 
-## Run F3D
+## Running F3D
 
 Once F3D has been [installed](INSTALLATION.md), you should be able to open a [supported file](#supported-file-formats) in any of the following ways:
 
@@ -72,32 +72,37 @@ F3D supports the following file formats:
 | Universal Scene Description | **.usd** | Full | Yes |
 | \***VDB** | **.vdb** | Default |
 
-\***Note:** Support for VDB is experimental.
+\***Note:** As of version 2.5.0, F3D support for VDB is still experimental.
 
-## Scene construction
+## Constructing scenes
 
 For most file formats, F3D constructs **a default scene**, loading only the *geometry* from the file.
 
 However, formats supporting **full scenes** will automatically load additional scene properties including *lights*, *cameras*, *actors* and *texture*.
 
-To disable these properties, you can specify the `--geometry-only` [option](OPTIONS.md) from the command line to use a default scene construction instead.
+If you'd like to disable these properties, you can specify the `--geometry-only` [option](OPTIONS.md) from the command line to use a default scene construction instead.
 
-Please refer to the table of supported file formats to see what kind of scenes your file supports.
+If you're unsure about what kind of scene your file supports, please see the table of [supported file formats](#supported-file-formats).
 
-For **default scene** formats, certain default values are set automatically:
- - texture-*: ""
- - line-width: 1.0
- - point-size: 10.0
- - opacity: 1.0
- - color: 1.0, 1.0, 1.0
- - emissive-factor: 1.0, 1.0, 1.0
- - normal-scale: 1.0
- - metallic: 0.0
- - roughness: 0.3
+## Interacting with your scene
 
-They will be overridden when using corresponding [options](OPTIONS.md).
+Once you've loaded your scene in F3D, you can interact with it by using your mouse and certain hotkeys. 
 
-## Animations
+### Moving the camera
+
+* *Click and drag* with the *left* mouse button to **rotate** around the focal point of the camera.
+* *Click and drag* vertically with the *right* mouse button <u>OR</u> *move the mouse wheel* to **zoom in/out**.
+* *Click and drag* with the *middle* mouse button to **translate** the camera.
+
+### Other shortcuts
+* Press <kbd>Enter</kbd> to reset the camera.
+* Press <kbd>Space</kbd> to play animation, if any.
+* Press <kbd>G</kbd> to toggle the horizontal grid.
+* Press <kbd>H</kbd> to display a cheatsheet of hotkey interactions. 
+
+For more information, see the [Interactions](INTERACTIONS.md) page.
+
+## Playing animations
 
 F3D can play [animations](ANIMATIONS.md) for a number of file formats if the file contains an animation. See the table of [supported file formats](#supported-file-formats) for supported file formats.
 
@@ -109,7 +114,7 @@ Additionally, F3D uses a default frame rate of 60 frames per second. To change t
 
 Press the "W" hotkey to cycle through available animations.
 
-## Plugins
+## Navigating plugins
 
 If you installed F3D using a package manager, it's possible that the packager chose to bundle the plugins in different packages or to list plugin dependencies as optional in order to reduce the reduce the number of dependencies of the main package.
 
