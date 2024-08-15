@@ -107,14 +107,59 @@ int TestSDKImage(int argc, char* argv[])
   try
   {
     generated.save("/dummy/folder/img.png");
-
     std::cerr << "An exception has not been thrown when saving to an incorrect path" << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::image::write_exception&)
   {
   }
+  try
+  {
+    img16.saveBuffer(f3d::image::SaveFormat::BMP);
+    std::cerr
+      << "An exception has not been thrown when saving to BMP format with an incompatible type"
+      << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::write_exception&)
+  {
+  }
+  try
+  {
+    img32.saveBuffer(f3d::image::SaveFormat::PNG);
+    std::cerr
+      << "An exception has not been thrown when saving to PNG format with an incompatible type"
+      << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::write_exception&)
+  {
+  }
 
+  f3d::image img2Ch(4, 4, 2);
+  f3d::image img5Ch(4, 4, 5);
+  try
+  {
+    img5Ch.saveBuffer(f3d::image::SaveFormat::BMP);
+    std::cerr << "An exception has not been thrown when saving to BMP format with an incompatible "
+                 "channel count"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::write_exception&)
+  {
+  }
+  try
+  {
+    img2Ch.saveBuffer(f3d::image::SaveFormat::JPG);
+    std::cerr
+      << "An exception has not been thrown when saving to PNG format with an incompatible type"
+      << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::write_exception&)
+  {
+  }
   try
   {
     f3d::image img("/dummy/folder/img.png");
@@ -351,18 +396,22 @@ int TestSDKImage(int argc, char* argv[])
     try
     {
       f3d::image(3, 3, 1, f3d::image::ChannelType::BYTE).toTerminalText();
+      std::cerr << "An exception has not been thrown when using toTerminalText with BYTE"
+                << std::endl;
       return EXIT_FAILURE; // expected to throw (wrong channel count)
     }
-    catch (const std::invalid_argument& e)
+    catch (const f3d::image::write_exception&)
     {
     }
 
     try
     {
       f3d::image(3, 3, 4, f3d::image::ChannelType::SHORT).toTerminalText();
+      std::cerr << "An exception has not been thrown when using toTerminalText with SHORT"
+                << std::endl;
       return EXIT_FAILURE; // expected to throw (wrong channel type)
     }
-    catch (const std::invalid_argument& e)
+    catch (const f3d::image::write_exception&)
     {
     }
 
@@ -413,7 +462,7 @@ int TestSDKImage(int argc, char* argv[])
       std::cerr << "getMetadata() failed to throw" << std::endl;
       return EXIT_FAILURE;
     }
-    catch (std::out_of_range& e)
+    catch (const f3d::image::metadata_exception&)
     {
       /* expected, key doesn't exist */
     }
@@ -425,7 +474,7 @@ int TestSDKImage(int argc, char* argv[])
       std::cerr << "setMetadata() with empty value failed" << std::endl;
       return EXIT_FAILURE;
     }
-    catch (std::out_of_range& e)
+    catch (const f3d::image::metadata_exception&)
     {
       /* expected, key has been removed */
     }
