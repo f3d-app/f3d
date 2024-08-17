@@ -638,7 +638,7 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::image ref(this->Internals->AppOptions.Reference);
       f3d::image diff;
       double error;
-      if (!img.compare(ref, this->Internals->AppOptions.RefThreshold, diff, error))
+      if (!img.compare(ref, this->Internals->AppOptions.RefThreshold, error))
       {
         if (this->Internals->AppOptions.Output.empty())
         {
@@ -651,8 +651,6 @@ int F3DStarter::Start(int argc, char** argv)
             " is higher than the threshold of ", this->Internals->AppOptions.RefThreshold, ".\n");
 
           img.save(this->Internals->AppOptions.Output);
-          diff.save(
-            fs::path(this->Internals->AppOptions.Output).replace_extension(".diff.png").string());
         }
         return EXIT_FAILURE;
       }

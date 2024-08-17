@@ -5,8 +5,8 @@
 
 #include <vtkBMPWriter.h>
 #include <vtkDataArrayRange.h>
+#include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include <vtkImageDifference.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Collection.h>
 #include <vtkImageReader2Factory.h>
@@ -18,7 +18,14 @@
 #include <vtkStringArray.h>
 #include <vtkTIFFWriter.h>
 #include <vtkUnsignedCharArray.h>
+#include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
+#include <vtkImageSSIM.h>
+#else
+#include <vtkImageDifference.h>
+#endif
 
 #include <algorithm>
 #include <cassert>
@@ -278,11 +285,68 @@ void* image::getContent() const
 }
 
 //----------------------------------------------------------------------------
-bool image::compare(const image& reference, double threshold, image& diff, double& error) const
+bool image::compare(const image& reference, double threshold, double& error) const
 {
+  ChannelType type = this->getChannelType();
+  if (type != reference.getChannelType())
+  {
+    error = 1;
+    return false;
+  }
+
+  unsigned int count = this->getChannelCount();
+  if (count != reference.getChannelCount())
+  {
+    error = 1;
+    return false;
+  }
+
+  if (this->getWidth() != reference.getWidth() || this->getHeight() != reference.getHeight())
+  {
+    error = 1;
+    return false;
+  }
+
+  if (this->getWidth() == 0 && this->getHeight() == 0)
+  {
+    error = 0;
+    return true;
+  }
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
+  vtkNew<vtkImageSSIM> ssim;
+  std::vector<int> ranges(count);
+  switch (type)
+  {
+    case ChannelType::BYTE:
+      std::fill(ranges.begin(), ranges.end(), 256);
+      ssim->SetInputRange(ranges);
+      break;
+    case ChannelType::SHORT:
+      std::fill(ranges.begin(), ranges.end(), 65535);
+      ssim->SetInputRange(ranges);
+      break;
+    case ChannelType::FLOAT:
+      ssim->SetInputToAuto();
+      break;
+  }
+
+  ssim->SetInputData(this->Internals->Image);
+  ssim->SetInputData(1, reference.Internals->Image);
+  ssim->Update();
+  vtkDoubleArray* scalars = vtkArrayDownCast<vtkDoubleArray>(
+    vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
+
+  // Thanks to the checks above, this is always true
+  assert(scalars != nullptr);
+
+  double unused;
+  vtkImageSSIM::ComputeErrorMetrics(scalars, error, unused);
+  return error <= threshold;
+#else
+  threshold *= 1000;
+
   vtkNew<vtkImageDifference> imDiff;
-  // handle threshold outside of vtkImageDifference:
-  // https://gitlab.kitware.com/vtk/vtk/-/issues/18152
   imDiff->SetThreshold(0);
   imDiff->SetInputData(this->Internals->Image);
   imDiff->SetImageData(reference.Internals->Image);
@@ -295,22 +359,20 @@ bool image::compare(const image& reference, double threshold, image& diff, doubl
     error = imDiff->GetThresholdedError();
   }
 
-  if (error > threshold)
-  {
-    imDiff->Update();
-    diff.Internals->Image = imDiff->GetOutput();
-    return false;
-  }
-
-  return true;
+  bool ret = error <= threshold;
+  error /= 1000;
+  return ret;
+#endif
 }
 
 //----------------------------------------------------------------------------
 bool image::operator==(const image& reference) const
 {
-  image diff;
   double error;
-  return this->compare(reference, 0, diff, error);
+  // XXX: We do not use 0 because even with identical images, rounding error, arithmetic imprecision
+  // or architecture issue may cause the value to not be 0. See:
+  // https://develop.openfoam.com/Development/openfoam/-/issues/2958
+  return this->compare(reference, 1e-14, error);
 }
 
 //----------------------------------------------------------------------------
@@ -351,6 +413,7 @@ void image::save(const std::string& path, SaveFormat format) const
 {
   vtkSmartPointer<vtkImageWriter> writer;
 
+  // TODO Check type is compatible
   switch (format)
   {
     case SaveFormat::PNG:
@@ -384,6 +447,7 @@ void image::save(const std::string& path, SaveFormat format) const
 //----------------------------------------------------------------------------
 std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
 {
+  // TODO Check type is compatible
   switch (format)
   {
     case SaveFormat::PNG:

@@ -25,7 +25,6 @@ def test_load_memory():
     img = engine.window.render_to_image()
     img.save(output)
 
-    diff = f3d.Image()
     error = 0.0
 
-    assert img.compare(f3d.Image(reference), 50, diff, error)
+    assert img.compare(f3d.Image(reference), 50, error)
