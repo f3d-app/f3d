@@ -228,7 +228,7 @@ int TestSDKImage(int argc, char* argv[])
   }*/
 
 // Remove this once VTK 9.3 support is removed
-#if F3D_SSIM_COMPARE
+#ifdef F3D_SSIM_COMPARE
   // check generated short image with baseline
   if (generated16.getWidth() != width || generated16.getHeight() != height)
   {
