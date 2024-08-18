@@ -111,7 +111,7 @@ There are three APIs to access the options
 
 The most straightforward and easy to use API, just access it through the structs available in the options instance, eg:
 
-```
+```cpp
   f3d::engine eng(f3d::window::Type::NATIVE);
   f3d::options& opt = eng.getOptions();
   opt.render.show_edges = true;
@@ -125,7 +125,7 @@ The most straightforward and easy to use API, just access it through the structs
 The most generic and flexible API, as it rely on parsing and string generation.
 See the dedicated doc about option parsing TODO.
 
-```
+```cpp
   f3d::engine eng(f3d::window::Type::NATIVE);
   f3d::options& opt = eng.getOptions();
   opt.setAsString("render.show_edges", "true");
@@ -138,7 +138,7 @@ See the dedicated doc about option parsing TODO.
 
 An API the is similar to the F3D 2.0 options API thanks to std::variant, requires C++17.
 
-```
+```cpp
   f3d::engine eng(f3d::window::Type::NATIVE);
   f3d::options& opt = eng.getOptions();
   opt.set("render.show_edges", true);
