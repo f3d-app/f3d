@@ -1,3 +1,4 @@
+#define F3D_DISABLE_CXX17_API
 #include <f3d/camera.h>
 #include <f3d/engine.h>
 #include <f3d/exception.h>

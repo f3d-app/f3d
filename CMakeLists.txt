@@ -52,13 +52,6 @@ set(F3D_SYSTEM_PROCESSOR "${F3D_SYSTEM_PROCESSOR}-bits")
 option(F3D_EXCLUDE_DEPRECATED "Exclude deprecated functions and options" OFF)
 mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 
-option(F3D_ENABLE_CXX17_API "Enable libf3d C++17 API" ON)
-mark_as_advanced(F3D_ENABLE_CXX17_API)
-set(f3d_cxx_standard 11)
-if(F3D_ENABLE_CXX17_API)
-  set(f3d_cxx_standard 17)
-endif()
-
 # Modules
 option(F3D_MODULE_EXTERNAL_RENDERING "External rendering module" OFF)
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)

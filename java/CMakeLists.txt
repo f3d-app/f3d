@@ -35,7 +35,7 @@ endif()
 
 set_target_properties(javaf3d PROPERTIES
   CXX_VISIBILITY_PRESET hidden
-  CXX_STANDARD ${f3d_cxx_standard}
+  CXX_STANDARD 17
   OUTPUT_NAME "f3d-java"
   )
 

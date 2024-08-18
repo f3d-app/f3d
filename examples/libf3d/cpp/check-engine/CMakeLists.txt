@@ -20,13 +20,7 @@ check_variable_defined(f3d_BINDINGS_JAVA)
 
 add_executable(check-engine main.cxx)
 target_link_libraries(check-engine f3d::libf3d)
-
-# make sure the libf3d API is compatible with the right version of the CXX standard
-set(f3d_cxx_standard 11)
-if(f3d_CXX17_API)
-  set(f3d_cxx_standard 17)
-endif()
-set_target_properties(check-engine PROPERTIES CXX_STANDARD ${f3d_cxx_standard})
+set_target_properties(check-engine PROPERTIES CXX_STANDARD 11)
 
 if(BUILD_TESTING)
   enable_testing()

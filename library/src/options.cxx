@@ -20,7 +20,6 @@ options::options()
   detail::init::initialize();
 };
 
-#ifdef F3D_ENABLE_CXX17_API
 //----------------------------------------------------------------------------
 options& options::set(const std::string& name, const option_variant_t& value)
 {
@@ -33,7 +32,6 @@ option_variant_t options::get(const std::string& name) const
 {
   return options_tools::get(*this, name);
 }
-#endif
 
 //----------------------------------------------------------------------------
 options& options::setAsString(const std::string& name, const std::string& str)

@@ -33,12 +33,6 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx"
   @ONLY)
 
-# This is used during the configuration of options.h.in and options_tools.h.in
-set(f3d_cxx17_api_bool "0")
-if(F3D_ENABLE_CXX17_API)
-  set(f3d_cxx17_api_bool "1")
-endif()
-
 include(f3dOptions)
 f3d_generate_options(
   INPUT_JSON "${CMAKE_CURRENT_SOURCE_DIR}/options.json"
@@ -180,10 +174,6 @@ target_link_options(libf3d PUBLIC ${f3d_link_options_public})
 if(F3D_STRICT_BUILD AND MSVC)
   # There are warnings in VTK related to deprecated features in C++17
   target_compile_definitions(libf3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
-endif()
-
-if(F3D_ENABLE_CXX17_API)
-  target_compile_definitions(libf3d PRIVATE F3D_ENABLE_CXX17_API )
 endif()
 
 if(APPLE)

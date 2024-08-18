@@ -6,16 +6,12 @@
 
 #include <sstream>
 
-#ifndef F3D_ENABLE_CXX17_API
 #include <variant>
-#endif
 
 namespace f3d
 {
 // Required as this becomes an internal type when CXX17 is not exposed byt the libf3d API
-#ifndef F3D_ENABLE_CXX17_API
 using option_variant_t = std::variant<bool, int, double, std::string, std::vector<double>>;
-#endif
 
 namespace options_tools
 {

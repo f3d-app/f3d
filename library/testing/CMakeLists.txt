@@ -75,6 +75,7 @@ set_target_properties(libf3dSDKTests PROPERTIES
   )
 
 target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR=$<BOOL:${F3D_MODULE_EXR}>)
+target_compile_definitions(libf3dSDKTests PRIVATE F3D_DISABLE_CXX17_API)
 
 # Remove this once VTK 9.3 support is removed
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
@@ -128,7 +129,30 @@ if(Qt5_FOUND)
 endif()
 
 # make sure the libf3d API is compatible with the right C++ standard
-set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD ${f3d_cxx_standard})
-if(F3D_ENABLE_CXX17_API)
-  target_compile_definitions(libf3dSDKTests PRIVATE F3D_ENABLE_CXX17_API )
-endif()
+set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 11)
+
+# Add Cxx17 tests
+list(APPEND libf3dSDKCxx17Tests_list
+     TestSDKOptionsCxx17.cxx
+)
+
+# create the testing file and list of tests
+create_test_sourcelist(_libf3dSDKCxx17Tests libf3dSDKCxx17Tests.cxx ${libf3dSDKCxx17Tests_list})
+
+# add the executable
+add_executable(libf3dSDKCxx17Tests ${_libf3dSDKCxx17Tests})
+set_target_properties(libf3dSDKCxx17Tests PROPERTIES
+  CXX_VISIBILITY_PRESET hidden
+  )
+
+# Add all the ADD_TEST for each test
+foreach (test ${libf3dSDKCxx17Tests_list})
+  get_filename_component (TName ${test} NAME_WE)
+  add_test (NAME libf3d::${TName} COMMAND libf3dSDKCxx17Tests ${TName}  "${F3D_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+  set_tests_properties(libf3d::${TName} PROPERTIES TIMEOUT 30)
+endforeach ()
+
+target_link_libraries(libf3dSDKCxx17Tests libf3d)
+
+# make sure the libf3d API is compatible with the right C++ standard
+set_target_properties(libf3dSDKCxx17Tests PROPERTIES CXX_STANDARD 17)

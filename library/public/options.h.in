@@ -9,13 +9,13 @@
 #include <string>
 #include <vector>
 
-#if ${f3d_cxx17_api_bool}
+#ifndef F3D_DISABLE_CXX17_API
   #include <variant>
 #endif
 
 namespace f3d
 {
-#if ${f3d_cxx17_api_bool}
+#ifndef F3D_DISABLE_CXX17_API
   // Declared here for simplicity
   using option_variant_t = std::variant<bool, int, double, std::string, std::vector<double>>;
 #endif
@@ -43,7 +43,7 @@ public:
   options& operator=(options&& other) noexcept = default;
   ///@}
 
-#if ${f3d_cxx17_api_bool}
+#ifndef F3D_DISABLE_CXX17_API
   /**
    * Set/Get an option as a variant based on its name
    * Please note that, on Windows, using an explicit std::string may be required:

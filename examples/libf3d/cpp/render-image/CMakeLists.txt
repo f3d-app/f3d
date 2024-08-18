@@ -4,19 +4,13 @@ project(render-image)
 
 find_package(f3d REQUIRED COMPONENTS library)
 
-# make sure the libf3d API is compatible with the right version of the CXX standard
-set(f3d_cxx_standard 11)
-if(f3d_CXX17_API)
-  set(f3d_cxx_standard 17)
-endif()
-
 add_executable(render-image main.cxx)
 target_link_libraries(render-image f3d::libf3d)
-set_target_properties(render-image PROPERTIES CXX_STANDARD ${f3d_cxx_standard})
+set_target_properties(render-image PROPERTIES CXX_STANDARD 11)
 
 add_executable(check-image check.cxx)
 target_link_libraries(check-image f3d::libf3d)
-set_target_properties(check-image PROPERTIES CXX_STANDARD ${f3d_cxx_standard})
+set_target_properties(check-image PROPERTIES CXX_STANDARD 11)
 
 # Simple testing
 if(BUILD_TESTING)
