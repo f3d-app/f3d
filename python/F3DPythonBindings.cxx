@@ -167,6 +167,10 @@ PYBIND11_MODULE(pyf3d, module)
         {
           throw py::key_error(key);
         }
+        catch (const f3d::options::incompatible_exception&)
+        {
+          throw py::attribute_error(key);
+        }
       })
     .def("__getitem__",
       [](f3d::options& opts, const std::string& key)

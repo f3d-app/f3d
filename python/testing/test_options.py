@@ -43,6 +43,12 @@ def test_set_non_existent_key():
         options["hello"] = "world"
 
 
+def test_set_incompatible_key():
+    options = f3d.Options()
+    with pytest.raises(AttributeError):
+        options["interactor.axis"] = "world"
+
+
 def test_len():
     options = f3d.Options()
     assert len(options) == len(options.keys())
