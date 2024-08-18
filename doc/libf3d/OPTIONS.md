@@ -123,7 +123,7 @@ The most straightforward and easy to use API, just access it through the structs
 ## String API
 
 The most generic and flexible API, as it rely on parsing and string generation.
-See the dedicated doc about option parsing TODO.
+The documentation about option parsing is upcoming.
 
 ```cpp
   f3d::engine eng(f3d::window::Type::NATIVE);
@@ -136,7 +136,7 @@ See the dedicated doc about option parsing TODO.
 
 ## Variant API
 
-An API the is similar to the F3D 2.0 options API thanks to std::variant, requires C++17.
+An API that is similar to the F3D 2.0 options API thanks to std::variant, requires C++17.
 
 ```cpp
   f3d::engine eng(f3d::window::Type::NATIVE);

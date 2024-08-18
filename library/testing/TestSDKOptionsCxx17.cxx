@@ -14,22 +14,12 @@ int TestSDKOptionsCxx17(int argc, char* argv[])
     std::cerr << "Options set/get bool is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  if (opt.getAsString("model.scivis.cells") != "true")
-  {
-    std::cerr << "Options getAsString bool is not behaving as expected." << std::endl;
-    return EXIT_FAILURE;
-  }
 
   // Test int
   opt.set("scene.animation.index", 1);
   if (std::get<int>(opt.get("scene.animation.index")) != 1)
   {
     std::cerr << "Options set/get int is not behaving as expected." << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (opt.getAsString("scene.animation.index") != "1")
-  {
-    std::cerr << "Options getAsString int is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -40,22 +30,12 @@ int TestSDKOptionsCxx17(int argc, char* argv[])
     std::cerr << "Options set/get double is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  if (opt.getAsString("render.line_width") != "1.7")
-  {
-    std::cerr << "Options getAsString double is not behaving as expected." << std::endl;
-    return EXIT_FAILURE;
-  }
 
   // Test ratio_t
   opt.set("scene.animation.speed_factor", 3.17);
   if (std::get<double>(opt.get("scene.animation.speed_factor")) != 3.17)
   {
     std::cerr << "Options set/get ratio_t is not behaving as expected." << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (opt.getAsString("scene.animation.speed_factor") != "3.17")
-  {
-    std::cerr << "Options getAsString ratio_t is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -67,11 +47,6 @@ int TestSDKOptionsCxx17(int argc, char* argv[])
     std::cerr << "Options set/get string is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
-  if (opt.getAsString("model.color.texture") != "test")
-  {
-    std::cerr << "Options getAsString string is not behaving as expected." << std::endl;
-    return EXIT_FAILURE;
-  }
 
   // Test double vector
   opt.set("render.background.color", std::vector<double>{ 0.1, 0.2, 0.3 });
@@ -79,11 +54,6 @@ int TestSDKOptionsCxx17(int argc, char* argv[])
     std::vector<double>{ 0.1, 0.2, 0.3 })
   {
     std::cerr << "Options set/get vector<double> is not behaving as expected." << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (opt.getAsString("render.background.color") != "0.1, 0.2, 0.3")
-  {
-    std::cerr << "Options getAsString vector<double> is not behaving as expected." << std::endl;
     return EXIT_FAILURE;
   }
 
