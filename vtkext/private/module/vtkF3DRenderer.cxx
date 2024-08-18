@@ -252,9 +252,9 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   else if (std::regex_match(up, match, re2))
   {
     const std::array<double, 3> upDir = {
-      ::atof(match[1].str().c_str()), //
-      ::atof(match[4].str().c_str()), //
-      ::atof(match[7].str().c_str()), //
+      std::stod(match[1].str()), //
+      std::stod(match[4].str()), //
+      std::stod(match[7].str()), //
     };
     const std::array<double, 3> rightDir = { 1, 0, 0 };
 
