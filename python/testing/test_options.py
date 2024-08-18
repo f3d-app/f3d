@@ -33,13 +33,13 @@ def test_getitem():
 
 def test_get_non_existent_key():
     options = f3d.Options()
-    with pytest.raises(Exception):
+    with pytest.raises(KeyError):
         assert options["hello"] == "world"
 
 
 def test_set_non_existent_key():
     options = f3d.Options()
-    with pytest.raises(Exception):
+    with pytest.raises(KeyError):
         options["hello"] = "world"
 
 

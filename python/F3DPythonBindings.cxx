@@ -156,8 +156,30 @@ PYBIND11_MODULE(pyf3d, module)
 
   options //
     .def(py::init<>())
-    .def("__setitem__", &f3d::options::set)
-    .def("__getitem__", &f3d::options::get)
+    .def("__setitem__",
+      [](f3d::options& opts, const std::string& key, const f3d::option_variant_t& value)
+      {
+        try
+        {
+          opts.set(key, value);
+        }
+        catch (const f3d::options::inexistent_exception&)
+        {
+          throw py::key_error(key);
+        }
+      })
+    .def("__getitem__",
+      [](f3d::options& opts, const std::string& key)
+      {
+        try
+        {
+          return opts.get(key);
+        }
+        catch (const f3d::options::inexistent_exception&)
+        {
+          throw py::key_error(key);
+        }
+      })
     .def("__len__", [](f3d::options& opts) { return opts.getNames().size(); })
     .def(
       "__iter__",
