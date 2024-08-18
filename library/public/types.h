@@ -43,8 +43,8 @@ class ratio_t
 public:
   ratio_t() = default;
   ratio_t(double val)
+    : Value(val)
   {
-    this->Value = val;
   }
   operator double() const
   {
