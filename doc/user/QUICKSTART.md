@@ -117,6 +117,8 @@ Alternatively, you can add your plugin directly in the [configuration file](CONF
 
 ### Supported plugins
 
+F3D supports the following plugins and their file formats:
+
 - **alembic**: `.abc`
 - **assimp**: `.fbx`, `.dae`, `.off`, `.dxf`, `.x`, `.3mf`
 - **draco**: `.drc`
