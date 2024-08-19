@@ -2,33 +2,33 @@
 
 F3D supports the following file formats:
 
-| Name | File Extension(s) | Type of Scene(s) Supported | Animations Supported |
+| Name | File Extension(s) | Type of Scene(s) Supported | Animations Supported? |
 | -- | -- | -- | -- |
 | Legacy VTK | `.vtk` | Default | 
-| VTK XML | **.vt[p\|u\|r\|i\|s\|m]** | Default |
+| VTK XML | `.vtp`, `.vtu`, `.vtr`, `.vti`, `.vts`, `.vtm` | Default |
 | Polygon File Format | `.ply` | Default |
 | Standard Triangle Language | `.stl` | Default |  
 | DICOM | `.dcm` | Default |
 | NRRD ("nearly raw raster data") | `.nrrd`, `.nhrd` | Default |
 | MetaHeader MetaIO | `.mhd`, `.mha` | Default |
-| Tag Image File Format (TIFF) 2D/3D | `.tif`, `.tiff` | Default |
+| Tag Image File Format 2D/3D | `.tif`, `.tiff` | Default |
 | EXODUS II | `.e`, `.ex2`, `.exo`, `.g` | Default | Yes |
 | CityGML | `.gml` | Default |
 | Point Cloud | `.pts` | Default |
-| Standard for the Exchange of Product Data (STEP) | `.step`, `.stp` | Default |
-| Initial Graphics Exchange Specification (IGES) | `.iges`, `.igs` | Default |
-| Open CASCADE Technology (OCCT) BRep format | `.brep` | Default |
-| Alembic (ABC) | `.abc` | Default |
+| Standard for the Exchange of Product Data | `.step`, `.stp` | Default |
+| Initial Graphics Exchange Specification | `.iges`, `.igs` | Default |
+| Open CASCADE Technology BRep format | `.brep` | Default |
+| Alembic | `.abc` | Default |
 | Wavefront OBJ | `.obj` | Default, Full |
 | GL Transmission Format | `.gltf`, `.glb` | Default, Full | Yes |
 | Autodesk 3D Studio | `.3ds` | Full |
-| Virtual Reality Modeling Language (VRML) | `.wrl` | Full |
-| Autodesk Filmbox (FBX) | `.fbx` | Full | Yes |
+| Virtual Reality Modeling Language | `.wrl` | Full |
+| Autodesk Filmbox | `.fbx` | Full | Yes |
 | COLLADA | `.dae` | Full | Yes |
-| Object File Format (OFF) | `.off` | Full |
-| Drawing Exchange Format (DFX) | `.dxf` | Full |
+| Object File Format | `.off` | Full |
+| Drawing Exchange Format | `.dxf` | Full |
 | DirectX | `.x` | Full | Yes |
-| 3D Manufacturing Format (3MF) | `.3mf` | Full |
+| 3D Manufacturing Format | `.3mf` | Full |
 | Universal Scene Description | `.usd` | Full | Yes |
 | VDB | `.vdb` | Default |
 
