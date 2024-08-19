@@ -6,11 +6,11 @@ As an overview, you'll learn how to run F3D and open supported files. You'll the
 
 ## Prerequisites
 
-To use F3D, you'll need to [install](INSTALLATION.md) F3D. See the [Installation](INSTALLATION.md) page for the latest release package supported by your system.
+To use F3D, you'll need to install F3D. See the [Installation](INSTALLATION.md) page for the latest release package supported by your system.
 
 ## Running F3D
 
-Once F3D has been [installed](INSTALLATION.md), you should be able to open a [supported file](#supported-file-formats) in any of the following ways:
+Once F3D has been installed, you should be able to open a [supported file](#supported-file-formats) in any of the following ways:
 
 * Open a file directly from your file manager.
 * Open F3D, then drag and drop a file into the application window.
@@ -70,7 +70,7 @@ F3D supports the following file formats:
 | DirectX | **.x** | Full | Yes |
 | 3D Manufacturing Format (3MF) | **.3mf** | Full |
 | Universal Scene Description | **.usd** | Full | Yes |
-| \***VDB** | **.vdb** | Default |
+| VDB | **.vdb** | Default |
 
 \***Note:** As of version 2.5.0, F3D support for VDB is still experimental.
 
@@ -116,7 +116,7 @@ A few things to note about F3D's default animation settings:
 
 For more information, see the [Animations](ANIMATIONS.md) page.
 
-## Navigating plugins
+## Plugins
 
 If you installed F3D using a package manager, it's possible that the packager chose to bundle the plugins in different packages or to list plugin dependencies as optional in order to reduce the reduce the number of dependencies of the main package.
 
