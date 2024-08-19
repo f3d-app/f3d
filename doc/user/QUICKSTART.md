@@ -99,23 +99,33 @@ For more information, see the [Animations](ANIMATIONS.md) page.
 
 ## Plugins
 
-If you installed F3D using a package manager, it's possible that the packager chose to bundle the plugins in different packages or to list plugin dependencies as optional in order to reduce the reduce the number of dependencies of the main package.
+F3D officially supports [plugins](#supported-plugins) for certain file formats. If you installed F3D using the binary release, there's no need to manually load these plugins when opening your file. F3D will load them automatically.
 
-In order to open a file that requires a plugin, make sure you have installed all necessary dependencies. You then need to specify which plugin you want to load in order to be able to open this file. You can either use the `--load-plugins` option or add it in the [configuration file](CONFIGURATION_FILE.md) if not already specified. You can specify multiple plugins in a single comma-separated list.
+However, if you installed F3D using a package manager, it's possible that the packager chose to bundle the plugins into different packages or to list plugin dependencies as optional in order to reduce the number of dependencies of the main package.
+
+In order to open a file that requires a plugin, make sure you've installed all necessary dependencies. You can then specify the `--load-plugins=<path or name>` [option](OPTIONS.md) in the command line to load your plugin. 
+
+Alternatively, you can add your plugin directly in the [configuration file](CONFIGURATION_FILE.md) if it isn't there already. You can specify one or multiple plugins in a single comma-separated list, like in the example below:
+
+```
+{
+    ".*(file_extension)": {
+        "load-plugins": "plugin_name"
+    }
+}
+```
 
 ### Supported plugins
 
-F3D officially provides the following plugins and their supported file formats:
+- **alembic**: `.abc`
+- **assimp**: `.fbx`, `.dae`, `.off`, `.dxf`, `.x`, `.3mf`
+- **draco**: `.drc`
+- **exodus**: `.ex2`
+- **occt**: `.step/.stp`, `.iges/.igs`
+- **usd**: `.usd`, `.usda`, `.usdc`, `.usdz`
+- **vdb**: `.vdb` (experimental)
 
-- **alembic**: ABC support
-- **assimp**: FBX, DAE, OFF, DXF, X and 3MF support
-- **draco**: DRC support
-- **exodus**: EX2 support
-- **occt**: STEP and IGES support
-- **usd**: USD, USDA, UDSC and USDZ support
-- **vdb**: VDB support (experimental)
-
-> Note: If you downloaded the binaries from the Release page, it's not necessary to specify manually the plugins above, all of them are loaded automatically.
+> Note: If you downloaded the binaries from the release page, it's not necessary to specify manually the plugins above. F3D loads them automatically.
 
 Here is how the plugins are searched (in preceding order):
 
