@@ -304,31 +304,29 @@ void vtkF3DRenderer::InitializeEnvironment(
   vtkMath::Cross(up.data(), front.data(), right.data());
   vtkMath::Normalize(right.data());
 
-  {
-    this->UpVector[0] = up[0];
-    this->UpVector[1] = up[1];
-    this->UpVector[2] = up[2];
-    this->RightVector[0] = right[0];
-    this->RightVector[1] = right[1];
-    this->RightVector[2] = right[2];
+  this->UpVector[0] = up[0];
+  this->UpVector[1] = up[1];
+  this->UpVector[2] = up[2];
+  this->RightVector[0] = right[0];
+  this->RightVector[1] = right[1];
+  this->RightVector[2] = right[2];
 
-    double pos[3];
-    vtkMath::Cross(this->UpVector, this->RightVector, pos);
-    vtkMath::MultiplyScalar(pos, -1.0);
+  double pos[3];
+  vtkMath::Cross(this->UpVector, this->RightVector, pos);
+  vtkMath::MultiplyScalar(pos, -1.0);
 
-    vtkCamera* cam = this->GetActiveCamera();
-    cam->SetFocalPoint(0.0, 0.0, 0.0);
-    cam->SetPosition(pos);
-    cam->SetViewUp(this->UpVector);
+  vtkCamera* cam = this->GetActiveCamera();
+  cam->SetFocalPoint(0.0, 0.0, 0.0);
+  cam->SetPosition(pos);
+  cam->SetViewUp(this->UpVector);
 
-    // skybox orientation
-    this->SkyboxActor->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
-    this->SkyboxActor->SetFloorRight(front[0], front[1], front[2]);
+  // skybox orientation
+  this->SkyboxActor->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
+  this->SkyboxActor->SetFloorRight(front[0], front[1], front[2]);
 
-    // environment orientation
-    this->SetEnvironmentUp(this->UpVector);
-    this->SetEnvironmentRight(this->RightVector);
-  }
+  // environment orientation
+  this->SetEnvironmentUp(this->UpVector);
+  this->SetEnvironmentRight(this->RightVector);
 }
 
 //----------------------------------------------------------------------------
@@ -571,15 +569,13 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
     vtkMath::Cross(right, up, front);
 
     vtkNew<vtkMatrix4x4> upMatrix;
-    {
-      const double m[16] = {
-        right[0], right[1], right[2], 0, //
-        up[0], up[1], up[2], 0,          //
-        front[0], front[1], front[2], 0, //
-        0, 0, 0, 1,                      //
-      };
-      upMatrix->DeepCopy(m);
-    }
+    const double m[16] = {
+      right[0], right[1], right[2], 0, //
+      up[0], up[1], up[2], 0,          //
+      front[0], front[1], front[2], 0, //
+      0, 0, 0, 1,                      //
+    };
+    upMatrix->DeepCopy(m);
     vtkNew<vtkMatrix4x4> upMatrixInv;
     upMatrixInv->DeepCopy(upMatrix);
     upMatrixInv->Transpose(); // matrix is orthonormal, no need to use `Invert()`
