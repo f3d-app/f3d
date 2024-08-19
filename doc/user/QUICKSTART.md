@@ -42,37 +42,18 @@ man f3d # Linux only
 
 F3D supports the following file formats:
 
-| Name | File Extension(s) | Type of Scene(s) Supported | Animations Supported |
-| -- | -- | -- | -- |
-| Legacy VTK | **.vtk** | Default | 
-| VTK XML | **.vt[p\|u\|r\|i\|s\|m]** | Default |
-| Polygon File Format | **.ply** | Default |
-| Standard Triangle Language | **.stl** | Default |  
-| DICOM | **.dcm** | Default |
-| NRRD ("nearly raw raster data") | **.nrrd/.nhrd** | Default |
-| MetaHeader MetaIO | **.mhd/mha** | Default |
-| Tag Image File Format (TIFF) 2D/3D | **.tif/.tiff** | Default |
-| EXODUS II | **.e/.ex2/.exo/.g** | Default | Yes |
-| CityGML | **.gml** | Default |
-| Point Cloud | **.pts** | Default |
-| Standard for the Exchange of Product Data (STEP) | **.step/.stp** | Default |
-| Initial Graphics Exchange Specification (IGES) | **.iges/.igs** | Default |
-| Open CASCADE Technology (OCCT) BRep format | **.brep** | Default |
-| Alembic (ABC) | **.abc** | Default |
-| Wavefront OBJ | **.obj** | Default, Full |
-| GL Transmission Format | **.gltf/.glb** | Default, Full | Yes |
-| Autodesk 3D Studio | **.3ds** | Full |
-| Virtual Reality Modeling Language (VRML) | **.wrl** | Full |
-| Autodesk Filmbox (FBX) | **.fbx** | Full | Yes |
-| COLLADA | **.dae** | Full | Yes |
-| Object File Format (OFF) | **.off** | Full |
-| Drawing Exchange Format (DFX) | **.dxf** | Full |
-| DirectX | **.x** | Full | Yes |
-| 3D Manufacturing Format (3MF) | **.3mf** | Full |
-| Universal Scene Description | **.usd** | Full | Yes |
-| VDB | **.vdb** | Default |
+* Legacy VTK (`.vtk`)
+* VTK XML (`.vtp`, `.vtu`, `.vtr`, `.vti`, `.vts`, `.vtm`)
+* Polygon File Format (`.ply`)
+* OBJ (`.obj`)
+* STL (`.stl`)
+* STEP (`.step`, `.stp`)
+* IGES (`.iges`, `.igs`)
+* Filmbox (`.fbx`): animations supported
+* Autodesk 3D Studio (`.3ds`): full scene by default
+* VDB (`.vdb`): experimental as of version 2.5.0
 
-\***Note:** As of version 2.5.0, F3D support for VDB is still experimental.
+See the [supported file formats](SUPPORTED_FILE_FORMATS.md) page for a full list of compatible file types.
 
 ## Constructing scenes
 
@@ -82,7 +63,7 @@ However, formats supporting **full scenes** will automatically load additional s
 
 If you'd like to disable these properties, you can specify the `--geometry-only` [option](OPTIONS.md) from the command line to construct a default scene instead.
 
-If you're unsure about what kind of scene your file supports, please see the table of [supported file formats](#supported-file-formats).
+See the table of [supported file formats](SUPPORTED_FILE_FORMATS.md) if you're unsure about what kind of scene your file supports.
 
 ## Interacting with your scene
 
