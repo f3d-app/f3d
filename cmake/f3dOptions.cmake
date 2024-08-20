@@ -105,6 +105,8 @@ function(_parse_json_option _top_json)
        set(_option_name "${_option_basename}${_member_name}")
 
        # Identify types
+       set(_option_actual_type ${_option_type})
+       set(_option_variant_type ${_option_type})
        set(_option_default_value_start "")
        set(_option_default_value_end "")
        if(_option_type STREQUAL "double_vector")
@@ -120,9 +122,6 @@ function(_parse_json_option _top_json)
        elseif(_option_type STREQUAL "ratio")
          set(_option_actual_type "f3d::ratio_t")
          set(_option_variant_type "double")
-       else()
-        set(_option_actual_type ${_option_type})
-        set(_option_variant_type ${_option_type})
        endif()
 
        # Add option to struct and methods
