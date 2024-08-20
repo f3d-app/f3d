@@ -120,10 +120,10 @@ static void parse(const std::string& str, std::vector<double>& value)
 // TODO Improve string generation
 //----------------------------------------------------------------------------
 /**
- * Generate a string from provided boolean
+ * Format provided var into a string from provided boolean
  * using boolalpha formatting, eg: "true" or "false"
  */
-static std::string toString(const bool& var)
+static std::string format(const bool& var)
 {
   std::stringstream stream;
   stream << std::boolalpha << var;
@@ -132,10 +132,10 @@ static std::string toString(const bool& var)
 
 //----------------------------------------------------------------------------
 /**
- * Generate a string from provided double
+ * Format provided var into a string from provided double
  * using ostringstream with std::noshowpoint
  */
-static std::string toString(const double& var)
+static std::string format(const double& var)
 {
   std::ostringstream stream;
   stream << std::noshowpoint << var;
@@ -144,37 +144,37 @@ static std::string toString(const double& var)
 
 //----------------------------------------------------------------------------
 /**
- * Generate a string from provided ratio_t
- * rely on toString(double&)
+ * Format provided var into a string from provided ratio_t
+ * rely on format(double&)
  */
-static std::string toString(const ratio_t& var)
+static std::string format(const ratio_t& var)
 {
   // TODO generate a proper ratio string
   double val = var;
-  return options_tools::toString(val);
+  return options_tools::format(val);
 }
 
 //----------------------------------------------------------------------------
 /**
  * Generate (returns) a string from provided string
  */
-static std::string toString(const std::string& var)
+static std::string format(const std::string& var)
 {
   return var;
 }
 
 //----------------------------------------------------------------------------
 /**
- * Generate a string from provided double vector
- * rely on toString(double&) and add `, ` between the double values
+ * Format provided var into a string from provided double vector
+ * rely on format(double&) and add `, ` between the double values
  */
-static std::string toString(const std::vector<double>& var)
+static std::string format(const std::vector<double>& var)
 {
   std::ostringstream stream;
   unsigned int i = 0;
   for (auto& elem : var)
   {
-    stream << ((i > 0) ? ", " : "") << options_tools::toString(elem);
+    stream << ((i > 0) ? ", " : "") << options_tools::format(elem);
     i++;
   }
   return stream.str();
@@ -186,7 +186,7 @@ static std::string toString(const std::vector<double>& var)
  * rely on std::to_string
  */
 template<typename T>
-static std::string toString(const T& var)
+static std::string format(const T& var)
 {
   return std::to_string(var);
 }

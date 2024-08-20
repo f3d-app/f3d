@@ -119,7 +119,7 @@ function(_parse_json_option _top_json)
        endif()
        list(APPEND _options_getter "if (name == \"${_option_name}\") return opt.${_option_name}")
        list(APPEND _options_string_setter "if (name == \"${_option_name}\") options_tools::parse(str, opt.${_option_name})")
-       list(APPEND _options_string_getter "if (name == \"${_option_name}\") return options_tools::toString(opt.${_option_name})")
+       list(APPEND _options_string_getter "if (name == \"${_option_name}\") return options_tools::format(opt.${_option_name})")
        list(APPEND _options_lister "\"${_option_name}\"")
     else()
       # Group found, add in the struct and recurse
