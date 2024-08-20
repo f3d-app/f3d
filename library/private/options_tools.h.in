@@ -20,7 +20,7 @@ namespace options_tools
 template<typename T>
 T parse(const std::string& str)
 {
-    static_assert(false, "NOT IMPLEMENTED");
+  static_assert(false, "NOT IMPLEMENTED");
 }
 
 //----------------------------------------------------------------------------
@@ -109,7 +109,7 @@ ratio_t parse(const std::string& str)
 template<>
 std::string parse(const std::string& str)
 {
- return str;
+  return str;
 }
 
 //----------------------------------------------------------------------------
