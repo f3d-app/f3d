@@ -64,12 +64,13 @@ set(F3D_SOURCE_FILES
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
-  ${CMAKE_CURRENT_SOURCE_DIR}/plugin/reader.h
+  ${CMAKE_CURRENT_BINARY_DIR}/public/export.h
+  ${CMAKE_CURRENT_BINARY_DIR}/public/options.h
   ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/plugin/reader.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/camera.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/engine.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/exception.h
-  ${CMAKE_CURRENT_BINARY_DIR}/public/export.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/interactor.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/loader.h
@@ -77,7 +78,6 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
-  ${CMAKE_CURRENT_BINARY_DIR}/public/options.h
   )
 
 set(F3D_PLUGIN_HEADERS

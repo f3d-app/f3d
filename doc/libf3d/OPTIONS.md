@@ -2,6 +2,7 @@
 
 An option is a specific value stored in different struct in an `options` instance.
 They can be accessed directly through the structs, through a string API or through a std::variant API, the last one require C++17.
+If your compiler does not support C++17, you can disable this API by defining `F3D_DISABLE_CXX17_API`.
 
 The possible option are listed below and are organized by categories and subcategories, here is a non-exhaustive explanation of the categories.
 

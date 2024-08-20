@@ -6,13 +6,8 @@
 
 #include <sstream>
 
-#include <variant>
-
 namespace f3d
 {
-// Required as this becomes an internal type when CXX17 is not exposed byt the libf3d API
-using option_variant_t = std::variant<bool, int, double, std::string, std::vector<double>>;
-
 namespace options_tools
 {
 
@@ -198,9 +193,7 @@ static std::string toString(const T& var)
 
 //----------------------------------------------------------------------------
 /**
- * Generated method that set an option in provided options according to
- * a provided name and value.
- * Can throw options::inexistent_exception or options::incompatible_exception
+ * Generated method, see `options::set`
  */
 void set(options& opt, const std::string& name, const option_variant_t& value)
 {
@@ -217,9 +210,7 @@ void set(options& opt, const std::string& name, const option_variant_t& value)
 
 //----------------------------------------------------------------------------
 /**
- * Generated method that get an option value in
- * provided options using a provided name
- * Can throw options::inexistent_exception
+ * Generated method, see `options::get`
  */
 option_variant_t get(const options& opt, const std::string& name)
 {
@@ -231,7 +222,7 @@ option_variant_t get(const options& opt, const std::string& name)
 
 //----------------------------------------------------------------------------
 /**
- * Generated method to recover all option names
+ * Generated method, see `options::getNames`
  */
 std::vector<std::string> getNames()
 {
@@ -241,7 +232,7 @@ std::vector<std::string> getNames()
 
 //----------------------------------------------------------------------------
 /**
- * See options::setAsString
+ * Generated method, see `options::setAsString`
  */
 void setAsString(options& opt, const std::string& name, const std::string& str)
 {
@@ -250,7 +241,7 @@ void setAsString(options& opt, const std::string& name, const std::string& str)
 }
 //----------------------------------------------------------------------------
 /**
- * See options::getAsString
+ * Generated method, see `options::getAsString`
  */
 std::string getAsString(const options& opt, const std::string& name)
 {
