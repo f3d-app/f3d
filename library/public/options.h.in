@@ -60,6 +60,7 @@ public:
   option_variant_t get(const std::string& name) const;
 #endif
 
+  ///@{
   /**
    * Set/Get an option as a string based on its name
    * The setter use specific parsing, see the related doc
@@ -68,6 +69,7 @@ public:
    */
   options& setAsString(const std::string& name, const std::string& str);
   std::string getAsString(const std::string& name) const;
+  ///@}
 
   /**
    * A boolean option specific method to toggle it.

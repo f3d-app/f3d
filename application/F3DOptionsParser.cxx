@@ -316,11 +316,11 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   // cxxopts sense.
   HasDefault LocalHasDefaultNo = allOptionsInitialized ? HasDefault::YES : HasDefault::NO;
 
-  std::map<std::string, std::string> libf3dOptions;
+  std::unordered_map<std::string, std::string> libf3dOptions;
   std::vector<std::string> keys = options.getNames();
   for (const std::string& key : keys)
   {
-    libf3dOptions[key] = options.getAsString(key);
+    libf3dOptions.emplace(key, options.getAsString(key));
   }
 
   try
@@ -447,7 +447,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     if (parseCommandLine)
     {
       auto result = cxxOptions.parse(this->Argc, this->Argv);
-      for (auto [key, val] : libf3dOptions)
+      for (const auto& [key, val] : libf3dOptions)
       {
         options.setAsString(key, val);
       }
@@ -520,7 +520,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     {
       // this will update the options using the config file without parsing actual argc/argv
       cxxOptions.parse(1, nullptr);
-      for (auto [key, val] : libf3dOptions)
+      for (const auto& [key, val] : libf3dOptions)
       {
         options.setAsString(key, val);
       }
