@@ -16,13 +16,8 @@ namespace options_tools
 /**
  * Not implemented generic templated parse method
  */
-template <typename T>
-struct false_template : std::false_type {};
 template<typename T>
-T parse(const std::string& str)
-{
-  static_assert(false_template<T>{}, "NOT IMPLEMENTED");
-}
+T parse(const std::string& str) = delete;
 
 //----------------------------------------------------------------------------
 /**
