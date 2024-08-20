@@ -2,7 +2,7 @@
 
 #include "log.h"
 // clang-format off
-@F3D_STATIC_PLUGIN_EXTERN@
+${F3D_STATIC_PLUGIN_EXTERN}
 // clang-format on
 
 namespace f3d
@@ -18,7 +18,7 @@ factory* factory::instance()
 factory::factory()
 {
   // clang-format off
-  @F3D_STATIC_PLUGIN_MAP@
+  ${F3D_STATIC_PLUGIN_MAP}
   // clang-format on
 }
 
@@ -61,11 +61,11 @@ reader* factory::getReader(const std::string& fileName)
 }
 
 //----------------------------------------------------------------------------
-void factory::load(plugin * r)
+void factory::load(plugin* plug)
 {
-  if (!this->registerOnce(r))
+  if (!this->registerOnce(plug))
   {
-    log::debug("A plugin named \"" + r->getName() + "\" is already registered.");
+    log::debug("A plugin named \"" + plug->getName() + "\" is already registered.");
   }
 }
 
@@ -79,25 +79,24 @@ void factory::autoload()
 }
 
 //----------------------------------------------------------------------------
-bool factory::registerOnce(plugin* p)
+bool factory::registerOnce(plugin* plug)
 {
-  if (std::find(this->Plugins.begin(), this->Plugins.end(), p) == this->Plugins.end())
+  if (std::find(this->Plugins.begin(), this->Plugins.end(), plug) == this->Plugins.end())
   {
-    this->Plugins.push_back(p);
+    this->Plugins.push_back(plug);
 
-    log::debug("Loading plugin \"" + p->getName() + "\"");
-    log::debug("  Version: " + p->getVersion());
-    log::debug("  Description: " + p->getDescription());
+    log::debug("Loading plugin \"" + plug->getName() + "\"");
+    log::debug("  Version: " + plug->getVersion());
+    log::debug("  Description: " + plug->getDescription());
     log::debug("  Readers:");
 
-    for (auto r : p->getReaders())
+    for (auto read : plug->getReaders())
     {
-      log::debug("    " + r->getLongDescription());
+      log::debug("    " + read->getLongDescription());
     }
 
     return true;
   }
-
   return false;
 }
 }

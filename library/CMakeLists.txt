@@ -161,8 +161,7 @@ list(JOIN F3D_STATIC_PLUGIN_MAP "\n  " F3D_STATIC_PLUGIN_MAP)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/factory.cxx.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/src/factory.cxx"
-  @ONLY)
+  "${CMAKE_CURRENT_BINARY_DIR}/src/factory.cxx")
 
 # libf3d links with the static plugins.
 list(TRANSFORM F3D_STATIC_PLUGIN_TARGETS PREPEND "f3d-plugin-")
