@@ -40,7 +40,7 @@ f3d_generate_options(
   INPUT_PRIVATE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/private/options_tools.h.in"
   DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
   OUTPUT_NAME "options"
-	)
+  )
 
 # Define libf3d target
 set(F3D_SOURCE_FILES

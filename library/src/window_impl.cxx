@@ -325,23 +325,25 @@ void window_impl::UpdateDynamicOptions()
     this->Initialize(false);
   }
 
+  vtkF3DRendererWithColoring* renderer = this->Internals->Renderer;
+
   if (this->Internals->WindowType == Type::NONE)
   {
     // With a NONE window type, only update the actors to get accurate bounding box information
-    this->Internals->Renderer->UpdateActors();
+    renderer->UpdateActors();
     return;
   }
 
   // Set the cache path if not already
-  this->Internals->Renderer->SetCachePath(this->Internals->GetCachePath());
+  renderer->SetCachePath(this->Internals->GetCachePath());
 
   // Make sure lights are created before we take options into account
-  this->Internals->Renderer->UpdateLights();
+  renderer->UpdateLights();
 
   const options& opt = this->Internals->Options;
-  this->Internals->Renderer->ShowAxis(opt.interactor.axis);
-  this->Internals->Renderer->SetUseTrackball(opt.interactor.trackball);
-  this->Internals->Renderer->SetInvertZoom(opt.interactor.invert_zoom);
+  renderer->ShowAxis(opt.interactor.axis);
+  renderer->SetUseTrackball(opt.interactor.trackball);
+  renderer->SetInvertZoom(opt.interactor.invert_zoom);
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
@@ -353,82 +355,79 @@ void window_impl::UpdateDynamicOptions()
     splatType = vtkF3DRendererWithColoring::SplatType::GAUSSIAN;
   }
 
-  this->Internals->Renderer->SetPointProperties(splatType, pointSize);
+  renderer->SetPointProperties(splatType, pointSize);
 
-  this->Internals->Renderer->SetLineWidth(opt.render.line_width);
-  this->Internals->Renderer->ShowEdge(opt.render.show_edges);
-  this->Internals->Renderer->ShowTimer(opt.ui.fps);
-  this->Internals->Renderer->ShowFilename(opt.ui.filename);
-  this->Internals->Renderer->SetFilenameInfo(opt.ui.filename_info);
-  this->Internals->Renderer->ShowMetaData(opt.ui.metadata);
-  this->Internals->Renderer->ShowCheatSheet(opt.ui.cheatsheet);
-  this->Internals->Renderer->ShowDropZone(opt.ui.dropzone);
-  this->Internals->Renderer->SetDropZoneInfo(opt.ui.dropzone_info);
+  renderer->SetLineWidth(opt.render.line_width);
+  renderer->ShowEdge(opt.render.show_edges);
+  renderer->ShowTimer(opt.ui.fps);
+  renderer->ShowFilename(opt.ui.filename);
+  renderer->SetFilenameInfo(opt.ui.filename_info);
+  renderer->ShowMetaData(opt.ui.metadata);
+  renderer->ShowCheatSheet(opt.ui.cheatsheet);
+  renderer->ShowDropZone(opt.ui.dropzone);
+  renderer->SetDropZoneInfo(opt.ui.dropzone_info);
 
-  this->Internals->Renderer->SetUseRaytracing(opt.render.raytracing.enable);
-  this->Internals->Renderer->SetRaytracingSamples(opt.render.raytracing.samples);
-  this->Internals->Renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
+  renderer->SetUseRaytracing(opt.render.raytracing.enable);
+  renderer->SetRaytracingSamples(opt.render.raytracing.samples);
+  renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
-  this->Internals->Renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
-  this->Internals->Renderer->SetUseFXAAPass(opt.render.effect.anti_aliasing);
-  this->Internals->Renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
-  this->Internals->Renderer->SetUseDepthPeelingPass(opt.render.effect.translucency_support);
-  this->Internals->Renderer->SetBackfaceType(opt.render.backface_type);
-  this->Internals->Renderer->SetFinalShader(opt.render.effect.final_shader);
+  renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
+  renderer->SetUseFXAAPass(opt.render.effect.anti_aliasing);
+  renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
+  renderer->SetUseDepthPeelingPass(opt.render.effect.translucency_support);
+  renderer->SetBackfaceType(opt.render.backface_type);
+  renderer->SetFinalShader(opt.render.effect.final_shader);
 
-  this->Internals->Renderer->SetBackground(opt.render.background.color.data());
-  this->Internals->Renderer->SetUseBlurBackground(opt.render.background.blur);
-  this->Internals->Renderer->SetBlurCircleOfConfusionRadius(opt.render.background.blur_coc);
-  this->Internals->Renderer->SetLightIntensity(opt.render.light.intensity);
+  renderer->SetBackground(opt.render.background.color.data());
+  renderer->SetUseBlurBackground(opt.render.background.blur);
+  renderer->SetBlurCircleOfConfusionRadius(opt.render.background.blur_coc);
+  renderer->SetLightIntensity(opt.render.light.intensity);
 
-  std::string hdriFile = opt.render.hdri.file;
-  bool hdriAmbient = opt.render.hdri.ambient;
-  bool hdriSkybox = opt.render.background.skybox;
-  this->Internals->Renderer->SetHDRIFile(hdriFile);
-  this->Internals->Renderer->SetUseImageBasedLighting(hdriAmbient);
-  this->Internals->Renderer->ShowHDRISkybox(hdriSkybox);
+  renderer->SetHDRIFile(opt.render.hdri.file);
+  renderer->SetUseImageBasedLighting(opt.render.hdri.ambient);
+  renderer->ShowHDRISkybox(opt.render.background.skybox);
 
-  this->Internals->Renderer->SetFontFile(opt.ui.font_file);
+  renderer->SetFontFile(opt.ui.font_file);
 
-  this->Internals->Renderer->SetGridUnitSquare(opt.render.grid.unit);
-  this->Internals->Renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
-  this->Internals->Renderer->SetGridAbsolute(opt.render.grid.absolute);
-  this->Internals->Renderer->ShowGrid(opt.render.grid.enable);
-  this->Internals->Renderer->SetGridColor(opt.render.grid.color);
+  renderer->SetGridUnitSquare(opt.render.grid.unit);
+  renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
+  renderer->SetGridAbsolute(opt.render.grid.absolute);
+  renderer->ShowGrid(opt.render.grid.enable);
+  renderer->SetGridColor(opt.render.grid.color);
 
   if (opt.scene.camera.index == -1)
   {
-    this->Internals->Renderer->SetUseOrthographicProjection(opt.scene.camera.orthographic);
+    renderer->SetUseOrthographicProjection(opt.scene.camera.orthographic);
   }
 
   if (this->Internals->WithColoring)
   {
     std::vector<double> rgb = opt.model.color.rgb;
-    this->Internals->Renderer->SetSurfaceColor(rgb.data());
-    this->Internals->Renderer->SetOpacity(opt.model.color.opacity);
-    this->Internals->Renderer->SetTextureBaseColor(opt.model.color.texture);
-    this->Internals->Renderer->SetRoughness(opt.model.material.roughness);
-    this->Internals->Renderer->SetMetallic(opt.model.material.metallic);
-    this->Internals->Renderer->SetTextureMaterial(opt.model.material.texture);
-    this->Internals->Renderer->SetTextureEmissive(opt.model.emissive.texture);
+    renderer->SetSurfaceColor(rgb.data());
+    renderer->SetOpacity(opt.model.color.opacity);
+    renderer->SetTextureBaseColor(opt.model.color.texture);
+    renderer->SetRoughness(opt.model.material.roughness);
+    renderer->SetMetallic(opt.model.material.metallic);
+    renderer->SetTextureMaterial(opt.model.material.texture);
+    renderer->SetTextureEmissive(opt.model.emissive.texture);
     std::vector<double> factor = opt.model.emissive.factor;
-    this->Internals->Renderer->SetEmissiveFactor(factor.data());
-    this->Internals->Renderer->SetTextureNormal(opt.model.normal.texture);
-    this->Internals->Renderer->SetNormalScale(opt.model.normal.scale);
-    this->Internals->Renderer->SetTextureMatCap(opt.model.matcap.texture);
+    renderer->SetEmissiveFactor(factor.data());
+    renderer->SetTextureNormal(opt.model.normal.texture);
+    renderer->SetNormalScale(opt.model.normal.scale);
+    renderer->SetTextureMatCap(opt.model.matcap.texture);
 
-    this->Internals->Renderer->SetColoring(
+    renderer->SetColoring(
       opt.model.scivis.cells, opt.model.scivis.array_name, opt.model.scivis.component);
-    this->Internals->Renderer->SetScalarBarRange(opt.model.scivis.range);
-    this->Internals->Renderer->SetColormap(opt.model.scivis.colormap);
-    this->Internals->Renderer->ShowScalarBar(opt.ui.scalar_bar);
+    renderer->SetScalarBarRange(opt.model.scivis.range);
+    renderer->SetColormap(opt.model.scivis.colormap);
+    renderer->ShowScalarBar(opt.ui.scalar_bar);
 
-    this->Internals->Renderer->SetUsePointSprites(opt.model.point_sprites.enable);
-    this->Internals->Renderer->SetUseVolume(opt.model.volume.enable);
-    this->Internals->Renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
+    renderer->SetUsePointSprites(opt.model.point_sprites.enable);
+    renderer->SetUseVolume(opt.model.volume.enable);
+    renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
   }
 
-  this->Internals->Renderer->UpdateActors();
+  renderer->UpdateActors();
 }
 
 //----------------------------------------------------------------------------

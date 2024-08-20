@@ -138,6 +138,7 @@ The documentation about option parsing is upcoming.
 ## Variant API
 
 An API that is similar to the F3D 2.0 options API thanks to std::variant, requires C++17.
+If your compiler does not support C++17, you can disable this API by defining `F3D_DISABLE_CXX17_API`.
 
 ```cpp
   f3d::engine eng(f3d::window::Type::NATIVE);
