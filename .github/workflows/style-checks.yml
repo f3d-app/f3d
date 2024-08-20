@@ -12,6 +12,7 @@ jobs:
       with:
         source: 'library application python plugins examples'
         extensions: 'h,cxx,in'
+        exclude: '**/*.py.in'
         clangFormatVersion: 14 # Last Ubuntu LTS version (22.04)
     - name: Python Formatting
       uses: psf/black@stable
