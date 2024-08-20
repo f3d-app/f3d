@@ -216,12 +216,10 @@ void set(options& opt, const std::string& name, const option_variant_t& value)
  */
 option_variant_t get(const options& opt, const std::string& name)
 {
-  option_variant_t var;
   // clang-format off
   ${_options_getter};
   // clang-format on
   else throw options::inexistent_exception("Option " + name + " does not exist");
-  return var;
 }
 
 //----------------------------------------------------------------------------
@@ -231,9 +229,8 @@ option_variant_t get(const options& opt, const std::string& name)
 std::vector<std::string> getNames()
 {
   // clang-format off
-  std::vector<std::string> vec{ ${_options_lister} };
+  return { ${_options_lister} };
   // clang-format on
-  return vec;
 }
 
 //----------------------------------------------------------------------------
