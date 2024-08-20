@@ -38,6 +38,9 @@ struct F3D_EXPORT vector3_t : std::array<double, 3>
  */
 using angle_deg_t = double;
 
+/**
+ * Describe a ratio.
+ */
 class ratio_t
 {
 public:
@@ -78,16 +81,6 @@ struct mesh_t
    * If invalid, an error message is returned in the second element.
    */
   F3D_EXPORT std::pair<bool, std::string> isValid() const;
-};
-
-enum class option_types
-{
-  _bool,
-  _int,
-  _double,
-  _ratio,
-  _string,
-  _double_vector
 };
 }
 

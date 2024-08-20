@@ -122,37 +122,6 @@ static void parse(const std::string& str, std::vector<double>& value)
   }
 }
 
-//----------------------------------------------------------------------------
-/**
- * Generic parsing templated method, parse provided string into provided reference
- * option_types is ignored.
- */
-template<typename T>
-static void parse(const std::string& str, T& value, option_types)
-{
-  options_tools::parse(str, value);
-}
-
-//----------------------------------------------------------------------------
-/**
- * Specific parsing method used to distinguish between ratio_t and double parsing
- * Parse provided string into provided double reference with the correct parsing method
- * depending on the provided option_types
- */
-static void parse(const std::string& str, double& value, option_types type)
-{
-  if (type == option_types::_ratio)
-  {
-    ratio_t ratio;
-    options_tools::parse(str, ratio);
-    value = ratio;
-  }
-  else
-  {
-    options_tools::parse(str, value);
-  }
-}
-
 // TODO Improve string generation
 //----------------------------------------------------------------------------
 /**
@@ -229,36 +198,6 @@ static std::string toString(const T& var)
 
 //----------------------------------------------------------------------------
 /**
- * Generic templated string generation from provided value with an option_types
- * rely on options_tools::toString and ignore option_types
- */
-template<typename T>
-static std::string toString(const T& value, option_types)
-{
-  return options_tools::toString(value);
-}
-
-//----------------------------------------------------------------------------
-/**
- * Specific string generation from provided double value with an option_types
- * rely on options_tools::toString and uses option_types to distinguish between
- * double and ratio_t
- */
-static std::string toString(const double& value, option_types type)
-{
-  if (type == option_types::_ratio)
-  {
-    ratio_t ratio = value;
-    return options_tools::toString(ratio);
-  }
-  else
-  {
-    return options_tools::toString(value);
-  }
-}
-
-//----------------------------------------------------------------------------
-/**
  * Generated method that set an option in provided options according to
  * a provided name and value.
  * Can throw options::inexistent_exception or options::incompatible_exception
@@ -292,19 +231,6 @@ option_variant_t get(const options& opt, const std::string& name)
 
 //----------------------------------------------------------------------------
 /**
- * Generated method that get an option type using a provided name
- * Can throw options::inexistent_exception
- */
-option_types getType(const std::string& name)
-{
-  ${_options_typer};
-  else throw options::inexistent_exception("Option " + name + " does not exist");
-  // Cannot be reached
-  return option_types::_bool;
-}
-
-//----------------------------------------------------------------------------
-/**
  * Generated method to recover all option names
  */
 std::vector<std::string> getNames()
@@ -319,21 +245,17 @@ std::vector<std::string> getNames()
  */
 void setAsString(options& opt, const std::string& name, const std::string& str)
 {
-  option_types type = options_tools::getType(name);
-  option_variant_t var = options_tools::get(opt, name);
-  std::visit([str, type](auto& ref) { options_tools::parse(str, ref, type); }, var);
-  options_tools::set(opt, name, var);
+  ${_options_string_setter};
+  else throw options::inexistent_exception("Option " + name + " does not exist");
 }
-
 //----------------------------------------------------------------------------
 /**
  * See options::getAsString
  */
 std::string getAsString(const options& opt, const std::string& name)
 {
-  option_types type = options_tools::getType(name);
-  option_variant_t var = options_tools::get(opt, name);
-  return std::visit([type](const auto& ref) { return options_tools::toString(ref, type); }, var);
+  ${_options_string_getter};
+  else throw options::inexistent_exception("Option " + name + " does not exist");
 }
 } // option_tools
 } // f3d
