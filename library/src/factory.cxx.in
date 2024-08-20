@@ -1,8 +1,9 @@
 #include "factory.h"
 
 #include "log.h"
-
+// clang-format off
 @F3D_STATIC_PLUGIN_EXTERN@
+// clang-format on
 
 namespace f3d
 {
@@ -16,7 +17,9 @@ factory* factory::instance()
 //----------------------------------------------------------------------------
 factory::factory()
 {
+  // clang-format off
   @F3D_STATIC_PLUGIN_MAP@
+  // clang-format on
 }
 
 //----------------------------------------------------------------------------
