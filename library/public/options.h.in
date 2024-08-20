@@ -10,14 +10,14 @@
 #include <vector>
 
 #ifndef F3D_DISABLE_CXX17_API
-  #include <variant>
+#include <variant>
 #endif
 
 namespace f3d
 {
 #ifndef F3D_DISABLE_CXX17_API
-  // Declared here for simplicity
-  using option_variant_t = std::variant<bool, int, double, std::string, std::vector<double>>;
+// Declared here for simplicity
+using option_variant_t = std::variant<bool, int, double, std::string, std::vector<double>>;
 #endif
 
 /**
@@ -133,7 +133,9 @@ public:
   /**
    * The complete generated options struct
    */
+  // clang-format off
   ${_options_struct}
+  // clang-format on
 };
 }
 

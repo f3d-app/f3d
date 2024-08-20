@@ -23,7 +23,9 @@ int main(int argc, char** argv)
 
   // Modify options use struct API
   f3d::options& opt = eng.getOptions();
-  opt.setAsString("render.show_edges", "true").setAsString("render.line_width", "10").setAsString("render.grid.enable", "1");
+  opt.setAsString("render.show_edges", "true")
+    .setAsString("render.line_width", "10")
+    .setAsString("render.grid.enable", "1");
 
   // Load a model
   const f3d::loader& load = eng.getLoader().loadGeometry(std::string(argv[1]));

@@ -10,7 +10,7 @@ jobs:
     - name: C++ Formatting
       uses: DoozyX/clang-format-lint-action@v0.16.1
       with:
-        source: 'library application python plugins'
+        source: 'library application python plugins examples'
         extensions: 'h,cxx,in'
         clangFormatVersion: 14 # Last Ubuntu LTS version (22.04)
     - name: Python Formatting
