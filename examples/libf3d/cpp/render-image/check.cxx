@@ -1,4 +1,3 @@
-#define F3D_DISABLE_CXX17_API
 #include <f3d/image.h>
 
 int main(int argc, char** argv)
