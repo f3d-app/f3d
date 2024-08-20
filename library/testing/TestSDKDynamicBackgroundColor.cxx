@@ -12,15 +12,15 @@ int TestSDKDynamicBackgroundColor(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
-  opt.set("ui.filename", true);
-  opt.set("ui.filename-info", "(1/1) cow.vtp");
+  opt.ui.filename = true;
+  opt.ui.filename_info = "(1/1) cow.vtp";
 
   load.loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
 
   win.render();
 
   // Change the background color and make sure it is taken into account
-  opt.set("render.background.color", { 1.0, 1.0, 1.0 });
+  opt.render.background.color = { 1.0, 1.0, 1.0 };
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
            std::string(argv[2]), "TestSDKDynamicBackgrounColor", 50)

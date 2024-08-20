@@ -50,8 +50,7 @@ bool animationManager::Initialize(
     progressRep->SetShowBorderToOff();
     progressRep->DrawFrameOff();
     progressRep->SetPadding(0.0, 0.0);
-    progressRep->SetVisibility(options->getAsBool("ui.animation-progress"));
-
+    progressRep->SetVisibility(options->ui.animation_progress);
     this->ProgressWidget->On();
   }
   else
@@ -59,8 +58,8 @@ bool animationManager::Initialize(
     this->ProgressWidget = nullptr;
   }
 
-  int animationIndex = options->getAsInt("scene.animation.index");
-  double animationTime = options->getAsDouble("scene.animation.time");
+  int animationIndex = options->scene.animation.index;
+  double animationTime = options->scene.animation.time;
 
   if (this->AvailAnimations <= 0)
   {
@@ -86,7 +85,7 @@ bool animationManager::Initialize(
   }
   log::debug("");
 
-  this->AnimationIndex = options->getAsInt("scene.animation.index");
+  this->AnimationIndex = options->scene.animation.index;
   if (this->AnimationIndex > 0 && this->AnimationIndex >= this->AvailAnimations)
   {
     log::warn(
@@ -110,7 +109,7 @@ bool animationManager::Initialize(
       // Discard timesteps, F3D only cares about real elapsed time using time range
       // Specifying the frame rate in the next call is not needed after VTK 9.2.20230603 :
       // VTK_VERSION_CHECK(9, 2, 20230603)
-      double frameRate = this->Options->getAsDouble("scene.animation.frame-rate");
+      double frameRate = options->scene.animation.frame_rate;
       this->Importer->GetTemporalInformation(
         animIndex, frameRate, nbTimeSteps, timeRange, timeSteps);
 
@@ -132,7 +131,7 @@ bool animationManager::Initialize(
     log::debug("Animation(s) time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
   }
 
-  bool autoplay = options->getAsBool("scene.animation.autoplay");
+  bool autoplay = options->scene.animation.autoplay;
   if (autoplay)
   {
     this->StartAnimation();
@@ -181,12 +180,12 @@ void animationManager::ToggleAnimation()
       // Always reset previous tick when starting the animation
       this->PreviousTick = std::chrono::steady_clock::now();
 
-      double frameRate = this->Options->getAsDouble("scene.animation.frame-rate");
+      double frameRate = this->Options->scene.animation.frame_rate;
       this->CallBackId =
         this->Interactor->createTimerCallBack(1000.0 / frameRate, [this]() { this->Tick(); });
     }
 
-    if (this->Playing && this->Options->getAsInt("scene.camera.index") >= 0)
+    if (this->Playing && this->Options->scene.camera.index >= 0)
     {
       this->Interactor->disableCameraMovement();
     }
@@ -210,7 +209,7 @@ void animationManager::Tick()
 
   // Convert to a usable time in seconds
   double elapsedTime = static_cast<double>(timeInMS) / 1000.0;
-  double animationSpeedFactor = this->Options->getAsDouble("scene.animation.speed-factor");
+  double animationSpeedFactor = this->Options->scene.animation.speed_factor;
 
   // elapsedTime can be negative
   elapsedTime *= animationSpeedFactor;

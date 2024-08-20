@@ -1,6 +1,9 @@
 # Options exhaustive list
 
-An option is a string used as a key associated with a value, which are stored in an `options` instance.
+An option is a specific value stored in different struct in an `options` instance.
+They can be accessed directly through the structs, through a string API or through a std::variant API, the last one require C++17.
+If your compiler does not support C++17, you can disable this API by defining `F3D_DISABLE_CXX17_API`.
+
 The possible option are listed below and are organized by categories and subcategories, here is a non-exhaustive explanation of the categories.
 
  * `scene` options are related to how the scene is being displayed
@@ -19,10 +22,10 @@ Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
 scene.animation.autoplay|bool<br>false<br>load|Automatically start animation.|\-\-animation-autoplay
 scene.animation.index|int<br>0<br>load|Select the animation to load.<br>Any negative value means all animations (glTF only).<br>The default scene always has at most one animation.|\-\-animation-index
-scene.animation.speed-factor|double<br>1<br>render|Set the animation speed factor to slow, speed up or even invert animation.|\-\-animation-speed-factor
-scene.animation.frame-rate|double<br>60<br>render|Set the animation frame rate used to play the animation interactively.|\-\-animation-frame-rate
+scene.animation.speed_factor|double<br>1<br>render|Set the animation speed factor to slow, speed up or even invert animation.|\-\-animation-speed-factor
+scene.animation.frame_rate|double<br>60<br>render|Set the animation frame rate used to play the animation interactively.|\-\-animation-frame-rate
 scene.camera.index|int<br>-1<br>load|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.|\-\-camera-index
-scene.up-direction|string<br>+Y<br>load|Define the Up direction|\-\-up
+scene.up_direction|string<br>+Y<br>load|Define the Up direction|\-\-up
 scene.camera.orthographic|bool<br>false<br>load|Toggles between orthographic projection and parallel mode.|\-\-camera\-orthographic
 
 ## Interactor Options
@@ -50,10 +53,10 @@ model.normal.texture|string<br>-<br>render|Path to a texture file that sets the 
 model.scivis.cells|bool<br>false<br>render|Color the data with value found *on the cells* instead of points|\-\-cells
 model.scivis.colormap|vector\<double\><br>\<inferno\><br>render|Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).|\-\-colormap
 model.scivis.component|int<br>-1<br>render|Specify the component to color with. -1 means *magnitude*. -2 means *direct values*.|\-\-comp
-model.scivis.array-name|string<br>\<reserved\><br>render|*Color by a specific data array* present in on the data. Set to <empty> to let libf3d find the first available array.|\-\-scalars
+model.scivis.array_name|string<br>\<reserved\><br>render|*Color by a specific data array* present in on the data. Set to <empty> to let libf3d find the first available array.|\-\-scalars
 model.scivis.range|vector\<double\><br>-<br>render|Set a *custom range for the coloring*.|\-\-range
-model.point-sprites.enable|bool<br>false<br>render|Show sphere *points sprites* instead of the geometry.|\-\-point-sprites
-model.point-sprites.type|string<br>sphere<br>render|Set the sprites type when showing point sprites (can be `sphere` or `gaussian`).|\-\-point-type
+model.point_sprites.enable|bool<br>false<br>render|Show sphere *points sprites* instead of the geometry.|\-\-point-sprites
+model.point_sprites.type|string<br>sphere<br>render|Set the sprites type when showing point sprites (can be `sphere` or `gaussian`).|\-\-point-type
 model.volume.enable|bool<br>false<br>render|Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.|\-\-volume
 model.volume.inverse|bool<br>false<br>render|Inverse the linear opacity function.|\-\-inverse
 
@@ -61,14 +64,14 @@ model.volume.inverse|bool<br>false<br>render|Inverse the linear opacity function
 
 Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
-render.effect.translucency-support|bool<br>false<br>render|Enable *translucency support*. This is a technique used to correctly render translucent objects, implemented using depth peeling|\-\-translucency-support
-render.effect.anti-aliasing|bool<br>false<br>render|Enable *anti-aliasing*. This technique is used to reduce aliasing, implemented using FXAA.|\-\-anti-aliasing
-render.effect.ambient-occlusion|bool<br>false<br>render|Enable *ambient occlusion*. This is a technique providing approximate shadows, used to improve the depth perception of the object. Implemented using SSAO|\-\-ambient-occlusion
-render.effect.tone-mapping|bool<br>false<br>render|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.|\-\-tone-mapping
-render.effect.final-shader|string<br>""<br>render|Add a final shader to the output image|\-\-final-shader. See [user documentation](../user/FINAL_SHADER.md).
-render.line-width|double<br>1.0<br>render|Set the *width* of lines when showing edges.|\-\-line-width
-render.show-edges|bool<br>false<br>render|Show the *cell edges*|\-\-edges
-render.point-size|double<br>10.0<br>render|Set the *size* of points when showing vertices and point sprites.|\-\-point-size
+render.effect.translucency_support|bool<br>false<br>render|Enable *translucency support*. This is a technique used to correctly render translucent objects, implemented using depth peeling|\-\-translucency-support
+render.effect.anti_aliasing|bool<br>false<br>render|Enable *anti-aliasing*. This technique is used to reduce aliasing, implemented using FXAA.|\-\-anti-aliasing
+render.effect.ambient_occlusion|bool<br>false<br>render|Enable *ambient occlusion*. This is a technique providing approximate shadows, used to improve the depth perception of the object. Implemented using SSAO|\-\-ambient_occlusion
+render.effect.tone_mapping|bool<br>false<br>render|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.|\-\-tone-mapping
+render.effect.final_shader|string<br>""<br>render|Add a final shader to the output image|\-\-final-shader. See [user documentation](../user/FINAL_SHADER.md).
+render.line_width|double<br>1.0<br>render|Set the *width* of lines when showing edges.|\-\-line-width
+render.show_edges|bool<br>false<br>render|Show the *cell edges*|\-\-edges
+render.point_size|double<br>10.0<br>render|Set the *size* of points when showing vertices and point sprites.|\-\-point-size
 render.grid.enable|bool<br>false<br>render|Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.|\-\-grid
 render.grid.absolute|bool<br>false<br>render|Position the grid at the *absolute origin* of the model's coordinate system instead of below the model.|\-\-grid
 render.grid.unit|double<br>0<br>render|Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.|\-\-grid\-unit
@@ -89,14 +92,59 @@ render.light.intensity|double<br>1.0<br>render|Adjust the intensity of every lig
 
 Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
-ui.bar|bool<br>false<br>render|Show *scalar bar* of the coloring by data array.|\-\-bar
+ui.scalar_bar|bool<br>false<br>render|Show *scalar bar* of the coloring by data array.|\-\-bar
 ui.cheatsheet|bool<br>false<br>render|Show a interactor cheatsheet
 ui.filename|bool<br>false<br>render|Display the *filename info content* on top of the window.|\-\-filename
-ui.filename-info|string<br>-<br>render|Content of *filename info* to display.
-ui.font-file|string<br>-<br>render|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.|\-\-font-file
+ui.filename_info|string<br>-<br>render|Content of *filename info* to display.
+ui.font_file|string<br>-<br>render|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.|\-\-font-file
 ui.fps|bool<br>false<br>render|Display a *frame per second counter*.|\-\-fps
-ui.loader-progress|bool<br>false<br>load|Show a *progress bar* when loading the file.|\-\-progress
-ui.animation-progress|bool<br>false<br>load|Show a *progress bar* when playing the animation.|\-\-animation-progress
+ui.loader_progress|bool<br>false<br>load|Show a *progress bar* when loading the file.|\-\-progress
+ui.animation_progress|bool<br>false<br>load|Show a *progress bar* when playing the animation.|\-\-animation-progress
 ui.metadata|bool<br>false<br>render|Display the *metadata*.|\-\-metadata
 ui.dropzone|bool<br>false<br>render|Show a drop zone.
-ui.dropzone-info|string<br>-<br>render|Content of the drop zone text to display.
+ui.dropzone_info|string<br>-<br>render|Content of the drop zone text to display.
+
+# APIs
+
+There are three APIs to access the options
+
+## Struct API
+
+The most straightforward and easy to use API, just access it through the structs available in the options instance, eg:
+
+```cpp
+  f3d::engine eng(f3d::window::Type::NATIVE);
+  f3d::options& opt = eng.getOptions();
+  opt.render.show_edges = true;
+  opt.render.grid.enable = true;
+  opt.ui.metadata = true;
+  opt.model.material.roughness = 0.6;
+```
+
+## String API
+
+The most generic and flexible API, as it rely on parsing and string generation.
+The documentation about option parsing is upcoming.
+
+```cpp
+  f3d::engine eng(f3d::window::Type::NATIVE);
+  f3d::options& opt = eng.getOptions();
+  opt.setAsString("render.show_edges", "true");
+  opt.setAsString("render.grid.enable", "true");
+  opt.setAsString("ui.metadata", "true");
+  opt.setAsString("model.material.roughness", "0.6");
+```
+
+## Variant API
+
+An API that is similar to the F3D 2.0 options API thanks to std::variant, requires C++17.
+If your compiler does not support C++17, you can disable this API by defining `F3D_DISABLE_CXX17_API`.
+
+```cpp
+  f3d::engine eng(f3d::window::Type::NATIVE);
+  f3d::options& opt = eng.getOptions();
+  opt.set("render.show_edges", true);
+  opt.set("render.grid.enable", true);
+  opt.set("ui.metadata", true);
+  opt.set("model.material.roughness", 0.6);
+```

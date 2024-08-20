@@ -1,6 +1,7 @@
 #include <f3d/engine.h>
 #include <f3d/image.h>
 #include <f3d/log.h>
+#include <f3d/options.h>
 #include <f3d/window.h>
 
 int main(int argc, char** argv)
@@ -19,6 +20,10 @@ int main(int argc, char** argv)
 
   // Create a native window engine
   f3d::engine eng(f3d::window::Type::NATIVE);
+
+  // Modify options
+  f3d::options& opt = eng.getOptions();
+  opt.set("render.show_edges", true).set("render.line_width", 10.0).set("render.grid.enable", true);
 
   // Load a model
   const f3d::loader& load = eng.getLoader().loadGeometry(std::string(argv[1]));

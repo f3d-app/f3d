@@ -33,6 +33,15 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx"
   @ONLY)
 
+include(f3dOptions)
+f3d_generate_options(
+  INPUT_JSON "${CMAKE_CURRENT_SOURCE_DIR}/options.json"
+  INPUT_PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/public/options.h.in"
+  INPUT_PRIVATE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/private/options_tools.h.in"
+  DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
+  OUTPUT_NAME "options"
+  )
+
 # Define libf3d target
 set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/animationManager.cxx
@@ -55,17 +64,17 @@ set(F3D_SOURCE_FILES
 
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
-  ${CMAKE_CURRENT_SOURCE_DIR}/plugin/reader.h
+  ${CMAKE_CURRENT_BINARY_DIR}/public/export.h
+  ${CMAKE_CURRENT_BINARY_DIR}/public/options.h
   ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/plugin/reader.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/camera.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/engine.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/exception.h
-  ${CMAKE_CURRENT_BINARY_DIR}/public/export.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/interactor.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/loader.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/log.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/options.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
@@ -152,8 +161,7 @@ list(JOIN F3D_STATIC_PLUGIN_MAP "\n  " F3D_STATIC_PLUGIN_MAP)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/factory.cxx.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/src/factory.cxx"
-  @ONLY)
+  "${CMAKE_CURRENT_BINARY_DIR}/src/factory.cxx")
 
 # libf3d links with the static plugins.
 list(TRANSFORM F3D_STATIC_PLUGIN_TARGETS PREPEND "f3d-plugin-")
