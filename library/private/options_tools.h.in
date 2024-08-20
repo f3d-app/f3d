@@ -12,33 +12,46 @@ namespace options_tools
 {
 
 // TODO expose parse methods in options API ?
+
 //----------------------------------------------------------------------------
 /**
- * Parse provided string into provided boolean reference
+ * Not implemented generic templated parse method
+ */
+template<typename T>
+T parse(const std::string& str)
+{
+    static_assert(false, "NOT IMPLEMENTED");
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Parse provided string into a bool
  * Numerical and boolaplha are both supported
  */
-static void parse(const std::string& str, bool& value)
+template<>
+bool parse(const std::string& str)
 {
   // TODO implement proper parsing, eg "True", "TRUE", "ON", "On", ...
   bool b1;
   bool b2;
   std::istringstream(str) >> b1;
   std::istringstream(str) >> std::boolalpha >> b2;
-  value = b1 || b2;
+  return b1 || b2;
 }
 
 //----------------------------------------------------------------------------
 /**
- * Parse provided string into provided int reference
+ * Parse provided string into an int
  * Rely on std::stoi for parsing
  * Can throw options::parsing_exception in case of failure to parse
  */
-static void parse(const std::string& str, int& value)
+template<>
+int parse(const std::string& str)
 {
   // TODO implement more parsing possibilities ?
   try
   {
-    value = std::stoi(str);
+    return std::stoi(str);
   }
   catch (std::invalid_argument const&)
   {
@@ -53,16 +66,17 @@ static void parse(const std::string& str, int& value)
 
 //----------------------------------------------------------------------------
 /**
- * Parse provided string into provided double reference
+ * Parse provided string into a double
  * Rely on std::stod for parsing
  * Can throw options::parsing_exception in case of failure to parse
  */
-static void parse(const std::string& str, double& value)
+template<>
+double parse(const std::string& str)
 {
   // TODO implement more parsing possibilities ?
   try
   {
-    value = std::stod(str);
+    return std::stod(str);
   }
   catch (std::invalid_argument const&)
   {
@@ -77,53 +91,65 @@ static void parse(const std::string& str, double& value)
 
 //----------------------------------------------------------------------------
 /**
- * Parse provided string into provided ratio_t reference
- * Rely on parse(string, double&) for parsing
+ * Parse provided string into a ratio_t
+ * Rely on <double> version for parsing
  * Can throw options::parsing_exception in case of failure to parse
  */
-static void parse(const std::string& str, ratio_t& value)
+template<>
+ratio_t parse(const std::string& str)
 {
   // TODO implement proper ratio parsing
-  double dbl;
-  options_tools::parse(str, dbl);
-  value = dbl;
+  return options_tools::parse<double>(str);
 }
 
+//----------------------------------------------------------------------------
 /**
- * Parse (copy) provided string into provided string reference
+ * Return provided string
  */
-//----------------------------------------------------------------------------
-static void parse(const std::string& str, std::string& value)
+template<>
+std::string parse(const std::string& str)
 {
-  value = str;
+ return str;
 }
 
 //----------------------------------------------------------------------------
 /**
- * Parse provided string into provided double vector reference
- * Split the string using ',', then rely on parse(string, double&) for parsing each token
+ * Parse provided string into a double vector
+ * Split the string using ',', then rely on double version for parsing each token
  * Can throw options::parsing_exception in case of failure to parse
  */
-static void parse(const std::string& str, std::vector<double>& value)
+template<>
+std::vector<double> parse(const std::string& str)
 {
   // TODO implement more parsing possibilities, eg different types of tokens
+  std::vector<double> vec;
   std::istringstream split(str);
-  value.clear();
   for (std::string each; std::getline(split, each, ',');)
   {
-    double dbl;
-    options_tools::parse(each, dbl);
-    value.push_back(dbl);
+    vec.emplace_back(options_tools::parse<double>(each));
   }
+  return vec;
 }
 
 // TODO Improve string generation
 //----------------------------------------------------------------------------
 /**
+ * Generic templated string generation from provided value
+ * rely on std::to_string
+ */
+template<typename T>
+std::string format(const T& var)
+{
+  return std::to_string(var);
+}
+
+//----------------------------------------------------------------------------
+/**
  * Format provided var into a string from provided boolean
  * using boolalpha formatting, eg: "true" or "false"
  */
-static std::string format(const bool& var)
+template<>
+std::string format(const bool& var)
 {
   std::stringstream stream;
   stream << std::boolalpha << var;
@@ -135,7 +161,8 @@ static std::string format(const bool& var)
  * Format provided var into a string from provided double
  * using ostringstream with std::noshowpoint
  */
-static std::string format(const double& var)
+template<>
+std::string format(const double& var)
 {
   std::ostringstream stream;
   stream << std::noshowpoint << var;
@@ -147,7 +174,8 @@ static std::string format(const double& var)
  * Format provided var into a string from provided ratio_t
  * rely on format(double&)
  */
-static std::string format(const ratio_t& var)
+template<>
+std::string format(const ratio_t& var)
 {
   // TODO generate a proper ratio string
   double val = var;
@@ -158,7 +186,8 @@ static std::string format(const ratio_t& var)
 /**
  * Generate (returns) a string from provided string
  */
-static std::string format(const std::string& var)
+template<>
+std::string format(const std::string& var)
 {
   return var;
 }
@@ -168,7 +197,8 @@ static std::string format(const std::string& var)
  * Format provided var into a string from provided double vector
  * rely on format(double&) and add `, ` between the double values
  */
-static std::string format(const std::vector<double>& var)
+template<>
+std::string format(const std::vector<double>& var)
 {
   std::ostringstream stream;
   unsigned int i = 0;
@@ -178,17 +208,6 @@ static std::string format(const std::vector<double>& var)
     i++;
   }
   return stream.str();
-}
-
-//----------------------------------------------------------------------------
-/**
- * Generic templated string generation from provided value
- * rely on std::to_string
- */
-template<typename T>
-static std::string format(const T& var)
-{
-  return std::to_string(var);
 }
 
 //----------------------------------------------------------------------------
