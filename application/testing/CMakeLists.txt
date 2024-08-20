@@ -915,6 +915,10 @@ f3d_test(NAME TestReadersList ARGS --readers-list REGEXP_FAIL "No registered rea
 add_test(NAME f3d::TestNoDryRun COMMAND $<TARGET_FILE:f3d> --no-render)
 set_tests_properties(f3d::TestNoDryRun PROPERTIES TIMEOUT 4)
 
+# Test invalid CLI args
+add_test(NAME f3d::TestInvalidCLIArgs COMMAND $<TARGET_FILE:f3d> --up)
+set_tests_properties(f3d::TestInvalidCLIArgs PROPERTIES PASS_REGULAR_EXPRESSION "Error parsing command line arguments")
+
 # Test failure without a reference, please do not create a TestNoRef.png file
 f3d_test(NAME TestNoRef DATA cow.vtp WILL_FAIL)
 

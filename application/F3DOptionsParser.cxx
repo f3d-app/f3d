@@ -316,6 +316,13 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
   // cxxopts sense.
   HasDefault LocalHasDefaultNo = allOptionsInitialized ? HasDefault::YES : HasDefault::NO;
 
+  std::unordered_map<std::string, std::string> libf3dOptions;
+  std::vector<std::string> keys = options.getNames();
+  for (const std::string& key : keys)
+  {
+    libf3dOptions.emplace(key, options.getAsString(key));
+  }
+
   try
   {
     cxxopts::Options cxxOptions(this->ExecutableName, F3D::AppTitle);
@@ -338,70 +345,70 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
 
     auto grp1 = cxxOptions.add_options("General");
     this->DeclareOption(grp1, "verbose", "", "Set verbose level, providing more information about the loaded data in the console output", appOptions.VerboseLevel, HasDefault::YES, MayHaveConfig::YES, "{debug, info, warning, error, quiet}", HasImplicitValue::YES, "debug");
-    this->DeclareOption(grp1, "progress", "", "Show loading progress bar", options.getAsBoolRef("ui.loader-progress"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "animation-progress", "", "Show animation progress bar", options.getAsBoolRef("ui.animation-progress"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "progress", "", "Show loading progress bar", libf3dOptions["ui.loader_progress"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp1, "animation-progress", "", "Show animation progress bar", libf3dOptions["ui.animation_progress"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
     this->DeclareOption(grp1, "geometry-only", "", "Do not read materials, cameras and lights from file", appOptions.GeometryOnly, HasDefault::YES, MayHaveConfig::YES);
     this->DeclareOption(grp1, "group-geometries", "", "When opening multiple files, show them all in the same scene. Force geometry-only. The configuration file for the first file will be loaded.", appOptions.GroupGeometries, HasDefault::YES, MayHaveConfig::NO);
-    this->DeclareOption(grp1, "up", "", "Up direction", options.getAsStringRef("scene.up-direction"), HasDefault::YES, MayHaveConfig::YES, "{-X, +X, -Y, +Y, -Z, +Z}");
-    this->DeclareOption(grp1, "axis", "x", "Show axes", options.getAsBoolRef("interactor.axis"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "grid", "g", "Show grid", options.getAsBoolRef("render.grid.enable"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "grid-absolute", "", "Position grid at the absolute origin instead of below the model", options.getAsBoolRef("render.grid.absolute"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "grid-unit", "", "Size of grid unit square, set to a non-positive value for automatic computation", options.getAsDoubleRef("render.grid.unit"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "grid-subdivisions", "", "Number of grid subdivisions", options.getAsIntRef("render.grid.subdivisions"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "grid-color", "", "Color of main grid lines", options.getAsDoubleVectorRef("render.grid.color"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "edges", "e", "Show cell edges", options.getAsBoolRef("render.show-edges"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", options.getAsIntRef("scene.camera.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
-    this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", options.getAsBoolRef("interactor.trackball"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "invert-zoom", "", "Invert zoom direction with right mouse click", options.getAsBoolRef("interactor.invert-zoom"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "animation-autoplay", "", "Automatically start animation", options.getAsBoolRef("scene.animation.autoplay"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp1, "animation-index", "", "Select animation to show", options.getAsIntRef("scene.animation.index"), HasDefault::YES, MayHaveConfig::YES, "<index>");
-    this->DeclareOption(grp1, "animation-speed-factor", "", "Set animation speed factor", options.getAsDoubleRef("scene.animation.speed-factor"), HasDefault::YES, MayHaveConfig::YES, "<factor>");
-    this->DeclareOption(grp1, "animation-time", "", "Set animation time to load", options.getAsDoubleRef("scene.animation.time"), HasDefault::YES, MayHaveConfig::YES, "<time>");
-    this->DeclareOption(grp1, "animation-frame-rate", "", "Set animation frame rate when playing animation interactively", options.getAsDoubleRef("scene.animation.frame-rate"), HasDefault::YES, MayHaveConfig::YES, "<frame rate>");
-    this->DeclareOption(grp1, "font-file", "", "Path to a FreeType compatible font file", options.getAsStringRef("ui.font-file"), LocalHasDefaultNo, MayHaveConfig::NO, "<file_path>");
+    this->DeclareOption(grp1, "up", "", "Up direction", libf3dOptions["scene.up_direction"], HasDefault::YES, MayHaveConfig::YES, "{-X, +X, -Y, +Y, -Z, +Z}");
+    this->DeclareOption(grp1, "axis", "x", "Show axes", libf3dOptions["interactor.axis"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp1, "grid", "g", "Show grid", libf3dOptions["render.grid.enable"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp1, "grid-absolute", "", "Position grid at the absolute origin instead of below the model", libf3dOptions["render.grid.absolute"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp1, "grid-unit", "", "Size of grid unit square, set to a non-positive value for automatic computation", libf3dOptions["render.grid.unit"], HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "grid-subdivisions", "", "Number of grid subdivisions", libf3dOptions["render.grid.subdivisions"], HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "grid-color", "", "Color of main grid lines", libf3dOptions["render.grid.color"], HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp1, "edges", "e", "Show cell edges", libf3dOptions["render.show_edges"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp1, "camera-index", "", "Select the camera to use", libf3dOptions["scene.camera.index"], HasDefault::YES, MayHaveConfig::YES, "<index>");
+    this->DeclareOption(grp1, "trackball", "k", "Enable trackball interaction", libf3dOptions["interactor.trackball"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp1, "invert-zoom", "", "Invert zoom direction with right mouse click", libf3dOptions["interactor.invert_zoom"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp1, "animation-autoplay", "", "Automatically start animation", libf3dOptions["scene.animation.autoplay"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp1, "animation-index", "", "Select animation to show", libf3dOptions["scene.animation.index"], HasDefault::YES, MayHaveConfig::YES, "<index>");
+    this->DeclareOption(grp1, "animation-speed-factor", "", "Set animation speed factor", libf3dOptions["scene.animation.speed_factor"], HasDefault::YES, MayHaveConfig::YES, "<factor>");
+    this->DeclareOption(grp1, "animation-time", "", "Set animation time to load", libf3dOptions["scene.animation.time"], HasDefault::YES, MayHaveConfig::YES, "<time>");
+    this->DeclareOption(grp1, "animation-frame-rate", "", "Set animation frame rate when playing animation interactively", libf3dOptions["scene.animation.frame_rate"], HasDefault::YES, MayHaveConfig::YES, "<frame rate>");
+    this->DeclareOption(grp1, "font-file", "", "Path to a FreeType compatible font file", libf3dOptions["ui.font_file"], LocalHasDefaultNo, MayHaveConfig::NO, "<file_path>");
 
     auto grp2 = cxxOptions.add_options("Material");
-    this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", options.getAsBoolRef("model.point-sprites.enable"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp2, "point-type", "", "Point sprites type when showing point sprites", options.getAsStringRef("model.point-sprites.type"), HasDefault::YES, MayHaveConfig::YES, "<sphere|gaussian>");
-    this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", options.getAsDoubleRef("render.point-size"), HasDefault::YES, MayHaveConfig::YES, "<size>");
-    this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", options.getAsDoubleRef("render.line-width"), HasDefault::YES, MayHaveConfig::YES, "<width>");
-    this->DeclareOption(grp2, "backface-type", "", "Backface type, can be default (usually visible), visible or hidden", options.getAsStringRef("render.backface-type"), HasDefault::YES, MayHaveConfig::YES, "<default|visible|hidden>");
-    this->DeclareOption(grp2, "color", "", "Solid color", options.getAsDoubleVectorRef("model.color.rgb"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
-    this->DeclareOption(grp2, "opacity", "", "Opacity", options.getAsDoubleRef("model.color.opacity"), HasDefault::YES, MayHaveConfig::YES, "<opacity>");
-    this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.roughness"), HasDefault::YES, MayHaveConfig::YES, "<roughness>");
-    this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", options.getAsDoubleRef("model.material.metallic"), HasDefault::YES, MayHaveConfig::YES, "<metallic>");
-    this->DeclareOption(grp2, "hdri-file", "", "Path to an image file that can be used as a light source and skybox", options.getAsStringRef("render.hdri.file"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "hdri-ambient", "f", "Enable HDRI ambient lighting", options.getAsBoolRef("render.hdri.ambient"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp2, "hdri-skybox", "j", "Enable HDRI skybox background", options.getAsBoolRef("render.background.skybox"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp2, "texture-matcap", "", "Path to a texture file containing a material capture", options.getAsStringRef("model.matcap.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", options.getAsStringRef("model.color.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", options.getAsStringRef("model.material.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emitted light of the object", options.getAsStringRef("model.emissive.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "emissive-factor", "", "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present", options.getAsDoubleVectorRef("model.emissive.factor"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
-    this->DeclareOption(grp2, "texture-normal", "", "Path to a texture file that sets the normal map of the object", options.getAsStringRef("model.normal.texture"), LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
-    this->DeclareOption(grp2, "normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", options.getAsDoubleRef("model.normal.scale"), HasDefault::YES, MayHaveConfig::YES, "<normalScale>");
+    this->DeclareOption(grp2, "point-sprites", "o", "Show sphere sprites instead of geometry", libf3dOptions["model.point_sprites.enable"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp2, "point-type", "", "Point sprites type when showing point sprites", libf3dOptions["model.point_sprites.type"], HasDefault::YES, MayHaveConfig::YES, "<sphere|gaussian>");
+    this->DeclareOption(grp2, "point-size", "", "Point size when showing vertices or point sprites", libf3dOptions["render.point_size"], HasDefault::YES, MayHaveConfig::YES, "<size>");
+    this->DeclareOption(grp2, "line-width", "", "Line width when showing edges", libf3dOptions["render.line_width"], HasDefault::YES, MayHaveConfig::YES, "<width>");
+    this->DeclareOption(grp2, "backface-type", "", "Backface type, can be default (usually visible), visible or hidden", libf3dOptions["render.backface_type"], HasDefault::YES, MayHaveConfig::YES, "<default|visible|hidden>");
+    this->DeclareOption(grp2, "color", "", "Solid color", libf3dOptions["model.color.rgb"], HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
+    this->DeclareOption(grp2, "opacity", "", "Opacity", libf3dOptions["model.color.opacity"], HasDefault::YES, MayHaveConfig::YES, "<opacity>");
+    this->DeclareOption(grp2, "roughness", "", "Roughness coefficient (0.0-1.0)", libf3dOptions["model.material.roughness"], HasDefault::YES, MayHaveConfig::YES, "<roughness>");
+    this->DeclareOption(grp2, "metallic", "", "Metallic coefficient (0.0-1.0)", libf3dOptions["model.material.metallic"], HasDefault::YES, MayHaveConfig::YES, "<metallic>");
+    this->DeclareOption(grp2, "hdri-file", "", "Path to an image file that can be used as a light source and skybox", libf3dOptions["render.hdri.file"], LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "hdri-ambient", "f", "Enable HDRI ambient lighting", libf3dOptions["render.hdri.ambient"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp2, "hdri-skybox", "j", "Enable HDRI skybox background", libf3dOptions["render.background.skybox"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp2, "texture-matcap", "", "Path to a texture file containing a material capture", libf3dOptions["model.matcap.texture"], LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "texture-base-color", "", "Path to a texture file that sets the color of the object", libf3dOptions["model.color.texture"], LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", libf3dOptions["model.material.texture"], LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "texture-emissive", "", "Path to a texture file that sets the emitted light of the object", libf3dOptions["model.emissive.texture"], LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "emissive-factor", "", "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present", libf3dOptions["model.emissive.factor"], HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
+    this->DeclareOption(grp2, "texture-normal", "", "Path to a texture file that sets the normal map of the object", libf3dOptions["model.normal.texture"], LocalHasDefaultNo, MayHaveConfig::YES, "<file path>");
+    this->DeclareOption(grp2, "normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", libf3dOptions["model.normal.scale"], HasDefault::YES, MayHaveConfig::YES, "<normalScale>");
 
     auto grp3 = cxxOptions.add_options("Window");
-    this->DeclareOption(grp3, "bg-color", "", "Background color", options.getAsDoubleVectorRef("render.background.color"), HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
+    this->DeclareOption(grp3, "bg-color", "", "Background color", libf3dOptions["render.background.color"], HasDefault::YES, MayHaveConfig::YES, "<R,G,B>");
     this->DeclareOption(grp3, "resolution", "", "Window resolution", appOptions.Resolution, HasDefault::YES, MayHaveConfig::YES, "<width,height>");
     this->DeclareOption(grp3, "position", "", "Window position", appOptions.Position, HasDefault::YES, MayHaveConfig::YES, "<x,y>");
-    this->DeclareOption(grp3, "fps", "z", "Display frame per second", options.getAsBoolRef("ui.fps"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp3, "filename", "n", "Display filename", options.getAsBoolRef("ui.filename"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp3, "metadata", "m", "Display file metadata", options.getAsBoolRef("ui.metadata"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp3, "blur-background", "u", "Blur background", options.getAsBoolRef("render.background.blur"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp3, "blur-coc", "", "Blur circle of confusion radius", options.getAsDoubleRef("render.background.blur.coc"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp3, "light-intensity", "", "Light intensity", options.getAsDoubleRef("render.light.intensity"), HasDefault::YES, MayHaveConfig::YES, "<intensity>");
+    this->DeclareOption(grp3, "fps", "z", "Display frame per second", libf3dOptions["ui.fps"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp3, "filename", "n", "Display filename", libf3dOptions["ui.filename"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp3, "metadata", "m", "Display file metadata", libf3dOptions["ui.metadata"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp3, "blur-background", "u", "Blur background", libf3dOptions["render.background.blur"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp3, "blur-coc", "", "Blur circle of confusion radius", libf3dOptions["render.background.blur_coc"], HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp3, "light-intensity", "", "Light intensity", libf3dOptions["render.light.intensity"], HasDefault::YES, MayHaveConfig::YES, "<intensity>");
 
     auto grp4 = cxxOptions.add_options("Scientific visualization");
-    this->DeclareOption(grp4, "scalars", "s", "Color by scalars", options.getAsStringRef("model.scivis.array-name"), HasDefault::YES, MayHaveConfig::YES, "<array_name>", HasImplicitValue::YES, "");
-    this->DeclareOption(grp4, "comp", "y", "Component from the scalar array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", options.getAsIntRef("model.scivis.component"), HasDefault::YES, MayHaveConfig::YES, "<comp_index>", HasImplicitValue::YES, "-2");
-    this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", options.getAsBoolRef("model.scivis.cells"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", options.getAsDoubleVectorRef("model.scivis.range"), HasDefault::YES, MayHaveConfig::YES, "<min,max>");
-    this->DeclareOption(grp4, "bar", "b", "Show scalar bar", options.getAsBoolRef("ui.bar"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp4, "scalars", "s", "Color by scalars", libf3dOptions["model.scivis.array_name"], HasDefault::YES, MayHaveConfig::YES, "<array_name>", HasImplicitValue::YES, "");
+    this->DeclareOption(grp4, "comp", "y", "Component from the scalar array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", libf3dOptions["model.scivis.component"], HasDefault::YES, MayHaveConfig::YES, "<comp_index>", HasImplicitValue::YES, "-2");
+    this->DeclareOption(grp4, "cells", "c", "Use a scalar array from the cells", libf3dOptions["model.scivis.cells"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp4, "range", "", "Custom range for the coloring by array", libf3dOptions["model.scivis.range"], HasDefault::YES, MayHaveConfig::YES, "<min,max>");
+    this->DeclareOption(grp4, "bar", "b", "Show scalar bar", libf3dOptions["ui.scalar_bar"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
     this->DeclareOption(grp4, "colormap-file", "", "Specify a colormap image", appOptions.ColorMapFile, LocalHasDefaultNo, MayHaveConfig::YES, "<filePath/filename/fileStem>");
-    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap (ignored if \"colormap-file\" is specified)", options.getAsDoubleVectorRef("model.scivis.colormap"), HasDefault::YES, MayHaveConfig::YES, "<color_list>");
-    this->DeclareOption(grp4, "volume", "v", "Show volume if the file is compatible", options.getAsBoolRef("model.volume.enable"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", options.getAsBoolRef("model.volume.inverse"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp4, "colormap", "", "Specify a custom colormap (ignored if \"colormap-file\" is specified)", libf3dOptions["model.scivis.colormap"], HasDefault::YES, MayHaveConfig::YES, "<color_list>");
+    this->DeclareOption(grp4, "volume", "v", "Show volume if the file is compatible", libf3dOptions["model.volume.enable"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp4, "inverse", "i", "Inverse opacity function for volume rendering", libf3dOptions["model.volume.inverse"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
 
     auto grpCamera = cxxOptions.add_options("Camera");
     this->DeclareOption(grpCamera, "camera-position", "", "Camera position (overrides camera direction and camera zoom factor if any)", appOptions.CameraPosition, HasDefault::YES, MayHaveConfig::YES, "<X,Y,Z>");
@@ -412,21 +419,21 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     this->DeclareOption(grpCamera, "camera-zoom-factor", "", "Camera zoom factor (non-zero)", appOptions.CameraZoomFactor, HasDefault::YES, MayHaveConfig::YES, "<factor>");
     this->DeclareOption(grpCamera, "camera-azimuth-angle", "", "Camera azimuth angle (in degrees), performed after other camera options", appOptions.CameraAzimuthAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
     this->DeclareOption(grpCamera, "camera-elevation-angle", "", "Camera elevation angle (in degrees), performed after other camera options", appOptions.CameraElevationAngle, HasDefault::YES, MayHaveConfig::YES, "<angle>");
-    this->DeclareOption(grpCamera, "camera-orthographic", "", "Use an orthographic camera", options.getAsBoolRef("scene.camera.orthographic"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grpCamera, "camera-orthographic", "", "Use an orthographic camera", libf3dOptions["scene.camera.orthographic"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
 
 #if F3D_MODULE_RAYTRACING
     auto grp5 = cxxOptions.add_options("Raytracing");
-    this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", options.getAsBoolRef("render.raytracing.enable"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", options.getAsIntRef("render.raytracing.samples"), HasDefault::YES, MayHaveConfig::YES, "<samples>");
-    this->DeclareOption(grp5, "denoise", "d", "Denoise the image", options.getAsBoolRef("render.raytracing.denoise"), HasDefault::YES, MayHaveConfig::YES);
+    this->DeclareOption(grp5, "raytracing", "r", "Enable raytracing", libf3dOptions["render.raytracing.enable"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp5, "samples", "", "Number of samples per pixel", libf3dOptions["render.raytracing.samples"], HasDefault::YES, MayHaveConfig::YES, "<samples>");
+    this->DeclareOption(grp5, "denoise", "d", "Denoise the image", libf3dOptions["render.raytracing.denoise"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
 #endif
 
     auto grp6 = cxxOptions.add_options("PostFX (OpenGL)");
-    this->DeclareOption(grp6, "translucency-support", "p", "Enable translucency support, implemented using depth peeling", options.getAsBoolRef("render.effect.translucency-support"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp6, "ambient-occlusion", "q", "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO", options.getAsBoolRef("render.effect.ambient-occlusion"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp6, "anti-aliasing", "a", "Enable anti-aliasing, implemented using FXAA", options.getAsBoolRef("render.effect.anti-aliasing"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping, providing balanced coloring", options.getAsBoolRef("render.effect.tone-mapping"), HasDefault::YES, MayHaveConfig::YES);
-    this->DeclareOption(grp6, "final-shader", "", "Execute the final shader at the end of the rendering pipeline", options.getAsStringRef("render.effect.final-shader"), LocalHasDefaultNo, MayHaveConfig::YES, "<GLSL code>");
+    this->DeclareOption(grp6, "translucency-support", "p", "Enable translucency support, implemented using depth peeling", libf3dOptions["render.effect.translucency_support"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp6, "ambient-occlusion", "q", "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO", libf3dOptions["render.effect.ambient_occlusion"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp6, "anti-aliasing", "a", "Enable anti-aliasing, implemented using FXAA", libf3dOptions["render.effect.anti_aliasing"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp6, "tone-mapping", "t", "Enable Tone Mapping, providing balanced coloring", libf3dOptions["render.effect.tone_mapping"], HasDefault::YES, MayHaveConfig::YES, "<bool>", HasImplicitValue::YES, "1");
+    this->DeclareOption(grp6, "final-shader", "", "Execute the final shader at the end of the rendering pipeline", libf3dOptions["render.effect.final_shader"], LocalHasDefaultNo, MayHaveConfig::YES, "<GLSL code>");
 
     auto grp7 = cxxOptions.add_options("Testing");
     this->DeclareOption(grp7, "ref", "", "Reference", appOptions.Reference, LocalHasDefaultNo, MayHaveConfig::YES, "<png file>");
@@ -440,7 +447,10 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     if (parseCommandLine)
     {
       auto result = cxxOptions.parse(this->Argc, this->Argv);
-
+      for (const auto& [key, val] : libf3dOptions)
+      {
+        options.setAsString(key, val);
+      }
       auto unmatched = result.unmatched();
       bool found_unknown_option = false;
       for (std::string unknownOption : unmatched)
@@ -510,12 +520,16 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
     {
       // this will update the options using the config file without parsing actual argc/argv
       cxxOptions.parse(1, nullptr);
+      for (const auto& [key, val] : libf3dOptions)
+      {
+        options.setAsString(key, val);
+      }
     }
   }
   catch (const cxxopts::exceptions::exception& ex)
   {
-    f3d::log::error("Error parsing options: ", ex.what());
-    throw;
+    f3d::log::error("Error parsing command line arguments: ", ex.what());
+    throw F3DExFailure("Could not parse command line arguments");
   }
 }
 

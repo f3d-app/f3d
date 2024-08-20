@@ -1,0 +1,308 @@
+{
+  "scene": {
+    "up_direction": {
+      "type": "string",
+      "default_value": "+Y"
+    },
+    "animation": {
+      "autoplay": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "index": {
+        "type": "int",
+        "default_value": "0"
+      },
+      "speed_factor": {
+        "type": "ratio",
+        "default_value": "1.0"
+      },
+      "time": {
+        "type": "double",
+        "default_value": "0.0"
+      },
+      "frame_rate": {
+        "type": "double",
+        "default_value": "60.0"
+      }
+    },
+    "camera": {
+      "index": {
+        "type": "int",
+        "default_value": "-1"
+      },
+      "orthographic": {
+        "type": "bool",
+        "default_value": "false"
+      }
+    }
+  },
+  "render": {
+    "show_edges": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "line_width": {
+      "type": "double",
+      "default_value": "1.0"
+    },
+    "point_size": {
+      "type": "double",
+      "default_value": "10.0"
+    },
+    "backface_type": {
+      "type": "string",
+      "default_value": "default"
+    },
+    "grid": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "absolute": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "unit": {
+        "type": "double",
+        "default_value": "0.0"
+      },
+      "subdivisions": {
+        "type": "int",
+        "default_value": "10"
+      },
+      "color": {
+        "type": "double_vector",
+        "default_value": "0.0, 0.0, 0.0"
+      }
+    },
+    "raytracing": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "denoise": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "samples": {
+        "type": "int",
+        "default_value": "5"
+      }
+    },
+    "effect": {
+      "translucency_support": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "anti_aliasing": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "ambient_occlusion": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "tone_mapping": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "final_shader": {
+        "type": "string",
+        "default_value": ""
+      }
+    },
+    "hdri": {
+      "file": {
+        "type": "string",
+        "default_value": ""
+      },
+      "ambient": {
+        "type": "bool",
+        "default_value": "false"
+      }
+    },
+    "background": {
+      "color": {
+        "type": "double_vector",
+        "default_value": "0.2, 0.2, 0.2"
+      },
+      "skybox": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "blur": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "blur_coc": {
+        "type": "double",
+        "default_value": "20.0"
+      }
+    },
+    "light": {
+      "intensity": {
+        "type": "double",
+        "default_value": "1.0"
+      }
+    }
+  },
+  "ui": {
+    "scalar_bar": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "filename": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "filename_info": {
+      "type": "string",
+      "default_value": ""
+    },
+    "fps": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "cheatsheet": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "dropzone": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "dropzone_info": {
+      "type": "string",
+      "default_value": ""
+    },
+    "metadata": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "font_file": {
+      "type": "string",
+      "default_value": ""
+    },
+    "loader_progress": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "animation_progress": {
+      "type": "bool",
+      "default_value": "false"
+    }
+  },
+  "model": {
+    "matcap": {
+      "texture": {
+        "type": "string",
+        "default_value": ""
+      }
+    },
+    "color": {
+      "opacity": {
+        "type": "double",
+        "default_value": "1.0"
+      },
+      "rgb": {
+        "type": "double_vector",
+        "default_value": "1.0, 1.0, 1.0"
+      },
+      "texture": {
+        "type": "string",
+        "default_value": ""
+      }
+    },
+    "emissive": {
+      "factor": {
+        "type": "double_vector",
+        "default_value": "1.0, 1.0, 1.0"
+      },
+      "texture": {
+        "type": "string",
+        "default_value": ""
+      }
+    },
+    "normal": {
+      "scale": {
+        "type": "double",
+        "default_value": "1.0"
+      },
+      "texture": {
+        "type": "string",
+        "default_value": ""
+      }
+    },
+    "material": {
+      "metallic": {
+        "type": "double",
+        "default_value": "0.0"
+      },
+      "roughness": {
+        "type": "double",
+        "default_value": "0.3"
+      },
+      "texture": {
+        "type": "string",
+        "default_value": ""
+      }
+    },
+    "scivis": {
+      "cells": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "array_name": {
+        "type": "string",
+        "default_value": "f3d_reserved"
+      },
+      "component": {
+        "type": "int",
+        "default_value": "-1"
+      },
+      "colormap": {
+        "type": "double_vector",
+        "default_value": "0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0"
+      },
+      "range": {
+        "type": "double_vector",
+        "default_value": "0.0"
+      }
+    },
+    "point_sprites": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "type": {
+        "type": "string",
+        "default_value": "sphere"
+      }
+    },
+    "volume": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "inverse": {
+        "type": "bool",
+        "default_value": "false"
+      }
+    }
+  },
+  "interactor": {
+    "axis": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "trackball": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "invert_zoom": {
+      "type": "bool",
+      "default_value": "false"
+    }
+  }
+}

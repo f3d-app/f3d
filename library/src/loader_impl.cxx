@@ -124,7 +124,7 @@ public:
     loader_impl::internals::ProgressDataStruct callbackData;
     callbackData.timer = timer;
     callbackData.widget = progressWidget;
-    if (this->Options.getAsBool("ui.loader-progress") && this->Interactor)
+    if (this->Options.ui.loader_progress && this->Interactor)
     {
       loader_impl::internals::CreateProgressRepresentationAndCallback(
         &callbackData, this->GenericImporter, this->Interactor);
@@ -151,7 +151,7 @@ public:
     if (this->AnimationManager.Initialize(
           &this->Options, &this->Window, this->Interactor, this->GenericImporter))
     {
-      double animationTime = this->Options.getAsDouble("scene.animation.time");
+      double animationTime = this->Options.scene.animation.time;
       double timeRange[2];
       this->AnimationManager.GetTimeRange(timeRange);
 
@@ -285,7 +285,7 @@ loader& loader_impl::loadScene(const std::string& filePath)
   this->Internals->CurrentFullSceneImporter->SetRenderWindow(
     this->Internals->Window.GetRenderWindow());
 
-  int cameraIndex = this->Internals->Options.getAsInt("scene.camera.index");
+  int cameraIndex = this->Internals->Options.scene.camera.index;
   this->Internals->CurrentFullSceneImporter->SetCamera(cameraIndex);
 
   log::debug("Loading 3D scene: ", filePath, "\n");
@@ -296,7 +296,7 @@ loader& loader_impl::loadScene(const std::string& filePath)
   loader_impl::internals::ProgressDataStruct callbackData;
   callbackData.timer = timer;
   callbackData.widget = progressWidget;
-  if (this->Internals->Options.getAsBool("ui.loader-progress") && this->Internals->Interactor)
+  if (this->Internals->Options.ui.loader_progress && this->Internals->Interactor)
   {
     loader_impl::internals::CreateProgressRepresentationAndCallback(
       &callbackData, this->Internals->CurrentFullSceneImporter, this->Internals->Interactor);
@@ -321,7 +321,7 @@ loader& loader_impl::loadScene(const std::string& filePath)
         &this->Internals->Window, this->Internals->Interactor,
         this->Internals->CurrentFullSceneImporter))
   {
-    double animationTime = this->Internals->Options.getAsDouble("scene.animation.time");
+    double animationTime = this->Internals->Options.scene.animation.time;
     double timeRange[2];
     this->Internals->AnimationManager.GetTimeRange(timeRange);
 
