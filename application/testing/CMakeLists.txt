@@ -880,7 +880,7 @@ f3d_test(NAME TestInvalidTexture DATA cow.vtp ARGS --texture-material=${F3D_SOUR
 f3d_test(NAME TestNonExistentInteraction DATA cow.vtp INTERACTION REGEXP "Interaction record file to play does not exist" NO_BASELINE)
 
 # Test unknown options, do not add a --colour option
-f3d_test(NAME TestUnknownOptionVerbose ARGS --colour=1,0,0 REGEXP "Did you mean '--color'?")
+f3d_test(NAME TestUnknownOptionVerbose ARGS --colour=1,0,0 REGEXP "Did you mean '--color=1,0,0'?")
 f3d_test(NAME TestUnknownOptionExitCode ARGS --colour=1,0,0 WILL_FAIL)
 
 # Test non-existent config filepath, do not add a dummy.json
