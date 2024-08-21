@@ -467,7 +467,7 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
           // check if it's a long option
           if (unknownOption.substr(0, 2) == "--")
           {
-            const size_t i = unknownOption.rfind("=");
+            const size_t i = unknownOption.rfind('=');
 
             // remove "--" and everything after the last "=" (if any)
             const std::string unknownName =
