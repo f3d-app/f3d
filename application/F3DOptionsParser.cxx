@@ -467,21 +467,17 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
           // check if it's a long option
           if (unknownOption.substr(0, 2) == "--")
           {
-            // remove trailing '--'
-            unknownOption = unknownOption.substr(2);
+            const size_t i = unknownOption.rfind('=');
 
-            auto it = std::find_if(unknownOption.rbegin(), unknownOption.rend(),
-              [](unsigned char ch) { return ch == '='; });
+            // remove "--" and everything after the last "=" (if any)
+            const std::string unknownName =
+              unknownOption.substr(2, i != std::string::npos ? i - 2 : i);
 
-            // remove everything after the character '='
-            if (it != unknownOption.rend())
-            {
-              unknownOption.erase(it.base() - 1, unknownOption.end());
-            }
+            auto [closestName, dist] = this->GetClosestOption(unknownOption);
+            const std::string closestOption =
+              i == std::string::npos ? closestName : closestName + unknownOption.substr(i);
 
-            auto [name, dist] = this->GetClosestOption(unknownOption);
-
-            f3d::log::error("Did you mean '--", name, "'?");
+            f3d::log::error("Did you mean '--", closestOption, "'?");
           }
         }
       }
