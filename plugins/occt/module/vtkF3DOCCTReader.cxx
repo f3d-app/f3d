@@ -660,20 +660,11 @@ int vtkF3DOCCTReader::RequestData(
   }
   else if (this->FileFormat == FILE_FORMAT::XBF)
   {
-    try
+    Handle(TDocStd_Application) app = new TDocStd_Application();
+    BinXCAFDrivers::DefineFormat(app);
+    if (app->Open(this->GetFileName().c_str(), doc) != PCDM_RS_OK)
     {
-      Handle(TDocStd_Application) app = new TDocStd_Application();
-      BinXCAFDrivers::DefineFormat(app);
-      if (app->Open(this->GetFileName().c_str(), doc) != PCDM_RS_OK)
-      {
-        vtkErrorWithObjectMacro(this, "Failed to read XBF file");
-        return 0;
-      }
-    }
-    catch (Standard_Failure const& failure)
-    {
-      vtkErrorWithObjectMacro(
-        this, "Could not initialize XCAF reader " << failure.GetMessageString());
+      vtkErrorWithObjectMacro(this, "Failed to read XBF file");
       return 0;
     }
   }
