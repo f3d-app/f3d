@@ -467,13 +467,13 @@ void ConfigurationOptions::GetOptions(F3DAppOptions& appOptions, f3d::options& o
           // check if it's a long option
           if (unknownOption.substr(0, 2) == "--")
           {
-            const size_t i = unknownOption.rfind('=');
+            const size_t i = unknownOption.find('=');
 
-            // remove "--" and everything after the last "=" (if any)
+            // remove "--" and everything after the first "=" (if any)
             const std::string unknownName =
               unknownOption.substr(2, i != std::string::npos ? i - 2 : i);
 
-            auto [closestName, dist] = this->GetClosestOption(unknownOption);
+            auto [closestName, dist] = this->GetClosestOption(unknownName);
             const std::string closestOption =
               i == std::string::npos ? closestName : closestName + unknownOption.substr(i);
 
