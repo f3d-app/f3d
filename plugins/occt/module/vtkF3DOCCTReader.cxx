@@ -667,14 +667,14 @@ int vtkF3DOCCTReader::RequestData(
       if (app->Open(this->GetFileName().c_str(), doc) != PCDM_RS_OK)
       {
         vtkErrorWithObjectMacro(this, "Failed to read XBF file");
-        return 1;
+        return 0;
       }
     }
     catch (Standard_Failure const& failure)
     {
       vtkErrorWithObjectMacro(
         this, "Could not initialize XCAF reader " << failure.GetMessageString());
-      return 1;
+      return 0;
     }
   }
 
