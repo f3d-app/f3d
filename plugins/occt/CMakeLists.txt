@@ -71,6 +71,15 @@ f3d_plugin_declare_reader(
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/brep.inl"
 )
 
+f3d_plugin_declare_reader(
+  NAME XBF
+  EXTENSIONS xbf
+  MIMETYPES application/vnd.xbf
+  VTK_READER vtkF3DOCCTReader
+  FORMAT_DESCRIPTION "Open CASCADE XBF"
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/xbf.inl"
+)
+
 set(rpaths "")
 get_target_property(target_type TKernel TYPE)
 if (target_type STREQUAL SHARED_LIBRARY)

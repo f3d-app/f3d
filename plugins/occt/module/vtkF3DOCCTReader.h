@@ -32,13 +32,14 @@ public:
   {
     BREP,
     STEP,
-    IGES
+    IGES,
+    XBF,
   };
 
   ///@{
   /**
    * Set the file format to read.
-   * It can be either BREP, STEP or IGES.
+   * It can be either BREP, STEP, IGES, or XBF.
    * Default is FILE_FORMAT::STEP
    */
   vtkSetMacro(FileFormat, FILE_FORMAT);

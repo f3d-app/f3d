@@ -637,6 +637,7 @@ if(F3D_PLUGIN_BUILD_OCCT)
 
   if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     f3d_test(NAME TestXCAFColors DATA xcaf-colors.stp ARGS --load-plugins=occt -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
+    f3d_test(NAME TestXCAFColorsXBF DATA xcaf-colors.xbf ARGS --load-plugins=occt -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
 
     if (NOT F3D_MACOS_BUNDLE)
       file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
