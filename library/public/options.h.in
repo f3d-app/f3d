@@ -112,7 +112,7 @@ public:
    * Throw an options::parsing_exception if parsing failed.
    */
   template<typename T>
-  static T parse(const std::string& str);
+  F3D_EXPORT static T parse(const std::string& str);
 
   /**
    * An exception that can be thrown by the options
