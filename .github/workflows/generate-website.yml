@@ -20,7 +20,6 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-latest
-    container: dockcross/web-wasm:20240529-0dade71
 
     steps:
 
@@ -31,8 +30,15 @@ jobs:
         fetch-depth: 0
         lfs: 'true'
 
-    - name: Web Assembly CI
-      uses: ./source/.github/actions/webassembly-ci
+    - name: Build
+      working-directory: ${{github.workspace}}/source/webassembly
+      run: npm run build:rel
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        path: ./source/webassembly/dist/*
+        name: f3d-wasm
 
 #----------------------------------------------------------------------------
 # generate website
