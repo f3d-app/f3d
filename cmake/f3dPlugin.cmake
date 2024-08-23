@@ -226,6 +226,10 @@ macro(f3d_plugin_build)
   list(APPEND f3d_plugin_compile_options "${f3d_strict_build_compile_options}")
   list(APPEND f3d_plugin_compile_options "${f3d_coverage_compile_options}")
   list(APPEND f3d_plugin_compile_options "${f3d_sanitizer_compile_options}")
+  if(EMSCRIPTEN)
+    # Exceptions are disabled by default in emscripten but we need them
+    list(APPEND f3d_plugin_compile_options "-fexceptions")
+  endif()
 
   set(f3d_plugin_link_options "")
   list(APPEND f3d_plugin_link_options "${f3d_coverage_link_options}")
