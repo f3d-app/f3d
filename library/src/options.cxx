@@ -106,6 +106,48 @@ std::pair<std::string, unsigned int> options::getClosestOption(const std::string
 }
 
 //----------------------------------------------------------------------------
+template<>
+bool options::parse(const std::string& str)
+{
+  return options_tools::parse<bool>(str);
+}
+
+//----------------------------------------------------------------------------
+template<>
+int options::parse(const std::string& str)
+{
+  return options_tools::parse<int>(str);
+}
+
+//----------------------------------------------------------------------------
+template<>
+double options::parse(const std::string& str)
+{
+  return options_tools::parse<double>(str);
+}
+
+//----------------------------------------------------------------------------
+template<>
+f3d::ratio_t options::parse(const std::string& str)
+{
+  return options_tools::parse<f3d::ratio_t>(str);
+}
+
+//----------------------------------------------------------------------------
+template<>
+std::string options::parse(const std::string& str)
+{
+  return options_tools::parse<std::string>(str);
+}
+
+//----------------------------------------------------------------------------
+template<>
+std::vector<double> options::parse(const std::string& str)
+{
+  return options_tools::parse<std::vector<double>>(str);
+}
+
+//----------------------------------------------------------------------------
 options::parsing_exception::parsing_exception(const std::string& what)
   : exception(what)
 {
