@@ -106,46 +106,20 @@ std::pair<std::string, unsigned int> options::getClosestOption(const std::string
 }
 
 //----------------------------------------------------------------------------
-template<>
-F3D_EXPORT bool options::parse(const std::string& str)
+template<typename T>
+F3D_EXPORT T options::parse(const std::string& str)
 {
-  return options_tools::parse<bool>(str);
+  return options_tools::parse<T>(str);
 }
 
 //----------------------------------------------------------------------------
-template<>
-F3D_EXPORT int options::parse(const std::string& str)
-{
-  return options_tools::parse<int>(str);
-}
-
-//----------------------------------------------------------------------------
-template<>
-F3D_EXPORT double options::parse(const std::string& str)
-{
-  return options_tools::parse<double>(str);
-}
-
-//----------------------------------------------------------------------------
-template<>
-F3D_EXPORT f3d::ratio_t options::parse(const std::string& str)
-{
-  return options_tools::parse<f3d::ratio_t>(str);
-}
-
-//----------------------------------------------------------------------------
-template<>
-F3D_EXPORT std::string options::parse(const std::string& str)
-{
-  return options_tools::parse<std::string>(str);
-}
-
-//----------------------------------------------------------------------------
-template<>
-F3D_EXPORT std::vector<double> options::parse(const std::string& str)
-{
-  return options_tools::parse<std::vector<double>>(str);
-}
+#define F3D_DECL_TYPE(TYPE) template TYPE options::parse<TYPE>(const std::string& str)
+F3D_DECL_TYPE(bool);
+F3D_DECL_TYPE(int);
+F3D_DECL_TYPE(double);
+F3D_DECL_TYPE(f3d::ratio_t);
+F3D_DECL_TYPE(std::string);
+F3D_DECL_TYPE(std::vector<double>);
 
 //----------------------------------------------------------------------------
 options::parsing_exception::parsing_exception(const std::string& what)
