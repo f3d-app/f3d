@@ -48,7 +48,7 @@ However, formats supporting **full scenes** will automatically load additional s
 
 If you'd like to disable these properties, you can specify the `--geometry-only` [option](OPTIONS.md) from the command line to construct a default scene instead.
 
-See the table of [supported file formats](SUPPORTED_FILE_FORMATS.md) if you're unsure about what kind of scene your file supports.
+See the table of [supported file formats](SUPPORTED_FORMATS.md) if you're unsure about what kind of scene your file supports.
 
 ## Interacting with your scene
 
@@ -70,7 +70,7 @@ For more information, see the [Interactions](INTERACTIONS.md) page.
 
 ## Playing animations
 
-F3D can play [animations](ANIMATIONS.md) for any [supported files](#supported-file-formats) that contain them.
+F3D can play [animations](ANIMATIONS.md) for any [supported files](SUPPORTED_FORMATS.md) that contain them.
 
 With your file loaded into F3D, press the <kbd>W</kbd> hotkey to cycle through available animations. Then, press <kbd>Space</kbd> to play your selected animation. 
 
