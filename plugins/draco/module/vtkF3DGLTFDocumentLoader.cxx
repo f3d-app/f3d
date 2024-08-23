@@ -8,10 +8,36 @@
 
 namespace
 {
+//----------------------------------------------------------------------------
+template<typename Decoder, typename... Args>
+std::vector<char> ComponentDispatcher(vtkGLTFDocumentLoader::ComponentType compType, Args&&... args)
+{
+  switch (compType)
+  {
+    case vtkGLTFDocumentLoader::ComponentType::BYTE:
+      return Decoder().template decode<int8_t>(args...);
+    case vtkGLTFDocumentLoader::ComponentType::UNSIGNED_BYTE:
+      return Decoder().template decode<uint16_t>(args...);
+    case vtkGLTFDocumentLoader::ComponentType::SHORT:
+      return Decoder().template decode<int16_t>(args...);
+    case vtkGLTFDocumentLoader::ComponentType::UNSIGNED_SHORT:
+      return Decoder().template decode<uint16_t>(args...);
+    case vtkGLTFDocumentLoader::ComponentType::UNSIGNED_INT:
+      return Decoder().template decode<uint32_t>(args...);
+    case vtkGLTFDocumentLoader::ComponentType::FLOAT:
+      return Decoder().template decode<float>(args...);
+    default:
+      break;
+  }
+
+  return {};
+}
 
 //----------------------------------------------------------------------------
+struct IndexBufferDecoder
+{
 template<typename T>
-std::vector<char> DecodeIndexBuffer(const std::unique_ptr<draco::Mesh>& mesh)
+std::vector<char> decode(const std::unique_ptr<draco::Mesh>& mesh)
 {
   std::vector<char> outBuffer(mesh->num_faces() * 3 * sizeof(T));
 
@@ -28,6 +54,7 @@ std::vector<char> DecodeIndexBuffer(const std::unique_ptr<draco::Mesh>& mesh)
 
   return outBuffer;
 }
+};
 
 //----------------------------------------------------------------------------
 std::vector<char> DecodeIndexBuffer(
@@ -36,28 +63,14 @@ std::vector<char> DecodeIndexBuffer(
   // indexing using float does not make sense
   assert(compType != vtkGLTFDocumentLoader::ComponentType::FLOAT);
 
-  switch (compType)
-  {
-    case vtkGLTFDocumentLoader::ComponentType::BYTE:
-      return DecodeIndexBuffer<int8_t>(mesh);
-    case vtkGLTFDocumentLoader::ComponentType::UNSIGNED_BYTE:
-      return DecodeIndexBuffer<uint16_t>(mesh);
-    case vtkGLTFDocumentLoader::ComponentType::SHORT:
-      return DecodeIndexBuffer<int16_t>(mesh);
-    case vtkGLTFDocumentLoader::ComponentType::UNSIGNED_SHORT:
-      return DecodeIndexBuffer<uint16_t>(mesh);
-    case vtkGLTFDocumentLoader::ComponentType::UNSIGNED_INT:
-      return DecodeIndexBuffer<uint32_t>(mesh);
-    default:
-      break;
-  }
-
-  return {};
+  return ComponentDispatcher<IndexBufferDecoder>(compType, mesh);
 }
 
 //----------------------------------------------------------------------------
+struct VertexBufferDecoder
+{
 template<typename T>
-std::vector<char> DecodeVertexBuffer(
+std::vector<char> decode(
   const std::unique_ptr<draco::Mesh>& mesh, const draco::PointAttribute* attribute)
 {
   std::vector<char> outBuffer(mesh->num_points() * attribute->num_components() * sizeof(T));
@@ -76,18 +89,13 @@ std::vector<char> DecodeVertexBuffer(
 
   return outBuffer;
 }
+};
 
 //----------------------------------------------------------------------------
 std::vector<char> DecodeVertexBuffer(vtkGLTFDocumentLoader::ComponentType compType,
   const std::unique_ptr<draco::Mesh>& mesh, int attIndex)
 {
-  (void)compType;
-
-  const draco::PointAttribute* attribute = mesh->GetAttributeByUniqueId(attIndex);
-
-  assert(compType == vtkGLTFDocumentLoader::ComponentType::FLOAT);
-
-  return DecodeVertexBuffer<float>(mesh, attribute);
+  return ComponentDispatcher<VertexBufferDecoder>(compType, mesh, mesh->GetAttributeByUniqueId(attIndex));
 }
 }
 
