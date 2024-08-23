@@ -60,16 +60,20 @@ public:
   option_variant_t get(const std::string& name) const;
 #endif
 
-  ///@{
   /**
-   * Set/Get an option as a string based on its name
-   * The setter use specific parsing, see the related doc
+   * Set an option as a string based on its name
+   * Use dedicated parsing code, see the related doc
    * TODO add parsing documentation
    * Throw an options::inexistent_exception if option does not exist.
+   * Throw an options::parsing_exception if parsing failed.
    */
   options& setAsString(const std::string& name, const std::string& str);
+
+  /**
+   * Get an option as a string based on its name
+   * Throw an options::inexistent_exception if option does not exist.
+   */
   std::string getAsString(const std::string& name) const;
-  ///@}
 
   /**
    * A boolean option specific method to toggle it.
@@ -101,6 +105,14 @@ public:
    * Get the closest option name and its Levenshtein distance.
    */
   std::pair<std::string, unsigned int> getClosestOption(const std::string& option) const;
+
+  /**
+   * Templated parsing method used internally to parse strings.
+   * Implemented only for: bool, int, double, ratio_t, string and double vector.
+   * Throw an options::parsing_exception if parsing failed.
+   */
+  template<typename T>
+  static T parse(const std::string& str);
 
   /**
    * An exception that can be thrown by the options
