@@ -41,7 +41,7 @@ using angle_deg_t = double;
 /**
  * Describe a ratio.
  */
-class ratio_t
+class F3D_EXPORT ratio_t
 {
 public:
   ratio_t() = default;
