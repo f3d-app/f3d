@@ -34,8 +34,8 @@ if("${OpenCASCADE_VERSION}" VERSION_LESS "7.8.0")
   option(F3D_PLUGIN_OCCT_COLORING_SUPPORT "Enable coloring support in occt plugin" ON)
   mark_as_advanced(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
   if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
-    if (NOT (TARGET "TKXDESTEP") OR NOT (TARGET "TKXDEIGES"))
-      message(FATAL_ERROR "occt plugin: TKXDESTEP and TKXDEIGES OCCT modules are not found. Turn off F3D_PLUGIN_OCCT_COLORING_SUPPORT or enable them in your OpenCascade build.")
+    if (NOT (TARGET "TKXDESTEP") OR NOT (TARGET "TKXDEIGES") OR NOT (TARGET "TKBinXCAF"))
+      message(FATAL_ERROR "occt plugin: TKXDESTEP, TKXDEIGES, TKBinXCAF OCCT modules are not found. Turn off F3D_PLUGIN_OCCT_COLORING_SUPPORT or enable them in your OpenCascade build.")
     endif()
   endif()
 else()
@@ -70,6 +70,17 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Open CASCADE BRep"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/brep.inl"
 )
+
+if (F3D_PLUGIN_OCCT_COLORING_SUPPORT)
+  f3d_plugin_declare_reader(
+    NAME XBF
+    EXTENSIONS xbf
+    MIMETYPES application/vnd.xbf
+    VTK_READER vtkF3DOCCTReader
+    FORMAT_DESCRIPTION "Open CASCADE XBF"
+    CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/xbf.inl"
+  )
+endif()
 
 set(rpaths "")
 get_target_property(target_type TKernel TYPE)

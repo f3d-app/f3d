@@ -25,6 +25,7 @@ Here is the list of supported file formats:
 * **.step/.stp** : CAD STEP exchange ISO format
 * **.iges/.igs** : CAD Initial Graphics Exchange Specification format
 * **.brep** : Open CASCADE BRep format
+* **.xbf** : Open CASCADE XBF format
 * **.abc** : Alembic format
 * **.vdb** : VDB format (experimental)
 * **.obj** : Wavefront OBJ file format (full scene and default scene)
