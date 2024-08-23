@@ -107,13 +107,13 @@ std::pair<std::string, unsigned int> options::getClosestOption(const std::string
 
 //----------------------------------------------------------------------------
 template<typename T>
-F3D_EXPORT T options::parse(const std::string& str)
+T options::parse(const std::string& str)
 {
   return options_tools::parse<T>(str);
 }
 
 //----------------------------------------------------------------------------
-#define F3D_DECL_TYPE(TYPE) template TYPE options::parse<TYPE>(const std::string& str)
+#define F3D_DECL_TYPE(TYPE) template F3D_EXPORT TYPE options::parse<TYPE>(const std::string& str)
 F3D_DECL_TYPE(bool);
 F3D_DECL_TYPE(int);
 F3D_DECL_TYPE(double);
