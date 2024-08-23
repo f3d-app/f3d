@@ -36,24 +36,24 @@ std::vector<char> ComponentDispatcher(vtkGLTFDocumentLoader::ComponentType compT
 //----------------------------------------------------------------------------
 struct IndexBufferDecoder
 {
-template<typename T>
-std::vector<char> decode(const std::unique_ptr<draco::Mesh>& mesh)
-{
-  std::vector<char> outBuffer(mesh->num_faces() * 3 * sizeof(T));
-
-  for (draco::FaceIndex f(0); f < mesh->num_faces(); ++f)
+  template<typename T>
+  std::vector<char> decode(const std::unique_ptr<draco::Mesh>& mesh)
   {
-    const draco::Mesh::Face& face = mesh->face(f);
+    std::vector<char> outBuffer(mesh->num_faces() * 3 * sizeof(T));
 
-    T indices[3] = { static_cast<T>(face[0].value()), static_cast<T>(face[1].value()),
-      static_cast<T>(face[2].value()) };
+    for (draco::FaceIndex f(0); f < mesh->num_faces(); ++f)
+    {
+      const draco::Mesh::Face& face = mesh->face(f);
 
-    std::copy(
-      indices, indices + 3, reinterpret_cast<T*>(outBuffer.data() + f.value() * sizeof(indices)));
+      T indices[3] = { static_cast<T>(face[0].value()), static_cast<T>(face[1].value()),
+        static_cast<T>(face[2].value()) };
+
+      std::copy(
+        indices, indices + 3, reinterpret_cast<T*>(outBuffer.data() + f.value() * sizeof(indices)));
+    }
+
+    return outBuffer;
   }
-
-  return outBuffer;
-}
 };
 
 //----------------------------------------------------------------------------
@@ -69,33 +69,34 @@ std::vector<char> DecodeIndexBuffer(
 //----------------------------------------------------------------------------
 struct VertexBufferDecoder
 {
-template<typename T>
-std::vector<char> decode(
-  const std::unique_ptr<draco::Mesh>& mesh, const draco::PointAttribute* attribute)
-{
-  std::vector<char> outBuffer(mesh->num_points() * attribute->num_components() * sizeof(T));
-  std::vector<T> values(attribute->num_components());
-
-  size_t byteOffset = 0;
-  for (draco::PointIndex i(0); i < mesh->num_points(); ++i)
+  template<typename T>
+  std::vector<char> decode(
+    const std::unique_ptr<draco::Mesh>& mesh, const draco::PointAttribute* attribute)
   {
-    attribute->ConvertValue<T>(
-      attribute->mapped_index(i), attribute->num_components(), values.data());
+    std::vector<char> outBuffer(mesh->num_points() * attribute->num_components() * sizeof(T));
+    std::vector<T> values(attribute->num_components());
 
-    std::copy(values.begin(), values.end(), reinterpret_cast<T*>(outBuffer.data() + byteOffset));
+    size_t byteOffset = 0;
+    for (draco::PointIndex i(0); i < mesh->num_points(); ++i)
+    {
+      attribute->ConvertValue<T>(
+        attribute->mapped_index(i), attribute->num_components(), values.data());
 
-    byteOffset += sizeof(T) * attribute->num_components();
+      std::copy(values.begin(), values.end(), reinterpret_cast<T*>(outBuffer.data() + byteOffset));
+
+      byteOffset += sizeof(T) * attribute->num_components();
+    }
+
+    return outBuffer;
   }
-
-  return outBuffer;
-}
 };
 
 //----------------------------------------------------------------------------
 std::vector<char> DecodeVertexBuffer(vtkGLTFDocumentLoader::ComponentType compType,
   const std::unique_ptr<draco::Mesh>& mesh, int attIndex)
 {
-  return ComponentDispatcher<VertexBufferDecoder>(compType, mesh, mesh->GetAttributeByUniqueId(attIndex));
+  return ComponentDispatcher<VertexBufferDecoder>(
+    compType, mesh, mesh->GetAttributeByUniqueId(attIndex));
 }
 }
 
