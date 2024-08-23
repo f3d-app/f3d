@@ -2,7 +2,7 @@
 
 This guide will help you get started using F3D.
 
-As an overview, you'll learn how to run F3D and open supported files. You'll then learn how to configure basic scene constructions, animations and plugins.
+As an overview, you'll learn how to run F3D and open files, configure basic scene constructions, interact with them, and play animations.
 
 ## Prerequisites
 
@@ -10,7 +10,7 @@ To use F3D, you'll need to install F3D. See the [Installation](INSTALLATION.md) 
 
 ## Running F3D
 
-Once F3D has been installed, you should be able to open a [supported file](#supported-file-formats) in any of the following ways:
+Once F3D has been installed, you should be able to open a file in any of the following ways:
 
 * Open a file directly from your file manager.
 * Open F3D, then drag and drop a file into the application window.
@@ -38,22 +38,7 @@ f3d --help
 man f3d # Linux only
 ```
 
-## Supported file formats
-
-F3D supports the following file formats:
-
-* Legacy VTK (`.vtk`)
-* VTK XML (`.vtp`, `.vtu`, `.vtr`, `.vti`, `.vts`, `.vtm`)
-* Polygon File Format (`.ply`)
-* OBJ (`.obj`)
-* STL (`.stl`)
-* STEP (`.step`, `.stp`)
-* IGES (`.iges`, `.igs`)
-* Filmbox (`.fbx`): animations supported
-* Autodesk 3D Studio (`.3ds`): full scene by default
-* VDB (`.vdb`): experimental as of version 2.5.0
-
-See the [supported file formats](SUPPORTED_FILE_FORMATS.md) page for a full list of compatible file types.
+> Note: See the [supported file formats](SUPPORTED_FORMATS.md) page for the full list of file types that F3D can open.
 
 ## Constructing scenes
 
@@ -97,54 +82,11 @@ A few things to note about F3D's default animation settings:
 
 For more information, see the [Animations](ANIMATIONS.md) page.
 
-## Plugins
-
-F3D officially supports [plugins](#supported-plugins) for certain file formats. If you installed F3D using the binary release, there's no need to manually load these plugins when opening your file. F3D will load them automatically.
-
-However, if you installed F3D using a package manager, it's possible that the packager chose to bundle the plugins into different packages or to list plugin dependencies as optional in order to reduce the number of dependencies of the main package.
-
-In order to open a file that requires a plugin, make sure you've installed all necessary dependencies. You can then specify the `--load-plugins=<path or name>` [option](OPTIONS.md) in the command line to load your plugin. 
-
-Alternatively, you can add your plugin directly in the [configuration file](CONFIGURATION_FILE.md) if it isn't there already. You can specify one or multiple plugins in a single comma-separated list, like in the example below:
-
-```
-{
-    ".*(file_extension)": {
-        "load-plugins": "plugin_name"
-    }
-}
-```
-
-### Supported plugins
-
-F3D supports the following plugins and their file formats:
-
-- **alembic**: `.abc`
-- **assimp**: `.fbx`, `.dae`, `.off`, `.dxf`, `.x`, `.3mf`
-- **draco**: `.drc`
-- **exodus**: `.ex2`
-- **occt**: `.step/.stp`, `.iges/.igs`
-- **usd**: `.usd`, `.usda`, `.usdc`, `.usdz`
-- **vdb**: `.vdb` (experimental)
-
-> Note: If you downloaded the binaries from the release page, it's not necessary to specify manually the plugins above. F3D loads them automatically.
-
-Here is how the plugins are searched (in preceding order):
-
-1. Search the static plugins.
-2. Consider the option given is a full path.
-3. Search in the paths specified in `F3D_PLUGINS_PATH` environment variable.
-4. Search in a directory relative to the F3D application: `../lib`.
-5. Rely on OS specific paths (e.g. `LD_LIBRARY_PATH` on Linux or `DYLD_LIBRARY_PATH` on macOS).
-
-You can also try plugins maintained by the community. If you have created a plugin and would like it to be listed here, please submit a pull request.
-
-- **Abaqus**: ODB support by @YangShen398 ([repository](https://github.com/YangShen398/F3D-ODB-Reader-Plugin))
-
 ## Further Reading
 
 * [A list of all F3D command-line options.](OPTIONS.md)
 * [How to interact with scenes in F3D.](INTERACTIONS.MD)
 * [How to play animations in F3D.](ANIMATIONS.md)
 * [How to specify colormaps in F3D.](COLOR_MAPS.md)
+* [How to configure plugins in F3D.](PLUGINS.md)
 * [Limitations and how to troubleshoot F3D.](LIMITATIONS_AND_TROUBLESHOOTING.md)
