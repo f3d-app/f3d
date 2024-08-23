@@ -12,4 +12,8 @@
     <comment>Open CASCADE BRep</comment>
     <glob pattern="*.brep"/>
   </mime-type>
+  <mime-type type="application/vnd.xbf">
+    <comment>Open CASCADE XBF</comment>
+    <glob pattern="*.xbf"/>
+  </mime-type>
 </mime-info>
