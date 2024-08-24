@@ -79,7 +79,7 @@ int TestTestHelper(int argc, char* argv[])
     metatest("fail with 1 == 1.0001", test.result() == EXIT_FAILURE);
   }
 
-  const auto kindaEq = [](double a, double b) { return ::abs(b - a) < 1e-5; };
+  const auto kindaEq = [](double a, double b) { return std::abs(b - a) < 1e-3; };
   {
     InnerTest test;
     test("pass", 1, 1, kindaEq);
