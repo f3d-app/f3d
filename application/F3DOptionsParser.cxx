@@ -580,13 +580,16 @@ void ConfigurationOptions::PrintVersion()
   f3d::log::info("Build date: " + libInfo.BuildDate + ".");
   f3d::log::info("Build system: " + libInfo.BuildSystem + ".");
   f3d::log::info("Compiler: " + libInfo.Compiler + ".");
-  f3d::log::info("External rendering module: " + libInfo.ExternalRenderingModule + ".");
-  f3d::log::info("Raytracing module: " + libInfo.RaytracingModule + ".");
+  for (const auto& [name, enabled] : libInfo.Modules)
+  {
+    f3d::log::info("Module " + name + ": " + (enabled ? "ON." : "OFF."));
+  }
   f3d::log::info("VTK version: " + libInfo.VTKVersion + ".");
-  f3d::log::info(libInfo.PreviousCopyright + ".");
-  f3d::log::info(libInfo.Copyright + ".");
+  for (const auto& cr : libInfo.Copyrights)
+  {
+    f3d::log::info("Copyright (C) " + cr + ".");
+  }
   f3d::log::info("License " + libInfo.License + ".");
-  f3d::log::info("By " + libInfo.Authors + ".");
   f3d::log::setUseColoring(true);
   f3d::log::waitForUser();
 }
