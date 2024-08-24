@@ -11,7 +11,7 @@ public:
   /** test a boolean condition */
   void operator()(const std::string& label, bool condition)
   {
-    this->log(condition, label);
+    this->record(condition, label);
   }
 
   /** test the execution of a function */
@@ -32,7 +32,7 @@ public:
   void operator()(const std::string& label, const T1& actual, const T2& expected)
   {
     const bool success = actual == expected;
-    this->log(success, label, this->comparisonMessage(actual, expected, success ? "==" : "!="));
+    this->record(success, label, this->comparisonMessage(actual, expected, success ? "==" : "!="));
   }
 
   /** test the equality of two values with a comparator */
@@ -40,7 +40,7 @@ public:
   void operator()(const std::string& label, const T1& actual, const T2& expected, F comparator)
   {
     const bool success = comparator(actual, expected);
-    this->log(success, label, this->comparisonMessage(actual, expected, success ? "~=" : "!="));
+    this->record(success, label, this->comparisonMessage(actual, expected, success ? "~=" : "!="));
   }
 
   int result()
@@ -68,41 +68,46 @@ protected:
       function();
       if (expectException)
       {
-        this->log(false, label, "did not throw");
+        this->record(false, label, "did not throw");
       }
       else
       {
-        this->log(true, label);
+        this->record(true, label);
       }
     }
     catch (const E& e)
     {
-      this->log(true, label, e.what());
+      this->record(true, label, e.what());
     }
     catch (const char* msg)
     {
-      this->log(false, label, msg);
+      this->record(false, label, msg);
     }
     catch (const std::string& msg)
     {
-      this->log(false, label, msg);
+      this->record(false, label, msg);
     }
     catch (const std::exception& e)
     {
-      this->log(false, label, std::string("unexpected execption (") + e.what() + ")");
+      this->record(false, label, std::string("unexpected exception (") + e.what() + ")");
     }
     catch (...)
     {
-      this->log(false, label, "unexpected execption");
+      this->record(false, label, "unexpected exception");
     }
   }
 
-  void log(const bool success, const std::string& label, const std::string& message = "")
+  void record(const bool success, const std::string& label, const std::string& message = "")
+  {
+    (success ? passCount : failCount)++;
+    this->log(success, label, message);
+  }
+
+  virtual void log(const bool success, const std::string& label, const std::string& message)
   {
     const std::string line = message.empty() ? label : (label + ": " + message);
     const std::string icon = success ? "\u2714" : "\u2718";
     (success ? std::cout : std::cerr) << icon << " " << line << std::endl;
-    (success ? passCount : failCount)++;
   }
 
   template<typename T1, typename T2>
