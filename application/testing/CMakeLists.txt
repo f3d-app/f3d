@@ -469,7 +469,7 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingPointCloud DATA pointsCloud.vtp ARGS -rd --samples=4 --point-size=20 THRESHOLD 0.1) # Threshold needed because of difference in rendering in VTK 9.3
   f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS -rd --samples=4)
   f3d_test(NAME TestRaytracingNoDenoise DATA suzanne.ply ARGS -r --samples=20)
-  f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Raytracing module: ON")
+  f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Module Raytracing: ON")
   f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --samples=4 INTERACTION) #RD
   f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsbd --samples=4 THRESHOLD 0.06) # Threshold needed because of difference in rendering in VTK 9.3 on macOS
 
@@ -485,7 +485,11 @@ else(F3D_MODULE_RAYTRACING)
 endif()
 
 if(F3D_MODULE_EXTERNAL_RENDERING)
-  f3d_test(NAME TestVersionExternal ARGS --version REGEXP "External rendering module: ON")
+  f3d_test(NAME TestVersionExternal ARGS --version REGEXP "Module ExternalRendering: ON")
+endif()
+
+if(F3D_MODULE_EXR)
+  f3d_test(NAME TestVersionEXR ARGS --version REGEXP "Module OpenEXR: ON")
 endif()
 
 if(F3D_PLUGIN_BUILD_ALEMBIC)

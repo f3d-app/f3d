@@ -290,28 +290,23 @@ engine::libInformation engine::getLibInfo()
   libInfo.BuildSystem = detail::LibBuildSystem;
   libInfo.Compiler = detail::LibCompiler;
 
-  std::string tmp;
-
 #if F3D_MODULE_RAYTRACING
-  tmp = "ON";
+  libInfo.Modules["Raytracing"] = true;
 #else
-  tmp = "OFF";
+  libInfo.Modules["Raytracing"] = false;
 #endif
-  libInfo.RaytracingModule = tmp;
 
 #if F3D_MODULE_EXTERNAL_RENDERING
-  tmp = "ON";
+  libInfo.Modules["ExternalRendering"] = true;
 #else
-  tmp = "OFF";
+  libInfo.Modules["ExternalRendering"] = false;
 #endif
-  libInfo.ExternalRenderingModule = tmp;
 
 #if F3D_MODULE_EXR
-  tmp = "ON";
+  libInfo.Modules["OpenEXR"] = true;
 #else
-  tmp = "OFF";
+  libInfo.Modules["OpenEXR"] = false;
 #endif
-  libInfo.OpenEXRModule = tmp;
 
   std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
   if (!vtkVersion.empty())
@@ -328,10 +323,9 @@ engine::libInformation engine::getLibInfo()
     libInfo.VTKVersion = vtkVersion::GetVTKVersion();
   }
 
-  libInfo.PreviousCopyright = "Copyright (C) 2019-2021 Kitware SAS";
-  libInfo.Copyright = "Copyright (C) 2021-2024 Michael Migliore, Mathieu Westphal";
+  libInfo.Copyrights.emplace_back("2019-2021 Kitware SAS");
+  libInfo.Copyrights.emplace_back("2021-2024 Michael Migliore, Mathieu Westphal");
   libInfo.License = "BSD-3-Clause";
-  libInfo.Authors = "Michael Migliore, Mathieu Westphal and Joachim Pouderoux";
 
   return libInfo;
 }
