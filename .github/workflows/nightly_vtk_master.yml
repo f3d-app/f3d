@@ -265,7 +265,6 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-latest
-    container: dockcross/web-wasm:20240529-0dade71
 
     steps:
 
@@ -276,7 +275,6 @@ jobs:
         fetch-depth: 0
         lfs: 'false'
 
-    - name: Web Assembly CI
-      uses: ./source/.github/actions/webassembly-ci
-      with:
-        vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+    - name: Build
+      working-directory: ${{github.workspace}}/source/webassembly
+      run: npm run build:rel
