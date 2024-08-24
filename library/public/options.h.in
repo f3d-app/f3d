@@ -38,7 +38,7 @@ public:
   options();
   ~options() = default;
   options(const options& opt) = default;
-  options& operator=(const options& opt) noexcept = default;
+  options& operator=(const options& opt) = default;
   options(options&& other) noexcept = default;
   options& operator=(options&& other) noexcept = default;
   ///@}
