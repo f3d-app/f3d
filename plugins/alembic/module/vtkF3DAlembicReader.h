@@ -17,7 +17,6 @@
 #include <vtkNew.h>
 #include <vtkPolyDataAlgorithm.h>
 #include <vtkVersion.h>
-
 #include <memory>
 
 class vtkF3DAlembicReader : public vtkPolyDataAlgorithm

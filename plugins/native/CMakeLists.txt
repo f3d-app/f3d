@@ -189,6 +189,15 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "3D Gaussian splats"
 )
 
+f3d_plugin_declare_reader(
+  NAME QuakeMDL
+  EXTENSIONS mdl
+  MIMETYPES application/vnd.mdl
+  VTK_IMPORTER vtkQuakeMDLImporter
+  FORMAT_DESCRIPTION "Quake 1 MDL model"
+)
+
+
 f3d_plugin_build(
   NAME native
   VERSION 1.0
