@@ -100,12 +100,14 @@ public:
         offset += 4 + nb * 4 + nb * (skinWidth) * (skinHeight);
       }
     }
-    vtkNew<vtkPNGReader> reader;
-    reader->SetFileName("C:\\\\Users\\Youva\\Downloads\\quake\\Untitled.png");
-    reader->Update();
 
-    vtkNew<vtkPNGWriter> writer;
-    writer->SetFileName("C:\\\\Users\\Youva\\Downloads\\skin2.png");
+    // Used while testing to load texture from a PNG file
+    // vtkNew<vtkPNGReader> reader;
+    // reader->SetFileName("C:\\\\Users\\Youva\\Downloads\\quake\\Untitled.png");
+    // reader->Update();
+    // Used while testing to check the texture is written correctly
+    // vtkNew<vtkPNGWriter> writer;
+    // writer->SetFileName("C:\\\\Users\\Youva\\Downloads\\skin2.png");
     vtkNew<vtkImageData> img;
     img->SetDimensions(skinWidth, skinHeight, 1);
     img->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
@@ -121,10 +123,11 @@ public:
         ptr[2] = DefaultColorMap[index][2]; // B
       }
     }
-
-    writer->SetInputData(img);
-    writer->Write();
+    // Used to write to file
+    // writer->SetInputData(img);
+    // writer->Write();
     texture->SetInputData(img);
+    // Used to set texture from image file
     //    texture->SetInputConnection(reader->GetOutputPort());
 
     return texture;
@@ -463,7 +466,7 @@ public:
   void ImportActors(vtkRenderer* renderer)
   {
     vtkNew<vtkActor> actor;
-    vtkNew<vtkOpenGLPolyDataMapper> mapper;
+    vtkNew<vtkPolyDataMapper> mapper;
     mapper->SetInputData(Mesh[0]);
         //Mesh);
     actor->SetMapper(mapper);
