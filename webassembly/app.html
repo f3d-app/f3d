@@ -212,8 +212,6 @@
             openFile(document.getElementById('file-name').innerHTML);
           });
 
-        // load the file located in the virtual filesystem
-        openFile('f3d.vtp');
 
         // setup the window size based on the canvas size
         const main = document.getElementById('main');
@@ -224,7 +222,7 @@
         Module.engineInstance.getWindow().render();
         Module.engineInstance.getInteractor().start();
 
-        // Parse url
+        // Parse search-query mesh url-param or load default mesh file
         const params = new URLSearchParams(window.location.search);
         const mesh_url = params.get("mesh");
         if (mesh_url) {
@@ -240,6 +238,9 @@
             Module.FS.writeFile('mesh_urlparam', new Uint8Array(buffer));
             openFile('mesh_urlparam');
           })
+        } else {
+          // load the file located in the virtual filesystem
+          openFile('f3d.vtp');
         }
       })
       .catch(error => console.error("Internal exception: " + error));
