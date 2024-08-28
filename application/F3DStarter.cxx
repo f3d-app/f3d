@@ -660,7 +660,7 @@ int F3DStarter::Start(int argc, char** argv)
         f3d::log::info("Image comparison success with an error difference of: ", error);
       }
 
-      if (this->Internals->FilesList.size() > 1)
+      if (this->Internals->FilesList.size() > 1 && !this->Internals->AppOptions.GroupGeometries)
       {
         f3d::log::warn("Image comparison was performed using a single 3D file, other provided "
                        "3D files were ignored.");
@@ -692,7 +692,7 @@ int F3DStarter::Start(int argc, char** argv)
         f3d::log::debug("Output image saved to ", path);
       }
 
-      if (this->Internals->FilesList.size() > 1)
+      if (this->Internals->FilesList.size() > 1 && !this->Internals->AppOptions.GroupGeometries)
       {
         f3d::log::warn("An output image was saved using a single 3D file, other provided 3D "
                        "files were ignored.");
