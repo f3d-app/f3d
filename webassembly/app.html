@@ -238,24 +238,34 @@
             let filename 
             if (extension) {
               filename = `mesh_urlparam.${extension}`
+              console.log('filename constructed from user-provided extension', filename)
             } else {
               // If extension is not provided by user, try to get it auto from content-disposition header of url extension 
               const contentDisposition = response.headers.get('content-disposition')
+              console.log('contentDisposition', contentDisposition)
               if (contentDisposition) {
                 filename = contentDisposition.split('filename=')[1].split(';')[0];
+                console.log('filename constructed from contentDisposition header', filename)
               } else {
                 try {
+                  filename = mesh_url.split('/').pop()
+                  console.log('filename constructed from mesh_url filename+extension', filename)
                   const url_extension = '.' + mesh_url.split('.').at(-1) 
-                  filename = `mesh_urlparam.${url_extension}`
+                  if (url_extension.length > 10) {
+                    throw new Error(`Bad extension parsed from filename ${filename}`)
+                  }
+                  // filename = `mesh_urlparam.${url_extension}`
                 } catch {
                   throw new Error(`Could not infer file extension from content-disposition or url extension. Please enforce it via the extension urlparam`);
                 }
               }
             }
             // Convert buffer to Uint8Array and openFile
-            const buffer = response.arrayBuffer();
-            Module.FS.writeFile(filename, new Uint8Array(buffer));
-            openFile(filename);
+            response.arrayBuffer().then((buffer) => {
+              const uint8array = new Uint8Array(buffer);
+              Module.FS.writeFile(filename, uint8array);
+              openFile(filename);
+            });
           })
         } else {
           // load the file located in the virtual filesystem
