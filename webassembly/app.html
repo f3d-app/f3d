@@ -126,10 +126,12 @@
           const loader = Module.engineInstance.getLoader();
           if (loader.hasSceneReader(filePath))
           {
+            console.log('loader.hasSceneReader')
             loader.loadScene(filePath);
           }
           else if (loader.hasGeometryReader(filePath))
           {
+            console.log('loader.hasGeometryReader')
             loader.loadGeometry(filePath);
           }
           else
@@ -235,10 +237,20 @@
             // Build filename given extension urlparam or response header content-disposition
             let filename 
             if (extension) {
-              filename = 'mesh_urlparam' + extension
+              filename = `mesh_urlparam.${extension}`
             } else {
+              // If extension is not provided by user, try to get it auto from content-disposition header of url extension 
               const contentDisposition = response.headers.get('content-disposition')
-              filename = contentDisposition.split('filename=')[1].split(';')[0];
+              if (contentDisposition) {
+                filename = contentDisposition.split('filename=')[1].split(';')[0];
+              } else {
+                try {
+                  const url_extension = '.' + mesh_url.split('.').at(-1) 
+                  filename = `mesh_urlparam.${url_extension}`
+                } catch {
+                  throw new Error(`Could not infer file extension from content-disposition or url extension. Please enforce it via the extension urlparam`);
+                }
+              }
             }
             // Convert buffer to Uint8Array and openFile
             const buffer = response.arrayBuffer();
