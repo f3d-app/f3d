@@ -225,18 +225,25 @@
         // Parse search-query mesh url-param or load default mesh file
         const params = new URLSearchParams(window.location.search);
         const mesh_url = params.get("mesh");
+        const extension = params.get("extension");
         if (mesh_url) {
           fetch(mesh_url)
           .then((response) => {
             if (!response.ok) {
               throw new Error(`HTTP error, status = ${response.status}`);
             }
-            return response.arrayBuffer();
-          })
-          .then((buffer) => {
+            // Build filename given extension urlparam or response header content-disposition
+            let filename 
+            if (extension) {
+              filename = 'mesh_urlparam' + extension
+            } else {
+              const contentDisposition = response.headers.get('content-disposition')
+              filename = contentDisposition.split('filename=')[1].split(';')[0];
+            }
             // Convert buffer to Uint8Array and openFile
-            Module.FS.writeFile('mesh_urlparam', new Uint8Array(buffer));
-            openFile('mesh_urlparam');
+            const buffer = response.arrayBuffer();
+            Module.FS.writeFile(filename, new Uint8Array(buffer));
+            openFile(filename);
           })
         } else {
           // load the file located in the virtual filesystem
