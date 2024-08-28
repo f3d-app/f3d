@@ -426,6 +426,11 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetUseVolume(opt.model.volume.enable);
     renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
   }
+  else
+  {
+    // make sure the scalar bar is hidden without coloring
+    renderer->ShowScalarBar(false);
+  }
 
   renderer->UpdateActors();
 }
