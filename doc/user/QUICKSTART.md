@@ -38,7 +38,7 @@ f3d --help
 man f3d # Linux only
 ```
 
-> Note: See the [supported file formats](SUPPORTED_FORMATS.md) page for the full list of file types that F3D can open.
+See the [supported file formats](SUPPORTED_FORMATS.md) page for the full list of file types that F3D can open.
 
 ## Constructing scenes
 
@@ -74,11 +74,7 @@ F3D can play [animations](ANIMATIONS.md) for any [supported files](SUPPORTED_FOR
 
 With your file loaded into F3D, press the <kbd>W</kbd> hotkey to cycle through available animations. Then, press <kbd>Space</kbd> to play your selected animation. 
 
-Alternatively, you can use the command line to play animations. Use the `--animation-index` [option](OPTIONS.md) to specify which animation you want to play. To play all animations at once, use `--animation-index=-1` (.gltf/.glb only). 
-
-A few things to note about F3D's default animation settings:
-* F3D plays animations at a default speed factor of 1. Change the `--animation-speed-factor` [option](OPTIONS.md) to adjust how fast or slow your animation plays.
-* Additionally, F3D animates at a default frame rate of 60 frames per second. Change the `--animation-frame-rate` [option](OPTIONS.md) to adjust your desired frame rate.
+Alternatively, you can use the command line to play animations. Use the `--animation-index` [option](OPTIONS.md) to specify which animation you want to play. To play all animations at once, use `--animation-index=-1` (`.gltf`/`.glb` only). 
 
 For more information, see the [Animations](ANIMATIONS.md) page.
 
