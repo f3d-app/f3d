@@ -223,43 +223,45 @@
         Module.engineInstance.getInteractor().start();
 
         // Parse mesh from url-param search query hash
+        function filename_for_model_url(model_url, extension_parsed, contentDisposition) {
+          // Build filename given extension urlparam or response header content-disposition
+          let filename;
+          if (extension_parsed) {
+            filename = `model_urlparam.${extension_parsed}`;
+          } else {
+            // If extension is not provided by user, try to get it auto from content-disposition header of url extension 
+            if (contentDisposition) {
+              filename = contentDisposition.split('filename=')[1].split(';')[0];
+            } else {
+              try {
+                filename = model_url.split('/').pop();
+                const url_extension = '.' + model_url.split('.').at(-1) ;
+              } catch {
+                throw new Error(`Could not infer file extension from content-disposition or url extension. Please enforce it via the extension urlparam`);
+              }
+            }
+          }
+          return filename;
+        }
         function load_from_url(){
           // Parse search-query mesh url-param or load default mesh file
           // const params = new URLSearchParams(window.location.search);
           // Replace first hash with question mark to have real search query parsing and avoid leading # in first parsed urlparam
           const params = new URLSearchParams(window.location.hash.replace(/^#/, '?'));
-          
-          const mesh_url_passed = params.get("mesh");
+          const model_url_passed = params.get("mesh");
           const extension_parsed = params.get("extension");
-          if (mesh_url_passed) {
-            const mesh_url = decodeURI(mesh_url_passed);
-            fetch(mesh_url)
+          if (model_url_passed) {
+            const model_url = decodeURI(model_url_passed);
+            fetch(model_url)
             .then((response) => {
               if (!response.ok) {
                 throw new Error(`HTTP error, status = ${response.status}`);
               }
-              // Build filename given extension urlparam or response header content-disposition
-              let filename;
-              if (extension_parsed) {
-                filename = `mesh_urlparam.${extension_parsed}`;
-              } else {
-                // If extension is not provided by user, try to get it auto from content-disposition header of url extension 
-                const contentDisposition = response.headers.get('content-disposition');
-                if (contentDisposition) {
-                  filename = contentDisposition.split('filename=')[1].split(';')[0];
-                } else {
-                  try {
-                    filename = mesh_url.split('/').pop();
-                    const url_extension = '.' + mesh_url.split('.').at(-1) ;
-                  } catch {
-                    throw new Error(`Could not infer file extension from content-disposition or url extension. Please enforce it via the extension urlparam`);
-                  }
-                }
-              }
+              const contentDisposition = response.headers.get('content-disposition');
+              const filename = filename_for_model_url(model_url, extension_parsed, contentDisposition);
               // Convert buffer to Uint8Array and openFile
               response.arrayBuffer().then((buffer) => {
-                const uint8array = new Uint8Array(buffer);
-                Module.FS.writeFile(filename, uint8array);
+                Module.FS.writeFile(filename, new Uint8Array(buffer));
                 openFile(filename);
               });
             })
@@ -267,7 +269,6 @@
             // load the file located in the virtual filesystem
             openFile('f3d.vtp');
           }
-          
         }
         addEventListener("hashchange", (event) => {load_from_url()}); 
         load_from_url(); 
