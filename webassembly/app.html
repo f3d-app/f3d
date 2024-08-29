@@ -232,11 +232,7 @@
             if (contentDisposition) {
               return contentDisposition.split('filename=')[1].split(';')[0];
             } else {
-              try {
-                return model_url.split('/').pop();
-              } catch {
-                throw new Error(`Could not infer file extension from content-disposition or url extension. Please enforce it via the extension urlparam`);
-              }
+              return model_url.split('/').pop();
             }
           }
           return filename;
