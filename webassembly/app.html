@@ -229,33 +229,25 @@
         const mesh_url_passed = params.get("mesh");
         const extension_parsed = params.get("extension");
         if (mesh_url_passed) {
-          const mesh_url = decodeURI(mesh_url_passed)
+          const mesh_url = decodeURI(mesh_url_passed);
           fetch(mesh_url)
           .then((response) => {
             if (!response.ok) {
               throw new Error(`HTTP error, status = ${response.status}`);
             }
             // Build filename given extension urlparam or response header content-disposition
-            let filename 
+            let filename;
             if (extension_parsed) {
-              filename = `mesh_urlparam.${extension_parsed}`
-              console.log('filename constructed from user-provided extension', filename)
+              filename = `mesh_urlparam.${extension_parsed}`;
             } else {
               // If extension is not provided by user, try to get it auto from content-disposition header of url extension 
-              const contentDisposition = response.headers.get('content-disposition')
-              console.log('contentDisposition', contentDisposition)
+              const contentDisposition = response.headers.get('content-disposition');
               if (contentDisposition) {
                 filename = contentDisposition.split('filename=')[1].split(';')[0];
-                console.log('filename constructed from contentDisposition header', filename)
               } else {
                 try {
-                  filename = mesh_url.split('/').pop()
-                  console.log('filename constructed from mesh_url filename+extension', filename)
-                  const url_extension = '.' + mesh_url.split('.').at(-1) 
-                  if (url_extension.length > 10) {
-                    throw new Error(`Bad extension parsed from filename ${filename}`)
-                  }
-                  // filename = `mesh_urlparam.${url_extension}`
+                  filename = mesh_url.split('/').pop();
+                  const url_extension = '.' + mesh_url.split('.').at(-1) ;
                 } catch {
                   throw new Error(`Could not infer file extension from content-disposition or url extension. Please enforce it via the extension urlparam`);
                 }
