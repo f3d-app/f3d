@@ -32,6 +32,18 @@ T parse(const std::string& str) = delete;
 
 //----------------------------------------------------------------------------
 /**
+ * Not implemented vector specific parse method
+ */
+template <typename T>
+struct is_vector:std::false_type{};
+template <typename... Args>
+struct is_vector<std::vector<Args...>>:std::true_type{};
+
+template<typename T>
+std::enable_if_t<!is_vector<T>::value, T> f3d::options_tools::parse(const std::string&) = delete
+
+//----------------------------------------------------------------------------
+/**
  * Parse vector template parsing provided string into a vector
  * Split the string using ',', then rely on single version for parsing each token
  * Can throw options::parsing_exception in case of failure to parse
@@ -138,38 +150,44 @@ std::string parse(const std::string& str)
   return options_tools::trim(str);
 }
 
+template<typename T>
+std::enable_if_t<is_vector<T>::value, T> parse(std::string s)
+{
+    return options_tools::parseVector<typename T::value_type>(s);
+}
+
 //----------------------------------------------------------------------------
 /**
  * Parse provided string into an int vector using parseVector method
  * Can throw options::parsing_exception in case of failure to parse
  */
-template<>
+/*template<>
 std::vector<int> parse(const std::string& str)
 {
   return options_tools::parseVector<int>(str);
-}
+}*/
 
 //----------------------------------------------------------------------------
 /**
  * Parse provided string into a double vector using parseVector method
  * Can throw options::parsing_exception in case of failure to parse
  */
-template<>
+/*template<>
 std::vector<double> parse(const std::string& str)
 {
   return options_tools::parseVector<double>(str);
-}
+}*/
 
 //----------------------------------------------------------------------------
 /**
  * Parse provided string into a string vector using parseVector method
  * Can throw options::parsing_exception in case of failure to parse
  */
-template<>
+/*template<>
 std::vector<std::string> parse(const std::string& str)
 {
   return options_tools::parseVector<std::string>(str);
-}
+}*/
 
 // TODO Improve string generation
 //----------------------------------------------------------------------------
