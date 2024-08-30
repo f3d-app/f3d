@@ -38,17 +38,19 @@ runs:
       if: |
         steps.cache-lfs.outputs.cache-hit != 'true' &&
         inputs.workflow_label == 'producer'
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@v4
       with:
         name: lfs-data
         path: lfs_data
+        overwrite: true
+        include-hidden-files: true
 
     - name: Download LFS artifact
       id: download-artifact
       if: |
         steps.cache-lfs.outputs.cache-hit != 'true' &&
         inputs.workflow_label == 'consumer'
-      uses: actions/download-artifact@master
+      uses: actions/download-artifact@v4
       continue-on-error: true
       with:
         name: lfs-data
