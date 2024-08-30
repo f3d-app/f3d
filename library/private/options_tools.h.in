@@ -11,17 +11,16 @@ namespace f3d
 namespace options_tools
 {
 
-static inline const std::string SPACE_CHARS = " \t\r\v\n";
-
 //----------------------------------------------------------------------------
 /**
  * A std::string_view trim function
  */
-std::string_view trim(std::string_view s)
+std::string_view trim(std::string_view str)
 {
-  s.remove_prefix(std::min(s.find_first_not_of(SPACE_CHARS), s.size()));
-  s.remove_suffix(std::min(s.size() - s.find_last_not_of(SPACE_CHARS) - 1, s.size()));
-  return s;
+  constexpr std::string_view spaces = " \t\r\v\n";
+  str.remove_prefix(std::min(str.find_first_not_of(spaces), str.size()));
+  str.remove_suffix(std::min(str.size() - str.find_last_not_of(spaces) - 1, str.size()));
+  return str;
 }
 
 //----------------------------------------------------------------------------
