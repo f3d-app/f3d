@@ -10,7 +10,19 @@ namespace f3d
 {
 namespace options_tools
 {
-// TODO expose parse methods in options API ?
+
+static inline const std::string SPACE_CHARS = " \t\r\v\n";
+
+//----------------------------------------------------------------------------
+/**
+ * A std::string_view trim function
+ */
+std::string_view trim(std::string_view s)
+{
+  s.remove_prefix(std::min(s.find_first_not_of(SPACE_CHARS), s.size()));
+  s.remove_suffix(std::min(s.size() - s.find_last_not_of(SPACE_CHARS) - 1, s.size()));
+  return s;
+}
 
 //----------------------------------------------------------------------------
 /**
@@ -18,6 +30,25 @@ namespace options_tools
  */
 template<typename T>
 T parse(const std::string& str) = delete;
+
+//----------------------------------------------------------------------------
+/**
+ * Parse vector template parsing provided string into a vector
+ * Split the string using ',', then rely on single version for parsing each token
+ * Can throw options::parsing_exception in case of failure to parse
+ */
+template<typename T>
+std::vector<T> parseVector(const std::string& str)
+{
+  // TODO implement more parsing possibilities, eg different types of tokens
+  std::vector<T> vec;
+  std::istringstream split(str);
+  for (std::string each; std::getline(split, each, ',');)
+  {
+    vec.emplace_back(options_tools::parse<T>(each));
+  }
+  return vec;
+}
 
 //----------------------------------------------------------------------------
 /**
@@ -100,31 +131,45 @@ ratio_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
- * Return provided string
+ * Return provided string stripped of leading and trailing spaces.
  */
 template<>
 std::string parse(const std::string& str)
 {
-  return str;
+  return std::string(options_tools::trim(str));
 }
 
 //----------------------------------------------------------------------------
 /**
- * Parse provided string into a double vector
- * Split the string using ',', then rely on double version for parsing each token
+ * Parse provided string into an int vector using parseVector method
+ * Can throw options::parsing_exception in case of failure to parse
+ */
+template<>
+std::vector<int> parse(const std::string& str)
+{
+  return options_tools::parseVector<int>(str);
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Parse provided string into a double vector using parseVector method
  * Can throw options::parsing_exception in case of failure to parse
  */
 template<>
 std::vector<double> parse(const std::string& str)
 {
-  // TODO implement more parsing possibilities, eg different types of tokens
-  std::vector<double> vec;
-  std::istringstream split(str);
-  for (std::string each; std::getline(split, each, ',');)
-  {
-    vec.emplace_back(options_tools::parse<double>(each));
-  }
-  return vec;
+  return options_tools::parseVector<double>(str);
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Parse provided string into a string vector using parseVector method
+ * Can throw options::parsing_exception in case of failure to parse
+ */
+template<>
+std::vector<std::string> parse(const std::string& str)
+{
+  return options_tools::parseVector<std::string>(str);
 }
 
 // TODO Improve string generation

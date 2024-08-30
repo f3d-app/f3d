@@ -312,15 +312,27 @@ int TestSDKOptions(int argc, char* argv[])
     std::cerr << "Options parse method not behaving as expected with ratio_t." << std::endl;
     return EXIT_FAILURE;
   }
-  if (f3d::options::parse<std::string>(std::string("foobar")) != "foobar")
+  if (f3d::options::parse<std::string>(std::string("  foobar  ")) != "foobar")
   {
     std::cerr << "Options parse method not behaving as expected with string." << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (f3d::options::parse<std::vector<int>>(std::string("1, 2, 3")) !=
+    std::vector<int>({ 1, 2, 3 }))
+  {
+    std::cerr << "Options parse method not behaving as expected with int vector." << std::endl;
     return EXIT_FAILURE;
   }
   if (f3d::options::parse<std::vector<double>>(std::string("0.1, 0.2, 0.3")) !=
     std::vector<double>({ 0.1, 0.2, 0.3 }))
   {
     std::cerr << "Options parse method not behaving as expected with double vector." << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (f3d::options::parse<std::vector<std::string>>(std::string("foo, bar, baz")) !=
+    std::vector<std::string>({ "foo", "bar", "baz" }))
+  {
+    std::cerr << "Options parse method not behaving as expected with string vector." << std::endl;
     return EXIT_FAILURE;
   }
 

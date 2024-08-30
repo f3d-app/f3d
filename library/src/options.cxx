@@ -119,7 +119,9 @@ F3D_DECL_TYPE(int);
 F3D_DECL_TYPE(double);
 F3D_DECL_TYPE(f3d::ratio_t);
 F3D_DECL_TYPE(std::string);
+F3D_DECL_TYPE(std::vector<int>);
 F3D_DECL_TYPE(std::vector<double>);
+F3D_DECL_TYPE(std::vector<std::string>);
 
 //----------------------------------------------------------------------------
 options::parsing_exception::parsing_exception(const std::string& what)
