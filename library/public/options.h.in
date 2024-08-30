@@ -108,7 +108,9 @@ public:
 
   /**
    * Templated parsing method used internally to parse strings.
-   * Implemented only for: bool, int, double, ratio_t, int, double and string vector.
+   * Implemented only for types: bool, int, double, ratio_t,
+   * as well as vector if these types.
+   * See parsing documentation for more info. TODO.
    * Throw an options::parsing_exception if parsing failed.
    */
   template<typename T>
