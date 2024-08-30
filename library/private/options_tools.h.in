@@ -15,12 +15,12 @@ namespace options_tools
 /**
  * A std::string_view trim function
  */
-std::string_view trim(std::string_view str)
+std::string trim(std::string_view strv)
 {
   constexpr std::string_view spaces = " \t\r\v\n";
-  str.remove_prefix(std::min(str.find_first_not_of(spaces), str.size()));
-  str.remove_suffix(std::min(str.size() - str.find_last_not_of(spaces) - 1, str.size()));
-  return str;
+  strv.remove_prefix(std::min(strv.find_first_not_of(spaces), strv.size()));
+  strv.remove_suffix(std::min(strv.size() - strv.find_last_not_of(spaces) - 1, strv.size()));
+  return std::string(strv);
 }
 
 //----------------------------------------------------------------------------
@@ -135,7 +135,7 @@ ratio_t parse(const std::string& str)
 template<>
 std::string parse(const std::string& str)
 {
-  return std::string(options_tools::trim(str));
+  return options_tools::trim(str);
 }
 
 //----------------------------------------------------------------------------
