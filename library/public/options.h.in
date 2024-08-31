@@ -109,7 +109,7 @@ public:
   /**
    * Templated parsing method used internally to parse strings.
    * Implemented only for types: bool, int, double, ratio_t,
-   * as well as vector if these types.
+   * as well as vector for each of these types.
    * See parsing documentation for more info. TODO.
    * Throw an options::parsing_exception if parsing failed.
    */
