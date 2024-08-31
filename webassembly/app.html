@@ -222,27 +222,25 @@
         Module.engineInstance.getWindow().render();
         Module.engineInstance.getInteractor().start();
 
-        // Parse mesh from url-param search query hash
+        // Parse model from url-param search query hash via model url and extension
         function filename_for_model_url(model_url, extension_parsed, contentDisposition) {
           // Build filename given extension urlparam or response header content-disposition
           if (extension_parsed) {
             return `model_urlparam.${extension_parsed}`;
-          } else {
+          } else if (contentDisposition) {
             // If extension is not provided by user, try to get it auto from content-disposition header of url extension 
-            if (contentDisposition) {
-              return contentDisposition.split('filename=')[1].split(';')[0];
-            } else {
-              return model_url.split('/').pop();
-            }
+            return contentDisposition.split('filename=')[1].split(';')[0];
+          } else {
+            return model_url.split('/').pop();
           }
-          return filename;
+          throw new Error(`Could not parse filename/extension from either urlparam extension, response header content-disposition, nor filename present in url`);
         }
         function load_from_url(){
-          // Parse search-query mesh url-param or load default mesh file
+          // Parse search-query model url-param or load default model file
           // const params = new URLSearchParams(window.location.search);
           // Replace first hash with question mark to have real search query parsing and avoid leading # in first parsed urlparam
           const params = new URLSearchParams(window.location.hash.replace(/^#/, '?'));
-          const model_url_passed = params.get("mesh");
+          const model_url_passed = params.get("model");
           const extension_parsed = params.get("extension");
           if (model_url_passed) {
             const model_url = decodeURI(model_url_passed);
