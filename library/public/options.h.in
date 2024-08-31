@@ -97,9 +97,8 @@ public:
 
   /**
    * Get all available option names.
-   * XXX: Should we add a getNamesStruct with the same structure as the struct below ?
    */
-  std::vector<std::string> getNames() const;
+  static std::vector<std::string> getNames();
 
   /**
    * Get the closest option name and its Levenshtein distance.

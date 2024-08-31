@@ -77,7 +77,7 @@ options& options::copy(const options& from, const std::string& name)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> options::getNames() const
+std::vector<std::string> options::getNames()
 {
   return options_tools::getNames();
 }
