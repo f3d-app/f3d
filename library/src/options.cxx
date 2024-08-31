@@ -113,10 +113,11 @@ T options::parse(const std::string& str)
 }
 
 //----------------------------------------------------------------------------
-#define F3D_DECL_TYPE_INTERNAL(TYPE) template F3D_EXPORT TYPE options::parse<TYPE>(const std::string& str)
-#define F3D_DECL_TYPE(TYPE) \
-F3D_DECL_TYPE_INTERNAL(TYPE); \
-F3D_DECL_TYPE_INTERNAL(std::vector<TYPE>)
+#define F3D_DECL_TYPE_INTERNAL(TYPE)                                                               \
+  template F3D_EXPORT TYPE options::parse<TYPE>(const std::string& str)
+#define F3D_DECL_TYPE(TYPE)                                                                        \
+  F3D_DECL_TYPE_INTERNAL(TYPE);                                                                    \
+  F3D_DECL_TYPE_INTERNAL(std::vector<TYPE>)
 F3D_DECL_TYPE(bool);
 F3D_DECL_TYPE(int);
 F3D_DECL_TYPE(double);
