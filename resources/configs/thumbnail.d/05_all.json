@@ -1,5 +1,5 @@
 {
-  "global":
+  ".*":
   {
     "anti-aliasing": true,
     "camera-direction": "-1,-0.5,-1",

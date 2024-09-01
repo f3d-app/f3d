@@ -10,10 +10,11 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.h")
 
 set(F3D_SOURCE_FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DColorMapTools.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DConfigFileTools.cxx
-  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptionsParser.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptionsTools.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DPluginsTools.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DStarter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DSystemTools.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cxx
@@ -85,6 +86,10 @@ endif ()
 set(f3d_compile_options_private "")
 set(f3d_compile_options_public "")
 set(f3d_link_options_public "")
+
+# This is required to avoid cxxopts
+# splitting input positional option by commas
+target_compile_definitions(f3d PRIVATE "CXXOPTS_VECTOR_DELIMITER='\\0'")
 
 # Headless EGL build
 if (VTK_OPENGL_HAS_EGL)
