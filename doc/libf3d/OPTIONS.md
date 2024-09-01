@@ -50,10 +50,11 @@ model.material.roughness|double<br>0.3<br>render|Set the *roughness coefficient*
 model.material.texture|string<br>-<br>render|Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object. Multiplied with the `model.material.roughness` and `model.material.metallic`, set both of them to 1.0 to get a true result.|\-\-texture-material
 model.normal.scale|double<br>1.0<br>render|Normal scale affects the strength of the normal deviation from the normal texture.|\-\-normal-scale
 model.normal.texture|string<br>-<br>render|Path to a texture file that sets the normal map of the object.|\-\-texture-normal
+model.scivis.enable|bool<br>false<br>render|*Color by an array* present in on the data. If `model.scivis.array_name` is set to <empty>, the first available array will be used.|\-\-scalar-coloring
 model.scivis.cells|bool<br>false<br>render|Color the data with value found *on the cells* instead of points|\-\-cells
 model.scivis.colormap|vector\<double\><br>\<inferno\><br>render|Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).|\-\-colormap
 model.scivis.component|int<br>-1<br>render|Specify the component to color with. -1 means *magnitude*. -2 means *direct values*.|\-\-comp
-model.scivis.array_name|string<br>\<reserved\><br>render|*Color by a specific data array* present in on the data. Set to <empty> to let libf3d find the first available array.|\-\-scalars
+model.scivis.array_name|string<br>-<br>render|Select the name of the array to color with.|\-\-coloring-array
 model.scivis.range|vector\<double\><br>-<br>render|Set a *custom range for the coloring*.|\-\-range
 model.point_sprites.enable|bool<br>false<br>render|Show sphere *points sprites* instead of the geometry.|\-\-point-sprites
 model.point_sprites.type|string<br>sphere<br>render|Set the sprites type when showing point sprites (can be `sphere` or `gaussian`).|\-\-point-type
