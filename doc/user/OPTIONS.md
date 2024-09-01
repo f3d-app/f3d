@@ -8,6 +8,7 @@ F3D behavior can be fully controlled from the command line using the following o
 
 Options|Default|Description
 ------|------|------
+\-\-input=\<input file\>||The input file or files to read, can also be provided as a positional argument.
 \-\-output=\<png file\>||Instead of showing a render view and render into it, *render directly into a png file*. When used with \-\-ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating).
 \-\-no-background||Use with \-\-output to output a png file with a transparent background.
 -h, \-\-help||Print *help* and exit. Ignore `--verbose`.
@@ -85,7 +86,8 @@ Options|Default|Description
 
 Options|Default|Description
 ------|------|------
--s, \-\-scalars=\<array_name\>||Specify an array to *Color* with if present in the file. If no array_name is provided, the first in alphabetical order will be picked if any are available. <br>Requires a default scene.<br>Use \-\-verbose to recover the usable array names.
+-s, \-\-scalar-coloring||Enable scalar coloring if present in the file. If no `--coloring-array` is provided, the first in alphabetical order will be picked if any are available. <br>Requires a default scene.
+\-\-coloring-array=\<array_name\>||The coloring array name to use when coloring.<br>Use \-\-verbose to recover the usable array names.
 -y, \-\-comp=\<comp_index\>|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. -1 means *magnitude*. -2 or the short option, -y, means *direct values*.<br>When using *direct values*, components are used as L, LA, RGB, RGBA values depending on the number of components.
 -c, \-\-cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
 \-\-range=\<min,max\>||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
@@ -146,8 +148,7 @@ Some rendering options are not compatible between them, here is the precedence o
 
 ## Options syntax
 
-The `--options=value` syntax is used everywhere in this documentation, however, the syntax `--options value` can also be used, with the exception of options that have implicit values,
-`--verbose`, `--comp` and `--scalars`.
+As documented, only the `--options=value` syntax is supported. The syntax `--options value` is not supported.
 
 ## Filename templating
 
@@ -167,4 +168,3 @@ The destination filename used by `--output` or to save screenshots can use the f
 
 For example the screenshot filename is configured as `{app}/{model}_{n}.png` by default, meaning that, assuming the model `hello.glb` is being viewed,
 consecutive screenshots are going to be saved as `F3D/hello_1.png`, `F3D/hello_2.png`, `F3D/hello_3.png`, ...
-
