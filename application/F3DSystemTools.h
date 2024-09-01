@@ -15,6 +15,8 @@ namespace F3DSystemTools
 {
 std::filesystem::path GetApplicationPath();
 std::vector<std::string> GetVectorEnvironnementVariable(const std::string& envVar);
+std::filesystem::path GetUserConfigFileDirectory();
+std::filesystem::path GetBinaryResourceDirectory();
 }
 
 #endif

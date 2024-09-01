@@ -1,6 +1,6 @@
 #include "F3DColorMapTools.h"
 
-#include "F3DConfigFileTools.h"
+#include "F3DSystemTools.h"
 
 #include "image.h"
 #include "log.h"
@@ -23,16 +23,14 @@ std::string Find(const std::string& str)
     }
   }
 
-  std::vector<fs::path> dirsToCheck;
-  dirsToCheck.emplace_back(F3DConfigFileTools::GetUserConfigFileDirectory() / "colormaps");
+  std::vector<fs::path> dirsToCheck{ F3DSystemTools::GetUserConfigFileDirectory() / "colormaps",
 #ifdef __APPLE__
-  dirsToCheck.emplace_back("/usr/local/etc/f3d/colormaps");
+    "/usr/local/etc/f3d/colormaps",
 #endif
 #ifdef __linux__
-  dirsToCheck.emplace_back("/etc/f3d/colormaps");
-  dirsToCheck.emplace_back("/usr/share/f3d/colormaps");
+    "/etc/f3d/colormaps", "/usr/share/f3d/colormaps",
 #endif
-  dirsToCheck.emplace_back(F3DConfigFileTools::GetBinaryResourceDirectory() / "colormaps");
+    F3DSystemTools::GetBinaryResourceDirectory() / "colormaps" };
 
   for (const fs::path& dir : dirsToCheck)
   {
