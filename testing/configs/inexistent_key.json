@@ -1,0 +1,6 @@
+{
+    ".*":
+    {
+      "scene.animation.inexistent": 0
+    }
+}

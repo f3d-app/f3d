@@ -1,0 +1,6 @@
+{
+    ".*":
+    {
+      "scene.animation.index": "nonparsable"
+    }
+}

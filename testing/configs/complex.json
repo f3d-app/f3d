@@ -1,14 +1,14 @@
 {
-  "global":
+  ".*":
   {
     "scalars": "",
-    "axis": true,
+    "interactor.axis": true,
     "grid": true
   },
   ".*(vt.)":
   {
     "bar": true,
-    "ambient-occlusion": true,
+    "render.effect.ambient_occlusion": true,
     "filename": true
   },
   ".*(vti)":
