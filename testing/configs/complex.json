@@ -1,7 +1,7 @@
 {
   ".*":
   {
-    "scalars": "",
+    "scalar-coloring": true,
     "interactor.axis": true,
     "grid": true
   },

@@ -126,9 +126,10 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"blur-coc", "", "Blur circle of confusion radius", "<value>", ""},
       {"light-intensity", "", "Light intensity", "<value>", ""} } },
   {"Scientific visualization",
-    { {"scalars", "s", "Color by scalars", "<array_name>", "f3d_reserved_true" }, // TODO
-      {"comp", "y", "Component from the scalar array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", "<comp_index>", "-2"},
-      {"cells", "c", "Use a scalar array from the cells", "<bool>", "1"},
+    { {"scalar-coloring", "s", "Color by a scalar array", "<bool>", "1" },
+      {"coloring-array", "", "Name of the array to color with", "<array_name>", "" },
+      {"comp", "y", "Component from the array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", "<comp_index>", "-2"},
+      {"cells", "c", "Use an array from the cells", "<bool>", "1"},
       {"range", "", "Custom range for the coloring by array", "<min,max>", ""},
       {"bar", "b", "Show scalar bar", "<bool>", "1" },
       {"colormap-file", "", "Specify a colormap image", "<filePath/filename/fileStem>", ""},
