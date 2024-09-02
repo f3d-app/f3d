@@ -1,5 +1,5 @@
 {
-  "global":
+  ".*":
   {
     "anti-aliasing": true,
     "camera-direction": "-1,-0.5,-1",
@@ -7,7 +7,7 @@
     "max-size":100,
     "no-background": true,
     "verbose": "quiet",
-    "scalars": "",
+    "scalar-coloring": true,
     "tone-mapping": true,
     "translucency-support": true
   }

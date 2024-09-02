@@ -473,7 +473,7 @@ vtkF3DRendererWithColoring::CycleType vtkF3DRendererWithColoring::CheckColoring(
   assert(this->Importer);
 
   // Never force change of anything if we are currently not coloring
-  if (this->ArrayIndexForColoring == -1)
+  if (this->ArrayIndexForColoring < 0)
   {
     return CycleType::NONE;
   }
@@ -501,7 +501,7 @@ vtkF3DRendererWithColoring::CycleType vtkF3DRendererWithColoring::CheckColoring(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetColoring(
+void vtkF3DRendererWithColoring::SetColoring(bool enable,
   bool useCellData, const std::string& arrayName, int component)
 {
   if (!this->Importer)
@@ -511,13 +511,16 @@ void vtkF3DRendererWithColoring::SetColoring(
 
   // XXX This should be reworked to avoid handling multiple information in one parameters
   // while still being future-proof and flexible enough.
-  if (this->GetColoringUseCell() != useCellData || this->GetColoringArrayName() != arrayName ||
-    this->GetColoringComponent() != component)
+  if (enable != (this->ArrayIndexForColoring >= 0)
+      || useCellData != this->UseCellColoring
+      || component != this->ComponentForColoring
+      || arrayName != this->GetColoringArrayName())
   {
     this->UseCellColoring = useCellData;
+    this->ComponentForColoring = component;
 
     int nIndexes = this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring);
-    if (arrayName == F3D_RESERVED_STRING)
+    if (!enable)
     {
       // Not coloring
       this->ArrayIndexForColoring = -1;
@@ -544,8 +547,6 @@ void vtkF3DRendererWithColoring::SetColoring(
       }
     }
 
-    this->ComponentForColoring = component;
-
     this->ColorTransferFunctionConfigured = false;
     this->GeometryMappersConfigured = false;
     this->PointSpritesMappersConfigured = false;
@@ -553,6 +554,12 @@ void vtkF3DRendererWithColoring::SetColoring(
     this->ScalarBarActorConfigured = false;
     this->ColoringConfigured = false;
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRendererWithColoring::GetColoringEnabled()
+{
+  return this->ArrayIndexForColoring >= 0;
 }
 
 //----------------------------------------------------------------------------
@@ -566,7 +573,7 @@ std::string vtkF3DRendererWithColoring::GetColoringArrayName()
 {
   if (!this->Importer)
   {
-    return F3D_RESERVED_STRING;
+    return "";
   }
 
   vtkF3DGenericImporter::ColoringInfo info;
@@ -576,7 +583,7 @@ std::string vtkF3DRendererWithColoring::GetColoringArrayName()
   }
   else
   {
-    return F3D_RESERVED_STRING;
+    return "";
   }
 }
 

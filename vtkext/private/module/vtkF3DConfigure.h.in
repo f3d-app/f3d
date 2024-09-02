@@ -3,7 +3,6 @@
 
 #include <string>
 
-static const std::string F3D_RESERVED_STRING = "f3d_reserved";
 static const std::string F3D_EXIT_HOTKEY_SYM = "Escape";
 
 // TODO: Use CMake definitions and get rid of these

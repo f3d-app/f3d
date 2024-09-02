@@ -157,17 +157,18 @@ public:
   void SetImporter(vtkF3DGenericImporter* importer);
 
   /**
-   * Set the coloring, call after SetColoringAttributes.
+   * Set coloring information.
    * This method will try to find the corresponding array in the coloring attributes and will
    * position ArrayIndexForColoring and DataForColoring accordingly.
    */
-  void SetColoring(bool useCellData, const std::string& arrayName, int component);
+  void SetColoring(bool enable, bool useCellData, const std::string& arrayName, int component);
 
   ///@{
   /**
    * Get current coloring information,
    * Useful after using Cycle methods
    */
+  bool GetColoringEnabled();
   bool GetColoringUseCell();
   std::string GetColoringArrayName();
   int GetColoringComponent();
