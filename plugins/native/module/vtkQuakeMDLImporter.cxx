@@ -1,5 +1,6 @@
 #include "vtkQuakeMDLImporter.h"
 
+#include <vtkTransform.h>
 #include <vtkCellArray.h>
 #include <vtkPolygon.h>
 #include <vtkCellData.h>
@@ -49,12 +50,32 @@ public:
   //----------------------------------------------------------------------------
   void ImportCameras(vtkRenderer* renderer)
   {
-
+    double cameraPosition[3] = { 50.0, 15.0, 0.0 };
+    vtkNew<vtkTransform> roll;
+    roll->RotateX(270);
+    roll->RotateZ(270);
+    renderer->GetActiveCamera()->SetPosition(cameraPosition);
+    renderer->GetActiveCamera()->SetModelTransformMatrix(roll->GetMatrix());
   }
 
   //----------------------------------------------------------------------------
   void ImportLights(vtkRenderer* renderer)
   {
+    // Adds 3 lights, there's already one on the right side.
+
+    vtkNew<vtkLight> frontLight;
+    double frontLightPosition[3] = { 50.0, 50.0, 0.0 };
+    frontLight->SetPosition(frontLightPosition);
+    vtkNew<vtkLight> leftLight;
+    double leftLightPosition[3] = { 50.0, -50.0, 0.0 };
+    leftLight->SetPosition(leftLightPosition);
+    vtkNew<vtkLight> backLight;
+    double backLightPosition[3] = { -50.0, 0.0, 0.0 };
+    backLight->SetPosition(backLightPosition);
+    
+    renderer->AddLight(frontLight);
+    renderer->AddLight(leftLight);
+    renderer->AddLight(backLight);
   }
 
   //----------------------------------------------------------------------------
@@ -62,8 +83,10 @@ public:
     int skinHeight, int nbSkins, int selectedSkinIndex)
   {
     vtkNew<vtkTexture> texture;
-    texture->SetWrap(3);
+    texture->InterpolateOn();
 
+
+    // Read textures.
     struct mdl_skin_t
     {
       int group;  /* 0 = single, 1 = group */
@@ -101,13 +124,7 @@ public:
       }
     }
 
-    // Used while testing to load texture from a PNG file
-    // vtkNew<vtkPNGReader> reader;
-    // reader->SetFileName("C:\\\\Users\\Youva\\Downloads\\quake\\Untitled.png");
-    // reader->Update();
-    // Used while testing to check the texture is written correctly
-    // vtkNew<vtkPNGWriter> writer;
-    // writer->SetFileName("C:\\\\Users\\Youva\\Downloads\\skin2.png");
+    // Copy to imageData
     vtkNew<vtkImageData> img;
     img->SetDimensions(skinWidth, skinHeight, 1);
     img->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
@@ -123,13 +140,8 @@ public:
         ptr[2] = DefaultColorMap[index][2]; // B
       }
     }
-    // Used to write to file
-    // writer->SetInputData(img);
-    // writer->Write();
-    texture->SetInputData(img);
-    // Used to set texture from image file
-    //    texture->SetInputConnection(reader->GetOutputPort());
 
+    texture->SetInputData(img);
     return texture;
   }
 
@@ -180,7 +192,6 @@ public:
       float* time;               // Size is nbFrames ???
       mdl_simpleframe_t* frames; // Size is nbFrames ???
     };
-
     struct plugin_frame_pointer
     {
       int* type;
@@ -223,14 +234,14 @@ public:
     vtkNew<vtkFloatArray> textureCoordinates;
     textureCoordinates->SetNumberOfComponents(2);
     textureCoordinates->SetName("TextureCoordinates");
-    textureCoordinates->Allocate(header->numVertices * 2);
+    textureCoordinates->Allocate(header->numTriangles * 3);
     struct plugin_texture_coords
     {
       float s;
       float t;
       int id;
     };
-    plugin_texture_coords* coords = new plugin_texture_coords[header->numVertices];
+    plugin_texture_coords* coords = new plugin_texture_coords[header->numTriangles * 3];
     for (int i = 0; i < header->numTriangles; i++)
     {
       vtkIdType* vertexNum = new vtkIdType[3];
@@ -238,28 +249,24 @@ public:
       {
         vertexNum[j] = triangles[i].vertex[j];
         int onseam_correct = 1;
-        float s = texcoords[vertexNum[j]].s;
-        float t = texcoords[vertexNum[j]].t;
-        if ( !triangles[i].facesfront && texcoords[vertexNum[j]].onseam)
+        float s = texcoords[triangles[i].vertex[j]].s;
+        float t = texcoords[triangles[i].vertex[j]].t;
+        if (!triangles[i].facesfront && texcoords[triangles[i].vertex[j]].onseam)
         {
           s = s + header->skinWidth * 0.5f;
         }
         s = (s + 0.5) / header->skinWidth;
         t = (t + 0.5) / header->skinHeight;
-        coords[vertexNum[j]].s = s;
-        coords[vertexNum[j]].t = t;
-        coords[vertexNum[j]].id = vertexNum[j];
+        coords[3 * i + j].s = s;
+        coords[3 * i + j].t = t;
+        coords[3 * i + j].id = triangles[i].vertex[j];
+        float st[2] = { s, t };
+        textureCoordinates->InsertNextTuple(st);
       }
-      cells->InsertNextCell(3, vertexNum);
+      vtkIdType t[3] = { i * 3, i * 3 + 1, i * 3 + 2 };
+      cells->InsertNextCell(3, t);
+
     }
-    // Add texture coords
-    for (int i = 0; i < header->numVertices; i++)
-    {
-      float* s_t = new float[2];
-      s_t[0] = coords[i].s;
-      s_t[1] = coords[i].t;
-      textureCoordinates->InsertNextTuple(s_t);
-    } 
 
 
     // Draw vertices
@@ -268,10 +275,11 @@ public:
     for (int frameNum = 0; frameNum < header->numFrames; frameNum++)
     {
       vtkNew<vtkPoints> vertices;
-      vertices->Allocate(header->numVertices);
+      vertices->Allocate(header->numTriangles * 3);
       vtkNew<vtkFloatArray> normals;
       normals->SetNumberOfComponents(3);
-      normals->Allocate(header->numVertices * 3);
+      normals->Allocate(header->numTriangles * 3 * 3);
+  
       plugin_frame_pointer selectedFrame = framePtr[frameNum];
       if (*selectedFrame.type == 0)
       {
@@ -288,17 +296,17 @@ public:
             {
               v[k] = v[k] * header->scale[k] + header->translation[k];
             }
-            vertices->InsertPoint(vertexNum[j], v);
+            vertices->InsertPoint(i*3+j, v);
             int normalIndex = selectedFrame.frames->verts[vertexNum[j]].normalIndex;
-            normals->SetTuple3(vertexNum[j], NormalVectors[normalIndex][0] / 255.0,
-              NormalVectors[normalIndex][1] / 255.0, NormalVectors[normalIndex][2] / 255.0);
+            normals->SetTuple3(i*3+j, NormalVectors[normalIndex][0] / 255.0,
+             NormalVectors[normalIndex][1] / 255.0, NormalVectors[normalIndex][2] / 255.0);
           }
         }
         vtkNew<vtkPolyData> mesh;
         mesh->SetPoints(vertices);
         mesh->SetPolys(cells);
         mesh->GetPointData()->SetTCoords(textureCoordinates);
-        mesh->GetPointData()->SetNormals(normals);
+//        mesh->GetPointData()->SetNormals(normals);
         Mesh.push_back(mesh);
         std::string meshName = std::string(selectedFrame.frames->name);
         for (int i = 0; i < meshName.size(); i++)
@@ -339,9 +347,9 @@ public:
               {
                 v[k] = v[k] * header->scale[k] + header->translation[k];
               }
-              vertices->InsertPoint(vertexNum[j], v);
+              vertices->InsertPoint(i*3+j, v);
               int normalIndex = selectedFrame.frames[groupFrameNum].verts[vertexNum[j]].normalIndex;
-              normals->SetTuple3(vertexNum[j], NormalVectors[normalIndex][0] / 255.0,
+              normals->SetTuple3(i*3+j, NormalVectors[normalIndex][0] / 255.0,
                 NormalVectors[normalIndex][1] / 255.0, NormalVectors[normalIndex][2] / 255.0);
             }
           }
@@ -375,7 +383,8 @@ public:
         }
       }
     }
-    
+    return;
+
     // Add interpolated frames
     for (int i = 0; i < Mesh.size() - 1; i++)
     {
@@ -386,11 +395,8 @@ public:
       else
       {
         vtkNew<vtkPoints> vertices;
-        vertices->Allocate(header->numVertices);
-        vtkNew<vtkFloatArray> normals;
-        normals->SetNumberOfComponents(3);
-        normals->Allocate(header->numVertices * 3);
-        for (int j = 0; j < header->numVertices; j++)
+        vertices->Allocate(header->numTriangles * 3);
+        for (int j = 0; j < header->numTriangles * 3; j++)
         {
           double* v_0 = Mesh[i]->GetPoint(j);
           double* v_1 = Mesh[i+1]->GetPoint(j);
@@ -417,10 +423,7 @@ public:
   bool ReadScene(const std::string& filePath)
   {
     std::ifstream inputStream(filePath, std::ios::binary);
-
     std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(inputStream), {});
-
-
     // Read header
     mdl_header_t* header = reinterpret_cast<mdl_header_t*>(buffer.data());
     int offset = 84;
@@ -440,11 +443,11 @@ public:
 
   void UpdateFrame(double timeValue)
   {
-    // Hardcoded frames per second
-    if (abs(timeValue - LastRenderTime) > 1.0 / 60)
+    // Hardcoded frames per second, 24FPS seems reasonable
+    if (abs(timeValue - LastRenderTime) > 1.0 / 24)
     {
       Mapper->SetInputData(
-        Mesh[(CurrentFrameIndex++) % (LastFrameIndex - FirstFrameIndex) + FirstFrameIndex]);
+          Mesh[(CurrentFrameIndex++) % (LastFrameIndex - FirstFrameIndex) + FirstFrameIndex]);         
       LastRenderTime = timeValue;
     }
   }
@@ -452,6 +455,8 @@ public:
   // Only one animation enabled at a time
   void EnableAnimation(vtkIdType animationIndex)
   {
+    // Animations are divided into groups, but stored as a vector of polydata.
+    // This functions set the indices for the first and last frames in the group.
     int i = 0;
     while (i < GroupAndTimeVal.size() && GroupAndTimeVal[++i].first < animationIndex)
     {
@@ -468,7 +473,6 @@ public:
     vtkNew<vtkActor> actor;
     vtkNew<vtkPolyDataMapper> mapper;
     mapper->SetInputData(Mesh[0]);
-        //Mesh);
     actor->SetMapper(mapper);
     actor->SetTexture(Texture);
     renderer->AddActor(actor);
@@ -478,18 +482,6 @@ public:
     Mapper = mapper;
   }
 
-  void UpdateNodeTransform()
-  {
-  }
-
-  void UpdateCameras()
-  {
-  }
-
-  void UpdateLights()
-  {
-
-  }
 
   
   vtkQuakeMDLImporter* Parent;
@@ -676,7 +668,7 @@ void vtkQuakeMDLImporter::UpdateTimeStep(double timeValue)
 //----------------------------------------------------------------------------
 vtkIdType vtkQuakeMDLImporter::GetNumberOfAnimations()
 {
-    return this->Internals->NumberOfAnimations;
+  return this->Internals->NumberOfAnimations;
 }
 
 //----------------------------------------------------------------------------
