@@ -5,8 +5,6 @@
  * @class   F3DOptionsTools
  * @brief   A namespace to handle and parse F3D Options
  */
-#include "F3DConfig.h"
-
 #include <filesystem>
 #include <map>
 #include <string>

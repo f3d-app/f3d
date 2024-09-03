@@ -91,6 +91,21 @@ set(f3d_link_options_public "")
 # splitting input positional option by commas
 target_compile_definitions(f3d PRIVATE "CXXOPTS_VECTOR_DELIMITER='\\0'")
 
+# macOS bundle
+if (F3D_MACOS_BUNDLE)
+  target_compile_definitions(f3d PRIVATE F3D_MACOS_BUNDLE)
+endif ()
+
+# raytracing
+if (F3D_MODULE_RAYTRACING)
+  target_compile_definitions(f3d PRIVATE F3D_MODULE_RAYTRACING)
+endif ()
+
+# exr
+if (F3D_MODULE_EXR)
+  target_compile_definitions(f3d PRIVATE F3D_MODULE_EXR)
+endif ()
+
 # Headless EGL build
 if (VTK_OPENGL_HAS_EGL)
   target_compile_definitions(f3d PRIVATE F3D_HEADLESS_BUILD)

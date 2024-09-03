@@ -1,6 +1,5 @@
 #include "F3DConfigFileTools.h"
 
-#include "F3DConfig.h"
 #include "F3DSystemTools.h"
 
 #include "nlohmann/json.hpp"
