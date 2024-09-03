@@ -41,7 +41,7 @@ F3D supports the following plugins and their file formats:
 Here is how the plugins are searched (in preceding order):
 
 1. Search the static plugins.
-2. Consider the `load-plugins` option given is a full path.
+2. Consider the `load-plugins` option given it is a full path.
 3. Search in the paths specified in `F3D_PLUGINS_PATH` environment variable.
 4. Search in a directory relative to the F3D application: `../lib`.
 5. Rely on OS specific paths (e.g. `LD_LIBRARY_PATH` on Linux or `DYLD_LIBRARY_PATH` on macOS).
