@@ -13,19 +13,16 @@ To use F3D, you'll need to install F3D. See the [Installation](INSTALLATION.md) 
 Once F3D has been installed, you should be able to open a file in any of the following ways:
 
 * Open a file directly from your file manager.
-* Open F3D, then drag and drop a file into the application window.
+* Open the F3D application directly, then drag and drop a file into the application window.
 * Run F3D from the terminal with a set of command-line [options](OPTIONS.md).
 * Configure F3D as a [thumbnailer](DESKTOP_INTEGRATION.md) for supported file formats with certain file managers.
 
-If you choose to run F3D from the terminal, you have different options.
-
-1\. Open a file and visualize it interactively:
-
+If you choose to run F3D from the terminal, you can open your file by running the following:
 ```
 f3d /path/to/file.ext
 ```
 
-2\. Open a file and save the rendering into an image file:
+Optionally, you can also save the rendering into an image file:
 
 ```
 f3d /path/to/file.ext --output=/path/to/img.png
@@ -37,6 +34,8 @@ If you need help, specify the `--help` [option](OPTIONS.md):
 f3d --help
 man f3d # Linux only
 ```
+
+Once you've opened your file in F3D, you're all set to start visualizing! Press <kbd>H</kbd> to open a list of shortcuts to help you interact with your scene. 
 
 See the [supported file formats](SUPPORTED_FORMATS.md) page for the full list of file types that F3D can open.
 
