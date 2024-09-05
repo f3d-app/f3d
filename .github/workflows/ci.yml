@@ -32,7 +32,7 @@ jobs:
 
     - name: Cache LFS Data
       id: lfs_sha_recover
-      uses: mwestphal/lfs-data-cache-action:add_action
+      uses: mwestphal/lfs-data-cache-action@add_action
       with:
         cache_postfix: 0
 
