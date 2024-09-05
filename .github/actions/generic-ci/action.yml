@@ -51,11 +51,11 @@ runs:
         [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
 
     - name: Recover LFS Data
-      uses: mwestphal/lfs-data-cache-action@add_action
+      uses: f3d-app/lfs-data-cache-action@v1
       with:
         type: 'consumer'
         lfs_sha: ${{inputs.lfs_sha}}
-        cache_postfix: f3d-1
+        cache_postfix: cache-0 
 
     - name: Dependencies Dir
       shell: bash
