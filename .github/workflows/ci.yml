@@ -27,14 +27,14 @@ jobs:
       uses: actions/checkout@v4
       with:
         path: 'source'
-        fetch-depth: 0
+        fetch-depth: 1
         lfs: false
 
     - name: Cache LFS Data
       id: lfs_sha_recover
       uses: mwestphal/lfs-data-cache-action@add_action
       with:
-        cache_postfix: 0
+        cache_postfix: f3d-1
 
 #----------------------------------------------------------------------------
 # Windows CI: Build and test, cross-vtk build matrix

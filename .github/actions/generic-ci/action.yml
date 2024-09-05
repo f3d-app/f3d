@@ -55,7 +55,7 @@ runs:
       with:
         workflow_label: 'consumer'
         lfs_sha: ${{inputs.lfs_sha}}
-        cache_postfix: 1
+        cache_postfix: f3d-1
 
     - name: Dependencies Dir
       shell: bash
