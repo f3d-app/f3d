@@ -50,11 +50,12 @@ runs:
       run: |
         [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
+    - name: Recover LFS Data
+      uses: f3d-app/lfs-data-cache-action@v1
       with:
-        lfs_sha: ${{ inputs.lfs_sha}}
-        workflow_label: 'consumer'
+        type: 'consumer'
+        lfs_sha: ${{inputs.lfs_sha}}
+        cache_postfix: cache-0 
 
     - name: Dependencies Dir
       shell: bash

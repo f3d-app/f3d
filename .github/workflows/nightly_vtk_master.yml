@@ -52,20 +52,14 @@ jobs:
       uses: actions/checkout@v4
       with:
         path: 'source'
-        fetch-depth: 0
+        fetch-depth: 1
         lfs: false
 
-    - name: Set LFS env var
-      working-directory: ${{github.workspace}}/source
+    - name: Cache LFS Data
       id: lfs_sha_recover
-      shell: bash
-      run: echo "lfs_sha=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/ .github/baselines/)" >> $GITHUB_OUTPUT
-
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
+      uses: f3d-app/lfs-data-cache-action@v1
       with:
-        lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
-        workflow_label: 'producer'
+        cache_postfix: cache-0
 
 #----------------------------------------------------------------------------
 # Windows CI: Build and test
