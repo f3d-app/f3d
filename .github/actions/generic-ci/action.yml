@@ -53,7 +53,7 @@ runs:
     - name: Recover LFS Data
       uses: mwestphal/lfs-data-cache-action@add_action
       with:
-        workflow_label: 'consumer'
+        type: 'consumer'
         lfs_sha: ${{inputs.lfs_sha}}
         cache_postfix: f3d-1
 
