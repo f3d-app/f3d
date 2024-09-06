@@ -54,10 +54,10 @@ by the same option being set in another block in another .json file read after.
 F3D provides a default config directory for generic usage (`config.d`) and a thumbnail specific config directory (`thumbnail.d`).
 You can edit the file contained in these directory or add your own in specific directories (see below).
 
-The following command-line options <b> cannot </b> be set via config file:
+The following options <b> cannot </b> be set via config file:
 `help`, `version`, `readers-list`, `config`, `dry-run` and `input`.
 
-The following command-line options <b>are only taken on the first load</b>:
+The following options <b>are only taken on the first load</b>:
 `no-render`, `output`, and all testing options.
 
 Boolean options that have been turned on in the configuration file can be turned

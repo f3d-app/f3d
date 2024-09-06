@@ -148,7 +148,9 @@ Some rendering options are not compatible between them, here is the precedence o
 
 ## Options syntax
 
-As documented, only the `--options=value` syntax is supported. The syntax `--options value` is not supported.
+To turn on/off options, it is possible to write `--option=true` and `--option=false`, eg `--points-sprites=false`.
+
+As documented, only the `--option=value` syntax is supported. The syntax `--option value` is not supported.
 
 ## Filename templating
 
