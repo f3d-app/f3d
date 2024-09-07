@@ -90,6 +90,19 @@ public:
   bool isSame(const options& other, const std::string& name) const;
 
   /**
+   * Reset an option to its default value
+   * Throw an options::inexistent_exception if option does not exist.
+   */
+  options& reset(const std::string& name);
+
+  /**
+   * Compare an option current value with its default value.
+   * Return true is they are the same value, false otherwise.
+   * Throw an options::inexistent_exception if option does not exist.
+   */
+  bool isDefault(const std::string& name) const;
+
+  /**
    * Copy the value of an option from this to the provided other.
    * Throw an options::inexistent_exception if option does not exist.
    */

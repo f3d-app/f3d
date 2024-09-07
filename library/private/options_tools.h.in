@@ -271,6 +271,7 @@ void setAsString(options& opt, const std::string& name, const std::string& str)
   // clang-format on
   else throw options::inexistent_exception("Option " + name + " does not exist");
 }
+
 //----------------------------------------------------------------------------
 /**
  * Generated method, see `options::getAsString`
@@ -279,6 +280,30 @@ std::string getAsString(const options& opt, const std::string& name)
 {
   // clang-format off
   ${_options_string_getter};
+  // clang-format on
+  else throw options::inexistent_exception("Option " + name + " does not exist");
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Generated method, see `options::reset`
+ */
+void reset(options& opt, const std::string& name)
+{
+  // clang-format off
+  ${_options_resetter};
+  // clang-format on
+  else throw options::inexistent_exception("Option " + name + " does not exist");
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Generated method, see `options::isDefault`
+ */
+bool isDefault(const options& opt, const std::string& name)
+{
+  // clang-format off
+  ${_options_default_checker};
   // clang-format on
   else throw options::inexistent_exception("Option " + name + " does not exist");
 }

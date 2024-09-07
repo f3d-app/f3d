@@ -70,6 +70,19 @@ bool options::isSame(const options& other, const std::string& name) const
 }
 
 //----------------------------------------------------------------------------
+options& options::reset(const std::string& name)
+{
+  options_tools::reset(*this, name);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+bool options::isDefault(const std::string& name) const
+{
+  return options_tools::isDefault(*this, name);
+}
+
+//----------------------------------------------------------------------------
 options& options::copy(const options& from, const std::string& name)
 {
   options_tools::set(*this, name, options_tools::get(from, name));

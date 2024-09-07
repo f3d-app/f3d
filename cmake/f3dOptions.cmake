@@ -74,6 +74,8 @@ function (f3d_generate_options)
   list(JOIN _options_string_setter ";\n  else " _options_string_setter)
   list(JOIN _options_string_getter ";\n  else " _options_string_getter)
   list(JOIN _options_lister ",\n  " _options_lister)
+  list(JOIN _options_resetter ";\n  else " _options_resetter)
+  list(JOIN _options_default_checker ";\n  else " _options_default_checker)
 
   configure_file(
     "${_f3d_generate_options_INPUT_PUBLIC_HEADER}"
@@ -125,12 +127,15 @@ function(_parse_json_option _top_json)
        endif()
 
        # Add option to struct and methods
-       string(APPEND _options_struct "${_option_indent}  ${_option_actual_type} ${_member_name} = ${_option_default_value_start}${_option_default_value}${_option_default_value_end};\n")
+       set(_option_default_value_full ${_option_default_value_start}${_option_default_value}${_option_default_value_end})
+       string(APPEND _options_struct "${_option_indent}  ${_option_actual_type} ${_member_name} = ${_option_default_value_full};\n")
        list(APPEND _options_setter "if (name == \"${_option_name}\") opt.${_option_name} = std::get<${_option_variant_type}>(value)")
        list(APPEND _options_getter "if (name == \"${_option_name}\") return opt.${_option_name}")
        list(APPEND _options_string_setter "if (name == \"${_option_name}\") opt.${_option_name} = options_tools::parse<${_option_actual_type}>(str)")
        list(APPEND _options_string_getter "if (name == \"${_option_name}\") return options_tools::format(opt.${_option_name})")
        list(APPEND _options_lister "\"${_option_name}\"")
+       list(APPEND _options_resetter "if (name == \"${_option_name}\") opt.${_option_name} = ${_option_actual_type}(${_option_default_value_full})")
+       list(APPEND _options_default_checker "if (name == \"${_option_name}\") return opt.${_option_name} == ${_option_actual_type}(${_option_default_value_full})")
 
     else()
       # Group found, add in the struct and recurse
@@ -153,4 +158,6 @@ function(_parse_json_option _top_json)
   set(_options_string_setter ${_options_string_setter} PARENT_SCOPE)
   set(_options_string_getter ${_options_string_getter} PARENT_SCOPE)
   set(_options_lister ${_options_lister} PARENT_SCOPE)
+  set(_options_resetter ${_options_resetter} PARENT_SCOPE)
+  set(_options_default_checker ${_options_default_checker} PARENT_SCOPE)
 endfunction()
