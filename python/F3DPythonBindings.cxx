@@ -196,6 +196,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("keys", &f3d::options::getNames) // to do `dict(options)`
     .def("toggle", &f3d::options::toggle)
     .def("is_same", &f3d::options::isSame)
+    .def("reset", &f3d::options::reset)
+    .def("is_default", &f3d::options::isDefault)
     .def("get_closest_option", &f3d::options::getClosestOption)
     .def("copy", &f3d::options::copy);
 

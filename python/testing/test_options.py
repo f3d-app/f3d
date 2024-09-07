@@ -134,6 +134,13 @@ def test_is_same():
     assert not options2.is_same(options1, "interactor.axis")
 
 
+def test_is_default():
+    options = f3d.Options()
+    options["interactor.axis"] = True
+    options.reset("interactor.axis")
+    assert options.is_default("interactor.axis")
+
+
 def test_is_copy():
     options1 = f3d.Options()
     options2 = f3d.Options()
