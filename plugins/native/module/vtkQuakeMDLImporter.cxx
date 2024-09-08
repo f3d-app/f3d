@@ -712,7 +712,6 @@ void vtkQuakeMDLImporter::SetCamera(vtkIdType camIndex)
   return;
 }
 
-
 //----------------------------------------------------------------------------
 void vtkQuakeMDLImporter::ImportCameras(vtkRenderer* renderer)
 {
