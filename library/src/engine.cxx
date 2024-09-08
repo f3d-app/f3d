@@ -252,11 +252,6 @@ std::vector<std::string> engine::getPluginsList(const std::string& pluginPath)
     for (unsigned long i = 0; i < dir.GetNumberOfFiles(); i++)
     {
       std::string currentFile = dir.GetFile(i);
-      // Test with the scan-plugins option crashes on values "." and ".." otherwise.
-      if (currentFile.length() < ext.length())
-      {
-        continue;
-      }
       if (std::equal(ext.rbegin(), ext.rend(), currentFile.rbegin()))
       {
         std::string fullPath = dir.GetPath();
