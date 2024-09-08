@@ -14,10 +14,10 @@
 #ifndef vtkF3DAlembicReader_h
 #define vtkF3DAlembicReader_h
 
+#include <memory>
 #include <vtkNew.h>
 #include <vtkPolyDataAlgorithm.h>
 #include <vtkVersion.h>
-#include <memory>
 
 class vtkF3DAlembicReader : public vtkPolyDataAlgorithm
 {

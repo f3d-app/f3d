@@ -1,0 +1,344 @@
+--- plugins/alembic/module/vtkF3DAlembicReader.h	(original)
++++ plugins/alembic/module/vtkF3DAlembicReader.h	(reformatted)
+@@ -14,10 +14,10 @@
+ #ifndef vtkF3DAlembicReader_h
+ #define vtkF3DAlembicReader_h
+ 
++#include <memory>
+ #include <vtkNew.h>
+ #include <vtkPolyDataAlgorithm.h>
+ #include <vtkVersion.h>
+-#include <memory>
+ 
+ class vtkF3DAlembicReader : public vtkPolyDataAlgorithm
+ {
+--- plugins/native/module/vtkQuakeMDLImporter.h	(original)
++++ plugins/native/module/vtkQuakeMDLImporter.h	(reformatted)
+@@ -5,14 +5,13 @@
+ 
+ #ifndef vtkQuakeMDLImporter_h
+ #define vtkQuakeMDLImporter_h
+-#include<vtkImporter.h>
++#include <vtkImporter.h>
+ 
+ class vtkQuakeMDLImporter : public vtkImporter
+ {
+ public:
+   static vtkQuakeMDLImporter* New();
+   vtkTypeMacro(vtkQuakeMDLImporter, vtkImporter);
+-
+ 
+   void PrintSelf(ostream& os, vtkIndent indent) override;
+ 
+@@ -86,17 +85,16 @@
+    */
+   void SetCamera(vtkIdType camIndex) override;
+ 
+-
+ protected:
+   vtkQuakeMDLImporter();
+   ~vtkQuakeMDLImporter() override = default;
+-  
++
+   int ImportBegin() override;
+   void ImportActors(vtkRenderer*) override;
+   void ImportCameras(vtkRenderer*) override;
+   void ImportLights(vtkRenderer*) override;
+ 
+-  // Header definition, 
++  // Header definition,
+   struct mdl_header_t
+   {
+     int IDPO;
+--- plugins/native/module/vtkQuakeMDLImporter.cxx	(original)
++++ plugins/native/module/vtkQuakeMDLImporter.cxx	(reformatted)
+@@ -1,42 +1,41 @@
+ #include "vtkQuakeMDLImporter.h"
+ 
+-#include <vtkTransform.h>
++#include <vtkActorCollection.h>
++#include <vtkAnimationScene.h>
++#include <vtkCamera.h>
+ #include <vtkCellArray.h>
+-#include <vtkPolygon.h>
+ #include <vtkCellData.h>
+ #include <vtkCommand.h>
+ #include <vtkDemandDrivenPipeline.h>
+ #include <vtkFloatArray.h>
+ #include <vtkIdTypeArray.h>
++#include <vtkImageData.h>
+ #include <vtkInformation.h>
+ #include <vtkInformationVector.h>
++#include <vtkLight.h>
++#include <vtkLookupTable.h>
++#include <vtkNamedColors.h>
+ #include <vtkNew.h>
++#include <vtkOpenGLTexture.h>
++#include <vtkPNGReader.h>
++#include <vtkPNGWriter.h>
++#include <vtkPlaneSource.h>
+ #include <vtkPointData.h>
+ #include <vtkPoints.h>
+ #include <vtkPolyData.h>
+-#include <vtkUnsignedCharArray.h>
+-#include <vtkOpenGLTexture.h>
+ #include <vtkPolyDataMapper.h>
+-#include <vtkImageData.h>
+-#include <vtkPlaneSource.h>
++#include <vtkPolygon.h>
+ #include <vtkProperty.h>
+-#include <vtkLight.h>
+-#include <vtkCamera.h>
+-#include <vtkActorCollection.h>
+-#include <vtkAnimationScene.h>
++#include <vtkRectilinearGrid.h>
++#include <vtkRenderer.h>
+ #include <vtkScenePicker.h>
+-#include <vtkRenderer.h>
+-#include <vtkLookupTable.h>
+-#include <vtkPNGReader.h>
+-#include <vtkNamedColors.h>
+-#include <vtkRectilinearGrid.h>
+-#include <vtkPNGWriter.h>
+ #include <vtkTable.h>
+ #include <vtkTextureObject.h>
++#include <vtkTransform.h>
++#include <vtkUnsignedCharArray.h>
+ 
+ //----------------------------------------------------------------------------
+ vtkStandardNewMacro(vtkQuakeMDLImporter);
+-
+ 
+ class vtkQuakeMDLImporter::vtkInternals
+ {
+@@ -72,24 +71,23 @@
+     vtkNew<vtkLight> backLight;
+     double backLightPosition[3] = { -50.0, 0.0, 0.0 };
+     backLight->SetPosition(backLightPosition);
+-    
++
+     renderer->AddLight(frontLight);
+     renderer->AddLight(leftLight);
+     renderer->AddLight(backLight);
+   }
+ 
+   //----------------------------------------------------------------------------
+-  vtkSmartPointer<vtkTexture> CreateTexture(std::vector<unsigned char> buffer, int& offset, int skinWidth,
+-    int skinHeight, int nbSkins, int selectedSkinIndex)
++  vtkSmartPointer<vtkTexture> CreateTexture(std::vector<unsigned char> buffer, int& offset,
++    int skinWidth, int skinHeight, int nbSkins, int selectedSkinIndex)
+   {
+     vtkNew<vtkTexture> texture;
+     texture->InterpolateOn();
+ 
+-
+     // Read textures.
+     struct mdl_skin_t
+     {
+-      int group;  /* 0 = single, 1 = group */
++      int group;           /* 0 = single, 1 = group */
+       unsigned char* data; /* texture data */
+     };
+     struct mdl_groupskin_t
+@@ -118,7 +116,7 @@
+       else
+       {
+         skins[i].group = 1;
+-        int nb = *reinterpret_cast<int*>(buffer.data() + offset + 4);        
++        int nb = *reinterpret_cast<int*>(buffer.data() + offset + 4);
+         skins[i].skin = reinterpret_cast<unsigned char*>(buffer.data() + 4 + nb * 4 + offset);
+         offset += 4 + nb * 4 + nb * (skinWidth) * (skinHeight);
+       }
+@@ -129,12 +127,12 @@
+     img->SetDimensions(skinWidth, skinHeight, 1);
+     img->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
+     unsigned char* selectedSkin = skins[selectedSkinIndex].skin;
+-    for (int i = 0; i < skinHeight ; i++)
++    for (int i = 0; i < skinHeight; i++)
+     {
+       for (int j = 0; j < skinWidth; j++)
+       {
+         unsigned char index = *reinterpret_cast<unsigned char*>(selectedSkin + i * skinWidth + j);
+-        unsigned char* ptr = reinterpret_cast<unsigned char*>(img->GetScalarPointer(j,i,0));
++        unsigned char* ptr = reinterpret_cast<unsigned char*>(img->GetScalarPointer(j, i, 0));
+         ptr[0] = DefaultColorMap[index][0]; // R
+         ptr[1] = DefaultColorMap[index][1]; // G
+         ptr[2] = DefaultColorMap[index][2]; // B
+@@ -145,8 +143,8 @@
+     return texture;
+   }
+ 
+-
+-  void CreateMesh(std::vector<unsigned char> buffer, int& offset, mdl_header_t* header, int selectedFrameIndex)
++  void CreateMesh(
++    std::vector<unsigned char> buffer, int& offset, mdl_header_t* header, int selectedFrameIndex)
+   {
+     // Read texture coordinates
+     struct mdl_texcoord_t
+@@ -217,9 +215,8 @@
+         framePtr[i].nb = reinterpret_cast<int*>(buffer.data() + 4 + offset);
+         mdl_vertex_t* min = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 8 + offset);
+         mdl_vertex_t* max = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 12 + offset);
+-        float* time = 
+-        framePtr[i].time = reinterpret_cast<float*>(buffer.data() + 16 + offset);
+-        framePtr[i].frames = 
++        float* time = framePtr[i].time = reinterpret_cast<float*>(buffer.data() + 16 + offset);
++        framePtr[i].frames =
+           reinterpret_cast<mdl_simpleframe_t*>(buffer.data() + 16 + 4 * (*framePtr[i].nb) + offset);
+         offset += 16 + (*framePtr[i].nb) * 4;
+         for (int j = 0; j < *framePtr[i].nb; j++)
+@@ -265,9 +262,7 @@
+       }
+       vtkIdType t[3] = { i * 3, i * 3 + 1, i * 3 + 2 };
+       cells->InsertNextCell(3, t);
+-
+-    }
+-
++    }
+ 
+     // Draw vertices
+     std::string frameName = "";
+@@ -279,7 +274,7 @@
+       vtkNew<vtkFloatArray> normals;
+       normals->SetNumberOfComponents(3);
+       normals->Allocate(header->numTriangles * 3 * 3);
+-  
++
+       plugin_frame_pointer selectedFrame = framePtr[frameNum];
+       if (*selectedFrame.type == 0)
+       {
+@@ -296,17 +291,17 @@
+             {
+               v[k] = v[k] * header->scale[k] + header->translation[k];
+             }
+-            vertices->InsertPoint(i*3+j, v);
++            vertices->InsertPoint(i * 3 + j, v);
+             int normalIndex = selectedFrame.frames->verts[vertexNum[j]].normalIndex;
+-            normals->SetTuple3(i*3+j, NormalVectors[normalIndex][0] / 255.0,
+-             NormalVectors[normalIndex][1] / 255.0, NormalVectors[normalIndex][2] / 255.0);
++            normals->SetTuple3(i * 3 + j, NormalVectors[normalIndex][0] / 255.0,
++              NormalVectors[normalIndex][1] / 255.0, NormalVectors[normalIndex][2] / 255.0);
+           }
+         }
+         vtkNew<vtkPolyData> mesh;
+         mesh->SetPoints(vertices);
+         mesh->SetPolys(cells);
+         mesh->GetPointData()->SetTCoords(textureCoordinates);
+-//        mesh->GetPointData()->SetNormals(normals);
++        //        mesh->GetPointData()->SetNormals(normals);
+         Mesh.push_back(mesh);
+         std::string meshName = std::string(selectedFrame.frames->name);
+         for (int i = 0; i < meshName.size(); i++)
+@@ -347,9 +342,9 @@
+               {
+                 v[k] = v[k] * header->scale[k] + header->translation[k];
+               }
+-              vertices->InsertPoint(i*3+j, v);
++              vertices->InsertPoint(i * 3 + j, v);
+               int normalIndex = selectedFrame.frames[groupFrameNum].verts[vertexNum[j]].normalIndex;
+-              normals->SetTuple3(i*3+j, NormalVectors[normalIndex][0] / 255.0,
++              normals->SetTuple3(i * 3 + j, NormalVectors[normalIndex][0] / 255.0,
+                 NormalVectors[normalIndex][1] / 255.0, NormalVectors[normalIndex][2] / 255.0);
+             }
+           }
+@@ -378,7 +373,8 @@
+             NumberOfAnimations++;
+             frameName = meshName;
+           }
+-          std::pair<int, float> pair = std::make_pair(frameIndex, selectedFrame.time[groupFrameNum]);
++          std::pair<int, float> pair =
++            std::make_pair(frameIndex, selectedFrame.time[groupFrameNum]);
+           GroupAndTimeVal.push_back(pair);
+         }
+       }
+@@ -399,7 +395,7 @@
+         for (int j = 0; j < header->numTriangles * 3; j++)
+         {
+           double* v_0 = Mesh[i]->GetPoint(j);
+-          double* v_1 = Mesh[i+1]->GetPoint(j);
++          double* v_1 = Mesh[i + 1]->GetPoint(j);
+           double* interp = new double[3];
+           interp[0] = v_0[0] + 0.5 * (v_1[0] - v_0[0]);
+           interp[1] = v_0[1] + 0.5 * (v_1[1] - v_0[1]);
+@@ -427,17 +423,14 @@
+     // Read header
+     mdl_header_t* header = reinterpret_cast<mdl_header_t*>(buffer.data());
+     int offset = 84;
+-    
++
+     // Set textures
+-    Texture= this->CreateTexture(
++    Texture = this->CreateTexture(
+       buffer, offset, header->skinWidth, header->skinHeight, header->numSkins, 0);
+-    
+-    
++
+     // Set polyData
+     this->CreateMesh(buffer, offset, header, 0);
+-    
+-    
+-    
++
+     return 1;
+   }
+ 
+@@ -447,7 +440,7 @@
+     if (abs(timeValue - LastRenderTime) > 1.0 / 24)
+     {
+       Mapper->SetInputData(
+-          Mesh[(CurrentFrameIndex++) % (LastFrameIndex - FirstFrameIndex) + FirstFrameIndex]);         
++        Mesh[(CurrentFrameIndex++) % (LastFrameIndex - FirstFrameIndex) + FirstFrameIndex]);
+       LastRenderTime = timeValue;
+     }
+   }
+@@ -465,7 +458,7 @@
+     while (i < GroupAndTimeVal.size() && GroupAndTimeVal[++i].first == animationIndex)
+     {
+     }
+-    LastFrameIndex = i-1;
++    LastFrameIndex = i - 1;
+   }
+ 
+   void ImportActors(vtkRenderer* renderer)
+@@ -482,14 +475,12 @@
+     Mapper = mapper;
+   }
+ 
+-
+-  
+   vtkQuakeMDLImporter* Parent;
+   std::string Description;
+   vtkSmartPointer<vtkActor> Actor;
+   vtkSmartPointer<vtkPolyDataMapper> Mapper;
+   std::vector<vtkSmartPointer<vtkPolyData>> Mesh;
+-  std::vector<std::pair<int, float> > GroupAndTimeVal;
++  std::vector<std::pair<int, float>> GroupAndTimeVal;
+   int ActiveAnimationId = 0;
+   int CurrentFrameIndex = 0;
+   int FirstFrameIndex = 0;
+@@ -637,9 +628,6 @@
+ 
+ //----------------------------------------------------------------------------
+ 
+-
+-
+-
+ //----------------------------------------------------------------------------
+ int vtkQuakeMDLImporter::ImportBegin()
+ {
+@@ -695,7 +683,6 @@
+ {
+   return true;
+ }
+-
+ 
+ //----------------------------------------------------------------------------
+ bool vtkQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
+@@ -722,7 +709,6 @@
+ //----------------------------------------------------------------------------
+ void vtkQuakeMDLImporter::SetCamera(vtkIdType camIndex)
+ {
+-  
+ }
+ 
+ //----------------------------------------------------------------------------
