@@ -1,0 +1,9 @@
+diff a/plugins/native/module/vtkQuakeMDLImporter.cxx b/plugins/native/module/vtkQuakeMDLImporter.cxx	(rejected hunks)
+@@ -722,7 +709,6 @@
+ //----------------------------------------------------------------------------
+ void vtkQuakeMDLImporter::SetCamera(vtkIdType camIndex)
+ {
+-  
+ }
+ 
+ //----------------------------------------------------------------------------
