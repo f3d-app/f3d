@@ -13,7 +13,6 @@ public:
   static vtkQuakeMDLImporter* New();
   vtkTypeMacro(vtkQuakeMDLImporter, vtkImporter);
 
-
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{
