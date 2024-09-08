@@ -5,7 +5,7 @@
 
 #ifndef vtkQuakeMDLImporter_h
 #define vtkQuakeMDLImporter_h
-#include<vtkImporter.h>
+#include <vtkImporter.h>
 
 class vtkQuakeMDLImporter : public vtkImporter
 {
@@ -86,17 +86,16 @@ public:
    */
   void SetCamera(vtkIdType camIndex) override;
 
-
 protected:
   vtkQuakeMDLImporter();
   ~vtkQuakeMDLImporter() override = default;
-  
+
   int ImportBegin() override;
   void ImportActors(vtkRenderer*) override;
   void ImportCameras(vtkRenderer*) override;
   void ImportLights(vtkRenderer*) override;
 
-  // Header definition, 
+  // Header definition,
   struct mdl_header_t
   {
     int IDPO;
