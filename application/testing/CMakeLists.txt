@@ -391,6 +391,7 @@ f3d_test(NAME TestCameraIndexConfiguration DATA Cameras.gltf ARGS --camera-index
 f3d_test(NAME TestVerboseCamera DATA Cameras.gltf ARGS --camera-index=1 --verbose NO_RENDER REGEXP "0:.*1:")
 
 f3d_test(NAME TestGLTFMorph DATA SimpleMorph.gltf)
+f3d_test(NAME TestGLTFURI DATA Lantern/Lantern.gltf)
 
 f3d_test(NAME TestNoBackground DATA cow.vtp ARGS --no-background)
 
