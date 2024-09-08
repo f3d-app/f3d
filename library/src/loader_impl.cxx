@@ -75,20 +75,13 @@ public:
     progressRep->DrawBackgroundOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
-
-// Complete vtkProgressBarRepresentation needs
-// https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7359
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201027)
     progressRep->DrawFrameOff();
     progressRep->SetPadding(0.0, 0.0);
-#endif
     data->timer->StartTimer();
   }
 
   static void DisplayImporterDescription(vtkImporter* importer)
   {
-// Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210303)
     vtkIdType availCameras = importer->GetNumberOfCameras();
     if (availCameras <= 0)
     {
@@ -103,7 +96,6 @@ public:
       log::debug(i, ": ", importer->GetCameraName(i));
     }
     log::debug("");
-#endif
     log::debug(importer->GetOutputsDescription(), "\n");
   }
 
@@ -132,7 +124,7 @@ public:
     loader_impl::internals::ProgressDataStruct callbackData;
     callbackData.timer = timer;
     callbackData.widget = progressWidget;
-    if (this->Options.getAsBool("ui.loader-progress") && this->Interactor)
+    if (this->Options.ui.loader_progress && this->Interactor)
     {
       loader_impl::internals::CreateProgressRepresentationAndCallback(
         &callbackData, this->GenericImporter, this->Interactor);
@@ -142,7 +134,14 @@ public:
     this->GenericImporter->AddInternalReader(name, source);
 
     // Update the importer
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
+    if (!this->GenericImporter->Update())
+    {
+      throw loader::load_failure_exception("failed to load geometry: " + name);
+    }
+#else
     this->GenericImporter->Update();
+#endif
 
     // Remove anything progress related if any
     this->GenericImporter->RemoveObservers(vtkCommand::ProgressEvent);
@@ -152,7 +151,7 @@ public:
     if (this->AnimationManager.Initialize(
           &this->Options, &this->Window, this->Interactor, this->GenericImporter))
     {
-      double animationTime = this->Options.getAsDouble("scene.animation.time");
+      double animationTime = this->Options.scene.animation.time;
       double timeRange[2];
       this->AnimationManager.GetTimeRange(timeRange);
 
@@ -230,7 +229,6 @@ loader& loader_impl::loadGeometry(const std::string& filePath, bool reset)
   }
   else
   {
-    log::debug("No reader found for \"" + filePath + "\"");
     throw loader::load_failure_exception(
       filePath + " is not a file of a supported 3D geometry file format");
   }
@@ -270,7 +268,6 @@ loader& loader_impl::loadScene(const std::string& filePath)
   }
   else
   {
-    log::debug("No reader found for \"" + filePath + "\"");
     throw loader::load_failure_exception(
       filePath + " is not a file of a supported 3D scene file format");
   }
@@ -288,17 +285,8 @@ loader& loader_impl::loadScene(const std::string& filePath)
   this->Internals->CurrentFullSceneImporter->SetRenderWindow(
     this->Internals->Window.GetRenderWindow());
 
-  int cameraIndex = this->Internals->Options.getAsInt("scene.camera.index");
-// Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210303)
+  int cameraIndex = this->Internals->Options.scene.camera.index;
   this->Internals->CurrentFullSceneImporter->SetCamera(cameraIndex);
-#else
-  // XXX There is no way to recover the init value yet, assume it is -1
-  if (cameraIndex != -1)
-  {
-    log::warn("This VTK version does not support specifying the camera index, ignored.");
-  }
-#endif
 
   log::debug("Loading 3D scene: ", filePath, "\n");
 
@@ -308,14 +296,21 @@ loader& loader_impl::loadScene(const std::string& filePath)
   loader_impl::internals::ProgressDataStruct callbackData;
   callbackData.timer = timer;
   callbackData.widget = progressWidget;
-  if (this->Internals->Options.getAsBool("ui.loader-progress") && this->Internals->Interactor)
+  if (this->Internals->Options.ui.loader_progress && this->Internals->Interactor)
   {
     loader_impl::internals::CreateProgressRepresentationAndCallback(
       &callbackData, this->Internals->CurrentFullSceneImporter, this->Internals->Interactor);
   }
 
   // Read the file
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
+  if (!this->Internals->CurrentFullSceneImporter->Update())
+  {
+    throw loader::load_failure_exception("failed to load scene: " + filePath);
+  }
+#else
   this->Internals->CurrentFullSceneImporter->Update();
+#endif
 
   // Remove anything progress related if any
   this->Internals->CurrentFullSceneImporter->RemoveObservers(vtkCommand::ProgressEvent);
@@ -326,7 +321,7 @@ loader& loader_impl::loadScene(const std::string& filePath)
         &this->Internals->Window, this->Internals->Interactor,
         this->Internals->CurrentFullSceneImporter))
   {
-    double animationTime = this->Internals->Options.getAsDouble("scene.animation.time");
+    double animationTime = this->Internals->Options.scene.animation.time;
     double timeRange[2];
     this->Internals->AnimationManager.GetTimeRange(timeRange);
 

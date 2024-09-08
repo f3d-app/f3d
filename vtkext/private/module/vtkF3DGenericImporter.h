@@ -6,6 +6,7 @@
 #ifndef vtkF3DGenericImporter_h
 #define vtkF3DGenericImporter_h
 
+#include "vtkF3DImporter.h"
 #include "vtkF3DPostProcessFilter.h"
 
 #include <vtkBoundingBox.h>
@@ -29,12 +30,12 @@ class vtkPolyDataMapper;
 class vtkSmartVolumeMapper;
 class vtkTexture;
 
-class vtkF3DGenericImporter : public vtkImporter
+class vtkF3DGenericImporter : public vtkF3DImporter
 {
 public:
   static vtkF3DGenericImporter* New();
 
-  vtkTypeMacro(vtkF3DGenericImporter, vtkImporter);
+  vtkTypeMacro(vtkF3DGenericImporter, vtkF3DImporter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -74,9 +75,9 @@ public:
    * Access to actors vectors. They all have the same size, which correspond to the number
    * of added internal readers.
    */
-  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > GetGeometryActorsAndMappers();
-  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > GetPointSpritesActorsAndMappers();
-  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > GetVolumePropsAndMappers();
+  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*>> GetGeometryActorsAndMappers();
+  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*>> GetPointSpritesActorsAndMappers();
+  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*>> GetVolumePropsAndMappers();
   ///@}
 
   /**
@@ -87,7 +88,7 @@ public:
     std::string Name;
     int MaximumNumberOfComponents = 0;
     std::vector<std::string> ComponentNames;
-    std::vector<std::array<double, 2> > ComponentRanges;
+    std::vector<std::array<double, 2>> ComponentRanges;
     std::array<double, 2> MagnitudeRange = { std::numeric_limits<float>::max(),
       std::numeric_limits<float>::min() };
     std::vector<vtkDataArray*> Arrays;
@@ -120,7 +121,7 @@ public:
   /**
    * Update readers and all pipelines on the specified timestep
    */
-  void UpdateTimeStep(double timestep) override;
+  bool UpdateAtTimeValue(double timeValue) override;
 
   /**
    * Get the number of available animations.
@@ -149,14 +150,8 @@ public:
    * Framerate is ignored in this implementation.
    * Only timerange is defined in this implementation.
    */
-// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
-#else
-  bool GetTemporalInformation(vtkIdType animationIndex, int& nbTimeSteps, double timeRange[2],
-    vtkDoubleArray* timeSteps) override;
-#endif
 
 protected:
   vtkF3DGenericImporter();

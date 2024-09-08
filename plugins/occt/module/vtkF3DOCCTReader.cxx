@@ -29,11 +29,13 @@
 #include <TopoDS_Solid.hxx>
 
 #if F3D_PLUGIN_OCCT_XCAF
+#include <BinXCAFDrivers.hxx>
 #include <IGESCAFControl_Reader.hxx>
 #include <STEPCAFControl_Reader.hxx>
 #include <Standard_Version.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDataStd_Name.hxx>
+#include <TDocStd_Application.hxx>
 #include <TDocStd_Document.hxx>
 #include <XCAFApp_Application.hxx>
 #include <XCAFDoc_DocumentTool.hxx>
@@ -528,7 +530,7 @@ public:
     }
   }
 
-  std::unordered_map<int, vtkSmartPointer<vtkPolyData> > ShapeMap;
+  std::unordered_map<int, vtkSmartPointer<vtkPolyData>> ShapeMap;
   Handle(XCAFDoc_ShapeTool) ShapeTool;
 #endif
 
@@ -651,10 +653,20 @@ int vtkF3DOCCTReader::RequestData(
     STEPCAFControl_Reader reader;
     TransferToDocument(this, reader, doc);
   }
-  else // FILE_FORMAT::IGES
+  else if (this->FileFormat == FILE_FORMAT::IGES)
   {
     IGESCAFControl_Reader reader;
     TransferToDocument(this, reader, doc);
+  }
+  else if (this->FileFormat == FILE_FORMAT::XBF)
+  {
+    Handle(TDocStd_Application) app = new TDocStd_Application();
+    BinXCAFDrivers::DefineFormat(app);
+    if (app->Open(this->GetFileName().c_str(), doc) != PCDM_RS_OK)
+    {
+      vtkErrorWithObjectMacro(this, "Failed to read XBF file");
+      return 0;
+    }
   }
 
   this->Internals->ShapeTool = XCAFDoc_DocumentTool::ShapeTool(doc->Main());
@@ -693,7 +705,7 @@ int vtkF3DOCCTReader::RequestData(
   {
     reader = new STEPControl_Reader();
   }
-  else // FILE_FORMAT::IGES
+  else if (this->FileFormat == FILE_FORMAT::IGES)
   {
     reader = new IGESControl_Reader();
   }
@@ -739,6 +751,7 @@ void vtkF3DOCCTReader::PrintSelf(ostream& os, vtkIndent indent)
     case FILE_FORMAT::BREP: os << "FileFormat: BREP" << "\n"; break;
     case FILE_FORMAT::STEP: os << "FileFormat: STEP" << "\n"; break;
     case FILE_FORMAT::IGES: os << "FileFormat: IGES" << "\n"; break;
+    case FILE_FORMAT::XBF: os << "FileFormat: XBF" << "\n"; break;
   }
   // clang-format
 }

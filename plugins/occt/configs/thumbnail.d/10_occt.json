@@ -1,5 +1,5 @@
 {
-  ".*(step|stp|iges|igs)":
+  ".*(step|stp|iges|igs|brep|xbf)":
   {
     "load-plugins": "occt",
     "up": "+Z",

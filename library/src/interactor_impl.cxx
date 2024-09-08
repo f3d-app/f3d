@@ -40,6 +40,9 @@ public:
     , Window(window)
     , Loader(loader)
   {
+#ifdef __EMSCRIPTEN__
+    vtkRenderWindowInteractor::InteractorManagesTheEventLoop = false;
+#endif
     this->VTKInteractor->SetRenderWindow(this->Window.GetRenderWindow());
     this->VTKInteractor->SetInteractorStyle(this->Style);
     this->VTKInteractor->Initialize();
@@ -68,11 +71,8 @@ public:
     middleButtonReleaseCallback->SetCallback(OnMiddleButtonRelease);
     this->Style->AddObserver(vtkCommand::MiddleButtonReleaseEvent, middleButtonReleaseCallback);
 
-// Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
     this->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
     this->Recorder->SetInteractor(this->VTKInteractor);
-#endif
   }
 
   //----------------------------------------------------------------------------
@@ -172,7 +172,7 @@ public:
     {
       case 'W':
         self->AnimationManager->CycleAnimation();
-        self->Options.set("scene.animation.index", self->AnimationManager->GetAnimationIndex());
+        self->Options.scene.animation.index = self->AnimationManager->GetAnimationIndex();
         ren->SetAnimationnameInfo(self->AnimationManager->GetAnimationName());
         render = true;
         break;
@@ -204,90 +204,92 @@ public:
         }
         break;
       case 'B':
-        self->Options.toggle("ui.bar");
+        self->Options.ui.scalar_bar = !self->Options.ui.scalar_bar;
         render = true;
         break;
       case 'P':
-        self->Options.toggle("render.effect.translucency-support");
+        self->Options.render.effect.translucency_support =
+          !self->Options.render.effect.translucency_support;
         render = true;
         break;
       case 'Q':
-        self->Options.toggle("render.effect.ambient-occlusion");
+        self->Options.render.effect.ambient_occlusion =
+          !self->Options.render.effect.ambient_occlusion;
         render = true;
         break;
       case 'A':
-        self->Options.toggle("render.effect.anti-aliasing");
+        self->Options.render.effect.anti_aliasing = !self->Options.render.effect.anti_aliasing;
         render = true;
         break;
       case 'T':
-        self->Options.toggle("render.effect.tone-mapping");
+        self->Options.render.effect.tone_mapping = !self->Options.render.effect.tone_mapping;
         render = true;
         break;
       case 'E':
-        self->Options.toggle("render.show-edges");
+        self->Options.render.show_edges = !self->Options.render.show_edges;
         render = true;
         break;
       case 'X':
-        self->Options.toggle("interactor.axis");
+        self->Options.interactor.axis = !self->Options.interactor.axis;
         render = true;
         break;
       case 'G':
-        self->Options.toggle("render.grid.enable");
+        self->Options.render.grid.enable = !self->Options.render.grid.enable;
         render = true;
         break;
       case 'N':
-        self->Options.toggle("ui.filename");
+        self->Options.ui.filename = !self->Options.ui.filename;
         render = true;
         break;
       case 'M':
-        self->Options.toggle("ui.metadata");
+        self->Options.ui.metadata = !self->Options.ui.metadata;
         render = true;
         break;
       case 'Z':
-        self->Options.toggle("ui.fps");
+        self->Options.ui.fps = !self->Options.ui.fps;
         self->Window.render();
         self->Window.render();
         // XXX: Double render is needed here
         break;
       case 'R':
-        self->Options.toggle("render.raytracing.enable");
+        self->Options.render.raytracing.enable = !self->Options.render.raytracing.enable;
         render = true;
         break;
       case 'D':
-        self->Options.toggle("render.raytracing.denoise");
+        self->Options.render.raytracing.denoise = !self->Options.render.raytracing.denoise;
         render = true;
         break;
       case 'V':
-        self->Options.toggle("model.volume.enable");
+        self->Options.model.volume.enable = !self->Options.model.volume.enable;
         render = true;
         break;
       case 'I':
-        self->Options.toggle("model.volume.inverse");
+        self->Options.model.volume.inverse = !self->Options.model.volume.inverse;
         render = true;
         break;
       case 'O':
-        self->Options.toggle("model.point-sprites.enable");
+        self->Options.model.point_sprites.enable = !self->Options.model.point_sprites.enable;
         render = true;
         break;
       case 'U':
-        self->Options.toggle("render.background.blur");
+        self->Options.render.background.blur = !self->Options.render.background.blur;
         render = true;
         break;
       case 'K':
-        self->Options.toggle("interactor.trackball");
+        self->Options.interactor.trackball = !self->Options.interactor.trackball;
         render = true;
         break;
       case 'F':
-        self->Options.toggle("render.hdri.ambient");
+        self->Options.render.hdri.ambient = !self->Options.render.hdri.ambient;
         render = true;
         break;
       case 'J':
-        self->Options.toggle("render.background.skybox");
+        self->Options.render.background.skybox = !self->Options.render.background.skybox;
         render = true;
         break;
       case 'L':
       {
-        const double intensity = self->Options.getAsDouble("render.light.intensity");
+        const double intensity = self->Options.render.light.intensity;
         const bool down = rwi->GetShiftKey();
 
         /* `ref < x` is equivalent to:
@@ -305,12 +307,12 @@ public:
         /* new intensity in percents */
         const int newIntensityPct = std::lround(intensity * 100) + (down ? -offsetPp : +offsetPp);
 
-        self->Options.set("render.light.intensity", std::max(newIntensityPct, 0) / 100.0);
+        self->Options.render.light.intensity = std::max(newIntensityPct, 0) / 100.0;
         render = true;
         break;
       }
       case 'H':
-        self->Options.toggle("ui.cheatsheet");
+        self->Options.ui.cheatsheet = !self->Options.ui.cheatsheet;
         render = true;
         break;
       case '?':
@@ -326,7 +328,7 @@ public:
         render = true;
         break;
       case '5':
-        self->Options.toggle("scene.camera.orthographic");
+        self->Options.scene.camera.orthographic = !self->Options.scene.camera.orthographic;
         render = true;
         break;
       case '7':
@@ -358,9 +360,10 @@ public:
     if (checkColoring)
     {
       // Resynchronise renderer coloring status with options
-      self->Options.set("model.scivis.cells", renWithColor->GetColoringUseCell());
-      self->Options.set("model.scivis.array-name", renWithColor->GetColoringArrayName());
-      self->Options.set("model.scivis.component", renWithColor->GetColoringComponent());
+      self->Options.model.scivis.enable = renWithColor->GetColoringEnabled();
+      self->Options.model.scivis.cells = renWithColor->GetColoringUseCell();
+      self->Options.model.scivis.array_name = renWithColor->GetColoringArrayName();
+      self->Options.model.scivis.component = renWithColor->GetColoringComponent();
     }
     if (render)
     {
@@ -545,7 +548,7 @@ public:
   vtkNew<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
-  std::map<unsigned long, std::pair<int, std::function<void()> > > TimerCallBacks;
+  std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
 
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;
@@ -662,16 +665,9 @@ bool interactor_impl::playInteraction(const std::string& file)
   }
   else
   {
-// Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
     // Make sure the recorder is off and streams are cleared
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
-#else
-    // Create a clean recorder as its internal state matters
-    this->Internals->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
-    this->Internals->Recorder->SetInteractor(this->Internals->VTKInteractor);
-#endif
 
     std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
     this->Internals->Recorder->SetFileName(cleanFile.c_str());
@@ -715,16 +711,9 @@ bool interactor_impl::recordInteraction(const std::string& file)
     return false;
   }
 
-// Clear needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9229
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 1, 20220601)
   // Make sure the recorder is off and streams are cleared
   this->Internals->Recorder->Off();
   this->Internals->Recorder->Clear();
-#else
-  // Create a clean recorder as its internal state matters
-  this->Internals->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
-  this->Internals->Recorder->SetInteractor(this->Internals->VTKInteractor);
-#endif
 
   this->Internals->Recorder->SetFileName(cleanFile.c_str());
   this->Internals->Recorder->On();

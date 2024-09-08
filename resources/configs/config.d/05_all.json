@@ -1,0 +1,16 @@
+{
+  ".*":
+  {
+    "axis": true,
+    "tone-mapping": true,
+    "grid": true,
+    "progress": true,
+    "anti-aliasing": true,
+    "filename": true,
+    "scalar-coloring": true,
+    "camera-direction": "-1,-0.5,-1",
+    "hdri-ambient": true,
+    "translucency-support": true,
+    "animation-progress": true
+  }
+}

@@ -213,12 +213,7 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
 
   posImpl += "  gl_Position = MCDCMatrix * posMC;\n";
 
-// LastLightComplexity Changed in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7933
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210506)
   if (this->PrimitiveInfo[this->LastBoundBO].LastLightComplexity > 0)
-#else
-  if (this->LastLightComplexity[this->LastBoundBO] > 0)
-#endif
   {
     posImpl += "  vertexVCVSOutput = MCVCMatrix * posMC;\n";
   }

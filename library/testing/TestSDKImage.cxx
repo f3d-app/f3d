@@ -4,6 +4,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <limits>
 #include <random>
 #include <set>
 #include <sstream>
@@ -34,22 +35,37 @@ int TestSDKImage(int argc, char* argv[])
   constexpr unsigned int height = 64;
   constexpr unsigned int channels = 3;
 
-  std::vector<unsigned char> pixels(width * height * channels);
-
   // fill with deterministic random values
   // do not use std::uniform_int_distribution, it's not giving the same result on different
   // platforms
-  std::mt19937 rand_generator;
-  std::generate(std::begin(pixels), std::end(pixels), [&]() { return rand_generator() % 256; });
+  std::mt19937 randGenerator;
 
   f3d::image generated(width, height, channels);
+  std::vector<uint8_t> pixels(width * height * channels);
+  std::generate(std::begin(pixels), std::end(pixels), [&]() { return randGenerator() % 256; });
   generated.setContent(pixels.data());
 
-  // test save in different formats
+  f3d::image generated16(width, height, channels, f3d::image::ChannelType::SHORT);
+  std::vector<uint16_t> pixels16(width * height * channels);
+  std::generate(
+    std::begin(pixels16), std::end(pixels16), [&]() { return randGenerator() % 65536; });
+  generated16.setContent(pixels16.data());
+
+  std::uniform_real_distribution<> dist(
+    std::numeric_limits<float>::min(), std::numeric_limits<float>::max());
+  f3d::image generated32(width, height, channels, f3d::image::ChannelType::FLOAT);
+  std::vector<float> pixels32(width * height * channels);
+  std::generate(std::begin(pixels32), std::end(pixels32), [&]() { return dist(randGenerator); });
+  generated32.setContent(pixels32.data());
+
+  // test save in different formats and different types
   generated.save(tmpDir + "/TestSDKImage.png");
   generated.save(tmpDir + "/TestSDKImage.jpg", f3d::image::SaveFormat::JPG);
-  generated.save(tmpDir + "/TestSDKImage.tif", f3d::image::SaveFormat::TIF);
   generated.save(tmpDir + "/TestSDKImage.bmp", f3d::image::SaveFormat::BMP);
+  generated.save(tmpDir + "/TestSDKImage.tif", f3d::image::SaveFormat::TIF);
+  generated16.save(tmpDir + "/TestSDKImage16.png");
+  generated16.save(tmpDir + "/TestSDKImage16.tif", f3d::image::SaveFormat::TIF);
+  generated32.save(tmpDir + "/TestSDKImage32.tif", f3d::image::SaveFormat::TIF);
 
   // test saveBuffer in different formats
   std::vector<unsigned char> bufferPNG = generated.saveBuffer();
@@ -91,14 +107,59 @@ int TestSDKImage(int argc, char* argv[])
   try
   {
     generated.save("/dummy/folder/img.png");
-
     std::cerr << "An exception has not been thrown when saving to an incorrect path" << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::image::write_exception&)
   {
   }
+  try
+  {
+    img16.saveBuffer(f3d::image::SaveFormat::BMP);
+    std::cerr
+      << "An exception has not been thrown when saving to BMP format with an incompatible type"
+      << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::write_exception&)
+  {
+  }
+  try
+  {
+    img32.saveBuffer(f3d::image::SaveFormat::PNG);
+    std::cerr
+      << "An exception has not been thrown when saving to PNG format with an incompatible type"
+      << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::write_exception&)
+  {
+  }
 
+  f3d::image img2Ch(4, 4, 2);
+  f3d::image img5Ch(4, 4, 5);
+  try
+  {
+    img5Ch.saveBuffer(f3d::image::SaveFormat::BMP);
+    std::cerr << "An exception has not been thrown when saving to BMP format with an incompatible "
+                 "channel count"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::write_exception&)
+  {
+  }
+  try
+  {
+    img2Ch.saveBuffer(f3d::image::SaveFormat::JPG);
+    std::cerr
+      << "An exception has not been thrown when saving to PNG format with an incompatible type"
+      << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::image::write_exception&)
+  {
+  }
   try
   {
     f3d::image img("/dummy/folder/img.png");
@@ -110,7 +171,7 @@ int TestSDKImage(int argc, char* argv[])
   {
   }
 
-  // check reading a 16-bits image
+  // check 16-bits image code paths
   f3d::image shortImg(testingDir + "/data/16bit.png");
 
   if (shortImg.getChannelType() != f3d::image::ChannelType::SHORT)
@@ -139,6 +200,7 @@ int TestSDKImage(int argc, char* argv[])
     std::cerr << "Cannot read a HDR 32-bits image type size" << std::endl;
     return EXIT_FAILURE;
   }
+  hdrImg.save(tmpDir + "/TestSDKImage32hdr.tif", f3d::image::SaveFormat::TIF);
 
 #if F3D_MODULE_EXR
   // check reading EXR
@@ -163,15 +225,7 @@ int TestSDKImage(int argc, char* argv[])
   {
   }
 
-  if (hdrImg.getChannelType() != f3d::image::ChannelType::FLOAT)
-  {
-    std::cerr << "Cannot read a HDR 32-bits image" << std::endl;
-    return EXIT_FAILURE;
-  }
-
   // check generated image with baseline
-  f3d::image baseline(testingDir + "/baselines/TestSDKImage.png");
-
   if (generated.getWidth() != width || generated.getHeight() != height)
   {
     std::cerr << "Image has wrong dimensions" << std::endl;
@@ -196,11 +250,114 @@ int TestSDKImage(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  f3d::image baseline(testingDir + "/baselines/TestSDKImage.png");
   if (generated != baseline)
   {
-    std::cerr << "Generated image is different from the baseline" << std::endl;
+    double error;
+    generated.compare(baseline, 0, error);
+
+    std::cerr << "Generated image is different from the png baseline: " << error << std::endl;
     return EXIT_FAILURE;
   }
+
+  // XXX: enable following code once https://github.com/f3d-app/f3d/issues/1558 is fixed
+  /*
+  f3d::image baselineTIF(testingDir + "/baselines/TestSDKImage.tif");
+  if (generated != baselineTIF)
+  {
+    double error;
+    generated.compare(baselineTIF, 0, error);
+
+    std::cerr << "Generated image is different from the tif baseline: " << error << std::endl;
+    return EXIT_FAILURE;
+  }*/
+
+// Remove this once VTK 9.3 support is removed
+#ifdef F3D_SSIM_COMPARE
+  // check generated short image with baseline
+  if (generated16.getWidth() != width || generated16.getHeight() != height)
+  {
+    std::cerr << "Short image has wrong dimensions" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated16.getChannelCount() != channels)
+  {
+    std::cerr << "Short image has wrong number of channels" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated16.getChannelType() != f3d::image::ChannelType::SHORT)
+  {
+    std::cerr << "Short image has wrong channel size" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated16.getContent() == nullptr)
+  {
+    std::cerr << "Short image has no data" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  f3d::image baseline16(testingDir + "/baselines/TestSDKImage16.png");
+  if (generated16 != baseline16)
+  {
+    double error;
+    generated16.compare(baseline16, 0, error);
+
+    std::cerr << "generated short image is different from the baseline: " << error << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // XXX: enable following code once https://github.com/f3d-app/f3d/issues/1558 is fixed
+  /*
+  f3d::image baseline16TIF(testingDir + "/baselines/TestSDKImage16.tif");
+  if (generated16 != baseline16TIF)
+  {
+    double error;
+    generated16.compare(baseline16TIF, 0, error);
+
+    std::cerr << "generated short image is different from the TIF baseline: " << error << std::endl;
+    return EXIT_FAILURE;
+  }*/
+
+  // check generated float image with baseline
+  // XXX: Uncomment once https://github.com/f3d-app/f3d/issues/1558 is fixed
+  // f3d::image baseline32(testingDir + "/baselines/TestSDKImage32.tif");
+  f3d::image baseline32 = generated32;
+  if (generated32.getWidth() != width || generated32.getHeight() != height)
+  {
+    std::cerr << "Float image has wrong dimensions" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated32.getChannelCount() != channels)
+  {
+    std::cerr << "Float image has wrong number of channels" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated32.getChannelType() != f3d::image::ChannelType::FLOAT)
+  {
+    std::cerr << "Float image has wrong channel size" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated32.getContent() == nullptr)
+  {
+    std::cerr << "Float image has no data" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (generated32 != baseline32)
+  {
+    double error;
+    generated32.compare(baseline32, 0, error);
+
+    std::cerr << "generated float image is different from the baseline: " << error << std::endl;
+    return EXIT_FAILURE;
+  }
+#endif // F3D_SSIM_COMPARE
 
   // test operators
   f3d::image imgCopy = generated; // copy constructor
@@ -239,18 +396,22 @@ int TestSDKImage(int argc, char* argv[])
     try
     {
       f3d::image(3, 3, 1, f3d::image::ChannelType::BYTE).toTerminalText();
+      std::cerr << "An exception has not been thrown when using toTerminalText with BYTE"
+                << std::endl;
       return EXIT_FAILURE; // expected to throw (wrong channel count)
     }
-    catch (const std::invalid_argument& e)
+    catch (const f3d::image::write_exception&)
     {
     }
 
     try
     {
       f3d::image(3, 3, 4, f3d::image::ChannelType::SHORT).toTerminalText();
+      std::cerr << "An exception has not been thrown when using toTerminalText with SHORT"
+                << std::endl;
       return EXIT_FAILURE; // expected to throw (wrong channel type)
     }
-    catch (const std::invalid_argument& e)
+    catch (const f3d::image::write_exception&)
     {
     }
 
@@ -301,7 +462,7 @@ int TestSDKImage(int argc, char* argv[])
       std::cerr << "getMetadata() failed to throw" << std::endl;
       return EXIT_FAILURE;
     }
-    catch (std::out_of_range& e)
+    catch (const f3d::image::metadata_exception&)
     {
       /* expected, key doesn't exist */
     }
@@ -313,7 +474,7 @@ int TestSDKImage(int argc, char* argv[])
       std::cerr << "setMetadata() with empty value failed" << std::endl;
       return EXIT_FAILURE;
     }
-    catch (std::out_of_range& e)
+    catch (const f3d::image::metadata_exception&)
     {
       /* expected, key has been removed */
     }
@@ -357,6 +518,35 @@ int TestSDKImage(int argc, char* argv[])
       std::cerr << "saving or loading buffer metadata failed" << std::endl;
       return EXIT_FAILURE;
     }
+  }
+
+  // Test image::compare dedicated code paths
+  double error;
+  if (generated.compare(generated16, 0, error) || error != 1.)
+  {
+    std::cerr << "Unexpected result when comparing image with different channel types" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  f3d::image generatedCount(width, height, channels + 1);
+  if (generated.compare(generatedCount, 0, error) || error != 1.)
+  {
+    std::cerr << "Unexpected result when comparing image with different channel count" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  f3d::image generatedSize(width + 1, height, channels);
+  if (generated.compare(generatedSize, 0, error) || error != 1.)
+  {
+    std::cerr << "Unexpected result when comparing image with different sizes" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  f3d::image empty(0, 0, 0);
+  if (!empty.compare(empty, 0, error) || error != 0.)
+  {
+    std::cerr << "Unexpected result when comparing empty images" << std::endl;
+    return EXIT_FAILURE;
   }
 
   return EXIT_SUCCESS;

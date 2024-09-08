@@ -196,6 +196,15 @@ camera& camera_impl::pan(double right, double up, double forward)
 }
 
 //----------------------------------------------------------------------------
+camera& camera_impl::zoom(double factor)
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  cam->Zoom(factor);
+  this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 camera& camera_impl::roll(angle_deg_t angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
@@ -262,7 +271,7 @@ camera& camera_impl::resetToDefault()
 //----------------------------------------------------------------------------
 camera& camera_impl::resetToBounds([[maybe_unused]] double zoomFactor)
 {
-#if __ANDROID__ || VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 0, 20210331)
+#if __ANDROID__
   this->Internals->VTKRenderer->ResetCamera();
 #else
   if (this->Internals->VTKRenderer->GetRenderWindow()->IsA("vtkExternalOpenGLRenderWindow"))

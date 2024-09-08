@@ -143,7 +143,7 @@ PYBIND11_MODULE(pyf3d, module)
         {
           return img.getMetadata(key);
         }
-        catch (std::out_of_range e)
+        catch (const f3d::image::metadata_exception&)
         {
           throw py::key_error(key);
         }
@@ -156,39 +156,33 @@ PYBIND11_MODULE(pyf3d, module)
 
   options //
     .def(py::init<>())
-    .def("__setitem__", py::overload_cast<const std::string&, bool>(&f3d::options::set))
-    .def("__setitem__", py::overload_cast<const std::string&, int>(&f3d::options::set))
-    .def("__setitem__", py::overload_cast<const std::string&, double>(&f3d::options::set))
-    .def(
-      "__setitem__", py::overload_cast<const std::string&, const std::string&>(&f3d::options::set))
     .def("__setitem__",
-      py::overload_cast<const std::string&, const std::vector<int>&>(&f3d::options::set))
-    .def("__setitem__",
-      py::overload_cast<const std::string&, const std::vector<double>&>(&f3d::options::set))
-    .def("__getitem__",
-      [](f3d::options& opts, const std::string key)
+      [](f3d::options& opts, const std::string& key, const f3d::option_variant_t& value)
       {
-#define TRY(getter)                                                                                \
-  try                                                                                              \
-  {                                                                                                \
-    auto v = getter(key);                                                                          \
-    return py::cast(v);                                                                            \
-  }                                                                                                \
-  catch (const f3d::options::inexistent_exception&)                                                \
-  {                                                                                                \
-    throw pybind11::key_error(key);                                                                \
-  }                                                                                                \
-  catch (const f3d::options::incompatible_exception&)                                              \
-  {                                                                                                \
-  }
-        TRY(opts.getAsBoolRef)
-        TRY(opts.getAsIntRef)
-        TRY(opts.getAsDoubleRef)
-        TRY(opts.getAsStringRef)
-        TRY(opts.getAsDoubleVectorRef)
-        TRY(opts.getAsIntVectorRef)
-        throw pybind11::key_error(key);
-#undef TRY
+        try
+        {
+          opts.set(key, value);
+        }
+        catch (const f3d::options::inexistent_exception&)
+        {
+          throw py::key_error(key);
+        }
+        catch (const f3d::options::incompatible_exception&)
+        {
+          throw py::attribute_error(key);
+        }
+      })
+    .def("__getitem__",
+      [](f3d::options& opts, const std::string& key)
+      {
+        try
+        {
+          return opts.get(key);
+        }
+        catch (const f3d::options::inexistent_exception&)
+        {
+          throw py::key_error(key);
+        }
       })
     .def("__len__", [](f3d::options& opts) { return opts.getNames().size(); })
     .def(
@@ -212,7 +206,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("text_distance", &f3d::utils::textDistance);
 
   // f3d::interactor
-  py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete> > interactor(
+  py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete>> interactor(
     module, "Interactor");
   interactor //
     .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation")
@@ -246,7 +240,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("face_indices", &f3d::mesh_t::face_indices);
 
   // f3d::loader
-  py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete> > loader(module, "Loader");
+  py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete>> loader(module, "Loader");
   loader //
     .def("has_geometry_reader", &f3d::loader::hasGeometryReader)
     .def("load_geometry", py::overload_cast<const std::string&, bool>(&f3d::loader::loadGeometry),
@@ -257,7 +251,7 @@ PYBIND11_MODULE(pyf3d, module)
       "Load a surfacic mesh from memory", py::arg("mesh"), py::arg("reset") = false);
 
   // f3d::camera
-  py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete> > camera(module, "Camera");
+  py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete>> camera(module, "Camera");
   camera //
     .def_property(
       "position", [](f3d::camera& cam) { return cam.getPosition(); }, &f3d::camera::setPosition)
@@ -272,6 +266,7 @@ PYBIND11_MODULE(pyf3d, module)
       "state", [](f3d::camera& cam) { return cam.getState(); }, &f3d::camera::setState)
     .def("dolly", &f3d::camera::dolly)
     .def("pan", &f3d::camera::pan, py::arg("right"), py::arg("up"), py::arg("forward") = 0.0)
+    .def("zoom", &f3d::camera::zoom)
     .def("roll", &f3d::camera::roll)
     .def("azimuth", &f3d::camera::azimuth)
     .def("yaw", &f3d::camera::yaw)
@@ -291,7 +286,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("angle", &f3d::camera_state_t::angle);
 
   // f3d::window
-  py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete> > window(module, "Window");
+  py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete>> window(module, "Window");
 
   py::enum_<f3d::window::Type>(window, "Type")
     .value("NONE", f3d::window::Type::NONE)
@@ -359,130 +354,4 @@ PYBIND11_MODULE(pyf3d, module)
     .value("ERROR", f3d::log::VerboseLevel::ERROR)
     .value("QUIET", f3d::log::VerboseLevel::QUIET)
     .export_values();
-
-// deprecated functions, will be removed in the next major release, F3D v3.0.0
-#ifndef F3D_NO_DEPRECATED
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  image //
-    .def("setResolution", &f3d::image::setResolution,
-      "DEPRECATED: use the appropriate constructor instead.")
-    .def("setChannelCount", &f3d::image::setResolution,
-      "DEPRECATED: use the appropriate constructor instead.")
-    .def(
-      "setData", [=](f3d::image& img, const py::bytes& data) { setImageBytes(img, data); },
-      "DEPRECATED: use setContent instead")
-    .def(
-      "getData", [=](const f3d::image& img) { return getImageBytes(img); },
-      "DEPRECATED: use getContent instead.")
-    .def("getWidth", &f3d::image::getWidth, "DEPRECATED")
-    .def("getHeight", &f3d::image::getHeight, "DEPRECATED")
-    .def("getChannelCount", &f3d::image::getChannelCount, "DEPRECATED")
-    .def("getChannelType", &f3d::image::getChannelType, "DEPRECATED")
-    .def("getChannelTypeSize", &f3d::image::getChannelTypeSize, "DEPRECATED")
-    .def("setContent", setImageBytes, "DEPRECATED")
-    .def("getContent", getImageBytes, "DEPRECATED");
-
-  options //
-    .def("set", py::overload_cast<const std::string&, bool>(&f3d::options::set),
-      "Set a boolean option", "DEPRECATED")
-    .def("set", py::overload_cast<const std::string&, int>(&f3d::options::set),
-      "Set an integer option", "DEPRECATED")
-    .def("set", py::overload_cast<const std::string&, double>(&f3d::options::set),
-      "Set a floating point option", "DEPRECATED")
-    .def("set", py::overload_cast<const std::string&, const std::string&>(&f3d::options::set),
-      "Set a string option", "DEPRECATED")
-    .def("set", py::overload_cast<const std::string&, const std::vector<int>&>(&f3d::options::set),
-      "Set an array of integers option", "DEPRECATED")
-    .def("set",
-      py::overload_cast<const std::string&, const std::vector<double>&>(&f3d::options::set),
-      "Set an array of floating points option", "DEPRECATED")
-    .def("getAsBool", &f3d::options::getAsBool, "DEPRECATED")
-    .def("getAsInt", &f3d::options::getAsInt, "DEPRECATED")
-    .def("getAsDouble", &f3d::options::getAsDouble, "DEPRECATED")
-    .def("getAsString", &f3d::options::getAsString, "DEPRECATED")
-    .def("getAsIntVector", &f3d::options::getAsIntVector, "DEPRECATED")
-    .def("getAsDoubleVector", &f3d::options::getAsDoubleVector, "DEPRECATED")
-    .def("isSame", &f3d::options::isSame, "DEPRECATED")
-    .def("getNames", &f3d::options::getNames, "DEPRECATED")
-    .def("getClosestOption", &f3d::options::getClosestOption, "DEPRECATED");
-
-  utils //
-    .def_static("textDistance", &f3d::utils::textDistance, "DEPRECATED");
-
-  interactor //
-    .def("toggleAnimation", &f3d::interactor::toggleAnimation, "Toggle the animation", "DEPRECATED")
-    .def("startAnimation", &f3d::interactor::startAnimation, "Start the animation", "DEPRECATED")
-    .def("stopAnimation", &f3d::interactor::stopAnimation, "Stop the animation", "DEPRECATED")
-    .def("isPlayingAnimation", &f3d::interactor::isPlayingAnimation,
-      "Returns True if the animation is currently started", "DEPRECATED")
-    .def("enableCameraMovement", &f3d::interactor::enableCameraMovement,
-      "Enable the camera interaction", "DEPRECATED")
-    .def("disableCameraMovement", &f3d::interactor::disableCameraMovement,
-      "Disable the camera interaction", "DEPRECATED")
-    .def("playInteraction", &f3d::interactor::playInteraction, "Play an interaction file",
-      "DEPRECATED")
-    .def("recordInteraction", &f3d::interactor::recordInteraction, "Record an interaction file",
-      "DEPRECATED")
-    .def_static(
-      "getDefaultInteractionsInfo", &f3d::interactor::getDefaultInteractionsInfo, "DEPRECATED");
-
-  loader //
-    .def("hasGeometryReader", &f3d::loader::hasGeometryReader, "DEPRECATED")
-    .def("loadGeometry", py::overload_cast<const std::string&, bool>(&f3d::loader::loadGeometry),
-      "load geometry to a default scene", "DEPRECATED")
-    .def("hasSceneReader", &f3d::loader::hasSceneReader, "DEPRECATED")
-    .def("loadScene", &f3d::loader::loadScene, "Load a specific full scene file", "DEPRECATED");
-
-  camera //
-    .def("setPosition", &f3d::camera::setPosition, "DEPRECATED: use position property setter")
-    .def("getPosition", py::overload_cast<>(&f3d::camera::getPosition),
-      "DEPRECATED: use position property getter")
-    .def("setFocalPoint", &f3d::camera::setFocalPoint, "DEPRECATED")
-    .def("getFocalPoint", py::overload_cast<>(&f3d::camera::getFocalPoint), "DEPRECATED")
-    .def("setViewUp", &f3d::camera::setViewUp, "DEPRECATED")
-    .def("getViewUp", py::overload_cast<>(&f3d::camera::getViewUp), "DEPRECATED")
-    .def("setViewAngle", &f3d::camera::setViewAngle, "DEPRECATED")
-    .def("getViewAngle", py::overload_cast<>(&f3d::camera::getViewAngle), "DEPRECATED")
-    .def("getViewAngle", py::overload_cast<f3d::angle_deg_t&>(&f3d::camera::getViewAngle),
-      "DEPRECATED")
-    .def("setState", &f3d::camera::setState, "DEPRECATED")
-    .def("getState", py::overload_cast<>(&f3d::camera::getState), "DEPRECATED")
-    .def("getState", py::overload_cast<f3d::camera_state_t&>(&f3d::camera::getState), "DEPRECATED")
-    .def("setCurrentAsDefault", &f3d::camera::setCurrentAsDefault, "DEPRECATED")
-    .def("resetToDefault", &f3d::camera::resetToDefault, "DEPRECATED")
-    .def("resetToBounds", &f3d::camera::resetToBounds, py::arg("zoomFactor") = 0.9, "DEPRECATED");
-
-  window //
-    .def("getType", &f3d::window::getType, "DEPRECATED")
-    .def("getCamera", &f3d::window::getCamera, py::return_value_policy::reference, "DEPRECATED")
-    .def("renderToImage", &f3d::window::renderToImage, "Render the window to an image",
-      py::arg("noBackground") = false, "DEPRECATED")
-    .def("setSize", &f3d::window::setSize, "Set the window size", "DEPRECATED")
-    .def("getWidth", &f3d::window::getWidth, "Get the window width", "DEPRECATED")
-    .def("getHeight", &f3d::window::getHeight, "Get the window height", "DEPRECATED")
-    .def("setPosition", &f3d::window::setPosition, "DEPRECATED")
-    .def("setIcon", &f3d::window::setIcon,
-      "Set the icon of the window using a memory buffer representing a PNG file", "DEPRECATED")
-    .def("setWindowName", &f3d::window::setWindowName, "Set the window name", "DEPRECATED")
-    .def("getWorldFromDisplay", &f3d::window::getWorldFromDisplay,
-      "Get world coordinate point from display coordinate", "DEPRECATED")
-    .def("getDisplayFromWorld", &f3d::window::getDisplayFromWorld,
-      "Get display coordinate point from world coordinate", "DEPRECATED");
-
-  engine //
-    .def("setCachePath", &f3d::engine::setCachePath, "Set the cache path directory", "DEPRECATED")
-    .def(
-      "setOptions", py::overload_cast<const f3d::options&>(&f3d::engine::setOptions), "DEPRECATED")
-    .def("getOptions", &f3d::engine::getOptions, py::return_value_policy::reference, "DEPRECATED")
-    .def("getWindow", &f3d::engine::getWindow, py::return_value_policy::reference, "DEPRECATED")
-    .def("getLoader", &f3d::engine::getLoader, py::return_value_policy::reference, "DEPRECATED")
-    .def("getInteractor", &f3d::engine::getInteractor, py::return_value_policy::reference,
-      "DEPRECATED")
-    .def_static("loadPlugin", &f3d::engine::loadPlugin, "Load a plugin", "DEPRECATED")
-    .def_static("autoloadPlugins", &f3d::engine::autoloadPlugins,
-      "Automatically load internal plugins", "DEPRECATED")
-    .def_static("getPluginsList", &f3d::engine::getPluginsList, "DEPRECATED");
-#pragma GCC diagnostic pop
-#endif
 }

@@ -39,6 +39,26 @@ struct F3D_EXPORT vector3_t : std::array<double, 3>
 using angle_deg_t = double;
 
 /**
+ * Describe a ratio.
+ */
+class F3D_EXPORT ratio_t
+{
+public:
+  ratio_t() = default;
+  ratio_t(double val)
+    : Value(val)
+  {
+  }
+  operator double() const
+  {
+    return this->Value;
+  }
+
+private:
+  double Value;
+};
+
+/**
  * Describe a 3D surfacic mesh.
  * A valid mesh fulfills these requirements:
  * - points must not be empty and its length must be a multiple of 3 (3 times the number of points)

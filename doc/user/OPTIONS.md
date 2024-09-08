@@ -1,11 +1,14 @@
+<!-- {% assign model = "{{model}}" %} set variable to prevent Jekyll from swallowing `{{model}}` when expanding template variables -->
+
 # Command line options
 
 F3D behavior can be fully controlled from the command line using the following options.
 
-## Applicative Options
+## Application Options
 
 Options|Default|Description
 ------|------|------
+\-\-input=\<input file\>||The input file or files to read, can also be provided as a positional argument.
 \-\-output=\<png file\>||Instead of showing a render view and render into it, *render directly into a png file*. When used with \-\-ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating).
 \-\-no-background||Use with \-\-output to output a png file with a transparent background.
 -h, \-\-help||Print *help* and exit. Ignore `--verbose`.
@@ -24,8 +27,9 @@ Options|Default|Description
 
 Options|Default|Description
 ------|------|------
-\-\-verbose=\<[debug\|info\|warning\|error\|quiet]\>|info| Set *verbose* level, in order to provide more information about the loaded data in the console output. If no level is providen, assume `debug`. Option parsing may ignore this flag.
+\-\-verbose=\<[debug\|info\|warning\|error\|quiet]\>|info| Set *verbose* level, in order to provide more information about the loaded data in the console output. If no level is provided, assume `debug`. Option parsing may ignore this flag.
 \-\-progress||Show a *progress bar* when loading the file.
+\-\-animation-progress||Show a *progress bar* when playing the animation.
 \-\-geometry-only||For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
 \-\-group-geometries||When opening multiple files, show them all in the same scene.<br>Force geometry-only. The configuration file for the first file will be loaded.
 \-\-up=\<[+\|-][X\|Y\|Z]\>|+Y|Define the Up direction.
@@ -33,6 +37,7 @@ Options|Default|Description
 -g, \-\-grid||Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.
 \-\-grid\-unit=\<length\>||Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.
 \-\-grid\-subdivisions=\<count\>||Set the number of subdivisions for the grid.
+\-\-grid\-color=\<color\>|(0,0,0)|Set the color grid lines.
 -e, \-\-edges||Show the *cell edges*.
 \-\-camera-index=\<idx\>|-1|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.
 -k, \-\-trackball||Enable trackball interaction.
@@ -81,7 +86,8 @@ Options|Default|Description
 
 Options|Default|Description
 ------|------|------
--s, \-\-scalars=\<array_name\>||Specify an array to *Color* with if present in the file. If no array_name is provided, the first in alphabetical order will be picked if any are available. <br>Requires a default scene.<br>Use \-\-verbose to recover the usable array names.
+-s, \-\-scalar-coloring||Enable scalar coloring if present in the file. If no `--coloring-array` is provided, the first in alphabetical order will be picked if any are available. <br>Requires a default scene.
+\-\-coloring-array=\<array_name\>||The coloring array name to use when coloring.<br>Use \-\-verbose to recover the usable array names.
 -y, \-\-comp=\<comp_index\>|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. -1 means *magnitude*. -2 or the short option, -y, means *direct values*.<br>When using *direct values*, components are used as L, LA, RGB, RGBA values depending on the number of components.
 -c, \-\-cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
 \-\-range=\<min,max\>||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
@@ -121,13 +127,14 @@ Options|Description
 -q, \-\-ambient-occlusion|Enable *ambient occlusion*. This is a technique used to improve the depth perception of the object.
 -a, \-\-anti-aliasing|Enable *anti-aliasing*. This technique is used to reduce aliasing.
 -t, \-\-tone-mapping|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.
+\-\-final-shader|Add a final shader to the output image. See [dedicated documentation](FINAL_SHADER.md) for more details.
 
 ## Testing options
 
 Options|Default|Description
 ------|------|------
 \-\-ref=\<png file\>||Render and compare with the provided *reference image*, for testing purposes. Use with output option to generate new baselines and diff images.
-\-\-ref-threshold=\<threshold\>|50|Set the *comparison threshold* to trigger a test failure or success. The default (50) correspond to almost visually identical images.
+\-\-ref-threshold=\<threshold\>|0.05|Set the *comparison threshold* to trigger a test failure or success. The default (0.05) correspond to almost visually identical images.
 \-\-interaction-test-record=\<log file\>||Path to an interaction log file to *record interaction events* to.
 \-\-interaction-test-play=\<log file\>||Path to an interaction log file to *play interactions events* from when loading a file.
 
@@ -141,8 +148,9 @@ Some rendering options are not compatible between them, here is the precedence o
 
 ## Options syntax
 
-The `--options=value` syntax is used everywhere in this documentation, however, the syntax `--options value` can also be used, with the exception of options that have implicit values,
-`--verbose`, `--comp` and `--scalars`.
+To turn on/off options, it is possible to write `--option=true` and `--option=false`, eg `--points-sprites=false`.
+
+As documented, only the `--option=value` syntax is supported. The syntax `--option value` is not supported.
 
 ## Filename templating
 
@@ -162,4 +170,3 @@ The destination filename used by `--output` or to save screenshots can use the f
 
 For example the screenshot filename is configured as `{app}/{model}_{n}.png` by default, meaning that, assuming the model `hello.glb` is being viewed,
 consecutive screenshots are going to be saved as `F3D/hello_1.png`, `F3D/hello_2.png`, `F3D/hello_3.png`, ...
-

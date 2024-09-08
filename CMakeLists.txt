@@ -30,7 +30,7 @@ include(f3dVersion)
 
 # Handle F3D_VERSION
 set(F3D_MAJOR_VERSION 2)
-set(F3D_MINOR_VERSION 4)
+set(F3D_MINOR_VERSION 5)
 set(F3D_PATCH_VERSION 0)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
@@ -95,7 +95,6 @@ find_package(VTK 9.0 REQUIRED
     IOXML
     RenderingAnnotation
     RenderingCore
-    RenderingLabel
     RenderingOpenGL2
     RenderingVolumeOpenGL2
     TestingCore
@@ -183,7 +182,6 @@ list(APPEND f3d_link_options_public ${f3d_sanitizer_link_options})
 
 # Testing
 option(BUILD_TESTING "Build the tests" OFF)
-cmake_dependent_option(F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON "Disable image comparison on tests using the default lights" OFF "BUILD_TESTING" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_RENDERING_TESTS "Enable rendering tests" ON "BUILD_TESTING" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" OFF)
 if(BUILD_TESTING)
@@ -212,7 +210,7 @@ endif()
 # F3D Application
 cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
 
-# Build VTK extension moddules
+# Build VTK extension modules
 add_subdirectory(vtkext)
 
 # plugins
@@ -274,10 +272,10 @@ endif ()
 file(SIZE "${F3D_SOURCE_DIR}/testing/data/dragon.vtu" f3d_lfs_file_size)
 if (f3d_lfs_file_size LESS_EQUAL 500)
   if(BUILD_TESTING)
-    message(FATAL_ERROR "Building tests without LFS data will result in non fonctionning tests, please fetch LFS data or disable BUILD_TESTING. Aborting.")
+    message(FATAL_ERROR "Building tests without git LFS data will result in non functioning tests, please fetch LFS data (git lfs pull) or disable BUILD_TESTING. Aborting.")
   endif()
   if (F3D_BINDINGS_PYTHON)
-    message(WARNING "Building python binding without LFS data is supported but testing using pytest will not be, please fetch LFS data to avoid this.")
+    message(WARNING "Building python binding without git LFS data is supported but testing using pytest will not be, please fetch LFS data (git lfs pull) to avoid this.")
   endif()
 endif()
 

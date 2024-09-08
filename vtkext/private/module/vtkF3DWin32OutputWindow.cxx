@@ -15,14 +15,11 @@ vtkF3DWin32OutputWindow::vtkF3DWin32OutputWindow()
   this->SetDisplayModeToDefault();
 }
 
-// WindowTitle needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7460
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201207)
 //------------------------------------------------------------------------------
 const char* vtkF3DWin32OutputWindow::GetWindowTitle()
 {
   return "F3D log window";
 }
-#endif
 
 //------------------------------------------------------------------------------
 int vtkF3DWin32OutputWindow::Initialize()
@@ -90,7 +87,7 @@ void vtkF3DWin32OutputWindow::DisplayText(const char* text)
   std::string str(text);
   str = std::regex_replace(str, std::regex("\n"), "\r\n");
 
-  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > converter;
+  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   std::wstring wstr = converter.from_bytes(str);
   wstr += L"\r\n";
 

@@ -1,40 +1,27 @@
 list(APPEND libf3dSDKTests_list
-     TestSDKRenderAndInteract.cxx
+     TestSDKAnimation.cxx
+     TestSDKCamera.cxx
+     TestSDKCompareWithFile.cxx
+     TestSDKDropZone.cxx
+     TestSDKDynamicBackgroundColor.cxx
+     TestSDKDynamicFontFile.cxx
+     TestSDKDynamicLightIntensity.cxx
+     TestSDKDynamicProperties.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
-     TestSDKOptions.cxx
-     TestSDKLog.cxx
+     TestSDKImage.cxx
+     TestSDKInteractorCallBack.cxx
+     TestSDKInteractorDropFullScene.cxx
+     TestSDKLoadFromMemory.cxx
      TestSDKLoader.cxx
-     TestSDKCamera.cxx
-    )
-
-# Test image comparison only with VTK > 9.0.1
-if(VTK_VERSION VERSION_GREATER 9.0.1)
-  list(APPEND libf3dSDKTests_list
-    TestSDKCompareWithFile.cxx
-    TestSDKDropZone.cxx
-    TestSDKImage.cxx
-    TestSDKLoadFromMemory.cxx
-    TestSDKMultiColoring.cxx
-    TestSDKMultiOptions.cxx
-    TestSDKWindowNative.cxx
-    TestSDKDynamicBackgroundColor.cxx
-    TestSDKDynamicFontFile.cxx
-    TestSDKDynamicLightIntensity.cxx
-    TestSDKDynamicProperties.cxx
-    )
-  if(NOT F3D_EXCLUDE_DEPRECATED)
-    list(APPEND libf3dSDKTests_list
-         TestSDKImageDeprecated.cxx)
-  endif()
-endif()
-
-# Animation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.0.20201016)
-  list(APPEND libf3dSDKTests_list
-    TestSDKAnimation.cxx
-    )
-endif()
+     TestSDKLog.cxx
+     TestSDKMultiColoring.cxx
+     TestSDKMultiOptions.cxx
+     TestSDKOptions.cxx
+     TestSDKRenderAndInteract.cxx
+     TestSDKRenderFinalShader.cxx
+     TestSDKWindowNative.cxx
+)
 
 # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
@@ -43,11 +30,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
     )
 endif()
 
-# Drop file test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9199
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519)
+# Invalid loader codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287
+# Merge with TestSDKLoader.cxx when VTK 9.4.0 is required.
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   list(APPEND libf3dSDKTests_list
-    TestSDKInteractorCallBack.cxx
-    TestSDKInteractorDropFullScene.cxx
+    TestSDKLoaderInvalid.cxx
     )
 endif()
 
@@ -58,7 +45,7 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullSc
                "${CMAKE_BINARY_DIR}/TestSDKInteractorDropFullScene.log") # world.obj; S
 
 # External window tests
-if(F3D_MODULE_EXTERNAL_RENDERING AND NOT VTK_OPENGL_HAS_EGL AND VTK_VERSION VERSION_GREATER 9.0.1)
+if(F3D_MODULE_EXTERNAL_RENDERING AND NOT VTK_OPENGL_HAS_EGL)
   find_package(glfw3 QUIET)
   if(glfw3_FOUND)
     list(APPEND libf3dSDKTests_list
@@ -88,6 +75,12 @@ set_target_properties(libf3dSDKTests PROPERTIES
   )
 
 target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR=$<BOOL:${F3D_MODULE_EXR}>)
+target_compile_definitions(libf3dSDKTests PRIVATE F3D_DISABLE_CXX17_API)
+
+# Remove this once VTK 9.3 support is removed
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
+  target_compile_definitions(libf3dSDKTests PRIVATE F3D_SSIM_COMPARE)
+endif()
 
 # List tests that do not require rendering
 list(APPEND libf3dSDKTestsNoRender_list
@@ -107,7 +100,6 @@ foreach (test ${libf3dSDKTests_list})
 endforeach ()
 
 # Specific test properties to check
-
 # CTest can't check colored output as it contains special chars
 set_tests_properties(libf3d::TestSDKLog PROPERTIES PASS_REGULAR_EXPRESSION
 "\
@@ -136,5 +128,31 @@ if(Qt5_FOUND)
   target_link_libraries(libf3dSDKTests Qt5::OpenGL)
 endif()
 
-# make sure the libf3d API is compatible with C++11
+# make sure the libf3d API is compatible with the right C++ standard
 set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 11)
+
+# Add Cxx17 tests
+list(APPEND libf3dSDKCxx17Tests_list
+     TestSDKOptionsCxx17.cxx
+)
+
+# create the testing file and list of tests
+create_test_sourcelist(_libf3dSDKCxx17Tests libf3dSDKCxx17Tests.cxx ${libf3dSDKCxx17Tests_list})
+
+# add the executable
+add_executable(libf3dSDKCxx17Tests ${_libf3dSDKCxx17Tests})
+set_target_properties(libf3dSDKCxx17Tests PROPERTIES
+  CXX_VISIBILITY_PRESET hidden
+  )
+
+# Add all the ADD_TEST for each test
+foreach (test ${libf3dSDKCxx17Tests_list})
+  get_filename_component (TName ${test} NAME_WE)
+  add_test (NAME libf3d::${TName} COMMAND libf3dSDKCxx17Tests ${TName}  "${F3D_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+  set_tests_properties(libf3d::${TName} PROPERTIES TIMEOUT 30)
+endforeach ()
+
+target_link_libraries(libf3dSDKCxx17Tests libf3d)
+
+# make sure the libf3d API is compatible with the right C++ standard
+set_target_properties(libf3dSDKCxx17Tests PROPERTIES CXX_STANDARD 17)

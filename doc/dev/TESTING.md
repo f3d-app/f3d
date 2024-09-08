@@ -5,10 +5,9 @@ F3D has an extensive suite of tests that can be run locally, either to validate 
 ## CMake Options
 
 There are a few CMake options to configure the F3D testing framework:
-* `BUILD_TESTING`: Enable the test framework, off by default.
+* `BUILD_TESTING`: Enable the test framework, off by default. Requires [git LFS](https://git-lfs.com/) if repository is cloned.
 * `F3D_TESTING_ENABLE_RENDERING_TESTS`: An option to enable/disable test that require rendering capabilities, on by default.
 * `F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS`: Certain tests can take some time to run, off by default, requires rendering tests.
-* `F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON`: With VTK < 9.1.0, rendering can be very different, although not incorrect, so this option is provided, off by default.
 
 ## Running the tests
 
@@ -38,21 +37,20 @@ When contributing to F3D, it is necessary that new code is covered by a test in 
 ### Application layer
 
 All application tests are initiated via the `CTest` (https://cmake.org/cmake/help/book/mastering-cmake/chapter/Testing%20With%20CMake%20and%20CTest.html) testing framework.
-`CTest` runs `f3d` with the `--output` and `--ref` arguments which renders an output image and compares it to a reference image. F3D compares the differences between the 2 images and generates a diff file if there are differences between the images.
+`CTest` runs `f3d` with the `--output` and `--ref` arguments which renders an output image and compares it to a reference image. F3D compares the differences between the 2 images and compute a difference value and compare it to a threshold to check if a test passes or not.
 
 All aspects of the application test framework are handled in `application/testing/CMakeLists.txt`.
 
 Usually, adding a test is as simple as adding a line like this one:
 
 ```
-f3d_test(NAME TestName DATA datafile.ext ARGS --args-to-test DEFAULT_LIGHTS)
+f3d_test(NAME TestName DATA datafile.ext ARGS --args-to-test)
 ```
 
  where
  - `NAME` should be the name of the test, which must be unique
  - `DATA` should be a file in `testing/data` directory, though adding a new file is possible
  - `ARGS` should be the F3D options to pass to the f3d executable, if any
- - `DEFAULT_LIGHTS` is expected when performing baselines comparison
 
 Once the new test has been added, configure and build F3D, then run the test (`-VV` for verbose output):
 
@@ -88,7 +86,7 @@ f3d --interaction-test-play ./TestName.log
 Interactions that are not needed for the test can be removed manually. After verifying that the interaction file works as expected, copy it to `./testing/recordings`. The name of the interaction file should be the same as the test name. The interaction test case can then be created by adding 
 
 ```
-f3d_test(NAME TestName DATA datafile.ext INTERACTION DEFAULT_LIGHTS)
+f3d_test(NAME TestName DATA datafile.ext INTERACTION)
 ```
 
 to `application/testing/CMakeLists.txt`

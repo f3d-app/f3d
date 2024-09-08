@@ -7,7 +7,7 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 ## Dependencies
 
 * [CMake](https://cmake.org) >= 3.1.
-* [VTK](https://vtk.org) >= 9.0.0 (9.2.6 recommended).
+* [VTK](https://vtk.org) >= 9.2.6 (9.3.1 recommended).
 * A C++17 compiler.
 * A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 * Optionally, [Assimp](https://www.assimp.org/) >= 5.0.
@@ -22,7 +22,7 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.0.0, however, many features are only available in certain conditions. We suggest using VTK 9.2.6 with RenderingRayTracing, RenderingExternal, IOExodus and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.2.6, however, some features may not be available. We suggest using VTK 9.3.1 with RenderingRayTracing, RenderingExternal, IOExodus and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 ## Configuration and building
 
@@ -44,7 +44,7 @@ Some modules, plugins and bindings depending on external libraries can be option
 * `F3D_MODULE_EXTERNAL_RENDERING`: Support for external render window. Requires that VTK has been built with `VTK_MODULE_ENABLE_VTK_RenderingExternal` turned on. Disabled by default.
 * `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
 * `F3D_PLUGIN_BUILD_EXODUS`: Support for ExodusII (.ex2) file format. Requires that VTK has been built with `IOExodus` module (and `hdf5`). Enabled by default.
-* `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES and BREP file formats. Requires `OpenCASCADE`. Disabled by default.
+* `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES, BREP, and XBF file formats. Requires `OpenCASCADE`. Disabled by default.
 * `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X and 3MF file formats. Requires `Assimp`. Disabled by default.
 * `F3D_PLUGIN_BUILD_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.
 * `F3D_PLUGIN_BUILD_DRACO`: Support for DRC file format. Requires `Draco`. Disabled by default.

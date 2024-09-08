@@ -135,15 +135,9 @@ bool vtkF3DGenericImporter::IsAnimationEnabled(vtkIdType animationIndex)
 }
 
 //----------------------------------------------------------------------------
-// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
 bool vtkF3DGenericImporter::GetTemporalInformation(vtkIdType animationIndex,
   double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
   vtkDoubleArray* vtkNotUsed(timeSteps))
-#else
-bool vtkF3DGenericImporter::GetTemporalInformation(vtkIdType animationIndex,
-  int& vtkNotUsed(nbTimeSteps), double timeRange[2], vtkDoubleArray* vtkNotUsed(timeSteps))
-#endif
 {
   // F3D do not care about timesteps
   if (animationIndex < this->GetNumberOfAnimations())
@@ -159,6 +153,7 @@ bool vtkF3DGenericImporter::GetTemporalInformation(vtkIdType animationIndex,
 void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
   this->Pimpl->GeometryBoundingBox.Reset();
+  bool hasGeometry = false;
 
   // Update each reader
   for (size_t readerIndex = 0; readerIndex < this->Pimpl->Readers.size(); readerIndex++)
@@ -184,17 +179,15 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
           self->InvokeEvent(vtkCommand::ProgressEvent, &progress);
         });
       pipe.Reader->AddObserver(vtkCommand::ProgressEvent, progressCallback);
-      pipe.PostPro->Update();
+      bool status = pipe.PostPro->GetExecutive()->Update();
       pipe.Reader->RemoveObservers(vtkCommand::ProgressEvent);
-    }
 
-    // Recover output
-    vtkDataObject* readerOutput = pipe.Reader->GetOutputDataObject(0);
-    if (!readerOutput)
-    {
-      F3DLog::Print(F3DLog::Severity::Warning, "A reader did not produce any output");
-      pipe.Output = nullptr;
-      continue;
+      if (!status || !pipe.Reader->GetOutputDataObject(0))
+      {
+        F3DLog::Print(F3DLog::Severity::Warning, "A reader failed to update");
+        pipe.Output = nullptr;
+        continue;
+      }
     }
 
     // Cast to dataset types
@@ -205,8 +198,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       : vtkDataSet::SafeDownCast(surface);
     pipe.Output = dataSet;
 
-    // Recover output description
-    pipe.OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(readerOutput);
+    // Recover output description from the reader
+    pipe.OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(pipe.Reader->GetOutputDataObject(0));
 
     // Recover data for coloring
     pipe.PointDataForColoring = vtkDataSetAttributes::SafeDownCast(dataSet->GetPointData());
@@ -238,10 +231,16 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     pipe.VolumeProp->VisibilityOff();
 
     pipe.Imported = true;
+    hasGeometry = true;
   }
+
   this->UpdateTemporalInformation();
   this->UpdateColoringVectors(false);
   this->UpdateColoringVectors(true);
+  if (!hasGeometry)
+  {
+    this->SetFailureStatus();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -394,23 +393,33 @@ std::string vtkF3DGenericImporter::GetMetaDataDescription()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGenericImporter::UpdateTimeStep(double timestep)
+bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
 {
   // Update each reader
+  bool hasGeometry = false;
   for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
-    pipe.PostPro->UpdateTimeStep(timestep);
+    if(!pipe.PostPro->UpdateTimeStep(timeValue) || !pipe.Reader->GetOutputDataObject(0))
+    {
+      F3DLog::Print(F3DLog::Severity::Warning, "A reader failed to update at a timeValue");
+      pipe.Output = nullptr;
+      pipe.Imported = false;
+      continue;
+    }
+    hasGeometry = true;
   }
+
   this->UpdateColoringVectors(false);
   this->UpdateColoringVectors(true);
   this->UpdateOutputDescriptions();
+  return hasGeometry;
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> >
+std::vector<std::pair<vtkActor*, vtkPolyDataMapper*>>
 vtkF3DGenericImporter::GetGeometryActorsAndMappers()
 {
-  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*> > actorsAndMappers(
+  std::vector<std::pair<vtkActor*, vtkPolyDataMapper*>> actorsAndMappers(
     this->Pimpl->Readers.size());
 
   std::transform(this->Pimpl->Readers.cbegin(), this->Pimpl->Readers.cend(),
@@ -422,10 +431,10 @@ vtkF3DGenericImporter::GetGeometryActorsAndMappers()
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> >
+std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*>>
 vtkF3DGenericImporter::GetPointSpritesActorsAndMappers()
 {
-  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*> > actorsAndMappers(
+  std::vector<std::pair<vtkActor*, vtkPointGaussianMapper*>> actorsAndMappers(
     this->Pimpl->Readers.size());
 
   std::transform(this->Pimpl->Readers.cbegin(), this->Pimpl->Readers.cend(),
@@ -437,10 +446,10 @@ vtkF3DGenericImporter::GetPointSpritesActorsAndMappers()
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> >
+std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*>>
 vtkF3DGenericImporter::GetVolumePropsAndMappers()
 {
-  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*> > propsAndMappers(
+  std::vector<std::pair<vtkVolume*, vtkSmartVolumeMapper*>> propsAndMappers(
     this->Pimpl->Readers.size());
 
   std::transform(this->Pimpl->Readers.cbegin(), this->Pimpl->Readers.cend(),
@@ -599,15 +608,11 @@ void vtkF3DGenericImporter::UpdateOutputDescriptions()
 {
   for (ReaderPipeline& pipe : this->Pimpl->Readers)
   {
-    vtkDataObject* readerOutput = pipe.Reader->GetOutputDataObject(0);
-    if (!readerOutput)
+    if (pipe.Imported)
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "A reader did not produce any output");
-      pipe.Output = nullptr;
-      continue;
+      // Recover output description
+      vtkDataObject* readerOutput = pipe.Reader->GetOutputDataObject(0);
+      pipe.OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(readerOutput);
     }
-
-    // Recover output description
-    pipe.OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(readerOutput);
   }
 }

@@ -12,10 +12,10 @@ TEST_DATA_DIR = Path(__file__).parent.parent.parent.parent.parent / "testing/dat
 def main():
     model_path = TEST_DATA_DIR / "suzanne.obj"
     options = {
-        "scene.up-direction": "+Y",
-        "render.effect.tone-mapping": True,
-        "render.effect.ambient-occlusion": True,
-        "render.effect.translucency-support": True,
+        "scene.up_direction": "+Y",
+        "render.effect.tone_mapping": True,
+        "render.effect.ambient_occlusion": True,
+        "render.effect.translucency_support": True,
         "render.effect.anti-aliasing": True,
     }
     anim_fps = 30

@@ -22,11 +22,12 @@ runs:
         [[ "${{ inputs.sanitizer_type }}" ]] || { echo "sanitizer_type input is empty" ; exit 1; }
         [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
+    - name: Recover LFS Data
+      uses: f3d-app/lfs-data-cache-action@v1
       with:
-        lfs_sha: ${{ inputs.lfs_sha}}
-        workflow_label: 'consumer'
+        type: 'consumer'
+        lfs_sha: ${{inputs.lfs_sha}}
+        cache_postfix: cache-0 
 
     - name: Dependencies Dir
       shell: bash
@@ -88,13 +89,18 @@ runs:
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
+    # Certain interaction test are failing because sanitizer is slow in CI
+    - name: Set CI test exception
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestInteractionAnimationSlow)" >> $GITHUB_ENV
+
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: |
         export LSAN_OPTIONS=suppressions=$(pwd)/../source/.lsan.supp:use_tls=0
         export TSAN_OPTIONS=suppressions=$(pwd)/../source/.tsan.supp
-        ctest -C Release -j 2 --output-on-failure || ctest -C Release -j 1 --rerun-failed -VV
+        ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure || ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 1 --rerun-failed -VV
 
     - name: Upload Tests Artifact
       if: failure()

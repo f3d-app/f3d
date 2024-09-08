@@ -27,20 +27,14 @@ jobs:
       uses: actions/checkout@v4
       with:
         path: 'source'
-        fetch-depth: 0
+        fetch-depth: 1
         lfs: false
 
-    - name: Set LFS env var
-      working-directory: ${{github.workspace}}/source
+    - name: Cache LFS Data
       id: lfs_sha_recover
-      shell: bash
-      run: echo "lfs_sha=$(git log -n 1 --pretty=format:%H -- testing/data/ testing/baselines/ examples/**/*/data/ examples/**/*/baselines/ .github/baselines/)" >> $GITHUB_OUTPUT
-
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
+      uses: f3d-app/lfs-data-cache-action@v1
       with:
-        lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
-        workflow_label: 'producer'
+        cache_postfix: cache-0
 
 #----------------------------------------------------------------------------
 # Windows CI: Build and test, cross-vtk build matrix
@@ -52,7 +46,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.3.0, v9.2.6]
+        vtk_version: [commit, v9.3.1, v9.2.6]
         static_label: [no-static]
         include:
           - vtk_version: commit
@@ -86,7 +80,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.3.0, v9.2.6, v9.1.0, v9.0.0]
+        vtk_version: [commit, v9.3.1, v9.2.6]
         build_type: [standard]
         include:
           - raytracing_label: raytracing
@@ -94,8 +88,6 @@ jobs:
           - optional_deps_label: optional-deps
           - egl_label: no-egl
           - static_label: no-static
-          - vtk_version: v9.0.0
-            raytracing_label: no-raytracing
           - build_type: headless
             vtk_version: commit
             raytracing_label: raytracing
@@ -160,7 +152,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.3.0, v9.2.6]
+        vtk_version: [commit, v9.3.1, v9.2.6]
 
     runs-on: macos-13
 
@@ -190,7 +182,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.3.0, v9.2.6]
+        vtk_version: [commit, v9.3.1, v9.2.6]
         bundle_label: [no-bundle]
         static_label: [no-static]
         include:
@@ -404,27 +396,3 @@ jobs:
       uses: ./source/.github/actions/android-ci
       with:
         arch: ${{matrix.arch}}
-
-#----------------------------------------------------------------------------
-# webassembly: Check build of F3D for webassembly
-#----------------------------------------------------------------------------
-  webassembly:
-    if: github.event.pull_request.draft == false
-
-    strategy:
-      fail-fast: false
-
-    runs-on: ubuntu-latest
-    container: dockcross/web-wasm:20230905-7b2d74f
-
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: 'false'
-
-    - name: Web Assembly CI
-      uses: ./source/.github/actions/webassembly-ci

@@ -10,10 +10,11 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.h")
 
 set(F3D_SOURCE_FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DColorMapTools.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DConfigFileTools.cxx
-  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptionsParser.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptionsTools.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DPluginsTools.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DStarter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DSystemTools.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cxx
@@ -85,6 +86,25 @@ endif ()
 set(f3d_compile_options_private "")
 set(f3d_compile_options_public "")
 set(f3d_link_options_public "")
+
+# This is required to avoid cxxopts
+# splitting input positional option by commas
+target_compile_definitions(f3d PRIVATE "CXXOPTS_VECTOR_DELIMITER='\\0'")
+
+# macOS bundle
+if (F3D_MACOS_BUNDLE)
+  target_compile_definitions(f3d PRIVATE F3D_MACOS_BUNDLE)
+endif ()
+
+# raytracing
+if (F3D_MODULE_RAYTRACING)
+  target_compile_definitions(f3d PRIVATE F3D_MODULE_RAYTRACING)
+endif ()
+
+# exr
+if (F3D_MODULE_EXR)
+  target_compile_definitions(f3d PRIVATE F3D_MODULE_EXR)
+endif ()
 
 # Headless EGL build
 if (VTK_OPENGL_HAS_EGL)
@@ -222,6 +242,12 @@ install(
 if(UNIX AND NOT APPLE AND NOT ANDROID)
   install(FILES "${F3D_SOURCE_DIR}/resources/f3d.desktop"
     DESTINATION "share/applications" COMPONENT assets)
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo16.png"
+    DESTINATION "share/icons/hicolor/16x16/apps" COMPONENT assets
+    RENAME "f3d.png")
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo24.png"
+    DESTINATION "share/icons/hicolor/24x24/apps" COMPONENT assets
+    RENAME "f3d.png")
   install(FILES "${F3D_SOURCE_DIR}/resources/logo32.png"
     DESTINATION "share/icons/hicolor/32x32/apps" COMPONENT assets
     RENAME "f3d.png")
@@ -231,8 +257,14 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
   install(FILES "${F3D_SOURCE_DIR}/resources/logo64.png"
     DESTINATION "share/icons/hicolor/64x64/apps" COMPONENT assets
     RENAME "f3d.png")
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo256.png"
+    DESTINATION "share/icons/hicolor/256x256/apps" COMPONENT assets
+    RENAME "f3d.png")
   install(FILES "${F3D_SOURCE_DIR}/resources/logo.svg"
     DESTINATION "share/icons/hicolor/scalable/apps" COMPONENT assets
+    RENAME "f3d.svg")
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo-mono.svg"
+    DESTINATION "share/icons/HighContrast/scalable/apps" COMPONENT assets
     RENAME "f3d.svg")
   install(FILES "${F3D_SOURCE_DIR}/resources/completion.bash"
     DESTINATION "share/bash-completion/completions" COMPONENT shellext

@@ -14,7 +14,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   renderer->ShowGrid(true);
 
   // Check error paths
-  if (renderer->GetColoringArrayName() != F3D_RESERVED_STRING)
+  if (!renderer->GetColoringArrayName().empty())
   {
     std::cerr << "Unexpected coloring information without an importer" << std::endl;
     return EXIT_FAILURE;
@@ -37,7 +37,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   importer->Update();
 
   // Check invalid array code path
-  renderer->SetColoring(false, "Invalid", 0);
+  renderer->SetColoring(true, false, "Invalid", 0);
   renderer->SetUseVolume(false);
   renderer->UpdateActors();
   renderer->CycleScalars(vtkF3DRendererWithColoring::CycleType::COMPONENT);
@@ -51,7 +51,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   }
 
   // Check invalid component code path
-  renderer->SetColoring(false, "Momentum", 5);
+  renderer->SetColoring(true, false, "Momentum", 5);
   renderer->UpdateActors();
   renderer->SetUseVolume(true);
   renderer->UpdateActors();

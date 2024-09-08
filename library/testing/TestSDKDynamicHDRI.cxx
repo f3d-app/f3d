@@ -19,8 +19,8 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
-  opt.set("ui.filename", true);
-  opt.set("ui.filename-info", "(1/1) cow.vtp");
+  opt.ui.filename = true;
+  opt.ui.filename_info = "(1/1) cow.vtp";
 
   load.loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
 
@@ -39,8 +39,8 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   eng.setCachePath(cachePath);
 
   // Enable HDRI ambient and skybox and check the default HDRI
-  opt.set("render.hdri.ambient", true);
-  opt.set("render.background.skybox", true);
+  opt.render.hdri.ambient = true;
+  opt.render.background.skybox = true;
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
     std::string(argv[2]), "TestSDKDynamicHDRIDefault", 120);
   if (!ret)
@@ -50,7 +50,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   }
 
   // Change the hdri and make sure it is taken into account
-  opt.set("render.hdri.file", std::string(argv[1]) + "data/palermo_park_1k.hdr");
+  opt.render.hdri.file = std::string(argv[1]) + "data/palermo_park_1k.hdr";
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
     std::string(argv[2]), "TestSDKDynamicHDRI", 50);
   if (!ret)
@@ -89,28 +89,13 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
 
 #if F3D_MODULE_EXR
   // Change the hdri and make sure it is taken into account
-  opt.set("render.hdri.file", std::string(argv[1]) + "/data/kloofendal_43d_clear_1k.exr");
+  opt.render.hdri.file = std::string(argv[1]) + "/data/kloofendal_43d_clear_1k.exr";
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
     std::string(argv[2]), "TestSDKDynamicHDRIExr", 50);
 
   if (!ret)
   {
     std::cerr << "Render with EXR HDRI failed" << std::endl;
-    return EXIT_FAILURE;
-  }
-#endif
-
-#ifndef F3D_NO_DEPRECATED
-  // Check deprecated HDRI options
-  opt.set("render.hdri.ambient", false);
-  opt.set("render.background.skybox", false);
-  opt.set("render.background.hdri", std::string(argv[1]) + "data/palermo_park_1k.hdr");
-
-  ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRI", 50);
-  if (!ret)
-  {
-    std::cerr << "Render with deprecated HDRI option failed" << std::endl;
     return EXIT_FAILURE;
   }
 #endif
