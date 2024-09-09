@@ -249,13 +249,17 @@
       }
     },
     "scivis": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
       "cells": {
         "type": "bool",
         "default_value": "false"
       },
       "array_name": {
         "type": "string",
-        "default_value": "f3d_reserved"
+        "default_value": ""
       },
       "component": {
         "type": "int",

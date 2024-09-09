@@ -37,7 +37,7 @@
       <aside class="menu">
         <div class="file has-name">
           <label class="file-label">
-            <input class="file-input" type="file" id="file-selector" accept=".gml,.gltf,.glb,.obj,.ply,.pts,.stl,.vtk,.vtp,.vtu,.3ds,.wrl,.vrml,.fbx,.off,.x,.dae" />
+            <input class="file-input" type="file" id="file-selector" accept=".gml,.gltf,.glb,.obj,.ply,.pts,.stl,.vtk,.vtp,.vtu,.3ds,.wrl,.vrml,.fbx,.off,.x,.dae,.stp,.step,.igs,.iges,.brep,.xbf,.drc" />
             <span class="file-cta">
               <span class="file-label">Open a file...</span>
             </span>
@@ -94,6 +94,7 @@
         options.set_color('render.background.color', 0, 0, 0);
 
         // setup coloring
+        options.toggle('model.scivis.enable');
         options.set_string('model.scivis.array_name', 'Colors');
         options.set_integer('model.scivis.component', -2);
         options.toggle('model.scivis.cells');
@@ -212,8 +213,6 @@
             openFile(document.getElementById('file-name').innerHTML);
           });
 
-        // load the file located in the virtual filesystem
-        openFile('f3d.vtp');
 
         // setup the window size based on the canvas size
         const main = document.getElementById('main');
@@ -223,6 +222,49 @@
         // do a first render and start the interactor
         Module.engineInstance.getWindow().render();
         Module.engineInstance.getInteractor().start();
+
+        // Parse model from url-param search query hash via model url and extension
+        function filename_for_model_url(model_url, extension_parsed, contentDisposition) {
+          // Build filename given extension urlparam or response header content-disposition
+          if (extension_parsed) {
+            return `model_urlparam.${extension_parsed}`;
+          } else if (contentDisposition) {
+            // If extension is not provided by user, try to get it auto from content-disposition header of url extension 
+            return contentDisposition.split('filename=')[1].split(';')[0];
+          } else {
+            return model_url.split('/').pop();
+          }
+          throw new Error(`Could not parse filename/extension from either urlparam extension, response header content-disposition, nor filename present in url`);
+        }
+        function load_from_url(){
+          // Parse search-query model url-param or load default model file
+          // const params = new URLSearchParams(window.location.search);
+          // Replace first hash with question mark to have real search query parsing and avoid leading # in first parsed urlparam
+          const params = new URLSearchParams(window.location.hash.replace(/^#/, '?'));
+          const model_url_passed = params.get("model");
+          const extension_parsed = params.get("extension");
+          if (model_url_passed) {
+            const model_url = decodeURI(model_url_passed);
+            fetch(model_url)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`HTTP error, status = ${response.status}`);
+              }
+              const contentDisposition = response.headers.get('content-disposition');
+              const filename = filename_for_model_url(model_url, extension_parsed, contentDisposition);
+              // Convert buffer to Uint8Array and openFile
+              response.arrayBuffer().then((buffer) => {
+                Module.FS.writeFile(filename, new Uint8Array(buffer));
+                openFile(filename);
+              });
+            })
+          } else {
+            // load the file located in the virtual filesystem
+            openFile('f3d.vtp');
+          }
+        }
+        addEventListener("hashchange", (event) => {load_from_url()}); 
+        load_from_url(); 
       })
       .catch(error => console.error("Internal exception: " + error));
   </script>

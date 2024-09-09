@@ -10,14 +10,45 @@ namespace f3d
 {
 namespace options_tools
 {
-// TODO expose parse methods in options API ?
 
 //----------------------------------------------------------------------------
 /**
- * Not implemented generic templated parse method
+ * A std::string_view trim function
+ */
+std::string trim(std::string_view strv)
+{
+  constexpr std::string_view spaces = " \t\r\v\n";
+  strv.remove_prefix(std::min(strv.find_first_not_of(spaces), strv.size()));
+  strv.remove_suffix(std::min(strv.size() - strv.find_last_not_of(spaces) - 1, strv.size()));
+  return std::string(strv);
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Vector specific templated parse method
  */
 template<typename T>
-T parse(const std::string& str) = delete;
+struct is_vector : std::false_type
+{
+};
+template<typename... Args>
+struct is_vector<std::vector<Args...>> : std::true_type
+{
+};
+template<typename T>
+T parse(const std::string& str)
+{
+  static_assert(is_vector<T>::value, "non-vector types parsing must be specialized");
+
+  // TODO implement more parsing possibilities, eg different types of tokens
+  T vec;
+  std::istringstream split(str);
+  for (std::string each; std::getline(split, each, ',');)
+  {
+    vec.emplace_back(options_tools::parse<typename T::value_type>(each));
+  }
+  return vec;
+}
 
 //----------------------------------------------------------------------------
 /**
@@ -100,31 +131,12 @@ ratio_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
- * Return provided string
+ * Return provided string stripped of leading and trailing spaces.
  */
 template<>
 std::string parse(const std::string& str)
 {
-  return str;
-}
-
-//----------------------------------------------------------------------------
-/**
- * Parse provided string into a double vector
- * Split the string using ',', then rely on double version for parsing each token
- * Can throw options::parsing_exception in case of failure to parse
- */
-template<>
-std::vector<double> parse(const std::string& str)
-{
-  // TODO implement more parsing possibilities, eg different types of tokens
-  std::vector<double> vec;
-  std::istringstream split(str);
-  for (std::string each; std::getline(split, each, ',');)
-  {
-    vec.emplace_back(options_tools::parse<double>(each));
-  }
-  return vec;
+  return options_tools::trim(str);
 }
 
 // TODO Improve string generation

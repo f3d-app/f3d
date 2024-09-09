@@ -38,7 +38,7 @@ public:
   options();
   ~options() = default;
   options(const options& opt) = default;
-  options& operator=(const options& opt) noexcept = default;
+  options& operator=(const options& opt) = default;
   options(options&& other) noexcept = default;
   options& operator=(options&& other) noexcept = default;
   ///@}
@@ -108,7 +108,9 @@ public:
 
   /**
    * Templated parsing method used internally to parse strings.
-   * Implemented only for: bool, int, double, ratio_t, string and double vector.
+   * Implemented only for types: bool, int, double, ratio_t,
+   * as well as vector for each of these types.
+   * See parsing documentation for more info. TODO.
    * Throw an options::parsing_exception if parsing failed.
    */
   template<typename T>

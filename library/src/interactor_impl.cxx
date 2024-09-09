@@ -360,6 +360,7 @@ public:
     if (checkColoring)
     {
       // Resynchronise renderer coloring status with options
+      self->Options.model.scivis.enable = renWithColor->GetColoringEnabled();
       self->Options.model.scivis.cells = renWithColor->GetColoringUseCell();
       self->Options.model.scivis.array_name = renWithColor->GetColoringArrayName();
       self->Options.model.scivis.component = renWithColor->GetColoringComponent();

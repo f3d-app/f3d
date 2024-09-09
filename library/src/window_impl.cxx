@@ -416,8 +416,8 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetNormalScale(opt.model.normal.scale);
     renderer->SetTextureMatCap(opt.model.matcap.texture);
 
-    renderer->SetColoring(
-      opt.model.scivis.cells, opt.model.scivis.array_name, opt.model.scivis.component);
+    renderer->SetColoring(opt.model.scivis.enable, opt.model.scivis.cells,
+      opt.model.scivis.array_name, opt.model.scivis.component);
     renderer->SetScalarBarRange(opt.model.scivis.range);
     renderer->SetColormap(opt.model.scivis.colormap);
     renderer->ShowScalarBar(opt.ui.scalar_bar);
@@ -425,6 +425,11 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetUsePointSprites(opt.model.point_sprites.enable);
     renderer->SetUseVolume(opt.model.volume.enable);
     renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
+  }
+  else
+  {
+    // make sure the scalar bar is hidden without coloring
+    renderer->ShowScalarBar(false);
   }
 
   renderer->UpdateActors();

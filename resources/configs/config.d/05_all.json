@@ -1,5 +1,5 @@
 {
-  "global":
+  ".*":
   {
     "axis": true,
     "tone-mapping": true,
@@ -7,7 +7,7 @@
     "progress": true,
     "anti-aliasing": true,
     "filename": true,
-    "scalars": "",
+    "scalar-coloring": true,
     "camera-direction": "-1,-0.5,-1",
     "hdri-ambient": true,
     "translucency-support": true,

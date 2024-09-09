@@ -75,9 +75,7 @@ Other hotkeys are available:
 * <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
 * <kbd>F11</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
 
-When loading another file or reloading, options that have been changed interactively are kept but can be overridden
-if a dedicated regular expression block in the configuration file is present, see the [configuration file](CONFIGURATION_FILE.md)
-documentation for more info.
+When loading another file or reloading, options that have been changed interactively are kept as is.
 
 ## Cycling Coloring
 
