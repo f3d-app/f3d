@@ -52,6 +52,9 @@ public:
   /**
    * Enable/Disable/Get the status of specific animations
    * Only one single animation can be enabled
+   * By default, no animation are enabled
+   * As specified in the vtkImporter API, animationIndex
+   * is expected to be 0 < GetNumberOfAnimations
    */
   void EnableAnimation(vtkIdType animationIndex) override;
   void DisableAnimation(vtkIdType animationIndex) override;
