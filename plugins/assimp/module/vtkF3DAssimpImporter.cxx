@@ -867,7 +867,7 @@ public:
   std::vector<vtkSmartPointer<vtkPolyData>> Meshes;
   std::vector<vtkSmartPointer<vtkProperty>> Properties;
   std::vector<vtkSmartPointer<vtkTexture>> EmbeddedTextures;
-  vtkIdType ActiveAnimation = 0;
+  vtkIdType ActiveAnimation = -1; // -1 means no animation enabled here
   std::vector<std::pair<std::string, vtkSmartPointer<vtkLight>>> Lights;
   std::vector<
     std::pair<std::string, std::pair<vtkSmartPointer<vtkCamera>, vtkSmartPointer<vtkCamera>>>>
@@ -910,8 +910,11 @@ std::string vtkF3DAssimpImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 bool vtkF3DAssimpImporter::UpdateAtTimeValue(double timeValue)
 {
-  assert(this->Internals->ActiveAnimation >= 0);
   assert(this->Internals->ActiveAnimation < this->GetNumberOfAnimations());
+  if (this->Internals->ActiveAnimation == -1)
+  {
+    return true;
+  }
 
   // get the animation tick
   double fps =
@@ -1034,26 +1037,30 @@ vtkIdType vtkF3DAssimpImporter::GetNumberOfAnimations()
 //----------------------------------------------------------------------------
 std::string vtkF3DAssimpImporter::GetAnimationName(vtkIdType animationIndex)
 {
-  assert(animationIndex >= 0);
   assert(animationIndex < this->GetNumberOfAnimations());
+  assert(animationIndex >= 0);
   return this->Internals->Scene->mAnimations[animationIndex]->mName.C_Str();
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DAssimpImporter::EnableAnimation(vtkIdType animationIndex)
 {
+  assert(animationIndex < this->GetNumberOfAnimations());
+  assert(animationIndex >= 0);
   this->Internals->ActiveAnimation = animationIndex;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DAssimpImporter::DisableAnimation(vtkIdType vtkNotUsed(animationIndex))
 {
-  this->Internals->ActiveAnimation = 0;
+  this->Internals->ActiveAnimation = -1;
 }
 
 //----------------------------------------------------------------------------
 bool vtkF3DAssimpImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
+  assert(animationIndex < this->GetNumberOfAnimations());
+  assert(animationIndex >= 0);
   return this->Internals->ActiveAnimation == animationIndex;
 }
 
@@ -1062,6 +1069,9 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex,
   double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
   vtkDoubleArray* vtkNotUsed(timeSteps))
 {
+  assert(animationIndex < this->GetNumberOfAnimations());
+  assert(animationIndex >= 0);
+
   double duration = this->Internals->Scene->mAnimations[animationIndex]->mDuration;
   double fps = this->Internals->Scene->mAnimations[animationIndex]->mTicksPerSecond;
   if (fps == 0.0)
