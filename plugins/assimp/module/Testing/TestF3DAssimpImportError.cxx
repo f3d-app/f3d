@@ -65,5 +65,12 @@ int TestF3DAssimpImportError(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
     return EXIT_FAILURE;
   }
 
+  if (!importer->UpdateAtTimeValue(0))
+  {
+    std::cerr << "Importer did not return true with no animation enabled "
+              << "when calling UpdateAtTimeValue()" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   return EXIT_SUCCESS;
 }

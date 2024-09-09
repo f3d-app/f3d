@@ -58,17 +58,14 @@ bool animationManager::Initialize(
     this->ProgressWidget = nullptr;
   }
 
-  int animationIndex = options->scene.animation.index;
-  double animationTime = options->scene.animation.time;
-
   if (this->AvailAnimations <= 0)
   {
     log::debug("No animation available in this file");
-    if (animationIndex > 0)
+    if (options->scene.animation.index > 0)
     {
       log::warn("An animation index has been specified but there are no animation available.");
     }
-    if (animationTime != 0)
+    if (options->scene.animation.time != 0)
     {
       log::warn("No animation available, cannot load a specific animation time");
     }
@@ -314,7 +311,7 @@ std::string animationManager::GetAnimationName()
     return "No animation";
   }
 
-  if (this->AnimationIndex == -1)
+  if (this->AnimationIndex < 0)
   {
     return "All Animations";
   }
@@ -331,7 +328,7 @@ void animationManager::EnableOnlyCurrentAnimation()
   }
   for (int i = 0; i < this->AvailAnimations; i++)
   {
-    if (this->AnimationIndex == -1 || i == this->AnimationIndex)
+    if (this->AnimationIndex < 0 || i == this->AnimationIndex)
     {
       this->Importer->EnableAnimation(i);
     }
