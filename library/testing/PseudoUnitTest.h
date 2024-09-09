@@ -5,6 +5,11 @@
 #include <iostream>
 #include <sstream>
 
+/** Helper to perform multiple checks within the same `ctest` test.
+ * Checks are performed using the various overloads of `operator()`
+ * and their results are logged and tracked so that the `result()` method
+ * will return `EXIT_FAILURE` if any of them failed (and `EXIT_SUCCESS` otherwise).
+ */
 class PseudoUnitTest
 {
 public:
