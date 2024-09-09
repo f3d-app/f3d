@@ -1,20 +1,21 @@
 #include <export.h>
 #include <options.h>
 
-#include "test.h"
+#include "FakeUnitTest.h"
+
 #include <iostream>
 
 int TestTestHelper(int argc, char* argv[])
 {
-  Test metatest;
+  FakeUnitTest metatest;
 
-  class InnerTest : public Test
+  class InnerTest : public FakeUnitTest
   {
   protected:
     void log(const bool success, const std::string& label, const std::string& message) override
     {
       (success ? std::cout : std::cerr) << "  ";
-      Test::log(success, label, message);
+      FakeUnitTest::log(success, label, message);
     }
   };
 

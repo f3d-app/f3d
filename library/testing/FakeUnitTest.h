@@ -5,7 +5,7 @@
 #include <iostream>
 #include <sstream>
 
-class Test
+class FakeUnitTest
 {
 public:
   /** test a boolean condition */
