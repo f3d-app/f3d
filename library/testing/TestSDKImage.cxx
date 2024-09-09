@@ -415,8 +415,7 @@ int TestSDKImage(int argc, char* argv[])
     {
     }
 
-    const auto fileToString = [](const std::string& path)
-    {
+    const auto fileToString = [](const std::string& path) {
       std::ifstream file(path);
       std::stringstream ss;
       ss << file.rdbuf();
