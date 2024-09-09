@@ -54,7 +54,7 @@ public:
     return success ? EXIT_SUCCESS : EXIT_FAILURE;
   }
 
-protected:
+private:
   size_t failCount = 0;
   size_t passCount = 0;
 
@@ -108,13 +108,6 @@ protected:
     this->log(success, label, message);
   }
 
-  virtual void log(const bool success, const std::string& label, const std::string& message)
-  {
-    const std::string line = message.empty() ? label : (label + ": " + message);
-    const std::string icon = success ? u8"\u2714" : u8"\u2718";
-    (success ? std::cout : std::cerr) << icon << " " << line << std::endl;
-  }
-
   template<typename T1, typename T2>
   std::string comparisonMessage(const T1& actual, const T2& expected, const std::string& comp)
   {
@@ -138,6 +131,14 @@ protected:
     std::stringstream ss;
     ss << value;
     return ss.str();
+  }
+
+protected:
+  virtual void log(const bool success, const std::string& label, const std::string& message)
+  {
+    const std::string line = message.empty() ? label : (label + ": " + message);
+    const std::string icon = success ? u8"\u2714" : u8"\u2718";
+    (success ? std::cout : std::cerr) << icon << " " << line << std::endl;
   }
 
 private:
