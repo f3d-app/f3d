@@ -1,13 +1,13 @@
 #include <export.h>
 #include <options.h>
 
-#include "FakeUnitTest.h"
+#include "PseudoUnitTest.h"
 
 #include <iostream>
 
 int TestSDKOptions(int argc, char* argv[])
 {
-  FakeUnitTest test;
+  PseudoUnitTest test;
 
   f3d::options opt;
 
