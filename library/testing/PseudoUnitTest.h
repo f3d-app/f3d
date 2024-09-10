@@ -1,5 +1,5 @@
-#ifndef Test_h
-#define Test_h
+#ifndef PseudoUnitTest_h
+#define PseudoUnitTest_h
 
 #include <functional>
 #include <iostream>
@@ -20,16 +20,17 @@ public:
   }
 
   /** test the execution of a function */
-  void operator()(const std::string& label, std::function<void()> function)
+  template<typename F>
+  void operator()(const std::string& label, F function)
   {
     this->testFunction<Dummy>(label, function);
   }
 
   /** test the execution of a function expecting a given exception */
-  template<typename E>
-  void expect(const std::string& label, std::function<void()> function)
+  template<typename E, typename F>
+  void expect(const std::string& label, F function)
   {
-    this->testFunction<E>(label, function, true);
+    this->testFunction<E>(label, function);
   }
 
   /** test the equality of two values with `==` */
@@ -59,25 +60,24 @@ private:
   size_t passCount = 0;
 
   /* execute `function` and:
-   * - *fail* on normal termination when `expectException` is `true`
-   * - *pass* on normal termination when `expectException` is `false`
+   * - *pass* on normal termination when `E` is `Dummy`
+   * - *fail* on normal termination when `E` is any other exception
    * - *pass* when an exception of type `E` is caught
    * - *fail* when anything else is caught
    */
-  template<typename E>
-  void testFunction(
-    const std::string& label, std::function<void()> function, bool expectException = false)
+  template<typename E, typename F>
+  void testFunction(const std::string& label, F function)
   {
     try
     {
       function();
-      if (expectException)
+      if (std::is_same<E, Dummy>::value)
       {
-        this->record(false, label, "did not throw");
+        this->record(true, label);
       }
       else
       {
-        this->record(true, label);
+        this->record(false, label, "did not throw");
       }
     }
     catch (const E& e)
