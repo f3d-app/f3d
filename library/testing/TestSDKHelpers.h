@@ -1,6 +1,9 @@
 #ifndef TestSDKHelpers_h
 #define TestSDKHelpers_h
 
+#include <image.h>
+#include <window.h>
+
 #include <fstream>
 #include <iostream>
 
