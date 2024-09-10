@@ -21,8 +21,9 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  glfwSetErrorCallback([](int error, const char* desc)
-    { std::cerr << "GLFW error " << error << ": " << desc << std::endl; });
+  glfwSetErrorCallback([](int error, const char* desc) {
+    std::cerr << "GLFW error " << error << ": " << desc << std::endl;
+  });
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -39,14 +40,12 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
   glfwSetWindowUserPointer(window, &eng);
 
   // key callback
-  glfwSetKeyCallback(window,
-    [](GLFWwindow* window, int key, int scancode, int action, int mods)
+  glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
-      if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-      {
-        glfwSetWindowShouldClose(window, 1);
-      }
-    });
+      glfwSetWindowShouldClose(window, 1);
+    }
+  });
 
   while (!glfwWindowShouldClose(window) && glfwGetTime() < 1.0)
   {

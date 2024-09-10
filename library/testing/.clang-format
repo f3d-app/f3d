@@ -1,0 +1,17 @@
+BasedOnStyle: InheritParentConfig
+BreakBeforeBraces: Custom
+BraceWrapping:
+  # emulate parent config's Allman...
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterObjCDeclaration: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  IndentBraces: false
+  # ...except for lambdas
+  BeforeLambdaBody: false

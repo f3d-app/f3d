@@ -36,27 +36,23 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
 
   inter.playInteraction(interactionFilePath); // Dragon.vtu; S
 
-  inter.setKeyPressCallBack(
-    [&](int, const std::string& keySym) -> bool
+  inter.setKeyPressCallBack([&](int, const std::string& keySym) -> bool {
+    if (keySym == "S")
     {
-      if (keySym == "S")
-      {
-        options.interactor.axis = true;
-        win.render();
-        return true;
-      }
-      return false;
-    });
-
-  inter.setDropFilesCallBack(
-    [&](std::vector<std::string> filesVec) -> bool
-    {
-      std::string path = filesVec[0];
-      size_t found = path.find_last_of("/\\");
-      load.loadGeometry(path.substr(0, found + 1) + "suzanne.ply", true);
+      options.interactor.axis = true;
       win.render();
       return true;
-    });
+    }
+    return false;
+  });
+
+  inter.setDropFilesCallBack([&](std::vector<std::string> filesVec) -> bool {
+    std::string path = filesVec[0];
+    size_t found = path.find_last_of("/\\");
+    load.loadGeometry(path.substr(0, found + 1) + "suzanne.ply", true);
+    win.render();
+    return true;
+  });
 
   // This time the interaction should result in a different rendering
   inter.playInteraction(interactionFilePath);
