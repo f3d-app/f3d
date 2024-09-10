@@ -21,6 +21,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKRenderAndInteract.cxx
      TestSDKRenderFinalShader.cxx
      TestSDKWindowNative.cxx
+     TestPseudoUnitTest.cxx
 )
 
 # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
