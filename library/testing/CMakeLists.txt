@@ -18,6 +18,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKMultiColoring.cxx
      TestSDKMultiOptions.cxx
      TestSDKOptions.cxx
+     TestSDKOptionsIO.cxx
      TestSDKRenderAndInteract.cxx
      TestSDKRenderFinalShader.cxx
      TestSDKWindowNative.cxx
@@ -87,6 +88,7 @@ endif()
 list(APPEND libf3dSDKTestsNoRender_list
      TestSDKEngineExceptions
      TestSDKOptions
+     TestSDKOptionsIO
      TestSDKLog
      TestSDKLoader)
 
