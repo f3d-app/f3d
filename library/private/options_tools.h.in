@@ -39,7 +39,7 @@ double parse_double(const std::string& str)
 
 //----------------------------------------------------------------------------
 /** Call `std::stoi` and throw `std::invalid_argument` if the whole string has not been consumed */
-double parse_int(const std::string& str)
+int parse_int(const std::string& str)
 {
   std::size_t pos = 0;
   const int i = std::stoi(str, &pos);
