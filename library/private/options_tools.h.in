@@ -26,33 +26,34 @@ std::string trim(std::string_view strv)
 
 //----------------------------------------------------------------------------
 /** Call `std::stod` and throw `std::invalid_argument` if the whole string has not been consumed. */
-double parse_double(const std::string& str)
+double stodStrict(const std::string& str)
 {
   std::size_t pos = 0;
-  const double d = std::stod(str, &pos);
+  const double parsed = std::stod(str, &pos);
   if (pos != str.size())
   {
     throw std::invalid_argument("partial");
   }
-  return d;
+  return parsed;
 }
 
 //----------------------------------------------------------------------------
 /** Call `std::stoi` and throw `std::invalid_argument` if the whole string has not been consumed */
-int parse_int(const std::string& str)
+int stoiStrict(const std::string& str)
 {
   std::size_t pos = 0;
-  const int i = std::stoi(str, &pos);
+  const int parsed = std::stoi(str, &pos);
   if (pos != str.size())
   {
     throw std::invalid_argument("partial");
   }
-  return i;
+  return parsed;
 }
 
 //----------------------------------------------------------------------------
 /**
- * Vector specific templated parse method
+ * Vector specific templated parse method.
+ * Splits on `","` and trims chunks before parsing each element
  */
 template<typename T>
 struct is_vector : std::false_type
@@ -81,6 +82,7 @@ T parse(const std::string& str)
 /**
  * Parse provided string into a bool
  * Supported values are: `"true"`/`"false"`, `"1"`/`"0"`, `"yes"`/`"no"`, `"on"`/`"off"`
+ * (case-insentive)
  */
 template<>
 bool parse(const std::string& str)
@@ -107,10 +109,9 @@ bool parse(const std::string& str)
 template<>
 int parse(const std::string& str)
 {
-  // TODO implement more parsing possibilities ?
   try
   {
-    return parse_int(str);
+    return stoiStrict(str);
   }
   catch (std::invalid_argument const&)
   {
@@ -132,10 +133,9 @@ int parse(const std::string& str)
 template<>
 double parse(const std::string& str)
 {
-  // TODO implement more parsing possibilities ?
   try
   {
-    return parse_double(str);
+    return stodStrict(str);
   }
   catch (std::invalid_argument const&)
   {
@@ -161,9 +161,9 @@ ratio_t parse(const std::string& str)
   {
     if (!str.empty() && str.at(str.size() - 1) == '%')
     {
-      return parse_double(str.substr(0, str.size() - 1)) / 100;
+      return stodStrict(str.substr(0, str.size() - 1)) / 100;
     }
-    return parse_double(str);
+    return stodStrict(str);
   }
   catch (std::invalid_argument const&)
   {
