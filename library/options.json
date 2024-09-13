@@ -6,8 +6,7 @@
     },
     "animation": {
       "autoplay": {
-        "type": "bool",
-        "default_value": "false"
+        "type": "bool"
       },
       "index": {
         "type": "int",
@@ -18,8 +17,7 @@
         "default_value": "1.0"
       },
       "time": {
-        "type": "double",
-        "default_value": "0.0"
+        "type": "double"
       },
       "frame_rate": {
         "type": "double",
@@ -28,31 +26,25 @@
     },
     "camera": {
       "index": {
-        "type": "int",
-        "default_value": "-1"
+        "type": "int"
       },
       "orthographic": {
-        "type": "bool",
-        "default_value": "false"
+        "type": "bool"
       }
     }
   },
   "render": {
     "show_edges": {
-      "type": "bool",
-      "default_value": "false"
+      "type": "bool"
     },
     "line_width": {
-      "type": "double",
-      "default_value": "1.0"
+      "type": "double"
     },
     "point_size": {
-      "type": "double",
-      "default_value": "10.0"
+      "type": "double"
     },
     "backface_type": {
-      "type": "string",
-      "default_value": "default"
+      "type": "string"
     },
     "grid": {
       "enable": {
@@ -64,16 +56,14 @@
         "default_value": "false"
       },
       "unit": {
-        "type": "double",
-        "default_value": "0.0"
+        "type": "double"
       },
       "subdivisions": {
         "type": "int",
         "default_value": "10"
       },
       "color": {
-        "type": "double_vector",
-        "default_value": "0.0, 0.0, 0.0"
+        "type": "double_vector"
       }
     },
     "raytracing": {
@@ -108,14 +98,12 @@
         "default_value": "false"
       },
       "final_shader": {
-        "type": "string",
-        "default_value": ""
+        "type": "string"
       }
     },
     "hdri": {
       "file": {
-        "type": "string",
-        "default_value": ""
+        "type": "string"
       },
       "ambient": {
         "type": "bool",
@@ -157,8 +145,7 @@
       "default_value": "false"
     },
     "filename_info": {
-      "type": "string",
-      "default_value": ""
+      "type": "string"
     },
     "fps": {
       "type": "bool",
@@ -173,16 +160,14 @@
       "default_value": "false"
     },
     "dropzone_info": {
-      "type": "string",
-      "default_value": ""
+      "type": "string"
     },
     "metadata": {
       "type": "bool",
       "default_value": "false"
     },
     "font_file": {
-      "type": "string",
-      "default_value": ""
+      "type": "string"
     },
     "loader_progress": {
       "type": "bool",
@@ -196,56 +181,45 @@
   "model": {
     "matcap": {
       "texture": {
-        "type": "string",
-        "default_value": ""
+        "type": "string"
       }
     },
     "color": {
       "opacity": {
-        "type": "double",
-        "default_value": "1.0"
+        "type": "double"
       },
       "rgb": {
-        "type": "double_vector",
-        "default_value": "1.0, 1.0, 1.0"
+        "type": "double_vector"
       },
       "texture": {
-        "type": "string",
-        "default_value": ""
+        "type": "string"
       }
     },
     "emissive": {
       "factor": {
-        "type": "double_vector",
-        "default_value": "1.0, 1.0, 1.0"
+        "type": "double_vector"
       },
       "texture": {
-        "type": "string",
-        "default_value": ""
+        "type": "string"
       }
     },
     "normal": {
       "scale": {
-        "type": "double",
-        "default_value": "1.0"
+        "type": "double"
       },
       "texture": {
-        "type": "string",
-        "default_value": ""
+        "type": "string"
       }
     },
     "material": {
       "metallic": {
-        "type": "double",
-        "default_value": "0.0"
+        "type": "double"
       },
       "roughness": {
-        "type": "double",
-        "default_value": "0.3"
+        "type": "double"
       },
       "texture": {
-        "type": "string",
-        "default_value": ""
+        "type": "string"
       }
     },
     "scivis": {
@@ -258,8 +232,7 @@
         "default_value": "false"
       },
       "array_name": {
-        "type": "string",
-        "default_value": ""
+        "type": "string"
       },
       "component": {
         "type": "int",
@@ -270,8 +243,7 @@
         "default_value": "0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0"
       },
       "range": {
-        "type": "double_vector",
-        "default_value": "0.0"
+        "type": "double_vector"
       }
     },
     "point_sprites": {
@@ -282,6 +254,10 @@
       "type": {
         "type": "string",
         "default_value": "sphere"
+      },
+      "size": {
+        "type": "int",
+        "default_value": 10.0
       }
     },
     "volume": {
