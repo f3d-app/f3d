@@ -18,20 +18,76 @@ vtkF3DInteractorEventRecorder::vtkF3DInteractorEventRecorder()
 //------------------------------------------------------------------------------
 void vtkF3DInteractorEventRecorder::SetInteractor(vtkRenderWindowInteractor* interactor)
 {
-  if (interactor == this->Interactor)
-  {
-    return;
-  }
+    if (interactor == this->Interactor)
+    {
+        // No change in interactor, so nothing to do
+        return;
+    }
 
-  // if we already have an Interactor then stop observing it
-  if (this->Interactor)
-  {
-    this->SetEnabled(0); // disable the old interactor
-  }
+    // if we already have an interactor then stop observing it
+    if (this->Interactor)
+    {
+        // Do a cleanup before disabling the old interactor
+        this->Interactor->RemoveObserver(this->EventCallbackCommand);
+        this->SetEnabled(0); // Now it can be disabled
+    }
 
-  this->Interactor = interactor;
-  this->Modified();
+    // Activate the new interactor and update the state
+    this->Interactor = interactor;
+
+    if (this->Interactor)
+    {
+        // Add the observers again or set up a new interactor if it is necessary
+        this->Interactor->AddObserver(vtkCommand::AnyEvent, this->EventCallbackCommand);
+        this->SetEnabled(1); // Enable the new interactor
+    }
+
+    this->Modified(); // Notify that the state has changed
 }
+
+void vtkF3DInteractorEventRecorder::WriteEvent(const char* eventId, int* position, int modifier, 
+                                               int keyCode, int repeatCount, char* keySym, 
+                                               void* callData)
+{
+    // Log the details
+    std::cout << "Event ID: " << (eventId ? eventId : "NULL") << std::endl;
+    std::cout << "Position: (" << position[0] << ", " << position[1] << ")" << std::endl;
+    std::cout << "Modifier: " << modifier << std::endl;
+    std::cout << "Key Code: " << keyCode << std::endl;
+    std::cout << "Repeat Count: " << repeatCount << std::endl;
+    std::cout << "Key Symbol: " << (keySym ? keySym : "NULL") << std::endl;
+
+    // Handle callData
+    if (callData)
+    {
+        // Assume callData is a pointer to a string.
+        // The data type can be adjusted in the future.
+        char* callDataStr = static_cast<char*>(callData);
+        std::cout << "Call Data: " << callDataStr << std::endl;
+    }
+    else
+    {
+        std::cout << "Call Data: NULL" << std::endl;
+    }
+
+    // Call the base class version to handle the standard behavior
+    this->vtkInteractorEventRecorder::WriteEvent(eventId, position, modifier, keyCode, 
+                                                 repeatCount, keySym);
+}
+
+void vtkF3DInteractorEventRecorder::Clear()
+{
+    if (this->OutputStream)
+    {
+        // Reset the output stream (clearing any recorded events)
+        this->OutputStream->clear();
+        std::cout << "Recorder cleared." << std::endl;
+    }
+
+    // Optionally reset the internal state, such as stopping recording
+    this->State = vtkInteractorEventRecorder::Start;
+}
+
 
 //------------------------------------------------------------------------------
 void vtkF3DInteractorEventRecorder::ProcessEvents(
