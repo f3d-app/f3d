@@ -23,7 +23,7 @@ jobs:
         uses: vedantmgoyal2009/winget-releaser@v2
         with:
           identifier: F3d.F3d
-          installers-regex: '^F3D-[\d\.]+-Windows-x86_64.exe\.exe$'
+          installers-regex: '^F3D-[\d\.]+-Windows-x86_64\.exe$'
           version: ${{ env.WINGET_TAG_NAME }}
           release-tag: ${{ inputs.tag_name || github.event.release.tag_name }}
           token: ${{ secrets.WINGET_ACC_TOKEN }}
