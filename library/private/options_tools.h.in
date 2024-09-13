@@ -82,7 +82,7 @@ T parse(const std::string& str)
 /**
  * Parse provided string into a bool
  * Supported values are: `"true"`/`"false"`, `"1"`/`"0"`, `"yes"`/`"no"`, `"on"`/`"off"`
- * (case-insentive)
+ * (case-insensitive)
  */
 template<>
 bool parse(const std::string& str)
