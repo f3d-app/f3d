@@ -150,8 +150,8 @@ double parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
- * Parse provided string into a ratio_t
- * Rely on <double> version for parsing
+ * Parse provided string into a ratio_t.
+ * Supported formats: number (same as `<double>` version), percentage, fraction
  * Can throw options::parsing_exception in case of failure to parse
  */
 template<>
@@ -163,6 +163,13 @@ ratio_t parse(const std::string& str)
     {
       return stodStrict(str.substr(0, str.size() - 1)) / 100;
     }
+
+    const std::size_t i = str.find('/');
+    if (i != std::string::npos)
+    {
+      return stodStrict(str.substr(0, i)) / stodStrict(str.substr(i + 1, str.size() - i - 1));
+    }
+
     return stodStrict(str);
   }
   catch (std::invalid_argument const&)

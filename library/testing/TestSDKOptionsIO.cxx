@@ -61,6 +61,8 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse<f3d::ratio_t>("ratio_t", "0.1234", 0.1234);
   test.parse<f3d::ratio_t>("ratio_t", "12.34%", 0.1234);
   test.parse_expect<f3d::ratio_t, parsing_exception>("invalid ratio_t", "12.34&");
+  test.parse<f3d::ratio_t>("ratio_t", "-2/-3.5", 2.0 / 3.5);
+  test.parse_expect<f3d::ratio_t, parsing_exception>("invalid ratio_t", "1/2/3");
 
   test.parse<std::vector<int>>("std::vector<int>", "1, 2, 3", { 1, 2, 3 });
 
