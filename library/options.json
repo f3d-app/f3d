@@ -273,7 +273,7 @@
         "default_value": "sphere"
       },
       "size": {
-        "type": "int",
+        "type": "double",
         "default_value": 10.0
       }
     },
