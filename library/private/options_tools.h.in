@@ -80,9 +80,7 @@ T parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
- * Parse provided string into a bool
- * Supported values are: `"true"`/`"false"`, `"1"`/`"0"`, `"yes"`/`"no"`, `"on"`/`"off"`
- * (case-insensitive)
+ * Parse provided string into a bool. Supports boolapha values as well as "yes/no" and "on/off"
  */
 template<>
 bool parse(const std::string& str)
