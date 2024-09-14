@@ -345,9 +345,9 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseTrackball(opt.interactor.trackball);
   renderer->SetInvertZoom(opt.interactor.invert_zoom);
 
-  // XXX: model.point_sprites.shape only has an effect on geometry scene
+  // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
-  std::string splatTypeStr = opt.model.point_sprites.shape;
+  std::string splatTypeStr = opt.model.point_sprites.type;
   int pointSpritesSize = opt.model.point_sprites.size;
   vtkF3DRendererWithColoring::SplatType splatType = vtkF3DRendererWithColoring::SplatType::SPHERE;
   if (splatTypeStr == "gaussian")

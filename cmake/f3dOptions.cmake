@@ -98,8 +98,9 @@ function(_parse_json_option _top_json)
     # Read the json element
     string(JSON _cur_json GET ${_top_json} ${_member_name})
     # Recover its type and default if it is a leaf option
-    string(JSON _option_type ERROR_VARIABLE _type_error GET ${_cur_json} "type")
-    if(_type_error STREQUAL "NOTFOUND")
+    string(JSON _option_type ERROR_VARIABLE _option_type_error GET ${_cur_json} "type")
+    string(JSON _option_type_type ERROR_VARIABLE _option_type_type_error TYPE ${_cur_json} "type")
+    if(_option_type_error STREQUAL "NOTFOUND" AND ${_option_type_type} STREQUAL "STRING")
        # Leaf option found!
 
        # Recover default_value if any

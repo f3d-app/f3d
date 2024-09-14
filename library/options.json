@@ -268,7 +268,7 @@
         "type": "bool",
         "default_value": "false"
       },
-      "shape": {
+      "type": {
         "type": "string",
         "default_value": "sphere"
       },

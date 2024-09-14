@@ -79,7 +79,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "animation-frame-rate", "scene.animation.frame_rate" },
   { "font-file", "ui.font_file" },
   { "point-sprites", "model.point_sprites.enable" },
-  { "point-sprites-type", "model.point_sprites.shape" },
+  { "point-sprites-type", "model.point_sprites.type" },
   { "point-sprites-size", "model.point_sprites.size" },
   { "point-size", "render.point_size" },
   { "line-width", "render.line_width" },
