@@ -396,7 +396,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowGrid(opt.render.grid.enable);
   renderer->SetGridColor(opt.render.grid.color);
 
-  if (opt.scene.camera.index == -1)
+  if (!opt.scene.camera.index.has_value())
   {
     renderer->SetUseOrthographicProjection(opt.scene.camera.orthographic);
   }
