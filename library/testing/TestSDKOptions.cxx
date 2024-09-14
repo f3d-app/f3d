@@ -21,6 +21,10 @@ int TestSDKOptions(int argc, char* argv[])
   opt.model.scivis.cells = false;
   test("getAsString bool", opt.getAsString("model.scivis.cells") == "false");
 
+  opt.set("model.scivis.cells", true);
+  test("set/get bool", std::get<bool>(opt.get("model.scivis.cells")) == true);
+
+  opt.set("model.scivis.cells", false);
   opt.toggle("model.scivis.cells");
   test("toggle", opt.getAsString("model.scivis.cells") == "true");
 
@@ -31,12 +35,18 @@ int TestSDKOptions(int argc, char* argv[])
   opt.scene.animation.index = 3;
   test("getAsString int", opt.getAsString("scene.animation.index") == "3");
 
+  opt.set("scene.animation.index", 1);
+  test("set/get int", std::get<int>(opt.get("scene.animation.index")) == 1);
+
   // Test double
   opt.setAsString("render.line_width", "2.14");
   test("setAsString double", opt.getAsString("render.line_width") == "2.14");
 
   opt.render.line_width = 2.13;
   test("getAsString double", opt.getAsString("render.line_width") == "2.13");
+
+  opt.set("render.line_width", 1.7);
+  test("set/get double", std::get<double>(opt.get("render.line_width")) == 1.7);
 
   // Test ratio_t
   opt.setAsString("scene.animation.speed_factor", "3.17");
@@ -45,6 +55,9 @@ int TestSDKOptions(int argc, char* argv[])
   opt.scene.animation.speed_factor = 3.18;
   test("getAsString ratio_t", opt.getAsString("scene.animation.speed_factor") == "3.18");
 
+  opt.set("scene.animation.speed_factor", 3.17);
+  test("set/get ratio_t", std::get<double>(opt.get("scene.animation.speed_factor")) == 3.17);
+
   // Test string
   opt.setAsString("model.color.texture", "testAsString");
   test("setAsString string", opt.getAsString("model.color.texture") == "testAsString");
@@ -52,12 +65,19 @@ int TestSDKOptions(int argc, char* argv[])
   opt.model.color.texture = "testInStruct";
   test("getAsString string", opt.getAsString("model.color.texture") == "testInStruct");
 
+  std::string inputString = "test";
+  opt.set("model.color.texture", inputString);
+  test("set/get string", std::get<std::string>(opt.get("model.color.texture")) == "test");
+
   // Test double vector
   opt.setAsString("render.background.color", "0.1, 0.2, 0.4");
   test("setAsString vector<double>", opt.getAsString("render.background.color") == "0.1, 0.2, 0.4");
 
   opt.render.background.color = { 0.1, 0.2, 0.5 };
   test("getAsString vector<double>", opt.getAsString("render.background.color") == "0.1, 0.2, 0.5");
+
+  opt.set("render.background.color", std::vector<double>{ 0.1, 0.2, 0.3 });
+  test("set/get vector<double>", std::get<std::vector<double>>(opt.get("render.background.color")) == std::vector<double>{ 0.1, 0.2, 0.3 });
 
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");
@@ -69,6 +89,9 @@ int TestSDKOptions(int argc, char* argv[])
   // Test chaining options
   opt.setAsString("model.scivis.cells", "false").setAsString("model.scivis.cells", "true");
   test("chaining setAsString calls", opt.getAsString("model.scivis.cells") == "true");
+
+  opt.set("model.scivis.cells", true).set("model.scivis.cells", false);
+  test("chaining set calls", std::get<bool>(opt.get("model.scivis.cells")) == false);
 
   // Test toggle error paths
   test.expect<f3d::options::incompatible_exception>(
@@ -137,6 +160,16 @@ int TestSDKOptions(int argc, char* argv[])
 
   test.expect<f3d::options::inexistent_exception>(
     "inexistent_exception exception on copy", [&]() { opt.copy(opt2, "dummy"); });
+
+  // Test set/get error paths
+  test.expect<f3d::options::incompatible_exception>(
+    "incompatible_exception exception on set", [&]() { opt.set("model.scivis.cells", 2.13); });
+
+  test.expect<f3d::options::inexistent_exception>(
+    "inexistent_exception exception on set", [&]() { opt.set("dummy", 2.13); });
+
+  test.expect<f3d::options::inexistent_exception>(
+    "inexistent_exception exception on get", [&]() { opt.get("dummy"); });
 
   return EXIT_SUCCESS;
 }
