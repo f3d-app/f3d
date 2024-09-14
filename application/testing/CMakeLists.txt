@@ -612,8 +612,11 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   f3d_test(NAME TestAnimationTimeLimitsHigh DATA small.ex2 ARGS ARGS --load-plugins=exodus --animation-time=10)
   f3d_test(NAME TestAnimationTimeLimitsLow DATA small.ex2 ARGS ARGS --load-plugins=exodus --animation-time=-5)
 
+  # Test if negative range is respected when loading a file without specifying the animation time
+  f3d_test(NAME TestTimeRangeLessThanZeroNoAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=exodus)
+
   # Test if the animation-time works when set to zero and time range[0] is less than zero
-  f3d_test(NAME TestTimeRangeLessThanZero DATA negative_range_animated.e ARGS -s --load-plugins=exodus --animation-time=0)
+  f3d_test(NAME TestTimeRangeLessThanZeroWithAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=exodus --animation-time=0)
 
   # Test if a negative animation-time works when time range[0] is less than zero
   f3d_test(NAME TestTimeRangeLessThanZeroNegativeAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=exodus --animation-time=-3)

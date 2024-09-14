@@ -53,7 +53,6 @@ struct CLIGroup
 /**
  * Declaration of all F3D CLI options except `--input` using above structs
  * Order of groups matters in the context of `--help`
- * TODO update help text for optional values
  */
 // clang-format off
 #if F3D_MODULE_RAYTRACING
