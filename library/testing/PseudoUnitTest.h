@@ -108,6 +108,28 @@ private:
     this->log(success, label, message);
   }
 
+  template<typename T>
+  std::string toString(const T& value)
+  {
+    std::stringstream ss;
+    ss << value;
+    return ss.str();
+  }
+
+  template<typename T>
+  std::string toString(const std::vector<T>& value)
+  {
+    std::stringstream ss;
+    size_t i = 0;
+    for (const T& item : value)
+    {
+      ss << (i++ ? ", " : "{ ") << this->toString(item);
+    }
+    ss << " }";
+    return ss.str();
+  }
+
+protected:
   template<typename T1, typename T2>
   std::string comparisonMessage(const T1& actual, const T2& expected, const std::string& comp)
   {
@@ -125,15 +147,6 @@ private:
     }
   }
 
-  template<typename T>
-  std::string toString(const T& value)
-  {
-    std::stringstream ss;
-    ss << value;
-    return ss.str();
-  }
-
-protected:
   virtual void log(const bool success, const std::string& label, const std::string& message)
   {
     const std::string line = message.empty() ? label : (label + ": " + message);
