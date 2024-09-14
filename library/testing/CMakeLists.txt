@@ -129,6 +129,3 @@ if(Qt5_FOUND)
   # external window test using QT
   target_link_libraries(libf3dSDKTests Qt5::OpenGL)
 endif()
-
-# make sure the libf3d API is compatible with the right C++ standard
-set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 17)

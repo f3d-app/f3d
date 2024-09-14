@@ -6,6 +6,9 @@ include(GNUInstallDirs)
 
 # Check if the plugin is built externally
 if(PROJECT_IS_TOP_LEVEL)
+  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CMAKE_CXX_EXTENSIONS OFF)
   find_package(f3d REQUIRED COMPONENTS pluginsdk)
 else()
   include(f3dPlugin)

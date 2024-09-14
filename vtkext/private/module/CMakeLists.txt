@@ -93,5 +93,3 @@ endif()
 if(F3D_MODULE_EXR)
   vtk_module_link(f3d::vtkextPrivate PRIVATE OpenEXR::OpenEXR)
 endif()
-
-vtk_module_set_properties(f3d::vtkextPrivate CXX_STANDARD 17)

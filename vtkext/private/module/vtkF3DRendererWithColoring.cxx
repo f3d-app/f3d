@@ -221,7 +221,6 @@ void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
     actorAndMapper.first->GetProperty()->SetOpacity(this->Opacity);
     actorAndMapper.first->GetProperty()->SetRoughness(this->Roughness);
     actorAndMapper.first->GetProperty()->SetMetallic(this->Metallic);
-//    actorAndMapper.first->GetProperty()->SetLineWidth(this->LineWidth); TODO generic importer
 
     // Textures
     auto colorTex = ::GetTexture(this->TextureBaseColor, true);
@@ -253,8 +252,6 @@ void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetPointSpritesProperties(SplatType type, double pointSpritesSize)
 {
-//  this->SetPointSize(pointSpritesSize); TODO
-
   if (!this->Importer)
   {
     return;
@@ -533,7 +530,7 @@ void vtkF3DRendererWithColoring::SetColoring(bool enable,
       F3DLog::Print(F3DLog::Severity::Debug, "No array to color with");
       this->ArrayIndexForColoring = -1;
     }
-    else if (!arrayName.has_value()) // TODO check this works
+    else if (!arrayName.has_value())
     {
       // Coloring with first array
       this->ArrayIndexForColoring = 0;

@@ -111,7 +111,6 @@ if (WIN32)
 endif()
 
 set_target_properties(libf3d PROPERTIES
-  CXX_STANDARD 17
   CXX_VISIBILITY_PRESET hidden
   POSITION_INDEPENDENT_CODE ON
   OUTPUT_NAME "f3d"

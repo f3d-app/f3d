@@ -217,6 +217,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
     // Set geometry actor default properties
     pipe.GeometryActor->GetProperty()->SetPointSize(10.0);
+    pipe.GeometryActor->GetProperty()->SetLineWidth(1.0);
 
     // add mappers
     pipe.VolumeProp->SetMapper(pipe.VolumeMapper);

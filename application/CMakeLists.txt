@@ -47,7 +47,6 @@ endif()
 
 set_target_properties(f3d PROPERTIES
   CXX_VISIBILITY_PRESET hidden
-  CXX_STANDARD 17
   )
 
 if (APPLE)
