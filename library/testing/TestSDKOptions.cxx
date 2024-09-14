@@ -77,7 +77,9 @@ int TestSDKOptions(int argc, char* argv[])
   test("getAsString vector<double>", opt.getAsString("render.background.color") == "0.1, 0.2, 0.5");
 
   opt.set("render.background.color", std::vector<double>{ 0.1, 0.2, 0.3 });
-  test("set/get vector<double>", std::get<std::vector<double>>(opt.get("render.background.color")) == std::vector<double>{ 0.1, 0.2, 0.3 });
+  test("set/get vector<double>",
+    std::get<std::vector<double>>(opt.get("render.background.color")) ==
+      std::vector<double>{ 0.1, 0.2, 0.3 });
 
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");
