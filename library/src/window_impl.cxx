@@ -348,16 +348,17 @@ void window_impl::UpdateDynamicOptions()
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
   std::string splatTypeStr = opt.model.point_sprites.type;
-  int pointSize = opt.render.point_size;
+  int pointSpritesSize = opt.model.point_sprites.size;
   vtkF3DRendererWithColoring::SplatType splatType = vtkF3DRendererWithColoring::SplatType::SPHERE;
   if (splatTypeStr == "gaussian")
   {
     splatType = vtkF3DRendererWithColoring::SplatType::GAUSSIAN;
   }
 
-  renderer->SetPointProperties(splatType, pointSize);
+  renderer->SetPointSpritesProperties(splatType, pointSpritesSize);
 
   renderer->SetLineWidth(opt.render.line_width);
+  renderer->SetPointSize(opt.render.point_size);
   renderer->ShowEdge(opt.render.show_edges);
   renderer->ShowTimer(opt.ui.fps);
   renderer->ShowFilename(opt.ui.filename);

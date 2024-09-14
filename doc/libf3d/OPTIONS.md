@@ -57,7 +57,8 @@ model.scivis.component|int<br>-1<br>render|Specify the component to color with. 
 model.scivis.array_name|string<br>-<br>render|Select the name of the array to color with.|\-\-coloring-array
 model.scivis.range|vector\<double\><br>-<br>render|Set a *custom range for the coloring*.|\-\-range
 model.point_sprites.enable|bool<br>false<br>render|Show sphere *points sprites* instead of the geometry.|\-\-point-sprites
-model.point_sprites.type|string<br>sphere<br>render|Set the sprites type when showing point sprites (can be `sphere` or `gaussian`).|\-\-point-type
+model.point_sprites.type|string<br>sphere<br>render|Set the sprites type when showing point sprites (can be `sphere` or `gaussian`).|\-\-point-stripes-type
+model.point_sprites.size|double<br>10.0<br>render|Set the *size* of point sprites.|\-\-point-stripes-size
 model.volume.enable|bool<br>false<br>render|Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other default scene formats.|\-\-volume
 model.volume.inverse|bool<br>false<br>render|Inverse the linear opacity function.|\-\-inverse
 
@@ -72,7 +73,7 @@ render.effect.tone_mapping|bool<br>false<br>render|Enable generic filmic *Tone M
 render.effect.final_shader|string<br>""<br>render|Add a final shader to the output image|\-\-final-shader. See [user documentation](../user/FINAL_SHADER.md).
 render.line_width|double<br>1.0<br>render|Set the *width* of lines when showing edges.|\-\-line-width
 render.show_edges|bool<br>false<br>render|Show the *cell edges*|\-\-edges
-render.point_size|double<br>10.0<br>render|Set the *size* of points when showing vertices and point sprites.|\-\-point-size
+render.point_size|double<br>10.0<br>render|Set the *size* of points when showing vertices.|\-\-point-size
 render.grid.enable|bool<br>false<br>render|Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.|\-\-grid
 render.grid.absolute|bool<br>false<br>render|Position the grid at the *absolute origin* of the model's coordinate system instead of below the model.|\-\-grid
 render.grid.unit|double<br>0<br>render|Set the size of the *unit square* for the grid. If set to non-positive (the default) a suitable value will be automatically computed.|\-\-grid\-unit

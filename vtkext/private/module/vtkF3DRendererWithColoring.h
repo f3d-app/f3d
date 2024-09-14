@@ -96,9 +96,9 @@ public:
   };
 
   /**
-   * Set the pointSize and the splat type on the pointGaussianMapper
+   * Set the point sprites size and the splat type on the pointGaussianMapper
    */
-  void SetPointProperties(SplatType splatType, double pointSize);
+  void SetPointSpritesProperties(SplatType splatType, double pointSpritesSize);
 
   /**
    * Set the visibility of the scalar bar.

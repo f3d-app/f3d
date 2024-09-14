@@ -6,7 +6,8 @@
     },
     "animation": {
       "autoplay": {
-        "type": "bool"
+        "type": "bool",
+        "default_value": "false"
       },
       "index": {
         "type": "int",

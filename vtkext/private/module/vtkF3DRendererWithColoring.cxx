@@ -249,9 +249,9 @@ void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetPointProperties(SplatType type, double pointSize)
+void vtkF3DRendererWithColoring::SetPointProperties(SplatType type, double pointSpritesSize)
 {
-  this->SetPointSize(pointSize);
+//  this->SetPointSize(pointSize); TODO
 
   if (!this->Importer)
   {
@@ -275,7 +275,7 @@ void vtkF3DRendererWithColoring::SetPointProperties(SplatType type, double point
   double scaleFactor = 1.0;
   if (bbox.IsValid())
   {
-    scaleFactor = pointSize * bbox.GetDiagonalLength() * 0.001;
+    scaleFactor = pointSpritesSize * bbox.GetDiagonalLength() * 0.001;
   }
 
   const auto& psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
