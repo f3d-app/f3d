@@ -30,13 +30,15 @@
         "type": "int"
       },
       "orthographic": {
-        "type": "bool"
+        "type": "bool",
+        "default_value": "false"
       }
     }
   },
   "render": {
     "show_edges": {
-      "type": "bool"
+      "type": "bool",
+      "default_value": "false"
     },
     "line_width": {
       "type": "double"
@@ -64,7 +66,8 @@
         "default_value": "10"
       },
       "color": {
-        "type": "double_vector"
+        "type": "double_vector",
+        "default_value": "0.0, 0.0, 0.0"
       }
     },
     "raytracing": {
@@ -146,7 +149,8 @@
       "default_value": "false"
     },
     "filename_info": {
-      "type": "string"
+      "type": "string",
+      "default_value": ""
     },
     "fps": {
       "type": "bool",
@@ -161,7 +165,8 @@
       "default_value": "false"
     },
     "dropzone_info": {
-      "type": "string"
+      "type": "string",
+      "default_value": ""
     },
     "metadata": {
       "type": "bool",
@@ -182,45 +187,56 @@
   "model": {
     "matcap": {
       "texture": {
-        "type": "string"
+        "type": "string",
+        "default_value": ""
       }
     },
     "color": {
       "opacity": {
-        "type": "double"
+        "type": "double",
+        "default_value": "1.0"
       },
       "rgb": {
-        "type": "double_vector"
+        "type": "double_vector",
+        "default_value": "1.0, 1.0, 1.0"
       },
       "texture": {
-        "type": "string"
+        "type": "string",
+        "default_value": ""
       }
     },
     "emissive": {
       "factor": {
-        "type": "double_vector"
+        "type": "double_vector",
+        "default_value": "1.0, 1.0, 1.0"
       },
       "texture": {
-        "type": "string"
+        "type": "string",
+        "default_value": ""
       }
     },
     "normal": {
       "scale": {
-        "type": "double"
+        "type": "double",
+        "default_value": "1.0"
       },
       "texture": {
-        "type": "string"
+        "type": "string",
+        "default_value": ""
       }
     },
     "material": {
       "metallic": {
-        "type": "double"
+        "type": "double",
+        "default_value": "0.0"
       },
       "roughness": {
-        "type": "double"
+        "type": "double",
+        "default_value": "0.3"
       },
       "texture": {
-        "type": "string"
+        "type": "string",
+        "default_value": ""
       }
     },
     "scivis": {
@@ -252,7 +268,7 @@
         "type": "bool",
         "default_value": "false"
       },
-      "type": {
+      "shape": {
         "type": "string",
         "default_value": "sphere"
       },

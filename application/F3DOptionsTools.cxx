@@ -53,6 +53,7 @@ struct CLIGroup
 /**
  * Declaration of all F3D CLI options except `--input` using above structs
  * Order of groups matters in the context of `--help`
+ * TODO update help text for optional values
  */
 // clang-format off
 #if F3D_MODULE_RAYTRACING
@@ -82,7 +83,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "up", "", "Up direction", "{-X, +X, -Y, +Y, -Z, +Z}", "" },
       { "axis", "x", "Show axes", "<bool>", "1" }, { "grid", "g", "Show grid", "<bool>", "1" },
       { "grid-absolute", "", "Position grid at the absolute origin instead of below the model", "<bool>", "1" },
-      { "grid-unit", "", "Size of grid unit square, set to a non-positive value for automatic computation", "<value>", "" },
+      { "grid-unit", "", "Size of grid unit square, automatically computed by default", "<value>", "" },
       { "grid-subdivisions", "", "Number of grid subdivisions", "<value>", "" },
       { "grid-color", "", "Color of main grid lines", "<R,G,B>", "" },
       { "edges", "e", "Show cell edges", "<bool>", "1" },
@@ -451,7 +452,14 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
             if (libIter != F3DOptionsTools::LibOptionsNames.end())
             {
               f3d::options opt;
-              defaultValue = opt.getAsString(std::string(libIter->second));
+              try
+              {
+                defaultValue = opt.getAsString(std::string(libIter->second));
+              }
+              catch (const f3d::options::unset_exception&)
+              {
+                // let defaultValue empty for unset options
+              }
             }
           }
 

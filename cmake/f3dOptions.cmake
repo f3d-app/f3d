@@ -99,9 +99,12 @@ function(_parse_json_option _top_json)
     string(JSON _cur_json GET ${_top_json} ${_member_name})
     # Recover its type and default if it is a leaf option
     string(JSON _option_type ERROR_VARIABLE _type_error GET ${_cur_json} "type")
-    string(JSON _option_default_value ERROR_VARIABLE _default_value_error GET ${_cur_json} "default_value")
-    if(_type_error STREQUAL "NOTFOUND" AND _default_value_error STREQUAL "NOTFOUND")
+    if(_type_error STREQUAL "NOTFOUND")
        # Leaf option found!
+
+       # Recover default_value if any
+       string(JSON _option_default_value ERROR_VARIABLE _default_value_error GET ${_cur_json} "default_value")
+
        set(_option_name "${_option_basename}${_member_name}")
 
        # Identify types
@@ -109,6 +112,7 @@ function(_parse_json_option _top_json)
        set(_option_variant_type ${_option_type})
        set(_option_default_value_start "")
        set(_option_default_value_end "")
+
        if(_option_type STREQUAL "double_vector")
          set(_option_actual_type "std::vector<double>")
          set(_option_variant_type "std::vector<double>")
@@ -125,11 +129,21 @@ function(_parse_json_option _top_json)
        endif()
 
        # Add option to struct and methods
-       string(APPEND _options_struct "${_option_indent}  ${_option_actual_type} ${_member_name} = ${_option_default_value_start}${_option_default_value}${_option_default_value_end};\n")
+
+       if(_default_value_error STREQUAL "NOTFOUND")
+         # Use default_value
+         string(APPEND _options_struct "${_option_indent}  ${_option_actual_type} ${_member_name} = ${_option_default_value_start}${_option_default_value}${_option_default_value_end};\n")
+         set(_optional_getter "")
+       else()
+         # No default_value, it is an std::optional
+         string(APPEND _options_struct "${_option_indent}  std::optional<${_option_actual_type}> ${_member_name};\n")
+         set(_optional_getter ".value()")
+       endif()
+
        list(APPEND _options_setter "if (name == \"${_option_name}\") opt.${_option_name} = std::get<${_option_variant_type}>(value)")
-       list(APPEND _options_getter "if (name == \"${_option_name}\") return opt.${_option_name}")
+       list(APPEND _options_getter "if (name == \"${_option_name}\") return opt.${_option_name}${_optional_getter}")
        list(APPEND _options_string_setter "if (name == \"${_option_name}\") opt.${_option_name} = options_tools::parse<${_option_actual_type}>(str)")
-       list(APPEND _options_string_getter "if (name == \"${_option_name}\") return options_tools::format(opt.${_option_name})")
+       list(APPEND _options_string_getter "if (name == \"${_option_name}\") return options_tools::format(opt.${_option_name}${_optional_getter})")
        list(APPEND _options_lister "\"${_option_name}\"")
 
     else()

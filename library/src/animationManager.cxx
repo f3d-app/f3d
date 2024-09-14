@@ -65,7 +65,7 @@ bool animationManager::Initialize(
     {
       log::warn("An animation index has been specified but there are no animation available.");
     }
-    if (options->scene.animation.time != 0)
+    if (options->scene.animation.time.has_value())
     {
       log::warn("No animation available, cannot load a specific animation time");
     }

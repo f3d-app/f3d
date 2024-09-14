@@ -314,13 +314,13 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     renderingPass = fxaaP;
   }
 
-  if (!this->FinalShader.empty())
+  if (this->FinalShader.has_value())
   {
     // basic validation
-    if (this->FinalShader.find("pixel") != std::string::npos)
+    if (this->FinalShader.value().find("pixel") != std::string::npos)
     {
       vtkNew<vtkF3DUserRenderPass> userP;
-      userP->SetUserShader(this->FinalShader.c_str());
+      userP->SetUserShader(this->FinalShader.value().c_str());
       userP->SetDelegatePass(renderingPass);
 
       this->SetPass(userP);
@@ -447,7 +447,7 @@ void vtkF3DRenderer::SetGridAbsolute(bool absolute)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetGridUnitSquare(double unitSquare)
+void vtkF3DRenderer::SetGridUnitSquare(const std::optional<double>& unitSquare)
 {
   if (this->GridUnitSquare != unitSquare)
   {
@@ -512,8 +512,13 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
     else
     {
       double diag = bbox.GetDiagonalLength();
-      double tmpUnitSquare = this->GridUnitSquare;
-      if (tmpUnitSquare <= 0)
+
+      double tmpUnitSquare;
+      if (this->GridUnitSquare.has_value())
+      {
+        tmpUnitSquare = this->GridUnitSquare.value();
+      }
+      else
       {
         tmpUnitSquare = pow(10.0, round(log10(diag * 0.1)));
       }
@@ -567,13 +572,13 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetHDRIFile(const std::string& hdriFile)
+void vtkF3DRenderer::SetHDRIFile(const std::optional<std::string>& hdriFile)
 {
   // Check HDRI is different than current one
-  std::string collapsedHdriFile;
-  if (!hdriFile.empty())
+  std::optional<std::string> collapsedHdriFile;
+  if (hdriFile.has_value())
   {
-    collapsedHdriFile = vtksys::SystemTools::CollapseFullPath(hdriFile);
+    collapsedHdriFile = vtksys::SystemTools::CollapseFullPath(hdriFile.value());
   }
 
   if (this->HDRIFile != collapsedHdriFile)
@@ -703,25 +708,25 @@ void vtkF3DRenderer::ConfigureHDRIReader()
   {
     this->UseDefaultHDRI = false;
     this->HDRIReader = nullptr;
-    if (!this->HDRIFile.empty())
+    if (this->HDRIFile.has_value())
     {
-      if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
+      if (!vtksys::SystemTools::FileExists(this->HDRIFile.value(), true))
       {
         F3DLog::Print(
-          F3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
+          F3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile.value());
       }
       else
       {
         this->HDRIReader = vtkSmartPointer<vtkImageReader2>::Take(
-          vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
+          vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.value().c_str()));
         if (this->HDRIReader)
         {
-          this->HDRIReader->SetFileName(this->HDRIFile.c_str());
+          this->HDRIReader->SetFileName(this->HDRIFile.value().c_str());
         }
         else
         {
           F3DLog::Print(F3DLog::Severity::Warning,
-            std::string("Cannot open HDRI file ") + this->HDRIFile +
+            std::string("Cannot open HDRI file ") + this->HDRIFile.value() +
               std::string(". Using default HDRI"));
         }
       }
@@ -754,8 +759,8 @@ void vtkF3DRenderer::ConfigureHDRIHash()
     }
     else
     {
-      // Compute HDRI MD5
-      this->HDRIHash = ::ComputeFileHash(this->HDRIFile);
+      // Compute HDRI MD5, here we know the HDRIFile has a value
+      this->HDRIHash = ::ComputeFileHash(this->HDRIFile.value());
     }
     this->HasValidHDRIHash = true;
     this->CreateCacheDirectory();
@@ -1021,9 +1026,9 @@ void vtkF3DRenderer::ConfigureTextActors()
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
   this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
-  if (!this->FontFile.empty())
+  if (this->FontFile.has_value())
   {
-    std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(this->FontFile);
+    std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(this->FontFile.value());
     if (vtksys::SystemTools::FileExists(tmpFontFile, true))
     {
       this->FilenameActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
@@ -1048,7 +1053,7 @@ void vtkF3DRenderer::ConfigureTextActors()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetLineWidth(double lineWidth)
+void vtkF3DRenderer::SetLineWidth(const std::optional<double>& lineWidth)
 {
   if (this->LineWidth != lineWidth)
   {
@@ -1058,7 +1063,7 @@ void vtkF3DRenderer::SetLineWidth(double lineWidth)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetPointSize(double pointSize)
+void vtkF3DRenderer::SetPointSize(const std::optional<double>& pointSize)
 {
   if (this->PointSize != pointSize)
   {
@@ -1068,7 +1073,7 @@ void vtkF3DRenderer::SetPointSize(double pointSize)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetFontFile(const std::string& fontFile)
+void vtkF3DRenderer::SetFontFile(const std::optional<std::string>& fontFile)
 {
   if (this->FontFile != fontFile)
   {
@@ -1131,7 +1136,7 @@ void vtkF3DRenderer::SetUseBlurBackground(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetBackfaceType(const std::string& backfaceType)
+void vtkF3DRenderer::SetBackfaceType(const std::optional<std::string>& backfaceType)
 {
   if (this->BackfaceType != backfaceType)
   {
@@ -1162,7 +1167,7 @@ void vtkF3DRenderer::SetUseSSAOPass(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetFinalShader(const std::string& finalShader)
+void vtkF3DRenderer::SetFinalShader(const std::optional<std::string>& finalShader)
 {
   if (this->FinalShader != finalShader)
   {
@@ -1384,19 +1389,31 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     if (vtkSkybox::SafeDownCast(anActor) == nullptr)
     {
       anActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
-      anActor->GetProperty()->SetLineWidth(this->LineWidth);
-      anActor->GetProperty()->SetPointSize(this->PointSize);
-      if (this->BackfaceType == "visible")
+
+      if (this->LineWidth.has_value())
       {
-        anActor->GetProperty()->SetBackfaceCulling(false);
+        anActor->GetProperty()->SetLineWidth(this->LineWidth.value());
       }
-      else if (this->BackfaceType == "hidden")
+
+      if (this->PointSize.has_value())
       {
-        anActor->GetProperty()->SetBackfaceCulling(true);
+        anActor->GetProperty()->SetPointSize(this->PointSize.value());
       }
-      else if (this->BackfaceType != "default")
+
+      if (this->BackfaceType.has_value())
       {
-        F3DLog::Print(F3DLog::Severity::Warning, this->BackfaceType + " is not a valid backface type, assuming default");
+        if (this->BackfaceType.value() == "visible")
+        {
+          anActor->GetProperty()->SetBackfaceCulling(false);
+        }
+        else if (this->BackfaceType.value() == "hidden")
+        {
+          anActor->GetProperty()->SetBackfaceCulling(true);
+        }
+        else
+        {
+          F3DLog::Print(F3DLog::Severity::Warning, this->BackfaceType.value() + " is not a valid backface type, assuming it is not set");
+        }
       }
     }
   }
@@ -1406,6 +1423,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowEdge(bool show)
 {
+  // XXX EdgeVisible should be an optional
   if (this->EdgeVisible != show)
   {
     this->EdgeVisible = show;
@@ -1418,6 +1436,7 @@ void vtkF3DRenderer::ShowEdge(bool show)
 void vtkF3DRenderer::SetUseOrthographicProjection(bool use)
 {
   // if the internal state is already the same as the target state there's nothing to do
+  // XXX UseOrthographicProjection should be an optional
   if (this->UseOrthographicProjection == use)
   {
     return;

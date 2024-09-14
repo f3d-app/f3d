@@ -66,7 +66,30 @@ options& options::toggle(const std::string& name)
 //----------------------------------------------------------------------------
 bool options::isSame(const options& other, const std::string& name) const
 {
-  return options_tools::get(*this, name) == options_tools::get(other, name);
+  option_variant_t ownVal;
+  option_variant_t otherVal;
+  bool ownUnset = false;
+  bool otherUnset = false;
+
+  try
+  {
+    ownVal = options_tools::get(*this, name);
+  }
+  catch (const f3d::options::unset_exception&)
+  {
+    ownUnset = true;
+  }
+
+  try
+  {
+    otherVal = options_tools::get(other, name);
+  }
+  catch (const f3d::options::unset_exception&)
+  {
+    otherUnset = true;
+  }
+
+  return ownUnset == otherUnset && ownVal == otherVal;
 }
 
 //----------------------------------------------------------------------------
@@ -138,6 +161,12 @@ options::incompatible_exception::incompatible_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 options::inexistent_exception::inexistent_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+options::unset_exception::unset_exception(const std::string& what)
   : exception(what)
 {
 }

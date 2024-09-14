@@ -137,9 +137,9 @@ f3d_test(NAME TestGridColor DATA suzanne.ply ARGS -g --grid-color=1,1,1)
 f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x)
 f3d_test(NAME TestBackfaceVisible DATA backface.vtp ARGS --backface-type=visible)
 f3d_test(NAME TestBackfaceHidden DATA backface.vtp ARGS --backface-type=hidden)
-f3d_test(NAME TestPointCloud DATA pointsCloud.vtp ARGS -o --point-size=20)
-f3d_test(NAME TestPointCloudBar DATA pointsCloud.vtp ARGS -sob --point-size=20)
-f3d_test(NAME TestPointCloudUG DATA pointsCloud.vtu ARGS -o --point-size=20)
+f3d_test(NAME TestPointCloud DATA pointsCloud.vtp ARGS -o --point-sprites-size=20)
+f3d_test(NAME TestPointCloudBar DATA pointsCloud.vtp ARGS -sob --point-sprites-size=20)
+f3d_test(NAME TestPointCloudUG DATA pointsCloud.vtu ARGS -o --point-sprites-size=20)
 f3d_test(NAME TestPointCloudVolume DATA bluntfin.vts ARGS -sob)
 f3d_test(NAME TestPointCloudDefaultScene DATA pointsCloud.vtp ARGS --point-size=20)
 f3d_test(NAME Test3DSImporter DATA iflamigm.3ds ARGS --up=+Z)
@@ -721,7 +721,7 @@ f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION) #VCCC
 f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION) #SYYYY
 f3d_test(NAME TestInteractionCycleScalars DATA dragon.vtu INTERACTION) #BSSSS
 f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION) #VI
-f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-size=20 INTERACTION) #O
+f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-sprites-size=20 INTERACTION) #O
 f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalar-coloring) #Right;Right;Right;Left;Up;
 f3d_test(NAME TestInteractionDirectoryLoop DATA mb INTERACTION ARGS --scalar-coloring) #Left;Left;Left;
 f3d_test(NAME TestInteractionDirectoryEmpty DATA mb INTERACTION NO_DATA_FORCE_RENDER) #Right;Right;Right;
