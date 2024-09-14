@@ -106,9 +106,11 @@ if (F3D_MODULE_EXR)
   target_compile_definitions(f3d PRIVATE F3D_MODULE_EXR)
 endif ()
 
+if(VTK_VERSION VERSION_LESS 9.3.20240914)
 # Headless EGL build
-if (VTK_OPENGL_HAS_EGL)
-  target_compile_definitions(f3d PRIVATE F3D_HEADLESS_BUILD)
+  if (VTK_OPENGL_HAS_EGL)
+    target_compile_definitions(f3d PRIVATE F3D_HEADLESS_BUILD)
+  endif ()
 endif ()
 
 # F3D_STRICT_BUILD

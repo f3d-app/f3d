@@ -99,13 +99,18 @@ find_package(VTK 9.0 REQUIRED
     RenderingVolumeOpenGL2
     TestingCore
     jsoncpp
-    opengl
   OPTIONAL_COMPONENTS
+    opengl
     IOExodus
     IOOpenVDB
     RenderingExternal
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
+
+if(VTK_VERSION VERSION_LESS 9.3.20240914)
+  # Not optional before
+  find_package(VTK 9.0 REQUIRED COMPONENTS opengl)
+endif()
 
 # Shared options between application and library
 include(GNUInstallDirs)
