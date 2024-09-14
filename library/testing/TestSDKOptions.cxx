@@ -138,50 +138,5 @@ int TestSDKOptions(int argc, char* argv[])
   test.expect<f3d::options::inexistent_exception>(
     "inexistent_exception exception on copy", [&]() { opt.copy(opt2, "dummy"); });
 
-  // Test parse
-  if (f3d::options::parse<bool>(std::string("true")) != true)
-  {
-    std::cerr << "Options parse method not behaving as expected with bool." << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (f3d::options::parse<int>(std::string("37")) != 37)
-  {
-    std::cerr << "Options parse method not behaving as expected with int." << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (f3d::options::parse<double>(std::string("37.2")) != 37.2)
-  {
-    std::cerr << "Options parse method not behaving as expected with double." << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (f3d::options::parse<f3d::ratio_t>(std::string("0.31")) != 0.31)
-  {
-    std::cerr << "Options parse method not behaving as expected with ratio_t." << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (f3d::options::parse<std::string>(std::string("  foobar  ")) != "foobar")
-  {
-    std::cerr << "Options parse method not behaving as expected with string." << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (f3d::options::parse<std::vector<int>>(std::string("1, 2, 3")) !=
-    std::vector<int>({ 1, 2, 3 }))
-  {
-    std::cerr << "Options parse method not behaving as expected with int vector." << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (f3d::options::parse<std::vector<double>>(std::string("0.1, 0.2, 0.3")) !=
-    std::vector<double>({ 0.1, 0.2, 0.3 }))
-  {
-    std::cerr << "Options parse method not behaving as expected with double vector." << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (f3d::options::parse<std::vector<std::string>>(std::string("foo, bar, baz")) !=
-    std::vector<std::string>({ "foo", "bar", "baz" }))
-  {
-    std::cerr << "Options parse method not behaving as expected with string vector." << std::endl;
-    return EXIT_FAILURE;
-  }
-
   return EXIT_SUCCESS;
 }

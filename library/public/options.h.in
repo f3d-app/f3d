@@ -108,8 +108,17 @@ public:
 
   /**
    * Templated parsing method used internally to parse strings.
-   * Implemented only for types: bool, int, double, ratio_t,
-   * as well as vector for each of these types.
+   * Implemented for:
+   * - `bool` as `"true"`/`"false"`, `"1"`/`"0"`, `"yes"`/`"no"`, `"on"`/`"off"`
+   * (case-insensitive)
+   * - `int`: `"123"`, `"+123"`, `"-456"`
+   * - `double`: `"123.45"`, `"+123.45"`, `"-67.8"`, `"-1e3"`
+   * - `ratio_t`: as
+   *   + a number, same a `double` above
+   *   + a percentage: `"12.3%"` => `0.123`
+   *   + a fraction: `"3/4"` => `0.75`
+   * - `vector<T>` where `T` is one of the above: the input is split on `","` and chunks are trimmed
+   *   before parsing each element.
    * See parsing documentation for more info. TODO.
    * Throw an options::parsing_exception if parsing failed.
    */
