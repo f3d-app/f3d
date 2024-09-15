@@ -451,14 +451,9 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
             if (libIter != F3DOptionsTools::LibOptionsNames.end())
             {
               f3d::options opt;
-              try
-              {
-                defaultValue = opt.getAsString(std::string(libIter->second));
-              }
-              catch (const f3d::options::unset_exception&)
-              {
-                // let defaultValue empty for unset options
-              }
+              std::string name = std::string(libIter->second);
+              // let default value empty for unset options
+              defaultValue = opt.isSet(name) ? opt.getAsString(name) : "";
             }
           }
 

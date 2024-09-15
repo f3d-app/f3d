@@ -84,14 +84,14 @@ def test_set_options():
     assert engine.options["scene.up_direction"] == "-Z"
 
 
-#def test_to_dict(): TODO does this matter ?
-#    options = f3d.Options()
-#    options_dict = dict(options)
-#
-#    assert len(options) > 0
-#    assert len(options) == len(options_dict)
-#    for k, v in options_dict.items():
-#        assert options[k] == v
+def test_to_dict():
+    options = f3d.Options()
+    options_dict = dict(options)
+
+    assert len(options) > 0
+    assert len(options) == len(options_dict)
+    for k, v in options_dict.items():
+        assert options[k] == v
 
 
 def test_update_from_dict():
