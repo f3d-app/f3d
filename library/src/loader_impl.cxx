@@ -290,7 +290,8 @@ loader& loader_impl::loadScene(const std::string& filePath)
 
   if (this->Internals->Options.scene.camera.index.has_value())
   {
-    this->Internals->CurrentFullSceneImporter->SetCamera(this->Internals->Options.scene.camera.index.value());
+    this->Internals->CurrentFullSceneImporter->SetCamera(
+      this->Internals->Options.scene.camera.index.value());
   }
 
   log::debug("Loading 3D scene: ", filePath, "\n");
