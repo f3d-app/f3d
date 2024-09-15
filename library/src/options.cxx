@@ -66,45 +66,28 @@ options& options::toggle(const std::string& name)
 //----------------------------------------------------------------------------
 bool options::isSame(const options& other, const std::string& name) const
 {
-  option_variant_t ownVal;
-  option_variant_t otherVal;
-  bool ownUnset = false;
-  bool otherUnset = false;
-
   try
   {
-    ownVal = options_tools::get(*this, name);
+    return options_tools::get(*this, name) == options_tools::get(other, name);
   }
   catch (const f3d::options::unset_exception&)
   {
-    ownUnset = true;
+    return !this->isSet(name) && !other.isSet(name);
   }
-
-  try
-  {
-    otherVal = options_tools::get(other, name);
-  }
-  catch (const f3d::options::unset_exception&)
-  {
-    otherUnset = true;
-  }
-
-  return ownUnset == otherUnset && ownVal == otherVal;
 }
 
 //----------------------------------------------------------------------------
 bool options::isSet(const std::string& name) const
 {
-  bool ret = true;
   try
   {
     options_tools::get(*this, name);
+    return true;
   }
   catch (const f3d::options::unset_exception&)
   {
-    ret = false;
+    return false;
   }
-  return ret;
 }
 
 //----------------------------------------------------------------------------
@@ -125,17 +108,10 @@ std::vector<std::string> options::getSetNames() const
 {
   std::vector<std::string> names = this->getNames();
   std::vector<std::string> setNames;
-  for (const std::string& name : names)
-  {
-    try
-    {
-      options_tools::get(*this, name);
-      setNames.emplace_back(name);
-    }
-    catch (const f3d::options::unset_exception&)
-    {
-    }
-  }
+  std::copy_if(names.begin(), names.end(), std::back_inserter(setNames),
+    [&](const std::string& name){
+       return this->isSet(name);
+    });
   return setNames;
 }
 
