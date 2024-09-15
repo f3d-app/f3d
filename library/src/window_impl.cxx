@@ -163,6 +163,7 @@ window_impl::window_impl(const options& options, Type type, engine::F3DOpenGLLoa
 #if F3D_MODULE_EXTERNAL_RENDERING
     this->Internals->RenWin = vtkSmartPointer<vtkExternalOpenGLRenderWindow>::New();
     vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin)->SetOpenGLSymbolLoader(loader, nullptr);
+    vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin)->OpenGLInit();
 #else
     throw engine::no_window_exception(
       "Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
