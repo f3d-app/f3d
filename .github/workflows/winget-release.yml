@@ -20,7 +20,7 @@ jobs:
       - name: Submit package to Windows Package Manager Community Repository
         uses: vedantmgoyal2009/winget-releaser@v2
         with:
-          identifier: f3d.F3D
+          identifier: f3d-app.f3d
           installers-regex: '^F3D-[\d\.]+-Windows-x86_64\.exe$'
           version: ${{ env.WINGET_TAG_NAME }}
           release-tag: ${{ inputs.tag_name || github.event.release.tag_name }}
