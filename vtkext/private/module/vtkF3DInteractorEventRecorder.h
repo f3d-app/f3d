@@ -23,6 +23,8 @@ public:
   vtkF3DInteractorEventRecorder(const vtkF3DInteractorEventRecorder&) = delete;
   void operator=(const vtkF3DInteractorEventRecorder&) = delete;
 
+  void Clear();
+
 protected:
   vtkF3DInteractorEventRecorder();
   ~vtkF3DInteractorEventRecorder() override = default;
