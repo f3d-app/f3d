@@ -150,7 +150,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-window_impl::window_impl(const options& options, Type type, engine::F3DOpenGLLoaderFunction loader)
+window_impl::window_impl(const options& options, Type type)
   : Internals(std::make_unique<window_impl::internals>(options))
 {
   this->Internals->WindowType = type;
@@ -162,8 +162,6 @@ window_impl::window_impl(const options& options, Type type, engine::F3DOpenGLLoa
   {
 #if F3D_MODULE_EXTERNAL_RENDERING
     this->Internals->RenWin = vtkSmartPointer<vtkExternalOpenGLRenderWindow>::New();
-    vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin)->SetOpenGLSymbolLoader(loader, nullptr);
-    vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin)->OpenGLInit();
 #else
     throw engine::no_window_exception(
       "Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
@@ -194,6 +192,13 @@ window_impl::window_impl(const options& options, Type type, engine::F3DOpenGLLoa
 window_impl::Type window_impl::getType()
 {
   return this->Internals->WindowType;
+}
+
+//----------------------------------------------------------------------------
+void window_impl::initializeExternal(F3DOpenGLLoaderFunction loader, void* openglContext)
+{
+  vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin)->SetOpenGLSymbolLoader(loader, openglContext);
+  vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin)->vtkOpenGLRenderWindow::OpenGLInit();
 }
 
 //----------------------------------------------------------------------------

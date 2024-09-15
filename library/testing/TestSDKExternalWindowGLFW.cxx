@@ -10,6 +10,9 @@
 
 int TestSDKExternalWindowGLFW(int argc, char* argv[])
 {
+  f3d::engine eng(f3d::window::Type::EXTERNAL);
+  eng.getWindow().setSize(300,300);
+
   // setup glfw window
   if (!glfwInit())
   {
@@ -33,18 +36,6 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
   }
   glfwMakeContextCurrent(window);
 
-  // create engine and load file
-  auto loadFunc = [](void*, const char* name) -> f3d::engine::F3DOpenGLAPIProc {
-    if (name)
-    {
-      return glfwGetProcAddress(name);
-    }
-    return nullptr;
-  };
-
-  f3d::engine eng(f3d::window::Type::EXTERNAL, loadFunc);
-  eng.getLoader().loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
-
   glfwSetWindowUserPointer(window, &eng);
 
   // key callback
@@ -54,6 +45,16 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
       glfwSetWindowShouldClose(window, 1);
     }
   });
+
+  auto loadFunc = [](void*, const char* name) -> f3d::window::F3DOpenGLAPIProc {
+    if (name)
+    {
+      return glfwGetProcAddress(name);
+    }
+    return nullptr;
+  };
+  eng.getWindow().initializeExternal(loadFunc);
+  eng.getLoader().loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
 
   while (!glfwWindowShouldClose(window) && glfwGetTime() < 1.0)
   {

@@ -10,7 +10,6 @@
 #ifndef f3d_window_impl_h
 #define f3d_window_impl_h
 
-#include "engine.h"
 #include "log.h"
 #include "window.h"
 
@@ -31,8 +30,9 @@ public:
    * Create the internal vtkRenderWindow using the offscreen param
    * and store option ref for later usage
    */
-  window_impl(const options& options, Type type, f3d::engine::F3DOpenGLLoaderFunction loader = {});
+  window_impl(const options& options, Type type);
 
+  void initializeExternal(f3d::window::F3DOpenGLLoaderFunction loader, void* openglContext = nullptr) override;
   /**
    * Default destructor
    */

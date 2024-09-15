@@ -33,7 +33,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-engine::engine(window::Type windowType, F3DOpenGLLoaderFunction loader)
+engine::engine(window::Type windowType)
   : Internals(new engine::internals)
 {
   // Ensure all lib initialization is done (once)
@@ -58,7 +58,7 @@ engine::engine(window::Type windowType, F3DOpenGLLoaderFunction loader)
   this->Internals->Options = std::make_unique<options>();
 
   this->Internals->Window =
-    std::make_unique<detail::window_impl>(*this->Internals->Options, windowType, loader);
+    std::make_unique<detail::window_impl>(*this->Internals->Options, windowType);
   this->Internals->Window->SetCachePath(cachePath);
 
   this->Internals->Loader =

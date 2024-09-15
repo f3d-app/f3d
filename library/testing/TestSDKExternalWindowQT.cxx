@@ -49,6 +49,23 @@ protected:
     this->close();
   }
 
+  void initializeGL() override
+  {
+    this->QOpenGLWindow::initializeGL();
+    auto loadFunc = [](void* userData,
+                       const char* name) -> f3d::window::F3DOpenGLAPIProc {
+      if (auto* context = reinterpret_cast<QOpenGLContext*>(userData))
+      {
+        if (auto* symbol = context->getProcAddress(name))
+        {
+          return symbol;
+        }
+      }
+      return nullptr;
+    };
+    mEngine.getWindow().initializeExternal(loadFunc, this->context());
+  }
+
   void paintGL() override
   {
     mEngine.getWindow().render();
