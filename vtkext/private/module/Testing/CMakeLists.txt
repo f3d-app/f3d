@@ -25,6 +25,7 @@ vtk_add_test_cxx(vtkextPrivateTests tests
   ${test_sources}
   ${F3D_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(vtkextPrivateTests tests)
+set_target_properties(vtkextPrivateTests PROPERTIES CXX_STANDARD 17)
 
 if(UNIX)
   # On windows, the default window output message does not redirect to cout
