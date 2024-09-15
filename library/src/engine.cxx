@@ -58,7 +58,7 @@ engine::engine(window::Type windowType, F3DOpenGLLoaderFunction loader)
   this->Internals->Options = std::make_unique<options>();
 
   this->Internals->Window =
-    std::make_unique<detail::window_impl>(*this->Internals->Options, windowType);
+    std::make_unique<detail::window_impl>(*this->Internals->Options, windowType, loader);
   this->Internals->Window->SetCachePath(cachePath);
 
   this->Internals->Loader =
