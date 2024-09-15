@@ -867,6 +867,12 @@ f3d_test(NAME TestVerboseVolumeNoArray DATA cow.vtp ARGS -v REGEXP "Cannot use v
 # Test scalar rendering without any array
 f3d_test(NAME TestVerboseNoArray DATA cow.vtp ARGS -s --verbose=debug REGEXP "No array to color with" NO_BASELINE)
 
+# Test invalid scalar range
+f3d_test(NAME TestInvalidScalarsRange DATA suzanne.ply ARGS -s --coloring-array=Normals --comp=1 --range=0,1,2 REGEXP "Invalid scalar range provided, using automatic range" NO_BASELINE)
+
+# Test invalid backface type
+f3d_test(NAME TestInvalidBackface DATA backface.vtp ARGS --backface-type=invalid REGEXP "is not a valid backface type, assuming it is not set" NO_BASELINE)
+
 # Test non existent file, do not create nonExistentFile.vtp
 f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp REGEXP "File .*nonExistentFile.vtp does not exist" NO_RENDER)
 
