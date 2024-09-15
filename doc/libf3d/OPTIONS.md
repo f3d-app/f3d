@@ -74,7 +74,7 @@ render.effect.anti_aliasing|bool<br>false<br>render|Enable *anti-aliasing*. This
 render.effect.ambient_occlusion|bool<br>false<br>render|Enable *ambient occlusion*. This is a technique providing approximate shadows, used to improve the depth perception of the object. Implemented using SSAO|\-\-ambient_occlusion
 render.effect.tone_mapping|bool<br>false<br>render|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.|\-\-tone-mapping
 render.effect.final_shader|string<br>optional<br>render|Add a final shader to the output image|\-\-final-shader. See [user documentation](../user/FINAL_SHADER.md).
-render.line_width|double<br>optional<br>render|Set the *width* of lines when showing edges. Model specifed by default.|\-\-line-width
+render.line_width|double<br>optional<br>render|Set the *width* of lines when showing edges. Model specified by default.|\-\-line-width
 render.show_edges|bool<br>false<br>render|Show the *cell edges*|\-\-edges
 render.point_size|double<br>optional<br>render|Set the *size* of points when showing vertices. Model specified by default.|\-\-point-size
 render.backface_type|string<br>optional<br>render|Set the Backface type, can be `visible` or `hidden`, model specified by default.|\-\-backface-type
