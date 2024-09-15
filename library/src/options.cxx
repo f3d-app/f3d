@@ -109,9 +109,7 @@ std::vector<std::string> options::getSetNames() const
   std::vector<std::string> names = this->getNames();
   std::vector<std::string> setNames;
   std::copy_if(names.begin(), names.end(), std::back_inserter(setNames),
-    [&](const std::string& name){
-       return this->isSet(name);
-    });
+    [&](const std::string& name) { return this->isSet(name); });
   return setNames;
 }
 
