@@ -47,14 +47,16 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullSc
                "${CMAKE_BINARY_DIR}/TestSDKInteractorDropFullScene.log") # world.obj; S
 
 # External window tests
-if(F3D_MODULE_EXTERNAL_RENDERING AND NOT VTK_OPENGL_HAS_EGL)
-  find_package(glfw3 QUIET)
+# TODO VTK version
+# TODO better control
+if(F3D_MODULE_EXTERNAL_RENDERING)
+  find_package(glfw3)
   if(glfw3_FOUND)
     list(APPEND libf3dSDKTests_list
         TestSDKExternalWindowGLFW.cxx
         )
   endif()
-  find_package(Qt5 QUIET COMPONENTS OpenGL)
+  find_package(Qt5 COMPONENTS OpenGL)
   if(Qt5_FOUND)
     list(APPEND libf3dSDKTests_list
         TestSDKExternalWindowQT.cxx
