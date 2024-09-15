@@ -3,6 +3,7 @@
 
 #include "PseudoUnitTest.h"
 
+#include <algorithm>
 #include <iostream>
 
 int TestSDKOptions(int argc, char* argv[])
@@ -135,8 +136,8 @@ int TestSDKOptions(int argc, char* argv[])
   test("move operator", opt5.render.line_width == 2.13);
 
   // Test getNames
-  std::vector<std::string> names = opt.getNames();
-  test("getNames count", names.size() != 0 && names == opt2.getNames());
+  std::vector<std::string> names = f3d::options::getAllNames();
+  test("getNames find", std::find(names.begin(), names.end(), "scene.animation.time") != names.end());
 
   std::vector<std::string> setNames = opt.getSetNames();
   test("getSetNames count", setNames.size() != 0 && setNames == opt2.getSetNames());

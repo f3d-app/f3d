@@ -102,7 +102,7 @@ public:
   /**
    * Get all available option names.
    */
-  std::vector<std::string> getNames() const;
+  static std::vector<std::string> getAllNames();
 
   /**
    * Get all option names that are currently set.

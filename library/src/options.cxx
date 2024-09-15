@@ -98,7 +98,7 @@ options& options::copy(const options& from, const std::string& name)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> options::getNames() const
+std::vector<std::string> options::getAllNames()
 {
   return options_tools::getNames();
 }
@@ -106,7 +106,7 @@ std::vector<std::string> options::getNames() const
 //----------------------------------------------------------------------------
 std::vector<std::string> options::getSetNames() const
 {
-  std::vector<std::string> names = this->getNames();
+  std::vector<std::string> names = options::getAllNames();
   std::vector<std::string> setNames;
   std::copy_if(names.begin(), names.end(), std::back_inserter(setNames),
     [&](const std::string& name) { return this->isSet(name); });
