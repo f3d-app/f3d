@@ -17,6 +17,7 @@ else ()
 endif ()
 
 target_link_libraries(F3DShellExtension PUBLIC libf3d PRIVATE pathcch shlwapi windowscodecs)
+set_target_properties(F3DShellExtension PROPERTIES CXX_STANDARD 17)
 
 # Installing
 install(TARGETS F3DShellExtension

@@ -24,10 +24,6 @@ project(F3D
   DESCRIPTION "F3D - A fast and minimalist 3D viewer"
   LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 set(f3d_cmake_dir "${F3D_SOURCE_DIR}/cmake")
 list(INSERT CMAKE_MODULE_PATH 0 "${f3d_cmake_dir}")
 include(f3dVersion)

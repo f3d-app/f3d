@@ -112,6 +112,7 @@ endif()
 
 set_target_properties(libf3d PROPERTIES
   CXX_VISIBILITY_PRESET hidden
+  CXX_STANDARD 17
   POSITION_INDEPENDENT_CODE ON
   OUTPUT_NAME "f3d"
   PDB_NAME "libf3d"
