@@ -137,7 +137,8 @@ int TestSDKOptions(int argc, char* argv[])
 
   // Test getNames
   std::vector<std::string> names = f3d::options::getAllNames();
-  test("getNames find", std::find(names.begin(), names.end(), "scene.animation.time") != names.end());
+  test(
+    "getNames find", std::find(names.begin(), names.end(), "scene.animation.time") != names.end());
 
   std::vector<std::string> setNames = opt.getSetNames();
   test("getSetNames count", setNames.size() != 0 && setNames == opt2.getSetNames());
