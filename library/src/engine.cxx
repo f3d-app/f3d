@@ -33,7 +33,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-engine::engine(window::Type windowType)
+engine::engine(window::Type windowType, F3DOpenGLLoaderFunction loader)
   : Internals(new engine::internals)
 {
   // Ensure all lib initialization is done (once)

@@ -10,10 +10,6 @@
 
 int TestSDKExternalWindowGLFW(int argc, char* argv[])
 {
-  // create engine and load file
-  f3d::engine eng(f3d::window::Type::EXTERNAL);
-  eng.getLoader().loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
-
   // setup glfw window
   if (!glfwInit())
   {
@@ -35,8 +31,20 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
     std::cerr << "Can't create GLFW window." << std::endl;
     return EXIT_FAILURE;
   }
-
   glfwMakeContextCurrent(window);
+
+  // create engine and load file
+  auto loadFunc = [](void*, const char* name) -> f3d::engine::F3DOpenGLAPIProc {
+    if (name)
+    {
+      return glfwGetProcAddress(name);
+    }
+    return nullptr;
+  };
+
+  f3d::engine eng(f3d::window::Type::EXTERNAL, loadFunc);
+  eng.getLoader().loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
+
   glfwSetWindowUserPointer(window, &eng);
 
   // key callback

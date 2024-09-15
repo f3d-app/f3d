@@ -46,6 +46,9 @@ namespace f3d
 class F3D_EXPORT engine
 {
 public:
+  typedef void (*F3DOpenGLAPIProc)();
+  typedef F3DOpenGLAPIProc (*F3DOpenGLLoaderFunction)(void* userptr, const char* name);
+
   /**
    * Engine constructor, choose the window type using the enum.
    * see window.h for details about the window.
@@ -56,7 +59,7 @@ public:
    * Throw a no_window_exception when using a Using window::Type::EXTERNAL without the right cmake
    * option.
    */
-  explicit engine(window::Type windowType = window::Type::NATIVE);
+  explicit engine(window::Type windowType = window::Type::NATIVE, F3DOpenGLLoaderFunction loader = {});
 
   /**
    * Engine destructor, delete all object instances as well.
