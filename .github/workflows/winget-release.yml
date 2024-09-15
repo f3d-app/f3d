@@ -6,10 +6,8 @@ on:
     inputs:
       tag_name:
         description: "Specific tag name"
-        required: false
+        required: true
         type: string
-env:
-  CI: true
 jobs:
   winget-publish:
     name: Publish winget package
@@ -22,7 +20,7 @@ jobs:
       - name: Submit package to Windows Package Manager Community Repository
         uses: vedantmgoyal2009/winget-releaser@v2
         with:
-          identifier: F3d.F3d
+          identifier: f3d.F3D
           installers-regex: '^F3D-[\d\.]+-Windows-x86_64\.exe$'
           version: ${{ env.WINGET_TAG_NAME }}
           release-tag: ${{ inputs.tag_name || github.event.release.tag_name }}
