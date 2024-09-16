@@ -199,9 +199,9 @@ void PrintHelpPair(
 //----------------------------------------------------------------------------
 void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
 {
-  const std::array<std::pair<std::string_view, std::string_view>, 4> examples = {{
+  const std::array<std::pair<std::string, std::string>, 4> examples = {{
     { execName + " file.vtu -xtgans",
-      "View a unstructured mesh in a typical nice looking sciviz style" },
+      "View an unstructured mesh in a typical nice-looking sciviz style" },
     { execName + " file.glb -tuqap --hdri-file=file.hdr --hdri-ambient --hdri-skybox",
       "View a gltf file in a realistic environment" },
     { execName + " file.ply -so --point-size=0 --comp=-2",
@@ -225,9 +225,10 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
   }
 
   f3d::log::info("\nExamples:");
-  for (const auto& [cmd, desc] : examples)
+  for (const auto& example : examples)
   {
-    ::PrintHelpPair(cmd, desc, 50);
+    f3d::log::info(example.first);  // Print the command part
+    f3d::log::info("    " + example.second);  // Print the description part indented
   }
   f3d::log::info("\nReport bugs to https://github.com/f3d-app/f3d/issues");
   f3d::log::setUseColoring(true);
