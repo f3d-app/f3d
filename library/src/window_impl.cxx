@@ -162,7 +162,9 @@ window_impl::window_impl(const options& options, Type type)
   else if (type == Type::EXTERNAL)
   {
 #if F3D_MODULE_EXTERNAL_RENDERING
-    this->Internals->RenWin = vtkSmartPointer<vtkExternalOpenGLRenderWindow>::New();
+    vtkNew<vtkExternalOpenGLRenderWindow> extWin;
+    extWin->AutomaticWindowPositionAndResizeOff();
+    this->Internals->RenWin = extWin;
 #else
     throw engine::no_window_exception(
       "Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
