@@ -192,7 +192,7 @@ void PrintHelpPair(
   std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70)
 {
   std::stringstream ss;
-  ss << "  " << std::left << std::setw(keyWidth) << key << " " << std::setw(helpWidth) << help;
+  ss << "  " << std::left << std::setw(keyWidth) << key << " \n" << std::setw(helpWidth) << help;
   f3d::log::info(ss.str());
 }
 
@@ -225,10 +225,9 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
   }
 
   f3d::log::info("\nExamples:");
-  for (const auto& example : examples)
+  for (const auto& [cmd, desc] : examples)
   {
-    f3d::log::info(example.first);  // Print the command part
-    f3d::log::info("    " + example.second);  // Print the description part indented
+    ::PrintHelpPair(cmd, desc, 50);
   }
   f3d::log::info("\nReport bugs to https://github.com/f3d-app/f3d/issues");
   f3d::log::setUseColoring(true);
