@@ -188,18 +188,32 @@ std::string CollapseName(const std::string_view& longName, const std::string_vie
 }
 
 //----------------------------------------------------------------------------
-void PrintHelpPair(
-  std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70)
+void PrintHelpPair(std::string_view key, std::string_view help, int keyWidth = 15)
 {
-  std::stringstream ss;
-  ss << "  " << std::left << std::setw(keyWidth) << key << " \n" << std::setw(helpWidth) << help;
-  f3d::log::info(ss.str());
+    std::stringstream ss;
+    std::string keyStr = std::string(key);
+    std::string helpStr = std::string(help);
+
+    if (key.length() > static_cast<size_t>(keyWidth)) 
+    {
+        ss << keyStr << "\n" << std::setw(keyWidth) << " " << helpStr; // Print command on one line, help text on the next line
+    }
+    else if (key.find(' ') != std::string::npos) 
+    {
+        ss << std::left << std::setw(keyWidth) << keyStr << " " << helpStr; // Adjust width to handle multi-word commands
+    }
+    else 
+    {
+        ss << std::left << std::setw(keyWidth) << keyStr << " " << helpStr; // Use the same width for shorter commands
+    }
+
+    f3d::log::info(ss.str());
 }
 
 //----------------------------------------------------------------------------
 void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
 {
-  const std::array<std::pair<std::string, std::string>, 4> examples = {{
+    const std::array<std::pair<std::string, std::string>, 4> examples = {{
     { execName + " file.vtu -xtgans",
       "View an unstructured mesh in a typical nice-looking sciviz style" },
     { execName + " file.glb -tuqap --hdri-file=file.hdr --hdri-ambient --hdri-skybox",
@@ -207,31 +221,38 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
     { execName + " file.ply -so --point-size=0 --comp=-2",
       "View a point cloud file with direct scalars rendering" },
     { execName + " folder", "View all files in folder" },
-  }};
+    }};
 
-  f3d::log::setUseColoring(false);
-  std::vector<std::string> orderedCLIGroupNames;
-  orderedCLIGroupNames.reserve(::CLIOptions.size());
-  for (const ::CLIGroup& optionGroup : ::CLIOptions)
-  {
-    // This ensure help is provided in the expected group order
-    orderedCLIGroupNames.emplace_back(optionGroup.GroupName);
-  }
-  f3d::log::info(cxxOptions.help(orderedCLIGroupNames));
-  f3d::log::info("Keys:");
-  for (const auto& [key, desc] : f3d::interactor::getDefaultInteractionsInfo())
-  {
-    ::PrintHelpPair(key, desc);
-  }
+    f3d::log::setUseColoring(false);
+    std::vector<std::string> orderedCLIGroupNames;
+    orderedCLIGroupNames.reserve(::CLIOptions.size());
+    for (const ::CLIGroup& optionGroup : ::CLIOptions)
+    {
+        orderedCLIGroupNames.emplace_back(optionGroup.GroupName);
+    }
+    f3d::log::info(cxxOptions.help(orderedCLIGroupNames));
+    f3d::log::info("Keys:");
+    for (const auto& [key, desc] : f3d::interactor::getDefaultInteractionsInfo())
+    {
+        ::PrintHelpPair(key, desc);
+    }
 
-  f3d::log::info("\nExamples:");
-  for (const auto& [cmd, desc] : examples)
-  {
-    ::PrintHelpPair(cmd, desc, 50);
-  }
-  f3d::log::info("\nReport bugs to https://github.com/f3d-app/f3d/issues");
-  f3d::log::setUseColoring(true);
-  f3d::log::waitForUser();
+    f3d::log::info("\nExamples:");
+    for (const auto& [cmd, desc] : examples)
+    {
+        // Print each example command
+        f3d::log::info(cmd);
+        // Print the corresponding description with proper indentation
+        std::stringstream descStream(desc);
+        std::string line;
+        while (std::getline(descStream, line))
+        {
+            f3d::log::info("   " + line);
+        }
+    }
+    f3d::log::info("\nReport bugs to https://github.com/f3d-app/f3d/issues");
+    f3d::log::setUseColoring(true);
+    f3d::log::waitForUser();
 }
 
 //----------------------------------------------------------------------------
