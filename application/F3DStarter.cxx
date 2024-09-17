@@ -957,14 +957,14 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
   // Detect interactively changed options and store them into the dynamic options dict
   // options names are shared between options instance
   F3DOptionsTools::OptionsDict dynamicOptionsDict;
-  std::vector<std::string> optionNames = dynamicOptions.getSetNames();
+  std::vector<std::string> optionNames = dynamicOptions.getValuedNames();
   for (const auto& name : optionNames)
   {
     if (!dynamicOptions.isSame(this->Internals->LibOptions, name))
     {
       // XXX Currently an assert is enough but it should be a proper try/catch once
       // we add a mechanism to unset an option
-      assert(dynamicOptions.isSet(name));
+      assert(dynamicOptions.hasValue(name));
       dynamicOptionsDict[name] = dynamicOptions.getAsString(name);
     }
   }

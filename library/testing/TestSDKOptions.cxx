@@ -136,19 +136,19 @@ int TestSDKOptions(int argc, char* argv[])
   test("move operator", opt5.render.line_width == 2.13);
 
   // Test getNames
-  std::vector<std::string> names = f3d::options::getAllNames();
+  std::vector<std::string> names = f3d::options::getNames();
   test(
     "getNames find", std::find(names.begin(), names.end(), "scene.animation.time") != names.end());
 
-  std::vector<std::string> setNames = opt.getSetNames();
-  test("getSetNames count", setNames.size() != 0 && setNames == opt2.getSetNames());
+  std::vector<std::string> setNames = opt.getValuedNames();
+  test("getValuedNames count", setNames.size() != 0 && setNames == opt2.getValuedNames());
 
-  // Test isSame/copy/isSet
+  // Test isSame/copy/hasValue
   test("isSame", opt.isSame(opt2, "render.line_width"));
   test("isSame unset", opt.isSame(opt2, "scene.animation.time"));
 
-  test("isSet", opt.isSet("render.line_width"));
-  test("isSet", !opt.isSet("scene.animation.time"));
+  test("hasValue", opt.hasValue("render.line_width"));
+  test("hasValue", !opt.hasValue("scene.animation.time"));
 
   opt2.render.line_width = 3.12;
   test("not isSame", !opt.isSame(opt2, "render.line_width"));

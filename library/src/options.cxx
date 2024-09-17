@@ -72,12 +72,12 @@ bool options::isSame(const options& other, const std::string& name) const
   }
   catch (const f3d::options::unset_exception&)
   {
-    return !this->isSet(name) && !other.isSet(name);
+    return !this->hasValue(name) && !other.hasValue(name);
   }
 }
 
 //----------------------------------------------------------------------------
-bool options::isSet(const std::string& name) const
+bool options::hasValue(const std::string& name) const
 {
   try
   {
@@ -98,18 +98,18 @@ options& options::copy(const options& from, const std::string& name)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> options::getAllNames()
+std::vector<std::string> options::getNames()
 {
   return options_tools::getNames();
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> options::getSetNames() const
+std::vector<std::string> options::getValuedNames() const
 {
-  std::vector<std::string> names = options::getAllNames();
+  const std::vector<std::string> names = options::getNames();
   std::vector<std::string> setNames;
   std::copy_if(names.begin(), names.end(), std::back_inserter(setNames),
-    [&](const std::string& name) { return this->isSet(name); });
+    [&](const std::string& name) { return this->hasValue(name); });
   return setNames;
 }
 

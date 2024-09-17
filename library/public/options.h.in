@@ -87,11 +87,11 @@ public:
   bool isSame(const options& other, const std::string& name) const;
 
   /**
-   * Return true if an option is set, false otherwise
+   * Return true if an option has a value, false otherwise
    * Always returns true for non-optional options.
    * Throw an options::inexistent_exception if option does not exist.
    */
-  bool isSet(const std::string& name) const;
+  bool hasValue(const std::string& name) const;
 
   /**
    * Copy the value of an option from this to the provided other.
@@ -102,12 +102,12 @@ public:
   /**
    * Get all available option names.
    */
-  static std::vector<std::string> getAllNames();
+  static std::vector<std::string> getNames();
 
   /**
-   * Get all option names that are currently set.
+   * Get all option names that currently have values.
    */
-  std::vector<std::string> getSetNames() const;
+  std::vector<std::string> getValuedNames() const;
 
   /**
    * Get the closest option name and its Levenshtein distance.

@@ -391,7 +391,7 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(const std::string&
   // Check libf3d option names
   if (checkLib)
   {
-    for (const std::string& key : f3d::options::getAllNames())
+    for (const std::string& key : f3d::options::getNames())
     {
       checkDistance(key, option, ret);
     }
@@ -452,7 +452,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
               f3d::options opt;
               std::string name = std::string(libIter->second);
               // let default value empty for unset options
-              defaultValue = opt.isSet(name) ? opt.getAsString(name) : "";
+              defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
             }
           }
 
