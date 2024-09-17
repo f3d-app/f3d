@@ -51,7 +51,7 @@ For **default scene** formats, certain defaults values are set automatically:
  - line_width: 1.0
  - point_size: 10.0
 
-They will be overriden if set using [options](OPTIONS.md).
+They will be overridden when using corresponding [options](OPTIONS.md).
 
 ## Animations
 
