@@ -8,6 +8,9 @@ unknownMacro
 *:external/cxxopts/cxxopts.hpp
 *:external/dmon/dmon.h
 
+// function returning a function
+*:library/testing/TestSDKExternalWindowGLFW.cxx
+
 // specific checks
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
 knownConditionTrueFalse:library/testing/TestSDKImageDeprecated.cxx

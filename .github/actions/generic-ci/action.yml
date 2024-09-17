@@ -174,10 +174,11 @@ runs:
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.1') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
+        -DF3D_TESTING_ENABLE_ONSCREEN_TESTS=${{ inputs.egl_label == 'egl' && 'OFF' || 'ON' }}
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'Linux' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
+        ${{ runner.os == 'Linux' && '-DF3NTESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
 
     - name: Build
       shell: bash

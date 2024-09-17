@@ -47,9 +47,8 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullSc
                "${CMAKE_BINARY_DIR}/TestSDKInteractorDropFullScene.log") # world.obj; S
 
 # External window tests
-# TODO VTK version
-# TODO better control
-if(F3D_MODULE_EXTERNAL_RENDERING)
+# TODO better control of deps
+if(F3D_MODULE_EXTERNAL_RENDERING AND F3D_TESTING_ENABLE_ONSCREEN_TESTS)
   find_package(glfw3)
   if(glfw3_FOUND)
     list(APPEND libf3dSDKTests_list
