@@ -24,6 +24,16 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+#if defined(_WIN32)
+#include <vtkWin32OpenGLRenderWindow.h>
+#else
+#ifdef __APPLE__
+#include <vtkCocoaRenderWindow.h>
+#else
+#include <vtkXOpenGLRenderWindow.h>
+#endif
+#endif
+
 #include <chrono>
 #include <cmath>
 #include <map>
@@ -502,7 +512,26 @@ public:
   void StopInteractor()
   {
     this->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
-    this->VTKInteractor->ExitCallback();
+
+    bool usingNative;
+    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+#if defined(_WIN32)
+    usingNative = vtkWin32OpenGLRenderWindow::SafeDownCast(renWin) != nullptr;
+#else
+#ifdef __APPLE__
+    usingNative = vtkCocoaRenderWindow::SafeDownCast(renWin) != nullptr;
+#else
+    usingNative = vtkXOpenGLRenderWindow::SafeDownCast(renWin) != nullptr;
+#endif
+#endif
+    if (usingNative)
+    {
+      this->VTKInteractor->ExitCallback();
+    }
+    else
+    {
+      this->VTKInteractor->SetDone(true);
+    }
   }
 
   /**

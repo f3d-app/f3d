@@ -198,7 +198,7 @@ window_impl::Type window_impl::getType()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::initializeExternal(F3DOpenGLLoaderFunction loader, void* openglContext)
+void window_impl::initializeExternal([[maybe_unused]] F3DOpenGLLoaderFunction loader, [[maybe_unused]] void* openglContext)
 {
   // Option to add default initialization? TODO
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
