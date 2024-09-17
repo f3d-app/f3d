@@ -43,7 +43,7 @@ public:
 
   typedef void (*F3DOpenGLAPIProc)();
   typedef F3DOpenGLAPIProc (*F3DOpenGLLoaderFunction)(void* userptr, const char* name);
-  virtual void initializeExternal(F3DOpenGLLoaderFunction loader, void* openglContext = nullptr) = 0;
+  virtual void initializeExternal([[maybe_unused]] F3DOpenGLLoaderFunction loader, [[maybe_unused]] void* openglContext = nullptr) = 0;
 
   /**
    * Get the camera provided by the window.

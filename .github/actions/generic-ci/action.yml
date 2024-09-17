@@ -178,7 +178,7 @@ runs:
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'Linux' && '-DF3NTESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
+        ${{ runner.os == 'Linux' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
 
     - name: Build
       shell: bash
