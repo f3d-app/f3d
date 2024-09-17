@@ -32,7 +32,8 @@ public:
    */
   window_impl(const options& options, Type type);
 
-  void initializeExternal(f3d::window::F3DOpenGLLoaderFunction loader, void* openglContext = nullptr) override;
+  void initializeExternal(
+    f3d::window::F3DOpenGLLoaderFunction loader, void* openglContext = nullptr) override;
   /**
    * Default destructor
    */

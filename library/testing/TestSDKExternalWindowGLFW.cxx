@@ -11,7 +11,7 @@
 int TestSDKExternalWindowGLFW(int argc, char* argv[])
 {
   f3d::engine eng(f3d::window::Type::EXTERNAL);
-  eng.getWindow().setSize(300,300);
+  eng.getWindow().setSize(300, 300);
 
   // setup glfw window
   if (!glfwInit())

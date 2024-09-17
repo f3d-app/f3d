@@ -52,8 +52,7 @@ protected:
   void initializeGL() override
   {
     this->QOpenGLWindow::initializeGL();
-    auto loadFunc = [](void* userData,
-                       const char* name) -> f3d::window::F3DOpenGLAPIProc {
+    auto loadFunc = [](void* userData, const char* name) -> f3d::window::F3DOpenGLAPIProc {
       if (auto* context = reinterpret_cast<QOpenGLContext*>(userData))
       {
         if (auto* symbol = context->getProcAddress(name))
