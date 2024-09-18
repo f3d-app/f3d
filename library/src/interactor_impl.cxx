@@ -505,7 +505,7 @@ public:
 
     vtkRenderWindow* renWin = this->Window.GetRenderWindow();
     bool usingNative = renWin->IsA("vtkWin32OpenGLRenderWindow") ||
-      renWin->IsA("vtkCocoaOpenGLRenderWindow") || renWin->IsA("vtkXOpenGLRenderWindow");
+      renWin->IsA("vtkCocoaRenderWindow") || renWin->IsA("vtkXOpenGLRenderWindow");
     if (usingNative)
     {
       this->VTKInteractor->ExitCallback();
