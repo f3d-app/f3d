@@ -137,8 +137,8 @@ int TestSDKOptions(int argc, char* argv[])
 
   // Test getNames
   std::vector<std::string> names = f3d::options::getAllNames();
-  test(
-    "getAllNames find", std::find(names.begin(), names.end(), "scene.animation.time") != names.end());
+  test("getAllNames find",
+    std::find(names.begin(), names.end(), "scene.animation.time") != names.end());
 
   std::vector<std::string> setNames = opt.getNames();
   test("getNames count", setNames.size() != 0 && setNames == opt2.getNames());
@@ -192,8 +192,8 @@ int TestSDKOptions(int argc, char* argv[])
   test.expect<f3d::options::inexistent_exception>(
     "inexistent_exception exception on getAsString", [&]() { opt.getAsString("dummy"); });
 
-  test.expect<f3d::options::no_value_exception>(
-    "no_value_exception exception on getAsString", [&]() { opt.getAsString("scene.animation.time"); });
+  test.expect<f3d::options::no_value_exception>("no_value_exception exception on getAsString",
+    [&]() { opt.getAsString("scene.animation.time"); });
 
   return EXIT_SUCCESS;
 }
