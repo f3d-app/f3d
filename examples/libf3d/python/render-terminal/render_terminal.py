@@ -16,7 +16,7 @@ def main():
         "render.effect.tone_mapping": True,
         "render.effect.ambient_occlusion": True,
         "render.effect.translucency_support": True,
-        "render.effect.anti-aliasing": True,
+        "render.effect.anti_aliasing": True,
     }
     anim_fps = 30
     anim_duration = 4

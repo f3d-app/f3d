@@ -215,11 +215,12 @@ void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
 
   for (auto& actorAndMapper : this->Importer->GetGeometryActorsAndMappers())
   {
+    // XXX: All properties below should be optional once we can apply them
+    // on full scenes importers
     actorAndMapper.first->GetProperty()->SetColor(this->SurfaceColor);
     actorAndMapper.first->GetProperty()->SetOpacity(this->Opacity);
     actorAndMapper.first->GetProperty()->SetRoughness(this->Roughness);
     actorAndMapper.first->GetProperty()->SetMetallic(this->Metallic);
-    actorAndMapper.first->GetProperty()->SetLineWidth(this->LineWidth);
 
     // Textures
     auto colorTex = ::GetTexture(this->TextureBaseColor, true);
@@ -249,10 +250,8 @@ void vtkF3DRendererWithColoring::ConfigureColoringActorsProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetPointProperties(SplatType type, double pointSize)
+void vtkF3DRendererWithColoring::SetPointSpritesProperties(SplatType type, double pointSpritesSize)
 {
-  this->SetPointSize(pointSize);
-
   if (!this->Importer)
   {
     return;
@@ -275,7 +274,7 @@ void vtkF3DRendererWithColoring::SetPointProperties(SplatType type, double point
   double scaleFactor = 1.0;
   if (bbox.IsValid())
   {
-    scaleFactor = pointSize * bbox.GetDiagonalLength() * 0.001;
+    scaleFactor = pointSpritesSize * bbox.GetDiagonalLength() * 0.001;
   }
 
   const auto& psActorsAndMappers = this->Importer->GetPointSpritesActorsAndMappers();
@@ -399,7 +398,7 @@ void vtkF3DRendererWithColoring::SetUseInverseOpacityFunction(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRendererWithColoring::SetScalarBarRange(const std::vector<double>& range)
+void vtkF3DRendererWithColoring::SetScalarBarRange(const std::optional<std::vector<double>>& range)
 {
   if (this->UserScalarBarRange != range)
   {
@@ -502,7 +501,7 @@ vtkF3DRendererWithColoring::CycleType vtkF3DRendererWithColoring::CheckColoring(
 
 //----------------------------------------------------------------------------
 void vtkF3DRendererWithColoring::SetColoring(bool enable,
-  bool useCellData, const std::string& arrayName, int component)
+  bool useCellData, const std::optional<std::string>& arrayName, int component)
 {
   if (!this->Importer)
   {
@@ -531,7 +530,7 @@ void vtkF3DRendererWithColoring::SetColoring(bool enable,
       F3DLog::Print(F3DLog::Severity::Debug, "No array to color with");
       this->ArrayIndexForColoring = -1;
     }
-    else if (arrayName.empty())
+    else if (!arrayName.has_value())
     {
       // Coloring with first array
       this->ArrayIndexForColoring = 0;
@@ -539,11 +538,11 @@ void vtkF3DRendererWithColoring::SetColoring(bool enable,
     else
     {
       // Coloring with named array
-      this->ArrayIndexForColoring = this->Importer->FindIndexForColoring(useCellData, arrayName);
+      this->ArrayIndexForColoring = this->Importer->FindIndexForColoring(useCellData, arrayName.value());
       if (this->ArrayIndexForColoring == -1)
       {
         // Could not find named array
-        F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: " + arrayName + "\n");
+        F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: \"" + arrayName.value() + "\"\n");
       }
     }
 
@@ -569,22 +568,15 @@ bool vtkF3DRendererWithColoring::GetColoringUseCell()
 }
 
 //----------------------------------------------------------------------------
-std::string vtkF3DRendererWithColoring::GetColoringArrayName()
+std::optional<std::string> vtkF3DRendererWithColoring::GetColoringArrayName()
 {
-  if (!this->Importer)
-  {
-    return "";
-  }
-
+  std::optional<std::string> arrayName;
   vtkF3DGenericImporter::ColoringInfo info;
-  if (this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
+  if (this->Importer && this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
   {
-    return info.Name;
+    arrayName = info.Name;
   }
-  else
-  {
-    return "";
-  }
+  return arrayName;
 }
 
 //----------------------------------------------------------------------------
@@ -919,20 +911,34 @@ void vtkF3DRendererWithColoring::ConfigureRangeAndCTFForColoring(
   }
 
   // Set range
-  if (this->UserScalarBarRange.size() == 2)
+  bool autoRange = true;
+  if (this->UserScalarBarRange.has_value())
   {
-    this->ColorRange[0] = this->UserScalarBarRange[0];
-    this->ColorRange[1] = this->UserScalarBarRange[1];
+    if (this->UserScalarBarRange.value().size() == 2 && this->UserScalarBarRange.value()[0] <= this->UserScalarBarRange.value()[1])
+    {
+      autoRange = false;
+      this->ColorRange[0] = this->UserScalarBarRange.value()[0];
+      this->ColorRange[1] = this->UserScalarBarRange.value()[1];
+    }
+    else
+    {
+      F3DLog::Print(F3DLog::Severity::Warning,
+        std::string("Invalid scalar range provided, using automatic range\n"));
+    }
   }
-  else if (this->ComponentForColoring >= 0)
+
+  if (autoRange)
   {
-    this->ColorRange[0] = info.ComponentRanges[this->ComponentForColoring][0];
-    this->ColorRange[1] = info.ComponentRanges[this->ComponentForColoring][1];
-  }
-  else
-  {
-    this->ColorRange[0] = info.MagnitudeRange[0];
-    this->ColorRange[1] = info.MagnitudeRange[1];
+    if (this->ComponentForColoring >= 0)
+    {
+      this->ColorRange[0] = info.ComponentRanges[this->ComponentForColoring][0];
+      this->ColorRange[1] = info.ComponentRanges[this->ComponentForColoring][1];
+    }
+    else
+    {
+      this->ColorRange[0] = info.MagnitudeRange[0];
+      this->ColorRange[1] = info.MagnitudeRange[1];
+    }
   }
 
   // Create lookup table

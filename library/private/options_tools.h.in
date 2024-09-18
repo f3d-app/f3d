@@ -295,10 +295,17 @@ void set(options& opt, const std::string& name, const option_variant_t& value)
  */
 option_variant_t get(const options& opt, const std::string& name)
 {
-  // clang-format off
-  ${_options_getter};
-  // clang-format on
-  else throw options::inexistent_exception("Option " + name + " does not exist");
+  try
+  {
+    // clang-format off
+    ${_options_getter};
+    // clang-format on
+    else throw options::inexistent_exception("Option " + name + " does not exist");
+  }
+  catch (const std::bad_optional_access&)
+  {
+    throw options::no_value_exception("Trying to get " + name + " before it was set");
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -329,10 +336,17 @@ void setAsString(options& opt, const std::string& name, const std::string& str)
  */
 std::string getAsString(const options& opt, const std::string& name)
 {
-  // clang-format off
-  ${_options_string_getter};
-  // clang-format on
-  else throw options::inexistent_exception("Option " + name + " does not exist");
+  try
+  {
+    // clang-format off
+    ${_options_string_getter};
+    // clang-format on
+    else throw options::inexistent_exception("Option " + name + " does not exist");
+  }
+  catch (const std::bad_optional_access&)
+  {
+    throw options::no_value_exception("Trying to get " + name + " before it was set");
+  }
 }
 } // option_tools
 } // f3d

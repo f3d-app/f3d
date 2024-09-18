@@ -66,7 +66,28 @@ options& options::toggle(const std::string& name)
 //----------------------------------------------------------------------------
 bool options::isSame(const options& other, const std::string& name) const
 {
-  return options_tools::get(*this, name) == options_tools::get(other, name);
+  try
+  {
+    return options_tools::get(*this, name) == options_tools::get(other, name);
+  }
+  catch (const f3d::options::no_value_exception&)
+  {
+    return !this->hasValue(name) && !other.hasValue(name);
+  }
+}
+
+//----------------------------------------------------------------------------
+bool options::hasValue(const std::string& name) const
+{
+  try
+  {
+    options_tools::get(*this, name);
+    return true;
+  }
+  catch (const f3d::options::no_value_exception&)
+  {
+    return false;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -77,9 +98,19 @@ options& options::copy(const options& from, const std::string& name)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> options::getNames() const
+std::vector<std::string> options::getAllNames()
 {
   return options_tools::getNames();
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> options::getNames() const
+{
+  const std::vector<std::string> names = options::getAllNames();
+  std::vector<std::string> setNames;
+  std::copy_if(names.begin(), names.end(), std::back_inserter(setNames),
+    [&](const std::string& name) { return this->hasValue(name); });
+  return setNames;
 }
 
 //----------------------------------------------------------------------------
@@ -138,6 +169,12 @@ options::incompatible_exception::incompatible_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 options::inexistent_exception::inexistent_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+options::no_value_exception::no_value_exception(const std::string& what)
   : exception(what)
 {
 }
