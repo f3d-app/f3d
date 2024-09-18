@@ -521,7 +521,11 @@ public:
 #ifdef __APPLE__
     usingNative = vtkCocoaRenderWindow::SafeDownCast(renWin) != nullptr;
 #else
+#if __ANDROID__
+    usingNative = true;
+#else // Any other UNIX
     usingNative = vtkXOpenGLRenderWindow::SafeDownCast(renWin) != nullptr;
+#endif
 #endif
 #endif
     if (usingNative)

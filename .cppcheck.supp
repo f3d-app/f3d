@@ -10,6 +10,7 @@ unknownMacro
 
 // function returning a function
 *:library/testing/TestSDKExternalWindowGLFW.cxx
+*:library/testing/TestSDKExternalWindowQT.cxx
 
 // specific checks
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
