@@ -47,7 +47,7 @@ but also some scene information like *lights*, *cameras*, *actors* in the scene,
 By default, all this information will be loaded from the file and displayed. Use the `--geometry-only` [options](OPTIONS.md)
 to modify this behavior. For file formats that do not support it, **a default scene** is created.
 
-For **default scene** formats, certain defaults values are set automatically:
+For **default scene** formats, certain default values are set automatically:
  - line_width: 1.0
  - point_size: 10.0
 

@@ -169,7 +169,7 @@ When using this API make sure to catch exceptions has needed, eg:
   {
     std::cout << userProvidedName << " does not exist." << std::endl;
   }
-  catch (const f3d::options::unset_exception&)
+  catch (const f3d::options::no_value_exception&)
   {
     std::cout << userProvidedName << " is not set." << std::endl;
   }

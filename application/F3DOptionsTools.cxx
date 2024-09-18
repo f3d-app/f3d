@@ -391,7 +391,7 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(const std::string&
   // Check libf3d option names
   if (checkLib)
   {
-    for (const std::string& key : f3d::options::getNames())
+    for (const std::string& key : f3d::options::getAllNames())
     {
       checkDistance(key, option, ret);
     }

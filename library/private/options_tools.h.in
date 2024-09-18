@@ -304,7 +304,7 @@ option_variant_t get(const options& opt, const std::string& name)
   }
   catch (const std::bad_optional_access&)
   {
-    throw options::unset_exception("Trying to get " + name + " before it was set");
+    throw options::no_value_exception("Trying to get " + name + " before it was set");
   }
 }
 
@@ -345,7 +345,7 @@ std::string getAsString(const options& opt, const std::string& name)
   }
   catch (const std::bad_optional_access&)
   {
-    throw options::unset_exception("Trying to get " + name + " before it was set");
+    throw options::no_value_exception("Trying to get " + name + " before it was set");
   }
 }
 } // option_tools

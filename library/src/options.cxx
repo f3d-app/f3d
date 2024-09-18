@@ -70,7 +70,7 @@ bool options::isSame(const options& other, const std::string& name) const
   {
     return options_tools::get(*this, name) == options_tools::get(other, name);
   }
-  catch (const f3d::options::unset_exception&)
+  catch (const f3d::options::no_value_exception&)
   {
     return !this->hasValue(name) && !other.hasValue(name);
   }
@@ -84,7 +84,7 @@ bool options::hasValue(const std::string& name) const
     options_tools::get(*this, name);
     return true;
   }
-  catch (const f3d::options::unset_exception&)
+  catch (const f3d::options::no_value_exception&)
   {
     return false;
   }
@@ -98,15 +98,15 @@ options& options::copy(const options& from, const std::string& name)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> options::getNames()
+std::vector<std::string> options::getAllNames()
 {
   return options_tools::getNames();
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> options::getValuedNames() const
+std::vector<std::string> options::getNames() const
 {
-  const std::vector<std::string> names = options::getNames();
+  const std::vector<std::string> names = options::getAllNames();
   std::vector<std::string> setNames;
   std::copy_if(names.begin(), names.end(), std::back_inserter(setNames),
     [&](const std::string& name) { return this->hasValue(name); });
@@ -174,7 +174,7 @@ options::inexistent_exception::inexistent_exception(const std::string& what)
 }
 
 //----------------------------------------------------------------------------
-options::unset_exception::unset_exception(const std::string& what)
+options::no_value_exception::no_value_exception(const std::string& what)
   : exception(what)
 {
 }

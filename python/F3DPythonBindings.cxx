@@ -184,16 +184,16 @@ PYBIND11_MODULE(pyf3d, module)
           throw py::key_error(key);
         }
       })
-    .def("__len__", [](f3d::options& opts) { return opts.getValuedNames().size(); })
+    .def("__len__", [](f3d::options& opts) { return opts.getNames().size(); })
     .def(
       "__iter__",
       [](f3d::options& opts)
       {
-        const auto names = py::cast(opts.getValuedNames()); // won't work without cast
+        const auto names = py::cast(opts.getNames()); // won't work without cast
         return make_iterator(names);
       },
       py::keep_alive<0, 1>())
-    .def("keys", &f3d::options::getValuedNames) // to do `dict(options)`
+    .def("keys", &f3d::options::getNames) // to do `dict(options)`
     .def("toggle", &f3d::options::toggle)
     .def("is_same", &f3d::options::isSame)
     .def("get_closest_option", &f3d::options::getClosestOption)

@@ -51,7 +51,7 @@ public:
   /**
    * Get an option as a variant based on its name
    * Throw an options::inexistent_exception if option does not exist.
-   * Throw an options::unset_exception if option has not been set.
+   * Throw an options::no_value_exception if option has not been set.
    */
   option_variant_t get(const std::string& name) const;
 
@@ -67,7 +67,7 @@ public:
   /**
    * Get an option as a string based on its name
    * Throw an options::inexistent_exception if option does not exist.
-   * Throw an options::unset_exception if option has not been set.
+   * Throw an options::no_value_exception if option has not been set.
    */
   std::string getAsString(const std::string& name) const;
 
@@ -75,7 +75,7 @@ public:
    * A boolean option specific method to toggle it.
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::incompatible_exception if option is not boolean.
-   * Throw an options::unset_exception if option has not been set.
+   * Throw an options::no_value_exception if option has not been set.
    */
   options& toggle(const std::string& name);
 
@@ -102,12 +102,12 @@ public:
   /**
    * Get all available option names.
    */
-  static std::vector<std::string> getNames();
+  static std::vector<std::string> getAllNames();
 
   /**
    * Get all option names that currently have values.
    */
-  std::vector<std::string> getValuedNames() const;
+  std::vector<std::string> getNames() const;
 
   /**
    * Get the closest option name and its Levenshtein distance.
@@ -165,9 +165,9 @@ public:
    * An exception that can be thrown by the options
    * when a provided option is accessed before being set.
    */
-  struct unset_exception : public exception
+  struct no_value_exception : public exception
   {
-    explicit unset_exception(const std::string& what = "");
+    explicit no_value_exception(const std::string& what = "");
   };
 
   /**
