@@ -24,16 +24,6 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
-#if defined(_WIN32)
-#include <vtkWin32OpenGLRenderWindow.h>
-#else
-#ifdef __APPLE__
-#include <vtkCocoaRenderWindow.h>
-#else
-#include <vtkXOpenGLRenderWindow.h>
-#endif
-#endif
-
 #include <chrono>
 #include <cmath>
 #include <map>
@@ -513,21 +503,11 @@ public:
   {
     this->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
 
-    bool usingNative;
     vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-#if defined(_WIN32)
-    usingNative = vtkWin32OpenGLRenderWindow::SafeDownCast(renWin) != nullptr;
-#else
-#ifdef __APPLE__
-    usingNative = vtkCocoaRenderWindow::SafeDownCast(renWin) != nullptr;
-#else
-#if __ANDROID__
-    usingNative = true;
-#else // Any other UNIX
-    usingNative = vtkXOpenGLRenderWindow::SafeDownCast(renWin) != nullptr;
-#endif
-#endif
-#endif
+    bool usingNative =
+      renWin->IsA("vtkWin32OpenGLRenderWindow") ||
+      renWin->IsA("vtkCocoaOpenGLRenderWindow") ||
+      renWin->IsA("vtkXOpenGLRenderWindow");
     if (usingNative)
     {
       this->VTKInteractor->ExitCallback();
