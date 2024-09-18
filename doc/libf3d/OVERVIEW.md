@@ -2,7 +2,7 @@
 
 By Michael Migliore and Mathieu Westphal.
 
-libf3d is a BSD-licensed C++ library to open and render 3D meshes. It is of course used by F3D.
+libf3d is a BSD-licensed C++17 library to open and render 3D meshes. It is of course used by F3D.
 libf3d API is simple and easy to learn. Python bindings are provided through pybind11. Java bindings are also available.
 libf3d API is still in alpha version and may change drastically in the future.
 

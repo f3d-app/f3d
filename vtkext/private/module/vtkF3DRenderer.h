@@ -15,6 +15,7 @@
 #include <vtkOpenGLRenderer.h>
 
 #include <map>
+#include <optional>
 
 class vtkCornerAnnotation;
 class vtkF3DDropZoneActor;
@@ -48,10 +49,10 @@ public:
   /**
    * Set different actors parameters
    */
-  void SetLineWidth(double lineWidth);
-  void SetPointSize(double pointSize);
-  void SetFontFile(const std::string& fontFile);
-  void SetHDRIFile(const std::string& hdriFile);
+  void SetLineWidth(const std::optional<double>& lineWidth);
+  void SetPointSize(const std::optional<double>& pointSize);
+  void SetFontFile(const std::optional<std::string>& fontFile);
+  void SetHDRIFile(const std::optional<std::string>& hdriFile);
   void SetUseImageBasedLighting(bool use) override;
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);
@@ -59,7 +60,7 @@ public:
   void SetAnimationnameInfo(const std::string& info);
   void SetDropZoneInfo(const std::string& info);
   void SetGridAbsolute(bool absolute);
-  void SetGridUnitSquare(double unitSquare);
+  void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
   ///@}
@@ -77,8 +78,8 @@ public:
   void SetUseBlurBackground(bool use);
   void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);
-  void SetBackfaceType(const std::string& backfaceType);
-  void SetFinalShader(const std::string& finalShader);
+  void SetBackfaceType(const std::optional<std::string>& backfaceType);
+  void SetFinalShader(const std::optional<std::string>& finalShader);
   ///@}
 
   ///@{
@@ -299,13 +300,13 @@ protected:
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
   double CircleOfConfusionRadius = 20.0;
-  double PointSize = 10.0;
-  double LineWidth = 1.0;
-  double GridUnitSquare = 0.0;
+  std::optional<double> PointSize;
+  std::optional<double> LineWidth;
+  std::optional<double> GridUnitSquare;
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
 
-  std::string HDRIFile;
+  std::optional<std::string> HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
   bool HasValidHDRIReader = false;
   bool UseDefaultHDRI = false;
@@ -317,7 +318,7 @@ protected:
   bool HasValidHDRISH = false;
   bool HasValidHDRISpec = false;
 
-  std::string FontFile;
+  std::optional<std::string> FontFile;
 
   double LightIntensity = 1.0;
   std::map<vtkLight*, double> OriginalLightIntensities;
@@ -328,8 +329,8 @@ protected:
   std::string CachePath;
   std::string AnimationNameInfo;
 
-  std::string BackfaceType = "default";
-  std::string FinalShader;
+  std::optional <std::string> BackfaceType;
+  std::optional <std::string> FinalShader;
 };
 
 #endif

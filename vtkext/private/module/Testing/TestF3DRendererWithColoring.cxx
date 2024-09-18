@@ -14,7 +14,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   renderer->ShowGrid(true);
 
   // Check error paths
-  if (!renderer->GetColoringArrayName().empty())
+  if (renderer->GetColoringArrayName().has_value())
   {
     std::cerr << "Unexpected coloring information without an importer" << std::endl;
     return EXIT_FAILURE;

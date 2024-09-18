@@ -16,8 +16,8 @@
   ".*(splat)":
   {
     "point-sprites": true,
-    "point-size": 1,
-    "point-type": "gaussian",
+    "point-sprites-size": 1,
+    "point-sprites-type": "gaussian",
     "scalar-coloring": true,
     "coloring-array": "color",
     "comp": "-2",

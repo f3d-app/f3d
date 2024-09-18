@@ -126,7 +126,7 @@ f3d_test(NAME TestVTS DATA bluntfin.vts)
 f3d_test(NAME TestVTM DATA mb.vtm)
 f3d_test(NAME TestVTK DATA cow.vtk)
 f3d_test(NAME TestNRRD DATA beach.nrrd ARGS -s)
-f3d_test(NAME TestSPLAT DATA small.splat ARGS -osy --up=-Y --point-size=1)
+f3d_test(NAME TestSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-size=1)
 f3d_test(NAME TestGridX DATA suzanne.ply ARGS -g --up=+X)
 f3d_test(NAME TestGridY DATA suzanne.ply ARGS -g --up=+Y)
 f3d_test(NAME TestGridZ DATA suzanne.ply ARGS -g --up=+Z)
@@ -137,9 +137,9 @@ f3d_test(NAME TestGridColor DATA suzanne.ply ARGS -g --grid-color=1,1,1)
 f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x)
 f3d_test(NAME TestBackfaceVisible DATA backface.vtp ARGS --backface-type=visible)
 f3d_test(NAME TestBackfaceHidden DATA backface.vtp ARGS --backface-type=hidden)
-f3d_test(NAME TestPointCloud DATA pointsCloud.vtp ARGS -o --point-size=20)
-f3d_test(NAME TestPointCloudBar DATA pointsCloud.vtp ARGS -sob --point-size=20)
-f3d_test(NAME TestPointCloudUG DATA pointsCloud.vtu ARGS -o --point-size=20)
+f3d_test(NAME TestPointCloud DATA pointsCloud.vtp ARGS -o --point-sprites-size=20)
+f3d_test(NAME TestPointCloudBar DATA pointsCloud.vtp ARGS -sob --point-sprites-size=20)
+f3d_test(NAME TestPointCloudUG DATA pointsCloud.vtu ARGS -o --point-sprites-size=20)
 f3d_test(NAME TestPointCloudVolume DATA bluntfin.vts ARGS -sob)
 f3d_test(NAME TestPointCloudDefaultScene DATA pointsCloud.vtp ARGS --point-size=20)
 f3d_test(NAME Test3DSImporter DATA iflamigm.3ds ARGS --up=+Z)
@@ -287,7 +287,7 @@ endif()
 # Needs splat sorting with compute shaders
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
   if(NOT APPLE) # MacOS does not support compute shaders
-    f3d_test(NAME Test3DGaussiansSplatting DATA small.splat ARGS -osy --up=-Y --point-size=1 --point-type=gaussian --camera-position=-3.6,0.5,-4.2)
+    f3d_test(NAME Test3DGaussiansSplatting DATA small.splat ARGS -osy --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,-4.2)
     f3d_test(NAME TestDefaultConfigFileSPLAT DATA small.splat CONFIG config_build LONG_TIMEOUT)
     f3d_test(NAME TestThumbnailConfigFileSPLAT DATA small.splat CONFIG thumbnail_build LONG_TIMEOUT)
   endif()
@@ -612,8 +612,11 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   f3d_test(NAME TestAnimationTimeLimitsHigh DATA small.ex2 ARGS ARGS --load-plugins=exodus --animation-time=10)
   f3d_test(NAME TestAnimationTimeLimitsLow DATA small.ex2 ARGS ARGS --load-plugins=exodus --animation-time=-5)
 
+  # Test if negative range is respected when loading a file without specifying the animation time
+  f3d_test(NAME TestTimeRangeLessThanZeroNoAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=exodus)
+
   # Test if the animation-time works when set to zero and time range[0] is less than zero
-  f3d_test(NAME TestTimeRangeLessThanZero DATA negative_range_animated.e ARGS -s --load-plugins=exodus --animation-time=0)
+  f3d_test(NAME TestTimeRangeLessThanZeroWithAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=exodus --animation-time=0)
 
   # Test if a negative animation-time works when time range[0] is less than zero
   f3d_test(NAME TestTimeRangeLessThanZeroNegativeAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=exodus --animation-time=-3)
@@ -721,7 +724,7 @@ f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION) #VCCC
 f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION) #SYYYY
 f3d_test(NAME TestInteractionCycleScalars DATA dragon.vtu INTERACTION) #BSSSS
 f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION) #VI
-f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-size=20 INTERACTION) #O
+f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-sprites-size=20 INTERACTION) #O
 f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalar-coloring) #Right;Right;Right;Left;Up;
 f3d_test(NAME TestInteractionDirectoryLoop DATA mb INTERACTION ARGS --scalar-coloring) #Left;Left;Left;
 f3d_test(NAME TestInteractionDirectoryEmpty DATA mb INTERACTION NO_DATA_FORCE_RENDER) #Right;Right;Right;
@@ -821,7 +824,7 @@ f3d_test(NAME TestVerboseDebug DATA dragon.vtu ARGS --verbose REGEXP "Number of 
 f3d_test(NAME TestVerboseInvalid DATA dragon.vtu ARGS --verbose=invalid REGEXP "Unrecognized verbose level" NO_BASELINE)
 
 # Unknown scalar array verbosity test
-f3d_test(NAME TestVerboseWrongArray DATA dragon.vtu ARGS -s --coloring-array=dummy --verbose REGEXP "Unknown scalar array: dummy" NO_BASELINE)
+f3d_test(NAME TestVerboseWrongArray DATA dragon.vtu ARGS -s --coloring-array=dummy --verbose REGEXP "Unknown scalar array: \"dummy\"" NO_BASELINE)
 
 # Default scalar array verbosity test
 f3d_test(NAME TestVerboseDefaultScalar DATA HeadMRVolume.mhd ARGS -s --verbose REGEXP "Coloring using point array named MetaImage, Magnitude" NO_BASELINE)
@@ -863,6 +866,12 @@ f3d_test(NAME TestVerboseVolumeNoArray DATA cow.vtp ARGS -v REGEXP "Cannot use v
 
 # Test scalar rendering without any array
 f3d_test(NAME TestVerboseNoArray DATA cow.vtp ARGS -s --verbose=debug REGEXP "No array to color with" NO_BASELINE)
+
+# Test invalid scalar range
+f3d_test(NAME TestInvalidScalarsRange DATA suzanne.ply ARGS -s --coloring-array=Normals --comp=1 --range=0,1,2 REGEXP "Invalid scalar range provided, using automatic range" NO_BASELINE)
+
+# Test invalid backface type
+f3d_test(NAME TestInvalidBackface DATA backface.vtp ARGS --backface-type=invalid REGEXP "is not a valid backface type, assuming it is not set" NO_BASELINE)
 
 # Test non existent file, do not create nonExistentFile.vtp
 f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp REGEXP "File .*nonExistentFile.vtp does not exist" NO_RENDER)

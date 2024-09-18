@@ -82,7 +82,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "up", "", "Up direction", "{-X, +X, -Y, +Y, -Z, +Z}", "" },
       { "axis", "x", "Show axes", "<bool>", "1" }, { "grid", "g", "Show grid", "<bool>", "1" },
       { "grid-absolute", "", "Position grid at the absolute origin instead of below the model", "<bool>", "1" },
-      { "grid-unit", "", "Size of grid unit square, set to a non-positive value for automatic computation", "<value>", "" },
+      { "grid-unit", "", "Size of grid unit square, automatically computed by default", "<value>", "" },
       { "grid-subdivisions", "", "Number of grid subdivisions", "<value>", "" },
       { "grid-color", "", "Color of main grid lines", "<R,G,B>", "" },
       { "edges", "e", "Show cell edges", "<bool>", "1" },
@@ -97,10 +97,11 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""} } },
   { "Material",
     { {"point-sprites", "o", "Show sphere sprites instead of geometry", "<bool>", "1" },
-      {"point-type", "", "Point sprites type when showing point sprites", "<sphere|gaussian>", ""},
-      {"point-size", "", "Point size when showing vertices or point sprites", "<size>", ""},
-      {"line-width", "", "Line width when showing edges", "<width>", ""},
-      {"backface-type", "", "Backface type, can be default (usually visible), visible or hidden", "<default|visible|hidden>", ""},
+      {"point-sprites-type", "", "Point sprites type", "<sphere|gaussian>", ""},
+      {"point-sprites-size", "", "Point sprites size", "<size>", ""},
+      {"point-size", "", "Point size when showing vertices, model specified by default", "<size>", ""},
+      {"line-width", "", "Line width when showing edges, model specified by default", "<width>", ""},
+      {"backface-type", "", "Backface type, can be visible or hidden, model specified by default", "<visible|hidden>", ""},
       {"color", "", "Solid color", "<R,G,B>", ""},
       {"opacity", "", "Opacity", "<opacity>", ""},
       {"roughness", "", "Roughness coefficient (0.0-1.0)", "<roughness>", ""},
@@ -130,7 +131,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"coloring-array", "", "Name of the array to color with", "<array_name>", "" },
       {"comp", "y", "Component from the array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", "<comp_index>", "-2"},
       {"cells", "c", "Use an array from the cells", "<bool>", "1"},
-      {"range", "", "Custom range for the coloring by array", "<min,max>", ""},
+      {"range", "", "Custom range for the coloring by array, automatically computed by default", "<min,max>", ""},
       {"bar", "b", "Show scalar bar", "<bool>", "1" },
       {"colormap-file", "", "Specify a colormap image", "<filePath/filename/fileStem>", ""},
       {"colormap", "", "Specify a custom colormap (ignored if \"colormap-file\" is specified)", "<color_list>", ""},
@@ -390,8 +391,7 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(const std::string&
   // Check libf3d option names
   if (checkLib)
   {
-    f3d::options opt;
-    for (const std::string& key : opt.getNames())
+    for (const std::string& key : f3d::options::getAllNames())
     {
       checkDistance(key, option, ret);
     }
@@ -450,7 +450,9 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
             if (libIter != F3DOptionsTools::LibOptionsNames.end())
             {
               f3d::options opt;
-              defaultValue = opt.getAsString(std::string(libIter->second));
+              std::string name = std::string(libIter->second);
+              // let default value empty for unset options
+              defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
             }
           }
 

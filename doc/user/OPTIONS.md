@@ -39,11 +39,12 @@ Options|Default|Description
 \-\-grid\-subdivisions=\<count\>||Set the number of subdivisions for the grid.
 \-\-grid\-color=\<color\>|(0,0,0)|Set the color grid lines.
 -e, \-\-edges||Show the *cell edges*.
-\-\-camera-index=\<idx\>|-1|Select the scene camera to use when available in the file.<br>Any negative value means automatic camera.<br>The default scene always uses automatic camera.
+\-\-camera-index=\<idx\>||Select the scene camera to use when available in the file. Automatically computed by default.
 -k, \-\-trackball||Enable trackball interaction.
 \-\-animation-autoplay||Automatically start animation.
 \-\-animation-index=\<idx\>|0|Select the animation to show.<br>Any negative value means all animations (glTF only).<br>The default scene always has at most one animation.
 \-\-animation-speed-factor=\<factor\>|1|Set the animation speed factor to slow, speed up or even invert animation time.
+\-\-animation-time=\<factor\>||Set the animation time to load.
 \-\-animation-frame-rate=\<factor\>|60|Set the animation frame rate used when playing animation interactively.
 \-\-font-file=\<font file\>||Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.
 
@@ -52,9 +53,11 @@ Options|Default|Description
 Options|Default|Description
 ------|------|------
 -o, \-\-point-sprites||Show sphere *points sprites* instead of the geometry.
-\-\-point-size=\<size\>|10.0|Set the *size* of points when showing vertices and point sprites.
-\-\-point-type=\<sphere|gaussian\>|sphere|Set the splat type when showing point sprites.
-\-\-line-width=\<size\>|1.0|Set the *width* of lines when showing edges.
+\-\-point-sprites-type=\<sphere|gaussian\>|sphere|Set the splat type when showing point sprites.
+\-\-point-sprites-size=\<size\>|10.0|Set the *size* of point sprites.
+\-\-point-size=\<size\>||Set the *size* of points when showing vertices. Model specified by default.
+\-\-line-width=\<size\>||Set the *width* of lines when showing edges. Model specified by default.
+\-\-backface-type=\<visible|hidden\>||Set the Backface type. Model specified by default.
 \-\-color=\<R,G,B\>|1.0, 1.0, 1.0| Set a *color* on the geometry. Multiplied with the base color texture when present. <br>Requires a default scene.
 \-\-opacity=\<opacity\>|1.0|Set *opacity* on the geometry. Multiplied with the base color texture when present. <br>Requires a default scene. Usually used with Depth Peeling option.
 \-\-roughness=\<roughness\>|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Requires a default scene.
@@ -86,11 +89,11 @@ Options|Default|Description
 
 Options|Default|Description
 ------|------|------
--s, \-\-scalar-coloring||Enable scalar coloring if present in the file. If no `--coloring-array` is provided, the first in alphabetical order will be picked if any are available. <br>Requires a default scene.
+-s, \-\-scalar-coloring||Enable scalar coloring if present in the file. If `--coloring-array` is not set, the first in alphabetical order will be picked if any are available. <br>Requires a default scene.
 \-\-coloring-array=\<array_name\>||The coloring array name to use when coloring.<br>Use \-\-verbose to recover the usable array names.
 -y, \-\-comp=\<comp_index\>|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. -1 means *magnitude*. -2 or the short option, -y, means *direct values*.<br>When using *direct values*, components are used as L, LA, RGB, RGBA values depending on the number of components.
 -c, \-\-cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
-\-\-range=\<min,max\>||Set a *custom range for the coloring* by the array.<br>Use with the scalar option.
+\-\-range=\<min,max\>||Set the *coloring range*. Automatically computed by default.<br>Use with the scalar option.
 -b, \-\-bar||Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
 \-\-colormap\-file=\<name\>||Set a *colormap file for the coloring*.<br>See [color maps](COLOR_MAPS.md).<br>Use with the scalar option.
 \-\-colormap=\<color_list\>||Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).<br>Ignored if `--colormap-file` option is specified.<br>Use with the scalar option.
