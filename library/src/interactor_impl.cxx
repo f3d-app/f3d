@@ -504,10 +504,8 @@ public:
     this->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
 
     vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-    bool usingNative =
-      renWin->IsA("vtkWin32OpenGLRenderWindow") ||
-      renWin->IsA("vtkCocoaOpenGLRenderWindow") ||
-      renWin->IsA("vtkXOpenGLRenderWindow");
+    bool usingNative = renWin->IsA("vtkWin32OpenGLRenderWindow") ||
+      renWin->IsA("vtkCocoaOpenGLRenderWindow") || renWin->IsA("vtkXOpenGLRenderWindow");
     if (usingNative)
     {
       this->VTKInteractor->ExitCallback();
