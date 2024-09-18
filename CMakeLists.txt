@@ -62,6 +62,7 @@ option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
 option(F3D_USE_EXTERNAL_NLOHMANN_JSON "Use external nlohmann_json dependency" OFF)
 option(F3D_USE_EXTERNAL_DMON "Use external dmon dependency" OFF)
 
+find_package(OpenGL REQUIRED COMPONENTS OpenGL EGL GLX)
 if (F3D_USE_EXTERNAL_CXXOPTS)
   find_package(cxxopts REQUIRED)
 endif ()

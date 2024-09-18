@@ -21,6 +21,9 @@
 
 #include <nlohmann/json.hpp>
 
+#include <EGL/egl.h>
+#include <GL/glx.h>
+
 namespace f3d
 {
 class engine::internals
@@ -33,7 +36,57 @@ public:
 };
 
 //----------------------------------------------------------------------------
-engine::engine(window::Type windowType)
+std::shared_ptr<f3d::engine> engine::createNative()
+{
+  return std::make_shared<engine>(window::Type::NATIVE);
+}
+
+//----------------------------------------------------------------------------
+std::shared_ptr<f3d::engine> engine::createNativeOffscreen()
+{
+  return std::make_shared<engine>(window::Type::NATIVE_OFFSCREEN);
+}
+
+//----------------------------------------------------------------------------
+std::shared_ptr<f3d::engine> engine::createNone()
+{
+  return std::make_shared<engine>(window::Type::NONE);
+}
+
+//----------------------------------------------------------------------------
+std::shared_ptr<f3d::engine> engine::createExternal(window::F3DOpenGLLoaderFunction loader, void* openglContext)
+{
+  return std::make_shared<engine>(window::Type::EXTERNAL, loader, openglContext);
+}
+
+//----------------------------------------------------------------------------
+std::shared_ptr<f3d::engine> engine::createExternalGLX()
+{
+  auto loadFunc = [](void*, const char* name) -> f3d::window::F3DOpenGLAPIProc {
+    if (name)
+    {
+      return glXGetProcAddress((const GLubyte*)name);
+    }
+    return nullptr;
+  };
+  return std::make_shared<engine>(window::Type::EXTERNAL);
+}
+
+//----------------------------------------------------------------------------
+std::shared_ptr<f3d::engine> engine::createExternalEGL()
+{
+  auto loadFunc = [](void*, const char* name) -> f3d::window::F3DOpenGLAPIProc {
+    if (name)
+    {
+      return eglGetProcAddress(name);
+    }
+    return nullptr;
+  };
+  return std::make_shared<engine>(window::Type::EXTERNAL, loadFunc);
+}
+
+//----------------------------------------------------------------------------
+engine::engine(window::Type windowType, window::F3DOpenGLLoaderFunction loader, void* openglContext)
   : Internals(new engine::internals)
 {
   // Ensure all lib initialization is done (once)
@@ -58,7 +111,7 @@ engine::engine(window::Type windowType)
   this->Internals->Options = std::make_unique<options>();
 
   this->Internals->Window =
-    std::make_unique<detail::window_impl>(*this->Internals->Options, windowType);
+    std::make_unique<detail::window_impl>(*this->Internals->Options, windowType, loader, openglContext);
   this->Internals->Window->SetCachePath(cachePath);
 
   this->Internals->Loader =

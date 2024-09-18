@@ -30,7 +30,8 @@ public:
    * Create the internal vtkRenderWindow using the offscreen param
    * and store option ref for later usage
    */
-  window_impl(const options& options, Type type);
+  window_impl(const options& options, Type type,
+    F3DOpenGLLoaderFunction loader, void* openglContext = nullptr);
 
   void initializeExternal(
     f3d::window::F3DOpenGLLoaderFunction loader, void* openglContext = nullptr) override;

@@ -53,6 +53,7 @@ if(F3D_MODULE_EXTERNAL_RENDERING AND F3D_TESTING_ENABLE_ONSCREEN_TESTS)
   if(glfw3_FOUND)
     list(APPEND libf3dSDKTests_list
         TestSDKExternalWindowGLFW.cxx
+        TestSDKExternalWindowGLX.cxx
         )
   endif()
   find_package(Qt5 COMPONENTS OpenGL)
@@ -124,7 +125,7 @@ target_link_libraries(libf3dSDKTests libf3d)
 
 if(glfw3_FOUND)
   # external window test using glfw
-  target_link_libraries(libf3dSDKTests glfw)
+  target_link_libraries(libf3dSDKTests glfw OpenGL::GLX X11)
 endif()
 
 if(Qt5_FOUND)

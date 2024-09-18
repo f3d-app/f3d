@@ -13,14 +13,12 @@
 class F3DWindow : public QOpenGLWindow
 {
 public:
-  F3DWindow(const std::string& filePath, std::string baselinePath, std::string outputPath)
+  F3DWindow(std::string filePath, std::string baselinePath, std::string outputPath)
     : QOpenGLWindow()
-    , mEngine(f3d::window::Type::EXTERNAL)
+    , mFilePath(std::move(filePath))
     , mBaselinePath(std::move(baselinePath))
     , mOutputPath(std::move(outputPath))
   {
-    f3d::loader& load = mEngine.getLoader();
-    load.loadGeometry(filePath);
   }
 
 protected:
@@ -52,6 +50,7 @@ protected:
   void initializeGL() override
   {
     this->QOpenGLWindow::initializeGL();
+
     auto loadFunc = [](void* userData, const char* name) -> f3d::window::F3DOpenGLAPIProc {
       if (auto* context = reinterpret_cast<QOpenGLContext*>(userData))
       {
@@ -62,16 +61,22 @@ protected:
       }
       return nullptr;
     };
-    mEngine.getWindow().initializeExternal(loadFunc, this->context());
+
+    mEngine = f3d::engine::createExternal(loadFunc, this->context());
+    f3d::loader& load = mEngine->getLoader();
+    load.loadGeometry(this->mFilePath);
+
+//    mEngine.getWindow().initializeExternal(loadFunc, this->context());
   }
 
   void paintGL() override
   {
-    mEngine.getWindow().render();
+    mEngine->getWindow().render();
   }
 
 private:
-  f3d::engine mEngine;
+  std::shared_ptr<f3d::engine> mEngine;
+  std::string mFilePath;
   std::string mBaselinePath;
   std::string mOutputPath;
 };

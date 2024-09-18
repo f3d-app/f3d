@@ -151,7 +151,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-window_impl::window_impl(const options& options, Type type)
+window_impl::window_impl(const options& options, Type type, F3DOpenGLLoaderFunction loader, void* openglContext)
   : Internals(std::make_unique<window_impl::internals>(options))
 {
   this->Internals->WindowType = type;
@@ -165,6 +165,7 @@ window_impl::window_impl(const options& options, Type type)
     vtkNew<vtkExternalOpenGLRenderWindow> extWin;
     extWin->AutomaticWindowPositionAndResizeOff();
     this->Internals->RenWin = extWin;
+    this->initializeExternal(loader, openglContext);
 #else
     throw engine::no_window_exception(
       "Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");

@@ -10,9 +10,6 @@
 
 int TestSDKExternalWindowGLFW(int argc, char* argv[])
 {
-  f3d::engine eng(f3d::window::Type::EXTERNAL);
-  eng.getWindow().setSize(300, 300);
-
   // setup glfw window
   if (!glfwInit())
   {
@@ -36,7 +33,18 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
   }
   glfwMakeContextCurrent(window);
 
-  glfwSetWindowUserPointer(window, &eng);
+  auto loadFunc = [](void*, const char* name) -> f3d::window::F3DOpenGLAPIProc {
+    if (name)
+    {
+      return glfwGetProcAddress(name);
+    }
+    return nullptr;
+  };
+  auto eng = f3d::engine::createExternal(loadFunc);
+  eng->getWindow().setSize(300, 300);
+
+
+  glfwSetWindowUserPointer(window, eng.get());
 
   // key callback
   glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -46,19 +54,11 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
     }
   });
 
-  auto loadFunc = [](void*, const char* name) -> f3d::window::F3DOpenGLAPIProc {
-    if (name)
-    {
-      return glfwGetProcAddress(name);
-    }
-    return nullptr;
-  };
-  eng.getWindow().initializeExternal(loadFunc);
-  eng.getLoader().loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
+  eng->getLoader().loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
 
   while (!glfwWindowShouldClose(window) && glfwGetTime() < 1.0)
   {
-    eng.getWindow().render();
+    eng->getWindow().render();
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
@@ -66,7 +66,7 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
   // Ideally, we should not test the content of the window, but the GLFW framebuffer itself
   // There is currently no API in GLFW that allows to do that unfortunately
   if (!TestSDKHelpers::RenderTest(
-        eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowGLFW"))
+        eng->getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowGLFW"))
   {
     return EXIT_FAILURE;
   }

@@ -11,6 +11,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace f3d
 {
@@ -56,7 +57,14 @@ public:
    * Throw a no_window_exception when using a Using window::Type::EXTERNAL without the right cmake
    * option.
    */
-  explicit engine(window::Type windowType = window::Type::NATIVE);
+  engine(window::Type windowType = window::Type::NATIVE, window::F3DOpenGLLoaderFunction loader = {}, void* openglContext = nullptr);
+
+  static std::shared_ptr<f3d::engine> createNative();
+  static std::shared_ptr<f3d::engine> createNativeOffscreen();
+  static std::shared_ptr<f3d::engine> createNone();
+  static std::shared_ptr<f3d::engine> createExternal(window::F3DOpenGLLoaderFunction loader = {}, void* openglContext = nullptr);
+  static std::shared_ptr<f3d::engine> createExternalGLX();
+  static std::shared_ptr<f3d::engine> createExternalEGL();
 
   /**
    * Engine destructor, delete all object instances as well.
@@ -214,6 +222,7 @@ private:
   engine(engine&& opt) = delete;
   engine& operator=(const engine& opt) = delete;
   engine& operator=(engine&& opt) = delete;
+
 };
 }
 
