@@ -89,8 +89,10 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
   vtkShaderProgram::Substitute(FSSource, "//VTK::Color::Impl",
     "  float majorAlpha = antialias(min(majorGrid.x, majorGrid.y), gridLineWidth);\n"
     "  float minorAlpha = antialias(min(minorGrid.x, minorGrid.y), gridLineWidth);\n"
-    "  float zoomFadeFactor = 1.0 - clamp(fwidth(majorCoord.x / unitSquare * fadeDist), 0.0, 1.0);"
-    "  float alpha = max(majorAlpha, minorAlpha * minorOpacity * zoomFadeFactor);\n"
+    "  float zoomFadeFactor = 1.0 - clamp(fwidth(majorCoord.x / unitSquare * fadeDist), 0.0, 1.0);\n"
+    "  float axisThreshold = 0.005;\n"
+    "  float alpha = abs(majorCoord.x)>axisThreshold && abs(majorCoord.y)>axisThreshold ? max(majorAlpha, minorAlpha * minorOpacity * zoomFadeFactor) : 0.0;\n"
+
     "  vec4 color = vec4(diffuseColorUniform, alpha);\n"
 
     "  float axis1Weight = abs(majorCoord.y) < 0.5 ? antialias(majorGrid.y, axesLineWidth) : 0.0;\n"
