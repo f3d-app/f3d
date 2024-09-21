@@ -340,7 +340,6 @@ PYBIND11_MODULE(pyf3d, module)
 
   // libInformation
   py::class_<f3d::engine::libInformation>(module, "LibInformation")
-    .def(py::init<>())
     .def_readonly("version", &f3d::engine::libInformation::Version)
     .def_readonly("version_full", &f3d::engine::libInformation::VersionFull)
     .def_readonly("build_date", &f3d::engine::libInformation::BuildDate)
@@ -353,7 +352,6 @@ PYBIND11_MODULE(pyf3d, module)
 
   // readerInformation
   py::class_<f3d::engine::readerInformation>(module, "ReaderInformation")
-    .def(py::init<>())
     .def_readonly("name", &f3d::engine::readerInformation::Name)
     .def_readonly("description", &f3d::engine::readerInformation::Description)
     .def_readonly("extensions", &f3d::engine::readerInformation::Extensions)
