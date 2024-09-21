@@ -341,17 +341,14 @@ PYBIND11_MODULE(pyf3d, module)
   // libInformation
   py::class_<f3d::engine::libInformation>(module, "LibInformation")
     .def(py::init<>())
-    .def(py::init<const std::string&, const std::string&, const std::string&, const std::string&,
-                  const std::string&, const std::string&, const std::string&, const std::string&,
-                  const std::string&, const std::string&, const std::string&, const std::string&,
-                  const std::string&>())
     .def_readonly("version", &f3d::engine::libInformation::Version)
     .def_readonly("version_full", &f3d::engine::libInformation::VersionFull)
     .def_readonly("build_date", &f3d::engine::libInformation::BuildDate)
     .def_readonly("build_system", &f3d::engine::libInformation::BuildSystem)
     .def_readonly("compiler", &f3d::engine::libInformation::Compiler)
     .def_readonly("raytracing_module", &f3d::engine::libInformation::RaytracingModule)
-    .def_readonly("external_rendering_module", &f3d::engine::libInformation::ExternalRenderingModule)
+    .def_readonly(
+      "external_rendering_module", &f3d::engine::libInformation::ExternalRenderingModule)
     .def_readonly("openexr_module", &f3d::engine::libInformation::OpenEXRModule)
     .def_readonly("vtk_version", &f3d::engine::libInformation::VTKVersion)
     .def_readonly("previous_copyright", &f3d::engine::libInformation::PreviousCopyright)
