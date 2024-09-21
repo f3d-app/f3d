@@ -341,8 +341,10 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static(
       "autoload_plugins", &f3d::engine::autoloadPlugins, "Automatically load internal plugins")
     .def_static("get_plugins_list", &f3d::engine::getPluginsList)
-    .def_static("get_lib_info", &f3d::engine::getLibInfo, py::return_value_policy::reference);
+    .def_static("get_lib_info", &f3d::engine::getLibInfo, py::return_value_policy::reference)
+    .def_static("get_readers_info", &f3d::engine::getReadersInfo);
 
+  // libInformation
   py::class_<f3d::engine::libInformation>(module, "LibInformation")
     .def(py::init<>())
     .def(py::init<const std::string&, const std::string&, const std::string&, const std::string&,
@@ -363,6 +365,16 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readonly("license", &f3d::engine::libInformation::License)
     .def_readonly("authors", &f3d::engine::libInformation::Authors);
 
+  // readerInformation
+  py::class_<f3d::engine::readerInformation>(module, "ReaderInformation")
+    .def(py::init<>())
+    .def_readonly("name", &f3d::engine::readerInformation::Name)
+    .def_readonly("description", &f3d::engine::readerInformation::Description)
+    .def_readonly("extensions", &f3d::engine::readerInformation::Extensions)
+    .def_readonly("mime_types", &f3d::engine::readerInformation::MimeTypes)
+    .def_readonly("plugin_name", &f3d::engine::readerInformation::PluginName)
+    .def_readonly("has_scene_reader", &f3d::engine::readerInformation::HasSceneReader)
+    .def_readonly("has_geometry_reader", &f3d::engine::readerInformation::HasGeometryReader);
   
   // f3d::log
   py::class_<f3d::log> log(module, "Log");
