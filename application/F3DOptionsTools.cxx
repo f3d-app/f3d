@@ -195,7 +195,7 @@ void PrintHelpPair(
   ss << "  " << std::left << std::setw(keyWidth) << key;
   if (key.size() > static_cast<size_t>(keyWidth))
   {
-    ss << "\n  " << std::setw(keyWidth) << " "; // Indent the second line
+    ss << "\n  ";
   }
   ss << " " << std::setw(helpWidth) << help;
   f3d::log::info(ss.str());
