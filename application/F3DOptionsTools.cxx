@@ -188,19 +188,16 @@ std::string CollapseName(const std::string_view& longName, const std::string_vie
 }
 
 //----------------------------------------------------------------------------
-void PrintHelpPair(std::string_view key, std::string_view help, int keyWidth = 50)
+void PrintHelpPair(
+  std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70)
 {
   std::stringstream ss;
-  if (key.find(' ') != std::string::npos)
+  ss << "  " << std::left << std::setw(keyWidth) << key;
+  if (key.size() > static_cast<size_t>(keyWidth))
   {
-    ss << key << "\n";
-    ss << std::setw(keyWidth) << " " << help;
+    ss << "\n  " << std::setw(keyWidth) << " "; // Indent the second line
   }
-  else
-  {
-    ss << std::left << std::setw(keyWidth) << key;
-    ss << " " << help;
-  }
+  ss << " " << std::setw(helpWidth) << help;
   f3d::log::info(ss.str());
 }
 
@@ -209,7 +206,7 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
 {
   const std::array<std::pair<std::string, std::string>, 4> examples = {{
     { execName + " file.vtu -xtgans",
-      "View an unstructured mesh in a typical nice-looking sciviz style" },
+      "View a unstructured mesh in a typical nice looking sciviz style" },
     { execName + " file.glb -tuqap --hdri-file=file.hdr --hdri-ambient --hdri-skybox",
       "View a gltf file in a realistic environment" },
     { execName + " file.ply -so --point-size=0 --comp=-2",
@@ -224,21 +221,18 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
   {
     orderedCLIGroupNames.emplace_back(optionGroup.GroupName);
   }
-  
   f3d::log::info(cxxOptions.help(orderedCLIGroupNames));
-  
-  f3d::log::info("Keys:");
+    f3d::log::info("Keys:");
   for (const auto& [key, desc] : f3d::interactor::getDefaultInteractionsInfo())
   {
-    ::PrintHelpPair(key, desc, 20);
+    ::PrintHelpPair(key, desc);
   }
 
   f3d::log::info("\nExamples:");
   for (const auto& [cmd, desc] : examples)
   {
-    ::PrintHelpPair(cmd, desc, 5);
+    ::PrintHelpPair(cmd, desc, 50);
   }
-
   f3d::log::info("\nReport bugs to https://github.com/f3d-app/f3d/issues");
   f3d::log::setUseColoring(true);
   f3d::log::waitForUser();
