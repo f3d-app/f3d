@@ -193,14 +193,19 @@ void PrintHelpPair(
   std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70)
 {
   std::stringstream ss;
-  ss << "  " << std::left << std::setw(keyWidth) << key << " " << std::setw(helpWidth) << help;
+  ss << "  " << std::left << std::setw(keyWidth) << key;
+  if (key.size() > static_cast<size_t>(keyWidth))
+  {
+    ss << "\n  " << std::setw(keyWidth) << " "; // Indent the second line
+  }
+  ss << " " << std::setw(helpWidth) << help;
   f3d::log::info(ss.str());
 }
 
 //----------------------------------------------------------------------------
 void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
 {
-  const std::array<std::pair<std::string_view, std::string_view>, 4> examples = {{
+  const std::array<std::pair<std::string, std::string>, 4> examples = {{
     { execName + " file.vtu -xtgans",
       "View a unstructured mesh in a typical nice looking sciviz style" },
     { execName + " file.glb -tuqap --hdri-file=file.hdr --hdri-ambient --hdri-skybox",
