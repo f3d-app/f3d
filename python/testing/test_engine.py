@@ -16,7 +16,7 @@ def test_plugins_list():
 
 
 def test_get_lib_info():
-    lib_info = f3d.engine.get_lib_info()
+    lib_info = f3d.Engine.get_lib_info()
 
     assert isinstance(lib_info, f3d.LibInformation)
 
@@ -41,7 +41,7 @@ def test_get_lib_info():
 
 
 def test_get_readers_info():
-    readers_info = f3d.engine.get_readers_info()
+    readers_info = f3d.Engine.get_readers_info()
 
     assert isinstance(readers_info, list) and readers_info
 
