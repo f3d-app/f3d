@@ -301,7 +301,7 @@ public:
         mesh->SetPolys(cells);
         mesh->GetPointData()->SetTCoords(textureCoordinates);
         //        mesh->GetPointData()->SetNormals(normals);
-        Mesh.push_back(mesh);
+        Mesh.emplace_back(mesh);
         std::string meshName = std::string(selectedFrame.frames->name);
         for (std::size_t i = 0; i < meshName.size(); i++)
         {
@@ -322,7 +322,7 @@ public:
           NumberOfAnimations++;
         }
         std::pair<int, float> pair = std::make_pair(frameIndex, 0.0);
-        GroupAndTimeVal.push_back(pair);
+        GroupAndTimeVal.emplace_back(pair);
       }
       else
       {
@@ -352,7 +352,7 @@ public:
           mesh->SetPolys(cells);
           mesh->GetPointData()->SetTCoords(textureCoordinates);
           mesh->GetPointData()->SetNormals(normals);
-          Mesh.push_back(mesh);
+          Mesh.emplace_back(mesh);
           std::string meshName = std::string(selectedFrame.frames[groupFrameNum].name);
           for (std::size_t i = 0; i < meshName.size(); i++)
           {
@@ -374,7 +374,7 @@ public:
           }
           std::pair<int, float> pair =
             std::make_pair(frameIndex, selectedFrame.time[groupFrameNum]);
-          GroupAndTimeVal.push_back(pair);
+          GroupAndTimeVal.emplace_back(pair);
         }
       }
     }
