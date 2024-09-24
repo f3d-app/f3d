@@ -646,7 +646,7 @@ std::string vtkQuakeMDLImporter::GetOutputsDescription()
 }
 
 //----------------------------------------------------------------------------
-void vtkQuakeMDLImporter::UpdateTimeStep(double timeValue) override
+void vtkQuakeMDLImporter::UpdateTimeStep(double timeValue)
 {
   this->Internals->UpdateFrame(timeValue);
   return;
