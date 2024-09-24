@@ -27,7 +27,7 @@ public:
    * Update actors at the given time value.
    */
 
-  void UpdateTimeStep(double timeValue);
+  void UpdateTimeStep(double timeValue) override;
 
   /**
    * Get the number of available animations.
@@ -78,11 +78,6 @@ public:
    * Get the name of a camera.
    */
   std::string GetCameraName(vtkIdType camIndex) override;
-
-  /**
-   * Re-render the scene after timestep
-   */
-  void UpdateTimeStep(double timeValue) override;
 
   /**
    * Enable a specific camera.
