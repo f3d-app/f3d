@@ -6,19 +6,15 @@
 #include "types.h"
 
 #include <array>
+#include <optional>
 #include <string>
-#include <vector>
-
-#ifndef F3D_DISABLE_CXX17_API
 #include <variant>
-#endif
+#include <vector>
 
 namespace f3d
 {
-#ifndef F3D_DISABLE_CXX17_API
 // Declared here for simplicity
 using option_variant_t = std::variant<bool, int, double, std::string, std::vector<double>>;
-#endif
 
 /**
  * @class   options
@@ -43,7 +39,6 @@ public:
   options& operator=(options&& other) noexcept = default;
   ///@}
 
-#ifndef F3D_DISABLE_CXX17_API
   /**
    * Set an option as a variant based on its name
    * Please note that, on Windows, using an explicit std::string may be required:
@@ -56,9 +51,9 @@ public:
   /**
    * Get an option as a variant based on its name
    * Throw an options::inexistent_exception if option does not exist.
+   * Throw an options::no_value_exception if option has not been set.
    */
   option_variant_t get(const std::string& name) const;
-#endif
 
   /**
    * Set an option as a string based on its name
@@ -72,6 +67,7 @@ public:
   /**
    * Get an option as a string based on its name
    * Throw an options::inexistent_exception if option does not exist.
+   * Throw an options::no_value_exception if option has not been set.
    */
   std::string getAsString(const std::string& name) const;
 
@@ -79,15 +75,23 @@ public:
    * A boolean option specific method to toggle it.
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::incompatible_exception if option is not boolean.
+   * Throw an options::no_value_exception if option has not been set.
    */
   options& toggle(const std::string& name);
 
   /**
    * Compare an option between this and a provided other.
-   * Return true is they are the same value, false otherwise.
+   * Return true if they are the same value, false otherwise.
    * Throw an options::inexistent_exception if option does not exist.
    */
   bool isSame(const options& other, const std::string& name) const;
+
+  /**
+   * Return true if an option has a value, false otherwise
+   * Always returns true for non-optional options.
+   * Throw an options::inexistent_exception if option does not exist.
+   */
+  bool hasValue(const std::string& name) const;
 
   /**
    * Copy the value of an option from this to the provided other.
@@ -97,7 +101,11 @@ public:
 
   /**
    * Get all available option names.
-   * XXX: Should we add a getNamesStruct with the same structure as the struct below ?
+   */
+  static std::vector<std::string> getAllNames();
+
+  /**
+   * Get all option names that currently have values.
    */
   std::vector<std::string> getNames() const;
 
@@ -151,6 +159,15 @@ public:
   struct inexistent_exception : public exception
   {
     explicit inexistent_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by the options
+   * when a provided option is accessed before being set.
+   */
+  struct no_value_exception : public exception
+  {
+    explicit no_value_exception(const std::string& what = "");
   };
 
   /**

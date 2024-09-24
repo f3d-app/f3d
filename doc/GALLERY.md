@@ -17,7 +17,7 @@ Images and videos displayed below use public datasets, you can download them [he
 
 <video src='https://media.githubusercontent.com/media/f3d-app/f3d-media/main/media/counter.webm' autoplay="autoplay" loop="loop" width="700"></video>
 
-*3D Gaussians Splatting*: `f3d counter.splat --point-size=1 --point-type=gaussian -soynxz --up=-Y --camera-position=0,1,-5.2 --camera-focal-point=0,1,0`
+*3D Gaussians Splatting*: `f3d counter.splat --point-sprites-size=1 --point-sprites-type=gaussian -soynxz --up=-Y --camera-position=0,1,-5.2 --camera-focal-point=0,1,0`
 
 <img src="https://user-images.githubusercontent.com/3129530/194735272-5bcd3e7c-a333-41f5-8066-9b0bec9885e8.png" width="700">
 

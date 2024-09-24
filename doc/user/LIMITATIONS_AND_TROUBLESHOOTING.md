@@ -40,7 +40,7 @@ VDB file formats rely on [OpenVDB](https://github.com/AcademySoftwareFoundation/
 - The `vdb` plugin is not shipped in the python wheels yet.
 
 ## Gaussian splatting
-Gaussian splatting (option `--point-type=gaussian`) needs depth sorting which is done internally using a compute shader. This requires support for OpenGL 4.3 which is not supported by macOS and old GPUs/drivers.
+Gaussian splatting (option `--point-sprites-type=gaussian`) needs depth sorting which is done internally using a compute shader. This requires support for OpenGL 4.3 which is not supported by macOS and old GPUs/drivers.
 
 # Troubleshooting
 

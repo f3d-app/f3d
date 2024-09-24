@@ -96,9 +96,9 @@ public:
   };
 
   /**
-   * Set the pointSize and the splat type on the pointGaussianMapper
+   * Set the point sprites size and the splat type on the pointGaussianMapper
    */
-  void SetPointProperties(SplatType splatType, double pointSize);
+  void SetPointSpritesProperties(SplatType splatType, double pointSpritesSize);
 
   /**
    * Set the visibility of the scalar bar.
@@ -130,7 +130,7 @@ public:
    * Set the range of the scalar bar
    * Setting an empty vector will use automatic range
    */
-  void SetScalarBarRange(const std::vector<double>& range);
+  void SetScalarBarRange(const std::optional<std::vector<double>>& range);
 
   /**
    * Set the colormap to use
@@ -161,7 +161,7 @@ public:
    * This method will try to find the corresponding array in the coloring attributes and will
    * position ArrayIndexForColoring and DataForColoring accordingly.
    */
-  void SetColoring(bool enable, bool useCellData, const std::string& arrayName, int component);
+  void SetColoring(bool enable, bool useCellData, const std::optional<std::string>& arrayName, int component);
 
   ///@{
   /**
@@ -170,7 +170,7 @@ public:
    */
   bool GetColoringEnabled();
   bool GetColoringUseCell();
-  std::string GetColoringArrayName();
+  std::optional<std::string> GetColoringArrayName();
   int GetColoringComponent();
   ///@}
 
@@ -304,7 +304,7 @@ protected:
   bool UseVolume = false;
   bool UseInverseOpacityFunction = false;
 
-  std::vector<double> UserScalarBarRange;
+  std::optional<std::vector<double>> UserScalarBarRange;
   std::vector<double> Colormap;
 
   vtkMTimeType ImporterTimeStamp = 0;

@@ -151,14 +151,17 @@ public:
     if (this->AnimationManager.Initialize(
           &this->Options, &this->Window, this->Interactor, this->GenericImporter))
     {
-      double animationTime = this->Options.scene.animation.time;
-      double timeRange[2];
-      this->AnimationManager.GetTimeRange(timeRange);
-
-      // We assume importers import data at timeRange[0] when not specified
-      if (animationTime != timeRange[0])
+      if (this->Options.scene.animation.time.has_value())
       {
-        this->AnimationManager.LoadAtTime(animationTime);
+        double animationTime = this->Options.scene.animation.time.value();
+        double timeRange[2];
+        this->AnimationManager.GetTimeRange(timeRange);
+
+        // We assume importers import data at timeRange[0] when not specified
+        if (animationTime != timeRange[0])
+        {
+          this->AnimationManager.LoadAtTime(animationTime);
+        }
       }
     }
 
@@ -285,8 +288,11 @@ loader& loader_impl::loadScene(const std::string& filePath)
   this->Internals->CurrentFullSceneImporter->SetRenderWindow(
     this->Internals->Window.GetRenderWindow());
 
-  int cameraIndex = this->Internals->Options.scene.camera.index;
-  this->Internals->CurrentFullSceneImporter->SetCamera(cameraIndex);
+  if (this->Internals->Options.scene.camera.index.has_value())
+  {
+    this->Internals->CurrentFullSceneImporter->SetCamera(
+      this->Internals->Options.scene.camera.index.value());
+  }
 
   log::debug("Loading 3D scene: ", filePath, "\n");
 
@@ -321,14 +327,17 @@ loader& loader_impl::loadScene(const std::string& filePath)
         &this->Internals->Window, this->Internals->Interactor,
         this->Internals->CurrentFullSceneImporter))
   {
-    double animationTime = this->Internals->Options.scene.animation.time;
-    double timeRange[2];
-    this->Internals->AnimationManager.GetTimeRange(timeRange);
-
-    // We assume importers import data at timeRange[0] when not specified
-    if (animationTime != timeRange[0])
+    if (this->Internals->Options.scene.animation.time.has_value())
     {
-      this->Internals->AnimationManager.LoadAtTime(animationTime);
+      double animationTime = this->Internals->Options.scene.animation.time.value();
+      double timeRange[2];
+      this->Internals->AnimationManager.GetTimeRange(timeRange);
+
+      // We assume importers import data at timeRange[0] when not specified
+      if (animationTime != timeRange[0])
+      {
+        this->Internals->AnimationManager.LoadAtTime(animationTime);
+      }
     }
   }
 
@@ -341,7 +350,7 @@ loader& loader_impl::loadScene(const std::string& filePath)
 
   // Initialize renderer and reset camera to bounds if needed
   this->Internals->Window.UpdateDynamicOptions();
-  if (cameraIndex == -1)
+  if (!this->Internals->Options.scene.camera.index.has_value())
   {
     this->Internals->Window.getCamera().resetToBounds();
   }

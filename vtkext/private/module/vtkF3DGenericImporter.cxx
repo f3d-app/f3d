@@ -215,6 +215,10 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     pipe.PointGaussianMapper->SetInputConnection(pipe.PostPro->GetOutputPort(1));
     pipe.VolumeMapper->SetInputConnection(pipe.PostPro->GetOutputPort(2));
 
+    // Set geometry actor default properties
+    pipe.GeometryActor->GetProperty()->SetPointSize(10.0);
+    pipe.GeometryActor->GetProperty()->SetLineWidth(1.0);
+
     // add mappers
     pipe.VolumeProp->SetMapper(pipe.VolumeMapper);
     pipe.GeometryActor->SetMapper(pipe.PolyDataMapper);
