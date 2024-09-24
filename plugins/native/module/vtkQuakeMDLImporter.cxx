@@ -429,7 +429,7 @@ public:
     // Set polyData
     this->CreateMesh(buffer, offset, header);
 
-    return 1;
+    return true;
   }
 
   void UpdateFrame(double timeValue)
