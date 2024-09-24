@@ -304,7 +304,7 @@ public:
         //        mesh->GetPointData()->SetNormals(normals);
         Mesh.push_back(mesh);
         std::string meshName = std::string(selectedFrame.frames->name);
-        for (int i = 0; i < meshName.size(); i++)
+        for (std::size_t i = 0; i < meshName.size(); i++)
         {
           if (meshName[i] >= '0' && meshName[i] <= '9')
           {
@@ -355,7 +355,7 @@ public:
           mesh->GetPointData()->SetNormals(normals);
           Mesh.push_back(mesh);
           std::string meshName = std::string(selectedFrame.frames[groupFrameNum].name);
-          for (int i = 0; i < meshName.size(); i++)
+          for (std::size_t i = 0; i < meshName.size(); i++)
           {
             if (meshName[i] >= '0' && meshName[i] <= '9')
             {
@@ -381,7 +381,7 @@ public:
     }
     
     // Add interpolated frames
-    for (int i = 0; i < Mesh.size() - 1; i++)
+    for (std::size_t i = 0; i < Mesh.size() - 1; i++)
     {
       if (GroupAndTimeVal[i + 1].first != GroupAndTimeVal[i].first)
       {
