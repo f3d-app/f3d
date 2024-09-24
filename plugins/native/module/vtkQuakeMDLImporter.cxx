@@ -457,7 +457,7 @@ public:
     while (i < GroupAndTimeVal.size() && GroupAndTimeVal[++i].first == animationIndex)
     {
     }
-    LastFrameIndex = i - 1;
+    LastFrameIndex = (int) i - 1;
   }
 
   void ImportActors(vtkRenderer* renderer)
@@ -646,7 +646,7 @@ std::string vtkQuakeMDLImporter::GetOutputsDescription()
 }
 
 //----------------------------------------------------------------------------
-void vtkQuakeMDLImporter::UpdateTimeStep(double timeValue)
+void vtkQuakeMDLImporter::UpdateTimeStep(double timeValue) override
 {
   this->Internals->UpdateFrame(timeValue);
   return;
