@@ -103,7 +103,7 @@ public:
       unsigned char* skin;
     };
     mixed_pointer_array* skins = new mixed_pointer_array[nbSkins];
-    unsigned char* skin = reinterpret_cast<unsigned char*>(buffer.data() + offset + 4);
+    //unsigned char* skin = buffer.data() + offset + 4;
     for (int i = 0; i < nbSkins; i++)
     {
       int* group = reinterpret_cast<int*>(buffer.data() + offset);
@@ -144,7 +144,7 @@ public:
   }
 
   void CreateMesh(
-    std::vector<unsigned char> buffer, int& offset, mdl_header_t* header, int selectedFrameIndex)
+    std::vector<unsigned char> buffer, int offset, mdl_header_t* header)
   {
     // Read texture coordinates
     struct mdl_texcoord_t
@@ -213,9 +213,9 @@ public:
       {
         framePtr[i].type = type;
         framePtr[i].nb = reinterpret_cast<int*>(buffer.data() + 4 + offset);
-        mdl_vertex_t* min = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 8 + offset);
-        mdl_vertex_t* max = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 12 + offset);
-        float* time = framePtr[i].time = reinterpret_cast<float*>(buffer.data() + 16 + offset);
+        //mdl_vertex_t* min = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 8 + offset);
+        //mdl_vertex_t* max = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 12 + offset);
+        //float* time = framePtr[i].time = reinterpret_cast<float*>(buffer.data() + 16 + offset);
         framePtr[i].frames =
           reinterpret_cast<mdl_simpleframe_t*>(buffer.data() + 16 + 4 * (*framePtr[i].nb) + offset);
         offset += 16 + (*framePtr[i].nb) * 4;
@@ -245,7 +245,7 @@ public:
       for (int j = 0; j < 3; j++)
       {
         vertexNum[j] = triangles[i].vertex[j];
-        int onseam_correct = 1;
+        //int onseam_correct = 1;
         float s = texcoords[triangles[i].vertex[j]].s;
         float t = texcoords[triangles[i].vertex[j]].t;
         if (!triangles[i].facesfront && texcoords[triangles[i].vertex[j]].onseam)
@@ -284,9 +284,9 @@ public:
           for (int j = 0; j < 3; j++)
           {
             vertexNum[j] = triangles[i].vertex[j];
-            double v[3] = { selectedFrame.frames->verts[vertexNum[j]].v[0],
-              selectedFrame.frames->verts[vertexNum[j]].v[1],
-              selectedFrame.frames->verts[vertexNum[j]].v[2] };
+            double v[3] = { double(selectedFrame.frames->verts[vertexNum[j]].v[0]),
+              double(selectedFrame.frames->verts[vertexNum[j]].v[1]),
+              double(selectedFrame.frames->verts[vertexNum[j]].v[2]) };
             for (int k = 0; k < 3; k++)
             {
               v[k] = v[k] * header->scale[k] + header->translation[k];
@@ -335,9 +335,9 @@ public:
             for (int j = 0; j < 3; j++)
             {
               vertexNum[j] = triangles[i].vertex[j];
-              double v[3] = { selectedFrame.frames[groupFrameNum].verts[vertexNum[j]].v[0],
-                selectedFrame.frames[groupFrameNum].verts[vertexNum[j]].v[1],
-                selectedFrame.frames[groupFrameNum].verts[vertexNum[j]].v[2] };
+              double v[3] = { double(selectedFrame.frames[groupFrameNum].verts[vertexNum[j]].v[0]),
+                double(selectedFrame.frames[groupFrameNum].verts[vertexNum[j]].v[1]),
+                double(selectedFrame.frames[groupFrameNum].verts[vertexNum[j]].v[2]) };
               for (int k = 0; k < 3; k++)
               {
                 v[k] = v[k] * header->scale[k] + header->translation[k];
@@ -379,8 +379,7 @@ public:
         }
       }
     }
-    return;
-
+    
     // Add interpolated frames
     for (int i = 0; i < Mesh.size() - 1; i++)
     {
@@ -429,15 +428,15 @@ public:
       buffer, offset, header->skinWidth, header->skinHeight, header->numSkins, 0);
 
     // Set polyData
-    this->CreateMesh(buffer, offset, header, 0);
+    this->CreateMesh(buffer, offset, header);
 
     return 1;
   }
 
   void UpdateFrame(double timeValue)
   {
-    // Hardcoded frames per second, 24FPS seems reasonable
-    if (abs(timeValue - LastRenderTime) > 1.0 / 24)
+    // Hardcoded frames per second, 60FPS
+    if (abs(timeValue - LastRenderTime) > 1.0 / 60)
     {
       Mapper->SetInputData(
         Mesh[(CurrentFrameIndex++) % (LastFrameIndex - FirstFrameIndex) + FirstFrameIndex]);
@@ -662,7 +661,7 @@ vtkIdType vtkQuakeMDLImporter::GetNumberOfAnimations()
 //----------------------------------------------------------------------------
 std::string vtkQuakeMDLImporter::GetAnimationName(vtkIdType animationIndex)
 {
-  return "";
+  return std::to_string(animationIndex);
 }
 
 //----------------------------------------------------------------------------
@@ -681,11 +680,11 @@ void vtkQuakeMDLImporter::DisableAnimation(vtkIdType vtkNotUsed(animationIndex))
 //----------------------------------------------------------------------------
 bool vtkQuakeMDLImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
-  return true;
+  return animationIndex == this->Internals->ActiveAnimationId;
 }
 
 //----------------------------------------------------------------------------
-bool vtkQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
+bool vtkQuakeMDLImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationIndex),
   double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
   vtkDoubleArray* vtkNotUsed(timeSteps))
 {
@@ -701,13 +700,13 @@ vtkIdType vtkQuakeMDLImporter::GetNumberOfCameras()
 }
 
 //----------------------------------------------------------------------------
-std::string vtkQuakeMDLImporter::GetCameraName(vtkIdType camIndex)
+std::string vtkQuakeMDLImporter::GetCameraName(vtkIdType vtkNotUsed(camIndex))
 {
   return "Camera";
 }
 
 //----------------------------------------------------------------------------
-void vtkQuakeMDLImporter::SetCamera(vtkIdType camIndex)
+void vtkQuakeMDLImporter::SetCamera(vtkIdType vtkNotUsed(camIndex))
 {
   return;
 }
