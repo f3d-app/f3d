@@ -449,7 +449,7 @@ public:
   {
     // Animations are divided into groups, but stored as a vector of polydata.
     // This functions set the indices for the first and last frames in the group.
-    int i = 0;
+    std::size_t i = 0;
     while (i < GroupAndTimeVal.size() && GroupAndTimeVal[++i].first < animationIndex)
     {
     }
