@@ -80,6 +80,11 @@ public:
   std::string GetCameraName(vtkIdType camIndex) override;
 
   /**
+   * Re-render the scene after timestep
+   */
+  void UpdateTimeStep(double timeValue) override;
+
+  /**
    * Enable a specific camera.
    * If a negative index is provided, no camera from the importer is used.
    */
