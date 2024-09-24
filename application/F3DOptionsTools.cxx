@@ -220,10 +220,11 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
   orderedCLIGroupNames.reserve(::CLIOptions.size());
   for (const ::CLIGroup& optionGroup : ::CLIOptions)
   {
+    // This ensure help is provided in the expected group order
     orderedCLIGroupNames.emplace_back(optionGroup.GroupName);
   }
   f3d::log::info(cxxOptions.help(orderedCLIGroupNames));
-    f3d::log::info("Keys:");
+  f3d::log::info("Keys:");
   for (const auto& [key, desc] : f3d::interactor::getDefaultInteractionsInfo())
   {
     ::PrintHelpPair(key, desc);
