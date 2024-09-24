@@ -88,15 +88,15 @@ public:
     struct mdl_skin_t
     {
 
-      //int group;           /* 0 = single, 1 = group */
-      //unsigned char* data; /* texture data */
+      // int group;           /* 0 = single, 1 = group */
+      // unsigned char* data; /* texture data */
     };
     struct mdl_groupskin_t
     {
-      //int group;            /* 1 = group */
-      //int nb;               /* number of pics */
-      //float* time;          /* time duration for each pic */
-      //unsigned char** data; /* texture data */
+      // int group;            /* 1 = group */
+      // int nb;               /* number of pics */
+      // float* time;          /* time duration for each pic */
+      // unsigned char** data; /* texture data */
     };
     struct mixed_pointer_array
     {
@@ -178,17 +178,17 @@ public:
     };
     struct mdl_frame_t
     {
-//      int type;
+      //      int type;
       mdl_simpleframe_t frame;
     };
     struct mdl_groupframe_t
     {
-//      int type;
-//      int nb;
+      //      int type;
+      //      int nb;
       mdl_vertex_t min;
       mdl_vertex_t max;
-//      float* time;               // Size is nbFrames ???
-//      mdl_simpleframe_t* frames; // Size is nbFrames ???
+      //      float* time;               // Size is nbFrames ???
+      //      mdl_simpleframe_t* frames; // Size is nbFrames ???
     };
     struct plugin_frame_pointer
     {
