@@ -103,7 +103,7 @@ public:
       unsigned char* skin;
     };
     mixed_pointer_array* skins = new mixed_pointer_array[nbSkins];
-    //unsigned char* skin = buffer.data() + offset + 4;
+    // unsigned char* skin = buffer.data() + offset + 4;
     for (int i = 0; i < nbSkins; i++)
     {
       int* group = reinterpret_cast<int*>(buffer.data() + offset);
@@ -143,8 +143,7 @@ public:
     return texture;
   }
 
-  void CreateMesh(
-    std::vector<unsigned char> buffer, int offset, mdl_header_t* header)
+  void CreateMesh(std::vector<unsigned char> buffer, int offset, mdl_header_t* header)
   {
     // Read texture coordinates
     struct mdl_texcoord_t
@@ -213,9 +212,9 @@ public:
       {
         framePtr[i].type = type;
         framePtr[i].nb = reinterpret_cast<int*>(buffer.data() + 4 + offset);
-        //mdl_vertex_t* min = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 8 + offset);
-        //mdl_vertex_t* max = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 12 + offset);
-        //float* time = framePtr[i].time = reinterpret_cast<float*>(buffer.data() + 16 + offset);
+        // mdl_vertex_t* min = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 8 + offset);
+        // mdl_vertex_t* max = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 12 + offset);
+        // float* time = framePtr[i].time = reinterpret_cast<float*>(buffer.data() + 16 + offset);
         framePtr[i].frames =
           reinterpret_cast<mdl_simpleframe_t*>(buffer.data() + 16 + 4 * (*framePtr[i].nb) + offset);
         offset += 16 + (*framePtr[i].nb) * 4;
@@ -245,7 +244,7 @@ public:
       for (int j = 0; j < 3; j++)
       {
         vertexNum[j] = triangles[i].vertex[j];
-        //int onseam_correct = 1;
+        // int onseam_correct = 1;
         float s = texcoords[triangles[i].vertex[j]].s;
         float t = texcoords[triangles[i].vertex[j]].t;
         if (!triangles[i].facesfront && texcoords[triangles[i].vertex[j]].onseam)
@@ -379,7 +378,7 @@ public:
         }
       }
     }
-    
+
     // Add interpolated frames
     for (std::size_t i = 0; i < Mesh.size() - 1; i++)
     {
@@ -457,7 +456,7 @@ public:
     while (i < GroupAndTimeVal.size() && GroupAndTimeVal[++i].first == animationIndex)
     {
     }
-    LastFrameIndex = (int) i - 1;
+    LastFrameIndex = (int)i - 1;
   }
 
   void ImportActors(vtkRenderer* renderer)
