@@ -7,7 +7,7 @@ list(APPEND pyf3dTests_list
 
 if(NOT F3D_MACOS_BUNDLE)
   list(APPEND pyf3dTests_list
-       test_plugins.py
+       test_engine.py
       )
 endif()
 
@@ -18,7 +18,7 @@ list(APPEND pyf3dTests_list
 
 list(APPEND pyf3dTestsNoRender_list
      test_options.py
-     test_plugins.py
+     test_engine.py
      test_utils.py
     )
 
