@@ -154,10 +154,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->Pimpl->GeometryBoundingBox.Reset();
   bool hasGeometry = false;
 
+  InitializeVolumeMapper();
+
   // Update each reader
   for (size_t readerIndex = 0; readerIndex < this->Pimpl->Readers.size(); readerIndex++)
   {
-    InitializeVolumeMapper();
     ReaderPipeline& pipe = this->Pimpl->Readers[readerIndex];
     if (pipe.Imported)
     {
