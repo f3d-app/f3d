@@ -741,6 +741,10 @@ void vtkF3DRendererWithColoring::ConfigureColoring()
     {
       if (!this->VolumePropsAndMappersConfigured)
       {
+        if (!propAndMapper.second)
+        {
+          this->Importer->InitializeVolumeMapper();
+        }
         vtkF3DRendererWithColoring::ConfigureVolumeForColoring(propAndMapper.second,
           propAndMapper.first, coloringArray, this->ComponentForColoring,
           this->ColorTransferFunction, this->ColorRange, this->UseCellColoring,
