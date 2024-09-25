@@ -45,6 +45,7 @@ public:
   vector3_t getViewUp() override;
   void getViewUp(vector3_t& up) override;
   camera& setViewAngle(const angle_deg_t& angle) override;
+  camera& rotateCamera(const angle_deg_t& angle) override;
   angle_deg_t getViewAngle() override;
   void getViewAngle(angle_deg_t& angle) override;
   camera& setState(const camera_state_t& state) override;

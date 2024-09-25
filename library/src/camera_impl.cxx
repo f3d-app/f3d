@@ -110,6 +110,15 @@ camera& camera_impl::setViewAngle(const angle_deg_t& angle)
 }
 
 //----------------------------------------------------------------------------
+camera& camera_impl::rotateCamera(const angle_deg_t& angle)
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  cam->Roll(angle);
+  this->Internals->VTKRenderer->ResetCameraClippingRange();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 angle_deg_t camera_impl::getViewAngle()
 {
   angle_deg_t angle;
