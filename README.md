@@ -31,14 +31,12 @@ If you need any help or want to discuss with other F3D users and developers, hea
 
 # Quickstart
 
-Open a file directly in F3D <u>OR</u> from the command line by running:
+Open a file directly in F3D or from the command line by running:
 ```
 f3d /path/to/file.ext
 ``` 
 
 Optionally, append `--output=/path/to/img.png` to save the rendering into an image file.
-
-Get help by running `f3d --help` or `man f3d` (Linux only).
 
 See the [Quickstart Guide](QUICKSTART.md) for more information about getting started with F3D.
 
