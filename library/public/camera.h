@@ -44,7 +44,6 @@ public:
   virtual vector3_t getViewUp() = 0;
   virtual void getViewUp(vector3_t& up) = 0;
   virtual camera& setViewAngle(const angle_deg_t& angle) = 0;
-  virtual camera& rotateCamera(const angle_deg_t& angle) = 0;
   virtual angle_deg_t getViewAngle() = 0;
   virtual void getViewAngle(angle_deg_t& angle) = 0;
   virtual camera& setState(const camera_state_t& state) = 0;
