@@ -153,8 +153,6 @@ public:
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
 
-  void InitializeVolumeMapper();
-
 protected:
   vtkF3DGenericImporter();
   ~vtkF3DGenericImporter() override = default;

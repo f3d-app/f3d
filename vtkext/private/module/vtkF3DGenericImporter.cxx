@@ -154,8 +154,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->Pimpl->GeometryBoundingBox.Reset();
   bool hasGeometry = false;
 
-  InitializeVolumeMapper();
-
   // Update each reader
   for (size_t readerIndex = 0; readerIndex < this->Pimpl->Readers.size(); readerIndex++)
   {
@@ -214,6 +212,16 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     // Add filter outputs to mapper inputs
     pipe.PolyDataMapper->SetInputConnection(pipe.PostPro->GetOutputPort(0));
     pipe.PointGaussianMapper->SetInputConnection(pipe.PostPro->GetOutputPort(1));
+
+    for (auto& reader : this->Pimpl->Readers)
+    {
+      if (!reader.VolumeMapper)
+      {
+        reader.VolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+        reader.VolumeMapper->SetRequestedRenderModeToGPU();
+      }
+    }
+
     pipe.VolumeMapper->SetInputConnection(pipe.PostPro->GetOutputPort(2));
 
     // Set geometry actor default properties
@@ -618,18 +626,6 @@ void vtkF3DGenericImporter::UpdateOutputDescriptions()
       // Recover output description
       vtkDataObject* readerOutput = pipe.Reader->GetOutputDataObject(0);
       pipe.OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(readerOutput);
-    }
-  }
-}
-
-void vtkF3DGenericImporter::InitializeVolumeMapper()
-{
-  for (auto& reader : this->Pimpl->Readers)
-  {
-    if (!reader.VolumeMapper)
-    {
-      reader.VolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-      reader.VolumeMapper->SetRequestedRenderModeToGPU();
     }
   }
 }
