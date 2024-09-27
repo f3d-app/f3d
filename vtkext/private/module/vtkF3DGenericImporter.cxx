@@ -213,15 +213,11 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     pipe.PolyDataMapper->SetInputConnection(pipe.PostPro->GetOutputPort(0));
     pipe.PointGaussianMapper->SetInputConnection(pipe.PostPro->GetOutputPort(1));
 
-    for (auto& reader : this->Pimpl->Readers)
+    if (!pipe.VolumeMapper)
     {
-      if (!reader.VolumeMapper)
-      {
-        reader.VolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-        reader.VolumeMapper->SetRequestedRenderModeToGPU();
-      }
+      pipe.VolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+      pipe.VolumeMapper->SetRequestedRenderModeToGPU();
     }
-
     pipe.VolumeMapper->SetInputConnection(pipe.PostPro->GetOutputPort(2));
 
     // Set geometry actor default properties
