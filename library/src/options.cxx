@@ -136,6 +136,11 @@ std::pair<std::string, unsigned int> options::getClosestOption(const std::string
   return ret;
 }
 
+bool options::IsOptional(const std::string& option) const
+{
+  return options_tools::IsOptional(option);
+}
+
 //----------------------------------------------------------------------------
 template<typename T>
 T options::parse(const std::string& str)

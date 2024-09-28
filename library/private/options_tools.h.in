@@ -348,6 +348,19 @@ std::string getAsString(const options& opt, const std::string& name)
     throw options::no_value_exception("Trying to get " + name + " before it was set");
   }
 }
+
+//----------------------------------------------------------------------------
+/**
+ * Generated method, see `options::getAsString`
+ */
+bool IsOptional(const std::string& name)
+{
+  // clang-format off
+  ${_options_is_optional};
+  // clang-format on
+  else throw options::inexistent_exception("Option " + name + " does not exist");
+}
+
 } // option_tools
 } // f3d
 #endif // f3d_options_tools_h

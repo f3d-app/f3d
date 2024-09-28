@@ -115,6 +115,12 @@ public:
   std::pair<std::string, unsigned int> getClosestOption(const std::string& option) const;
 
   /**
+   *  Returns true if the option is optional else returns false.
+   *  Throws an options::inexistent_exception if option does not exist.
+   */
+  bool IsOptional(const std::string& option) const;
+
+  /**
    * Templated parsing method used internally to parse strings.
    * Implemented for:
    * - `bool` as `"true"`/`"false"`, `"1"`/`"0"`, `"yes"`/`"no"`, `"on"`/`"off"`
