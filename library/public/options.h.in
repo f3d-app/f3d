@@ -121,6 +121,18 @@ public:
   bool isOptional(const std::string& option) const;
 
   /**
+   *  Resets the option to default value.
+   *  Throws an options::inexistent_exception if option does not exist.
+   */
+  void reset(options& opt, const std::string& name);
+
+  /**
+   *  Unset the option if it is optional.
+   *  Throws an options::inexistent_exception if option does not exist.
+   */
+  void removeValue(options& opt, const std::string& name);
+
+  /**
    * Templated parsing method used internally to parse strings.
    * Implemented for:
    * - `bool` as `"true"`/`"false"`, `"1"`/`"0"`, `"yes"`/`"no"`, `"on"`/`"off"`
