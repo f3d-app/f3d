@@ -136,9 +136,9 @@ std::pair<std::string, unsigned int> options::getClosestOption(const std::string
   return ret;
 }
 
-bool options::IsOptional(const std::string& option) const
+bool options::isOptional(const std::string& option) const
 {
-  return options_tools::IsOptional(option);
+  return options_tools::isOptional(option);
 }
 
 //----------------------------------------------------------------------------

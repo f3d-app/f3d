@@ -118,7 +118,7 @@ public:
    *  Returns true if the option is optional else returns false.
    *  Throws an options::inexistent_exception if option does not exist.
    */
-  bool IsOptional(const std::string& option) const;
+  bool isOptional(const std::string& option) const;
 
   /**
    * Templated parsing method used internally to parse strings.

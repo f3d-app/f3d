@@ -351,9 +351,9 @@ std::string getAsString(const options& opt, const std::string& name)
 
 //----------------------------------------------------------------------------
 /**
- * Generated method, see `options::getAsString`
+ * Generated method, see `options::isOptional`
  */
-bool IsOptional(const std::string& name)
+bool isOptional(const std::string& name)
 {
   // clang-format off
   ${_options_is_optional};
