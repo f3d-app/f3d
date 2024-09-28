@@ -675,7 +675,8 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::options::parse<std::string>(cliOptionsDict["verbose"]);
   }
   this->Internals->AppOptions.cameraIndexPassed = false;
-  if(cliOptionsDict.find("camera-index") != cliOptionsDict.end()){
+  if(cliOptionsDict.find("camera-index") != cliOptionsDict.end())
+  {
     this->Internals->AppOptions.cameraIndexPassed = true;
   }
 
