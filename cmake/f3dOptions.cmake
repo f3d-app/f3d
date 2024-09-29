@@ -76,7 +76,6 @@ function (f3d_generate_options)
   list(JOIN _options_lister ",\n  " _options_lister)
   list(JOIN _options_is_optional ";\n  else " _options_is_optional)
   list(JOIN _options_reset ";\n  else " _options_reset)
-  list(JOIN _options_remove_value ";\n  else " _options_remove_value)
 
   configure_file(
     "${_f3d_generate_options_INPUT_PUBLIC_HEADER}"
@@ -136,17 +135,17 @@ function(_parse_json_option _top_json)
 
        if(_default_value_error STREQUAL "NOTFOUND")
          # Use default_value
-         string(APPEND _options_struct "${_option_indent}  ${_option_actual_type} ${_member_name} = ${_option_default_value_start}${_option_default_value}${_option_default_value_end};\n")
+         set(_optional_default_value_initialize "${_option_default_value_start}${_option_default_value}${_option_default_value_end}")
+         string(APPEND _options_struct "${_option_indent}  ${_option_actual_type} ${_member_name} = ${_optional_default_value_initialize};\n")
          set(_optional_getter "")
          list(APPEND _options_is_optional "if (name == \"${_option_name}\") return false")
-       list(APPEND _options_reset "if (name == \"${_option_name}\") opt.${_option_name} = ${_option_default_value_start}${_option_default_value}${_option_default_value_end}")
+         list(APPEND _options_reset "if (name == \"${_option_name}\") opt.${_option_name} = ${_optional_default_value_initialize}")
        else()
          # No default_value, it is an std::optional
          string(APPEND _options_struct "${_option_indent}  std::optional<${_option_actual_type}> ${_member_name};\n")
          set(_optional_getter ".value()")
          list(APPEND _options_is_optional "if (name == \"${_option_name}\") return true")
          list(APPEND _options_reset "if (name == \"${_option_name}\") opt.${_option_name}.reset()")
-         list(APPEND _options_remove_value "if (name == \"${_option_name}\") opt.${_option_name}.reset()")
        endif()
 
        list(APPEND _options_setter "if (name == \"${_option_name}\") opt.${_option_name} = std::get<${_option_variant_type}>(value)")
@@ -178,5 +177,4 @@ function(_parse_json_option _top_json)
   set(_options_lister ${_options_lister} PARENT_SCOPE)
   set(_options_is_optional ${_options_is_optional} PARENT_SCOPE)
   set(_options_reset ${_options_reset} PARENT_SCOPE)
-  set(_options_remove_value ${_options_remove_value} PARENT_SCOPE)
 endfunction()

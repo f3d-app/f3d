@@ -117,8 +117,7 @@ int parse(const std::string& str)
   }
   catch (std::out_of_range const&)
   {
-    throw options::parsing_exception(
-      "Cannot parse " + str + " into an int as it would go out of range");
+    throw options::parsing_exception("Cannot parse " + str + " into an int as it would go out of range");
   }
 }
 
@@ -379,10 +378,14 @@ void reset(options& opt, const std::string& name)
  */
 void removeValue(options& opt, const std::string& name)
 {
-  // clang-format off
-  ${_options_remove_value};
-  // clang-format on
-  else throw options::inexistent_exception("Option " + name + " does not exist or is not not optional");
+  if (isOptional(name))
+  {
+    reset(opt, name);
+  }
+  else
+  {
+    throw options::incompatible_exception("Option " + name + " is not not optional");
+  }
 }
 
 } // option_tools
