@@ -117,7 +117,8 @@ int parse(const std::string& str)
   }
   catch (std::out_of_range const&)
   {
-    throw options::parsing_exception("Cannot parse " + str + " into an int as it would go out of range");
+    throw options::parsing_exception(
+      "Cannot parse " + str + " into an int as it would go out of range");
   }
 }
 

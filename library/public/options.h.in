@@ -124,13 +124,13 @@ public:
    *  Resets the option to default value.
    *  Throws an options::inexistent_exception if option does not exist.
    */
-  void reset(options& opt, const std::string& name);
+  void reset(const std::string& name);
 
   /**
    *  Unset the option if it is optional.
    *  Throws an options::inexistent_exception if option does not exist.
    */
-  void removeValue(options& opt, const std::string& name);
+  void removeValue(const std::string& name);
 
   /**
    * Templated parsing method used internally to parse strings.

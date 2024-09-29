@@ -141,12 +141,12 @@ bool options::isOptional(const std::string& option) const
   return options_tools::isOptional(option);
 }
 
-void options::reset(options& opt, const std::string& name)
+void options::reset(const std::string& name)
 {
   options_tools::reset(*this, name);
 }
 
-void options::removeValue(options& opt, const std::string& name)
+void options::removeValue(const std::string& name)
 {
   options_tools::removeValue(*this, name);
 }
