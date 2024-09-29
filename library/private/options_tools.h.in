@@ -363,7 +363,7 @@ bool isOptional(const std::string& name)
 
 //----------------------------------------------------------------------------
 /**
- * Generated method, see `options::isOptional`
+ * Generated method, see `options::reset`
  */
 void reset(options& opt, const std::string& name)
 {
@@ -371,22 +371,6 @@ void reset(options& opt, const std::string& name)
   ${_options_reset};
   // clang-format on
   else throw options::inexistent_exception("Option " + name + " does not exist");
-}
-
-//----------------------------------------------------------------------------
-/**
- * Generated method, see `options::removeValue`
- */
-void removeValue(options& opt, const std::string& name)
-{
-  if (isOptional(name))
-  {
-    reset(opt, name);
-  }
-  else
-  {
-    throw options::incompatible_exception("Option " + name + " is not not optional");
-  }
 }
 
 } // option_tools
