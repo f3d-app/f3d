@@ -754,6 +754,8 @@ f3d_test(NAME TestInteractionCameraHotkeys DATA cow.vtp INTERACTION)
 f3d_test(NAME TestInteractionZoomToMouse DATA cow.vtp INTERACTION)
 f3d_test(NAME TestInteractionOrthographicProjection DATA cow.vtp INTERACTION) #5;5
 f3d_test(NAME TestInteractionZoomToggleOrthographicProjection DATA cow.vtp INTERACTION) #MouseWheel;5;Mousewheelx6;5
+f3d_test(NAME TestInteractionRotateCameraMinus90 DATA f3d.glb INTERACTION)
+f3d_test(NAME TestInteractionRotateCamera90 DATA f3d.glb INTERACTION)
 
 # Progress test
 f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)

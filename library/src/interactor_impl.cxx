@@ -327,8 +327,16 @@ public:
         self->SetViewOrbit(ViewType::VT_RIGHT, self);
         render = true;
         break;
+      case '4':
+        self->Window.getCamera().roll(-90);
+        render = true;
+        break;
       case '5':
         self->Options.scene.camera.orthographic = !self->Options.scene.camera.orthographic;
+        render = true;
+        break;
+      case '6':
+        self->Window.getCamera().roll(90);
         render = true;
         break;
       case '7':

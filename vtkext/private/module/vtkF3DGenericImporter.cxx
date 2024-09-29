@@ -32,7 +32,6 @@ struct ReaderPipeline
   ReaderPipeline()
   {
     this->GeometryActor->GetProperty()->SetInterpolationToPBR();
-    this->VolumeMapper->SetRequestedRenderModeToGPU();
     this->PolyDataMapper->InterpolateScalarsBeforeMappingOn();
   }
 
@@ -47,7 +46,7 @@ struct ReaderPipeline
   vtkNew<vtkVolume> VolumeProp;
   vtkNew<vtkPolyDataMapper> PolyDataMapper;
   vtkNew<vtkPointGaussianMapper> PointGaussianMapper;
-  vtkNew<vtkSmartVolumeMapper> VolumeMapper;
+  vtkSmartPointer<vtkSmartVolumeMapper> VolumeMapper;
 
   vtkDataSet* Output = nullptr;
   vtkDataSetAttributes* PointDataForColoring = nullptr;
@@ -213,6 +212,12 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     // Add filter outputs to mapper inputs
     pipe.PolyDataMapper->SetInputConnection(pipe.PostPro->GetOutputPort(0));
     pipe.PointGaussianMapper->SetInputConnection(pipe.PostPro->GetOutputPort(1));
+
+    if (!pipe.VolumeMapper)
+    {
+      pipe.VolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+      pipe.VolumeMapper->SetRequestedRenderModeToGPU();
+    }
     pipe.VolumeMapper->SetInputConnection(pipe.PostPro->GetOutputPort(2));
 
     // Set geometry actor default properties

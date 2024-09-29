@@ -1308,8 +1308,10 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     cheatSheetText << " DOWN : Add files from dir of current file\n";
     cheatSheetText << "\n 1: Front View camera\n";
     cheatSheetText << " 3: Right View camera\n";
+    cheatSheetText << " 4: Roll the camera left by 90 degrees\n";
     cheatSheetText << " 5: Toggle Orthographic Projection "
                    << (this->UseOrthographicProjection ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " 6: Roll the camera right by 90 degrees\n";
     cheatSheetText << " 7: Top View camera\n";
     cheatSheetText << " 9: Isometric View camera\n";
     cheatSheetText << " ENTER: Reset camera to initial parameters\n";
