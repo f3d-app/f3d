@@ -1101,7 +1101,7 @@ void F3DStarter::LoadFile(int index, bool relativeIndex)
         f3d::log::error("Could not load file: ", ex.what());
       }
 
-      if (!this->Internals->Options.scene.camera.index.hasValue() && !this->Internals->AppOptions.NoRender)
+      if (!dynamicOptions.scene.camera.index.has_value() && !this->Internals->AppOptions.NoRender)
       {
         // Setup the camera according to options
         this->Internals->SetupCamera(this->Internals->AppOptions.CamConf);
