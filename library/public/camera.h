@@ -73,8 +73,8 @@ public:
 
   ///@}
 
-virtual camera& rotateByMouse(double deltaX, double deltaY) = 0;
-virtual camera& rotateAroundFocalPoint(double deltaX, double deltaY) = 0;
+  virtual camera& rotateByMouse(double deltaX, double deltaY) = 0;
+  virtual camera& rotateAroundFocalPoint(double deltaX, double deltaY) = 0;
 
   /**
    * Store the current camera configuration as default.

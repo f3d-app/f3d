@@ -163,7 +163,7 @@ camera& camera_impl::dolly(double val)
   this->Internals->VTKRenderer->ResetCameraClippingRange();
   return *this;
 }
-//---------------------------------------------------------------------------- 
+//----------------------------------------------------------------------------
 camera& camera_impl::rotateByMouse(double deltaX, double deltaY) 
 {
   vtkCamera* cam = this->GetVTKCamera();
@@ -173,7 +173,7 @@ camera& camera_impl::rotateByMouse(double deltaX, double deltaY)
   this->Internals->VTKRenderer->ResetCameraClippingRange();
   return *this;
 }
-//---------------------------------------------------------------------------- 
+//----------------------------------------------------------------------------
 camera& camera_impl::rotateAroundFocalPoint(double deltaX, double deltaY) 
 {
   vtkCamera* cam = this->GetVTKCamera();
