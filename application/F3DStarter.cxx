@@ -69,7 +69,6 @@ public:
     std::string Output;
     bool NoBackground;
     bool NoRender;
-    bool cameraIndexPassed;
     double MaxSize;
     bool Watch;
     std::vector<std::string> Plugins;
@@ -673,11 +672,6 @@ int F3DStarter::Start(int argc, char** argv)
   {
     this->Internals->AppOptions.VerboseLevel =
       f3d::options::parse<std::string>(cliOptionsDict["verbose"]);
-  }
-  this->Internals->AppOptions.cameraIndexPassed = false;
-  if (cliOptionsDict.find("camera-index") != cliOptionsDict.end())
-  {
-    this->Internals->AppOptions.cameraIndexPassed = true;
   }
 
   // Set verbosity level early from command line
