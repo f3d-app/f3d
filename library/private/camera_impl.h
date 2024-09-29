@@ -59,6 +59,8 @@ public:
   camera& yaw(angle_deg_t angle) override;
   camera& elevation(angle_deg_t angle) override;
   camera& pitch(angle_deg_t angle) override;
+  camera& rotateByMouse(double deltaX, double deltaY);
+  camera& rotateAroundFocalPoint(double deltaX, double deltaY);
 
   camera& setCurrentAsDefault() override;
   camera& resetToDefault() override;
