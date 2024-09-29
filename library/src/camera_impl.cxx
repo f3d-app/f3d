@@ -164,7 +164,7 @@ camera& camera_impl::dolly(double val)
   return *this;
 }
 //----------------------------------------------------------------------------
-camera& camera_impl::rotateByMouse(double deltaX, double deltaY) 
+camera& camera_impl::rotateByMouse(double deltaX, double deltaY)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Azimuth(deltaX);
@@ -174,7 +174,7 @@ camera& camera_impl::rotateByMouse(double deltaX, double deltaY)
   return *this;
 }
 //----------------------------------------------------------------------------
-camera& camera_impl::rotateAroundFocalPoint(double deltaX, double deltaY) 
+camera& camera_impl::rotateAroundFocalPoint(double deltaX, double deltaY)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Azimuth(deltaX);
