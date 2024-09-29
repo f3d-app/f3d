@@ -151,9 +151,9 @@ void options::reset(const std::string& name)
 //----------------------------------------------------------------------------
 void options::removeValue(const std::string& name)
 {
-  if (isOptional(name))
+  if (this->isOptional(name))
   {
-    reset(name);
+    this->reset(name);
   }
   else
   {
