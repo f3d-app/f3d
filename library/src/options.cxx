@@ -137,6 +137,31 @@ std::pair<std::string, unsigned int> options::getClosestOption(const std::string
 }
 
 //----------------------------------------------------------------------------
+bool options::isOptional(const std::string& option) const
+{
+  return options_tools::isOptional(option);
+}
+
+//----------------------------------------------------------------------------
+void options::reset(const std::string& name)
+{
+  options_tools::reset(*this, name);
+}
+
+//----------------------------------------------------------------------------
+void options::removeValue(const std::string& name)
+{
+  if (this->isOptional(name))
+  {
+    this->reset(name);
+  }
+  else
+  {
+    throw options::incompatible_exception("Option " + name + " is not not optional");
+  }
+}
+
+//----------------------------------------------------------------------------
 template<typename T>
 T options::parse(const std::string& str)
 {
