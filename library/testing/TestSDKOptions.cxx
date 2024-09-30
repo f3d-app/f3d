@@ -195,5 +195,52 @@ int TestSDKOptions(int argc, char* argv[])
   test.expect<f3d::options::no_value_exception>("no_value_exception exception on getAsString",
     [&]() { opt.getAsString("scene.animation.time"); });
 
+  f3d::options opt6{};
+
+  // Test isOptional optional values
+  test("isOptional with optional value", opt6.isOptional("model.scivis.array_name"));
+  test("isOptional with optional value", opt6.isOptional("model.scivis.range"));
+
+  // Test isOptional non-optional values
+  test("isOptional with non-optional value", opt6.isOptional("model.scivis.cells") == false);
+  test("isOptional with non-optional value", opt6.isOptional("model.scivis.enable") == false);
+
+  // Test isOptional non-existent options
+  test.expect<f3d::options::inexistent_exception>(
+    "isOptional with non-existent option", [&]() { opt6.isOptional("dummy"); });
+
+  f3d::options opt7{};
+
+  // Test reset non-optional values
+  opt7.model.color.opacity = 0.5;
+  opt7.reset("model.color.opacity");
+  test("reset non-optional values", opt7.model.color.opacity == 1.0);
+
+  // Test reset optional values
+  opt7.model.scivis.array_name = "dummy";
+  opt7.reset("model.scivis.array_name");
+  test.expect<f3d::options::no_value_exception>(
+    "reset non-optional values", [&]() { opt7.get("model.scivis.array_name"); });
+
+  // Test reset non-existent option
+  test.expect<f3d::options::inexistent_exception>(
+    "reset with non-existent option", [&]() { opt7.reset("dummy"); });
+
+  f3d::options opt8{};
+
+  // Test removeValue optional values
+  opt8.model.scivis.array_name = "dummy";
+  opt8.removeValue("model.scivis.array_name");
+  test.expect<f3d::options::no_value_exception>(
+    "removeValue optional values", [&]() { opt8.get("model.scivis.array_name"); });
+
+  // Test removeValue non-optional values
+  test.expect<f3d::options::incompatible_exception>(
+    "removeValue non-optional values", [&]() { opt8.removeValue("model.scivis.cells"); });
+
+  // Test removeValue non-optional values
+  test.expect<f3d::options::inexistent_exception>(
+    "removeValue non-existent option", [&]() { opt8.removeValue("dummy"); });
+
   return EXIT_SUCCESS;
 }
