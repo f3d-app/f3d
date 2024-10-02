@@ -98,7 +98,6 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "  float axis2Weight = abs(majorCoord.x) < 0.5 ? antialias(majorGrid.x, axesLineWidth) : 0.0;\n"
     "  color = mix(color, axis2Color, axis2Weight);\n"
     "  color = mix(color, axis1Color, axis1Weight);\n"
-
     "  float sqDist = unitSquare * unitSquare * dot(fromCenter, fromCenter);\n"
     "  float radialFadeFactor = 1.0 - sqDist / (fadeDist * fadeDist);\n"
     "  color.w *= radialFadeFactor;\n"
