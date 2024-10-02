@@ -492,36 +492,6 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     cxxOptions.show_positional_help();
     auto result = cxxOptions.parse(argc, argv);
 
-    // Check for unknown options and log them
-    auto unmatched = result.unmatched();
-    bool foundUnknownOption = false;
-    for (const std::string& unknownOption : unmatched)
-    {
-      f3d::log::error("Unknown option '", unknownOption, "'");
-      foundUnknownOption = true;
-
-      // check if it's a long option
-      if (unknownOption.substr(0, 2) == "--")
-      {
-        const size_t equalPos = unknownOption.find('=');
-
-        // remove "--" and everything after the first "=" (if any)
-        const std::string unknownName =
-          unknownOption.substr(2, equalPos != std::string::npos ? equalPos - 2 : equalPos);
-
-        auto [closestName, dist] = F3DOptionsTools::GetClosestOption(unknownName);
-        const std::string closestOption =
-          equalPos == std::string::npos ? closestName : closestName + unknownOption.substr(equalPos);
-
-        f3d::log::error("Did you mean '--", closestOption, "'?");
-      }
-    }
-    if (foundUnknownOption)
-    {
-      f3d::log::waitForUser();
-      throw F3DExFailure("unknown options");
-    }
-
     // Check boolean options and log them if any
     if (result.count("help") > 0)
     {
@@ -550,6 +520,36 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       F3DPluginsTools::LoadPlugins(plugins);
       ::PrintReadersList();
       throw F3DExNoProcess("reader list requested");
+    }
+
+    // Check for unknown options and log them
+    auto unmatched = result.unmatched();
+    bool foundUnknownOption = false;
+    for (const std::string& unknownOption : unmatched)
+    {
+      f3d::log::error("Unknown option '", unknownOption, "'");
+      foundUnknownOption = true;
+
+      // check if it's a long option
+      if (unknownOption.substr(0, 2) == "--")
+      {
+        const size_t equalPos = unknownOption.find('=');
+
+        // remove "--" and everything after the first "=" (if any)
+        const std::string unknownName =
+          unknownOption.substr(2, equalPos != std::string::npos ? equalPos - 2 : equalPos);
+
+        auto [closestName, dist] = F3DOptionsTools::GetClosestOption(unknownName);
+        const std::string closestOption =
+          equalPos == std::string::npos ? closestName : closestName + unknownOption.substr(equalPos);
+
+        f3d::log::error("Did you mean '--", closestOption, "'?");
+      }
+    }
+    if (foundUnknownOption)
+    {
+      f3d::log::waitForUser();
+      throw F3DExFailure("unknown options");
     }
 
     // Add each CLI options into a vector of string/string and return it
