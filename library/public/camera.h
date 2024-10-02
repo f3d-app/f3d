@@ -76,7 +76,6 @@ public:
 
   ///@}
 
-
   /**
    * Store the current camera configuration as default.
    */
