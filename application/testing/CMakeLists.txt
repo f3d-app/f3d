@@ -984,10 +984,10 @@ f3d_test(NAME TestBadRefNoOutput DATA cow.vtp ARGS --ref=${F3D_SOURCE_DIR}/testi
 f3d_test(NAME TestPlayNoFile DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/dummy.log WILL_FAIL)
 
 # Test that --help is displayed even when there is an unknown option
-f3d_test(NAME TestHelpPrecedenceWithUnknownOption ARGS --help --unknown REGEXP "F3D Command Line Help"  NO_BASELINE)
+f3d_test(NAME TestHelpPrecedenceWithUnknownOption ARGS --help --unknown REGEXP "Usage:"  NO_BASELINE)
 
 # Test that --version is displayed even when there is an unknown option
-f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown REGEXP "F3D Version" NO_BASELINE)
+f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown REGEXP "Version:" NO_BASELINE)
 
 # Test scan plugins
 if(NOT F3D_MACOS_BUNDLE)
