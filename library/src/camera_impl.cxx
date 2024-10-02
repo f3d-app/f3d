@@ -118,6 +118,60 @@ angle_deg_t camera_impl::getViewAngle()
 }
 
 //----------------------------------------------------------------------------
+angle_deg_t camera_impl::getAzimuth()
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  double pos[3], foc[3];
+  cam->GetPosition(pos);
+  cam->GetFocalPoint(foc);
+  double viewDir[3];
+  vtkMath::Subtract(foc, pos, viewDir);
+  double viewDirProj[3] = { viewDir[0], viewDir[1], 0.0 };
+  double norm = vtkMath::Norm(viewDirProj);
+  if (norm < VTK_DBL_EPSILON)
+  {
+    return 0.0;
+  }
+  vtkMath::Normalize(viewDirProj);
+  return vtkMath::DegreesFromRadians(atan2(viewDirProj[1], viewDirProj[0]));
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getYaw()
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  double pos[3], foc[3];
+  cam->GetPosition(pos);
+  cam->GetFocalPoint(foc);
+  double viewDir[3];
+  vtkMath::Subtract(foc, pos, viewDir);
+  double viewDirProj[3] = { viewDir[0], 0.0, viewDir[2] };
+  double norm = vtkMath::Norm(viewDirProj);
+  if (norm < VTK_DBL_EPSILON)
+  {
+    return 0.0;
+  }
+  vtkMath::Normalize(viewDirProj);
+  double angleRad = atan2(viewDirProj[0], viewDirProj[2]);
+  return vtkMath::DegreesFromRadians(angleRad);
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getElevation()
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  double pos[3], foc[3];
+  cam->GetPosition(pos);
+  cam->GetFocalPoint(foc);
+
+  double viewDir[3];
+  vtkMath::Subtract(foc, pos, viewDir);
+  vtkMath::Normalize(viewDir);
+
+  return vtkMath::DegreesFromRadians(asin(viewDir[2]));
+}
+
+//----------------------------------------------------------------------------
 void camera_impl::getViewAngle(angle_deg_t& angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
@@ -159,26 +213,6 @@ camera& camera_impl::dolly(double val)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Dolly(val);
-  cam->OrthogonalizeViewUp();
-  this->Internals->VTKRenderer->ResetCameraClippingRange();
-  return *this;
-}
-//----------------------------------------------------------------------------
-camera& camera_impl::rotateByMouse(double deltaX, double deltaY)
-{
-  vtkCamera* cam = this->GetVTKCamera();
-  cam->Azimuth(deltaX);
-  cam->Elevation(deltaY);
-  cam->OrthogonalizeViewUp();
-  this->Internals->VTKRenderer->ResetCameraClippingRange();
-  return *this;
-}
-//----------------------------------------------------------------------------
-camera& camera_impl::rotateAroundFocalPoint(double deltaX, double deltaY)
-{
-  vtkCamera* cam = this->GetVTKCamera();
-  cam->Azimuth(deltaX);
-  cam->Elevation(deltaY);
   cam->OrthogonalizeViewUp();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
   return *this;

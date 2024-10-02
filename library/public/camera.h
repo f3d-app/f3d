@@ -49,6 +49,9 @@ public:
   virtual camera& setState(const camera_state_t& state) = 0;
   virtual camera_state_t getState() = 0;
   virtual void getState(camera_state_t& state) = 0;
+  virtual angle_deg_t getAzimuth() = 0;
+  virtual angle_deg_t getYaw() = 0;
+  virtual angle_deg_t getElevation() = 0;
   ///@}
 
   ///@{ @name Manipulation
@@ -73,8 +76,6 @@ public:
 
   ///@}
 
-  virtual camera& rotateByMouse(double deltaX, double deltaY) = 0;
-  virtual camera& rotateAroundFocalPoint(double deltaX, double deltaY) = 0;
 
   /**
    * Store the current camera configuration as default.

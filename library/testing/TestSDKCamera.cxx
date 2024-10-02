@@ -179,6 +179,19 @@ int TestSDKCamera(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Test getAzimuth
+  double azimuth = cam.getAzimuth();
+  checkDouble(azimuth, 0.0, "getAzimuth");
+
+
+  // Test getYaw (same value as azimuth here)
+  double yaw = cam.getYaw();
+  checkDouble(yaw, 90.0, "getYaw");
+
+  // Test getElevation
+  double elevation = cam.getElevation();
+  checkDouble(elevation, 0.0, "getElevation");
+
   // Test elevation
   cam.elevation(90);
   expectedPos = { 11., -11., -12. };
