@@ -183,7 +183,6 @@ int TestSDKCamera(int argc, char* argv[])
   double azimuth = cam.getAzimuth();
   checkDouble(azimuth, 0.0, "getAzimuth");
 
-
   // Test getYaw (same value as azimuth here)
   double yaw = cam.getYaw();
   checkDouble(yaw, 90.0, "getYaw");
