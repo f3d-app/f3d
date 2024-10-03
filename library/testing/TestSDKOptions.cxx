@@ -242,5 +242,5 @@ int TestSDKOptions(int argc, char* argv[])
   test.expect<f3d::options::inexistent_exception>(
     "removeValue non-existent option", [&]() { opt8.removeValue("dummy"); });
 
-  return EXIT_SUCCESS;
+  return test.result();
 }
