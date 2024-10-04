@@ -27,4 +27,4 @@ def test_load_memory():
 
     error = 0.0
 
-    assert img.compare(f3d.Image(reference), 50, error)
+    assert img.compare(f3d.Image(reference), 0.05, error)
