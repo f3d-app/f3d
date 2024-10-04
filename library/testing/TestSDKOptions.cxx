@@ -121,19 +121,21 @@ int TestSDKOptions(int argc, char* argv[])
   });
 
   // Test copy operator and constructor
+  opt.render.background.color = { 0.1, 0.2, 0.7 };
+  opt.render.line_width = 2.17;
   f3d::options opt2 = opt;
-  test("copy constructor", opt2.render.line_width == 2.13);
+  test("copy constructor", opt2.render.line_width == 2.17);
 
   f3d::options opt3;
   opt3 = opt2;
-  test("copy operator", opt3.render.line_width == 2.13);
+  test("copy operator", opt3.render.line_width == 2.17);
 
   f3d::options opt4 = std::move(opt3);
-  test("move constructor", opt4.render.line_width == 2.13);
+  test("move constructor", opt4.render.line_width == 2.17);
 
   f3d::options opt5;
   opt5 = std::move(opt4);
-  test("move operator", opt5.render.line_width == 2.13);
+  test("move operator", opt5.render.line_width == 2.17);
 
   // Test getNames
   std::vector<std::string> names = f3d::options::getAllNames();
@@ -154,7 +156,7 @@ int TestSDKOptions(int argc, char* argv[])
   test("not isSame", !opt.isSame(opt2, "render.line_width"));
 
   opt2.copy(opt, "render.line_width");
-  test("copy", opt2.render.line_width == 2.13);
+  test("copy", opt2.render.line_width == 2.17);
 
   // Test isSame/copy vector
   test("isSame with vectors", opt.isSame(opt2, "render.background.color"));
@@ -163,7 +165,7 @@ int TestSDKOptions(int argc, char* argv[])
   test("not isSame with vectors", !opt.isSame(opt2, "render.background.color"));
 
   opt2.copy(opt, "render.background.color");
-  test("copy with vectors", opt2.render.background.color == std::vector<double>({ 0.1, 0.2, 0.5 }));
+  test("copy with vectors", opt2.render.background.color == std::vector<double>({ 0.1, 0.2, 0.7 }));
 
   // Test isSame/copy error path
   test.expect<f3d::options::inexistent_exception>(
@@ -242,5 +244,5 @@ int TestSDKOptions(int argc, char* argv[])
   test.expect<f3d::options::inexistent_exception>(
     "removeValue non-existent option", [&]() { opt8.removeValue("dummy"); });
 
-  return EXIT_SUCCESS;
+  return test.result();
 }
