@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cmath>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -81,6 +82,21 @@ struct vector3_t : std::array<double, 3>
   vector3_t(double x, double y, double z)
     : array{ x, y, z }
   {
+  }
+  vector3_t(const std::vector<double>& vec)
+  {
+    if (vec.size() != 3)
+    {
+      throw std::runtime_error("cannot create a vector3_t");
+    }
+    _M_elems[0] = vec[0];
+    _M_elems[1] = vec[1];
+    _M_elems[2] = vec[2];
+  }
+
+  operator std::vector<double>() const
+  {
+    return { _M_elems[0], _M_elems[1], _M_elems[2] };
   }
 
   static vector3_t fromSphericalCoordinates(double theta, double phi)
