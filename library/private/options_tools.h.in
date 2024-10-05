@@ -261,24 +261,6 @@ std::string format(const ratio_t& var)
 
 //----------------------------------------------------------------------------
 /**
- * Format provided var into a string from provided vector3_t
- * rely on format(double&)
- */
-template<>
-std::string format(const vector3_t& var)
-{
-  std::ostringstream stream;
-  unsigned int i = 0;
-  for (auto& elem : var)
-  {
-    stream << ((i > 0) ? ", " : "") << options_tools::format(elem);
-    i++;
-  }
-  return stream.str();
-}
-
-//----------------------------------------------------------------------------
-/**
  * Generate (returns) a string from provided string
  */
 template<>
@@ -303,6 +285,17 @@ std::string format(const std::vector<double>& var)
     i++;
   }
   return stream.str();
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Format provided var into a string from provided vector3_t
+ * rely on format(double&)
+ */
+template<>
+std::string format(const vector3_t& var)
+{
+  return format(static_cast<std::vector<double>>(var));
 }
 
 //----------------------------------------------------------------------------

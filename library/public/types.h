@@ -76,11 +76,11 @@ struct mesh_t
 /**
  * Describe a 3D vector.
  */
-struct vector3_t : std::array<double, 3>
+struct vector3_t
 {
   vector3_t() = default;
   vector3_t(double x, double y, double z)
-    : array{ x, y, z }
+    : Value{ x, y, z }
   {
   }
   vector3_t(const std::vector<double>& vec)
@@ -89,14 +89,60 @@ struct vector3_t : std::array<double, 3>
     {
       throw std::runtime_error("cannot create a vector3_t");
     }
-    _M_elems[0] = vec[0];
-    _M_elems[1] = vec[1];
-    _M_elems[2] = vec[2];
+    Value[0] = vec[0];
+    Value[1] = vec[1];
+    Value[2] = vec[2];
   }
 
+  double* data()
+  {
+    return Value;
+  }
+  const double* data() const
+  {
+    return Value;
+  }
+
+  double& operator[](int idx)
+  {
+    return Value[idx];
+  }
+  double operator[](int idx) const
+  {
+    return Value[idx];
+  }
   operator std::vector<double>() const
   {
-    return { _M_elems[0], _M_elems[1], _M_elems[2] };
+    return { Value[0], Value[1], Value[2] };
+  }
+  operator std::array<double, 3>() const
+  {
+    return { Value[0], Value[1], Value[2] };
+  }
+  bool operator==(const vector3_t& vec) const
+  {
+    return Value[0] == vec.Value[0] && Value[1] == vec.Value[1] && Value[2] == vec.Value[2];
+  }
+  bool operator!=(const vector3_t& vec) const
+  {
+    return !(*this == vec);
+  }
+
+  double* begin()
+  {
+    return Value;
+  }
+  const double* cbegin() const
+  {
+    return Value;
+  }
+  double* end()
+  {
+    return Value + 3;
+  }
+  const double* cend() const
+  {
+    return Value + 3;
   }
 
   static vector3_t fromSphericalCoordinates(double theta, double phi)
@@ -119,6 +165,9 @@ struct vector3_t : std::array<double, 3>
   {
     return { 0, 0, 0 };
   }
+
+private:
+  double Value[3];
 };
 }
 
