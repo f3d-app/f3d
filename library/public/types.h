@@ -4,6 +4,7 @@
 #include "export.h"
 
 #include <array>
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -16,18 +17,6 @@ struct F3D_EXPORT point3_t : std::array<double, 3>
 {
   template<typename... Args>
   point3_t(Args&&... args)
-    : array({ double(std::forward<Args>(args))... })
-  {
-  }
-};
-
-/**
- * Describe a 3D vector.
- */
-struct F3D_EXPORT vector3_t : std::array<double, 3>
-{
-  template<typename... Args>
-  vector3_t(Args&&... args)
     : array({ double(std::forward<Args>(args))... })
   {
   }
@@ -81,6 +70,39 @@ struct mesh_t
    * If invalid, an error message is returned in the second element.
    */
   F3D_EXPORT std::pair<bool, std::string> isValid() const;
+};
+
+/**
+ * Describe a 3D vector.
+ */
+struct vector3_t : std::array<double, 3>
+{
+  vector3_t() = default;
+  vector3_t(double x, double y, double z)
+    : array{ x, y, z }
+  {
+  }
+
+  static vector3_t fromSphericalCoordinates(double theta, double phi)
+  {
+    return { std::sin(phi) * std::cos(theta), std::sin(phi) * std::cos(theta), std::cos(phi) };
+  }
+  static vector3_t x()
+  {
+    return { 1, 0, 0 };
+  }
+  static vector3_t y()
+  {
+    return { 0, 1, 0 };
+  }
+  static vector3_t z()
+  {
+    return { 0, 0, 1 };
+  }
+  static vector3_t zero()
+  {
+    return { 0, 0, 0 };
+  }
 };
 }
 

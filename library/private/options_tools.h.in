@@ -5,7 +5,9 @@
 #include "types.h"
 
 #include <algorithm>
+#include <exception>
 #include <sstream>
+#include <vector>
 
 namespace f3d
 {
@@ -179,6 +181,21 @@ ratio_t parse(const std::string& str)
     throw options::parsing_exception(
       "Cannot parse " + str + " into a ratio_t as it would go out of range");
   }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Parse provided string into a vector3_t.
+ */
+template<>
+vector3_t parse(const std::string& str)
+{
+  std::vector vec = parse<std::vector<double>>(str);
+  if (vec.size() != 3)
+  {
+    throw options::parsing_exception("cannot parse " + str + " to a vector3_t");
+  }
+  return { vec[0], vec[1], vec[2] };
 }
 
 //----------------------------------------------------------------------------
