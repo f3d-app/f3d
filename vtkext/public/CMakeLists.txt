@@ -41,18 +41,10 @@ vtk_module_build(
   TARGETS_COMPONENT library
   PACKAGE "f3d_vtkext")
 
-# We need non empty cmake vars for these calls for VTK <= 9.1
-# See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9084
 foreach (module IN LISTS modules)
-  if(NOT "${f3d_compile_options_public}" STREQUAL "")
-    vtk_module_compile_options(${module} PUBLIC ${f3d_compile_options_public})
-  endif()
-  if(NOT "${f3d_compile_options_private}" STREQUAL "")
-    vtk_module_compile_options(${module} PRIVATE ${f3d_compile_options_private})
-  endif()
-  if (NOT "${f3d_link_options_public}" STREQUAL "")
-    vtk_module_link_options(${module} PUBLIC ${f3d_link_options_public})
-  endif()
+  vtk_module_compile_options(${module} PUBLIC ${f3d_compile_options_public})
+  vtk_module_compile_options(${module} PRIVATE ${f3d_compile_options_private})
+  vtk_module_link_options(${module} PUBLIC ${f3d_link_options_public})
   vtk_module_set_properties(${module} CXX_STANDARD 17)
   if(F3D_STRICT_BUILD AND MSVC)
     # There are warnings in VTK related to deprecated features in C++17
