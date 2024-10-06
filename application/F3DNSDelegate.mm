@@ -24,7 +24,7 @@
 {
   (void)theApplication;
   Starter->AddFile([filename UTF8String]);
-  Starter->LoadFile();
+  Starter->LoadFileGroup();
   Starter->Render();
   return YES;
 }

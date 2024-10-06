@@ -16,7 +16,7 @@
 #include <memory>
 
 class vtkRenderWindow;
-class vtkF3DGenericImporter;
+class vtkF3DMetaImporter;
 namespace f3d
 {
 class options;
@@ -58,27 +58,31 @@ public:
 
   /**
    * Implementation only API.
-   * Create and initialize the internal vtkF3DRenderer with the provided parameters
-   * Called by the loader right before reading a file
+   * Initialize the renderer by clearing it of all actors.
    */
-  virtual void Initialize(bool withColoring);
+  void Initialize();
 
   /**
    * Implementation only API.
-   * Set the importer on an already created vtkF3DRendererWithColoring
-   * Called by the loader right after reading a file
+   * Initialize the up vector on the renderer using the Up string option
    */
-  virtual void SetImporterForColoring(vtkF3DGenericImporter* importer);
+  void InitializeUpVector();
+
+  /**
+   * Implementation only API.
+   * Set the importer on the internal renderer
+   */
+  void SetImporter(vtkF3DMetaImporter* importer);
 
   /**
    * Implementation only API.
    * Use all the rendering related options to update the configuration of the window
-   * and the rendering stack below. This also initialize the rendering stack if needed.
+   * and the rendering stack below.
    * This will be called automatically when calling loader::loadFile but can also be called manually
    * when needed. This must be called, either manually or automatically, before any render call.
    * Return true on success, false otherwise.
    */
-  virtual void UpdateDynamicOptions();
+  void UpdateDynamicOptions();
 
   /**
    * Implementation only API.

@@ -22,7 +22,7 @@ int TestSDKMultiOptions(int argc, char* argv[])
   std::string right = std::string(argv[1]) + "data/" + rightFilename;
 
   // Render one geometry with a render option
-  load.loadGeometry(left);
+  load.add(left);
   opt.render.show_edges = true;
   opt.render.grid.enable = true;
   opt.ui.metadata = true;
@@ -30,7 +30,7 @@ int TestSDKMultiOptions(int argc, char* argv[])
   win.render();
 
   // Add another geometry
-  load.loadGeometry(right);
+  load.add(right);
 
   // Check rendering is correct
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",

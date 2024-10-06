@@ -22,7 +22,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   opt.ui.filename = true;
   opt.ui.filename_info = "(1/1) cow.vtp";
 
-  load.loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
+  load.add(std::string(argv[1]) + "/data/cow.vtp");
 
   bool ret = win.render();
   if (!ret)

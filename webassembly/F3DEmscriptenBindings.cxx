@@ -57,21 +57,17 @@ f3d::loader* getLoaderPtr(f3d::engine& e)
 {
   return &e.getLoader();
 }
-f3d::loader* loadGeometry(f3d::loader& l, const std::string& p)
+f3d::loader* add(f3d::loader& l, const std::string& p)
 {
-  return &l.loadGeometry(p, true);
+  return &l.add(p);
 }
-f3d::loader* loadScene(f3d::loader& l, const std::string& p)
+bool supported(f3d::loader& l, const std::string& p)
 {
-  return &l.loadScene(p);
+  return l.supported(p);
 }
-bool hasGeometryReader(f3d::loader& l, const std::string& p)
+f3d::loader* clear(f3d::loader& l)
 {
-  return l.hasGeometryReader(p);
-}
-bool hasSceneReader(f3d::loader& l, const std::string& p)
-{
-  return l.hasSceneReader(p);
+  return &l.clear();
 }
 
 f3d::window* getWindowPtr(f3d::engine& e)
@@ -104,10 +100,9 @@ EMSCRIPTEN_BINDINGS(f3d)
 
   // f3d::loader
   emscripten::class_<f3d::loader>("Loader")
-    .function("loadGeometry", &loadGeometry, emscripten::allow_raw_pointers())
-    .function("loadScene", &loadScene, emscripten::allow_raw_pointers())
-    .function("hasGeometryReader", &hasGeometryReader, emscripten::allow_raw_pointers())
-    .function("hasSceneReader", &hasSceneReader, emscripten::allow_raw_pointers());
+    .function("supported", &supported, emscripten::allow_raw_pointers())
+    .function("add", &add, emscripten::allow_raw_pointers())
+    .function("clear", &clear, emscripten::allow_raw_pointers());
 
   // f3d::window
   emscripten::class_<f3d::window>("Window")

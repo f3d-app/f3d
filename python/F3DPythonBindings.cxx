@@ -1,6 +1,7 @@
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl/filesystem.h>
 
 #include "camera.h"
 #include "engine.h"
@@ -242,13 +243,16 @@ PYBIND11_MODULE(pyf3d, module)
   // f3d::loader
   py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete>> loader(module, "Loader");
   loader //
-    .def("has_geometry_reader", &f3d::loader::hasGeometryReader)
-    .def("load_geometry", py::overload_cast<const std::string&, bool>(&f3d::loader::loadGeometry),
-      "load geometry to a default scene", py::arg("file_path"), py::arg("reset") = false)
-    .def("has_scene_reader", &f3d::loader::hasSceneReader)
-    .def("load_scene", &f3d::loader::loadScene, "Load a specific full scene file")
-    .def("load_geometry", py::overload_cast<const f3d::mesh_t&, bool>(&f3d::loader::loadGeometry),
-      "Load a surfacic mesh from memory", py::arg("mesh"), py::arg("reset") = false);
+    .def("supported", &f3d::loader::supported)
+    .def("clear", &f3d::loader::clear)
+    .def("add", py::overload_cast<const std::filesystem::path&>(&f3d::loader::add),
+      "Add a file the scene", py::arg("file_path"))
+    .def("add", py::overload_cast<const std::vector<std::filesystem::path>&>(&f3d::loader::add),
+      "Add multiple filepaths to the scene", py::arg("file_path_vector"))
+    .def("add", py::overload_cast<const std::vector<std::string>&>(&f3d::loader::add),
+      "Add multiple filenames to the scene", py::arg("file_name_vector"))
+    .def("add", py::overload_cast<const f3d::mesh_t&>(&f3d::loader::add),
+      "Add a surfacic mesh from memory into the scene", py::arg("mesh"));
 
   // f3d::camera
   py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete>> camera(module, "Camera");

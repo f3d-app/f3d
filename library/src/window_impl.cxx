@@ -144,8 +144,6 @@ public:
   vtkNew<vtkF3DRendererWithColoring> Renderer;
   Type WindowType;
   const options& Options;
-  bool Initialized = false;
-  bool WithColoring = false;
   std::string CachePath;
 };
 
@@ -186,6 +184,21 @@ window_impl::window_impl(const options& options, Type type)
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
+
+  this->Initialize();
+  this->Internals->UpdateTheme();
+}
+
+//----------------------------------------------------------------------------
+void window_impl::Initialize()
+{
+  this->Internals->Renderer->Initialize();
+}
+
+//----------------------------------------------------------------------------
+void window_impl::InitializeUpVector()
+{
+  this->Internals->Renderer->InitializeUpVector(this->Internals->Options.scene.up_direction);
 }
 
 //----------------------------------------------------------------------------
@@ -197,13 +210,6 @@ window_impl::Type window_impl::getType()
 //----------------------------------------------------------------------------
 camera& window_impl::getCamera()
 {
-  // Make sure the camera (and the whole rendering stack)
-  // is initialized before providing one.
-  if (!this->Internals->Initialized)
-  {
-    this->Initialize(false);
-  }
-
   return *this->Internals->Camera;
 }
 
@@ -308,23 +314,8 @@ window_impl::~window_impl()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::Initialize(bool withColoring)
-{
-  this->Internals->WithColoring = withColoring;
-  this->Internals->Renderer->Initialize(this->Internals->Options.scene.up_direction);
-  this->Internals->UpdateTheme();
-  this->Internals->Initialized = true;
-}
-
-//----------------------------------------------------------------------------
 void window_impl::UpdateDynamicOptions()
 {
-  if (!this->Internals->Initialized)
-  {
-    // Renderer is missing, create a default one
-    this->Initialize(false);
-  }
-
   vtkF3DRendererWithColoring* renderer = this->Internals->Renderer;
 
   if (this->Internals->WindowType == Type::NONE)
@@ -397,37 +388,27 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetUseOrthographicProjection(opt.scene.camera.orthographic);
   }
 
-  if (this->Internals->WithColoring)
-  {
-    std::vector<double> rgb = opt.model.color.rgb;
-    renderer->SetSurfaceColor(rgb.data());
-    renderer->SetOpacity(opt.model.color.opacity);
-    renderer->SetTextureBaseColor(opt.model.color.texture);
-    renderer->SetRoughness(opt.model.material.roughness);
-    renderer->SetMetallic(opt.model.material.metallic);
-    renderer->SetTextureMaterial(opt.model.material.texture);
-    renderer->SetTextureEmissive(opt.model.emissive.texture);
-    std::vector<double> factor = opt.model.emissive.factor;
-    renderer->SetEmissiveFactor(factor.data());
-    renderer->SetTextureNormal(opt.model.normal.texture);
-    renderer->SetNormalScale(opt.model.normal.scale);
-    renderer->SetTextureMatCap(opt.model.matcap.texture);
+  renderer->SetSurfaceColor(opt.model.color.rgb);
+  renderer->SetOpacity(opt.model.color.opacity);
+  renderer->SetTextureBaseColor(opt.model.color.texture);
+  renderer->SetRoughness(opt.model.material.roughness);
+  renderer->SetMetallic(opt.model.material.metallic);
+  renderer->SetTextureMaterial(opt.model.material.texture);
+  renderer->SetTextureEmissive(opt.model.emissive.texture);
+  renderer->SetEmissiveFactor(opt.model.emissive.factor);
+  renderer->SetTextureNormal(opt.model.normal.texture);
+  renderer->SetNormalScale(opt.model.normal.scale);
+  renderer->SetTextureMatCap(opt.model.matcap.texture);
 
-    renderer->SetColoring(opt.model.scivis.enable, opt.model.scivis.cells,
-      opt.model.scivis.array_name, opt.model.scivis.component);
-    renderer->SetScalarBarRange(opt.model.scivis.range);
-    renderer->SetColormap(opt.model.scivis.colormap);
-    renderer->ShowScalarBar(opt.ui.scalar_bar);
+  renderer->SetColoring(opt.model.scivis.enable, opt.model.scivis.cells,
+    opt.model.scivis.array_name, opt.model.scivis.component);
+  renderer->SetScalarBarRange(opt.model.scivis.range);
+  renderer->SetColormap(opt.model.scivis.colormap);
+  renderer->ShowScalarBar(opt.ui.scalar_bar);
 
-    renderer->SetUsePointSprites(opt.model.point_sprites.enable);
-    renderer->SetUseVolume(opt.model.volume.enable);
-    renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
-  }
-  else
-  {
-    // make sure the scalar bar is hidden without coloring
-    renderer->ShowScalarBar(false);
-  }
+  renderer->SetUsePointSprites(opt.model.point_sprites.enable);
+  renderer->SetUseVolume(opt.model.volume.enable);
+  renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
 
   renderer->UpdateActors();
 }
@@ -441,13 +422,10 @@ void window_impl::PrintSceneDescription(log::VerboseLevel level)
 //----------------------------------------------------------------------------
 void window_impl::PrintColoringDescription(log::VerboseLevel level)
 {
-  if (this->Internals->WithColoring)
+  std::string descr = this->Internals->Renderer->GetColoringDescription();
+  if (!descr.empty())
   {
-    std::string descr = this->Internals->Renderer->GetColoringDescription();
-    if (!descr.empty())
-    {
-      log::print(level, descr);
-    }
+    log::print(level, descr);
   }
 }
 
@@ -495,12 +473,9 @@ image window_impl::renderToImage(bool noBackground)
 }
 
 //----------------------------------------------------------------------------
-void window_impl::SetImporterForColoring(vtkF3DGenericImporter* importer)
+void window_impl::SetImporter(vtkF3DMetaImporter* importer)
 {
-  if (this->Internals->WithColoring)
-  {
-    this->Internals->Renderer->SetImporter(importer);
-  }
+  this->Internals->Renderer->SetImporter(importer);
 }
 
 //----------------------------------------------------------------------------

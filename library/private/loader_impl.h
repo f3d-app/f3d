@@ -30,11 +30,12 @@ public:
    */
   loader_impl(const options& options, window_impl& window);
   ~loader_impl();
-  loader& loadGeometry(const std::string& filePath, bool reset) override;
-  loader& loadGeometry(const mesh_t& mesh, bool reset = false) override;
-  loader& loadScene(const std::string& filePath) override;
-  bool hasGeometryReader(const std::string& filePath) override;
-  bool hasSceneReader(const std::string& filePath) override;
+  loader& add(const std::filesystem::path& filePath) override;
+  loader& add(const std::vector<std::filesystem::path>& filePath) override;
+  loader& add(const std::vector<std::string>& filePathStrings) override;
+  loader& add(const mesh_t& mesh) override;
+  loader& clear() override;
+  bool supported(const std::filesystem::path& filePath) override;
   ///@}
 
   /**

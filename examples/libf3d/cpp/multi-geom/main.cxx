@@ -26,7 +26,7 @@ int main(int argc, char** argv)
   f3d::loader& load = eng.getLoader();
   for (auto& entry : std::filesystem::directory_iterator(argv[1]))
   {
-    load.loadGeometry(entry.path().string());
+    load.add(entry.path().string());
   }
 
   // Render

@@ -24,7 +24,7 @@ int TestSDKMultiColoring(int argc, char* argv[])
   std::string right = std::string(argv[1]) + "data/" + rightFilename;
 
   // Multiple geometries
-  load.loadGeometry(cube).loadGeometry(left).loadGeometry(right);
+  load.add(std::vector<std::string>{ cube, left, right });
 
   opt.model.scivis.array_name = "Normals";
 
