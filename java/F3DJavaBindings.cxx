@@ -138,17 +138,17 @@ extern "C"
 
   JNIEXPORT void JAVA_BIND(Camera, azimuth)(JNIEnv* env, jobject self, jdouble angle)
   {
-    GetEngine(env, self)->getWindow().getCamera().azimuth(angle);
+    GetEngine(env, self)->getWindow().getCamera().addAzimuth(angle);
   }
 
   JNIEXPORT void JAVA_BIND(Camera, yaw)(JNIEnv* env, jobject self, jdouble angle)
   {
-    GetEngine(env, self)->getWindow().getCamera().yaw(angle);
+    GetEngine(env, self)->getWindow().getCamera().addYaw(angle);
   }
 
   JNIEXPORT void JAVA_BIND(Camera, elevation)(JNIEnv* env, jobject self, jdouble angle)
   {
-    GetEngine(env, self)->getWindow().getCamera().elevation(angle);
+    GetEngine(env, self)->getWindow().getCamera().addElevation(angle);
   }
 
   JNIEXPORT void JAVA_BIND(Camera, pitch)(JNIEnv* env, jobject self, jdouble angle)
