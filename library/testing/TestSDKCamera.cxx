@@ -121,7 +121,7 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test azimuth
-  cam.azimuth(90);
+  cam.addAzimuth(90);
   f3d::point3_t expectedPos = { 0., -11., -1. };
   f3d::point3_t expectedFoc = { 0., 0., -1. };
   f3d::vector3_t expectedUp = { 1., 0., 0. };
@@ -161,7 +161,7 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test yaw
-  cam.yaw(90);
+  cam.addYaw(90);
   expectedFoc = { 11., -11., -1. };
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
@@ -180,19 +180,19 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test getAzimuth
-  double azimuth = cam.getAzimuth();
-  checkDouble(azimuth, 0.0, "getAzimuth");
+  double addAzimuth = cam.getAzimuth();
+  checkDouble(addAzimuth, 0.0, "getAzimuth");
 
   // Test getYaw (same value as azimuth here)
-  double yaw = cam.getYaw();
-  checkDouble(yaw, 90.0, "getYaw");
+  double addYaw = cam.getYaw();
+  checkDouble(addYaw, 90.0, "getYaw");
 
   // Test getElevation
-  double elevation = cam.getElevation();
-  checkDouble(elevation, 0.0, "getElevation");
+  double addElevation = cam.getElevation();
+  checkDouble(addElevation, 0.0, "getElevation");
 
   // Test elevation
-  cam.elevation(90);
+  cam.addElevation(90);
   expectedPos = { 11., -11., -12. };
   expectedUp = { 1., 0., 0. };
   pos = cam.getPosition();
