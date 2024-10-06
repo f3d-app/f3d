@@ -179,18 +179,6 @@ int TestSDKCamera(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // Test getAzimuth
-  double addAzimuth = cam.getAzimuth();
-  checkDouble(addAzimuth, 0.0, "getAzimuth");
-
-  // Test getYaw (same value as azimuth here)
-  double addYaw = cam.getYaw();
-  checkDouble(addYaw, 90.0, "getYaw");
-
-  // Test getElevation
-  double addElevation = cam.getElevation();
-  checkDouble(addElevation, 0.0, "getElevation");
-
   // Test elevation
   cam.addElevation(90);
   expectedPos = { 11., -11., -12. };
@@ -208,6 +196,36 @@ int TestSDKCamera(int argc, char* argv[])
               << foc[2] << std::endl;
     std::cerr << std::setprecision(12) << "view up: " << up[0] << "," << up[1] << "," << up[2]
               << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Test getAzimuth
+  expectedPos = { 11., -11., -12. };
+  expectedUp = { 1., 0., 0. };
+  double addAzimuth = cam.getAzimuth();
+  if (!compareDouble(addAzimuth, 0.0))
+  {
+    std::cerr << "getAzimuth failed when camera is along Z-axis: " << addAzimuth << " != 0.0" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Test getYaw
+  expectedPos = { 11., -11., -12. };
+  expectedUp = { 1., 0., 0. };
+  double addYaw = cam.getYaw();
+  if (!compareDouble(addYaw, 0.0))
+  {
+    std::cerr << "getYaw failed when camera is along Y-axis: " << addYaw << " != 0.0" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Test getElevation
+  expectedPos = { 11., -11., -12. };
+  expectedUp = { 1., 0., 0. };
+  double addElevation = cam.getElevation();
+  if (!compareDouble(addElevation, 90.0))
+  {
+    std::cerr << "getElevation failed when camera is along Z-axis: " << addElevation << " != 90.0" << std::endl;
     return EXIT_FAILURE;
   }
 
