@@ -75,7 +75,7 @@ endif ()
 # VTK dependency
 # Optional components should list VTK modules
 # needed by plugins and optional modules
-find_package(VTK 9.0 REQUIRED
+find_package(VTK 9.2.6 REQUIRED
   COMPONENTS
     CommonCore
     CommonDataModel

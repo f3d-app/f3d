@@ -4,8 +4,6 @@ Here is a non exhaustive list of F3D limitations:
 
 * No support for specifying manual lighting in the default scene apart from using `--light-intensity` option.
 * Multiblock (.vtm, .gml) support is partial, non-surfacic data will be converted into surfaces.
-* Animation support with full scene data format require VTK >= 9.0.20201016.
-* Full drag and drop support require VTK >= 9.0.20210620
 * Drag and drop interaction cannot be recorded nor played back.
 * Volume rendering and HDRI support requires a decent GPU.
 * The `--camera-zoom-factor` option require VTK >= 9.3.0
