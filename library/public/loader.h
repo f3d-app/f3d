@@ -25,7 +25,7 @@ namespace f3d
  *  f3d::engine eng(f3d::window::Type::NATIVE);
  *  f3d::loader& load = eng.getLoader();
  *
- *  if (load.supported(path)
+ *  if (load.supports(path)
  *  {
  *    load.add(path);
  *  }
@@ -82,7 +82,7 @@ public:
   /**
    * Return true if provided file path is supported, false otherwise.
    */
-  virtual bool supported(const std::filesystem::path& filePath) = 0;
+  virtual bool supports(const std::filesystem::path& filePath) = 0;
 
 protected:
   //! @cond

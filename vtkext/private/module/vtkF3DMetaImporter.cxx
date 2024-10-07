@@ -138,7 +138,12 @@ struct vtkF3DMetaImporter::Internals
   std::vector<std::string> PointDataArrayNames;
   std::vector<std::string> CellDataArrayNames;
 
-  std::vector<std::pair<vtkSmartPointer<vtkImporter>, bool>> Importers;
+  struct ImporterPair
+  {
+    vtkSmartPointer<vtkImporter> Importer;
+    bool Updated = false;
+  };
+  std::vector<ImporterPair> Importers;
   std::optional<vtkIdType> CameraIndex;
   vtkBoundingBox GeometryBoundingBox;
   bool ColoringInfoUpdated = false;
@@ -180,7 +185,7 @@ void vtkF3DMetaImporter::Clear()
 //----------------------------------------------------------------------------
 void vtkF3DMetaImporter::AddImporter(const vtkSmartPointer<vtkImporter>& importer)
 {
-  this->Pimpl->Importers.emplace_back(std::make_pair(importer, false));
+  this->Pimpl->Importers.emplace_back(vtkF3DMetaImporter::Internals::ImporterPair {importer, false});
   this->Modified();
 
   // Add a progress event observer
@@ -194,7 +199,7 @@ void vtkF3DMetaImporter::AddImporter(const vtkSmartPointer<vtkImporter>& importe
       double actualProgress = 0.0;
       for (size_t i = 0; i < self->Pimpl->Importers.size(); i++)
       {
-        if (self->Pimpl->Importers[i].first == caller)
+        if (self->Pimpl->Importers[i].Importer == caller)
         {
           // XXX: This does not consider that some importer may already have been updated
           // or that some importers may take much longer than other.
@@ -315,10 +320,10 @@ bool vtkF3DMetaImporter::Update()
 
   for (auto& importerPair : this->Pimpl->Importers)
   {
-    vtkImporter* importer = importerPair.first;
+    vtkImporter* importer = importerPair.Importer;
 
     // Importer has already been updated
-    if (importerPair.second)
+    if (importerPair.Updated)
     {
       localCameraIndex -= importer->GetNumberOfCameras();
       continue;
@@ -443,7 +448,7 @@ bool vtkF3DMetaImporter::Update()
       }
     }
 
-    importerPair.second = true;
+    importerPair.Updated = true;
   }
 
   if (localCameraIndex > 0)
@@ -465,7 +470,7 @@ std::string vtkF3DMetaImporter::GetOutputsDescription()
   description += "Number of actors: " + std::to_string(this->ActorCollection->GetNumberOfItems()) + "\n";
   description += std::accumulate(this->Pimpl->Importers.begin(), this->Pimpl->Importers.end(),
     std::string(), [](const std::string& a, const auto& importerPair)
-    { return a + "----------\n" + importerPair.first->GetOutputsDescription(); });
+    { return a + "----------\n" + importerPair.Importer->GetOutputsDescription(); });
   return description;
 }
 
@@ -474,19 +479,19 @@ vtkIdType vtkF3DMetaImporter::GetNumberOfAnimations()
 {
   return std::accumulate(this->Pimpl->Importers.begin(), this->Pimpl->Importers.end(), 0,
     [](vtkIdType a, const auto& importerPair)
-    { return a + importerPair.first->GetNumberOfAnimations(); });
+    { return a + importerPair.Importer->GetNumberOfAnimations(); });
 }
 
 //----------------------------------------------------------------------------
 std::string vtkF3DMetaImporter::GetAnimationName(vtkIdType animationIndex)
 {
   vtkIdType localAnimationIndex = animationIndex;
-  for (const auto& importer : this->Pimpl->Importers)
+  for (const auto& importerPair : this->Pimpl->Importers)
   {
-    vtkIdType nAnim = importer.first->GetNumberOfAnimations();
+    vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
     if (localAnimationIndex < nAnim)
     {
-      std::string name = importer.first->GetAnimationName(localAnimationIndex);
+      std::string name = importerPair.Importer->GetAnimationName(localAnimationIndex);
       if (name.empty())
       {
         name = "unnamed_" + std::to_string(animationIndex);
@@ -505,12 +510,12 @@ std::string vtkF3DMetaImporter::GetAnimationName(vtkIdType animationIndex)
 void vtkF3DMetaImporter::EnableAnimation(vtkIdType animationIndex)
 {
   vtkIdType localAnimationIndex = animationIndex;
-  for (const auto& importer : this->Pimpl->Importers)
+  for (const auto& importerPair : this->Pimpl->Importers)
   {
-    vtkIdType nAnim = importer.first->GetNumberOfAnimations();
+    vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
     if (localAnimationIndex < nAnim)
     {
-      importer.first->EnableAnimation(localAnimationIndex);
+      importerPair.Importer->EnableAnimation(localAnimationIndex);
       return;
     }
     else
@@ -524,12 +529,12 @@ void vtkF3DMetaImporter::EnableAnimation(vtkIdType animationIndex)
 void vtkF3DMetaImporter::DisableAnimation(vtkIdType animationIndex)
 {
   vtkIdType localAnimationIndex = animationIndex;
-  for (const auto& importer : this->Pimpl->Importers)
+  for (const auto& importerPair : this->Pimpl->Importers)
   {
-    vtkIdType nAnim = importer.first->GetNumberOfAnimations();
+    vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
     if (localAnimationIndex < nAnim)
     {
-      importer.first->DisableAnimation(localAnimationIndex);
+      importerPair.Importer->DisableAnimation(localAnimationIndex);
       return;
     }
     else
@@ -543,12 +548,12 @@ void vtkF3DMetaImporter::DisableAnimation(vtkIdType animationIndex)
 bool vtkF3DMetaImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
   vtkIdType localAnimationIndex = animationIndex;
-  for (const auto& importer : this->Pimpl->Importers)
+  for (const auto& importerPair : this->Pimpl->Importers)
   {
-    vtkIdType nAnim = importer.first->GetNumberOfAnimations();
+    vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
     if (localAnimationIndex < nAnim)
     {
-      return importer.first->IsAnimationEnabled(localAnimationIndex);
+      return importerPair.Importer->IsAnimationEnabled(localAnimationIndex);
     }
     else
     {
@@ -563,19 +568,19 @@ vtkIdType vtkF3DMetaImporter::GetNumberOfCameras()
 {
   return std::accumulate(this->Pimpl->Importers.begin(), this->Pimpl->Importers.end(), 0,
     [](vtkIdType a, const auto& importerPair)
-    { return a + importerPair.first->GetNumberOfCameras(); });
+    { return a + importerPair.Importer->GetNumberOfCameras(); });
 }
 
 //----------------------------------------------------------------------------
 std::string vtkF3DMetaImporter::GetCameraName(vtkIdType camIndex)
 {
   vtkIdType localCameraIndex = camIndex;
-  for (const auto& importer : this->Pimpl->Importers)
+  for (const auto& importerPair : this->Pimpl->Importers)
   {
-    vtkIdType nCam = importer.first->GetNumberOfCameras();
+    vtkIdType nCam = importerPair.Importer->GetNumberOfCameras();
     if (localCameraIndex < nCam)
     {
-      std::string name = importer.first->GetCameraName(localCameraIndex);
+      std::string name = importerPair.Importer->GetCameraName(localCameraIndex);
       if (name.empty())
       {
         name = "unnamed_" + std::to_string(camIndex);
@@ -601,12 +606,12 @@ bool vtkF3DMetaImporter::GetTemporalInformation(vtkIdType animationIndex, double
   int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
 {
   vtkIdType localAnimationIndex = animationIndex;
-  for (const auto& importer : this->Pimpl->Importers)
+  for (const auto& importerPair : this->Pimpl->Importers)
   {
-    vtkIdType nAnim = importer.first->GetNumberOfAnimations();
+    vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
     if (localAnimationIndex < nAnim)
     {
-      return importer.first->GetTemporalInformation(
+      return importerPair.Importer->GetTemporalInformation(
         localAnimationIndex, frameRate, nbTimeSteps, timeRange, timeSteps);
     }
     else
@@ -622,12 +627,12 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
 {
   this->Pimpl->ColoringInfoUpdated = false;
   bool ret = true;
-  for (const auto& importer : this->Pimpl->Importers)
+  for (const auto& importerPair : this->Pimpl->Importers)
   {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
-    ret &= importer.first->UpdateAtTimeValue(timeValue);
+    ret = ret && importerPair.Importer->UpdateAtTimeValue(timeValue);
 #else
-    importer.first->UpdateTimeStep(timeValue);
+    importerPair.Importer->UpdateTimeStep(timeValue);
 #endif
   }
   return ret;
@@ -636,13 +641,13 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
 //----------------------------------------------------------------------------
 void vtkF3DMetaImporter::UpdateInfoForColoring()
 {
-  for (const auto& importer : this->Pimpl->Importers)
+  for (const auto& importerPair : this->Pimpl->Importers)
   {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
-    vtkActorCollection* actorCollection = importer.first->GetImportedActors();
+    vtkActorCollection* actorCollection = importerPair.Importer->GetImportedActors();
 #else
     vtkActorCollection* actorCollection =
-      this->Pimpl->ActorsForImporterMap.at(importer.first).Get();
+      this->Pimpl->ActorsForImporterMap.at(importerPair.Importer).Get();
 #endif
     vtkCollectionSimpleIterator ait;
     actorCollection->InitTraversal(ait);
@@ -653,7 +658,7 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
 
       // Update coloring vectors, with a dedicated logic for generic importer
       vtkDataSet* datasetForColoring = pdMapper->GetInput();
-      vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importer.first);
+      vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importerPair.Importer);
       if (genericImporter)
       {
         // TODO This will be improved with proper composite support

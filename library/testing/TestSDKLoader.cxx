@@ -39,12 +39,12 @@ int TestSDKLoader(int argc, char* argv[])
   std::string cube = std::string(argv[1]) + "data/" + cubeFilename;
   std::string world = std::string(argv[1]) + "data/" + worldFilename;
 
-  // supported method
-  test("supported with empty filename", !load.supported(empty));
-  test("supported with dummy filename", !load.supported(dummy));
-  test("supported with non existent filename", load.supported(nonExistent));
-  test("supported with default scene format", load.supported(cube));
-  test("supported with full scene format", load.supported(logo));
+  // supports method
+  test("supported with empty filename", !load.supports(empty));
+  test("supported with dummy filename", !load.supports(dummy));
+  test("supported with non existent filename", load.supports(nonExistent));
+  test("supported with default scene format", load.supports(cube));
+  test("supported with full scene format", load.supports(logo));
 
   // add error code paths
   test.expect<f3d::loader::load_failure_exception>(

@@ -35,7 +35,7 @@ public:
   loader& add(const std::vector<std::string>& filePathStrings) override;
   loader& add(const mesh_t& mesh) override;
   loader& clear() override;
-  bool supported(const std::filesystem::path& filePath) override;
+  bool supports(const std::filesystem::path& filePath) override;
   ///@}
 
   /**

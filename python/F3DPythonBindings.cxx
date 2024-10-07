@@ -243,7 +243,7 @@ PYBIND11_MODULE(pyf3d, module)
   // f3d::loader
   py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete>> loader(module, "Loader");
   loader //
-    .def("supported", &f3d::loader::supported)
+    .def("supports", &f3d::loader::supports)
     .def("clear", &f3d::loader::clear)
     .def("add", py::overload_cast<const std::filesystem::path&>(&f3d::loader::add),
       "Add a file the scene", py::arg("file_path"))

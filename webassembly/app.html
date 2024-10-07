@@ -125,7 +125,7 @@
           document.getElementById('file-name').innerHTML = name;
           const filePath = '/' + name;
           const loader = Module.engineInstance.getLoader();
-          if (loader.supported(filePath))
+          if (loader.supports(filePath))
           {
             loader.add(filePath);
           }

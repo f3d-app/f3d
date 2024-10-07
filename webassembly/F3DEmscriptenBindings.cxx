@@ -61,9 +61,9 @@ f3d::loader* add(f3d::loader& l, const std::string& p)
 {
   return &l.add(p);
 }
-bool supported(f3d::loader& l, const std::string& p)
+bool supports(f3d::loader& l, const std::string& p)
 {
-  return l.supported(p);
+  return l.supports(p);
 }
 f3d::loader* clear(f3d::loader& l)
 {

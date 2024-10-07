@@ -205,9 +205,8 @@ public:
     F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
     const std::lock_guard<std::mutex> lock(self->Internals->LoadedFilesMutex);
     if (std::find_if(self->Internals->LoadedFiles.begin(), self->Internals->LoadedFiles.end(),
-          [filename](const auto& path) {
-            return path.filename().string() == std::string(filename);
-          }) != self->Internals->LoadedFiles.end())
+          [&](const auto& path)
+          { return path.filename() == filename; }) != self->Internals->LoadedFiles.end())
     {
       self->Internals->ReloadFileRequested = true;
     }
@@ -259,7 +258,7 @@ public:
      * a single file is loaded */
     const auto fileCheck = [&]()
     {
-      if (this->LoadedFiles.size() == 0)
+      if (this->LoadedFiles.empty())
       {
         return "no_file";
       }
@@ -620,7 +619,7 @@ public:
       {
         window.setSize(this->AppOptions.Resolution[0], this->AppOptions.Resolution[1]);
       }
-      else if (this->AppOptions.Resolution.size() != 0)
+      else if (!this->AppOptions.Resolution.empty())
       {
         f3d::log::warn("Provided resolution could not be applied");
       }
@@ -631,7 +630,7 @@ public:
       }
       else
       {
-        if (this->AppOptions.Position.size() != 0)
+        if (!this->AppOptions.Position.empty())
         {
           f3d::log::warn("Provided position could not be applied");
         }
@@ -894,7 +893,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Render and compare with file if needed
     if (!reference.empty())
     {
-      if (this->Internals->LoadedFiles.size() == 0 && !noDataForceRender)
+      if (this->Internals->LoadedFiles.empty() && !noDataForceRender)
       {
         f3d::log::error("No file loaded, no rendering performed");
         return EXIT_FAILURE;
@@ -953,7 +952,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Render to file if needed
     else if (!output.empty())
     {
-      if (this->Internals->LoadedFiles.size() == 0 && !noDataForceRender)
+      if (this->Internals->LoadedFiles.empty() && !noDataForceRender)
       {
         f3d::log::error("No files loaded, no rendering performed");
         return EXIT_FAILURE;
@@ -1118,7 +1117,7 @@ void F3DStarter::LoadFileGroup(
         if (std::find(this->Internals->LoadedFiles.begin(), this->Internals->LoadedFiles.end(),
               tmpPath) == this->Internals->LoadedFiles.end())
         {
-          if (loader.supported(tmpPath))
+          if (loader.supports(tmpPath))
           {
             // Check the size of the file before loading it
             static constexpr int BYTES_IN_MIB = 1048576;
@@ -1227,7 +1226,7 @@ void F3DStarter::LoadFileGroup(
   // XXX: We can force dropzone and filename_info because they cannot be set
   // manually by the user for now
   f3d::options& options = this->Internals->Engine->getOptions();
-  options.ui.dropzone = this->Internals->LoadedFiles.size() == 0;
+  options.ui.dropzone = this->Internals->LoadedFiles.empty();
   options.ui.filename_info = filenameInfo;
 }
 
@@ -1353,7 +1352,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       // XXX more multi-file mode may be added in the future
       if (this->Internals->AppOptions.MultiFileMode == "all")
       {
-        if (this->Internals->FilesGroups.size() == 0)
+        if (this->Internals->FilesGroups.empty())
         {
           this->Internals->FilesGroups.resize(1);
         }

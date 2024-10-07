@@ -322,7 +322,7 @@ loader& loader_impl::clear()
 }
 
 //----------------------------------------------------------------------------
-bool loader_impl::supported(const fs::path& filePath)
+bool loader_impl::supports(const fs::path& filePath)
 {
   return f3d::factory::instance()->getReader(filePath.string()) != nullptr;
 }
