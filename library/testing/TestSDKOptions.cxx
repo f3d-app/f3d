@@ -1,7 +1,7 @@
+#include "PseudoUnitTest.h"
+
 #include <export.h>
 #include <options.h>
-
-#include "PseudoUnitTest.h"
 
 #include <algorithm>
 #include <iostream>
@@ -214,9 +214,9 @@ int TestSDKOptions(int argc, char* argv[])
   f3d::options opt7{};
 
   // Test reset non-optional values
-  opt7.model.color.opacity = 0.5;
-  opt7.reset("model.color.opacity");
-  test("reset non-optional values", opt7.model.color.opacity == 1.0);
+  opt7.scene.up_direction = "+Z";
+  opt7.reset("scene.up_direction");
+  test("reset non-optional values", opt7.scene.up_direction == "+Y");
 
   // Test reset optional values
   opt7.model.scivis.array_name = "dummy";

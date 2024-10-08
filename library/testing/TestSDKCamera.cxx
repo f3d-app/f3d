@@ -1,6 +1,7 @@
 #include <camera.h>
 #include <engine.h>
 #include <loader.h>
+#include <log.h>
 #include <window.h>
 
 #include <cmath>
@@ -67,6 +68,7 @@ void checkDouble(const double actual, const double expected, const std::string& 
 
 int TestSDKCamera(int argc, char* argv[])
 {
+  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
   f3d::window& win = eng.getWindow();
   f3d::camera& cam = win.getCamera();
@@ -74,7 +76,6 @@ int TestSDKCamera(int argc, char* argv[])
   // check coordinates conversion
   f3d::point3_t point = { 0.1, 0.1, 0.1 };
   f3d::point3_t pointDC = win.getDisplayFromWorld(point);
-
   if (!comparePoint(point, win.getWorldFromDisplay(pointDC)))
   {
     std::cerr << "coordinates conversion is not behaving as expected" << std::endl;

@@ -1,6 +1,7 @@
 {
   ".*(ex2)":
   {
+    "scalar-coloring": true,
     "load-plugins": "exodus",
     "bar": true
   }

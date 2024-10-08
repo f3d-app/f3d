@@ -1,11 +1,11 @@
 set(test_sources
   TestF3DCachedTexturesPrint.cxx
   TestF3DGenericImporter.cxx
-  TestF3DGenericImporterMultiColoring.cxx
   TestF3DInteractorEventRecorder.cxx
   TestF3DLog.cxx
+  TestF3DMetaImporterMultiColoring.cxx
   TestF3DObjectFactory.cxx
-  TestF3DOpenGLGridMapper.cxx 
+  TestF3DOpenGLGridMapper.cxx
   TestF3DRenderPass.cxx
   TestF3DRendererWithColoring.cxx
   )
@@ -15,7 +15,7 @@ if(WIN32 AND F3D_WINDOWS_GUI)
 endif()
 
 if(F3D_MODULE_EXR)
-  list(APPEND test_sources 
+  list(APPEND test_sources
        TestF3DEXRReader.cxx
        TestF3DEXRReaderInvalid.cxx)
 endif()
@@ -32,8 +32,12 @@ if(UNIX)
   set_tests_properties(f3d::vtkextPrivateCxx-TestF3DLog PROPERTIES PASS_REGULAR_EXPRESSION "Test Info Test Warning Test Error\nTest Debug Test Info Test Warning Test Error\nTest Warning Test Error\nTest Error\nTest Info Coloring Test Warning Coloring Test Error Coloring\n")
 endif()
 
+set_tests_properties(f3d::vtkextPrivateCxx-TestF3DGenericImporter
+  PROPERTIES
+  FAIL_REGULAR_EXPRESSION "")
+
 if(F3D_MODULE_EXR)
   set_tests_properties(f3d::vtkextPrivateCxx-TestF3DEXRReaderInvalid
-    PROPERTIES 
+    PROPERTIES
     FAIL_REGULAR_EXPRESSION "")
 endif()

@@ -29,7 +29,7 @@ public class TestJavaBindings {
       assert pos[2] == 2.0 : "Position Z is not valid";
 
       Loader loader = engine.getLoader();
-      loader.loadGeometry(args[0] + "data/cow.vtp");
+      loader.add(args[0] + "data/cow.vtp");
     }
   }
 }

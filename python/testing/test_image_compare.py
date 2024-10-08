@@ -19,7 +19,7 @@ def test_compare_with_file():
     assert engine.window.width == 300
     assert engine.window.height == 300
 
-    engine.loader.load_geometry(dataset, True)
+    engine.loader.add(dataset)
 
     img = engine.window.render_to_image()
     img.save(output)

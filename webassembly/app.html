@@ -125,13 +125,9 @@
           document.getElementById('file-name').innerHTML = name;
           const filePath = '/' + name;
           const loader = Module.engineInstance.getLoader();
-          if (loader.hasSceneReader(filePath))
+          if (loader.supports(filePath))
           {
-            loader.loadScene(filePath);
-          }
-          else if (loader.hasGeometryReader(filePath))
-          {
-            loader.loadGeometry(filePath);
+            loader.add(filePath);
           }
           else
           {

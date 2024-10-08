@@ -7,6 +7,9 @@ KeyReleaseEvent 474 416 0 115 1 s 0
 KeyPressEvent 474 416 0 115 1 s 0
 CharEvent 474 416 0 115 1 s 0
 KeyReleaseEvent 474 416 0 115 1 s 0
+KeyPressEvent 474 416 0 115 1 s 0
+CharEvent 474 416 0 115 1 s 0
+KeyReleaseEvent 474 416 0 115 1 s 0
 KeyPressEvent 474 416 0 98 1 b 0
 CharEvent 474 416 0 98 1 b 0
 KeyReleaseEvent 474 416 0 98 1 b 0

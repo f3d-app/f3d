@@ -3,6 +3,7 @@
 #include <vtkNew.h>
 #include <vtkPLYReader.h>
 #include <vtkTestUtilities.h>
+#include <vtkVersion.h>
 
 #include "vtkF3DGenericImporter.h"
 
@@ -11,15 +12,6 @@
 int TestF3DGenericImporter(int argc, char* argv[])
 {
   vtkNew<vtkF3DGenericImporter> importer;
-
-  // Test without any reader
-  if (importer->CanReadFile())
-  {
-    std::cerr << "Importer unexpectedly can read a file without internal reader" << std::endl;
-    return EXIT_FAILURE;
-  }
-  importer->Update();
-  importer->Print(cout);
   if (importer->GetNumberOfAnimations() != 0)
   {
     std::cerr << "Unexpected number of animations" << std::endl;
@@ -44,13 +36,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
   reader->UpdateInformation();
   reader->EnableAnimation(0);
 
-  importer->AddInternalReader("Test", reader);
-  if (!importer->CanReadFile())
-  {
-    std::cerr << "Importer unexpectedly can not read a valid file" << std::endl;
-    return EXIT_FAILURE;
-  }
-
+  importer->SetInternalReader(reader);
   importer->Update();
   importer->Print(cout);
   if (importer->GetNumberOfAnimations() != 1)
@@ -73,24 +59,20 @@ int TestF3DGenericImporter(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // Test with multiple readers
-  vtkNew<vtkPLYReader> reader2;
-  filename = std::string(argv[1]) + "data/suzanne.ply";
-  reader2->SetFileName(filename.c_str());
-  importer->AddInternalReader("Test2", reader2);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240910)
+  filename = std::string(argv[1]) + "data/BoxAnimated_invalid_animation.gltf";
+  reader->SetFileName(filename.c_str());
+  reader->UpdateInformation();
+  reader->EnableAnimation(0);
 
-  if (!importer->CanReadFile())
-  {
-    std::cerr << "Importer unexpectedly can not read a valid file" << std::endl;
-    return EXIT_FAILURE;
-  }
+  importer->SetInternalReader(reader);
   importer->Update();
-  std::string description = importer->GetMetaDataDescription();
-  if (description.find("Number of geometries: 2") == std::string::npos)
+  if (importer->UpdateAtTimeValue(0.1))
   {
-    std::cerr << "Unexpected meta data description with multiple geometries" << std::endl;
+    std::cerr << "Unexpected UpdateAtTimeValue success" << std::endl;
     return EXIT_FAILURE;
   }
+#endif
 
   // Static method testing
   if (vtkF3DGenericImporter::GetDataObjectDescription(nullptr) != "")

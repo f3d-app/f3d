@@ -191,56 +191,45 @@
   "model": {
     "matcap": {
       "texture": {
-        "type": "string",
-        "default_value": ""
+        "type": "string"
       }
     },
     "color": {
       "opacity": {
-        "type": "double",
-        "default_value": "1.0"
+        "type": "double"
       },
       "rgb": {
-        "type": "double_vector",
-        "default_value": "1.0, 1.0, 1.0"
+        "type": "double_vector"
       },
       "texture": {
-        "type": "string",
-        "default_value": ""
+        "type": "string"
       }
     },
     "emissive": {
       "factor": {
-        "type": "double_vector",
-        "default_value": "1.0, 1.0, 1.0"
+        "type": "double_vector"
       },
       "texture": {
-        "type": "string",
-        "default_value": ""
+        "type": "string"
       }
     },
     "normal": {
       "scale": {
-        "type": "double",
-        "default_value": "1.0"
+        "type": "double"
       },
       "texture": {
-        "type": "string",
-        "default_value": ""
+        "type": "string"
       }
     },
     "material": {
       "metallic": {
-        "type": "double",
-        "default_value": "0.0"
+        "type": "double"
       },
       "roughness": {
-        "type": "double",
-        "default_value": "0.3"
+        "type": "double"
       },
       "texture": {
-        "type": "string",
-        "default_value": ""
+        "type": "string"
       }
     },
     "scivis": {

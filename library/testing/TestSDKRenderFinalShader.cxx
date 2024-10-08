@@ -13,7 +13,7 @@ int TestSDKRenderFinalShader(int argc, char* argv[])
   win.setSize(300, 300);
 
   f3d::loader& load = eng.getLoader();
-  load.loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
+  load.add(std::string(argv[1]) + "/data/cow.vtp");
 
   win.render();
 
