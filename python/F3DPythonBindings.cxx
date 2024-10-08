@@ -241,7 +241,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("face_indices", &f3d::mesh_t::face_indices);
 
   // f3d::scene
-  py::class_<f3d::scene, std::unique_ptr<f3d::scene, py::nodelete>> scene(module, "scene");
+  py::class_<f3d::scene, std::unique_ptr<f3d::scene, py::nodelete>> scene(module, "Scene");
   scene //
     .def("supports", &f3d::scene::supports)
     .def("clear", &f3d::scene::clear)
