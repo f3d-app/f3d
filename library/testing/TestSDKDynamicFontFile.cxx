@@ -1,6 +1,6 @@
 #include <engine.h>
-#include <scene.h>
 #include <options.h>
+#include <scene.h>
 #include <window.h>
 
 #include "TestSDKHelpers.h"

@@ -1,8 +1,8 @@
 #include <engine.h>
 #include <export.h>
-#include <scene.h>
 #include <log.h>
 #include <options.h>
+#include <scene.h>
 #include <window.h>
 
 #include "TestSDKHelpers.h"

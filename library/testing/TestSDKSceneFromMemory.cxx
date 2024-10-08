@@ -2,8 +2,8 @@
 #include "TestSDKHelpers.h"
 
 #include <engine.h>
-#include <scene.h>
 #include <log.h>
+#include <scene.h>
 #include <window.h>
 
 #include <iostream>

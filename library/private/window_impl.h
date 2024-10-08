@@ -78,9 +78,8 @@ public:
    * Implementation only API.
    * Use all the rendering related options to update the configuration of the window
    * and the rendering stack below.
-   * This is called automatically when calling scene::add and window::render but can also be called manually
-   * when needed.
-   * Return true on success, false otherwise.
+   * This is called automatically when calling scene::add and window::render but can also be called
+   * manually when needed. Return true on success, false otherwise.
    */
   void UpdateDynamicOptions();
 

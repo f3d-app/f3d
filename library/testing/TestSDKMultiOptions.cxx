@@ -1,7 +1,7 @@
 #include <engine.h>
 #include <interactor.h>
-#include <scene.h>
 #include <log.h>
+#include <scene.h>
 #include <window.h>
 
 #include "TestSDKHelpers.h"
