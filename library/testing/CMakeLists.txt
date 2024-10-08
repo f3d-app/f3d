@@ -12,8 +12,8 @@ list(APPEND libf3dSDKTests_list
      TestSDKImage.cxx
      TestSDKInteractorCallBack.cxx
      TestSDKInteractorDropFullScene.cxx
-     TestSDKLoadFromMemory.cxx
-     TestSDKLoader.cxx
+     TestSDKSceneFromMemory.cxx
+     TestSDKScene.cxx
      TestSDKLog.cxx
      TestSDKMultiColoring.cxx
      TestSDKMultiOptions.cxx
@@ -32,11 +32,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
     )
 endif()
 
-# Invalid loader codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287
-# Merge with TestSDKLoader.cxx when VTK 9.4.0 is required.
+# Invalid scene codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287
+# Merge with TestSDKScene.cxx when VTK 9.4.0 is required.
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   list(APPEND libf3dSDKTests_list
-    TestSDKLoaderInvalid.cxx
+    TestSDKSceneInvalid.cxx
     )
 endif()
 
@@ -89,7 +89,7 @@ list(APPEND libf3dSDKTestsNoRender_list
      TestSDKOptions
      TestSDKOptionsIO
      TestSDKLog
-     TestSDKLoader)
+     TestSDKScene)
 
 # Add all the ADD_TEST for each test
 foreach (test ${libf3dSDKTests_list})

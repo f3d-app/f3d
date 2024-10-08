@@ -13,7 +13,7 @@ endif()
 
 list(APPEND pyf3dTests_list
      test_image_compare.py
-     test_loader.py
+     test_scene.py
     )
 
 list(APPEND pyf3dTestsNoRender_list

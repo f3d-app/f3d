@@ -124,14 +124,10 @@
         const openFile = (name) => {
           document.getElementById('file-name').innerHTML = name;
           const filePath = '/' + name;
-          const loader = Module.engineInstance.getLoader();
-          if (loader.hasSceneReader(filePath))
+          const scene = Module.engineInstance.getScene();
+          if (scene.supports(filePath))
           {
-            loader.loadScene(filePath);
-          }
-          else if (loader.hasGeometryReader(filePath))
-          {
-            loader.loadGeometry(filePath);
+            scene.add(filePath);
           }
           else
           {

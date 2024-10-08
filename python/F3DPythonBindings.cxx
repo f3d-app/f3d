@@ -1,14 +1,15 @@
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl/filesystem.h>
 
 #include "camera.h"
 #include "engine.h"
 #include "image.h"
 #include "interactor.h"
-#include "loader.h"
 #include "log.h"
 #include "options.h"
+#include "scene.h"
 #include "types.h"
 #include "utils.h"
 #include "window.h"
@@ -239,16 +240,19 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("face_sides", &f3d::mesh_t::face_sides)
     .def_readwrite("face_indices", &f3d::mesh_t::face_indices);
 
-  // f3d::loader
-  py::class_<f3d::loader, std::unique_ptr<f3d::loader, py::nodelete>> loader(module, "Loader");
-  loader //
-    .def("has_geometry_reader", &f3d::loader::hasGeometryReader)
-    .def("load_geometry", py::overload_cast<const std::string&, bool>(&f3d::loader::loadGeometry),
-      "load geometry to a default scene", py::arg("file_path"), py::arg("reset") = false)
-    .def("has_scene_reader", &f3d::loader::hasSceneReader)
-    .def("load_scene", &f3d::loader::loadScene, "Load a specific full scene file")
-    .def("load_geometry", py::overload_cast<const f3d::mesh_t&, bool>(&f3d::loader::loadGeometry),
-      "Load a surfacic mesh from memory", py::arg("mesh"), py::arg("reset") = false);
+  // f3d::scene
+  py::class_<f3d::scene, std::unique_ptr<f3d::scene, py::nodelete>> scene(module, "Scene");
+  scene //
+    .def("supports", &f3d::scene::supports)
+    .def("clear", &f3d::scene::clear)
+    .def("add", py::overload_cast<const std::filesystem::path&>(&f3d::scene::add),
+      "Add a file the scene", py::arg("file_path"))
+    .def("add", py::overload_cast<const std::vector<std::filesystem::path>&>(&f3d::scene::add),
+      "Add multiple filepaths to the scene", py::arg("file_path_vector"))
+    .def("add", py::overload_cast<const std::vector<std::string>&>(&f3d::scene::add),
+      "Add multiple filenames to the scene", py::arg("file_name_vector"))
+    .def("add", py::overload_cast<const f3d::mesh_t&>(&f3d::scene::add),
+      "Add a surfacic mesh from memory into the scene", py::arg("mesh"));
 
   // f3d::camera
   py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete>> camera(module, "Camera");
@@ -331,7 +335,7 @@ PYBIND11_MODULE(pyf3d, module)
       py::overload_cast<const f3d::options&>(&f3d::engine::setOptions),
       py::return_value_policy::reference)
     .def_property_readonly("window", &f3d::engine::getWindow, py::return_value_policy::reference)
-    .def_property_readonly("loader", &f3d::engine::getLoader, py::return_value_policy::reference)
+    .def_property_readonly("scene", &f3d::engine::getScene, py::return_value_policy::reference)
     .def_property_readonly(
       "interactor", &f3d::engine::getInteractor, py::return_value_policy::reference)
     .def_static("load_plugin", &f3d::engine::loadPlugin, "Load a plugin")

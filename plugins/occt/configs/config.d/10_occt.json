@@ -1,6 +1,7 @@
 {
   ".*(step|stp|iges|igs|brep|xbf)":
   {
+    "scalar-coloring": true,
     "load-plugins": "occt",
     "up": "+Z",
     "ambient-occlusion": true,

@@ -77,8 +77,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
     { { "verbose", "", "Set verbose level, providing more information about the loaded data in the console output", "{debug, info, warning, error, quiet}", "debug" },
       { "progress", "", "Show loading progress bar", "<bool>", "1" },
       { "animation-progress", "", "Show animation progress bar", "<bool>", "1" },
-      { "geometry-only", "", "Do not read materials, cameras and lights from file", "<bool>", "1" },
-      { "group-geometries", "", "When opening multiple files, show them all in the same scene. Force geometry-only. The configuration file for the first file will be loaded.", "<bool>", "1" },
+      { "multi-file-mode", "", R"(Choose the behavior when opening multiple files. "single" will show one file at a time, "all" will show all files in a single scene.)", "<single|all>", "" },
       { "up", "", "Up direction", "{-X, +X, -Y, +Y, -Z, +Z}", "" },
       { "axis", "x", "Show axes", "<bool>", "1" }, { "grid", "g", "Show grid", "<bool>", "1" },
       { "grid-absolute", "", "Position grid at the absolute origin instead of below the model", "<bool>", "1" },
@@ -96,7 +95,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"animation-frame-rate", "", "Set animation frame rate when playing animation interactively", "<frame rate>", ""},
       {"font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""} } },
   { "Material",
-    { {"point-sprites", "o", "Show sphere sprites instead of geometry", "<bool>", "1" },
+    { {"point-sprites", "o", "Show sphere sprites instead of surfaces", "<bool>", "1" },
       {"point-sprites-type", "", "Point sprites type", "<sphere|gaussian>", ""},
       {"point-sprites-size", "", "Point sprites size", "<size>", ""},
       {"point-size", "", "Point size when showing vertices, model specified by default", "<size>", ""},
@@ -492,36 +491,6 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     cxxOptions.show_positional_help();
     auto result = cxxOptions.parse(argc, argv);
 
-    // Check for unknown options and log them
-    auto unmatched = result.unmatched();
-    bool foundUnknownOption = false;
-    for (const std::string& unknownOption : unmatched)
-    {
-      f3d::log::error("Unknown option '", unknownOption, "'");
-      foundUnknownOption = true;
-
-      // check if it's a long option
-      if (unknownOption.substr(0, 2) == "--")
-      {
-        const size_t equalPos = unknownOption.find('=');
-
-        // remove "--" and everything after the first "=" (if any)
-        const std::string unknownName =
-          unknownOption.substr(2, equalPos != std::string::npos ? equalPos - 2 : equalPos);
-
-        auto [closestName, dist] = F3DOptionsTools::GetClosestOption(unknownName);
-        const std::string closestOption =
-          equalPos == std::string::npos ? closestName : closestName + unknownOption.substr(equalPos);
-
-        f3d::log::error("Did you mean '--", closestOption, "'?");
-      }
-    }
-    if (foundUnknownOption)
-    {
-      f3d::log::waitForUser();
-      throw F3DExFailure("unknown options");
-    }
-
     // Check boolean options and log them if any
     if (result.count("help") > 0)
     {
@@ -550,6 +519,36 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       F3DPluginsTools::LoadPlugins(plugins);
       ::PrintReadersList();
       throw F3DExNoProcess("reader list requested");
+    }
+
+    // Check for unknown options and log them
+    auto unmatched = result.unmatched();
+    bool foundUnknownOption = false;
+    for (const std::string& unknownOption : unmatched)
+    {
+      f3d::log::error("Unknown option '", unknownOption, "'");
+      foundUnknownOption = true;
+
+      // check if it's a long option
+      if (unknownOption.substr(0, 2) == "--")
+      {
+        const size_t equalPos = unknownOption.find('=');
+
+        // remove "--" and everything after the first "=" (if any)
+        const std::string unknownName =
+          unknownOption.substr(2, equalPos != std::string::npos ? equalPos - 2 : equalPos);
+
+        auto [closestName, dist] = F3DOptionsTools::GetClosestOption(unknownName);
+        const std::string closestOption =
+          equalPos == std::string::npos ? closestName : closestName + unknownOption.substr(equalPos);
+
+        f3d::log::error("Did you mean '--", closestOption, "'?");
+      }
+    }
+    if (foundUnknownOption)
+    {
+      f3d::log::waitForUser();
+      throw F3DExFailure("unknown options");
     }
 
     // Add each CLI options into a vector of string/string and return it

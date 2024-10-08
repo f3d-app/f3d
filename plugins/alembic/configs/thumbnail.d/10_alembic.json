@@ -1,6 +1,7 @@
 {
   ".*(abc)":
   {
+    "scalar-coloring": true,
     "load-plugins": "alembic"
   }
 }

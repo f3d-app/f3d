@@ -4,9 +4,9 @@
 #include <f3d/export.h>
 #include <f3d/image.h>
 #include <f3d/interactor.h>
-#include <f3d/loader.h>
 #include <f3d/log.h>
 #include <f3d/options.h>
+#include <f3d/scene.h>
 #include <f3d/types.h>
 #include <f3d/window.h>
 

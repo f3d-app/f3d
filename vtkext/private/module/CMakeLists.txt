@@ -40,6 +40,7 @@ set(classes
   vtkF3DInteractorEventRecorder
   vtkF3DInteractorStyle
   vtkF3DMemoryMesh
+  vtkF3DMetaImporter
   vtkF3DNoRenderWindow
   vtkF3DObjectFactory
   vtkF3DOpenGLGridMapper

@@ -21,7 +21,7 @@ class options;
 
 namespace detail
 {
-class loader_impl;
+class scene_impl;
 class window_impl;
 class animationManager;
 
@@ -32,7 +32,7 @@ public:
   /**
    * Documented public API
    */
-  interactor_impl(options& options, window_impl& window, loader_impl& loader);
+  interactor_impl(options& options, window_impl& window, scene_impl& scene);
   ~interactor_impl() override;
 
   interactor& setKeyPressCallBack(std::function<bool(int, std::string)> callBack) override;
@@ -71,7 +71,7 @@ public:
   /**
    * Implementation only API.
    * Initialize the animation manager using interactor objects.
-   * This is called by the loader after loading a file.
+   * This is called by the scene after add a file.
    */
   void InitializeAnimation(vtkImporter* importer);
 

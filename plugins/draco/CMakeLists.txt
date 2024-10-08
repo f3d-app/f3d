@@ -32,10 +32,8 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     SCORE 90
     EXTENSIONS gltf glb
     MIMETYPES model/gltf-binary model/gltf+json
-    VTK_READER vtkF3DGLTFReader
     VTK_IMPORTER vtkF3DGLTFImporter
     FORMAT_DESCRIPTION "GL Transmission Format"
-    CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/gltf.inl"
   )
 endif()
 

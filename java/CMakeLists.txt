@@ -11,8 +11,8 @@ endif()
 set(F3D_JAVA_SOURCES
   Camera.java
   Engine.java
-  Loader.java
   Options.java
+  Scene.java
   Window.java)
 
 # Generate JNI headers, and builds a JAR package

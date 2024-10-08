@@ -72,8 +72,8 @@ Other hotkeys are available:
 * <kbd>Space</kbd>: play the animation if any.
 * <kbd>&larr;</kbd>: load the previous file if any and reset the camera.
 * <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
-* <kbd>&uarr;</kbd>: reload the current file.
-* <kbd>&darr;</kbd>: add current file parent directory to the list of files, reload the current file and reset the camera.
+* <kbd>&uarr;</kbd>: reload the currently loaded files.
+* <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera.
 * <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
 * <kbd>F11</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
 
@@ -81,7 +81,7 @@ When loading another file or reloading, options that have been changed interacti
 
 ## Cycling Coloring
 
-When using the default scene, the following hotkeys let you cycle the coloring of the data:
+The following hotkeys let you cycle the coloring of the data:
 
 * <kbd>C</kbd>: cycle between point data and cell data - field data is not supported.
 * <kbd>S</kbd>: cycle the array available on the currently selected data in alphabetical order,

@@ -177,6 +177,9 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->CheatSheetActor->VisibilityOff();
   this->DropZoneActor->VisibilityOff();
   this->SkyboxActor->VisibilityOff();
+
+  // Make sure an active camera is available on the renderer
+  this->GetActiveCamera();
 }
 
 //----------------------------------------------------------------------------
@@ -194,7 +197,7 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::Initialize(const std::string& up)
+void vtkF3DRenderer::Initialize()
 {
   this->OriginalLightIntensities.clear();
   this->RemoveAllViewProps();
@@ -223,11 +226,14 @@ void vtkF3DRenderer::Initialize(const std::string& up)
 
   this->AnimationNameInfo = "";
   this->GridInfo = "";
+}
 
-  // Importer rely on the Environment being set, so this is needed in the initialization
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::InitializeUpVector(const std::string& upString)
+{
   const std::regex re("([-+]?)([XYZ])", std::regex_constants::icase);
   std::smatch match;
-  if (std::regex_match(up, match, re))
+  if (std::regex_match(upString, match, re))
   {
     const float sign = match[1].str() == "-" ? -1.0 : +1.0;
     const int index = std::toupper(match[2].str()[0]) - 'X';
@@ -245,6 +251,8 @@ void vtkF3DRenderer::Initialize(const std::string& up)
     vtkMath::Cross(this->UpVector, this->RightVector, pos);
     vtkMath::MultiplyScalar(pos, -1.0);
 
+    // XXX: Initialize the camera to a default position
+    // Note that camera reset is expected to be called later during importing
     vtkCamera* cam = this->GetActiveCamera();
     cam->SetFocalPoint(0.0, 0.0, 0.0);
     cam->SetPosition(pos);
@@ -262,7 +270,7 @@ void vtkF3DRenderer::Initialize(const std::string& up)
   }
   else
   {
-    F3DLog::Print(F3DLog::Severity::Warning, up + " is not a valid up direction");
+    F3DLog::Print(F3DLog::Severity::Warning, upString + " is not a valid up direction");
   }
 }
 
@@ -1383,6 +1391,7 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureActorsProperties()
 {
+  // XXX should be handled using new importer API once renderers are merged
   vtkActor* anActor;
   vtkActorCollection* ac = this->GetActors();
   vtkCollectionSimpleIterator ait;

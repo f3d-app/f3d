@@ -42,10 +42,8 @@ f3d_plugin_declare_reader(
   SCORE 80
   EXTENSIONS gltf glb
   MIMETYPES model/gltf-binary model/gltf+json
-  VTK_READER vtkGLTFReader
   VTK_IMPORTER vtkGLTFImporter
   FORMAT_DESCRIPTION "GL Transmission Format"
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/gltf.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -68,7 +66,6 @@ f3d_plugin_declare_reader(
   NAME OBJ
   EXTENSIONS obj
   MIMETYPES model/obj
-  VTK_READER vtkOBJReader
   VTK_IMPORTER vtkOBJImporter
   FORMAT_DESCRIPTION "Wavefront OBJ"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/obj.inl"

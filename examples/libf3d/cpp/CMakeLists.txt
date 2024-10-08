@@ -5,7 +5,7 @@ if(BUILD_TESTING)
 endif()
 
 add_subdirectory(check-engine)
-add_subdirectory(multi-geom)
+add_subdirectory(multi-files)
 add_subdirectory(render-image)
 add_subdirectory(render-interact)
 add_subdirectory(use-options-string)

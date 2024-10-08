@@ -1,6 +1,7 @@
 {
   ".*(drc)":
   {
+    "scalar-coloring": true,
     "load-plugins": "draco"
   }
 }

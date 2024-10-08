@@ -2,8 +2,8 @@
 
 #include "engine.h"
 #include "interactor.h"
-#include "loader.h"
 #include "options.h"
+#include "scene.h"
 #include "window.h"
 
 namespace emscripten
@@ -11,7 +11,7 @@ namespace emscripten
 namespace internal
 {
 template<>
-void raw_destructor<f3d::loader>(f3d::loader* ptr)
+void raw_destructor<f3d::scene>(f3d::scene* ptr)
 {
 }
 
@@ -53,25 +53,21 @@ f3d::options* set_color(f3d::options& o, const std::string& name, double r, doub
   return &o.set(name, std::vector{ r, g, b });
 }
 
-f3d::loader* getLoaderPtr(f3d::engine& e)
+f3d::scene* getScenePtr(f3d::engine& e)
 {
-  return &e.getLoader();
+  return &e.getScene();
 }
-f3d::loader* loadGeometry(f3d::loader& l, const std::string& p)
+f3d::scene* add(f3d::scene& l, const std::string& p)
 {
-  return &l.loadGeometry(p, true);
+  return &l.add(p);
 }
-f3d::loader* loadScene(f3d::loader& l, const std::string& p)
+bool supports(f3d::scene& l, const std::string& p)
 {
-  return &l.loadScene(p);
+  return l.supports(p);
 }
-bool hasGeometryReader(f3d::loader& l, const std::string& p)
+f3d::scene* clear(f3d::scene& l)
 {
-  return l.hasGeometryReader(p);
-}
-bool hasSceneReader(f3d::loader& l, const std::string& p)
-{
-  return l.hasSceneReader(p);
+  return &l.clear();
 }
 
 f3d::window* getWindowPtr(f3d::engine& e)
@@ -102,12 +98,11 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("set_integer", &set_integer, emscripten::allow_raw_pointers())
     .function("set_color", &set_color, emscripten::allow_raw_pointers());
 
-  // f3d::loader
-  emscripten::class_<f3d::loader>("Loader")
-    .function("loadGeometry", &loadGeometry, emscripten::allow_raw_pointers())
-    .function("loadScene", &loadScene, emscripten::allow_raw_pointers())
-    .function("hasGeometryReader", &hasGeometryReader, emscripten::allow_raw_pointers())
-    .function("hasSceneReader", &hasSceneReader, emscripten::allow_raw_pointers());
+  // f3d::scene
+  emscripten::class_<f3d::scene>("Scene")
+    .function("supported", &supported, emscripten::allow_raw_pointers())
+    .function("add", &add, emscripten::allow_raw_pointers())
+    .function("clear", &clear, emscripten::allow_raw_pointers());
 
   // f3d::window
   emscripten::class_<f3d::window>("Window")
@@ -122,7 +117,7 @@ EMSCRIPTEN_BINDINGS(f3d)
   emscripten::class_<f3d::engine> engine("Engine");
 
   engine.constructor<>()
-    .function("getLoader", &getLoaderPtr, emscripten::allow_raw_pointers())
+    .function("getScene", &getScenePtr, emscripten::allow_raw_pointers())
     .function("getWindow", &getWindowPtr, emscripten::allow_raw_pointers())
     .function("getInteractor", &getInteractorPtr, emscripten::allow_raw_pointers())
     .function("getOptions", &getOptionsPtr, emscripten::allow_raw_pointers())

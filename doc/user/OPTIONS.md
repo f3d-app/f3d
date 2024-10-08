@@ -30,8 +30,7 @@ Options|Default|Description
 \-\-verbose=\<[debug\|info\|warning\|error\|quiet]\>|info| Set *verbose* level, in order to provide more information about the loaded data in the console output. If no level is provided, assume `debug`. Option parsing may ignore this flag.
 \-\-progress||Show a *progress bar* when loading the file.
 \-\-animation-progress||Show a *progress bar* when playing the animation.
-\-\-geometry-only||For certain **full scene** file formats (gltf/glb and obj),<br>reads *only the geometry* from the file and use default scene construction instead.
-\-\-group-geometries||When opening multiple files, show them all in the same scene.<br>Force geometry-only. The configuration file for the first file will be loaded.
+\-\-multi-file-mode=\<single|all\>||When opening multiple files, select if they should be grouped (`all`) or alone (`single`). Configuration files for all loaded files will be used in the order they are provided.
 \-\-up=\<[+\|-][X\|Y\|Z]\>|+Y|Define the Up direction.
 -x, \-\-axis||Show *axes* as a trihedron in the scene.
 -g, \-\-grid||Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.
@@ -58,17 +57,17 @@ Options|Default|Description
 \-\-point-size=\<size\>||Set the *size* of points when showing vertices. Model specified by default.
 \-\-line-width=\<size\>||Set the *width* of lines when showing edges. Model specified by default.
 \-\-backface-type=\<visible|hidden\>||Set the Backface type. Model specified by default.
-\-\-color=\<R,G,B\>|1.0, 1.0, 1.0| Set a *color* on the geometry. Multiplied with the base color texture when present. <br>Requires a default scene.
-\-\-opacity=\<opacity\>|1.0|Set *opacity* on the geometry. Multiplied with the base color texture when present. <br>Requires a default scene. Usually used with Depth Peeling option.
-\-\-roughness=\<roughness\>|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Requires a default scene.
-\-\-metallic=\<metallic\>|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Requires a default scene.
+\-\-color=\<R,G,B\>|1.0, 1.0, 1.0| Set a *color* on the geometry. Multiplied with the base color texture when present. <br>Model specified by default.
+\-\-opacity=\<opacity\>|1.0|Set *opacity* on the geometry. Multiplied with the base color texture when present. <br>Model specified by default. Usually used with Depth Peeling option.
+\-\-roughness=\<roughness\>|0.3|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Model specified by default.
+\-\-metallic=\<metallic\>|0.0|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Model specified by default.
 \-\-hdri-file=\<HDRI file\>||Set the *HDRI* image that can be used as ambient lighting and skybox.<br>Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp. <br> If not set, a default is provided.
 \-\-hdri-ambient||Light the scene using the *HDRI* image as ambient lighting.<br>The environment act as a light source and is reflected on the material.
-\-\-texture-matcap=\<texture file\>||Set the texture file to control the material capture of the object. All other model options for surfaces are ignored if this is set. Must be in linear color space.
-\-\-texture-base-color=\<texture file\>||Set the texture file to control the color of the object. Please note this will be multiplied with the color and opacity options. Must be in sRGB color space.
-\-\-texture-material=\<texture file\>||Set the texture file to control the occlusion, roughness and metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use \-\-roughness=1 \-\-metallic=1. Must be in linear color space.
-\-\-texture-emissive=\<texture file\>||Set the texture file to control the emitted light of the object. Please note this will be multiplied with the emissive factor.  Must be in sRGB color space.
-\-\-emissive-factor=\<R,G,B\>|1.0, 1.0, 1.0|Set the emissive factor. This value is multiplied with the emissive color when an emissive texture is present.
+\-\-texture-matcap=\<texture file\>||Set the texture file to control the material capture of the object. All other model options for surfaces are ignored if this is set. Must be in linear color space. <br>Model specified by default.
+\-\-texture-base-color=\<texture file\>||Set the texture file to control the color of the object. Please note this will be multiplied with the color and opacity options. Must be in sRGB color space. <br>Model specified by default.
+\-\-texture-material=\<texture file\>||Set the texture file to control the occlusion, roughness and metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use \-\-roughness=1 \-\-metallic=1. Must be in linear color space. <br>Model specified by default.
+\-\-texture-emissive=\<texture file\>||Set the texture file to control the emitted light of the object. Please note this will be multiplied with the emissive factor.  Must be in sRGB color space. <br>Model specified by default.
+\-\-emissive-factor=\<R,G,B\>|1.0, 1.0, 1.0|Set the emissive factor. This value is multiplied with the emissive color when an emissive texture is present. <br>Model specified by default.
 
 ## Window options
 
@@ -79,7 +78,7 @@ Options|Default|Description
 \-\-position=\<x,y\>||Set the *window position* (top left corner) , in pixels, starting from the top left of your screens.
 -z, \-\-fps||Display a *frame per second counter*.
 -n, \-\-filename||Display the *name of the file* on top of the window.
--m, \-\-metadata||Display the *metadata*.<br>Empty without a default scene.
+-m, \-\-metadata||Display the *metadata*.
 \-\-hdri-skybox||Show the HDRI as a skybox. Overrides \-\-bg-color and \-\-no-background.
 -u, \-\-blur-background||Blur background.<br>Useful with a HDRI skybox.
 \-\-blur-coc|20|Blur circle of confusion radius.
@@ -89,7 +88,7 @@ Options|Default|Description
 
 Options|Default|Description
 ------|------|------
--s, \-\-scalar-coloring||Enable scalar coloring if present in the file. If `--coloring-array` is not set, the first in alphabetical order will be picked if any are available. <br>Requires a default scene.
+-s, \-\-scalar-coloring||Enable scalar coloring if present in the file. If `--coloring-array` is not set, the first in alphabetical order will be picked if any are available.
 \-\-coloring-array=\<array_name\>||The coloring array name to use when coloring.<br>Use \-\-verbose to recover the usable array names.
 -y, \-\-comp=\<comp_index\>|-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. -1 means *magnitude*. -2 or the short option, -y, means *direct values*.<br>When using *direct values*, components are used as L, LA, RGB, RGBA values depending on the number of components.
 -c, \-\-cells||Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
@@ -173,3 +172,5 @@ The destination filename used by `--output` or to save screenshots can use the f
 
 For example the screenshot filename is configured as `{app}/{model}_{n}.png` by default, meaning that, assuming the model `hello.glb` is being viewed,
 consecutive screenshots are going to be saved as `F3D/hello_1.png`, `F3D/hello_2.png`, `F3D/hello_3.png`, ...
+
+Model related variables will be replaced by `no_file` if no file is loaded and `multi_file` if multiple files are loaded using the `multi-file-mode` option.

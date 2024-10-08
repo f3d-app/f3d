@@ -112,15 +112,6 @@ runs:
          mkdir install
          mkdir install/output
 
-    # There is a RPATH issue with VTK < 9.2.0
-    # This is a simple workaround for it
-    # See https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8210
-    - name: Set LD_LIBRARY_PATH ubuntu VTK
-      if: runner.os == 'Linux'
-      shell: bash
-      working-directory: ${{github.workspace}}/dependencies/
-      run: echo "LD_LIBRARY_PATH=$(pwd)/install/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-
     - name: Set PATH windows
       if: runner.os == 'Windows'
       shell: powershell

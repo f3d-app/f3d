@@ -7,7 +7,6 @@
     "max-size":100,
     "no-background": true,
     "verbose": "quiet",
-    "scalar-coloring": true,
     "tone-mapping": true,
     "translucency-support": true
   }

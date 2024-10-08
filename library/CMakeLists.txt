@@ -54,9 +54,9 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/interactor.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/interactor_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/levenshtein.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/loader_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/log.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/options.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/scene_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/types.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/utils.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl.cxx
@@ -73,8 +73,8 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/exception.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/interactor.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/loader.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/log.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/scene.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h

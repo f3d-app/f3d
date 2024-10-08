@@ -19,11 +19,11 @@ def test_compare_with_file():
     assert engine.window.width == 300
     assert engine.window.height == 300
 
-    engine.loader.load_geometry(dataset, True)
+    engine.scene.add(dataset)
 
     img = engine.window.render_to_image()
     img.save(output)
 
     error = 0.0
 
-    assert img.compare(f3d.Image(reference), 50, error)
+    assert img.compare(f3d.Image(reference), 0.05, error)
