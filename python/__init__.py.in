@@ -68,7 +68,7 @@ def deprecated_decorator(f, reason):
 def add_deprecation_warnings():
     for f3d_class in (
         Camera,
-        Loader,
+        Scene,
         Options,
         Interactor,
         Engine,

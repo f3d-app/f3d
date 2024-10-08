@@ -1,6 +1,6 @@
 #include <engine.h>
-#include <loader.h>
 #include <options.h>
+#include <scene.h>
 #include <window.h>
 
 #include "TestSDKHelpers.h"
@@ -12,8 +12,8 @@ int TestSDKRenderFinalShader(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   win.setSize(300, 300);
 
-  f3d::loader& load = eng.getLoader();
-  load.add(std::string(argv[1]) + "/data/cow.vtp");
+  f3d::scene& sce = eng.getScene();
+  sce.add(std::string(argv[1]) + "/data/cow.vtp");
 
   win.render();
 

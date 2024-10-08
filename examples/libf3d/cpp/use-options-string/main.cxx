@@ -27,8 +27,8 @@ int main(int argc, char** argv)
     .setAsString("render.line_width", "10")
     .setAsString("render.grid.enable", "1");
 
-  // Load a model
-  const f3d::loader& load = eng.getLoader().add(std::string(argv[1]));
+  // add a model
+  const f3d::scene& sce = eng.getScene().add(std::string(argv[1]));
 
   // Render
   f3d::window& win = eng.getWindow();

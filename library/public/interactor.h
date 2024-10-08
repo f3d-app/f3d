@@ -2,7 +2,6 @@
 #define f3d_interactor_h
 
 #include "export.h"
-#include "loader.h"
 #include "options.h"
 #include "window.h"
 

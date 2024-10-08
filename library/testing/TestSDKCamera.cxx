@@ -1,6 +1,5 @@
 #include <camera.h>
 #include <engine.h>
-#include <loader.h>
 #include <log.h>
 #include <window.h>
 

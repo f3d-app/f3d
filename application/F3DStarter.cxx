@@ -1077,7 +1077,7 @@ void F3DStarter::LoadFileGroup(
     dynamicOptionsDict, fs::path(), "dynamic options");
 
   // Recover file information
-  f3d::loader& loader = this->Internals->Engine->getLoader();
+  f3d::scene& scene = this->Internals->Engine->getScene();
   bool unsupported = false;
 
   std::vector<fs::path> localPaths;
@@ -1088,7 +1088,7 @@ void F3DStarter::LoadFileGroup(
 
     if (clear)
     {
-      loader.clear();
+      scene.clear();
       this->Internals->LoadedFiles.clear();
     }
 
@@ -1117,7 +1117,7 @@ void F3DStarter::LoadFileGroup(
         if (std::find(this->Internals->LoadedFiles.begin(), this->Internals->LoadedFiles.end(),
               tmpPath) == this->Internals->LoadedFiles.end())
         {
-          if (loader.supports(tmpPath))
+          if (scene.supports(tmpPath))
           {
             // Check the size of the file before loading it
             static constexpr int BYTES_IN_MIB = 1048576;
@@ -1143,7 +1143,7 @@ void F3DStarter::LoadFileGroup(
       if (!localPaths.empty())
       {
         // Add files to the scene
-        loader.add(localPaths);
+        scene.add(localPaths);
 
         // Update loaded files
         std::copy(
@@ -1151,7 +1151,7 @@ void F3DStarter::LoadFileGroup(
       }
     }
   }
-  catch (const f3d::loader::load_failure_exception& ex)
+  catch (const f3d::scene::load_failure_exception& ex)
   {
     f3d::log::error("Some of these files could not be loaded: ", ex.what());
     for (const fs::path& tmpPath : localPaths)

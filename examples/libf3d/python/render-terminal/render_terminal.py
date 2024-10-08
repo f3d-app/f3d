@@ -30,7 +30,7 @@ def main():
     # setup engine
     engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
     engine.options.update(options)
-    engine.loader.load_geometry(str(model_path))
+    engine.scene.add(str(model_path))
     engine.window.size = rows, cols * 2
 
     # fit view to loaded model and grab computed camera position

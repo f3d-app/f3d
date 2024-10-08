@@ -1,8 +1,8 @@
 package app.f3d.F3D;
 
-public class Loader {
+public class Scene {
 
-    public Loader(long nativeAddress) {
+    public Scene(long nativeAddress) {
         mNativeAddress = nativeAddress;
     }
 

@@ -1,5 +1,5 @@
-#ifndef f3d_loader_h
-#define f3d_loader_h
+#ifndef f3d_scene_h
+#define f3d_scene_h
 
 #include "exception.h"
 #include "export.h"
@@ -12,18 +12,16 @@
 namespace f3d
 {
 /**
- * @class   loader
- * @brief   Class to load files in F3D
+ * @class   scene
+ * @brief   Class to load files into
  *
- * A class to load files in F3D. The loader can load a full scene or multiple geometries into a
- * default scene. It also support checking if a scene or geometry reader is available for a given
- * file.
+ * The scene where files and meshes can be added and loaded into.
  *
  * Example usage:
  * \code{.cpp}
  *  std::string path = ...
  *  f3d::engine eng(f3d::window::Type::NATIVE);
- *  f3d::loader& load = eng.getLoader();
+ *  f3d::scene& load = eng.getScene();
  *
  *  if (load.supports(path)
  *  {
@@ -32,11 +30,11 @@ namespace f3d
  * \endcode
  *
  */
-class F3D_EXPORT loader
+class F3D_EXPORT scene
 {
 public:
   /**
-   * An exception that can be thrown by the loader
+   * An exception that can be thrown by the scene
    * when it failed to load a file for some reason.
    */
   struct load_failure_exception : public exception
@@ -50,25 +48,25 @@ public:
    * Add and load provided files into the scene
    * Already added file will NOT be reloaded
    */
-  virtual loader& add(const std::filesystem::path& filePath) = 0;
-  virtual loader& add(const std::vector<std::filesystem::path>& filePath) = 0;
-  virtual loader& add(const std::vector<std::string>& filePathStrings) = 0;
+  virtual scene& add(const std::filesystem::path& filePath) = 0;
+  virtual scene& add(const std::vector<std::filesystem::path>& filePath) = 0;
+  virtual scene& add(const std::vector<std::string>& filePathStrings) = 0;
   ///@}
 
   /**
    * Add and load provided mesh into the scene
    */
-  virtual loader& add(const mesh_t& mesh) = 0;
+  virtual scene& add(const mesh_t& mesh) = 0;
 
   ///@{
   /**
    * Convenience initializer list signature for add method
    */
-  loader& add(std::initializer_list<std::string> list)
+  scene& add(std::initializer_list<std::string> list)
   {
     return this->add(std::vector<std::string>(list));
   }
-  loader& add(std::initializer_list<std::filesystem::path> list)
+  scene& add(std::initializer_list<std::filesystem::path> list)
   {
     return this->add(std::vector<std::filesystem::path>(list));
   }
@@ -77,7 +75,7 @@ public:
   /**
    * Clear the scene of all added files
    */
-  virtual loader& clear() = 0;
+  virtual scene& clear() = 0;
 
   /**
    * Return true if provided file path is supported, false otherwise.
@@ -86,12 +84,12 @@ public:
 
 protected:
   //! @cond
-  loader() = default;
-  virtual ~loader() = default;
-  loader(const loader& opt) = delete;
-  loader(loader&& opt) = delete;
-  loader& operator=(const loader& opt) = delete;
-  loader& operator=(loader&& opt) = delete;
+  scene() = default;
+  virtual ~scene() = default;
+  scene(const scene& opt) = delete;
+  scene(scene&& opt) = delete;
+  scene& operator=(const scene& opt) = delete;
+  scene& operator=(scene&& opt) = delete;
   //! @endcond
 };
 }
