@@ -1,6 +1,5 @@
 #include <engine.h>
 #include <interactor.h>
-#include <loader.h>
 #include <window.h>
 
 #include <iostream>

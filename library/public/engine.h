@@ -4,8 +4,8 @@
 #include "exception.h"
 #include "export.h"
 #include "interactor.h"
-#include "loader.h"
 #include "options.h"
+#include "scene.h"
 #include "window.h"
 
 #include <map>
@@ -26,8 +26,8 @@ namespace f3d
  *
  * \code{.cpp}
  *  f3d::engine eng();
- *  f3d::loader& load = eng.getLoader();
- *  load.add({"path/to/file", "path/to/another/file"});
+ *  f3d::scene& sce = eng.getscene();
+ *  sce.add({"path/to/file", "path/to/another/file"});
  *  f3d::interactor& inter = eng.getInteractor();
  *  inter.start();
  * \endcode
@@ -90,7 +90,7 @@ public:
   /**
    * Get the loaded provided by the engine.
    */
-  loader& getLoader();
+  scene& getScene();
 
   /**
    * Get the interactor provided by the engine, if any.

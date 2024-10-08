@@ -21,8 +21,8 @@ int main(int argc, char** argv)
     // Create a offscreen window engine
     f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
 
-    // Load a model
-    eng.getLoader().add(std::string(argv[1]));
+    // add a model
+    eng.getScene().add(std::string(argv[1]));
 
     // Set the window size and render to an image
     f3d::image img = eng.getWindow().setSize(300, 300).renderToImage();

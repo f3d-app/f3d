@@ -1,6 +1,6 @@
 #include <engine.h>
-#include <loader.h>
 #include <options.h>
+#include <scene.h>
 #include <window.h>
 
 #include "TestSDKHelpers.h"
@@ -8,12 +8,12 @@
 int TestSDKDynamicLightIntensity(int argc, char* argv[])
 {
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
-  f3d::loader& load = eng.getLoader();
+  f3d::scene& Scene = eng.getScene();
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
 
-  load.add(std::string(argv[1]) + "/data/cow.vtp");
+  Scene.add(std::string(argv[1]) + "/data/cow.vtp");
 
   win.render();
 

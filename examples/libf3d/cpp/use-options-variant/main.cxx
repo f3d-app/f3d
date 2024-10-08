@@ -25,8 +25,8 @@ int main(int argc, char** argv)
   f3d::options& opt = eng.getOptions();
   opt.set("render.show_edges", true).set("render.line_width", 10.0).set("render.grid.enable", true);
 
-  // Load a model
-  const f3d::loader& load = eng.getLoader().add(std::string(argv[1]));
+  // ad a model
+  const f3d::scene& sce = eng.getScene().add(std::string(argv[1]));
 
   // Render
   f3d::window& win = eng.getWindow();

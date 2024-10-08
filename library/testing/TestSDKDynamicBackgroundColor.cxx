@@ -1,6 +1,6 @@
 #include <engine.h>
-#include <loader.h>
 #include <options.h>
+#include <scene.h>
 #include <window.h>
 
 #include "TestSDKHelpers.h"
@@ -8,14 +8,14 @@
 int TestSDKDynamicBackgroundColor(int argc, char* argv[])
 {
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
-  f3d::loader& load = eng.getLoader();
+  f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
   opt.ui.filename = true;
   opt.ui.filename_info = "(1/1) cow.vtp";
 
-  load.add(std::string(argv[1]) + "/data/cow.vtp");
+  sce.add(std::string(argv[1]) + "/data/cow.vtp");
 
   win.render();
 

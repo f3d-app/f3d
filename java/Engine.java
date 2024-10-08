@@ -8,7 +8,7 @@ public class Engine implements AutoCloseable {
 
     public Engine() {
         mNativeAddress = construct(); // instantiate the native engine
-        mLoader = new Loader(mNativeAddress);
+        mScene = new Scene(mNativeAddress);
         mOptions = new Options(mNativeAddress);
         mWindow = new Window(mNativeAddress);
     }
@@ -26,14 +26,14 @@ public class Engine implements AutoCloseable {
     static public native void loadPlugin(String plugin);
     static public native void autoloadPlugins();
 
-    public Loader getLoader() { return mLoader; }
+    public Scene getScene() { return mScene; }
     public Options getOptions() { return mOptions; }
     public Window getWindow() { return mWindow; }
 
     private native long construct();
     private native void destroy(long nativeAddress);
 
-    private Loader mLoader;
+    private Scene mScene;
     private Options mOptions;
     private Window mWindow;
 

@@ -1,5 +1,5 @@
 #include <engine.h>
-#include <loader.h>
+#include <scene.h>
 #include <window.h>
 
 #include <QGuiApplication>
@@ -19,8 +19,8 @@ public:
     , mBaselinePath(std::move(baselinePath))
     , mOutputPath(std::move(outputPath))
   {
-    f3d::loader& load = mEngine.getLoader();
-    load.add(filePath);
+    f3d::scene& sce = mEngine.getScene();
+    sce.add(filePath);
   }
 
 protected:

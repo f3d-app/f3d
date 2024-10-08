@@ -20,8 +20,8 @@ int main(int argc, char** argv)
   // Create a native window engine
   f3d::engine eng(f3d::window::Type::NATIVE);
 
-  // Load a model
-  const f3d::loader& load = eng.getLoader().add(std::string(argv[1]));
+  // add a model
+  eng.getScene().add(std::string(argv[1]));
 
   // Render
   f3d::window& win = eng.getWindow();

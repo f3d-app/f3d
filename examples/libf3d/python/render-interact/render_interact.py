@@ -11,9 +11,9 @@ if __name__ == "__main__":
     # Create a native window engine
     eng = f3d.Engine(f3d.Window.NATIVE)
 
-    # Load a model
+    # Add a model
     try:
-        eng.loader.load_geometry(sys.argv[1])
+        eng.scene.add(sys.argv[1])
     except RuntimeError as e:
         print(e)
 

@@ -16,7 +16,7 @@ if __name__ == "__main__":
     files = [f for f in Path(sys.argv[1]).iterdir() if f.is_file()]
     for file in files:
         try:
-            eng.loader.load_geometry(str(file))
+            eng.scene.add(str(file))
         except RuntimeError as e:
             print(e)
 
