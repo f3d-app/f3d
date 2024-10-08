@@ -2,6 +2,7 @@
 #include <options.h>
 
 #include "PseudoUnitTest.h"
+#include "types.h"
 
 #include <iostream>
 
@@ -70,6 +71,9 @@ int TestSDKOptionsIO(int argc, char* argv[])
 
   test.parse<std::vector<std::string>>(
     "std::vector<std::string>", "  foo, bar ,   baz ", { "foo", "bar", "baz" });
+
+  test.parse<f3d::vector3_t>("vector3_t", "1, 2, 3", { 1, 2, 3 });
+  test.parse<f3d::vector3_t>("vector3_t", " 1,    2, 3  ", { 1, 2, 3 });
 
   return test.result();
 }

@@ -5,6 +5,7 @@
 #include "types.h"
 
 #include <algorithm>
+#include <cctype>
 #include <exception>
 #include <sstream>
 #include <vector>
@@ -190,12 +191,61 @@ ratio_t parse(const std::string& str)
 template<>
 vector3_t parse(const std::string& str)
 {
-  std::vector vec = parse<std::vector<double>>(str);
-  if (vec.size() != 3)
+  auto parseCommaSeparated = [](const std::string& str) -> vector3_t
   {
-    throw options::parsing_exception("cannot parse " + str + " to a vector3_t");
+    std::vector vec = parse<std::vector<double>>(str);
+    if (vec.size() != 3)
+    {
+      throw options::parsing_exception("cannot parse " + str + " to a vector3_t");
+    }
+    return { vec[0], vec[1], vec[2] };
+  };
+  auto parseYSyntax = [](const std::string& str) -> vector3_t
+  {
+    auto ss = trim(str);
+    if (ss.size() != 2)
+    {
+      throw options::parsing_exception("cannot parse " + str + " to a vector3_t");
+    }
+    int sign = +1;
+    if (ss[0] == '-')
+    {
+      sign = -1;
+    }
+    else if (ss[0] == '+')
+    {
+      sign = +1;
+    }
+    else
+    {
+      throw options::parsing_exception("cannot parse " + str + " to a vector3_t");
+    }
+    if (ss[1] == 'X')
+    {
+      return { double(sign) * 1, 0, 0 };
+    }
+    else if (ss[1] == 'Y')
+    {
+      return { 0, double(sign) * 1, 0 };
+    }
+    else if (ss[1] == 'Z')
+    {
+      return { 0, 0, double(sign) * 1 };
+    }
+    else
+    {
+      throw options::parsing_exception("cannot parse " + str + " to a vector3_t");
+    }
+  };
+  bool isCommaSeparated = std::find_if(str.begin(), str.end(), std::isalpha<char>) != str.end();
+  if (isCommaSeparated)
+  {
+    return parseCommaSeparated(str);
   }
-  return { vec[0], vec[1], vec[2] };
+  else
+  {
+    return parseYSyntax(str);
+  }
 }
 
 //----------------------------------------------------------------------------

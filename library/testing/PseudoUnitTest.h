@@ -1,6 +1,7 @@
 #ifndef PseudoUnitTest_h
 #define PseudoUnitTest_h
 
+#include "types.h"
 #include <functional>
 #include <iostream>
 #include <sstream>
@@ -122,6 +123,18 @@ private:
     std::stringstream ss;
     size_t i = 0;
     for (const T& item : value)
+    {
+      ss << (i++ ? ", " : "{ ") << this->toString(item);
+    }
+    ss << " }";
+    return ss.str();
+  }
+
+  std::string toString(const f3d::vector3_t& value)
+  {
+    std::stringstream ss;
+    size_t i = 0;
+    for (const double& item : value)
     {
       ss << (i++ ? ", " : "{ ") << this->toString(item);
     }

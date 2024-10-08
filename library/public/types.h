@@ -76,7 +76,7 @@ struct mesh_t
 /**
  * Describe a 3D vector.
  */
-struct vector3_t
+struct F3D_EXPORT vector3_t
 {
   vector3_t() = default;
   vector3_t(double x, double y, double z)
@@ -132,11 +132,19 @@ struct vector3_t
   {
     return Value;
   }
+  const double* begin() const
+  {
+    return Value;
+  }
   const double* cbegin() const
   {
     return Value;
   }
   double* end()
+  {
+    return Value + 3;
+  }
+  const double* end() const
   {
     return Value + 3;
   }
@@ -147,7 +155,9 @@ struct vector3_t
 
   static vector3_t fromSphericalCoordinates(double theta, double phi)
   {
-    return { std::sin(phi) * std::cos(theta), std::sin(phi) * std::cos(theta), std::cos(phi) };
+    auto sinPhi = std::sin(phi);
+    auto cosTheta = std::cos(theta);
+    return { sinPhi * cosTheta, sinPhi * cosTheta, std::cos(phi) };
   }
   static vector3_t x()
   {
