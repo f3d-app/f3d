@@ -1,7 +1,7 @@
 // Automatically generated headers
 #include <app_f3d_F3D_Camera.h>
 #include <app_f3d_F3D_Engine.h>
-#include <app_f3d_F3D_Loader.h>
+#include <app_f3d_F3D_Scene.h>
 #include <app_f3d_F3D_Options.h>
 #include <app_f3d_F3D_Window.h>
 
@@ -54,16 +54,16 @@ extern "C"
     delete reinterpret_cast<f3d::engine*>(ptr);
   }
 
-  // Loader
-  JNIEXPORT void JAVA_BIND(Loader, add)(JNIEnv* env, jobject self, jstring path)
+  // Scene
+  JNIEXPORT void JAVA_BIND(Scene, add)(JNIEnv* env, jobject self, jstring path)
   {
     const char* str = env->GetStringUTFChars(path, nullptr);
-    GetEngine(env, self)->getLoader().add(str);
+    GetEngine(env, self)->getScene().add(str);
     env->ReleaseStringUTFChars(path, str);
   }
-  JNIEXPORT void JAVA_BIND(Loader, clear)(JNIEnv* env, jobject self)
+  JNIEXPORT void JAVA_BIND(Scene, clear)(JNIEnv* env, jobject self)
   {
-    GetEngine(env, self)->getLoader().clear();
+    GetEngine(env, self)->getScene().clear();
   }
 
   // Window

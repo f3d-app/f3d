@@ -78,8 +78,8 @@ public:
    * Implementation only API.
    * Use all the rendering related options to update the configuration of the window
    * and the rendering stack below.
-   * This will be called automatically when calling loader::loadFile but can also be called manually
-   * when needed. This must be called, either manually or automatically, before any render call.
+   * This is called automatically when calling scene::add and window::render but can also be called manually
+   * when needed.
    * Return true on success, false otherwise.
    */
   void UpdateDynamicOptions();

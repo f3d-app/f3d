@@ -22,11 +22,11 @@ int main(int argc, char** argv)
   // Create a native window engine
   f3d::engine eng(f3d::window::Type::NATIVE);
 
-  // Load all files from provided directory as geometries
-  f3d::loader& load = eng.getLoader();
+  // Add all files from provided directory
+  f3d::scene& sce = eng.getScene();
   for (auto& entry : std::filesystem::directory_iterator(argv[1]))
   {
-    load.add(entry.path().string());
+    sce.add(entry.path().string());
   }
 
   // Render

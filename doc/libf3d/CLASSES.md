@@ -5,7 +5,7 @@ For the complete documentation, please consult the [libf3d doxygen documentation
 
 ## Engine class
 
-The engine class is the main class that needs to be instantiated. All other classes instance are provided by the engine using getters, `getLoader`, `getWindow`, `getInteractor`, `getOptions`.
+The engine class is the main class that needs to be instantiated. All other classes instance are provided by the engine using getters, `getScene`, `getWindow`, `getInteractor`, `getOptions`.
 
 The engine constructor lets you choose the type of window in its constructor, `NONE`, `NATIVE`, `NATIVE_OFFSCREEN`, `EXTERNAL`. Default is `NATIVE`. See [Window class](#window-class) documentation for more info. Please note that the engine will not provide a interactor with `NONE` and `EXTERNAL`.
 
@@ -13,10 +13,10 @@ A static function `loadPlugin` can also be called to load reader plugins. It mus
 If CMake option `F3D_PLUGINS_STATIC_BUILD` is enabled, the plugins listed above are also static just like `native` plugin.
 All static plugins can be loaded using `f3d::engine::autoloadPlugins()`.
 
-## Loader class
+## Scene class
 
-The loader class is responsible to `add` file from the disk into the scene. It supports reading multiple files at the same time and even mesh from memory.
-It is possible to `clear` the scene and to check if a file is `supported`.
+The scene class is responsible to `add` file from the disk into the scene. It supports reading multiple files at the same time and even mesh from memory.
+It is possible to `clear` the scene and to check if the scene `supports` a file.
 
 ## Window class
 

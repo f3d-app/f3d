@@ -3,8 +3,8 @@
 #include "config.h"
 #include "init.h"
 #include "interactor_impl.h"
-#include "loader_impl.h"
 #include "log.h"
+#include "scene_impl.h"
 #include "window_impl.h"
 
 #include "factory.h"
@@ -28,7 +28,7 @@ class engine::internals
 public:
   std::unique_ptr<options> Options;
   std::unique_ptr<detail::window_impl> Window;
-  std::unique_ptr<detail::loader_impl> Loader;
+  std::unique_ptr<detail::scene_impl> Scene;
   std::unique_ptr<detail::interactor_impl> Interactor;
 };
 
@@ -61,14 +61,14 @@ engine::engine(window::Type windowType)
     std::make_unique<detail::window_impl>(*this->Internals->Options, windowType);
   this->Internals->Window->SetCachePath(cachePath);
 
-  this->Internals->Loader =
-    std::make_unique<detail::loader_impl>(*this->Internals->Options, *this->Internals->Window);
+  this->Internals->Scene =
+    std::make_unique<detail::scene_impl>(*this->Internals->Options, *this->Internals->Window);
 
   // Do not create an interactor for NONE or EXTERNAL
   if (windowType != window::Type::NONE && windowType != window::Type::EXTERNAL)
   {
     this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
-      *this->Internals->Options, *this->Internals->Window, *this->Internals->Loader);
+      *this->Internals->Options, *this->Internals->Window, *this->Internals->Scene);
   }
 }
 
@@ -109,9 +109,9 @@ window& engine::getWindow()
 }
 
 //----------------------------------------------------------------------------
-loader& engine::getLoader()
+scene& engine::getScene()
 {
-  return *this->Internals->Loader;
+  return *this->Internals->Scene;
 }
 
 //----------------------------------------------------------------------------

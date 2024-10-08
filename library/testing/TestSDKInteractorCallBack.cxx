@@ -1,7 +1,7 @@
 #include <engine.h>
 #include <interactor.h>
-#include <loader.h>
 #include <options.h>
+#include <scene.h>
 #include <window.h>
 
 #include <iostream>
@@ -12,7 +12,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
 {
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
   f3d::options& options = eng.getOptions();
-  f3d::loader& load = eng.getLoader();
+  f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();
   win.setSize(300, 300);
@@ -49,7 +49,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.setDropFilesCallBack([&](std::vector<std::string> filesVec) -> bool {
     std::string path = filesVec[0];
     size_t found = path.find_last_of("/\\");
-    load.add(path.substr(0, found + 1) + "suzanne.ply");
+    sce.add(path.substr(0, found + 1) + "suzanne.ply");
     win.render();
     return true;
   });

@@ -1,7 +1,7 @@
 #include <engine.h>
 #include <interactor.h>
-#include <loader.h>
 #include <log.h>
+#include <scene.h>
 #include <window.h>
 
 #include "TestSDKHelpers.h"
@@ -12,7 +12,7 @@ int TestSDKMultiColoring(int argc, char* argv[])
 {
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
-  f3d::loader& load = eng.getLoader();
+  f3d::scene& sce = eng.getScene();
   f3d::options& opt = eng.getOptions();
 
   // Test file logic
@@ -24,7 +24,7 @@ int TestSDKMultiColoring(int argc, char* argv[])
   std::string right = std::string(argv[1]) + "data/" + rightFilename;
 
   // Multiple geometries
-  load.add(std::vector<std::string>{ cube, left, right });
+  sce.add(std::vector<std::string>{ cube, left, right });
 
   opt.model.scivis.array_name = "Normals";
 

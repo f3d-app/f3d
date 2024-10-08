@@ -7,16 +7,15 @@
 #ifndef F3DStarter_h
 #define F3DStarter_h
 
-#include "loader.h"
-
 #include <filesystem>
 #include <memory>
+#include <vector>
 
 class F3DStarter
 {
 public:
   /**
-   * Parse the options and configure a f3d::loader accordingly
+   * Parse the options and configure a f3d::scene accordingly
    */
   int Start(int argc, char** argv);
 

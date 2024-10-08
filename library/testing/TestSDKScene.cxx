@@ -3,7 +3,7 @@
 
 #include <engine.h>
 #include <interactor.h>
-#include <loader.h>
+#include <scene.h>
 #include <log.h>
 #include <window.h>
 
@@ -11,13 +11,13 @@
 
 namespace fs = std::filesystem;
 
-int TestSDKLoader(int argc, char* argv[])
+int TestSDKScene(int argc, char* argv[])
 {
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
-  f3d::loader& load = eng.getLoader();
+  f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow().setSize(300, 300);
 
   // Test file logic
@@ -40,31 +40,31 @@ int TestSDKLoader(int argc, char* argv[])
   std::string world = std::string(argv[1]) + "data/" + worldFilename;
 
   // supports method
-  test("supported with empty filename", !load.supports(empty));
-  test("supported with dummy filename", !load.supports(dummy));
-  test("supported with non existent filename", load.supports(nonExistent));
-  test("supported with default scene format", load.supports(cube));
-  test("supported with full scene format", load.supports(logo));
+  test("supported with empty filename", !sce.supports(empty));
+  test("supported with dummy filename", !sce.supports(dummy));
+  test("supported with non existent filename", sce.supports(nonExistent));
+  test("supported with default scene format", sce.supports(cube));
+  test("supported with full scene format", sce.supports(logo));
 
   // add error code paths
-  test.expect<f3d::loader::load_failure_exception>(
-    "add with dummy file", [&]() { load.add(dummy); });
-  test.expect<f3d::loader::load_failure_exception>(
-    "add with unsupported file", [&]() { load.add(unsupported); });
-  test.expect<f3d::loader::load_failure_exception>(
-    "add with inexistent file", [&]() { load.add(nonExistent); });
+  test.expect<f3d::scene::load_failure_exception>(
+    "add with dummy file", [&]() { sce.add(dummy); });
+  test.expect<f3d::scene::load_failure_exception>(
+    "add with unsupported file", [&]() { sce.add(unsupported); });
+  test.expect<f3d::scene::load_failure_exception>(
+    "add with inexistent file", [&]() { sce.add(nonExistent); });
 
   // add standard code paths
-  test("add with empty file", [&]() { load.add(std::vector<std::string>{}); });
-  test("add with empty file", [&]() { load.add(empty); });
-  test("add with a single path", [&]() { load.add(fs::path(logo)); });
-  test("add with multiples filepaths", [&]() { load.add({ fs::path(sphere2), fs::path(cube) }); });
-  test("add with multiples file strings", [&]() { load.add({ sphere1, world }); });
+  test("add with empty file", [&]() { sce.add(std::vector<std::string>{}); });
+  test("add with empty file", [&]() { sce.add(empty); });
+  test("add with a single path", [&]() { sce.add(fs::path(logo)); });
+  test("add with multiples filepaths", [&]() { sce.add({ fs::path(sphere2), fs::path(cube) }); });
+  test("add with multiples file strings", [&]() { sce.add({ sphere1, world }); });
 
   // render test
   test("render after add", [&]() {
     if (!TestSDKHelpers::RenderTest(
-          win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKLoader"))
+          win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKScene"))
     {
       throw "rendering test failed";
     }

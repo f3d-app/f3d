@@ -1,8 +1,8 @@
 #include "interactor_impl.h"
 
 #include "animationManager.h"
-#include "loader_impl.h"
 #include "log.h"
+#include "scene_impl.h"
 #include "window_impl.h"
 
 #include "vtkF3DConfigure.h"
@@ -35,10 +35,10 @@ namespace f3d::detail
 class interactor_impl::internals
 {
 public:
-  internals(options& options, window_impl& window, loader_impl& loader)
+  internals(options& options, window_impl& window, scene_impl& scene)
     : Options(options)
     , Window(window)
-    , Loader(loader)
+    , Scene(scene)
   {
 #ifdef __EMSCRIPTEN__
     vtkRenderWindowInteractor::InteractorManagesTheEventLoop = false;
@@ -400,7 +400,7 @@ public:
     {
       assert(self->AnimationManager);
       self->AnimationManager->StopAnimation();
-      self->Loader.add(filesVec);
+      self->Scene.add(filesVec);
       self->Window.render();
     }
   }
@@ -543,7 +543,7 @@ public:
 
   options& Options;
   window_impl& Window;
-  loader_impl& Loader;
+  scene_impl& Scene;
   animationManager* AnimationManager;
 
   vtkNew<vtkRenderWindowInteractor> VTKInteractor;
@@ -561,11 +561,11 @@ public:
 };
 
 //----------------------------------------------------------------------------
-interactor_impl::interactor_impl(options& options, window_impl& window, loader_impl& loader)
-  : Internals(std::make_unique<interactor_impl::internals>(options, window, loader))
+interactor_impl::interactor_impl(options& options, window_impl& window, scene_impl& scene)
+  : Internals(std::make_unique<interactor_impl::internals>(options, window, scene))
 {
-  // Loader need the interactor, loader will set the AnimationManager on the interactor
-  this->Internals->Loader.SetInteractor(this);
+  // scene need the interactor, scene will set the AnimationManager on the interactor
+  this->Internals->Scene.SetInteractor(this);
 }
 
 //----------------------------------------------------------------------------

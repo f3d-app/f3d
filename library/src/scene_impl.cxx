@@ -1,4 +1,4 @@
-#include "loader_impl.h"
+#include "scene_impl.h"
 
 #include "animationManager.h"
 #include "interactor_impl.h"
@@ -26,7 +26,7 @@ namespace fs = std::filesystem;
 
 namespace f3d::detail
 {
-class loader_impl::internals
+class scene_impl::internals
 {
 public:
   internals(const options& options, window_impl& window)
@@ -105,12 +105,12 @@ public:
     // Manage progress bar
     vtkNew<vtkProgressBarWidget> progressWidget;
     vtkNew<vtkTimerLog> timer;
-    loader_impl::internals::ProgressDataStruct callbackData;
+    scene_impl::internals::ProgressDataStruct callbackData;
     callbackData.timer = timer;
     callbackData.widget = progressWidget;
     if (this->Options.ui.loader_progress && this->Interactor)
     {
-      loader_impl::internals::CreateProgressRepresentationAndCallback(
+      scene_impl::internals::CreateProgressRepresentationAndCallback(
         &callbackData, this->MetaImporter, this->Interactor);
     }
 
@@ -118,7 +118,7 @@ public:
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     if (!this->MetaImporter->Update())
     {
-      throw loader::load_failure_exception("failed to load scene");
+      throw scene::load_failure_exception("failed to load scene");
     }
 #else
     this->MetaImporter->Update();
@@ -149,7 +149,7 @@ public:
     this->Window.setAnimationNameInfo(this->AnimationManager.GetAnimationName());
 
     // Display output description
-    loader_impl::internals::DisplayImporterDescription(this->MetaImporter);
+    scene_impl::internals::DisplayImporterDescription(this->MetaImporter);
 
     // Update all window options and reset camera to bounds if needed
     this->Window.UpdateDynamicOptions();
@@ -191,23 +191,23 @@ public:
 };
 
 //----------------------------------------------------------------------------
-loader_impl::loader_impl(const options& options, window_impl& window)
-  : Internals(std::make_unique<loader_impl::internals>(options, window))
+scene_impl::scene_impl(const options& options, window_impl& window)
+  : Internals(std::make_unique<scene_impl::internals>(options, window))
 {
 }
 
 //----------------------------------------------------------------------------
-loader_impl::~loader_impl() = default;
+scene_impl::~scene_impl() = default;
 
 //----------------------------------------------------------------------------
-loader& loader_impl::add(const fs::path& filePath)
+scene& scene_impl::add(const fs::path& filePath)
 {
   std::vector<fs::path> paths = { filePath };
   return this->add(paths);
 }
 
 //----------------------------------------------------------------------------
-loader& loader_impl::add(const std::vector<std::string>& filePathStrings)
+scene& scene_impl::add(const std::vector<std::string>& filePathStrings)
 {
   std::vector<fs::path> paths;
   paths.reserve(filePathStrings.size());
@@ -219,7 +219,7 @@ loader& loader_impl::add(const std::vector<std::string>& filePathStrings)
 }
 
 //----------------------------------------------------------------------------
-loader& loader_impl::add(const std::vector<fs::path>& filePaths)
+scene& scene_impl::add(const std::vector<fs::path>& filePaths)
 {
   if (filePaths.empty())
   {
@@ -237,7 +237,7 @@ loader& loader_impl::add(const std::vector<fs::path>& filePaths)
     }
     if (!vtksys::SystemTools::FileExists(filePath.string(), true))
     {
-      throw loader::load_failure_exception(filePath.string() + " does not exists");
+      throw scene::load_failure_exception(filePath.string() + " does not exists");
     }
 
     // Recover the importer for the provided file path
@@ -249,7 +249,7 @@ loader& loader_impl::add(const std::vector<fs::path>& filePaths)
     }
     else
     {
-      throw loader::load_failure_exception(
+      throw scene::load_failure_exception(
         filePath.string() + " is not a file of a supported 3D scene file format");
     }
     vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
@@ -286,13 +286,13 @@ loader& loader_impl::add(const std::vector<fs::path>& filePaths)
 }
 
 //----------------------------------------------------------------------------
-loader& loader_impl::add(const mesh_t& mesh)
+scene& scene_impl::add(const mesh_t& mesh)
 {
   // sanity checks
   auto [valid, err] = mesh.isValid();
   if (!valid)
   {
-    throw loader::load_failure_exception(err);
+    throw scene::load_failure_exception(err);
   }
 
   vtkNew<vtkF3DMemoryMesh> vtkSource;
@@ -310,7 +310,7 @@ loader& loader_impl::add(const mesh_t& mesh)
 }
 
 //----------------------------------------------------------------------------
-loader& loader_impl::clear()
+scene& scene_impl::clear()
 {
   // Clear the meta importer from all importers
   this->Internals->MetaImporter->Clear();
@@ -322,13 +322,13 @@ loader& loader_impl::clear()
 }
 
 //----------------------------------------------------------------------------
-bool loader_impl::supports(const fs::path& filePath)
+bool scene_impl::supports(const fs::path& filePath)
 {
   return f3d::factory::instance()->getReader(filePath.string()) != nullptr;
 }
 
 //----------------------------------------------------------------------------
-void loader_impl::SetInteractor(interactor_impl* interactor)
+void scene_impl::SetInteractor(interactor_impl* interactor)
 {
   this->Internals->Interactor = interactor;
   this->Internals->AnimationManager.SetInteractor(interactor);

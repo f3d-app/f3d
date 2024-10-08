@@ -1,15 +1,15 @@
 #include <engine.h>
 #include <interactor.h>
-#include <loader.h>
+#include <scene.h>
 
 #include <iostream>
 
 int TestSDKAnimation(int argc, char* argv[])
 {
   f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
-  f3d::loader& load = eng.getLoader();
+  f3d::scene& sce = eng.getScene();
   f3d::interactor& inter = eng.getInteractor();
-  load.add(std::string(argv[1]) + "/data/InterpolationTest.glb");
+  sce.add(std::string(argv[1]) + "/data/InterpolationTest.glb");
 
   inter.startAnimation();
   if (!inter.isPlayingAnimation())
