@@ -395,19 +395,12 @@ public:
       return;
     }
 
-    // No user defined behavior, load the first file
+    // No user defined behavior, load all files
     if (!filesVec.empty())
     {
       assert(self->AnimationManager);
       self->AnimationManager->StopAnimation();
-      if (self->Loader.hasSceneReader(filesVec[0]))
-      {
-        self->Loader.loadScene(filesVec[0]);
-      }
-      else if (self->Loader.hasGeometryReader(filesVec[0]))
-      {
-        self->Loader.loadGeometry(filesVec[0], true);
-      }
+      self->Loader.add(filesVec);
       self->Window.render();
     }
   }

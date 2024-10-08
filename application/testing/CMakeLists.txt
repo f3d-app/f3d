@@ -1,7 +1,7 @@
 # F3D Testing
 function(f3d_test)
 
-	cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;DATA;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI" "DEPENDS;ARGS" ${ARGN})
+	cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI" "DATA;DEPENDS;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -10,7 +10,9 @@ function(f3d_test)
   endif()
 
   if (F3D_TEST_DATA)
-    list(APPEND F3D_TEST_ARGS "${F3D_SOURCE_DIR}/testing/data/${F3D_TEST_DATA}")
+    foreach(_single_data ${F3D_TEST_DATA})
+      list(APPEND F3D_TEST_ARGS "${F3D_SOURCE_DIR}/testing/data/${_single_data}")
+    endforeach()
   endif()
 
   if(F3D_TEST_INTERACTION)
@@ -117,7 +119,7 @@ function(f3d_test)
 endfunction()
 
 f3d_test(NAME TestPLY DATA suzanne.ply)
-f3d_test(NAME TestOBJ DATA suzanne.obj ARGS --geometry-only)
+f3d_test(NAME TestOBJ DATA world.obj)
 f3d_test(NAME TestSTL DATA suzanne.stl)
 f3d_test(NAME TestVTU DATA dragon.vtu)
 f3d_test(NAME TestVTP DATA cow.vtp)
@@ -150,7 +152,6 @@ f3d_test(NAME TestScalarsWithBar DATA suzanne.ply ARGS -b -s --coloring-array=No
 f3d_test(NAME TestGLTFImporter DATA f3d.glb)
 f3d_test(NAME TestGLTFImporterWithAnimation DATA BoxAnimated.gltf ARGS --animation-time=2 --animation-progress)
 f3d_test(NAME TestGLTFSkin DATA SimpleSkin.gltf)
-f3d_test(NAME TestGLTFReaderWithAnimation DATA BoxAnimated.gltf ARGS --geometry-only --animation-time=2 --animation-progress)
 f3d_test(NAME TestDicom DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1)
 f3d_test(NAME TestMHD DATA HeadMRVolume.mhd ARGS --scalar-coloring --roughness=1)
 f3d_test(NAME TestVTICell DATA waveletMaterial.vti ARGS -s --coloring-array=Material -c --roughness=1)
@@ -176,13 +177,14 @@ f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --comp=3 LONG_TIMEOUT)
 f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --comp=-2 LONG_TIMEOUT)
 f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --cells LONG_TIMEOUT)
 f3d_test(NAME TestVolumeNonScalars DATA waveletArrays.vti ARGS -vb -s --coloring-array=RandomPointScalars LONG_TIMEOUT)
-f3d_test(NAME TestTextureNormal DATA WaterBottle.glb ARGS --geometry-only --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --normal-scale=0.1)
-f3d_test(NAME TestTextureMaterial DATA WaterBottle.glb ARGS --geometry-only --texture-material=${F3D_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=1 --metallic=1)
-f3d_test(NAME TestTextureMaterialWithOptions DATA WaterBottle.glb ARGS --geometry-only --texture-material=${F3D_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=0.5 --metallic=0.5)
-f3d_test(NAME TestTextureEmissive DATA WaterBottle.glb ARGS --geometry-only --texture-emissive=${F3D_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1)
-f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --geometry-only --texture-material=${F3D_SOURCE_DIR}/testing/data/red.jpg --roughness=1 --metallic=1 --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo.png --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --texture-emissive=${F3D_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1)
+f3d_test(NAME TestTextureNormal DATA WaterBottle.glb ARGS --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --normal-scale=0.1)
+f3d_test(NAME TestTextureMaterial DATA WaterBottle.glb ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=1 --metallic=1)
+f3d_test(NAME TestTextureMaterialWithOptions DATA WaterBottle.glb ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=0.5 --metallic=0.5)
+f3d_test(NAME TestTextureEmissive DATA WaterBottle.glb ARGS --texture-emissive=${F3D_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1)
+f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/red.jpg --roughness=1 --metallic=1 --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo.png --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --texture-emissive=${F3D_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1)
 f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m)
 f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m)
+f3d_test(NAME TestMultiFileMetaData DATA mb/recursive ARGS -m --multi-file-mode=all)
 f3d_test(NAME TestTIFF DATA f3d.tif ARGS -sy --up=-Y)
 f3d_test(NAME TestLightIntensityBrighter DATA cow.vtp ARGS --light-intensity=5.0)
 f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2)
@@ -192,25 +194,29 @@ f3d_test(NAME TestUTF8 DATA "(ノಠ益ಠ )ノ.vtp")
 f3d_test(NAME TestFilenameCommasSpaces DATA "tetrahedron, with commas & spaces.stl")
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf)
 f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 --animation-progress)
+f3d_test(NAME TestMultiFileAnimationIndex DATA InterpolationTest.glb BoxAnimated.gltf ARGS --animation-index=9 --animation-time=0.85 --animation-progress --multi-file-mode=all)
 f3d_test(NAME TestAnimationAutoplay DATA InterpolationTest.glb ARGS --animation-autoplay)
 f3d_test(NAME TestMaxSizeBelow DATA suzanne.stl ARGS --max-size=1)
-f3d_test(NAME TestMaxSizeAbove DATA WaterBottle.glb ARGS --max-size=0.2 REGEXP "No file loaded, file is bigger than max size" NO_BASELINE)
-f3d_test(NAME TestAlternativeOptionSyntax DATA WaterBottle.glb ARGS --max-size 0.2 REGEXP "No file loaded, file is bigger than max size" NO_BASELINE)
+f3d_test(NAME TestMaxSizeAbove DATA WaterBottle.glb ARGS --max-size=0.2 REGEXP "file is bigger than max size" NO_BASELINE)
+f3d_test(NAME TestMaxSizeAboveMultiFile DATA suzanne.obj WaterBottle.glb ARGS --multi-file-mode=all --max-size=0.6 --translucency-support --opacity=0.5)
+f3d_test(NAME TestAlternativeOptionSyntax DATA WaterBottle.glb ARGS --max-size 0.2 REGEXP "file is bigger than max size" NO_BASELINE)
 f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_FAIL)
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
 f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalar-coloring --bar --comp=2)
 f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
 f3d_test(NAME TestNoRenderWithOptions DATA dragon.vtu ARGS --hdri-ambient --axis NO_RENDER) # These options causes issues if not handled correctly
 f3d_test(NAME TestNoFile NO_DATA_FORCE_RENDER)
-f3d_test(NAME TestGroupGeometries DATA mb/recursive ARGS --group-geometries)
-f3d_test(NAME TestGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries -s --coloring-array=Polynomial -b)
-f3d_test(NAME TestMultiInputPositionals ARGS ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --group-geometries -s --coloring-array=Polynomial -b)
-f3d_test(NAME TestMultiInputArg ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --group-geometries -s --coloring-array=Polynomial -b)
-f3d_test(NAME TestMultiInputMultiArgs ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --group-geometries -s --coloring-array=Polynomial -b)
+f3d_test(NAME TestMultiFile DATA mb/recursive ARGS --multi-file-mode=all)
+f3d_test(NAME TestMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all -s --coloring-array=Polynomial -b)
+f3d_test(NAME TestMultiFileVolume DATA multi ARGS --multi-file-mode=all -vsb --coloring-array=Scalars_)
+f3d_test(NAME TestMultiFileColoringTexture DATA mb/recursive/mb_1_0.vtp mb/recursive/mb_2_0.vtp world.obj ARGS --multi-file-mode=all -sb --coloring-array=Normals --comp=1)
+f3d_test(NAME TestMultiFilePositionals DATA mb/recursive/mb_0_0.vtu mb/recursive/mb_1_0.vtp ARGS --multi-file-mode=all -s --coloring-array=Polynomial -b)
+f3d_test(NAME TestMultiInputArg ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --multi-file-mode=all -s --coloring-array=Polynomial -b)
+f3d_test(NAME TestMultiInputMultiArgs ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --multi-file-mode=all -s --coloring-array=Polynomial -b)
 f3d_test(NAME TestInvalidUpDirection DATA suzanne.ply ARGS -g --up=W REGEXP "W is not a valid up direction" NO_BASELINE)
 f3d_test(NAME TestUpDirectionNoSign DATA suzanne.ply ARGS --up=X)
 f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
-f3d_test(NAME TestTextureMatCapWithTCoords DATA WaterBottle.glb ARGS --geometry-only --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
+f3d_test(NAME TestTextureMatCapWithTCoords DATA WaterBottle.glb ARGS --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
 f3d_test(NAME TestConfigOrder DATA suzanne.ply ARGS CONFIG ${F3D_SOURCE_DIR}/testing/configs/config_order.json) # `.+` > `.*` alphabetically but overridden by the order
 f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP "^.PNG" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
@@ -268,20 +274,20 @@ f3d_ss_test(NAME UserModelN TEMPLATE {model}_{n}.png EXPECTED ${_screenshot_user
 set_tests_properties(f3d::TestScreenshotUserModelN PROPERTIES ENVIRONMENT "XDG_PICTURES_DIR=${_screenshot_user_dir};HOME=${_screenshot_user_dir};USERPROFILE=${_screenshot_user_dir}")
 
 if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
-  f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --geometry-only --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --translucency-support)
+  f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --translucency-support)
 endif()
 
 # Needs SSBO: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231108)
   if(APPLE) # MacOS does not support OpenGL 4.3
-    f3d_test(NAME TestSkinningManyBonesFailure DATA tube_254bones.glb ARGS -v REGEXP "which requires OpenGL" NO_BASELINE)
+    f3d_test(NAME TestSkinningManyBonesFailure DATA tube_254bones.glb ARGS --verbose REGEXP "which requires OpenGL" NO_BASELINE)
   else()
     # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
     # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
     f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb)
   endif()
 else()
-  f3d_test(NAME TestSkinningManyBonesWarning DATA tube_254bones.glb ARGS -v REGEXP "with more than 250 bones \\\(254\\\)" NO_BASELINE)
+  f3d_test(NAME TestSkinningManyBonesWarning DATA tube_254bones.glb ARGS --verbose REGEXP "with more than 250 bones \\\(254\\\)" NO_BASELINE)
 endif()
 
 # Needs splat sorting with compute shaders
@@ -313,6 +319,8 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json)
   f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build)
   f3d_test(NAME TestConfigFileUpperCase DATA suzanne_upper.STL CONFIG complex_build)
+  f3d_test(NAME TestConfigFileMultiFileSTL DATA mb/recursive/mb_1_0.vtp suzanne.stl ARGS --multi-file-mode=all CONFIG complex_build)
+  f3d_test(NAME TestConfigFileMultiFileVTP DATA mb/recursive/mb_1_0.vtp suzanne.stl mb/recursive/mb_2_0.vtp ARGS --multi-file-mode=all CONFIG complex_build)
 
   file(COPY "${F3D_SOURCE_DIR}/resources/configs/config.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build LONG_TIMEOUT TONE_MAPPING)
@@ -332,12 +340,12 @@ endif()
 
 # color texture with opacity needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9467
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220811)
-  f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --geometry-only --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.4 --translucency-support)
+  f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.4 --translucency-support)
 endif()
 
-f3d_test(NAME TestOBJImporter DATA world.obj)
 f3d_test(NAME TestGLTFImporterUnlit DATA UnlitTest.glb)
 f3d_test(NAME TestMaterial DATA suzanne.ply ARGS --color=0.72,0.45,0.2 --metallic=0.7 --roughness=0.2)
+f3d_test(NAME TestMaterialFullScene DATA WaterBottle.glb ARGS --color=0.9,0.1,0.1 --metallic=0.7 --roughness=0.2)
 f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m)
 f3d_test(NAME TestEdges DATA suzanne.ply ARGS -e)
 f3d_test(NAME TestLineWidth DATA cow.vtk ARGS -e --line-width=5)
@@ -387,6 +395,16 @@ endif()
 f3d_test(NAME TestCameraPersp DATA Cameras.gltf ARGS --camera-index=0)
 f3d_test(NAME TestCameraOrtho DATA Cameras.gltf ARGS --camera-index=1)
 f3d_test(NAME TestCameraIndexConfiguration DATA Cameras.gltf ARGS --camera-index=0  --camera-azimuth-angle=15 --camera-position=0.7,0.5,3)
+f3d_test(NAME TestCameraIndexInvalid DATA Cameras.gltf ARGS --camera-index=3 REGEXP "is higher than the number of available camera" NO_BASELINE)
+f3d_test(NAME TestCameraIndexNegative DATA Cameras.gltf ARGS --camera-index=-1 REGEXP "Invalid camera index" NO_BASELINE)
+
+# Require improved importer support https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11303
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240910)
+  f3d_test(NAME TestInvalidFileFileName DATA invalid.vtp ARGS --filename NO_DATA_FORCE_RENDER)
+  f3d_test(NAME TestMultiFileInvalidFilesFileName DATA mb/mb_3_0.vtt invalid.vtp ARGS --multi-file-mode=all --filename NO_DATA_FORCE_RENDER)
+  f3d_test(NAME TestMultiFileCameraIndex DATA Cameras.gltf CameraAnimated.glb ARGS --multi-file-mode=all --camera-index=2 --opacity=0.5 --translucency-support)
+endif()
+
 # Test Verbose camera
 f3d_test(NAME TestVerboseCamera DATA Cameras.gltf ARGS --camera-index=1 --verbose NO_RENDER REGEXP "0:.*1:")
 
@@ -574,8 +592,7 @@ if(F3D_PLUGIN_BUILD_DRACO)
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10884
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     f3d_test(NAME TestGLTFDracoImporter DATA Box_draco.gltf ARGS --load-plugins=draco --camera-position=-1.6,1.3,2.7)
-    f3d_test(NAME TestGLTFDracoReader DATA Box_draco.gltf ARGS --load-plugins=draco --geometry-only --camera-position=-1.6,1.3,2.7)
-    f3d_test(NAME TestGLTFDracoReaderWithoutCompression DATA BoxAnimated.gltf ARGS --load-plugins=draco --geometry-only --animation-time=2 --animation-progress)
+    f3d_test(NAME TestGLTFDracoImporterWithoutCompression DATA BoxAnimated.gltf ARGS --load-plugins=draco --animation-time=2 --animation-progress)
   endif()
 
   if(NOT F3D_MACOS_BUNDLE)
@@ -647,13 +664,15 @@ if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestBinaryBREP DATA f3d.bin.brep ARGS --load-plugins=occt --up=+Z)
 
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
-    f3d_test(NAME TestInvalidBREP DATA invalid.brep ARGS --verbose --load-plugins=occt REGEXP "failed to load geometry" NO_BASELINE)
+    f3d_test(NAME TestInvalidBREP DATA invalid.brep ARGS --verbose --load-plugins=occt REGEXP "failed to load scene" NO_BASELINE)
   endif()
 
   if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     f3d_test(NAME TestXCAFColors DATA xcaf-colors.stp ARGS --load-plugins=occt -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
     f3d_test(NAME TestXCAFColorsXBF DATA xcaf-colors.xbf ARGS --load-plugins=occt -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
-    f3d_test(NAME TestInvalidXBF DATA invalid.xbf ARGS --verbose --load-plugins=occt REGEXP "A reader failed to update" NO_BASELINE)
+    if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
+      f3d_test(NAME TestInvalidXBF DATA invalid.xbf ARGS --verbose --load-plugins=occt REGEXP "failed to load scene" NO_BASELINE)
+    endif()
 
     if (NOT F3D_MACOS_BUNDLE)
       file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
@@ -723,10 +742,12 @@ f3d_test(NAME TestInteractionMisc DATA cow.vtp NO_BASELINE INTERACTION) #KK
 f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION) #VCCC
 f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION) #SYYYY
 f3d_test(NAME TestInteractionCycleScalars DATA dragon.vtu INTERACTION) #BSSSS
+f3d_test(NAME TestInteractionCycleCellInvalidIndex DATA waveletArrays.vti INTERACTION) #SSC
 f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION) #VI
+f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS --multi-file-mode=all INTERACTION) #SSVB
 f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-sprites-size=20 INTERACTION) #O
 f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalar-coloring) #Right;Right;Right;Left;Up;
-f3d_test(NAME TestInteractionDirectoryLoop DATA mb INTERACTION ARGS --scalar-coloring) #Left;Left;Left;
+f3d_test(NAME TestInteractionDirectoryLoop DATA mb/recursive INTERACTION ARGS --scalar-coloring --filename) #Left;Left;Left;Left;Left;
 f3d_test(NAME TestInteractionDirectoryEmpty DATA mb INTERACTION NO_DATA_FORCE_RENDER) #Right;Right;Right;
 f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "is not a file of a supported file format") #Right;Right;Right;HMCSY
 f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_BASELINE INTERACTION)#Space;
@@ -744,11 +765,11 @@ f3d_test(NAME TestInteractionFocalPointPickingDefault DATA dragon.vtu INTERACTIO
 f3d_test(NAME TestInteractionFocalPointPickingShift DATA dragon.vtu INTERACTION)
 f3d_test(NAME TestInteractionFocalPointPickingPoints DATA pointsCloud.vtp INTERACTION)
 f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION)
-f3d_test(NAME TestInteractionGroupGeometriesColoring DATA mb/recursive ARGS --group-geometries INTERACTION) #SSB
+f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all INTERACTION) #SSSB
 f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION) #Up;
 f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION) #Down;
-f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No file loaded, no rendering performed") #Down;
-f3d_test(NAME TestInteractionGroupGeometriesLoadParentDirectory DATA mb/mb_0_0.vtu ARGS --group-geometries --filename INTERACTION) #Down;
+f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No files loaded, no rendering performed") #Down;
+f3d_test(NAME TestInteractionMultiFileLoadParentDirectory DATA mb/mb_0_0.vtu ARGS --multi-file-mode=all --filename INTERACTION) #Down;
 f3d_test(NAME TestInteractionInvertZoom DATA suzanne.ply ARGS --invert-zoom INTERACTION)
 f3d_test(NAME TestInteractionCameraHotkeys DATA cow.vtp INTERACTION)
 f3d_test(NAME TestInteractionZoomToMouse DATA cow.vtp INTERACTION)
@@ -769,7 +790,7 @@ endif()
 f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
 
 f3d_test(NAME TestInteractionDropFiles INTERACTION_CONFIGURE)#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
-f3d_test(NAME TestInteractionGroupGeometriesDrop DATA mb/mb_1_0.vtp ARGS --group-geometries -e INTERACTION_CONFIGURE) #DropEvent mb_2_0.vtp
+f3d_test(NAME TestInteractionMultiFileDrop DATA mb/mb_1_0.vtp ARGS --multi-file-mode=all -e INTERACTION_CONFIGURE) #DropEvent mb_2_0.vtp
 f3d_test(NAME TestInteractionDropSameFiles ARGS -x INTERACTION_CONFIGURE)#DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
 
 # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
@@ -792,7 +813,7 @@ endif()
 # Output option test
 f3d_test(NAME TestOutput DATA cow.vtp NO_BASELINE)
 f3d_test(NAME TestOutputOutput DATA cow.vtp ARGS --ref=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutput.png DEPENDS TestOutput NO_BASELINE)
-f3d_test(NAME TestUnsupportedInputOutput DATA unsupportedFile.dummy REGEXP "No file loaded, no rendering performed" NO_BASELINE)
+f3d_test(NAME TestUnsupportedInputOutput DATA unsupportedFile.dummy REGEXP "No files loaded, no rendering performed" NO_BASELINE)
 f3d_test(NAME TestOutputNoBackground DATA cow.vtp ARGS --no-background NO_BASELINE)
 
 # Test Non existent interaction record directory
@@ -834,11 +855,14 @@ f3d_test(NAME TestVerboseDefaultScalar DATA HeadMRVolume.mhd ARGS -s --verbose R
 # Incorrect component test
 f3d_test(NAME TestIncorrectComponent DATA dragon.vtu ARGS -s --comp=4 REGEXP "Invalid component index: 4" NO_BASELINE)
 
+# Incorrect volume coloring with multi file
+f3d_test(NAME TestIncorrectMultiFileVolume DATA multi ARGS -sv --coloring-array=Normals --multi-file-mode=all REGEXP "Cannot find the array \"Normals\" to display volume with" NO_BASELINE)
+
 # Incorrect color map
 f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1 REGEXP "Specified color map list count is not a multiple of 4, ignoring it." NO_BASELINE)
 
 # Test opening a directory
-f3d_test(NAME TestVerboseDirectory DATA mb REGEXP "Loading 3D geometry: .*mb_._0.vt." NO_RENDER)
+f3d_test(NAME TestVerboseDirectory DATA mb REGEXP "mb_0_0.vtu" NO_RENDER)
 
 # Test opening multiple file and rendering only one
 f3d_test(NAME TestVerboseMultiFileRender DATA mb REGEXP "An output image was saved using a single 3D file, other provided 3D files were ignored." NO_BASELINE)
@@ -864,7 +888,7 @@ f3d_test(NAME TestTensorsDirect DATA tensors.vti ARGS -s --coloring-array=tensor
 f3d_test(NAME TestTensorsVolumeDirect DATA tensors.vti ARGS -v -s --coloring-array=tensors1 --comp=-2 REGEXP "Direct scalars rendering not supported by array with more than 4 components" NO_BASELINE)
 
 # Test volume rendering without any array
-f3d_test(NAME TestVerboseVolumeNoArray DATA cow.vtp ARGS -v REGEXP "Cannot use volume with this dataset" NO_BASELINE)
+f3d_test(NAME TestVerboseVolumeNoArray DATA cow.vtp ARGS -v REGEXP "Cannot use volume with this data" NO_BASELINE)
 
 # Test scalar rendering without any array
 f3d_test(NAME TestVerboseNoArray DATA cow.vtp ARGS -s --verbose=debug REGEXP "No array to color with" NO_BASELINE)
@@ -895,18 +919,21 @@ f3d_test(NAME TestUnsupportedFileText DATA unsupportedFile.dummy ARGS --filename
 f3d_test(NAME TestNonExistentTexture DATA cow.vtp ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/dummy.png REGEXP "Texture file does not exist" NO_BASELINE)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
-  # Test invalid geometry
-  f3d_test(NAME TestInvalidGeometry DATA world_invalid.obj ARGS --geometry-only REGEXP "failed to load geometry" NO_BASELINE)
+  # Test invalid file
+  f3d_test(NAME TestInvalidFile DATA duck_invalid.gltf REGEXP "failed to load scene" NO_BASELINE)
 
-  # Test invalid full scene file
-  f3d_test(NAME TestInvalidFullScene DATA duck_invalid.gltf REGEXP "failed to load scene" NO_BASELINE)
-
-  # Test invalid geometry with animation
-  f3d_test(NAME TestInteractionAnimationInvalid DATA BoxAnimated_invalid_animation.gltf ARGS --geometry-only REGEXP "A reader failed to update at a timeValue" INTERACTION NO_BASELINE)
+  # Test invalid animation
+  f3d_test(NAME TestAnimationInvalid DATA BoxAnimated_invalid_animation.gltf ARGS --animation-time 1 REGEXP "Could not load time value: 1" NO_BASELINE)
 endif ()
 
 # Test invalid texture
 f3d_test(NAME TestInvalidTexture DATA cow.vtp ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open texture file" NO_BASELINE)
+
+# Test invalid color
+f3d_test(NAME TestInvalidColor DATA cow.vtp ARGS --color=0,0,0,1 REGEXP "Invalid surface color provided, not applying" NO_BASELINE)
+
+# Test invalid emmisive factor
+f3d_test(NAME TestInvalidEmissiveFactor DATA cow.vtp ARGS --emissive-factor=0,0,0,1 REGEXP "Invalid emissive factor provided, not applying" NO_BASELINE)
 
 # Test non existent interaction file, do not add a TestNonExistentInteraction
 f3d_test(NAME TestNonExistentInteraction DATA cow.vtp INTERACTION REGEXP "Interaction record file to play does not exist" NO_BASELINE)
@@ -927,6 +954,13 @@ f3d_test(NAME TestNonExistentConfigFileStem DATA cow.vtp CONFIG "dummy" REGEXP "
 # Test invalid config file
 f3d_test(NAME TestInvalidConfigFile DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid.json REGEXP "Unable to parse the configuration file" NO_BASELINE)
 
+# Test invalid multifile mode
+f3d_test(NAME TestInvalidMultiFileMode DATA mb/recursive ARGS --multi-file-mode=add REGEXP "Unrecognized multi-file-mode: add. Assuming \"single\" mode." NO_BASELINE)
+
+# Test unnamed cameras/animation
+f3d_test(NAME TestVerboseUnnamedCamera DATA Cameras.gltf ARGS --verbose REGEXP "1: unnamed_1" NO_BASELINE)
+f3d_test(NAME TestVerboseUnnamedAnimation DATA BoxAnimated.gltf ARGS --verbose REGEXP "0: unnamed_0" NO_BASELINE)
+
 # Test invalid value in config file
 f3d_test(NAME TestConfigFileInvalidValue DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_value.json REGEXP "must be a string, a boolean or a number" NO_BASELINE)
 
@@ -940,7 +974,7 @@ f3d_test(NAME TestConfigFileInexistentKey DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/
 f3d_test(NAME TestConfigFileQuiet DATA nonExistentFile.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/quiet.json REGEXP_FAIL "File .*/testing/data/nonExistentFile.vtp does not exist" NO_BASELINE)
 
 # Test no file with config file
-f3d_test(NAME TestNoFileConfigFile CONFIG ${F3D_SOURCE_DIR}/testing/configs/verbose.json ARGS --verbose REGEXP "No file to load provided." NO_BASELINE)
+f3d_test(NAME TestNoFileConfigFile CONFIG ${F3D_SOURCE_DIR}/testing/configs/verbose.json ARGS --verbose REGEXP "No files to load provided" NO_BASELINE)
 
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
@@ -967,6 +1001,15 @@ set_tests_properties(f3d::TestInvalidCLIArgs PROPERTIES PASS_REGULAR_EXPRESSION 
 
 # Test that f3d resolution can be controlled from config file
 add_test(NAME f3d::TestConfigResolution COMMAND $<TARGET_FILE:f3d> --config=${F3D_SOURCE_DIR}/testing/configs/resolution.json ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestConfigResolution.png --ref=${F3D_SOURCE_DIR}/testing/baselines/TestConfigResolution.png)
+
+# Test filename template with multiple files
+add_test(NAME f3d::TestMultiFileFileNameTemplate COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/suzanne.stl ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --output=${CMAKE_BINARY_DIR}/Testing/Temporary/{model.ext}.png --multi-file-mode=all --verbose)
+set_tests_properties(f3d::TestMultiFileFileNameTemplate PROPERTIES PASS_REGULAR_EXPRESSION "Output image saved to \".*/Testing/Temporary/multi_file.png\"")
+
+# Test filename template with no files
+add_test(NAME f3d::TestNoFileFileNameTemplate COMMAND $<TARGET_FILE:f3d> --output=${CMAKE_BINARY_DIR}/Testing/Temporary/{model.ext}.png --verbose)
+set_tests_properties(f3d::TestNoFileFileNameTemplate PROPERTIES PASS_REGULAR_EXPRESSION "Output image saved to \".*/Testing/Temporary/no_file.png\"")
+set_tests_properties(f3d::TestNoFileFileNameTemplate PROPERTIES ENVIRONMENT "CTEST_F3D_NO_DATA_FORCE_RENDER=1")
 
 # Test failure without a reference, please do not create a TestNoRef.png file
 f3d_test(NAME TestNoRef DATA cow.vtp WILL_FAIL)

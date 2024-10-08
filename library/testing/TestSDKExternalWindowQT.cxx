@@ -20,7 +20,7 @@ public:
     , mOutputPath(std::move(outputPath))
   {
     f3d::loader& load = mEngine.getLoader();
-    load.loadGeometry(filePath);
+    load.add(filePath);
   }
 
 protected:

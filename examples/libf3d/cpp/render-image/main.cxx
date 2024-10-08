@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
 
     // Load a model
-    eng.getLoader().loadGeometry(std::string(argv[1]));
+    eng.getLoader().add(std::string(argv[1]));
 
     // Set the window size and render to an image
     f3d::image img = eng.getWindow().setSize(300, 300).renderToImage();

@@ -7,6 +7,7 @@ Here is a non exhaustive list of F3D limitations:
 * Drag and drop interaction cannot be recorded nor played back.
 * Volume rendering and HDRI support requires a decent GPU.
 * The `--camera-zoom-factor` option require VTK >= 9.3.0
+* Information about the failure to load a file is not provided before VTK >= 9.4.0
 
 ## Assimp
 FBX, DAE, OFF, DXF, X and 3MF file formats rely on [Assimp](https://github.com/assimp/assimp) library. It comes with some known limitations:

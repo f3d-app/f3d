@@ -49,7 +49,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.setDropFilesCallBack([&](std::vector<std::string> filesVec) -> bool {
     std::string path = filesVec[0];
     size_t found = path.find_last_of("/\\");
-    load.loadGeometry(path.substr(0, found + 1) + "suzanne.ply", true);
+    load.add(path.substr(0, found + 1) + "suzanne.ply");
     win.render();
     return true;
   });

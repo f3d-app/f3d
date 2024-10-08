@@ -1,3 +1,5 @@
+#include "PseudoUnitTest.h"
+
 #include <engine.h>
 #include <interactor.h>
 #include <loader.h>
@@ -8,34 +10,21 @@
 
 int TestSDKLoaderInvalid(int argc, char* argv[])
 {
+  PseudoUnitTest test;
+
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
   f3d::engine eng(f3d::window::Type::NONE);
   f3d::loader& load = eng.getLoader();
 
-  std::string invalidGeometryFilename = "invalid.vtp";
+  std::string invalidDefaultSceneFilename = "invalid.vtp";
   std::string invalidFullSceneFilename = "duck_invalid.gltf";
-  std::string invalidGeometry = std::string(argv[1]) + "data/" + invalidGeometryFilename;
+  std::string invalidDefaultScene = std::string(argv[1]) + "data/" + invalidDefaultSceneFilename;
   std::string invalidFullScene = std::string(argv[1]) + "data/" + invalidFullSceneFilename;
 
-  try
-  {
-    load.loadGeometry(invalidGeometry);
-    std::cerr << "Unexpected loadGeometry success with an invalid file" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-  }
+  test.expect<f3d::loader::load_failure_exception>(
+    "add with invalid default scene file", [&]() { load.add(invalidDefaultScene); });
+  test.expect<f3d::loader::load_failure_exception>(
+    "add with invalid full scene file", [&]() { load.add(invalidFullScene); });
 
-  try
-  {
-    load.loadScene(invalidFullScene);
-    std::cerr << "Unexpected loadScene success with an invalid file" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-  }
-
-  return EXIT_SUCCESS;
+  return test.result();
 }

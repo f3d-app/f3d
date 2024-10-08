@@ -28,8 +28,8 @@ Here is the list of supported file formats:
 * **.xbf** : Open CASCADE XBF format
 * **.abc** : Alembic format
 * **.vdb** : VDB format (experimental)
-* **.obj** : Wavefront OBJ file format (full scene and default scene)
-* **.gltf/.glb** : GL Transmission Format (full scene and default scene)
+* **.obj** : Wavefront OBJ file format (full scene)
+* **.gltf/.glb** : GL Transmission Format (full scene)
 * **.3ds** : Autodesk 3D Studio file format (full scene)
 * **.wrl** : VRML file format (full scene)
 * **.fbx** : Autodesk Filmbox (full scene)
@@ -44,12 +44,19 @@ Here is the list of supported file formats:
 
 The **full scene** formats (.gltf/.glb, .3ds, .wrl, .obj, .fbx, .dae, .off, .x, .3mf, .usd) contain not only *geometry*,
 but also some scene information like *lights*, *cameras*, *actors* in the scene, as well as *texture* properties.
-By default, all this information will be loaded from the file and displayed. Use the `--geometry-only` [options](OPTIONS.md)
-to modify this behavior. For file formats that do not support it, **a default scene** is created.
+By default, all this information will be loaded from the file and displayed.
+For file formats that do not support it, **a default scene** is created.
 
 For **default scene** formats, certain default values are set automatically:
- - line_width: 1.0
- - point_size: 10.0
+ - texture-*: ""
+ - line-width: 1.0
+ - point-size: 10.0
+ - opacity: 1.0
+ - color: 1.0, 1.0, 1.0
+ - emissive-factor: 1.0, 1.0, 1.0
+ - normal-scale: 1.0
+ - metallic: 0.0
+ - roughness: 0.3
 
 They will be overridden when using corresponding [options](OPTIONS.md).
 

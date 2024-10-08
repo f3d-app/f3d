@@ -12,10 +12,10 @@ def test_closest_option():
 def test_setitem():
     options = f3d.Options()
     options["interactor.axis"] = False
-    options["model.material.roughness"] = 0.3
+    options["scene.animation.frame_rate"] = 33.33
     options["scene.animation.speed_factor"] = 3.3
     options["render.raytracing.samples"] = 5
-    options["model.color.rgb"] = [1.0, 1.0, 1.0]
+    options["render.grid.color"] = [1.0, 1.0, 1.0]
     options["scene.up_direction"] = "+Y"
 
 
@@ -24,10 +24,10 @@ def test_getitem():
     options = engine.options
 
     assert options["interactor.axis"] is False
-    assert options["model.material.roughness"] == 0.3
+    assert options["scene.animation.frame_rate"] == 60.0
     assert options["scene.animation.speed_factor"] == 1.0
     assert options["render.raytracing.samples"] == 5
-    assert options["model.color.rgb"] == [1.0, 1.0, 1.0]
+    assert options["render.grid.color"] == [0.0, 0.0, 0.0]
     assert options["scene.up_direction"] == "+Y"
 
 
@@ -61,7 +61,7 @@ def test_iter():
 
 def test_contains():
     options = f3d.Options()
-    assert "model.color.rgb" in options
+    assert "render.grid.color" in options
     assert "hello.world" not in options
 
 

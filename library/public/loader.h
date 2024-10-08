@@ -5,6 +5,7 @@
 #include "export.h"
 #include "types.h"
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -24,13 +25,9 @@ namespace f3d
  *  f3d::engine eng(f3d::window::Type::NATIVE);
  *  f3d::loader& load = eng.getLoader();
  *
- *  if (load.hasSceneReader(path)
+ *  if (load.supports(path)
  *  {
- *    load.loadScene(path);
- *  }
- *  else if (load.hasGeometryReader(path)
- *  {
- *    load.loadGeometry(path);
+ *    load.add(path);
  *  }
  * \endcode
  *
@@ -48,41 +45,44 @@ public:
       : exception(what){};
   };
 
+  ///@{
   /**
-   * Return true if the loader has a geometry reader for the providen file, false otherwise.
+   * Add and load provided files into the scene
+   * Already added file will NOT be reloaded
    */
-  virtual bool hasGeometryReader(const std::string& filePath) = 0;
+  virtual loader& add(const std::filesystem::path& filePath) = 0;
+  virtual loader& add(const std::vector<std::filesystem::path>& filePath) = 0;
+  virtual loader& add(const std::vector<std::string>& filePathStrings) = 0;
+  ///@}
 
   /**
-   * Load a geometry from a provided file to the scene.
-   * Calling this method will reset the scene before loading if a full scene was loaded previously
-   * or if the reset argument is set to true, It will not reset if only geometries were loaded
-   * previously. Geometries loaded using this method will be available in a default scene and use
-   * all default scene related options. Throw a load_failure_exception on failure.
+   * Add and load provided mesh into the scene
    */
-  virtual loader& loadGeometry(const std::string& filePath, bool reset = false) = 0;
+  virtual loader& add(const mesh_t& mesh) = 0;
+
+  ///@{
+  /**
+   * Convenience initializer list signature for add method
+   */
+  loader& add(std::initializer_list<std::string> list)
+  {
+    return this->add(std::vector<std::string>(list));
+  }
+  loader& add(std::initializer_list<std::filesystem::path> list)
+  {
+    return this->add(std::vector<std::filesystem::path>(list));
+  }
+  ///@}
 
   /**
-   * Load a geometry from memory buffers.
-   * Calling this method will reset the scene before loading if a full scene was loaded previously
-   * or if the reset argument is set to true, It will not reset if only geometries were loaded
-   * previously. Geometries loaded using this method will be available in a default scene and use
-   * all default scene related options.
-   * Throw a load_failure_exception if the mesh is invalid.
+   * Clear the scene of all added files
    */
-  virtual loader& loadGeometry(const mesh_t& mesh, bool reset = false) = 0;
+  virtual loader& clear() = 0;
 
   /**
-   * Return true if the loader has a scene reader for the providen file, false otherwise.
+   * Return true if provided file path is supported, false otherwise.
    */
-  virtual bool hasSceneReader(const std::string& filePath) = 0;
-
-  /**
-   * Reset scene and load a (full) scene from provided file.
-   * Please note default scene related options are not taken into account when loading a full scene.
-   * Throw a load_failure_exception on failure.
-   */
-  virtual loader& loadScene(const std::string& filePath) = 0;
+  virtual bool supports(const std::filesystem::path& filePath) = 0;
 
 protected:
   //! @cond

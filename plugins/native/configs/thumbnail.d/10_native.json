@@ -1,6 +1,7 @@
 {
   ".*(dcm|nrrd|mhd|mha|vti)":
   {
+    "scalar-coloring": true,
     "volume": true
   },
   ".*(3ds|stl)":
@@ -8,8 +9,13 @@
     "up": "+Z",
     "camera-direction": "-1,1,-0.5"
   },
+  ".*(stl|gml|pts|vt.)":
+  {
+    "scalar-coloring": true
+  },
   ".*(ply)":
   {
+    "scalar-coloring": true,
     "comp": "-2",
     "translucency-support": true
   },

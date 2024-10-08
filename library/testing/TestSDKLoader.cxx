@@ -1,3 +1,6 @@
+#include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
+
 #include <engine.h>
 #include <interactor.h>
 #include <loader.h>
@@ -6,180 +9,66 @@
 
 #include <iostream>
 
+namespace fs = std::filesystem;
+
 int TestSDKLoader(int argc, char* argv[])
 {
+  PseudoUnitTest test;
+
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  f3d::engine eng(f3d::window::Type::NONE);
+  f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
   f3d::loader& load = eng.getLoader();
+  f3d::window& win = eng.getWindow().setSize(300, 300);
 
   // Test file logic
   std::string empty;
   std::string dummyFilename = "dummy.foo";
-  std::string nonExistentGeometryFilename = "nonExistent.vtp";
-  std::string nonExistentFullSceneFilename = "nonExistent.obj";
+  std::string nonExistentFilename = "nonExistent.vtp";
   std::string unsupportedFilename = "unsupportedFile.dummy";
-  std::string cowFilename = "cow.vtp";
-  std::string dragonFilename = "dragon.vtu";
-  std::string suzanneFilename = "suzanne.stl";
+  std::string logoFilename = "mb/recursive/f3d.glb";
+  std::string sphere1Filename = "mb/recursive/mb_1_0.vtp";
+  std::string sphere2Filename = "mb/recursive/mb_2_0.vtp";
+  std::string cubeFilename = "mb/recursive/mb_0_0.vtu";
   std::string worldFilename = "world.obj";
-  std::string botFilename = "bot2.wrl";
   std::string dummy = std::string(argv[1]) + "data/" + dummyFilename;
-  std::string nonExistentGeometry = std::string(argv[1]) + "data/" + nonExistentGeometryFilename;
-  std::string nonExistentFullScene = std::string(argv[1]) + "data/" + nonExistentFullSceneFilename;
+  std::string nonExistent = std::string(argv[1]) + "data/" + nonExistentFilename;
   std::string unsupported = std::string(argv[1]) + "data/" + unsupportedFilename;
-  std::string cow = std::string(argv[1]) + "data/" + cowFilename;
-  std::string dragon = std::string(argv[1]) + "data/" + dragonFilename;
-  std::string suzanne = std::string(argv[1]) + "data/" + suzanneFilename;
+  std::string logo = std::string(argv[1]) + "data/" + logoFilename;
+  std::string sphere1 = std::string(argv[1]) + "data/" + sphere1Filename;
+  std::string sphere2 = std::string(argv[1]) + "data/" + sphere2Filename;
+  std::string cube = std::string(argv[1]) + "data/" + cubeFilename;
   std::string world = std::string(argv[1]) + "data/" + worldFilename;
-  std::string bot = std::string(argv[1]) + "data/" + botFilename;
 
-  // has*Reader methods
-  if (load.hasGeometryReader(empty) || load.hasSceneReader(empty))
-  {
-    std::cerr << "Unexpected has*Reader output with empty filenames" << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (load.hasGeometryReader(dummy) || load.hasSceneReader(dummy))
-  {
-    std::cerr << "Unexpected has*Reader output with dummy filenames" << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (!load.hasGeometryReader(nonExistentGeometry) || !load.hasSceneReader(nonExistentFullScene))
-  {
-    std::cerr << "Unexpected has*Reader output with non existent filenames" << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (load.hasGeometryReader(bot) || load.hasSceneReader(dragon))
-  {
-    std::cerr << "Unexpected has*Reader output with incorrect formats" << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (!load.hasGeometryReader(dragon) || !load.hasSceneReader(bot))
-  {
-    std::cerr << "Unexpected has*Reader output with correct formats" << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (!load.hasGeometryReader(world) || !load.hasSceneReader(world))
-  {
-    std::cerr << "Unexpected has*Reader output with geometry and full scene format" << std::endl;
-    return EXIT_FAILURE;
-  }
+  // supports method
+  test("supported with empty filename", !load.supports(empty));
+  test("supported with dummy filename", !load.supports(dummy));
+  test("supported with non existent filename", load.supports(nonExistent));
+  test("supported with default scene format", load.supports(cube));
+  test("supported with full scene format", load.supports(logo));
 
-  // Empty filename, success expected but nothing is loaded
-  try
-  {
-    load.loadGeometry(empty);
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-    std::cerr << "Unexpected loadGeometry failure with an empty file" << std::endl;
-    return EXIT_FAILURE;
-  }
+  // add error code paths
+  test.expect<f3d::loader::load_failure_exception>(
+    "add with dummy file", [&]() { load.add(dummy); });
+  test.expect<f3d::loader::load_failure_exception>(
+    "add with unsupported file", [&]() { load.add(unsupported); });
+  test.expect<f3d::loader::load_failure_exception>(
+    "add with inexistent file", [&]() { load.add(nonExistent); });
 
-  try
-  {
-    load.loadScene(empty);
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-    std::cerr << "Unexpected loadGeometry failure with an empty file" << std::endl;
-    return EXIT_FAILURE;
-  }
+  // add standard code paths
+  test("add with empty file", [&]() { load.add(std::vector<std::string>{}); });
+  test("add with empty file", [&]() { load.add(empty); });
+  test("add with a single path", [&]() { load.add(fs::path(logo)); });
+  test("add with multiples filepaths", [&]() { load.add({ fs::path(sphere2), fs::path(cube) }); });
+  test("add with multiples file strings", [&]() { load.add({ sphere1, world }); });
 
-  // Dummy filename
-  try
-  {
-    load.loadGeometry(dummy);
-    std::cerr << "Unexpected loadGeometry success with a dummy file" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-  }
+  // render test
+  test("render after add", [&]() {
+    if (!TestSDKHelpers::RenderTest(
+          win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKLoader"))
+    {
+      throw "rendering test failed";
+    }
+  });
 
-  try
-  {
-    load.loadScene(dummy);
-    std::cerr << "Unexpected loadGeometry success with a dummy file" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-  }
-
-  // Non supported files
-  try
-  {
-    load.loadGeometry(unsupported);
-    std::cerr << "Unexpected loadGeometry success with an unsupported file" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-  }
-
-  try
-  {
-    load.loadScene(unsupported);
-    std::cerr << "Unexpected loadScene success with an unsupported file" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-  }
-
-  // Incorrect files
-  try
-  {
-    load.loadGeometry(bot);
-    std::cerr << "Unexpected loadGeometry success with an incorrect file" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-  }
-
-  try
-  {
-    load.loadScene(cow);
-    std::cerr << "Unexpected loadScene success with an incorrect file" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-  }
-
-  // Non existent files
-  try
-  {
-    load.loadGeometry(nonExistentGeometry);
-    std::cerr << "Unexpected loadGeometry success with a non existent file" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-  }
-
-  try
-  {
-    load.loadScene(nonExistentFullScene);
-    std::cerr << "Unexpected loadScene success with a non existent file" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-  }
-
-  // Multiple geometries
-  try
-  {
-    load.loadGeometry(cow).loadGeometry(suzanne).loadGeometry(dragon);
-  }
-  catch (const f3d::loader::load_failure_exception& ex)
-  {
-    std::cerr << "Unexpected loadGeometry failure with multiple files" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  return EXIT_SUCCESS;
+  return test.result();
 }
