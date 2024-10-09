@@ -121,7 +121,7 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test azimuth
-  cam.azimuth(90);
+  cam.addAzimuth(90);
   f3d::point3_t expectedPos = { 0., -11., -1. };
   f3d::point3_t expectedFoc = { 0., 0., -1. };
   f3d::vector3_t expectedUp = { 1., 0., 0. };
@@ -161,7 +161,7 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test yaw
-  cam.yaw(90);
+  cam.addYaw(90);
   expectedFoc = { 11., -11., -1. };
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
@@ -179,8 +179,30 @@ int TestSDKCamera(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Test getAzimuth
+  f3d::angle_deg_t addAzimuth = cam.getAzimuth();
+  if (!compareDouble(addAzimuth, 0.0))
+  {
+    std::cerr << "getAzimuth is not behaving as expected:" << std::endl;
+    std::cerr << std::setprecision(12) << "azimuth: " << addAzimuth << " != 0.0" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Test getYaw
+  f3d::angle_deg_t addYaw = cam.getYaw();
+  if (!compareDouble(addYaw, 90.0))
+  {
+    std::cerr << "getYaw is not behaving as expected:" << std::endl;
+    std::cerr << std::setprecision(12) << "yaw: " << addYaw << " != 0.0" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Test getElevation
+  double addElevation = cam.getElevation();
+  checkDouble(addElevation, 0.0, "getElevation");
+
   // Test elevation
-  cam.elevation(90);
+  cam.addElevation(90);
   expectedPos = { 11., -11., -12. };
   expectedUp = { 1., 0., 0. };
   pos = cam.getPosition();

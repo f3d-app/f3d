@@ -80,9 +80,9 @@ def test_moves():
     camera.dolly(10)
     angle = 30
     camera.roll(angle)
-    camera.azimuth(angle)
-    camera.yaw(angle)
-    camera.elevation(angle)
+    camera.add_azimuth(angle)
+    camera.add_yaw(angle)
+    camera.add_elevation(angle)
     camera.pitch(angle)
 
 
