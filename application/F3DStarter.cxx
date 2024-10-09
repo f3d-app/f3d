@@ -1161,12 +1161,6 @@ void F3DStarter::LoadFileGroup(
     unsupported = true;
   }
 
-  if (!dynamicOptions.scene.camera.index.has_value() && !this->Internals->AppOptions.NoRender)
-  {
-    // Setup the camera according to options
-    this->Internals->SetupCamera(this->Internals->AppOptions.CamConf);
-  }
-
   std::string filenameInfo;
   if (this->Internals->LoadedFiles.size() > 0)
   {
@@ -1221,6 +1215,17 @@ void F3DStarter::LoadFileGroup(
   if (!this->Internals->AppOptions.NoRender)
   {
     this->Internals->Engine->getWindow().setWindowName(filenameInfo + " - " + F3D::AppName);
+
+    if (dynamicOptions.scene.camera.index.has_value())
+    {
+      // Camera is setup by importer, save its configuration as default
+      this->Internals->Engine->getWindow().getCamera().setCurrentAsDefault();
+    }
+    else
+    {
+      // Setup the camera according to options
+      this->Internals->SetupCamera(this->Internals->AppOptions.CamConf);
+    }
   }
 
   // XXX: We can force dropzone and filename_info because they cannot be set
