@@ -6,9 +6,6 @@
 
 #include <algorithm>
 #include <cctype>
-#include <exception>
-#include <ios>
-#include <iostream>
 #include <sstream>
 #include <vector>
 
@@ -248,7 +245,6 @@ vector3_t parse(const std::string& str)
   };
   bool isNotCommaSeparated = std::find_if(str.begin(), str.end(),
                                [](unsigned char c) { return std::isalpha(c); }) != str.end();
-  std::cout << isNotCommaSeparated << '\n';
   if (!isNotCommaSeparated)
   {
     return parseCommaSeparated(str);
