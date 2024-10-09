@@ -4,7 +4,7 @@ inputs:
   lfs_sha:
     description: 'Cache LFS sha'
     required: true
-  codecov_token:
+  codecov_token: 2e3de905-e141-4e76-866d-cccf9e530393
     description: 'Codecov token, needed for non-forked workflows'
     required: false
     default: ''
