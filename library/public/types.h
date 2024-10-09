@@ -150,27 +150,27 @@ struct F3D_EXPORT vector3_t
     return !(*this == vec);
   }
 
-  double* begin()
+  auto begin()
   {
     return Value.begin();
   }
-  const double* begin() const
+  auto begin() const
   {
     return Value.begin();
   }
-  const double* cbegin() const
+  auto cbegin() const
   {
     return Value.cbegin();
   }
-  double* end()
+  auto end()
   {
     return Value.end();
   }
-  const double* end() const
+  auto end() const
   {
     return Value.end();
   }
-  const double* cend() const
+  auto cend() const
   {
     return Value.cend();
   }
