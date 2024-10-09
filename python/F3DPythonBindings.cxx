@@ -36,7 +36,6 @@ bool load_array(const py::handle& src, bool convert, std::array<T, S>& value)
   return true;
 }
 
-template<>
 bool load_array(const py::handle& src, bool convert, f3d::vector3_t& value)
 {
   if (!py::isinstance<py::sequence>(src))
