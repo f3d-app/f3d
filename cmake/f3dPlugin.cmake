@@ -129,6 +129,10 @@ macro(f3d_plugin_declare_reader)
     set(F3D_READER_HAS_GEOMETRY_READER 0)
   endif()
 
+  if (NOT F3D_READER_HAS_SCENE_READER AND NOT F3D_READER_HAS_GEOMETRY_READER)
+    message(FATAL_ERROR "Please provide either a VTK_IMPORTER or a VTK_READER")
+  endif ()
+
   string(JSON F3D_PLUGIN_JSON
     SET "${F3D_PLUGIN_JSON}" "readers" ${F3D_PLUGIN_CURRENT_READER_INDEX} "${F3D_READER_JSON}")
 
