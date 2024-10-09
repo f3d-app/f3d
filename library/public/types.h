@@ -101,7 +101,7 @@ struct F3D_EXPORT vector3_t
     Value[1] = arr[1];
     Value[2] = arr[2];
   }
-  vector3_t(double* ptr)
+  vector3_t(const double* ptr)
   {
     Value[0] = ptr[0];
     Value[1] = ptr[1];
