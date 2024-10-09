@@ -255,9 +255,8 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
     if (!importer)
     {
+      // XXX: F3D Plugin CMake logic ensure there is either a scene reader or a geometry reader
       auto vtkReader = reader->createGeometryReader(filePath.string());
-      // XXX: We assume the f3d reader provide either a scene reader or a geometry reader
-      // TODO: Put in f3d::reader directly
       assert(vtkReader);
       vtkSmartPointer<vtkF3DGenericImporter> genericImporter =
         vtkSmartPointer<vtkF3DGenericImporter>::New();
