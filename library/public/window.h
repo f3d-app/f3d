@@ -23,11 +23,15 @@ public:
    * Enumeration of supported window types
    * =====================================
    * NONE: A mock window without rendering capabilities.
-   * NATIVE: A window using the native graphical stack.
+   * AUTO: A window using the native graphical stack, EGL, or OSMesa automatically.
    * EXTERNAL: An external window that assume the OpenGL context would have been created by another
    * framework.
+   * GLX: A window using GLX.
+   * WGL: A window using WGL.
+   * COCOA: A window using COCOA.
    * EGL: An offscreen window using hardware acceleration that can run headless.
    * OSMESA: An offscreen window using software rendering that can run headless.
+   * WASM: A webassembly window.
    */
   enum class Type : unsigned char
   {

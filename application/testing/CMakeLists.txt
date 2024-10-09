@@ -381,11 +381,6 @@ f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf AR
 # Test exit hotkey
 f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
 
-if(UNIX AND NOT APPLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
-  f3d_test(NAME TestInteractionSimpleExitHeadless DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
-  set_tests_properties(f3d::TestInteractionSimpleExitHeadless PROPERTIES ENVIRONMENT "DISPLAY=")
-endif()
-
 # No alternative baseline supports in F3D
 if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionCheatsheetRaytracing DATA cow.vtp INTERACTION) #H

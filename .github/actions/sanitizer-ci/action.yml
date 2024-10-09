@@ -1,4 +1,4 @@
-name: 'Sanitzier CI'
+name: 'Sanitizer CI'
 description: 'Sanitizer CI'
 inputs:
   sanitizer_type:
@@ -78,6 +78,11 @@ runs:
         -DF3D_PLUGIN_BUILD_VDB=OFF
         -DF3D_SANITIZER=${{inputs.sanitizer_type}}
         -DF3D_STRICT_BUILD=ON
+        -DF3D_TESTING_ENABLE_EXTERNAL_EGL=ON
+        -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=ON
+        -DF3D_TESTING_ENABLE_EXTERNAL_GLX=ON
+        -DF3D_TESTING_ENABLE_EXTERNAL_OSMESA=ON
+        -DF3D_TESTING_ENABLE_EXTERNAL_QT=ON
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
 
     - name: Build
