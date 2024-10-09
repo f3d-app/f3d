@@ -180,12 +180,32 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test getAzimuth
-  double addAzimuth = cam.getAzimuth();
-  checkDouble(addAzimuth, 0.0, "getAzimuth");
+  try
+  {
+    f3d::point3_t expectedPos = { 0., -11., -1. };
+    f3d::point3_t expectedFoc = { 0., 0., -1. };
+    f3d::vector3_t expectedUp = { 1., 0., 0. };
+    f3d::angle_deg_t addAzimuth = cam.getAzimuth();
+    checkDouble(addAzimuth, 0.0, "getAzimuth:");
+  }
+  catch (testFailure& e)
+  {
+    std::cerr << e.what() << std::endl;
+    return EXIT_FAILURE;
+  }
 
   // Test getYaw (same value as azimuth here)
-  double addYaw = cam.getYaw();
-  checkDouble(addYaw, 90.0, "getYaw");
+  try
+  {
+    expectedFoc = { 11., -11., -1. };
+    f3d::angle_deg_t addYaw = cam.getYaw();
+    checkDouble(addYaw, 90.0, "getYaw: ");
+  }
+  catch (testFailure& e)
+  {
+    std::cerr << e.what() << std::endl;
+    return EXIT_FAILURE;
+  }
 
   // Test getElevation
   double addElevation = cam.getElevation();
