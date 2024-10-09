@@ -130,7 +130,7 @@ macro(f3d_plugin_declare_reader)
   endif()
 
   if (NOT F3D_READER_HAS_SCENE_READER AND NOT F3D_READER_HAS_GEOMETRY_READER)
-    message(FATAL_ERROR "A F3D Please should provide either a VTK_IMPORTER or a VTK_READER")
+    message(FATAL_ERROR "Please provide either a VTK_IMPORTER or a VTK_READER")
   endif ()
 
   string(JSON F3D_PLUGIN_JSON
