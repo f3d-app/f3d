@@ -181,7 +181,7 @@ int TestSDKCamera(int argc, char* argv[])
 
   // Test getAzimuth
   f3d::angle_deg_t addAzimuth = cam.getAzimuth();
-  if (!compareDouble(addAzimuth,0.0))
+  if (!compareDouble(addAzimuth, 0.0))
   {
     std::cerr << "getAzimuth is not behaving as expected:" << std::endl;
     std::cerr << std::setprecision(12) << "azimuth: " << addAzimuth << " != 0.0" << std::endl;
@@ -190,7 +190,7 @@ int TestSDKCamera(int argc, char* argv[])
 
   // Test getYaw
   f3d::angle_deg_t addYaw = cam.getYaw();
-  if (!compareDouble(addYaw,90.0))
+  if (!compareDouble(addYaw, 90.0))
   {
     std::cerr << "getYaw is not behaving as expected:" << std::endl;
     std::cerr << std::setprecision(12) << "yaw: " << addYaw << " != 0.0" << std::endl;
