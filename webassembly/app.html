@@ -119,7 +119,7 @@
         // automatically load all supported file format readers
         Module.Engine.autoloadPlugins();
 
-        Module.engineInstance = new Module.Engine();
+        Module.engineInstance = Module.Engine.create()
 
         const openFile = (name) => {
           document.getElementById('file-name').innerHTML = name;

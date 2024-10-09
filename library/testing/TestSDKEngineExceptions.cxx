@@ -6,7 +6,7 @@
 
 int TestSDKEngineExceptions(int argc, char* argv[])
 {
-  f3d::engine eng(f3d::window::Type::NONE);
+  f3d::engine eng = f3d::engine::createNone();
 
   try
   {

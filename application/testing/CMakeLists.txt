@@ -51,6 +51,10 @@ function(f3d_test)
     endif()
   endif()
 
+  if(DEFINED F3D_TESTING_OFFSCREEN_BACKEND)
+    list(APPEND F3D_TEST_ARGS "--offscreen-backend=${F3D_TESTING_OFFSCREEN_BACKEND}")
+  endif()
+
   add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
 
   set(_timeout "30")
@@ -376,6 +380,11 @@ f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf AR
 
 # Test exit hotkey
 f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
+
+if(UNIX AND NOT APPLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+  f3d_test(NAME TestInteractionSimpleExitHeadless DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
+  set_tests_properties(f3d::TestInteractionSimpleExitHeadless PROPERTIES ENVIRONMENT "DISPLAY=")
+endif()
 
 # No alternative baseline supports in F3D
 if(F3D_MODULE_RAYTRACING)
@@ -1042,8 +1051,8 @@ if(NOT F3D_MACOS_BUNDLE)
   endif()
 endif()
 
-# Watch testing require onscreen rendering
-if(NOT VTK_OPENGL_HAS_EGL)
+if(F3D_TESTING_ENABLE_ONSCREEN_TESTS)
+  # Watch testing require onscreen rendering
   if(UNIX)
     set(_f3d_os_script_ext "sh")
     set(_f3d_os_script_exec "")

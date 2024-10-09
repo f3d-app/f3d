@@ -13,14 +13,12 @@
 class F3DWindow : public QOpenGLWindow
 {
 public:
-  F3DWindow(const std::string& filePath, std::string baselinePath, std::string outputPath)
+  F3DWindow(std::string filePath, std::string baselinePath, std::string outputPath)
     : QOpenGLWindow()
-    , mEngine(f3d::window::Type::EXTERNAL)
+    , mFilePath(std::move(filePath))
     , mBaselinePath(std::move(baselinePath))
     , mOutputPath(std::move(outputPath))
   {
-    f3d::scene& sce = mEngine.getScene();
-    sce.add(filePath);
   }
 
 protected:
@@ -49,13 +47,27 @@ protected:
     this->close();
   }
 
+  void initializeGL() override
+  {
+    this->QOpenGLWindow::initializeGL();
+
+    f3d::context::function loadFunc = [this](const char* name) {
+      return this->context()->getProcAddress(name);
+    };
+
+    mEngine = std::make_unique<f3d::engine>(f3d::engine::createExternal(loadFunc));
+    f3d::scene& sce = mEngine.getScene();
+    sce.add(mFilePath);
+  }
+
   void paintGL() override
   {
-    mEngine.getWindow().render();
+    mEngine->getWindow().render();
   }
 
 private:
-  f3d::engine mEngine;
+  std::unique_ptr<f3d::engine> mEngine;
+  std::string mFilePath;
   std::string mBaselinePath;
   std::string mOutputPath;
 };
@@ -68,9 +80,9 @@ int TestSDKExternalWindowQT(int argc, char* argv[])
     std::string(argv[1]) + "/data/cow.vtp", std::string(argv[1]) + "/baselines/", argv[2]);
   w.setTitle("F3D QT External Window");
   w.resize(300, 300);
-  w.startTimer(1000);
-
   w.show();
+
+  w.startTimer(1000);
 
   return a.exec();
 }

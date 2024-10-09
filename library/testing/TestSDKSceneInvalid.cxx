@@ -1,19 +1,15 @@
 #include "PseudoUnitTest.h"
 
 #include <engine.h>
-#include <interactor.h>
 #include <log.h>
 #include <scene.h>
-#include <window.h>
-
-#include <iostream>
 
 int TestSDKSceneInvalid(int argc, char* argv[])
 {
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  f3d::engine eng(f3d::window::Type::NONE);
+  f3d::engine eng = f3d::engine::createNone();
   f3d::scene& sce = eng.getScene();
 
   std::string invalidDefaultSceneFilename = "invalid.vtp";

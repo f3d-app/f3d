@@ -19,7 +19,7 @@ int main(int argc, char** argv)
     f3d::engine::autoloadPlugins();
 
     // Create a offscreen window engine
-    f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
+    f3d::engine eng = f3d::engine::create(true);
 
     // add a model
     eng.getScene().add(std::string(argv[1]));

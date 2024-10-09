@@ -12,6 +12,7 @@
 
 #include <vtkCallbackCommand.h>
 #include <vtkCellPicker.h>
+#include <vtkGenericRenderWindowInteractor.h>
 #include <vtkMath.h>
 #include <vtkMatrix3x3.h>
 #include <vtkNew.h>
@@ -40,6 +41,16 @@ public:
     , Window(window)
     , Scene(scene)
   {
+    if (window.getType() == window::Type::GLX || window.getType() == window::Type::WGL ||
+      window.getType() == window::Type::COCOA || window.getType() == window::Type::WASM)
+    {
+      this->VTKInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    }
+    else
+    {
+      this->VTKInteractor = vtkSmartPointer<vtkGenericRenderWindowInteractor>::New();
+    }
+
 #ifdef __EMSCRIPTEN__
     vtkRenderWindowInteractor::InteractorManagesTheEventLoop = false;
 #endif
@@ -545,7 +556,7 @@ public:
   scene_impl& Scene;
   animationManager* AnimationManager;
 
-  vtkNew<vtkRenderWindowInteractor> VTKInteractor;
+  vtkSmartPointer<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
   std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;

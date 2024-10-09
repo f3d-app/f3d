@@ -7,7 +7,7 @@
 
 int TestSDKDynamicProperties(int argc, char* argv[])
 {
-  f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
+  f3d::engine eng = f3d::engine::create(true);
   f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();

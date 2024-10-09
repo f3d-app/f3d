@@ -28,7 +28,7 @@ def main():
         rows, cols = 40, 20
 
     # setup engine
-    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+    engine = f3d.Engine.create(True)
     engine.options.update(options)
     engine.scene.add(str(model_path))
     engine.window.size = rows, cols * 2

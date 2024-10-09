@@ -13,10 +13,6 @@ inputs:
     description: 'Label to control raytracing'
     required: false
     default: 'no-raytracing'
-  egl_label:
-    description: 'Label to control egl'
-    required: false
-    default: 'no-egl'
   cpu:
     description: 'CPU architecture to build for'
     required: false
@@ -47,7 +43,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.egl_label}}-${{inputs.cpu}}-8
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-3
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -86,7 +82,6 @@ runs:
         -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_BUILD_TESTING=OFF
         -DVTK_DEBUG_LEAKS=ON
-        -DVTK_DEFAULT_RENDER_WINDOW_HEADLESS=${{ inputs.egl_label == 'egl' && 'ON' || 'OFF' }}
         -DVTK_ENABLE_LOGGING=OFF
         -DVTK_ENABLE_REMOTE_MODULES=OFF
         -DVTK_ENABLE_WRAPPING=OFF
@@ -116,7 +111,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.raytracing_label == 'raytracing' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
-        -DVTK_OPENGL_HAS_EGL=${{ inputs.egl_label == 'egl' && 'ON' || 'OFF' }}
+        -DVTK_OPENGL_HAS_EGL=${{ inputs.vtk_version == 'commit' && 'ON' || 'OFF' }}
         -DVTK_SMP_IMPLEMENTATION_TYPE=TBB
         -DVTK_VERSIONED_INSTALL=OFF
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}

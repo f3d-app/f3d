@@ -21,7 +21,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKOptionsIO.cxx
      TestSDKRenderAndInteract.cxx
      TestSDKRenderFinalShader.cxx
-     TestSDKWindowNative.cxx
+     TestSDKWindowAuto.cxx
      TestPseudoUnitTest.cxx
 )
 
@@ -47,18 +47,37 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullSc
                "${CMAKE_BINARY_DIR}/TestSDKInteractorDropFullScene.log") # world.obj; S
 
 # External window tests
-if(F3D_MODULE_EXTERNAL_RENDERING AND NOT VTK_OPENGL_HAS_EGL)
-  find_package(glfw3 QUIET)
-  if(glfw3_FOUND)
-    list(APPEND libf3dSDKTests_list
-        TestSDKExternalWindowGLFW.cxx
-        )
+cmake_dependent_option(F3D_TESTING_ENABLE_EXTERNAL_GLFW "Test external GLFW" OFF "F3D_MODULE_EXTERNAL_RENDERING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_EXTERNAL_QT "Test external QT" OFF "F3D_MODULE_EXTERNAL_RENDERING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_EXTERNAL_OSMESA "Test external OSMesa" OFF "WIN32 AND F3D_MODULE_EXTERNAL_RENDERING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_EXTERNAL_GLX "Test external GLX" OFF "UNIX AND F3D_MODULE_EXTERNAL_RENDERING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_EXTERNAL_EGL "Test external GLX" OFF "F3D_MODULE_EXTERNAL_RENDERING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_EXTERNAL_WGL "Test external WGL" OFF "WIN32 AND F3D_MODULE_EXTERNAL_RENDERING" OFF)
+
+if(F3D_MODULE_EXTERNAL_RENDERING)
+  if(F3D_TESTING_ENABLE_EXTERNAL_GLFW)
+    find_package(glfw3 REQUIRED)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLFW.cxx)
   endif()
-  find_package(Qt5 QUIET COMPONENTS OpenGL)
-  if(Qt5_FOUND)
-    list(APPEND libf3dSDKTests_list
-        TestSDKExternalWindowQT.cxx
-        )
+  if(F3D_TESTING_ENABLE_EXTERNAL_QT)
+    find_package(Qt5 COMPONENTS OpenGL REQUIRED)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
+  endif()
+  if(F3D_TESTING_ENABLE_EXTERNAL_OSMESA)
+    find_package(OSMesa REQUIRED)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowOSMesa.cxx)
+  endif()
+  if(F3D_TESTING_ENABLE_EXTERNAL_GLX)
+    find_package(OpenGL COMPONENTS GLX REQUIRED)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLX.cxx)
+  endif()
+  if(F3D_TESTING_ENABLE_EXTERNAL_EGL)
+    find_package(OpenGL COMPONENTS EGL REQUIRED)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowEGL.cxx)
+  endif()
+  if(F3D_TESTING_ENABLE_EXTERNAL_WGL)
+    find_package(OpenGL COMPONENTS OpenGL REQUIRED)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowWGL.cxx)
   endif()
 endif()
 
@@ -120,14 +139,34 @@ endif()
 
 target_link_libraries(libf3dSDKTests libf3d)
 
-if(glfw3_FOUND)
+if(F3D_TESTING_ENABLE_EXTERNAL_GLFW)
   # external window test using glfw
   target_link_libraries(libf3dSDKTests glfw)
 endif()
 
-if(Qt5_FOUND)
+if(F3D_TESTING_ENABLE_EXTERNAL_QT)
   # external window test using QT
   target_link_libraries(libf3dSDKTests Qt5::OpenGL)
+endif()
+
+if(F3D_TESTING_ENABLE_EXTERNAL_OSMESA)
+  # external window test using OSMesa
+  target_link_libraries(libf3dSDKTests OSMesa)
+endif()
+
+if(F3D_TESTING_ENABLE_EXTERNAL_GLX)
+  # external window test using GLX
+  target_link_libraries(libf3dSDKTests OpenGL::GLX X11)
+endif()
+
+if(F3D_TESTING_ENABLE_EXTERNAL_EGL)
+  # external window test using EGL
+  target_link_libraries(libf3dSDKTests OpenGL::EGL)
+endif()
+
+if(F3D_TESTING_ENABLE_EXTERNAL_WGL)
+  # external window test using WGL
+  target_link_libraries(libf3dSDKTests OpenGL::GL)
 endif()
 
 # make sure the libf3d API is compatible with the right C++ standard
