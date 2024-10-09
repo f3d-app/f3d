@@ -82,11 +82,16 @@ runs:
         -DF3D_TESTING_ENABLE_EXTERNAL_OSMESA=ON
         -DF3D_TESTING_ENABLE_EXTERNAL_QT=OFF
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
+        -DF3D_TESTING_ENABLE_ONSCREEN_TESTS=ON
 
     - name: Build
       shell: bash
       working-directory: ${{github.workspace}}/source
       run: cmake --build . --parallel 2 --config Release
+
+    - name: Run Xvfb
+      shell: bash
+      run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
     - name: Test
       shell: bash
