@@ -42,6 +42,7 @@ public:
    * Windows: Try Win32, then EGL
    * macOS: Always use Cocoa
    * Optionally, the window can be hidden by setting offscreen to true.
+   * Throws engine::no_window_exception in case of window creation failure.
    */
   static engine create(bool offscreen = false);
 
@@ -54,6 +55,7 @@ public:
    * Create an engine with a GLX window.
    * Works on Linux only.
    * Optionally, the window can be hidden by setting offscreen to true.
+   * Throws engine::no_window_exception in case of window creation failure.
    */
   static engine createGLX(bool offscreen = false);
 
@@ -61,6 +63,7 @@ public:
    * Create an engine with a WGL window.
    * Works on Windows only.
    * Optionally, the window can be hidden by setting offscreen to true.
+   * Throws engine::no_window_exception in case of window creation failure.
    */
   static engine createWGL(bool offscreen = false);
 
@@ -69,6 +72,7 @@ public:
    * If several GPU are available, the environment variable
    * `VTK_DEFAULT_EGL_DEVICE_INDEX` allows its selection.
    * Optionally, the window can be hidden by setting offscreen to true.
+   * Throws engine::no_window_exception in case of failure.
    */
   static engine createEGL(bool offscreen = false);
 

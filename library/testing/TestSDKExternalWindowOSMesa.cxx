@@ -31,8 +31,8 @@ int TestSDKExternalWindowOSMesa(int argc, char* argv[])
   eng.getWindow().setSize(size[0], size[1]);
   eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
 
-  if (!TestSDKHelpers::RenderTest(
-        eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowOSMesa"))
+  if (!TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2],
+    "TestSDKExternalWindowOSMesa"))
   {
     return EXIT_FAILURE;
   }

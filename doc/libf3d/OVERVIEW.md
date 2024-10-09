@@ -80,7 +80,7 @@ Manipulating the window directly can be done this way:
 // Load VTK native readers
 f3d::engine::autoloadPlugins();
 
-// Create a f3d::engine with a hidden window
+// Create a f3d::engine with a offscreen window
 f3d::engine eng = f3d::engine::create(true);
 
 // Load a geometry

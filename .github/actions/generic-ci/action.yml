@@ -164,6 +164,12 @@ runs:
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.1') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
+        -DF3D_TESTING_ENABLE_EXTERNAL_EGL=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EXTERNAL_GLX=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EXTERNAL_OSMESA=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EXTERNAL_QT=ON
+        -DF3D_TESTING_ENABLE_EXTERNAL_WGL=${{ runner.os == 'Windows' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_ONSCREEN_TESTS=${{ inputs.offscreen_backend == 'auto' && 'ON' || 'OFF' }}
         -DF3D_TESTING_OFFSCREEN_BACKEND=${{ inputs.offscreen_backend }}
         -DF3D_WINDOWS_GUI=ON
