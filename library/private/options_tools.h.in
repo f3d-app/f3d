@@ -193,9 +193,9 @@ ratio_t parse(const std::string& str)
 template<>
 vector3_t parse(const std::string& str)
 {
-  auto parseCommaSeparated = [](const std::string& str) -> vector3_t
+  auto parseCommaSeparated = [](const std::string& s) -> vector3_t
   {
-    std::vector vec = parse<std::vector<double>>(str);
+    std::vector vec = parse<std::vector<double>>(s);
     if (vec.size() == 2)
     {
       return f3d::vector3_t::fromSphericalCoordinates(vec[0], vec[1]);
@@ -206,15 +206,15 @@ vector3_t parse(const std::string& str)
     }
     else
     {
-      throw options::parsing_exception("cannot parse " + str + " to a vector3_t");
+      throw options::parsing_exception("cannot parse " + s + " to a vector3_t");
     }
   };
-  auto parseYSyntax = [](const std::string& str) -> vector3_t
+  auto parseYSyntax = [](const std::string& s) -> vector3_t
   {
-    auto ss = trim(str);
+    auto ss = trim(s);
     if (ss.size() != 2)
     {
-      throw options::parsing_exception("cannot parse " + str + " to a vector3_t");
+      throw options::parsing_exception("cannot parse " + s + " to a vector3_t");
     }
     int sign = +1;
     if (ss[0] == '-')
@@ -227,7 +227,7 @@ vector3_t parse(const std::string& str)
     }
     else
     {
-      throw options::parsing_exception("cannot parse " + str + " to a vector3_t");
+      throw options::parsing_exception("cannot parse " + s + " to a vector3_t");
     }
     if (ss[1] == 'X')
     {
@@ -243,7 +243,7 @@ vector3_t parse(const std::string& str)
     }
     else
     {
-      throw options::parsing_exception("cannot parse " + str + " to a vector3_t");
+      throw options::parsing_exception("cannot parse " + s + " to a vector3_t");
     }
   };
   bool isNotCommaSeparated = std::find_if(str.begin(), str.end(),

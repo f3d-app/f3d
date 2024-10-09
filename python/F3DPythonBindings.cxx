@@ -15,15 +15,15 @@
 
 namespace py = pybind11;
 
-template<typename T, size_t S>
-bool load_array(const py::handle& src, bool convert, std::array<T, S>& value)
+template<typename T>
+bool load_array(const py::handle& src, bool convert, T& value)
 {
   if (!py::isinstance<py::sequence>(src))
   {
     return false;
   }
   const py::sequence l = py::reinterpret_borrow<py::sequence>(src);
-  if (l.size() != S)
+  if (l.size() != 3)
   {
     return false;
   }
@@ -31,7 +31,7 @@ bool load_array(const py::handle& src, bool convert, std::array<T, S>& value)
   size_t i = 0;
   for (auto it : l)
   {
-    value[i++] = py::cast<T>(it);
+    value[i++] = py::cast<double>(it);
   }
   return true;
 }
@@ -367,8 +367,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("set_verbose_level", &f3d::log::setVerboseLevel, py::arg("level"),
       py::arg("force_std_err") = false)
     .def_static("set_use_coloring", &f3d::log::setUseColoring)
-    .def_static("print",
-      [](f3d::log::VerboseLevel& level, const std::string& message)
+    .def_static("print", [](f3d::log::VerboseLevel& level, const std::string& message)
       { f3d::log::print(level, message); });
 
   py::enum_<f3d::log::VerboseLevel>(log, "VerboseLevel")
