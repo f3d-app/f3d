@@ -99,13 +99,18 @@ find_package(VTK 9.2.6 REQUIRED
     RenderingVolumeOpenGL2
     TestingCore
     jsoncpp
-    opengl
   OPTIONAL_COMPONENTS
+    opengl
     IOExodus
     IOOpenVDB
     RenderingExternal
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
+
+if(VTK_VERSION VERSION_LESS 9.3.20240914)
+  # Not optional before
+  find_package(VTK 9.0 REQUIRED COMPONENTS opengl)
+endif()
 
 # Shared options between application and library
 include(GNUInstallDirs)
@@ -184,9 +189,17 @@ list(APPEND f3d_link_options_public ${f3d_sanitizer_link_options})
 option(BUILD_TESTING "Build the tests" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_RENDERING_TESTS "Enable rendering tests" ON "BUILD_TESTING" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_ONSCREEN_TESTS "Enable test that require onscreen rendering" ON "F3D_TESTING_ENABLE_RENDERING_TESTS" OFF)
 if(BUILD_TESTING)
   enable_testing()
 endif()
+
+# Testing offscreen backend
+if(NOT F3D_TESTING_OFFSCREEN_BACKEND)
+  set(F3D_TESTING_OFFSCREEN_BACKEND "auto" CACHE STRING "Testing offscreen backend" FORCE)
+  set_property(CACHE F3D_TESTING_OFFSCREEN_BACKEND PROPERTY STRINGS "auto" "egl" "osmesa")
+endif()
+mark_as_advanced(F3D_TESTING_OFFSCREEN_BACKEND)
 
 # Figure out F3D configuration directory
 if(UNIX AND NOT APPLE)

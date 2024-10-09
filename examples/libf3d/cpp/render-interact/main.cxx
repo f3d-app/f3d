@@ -18,7 +18,7 @@ int main(int argc, char** argv)
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
 
   // Create a native window engine
-  f3d::engine eng(f3d::window::Type::NATIVE);
+  f3d::engine eng = f3d::engine::create();
 
   // add a model
   eng.getScene().add(std::string(argv[1]));

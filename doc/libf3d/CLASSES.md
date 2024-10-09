@@ -7,7 +7,7 @@ For the complete documentation, please consult the [libf3d doxygen documentation
 
 The engine class is the main class that needs to be instantiated. All other classes instance are provided by the engine using getters, `getScene`, `getWindow`, `getInteractor`, `getOptions`.
 
-The engine constructor lets you choose the type of window in its constructor, `NONE`, `NATIVE`, `NATIVE_OFFSCREEN`, `EXTERNAL`. Default is `NATIVE`. See [Window class](#window-class) documentation for more info. Please note that the engine will not provide a interactor with `NONE` and `EXTERNAL`.
+The engine factory lets you choose between the different types of OpenGL contexts. See [Window class](#window-class) documentation for more info. Please note that the engine will provide an interactor with native contexts.
 
 A static function `loadPlugin` can also be called to load reader plugins. It must be called before loading any file. An internal plugin containing VTK native readers can be loaded by calling `f3d::engine::loadPlugin("native");`. Other plugins maintained by F3D team are available if their build is enabled: `alembic`, `assimp`, `draco`, `exodus`, `occt` and `usd`.
 If CMake option `F3D_PLUGINS_STATIC_BUILD` is enabled, the plugins listed above are also static just like `native` plugin.
@@ -29,6 +29,10 @@ The window class is responsible for rendering the meshes. It supports multiple m
 * `NATIVE_OFFSCREEN`: Use native graphical capabilities for rendering, but unto an offscreen window, which will not appear on screen, practical when generating screenshots.
 
 * `EXTERNAL`: A window where the OpenGL context is not created but assumed to have been created externally. To be used with other frameworks like Qt or GLFW.
+
+* `EGL`: A window created offscreen, running with full graphical capabilities, possibly in a headless context.
+
+* `OSMESA`: A window created offscreen, running with software rendering, possibly in a headless context.
 
 Window lets you `render`, `renderToImage` and control other parameters of the window, like icon or windowName.
 

@@ -6,14 +6,12 @@
 #include <scene.h>
 #include <window.h>
 
-#include <iostream>
-
 int TestSDKSceneFromMemory(int argc, char* argv[])
 {
   PseudoUnitTest test;
 
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
+  f3d::engine eng = f3d::engine::create(true);
   f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow().setSize(300, 300);
 

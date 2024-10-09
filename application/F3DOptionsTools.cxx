@@ -68,6 +68,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations", "<filePath/filename/fileStem>", "" },
       { "dry-run", "", "Do not read the configuration file", "<bool>", "1" },
       { "no-render", "", "Do not read the configuration file", "<bool>", "1" },
+      { "offscreen-backend", "", "Backend to use when rendering offscreen (auto|glx|wgl|egl|osmesa)", "<string>", "auto" },
       { "max-size", "", "Maximum size in Mib of a file to load, negative value means unlimited", "<size in Mib>", "" },
       { "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", "<bool>", "1" },
       { "load-plugins", "", "List of plugins to load separated with a comma", "<paths or names>", "" },

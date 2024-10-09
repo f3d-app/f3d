@@ -69,6 +69,7 @@ public:
     std::string Output;
     bool NoBackground;
     bool NoRender;
+    std::string OffscreenBackend;
     double MaxSize;
     bool Watch;
     std::vector<std::string> Plugins;
@@ -557,6 +558,8 @@ public:
     this->AppOptions.Output = f3d::options::parse<std::string>(appOptions.at("output"));
     this->AppOptions.NoBackground = f3d::options::parse<bool>(appOptions.at("no-background"));
     this->AppOptions.NoRender = f3d::options::parse<bool>(appOptions.at("no-render"));
+    this->AppOptions.OffscreenBackend =
+      f3d::options::parse<std::string>(appOptions.at("offscreen-backend"));
     this->AppOptions.MaxSize = f3d::options::parse<double>(appOptions.at("max-size"));
     this->AppOptions.Watch = f3d::options::parse<bool>(appOptions.at("watch"));
     this->AppOptions.Plugins = { f3d::options::parse<std::vector<std::string>>(
@@ -759,13 +762,43 @@ int F3DStarter::Start(int argc, char** argv)
 
   if (this->Internals->AppOptions.NoRender)
   {
-    this->Internals->Engine = std::make_unique<f3d::engine>(f3d::window::Type::NONE);
+    this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createNone());
   }
   else
   {
     bool offscreen = !reference.empty() || !output.empty();
-    this->Internals->Engine = std::make_unique<f3d::engine>(
-      offscreen ? f3d::window::Type::NATIVE_OFFSCREEN : f3d::window::Type::NATIVE);
+
+    if (!offscreen)
+    {
+      this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::create(offscreen));
+    }
+    else
+    {
+      if (this->Internals->AppOptions.OffscreenBackend == "egl")
+      {
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createEGL(true));
+      }
+      else if (this->Internals->AppOptions.OffscreenBackend == "osmesa")
+      {
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createOSMesa());
+      }
+      else if (this->Internals->AppOptions.OffscreenBackend == "glx")
+      {
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createGLX(true));
+      }
+      else if (this->Internals->AppOptions.OffscreenBackend == "wgl")
+      {
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createWGL(true));
+      }
+      else
+      {
+        if (this->Internals->AppOptions.OffscreenBackend != "auto")
+        {
+          f3d::log::warn("--offscreen-backend value is invalid, falling back to \"auto\"");
+        }
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::create(true));
+      }
+    }
 
     f3d::window& window = this->Internals->Engine->getWindow();
     window.setWindowName(F3D::AppTitle).setIcon(F3DIcon, sizeof(F3DIcon));

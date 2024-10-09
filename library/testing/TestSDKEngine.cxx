@@ -22,15 +22,15 @@ int TestSDKEngine(int argc, char* argv[])
   // clang-format on
 
   // Test different flags combinations that makes sense
-  f3d::engine eng0(f3d::window::Type::NONE);
+  f3d::engine eng0 = f3d::engine::createNone();
   const f3d::scene& sce = eng0.getScene();
 
-  f3d::engine eng1(f3d::window::Type::NATIVE);
+  f3d::engine eng1 = f3d::engine::create();
   const f3d::scene& sce1 = eng1.getScene();
   const f3d::window& window1 = eng1.getWindow();
   const f3d::interactor& inter1 = eng1.getInteractor();
 
-  f3d::engine eng2(f3d::window::Type::NATIVE_OFFSCREEN);
+  f3d::engine eng2 = f3d::engine::create(true);
   const f3d::scene& sce2 = eng2.getScene();
   const f3d::window& window2 = eng2.getWindow();
   const f3d::interactor& inter2 = eng2.getInteractor();
