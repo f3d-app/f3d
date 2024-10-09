@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace f3d
 {
@@ -117,11 +118,11 @@ struct F3D_EXPORT vector3_t
 
   double* data()
   {
-    return Value;
+    return Value.data();
   }
   const double* data() const
   {
-    return Value;
+    return Value.data();
   }
 
   double& operator[](int idx)
@@ -151,27 +152,27 @@ struct F3D_EXPORT vector3_t
 
   double* begin()
   {
-    return Value;
+    return Value.begin();
   }
   const double* begin() const
   {
-    return Value;
+    return Value.begin();
   }
   const double* cbegin() const
   {
-    return Value;
+    return Value.cbegin();
   }
   double* end()
   {
-    return Value + 3;
+    return Value.end();
   }
   const double* end() const
   {
-    return Value + 3;
+    return Value.end();
   }
   const double* cend() const
   {
-    return Value + 3;
+    return Value.cend();
   }
 
   static vector3_t fromSphericalCoordinates(double theta, double phi)
@@ -198,8 +199,20 @@ struct F3D_EXPORT vector3_t
   }
 
 private:
-  double Value[3];
+  std::array<double, 3> Value;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const f3d::vector3_t& vec)
+{
+  size_t i = 0;
+  for (auto val : vec)
+  {
+    os << (i++ ? ", " : "{ ") << val;
+  }
+  os << " }";
+  return os;
+}
+
 }
 
 #endif
