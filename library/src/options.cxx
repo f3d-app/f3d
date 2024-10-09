@@ -4,6 +4,7 @@
 #include "export.h"
 #include "init.h"
 #include "log.h"
+#include "types.h"
 #include "utils.h"
 
 #include "vtkF3DConfigure.h"
@@ -178,6 +179,7 @@ F3D_DECL_TYPE(bool);
 F3D_DECL_TYPE(int);
 F3D_DECL_TYPE(double);
 F3D_DECL_TYPE(f3d::ratio_t);
+F3D_DECL_TYPE(f3d::vector3_t);
 F3D_DECL_TYPE(std::string);
 
 //----------------------------------------------------------------------------

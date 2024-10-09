@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cmath>
+#include <initializer_list>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -92,6 +93,26 @@ struct F3D_EXPORT vector3_t
     Value[0] = vec[0];
     Value[1] = vec[1];
     Value[2] = vec[2];
+  }
+  vector3_t(const std::array<double, 3>& arr)
+  {
+    Value[0] = arr[0];
+    Value[1] = arr[1];
+    Value[2] = arr[2];
+  }
+  vector3_t(double* ptr)
+  {
+    Value[0] = ptr[0];
+    Value[1] = ptr[1];
+    Value[2] = ptr[2];
+  }
+  vector3_t(std::initializer_list<double> l)
+  {
+    if (l.size() != 3)
+    {
+      throw std::runtime_error("cannot create a vector3_t");
+    }
+    std::copy(l.begin(), l.end(), std::begin(Value));
   }
 
   double* data()

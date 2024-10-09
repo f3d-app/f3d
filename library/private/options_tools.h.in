@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <cctype>
 #include <exception>
+#include <ios>
+#include <iostream>
 #include <sstream>
 #include <vector>
 
@@ -194,11 +196,18 @@ vector3_t parse(const std::string& str)
   auto parseCommaSeparated = [](const std::string& str) -> vector3_t
   {
     std::vector vec = parse<std::vector<double>>(str);
-    if (vec.size() != 3)
+    if (vec.size() == 2)
+    {
+      return f3d::vector3_t::fromSphericalCoordinates(vec[0], vec[1]);
+    }
+    if (vec.size() == 3)
+    {
+      return { vec[0], vec[1], vec[2] };
+    }
+    else
     {
       throw options::parsing_exception("cannot parse " + str + " to a vector3_t");
     }
-    return { vec[0], vec[1], vec[2] };
   };
   auto parseYSyntax = [](const std::string& str) -> vector3_t
   {
@@ -237,8 +246,10 @@ vector3_t parse(const std::string& str)
       throw options::parsing_exception("cannot parse " + str + " to a vector3_t");
     }
   };
-  bool isCommaSeparated = std::find_if(str.begin(), str.end(), std::isalpha<char>) != str.end();
-  if (isCommaSeparated)
+  bool isNotCommaSeparated = std::find_if(str.begin(), str.end(),
+                               [](unsigned char c) { return std::isalpha(c); }) != str.end();
+  std::cout << isNotCommaSeparated << '\n';
+  if (!isNotCommaSeparated)
   {
     return parseCommaSeparated(str);
   }
