@@ -5,7 +5,9 @@
 #include "types.h"
 
 #include <algorithm>
+#include <cctype>
 #include <sstream>
+#include <vector>
 
 namespace f3d
 {
@@ -183,6 +185,78 @@ ratio_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
+ * Parse provided string into a vector3_t.
+ */
+template<>
+vector3_t parse(const std::string& str)
+{
+  auto parseCommaSeparated = [](const std::string& s) -> vector3_t
+  {
+    std::vector vec = parse<std::vector<double>>(s);
+    if (vec.size() == 2)
+    {
+      return f3d::vector3_t::fromSphericalCoordinates(vec[0], vec[1]);
+    }
+    if (vec.size() == 3)
+    {
+      return { vec[0], vec[1], vec[2] };
+    }
+    else
+    {
+      throw options::parsing_exception("cannot parse " + s + " to a vector3_t");
+    }
+  };
+  auto parseYSyntax = [](const std::string& s) -> vector3_t
+  {
+    auto ss = trim(s);
+    if (ss.size() != 2)
+    {
+      throw options::parsing_exception("cannot parse " + s + " to a vector3_t");
+    }
+    int sign = +1;
+    if (ss[0] == '-')
+    {
+      sign = -1;
+    }
+    else if (ss[0] == '+')
+    {
+      sign = +1;
+    }
+    else
+    {
+      throw options::parsing_exception("cannot parse " + s + " to a vector3_t");
+    }
+    if (ss[1] == 'X')
+    {
+      return { double(sign) * 1, 0, 0 };
+    }
+    else if (ss[1] == 'Y')
+    {
+      return { 0, double(sign) * 1, 0 };
+    }
+    else if (ss[1] == 'Z')
+    {
+      return { 0, 0, double(sign) * 1 };
+    }
+    else
+    {
+      throw options::parsing_exception("cannot parse " + s + " to a vector3_t");
+    }
+  };
+  bool isNotCommaSeparated = std::find_if(str.begin(), str.end(),
+                               [](unsigned char c) { return std::isalpha(c); }) != str.end();
+  if (!isNotCommaSeparated)
+  {
+    return parseCommaSeparated(str);
+  }
+  else
+  {
+    return parseYSyntax(str);
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
  * Return provided string stripped of leading and trailing spaces.
  */
 template<>
@@ -268,6 +342,17 @@ std::string format(const std::vector<double>& var)
     i++;
   }
   return stream.str();
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Format provided var into a string from provided vector3_t
+ * rely on format(double&)
+ */
+template<>
+std::string format(const vector3_t& var)
+{
+  return format(static_cast<std::vector<double>>(var));
 }
 
 //----------------------------------------------------------------------------
