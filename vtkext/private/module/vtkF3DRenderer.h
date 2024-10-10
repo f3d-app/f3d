@@ -480,7 +480,6 @@ private:
   vtkNew<vtkTextActor> TimerActor;
   unsigned int Timer = 0;
 
-  bool UpVectorConfigured = false;
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
   bool GridConfigured = false;
