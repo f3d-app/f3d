@@ -8,7 +8,7 @@
 #include "vtkF3DConfigure.h"
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
-#include "vtkF3DRendererWithColoring.h"
+#include "vtkF3DRenderer.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCellPicker.h>
@@ -163,7 +163,6 @@ public:
     // No user defined behavior, use standard behavior
     vtkRenderWindow* renWin = self->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    vtkF3DRendererWithColoring* renWithColor = vtkF3DRendererWithColoring::SafeDownCast(ren);
     bool checkColoring = false;
     bool render = false;
 
@@ -177,27 +176,27 @@ public:
         render = true;
         break;
       case 'C':
-        if (renWithColor)
+        if (ren)
         {
-          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::FIELD);
+          ren->CycleScalars(vtkF3DRenderer::CycleType::FIELD);
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
         }
         break;
       case 'S':
-        if (renWithColor)
+        if (ren)
         {
-          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::ARRAY_INDEX);
+          ren->CycleScalars(vtkF3DRenderer::CycleType::ARRAY_INDEX);
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
         }
         break;
       case 'Y':
-        if (renWithColor)
+        if (ren)
         {
-          renWithColor->CycleScalars(vtkF3DRendererWithColoring::CycleType::COMPONENT);
+          ren->CycleScalars(vtkF3DRenderer::CycleType::COMPONENT);
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
@@ -368,10 +367,10 @@ public:
     if (checkColoring)
     {
       // Resynchronise renderer coloring status with options
-      self->Options.model.scivis.enable = renWithColor->GetColoringEnabled();
-      self->Options.model.scivis.cells = renWithColor->GetColoringUseCell();
-      self->Options.model.scivis.array_name = renWithColor->GetColoringArrayName();
-      self->Options.model.scivis.component = renWithColor->GetColoringComponent();
+      self->Options.model.scivis.enable = ren->GetColoringEnabled();
+      self->Options.model.scivis.cells = ren->GetColoringUseCell();
+      self->Options.model.scivis.array_name = ren->GetColoringArrayName();
+      self->Options.model.scivis.component = ren->GetColoringComponent();
     }
     if (render)
     {
