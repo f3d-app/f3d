@@ -40,7 +40,7 @@ public:
    */
   void ShowAxis(bool show);
   void ShowGrid(bool show);
-  void ShowEdge(bool show);
+  void ShowEdge(const std::optional<bool>& show);
   void ShowTimer(bool show);
   void ShowMetaData(bool show);
   void ShowFilename(bool show);
@@ -90,7 +90,7 @@ public:
   /**
    * Set SetUseOrthographicProjection
    */
-  void SetUseOrthographicProjection(bool use);
+  void SetUseOrthographicProjection(const std::optional<bool>& use);
 
   ///@{
   /**
@@ -499,7 +499,7 @@ private:
   bool GridVisible = false;
   bool GridAbsolute = false;
   bool AxisVisible = false;
-  bool EdgeVisible = false;
+  std::optional<bool> EdgeVisible;
   bool TimerVisible = false;
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
@@ -513,7 +513,7 @@ private:
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;
-  bool UseOrthographicProjection = false;
+  std::optional<bool> UseOrthographicProjection = false;
   bool UseTrackball = false;
   bool InvertZoom = false;
 
