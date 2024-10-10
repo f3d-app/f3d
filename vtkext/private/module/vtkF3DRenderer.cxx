@@ -289,7 +289,6 @@ void vtkF3DRenderer::Initialize()
   this->VolumePropsAndMappersConfigured = false;
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
-  this->ColoringActorsPropertiesConfigured = false;
   this->ColoringConfigured = false;
 }
 
@@ -1472,49 +1471,6 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ConfigureActorsProperties()
-{
-  // XXX should be handled using new importer API once renderers are merged
-  vtkActor* anActor;
-  vtkActorCollection* ac = this->GetActors();
-  vtkCollectionSimpleIterator ait;
-  for (ac->InitTraversal(ait); (anActor = ac->GetNextActor(ait));)
-  {
-    if (vtkSkybox::SafeDownCast(anActor) == nullptr)
-    {
-      anActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
-
-      if (this->LineWidth.has_value())
-      {
-        anActor->GetProperty()->SetLineWidth(this->LineWidth.value());
-      }
-
-      if (this->PointSize.has_value())
-      {
-        anActor->GetProperty()->SetPointSize(this->PointSize.value());
-      }
-
-      if (this->BackfaceType.has_value())
-      {
-        if (this->BackfaceType.value() == "visible")
-        {
-          anActor->GetProperty()->SetBackfaceCulling(false);
-        }
-        else if (this->BackfaceType.value() == "hidden")
-        {
-          anActor->GetProperty()->SetBackfaceCulling(true);
-        }
-        else
-        {
-          F3DLog::Print(F3DLog::Severity::Warning, this->BackfaceType.value() + " is not a valid backface type, assuming it is not set");
-        }
-      }
-    }
-  }
-  this->ActorsPropertiesConfigured = true;
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowEdge(bool show)
 {
   // XXX EdgeVisible should be an optional
@@ -1593,14 +1549,14 @@ void vtkF3DRenderer::UpdateActors()
     this->ActorsPropertiesConfigured = false;
     this->GridConfigured = false;
     this->MetaDataConfigured = false;
-    this->ColoringActorsPropertiesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
     this->ColoringConfigured = false;
   }
   this->ImporterTimeStamp = importerMTime;
 
-  if (!this->ColoringActorsPropertiesConfigured)
+  if (!this->ActorsPropertiesConfigured)
   {
-    this->ConfigureColoringActorsProperties();
+    this->ConfigureActorsProperties();
   }
 
   if (!this->ColoringConfigured)
@@ -1635,11 +1591,6 @@ void vtkF3DRenderer::UpdateActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
-  if (!this->ActorsPropertiesConfigured)
-  {
-    this->ConfigureActorsProperties();
-  }
-
   if (!this->CheatSheetConfigured)
   {
     this->ConfigureCheatSheet();
@@ -1824,7 +1775,7 @@ void vtkF3DRenderer::SetRoughness(const std::optional<double>& roughness)
   if (this->Roughness != roughness)
   {
     this->Roughness = roughness;
-    this->ColoringActorsPropertiesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
@@ -1834,7 +1785,7 @@ void vtkF3DRenderer::SetOpacity(const std::optional<double>& opacity)
   if (this->Opacity != opacity)
   {
     this->Opacity = opacity;
-    this->ColoringActorsPropertiesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
@@ -1844,7 +1795,7 @@ void vtkF3DRenderer::SetMetallic(const std::optional<double>& metallic)
   if (this->Metallic != metallic)
   {
     this->Metallic = metallic;
-    this->ColoringActorsPropertiesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
@@ -1854,7 +1805,7 @@ void vtkF3DRenderer::SetNormalScale(const std::optional<double>& normalScale)
   if (this->NormalScale != normalScale)
   {
     this->NormalScale = normalScale;
-    this->ColoringActorsPropertiesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
@@ -1864,7 +1815,7 @@ void vtkF3DRenderer::SetSurfaceColor(const std::optional<std::vector<double>>& c
   if (this->SurfaceColor != color)
   {
     this->SurfaceColor = color;
-    this->ColoringActorsPropertiesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
@@ -1874,7 +1825,7 @@ void vtkF3DRenderer::SetEmissiveFactor(const std::optional<std::vector<double>>&
   if (this->EmissiveFactor != factor)
   {
     this->EmissiveFactor = factor;
-    this->ColoringActorsPropertiesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
@@ -1884,7 +1835,7 @@ void vtkF3DRenderer::SetTextureMatCap(const std::optional<std::string>& tex)
   if (this->TextureMatCap != tex)
   {
     this->TextureMatCap = tex;
-    this->ColoringActorsPropertiesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
@@ -1894,7 +1845,7 @@ void vtkF3DRenderer::SetTextureBaseColor(const std::optional<std::string>& tex)
   if (this->TextureBaseColor != tex)
   {
     this->TextureBaseColor = tex;
-    this->ColoringActorsPropertiesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
@@ -1904,7 +1855,7 @@ void vtkF3DRenderer::SetTextureMaterial(const std::optional<std::string>& tex)
   if (this->TextureMaterial != tex)
   {
     this->TextureMaterial = tex;
-    this->ColoringActorsPropertiesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
@@ -1914,7 +1865,7 @@ void vtkF3DRenderer::SetTextureEmissive(const std::optional<std::string>& tex)
   if (this->TextureEmissive != tex)
   {
     this->TextureEmissive = tex;
-    this->ColoringActorsPropertiesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
@@ -1924,12 +1875,12 @@ void vtkF3DRenderer::SetTextureNormal(const std::optional<std::string>& tex)
   if (this->TextureNormal != tex)
   {
     this->TextureNormal = tex;
-    this->ColoringActorsPropertiesConfigured = false;
+    this->ActorsPropertiesConfigured = false;
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ConfigureColoringActorsProperties()
+void vtkF3DRenderer::ConfigureActorsProperties()
 {
   assert(this->Importer);
 
@@ -1960,9 +1911,50 @@ void vtkF3DRenderer::ConfigureColoringActorsProperties()
       emissiveFactor = this->EmissiveFactor.value().data();
     }
   }
+  
+  bool setBackfaceCulling = false;
+  bool backfaceCulling = true;
+  if (this->BackfaceType.has_value())
+  {
+    setBackfaceCulling = true;
+    if (this->BackfaceType.value() == "visible")
+    {
+      backfaceCulling = false;
+    }
+    else if (this->BackfaceType.value() == "hidden")
+    {
+      backfaceCulling = true;
+    }
+    else
+    {
+      setBackfaceCulling = false;
+      F3DLog::Print(F3DLog::Severity::Warning, this->BackfaceType.value() + " is not a valid backface type, assuming it is not set");
+    }
+  }
 
   for ([[maybe_unused]] const auto& [actor, mapper, originalActor] : this->Importer->GetColoringActorsAndMappers())
   {
+    actor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
+    originalActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
+
+    if (this->LineWidth.has_value())
+    {
+      actor->GetProperty()->SetLineWidth(this->LineWidth.value());
+      originalActor->GetProperty()->SetLineWidth(this->LineWidth.value());
+    }
+
+    if (this->PointSize.has_value())
+    {
+      actor->GetProperty()->SetPointSize(this->PointSize.value());
+      originalActor->GetProperty()->SetPointSize(this->PointSize.value());
+    }
+
+    if (setBackfaceCulling)
+    {
+      actor->GetProperty()->SetBackfaceCulling(backfaceCulling);
+      originalActor->GetProperty()->SetBackfaceCulling(backfaceCulling);
+    }
+
     if(surfaceColor)
     {
       actor->GetProperty()->SetColor(surfaceColor);
@@ -2056,7 +2048,7 @@ void vtkF3DRenderer::ConfigureColoringActorsProperties()
     }
   }
 
-  this->ColoringActorsPropertiesConfigured = true;
+  this->ActorsPropertiesConfigured = true;
 }
 
 //----------------------------------------------------------------------------

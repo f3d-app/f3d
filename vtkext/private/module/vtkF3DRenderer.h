@@ -364,10 +364,7 @@ private:
   ///@}
 
   /**
-   * Configure all actors properties according to what has been set for:
-   * - point size
-   * - line width
-   * - show edges
+   * Configure all actors properties
    */
   void ConfigureActorsProperties();
 
@@ -406,12 +403,6 @@ private:
    * Shorten a provided name with "..."
    */
   static std::string ShortName(const std::string& name, int maxChar);
-
-  /**
-   * XXX: This method name is semantically incorrect and will soon be changed
-   * Configure all coloring actors properties
-   */
-  void ConfigureColoringActorsProperties();
 
   /**
    * Configure coloring for all actors
@@ -572,7 +563,6 @@ private:
   bool ColoringMappersConfigured = false;
   bool PointSpritesMappersConfigured = false;
   bool VolumePropsAndMappersConfigured = false;
-  bool ColoringActorsPropertiesConfigured = false;
   bool ColoringConfigured = false;
 
   std::optional<double> Opacity;
