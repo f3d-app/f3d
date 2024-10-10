@@ -31,7 +31,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "config", "" },
   { "dry-run", "false" },
   { "no-render", "false" },
-  { "offscreen-backend", "auto" },
+  { "rendering-backend", "auto" },
   { "max-size", "-1.0" },
   { "watch", "false" },
   { "load-plugins", "" },

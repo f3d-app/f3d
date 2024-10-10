@@ -8,7 +8,7 @@ There are a few CMake options to configure the F3D testing framework:
 * `BUILD_TESTING`: Enable the test framework, off by default. Requires [git LFS](https://git-lfs.com/) if repository is cloned.
 * `F3D_TESTING_ENABLE_RENDERING_TESTS`: An option to enable/disable test that require rendering capabilities, on by default.
 * `F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS`: Certain tests can take some time to run, off by default, requires rendering tests.
-* `F3D_TESTING_OFFSCREEN_BACKEND`: Configure the offscreen backend to use. Can be `auto` (default), `egl` or `osmesa`.
+* `F3D_TESTING_RENDERING_BACKEND`: Configure the rendering backend to use. Can be `auto` (default), `egl` or `osmesa`.
 
 ## Running the tests
 

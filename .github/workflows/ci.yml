@@ -86,42 +86,42 @@ jobs:
           - raytracing_label: raytracing
           - exclude_deprecated_label: no-exclude-deprecated
           - optional_deps_label: optional-deps
-          - offscreen_backend: auto
+          - rendering_backend: auto
           - static_label: no-static
           - build_type: egl
             vtk_version: commit
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
-            offscreen_backend: egl
+            rendering_backend: egl
             static_label: no-static
           - build_type: osmesa
             vtk_version: commit
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
-            offscreen_backend: osmesa
+            rendering_backend: osmesa
             static_label: no-static
           - build_type: exclude_deprecated
             vtk_version: commit
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: exclude-deprecated
-            offscreen_backend: auto
+            rendering_backend: auto
             static_label: no-static
           - build_type: no_optional_deps
             vtk_version: commit
             raytracing_label: no-raytracing
             optional_deps_label: no-optional-deps
             exclude_deprecated_label: no-exclude-deprecated
-            offscreen_backend: auto
+            rendering_backend: auto
             static_label: no-static
           - build_type: static_libs
             vtk_version: commit
             raytracing_label: no-raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
-            offscreen_backend: auto
+            rendering_backend: auto
             static_label: static
 
     runs-on: ubuntu-latest

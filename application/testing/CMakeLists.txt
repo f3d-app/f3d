@@ -51,8 +51,8 @@ function(f3d_test)
     endif()
   endif()
 
-  if(DEFINED F3D_TESTING_OFFSCREEN_BACKEND)
-    list(APPEND F3D_TEST_ARGS "--offscreen-backend=${F3D_TESTING_OFFSCREEN_BACKEND}")
+  if(DEFINED F3D_TESTING_RENDERING_BACKEND)
+    list(APPEND F3D_TEST_ARGS "--rendering-backend=${F3D_TESTING_RENDERING_BACKEND}")
   endif()
 
   add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
@@ -994,6 +994,17 @@ f3d_test(NAME TestReadersList ARGS --readers-list REGEXP_FAIL "No registered rea
 # Test multi plugin readers-lists
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestReadersListMultiplePlugins ARGS --readers-list --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
+endif()
+
+# Test rendering backends
+add_test(NAME f3d::TestRenderingBackendAuto COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=auto --verbose)
+if(UNIX AND NOT APPLE)
+  add_test(NAME f3d::TestRenderingBackendEGL COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=egl --verbose)
+  add_test(NAME f3d::TestRenderingBackendOSMesa COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=osmesa --verbose)
+  add_test(NAME f3d::TestRenderingBackendGLX COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=glx --verbose)
+endif()
+if(WIN32)
+  add_test(NAME f3d::TestRenderingBackendWGL COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=wgl --verbose)
 endif()
 
 # Test that f3d can try to read a system config file
