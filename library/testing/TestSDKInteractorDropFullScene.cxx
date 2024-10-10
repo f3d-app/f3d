@@ -9,7 +9,7 @@
 
 int TestSDKInteractorDropFullScene(int argc, char* argv[])
 {
-  f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
+  f3d::engine eng = f3d::engine::create(true);
   const f3d::options& options = eng.getOptions();
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();

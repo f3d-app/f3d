@@ -20,7 +20,7 @@ def test_setitem():
 
 
 def test_getitem():
-    engine = f3d.Engine(f3d.Window.NONE)
+    engine = f3d.Engine.create_none()
     options = engine.options
 
     assert options["interactor.axis"] is False
@@ -74,7 +74,7 @@ def test_set_options():
     options["model.color.rgb"] = [0.0, 1.0, 1.0]
     options["scene.up_direction"] = "-Z"
 
-    engine = f3d.Engine(f3d.Window.NONE)
+    engine = f3d.Engine.create_none()
     engine.options = options
     assert engine.options["interactor.axis"] is True
     assert engine.options["model.material.roughness"] == 0.7

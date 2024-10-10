@@ -12,7 +12,7 @@ def test_compare_with_file():
     output = tempfile.gettempdir() + "/TestPythonCompareWithFile.png"
     outputDiff = tempfile.gettempdir() + "/TestPythonCompareWithFile.diff.png"
 
-    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+    engine = f3d.Engine.create(True)
     engine.window.size = 300, 300
 
     # verify the size is properly set

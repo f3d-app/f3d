@@ -11,7 +11,7 @@
 int TestSDKMultiOptions(int argc, char* argv[])
 {
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
+  f3d::engine eng = f3d::engine::create(true);
   f3d::scene& sce = eng.getScene();
   f3d::options& opt = eng.getOptions();
   f3d::window& win = eng.getWindow();

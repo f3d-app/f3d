@@ -14,7 +14,7 @@ int main()
 {
   f3d::engine::autoloadPlugins();
 
-  f3d::engine eng(f3d::window::Type::NONE);
+  f3d::engine eng = f3d::engine::createNone();
 
   f3d::log::info("F3D engine is loaded");
 

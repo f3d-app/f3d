@@ -51,6 +51,10 @@ function(f3d_test)
     endif()
   endif()
 
+  if(DEFINED F3D_TESTING_RENDERING_BACKEND)
+    list(APPEND F3D_TEST_ARGS "--rendering-backend=${F3D_TESTING_RENDERING_BACKEND}")
+  endif()
+
   add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
 
   set(_timeout "30")
@@ -992,6 +996,17 @@ if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestReadersListMultiplePlugins ARGS --readers-list --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()
 
+# Test rendering backends
+add_test(NAME f3d::TestRenderingBackendAuto COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=auto --verbose)
+if(UNIX AND NOT APPLE)
+  add_test(NAME f3d::TestRenderingBackendEGL COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=egl --verbose)
+  add_test(NAME f3d::TestRenderingBackendOSMesa COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=osmesa --verbose)
+  add_test(NAME f3d::TestRenderingBackendGLX COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=glx --verbose)
+endif()
+if(WIN32)
+  add_test(NAME f3d::TestRenderingBackendWGL COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=wgl --verbose)
+endif()
+
 # Test that f3d can try to read a system config file
 add_test(NAME f3d::TestNoDryRun COMMAND $<TARGET_FILE:f3d> --no-render)
 set_tests_properties(f3d::TestNoDryRun PROPERTIES TIMEOUT 4)
@@ -1042,8 +1057,8 @@ if(NOT F3D_MACOS_BUNDLE)
   endif()
 endif()
 
-# Watch testing require onscreen rendering
-if(NOT VTK_OPENGL_HAS_EGL)
+if(F3D_TESTING_ENABLE_ONSCREEN_TESTS)
+  # Watch testing require onscreen rendering
   if(UNIX)
     set(_f3d_os_script_ext "sh")
     set(_f3d_os_script_exec "")

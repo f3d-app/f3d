@@ -119,7 +119,7 @@ There are three APIs to access the options
 The most straightforward and easy to use API, just access it through the structs available in the options instance, eg:
 
 ```cpp
-  f3d::engine eng(f3d::window::Type::NATIVE);
+  f3d::engine eng = f3d::engine::create();
   f3d::options& opt = eng.getOptions();
   opt.render.show_edges = true;
   opt.render.grid.enable = true;
@@ -130,7 +130,7 @@ The most straightforward and easy to use API, just access it through the structs
 Please note that when accessing optional options, special care must be used, eg:
 
 ```cpp
-  f3d::engine eng(f3d::window::Type::NATIVE);
+  f3d::engine eng = f3d::engine::create();
   f3d::options& opt = eng.getOptions();
   if (opt.render.line_width.has_value())
   {
@@ -147,7 +147,7 @@ The most generic and flexible API, as it rely on parsing and string generation.
 The documentation about option parsing is upcoming.
 
 ```cpp
-  f3d::engine eng(f3d::window::Type::NATIVE);
+  f3d::engine eng = f3d::engine::create();
   f3d::options& opt = eng.getOptions();
   opt.setAsString("render.show_edges", "true");
   opt.setAsString("render.grid.enable", "true");
@@ -158,7 +158,7 @@ The documentation about option parsing is upcoming.
 When using this API make sure to catch exceptions has needed, eg:
 
 ```cpp
-  f3d::engine eng(f3d::window::Type::NATIVE);
+  f3d::engine eng = f3d::engine::create();
   f3d::options& opt = eng.getOptions();
 
   try
@@ -180,7 +180,7 @@ When using this API make sure to catch exceptions has needed, eg:
 An API that is similar to the F3D 2.0 options API thanks to std::variant.
 
 ```cpp
-  f3d::engine eng(f3d::window::Type::NATIVE);
+  f3d::engine eng = f3d::engine::create();
   f3d::options& opt = eng.getOptions();
   opt.set("render.show_edges", true);
   opt.set("render.grid.enable", true);
