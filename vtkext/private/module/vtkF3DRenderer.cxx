@@ -1471,9 +1471,8 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ShowEdge(bool show)
+void vtkF3DRenderer::ShowEdge(const std::optional<bool>& show)
 {
-  // XXX EdgeVisible should be an optional
   if (this->EdgeVisible != show)
   {
     this->EdgeVisible = show;
@@ -1483,40 +1482,42 @@ void vtkF3DRenderer::ShowEdge(bool show)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseOrthographicProjection(bool use)
+void vtkF3DRenderer::SetUseOrthographicProjection(const std::optional<bool>& use)
 {
   // if the internal state is already the same as the target state there's nothing to do
-  // XXX UseOrthographicProjection should be an optional
-  if (this->UseOrthographicProjection == use)
+  if (this->UseOrthographicProjection != use)
   {
-    return;
-  }
+    this->UseOrthographicProjection = use;
 
-  vtkCamera* camera = GetActiveCamera();
-  const double angle = vtkMath::RadiansFromDegrees(camera->GetViewAngle());
-  const double* position = camera->GetPosition();
-  const double* focal = camera->GetFocalPoint();
+    // XXX This could be done in UpdateActors for coherency
+    if (this->UseOrthographicProjection.has_value())
+    {
+      vtkCamera* camera = GetActiveCamera();
+      const double angle = vtkMath::RadiansFromDegrees(camera->GetViewAngle());
+      const double* position = camera->GetPosition();
+      const double* focal = camera->GetFocalPoint();
 
-  if (use)
-  {
-    const double distance = std::sqrt(vtkMath::Distance2BetweenPoints(position, focal));
-    const double parallelScale = distance * tan(angle / 2);
-    camera->SetParallelScale(parallelScale);
+      if (this->UseOrthographicProjection.value())
+      {
+        const double distance = std::sqrt(vtkMath::Distance2BetweenPoints(position, focal));
+        const double parallelScale = distance * tan(angle / 2);
+        camera->SetParallelScale(parallelScale);
+      }
+      else
+      {
+        const double distance = camera->GetParallelScale() / tan(angle / 2);
+        double direction[3];
+        vtkMath::Subtract(position, focal, direction);
+        vtkMath::Normalize(direction);
+        vtkMath::MultiplyScalar(direction, distance);
+        double newPosition[3];
+        vtkMath::Add(focal, direction, newPosition);
+        camera->SetPosition(newPosition);
+      }
+      camera->SetParallelProjection(this->UseOrthographicProjection.value());
+      this->ResetCameraClippingRange();
+    }
   }
-  else
-  {
-    const double distance = camera->GetParallelScale() / tan(angle / 2);
-    double direction[3];
-    vtkMath::Subtract(position, focal, direction);
-    vtkMath::Normalize(direction);
-    vtkMath::MultiplyScalar(direction, distance);
-    double newPosition[3];
-    vtkMath::Add(focal, direction, newPosition);
-    camera->SetPosition(newPosition);
-  }
-  this->UseOrthographicProjection = use;
-  camera->SetParallelProjection(use);
-  this->ResetCameraClippingRange();
 }
 
 //----------------------------------------------------------------------------
@@ -1934,8 +1935,11 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 
   for ([[maybe_unused]] const auto& [actor, mapper, originalActor] : this->Importer->GetColoringActorsAndMappers())
   {
-    actor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
-    originalActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible);
+    if (this->EdgeVisible.has_value())
+    {
+      actor->GetProperty()->SetEdgeVisibility(this->EdgeVisible.value());
+      originalActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible.value());
+    }
 
     if (this->LineWidth.has_value())
     {

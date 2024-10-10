@@ -34,15 +34,13 @@
         "type": "int"
       },
       "orthographic": {
-        "type": "bool",
-        "default_value": "false"
+        "type": "bool"
       }
     }
   },
   "render": {
     "show_edges": {
-      "type": "bool",
-      "default_value": "false"
+      "type": "bool"
     },
     "line_width": {
       "type": "double"
