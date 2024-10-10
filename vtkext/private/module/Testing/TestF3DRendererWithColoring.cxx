@@ -5,11 +5,11 @@
 
 #include "vtkF3DConfigure.h"
 #include "vtkF3DGenericImporter.h"
-#include "vtkF3DRendererWithColoring.h"
+#include "vtkF3DRenderer.h"
 
 int TestF3DRendererWithColoring(int argc, char* argv[])
 {
-  vtkNew<vtkF3DRendererWithColoring> renderer;
+  vtkNew<vtkF3DRenderer> renderer;
   vtkNew<vtkF3DMetaImporter> importer;
   vtkNew<vtkRenderWindow> window;
 
@@ -34,7 +34,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   renderer->SetColoring(true, false, "Invalid", 0);
   renderer->SetUseVolume(false);
   renderer->UpdateActors();
-  renderer->CycleScalars(vtkF3DRendererWithColoring::CycleType::COMPONENT);
+  renderer->CycleScalars(vtkF3DRenderer::CycleType::COMPONENT);
   renderer->SetUseVolume(true);
   renderer->UpdateActors();
 
@@ -56,7 +56,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  renderer->CycleScalars(vtkF3DRendererWithColoring::CycleType::COMPONENT);
+  renderer->CycleScalars(vtkF3DRenderer::CycleType::COMPONENT);
   if (renderer->GetColoringArrayName() != "Momentum" || renderer->GetColoringComponent() != 1)
   {
     std::cerr << "Unexpected coloring information after cycling component" << std::endl;

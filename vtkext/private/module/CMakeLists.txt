@@ -48,7 +48,6 @@ set(classes
   vtkF3DPostProcessFilter
   vtkF3DRenderPass
   vtkF3DRenderer
-  vtkF3DRendererWithColoring
   vtkF3DUserRenderPass
   )
 
