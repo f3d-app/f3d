@@ -25,8 +25,8 @@ inputs:
     description: 'Label to control bundle'
     required: false
     default: 'no-bundle'
-  offscreen_backend:
-    description: 'Label to control the offscreen backend'
+  rendering_backend:
+    description: 'Label to control the rendering backend'
     required: false
     default: 'auto'
   static_label:
@@ -170,8 +170,8 @@ runs:
         -DF3D_TESTING_ENABLE_EXTERNAL_OSMESA=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_QT=OFF
         -DF3D_TESTING_ENABLE_EXTERNAL_WGL=${{ runner.os == 'Windows' && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_ONSCREEN_TESTS=${{ inputs.offscreen_backend == 'auto' && 'ON' || 'OFF' }}
-        -DF3D_TESTING_OFFSCREEN_BACKEND=${{ inputs.offscreen_backend }}
+        -DF3D_TESTING_ENABLE_ONSCREEN_TESTS=${{ inputs.rendering_backend == 'auto' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
@@ -185,7 +185,7 @@ runs:
     - name: Run Xvfb ubuntu
       if: |
         runner.os == 'Linux' &&
-        inputs.offscreen_backend == 'auto'
+        inputs.rendering_backend == 'auto'
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 

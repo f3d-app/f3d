@@ -98,11 +98,11 @@ jobs:
     matrix:
       build_type: [standard]
       include:
-        - offscreen_backend: auto
+        - rendering_backend: auto
         - build_type: egl
-          offscreen_backend: egl
+          rendering_backend: egl
         - build_type: osmesa
-          offscreen_backend: osmesa
+          rendering_backend: osmesa
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
@@ -124,7 +124,7 @@ jobs:
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
         raytracing_label: 'raytracing'
         exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
-        offscreen_backend: ${{matrix.offscreen_backend}}
+        rendering_backend: ${{matrix.rendering_backend}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------

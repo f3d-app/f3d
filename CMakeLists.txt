@@ -195,11 +195,11 @@ if(BUILD_TESTING)
 endif()
 
 # Testing offscreen backend
-if(NOT F3D_TESTING_OFFSCREEN_BACKEND)
-  set(F3D_TESTING_OFFSCREEN_BACKEND "auto" CACHE STRING "Testing offscreen backend" FORCE)
-  set_property(CACHE F3D_TESTING_OFFSCREEN_BACKEND PROPERTY STRINGS "auto" "egl" "osmesa")
+if(NOT F3D_TESTING_RENDERING_BACKEND)
+  set(F3D_TESTING_RENDERING_BACKEND "auto" CACHE STRING "Testing offscreen backend" FORCE)
+  set_property(CACHE F3D_TESTING_RENDERING_BACKEND PROPERTY STRINGS "auto" "egl" "osmesa")
 endif()
-mark_as_advanced(F3D_TESTING_OFFSCREEN_BACKEND)
+mark_as_advanced(F3D_TESTING_RENDERING_BACKEND)
 
 # Figure out F3D configuration directory
 if(UNIX AND NOT APPLE)
