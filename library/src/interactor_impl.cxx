@@ -30,6 +30,8 @@
 
 #include "camera.h"
 
+#include "imgui_impl_vtk.h"
+
 namespace f3d::detail
 {
 class interactor_impl::internals
@@ -50,6 +52,8 @@ public:
     // Disable standard interactor behavior with timer event
     // in order to be able to interact while animating
     this->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
+
+    ImGui_ImplVTK_AddObservers(this->VTKInteractor);
 
     vtkNew<vtkCallbackCommand> keyPressCallback;
     keyPressCallback->SetClientData(this);
