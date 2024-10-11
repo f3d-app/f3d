@@ -170,8 +170,8 @@ runs:
         -DF3D_TESTING_ENABLE_EXTERNAL_OSMESA=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_QT=OFF
         -DF3D_TESTING_ENABLE_EXTERNAL_WGL=${{ runner.os == 'Windows' && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_ONSCREEN_TESTS=${{ inputs.rendering_backend == 'auto' && 'ON' || 'OFF' }}
-        -DF3D_TESTING_RENDERING_BACKEND=${{ inputs.rendering_backend }}
+        -DF3D_TESTING_ENABLE_GLX_TESTS=${{ inputs.rendering_backend == 'auto' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}

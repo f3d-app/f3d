@@ -166,7 +166,6 @@ public:
   std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkNew<vtkF3DRenderer> Renderer;
-  Type WindowType;
   const options& Options;
   std::string CachePath;
   context::function GetProcAddress;
@@ -174,10 +173,9 @@ public:
 
 //----------------------------------------------------------------------------
 window_impl::window_impl(
-  const options& options, Type type, bool offscreen, const context::function& getProcAddress)
+  const options& options, const std::optional<Type>& type, bool offscreen, const context::function& getProcAddress)
   : Internals(std::make_unique<window_impl::internals>(options))
 {
-  this->Internals->WindowType = type;
   this->Internals->GetProcAddress = getProcAddress;
   if (type == Type::NONE)
   {
@@ -262,48 +260,9 @@ window_impl::window_impl(
     throw engine::no_window_exception("Window type is Cocoa but it is supported on macOS only");
 #endif
   }
-  else if (type == Type::AUTO)
+  else if (!type.has_value())
   {
     this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
-
-    if (this->Internals->RenWin->IsA("vtkOSOpenGLRenderWindow"))
-    {
-      this->Internals->WindowType = Type::OSMESA;
-    }
-#ifdef VTK_USE_X
-    else if (this->Internals->RenWin->IsA("vtkXOpenGLRenderWindow"))
-    {
-      this->Internals->WindowType = Type::GLX;
-    }
-#endif
-#ifdef _WIN32
-    else if (this->Internals->RenWin->IsA("vtkWin32OpenGLRenderWindow"))
-    {
-      this->Internals->WindowType = Type::WGL;
-    }
-#endif
-#ifdef __APPLE__
-    else if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
-    {
-      this->Internals->WindowType = Type::COCOA;
-    }
-#endif
-#ifdef VTK_OPENGL_HAS_EGL
-    else if (this->Internals->RenWin->IsA("vtkEGLRenderWindow"))
-    {
-      this->Internals->WindowType = Type::EGL;
-    }
-#endif
-#ifdef __EMSCRIPTEN__
-    else if (this->Internals->RenWin->IsA("vtkWebAssemblyOpenGLRenderWindow"))
-    {
-      this->Internals->WindowType = Type::WASM;
-    }
-#endif
-    else
-    {
-      this->Internals->WindowType = Type::UNKNOWN;
-    }
   }
   else
   {
@@ -341,7 +300,46 @@ void window_impl::InitializeUpVector()
 //----------------------------------------------------------------------------
 window_impl::Type window_impl::getType()
 {
-  return this->Internals->WindowType;
+  if (this->Internals->RenWin->IsA("vtkOSOpenGLRenderWindow"))
+  {
+    return Type::OSMESA;
+  }
+
+#ifdef VTK_USE_X
+  if (this->Internals->RenWin->IsA("vtkXOpenGLRenderWindow"))
+  {
+    return Type::GLX;
+  }
+#endif
+
+#ifdef _WIN32
+  if (this->Internals->RenWin->IsA("vtkWin32OpenGLRenderWindow"))
+  {
+    return Type::WGL;
+  }
+#endif
+
+#ifdef __APPLE__
+  if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
+  {
+    return Type::COCOA;
+  }
+#endif
+
+#ifdef VTK_OPENGL_HAS_EGL
+  if (this->Internals->RenWin->IsA("vtkEGLRenderWindow"))
+  {
+    return Type::EGL;
+  }
+#endif
+#ifdef __EMSCRIPTEN__
+  if (this->Internals->RenWin->IsA("vtkWebAssemblyOpenGLRenderWindow"))
+  {
+    return Type::WASM;
+  }
+#endif
+
+  return Type::UNKNOWN;
 }
 
 //----------------------------------------------------------------------------
@@ -461,7 +459,7 @@ void window_impl::UpdateDynamicOptions()
 {
   vtkF3DRenderer* renderer = this->Internals->Renderer;
 
-  if (this->Internals->WindowType == Type::NONE)
+  if (this->Internals->RenWin->IsA("vtkF3DNoRenderWindow"))
   {
     // With a NONE window type, only update the actors to get accurate bounding box information
     renderer->UpdateActors();

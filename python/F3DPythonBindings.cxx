@@ -294,7 +294,6 @@ PYBIND11_MODULE(pyf3d, module)
 
   py::enum_<f3d::window::Type>(window, "Type")
     .value("NONE", f3d::window::Type::NONE)
-    .value("AUTO", f3d::window::Type::AUTO)
     .value("EXTERNAL", f3d::window::Type::EXTERNAL)
     .value("GLX", f3d::window::Type::GLX)
     .value("WGL", f3d::window::Type::WGL)

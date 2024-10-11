@@ -15,6 +15,7 @@
 #include "window.h"
 
 #include <memory>
+#include <optional>
 
 class vtkRenderWindow;
 class vtkF3DMetaImporter;
@@ -32,7 +33,7 @@ public:
    * and store option ref for later usage
    */
   window_impl(
-    const options& options, Type type, bool offscreen, const context::function& getProcAddress);
+    const options& options, const std::optional<Type>& type, bool offscreen, const context::function& getProcAddress);
   /**
    * Default destructor
    */

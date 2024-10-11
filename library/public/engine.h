@@ -39,7 +39,7 @@ public:
   /**
    * Create an engine with an automatic window.
    * Linux: Try GLX, then EGL, then OSMesa
-   * Windows: Try Win32, then EGL
+   * Windows: Try Win32, then EGL, then OSMesa
    * macOS: Always use Cocoa
    * Optionally, the window can be hidden by setting offscreen to true.
    * Throws engine::no_window_exception in case of window creation failure.
@@ -84,7 +84,7 @@ public:
   /**
    * Create an engine with an external window.
    * A context to retrieve OpenGL symbols is required.
-   * The context can be nullptr for an external WGL or Cocoa window.
+   * The context can be nullptr for an external Cocoa window.
    * Here's an example if a GLFW window is used:
    * \code{.cpp}
    *  f3d::engine eng = f3d::engine::createExternal(glfwGetProcAddress);
@@ -125,6 +125,7 @@ public:
    */
   ~engine();
 
+  //@{
   /**
    * Engine copy is not possible but move is allowed.
    */
@@ -132,6 +133,7 @@ public:
   engine(engine&& other) noexcept;
   engine& operator=(const engine& other) = delete;
   engine& operator=(engine&& other) noexcept;
+  //@}
 
   /**
    * Set the cache path. Must be an absolute path.
@@ -285,7 +287,7 @@ private:
    * Engine constructor. This is a private method.
    * The user must rely on factories to create the engine instance.
    */
-  engine(window::Type windowType, bool offscreen, const context::function& loader = nullptr);
+  engine(const std::optional<window::Type>& windowType, bool offscreen, const context::function& loader = nullptr);
 };
 }
 

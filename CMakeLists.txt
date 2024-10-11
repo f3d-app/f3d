@@ -189,17 +189,17 @@ list(APPEND f3d_link_options_public ${f3d_sanitizer_link_options})
 option(BUILD_TESTING "Build the tests" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_RENDERING_TESTS "Enable rendering tests" ON "BUILD_TESTING" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" OFF)
-cmake_dependent_option(F3D_TESTING_ENABLE_ONSCREEN_TESTS "Enable test that require onscreen rendering" ON "F3D_TESTING_ENABLE_RENDERING_TESTS" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_GLX_TESTS "Enable test that require a X server running on Linux" ON "F3D_TESTING_ENABLE_RENDERING_TESTS AND UNIX AND NOT APPLE" OFF)
 if(BUILD_TESTING)
   enable_testing()
 endif()
 
 # Testing offscreen backend
-if(NOT F3D_TESTING_RENDERING_BACKEND)
-  set(F3D_TESTING_RENDERING_BACKEND "auto" CACHE STRING "Testing offscreen backend" FORCE)
-  set_property(CACHE F3D_TESTING_RENDERING_BACKEND PROPERTY STRINGS "auto" "egl" "osmesa")
+if(NOT F3D_TESTING_FORCE_RENDERING_BACKEND)
+  set(F3D_TESTING_FORCE_RENDERING_BACKEND "auto" CACHE STRING "Force testing offscreen backend" FORCE)
+  set_property(CACHE F3D_TESTING_FORCE_RENDERING_BACKEND PROPERTY STRINGS "auto" "egl" "osmesa")
 endif()
-mark_as_advanced(F3D_TESTING_RENDERING_BACKEND)
+mark_as_advanced(F3D_TESTING_FORCE_RENDERING_BACKEND)
 
 # Figure out F3D configuration directory
 if(UNIX AND NOT APPLE)

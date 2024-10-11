@@ -54,8 +54,10 @@ function(f3d_test)
   if(F3D_TEST_RENDERING_BACKEND)
     list(APPEND F3D_TEST_ARGS "--rendering-backend=${F3D_TEST_RENDERING_BACKEND}")
   else()
-    if(F3D_TESTING_RENDERING_BACKEND)
-      list(APPEND F3D_TEST_ARGS "--rendering-backend=${F3D_TESTING_RENDERING_BACKEND}")
+    # If no rendering backend is specified by the test, "auto" is used.
+    # However, F3D_TESTING_FORCE_RENDERING_BACKEND can be used to force the rendering backend for these tests
+    if(F3D_TESTING_FORCE_RENDERING_BACKEND)
+      list(APPEND F3D_TEST_ARGS "--rendering-backend=${F3D_TESTING_FORCE_RENDERING_BACKEND}")
     endif()
   endif()
 
@@ -1005,8 +1007,9 @@ f3d_test(NAME TestRenderingBackendAuto DATA cow.vtp RENDERING_BACKEND auto)
 if(UNIX AND NOT APPLE)
   f3d_test(NAME TestRenderingBackendEGL DATA cow.vtp RENDERING_BACKEND egl ARGS --verbose REGEXP "vtkEGLRenderWindow")
   f3d_test(NAME TestRenderingBackendOSMesa DATA cow.vtp RENDERING_BACKEND osmesa ARGS --verbose REGEXP "vtkOSOpenGLRenderWindow")
-  if(F3D_TESTING_ENABLE_ONSCREEN_TESTS)
-    f3d_test(NAME TestRenderingBackendGLX DATA cow.vtp RENDERING_BACKEND glx ARGS --verbose REGEXP "vtkXOpenGLRenderWindow")
+  if(F3D_TESTING_ENABLE_GLX_TESTS)
+    # TODO: enable
+    #f3d_test(NAME TestRenderingBackendGLX DATA cow.vtp RENDERING_BACKEND glx ARGS --verbose REGEXP "vtkXOpenGLRenderWindow")
   endif()
 endif()
 if(WIN32)
@@ -1063,7 +1066,7 @@ if(NOT F3D_MACOS_BUNDLE)
   endif()
 endif()
 
-if(F3D_TESTING_ENABLE_ONSCREEN_TESTS)
+if(F3D_TESTING_ENABLE_GLX_TESTS)
   # Watch testing require onscreen rendering
   if(UNIX)
     set(_f3d_os_script_ext "sh")

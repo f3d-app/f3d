@@ -13,10 +13,10 @@ namespace f3d
  * @class   context
  * @brief   Utility function that implements basic OpenGL context symbol resolvers
  *
- * These functions should be use only when the rendering context (the OpenGL window) isn't
+ * These functions should be used only when the rendering context (the OpenGL window) isn't
  * managed by libf3d, but by the user directly.
  * Therefore, the engine is created using `f3d::engine::createExternal` and the functions below
- * can be use in the single argument of this factory.
+ * can be used as argument of this factory.
  */
 class F3D_EXPORT context
 {
