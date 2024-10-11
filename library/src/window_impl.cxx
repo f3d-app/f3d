@@ -25,6 +25,9 @@
 
 #ifdef VTK_USE_X
 #include <vtkXOpenGLRenderWindow.h>
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+#include <vtkglad/include/glad/glx.h>
+#endif
 #endif
 
 #ifdef _WIN32
@@ -238,7 +241,8 @@ window_impl::window_impl(
   }
   else if (type == Type::GLX)
   {
-#ifdef VTK_USE_X
+#ifdef VTK_USE_X && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+    gladLoaderLoadGLX(nullptr, 0); // Load core glx functions.
     this->Internals->RenWin = vtkSmartPointer<vtkXOpenGLRenderWindow>::New();
 #else
     throw engine::no_window_exception("Window type is GLX but VTK GLX support is not enabled");
