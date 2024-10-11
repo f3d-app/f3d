@@ -1,7 +1,7 @@
 # F3D Testing
 function(f3d_test)
 
-	cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI" "DATA;DEPENDS;ARGS" ${ARGN})
+	cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND" "DATA;DEPENDS;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -51,8 +51,12 @@ function(f3d_test)
     endif()
   endif()
 
-  if(DEFINED F3D_TESTING_RENDERING_BACKEND)
-    list(APPEND F3D_TEST_ARGS "--rendering-backend=${F3D_TESTING_RENDERING_BACKEND}")
+  if(F3D_TEST_RENDERING_BACKEND)
+    list(APPEND F3D_TEST_ARGS "--rendering-backend=${F3D_TEST_RENDERING_BACKEND}")
+  else()
+    if(F3D_TESTING_RENDERING_BACKEND)
+      list(APPEND F3D_TEST_ARGS "--rendering-backend=${F3D_TESTING_RENDERING_BACKEND}")
+    endif()
   endif()
 
   add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
@@ -997,14 +1001,14 @@ if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
 endif()
 
 # Test rendering backends
-add_test(NAME f3d::TestRenderingBackendAuto COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=auto --verbose)
+f3d_test(NAME TestRenderingBackendAuto DATA cow.vtp RENDERING_BACKEND auto)
 if(UNIX AND NOT APPLE)
-  add_test(NAME f3d::TestRenderingBackendEGL COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=egl --verbose)
-  add_test(NAME f3d::TestRenderingBackendOSMesa COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=osmesa --verbose)
-  add_test(NAME f3d::TestRenderingBackendGLX COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=glx --verbose)
+  f3d_test(NAME TestRenderingBackendEGL DATA cow.vtp RENDERING_BACKEND egl ARGS --verbose REGEXP "vtkEGLRenderWindow")
+  f3d_test(NAME TestRenderingBackendOSMesa DATA cow.vtp RENDERING_BACKEND osmesa ARGS --verbose REGEXP "vtkOSOpenGLRenderWindow")
+  f3d_test(NAME TestRenderingBackendGLX DATA cow.vtp RENDERING_BACKEND glx ARGS --verbose REGEXP "vtkXOpenGLRenderWindow")
 endif()
 if(WIN32)
-  add_test(NAME f3d::TestRenderingBackendWGL COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --rendering-backend=wgl --verbose)
+  f3d_test(NAME TestRenderingBackendWGL DATA cow.vtp RENDERING_BACKEND wgl ARGS --verbose REGEXP "vtkWin32OpenGLRenderWindow")
 endif()
 
 # Test that f3d can try to read a system config file
