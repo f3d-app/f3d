@@ -175,8 +175,8 @@ public:
 };
 
 //----------------------------------------------------------------------------
-window_impl::window_impl(
-  const options& options, const std::optional<Type>& type, bool offscreen, const context::function& getProcAddress)
+window_impl::window_impl(const options& options, const std::optional<Type>& type, bool offscreen,
+  const context::function& getProcAddress)
   : Internals(std::make_unique<window_impl::internals>(options))
 {
   this->Internals->GetProcAddress = getProcAddress;
@@ -241,7 +241,7 @@ window_impl::window_impl(
   }
   else if (type == Type::GLX)
   {
-#ifdef VTK_USE_X && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+#if defined(VTK_USE_X) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
     gladLoaderLoadGLX(nullptr, 0); // Load core glx functions.
     this->Internals->RenWin = vtkSmartPointer<vtkXOpenGLRenderWindow>::New();
 #else

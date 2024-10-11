@@ -32,8 +32,8 @@ public:
    * Create the internal vtkRenderWindow using the offscreen param
    * and store option ref for later usage
    */
-  window_impl(
-    const options& options, const std::optional<Type>& type, bool offscreen, const context::function& getProcAddress);
+  window_impl(const options& options, const std::optional<Type>& type, bool offscreen,
+    const context::function& getProcAddress);
   /**
    * Default destructor
    */
