@@ -343,6 +343,11 @@ window_impl::Type window_impl::getType()
   }
 #endif
 
+  if (this->Internals->RenWin->IsA("vtkF3DNoRenderWindow"))
+  {
+    return Type::NONE;
+  }
+
   return Type::UNKNOWN;
 }
 
