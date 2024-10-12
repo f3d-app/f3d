@@ -54,6 +54,7 @@ public:
   /**
    * Create an engine with a GLX window.
    * Works on Linux only.
+   * VTK >= 9.4 required.
    * Optionally, the window can be hidden by setting offscreen to true.
    * Throws engine::no_window_exception in case of window creation failure.
    */
@@ -62,6 +63,7 @@ public:
   /**
    * Create an engine with a WGL window.
    * Works on Windows only.
+   * VTK >= 9.4 required.
    * Optionally, the window can be hidden by setting offscreen to true.
    * Throws engine::no_window_exception in case of window creation failure.
    */
@@ -69,6 +71,7 @@ public:
 
   /**
    * Create an engine with an EGL window.
+   * VTK >= 9.4 required.
    * If several GPU are available, the environment variable
    * `VTK_DEFAULT_EGL_DEVICE_INDEX` allows its selection.
    * Optionally, the window can be hidden by setting offscreen to true.
@@ -78,6 +81,7 @@ public:
 
   /**
    * Create an engine with an OSMesa window.
+   * VTK >= 9.4 required.
    */
   static engine createOSMesa();
 
@@ -95,6 +99,7 @@ public:
   /**
    * Create an engine with an external GLX.
    * Equivalent to createExternal(f3d::context::glx());
+   * VTK >= 9.4 required.
    * Throws context::loading_exception if GLX library is not found or if not running on Linux.
    */
   static engine createExternalGLX();
@@ -102,6 +107,7 @@ public:
   /**
    * Create an engine with an external WGL.
    * Equivalent to createExternal(f3d::context::wgl());
+   * VTK >= 9.4 required.
    * Throws context::loading_exception if WGL library is not found or if not running on Windows.
    */
   static engine createExternalWGL();
@@ -109,6 +115,7 @@ public:
   /**
    * Create an engine with an external EGL context.
    * Equivalent to createExternal(f3d::context::egl());
+   * VTK >= 9.4 required.
    * Throws context::loading_exception if EGL library is not found.
    */
   static engine createExternalEGL();
@@ -116,6 +123,7 @@ public:
   /**
    * Create an engine with an external OSMesa context.
    * Equivalent to createExternal(f3d::context::osmesa());
+   * VTK >= 9.4 required.
    * Throws context::loading_exception if OSMesa library is not found.
    */
   static engine createExternalOSMesa();
