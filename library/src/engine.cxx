@@ -33,8 +33,8 @@ public:
 };
 
 //----------------------------------------------------------------------------
-engine::engine(const std::optional<window::Type>& windowType, bool offscreen,
-  const context::function& loader)
+engine::engine(
+  const std::optional<window::Type>& windowType, bool offscreen, const context::function& loader)
   : Internals(new engine::internals)
 {
   // Ensure all lib initialization is done (once)
