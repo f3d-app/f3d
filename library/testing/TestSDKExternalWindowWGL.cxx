@@ -1,4 +1,3 @@
-// Copyright 2008 Arne Reiners
 #include "engine.h"
 
 #include "TestSDKHelpers.h"

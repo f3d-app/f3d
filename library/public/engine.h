@@ -38,10 +38,12 @@ class F3D_EXPORT engine
 public:
   /**
    * Create an engine with an automatic window.
+   * Optionally, the window can be hidden by setting offscreen to true.
+   * For VTK < 9.3, the window type will depend on the VTK build options
+   * For VTK >= 9.4:
    * Linux: Try GLX, then EGL, then OSMesa
    * Windows: Try Win32, then EGL, then OSMesa
    * macOS: Always use Cocoa
-   * Optionally, the window can be hidden by setting offscreen to true.
    * Throws engine::no_window_exception in case of window creation failure.
    */
   static engine create(bool offscreen = false);

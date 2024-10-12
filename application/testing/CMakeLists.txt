@@ -1004,7 +1004,7 @@ endif()
 
 # Test rendering backends
 f3d_test(NAME TestRenderingBackendAuto DATA cow.vtp RENDERING_BACKEND auto)
-if(UNIX AND NOT APPLE AND VTK_VERSION VERSION_LESS 9.3.20240914)
+if(UNIX AND NOT APPLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
   f3d_test(NAME TestRenderingBackendEGL DATA cow.vtp RENDERING_BACKEND egl ARGS --verbose REGEXP "vtkEGLRenderWindow")
   f3d_test(NAME TestRenderingBackendOSMesa DATA cow.vtp RENDERING_BACKEND osmesa ARGS --verbose REGEXP "vtkOSOpenGLRenderWindow")
   if(F3D_TESTING_ENABLE_GLX_TESTS)
@@ -1066,7 +1066,7 @@ if(NOT F3D_MACOS_BUNDLE)
 endif()
 
 if(F3D_TESTING_ENABLE_GLX_TESTS)
-  # Watch testing require onscreen rendering
+  # Watch testing require GLX rendering
   if(UNIX)
     set(_f3d_os_script_ext "sh")
     set(_f3d_os_script_exec "")
