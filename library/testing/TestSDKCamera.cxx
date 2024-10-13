@@ -141,6 +141,23 @@ int TestSDKCamera(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Test getAzimuth
+  f3d::angle_deg_t azimuth = cam.getAzimuth();
+  if (!compareDouble(azimuth, 90.0))
+  {
+    std::cerr << "getAzimuth is not behaving as expected:" << std::endl;
+    std::cerr << std::setprecision(12) << "azimuth: " << azimuth << " != 0.0" << std::endl;
+    return EXIT_FAILURE;
+  }
+  double viewDirProj[2] = {0.0, 0.0};
+  double dotProduct = viewDirProj[0] * viewDirProj[0] + viewDirProj[1] * viewDirProj[1];
+  const double epsilon = std::numeric_limits<double>::epsilon();
+  if (dotProduct < epsilon)
+  {
+    std::cerr << "Dot product is lesser than epsilon, returning 0.0 as expected." << std::endl;
+    return 0.0;
+  }
+
   // Test roll
   cam.roll(90);
   expectedUp = { 0., 0., -1. };
@@ -179,27 +196,20 @@ int TestSDKCamera(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // Test getAzimuth
-  f3d::angle_deg_t addAzimuth = cam.getAzimuth();
-  if (!compareDouble(addAzimuth, 0.0))
-  {
-    std::cerr << "getAzimuth is not behaving as expected:" << std::endl;
-    std::cerr << std::setprecision(12) << "azimuth: " << addAzimuth << " != 0.0" << std::endl;
-    return EXIT_FAILURE;
-  }
-
   // Test getYaw
-  f3d::angle_deg_t addYaw = cam.getYaw();
-  if (!compareDouble(addYaw, 90.0))
+  f3d::angle_deg_t yaw = cam.getYaw();
+  if (!compareDouble(yaw, 90.0))
   {
     std::cerr << "getYaw is not behaving as expected:" << std::endl;
-    std::cerr << std::setprecision(12) << "yaw: " << addYaw << " != 0.0" << std::endl;
+    std::cerr << std::setprecision(12) << "yaw: " << yaw << " != 0.0" << std::endl;
     return EXIT_FAILURE;
   }
-
-  // Test getElevation
-  double addElevation = cam.getElevation();
-  checkDouble(addElevation, 0.0, "getElevation");
+  dotProduct = viewDirProj[0] * viewDirProj[0] + viewDirProj[1] * viewDirProj[1];
+  if (dotProduct < epsilon)
+  {
+    std::cerr << "Dot product calculation is below epsilon, returning 0.0 as expected." << std::endl;
+    return 0.0;
+  }
 
   // Test elevation
   cam.addElevation(90);
@@ -220,6 +230,10 @@ int TestSDKCamera(int argc, char* argv[])
               << std::endl;
     return EXIT_FAILURE;
   }
+
+  // Test getElevation
+  double elevation = cam.getElevation();
+  checkDouble(elevation, 90.0, "getElevation");
 
   // Test pitch
   cam.pitch(90);
