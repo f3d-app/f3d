@@ -149,12 +149,13 @@ int TestSDKCamera(int argc, char* argv[])
     std::cerr << std::setprecision(12) << "azimuth: " << azimuth << " != 0.0" << std::endl;
     return EXIT_FAILURE;
   }
-  double viewDirProj[2] = {0.0, 0.0};
+  double viewDirProj[2] = { 0.0, 0.0 };
   double dotProduct = viewDirProj[0] * viewDirProj[0] + viewDirProj[1] * viewDirProj[1];
   const double epsilon = std::numeric_limits<double>::epsilon();
   if (dotProduct < epsilon)
   {
-    std::cerr << "Dot product is lesser than epsilon, returning 0.0 as expected." << std::endl;
+    std::cerr << "Dot product is lesser than epsilon, returning 0.0 as expected." 
+              << std::endl;
     return 0.0;
   }
 
@@ -207,7 +208,8 @@ int TestSDKCamera(int argc, char* argv[])
   dotProduct = viewDirProj[0] * viewDirProj[0] + viewDirProj[1] * viewDirProj[1];
   if (dotProduct < epsilon)
   {
-    std::cerr << "Dot product calculation is below epsilon, returning 0.0 as expected." << std::endl;
+    std::cerr << "Dot product is lesser than epsilon, returning 0.0 as expected." 
+              << std::endl;
     return 0.0;
   }
 
