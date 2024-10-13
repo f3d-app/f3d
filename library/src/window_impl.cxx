@@ -9,7 +9,7 @@
 
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DNoRenderWindow.h"
-#include "vtkF3DRendererWithColoring.h"
+#include "vtkF3DRenderer.h"
 
 #include <vtkCamera.h>
 #include <vtkImageData.h>
@@ -141,7 +141,7 @@ public:
 
   std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
-  vtkNew<vtkF3DRendererWithColoring> Renderer;
+  vtkNew<vtkF3DRenderer> Renderer;
   Type WindowType;
   const options& Options;
   std::string CachePath;
@@ -316,7 +316,7 @@ window_impl::~window_impl()
 //----------------------------------------------------------------------------
 void window_impl::UpdateDynamicOptions()
 {
-  vtkF3DRendererWithColoring* renderer = this->Internals->Renderer;
+  vtkF3DRenderer* renderer = this->Internals->Renderer;
 
   if (this->Internals->WindowType == Type::NONE)
   {
@@ -339,9 +339,9 @@ void window_impl::UpdateDynamicOptions()
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
   const int pointSpritesSize = opt.model.point_sprites.size;
-  const vtkF3DRendererWithColoring::SplatType splatType = opt.model.point_sprites.type == "gaussian"
-    ? vtkF3DRendererWithColoring::SplatType::GAUSSIAN
-    : vtkF3DRendererWithColoring::SplatType::SPHERE;
+  const vtkF3DRenderer::SplatType splatType = opt.model.point_sprites.type == "gaussian"
+    ? vtkF3DRenderer::SplatType::GAUSSIAN
+    : vtkF3DRenderer::SplatType::SPHERE;
   renderer->SetPointSpritesProperties(splatType, pointSpritesSize);
 
   renderer->SetLineWidth(opt.render.line_width);
