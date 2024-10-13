@@ -81,7 +81,9 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse<f3d::vector3_t>("vector3_t", "-X", { -1, 0, 0 });
   test.parse<f3d::vector3_t>("vector3_t", "+Z", { 0, 0, 1 });
   test.parse<f3d::vector3_t>("vector3_t", "-Z", { 0, 0, -1 });
-  test.parse<f3d::vector3_t>("vector3_t", "1, 2", f3d::vector3_t::fromSphericalCoordinates(1, 2));
+  test.parse<f3d::vector3_t>("vector3_t", "0, 0", { 0, 0, 1 });
+  test.expect<f3d::type_creation_exception>(
+    "cannot create a vector3_t", [&]() { f3d::vector3_t{ 1., 2., 3., 4. }; });
 
   return test.result();
 }

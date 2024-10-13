@@ -1,18 +1,30 @@
 #ifndef f3d_types_h
 #define f3d_types_h
 
+#include "exception.h"
 #include "export.h"
 
 #include <array>
 #include <cmath>
 #include <initializer_list>
 #include <iostream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace f3d
 {
+
+/**
+ * An exception that can be thrown when we fail to create a type
+ */
+struct type_creation_exception : public exception
+{
+  explicit type_creation_exception(const std::string& what = "")
+    : exception(what)
+  {
+  }
+};
+
 /**
  * Describe a 3D point.
  */
@@ -89,7 +101,7 @@ struct F3D_EXPORT vector3_t
   {
     if (vec.size() != 3)
     {
-      throw std::runtime_error("cannot create a vector3_t");
+      throw type_creation_exception("cannot create a vector3_t");
     }
     Value[0] = vec[0];
     Value[1] = vec[1];
@@ -111,7 +123,7 @@ struct F3D_EXPORT vector3_t
   {
     if (l.size() != 3)
     {
-      throw std::runtime_error("cannot create a vector3_t");
+      throw type_creation_exception("cannot create a vector3_t");
     }
     std::copy(l.begin(), l.end(), std::begin(Value));
   }
@@ -154,10 +166,10 @@ struct F3D_EXPORT vector3_t
   {
     return Value.begin();
   }
-  auto begin() const
-  {
-    return Value.begin();
-  }
+  // auto begin() const
+  // {
+  //   return Value.begin();
+  // }
   auto cbegin() const
   {
     return Value.cbegin();
@@ -166,10 +178,10 @@ struct F3D_EXPORT vector3_t
   {
     return Value.end();
   }
-  auto end() const
-  {
-    return Value.end();
-  }
+  // auto end() const
+  // {
+  //   return Value.end();
+  // }
   auto cend() const
   {
     return Value.cend();
@@ -178,8 +190,7 @@ struct F3D_EXPORT vector3_t
   static vector3_t fromSphericalCoordinates(double theta, double phi)
   {
     auto sinPhi = std::sin(phi);
-    auto cosTheta = std::cos(theta);
-    return { sinPhi * cosTheta, sinPhi * cosTheta, std::cos(phi) };
+    return { sinPhi * std::cos(theta), sinPhi * std::sin(theta), std::cos(phi) };
   }
   static vector3_t x()
   {
@@ -204,10 +215,9 @@ private:
 
 inline std::ostream& operator<<(std::ostream& os, const f3d::vector3_t& vec)
 {
-  size_t i = 0;
-  for (auto val : vec)
+  for (size_t i = 0; i < 3; ++i)
   {
-    os << (i++ ? ", " : "{ ") << val;
+    os << (i == 0 ? ", " : "{ ") << vec[i];
   }
   os << " }";
   return os;
