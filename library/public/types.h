@@ -215,7 +215,7 @@ private:
 
 inline std::ostream& operator<<(std::ostream& os, const f3d::vector3_t& vec)
 {
-  for (size_t i = 0; i < 3; ++i)
+  for (int i = 0; i < 3; ++i)
   {
     os << (i == 0 ? ", " : "{ ") << vec[i];
   }
