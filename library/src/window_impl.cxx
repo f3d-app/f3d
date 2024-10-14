@@ -34,10 +34,6 @@
 #include <vtkWin32OpenGLRenderWindow.h>
 #endif
 
-#ifdef __APPLE__
-#include <vtkCocoaRenderWindow.h>
-#endif
-
 #ifdef VTK_OPENGL_HAS_EGL
 #include <vtkEGLRenderWindow.h>
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
@@ -256,22 +252,12 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     throw engine::no_window_exception("Window type is WGL but it is supported on Windows only");
 #endif
   }
-  else if (type == Type::COCOA)
-  {
-#ifdef __APPLE__
-    this->Internals->RenWin = vtkSmartPointer<vtkCocoaRenderWindow>::New();
-#else
-    throw engine::no_window_exception("Window type is Cocoa but it is supported on macOS only");
-#endif
-  }
   else if (!type.has_value())
   {
     this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
   }
-  else
-  {
-    throw engine::no_window_exception("Cannot create this window type.");
-  }
+
+  assert(this->Internals->RenWin != nullptr);
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240606)
   this->Internals->RenWin->EnableTranslucentSurfaceOn();

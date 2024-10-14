@@ -25,6 +25,12 @@ int TestSDKWindowAuto(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  if (!win.isOffscreen())
+  {
+    std::cerr << "Window should not be offscreen" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   f3d::options& options = eng.getOptions();
   options.render.background.color = { 0.8, 0.2, 0.9 };
 

@@ -1014,6 +1014,7 @@ endif()
 if(WIN32)
   f3d_test(NAME TestRenderingBackendWGL DATA cow.vtp RENDERING_BACKEND wgl ARGS --verbose REGEXP "vtkWin32OpenGLRenderWindow")
 endif()
+f3d_test(NAME TestRenderingBackendInvalid DATA cow.vtp RENDERING_BACKEND invalid ARGS --verbose REGEXP "rendering-backend value is invalid, falling back to" NO_BASELINE NO_OUTPUT)
 
 # Test that f3d can try to read a system config file
 add_test(NAME f3d::TestNoDryRun COMMAND $<TARGET_FILE:f3d> --no-render)
@@ -1065,8 +1066,7 @@ if(NOT F3D_MACOS_BUNDLE)
   endif()
 endif()
 
-if(F3D_TESTING_ENABLE_GLX_TESTS)
-  # Watch testing require GLX rendering
+if(WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS) # Watch testing require GLX rendering on Linux
   if(UNIX)
     set(_f3d_os_script_ext "sh")
     set(_f3d_os_script_exec "")
