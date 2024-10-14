@@ -199,7 +199,10 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
       }
       return nullptr;
     };
-    extWin->SetOpenGLSymbolLoader(invoke, &this->Internals->GetProcAddress);
+    if (this->Internals->GetProcAddress)
+    {
+      extWin->SetOpenGLSymbolLoader(invoke, &this->Internals->GetProcAddress);
+    }
     extWin->vtkOpenGLRenderWindow::OpenGLInit();
 #endif
 

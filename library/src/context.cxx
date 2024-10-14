@@ -1,5 +1,9 @@
 #include "context.h"
 
+#ifdef __APPLE__
+#include "context_cocoa.h"
+#endif
+
 #include <vtksys/DynamicLoader.hxx>
 
 namespace f3d
@@ -57,6 +61,20 @@ context::function context::wgl()
   };
 #else
   throw loading_exception("Cannot use a WGL context on this platform");
+#endif
+}
+
+//----------------------------------------------------------------------------
+context::function context::cocoa()
+{
+#ifdef __APPLE__
+  return [](const char* name)
+  {
+    fptr p = reinterpret_cast<fptr>(detail::getCocoaOpenGLSymbol(name));
+    return p;
+  };
+#else
+  throw loading_exception("Cannot use a COCOA context on this platform");
 #endif
 }
 

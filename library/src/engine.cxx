@@ -128,6 +128,12 @@ engine engine::createExternalWGL()
 }
 
 //----------------------------------------------------------------------------
+engine engine::createExternalCOCOA()
+{
+  return { window::Type::EXTERNAL, false, context::cocoa() };
+}
+
+//----------------------------------------------------------------------------
 engine engine::createExternalEGL()
 {
   return { window::Type::EXTERNAL, false, context::egl() };

@@ -78,6 +78,11 @@ if(F3D_MODULE_EXTERNAL_RENDERING)
     find_package(OpenGL COMPONENTS OpenGL REQUIRED)
     list(APPEND libf3dSDKTests_list TestSDKExternalWindowWGL.cxx)
   endif()
+  if(APPLE)
+    find_library(COCOA_LIBRARY Cocoa)
+    find_library(OpenGL_LIBRARY OpenGL)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowCOCOA.mm)
+  endif()
 endif()
 
 # create the testing file and list of tests
@@ -166,6 +171,10 @@ endif()
 if(F3D_MODULE_EXTERNAL_RENDERING AND WIN32)
   # external window test using WGL
   target_link_libraries(libf3dSDKTests OpenGL::GL)
+endif()
+
+if(F3D_MODULE_EXTERNAL_RENDERING AND APPLE)
+  target_link_libraries(libf3dSDKTests ${COCOA_LIBRARY} ${OpenGL_LIBRARY})
 endif()
 
 # make sure the libf3d API is compatible with the right C++ standard

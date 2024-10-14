@@ -31,11 +31,17 @@ public:
   static function glx();
 
   /**
-   * Create a EGL context function.
-   * This is usually required when using a headless context and a GPU device.
-   * Only supported on Linux and Windows.
+   * Create a WGL context function.
+   * Only supported on Windows.
    */
   static function wgl();
+
+  /**
+   * Create a COCOA context function.
+   * This is usually required when using a headless context and a GPU device.
+   * Only supported on macOS.
+   */
+  static function cocoa();
 
   /**
    * Create a EGL context function.

@@ -99,7 +99,7 @@ public:
   static engine createExternal(const context::function& getProcAddress);
 
   /**
-   * Create an engine with an external GLX.
+   * Create an engine with an external GLX context.
    * Equivalent to createExternal(f3d::context::glx());
    * VTK >= 9.4 required.
    * Throws context::loading_exception if GLX library is not found or if not running on Linux.
@@ -107,12 +107,20 @@ public:
   static engine createExternalGLX();
 
   /**
-   * Create an engine with an external WGL.
+   * Create an engine with an external WGL context.
    * Equivalent to createExternal(f3d::context::wgl());
    * VTK >= 9.4 required.
    * Throws context::loading_exception if WGL library is not found or if not running on Windows.
    */
   static engine createExternalWGL();
+
+  /**
+   * Create an engine with an external COCOA context.
+   * Equivalent to createExternal(f3d::context::cocoa());
+   * VTK >= 9.4 required.
+   * Throws context::loading_exception if WGL library is not found or if not running on Windows.
+   */
+  static engine createExternalCOCOA();
 
   /**
    * Create an engine with an external EGL context.

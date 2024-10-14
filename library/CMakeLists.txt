@@ -63,6 +63,10 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl.cxx
   )
 
+if(APPLE)
+  list(APPEND F3D_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/context_cocoa.mm)
+endif()
+
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_BINARY_DIR}/public/export.h
