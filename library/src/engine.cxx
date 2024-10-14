@@ -163,6 +163,7 @@ engine& engine::operator=(engine&& other) noexcept
 {
   this->Internals = other.Internals;
   delete other.Internals;
+  other.Internals = nullptr;
   return *this;
 }
 
