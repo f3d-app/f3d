@@ -56,8 +56,7 @@ protected:
     };
 
     mEngine = std::make_unique<f3d::engine>(f3d::engine::createExternal(loadFunc));
-    f3d::scene& sce = mEngine.getScene();
-    sce.add(mFilePath);
+    mEngine->getScene().add(mFilePath);
   }
 
   void paintGL() override
