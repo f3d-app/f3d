@@ -34,10 +34,10 @@ int TestSDKExternalWindowOSMesa(int argc, char* argv[])
   if (!TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2],
         "TestSDKExternalWindowOSMesa"))
   {
+    OSMesaDestroyContext(ctx);
     return EXIT_FAILURE;
   }
 
   OSMesaDestroyContext(ctx);
-
   return EXIT_SUCCESS;
 }

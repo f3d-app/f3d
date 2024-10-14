@@ -68,6 +68,9 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   {
     std::cout << ex.what() << std::endl;
   }
+
+  // cover operator=(engine&&)
+  eng = f3d::engine::create(false);
 #endif
 
   return EXIT_SUCCESS;

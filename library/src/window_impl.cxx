@@ -189,15 +189,10 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
     auto invoke = [](void* userptr, const char* name) -> context::fptr
     {
-      if (userptr)
-      {
-        auto* fn = static_cast<context::function*>(userptr);
-        if (*fn)
-        {
-          return (*fn)(name);
-        }
-      }
-      return nullptr;
+      assert(userptr != nullptr);
+      auto* fn = static_cast<context::function*>(userptr);
+      assert(fn != nullptr);
+      return (*fn)(name);
     };
     if (this->Internals->GetProcAddress)
     {
