@@ -56,6 +56,18 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   {
     std::cout << ex.what() << std::endl;
   }
+
+  try
+  {
+    eng = f3d::engine::createExternalCOCOA();
+    std::cerr << "An exception has not been thrown when creating an external COCOA engine on Linux"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::context::loading_exception& ex)
+  {
+    std::cout << ex.what() << std::endl;
+  }
 #endif
 
   return EXIT_SUCCESS;

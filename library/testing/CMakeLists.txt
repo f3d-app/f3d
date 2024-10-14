@@ -52,36 +52,45 @@ cmake_dependent_option(F3D_TESTING_ENABLE_EXTERNAL_QT "Test external QT" OFF "F3
 cmake_dependent_option(F3D_TESTING_ENABLE_EXTERNAL_OSMESA "Test external OSMesa" OFF "F3D_MODULE_EXTERNAL_RENDERING" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_EXTERNAL_EGL "Test external GLX" OFF "F3D_MODULE_EXTERNAL_RENDERING" OFF)
 
+set(libf3dSDKTests_link_libs "")
+
 if(F3D_MODULE_EXTERNAL_RENDERING)
   if(F3D_TESTING_ENABLE_EXTERNAL_GLFW)
     find_package(glfw3 REQUIRED)
     list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLFW.cxx)
+    list(APPEND libf3dSDKTests_link_libs glfw)
   endif()
   if(F3D_TESTING_ENABLE_EXTERNAL_QT)
     find_package(Qt5 COMPONENTS OpenGL REQUIRED)
     list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
+    list(APPEND libf3dSDKTests_link_libs Qt5::OpenGL)
   endif()
-  if(F3D_TESTING_ENABLE_EXTERNAL_OSMESA)
+  if(F3D_TESTING_ENABLE_EXTERNAL_OSMESA AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
     find_library(OSMesa_LIB OSMesa REQUIRED)
     list(APPEND libf3dSDKTests_list TestSDKExternalWindowOSMesa.cxx)
+    list(APPEND libf3dSDKTests_link_libs "${OSMesa_LIB}")
   endif()
   if(F3D_TESTING_ENABLE_GLX_TESTS)
     find_package(OpenGL COMPONENTS GLX REQUIRED)
     find_library(X11_LIB X11 REQUIRED)
     list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLX.cxx)
+    list(APPEND libf3dSDKTests_link_libs OpenGL::GLX "${X11_LIB}")
   endif()
   if(F3D_TESTING_ENABLE_EXTERNAL_EGL)
     find_package(OpenGL COMPONENTS EGL REQUIRED)
     list(APPEND libf3dSDKTests_list TestSDKExternalWindowEGL.cxx)
+    list(APPEND libf3dSDKTests_link_libs OpenGL::EGL)
   endif()
   if(WIN32)
     find_package(OpenGL COMPONENTS OpenGL REQUIRED)
     list(APPEND libf3dSDKTests_list TestSDKExternalWindowWGL.cxx)
+    list(APPEND libf3dSDKTests_link_libs OpenGL::GL)
   endif()
   if(APPLE)
     find_library(COCOA_LIBRARY Cocoa)
     find_library(OpenGL_LIBRARY OpenGL)
     list(APPEND libf3dSDKTests_list TestSDKExternalWindowCOCOA.mm)
+    list(APPEND libf3dSDKTests_link_libs "${COCOA_LIBRARY}" "${OpenGL_LIBRARY}")
   endif()
 endif()
 
@@ -141,41 +150,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   endif()
 endif()
 
-target_link_libraries(libf3dSDKTests libf3d)
-
-if(F3D_TESTING_ENABLE_EXTERNAL_GLFW)
-  # external window test using glfw
-  target_link_libraries(libf3dSDKTests glfw)
-endif()
-
-if(F3D_TESTING_ENABLE_EXTERNAL_QT)
-  # external window test using QT
-  target_link_libraries(libf3dSDKTests Qt5::OpenGL)
-endif()
-
-if(F3D_TESTING_ENABLE_EXTERNAL_OSMESA)
-  # external window test using OSMesa
-  target_link_libraries(libf3dSDKTests "${OSMesa_LIB}")
-endif()
-
-if(F3D_MODULE_EXTERNAL_RENDERING AND F3D_TESTING_ENABLE_GLX_TESTS)
-  # external window test using GLX
-  target_link_libraries(libf3dSDKTests OpenGL::GLX "${X11_LIB}")
-endif()
-
-if(F3D_TESTING_ENABLE_EXTERNAL_EGL)
-  # external window test using EGL
-  target_link_libraries(libf3dSDKTests OpenGL::EGL)
-endif()
-
-if(F3D_MODULE_EXTERNAL_RENDERING AND WIN32)
-  # external window test using WGL
-  target_link_libraries(libf3dSDKTests OpenGL::GL)
-endif()
-
-if(F3D_MODULE_EXTERNAL_RENDERING AND APPLE)
-  target_link_libraries(libf3dSDKTests ${COCOA_LIBRARY} ${OpenGL_LIBRARY})
-endif()
+target_link_libraries(libf3dSDKTests libf3d ${libf3dSDKTests_link_libs})
 
 # make sure the libf3d API is compatible with the right C++ standard
 set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 17)
