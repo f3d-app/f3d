@@ -162,7 +162,7 @@ engine::engine(engine&& other) noexcept
 engine& engine::operator=(engine&& other) noexcept
 {
   this->Internals = other.Internals;
-  other.Internals = nullptr;
+  delete other.Internals;
   return *this;
 }
 
