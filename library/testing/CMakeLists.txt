@@ -75,6 +75,7 @@ if(F3D_MODULE_EXTERNAL_RENDERING)
   endif()
   if(WIN32)
     find_package(OpenGL COMPONENTS OpenGL REQUIRED)
+    find_library(X11_LIB X11 REQUIRED)
     list(APPEND libf3dSDKTests_list TestSDKExternalWindowWGL.cxx)
   endif()
 endif()
@@ -149,12 +150,12 @@ endif()
 
 if(F3D_TESTING_ENABLE_EXTERNAL_OSMESA)
   # external window test using OSMesa
-  target_link_libraries(libf3dSDKTests ${OSMesa_LIB})
+  target_link_libraries(libf3dSDKTests "${OSMesa_LIB}")
 endif()
 
 if(F3D_MODULE_EXTERNAL_RENDERING AND F3D_TESTING_ENABLE_GLX_TESTS)
   # external window test using GLX
-  target_link_libraries(libf3dSDKTests OpenGL::GLX X11)
+  target_link_libraries(libf3dSDKTests OpenGL::GLX "${X11_LIB}")
 endif()
 
 if(F3D_TESTING_ENABLE_EXTERNAL_EGL)

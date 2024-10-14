@@ -52,7 +52,7 @@ int TestSDKEngineExceptions(int argc, char* argv[])
               << std::endl;
     return EXIT_FAILURE;
   }
-  catch (const f3d::engine::no_window_exception& ex)
+  catch (const f3d::context::loading_exception& ex)
   {
     std::cout << ex.what() << std::endl;
   }
