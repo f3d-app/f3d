@@ -100,7 +100,7 @@ EMSCRIPTEN_BINDINGS(f3d)
 
   // f3d::scene
   emscripten::class_<f3d::scene>("Scene")
-    .function("supported", &supported, emscripten::allow_raw_pointers())
+    .function("supports", &supports, emscripten::allow_raw_pointers())
     .function("add", &add, emscripten::allow_raw_pointers())
     .function("clear", &clear, emscripten::allow_raw_pointers());
 
