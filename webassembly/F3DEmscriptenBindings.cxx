@@ -103,7 +103,7 @@ EMSCRIPTEN_BINDINGS(f3d)
 
   engine
     .class_function("create", &createEngine, emscripten::return_value_policy::take_ownership())
-    .function("getScene", &f3d::engine::getScene, emscripten::reference())
+    .function("getScene", &f3d::engine::getScene, emscripten::return_value_policy::reference())
     .function("getWindow", &f3d::engine::getWindow, emscripten::return_value_policy::reference())
     .function("getInteractor", &f3d::engine::getInteractor, emscripten::return_value_policy::reference())
     .function("getOptions", &f3d::engine::getOptions, emscripten::return_value_policy::reference())
