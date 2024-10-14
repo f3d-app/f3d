@@ -31,7 +31,6 @@ std::unique_ptr<f3d::engine> engine;
       NSOpenGLPFAColorSize, 24,
       NSOpenGLPFAAlphaSize, 8,
       NSOpenGLPFADepthSize, 32,
-      NSOpenGLPFAAccelerated,
       0
   };
   
