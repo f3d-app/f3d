@@ -8,7 +8,6 @@
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 @property (strong) NSWindow *window;
 @property (strong) NSOpenGLContext *openGLContext;
-@property (strong) NSTimer *renderTimer;
 @property std::string dataPath;
 @property std::string outPath;
 @end
