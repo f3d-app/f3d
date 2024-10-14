@@ -39,17 +39,13 @@
   f3d::engine engine = f3d::engine::createExternalCOCOA();
   engine.getWindow().setSize(300, 300);
   engine.getScene().add(_dataPath + "/data/cow.vtp");
-  _result = engine.getWindow().renderToImage(false);
 
-  [NSApp performSelector:@selector(terminate:) withObject:nil afterDelay:0.1];
-}
-
-- (void)applicationWillTerminate:(NSNotification *)notification {
-  if (!TestSDKHelpers::RenderTest(_result, _dataPath + "baselines/", _outPath,
-            "TestSDKExternalWindowCOCOA"))
+  if (!TestSDKHelpers::RenderTest(engine.getWindow(), _dataPath + "baselines/", _outPath, "TestSDKExternalWindowCOCOA"))
   {
     exit(1);
   }
+
+  [NSApp performSelector:@selector(terminate:) withObject:nil afterDelay:0.1];
 }
 
 @end
