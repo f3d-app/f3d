@@ -44,8 +44,7 @@ std::unique_ptr<f3d::engine> engine;
   engine->getScene().add(_dataPath + "/data/cow.vtp");
   _result = engine->getWindow().renderToImage(false);
 
-  [self.window performSelector:@selector(close) withObject:nil afterDelay:0.1];
-  [NSApp performSelector:@selector(terminate:) withObject:nil afterDelay:0.2];
+  [NSApp performSelector:@selector(terminate:) withObject:nil afterDelay:0.1];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {

@@ -130,7 +130,7 @@ engine engine::createExternalWGL()
 //----------------------------------------------------------------------------
 engine engine::createExternalCOCOA()
 {
-  return { window::Type::EXTERNAL, false, context::cocoa() };
+  return { window::Type::EXTERNAL, false };
 }
 
 //----------------------------------------------------------------------------
