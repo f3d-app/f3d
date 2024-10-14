@@ -11,7 +11,6 @@
 @property (strong) NSTimer *renderTimer;
 @property std::string dataPath;
 @property std::string outPath;
-@property f3d::image result;
 @end
 
 @implementation AppDelegate
