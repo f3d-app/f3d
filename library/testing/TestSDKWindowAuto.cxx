@@ -25,7 +25,7 @@ int TestSDKWindowAuto(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (!win.isOffscreen())
+  if (win.isOffscreen())
   {
     std::cerr << "Window should not be offscreen" << std::endl;
     return EXIT_FAILURE;

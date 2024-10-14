@@ -1014,7 +1014,7 @@ endif()
 if(WIN32)
   f3d_test(NAME TestRenderingBackendWGL DATA cow.vtp RENDERING_BACKEND wgl ARGS --verbose REGEXP "vtkWin32OpenGLRenderWindow")
 endif()
-f3d_test(NAME TestRenderingBackendInvalid DATA cow.vtp RENDERING_BACKEND invalid ARGS --verbose REGEXP "rendering-backend value is invalid, falling back to" NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestRenderingBackendInvalid DATA cow.vtp RENDERING_BACKEND invalid ARGS --verbose REGEXP "rendering-backend value is invalid, falling back to" NO_BASELINE)
 
 # Test that f3d can try to read a system config file
 add_test(NAME f3d::TestNoDryRun COMMAND $<TARGET_FILE:f3d> --no-render)

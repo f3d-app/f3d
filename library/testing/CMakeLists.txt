@@ -62,7 +62,7 @@ if(F3D_MODULE_EXTERNAL_RENDERING)
     list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
   endif()
   if(F3D_TESTING_ENABLE_EXTERNAL_OSMESA)
-    find_package(OSMesa REQUIRED)
+    find_library(OSMesa_LIB OSMesa REQUIRED)
     list(APPEND libf3dSDKTests_list TestSDKExternalWindowOSMesa.cxx)
   endif()
   if(F3D_TESTING_ENABLE_GLX_TESTS)
@@ -149,7 +149,7 @@ endif()
 
 if(F3D_TESTING_ENABLE_EXTERNAL_OSMESA)
   # external window test using OSMesa
-  target_link_libraries(libf3dSDKTests OSMesa)
+  target_link_libraries(libf3dSDKTests ${OSMesa_LIB})
 endif()
 
 if(F3D_MODULE_EXTERNAL_RENDERING AND F3D_TESTING_ENABLE_GLX_TESTS)

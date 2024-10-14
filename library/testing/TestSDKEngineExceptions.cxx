@@ -36,7 +36,8 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   try
   {
     eng = f3d::engine::createWGL();
-    std::cerr << "An exception has not been thrown when creating a WGL engine on Linux" << std::endl;
+    std::cerr << "An exception has not been thrown when creating a WGL engine on Linux"
+              << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::engine::no_window_exception& ex)
@@ -47,7 +48,8 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   try
   {
     eng = f3d::engine::createExternalWGL();
-    std::cerr << "An exception has not been thrown when creating an external WGL engine on Linux" << std::endl;
+    std::cerr << "An exception has not been thrown when creating an external WGL engine on Linux"
+              << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::engine::no_window_exception& ex)
