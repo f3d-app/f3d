@@ -5,8 +5,6 @@
 #import <Cocoa/Cocoa.h>
 #import <OpenGL/gl3.h>
 
-std::unique_ptr<f3d::engine> engine;
-
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 @property (strong) NSWindow *window;
 @property (strong) NSOpenGLContext *openGLContext;
@@ -38,10 +36,10 @@ std::unique_ptr<f3d::engine> engine;
   self.openGLContext = [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
   [self.openGLContext makeCurrentContext];
 
-  engine = std::make_unique<f3d::engine>(f3d::engine::createExternalCOCOA());
-  engine->getWindow().setSize(300, 300);
-  engine->getScene().add(_dataPath + "/data/cow.vtp");
-  _result = engine->getWindow().renderToImage(false);
+  f3d::engine engine = f3d::engine::createExternalCOCOA();
+  engine.getWindow().setSize(300, 300);
+  engine.getScene().add(_dataPath + "/data/cow.vtp");
+  _result = engine.getWindow().renderToImage(false);
 
   [NSApp performSelector:@selector(terminate:) withObject:nil afterDelay:0.1];
 }
