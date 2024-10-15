@@ -227,8 +227,6 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   {
 #ifdef _WIN32
     this->Internals->RenWin = vtkSmartPointer<vtkWin32OpenGLRenderWindow>::New();
-#else
-    throw engine::no_window_exception("Window type is WGL but it is supported on Windows only");
 #endif
   }
   else if (!type.has_value())

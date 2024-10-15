@@ -31,7 +31,7 @@ int TestSDKEngineExceptions(int argc, char* argv[])
     std::cout << ex.what() << std::endl;
   }
 
-// These tests are defined for coverage of WGL APIs
+// These tests are defined for coverage
 #ifdef __linux__
   try
   {
@@ -65,6 +65,30 @@ int TestSDKEngineExceptions(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   catch (const f3d::context::loading_exception& ex)
+  {
+    std::cout << ex.what() << std::endl;
+  }
+
+  try
+  {
+    eng = f3d::engine::createExternal(f3d::context::getSymbol("invalid", "invalid"));
+    std::cerr << "An exception has not been thrown when loading an invalid library"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::context::loading_exception& ex)
+  {
+    std::cout << ex.what() << std::endl;
+  }
+
+  try
+  {
+    eng = f3d::engine::createExternal(f3d::context::getSymbol("GLX", "invalid"));
+    std::cerr << "An exception has not been thrown when loading an invalid symbol"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::context::symbol_exception& ex)
   {
     std::cout << ex.what() << std::endl;
   }

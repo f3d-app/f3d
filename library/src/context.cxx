@@ -20,7 +20,7 @@
 namespace f3d
 {
 //----------------------------------------------------------------------------
-context::function getSymbol(const std::string& lib, const std::string& func)
+context::function context::getSymbol(const std::string& lib, const std::string& func)
 {
   std::string libName = vtksys::DynamicLoader::LibPrefix();
   libName += lib;

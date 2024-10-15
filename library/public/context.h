@@ -59,6 +59,14 @@ public:
   static function osmesa();
 
   /**
+   * Create a context function from a library name and a function name.
+   * The library name must be specified without its prefix and extension.
+   * For example, `getSymbol("EGL", "eglGetProcAddress")` looks for the symbol
+   * `eglGetProcAddress` in the library `libEGL.so` on Linux.
+   */
+  static function getSymbol(const std::string& lib, const std::string& func);
+
+  /**
    * An exception that can be thrown when the requested library cannot be loaded.
    */
   struct loading_exception : public exception
