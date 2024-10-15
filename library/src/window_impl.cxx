@@ -25,9 +25,6 @@
 
 #ifdef VTK_USE_X
 #include <vtkXOpenGLRenderWindow.h>
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-#include <vtkglad/include/glad/glx.h>
-#endif
 #endif
 
 #ifdef _WIN32
@@ -36,9 +33,6 @@
 
 #ifdef VTK_OPENGL_HAS_EGL
 #include <vtkEGLRenderWindow.h>
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-#include <vtkglad/include/glad/egl.h>
-#endif
 #endif
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
@@ -162,6 +156,14 @@ public:
 #endif
   }
 
+  static context::fptr SymbolLoader(void* userptr, const char* name)
+  {
+    assert(userptr != nullptr);
+    auto* fn = static_cast<context::function*>(userptr);
+    assert(fn != nullptr);
+    return (*fn)(name);
+  }
+
   std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkNew<vtkF3DRenderer> Renderer;
@@ -185,22 +187,6 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
 #if F3D_MODULE_EXTERNAL_RENDERING
     vtkNew<vtkExternalOpenGLRenderWindow> extWin;
     extWin->AutomaticWindowPositionAndResizeOff();
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-    auto invoke = [](void* userptr, const char* name) -> context::fptr
-    {
-      assert(userptr != nullptr);
-      auto* fn = static_cast<context::function*>(userptr);
-      assert(fn != nullptr);
-      return (*fn)(name);
-    };
-    if (this->Internals->GetProcAddress)
-    {
-      extWin->SetOpenGLSymbolLoader(invoke, &this->Internals->GetProcAddress);
-    }
-    extWin->vtkOpenGLRenderWindow::OpenGLInit();
-#endif
-
     this->Internals->RenWin = extWin;
 #else
     throw engine::no_window_exception(
@@ -210,10 +196,6 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   else if (type == Type::EGL)
   {
 #if defined(VTK_OPENGL_HAS_EGL) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-    if (!gladLoaderLoadEGL(EGL_NO_DISPLAY))
-    {
-      throw engine::no_window_exception("Cannot load EGL library");
-    }
     this->Internals->RenWin = vtkSmartPointer<vtkEGLRenderWindow>::New();
 #ifdef __ANDROID__
     // Since F3D_MODULE_EXTERNAL_RENDERING is not supported on Android yet, we need to call
@@ -236,7 +218,6 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   else if (type == Type::GLX)
   {
 #if defined(VTK_USE_X) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-    gladLoaderLoadGLX(nullptr, 0); // Load core glx functions.
     this->Internals->RenWin = vtkSmartPointer<vtkXOpenGLRenderWindow>::New();
 #else
     throw engine::no_window_exception("Window type is GLX but VTK GLX support is not enabled");
@@ -252,10 +233,24 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
   else if (!type.has_value())
   {
+    // rely on VTK logic
     this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
   }
 
   assert(this->Internals->RenWin != nullptr);
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+  vtkOpenGLRenderWindow* oglRenWin = vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin);
+  if (oglRenWin)
+  {
+    if (this->Internals->GetProcAddress)
+    {
+      oglRenWin->SetOpenGLSymbolLoader(&internals::SymbolLoader, &this->Internals->GetProcAddress);
+    }
+    // We need to call vtkOpenGLRenderWindow function because vtkGenericOpenGLRenderWindow is reimplementing it incorrectly
+    oglRenWin->vtkOpenGLRenderWindow::OpenGLInit();
+  }
+#endif
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240606)
   this->Internals->RenWin->EnableTranslucentSurfaceOn();

@@ -76,37 +76,37 @@ engine::engine(
 //----------------------------------------------------------------------------
 engine engine::create(bool offscreen)
 {
-  return { {}, offscreen };
+  return { std::nullopt, offscreen, nullptr };
 }
 
 //----------------------------------------------------------------------------
 engine engine::createNone()
 {
-  return { window::Type::NONE, true };
+  return { window::Type::NONE, true, nullptr };
 }
 
 //----------------------------------------------------------------------------
 engine engine::createGLX(bool offscreen)
 {
-  return { window::Type::GLX, offscreen };
+  return { window::Type::GLX, offscreen, context::glx() };
 }
 
 //----------------------------------------------------------------------------
 engine engine::createWGL(bool offscreen)
 {
-  return { window::Type::WGL, offscreen };
+  return { window::Type::WGL, offscreen, context::wgl() };
 }
 
 //----------------------------------------------------------------------------
 engine engine::createEGL(bool offscreen)
 {
-  return { window::Type::EGL, offscreen };
+  return { window::Type::EGL, offscreen, context::egl() };
 }
 
 //----------------------------------------------------------------------------
 engine engine::createOSMesa()
 {
-  return { window::Type::OSMESA, true };
+  return { window::Type::OSMESA, true, context::osmesa() };
 }
 
 //----------------------------------------------------------------------------

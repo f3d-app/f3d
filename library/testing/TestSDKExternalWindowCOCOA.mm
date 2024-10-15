@@ -34,7 +34,7 @@
   self.openGLContext = [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
   [self.openGLContext makeCurrentContext];
 
-  f3d::engine engine = f3d::engine::createExternalCOCOA();
+  f3d::engine engine = f3d::engine::createExternal(nullptr);
   engine.getWindow().setSize(300, 300);
   engine.getScene().add(_dataPath + "/data/cow.vtp");
 

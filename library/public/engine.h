@@ -306,7 +306,7 @@ private:
    * The user must rely on factories to create the engine instance.
    */
   engine(const std::optional<window::Type>& windowType, bool offscreen,
-    const context::function& loader = nullptr);
+    const context::function& loader);
 };
 }
 
