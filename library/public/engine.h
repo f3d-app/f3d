@@ -305,8 +305,8 @@ private:
    * Engine constructor. This is a private method.
    * The user must rely on factories to create the engine instance.
    */
-  engine(const std::optional<window::Type>& windowType, bool offscreen,
-    const context::function& loader);
+  engine(
+    const std::optional<window::Type>& windowType, bool offscreen, const context::function& loader);
 };
 }
 

@@ -250,7 +250,8 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
 #if F3D_MODULE_EXTERNAL_RENDERING
     if (oglRenWin->IsA("vtkExternalOpenGLRenderWindow"))
     {
-      // We need to call vtkOpenGLRenderWindow function because vtkGenericOpenGLRenderWindow is reimplementing it incorrectly
+      // We need to call vtkOpenGLRenderWindow function because vtkGenericOpenGLRenderWindow is
+      // reimplementing it incorrectly
       oglRenWin->vtkOpenGLRenderWindow::OpenGLInit();
     }
 #endif
