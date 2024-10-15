@@ -4,6 +4,16 @@
 #include "context_cocoa.h"
 #endif
 
+#include <vtkRenderingOpenGLConfigure.h>
+
+#if defined(VTK_USE_X)
+#include <vtkglad/include/glad/glx.h>
+#endif
+
+#if defined(VTK_OPENGL_HAS_EGL)
+#include <vtkglad/include/glad/egl.h>
+#endif
+
 #include <vtksys/DynamicLoader.hxx>
 
 namespace f3d
@@ -38,6 +48,7 @@ context::function getSymbol(const std::string& lib, const std::string& func)
 context::function context::glx()
 {
 #ifdef __linux__
+  gladLoaderLoadGLX(nullptr, 0); // Load core glx functions.
   return getSymbol("GLX", "glXGetProcAddress");
 #else
   throw loading_exception("Cannot use a GLX context on this platform");
@@ -82,6 +93,7 @@ context::function context::cocoa()
 context::function context::egl()
 {
 #ifndef __APPLE__
+  gladLoaderLoadEGL(EGL_NO_DISPLAY);
   return getSymbol("EGL", "eglGetProcAddress");
 #else
   throw loading_exception("Cannot use a EGL context on this platform");
