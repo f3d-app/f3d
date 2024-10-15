@@ -72,8 +72,7 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   try
   {
     eng = f3d::engine::createExternal(f3d::context::getSymbol("invalid", "invalid"));
-    std::cerr << "An exception has not been thrown when loading an invalid library"
-              << std::endl;
+    std::cerr << "An exception has not been thrown when loading an invalid library" << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::context::loading_exception& ex)
@@ -84,8 +83,7 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   try
   {
     eng = f3d::engine::createExternal(f3d::context::getSymbol("GLX", "invalid"));
-    std::cerr << "An exception has not been thrown when loading an invalid symbol"
-              << std::endl;
+    std::cerr << "An exception has not been thrown when loading an invalid symbol" << std::endl;
     return EXIT_FAILURE;
   }
   catch (const f3d::context::symbol_exception& ex)
