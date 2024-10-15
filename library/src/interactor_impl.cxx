@@ -42,8 +42,8 @@ public:
     , Scene(scene)
   {
     window::Type type = window.getType();
-    if (type == window::Type::GLX || type == window::Type::WGL ||
-      type == window::Type::COCOA || type == window::Type::WASM)
+    if (type == window::Type::GLX || type == window::Type::WGL || type == window::Type::COCOA ||
+      type == window::Type::WASM)
     {
       this->VTKInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     }

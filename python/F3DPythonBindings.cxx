@@ -333,10 +333,10 @@ PYBIND11_MODULE(pyf3d, module)
   engine //
     .def_static("create", &f3d::engine::create, "Create an engine with a automatic window")
     .def_static("create_none", &f3d::engine::createNone, "Create an engine with no window")
-    .def_static("create_glx", &f3d::engine::createGLX,
-      "Create an engine with an GLX window (Linux only)")
-    .def_static("create_wgl", &f3d::engine::createWGL,
-      "Create an engine with an WGL window (Windows only)")
+    .def_static(
+      "create_glx", &f3d::engine::createGLX, "Create an engine with an GLX window (Linux only)")
+    .def_static(
+      "create_wgl", &f3d::engine::createWGL, "Create an engine with an WGL window (Windows only)")
     .def_static("create_egl", &f3d::engine::createEGL,
       "Create an engine with an EGL window (Windows/Linux only)")
     .def_static("create_osmesa", &f3d::engine::createOSMesa,
