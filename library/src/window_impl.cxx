@@ -247,8 +247,13 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     {
       oglRenWin->SetOpenGLSymbolLoader(&internals::SymbolLoader, &this->Internals->GetProcAddress);
     }
-    // We need to call vtkOpenGLRenderWindow function because vtkGenericOpenGLRenderWindow is reimplementing it incorrectly
-    oglRenWin->vtkOpenGLRenderWindow::OpenGLInit();
+#if F3D_MODULE_EXTERNAL_RENDERING
+    if (oglRenWin->IsA("vtkExternalOpenGLRenderWindow"))
+    {
+      // We need to call vtkOpenGLRenderWindow function because vtkGenericOpenGLRenderWindow is reimplementing it incorrectly
+      oglRenWin->vtkOpenGLRenderWindow::OpenGLInit();
+    }
+#endif
   }
 #endif
 
