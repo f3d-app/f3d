@@ -17,6 +17,7 @@ namespace f3d
  * managed by libf3d, but by the user directly.
  * Therefore, the engine is created using `f3d::engine::createExternal` and the functions below
  * can be used as argument of this factory.
+ * One can also create a custom functor returning a `f3d::context::function`.
  */
 class F3D_EXPORT context
 {

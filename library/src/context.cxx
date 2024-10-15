@@ -47,7 +47,7 @@ context::function getSymbol(const std::string& lib, const std::string& func)
 //----------------------------------------------------------------------------
 context::function context::glx()
 {
-#ifdef __linux__
+#ifdef VTK_USE_X
   gladLoaderLoadGLX(nullptr, 0); // Load core glx functions.
   return getSymbol("GLX", "glXGetProcAddress");
 #else
@@ -92,7 +92,7 @@ context::function context::cocoa()
 //----------------------------------------------------------------------------
 context::function context::egl()
 {
-#ifndef __APPLE__
+#ifdef VTK_OPENGL_HAS_EGL
   gladLoaderLoadEGL(EGL_NO_DISPLAY);
   return getSymbol("EGL", "eglGetProcAddress");
 #else
