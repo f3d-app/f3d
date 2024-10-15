@@ -5,12 +5,13 @@
 #endif
 
 #include <vtkRenderingOpenGLConfigure.h>
+#include <vtkVersion.h>
 
-#if defined(VTK_USE_X)
+#if defined(VTK_USE_X) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtkglad/include/glad/glx.h>
 #endif
 
-#if defined(VTK_OPENGL_HAS_EGL)
+#if defined(VTK_OPENGL_HAS_EGL) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtkglad/include/glad/egl.h>
 #endif
 
@@ -47,7 +48,7 @@ context::function getSymbol(const std::string& lib, const std::string& func)
 //----------------------------------------------------------------------------
 context::function context::glx()
 {
-#ifdef VTK_USE_X
+#if defined(VTK_USE_X) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
   gladLoaderLoadGLX(nullptr, 0); // Load core glx functions.
   return getSymbol("GLX", "glXGetProcAddress");
 #else
@@ -92,7 +93,7 @@ context::function context::cocoa()
 //----------------------------------------------------------------------------
 context::function context::egl()
 {
-#ifdef VTK_OPENGL_HAS_EGL
+#if defined(VTK_OPENGL_HAS_EGL) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
   gladLoaderLoadEGL(EGL_NO_DISPLAY);
   return getSymbol("EGL", "eglGetProcAddress");
 #else
