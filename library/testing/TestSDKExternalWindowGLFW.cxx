@@ -10,10 +10,6 @@
 
 int TestSDKExternalWindowGLFW(int argc, char* argv[])
 {
-  // create engine and load file
-  f3d::engine eng(f3d::window::Type::EXTERNAL);
-  eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
-
   // setup glfw window
   if (!glfwInit())
   {
@@ -37,7 +33,9 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
   }
 
   glfwMakeContextCurrent(window);
-  glfwSetWindowUserPointer(window, &eng);
+
+  f3d::engine eng = f3d::engine::createExternal(glfwGetProcAddress);
+  eng.getWindow().setSize(300, 300);
 
   // key callback
   glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -46,6 +44,8 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
       glfwSetWindowShouldClose(window, 1);
     }
   });
+
+  eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
 
   while (!glfwWindowShouldClose(window) && glfwGetTime() < 1.0)
   {

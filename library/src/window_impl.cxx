@@ -18,9 +18,26 @@
 #include <vtkPointGaussianMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
+#include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
 #include <vtksys/SystemTools.hxx>
+
+#ifdef VTK_USE_X
+#include <vtkXOpenGLRenderWindow.h>
+#endif
+
+#ifdef _WIN32
+#include <vtkWin32OpenGLRenderWindow.h>
+#endif
+
+#ifdef VTK_OPENGL_HAS_EGL
+#include <vtkEGLRenderWindow.h>
+#endif
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+#include <vtkOSOpenGLRenderWindow.h>
+#endif
 
 #if F3D_MODULE_EXTERNAL_RENDERING
 #include <vtkExternalOpenGLRenderWindow.h>
@@ -139,19 +156,28 @@ public:
 #endif
   }
 
+  static context::fptr SymbolLoader(void* userptr, const char* name)
+  {
+    assert(userptr != nullptr);
+    auto* fn = static_cast<context::function*>(userptr);
+    assert(fn != nullptr);
+    return (*fn)(name);
+  }
+
   std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkNew<vtkF3DRenderer> Renderer;
-  Type WindowType;
   const options& Options;
   std::string CachePath;
+  context::function GetProcAddress;
 };
 
 //----------------------------------------------------------------------------
-window_impl::window_impl(const options& options, Type type)
+window_impl::window_impl(const options& options, const std::optional<Type>& type, bool offscreen,
+  const context::function& getProcAddress)
   : Internals(std::make_unique<window_impl::internals>(options))
 {
-  this->Internals->WindowType = type;
+  this->Internals->GetProcAddress = getProcAddress;
   if (type == Type::NONE)
   {
     this->Internals->RenWin = vtkSmartPointer<vtkF3DNoRenderWindow>::New();
@@ -159,27 +185,82 @@ window_impl::window_impl(const options& options, Type type)
   else if (type == Type::EXTERNAL)
   {
 #if F3D_MODULE_EXTERNAL_RENDERING
-    this->Internals->RenWin = vtkSmartPointer<vtkExternalOpenGLRenderWindow>::New();
+    vtkNew<vtkExternalOpenGLRenderWindow> extWin;
+    extWin->AutomaticWindowPositionAndResizeOff();
+    this->Internals->RenWin = extWin;
 #else
     throw engine::no_window_exception(
       "Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
 #endif
   }
-  else
+  else if (type == Type::EGL)
   {
-    this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
-    this->Internals->RenWin->SetOffScreenRendering(type == Type::NATIVE_OFFSCREEN);
-    this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
-
+#if defined(VTK_OPENGL_HAS_EGL) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+    this->Internals->RenWin = vtkSmartPointer<vtkEGLRenderWindow>::New();
 #ifdef __ANDROID__
     // Since F3D_MODULE_EXTERNAL_RENDERING is not supported on Android yet, we need to call
     // this workaround. It makes vtkEGLRenderWindow external if WindowInfo is not nullptr.
     this->Internals->RenWin->SetWindowInfo("jni");
 #endif
+#else
+    throw engine::no_window_exception("Window type is EGL but VTK EGL support is not enabled");
+#endif
   }
+  else if (type == Type::OSMESA)
+  {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+    this->Internals->RenWin = vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+#else
+    throw engine::no_window_exception(
+      "Window type is OSMesa but VTK OSMesa support is not enabled");
+#endif
+  }
+  else if (type == Type::GLX)
+  {
+#if defined(VTK_USE_X) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+    this->Internals->RenWin = vtkSmartPointer<vtkXOpenGLRenderWindow>::New();
+#else
+    throw engine::no_window_exception("Window type is GLX but VTK GLX support is not enabled");
+#endif
+  }
+  else if (type == Type::WGL)
+  {
+#ifdef _WIN32
+    this->Internals->RenWin = vtkSmartPointer<vtkWin32OpenGLRenderWindow>::New();
+#endif
+  }
+  else if (!type.has_value())
+  {
+    // rely on VTK logic
+    this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
+  }
+
+  assert(this->Internals->RenWin != nullptr);
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+  vtkOpenGLRenderWindow* oglRenWin = vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin);
+  if (oglRenWin)
+  {
+    if (this->Internals->GetProcAddress)
+    {
+      oglRenWin->SetOpenGLSymbolLoader(&internals::SymbolLoader, &this->Internals->GetProcAddress);
+    }
+#if F3D_MODULE_EXTERNAL_RENDERING
+    if (oglRenWin->IsA("vtkExternalOpenGLRenderWindow"))
+    {
+      // We need to call vtkOpenGLRenderWindow function because vtkGenericOpenGLRenderWindow is
+      // reimplementing it incorrectly
+      oglRenWin->vtkOpenGLRenderWindow::OpenGLInit();
+    }
+#endif
+  }
+#endif
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240606)
   this->Internals->RenWin->EnableTranslucentSurfaceOn();
 #endif
+  this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
+  this->Internals->RenWin->SetOffScreenRendering(offscreen);
   this->Internals->RenWin->SetWindowName("f3d");
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
@@ -187,6 +268,8 @@ window_impl::window_impl(const options& options, Type type)
 
   this->Initialize();
   this->Internals->UpdateTheme();
+
+  log::debug("VTK window class type is ", this->Internals->RenWin->GetClassName());
 }
 
 //----------------------------------------------------------------------------
@@ -204,7 +287,57 @@ void window_impl::InitializeUpVector()
 //----------------------------------------------------------------------------
 window_impl::Type window_impl::getType()
 {
-  return this->Internals->WindowType;
+  if (this->Internals->RenWin->IsA("vtkOSOpenGLRenderWindow"))
+  {
+    return Type::OSMESA;
+  }
+
+#ifdef VTK_USE_X
+  if (this->Internals->RenWin->IsA("vtkXOpenGLRenderWindow"))
+  {
+    return Type::GLX;
+  }
+#endif
+
+#ifdef _WIN32
+  if (this->Internals->RenWin->IsA("vtkWin32OpenGLRenderWindow"))
+  {
+    return Type::WGL;
+  }
+#endif
+
+#ifdef __APPLE__
+  if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
+  {
+    return Type::COCOA;
+  }
+#endif
+
+#ifdef VTK_OPENGL_HAS_EGL
+  if (this->Internals->RenWin->IsA("vtkEGLRenderWindow"))
+  {
+    return Type::EGL;
+  }
+#endif
+#ifdef __EMSCRIPTEN__
+  if (this->Internals->RenWin->IsA("vtkWebAssemblyOpenGLRenderWindow"))
+  {
+    return Type::WASM;
+  }
+#endif
+
+  if (this->Internals->RenWin->IsA("vtkF3DNoRenderWindow"))
+  {
+    return Type::NONE;
+  }
+
+  return Type::UNKNOWN;
+}
+
+//----------------------------------------------------------------------------
+bool window_impl::isOffscreen()
+{
+  return !this->Internals->RenWin->GetShowWindow();
 }
 
 //----------------------------------------------------------------------------
@@ -318,7 +451,7 @@ void window_impl::UpdateDynamicOptions()
 {
   vtkF3DRenderer* renderer = this->Internals->Renderer;
 
-  if (this->Internals->WindowType == Type::NONE)
+  if (this->Internals->RenWin->IsA("vtkF3DNoRenderWindow"))
   {
     // With a NONE window type, only update the actors to get accurate bounding box information
     renderer->UpdateActors();

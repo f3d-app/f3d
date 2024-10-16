@@ -25,10 +25,10 @@ inputs:
     description: 'Label to control bundle'
     required: false
     default: 'no-bundle'
-  egl_label:
-    description: 'Label to control egl'
+  rendering_backend:
+    description: 'Label to control the rendering backend'
     required: false
-    default: 'no-egl'
+    default: 'auto'
   static_label:
     description: 'Label to control static build'
     required: false
@@ -82,7 +82,6 @@ runs:
         vtk_version: ${{inputs.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         raytracing_label: ${{inputs.raytracing_label}}
-        egl_label: ${{inputs.egl_label}}
         cpu: ${{inputs.cpu}}
 
     - name: Install F3D dependencies
@@ -165,6 +164,12 @@ runs:
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.1') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
+        -DF3D_TESTING_ENABLE_EXTERNAL_EGL=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EXTERNAL_OSMESA=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EXTERNAL_QT=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_GLX_TESTS=${{ inputs.rendering_backend == 'auto' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
@@ -178,7 +183,7 @@ runs:
     - name: Run Xvfb ubuntu
       if: |
         runner.os == 'Linux' &&
-        inputs.egl_label != 'egl'
+        inputs.rendering_backend == 'auto'
       shell: bash
       run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
 

@@ -10,7 +10,7 @@ if __name__ == "__main__":
     f3d.Engine.autoload_plugins()
 
     # Create a native window engine
-    eng = f3d.Engine(f3d.Window.NATIVE)
+    eng = f3d.Engine.create()
 
     # Load all files from provided directory as geometries
     files = [f for f in Path(sys.argv[1]).iterdir() if f.is_file()]

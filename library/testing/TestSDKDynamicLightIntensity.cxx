@@ -7,7 +7,7 @@
 
 int TestSDKDynamicLightIntensity(int argc, char* argv[])
 {
-  f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
+  f3d::engine eng = f3d::engine::create(true);
   f3d::scene& Scene = eng.getScene();
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();

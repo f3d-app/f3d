@@ -8,7 +8,7 @@ import f3d
 
 @pytest.fixture
 def f3d_engine():
-    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+    engine = f3d.Engine.create(True)
     engine.window.size = 300, 200
     return engine
 

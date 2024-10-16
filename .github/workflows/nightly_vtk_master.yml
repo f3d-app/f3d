@@ -95,13 +95,14 @@ jobs:
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
     strategy:
       fail-fast: false
-      matrix:
-        build_type: [standard]
-        include:
-          - egl_label: no-egl
-          - build_type: headless
-            egl_label: egl
-
+    matrix:
+      build_type: [standard]
+      include:
+        - rendering_backend: auto
+        - build_type: egl
+          rendering_backend: egl
+        - build_type: osmesa
+          rendering_backend: osmesa
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
@@ -123,7 +124,7 @@ jobs:
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
         raytracing_label: 'raytracing'
         exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
-        egl_label: ${{matrix.egl_label}}
+        rendering_backend: ${{matrix.rendering_backend}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
 #----------------------------------------------------------------------------

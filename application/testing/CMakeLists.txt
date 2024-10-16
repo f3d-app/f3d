@@ -1,7 +1,7 @@
 # F3D Testing
 function(f3d_test)
 
-	cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI" "DATA;DEPENDS;ARGS" ${ARGN})
+	cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND" "DATA;DEPENDS;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -48,6 +48,16 @@ function(f3d_test)
 
     if(F3D_TEST_THRESHOLD)
       list(APPEND F3D_TEST_ARGS "--ref-threshold=${F3D_TEST_THRESHOLD}")
+    endif()
+  endif()
+
+  if(F3D_TEST_RENDERING_BACKEND)
+    list(APPEND F3D_TEST_ARGS "--rendering-backend=${F3D_TEST_RENDERING_BACKEND}")
+  else()
+    # If no rendering backend is specified by the test, "auto" is used.
+    # However, F3D_TESTING_FORCE_RENDERING_BACKEND can be used to force the rendering backend for these tests
+    if(F3D_TESTING_FORCE_RENDERING_BACKEND)
+      list(APPEND F3D_TEST_ARGS "--rendering-backend=${F3D_TESTING_FORCE_RENDERING_BACKEND}")
     endif()
   endif()
 
@@ -992,6 +1002,27 @@ if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestReadersListMultiplePlugins ARGS --readers-list --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()
 
+# Test rendering backends
+# For some reason the sanitizer detects leaks because of EGL and OSMesa
+f3d_test(NAME TestRenderingBackendAuto DATA cow.vtp RENDERING_BACKEND auto)
+if(UNIX AND NOT APPLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914 AND F3D_SANITIZER STREQUAL "none")
+  f3d_test(NAME TestRenderingBackendEGL DATA cow.vtp RENDERING_BACKEND egl)
+  f3d_test(NAME TestRenderingBackendEGLCheckClass DATA cow.vtp RENDERING_BACKEND egl ARGS --verbose REGEXP "vtkEGLRenderWindow" NO_BASELINE)
+  f3d_test(NAME TestRenderingBackendOSMesa DATA cow.vtp RENDERING_BACKEND osmesa)
+  f3d_test(NAME TestRenderingBackendOSMesaCheckClass DATA cow.vtp RENDERING_BACKEND osmesa ARGS --verbose REGEXP "vtkOSOpenGLRenderWindow" NO_BASELINE)
+  f3d_test(NAME TestRenderingBackendWGLFailure DATA cow.vtp RENDERING_BACKEND wgl REGEXP "Cannot use a WGL context on this platform" NO_BASELINE)
+  if(F3D_TESTING_ENABLE_GLX_TESTS)
+    f3d_test(NAME TestRenderingBackendGLX DATA cow.vtp RENDERING_BACKEND glx)
+    f3d_test(NAME TestRenderingBackendGLXCheckClass DATA cow.vtp RENDERING_BACKEND glx ARGS --verbose REGEXP "vtkXOpenGLRenderWindow" NO_BASELINE)
+  endif()
+endif()
+if(WIN32)
+  f3d_test(NAME TestRenderingBackendWGL DATA cow.vtp RENDERING_BACKEND wgl)
+  f3d_test(NAME TestRenderingBackendWGLCheckClass DATA cow.vtp RENDERING_BACKEND wgl ARGS --verbose REGEXP "vtkWin32OpenGLRenderWindow" NO_BASELINE)
+  f3d_test(NAME TestRenderingBackendGLXFailure DATA cow.vtp RENDERING_BACKEND glx REGEXP "Cannot use a GLX context on this platform" NO_BASELINE)
+endif()
+f3d_test(NAME TestRenderingBackendInvalid DATA cow.vtp RENDERING_BACKEND invalid ARGS --verbose REGEXP "rendering-backend value is invalid, falling back to" NO_BASELINE)
+
 # Test that f3d can try to read a system config file
 add_test(NAME f3d::TestNoDryRun COMMAND $<TARGET_FILE:f3d> --no-render)
 set_tests_properties(f3d::TestNoDryRun PROPERTIES TIMEOUT 4)
@@ -1042,8 +1073,7 @@ if(NOT F3D_MACOS_BUNDLE)
   endif()
 endif()
 
-# Watch testing require onscreen rendering
-if(NOT VTK_OPENGL_HAS_EGL)
+if(WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS) # Watch testing require GLX rendering on Linux
   if(UNIX)
     set(_f3d_os_script_ext "sh")
     set(_f3d_os_script_exec "")

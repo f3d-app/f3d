@@ -23,23 +23,38 @@ public:
    * Enumeration of supported window types
    * =====================================
    * NONE: A mock window without rendering capabilities.
-   * NATIVE: A window using the native graphical stack.
-   * NATIVE_OFFSCREEN: A native window rendering to an offscreen buffer, not visible on screen.
-   * EXTERNAL: An external window that assume the OpenGL context would have been created by.
-   * another framework
+   * EXTERNAL: An external window that assume the OpenGL context would have been created by another
+   * framework.
+   * GLX: A window using GLX.
+   * WGL: A window using WGL.
+   * COCOA: A window using COCOA.
+   * EGL: An offscreen window using hardware acceleration that can run headless.
+   * OSMESA: An offscreen window using software rendering that is always run headless.
+   * WASM: A webassembly window (when libf3d is built with emscripten).
+   * UNKNOWN: An unknown window (should not happen).
    */
   enum class Type : unsigned char
   {
     NONE,
-    NATIVE,
-    NATIVE_OFFSCREEN,
-    EXTERNAL
+    EXTERNAL,
+    GLX,
+    WGL,
+    COCOA,
+    EGL,
+    OSMESA,
+    WASM,
+    UNKNOWN
   };
 
   /**
    * Get the type of the window.
    */
   virtual Type getType() = 0;
+
+  /**
+   * Is the window offscreen.
+   */
+  virtual bool isOffscreen() = 0;
 
   /**
    * Get the camera provided by the window.
