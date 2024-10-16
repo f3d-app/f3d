@@ -75,7 +75,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "  float alpha = min(linewidth, 1.0);\n"
     "  float d = dist - lw;\n"
     "  return d < .0 ? alpha\n"
-    "       : d < aa ? pow((1.0 - d / aa) * alpha, 3)\n"
+    "       : d < aa ? pow((1.0 - d / aa) * alpha, 3.0)\n"
     "       : 0.0;\n"
     "}\n"
   );
