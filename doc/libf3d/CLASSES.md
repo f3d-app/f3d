@@ -14,9 +14,9 @@ However, it's possible to force the rendering backend in some specific use cases
 * `createWGL()`: force usage of WGL native backend on Windows.
 * `createEGL()`: force usage of EGL backend, recommended when doing offscreen rendering with a GPU available. Requires EGL library available. No interactor provided.
 * `createOSMesa()`: force usage of OSMesa backend (software rendering), recommended when doing offscreen rendering without any GPU. Requires OSMesa library available. No interactor provided.
-* `createNone()`: do not use any rendering. Useful only to retrieve metadata only.
+* `createNone()`: do not use any rendering. Useful to retrieve metadata only.
 * `createExternal()`: the user is responsible of the rendering stack. It lets the user integrate libf3d in other frameworks like Qt or GLFW. No interactor provided. See [Context](#context-class) documentation for more info.
-An additional boolean argument is available to specify is offscreen rendering is requested when relevant on the selected rendering backend.
+An additional boolean argument is available to specify if offscreen rendering is requested when relevant on the selected rendering backend.
 
 A static function `loadPlugin` can also be called to load reader plugins. It must be called before loading any file. An internal plugin containing VTK native readers can be loaded by calling `f3d::engine::loadPlugin("native");`. Other plugins maintained by F3D team are available if their build is enabled: `alembic`, `assimp`, `draco`, `exodus`, `occt` and `usd`.
 If CMake option `F3D_PLUGINS_STATIC_BUILD` is enabled, the plugins listed above are also static just like `native` plugin.
@@ -29,7 +29,7 @@ It is possible to `clear` the scene and to check if the scene `supports` a file.
 
 ## Context class
 
-Convenient class providing generic context API when using a external rendering backend (using `f3d::engine::createExternal()` factory).
+Convenience class providing generic context API when using a external rendering backend (using `f3d::engine::createExternal()` factory).
 
 ## Window class
 

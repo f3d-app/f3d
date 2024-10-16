@@ -109,7 +109,7 @@ message(STATUS "VTK ${VTK_VERSION} found")
 
 if(VTK_VERSION VERSION_LESS 9.3.20240914)
   # Not optional before
-  find_package(VTK 9.0 REQUIRED COMPONENTS opengl)
+  find_package(VTK REQUIRED COMPONENTS opengl)
 endif()
 
 # Shared options between application and library

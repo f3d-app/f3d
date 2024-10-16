@@ -44,7 +44,6 @@ public:
    * Linux: Try GLX, then EGL, then OSMesa
    * Windows: Try Win32, then EGL, then OSMesa
    * macOS: Always use Cocoa
-   * Throws engine::no_window_exception in case of window creation failure.
    */
   static engine create(bool offscreen = false);
 
@@ -58,7 +57,7 @@ public:
    * Works on Linux only.
    * VTK >= 9.4 required.
    * Optionally, the window can be hidden by setting offscreen to true.
-   * Throws engine::no_window_exception in case of window creation failure.
+   * Throws engine::loading_exception in case of window creation failure.
    */
   static engine createGLX(bool offscreen = false);
 
@@ -67,7 +66,7 @@ public:
    * Works on Windows only.
    * VTK >= 9.4 required.
    * Optionally, the window can be hidden by setting offscreen to true.
-   * Throws engine::no_window_exception in case of window creation failure.
+   * Throws engine::loading_exception in case of window creation failure.
    */
   static engine createWGL(bool offscreen = false);
 
@@ -77,13 +76,14 @@ public:
    * If several GPU are available, the environment variable
    * `VTK_DEFAULT_EGL_DEVICE_INDEX` allows its selection.
    * Optionally, the window can be hidden by setting offscreen to true.
-   * Throws engine::no_window_exception in case of failure.
+   * Throws engine::loading_exception in case of failure.
    */
   static engine createEGL(bool offscreen = false);
 
   /**
    * Create an engine with an OSMesa window.
    * VTK >= 9.4 required.
+   * Throws engine::loading_exception in case of window creation failure.
    */
   static engine createOSMesa();
 
