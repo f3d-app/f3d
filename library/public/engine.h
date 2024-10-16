@@ -1,6 +1,7 @@
 #ifndef f3d_engine_h
 #define f3d_engine_h
 
+#include "context.h"
 #include "exception.h"
 #include "export.h"
 #include "interactor.h"
@@ -25,7 +26,7 @@ namespace f3d
  * Example usage for adding some files in the scene
  *
  * \code{.cpp}
- *  f3d::engine eng();
+ *  f3d::engine eng = f3d::engine::create();
  *  f3d::scene& sce = eng.getscene();
  *  sce.add({"path/to/file", "path/to/another/file"});
  *  f3d::interactor& inter = eng.getInteractor();
@@ -36,21 +37,121 @@ class F3D_EXPORT engine
 {
 public:
   /**
-   * Engine constructor, choose the window type using the enum.
-   * see window.h for details about the window.
-   * When using window::Type::NONE, window and interactor will not be provided by the engine.
-   * When using window::Type::EXTERNAL, interactor will not be provided by the engine.
-   * All objects instances will be created on construction.
-   * Default is window::Type::NATIVE.
-   * Throw a no_window_exception when using a Using window::Type::EXTERNAL without the right cmake
-   * option.
+   * Create an engine with an automatic window.
+   * Optionally, the window can be hidden by setting offscreen to true.
+   * For VTK < 9.3, the window type will depend on the VTK build options
+   * For VTK >= 9.4:
+   * Linux: Try GLX, then EGL, then OSMesa
+   * Windows: Try Win32, then EGL, then OSMesa
+   * macOS: Always use Cocoa
    */
-  explicit engine(window::Type windowType = window::Type::NATIVE);
+  static engine create(bool offscreen = false);
+
+  /**
+   * Create an engine with no window.
+   */
+  static engine createNone();
+
+  /**
+   * Create an engine with a GLX window.
+   * Works on Linux only.
+   * VTK >= 9.4 required.
+   * Optionally, the window can be hidden by setting offscreen to true.
+   * Throws engine::loading_exception in case of window creation failure.
+   */
+  static engine createGLX(bool offscreen = false);
+
+  /**
+   * Create an engine with a WGL window.
+   * Works on Windows only.
+   * VTK >= 9.4 required.
+   * Optionally, the window can be hidden by setting offscreen to true.
+   * Throws engine::loading_exception in case of window creation failure.
+   */
+  static engine createWGL(bool offscreen = false);
+
+  /**
+   * Create an engine with an EGL window.
+   * VTK >= 9.4 required.
+   * If several GPU are available, the environment variable
+   * `VTK_DEFAULT_EGL_DEVICE_INDEX` allows its selection.
+   * Optionally, the window can be hidden by setting offscreen to true.
+   * Throws engine::loading_exception in case of failure.
+   */
+  static engine createEGL(bool offscreen = false);
+
+  /**
+   * Create an engine with an OSMesa window.
+   * VTK >= 9.4 required.
+   * Throws engine::loading_exception in case of window creation failure.
+   */
+  static engine createOSMesa();
+
+  /**
+   * Create an engine with an external window.
+   * A context to retrieve OpenGL symbols is required.
+   * The context can be nullptr for an external Cocoa window.
+   * Here's an example if a GLFW window is used:
+   * \code{.cpp}
+   *  f3d::engine eng = f3d::engine::createExternal(glfwGetProcAddress);
+   * \endcode
+   */
+  static engine createExternal(const context::function& getProcAddress);
+
+  /**
+   * Create an engine with an external GLX context.
+   * Equivalent to createExternal(f3d::context::glx());
+   * VTK >= 9.4 required.
+   * Throws context::loading_exception if GLX library is not found or if not running on Linux.
+   */
+  static engine createExternalGLX();
+
+  /**
+   * Create an engine with an external WGL context.
+   * Equivalent to createExternal(f3d::context::wgl());
+   * VTK >= 9.4 required.
+   * Throws context::loading_exception if WGL library is not found or if not running on Windows.
+   */
+  static engine createExternalWGL();
+
+  /**
+   * Create an engine with an external COCOA context.
+   * Equivalent to createExternal(f3d::context::cocoa());
+   * VTK >= 9.4 required.
+   * Throws context::loading_exception if WGL library is not found or if not running on Windows.
+   */
+  static engine createExternalCOCOA();
+
+  /**
+   * Create an engine with an external EGL context.
+   * Equivalent to createExternal(f3d::context::egl());
+   * VTK >= 9.4 required.
+   * Throws context::loading_exception if EGL library is not found.
+   */
+  static engine createExternalEGL();
+
+  /**
+   * Create an engine with an external OSMesa context.
+   * Equivalent to createExternal(f3d::context::osmesa());
+   * VTK >= 9.4 required.
+   * Throws context::loading_exception if OSMesa library is not found.
+   */
+  static engine createExternalOSMesa();
 
   /**
    * Engine destructor, delete all object instances as well.
    */
   ~engine();
+
+  //@{
+  /**
+   * Engine copy is not possible but move is allowed.
+   */
+  engine(const engine& other) = delete;
+  engine(engine&& other) noexcept;
+  engine& operator=(const engine& other) = delete;
+  engine& operator=(engine&& other) noexcept;
+  //@}
 
   /**
    * Set the cache path. Must be an absolute path.
@@ -199,10 +300,13 @@ public:
 private:
   class internals;
   internals* Internals;
-  engine(const engine& opt) = delete;
-  engine(engine&& opt) = delete;
-  engine& operator=(const engine& opt) = delete;
-  engine& operator=(engine&& opt) = delete;
+
+  /**
+   * Engine constructor. This is a private method.
+   * The user must rely on factories to create the engine instance.
+   */
+  engine(
+    const std::optional<window::Type>& windowType, bool offscreen, const context::function& loader);
 };
 }
 

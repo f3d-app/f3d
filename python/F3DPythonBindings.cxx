@@ -294,13 +294,18 @@ PYBIND11_MODULE(pyf3d, module)
 
   py::enum_<f3d::window::Type>(window, "Type")
     .value("NONE", f3d::window::Type::NONE)
-    .value("NATIVE", f3d::window::Type::NATIVE)
-    .value("NATIVE_OFFSCREEN", f3d::window::Type::NATIVE_OFFSCREEN)
     .value("EXTERNAL", f3d::window::Type::EXTERNAL)
+    .value("GLX", f3d::window::Type::GLX)
+    .value("WGL", f3d::window::Type::WGL)
+    .value("COCOA", f3d::window::Type::COCOA)
+    .value("EGL", f3d::window::Type::EGL)
+    .value("OSMESA", f3d::window::Type::OSMESA)
+    .value("UNKNOWN", f3d::window::Type::UNKNOWN)
     .export_values();
 
   window //
     .def_property_readonly("type", &f3d::window::getType)
+    .def_property_readonly("offscreen", &f3d::window::isOffscreen)
     .def_property_readonly("camera", &f3d::window::getCamera, py::return_value_policy::reference)
     .def_property(
       "size",
@@ -326,7 +331,26 @@ PYBIND11_MODULE(pyf3d, module)
   py::class_<f3d::engine> engine(module, "Engine");
 
   engine //
-    .def(py::init<f3d::window::Type>(), py::arg("window_type") = f3d::window::Type::NATIVE)
+    .def_static("create", &f3d::engine::create, "Create an engine with a automatic window")
+    .def_static("create_none", &f3d::engine::createNone, "Create an engine with no window")
+    .def_static(
+      "create_glx", &f3d::engine::createGLX, "Create an engine with an GLX window (Linux only)")
+    .def_static(
+      "create_wgl", &f3d::engine::createWGL, "Create an engine with an WGL window (Windows only)")
+    .def_static("create_egl", &f3d::engine::createEGL,
+      "Create an engine with an EGL window (Windows/Linux only)")
+    .def_static("create_osmesa", &f3d::engine::createOSMesa,
+      "Create an engine with an OSMesa window (Windows/Linux only)")
+    .def_static("create_external_glx", &f3d::engine::createExternalGLX,
+      "Create an engine with an existing GLX context (Linux only)")
+    .def_static("create_external_wgl", &f3d::engine::createExternalWGL,
+      "Create an engine with an existing WGL context (Windows only)")
+    .def_static("create_external_cocoa", &f3d::engine::createExternalCOCOA,
+      "Create an engine with an existing COCOA context (macOS only)")
+    .def_static("create_external_egl", &f3d::engine::createExternalEGL,
+      "Create an engine with an existing EGL context (Windows/Linux only)")
+    .def_static("create_external_osmesa", &f3d::engine::createExternalOSMesa,
+      "Create an engine with an existing OSMesa context (Windows/Linux only)")
     .def("set_cache_path", &f3d::engine::setCachePath, "Set the cache path directory")
     .def_property("options", &f3d::engine::getOptions,
       py::overload_cast<const f3d::options&>(&f3d::engine::setOptions),

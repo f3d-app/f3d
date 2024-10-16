@@ -8,7 +8,7 @@ if __name__ == "__main__":
     try:
         f3d.Engine.autoload_plugins()
 
-        eng = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+        eng = f3d.Engine.create(True)
         eng.scene.add(sys.argv[1])
 
         eng.window.size = 300, 300

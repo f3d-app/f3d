@@ -18,6 +18,9 @@ leak:TKernel
 # TBB
 leak:libtbb
 
+# OSMesa
+leak:libOSMesa
+
 # Potential mesa/VTK leak with incomplete callstack
 # forces us to hide all leaks from the tests using a render window
 # https://gitlab.kitware.com/vtk/vtk/-/issues/18504

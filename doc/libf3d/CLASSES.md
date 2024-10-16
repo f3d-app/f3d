@@ -7,7 +7,16 @@ For the complete documentation, please consult the [libf3d doxygen documentation
 
 The engine class is the main class that needs to be instantiated. All other classes instance are provided by the engine using getters, `getScene`, `getWindow`, `getInteractor`, `getOptions`.
 
-The engine constructor lets you choose the type of window in its constructor, `NONE`, `NATIVE`, `NATIVE_OFFSCREEN`, `EXTERNAL`. Default is `NATIVE`. See [Window class](#window-class) documentation for more info. Please note that the engine will not provide a interactor with `NONE` and `EXTERNAL`.
+The engine factory lets you choose between the different types of OpenGL rendering backend.
+The generic `create()` is recommended in most cases and will use the best context possible available on your system.
+However, it's possible to force the rendering backend in some specific use cases:
+* `createGLX()`: force usage of GLX backend, works on Linux only and requires a X11 server to run.
+* `createWGL()`: force usage of WGL native backend on Windows.
+* `createEGL()`: force usage of EGL backend, recommended when doing offscreen rendering with a GPU available. Requires EGL library available. No interactor provided.
+* `createOSMesa()`: force usage of OSMesa backend (software rendering), recommended when doing offscreen rendering without any GPU. Requires OSMesa library available. No interactor provided.
+* `createNone()`: do not use any rendering. Useful to retrieve metadata only.
+* `createExternal()`: the user is responsible of the rendering stack. It lets the user integrate libf3d in other frameworks like Qt or GLFW. No interactor provided. See [Context](#context-class) documentation for more info.
+An additional boolean argument is available to specify if offscreen rendering is requested when relevant on the selected rendering backend.
 
 A static function `loadPlugin` can also be called to load reader plugins. It must be called before loading any file. An internal plugin containing VTK native readers can be loaded by calling `f3d::engine::loadPlugin("native");`. Other plugins maintained by F3D team are available if their build is enabled: `alembic`, `assimp`, `draco`, `exodus`, `occt` and `usd`.
 If CMake option `F3D_PLUGINS_STATIC_BUILD` is enabled, the plugins listed above are also static just like `native` plugin.
@@ -18,18 +27,13 @@ All static plugins can be loaded using `f3d::engine::autoloadPlugins()`.
 The scene class is responsible to `add` file from the disk into the scene. It supports reading multiple files at the same time and even mesh from memory.
 It is possible to `clear` the scene and to check if the scene `supports` a file.
 
+## Context class
+
+Convenience class providing generic context API when using a external rendering backend (using `f3d::engine::createExternal()` factory).
+
 ## Window class
 
-The window class is responsible for rendering the meshes. It supports multiple modes.
-
-* `NONE`: A window that will not render anything, very practical when only trying to recover meta-information about the data.
-
-* `NATIVE`: Default mode where a window is shown onscreen using native graphical capabilities.
-
-* `NATIVE_OFFSCREEN`: Use native graphical capabilities for rendering, but unto an offscreen window, which will not appear on screen, practical when generating screenshots.
-
-* `EXTERNAL`: A window where the OpenGL context is not created but assumed to have been created externally. To be used with other frameworks like Qt or GLFW.
-
+The window class is responsible for rendering the data.
 Window lets you `render`, `renderToImage` and control other parameters of the window, like icon or windowName.
 
 ## Interactor class

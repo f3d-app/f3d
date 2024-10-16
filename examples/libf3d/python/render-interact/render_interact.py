@@ -9,7 +9,7 @@ if __name__ == "__main__":
     f3d.Engine.autoload_plugins()
 
     # Create a native window engine
-    eng = f3d.Engine(f3d.Window.NATIVE)
+    eng = f3d.Engine.create()
 
     # Add a model
     try:

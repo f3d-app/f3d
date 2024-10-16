@@ -10,10 +10,12 @@
 #ifndef f3d_window_impl_h
 #define f3d_window_impl_h
 
+#include "context.h"
 #include "log.h"
 #include "window.h"
 
 #include <memory>
+#include <optional>
 
 class vtkRenderWindow;
 class vtkF3DMetaImporter;
@@ -30,8 +32,8 @@ public:
    * Create the internal vtkRenderWindow using the offscreen param
    * and store option ref for later usage
    */
-  window_impl(const options& options, Type type);
-
+  window_impl(const options& options, const std::optional<Type>& type, bool offscreen,
+    const context::function& getProcAddress);
   /**
    * Default destructor
    */
@@ -42,6 +44,7 @@ public:
    * Documented public API
    */
   Type getType() override;
+  bool isOffscreen() override;
   camera& getCamera() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;

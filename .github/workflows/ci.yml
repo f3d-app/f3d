@@ -86,35 +86,42 @@ jobs:
           - raytracing_label: raytracing
           - exclude_deprecated_label: no-exclude-deprecated
           - optional_deps_label: optional-deps
-          - egl_label: no-egl
+          - rendering_backend: auto
           - static_label: no-static
-          - build_type: headless
+          - build_type: egl
             vtk_version: commit
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
-            egl_label: egl
+            rendering_backend: egl
+            static_label: no-static
+          - build_type: osmesa
+            vtk_version: commit
+            raytracing_label: raytracing
+            optional_deps_label: optional-deps
+            exclude_deprecated_label: no-exclude-deprecated
+            rendering_backend: osmesa
             static_label: no-static
           - build_type: exclude_deprecated
             vtk_version: commit
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: exclude-deprecated
-            egl_label: no-egl
+            rendering_backend: auto
             static_label: no-static
           - build_type: no_optional_deps
             vtk_version: commit
             raytracing_label: no-raytracing
             optional_deps_label: no-optional-deps
             exclude_deprecated_label: no-exclude-deprecated
-            egl_label: no-egl
+            rendering_backend: auto
             static_label: no-static
           - build_type: static_libs
             vtk_version: commit
             raytracing_label: no-raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
-            egl_label: no-egl
+            rendering_backend: auto
             static_label: static
 
     runs-on: ubuntu-latest
@@ -139,7 +146,6 @@ jobs:
         raytracing_label: ${{matrix.raytracing_label}}
         optional_deps_label: ${{matrix.optional_deps_label}}
         exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
-        egl_label: ${{matrix.egl_label}}
         static_label: ${{matrix.static_label}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
@@ -182,7 +188,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.3.1, v9.2.6]
+        vtk_version: [commit, v9.3.1] # VTK 9.2.6 not compatible with recent clang version on macOS
         bundle_label: [no-bundle]
         static_label: [no-static]
         include:

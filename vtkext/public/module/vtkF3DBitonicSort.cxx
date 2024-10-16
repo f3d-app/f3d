@@ -1,18 +1,24 @@
 #include "vtkF3DBitonicSort.h"
 
+#include "vtkF3DBitonicSortFunctions.h"
+#include "vtkF3DBitonicSortGlobalDisperseCS.h"
+#include "vtkF3DBitonicSortGlobalFlipCS.h"
+#include "vtkF3DBitonicSortLocalDisperseCS.h"
+#include "vtkF3DBitonicSortLocalSortCS.h"
+
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLShaderCache.h>
 #include <vtkShader.h>
 #include <vtkShaderProgram.h>
-#include <vtk_glew.h>
+#include <vtkVersion.h>
 
-#include "vtkF3DBitonicSortFunctions.h"
-#include "vtkF3DBitonicSortGlobalDisperseCS.h"
-#include "vtkF3DBitonicSortGlobalFlipCS.h"
-#include "vtkF3DBitonicSortLocalDisperseCS.h"
-#include "vtkF3DBitonicSortLocalSortCS.h"
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+#include <vtk_glad.h>
+#else
+#include <vtk_glew.h>
+#endif
 
 #include <sstream>
 

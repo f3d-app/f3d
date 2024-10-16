@@ -6,7 +6,7 @@
 
 int TestSDKEngineExceptions(int argc, char* argv[])
 {
-  f3d::engine eng(f3d::window::Type::NONE);
+  f3d::engine eng = f3d::engine::createNone();
 
   try
   {
@@ -30,6 +30,70 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   {
     std::cout << ex.what() << std::endl;
   }
+
+// These tests are defined for coverage
+#ifdef __linux__
+  try
+  {
+    eng = f3d::engine::createWGL();
+    std::cerr << "An exception has not been thrown when creating a WGL engine on Linux"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::context::loading_exception& ex)
+  {
+    std::cout << ex.what() << std::endl;
+  }
+
+  try
+  {
+    eng = f3d::engine::createExternalWGL();
+    std::cerr << "An exception has not been thrown when creating an external WGL engine on Linux"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::context::loading_exception& ex)
+  {
+    std::cout << ex.what() << std::endl;
+  }
+
+  try
+  {
+    eng = f3d::engine::createExternalCOCOA();
+    std::cerr << "An exception has not been thrown when creating an external COCOA engine on Linux"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::context::loading_exception& ex)
+  {
+    std::cout << ex.what() << std::endl;
+  }
+
+  try
+  {
+    eng = f3d::engine::createExternal(f3d::context::getSymbol("invalid", "invalid"));
+    std::cerr << "An exception has not been thrown when loading an invalid library" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::context::loading_exception& ex)
+  {
+    std::cout << ex.what() << std::endl;
+  }
+
+  try
+  {
+    eng = f3d::engine::createExternal(f3d::context::getSymbol("GLX", "invalid"));
+    std::cerr << "An exception has not been thrown when loading an invalid symbol" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::context::symbol_exception& ex)
+  {
+    std::cout << ex.what() << std::endl;
+  }
+
+  // cover operator=(engine&&)
+  eng = f3d::engine::create(false);
+#endif
 
   return EXIT_SUCCESS;
 }

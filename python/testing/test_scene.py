@@ -10,7 +10,7 @@ def test_scene_memory():
     reference = f"{testing_dir}/baselines/TestPythonSceneMemory.png"
     output = tempfile.gettempdir() + "/TestPythonSceneMemory.png"
 
-    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+    engine = f3d.Engine.create(True)
     engine.window.size = 300, 300
 
     engine.scene.add(
@@ -40,7 +40,7 @@ def test_scene():
     reference = f"{testing_dir}/baselines/TestPythonScene.png"
     output = tempfile.gettempdir() + "/TestPythonScene.png"
 
-    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+    engine = f3d.Engine.create(True)
     engine.window.size = 300, 300
 
     engine.scene.add([world, logo])

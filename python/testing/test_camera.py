@@ -4,7 +4,7 @@ import f3d
 
 
 def test_properties():
-    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+    engine = f3d.Engine.create(True)
     camera = engine.window.camera
 
     pos = 1, 2, 3
@@ -23,7 +23,7 @@ def test_properties():
 
 
 def test_get_state():
-    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+    engine = f3d.Engine.create(True)
     camera = engine.window.camera
 
     pos = 1, 2, 3
@@ -43,7 +43,7 @@ def test_get_state():
 
 
 def test_set_state():
-    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+    engine = f3d.Engine.create(True)
     camera = engine.window.camera
 
     state = f3d.CameraState((1, 2, 3), (1, 22, 3), (0, 0, 1), 32)
@@ -74,7 +74,7 @@ def test_state_compare():
 
 
 def test_moves():
-    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+    engine = f3d.Engine.create(True)
     camera = engine.window.camera
 
     camera.dolly(10)
@@ -87,7 +87,7 @@ def test_moves():
 
 
 def test_pan():
-    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+    engine = f3d.Engine.create(True)
     camera = engine.window.camera
 
     camera.state = f3d.CameraState((1, 2, 3), (1, 2, 13), (0, 1, 0), 40)
@@ -102,7 +102,7 @@ def test_pan():
 
 
 def test_resets():
-    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+    engine = f3d.Engine.create(True)
     camera = engine.window.camera
     camera.set_current_as_default()
     camera.reset_to_bounds()

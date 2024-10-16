@@ -33,7 +33,8 @@ public:
 };
 
 //----------------------------------------------------------------------------
-engine::engine(window::Type windowType)
+engine::engine(
+  const std::optional<window::Type>& windowType, bool offscreen, const context::function& loader)
   : Internals(new engine::internals)
 {
   // Ensure all lib initialization is done (once)
@@ -58,7 +59,7 @@ engine::engine(window::Type windowType)
   this->Internals->Options = std::make_unique<options>();
 
   this->Internals->Window =
-    std::make_unique<detail::window_impl>(*this->Internals->Options, windowType);
+    std::make_unique<detail::window_impl>(*this->Internals->Options, windowType, offscreen, loader);
   this->Internals->Window->SetCachePath(cachePath);
 
   this->Internals->Scene =
@@ -73,9 +74,97 @@ engine::engine(window::Type windowType)
 }
 
 //----------------------------------------------------------------------------
+engine engine::create(bool offscreen)
+{
+  return { std::nullopt, offscreen, nullptr };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createNone()
+{
+  return { window::Type::NONE, true, nullptr };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createGLX(bool offscreen)
+{
+  return { window::Type::GLX, offscreen, context::glx() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createWGL(bool offscreen)
+{
+  return { window::Type::WGL, offscreen, context::wgl() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createEGL(bool offscreen)
+{
+  return { window::Type::EGL, offscreen, context::egl() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createOSMesa()
+{
+  return { window::Type::OSMESA, true, context::osmesa() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createExternal(const context::function& getProcAddress)
+{
+  return { window::Type::EXTERNAL, false, getProcAddress };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createExternalGLX()
+{
+  return { window::Type::EXTERNAL, false, context::glx() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createExternalWGL()
+{
+  return { window::Type::EXTERNAL, false, context::wgl() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createExternalCOCOA()
+{
+  return { window::Type::EXTERNAL, false, context::cocoa() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createExternalEGL()
+{
+  return { window::Type::EXTERNAL, false, context::egl() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createExternalOSMesa()
+{
+  return { window::Type::EXTERNAL, false, context::osmesa() };
+}
+
+//----------------------------------------------------------------------------
 engine::~engine()
 {
   delete this->Internals;
+}
+
+//----------------------------------------------------------------------------
+engine::engine(engine&& other) noexcept
+{
+  this->Internals = other.Internals;
+  other.Internals = nullptr;
+}
+
+//----------------------------------------------------------------------------
+engine& engine::operator=(engine&& other) noexcept
+{
+  delete this->Internals;
+  this->Internals = other.Internals;
+  other.Internals = nullptr;
+  return *this;
 }
 
 //----------------------------------------------------------------------------
