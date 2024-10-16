@@ -1003,8 +1003,9 @@ if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
 endif()
 
 # Test rendering backends
+# For some reason the sanitizer detects leaks because of EGL and OSMesa
 f3d_test(NAME TestRenderingBackendAuto DATA cow.vtp RENDERING_BACKEND auto)
-if(UNIX AND NOT APPLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+if(UNIX AND NOT APPLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914 AND F3D_SANITIZER STREQUAL "none")
   f3d_test(NAME TestRenderingBackendEGL DATA cow.vtp RENDERING_BACKEND egl)
   f3d_test(NAME TestRenderingBackendEGLCheckClass DATA cow.vtp RENDERING_BACKEND egl ARGS --verbose REGEXP "vtkEGLRenderWindow" NO_BASELINE)
   f3d_test(NAME TestRenderingBackendOSMesa DATA cow.vtp RENDERING_BACKEND osmesa)
