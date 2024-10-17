@@ -95,14 +95,14 @@ jobs:
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
     strategy:
       fail-fast: false
-    matrix:
-      build_type: [standard]
-      include:
-        - rendering_backend: auto
-        - build_type: egl
-          rendering_backend: egl
-        - build_type: osmesa
-          rendering_backend: osmesa
+      matrix:
+        build_type: [standard]
+        include:
+          - rendering_backend: auto
+          - build_type: egl
+            rendering_backend: egl
+          - build_type: osmesa
+            rendering_backend: osmesa
     runs-on: ubuntu-latest
     container: ghcr.io/f3d-app/f3d-ci
 
