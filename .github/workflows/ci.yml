@@ -144,6 +144,7 @@ jobs:
         build_type: ${{matrix.build_type}}
         vtk_version: ${{matrix.vtk_version}}
         raytracing_label: ${{matrix.raytracing_label}}
+        rendering_backend: ${{matrix.rendering_backend}}
         optional_deps_label: ${{matrix.optional_deps_label}}
         exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
         static_label: ${{matrix.static_label}}
