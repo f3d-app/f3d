@@ -130,6 +130,10 @@ runs:
       # https://github.com/f3d-app/f3d/issues/1322
       # MacOS x86_64 occasionally segfault with Java
       # https://github.com/f3d-app/f3d/issues/1410
+      # F3D_TESTING_ENABLE_EXTERNAL_(EGL|QT|GLFW) are disabled if no X server is running
+      # EGL is crashing in the CI but not locally
+      # QT/GLFW external tests should be adapted to run offscreen
+      # https://github.com/f3d-app/f3d/issues/1670
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}/build
@@ -164,10 +168,10 @@ runs:
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.1') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
-        -DF3D_TESTING_ENABLE_EXTERNAL_EGL=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EXTERNAL_EGL=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_OSMESA=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_EXTERNAL_QT=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EXTERNAL_QT=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_GLX_TESTS=${{ inputs.rendering_backend == 'auto' && 'ON' || 'OFF' }}
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_GUI=ON
