@@ -1,6 +1,7 @@
 #ifndef PseudoUnitTest_h
 #define PseudoUnitTest_h
 
+#include "types.h"
 #include <functional>
 #include <iostream>
 #include <sstream>
