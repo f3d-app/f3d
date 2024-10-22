@@ -2,6 +2,7 @@
 
 #include "F3DDefaultHDRI.h"
 #include "F3DLog.h"
+#include "F3DColoringInfoHelper.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
 #include "vtkF3DConfigure.h"
@@ -1429,9 +1430,9 @@ void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
 {
   assert(this->Importer);
 
-  vtkF3DMetaImporter::ColoringInfo info;
+  F3DColoringInfoHelper::ColoringInfo info;
   bool hasColoring =
-    this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
+    this->Importer->GetColoringInfoHelper().GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
 
   cheatSheetText << " C: Cell scalars coloring [" << (this->UseCellColoring ? "ON" : "OFF")
                  << "]\n";
@@ -2275,14 +2276,14 @@ vtkF3DRenderer::CycleType vtkF3DRenderer::CheckColoring()
   }
 
   // Never force change of CellData/PointData coloring on the user
-  if (this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring) == 0)
+  if (this->Importer->GetColoringInfoHelper().GetNumberOfIndexesForColoring(this->UseCellColoring) == 0)
   {
     return CycleType::NONE;
   }
 
   // Suggest to change the array index only if current index is not valid
-  vtkF3DMetaImporter::ColoringInfo info;
-  if (!this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
+  F3DColoringInfoHelper::ColoringInfo info;
+  if (!this->Importer->GetColoringInfoHelper().GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
   {
     return CycleType::ARRAY_INDEX;
   }
@@ -2312,7 +2313,7 @@ void vtkF3DRenderer::SetColoring(bool enable,
     this->UseCellColoring = useCellData;
     this->ComponentForColoring = component;
 
-    int nIndexes = this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring);
+    int nIndexes = this->Importer->GetColoringInfoHelper().GetNumberOfIndexesForColoring(this->UseCellColoring);
     if (!enable)
     {
       // Not coloring
@@ -2332,7 +2333,7 @@ void vtkF3DRenderer::SetColoring(bool enable,
     else
     {
       // Coloring with named array
-      this->ArrayIndexForColoring = this->Importer->FindIndexForColoring(useCellData, arrayName.value());
+      this->ArrayIndexForColoring = this->Importer->GetColoringInfoHelper().FindIndexForColoring(useCellData, arrayName.value());
       if (this->ArrayIndexForColoring == -1)
       {
         // Could not find named array
@@ -2367,8 +2368,8 @@ std::optional<std::string> vtkF3DRenderer::GetColoringArrayName()
   assert(this->Importer);
 
   std::optional<std::string> arrayName;
-  vtkF3DMetaImporter::ColoringInfo info;
-  if (this->Importer && this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
+  F3DColoringInfoHelper::ColoringInfo info;
+  if (this->Importer && this->Importer->GetColoringInfoHelper().GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
   {
     arrayName = info.Name;
   }
@@ -2387,9 +2388,11 @@ void vtkF3DRenderer::ConfigureColoring()
   assert(this->Importer);
 
   // Recover coloring information
-  vtkF3DMetaImporter::ColoringInfo info;
+  F3DColoringInfoHelper& coloringHelper = this->Importer->GetColoringInfoHelper();
+  F3DColoringInfoHelper::ColoringInfo info;
+
   bool hasColoring =
-    this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
+    coloringHelper.GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
 
   bool volumeVisible = !this->UseRaytracing && this->UseVolume;
   if (!hasColoring && volumeVisible)
@@ -2397,7 +2400,7 @@ void vtkF3DRenderer::ConfigureColoring()
     // When showing volume, always try to find an array to color with
     this->CycleScalars(vtkF3DRenderer::CycleType::ARRAY_INDEX);
     hasColoring =
-      this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
+      coloringHelper.GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
   }
 
   if (hasColoring && !this->ColorTransferFunctionConfigured)
@@ -2523,8 +2526,8 @@ std::string vtkF3DRenderer::GetColoringDescription()
   assert(this->Importer);
 
   std::stringstream stream;
-  vtkF3DMetaImporter::ColoringInfo info;
-  if (this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
+  F3DColoringInfoHelper::ColoringInfo info;
+  if (this->Importer->GetColoringInfoHelper().GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
   {
     stream << "Coloring using " << (this->UseCellColoring ? "cell" : "point") << " array named "
            << info.Name << ", "
@@ -2657,7 +2660,7 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
-  const vtkF3DMetaImporter::ColoringInfo& info)
+  const F3DColoringInfoHelper::ColoringInfo& info)
 {
   if (this->ComponentForColoring == -2)
   {
@@ -2748,7 +2751,7 @@ void vtkF3DRenderer::CycleArrayIndexForColoring()
 {
   assert(this->Importer);
 
-  int nIndex = this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring);
+  int nIndex = this->Importer->GetColoringInfoHelper().GetNumberOfIndexesForColoring(this->UseCellColoring);
   if (nIndex <= 0)
   {
     return;
@@ -2771,8 +2774,8 @@ void vtkF3DRenderer::CycleComponentForColoring()
 {
   assert(this->Importer);
 
-  vtkF3DMetaImporter::ColoringInfo info;
-  if (!this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
+  F3DColoringInfoHelper::ColoringInfo info;
+  if (!this->Importer->GetColoringInfoHelper().GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
   {
     return;
   }
@@ -2797,8 +2800,8 @@ std::string vtkF3DRenderer::ComponentToString(int component)
   }
   else
   {
-    vtkF3DMetaImporter::ColoringInfo info;
-    if (!this->Importer->GetInfoForColoring(
+    F3DColoringInfoHelper::ColoringInfo info;
+    if (!this->Importer->GetColoringInfoHelper().GetInfoForColoring(
           this->UseCellColoring, this->ArrayIndexForColoring, info))
     {
       return "";

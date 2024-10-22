@@ -434,7 +434,7 @@ private:
    * Configure internal range and color transfer function according to provided
    * coloring info
    */
-  void ConfigureRangeAndCTFForColoring(const vtkF3DMetaImporter::ColoringInfo& info);
+  void ConfigureRangeAndCTFForColoring(const F3DColoringInfoHelper::ColoringInfo& info);
 
   /**
    * Switch between point data and cell data coloring
