@@ -111,7 +111,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.raytracing_label == 'raytracing' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
-        -DVTK_OPENGL_HAS_EGL=${{ inputs.vtk_version == 'commit' && 'ON' || 'OFF' }}
+        -DVTK_OPENGL_HAS_EGL=${{ inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1' && 'ON' || 'OFF' }}
         -DVTK_SMP_IMPLEMENTATION_TYPE=TBB
         -DVTK_VERSIONED_INSTALL=OFF
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
