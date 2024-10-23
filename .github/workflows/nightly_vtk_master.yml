@@ -123,7 +123,6 @@ jobs:
         build_type: ${{matrix.build_type}}
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
         raytracing_label: 'raytracing'
-        exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
         rendering_backend: ${{matrix.rendering_backend}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
