@@ -1,18 +1,19 @@
 /**
- * @class F3DColoringInfoHelper
- * @brief A statefull helper to handle coloring info
+ * @class F3DColoringInfoHandler
+ * @brief A statefull Handler to handle coloring info
  */
-#ifndef F3DColoringInfoHelper_h
-#define F3DColoringInfoHelper_h
+#ifndef F3DColoringInfoHandler_h
+#define F3DColoringInfoHandler_h
 
 #include <map>
 #include <string>
 #include <vector>
 #include <array>
 #include <limits>
+#include <optional>
 
 class vtkDataSet;
-class F3DColoringInfoHelper
+class F3DColoringInfoHandler
 {
 public:
   /**
@@ -34,23 +35,27 @@ public:
   void FinalizeColoringInfo(bool useCellData);
   void ClearColoringInfo();
 
+  bool SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, ColoringInfo& info);
+  bool GetCurrentColoring(ColoringInfo& info);
+  void CycleColoringArray(bool cycleToNonColoring);
+
   /**
    * Recover information about coloring by index
    * Should be called after actors have been imported
    */
-  bool GetInfoForColoring(bool useCellData, int index, ColoringInfo& info);
+//  bool GetInfoForColoring(bool useCellData, int index, ColoringInfo& info);
 
   /**
    * Get the maximum index possible for coloring
    * Should be called after actors have been imported
    */
-  int GetNumberOfIndexesForColoring(bool useCellData);
+//  int GetNumberOfIndexesForColoring(bool useCellData);
 
   /**
    * Find an index for coloring corresponding to provided arrayName if available
    * Should be called after actors have been imported
    */
-  int FindIndexForColoring(bool useCellData, const std::string& arrayName);
+//  int FindIndexForColoring(bool useCellData, const std::string& arrayName);
 
 private:
   // Map of arrayName -> coloring info
@@ -58,6 +63,8 @@ private:
   std::map<std::string, ColoringInfo> CellDataColoringInfo;
   std::vector<std::string> PointDataArrayNames;
   std::vector<std::string> CellDataArrayNames;
+  int CurrentArrayIndex = -1;
+  bool CurrentUsingCellData = false;
 };
 
 #endif

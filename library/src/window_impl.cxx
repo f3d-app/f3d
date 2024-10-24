@@ -533,8 +533,11 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetNormalScale(opt.model.normal.scale);
   renderer->SetTextureMatCap(opt.model.matcap.texture);
 
-  renderer->SetColoring(opt.model.scivis.enable, opt.model.scivis.cells,
-    opt.model.scivis.array_name, opt.model.scivis.component);
+  renderer->SetEnableColoring(opt.model.scivis.enable);
+  renderer->SetUseCellColoring(opt.model.scivis.cells);
+  renderer->SetArrayNameForColoring(opt.model.scivis.array_name);
+  renderer->SetComponentForColoring(opt.model.scivis.component);
+
   renderer->SetScalarBarRange(opt.model.scivis.range);
   renderer->SetColormap(opt.model.scivis.colormap);
   renderer->ShowScalarBar(opt.ui.scalar_bar);

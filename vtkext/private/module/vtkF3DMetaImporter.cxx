@@ -39,7 +39,7 @@ struct vtkF3DMetaImporter::Internals
   vtkBoundingBox GeometryBoundingBox;
   bool ColoringInfoUpdated = false;
 
-  F3DColoringInfoHelper ColoringInfoHelper;
+  F3DColoringInfoHandler ColoringInfoHandler;
 
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20240707)
   std::map<vtkImporter*, vtkSmartPointer<vtkActorCollection>> ActorsForImporterMap;
@@ -71,7 +71,7 @@ void vtkF3DMetaImporter::Clear()
   this->Pimpl->ColoringActorsAndMappers.clear();
   this->Pimpl->PointSpritesActorsAndMappers.clear();
   this->Pimpl->VolumePropsAndMappers.clear();
-  this->Pimpl->ColoringInfoHelper.ClearColoringInfo();
+  this->Pimpl->ColoringInfoHandler.ClearColoringInfo();
   this->Modified();
 }
 
@@ -510,13 +510,13 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
           datasetForColoring = genericImporter->GetImportedPoints();
         }
       }
-      this->Pimpl->ColoringInfoHelper.UpdateColoringInfo(datasetForColoring, false);
-      this->Pimpl->ColoringInfoHelper.UpdateColoringInfo(datasetForColoring, true);
+      this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, false);
+      this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, true);
     }
   }
 
-  this->Pimpl->ColoringInfoHelper.FinalizeColoringInfo(false);
-  this->Pimpl->ColoringInfoHelper.FinalizeColoringInfo(true);
+  this->Pimpl->ColoringInfoHandler.FinalizeColoringInfo(false);
+  this->Pimpl->ColoringInfoHandler.FinalizeColoringInfo(true);
   this->Pimpl->ColoringInfoUpdated = true;
 }
 
@@ -555,12 +555,12 @@ std::string vtkF3DMetaImporter::GetMetaDataDescription() const
 }
 
 //----------------------------------------------------------------------------
-F3DColoringInfoHelper& vtkF3DMetaImporter::GetColoringInfoHelper()
+F3DColoringInfoHandler& vtkF3DMetaImporter::GetColoringInfoHandler()
 {
   if (!this->Pimpl->ColoringInfoUpdated)
   {
     this->UpdateInfoForColoring();
   }
 
-  return this->Pimpl->ColoringInfoHelper;
+  return this->Pimpl->ColoringInfoHandler;
 }

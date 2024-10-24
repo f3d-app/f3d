@@ -282,18 +282,18 @@ public:
    */
   void SetColormap(const std::vector<double>& colormap);
 
-  enum class CycleType
+/*  enum class CycleType
   {
     NONE,
     FIELD,
     ARRAY_INDEX,
     COMPONENT
-  };
+  };*/
 
   /**
    * Cycle the shown scalars according to the cycle type
    */
-  void CycleScalars(CycleType type);
+//  void CycleScalars(CycleType type);
 
   /**
    * Set the meta importer to recover coloring information from
@@ -305,23 +305,55 @@ public:
    * This method will try to find the corresponding array in the coloring attributes and will
    * position ArrayIndexForColoring and DataForColoring accordingly.
    */
-  void SetColoring(bool enable, bool useCellData, const std::optional<std::string>& arrayName, int component);
+//  void SetColoring(bool enable, bool useCellData, const std::optional<std::string>& arrayName, int component);
 
   ///@{
   /**
    * Get current coloring information,
    * Useful after using Cycle methods
    */
-  bool GetColoringEnabled();
+/*  bool GetColoringEnabled();
   bool GetColoringUseCell();
   std::optional<std::string> GetColoringArrayName();
-  int GetColoringComponent();
+  int GetColoringComponent();*/
   ///@}
+
+  void SetEnableColoring(bool enable);
+  vtkGetMacro(EnableColoring, bool);
+  
+  void SetUseCellColoring(bool useCell);
+  vtkGetMacro(UseCellColoring, bool);
+  
+  void SetArrayNameForColoring(const std::optional<std::string>& arrayName);
+  std::optional<std::string> GetArrayNameForColoring();
+  
+  void SetComponentForColoring(int component);
+  vtkGetMacro(ComponentForColoring, int);
 
   /**
    * Get information about the current coloring
    */
   virtual std::string GetColoringDescription();
+
+  /**
+   * Switch between point data and cell data coloring
+   */
+  void CycleFieldForColoring();
+
+  /**
+   * Increment the array index or loop it back
+   * When not using volume, it will loop back
+   * to not coloring
+   * TODO
+   */
+  void CycleArrayForColoring();
+
+  /**
+   * Cycle the component in used for rendering
+   * looping back to direct scalars
+   */
+  void CycleComponentForColoring();
+
 
 private:
   vtkF3DRenderer();
@@ -434,30 +466,14 @@ private:
    * Configure internal range and color transfer function according to provided
    * coloring info
    */
-  void ConfigureRangeAndCTFForColoring(const F3DColoringInfoHelper::ColoringInfo& info);
-
-  /**
-   * Switch between point data and cell data coloring
-   */
-  void CycleFieldForColoring();
-
-  /**
-   * Increment the array index or loop it back
-   * When not using volume, it will loop back
-   * to not coloring
-   */
-  void CycleArrayIndexForColoring();
-
-  /**
-   * Cycle the component in used for rendering
-   * looping back to direct scalars
-   */
-  void CycleComponentForColoring();
+  void ConfigureRangeAndCTFForColoring(const F3DColoringInfoHandler::ColoringInfo& info);
 
   /**
    * Check coloring is currently valid and return a cycle type to perform if not
    */
-  CycleType CheckColoring();
+//  CycleType CheckColoring();
+
+  bool SetColoringOnHandler(F3DColoringInfoHandler::ColoringInfo& info);
 
   /**
    * Convert a component index into a string
@@ -580,9 +596,11 @@ private:
   double ColorRange[2] = { 0.0, 1.0 };
   bool ColorTransferFunctionConfigured = false;
 
+  bool EnableColoring = false;
   bool UseCellColoring = false;
-  int ArrayIndexForColoring = -1;
+//  int ArrayIndexForColoring = -1;
   int ComponentForColoring = -1;
+  std::optional<std::string> ArrayNameForColoring;
 
   bool ScalarBarVisible = false;
   bool UsePointSprites = false;

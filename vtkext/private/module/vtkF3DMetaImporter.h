@@ -7,7 +7,7 @@
 #define vtkF3DMetaImporter_h
 
 #include "vtkF3DImporter.h"
-#include "F3DColoringInfoHelper.h"
+#include "F3DColoringInfoHandler.h"
 
 #include <vtkActor.h>
 #include <vtkVolume.h>
@@ -100,7 +100,7 @@ public:
   std::string GetMetaDataDescription() const;
 
 
-  F3DColoringInfoHelper& GetColoringInfoHelper();
+  F3DColoringInfoHandler& GetColoringInfoHandler();
 
   ///@{
   /**
