@@ -190,7 +190,7 @@ public:
       case 'C':
         if (ren)
         {
-          ren->CycleScalars(vtkF3DRenderer::CycleType::FIELD);
+          ren->CycleFieldForColoring();
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
@@ -199,7 +199,7 @@ public:
       case 'S':
         if (ren)
         {
-          ren->CycleScalars(vtkF3DRenderer::CycleType::ARRAY_INDEX);
+          ren->CycleArrayForColoring();
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
@@ -208,7 +208,7 @@ public:
       case 'Y':
         if (ren)
         {
-          ren->CycleScalars(vtkF3DRenderer::CycleType::COMPONENT);
+          ren->CycleComponentForColoring();;
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
@@ -379,10 +379,10 @@ public:
     if (checkColoring)
     {
       // Resynchronise renderer coloring status with options
-      self->Options.model.scivis.enable = ren->GetColoringEnabled();
-      self->Options.model.scivis.cells = ren->GetColoringUseCell();
-      self->Options.model.scivis.array_name = ren->GetColoringArrayName();
-      self->Options.model.scivis.component = ren->GetColoringComponent();
+      self->Options.model.scivis.enable = ren->GetEnableColoring();
+      self->Options.model.scivis.cells = ren->GetUseCellColoring();
+      self->Options.model.scivis.array_name = ren->GetArrayNameForColoring();
+      self->Options.model.scivis.component = ren->GetComponentForColoring();
     }
     if (render)
     {

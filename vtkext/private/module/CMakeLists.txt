@@ -31,6 +31,7 @@ endforeach()
 
 set(classes
   F3DLog
+  F3DColoringInfoHandler
   vtkF3DCachedLUTTexture
   vtkF3DCachedSpecularTexture
   vtkF3DConsoleOutputWindow
