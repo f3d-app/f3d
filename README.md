@@ -31,24 +31,14 @@ If you need any help or want to discuss with other F3D users and developers, hea
 
 # Quickstart
 
-Open a file and visualize it interactively:
-
+Open a file directly in F3D or from the command line by running:
 ```
 f3d /path/to/file.ext
-```
+``` 
 
-Open a file and save the rendering into an image file:
+Optionally, append `--output=/path/to/img.png` to save the rendering into an image file.
 
-```
-f3d /path/to/file.ext --output=/path/to/img.png
-```
-
-Get help:
-
-```
-f3d --help
-man f3d # Linux only
-```
+See the [Quickstart Guide](QUICKSTART.md) for more information about getting started with F3D.
 
 # Documentation
 
