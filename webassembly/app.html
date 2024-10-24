@@ -127,6 +127,7 @@
           const scene = Module.engineInstance.getScene();
           if (scene.supports(filePath))
           {
+            scene.clear();
             scene.add(filePath);
           }
           else
