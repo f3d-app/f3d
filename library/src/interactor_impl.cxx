@@ -208,7 +208,7 @@ public:
       case 'Y':
         if (ren)
         {
-          ren->CycleComponentForColoring();;
+          ren->CycleComponentForColoring();
           self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
