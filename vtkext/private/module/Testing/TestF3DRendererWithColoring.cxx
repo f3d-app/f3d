@@ -39,7 +39,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   renderer->SetUseVolume(true);
   renderer->UpdateActors();
 
-  if (renderer->GetArrayNameForColoring() != "Density" || renderer->GetComponentForColoring() != 0)
+  if (renderer->GetArrayNameForColoring() != "Invalid" || renderer->GetComponentForColoring() != -1)
   {
     std::cerr << "Unexpected coloring information with invalid array" << std::endl;
     return EXIT_FAILURE;
