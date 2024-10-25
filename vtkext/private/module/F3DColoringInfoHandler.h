@@ -35,7 +35,7 @@ public:
   void FinalizeColoringInfo(bool useCellData);
   void ClearColoringInfo();
 
-  bool SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, ColoringInfo& info);
+  bool SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, ColoringInfo& info, bool quiet);
   bool GetCurrentColoring(ColoringInfo& info);
   void CycleColoringArray(bool cycleToNonColoring);
 

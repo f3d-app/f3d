@@ -282,41 +282,10 @@ public:
    */
   void SetColormap(const std::vector<double>& colormap);
 
-/*  enum class CycleType
-  {
-    NONE,
-    FIELD,
-    ARRAY_INDEX,
-    COMPONENT
-  };*/
-
-  /**
-   * Cycle the shown scalars according to the cycle type
-   */
-//  void CycleScalars(CycleType type);
-
   /**
    * Set the meta importer to recover coloring information from
    */
   void SetImporter(vtkF3DMetaImporter* importer);
-
-  /**
-   * Set coloring information.
-   * This method will try to find the corresponding array in the coloring attributes and will
-   * position ArrayIndexForColoring and DataForColoring accordingly.
-   */
-//  void SetColoring(bool enable, bool useCellData, const std::optional<std::string>& arrayName, int component);
-
-  ///@{
-  /**
-   * Get current coloring information,
-   * Useful after using Cycle methods
-   */
-/*  bool GetColoringEnabled();
-  bool GetColoringUseCell();
-  std::optional<std::string> GetColoringArrayName();
-  int GetColoringComponent();*/
-  ///@}
 
   void SetEnableColoring(bool enable);
   vtkGetMacro(EnableColoring, bool);
@@ -341,9 +310,6 @@ public:
   void CycleFieldForColoring();
 
   /**
-   * Increment the array index or loop it back
-   * When not using volume, it will loop back
-   * to not coloring
    * TODO
    */
   void CycleArrayForColoring();
@@ -401,7 +367,7 @@ private:
   void ConfigureActorsProperties();
 
   /**
-   * Configure the cheatsheet text and mark it for rendering
+   * Configure the cheatsheet text and hotkeys and mark it for rendering
    */
   void ConfigureCheatSheet();
 
@@ -414,11 +380,6 @@ private:
    * Configure the different render passes
    */
   void ConfigureRenderPasses();
-
-  /**
-   * Add all hotkeys options to the cheatsheet.
-   */
-  void FillCheatSheetHotkeys(std::stringstream& sheet);
 
   /**
    * Generate a padded metadata description
@@ -467,13 +428,6 @@ private:
    * coloring info
    */
   void ConfigureRangeAndCTFForColoring(const F3DColoringInfoHandler::ColoringInfo& info);
-
-  /**
-   * Check coloring is currently valid and return a cycle type to perform if not
-   */
-//  CycleType CheckColoring();
-
-  bool SetColoringOnHandler(F3DColoringInfoHandler::ColoringInfo& info);
 
   /**
    * Convert a component index into a string
@@ -598,7 +552,6 @@ private:
 
   bool EnableColoring = false;
   bool UseCellColoring = false;
-//  int ArrayIndexForColoring = -1;
   int ComponentForColoring = -1;
   std::optional<std::string> ArrayNameForColoring;
 

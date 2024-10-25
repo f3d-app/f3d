@@ -157,7 +157,7 @@ int F3DColoringInfoHandler::FindIndexForColoring(bool useCellData, const std::st
 }*/
 
 //----------------------------------------------------------------------------
-bool F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, ColoringInfo& info)
+bool F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, ColoringInfo& info, bool quiet)
 {
   this->CurrentUsingCellData = useCellData;
   auto& data =
@@ -192,7 +192,10 @@ bool F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, s
     {
       // Could not find named array
       this->CurrentArrayIndex = -1;
-      F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: \"" + arrayName.value() + "\"\n");
+      if (!quiet)
+      {
+        F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: \"" + arrayName.value() + "\"\n");
+      }
     }
   }
   return this->GetCurrentColoring(info);
