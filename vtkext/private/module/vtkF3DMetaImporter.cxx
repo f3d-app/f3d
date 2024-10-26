@@ -514,9 +514,6 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
       this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, true);
     }
   }
-
-  this->Pimpl->ColoringInfoHandler.FinalizeColoringInfo(false);
-  this->Pimpl->ColoringInfoHandler.FinalizeColoringInfo(true);
   this->Pimpl->ColoringInfoUpdated = true;
 }
 

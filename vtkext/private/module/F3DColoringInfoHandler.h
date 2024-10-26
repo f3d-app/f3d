@@ -27,12 +27,10 @@ public:
     std::vector<std::array<double, 2>> ComponentRanges;
     std::array<double, 2> MagnitudeRange = { std::numeric_limits<float>::max(),
       std::numeric_limits<float>::min() };
-    int Index = -1; // TODO remove
   };
 
 
   void UpdateColoringInfo(vtkDataSet* dataset, bool useCellData);
-  void FinalizeColoringInfo(bool useCellData);
   void ClearColoringInfo();
 
   bool SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, ColoringInfo& info, bool quiet);
@@ -41,11 +39,12 @@ public:
 
 private:
   // Map of arrayName -> coloring info
-  std::map<std::string, ColoringInfo> PointDataColoringInfo;
-  std::map<std::string, ColoringInfo> CellDataColoringInfo;
-  std::vector<std::string> PointDataArrayNames;
-  std::vector<std::string> CellDataArrayNames;
-  int CurrentArrayIndex = -1;
+  using ColoringMap = std::map<std::string, ColoringInfo>;
+  ColoringMap PointDataColoringInfo;
+  ColoringMap CellDataColoringInfo;
+
+  bool Coloring = false;
+  ColoringMap::iterator CurrentColoringIter;
   bool CurrentUsingCellData = false;
 };
 

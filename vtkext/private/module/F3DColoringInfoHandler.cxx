@@ -101,22 +101,6 @@ void F3DColoringInfoHandler::UpdateColoringInfo(vtkDataSet* dataset, bool useCel
 }
 
 //----------------------------------------------------------------------------
-void F3DColoringInfoHandler::FinalizeColoringInfo(bool useCellData)
-{
-  auto& names = useCellData ? this->CellDataArrayNames : this->PointDataArrayNames;
-  names.clear();
-
-  auto& data = useCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
-  int index = 0;
-  for (auto& [name, info] : data)
-  {
-    info.Index = index;
-    names.emplace_back(name);
-    index++;
-  }
-}
-
-//----------------------------------------------------------------------------
 bool F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, ColoringInfo& info, bool quiet)
 {
   this->CurrentUsingCellData = useCellData;
@@ -127,31 +111,29 @@ bool F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, s
   if (!enable)
   {
     // Not coloring
-    this->CurrentArrayIndex = -1;
+    this->Coloring = false;
   }
   else if (nIndices == 0)
   {
     // Trying to color but no array available
     F3DLog::Print(F3DLog::Severity::Debug, "No array to color with");
-    this->CurrentArrayIndex = -1;
+    this->Coloring = false;
   }
   else if (!arrayName.has_value())
   {
     // Coloring with first array
-    this->CurrentArrayIndex = 0;
+    this->Coloring = true;
+    this->CurrentColoringIter = data.begin();
   }
   else
   {
     // Coloring with named array
-    auto it = data.find(arrayName.value());
-    if (it != data.end())
-    {
-      this->CurrentArrayIndex =  it->second.Index; // TODO
-    }
-    else
+    this->Coloring = true;
+    this->CurrentColoringIter = data.find(arrayName.value());
+    if (this->CurrentColoringIter == data.end())
     {
       // Could not find named array
-      this->CurrentArrayIndex = -1;
+      this->Coloring = false;
       if (!quiet)
       {
         F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: \"" + arrayName.value() + "\"\n");
@@ -164,18 +146,13 @@ bool F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, s
 //----------------------------------------------------------------------------
 bool F3DColoringInfoHandler::GetCurrentColoring(ColoringInfo& info)
 {
-  if (this->CurrentArrayIndex != -1)
+  if (this->Coloring)
   {
     auto& data =
       this->CurrentUsingCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
-    auto& names = this->CurrentUsingCellData ? this->CellDataArrayNames : this->PointDataArrayNames;
-    info = data[names[this->CurrentArrayIndex]];
-    return true;
+    info = this->CurrentColoringIter->second;
   }
-  else
-  {
-    return false;
-  }
+  return this->Coloring;
 }
 
 //----------------------------------------------------------------------------
@@ -183,20 +160,31 @@ void F3DColoringInfoHandler::CycleColoringArray(bool cycleToNonColoring)
 {
   auto& data =
     this->CurrentUsingCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
-  int nIndices = static_cast<int>(data.size());
-  if (nIndices <= 0)
+  if (!this->Coloring)
   {
-    return;
-  }
-
-  if (cycleToNonColoring)
-  {
-    // Cycle through arrays looping back to -1
-    // -1 0 1 2 -1 0 1 2 ...
-    this->CurrentArrayIndex = (this->CurrentArrayIndex + 2) % (nIndices + 1) - 1;
+    if(data.size() == 0)
+    {
+      return;
+    }
+    else
+    {
+      this->Coloring = true;
+      this->CurrentColoringIter = data.begin();
+    }
   }
   else
   {
-    this->CurrentArrayIndex = (this->CurrentArrayIndex + 1) % nIndices;
+    this->CurrentColoringIter++;
+    if (this->CurrentColoringIter == data.end())
+    {
+      if (cycleToNonColoring)
+      {
+        this->Coloring = false;
+      }
+      else
+      {
+        this->CurrentColoringIter = data.begin();
+      }
+    }
   }
 }
