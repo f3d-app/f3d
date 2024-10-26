@@ -62,7 +62,7 @@ model.scivis.range|vector\<double\><br>optional<br>render|Set the *coloring rang
 model.point_sprites.enable|bool<br>false<br>render|Show sphere *points sprites* instead of the geometry.|\-\-point-sprites
 model.point_sprites.type|string<br>sphere<br>render|Set the sprites type when showing point sprites (can be `sphere` or `gaussian`).|\-\-point-stripes-type
 model.point_sprites.size|double<br>10.0<br>render|Set the *size* of point sprites.|\-\-point-stripes-size
-model.volume.enable|bool<br>false<br>render|Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other formats.|\-\-volume
+model.volume.enable|bool<br>false<br>render|Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other formats. It forces coloring.|\-\-volume
 model.volume.inverse|bool<br>false<br>render|Inverse the linear opacity function.|\-\-inverse
 
 ## Render Options
