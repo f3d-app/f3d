@@ -62,7 +62,7 @@ public:
    * Cycle the current coloring
    * If not coloring, this will try to find an array to color with
    * This does not change the cell/point data status
-   * @param cycleToNonColoring: Control wether to cycle to non coloring after reaching the last array or not
+   * @param cycleToNonColoring: Control whether to cycle to non coloring after reaching the last array or not
    */
   void CycleColoringArray(bool cycleToNonColoring);
 
