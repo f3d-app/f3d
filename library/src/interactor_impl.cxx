@@ -176,6 +176,7 @@ public:
     vtkRenderWindow* renWin = self->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
     bool checkColoring = false;
+    bool printColoring = false;
     bool render = false;
 
     // Available keycodes: None
@@ -191,27 +192,27 @@ public:
         if (ren)
         {
           ren->CycleFieldForColoring();
-          self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
+          printColoring = true;
         }
         break;
       case 'S':
         if (ren)
         {
           ren->CycleArrayForColoring();
-          self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
+          printColoring = true;
         }
         break;
       case 'Y':
         if (ren)
         {
           ren->CycleComponentForColoring();
-          self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
           checkColoring = true;
           render = true;
+          printColoring = true;
         }
         break;
       case 'B':
@@ -273,6 +274,7 @@ public:
       case 'V':
         self->Options.model.volume.enable = !self->Options.model.volume.enable;
         render = true;
+        printColoring = true;
         break;
       case 'I':
         self->Options.model.volume.inverse = !self->Options.model.volume.inverse;
@@ -387,6 +389,10 @@ public:
     if (render)
     {
       self->Window.render();
+    }
+    if (printColoring)
+    {
+      self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     }
   }
 

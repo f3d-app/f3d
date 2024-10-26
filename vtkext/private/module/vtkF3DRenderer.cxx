@@ -1373,7 +1373,7 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     cheatSheetText << " C: Cell scalars coloring [" << (this->UseCellColoring ? "ON" : "OFF")
       << "]\n";
     cheatSheetText << " S: Scalars coloring ["
-      << (hasColoring ? vtkF3DRenderer::ShortName(info.Name, 19) : "OFF") << "]\n";
+      << (hasColoring ? vtkF3DRenderer::ShortName(info.Name, 19) + (this->EnableColoring ? "" : "(forced)") : "OFF") << "]\n";
     cheatSheetText << " Y: Coloring component ["
       << vtkF3DRenderer::ComponentToString(this->ComponentForColoring)
       << "]\n";
@@ -2418,7 +2418,7 @@ std::string vtkF3DRenderer::GetColoringDescription()
   if (this->Importer->GetColoringInfoHandler().GetCurrentColoring(info))
   {
     stream << "Coloring using " << (this->UseCellColoring ? "cell" : "point") << " array named "
-           << info.Name << ", "
+           << info.Name << (this->EnableColoring ? ", " : " (forced), ")
            << vtkF3DRenderer::ComponentToString(this->ComponentForColoring) << "\n";
   }
   else
