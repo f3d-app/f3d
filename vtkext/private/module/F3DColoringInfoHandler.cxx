@@ -174,7 +174,7 @@ void F3DColoringInfoHandler::CycleColoringArray(bool cycleToNonColoring)
   else
   {
     // XXX: Iter is always valid here
-    this->CurrentColoringIter++;
+    ++this->CurrentColoringIter;
     if (this->CurrentColoringIter == data.end())
     {
       if (cycleToNonColoring)
