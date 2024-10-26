@@ -287,17 +287,37 @@ public:
    */
   void SetImporter(vtkF3DMetaImporter* importer);
 
+  ///@{
+  /**
+   * Set/Get if coloring is enabled
+   */
   void SetEnableColoring(bool enable);
   vtkGetMacro(EnableColoring, bool);
-  
+  ///@}
+
+  ///@{
+  /**
+   * Set/Get if using point or cell data coloring
+   */
   void SetUseCellColoring(bool useCell);
   vtkGetMacro(UseCellColoring, bool);
+  ///@}
   
+  ///@{
+  /**
+   * Set/Get the name of the array to use for coloring
+   */
   void SetArrayNameForColoring(const std::optional<std::string>& arrayName);
   std::optional<std::string> GetArrayNameForColoring();
+  ///@}
   
+  ///@{
+  /**
+   * Set/Get the name of the component to use for coloring
+   */
   void SetComponentForColoring(int component);
   vtkGetMacro(ComponentForColoring, int);
+  ///@}
 
   /**
    * Get information about the current coloring
@@ -305,12 +325,15 @@ public:
   virtual std::string GetColoringDescription();
 
   /**
-   * Switch between point data and cell data coloring
+   * Switch between point data and cell data coloring, actually setting UseCellColoring member.
+   * This can trigger CycleArrayForColoring if current array is not valid.
    */
   void CycleFieldForColoring();
 
   /**
-   * TODO
+   * Cycle the current array for coloring, actually setting EnableColoring and ArrayNameForColoring members.
+   * This loops back to not coloring if volume is not enabled.
+   * This can trigger CycleComponentForColoring if current component is not valid.
    */
   void CycleArrayForColoring();
 
@@ -435,7 +458,6 @@ private:
    * Otherwise, use component #index as the default value.
    */
   std::string ComponentToString(int component);
-
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 

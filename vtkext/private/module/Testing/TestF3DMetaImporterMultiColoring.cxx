@@ -41,13 +41,6 @@ int TestF3DMetaImporterMultiColoring(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-/*  if (importer->FindIndexForColoring(false, "") != -1)
-  {
-    std::cerr << "Unexpected FindIndexForColoring success" << std::endl;
-    return EXIT_FAILURE;
-  }*/
-
-
   // Read a vts and a vtu with same array names
   // but different component names and array ranges
   vtkNew<vtkXMLUnstructuredGridReader> readerVTU;
@@ -71,21 +64,15 @@ int TestF3DMetaImporterMultiColoring(int argc, char* argv[])
   importer->SetRenderWindow(window);
   importer->Update();
 
-  /*if (importer->GetNumberOfIndexesForColoring(false) != 3)
+  // Test coloring handler
+  F3DColoringInfoHandler& coloringHandler = importer->GetColoringInfoHandler();
+
+  F3DColoringInfoHandler::ColoringInfo info;
+  if (!coloringHandler.SetCurrentColoring(true, false, "Momentum", false, info))
   {
-    std::cerr << "Importer provide unexpected number of indexes for coloring" << std::endl;
+    std::cerr << "Coloring handler unable to set coloring as expected" << std::endl;
     return EXIT_FAILURE;
   }
-
-  int idx = importer->FindIndexForColoring(false, "Momentum");
-  if (idx < 0)
-  {
-    std::cerr << "Importer unable to find an expected coloring array" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  vtkF3DMetaImporter::ColoringInfo info;
-  importer->GetInfoForColoring(false, idx, info);
   if (info.Name != "Momentum")
   {
     std::cerr << "Unexpected coloring name: " << info.Name << std::endl;
@@ -122,7 +109,7 @@ int TestF3DMetaImporterMultiColoring(int argc, char* argv[])
   {
     std::cerr << "Unexpected coloring magnitude range" << std::endl;
     return EXIT_FAILURE;
-  }*/
+  }
 
   return EXIT_SUCCESS;
 }

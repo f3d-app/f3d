@@ -1,16 +1,16 @@
 /**
  * @class F3DColoringInfoHandler
- * @brief A statefull Handler to handle coloring info
+ * @brief A stateful handler to handle coloring info
  */
 #ifndef F3DColoringInfoHandler_h
 #define F3DColoringInfoHandler_h
 
-#include <map>
-#include <string>
-#include <vector>
 #include <array>
 #include <limits>
+#include <map>
 #include <optional>
+#include <string>
+#include <vector>
 
 class vtkDataSet;
 class F3DColoringInfoHandler
@@ -29,12 +29,41 @@ public:
       std::numeric_limits<float>::min() };
   };
 
-
+  /**
+   * Update internal coloring maps using provided dataset
+   * useCellData control if point data or cell data should be updated
+   */
   void UpdateColoringInfo(vtkDataSet* dataset, bool useCellData);
+
+  /**
+   * Clear all internal coloring maps
+   */
   void ClearColoringInfo();
 
-  bool SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, ColoringInfo& info, bool quiet);
+  /**
+   * Set the current coloring state
+   * @param enable: If coloring should be enabled or not
+   * @param useCellData: If cell data or point data should be used
+   * @param arrayName: An optional arrayName to color with
+   * @param quiet: If true, no log will be done by this method, even when failing to find an array to color with
+   * @param info: Output param containing current ColoringInfo
+   * @return: true if the provided arguments resulted in coloring, false otherwise
+   */
+  bool SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, bool quiet, ColoringInfo& info);
+
+  /**
+   * Get the current coloring state
+   * Return true if coloring, false otherwise
+   * When returning true, info contain the current ColoringInfo
+   */
   bool GetCurrentColoring(ColoringInfo& info);
+
+  /**
+   * Cycle the current coloring
+   * If not coloring, this will try to find an array to color with
+   * This does not change the cell/point data status
+   * @param cycleToNonColoring: Control wether to cycle to non coloring after reaching the last array or not
+   */
   void CycleColoringArray(bool cycleToNonColoring);
 
 private:
@@ -43,9 +72,10 @@ private:
   ColoringMap PointDataColoringInfo;
   ColoringMap CellDataColoringInfo;
 
+  // Current coloring state
+  bool CurrentUsingCellData = false;
   bool Coloring = false;
   ColoringMap::iterator CurrentColoringIter;
-  bool CurrentUsingCellData = false;
 };
 
 #endif

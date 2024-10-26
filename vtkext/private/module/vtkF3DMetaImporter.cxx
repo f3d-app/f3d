@@ -6,10 +6,8 @@
 #include <vtkActorCollection.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
-#include <vtkCellData.h>
 #include <vtkImageData.h>
 #include <vtkObjectFactory.h>
-#include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
@@ -19,7 +17,6 @@
 #include <cassert>
 #include <iostream>
 #include <numeric>
-#include <set>
 #include <vector>
 
 struct vtkF3DMetaImporter::Internals

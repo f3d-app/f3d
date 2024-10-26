@@ -2,13 +2,13 @@
 
 #include "F3DLog.h"
 
-#include <vtkDataSet.h>
 #include <vtkCellData.h>
-#include <vtkPointData.h>
 #include <vtkDataArray.h>
+#include <vtkDataSet.h>
+#include <vtkPointData.h>
 
-#include <set>
 #include <cassert>
+#include <set>
 
 //----------------------------------------------------------------------------
 void F3DColoringInfoHandler::ClearColoringInfo()
@@ -101,7 +101,7 @@ void F3DColoringInfoHandler::UpdateColoringInfo(vtkDataSet* dataset, bool useCel
 }
 
 //----------------------------------------------------------------------------
-bool F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, ColoringInfo& info, bool quiet)
+bool F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, bool quiet, ColoringInfo& info)
 {
   this->CurrentUsingCellData = useCellData;
   auto& data =
@@ -148,8 +148,7 @@ bool F3DColoringInfoHandler::GetCurrentColoring(ColoringInfo& info)
 {
   if (this->Coloring)
   {
-    auto& data =
-      this->CurrentUsingCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
+    // XXX: Iter is always valid here
     info = this->CurrentColoringIter->second;
   }
   return this->Coloring;
@@ -174,6 +173,7 @@ void F3DColoringInfoHandler::CycleColoringArray(bool cycleToNonColoring)
   }
   else
   {
+    // XXX: Iter is always valid here
     this->CurrentColoringIter++;
     if (this->CurrentColoringIter == data.end())
     {

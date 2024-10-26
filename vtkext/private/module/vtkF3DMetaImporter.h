@@ -21,8 +21,6 @@
 #include <vtkActorCollection.h>
 #endif
 
-#include <array>
-#include <limits>
 #include <memory>
 #include <optional>
 #include <string>

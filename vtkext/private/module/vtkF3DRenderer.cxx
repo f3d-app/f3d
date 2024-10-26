@@ -2289,7 +2289,7 @@ void vtkF3DRenderer::ConfigureColoring()
   bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
   F3DColoringInfoHandler::ColoringInfo info;
-  bool hasColoring = coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, info, false);
+  bool hasColoring = coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false, info);
   if (hasColoring && !this->ColorTransferFunctionConfigured)
   {
     this->ConfigureRangeAndCTFForColoring(info);
@@ -2635,7 +2635,7 @@ void vtkF3DRenderer::CycleFieldForColoring()
   bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
   F3DColoringInfoHandler::ColoringInfo info;
-  if (!coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, info, true))
+  if (!coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, true, info))
   {
     // Cycle array if the current one is not valid
     this->CycleArrayForColoring();
