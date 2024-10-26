@@ -39,24 +39,6 @@ public:
   bool GetCurrentColoring(ColoringInfo& info);
   void CycleColoringArray(bool cycleToNonColoring);
 
-  /**
-   * Recover information about coloring by index
-   * Should be called after actors have been imported
-   */
-//  bool GetInfoForColoring(bool useCellData, int index, ColoringInfo& info);
-
-  /**
-   * Get the maximum index possible for coloring
-   * Should be called after actors have been imported
-   */
-//  int GetNumberOfIndexesForColoring(bool useCellData);
-
-  /**
-   * Find an index for coloring corresponding to provided arrayName if available
-   * Should be called after actors have been imported
-   */
-//  int FindIndexForColoring(bool useCellData, const std::string& arrayName);
-
 private:
   // Map of arrayName -> coloring info
   std::map<std::string, ColoringInfo> PointDataColoringInfo;

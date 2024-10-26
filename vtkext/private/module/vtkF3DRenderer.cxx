@@ -481,27 +481,21 @@ void vtkF3DRenderer::ShowAxis(bool show)
     this->AxisWidget = nullptr;
     if (show)
     {
-      if (this->RenderWindow->GetInteractor())
-      {
-        vtkNew<vtkAxesActor> axes;
+      assert(this->RenderWindow->GetInteractor());
+      vtkNew<vtkAxesActor> axes;
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
-        this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
+      this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
 #else
-        this->AxisWidget = vtkSmartPointer<vtkF3DOrientationMarkerWidget>::New();
+      this->AxisWidget = vtkSmartPointer<vtkF3DOrientationMarkerWidget>::New();
 #endif
-        this->AxisWidget->SetOrientationMarker(axes);
-        this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
-        this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
-        this->AxisWidget->On();
+      this->AxisWidget->SetOrientationMarker(axes);
+      this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
+      this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
+      this->AxisWidget->On();
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
-        this->AxisWidget->InteractiveOff();
+      this->AxisWidget->InteractiveOff();
 #endif
-        this->AxisWidget->SetKeyPressActivation(false);
-      }
-      else
-      {
-        F3DLog::Print(F3DLog::Severity::Error, "Axis widget cannot be shown without an interactor\n");
-      }
+      this->AxisWidget->SetKeyPressActivation(false);
     }
 
     this->AxisVisible = show;
@@ -2665,6 +2659,10 @@ void vtkF3DRenderer::CycleArrayForColoring()
       // Cycle component if the current one is not valid
       this->CycleComponentForColoring();
     }
+  }
+  else
+  {
+    this->SetArrayNameForColoring(std::optional<std::string>());
   }
 }
 

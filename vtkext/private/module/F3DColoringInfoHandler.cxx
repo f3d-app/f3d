@@ -117,46 +117,6 @@ void F3DColoringInfoHandler::FinalizeColoringInfo(bool useCellData)
 }
 
 //----------------------------------------------------------------------------
-/*bool F3DColoringInfoHandler::GetInfoForColoring(
-  bool useCellData, int index, F3DColoringInfoHandler::ColoringInfo& info)
-{
-  auto& data =
-    useCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
-  auto& names =
-    useCellData ? this->CellDataArrayNames : this->PointDataArrayNames;
-
-  if (index < 0 || index >= static_cast<int>(data.size()))
-  {
-    return false;
-  }
-
-  info = data[names[index]];
-  return true;
-}
-
-//----------------------------------------------------------------------------
-int F3DColoringInfoHandler::GetNumberOfIndicesForColoring(bool useCellData)
-{
-  auto& data =
-    useCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
-  return static_cast<int>(data.size());
-}
-
-//----------------------------------------------------------------------------
-int F3DColoringInfoHandler::FindIndexForColoring(bool useCellData, const std::string& arrayName)
-{
-  auto& data =
-    useCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
-
-  auto it = data.find(arrayName);
-  if (it != data.end())
-  {
-    return it->second.Index;
-  }
-  return -1;
-}*/
-
-//----------------------------------------------------------------------------
 bool F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, ColoringInfo& info, bool quiet)
 {
   this->CurrentUsingCellData = useCellData;
@@ -186,7 +146,7 @@ bool F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, s
     auto it = data.find(arrayName.value());
     if (it != data.end())
     {
-      this->CurrentArrayIndex = it->second.Index;
+      this->CurrentArrayIndex =  it->second.Index; // TODO
     }
     else
     {
