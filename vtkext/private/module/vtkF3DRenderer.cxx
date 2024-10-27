@@ -2659,7 +2659,7 @@ void vtkF3DRenderer::CycleArrayForColoring()
   }
   else
   {
-    this->SetArrayNameForColoring(std::optional<std::string>());
+    this->SetArrayNameForColoring(std::nullopt);
   }
 }
 
