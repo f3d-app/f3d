@@ -101,7 +101,7 @@ void F3DColoringInfoHandler::UpdateColoringInfo(vtkDataSet* dataset, bool useCel
 }
 
 //----------------------------------------------------------------------------
-bool F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, bool quiet, ColoringInfo& info)
+std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, bool quiet)
 {
   this->CurrentUsingCellData = useCellData;
   auto& data =
@@ -111,47 +111,51 @@ bool F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, s
   if (!enable)
   {
     // Not coloring
-    this->Coloring = false;
+    this->CurrentColoringIter.reset();
   }
   else if (nIndices == 0)
   {
     // Trying to color but no array available
-    F3DLog::Print(F3DLog::Severity::Debug, "No array to color with");
-    this->Coloring = false;
+    this->CurrentColoringIter.reset();
+
+    if (!quiet)
+    {
+      F3DLog::Print(F3DLog::Severity::Debug, "No array to color with");
+    }
   }
   else if (!arrayName.has_value())
   {
     // Coloring with first array
-    this->Coloring = true;
     this->CurrentColoringIter = data.begin();
   }
   else
   {
     // Coloring with named array
-    this->Coloring = true;
     this->CurrentColoringIter = data.find(arrayName.value());
-    if (this->CurrentColoringIter == data.end())
+    if (this->CurrentColoringIter.value() == data.end())
     {
       // Could not find named array
-      this->Coloring = false;
+      this->CurrentColoringIter.reset();
       if (!quiet)
       {
         F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: \"" + arrayName.value() + "\"\n");
       }
     }
   }
-  return this->GetCurrentColoring(info);
+  return this->GetCurrentColoringInfo();
 }
 
 //----------------------------------------------------------------------------
-bool F3DColoringInfoHandler::GetCurrentColoring(ColoringInfo& info)
+std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::GetCurrentColoringInfo() const
 {
-  if (this->Coloring)
+  if (this->CurrentColoringIter.has_value())
   {
-    // XXX: Iter is always valid here
-    info = this->CurrentColoringIter->second;
+    return this->CurrentColoringIter.value()->second;
   }
-  return this->Coloring;
+  else
+  {
+    return std::optional<ColoringInfo>();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -159,27 +163,26 @@ void F3DColoringInfoHandler::CycleColoringArray(bool cycleToNonColoring)
 {
   auto& data =
     this->CurrentUsingCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
-  if (!this->Coloring)
+  if (!this->CurrentColoringIter.has_value())
   {
-    if(data.size() == 0)
+    if(data.empty())
     {
       return;
     }
     else
     {
-      this->Coloring = true;
       this->CurrentColoringIter = data.begin();
     }
   }
   else
   {
     // XXX: Iter is always valid here
-    ++this->CurrentColoringIter;
-    if (this->CurrentColoringIter == data.end())
+    ++(this->CurrentColoringIter.value());
+    if (this->CurrentColoringIter.value() == data.end())
     {
       if (cycleToNonColoring)
       {
-        this->Coloring = false;
+        this->CurrentColoringIter.reset();
       }
       else
       {

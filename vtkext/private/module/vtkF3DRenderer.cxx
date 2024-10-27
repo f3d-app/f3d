@@ -1364,16 +1364,13 @@ void vtkF3DRenderer::ConfigureCheatSheet()
   assert(this->Importer);
   if (this->CheatSheetVisible)
   {
-    F3DColoringInfoHandler::ColoringInfo info;
-    bool hasColoring =
-      this->Importer->GetColoringInfoHandler().GetCurrentColoring(info);
-
+    auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
     std::stringstream cheatSheetText;
     cheatSheetText << "\n";
     cheatSheetText << " C: Cell scalars coloring [" << (this->UseCellColoring ? "ON" : "OFF")
       << "]\n";
     cheatSheetText << " S: Scalars coloring ["
-      << (hasColoring ? vtkF3DRenderer::ShortName(info.Name, 19) + (this->EnableColoring ? "" : "(forced)") : "OFF") << "]\n";
+      << (info.has_value() ? vtkF3DRenderer::ShortName(info.value().Name, 19) + (this->EnableColoring ? "" : "(forced)") : "OFF") << "]\n";
     cheatSheetText << " Y: Coloring component ["
       << vtkF3DRenderer::ComponentToString(this->ComponentForColoring)
       << "]\n";
@@ -2288,11 +2285,11 @@ void vtkF3DRenderer::ConfigureColoring()
   // Recover coloring information and update handler
   bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
-  F3DColoringInfoHandler::ColoringInfo info;
-  bool hasColoring = coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false, info);
+  auto info = coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
+  bool hasColoring = info.has_value();
   if (hasColoring && !this->ColorTransferFunctionConfigured)
   {
-    this->ConfigureRangeAndCTFForColoring(info);
+    this->ConfigureRangeAndCTFForColoring(info.value());
     this->ColorTransferFunctionConfigured = true;
   }
 
@@ -2309,7 +2306,7 @@ void vtkF3DRenderer::ConfigureColoring()
         visible = mapper->GetScalarVisibility();
         if (!this->ColoringMappersConfigured)
         {
-          visible = vtkF3DRenderer::ConfigureMapperForColoring(mapper, info.Name,
+          visible = vtkF3DRenderer::ConfigureMapperForColoring(mapper, info.value().Name,
             this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
             this->UseCellColoring);
         }
@@ -2339,7 +2336,7 @@ void vtkF3DRenderer::ConfigureColoring()
       {
         if (!this->PointSpritesMappersConfigured)
         {
-          vtkF3DRenderer::ConfigureMapperForColoring(mapper, info.Name,
+          vtkF3DRenderer::ConfigureMapperForColoring(mapper, info.value().Name,
             this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
             this->UseCellColoring);
         }
@@ -2371,13 +2368,13 @@ void vtkF3DRenderer::ConfigureColoring()
         if (!this->VolumePropsAndMappersConfigured)
         {
           visible = vtkF3DRenderer::ConfigureVolumeForColoring(mapper,
-            prop, info.Name, this->ComponentForColoring,
+            prop, info.value().Name, this->ComponentForColoring,
             this->ColorTransferFunction, this->ColorRange, this->UseCellColoring,
             this->UseInverseOpacityFunction);
           if (!visible)
           {
             F3DLog::Print(
-              F3DLog::Severity::Warning, "Cannot find the array \"" + info.Name + "\" to display volume with\n");
+              F3DLog::Severity::Warning, "Cannot find the array \"" + info.value().Name + "\" to display volume with\n");
           }
         }
       }
@@ -2400,7 +2397,7 @@ void vtkF3DRenderer::ConfigureColoring()
   if (barVisible && !this->ScalarBarActorConfigured)
   {
     vtkF3DRenderer::ConfigureScalarBarActorForColoring(
-      this->ScalarBarActor, info.Name, this->ComponentForColoring, this->ColorTransferFunction);
+      this->ScalarBarActor, info.value().Name, this->ComponentForColoring, this->ColorTransferFunction);
     this->ScalarBarActorConfigured = true;
   }
 
@@ -2414,11 +2411,11 @@ std::string vtkF3DRenderer::GetColoringDescription()
   assert(this->Importer);
 
   std::stringstream stream;
-  F3DColoringInfoHandler::ColoringInfo info;
-  if (this->Importer->GetColoringInfoHandler().GetCurrentColoring(info))
+  auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
+  if (info.has_value())
   {
     stream << "Coloring using " << (this->UseCellColoring ? "cell" : "point") << " array named "
-           << info.Name << (this->EnableColoring ? ", " : " (forced), ")
+           << info.value().Name << (this->EnableColoring ? ", " : " (forced), ")
            << vtkF3DRenderer::ComponentToString(this->ComponentForColoring) << "\n";
   }
   else
@@ -2634,8 +2631,8 @@ void vtkF3DRenderer::CycleFieldForColoring()
   this->SetUseCellColoring(!this->UseCellColoring);
   bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
-  F3DColoringInfoHandler::ColoringInfo info;
-  if (!coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, true, info))
+  auto info = coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, true);
+  if (!info.has_value())
   {
     // Cycle array if the current one is not valid
     this->CycleArrayForColoring();
@@ -2647,14 +2644,14 @@ void vtkF3DRenderer::CycleArrayForColoring()
 {
   assert(this->Importer);
   this->Importer->GetColoringInfoHandler().CycleColoringArray(!this->UseVolume); //TODO check this cond
-  F3DColoringInfoHandler::ColoringInfo info;
-  bool enable = this->Importer->GetColoringInfoHandler().GetCurrentColoring(info);
+  auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
+  bool enable = info.has_value();
 
   this->SetEnableColoring(enable);
   if (this->EnableColoring)
   {
-    this->SetArrayNameForColoring(info.Name);
-    if (this->ComponentForColoring >= info.MaximumNumberOfComponents)
+    this->SetArrayNameForColoring(info.value().Name);
+    if (this->ComponentForColoring >= info.value().MaximumNumberOfComponents)
     {
       // Cycle component if the current one is not valid
       this->CycleComponentForColoring();
@@ -2671,15 +2668,15 @@ void vtkF3DRenderer::CycleComponentForColoring()
 {
   assert(this->Importer);
 
-  F3DColoringInfoHandler::ColoringInfo info;
-  if (!this->Importer->GetColoringInfoHandler().GetCurrentColoring(info))
+  auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
+  if (!info.has_value())
   {
     return;
   }
 
   // -2 -1 0 1 2 3 4
   this->SetComponentForColoring(
-    (this->ComponentForColoring + 3) % (info.MaximumNumberOfComponents + 2) - 2);
+    (this->ComponentForColoring + 3) % (info.value().MaximumNumberOfComponents + 2) - 2);
 }
 
 //----------------------------------------------------------------------------
@@ -2697,20 +2694,20 @@ std::string vtkF3DRenderer::ComponentToString(int component)
   }
   else
   {
-    F3DColoringInfoHandler::ColoringInfo info;
-    if (!this->Importer->GetColoringInfoHandler().GetCurrentColoring(info))
+    auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
+    if (!info.has_value())
     {
       return "";
     }
-    if (component >= info.MaximumNumberOfComponents)
+    if (component >= info.value().MaximumNumberOfComponents)
     {
       return "";
     }
 
     std::string componentName;
-    if (component < static_cast<int>(info.ComponentNames.size()))
+    if (component < static_cast<int>(info.value().ComponentNames.size()))
     {
-      componentName = info.ComponentNames[component];
+      componentName = info.value().ComponentNames[component];
     }
     if (componentName.empty())
     {

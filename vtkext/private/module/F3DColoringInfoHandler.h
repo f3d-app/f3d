@@ -46,17 +46,15 @@ public:
    * @param useCellData: If cell data or point data should be used
    * @param arrayName: An optional arrayName to color with
    * @param quiet: If true, no log will be done by this method, even when failing to find an array to color with
-   * @param info: Output param containing current ColoringInfo
-   * @return: true if the provided arguments resulted in coloring, false otherwise
+   * @return: current coloring info if any, unset optional otherwise
    */
-  bool SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, bool quiet, ColoringInfo& info);
+  std::optional<ColoringInfo> SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, bool quiet);
 
   /**
    * Get the current coloring state
-   * Return true if coloring, false otherwise
-   * When returning true, info contain the current ColoringInfo
+   * Return current coloring info if any, unset optional otherwise
    */
-  bool GetCurrentColoring(ColoringInfo& info);
+  std::optional<ColoringInfo> GetCurrentColoringInfo() const;
 
   /**
    * Cycle the current coloring
@@ -74,8 +72,7 @@ private:
 
   // Current coloring state
   bool CurrentUsingCellData = false;
-  bool Coloring = false;
-  ColoringMap::iterator CurrentColoringIter;
+  std::optional<ColoringMap::iterator> CurrentColoringIter;
 };
 
 #endif
