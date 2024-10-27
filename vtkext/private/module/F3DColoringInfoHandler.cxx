@@ -154,7 +154,7 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::GetC
   }
   else
   {
-    return std::optional<ColoringInfo>();
+    return std::nullopt;
   }
 }
 
@@ -165,20 +165,14 @@ void F3DColoringInfoHandler::CycleColoringArray(bool cycleToNonColoring)
     this->CurrentUsingCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
   if (!this->CurrentColoringIter.has_value())
   {
-    if(data.empty())
-    {
-      return;
-    }
-    else
+    if(!data.empty())
     {
       this->CurrentColoringIter = data.begin();
     }
   }
   else
   {
-    // XXX: Iter is always valid here
-    ++(this->CurrentColoringIter.value());
-    if (this->CurrentColoringIter.value() == data.end())
+    if (++this->CurrentColoringIter.value() == data.end())
     {
       if (cycleToNonColoring)
       {
