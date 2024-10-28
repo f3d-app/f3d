@@ -172,14 +172,14 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
       else
       {
         std::string msg = "A mesh is associated with more than 250 bones (" +
-          std::to_string(nbJoints) + "), which requires OpenGL >= 4.3\n";
+          std::to_string(nbJoints) + "), which requires OpenGL >= 4.3";
         F3DLog::Print(F3DLog::Severity::Warning, msg);
 
         skinningSupported = false;
       }
 #else
       std::string msg = "A mesh is associated with more than 250 bones (" +
-        std::to_string(nbJoints) + "), which is not supported by VTK < 9.3.20231108\n";
+        std::to_string(nbJoints) + "), which is not supported by VTK < 9.3.20231108";
       F3DLog::Print(F3DLog::Severity::Warning, msg);
 
       skinningSupported = false;

@@ -19,7 +19,7 @@ void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
 {
   if (files == nullptr)
   {
-    F3DLog::Print(F3DLog::Severity::Warning, "Drop event without any provided files.\n");
+    F3DLog::Print(F3DLog::Severity::Warning, "Drop event without any provided files.");
     return;
   }
   this->InvokeEvent(vtkF3DInteractorStyle::DropFilesEvent, files);
