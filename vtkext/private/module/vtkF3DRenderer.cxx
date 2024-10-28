@@ -1877,7 +1877,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     if (this->SurfaceColor.value().size() != 3)
     {
       F3DLog::Print(F3DLog::Severity::Warning,
-        std::string("Invalid surface color provided, not applying"));
+        std::string("Invalid surface color provided, not applying\n"));
     }
     else
     {
@@ -1891,7 +1891,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     if (this->EmissiveFactor.value().size() != 3)
     {
       F3DLog::Print(F3DLog::Severity::Warning,
-        std::string("Invalid emissive factor provided, not applying"));
+        std::string("Invalid emissive factor provided, not applying\n"));
     }
     else
     {
