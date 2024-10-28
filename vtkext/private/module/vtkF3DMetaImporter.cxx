@@ -6,10 +6,8 @@
 #include <vtkActorCollection.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
-#include <vtkCellData.h>
 #include <vtkImageData.h>
 #include <vtkObjectFactory.h>
-#include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
@@ -19,124 +17,14 @@
 #include <cassert>
 #include <iostream>
 #include <numeric>
-#include <set>
 #include <vector>
 
 struct vtkF3DMetaImporter::Internals
 {
-  void ClearColoringInfo()
-  {
-    this->PointDataColoringInfo.clear();
-    this->CellDataColoringInfo.clear();
-  }
-
-  void UpdateColoringInfo(vtkDataSet* dataset, bool useCellData)
-  {
-    // XXX: This assumes importer do not import actors with an empty input
-    assert(dataset);
-
-    // Recover all possible names
-    std::set<std::string> arrayNames;
-
-    vtkDataSetAttributes* attr = useCellData
-      ? static_cast<vtkDataSetAttributes*>(dataset->GetCellData())
-      : static_cast<vtkDataSetAttributes*>(dataset->GetPointData());
-
-    for (int i = 0; i < attr->GetNumberOfArrays(); i++)
-    {
-      vtkDataArray* array = attr->GetArray(i);
-      if (array && array->GetName())
-      {
-        arrayNames.insert(array->GetName());
-      }
-    }
-
-    auto& data = useCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
-
-    for (const std::string& arrayName : arrayNames)
-    {
-      // Recover/Create a coloring info
-      vtkF3DMetaImporter::ColoringInfo& info = data[arrayName];
-      info.Name = arrayName;
-
-      vtkDataArray* array = useCellData ? dataset->GetCellData()->GetArray(arrayName.c_str())
-                                        : dataset->GetPointData()->GetArray(arrayName.c_str());
-      if (array)
-      {
-        info.MaximumNumberOfComponents =
-          std::max(info.MaximumNumberOfComponents, array->GetNumberOfComponents());
-
-        // Set ranges
-        // XXX this does not take animation into account
-        std::array<double, 2> range;
-        array->GetRange(range.data(), -1);
-        info.MagnitudeRange[0] = std::min(info.MagnitudeRange[0], range[0]);
-        info.MagnitudeRange[1] = std::max(info.MagnitudeRange[1], range[1]);
-
-        for (size_t i = 0; i < static_cast<size_t>(array->GetNumberOfComponents()); i++)
-        {
-          array->GetRange(range.data(), static_cast<int>(i));
-          if (i < info.ComponentRanges.size())
-          {
-            info.ComponentRanges[i][0] = std::min(info.ComponentRanges[i][0], range[0]);
-            info.ComponentRanges[i][1] = std::max(info.ComponentRanges[i][1], range[1]);
-          }
-          else
-          {
-            info.ComponentRanges.emplace_back(range);
-          }
-        }
-
-        // Set component names
-        if (array->HasAComponentName())
-        {
-          for (size_t i = 0; i < static_cast<size_t>(array->GetNumberOfComponents()); i++)
-          {
-            const char* compName = array->GetComponentName(i);
-            if (i < info.ComponentNames.size())
-            {
-              if (compName && info.ComponentNames[i] != std::string(compName))
-              {
-                // set non-coherent component names to empty string
-                info.ComponentNames[i] = "";
-              }
-            }
-            else
-            {
-              // Add components names to the back of the component names vector
-              info.ComponentNames.emplace_back(compName ? compName : "");
-            }
-          }
-        }
-      }
-    }
-  }
-
-  void FinalizeColoringInfo(bool useCellData)
-  {
-    auto& names = useCellData ? this->CellDataArrayNames : this->PointDataArrayNames;
-    names.clear();
-
-    auto& data = useCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
-    int index = 0;
-    for (auto& [name, info] : data)
-    {
-      info.Index = index;
-      names.emplace_back(name);
-      index++;
-    }
-  }
-
   // Actors related vectors
   std::vector<vtkF3DMetaImporter::ColoringStruct> ColoringActorsAndMappers;
   std::vector<vtkF3DMetaImporter::PointSpritesStruct> PointSpritesActorsAndMappers;
   std::vector<vtkF3DMetaImporter::VolumeStruct> VolumePropsAndMappers;
-
-  // Map of arrayName -> coloring info
-  std::map<std::string, ColoringInfo> PointDataColoringInfo;
-  std::map<std::string, ColoringInfo> CellDataColoringInfo;
-  std::vector<std::string> PointDataArrayNames;
-  std::vector<std::string> CellDataArrayNames;
 
   struct ImporterPair
   {
@@ -147,6 +35,8 @@ struct vtkF3DMetaImporter::Internals
   std::optional<vtkIdType> CameraIndex;
   vtkBoundingBox GeometryBoundingBox;
   bool ColoringInfoUpdated = false;
+
+  F3DColoringInfoHandler ColoringInfoHandler;
 
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20240707)
   std::map<vtkImporter*, vtkSmartPointer<vtkActorCollection>> ActorsForImporterMap;
@@ -178,7 +68,7 @@ void vtkF3DMetaImporter::Clear()
   this->Pimpl->ColoringActorsAndMappers.clear();
   this->Pimpl->PointSpritesActorsAndMappers.clear();
   this->Pimpl->VolumePropsAndMappers.clear();
-  this->Pimpl->ClearColoringInfo();
+  this->Pimpl->ColoringInfoHandler.ClearColoringInfo();
   this->Modified();
 }
 
@@ -215,61 +105,6 @@ void vtkF3DMetaImporter::AddImporter(const vtkSmartPointer<vtkImporter>& importe
 const vtkBoundingBox& vtkF3DMetaImporter::GetGeometryBoundingBox()
 {
   return this->Pimpl->GeometryBoundingBox;
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DMetaImporter::GetInfoForColoring(
-  bool useCellData, int index, vtkF3DMetaImporter::ColoringInfo& info)
-{
-  if (!this->Pimpl->ColoringInfoUpdated)
-  {
-    this->UpdateInfoForColoring();
-  }
-
-  auto& data =
-    useCellData ? this->Pimpl->CellDataColoringInfo : this->Pimpl->PointDataColoringInfo;
-  auto& names =
-    useCellData ? this->Pimpl->CellDataArrayNames : this->Pimpl->PointDataArrayNames;
-
-  if (index < 0 || index >= static_cast<int>(data.size()))
-  {
-    return false;
-  }
-
-  info = data[names[index]];
-  return true;
-}
-
-//----------------------------------------------------------------------------
-int vtkF3DMetaImporter::GetNumberOfIndexesForColoring(bool useCellData)
-{
-  if (!this->Pimpl->ColoringInfoUpdated)
-  {
-    this->UpdateInfoForColoring();
-  }
-
-  auto& data =
-    useCellData ? this->Pimpl->CellDataColoringInfo : this->Pimpl->PointDataColoringInfo;
-  return static_cast<int>(data.size());
-}
-
-//----------------------------------------------------------------------------
-int vtkF3DMetaImporter::FindIndexForColoring(bool useCellData, const std::string& arrayName)
-{
-  if (!this->Pimpl->ColoringInfoUpdated)
-  {
-    this->UpdateInfoForColoring();
-  }
-
-  auto& data =
-    useCellData ? this->Pimpl->CellDataColoringInfo : this->Pimpl->PointDataColoringInfo;
-
-  auto it = data.find(arrayName);
-  if (it != data.end())
-  {
-    return it->second.Index;
-  }
-  return -1;
 }
 
 //----------------------------------------------------------------------------
@@ -672,13 +507,10 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
           datasetForColoring = genericImporter->GetImportedPoints();
         }
       }
-      this->Pimpl->UpdateColoringInfo(datasetForColoring, false);
-      this->Pimpl->UpdateColoringInfo(datasetForColoring, true);
+      this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, false);
+      this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, true);
     }
   }
-
-  this->Pimpl->FinalizeColoringInfo(false);
-  this->Pimpl->FinalizeColoringInfo(true);
   this->Pimpl->ColoringInfoUpdated = true;
 }
 
@@ -714,4 +546,15 @@ std::string vtkF3DMetaImporter::GetMetaDataDescription() const
   description += "Number of cells: ";
   description += std::to_string(nCells);
   return description;
+}
+
+//----------------------------------------------------------------------------
+F3DColoringInfoHandler& vtkF3DMetaImporter::GetColoringInfoHandler()
+{
+  if (!this->Pimpl->ColoringInfoUpdated)
+  {
+    this->UpdateInfoForColoring();
+  }
+
+  return this->Pimpl->ColoringInfoHandler;
 }

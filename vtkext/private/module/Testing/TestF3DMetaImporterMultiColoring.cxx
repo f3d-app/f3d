@@ -41,13 +41,6 @@ int TestF3DMetaImporterMultiColoring(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (importer->FindIndexForColoring(false, "") != -1)
-  {
-    std::cerr << "Unexpected FindIndexForColoring success" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-
   // Read a vts and a vtu with same array names
   // but different component names and array ranges
   vtkNew<vtkXMLUnstructuredGridReader> readerVTU;
@@ -71,54 +64,48 @@ int TestF3DMetaImporterMultiColoring(int argc, char* argv[])
   importer->SetRenderWindow(window);
   importer->Update();
 
-  if (importer->GetNumberOfIndexesForColoring(false) != 3)
-  {
-    std::cerr << "Importer provide unexpected number of indexes for coloring" << std::endl;
-    return EXIT_FAILURE;
-  }
+  // Test coloring handler
+  F3DColoringInfoHandler& coloringHandler = importer->GetColoringInfoHandler();
 
-  int idx = importer->FindIndexForColoring(false, "Momentum");
-  if (idx < 0)
+  auto info = coloringHandler.SetCurrentColoring(true, false, "Momentum", false);
+  if (!info.has_value())
   {
-    std::cerr << "Importer unable to find an expected coloring array" << std::endl;
+    std::cerr << "Coloring handler unable to set coloring as expected" << std::endl;
     return EXIT_FAILURE;
   }
-
-  vtkF3DMetaImporter::ColoringInfo info;
-  importer->GetInfoForColoring(false, idx, info);
-  if (info.Name != "Momentum")
+  if (info.value().Name != "Momentum")
   {
-    std::cerr << "Unexpected coloring name: " << info.Name << std::endl;
+    std::cerr << "Unexpected coloring name: " << info.value().Name << std::endl;
     return EXIT_FAILURE;
   }
-  if (info.MaximumNumberOfComponents != 3)
+  if (info.value().MaximumNumberOfComponents != 3)
   {
     std::cerr << "Unexpected coloring nComp" << std::endl;
     return EXIT_FAILURE;
   }
-  if (info.ComponentNames[0] != "LX Momentum")
+  if (info.value().ComponentNames[0] != "LX Momentum")
   {
     std::cerr << "Unexpected coloring component name 0" << std::endl;
     return EXIT_FAILURE;
   }
-  if (info.ComponentNames[1] != "LY Momentum_t")
+  if (info.value().ComponentNames[1] != "LY Momentum_t")
   {
     std::cerr << "Unexpected coloring component name 1" << std::endl;
     return EXIT_FAILURE;
   }
-  if (info.ComponentNames[2] != "")
+  if (info.value().ComponentNames[2] != "")
   {
     std::cerr << "Unexpected coloring component name 2" << std::endl;
     return EXIT_FAILURE;
   }
-  if (!vtkMathUtilities::FuzzyCompare(info.ComponentRanges[0][0], -5.49586, 1e-5) ||
-    !vtkMathUtilities::FuzzyCompare(info.ComponentRanges[0][1], 5.79029, 1e-5))
+  if (!vtkMathUtilities::FuzzyCompare(info.value().ComponentRanges[0][0], -5.49586, 1e-5) ||
+    !vtkMathUtilities::FuzzyCompare(info.value().ComponentRanges[0][1], 5.79029, 1e-5))
   {
     std::cerr << "Unexpected coloring component range" << std::endl;
     return EXIT_FAILURE;
   }
-  if (!vtkMathUtilities::FuzzyCompare(info.MagnitudeRange[0], 0., 1e-5) ||
-    !vtkMathUtilities::FuzzyCompare(info.MagnitudeRange[1], 6.25568, 1e-5))
+  if (!vtkMathUtilities::FuzzyCompare(info.value().MagnitudeRange[0], 0., 1e-5) ||
+    !vtkMathUtilities::FuzzyCompare(info.value().MagnitudeRange[1], 6.25568, 1e-5))
   {
     std::cerr << "Unexpected coloring magnitude range" << std::endl;
     return EXIT_FAILURE;

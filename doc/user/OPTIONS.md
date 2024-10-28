@@ -96,7 +96,7 @@ Options|Default|Description
 -b, \-\-bar||Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
 \-\-colormap\-file=\<name\>||Set a *colormap file for the coloring*.<br>See [color maps](COLOR_MAPS.md).<br>Use with the scalar option.
 \-\-colormap=\<color_list\>||Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).<br>Ignored if `--colormap-file` option is specified.<br>Use with the scalar option.
--v, \-\-volume||Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other formats.
+-v, \-\-volume||Enable *volume rendering*. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other formats. It forces coloring.
 -i, \-\-inverse||Inverse the linear opacity function used for volume rendering.
 
 ## Camera configuration options
