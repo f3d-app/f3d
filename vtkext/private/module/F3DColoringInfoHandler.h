@@ -48,7 +48,7 @@ public:
    * @param quiet: If true, no log will be done by this method, even when failing to find an array to color with
    * @return: current coloring info if any, unset optional otherwise
    */
-  std::optional<ColoringInfo> SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, bool quiet);
+  std::optional<ColoringInfo> SetCurrentColoring(bool enable, bool useCellData, const std::optional<std::string>& arrayName, bool quiet);
 
   /**
    * Get the current coloring state

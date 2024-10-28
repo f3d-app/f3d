@@ -68,7 +68,7 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
         if (!leafDS)
         {
           F3DLog::Print(F3DLog::Severity::Warning,
-            "A non data set block was ignored while reading a composite.");
+            "A non data set block was ignored while reading a composite.\n");
         }
         else
         {

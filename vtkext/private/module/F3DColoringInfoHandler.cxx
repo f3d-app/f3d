@@ -101,7 +101,7 @@ void F3DColoringInfoHandler::UpdateColoringInfo(vtkDataSet* dataset, bool useCel
 }
 
 //----------------------------------------------------------------------------
-std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, std::optional<std::string> arrayName, bool quiet)
+std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, const std::optional<std::string>& arrayName, bool quiet)
 {
   this->CurrentUsingCellData = useCellData;
   auto& data =
@@ -120,7 +120,7 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetC
 
     if (!quiet)
     {
-      F3DLog::Print(F3DLog::Severity::Debug, "No array to color with");
+      F3DLog::Print(F3DLog::Severity::Debug, "No array to color with\n");
     }
   }
   else if (!arrayName.has_value())
@@ -152,10 +152,7 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::GetC
   {
     return this->CurrentColoringIter.value()->second;
   }
-  else
-  {
-    return std::nullopt;
-  }
+  return std::nullopt;
 }
 
 //----------------------------------------------------------------------------

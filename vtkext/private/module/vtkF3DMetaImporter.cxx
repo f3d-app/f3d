@@ -148,7 +148,7 @@ bool vtkF3DMetaImporter::Update()
     {
       F3DLog::Print(F3DLog::Severity::Warning,
         "Invalid camera index: " + std::to_string(this->Pimpl->CameraIndex.value()) +
-          ". Camera may be incorrect.");
+          ". Camera may be incorrect.\n");
     }
     localCameraIndex = this->Pimpl->CameraIndex.value();
   }
@@ -291,7 +291,7 @@ bool vtkF3DMetaImporter::Update()
     // Here we know that CameraIndex has a value
     F3DLog::Print(F3DLog::Severity::Warning,
       "Camera index " + std::to_string(this->Pimpl->CameraIndex.value()) +
-        " is higher than the number of available camera in the files. Camera may be incorrect.");
+        " is higher than the number of available camera in the files. Camera may be incorrect.\n");
   }
 
   // XXX: UpdateStatus is not set, but libf3d does not use it
