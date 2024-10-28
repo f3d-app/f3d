@@ -781,7 +781,7 @@ void vtkF3DRenderer::ConfigureHDRIReader()
       if (!vtksys::SystemTools::FileExists(this->HDRIFile.value(), true))
       {
         F3DLog::Print(
-          F3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile.value();
+          F3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile.value());
       }
       else
       {
