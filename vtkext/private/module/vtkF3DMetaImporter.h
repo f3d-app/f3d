@@ -7,6 +7,7 @@
 #define vtkF3DMetaImporter_h
 
 #include "vtkF3DImporter.h"
+#include "F3DColoringInfoHandler.h"
 
 #include <vtkActor.h>
 #include <vtkVolume.h>
@@ -20,8 +21,6 @@
 #include <vtkActorCollection.h>
 #endif
 
-#include <array>
-#include <limits>
 #include <memory>
 #include <optional>
 #include <string>
@@ -78,20 +77,6 @@ public:
   ///@}
 
   /**
-   * A struct containing information about possible coloring
-   */
-  struct ColoringInfo
-  {
-    std::string Name;
-    int MaximumNumberOfComponents = 0;
-    std::vector<std::string> ComponentNames;
-    std::vector<std::array<double, 2>> ComponentRanges;
-    std::array<double, 2> MagnitudeRange = { std::numeric_limits<float>::max(),
-      std::numeric_limits<float>::min() };
-    int Index = -1;
-  };
-
-  /**
    * Clear all importers and internal structures
    */
   void Clear();
@@ -112,23 +97,8 @@ public:
    */
   std::string GetMetaDataDescription() const;
 
-  /**
-   * Recover information about coloring by index
-   * Should be called after actors have been imported
-   */
-  bool GetInfoForColoring(bool useCellData, int index, ColoringInfo& info);
 
-  /**
-   * Get the maximum index possible for coloring
-   * Should be called after actors have been imported
-   */
-  int GetNumberOfIndexesForColoring(bool useCellData);
-
-  /**
-   * Find an index for coloring corresponding to provided arrayName if available
-   * Should be called after actors have been imported
-   */
-  int FindIndexForColoring(bool useCellData, const std::string& arrayName);
+  F3DColoringInfoHandler& GetColoringInfoHandler();
 
   ///@{
   /**

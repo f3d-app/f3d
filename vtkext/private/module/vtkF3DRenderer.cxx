@@ -2,6 +2,7 @@
 
 #include "F3DDefaultHDRI.h"
 #include "F3DLog.h"
+#include "F3DColoringInfoHandler.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
 #include "vtkF3DConfigure.h"
@@ -281,9 +282,6 @@ void vtkF3DRenderer::Initialize()
   this->AnimationNameInfo = "";
   this->GridInfo = "";
 
-  this->ArrayIndexForColoring = -1;
-  this->ComponentForColoring = -1;
-
   this->AddActor2D(this->ScalarBarActor);
   this->ScalarBarActor->VisibilityOff();
 
@@ -483,27 +481,21 @@ void vtkF3DRenderer::ShowAxis(bool show)
     this->AxisWidget = nullptr;
     if (show)
     {
-      if (this->RenderWindow->GetInteractor())
-      {
-        vtkNew<vtkAxesActor> axes;
+      assert(this->RenderWindow->GetInteractor());
+      vtkNew<vtkAxesActor> axes;
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
-        this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
+      this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
 #else
-        this->AxisWidget = vtkSmartPointer<vtkF3DOrientationMarkerWidget>::New();
+      this->AxisWidget = vtkSmartPointer<vtkF3DOrientationMarkerWidget>::New();
 #endif
-        this->AxisWidget->SetOrientationMarker(axes);
-        this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
-        this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
-        this->AxisWidget->On();
+      this->AxisWidget->SetOrientationMarker(axes);
+      this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
+      this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
+      this->AxisWidget->On();
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
-        this->AxisWidget->InteractiveOff();
+      this->AxisWidget->InteractiveOff();
 #endif
-        this->AxisWidget->SetKeyPressActivation(false);
-      }
-      else
-      {
-        F3DLog::Print(F3DLog::Severity::Error, "Axis widget cannot be shown without an interactor");
-      }
+      this->AxisWidget->SetKeyPressActivation(false);
     }
 
     this->AxisVisible = show;
@@ -1369,11 +1361,51 @@ void vtkF3DRenderer::ShowCheatSheet(bool show)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureCheatSheet()
 {
+  assert(this->Importer);
   if (this->CheatSheetVisible)
   {
+    auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
     std::stringstream cheatSheetText;
     cheatSheetText << "\n";
-    this->FillCheatSheetHotkeys(cheatSheetText);
+    cheatSheetText << " C: Cell scalars coloring [" << (this->UseCellColoring ? "ON" : "OFF")
+      << "]\n";
+    cheatSheetText << " S: Scalars coloring ["
+      << (info.has_value() ? vtkF3DRenderer::ShortName(info.value().Name, 19) + (this->EnableColoring ? "" : "(forced)") : "OFF") << "]\n";
+    cheatSheetText << " Y: Coloring component ["
+      << vtkF3DRenderer::ComponentToString(this->ComponentForColoring)
+      << "]\n";
+    cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " V: Volume representation " << (this->UseVolume ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " I: Inverse volume opacity "
+      << (this->UseInverseOpacityFunction ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " O: Point sprites " << (this->UsePointSprites ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " W: Cycle animation ["
+      << vtkF3DRenderer::ShortName(this->AnimationNameInfo, 22) << "]\n";
+    cheatSheetText << " P: Translucency support " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]")
+      << "\n";
+    cheatSheetText << " Q: Ambient occlusion " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " A: Anti-aliasing " << (this->UseFXAAPass ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " T: Tone mapping " << (this->UseToneMappingPass ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " E: Edge visibility " << (this->EdgeVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " X: Axis " << (this->AxisVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " G: Grid " << (this->GridVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " N: File name " << (this->FilenameVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " M: Metadata " << (this->MetaDataVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " Z: FPS Timer " << (this->TimerVisible ? "[ON]" : "[OFF]") << "\n";
+#if F3D_MODULE_RAYTRACING
+    cheatSheetText << " R: Raytracing " << (this->UseRaytracing ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " D: Denoiser " << (this->UseRaytracingDenoiser ? "[ON]" : "[OFF]") << "\n";
+#endif
+    cheatSheetText << " U: Blur background " << (this->UseBlurBackground ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " K: Trackball interaction " << (this->UseTrackball ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " F: HDRI ambient lighting "
+      << (this->GetUseImageBasedLighting() ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " J: HDRI skybox " << (this->HDRISkyboxVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText.precision(2);
+    cheatSheetText << std::fixed;
+    cheatSheetText << " L: Light (increase, shift+L: decrease) [" << this->LightIntensity << "]"
+      << " \n";
+
     cheatSheetText << "\n   H  : Cheat sheet \n";
     cheatSheetText << "   ?  : Print scene descr to terminal\n";
     cheatSheetText << "  ESC : Quit \n";
@@ -1386,7 +1418,7 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     cheatSheetText << " 3: Right View camera\n";
     cheatSheetText << " 4: Roll the camera left by 90 degrees\n";
     cheatSheetText << " 5: Toggle Orthographic Projection "
-                   << (this->UseOrthographicProjection ? "[ON]" : "[OFF]") << "\n";
+      << (this->UseOrthographicProjection ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " 6: Roll the camera right by 90 degrees\n";
     cheatSheetText << " 7: Top View camera\n";
     cheatSheetText << " 9: Isometric View camera\n";
@@ -1422,56 +1454,6 @@ void vtkF3DRenderer::ShowHDRISkybox(bool show)
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
   }
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::FillCheatSheetHotkeys(std::stringstream& cheatSheetText)
-{
-  assert(this->Importer);
-
-  vtkF3DMetaImporter::ColoringInfo info;
-  bool hasColoring =
-    this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
-
-  cheatSheetText << " C: Cell scalars coloring [" << (this->UseCellColoring ? "ON" : "OFF")
-                 << "]\n";
-  cheatSheetText << " S: Scalars coloring ["
-                 << (hasColoring ? vtkF3DRenderer::ShortName(info.Name, 19) : "OFF") << "]\n";
-  cheatSheetText << " Y: Coloring component ["
-                 << vtkF3DRenderer::ComponentToString(this->ComponentForColoring)
-                 << "]\n";
-  cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";
-
-  cheatSheetText << " V: Volume representation " << (this->UseVolume ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " I: Inverse volume opacity "
-                 << (this->UseInverseOpacityFunction ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " O: Point sprites " << (this->UsePointSprites ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " W: Cycle animation ["
-                 << vtkF3DRenderer::ShortName(this->AnimationNameInfo, 22) << "]\n";
-  cheatSheetText << " P: Translucency support " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]")
-                 << "\n";
-  cheatSheetText << " Q: Ambient occlusion " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " A: Anti-aliasing " << (this->UseFXAAPass ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " T: Tone mapping " << (this->UseToneMappingPass ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " E: Edge visibility " << (this->EdgeVisible ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " X: Axis " << (this->AxisVisible ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " G: Grid " << (this->GridVisible ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " N: File name " << (this->FilenameVisible ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " M: Metadata " << (this->MetaDataVisible ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " Z: FPS Timer " << (this->TimerVisible ? "[ON]" : "[OFF]") << "\n";
-#if F3D_MODULE_RAYTRACING
-  cheatSheetText << " R: Raytracing " << (this->UseRaytracing ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " D: Denoiser " << (this->UseRaytracingDenoiser ? "[ON]" : "[OFF]") << "\n";
-#endif
-  cheatSheetText << " U: Blur background " << (this->UseBlurBackground ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " K: Trackball interaction " << (this->UseTrackball ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " F: HDRI ambient lighting "
-                 << (this->GetUseImageBasedLighting() ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText << " J: HDRI skybox " << (this->HDRISkyboxVisible ? "[ON]" : "[OFF]") << "\n";
-  cheatSheetText.precision(2);
-  cheatSheetText << std::fixed;
-  cheatSheetText << " L: Light (increase, shift+L: decrease) [" << this->LightIntensity << "]"
-                 << " \n";
 }
 
 //----------------------------------------------------------------------------
@@ -1916,7 +1898,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       emissiveFactor = this->EmissiveFactor.value().data();
     }
   }
-  
+
   bool setBackfaceCulling = false;
   bool backfaceCulling = true;
   if (this->BackfaceType.has_value())
@@ -2231,154 +2213,68 @@ void vtkF3DRenderer::SetColormap(const std::vector<double>& colormap)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::CycleScalars(CycleType type)
+void vtkF3DRenderer::SetEnableColoring(bool enable)
 {
-  switch (type)
+  if (enable != this->EnableColoring)
   {
-    case (CycleType::NONE):
-      return;
-      break;
-    case (CycleType::FIELD):
-      this->CycleFieldForColoring();
-      break;
-    case (CycleType::ARRAY_INDEX):
-      this->CycleArrayIndexForColoring();
-      break;
-    case (CycleType::COMPONENT):
-      this->CycleComponentForColoring();
-      break;
-    default:
-      break;
-  }
-
-  // Check attributes are valid and cycle recursively if needed
-  this->CycleScalars(this->CheckColoring());
-
-  this->ColorTransferFunctionConfigured = false;
-  this->ColoringMappersConfigured = false;
-  this->PointSpritesMappersConfigured = false;
-  this->VolumePropsAndMappersConfigured = false;
-  this->ScalarBarActorConfigured = false;
-  this->CheatSheetConfigured = false;
-  this->ColoringConfigured = false;
-}
-
-//----------------------------------------------------------------------------
-vtkF3DRenderer::CycleType vtkF3DRenderer::CheckColoring()
-{
-  assert(this->Importer);
-
-  // Never force change of anything if we are currently not coloring
-  if (this->ArrayIndexForColoring < 0)
-  {
-    return CycleType::NONE;
-  }
-
-  // Never force change of CellData/PointData coloring on the user
-  if (this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring) == 0)
-  {
-    return CycleType::NONE;
-  }
-
-  // Suggest to change the array index only if current index is not valid
-  vtkF3DMetaImporter::ColoringInfo info;
-  if (!this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
-  {
-    return CycleType::ARRAY_INDEX;
-  }
-
-  // Suggest to change the component if current component is invalid
-  if (this->ComponentForColoring >= info.MaximumNumberOfComponents)
-  {
-    return CycleType::COMPONENT;
-  }
-
-  return CycleType::NONE;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::SetColoring(bool enable,
-  bool useCellData, const std::optional<std::string>& arrayName, int component)
-{
-  assert(this->Importer);
-
-  // XXX This should be reworked to avoid handling multiple information in one parameters
-  // while still being future-proof and flexible enough.
-  if (enable != (this->ArrayIndexForColoring >= 0)
-      || useCellData != this->UseCellColoring
-      || component != this->ComponentForColoring
-      || arrayName != this->GetColoringArrayName())
-  {
-    this->UseCellColoring = useCellData;
-    this->ComponentForColoring = component;
-
-    int nIndexes = this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring);
-    if (!enable)
-    {
-      // Not coloring
-      this->ArrayIndexForColoring = -1;
-    }
-    else if (nIndexes == 0)
-    {
-      // Trying to color but no array available
-      F3DLog::Print(F3DLog::Severity::Debug, "No array to color with");
-      this->ArrayIndexForColoring = -1;
-    }
-    else if (!arrayName.has_value())
-    {
-      // Coloring with first array
-      this->ArrayIndexForColoring = 0;
-    }
-    else
-    {
-      // Coloring with named array
-      this->ArrayIndexForColoring = this->Importer->FindIndexForColoring(useCellData, arrayName.value());
-      if (this->ArrayIndexForColoring == -1)
-      {
-        // Could not find named array
-        F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: \"" + arrayName.value() + "\"\n");
-      }
-    }
-
-    this->ColorTransferFunctionConfigured = false;
-    this->ColoringMappersConfigured = false;
-    this->PointSpritesMappersConfigured = false;
-    this->VolumePropsAndMappersConfigured = false;
-    this->ScalarBarActorConfigured = false;
+    this->EnableColoring = enable;
+    this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
   }
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::GetColoringEnabled()
+void vtkF3DRenderer::SetUseCellColoring(bool useCell)
 {
-  return this->ArrayIndexForColoring >= 0;
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::GetColoringUseCell()
-{
-  return this->UseCellColoring;
-}
-
-//----------------------------------------------------------------------------
-std::optional<std::string> vtkF3DRenderer::GetColoringArrayName()
-{
-  assert(this->Importer);
-
-  std::optional<std::string> arrayName;
-  vtkF3DMetaImporter::ColoringInfo info;
-  if (this->Importer && this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
+  if (useCell != this->UseCellColoring)
   {
-    arrayName = info.Name;
+    this->UseCellColoring = useCell;
+    this->ColorTransferFunctionConfigured = false;
+    this->ColoringMappersConfigured = false;
+    this->PointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->CheatSheetConfigured = false;
+    this->ColoringConfigured = false;
   }
-  return arrayName;
 }
 
 //----------------------------------------------------------------------------
-int vtkF3DRenderer::GetColoringComponent()
+void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& arrayName)
 {
-  return this->ComponentForColoring;
+  if (arrayName != this->ArrayNameForColoring)
+  {
+    this->ArrayNameForColoring = arrayName;
+    this->ColorTransferFunctionConfigured = false;
+    this->ColoringMappersConfigured = false;
+    this->PointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->CheatSheetConfigured = false;
+    this->ColoringConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+std::optional<std::string> vtkF3DRenderer::GetArrayNameForColoring()
+{
+  return this->ArrayNameForColoring;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetComponentForColoring(int component)
+{
+  if (component != this->ComponentForColoring)
+  {
+    this->ComponentForColoring = component;
+    this->ColorTransferFunctionConfigured = false;
+    this->ColoringMappersConfigured = false;
+    this->PointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->CheatSheetConfigured = false;
+    this->ColoringConfigured = false;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -2386,23 +2282,14 @@ void vtkF3DRenderer::ConfigureColoring()
 {
   assert(this->Importer);
 
-  // Recover coloring information
-  vtkF3DMetaImporter::ColoringInfo info;
-  bool hasColoring =
-    this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
-
-  bool volumeVisible = !this->UseRaytracing && this->UseVolume;
-  if (!hasColoring && volumeVisible)
-  {
-    // When showing volume, always try to find an array to color with
-    this->CycleScalars(vtkF3DRenderer::CycleType::ARRAY_INDEX);
-    hasColoring =
-      this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info);
-  }
-
+  // Recover coloring information and update handler
+  bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
+  F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
+  auto info = coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
+  bool hasColoring = info.has_value();
   if (hasColoring && !this->ColorTransferFunctionConfigured)
   {
-    this->ConfigureRangeAndCTFForColoring(info);
+    this->ConfigureRangeAndCTFForColoring(info.value());
     this->ColorTransferFunctionConfigured = true;
   }
 
@@ -2419,7 +2306,7 @@ void vtkF3DRenderer::ConfigureColoring()
         visible = mapper->GetScalarVisibility();
         if (!this->ColoringMappersConfigured)
         {
-          visible = vtkF3DRenderer::ConfigureMapperForColoring(mapper, info.Name,
+          visible = vtkF3DRenderer::ConfigureMapperForColoring(mapper, info.value().Name,
             this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
             this->UseCellColoring);
         }
@@ -2449,7 +2336,7 @@ void vtkF3DRenderer::ConfigureColoring()
       {
         if (!this->PointSpritesMappersConfigured)
         {
-          vtkF3DRenderer::ConfigureMapperForColoring(mapper, info.Name,
+          vtkF3DRenderer::ConfigureMapperForColoring(mapper, info.value().Name,
             this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
             this->UseCellColoring);
         }
@@ -2463,6 +2350,7 @@ void vtkF3DRenderer::ConfigureColoring()
   }
 
   // Handle Volume prop
+  bool volumeVisible = !this->UseRaytracing && this->UseVolume;
   const auto& volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
   for (const auto& [prop, mapper] : volPropsAndMappers)
   {
@@ -2480,13 +2368,13 @@ void vtkF3DRenderer::ConfigureColoring()
         if (!this->VolumePropsAndMappersConfigured)
         {
           visible = vtkF3DRenderer::ConfigureVolumeForColoring(mapper,
-            prop, info.Name, this->ComponentForColoring,
+            prop, info.value().Name, this->ComponentForColoring,
             this->ColorTransferFunction, this->ColorRange, this->UseCellColoring,
             this->UseInverseOpacityFunction);
           if (!visible)
           {
             F3DLog::Print(
-              F3DLog::Severity::Warning, "Cannot find the array \"" + info.Name + "\" to display volume with");
+              F3DLog::Severity::Warning, "Cannot find the array \"" + info.value().Name + "\" to display volume with");
           }
         }
       }
@@ -2509,7 +2397,7 @@ void vtkF3DRenderer::ConfigureColoring()
   if (barVisible && !this->ScalarBarActorConfigured)
   {
     vtkF3DRenderer::ConfigureScalarBarActorForColoring(
-      this->ScalarBarActor, info.Name, this->ComponentForColoring, this->ColorTransferFunction);
+      this->ScalarBarActor, info.value().Name, this->ComponentForColoring, this->ColorTransferFunction);
     this->ScalarBarActorConfigured = true;
   }
 
@@ -2523,11 +2411,11 @@ std::string vtkF3DRenderer::GetColoringDescription()
   assert(this->Importer);
 
   std::stringstream stream;
-  vtkF3DMetaImporter::ColoringInfo info;
-  if (this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
+  auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
+  if (info.has_value())
   {
     stream << "Coloring using " << (this->UseCellColoring ? "cell" : "point") << " array named "
-           << info.Name << ", "
+           << info.value().Name << (this->EnableColoring ? ", " : " (forced), ")
            << vtkF3DRenderer::ComponentToString(this->ComponentForColoring) << "\n";
   }
   else
@@ -2657,7 +2545,7 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
-  const vtkF3DMetaImporter::ColoringInfo& info)
+  const F3DColoringInfoHandler::ColoringInfo& info)
 {
   if (this->ComponentForColoring == -2)
   {
@@ -2739,30 +2627,39 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::CycleFieldForColoring()
 {
-  // A generic approach will be better when adding categorical field data coloring
-  this->UseCellColoring = !this->UseCellColoring;
+  // XXX: A generic approach will be better when adding categorical field data coloring
+  this->SetUseCellColoring(!this->UseCellColoring);
+  bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
+  F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
+  auto info = coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, true);
+  if (!info.has_value())
+  {
+    // Cycle array if the current one is not valid
+    this->CycleArrayForColoring();
+  }
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::CycleArrayIndexForColoring()
+void vtkF3DRenderer::CycleArrayForColoring()
 {
   assert(this->Importer);
+  this->Importer->GetColoringInfoHandler().CycleColoringArray(!this->UseVolume); //TODO check this cond
+  auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
+  bool enable = info.has_value();
 
-  int nIndex = this->Importer->GetNumberOfIndexesForColoring(this->UseCellColoring);
-  if (nIndex <= 0)
+  this->SetEnableColoring(enable);
+  if (this->EnableColoring)
   {
-    return;
-  }
-
-  if (this->UseVolume)
-  {
-    this->ArrayIndexForColoring = (this->ArrayIndexForColoring + 1) % nIndex;
+    this->SetArrayNameForColoring(info.value().Name);
+    if (this->ComponentForColoring >= info.value().MaximumNumberOfComponents)
+    {
+      // Cycle component if the current one is not valid
+      this->CycleComponentForColoring();
+    }
   }
   else
   {
-    // Cycle through arrays looping back to -1
-    // -1 0 1 2 -1 0 1 2 ...
-    this->ArrayIndexForColoring = (this->ArrayIndexForColoring + 2) % (nIndex + 1) - 1;
+    this->SetArrayNameForColoring(std::nullopt);
   }
 }
 
@@ -2771,15 +2668,15 @@ void vtkF3DRenderer::CycleComponentForColoring()
 {
   assert(this->Importer);
 
-  vtkF3DMetaImporter::ColoringInfo info;
-  if (!this->Importer->GetInfoForColoring(this->UseCellColoring, this->ArrayIndexForColoring, info))
+  auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
+  if (!info.has_value())
   {
     return;
   }
 
   // -2 -1 0 1 2 3 4
-  this->ComponentForColoring =
-    (this->ComponentForColoring + 3) % (info.MaximumNumberOfComponents + 2) - 2;
+  this->SetComponentForColoring(
+    (this->ComponentForColoring + 3) % (info.value().MaximumNumberOfComponents + 2) - 2);
 }
 
 //----------------------------------------------------------------------------
@@ -2797,21 +2694,20 @@ std::string vtkF3DRenderer::ComponentToString(int component)
   }
   else
   {
-    vtkF3DMetaImporter::ColoringInfo info;
-    if (!this->Importer->GetInfoForColoring(
-          this->UseCellColoring, this->ArrayIndexForColoring, info))
+    auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
+    if (!info.has_value())
     {
       return "";
     }
-    if (component >= info.MaximumNumberOfComponents)
+    if (component >= info.value().MaximumNumberOfComponents)
     {
       return "";
     }
 
     std::string componentName;
-    if (component < static_cast<int>(info.ComponentNames.size()))
+    if (component < static_cast<int>(info.value().ComponentNames.size()))
     {
-      componentName = info.ComponentNames[component];
+      componentName = info.value().ComponentNames[component];
     }
     if (componentName.empty())
     {

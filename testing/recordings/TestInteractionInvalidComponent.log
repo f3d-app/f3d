@@ -1,0 +1,10 @@
+# StreamVersion 1.2
+ExposeEvent 0 599 0 0 0 0 0
+RenderEvent 0 599 0 0 0 0 0
+TimerEvent 0 599 0 0 0 0 0
+TimerEvent 0 599 0 0 0 0 0
+KeyPressEvent 291 357 0 104 1 h 0
+CharEvent 291 357 0 104 1 h 0
+TimerEvent 0 599 0 0 0 0 0
+KeyReleaseEvent 291 357 0 104 1 h 0
+TimerEvent 291 357 0 104 1 h 0

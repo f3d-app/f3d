@@ -176,6 +176,7 @@ public:
     vtkRenderWindow* renWin = self->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
     bool checkColoring = false;
+    bool printColoring = false;
     bool render = false;
 
     // Available keycodes: None
@@ -190,28 +191,28 @@ public:
       case 'C':
         if (ren)
         {
-          ren->CycleScalars(vtkF3DRenderer::CycleType::FIELD);
-          self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+          ren->CycleFieldForColoring();
           checkColoring = true;
           render = true;
+          printColoring = true;
         }
         break;
       case 'S':
         if (ren)
         {
-          ren->CycleScalars(vtkF3DRenderer::CycleType::ARRAY_INDEX);
-          self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+          ren->CycleArrayForColoring();
           checkColoring = true;
           render = true;
+          printColoring = true;
         }
         break;
       case 'Y':
         if (ren)
         {
-          ren->CycleScalars(vtkF3DRenderer::CycleType::COMPONENT);
-          self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+          ren->CycleComponentForColoring();
           checkColoring = true;
           render = true;
+          printColoring = true;
         }
         break;
       case 'B':
@@ -273,6 +274,7 @@ public:
       case 'V':
         self->Options.model.volume.enable = !self->Options.model.volume.enable;
         render = true;
+        printColoring = true;
         break;
       case 'I':
         self->Options.model.volume.inverse = !self->Options.model.volume.inverse;
@@ -379,14 +381,18 @@ public:
     if (checkColoring)
     {
       // Resynchronise renderer coloring status with options
-      self->Options.model.scivis.enable = ren->GetColoringEnabled();
-      self->Options.model.scivis.cells = ren->GetColoringUseCell();
-      self->Options.model.scivis.array_name = ren->GetColoringArrayName();
-      self->Options.model.scivis.component = ren->GetColoringComponent();
+      self->Options.model.scivis.enable = ren->GetEnableColoring();
+      self->Options.model.scivis.cells = ren->GetUseCellColoring();
+      self->Options.model.scivis.array_name = ren->GetArrayNameForColoring();
+      self->Options.model.scivis.component = ren->GetComponentForColoring();
     }
     if (render)
     {
       self->Window.render();
+    }
+    if (printColoring)
+    {
+      self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     }
   }
 
