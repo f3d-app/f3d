@@ -38,7 +38,7 @@ f3d /path/to/file.ext
 
 Optionally, append `--output=/path/to/img.png` to save the rendering into an image file.
 
-See the [Quickstart Guide](QUICKSTART.md) for more information about getting started with F3D.
+See the [Quickstart Guide](doc/user/QUICKSTART.md) for more information about getting started with F3D.
 
 # Documentation
 

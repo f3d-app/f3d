@@ -35,23 +35,33 @@ f3d --help
 man f3d # Linux only
 ```
 
-Once you've opened your file in F3D, you're all set to start visualizing! Press <kbd>H</kbd> to open a list of shortcuts to help you interact with your scene. 
+Once you've opened your file in F3D, you're all set to start visualizing! Press <kbd>H</kbd> to open a list of shortcuts to help you interact with your scene.
 
 See the [supported file formats](SUPPORTED_FORMATS.md) page for the full list of file types that F3D can open.
 
 ## Constructing scenes
 
-For most file formats, F3D constructs **a default scene**, loading only the *geometry* from the file.
+Certain [formats](SUPPORTED_FORMATS.md) are listed as **full scene** formats (.gltf/.glb, .3ds, .wrl, .obj, .fbx, .dae, .off, .x, .3mf, .usd)
+which means these files contain not only *geometry* but also some scene information like *lights*, *cameras*, *actors* in the scene,
+as well as *texture* properties. By default, all this information will be loaded from the file and displayed.
+For file formats that are not **full scene**, **a default scene** is created.
 
-However, formats supporting **full scenes** will automatically load additional scene properties including *lights*, *cameras*, *actors* and *texture*.
+For **default scene** formats, certain default values are set automatically:
+ - texture-*: ""
+ - line-width: 1.0
+ - point-size: 10.0
+ - opacity: 1.0
+ - color: 1.0, 1.0, 1.0
+ - emissive-factor: 1.0, 1.0, 1.0
+ - normal-scale: 1.0
+ - metallic: 0.0
+ - roughness: 0.3
 
-If you'd like to disable these properties, you can specify the `--geometry-only` [option](OPTIONS.md) from the command line to construct a default scene instead.
-
-See the table of [supported file formats](SUPPORTED_FORMATS.md) if you're unsure about what kind of scene your file supports.
+They will be overridden when using corresponding [options](OPTIONS.md).
 
 ## Interacting with your scene
 
-Once you've loaded your scene in F3D, you can interact with it by using your mouse and certain hotkeys. 
+Once you've loaded your scene in F3D, you can interact with it by using your mouse and certain hotkeys.
 
 ### Moving the camera
 
@@ -63,7 +73,7 @@ Once you've loaded your scene in F3D, you can interact with it by using your mou
 * Press <kbd>Enter</kbd> to reset the camera.
 * Press <kbd>Space</kbd> to play animation, if any.
 * Press <kbd>G</kbd> to toggle the horizontal grid.
-* Press <kbd>H</kbd> to display a cheatsheet of hotkey interactions. 
+* Press <kbd>H</kbd> to display a cheatsheet of hotkey interactions.
 
 For more information, see the [Interactions](INTERACTIONS.md) page.
 
@@ -71,9 +81,9 @@ For more information, see the [Interactions](INTERACTIONS.md) page.
 
 F3D can play [animations](ANIMATIONS.md) for any [supported files](SUPPORTED_FORMATS.md) that contain them.
 
-With your file loaded into F3D, press the <kbd>W</kbd> hotkey to cycle through available animations. Then, press <kbd>Space</kbd> to play your selected animation. 
+With your file loaded into F3D, press the <kbd>W</kbd> hotkey to cycle through available animations. Then, press <kbd>Space</kbd> to play your selected animation.
 
-Alternatively, you can use the command line to play animations. Use the `--animation-index` [option](OPTIONS.md) to specify which animation you want to play. To play all animations at once, use `--animation-index=-1` (`.gltf`/`.glb` only). 
+Alternatively, you can use the command line to play animations. Use the `--animation-index` [option](OPTIONS.md) to specify which animation you want to play. To play all animations at once, use `--animation-index=-1` (`.gltf`/`.glb` only).
 
 For more information, see the [Animations](ANIMATIONS.md) page.
 
