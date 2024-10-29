@@ -336,7 +336,7 @@ void vtkF3DRenderer::InitializeUpVector(const std::string& upString)
   }
   else
   {
-    F3DLog::Print(F3DLog::Severity::Warning, upString + " is not a valid up direction");
+    F3DLog::Print(F3DLog::Severity::Warning, upString + " is not a valid up direction\n");
   }
 }
 
@@ -403,7 +403,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     else
     {
       F3DLog::Print(F3DLog::Severity::Warning,
-        "Final shader must define a function named \"pixel\"");
+        "Final shader must define a function named \"pixel\"\n");
     }
   }
 
@@ -425,7 +425,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   if (this->UseRaytracing || this->UseRaytracingDenoiser)
   {
     F3DLog::Print(F3DLog::Severity::Warning,
-      "Raytracing options can't be used if F3D has not been built with raytracing");
+      "Raytracing options can't be used if F3D has not been built with raytracing\n");
   }
 #endif
   this->RenderPassesConfigured = true;
@@ -781,7 +781,7 @@ void vtkF3DRenderer::ConfigureHDRIReader()
       if (!vtksys::SystemTools::FileExists(this->HDRIFile.value(), true))
       {
         F3DLog::Print(
-          F3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile.value());
+          F3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile.value() + "\n");
       }
       else
       {
@@ -795,7 +795,7 @@ void vtkF3DRenderer::ConfigureHDRIReader()
         {
           F3DLog::Print(F3DLog::Severity::Warning,
             std::string("Cannot open HDRI file ") + this->HDRIFile.value() +
-              std::string(". Using default HDRI"));
+              std::string(". Using default HDRI\n"));
         }
       }
     }
@@ -1113,7 +1113,7 @@ void vtkF3DRenderer::ConfigureTextActors()
     else
     {
       F3DLog::Print(
-        F3DLog::Severity::Warning, std::string("Cannot find \"") + tmpFontFile + "\" font file.");
+        F3DLog::Severity::Warning, std::string("Cannot find \"") + tmpFontFile + "\" font file.\n");
     }
   }
 
@@ -1915,7 +1915,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     else
     {
       setBackfaceCulling = false;
-      F3DLog::Print(F3DLog::Severity::Warning, this->BackfaceType.value() + " is not a valid backface type, assuming it is not set");
+      F3DLog::Print(F3DLog::Severity::Warning, this->BackfaceType.value() + " is not a valid backface type, assuming it is not set\n");
     }
   }
 
@@ -2053,7 +2053,7 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
     {
       F3DLog::Print(F3DLog::Severity::Warning,
         "Compute shaders are not supported, gaussians are not sorted, resulting in blending "
-        "artifacts");
+        "artifacts\n");
     }
 #endif
   }
@@ -2088,7 +2088,7 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
       mapper->SetLowpassMatrix(lowPass);
 #else
       F3DLog::Print(F3DLog::Severity::Warning,
-        "Gaussian splatting selected but VTK <= 9.3 only supports isotropic gaussians");
+        "Gaussian splatting selected but VTK <= 9.3 only supports isotropic gaussians\n");
 #endif
 
       actor->ForceTranslucentOn();
@@ -2374,7 +2374,7 @@ void vtkF3DRenderer::ConfigureColoring()
           if (!visible)
           {
             F3DLog::Print(
-              F3DLog::Severity::Warning, "Cannot find the array \"" + info.value().Name + "\" to display volume with");
+              F3DLog::Severity::Warning, "Cannot find the array \"" + info.value().Name + "\" to display volume with\n");
           }
         }
       }
@@ -2386,7 +2386,7 @@ void vtkF3DRenderer::ConfigureColoring()
     if (!this->VolumePropsAndMappersConfigured && volPropsAndMappers.size() == 0)
     {
       F3DLog::Print(
-        F3DLog::Severity::Error, "Cannot use volume with this data");
+        F3DLog::Severity::Error, "Cannot use volume with this data\n");
     }
     this->VolumePropsAndMappersConfigured = true;
   }
@@ -2451,7 +2451,7 @@ bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const
     {
       // comp > 4 is actually not supported and would fail with a vtk error
       F3DLog::Print(F3DLog::Severity::Warning,
-        "Direct scalars rendering not supported by array with more than 4 components");
+        "Direct scalars rendering not supported by array with more than 4 components\n");
       return false;
     }
     else
@@ -2503,7 +2503,7 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper,
     {
       // comp > 4 is actually not supported and would fail with a vtk error
       F3DLog::Print(F3DLog::Severity::Warning,
-        "Direct scalars rendering not supported by array with more than 4 components");
+        "Direct scalars rendering not supported by array with more than 4 components\n");
       return false;
     }
     else
@@ -2609,7 +2609,7 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     else
     {
       F3DLog::Print(F3DLog::Severity::Warning,
-        "Specified color map list count is not a multiple of 4, ignoring it.");
+        "Specified color map list count is not a multiple of 4, ignoring it.\n");
     }
   }
 

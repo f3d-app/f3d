@@ -262,7 +262,7 @@ bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
   assert(this->Pimpl->Reader);
   if(!this->Pimpl->PostPro->UpdateTimeStep(timeValue) || !this->Pimpl->Reader->GetOutputDataObject(0))
   {
-    F3DLog::Print(F3DLog::Severity::Warning, "A reader failed to update at a timeValue");
+    F3DLog::Print(F3DLog::Severity::Warning, "A reader failed to update at a timeValue\n");
     return false;
   }
 
