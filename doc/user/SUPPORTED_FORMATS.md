@@ -29,7 +29,7 @@ F3D supports the following file formats:
 | Drawing Exchange Format | `.dxf` | Full | | `assimp` |
 | DirectX | `.x` | Full | Yes | `assimp` |
 | 3D Manufacturing Format | `.3mf` | Full | | `assimp` |
-| Universal Scene Description | `.usd` | Full | Yes | `usd` |
+| Universal Scene Description | `.usd`, `.usda`, `.usdc`, `.usdz` | Full | Yes | `usd` |
 | VDB | `.vdb` | Default | | `vdb` |
 
 \***Note:** As of version 2.5.0, F3D support for VDB is still experimental.
