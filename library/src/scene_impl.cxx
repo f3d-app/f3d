@@ -158,8 +158,11 @@ public:
       this->Window.getCamera().resetToBounds();
     }
 
-    // Print info about scene and coloring
+    // Display coloring information
     this->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+    log::debug("");
+
+    // Print scene description
     this->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
   }
 

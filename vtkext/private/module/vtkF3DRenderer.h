@@ -158,6 +158,7 @@ public:
   /**
    * Return description about the current rendering status
    * Currently contains information about the camera and the grid if any
+   * Returns a multiline string containing the scene description
    */
   std::string GetSceneDescription();
 
@@ -321,6 +322,7 @@ public:
 
   /**
    * Get information about the current coloring
+   * Returns a single line string containing the coloring description
    */
   virtual std::string GetColoringDescription();
 
@@ -406,7 +408,8 @@ private:
 
   /**
    * Generate a padded metadata description
-   * using the internal importer
+   * using the internal importer.
+   * Returns a multiline string containing the meta data description
    */
   std::string GenerateMetaDataDescription();
 
