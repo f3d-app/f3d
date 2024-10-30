@@ -120,7 +120,7 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetC
 
     if (!quiet)
     {
-      F3DLog::Print(F3DLog::Severity::Debug, "No array to color with\n");
+      F3DLog::Print(F3DLog::Severity::Debug, "No array to color with");
     }
   }
   else if (!arrayName.has_value())
@@ -138,7 +138,7 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetC
       this->CurrentColoringIter.reset();
       if (!quiet)
       {
-        F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: \"" + arrayName.value() + "\"\n");
+        F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: \"" + arrayName.value() + "\"");
       }
     }
   }
