@@ -29,7 +29,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "output", "" },
   { "no-background", "false" },
   { "config", "" },
-  { "dry-run", "false" },
+  { "no-config", "false" },
   { "no-render", "false" },
   { "rendering-backend", "auto" },
   { "max-size", "-1.0" },
