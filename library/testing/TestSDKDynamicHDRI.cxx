@@ -52,7 +52,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   // Change the hdri and make sure it is taken into account
   opt.render.hdri.file = std::string(argv[1]) + "data/palermo_park_1k.hdr";
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRI", 50);
+    std::string(argv[2]), "TestSDKDynamicHDRI");
   if (!ret)
   {
     std::cerr << "Render with HDRI failed" << std::endl;
@@ -70,7 +70,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   // Force a cache path change to force a LUT reconfiguration and test dynamic cache path
   eng.setCachePath(std::string(argv[2]) + "/cache_" + std::to_string(dist(e1)));
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRI", 50);
+    std::string(argv[2]), "TestSDKDynamicHDRI");
   if (!ret)
   {
     std::cerr << "Render with HDRI with another cache path failed" << std::endl;
@@ -80,7 +80,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   // Use an existing cache
   eng.setCachePath(cachePath);
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRI", 50);
+    std::string(argv[2]), "TestSDKDynamicHDRI");
   if (!ret)
   {
     std::cerr << "Render with HDRI with existing cache path failed" << std::endl;
@@ -91,7 +91,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   // Change the hdri and make sure it is taken into account
   opt.render.hdri.file = std::string(argv[1]) + "/data/kloofendal_43d_clear_1k.exr";
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRIExr", 50);
+    std::string(argv[2]), "TestSDKDynamicHDRIExr");
 
   if (!ret)
   {

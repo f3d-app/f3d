@@ -338,6 +338,13 @@ void* image::getContent() const
 //----------------------------------------------------------------------------
 bool image::compare(const image& reference, double threshold, double& error) const
 {
+  // Sanity check for threshold
+  if (threshold < 0 || threshold >= 1)
+  {
+    error = 1;
+    return false;
+  }
+
   ChannelType type = this->getChannelType();
   if (type != reference.getChannelType())
   {
