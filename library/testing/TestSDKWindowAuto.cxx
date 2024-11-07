@@ -34,8 +34,10 @@ int TestSDKWindowAuto(int argc, char* argv[])
   f3d::options& options = eng.getOptions();
   options.render.background.color = { 0.8, 0.2, 0.9 };
 
+  // XXX: Use a higher threshold as background difference can be strong with older versions of VTK
+  // This can be removed once VTK 9.3 support is removed
   return TestSDKHelpers::RenderTest(
-           win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKWindowStandard")
+           win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKWindowStandard", 0.12)
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }
