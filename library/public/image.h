@@ -144,6 +144,7 @@ public:
    * Please note, due to possible arithmetic imprecision in the SSIM computation
    * using a threshold of zero may return false with identical images.
    * Depending on the VTK version, another comparison algorithm may be used.
+   * Threshold should be in range [0, 1[, this returns false otherwise.
    * 1e-14: Pixel perfect comparison.
    * 0.05: Visually indistinguishable.
    * 0.1: Small visible difference.
