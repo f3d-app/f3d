@@ -843,38 +843,18 @@ int F3DStarter::Start(int argc, char** argv)
         return true;
       });
 
-    interactor.setKeyPressCallBack(
-      [this](int, const std::string& keySym) -> bool
-      {
-        if (keySym == "Left")
-        {
-          return this->Internals->Engine->getInteractor().triggerCommand(
-            "load_previous_file_group");
-        }
-        if (keySym == "Right")
-        {
-          return this->Internals->Engine->getInteractor().triggerCommand("load_next_file_group");
-        }
-        if (keySym == "Up")
-        {
-          return this->Internals->Engine->getInteractor().triggerCommand(
-            "reload_current_file_group");
-        }
-        if (keySym == "Down")
-        {
-          return this->Internals->Engine->getInteractor().triggerCommand("add_current_directories");
-        }
-
-        if (keySym == "F12")
-        {
-          return this->Internals->Engine->getInteractor().triggerCommand("take_screenshot");
-        }
-        if (keySym == "F11")
-        {
-          return this->Internals->Engine->getInteractor().triggerCommand("take_minimal_screenshot");
-        }
-        return false;
-      });
+    interactor.addInteractionCommands(
+      "Left", f3d::interactor::ModifierKeys::ANY, { "load_previous_file_group" });
+    interactor.addInteractionCommands(
+      "Right", f3d::interactor::ModifierKeys::ANY, { "load_next_file_group" });
+    interactor.addInteractionCommands(
+      "Up", f3d::interactor::ModifierKeys::ANY, { "reload_current_file_group" });
+    interactor.addInteractionCommands(
+      "Down", f3d::interactor::ModifierKeys::ANY, { "add_current_directories" });
+    interactor.addInteractionCommands(
+      "F11", f3d::interactor::ModifierKeys::ANY, { "take_minimal_screenshot" });
+    interactor.addInteractionCommands(
+      "F12", f3d::interactor::ModifierKeys::ANY, { "take_screenshot" });
 
     interactor.setDropFilesCallBack(
       [this](const std::vector<std::string>& filesVec) -> bool

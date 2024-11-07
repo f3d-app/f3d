@@ -196,10 +196,10 @@ public:
   //----------------------------------------------------------------------------
   static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
   {
-
     internals* self = static_cast<internals*>(clientData);
     vtkRenderWindowInteractor* rwi = self->Style->GetInteractor();
-    int keyCode = std::toupper(rwi->GetKeyCode());
+    int shift = rwi->GetShiftKey();
+    int ctrl = rwi->GetControlKey();
     std::string keySym = rwi->GetKeySym();
     if (keySym.length() > 0)
     {
@@ -207,134 +207,46 @@ public:
       keySym[0] = std::toupper(keySym[0]);
     }
 
-    if (self->KeyPressUserCallBack(keyCode, keySym))
+    // Actual key press implementation
+    // Check of an *any modifier* interaction first
+    auto mapKey = std::make_pair(keySym, ModifierKeys::ANY);
+    auto commandsIt = self->InteractionCommands.find(mapKey);
+    if (commandsIt != self->InteractionCommands.end())
     {
-      return;
+      for (const std::string& command : commandsIt->second)
+      {
+        if (!self->Interactor.triggerCommand(command))
+        {
+          log::error("Interaction: error running command:\"", command, "\", ignoring");
+        }
+      }
     }
 
-    // Available keycodes: None
-    switch (keyCode)
+    // Check for an interaction command with modifiers
+    ModifierKeys modifiers = ModifierKeys::NONE;
+    if (shift == 1 && ctrl == 1)
     {
-      case 'W':
-        self->Interactor.triggerCommand("cycle_animation");
-        break;
-      case 'C':
-        self->Interactor.triggerCommand("cycle_coloring field");
-        break;
-      case 'S':
-        self->Interactor.triggerCommand("cycle_coloring array");
-        break;
-      case 'Y':
-        self->Interactor.triggerCommand("cycle_coloring component");
-        break;
-      case 'B':
-        self->Interactor.triggerCommand("toggle ui.scalar_bar");
-        break;
-      case 'P':
-        self->Interactor.triggerCommand("toggle render.effect.translucency_support");
-        break;
-      case 'Q':
-        self->Interactor.triggerCommand("toggle render.effect.ambient_occlusion");
-        break;
-      case 'A':
-        self->Interactor.triggerCommand("toggle render.effect.anti_aliasing");
-        break;
-      case 'T':
-        self->Interactor.triggerCommand("toggle render.effect.tone_mapping");
-        break;
-      case 'E':
-        self->Interactor.triggerCommand("toggle render.show_edges");
-        break;
-      case 'X':
-        self->Interactor.triggerCommand("toggle interactor.axis");
-        break;
-      case 'G':
-        self->Interactor.triggerCommand("toggle render.grid.enable");
-        break;
-      case 'N':
-        self->Interactor.triggerCommand("toggle ui.filename");
-        break;
-      case 'M':
-        self->Interactor.triggerCommand("toggle ui.metadata");
-        break;
-      case 'Z':
-        self->Interactor.triggerCommand("toggle_fps");
-        break;
-      case 'R':
-        self->Interactor.triggerCommand("toggle render.raytracing.enable");
-        break;
-      case 'D':
-        self->Interactor.triggerCommand("toggle render.raytracing.denoise");
-        break;
-      case 'V':
-        self->Interactor.triggerCommand("toggle_volume_rendering");
-        break;
-      case 'I':
-        self->Interactor.triggerCommand("toggle model.volume.inverse");
-        break;
-      case 'O':
-        self->Interactor.triggerCommand("toggle model.point_sprites.enable");
-        break;
-      case 'U':
-        self->Interactor.triggerCommand("toggle render.background.blur");
-        break;
-      case 'K':
-        self->Interactor.triggerCommand("toggle interactor.trackball");
-        break;
-      case 'F':
-        self->Interactor.triggerCommand("toggle render.hdri.ambient");
-        break;
-      case 'J':
-        self->Interactor.triggerCommand("toggle render.background.skybox");
-        break;
-      case 'L':
+      modifiers = ModifierKeys::CTRL_SHIFT;
+    }
+    else if (ctrl == 1)
+    {
+      modifiers = ModifierKeys::CTRL;
+    }
+    else if (shift == 1)
+    {
+      modifiers = ModifierKeys::SHIFT;
+    }
+    mapKey.second = modifiers;
+    commandsIt = self->InteractionCommands.find(mapKey);
+    if (commandsIt != self->InteractionCommands.end())
+    {
+      for (const std::string& command : commandsIt->second)
       {
-        std::string command =
-          rwi->GetShiftKey() ? "decrease_light_intensity" : "increase_light_intensity";
-        self->Interactor.triggerCommand(std::move(command));
-        break;
+        if (!self->Interactor.triggerCommand(command))
+        {
+          log::error("Interaction: error running command:\"", command, "\", ignoring");
+        }
       }
-      case 'H':
-        self->Interactor.triggerCommand("toggle ui.cheatsheet");
-        break;
-      case '?':
-        self->Interactor.triggerCommand("print_scene_info");
-        break;
-      case '1':
-        self->Interactor.triggerCommand("set_camera front");
-        break;
-      case '3':
-        self->Interactor.triggerCommand("set_camera right");
-        break;
-      case '4':
-        self->Interactor.triggerCommand("roll_camera -90");
-        break;
-      case '5':
-        self->Interactor.triggerCommand("toggle scene.camera.orthographic");
-        break;
-      case '6':
-        self->Interactor.triggerCommand("roll_camera 90");
-        break;
-      case '7':
-        self->Interactor.triggerCommand("set_camera top");
-        break;
-      case '9':
-        self->Interactor.triggerCommand("set_camera isometric");
-        break;
-      default:
-        if (keySym == F3D_EXIT_HOTKEY_SYM)
-        {
-          self->Interactor.triggerCommand("stop_interactor");
-        }
-        else if (keySym == "Return")
-        {
-          self->Interactor.triggerCommand("reset_camera");
-        }
-        else if (keySym == "Space")
-        {
-          self->Interactor.triggerCommand("toggle_animation");
-        }
-        break;
     }
 
     // Always render after interaction
@@ -456,8 +368,6 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  std::function<bool(int, const std::string&)> KeyPressUserCallBack = [](int, const std::string&)
-  { return false; };
   std::function<bool(const std::vector<std::string>&)> DropFilesUserCallBack =
     [](const std::vector<std::string>&) { return false; };
 
@@ -523,6 +433,7 @@ public:
   std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
 
   std::map<std::string, std::function<bool(const std::vector<std::string>&)>> CommandCallbacks;
+  std::map<std::pair<std::string, ModifierKeys>, std::vector<std::string>> InteractionCommands;
 
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;
@@ -746,17 +657,52 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
       this->Internals->AnimationManager->ToggleAnimation();
       return true;
     });
+
+  // Available standard keys: None
+  this->addInteractionCommands("W", ModifierKeys::ANY, { "cycle_animation" });
+  this->addInteractionCommands("C", ModifierKeys::ANY, { "cycle_coloring field" });
+  this->addInteractionCommands("S", ModifierKeys::ANY, { "cycle_coloring array" });
+  this->addInteractionCommands("Y", ModifierKeys::ANY, { "cycle_coloring component" });
+  this->addInteractionCommands("B", ModifierKeys::ANY, { "toggle ui.scalar_bar" });
+  this->addInteractionCommands(
+    "P", ModifierKeys::ANY, { "toggle render.effect.translucency_support" });
+  this->addInteractionCommands(
+    "Q", ModifierKeys::ANY, { "toggle render.effect.ambient_occlusion" });
+  this->addInteractionCommands("A", ModifierKeys::ANY, { "toggle render.effect.anti_aliasing" });
+  this->addInteractionCommands("T", ModifierKeys::ANY, { "toggle render.effect.tone_mapping" });
+  this->addInteractionCommands("E", ModifierKeys::ANY, { "toggle render.show_edges" });
+  this->addInteractionCommands("X", ModifierKeys::ANY, { "toggle interactor.axis" });
+  this->addInteractionCommands("G", ModifierKeys::ANY, { "toggle render.grid.enable" });
+  this->addInteractionCommands("N", ModifierKeys::ANY, { "toggle ui.filename" });
+  this->addInteractionCommands("M", ModifierKeys::ANY, { "toggle ui.metadata" });
+  this->addInteractionCommands("Z", ModifierKeys::ANY, { "toggle_fps" });
+  this->addInteractionCommands("R", ModifierKeys::ANY, { "toggle render.raytracing.enable" });
+  this->addInteractionCommands("D", ModifierKeys::ANY, { "toggle render.raytracing.denoise" });
+  this->addInteractionCommands("V", ModifierKeys::ANY, { "toggle_volume_rendering" });
+  this->addInteractionCommands("I", ModifierKeys::ANY, { "toggle model.volume.inverse" });
+  this->addInteractionCommands("O", ModifierKeys::ANY, { "toggle model.point_sprites.enable" });
+  this->addInteractionCommands("U", ModifierKeys::ANY, { "toggle render.background.blur" });
+  this->addInteractionCommands("K", ModifierKeys::ANY, { "toggle interactor.trackball" });
+  this->addInteractionCommands("F", ModifierKeys::ANY, { "toggle render.hdri.ambient" });
+  this->addInteractionCommands("J", ModifierKeys::ANY, { "toggle render.background.skybox" });
+  this->addInteractionCommands("L", ModifierKeys::NONE, { "increase_light_intensity" });
+  this->addInteractionCommands("L", ModifierKeys::SHIFT, { "decrease_light_intensity" });
+  this->addInteractionCommands("H", ModifierKeys::ANY, { "toggle ui.cheatsheet" });
+  this->addInteractionCommands("Question", ModifierKeys::ANY, { "print_scene_info" });
+  this->addInteractionCommands("1", ModifierKeys::ANY, { "set_camera front" });
+  this->addInteractionCommands("3", ModifierKeys::ANY, { "set_camera right" });
+  this->addInteractionCommands("4", ModifierKeys::ANY, { "roll_camera -90" });
+  this->addInteractionCommands("5", ModifierKeys::ANY, { "toggle scene.camera.orthographic" });
+  this->addInteractionCommands("6", ModifierKeys::ANY, { "roll_camera 90" });
+  this->addInteractionCommands("7", ModifierKeys::ANY, { "set_camera top" });
+  this->addInteractionCommands("9", ModifierKeys::ANY, { "set_camera isometric" });
+  this->addInteractionCommands(F3D_EXIT_HOTKEY_SYM, ModifierKeys::ANY, { "stop_interactor" });
+  this->addInteractionCommands("Return", ModifierKeys::ANY, { "reset_camera" });
+  this->addInteractionCommands("Space", ModifierKeys::ANY, { "toggle_animation" });
 }
 
 //----------------------------------------------------------------------------
 interactor_impl::~interactor_impl() = default;
-
-//----------------------------------------------------------------------------
-interactor& interactor_impl::setKeyPressCallBack(std::function<bool(int, std::string)> callBack)
-{
-  this->Internals->KeyPressUserCallBack = callBack;
-  return *this;
-}
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::setDropFilesCallBack(
@@ -831,6 +777,23 @@ bool interactor_impl::triggerCommand(std::string_view command)
       "\" cannot be parsed into an option, ignoring");
   }
   return false;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::addInteractionCommands(
+  std::string interaction, ModifierKeys modifiers, const std::vector<std::string>& commands)
+{
+  this->Internals->InteractionCommands[std::make_pair(std::move(interaction), modifiers)] =
+    commands;
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::removeInteractionCommands(
+  const std::string& interaction, ModifierKeys modifiers)
+{
+  this->Internals->InteractionCommands.erase(std::make_pair(interaction, modifiers));
+  return *this;
 }
 
 //----------------------------------------------------------------------------

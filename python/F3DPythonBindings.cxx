@@ -228,6 +228,10 @@ PYBIND11_MODULE(pyf3d, module)
     .def("remove_command_callback", &f3d::interactor::removeCommandCallback,
       "Remove a command callback")
     .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command")
+    .def("add_interaction_command", &f3d::interactor::addInteractionCommands,
+      "Add new interaction commands")
+    .def("remove_interaction_command", &f3d::interactor::removeInteractionCommands,
+      "Remove interaction commands")
     .def_static("get_default_interactions_info", &f3d::interactor::getDefaultInteractionsInfo);
 
   // f3d::mesh_t
@@ -334,6 +338,14 @@ PYBIND11_MODULE(pyf3d, module)
 
   // f3d::engine
   py::class_<f3d::engine> engine(module, "Engine");
+
+  py::enum_<f3d::interactor::ModifierKeys>(interactor, "ModifierKeys")
+    .value("ANY", f3d::interactor::ModifierKeys::ANY)
+    .value("NONE", f3d::interactor::ModifierKeys::NONE)
+    .value("CTRL", f3d::interactor::ModifierKeys::CTRL)
+    .value("SHIFT", f3d::interactor::ModifierKeys::SHIFT)
+    .value("CTRL_SHIFT", f3d::interactor::ModifierKeys::CTRL_SHIFT)
+    .export_values();
 
   engine //
     .def_static("create", &f3d::engine::create, "Create an engine with a automatic window")
