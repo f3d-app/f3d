@@ -119,11 +119,12 @@ public:
     VT_TOP,
     VT_ISOMETRIC
   };
-  static void SetViewOrbit(ViewType view, internals* self)
+
+  void SetViewOrbit(ViewType view)
   {
     vtkNew<vtkMatrix3x3> transform;
-    self->ToEnvironmentSpace(transform);
-    camera& cam = self->Window.getCamera();
+    this->ToEnvironmentSpace(transform);
+    camera& cam = this->Window.getCamera();
     vector3_t up = { 0, 0, 1 };
     point3_t foc = cam.getFocalPoint();
     point3_t axis, newPos;
@@ -687,19 +688,19 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
       std::string_view type = args[0];
       if (type == "front")
       {
-        this->Internals->SetViewOrbit(internals::ViewType::VT_FRONT, this->Internals.get());
+        this->Internals->SetViewOrbit(internals::ViewType::VT_FRONT);
       }
       else if (type == "top")
       {
-        this->Internals->SetViewOrbit(internals::ViewType::VT_TOP, this->Internals.get());
+        this->Internals->SetViewOrbit(internals::ViewType::VT_TOP);
       }
       else if (type == "right")
       {
-        this->Internals->SetViewOrbit(internals::ViewType::VT_RIGHT, this->Internals.get());
+        this->Internals->SetViewOrbit(internals::ViewType::VT_RIGHT);
       }
       else if (type == "isometric")
       {
-        this->Internals->SetViewOrbit(internals::ViewType::VT_ISOMETRIC, this->Internals.get());
+        this->Internals->SetViewOrbit(internals::ViewType::VT_ISOMETRIC);
       }
       else
       {
