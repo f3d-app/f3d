@@ -3,6 +3,7 @@
 #include "animationManager.h"
 #include "log.h"
 #include "scene_impl.h"
+#include "utils.h"
 #include "window_impl.h"
 
 #include "vtkF3DConfigure.h"
@@ -25,9 +26,11 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <map>
+#include <vector>
 
 #include "camera.h"
 
@@ -36,10 +39,11 @@ namespace f3d::detail
 class interactor_impl::internals
 {
 public:
-  internals(options& options, window_impl& window, scene_impl& scene)
+  internals(options& options, window_impl& window, scene_impl& scene, interactor_impl& inter)
     : Options(options)
     , Window(window)
     , Scene(scene)
+    , Interactor(inter)
   {
     window::Type type = window.getType();
     if (type == window::Type::GLX || type == window::Type::WGL || type == window::Type::COCOA ||
@@ -154,6 +158,42 @@ public:
     cam.resetToBounds(0.9);
   }
 
+  //----------------------------------------------------------------------------
+  // Increase/Decrease light intensity
+  void IncreaseLightIntensity(bool negative)
+  {
+    const double intensity = this->Options.render.light.intensity;
+
+    /* `ref < x` is equivalent to:
+     * - `intensity <= x` when going down
+     * - `intensity < x` when going up */
+    const double ref = negative ? intensity - 1e-6 : intensity;
+    // clang-format off
+      /* offset in percentage points */
+      const int offsetPp = ref < .5 ?  1
+      : ref <  1 ?  2
+      : ref <  5 ?  5
+      : ref < 10 ? 10
+      :            25;
+    // clang-format on
+
+    /* new intensity in percents */
+    const int newIntensityPct = std::lround(intensity * 100) + (negative ? -offsetPp : +offsetPp);
+    this->Options.render.light.intensity = std::max(newIntensityPct, 0) / 100.0;
+  }
+
+  //----------------------------------------------------------------------------
+  // Synchronise options from the renderer properties
+  static void SynchronizeScivisOptions(f3d::options& opt, vtkF3DRenderer* ren)
+  {
+    // Synchronize renderer coloring status with scivis options
+    opt.model.scivis.enable = ren->GetEnableColoring();
+    opt.model.scivis.cells = ren->GetUseCellColoring();
+    opt.model.scivis.array_name = ren->GetArrayNameForColoring();
+    opt.model.scivis.component = ren->GetComponentForColoring();
+  }
+
+  //----------------------------------------------------------------------------
   static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
   {
 
@@ -172,230 +212,136 @@ public:
       return;
     }
 
-    // No user defined behavior, use standard behavior
-    vtkRenderWindow* renWin = self->Window.GetRenderWindow();
-    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    bool checkColoring = false;
-    bool printColoring = false;
-    bool render = false;
-
     // Available keycodes: None
     switch (keyCode)
     {
       case 'W':
-        self->AnimationManager->CycleAnimation();
-        self->Options.scene.animation.index = self->AnimationManager->GetAnimationIndex();
-        ren->SetAnimationnameInfo(self->AnimationManager->GetAnimationName());
-        render = true;
+        self->Interactor.triggerCommand("cycle_animation");
         break;
       case 'C':
-        if (ren)
-        {
-          ren->CycleFieldForColoring();
-          checkColoring = true;
-          render = true;
-          printColoring = true;
-        }
+        self->Interactor.triggerCommand("cycle_coloring field");
         break;
       case 'S':
-        if (ren)
-        {
-          ren->CycleArrayForColoring();
-          checkColoring = true;
-          render = true;
-          printColoring = true;
-        }
+        self->Interactor.triggerCommand("cycle_coloring array");
         break;
       case 'Y':
-        if (ren)
-        {
-          ren->CycleComponentForColoring();
-          checkColoring = true;
-          render = true;
-          printColoring = true;
-        }
+        self->Interactor.triggerCommand("cycle_coloring component");
         break;
       case 'B':
-        self->Options.ui.scalar_bar = !self->Options.ui.scalar_bar;
-        render = true;
+        self->Interactor.triggerCommand("toggle ui.scalar_bar");
         break;
       case 'P':
-        self->Options.render.effect.translucency_support =
-          !self->Options.render.effect.translucency_support;
-        render = true;
+        self->Interactor.triggerCommand("toggle render.effect.translucency_support");
         break;
       case 'Q':
-        self->Options.render.effect.ambient_occlusion =
-          !self->Options.render.effect.ambient_occlusion;
-        render = true;
+        self->Interactor.triggerCommand("toggle render.effect.ambient_occlusion");
         break;
       case 'A':
-        self->Options.render.effect.anti_aliasing = !self->Options.render.effect.anti_aliasing;
-        render = true;
+        self->Interactor.triggerCommand("toggle render.effect.anti_aliasing");
         break;
       case 'T':
-        self->Options.render.effect.tone_mapping = !self->Options.render.effect.tone_mapping;
-        render = true;
+        self->Interactor.triggerCommand("toggle render.effect.tone_mapping");
         break;
       case 'E':
-        self->Options.render.show_edges = !self->Options.render.show_edges;
-        render = true;
+        self->Interactor.triggerCommand("toggle render.show_edges");
         break;
       case 'X':
-        self->Options.interactor.axis = !self->Options.interactor.axis;
-        render = true;
+        self->Interactor.triggerCommand("toggle interactor.axis");
         break;
       case 'G':
-        self->Options.render.grid.enable = !self->Options.render.grid.enable;
-        render = true;
+        self->Interactor.triggerCommand("toggle render.grid.enable");
         break;
       case 'N':
-        self->Options.ui.filename = !self->Options.ui.filename;
-        render = true;
+        self->Interactor.triggerCommand("toggle ui.filename");
         break;
       case 'M':
-        self->Options.ui.metadata = !self->Options.ui.metadata;
-        render = true;
+        self->Interactor.triggerCommand("toggle ui.metadata");
         break;
       case 'Z':
-        self->Options.ui.fps = !self->Options.ui.fps;
-        self->Window.render();
-        self->Window.render();
-        // XXX: Double render is needed here
+        self->Interactor.triggerCommand("toggle_fps");
         break;
       case 'R':
-        self->Options.render.raytracing.enable = !self->Options.render.raytracing.enable;
-        render = true;
+        self->Interactor.triggerCommand("toggle render.raytracing.enable");
         break;
       case 'D':
-        self->Options.render.raytracing.denoise = !self->Options.render.raytracing.denoise;
-        render = true;
+        self->Interactor.triggerCommand("toggle render.raytracing.denoise");
         break;
       case 'V':
-        self->Options.model.volume.enable = !self->Options.model.volume.enable;
-        render = true;
-        printColoring = true;
+        self->Interactor.triggerCommand("toggle_volume_rendering");
         break;
       case 'I':
-        self->Options.model.volume.inverse = !self->Options.model.volume.inverse;
-        render = true;
+        self->Interactor.triggerCommand("toggle model.volume.inverse");
         break;
       case 'O':
-        self->Options.model.point_sprites.enable = !self->Options.model.point_sprites.enable;
-        render = true;
+        self->Interactor.triggerCommand("toggle model.point_sprites.enable");
         break;
       case 'U':
-        self->Options.render.background.blur = !self->Options.render.background.blur;
-        render = true;
+        self->Interactor.triggerCommand("toggle render.background.blur");
         break;
       case 'K':
-        self->Options.interactor.trackball = !self->Options.interactor.trackball;
-        render = true;
+        self->Interactor.triggerCommand("toggle interactor.trackball");
         break;
       case 'F':
-        self->Options.render.hdri.ambient = !self->Options.render.hdri.ambient;
-        render = true;
+        self->Interactor.triggerCommand("toggle render.hdri.ambient");
         break;
       case 'J':
-        self->Options.render.background.skybox = !self->Options.render.background.skybox;
-        render = true;
+        self->Interactor.triggerCommand("toggle render.background.skybox");
         break;
       case 'L':
       {
-        const double intensity = self->Options.render.light.intensity;
-        const bool down = rwi->GetShiftKey();
-
-        /* `ref < x` is equivalent to:
-         * - `intensity <= x` when going down
-         * - `intensity < x` when going up */
-        const double ref = down ? intensity - 1e-6 : intensity;
-        // clang-format off
-        /* offset in percentage points */
-        const int offsetPp = ref < .5 ?  1
-                           : ref <  1 ?  2
-                           : ref <  5 ?  5
-                           : ref < 10 ? 10
-                           :            25;
-        // clang-format on
-        /* new intensity in percents */
-        const int newIntensityPct = std::lround(intensity * 100) + (down ? -offsetPp : +offsetPp);
-
-        self->Options.render.light.intensity = std::max(newIntensityPct, 0) / 100.0;
-        render = true;
+        std::string command =
+          rwi->GetShiftKey() ? "decrease_light_intensity" : "increase_light_intensity";
+        self->Interactor.triggerCommand(std::move(command));
         break;
       }
       case 'H':
-        self->Options.ui.cheatsheet = !self->Options.ui.cheatsheet;
-        render = true;
+        self->Interactor.triggerCommand("toggle ui.cheatsheet");
         break;
       case '?':
-        self->Window.PrintColoringDescription(log::VerboseLevel::INFO);
-        self->Window.PrintSceneDescription(log::VerboseLevel::INFO);
+        self->Interactor.triggerCommand("print_scene_info");
         break;
       case '1':
-        self->SetViewOrbit(ViewType::VT_FRONT, self);
-        render = true;
+        self->Interactor.triggerCommand("set_camera front");
         break;
       case '3':
-        self->SetViewOrbit(ViewType::VT_RIGHT, self);
-        render = true;
+        self->Interactor.triggerCommand("set_camera right");
         break;
       case '4':
-        self->Window.getCamera().roll(-90);
-        render = true;
+        self->Interactor.triggerCommand("roll_camera -90");
         break;
       case '5':
-        self->Options.scene.camera.orthographic = !self->Options.scene.camera.orthographic;
-        render = true;
+        self->Interactor.triggerCommand("toggle scene.camera.orthographic");
         break;
       case '6':
-        self->Window.getCamera().roll(90);
-        render = true;
+        self->Interactor.triggerCommand("roll_camera 90");
         break;
       case '7':
-        self->SetViewOrbit(ViewType::VT_TOP, self);
-        render = true;
+        self->Interactor.triggerCommand("set_camera top");
         break;
       case '9':
-        self->SetViewOrbit(ViewType::VT_ISOMETRIC, self);
-        render = true;
+        self->Interactor.triggerCommand("set_camera isometric");
         break;
       default:
         if (keySym == F3D_EXIT_HOTKEY_SYM)
         {
-          self->StopInteractor();
+          self->Interactor.triggerCommand("stop_interactor");
         }
         else if (keySym == "Return")
         {
-          self->Window.getCamera().resetToDefault();
-          render = true;
+          self->Interactor.triggerCommand("reset_camera");
         }
         else if (keySym == "Space")
         {
-          assert(self->AnimationManager);
-          self->AnimationManager->ToggleAnimation();
+          self->Interactor.triggerCommand("toggle_animation");
         }
         break;
     }
 
-    if (checkColoring)
-    {
-      // Resynchronise renderer coloring status with options
-      self->Options.model.scivis.enable = ren->GetEnableColoring();
-      self->Options.model.scivis.cells = ren->GetUseCellColoring();
-      self->Options.model.scivis.array_name = ren->GetArrayNameForColoring();
-      self->Options.model.scivis.component = ren->GetComponentForColoring();
-    }
-    if (render)
-    {
-      self->Window.render();
-    }
-    if (printColoring)
-    {
-      self->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-    }
+    // Always render after interaction
+    self->Window.render();
   }
 
+  //----------------------------------------------------------------------------
   static void OnDropFiles(vtkObject*, unsigned long, void* clientData, void* callData)
   {
     internals* self = static_cast<internals*>(clientData);
@@ -422,6 +368,7 @@ public:
     }
   }
 
+  //----------------------------------------------------------------------------
   static void OnMiddleButtonPress(vtkObject*, unsigned long, void* clientData, void*)
   {
     internals* self = static_cast<internals*>(clientData);
@@ -431,6 +378,7 @@ public:
     self->Style->OnMiddleButtonDown();
   }
 
+  //----------------------------------------------------------------------------
   static void OnMiddleButtonRelease(vtkObject*, unsigned long, void* clientData, void*)
   {
     internals* self = static_cast<internals*>(clientData);
@@ -507,22 +455,26 @@ public:
     self->Style->OnMiddleButtonUp();
   }
 
+  //----------------------------------------------------------------------------
   std::function<bool(int, const std::string&)> KeyPressUserCallBack = [](int, const std::string&)
   { return false; };
   std::function<bool(const std::vector<std::string>&)> DropFilesUserCallBack =
     [](const std::vector<std::string>&) { return false; };
 
+  //----------------------------------------------------------------------------
   void StartInteractor()
   {
     this->VTKInteractor->Start();
   }
 
+  //----------------------------------------------------------------------------
   void StopInteractor()
   {
     this->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
     this->VTKInteractor->ExitCallback();
   }
 
+  //----------------------------------------------------------------------------
   /**
    * Run a camera transition animation based on a camera state interpolation function.
    * The provided function will be called with an interpolation parameter
@@ -558,15 +510,19 @@ public:
     this->Window.render();
   }
 
+  //----------------------------------------------------------------------------
   options& Options;
   window_impl& Window;
   scene_impl& Scene;
+  interactor_impl& Interactor;
   animationManager* AnimationManager;
 
   vtkSmartPointer<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
   std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
+
+  std::map<std::string, std::function<bool(const std::vector<std::string>&)>> CommandCallbacks;
 
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;
@@ -579,10 +535,217 @@ public:
 
 //----------------------------------------------------------------------------
 interactor_impl::interactor_impl(options& options, window_impl& window, scene_impl& scene)
-  : Internals(std::make_unique<interactor_impl::internals>(options, window, scene))
+  : Internals(std::make_unique<interactor_impl::internals>(options, window, scene, *this))
 {
   // scene need the interactor, scene will set the AnimationManager on the interactor
   this->Internals->Scene.SetInteractor(this);
+
+  const auto check_args = [&](const std::vector<std::string>& args, size_t expectedSize,
+                            std::string_view actionName) -> bool
+  {
+    if (args.size() != expectedSize)
+    {
+      log::error("Command: ", actionName, " is expecting ", std::to_string(expectedSize),
+        " arguments, ignoring");
+      return false;
+    }
+    return true;
+  };
+
+  // Add default callbacks
+  this->addCommandCallback("set",
+    [&](const std::vector<std::string>& args) -> bool
+    {
+      if (!check_args(args, 2, "set"))
+      {
+        return false;
+      }
+      this->Internals->Options.setAsString(args[0], args[1]);
+      return true;
+    });
+
+  this->addCommandCallback("toggle",
+    [&](const std::vector<std::string>& args) -> bool
+    {
+      if (!check_args(args, 1, "toggle"))
+      {
+        return false;
+      }
+      this->Internals->Options.toggle(args[0]);
+      return true;
+    });
+
+  this->addCommandCallback("reset",
+    [&](const std::vector<std::string>& args) -> bool
+    {
+      if (!check_args(args, 1, "reset"))
+      {
+        return false;
+      }
+      this->Internals->Options.reset(args[0]);
+      return true;
+    });
+  this->addCommandCallback("print",
+    [&](const std::vector<std::string>& args) -> bool
+    {
+      if (!check_args(args, 1, "print"))
+      {
+        return false;
+      }
+      log::info(this->Internals->Options.getAsString(args[0]));
+      return true;
+    });
+
+  this->addCommandCallback("cycle_animation",
+    [&](const std::vector<std::string>&) -> bool
+    {
+      vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+      vtkF3DRenderer* ren =
+        vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+      this->Internals->AnimationManager->CycleAnimation();
+      this->Internals->Options.scene.animation.index =
+        this->Internals->AnimationManager->GetAnimationIndex();
+      ren->SetAnimationnameInfo(this->Internals->AnimationManager->GetAnimationName());
+      return true;
+    });
+
+  this->addCommandCallback("cycle_coloring",
+    [&](const std::vector<std::string>& args) -> bool
+    {
+      if (!check_args(args, 1, "cycle_coloring"))
+      {
+        return false;
+      }
+
+      std::string_view type = args[0];
+      vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+      vtkF3DRenderer* ren =
+        vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+      if (type == "field")
+      {
+        ren->CycleFieldForColoring();
+      }
+      else if (type == "array")
+      {
+        ren->CycleArrayForColoring();
+      }
+      else if (type == "component")
+      {
+        ren->CycleComponentForColoring();
+      }
+      else
+      {
+        log::error("Command: cycle_coloring arg:\"", type, "\" is not recognized, ignoring");
+        return false;
+      }
+      this->Internals->SynchronizeScivisOptions(this->Internals->Options, ren);
+      this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+      return true;
+    });
+
+  this->addCommandCallback("roll_camera",
+    [&](const std::vector<std::string>& args) -> bool
+    {
+      if (!check_args(args, 1, "roll_camera"))
+      {
+        return false;
+      }
+      this->Internals->Window.getCamera().roll(options::parse<int>(args[0]));
+      return true;
+    });
+
+  this->addCommandCallback("increase_light_intensity",
+    [&](const std::vector<std::string>&) -> bool
+    {
+      this->Internals->IncreaseLightIntensity(false);
+      return true;
+    });
+
+  this->addCommandCallback("decrease_light_intensity",
+    [&](const std::vector<std::string>&) -> bool
+    {
+      this->Internals->IncreaseLightIntensity(true);
+      return true;
+    });
+
+  this->addCommandCallback("print_scene_info",
+    [&](const std::vector<std::string>&) -> bool
+    {
+      this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO);
+      this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO);
+      return true;
+    });
+
+  this->addCommandCallback("set_camera",
+    [&](const std::vector<std::string>& args) -> bool
+    {
+      if (!check_args(args, 1, "cycle_coloring"))
+      {
+        return false;
+      }
+
+      std::string_view type = args[0];
+      if (type == "front")
+      {
+        this->Internals->SetViewOrbit(internals::ViewType::VT_FRONT, this->Internals.get());
+      }
+      else if (type == "top")
+      {
+        this->Internals->SetViewOrbit(internals::ViewType::VT_TOP, this->Internals.get());
+      }
+      else if (type == "right")
+      {
+        this->Internals->SetViewOrbit(internals::ViewType::VT_RIGHT, this->Internals.get());
+      }
+      else if (type == "isometric")
+      {
+        this->Internals->SetViewOrbit(internals::ViewType::VT_ISOMETRIC, this->Internals.get());
+      }
+      else
+      {
+        log::error("Command: set_camera arg:\"", type, "\" is not recognized, ignoring");
+        return false;
+      }
+      return true;
+    });
+
+  this->addCommandCallback("toggle_volume_rendering",
+    [&](const std::vector<std::string>&) -> bool
+    {
+      this->Internals->Options.model.volume.enable = !this->Internals->Options.model.volume.enable;
+      this->Internals->Window.render();
+      this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+      return true;
+    });
+
+  this->addCommandCallback("toggle_fps",
+    [&](const std::vector<std::string>&) -> bool
+    {
+      this->Internals->Options.ui.fps = !this->Internals->Options.ui.fps;
+      this->Internals->Window.render();
+      return true;
+    });
+
+  this->addCommandCallback("stop_interactor",
+    [&](const std::vector<std::string>&) -> bool
+    {
+      this->Internals->StopInteractor();
+      return true;
+    });
+
+  this->addCommandCallback("reset_camera",
+    [&](const std::vector<std::string>&) -> bool
+    {
+      this->Internals->Window.getCamera().resetToDefault();
+      return true;
+    });
+
+  this->addCommandCallback("toggle_animation",
+    [&](const std::vector<std::string>&) -> bool
+    {
+      this->Internals->AnimationManager->ToggleAnimation();
+      return true;
+    });
 }
 
 //----------------------------------------------------------------------------
@@ -601,6 +764,73 @@ interactor& interactor_impl::setDropFilesCallBack(
 {
   this->Internals->DropFilesUserCallBack = callBack;
   return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::addCommandCallback(
+  std::string action, std::function<bool(const std::vector<std::string>&)> callback)
+{
+  this->Internals->CommandCallbacks[std::move(action)] = callback;
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::removeCommandCallback(const std::string& action)
+{
+  this->Internals->CommandCallbacks.erase(action);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+bool interactor_impl::triggerCommand(std::string_view command)
+{
+  std::vector<std::string> tokens;
+  try
+  {
+    tokens = utils::tokenize(command);
+  }
+  catch (const utils::tokenize_exception&)
+  {
+    log::error("Command: unable to tokenize command:\"", command, "\", ignoring");
+    return false;
+  }
+
+  const std::string& action = tokens[0];
+  try
+  {
+    // Find the right command to call
+    auto callbackIt = this->Internals->CommandCallbacks.find(action);
+    if (callbackIt != this->Internals->CommandCallbacks.end())
+    {
+      return callbackIt->second({ tokens.begin() + 1, tokens.end() });
+    }
+    else
+    {
+      log::error("Command: \"", action, "\" is not recognized, ignoring");
+      return false;
+    }
+  }
+  catch (const f3d::options::incompatible_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" are not compatible with action:\"", action, "\", ignoring");
+  }
+  catch (const f3d::options::inexistent_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" point to an inexistent option, ignoring");
+  }
+  catch (const f3d::options::no_value_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" point to an option without a value, ignoring");
+  }
+  catch (const f3d::options::parsing_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" cannot be parsed into an option, ignoring");
+  }
+  return false;
 }
 
 //----------------------------------------------------------------------------

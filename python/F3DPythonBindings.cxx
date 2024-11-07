@@ -1,3 +1,4 @@
+#include <pybind11/functional.h>
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -243,6 +244,10 @@ PYBIND11_MODULE(pyf3d, module)
     .def("record_interaction", &f3d::interactor::recordInteraction, "Record an interaction file")
     .def("start", &f3d::interactor::start, "Start the interactor")
     .def("stop", &f3d::interactor::start, "Stop the interactor")
+    .def("add_command_callback", &f3d::interactor::addCommandCallback, "Add a new command callback")
+    .def("remove_command_callback", &f3d::interactor::removeCommandCallback,
+      "Remove a command callback")
+    .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command")
     .def_static("get_default_interactions_info", &f3d::interactor::getDefaultInteractionsInfo);
 
   // f3d::mesh_t

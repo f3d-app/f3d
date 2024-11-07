@@ -29,7 +29,7 @@ scene.animation.time|double<br>optional<br>load|Set the animation time to load.|
 scene.animation.frame_rate|double<br>60<br>render|Set the animation frame rate used to play the animation interactively.|\-\-animation-frame-rate
 scene.camera.index|int<br>optional<br>load|Select the scene camera to use when available in the file.<br>The default scene always uses automatic camera.|\-\-camera-index
 scene.up_direction|string<br>+Y<br>load|Define the Up direction. It impacts the grid, the axis, the HDRI and the camera.|\-\-up
-scene.camera.orthographic|bool<br>false<br>load|Toggles between orthographic projection and parallel mode.|\-\-camera\-orthographic
+scene.camera.orthographic|bool<br>optional<br>load|Set to true to force orthographic projection. Model specified by default, which is false if not specified.|\-\-camera\-orthographic
 
 ## Interactor Options
 
@@ -75,7 +75,7 @@ render.effect.ambient_occlusion|bool<br>false<br>render|Enable *ambient occlusio
 render.effect.tone_mapping|bool<br>false<br>render|Enable generic filmic *Tone Mapping Pass*. This technique is used to map colors properly to the monitor colors.|\-\-tone-mapping
 render.effect.final_shader|string<br>optional<br>render|Add a final shader to the output image|\-\-final-shader. See [user documentation](../user/FINAL_SHADER.md).
 render.line_width|double<br>optional<br>render|Set the *width* of lines when showing edges. Model specified by default.|\-\-line-width
-render.show_edges|bool<br>false<br>render|Show the *cell edges*|\-\-edges
+render.show_edges|bool<br>optional<br>render|Set to true to show the *cell edges*. Model specified by default.|\-\-edges
 render.point_size|double<br>optional<br>render|Set the *size* of points when showing vertices. Model specified by default.|\-\-point-size
 render.backface_type|string<br>optional<br>render|Set the Backface type, can be `visible` or `hidden`, model specified by default.|\-\-backface-type
 render.grid.enable|bool<br>false<br>render|Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.|\-\-grid
@@ -141,6 +141,9 @@ Please note that when accessing optional options, special care must be used, eg:
     std::cout << "Line Width: unset" << std::endl;
   }
 ```
+
+It's even more true with the few optional boolean options as std::optional has an implicit boolean cast operator.
+
 ## String API
 
 The most generic and flexible API, as it rely on parsing and string generation.

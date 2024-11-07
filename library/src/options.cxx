@@ -57,6 +57,11 @@ options& options::toggle(const std::string& name)
     options_tools::set(*this, name, !std::get<bool>(val));
     return *this;
   }
+  catch (const f3d::options::no_value_exception&)
+  {
+    options_tools::set(*this, name, true);
+    return *this;
+  }
   catch (const std::bad_variant_access&)
   {
     throw options::incompatible_exception(

@@ -1386,7 +1386,7 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     cheatSheetText << " Q: Ambient occlusion " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " A: Anti-aliasing " << (this->UseFXAAPass ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " T: Tone mapping " << (this->UseToneMappingPass ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " E: Edge visibility " << (this->EdgeVisible ? "[ON]" : "[OFF]") << "\n";
+    cheatSheetText << " E: Edge visibility " << (this->EdgeVisible.has_value() ? (this->EdgeVisible.value() ? "[ON]" : "[OFF]") : "[NOT SET]") << "\n";
     cheatSheetText << " X: Axis " << (this->AxisVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " G: Grid " << (this->GridVisible ? "[ON]" : "[OFF]") << "\n";
     cheatSheetText << " N: File name " << (this->FilenameVisible ? "[ON]" : "[OFF]") << "\n";
@@ -1418,7 +1418,7 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     cheatSheetText << " 3: Right View camera\n";
     cheatSheetText << " 4: Roll the camera left by 90 degrees\n";
     cheatSheetText << " 5: Toggle Orthographic Projection "
-      << (this->UseOrthographicProjection ? "[ON]" : "[OFF]") << "\n";
+      << (this->UseOrthographicProjection.has_value() ? (this->UseOrthographicProjection.value() ? "[ON]" : "[OFF]") : "[NOT SET]") << "\n";
     cheatSheetText << " 6: Roll the camera right by 90 degrees\n";
     cheatSheetText << " 7: Top View camera\n";
     cheatSheetText << " 9: Isometric View camera\n";
@@ -1503,6 +1503,7 @@ void vtkF3DRenderer::SetUseOrthographicProjection(const std::optional<bool>& use
       camera->SetParallelProjection(this->UseOrthographicProjection.value());
       this->ResetCameraClippingRange();
     }
+    this->CheatSheetConfigured = false;
   }
 }
 
