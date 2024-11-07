@@ -19,12 +19,6 @@ static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
     return false;
   }
 
-  if (threshold > 1)
-  {
-    std::cerr << "Threshold is too high and will never be reached" << std::endl;
-    return false;
-  }
-
   std::string baseline = baselinePath + name + ".png";
   std::string output = outputPath + name + ".png";
 
