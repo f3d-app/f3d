@@ -73,9 +73,9 @@ public:
 
   /**
    * A boolean option specific method to toggle it.
+   * If the option has not been set yet, set it to true.
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::incompatible_exception if option is not boolean.
-   * Throw an options::no_value_exception if option has not been set.
    */
   options& toggle(const std::string& name);
 

@@ -42,7 +42,8 @@ When provided by the engine, the interactor class lets you choose how to interac
 
 It contains the animation API to start and stop animation.
 
-Interactor also lets you set your interaction callbacks in order to modify how the interaction with the data is done.
+Interactor also lets you set your interaction callbacks in order to modify how the interaction with the data is done,
+as well as adding/removing/triggering [command](../user/COMMANDS.md) callbacks.
 
 Of course, you can use `start` and `stop` to control the interactor behavior.
 

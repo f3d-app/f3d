@@ -156,7 +156,7 @@ As documented, only the `--option=value` syntax is supported. The syntax `--opti
 
 ## Filename templating
 
-The destination filename used by `--output` or to save screenshots can use the following template variables:
+The destination filename used by `--output` or to save screenshots using `--screenshot-filename` can use the following template variables:
 
 - `{app}`: application name (ie. `F3D`)
 - `{version}`: application version (eg. `2.4.0`)

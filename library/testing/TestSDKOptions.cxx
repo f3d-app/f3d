@@ -28,6 +28,8 @@ int TestSDKOptions(int argc, char* argv[])
   opt.set("model.scivis.cells", false);
   opt.toggle("model.scivis.cells");
   test("toggle", opt.getAsString("model.scivis.cells") == "true");
+  opt.toggle("render.show_edges");
+  test("toggle optional", opt.getAsString("render.show_edges") == "true");
 
   // Test int
   opt.setAsString("scene.animation.index", "2");

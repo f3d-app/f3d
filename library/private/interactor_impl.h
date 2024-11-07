@@ -38,6 +38,11 @@ public:
   interactor& setKeyPressCallBack(std::function<bool(int, std::string)> callBack) override;
   interactor& setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack) override;
 
+  interactor& addCommandCallback(
+    std::string action, std::function<bool(const std::vector<std::string>&)> callback) override;
+  interactor& removeCommandCallback(const std::string& action) override;
+  bool triggerCommand(std::string_view command) override;
+
   unsigned long createTimerCallBack(double time, std::function<void()> callBack) override;
   void removeTimerCallBack(unsigned long id) override;
 
