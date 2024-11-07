@@ -26,6 +26,7 @@ int TestSDKMultiColoring(int argc, char* argv[])
   // Multiple geometries
   sce.add(std::vector<std::string>{ cube, left, right });
 
+  opt.model.scivis.enable = true;
   opt.model.scivis.array_name = "Normals";
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
