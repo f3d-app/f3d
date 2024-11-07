@@ -798,45 +798,81 @@ int F3DStarter::Start(int argc, char** argv)
     this->Internals->ApplyPositionAndResolution();
 
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
+
+    interactor.addCommandCallback("load_previous_file_group",
+      [this](const std::vector<std::string>&) { return this->LoadRelativeFileGroup(-1); });
+
+    interactor.addCommandCallback("load_next_file_group",
+      [this](const std::vector<std::string>&) { return this->LoadRelativeFileGroup(+1); });
+
+    interactor.addCommandCallback("reload_current_file_group",
+      [this](const std::vector<std::string>&)
+      { return this->LoadRelativeFileGroup(0, true, true); });
+
+    interactor.addCommandCallback("add_current_directories",
+      [this](const std::vector<std::string>&) -> bool
+      {
+        if (this->Internals->LoadedFiles.size() > 0)
+        {
+          for (const auto& parentPath : F3DInternals::ParentPaths(this->Internals->LoadedFiles))
+          {
+            this->AddFile(parentPath, true);
+          }
+          return this->LoadRelativeFileGroup(0);
+        }
+        return true;
+      });
+
+    interactor.addCommandCallback("take_screenshot",
+      [this](const std::vector<std::string>& args) -> bool
+      {
+        // XXX: Add a test for this one this can be reached with a non empty filename
+        std::string filename =
+          args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
+        this->SaveScreenshot(filename);
+        return true;
+      });
+
+    interactor.addCommandCallback("take_minimal_screenshot",
+      [this](const std::vector<std::string>& args) -> bool
+      {
+        // XXX: Add a test for this one this can be reached with a non empty filename
+        std::string filename =
+          args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
+        this->SaveScreenshot(filename, true);
+        return true;
+      });
+
     interactor.setKeyPressCallBack(
       [this](int, const std::string& keySym) -> bool
       {
         if (keySym == "Left")
         {
-          return this->LoadRelativeFileGroup(-1);
+          return this->Internals->Engine->getInteractor().triggerCommand(
+            "load_previous_file_group");
         }
         if (keySym == "Right")
         {
-          return this->LoadRelativeFileGroup(+1);
+          return this->Internals->Engine->getInteractor().triggerCommand("load_next_file_group");
         }
         if (keySym == "Up")
         {
-          return this->LoadRelativeFileGroup(0, true, true);
+          return this->Internals->Engine->getInteractor().triggerCommand(
+            "reload_current_file_group");
         }
         if (keySym == "Down")
         {
-          if (this->Internals->LoadedFiles.size() > 0)
-          {
-            for (const auto& parentPath : F3DInternals::ParentPaths(this->Internals->LoadedFiles))
-            {
-              this->AddFile(parentPath, true);
-            }
-            return this->LoadRelativeFileGroup(0);
-          }
-          return true;
+          return this->Internals->Engine->getInteractor().triggerCommand("add_current_directories");
         }
 
         if (keySym == "F12")
         {
-          this->SaveScreenshot(this->Internals->AppOptions.ScreenshotFilename);
-          return true;
+          return this->Internals->Engine->getInteractor().triggerCommand("take_screenshot");
         }
         if (keySym == "F11")
         {
-          this->SaveScreenshot(this->Internals->AppOptions.ScreenshotFilename, true);
-          return true;
+          return this->Internals->Engine->getInteractor().triggerCommand("take_minimal_screenshot");
         }
-
         return false;
       });
 

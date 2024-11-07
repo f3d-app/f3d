@@ -12,6 +12,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKImage.cxx
      TestSDKInteractorCallBack.cxx
      TestSDKInteractorDropFullScene.cxx
+     TestSDKInteractorCommand.cxx
      TestSDKSceneFromMemory.cxx
      TestSDKScene.cxx
      TestSDKLog.cxx
@@ -21,6 +22,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKOptionsIO.cxx
      TestSDKRenderAndInteract.cxx
      TestSDKRenderFinalShader.cxx
+     TestSDKUtils.cxx
      TestSDKWindowAuto.cxx
      TestPseudoUnitTest.cxx
 )

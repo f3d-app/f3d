@@ -45,6 +45,26 @@ public:
   virtual interactor& setDropFilesCallBack(
     std::function<bool(std::vector<std::string>)> callBack) = 0;
 
+  ///@{ @name Command
+  /**
+   * Use this method to add a callback into the command map
+   * to be called using triggerCommand.
+   * Adding a commandCallback with an existing action replaces it.
+   */
+  virtual interactor& addCommandCallback(
+    std::string action, std::function<bool(const std::vector<std::string>&)> callback) = 0;
+
+  /**
+   * Remove a command callback for provided action
+   */
+  virtual interactor& removeCommandCallback(const std::string& action) = 0;
+
+  /**
+   * Trigger provided command, see COMMAND.md for more information
+   */
+  virtual bool triggerCommand(std::string_view command) = 0;
+  ///@}
+
   /**
    * Use this method to create your own timer callback. You callback will be called once every time
    * ms. Return an id to use in removeTimeCallBack.
