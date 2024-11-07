@@ -49,6 +49,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.setDropFilesCallBack([&](std::vector<std::string> filesVec) -> bool {
     std::string path = filesVec[0];
     size_t found = path.find_last_of("/\\");
+    sce.clear();
     sce.add(path.substr(0, found + 1) + "suzanne.ply");
     win.render();
     return true;
@@ -58,7 +59,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.playInteraction(interactionFilePath);
 
   return TestSDKHelpers::RenderTest(
-           win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename, 50)
+           win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename)
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }

@@ -37,7 +37,7 @@ int TestSDKRenderFinalShader(int argc, char* argv[])
   options.render.effect.final_shader = negativeShader;
 
   if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-        "TestSDKRenderFinalShaderNegative", 50))
+        "TestSDKRenderFinalShaderNegative"))
   {
     std::cerr << "Negative shader failure";
     return EXIT_FAILURE;
@@ -47,7 +47,7 @@ int TestSDKRenderFinalShader(int argc, char* argv[])
   options.render.effect.final_shader = vignetteShader;
 
   if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-        "TestSDKRenderFinalShaderVignette", 50))
+        "TestSDKRenderFinalShaderVignette"))
   {
     std::cerr << "Vignette shader failure";
     return EXIT_FAILURE;

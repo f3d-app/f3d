@@ -54,7 +54,7 @@ static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
 }
 
 static bool RenderTest(f3d::window& win, const std::string& baselinePath,
-  const std::string& outputPath, const std::string& name, double threshold = 50,
+  const std::string& outputPath, const std::string& name, double threshold = 0.05,
   bool noBackground = false)
 {
   return TestSDKHelpers::RenderTest(

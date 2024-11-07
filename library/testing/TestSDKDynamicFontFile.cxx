@@ -23,7 +23,7 @@ int TestSDKDynamicFontFile(int argc, char* argv[])
   opt.ui.font_file = std::string(argv[1]) + "data/Crosterian.ttf";
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-           std::string(argv[2]), "TestSDKDynamicFontFile", 50)
+           std::string(argv[2]), "TestSDKDynamicFontFile")
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }
