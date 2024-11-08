@@ -51,6 +51,15 @@ public:
   virtual void getState(camera_state_t& state) = 0;
   ///@}
 
+  ///@{ @name Orientation
+  /** Get the azimuth angle of the camera. */
+  virtual angle_deg_t getAzimuth() = 0;
+  /** Get the yaw angle of the camera. */
+  virtual angle_deg_t getYaw() = 0;
+  /** Get the elevation angle of the camera. */
+  virtual angle_deg_t getElevation() = 0;
+  ///@}
+
   ///@{ @name Manipulation
   /// Standard camera manipulation methods. Angles are in degrees.
 
@@ -63,11 +72,11 @@ public:
   /** Rotate the camera about its forward axis. */
   virtual camera& roll(angle_deg_t angle) = 0;
   /** Rotate the camera about its vertical axis, centered at the focal point. */
-  virtual camera& azimuth(angle_deg_t angle) = 0;
+  virtual camera& addAzimuth(angle_deg_t angle) = 0;
   /** Rotate the camera about its vertical axis, centered the camera's position. */
-  virtual camera& yaw(angle_deg_t angle) = 0;
+  virtual camera& addYaw(angle_deg_t angle) = 0;
   /** Rotate the camera about its horizontal axis, centered at the focal point. */
-  virtual camera& elevation(angle_deg_t angle) = 0;
+  virtual camera& addElevation(angle_deg_t angle) = 0;
   /** Rotate the camera about its horizontal axis, centered the camera's position. */
   virtual camera& pitch(angle_deg_t angle) = 0;
 
