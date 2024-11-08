@@ -154,8 +154,8 @@ int TestSDKCamera(int argc, char* argv[])
   const double epsilon = std::numeric_limits<double>::epsilon();
   if (dotProduct < epsilon)
   {
-    std::cerr << "Dot product is lesser than epsilon, returning 0.0 as expected." << std::endl;
-    return 0.0;
+    std::cerr << "Dot product is lesser than epsilon, returning epsilon." << std::endl;
+    return epsilon;
   }
 
   // Test roll
@@ -207,8 +207,8 @@ int TestSDKCamera(int argc, char* argv[])
   dotProduct = viewDirProj[0] * viewDirProj[0] + viewDirProj[1] * viewDirProj[1];
   if (dotProduct < epsilon)
   {
-    std::cerr << "Dot product is lesser than epsilon, returning 0.0 as expected." << std::endl;
-    return 0.0;
+    std::cerr << "Dot product is lesser than epsilon, returning epsilon." << std::endl;
+    return epsilon;
   }
 
   // Test elevation
