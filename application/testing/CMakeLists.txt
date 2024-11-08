@@ -803,8 +803,8 @@ if(F3D_SANITIZER STREQUAL "none")
 endif()
 f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
 
-f3d_test(NAME TestInteractionDropFiles INTERACTION_CONFIGURE)#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
-f3d_test(NAME TestInteractionMultiFileDrop DATA mb/mb_1_0.vtp ARGS --multi-file-mode=all -e INTERACTION_CONFIGURE) #DropEvent mb_2_0.vtp
+f3d_test(NAME TestInteractionDropFiles ARGS -n INTERACTION_CONFIGURE)#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
+f3d_test(NAME TestInteractionMultiFileDrop ARGS --multi-file-mode=all -e INTERACTION_CONFIGURE) #DropEvent mb_1_0.vtp mb_2_0.vtp
 f3d_test(NAME TestInteractionDropSameFiles ARGS -x INTERACTION_CONFIGURE)#DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
 
 # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
@@ -812,6 +812,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEven palermo.hdr;
   f3d_test(NAME TestInteractionDropHDRIInvert INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent palermo.hdr;DropEvent dragon.vtu;
   f3d_test(NAME TestInteractionDropHDRIMulti INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu palermo.hdr;
+  f3d_test(NAME TestInteractionDropHDRIModifiers INTERACTION_CONFIGURE LONG_TIMEOUT)#X;CTRL+DropEvent dragon.vtu;SHIFT+DropEven palermo.hdr;
 
   # Test interactive animation and dropping HDRI
   if(F3D_SANITIZER STREQUAL "none")

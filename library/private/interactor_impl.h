@@ -35,8 +35,6 @@ public:
   interactor_impl(options& options, window_impl& window, scene_impl& scene);
   ~interactor_impl() override;
 
-  interactor& setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack) override;
-
   interactor& addCommandCallback(
     std::string action, std::function<bool(const std::vector<std::string>&)> callback) override;
   interactor& removeCommandCallback(const std::string& action) override;

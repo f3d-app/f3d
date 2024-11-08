@@ -199,7 +199,6 @@ public:
   {
     internals* self = static_cast<internals*>(clientData);
     vtkRenderWindowInteractor* rwi = self->Style->GetInteractor();
-
     std::string interaction = rwi->GetKeySym();
     if (!interaction.empty())
     {
@@ -207,69 +206,7 @@ public:
       interaction[0] = std::toupper(interaction[0]);
     }
 
-    const auto modifiers = [&]()
-    {
-      const bool shift = rwi->GetShiftKey() == 1;
-      const bool ctrl = rwi->GetControlKey() == 1;
-      if (shift && ctrl)
-      {
-        return ModifierKeys::CTRL_SHIFT;
-      }
-      else if (ctrl)
-      {
-        return ModifierKeys::CTRL;
-      }
-      else if (shift)
-      {
-        return ModifierKeys::SHIFT;
-      }
-      else
-      {
-        return ModifierKeys::NONE;
-      }
-    };
-
-    const auto to_string = [](const InteractionBind& bind)
-    {
-      const auto& [inter, mod] = bind;
-      switch (mod)
-      {
-        case f3d::interactor::ModifierKeys::CTRL_SHIFT:
-          return "CTRL+SHIFT+" + inter;
-        case f3d::interactor::ModifierKeys::CTRL:
-          return "CTRL+" + inter;
-        case f3d::interactor::ModifierKeys::SHIFT:
-          return "SHIFT+" + inter;
-        default:
-          // No need to check for ANY (unreachable) or NONE (no log needed)
-          return inter;
-      }
-    };
-
-    // Check for an interaction command with modifiers
-    const InteractionBind bind = { interaction, modifiers() };
-    log::debug("Interaction: KeyPress ", to_string(bind));
-
-    auto commandsIt = self->InteractionCommands.find(bind);
-    if (commandsIt == self->InteractionCommands.end())
-    {
-      // Modifiers version not found, try ANY instead
-      commandsIt = self->InteractionCommands.find({ interaction, ModifierKeys::ANY });
-    }
-
-    if (commandsIt != self->InteractionCommands.end())
-    {
-      for (const std::string& command : commandsIt->second)
-      {
-        if (!self->Interactor.triggerCommand(command))
-        {
-          log::error("Interaction: error running command:\"", command, "\", ignoring");
-        }
-      }
-    }
-
-    // Always render after interaction
-    self->Window.render();
+    self->TriggerInteractionCommands(interaction, "");
   }
 
   //----------------------------------------------------------------------------
@@ -277,26 +214,13 @@ public:
   {
     internals* self = static_cast<internals*>(clientData);
     vtkStringArray* filesArr = static_cast<vtkStringArray*>(callData);
-    std::vector<std::string> filesVec;
-    filesVec.resize(filesArr->GetNumberOfTuples());
+    std::string filesString;
     for (int i = 0; i < filesArr->GetNumberOfTuples(); i++)
     {
-      filesVec[i] = filesArr->GetValue(i);
+      filesString.append(" \"" + filesArr->GetValue(i) + "\" ");
     }
 
-    if (self->DropFilesUserCallBack(filesVec))
-    {
-      return;
-    }
-
-    // No user defined behavior, load all files
-    if (!filesVec.empty())
-    {
-      assert(self->AnimationManager);
-      self->AnimationManager->StopAnimation();
-      self->Scene.add(filesVec);
-      self->Window.render();
-    }
+    self->TriggerInteractionCommands("Drop", filesString);
   }
 
   //----------------------------------------------------------------------------
@@ -387,10 +311,6 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  std::function<bool(const std::vector<std::string>&)> DropFilesUserCallBack =
-    [](const std::vector<std::string>&) { return false; };
-
-  //----------------------------------------------------------------------------
   void StartInteractor()
   {
     this->VTKInteractor->Start();
@@ -440,6 +360,76 @@ public:
   }
 
   //----------------------------------------------------------------------------
+  void TriggerInteractionCommands(const std::string& interaction, const std::string& argsString)
+  {
+    const auto modifiers = [&]()
+    {
+      vtkRenderWindowInteractor* rwi = this->Style->GetInteractor();
+      const bool shift = rwi->GetShiftKey() == 1;
+      const bool ctrl = rwi->GetControlKey() == 1;
+      if (shift && ctrl)
+      {
+        return ModifierKeys::CTRL_SHIFT;
+      }
+      else if (ctrl)
+      {
+        return ModifierKeys::CTRL;
+      }
+      else if (shift)
+      {
+        return ModifierKeys::SHIFT;
+      }
+      else
+      {
+        return ModifierKeys::NONE;
+      }
+    };
+
+    const auto to_string = [](const InteractionBind& bind)
+    {
+      const auto& [inter, mod] = bind;
+      switch (mod)
+      {
+        case f3d::interactor::ModifierKeys::CTRL_SHIFT:
+          return "CTRL+SHIFT+" + inter;
+        case f3d::interactor::ModifierKeys::CTRL:
+          return "CTRL+" + inter;
+        case f3d::interactor::ModifierKeys::SHIFT:
+          return "SHIFT+" + inter;
+        default:
+          // No need to check for ANY (unreachable) or NONE (no log needed)
+          return inter;
+      }
+    };
+
+    // Check for an interaction command with modifiers
+    const InteractionBind bind = { interaction, modifiers() };
+    log::debug("Interaction: KeyPress ", to_string(bind));
+
+    auto commandsIt = this->InteractionCommands.find(bind);
+    if (commandsIt == this->InteractionCommands.end())
+    {
+      // Modifiers version not found, try ANY instead
+      commandsIt = this->InteractionCommands.find({ interaction, ModifierKeys::ANY });
+    }
+
+    if (commandsIt != this->InteractionCommands.end())
+    {
+      for (const std::string& command : commandsIt->second)
+      {
+        if (!this->Interactor.triggerCommand(command + argsString))
+        {
+          log::error("Interaction: error running command:\"", command + argsString, "\", ignoring");
+        }
+      }
+    }
+
+    // Always render after interaction
+    this->Window.render();
+  }
+
+  //----------------------------------------------------------------------------
+
   options& Options;
   window_impl& Window;
   scene_impl& Scene;
@@ -481,6 +471,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
 {
   // scene need the interactor, scene will set the AnimationManager on the interactor
   this->Internals->Scene.SetInteractor(this);
+  assert(this->Internals->AnimationManager);
 
   const auto check_args = [&](const std::vector<std::string>& args, size_t expectedSize,
                             std::string_view actionName) -> bool
@@ -689,6 +680,14 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
       return true;
     });
 
+  this->addCommandCallback("add_files",
+    [&](const std::vector<std::string>& files) -> bool
+    {
+      this->Internals->AnimationManager->StopAnimation();
+      this->Internals->Scene.add(files);
+      return true;
+    });
+
   // Available standard keys: None
   this->addInteractionCommand("W", ModifierKeys::NONE, "cycle_animation");
   this->addInteractionCommand("C", ModifierKeys::NONE, "cycle_coloring field");
@@ -728,18 +727,11 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
   this->addInteractionCommand(F3D_EXIT_HOTKEY_SYM, ModifierKeys::NONE, "stop_interactor");
   this->addInteractionCommand("Return", ModifierKeys::NONE, "reset_camera");
   this->addInteractionCommand("Space", ModifierKeys::NONE, "toggle_animation");
+  this->addInteractionCommand("Drop", ModifierKeys::NONE, "add_files");
 }
 
 //----------------------------------------------------------------------------
 interactor_impl::~interactor_impl() = default;
-
-//----------------------------------------------------------------------------
-interactor& interactor_impl::setDropFilesCallBack(
-  std::function<bool(std::vector<std::string>)> callBack)
-{
-  this->Internals->DropFilesUserCallBack = callBack;
-  return *this;
-}
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addCommandCallback(

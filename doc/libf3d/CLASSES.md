@@ -46,7 +46,9 @@ Interactor lets you add, remove and trigger your [command](../user/COMMANDS.md) 
 Command lets you interact with the libf3d in a very flexible manner.
 
 Interactor also lets you add and remove interaction commands in order to modify how
-the libf3d react to different interactions, eg. when a key is pressed.
+the libf3d react to different interactions, eg. when a key is pressed or when a file is dropped.
+
+Use `log::setVerboseLevel(log::VerboseLevel::DEBUG)` to print debug information on interaction and command use.
 
 Of course, you can use `start` and `stop` to control the interactor behavior.
 

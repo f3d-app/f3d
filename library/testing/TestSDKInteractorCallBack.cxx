@@ -73,13 +73,12 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.addInteractionCommand(
     "A", f3d::interactor::ModifierKeys::ANY, "toggle render.background.skybox");
 
-  // Check drop files callback
-  inter.setDropFilesCallBack([&](std::vector<std::string> filesVec) -> bool {
-    std::string path = filesVec[0];
+  // Modify the add_files command
+  inter.addCommandCallback("add_files", [&](const std::vector<std::string>& filesVec) -> bool {
+    const std::string& path = filesVec[0];
     size_t found = path.find_last_of("/\\");
     sce.clear();
     sce.add(path.substr(0, found + 1) + "suzanne.ply");
-    win.render();
     return true;
   });
 

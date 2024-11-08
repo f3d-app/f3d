@@ -843,23 +843,46 @@ int F3DStarter::Start(int argc, char** argv)
         return true;
       });
 
-    interactor.addInteractionCommand(
-      "Left", f3d::interactor::ModifierKeys::NONE, "load_previous_file_group");
-    interactor.addInteractionCommand(
-      "Right", f3d::interactor::ModifierKeys::NONE, "load_next_file_group");
-    interactor.addInteractionCommand(
-      "Up", f3d::interactor::ModifierKeys::NONE, "reload_current_file_group");
-    interactor.addInteractionCommand(
-      "Down", f3d::interactor::ModifierKeys::NONE, "add_current_directories");
-    interactor.addInteractionCommand(
-      "F11", f3d::interactor::ModifierKeys::NONE, "take_minimal_screenshot");
-    interactor.addInteractionCommand("F12", f3d::interactor::ModifierKeys::NONE, "take_screenshot");
-
-    interactor.setDropFilesCallBack(
-      [this](const std::vector<std::string>& filesVec) -> bool
+    // This replace an existing command in libf3d
+    interactor.addCommandCallback("add_files",
+      [this](const std::vector<std::string>& files) -> bool
       {
         int index = -1;
-        for (const std::string& file : filesVec)
+        for (const std::string& file : files)
+        {
+          index = this->AddFile(fs::path(file));
+        }
+        if (index > -1)
+        {
+          this->LoadFileGroup(index);
+        }
+        return true;
+      });
+
+    interactor.addCommandCallback("set_hdri",
+      [this](const std::vector<std::string>& files) -> bool
+      {
+        if (files.empty() || files.size() > 1)
+        {
+          return false;
+        }
+
+        // Set the first file has an HDRI
+        f3d::options& options = this->Internals->Engine->getOptions();
+        options.render.hdri.file = files[0];
+        options.render.hdri.ambient = true;
+        options.render.background.skybox = true;
+
+        // Rendering now is needed for correct lighting
+        this->Render();
+        return true;
+      });
+
+    interactor.addCommandCallback("add_files_or_set_hdri",
+      [this](const std::vector<std::string>& files) -> bool
+      {
+        int index = -1;
+        for (const std::string& file : files)
         {
           if (F3DInternals::HasHDRIExtension(file))
           {
@@ -883,9 +906,26 @@ int F3DStarter::Start(int argc, char** argv)
         {
           this->LoadFileGroup(index);
         }
-        this->RequestRender();
         return true;
       });
+
+    interactor.addInteractionCommand(
+      "Left", f3d::interactor::ModifierKeys::NONE, "load_previous_file_group");
+    interactor.addInteractionCommand(
+      "Right", f3d::interactor::ModifierKeys::NONE, "load_next_file_group");
+    interactor.addInteractionCommand(
+      "Up", f3d::interactor::ModifierKeys::NONE, "reload_current_file_group");
+    interactor.addInteractionCommand(
+      "Down", f3d::interactor::ModifierKeys::NONE, "add_current_directories");
+    interactor.addInteractionCommand(
+      "F11", f3d::interactor::ModifierKeys::NONE, "take_minimal_screenshot");
+    interactor.addInteractionCommand("F12", f3d::interactor::ModifierKeys::NONE, "take_screenshot");
+
+    // This replace an existing default interaction command in the libf3d
+    interactor.addInteractionCommand(
+      "Drop", f3d::interactor::ModifierKeys::NONE, "add_files_or_set_hdri");
+    interactor.addInteractionCommand("Drop", f3d::interactor::ModifierKeys::CTRL, "add_files");
+    interactor.addInteractionCommand("Drop", f3d::interactor::ModifierKeys::SHIFT, "set_hdri");
   }
 
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
