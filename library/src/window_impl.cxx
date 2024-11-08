@@ -17,7 +17,6 @@
 #include <vtkImageExport.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
-#include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
@@ -506,7 +505,7 @@ bool window_impl::render()
 //----------------------------------------------------------------------------
 image window_impl::renderToImage(bool noBackground)
 {
-  this->UpdateDynamicOptions();
+  this->render();
 
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(this->Internals->RenWin);
@@ -515,7 +514,7 @@ image window_impl::renderToImage(bool noBackground)
   {
     // we need to set the background to black to avoid blending issues with translucent
     // objects when saving to file with no background
-    this->Internals->RenWin->GetRenderers()->GetFirstRenderer()->SetBackground(0, 0, 0);
+    this->Internals->Renderer->SetBackground(0, 0, 0);
     rtW2if->SetInputBufferTypeToRGBA();
   }
 

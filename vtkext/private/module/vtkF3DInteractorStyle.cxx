@@ -14,6 +14,102 @@
 
 vtkStandardNewMacro(vtkF3DInteractorStyle);
 
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::OnLeftButtonDown()
+{
+  this->FindPokedRenderer(
+    this->Interactor->GetEventPosition()[0], this->Interactor->GetEventPosition()[1]);
+  assert(this->CurrentRenderer != nullptr);
+
+  if (this->Interactor->GetShiftKey())
+  {
+    this->StartPan();
+  }
+  else
+  {
+    if (this->Interactor->GetControlKey())
+    {
+      this->StartSpin();
+    }
+    else
+    {
+      this->StartRotate();
+    }
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::OnLeftButtonUp()
+{
+  switch (this->State)
+  {
+    case VTKIS_PAN:
+      this->EndPan();
+      break;
+
+    case VTKIS_SPIN:
+      this->EndSpin();
+      break;
+
+    case VTKIS_ROTATE:
+      this->EndRotate();
+      break;
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::OnMiddleButtonDown()
+{
+  this->FindPokedRenderer(
+    this->Interactor->GetEventPosition()[0], this->Interactor->GetEventPosition()[1]);
+  assert(this->CurrentRenderer != nullptr);
+
+  this->StartPan();
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::OnMiddleButtonUp()
+{
+  switch (this->State)
+  {
+    case VTKIS_PAN:
+      this->EndPan();
+      break;
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::OnRightButtonDown()
+{
+  this->FindPokedRenderer(
+    this->Interactor->GetEventPosition()[0], this->Interactor->GetEventPosition()[1]);
+  assert(this->CurrentRenderer != nullptr);
+
+  if (this->Interactor->GetShiftKey())
+  {
+    this->StartEnvRotate();
+  }
+  else
+  {
+    this->StartDolly();
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::OnRightButtonUp()
+{
+  switch (this->State)
+  {
+    case VTKIS_ENV_ROTATE:
+      this->EndEnvRotate();
+      break;
+
+    case VTKIS_DOLLY:
+      this->EndDolly();
+      break;
+  }
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
 {

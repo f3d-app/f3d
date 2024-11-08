@@ -13,7 +13,7 @@ $reloaded_data = "$tmp_dir/cow.vtp"
 Copy-Item $hires_data -Destination $reloaded_data
 
 $log = "$tmp_dir/output.log"
-$id = (Start-Process -FilePath $f3d_cmd -ArgumentList "--watch --verbose $reloaded_data" -RedirectStandardOutput $log -PassThru).Id
+Start-Process -FilePath $f3d_cmd -ArgumentList "--watch --verbose $reloaded_data" -RedirectStandardOutput $log -PassThru
 
 Start-Sleep -Seconds 3
 Copy-Item $lowres_data -Destination $reloaded_data
@@ -26,5 +26,7 @@ if ($str -ne $null) {
   $ret = 1
 }
 
-Stop-Process -Id $id
+Get-Content $log
+
+Stop-Process -Name "f3d"
 exit $ret

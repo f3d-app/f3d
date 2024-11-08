@@ -24,6 +24,18 @@ public:
     KeyPressEvent
   };
 
+  ///@{
+  /**
+   * Disable default Grab/Release Focus.
+   */
+  void OnLeftButtonDown() override;
+  void OnLeftButtonUp() override;
+  void OnMiddleButtonDown() override;
+  void OnMiddleButtonUp() override;
+  void OnRightButtonDown() override;
+  void OnRightButtonUp() override;
+  ///@}
+
   /**
    * Handle key presses
    */

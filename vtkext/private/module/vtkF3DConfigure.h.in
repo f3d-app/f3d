@@ -10,4 +10,5 @@ static const std::string F3D_EXIT_HOTKEY_SYM = "Escape";
 
 #cmakedefine01 F3D_MODULE_RAYTRACING
 #cmakedefine01 F3D_MODULE_EXR
+#cmakedefine01 F3D_MODULE_UI
 #endif

@@ -17,6 +17,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();
   win.setSize(300, 300);
+  win.render();
 
   // Sanity checks coverage
   if (inter.playInteraction(""))

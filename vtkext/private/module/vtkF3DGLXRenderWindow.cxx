@@ -1,4 +1,5 @@
 #include <vtkObjectFactory.h>
+#include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
@@ -9,6 +10,7 @@
 #endif
 
 #include "vtkF3DGLXRenderWindow.h"
+#include "vtkF3DRenderer.h"
 
 #include <X11/Xlib.h>
 

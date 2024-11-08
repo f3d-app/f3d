@@ -14,6 +14,7 @@ int TestSDKInteractorDropFullScene(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();
   win.setSize(300, 300);
+  win.render();
 
   std::string filename = "TestSDKInteractorDropFullScene";
   std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
