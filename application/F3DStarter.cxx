@@ -1276,7 +1276,10 @@ void F3DStarter::LoadFileGroup(
 
   if (!this->Internals->AppOptions.NoRender)
   {
-    this->Internals->Engine->getWindow().setWindowName(filenameInfo + " - " + F3D::AppName);
+    if (!filenameInfo.empty())
+    {
+      this->Internals->Engine->getWindow().setWindowName(filenameInfo + " - " + F3D::AppName);
+    }
 
     if (dynamicOptions.scene.camera.index.has_value())
     {
