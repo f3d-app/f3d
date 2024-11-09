@@ -32,7 +32,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   std::string filename = "TestSDKInteractorCallBack";
   std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
   if (!inter.playInteraction(
-        interactionFilePath)) // Dragon.vtu; SSS; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; 7
+        interactionFilePath)) // Dragon.vtu; SYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   {
     std::cerr << "Unexcepted error playing interaction" << std::endl;
     return EXIT_FAILURE;
@@ -43,41 +43,36 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // Remove some default interactions to reduce false positive risks
+  // Remove interactions that will be triggered later and should not have any effect
+  // Do not remove S as it will be replaced below
+  inter.removeInteractionCommands({"7", f3d::interactor::ModifierKeys::ANY});
+  inter.removeInteractionCommands({"Y", f3d::interactor::ModifierKeys::NONE});
+  inter.removeInteractionCommands({"B", f3d::interactor::ModifierKeys::NONE});
 
-  // Do not remove "S", to ensure it is being replaced as expected
-  inter.removeInteractionCommands("X", f3d::interactor::ModifierKeys::ANY);
-  inter.removeInteractionCommands("N", f3d::interactor::ModifierKeys::ANY);
-  inter.removeInteractionCommands("G", f3d::interactor::ModifierKeys::ANY);
-  inter.removeInteractionCommands("E", f3d::interactor::ModifierKeys::ANY);
-  inter.removeInteractionCommands("P", f3d::interactor::ModifierKeys::ANY);
-  inter.removeInteractionCommands("Y", f3d::interactor::ModifierKeys::ANY);
-  inter.removeInteractionCommands("B", f3d::interactor::ModifierKeys::ANY);
-
-  // Remove an interaction that will be triggered later and should not have any effect
-  inter.removeInteractionCommands("7", f3d::interactor::ModifierKeys::ANY);
-
-  // Check that an ANY interaction can be added and that it removes existing interaction
-  inter.addInteractionCommands(
-    "S", f3d::interactor::ModifierKeys::ANY, { "set interactor.axis true" });
+  // Check that an interaction can be added and that it removes existing interaction
+  inter.addInteractionCommand(
+    {"S", f3d::interactor::ModifierKeys::NONE}, "toggle interactor.axis");
 
   // Check CTRL modifier and that another interaction can be added on the same key with another
   // modifier
-  inter.addInteractionCommands(
-    "S", f3d::interactor::ModifierKeys::CTRL, { "set render.grid.enable true" });
+  inter.addInteractionCommand(
+    {"S", f3d::interactor::ModifierKeys::CTRL}, "toggle render.grid.enable");
 
   // Check invalid command for coverage
-  inter.addInteractionCommands("P", f3d::interactor::ModifierKeys::ANY, { "invalid command any" });
-  inter.addInteractionCommands(
-    "P", f3d::interactor::ModifierKeys::CTRL, { "invalid command ctrl" });
+  inter.addInteractionCommand(
+    {"P", f3d::interactor::ModifierKeys::CTRL}, "invalid command");
 
   // Check SHIFT modifier
-  inter.addInteractionCommands(
-    "Y", f3d::interactor::ModifierKeys::SHIFT, { R"(set ui.filename_info "My Own Filename")" });
+  inter.addInteractionCommand(
+    {"Y", f3d::interactor::ModifierKeys::SHIFT}, R"(set ui.filename_info "My Own Filename")");
 
   // Check CTRL_SHIFT modifier
-  inter.addInteractionCommands("B", f3d::interactor::ModifierKeys::CTRL_SHIFT,
+  inter.addInteractionCommands({"B", f3d::interactor::ModifierKeys::CTRL_SHIFT},
     { "set ui.filename true", "set render.show_edges true" });
+
+  // Check ANY modifier
+  inter.addInteractionCommand(
+    {"A", f3d::interactor::ModifierKeys::ANY}, "toggle render.background.skybox");
 
   // Check drop files callback
   inter.setDropFilesCallBack([&](std::vector<std::string> filesVec) -> bool {
@@ -91,7 +86,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
 
   // This time the interaction should result in a different rendering
   if (!inter.playInteraction(
-        interactionFilePath)) // Dragon.vtu; SSS; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; 7
+        interactionFilePath)) // Dragon.vtu; S; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; 7
   {
     std::cerr << "Unexcepted error playing interaction" << std::endl;
     return EXIT_FAILURE;

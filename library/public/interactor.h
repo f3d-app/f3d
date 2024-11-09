@@ -52,7 +52,9 @@ public:
    * Trigger provided command, see COMMAND.md for more information
    */
   virtual bool triggerCommand(std::string_view command) = 0;
+  ///@}
 
+  ///@{ @name Interaction Commands
   /**
    * Enumeration of supported modifier combination, in binary.
    */
@@ -65,25 +67,45 @@ public:
     CTRL_SHIFT = 0x3 // 00000011
   };
 
+  struct InteractionBind
+  {
+    std::string Interaction;
+    ModifierKeys Modifiers;
+
+    // TODO use decltype in cxx instead?
+    bool operator<(const f3d::interactor::InteractionBind& bind) const{
+      return this->Interaction < bind.Interaction || (this->Interaction == bind.Interaction && this->Modifiers < bind.Modifiers);
+    }
+  };
+
   /**
    * Use this method to specify your own interaction commands for a specified interaction and
    * modifiers flag.
-   * Interaction can be a pressed key symbol, eg: "C", or a dedicated key symbol for
-   * special keys: "Left", "Right", "Up", "Down", "Space", "Enter", "Escape", "Question".
-   * Modifiers is a binary flag from the dedicated enum.
-   * Adding commands for an existing interaction and modifiers will replace it.
+   *
+   * InteractionBind.Interaction can be a pressed key symbol, eg: "C",
+   * or a dedicated key symbol for special keys:
+   * "Left", "Right", "Up", "Down", "Space", "Enter", "Escape", "Question".
+   *
+   * InteractionBind.Modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
+   *
+   * Adding commands for an existing InteractionBind will replace it.
+   *
    * When the corresponding interaction and modifiers happens, the provided commands will be
-   * triggered using triggerCommand. If an ANY interaction and another modifier interaction are
-   * added for the same interaction, both will be triggered.
+   * triggered using triggerCommand.
    */
-  virtual interactor& addInteractionCommands(
-    std::string interaction, ModifierKeys modifiers, const std::vector<std::string>& commands) = 0;
+  virtual interactor& addInteractionCommands(InteractionBind bind, const std::vector<std::string>& commands) = 0;
+
+  /**
+   * See addInteractionCommands
+   * Convenience method to add a single command for an interaction, similar as
+   * addInteractionCommands(bind, {command})
+   */
+  virtual interactor& addInteractionCommand(InteractionBind bind, const std::string& command) = 0;
 
   /**
    * Remove interaction commands corresponding to provided interaction and modifiers
    */
-  virtual interactor& removeInteractionCommands(
-    const std::string& interaction, ModifierKeys modifiers) = 0;
+  virtual interactor& removeInteractionCommands(InteractionBind bind) = 0;
   ///@}
 
   /**

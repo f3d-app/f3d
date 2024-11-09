@@ -24,19 +24,16 @@ def test_interaction_command():
     # Smoke test
     engine = f3d.Engine.create(True)
     inter = engine.interactor
-    inter.add_interaction_command(
-        "P", f3d.Interactor.ModifierKeys.ANY, ["dummy command"]
-    )
-    inter.add_interaction_command(
-        "P", f3d.Interactor.ModifierKeys.NONE, ["dummy command"]
-    )
-    inter.add_interaction_command(
-        "P", f3d.Interactor.ModifierKeys.CTRL, ["dummy command"]
-    )
-    inter.add_interaction_command(
-        "P", f3d.Interactor.ModifierKeys.SHIFT, ["dummy command"]
-    )
-    inter.add_interaction_command(
-        "P", f3d.Interactor.ModifierKeys.CTRL_SHIFT, ["dummy command"]
-    )
-    inter.remove_interaction_command("P", f3d.Interactor.ModifierKeys.ANY)
+    bind = f3d.Interactor.InteractionBind
+    bind.Interaction = "P"
+    bind.Modifiers = f3d.Interactor.ModifierKeys.ANY;
+    inter.add_interaction_command(bind, ["dummy command"])
+    bind.Modifiers = f3d.Interactor.ModifierKeys.NONE;
+    inter.add_interaction_command(bind, ["dummy command"])
+    bind.Modifiers = f3d.Interactor.ModifierKeys.CTRL;
+    inter.add_interaction_command(bind, ["dummy command"])
+    bind.Modifiers = f3d.Interactor.ModifierKeys.SHIFT;
+    inter.add_interaction_command(bind, ["dummy command"])
+    bind.Modifiers = f3d.Interactor.ModifierKeys.CTRL_SHIFT;
+    inter.add_interaction_command(bind, ["dummy command"])
+    inter.remove_interaction_command(bind)
