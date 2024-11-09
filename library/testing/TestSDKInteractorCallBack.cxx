@@ -46,33 +46,33 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
 
   // Remove interactions that will be triggered later and should not have any effect
   // Do not remove S as it will be replaced below
-  inter.removeInteractionCommands({ "7", f3d::interactor::ModifierKeys::ANY });
-  inter.removeInteractionCommands({ "Y", f3d::interactor::ModifierKeys::NONE });
-  inter.removeInteractionCommands({ "B", f3d::interactor::ModifierKeys::NONE });
+  inter.removeInteractionCommands("7", f3d::interactor::ModifierKeys::ANY);
+  inter.removeInteractionCommands("Y", f3d::interactor::ModifierKeys::NONE);
+  inter.removeInteractionCommands("B", f3d::interactor::ModifierKeys::NONE);
 
   // Check that an interaction can be added and that it removes existing interaction
   inter.addInteractionCommand(
-    { "S", f3d::interactor::ModifierKeys::NONE }, "toggle interactor.axis");
+    "S", f3d::interactor::ModifierKeys::NONE, "toggle interactor.axis");
 
   // Check CTRL modifier and that another interaction can be added on the same key with another
   // modifier
   inter.addInteractionCommand(
-    { "S", f3d::interactor::ModifierKeys::CTRL }, "toggle render.grid.enable");
+    "S", f3d::interactor::ModifierKeys::CTRL, "toggle render.grid.enable");
 
   // Check invalid command for coverage
-  inter.addInteractionCommand({ "P", f3d::interactor::ModifierKeys::CTRL }, "invalid command");
+  inter.addInteractionCommand("P", f3d::interactor::ModifierKeys::CTRL, "invalid command");
 
   // Check SHIFT modifier
   inter.addInteractionCommand(
-    { "Y", f3d::interactor::ModifierKeys::SHIFT }, R"(set ui.filename_info "My Own Filename")");
+    "Y", f3d::interactor::ModifierKeys::SHIFT, R"(set ui.filename_info "My Own Filename")");
 
   // Check CTRL_SHIFT modifier
-  inter.addInteractionCommands({ "B", f3d::interactor::ModifierKeys::CTRL_SHIFT },
+  inter.addInteractionCommands("B", f3d::interactor::ModifierKeys::CTRL_SHIFT,
     { "set ui.filename true", "set render.show_edges true" });
 
   // Check ANY modifier
   inter.addInteractionCommand(
-    { "A", f3d::interactor::ModifierKeys::ANY }, "toggle render.background.skybox");
+    "A", f3d::interactor::ModifierKeys::ANY, "toggle render.background.skybox");
 
   // Check drop files callback
   inter.setDropFilesCallBack([&](std::vector<std::string> filesVec) -> bool {

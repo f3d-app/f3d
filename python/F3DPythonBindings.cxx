@@ -242,11 +242,6 @@ PYBIND11_MODULE(pyf3d, module)
     .value("CTRL_SHIFT", f3d::interactor::ModifierKeys::CTRL_SHIFT)
     .export_values();
 
-  py::class_<f3d::interactor::InteractionBind>(interactor, "InteractionBind")
-    .def(py::init<>())
-    .def_readwrite("interaction", &f3d::interactor::InteractionBind::Interaction)
-    .def_readwrite("modifiers", &f3d::interactor::InteractionBind::Modifiers);
-
   // f3d::mesh_t
   py::class_<f3d::mesh_t>(module, "Mesh")
     .def(py::init<>())
