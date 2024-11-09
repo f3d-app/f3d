@@ -41,9 +41,10 @@ public:
     std::string action, std::function<bool(const std::vector<std::string>&)> callback) override;
   interactor& removeCommandCallback(const std::string& action) override;
   bool triggerCommand(std::string_view command) override;
-  interactor& addInteractionCommands(
-    std::string interaction, ModifierKeys modifiers, const std::vector<std::string>& command) override;
-  interactor& addInteractionCommand(std::string interaction, ModifierKeys modifiers, const std::string& command) override;
+  interactor& addInteractionCommands(std::string interaction, ModifierKeys modifiers,
+    const std::vector<std::string>& command) override;
+  interactor& addInteractionCommand(
+    std::string interaction, ModifierKeys modifiers, const std::string& command) override;
   interactor& removeInteractionCommands(std::string interaction, ModifierKeys modifiers) override;
 
   unsigned long createTimerCallBack(double time, std::function<void()> callBack) override;

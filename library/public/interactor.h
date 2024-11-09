@@ -84,19 +84,22 @@ public:
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
    * as found.
    */
-  virtual interactor& addInteractionCommands(std::string interaction, ModifierKeys modifiers, const std::vector<std::string>& commands) = 0;
+  virtual interactor& addInteractionCommands(
+    std::string interaction, ModifierKeys modifiers, const std::vector<std::string>& commands) = 0;
 
   /**
    * See addInteractionCommands
    * Convenience method to add a single command for an interaction, similar as
    * addInteractionCommands(interaction, modifiers, {command})
    */
-  virtual interactor& addInteractionCommand(std::string interaction, ModifierKeys modifiers, const std::string& command) = 0;
+  virtual interactor& addInteractionCommand(
+    std::string interaction, ModifierKeys modifiers, const std::string& command) = 0;
 
   /**
    * Remove interaction commands corresponding to provided interaction and modifiers
    */
-  virtual interactor& removeInteractionCommands(std::string interaction, ModifierKeys modifiers) = 0;
+  virtual interactor& removeInteractionCommands(
+    std::string interaction, ModifierKeys modifiers) = 0;
   ///@}
 
   /**

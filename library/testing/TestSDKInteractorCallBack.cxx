@@ -51,8 +51,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.removeInteractionCommands("B", f3d::interactor::ModifierKeys::NONE);
 
   // Check that an interaction can be added and that it removes existing interaction
-  inter.addInteractionCommand(
-    "S", f3d::interactor::ModifierKeys::NONE, "toggle interactor.axis");
+  inter.addInteractionCommand("S", f3d::interactor::ModifierKeys::NONE, "toggle interactor.axis");
 
   // Check CTRL modifier and that another interaction can be added on the same key with another
   // modifier

@@ -672,13 +672,11 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
   this->addInteractionCommands("Y", ModifierKeys::NONE, { "cycle_coloring component" });
   this->addInteractionCommands("B", ModifierKeys::NONE, { "toggle ui.scalar_bar" });
   this->addInteractionCommands(
-     "P", ModifierKeys::NONE, { "toggle render.effect.translucency_support" });
+    "P", ModifierKeys::NONE, { "toggle render.effect.translucency_support" });
   this->addInteractionCommands(
-     "Q", ModifierKeys::NONE, { "toggle render.effect.ambient_occlusion" });
-  this->addInteractionCommands(
-     "A", ModifierKeys::NONE, { "toggle render.effect.anti_aliasing" });
-  this->addInteractionCommands(
-     "T", ModifierKeys::NONE, { "toggle render.effect.tone_mapping" });
+    "Q", ModifierKeys::NONE, { "toggle render.effect.ambient_occlusion" });
+  this->addInteractionCommands("A", ModifierKeys::NONE, { "toggle render.effect.anti_aliasing" });
+  this->addInteractionCommands("T", ModifierKeys::NONE, { "toggle render.effect.tone_mapping" });
   this->addInteractionCommands("E", ModifierKeys::NONE, { "toggle render.show_edges" });
   this->addInteractionCommands("X", ModifierKeys::NONE, { "toggle interactor.axis" });
   this->addInteractionCommands("G", ModifierKeys::NONE, { "toggle render.grid.enable" });
@@ -689,8 +687,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
   this->addInteractionCommands("D", ModifierKeys::NONE, { "toggle render.raytracing.denoise" });
   this->addInteractionCommands("V", ModifierKeys::NONE, { "toggle_volume_rendering" });
   this->addInteractionCommands("I", ModifierKeys::NONE, { "toggle model.volume.inverse" });
-  this->addInteractionCommands(
-     "O", ModifierKeys::NONE, { "toggle model.point_sprites.enable" });
+  this->addInteractionCommands("O", ModifierKeys::NONE, { "toggle model.point_sprites.enable" });
   this->addInteractionCommands("U", ModifierKeys::NONE, { "toggle render.background.blur" });
   this->addInteractionCommands("K", ModifierKeys::NONE, { "toggle interactor.trackball" });
   this->addInteractionCommands("F", ModifierKeys::NONE, { "toggle render.hdri.ambient" });
@@ -794,21 +791,25 @@ bool interactor_impl::triggerCommand(std::string_view command)
 interactor& interactor_impl::addInteractionCommands(
   std::string interaction, ModifierKeys modifiers, const std::vector<std::string>& commands)
 {
-  this->Internals->InteractionCommands[{std::move(interaction), std::move(modifiers)}] = commands;
+  this->Internals->InteractionCommands[{ std::move(interaction), std::move(modifiers) }] = commands;
   return *this;
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addInteractionCommand(std::string interaction, ModifierKeys modifiers, const std::string& command)
+interactor& interactor_impl::addInteractionCommand(
+  std::string interaction, ModifierKeys modifiers, const std::string& command)
 {
-  this->Internals->InteractionCommands[{std::move(interaction), std::move(modifiers)}] = { command };
+  this->Internals->InteractionCommands[{ std::move(interaction), std::move(modifiers) }] = {
+    command
+  };
   return *this;
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::removeInteractionCommands(std::string interaction, ModifierKeys modifiers)
+interactor& interactor_impl::removeInteractionCommands(
+  std::string interaction, ModifierKeys modifiers)
 {
-  this->Internals->InteractionCommands.erase({std::move(interaction), std::move(modifiers)});
+  this->Internals->InteractionCommands.erase({ std::move(interaction), std::move(modifiers) });
   return *this;
 }
 
