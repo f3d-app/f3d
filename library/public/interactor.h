@@ -73,8 +73,10 @@ public:
     ModifierKeys Modifiers;
 
     // TODO use decltype in cxx instead?
-    bool operator<(const f3d::interactor::InteractionBind& bind) const{
-      return this->Interaction < bind.Interaction || (this->Interaction == bind.Interaction && this->Modifiers < bind.Modifiers);
+    bool operator<(const f3d::interactor::InteractionBind& bind) const
+    {
+      return this->Interaction < bind.Interaction ||
+        (this->Interaction == bind.Interaction && this->Modifiers < bind.Modifiers);
     }
   };
 
@@ -93,7 +95,8 @@ public:
    * When the corresponding interaction and modifiers happens, the provided commands will be
    * triggered using triggerCommand.
    */
-  virtual interactor& addInteractionCommands(InteractionBind bind, const std::vector<std::string>& commands) = 0;
+  virtual interactor& addInteractionCommands(
+    InteractionBind bind, const std::vector<std::string>& commands) = 0;
 
   /**
    * See addInteractionCommands

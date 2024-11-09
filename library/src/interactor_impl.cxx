@@ -655,46 +655,49 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
     });
 
   // Available standard keys: None
-  this->addInteractionCommands({"W", ModifierKeys::NONE}, { "cycle_animation" });
-  this->addInteractionCommands({"C", ModifierKeys::NONE}, { "cycle_coloring field" });
-  this->addInteractionCommands({"S", ModifierKeys::NONE}, { "cycle_coloring array" });
-  this->addInteractionCommands({"Y", ModifierKeys::NONE}, { "cycle_coloring component" });
-  this->addInteractionCommands({"B", ModifierKeys::NONE}, { "toggle ui.scalar_bar" });
+  this->addInteractionCommands({ "W", ModifierKeys::NONE }, { "cycle_animation" });
+  this->addInteractionCommands({ "C", ModifierKeys::NONE }, { "cycle_coloring field" });
+  this->addInteractionCommands({ "S", ModifierKeys::NONE }, { "cycle_coloring array" });
+  this->addInteractionCommands({ "Y", ModifierKeys::NONE }, { "cycle_coloring component" });
+  this->addInteractionCommands({ "B", ModifierKeys::NONE }, { "toggle ui.scalar_bar" });
   this->addInteractionCommands(
-    {"P", ModifierKeys::NONE}, { "toggle render.effect.translucency_support" });
+    { "P", ModifierKeys::NONE }, { "toggle render.effect.translucency_support" });
   this->addInteractionCommands(
-    {"Q", ModifierKeys::NONE}, { "toggle render.effect.ambient_occlusion" });
-  this->addInteractionCommands({"A", ModifierKeys::NONE}, { "toggle render.effect.anti_aliasing" });
-  this->addInteractionCommands({"T", ModifierKeys::NONE}, { "toggle render.effect.tone_mapping" });
-  this->addInteractionCommands({"E", ModifierKeys::NONE}, { "toggle render.show_edges" });
-  this->addInteractionCommands({"X", ModifierKeys::NONE}, { "toggle interactor.axis" });
-  this->addInteractionCommands({"G", ModifierKeys::NONE}, { "toggle render.grid.enable" });
-  this->addInteractionCommands({"N", ModifierKeys::NONE}, { "toggle ui.filename" });
-  this->addInteractionCommands({"M", ModifierKeys::NONE}, { "toggle ui.metadata" });
-  this->addInteractionCommands({"Z", ModifierKeys::NONE}, { "toggle_fps" });
-  this->addInteractionCommands({"R", ModifierKeys::NONE}, { "toggle render.raytracing.enable" });
-  this->addInteractionCommands({"D", ModifierKeys::NONE}, { "toggle render.raytracing.denoise" });
-  this->addInteractionCommands({"V", ModifierKeys::NONE}, { "toggle_volume_rendering" });
-  this->addInteractionCommands({"I", ModifierKeys::NONE}, { "toggle model.volume.inverse" });
-  this->addInteractionCommands({"O", ModifierKeys::NONE}, { "toggle model.point_sprites.enable" });
-  this->addInteractionCommands({"U", ModifierKeys::NONE}, { "toggle render.background.blur" });
-  this->addInteractionCommands({"K", ModifierKeys::NONE}, { "toggle interactor.trackball" });
-  this->addInteractionCommands({"F", ModifierKeys::NONE}, { "toggle render.hdri.ambient" });
-  this->addInteractionCommands({"J", ModifierKeys::NONE}, { "toggle render.background.skybox" });
-  this->addInteractionCommands({"L", ModifierKeys::NONE}, { "increase_light_intensity" });
-  this->addInteractionCommands({"L", ModifierKeys::SHIFT}, { "decrease_light_intensity" });
-  this->addInteractionCommands({"H", ModifierKeys::NONE}, { "toggle ui.cheatsheet" });
-  this->addInteractionCommands({"Question", ModifierKeys::ANY}, { "print_scene_info" });
-  this->addInteractionCommands({"1", ModifierKeys::ANY}, { "set_camera front" });
-  this->addInteractionCommands({"3", ModifierKeys::ANY}, { "set_camera right" });
-  this->addInteractionCommands({"4", ModifierKeys::ANY}, { "roll_camera -90" });
-  this->addInteractionCommands({"5", ModifierKeys::ANY}, { "toggle scene.camera.orthographic" });
-  this->addInteractionCommands({"6", ModifierKeys::ANY}, { "roll_camera 90" });
-  this->addInteractionCommands({"7", ModifierKeys::ANY}, { "set_camera top" });
-  this->addInteractionCommands({"9", ModifierKeys::ANY}, { "set_camera isometric" });
-  this->addInteractionCommands({F3D_EXIT_HOTKEY_SYM, ModifierKeys::NONE}, { "stop_interactor" });
-  this->addInteractionCommands({"Return", ModifierKeys::NONE}, { "reset_camera" });
-  this->addInteractionCommands({"Space", ModifierKeys::NONE}, { "toggle_animation" });
+    { "Q", ModifierKeys::NONE }, { "toggle render.effect.ambient_occlusion" });
+  this->addInteractionCommands(
+    { "A", ModifierKeys::NONE }, { "toggle render.effect.anti_aliasing" });
+  this->addInteractionCommands(
+    { "T", ModifierKeys::NONE }, { "toggle render.effect.tone_mapping" });
+  this->addInteractionCommands({ "E", ModifierKeys::NONE }, { "toggle render.show_edges" });
+  this->addInteractionCommands({ "X", ModifierKeys::NONE }, { "toggle interactor.axis" });
+  this->addInteractionCommands({ "G", ModifierKeys::NONE }, { "toggle render.grid.enable" });
+  this->addInteractionCommands({ "N", ModifierKeys::NONE }, { "toggle ui.filename" });
+  this->addInteractionCommands({ "M", ModifierKeys::NONE }, { "toggle ui.metadata" });
+  this->addInteractionCommands({ "Z", ModifierKeys::NONE }, { "toggle_fps" });
+  this->addInteractionCommands({ "R", ModifierKeys::NONE }, { "toggle render.raytracing.enable" });
+  this->addInteractionCommands({ "D", ModifierKeys::NONE }, { "toggle render.raytracing.denoise" });
+  this->addInteractionCommands({ "V", ModifierKeys::NONE }, { "toggle_volume_rendering" });
+  this->addInteractionCommands({ "I", ModifierKeys::NONE }, { "toggle model.volume.inverse" });
+  this->addInteractionCommands(
+    { "O", ModifierKeys::NONE }, { "toggle model.point_sprites.enable" });
+  this->addInteractionCommands({ "U", ModifierKeys::NONE }, { "toggle render.background.blur" });
+  this->addInteractionCommands({ "K", ModifierKeys::NONE }, { "toggle interactor.trackball" });
+  this->addInteractionCommands({ "F", ModifierKeys::NONE }, { "toggle render.hdri.ambient" });
+  this->addInteractionCommands({ "J", ModifierKeys::NONE }, { "toggle render.background.skybox" });
+  this->addInteractionCommands({ "L", ModifierKeys::NONE }, { "increase_light_intensity" });
+  this->addInteractionCommands({ "L", ModifierKeys::SHIFT }, { "decrease_light_intensity" });
+  this->addInteractionCommands({ "H", ModifierKeys::NONE }, { "toggle ui.cheatsheet" });
+  this->addInteractionCommands({ "Question", ModifierKeys::ANY }, { "print_scene_info" });
+  this->addInteractionCommands({ "1", ModifierKeys::ANY }, { "set_camera front" });
+  this->addInteractionCommands({ "3", ModifierKeys::ANY }, { "set_camera right" });
+  this->addInteractionCommands({ "4", ModifierKeys::ANY }, { "roll_camera -90" });
+  this->addInteractionCommands({ "5", ModifierKeys::ANY }, { "toggle scene.camera.orthographic" });
+  this->addInteractionCommands({ "6", ModifierKeys::ANY }, { "roll_camera 90" });
+  this->addInteractionCommands({ "7", ModifierKeys::ANY }, { "set_camera top" });
+  this->addInteractionCommands({ "9", ModifierKeys::ANY }, { "set_camera isometric" });
+  this->addInteractionCommands({ F3D_EXIT_HOTKEY_SYM, ModifierKeys::NONE }, { "stop_interactor" });
+  this->addInteractionCommands({ "Return", ModifierKeys::NONE }, { "reset_camera" });
+  this->addInteractionCommands({ "Space", ModifierKeys::NONE }, { "toggle_animation" });
 }
 
 //----------------------------------------------------------------------------
@@ -777,7 +780,8 @@ bool interactor_impl::triggerCommand(std::string_view command)
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addInteractionCommands(InteractionBind bind, const std::vector<std::string>& commands)
+interactor& interactor_impl::addInteractionCommands(
+  InteractionBind bind, const std::vector<std::string>& commands)
 {
   this->Internals->InteractionCommands[std::move(bind)] = commands;
   return *this;
@@ -786,7 +790,7 @@ interactor& interactor_impl::addInteractionCommands(InteractionBind bind, const 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addInteractionCommand(InteractionBind bind, const std::string& command)
 {
-  this->Internals->InteractionCommands[std::move(bind)] = {command};
+  this->Internals->InteractionCommands[std::move(bind)] = { command };
   return *this;
 }
 
