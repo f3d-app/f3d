@@ -200,7 +200,7 @@ public:
     vtkRenderWindowInteractor* rwi = self->Style->GetInteractor();
     InteractionBind bind;
     bind.Interaction = rwi->GetKeySym();
-    if (bind.Interaction.length() > 0)
+    if (!bind.Interaction.empty())
     {
       // Make sure key symbols starts with an upper char (e.g. "space" -> "Space")
       bind.Interaction[0] = std::toupper(bind.Interaction[0]);
