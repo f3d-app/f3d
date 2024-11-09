@@ -36,7 +36,6 @@
 
 namespace f3d::detail
 {
-
 class interactor_impl::internals
 {
 public:
