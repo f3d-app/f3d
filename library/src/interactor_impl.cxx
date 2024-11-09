@@ -209,9 +209,9 @@ public:
     // Check for an interaction command with modifiers
     // XXX: Cannot use binary stuff here ?
     bind.Modifiers = ModifierKeys::NONE;
-    int shift = rwi->GetShiftKey();
-    int ctrl = rwi->GetControlKey();
-    if (shift == 1 && ctrl == 1)
+    const bool shift = rwi->GetShiftKey() == 1;
+    const bool ctrl = rwi->GetControlKey() == 1;
+    if (shift && ctrl)
     {
       bind.Modifiers = ModifierKeys::CTRL_SHIFT;
     }
