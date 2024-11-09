@@ -208,7 +208,7 @@ public:
     }
 
     // Check for an interaction command with modifiers
-    // XXX: Cant use binary stuff here ?
+    // XXX: Cannot use binary stuff here ?
     bind.Modifiers = ModifierKeys::NONE;
     int shift = rwi->GetShiftKey();
     int ctrl = rwi->GetControlKey();

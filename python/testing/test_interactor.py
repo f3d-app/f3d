@@ -26,14 +26,14 @@ def test_interaction_command():
     inter = engine.interactor
     bind = f3d.Interactor.InteractionBind
     bind.Interaction = "P"
-    bind.Modifiers = f3d.Interactor.ModifierKeys.ANY;
+    bind.Modifiers = f3d.Interactor.ModifierKeys.ANY
     inter.add_interaction_command(bind, ["dummy command"])
-    bind.Modifiers = f3d.Interactor.ModifierKeys.NONE;
+    bind.Modifiers = f3d.Interactor.ModifierKeys.NONE
     inter.add_interaction_command(bind, ["dummy command"])
-    bind.Modifiers = f3d.Interactor.ModifierKeys.CTRL;
+    bind.Modifiers = f3d.Interactor.ModifierKeys.CTRL
     inter.add_interaction_command(bind, ["dummy command"])
-    bind.Modifiers = f3d.Interactor.ModifierKeys.SHIFT;
+    bind.Modifiers = f3d.Interactor.ModifierKeys.SHIFT
     inter.add_interaction_command(bind, ["dummy command"])
-    bind.Modifiers = f3d.Interactor.ModifierKeys.CTRL_SHIFT;
+    bind.Modifiers = f3d.Interactor.ModifierKeys.CTRL_SHIFT
     inter.add_interaction_command(bind, ["dummy command"])
     inter.remove_interaction_command(bind)
