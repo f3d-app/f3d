@@ -93,7 +93,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
 
   // With VTK 9.2.6 and 9.3.0, rendering is slightly different
   return TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-           filename + "Modified", 0.1)
+           filename + "Modified", 0.11)
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }

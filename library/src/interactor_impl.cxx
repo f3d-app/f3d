@@ -811,7 +811,7 @@ interactor& interactor_impl::addInteractionCommand(
 interactor& interactor_impl::removeInteractionCommands(
   std::string interaction, ModifierKeys modifiers)
 {
-  this->Internals->InteractionCommands.erase({ std::move(interaction), std::move(modifiers) });
+  this->Internals->InteractionCommands.erase({ std::move(interaction), modifiers });
   return *this;
 }
 
