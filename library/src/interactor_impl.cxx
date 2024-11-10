@@ -207,23 +207,27 @@ public:
     }
 
     // Check for an interaction command with modifiers
-    // XXX: Cannot use binary stuff here ?
     bind.Modifiers = ModifierKeys::NONE;
+    std::string modifierLog;
     const bool shift = rwi->GetShiftKey() == 1;
     const bool ctrl = rwi->GetControlKey() == 1;
     if (shift && ctrl)
     {
       bind.Modifiers = ModifierKeys::CTRL_SHIFT;
+      modifierLog = "CTRL+SHIFT+";
     }
-    else if (ctrl == 1)
+    else if (ctrl)
     {
       bind.Modifiers = ModifierKeys::CTRL;
+      modifierLog = "CTRL+";
     }
-    else if (shift == 1)
+    else if (shift)
     {
       bind.Modifiers = ModifierKeys::SHIFT;
+      modifierLog = "SHIFT+";
     }
-    // TODO: Add trace log for interactions
+    log::debug("Interaction: KeyPress ", modifierLog, "+", bind.Interaction);
+
     auto commandsIt = self->InteractionCommands.find(bind);
     if (commandsIt == self->InteractionCommands.end())
     {
@@ -736,7 +740,7 @@ interactor& interactor_impl::removeCommandCallback(const std::string& action)
 //----------------------------------------------------------------------------
 bool interactor_impl::triggerCommand(std::string_view command)
 {
-  // TODO: add trace log for command
+  log::debug("Command: ", command);
   std::vector<std::string> tokens;
   try
   {
@@ -788,18 +792,18 @@ bool interactor_impl::triggerCommand(std::string_view command)
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addInteractionCommands(
-  std::string interaction, ModifierKeys modifiers, const std::vector<std::string>& commands)
+  std::string interaction, ModifierKeys modifiers, std::vector<std::string> commands)
 {
-  this->Internals->InteractionCommands[{ std::move(interaction), std::move(modifiers) }] = commands;
+  this->Internals->InteractionCommands[{ std::move(interaction), modifiers }] = std::move(commands);
   return *this;
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addInteractionCommand(
-  std::string interaction, ModifierKeys modifiers, const std::string& command)
+  std::string interaction, ModifierKeys modifiers, std::string command)
 {
-  this->Internals->InteractionCommands[{ std::move(interaction), std::move(modifiers) }] = {
-    command
+  this->Internals->InteractionCommands[{ std::move(interaction), modifiers }] = {
+    std::move(command)
   };
   return *this;
 }

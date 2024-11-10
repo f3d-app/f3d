@@ -82,10 +82,10 @@ public:
    * When the corresponding interaction and modifiers happens, the provided commands will be
    * triggered using triggerCommand.
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
-   * as found.
+   * is found.
    */
   virtual interactor& addInteractionCommands(
-    std::string interaction, ModifierKeys modifiers, const std::vector<std::string>& commands) = 0;
+    std::string interaction, ModifierKeys modifiers, std::vector<std::string> commands) = 0;
 
   /**
    * See addInteractionCommands
@@ -93,7 +93,7 @@ public:
    * addInteractionCommands(interaction, modifiers, {command})
    */
   virtual interactor& addInteractionCommand(
-    std::string interaction, ModifierKeys modifiers, const std::string& command) = 0;
+    std::string interaction, ModifierKeys modifiers, std::string command) = 0;
 
   /**
    * Remove interaction commands corresponding to provided interaction and modifiers
