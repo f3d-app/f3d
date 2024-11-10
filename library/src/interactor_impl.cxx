@@ -802,9 +802,8 @@ interactor& interactor_impl::addInteractionCommands(
 interactor& interactor_impl::addInteractionCommand(
   std::string interaction, ModifierKeys modifiers, std::string command)
 {
-  this->Internals->InteractionCommands[{ std::move(interaction), modifiers }] = {
-    std::move(command)
-  };
+  this->Internals->InteractionCommands[{ std::move(interaction), modifiers }] = { std::move(
+    command) };
   return *this;
 }
 
