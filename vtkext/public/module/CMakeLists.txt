@@ -28,7 +28,7 @@ endif()
 
 # CMake 3.31 trigger error in vtkModule.cmake without this policy set
 if(POLICY CMP0174)
-  cmake_policy(SET CMP0167 OLD)
+  cmake_policy(SET CMP0174 OLD)
 endif()
 
 vtk_module_add_module(f3d::vtkext
