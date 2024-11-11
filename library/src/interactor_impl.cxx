@@ -198,42 +198,62 @@ public:
   {
     internals* self = static_cast<internals*>(clientData);
     vtkRenderWindowInteractor* rwi = self->Style->GetInteractor();
-    InteractionBind bind;
-    bind.Interaction = rwi->GetKeySym();
-    if (!bind.Interaction.empty())
+
+    std::string interaction = rwi->GetKeySym();
+    if (!interaction.empty())
     {
       // Make sure key symbols starts with an upper char (e.g. "space" -> "Space")
-      bind.Interaction[0] = std::toupper(bind.Interaction[0]);
+      interaction[0] = std::toupper(interaction[0]);
     }
 
+    const auto modifiers = [&]()
+    {
+      const bool shift = rwi->GetShiftKey() == 1;
+      const bool ctrl = rwi->GetControlKey() == 1;
+      if (shift && ctrl)
+      {
+        return ModifierKeys::CTRL_SHIFT;
+      }
+      else if (ctrl)
+      {
+        return ModifierKeys::CTRL;
+      }
+      else if (shift)
+      {
+        return ModifierKeys::SHIFT;
+      }
+      else
+      {
+        return ModifierKeys::NONE;
+      }
+    };
+
+    const auto to_string = [](const InteractionBind& bind)
+    {
+      const auto& [interaction, modifiers] = bind;
+      switch (modifiers)
+      {
+        case f3d::interactor::ModifierKeys::CTRL_SHIFT:
+          return "CTRL+SHIFT+" + interaction;
+        case f3d::interactor::ModifierKeys::CTRL:
+          return "CTRL+" + interaction;
+        case f3d::interactor::ModifierKeys::SHIFT:
+          return "SHIFT+" + interaction;
+        default:
+          // No need to check for ANY (unreachable) or NONE (no log needed)
+          return interaction;
+      }
+    };
+
     // Check for an interaction command with modifiers
-    bind.Modifiers = ModifierKeys::NONE;
-    std::string modifierLog;
-    const bool shift = rwi->GetShiftKey() == 1;
-    const bool ctrl = rwi->GetControlKey() == 1;
-    if (shift && ctrl)
-    {
-      bind.Modifiers = ModifierKeys::CTRL_SHIFT;
-      modifierLog = "CTRL+SHIFT+";
-    }
-    else if (ctrl)
-    {
-      bind.Modifiers = ModifierKeys::CTRL;
-      modifierLog = "CTRL+";
-    }
-    else if (shift)
-    {
-      bind.Modifiers = ModifierKeys::SHIFT;
-      modifierLog = "SHIFT+";
-    }
-    log::debug("Interaction: KeyPress ", modifierLog, "+", bind.Interaction);
+    const InteractionBind bind = { interaction, modifiers() };
+    log::debug("Interaction: KeyPress ", to_string(bind));
 
     auto commandsIt = self->InteractionCommands.find(bind);
     if (commandsIt == self->InteractionCommands.end())
     {
       // Modifiers version not found, try ANY instead
-      bind.Modifiers = ModifierKeys::ANY;
-      commandsIt = self->InteractionCommands.find(bind);
+      commandsIt = self->InteractionCommands.find({ interaction, ModifierKeys::ANY });
     }
 
     if (commandsIt != self->InteractionCommands.end())
