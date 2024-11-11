@@ -2,6 +2,11 @@
 
 F3D can be integrated in the desktop experience.
 
+F3D now supports rendering in sandboxed environments. To enable thumbnail generation in sandboxed environments (e.g., Nautilus), add the `--rendering-backend` option to specify EGL as the backend:
+
+For Example:
+Exec=f3d --rendering-backend=egl --output=%o --resolution=%s,%s %i
+
 ## Linux
 
 For Linux desktop integration, F3D rely on mime types files as defined by the [XDG standard](https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-latest.html), .thumbnailer file as specified [here](https://wiki.archlinux.org/title/File_manager_functionality#Thumbnail_previews) and .desktop file as specified [here](https://wiki.archlinux.org/title/desktop_entries). Many file managers use this mechanism, including nautilus, thunar, pcmanfm and caja.
@@ -47,6 +52,3 @@ regsvr32 /u F3DShellExtension.dll
 
 There is no support for thumbnails on MacOS, the .dmg binary release provides automatic file openings.
 
-## Limitations
-
-- TIFF files are excluded from the thumbnailer to avoid conflicts with other better 2D thumbnailers.
