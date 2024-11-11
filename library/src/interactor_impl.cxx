@@ -230,18 +230,18 @@ public:
 
     const auto to_string = [](const InteractionBind& bind)
     {
-      const auto& [interaction, modifiers] = bind;
-      switch (modifiers)
+      const auto& [inter, mod] = bind;
+      switch (mod)
       {
         case f3d::interactor::ModifierKeys::CTRL_SHIFT:
-          return "CTRL+SHIFT+" + interaction;
+          return "CTRL+SHIFT+" + inter;
         case f3d::interactor::ModifierKeys::CTRL:
-          return "CTRL+" + interaction;
+          return "CTRL+" + inter;
         case f3d::interactor::ModifierKeys::SHIFT:
-          return "SHIFT+" + interaction;
+          return "SHIFT+" + inter;
         default:
           // No need to check for ANY (unreachable) or NONE (no log needed)
-          return interaction;
+          return inter;
       }
     };
 
