@@ -228,8 +228,10 @@ PYBIND11_MODULE(pyf3d, module)
     .def("remove_command_callback", &f3d::interactor::removeCommandCallback,
       "Remove a command callback")
     .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command")
-    .def("add_interaction_command", &f3d::interactor::addInteractionCommands,
-      "Add new interaction commands")
+    .def("add_interaction_commands", &f3d::interactor::addInteractionCommands,
+      "Add interaction commands")
+    .def("add_interaction_command", &f3d::interactor::addInteractionCommand,
+      "Add an interaction command")
     .def("remove_interaction_command", &f3d::interactor::removeInteractionCommands,
       "Remove interaction commands")
     .def_static("get_default_interactions_info", &f3d::interactor::getDefaultInteractionsInfo);
