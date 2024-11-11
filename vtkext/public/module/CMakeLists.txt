@@ -26,6 +26,11 @@ if(NOT ANDROID AND NOT EMSCRIPTEN AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.2024
   set(classes ${classes} vtkF3DBitonicSort)
 endif()
 
+# CMake 3.31 trigger error in vtkModule.cmake without this policy set
+if(POLICY CMP0174)
+  cmake_policy(SET CMP0167 OLD)
+endif()
+
 vtk_module_add_module(f3d::vtkext
   ${f3d_vtk_no_install}
   ${f3d_vtk_force_static}

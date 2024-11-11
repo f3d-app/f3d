@@ -1,11 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 include(CMakeDependentOption)
 
-# CMake 3.31 trigger error in vtkModule.cmake without this policy set
-if(POLICY CMP0174)
-  cmake_policy(SET CMP0167 OLD)
-endif()
-
 # Generic CMake variables, should be done before project()
 set(output_postfix "")
 get_property(F3D_MULTI_CONFIG_GENERATOR GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
