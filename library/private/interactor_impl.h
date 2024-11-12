@@ -35,15 +35,26 @@ public:
   interactor_impl(options& options, window_impl& window, scene_impl& scene);
   ~interactor_impl() override;
 
+  interactor& createDefaultCommandCallbacks() override;
   interactor& addCommandCallback(
+    const std::string& action, std::function<bool(const std::vector<std::string>&)> callback) override;
+  interactor& replaceCommandCallback(
     std::string action, std::function<bool(const std::vector<std::string>&)> callback) override;
   interactor& removeCommandCallback(const std::string& action) override;
   bool triggerCommand(std::string_view command) override;
+  interactor& removeAllCommandCallbacks() override;
+
+  interactor& createDefaultInteractionsCommands() override;
   interactor& addInteractionCommands(
-    std::string interaction, ModifierKeys modifiers, std::vector<std::string> command) override;
+    const std::string& interaction, ModifierKeys modifiers, std::vector<std::string> command) override;
   interactor& addInteractionCommand(
+    const std::string& interaction, ModifierKeys modifiers, std::string command) override;
+  interactor& replaceInteractionCommands(
+    std::string interaction, ModifierKeys modifiers, std::vector<std::string> command) override;
+  interactor& replaceInteractionCommand(
     std::string interaction, ModifierKeys modifiers, std::string command) override;
   interactor& removeInteractionCommands(std::string interaction, ModifierKeys modifiers) override;
+  interactor& removeAllInteractionsCommands() override;
 
   unsigned long createTimerCallBack(double time, std::function<void()> callBack) override;
   void removeTimerCallBack(unsigned long id) override;

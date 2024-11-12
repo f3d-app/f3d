@@ -51,4 +51,10 @@ const std::vector<std::pair<std::string, std::string>>& interactor::getDefaultIn
 
   return DefaultInteractionsInfo;
 };
+
+//----------------------------------------------------------------------------
+interactor::already_exists_exception::already_exists_exception(const std::string& what)
+  : exception(what)
+{
+}
 }

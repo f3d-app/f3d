@@ -1,6 +1,7 @@
 #ifndef f3d_interactor_h
 #define f3d_interactor_h
 
+#include "exception.h"
 #include "export.h"
 #include "options.h"
 #include "window.h"
@@ -24,11 +25,25 @@ class F3D_EXPORT interactor
 public:
   ///@{ @name Command
   /**
+   * Create default command callbacks, see COMMANDS.md
+   * for details.
+   */
+  virtual interactor& createDefaultCommandCallbacks() = 0;
+
+  /**
    * Use this method to add a callback into the command map
    * to be called using triggerCommand.
-   * Adding a commandCallback with an existing action replaces it.
+   * Adding a commandCallback with an already existing action throw a
+   * interactor::already_exists_exception.
    */
   virtual interactor& addCommandCallback(
+    const std::string& action, std::function<bool(const std::vector<std::string>&)> callback) = 0;
+
+  /**
+   * Similar as addCommandCallback but replace an already existing action
+   * instead of throwing.
+   */
+  virtual interactor& replaceCommandCallback(
     std::string action, std::function<bool(const std::vector<std::string>&)> callback) = 0;
 
   /**
@@ -37,7 +52,13 @@ public:
   virtual interactor& removeCommandCallback(const std::string& action) = 0;
 
   /**
-   * Trigger provided command, see COMMAND.md for more information
+   * Remove a all existing command callbacks
+   */
+  virtual interactor& removeAllCommandCallbacks() = 0;
+
+  /**
+   * Trigger provided command, see COMMANDS.md for details about supported
+   * commands and syntax.
    */
   virtual bool triggerCommand(std::string_view command) = 0;
   ///@}
@@ -56,6 +77,12 @@ public:
   };
 
   /**
+   * Create commands for default interactions, see INTERACTIONS.md
+   * for details.
+   */
+  virtual interactor& createDefaultInteractionsCommands() = 0;
+
+  /**
    * Use this method to specify your own interaction commands for a specified interaction and
    * modifiers flag.
    *
@@ -65,22 +92,41 @@ public:
    *
    * modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
    *
-   * Adding commands for an existing combination of interaction and modifier will replace it.
-   *
    * When the corresponding interaction and modifiers happens, the provided commands will be
    * triggered using triggerCommand.
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
    * is found.
+   *
+   * Adding commands for an existing combination of interaction and modifier will throw a
+   * interactor::already_exists_exception.
    */
   virtual interactor& addInteractionCommands(
-    std::string interaction, ModifierKeys modifiers, std::vector<std::string> commands) = 0;
+    const std::string& interaction, ModifierKeys modifiers, std::vector<std::string> commands) = 0;
 
   /**
    * See addInteractionCommands
    * Convenience method to add a single command for an interaction, similar as
    * addInteractionCommands(interaction, modifiers, {command})
+   *
+   * Adding command for an existing combination of interaction and modifier will throw a
+   * interactor::already_exists_exception.
    */
   virtual interactor& addInteractionCommand(
+    const std::string& interaction, ModifierKeys modifiers, std::string command) = 0;
+
+  /**
+   * Similar to addInteractionCommands but replace commands for an existing combination
+   * instead of throwing.
+   */
+  virtual interactor& replaceInteractionCommands(
+    std::string interaction, ModifierKeys modifiers, std::vector<std::string> commands) = 0;
+
+  /**
+   * See replaceInteractionCommands
+   * Convenience method to replace a single command for an interaction, similar as
+   * replaceInteractionCommands(interaction, modifiers, {command})
+   */
+  virtual interactor& replaceInteractionCommand(
     std::string interaction, ModifierKeys modifiers, std::string command) = 0;
 
   /**
@@ -88,6 +134,11 @@ public:
    */
   virtual interactor& removeInteractionCommands(
     std::string interaction, ModifierKeys modifiers) = 0;
+
+  /**
+   * Remove all commands for all interactions
+   */
+  virtual interactor& removeAllInteractionsCommands() = 0;
   ///@}
 
   /**
@@ -143,6 +194,15 @@ public:
    * Get a structure of strings describing default interactions.
    */
   static const std::vector<std::pair<std::string, std::string>>& getDefaultInteractionsInfo();
+
+  /**
+   * An exception that can be thrown by the interactor
+   * when adding something that already exists internally
+   */
+  struct already_exists_exception : public exception
+  {
+    explicit already_exists_exception(const std::string& what = "");
+  };
 
 protected:
   //! @cond
