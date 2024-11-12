@@ -18,3 +18,23 @@ def test_command(capfd):
     inter.remove_command_callback("my_cmd")
     out, err = capfd.readouterr()
     assert out == "['arg1', 'arg2']\n"
+
+
+def test_interaction_command():
+    # Smoke test
+    engine = f3d.Engine.create(True)
+    inter = engine.interactor
+    inter.add_interaction_command("P", f3d.Interactor.ModifierKeys.ANY, "dummy command")
+    inter.add_interaction_command(
+        "P", f3d.Interactor.ModifierKeys.NONE, "dummy command"
+    )
+    inter.add_interaction_command(
+        "P", f3d.Interactor.ModifierKeys.CTRL, "dummy command"
+    )
+    inter.add_interaction_command(
+        "P", f3d.Interactor.ModifierKeys.SHIFT, "dummy command"
+    )
+    inter.add_interaction_commands(
+        "P", f3d.Interactor.ModifierKeys.CTRL_SHIFT, ["dummy command", "dummy command"]
+    )
+    inter.remove_interaction_command("P", f3d.Interactor.ModifierKeys.ANY)
