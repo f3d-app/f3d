@@ -29,8 +29,9 @@ eg: `cycle_coloring array`.
 `roll_camera value`: A specific command to roll the camera on its side, takes an angle in degrees as an argument. 
 eg: `roll_camera 120`.
 
-`increase_light_intensity [negative]`: A specific command to increase/decrease light intensity. Add the optional `negative argument to decrease.
-eg: `increase_light_intensity negative`.
+`increase_light_intensity`: A specific command to increase light intensity. No argument.
+
+`decrease_light_intensity`: A specific command to decrease light intensity. No argument.
 
 `print_scene_info`: A specific command to print information about the scene, No argument.
 
@@ -46,6 +47,9 @@ Supports `front`, `top`, `right`, `isometric` arguments. eg: `set_camera top`.
 `reset_camera`: A specific command to reset the camera to its original location. No argument.
 
 `toggle_animation`: A specific command to start/stop the animation. No argument.
+
+`add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene (overridden by a F3D specific command, see below). Take one or more files as arguments.
+eg: `add_files /path/to/dragon.vtu`.
 
 ## F3D provided specific commands
 
@@ -64,6 +68,15 @@ rely on the `--screenshot-filename` CLI option. eg: `take_screenshot path/to/fil
 
 `take_minimal_screenshot [filename]`: A specific command to [take a minimal screenshot](INTERACTIONS.md#taking-screenshots). If filename is not specified,
 rely on the `--screenshot-filename` CLI option. eg: `take_screenshot path/to/file.png`.
+
+`add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene according to the current grouping logic. Take one or more files as arguments.
+eg: `add_files /path/to/dragon.vtu`.
+
+`set_hdri [path/to/hdri]`: A specific command to set and use an HDRI image. Take a HDRI file as an argument.
+eg: `set_hdri /path/to/file.hdr`.
+
+`add_files_or_set_hdri [path/to/file1] [path/to/file2]`: A specific command that will process each files and either, `set_hdri` if the provided file uses a recognised HDR extension or `add_files` otherwise. Take one or more files as arguments.
+eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
 ## Command syntax
 
