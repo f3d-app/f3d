@@ -2,10 +2,6 @@
 
 F3D can be integrated in the desktop experience.
 
-F3D now supports rendering in sandboxed environments. To enable thumbnail generation in sandboxed environments (e.g., Nautilus), add the `--rendering-backend` option to specify EGL as the backend:
-
-For Example:
-Exec=f3d --rendering-backend=egl --output=%o --resolution=%s,%s %i
 
 ## Linux
 
@@ -27,6 +23,11 @@ sudo update-desktop-database ~/.local/share/applications
 ```
 
 If you have any issues, refer to the [troubleshooting](LIMITATIONS_AND_TROUBLESHOOTING.md) part.
+
+F3D now supports rendering in sandboxed environments. To enable thumbnail generation in sandboxed environments (e.g., Nautilus), add the `--rendering-backend` option to specify EGL as the backend:
+
+For Example:
+Exec=f3d --rendering-backend=egl --output=%o --resolution=%s,%s %i
 
 ## Windows
 
@@ -52,3 +53,7 @@ regsvr32 /u F3DShellExtension.dll
 
 There is no support for thumbnails on MacOS, the .dmg binary release provides automatic file openings.
 
+## Limitations
+
+- TIFF files are excluded from the thumbnailer to avoid conflicts with other better 2D thumbnailers.
+Contributor
