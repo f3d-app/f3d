@@ -72,11 +72,6 @@ The GCC flag `-latomic` is not being added automatically with specific architect
   * If no formats have working thumbnails, then it is an issue with the `f3d-plugin-xxx.thumbnailer` files.
   * If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/10_global.json` configuration folder using the `max-size` option.
 
-
-access to the Xorg server to render anything.
-In that case, you want to use the headless version of F3D that rely on EGL instead of Xorg, available in the [releases page](https://github.com/f3d-app/f3d/releases).
-If you use the portable archive, make sure to extract it somewhere the sandboxing system has access to, eg: Nautilus uses `bwrap` and gives it access to `/usr` but not to `/opt`.
-
 ## Windows
 
 > Using the portable binary release, I'm unable to run F3D because Windows warns about a security risk
