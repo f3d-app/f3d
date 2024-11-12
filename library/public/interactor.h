@@ -23,17 +23,6 @@ class F3D_EXPORT interactor
 {
 public:
   /**
-   * Use this method to specify your own keypress callback, with the expected API:
-   * \code
-   * bool callBack(int keyCode, std::string keySym)
-   * \endcode
-   * keyCode being the pressed key, eg: `C` and keySym the key symbol for keys which do not have
-   * codes, eg: Left, Right, Up, Down, Space, Enter. Your callBack should return true if the key was
-   * handled, false if you want standard interactor behavior instead.
-   */
-  virtual interactor& setKeyPressCallBack(std::function<bool(int, std::string)> callBack) = 0;
-
-  /**
    * Use this method to specify your own drop files callback, with the expected API:
    * \code
    * bool callBack(std::vector<std::string> files)
@@ -63,6 +52,54 @@ public:
    * Trigger provided command, see COMMAND.md for more information
    */
   virtual bool triggerCommand(std::string_view command) = 0;
+  ///@}
+
+  ///@{ @name Interaction Commands
+  /**
+   * Enumeration of supported modifier combination, in binary.
+   */
+  enum class ModifierKeys : unsigned char
+  {
+    ANY = 0x80,      // 10000000
+    NONE = 0x0,      // 00000000
+    CTRL = 0x1,      // 00000001
+    SHIFT = 0x2,     // 00000010
+    CTRL_SHIFT = 0x3 // 00000011
+  };
+
+  /**
+   * Use this method to specify your own interaction commands for a specified interaction and
+   * modifiers flag.
+   *
+   * interaction can be a pressed key symbol, eg: "C",
+   * or a dedicated key symbol for special keys:
+   * "Left", "Right", "Up", "Down", "Space", "Enter", "Escape", "Question".
+   *
+   * modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
+   *
+   * Adding commands for an existing combination of interaction and modifier will replace it.
+   *
+   * When the corresponding interaction and modifiers happens, the provided commands will be
+   * triggered using triggerCommand.
+   * ANY modifier interactions will only be triggered if no other interaction bind with modifier
+   * is found.
+   */
+  virtual interactor& addInteractionCommands(
+    std::string interaction, ModifierKeys modifiers, std::vector<std::string> commands) = 0;
+
+  /**
+   * See addInteractionCommands
+   * Convenience method to add a single command for an interaction, similar as
+   * addInteractionCommands(interaction, modifiers, {command})
+   */
+  virtual interactor& addInteractionCommand(
+    std::string interaction, ModifierKeys modifiers, std::string command) = 0;
+
+  /**
+   * Remove interaction commands corresponding to provided interaction and modifiers
+   */
+  virtual interactor& removeInteractionCommands(
+    std::string interaction, ModifierKeys modifiers) = 0;
   ///@}
 
   /**
