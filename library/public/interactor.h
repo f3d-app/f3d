@@ -22,18 +22,6 @@ namespace f3d
 class F3D_EXPORT interactor
 {
 public:
-  /**
-   * Use this method to specify your own drop files callback, with the expected API:
-   * \code
-   * bool callBack(std::vector<std::string> files)
-   * \endcode
-   * files being a vector of string containing paths to dropped files.
-   * Your callBack should return true if the event was handled, false if you want standard
-   * interactor behavior instead.
-   */
-  virtual interactor& setDropFilesCallBack(
-    std::function<bool(std::vector<std::string>)> callBack) = 0;
-
   ///@{ @name Command
   /**
    * Use this method to add a callback into the command map
