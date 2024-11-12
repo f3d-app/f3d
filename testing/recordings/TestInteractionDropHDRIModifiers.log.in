@@ -20,6 +20,7 @@ TimerEvent -604 609 1 80 1 Shift_L 0
 TimerEvent -604 609 1 80 1 Shift_L 0
 UpdateDropLocationEvent 677 699 1 80 1 Shift_L 0
 EnterEvent 781 494 1 80 1 Shift_L 0
+DropFilesEvent 781 494 1 80 1 Shift_L 1 0
 DropFilesEvent 781 494 1 80 1 Shift_L 1 1 ${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.tif
 RenderEvent 781 494 1 80 1 Control_L 0
 TimerEvent -604 609 1 80 1 Shift_L 0

@@ -814,7 +814,8 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestInteractionDropHDRIMulti INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu palermo.hdr;
 
   # Test modified drops, this test rendering is impacted by https://github.com/f3d-app/f3d/issues/1558
-  f3d_test(NAME TestInteractionDropHDRIModifiers INTERACTION_CONFIGURE LONG_TIMEOUT)#CTRL+DropEvent f3d.tif;SHIFT+DropEven palermo.tif;SYYYY
+  # Empty drop is for coverage
+  f3d_test(NAME TestInteractionDropHDRIModifiers INTERACTION_CONFIGURE LONG_TIMEOUT)#CTRL+DropEvent f3d.tif;SHIFT+DropEvent;SHIFT+DropEven palermo.tif;SYYYY
 
   # Test interactive animation and dropping HDRI
   if(F3D_SANITIZER STREQUAL "none")
