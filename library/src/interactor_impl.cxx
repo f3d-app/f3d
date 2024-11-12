@@ -850,7 +850,7 @@ interactor& interactor_impl::addInteractionCommands(
 interactor& interactor_impl::addInteractionCommand(
   const std::string& interaction, ModifierKeys modifiers, std::string command)
 {
-  return this->addInteractionCommand(interaction, modifiers, { std::move(command) });
+  return this->addInteractionCommands(interaction, modifiers, { std::move(command) });
 }
 
 //----------------------------------------------------------------------------
@@ -865,7 +865,7 @@ interactor& interactor_impl::replaceInteractionCommands(
 interactor& interactor_impl::replaceInteractionCommand(
   std::string interaction, ModifierKeys modifiers, std::string command)
 {
-  return this->addInteractionCommand(std::move(interaction), modifiers, { std::move(command) });
+  return this->replaceInteractionCommands(std::move(interaction), modifiers, { std::move(command) });
 }
 
 //----------------------------------------------------------------------------
