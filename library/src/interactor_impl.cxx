@@ -701,7 +701,7 @@ interactor& interactor_impl::createDefaultCommandCallbacks()
 interactor& interactor_impl::addCommandCallback(
   const std::string& action, std::function<bool(const std::vector<std::string>&)> callback)
 {
-  const auto [it, success] = this->Internals->CommandCallbacks.insert({action, callback});
+  const auto [it, success] = this->Internals->CommandCallbacks.insert({ action, callback });
   if (!success)
   {
     throw interactor::already_exists_exception(
@@ -835,11 +835,13 @@ interactor& interactor_impl::createDefaultInteractionsCommands()
 interactor& interactor_impl::addInteractionCommands(
   const std::string& interaction, ModifierKeys modifiers, std::vector<std::string> commands)
 {
-  const auto [it, success] = this->Internals->InteractionCommands.insert({{ interaction, modifiers }, std::move(commands)});
+  const auto [it, success] = this->Internals->InteractionCommands.insert(
+    { { interaction, modifiers }, std::move(commands) });
   if (!success)
   {
     throw interactor::already_exists_exception(
-      "Could not add interaction commands for interaction: " + internals::FormatInteractionBind({interaction, modifiers}) + " as it already exists.");
+      "Could not add interaction commands for interaction: " +
+      internals::FormatInteractionBind({ interaction, modifiers }) + " as it already exists.");
   }
   return *this;
 }
@@ -848,7 +850,7 @@ interactor& interactor_impl::addInteractionCommands(
 interactor& interactor_impl::addInteractionCommand(
   const std::string& interaction, ModifierKeys modifiers, std::string command)
 {
-  return this->addInteractionCommand(interaction, modifiers, {std::move(command)});
+  return this->addInteractionCommand(interaction, modifiers, { std::move(command) });
 }
 
 //----------------------------------------------------------------------------
@@ -863,7 +865,7 @@ interactor& interactor_impl::replaceInteractionCommands(
 interactor& interactor_impl::replaceInteractionCommand(
   std::string interaction, ModifierKeys modifiers, std::string command)
 {
-  return this->addInteractionCommand(std::move(interaction), modifiers, {std::move(command)});
+  return this->addInteractionCommand(std::move(interaction), modifiers, { std::move(command) });
 }
 
 //----------------------------------------------------------------------------

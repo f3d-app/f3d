@@ -36,8 +36,8 @@ public:
   ~interactor_impl() override;
 
   interactor& createDefaultCommandCallbacks() override;
-  interactor& addCommandCallback(
-    const std::string& action, std::function<bool(const std::vector<std::string>&)> callback) override;
+  interactor& addCommandCallback(const std::string& action,
+    std::function<bool(const std::vector<std::string>&)> callback) override;
   interactor& replaceCommandCallback(
     std::string action, std::function<bool(const std::vector<std::string>&)> callback) override;
   interactor& removeCommandCallback(const std::string& action) override;
@@ -45,8 +45,8 @@ public:
   interactor& removeAllCommandCallbacks() override;
 
   interactor& createDefaultInteractionsCommands() override;
-  interactor& addInteractionCommands(
-    const std::string& interaction, ModifierKeys modifiers, std::vector<std::string> command) override;
+  interactor& addInteractionCommands(const std::string& interaction, ModifierKeys modifiers,
+    std::vector<std::string> command) override;
   interactor& addInteractionCommand(
     const std::string& interaction, ModifierKeys modifiers, std::string command) override;
   interactor& replaceInteractionCommands(
