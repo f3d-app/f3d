@@ -22,19 +22,16 @@ sudo update-mime-database ~/.local/share/mime/
 sudo update-desktop-database ~/.local/share/applications
 ```
 
-If you have any issues, refer to the [troubleshooting](LIMITATIONS_AND_TROUBLESHOOTING.md) part.
 
-F3D supports rendering in environments with limited graphical environnements, including sandboxes or without Xorg. In most cases, the default behavior will automatically detect which capabilities are available and use the right rendering backend, it is possible to specify it using --rendering-backend CLI option.
+F3D supports rendering in environments with limited graphical environnements, including sandboxes or without Xorg. In most cases, the default behavior will automatically detect which capabilities are available and use the right rendering backend, it is possible to specify it using `--rendering-backend` CLI option.
 
-If libEGL.so is available, you can use: --rendering-backend=egl.
-If libOSMesa.so is available, you can user: --rendering-backend=osmesa.
+If `libEGL.so` is available, you can use: `--rendering-backend=egl`.
+If `libOSMesa.so` is available, you can user: `--rendering-backend=osmesa`.
 
 You can use that feature for thumbnail generation in sandboxed environments (e.g., Nautilus), by modifying the f3d.thumbnailer file like this:
 
-Exec=f3d --rendering-backend=egl --output=%o --resolution=%s,%s %i
+```Exec=f3d --rendering-backend=egl --output=%o --resolution=%s,%s %i ```
 Please note this change will be overriden if you reinstall F3D.
-
-Some file managers (eg: Nautilus) are using sandboxing for thumbnails, which the F3D standard binary release does not support as it needs access to the Xorg server to render anything.
 
 ## Windows
 
