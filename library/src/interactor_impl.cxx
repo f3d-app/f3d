@@ -362,49 +362,44 @@ public:
   //----------------------------------------------------------------------------
   void TriggerInteractionCommands(const std::string& interaction, const std::string& argsString)
   {
-    const auto modifiers = [&]()
+    ModifierKeys mod = ModifierKeys::NONE;
+    vtkRenderWindowInteractor* rwi = this->Style->GetInteractor();
+    const bool shift = rwi->GetShiftKey() == 1;
+    const bool ctrl = rwi->GetControlKey() == 1;
+    if (shift && ctrl)
     {
-      vtkRenderWindowInteractor* rwi = this->Style->GetInteractor();
-      const bool shift = rwi->GetShiftKey() == 1;
-      const bool ctrl = rwi->GetControlKey() == 1;
-      if (shift && ctrl)
-      {
-        return ModifierKeys::CTRL_SHIFT;
-      }
-      else if (ctrl)
-      {
-        return ModifierKeys::CTRL;
-      }
-      else if (shift)
-      {
-        return ModifierKeys::SHIFT;
-      }
-      else
-      {
-        return ModifierKeys::NONE;
-      }
-    };
+      mod = ModifierKeys::CTRL_SHIFT;
+    }
+    else if (ctrl)
+    {
+      mod = ModifierKeys::CTRL;
+    }
+    else if (shift)
+    {
+      mod = ModifierKeys::SHIFT;
+    }
 
-    const auto to_string = [](const InteractionBind& bind)
+    std::string interactionLog;
+    switch (mod)
     {
-      const auto& [inter, mod] = bind;
-      switch (mod)
-      {
-        case f3d::interactor::ModifierKeys::CTRL_SHIFT:
-          return "CTRL+SHIFT+" + inter;
-        case f3d::interactor::ModifierKeys::CTRL:
-          return "CTRL+" + inter;
-        case f3d::interactor::ModifierKeys::SHIFT:
-          return "SHIFT+" + inter;
-        default:
-          // No need to check for ANY (unreachable) or NONE (no log needed)
-          return inter;
-      }
-    };
+      case f3d::interactor::ModifierKeys::CTRL_SHIFT:
+        interactionLog = "CTRL+SHIFT+" + interaction;
+        break;
+      case f3d::interactor::ModifierKeys::CTRL:
+        interactionLog = "CTRL+" + interaction;
+        break;
+      case f3d::interactor::ModifierKeys::SHIFT:
+        interactionLog = "SHIFT+" + interaction;
+        break;
+      default:
+        // No need to check for ANY (unreachable) or NONE (no log needed)
+        interactionLog = interaction;
+        break;
+    }
 
     // Check for an interaction command with modifiers
-    const InteractionBind bind = { interaction, modifiers() };
-    log::debug("Interaction: KeyPress ", to_string(bind));
+    const InteractionBind bind = { interaction, mod };
+    log::debug("Interaction: KeyPress ", interactionLog);
 
     auto commandsIt = this->InteractionCommands.find(bind);
     if (commandsIt == this->InteractionCommands.end())
