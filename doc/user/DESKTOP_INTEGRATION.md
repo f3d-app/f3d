@@ -31,7 +31,7 @@ You can use that feature for thumbnail generation in sandboxed environments (e.g
 ```
 Exec=f3d --rendering-backend=egl --output=%o --resolution=%s,%s %i
 ```
-Please note this change will be overriden if you reinstall F3D.
+Please note this change will be overridden if you reinstall F3D.
 
 If you use the portable archive, make sure to extract it somewhere the sandboxing system has access to, eg: Nautilus uses `bwrap` and gives it access to `/usr` but not to `/opt`.
 
