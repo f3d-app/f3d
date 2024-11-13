@@ -25,7 +25,7 @@ class F3D_EXPORT interactor
 public:
   ///@{ @name Command
   /**
-   * Create default command callbacks, see COMMANDS.md
+   * Create and replace all default command callbacks, see COMMANDS.md
    * for details.
    */
   virtual interactor& createDefaultCommandCallbacks() = 0;
@@ -40,7 +40,7 @@ public:
     const std::string& action, std::function<bool(const std::vector<std::string>&)> callback) = 0;
 
   /**
-   * Similar as addCommandCallback but replace an already existing action
+   * Similar as addCommandCallback but either add or replace an already existing action
    * instead of throwing.
    */
   virtual interactor& replaceCommandCallback(
@@ -77,7 +77,7 @@ public:
   };
 
   /**
-   * Create commands for default interactions, see INTERACTIONS.md
+   * Create and replace all commands for default interactions, see INTERACTIONS.md
    * for details.
    */
   virtual interactor& createDefaultInteractionsCommands() = 0;
@@ -115,15 +115,15 @@ public:
     const std::string& interaction, ModifierKeys modifiers, std::string command) = 0;
 
   /**
-   * Similar to addInteractionCommands but replace commands for an existing combination
-   * instead of throwing.
+   * Similar to addInteractionCommands but either add or replace commands for an existing
+   * combination instead of throwing.
    */
   virtual interactor& replaceInteractionCommands(
     std::string interaction, ModifierKeys modifiers, std::vector<std::string> commands) = 0;
 
   /**
    * See replaceInteractionCommands
-   * Convenience method to replace a single command for an interaction, similar as
+   * Convenience method to either add or replace a single command for an interaction, similar as
    * replaceInteractionCommands(interaction, modifiers, {command})
    */
   virtual interactor& replaceInteractionCommand(

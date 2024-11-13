@@ -844,7 +844,7 @@ int F3DStarter::Start(int argc, char** argv)
       });
 
     // This replace an existing command in libf3d
-    interactor.addCommandCallback("add_files",
+    interactor.replaceCommandCallback("add_files",
       [this](const std::vector<std::string>& files) -> bool
       {
         int index = -1;
@@ -922,7 +922,7 @@ int F3DStarter::Start(int argc, char** argv)
     interactor.addInteractionCommand("F12", f3d::interactor::ModifierKeys::NONE, "take_screenshot");
 
     // This replace an existing default interaction command in the libf3d
-    interactor.addInteractionCommand(
+    interactor.replaceInteractionCommand(
       "Drop", f3d::interactor::ModifierKeys::NONE, "add_files_or_set_hdri");
     interactor.addInteractionCommand("Drop", f3d::interactor::ModifierKeys::CTRL, "add_files");
     interactor.addInteractionCommand("Drop", f3d::interactor::ModifierKeys::SHIFT, "set_hdri");

@@ -51,7 +51,8 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.removeInteractionCommands("B", f3d::interactor::ModifierKeys::NONE);
 
   // Check that an interaction can be added and that it removes existing interaction
-  inter.addInteractionCommand("S", f3d::interactor::ModifierKeys::NONE, "toggle interactor.axis");
+  inter.replaceInteractionCommand(
+    "S", f3d::interactor::ModifierKeys::NONE, "toggle interactor.axis");
 
   // Check CTRL modifier and that another interaction can be added on the same key with another
   // modifier
@@ -74,7 +75,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     "A", f3d::interactor::ModifierKeys::ANY, "toggle render.background.skybox");
 
   // Modify the add_files command
-  inter.addCommandCallback("add_files", [&](const std::vector<std::string>& filesVec) -> bool {
+  inter.replaceCommandCallback("add_files", [&](const std::vector<std::string>& filesVec) -> bool {
     const std::string& path = filesVec[0];
     size_t found = path.find_last_of("/\\");
     sce.clear();
@@ -91,8 +92,39 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   }
 
   // With VTK 9.2.6 and 9.3.0, rendering is slightly different
+  if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+        filename + "Modified", 0.11))
+  {
+    return EXIT_FAILURE;
+  }
+
+  // Remove all interactions and play interaction again
+  inter.removeAllInteractionsCommands();
+  // Dragon.vtu; SYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
+  if (!inter.playInteraction(interactionFilePath))
+  {
+    std::cerr << "Unexcepted error playing interaction" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // With VTK 9.2.6 and 9.3.0, rendering is slightly different
+  if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+        filename + "ModifiedAgain", 0.11))
+  {
+    return EXIT_FAILURE;
+  }
+
+  // Create default interactions commands again, two times, and check rendering
+  inter.createDefaultInteractionsCommands();
+  inter.createDefaultInteractionsCommands();
+  // Dragon.vtu; SYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
+  if (!inter.playInteraction(interactionFilePath))
+  {
+    std::cerr << "Unexcepted error playing interaction" << std::endl;
+    return EXIT_FAILURE;
+  }
   return TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-           filename + "Modified", 0.11)
+           filename + "DefaultAgain")
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }

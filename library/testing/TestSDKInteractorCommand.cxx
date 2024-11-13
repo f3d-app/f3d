@@ -36,13 +36,20 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   test("triggerCommand set unparsable",
     inter.triggerCommand("set scene.animation.index invalid") == false);
 
-  // Add/Remove callback
+  // Add/Replace/Remove callback
   inter.addCommandCallback("test_toggle", [&](const std::vector<std::string>&) -> bool {
     options.toggle("model.scivis.cells");
     return true;
   });
   inter.triggerCommand("test_toggle");
   test("addCommandCallback", options.model.scivis.cells == false);
+
+  inter.replaceCommandCallback("test_toggle", [&](const std::vector<std::string>&) -> bool {
+    options.toggle("scene.camera.orthographic");
+    return true;
+  });
+  inter.triggerCommand("test_toggle");
+  test("replaceCommandCallback", options.scene.camera.orthographic == true);
 
   inter.removeCommandCallback("test_toggle");
   test("removeCommandCallback", inter.triggerCommand("test_toggle") == false);
@@ -61,6 +68,22 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   // Coverage exception handling
   test("triggerCommand exception handling",
     inter.triggerCommand(R"(print "render.hdri.file)") == false);
+
+  // removeAll/CreateDefault
+  inter.removeAllCommandCallbacks();
+  test("removeAllCommandCallbacks", inter.triggerCommand("print model.scivis.cells") == false);
+  inter.createDefaultCommandCallbacks();
+  inter.createDefaultCommandCallbacks();
+  inter.triggerCommand("toggle model.scivis.cells");
+  test("triggerCommand after defaults creation", options.model.scivis.cells == true);
+
+  // check exception
+  test.expect<f3d::interactor::already_exists_exception>("add already existing callback", [&]() {
+    inter.addCommandCallback("toggle", [&](const std::vector<std::string>&) -> bool {
+      options.toggle("model.scivis.cells");
+      return true;
+    });
+  });
 
   // Args check
   test("triggerCommand set invalid args", inter.triggerCommand("set one") == false);
