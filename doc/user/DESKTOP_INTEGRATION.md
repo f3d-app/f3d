@@ -2,7 +2,6 @@
 
 F3D can be integrated in the desktop experience.
 
-
 ## Linux
 
 For Linux desktop integration, F3D rely on mime types files as defined by the [XDG standard](https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-latest.html), .thumbnailer file as specified [here](https://wiki.archlinux.org/title/File_manager_functionality#Thumbnail_previews) and .desktop file as specified [here](https://wiki.archlinux.org/title/desktop_entries). Many file managers use this mechanism, including nautilus, thunar, pcmanfm and caja.
@@ -25,11 +24,13 @@ sudo update-desktop-database ~/.local/share/applications
 F3D supports rendering in environments with limited graphical environnements, including sandboxes or without Xorg. In most cases, the default behavior will automatically detect which capabilities are available and use the right rendering backend, it is possible to specify it using `--rendering-backend` CLI option.
 
 If `libEGL.so` is available, you can use: `--rendering-backend=egl`.
-If `libOSMesa.so` is available, you can user: `--rendering-backend=osmesa`.
+If `libOSMesa.so` is available, you can use: `--rendering-backend=osmesa`.
 
 You can use that feature for thumbnail generation in sandboxed environments (e.g., Nautilus), by modifying the `f3d.thumbnailer` file like this:
 
-```Exec=f3d --rendering-backend=egl --output=%o --resolution=%s,%s %i ```
+```
+Exec=f3d --rendering-backend=egl --output=%o --resolution=%s,%s %i
+```
 Please note this change will be overriden if you reinstall F3D.
 
 If you use the portable archive, make sure to extract it somewhere the sandboxing system has access to, eg: Nautilus uses `bwrap` and gives it access to `/usr` but not to `/opt`.
