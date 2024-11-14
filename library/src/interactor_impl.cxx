@@ -722,7 +722,7 @@ interactor& interactor_impl::removeCommandCallback(const std::string& action)
 std::vector<std::string> interactor_impl::getCommandCallbackActions()
 {
   std::vector<std::string> actions;
-  for (auto const & [action, callback] : this->Internals->CommandCallbacks)
+  for (auto const& [action, callback] : this->Internals->CommandCallbacks)
   {
     actions.push_back(action);
   }
@@ -834,13 +834,14 @@ interactor& interactor_impl::createDefaultInteractionsCommands()
 interactor& interactor_impl::addInteractionCommands(
   const std::string& interaction, ModifierKeys modifiers, std::vector<std::string> commands)
 {
-  const internals::InteractionBind bind { interaction, modifiers };
-  const auto [it, success] = this->Internals->InteractionCommands.insert(
-    { bind, std::move(commands) });
+  const internals::InteractionBind bind{ interaction, modifiers };
+  const auto [it, success] =
+    this->Internals->InteractionCommands.insert({ bind, std::move(commands) });
   if (!success)
   {
     throw interactor::already_exists_exception(
-      "Could not add interaction commands for interaction: " + bind.Format() + " as it already exists.");
+      "Could not add interaction commands for interaction: " + bind.Format() +
+      " as it already exists.");
   }
   return *this;
 }
