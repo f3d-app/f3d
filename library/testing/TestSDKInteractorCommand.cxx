@@ -63,7 +63,7 @@ int TestSDKInteractorCommand(int argc, char* argv[])
     inter.triggerCommand(R"(print "render.hdri.file)") == false);
 
   // remove all command callbacks
-  for (std::string action : inter.getCommandCallbackActions())
+  for (const std::string& action : inter.getCommandCallbackActions())
   {
     inter.removeCommandCallback(action);
   }
