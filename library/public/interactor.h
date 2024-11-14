@@ -25,8 +25,8 @@ class F3D_EXPORT interactor
 public:
   ///@{ @name Command
   /**
-   * Create and replace all default command callbacks, see COMMANDS.md
-   * for details.
+   * Remove all existing command callbacks and create all default command callbacks,
+   * see COMMANDS.md for details.
    */
   virtual interactor& createDefaultCommandCallbacks() = 0;
 
@@ -40,21 +40,14 @@ public:
     const std::string& action, std::function<bool(const std::vector<std::string>&)> callback) = 0;
 
   /**
-   * Similar as addCommandCallback but either add or replace an already existing action
-   * instead of throwing.
-   */
-  virtual interactor& replaceCommandCallback(
-    std::string action, std::function<bool(const std::vector<std::string>&)> callback) = 0;
-
-  /**
-   * Remove a command callback for provided action
+   * Remove a command callback for provided action, does not do anything if it does not exists.
    */
   virtual interactor& removeCommandCallback(const std::string& action) = 0;
 
   /**
-   * Remove a all existing command callbacks
+   * Return a string vector containing all currently defined actions of command callbacks
    */
-  virtual interactor& removeAllCommandCallbacks() = 0;
+  virtual std::vector<std::string> getCommandCallbackActions() = 0;
 
   /**
    * Trigger provided command, see COMMANDS.md for details about supported
@@ -77,8 +70,8 @@ public:
   };
 
   /**
-   * Create and replace all commands for default interactions, see INTERACTIONS.md
-   * for details.
+   * Remove all existing interaction command and create all commands for default interactions,
+   * see INTERACTIONS.md for details.
    */
   virtual interactor& createDefaultInteractionsCommands() = 0;
 
@@ -115,30 +108,15 @@ public:
     const std::string& interaction, ModifierKeys modifiers, std::string command) = 0;
 
   /**
-   * Similar to addInteractionCommands but either add or replace commands for an existing
-   * combination instead of throwing.
-   */
-  virtual interactor& replaceInteractionCommands(
-    std::string interaction, ModifierKeys modifiers, std::vector<std::string> commands) = 0;
-
-  /**
-   * See replaceInteractionCommands
-   * Convenience method to either add or replace a single command for an interaction, similar as
-   * replaceInteractionCommands(interaction, modifiers, {command})
-   */
-  virtual interactor& replaceInteractionCommand(
-    std::string interaction, ModifierKeys modifiers, std::string command) = 0;
-
-  /**
    * Remove interaction commands corresponding to provided interaction and modifiers
    */
   virtual interactor& removeInteractionCommands(
     std::string interaction, ModifierKeys modifiers) = 0;
 
   /**
-   * Remove all commands for all interactions
+   * Return a string vector of all currently defined interaction binds
    */
-  virtual interactor& removeAllInteractionsCommands() = 0;
+  virtual std::vector<std::pair<std::string, ModifierKeys>> getInteractionBinds() = 0;
   ///@}
 
   /**

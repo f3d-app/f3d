@@ -44,14 +44,24 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Check that adding an existing interaction command trigger an exception
+  try
+  {
+    inter.addInteractionCommand("7", f3d::interactor::ModifierKeys::ANY, "exception");
+    std::cerr << "An exception has not been thrown when adding a existing interaction command"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const f3d::interactor::already_exists_exception& ex){}
+
   // Remove interactions that will be triggered later and should not have any effect
-  // Do not remove S as it will be replaced below
   inter.removeInteractionCommands("7", f3d::interactor::ModifierKeys::ANY);
   inter.removeInteractionCommands("Y", f3d::interactor::ModifierKeys::NONE);
   inter.removeInteractionCommands("B", f3d::interactor::ModifierKeys::NONE);
+  inter.removeInteractionCommands("S", f3d::interactor::ModifierKeys::NONE);
 
   // Check that an interaction can be added and that it removes existing interaction
-  inter.replaceInteractionCommand(
+  inter.addInteractionCommand(
     "S", f3d::interactor::ModifierKeys::NONE, "toggle interactor.axis");
 
   // Check CTRL modifier and that another interaction can be added on the same key with another
@@ -74,8 +84,9 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.addInteractionCommand(
     "A", f3d::interactor::ModifierKeys::ANY, "toggle render.background.skybox");
 
-  // Modify the add_files command
-  inter.replaceCommandCallback("add_files", [&](const std::vector<std::string>& filesVec) -> bool {
+  // Replace the add_files command
+  inter.removeCommandCallback("add_files");
+  inter.addCommandCallback("add_files", [&](const std::vector<std::string>& filesVec) -> bool {
     const std::string& path = filesVec[0];
     size_t found = path.find_last_of("/\\");
     sce.clear();
@@ -98,8 +109,15 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // Remove all interactions and play interaction again
-  inter.removeAllInteractionsCommands();
+  // Remove a non-existing interaction command
+  inter.removeInteractionCommands("Invalid", f3d::interactor::ModifierKeys::ANY);
+
+  // Remove all interactions
+  for (const auto& [interaction, modifier] : inter.getInteractionBinds())
+  {
+    inter.removeInteractionCommands(interaction, modifier);
+  }
+  // Play interaction again, which should not have any effect
   // Dragon.vtu; SYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
   {
