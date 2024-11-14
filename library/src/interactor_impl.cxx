@@ -724,7 +724,7 @@ std::vector<std::string> interactor_impl::getCommandCallbackActions()
   std::vector<std::string> actions;
   for (auto const& [action, callback] : this->Internals->CommandCallbacks)
   {
-    actions.push_back(action);
+    actions.emplace_back(action);
   }
   return actions;
 }
@@ -868,7 +868,7 @@ interactor_impl::getInteractionBinds()
   std::vector<std::pair<std::string, ModifierKeys>> binds;
   for (const auto& [bind, command] : this->Internals->InteractionCommands)
   {
-    binds.push_back({ bind.Interaction, bind.Modifiers });
+    binds.emplace_back({ bind.Interaction, bind.Modifiers });
   }
   return binds;
 }
