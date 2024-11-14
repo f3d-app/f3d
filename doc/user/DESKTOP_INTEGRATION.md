@@ -26,12 +26,13 @@ F3D supports rendering in environments with limited graphical environnements, in
 If `libEGL.so` is available, you can use: `--rendering-backend=egl`.
 If `libOSMesa.so` is available, you can use: `--rendering-backend=osmesa`.
 
-You can use that feature for thumbnail generation in sandboxed environments (e.g., Nautilus), by modifying the `f3d.thumbnailer` file like this:
+You can use that feature for thumbnail generation whenver needed (e.g., Nautilus), by modifying the thumbnail config file, eg:` ~/.config/f3d/thumbnail.json `:
 
 ```
-Exec=f3d --rendering-backend=egl --output=%o --resolution=%s,%s %i
+    ".*": {
+         "rendering-backend": "egl"
+   },
 ```
-Please note this change will be overriden if you reinstall F3D.
 
 If you use the portable archive, make sure to extract it somewhere the sandboxing system has access to, eg: Nautilus uses `bwrap` and gives it access to `/usr` but not to `/opt`.
 
