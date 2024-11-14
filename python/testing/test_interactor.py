@@ -17,8 +17,8 @@ def test_command(capfd):
     # Check default commands can be removed
     actions = inter.get_command_callback_actions()
     for action in actions:
-      inter.remove_command_callback(action)
-    assert(len(inter.get_command_callback_actions()) == 0)
+        inter.remove_command_callback(action)
+    assert len(inter.get_command_callback_actions()) == 0
 
     # Check a command can be triggered
     inter.add_command_callback("my_cmd", callback_fn)
@@ -38,8 +38,8 @@ def test_interaction_command():
     # Check default interactions can be removed
     binds = inter.get_interaction_binds()
     for [interaction, modifiers] in binds:
-      inter.remove_interaction_command(interaction, modifiers)
-    assert(len(inter.get_interaction_binds()) == 0)
+        inter.remove_interaction_command(interaction, modifiers)
+    assert len(inter.get_interaction_binds()) == 0
 
     # Smoke test
     inter.add_interaction_command("P", f3d.Interactor.ModifierKeys.ANY, "dummy command")
