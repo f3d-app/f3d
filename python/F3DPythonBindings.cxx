@@ -224,17 +224,25 @@ PYBIND11_MODULE(pyf3d, module)
     .def("record_interaction", &f3d::interactor::recordInteraction, "Record an interaction file")
     .def("start", &f3d::interactor::start, "Start the interactor")
     .def("stop", &f3d::interactor::start, "Stop the interactor")
-    .def("create_default_command_callbacks", &f3d::interactor::createDefaultCommandCallbacks, "Remove all command callbacks and create default command callbacks")
+    .def("create_default_command_callbacks", &f3d::interactor::createDefaultCommandCallbacks,
+      "Remove all command callbacks and create default command callbacks")
     .def("add_command_callback", &f3d::interactor::addCommandCallback, "Add a new command callback")
     .def("remove_command_callback", &f3d::interactor::removeCommandCallback,
       "Remove a command callback")
-    .def("get_command_callback_actions", &f3d::interactor::getCommandCallbackActions, "Get all command callbacks actions")
+    .def("get_command_callback_actions", &f3d::interactor::getCommandCallbackActions,
+      "Get all command callbacks actions")
     .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command")
-    .def("create_default_interactions_commands", &f3d::interactor::createDefaultInteractionsCommands, "Remove all interaction commands and create default interaction commands")
-    .def("add_interaction_command", &f3d::interactor::addInteractionCommand, "Add an interaction command")
-    .def("add_interaction_commands", &f3d::interactor::addInteractionCommands, "Add interaction commands")
-    .def("remove_interaction_command", &f3d::interactor::removeInteractionCommands, "Remove interaction commands")
-    .def("get_interaction_binds", &f3d::interactor::getInteractionBinds, "Get all interaction binds")
+    .def("create_default_interactions_commands",
+      &f3d::interactor::createDefaultInteractionsCommands,
+      "Remove all interaction commands and create default interaction commands")
+    .def("add_interaction_command", &f3d::interactor::addInteractionCommand,
+      "Add an interaction command")
+    .def("add_interaction_commands", &f3d::interactor::addInteractionCommands,
+      "Add interaction commands")
+    .def("remove_interaction_command", &f3d::interactor::removeInteractionCommands,
+      "Remove interaction commands")
+    .def(
+      "get_interaction_binds", &f3d::interactor::getInteractionBinds, "Get all interaction binds")
     .def_static("get_default_interactions_info", &f3d::interactor::getDefaultInteractionsInfo);
 
   py::enum_<f3d::interactor::ModifierKeys>(interactor, "ModifierKeys")
@@ -415,8 +423,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("set_verbose_level", &f3d::log::setVerboseLevel, py::arg("level"),
       py::arg("force_std_err") = false)
     .def_static("set_use_coloring", &f3d::log::setUseColoring)
-    .def_static("print",
-      [](f3d::log::VerboseLevel& level, const std::string& message)
+    .def_static("print", [](f3d::log::VerboseLevel& level, const std::string& message)
       { f3d::log::print(level, message); });
 
   py::enum_<f3d::log::VerboseLevel>(log, "VerboseLevel")
