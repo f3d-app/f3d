@@ -723,7 +723,8 @@ interactor& interactor_impl::removeCommandCallback(const std::string& action)
 std::vector<std::string> interactor_impl::getCommandCallbackActions()
 {
   std::vector<std::string> actions;
-  for(auto it = this->Internals->CommandCallbacks.begin(); it != this->Internals->CommandCallbacks.end(); ++it)
+  for (auto it = this->Internals->CommandCallbacks.begin();
+       it != this->Internals->CommandCallbacks.end(); ++it)
   {
     actions.push_back(it->first);
   }
@@ -794,10 +795,8 @@ interactor& interactor_impl::createDefaultInteractionsCommands()
   this->addInteractionCommand("S", ModifierKeys::NONE, "cycle_coloring array");
   this->addInteractionCommand("Y", ModifierKeys::NONE, "cycle_coloring component");
   this->addInteractionCommand("B", ModifierKeys::NONE, "toggle ui.scalar_bar");
-  this->addInteractionCommand(
-    "P", ModifierKeys::NONE, "toggle render.effect.translucency_support");
-  this->addInteractionCommand(
-    "Q", ModifierKeys::NONE, "toggle render.effect.ambient_occlusion");
+  this->addInteractionCommand("P", ModifierKeys::NONE, "toggle render.effect.translucency_support");
+  this->addInteractionCommand("Q", ModifierKeys::NONE, "toggle render.effect.ambient_occlusion");
   this->addInteractionCommand("A", ModifierKeys::NONE, "toggle render.effect.anti_aliasing");
   this->addInteractionCommand("T", ModifierKeys::NONE, "toggle render.effect.tone_mapping");
   this->addInteractionCommand("E", ModifierKeys::NONE, "toggle render.show_edges");
@@ -864,12 +863,14 @@ interactor& interactor_impl::removeInteractionCommands(
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<std::string, f3d::interactor::ModifierKeys>> interactor_impl::getInteractionBinds()
+std::vector<std::pair<std::string, f3d::interactor::ModifierKeys>>
+interactor_impl::getInteractionBinds()
 {
   std::vector<std::pair<std::string, ModifierKeys>> binds;
-  for(auto it = this->Internals->InteractionCommands.begin(); it != this->Internals->InteractionCommands.end(); ++it)
+  for (auto it = this->Internals->InteractionCommands.begin();
+       it != this->Internals->InteractionCommands.end(); ++it)
   {
-    binds.push_back({it->first.Interaction, it->first.Modifiers});
+    binds.push_back({ it->first.Interaction, it->first.Modifiers });
   }
   return binds;
 }

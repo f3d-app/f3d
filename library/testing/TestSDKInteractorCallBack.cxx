@@ -52,7 +52,9 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
               << std::endl;
     return EXIT_FAILURE;
   }
-  catch (const f3d::interactor::already_exists_exception& ex){}
+  catch (const f3d::interactor::already_exists_exception& ex)
+  {
+  }
 
   // Remove interactions that will be triggered later and should not have any effect
   inter.removeInteractionCommands("7", f3d::interactor::ModifierKeys::ANY);
@@ -61,8 +63,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.removeInteractionCommands("S", f3d::interactor::ModifierKeys::NONE);
 
   // Check that an interaction can be added and that it removes existing interaction
-  inter.addInteractionCommand(
-    "S", f3d::interactor::ModifierKeys::NONE, "toggle interactor.axis");
+  inter.addInteractionCommand("S", f3d::interactor::ModifierKeys::NONE, "toggle interactor.axis");
 
   // Check CTRL modifier and that another interaction can be added on the same key with another
   // modifier
