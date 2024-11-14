@@ -35,6 +35,8 @@ public:
    * to be called using triggerCommand.
    * Adding a commandCallback with an already existing action throw a
    * interactor::already_exists_exception.
+   * Considering namespacing dedicated action to avoid conflicts with default action,
+   * eg: `my_app::action`
    */
   virtual interactor& addCommandCallback(
     const std::string& action, std::function<bool(const std::vector<std::string>&)> callback) = 0;
@@ -87,6 +89,8 @@ public:
    *
    * When the corresponding interaction and modifiers happens, the provided commands will be
    * triggered using triggerCommand.
+   * Considering checkinng if an interaction exists or removing it before adding it to avoid potential conflicts.
+   *
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
    * is found.
    *
