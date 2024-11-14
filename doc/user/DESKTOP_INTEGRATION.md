@@ -33,7 +33,6 @@ You can use that feature for thumbnail generation whenver needed (e.g., Nautilus
          "rendering-backend": "egl"
    },
 ```
-Please note this change will be overriden if you reinstall F3D.
 
 If you use the portable archive, make sure to extract it somewhere the sandboxing system has access to, eg: Nautilus uses `bwrap` and gives it access to `/usr` but not to `/opt`.
 
