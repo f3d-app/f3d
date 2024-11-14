@@ -70,7 +70,7 @@ runs:
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/vtk
       shell: bash
-      run: patch -p1 < $GITHUB_ACTION_PATH/policy_CMP0177.patch
+      run: cat set_cmp0177_policy.cmake CMake/vtkModule.cmake > CMake/vtkModule.cmake
 
       # OpenVDB_CMAKE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
