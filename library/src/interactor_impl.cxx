@@ -42,12 +42,30 @@ public:
   struct InteractionBind
   {
     std::string Interaction;
-    ModifierKeys Modifiers;
+    ModifierKeys Modifiers = f3d::interactor::ModifierKeys::ANY;
 
     bool operator<(const InteractionBind& bind) const
     {
       return this->Interaction < bind.Interaction ||
         (this->Interaction == bind.Interaction && this->Modifiers < bind.Modifiers);
+    }
+
+    std::string Format() const
+    {
+      switch (this->Modifiers)
+      {
+        case f3d::interactor::ModifierKeys::CTRL_SHIFT:
+          return "CTRL+SHIFT+" + this->Interaction;
+        case f3d::interactor::ModifierKeys::CTRL:
+          return "CTRL+" + this->Interaction;
+        case f3d::interactor::ModifierKeys::SHIFT:
+          return "SHIFT+" + this->Interaction;
+        case f3d::interactor::ModifierKeys::ANY:
+          return "ANY+" + this->Interaction;
+        default:
+          // No need to check for NONE (no log needed)
+          return this->Interaction;
+      }
     }
   };
 
@@ -371,25 +389,6 @@ public:
     this->Window.render();
   }
 
-  static std::string FormatInteractionBind(const InteractionBind& bind)
-  {
-    const auto& [inter, mod] = bind;
-    switch (mod)
-    {
-      case f3d::interactor::ModifierKeys::CTRL_SHIFT:
-        return "CTRL+SHIFT+" + inter;
-      case f3d::interactor::ModifierKeys::CTRL:
-        return "CTRL+" + inter;
-      case f3d::interactor::ModifierKeys::SHIFT:
-        return "SHIFT+" + inter;
-      case f3d::interactor::ModifierKeys::ANY:
-        return "ANY+" + inter;
-      default:
-        // No need to check for NONE (no log needed)
-        return inter;
-    }
-  }
-
   //----------------------------------------------------------------------------
   void TriggerInteractionCommands(const std::string& interaction, const std::string& argsString)
   {
@@ -412,7 +411,7 @@ public:
 
     // Check for an interaction command with modifiers
     const InteractionBind bind = { interaction, mod };
-    log::debug("Interaction: KeyPress ", internals::FormatInteractionBind(bind));
+    log::debug("Interaction: KeyPress ", bind.Format());
 
     auto commandsIt = this->InteractionCommands.find(bind);
     if (commandsIt == this->InteractionCommands.end())
@@ -723,9 +722,9 @@ interactor& interactor_impl::removeCommandCallback(const std::string& action)
 std::vector<std::string> interactor_impl::getCommandCallbackActions()
 {
   std::vector<std::string> actions;
-  for (const auto& [k, v] = this->Internals->CommandCallbacks)
+  for (auto const & [action, callback] : this->Internals->CommandCallbacks)
   {
-    actions.push_back(k);
+    actions.push_back(action);
   }
   return actions;
 }
@@ -835,13 +834,13 @@ interactor& interactor_impl::createDefaultInteractionsCommands()
 interactor& interactor_impl::addInteractionCommands(
   const std::string& interaction, ModifierKeys modifiers, std::vector<std::string> commands)
 {
+  const internals::InteractionBind bind { interaction, modifiers };
   const auto [it, success] = this->Internals->InteractionCommands.insert(
-    { { interaction, modifiers }, std::move(commands) });
+    { bind, std::move(commands) });
   if (!success)
   {
     throw interactor::already_exists_exception(
-      "Could not add interaction commands for interaction: " +
-      internals::FormatInteractionBind({ interaction, modifiers }) + " as it already exists.");
+      "Could not add interaction commands for interaction: " + bind.Format() + " as it already exists.");
   }
   return *this;
 }
@@ -866,7 +865,7 @@ std::vector<std::pair<std::string, f3d::interactor::ModifierKeys>>
 interactor_impl::getInteractionBinds()
 {
   std::vector<std::pair<std::string, ModifierKeys>> binds;
-  for (const auto& [bind, cmd] = this->Internals->InteractionCommands)
+  for (const auto& [bind, command] : this->Internals->InteractionCommands)
   {
     binds.push_back({ bind.Interaction, bind.Modifiers });
   }
