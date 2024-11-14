@@ -89,7 +89,8 @@ public:
    *
    * When the corresponding interaction and modifiers happens, the provided commands will be
    * triggered using triggerCommand.
-   * Considering checkinng if an interaction exists or removing it before adding it to avoid potential conflicts.
+   * Considering checkinng if an interaction exists or removing it before adding it to avoid
+   * potential conflicts.
    *
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
    * is found.
