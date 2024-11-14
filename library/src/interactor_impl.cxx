@@ -723,10 +723,9 @@ interactor& interactor_impl::removeCommandCallback(const std::string& action)
 std::vector<std::string> interactor_impl::getCommandCallbackActions()
 {
   std::vector<std::string> actions;
-  for (auto it = this->Internals->CommandCallbacks.begin();
-       it != this->Internals->CommandCallbacks.end(); ++it)
+  for (const auto& [k, v] = this->Internals->CommandCallbacks)
   {
-    actions.push_back(it->first);
+    actions.push_back(k);
   }
   return actions;
 }
