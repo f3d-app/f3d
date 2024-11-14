@@ -866,10 +866,9 @@ std::vector<std::pair<std::string, f3d::interactor::ModifierKeys>>
 interactor_impl::getInteractionBinds()
 {
   std::vector<std::pair<std::string, ModifierKeys>> binds;
-  for (auto it = this->Internals->InteractionCommands.begin();
-       it != this->Internals->InteractionCommands.end(); ++it)
+  for (const auto& [bind, cmd] = this->Internals->InteractionCommands)
   {
-    binds.push_back({ it->first.Interaction, it->first.Modifiers });
+    binds.push_back({ bind.Interaction, bind.Modifiers });
   }
   return binds;
 }
