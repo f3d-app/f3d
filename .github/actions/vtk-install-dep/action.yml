@@ -43,7 +43,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-3
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-4
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -63,6 +63,14 @@ runs:
         fetch-depth: 0
         path: './dependencies/vtk'
         ref: ${{env.VTK_SHA_OR_TAG}}
+
+    # CMake 3.31 introduced a new policy producing a warning when using vtkModule.cmake
+    # See https://gitlab.kitware.com/vtk/vtk/-/issues/19526
+    - name: Patch VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/vtk
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/policy_CMP0177.patch
 
       # OpenVDB_CMAKE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
