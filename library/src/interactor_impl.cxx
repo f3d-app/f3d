@@ -868,7 +868,7 @@ interactor_impl::getInteractionBinds()
   std::vector<std::pair<std::string, ModifierKeys>> binds;
   for (const auto& [bind, command] : this->Internals->InteractionCommands)
   {
-    binds.emplace_back({ bind.Interaction, bind.Modifiers });
+    binds.emplace_back(std::make_pair(bind.Interaction, bind.Modifiers));
   }
   return binds;
 }
