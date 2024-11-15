@@ -74,7 +74,7 @@ The GCC flag `-latomic` is not being added automatically with specific architect
 
   > `--rendering-backend` CLI option is not working as expected
 
-Dynamically switching rendering backend require VTK 9.4.0, you may need to update VTK or to use our [binary release](INSTALLATION.md)
+Dynamically switching rendering backend require VTK 9.4.0, you may need to update VTK or to use our [binary release](INSTALLATION.md).
 
 ## Windows
 
