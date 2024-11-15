@@ -31,7 +31,7 @@ You can use that feature for thumbnail generation whenever needed (e.g., Nautilu
 ```javascript
     ".*":
     {
-    "rendering-backend": "egl"
+      "rendering-backend": "egl"
     },
 ```
 
