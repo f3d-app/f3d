@@ -218,7 +218,7 @@ vector3_t parse(const std::string& str)
       const double sign = match[1].str() == "-" ? -1.0 : 1.0;
       const int index = std::toupper(match[2].str()[0]) - 'X';
       assert(index >= 0 && index < 3);
-      vector3_t vec = {0, 0, 0};
+      vector3_t vec = { 0, 0, 0 };
       vec[index] = 1.0 * sign;
       return vec;
     }
