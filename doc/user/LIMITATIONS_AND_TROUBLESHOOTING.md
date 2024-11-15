@@ -69,13 +69,12 @@ The GCC flag `-latomic` is not being added automatically with specific architect
  * If all fails, remove your `.cache` user dir and check that `pcmanfm` thumbnails are working.
   * If they are working, then it is an issue specific to your file manager (see below for a potential work around).
   * If only a few format have working thumbnails, then it is an issue with the mime types database.
-  * If no formats have working thumbnails, then it is an issue with the `f3d-plugin-xxx.thumbnailer` files.
+  * If no formats have working thumbnails, then it is can be an issue with sandboxing or with the `f3d-plugin-xxx.thumbnailer` files.
   * If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/10_global.json` configuration folder using the `max-size` option.
 
-Some file managers (eg: Nautilus) are using sandboxing for thumbnails, which the F3D standard binary release does not support as it needs
-access to the Xorg server to render anything.
-In that case, you want to use the headless version of F3D that rely on EGL instead of Xorg, available in the [releases page](https://github.com/f3d-app/f3d/releases).
-If you use the portable archive, make sure to extract it somewhere the sandboxing system has access to, eg: Nautilus uses `bwrap` and gives it access to `/usr` but not to `/opt`.
+  > `--rendering-backend` CLI option is not working as expected
+
+Dynamically switching rendering backend require VTK 9.4.0, you may need to update VTK or to use our [binary release](INSTALLATION.md).
 
 ## Windows
 
