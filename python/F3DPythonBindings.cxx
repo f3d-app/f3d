@@ -25,7 +25,7 @@ bool load_array(const py::handle& src, bool convert, std::array<T, S>& value)
     return false;
   }
   const py::sequence l = py::reinterpret_borrow<py::sequence>(src);
-  if (l.size() != S)
+  if (l.size() != 3)
   {
     return false;
   }
@@ -34,6 +34,26 @@ bool load_array(const py::handle& src, bool convert, std::array<T, S>& value)
   for (auto it : l)
   {
     value[i++] = py::cast<T>(it);
+  }
+  return true;
+}
+
+bool load_array(const py::handle& src, bool convert, f3d::vector3_t& value)
+{
+  if (!py::isinstance<py::sequence>(src))
+  {
+    return false;
+  }
+  const py::sequence l = py::reinterpret_borrow<py::sequence>(src);
+  if (l.size() != 3)
+  {
+    return false;
+  }
+
+  size_t i = 0;
+  for (auto it : l)
+  {
+    value[i++] = py::cast<double>(it);
   }
   return true;
 }

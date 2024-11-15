@@ -5,7 +5,11 @@
 #include "types.h"
 
 #include <algorithm>
+#include <cassert>
+#include <cctype>
+#include <regex>
 #include <sstream>
+#include <vector>
 
 namespace f3d
 {
@@ -183,6 +187,60 @@ ratio_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
+ * Parse provided string into a vector3_t.
+ */
+template<>
+vector3_t parse(const std::string& str)
+{
+  auto parseCommaSeparated = [](const std::string& s) -> vector3_t
+  {
+    std::vector vec = parse<std::vector<double>>(s);
+    if (vec.size() == 2)
+    {
+      return f3d::vector3_t::fromSphericalCoordinates(vec[0], vec[1]);
+    }
+    if (vec.size() == 3)
+    {
+      return { vec[0], vec[1], vec[2] };
+    }
+    else
+    {
+      throw options::parsing_exception("cannot parse " + s + " to a vector3_t");
+    }
+  };
+  auto parseYSyntax = [](const std::string& s) -> vector3_t
+  {
+    const std::regex re("([-+]?)([XYZ])", std::regex_constants::icase);
+    std::smatch match;
+    std::string ss = trim(s);
+    if (std::regex_match(ss, match, re))
+    {
+      const double sign = match[1].str() == "-" ? -1.0 : 1.0;
+      const int index = std::toupper(match[2].str()[0]) - 'X';
+      assert(index >= 0 && index < 3);
+      vector3_t vec = { 0, 0, 0 };
+      vec[index] = 1.0 * sign;
+      return vec;
+    }
+    else
+    {
+      throw options::parsing_exception("cannot parse " + s + " to a vector3_t");
+    }
+  };
+  bool isNotCommaSeparated = std::find_if(str.begin(), str.end(),
+                               [](unsigned char c) { return std::isalpha(c); }) != str.end();
+  if (!isNotCommaSeparated)
+  {
+    return parseCommaSeparated(str);
+  }
+  else
+  {
+    return parseYSyntax(str);
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
  * Return provided string stripped of leading and trailing spaces.
  */
 template<>
@@ -268,6 +326,17 @@ std::string format(const std::vector<double>& var)
     i++;
   }
   return stream.str();
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Format provided var into a string from provided vector3_t
+ * rely on format(double&)
+ */
+template<>
+std::string format(const vector3_t& var)
+{
+  return format(static_cast<std::vector<double>>(var));
 }
 
 //----------------------------------------------------------------------------

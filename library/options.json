@@ -4,6 +4,10 @@
       "type": "string",
       "default_value": "+Y"
     },
+    "up_direction2": {
+      "type": "vector",
+      "default_value": "0, 1, 0"
+    },
     "animation": {
       "autoplay": {
         "type": "bool",
