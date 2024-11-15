@@ -61,6 +61,18 @@ int TestSDKOptions(int argc, char* argv[])
   opt.set("scene.animation.speed_factor", 3.17);
   test("set/get ratio_t", std::get<double>(opt.get("scene.animation.speed_factor")) == 3.17);
 
+  // Test vector3_t
+  opt.setAsString("scene.up_direction2", "0, 1, 0");
+  test("setAsString vector3_t", opt.getAsString("scene.up_direction2") == "0, 1, 0");
+
+  opt.scene.up_direction2 = { 1, 0, 0 };
+  test("getAsString vector3_t", opt.getAsString("scene.up_direction2") == "1, 0, 0");
+
+  opt.set("scene.up_direction2", std::vector<double>{ 0, 0, 1 });
+  test("set/get vector3_t",
+    std::get<std::vector<double>>(opt.get("scene.up_direction2")) ==
+      std::vector<double>{ 0, 0, 1 });
+
   // Test string
   opt.setAsString("model.color.texture", "testAsString");
   test("setAsString string", opt.getAsString("model.color.texture") == "testAsString");

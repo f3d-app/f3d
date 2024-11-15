@@ -17,7 +17,7 @@ namespace f3d
 /**
  * An exception that can be thrown when we fail to create a type
  */
-struct type_creation_exception : public exception
+struct F3D_EXPORT type_creation_exception : public exception
 {
   explicit type_creation_exception(const std::string& what = "")
     : exception(what)
