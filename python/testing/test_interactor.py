@@ -43,15 +43,9 @@ def test_binding():
 
     # Smoke test
     inter.add_binding("P", f3d.Interactor.ModifierKeys.ANY, "dummy command")
-    inter.add_binding(
-        "P", f3d.Interactor.ModifierKeys.NONE, "dummy command"
-    )
-    inter.add_binding(
-        "P", f3d.Interactor.ModifierKeys.CTRL, "dummy command"
-    )
-    inter.add_binding(
-        "P", f3d.Interactor.ModifierKeys.SHIFT, "dummy command"
-    )
+    inter.add_binding("P", f3d.Interactor.ModifierKeys.NONE, "dummy command")
+    inter.add_binding("P", f3d.Interactor.ModifierKeys.CTRL, "dummy command")
+    inter.add_binding("P", f3d.Interactor.ModifierKeys.SHIFT, "dummy command")
     inter.add_binding(
         "P", f3d.Interactor.ModifierKeys.CTRL_SHIFT, ["dummy command", "dummy command"]
     )
