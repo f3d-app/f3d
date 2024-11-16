@@ -805,8 +805,7 @@ int F3DStarter::Start(int argc, char** argv)
     interactor.addCommand("load_next_file_group",
       [this](const std::vector<std::string>&) { return this->LoadRelativeFileGroup(+1); });
 
-    interactor.addCommand("reload_current_file_group",
-      [this](const std::vector<std::string>&)
+    interactor.addCommand("reload_current_file_group", [this](const std::vector<std::string>&)
       { return this->LoadRelativeFileGroup(0, true, true); });
 
     interactor.addCommand("add_current_directories",
@@ -910,22 +909,16 @@ int F3DStarter::Start(int argc, char** argv)
         return true;
       });
 
-    interactor.addBinding(
-      "Left", f3d::interactor::ModifierKeys::NONE, "load_previous_file_group");
-    interactor.addBinding(
-      "Right", f3d::interactor::ModifierKeys::NONE, "load_next_file_group");
-    interactor.addBinding(
-      "Up", f3d::interactor::ModifierKeys::NONE, "reload_current_file_group");
-    interactor.addBinding(
-      "Down", f3d::interactor::ModifierKeys::NONE, "add_current_directories");
-    interactor.addBinding(
-      "F11", f3d::interactor::ModifierKeys::NONE, "take_minimal_screenshot");
+    interactor.addBinding("Left", f3d::interactor::ModifierKeys::NONE, "load_previous_file_group");
+    interactor.addBinding("Right", f3d::interactor::ModifierKeys::NONE, "load_next_file_group");
+    interactor.addBinding("Up", f3d::interactor::ModifierKeys::NONE, "reload_current_file_group");
+    interactor.addBinding("Down", f3d::interactor::ModifierKeys::NONE, "add_current_directories");
+    interactor.addBinding("F11", f3d::interactor::ModifierKeys::NONE, "take_minimal_screenshot");
     interactor.addBinding("F12", f3d::interactor::ModifierKeys::NONE, "take_screenshot");
 
     // This replace an existing default interaction command in the libf3d
     interactor.removeBinding("Drop", f3d::interactor::ModifierKeys::NONE);
-    interactor.addBinding(
-      "Drop", f3d::interactor::ModifierKeys::NONE, "add_files_or_set_hdri");
+    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::NONE, "add_files_or_set_hdri");
     interactor.addBinding("Drop", f3d::interactor::ModifierKeys::CTRL, "add_files");
     interactor.addBinding("Drop", f3d::interactor::ModifierKeys::SHIFT, "set_hdri");
   }

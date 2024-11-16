@@ -67,8 +67,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
 
   // Check CTRL modifier and that another interaction can be added on the same key with another
   // modifier
-  inter.addBinding(
-    "S", f3d::interactor::ModifierKeys::CTRL, "toggle render.grid.enable");
+  inter.addBinding("S", f3d::interactor::ModifierKeys::CTRL, "toggle render.grid.enable");
 
   // Check invalid command for coverage
   inter.addBinding("P", f3d::interactor::ModifierKeys::CTRL, "invalid command");
@@ -82,8 +81,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     { "set ui.filename true", "set render.show_edges true" });
 
   // Check ANY modifier
-  inter.addBinding(
-    "A", f3d::interactor::ModifierKeys::ANY, "toggle render.background.skybox");
+  inter.addBinding("A", f3d::interactor::ModifierKeys::ANY, "toggle render.background.skybox");
 
   // Replace the add_files command
   inter.removeCommand("add_files");

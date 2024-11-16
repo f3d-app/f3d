@@ -719,7 +719,7 @@ interactor& interactor_impl::removeCommand(const std::string& action)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> interactor_impl::getCommandActions()
+std::vector<std::string> interactor_impl::getCommandActions() const
 {
   std::vector<std::string> actions;
   for (auto const& [action, callback] : this->Internals->Commands)
@@ -835,8 +835,7 @@ interactor& interactor_impl::addBinding(
   const std::string& interaction, ModifierKeys modifiers, std::vector<std::string> commands)
 {
   const internals::Bind bind{ interaction, modifiers };
-  const auto [it, success] =
-    this->Internals->Bindings.insert({ bind, std::move(commands) });
+  const auto [it, success] = this->Internals->Bindings.insert({ bind, std::move(commands) });
   if (!success)
   {
     throw interactor::already_exists_exception(
@@ -854,8 +853,7 @@ interactor& interactor_impl::addBinding(
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::removeBinding(
-  std::string interaction, ModifierKeys modifiers)
+interactor& interactor_impl::removeBinding(std::string interaction, ModifierKeys modifiers)
 {
   this->Internals->Bindings.erase({ std::move(interaction), modifiers });
   return *this;
@@ -863,7 +861,7 @@ interactor& interactor_impl::removeBinding(
 
 //----------------------------------------------------------------------------
 std::vector<std::pair<std::string, f3d::interactor::ModifierKeys>>
-interactor_impl::getBindingInteractions()
+interactor_impl::getBindingInteractions() const
 {
   std::vector<std::pair<std::string, ModifierKeys>> binds;
   for (const auto& [bind, command] : this->Internals->Bindings)

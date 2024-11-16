@@ -48,7 +48,7 @@ public:
   /**
    * Return a string vector containing all currently defined actions of commands
    */
-  virtual std::vector<std::string> getCommandActions() = 0;
+  virtual std::vector<std::string> getCommandActions() const = 0;
 
   /**
    * Trigger provided command, see COMMANDS.md for details about supported
@@ -123,13 +123,12 @@ public:
   /**
    * Remove binding corresponding to provided interaction and modifiers
    */
-  virtual interactor& removeBinding(
-    std::string interaction, ModifierKeys modifiers) = 0;
+  virtual interactor& removeBinding(std::string interaction, ModifierKeys modifiers) = 0;
 
   /**
    * Return a string vector of all currently defined bind interactions
    */
-  virtual std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() = 0;
+  virtual std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const = 0;
   ///@}
 
   /**

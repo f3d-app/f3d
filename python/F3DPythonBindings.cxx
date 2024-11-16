@@ -228,14 +228,17 @@ PYBIND11_MODULE(pyf3d, module)
       "Remove all commands and add all default command callbacks")
     .def("add_command", &f3d::interactor::addCommand, "Add a command")
     .def("remove_command", &f3d::interactor::removeCommand, "Remove a command")
-    .def("get_command_actions", &f3d::interactor::getCommandActions,
-      "Get all command actions")
+    .def("get_command_actions", &f3d::interactor::getCommandActions, "Get all command actions")
     .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command")
     .def("initialize_default_bindings", &f3d::interactor::initializeDefaultBindings,
       "Remove all bindings and add default bindings")
-    .def("add_binding", py::overload_cast<const std::string&, f3d::interactor::ModifierKeys, std::string>(&f3d::interactor::addBinding),
+    .def("add_binding",
+      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys, std::string>(
+        &f3d::interactor::addBinding),
       "Add a binding command")
-    .def("add_binding", py::overload_cast<const std::string&, f3d::interactor::ModifierKeys, std::vector<std::string>>(&f3d::interactor::addBinding),
+    .def("add_binding",
+      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys,
+        std::vector<std::string>>(&f3d::interactor::addBinding),
       "Add binding commands")
     .def("remove_binding", &f3d::interactor::removeBinding, "Remove interaction commands")
     .def("get_binding_interactions", &f3d::interactor::getBindingInteractions,

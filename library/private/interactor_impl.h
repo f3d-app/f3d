@@ -39,7 +39,7 @@ public:
   interactor& addCommand(const std::string& action,
     std::function<bool(const std::vector<std::string>&)> callback) override;
   interactor& removeCommand(const std::string& action) override;
-  std::vector<std::string> getCommandActions() override;
+  std::vector<std::string> getCommandActions() const override;
   bool triggerCommand(std::string_view command) override;
 
   interactor& initializeDefaultBindings() override;
@@ -48,7 +48,7 @@ public:
   interactor& addBinding(
     const std::string& interaction, ModifierKeys modifiers, std::string command) override;
   interactor& removeBinding(std::string interaction, ModifierKeys modifiers) override;
-  std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() override;
+  std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const override;
 
   unsigned long createTimerCallBack(double time, std::function<void()> callBack) override;
   void removeTimerCallBack(unsigned long id) override;
