@@ -805,7 +805,8 @@ int F3DStarter::Start(int argc, char** argv)
     interactor.addCommand("load_next_file_group",
       [this](const std::vector<std::string>&) { return this->LoadRelativeFileGroup(+1); });
 
-    interactor.addCommand("reload_current_file_group", [this](const std::vector<std::string>&)
+    interactor.addCommand("reload_current_file_group",
+      [this](const std::vector<std::string>&)
       { return this->LoadRelativeFileGroup(0, true, true); });
 
     interactor.addCommand("add_current_directories",
