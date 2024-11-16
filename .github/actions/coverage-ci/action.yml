@@ -65,7 +65,6 @@ runs:
         -DCMAKE_MODULE_PATH=$(pwd)/../dependencies/install/lib/cmake/OpenVDB/
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_COVERAGE=ON
-        -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_MODULE_EXR=ON
         -DF3D_MODULE_RAYTRACING=ON
         -DF3D_PLUGINS_STATIC_BUILD=OFF

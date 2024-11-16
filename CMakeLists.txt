@@ -53,7 +53,6 @@ option(F3D_EXCLUDE_DEPRECATED "Exclude deprecated functions and options" OFF)
 mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 
 # Modules
-option(F3D_MODULE_EXTERNAL_RENDERING "External rendering module" OFF)
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 option(F3D_MODULE_EXR "OpenEXR images module" OFF)
 
@@ -301,7 +300,6 @@ f3d_report_variable(F3D_BINDINGS_JAVA)
 f3d_report_variable(F3D_BINDINGS_PYTHON)
 f3d_report_variable(F3D_BUILD_APPLICATION)
 f3d_report_variable(F3D_MODULE_EXR)
-f3d_report_variable(F3D_MODULE_EXTERNAL_RENDERING)
 f3d_report_variable(F3D_MODULE_RAYTRACING)
 f3d_report_variable(F3D_PLUGIN_BUILD_ALEMBIC)
 f3d_report_variable(F3D_PLUGIN_BUILD_ASSIMP)

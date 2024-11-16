@@ -6,6 +6,7 @@
 #include "options.h"
 
 #include "vtkF3DConfigure.h"
+#include "vtkF3DExternalRenderWindow.h"
 
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DNoRenderWindow.h"
@@ -37,10 +38,6 @@
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtkOSOpenGLRenderWindow.h>
-#endif
-
-#if F3D_MODULE_EXTERNAL_RENDERING
-#include <vtkExternalOpenGLRenderWindow.h>
 #endif
 
 #ifdef _WIN32
@@ -184,24 +181,12 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
   else if (type == Type::EXTERNAL)
   {
-#if F3D_MODULE_EXTERNAL_RENDERING
-    vtkNew<vtkExternalOpenGLRenderWindow> extWin;
-    extWin->AutomaticWindowPositionAndResizeOff();
-    this->Internals->RenWin = extWin;
-#else
-    throw engine::no_window_exception(
-      "Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
-#endif
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DExternalRenderWindow>::New();
   }
   else if (type == Type::EGL)
   {
 #if defined(VTK_OPENGL_HAS_EGL) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
     this->Internals->RenWin = vtkSmartPointer<vtkEGLRenderWindow>::New();
-#ifdef __ANDROID__
-    // Since F3D_MODULE_EXTERNAL_RENDERING is not supported on Android yet, we need to call
-    // this workaround. It makes vtkEGLRenderWindow external if WindowInfo is not nullptr.
-    this->Internals->RenWin->SetWindowInfo("jni");
-#endif
 #else
     throw engine::no_window_exception("Window type is EGL but VTK EGL support is not enabled");
 #endif
@@ -245,14 +230,10 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     {
       oglRenWin->SetOpenGLSymbolLoader(&internals::SymbolLoader, &this->Internals->GetProcAddress);
     }
-#if F3D_MODULE_EXTERNAL_RENDERING
-    if (oglRenWin->IsA("vtkExternalOpenGLRenderWindow"))
+    if (oglRenWin->IsA("vtkF3DExternalRenderWindow"))
     {
-      // We need to call vtkOpenGLRenderWindow function because vtkGenericOpenGLRenderWindow is
-      // reimplementing it incorrectly
-      oglRenWin->vtkOpenGLRenderWindow::OpenGLInit();
+      oglRenWin->OpenGLInit();
     }
-#endif
   }
 #endif
 

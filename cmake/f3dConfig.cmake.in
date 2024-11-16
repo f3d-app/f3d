@@ -7,7 +7,6 @@
 #   f3d_BUILD_APPLICATION          Will be enabled if F3D application was built
 #   f3d_CONFIG_DIR                 Path to F3D configuration directory, can be absolute or relative
 #   f3d_MODULE_EXR                 Will be enabled if F3D was built with OpenEXR images support
-#   f3d_MODULE_EXTERNAL_RENDERING  Will be enabled if F3D was built with external rendering support
 #   f3d_MODULE_RAYTRACING          Will be enabled if F3D was built with raytracing support
 #   f3d_PLUGINS_INSTALL_DIR        Path to the location to install plugins so that F3D can find them
 #   f3d_PREFIX_DIR                 Absolute path to the directory where F3D was installed
@@ -46,7 +45,6 @@ include(${CMAKE_CURRENT_LIST_DIR}/f3dConfigVersion.cmake)
 message(STATUS "Found f3d ${PACKAGE_VERSION}")
 
 set(f3d_BUILD_APPLICATION "@F3D_BUILD_APPLICATION@")
-set(f3d_MODULE_EXTERNAL_RENDERING "@F3D_MODULE_EXTERNAL_RENDERING@")
 set(f3d_MODULE_RAYTRACING "@F3D_MODULE_RAYTRACING@")
 set(f3d_MODULE_EXR "@F3D_MODULE_EXR@")
 set(f3d_BINDINGS_PYTHON "@F3D_BINDINGS_PYTHON@")

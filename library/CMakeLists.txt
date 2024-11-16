@@ -19,15 +19,6 @@ if(F3D_MODULE_RAYTRACING)
   endif()
 endif()
 
-if(F3D_MODULE_EXTERNAL_RENDERING)
-  if(TARGET VTK::RenderingExternal)
-    message(STATUS "VTK::RenderingExternal module found")
-    set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::RenderingExternal)
-  else()
-    message(FATAL_ERROR "F3D_MODULE_EXTERNAL_RENDERING option is enabled but VTK::RenderingExternal is not found")
-  endif()
-endif()
-
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/config.cxx.in"
   "${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx"
