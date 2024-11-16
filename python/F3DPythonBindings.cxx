@@ -233,17 +233,17 @@ PYBIND11_MODULE(pyf3d, module)
     .def("init_bindings", &f3d::interactor::initBindings,
       "Remove all bindings and add default bindings")
     .def("add_binding",
-      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys, std::string>(
+      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys, std::string, std::string>(
         &f3d::interactor::addBinding),
       "Add a binding command")
     .def("add_binding",
       py::overload_cast<const std::string&, f3d::interactor::ModifierKeys,
-        std::vector<std::string>>(&f3d::interactor::addBinding),
+        std::vector<std::string>, std::string>(&f3d::interactor::addBinding),
       "Add binding commands")
     .def("remove_binding", &f3d::interactor::removeBinding, "Remove interaction commands")
     .def("get_binding_interactions", &f3d::interactor::getBindingInteractions,
       "Get all interaction binds")
-    .def_static("get_default_interactions_info", &f3d::interactor::getDefaultInteractionsInfo);
+    .def("get_bindings_documentation", &f3d::interactor::getBindingsDocumentation);
 
   py::enum_<f3d::interactor::ModifierKeys>(interactor, "ModifierKeys")
     .value("ANY", f3d::interactor::ModifierKeys::ANY)

@@ -51,6 +51,11 @@ public:
         (this->Interaction == bind.Interaction && this->Modifiers < bind.Modifiers);
     }
 
+    bool operator==(const Bind& bind) const
+    {
+      return this->Interaction == bind.Interaction && this->Modifiers == bind.Modifiers;
+    }
+
     std::string Format() const
     {
       switch (this->Modifiers)
@@ -68,6 +73,12 @@ public:
           return this->Interaction;
       }
     }
+  };
+
+  struct BindingCommands
+  {
+    std::vector<std::string> CommandVector;
+    std::function<std::string(bool showValue)> DocumentationCallback;
   };
 
   internals(options& options, window_impl& window, scene_impl& scene, interactor_impl& inter)
@@ -432,7 +443,7 @@ public:
 
     if (commandsIt != this->Bindings.end())
     {
-      for (const std::string& command : commandsIt->second)
+      for (const std::string& command : commandsIt->second.CommandVector)
       {
         std::string commandWithArgs = command;
         if (!argsString.empty())
@@ -459,7 +470,6 @@ public:
   }
 
   //----------------------------------------------------------------------------
-
   options& Options;
   window_impl& Window;
   scene_impl& Scene;
@@ -473,7 +483,8 @@ public:
 
   std::map<std::string, std::function<void(const std::vector<std::string>&)>> Commands;
 
-  std::map<Bind, std::vector<std::string>> Bindings;
+  std::map<Bind, BindingCommands> Bindings;
+  std::vector<Bind> OrderedBinds;
 
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;
@@ -762,75 +773,314 @@ interactor& interactor_impl::initBindings()
 {
   this->Internals->Bindings.clear();
 
+  auto docToggle = [](bool showValue, std::string doc, bool val) -> std::string
+  { return doc + (showValue ? std::string(" [") + (val ? "ON" : "OFF") + "]" : ""); };
+
+  auto docToggleOptional = [](bool showValue, std::string doc,
+                             std::optional<bool> val) -> std::string
+  {
+    return doc +
+      (showValue
+          ? std::string(" [") + (val.has_value() ? (val.value() ? "ON" : "OFF") : "NOT SET") + "]"
+          : "");
+  };
+
+  auto shortName = [](const std::string& name, int maxChar)
+  {
+    if (name.size() <= static_cast<size_t>(maxChar) || maxChar <= 3)
+    {
+      return name;
+    }
+    else
+    {
+      return name.substr(0, maxChar - 3) + "...";
+    }
+  };
+
   // Available standard keys: None
-  this->addBinding("W", ModifierKeys::NONE, "cycle_animation");
-  this->addBinding("C", ModifierKeys::NONE, "cycle_coloring field");
-  this->addBinding("S", ModifierKeys::NONE, "cycle_coloring array");
-  this->addBinding("Y", ModifierKeys::NONE, "cycle_coloring component");
-  this->addBinding("B", ModifierKeys::NONE, "toggle ui.scalar_bar");
-  this->addBinding("P", ModifierKeys::NONE, "toggle render.effect.translucency_support");
-  this->addBinding("Q", ModifierKeys::NONE, "toggle render.effect.ambient_occlusion");
-  this->addBinding("A", ModifierKeys::NONE, "toggle render.effect.anti_aliasing");
-  this->addBinding("T", ModifierKeys::NONE, "toggle render.effect.tone_mapping");
-  this->addBinding("E", ModifierKeys::NONE, "toggle render.show_edges");
-  this->addBinding("X", ModifierKeys::NONE, "toggle interactor.axis");
-  this->addBinding("G", ModifierKeys::NONE, "toggle render.grid.enable");
-  this->addBinding("N", ModifierKeys::NONE, "toggle ui.filename");
-  this->addBinding("M", ModifierKeys::NONE, "toggle ui.metadata");
-  this->addBinding("Z", ModifierKeys::NONE, "toggle_fps");
-  this->addBinding("R", ModifierKeys::NONE, "toggle render.raytracing.enable");
-  this->addBinding("D", ModifierKeys::NONE, "toggle render.raytracing.denoise");
-  this->addBinding("V", ModifierKeys::NONE, "toggle_volume_rendering");
-  this->addBinding("I", ModifierKeys::NONE, "toggle model.volume.inverse");
-  this->addBinding("O", ModifierKeys::NONE, "toggle model.point_sprites.enable");
-  this->addBinding("U", ModifierKeys::NONE, "toggle render.background.blur");
-  this->addBinding("K", ModifierKeys::NONE, "toggle interactor.trackball");
-  this->addBinding("F", ModifierKeys::NONE, "toggle render.hdri.ambient");
-  this->addBinding("J", ModifierKeys::NONE, "toggle render.background.skybox");
-  this->addBinding("L", ModifierKeys::NONE, "increase_light_intensity");
-  this->addBinding("L", ModifierKeys::SHIFT, "decrease_light_intensity");
-  this->addBinding("H", ModifierKeys::NONE, "toggle ui.cheatsheet");
-  this->addBinding("Question", ModifierKeys::ANY, "print_scene_info");
-  this->addBinding("1", ModifierKeys::ANY, "set_camera front");
-  this->addBinding("3", ModifierKeys::ANY, "set_camera right");
-  this->addBinding("4", ModifierKeys::ANY, "roll_camera -90");
-  this->addBinding("5", ModifierKeys::ANY, "toggle scene.camera.orthographic");
-  this->addBinding("6", ModifierKeys::ANY, "roll_camera 90");
-  this->addBinding("7", ModifierKeys::ANY, "set_camera top");
-  this->addBinding("9", ModifierKeys::ANY, "set_camera isometric");
-  this->addBinding(F3D_EXIT_HOTKEY_SYM, ModifierKeys::NONE, "stop_interactor");
-  this->addBinding("Return", ModifierKeys::NONE, "reset_camera");
-  this->addBinding("Space", ModifierKeys::NONE, "toggle_animation");
-  this->addBinding("Drop", ModifierKeys::NONE, "add_files");
+
+  // TODO add support for diplaying animation name
+  this->addBinding("W", ModifierKeys::NONE, "cycle_animation",
+    [](bool) -> std::string { return "Cycle animation"; });
+
+  this->addBinding("C", ModifierKeys::NONE, "cycle_coloring field",
+    [&](bool showValue) -> std::string
+    {
+      std::string documentation = "Cycle point/cell data coloring";
+      if (showValue)
+      {
+        documentation += std::string(" [") +
+          (this->Internals->Options.model.scivis.cells ? "CELL" : "POINT") + "]";
+      }
+      return documentation;
+    });
+
+  this->addBinding("S", ModifierKeys::NONE, "cycle_coloring array",
+    [&](bool showValue) -> std::string
+    {
+      std::string documentation = "Cycle array to color with";
+      if (showValue)
+      {
+        if (this->Internals->Options.model.scivis.array_name.has_value())
+        {
+          documentation += std::string(" [") +
+            shortName(this->Internals->Options.model.scivis.array_name.value(), 19) +
+            (this->Internals->Options.model.scivis.enable ? "" : " (forced)") + "]";
+        }
+        else
+        {
+          documentation += " [OFF]";
+        }
+      }
+      return documentation;
+    });
+
+  this->addBinding("Y", ModifierKeys::NONE, "cycle_coloring component",
+    [&](bool showValue) -> std::string
+    {
+      std::string documentation = "Cycle array component to color with";
+      if (showValue)
+      {
+        vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+        vtkF3DRenderer* ren =
+          vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+
+        documentation += std::string(" [") +
+          ren->ComponentToString(this->Internals->Options.model.scivis.component) + "]";
+      }
+      return documentation;
+    });
+
+  this->addBinding("B", ModifierKeys::NONE, "toggle ui.scalar_bar",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle the scalar bar display", this->Internals->Options.ui.scalar_bar);
+    });
+
+  this->addBinding("P", ModifierKeys::NONE, "toggle render.effect.translucency_support",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(showValue, "Toggle translucency support",
+        this->Internals->Options.render.effect.translucency_support);
+    });
+
+  this->addBinding("Q", ModifierKeys::NONE, "toggle render.effect.ambient_occlusion",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(showValue, "Toggle ambient occlusion",
+        this->Internals->Options.render.effect.ambient_occlusion);
+    });
+
+  this->addBinding("A", ModifierKeys::NONE, "toggle render.effect.anti_aliasing",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle anti-aliasing", this->Internals->Options.render.effect.anti_aliasing);
+    });
+
+  this->addBinding("T", ModifierKeys::NONE, "toggle render.effect.tone_mapping",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle tone mapping", this->Internals->Options.render.effect.tone_mapping);
+    });
+
+  this->addBinding("E", ModifierKeys::NONE, "toggle render.show_edges",
+    [&](bool showValue) -> std::string
+    {
+      return docToggleOptional(
+        showValue, "Toggle the edges display", this->Internals->Options.render.show_edges);
+    });
+  this->addBinding("X", ModifierKeys::NONE, "toggle interactor.axis",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle the axes display", this->Internals->Options.interactor.axis);
+    });
+
+  this->addBinding("G", ModifierKeys::NONE, "toggle render.grid.enable",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle the grid display", this->Internals->Options.render.grid.enable);
+    });
+
+  this->addBinding("N", ModifierKeys::NONE, "toggle ui.filename",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle the filename display", this->Internals->Options.ui.filename);
+    });
+
+  this->addBinding("M", ModifierKeys::NONE, "toggle ui.metadata",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle the metadata display", this->Internals->Options.ui.metadata);
+    });
+
+  this->addBinding("Z", ModifierKeys::NONE, "toggle_fps",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle the FPS counter display", this->Internals->Options.ui.fps);
+    });
+
+  this->addBinding("R", ModifierKeys::NONE, "toggle render.raytracing.enable",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(showValue, "Toggle raytracing rendering",
+        this->Internals->Options.render.raytracing.enable);
+    });
+
+  this->addBinding("D", ModifierKeys::NONE, "toggle render.raytracing.denoise",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(showValue, "Toggle denoising when raytracing",
+        this->Internals->Options.render.raytracing.denoise);
+    });
+
+  this->addBinding("V", ModifierKeys::NONE, "toggle_volume_rendering",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle volume rendering", this->Internals->Options.model.volume.enable);
+    });
+
+  this->addBinding("I", ModifierKeys::NONE, "toggle model.volume.inverse",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle inverse volume opacity", this->Internals->Options.model.volume.inverse);
+    });
+
+  this->addBinding("O", ModifierKeys::NONE, "toggle model.point_sprites.enable",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(showValue, "Toggle point sprites rendering",
+        this->Internals->Options.model.point_sprites.enable);
+    });
+
+  this->addBinding("U", ModifierKeys::NONE, "toggle render.background.blur",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle blur background", this->Internals->Options.render.background.blur);
+    });
+
+  this->addBinding("K", ModifierKeys::NONE, "toggle interactor.trackball",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle trackball interaction", this->Internals->Options.interactor.trackball);
+    });
+
+  this->addBinding("F", ModifierKeys::NONE, "toggle render.hdri.ambient",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle HDRI ambient lighting", this->Internals->Options.render.hdri.ambient);
+    });
+
+  this->addBinding("J", ModifierKeys::NONE, "toggle render.background.skybox",
+    [&](bool showValue) -> std::string
+    {
+      return docToggle(
+        showValue, "Toggle HDRI skybox", this->Internals->Options.render.background.skybox);
+    });
+
+  this->addBinding("L", ModifierKeys::NONE, "increase_light_intensity",
+    [&](bool showValue) -> std::string
+    {
+      return "Increase lights intensity" +
+        (showValue ? std::string(" [") +
+              std::to_string(this->Internals->Options.render.light.intensity) + "]"
+                   : "");
+    });
+
+  this->addBinding("L", ModifierKeys::SHIFT, "decrease_light_intensity",
+    [&](bool showValue) -> std::string
+    {
+      return "Decrease lights intensity" +
+        (showValue ? std::string(" [") +
+              std::to_string(this->Internals->Options.render.light.intensity) + "]"
+                   : "");
+    });
+
+  this->addBinding("H", ModifierKeys::NONE, "toggle ui.cheatsheet",
+    [](bool) -> std::string { return "Toggle cheatsheet display"; });
+  this->addBinding("Question", ModifierKeys::ANY, "print_scene_info",
+    [](bool) -> std::string { return "Print camera state to the terminal"; });
+  this->addBinding("1", ModifierKeys::ANY, "set_camera front",
+    [](bool) -> std::string { return "Front View camera"; });
+  this->addBinding("3", ModifierKeys::ANY, "set_camera right",
+    [](bool) -> std::string { return "Right View camera"; });
+  this->addBinding("4", ModifierKeys::ANY, "roll_camera -90",
+    [](bool) -> std::string { return "Rotate camera right"; });
+  this->addBinding("5", ModifierKeys::ANY, "toggle scene.camera.orthographic",
+    [&](bool showValue) -> std::string
+    {
+      return docToggleOptional(showValue, "Toggle Orthographic Projection",
+        this->Internals->Options.scene.camera.orthographic);
+    });
+  this->addBinding("6", ModifierKeys::ANY, "roll_camera 90",
+    [](bool) -> std::string { return "Rotate camera left"; });
+  this->addBinding("7", ModifierKeys::ANY, "set_camera top",
+    [](bool) -> std::string { return "Top View camera"; });
+  this->addBinding("9", ModifierKeys::ANY, "set_camera isometric",
+    [](bool) -> std::string { return "Isometric View camera"; });
+  this->addBinding(F3D_EXIT_HOTKEY_SYM, ModifierKeys::NONE, "stop_interactor",
+    [](bool) -> std::string { return "Quit"; });
+  this->addBinding("Return", ModifierKeys::NONE, "reset_camera",
+    [](bool) -> std::string { return "Reset camera to initial parameters"; });
+  this->addBinding("Space", ModifierKeys::NONE, "toggle_animation",
+    [](bool) -> std::string { return "Play/Pause animation if any"; });
+  this->addBinding("Drop", ModifierKeys::NONE, "add_files",
+    [](bool) -> std::string { return "Add files to the scene"; });
   return *this;
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addBinding(
-  const std::string& interaction, ModifierKeys modifiers, std::vector<std::string> commands)
+interactor& interactor_impl::addBinding(const std::string& interaction, ModifierKeys modifiers,
+  std::vector<std::string> commands,
+  std::function<std::string(bool showValue)> documentationCallback)
 {
   const internals::Bind bind{ interaction, modifiers };
-  const auto [it, success] = this->Internals->Bindings.insert({ bind, std::move(commands) });
+  const auto [it, success] = this->Internals->Bindings.insert(
+    { bind, { std::move(commands), std::move(documentationCallback) } });
   if (!success)
   {
     throw interactor::already_exists_exception(
       "Could not add interaction commands for interaction: " + bind.Format() +
       " as it already exists.");
   }
+  else
+  {
+    this->Internals->OrderedBinds.emplace_back(bind);
+  }
   return *this;
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addBinding(
-  const std::string& interaction, ModifierKeys modifiers, std::string command)
+interactor& interactor_impl::addBinding(const std::string& interaction, ModifierKeys modifiers,
+  std::string command, std::function<std::string(bool showValue)> documentationCallback)
 {
-  return this->addBinding(interaction, modifiers, std::vector<std::string>{ std::move(command) });
+  return this->addBinding(
+    interaction, modifiers, std::vector<std::string>{ std::move(command) }, documentationCallback);
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::removeBinding(std::string interaction, ModifierKeys modifiers)
 {
-  this->Internals->Bindings.erase({ std::move(interaction), modifiers });
+  internals::Bind bind{ std::move(interaction), modifiers };
+  this->Internals->Bindings.erase(bind);
+  auto vecIt =
+    std::find(this->Internals->OrderedBinds.begin(), this->Internals->OrderedBinds.end(), bind);
+  if (vecIt != this->Internals->OrderedBinds.end())
+  {
+    this->Internals->OrderedBinds.erase(vecIt);
+  }
   return *this;
 }
 
@@ -844,6 +1094,21 @@ interactor_impl::getBindingInteractions() const
     binds.emplace_back(std::make_pair(bind.Interaction, bind.Modifiers));
   }
   return binds;
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::pair<std::string, std::string>> interactor_impl::getBindingsDocumentation() const
+{
+  std::vector<std::pair<std::string, std::string>> docs;
+  for (internals::Bind bind : this->Internals->OrderedBinds)
+  {
+    auto docFunc = this->Internals->Bindings[bind].DocumentationCallback;
+    if (docFunc)
+    {
+      docs.emplace_back(bind.Format(), docFunc(true));
+    }
+  }
+  return docs;
 }
 
 //----------------------------------------------------------------------------

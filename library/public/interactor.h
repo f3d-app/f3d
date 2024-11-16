@@ -105,7 +105,7 @@ public:
    * interactor::already_exists_exception.
    */
   virtual interactor& addBinding(
-    const std::string& interaction, ModifierKeys modifiers, std::vector<std::string> commands) = 0;
+    const std::string& interaction, ModifierKeys modifiers, std::vector<std::string> commands, std::function<std::string(bool showValue)> documentationCallback = nullptr) = 0;
 
   /**
    * See addBinding
@@ -116,15 +116,15 @@ public:
    * interactor::already_exists_exception.
    */
   virtual interactor& addBinding(
-    const std::string& interaction, ModifierKeys modifiers, std::string command) = 0;
+    const std::string& interaction, ModifierKeys modifiers, std::string command, std::function<std::string(bool showValue)> documentationCallback = nullptr) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(
-    const std::string& interaction, ModifierKeys modifiers, std::initializer_list<std::string> list)
+    const std::string& interaction, ModifierKeys modifiers, std::initializer_list<std::string> list, std::function<std::string(bool showValue)> documentationCallback)
   {
-    return this->addBinding(interaction, modifiers, std::vector<std::string>(list));
+    return this->addBinding(interaction, modifiers, std::vector<std::string>(list), documentationCallback);
   }
 
   /**
@@ -136,6 +136,11 @@ public:
    * Return a string vector of all currently defined bind interactions
    */
   virtual std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const = 0;
+
+  /**
+   * Get a structure of strings documenting bindings.
+   */
+  virtual std::vector<std::pair<std::string, std::string>> getBindingsDocumentation() const = 0;
   ///@}
 
   /**
@@ -186,11 +191,6 @@ public:
    * Stop the interactor.
    */
   virtual void stop() = 0;
-
-  /**
-   * Get a structure of strings describing default interactions.
-   */
-  static const std::vector<std::pair<std::string, std::string>>& getDefaultInteractionsInfo();
 
   /**
    * An exception that can be thrown by the interactor

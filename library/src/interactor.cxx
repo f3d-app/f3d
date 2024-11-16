@@ -2,7 +2,7 @@
 
 namespace f3d
 {
-const std::vector<std::pair<std::string, std::string>>& interactor::getDefaultInteractionsInfo()
+/*const std::vector<std::pair<std::string, std::string>>& interactor::getDefaultInteractionsInfo()
 {
   // clang-format off
   static const std::vector<std::pair<std::string, std::string> > DefaultInteractionsInfo{
@@ -50,7 +50,7 @@ const std::vector<std::pair<std::string, std::string>>& interactor::getDefaultIn
   // clang-format on
 
   return DefaultInteractionsInfo;
-};
+};*/
 
 //----------------------------------------------------------------------------
 interactor::already_exists_exception::already_exists_exception(const std::string& what)

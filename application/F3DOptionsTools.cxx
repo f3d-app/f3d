@@ -225,10 +225,10 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
   }
   f3d::log::info(cxxOptions.help(orderedCLIGroupNames));
   f3d::log::info("Keys:");
-  for (const auto& [key, desc] : f3d::interactor::getDefaultInteractionsInfo())
+/*  for (const auto& [key, desc] : f3d::interactor::getBindingsDocumentation())
   {
     ::PrintHelpPair(key, desc);
-  }
+  }TODO */
 
   f3d::log::info("\nExamples:");
   for (const auto& [cmd, desc] : examples)

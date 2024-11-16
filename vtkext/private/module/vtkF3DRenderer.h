@@ -345,6 +345,12 @@ public:
    */
   void CycleComponentForColoring();
 
+  /**
+   * Convert a component index into a string
+   * If there is a component name defined in the current coloring information, display it.
+   * Otherwise, use component #index as the default value.
+   */
+  std::string ComponentToString(int component);
 
 private:
   vtkF3DRenderer();
@@ -454,13 +460,6 @@ private:
    * coloring info
    */
   void ConfigureRangeAndCTFForColoring(const F3DColoringInfoHandler::ColoringInfo& info);
-
-  /**
-   * Convert a component index into a string
-   * If there is a component name defined in the current coloring information, display it.
-   * Otherwise, use component #index as the default value.
-   */
-  std::string ComponentToString(int component);
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
