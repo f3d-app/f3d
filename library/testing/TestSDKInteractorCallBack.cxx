@@ -47,7 +47,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   // Check that adding an existing interaction command trigger an exception
   try
   {
-    inter.addInteractionCommand("7", f3d::interactor::ModifierKeys::ANY, "exception");
+    inter.addBinding("7", f3d::interactor::ModifierKeys::ANY, "exception");
     std::cerr << "An exception has not been thrown when adding a existing interaction command"
               << std::endl;
     return EXIT_FAILURE;
@@ -56,38 +56,38 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   {
   }
 
-  // Remove interactions that will be triggered later and should not have any effect
-  inter.removeInteractionCommands("7", f3d::interactor::ModifierKeys::ANY);
-  inter.removeInteractionCommands("Y", f3d::interactor::ModifierKeys::NONE);
-  inter.removeInteractionCommands("B", f3d::interactor::ModifierKeys::NONE);
-  inter.removeInteractionCommands("S", f3d::interactor::ModifierKeys::NONE);
+  // Remove bindings that will be triggered later and should not have any effect
+  inter.removeBinding("7", f3d::interactor::ModifierKeys::ANY);
+  inter.removeBinding("Y", f3d::interactor::ModifierKeys::NONE);
+  inter.removeBinding("B", f3d::interactor::ModifierKeys::NONE);
+  inter.removeBinding("S", f3d::interactor::ModifierKeys::NONE);
 
-  // Check that an interaction can be added and that it removes existing interaction
-  inter.addInteractionCommand("S", f3d::interactor::ModifierKeys::NONE, "toggle interactor.axis");
+  // Check that an binding can be added
+  inter.addBinding("S", f3d::interactor::ModifierKeys::NONE, "toggle interactor.axis");
 
   // Check CTRL modifier and that another interaction can be added on the same key with another
   // modifier
-  inter.addInteractionCommand(
+  inter.addBinding(
     "S", f3d::interactor::ModifierKeys::CTRL, "toggle render.grid.enable");
 
   // Check invalid command for coverage
-  inter.addInteractionCommand("P", f3d::interactor::ModifierKeys::CTRL, "invalid command");
+  inter.addBinding("P", f3d::interactor::ModifierKeys::CTRL, "invalid command");
 
   // Check SHIFT modifier
-  inter.addInteractionCommand(
+  inter.addBinding(
     "Y", f3d::interactor::ModifierKeys::SHIFT, R"(set ui.filename_info "My Own Filename")");
 
   // Check CTRL_SHIFT modifier
-  inter.addInteractionCommands("B", f3d::interactor::ModifierKeys::CTRL_SHIFT,
+  inter.addBinding("B", f3d::interactor::ModifierKeys::CTRL_SHIFT,
     { "set ui.filename true", "set render.show_edges true" });
 
   // Check ANY modifier
-  inter.addInteractionCommand(
+  inter.addBinding(
     "A", f3d::interactor::ModifierKeys::ANY, "toggle render.background.skybox");
 
   // Replace the add_files command
-  inter.removeCommandCallback("add_files");
-  inter.addCommandCallback("add_files", [&](const std::vector<std::string>& filesVec) -> bool {
+  inter.removeCommand("add_files");
+  inter.addCommand("add_files", [&](const std::vector<std::string>& filesVec) -> bool {
     const std::string& path = filesVec[0];
     size_t found = path.find_last_of("/\\");
     sce.clear();
@@ -111,12 +111,12 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   }
 
   // Remove a non-existing interaction command
-  inter.removeInteractionCommands("Invalid", f3d::interactor::ModifierKeys::ANY);
+  inter.removeBinding("Invalid", f3d::interactor::ModifierKeys::ANY);
 
-  // Remove all interactions
-  for (const auto& [interaction, modifier] : inter.getInteractionBinds())
+  // Remove all bindings
+  for (const auto& [interaction, modifier] : inter.getBindingInteractions())
   {
-    inter.removeInteractionCommands(interaction, modifier);
+    inter.removeBinding(interaction, modifier);
   }
   // Play interaction again, which should not have any effect
   // Dragon.vtu; SYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
@@ -133,9 +133,9 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // Create default interactions commands again, two times, and check rendering
-  inter.createDefaultInteractionsCommands();
-  inter.createDefaultInteractionsCommands();
+  // initialize default bindings again, two times, and check rendering
+  inter.initializeDefaultBindings();
+  inter.initializeDefaultBindings();
   // Dragon.vtu; SYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
   {

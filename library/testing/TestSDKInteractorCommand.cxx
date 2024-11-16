@@ -36,16 +36,16 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   test("triggerCommand set unparsable",
     inter.triggerCommand("set scene.animation.index invalid") == false);
 
-  // Add/Remove callback
-  inter.addCommandCallback("test_toggle", [&](const std::vector<std::string>&) -> bool {
+  // Add/Remove command
+  inter.addCommand("test_toggle", [&](const std::vector<std::string>&) -> bool {
     options.toggle("model.scivis.cells");
     return true;
   });
   inter.triggerCommand("test_toggle");
-  test("addCommandCallback", options.model.scivis.cells == false);
+  test("addCommand", options.model.scivis.cells == false);
 
-  inter.removeCommandCallback("test_toggle");
-  test("removeCommandCallback", inter.triggerCommand("test_toggle") == false);
+  inter.removeCommand("test_toggle");
+  test("removeCommand", inter.triggerCommand("test_toggle") == false);
 
   // Coverage print
   inter.triggerCommand("print model.scivis.cells");
@@ -62,22 +62,22 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   test("triggerCommand exception handling",
     inter.triggerCommand(R"(print "render.hdri.file)") == false);
 
-  // remove all command callbacks
-  for (const std::string& action : inter.getCommandCallbackActions())
+  // remove all commands
+  for (const std::string& action : inter.getCommandActions())
   {
-    inter.removeCommandCallback(action);
+    inter.removeCommand(action);
   }
-  test("removeAllCommandCallbacks", inter.triggerCommand("print model.scivis.cells") == false);
+  test("removeAllCommands", inter.triggerCommand("print model.scivis.cells") == false);
 
-  // Create default two times and check they work
-  inter.createDefaultCommandCallbacks();
-  inter.createDefaultCommandCallbacks();
+  // Intialize default two times and check they work
+  inter.initializeDefaultCommands();
+  inter.initializeDefaultCommands();
   inter.triggerCommand("toggle model.scivis.cells");
   test("triggerCommand after defaults creation", options.model.scivis.cells == true);
 
   // check exception
-  test.expect<f3d::interactor::already_exists_exception>("add already existing callback", [&]() {
-    inter.addCommandCallback("toggle", [&](const std::vector<std::string>&) -> bool {
+  test.expect<f3d::interactor::already_exists_exception>("add already existing command", [&]() {
+    inter.addCommand("toggle", [&](const std::vector<std::string>&) -> bool {
       options.toggle("model.scivis.cells");
       return true;
     });

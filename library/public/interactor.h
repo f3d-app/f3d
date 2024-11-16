@@ -25,31 +25,30 @@ class F3D_EXPORT interactor
 public:
   ///@{ @name Command
   /**
-   * Remove all existing command callbacks and create all default command callbacks,
+   * Remove all existing commands and initialize all default commands,
    * see COMMANDS.md for details.
    */
-  virtual interactor& createDefaultCommandCallbacks() = 0;
+  virtual interactor& initializeDefaultCommands() = 0;
 
   /**
-   * Use this method to add a callback into the command map
-   * to be called using triggerCommand.
-   * Adding a commandCallback with an already existing action throw a
+   * Use this method to add a command to be called using triggerCommand.
+   * Adding a command with an already existing action throw a
    * interactor::already_exists_exception.
    * Considering namespacing dedicated action to avoid conflicts with default action,
    * eg: `my_app::action`
    */
-  virtual interactor& addCommandCallback(
+  virtual interactor& addCommand(
     const std::string& action, std::function<bool(const std::vector<std::string>&)> callback) = 0;
 
   /**
-   * Remove a command callback for provided action, does not do anything if it does not exists.
+   * Remove a command for provided action, does not do anything if it does not exists.
    */
-  virtual interactor& removeCommandCallback(const std::string& action) = 0;
+  virtual interactor& removeCommand(const std::string& action) = 0;
 
   /**
-   * Return a string vector containing all currently defined actions of command callbacks
+   * Return a string vector containing all currently defined actions of commands
    */
-  virtual std::vector<std::string> getCommandCallbackActions() = 0;
+  virtual std::vector<std::string> getCommandActions() = 0;
 
   /**
    * Trigger provided command, see COMMANDS.md for details about supported
@@ -58,7 +57,7 @@ public:
   virtual bool triggerCommand(std::string_view command) = 0;
   ///@}
 
-  ///@{ @name Interaction Commands
+  ///@{ @name Bindings
   /**
    * Enumeration of supported modifier combination, in binary.
    */
@@ -72,13 +71,13 @@ public:
   };
 
   /**
-   * Remove all existing interaction command and create all commands for default interactions,
+   * Remove all existing interaction command and add all default bindings
    * see INTERACTIONS.md for details.
    */
-  virtual interactor& createDefaultInteractionsCommands() = 0;
+  virtual interactor& initializeDefaultBindings() = 0;
 
   /**
-   * Use this method to specify your own interaction commands for a specified interaction and
+   * Use this method to add binding, in order to trigger commands for a specified interaction and
    * modifiers flag.
    *
    * interaction can be a pressed key symbol, eg: "C",
@@ -89,7 +88,7 @@ public:
    *
    * When the corresponding interaction and modifiers happens, the provided commands will be
    * triggered using triggerCommand.
-   * Considering checkinng if an interaction exists or removing it before adding it to avoid
+   * Considering checking if an interaction exists or removing it before adding it to avoid
    * potential conflicts.
    *
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
@@ -98,30 +97,39 @@ public:
    * Adding commands for an existing combination of interaction and modifier will throw a
    * interactor::already_exists_exception.
    */
-  virtual interactor& addInteractionCommands(
+  virtual interactor& addBinding(
     const std::string& interaction, ModifierKeys modifiers, std::vector<std::string> commands) = 0;
 
   /**
-   * See addInteractionCommands
+   * See addBinding
    * Convenience method to add a single command for an interaction, similar as
-   * addInteractionCommands(interaction, modifiers, {command})
+   * addBinding(interaction, modifiers, {command})
    *
    * Adding command for an existing combination of interaction and modifier will throw a
    * interactor::already_exists_exception.
    */
-  virtual interactor& addInteractionCommand(
+  virtual interactor& addBinding(
     const std::string& interaction, ModifierKeys modifiers, std::string command) = 0;
 
   /**
-   * Remove interaction commands corresponding to provided interaction and modifiers
+   * Convenience initializer list signature for add binding method
    */
-  virtual interactor& removeInteractionCommands(
+  interactor& addBinding(
+    const std::string& interaction, ModifierKeys modifiers, std::initializer_list<std::string> list)
+  {
+    return this->addBinding(interaction, modifiers, std::vector<std::string>(list));
+  }
+
+  /**
+   * Remove binding corresponding to provided interaction and modifiers
+   */
+  virtual interactor& removeBinding(
     std::string interaction, ModifierKeys modifiers) = 0;
 
   /**
-   * Return a string vector of all currently defined interaction binds
+   * Return a string vector of all currently defined bind interactions
    */
-  virtual std::vector<std::pair<std::string, ModifierKeys>> getInteractionBinds() = 0;
+  virtual std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() = 0;
   ///@}
 
   /**
