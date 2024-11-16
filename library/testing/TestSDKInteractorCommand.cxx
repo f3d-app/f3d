@@ -69,7 +69,7 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   }
   test("removeAllCommands", inter.triggerCommand("print model.scivis.cells") == false);
 
-  // Intialize default two times and check they work
+  // Initialize default two times and check they work
   inter.initializeDefaultCommands();
   inter.initializeDefaultCommands();
   inter.triggerCommand("toggle model.scivis.cells");
