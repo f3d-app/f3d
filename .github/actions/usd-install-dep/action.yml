@@ -26,7 +26,7 @@ runs:
         ref: v24.11
 
    # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
-   - name: Patch USD
+    - name: Patch USD
       if: steps.cache-usd.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/usd
       shell: bash
