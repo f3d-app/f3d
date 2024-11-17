@@ -43,7 +43,7 @@ When provided by the engine, the interactor class lets you choose how to interac
 It contains the animation API to start and stop animation.
 
 Interactor lets you add, remove and trigger your [commands](../user/COMMANDS.md).
-The commands lets you interact with the libf3d in a very flexible manner.
+The commands let you interact with the libf3d in a very flexible manner.
 
 Interactor also lets you add and remove bindings in order to modify how
 the libf3d react to different interactions, eg. when a key is pressed or when a file is dropped.
