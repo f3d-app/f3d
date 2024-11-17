@@ -71,7 +71,7 @@ public:
   };
 
   /**
-   * Remove all existing interaction command and add all default bindings
+   * Remove all existing interaction commands and add all default bindings
    * see INTERACTIONS.md for details.
    */
   virtual interactor& initializeDefaultBindings() = 0;
