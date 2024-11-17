@@ -75,7 +75,9 @@ void vtkF3DMetaImporter::Clear()
 //----------------------------------------------------------------------------
 void vtkF3DMetaImporter::AddImporter(const vtkSmartPointer<vtkImporter>& importer)
 {
-  this->Pimpl->Importers.emplace_back(vtkF3DMetaImporter::Internals::ImporterPair {importer, false});
+  F3DLog::Print(F3DLog::Severity::Info, std::string("[gapry][issues][1281][") + __PRETTY_FUNCTION__ + "] ");
+
+  this->Pimpl->Importers.emplace_back(vtkF3DMetaImporter::Internals::ImporterPair {importer, false}); // [gapry][issues][1281]
   this->Modified();
 
   // Add a progress event observer

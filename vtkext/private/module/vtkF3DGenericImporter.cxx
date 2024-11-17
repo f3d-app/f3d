@@ -172,6 +172,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 //----------------------------------------------------------------------------
 void vtkF3DGenericImporter::SetInternalReader(vtkAlgorithm* reader)
 {
+  F3DLog::Print(F3DLog::Severity::Info, std::string("[gapry][issues][1281][") + __PRETTY_FUNCTION__ + "]");
+
   if (reader)
   {
     this->Pimpl->Reader = reader;

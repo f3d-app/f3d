@@ -89,6 +89,8 @@ public:
 
   void Load(const std::vector<vtkSmartPointer<vtkImporter>>& importers)
   {
+    log::info(std::string("[gapry][issues][1281][") + __PRETTY_FUNCTION__ + "]");
+
     for (const vtkSmartPointer<vtkImporter>& importer : importers)
     {
       this->MetaImporter->AddImporter(importer);
@@ -243,6 +245,8 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       throw scene::load_failure_exception(filePath.string() + " does not exists");
     }
 
+    f3d::log::info("[gapry][issues][1281][", __PRETTY_FUNCTION__, "] ", filePath.string());
+
     // Recover the importer for the provided file path
     f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string());
     if (reader)
@@ -259,14 +263,14 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     if (!importer)
     {
       // XXX: F3D Plugin CMake logic ensure there is either a scene reader or a geometry reader
-      auto vtkReader = reader->createGeometryReader(filePath.string());
+      auto vtkReader = reader->createGeometryReader(filePath.string()); // [gapry][issues][1281]
       assert(vtkReader);
       vtkSmartPointer<vtkF3DGenericImporter> genericImporter =
         vtkSmartPointer<vtkF3DGenericImporter>::New();
       genericImporter->SetInternalReader(vtkReader);
       importer = genericImporter;
     }
-    importers.emplace_back(importer);
+    importers.emplace_back(importer); // [gapry][issues][1281]
   }
 
   log::debug("\nLoading files: ");
