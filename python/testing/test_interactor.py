@@ -7,7 +7,6 @@ import f3d
 
 def callback_fn(args):
     print(args)
-    return True
 
 
 def test_command(capfd):
@@ -28,7 +27,7 @@ def test_command(capfd):
     assert out == "['arg1', 'arg2']\n"
 
     # Smoke test
-    inter.initialize_default_commands()
+    inter.init_commands()
 
 
 def test_binding():
@@ -49,4 +48,4 @@ def test_binding():
     inter.add_binding(
         "P", f3d.Interactor.ModifierKeys.CTRL_SHIFT, ["dummy command", "dummy command"]
     )
-    inter.initialize_default_bindings()
+    inter.init_bindings()

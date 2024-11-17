@@ -35,14 +35,14 @@ public:
   interactor_impl(options& options, window_impl& window, scene_impl& scene);
   ~interactor_impl() override;
 
-  interactor& initializeDefaultCommands() override;
+  interactor& initCommands() override;
   interactor& addCommand(const std::string& action,
-    std::function<bool(const std::vector<std::string>&)> callback) override;
+    std::function<void(const std::vector<std::string>&)> callback) override;
   interactor& removeCommand(const std::string& action) override;
   std::vector<std::string> getCommandActions() const override;
   bool triggerCommand(std::string_view command) override;
 
-  interactor& initializeDefaultBindings() override;
+  interactor& initBindings() override;
   interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
     std::vector<std::string> commands) override;
   interactor& addBinding(
@@ -94,6 +94,16 @@ public:
    * the camera clipping range.
    */
   void UpdateRendererAfterInteraction();
+
+  /**
+   * An exception that can be thrown by certain command callbacks
+   * when the arguments of the callback are incorrect and expected
+   * to be caught by triggerCommand
+   */
+  struct invalid_args_exception : public exception
+  {
+    explicit invalid_args_exception(const std::string& what = "");
+  };
 
 private:
   class internals;

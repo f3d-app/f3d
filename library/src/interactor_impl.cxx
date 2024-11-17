@@ -424,9 +424,16 @@ public:
     {
       for (const std::string& command : commandsIt->second)
       {
-        if (!this->Interactor.triggerCommand(command + argsString))
+        try
         {
-          log::error("Interaction: error running command:\"", command + argsString, "\", ignoring");
+          // XXX: Ignore the boolean return of triggerCommand,
+          //  error is already logged by triggerCommand
+          this->Interactor.triggerCommand(command + argsString);
+        }
+        catch (const f3d::interactor::command_runtime_exception& ex)
+        {
+          log::error("Interaction: error running command:\"", command + argsString, "\":");
+          log::error(ex.what());
         }
       }
     }
@@ -448,7 +455,7 @@ public:
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
   std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
 
-  std::map<std::string, std::function<bool(const std::vector<std::string>&)>> Commands;
+  std::map<std::string, std::function<void(const std::vector<std::string>&)>> Commands;
 
   std::map<Bind, std::vector<std::string>> Bindings;
 
@@ -469,76 +476,58 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
   this->Internals->Scene.SetInteractor(this);
   assert(this->Internals->AnimationManager);
 
-  this->initializeDefaultCommands();
-  this->initializeDefaultBindings();
+  this->initCommands();
+  this->initBindings();
 }
 
 //----------------------------------------------------------------------------
 interactor_impl::~interactor_impl() = default;
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::initializeDefaultCommands()
+interactor& interactor_impl::initCommands()
 {
   this->Internals->Commands.clear();
 
-  const auto check_args = [&](const std::vector<std::string>& args, size_t expectedSize,
-                            std::string_view actionName) -> bool
+  const auto check_args =
+    [&](const std::vector<std::string>& args, size_t expectedSize, std::string_view actionName)
   {
     if (args.size() != expectedSize)
     {
-      log::error("Command: ", actionName, " is expecting ", std::to_string(expectedSize),
-        " arguments, ignoring");
-      return false;
+      throw interactor_impl::invalid_args_exception(std::string("Command: ") +
+        std::string(actionName) + " is expecting " + std::to_string(expectedSize) + " arguments");
     }
-    return true;
   };
 
   // Add default callbacks
   this->addCommand("set",
-    [&](const std::vector<std::string>& args) -> bool
+    [&](const std::vector<std::string>& args)
     {
-      if (!check_args(args, 2, "set"))
-      {
-        return false;
-      }
+      check_args(args, 2, "set");
       this->Internals->Options.setAsString(args[0], args[1]);
-      return true;
     });
 
   this->addCommand("toggle",
-    [&](const std::vector<std::string>& args) -> bool
+    [&](const std::vector<std::string>& args)
     {
-      if (!check_args(args, 1, "toggle"))
-      {
-        return false;
-      }
+      check_args(args, 1, "toggle");
       this->Internals->Options.toggle(args[0]);
-      return true;
     });
 
   this->addCommand("reset",
-    [&](const std::vector<std::string>& args) -> bool
+    [&](const std::vector<std::string>& args)
     {
-      if (!check_args(args, 1, "reset"))
-      {
-        return false;
-      }
+      check_args(args, 1, "reset");
       this->Internals->Options.reset(args[0]);
-      return true;
     });
   this->addCommand("print",
-    [&](const std::vector<std::string>& args) -> bool
+    [&](const std::vector<std::string>& args)
     {
-      if (!check_args(args, 1, "print"))
-      {
-        return false;
-      }
+      check_args(args, 1, "print");
       log::info(this->Internals->Options.getAsString(args[0]));
-      return true;
     });
 
   this->addCommand("cycle_animation",
-    [&](const std::vector<std::string>&) -> bool
+    [&](const std::vector<std::string>&)
     {
       vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
       vtkF3DRenderer* ren =
@@ -547,17 +536,12 @@ interactor& interactor_impl::initializeDefaultCommands()
       this->Internals->Options.scene.animation.index =
         this->Internals->AnimationManager->GetAnimationIndex();
       ren->SetAnimationnameInfo(this->Internals->AnimationManager->GetAnimationName());
-      return true;
     });
 
   this->addCommand("cycle_coloring",
-    [&](const std::vector<std::string>& args) -> bool
+    [&](const std::vector<std::string>& args)
     {
-      if (!check_args(args, 1, "cycle_coloring"))
-      {
-        return false;
-      }
-
+      check_args(args, 1, "cycle_coloring");
       std::string_view type = args[0];
       vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
       vtkF3DRenderer* ren =
@@ -576,55 +560,38 @@ interactor& interactor_impl::initializeDefaultCommands()
       }
       else
       {
-        log::error("Command: cycle_coloring arg:\"", type, "\" is not recognized, ignoring");
-        return false;
+        throw interactor_impl::invalid_args_exception(
+          std::string("Command: cycle_coloring arg:\"") + std::string(type) +
+          "\" is not recognized.");
       }
       this->Internals->SynchronizeScivisOptions(this->Internals->Options, ren);
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-      return true;
     });
 
   this->addCommand("roll_camera",
-    [&](const std::vector<std::string>& args) -> bool
+    [&](const std::vector<std::string>& args)
     {
-      if (!check_args(args, 1, "roll_camera"))
-      {
-        return false;
-      }
+      check_args(args, 1, "roll_camera");
       this->Internals->Window.getCamera().roll(options::parse<int>(args[0]));
-      return true;
     });
 
   this->addCommand("increase_light_intensity",
-    [&](const std::vector<std::string>&) -> bool
-    {
-      this->Internals->IncreaseLightIntensity(false);
-      return true;
-    });
+    [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(false); });
 
   this->addCommand("decrease_light_intensity",
-    [&](const std::vector<std::string>&) -> bool
-    {
-      this->Internals->IncreaseLightIntensity(true);
-      return true;
-    });
+    [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(true); });
 
   this->addCommand("print_scene_info",
-    [&](const std::vector<std::string>&) -> bool
+    [&](const std::vector<std::string>&)
     {
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO);
       this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO);
-      return true;
     });
 
   this->addCommand("set_camera",
-    [&](const std::vector<std::string>& args) -> bool
+    [&](const std::vector<std::string>& args)
     {
-      if (!check_args(args, 1, "cycle_coloring"))
-      {
-        return false;
-      }
-
+      check_args(args, 1, "cycle_coloring");
       std::string_view type = args[0];
       if (type == "front")
       {
@@ -644,63 +611,47 @@ interactor& interactor_impl::initializeDefaultCommands()
       }
       else
       {
-        log::error("Command: set_camera arg:\"", type, "\" is not recognized, ignoring");
-        return false;
+        throw interactor_impl::invalid_args_exception(
+          std::string("Command: set_camera arg:\"") + std::string(type) + "\" is not recognized.");
       }
-      return true;
     });
 
   this->addCommand("toggle_volume_rendering",
-    [&](const std::vector<std::string>&) -> bool
+    [&](const std::vector<std::string>&)
     {
       this->Internals->Options.model.volume.enable = !this->Internals->Options.model.volume.enable;
       this->Internals->Window.render();
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-      return true;
     });
 
   this->addCommand("toggle_fps",
-    [&](const std::vector<std::string>&) -> bool
+    [&](const std::vector<std::string>&)
     {
       this->Internals->Options.ui.fps = !this->Internals->Options.ui.fps;
       this->Internals->Window.render();
-      return true;
     });
 
-  this->addCommand("stop_interactor",
-    [&](const std::vector<std::string>&) -> bool
-    {
-      this->Internals->StopInteractor();
-      return true;
-    });
+  this->addCommand(
+    "stop_interactor", [&](const std::vector<std::string>&) { this->Internals->StopInteractor(); });
 
   this->addCommand("reset_camera",
-    [&](const std::vector<std::string>&) -> bool
-    {
-      this->Internals->Window.getCamera().resetToDefault();
-      return true;
-    });
+    [&](const std::vector<std::string>&) { this->Internals->Window.getCamera().resetToDefault(); });
 
   this->addCommand("toggle_animation",
-    [&](const std::vector<std::string>&) -> bool
-    {
-      this->Internals->AnimationManager->ToggleAnimation();
-      return true;
-    });
+    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->ToggleAnimation(); });
 
   this->addCommand("add_files",
-    [&](const std::vector<std::string>& files) -> bool
+    [&](const std::vector<std::string>& files)
     {
       this->Internals->AnimationManager->StopAnimation();
       this->Internals->Scene.add(files);
-      return true;
     });
   return *this;
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addCommand(
-  const std::string& action, std::function<bool(const std::vector<std::string>&)> callback)
+  const std::string& action, std::function<void(const std::vector<std::string>&)> callback)
 {
   const auto [it, success] = this->Internals->Commands.insert({ action, callback });
   if (!success)
@@ -751,7 +702,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
     auto callbackIt = this->Internals->Commands.find(action);
     if (callbackIt != this->Internals->Commands.end())
     {
-      return callbackIt->second({ tokens.begin() + 1, tokens.end() });
+      callbackIt->second({ tokens.begin() + 1, tokens.end() });
     }
     else
     {
@@ -779,11 +730,19 @@ bool interactor_impl::triggerCommand(std::string_view command)
     log::error("Command: provided args in command: \"", command,
       "\" cannot be parsed into an option, ignoring");
   }
+  catch (const invalid_args_exception& ex)
+  {
+    log::error(ex.what(), " Ignoring.");
+  }
+  catch (const std::exception& ex)
+  {
+    throw interactor::command_runtime_exception(ex.what());
+  }
   return false;
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::initializeDefaultBindings()
+interactor& interactor_impl::initBindings()
 {
   this->Internals->Bindings.clear();
 
@@ -1037,5 +996,11 @@ void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 void interactor_impl::UpdateRendererAfterInteraction()
 {
   this->Internals->Style->UpdateRendererAfterInteraction();
+}
+
+//----------------------------------------------------------------------------
+interactor_impl::invalid_args_exception::invalid_args_exception(const std::string& what)
+  : exception(what)
+{
 }
 }

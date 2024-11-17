@@ -25,10 +25,10 @@ class F3D_EXPORT interactor
 public:
   ///@{ @name Command
   /**
-   * Remove all existing commands and initialize all default commands,
+   * Remove all existing commands and add all default commands,
    * see COMMANDS.md for details.
    */
-  virtual interactor& initializeDefaultCommands() = 0;
+  virtual interactor& initCommands() = 0;
 
   /**
    * Use this method to add a command to be called using triggerCommand.
@@ -38,7 +38,7 @@ public:
    * eg: `my_app::action`
    */
   virtual interactor& addCommand(
-    const std::string& action, std::function<bool(const std::vector<std::string>&)> callback) = 0;
+    const std::string& action, std::function<void(const std::vector<std::string>&)> callback) = 0;
 
   /**
    * Remove a command for provided action, does not do anything if it does not exists.
@@ -53,6 +53,13 @@ public:
   /**
    * Trigger provided command, see COMMANDS.md for details about supported
    * commands and syntax.
+   *
+   * If the command fails, it prints a debug log explaining why.
+   *
+   * Return true if the command succeeded, false otherwise.
+   * Throw an interactor::command_runtime_exception if the command callback
+   * throw an unrecognized exception. Note that default commands cannot throw such
+   * an exception.
    */
   virtual bool triggerCommand(std::string_view command) = 0;
   ///@}
@@ -74,7 +81,7 @@ public:
    * Remove all existing interaction commands and add all default bindings
    * see INTERACTIONS.md for details.
    */
-  virtual interactor& initializeDefaultBindings() = 0;
+  virtual interactor& initBindings() = 0;
 
   /**
    * Use this method to add binding, in order to trigger commands for a specified interaction and
@@ -192,6 +199,15 @@ public:
   struct already_exists_exception : public exception
   {
     explicit already_exists_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by interactor::triggerCommand
+   * when a command callback throw an exception
+   */
+  struct command_runtime_exception : public exception
+  {
+    explicit command_runtime_exception(const std::string& what = "");
   };
 
 protected:

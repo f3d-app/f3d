@@ -32,7 +32,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   std::string filename = "TestSDKInteractorCallBack";
   std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
 
-  // Dragon.vtu; SYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
+  // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
   {
     std::cerr << "Unexcepted error playing interaction" << std::endl;
@@ -61,6 +61,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.removeBinding("Y", f3d::interactor::ModifierKeys::NONE);
   inter.removeBinding("B", f3d::interactor::ModifierKeys::NONE);
   inter.removeBinding("S", f3d::interactor::ModifierKeys::NONE);
+  inter.removeBinding("Z", f3d::interactor::ModifierKeys::NONE);
 
   // Check that an binding can be added
   inter.addBinding("S", f3d::interactor::ModifierKeys::NONE, "toggle interactor.axis");
@@ -85,16 +86,21 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
 
   // Replace the add_files command
   inter.removeCommand("add_files");
-  inter.addCommand("add_files", [&](const std::vector<std::string>& filesVec) -> bool {
+  inter.addCommand("add_files", [&](const std::vector<std::string>& filesVec) {
     const std::string& path = filesVec[0];
     size_t found = path.find_last_of("/\\");
     sce.clear();
     sce.add(path.substr(0, found + 1) + "suzanne.ply");
-    return true;
   });
 
+  // Add a command and binding that throws an exception
+  inter.addCommand("exception", [&](const std::vector<std::string>&) {
+    throw std::runtime_error("testing runtime exception");
+  });
+  inter.addBinding("Z", f3d::interactor::ModifierKeys::NONE, "exception");
+
   // This time the interaction should result in a different rendering
-  // Dragon.vtu; SYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
+  // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
   {
     std::cerr << "Unexcepted error playing interaction" << std::endl;
@@ -117,7 +123,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     inter.removeBinding(interaction, modifier);
   }
   // Play interaction again, which should not have any effect
-  // Dragon.vtu; SYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
+  // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
   {
     std::cerr << "Unexcepted error playing interaction" << std::endl;
@@ -132,9 +138,9 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   }
 
   // initialize default bindings again, two times, and check rendering
-  inter.initializeDefaultBindings();
-  inter.initializeDefaultBindings();
-  // Dragon.vtu; SYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
+  inter.initBindings();
+  inter.initBindings();
+  // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
   {
     std::cerr << "Unexcepted error playing interaction" << std::endl;

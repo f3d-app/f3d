@@ -37,10 +37,8 @@ int TestSDKInteractorCommand(int argc, char* argv[])
     inter.triggerCommand("set scene.animation.index invalid") == false);
 
   // Add/Remove command
-  inter.addCommand("test_toggle", [&](const std::vector<std::string>&) -> bool {
-    options.toggle("model.scivis.cells");
-    return true;
-  });
+  inter.addCommand(
+    "test_toggle", [&](const std::vector<std::string>&) { options.toggle("model.scivis.cells"); });
   inter.triggerCommand("test_toggle");
   test("addCommand", options.model.scivis.cells == false);
 
@@ -70,17 +68,15 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   test("removeAllCommands", inter.triggerCommand("print model.scivis.cells") == false);
 
   // Initialize default two times and check they work
-  inter.initializeDefaultCommands();
-  inter.initializeDefaultCommands();
+  inter.initCommands();
+  inter.initCommands();
   inter.triggerCommand("toggle model.scivis.cells");
   test("triggerCommand after defaults creation", options.model.scivis.cells == true);
 
   // check exception
   test.expect<f3d::interactor::already_exists_exception>("add already existing command", [&]() {
-    inter.addCommand("toggle", [&](const std::vector<std::string>&) -> bool {
-      options.toggle("model.scivis.cells");
-      return true;
-    });
+    inter.addCommand(
+      "toggle", [&](const std::vector<std::string>&) { options.toggle("model.scivis.cells"); });
   });
 
   // Args check
@@ -95,6 +91,14 @@ int TestSDKInteractorCommand(int argc, char* argv[])
     "triggerCommand set_camera invalid args", inter.triggerCommand("set_camera one two") == false);
   test("triggerCommand cycle_coloring invalid args",
     inter.triggerCommand("cycle_coloring one two") == false);
+
+  // check runtime exception
+  test.expect<f3d::interactor::command_runtime_exception>("trigger a runtime exception", [&]() {
+    inter.addCommand("exception", [&](const std::vector<std::string>&) {
+      throw std::runtime_error("testing runtime exception");
+    });
+    inter.triggerCommand("exception");
+  });
 
   return test.result();
 }

@@ -800,17 +800,16 @@ int F3DStarter::Start(int argc, char** argv)
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
     interactor.addCommand("load_previous_file_group",
-      [this](const std::vector<std::string>&) { return this->LoadRelativeFileGroup(-1); });
+      [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(-1); });
 
     interactor.addCommand("load_next_file_group",
-      [this](const std::vector<std::string>&) { return this->LoadRelativeFileGroup(+1); });
+      [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(+1); });
 
     interactor.addCommand("reload_current_file_group",
-      [this](const std::vector<std::string>&)
-      { return this->LoadRelativeFileGroup(0, true, true); });
+      [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(0, true, true); });
 
     interactor.addCommand("add_current_directories",
-      [this](const std::vector<std::string>&) -> bool
+      [this](const std::vector<std::string>&)
       {
         if (this->Internals->LoadedFiles.size() > 0)
         {
@@ -818,35 +817,32 @@ int F3DStarter::Start(int argc, char** argv)
           {
             this->AddFile(parentPath, true);
           }
-          return this->LoadRelativeFileGroup(0);
+          this->LoadRelativeFileGroup(0);
         }
-        return true;
       });
 
     interactor.addCommand("take_screenshot",
-      [this](const std::vector<std::string>& args) -> bool
+      [this](const std::vector<std::string>& args)
       {
         // XXX: Add a test for this one this can be reached with a non empty filename
         std::string filename =
           args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
         this->SaveScreenshot(filename);
-        return true;
       });
 
     interactor.addCommand("take_minimal_screenshot",
-      [this](const std::vector<std::string>& args) -> bool
+      [this](const std::vector<std::string>& args)
       {
         // XXX: Add a test for this one this can be reached with a non empty filename
         std::string filename =
           args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
         this->SaveScreenshot(filename, true);
-        return true;
       });
 
     // This replace an existing command in libf3d
     interactor.removeCommand("add_files");
     interactor.addCommand("add_files",
-      [this](const std::vector<std::string>& files) -> bool
+      [this](const std::vector<std::string>& files)
       {
         int index = -1;
         for (const std::string& file : files)
@@ -857,30 +853,26 @@ int F3DStarter::Start(int argc, char** argv)
         {
           this->LoadFileGroup(index);
         }
-        return true;
       });
 
     interactor.addCommand("set_hdri",
-      [this](const std::vector<std::string>& files) -> bool
+      [this](const std::vector<std::string>& files)
       {
-        if (files.empty() || files.size() > 1)
+        if (!files.empty())
         {
-          return false;
+          // Set the first file has an HDRI
+          f3d::options& options = this->Internals->Engine->getOptions();
+          options.render.hdri.file = files[0];
+          options.render.hdri.ambient = true;
+          options.render.background.skybox = true;
+
+          // Rendering now is needed for correct lighting
+          this->Render();
         }
-
-        // Set the first file has an HDRI
-        f3d::options& options = this->Internals->Engine->getOptions();
-        options.render.hdri.file = files[0];
-        options.render.hdri.ambient = true;
-        options.render.background.skybox = true;
-
-        // Rendering now is needed for correct lighting
-        this->Render();
-        return true;
       });
 
     interactor.addCommand("add_files_or_set_hdri",
-      [this](const std::vector<std::string>& files) -> bool
+      [this](const std::vector<std::string>& files)
       {
         int index = -1;
         for (const std::string& file : files)
@@ -907,7 +899,6 @@ int F3DStarter::Start(int argc, char** argv)
         {
           this->LoadFileGroup(index);
         }
-        return true;
       });
 
     interactor.addBinding("Left", f3d::interactor::ModifierKeys::NONE, "load_previous_file_group");
