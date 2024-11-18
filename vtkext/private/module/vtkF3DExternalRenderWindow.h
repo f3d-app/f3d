@@ -29,12 +29,6 @@ public:
    */
   void Render() override;
 
-  /**
-   * Initialize the OpenGL context. Reimplemented to skip the incorrect
-   * vtkGenericOpenGLRenderWindow::OpenGLInit() implementation
-   */
-  void OpenGLInit() override;
-
 protected:
   vtkF3DExternalRenderWindow();
   ~vtkF3DExternalRenderWindow() override;

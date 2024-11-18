@@ -34,15 +34,9 @@ void vtkF3DExternalRenderWindow::Render()
 {
   if (!this->Initialized)
   {
-    this->OpenGLInit();
+    // skip vtkGenericOpenGLRenderWindow because it calls OpenGL before it's even initialized
+    this->vtkOpenGLRenderWindow::OpenGLInit();
   }
 
   this->Superclass::Render();
-}
-
-//------------------------------------------------------------------------------
-void vtkF3DExternalRenderWindow::OpenGLInit()
-{
-  // skip vtkGenericOpenGLRenderWindow because it calls OpenGL before it's even initialized
-  this->vtkOpenGLRenderWindow::OpenGLInit();
 }
