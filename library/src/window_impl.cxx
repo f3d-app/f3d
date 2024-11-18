@@ -29,7 +29,7 @@
 #endif
 
 #ifdef _WIN32
-#include <vtkWin32OpenGLRenderWindow.h>
+#include <vtkF3DWGLRenderWindow.h>
 #endif
 
 #ifdef VTK_OPENGL_HAS_EGL
@@ -38,17 +38,6 @@
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtkOSOpenGLRenderWindow.h>
-#endif
-
-#ifdef _WIN32
-#include <Windows.h>
-#include <dwmapi.h>
-
-#ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
-#define DWMWA_USE_IMMERSIVE_DARK_MODE 20
-#endif
-
-constexpr auto IMMERSIVE_DARK_MODE_SUPPORTED_SINCE = 19041;
 #endif
 
 namespace f3d::detail
@@ -67,90 +56,6 @@ public:
     vtksys::SystemTools::MakeDirectory(this->CachePath);
 
     return this->CachePath;
-  }
-
-#if _WIN32
-  /**
-   * Helper function to detect if the
-   * Windows Build Number is equal or greater to a number
-   */
-  static bool IsWindowsBuildNumberOrGreater(int buildNumber)
-  {
-    std::string value{};
-    bool result = vtksys::SystemTools::ReadRegistryValue(
-      "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion;CurrentBuildNumber",
-      value);
-
-    if (result == true)
-    {
-      try
-      {
-        return std::stoi(value) >= buildNumber;
-      }
-      catch (const std::invalid_argument& e)
-      {
-        f3d::log::debug("Error parsing CurrentBuildNumber", e.what());
-      }
-    }
-    else
-    {
-      f3d::log::debug("Error opening registry key.");
-    }
-
-    return false;
-  }
-
-  /**
-   * Helper function to fetch a DWORD from windows registry.
-   *
-   * @param hKey A handle to an open registry key
-   * @param subKey The path of registry key relative to 'hKey'
-   * @param value The name of the registry value
-   * @param dWord Variable to store the result in
-   */
-  static bool ReadRegistryDWord(
-    HKEY hKey, const std::wstring& subKey, const std::wstring& value, DWORD& dWord)
-  {
-    DWORD dataSize = sizeof(DWORD);
-    LONG result = RegGetValueW(
-      hKey, subKey.c_str(), value.c_str(), RRF_RT_REG_DWORD, nullptr, &dWord, &dataSize);
-
-    return result == ERROR_SUCCESS;
-  }
-
-  /**
-   * Helper function to detect user theme
-   */
-  static bool IsWindowsInDarkMode()
-  {
-    std::wstring subKey(L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize");
-
-    DWORD value{};
-
-    if (ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"AppsUseLightTheme", value))
-    {
-      return value == 0;
-    }
-
-    if (ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"SystemUsesLightTheme", value))
-    {
-      return value == 0;
-    }
-
-    return false;
-  }
-#endif
-
-  void UpdateTheme() const
-  {
-#ifdef _WIN32
-    if (this->IsWindowsBuildNumberOrGreater(IMMERSIVE_DARK_MODE_SUPPORTED_SINCE))
-    {
-      HWND hwnd = static_cast<HWND>(this->RenWin->GetGenericWindowId());
-      BOOL useDarkMode = this->IsWindowsInDarkMode();
-      DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
-    }
-#endif
   }
 
   static context::fptr SymbolLoader(void* userptr, const char* name)
@@ -211,7 +116,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   else if (type == Type::WGL)
   {
 #ifdef _WIN32
-    this->Internals->RenWin = vtkSmartPointer<vtkWin32OpenGLRenderWindow>::New();
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
 #endif
   }
   else if (!type.has_value())
@@ -244,7 +149,6 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
 
   this->Initialize();
-  this->Internals->UpdateTheme();
 
   log::debug("VTK window class type is ", this->Internals->RenWin->GetClassName());
 }
@@ -277,7 +181,7 @@ window_impl::Type window_impl::getType()
 #endif
 
 #ifdef _WIN32
-  if (this->Internals->RenWin->IsA("vtkWin32OpenGLRenderWindow"))
+  if (this->Internals->RenWin->IsA("vtkF3DWGLRenderWindow"))
   {
     return Type::WGL;
   }
