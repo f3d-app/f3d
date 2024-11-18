@@ -21,7 +21,7 @@ namespace
    */
   bool IsWindowsBuildNumberOrGreater(int buildNumber)
   {
-    std::string value{};
+    std::string value;
     bool result = vtksys::SystemTools::ReadRegistryValue(
       "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion;CurrentBuildNumber",
       value);
@@ -34,12 +34,7 @@ namespace
       }
       catch (const std::invalid_argument& e)
       {
-        f3d::log::debug("Error parsing CurrentBuildNumber", e.what());
       }
-    }
-    else
-    {
-      f3d::log::debug("Error opening registry key.");
     }
 
     return false;
@@ -72,12 +67,12 @@ namespace
 
     DWORD value{};
 
-    if (ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"AppsUseLightTheme", value))
+    if (::ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"AppsUseLightTheme", value))
     {
       return value == 0;
     }
 
-    if (ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"SystemUsesLightTheme", value))
+    if (::ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"SystemUsesLightTheme", value))
     {
       return value == 0;
     }
