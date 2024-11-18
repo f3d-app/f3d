@@ -102,7 +102,6 @@ find_package(VTK 9.2.6 REQUIRED
     opengl
     IOExodus
     IOOpenVDB
-    RenderingExternal
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
 
