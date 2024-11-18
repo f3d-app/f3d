@@ -3,7 +3,7 @@
 F3D will provide access to commands through bindings configuration and command line widget in the future.
 Commands let you trigger specific behavior that may not be available otherwise.
 Please note commands are currently experimental and the behaviors, actions may be added or removed without deprecation.
-action names and arguments may change without deprecation.
+Action names and arguments may also change without deprecation.
 
 Commands have the following syntax:
 
