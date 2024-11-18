@@ -14,6 +14,9 @@ public:
   static vtkF3DWGLRenderWindow* New();
   vtkTypeMacro(vtkF3DWGLRenderWindow, vtkWin32OpenGLRenderWindow);
 
+  /**
+   * Override to decorate with dark theme if needed.
+   */
   void WindowInitialize() override;
 
 protected:
