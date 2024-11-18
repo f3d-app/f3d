@@ -66,6 +66,18 @@ public:
     return (*fn)(name);
   }
 
+  static vtkSmartPointer<vtkRenderWindow> AutoBackendWindow()
+  {
+    // Override VTK logic
+#ifdef _WIN32
+    return vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
+#endif
+
+    // XXX: At the moment, rely on VTK logic for Linux and macOS
+    // It will change in the future when other subclasses are implemented
+    return vtkSmartPointer<vtkRenderWindow>::New();
+  }
+
   std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkNew<vtkF3DRenderer> Renderer;
@@ -121,11 +133,13 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
   else if (!type.has_value())
   {
-    // rely on VTK logic
-    this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
+    this->Internals->RenWin = internals::AutoBackendWindow();
   }
 
-  assert(this->Internals->RenWin != nullptr);
+  if (this->Internals->RenWin == nullptr)
+  {
+    throw engine::no_window_exception("Cannot create this window type");
+  }
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
   vtkOpenGLRenderWindow* oglRenWin = vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin);
