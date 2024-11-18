@@ -224,16 +224,25 @@ PYBIND11_MODULE(pyf3d, module)
     .def("record_interaction", &f3d::interactor::recordInteraction, "Record an interaction file")
     .def("start", &f3d::interactor::start, "Start the interactor")
     .def("stop", &f3d::interactor::start, "Stop the interactor")
-    .def("add_command_callback", &f3d::interactor::addCommandCallback, "Add a new command callback")
-    .def("remove_command_callback", &f3d::interactor::removeCommandCallback,
-      "Remove a command callback")
+    .def("init_commands", &f3d::interactor::initCommands,
+      "Remove all commands and add all default command callbacks")
+    .def("add_command", &f3d::interactor::addCommand, "Add a command")
+    .def("remove_command", &f3d::interactor::removeCommand, "Remove a command")
+    .def("get_command_actions", &f3d::interactor::getCommandActions, "Get all command actions")
     .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command")
-    .def("add_interaction_commands", &f3d::interactor::addInteractionCommands,
-      "Add interaction commands")
-    .def("add_interaction_command", &f3d::interactor::addInteractionCommand,
-      "Add an interaction command")
-    .def("remove_interaction_command", &f3d::interactor::removeInteractionCommands,
-      "Remove interaction commands")
+    .def("init_bindings", &f3d::interactor::initBindings,
+      "Remove all bindings and add default bindings")
+    .def("add_binding",
+      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys, std::string>(
+        &f3d::interactor::addBinding),
+      "Add a binding command")
+    .def("add_binding",
+      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys,
+        std::vector<std::string>>(&f3d::interactor::addBinding),
+      "Add binding commands")
+    .def("remove_binding", &f3d::interactor::removeBinding, "Remove interaction commands")
+    .def("get_binding_interactions", &f3d::interactor::getBindingInteractions,
+      "Get all interaction binds")
     .def_static("get_default_interactions_info", &f3d::interactor::getDefaultInteractionsInfo);
 
   py::enum_<f3d::interactor::ModifierKeys>(interactor, "ModifierKeys")

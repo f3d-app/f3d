@@ -36,16 +36,14 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   test("triggerCommand set unparsable",
     inter.triggerCommand("set scene.animation.index invalid") == false);
 
-  // Add/Remove callback
-  inter.addCommandCallback("test_toggle", [&](const std::vector<std::string>&) -> bool {
-    options.toggle("model.scivis.cells");
-    return true;
-  });
+  // Add/Remove command
+  inter.addCommand(
+    "test_toggle", [&](const std::vector<std::string>&) { options.toggle("model.scivis.cells"); });
   inter.triggerCommand("test_toggle");
-  test("addCommandCallback", options.model.scivis.cells == false);
+  test("addCommand", options.model.scivis.cells == false);
 
-  inter.removeCommandCallback("test_toggle");
-  test("removeCommandCallback", inter.triggerCommand("test_toggle") == false);
+  inter.removeCommand("test_toggle");
+  test("removeCommand", inter.triggerCommand("test_toggle") == false);
 
   // Coverage print
   inter.triggerCommand("print model.scivis.cells");
@@ -62,6 +60,25 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   test("triggerCommand exception handling",
     inter.triggerCommand(R"(print "render.hdri.file)") == false);
 
+  // remove all commands
+  for (const std::string& action : inter.getCommandActions())
+  {
+    inter.removeCommand(action);
+  }
+  test("removeAllCommands", inter.triggerCommand("print model.scivis.cells") == false);
+
+  // Initialize default two times and check they work
+  inter.initCommands();
+  inter.initCommands();
+  inter.triggerCommand("toggle model.scivis.cells");
+  test("triggerCommand after defaults creation", options.model.scivis.cells == true);
+
+  // check exception
+  test.expect<f3d::interactor::already_exists_exception>("add already existing command", [&]() {
+    inter.addCommand(
+      "toggle", [&](const std::vector<std::string>&) { options.toggle("model.scivis.cells"); });
+  });
+
   // Args check
   test("triggerCommand set invalid args", inter.triggerCommand("set one") == false);
   test("triggerCommand toggle invalid args", inter.triggerCommand("toggle one two") == false);
@@ -74,6 +91,14 @@ int TestSDKInteractorCommand(int argc, char* argv[])
     "triggerCommand set_camera invalid args", inter.triggerCommand("set_camera one two") == false);
   test("triggerCommand cycle_coloring invalid args",
     inter.triggerCommand("cycle_coloring one two") == false);
+
+  // check runtime exception
+  test.expect<f3d::interactor::command_runtime_exception>("trigger a runtime exception", [&]() {
+    inter.addCommand("exception", [&](const std::vector<std::string>&) {
+      throw std::runtime_error("testing runtime exception");
+    });
+    inter.triggerCommand("exception");
+  });
 
   return test.result();
 }
