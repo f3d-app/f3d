@@ -136,10 +136,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     this->Internals->RenWin = internals::AutoBackendWindow();
   }
 
-  if (this->Internals->RenWin == nullptr)
-  {
-    throw engine::no_window_exception("Cannot create this window type");
-  }
+  assert(this->Internals->RenWin != nullptr);
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
   vtkOpenGLRenderWindow* oglRenWin = vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin);
