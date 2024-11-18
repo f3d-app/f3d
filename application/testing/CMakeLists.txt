@@ -520,10 +520,6 @@ else(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionRaytracingDenoiseNoRaytracing DATA suzanne.ply INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
 endif()
 
-if(F3D_MODULE_EXTERNAL_RENDERING)
-  f3d_test(NAME TestVersionExternal ARGS --version REGEXP "Module ExternalRendering: ON")
-endif()
-
 if(F3D_MODULE_EXR)
   f3d_test(NAME TestVersionEXR ARGS --version REGEXP "Module OpenEXR: ON")
 endif()

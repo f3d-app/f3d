@@ -36,6 +36,7 @@ set(classes
   vtkF3DCachedSpecularTexture
   vtkF3DConsoleOutputWindow
   vtkF3DDropZoneActor
+  vtkF3DExternalRenderWindow
   vtkF3DGenericImporter
   vtkF3DHexagonalBokehBlurPass
   vtkF3DInteractorEventRecorder

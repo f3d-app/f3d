@@ -27,7 +27,6 @@ PRIVATE_DEPENDS
   VTK::RenderingVolumeOpenGL2
 OPTIONAL_DEPENDS
   VTK::opengl
-  VTK::RenderingExternal
   VTK::RenderingRayTracing
 TEST_DEPENDS
   VTK::IOGeometry

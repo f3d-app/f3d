@@ -385,12 +385,6 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["Raytracing"] = false;
 #endif
 
-#if F3D_MODULE_EXTERNAL_RENDERING
-  libInfo.Modules["ExternalRendering"] = true;
-#else
-  libInfo.Modules["ExternalRendering"] = false;
-#endif
-
 #if F3D_MODULE_EXR
   libInfo.Modules["OpenEXR"] = true;
 #else

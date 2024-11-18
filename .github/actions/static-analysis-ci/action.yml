@@ -60,7 +60,6 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_MODULE_PATH=$(pwd)/../dependencies/install/lib/cmake/OpenVDB/
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
-        -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_MODULE_EXR=ON
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
