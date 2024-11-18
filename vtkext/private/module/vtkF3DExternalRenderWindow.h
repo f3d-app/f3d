@@ -25,10 +25,15 @@ public:
   bool IsCurrent() override { return true; }
 
   /**
+   * Trigger rendering. Reimplemented to ensure OpenGL is initialized.
+   */
+  void Render() override;
+
+  /**
    * Initialize the OpenGL context. Reimplemented to skip the incorrect
    * vtkGenericOpenGLRenderWindow::OpenGLInit() implementation
    */
-  void Initialize() override;
+  void OpenGLInit() override;
 
 protected:
   vtkF3DExternalRenderWindow();
