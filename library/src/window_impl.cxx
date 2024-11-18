@@ -230,10 +230,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     {
       oglRenWin->SetOpenGLSymbolLoader(&internals::SymbolLoader, &this->Internals->GetProcAddress);
     }
-    if (oglRenWin->IsA("vtkF3DExternalRenderWindow"))
-    {
-      oglRenWin->OpenGLInit();
-    }
+    oglRenWin->OpenGLInit();
   }
 #endif
 
