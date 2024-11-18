@@ -71,11 +71,11 @@ public:
     // Override VTK logic
 #ifdef _WIN32
     return vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
-#endif
-
+#else
     // XXX: At the moment, rely on VTK logic for Linux and macOS
     // It will change in the future when other subclasses are implemented
     return vtkSmartPointer<vtkRenderWindow>::New();
+#endif
   }
 
   std::unique_ptr<camera_impl> Camera;
