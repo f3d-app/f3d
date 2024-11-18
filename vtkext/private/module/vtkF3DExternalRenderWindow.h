@@ -28,7 +28,7 @@ public:
    * Initialize the OpenGL context. Reimplemented to skip the incorrect
    * vtkGenericOpenGLRenderWindow::OpenGLInit() implementation
    */
-  void OpenGLInit() override;
+  void Initialize() override;
 
 protected:
   vtkF3DExternalRenderWindow();

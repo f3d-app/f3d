@@ -230,7 +230,6 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     {
       oglRenWin->SetOpenGLSymbolLoader(&internals::SymbolLoader, &this->Internals->GetProcAddress);
     }
-    oglRenWin->OpenGLInit();
   }
 #endif
 
@@ -243,7 +242,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
-
+  this->Internals->RenWin->Initialize();
   this->Initialize();
   this->Internals->UpdateTheme();
 
