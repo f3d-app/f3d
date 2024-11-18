@@ -32,7 +32,7 @@ namespace
       {
         return std::stoi(value) >= buildNumber;
       }
-      catch (const std::invalid_argument& e)
+      catch (const std::invalid_argument&)
       {
       }
     }
