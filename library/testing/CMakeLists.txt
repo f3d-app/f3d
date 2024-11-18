@@ -152,6 +152,10 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   endif()
 endif()
 
+if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
+  set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
+endif()
+
 target_link_libraries(libf3dSDKTests libf3d ${libf3dSDKTests_link_libs})
 
 # make sure the libf3d API is compatible with the right C++ standard
