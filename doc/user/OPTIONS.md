@@ -22,6 +22,7 @@ Options|Default|Description
 \-\-load-plugins=\<paths or names\>||List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `exodus`, `occt`, `usd`, `vdb`. See [plugins](PLUGINS.md) for more info.
 \-\-scan-plugins||Scan standard directories for plugins and display their names, results may be incomplete. See [plugins](PLUGINS.md) for more info.
 \-\-screenshot-filename=\<png file\>|`{app}/{model}_{n}.png`|Filename to save [screenshots](INTERACTIONS.md#taking-screenshots) to. Can use [template variables](#filename-templating).
+\-\-rendering-backend=\<auto|egl|osmesa|glx|wgl\>|auto|Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` on linux to force headless rendering.
 
 ## General Options
 

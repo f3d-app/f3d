@@ -72,7 +72,7 @@ The GCC flag `-latomic` is not being added automatically with specific architect
   * If no formats have working thumbnails, then it is can be an issue with sandboxing or with the `f3d-plugin-xxx.thumbnailer` files.
   * If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/10_global.json` configuration folder using the `max-size` option.
 
-  > `--rendering-backend` CLI option is not working as expected
+> `--rendering-backend` CLI option is not working as expected
 
 Dynamically switching rendering backend require VTK 9.4.0, you may need to update VTK or to use our [binary release](INSTALLATION.md).
 

@@ -1055,10 +1055,19 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::log::error("This is a headless build of F3D, interactive rendering is not supported");
       return EXIT_FAILURE;
 #else
-      // Create the event loop repeating timer
-      interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
-      this->RequestRender();
-      interactor.start();
+      if (this->Internals->Engine->getWindow().isOffscreen())
+      {
+        f3d::log::warn(
+          "You are using an offscreen configuration, interactive rendering is disabled");
+        return EXIT_SUCCESS;
+      }
+      else
+      {
+        // Create the event loop repeating timer
+        interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
+        this->RequestRender();
+        interactor.start();
+      }
 #endif
     }
   }
