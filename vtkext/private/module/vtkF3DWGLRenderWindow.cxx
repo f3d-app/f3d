@@ -11,8 +11,6 @@
 
 constexpr auto IMMERSIVE_DARK_MODE_SUPPORTED_SINCE = 19041;
 
-vtkStandardNewMacro(vtkF3DWGLRenderWindow);
-
 namespace
 {
   /**
@@ -80,6 +78,9 @@ namespace
     return false;
   }
 }
+
+//------------------------------------------------------------------------------
+vtkStandardNewMacro(vtkF3DWGLRenderWindow);
 
 //------------------------------------------------------------------------------
 vtkF3DWGLRenderWindow::vtkF3DWGLRenderWindow() = default;
