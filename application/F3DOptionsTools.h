@@ -30,7 +30,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "bindings-list", "false" },
   { "no-background", "false" },
   { "config", "" },
-  { "dry-run", "false" },
+  { "no-config", "false" },
   { "no-render", "false" },
   { "rendering-backend", "auto" },
   { "max-size", "" },

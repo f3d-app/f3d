@@ -65,7 +65,7 @@ The third block specifies raytracing usage for .gltf and .glb files.
 The last block specifies that volume rendering should be used with .mhd files.
 
 The following options <b> cannot </b> be set via config file:
-`help`, `version`, `readers-list`, `config`, `dry-run` and `input`.
+`help`, `version`, `readers-list`, `config`, `no-config` and `input`.
 
 The following options <b>are only taken on the first load</b>:
 `no-render`, `output`, `position`, `resolution`, `frame-rate` and all testing options.
