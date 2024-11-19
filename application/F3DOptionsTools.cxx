@@ -67,7 +67,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "readers-list", "", "Print the list of readers", "", "" },
       { "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations", "<filePath/filename/fileStem>", "" },
       { "dry-run", "", "Do not read the configuration file", "<bool>", "1" },
-      { "no-render", "", "Do not read the configuration file", "<bool>", "1" },
+      { "no-render", "", "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.", "<bool>", "1" },
       { "rendering-backend", "", "Backend to use when rendering (auto|glx|wgl|egl|osmesa)", "<string>", "" },
       { "max-size", "", "Maximum size in Mib of a file to load, negative value means unlimited", "<size in Mib>", "" },
       { "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", "<bool>", "1" },
