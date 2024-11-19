@@ -55,7 +55,7 @@ F3D provides a default config directory for generic usage (`config.d`) and a thu
 You can edit the file contained in these directory or add your own in specific directories (see below).
 
 The following options <b> cannot </b> be set via config file:
-`help`, `version`, `readers-list`, `config`, `dry-run` and `input`.
+`help`, `version`, `readers-list`, `config`, `no-config` and `input`.
 
 The following options <b>are only taken on the first load</b>:
 `no-render`, `output`, and all testing options.
