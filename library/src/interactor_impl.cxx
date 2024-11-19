@@ -780,6 +780,10 @@ interactor& interactor_impl::initBindings()
   // "doc"
   auto docString = [](const std::string& doc) -> std::string { return doc; };
 
+  // "doc [valueString]"
+  auto docValueString = [](bool showValue, const std::string& doc, std::function<std::string()> valueString) -> std::string
+  { return doc + (showValue ? std::string(" [") + valueString() + "]" : ""); };
+
   // "doc [value]"
   auto docDouble = [](bool showValue, std::string doc, double val, int precision) -> std::string
   {
@@ -818,60 +822,28 @@ interactor& interactor_impl::initBindings()
   using namespace std::placeholders;
   f3d::options& opts = this->Internals->Options;
 
+  // Lambda to recover dedicated string values
+  auto animString = [&]() -> std::string { return this->Internals->AnimationManager->GetAnimationName(); };
+  auto pointCellString = [&]() -> std::string { return opts.model.scivis.cells ? "CELL" : "POINT"; };
+  auto arrayNameString = [&]() -> std::string
+  {
+    return opts.model.scivis.array_name.has_value()
+      ? shortName(opts.model.scivis.array_name.value(), 15) + (opts.model.scivis.enable ? "" : " (forced)")
+      : "OFF";
+  };
+  auto componentString = [&]() -> std::string
+  {
+    vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+    vtkF3DRenderer* ren =
+      vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    return ren->ComponentToString(opts.model.scivis.component);
+  };
+
   // Available standard keys: None
-
-  // TODO add support for diplaying animation name
-  this->addBinding(
-    "W", ModifierKeys::NONE, "cycle_animation", std::bind(docString, "Cycle animation"));
-
-  this->addBinding("C", ModifierKeys::NONE, "cycle_coloring field",
-    [&](bool showValue) -> std::string
-    {
-      std::string documentation = "Cycle point/cell data coloring";
-      if (showValue)
-      {
-        documentation += std::string(" [") +
-          (opts.model.scivis.cells ? "CELL" : "POINT") + "]";
-      }
-      return documentation;
-    });
-
-  this->addBinding("S", ModifierKeys::NONE, "cycle_coloring array",
-    [&](bool showValue) -> std::string
-    {
-      std::string documentation = "Cycle array to color with";
-      if (showValue)
-      {
-        if (opts.model.scivis.array_name.has_value())
-        {
-          documentation += std::string(" [") +
-            shortName(opts.model.scivis.array_name.value(), 19) +
-            (opts.model.scivis.enable ? "" : " (forced)") + "]";
-        }
-        else
-        {
-          documentation += " [OFF]";
-        }
-      }
-      return documentation;
-    });
-
-  this->addBinding("Y", ModifierKeys::NONE, "cycle_coloring component",
-    [&](bool showValue) -> std::string
-    {
-      std::string documentation = "Cycle component to color with";
-      if (showValue)
-      {
-        vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-        vtkF3DRenderer* ren =
-          vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-
-        documentation += std::string(" [") +
-          ren->ComponentToString(opts.model.scivis.component) + "]";
-      }
-      return documentation;
-    });
-
+  this->addBinding("W", ModifierKeys::NONE, "cycle_animation", std::bind(docValueString, _1, "Cycle animation", animString));
+  this->addBinding("C", ModifierKeys::NONE, "cycle_coloring field", std::bind(docValueString, _1, "Cycle point/cell data coloring", pointCellString));
+  this->addBinding("S", ModifierKeys::NONE, "cycle_coloring array", std::bind(docValueString, _1, "Cycle array to color with", arrayNameString));
+  this->addBinding("Y", ModifierKeys::NONE, "cycle_coloring component", std::bind(docValueString, _1, "Cycle component to color with", componentString));
   this->addBinding("B", ModifierKeys::NONE, "toggle ui.scalar_bar", std::bind(docToggle, _1, "Toggle the scalar bar display", opts.ui.scalar_bar));
   this->addBinding("P", ModifierKeys::NONE, "toggle render.effect.translucency_support", std::bind(docToggle, _1, "Toggle scalar bar display", opts.ui.scalar_bar));
   this->addBinding("Q", ModifierKeys::NONE, "toggle render.effect.ambient_occlusion",std::bind(docToggle, _1, "Toggle ambient occlusion", opts.render.effect.ambient_occlusion));
