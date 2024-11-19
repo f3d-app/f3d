@@ -712,13 +712,13 @@ int F3DStarter::Start(int argc, char** argv)
   // XXX: the local variable are initialized manually for simplicity
   // but this duplicate the initialization value as it is present in
   // F3DOptionTools::DefaultAppOptions too
-  bool dryRun = false;
+  bool noConfig = false;
   if (cliOptionsDict.find("no-config") != cliOptionsDict.end())
   {
-    dryRun = f3d::options::parse<bool>(cliOptionsDict["no-config"]);
+    noConfig = f3d::options::parse<bool>(cliOptionsDict["no-config"]);
   }
   std::string config;
-  if (!dryRun && cliOptionsDict.find("config") != cliOptionsDict.end())
+  if (!noConfig && cliOptionsDict.find("config") != cliOptionsDict.end())
   {
     config = f3d::options::parse<std::string>(cliOptionsDict["config"]);
   }
@@ -740,7 +740,7 @@ int F3DStarter::Start(int argc, char** argv)
   f3d::log::debug("========== Initializing Options ==========");
 
   // Read config files
-  if (!dryRun)
+  if (!noConfig)
   {
     this->Internals->ConfigOptionsEntries = F3DConfigFileTools::ReadConfigFiles(config);
   }
