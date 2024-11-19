@@ -32,7 +32,7 @@ if(BUILD_TESTING)
   find_package(f3d REQUIRED COMPONENTS application)
   add_test(NAME TestPluginExample
           COMMAND "$<TARGET_FILE:f3d::f3d>"
-                  "--dry-run"
+                  "--no-config"
                   "--no-render"
                   "--verbose"
                   "--load-plugins=$<TARGET_FILE:f3d-plugin-example>"
