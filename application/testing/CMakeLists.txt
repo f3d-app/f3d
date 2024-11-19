@@ -1113,8 +1113,8 @@ endif()
 f3d_test(NAME TestRenderingBackendInvalid DATA cow.vtp RENDERING_BACKEND invalid ARGS --verbose REGEXP "rendering-backend value is invalid, falling back to" NO_BASELINE)
 
 # Test that f3d can try to read a system config file
-add_test(NAME f3d::TestNoDryRun COMMAND $<TARGET_FILE:f3d> --no-render)
-set_tests_properties(f3d::TestNoDryRun PROPERTIES TIMEOUT 4)
+add_test(NAME f3d::TestNoNoRender COMMAND $<TARGET_FILE:f3d> --no-render)
+set_tests_properties(f3d::TestNoNoRender PROPERTIES TIMEOUT 4)
 
 # Test invalid CLI args
 add_test(NAME f3d::TestInvalidCLIArgs COMMAND $<TARGET_FILE:f3d> --up)

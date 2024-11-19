@@ -15,7 +15,7 @@ Options|Type<br>Default|Description
 \-\-version||Show *version* information and exit. Ignore `--verbose`.
 \-\-readers-list||List available *readers* and exit. Ignore `--verbose`.
 \-\-config=\<config file path/name/stem\>|string<br>config|Specify the [configuration file](CONFIGURATION_FILE.md) to use. Supports absolute/relative path but also filename/filestem to search for in standard configuration file locations.
-\-\-dry-run|bool<br>false|Do not read any configuration file and consider only the command line options.
+\-\-no-config|bool<br>false|Do not read any configuration file and consider only the command line options.
 \-\-no-render|bool<br>false|Do not render anything and quit just after loading the first file, use with \-\-verbose to recover information about a file.
 \-\-max-size=\<size in MiB\>|int<br>-1|Prevent F3D to load a file bigger than the provided size in Mib, leave empty for unlimited, useful for thumbnails.
 \-\-watch|bool<br>false|Watch current file and automatically reload it whenever it is modified on disk.
