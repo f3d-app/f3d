@@ -3,6 +3,7 @@
 #include "F3DColorMapTools.h"
 #include "F3DConfig.h"
 #include "F3DConfigFileTools.h"
+#include "F3DException.h"
 #include "F3DIcon.h"
 #include "F3DNSDelegate.h"
 #include "F3DOptionsTools.h"
@@ -67,6 +68,7 @@ public:
   struct F3DAppOptions
   {
     std::string Output;
+    bool BindingsList;
     bool NoBackground;
     bool NoRender;
     std::string RenderingBackend;
@@ -556,6 +558,7 @@ public:
   {
     // Update typed app options from app options
     this->AppOptions.Output = f3d::options::parse<std::string>(appOptions.at("output"));
+    this->AppOptions.BindingsList = f3d::options::parse<bool>(appOptions.at("bindings-list"));
     this->AppOptions.NoBackground = f3d::options::parse<bool>(appOptions.at("no-background"));
     this->AppOptions.NoRender = f3d::options::parse<bool>(appOptions.at("no-render"));
     this->AppOptions.RenderingBackend =
@@ -766,7 +769,7 @@ int F3DStarter::Start(int argc, char** argv)
   }
   else
   {
-    bool offscreen = !reference.empty() || !output.empty();
+    bool offscreen = !reference.empty() || !output.empty() || this->Internals->AppOptions.BindingsList;
 
     if (this->Internals->AppOptions.RenderingBackend == "egl")
     {
@@ -920,6 +923,17 @@ int F3DStarter::Start(int argc, char** argv)
 
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
   f3d::log::debug("Engine configured");
+
+  // Print bindings list and exits if needed
+  if (this->Internals->AppOptions.BindingsList)
+  {
+    f3d::log::info("Bindings:");
+    for (const auto& [key, desc] : this->Internals->Engine->getInteractor().getBindingsDocumentation())
+    {
+      F3DOptionsTools::PrintHelpPair(key, desc, 12);
+    }
+    throw F3DExNoProcess("bindings list requested");
+  }
 
   // Add all input files
   for (auto& file : inputFiles)

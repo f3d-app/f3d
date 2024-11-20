@@ -141,7 +141,7 @@ public:
    * Get a structure of strings documenting bindings.
    * Set withValue to true to recover associated values in the string when there is any.
    */
-  virtual std::vector<std::pair<std::string, std::string>> getBindingsDocumentation(bool withValue) const = 0;
+  virtual std::vector<std::pair<std::string, std::string>> getBindingsDocumentation(bool withValue = false) const = 0;
   ///@}
 
   /**
