@@ -920,14 +920,14 @@ int F3DStarter::Start(int argc, char** argv)
       [](bool) -> std::string { return "Load next file group"; });
 
     interactor.addBinding("Up", f3d::interactor::ModifierKeys::NONE, "reload_current_file_group", [](bool) -> std::string { return "Reload current file group"; });
-    interactor.addBinding("Down", f3d::interactor::ModifierKeys::NONE, "add_current_directories", [](bool) -> std::string { return "Add current file parent directory to the list of files and reload the current file group"; });
+    interactor.addBinding("Down", f3d::interactor::ModifierKeys::NONE, "add_current_directories", [](bool) -> std::string { return "Add files from dir of current file"; });
     interactor.addBinding("F11", f3d::interactor::ModifierKeys::NONE, "take_minimal_screenshot", [](bool) -> std::string { return "Take a minimal screenshot"; });
     interactor.addBinding("F12", f3d::interactor::ModifierKeys::NONE, "take_screenshot", [](bool) -> std::string { return "Take a screenshot"; });
 
     // This replace an existing default interaction command in the libf3d
     interactor.removeBinding("Drop", f3d::interactor::ModifierKeys::NONE);
-    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::NONE, "add_files_or_set_hdri", [](bool) -> std::string { return "Add files to the scene or set HDRI and use it"; });
-    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::CTRL, "add_files", [](bool) -> std::string { return "Add files to the scene"; });
+    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::NONE, "add_files_or_set_hdri", [](bool) -> std::string { return "Load dropped files, folder or HDRI"; });
+    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::CTRL, "add_files", [](bool) -> std::string { return "Load dropped files or folder"; });
     interactor.addBinding("Drop", f3d::interactor::ModifierKeys::SHIFT, "set_hdri", [](bool) -> std::string { return "Set HDRI and use it"; });
     for (const auto& [key, desc] : interactor.getBindingsDocumentation())
     {

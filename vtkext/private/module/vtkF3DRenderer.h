@@ -61,6 +61,7 @@ public:
   void SetUseImageBasedLighting(bool use) override;
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);
+  void SetCheatSheetInfo(const std::string& info);
   void SetFilenameInfo(const std::string& info);
   void SetAnimationnameInfo(const std::string& info);
   void SetDropZoneInfo(const std::string& info);
@@ -303,7 +304,7 @@ public:
   void SetUseCellColoring(bool useCell);
   vtkGetMacro(UseCellColoring, bool);
   ///@}
-  
+
   ///@{
   /**
    * Set/Get the name of the array to use for coloring
@@ -311,7 +312,7 @@ public:
   void SetArrayNameForColoring(const std::optional<std::string>& arrayName);
   std::optional<std::string> GetArrayNameForColoring();
   ///@}
-  
+
   ///@{
   /**
    * Set/Get the name of the component to use for coloring
@@ -351,6 +352,9 @@ public:
    * Otherwise, use component #index as the default value.
    */
   std::string ComponentToString(int component);
+
+  // TODO
+  bool CheatSheetInfoNeedsUpdate();
 
 private:
   vtkF3DRenderer();

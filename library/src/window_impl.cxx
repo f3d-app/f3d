@@ -40,6 +40,8 @@
 #include <vtkOSOpenGLRenderWindow.h>
 #endif
 
+#include <sstream>
+
 namespace f3d::detail
 {
 class window_impl::internals
@@ -90,6 +92,7 @@ public:
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkNew<vtkF3DRenderer> Renderer;
   const options& Options;
+  interactor_impl* Interactor = nullptr;
   std::string CachePath;
   context::function GetProcAddress;
 };
@@ -449,6 +452,17 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseVolume(opt.model.volume.enable);
   renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
 
+  if (this->Internals->Interactor && renderer->CheatSheetInfoNeedsUpdate())
+  {
+    std::stringstream cheatSheetStream;
+    cheatSheetStream << "\n";
+    for (auto [bind, doc] : this->Internals->Interactor->getBindingsDocumentation())
+    {
+      cheatSheetStream << " " << bind << ": " << doc << "\n";
+    }
+    renderer->SetCheatSheetInfo(cheatSheetStream.str());
+  }
+
   renderer->UpdateActors();
 }
 
@@ -521,5 +535,11 @@ void window_impl::SetImporter(vtkF3DMetaImporter* importer)
 void window_impl::SetCachePath(const std::string& cachePath)
 {
   this->Internals->CachePath = cachePath;
+}
+
+//----------------------------------------------------------------------------
+void window_impl::SetInteractor(interactor_impl* interactor)
+{
+  this->Internals->Interactor = interactor;
 }
 };

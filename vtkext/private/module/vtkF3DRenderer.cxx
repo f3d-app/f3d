@@ -1169,6 +1169,13 @@ void vtkF3DRenderer::SetLightIntensity(const double intensityFactor)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetCheatSheetInfo(const std::string& info)
+{
+  this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, info.c_str());
+  this->CheatSheetConfigured = false;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetFilenameInfo(const std::string& info)
 {
   this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, info.c_str());
@@ -1364,6 +1371,7 @@ void vtkF3DRenderer::ConfigureCheatSheet()
   assert(this->Importer);
   if (this->CheatSheetVisible)
   {
+    /*
     auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
     std::stringstream cheatSheetText;
     cheatSheetText << "\n";
@@ -1424,9 +1432,10 @@ void vtkF3DRenderer::ConfigureCheatSheet()
     cheatSheetText << " 9: Isometric View camera\n";
     cheatSheetText << " ENTER: Reset camera to initial parameters\n";
     cheatSheetText << " Drop  : Load dropped file, folder or HDRI\n";
+    */
 
-    this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, cheatSheetText.str().c_str());
-    this->CheatSheetActor->RenderOpaqueGeometry(this);
+    //this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, this->CheatSheetInfo);
+//    this->CheatSheetActor->RenderOpaqueGeometry(this);
     this->CheatSheetConfigured = true;
   }
 }
@@ -2717,4 +2726,10 @@ std::string vtkF3DRenderer::ComponentToString(int component)
     }
     return componentName;
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::CheatSheetInfoNeedsUpdate()
+{
+  return this->CheatSheetVisible && !this->CheatSheetConfigured;
 }

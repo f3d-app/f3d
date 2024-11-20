@@ -501,6 +501,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
 {
   // scene need the interactor, scene will set the AnimationManager on the interactor
   this->Internals->Scene.SetInteractor(this);
+  this->Internals->Window.SetInteractor(this);
   assert(this->Internals->AnimationManager);
 
   this->initCommands();
@@ -773,6 +774,16 @@ interactor& interactor_impl::initBindings()
 {
   this->Internals->Bindings.clear();
 
+  auto docDouble = [](bool showValue, std::string doc, double val, int precision) -> std::string
+  {
+    std::stringstream valStream;
+    valStream.precision(2);
+    valStream << std::fixed;
+    valStream << val;
+      return doc +
+        (showValue ? std::string(" [") + valStream.str() + "]" : "");
+  };
+
   auto docToggle = [](bool showValue, std::string doc, bool val) -> std::string
   { return doc + (showValue ? std::string(" [") + (val ? "ON" : "OFF") + "]" : ""); };
 
@@ -838,7 +849,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding("Y", ModifierKeys::NONE, "cycle_coloring component",
     [&](bool showValue) -> std::string
     {
-      std::string documentation = "Cycle array component to color with";
+      std::string documentation = "Cycle component to color with";
       if (showValue)
       {
         vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
@@ -993,25 +1004,19 @@ interactor& interactor_impl::initBindings()
   this->addBinding("L", ModifierKeys::NONE, "increase_light_intensity",
     [&](bool showValue) -> std::string
     {
-      return "Increase lights intensity" +
-        (showValue ? std::string(" [") +
-              std::to_string(this->Internals->Options.render.light.intensity) + "]"
-                   : "");
+      return docDouble(showValue, "Increase lights intensity", this->Internals->Options.render.light.intensity, 2);
     });
 
   this->addBinding("L", ModifierKeys::SHIFT, "decrease_light_intensity",
     [&](bool showValue) -> std::string
     {
-      return "Decrease lights intensity" +
-        (showValue ? std::string(" [") +
-              std::to_string(this->Internals->Options.render.light.intensity) + "]"
-                   : "");
+      return docDouble(showValue, "Decrease lights intensity", this->Internals->Options.render.light.intensity, 2);
     });
 
   this->addBinding("H", ModifierKeys::NONE, "toggle ui.cheatsheet",
     [](bool) -> std::string { return "Toggle cheatsheet display"; });
   this->addBinding("Question", ModifierKeys::ANY, "print_scene_info",
-    [](bool) -> std::string { return "Print camera state to the terminal"; });
+    [](bool) -> std::string { return "Print scene descr to terminal"; });
   this->addBinding("1", ModifierKeys::ANY, "set_camera front",
     [](bool) -> std::string { return "Front View camera"; });
   this->addBinding("3", ModifierKeys::ANY, "set_camera right",

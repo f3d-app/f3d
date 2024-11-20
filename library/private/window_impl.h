@@ -13,6 +13,7 @@
 #include "context.h"
 #include "log.h"
 #include "window.h"
+#include "interactor_impl.h"
 
 #include <memory>
 #include <optional>
@@ -109,6 +110,12 @@ public:
    * Set the cache path.
    */
   void SetCachePath(const std::string& cachePath);
+
+  /**
+   * Implementation only API.
+   * Set the interactor to use when recovering bindings documentation.
+   */
+  void SetInteractor(interactor_impl* interactor);
 
 private:
   class internals;
