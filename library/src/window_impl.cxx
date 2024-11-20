@@ -25,7 +25,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #ifdef VTK_USE_X
-#include <vtkXOpenGLRenderWindow.h>
+#include <vtkF3DGLXRenderWindow.h>
 #endif
 
 #ifdef _WIN32
@@ -72,7 +72,15 @@ public:
 #ifdef _WIN32
     return vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
 #else
-    // XXX: At the moment, rely on VTK logic for Linux and macOS
+#if defined(VTK_USE_X)
+    // try GLX
+    vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
+    if (renWin)
+    {
+      return renWin;
+    }
+#endif
+    // XXX: At the moment, fallback on VTK logic
     // It will change in the future when other subclasses are implemented
     return vtkSmartPointer<vtkRenderWindow>::New();
 #endif
@@ -119,8 +127,8 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
   else if (type == Type::GLX)
   {
-#if defined(VTK_USE_X) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-    this->Internals->RenWin = vtkSmartPointer<vtkXOpenGLRenderWindow>::New();
+#if defined(VTK_USE_X)
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
 #else
     throw engine::no_window_exception("Window type is GLX but VTK GLX support is not enabled");
 #endif
@@ -136,7 +144,10 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     this->Internals->RenWin = internals::AutoBackendWindow();
   }
 
-  assert(this->Internals->RenWin != nullptr);
+  if (this->Internals->RenWin == nullptr)
+  {
+    throw engine::no_window_exception("Cannot create a window");
+  }
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
   vtkOpenGLRenderWindow* oglRenWin = vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin);
@@ -185,7 +196,7 @@ window_impl::Type window_impl::getType()
   }
 
 #ifdef VTK_USE_X
-  if (this->Internals->RenWin->IsA("vtkXOpenGLRenderWindow"))
+  if (this->Internals->RenWin->IsA("vtkF3DGLXRenderWindow"))
   {
     return Type::GLX;
   }
