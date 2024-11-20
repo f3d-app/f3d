@@ -901,26 +901,21 @@ int F3DStarter::Start(int argc, char** argv)
         }
       });
 
-    interactor.addBinding("Left", f3d::interactor::ModifierKeys::NONE, "load_previous_file_group",
-      [](bool) -> std::string { return "Load previous file group"; });
-    interactor.addBinding("Right", f3d::interactor::ModifierKeys::NONE, "load_next_file_group",
-      [](bool) -> std::string { return "Load next file group"; });
+    // "doc"
+    auto docString = [](const std::string& doc) -> std::string { return doc; };
 
-    interactor.addBinding("Up", f3d::interactor::ModifierKeys::NONE, "reload_current_file_group", [](bool) -> std::string { return "Reload current file group"; });
-    interactor.addBinding("Down", f3d::interactor::ModifierKeys::NONE, "add_current_directories", [](bool) -> std::string { return "Add files from dir of current file"; });
-    interactor.addBinding("F11", f3d::interactor::ModifierKeys::NONE, "take_minimal_screenshot", [](bool) -> std::string { return "Take a minimal screenshot"; });
-    interactor.addBinding("F12", f3d::interactor::ModifierKeys::NONE, "take_screenshot", [](bool) -> std::string { return "Take a screenshot"; });
+    interactor.addBinding("Left", f3d::interactor::ModifierKeys::NONE, "load_previous_file_group", std::bind(docString, "Load previous file group"));
+    interactor.addBinding("Right", f3d::interactor::ModifierKeys::NONE, "load_next_file_group", std::bind(docString, "Load next file group"));
+    interactor.addBinding("Up", f3d::interactor::ModifierKeys::NONE, "reload_current_file_group",std::bind(docString, "Reload current file group"));
+    interactor.addBinding("Down", f3d::interactor::ModifierKeys::NONE, "add_current_directories",std::bind(docString, "Add files from dir of current file"));
+    interactor.addBinding("F11", f3d::interactor::ModifierKeys::NONE, "take_minimal_screenshot",std::bind(docString, "Take a minimal screenshot"));
+    interactor.addBinding("F12", f3d::interactor::ModifierKeys::NONE, "take_screenshot",std::bind(docString, "Take a screenshot"));
 
     // This replace an existing default interaction command in the libf3d
     interactor.removeBinding("Drop", f3d::interactor::ModifierKeys::NONE);
-    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::NONE, "add_files_or_set_hdri", [](bool) -> std::string { return "Load dropped files, folder or HDRI"; });
-    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::CTRL, "add_files", [](bool) -> std::string { return "Load dropped files or folder"; });
-    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::SHIFT, "set_hdri", [](bool) -> std::string { return "Set HDRI and use it"; });
-    for (const auto& [key, desc] : interactor.getBindingsDocumentation())
-    {
-      F3DOptionsTools::PrintHelpPair(key, desc);
-    }
-
+    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::NONE, "add_files_or_set_hdri",std::bind(docString, "Load dropped files, folder or HDRI"));
+    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::CTRL, "add_files",std::bind(docString, "Load dropped files or folder"));
+    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::SHIFT, "set_hdri",std::bind(docString, "Set HDRI and use it"));
   }
 
   this->Internals->Engine->setOptions(this->Internals->LibOptions);

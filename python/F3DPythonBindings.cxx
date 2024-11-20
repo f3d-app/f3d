@@ -233,12 +233,12 @@ PYBIND11_MODULE(pyf3d, module)
     .def("init_bindings", &f3d::interactor::initBindings,
       "Remove all bindings and add default bindings")
     .def("add_binding",
-      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys, std::string, std::string>(
+      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys, std::string, std::function<std::string(bool)>>(
         &f3d::interactor::addBinding),
       "Add a binding command")
     .def("add_binding",
       py::overload_cast<const std::string&, f3d::interactor::ModifierKeys,
-        std::vector<std::string>, std::string>(&f3d::interactor::addBinding),
+        std::vector<std::string>, std::function<std::string(bool)>>(&f3d::interactor::addBinding),
       "Add binding commands")
     .def("remove_binding", &f3d::interactor::removeBinding, "Remove interaction commands")
     .def("get_binding_interactions", &f3d::interactor::getBindingInteractions,

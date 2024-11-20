@@ -939,7 +939,7 @@ interactor_impl::getBindingInteractions() const
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<std::string, std::string>> interactor_impl::getBindingsDocumentation() const
+std::vector<std::pair<std::string, std::string>> interactor_impl::getBindingsDocumentation(bool withValue) const
 {
   std::vector<std::pair<std::string, std::string>> docs;
   for (internals::Bind bind : this->Internals->OrderedBinds)
@@ -947,7 +947,7 @@ std::vector<std::pair<std::string, std::string>> interactor_impl::getBindingsDoc
     auto docFunc = this->Internals->Bindings[bind].DocumentationCallback;
     if (docFunc)
     {
-      docs.emplace_back(bind.Format(), docFunc(true));
+      docs.emplace_back(bind.Format(), docFunc(withValue));
     }
   }
   return docs;

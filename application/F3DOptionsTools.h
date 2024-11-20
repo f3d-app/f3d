@@ -142,7 +142,7 @@ F3DOptionsTools::OptionsDict ParseCLIOptions(
   int argc, char** argv, std::vector<std::string>& positionals);
 
 /**
- * Log provided key and help with nice formating
+ * Log provided key and help with nice formatting
  */
 void PrintHelpPair(std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70);
 };
