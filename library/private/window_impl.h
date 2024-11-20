@@ -11,9 +11,9 @@
 #define f3d_window_impl_h
 
 #include "context.h"
+#include "interactor_impl.h"
 #include "log.h"
 #include "window.h"
-#include "interactor_impl.h"
 
 #include <memory>
 #include <optional>

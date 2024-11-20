@@ -145,7 +145,8 @@ F3DOptionsTools::OptionsDict ParseCLIOptions(
 /**
  * Log provided key and help with nice formatting
  */
-void PrintHelpPair(std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70);
+void PrintHelpPair(
+  std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70);
 };
 
 #endif

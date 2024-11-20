@@ -939,7 +939,8 @@ interactor_impl::getBindingInteractions() const
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<std::string, std::string>> interactor_impl::getBindingsDocumentation(bool withValue) const
+std::vector<std::pair<std::string, std::string>> interactor_impl::getBindingsDocumentation(
+  bool withValue) const
 {
   std::vector<std::pair<std::string, std::string>> docs;
   for (internals::Bind bind : this->Internals->OrderedBinds)
