@@ -784,7 +784,7 @@ interactor& interactor_impl::initBindings()
   auto docDouble = [](bool showValue, std::string doc, double val, int precision) -> std::string
   {
     std::stringstream valStream;
-    valStream.precision(2);
+    valStream.precision(precision);
     valStream << std::fixed;
     valStream << val;
     return doc + (showValue ? std::string(" [") + valStream.str() + "]" : "");
