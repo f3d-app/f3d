@@ -563,7 +563,6 @@ interactor& interactor_impl::initCommands()
       this->Internals->AnimationManager->CycleAnimation();
       this->Internals->Options.scene.animation.index =
         this->Internals->AnimationManager->GetAnimationIndex();
-      ren->SetAnimationnameInfo(this->Internals->AnimationManager->GetAnimationName());
     });
 
   this->addCommand("cycle_coloring",

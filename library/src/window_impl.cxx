@@ -265,13 +265,6 @@ int window_impl::getHeight() const
 }
 
 //----------------------------------------------------------------------------
-window& window_impl::setAnimationNameInfo(const std::string& name)
-{
-  this->Internals->Renderer->SetAnimationnameInfo(name);
-  return *this;
-}
-
-//----------------------------------------------------------------------------
 window& window_impl::setSize(int width, int height)
 {
   this->Internals->RenWin->SetSize(width, height);
@@ -452,6 +445,9 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseVolume(opt.model.volume.enable);
   renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
 
+  renderer->UpdateActors();
+
+  // Update the cheatsheet if needed
   if (this->Internals->Interactor && renderer->CheatSheetInfoNeedsUpdate())
   {
     std::stringstream cheatSheetStream;
@@ -460,10 +456,8 @@ void window_impl::UpdateDynamicOptions()
     {
       cheatSheetStream << " " << bind << ": " << doc << "\n";
     }
-    renderer->SetCheatSheetInfo(cheatSheetStream.str());
+    renderer->ConfigureCheatSheet(cheatSheetStream.str());
   }
-
-  renderer->UpdateActors();
 }
 
 //----------------------------------------------------------------------------

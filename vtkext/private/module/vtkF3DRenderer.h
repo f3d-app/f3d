@@ -61,9 +61,7 @@ public:
   void SetUseImageBasedLighting(bool use) override;
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);
-  void SetCheatSheetInfo(const std::string& info);
   void SetFilenameInfo(const std::string& info);
-  void SetAnimationnameInfo(const std::string& info);
   void SetDropZoneInfo(const std::string& info);
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
@@ -112,7 +110,6 @@ public:
   /**
    * Reimplemented to configure:
    *  - ActorsProperties
-   *  - CheatSheet
    *  - Timer
    * before actual rendering, only when needed
    */
@@ -353,8 +350,18 @@ public:
    */
   std::string ComponentToString(int component);
 
-  // TODO
+  /**
+   * Return true if the cheatsheet info is potentially
+   * out of date since the last ConfigureCheatSheet call,
+   * false otherwise.
+   */
   bool CheatSheetInfoNeedsUpdate();
+
+  /**
+   * Configure the cheatsheet text from the provided info
+   * Should be called before Render() if CheatSheetInfoNeedsUpdate() returns true.
+   */
+  void ConfigureCheatSheet(const std::string& info);
 
 private:
   vtkF3DRenderer();
@@ -400,11 +407,6 @@ private:
    * Configure all actors properties
    */
   void ConfigureActorsProperties();
-
-  /**
-   * Configure the cheatsheet text and hotkeys and mark it for rendering
-   */
-  void ConfigureCheatSheet();
 
   /**
    * Configure the grid
@@ -546,7 +548,6 @@ private:
   std::string GridInfo;
 
   std::string CachePath;
-  std::string AnimationNameInfo;
 
   std::optional <std::string> BackfaceType;
   std::optional <std::string> FinalShader;

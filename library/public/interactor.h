@@ -122,7 +122,7 @@ public:
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(
-    const std::string& interaction, ModifierKeys modifiers, std::initializer_list<std::string> list, std::function<std::string(bool showValue)> documentationCallback)
+    const std::string& interaction, ModifierKeys modifiers, std::initializer_list<std::string> list, std::function<std::string(bool showValue)> documentationCallback = nullptr)
   {
     return this->addBinding(interaction, modifiers, std::vector<std::string>(list), documentationCallback);
   }
