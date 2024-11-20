@@ -30,6 +30,7 @@
 #include <chrono>
 #include <cmath>
 #include <map>
+#include <regex>
 #include <vector>
 
 #include "camera.h"
@@ -244,10 +245,19 @@ public:
   {
     internals* self = static_cast<internals*>(clientData);
     vtkStringArray* filesArr = static_cast<vtkStringArray*>(callData);
+    const std::regex charsToEscape("([\"])");
     std::string filesString;
     for (int i = 0; i < filesArr->GetNumberOfTuples(); i++)
     {
-      filesString.append(" \"" + filesArr->GetValue(i) + "\" ");
+      const vtkStdString& filename = filesArr->GetValue(i);
+      const std::string escapedFilename = std::regex_replace(filename, charsToEscape, "\\$1");
+      if (i > 0)
+      {
+        filesString.push_back(' ');
+      }
+      filesString.push_back('"');
+      filesString.append(escapedFilename);
+      filesString.push_back('"');
     }
 
     self->TriggerBinding("Drop", filesString);
@@ -424,15 +434,17 @@ public:
     {
       for (const std::string& command : commandsIt->second)
       {
+        const std::string commandWithArgs =
+          argsString.empty() ? command : command + " " + argsString;
         try
         {
           // XXX: Ignore the boolean return of triggerCommand,
           //  error is already logged by triggerCommand
-          this->Interactor.triggerCommand(command + argsString);
+          this->Interactor.triggerCommand(commandWithArgs);
         }
         catch (const f3d::interactor::command_runtime_exception& ex)
         {
-          log::error("Interaction: error running command:\"", command + argsString, "\":");
+          log::error("Interaction: error running command:\"", commandWithArgs, "\":");
           log::error(ex.what());
         }
       }
