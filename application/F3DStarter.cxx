@@ -770,7 +770,7 @@ int F3DStarter::Start(int argc, char** argv)
 
     if (this->Internals->AppOptions.RenderingBackend == "egl")
     {
-      this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createEGL(offscreen));
+      this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createEGL());
     }
     else if (this->Internals->AppOptions.RenderingBackend == "osmesa")
     {
