@@ -71,17 +71,16 @@ public:
   static engine createWGL(bool offscreen = false);
 
   /**
-   * Create an engine with an EGL window.
+   * Create an engine with an offscreen EGL window.
    * VTK >= 9.4 required.
    * If several GPU are available, the environment variable
    * `VTK_DEFAULT_EGL_DEVICE_INDEX` allows its selection.
-   * Optionally, the window can be hidden by setting offscreen to true.
    * Throws engine::loading_exception in case of failure.
    */
-  static engine createEGL(bool offscreen = false);
+  static engine createEGL();
 
   /**
-   * Create an engine with an OSMesa window.
+   * Create an engine with an offscreen OSMesa window.
    * VTK >= 9.4 required.
    * Throws engine::loading_exception in case of window creation failure.
    */

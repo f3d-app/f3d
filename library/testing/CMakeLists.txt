@@ -51,8 +51,6 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullSc
 # External window tests
 option(F3D_TESTING_ENABLE_EXTERNAL_GLFW "Test external GLFW" OFF)
 option(F3D_TESTING_ENABLE_EXTERNAL_QT "Test external QT" OFF)
-option(F3D_TESTING_ENABLE_EXTERNAL_OSMESA "Test external OSMesa" OFF)
-option(F3D_TESTING_ENABLE_EXTERNAL_EGL "Test external GLX" OFF)
 
 set(libf3dSDKTests_link_libs "")
 
@@ -66,7 +64,7 @@ if(F3D_TESTING_ENABLE_EXTERNAL_QT)
   list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
   list(APPEND libf3dSDKTests_link_libs Qt5::OpenGL)
 endif()
-if(F3D_TESTING_ENABLE_EXTERNAL_OSMESA AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+if(F3D_TESTING_ENABLE_OSMESA_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
   find_library(OSMesa_LIB OSMesa REQUIRED)
   list(APPEND libf3dSDKTests_list TestSDKExternalWindowOSMesa.cxx)
   list(APPEND libf3dSDKTests_link_libs "${OSMesa_LIB}")
@@ -77,7 +75,7 @@ if(F3D_TESTING_ENABLE_GLX_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.202409
   list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLX.cxx)
   list(APPEND libf3dSDKTests_link_libs OpenGL::GLX "${X11_LIB}")
 endif()
-if(F3D_TESTING_ENABLE_EXTERNAL_EGL AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+if(F3D_TESTING_ENABLE_EGL_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
   find_package(OpenGL COMPONENTS EGL REQUIRED)
   list(APPEND libf3dSDKTests_list TestSDKExternalWindowEGL.cxx)
   list(APPEND libf3dSDKTests_link_libs OpenGL::EGL)

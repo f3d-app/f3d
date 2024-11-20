@@ -770,7 +770,7 @@ int F3DStarter::Start(int argc, char** argv)
 
     if (this->Internals->AppOptions.RenderingBackend == "egl")
     {
-      this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createEGL(offscreen));
+      this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createEGL());
     }
     else if (this->Internals->AppOptions.RenderingBackend == "osmesa")
     {
@@ -1055,10 +1055,19 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::log::error("This is a headless build of F3D, interactive rendering is not supported");
       return EXIT_FAILURE;
 #else
-      // Create the event loop repeating timer
-      interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
-      this->RequestRender();
-      interactor.start();
+      if (this->Internals->Engine->getWindow().isOffscreen())
+      {
+        f3d::log::warn(
+          "You are using an offscreen configuration, interactive rendering is disabled");
+        return EXIT_SUCCESS;
+      }
+      else
+      {
+        // Create the event loop repeating timer
+        interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
+        this->RequestRender();
+        interactor.start();
+      }
 #endif
     }
   }

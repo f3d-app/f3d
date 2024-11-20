@@ -98,9 +98,9 @@ engine engine::createWGL(bool offscreen)
 }
 
 //----------------------------------------------------------------------------
-engine engine::createEGL(bool offscreen)
+engine engine::createEGL()
 {
-  return { window::Type::EGL, offscreen, context::egl() };
+  return { window::Type::EGL, true, context::egl() };
 }
 
 //----------------------------------------------------------------------------

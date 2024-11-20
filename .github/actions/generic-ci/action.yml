@@ -55,7 +55,7 @@ runs:
       with:
         type: 'consumer'
         lfs_sha: ${{inputs.lfs_sha}}
-        cache_postfix: cache-0 
+        cache_postfix: cache-0
 
     - name: Dependencies Dir
       shell: bash
@@ -130,8 +130,7 @@ runs:
       # https://github.com/f3d-app/f3d/issues/1322
       # MacOS x86_64 occasionally segfault with Java
       # https://github.com/f3d-app/f3d/issues/1410
-      # F3D_TESTING_ENABLE_EXTERNAL_(EGL|QT|GLFW) are disabled if no X server is running
-      # EGL is crashing in the CI but not locally
+      # F3D_TESTING_ENABLE_EXTERNAL_(QT|GLFW) are disabled if no X server is running
       # QT/GLFW external tests should be adapted to run offscreen
       # https://github.com/f3d-app/f3d/issues/1670
     - name: Configure
@@ -167,11 +166,11 @@ runs:
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.1') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
-        -DF3D_TESTING_ENABLE_EXTERNAL_EGL=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EGL_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_EXTERNAL_OSMESA=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_QT=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_GLX_TESTS=${{ inputs.rendering_backend == 'auto' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_GLX_TESTS=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
@@ -195,6 +194,14 @@ runs:
       uses: f3d-app/install-mesa-windows-action@v1
       with:
         path: ${{github.workspace}}\build\bin_Release
+
+    # A EGL test is crashing in the CI but not locally
+    - name: Set CI test exception for Linux EGL
+      if:
+        runner.os == 'Linux' &&
+        inputs.rendering_backend != 'auto'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestSDKExternalWindowEGL)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS with GPU pass through
     # https://github.com/f3d-app/f3d/issues/792
