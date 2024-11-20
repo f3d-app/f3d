@@ -189,20 +189,6 @@ std::string CollapseName(const std::string_view& longName, const std::string_vie
 }
 
 //----------------------------------------------------------------------------
-void PrintHelpPair(
-  std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70)
-{
-  std::stringstream ss;
-  ss << "  " << std::left << std::setw(keyWidth) << key;
-  if (key.size() > static_cast<size_t>(keyWidth))
-  {
-    ss << "\n  " << std::setw(keyWidth) << " ";
-  }
-  ss << " " << std::setw(helpWidth) << help;
-  f3d::log::info(ss.str());
-}
-
-//----------------------------------------------------------------------------
 void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
 {
   const std::array<std::pair<std::string, std::string>, 4> examples = {{
@@ -224,16 +210,10 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
     orderedCLIGroupNames.emplace_back(optionGroup.GroupName);
   }
   f3d::log::info(cxxOptions.help(orderedCLIGroupNames));
-  f3d::log::info("Keys:");
-/*  for (const auto& [key, desc] : f3d::interactor::getBindingsDocumentation())
-  {
-    ::PrintHelpPair(key, desc);
-  }TODO */
-
   f3d::log::info("\nExamples:");
   for (const auto& [cmd, desc] : examples)
   {
-    ::PrintHelpPair(cmd, desc, 50);
+    F3DOptionsTools::PrintHelpPair(cmd, desc, 50);
   }
   f3d::log::info("\nReport bugs to https://github.com/f3d-app/f3d/issues");
   f3d::log::setUseColoring(true);
@@ -569,4 +549,18 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     f3d::log::error("Error parsing command line arguments: ", ex.what());
     throw F3DExFailure("Could not parse command line arguments");
   }
+}
+
+//----------------------------------------------------------------------------
+void F3DOptionsTools::PrintHelpPair(
+  std::string_view key, std::string_view help, int keyWidth, int helpWidth)
+{
+  std::stringstream ss;
+  ss << "  " << std::left << std::setw(keyWidth) << key;
+  if (key.size() > static_cast<size_t>(keyWidth))
+  {
+    ss << "\n  " << std::setw(keyWidth) << " ";
+  }
+  ss << " " << std::setw(helpWidth) << help;
+  f3d::log::info(ss.str());
 }

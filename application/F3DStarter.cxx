@@ -86,19 +86,6 @@ public:
     std::string InteractionTestPlayFile;
   };
 
-  static void PrintHelpPair(
-    std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70)
-  {
-    std::stringstream ss;
-    ss << "  " << std::left << std::setw(keyWidth) << key;
-    if (key.size() > static_cast<size_t>(keyWidth))
-    {
-      ss << "\n  " << std::setw(keyWidth) << " ";
-    }
-    ss << " " << std::setw(helpWidth) << help;
-    f3d::log::info(ss.str());
-  }
-
   void SetupCamera(const CameraConfiguration& camConf)
   {
     f3d::camera& cam = this->Engine->getWindow().getCamera();
@@ -931,7 +918,7 @@ int F3DStarter::Start(int argc, char** argv)
     interactor.addBinding("Drop", f3d::interactor::ModifierKeys::SHIFT, "set_hdri", [](bool) -> std::string { return "Set HDRI and use it"; });
     for (const auto& [key, desc] : interactor.getBindingsDocumentation())
     {
-      F3DInternals::PrintHelpPair(key, desc);
+      F3DOptionsTools::PrintHelpPair(key, desc);
     }
 
   }

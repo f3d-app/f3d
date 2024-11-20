@@ -140,6 +140,11 @@ std::pair<std::string, int> GetClosestOption(const std::string& option, bool che
  */
 F3DOptionsTools::OptionsDict ParseCLIOptions(
   int argc, char** argv, std::vector<std::string>& positionals);
+
+/**
+ * Log provided key and help with nice formating
+ */
+void PrintHelpPair(std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70);
 };
 
 #endif
