@@ -557,9 +557,6 @@ interactor& interactor_impl::initCommands()
   this->addCommand("cycle_animation",
     [&](const std::vector<std::string>&)
     {
-      vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-      vtkF3DRenderer* ren =
-        vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
       this->Internals->AnimationManager->CycleAnimation();
       this->Internals->Options.scene.animation.index =
         this->Internals->AnimationManager->GetAnimationIndex();
