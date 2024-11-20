@@ -199,7 +199,7 @@ runs:
     - name: Set CI test exception for Linux EGL
       if:
         runner.os == 'Linux' &&
-        inputs.rendering_backend == 'egl'
+        inputs.rendering_backend != 'auto'
       shell: bash
       run: echo "F3D_CTEST_EXCEPTIONS=(TestSDKExternalWindowEGL)" >> $GITHUB_ENV
 
