@@ -434,8 +434,12 @@ public:
     {
       for (const std::string& command : commandsIt->second)
       {
-        const std::string commandWithArgs =
-          argsString.empty() ? command : command + " " + argsString;
+        std::string commandWithArgs = command;
+        if (!argsString.empty())
+        {
+          commandWithArgs.push_back(' ');
+          commandWithArgs.append(argsString);
+        };
         try
         {
           // XXX: Ignore the boolean return of triggerCommand,
