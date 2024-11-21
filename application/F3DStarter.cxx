@@ -906,7 +906,8 @@ int F3DStarter::Start(int argc, char** argv)
       });
 
     // "doc"
-    auto docString = [](const std::string& doc) -> std::string { return doc; };
+    auto docString = [](const std::string& doc) -> std::pair<std::string, std::string>
+    { return std::make_pair(doc, ""); };
 
     interactor.addBinding("Left", f3d::interactor::ModifierKeys::NONE, "load_previous_file_group",
       std::bind(docString, "Load previous file group"));
@@ -938,7 +939,7 @@ int F3DStarter::Start(int argc, char** argv)
   if (this->Internals->AppOptions.BindingsList)
   {
     f3d::log::info("Bindings:");
-    for (const auto& [key, desc] :
+    for (const auto& [key, desc, val] :
       this->Internals->Engine->getInteractor().getBindingsDocumentation())
     {
       F3DOptionsTools::PrintHelpPair(key, desc, 12);

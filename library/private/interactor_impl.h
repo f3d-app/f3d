@@ -45,14 +45,14 @@ public:
   interactor& initBindings() override;
   interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
     std::vector<std::string> commands,
-    std::function<std::string(bool showValue)> documentationCallback = nullptr) override;
+    std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) override;
   interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
     std::string command,
-    std::function<std::string(bool showValue)> documentationCallback = nullptr) override;
+    std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) override;
   interactor& removeBinding(std::string interaction, ModifierKeys modifiers) override;
   std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const override;
-  std::vector<std::pair<std::string, std::string>> getBindingsDocumentation(
-    bool withValue) const override;
+  std::vector<std::tuple<std::string, std::string, std::string>> getBindingsDocumentation()
+    const override;
 
   unsigned long createTimerCallBack(double time, std::function<void()> callBack) override;
   void removeTimerCallBack(unsigned long id) override;

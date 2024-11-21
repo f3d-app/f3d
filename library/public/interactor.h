@@ -106,7 +106,7 @@ public:
    */
   virtual interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
     std::vector<std::string> commands,
-    std::function<std::string(bool)> documentationCallback = nullptr) = 0;
+    std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) = 0;
 
   /**
    * See addBinding
@@ -117,14 +117,15 @@ public:
    * interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
-    std::string command, std::function<std::string(bool)> documentationCallback = nullptr) = 0;
+    std::string command,
+    std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
     std::initializer_list<std::string> list,
-    std::function<std::string(bool)> documentationCallback = nullptr)
+    std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr)
   {
     return this->addBinding(
       interaction, modifiers, std::vector<std::string>(list), documentationCallback);
@@ -144,8 +145,8 @@ public:
    * Get a structure of strings documenting bindings.
    * Set withValue to true to recover associated values in the string when there is any.
    */
-  virtual std::vector<std::pair<std::string, std::string>> getBindingsDocumentation(
-    bool withValue = false) const = 0;
+  virtual std::vector<std::tuple<std::string, std::string, std::string>> getBindingsDocumentation()
+    const = 0;
   ///@}
 
   /**

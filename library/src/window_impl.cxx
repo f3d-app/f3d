@@ -452,9 +452,14 @@ void window_impl::UpdateDynamicOptions()
   {
     std::stringstream cheatSheetStream;
     cheatSheetStream << "\n";
-    for (auto [bind, doc] : this->Internals->Interactor->getBindingsDocumentation(true))
+    for (auto [bind, doc, val] : this->Internals->Interactor->getBindingsDocumentation())
     {
-      cheatSheetStream << " " << bind << ": " << doc << "\n";
+      cheatSheetStream << " " << bind << ": " << doc;
+      if (!val.empty())
+      {
+        cheatSheetStream << " [" << val << "]";
+      }
+      cheatSheetStream << "\n";
     }
     renderer->ConfigureCheatSheet(cheatSheetStream.str());
   }
