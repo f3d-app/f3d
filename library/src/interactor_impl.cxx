@@ -769,6 +769,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
 interactor& interactor_impl::initBindings()
 {
   this->Internals->Bindings.clear();
+  this->Internals->OrderedBinds.clear();
   f3d::options& opts = this->Internals->Options;
 
   // clang-format off
@@ -934,7 +935,7 @@ interactor& interactor_impl::addBinding(const std::string& interaction, Modifier
   std::string command, std::function<std::pair<std::string, std::string>()> documentationCallback)
 {
   return this->addBinding(
-    interaction, modifiers, std::vector<std::string>{ std::move(command) }, documentationCallback);
+    interaction, modifiers, std::vector<std::string>{ std::move(command) }, std::move(documentationCallback));
 }
 
 //----------------------------------------------------------------------------
