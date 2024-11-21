@@ -9,6 +9,10 @@ def callback_fn(args):
     print(args)
 
 
+def doc_fn():
+    return ["dummyDoc", "dummyValue"]
+
+
 def test_command(capfd):
     engine = f3d.Engine.create(True)
     inter = engine.interactor
@@ -41,11 +45,14 @@ def test_binding():
     assert len(inter.get_binding_interactions()) == 0
 
     # Smoke test
-    inter.add_binding("P", f3d.Interactor.ModifierKeys.ANY, "dummy command")
-    inter.add_binding("P", f3d.Interactor.ModifierKeys.NONE, "dummy command")
-    inter.add_binding("P", f3d.Interactor.ModifierKeys.CTRL, "dummy command")
-    inter.add_binding("P", f3d.Interactor.ModifierKeys.SHIFT, "dummy command")
+    inter.add_binding("P", f3d.Interactor.ModifierKeys.ANY, "dummy command", doc_fn)
+    inter.add_binding("P", f3d.Interactor.ModifierKeys.NONE, "dummy command", doc_fn)
+    inter.add_binding("P", f3d.Interactor.ModifierKeys.CTRL, "dummy command", doc_fn)
+    inter.add_binding("P", f3d.Interactor.ModifierKeys.SHIFT, "dummy command", doc_fn)
     inter.add_binding(
-        "P", f3d.Interactor.ModifierKeys.CTRL_SHIFT, ["dummy command", "dummy command"]
+        "P",
+        f3d.Interactor.ModifierKeys.CTRL_SHIFT,
+        ["dummy command", "dummy command"],
+        doc_fn,
     )
     inter.init_bindings()

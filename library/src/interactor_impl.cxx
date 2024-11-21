@@ -865,10 +865,12 @@ interactor& interactor_impl::initBindings()
     [&]() -> std::string { return docTgl(opts.ui.metadata);}));
   this->addBinding("Z", ModifierKeys::NONE, "toggle_fps",std::bind(docStrVal, "Toggle FPS counter display",
     [&]() -> std::string { return docTgl(opts.ui.fps);}));
+#if F3D_MODULE_RAYTRACING
   this->addBinding("R", ModifierKeys::NONE, "toggle render.raytracing.enable",std::bind(docStrVal, "Toggle raytracing rendering",
     [&]() -> std::string { return docTgl(opts.render.raytracing.enable);}));
   this->addBinding("D", ModifierKeys::NONE, "toggle render.raytracing.denoise",std::bind(docStrVal, "Toggle denoising when raytracing",
     [&]() -> std::string { return docTgl(opts.render.raytracing.denoise);}));
+#endif
   this->addBinding("V", ModifierKeys::NONE, "toggle_volume_rendering",std::bind(docStrVal, "Toggle volume rendering",
     [&]() -> std::string { return docTgl(opts.model.volume.enable);}));
   this->addBinding("I", ModifierKeys::NONE, "toggle model.volume.inverse",std::bind(docStrVal, "Toggle inverse volume opacity",
