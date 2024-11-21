@@ -934,8 +934,8 @@ interactor& interactor_impl::addBinding(const std::string& interaction, Modifier
 interactor& interactor_impl::addBinding(const std::string& interaction, ModifierKeys modifiers,
   std::string command, std::function<std::pair<std::string, std::string>()> documentationCallback)
 {
-  return this->addBinding(
-    interaction, modifiers, std::vector<std::string>{ std::move(command) }, std::move(documentationCallback));
+  return this->addBinding(interaction, modifiers, std::vector<std::string>{ std::move(command) },
+    std::move(documentationCallback));
 }
 
 //----------------------------------------------------------------------------
