@@ -16,14 +16,8 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   f3d::interactor& inter = eng.getInteractor();
   win.setSize(300, 300);
 
-  constexpr int expectedBindingsSize = 39;
-
-  // Check the current number of documented bindings
-  if (inter.getBindingsDocumentation().size() != expectedBindingsSize)
-  {
-    std::cerr << "Unexcepted bindings documentation size initially" << std::endl;
-    return EXIT_FAILURE;
-  }
+  // Avoid using a hardcoded value so this test does not fail when adding/removing bindings
+  constexpr int expectedBindingsSize = inter.getBindingsDocumentation().size();
 
   // Sanity checks coverage
   if (inter.playInteraction(""))
