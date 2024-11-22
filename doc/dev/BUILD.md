@@ -38,7 +38,7 @@ Here is some CMake options of interest:
 * `F3D_PLUGINS_STATIC_BUILD`: Build all plugins as static library (embedded into `libf3d`) and automatically loaded by the application. Incompatible with `F3D_MACOS_BUNDLE`.
 * `BUILD_SHARED_LIBS`: Build the libf3d and all plugins as static library (embedded into `f3d` executable). The `library` and `plugin_sdk` component will not be installed.
 
-Some modules, plugins and bindings depending on external libraries can be optionally enabled with the following CMake variables:
+Some modules, plugins and language bindings depending on external libraries can be optionally enabled with the following CMake variables:
 
 * `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `VTK_MODULE_ENABLE_VTK_RenderingRayTracing` turned on. Disabled by default.
 * `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.

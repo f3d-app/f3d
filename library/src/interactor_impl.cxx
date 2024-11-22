@@ -776,7 +776,7 @@ interactor& interactor_impl::initBindings()
   // Define lambdas used for documentation
 
   // Shorten a long name
-  auto shortName = [](const std::string& name, int maxChar)
+  auto shortName = [](const std::string& name, int maxChar) -> std::string
   {
     if (name.size() <= static_cast<size_t>(maxChar) || maxChar <= 3)
     {
@@ -811,18 +811,18 @@ interactor& interactor_impl::initBindings()
   { return val ? "ON" : "OFF"; };
 
   // "ON/OFF/NO SET"
-  auto docTglOptional = [](std::optional<bool> val) -> std::string
+  auto docTglOpt = [](std::optional<bool> val) -> std::string
   { return val.has_value() ? (val.value() ? "ON" : "OFF") : "NOT SET"; };
 
   // "animationName"
   auto animStr = [&]() -> std::string
   { return this->Internals->AnimationManager->GetAnimationName(); };
 
-  // POINT/CELL
+  // "POINT/CELL"
   auto pointCellStr = [&]() -> std::string
   { return opts.model.scivis.cells ? "CELL" : "POINT"; };
 
-  // arrayName
+  // "arrayName"
   auto arrayStr = [&]() -> std::string
   {
     return opts.model.scivis.array_name.has_value()
@@ -830,7 +830,7 @@ interactor& interactor_impl::initBindings()
       : "OFF";
   };
 
-  // component
+  // "component"
   auto compStr = [&]() -> std::string
   {
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
@@ -855,7 +855,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding("T", ModifierKeys::NONE, "toggle render.effect.tone_mapping",std::bind(docStrVal, "Toggle tone mapping",
     [&]() -> std::string { return docTgl(opts.render.effect.tone_mapping);}));
   this->addBinding("E", ModifierKeys::NONE, "toggle render.show_edges",std::bind(docStrVal, "Toggle edges display",
-    [&]() -> std::string { return docTglOptional(opts.render.show_edges);}));
+    [&]() -> std::string { return docTglOpt(opts.render.show_edges);}));
   this->addBinding("X", ModifierKeys::NONE, "toggle interactor.axis",std::bind(docStrVal, "Toggle axes display",
     [&]() -> std::string { return docTgl(opts.interactor.axis);}));
   this->addBinding("G", ModifierKeys::NONE, "toggle render.grid.enable",std::bind(docStrVal, "Toggle grid display",
@@ -896,7 +896,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding("3", ModifierKeys::ANY, "set_camera right", std::bind(docStr, "Right View camera"));
   this->addBinding("4", ModifierKeys::ANY, "roll_camera -90", std::bind(docStr, "Rotate camera right"));
   this->addBinding("5", ModifierKeys::ANY, "toggle scene.camera.orthographic", std::bind(docStrVal, "Toggle Orthographic Projection",
-    [&]() -> std::string { return docTglOptional(opts.scene.camera.orthographic);}));
+    [&]() -> std::string { return docTglOpt(opts.scene.camera.orthographic);}));
   this->addBinding("6", ModifierKeys::ANY, "roll_camera 90", std::bind(docStr, "Rotate camera left"));
   this->addBinding("7", ModifierKeys::ANY, "set_camera top", std::bind(docStr, "Top View camera"));
   this->addBinding("9", ModifierKeys::ANY, "set_camera isometric", std::bind(docStr, "Isometric View camera"));
