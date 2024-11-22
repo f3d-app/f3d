@@ -314,8 +314,7 @@ void animationManager::CycleAnimation()
   this->LoadAtTime(this->TimeRange[0]);
 
   vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-  vtkF3DRenderer* ren =
-    vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
   ren->SetCheatSheetConfigured(false);
 }
 

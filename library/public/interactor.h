@@ -93,7 +93,7 @@ public:
    *
    * modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
    *
-   * documentationCallback is an optional function that returns a pair of string, 
+   * documentationCallback is an optional function that returns a pair of string,
    * the first is the doc itself, the second is the current value as a string, if any.
    * Use `getBindingsDocumentation` to access this doc.
    *
@@ -151,13 +151,13 @@ public:
    * added either by default or by `addBinding`.
    * This is the method used to print the cheatsheet.
    *
-   * The first string in the tuple is the binding interaction itself, as a string, 
+   * The first string in the tuple is the binding interaction itself, as a string,
    * eg: "A", "ANY+Question", "SHIFT+L".
-   * The second scring in the tuple is the documentation of the binding, 
-   * eg: "Toggle anti aliasing", "Print scene descr to terminal", "Decrease light intensity" 
-   * The third string of the tuple is the current value of the binding, 
+   * The second scring in the tuple is the documentation of the binding,
+   * eg: "Toggle anti aliasing", "Print scene descr to terminal", "Decrease light intensity"
+   * The third string of the tuple is the current value of the binding,
    * eg: "OFF", "" if there is no value or "1.12".
-   * The possibel string can depends on the bindings but boolean value are expected to be 
+   * The possible string can depends on the bindings but boolean value are expected to be
    * "ON", "OFF", "NO SET" (for optional values).
    */
   virtual std::vector<std::tuple<std::string, std::string, std::string>> getBindingsDocumentation()
