@@ -518,7 +518,8 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -rd --samples=4 --no-background)
 
 else(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestInteractionRaytracingDenoiseNoRaytracing DATA suzanne.ply INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
+  # XXX: This test is disabled until this code can be reached again using `--command-script`
+  # f3d_test(NAME TestInteractionRaytracingDenoiseNoRaytracing DATA suzanne.ply INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
 endif()
 
 if(F3D_MODULE_EXR)
@@ -1019,6 +1020,9 @@ f3d_test(NAME TestInteractionInvalidComponent INTERACTION DATA cow.vtp ARGS --co
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestReadersListMultiplePlugins ARGS --readers-list --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()
+
+# Test bindings-list display
+f3d_test(NAME TestBindingsList ARGS --bindings-list REGEXP "ANY.Question Print scene descr to terminal")
 
 # Test rendering backends
 # For some reason the sanitizer detects leaks because of EGL and OSMesa
