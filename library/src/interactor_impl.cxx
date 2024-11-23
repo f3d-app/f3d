@@ -37,43 +37,11 @@
 
 namespace f3d::detail
 {
+using mod_t = interaction_bind_t::ModifierKeys;
+
 class interactor_impl::internals
 {
 public:
-  struct Bind
-  {
-    std::string Interaction;
-    ModifierKeys Modifiers = f3d::interactor::ModifierKeys::ANY;
-
-    bool operator<(const Bind& bind) const
-    {
-      return this->Interaction < bind.Interaction ||
-        (this->Interaction == bind.Interaction && this->Modifiers < bind.Modifiers);
-    }
-
-    bool operator==(const Bind& bind) const
-    {
-      return this->Interaction == bind.Interaction && this->Modifiers == bind.Modifiers;
-    }
-
-    std::string Format() const
-    {
-      switch (this->Modifiers)
-      {
-        case f3d::interactor::ModifierKeys::CTRL_SHIFT:
-          return "CTRL+SHIFT+" + this->Interaction;
-        case f3d::interactor::ModifierKeys::CTRL:
-          return "CTRL+" + this->Interaction;
-        case f3d::interactor::ModifierKeys::SHIFT:
-          return "SHIFT+" + this->Interaction;
-        case f3d::interactor::ModifierKeys::ANY:
-          return "ANY+" + this->Interaction;
-        default:
-          // No need to check for NONE (no log needed)
-          return this->Interaction;
-      }
-    }
-  };
 
   struct BindingCommands
   {
@@ -413,32 +381,32 @@ public:
   //----------------------------------------------------------------------------
   void TriggerBinding(const std::string& interaction, const std::string& argsString)
   {
-    ModifierKeys mod = ModifierKeys::NONE;
+    mod_t mod = mod_t::NONE;
     vtkRenderWindowInteractor* rwi = this->Style->GetInteractor();
     const bool shift = rwi->GetShiftKey() == 1;
     const bool ctrl = rwi->GetControlKey() == 1;
     if (shift && ctrl)
     {
-      mod = ModifierKeys::CTRL_SHIFT;
+      mod = mod_t::CTRL_SHIFT;
     }
     else if (ctrl)
     {
-      mod = ModifierKeys::CTRL;
+      mod = mod_t::CTRL;
     }
     else if (shift)
     {
-      mod = ModifierKeys::SHIFT;
+      mod = mod_t::SHIFT;
     }
 
     // Check for an interaction command with modifiers
-    const Bind bind = { interaction, mod };
-    log::debug("Interaction: KeyPress ", bind.Format());
+    const interaction_bind_t bind = { mod, interaction};
+    log::debug("Interaction: KeyPress ", bind.format());
 
     auto commandsIt = this->Bindings.find(bind);
     if (commandsIt == this->Bindings.end())
     {
       // Modifiers version not found, try ANY instead
-      commandsIt = this->Bindings.find({ interaction, ModifierKeys::ANY });
+      commandsIt = this->Bindings.find({mod_t::ANY, interaction });
     }
 
     if (commandsIt != this->Bindings.end())
@@ -483,8 +451,8 @@ public:
 
   std::map<std::string, std::function<void(const std::vector<std::string>&)>> Commands;
 
-  std::map<Bind, BindingCommands> Bindings;
-  std::multimap<std::string, Bind> GroupedBinds;
+  std::map<interaction_bind_t, BindingCommands> Bindings;
+  std::multimap<std::string, interaction_bind_t> GroupedBinds;
   std::vector<std::string> OrderedBindGroups;
 
   vtkNew<vtkCellPicker> CellPicker;
@@ -842,87 +810,86 @@ interactor& interactor_impl::initBindings()
   };
 
   // Available standard keys: None
-  this->addBinding("W", ModifierKeys::NONE, "cycle_animation", "Scene", std::bind(docStrVal, "Cycle animation", animStr));
-  this->addBinding("C", ModifierKeys::NONE, "cycle_coloring field", "Scene", std::bind(docStrVal, "Cycle point/cell data coloring", pointCellStr));
-  this->addBinding("S", ModifierKeys::NONE, "cycle_coloring array", "Scene", std::bind(docStrVal, "Cycle array to color with", arrayStr));
-  this->addBinding("Y", ModifierKeys::NONE, "cycle_coloring component", "Scene", std::bind(docStrVal, "Cycle component to color with", compStr));
-  this->addBinding("B", ModifierKeys::NONE, "toggle ui.scalar_bar", "Scene", std::bind(docStrVal, "Toggle the scalar bar display",
+  this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", std::bind(docStrVal, "Cycle animation", animStr));
+  this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", std::bind(docStrVal, "Cycle point/cell data coloring", pointCellStr));
+  this->addBinding({mod_t::NONE, "S"}, "cycle_coloring array", "Scene", std::bind(docStrVal, "Cycle array to color with", arrayStr));
+  this->addBinding({mod_t::NONE, "Y"}, "cycle_coloring component", "Scene", std::bind(docStrVal, "Cycle component to color with", compStr));
+  this->addBinding({mod_t::NONE, "B"}, "toggle ui.scalar_bar", "Scene", std::bind(docStrVal, "Toggle the scalar bar display",
     [&]() -> std::string { return docTgl(opts.ui.scalar_bar);}));
-  this->addBinding("P", ModifierKeys::NONE, "toggle render.effect.translucency_support", "Scene", std::bind(docStrVal, "Toggle scalar bar display",
+  this->addBinding({mod_t::NONE, "P"}, "toggle render.effect.translucency_support", "Scene", std::bind(docStrVal, "Toggle scalar bar display",
     [&]() -> std::string { return docTgl(opts.render.effect.translucency_support);}));
-  this->addBinding("Q", ModifierKeys::NONE, "toggle render.effect.ambient_occlusion","Scene", std::bind(docStrVal, "Toggle ambient occlusion",
+  this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docStrVal, "Toggle ambient occlusion",
     [&]() -> std::string { return docTgl(opts.render.effect.ambient_occlusion);}));
-  this->addBinding("A", ModifierKeys::NONE, "toggle render.effect.anti_aliasing","Scene", std::bind(docStrVal, "Toggle anti-aliasing",
+  this->addBinding({mod_t::NONE, "A"}, "toggle render.effect.anti_aliasing","Scene", std::bind(docStrVal, "Toggle anti-aliasing",
     [&]() -> std::string { return docTgl(opts.render.effect.anti_aliasing);}));
-  this->addBinding("T", ModifierKeys::NONE, "toggle render.effect.tone_mapping","Scene", std::bind(docStrVal, "Toggle tone mapping",
+  this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docStrVal, "Toggle tone mapping",
     [&]() -> std::string { return docTgl(opts.render.effect.tone_mapping);}));
-  this->addBinding("E", ModifierKeys::NONE, "toggle render.show_edges","Scene", std::bind(docStrVal, "Toggle edges display",
+  this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docStrVal, "Toggle edges display",
     [&]() -> std::string { return docTglOpt(opts.render.show_edges);}));
-  this->addBinding("X", ModifierKeys::NONE, "toggle interactor.axis","Scene", std::bind(docStrVal, "Toggle axes display",
+  this->addBinding({mod_t::NONE, "X"}, "toggle interactor.axis","Scene", std::bind(docStrVal, "Toggle axes display",
     [&]() -> std::string { return docTgl(opts.interactor.axis);}));
-  this->addBinding("G", ModifierKeys::NONE, "toggle render.grid.enable","Scene", std::bind(docStrVal, "Toggle grid display",
+  this->addBinding({mod_t::NONE, "G"}, "toggle render.grid.enable","Scene", std::bind(docStrVal, "Toggle grid display",
     [&]() -> std::string { return docTgl(opts.render.grid.enable);}));
-  this->addBinding("N", ModifierKeys::NONE, "toggle ui.filename","Scene", std::bind(docStrVal, "Toggle filename display",
+  this->addBinding({mod_t::NONE, "N"}, "toggle ui.filename","Scene", std::bind(docStrVal, "Toggle filename display",
     [&]() -> std::string { return docTgl(opts.ui.filename);}));
-  this->addBinding("M", ModifierKeys::NONE, "toggle ui.metadata","Scene", std::bind(docStrVal, "Toggle metadata display",
+  this->addBinding({mod_t::NONE, "M"}, "toggle ui.metadata","Scene", std::bind(docStrVal, "Toggle metadata display",
     [&]() -> std::string { return docTgl(opts.ui.metadata);}));
-  this->addBinding("Z", ModifierKeys::NONE, "toggle_fps","Scene", std::bind(docStrVal, "Toggle FPS counter display",
+  this->addBinding({mod_t::NONE, "Z"}, "toggle_fps","Scene", std::bind(docStrVal, "Toggle FPS counter display",
     [&]() -> std::string { return docTgl(opts.ui.fps);}));
 #if F3D_MODULE_RAYTRACING
-  this->addBinding("R", ModifierKeys::NONE, "toggle render.raytracing.enable","Scene", std::bind(docStrVal, "Toggle raytracing rendering",
+  this->addBinding({mod_t::NONE, "R"}, "toggle render.raytracing.enable","Scene", std::bind(docStrVal, "Toggle raytracing rendering",
     [&]() -> std::string { return docTgl(opts.render.raytracing.enable);}));
-  this->addBinding("D", ModifierKeys::NONE, "toggle render.raytracing.denoise","Scene", std::bind(docStrVal, "Toggle denoising when raytracing",
+  this->addBinding({mod_t::NONE, "D"}, "toggle render.raytracing.denoise","Scene", std::bind(docStrVal, "Toggle denoising when raytracing",
     [&]() -> std::string { return docTgl(opts.render.raytracing.denoise);}));
 #endif
-  this->addBinding("V", ModifierKeys::NONE, "toggle_volume_rendering","Scene", std::bind(docStrVal, "Toggle volume rendering",
+  this->addBinding({mod_t::NONE, "V"}, "toggle_volume_rendering","Scene", std::bind(docStrVal, "Toggle volume rendering",
     [&]() -> std::string { return docTgl(opts.model.volume.enable);}));
-  this->addBinding("I", ModifierKeys::NONE, "toggle model.volume.inverse","Scene", std::bind(docStrVal, "Toggle inverse volume opacity",
+  this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docStrVal, "Toggle inverse volume opacity",
     [&]() -> std::string { return docTgl(opts.model.volume.inverse);}));
-  this->addBinding("O", ModifierKeys::NONE, "toggle model.point_sprites.enable","Scene", std::bind(docStrVal, "Toggle point sprites rendering",
+  this->addBinding({mod_t::NONE, "O"}, "toggle model.point_sprites.enable","Scene", std::bind(docStrVal, "Toggle point sprites rendering",
     [&]() -> std::string { return docTgl(opts.model.point_sprites.enable);}));
-  this->addBinding("U", ModifierKeys::NONE, "toggle render.background.blur","Scene", std::bind(docStrVal, "Toggle blur background",
+  this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur","Scene", std::bind(docStrVal, "Toggle blur background",
     [&]() -> std::string { return docTgl(opts.render.background.blur);}));
-  this->addBinding("K", ModifierKeys::NONE, "toggle interactor.trackball","Scene", std::bind(docStrVal, "Toggle trackball interaction",
+  this->addBinding({mod_t::NONE, "K"}, "toggle interactor.trackball","Scene", std::bind(docStrVal, "Toggle trackball interaction",
     [&]() -> std::string { return docTgl(opts.interactor.trackball);}));
-  this->addBinding("F", ModifierKeys::NONE, "toggle render.hdri.ambient","Scene", std::bind(docStrVal, "Toggle HDRI ambient lighting",
+  this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docStrVal, "Toggle HDRI ambient lighting",
     [&]() -> std::string { return docTgl(opts.render.hdri.ambient);}));
-  this->addBinding("J", ModifierKeys::NONE, "toggle render.background.skybox","Scene", std::bind(docStrVal, "Toggle HDRI skybox",
+  this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docStrVal, "Toggle HDRI skybox",
     [&]() -> std::string { return docTgl(opts.render.background.skybox);}));
-  this->addBinding("L", ModifierKeys::NONE, "increase_light_intensity", "Scene", std::bind(docStrVal, "Increase lights intensity",
+  this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docStrVal, "Increase lights intensity",
     [&]() -> std::string { return docDbl(opts.render.light.intensity, 2);}));
-  this->addBinding("L", ModifierKeys::SHIFT, "decrease_light_intensity", "Scene", std::bind(docStrVal, "Decrease lights intensity",
+  this->addBinding({mod_t::SHIFT, "L"}, "decrease_light_intensity", "Scene", std::bind(docStrVal, "Decrease lights intensity",
     [&]() -> std::string { return docDbl(opts.render.light.intensity, 2);}));
-  this->addBinding("1", ModifierKeys::ANY, "set_camera front", "Camera", std::bind(docStr, "Front View camera"));
-  this->addBinding("3", ModifierKeys::ANY, "set_camera right", "Camera", std::bind(docStr, "Right View camera"));
-  this->addBinding("4", ModifierKeys::ANY, "roll_camera -90", "Camera", std::bind(docStr, "Rotate camera right"));
-  this->addBinding("5", ModifierKeys::ANY, "toggle scene.camera.orthographic", "Camera", std::bind(docStrVal, "Toggle Orthographic Projection",
+  this->addBinding({mod_t::ANY, "1"}, "set_camera front", "Camera", std::bind(docStr, "Front View camera"));
+  this->addBinding({mod_t::ANY, "3"}, "set_camera right", "Camera", std::bind(docStr, "Right View camera"));
+  this->addBinding({mod_t::ANY, "4"}, "roll_camera -90", "Camera", std::bind(docStr, "Rotate camera right"));
+  this->addBinding({mod_t::ANY, "5"}, "toggle scene.camera.orthographic", "Camera", std::bind(docStrVal, "Toggle Orthographic Projection",
     [&]() -> std::string { return docTglOpt(opts.scene.camera.orthographic);}));
-  this->addBinding("6", ModifierKeys::ANY, "roll_camera 90", "Camera", std::bind(docStr, "Rotate camera left"));
-  this->addBinding("7", ModifierKeys::ANY, "set_camera top", "Camera", std::bind(docStr, "Top View camera"));
-  this->addBinding("9", ModifierKeys::ANY, "set_camera isometric", "Camera", std::bind(docStr, "Isometric View camera"));
-  this->addBinding("H", ModifierKeys::NONE, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
-  this->addBinding("Question", ModifierKeys::ANY, "print_scene_info", "Others", std::bind(docStr, "Print scene descr to terminal"));
-  this->addBinding(F3D_EXIT_HOTKEY_SYM, ModifierKeys::NONE, "stop_interactor", "Others", std::bind(docStr, "Quit"));
-  this->addBinding("Return", ModifierKeys::NONE, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
-  this->addBinding("Space", ModifierKeys::NONE, "toggle_animation", "Others", std::bind(docStr, "Play/Pause animation if any"));
-  this->addBinding("Drop", ModifierKeys::NONE, "add_files", "Others", std::bind(docStr, "Add files to the scene"));
+  this->addBinding({mod_t::ANY, "6"}, "roll_camera 90", "Camera", std::bind(docStr, "Rotate camera left"));
+  this->addBinding({mod_t::ANY, "7"}, "set_camera top", "Camera", std::bind(docStr, "Top View camera"));
+  this->addBinding({mod_t::ANY, "9"}, "set_camera isometric", "Camera", std::bind(docStr, "Isometric View camera"));
+  this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
+  this->addBinding({mod_t::ANY, "Question"}, "print_scene_info", "Others", std::bind(docStr, "Print scene descr to terminal"));
+  this->addBinding({mod_t::NONE, F3D_EXIT_HOTKEY_SYM}, "stop_interactor", "Others", std::bind(docStr, "Quit"));
+  this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
+  this->addBinding({mod_t::NONE, "Space"}, "toggle_animation", "Others", std::bind(docStr, "Play/Pause animation if any"));
+  this->addBinding({mod_t::NONE, "Drop"}, "add_files", "Others", std::bind(docStr, "Add files to the scene"));
   // clang-format on
 
   return *this;
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addBinding(const std::string& interaction, ModifierKeys modifiers,
+interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
   std::vector<std::string> commands, std::string group,
   std::function<std::pair<std::string, std::string>()> documentationCallback)
 {
-  const internals::Bind bind{ interaction, modifiers };
   const auto [it, success] = this->Internals->Bindings.insert(
     { bind, { std::move(commands), std::move(documentationCallback) } });
   if (!success)
   {
     throw interactor::already_exists_exception(
-      "Could not add interaction commands for interaction: " + bind.Format() +
+      "Could not add interaction commands for interaction: " + bind.format() +
       " as it already exists.");
   }
   else
@@ -937,17 +904,16 @@ interactor& interactor_impl::addBinding(const std::string& interaction, Modifier
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addBinding(const std::string& interaction, ModifierKeys modifiers,
+interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
   std::string command, std::string group, std::function<std::pair<std::string, std::string>()> documentationCallback)
 {
-  return this->addBinding(interaction, modifiers, std::vector<std::string>{ std::move(command) }, std::move(group),
+  return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
     std::move(documentationCallback));
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::removeBinding(std::string interaction, ModifierKeys modifiers)
+interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
 {
-  internals::Bind bind{ std::move(interaction), modifiers };
   this->Internals->Bindings.erase(bind);
   std::string group;
   for (auto it = this->Internals->GroupedBinds.begin(); it != this->Internals->GroupedBinds.end(); it++)
@@ -970,58 +936,27 @@ interactor& interactor_impl::removeBinding(std::string interaction, ModifierKeys
   return *this;
 }
 
-/*
 //----------------------------------------------------------------------------
-std::vector<std::pair<std::string, f3d::interactor::ModifierKeys>>
-interactor_impl::getBindingInteractions() const
-{
-  std::vector<std::pair<std::string, ModifierKeys>> binds;
-  for (const auto& [bind, command] : this->Internals->Bindings)
-  {
-    binds.emplace_back(std::make_pair(bind.Interaction, bind.Modifiers));
-  }
-  return binds;
-}
-
-//----------------------------------------------------------------------------
-std::vector<std::tuple<std::string, std::string, std::string>>
-interactor_impl::getBindingsDocumentation() const
-{
-  std::vector<std::tuple<std::string, std::string, std::string>> docs;
-  for (internals::Bind bind : this->Internals->OrderedBinds)
-  {
-    auto docFunc = this->Internals->Bindings[bind].DocumentationCallback;
-    if (docFunc)
-    {
-      auto docPair = docFunc();
-      docs.emplace_back(bind.Format(), docPair.first, docPair.second);
-    }
-  }
-  return docs;
-}*/
-
-//----------------------------------------------------------------------------
-std::vector<std::string> interactor_impl::getBindingGroups() const
+std::vector<std::string> interactor_impl::getBindGroups() const
 {
   return this->Internals->OrderedBindGroups;
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<std::string, interactor::ModifierKeys>> interactor_impl::getBindingsForGroup(std::string group) const
+std::vector<interaction_bind_t> interactor_impl::getBindsForGroup(std::string group) const
 {
-  std::vector<std::pair<std::string, ModifierKeys>> output;
+  std::vector<interaction_bind_t> output;
   for (auto[it, rangeEnd] = this->Internals->GroupedBinds.equal_range(group); it != rangeEnd; ++it)
   {
-    output.emplace_back(std::make_pair(it->second.Interaction, it->second.Modifiers));
+    output.emplace_back(it->second);
   }
   return output;
 }
 
 //----------------------------------------------------------------------------
-std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(std::string interaction, interactor::ModifierKeys modifiers) const
+std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(const interaction_bind_t& bind) const
 {
   std::vector<std::tuple<std::string, std::string, std::string>> doc;
-  const internals::Bind bind{ interaction, modifiers };
   auto docFunc = this->Internals->Bindings[bind].DocumentationCallback;
   return docFunc ? docFunc() : std::make_pair(std::string(), std::string());
 }

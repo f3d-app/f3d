@@ -452,11 +452,11 @@ void window_impl::UpdateDynamicOptions()
   {
     std::stringstream cheatSheetStream;
     cheatSheetStream << "\n";
-    for (std::string group : this->Internals->Interactor->getBindingGroups())
+    for (std::string group : this->Internals->Interactor->getBindGroups())
     {
-      for (auto [inter, mod] : this->Internals->Interactor->getBindingsForGroup(group))
+      for (auto [mod, inter] : this->Internals->Interactor->getBindsForGroup(group))
       {
-        auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(inter, mod);
+        auto [doc, val] = this->Internals->Interactor->getBindingDocumentation({mod, inter});
         if (!doc.empty())
         {
           // TODO bind

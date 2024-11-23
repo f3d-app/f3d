@@ -39,20 +39,21 @@ def test_binding():
     inter = engine.interactor
 
     # Check default interactions can be removed
-    binds = inter.get_binding_interactions()
-    for [interaction, modifiers] in binds:
-        inter.remove_binding(interaction, modifiers)
-    assert len(inter.get_binding_interactions()) == 0
+    groups = inter.get_bind_groups()
+    for group in groups:
+      binds = inter.get_binds_for_group(group)
+      for bind in binds:
+        inter.remove_binding(bind)
+    assert len(inter.get_bind_groups()) == 0
 
     # Smoke test
-    inter.add_binding("P", f3d.Interactor.ModifierKeys.ANY, "dummy command", doc_fn)
-    inter.add_binding("P", f3d.Interactor.ModifierKeys.NONE, "dummy command", doc_fn)
-    inter.add_binding("P", f3d.Interactor.ModifierKeys.CTRL, "dummy command", doc_fn)
-    inter.add_binding("P", f3d.Interactor.ModifierKeys.SHIFT, "dummy command", doc_fn)
-    inter.add_binding(
-        "P",
-        f3d.Interactor.ModifierKeys.CTRL_SHIFT,
+    inter.add_binding(f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.ANY, "P"), "dummy command", "DummyGroup", doc_fn)
+    inter.add_binding(f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "P"), "dummy command", "DummyGroup", doc_fn)
+    inter.add_binding(f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P"), "dummy command", "DummyGroup", doc_fn)
+    inter.add_binding(f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.SHIFT, "P"), "dummy command", "DummyGroup", doc_fn)
+    inter.add_binding(f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL_SHIFT, "P"),
         ["dummy command", "dummy command"],
+        "DummyGroup",
         doc_fn,
     )
     inter.init_bindings()

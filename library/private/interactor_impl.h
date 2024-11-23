@@ -43,19 +43,19 @@ public:
   bool triggerCommand(std::string_view command) override;
 
   interactor& initBindings() override;
-  interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
+  interactor& addBinding(const interaction_bind_t& bind,
     std::vector<std::string> commands, std::string group = std::string(),
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) override;
-  interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
+  interactor& addBinding(const interaction_bind_t& bind,
     std::string command, std::string group = std::string(),
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) override;
-  interactor& removeBinding(std::string interaction, ModifierKeys modifiers) override;
+  interactor& removeBinding(const interaction_bind_t& bind) override;
 /*  std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const override;
   std::vector<std::tuple<std::string, std::string, std::string>> getBindingsDocumentation()
     const override;*/
-  std::vector<std::string> getBindingGroups() const override;
-  std::vector<std::pair<std::string, ModifierKeys>> getBindingsForGroup(std::string group) const override;
-  std::pair<std::string, std::string> getBindingDocumentation(std::string interaction, ModifierKeys modifiers) const override;
+  std::vector<std::string> getBindGroups() const override;
+  std::vector<interaction_bind_t> getBindsForGroup(std::string group) const override;
+  std::pair<std::string, std::string> getBindingDocumentation(const interaction_bind_t& bind) const override;
 
 
 

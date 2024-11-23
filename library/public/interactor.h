@@ -13,6 +13,54 @@
 
 namespace f3d
 {
+
+struct interaction_bind_t
+{
+  /**
+   * Enumeration of supported modifier combination, in binary.
+   */
+  enum class ModifierKeys : unsigned char
+  {
+    ANY = 0x80,      // 10000000
+    NONE = 0x0,      // 00000000
+    CTRL = 0x1,      // 00000001
+    SHIFT = 0x2,     // 00000010
+    CTRL_SHIFT = 0x3 // 00000011
+  };
+
+  ModifierKeys mod;
+  std::string inter;
+
+  bool operator<(const interaction_bind_t& bind) const
+  {
+    return this->inter < bind.inter ||
+      (this->inter == bind.inter && this->mod < bind.mod);
+  }
+
+  bool operator==(const interaction_bind_t& bind) const
+  {
+    return this->inter == bind.inter && this->mod == bind.mod;
+  }
+
+  std::string format() const
+  {
+    switch (this->mod)
+    {
+      case ModifierKeys::CTRL_SHIFT:
+        return "Ctrl+Shift+" + this->inter;
+      case ModifierKeys::CTRL:
+        return "Ctrl+" + this->inter;
+      case ModifierKeys::SHIFT:
+        return "Shift+" + this->inter;
+      case ModifierKeys::ANY:
+        return "Any+" + this->inter;
+      default:
+        // No need to check for NONE (no log needed)
+        return this->inter;
+    }
+  }
+};
+
 /**
  * @class   interactor
  * @brief   Class used to control interaction and animation
@@ -66,18 +114,6 @@ public:
 
   ///@{ @name Bindings
   /**
-   * Enumeration of supported modifier combination, in binary.
-   */
-  enum class ModifierKeys : unsigned char
-  {
-    ANY = 0x80,      // 10000000
-    NONE = 0x0,      // 00000000
-    CTRL = 0x1,      // 00000001
-    SHIFT = 0x2,     // 00000010
-    CTRL_SHIFT = 0x3 // 00000011
-  };
-
-  /**
    * Remove all existing interaction commands and add all default bindings
    * see INTERACTIONS.md for details.
    */
@@ -108,7 +144,7 @@ public:
    * Adding commands for an existing combination of interaction and modifier will throw a
    * interactor::already_exists_exception.
    */
-  virtual interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
+  virtual interactor& addBinding(const interaction_bind_t& bind,
     std::vector<std::string> commands, std::string group = std::string(),
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) = 0;
 
@@ -120,35 +156,35 @@ public:
    * Adding command for an existing combination of interaction and modifier will throw a
    * interactor::already_exists_exception.
    */
-  virtual interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
+  virtual interactor& addBinding(const interaction_bind_t& bind,
     std::string command, std::string group = std::string(),
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
-  interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
+  interactor& addBinding(const interaction_bind_t& bind,
     std::initializer_list<std::string> list, std::string group = std::string(),
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr)
   {
-    return this->addBinding(
-      interaction, modifiers, std::vector<std::string>(list), group, documentationCallback);
+    return this->addBinding(bind,
+      std::vector<std::string>(list), group, documentationCallback);
   }
 
   /**
    * Remove binding corresponding to provided interaction and modifiers
    */
-  virtual interactor& removeBinding(std::string interaction, ModifierKeys modifiers) = 0;
+  virtual interactor& removeBinding(const interaction_bind_t& bind) = 0;
 
-  virtual std::vector<std::string> getBindingGroups() const = 0;
-  virtual std::vector<std::pair<std::string, ModifierKeys>> getBindingsForGroup(std::string group) const = 0;
+  virtual std::vector<std::string> getBindGroups() const = 0;
+  virtual std::vector<interaction_bind_t> getBindsForGroup(std::string group) const = 0;
 
   /**
    * Return a string vector of all currently defined bind interactions
    */
 //  virtual std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const = 0;
 
-  virtual std::pair<std::string, std::string> getBindingDocumentation(std::string interaction, ModifierKeys modifiers) const = 0;
+  virtual std::pair<std::string, std::string> getBindingDocumentation(const interaction_bind_t& bind) const = 0;
 
   /**
    * Get a structure of strings documenting bindings.
