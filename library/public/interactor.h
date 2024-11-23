@@ -41,6 +41,10 @@ struct interaction_bind_t
     return this->inter == bind.inter && this->mod == bind.mod;
   }
 
+  /**
+   * Format this binding into a string
+   * eg: "A", "Any+Question", "Shift+L".
+   */
   std::string format() const
   {
     switch (this->mod)
@@ -119,29 +123,29 @@ public:
   virtual interactor& initBindings() = 0;
 
   /**
-   * Use this method to add binding, in order to trigger commands for a specified interaction and
-   * modifiers flag.
+   * Use this method to add binding, in order to trigger commands for a specific bind
    *
-   * interaction can be a pressed key symbol, eg: "C",
+   * Bind modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
+   * Bind interaction can be a pressed key symbol, eg: "C",
    * or a dedicated key symbol for special keys:
    * "Left", "Right", "Up", "Down", "Space", "Enter", "Escape", "Question".
    *
-   * modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
+   * group is an optional arg to group bindings together for better display of the documentation.
+   * Groups are kept in order of addition when recovered using `getBindGroups`.
+   * Bindings are kept in order of addition when recovered using `getBindsForGroup`.
    *
    * documentationCallback is an optional function that returns a pair of string,
    * the first is the doc itself, the second is the current value as a string, if any.
-   * Use `getBindingsDocumentation` to access this doc.
+   * Use `getBindingDocumentation` to access this doc.
    *
-   * When the corresponding interaction and modifiers happens, the provided commands will be
-   * triggered using triggerCommand.
+   * When the corresponding bind happens, the provided commands will be triggered using triggerCommand.
    * Considering checking if an interaction exists or removing it before adding it to avoid
    * potential conflicts.
    *
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
    * is found.
    *
-   * Adding commands for an existing combination of interaction and modifier will throw a
-   * interactor::already_exists_exception.
+   * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
     std::string group = std::string(),
@@ -149,11 +153,9 @@ public:
 
   /**
    * See addBinding
-   * Convenience method to add a single command for an interaction, similar as
-   * addBinding(interaction, modifiers, {command})
+   * Convenience method to add a single command for an interaction, similar as `addBinding(bind, {command})`
    *
-   * Adding command for an existing combination of interaction and modifier will throw a
-   * interactor::already_exists_exception.
+   * Adding command for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
     std::string group = std::string(),
@@ -174,35 +176,28 @@ public:
    */
   virtual interactor& removeBinding(const interaction_bind_t& bind) = 0;
 
+  /**
+   * Return a vector of available bind groups, in order of addition
+   */
   virtual std::vector<std::string> getBindGroups() const = 0;
+
+  /**
+   * Return a vector of bind for the specified group, in order of addition
+   */
   virtual std::vector<interaction_bind_t> getBindsForGroup(std::string group) const = 0;
 
   /**
-   * Return a string vector of all currently defined bind interactions
+   * Get a pair of string documenting a binding.
+   * The first string is the documentation of the binding,
+   * eg: "Toggle anti aliasing", "Print scene descr to terminal", "Decrease light intensity"
+   * The second string is the current value of the binding,
+   * eg: "OFF", "" if there is no value or "1.12".
+   * If a binding was not documented on addition, the provided strings will be empty.
+   * The possible string can depends on the bindings but boolean value are expected to be
+   * "ON", "OFF", "N/A" (for optional values).
    */
-  //  virtual std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const = 0;
-
   virtual std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const = 0;
-
-  /**
-   * Get a structure of strings documenting bindings.
-   * This returns a vectors of tuple of strings, with one entry in the vector by documented binding
-   * added either by default or by `addBinding`.
-   * This is the method used to print the cheatsheet.
-   *
-   * The first string in the tuple is the binding interaction itself, as a string,
-   * eg: "A", "ANY+Question", "SHIFT+L".
-   * The second scring in the tuple is the documentation of the binding,
-   * eg: "Toggle anti aliasing", "Print scene descr to terminal", "Decrease light intensity"
-   * The third string of the tuple is the current value of the binding,
-   * eg: "OFF", "" if there is no value or "1.12".
-   * The possible string can depends on the bindings but boolean value are expected to be
-   * "ON", "OFF", "NO SET" (for optional values).
-   */
-  //  virtual std::vector<std::tuple<std::string, std::string, std::string>>
-  //  getBindingsDocumentation()
-  //    const = 0;
   ///@}
 
   /**
