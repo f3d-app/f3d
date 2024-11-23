@@ -954,7 +954,7 @@ int F3DStarter::Start(int argc, char** argv)
     if (this->Internals->AppOptions.BindingsList)
     {
       f3d::log::info("Bindings:");
-      for (std::string group : interactor.getBindGroups())
+      for (const std::string& group : interactor.getBindGroups())
       {
         f3d::log::info(" ", group, ":");
         for (const f3d::interaction_bind_t& bind : interactor.getBindsForGroup(group))
