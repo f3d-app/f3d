@@ -63,7 +63,7 @@ Camera Hotkeys:
 * <kbd>9</kbd>: isometric view camera.
 * <kbd>Enter</kbd>: reset the camera to its initial parameters.
 
-Other hotkeys are available:
+Other hotkeys and interactions are available:
 
 * <kbd>H</kbd>: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
 * <kbd>?</kbd>: key to print scene description to the terminal.
