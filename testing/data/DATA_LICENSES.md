@@ -58,7 +58,7 @@
 - 16bits.*: @bisechen: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
 - Rec709.exr: [Copyright 2006 Industrial Light & Magic](https://github.com/AcademySoftwareFoundation/openexr/blob/370db2835843ac75f85e1386c05455f26a6ff58c/website/test_images/Chromaticities/Rec709.rst): BSD-3-Clause
-- small.usdz: Copyright USD contributors: CC-BY 4.0
+- small.usdz: [Copyright USD contributors](https://github.com/usd-wg/assets/tree/main/full_assets/StandardShaderBall): [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 
 All other datasets are licensed under the BSD-3-Clause F3D license.
 
