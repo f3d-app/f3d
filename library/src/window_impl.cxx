@@ -452,11 +452,11 @@ void window_impl::UpdateDynamicOptions()
   {
     std::stringstream cheatSheetStream;
     cheatSheetStream << "\n";
-    for (std::string group : this->Internals->Interactor->getBindGroups())
+    for (const std::string& group : this->Internals->Interactor->getBindGroups())
     {
-      for (auto [mod, inter] : this->Internals->Interactor->getBindsForGroup(group))
+      for (const auto& bind : this->Internals->Interactor->getBindsForGroup(group))
       {
-        auto [doc, val] = this->Internals->Interactor->getBindingDocumentation({ mod, inter });
+        auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
         if (!doc.empty())
         {
           // XXX: This formatting will be reworked during ImGUI work
