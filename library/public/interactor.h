@@ -55,7 +55,7 @@ struct interaction_bind_t
       case ModifierKeys::ANY:
         return "Any+" + this->inter;
       default:
-        // No need to check for NONE (no log needed)
+        // No need to check for NONE
         return this->inter;
     }
   }
