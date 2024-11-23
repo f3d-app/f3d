@@ -138,9 +138,9 @@ public:
    * the first is the doc itself, the second is the current value as a string, if any.
    * Use `getBindingDocumentation` to access this doc.
    *
-   * When the corresponding bind happens, the provided commands will be triggered using triggerCommand.
-   * Considering checking if an interaction exists or removing it before adding it to avoid
-   * potential conflicts.
+   * When the corresponding bind happens, the provided commands will be triggered using
+   * triggerCommand. Considering checking if an interaction exists or removing it before adding it
+   * to avoid potential conflicts.
    *
    * ANY modifier interactions will only be triggered if no other interaction bind with modifier
    * is found.
@@ -153,7 +153,8 @@ public:
 
   /**
    * See addBinding
-   * Convenience method to add a single command for an interaction, similar as `addBinding(bind, {command})`
+   * Convenience method to add a single command for an interaction,
+   * similar as `addBinding(bind, {command})`
    *
    * Adding command for an existing bind will throw a interactor::already_exists_exception.
    */

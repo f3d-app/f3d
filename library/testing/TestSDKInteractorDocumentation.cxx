@@ -69,7 +69,8 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
   {
     // Test initial state
     test("Initial group size after init", inter.getBindGroups().size() == nGroup);
-    test("Initial nBindings Camera after init", inter.getBindsForGroup("Camera").size() == nBindingsCamera);
+    test("Initial nBindings Camera after init",
+      inter.getBindsForGroup("Camera").size() == nBindingsCamera);
     const auto& [doc, val] = inter.getBindingDocumentation({ mod_t::ANY, "5" });
     test("Initial doc and val after init", doc == initDoc && val == initVal);
   }
