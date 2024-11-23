@@ -893,9 +893,11 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
   }
   else
   {
+    // Add the bind to the group
     auto groupIt = this->Internals->GroupedBinds.emplace(std::move(group), bind);
     if (this->Internals->GroupedBinds.count(groupIt->first) == 1)
     {
+      // Add the group in order if first addition
       this->Internals->OrderedBindGroups.emplace_back(groupIt->first);
     }
   }
@@ -914,23 +916,27 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::str
 interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
 {
   this->Internals->Bindings.erase(bind);
+
+  // Look for the group of the removed bind
   std::string group;
   for (auto it = this->Internals->GroupedBinds.begin(); it != this->Internals->GroupedBinds.end();
        it++)
   {
     if (it->second == bind)
     {
+      // Binds are unique
+      // Erase the bind entry in the group
       group = it->first;
       this->Internals->GroupedBinds.erase(it);
       if (this->Internals->GroupedBinds.count(group) == 0)
       {
-        // We know the group is present and unique in the vector, so always erase once
+        // If it was the last one, remove it from the ordered group
+        // We know the group is present and unique in the vector, so only erase once
         auto vecIt = std::find(this->Internals->OrderedBindGroups.begin(),
           this->Internals->OrderedBindGroups.end(), group);
         assert(vecIt != this->Internals->OrderedBindGroups.end());
         this->Internals->OrderedBindGroups.erase(vecIt);
       }
-      // Binds are unique
       break;
     }
   }

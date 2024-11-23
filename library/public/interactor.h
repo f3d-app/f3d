@@ -169,7 +169,7 @@ public:
     std::string group = std::string(),
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr)
   {
-    return this->addBinding(bind, std::vector<std::string>(list), group, documentationCallback);
+    return this->addBinding(bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));
   }
 
   /**

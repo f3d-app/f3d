@@ -2,7 +2,6 @@
 
 #include <engine.h>
 #include <interactor.h>
-#include <options.h>
 
 using mod_t = f3d::interaction_bind_t::ModifierKeys;
 
@@ -14,7 +13,6 @@ constexpr std::string_view initVal = "N/A";
 int TestSDKInteractorDocumentation(int argc, char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
-  f3d::options& options = eng.getOptions();
   f3d::interactor& inter = eng.getInteractor();
 
   PseudoUnitTest test;
