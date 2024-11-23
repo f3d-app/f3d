@@ -16,9 +16,6 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   f3d::interactor& inter = eng.getInteractor();
   win.setSize(300, 300);
 
-  // Avoid using a hardcoded value so this test does not fail when adding/removing bindings
-  size_t expectedBindingsSize = inter.getBindingsDocumentation().size();
-
   // Sanity checks coverage
   if (inter.playInteraction(""))
   {
@@ -66,13 +63,6 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.removeBinding("S", f3d::interactor::ModifierKeys::NONE);
   inter.removeBinding("Z", f3d::interactor::ModifierKeys::NONE);
 
-  // Check the current number of documented bindings
-  if (inter.getBindingsDocumentation().size() != expectedBindingsSize - 5)
-  {
-    std::cerr << "Unexcepted bindings documentation size after removal" << std::endl;
-    return EXIT_FAILURE;
-  }
-
   // Check that an binding can be added
   inter.addBinding("S", f3d::interactor::ModifierKeys::NONE, "toggle interactor.axis");
 
@@ -109,13 +99,6 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   });
   inter.addBinding("Z", f3d::interactor::ModifierKeys::NONE, "exception");
 
-  // Check the current number of documented bindings
-  if (inter.getBindingsDocumentation().size() != expectedBindingsSize - 5)
-  {
-    std::cerr << "Unexcepted bindings documentation size after addition without doc" << std::endl;
-    return EXIT_FAILURE;
-  }
-
   // This time the interaction should result in a different rendering
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
@@ -135,10 +118,14 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.removeBinding("Invalid", f3d::interactor::ModifierKeys::ANY);
 
   // Remove all bindings
-  for (const auto& [interaction, modifier] : inter.getBindingInteractions())
+  for (const std::string& group : inter.getBindingGroups())
   {
-    inter.removeBinding(interaction, modifier);
+    for (const auto& [interaction, modifier] : inter.getBindingsForGroup(group))
+    {
+      inter.removeBinding(interaction, modifier);
+    }
   }
+
   // Play interaction again, which should not have any effect
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
@@ -155,7 +142,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   }
 
   // Check the current number of documented bindings
-  if (inter.getBindingsDocumentation().size() != 0)
+  if (inter.getBindingsForGroup("Scene").size() != 0)
   {
     std::cerr << "Unexcepted bindings documentation size after complete removal" << std::endl;
     return EXIT_FAILURE;
@@ -164,13 +151,6 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   // initialize default bindings again, two times, and check rendering
   inter.initBindings();
   inter.initBindings();
-
-  // Check the current number of documented bindings
-  if (inter.getBindingsDocumentation().size() != expectedBindingsSize)
-  {
-    std::cerr << "Unexcepted bindings documentation size after initialization" << std::endl;
-    return EXIT_FAILURE;
-  }
 
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))

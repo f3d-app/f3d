@@ -109,7 +109,7 @@ public:
    * interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
-    std::vector<std::string> commands,
+    std::vector<std::string> commands, std::string group = std::string(),
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) = 0;
 
   /**
@@ -121,18 +121,18 @@ public:
    * interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
-    std::string command,
+    std::string command, std::string group = std::string(),
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
-    std::initializer_list<std::string> list,
+    std::initializer_list<std::string> list, std::string group = std::string(),
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr)
   {
     return this->addBinding(
-      interaction, modifiers, std::vector<std::string>(list), documentationCallback);
+      interaction, modifiers, std::vector<std::string>(list), group, documentationCallback);
   }
 
   /**
@@ -140,10 +140,15 @@ public:
    */
   virtual interactor& removeBinding(std::string interaction, ModifierKeys modifiers) = 0;
 
+  virtual std::vector<std::string> getBindingGroups() const = 0;
+  virtual std::vector<std::pair<std::string, ModifierKeys>> getBindingsForGroup(std::string group) const = 0;
+
   /**
    * Return a string vector of all currently defined bind interactions
    */
-  virtual std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const = 0;
+//  virtual std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const = 0;
+
+  virtual std::pair<std::string, std::string> getBindingDocumentation(std::string interaction, ModifierKeys modifiers) const = 0;
 
   /**
    * Get a structure of strings documenting bindings.
@@ -160,8 +165,8 @@ public:
    * The possible string can depends on the bindings but boolean value are expected to be
    * "ON", "OFF", "NO SET" (for optional values).
    */
-  virtual std::vector<std::tuple<std::string, std::string, std::string>> getBindingsDocumentation()
-    const = 0;
+//  virtual std::vector<std::tuple<std::string, std::string, std::string>> getBindingsDocumentation()
+//    const = 0;
   ///@}
 
   /**

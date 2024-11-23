@@ -233,17 +233,17 @@ PYBIND11_MODULE(pyf3d, module)
     .def("init_bindings", &f3d::interactor::initBindings,
       "Remove all bindings and add default bindings")
     .def("add_binding",
-      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys, std::string,
+      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys, std::string, std::string,
         std::function<std::pair<std::string, std::string>()>>(&f3d::interactor::addBinding),
       "Add a binding command")
     .def("add_binding",
-      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys, std::vector<std::string>,
+      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys, std::vector<std::string>, std::string,
         std::function<std::pair<std::string, std::string>()>>(&f3d::interactor::addBinding),
       "Add binding commands")
     .def("remove_binding", &f3d::interactor::removeBinding, "Remove interaction commands")
-    .def("get_binding_interactions", &f3d::interactor::getBindingInteractions,
-      "Get all interaction binds")
-    .def("get_bindings_documentation", &f3d::interactor::getBindingsDocumentation);
+    .def("get_binding_groups", &f3d::interactor::getBindingGroups)
+    .def("get_bindings_for_group", &f3d::interactor::getBindingsForGroup)
+    .def("get_binding_documentation", &f3d::interactor::getBindingDocumentation);
 
   py::enum_<f3d::interactor::ModifierKeys>(interactor, "ModifierKeys")
     .value("ANY", f3d::interactor::ModifierKeys::ANY)
