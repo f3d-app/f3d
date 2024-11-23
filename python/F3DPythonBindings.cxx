@@ -218,8 +218,7 @@ PYBIND11_MODULE(pyf3d, module)
     .value("CTRL_SHIFT", f3d::interaction_bind_t::ModifierKeys::CTRL_SHIFT)
     .export_values();
 
-  interaction_bind
-    .def(py::init<const f3d::interaction_bind_t::ModifierKeys&, const std::string&>())
+  interaction_bind.def(py::init<const f3d::interaction_bind_t::ModifierKeys&, const std::string&>())
     .def_readwrite("mod", &f3d::interaction_bind_t::mod)
     .def_readwrite("inter", &f3d::interaction_bind_t::inter)
     .def("format", &f3d::interaction_bind_t::format);

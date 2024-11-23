@@ -65,7 +65,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "no-background", "", "No background when render to file", "<bool>", "1" },
       { "help", "h", "Print help", "", "" }, { "version", "", "Print version details", "", "" },
       { "readers-list", "", "Print the list of readers", "", "" },
-      { "bindings-list", "", "Print the list of interaction bindings", "", "" },
+      { "bindings-list", "", "Print the list of interaction bindings, ignored with `--no-render`", "", "" },
       { "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations", "<filePath/filename/fileStem>", "" },
       { "dry-run", "", "Do not read the configuration file", "<bool>", "1" },
       { "no-render", "", "Do not read the configuration file", "<bool>", "1" },

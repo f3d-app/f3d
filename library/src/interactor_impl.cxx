@@ -42,7 +42,6 @@ using mod_t = interaction_bind_t::ModifierKeys;
 class interactor_impl::internals
 {
 public:
-
   struct BindingCommands
   {
     std::vector<std::string> CommandVector;
@@ -399,14 +398,14 @@ public:
     }
 
     // Check for an interaction command with modifiers
-    const interaction_bind_t bind = { mod, interaction};
+    const interaction_bind_t bind = { mod, interaction };
     log::debug("Interaction: KeyPress ", bind.format());
 
     auto commandsIt = this->Bindings.find(bind);
     if (commandsIt == this->Bindings.end())
     {
       // Modifiers version not found, try ANY instead
-      commandsIt = this->Bindings.find({mod_t::ANY, interaction });
+      commandsIt = this->Bindings.find({ mod_t::ANY, interaction });
     }
 
     if (commandsIt != this->Bindings.end())
@@ -904,8 +903,8 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
-  std::string command, std::string group, documentation_callback_t documentationCallback)
+interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::string command,
+  std::string group, documentation_callback_t documentationCallback)
 {
   return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
     std::move(documentationCallback));
@@ -916,7 +915,8 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
 {
   this->Internals->Bindings.erase(bind);
   std::string group;
-  for (auto it = this->Internals->GroupedBinds.begin(); it != this->Internals->GroupedBinds.end(); it++)
+  for (auto it = this->Internals->GroupedBinds.begin(); it != this->Internals->GroupedBinds.end();
+       it++)
   {
     if (it->second == bind)
     {
@@ -925,7 +925,8 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
       if (this->Internals->GroupedBinds.count(group) == 0)
       {
         // We know the group is present and unique in the vector, so always erase once
-        auto vecIt = std::find(this->Internals->OrderedBindGroups.begin(), this->Internals->OrderedBindGroups.end(), group);
+        auto vecIt = std::find(this->Internals->OrderedBindGroups.begin(),
+          this->Internals->OrderedBindGroups.end(), group);
         assert(vecIt != this->Internals->OrderedBindGroups.end());
         this->Internals->OrderedBindGroups.erase(vecIt);
       }
@@ -946,7 +947,7 @@ std::vector<std::string> interactor_impl::getBindGroups() const
 std::vector<interaction_bind_t> interactor_impl::getBindsForGroup(std::string group) const
 {
   std::vector<interaction_bind_t> output;
-  for (auto[it, rangeEnd] = this->Internals->GroupedBinds.equal_range(group); it != rangeEnd; ++it)
+  for (auto [it, rangeEnd] = this->Internals->GroupedBinds.equal_range(group); it != rangeEnd; ++it)
   {
     output.emplace_back(it->second);
   }
@@ -954,7 +955,8 @@ std::vector<interaction_bind_t> interactor_impl::getBindsForGroup(std::string gr
 }
 
 //----------------------------------------------------------------------------
-std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(const interaction_bind_t& bind) const
+std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
+  const interaction_bind_t& bind) const
 {
   std::vector<std::tuple<std::string, std::string, std::string>> doc;
   auto docFunc = this->Internals->Bindings[bind].DocumentationCallback;
