@@ -1024,7 +1024,7 @@ if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
 endif()
 
 # Test bindings-list display
-f3d_test(NAME TestBindingsList ARGS --bindings-list REGEXP "ANY.Question Print scene descr to terminal")
+f3d_test(NAME TestBindingsList ARGS --bindings-list REGEXP "Any.Question Print scene descr to terminal")
 
 # Test rendering backends
 # For some reason the sanitizer detects leaks because of EGL and OSMesa

@@ -459,7 +459,7 @@ void window_impl::UpdateDynamicOptions()
         auto [doc, val] = this->Internals->Interactor->getBindingDocumentation({mod, inter});
         if (!doc.empty())
         {
-          // TODO bind
+          // XXX: This formatting will be reworked during ImGUI work
           cheatSheetStream << " " << inter << ": " << doc;
           if (!val.empty())
           {
