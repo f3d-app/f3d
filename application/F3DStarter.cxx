@@ -947,7 +947,7 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::log::info(" ", group, ":");
       for (const f3d::interaction_bind_t& bind : interactor.getBindsForGroup(group))
       {
-        // TODO max size ?
+        // XXX: Formating could be improved here
         auto [doc, val] = interactor.getBindingDocumentation(bind);
         F3DOptionsTools::PrintHelpPair(bind.format(), doc, 12);
       }

@@ -456,7 +456,7 @@ void window_impl::UpdateDynamicOptions()
     {
       for (auto [mod, inter] : this->Internals->Interactor->getBindsForGroup(group))
       {
-        auto [doc, val] = this->Internals->Interactor->getBindingDocumentation({mod, inter});
+        auto [doc, val] = this->Internals->Interactor->getBindingDocumentation({ mod, inter });
         if (!doc.empty())
         {
           // XXX: This formatting will be reworked during ImGUI work

@@ -33,8 +33,7 @@ struct interaction_bind_t
 
   bool operator<(const interaction_bind_t& bind) const
   {
-    return this->inter < bind.inter ||
-      (this->inter == bind.inter && this->mod < bind.mod);
+    return this->inter < bind.inter || (this->inter == bind.inter && this->mod < bind.mod);
   }
 
   bool operator==(const interaction_bind_t& bind) const
@@ -55,7 +54,7 @@ struct interaction_bind_t
       case ModifierKeys::ANY:
         return "Any+" + this->inter;
       default:
-        // No need to check for NONE (no log needed)
+        // No need to check for NONE
         return this->inter;
     }
   }
@@ -144,8 +143,8 @@ public:
    * Adding commands for an existing combination of interaction and modifier will throw a
    * interactor::already_exists_exception.
    */
-  virtual interactor& addBinding(const interaction_bind_t& bind,
-    std::vector<std::string> commands, std::string group = std::string(),
+  virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
+    std::string group = std::string(),
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) = 0;
 
   /**
@@ -156,19 +155,18 @@ public:
    * Adding command for an existing combination of interaction and modifier will throw a
    * interactor::already_exists_exception.
    */
-  virtual interactor& addBinding(const interaction_bind_t& bind,
-    std::string command, std::string group = std::string(),
+  virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
+    std::string group = std::string(),
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
-  interactor& addBinding(const interaction_bind_t& bind,
-    std::initializer_list<std::string> list, std::string group = std::string(),
+  interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
+    std::string group = std::string(),
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr)
   {
-    return this->addBinding(bind,
-      std::vector<std::string>(list), group, documentationCallback);
+    return this->addBinding(bind, std::vector<std::string>(list), group, documentationCallback);
   }
 
   /**
@@ -182,9 +180,10 @@ public:
   /**
    * Return a string vector of all currently defined bind interactions
    */
-//  virtual std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const = 0;
+  //  virtual std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const = 0;
 
-  virtual std::pair<std::string, std::string> getBindingDocumentation(const interaction_bind_t& bind) const = 0;
+  virtual std::pair<std::string, std::string> getBindingDocumentation(
+    const interaction_bind_t& bind) const = 0;
 
   /**
    * Get a structure of strings documenting bindings.
@@ -201,8 +200,9 @@ public:
    * The possible string can depends on the bindings but boolean value are expected to be
    * "ON", "OFF", "NO SET" (for optional values).
    */
-//  virtual std::vector<std::tuple<std::string, std::string, std::string>> getBindingsDocumentation()
-//    const = 0;
+  //  virtual std::vector<std::tuple<std::string, std::string, std::string>>
+  //  getBindingsDocumentation()
+  //    const = 0;
   ///@}
 
   /**

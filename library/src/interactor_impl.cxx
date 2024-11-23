@@ -46,7 +46,7 @@ public:
   struct BindingCommands
   {
     std::vector<std::string> CommandVector;
-    std::function<std::pair<std::string, std::string>()> DocumentationCallback;
+    documentation_callback_t DocumentationCallback;
   };
 
   internals(options& options, window_impl& window, scene_impl& scene, interactor_impl& inter)
@@ -782,7 +782,7 @@ interactor& interactor_impl::initBindings()
 
   // "ON/OFF/NO SET"
   auto docTglOpt = [](std::optional<bool> val) -> std::string
-  { return val.has_value() ? (val.value() ? "ON" : "OFF") : "NOT SET"; };
+  { return val.has_value() ? (val.value() ? "ON" : "OFF") : "N/A"; };
 
   // "animationName"
   auto animStr = [&]() -> std::string
@@ -882,7 +882,7 @@ interactor& interactor_impl::initBindings()
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
   std::vector<std::string> commands, std::string group,
-  std::function<std::pair<std::string, std::string>()> documentationCallback)
+  documentation_callback_t documentationCallback)
 {
   const auto [it, success] = this->Internals->Bindings.insert(
     { bind, { std::move(commands), std::move(documentationCallback) } });
@@ -905,7 +905,7 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
-  std::string command, std::string group, std::function<std::pair<std::string, std::string>()> documentationCallback)
+  std::string command, std::string group, documentation_callback_t documentationCallback)
 {
   return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
     std::move(documentationCallback));

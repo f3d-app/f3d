@@ -49,7 +49,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   // Check that adding an existing interaction command trigger an exception
   try
   {
-    inter.addBinding({mod_t::ANY, "7"}, "exception");
+    inter.addBinding({ mod_t::ANY, "7" }, "exception");
     std::cerr << "An exception has not been thrown when adding a existing interaction command"
               << std::endl;
     return EXIT_FAILURE;
@@ -59,32 +59,31 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   }
 
   // Remove bindings that will be triggered later and should not have any effect
-  inter.removeBinding({mod_t::ANY, "7"});
-  inter.removeBinding({mod_t::NONE, "Y"});
-  inter.removeBinding({mod_t::NONE, "B"});
-  inter.removeBinding({mod_t::NONE, "S"});
-  inter.removeBinding({mod_t::NONE, "Z"});
+  inter.removeBinding({ mod_t::ANY, "7" });
+  inter.removeBinding({ mod_t::NONE, "Y" });
+  inter.removeBinding({ mod_t::NONE, "B" });
+  inter.removeBinding({ mod_t::NONE, "S" });
+  inter.removeBinding({ mod_t::NONE, "Z" });
 
   // Check that an binding can be added
-  inter.addBinding({mod_t::NONE, "S"}, "toggle interactor.axis");
+  inter.addBinding({ mod_t::NONE, "S" }, "toggle interactor.axis");
 
   // Check CTRL modifier and that another interaction can be added on the same key with another
   // modifier
-  inter.addBinding({mod_t::CTRL, "S"}, "toggle render.grid.enable");
+  inter.addBinding({ mod_t::CTRL, "S" }, "toggle render.grid.enable");
 
   // Check invalid command for coverage
-  inter.addBinding({mod_t::CTRL, "P"}, "invalid command");
+  inter.addBinding({ mod_t::CTRL, "P" }, "invalid command");
 
   // Check SHIFT modifier
-  inter.addBinding(
-    {mod_t::SHIFT, "Y"}, R"(set ui.filename_info "My Own Filename")");
+  inter.addBinding({ mod_t::SHIFT, "Y" }, R"(set ui.filename_info "My Own Filename")");
 
   // Check CTRL_SHIFT modifier
-  inter.addBinding({mod_t::CTRL_SHIFT, "B"},
-    { "set ui.filename true", "set render.show_edges true" });
+  inter.addBinding(
+    { mod_t::CTRL_SHIFT, "B" }, { "set ui.filename true", "set render.show_edges true" });
 
   // Check ANY modifier
-  inter.addBinding({mod_t::ANY, "A"}, "toggle render.background.skybox");
+  inter.addBinding({ mod_t::ANY, "A" }, "toggle render.background.skybox");
 
   // Replace the add_files command
   inter.removeCommand("add_files");
@@ -99,7 +98,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.addCommand("exception", [&](const std::vector<std::string>&) {
     throw std::runtime_error("testing runtime exception");
   });
-  inter.addBinding({mod_t::NONE, "Z"}, "exception");
+  inter.addBinding({ mod_t::NONE, "Z" }, "exception");
 
   // This time the interaction should result in a different rendering
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
@@ -117,7 +116,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   }
 
   // Remove a non-existing interaction command
-  inter.removeBinding({mod_t::ANY, "Invalid"});
+  inter.removeBinding({ mod_t::ANY, "Invalid" });
 
   // Remove all bindings
   for (const std::string& group : inter.getBindGroups())

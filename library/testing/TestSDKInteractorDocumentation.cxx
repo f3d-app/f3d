@@ -23,14 +23,14 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
     // Test initial state
     test("Initial group size", inter.getBindGroups().size() == nGroup);
     test("Initial nBindings Scene", inter.getBindsForGroup("Scene").size() == nBindingsScene);
-    const auto& [doc, val] = inter.getBindingDocumentation({mod_t::NONE, "K"});
+    const auto& [doc, val] = inter.getBindingDocumentation({ mod_t::NONE, "K" });
     test("Initial doc and val", doc == initDoc && val == initVal);
   }
 
   {
     // Test invalid args
     test("Initial invalid group", inter.getBindsForGroup("Invalid").size() == 0);
-    const auto& [doc, val] = inter.getBindingDocumentation({mod_t::NONE, "Invalid"});
+    const auto& [doc, val] = inter.getBindingDocumentation({ mod_t::NONE, "Invalid" });
     test("Initial invalid doc and val", doc == "" && val == "");
   }
 
@@ -47,18 +47,19 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
     // Test empty state
     test("Empty group size", inter.getBindGroups().size() == 0);
     test("Empty nBindings Scene", inter.getBindsForGroup("Scene").size() == 0);
-    const auto& [doc, val] = inter.getBindingDocumentation({mod_t::NONE, "K"});
+    const auto& [doc, val] = inter.getBindingDocumentation({ mod_t::NONE, "K" });
     test("Empty doc and val", doc == "" && val == "");
   }
 
   // Add a dummy binding
-  inter.addBinding({mod_t::NONE, "DummyBind"}, "DummyCommand", "DummyGroup", []() ->std::pair<std::string, std::string>{ return std::pair("DummyDoc", "DummyVal"); });
+  inter.addBinding({ mod_t::NONE, "DummyBind" }, "DummyCommand", "DummyGroup",
+    []() -> std::pair<std::string, std::string> { return std::pair("DummyDoc", "DummyVal"); });
 
   {
     // Test dummy binding
     test("Dummy group size", inter.getBindGroups().size() == 1);
     test("Dummy nBindings DummyGroup", inter.getBindsForGroup("DummyGroup").size() == 1);
-    const auto& [doc, val] = inter.getBindingDocumentation({mod_t::NONE, "DummyBind"});
+    const auto& [doc, val] = inter.getBindingDocumentation({ mod_t::NONE, "DummyBind" });
     test("Dummy doc and val", doc == "DummyDoc" && val == "DummyVal");
   }
 
