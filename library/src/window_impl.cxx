@@ -460,7 +460,7 @@ void window_impl::UpdateDynamicOptions()
         if (!doc.empty())
         {
           // XXX: This formatting will be reworked during ImGUI work
-          cheatSheetStream << " " << inter << ": " << doc;
+          cheatSheetStream << " " << bind.format() << ": " << doc;
           if (!val.empty())
           {
             cheatSheetStream << " [" << val << "]";
