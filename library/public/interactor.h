@@ -148,7 +148,7 @@ public:
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = std::string(),
+    std::string group = {},
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) = 0;
 
   /**
@@ -159,17 +159,18 @@ public:
    * Adding command for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = std::string(),
+    std::string group = {},
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
-    std::string group = std::string(),
+    std::string group = {},
     std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr)
   {
-    return this->addBinding(bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));
+    return this->addBinding(
+      bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));
   }
 
   /**

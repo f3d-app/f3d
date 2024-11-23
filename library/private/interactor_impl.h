@@ -51,9 +51,6 @@ public:
     std::string group = std::string(),
     documentation_callback_t documentationCallback = nullptr) override;
   interactor& removeBinding(const interaction_bind_t& bind) override;
-  /*  std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const override;
-    std::vector<std::tuple<std::string, std::string, std::string>> getBindingsDocumentation()
-      const override;*/
   std::vector<std::string> getBindGroups() const override;
   std::vector<interaction_bind_t> getBindsForGroup(std::string group) const override;
   std::pair<std::string, std::string> getBindingDocumentation(
