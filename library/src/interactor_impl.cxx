@@ -245,7 +245,7 @@ public:
   {
     internals* self = static_cast<internals*>(clientData);
     vtkStringArray* filesArr = static_cast<vtkStringArray*>(callData);
-    const std::regex charsToEscape("([\"\\\\])");
+    const std::regex charsToEscape(R"(([\"\\]))");
     std::string filesString;
     for (int i = 0; i < filesArr->GetNumberOfTuples(); i++)
     {
