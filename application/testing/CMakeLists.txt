@@ -807,9 +807,8 @@ f3d_test(NAME TestInteractionDropSameFiles ARGS -x INTERACTION_CONFIGURE)#DropEv
 f3d_test(NAME TestInteractionDropFileWithQuotes ARGS -n INTERACTION REGEXP "\"'`Quotes\"'`.stl does not exist" NO_BASELINE)#X;DropEvent "'`Quotes"'`.stl"; 
 
 if(WIN32)
-  # Windows specific drop test, force it on as Windows usually do not enabled LONG_TIMEOUT
+  # Windows specific drop test, using backslashes
   f3d_test(NAME TestInteractionDropFileBackslashes ARGS -n INTERACTION_CONFIGURE)#X;DropEvent path\to\cow.vtp;
-  set_tests_properties(f3d::TestInteractionDropFileBackslashes PROPERTIES DISABLED OFF)
 endif()
 
 # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
