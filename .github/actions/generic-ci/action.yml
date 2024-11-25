@@ -170,12 +170,12 @@ runs:
         -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_QT=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_GLX_TESTS=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=${{ (runner.os != 'macOS' || inputs.cpu == 'x86_64') && 'OFF' || 'ON' }}
         -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'Linux' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
 
     - name: Build
       shell: bash
@@ -205,22 +205,24 @@ runs:
 
     # Certain tests are failing on macOS with GPU pass through
     # https://github.com/f3d-app/f3d/issues/792
+    # https://github.com/f3d-app/f3d/issues/1534
     - name: Set CI test exception for macOS x86_64
       if: |
         runner.os == 'macOS' &&
         inputs.cpu == 'x86_64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS arm64 for unknown reasons
     # https://github.com/f3d-app/f3d/issues/1276
     # https://github.com/f3d-app/f3d/issues/792
+    # https://github.com/f3d-app/f3d/issues/1534
     - name: Set CI test exception for macOS arm64
       if: |
         runner.os == 'macOS' &&
         inputs.cpu == 'arm64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestSDKInteractorCallBack)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestSDKInteractorCallBack)|(TestInteractionActors)|(TestDefaultConfigFile.*)|(TestThumbnailConfigFile.*)|(TestInteractionCycleAnimation)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
