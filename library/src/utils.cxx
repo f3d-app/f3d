@@ -34,12 +34,8 @@ std::vector<std::string> utils::tokenize(std::string_view str)
         if (escaped)
         {
           accumulate(c);
-          escaped = false;
         }
-        else
-        {
-          escaped = true;
-        }
+        escaped = !escaped;
         break;
       case ' ':
         if (!escaped && !quoted)
