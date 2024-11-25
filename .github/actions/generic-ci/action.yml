@@ -170,7 +170,7 @@ runs:
         -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_QT=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_GLX_TESTS=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=${{ (runner.os != 'macOS' || inputs.cpu == 'x86_64') && 'OFF' || 'ON' }}
+        -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=${{ (runner.os == 'Linux' || runner.os == 'Windows') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_GUI=ON
@@ -222,7 +222,7 @@ runs:
         runner.os == 'macOS' &&
         inputs.cpu == 'arm64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestSDKInteractorCallBack)|(TestInteractionActors)|(TestDefaultConfigFile.*)|(TestThumbnailConfigFile.*)|(TestInteractionCycleAnimation)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash

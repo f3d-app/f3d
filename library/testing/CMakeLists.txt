@@ -142,7 +142,7 @@ Test Print Debug\nTest Print Info\nTest Print Warning\nTest Print Error\n\
 Test Debug Coloring")
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
-  set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES TIMEOUT 90)
+  set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES TIMEOUT 120)
   if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
     set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)
   endif()

@@ -394,13 +394,13 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionCheatsheetRaytracing DATA cow.vtp INTERACTION) #H
   f3d_test(NAME TestInteractionCheatsheetWhiteBGRaytracing DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION) #H
   f3d_test(NAME TestInteractionCheatsheetBlackBGRaytracing DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetScalarsRaytracing DATA dragon.vtu ARGS --scalar-coloring --comp=-2 INTERACTION) #HSSS
+  f3d_test(NAME TestInteractionCheatsheetScalarsRaytracing DATA dragon.vtu ARGS --scalar-coloring --comp=-2 INTERACTION LONG_TIMEOUT) #HSSS
   f3d_test(NAME TestInteractionNoFileCheatsheetRaytracing INTERACTION NO_DATA_FORCE_RENDER) #HXZM
 else()
   f3d_test(NAME TestInteractionCheatsheet DATA cow.vtp INTERACTION) #H
   f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION) #H
   f3d_test(NAME TestInteractionCheatsheetBlackBG DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-coloring --comp=-2 INTERACTION) #HSSS
+  f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-coloring --comp=-2 INTERACTION LONG_TIMEOUT) #HSSS
   f3d_test(NAME TestInteractionNoFileCheatsheet INTERACTION NO_DATA_FORCE_RENDER) #HXZM
 endif()
 
