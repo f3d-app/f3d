@@ -448,8 +448,7 @@ public:
         }
         catch (const f3d::interactor::command_runtime_exception& ex)
         {
-          log::error("Interaction: error running command:\"", commandWithArgs, "\":");
-          log::error(ex.what());
+          log::error("Interaction: error running command: \"" + commandWithArgs + "\": " + ex.what());
         }
       }
     }
