@@ -178,11 +178,31 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
     }
 
     // For each config "pattern"
-    for (const auto& configBlock : json.items())
+    for (const auto& configBlock : json)
     {
-      // Add each config entry into an option dict
+      // Recover match if any
+      std::string match;
+      try
+      {
+        match = configBlock.at("match");
+      }
+      catch(nlohmann::json::exception&)
+      {
+        // No match defined, use a catch all regex
+        match = ".*";
+      }
+
+      // Recover options if any
+      nlohmann::ordered_json optionsBlock;
+      try
+      {
+        optionsBlock = configBlock.at("options");
+      }
+      catch(nlohmann::json::exception&){}
+
+      // Add each options config entry into an option dict
       F3DOptionsTools::OptionsDict entry;
-      for (const auto& item : configBlock.value().items())
+      for (const auto& item : optionsBlock.items())
       {
         if (item.value().is_number() || item.value().is_boolean())
         {
@@ -200,8 +220,8 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
         }
       }
 
-      // Emplace the option dict for that pattern into the config entries vector
-      confEntries.emplace_back(entry, configFilePath, configBlock.key());
+      // Emplace the option dict for that pattern match into the config entries vector
+      confEntries.emplace_back(entry, configFilePath, match);
     }
   }
   return confEntries;
