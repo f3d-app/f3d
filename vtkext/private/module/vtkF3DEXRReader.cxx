@@ -207,10 +207,6 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
     }
     else
     {
-      if (!(this->InternalFileName))
-      {
-        throw std::invalid_argument("Not filename in EXR Reader when no Memory Buffer is set.");
-      }
       Imf::RgbaInputFile file(this->InternalFileName);
       execute(file);
     }
