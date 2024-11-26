@@ -452,18 +452,21 @@ void window_impl::UpdateDynamicOptions()
   {
     std::stringstream cheatSheetStream;
     cheatSheetStream << "\n";
-    for (const auto& bind : this->Internals->Interactor->getBinds())
+    for (const std::string& group : this->Internals->Interactor->getBindGroups())
     {
-      auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
-      if (!doc.empty())
+      for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
       {
-        // XXX: This formatting will be reworked during ImGUI work
-        cheatSheetStream << " " << bind.format() << ": " << doc;
-        if (!val.empty())
+        auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
+        if (!doc.empty())
         {
-          cheatSheetStream << " [" << val << "]";
+          // XXX: This formatting will be reworked during ImGUI work
+          cheatSheetStream << " " << bind.format() << ": " << doc;
+          if (!val.empty())
+          {
+            cheatSheetStream << " [" << val << "]";
+          }
+          cheatSheetStream << "\n";
         }
-        cheatSheetStream << "\n";
       }
     }
     renderer->ConfigureCheatSheet(cheatSheetStream.str());

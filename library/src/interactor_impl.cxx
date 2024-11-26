@@ -757,113 +757,83 @@ interactor& interactor_impl::initBindings()
     }
   };
 
+  // "Cycle animation" , "animationName"
+  auto docAnim = [&](){ return std::pair("Cycle animation", this->Internals->AnimationManager->GetAnimationName()); };
+  
+  // "Cycle point/cell data coloring" , "POINT/CELL"
+  auto docField = [&](){ return std::pair(std::string("Cycle point/cell data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT")); };
+
+  // "Cycle array to color with" , "arrayName"
+  auto docArray = [&](){ 
+    return std::pair("Cycle array to color with", 
+      (opts.model.scivis.array_name.has_value()
+        ? shortName(opts.model.scivis.array_name.value(), 15) + (opts.model.scivis.enable ? "" : " (forced)")
+        : "OFF"));
+  };
+
+  // "Cycle component to color with" , "component"
+  auto docComp = [&](){ 
+    vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+    vtkF3DRenderer* ren =
+      vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    return std::pair("Cycle component to color with", ren->ComponentToString(opts.model.scivis.component));
+  };
+
   // "doc", ""
   auto docStr = [](const std::string& doc)
   { return std::pair(doc, ""); };
 
-  // "doc", "valueString()"
-  auto docStrVal = [](const std::string& doc, const std::function<std::string()>& valueString)
-  { return std::pair(doc, valueString());  };
-
-  // "value"
-  auto docDbl = [](double val, int precision)
+  // "doc", "value"
+  auto docDbl = [](const std::string& doc, const double& val)
   {
     std::stringstream valStream;
-    valStream.precision(precision);
+    valStream.precision(2);
     valStream << std::fixed;
     valStream << val;
-    return valStream.str();
+    return std::pair(doc, valStream.str());
   };
 
-  // "ON/OFF"
-  auto docTgl = [](bool val)
-  { return val ? "ON" : "OFF"; };
+  // "doc", "ON/OFF"
+  auto docTgl = [](const std::string& doc, const bool& val)
+  { return std::pair(doc, (val ? "ON" : "OFF")); };
 
-  // "ON/OFF/NO SET"
-  auto docTglOpt = [](std::optional<bool> val)
-  { return val.has_value() ? (val.value() ? "ON" : "OFF") : "N/A"; };
-
-  // "animationName"
-  auto animStr = [&]()
-  { return this->Internals->AnimationManager->GetAnimationName(); };
-
-  // "POINT/CELL"
-  auto pointCellStr = [&]()
-  { return opts.model.scivis.cells ? "CELL" : "POINT"; };
-
-  // "arrayName"
-  auto arrayStr = [&]()
-  {
-    return opts.model.scivis.array_name.has_value()
-      ? shortName(opts.model.scivis.array_name.value(), 15) + (opts.model.scivis.enable ? "" : " (forced)")
-      : "OFF";
-  };
-
-  // "component"
-  auto compStr = [&]()
-  {
-    vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-    vtkF3DRenderer* ren =
-      vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    return ren->ComponentToString(opts.model.scivis.component);
-  };
+  // "doc", "ON/OFF/N/A"
+  auto docTglOpt = [](const std::string& doc, const std::optional<bool>& val)
+  { return std::pair(doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "N/A")); };
 
   // Available standard keys: None
-  this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", std::bind(docStrVal, "Cycle animation", animStr));
-  this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", std::bind(docStrVal, "Cycle point/cell data coloring", pointCellStr));
-  this->addBinding({mod_t::NONE, "S"}, "cycle_coloring array", "Scene", std::bind(docStrVal, "Cycle array to color with", arrayStr));
-  this->addBinding({mod_t::NONE, "Y"}, "cycle_coloring component", "Scene", std::bind(docStrVal, "Cycle component to color with", compStr));
-  this->addBinding({mod_t::NONE, "B"}, "toggle ui.scalar_bar", "Scene", std::bind(docStrVal, "Toggle the scalar bar display",
-    [&]() { return docTgl(opts.ui.scalar_bar);}));
-  this->addBinding({mod_t::NONE, "P"}, "toggle render.effect.translucency_support", "Scene", std::bind(docStrVal, "Toggle scalar bar display",
-    [&]() { return docTgl(opts.render.effect.translucency_support);}));
-  this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docStrVal, "Toggle ambient occlusion",
-    [&]() { return docTgl(opts.render.effect.ambient_occlusion);}));
-  this->addBinding({mod_t::NONE, "A"}, "toggle render.effect.anti_aliasing","Scene", std::bind(docStrVal, "Toggle anti-aliasing",
-    [&]() { return docTgl(opts.render.effect.anti_aliasing);}));
-  this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docStrVal, "Toggle tone mapping",
-    [&]() { return docTgl(opts.render.effect.tone_mapping);}));
-  this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docStrVal, "Toggle edges display",
-    [&]() { return docTglOpt(opts.render.show_edges);}));
-  this->addBinding({mod_t::NONE, "X"}, "toggle interactor.axis","Scene", std::bind(docStrVal, "Toggle axes display",
-    [&]() { return docTgl(opts.interactor.axis);}));
-  this->addBinding({mod_t::NONE, "G"}, "toggle render.grid.enable","Scene", std::bind(docStrVal, "Toggle grid display",
-    [&]() { return docTgl(opts.render.grid.enable);}));
-  this->addBinding({mod_t::NONE, "N"}, "toggle ui.filename","Scene", std::bind(docStrVal, "Toggle filename display",
-    [&]() { return docTgl(opts.ui.filename);}));
-  this->addBinding({mod_t::NONE, "M"}, "toggle ui.metadata","Scene", std::bind(docStrVal, "Toggle metadata display",
-    [&]() { return docTgl(opts.ui.metadata);}));
-  this->addBinding({mod_t::NONE, "Z"}, "toggle_fps","Scene", std::bind(docStrVal, "Toggle FPS counter display",
-    [&]() { return docTgl(opts.ui.fps);}));
+  this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim);
+  this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", docField);
+  this->addBinding({mod_t::NONE, "S"}, "cycle_coloring array", "Scene", docArray);
+  this->addBinding({mod_t::NONE, "Y"}, "cycle_coloring component", "Scene", docComp);
+  this->addBinding({mod_t::NONE, "B"}, "toggle ui.scalar_bar", "Scene", std::bind(docTgl, "Toggle the scalar bar display", std::cref(opts.ui.scalar_bar)));
+  this->addBinding({mod_t::NONE, "P"}, "toggle render.effect.translucency_support", "Scene", std::bind(docTgl, "Toggle Translucency", std::cref(opts.render.effect.translucency_support)));
+  this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docTgl, "Toggle ambient occlusion", std::cref(opts.render.effect.ambient_occlusion)));
+  this->addBinding({mod_t::NONE, "A"}, "toggle render.effect.anti_aliasing","Scene", std::bind(docTgl, "Toggle anti-aliasing", std::cref(opts.render.effect.anti_aliasing)));
+  this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docTgl, "Toggle tone mapping", std::cref(opts.render.effect.tone_mapping)));
+  this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docTglOpt, "Toggle edges display", std::cref(opts.render.show_edges)));
+  this->addBinding({mod_t::NONE, "X"}, "toggle interactor.axis","Scene", std::bind(docTgl, "Toggle axes display", std::cref(opts.interactor.axis)));
+  this->addBinding({mod_t::NONE, "G"}, "toggle render.grid.enable","Scene", std::bind(docTgl, "Toggle grid display", std::cref(opts.render.grid.enable)));
+  this->addBinding({mod_t::NONE, "N"}, "toggle ui.filename","Scene", std::bind(docTgl, "Toggle filename display", std::cref(opts.ui.filename)));
+  this->addBinding({mod_t::NONE, "M"}, "toggle ui.metadata","Scene", std::bind(docTgl, "Toggle metadata display", std::cref(opts.ui.metadata)));
+  this->addBinding({mod_t::NONE, "Z"}, "toggle_fps","Scene", std::bind(docTgl, "Toggle FPS counter display", std::cref(opts.ui.fps)));
 #if F3D_MODULE_RAYTRACING
-  this->addBinding({mod_t::NONE, "R"}, "toggle render.raytracing.enable","Scene", std::bind(docStrVal, "Toggle raytracing rendering",
-    [&]() { return docTgl(opts.render.raytracing.enable);}));
-  this->addBinding({mod_t::NONE, "D"}, "toggle render.raytracing.denoise","Scene", std::bind(docStrVal, "Toggle denoising when raytracing",
-    [&]() { return docTgl(opts.render.raytracing.denoise);}));
+  this->addBinding({mod_t::NONE, "R"}, "toggle render.raytracing.enable","Scene", std::bind(docTgl, "Toggle raytracing rendering", std::cref(opts.render.raytracing.enable)));
+  this->addBinding({mod_t::NONE, "D"}, "toggle render.raytracing.denoise","Scene", std::bind(docTgl, "Toggle denoising when raytracing", std::cref(opts.render.raytracing.denoise)));
 #endif
-  this->addBinding({mod_t::NONE, "V"}, "toggle_volume_rendering","Scene", std::bind(docStrVal, "Toggle volume rendering",
-    [&]() { return docTgl(opts.model.volume.enable);}));
-  this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docStrVal, "Toggle inverse volume opacity",
-    [&]() { return docTgl(opts.model.volume.inverse);}));
-  this->addBinding({mod_t::NONE, "O"}, "toggle model.point_sprites.enable","Scene", std::bind(docStrVal, "Toggle point sprites rendering",
-    [&]() { return docTgl(opts.model.point_sprites.enable);}));
-  this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur","Scene", std::bind(docStrVal, "Toggle blur background",
-    [&]() { return docTgl(opts.render.background.blur);}));
-  this->addBinding({mod_t::NONE, "K"}, "toggle interactor.trackball","Scene", std::bind(docStrVal, "Toggle trackball interaction",
-    [&]() { return docTgl(opts.interactor.trackball);}));
-  this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docStrVal, "Toggle HDRI ambient lighting",
-    [&]() { return docTgl(opts.render.hdri.ambient);}));
-  this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docStrVal, "Toggle HDRI skybox",
-    [&]() { return docTgl(opts.render.background.skybox);}));
-  this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docStrVal, "Increase lights intensity",
-    [&]() { return docDbl(opts.render.light.intensity, 2);}));
-  this->addBinding({mod_t::SHIFT, "L"}, "decrease_light_intensity", "Scene", std::bind(docStrVal, "Decrease lights intensity",
-    [&]() { return docDbl(opts.render.light.intensity, 2);}));
+  this->addBinding({mod_t::NONE, "V"}, "toggle_volume_rendering","Scene", std::bind(docTgl, "Toggle volume rendering", std::cref(opts.model.volume.enable)));
+  this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docTgl, "Toggle inverse volume opacity", std::cref(opts.model.volume.inverse)));
+  this->addBinding({mod_t::NONE, "O"}, "toggle model.point_sprites.enable","Scene", std::bind(docTgl, "Toggle point sprites rendering", std::cref(opts.model.point_sprites.enable)));
+  this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur","Scene", std::bind(docTgl, "Toggle blur background", std::cref(opts.render.background.blur)));
+  this->addBinding({mod_t::NONE, "K"}, "toggle interactor.trackball","Scene", std::bind(docTgl, "Toggle trackball interaction", std::cref(opts.interactor.trackball)));
+  this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docTgl, "Toggle HDRI ambient lighting", std::cref(opts.render.hdri.ambient)));
+  this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docTgl, "Toggle HDRI skybox", std::cref(opts.render.background.skybox)));
+  this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)));
+  this->addBinding({mod_t::SHIFT, "L"}, "decrease_light_intensity", "Scene", std::bind(docDbl, "Decrease lights intensity", std::cref(opts.render.light.intensity)));
   this->addBinding({mod_t::ANY, "1"}, "set_camera front", "Camera", std::bind(docStr, "Front View camera"));
   this->addBinding({mod_t::ANY, "3"}, "set_camera right", "Camera", std::bind(docStr, "Right View camera"));
   this->addBinding({mod_t::ANY, "4"}, "roll_camera -90", "Camera", std::bind(docStr, "Rotate camera right"));
-  this->addBinding({mod_t::ANY, "5"}, "toggle scene.camera.orthographic", "Camera", std::bind(docStrVal, "Toggle Orthographic Projection",
-    [&]() { return docTglOpt(opts.scene.camera.orthographic);}));
+  this->addBinding({mod_t::ANY, "5"}, "toggle scene.camera.orthographic", "Camera", std::bind(docTglOpt, "Toggle Orthographic Projection", std::cref(opts.scene.camera.orthographic)));
   this->addBinding({mod_t::ANY, "6"}, "roll_camera 90", "Camera", std::bind(docStr, "Rotate camera left"));
   this->addBinding({mod_t::ANY, "7"}, "set_camera top", "Camera", std::bind(docStr, "Top View camera"));
   this->addBinding({mod_t::ANY, "9"}, "set_camera isometric", "Camera", std::bind(docStr, "Isometric View camera"));
