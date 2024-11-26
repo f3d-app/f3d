@@ -116,7 +116,7 @@ public:
   ///@}
 
   ///@{ @name Bindings
-  using documentation_callback_t = std::function < std::pair<std::string, std::string>();
+  using documentation_callback_t = std::function < std::pair<std::string, std::string>()>;
 
   /**
    * Remove all existing interaction commands and add all default bindings
