@@ -53,6 +53,7 @@ public:
   interactor& removeBinding(const interaction_bind_t& bind) override;
   std::vector<std::string> getBindGroups() const override;
   std::vector<interaction_bind_t> getBindsForGroup(std::string group) const override;
+  std::vector<interaction_bind_t> getBinds() const override;
   std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const override;
 

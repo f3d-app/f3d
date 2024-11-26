@@ -45,6 +45,7 @@ def test_binding():
         for bind in binds:
             inter.remove_binding(bind)
     assert len(inter.get_bind_groups()) == 0
+    assert len(inter.get_binds()) == 0
 
     # Smoke test
     inter.add_binding(
@@ -77,4 +78,7 @@ def test_binding():
         "DummyGroup",
         doc_fn,
     )
+    assert len(inter.get_bind_groups()) == 1
+    assert len(inter.get_binds()) == 5
+
     inter.init_bindings()

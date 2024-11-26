@@ -258,6 +258,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("remove_binding", &f3d::interactor::removeBinding, "Remove interaction commands")
     .def("get_bind_groups", &f3d::interactor::getBindGroups)
     .def("get_binds_for_group", &f3d::interactor::getBindsForGroup)
+    .def("get_binds", &f3d::interactor::getBinds)
     .def("get_binding_documentation", &f3d::interactor::getBindingDocumentation);
 
   // f3d::mesh_t

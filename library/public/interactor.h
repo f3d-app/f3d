@@ -174,7 +174,8 @@ public:
   }
 
   /**
-   * Remove binding corresponding to provided interaction and modifiers
+   * Remove binding corresponding to provided bind.
+   * Does not do anything if the provided bind does not exists.
    */
   virtual interactor& removeBinding(const interaction_bind_t& bind) = 0;
 
@@ -185,8 +186,15 @@ public:
 
   /**
    * Return a vector of bind for the specified group, in order of addition
+   *
+   * Geting binds for a group that does not exists will throw a does_not_exists_exception.
    */
   virtual std::vector<interaction_bind_t> getBindsForGroup(std::string group) const = 0;
+
+  /**
+   * Return a vector of all binds, in order of addition
+   */
+  virtual std::vector<interaction_bind_t> getBinds() const = 0;
 
   /**
    * Get a pair of string documenting a binding.
@@ -197,6 +205,8 @@ public:
    * If a binding was not documented on addition, the provided strings will be empty.
    * The possible string can depends on the bindings but boolean value are expected to be
    * "ON", "OFF", "N/A" (for optional values).
+   *
+   * Geting documentation for a bind that does not exists will throw a does_not_exists_exception.
    */
   virtual std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const = 0;
@@ -258,6 +268,15 @@ public:
   struct already_exists_exception : public exception
   {
     explicit already_exists_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by the interactor
+   * when looking for something that does not exists
+   */
+  struct does_not_exists_exception : public exception
+  {
+    explicit does_not_exists_exception(const std::string& what = "");
   };
 
   /**

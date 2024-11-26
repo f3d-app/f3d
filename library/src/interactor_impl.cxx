@@ -957,6 +957,21 @@ std::vector<interaction_bind_t> interactor_impl::getBindsForGroup(std::string gr
   {
     output.emplace_back(it->second);
   }
+  if (output.size() == 0)
+  {
+    throw interactor_impl::does_not_exists_exception(std::string("Bind: There is no binds for ") + group + " group");
+  }
+  return output;
+}
+
+//----------------------------------------------------------------------------
+std::vector<interaction_bind_t> interactor_impl::getBinds() const
+{
+  std::vector<interaction_bind_t> output;
+  for (const auto& [bind, command] : this->Internals->Bindings)
+  {
+    output.emplace_back(bind);
+  }
   return output;
 }
 
@@ -965,7 +980,12 @@ std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
   const interaction_bind_t& bind) const
 {
   std::vector<std::tuple<std::string, std::string, std::string>> doc;
-  auto docFunc = this->Internals->Bindings[bind].DocumentationCallback;
+  auto it =  this->Internals->Bindings.find(bind);
+  if (it == this->Internals->Bindings.end())
+  {
+    throw interactor_impl::does_not_exists_exception(std::string("Bind: ") + bind.format() + " does not exists");
+  }
+  auto docFunc = it->second.DocumentationCallback;
   return docFunc ? docFunc() : std::make_pair(std::string(), std::string());
 }
 
