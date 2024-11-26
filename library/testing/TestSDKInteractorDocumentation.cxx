@@ -35,7 +35,7 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
 
     test.expect<f3d::interactor::does_not_exists_exception>("Initial invalid bind", [&]() {
       inter.getBindingDocumentation({ mod_t::ANY, "Invalid" });
-      });
+    });
   }
 
   // Remove all bindings
