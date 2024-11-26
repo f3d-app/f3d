@@ -33,12 +33,12 @@ struct interaction_bind_t
 
   bool operator<(const interaction_bind_t& bind) const
   {
-    return this->inter < bind.inter || (this->inter == bind.inter && this->mod < bind.mod);
+    return this->mod < bind.mod || (this->mod == bind.mod && this->inter < bind.inter);
   }
 
   bool operator==(const interaction_bind_t& bind) const
   {
-    return this->inter == bind.inter && this->mod == bind.mod;
+    return  this->mod == bind.mod && this->inter == bind.inter;
   }
 
   /**
@@ -116,6 +116,8 @@ public:
   ///@}
 
   ///@{ @name Bindings
+  using documentation_callback_t = std::function<std::pair<std::string, std::string>();
+
   /**
    * Remove all existing interaction commands and add all default bindings
    * see INTERACTIONS.md for details.
@@ -148,8 +150,7 @@ public:
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = {},
-    std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) = 0;
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
 
   /**
    * See addBinding
@@ -159,15 +160,13 @@ public:
    * Adding command for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = {},
-    std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr) = 0;
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
-    std::string group = {},
-    std::function<std::pair<std::string, std::string>()> documentationCallback = nullptr)
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr)
   {
     return this->addBinding(
       bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));
@@ -187,7 +186,7 @@ public:
   /**
    * Return a vector of bind for the specified group, in order of addition
    *
-   * Geting binds for a group that does not exists will throw a does_not_exists_exception.
+   * Getting binds for a group that does not exists will throw a does_not_exists_exception.
    */
   virtual std::vector<interaction_bind_t> getBindsForGroup(std::string group) const = 0;
 
@@ -206,7 +205,7 @@ public:
    * The possible string can depends on the bindings but boolean value are expected to be
    * "ON", "OFF", "N/A" (for optional values).
    *
-   * Geting documentation for a bind that does not exists will throw a does_not_exists_exception.
+   * Getting documentation for a bind that does not exists will throw a does_not_exists_exception.
    */
   virtual std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const = 0;

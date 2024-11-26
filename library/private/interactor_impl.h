@@ -42,7 +42,6 @@ public:
   std::vector<std::string> getCommandActions() const override;
   bool triggerCommand(std::string_view command) override;
 
-  using documentation_callback_t = std::function<std::pair<std::string, std::string>()>;
   interactor& initBindings() override;
   interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
     std::string group = std::string(),

@@ -30,13 +30,11 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
 
   {
     // check exceptions for invalid args
-    test.expect<f3d::interactor::does_not_exists_exception>("Initial invalid group", [&]() {
-      inter.getBindsForGroup("Invalid");
-      });
+    test.expect<f3d::interactor::does_not_exists_exception>(
+      "Initial invalid group", [&]() { inter.getBindsForGroup("Invalid"); });
 
-    test.expect<f3d::interactor::does_not_exists_exception>("Initial invalid bind", [&]() {
-      inter.getBindingDocumentation({ mod_t::ANY, "Invalid" });
-      });
+    test.expect<f3d::interactor::does_not_exists_exception>(
+      "Initial invalid bind", [&]() { inter.getBindingDocumentation({ mod_t::ANY, "Invalid" }); });
   }
 
   // Remove all bindings
@@ -53,13 +51,11 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
     test("Empty group size", inter.getBindGroups().size() == 0);
     test("Empty binds size", inter.getBinds().size() == 0);
     // check exceptions for invalid args
-    test.expect<f3d::interactor::does_not_exists_exception>("Empty group", [&]() {
-      inter.getBindsForGroup("Camera");
-      });
+    test.expect<f3d::interactor::does_not_exists_exception>(
+      "Empty group", [&]() { inter.getBindsForGroup("Camera"); });
 
-    test.expect<f3d::interactor::does_not_exists_exception>("Empty bind", [&]() {
-      inter.getBindingDocumentation({ mod_t::ANY, "5" });
-      });
+    test.expect<f3d::interactor::does_not_exists_exception>(
+      "Empty bind", [&]() { inter.getBindingDocumentation({ mod_t::ANY, "5" }); });
   }
 
   // Add a dummy binding
@@ -82,8 +78,8 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
     // Test initial state
     test("Initial group size after init", inter.getBindGroups().size() == nGroup);
     test("Initial binds size", inter.getBinds().size() == nBinds);
-    test("Initial nBinds Camera after init",
-      inter.getBindsForGroup("Camera").size() == nBindsCamera);
+    test(
+      "Initial nBinds Camera after init", inter.getBindsForGroup("Camera").size() == nBindsCamera);
     const auto& [doc, val] = inter.getBindingDocumentation({ mod_t::ANY, "5" });
     test("Initial doc and val after init", doc == initDoc && val == initVal);
   }
