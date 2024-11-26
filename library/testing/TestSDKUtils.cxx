@@ -50,6 +50,10 @@ int TestSDKUtils(int argc, char* argv[])
     f3d::utils::tokenize(R"(set render.hdri.file file\ pa\th\ esc\ape)") ==
       std::vector<std::string>{ "set", "render.hdri.file", "file path escape" });
 
+  test("tokenize backslashes",
+    f3d::utils::tokenize(R"(set render.hdri.file file\\pa\\th\\backsl\\ashes)") ==
+      std::vector<std::string>{ "set", "render.hdri.file", R"(file\pa\th\backsl\ashes)" });
+
   test.expect<f3d::utils::tokenize_exception>("tokenize_exception with incomplete quotes",
     [&]() { f3d::utils::tokenize(R"(set render.hdri.file "file path back)"); });
 

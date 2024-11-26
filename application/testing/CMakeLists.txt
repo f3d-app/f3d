@@ -804,6 +804,14 @@ f3d_test(NAME TestInteractionDropFiles ARGS -n INTERACTION_CONFIGURE)#X;DropEven
 f3d_test(NAME TestInteractionMultiFileDrop ARGS --multi-file-mode=all -e INTERACTION_CONFIGURE) #DropEvent mb_1_0.vtp mb_2_0.vtp
 f3d_test(NAME TestInteractionDropSameFiles ARGS -x INTERACTION_CONFIGURE)#DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
 
+# A proper test for this is not possible because of the double quotes
+f3d_test(NAME TestInteractionDropFileWithQuotes ARGS -n INTERACTION REGEXP "\"'`Quotes\"'`.stl does not exist" NO_BASELINE)#X;DropEvent "'`Quotes"'`.stl"; 
+
+if(WIN32)
+  # Windows specific drop test, using backslashes
+  f3d_test(NAME TestInteractionDropFileBackslashes ARGS -n INTERACTION_CONFIGURE)#X;DropEvent path\to\cow.vtp;
+endif()
+
 # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEven palermo.hdr;
