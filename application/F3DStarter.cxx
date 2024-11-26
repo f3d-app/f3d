@@ -37,6 +37,7 @@
 #include <cassert>
 #include <filesystem>
 #include <iomanip>
+#include <fstream>
 #include <iostream>
 #include <mutex>
 #include <regex>
@@ -84,6 +85,7 @@ public:
     double RefThreshold;
     std::string InteractionTestRecordFile;
     std::string InteractionTestPlayFile;
+    std::string CommandScriptFile; 
   };
 
   void SetupCamera(const CameraConfiguration& camConf)
@@ -591,6 +593,8 @@ public:
       f3d::options::parse<std::string>(appOptions.at("interaction-test-record"));
     this->AppOptions.InteractionTestPlayFile =
       f3d::options::parse<std::string>(appOptions.at("interaction-test-play"));
+    this->AppOptions.CommandScriptFile = 
+      f3d::options::parse<std::string>(appOptions.at("command-script"));
   }
 
   void UpdateInterdependentOptions()
@@ -952,6 +956,31 @@ int F3DStarter::Start(int argc, char** argv)
     {
       if (!interactor.recordInteraction(interactionTestRecordFile))
       {
+        return EXIT_FAILURE;
+      }
+    }
+
+    // Process Command Script file
+    const std::string& commandScriptFile = 
+      this->Internals->AppOptions.CommandScriptFile;
+    if (!commandScriptFile.empty())
+    {
+      std::ifstream scriptFile(commandScriptFile);
+      if (scriptFile.is_open())
+      {
+        std::string command;
+        while (std::getline(scriptFile, command))
+        {
+          if (!command.empty() && command[0] != '#')
+          {
+            interactor.triggerCommand(command);
+          }
+        }
+        scriptFile.close();
+      }
+      else
+      {
+        f3d::log::error("Unable to open command script file");
         return EXIT_FAILURE;
       }
     }

@@ -53,6 +53,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "ref-threshold", "0.05" },
   { "interaction-test-record", "" },
   { "interaction-test-play", "" },
+  { "command-script", "" },
 };
 
 /**
