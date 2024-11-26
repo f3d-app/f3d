@@ -10,6 +10,7 @@
 #include <ImfArray.h>
 #include <ImfRgbaFile.h>
 
+#include <cstring>
 #include <sstream>
 #include <thread>
 
@@ -30,7 +31,7 @@ void vtkF3DEXRReader::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 void vtkF3DEXRReader::ExecuteInformation()
 {
-  // XXX: Needed because of VTK initialize file pattern in the constructor for some reasons
+  //  XXX: Needed because of VTK initialize file pattern in the constructor for some reasons
   delete[] this->FilePattern;
   this->FilePattern = nullptr;
 
@@ -38,13 +39,13 @@ void vtkF3DEXRReader::ExecuteInformation()
   this->ComputeInternalFileName(this->DataExtent[4]);
   if (this->InternalFileName == nullptr || this->InternalFileName[0] == '\0')
   {
-    return;
+    // If we have no file then maybe we have the file in memory
+    if (!this->MemoryBuffer)
+      return;
   }
 
-  try
+  auto execute = [&](Imf::RgbaInputFile& file)
   {
-    Imf::RgbaInputFile file(this->InternalFileName);
-
     Imath::Box2i dw = file.dataWindow();
     this->DataExtent[0] = dw.min.x;
     this->DataExtent[1] = dw.max.x;
@@ -56,6 +57,21 @@ void vtkF3DEXRReader::ExecuteInformation()
     {
       throw std::runtime_error("only RGB and RGBA channels are supported");
     }
+  };
+
+  try
+  {
+    if (this->MemoryBuffer)
+    {
+      MemStream memoryStream("EXRmemoryStream", this->MemoryBuffer, this->MemoryBufferLength);
+      Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
+      execute(file);
+    }
+    else
+    {
+      Imf::RgbaInputFile file(this->InternalFileName);
+      execute(file);
+    }
   }
   catch (const std::exception& e)
   {
@@ -65,13 +81,14 @@ void vtkF3DEXRReader::ExecuteInformation()
 
   this->SetNumberOfScalarComponents(3);
   this->SetDataScalarTypeToFloat();
-
+  std::cout << "made it ExecuteInformation\n";
   this->vtkImageReader::ExecuteInformation();
 }
 
 //------------------------------------------------------------------------------
 int vtkF3DEXRReader::CanReadFile(const char* fname)
 {
+  std::cout << "can read\n";
   // get the magic number by reading in a file
   vtksys::ifstream ifs(fname, vtksys::ifstream::in);
 
@@ -95,10 +112,12 @@ int vtkF3DEXRReader::CanReadFile(const char* fname)
 //------------------------------------------------------------------------------
 void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInformation* outInfo)
 {
+  std::cout << "execute with info exr\n";
   vtkImageData* data = this->AllocateOutputData(output, outInfo);
 
   if (this->UpdateExtentIsEmpty(outInfo, output))
   {
+    std::cout << "ret 1\n";
     return;
   }
 
@@ -106,23 +125,18 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
   if (!scalars)
   {
     vtkErrorMacro(<< "Could not find expected scalar array");
+    std::cout << "ret 2\n";
     return;
   }
-
+  std::cout << "setting pix\n";
   scalars->SetName("Pixels");
   float* dataPtr = scalars->GetPointer(0);
 
-  try
+  auto execute = [&](Imf::RgbaInputFile& file)
   {
-    assert(this->InternalFileName);
-    Imf::setGlobalThreadCount(std::thread::hardware_concurrency());
-    Imf::RgbaInputFile file(this->InternalFileName);
-
     Imf::Array2D<Imf::Rgba> pixels(this->GetHeight(), this->GetWidth());
-
     file.setFrameBuffer(&pixels[0][0], 1, this->GetWidth());
     file.readPixels(this->DataExtent[2], this->DataExtent[3]);
-
     for (int y = this->GetHeight() - 1; y >= 0; y--)
     {
       for (int x = 0; x < this->GetWidth(); x++)
@@ -134,12 +148,49 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
         dataPtr += 3;
       }
     }
+  };
+
+  try
+  {
+    assert(this->InternalFileName);
+    Imf::setGlobalThreadCount(std::thread::hardware_concurrency());
+
+    if (this->MemoryBuffer)
+    {
+      MemStream memoryStream("EXRmemoryStream", this->MemoryBuffer, this->MemoryBufferLength);
+      Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
+      execute(file);
+    }
+    else
+    {
+      Imf::RgbaInputFile file(this->InternalFileName);
+      execute(file);
+    }
+    std::cout << "also made it\n";
   }
   catch (const std::exception& e)
   {
     vtkErrorMacro("Error reading EXR file: " << e.what());
     return;
   }
+}
+
+//------------------------------------------------------------------------------
+/**
+ * Read from memory instead of file
+ */
+void vtkF3DEXRReader::SetMemoryBuffer(const void* buff)
+{
+  this->MemoryBuffer = buff;
+}
+
+//------------------------------------------------------------------------------
+/**
+ * Specify the in memory image buffer length.
+ */
+void vtkF3DEXRReader::SetMemoryBufferLength(vtkIdType buflen)
+{
+  this->MemoryBufferLength = buflen;
 }
 
 //------------------------------------------------------------------------------
@@ -152,4 +203,16 @@ int vtkF3DEXRReader::GetWidth() const
 int vtkF3DEXRReader::GetHeight() const
 {
   return this->DataExtent[3] - this->DataExtent[2] + 1;
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DEXRReader::MemStream::read(char c[], int n)
+{
+  if (pos + n <= buflen)
+  {
+    memcpy(c, buffer + pos, n);
+    pos += n;
+    return true;
+  }
+  return false;
 }

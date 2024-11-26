@@ -883,6 +883,7 @@ public:
         if (!asset)
         {
           // cannot get USD asset
+          std::cout << "HEREHRHEHRE no asset" << std::endl;
           return nullptr;
         }
 
@@ -890,6 +891,7 @@ public:
 
         if (!buffer)
         {
+          std::cout << "HEREHRHEHRE no buffer" << std::endl;
           // buffer invalid
           return nullptr;
         }
