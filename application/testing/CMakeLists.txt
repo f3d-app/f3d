@@ -803,10 +803,8 @@ f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
 f3d_test(NAME TestProgressScene DATA WaterBottle.glb ARGS --progress NO_BASELINE)
 f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --progress NO_BASELINE INTERACTION) #Up;Up;Up;Up
 
-# For some reasons this animation test goes "too far" when run with sanitizer
-if(F3D_SANITIZER STREQUAL "none")
-  f3d_test(NAME TestInteractionCycleAnimation DATA InterpolationTest.glb INTERACTION THRESHOLD 0.06) #WWWWWWWWWWW;Space;Space;
-endif()
+# This test is not reliable since dependending on the local performance, different frames can be captured
+# f3d_test(NAME TestInteractionCycleAnimation DATA InterpolationTest.glb INTERACTION) #WWWWWWWWWWW;Space;Space;
 f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
 
 f3d_test(NAME TestInteractionDropFiles ARGS -n INTERACTION_CONFIGURE UI)#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;

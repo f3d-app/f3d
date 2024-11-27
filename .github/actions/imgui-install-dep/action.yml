@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/imgui_install
-        key: imgui-v1.91.5-${{runner.os}}-${{inputs.cpu}}-2
+        key: imgui-v1.91.5-${{runner.os}}-${{inputs.cpu}}-3
 
     - name: Checkout ImGui
       if: steps.cache-imgui.outputs.cache-hit != 'true'
