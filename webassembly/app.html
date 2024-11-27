@@ -186,7 +186,7 @@
           ['ssao', 'render.effect.ambient_occlusion'],
           ['ambient', 'render.hdri.ambient'],
         ]
-        // This assumes all toggles are on before mapping their state to options
+        // This assumes all toggles are 'on' before mapping their state to options
         // Ok after f3d(settings) where settings = {..., setupOptions} which toggles some options
         for (let [id, option] of idOptionMappings) {
           mapToggleIdToOption(id, option);
@@ -278,6 +278,10 @@
                 openFile(filename);
               });
             })
+            .catch(function (error) {
+              console.log('error catched during fetch', error)
+              alert('Error occured while fetching the model at provided url (passed as url-param). \n\nThis might be a CORS issue (you can avoid it by using a Allow-CORS plugin) because server does not allow cross-origin requests, or the url to the file is wrong. \n\nComplete error message: ' + error.message)
+            });
           } else {
             // load the file located in the virtual filesystem
             openFile('f3d.vtp');
@@ -286,10 +290,8 @@
           // Parse other options like #axis=false&grid=false&fxaa=false&tone=false&ssao=false&ambient=false
           const options = Module.engineInstance.getOptions()
           for (let [id, option] of idOptionMappings) {
-            console.log(id, option)
             // Set f3d option parameter values
             const parsed_param_value = params.get(id);
-            console.log('  ', parsed_param_value, typeof parsed_param_value)
             if (parsed_param_value && parsed_param_value.toLowerCase() === 'false') {
               // we can use toggle, set_string, set_integer, set_color
               // sad thing is toggle requires knowing the param state beforehand, rather than setting it explicitly
