@@ -2,7 +2,7 @@
  * @class   vtkF3DUIActor
  * @brief   A basic implementation for UI context handler and renderer
  *
- * This is overriden by vtkF3DImguiActor if F3D_MODULE_UI is enabled
+ * This is overridden by vtkF3DImguiActor if F3D_MODULE_UI is enabled
  */
 
 #ifndef vtkF3DUIActor_h
