@@ -279,7 +279,6 @@ void vtkF3DRenderer::Initialize()
   this->HDRISpecularConfigured = false;
   this->HDRISkyboxConfigured = false;
 
-  this->AnimationNameInfo = "";
   this->GridInfo = "";
 
   this->AddActor2D(this->ScalarBarActor);
@@ -1359,73 +1358,11 @@ void vtkF3DRenderer::ShowCheatSheet(bool show)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ConfigureCheatSheet()
+void vtkF3DRenderer::ConfigureCheatSheet(const std::string& info)
 {
-  assert(this->Importer);
   if (this->CheatSheetVisible)
   {
-    auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
-    std::stringstream cheatSheetText;
-    cheatSheetText << "\n";
-    cheatSheetText << " C: Cell scalars coloring [" << (this->UseCellColoring ? "ON" : "OFF")
-      << "]\n";
-    cheatSheetText << " S: Scalars coloring ["
-      << (info.has_value() ? vtkF3DRenderer::ShortName(info.value().Name, 19) + (this->EnableColoring ? "" : "(forced)") : "OFF") << "]\n";
-    cheatSheetText << " Y: Coloring component ["
-      << vtkF3DRenderer::ComponentToString(this->ComponentForColoring)
-      << "]\n";
-    cheatSheetText << " B: Scalar bar " << (this->ScalarBarVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " V: Volume representation " << (this->UseVolume ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " I: Inverse volume opacity "
-      << (this->UseInverseOpacityFunction ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " O: Point sprites " << (this->UsePointSprites ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " W: Cycle animation ["
-      << vtkF3DRenderer::ShortName(this->AnimationNameInfo, 22) << "]\n";
-    cheatSheetText << " P: Translucency support " << (this->UseDepthPeelingPass ? "[ON]" : "[OFF]")
-      << "\n";
-    cheatSheetText << " Q: Ambient occlusion " << (this->UseSSAOPass ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " A: Anti-aliasing " << (this->UseFXAAPass ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " T: Tone mapping " << (this->UseToneMappingPass ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " E: Edge visibility " << (this->EdgeVisible.has_value() ? (this->EdgeVisible.value() ? "[ON]" : "[OFF]") : "[NOT SET]") << "\n";
-    cheatSheetText << " X: Axis " << (this->AxisVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " G: Grid " << (this->GridVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " N: File name " << (this->FilenameVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " M: Metadata " << (this->MetaDataVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " Z: FPS Timer " << (this->TimerVisible ? "[ON]" : "[OFF]") << "\n";
-#if F3D_MODULE_RAYTRACING
-    cheatSheetText << " R: Raytracing " << (this->UseRaytracing ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " D: Denoiser " << (this->UseRaytracingDenoiser ? "[ON]" : "[OFF]") << "\n";
-#endif
-    cheatSheetText << " U: Blur background " << (this->UseBlurBackground ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " K: Trackball interaction " << (this->UseTrackball ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " F: HDRI ambient lighting "
-      << (this->GetUseImageBasedLighting() ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText << " J: HDRI skybox " << (this->HDRISkyboxVisible ? "[ON]" : "[OFF]") << "\n";
-    cheatSheetText.precision(2);
-    cheatSheetText << std::fixed;
-    cheatSheetText << " L: Light (increase, shift+L: decrease) [" << this->LightIntensity << "]"
-      << " \n";
-
-    cheatSheetText << "\n   H  : Cheat sheet \n";
-    cheatSheetText << "   ?  : Print scene descr to terminal\n";
-    cheatSheetText << "  ESC : Quit \n";
-    cheatSheetText << " SPACE: Play animation if any\n";
-    cheatSheetText << " LEFT : Previous file \n";
-    cheatSheetText << " RIGHT: Next file \n";
-    cheatSheetText << "  UP  : Reload current file \n";
-    cheatSheetText << " DOWN : Add files from dir of current file\n";
-    cheatSheetText << "\n 1: Front View camera\n";
-    cheatSheetText << " 3: Right View camera\n";
-    cheatSheetText << " 4: Roll the camera left by 90 degrees\n";
-    cheatSheetText << " 5: Toggle Orthographic Projection "
-      << (this->UseOrthographicProjection.has_value() ? (this->UseOrthographicProjection.value() ? "[ON]" : "[OFF]") : "[NOT SET]") << "\n";
-    cheatSheetText << " 6: Roll the camera right by 90 degrees\n";
-    cheatSheetText << " 7: Top View camera\n";
-    cheatSheetText << " 9: Isometric View camera\n";
-    cheatSheetText << " ENTER: Reset camera to initial parameters\n";
-    cheatSheetText << " Drop  : Load dropped file, folder or HDRI\n";
-
-    this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, cheatSheetText.str().c_str());
+    this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, info.c_str());
     this->CheatSheetActor->RenderOpaqueGeometry(this);
     this->CheatSheetConfigured = true;
   }
@@ -1579,11 +1516,6 @@ void vtkF3DRenderer::UpdateActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
-  if (!this->CheatSheetConfigured)
-  {
-    this->ConfigureCheatSheet();
-  }
-
   if (!this->TimerVisible)
   {
     this->Superclass::Render();
@@ -1702,26 +1634,6 @@ void vtkF3DRenderer::CreateCacheDirectory()
 
   // Create the folder if it does not exists
   vtksys::SystemTools::MakeDirectory(currentCachePath);
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::SetAnimationnameInfo(const std::string& info)
-{
-  this->AnimationNameInfo = info;
-  this->CheatSheetConfigured = false;
-}
-
-//----------------------------------------------------------------------------
-std::string vtkF3DRenderer::ShortName(const std::string& name, int maxChar)
-{
-  if (name.size() <= static_cast<size_t>(maxChar) || maxChar <= 3)
-  {
-    return name;
-  }
-  else
-  {
-    return name.substr(0, maxChar - 3) + "...";
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -2717,4 +2629,16 @@ std::string vtkF3DRenderer::ComponentToString(int component)
     }
     return componentName;
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::CheatSheetNeedsUpdate() const
+{
+  return this->CheatSheetVisible && !this->CheatSheetConfigured;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetCheatSheetConfigured(bool flag)
+{
+  this->CheatSheetConfigured = flag;
 }

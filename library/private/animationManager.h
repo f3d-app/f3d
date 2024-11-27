@@ -20,16 +20,16 @@ class vtkRenderWindow;
 namespace f3d
 {
 class options;
-class window;
 
 namespace detail
 {
 class interactor_impl;
+class window_impl;
 
 class animationManager
 {
 public:
-  animationManager(const options& options, window& window);
+  animationManager(const options& options, window_impl& window);
   ~animationManager() = default;
 
   /**
@@ -107,7 +107,7 @@ private:
   void Tick();
 
   const options& Options;
-  window& Window;
+  window_impl& Window;
   vtkImporter* Importer = nullptr;
   interactor_impl* Interactor = nullptr;
 

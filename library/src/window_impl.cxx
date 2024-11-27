@@ -40,6 +40,8 @@
 #include <vtkOSOpenGLRenderWindow.h>
 #endif
 
+#include <sstream>
+
 namespace f3d::detail
 {
 class window_impl::internals
@@ -90,6 +92,7 @@ public:
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkNew<vtkF3DRenderer> Renderer;
   const options& Options;
+  interactor_impl* Interactor = nullptr;
   std::string CachePath;
   context::function GetProcAddress;
 };
@@ -259,13 +262,6 @@ int window_impl::getWidth() const
 int window_impl::getHeight() const
 {
   return this->Internals->RenWin->GetSize()[1];
-}
-
-//----------------------------------------------------------------------------
-window& window_impl::setAnimationNameInfo(const std::string& name)
-{
-  this->Internals->Renderer->SetAnimationnameInfo(name);
-  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -450,6 +446,31 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
 
   renderer->UpdateActors();
+
+  // Update the cheatsheet if needed
+  if (this->Internals->Interactor && renderer->CheatSheetNeedsUpdate())
+  {
+    std::stringstream cheatSheetStream;
+    cheatSheetStream << "\n";
+    for (const std::string& group : this->Internals->Interactor->getBindGroups())
+    {
+      for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
+      {
+        auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
+        if (!doc.empty())
+        {
+          // XXX: This formatting will be reworked during ImGUI work
+          cheatSheetStream << " " << bind.format() << ": " << doc;
+          if (!val.empty())
+          {
+            cheatSheetStream << " [" << val << "]";
+          }
+          cheatSheetStream << "\n";
+        }
+      }
+    }
+    renderer->ConfigureCheatSheet(cheatSheetStream.str());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -521,5 +542,11 @@ void window_impl::SetImporter(vtkF3DMetaImporter* importer)
 void window_impl::SetCachePath(const std::string& cachePath)
 {
   this->Internals->CachePath = cachePath;
+}
+
+//----------------------------------------------------------------------------
+void window_impl::SetInteractor(interactor_impl* interactor)
+{
+  this->Internals->Interactor = interactor;
 }
 };

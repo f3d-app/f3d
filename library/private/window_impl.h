@@ -11,6 +11,7 @@
 #define f3d_window_impl_h
 
 #include "context.h"
+#include "interactor_impl.h"
 #include "log.h"
 #include "window.h"
 
@@ -50,7 +51,6 @@ public:
   image renderToImage(bool noBackground = false) override;
   int getWidth() const override;
   int getHeight() const override;
-  window& setAnimationNameInfo(const std::string& name);
   window& setSize(int width, int height) override;
   window& setPosition(int x, int y) override;
   window& setIcon(const unsigned char* icon, size_t iconSize) override;
@@ -109,6 +109,12 @@ public:
    * Set the cache path.
    */
   void SetCachePath(const std::string& cachePath);
+
+  /**
+   * Implementation only API.
+   * Set the interactor to use when recovering bindings documentation.
+   */
+  void SetInteractor(interactor_impl* interactor);
 
 private:
   class internals;

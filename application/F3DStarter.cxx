@@ -3,6 +3,7 @@
 #include "F3DColorMapTools.h"
 #include "F3DConfig.h"
 #include "F3DConfigFileTools.h"
+#include "F3DException.h"
 #include "F3DIcon.h"
 #include "F3DNSDelegate.h"
 #include "F3DOptionsTools.h"
@@ -68,6 +69,7 @@ public:
   struct F3DAppOptions
   {
     std::string Output;
+    bool BindingsList;
     bool NoBackground;
     bool NoRender;
     std::string RenderingBackend;
@@ -558,6 +560,7 @@ public:
   {
     // Update typed app options from app options
     this->AppOptions.Output = f3d::options::parse<std::string>(appOptions.at("output"));
+    this->AppOptions.BindingsList = f3d::options::parse<bool>(appOptions.at("bindings-list"));
     this->AppOptions.NoBackground = f3d::options::parse<bool>(appOptions.at("no-background"));
     this->AppOptions.NoRender = f3d::options::parse<bool>(appOptions.at("no-render"));
     this->AppOptions.RenderingBackend =
@@ -770,7 +773,8 @@ int F3DStarter::Start(int argc, char** argv)
   }
   else
   {
-    bool offscreen = !reference.empty() || !output.empty();
+    bool offscreen =
+      !reference.empty() || !output.empty() || this->Internals->AppOptions.BindingsList;
 
     if (this->Internals->AppOptions.RenderingBackend == "egl")
     {
@@ -905,18 +909,32 @@ int F3DStarter::Start(int argc, char** argv)
         }
       });
 
-    interactor.addBinding("Left", f3d::interactor::ModifierKeys::NONE, "load_previous_file_group");
-    interactor.addBinding("Right", f3d::interactor::ModifierKeys::NONE, "load_next_file_group");
-    interactor.addBinding("Up", f3d::interactor::ModifierKeys::NONE, "reload_current_file_group");
-    interactor.addBinding("Down", f3d::interactor::ModifierKeys::NONE, "add_current_directories");
-    interactor.addBinding("F11", f3d::interactor::ModifierKeys::NONE, "take_minimal_screenshot");
-    interactor.addBinding("F12", f3d::interactor::ModifierKeys::NONE, "take_screenshot");
+    // "doc"
+    auto docString = [](const std::string& doc) -> std::pair<std::string, std::string>
+    { return std::make_pair(doc, ""); };
+
+    using mod_t = f3d::interaction_bind_t::ModifierKeys;
+    interactor.addBinding({ mod_t::NONE, "Left" }, "load_previous_file_group", "Others",
+      std::bind(docString, "Load previous file group"));
+    interactor.addBinding({ mod_t::NONE, "Right" }, "load_next_file_group", "Others",
+      std::bind(docString, "Load next file group"));
+    interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others",
+      std::bind(docString, "Reload current file group"));
+    interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others",
+      std::bind(docString, "Add files from dir of current file"));
+    interactor.addBinding({ mod_t::NONE, "F11" }, "take_minimal_screenshot", "Others",
+      std::bind(docString, "Take a minimal screenshot"));
+    interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others",
+      std::bind(docString, "Take a screenshot"));
 
     // This replace an existing default interaction command in the libf3d
-    interactor.removeBinding("Drop", f3d::interactor::ModifierKeys::NONE);
-    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::NONE, "add_files_or_set_hdri");
-    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::CTRL, "add_files");
-    interactor.addBinding("Drop", f3d::interactor::ModifierKeys::SHIFT, "set_hdri");
+    interactor.removeBinding({ mod_t::NONE, "Drop" });
+    interactor.addBinding({ mod_t::NONE, "Drop" }, "add_files_or_set_hdri", "Others",
+      std::bind(docString, "Load dropped files, folder or HDRI"));
+    interactor.addBinding({ mod_t::CTRL, "Drop" }, "add_files", "Others",
+      std::bind(docString, "Load dropped files or folder"));
+    interactor.addBinding(
+      { mod_t::SHIFT, "Drop" }, "set_hdri", "Others", std::bind(docString, "Set HDRI and use it"));
   }
 
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
@@ -935,6 +953,24 @@ int F3DStarter::Start(int argc, char** argv)
   {
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
+
+    // Print bindings list and exits if needed
+    if (this->Internals->AppOptions.BindingsList)
+    {
+      f3d::log::info("Bindings:");
+      for (const std::string& group : interactor.getBindGroups())
+      {
+        f3d::log::info(" ", group, ":");
+        for (const f3d::interaction_bind_t& bind : interactor.getBindsForGroup(group))
+        {
+          // XXX: Formatting could be improved here
+          auto [doc, val] = interactor.getBindingDocumentation(bind);
+          F3DOptionsTools::PrintHelpPair(bind.format(), doc, 12);
+        }
+        f3d::log::info("");
+      }
+      throw F3DExNoProcess("bindings list requested");
+    }
 
     // Play recording if any
     const std::string& interactionTestPlayFile =

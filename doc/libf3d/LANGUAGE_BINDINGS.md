@@ -1,4 +1,4 @@
-# Bindings
+# Language Bindings
 
 ## Python
 
