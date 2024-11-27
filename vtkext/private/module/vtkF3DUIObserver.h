@@ -23,12 +23,13 @@ public:
    */
   virtual void InstallObservers(vtkRenderWindowInteractor*) {}
 
-  vtkF3DUIObserver(const vtkF3DUIObserver&) = delete;
-  void operator=(const vtkF3DUIObserver&) = delete;
-
 protected:
   vtkF3DUIObserver() = default;
   ~vtkF3DUIObserver() override = default;
+
+private:
+  vtkF3DUIObserver(const vtkF3DUIObserver&) = delete;
+  void operator=(const vtkF3DUIObserver&) = delete;
 };
 
 #endif

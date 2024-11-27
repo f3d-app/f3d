@@ -24,9 +24,6 @@ public:
    */
   void InstallObservers(vtkRenderWindowInteractor* interactor) override;
 
-  vtkF3DImguiObserver(const vtkF3DImguiObserver&) = delete;
-  void operator=(const vtkF3DImguiObserver&) = delete;
-
 protected:
   vtkF3DImguiObserver() = default;
   ~vtkF3DImguiObserver() override = default;
@@ -51,6 +48,9 @@ private:
    * Trigger a window rendering, but render only the UI/overlay actors.
    */
   void RenderUI(vtkRenderWindowInteractor* interactor);
+
+  vtkF3DImguiObserver(const vtkF3DImguiObserver&) = delete;
+  void operator=(const vtkF3DImguiObserver&) = delete;
 };
 
 #endif

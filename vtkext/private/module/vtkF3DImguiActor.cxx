@@ -20,10 +20,9 @@
 
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
-
 #include "F3DFontBuffer.h"
 
-#include "imgui.h"
+#include <imgui.h>
 
 struct vtkF3DImguiActor::Internals
 {
@@ -174,17 +173,17 @@ struct vtkF3DImguiActor::Internals
           (cmd->ClipRect.x - clipOff.x) * clipScale.x, (cmd->ClipRect.y - clipOff.y) * clipScale.y);
         ImVec2 clipMax(
           (cmd->ClipRect.z - clipOff.x) * clipScale.x, (cmd->ClipRect.w - clipOff.y) * clipScale.y);
-        if (clipMax.x <= clipMin.x || clipMax.y <= clipMin.y)
-          continue;
+        if (clipMax.x > clipMin.x && clipMax.y > clipMin.y)
+        {
+          // Apply scissor/clipping rectangle (Y is inverted in OpenGL)
+          float fbHeight = drawData->DisplaySize.y * drawData->FramebufferScale.y;
+          state->vtkglScissor(static_cast<GLint>(clipMin.x), static_cast<GLint>(fbHeight - clipMax.y),
+            static_cast<GLsizei>(clipMax.x - clipMin.x), static_cast<GLsizei>(clipMax.y - clipMin.y));
 
-        // Apply scissor/clipping rectangle (Y is inverted in OpenGL)
-        float fbHeight = drawData->DisplaySize.y * drawData->FramebufferScale.y;
-        state->vtkglScissor(static_cast<GLint>(clipMin.x), static_cast<GLint>(fbHeight - clipMax.y),
-          static_cast<GLsizei>(clipMax.x - clipMin.x), static_cast<GLsizei>(clipMax.y - clipMin.y));
-
-        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(cmd->ElemCount),
-          sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
-          reinterpret_cast<void*>(cmd->IdxOffset * sizeof(ImDrawIdx)));
+          glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(cmd->ElemCount),
+            sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
+            reinterpret_cast<void*>(cmd->IdxOffset * sizeof(ImDrawIdx)));
+        }
       }
     }
 
@@ -295,12 +294,7 @@ void vtkF3DImguiActor::StartFrame(vtkOpenGLRenderWindow* renWin)
 
   this->Pimpl->Initialize(renWin);
 
-  io.DisplaySize = ImVec2(static_cast<float>(size[0]), static_cast<float>(size[1]));
-
   ImGui::NewFrame();
-
-  // debug
-  // ImGui::ShowDemoWindow(nullptr);
 }
 
 //----------------------------------------------------------------------------

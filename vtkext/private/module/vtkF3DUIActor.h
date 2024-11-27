@@ -46,9 +46,6 @@ public:
    */
   int RenderOverlay(vtkViewport* vp) override;
 
-  vtkF3DUIActor(const vtkF3DUIActor&) = delete;
-  void operator=(const vtkF3DUIActor&) = delete;
-
 protected:
   vtkF3DUIActor();
   ~vtkF3DUIActor() override;
@@ -71,6 +68,10 @@ protected:
   bool FileNameVisible = false;
   std::string FileName = "";
   std::string FontFile = "";
+
+private:
+  vtkF3DUIActor(const vtkF3DUIActor&) = delete;
+  void operator=(const vtkF3DUIActor&) = delete;
 };
 
 #endif

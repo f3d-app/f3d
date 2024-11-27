@@ -31,9 +31,6 @@ public:
    */
   void ReleaseGraphicsResources(vtkWindow* w) override;
 
-  vtkF3DImguiActor(const vtkF3DImguiActor&) = delete;
-  void operator=(const vtkF3DImguiActor&) = delete;
-
 protected:
   vtkF3DImguiActor();
   ~vtkF3DImguiActor() override;
@@ -58,6 +55,10 @@ private:
    * Render the filename UI widget
    */
   void RenderFileName() override;
+
+private:
+  vtkF3DImguiActor(const vtkF3DImguiActor&) = delete;
+  void operator=(const vtkF3DImguiActor&) = delete;
 };
 
 #endif

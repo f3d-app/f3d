@@ -3,7 +3,7 @@
  * @brief   A F3D dedicated renderer
  *
  * This renderers all the generic actors added by F3D which includes
- * axis, grid, edges, timer, metadata and cheatsheet.
+ * UI, axis, grid, edges, timer, metadata and cheatsheet.
  * It also handles the different rendering passes, including
  * raytracing, ssao, fxaa, tonemapping.
  */

@@ -9,7 +9,7 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 
-#include "imgui.h"
+#include <imgui.h>
 
 namespace
 {

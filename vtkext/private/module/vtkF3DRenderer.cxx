@@ -1106,7 +1106,7 @@ void vtkF3DRenderer::ConfigureTextActors()
       this->CheatSheetActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
       this->DropZoneActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
       this->DropZoneActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
-      this->UIActor->SetFontFile(tmpFontFile.c_str());
+      this->UIActor->SetFontFile(tmpFontFile);
     }
     else
     {

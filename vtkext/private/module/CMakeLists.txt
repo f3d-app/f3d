@@ -5,28 +5,33 @@ configure_file(
 
 set(F3D_DEFAULT_HDRI "${F3D_SOURCE_DIR}/resources/defaultHDRI.png" CACHE STRING "Default HDRI when no HDRI file is provided")
 mark_as_advanced(F3D_DEFAULT_HDRI)
-set(F3D_FONT_FILE "${F3D_SOURCE_DIR}/resources/Inter-Regular.ttf" CACHE STRING "Font used in UI widgets")
-mark_as_advanced(F3D_FONT_FILE)
 include("f3dEmbed")
 f3d_embed_file(
   INPUT "${F3D_DEFAULT_HDRI}"
   NAME F3DDefaultHDRI
   BINARY)
-f3d_embed_file(
-  INPUT "${F3D_FONT_FILE}"
-  NAME F3DFontBuffer
-  BINARY)
-set(sources
-  ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.cxx
-  ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.cxx)
-set(private_headers
-  ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h
-  ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.h)
 
-set(shader_files
-  glsl/vtkF3DComputeDepthCS.glsl
-  glsl/vtkF3DImguiFS.glsl
-  glsl/vtkF3DImguiVS.glsl)
+set(sources ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.cxx)
+set(private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
+
+if(F3D_MODULE_UI)
+  set(F3D_FONT_FILE "${F3D_SOURCE_DIR}/resources/Inter-Regular.ttf" CACHE STRING "Font used in UI widgets")
+  mark_as_advanced(F3D_FONT_FILE)
+
+  f3d_embed_file(
+    INPUT "${F3D_FONT_FILE}"
+    NAME F3DFontBuffer
+    BINARY)
+
+  list(APPEND sources ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.cxx)
+  list(APPEND private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.h)
+endif()
+
+set(shader_files glsl/vtkF3DComputeDepthCS.glsl)
+
+if(F3D_MODULE_UI)
+  list(APPEND shader_files glsl/vtkF3DImguiFS.glsl glsl/vtkF3DImguiVS.glsl)
+endif()
 
 foreach(file IN LISTS shader_files)
   vtk_encode_string(
