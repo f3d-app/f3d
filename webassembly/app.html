@@ -279,8 +279,8 @@
               });
             })
             .catch(function (error) {
-              console.log('error catched during fetch', error)
-              alert('Error occured while fetching the model at provided url (passed as url-param). \n\nThis might be a CORS issue (you can avoid it by using a Allow-CORS plugin) because server does not allow cross-origin requests, or the url to the file is wrong. \n\nComplete error message: ' + error.message)
+              console.log('error caught during fetch', error)
+              alert('Error occurred while fetching the model at provided url (passed as url-param). \n\nThis might be a CORS issue (you can avoid it by using a Allow-CORS plugin) because server does not allow cross-origin requests, or the url to the file is wrong. \n\nComplete error message: ' + error.message)
             });
           } else {
             // load the file located in the virtual filesystem
