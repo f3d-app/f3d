@@ -1009,20 +1009,7 @@ int F3DStarter::Start(int argc, char** argv)
         {
           if (!command.empty() && command[0] != '#')
           {
-            try
-            {
-              interactor.triggerCommand(command);
-            }
-            catch (const std::exception& e)
-            {
-              f3d::log::error("Exception caught while processing command: ", e.what());
-              return EXIT_FAILURE;
-            }
-            catch (...)
-            {
-              f3d::log::error("Unknown exception caught while processing command.");
-              return EXIT_FAILURE;
-            }
+            interactor.triggerCommand(command);
           }
         }
         scriptFile.close();

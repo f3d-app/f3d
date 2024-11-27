@@ -850,8 +850,8 @@ f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=
 f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log DEPENDS TestInteractionRecord NO_BASELINE)
 
 # Command Script Test
-f3d_test(NAME TestCommandScriptMissingFile DATA dragon.vtu ARGS --command-script=${F3D_SOURCE_DIR}/Testing/data/goodScript.txt NO_BASELINE)
-f3d_test(NAME TestCommandScriptBasic DATA dragon.vtu ARGS --command-script=missing_script.txt REGEXP "Unable to open command script file" NO_BASELINE)
+f3d_test(NAME TestCommandScriptBasic DATA dragon.vtu ARGS --command-script=${F3D_SOURCE_DIR}/Testing/data/TestCommandScriptBasic.txt --ref=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptBasic.png)
+f3d_test(NAME TestCommandScriptInvalidCommand DATA dragon.vtu ARGS --command-script=${F3D_SOURCE_DIR}/Testing/data/TestCommandScriptInvalid.txt REGEXP "Command: \"INVALID_COMMAND_1\" is not recognized, ignoring" NO_BASELINE)
 
 # Window position test
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
