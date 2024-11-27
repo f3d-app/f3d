@@ -1,6 +1,8 @@
+[
 {
-    ".*":
-    {
-      "scene.animation.index": "nonparsable"
-    }
+  "options":
+  {
+    "scene.animation.index": "nonparsable"
+  }
 }
+]

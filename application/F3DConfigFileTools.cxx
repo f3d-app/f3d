@@ -177,7 +177,7 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
       continue;
     }
 
-    // For each config "pattern"
+    // For each config block in the main array
     for (const auto& configBlock : json)
     {
       // Recover match if any

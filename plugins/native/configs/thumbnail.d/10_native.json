@@ -1,25 +1,39 @@
+[
 {
-  ".*(dcm|nrrd|mhd|mha|vti)":
+  "match": ".*(dcm|nrrd|mhd|mha|vti)",
+  "options":
   {
     "scalar-coloring": true,
     "volume": true
-  },
-  ".*(3ds|stl)":
+  }
+},
+{
+  "match": ".*(3ds|stl)",
+  "options":
   {
     "up": "+Z",
     "camera-direction": "-1,1,-0.5"
-  },
-  ".*(stl|gml|pts|vt.)":
+  }
+},
+{
+  "match": ".*(stl|gml|pts|vt.)",
+  "options":
   {
     "scalar-coloring": true
-  },
-  ".*(ply)":
+  }
+},
+{
+  "match": ".*(ply)",
+  "options":
   {
     "scalar-coloring": true,
     "comp": "-2",
     "translucency-support": true
-  },
-  ".*(splat)":
+  }
+},
+{
+  "match": ".*(splat)",
+  "options":
   {
     "point-sprites": true,
     "point-sprites-size": 1,
@@ -36,3 +50,4 @@
     "translucency-support": false
   }
 }
+]
