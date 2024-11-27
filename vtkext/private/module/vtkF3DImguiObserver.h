@@ -2,6 +2,7 @@
  * @class   vtkF3DImguiObserver
  * @brief   VTK ImGui event observer
  *
+ * This class is used instead of the generic vtkF3DUIObserver if F3D_MODULE_UI is enabled
  */
 
 #ifndef vtkF3DImguiObserver_h
@@ -31,6 +32,10 @@ protected:
   ~vtkF3DImguiObserver() override = default;
 
 private:
+  //@{
+  /**
+   * Callbacks called when an event is invoked by the interactor
+   */
   bool MouseMove(vtkObject* caller, unsigned long, void*);
   bool MouseLeftPress(vtkObject* caller, unsigned long, void*);
   bool MouseLeftRelease(vtkObject* caller, unsigned long, void*);
@@ -40,7 +45,11 @@ private:
   bool MouseWheelBackward(vtkObject* caller, unsigned long, void*);
   bool KeyPress(vtkObject* caller, unsigned long, void*);
   bool KeyRelease(vtkObject* caller, unsigned long, void*);
+  //@}
 
+  /**
+   * Trigger a window rendering, but render only the UI/overlay actors.
+   */
   void RenderUI(vtkRenderWindowInteractor* interactor);
 };
 

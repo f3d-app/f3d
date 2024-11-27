@@ -19,7 +19,7 @@ void vtkF3DUIActor::SetFileNameVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DUIActor::ReportFileName(const std::string& filename)
+void vtkF3DUIActor::SetFileName(const std::string& filename)
 {
   this->FileName = filename;
 }

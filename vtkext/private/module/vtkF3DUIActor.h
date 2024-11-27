@@ -1,8 +1,8 @@
 /**
  * @class   vtkF3DUIActor
- * @brief   An interface for UI context handler and renderer
+ * @brief   A basic implementation for UI context handler and renderer
  *
- * This interface is implemented by vtkF3DImguiActor if module is enabled
+ * This is overriden by vtkF3DImguiActor if F3D_MODULE_UI is enabled
  */
 
 #ifndef vtkF3DUIActor_h
@@ -18,13 +18,32 @@ public:
   static vtkF3DUIActor* New();
   vtkTypeMacro(vtkF3DUIActor, vtkProp);
 
+  /**
+  * Initialize the UI actor resources
+  */
   virtual void Initialize(vtkOpenGLRenderWindow*) {}
 
+  /**
+   * Set the filename visibility
+   * False by default
+   */
   void SetFileNameVisibility(bool show);
-  void ReportFileName(const std::string& filename);
 
+  /**
+   * Set the filename string
+   * Empty by default
+   */
+  void SetFileName(const std::string& filename);
+
+  /**
+   * Set the font file path
+   * Use Inter font by default if empty
+   */
   void SetFontFile(const std::string& font);
 
+  /**
+   * Render the UI actor
+   */
   int RenderOverlay(vtkViewport* vp) override;
 
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
@@ -34,9 +53,19 @@ protected:
   vtkF3DUIActor();
   ~vtkF3DUIActor() override;
 
+  /**
+   * Called at the beginning of the rendering step
+   */
   virtual void StartFrame(vtkOpenGLRenderWindow*) {}
+
+  /**
+   * Called at the end of the rendering step
+   */
   virtual void EndFrame(vtkOpenGLRenderWindow*) {}
 
+  /**
+   * Render the filename UI widget
+   */
   virtual void RenderFileName() {}
 
   bool FileNameVisible = false;

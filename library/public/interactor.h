@@ -252,6 +252,7 @@ public:
 
   /**
    * Start the interactor.
+   * Make sure the window is initialized first, by calling `window.render()`
    */
   virtual void start() = 0;
 

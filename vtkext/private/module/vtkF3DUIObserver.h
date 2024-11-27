@@ -1,8 +1,8 @@
 /**
  * @class   vtkF3DUIObserver
- * @brief   An interface for UI event observer
+ * @brief   A basic implementation for UI event observer
  *
- * Implemented by vtkF3DImguiObserver
+ * This is overriden by vtkF3DImguiObserver if F3D_MODULE_UI is enabled
  */
 
 #ifndef vtkF3DUIObserver_h
